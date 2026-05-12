@@ -1,11 +1,1435 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>VMPix V3</title>
-  </head>
-  <body>
-    <h1>VMPix V3 Development Shell</h1>
-    <p>Static preview placeholder.</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VMPix V3 Admin Shell Alpha 1</title>
+  <style>
+    /* =========================================================
+       VMPix V3 Admin Shell Alpha 1
+       Static prototype only: no APIs, no auth, no dependencies.
+       ========================================================= */
+
+    :root {
+      color-scheme: dark;
+      --bg: #050913;
+      --bg-deep: #02040b;
+      --panel: rgba(9, 18, 34, 0.78);
+      --panel-strong: rgba(12, 26, 48, 0.92);
+      --panel-soft: rgba(10, 22, 42, 0.54);
+      --line: rgba(127, 219, 255, 0.24);
+      --line-strong: rgba(127, 219, 255, 0.44);
+      --cyan: #67e8ff;
+      --cyan-soft: rgba(103, 232, 255, 0.16);
+      --blue: #56a8ff;
+      --purple: #9d7cff;
+      --green: #72f2b4;
+      --amber: #ffd166;
+      --red: #ff6b8a;
+      --text: #edf8ff;
+      --muted: #9cb4c9;
+      --faint: #65819a;
+      --shadow: 0 22px 80px rgba(0, 0, 0, 0.44);
+      --glow-cyan: 0 0 26px rgba(103, 232, 255, 0.22);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --tap: 48px;
+      --topbar: 72px;
+      --bottom-nav: 76px;
+      --content-max: 1480px;
+      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--bg-deep);
+    }
+
+    body {
+      min-height: 100svh;
+      margin: 0;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 20% -10%, rgba(86, 168, 255, 0.18), transparent 34rem),
+        radial-gradient(circle at 90% 5%, rgba(157, 124, 255, 0.13), transparent 28rem),
+        linear-gradient(160deg, var(--bg), #071121 48%, var(--bg-deep));
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      background:
+        linear-gradient(rgba(103, 232, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(103, 232, 255, 0.03) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 78%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .hud-label {
+      margin: 0;
+      color: var(--faint);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      margin: 0;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 0.65rem;
+      height: 0.65rem;
+      display: inline-block;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 16px rgba(114, 242, 180, 0.55);
+    }
+
+    .status-dot.is-cyan {
+      background: var(--cyan);
+      box-shadow: 0 0 16px rgba(103, 232, 255, 0.5);
+    }
+
+    .status-dot.is-amber {
+      background: var(--amber);
+      box-shadow: 0 0 16px rgba(255, 209, 102, 0.48);
+    }
+
+    .status-dot.is-red {
+      background: var(--red);
+      box-shadow: 0 0 16px rgba(255, 107, 138, 0.48);
+    }
+
+    /* =========================
+       Top status bar
+       ========================= */
+
+    .top-status {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      min-height: var(--topbar);
+      padding:
+        calc(0.8rem + env(safe-area-inset-top))
+        max(1rem, env(safe-area-inset-right))
+        0.8rem
+        max(1rem, env(safe-area-inset-left));
+      border-bottom: 1px solid var(--line);
+      background: rgba(3, 8, 18, 0.9);
+      box-shadow: 0 12px 42px rgba(0, 0, 0, 0.34);
+      backdrop-filter: blur(14px);
+    }
+
+    .top-status-inner {
+      width: min(100%, var(--content-max));
+      margin: 0 auto;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .brand-row {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-lockup {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-mark {
+      width: 2.4rem;
+      height: 2.4rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(103, 232, 255, 0.24), transparent 58%),
+        rgba(8, 20, 39, 0.7);
+      color: var(--cyan);
+      font-size: 0.78rem;
+      font-weight: 900;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: clamp(1rem, 4vw, 1.35rem);
+      font-weight: 850;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand-copy p {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .env-pill {
+      min-height: 2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(157, 124, 255, 0.38);
+      border-radius: 999px;
+      background: rgba(157, 124, 255, 0.12);
+      color: #d7ccff;
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .status-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .status-chip {
+      min-width: 0;
+      min-height: 2.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid rgba(127, 219, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(9, 20, 39, 0.66);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .status-chip strong {
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    /* =========================
+       Shell layout
+       ========================= */
+
+    .shell-body {
+      width: min(100%, var(--content-max));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+      padding:
+        1rem
+        max(1rem, env(safe-area-inset-right))
+        calc(var(--bottom-nav) + 1.25rem + env(safe-area-inset-bottom))
+        max(1rem, env(safe-area-inset-left));
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .shared-viewport {
+      min-width: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .viewport-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .viewport-header h2 {
+      margin: 0.15rem 0 0;
+      color: var(--text);
+      font-size: clamp(1.45rem, 7vw, 2.8rem);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .viewport-header p {
+      max-width: 42rem;
+      margin: 0.5rem 0 0;
+      color: var(--muted);
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      line-height: 1.55;
+    }
+
+    .viewport-badge {
+      display: none;
+      min-height: 2.4rem;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid rgba(114, 242, 180, 0.3);
+      border-radius: 999px;
+      background: rgba(114, 242, 180, 0.1);
+      color: #c6ffe2;
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       Dashboard composition
+       ========================= */
+
+    .dashboard-grid {
+      min-width: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .panel {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(145deg, rgba(127, 219, 255, 0.075), transparent 40%),
+        var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .panel::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      border-radius: inherit;
+      background:
+        linear-gradient(90deg, transparent, rgba(103, 232, 255, 0.08), transparent)
+        0 0 / 180% 1px no-repeat;
+      opacity: 0.8;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1rem 0;
+    }
+
+    .panel-body {
+      padding: 1rem;
+    }
+
+    .panel-meta {
+      color: var(--faint);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       Nexus Core center panel
+       ========================= */
+
+    .nexus-panel {
+      display: grid;
+      place-items: center;
+      min-height: clamp(22rem, 64vw, 34rem);
+      padding: 1rem;
+      background:
+        radial-gradient(circle at center, rgba(103, 232, 255, 0.12), transparent 42%),
+        radial-gradient(circle at 70% 18%, rgba(157, 124, 255, 0.12), transparent 30%),
+        rgba(6, 16, 31, 0.82);
+    }
+
+    .nexus-core {
+      width: min(100%, 24rem);
+      display: grid;
+      place-items: center;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .radar {
+      position: relative;
+      width: min(72vw, 18rem);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(103, 232, 255, 0.38);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(103, 232, 255, 0.2) 0 2px, transparent 3px),
+        radial-gradient(circle, transparent 0 28%, rgba(103, 232, 255, 0.09) 29%, transparent 30%),
+        radial-gradient(circle, transparent 0 47%, rgba(103, 232, 255, 0.13) 48%, transparent 49%),
+        radial-gradient(circle, transparent 0 67%, rgba(103, 232, 255, 0.12) 68%, transparent 69%),
+        linear-gradient(90deg, transparent 49.6%, rgba(103, 232, 255, 0.2) 50%, transparent 50.4%),
+        linear-gradient(0deg, transparent 49.6%, rgba(103, 232, 255, 0.2) 50%, transparent 50.4%),
+        rgba(5, 15, 29, 0.72);
+      box-shadow:
+        inset 0 0 38px rgba(103, 232, 255, 0.12),
+        0 0 42px rgba(103, 232, 255, 0.16);
+    }
+
+    .radar::before {
+      position: absolute;
+      inset: 0.35rem;
+      content: "";
+      border: 1px solid rgba(157, 124, 255, 0.24);
+      border-radius: inherit;
+    }
+
+    .radar::after {
+      position: absolute;
+      inset: 50% 50% auto auto;
+      width: 46%;
+      height: 1px;
+      content: "";
+      transform-origin: 0 0;
+      background: linear-gradient(90deg, rgba(103, 232, 255, 0.7), transparent);
+      animation: radarSweep 8s linear infinite;
+    }
+
+    .health-readout {
+      position: relative;
+      z-index: 1;
+      width: 58%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(114, 242, 180, 0.34);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(114, 242, 180, 0.16), transparent 64%),
+        rgba(2, 8, 16, 0.74);
+      box-shadow: inset 0 0 26px rgba(114, 242, 180, 0.1);
+    }
+
+    .health-readout strong {
+      display: block;
+      color: var(--text);
+      font-size: clamp(2.5rem, 12vw, 4.5rem);
+      font-weight: 900;
+      line-height: 0.92;
+    }
+
+    .health-readout span {
+      display: block;
+      margin-top: 0.4rem;
+      color: var(--green);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .nexus-caption h3 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      line-height: 1;
+    }
+
+    .nexus-caption p {
+      max-width: 28rem;
+      margin: 0.55rem auto 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .nexus-status-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+
+    .mini-signal {
+      min-width: 0;
+      padding: 0.65rem;
+      border: 1px solid rgba(127, 219, 255, 0.16);
+      border-radius: var(--radius-sm);
+      background: rgba(5, 14, 27, 0.62);
+    }
+
+    .mini-signal b {
+      display: block;
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .mini-signal span {
+      display: block;
+      margin-top: 0.35rem;
+      color: var(--faint);
+      font-size: 0.62rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* =========================
+       Dashboard cards
+       ========================= */
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .stat-card {
+      min-width: 0;
+      min-height: 8.1rem;
+      display: grid;
+      align-content: space-between;
+      gap: 1rem;
+      padding: 0.95rem;
+      border: 1px solid rgba(127, 219, 255, 0.18);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(145deg, rgba(103, 232, 255, 0.09), transparent 58%),
+        rgba(7, 18, 35, 0.7);
+    }
+
+    .stat-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.7rem;
+    }
+
+    .stat-icon {
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(103, 232, 255, 0.24);
+      border-radius: 50%;
+      background: rgba(103, 232, 255, 0.08);
+      color: var(--cyan);
+      font-size: 0.68rem;
+      font-weight: 900;
+    }
+
+    .stat-value {
+      color: var(--text);
+      font-size: clamp(1.6rem, 8vw, 2.25rem);
+      font-weight: 900;
+      line-height: 0.95;
+    }
+
+    .stat-card p {
+      margin: 0.4rem 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .stat-trend {
+      color: var(--green);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* =========================
+       Panels and lists
+       ========================= */
+
+    .side-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .alert-list,
+    .import-list {
+      display: grid;
+      gap: 0.7rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .alert-item,
+    .import-item {
+      min-width: 0;
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.8rem;
+      border: 1px solid rgba(127, 219, 255, 0.14);
+      border-radius: var(--radius-sm);
+      background: rgba(4, 12, 24, 0.54);
+    }
+
+    .alert-item header,
+    .import-item header {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .alert-name,
+    .import-name {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 820;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .severity,
+    .import-state {
+      flex: 0 0 auto;
+      padding: 0.25rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .severity.is-warn {
+      background: rgba(255, 209, 102, 0.12);
+      color: #ffe2a0;
+    }
+
+    .severity.is-high {
+      background: rgba(255, 107, 138, 0.12);
+      color: #ffc2cf;
+    }
+
+    .severity.is-info,
+    .import-state {
+      background: rgba(103, 232, 255, 0.1);
+      color: #bff6ff;
+    }
+
+    .alert-item p,
+    .import-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .import-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.8rem;
+      color: var(--faint);
+      font-size: 0.72rem;
+      font-weight: 760;
+    }
+
+    /* =========================
+       Quick commands
+       ========================= */
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .command-button {
+      min-width: 0;
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.8rem 0.65rem;
+      border: 1px solid rgba(103, 232, 255, 0.24);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(145deg, rgba(103, 232, 255, 0.13), transparent 70%),
+        rgba(7, 18, 35, 0.84);
+      color: var(--text);
+      cursor: default;
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .command-button span {
+      color: var(--cyan);
+      font-weight: 900;
+    }
+
+    .prototype-note {
+      margin: 0.9rem 0 0;
+      color: var(--faint);
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    /* =========================
+       Navigation
+       ========================= */
+
+    .nav-list {
+      display: grid;
+      gap: 0.4rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-button,
+    .mobile-nav-button {
+      min-width: 0;
+      border: 0;
+      color: var(--muted);
+      cursor: default;
+    }
+
+    .nav-button {
+      width: 100%;
+      min-height: var(--tap);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.72rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      text-align: left;
+      font-size: 0.86rem;
+      font-weight: 780;
+    }
+
+    .nav-button.is-active,
+    .nav-button:hover,
+    .nav-button:focus-visible {
+      border-color: rgba(103, 232, 255, 0.24);
+      background: rgba(103, 232, 255, 0.09);
+      color: var(--text);
+      outline: none;
+    }
+
+    .nav-glyph {
+      width: 1.75rem;
+      height: 1.75rem;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(127, 219, 255, 0.16);
+      border-radius: 50%;
+      color: var(--cyan);
+      font-size: 0.62rem;
+      font-weight: 900;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 30;
+      padding:
+        0.55rem
+        max(0.75rem, env(safe-area-inset-right))
+        calc(0.55rem + env(safe-area-inset-bottom))
+        max(0.75rem, env(safe-area-inset-left));
+      border-top: 1px solid var(--line);
+      background: rgba(3, 8, 18, 0.93);
+      box-shadow: 0 -18px 44px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(14px);
+    }
+
+    .bottom-nav-list {
+      width: min(100%, 35rem);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.4rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mobile-nav-button {
+      width: 100%;
+      min-height: 3.6rem;
+      display: grid;
+      place-items: center;
+      gap: 0.25rem;
+      padding: 0.45rem 0.25rem;
+      border: 1px solid transparent;
+      border-radius: 1rem;
+      background: transparent;
+      font-size: 0.64rem;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+    }
+
+    .mobile-nav-button b {
+      width: 1.45rem;
+      height: 1.45rem;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(127, 219, 255, 0.16);
+      border-radius: 50%;
+      color: var(--cyan);
+      font-size: 0.58rem;
+      font-weight: 900;
+    }
+
+    .mobile-nav-button.is-active {
+      border-color: rgba(103, 232, 255, 0.24);
+      background: rgba(103, 232, 255, 0.09);
+      color: var(--text);
+    }
+
+    /* =========================
+       Light motion
+       ========================= */
+
+    @keyframes radarSweep {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes softPulse {
+      0%,
+      100% {
+        opacity: 0.82;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .status-dot,
+    .brand-mark {
+      animation: softPulse 4.8s var(--ease) infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* =========================
+       Responsive scaling
+       ========================= */
+
+    @media (min-width: 560px) {
+      .status-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .command-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 820px) {
+      .top-status-inner {
+        grid-template-columns: minmax(18rem, 0.8fr) minmax(0, 1.2fr);
+        align-items: center;
+      }
+
+      .status-strip {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .shell-body {
+        grid-template-columns: 15.5rem minmax(0, 1fr);
+        align-items: start;
+        padding-bottom: 2rem;
+      }
+
+      .desktop-nav {
+        position: sticky;
+        top: calc(var(--topbar) + 1rem);
+        display: block;
+        min-width: 0;
+        padding: 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background:
+          linear-gradient(160deg, rgba(103, 232, 255, 0.09), transparent 42%),
+          rgba(5, 14, 27, 0.78);
+        box-shadow: var(--shadow);
+      }
+
+      .desktop-nav-header {
+        padding: 0.35rem 0.35rem 0.9rem;
+      }
+
+      .desktop-nav-header h2 {
+        margin: 0.2rem 0 0;
+        color: var(--text);
+        font-size: 0.95rem;
+        line-height: 1.2;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      .viewport-badge {
+        display: inline-flex;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: minmax(0, 1.08fr) minmax(19rem, 0.92fr);
+        align-items: start;
+      }
+
+      .nexus-panel {
+        min-height: 37rem;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .command-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1180px) {
+      .shell-body {
+        grid-template-columns: 16.5rem minmax(0, 1fr);
+        gap: 1.25rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: minmax(0, 1.18fr) minmax(22rem, 0.82fr);
+        gap: 1.25rem;
+      }
+
+      .shared-viewport {
+        gap: 1.25rem;
+      }
+
+      .stat-grid {
+        gap: 0.9rem;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .status-strip {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .stat-grid,
+      .command-grid,
+      .nexus-status-row {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .mobile-nav-button {
+        font-size: 0.58rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- =======================================================
+         Top status bar: global shell status and environment.
+         ======================================================= -->
+    <header class="top-status" aria-label="VMPix admin shell status">
+      <div class="top-status-inner">
+        <div class="brand-row">
+          <div class="brand-lockup">
+            <div class="brand-mark" aria-hidden="true">V3</div>
+            <div class="brand-copy">
+              <h1>VMPix-V3 Admin Shell</h1>
+              <p>Alpha 1 static prototype</p>
+            </div>
+          </div>
+          <div class="env-pill">Preview</div>
+        </div>
+
+        <div class="status-strip" aria-label="System status summary">
+          <div class="status-chip">
+            <span class="status-dot"></span>
+            <span>System <strong id="status-system">Online</strong></span>
+          </div>
+          <div class="status-chip">
+            <span class="status-dot is-cyan"></span>
+            <span>Polling <strong id="status-polling">Mock</strong></span>
+          </div>
+          <div class="status-chip">
+            <span class="status-dot"></span>
+            <span>DB <strong id="status-db">100%</strong></span>
+          </div>
+          <div class="status-chip">
+            <span class="status-dot"></span>
+            <span>API <strong id="status-api">100%</strong></span>
+          </div>
+          <div class="status-chip">
+            <span class="status-dot is-amber"></span>
+            <span>Env <strong id="status-env">Static</strong></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell-body">
+      <!-- =====================================================
+           Left desktop navigation: visible on tablet/desktop.
+           Prototype only; buttons do not route.
+           ===================================================== -->
+      <aside class="desktop-nav" aria-label="Admin navigation">
+        <div class="desktop-nav-header">
+          <p class="hud-label">Command Index</p>
+          <h2>Operations</h2>
+        </div>
+        <nav>
+          <ul class="nav-list">
+            <li><button class="nav-button is-active" type="button"><span class="nav-glyph">DB</span>Dashboard</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">IM</span>Imports</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">LK</span>Locks</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">RL</span>Relationships</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">ST</span>Stats</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">MU</span>Music</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">WR</span>Wrestling</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">LG</span>Logs</button></li>
+            <li><button class="nav-button" type="button"><span class="nav-glyph">SE</span>Settings</button></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- =====================================================
+           Main shared viewport: dashboard-only Alpha 1 surface.
+           ===================================================== -->
+      <main class="shared-viewport" id="main-viewport">
+        <section class="viewport-header" aria-labelledby="dashboard-title">
+          <div>
+            <p class="hud-label">Shared Viewport</p>
+            <h2 id="dashboard-title">Nexus Dashboard</h2>
+            <p>
+              Static command-center preview for future imports, locks, relationship health,
+              archive status, and operational diagnostics.
+            </p>
+          </div>
+          <div class="viewport-badge">
+            <span class="status-dot"></span>
+            Shell stable
+          </div>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Dashboard prototype">
+          <div class="shared-viewport">
+            <!-- Nexus Core center panel -->
+            <section class="panel nexus-panel" aria-labelledby="nexus-title">
+              <div class="nexus-core">
+                <div class="radar" aria-label="System health radar">
+                  <div class="health-readout">
+                    <div>
+                      <strong id="health-percent">94%</strong>
+                      <span>Health</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="nexus-caption">
+                  <p class="hud-label">Nexus Core</p>
+                  <h3 id="nexus-title">Archive Operations HUD</h3>
+                  <p>
+                    Mock shell telemetry only. No live APIs, no authentication, and no
+                    destructive actions are connected in this prototype.
+                  </p>
+                </div>
+
+                <div class="nexus-status-row" aria-label="Core status signals">
+                  <div class="mini-signal">
+                    <b id="nexus-imports">3</b>
+                    <span>Imports</span>
+                  </div>
+                  <div class="mini-signal">
+                    <b id="nexus-locks">2</b>
+                    <span>Locks</span>
+                  </div>
+                  <div class="mini-signal">
+                    <b id="nexus-stats-age">2h</b>
+                    <span>Stats Age</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Dashboard cards -->
+            <section class="panel" aria-labelledby="cards-title">
+              <div class="panel-header">
+                <div>
+                  <p class="hud-label">Telemetry</p>
+                  <h3 class="section-title" id="cards-title">Dashboard Cards</h3>
+                </div>
+                <span class="panel-meta">Mock data</span>
+              </div>
+              <div class="panel-body">
+                <div class="stat-grid" id="stat-grid" aria-label="Dashboard status cards"></div>
+              </div>
+            </section>
+
+            <!-- Quick commands -->
+            <section class="panel" aria-labelledby="commands-title">
+              <div class="panel-header">
+                <div>
+                  <p class="hud-label">Command Surface</p>
+                  <h3 class="section-title" id="commands-title">Quick Commands</h3>
+                </div>
+                <span class="panel-meta">Disabled</span>
+              </div>
+              <div class="panel-body">
+                <div class="command-grid" aria-label="Prototype quick commands">
+                  <button class="command-button" type="button" aria-disabled="true"><span>01</span>Run Imports</button>
+                  <button class="command-button" type="button" aria-disabled="true"><span>02</span>Rebuild Stats</button>
+                  <button class="command-button" type="button" aria-disabled="true"><span>03</span>Clear Locks</button>
+                  <button class="command-button" type="button" aria-disabled="true"><span>04</span>Diagnostics</button>
+                  <button class="command-button" type="button" aria-disabled="true"><span>05</span>View Logs</button>
+                </div>
+                <p class="prototype-note">
+                  Buttons are visual placeholders only. They do not call APIs, change data,
+                  or trigger backend actions.
+                </p>
+              </div>
+            </section>
+          </div>
+
+          <div class="side-grid">
+            <!-- System alerts panel -->
+            <section class="panel" aria-labelledby="alerts-title">
+              <div class="panel-header">
+                <div>
+                  <p class="hud-label">Diagnostics</p>
+                  <h3 class="section-title" id="alerts-title">System Alerts</h3>
+                </div>
+                <span class="panel-meta">4 warnings</span>
+              </div>
+              <div class="panel-body">
+                <ul class="alert-list" id="alert-list"></ul>
+              </div>
+            </section>
+
+            <!-- Latest imports panel -->
+            <section class="panel" aria-labelledby="imports-title">
+              <div class="panel-header">
+                <div>
+                  <p class="hud-label">Archive Intake</p>
+                  <h3 class="section-title" id="imports-title">Latest Imports</h3>
+                </div>
+                <span class="panel-meta">Recent</span>
+              </div>
+              <div class="panel-body">
+                <ul class="import-list" id="import-list"></ul>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- =======================================================
+         Bottom mobile navigation: visible on mobile only.
+         Prototype only; buttons do not route.
+         ======================================================= -->
+    <nav class="bottom-nav" aria-label="Mobile admin navigation">
+      <ul class="bottom-nav-list">
+        <li><button class="mobile-nav-button is-active" type="button"><b>HM</b>Home</button></li>
+        <li><button class="mobile-nav-button" type="button"><b>IM</b>Imports</button></li>
+        <li><button class="mobile-nav-button" type="button"><b>SY</b>Systems</button></li>
+        <li><button class="mobile-nav-button" type="button"><b>AR</b>Archive</button></li>
+        <li><button class="mobile-nav-button" type="button"><b>LG</b>Logs</button></li>
+      </ul>
+    </nav>
+  </div>
+
+  <script>
+    /* =========================================================
+       Local mock data only. No fetch, APIs, auth, or routing.
+       ========================================================= */
+
+    const mockDashboard = {
+      environment: "Static",
+      systemOnline: true,
+      pollingMode: "Mock",
+      systemHealth: 94,
+      importsActive: 3,
+      locksActive: 2,
+      relationshipsHealth: 94,
+      statsAge: "2h",
+      dbHealth: 100,
+      apiHealth: 100,
+      cards: [
+        {
+          label: "Imports",
+          value: "3",
+          description: "Active archive intake batches",
+          trend: "Monitoring",
+          glyph: "IM"
+        },
+        {
+          label: "Locks",
+          value: "2",
+          description: "Protected records awaiting review",
+          trend: "Contained",
+          glyph: "LK"
+        },
+        {
+          label: "Relationships",
+          value: "94%",
+          description: "Entity relationship health",
+          trend: "Stable",
+          glyph: "RL"
+        },
+        {
+          label: "Stats Age",
+          value: "2h",
+          description: "Latest generated stats snapshot",
+          trend: "Fresh",
+          glyph: "ST"
+        },
+        {
+          label: "DB Health",
+          value: "100%",
+          description: "Mock database status",
+          trend: "Online",
+          glyph: "DB"
+        },
+        {
+          label: "API Health",
+          value: "100%",
+          description: "Mock API gateway status",
+          trend: "Online",
+          glyph: "AP"
+        }
+      ],
+      alerts: [
+        {
+          name: "Broken Links",
+          severity: "warn",
+          detail: "12 archived media references need future link validation."
+        },
+        {
+          name: "Orphans",
+          severity: "high",
+          detail: "7 entities are missing parent relationship assignments."
+        },
+        {
+          name: "Missing Venues",
+          severity: "warn",
+          detail: "4 wrestling events need venue metadata review."
+        },
+        {
+          name: "Missing People",
+          severity: "info",
+          detail: "9 music gallery credits need person matching."
+        }
+      ],
+      imports: [
+        {
+          name: "Music Archive Delta",
+          state: "Active",
+          count: "184 files",
+          age: "14 min ago"
+        },
+        {
+          name: "Wrestling Event Sync",
+          state: "Queued",
+          count: "62 records",
+          age: "31 min ago"
+        },
+        {
+          name: "Venue Metadata Sweep",
+          state: "Review",
+          count: "18 venues",
+          age: "1h ago"
+        },
+        {
+          name: "People Relationship Pass",
+          state: "Complete",
+          count: "43 links",
+          age: "2h ago"
+        }
+      ]
+    };
+
+    function setText(id, value) {
+      const node = document.getElementById(id);
+      if (node) {
+        node.textContent = value;
+      }
+    }
+
+    function createElement(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) {
+        node.className = className;
+      }
+      if (text !== undefined) {
+        node.textContent = text;
+      }
+      return node;
+    }
+
+    function renderStatus(data) {
+      setText("status-system", data.systemOnline ? "Online" : "Offline");
+      setText("status-polling", data.pollingMode);
+      setText("status-db", `${data.dbHealth}%`);
+      setText("status-api", `${data.apiHealth}%`);
+      setText("status-env", data.environment);
+      setText("health-percent", `${data.systemHealth}%`);
+      setText("nexus-imports", data.importsActive);
+      setText("nexus-locks", data.locksActive);
+      setText("nexus-stats-age", data.statsAge);
+    }
+
+    function renderCards(cards) {
+      const grid = document.getElementById("stat-grid");
+      if (!grid) {
+        return;
+      }
+
+      cards.forEach((card) => {
+        const article = createElement("article", "stat-card");
+        const header = createElement("header");
+        const label = createElement("p", "hud-label", card.label);
+        const icon = createElement("span", "stat-icon", card.glyph);
+        const value = createElement("div", "stat-value", card.value);
+        const description = createElement("p", "", card.description);
+        const trend = createElement("div", "stat-trend", card.trend);
+
+        header.append(label, icon);
+        article.append(header, value, description, trend);
+        grid.appendChild(article);
+      });
+    }
+
+    function renderAlerts(alerts) {
+      const list = document.getElementById("alert-list");
+      if (!list) {
+        return;
+      }
+
+      alerts.forEach((alert) => {
+        const item = createElement("li", "alert-item");
+        const header = createElement("header");
+        const name = createElement("span", "alert-name", alert.name);
+        const severity = createElement("span", `severity is-${alert.severity}`, alert.severity);
+        const detail = createElement("p", "", alert.detail);
+
+        header.append(name, severity);
+        item.append(header, detail);
+        list.appendChild(item);
+      });
+    }
+
+    function renderImports(imports) {
+      const list = document.getElementById("import-list");
+      if (!list) {
+        return;
+      }
+
+      imports.forEach((entry) => {
+        const item = createElement("li", "import-item");
+        const header = createElement("header");
+        const name = createElement("span", "import-name", entry.name);
+        const state = createElement("span", "import-state", entry.state);
+        const meta = createElement("div", "import-meta");
+        const count = createElement("span", "", entry.count);
+        const age = createElement("span", "", entry.age);
+
+        header.append(name, state);
+        meta.append(count, age);
+        item.append(header, meta);
+        list.appendChild(item);
+      });
+    }
+
+    function bootPrototype() {
+      renderStatus(mockDashboard);
+      renderCards(mockDashboard.cards);
+      renderAlerts(mockDashboard.alerts);
+      renderImports(mockDashboard.imports);
+    }
+
+    document.addEventListener("DOMContentLoaded", bootPrototype);
+  </script>
+</body>
 </html>
