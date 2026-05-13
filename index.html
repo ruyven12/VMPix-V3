@@ -13,7 +13,7 @@
 
   <style>
     /* =========================================================
-       VMPix V3 Public Homepage Shell - Pass 5
+       VMPix V3 Public Homepage Shell - Pass 6
        Static foundation only. No routes, APIs, modules, or transitions.
        ========================================================= */
 
@@ -46,6 +46,7 @@
       --radius-md: 0.5rem;
       --tap-target: 48px;
       --frame-max: 44rem;
+      --hub-max: 46rem;
       --title-size: 2rem;
       --kicker-size: 1rem;
       --button-text-size: 0.88rem;
@@ -257,7 +258,11 @@
       min-width: 0;
       min-height: 0;
       display: grid;
-      place-items: center;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: safe center;
+      justify-items: center;
+      overflow-x: hidden;
+      overflow-y: auto;
       padding:
         max(var(--space-4), env(safe-area-inset-top))
         max(var(--space-3), env(safe-area-inset-right))
@@ -266,6 +271,7 @@
     }
 
     .home-frame {
+      grid-area: 1 / 1;
       position: relative;
       width: min(100%, var(--frame-max));
       min-height: clamp(24rem, 66svh, 38rem);
@@ -280,6 +286,7 @@
       isolation: isolate;
       transition:
         opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
         background-color var(--motion-standard) var(--ease-standard);
     }
@@ -543,6 +550,131 @@
       min-width: 0;
     }
 
+    .portfolio-hub {
+      grid-area: 1 / 1;
+      position: relative;
+      width: min(100%, var(--hub-max));
+      display: grid;
+      gap: clamp(1.1rem, 3svh, 1.6rem);
+      padding: clamp(1.1rem, 4vw, 2rem);
+      border: 1px solid rgba(247, 247, 242, 0.22);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 42%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.075), transparent 38%),
+        rgba(6, 6, 9, 0.78);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(0, 0.7rem, 0) scale(0.975);
+      transition:
+        opacity 360ms var(--ease-standard),
+        transform 360ms var(--ease-standard),
+        border-color 360ms var(--ease-standard);
+      isolation: isolate;
+    }
+
+    .portfolio-hub::before {
+      position: absolute;
+      inset: var(--space-2);
+      z-index: -1;
+      content: "";
+      border: 1px solid rgba(213, 22, 34, 0.14);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, transparent 0 45%, rgba(247, 247, 242, 0.07) 50%, transparent 55%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, transparent 0 45%, rgba(213, 22, 34, 0.12) 50%, transparent 55%) left / 1px 100% no-repeat;
+    }
+
+    .hub-header {
+      display: grid;
+      justify-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .hub-kicker {
+      margin: 0;
+      color: var(--color-muted);
+      font-size: clamp(0.78rem, 3vw, 0.98rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .hub-title {
+      max-width: 100%;
+      margin: 0;
+      color: var(--color-text);
+      font-size: clamp(1.55rem, 8vw, 3rem);
+      font-weight: 400;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .hub-grid {
+      display: grid;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    .hub-card {
+      position: relative;
+      min-width: 0;
+      min-height: 4.75rem;
+      display: grid;
+      align-content: center;
+      gap: 0.4rem;
+      padding: 0.95rem 1rem;
+      border: 1px solid rgba(247, 247, 242, 0.18);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 44%),
+        rgba(8, 8, 11, 0.74);
+      color: var(--color-text);
+      cursor: pointer;
+      font-family: var(--font-display);
+      text-align: left;
+      transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        background-color var(--motion-fast) var(--ease-standard),
+        transform var(--motion-fast) var(--ease-standard);
+    }
+
+    .hub-card::after {
+      position: absolute;
+      top: 0.55rem;
+      right: 0.55rem;
+      width: 0.45rem;
+      height: 0.45rem;
+      content: "";
+      background: var(--color-accent);
+      opacity: 0.74;
+    }
+
+    .hub-card:hover {
+      border-color: rgba(247, 247, 242, 0.34);
+      background-color: rgba(213, 22, 34, 0.08);
+      transform: translate3d(0, -1px, 0);
+    }
+
+    .hub-card:focus-visible {
+      outline: 2px solid var(--color-text);
+      outline-offset: 0.25rem;
+    }
+
+    .hub-card-title {
+      overflow-wrap: anywhere;
+      font-size: clamp(1rem, 4vw, 1.18rem);
+      line-height: 1.1;
+    }
+
+    .hub-card-meta {
+      color: var(--color-muted);
+      font-size: clamp(0.68rem, 2.6vw, 0.78rem);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
     .site-shell.is-activating .ambient-energy {
       opacity: 0.7;
       animation-duration: 5s;
@@ -617,6 +749,18 @@
       animation: none;
     }
 
+    .site-shell.has-entered-hub .home-frame {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(0, -0.35rem, 0) scale(0.965);
+    }
+
+    .site-shell.has-entered-hub .portfolio-hub {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
     @keyframes portalRingSpin {
       from {
         transform: rotate(0deg);
@@ -686,6 +830,10 @@
         padding-inline: var(--space-3);
       }
 
+      .portfolio-hub {
+        padding: var(--space-3);
+      }
+
       .status-row {
         justify-content: center;
         text-align: center;
@@ -725,6 +873,15 @@
       .public-home {
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
       }
+
+      .hub-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .hub-card {
+        min-height: 8rem;
+        align-content: end;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -756,6 +913,12 @@
       .site-shell.is-activating .title-group,
       .site-shell.is-activating .status-row {
         opacity: 0.72;
+        transform: none;
+      }
+
+      .portfolio-hub,
+      .site-shell.has-entered-hub .portfolio-hub,
+      .site-shell.has-entered-hub .home-frame {
         transform: none;
       }
     }
@@ -796,6 +959,28 @@
           <span class="sr-only" id="start-description">Placeholder start control centered inside the VMPix V3 portal shell.</span>
         </div>
       </section>
+
+      <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true">
+        <div class="hub-header">
+          <p class="hub-kicker">Interactive Portfolio</p>
+          <h2 class="hub-title" id="portfolio-title">Choose Your Archive</h2>
+        </div>
+
+        <div class="hub-grid" aria-label="Archive preview navigation">
+          <button class="hub-card" type="button" aria-label="Music archive preview" tabindex="-1">
+            <span class="hub-card-title">Music</span>
+            <span class="hub-card-meta">Bands · People · Shows</span>
+          </button>
+          <button class="hub-card" type="button" aria-label="Wrestling archive preview" tabindex="-1">
+            <span class="hub-card-title">Wrestling</span>
+            <span class="hub-card-meta">Shows · Matches · People</span>
+          </button>
+          <button class="hub-card" type="button" aria-label="Calendar archive preview" tabindex="-1">
+            <span class="hub-card-title">Calendar</span>
+            <span class="hub-card-meta">Events · Booking · Schedule</span>
+          </button>
+        </div>
+      </section>
     </main>
 
     <footer class="status-row" aria-label="Homepage status">
@@ -808,19 +993,45 @@
     (() => {
       const shell = document.querySelector(".site-shell");
       const startButton = document.querySelector(".start-button");
+      const homeFrame = document.querySelector(".home-frame");
+      const portfolioHub = document.querySelector(".portfolio-hub");
+      const hubCards = document.querySelectorAll(".hub-card");
       const reducedMotion = window.matchMedia
         ? window.matchMedia("(prefers-reduced-motion: reduce)")
         : { matches: false };
       let activationTimer;
 
-      function finishActivation() {
+      function setHubInteractive(isInteractive) {
+        hubCards.forEach((card) => {
+          if (isInteractive) {
+            card.removeAttribute("tabindex");
+          } else {
+            card.setAttribute("tabindex", "-1");
+          }
+        });
+      }
+
+      function revealHub() {
         shell.classList.remove("is-activating", "is-reduced-activation");
-        startButton.disabled = false;
+        shell.classList.add("has-entered-hub");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        if (portfolioHub) {
+          portfolioHub.setAttribute("aria-hidden", "false");
+        }
+        setHubInteractive(true);
         startButton.setAttribute("aria-busy", "false");
       }
 
       function activatePortal() {
-        if (!shell || !startButton || startButton.disabled || shell.classList.contains("is-activating")) {
+        if (
+          !shell ||
+          !startButton ||
+          startButton.disabled ||
+          shell.classList.contains("is-activating") ||
+          shell.classList.contains("has-entered-hub")
+        ) {
           return;
         }
 
@@ -830,11 +1041,12 @@
         shell.classList.toggle("is-reduced-activation", reducedMotion.matches);
         shell.classList.add("is-activating");
 
-        activationTimer = window.setTimeout(finishActivation, reducedMotion.matches ? 460 : 1120);
+        activationTimer = window.setTimeout(revealHub, reducedMotion.matches ? 460 : 1120);
       }
 
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
+        setHubInteractive(false);
         startButton.addEventListener("click", activatePortal);
         window.addEventListener("pagehide", () => window.clearTimeout(activationTimer));
       }
