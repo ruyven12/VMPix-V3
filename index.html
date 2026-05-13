@@ -13,7 +13,7 @@
 
   <style>
     /* =========================================================
-       VMPix V3 Public Homepage Shell - Pass 1
+       VMPix V3 Public Homepage Shell - Pass 2
        Static foundation only. No routes, APIs, modules, or transitions.
        ========================================================= */
 
@@ -34,7 +34,6 @@
       --color-accent-line: rgba(213, 22, 34, 0.58);
 
       --font-display: Audiowide, Orbitron, Rajdhani, "Segoe UI", Arial, sans-serif;
-      --font-body: Rajdhani, "Segoe UI", Arial, sans-serif;
 
       --space-1: 0.5rem;
       --space-2: 0.75rem;
@@ -47,6 +46,12 @@
       --radius-md: 0.5rem;
       --tap-target: 48px;
       --frame-max: 44rem;
+      --title-size: 2rem;
+      --kicker-size: 1rem;
+      --button-text-size: 0.88rem;
+      --footer-text-size: 0.68rem;
+      --title-gap: 0.82rem;
+      --lockup-gap: clamp(1.85rem, 5svh, 3rem);
       --motion-fast: 160ms;
       --motion-standard: 240ms;
       --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -71,8 +76,10 @@
         radial-gradient(circle at 50% 45%, rgba(213, 22, 34, 0.11), transparent 28rem),
         linear-gradient(180deg, #09090d 0%, var(--color-bg) 42%, var(--color-bg-deep) 100%);
       color: var(--color-text);
-      font-family: var(--font-body);
+      font-family: var(--font-display);
+      font-synthesis: none;
       letter-spacing: 0;
+      text-rendering: optimizeLegibility;
     }
 
     body::before,
@@ -133,7 +140,7 @@
       min-height: clamp(24rem, 66svh, 38rem);
       display: grid;
       place-items: center;
-      padding: clamp(2rem, 8vw, 4.5rem) clamp(1rem, 6vw, 3.5rem);
+      padding: clamp(2rem, 8svh, 4rem) clamp(1rem, 6vw, 3.5rem);
       border: 1px solid var(--color-line);
       border-radius: var(--radius-md);
       background:
@@ -223,23 +230,24 @@
       max-width: 38rem;
       display: grid;
       justify-items: center;
-      gap: clamp(1.4rem, 5svh, 2.7rem);
+      gap: var(--lockup-gap);
       text-align: center;
     }
 
     .title-group {
       display: grid;
       justify-items: center;
-      gap: var(--space-2);
+      gap: var(--title-gap);
       min-width: 0;
     }
 
     .title-kicker {
       margin: 0;
-      color: var(--color-muted);
-      font-size: clamp(0.72rem, 2.8vw, 0.92rem);
-      font-weight: 700;
-      line-height: 1;
+      color: var(--color-text);
+      font-family: var(--font-display);
+      font-size: var(--kicker-size);
+      font-weight: 400;
+      line-height: 1.08;
       text-transform: uppercase;
     }
 
@@ -248,9 +256,9 @@
       margin: 0;
       color: var(--color-text);
       font-family: var(--font-display);
-      font-size: clamp(2rem, 9.8vw, 4.9rem);
+      font-size: var(--title-size);
       font-weight: 400;
-      line-height: 0.95;
+      line-height: 1;
       text-transform: none;
       white-space: nowrap;
     }
@@ -270,7 +278,7 @@
       color: var(--color-text);
       cursor: pointer;
       font-family: var(--font-display);
-      font-size: clamp(0.78rem, 3.4vw, 1rem);
+      font-size: var(--button-text-size);
       letter-spacing: 0;
       text-transform: uppercase;
       transition:
@@ -302,8 +310,9 @@
         max(var(--space-3), env(safe-area-inset-left));
       border-top: 1px solid rgba(247, 247, 242, 0.1);
       color: var(--color-faint);
-      font-size: clamp(0.68rem, 2.7vw, 0.78rem);
-      font-weight: 700;
+      font-family: var(--font-display);
+      font-size: var(--footer-text-size);
+      font-weight: 400;
       line-height: 1.2;
       text-transform: uppercase;
     }
@@ -325,6 +334,12 @@
     }
 
     @media (max-width: 360px) {
+      :root {
+        --title-size: 1.88rem;
+        --kicker-size: 0.94rem;
+        --lockup-gap: clamp(1.55rem, 4.5svh, 2.2rem);
+      }
+
       .home-frame {
         padding-inline: var(--space-3);
       }
@@ -336,7 +351,31 @@
       }
     }
 
+    @media (min-width: 480px) {
+      :root {
+        --title-size: 2.65rem;
+        --kicker-size: 1.06rem;
+        --button-text-size: 0.92rem;
+      }
+    }
+
+    @media (min-width: 620px) {
+      :root {
+        --title-size: 3.25rem;
+        --kicker-size: 1.1rem;
+      }
+    }
+
     @media (min-width: 760px) {
+      :root {
+        --title-size: 4.35rem;
+        --kicker-size: 1.12rem;
+        --button-text-size: 0.94rem;
+        --footer-text-size: 0.72rem;
+        --title-gap: 0.95rem;
+        --lockup-gap: clamp(2.15rem, 6svh, 3.35rem);
+      }
+
       .public-home {
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
       }
