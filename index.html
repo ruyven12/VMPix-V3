@@ -13,7 +13,7 @@
 
   <style>
     /* =========================================================
-       VMPix V3 Public Homepage Shell - Pass 3
+       VMPix V3 Public Homepage Shell - Pass 4
        Static foundation only. No routes, APIs, modules, or transitions.
        ========================================================= */
 
@@ -57,8 +57,14 @@
       --portal-line: rgba(247, 247, 242, 0.2);
       --portal-line-soft: rgba(247, 247, 242, 0.12);
       --portal-red-line: rgba(213, 22, 34, 0.56);
+      --ambient-grid-line: rgba(247, 247, 242, 0.028);
+      --ambient-grid-red: rgba(213, 22, 34, 0.055);
+      --ambient-ring-line: rgba(247, 247, 242, 0.075);
+      --ambient-ring-red: rgba(213, 22, 34, 0.15);
       --motion-fast: 160ms;
       --motion-standard: 240ms;
+      --motion-ambient: 12s;
+      --motion-ambient-slow: 20s;
       --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
@@ -77,9 +83,7 @@
       min-height: 100svh;
       margin: 0;
       overflow-x: hidden;
-      background:
-        radial-gradient(circle at 50% 45%, rgba(213, 22, 34, 0.11), transparent 28rem),
-        linear-gradient(180deg, #09090d 0%, var(--color-bg) 42%, var(--color-bg-deep) 100%);
+      background: linear-gradient(180deg, #09090d 0%, var(--color-bg) 42%, var(--color-bg-deep) 100%);
       color: var(--color-text);
       font-family: var(--font-display);
       font-synthesis: none;
@@ -87,47 +91,167 @@
       text-rendering: optimizeLegibility;
     }
 
-    body::before,
-    body::after {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      content: "";
-    }
-
-    body::before {
-      background:
-        linear-gradient(rgba(247, 247, 242, 0.032) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(247, 247, 242, 0.026) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.12));
-    }
-
-    body::after {
-      opacity: 0.18;
-      background: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.055) 0,
-        rgba(255, 255, 255, 0.055) 1px,
-        transparent 1px,
-        transparent 5px
-      );
-    }
-
     button {
       font: inherit;
     }
 
     .site-shell {
+      position: relative;
       min-height: 100vh;
       min-height: 100svh;
       display: grid;
       grid-template-rows: minmax(0, 1fr) auto;
       overflow: hidden;
+      isolation: isolate;
+    }
+
+    .ambient-system,
+    .ambient-system::before,
+    .ambient-system::after,
+    .ambient-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .ambient-system {
+      z-index: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.075), transparent min(54vw, 33rem)),
+        radial-gradient(circle at 50% 100%, rgba(247, 247, 242, 0.035), transparent 32rem);
+      contain: layout paint style;
+    }
+
+    .ambient-system::before,
+    .ambient-system::after {
+      content: "";
+    }
+
+    .ambient-system::before {
+      background:
+        linear-gradient(var(--ambient-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--ambient-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, transparent 0 47%, var(--ambient-grid-red) 50%, transparent 53%) 50% 0 / min(62rem, 120vw) 100% no-repeat,
+        linear-gradient(0deg, transparent 0 47%, rgba(247, 247, 242, 0.035) 50%, transparent 53%) 0 50% / 100% min(31rem, 86svh) no-repeat;
+      background-size:
+        42px 42px,
+        42px 42px,
+        min(62rem, 120vw) 100%,
+        100% min(31rem, 86svh);
+      opacity: 0.86;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.14));
+    }
+
+    .ambient-system::after {
+      opacity: 0.18;
+      background:
+        radial-gradient(ellipse at center, transparent 0 50%, rgba(0, 0, 0, 0.56) 100%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.055) 0,
+          rgba(255, 255, 255, 0.055) 1px,
+          transparent 1px,
+          transparent 5px
+        );
+    }
+
+    .ambient-energy {
+      background:
+        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.2), transparent min(32rem, 68vw)),
+        radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
+      opacity: 0.48;
+      animation: ambientBreath var(--motion-ambient-slow) var(--ease-standard) infinite;
+    }
+
+    .ambient-rings {
+      inset: 50% auto auto 50%;
+      width: min(78vw, 43rem);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle, transparent 0 36%, var(--ambient-ring-red) 36.1% 36.3%, transparent 36.7%),
+        radial-gradient(circle, transparent 0 52%, var(--ambient-ring-line) 52.1% 52.35%, transparent 52.8%),
+        radial-gradient(circle, transparent 0 70%, rgba(247, 247, 242, 0.055) 70.1% 70.3%, transparent 70.75%),
+        conic-gradient(from 12deg, transparent 0 18deg, rgba(213, 22, 34, 0.1) 19deg 20deg, transparent 21deg 94deg, rgba(247, 247, 242, 0.08) 95deg 96deg, transparent 97deg 180deg, rgba(213, 22, 34, 0.085) 181deg 182deg, transparent 183deg 360deg);
+      opacity: 0.62;
+      animation: ambientRingDrift var(--motion-ambient-slow) linear infinite;
+    }
+
+    .ambient-sweep {
+      inset: -20% auto auto -55%;
+      width: 46%;
+      height: 140%;
+      background: linear-gradient(90deg, transparent, rgba(247, 247, 242, 0.045), transparent);
+      opacity: 0.46;
+      transform: skewX(-18deg) translate3d(-12%, 0, 0);
+      animation: ambientSweep 18s var(--ease-standard) infinite;
+    }
+
+    .ambient-particles {
+      background:
+        radial-gradient(circle, rgba(213, 22, 34, 0.55) 0 1px, transparent 1.6px) 18% 24% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(247, 247, 242, 0.35) 0 1px, transparent 1.5px) 74% 22% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(213, 22, 34, 0.4) 0 1px, transparent 1.5px) 58% 68% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(247, 247, 242, 0.28) 0 1px, transparent 1.45px) 32% 78% / 100% 100% no-repeat,
+        radial-gradient(circle, rgba(213, 22, 34, 0.34) 0 1px, transparent 1.45px) 86% 74% / 100% 100% no-repeat;
+      opacity: 0.44;
+      transform: translate3d(0, 0, 0);
+      animation: ambientDust var(--motion-ambient) var(--ease-standard) infinite;
+    }
+
+    @keyframes ambientBreath {
+      0%,
+      100% {
+        opacity: 0.36;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.58;
+        transform: scale(1.035);
+      }
+    }
+
+    @keyframes ambientRingDrift {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      to {
+        transform: translate(-50%, -50%) rotate(12deg);
+      }
+    }
+
+    @keyframes ambientSweep {
+      0%,
+      62% {
+        opacity: 0;
+        transform: skewX(-18deg) translate3d(-12%, 0, 0);
+      }
+      78% {
+        opacity: 0.38;
+      }
+      100% {
+        opacity: 0;
+        transform: skewX(-18deg) translate3d(360%, 0, 0);
+      }
+    }
+
+    @keyframes ambientDust {
+      0%,
+      100% {
+        opacity: 0.28;
+        transform: translate3d(0, 0.3rem, 0);
+      }
+      50% {
+        opacity: 0.46;
+        transform: translate3d(0, -0.4rem, 0);
+      }
     }
 
     .public-home {
+      position: relative;
+      z-index: 1;
       min-width: 0;
       min-height: 0;
       display: grid;
@@ -342,6 +466,8 @@
     }
 
     .status-row {
+      position: relative;
+      z-index: 1;
       min-width: 0;
       display: flex;
       align-items: center;
@@ -384,6 +510,14 @@
         --lockup-gap: clamp(1.55rem, 4.5svh, 2.2rem);
         --portal-size: clamp(12.5rem, 67vw, 13.25rem);
         --portal-button-size: clamp(6.45rem, 33vw, 7rem);
+      }
+
+      .ambient-particles {
+        opacity: 0.24;
+      }
+
+      .ambient-rings {
+        width: min(88vw, 22rem);
       }
 
       .home-frame {
@@ -439,11 +573,28 @@
         scroll-behavior: auto !important;
         transition-duration: 0.001ms !important;
       }
+
+      .ambient-energy {
+        opacity: 0.34;
+        transform: none;
+      }
+
+      .ambient-sweep,
+      .ambient-particles {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
   <div class="site-shell">
+    <div class="ambient-system" aria-hidden="true">
+      <span class="ambient-layer ambient-energy"></span>
+      <span class="ambient-layer ambient-rings"></span>
+      <span class="ambient-layer ambient-sweep"></span>
+      <span class="ambient-layer ambient-particles"></span>
+    </div>
+
     <main class="public-home" aria-labelledby="home-title">
       <section class="home-frame" aria-label="Voodoo Media public homepage">
         <span class="frame-corner frame-corner--top-left" aria-hidden="true"></span>
