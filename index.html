@@ -13,7 +13,7 @@
 
   <style>
     /* =========================================================
-       VMPix V3 Public Homepage Shell - Pass 2
+       VMPix V3 Public Homepage Shell - Pass 3
        Static foundation only. No routes, APIs, modules, or transitions.
        ========================================================= */
 
@@ -52,6 +52,11 @@
       --footer-text-size: 0.68rem;
       --title-gap: 0.82rem;
       --lockup-gap: clamp(1.85rem, 5svh, 3rem);
+      --portal-size: clamp(13.25rem, 68vw, 18.5rem);
+      --portal-button-size: clamp(7rem, 34vw, 9rem);
+      --portal-line: rgba(247, 247, 242, 0.2);
+      --portal-line-soft: rgba(247, 247, 242, 0.12);
+      --portal-red-line: rgba(213, 22, 34, 0.56);
       --motion-fast: 160ms;
       --motion-standard: 240ms;
       --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -263,8 +268,47 @@
       white-space: nowrap;
     }
 
+    .start-portal {
+      position: relative;
+      width: min(100%, var(--portal-size));
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--portal-line);
+      border-radius: 50%;
+      background:
+        linear-gradient(90deg, transparent calc(50% - 0.5px), var(--portal-line-soft) 50%, transparent calc(50% + 0.5px)),
+        linear-gradient(0deg, transparent calc(50% - 0.5px), var(--portal-line-soft) 50%, transparent calc(50% + 0.5px)),
+        radial-gradient(circle, transparent 0 43%, rgba(213, 22, 34, 0.18) 43.3% 43.7%, transparent 44%),
+        radial-gradient(circle, rgba(213, 22, 34, 0.07), transparent 58%),
+        rgba(5, 5, 7, 0.2);
+      isolation: isolate;
+    }
+
+    .start-portal::before,
+    .start-portal::after {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      content: "";
+    }
+
+    .start-portal::before {
+      inset: clamp(1.05rem, 5vw, 1.45rem);
+      border: 1px solid var(--portal-line-soft);
+    }
+
+    .start-portal::after {
+      inset: clamp(2.05rem, 8.5vw, 3rem);
+      border: 1px solid var(--portal-red-line);
+      opacity: 0.88;
+    }
+
     .start-button {
-      width: clamp(7.25rem, 34vw, 9.4rem);
+      position: relative;
+      z-index: 1;
+      width: var(--portal-button-size);
       min-width: var(--tap-target);
       aspect-ratio: 1;
       display: inline-grid;
@@ -338,6 +382,8 @@
         --title-size: 1.88rem;
         --kicker-size: 0.94rem;
         --lockup-gap: clamp(1.55rem, 4.5svh, 2.2rem);
+        --portal-size: clamp(12.5rem, 67vw, 13.25rem);
+        --portal-button-size: clamp(6.45rem, 33vw, 7rem);
       }
 
       .home-frame {
@@ -356,6 +402,7 @@
         --title-size: 2.65rem;
         --kicker-size: 1.06rem;
         --button-text-size: 0.92rem;
+        --portal-size: clamp(15rem, 54vw, 17rem);
       }
     }
 
@@ -374,6 +421,8 @@
         --footer-text-size: 0.72rem;
         --title-gap: 0.95rem;
         --lockup-gap: clamp(2.15rem, 6svh, 3.35rem);
+        --portal-size: clamp(17rem, 28vw, 19.25rem);
+        --portal-button-size: clamp(8.25rem, 14vw, 9.25rem);
       }
 
       .public-home {
@@ -408,15 +457,17 @@
             <h1 class="home-title" id="home-title">Voodoo Media</h1>
           </div>
 
-          <button
-            class="start-button"
-            type="button"
-            aria-label="Start Voodoo Media"
-            aria-describedby="start-description"
-          >
-            Start
-          </button>
-          <span class="sr-only" id="start-description">Placeholder start control for the VMPix V3 public shell.</span>
+          <div class="start-portal">
+            <button
+              class="start-button"
+              type="button"
+              aria-label="Start Voodoo Media"
+              aria-describedby="start-description"
+            >
+              Start
+            </button>
+          </div>
+          <span class="sr-only" id="start-description">Placeholder start control centered inside the VMPix V3 portal shell.</span>
         </div>
       </section>
     </main>
