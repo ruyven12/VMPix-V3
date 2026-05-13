@@ -13,8 +13,20 @@
 
   <style>
     /* =========================================================
-       VMPix V3 Public Homepage Shell - Pass 6
-       Static foundation only. No routes, APIs, modules, or transitions.
+       Homepage v1 source-of-truth implementation
+       Static foundation only. No routes, APIs, modules, or backend behavior.
+
+       Future work not included in v1:
+       - real public shell routing
+       - full Interactive Portfolio Hub design
+       - real module selection system
+       - full Music module
+       - full Wrestling module
+       - full Calendar module
+       - About/Pricing/Contact routes
+       - backend integrations
+       - advanced animation polish
+       - self-hosted fonts if needed
        ========================================================= */
 
     :root {
@@ -47,6 +59,8 @@
       --tap-target: 48px;
       --frame-max: 44rem;
       --hub-max: 46rem;
+      --stage-min-height: clamp(26rem, calc(100vh - 7.75rem), 46rem);
+      --stage-min-height: clamp(26rem, calc(100svh - 7.75rem), 46rem);
       --title-size: 2rem;
       --kicker-size: 1rem;
       --button-text-size: 0.88rem;
@@ -274,7 +288,7 @@
       grid-area: 1 / 1;
       position: relative;
       width: min(100%, var(--frame-max));
-      min-height: clamp(24rem, 66svh, 38rem);
+      min-height: var(--stage-min-height);
       display: grid;
       place-items: center;
       padding: clamp(2rem, 8svh, 4rem) clamp(1rem, 6vw, 3.5rem);
@@ -554,8 +568,11 @@
       grid-area: 1 / 1;
       position: relative;
       width: min(100%, var(--hub-max));
+      min-height: var(--stage-min-height);
       display: grid;
-      gap: clamp(1.1rem, 3svh, 1.6rem);
+      align-content: center;
+      justify-items: center;
+      gap: clamp(2rem, 7svh, 4.5rem);
       padding: clamp(1.1rem, 4vw, 2rem);
       border: 1px solid rgba(247, 247, 242, 0.22);
       border-radius: var(--radius-md);
@@ -588,7 +605,7 @@
     .hub-header {
       display: grid;
       justify-items: center;
-      gap: 0.55rem;
+      gap: 0.65rem;
       min-width: 0;
       text-align: center;
     }
@@ -605,74 +622,49 @@
       max-width: 100%;
       margin: 0;
       color: var(--color-text);
-      font-size: clamp(1.55rem, 8vw, 3rem);
+      font-size: clamp(1.55rem, 8vw, 2.8rem);
       font-weight: 400;
       line-height: 1.05;
       text-wrap: balance;
     }
 
-    .hub-grid {
-      display: grid;
-      gap: var(--space-2);
-      min-width: 0;
-    }
-
-    .hub-card {
+    .hub-future-mount {
       position: relative;
-      min-width: 0;
-      min-height: 4.75rem;
+      width: min(100%, 22rem);
+      min-height: clamp(8rem, 22svh, 13rem);
       display: grid;
-      align-content: center;
-      gap: 0.4rem;
-      padding: 0.95rem 1rem;
-      border: 1px solid rgba(247, 247, 242, 0.18);
-      border-radius: var(--radius-sm);
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.12);
+      border-radius: 50%;
       background:
-        linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 44%),
-        rgba(8, 8, 11, 0.74);
-      color: var(--color-text);
-      cursor: pointer;
-      font-family: var(--font-display);
-      text-align: left;
-      transition:
-        border-color var(--motion-fast) var(--ease-standard),
-        background-color var(--motion-fast) var(--ease-standard),
-        transform var(--motion-fast) var(--ease-standard);
+        radial-gradient(circle, rgba(213, 22, 34, 0.11), transparent 58%),
+        radial-gradient(circle, transparent 0 58%, rgba(247, 247, 242, 0.08) 58.4% 58.8%, transparent 59.2%),
+        rgba(5, 5, 7, 0.18);
+      overflow: hidden;
     }
 
-    .hub-card::after {
+    .hub-future-mount::before,
+    .hub-future-mount::after {
       position: absolute;
-      top: 0.55rem;
-      right: 0.55rem;
-      width: 0.45rem;
-      height: 0.45rem;
+      inset: 15%;
       content: "";
-      background: var(--color-accent);
-      opacity: 0.74;
+      border: 1px solid rgba(213, 22, 34, 0.22);
+      border-radius: inherit;
+      pointer-events: none;
     }
 
-    .hub-card:hover {
-      border-color: rgba(247, 247, 242, 0.34);
-      background-color: rgba(213, 22, 34, 0.08);
-      transform: translate3d(0, -1px, 0);
+    .hub-future-mount::after {
+      inset: 32%;
+      border-color: rgba(247, 247, 242, 0.12);
     }
 
-    .hub-card:focus-visible {
-      outline: 2px solid var(--color-text);
-      outline-offset: 0.25rem;
-    }
-
-    .hub-card-title {
-      overflow-wrap: anywhere;
-      font-size: clamp(1rem, 4vw, 1.18rem);
-      line-height: 1.1;
-    }
-
-    .hub-card-meta {
+    .hub-status {
+      position: relative;
+      z-index: 1;
       color: var(--color-muted);
-      font-size: clamp(0.68rem, 2.6vw, 0.78rem);
-      line-height: 1.35;
-      overflow-wrap: anywhere;
+      font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+      line-height: 1;
+      text-transform: uppercase;
     }
 
     .site-shell.is-activating .ambient-energy {
@@ -759,6 +751,15 @@
       opacity: 1;
       pointer-events: auto;
       transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    .site-shell.has-entered-hub .ambient-energy {
+      opacity: 0.58;
+    }
+
+    .site-shell.has-entered-hub .ambient-rings {
+      opacity: 0.72;
+      animation-duration: 16s;
     }
 
     @keyframes portalRingSpin {
@@ -873,15 +874,6 @@
       .public-home {
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
       }
-
-      .hub-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .hub-card {
-        min-height: 8rem;
-        align-content: end;
-      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -963,22 +955,14 @@
       <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true">
         <div class="hub-header">
           <p class="hub-kicker">Interactive Portfolio</p>
-          <h2 class="hub-title" id="portfolio-title">Choose Your Archive</h2>
+          <h2 class="hub-title" id="portfolio-title">Nexus Awaiting Input</h2>
         </div>
 
-        <div class="hub-grid" aria-label="Archive preview navigation">
-          <button class="hub-card" type="button" aria-label="Music archive preview" tabindex="-1">
-            <span class="hub-card-title">Music</span>
-            <span class="hub-card-meta">Bands · People · Shows</span>
-          </button>
-          <button class="hub-card" type="button" aria-label="Wrestling archive preview" tabindex="-1">
-            <span class="hub-card-title">Wrestling</span>
-            <span class="hub-card-meta">Shows · Matches · People</span>
-          </button>
-          <button class="hub-card" type="button" aria-label="Calendar archive preview" tabindex="-1">
-            <span class="hub-card-title">Calendar</span>
-            <span class="hub-card-meta">Events · Booking · Schedule</span>
-          </button>
+        <!-- Future Interactive Portfolio Hub mount:
+             keep this container empty in Homepage v1.
+             Future work will decide the real module selection system. -->
+        <div class="hub-future-mount" data-future-hub-mount aria-label="Future Interactive Portfolio Hub mount">
+          <span class="hub-status">System Ready</span>
         </div>
       </section>
     </main>
@@ -995,21 +979,10 @@
       const startButton = document.querySelector(".start-button");
       const homeFrame = document.querySelector(".home-frame");
       const portfolioHub = document.querySelector(".portfolio-hub");
-      const hubCards = document.querySelectorAll(".hub-card");
       const reducedMotion = window.matchMedia
         ? window.matchMedia("(prefers-reduced-motion: reduce)")
         : { matches: false };
       let activationTimer;
-
-      function setHubInteractive(isInteractive) {
-        hubCards.forEach((card) => {
-          if (isInteractive) {
-            card.removeAttribute("tabindex");
-          } else {
-            card.setAttribute("tabindex", "-1");
-          }
-        });
-      }
 
       function revealHub() {
         shell.classList.remove("is-activating", "is-reduced-activation");
@@ -1020,7 +993,6 @@
         if (portfolioHub) {
           portfolioHub.setAttribute("aria-hidden", "false");
         }
-        setHubInteractive(true);
         startButton.setAttribute("aria-busy", "false");
       }
 
@@ -1046,7 +1018,6 @@
 
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
-        setHubInteractive(false);
         startButton.addEventListener("click", activatePortal);
         window.addEventListener("pagehide", () => window.clearTimeout(activationTimer));
       }
