@@ -34,8 +34,8 @@
 
       --color-bg: #050507;
       --color-bg-deep: #010103;
-      --color-panel: rgba(9, 9, 12, 0.72);
-      --color-panel-soft: rgba(255, 255, 255, 0.035);
+      --color-panel: rgba(7, 7, 10, 0.56);
+      --color-panel-soft: rgba(255, 255, 255, 0.052);
       --color-text: #f7f7f2;
       --color-muted: rgba(247, 247, 242, 0.68);
       --color-faint: rgba(247, 247, 242, 0.43);
@@ -190,20 +190,20 @@
       display: block;
       object-fit: cover;
       object-position: center bottom;
-      opacity: 0.27;
-      filter: brightness(0.34) contrast(1.12) saturate(0.66) blur(1px);
+      opacity: 0.29;
+      filter: brightness(0.35) contrast(1.12) saturate(0.66) blur(1px);
       transform: translateZ(0) scale(1.03);
       transition: opacity var(--motion-standard) var(--ease-standard), filter var(--motion-standard) var(--ease-standard);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.13) 18%, rgba(0, 0, 0, 0.76) 50%, rgba(0, 0, 0, 0.92) 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.13) 18%, rgba(0, 0, 0, 0.76) 50%, rgba(0, 0, 0, 0.92) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.16) 16%, rgba(0, 0, 0, 0.82) 50%, rgba(0, 0, 0, 0.94) 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.16) 16%, rgba(0, 0, 0, 0.82) 50%, rgba(0, 0, 0, 0.94) 100%);
     }
 
     .ambient-energy {
       z-index: 1;
       background:
-        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.038) 50%, transparent 52%) 50% 52% / min(42rem, 86vw) 66svh no-repeat,
-        radial-gradient(ellipse at 50% 24%, rgba(247, 247, 242, 0.03), transparent min(42rem, 84vw)),
-        radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.21), transparent min(37rem, 74vw)),
+        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.04) 50%, transparent 52%) 50% 52% / min(42rem, 86vw) 66svh no-repeat,
+        radial-gradient(ellipse at 50% 24%, rgba(247, 247, 242, 0.035), transparent min(42rem, 84vw)),
+        radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.23), transparent min(38rem, 75vw)),
         radial-gradient(circle at 50% 50%, rgba(213, 22, 34, 0.16), transparent min(32rem, 68vw)),
         radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
       opacity: 0.48;
@@ -327,13 +327,16 @@
       border: 1px solid var(--color-line);
       border-radius: var(--radius-md);
       background:
-        linear-gradient(180deg, var(--color-panel-soft), transparent 46%),
+        radial-gradient(ellipse at 50% 70%, rgba(213, 22, 34, 0.055), transparent min(50vw, 25rem)),
+        linear-gradient(180deg, var(--color-panel-soft), rgba(255, 255, 255, 0.012) 44%, transparent 76%),
         var(--color-panel);
       box-shadow:
         inset 0 0 0 rgba(247, 247, 242, 0),
         0 0 0 rgba(213, 22, 34, 0);
       isolation: isolate;
-      animation: shellIdleTrace 26s var(--ease-breath) infinite;
+      animation:
+        frameSettle 680ms var(--ease-standard) 1 backwards,
+        shellIdleTrace 26s var(--ease-breath) 760ms infinite;
       transition:
         opacity var(--motion-standard) var(--ease-standard),
         transform var(--motion-standard) var(--ease-standard),
@@ -392,6 +395,7 @@
       transition:
         opacity var(--motion-standard) var(--ease-standard),
         transform var(--motion-standard) var(--ease-standard);
+      animation: lockupSettle 640ms var(--ease-standard) 80ms 1 backwards;
     }
 
     .title-kicker {
@@ -442,6 +446,7 @@
         0 0 3.5rem rgba(213, 22, 34, 0.055);
       isolation: isolate;
       transform: translateZ(0) scale(1);
+      animation: portalSettle 760ms var(--ease-standard) 120ms 1 backwards;
       transition:
         transform var(--activation-duration) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
@@ -508,8 +513,8 @@
       border: 1px solid var(--color-accent-line);
       border-radius: 50%;
       background:
-        radial-gradient(circle at 50% 42%, rgba(247, 247, 242, 0.12), transparent 36%),
-        radial-gradient(circle at 50% 70%, rgba(213, 22, 34, 0.2), transparent 70%),
+        radial-gradient(circle at 50% 42%, rgba(247, 247, 242, 0.13), transparent 36%),
+        radial-gradient(circle at 50% 70%, rgba(213, 22, 34, 0.22), transparent 70%),
         rgba(5, 5, 7, 0.86);
       box-shadow:
         inset 0 0 1.15rem rgba(0, 0, 0, 0.82),
@@ -539,6 +544,19 @@
       opacity: 0;
       pointer-events: none;
       transform: translate3d(-130%, 0, 0) rotate(10deg);
+    }
+
+    .start-button::after {
+      position: absolute;
+      inset: 18%;
+      content: "";
+      border-radius: inherit;
+      background:
+        conic-gradient(from 24deg, transparent 0 74deg, rgba(213, 22, 34, 0.12) 75deg 76deg, transparent 77deg 238deg, rgba(247, 247, 242, 0.055) 239deg 240deg, transparent 241deg 360deg),
+        radial-gradient(circle, rgba(213, 22, 34, 0.1), transparent 58%);
+      opacity: 0.36;
+      pointer-events: none;
+      animation: startCoreShimmer 16s var(--ease-breath) infinite;
     }
 
     .start-button:hover {
@@ -595,14 +613,14 @@
       color: rgba(247, 247, 242, 0.52);
     }
 
-    .status-value--standby,
-    .status-value--version {
+    .status-value--view,
+    .status-value--build {
       color: rgba(213, 22, 34, 0.74);
       text-shadow: 0 0 0.55rem rgba(213, 22, 34, 0.08);
       animation: statusIdlePulse 9.5s var(--ease-breath) infinite;
     }
 
-    .status-value--version {
+    .status-value--build {
       animation-delay: -3.2s;
       animation-duration: 11.25s;
     }
@@ -622,7 +640,7 @@
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 42%),
         linear-gradient(135deg, rgba(213, 22, 34, 0.075), transparent 38%),
-        rgba(6, 6, 9, 0.78);
+        rgba(6, 6, 9, 0.68);
       opacity: 0;
       pointer-events: none;
       transform: translate3d(0, 0.7rem, 0) scale(0.975);
@@ -721,8 +739,8 @@
     }
 
     .site-shell.is-activating .cinema-fire-bg {
-      opacity: 0.31;
-      filter: brightness(0.4) contrast(1.12) saturate(0.7) blur(1px);
+      opacity: 0.34;
+      filter: brightness(0.42) contrast(1.12) saturate(0.7) blur(1px);
     }
 
     .site-shell.is-activating .ambient-system::after {
@@ -736,6 +754,7 @@
       box-shadow:
         inset 0 0 1.35rem rgba(213, 22, 34, 0.045),
         0 0 3rem rgba(213, 22, 34, 0.08);
+      animation: none;
     }
 
     .site-shell.is-activating .home-frame::before {
@@ -751,6 +770,7 @@
     .site-shell.is-activating .title-group {
       opacity: 0.46;
       transform: translate3d(0, -0.24rem, 0);
+      animation: none;
     }
 
     .site-shell.is-activating .status-row {
@@ -767,6 +787,7 @@
         0 1.5rem 3.4rem rgba(0, 0, 0, 0.52),
         0 0 4.2rem rgba(213, 22, 34, 0.12);
       transform: translateZ(0) scale(var(--portal-activation-scale));
+      animation: none;
     }
 
     .site-shell.is-activating .start-portal::before {
@@ -787,11 +808,15 @@
       background-color: rgba(213, 22, 34, 0.16);
       color: #ffffff;
       opacity: 0.95;
-      transform: translateZ(0) scale(0.91);
+      transform: translateZ(0) scale(0.88);
     }
 
     .site-shell.is-activating .start-button::before {
       animation: activationSweep 820ms var(--ease-standard) both;
+    }
+
+    .site-shell.is-activating .start-button::after {
+      opacity: 0.5;
     }
 
     .site-shell.is-reduced-activation .home-frame,
@@ -833,8 +858,41 @@
     }
 
     .site-shell.has-entered-hub .cinema-fire-bg {
-      opacity: 0.29;
-      filter: brightness(0.37) contrast(1.1) saturate(0.68) blur(1px);
+      opacity: 0.31;
+      filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
+    }
+
+    @keyframes frameSettle {
+      from {
+        opacity: 1;
+        transform: translate3d(0, 0.18rem, 0) scale(0.996);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @keyframes lockupSettle {
+      from {
+        opacity: 1;
+        transform: translate3d(0, 0.16rem, 0);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    @keyframes portalSettle {
+      from {
+        opacity: 1;
+        transform: translateZ(0) scale(0.982);
+      }
+      to {
+        opacity: 1;
+        transform: translateZ(0) scale(1);
+      }
     }
 
     @keyframes shellIdleTrace {
@@ -932,6 +990,22 @@
       }
     }
 
+    @keyframes startCoreShimmer {
+      0%,
+      100% {
+        opacity: 0.22;
+        transform: rotate(0deg) scale(0.985);
+      }
+      47% {
+        opacity: 0.42;
+        transform: rotate(6deg) scale(1.01);
+      }
+      78% {
+        opacity: 0.3;
+        transform: rotate(3deg) scale(1);
+      }
+    }
+
     @keyframes portalRingSpin {
       from {
         transform: rotate(0deg);
@@ -997,7 +1071,7 @@
       }
 
       .cinema-fire-bg {
-        opacity: 0.16;
+        opacity: 0.22;
       }
 
       .ambient-rings {
@@ -1021,18 +1095,35 @@
       }
 
       .status-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
         gap: 0.35rem;
-        justify-content: space-between;
+        justify-items: stretch;
         padding-right: max(var(--space-2), env(safe-area-inset-right));
         padding-left: max(var(--space-2), env(safe-area-inset-left));
-        text-align: center;
+        text-align: left;
+      }
+
+      .status-row > span:last-child {
+        justify-self: end;
       }
     }
 
     @media (max-width: 479px) {
       .status-row {
-        justify-content: space-between;
-        text-align: center;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.2rem;
+        justify-items: stretch;
+        padding-top: 0.32rem;
+        padding-bottom: max(0.32rem, env(safe-area-inset-bottom));
+        font-size: min(var(--footer-text-size), 0.72rem);
+        line-height: 1.16;
+        text-align: left;
+      }
+
+      .status-row > span:last-child {
+        justify-self: end;
       }
     }
 
@@ -1119,9 +1210,10 @@
 
       .start-portal::before,
       .start-portal::after,
+      .start-button::after,
       .home-frame::after,
-      .status-value--standby,
-      .status-value--version {
+      .status-value--view,
+      .status-value--build {
         animation: none !important;
       }
 
@@ -1190,8 +1282,8 @@
     </main>
 
     <footer class="status-row" aria-label="Homepage status">
-      <span><span class="status-label">System Status:</span> <span class="status-value status-value--standby">Standby</span></span>
-      <span><span class="status-label">Version</span> <span class="status-value status-value--version">3.0</span></span>
+      <span><span class="status-label">Currently Viewing:</span> <span class="status-value status-value--view">Homepage</span></span>
+      <span><span class="status-label">Archive Build:</span> <span class="status-value status-value--build">3.0.01</span></span>
     </footer>
   </div>
 
