@@ -59,14 +59,14 @@
       --tap-target: 48px;
       --frame-max: 44rem;
       --hub-max: 46rem;
-      --stage-min-height: clamp(26rem, calc(100vh - 7.75rem), 46rem);
-      --stage-min-height: clamp(26rem, calc(100svh - 7.75rem), 46rem);
+      --stage-min-height: clamp(29rem, calc(100vh - 5.75rem), 52rem);
+      --stage-min-height: clamp(29rem, calc(100svh - 5.75rem), 52rem);
       --title-size: 2rem;
       --kicker-size: 1rem;
       --button-text-size: 0.88rem;
       --footer-text-size: 0.68rem;
       --title-gap: 0.82rem;
-      --lockup-gap: clamp(1.85rem, 5svh, 3rem);
+      --lockup-gap: clamp(2.2rem, 7svh, 4.9rem);
       --portal-size: clamp(13.25rem, 68vw, 18.5rem);
       --portal-button-size: clamp(7rem, 34vw, 9rem);
       --portal-line: rgba(247, 247, 242, 0.2);
@@ -125,6 +125,7 @@
     .ambient-system,
     .ambient-system::before,
     .ambient-system::after,
+    .cinema-fire-bg,
     .ambient-layer {
       position: fixed;
       inset: 0;
@@ -135,8 +136,10 @@
       z-index: 0;
       overflow: hidden;
       background:
-        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.075), transparent min(54vw, 33rem)),
-        radial-gradient(circle at 50% 100%, rgba(247, 247, 242, 0.035), transparent 32rem);
+        radial-gradient(ellipse at 50% 78%, rgba(213, 22, 34, 0.13), transparent min(60vw, 38rem)),
+        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.065), transparent min(54vw, 33rem)),
+        radial-gradient(circle at 50% 100%, rgba(247, 247, 242, 0.035), transparent 32rem),
+        linear-gradient(180deg, rgba(1, 1, 3, 0.92), rgba(5, 5, 7, 0.48) 54%, rgba(1, 1, 3, 0.9));
       contain: layout paint style;
     }
 
@@ -146,6 +149,7 @@
     }
 
     .ambient-system::before {
+      z-index: 3;
       background:
         linear-gradient(var(--ambient-grid-line) 1px, transparent 1px),
         linear-gradient(90deg, var(--ambient-grid-line) 1px, transparent 1px),
@@ -161,27 +165,48 @@
     }
 
     .ambient-system::after {
-      opacity: 0.18;
+      z-index: 5;
+      opacity: 1;
       background:
-        radial-gradient(ellipse at center, transparent 0 50%, rgba(0, 0, 0, 0.56) 100%),
+        linear-gradient(180deg, rgba(1, 1, 3, 0.84), rgba(1, 1, 3, 0.28) 46%, rgba(1, 1, 3, 0.78)),
+        radial-gradient(ellipse at 50% 42%, transparent 0 46%, rgba(0, 0, 0, 0.62) 100%),
+        radial-gradient(ellipse at 50% 88%, rgba(213, 22, 34, 0.09), transparent min(68vw, 42rem)),
         repeating-linear-gradient(
           to bottom,
-          rgba(255, 255, 255, 0.055) 0,
-          rgba(255, 255, 255, 0.055) 1px,
+          rgba(255, 255, 255, 0.032) 0,
+          rgba(255, 255, 255, 0.032) 1px,
           transparent 1px,
           transparent 5px
         );
     }
 
+    .cinema-fire-bg {
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center bottom;
+      opacity: 0.2;
+      filter: brightness(0.3) contrast(1.08) saturate(0.62) blur(1px);
+      transform: translateZ(0) scale(1.03);
+      transition: opacity var(--motion-standard) var(--ease-standard), filter var(--motion-standard) var(--ease-standard);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 24%, rgba(0, 0, 0, 0.74) 56%, rgba(0, 0, 0, 0.86) 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 24%, rgba(0, 0, 0, 0.74) 56%, rgba(0, 0, 0, 0.86) 100%);
+    }
+
     .ambient-energy {
+      z-index: 1;
       background:
-        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.2), transparent min(32rem, 68vw)),
+        radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.18), transparent min(36rem, 72vw)),
+        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.18), transparent min(32rem, 68vw)),
         radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
       opacity: 0.48;
       animation: ambientBreath var(--motion-ambient-slow) var(--ease-standard) infinite;
     }
 
     .ambient-rings {
+      z-index: 2;
       inset: 50% auto auto 50%;
       width: min(78vw, 43rem);
       aspect-ratio: 1;
@@ -197,6 +222,7 @@
     }
 
     .ambient-sweep {
+      z-index: 4;
       inset: -20% auto auto -55%;
       width: 46%;
       height: 140%;
@@ -207,6 +233,7 @@
     }
 
     .ambient-particles {
+      z-index: 4;
       background:
         radial-gradient(circle, rgba(213, 22, 34, 0.55) 0 1px, transparent 1.6px) 18% 24% / 100% 100% no-repeat,
         radial-gradient(circle, rgba(247, 247, 242, 0.35) 0 1px, transparent 1.5px) 74% 22% / 100% 100% no-repeat,
@@ -278,9 +305,9 @@
       overflow-x: hidden;
       overflow-y: auto;
       padding:
-        max(var(--space-4), env(safe-area-inset-top))
+        max(clamp(1rem, 2.8svh, 1.8rem), env(safe-area-inset-top))
         max(var(--space-3), env(safe-area-inset-right))
-        var(--space-4)
+        clamp(1.1rem, 2.8svh, 1.9rem)
         max(var(--space-3), env(safe-area-inset-left));
     }
 
@@ -291,7 +318,7 @@
       min-height: var(--stage-min-height);
       display: grid;
       place-items: center;
-      padding: clamp(2rem, 8svh, 4rem) clamp(1rem, 6vw, 3.5rem);
+      padding: clamp(2.35rem, 8.8svh, 5rem) clamp(1rem, 6vw, 3.5rem);
       border: 1px solid var(--color-line);
       border-radius: var(--radius-md);
       background:
@@ -386,7 +413,9 @@
       max-width: 38rem;
       display: grid;
       justify-items: center;
+      align-content: center;
       gap: var(--lockup-gap);
+      min-height: clamp(20rem, 58svh, 35rem);
       text-align: center;
     }
 
@@ -415,7 +444,7 @@
       margin: 0;
       color: var(--color-text);
       font-family: var(--font-display);
-      font-size: var(--title-size);
+      font-size: clamp(1.55rem, 7.15vw, var(--title-size));
       font-weight: 400;
       line-height: 1;
       text-transform: none;
@@ -541,7 +570,8 @@
       min-width: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: var(--space-2) var(--space-3);
       padding:
         var(--space-3)
@@ -561,7 +591,9 @@
     }
 
     .status-row span {
-      min-width: 0;
+      flex: 0 0 auto;
+      min-width: max-content;
+      white-space: nowrap;
     }
 
     .portfolio-hub {
@@ -677,6 +709,11 @@
       animation-duration: 6s;
     }
 
+    .site-shell.is-activating .cinema-fire-bg {
+      opacity: 0.26;
+      filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
+    }
+
     .site-shell.is-activating .home-frame {
       opacity: 0.76;
       border-color: rgba(213, 22, 34, 0.34);
@@ -762,6 +799,11 @@
       animation-duration: 16s;
     }
 
+    .site-shell.has-entered-hub .cinema-fire-bg {
+      opacity: 0.27;
+      filter: brightness(0.36) contrast(1.08) saturate(0.68) blur(1px);
+    }
+
     @keyframes portalRingSpin {
       from {
         transform: rotate(0deg);
@@ -813,7 +855,9 @@
       :root {
         --title-size: 1.88rem;
         --kicker-size: 0.94rem;
-        --lockup-gap: clamp(1.55rem, 4.5svh, 2.2rem);
+        --stage-min-height: clamp(27rem, calc(100vh - 5.25rem), 48rem);
+        --stage-min-height: clamp(27rem, calc(100svh - 5.25rem), 48rem);
+        --lockup-gap: clamp(1.75rem, 5svh, 2.55rem);
         --portal-size: clamp(12.5rem, 67vw, 13.25rem);
         --portal-button-size: clamp(6.45rem, 33vw, 7rem);
         --portal-activation-scale: 1.22;
@@ -821,6 +865,10 @@
 
       .ambient-particles {
         opacity: 0.24;
+      }
+
+      .cinema-fire-bg {
+        opacity: 0.16;
       }
 
       .ambient-rings {
@@ -831,6 +879,10 @@
         padding-inline: var(--space-3);
       }
 
+      .home-lockup {
+        min-height: clamp(18.5rem, 54svh, 30rem);
+      }
+
       .portfolio-hub {
         padding: var(--space-3);
       }
@@ -838,7 +890,13 @@
       .status-row {
         justify-content: center;
         text-align: center;
-        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 479px) {
+      .status-row {
+        justify-content: center;
+        text-align: center;
       }
     }
 
@@ -865,7 +923,7 @@
         --button-text-size: 0.94rem;
         --footer-text-size: 0.72rem;
         --title-gap: 0.95rem;
-        --lockup-gap: clamp(2.15rem, 6svh, 3.35rem);
+        --lockup-gap: clamp(2.75rem, 7svh, 5.15rem);
         --portal-size: clamp(17rem, 28vw, 19.25rem);
         --portal-button-size: clamp(8.25rem, 14vw, 9.25rem);
         --portal-activation-scale: 1.46;
@@ -873,6 +931,11 @@
 
       .public-home {
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
+      }
+
+      .status-row {
+        justify-content: space-between;
+        text-align: left;
       }
     }
 
@@ -894,6 +957,13 @@
       .ambient-energy {
         opacity: 0.34;
         transform: none;
+      }
+
+      .cinema-fire-bg,
+      .site-shell.is-activating .cinema-fire-bg,
+      .site-shell.has-entered-hub .cinema-fire-bg {
+        opacity: 0.1;
+        filter: brightness(0.22) contrast(1) saturate(0.42) blur(1.5px);
       }
 
       .ambient-sweep,
@@ -919,6 +989,9 @@
 <body>
   <div class="site-shell">
     <div class="ambient-system" aria-hidden="true">
+      <video class="cinema-fire-bg" autoplay muted loop playsinline aria-hidden="true" preload="metadata">
+        <source src="./assets/media/background/background-fire.mp4" type="video/mp4">
+      </video>
       <span class="ambient-layer ambient-energy"></span>
       <span class="ambient-layer ambient-rings"></span>
       <span class="ambient-layer ambient-sweep"></span>
@@ -979,10 +1052,27 @@
       const startButton = document.querySelector(".start-button");
       const homeFrame = document.querySelector(".home-frame");
       const portfolioHub = document.querySelector(".portfolio-hub");
+      const fireVideo = document.querySelector(".cinema-fire-bg");
       const reducedMotion = window.matchMedia
         ? window.matchMedia("(prefers-reduced-motion: reduce)")
         : { matches: false };
       let activationTimer;
+
+      function syncAmbientMotion() {
+        if (!fireVideo) {
+          return;
+        }
+
+        if (reducedMotion.matches) {
+          fireVideo.pause();
+          return;
+        }
+
+        const playback = fireVideo.play();
+        if (playback && typeof playback.catch === "function") {
+          playback.catch(() => {});
+        }
+      }
 
       function revealHub() {
         shell.classList.remove("is-activating", "is-reduced-activation");
@@ -1019,6 +1109,12 @@
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
         startButton.addEventListener("click", activatePortal);
+        syncAmbientMotion();
+        if (typeof reducedMotion.addEventListener === "function") {
+          reducedMotion.addEventListener("change", syncAmbientMotion);
+        } else if (typeof reducedMotion.addListener === "function") {
+          reducedMotion.addListener(syncAmbientMotion);
+        }
         window.addEventListener("pagehide", () => window.clearTimeout(activationTimer));
       }
     })();
