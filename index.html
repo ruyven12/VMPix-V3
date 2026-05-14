@@ -95,7 +95,7 @@
     }
 
     body {
-      min-width: 320px;
+      min-width: 0;
       min-height: 100vh;
       min-height: 100svh;
       margin: 0;
@@ -114,6 +114,7 @@
 
     .site-shell {
       position: relative;
+      min-width: 0;
       min-height: 100vh;
       min-height: 100svh;
       display: grid;
@@ -136,9 +137,9 @@
       z-index: 0;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 78%, rgba(213, 22, 34, 0.13), transparent min(60vw, 38rem)),
+        radial-gradient(ellipse at 50% 76%, rgba(213, 22, 34, 0.15), transparent min(62vw, 39rem)),
         radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.065), transparent min(54vw, 33rem)),
-        radial-gradient(circle at 50% 100%, rgba(247, 247, 242, 0.035), transparent 32rem),
+        radial-gradient(ellipse at 50% 102%, rgba(247, 247, 242, 0.045), transparent 34rem),
         linear-gradient(180deg, rgba(1, 1, 3, 0.92), rgba(5, 5, 7, 0.48) 54%, rgba(1, 1, 3, 0.9));
       contain: layout paint style;
     }
@@ -168,9 +169,9 @@
       z-index: 5;
       opacity: 1;
       background:
-        linear-gradient(180deg, rgba(1, 1, 3, 0.84), rgba(1, 1, 3, 0.28) 46%, rgba(1, 1, 3, 0.78)),
-        radial-gradient(ellipse at 50% 42%, transparent 0 46%, rgba(0, 0, 0, 0.62) 100%),
-        radial-gradient(ellipse at 50% 88%, rgba(213, 22, 34, 0.09), transparent min(68vw, 42rem)),
+        linear-gradient(180deg, rgba(1, 1, 3, 0.86), rgba(1, 1, 3, 0.24) 46%, rgba(1, 1, 3, 0.76)),
+        radial-gradient(ellipse at 50% 42%, transparent 0 45%, rgba(0, 0, 0, 0.6) 100%),
+        radial-gradient(ellipse at 50% 87%, rgba(213, 22, 34, 0.11), transparent min(68vw, 43rem)),
         repeating-linear-gradient(
           to bottom,
           rgba(255, 255, 255, 0.032) 0,
@@ -187,19 +188,20 @@
       display: block;
       object-fit: cover;
       object-position: center bottom;
-      opacity: 0.2;
-      filter: brightness(0.3) contrast(1.08) saturate(0.62) blur(1px);
+      opacity: 0.23;
+      filter: brightness(0.32) contrast(1.1) saturate(0.64) blur(1px);
       transform: translateZ(0) scale(1.03);
       transition: opacity var(--motion-standard) var(--ease-standard), filter var(--motion-standard) var(--ease-standard);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 24%, rgba(0, 0, 0, 0.74) 56%, rgba(0, 0, 0, 0.86) 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 24%, rgba(0, 0, 0, 0.74) 56%, rgba(0, 0, 0, 0.86) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 22%, rgba(0, 0, 0, 0.72) 54%, rgba(0, 0, 0, 0.9) 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 22%, rgba(0, 0, 0, 0.72) 54%, rgba(0, 0, 0, 0.9) 100%);
     }
 
     .ambient-energy {
       z-index: 1;
       background:
-        radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.18), transparent min(36rem, 72vw)),
-        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.18), transparent min(32rem, 68vw)),
+        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.035) 50%, transparent 52%) 50% 54% / min(42rem, 86vw) 58svh no-repeat,
+        radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.21), transparent min(37rem, 74vw)),
+        radial-gradient(circle at 50% 50%, rgba(213, 22, 34, 0.16), transparent min(32rem, 68vw)),
         radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
       opacity: 0.48;
       animation: ambientBreath var(--motion-ambient-slow) var(--ease-standard) infinite;
@@ -253,7 +255,7 @@
       }
       50% {
         opacity: 0.58;
-        transform: scale(1.035);
+        transform: translate3d(0, -0.18rem, 0) scale(1.035);
       }
     }
 
@@ -344,6 +346,20 @@
         linear-gradient(180deg, transparent 0 44%, rgba(247, 247, 242, 0.08) 50%, transparent 56%) left / 1px 100% no-repeat;
     }
 
+    .home-frame::after {
+      position: absolute;
+      inset: var(--space-2);
+      z-index: -1;
+      content: "";
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, transparent 6%, rgba(247, 247, 242, 0.03) 35%, rgba(213, 22, 34, 0.09) 61%, transparent 88%) 50% 50% / 1px 100% no-repeat,
+        radial-gradient(ellipse at 50% 66%, rgba(213, 22, 34, 0.08), transparent min(48vw, 24rem)),
+        radial-gradient(ellipse at 50% 82%, rgba(247, 247, 242, 0.035), transparent min(54vw, 28rem));
+      opacity: 0.9;
+      animation: chamberDepthDrift 17s var(--ease-standard) infinite;
+    }
+
     .frame-corner {
       position: absolute;
       width: clamp(2.25rem, 12vw, 4rem);
@@ -411,6 +427,7 @@
     .home-lockup {
       width: 100%;
       max-width: 38rem;
+      min-width: 0;
       display: grid;
       justify-items: center;
       align-content: center;
@@ -444,7 +461,7 @@
       margin: 0;
       color: var(--color-text);
       font-family: var(--font-display);
-      font-size: clamp(1.55rem, 7.15vw, var(--title-size));
+      font-size: clamp(1.28rem, 6.35vw, var(--title-size));
       font-weight: 400;
       line-height: 1;
       text-transform: none;
@@ -461,17 +478,27 @@
       border: 1px solid var(--portal-line);
       border-radius: 50%;
       background:
+        radial-gradient(circle at 50% 54%, rgba(1, 1, 3, 0.9) 0 30%, transparent 48%),
+        radial-gradient(circle at 50% 58%, rgba(247, 247, 242, 0.055), transparent 35%),
+        radial-gradient(circle at 50% 72%, rgba(213, 22, 34, 0.16), transparent 58%),
         linear-gradient(90deg, transparent calc(50% - 0.5px), var(--portal-line-soft) 50%, transparent calc(50% + 0.5px)),
         linear-gradient(0deg, transparent calc(50% - 0.5px), var(--portal-line-soft) 50%, transparent calc(50% + 0.5px)),
-        radial-gradient(circle, transparent 0 43%, rgba(213, 22, 34, 0.18) 43.3% 43.7%, transparent 44%),
-        radial-gradient(circle, rgba(213, 22, 34, 0.07), transparent 58%),
+        radial-gradient(circle, transparent 0 36%, rgba(0, 0, 0, 0.5) 38%, transparent 50%),
+        radial-gradient(circle, transparent 0 43%, rgba(213, 22, 34, 0.2) 43.3% 43.7%, transparent 44%),
+        conic-gradient(from 18deg, transparent 0 58deg, rgba(247, 247, 242, 0.045) 59deg 60deg, transparent 61deg 142deg, rgba(213, 22, 34, 0.075) 143deg 144deg, transparent 145deg 250deg, rgba(247, 247, 242, 0.035) 251deg 252deg, transparent 253deg 360deg),
         rgba(5, 5, 7, 0.2);
+      box-shadow:
+        inset 0 0 2.35rem rgba(0, 0, 0, 0.82),
+        inset 0 0 0.85rem rgba(247, 247, 242, 0.035),
+        0 1.35rem 3rem rgba(0, 0, 0, 0.48),
+        0 0 3.5rem rgba(213, 22, 34, 0.055);
       isolation: isolate;
       transform: translateZ(0) scale(1);
       transition:
         transform var(--activation-duration) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
         background-color var(--motion-standard) var(--ease-standard),
+        box-shadow var(--motion-standard) var(--ease-standard),
         opacity var(--motion-standard) var(--ease-standard);
     }
 
@@ -487,13 +514,19 @@
       inset: clamp(1.05rem, 5vw, 1.45rem);
       border: 1px solid var(--portal-line-soft);
       background: conic-gradient(
-        from 0deg,
+        from -9deg,
         transparent 0 38deg,
         rgba(247, 247, 242, 0.16) 39deg 40deg,
-        transparent 41deg 178deg,
-        rgba(213, 22, 34, 0.18) 179deg 180deg,
-        transparent 181deg 360deg
+        transparent 41deg 126deg,
+        rgba(213, 22, 34, 0.12) 127deg 128deg,
+        transparent 129deg 178deg,
+        rgba(213, 22, 34, 0.2) 179deg 180deg,
+        transparent 181deg 294deg,
+        rgba(247, 247, 242, 0.09) 295deg 296deg,
+        transparent 297deg 360deg
       );
+      opacity: 0.86;
+      animation: portalDormantDrift 19s linear infinite;
       transition:
         border-color var(--motion-standard) var(--ease-standard),
         opacity var(--motion-standard) var(--ease-standard);
@@ -503,6 +536,13 @@
       inset: clamp(2.05rem, 8.5vw, 3rem);
       border: 1px solid var(--portal-red-line);
       opacity: 0.88;
+      background:
+        radial-gradient(circle, transparent 0 58%, rgba(213, 22, 34, 0.13) 58.4% 58.9%, transparent 59.3%),
+        conic-gradient(from 42deg, transparent 0 84deg, rgba(213, 22, 34, 0.12) 85deg 86deg, transparent 87deg 226deg, rgba(247, 247, 242, 0.06) 227deg 228deg, transparent 229deg 360deg);
+      box-shadow:
+        inset 0 0 1.2rem rgba(0, 0, 0, 0.56),
+        0 0 1.6rem rgba(213, 22, 34, 0.06);
+      animation: portalInnerBreath 11s var(--ease-standard) infinite;
       transition:
         inset var(--activation-duration) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
@@ -520,9 +560,12 @@
       border: 1px solid var(--color-accent-line);
       border-radius: 50%;
       background:
-        radial-gradient(circle, rgba(247, 247, 242, 0.08), transparent 58%),
-        radial-gradient(circle, var(--color-accent-soft), transparent 72%),
+        radial-gradient(circle at 50% 42%, rgba(247, 247, 242, 0.12), transparent 36%),
+        radial-gradient(circle at 50% 70%, rgba(213, 22, 34, 0.2), transparent 70%),
         rgba(5, 5, 7, 0.86);
+      box-shadow:
+        inset 0 0 1.15rem rgba(0, 0, 0, 0.82),
+        0 0 1.4rem rgba(213, 22, 34, 0.08);
       color: var(--color-text);
       cursor: pointer;
       font-family: var(--font-display);
@@ -733,6 +776,11 @@
     .site-shell.is-activating .start-portal {
       border-color: rgba(247, 247, 242, 0.42);
       background-color: rgba(213, 22, 34, 0.06);
+      box-shadow:
+        inset 0 0 2.8rem rgba(0, 0, 0, 0.86),
+        inset 0 0 1.1rem rgba(247, 247, 242, 0.055),
+        0 1.5rem 3.4rem rgba(0, 0, 0, 0.52),
+        0 0 4.2rem rgba(213, 22, 34, 0.12);
       transform: translateZ(0) scale(var(--portal-activation-scale));
     }
 
@@ -802,6 +850,39 @@
     .site-shell.has-entered-hub .cinema-fire-bg {
       opacity: 0.27;
       filter: brightness(0.36) contrast(1.08) saturate(0.68) blur(1px);
+    }
+
+    @keyframes chamberDepthDrift {
+      0%,
+      100% {
+        opacity: 0.72;
+        transform: translate3d(0, 0.16rem, 0) scaleY(1);
+      }
+      50% {
+        opacity: 0.94;
+        transform: translate3d(0, -0.12rem, 0) scaleY(1.015);
+      }
+    }
+
+    @keyframes portalDormantDrift {
+      from {
+        transform: rotate(0deg) scale(1);
+      }
+      to {
+        transform: rotate(18deg) scale(1);
+      }
+    }
+
+    @keyframes portalInnerBreath {
+      0%,
+      100% {
+        opacity: 0.72;
+        transform: scale(0.992);
+      }
+      50% {
+        opacity: 0.94;
+        transform: scale(1.012);
+      }
     }
 
     @keyframes portalRingSpin {
@@ -877,6 +958,10 @@
 
       .home-frame {
         padding-inline: var(--space-3);
+      }
+
+      .home-title {
+        font-size: clamp(1.02rem, 5.35vw, 1.22rem);
       }
 
       .home-lockup {
@@ -959,6 +1044,11 @@
         transform: none;
       }
 
+      .home-frame::after {
+        opacity: 0.58;
+        transform: none;
+      }
+
       .cinema-fire-bg,
       .site-shell.is-activating .cinema-fire-bg,
       .site-shell.has-entered-hub .cinema-fire-bg {
@@ -969,6 +1059,12 @@
       .ambient-sweep,
       .ambient-particles {
         display: none;
+      }
+
+      .start-portal::before,
+      .start-portal::after,
+      .home-frame::after {
+        animation: none !important;
       }
 
       .site-shell.is-activating .home-frame,
