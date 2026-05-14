@@ -40,7 +40,7 @@
       --color-muted: rgba(247, 247, 242, 0.68);
       --color-faint: rgba(247, 247, 242, 0.43);
       --color-line: rgba(247, 247, 242, 0.2);
-      --color-line-strong: rgba(247, 247, 242, 0.42);
+      --color-line-strong: rgba(247, 247, 242, 0.24);
       --color-accent: #d51622;
       --color-accent-soft: rgba(213, 22, 34, 0.18);
       --color-accent-line: rgba(213, 22, 34, 0.58);
@@ -64,7 +64,7 @@
       --title-size: 2rem;
       --kicker-size: 1rem;
       --button-text-size: 0.88rem;
-      --footer-text-size: 0.68rem;
+      --footer-text-size: 0.78rem;
       --title-gap: 0.82rem;
       --lockup-gap: clamp(2.2rem, 7svh, 4.9rem);
       --portal-size: clamp(13.25rem, 68vw, 18.5rem);
@@ -76,13 +76,14 @@
       --ambient-grid-red: rgba(213, 22, 34, 0.055);
       --ambient-ring-line: rgba(247, 247, 242, 0.075);
       --ambient-ring-red: rgba(213, 22, 34, 0.15);
-      --motion-fast: 160ms;
-      --motion-standard: 240ms;
-      --motion-ambient: 12s;
-      --motion-ambient-slow: 20s;
+      --motion-fast: 180ms;
+      --motion-standard: 300ms;
+      --motion-ambient: 18s;
+      --motion-ambient-slow: 32s;
       --activation-duration: 1100ms;
       --portal-activation-scale: 1.32;
-      --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+      --ease-standard: cubic-bezier(0.22, 0.72, 0.18, 1);
+      --ease-breath: cubic-bezier(0.45, 0, 0.2, 1);
     }
 
     * {
@@ -204,7 +205,7 @@
         radial-gradient(circle at 50% 50%, rgba(213, 22, 34, 0.16), transparent min(32rem, 68vw)),
         radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
       opacity: 0.48;
-      animation: ambientBreath var(--motion-ambient-slow) var(--ease-standard) infinite;
+      animation: ambientBreath var(--motion-ambient-slow) var(--ease-breath) infinite;
     }
 
     .ambient-rings {
@@ -220,7 +221,7 @@
         radial-gradient(circle, transparent 0 70%, rgba(247, 247, 242, 0.055) 70.1% 70.3%, transparent 70.75%),
         conic-gradient(from 12deg, transparent 0 18deg, rgba(213, 22, 34, 0.1) 19deg 20deg, transparent 21deg 94deg, rgba(247, 247, 242, 0.08) 95deg 96deg, transparent 97deg 180deg, rgba(213, 22, 34, 0.085) 181deg 182deg, transparent 183deg 360deg);
       opacity: 0.62;
-      animation: ambientRingDrift var(--motion-ambient-slow) linear infinite;
+      animation: ambientRingDrift 42s linear infinite;
     }
 
     .ambient-sweep {
@@ -229,9 +230,9 @@
       width: 46%;
       height: 140%;
       background: linear-gradient(90deg, transparent, rgba(247, 247, 242, 0.045), transparent);
-      opacity: 0.46;
+      opacity: 0.38;
       transform: skewX(-18deg) translate3d(-12%, 0, 0);
-      animation: ambientSweep 18s var(--ease-standard) infinite;
+      animation: ambientSweep 28s var(--ease-breath) infinite;
     }
 
     .ambient-particles {
@@ -275,7 +276,7 @@
         transform: skewX(-18deg) translate3d(-12%, 0, 0);
       }
       78% {
-        opacity: 0.38;
+        opacity: 0.28;
       }
       100% {
         opacity: 0;
@@ -356,8 +357,8 @@
         linear-gradient(180deg, transparent 6%, rgba(247, 247, 242, 0.03) 35%, rgba(213, 22, 34, 0.09) 61%, transparent 88%) 50% 50% / 1px 100% no-repeat,
         radial-gradient(ellipse at 50% 66%, rgba(213, 22, 34, 0.08), transparent min(48vw, 24rem)),
         radial-gradient(ellipse at 50% 82%, rgba(247, 247, 242, 0.035), transparent min(54vw, 28rem));
-      opacity: 0.9;
-      animation: chamberDepthDrift 17s var(--ease-standard) infinite;
+      opacity: 0.82;
+      animation: chamberDepthDrift 28s var(--ease-breath) infinite;
     }
 
     .frame-corner {
@@ -365,15 +366,17 @@
       width: clamp(2.25rem, 12vw, 4rem);
       height: clamp(2.25rem, 12vw, 4rem);
       border-color: var(--color-line-strong);
+      opacity: 0.58;
       pointer-events: none;
     }
 
     .frame-corner::after {
       position: absolute;
-      width: 0.42rem;
-      height: 0.42rem;
+      width: 0.32rem;
+      height: 0.32rem;
       content: "";
-      background: var(--color-accent);
+      background: rgba(213, 22, 34, 0.58);
+      box-shadow: 0 0 0.65rem rgba(213, 22, 34, 0.08);
     }
 
     .frame-corner--top-left {
@@ -526,7 +529,7 @@
         transparent 297deg 360deg
       );
       opacity: 0.86;
-      animation: portalDormantDrift 19s linear infinite;
+      animation: portalDormantDrift 38s var(--ease-breath) infinite alternate;
       transition:
         border-color var(--motion-standard) var(--ease-standard),
         opacity var(--motion-standard) var(--ease-standard);
@@ -542,7 +545,7 @@
       box-shadow:
         inset 0 0 1.2rem rgba(0, 0, 0, 0.56),
         0 0 1.6rem rgba(213, 22, 34, 0.06);
-      animation: portalInnerBreath 11s var(--ease-standard) infinite;
+      animation: portalInnerBreath 18s var(--ease-breath) infinite;
       transition:
         inset var(--activation-duration) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
@@ -613,20 +616,20 @@
       min-width: 0;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       flex-wrap: wrap;
       gap: var(--space-2) var(--space-3);
       padding:
-        var(--space-3)
+        0.85rem
         max(var(--space-3), env(safe-area-inset-right))
-        max(var(--space-3), env(safe-area-inset-bottom))
+        max(0.85rem, env(safe-area-inset-bottom))
         max(var(--space-3), env(safe-area-inset-left));
       border-top: 1px solid rgba(247, 247, 242, 0.1);
       color: var(--color-faint);
       font-family: var(--font-display);
       font-size: var(--footer-text-size);
       font-weight: 400;
-      line-height: 1.2;
+      line-height: 1.25;
       text-transform: uppercase;
       transition:
         opacity var(--motion-standard) var(--ease-standard),
@@ -637,6 +640,26 @@
       flex: 0 0 auto;
       min-width: max-content;
       white-space: nowrap;
+    }
+
+    .status-label {
+      color: rgba(247, 247, 242, 0.34);
+    }
+
+    .status-value {
+      color: rgba(247, 247, 242, 0.52);
+    }
+
+    .status-value--standby,
+    .status-value--version {
+      color: rgba(213, 22, 34, 0.74);
+      text-shadow: 0 0 0.55rem rgba(213, 22, 34, 0.08);
+      animation: statusIdlePulse 9.5s var(--ease-breath) infinite;
+    }
+
+    .status-value--version {
+      animation-delay: -3.2s;
+      animation-duration: 11.25s;
     }
 
     .portfolio-hub {
@@ -743,13 +766,13 @@
     }
 
     .site-shell.is-activating .ambient-energy {
-      opacity: 0.7;
-      animation-duration: 5s;
+      opacity: 0.64;
+      animation-duration: 8s;
     }
 
     .site-shell.is-activating .ambient-rings {
-      opacity: 0.86;
-      animation-duration: 6s;
+      opacity: 0.78;
+      animation-duration: 10s;
     }
 
     .site-shell.is-activating .cinema-fire-bg {
@@ -787,14 +810,14 @@
     .site-shell.is-activating .start-portal::before {
       border-color: rgba(247, 247, 242, 0.28);
       opacity: 0.96;
-      animation: portalRingSpin 420ms linear infinite;
+      animation: portalRingSpin 640ms linear infinite;
     }
 
     .site-shell.is-activating .start-portal::after {
       inset: clamp(1.45rem, 6vw, 2.2rem);
       border-color: rgba(213, 22, 34, 0.82);
       opacity: 1;
-      animation: portalRedPulse 560ms var(--ease-standard) infinite;
+      animation: portalRedPulse 780ms var(--ease-standard) infinite;
     }
 
     .site-shell.is-activating .start-button {
@@ -806,7 +829,7 @@
     }
 
     .site-shell.is-activating .start-button::before {
-      animation: activationSweep 680ms var(--ease-standard) both;
+      animation: activationSweep 820ms var(--ease-standard) both;
     }
 
     .site-shell.is-reduced-activation .home-frame,
@@ -844,7 +867,7 @@
 
     .site-shell.has-entered-hub .ambient-rings {
       opacity: 0.72;
-      animation-duration: 16s;
+      animation-duration: 34s;
     }
 
     .site-shell.has-entered-hub .cinema-fire-bg {
@@ -859,17 +882,20 @@
         transform: translate3d(0, 0.16rem, 0) scaleY(1);
       }
       50% {
-        opacity: 0.94;
-        transform: translate3d(0, -0.12rem, 0) scaleY(1.015);
+        opacity: 0.88;
+        transform: translate3d(0, -0.1rem, 0) scaleY(1.01);
       }
     }
 
     @keyframes portalDormantDrift {
-      from {
+      0% {
         transform: rotate(0deg) scale(1);
       }
-      to {
-        transform: rotate(18deg) scale(1);
+      48% {
+        transform: rotate(5deg) scale(1.002);
+      }
+      100% {
+        transform: rotate(11deg) scale(1);
       }
     }
 
@@ -880,8 +906,29 @@
         transform: scale(0.992);
       }
       50% {
-        opacity: 0.94;
-        transform: scale(1.012);
+        opacity: 0.88;
+        transform: scale(1.008);
+      }
+    }
+
+    @keyframes statusIdlePulse {
+      0%,
+      18%,
+      100% {
+        opacity: 0.58;
+        text-shadow: 0 0 0.45rem rgba(213, 22, 34, 0.05);
+      }
+      43% {
+        opacity: 0.76;
+        text-shadow: 0 0 0.62rem rgba(213, 22, 34, 0.12);
+      }
+      57% {
+        opacity: 0.66;
+        text-shadow: 0 0 0.5rem rgba(213, 22, 34, 0.08);
+      }
+      83% {
+        opacity: 0.82;
+        text-shadow: 0 0 0.7rem rgba(213, 22, 34, 0.13);
       }
     }
 
@@ -936,6 +983,7 @@
       :root {
         --title-size: 1.88rem;
         --kicker-size: 0.94rem;
+        --footer-text-size: 0.64rem;
         --stage-min-height: clamp(27rem, calc(100vh - 5.25rem), 48rem);
         --stage-min-height: clamp(27rem, calc(100svh - 5.25rem), 48rem);
         --lockup-gap: clamp(1.75rem, 5svh, 2.55rem);
@@ -973,14 +1021,17 @@
       }
 
       .status-row {
-        justify-content: center;
+        gap: 0.35rem;
+        justify-content: space-between;
+        padding-right: max(var(--space-2), env(safe-area-inset-right));
+        padding-left: max(var(--space-2), env(safe-area-inset-left));
         text-align: center;
       }
     }
 
     @media (max-width: 479px) {
       .status-row {
-        justify-content: center;
+        justify-content: space-between;
         text-align: center;
       }
     }
@@ -1006,7 +1057,7 @@
         --title-size: 4.35rem;
         --kicker-size: 1.12rem;
         --button-text-size: 0.94rem;
-        --footer-text-size: 0.72rem;
+        --footer-text-size: 0.84rem;
         --title-gap: 0.95rem;
         --lockup-gap: clamp(2.75rem, 7svh, 5.15rem);
         --portal-size: clamp(17rem, 28vw, 19.25rem);
@@ -1063,7 +1114,9 @@
 
       .start-portal::before,
       .start-portal::after,
-      .home-frame::after {
+      .home-frame::after,
+      .status-value--standby,
+      .status-value--version {
         animation: none !important;
       }
 
@@ -1137,8 +1190,8 @@
     </main>
 
     <footer class="status-row" aria-label="Homepage status">
-      <span>System Status: Standby</span>
-      <span>Version 3.0</span>
+      <span><span class="status-label">System Status:</span> <span class="status-value status-value--standby">Standby</span></span>
+      <span><span class="status-label">Version</span> <span class="status-value status-value--version">3.0</span></span>
     </footer>
   </div>
 
