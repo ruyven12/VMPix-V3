@@ -1,0 +1,13 @@
+{
+  "name": "vmpix-v3-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static VMPix V3 frontend QA harness.",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest"
+  }
+}
