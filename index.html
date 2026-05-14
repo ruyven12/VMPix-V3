@@ -80,7 +80,7 @@
       --motion-standard: 300ms;
       --motion-ambient: 18s;
       --motion-ambient-slow: 32s;
-      --activation-duration: 1100ms;
+      --activation-duration: 1260ms;
       --portal-activation-scale: 1.32;
       --ease-standard: cubic-bezier(0.22, 0.72, 0.18, 1);
       --ease-breath: cubic-bezier(0.45, 0, 0.2, 1);
@@ -138,9 +138,10 @@
       z-index: 0;
       overflow: hidden;
       background:
-        radial-gradient(ellipse at 50% 76%, rgba(213, 22, 34, 0.15), transparent min(62vw, 39rem)),
-        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.065), transparent min(54vw, 33rem)),
-        radial-gradient(ellipse at 50% 102%, rgba(247, 247, 242, 0.045), transparent 34rem),
+        radial-gradient(ellipse at 50% 18%, rgba(247, 247, 242, 0.026), transparent min(48vw, 27rem)),
+        radial-gradient(ellipse at 50% 76%, rgba(213, 22, 34, 0.17), transparent min(62vw, 40rem)),
+        radial-gradient(circle at 50% 46%, rgba(213, 22, 34, 0.072), transparent min(54vw, 33rem)),
+        radial-gradient(ellipse at 50% 102%, rgba(247, 247, 242, 0.055), transparent 35rem),
         linear-gradient(180deg, rgba(1, 1, 3, 0.92), rgba(5, 5, 7, 0.48) 54%, rgba(1, 1, 3, 0.9));
       contain: layout paint style;
     }
@@ -170,9 +171,9 @@
       z-index: 5;
       opacity: 1;
       background:
-        linear-gradient(180deg, rgba(1, 1, 3, 0.86), rgba(1, 1, 3, 0.24) 46%, rgba(1, 1, 3, 0.76)),
-        radial-gradient(ellipse at 50% 42%, transparent 0 45%, rgba(0, 0, 0, 0.6) 100%),
-        radial-gradient(ellipse at 50% 87%, rgba(213, 22, 34, 0.11), transparent min(68vw, 43rem)),
+        linear-gradient(180deg, rgba(1, 1, 3, 0.8), rgba(1, 1, 3, 0.2) 46%, rgba(1, 1, 3, 0.72)),
+        radial-gradient(ellipse at 50% 42%, transparent 0 44%, rgba(0, 0, 0, 0.56) 100%),
+        radial-gradient(ellipse at 50% 87%, rgba(213, 22, 34, 0.13), transparent min(68vw, 44rem)),
         repeating-linear-gradient(
           to bottom,
           rgba(255, 255, 255, 0.032) 0,
@@ -189,18 +190,19 @@
       display: block;
       object-fit: cover;
       object-position: center bottom;
-      opacity: 0.23;
-      filter: brightness(0.32) contrast(1.1) saturate(0.64) blur(1px);
+      opacity: 0.27;
+      filter: brightness(0.34) contrast(1.12) saturate(0.66) blur(1px);
       transform: translateZ(0) scale(1.03);
       transition: opacity var(--motion-standard) var(--ease-standard), filter var(--motion-standard) var(--ease-standard);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 22%, rgba(0, 0, 0, 0.72) 54%, rgba(0, 0, 0, 0.9) 100%);
-      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 22%, rgba(0, 0, 0, 0.72) 54%, rgba(0, 0, 0, 0.9) 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.13) 18%, rgba(0, 0, 0, 0.76) 50%, rgba(0, 0, 0, 0.92) 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.13) 18%, rgba(0, 0, 0, 0.76) 50%, rgba(0, 0, 0, 0.92) 100%);
     }
 
     .ambient-energy {
       z-index: 1;
       background:
-        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.035) 50%, transparent 52%) 50% 54% / min(42rem, 86vw) 58svh no-repeat,
+        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.038) 50%, transparent 52%) 50% 52% / min(42rem, 86vw) 66svh no-repeat,
+        radial-gradient(ellipse at 50% 24%, rgba(247, 247, 242, 0.03), transparent min(42rem, 84vw)),
         radial-gradient(ellipse at 50% 84%, rgba(213, 22, 34, 0.21), transparent min(37rem, 74vw)),
         radial-gradient(circle at 50% 50%, rgba(213, 22, 34, 0.16), transparent min(32rem, 68vw)),
         radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.045), transparent min(20rem, 48vw));
@@ -327,12 +329,17 @@
       background:
         linear-gradient(180deg, var(--color-panel-soft), transparent 46%),
         var(--color-panel);
+      box-shadow:
+        inset 0 0 0 rgba(247, 247, 242, 0),
+        0 0 0 rgba(213, 22, 34, 0);
       isolation: isolate;
+      animation: shellIdleTrace 26s var(--ease-breath) infinite;
       transition:
         opacity var(--motion-standard) var(--ease-standard),
         transform var(--motion-standard) var(--ease-standard),
         border-color var(--motion-standard) var(--ease-standard),
-        background-color var(--motion-standard) var(--ease-standard);
+        background-color var(--motion-standard) var(--ease-standard),
+        box-shadow var(--motion-standard) var(--ease-standard);
     }
 
     .home-frame::before {
@@ -340,11 +347,15 @@
       inset: var(--space-2);
       z-index: -1;
       content: "";
-      border: 1px solid rgba(213, 22, 34, 0.12);
+      border: 1px solid rgba(213, 22, 34, 0.13);
       border-radius: var(--radius-sm);
       background:
-        linear-gradient(90deg, transparent 0 44%, rgba(213, 22, 34, 0.12) 50%, transparent 56%) top / 100% 1px no-repeat,
-        linear-gradient(180deg, transparent 0 44%, rgba(247, 247, 242, 0.08) 50%, transparent 56%) left / 1px 100% no-repeat;
+        linear-gradient(90deg, transparent 0 14%, rgba(247, 247, 242, 0.08) 50%, transparent 86%) top / 100% 1px no-repeat,
+        linear-gradient(90deg, transparent 0 18%, rgba(213, 22, 34, 0.09) 50%, transparent 82%) bottom / 100% 1px no-repeat,
+        linear-gradient(180deg, transparent 0 18%, rgba(247, 247, 242, 0.06) 50%, transparent 82%) left / 1px 100% no-repeat,
+        linear-gradient(180deg, transparent 0 18%, rgba(213, 22, 34, 0.08) 50%, transparent 82%) right / 1px 100% no-repeat;
+      opacity: 0.78;
+      animation: shellInnerTrace 18s var(--ease-breath) infinite;
     }
 
     .home-frame::after {
@@ -359,72 +370,6 @@
         radial-gradient(ellipse at 50% 82%, rgba(247, 247, 242, 0.035), transparent min(54vw, 28rem));
       opacity: 0.82;
       animation: chamberDepthDrift 28s var(--ease-breath) infinite;
-    }
-
-    .frame-corner {
-      position: absolute;
-      width: clamp(2.25rem, 12vw, 4rem);
-      height: clamp(2.25rem, 12vw, 4rem);
-      border-color: var(--color-line-strong);
-      opacity: 0.58;
-      pointer-events: none;
-    }
-
-    .frame-corner::after {
-      position: absolute;
-      width: 0.32rem;
-      height: 0.32rem;
-      content: "";
-      background: rgba(213, 22, 34, 0.58);
-      box-shadow: 0 0 0.65rem rgba(213, 22, 34, 0.08);
-    }
-
-    .frame-corner--top-left {
-      top: calc(var(--space-2) * -1);
-      left: calc(var(--space-2) * -1);
-      border-top: 1px solid;
-      border-left: 1px solid;
-    }
-
-    .frame-corner--top-left::after {
-      top: -0.22rem;
-      left: -0.22rem;
-    }
-
-    .frame-corner--top-right {
-      top: calc(var(--space-2) * -1);
-      right: calc(var(--space-2) * -1);
-      border-top: 1px solid;
-      border-right: 1px solid;
-    }
-
-    .frame-corner--top-right::after {
-      top: -0.22rem;
-      right: -0.22rem;
-    }
-
-    .frame-corner--bottom-left {
-      bottom: calc(var(--space-2) * -1);
-      left: calc(var(--space-2) * -1);
-      border-bottom: 1px solid;
-      border-left: 1px solid;
-    }
-
-    .frame-corner--bottom-left::after {
-      bottom: -0.22rem;
-      left: -0.22rem;
-    }
-
-    .frame-corner--bottom-right {
-      right: calc(var(--space-2) * -1);
-      bottom: calc(var(--space-2) * -1);
-      border-right: 1px solid;
-      border-bottom: 1px solid;
-    }
-
-    .frame-corner--bottom-right::after {
-      right: -0.22rem;
-      bottom: -0.22rem;
     }
 
     .home-lockup {
@@ -682,9 +627,9 @@
       pointer-events: none;
       transform: translate3d(0, 0.7rem, 0) scale(0.975);
       transition:
-        opacity 360ms var(--ease-standard),
-        transform 360ms var(--ease-standard),
-        border-color 360ms var(--ease-standard);
+        opacity 520ms var(--ease-standard) 120ms,
+        transform 620ms var(--ease-standard) 120ms,
+        border-color 520ms var(--ease-standard) 120ms;
       isolation: isolate;
     }
 
@@ -766,29 +711,46 @@
     }
 
     .site-shell.is-activating .ambient-energy {
-      opacity: 0.64;
-      animation-duration: 8s;
+      opacity: 0.72;
+      animation-duration: 7s;
     }
 
     .site-shell.is-activating .ambient-rings {
-      opacity: 0.78;
-      animation-duration: 10s;
+      opacity: 0.84;
+      animation-duration: 9s;
     }
 
     .site-shell.is-activating .cinema-fire-bg {
-      opacity: 0.26;
-      filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
+      opacity: 0.31;
+      filter: brightness(0.4) contrast(1.12) saturate(0.7) blur(1px);
+    }
+
+    .site-shell.is-activating .ambient-system::after {
+      opacity: 0.86;
     }
 
     .site-shell.is-activating .home-frame {
-      opacity: 0.76;
+      opacity: 0.82;
       border-color: rgba(213, 22, 34, 0.34);
       background-color: rgba(9, 9, 12, 0.42);
+      box-shadow:
+        inset 0 0 1.35rem rgba(213, 22, 34, 0.045),
+        0 0 3rem rgba(213, 22, 34, 0.08);
+    }
+
+    .site-shell.is-activating .home-frame::before {
+      opacity: 1;
+      animation-duration: 5s;
+    }
+
+    .site-shell.is-activating .home-frame::after {
+      opacity: 0.96;
+      animation-duration: 8s;
     }
 
     .site-shell.is-activating .title-group {
       opacity: 0.46;
-      transform: translate3d(0, -0.16rem, 0);
+      transform: translate3d(0, -0.24rem, 0);
     }
 
     .site-shell.is-activating .status-row {
@@ -862,7 +824,7 @@
     }
 
     .site-shell.has-entered-hub .ambient-energy {
-      opacity: 0.58;
+      opacity: 0.64;
     }
 
     .site-shell.has-entered-hub .ambient-rings {
@@ -871,8 +833,46 @@
     }
 
     .site-shell.has-entered-hub .cinema-fire-bg {
-      opacity: 0.27;
-      filter: brightness(0.36) contrast(1.08) saturate(0.68) blur(1px);
+      opacity: 0.29;
+      filter: brightness(0.37) contrast(1.1) saturate(0.68) blur(1px);
+    }
+
+    @keyframes shellIdleTrace {
+      0%,
+      100% {
+        border-color: rgba(247, 247, 242, 0.16);
+        box-shadow:
+          inset 0 0 0 rgba(247, 247, 242, 0),
+          0 0 0 rgba(213, 22, 34, 0);
+      }
+      46% {
+        border-color: rgba(247, 247, 242, 0.22);
+        box-shadow:
+          inset 0 0 0.8rem rgba(247, 247, 242, 0.018),
+          0 0 1.8rem rgba(213, 22, 34, 0.035);
+      }
+      72% {
+        border-color: rgba(213, 22, 34, 0.22);
+        box-shadow:
+          inset 0 0 0.6rem rgba(213, 22, 34, 0.025),
+          0 0 1.4rem rgba(213, 22, 34, 0.03);
+      }
+    }
+
+    @keyframes shellInnerTrace {
+      0%,
+      100% {
+        opacity: 0.56;
+        transform: scale(1);
+      }
+      44% {
+        opacity: 0.84;
+        transform: scale(1.001);
+      }
+      72% {
+        opacity: 0.68;
+        transform: scale(1);
+      }
     }
 
     @keyframes chamberDepthDrift {
@@ -1100,6 +1100,11 @@
         transform: none;
       }
 
+      .home-frame,
+      .home-frame::before {
+        animation: none !important;
+      }
+
       .cinema-fire-bg,
       .site-shell.is-activating .cinema-fire-bg,
       .site-shell.has-entered-hub .cinema-fire-bg {
@@ -1149,11 +1154,6 @@
 
     <main class="public-home" aria-labelledby="home-title">
       <section class="home-frame" aria-label="Voodoo Media public homepage">
-        <span class="frame-corner frame-corner--top-left" aria-hidden="true"></span>
-        <span class="frame-corner frame-corner--top-right" aria-hidden="true"></span>
-        <span class="frame-corner frame-corner--bottom-left" aria-hidden="true"></span>
-        <span class="frame-corner frame-corner--bottom-right" aria-hidden="true"></span>
-
         <div class="home-lockup">
           <div class="title-group">
             <p class="title-kicker">Welcome To</p>
@@ -1252,7 +1252,7 @@
         shell.classList.toggle("is-reduced-activation", reducedMotion.matches);
         shell.classList.add("is-activating");
 
-        activationTimer = window.setTimeout(revealHub, reducedMotion.matches ? 460 : 1120);
+        activationTimer = window.setTimeout(revealHub, reducedMotion.matches ? 460 : 1360);
       }
 
       if (shell && startButton) {
