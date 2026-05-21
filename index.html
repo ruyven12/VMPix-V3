@@ -926,6 +926,8 @@
     .hub-carousel {
       position: relative;
       z-index: 1;
+      grid-column: 1;
+      grid-row: 1;
       width: 100%;
       min-width: 0;
       overflow-x: auto;
@@ -935,6 +937,10 @@
       scroll-snap-type: x mandatory;
       scrollbar-color: rgba(213, 22, 34, 0.5) rgba(247, 247, 242, 0.08);
       scrollbar-width: thin;
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
     }
 
     .hub-carousel::-webkit-scrollbar {
@@ -958,6 +964,7 @@
 
     .hub-card {
       --module-accent: var(--color-accent);
+      appearance: none;
       flex: 0 0 min(82vw, 17.5rem);
       height: clamp(12.75rem, 58vw, 15.7rem);
       position: relative;
@@ -977,8 +984,16 @@
         inset 0 0 0 1px rgba(247, 247, 242, 0.035),
         0 0 1.8rem color-mix(in srgb, var(--module-accent) 13%, transparent);
       color: var(--color-text);
+      cursor: default;
+      font: inherit;
       overflow: hidden;
       scroll-snap-align: center;
+      text-align: left;
+      transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
     }
 
     .hub-card::before {
@@ -1003,6 +1018,19 @@
     .hub-card--future {
       --module-accent: rgba(247, 247, 242, 0.38);
       opacity: 0.62;
+    }
+
+    .hub-card[data-module-state="active"] {
+      cursor: pointer;
+    }
+
+    .hub-card[data-module-state="active"]:hover {
+      border-color: color-mix(in srgb, var(--module-accent) 58%, rgba(247, 247, 242, 0.2));
+    }
+
+    .hub-card[data-module-state="active"]:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.2rem;
     }
 
     .hub-card-kicker,
@@ -1058,6 +1086,8 @@
     .hub-context {
       position: relative;
       z-index: 1;
+      grid-column: 1;
+      grid-row: 2;
       min-width: 0;
       min-height: 0;
       display: grid;
@@ -1068,6 +1098,10 @@
       padding: 0 0.2rem 0.16rem;
       scrollbar-color: rgba(213, 22, 34, 0.48) rgba(247, 247, 242, 0.07);
       scrollbar-width: thin;
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
     }
 
     .hub-context::-webkit-scrollbar {
@@ -1195,6 +1229,121 @@
       line-height: 1;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    .module-placeholder {
+      position: relative;
+      z-index: 2;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: clamp(0.85rem, 2.7svh, 1.2rem);
+      padding: clamp(1rem, 4vw, 1.4rem);
+      border: 1px solid rgba(247, 247, 242, 0.14);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.045), transparent 48%),
+        radial-gradient(ellipse at 50% 78%, rgba(213, 22, 34, 0.12), transparent min(48vw, 28rem)),
+        rgba(3, 3, 6, 0.54);
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transform: translate3d(0, 0.36rem, 0);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
+      visibility: hidden;
+    }
+
+    .module-placeholder::before {
+      position: absolute;
+      inset: var(--space-2);
+      content: "";
+      border: 1px solid rgba(213, 22, 34, 0.15);
+      border-radius: var(--radius-sm);
+      pointer-events: none;
+    }
+
+    .module-placeholder-content {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 31rem);
+      display: grid;
+      justify-items: center;
+      gap: 0.78rem;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .module-placeholder-kicker,
+    .module-placeholder-title,
+    .module-placeholder-copy {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .module-placeholder-kicker {
+      color: rgba(213, 22, 34, 0.76);
+      font-size: clamp(0.78rem, 3.2vw, 0.9rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .module-placeholder-title {
+      color: var(--color-text);
+      font-size: clamp(1.28rem, 6vw, 2rem);
+      font-weight: 400;
+      line-height: 1.05;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .module-placeholder-copy {
+      color: var(--color-muted);
+      font-size: clamp(0.82rem, 3.1vw, 0.96rem);
+      line-height: 1.42;
+      text-wrap: balance;
+    }
+
+    .module-placeholder-back {
+      position: relative;
+      z-index: 1;
+      min-height: var(--tap-target);
+      padding: 0.72rem 0.9rem;
+      border: 1px solid rgba(213, 22, 34, 0.34);
+      border-radius: var(--radius-sm);
+      background: rgba(213, 22, 34, 0.08);
+      color: rgba(247, 247, 242, 0.84);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.78rem, 3vw, 0.88rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .module-placeholder-back:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.2rem;
+    }
+
+    .site-shell.is-module-view .hub-carousel,
+    .site-shell.is-module-view .hub-context {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate3d(0, -0.18rem, 0);
+      visibility: hidden;
+    }
+
+    .site-shell.is-module-view .module-placeholder {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate3d(0, 0, 0);
+      visibility: visible;
     }
 
     .site-shell.is-activating .ambient-energy {
@@ -1772,19 +1921,19 @@
 
         <div class="hub-carousel" data-hub-carousel aria-label="Portfolio module carousel">
           <div class="hub-carousel-track">
-            <article class="hub-card hub-card--music" data-module-card="music" data-module-state="active" data-module-route="music">
-              <p class="hub-card-kicker">Music</p>
-              <h3 class="hub-card-title">The Soundtrack Archive</h3>
-              <p class="hub-card-meta">Bands / Shows / People / Venues</p>
+            <button class="hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music placeholder">
+              <span class="hub-card-kicker">Music</span>
+              <span class="hub-card-title">The Soundtrack Archive</span>
+              <span class="hub-card-meta">Bands / Shows / People / Venues</span>
               <span class="hub-card-action">Explore Music</span>
-            </article>
+            </button>
 
-            <article class="hub-card hub-card--wrestling" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling">
-              <p class="hub-card-kicker">Wrestling</p>
-              <h3 class="hub-card-title">The Battleground Archive</h3>
-              <p class="hub-card-meta">Shows / Matches / People / Venues</p>
+            <button class="hub-card hub-card--wrestling" type="button" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling" aria-label="Open Wrestling placeholder">
+              <span class="hub-card-kicker">Wrestling</span>
+              <span class="hub-card-title">The Battleground Archive</span>
+              <span class="hub-card-meta">Shows / Matches / People / Venues</span>
               <span class="hub-card-action">Explore Wrestling</span>
-            </article>
+            </button>
 
             <article class="hub-card hub-card--future" data-module-card="wildlife" data-module-state="future">
               <p class="hub-card-kicker">Wildlife</p>
@@ -1845,6 +1994,19 @@
             </div>
           </section>
         </div>
+
+        <section class="module-placeholder" aria-labelledby="module-placeholder-title" aria-hidden="true" inert data-module-placeholder>
+          <div class="module-placeholder-content">
+            <p class="module-placeholder-kicker" data-module-placeholder-kicker>Archive Placeholder</p>
+            <h3 class="module-placeholder-title" id="module-placeholder-title" data-module-placeholder-title>Module Placeholder</h3>
+            <p class="module-placeholder-copy" data-module-placeholder-copy>
+              Lightweight placeholder state for the selected archive module. Full module pages are not wired in v1.
+            </p>
+          </div>
+          <button class="module-placeholder-back" type="button" data-module-back>
+            Back to Portfolio Hub
+          </button>
+        </section>
       </section>
     </main>
 
@@ -1935,6 +2097,14 @@
       const globalMenuBackdrop = document.querySelector("[data-global-menu-backdrop]");
       const globalMenuClose = document.querySelector("[data-global-menu-close]");
       const hubCarousel = document.querySelector("[data-hub-carousel]");
+      const hubContext = document.querySelector("[data-hub-context]");
+      const currentView = document.querySelector("[data-current-view]");
+      const moduleCards = document.querySelectorAll("[data-module-card][data-module-state='active']");
+      const modulePlaceholder = document.querySelector("[data-module-placeholder]");
+      const modulePlaceholderKicker = document.querySelector("[data-module-placeholder-kicker]");
+      const modulePlaceholderTitle = document.querySelector("[data-module-placeholder-title]");
+      const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-copy]");
+      const moduleBack = document.querySelector("[data-module-back]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -1959,6 +2129,27 @@
           tags: ["Queued", "Archive Standby", "Future Lane"],
         },
       };
+
+      const modulePlaceholderContent = {
+        music: {
+          rail: "Music",
+          kicker: "Music Placeholder",
+          title: "Music Archive Placeholder",
+          copy: "Lightweight v1 module state for the Music archive. Full bands, shows, people, venues, and gallery wiring will be added later.",
+        },
+        wrestling: {
+          rail: "Wrestling",
+          kicker: "Wrestling Placeholder",
+          title: "Wrestling Archive Placeholder",
+          copy: "Lightweight v1 module state for the Wrestling archive. Full shows, matches, people, venues, and tagged gallery wiring will be added later.",
+        },
+      };
+
+      function setCurrentView(viewName) {
+        if (currentView) {
+          currentView.textContent = viewName;
+        }
+      }
 
       function setSpotlight(moduleName) {
         if (!spotlightCopy || !spotlightTags) {
@@ -2031,6 +2222,68 @@
         }
       }
 
+      function setHubChromeHidden(isHidden) {
+        [hubCarousel, hubContext].forEach((element) => {
+          if (!element) {
+            return;
+          }
+
+          element.setAttribute("aria-hidden", String(isHidden));
+          if (isHidden) {
+            element.setAttribute("inert", "");
+          } else {
+            element.removeAttribute("inert");
+          }
+        });
+      }
+
+      function showPortfolioHubView() {
+        if (!shell) {
+          return;
+        }
+
+        shell.classList.remove("is-module-view");
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        setHubChromeHidden(false);
+        setCurrentView("Interactive Portfolio");
+      }
+
+      function showModulePlaceholder(moduleName) {
+        const content = modulePlaceholderContent[moduleName];
+        if (!content || !shell || !portfolioHub || !modulePlaceholder) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation");
+        shell.classList.add("has-entered-hub", "is-module-view");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        portfolioHub.setAttribute("aria-hidden", "false");
+        portfolioHub.removeAttribute("inert");
+        modulePlaceholder.setAttribute("aria-hidden", "false");
+        modulePlaceholder.removeAttribute("inert");
+        setHubChromeHidden(true);
+        if (modulePlaceholderKicker) {
+          modulePlaceholderKicker.textContent = content.kicker;
+        }
+        if (modulePlaceholderTitle) {
+          modulePlaceholderTitle.textContent = content.title;
+        }
+        if (modulePlaceholderCopy) {
+          modulePlaceholderCopy.textContent = content.copy;
+        }
+        setCurrentView(content.rail);
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.setAttribute("aria-busy", "false");
+        }
+      }
+
       function syncRailHeight() {
         if (!bottomRail) {
           return;
@@ -2051,7 +2304,13 @@
         globalMenuDrawer.setAttribute("aria-hidden", "false");
         railMenuTrigger.setAttribute("aria-expanded", "true");
         window.requestAnimationFrame(() => {
+          if (globalMenuDrawer.hidden) {
+            return;
+          }
           shell.classList.add("is-global-menu-open");
+          if (globalMenuClose) {
+            globalMenuClose.focus({ preventScroll: true });
+          }
         });
       }
 
@@ -2072,6 +2331,7 @@
         shell.classList.remove("is-global-menu-open");
         globalMenuDrawer.setAttribute("aria-hidden", "true");
         railMenuTrigger.setAttribute("aria-expanded", "false");
+        railMenuTrigger.focus({ preventScroll: true });
         window.clearTimeout(drawerCloseTimer);
         if (reducedMotion.matches) {
           finishGlobalMenuClose();
@@ -2087,7 +2347,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub");
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view");
         startButton.disabled = false;
         startButton.setAttribute("aria-busy", "false");
         if (homeFrame) {
@@ -2097,6 +2357,12 @@
           portfolioHub.setAttribute("aria-hidden", "true");
           portfolioHub.setAttribute("inert", "");
         }
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        setHubChromeHidden(false);
+        setCurrentView("Homepage");
       }
 
       function handleGlobalMenuAction(event) {
@@ -2122,7 +2388,11 @@
           portfolioHub.setAttribute("aria-hidden", "false");
           portfolioHub.removeAttribute("inert");
         }
+        showPortfolioHubView();
         syncSpotlightFromCarousel();
+        if (startButton) {
+          startButton.disabled = true;
+        }
         startButton.setAttribute("aria-busy", "false");
       }
 
@@ -2162,6 +2432,12 @@
         document.querySelectorAll("[data-global-nav-target], [data-shell-nav-target]").forEach((button) => {
           button.addEventListener("click", handleGlobalMenuAction);
         });
+        moduleCards.forEach((card) => {
+          card.addEventListener("click", () => showModulePlaceholder(card.dataset.moduleCard));
+        });
+        if (moduleBack) {
+          moduleBack.addEventListener("click", revealHub);
+        }
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
           syncSpotlightFromCarousel();
@@ -2174,7 +2450,7 @@
         }
         window.addEventListener("resize", syncRailHeight);
         window.addEventListener("keydown", (event) => {
-          if (event.key === "Escape" && shell.classList.contains("is-global-menu-open")) {
+          if (event.key === "Escape" && globalMenuDrawer && !globalMenuDrawer.hidden) {
             closeGlobalMenu();
           }
         });

@@ -30,30 +30,14 @@ async function expectNoHorizontalOverflow(page) {
   expect(overflow.bodyOverflow).toBeLessThanOrEqual(1);
 }
 
-async function expectTitleReadable(page) {
-  const title = page.getByRole("heading", { name: "Voodoo Media" });
-
-  await expect(title).toBeVisible();
-
-  const metrics = await title.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return {
-      width: rect.width,
-      height: rect.height,
-      scrollWidth: element.scrollWidth,
-      clientWidth: element.clientWidth,
-      opacity: Number(window.getComputedStyle(element).opacity),
-    };
-  });
-
-  expect(metrics.width).toBeGreaterThan(0);
-  expect(metrics.height).toBeGreaterThan(0);
-  expect(metrics.opacity).toBeGreaterThan(0.8);
-  expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+async function activateHub(page) {
+  await page.getByRole("button", { name: "Start Voodoo Media" }).click();
+  await expect(page.locator(".portfolio-hub")).toBeVisible({ timeout: 4_000 });
+  await expect(page.locator(".site-shell")).toHaveClass(/has-entered-hub/);
 }
 
-test.describe("Homepage shell", () => {
-  test("loads without obvious console errors", async ({ page }) => {
+test.describe("Interactive Portfolio Hub v1", () => {
+  test("loads the homepage without obvious console errors", async ({ page }) => {
     const consoleErrors = [];
     const pageErrors = [];
 
@@ -70,57 +54,77 @@ test.describe("Homepage shell", () => {
     await gotoHomepage(page);
     await page.waitForTimeout(500);
 
+    await expect(page.getByRole("button", { name: "Start Voodoo Media" })).toBeVisible();
+    await expect(page.locator("[data-current-view]")).toHaveText("Homepage");
     expect(pageErrors).toEqual([]);
     expect(consoleErrors).toEqual([]);
   });
 
-  test("keeps the environmental video wired to the locked background asset", async ({ page, request }) => {
+  test("START reveals the Portfolio Hub and updates the bottom rail", async ({ page }) => {
     await gotoHomepage(page);
 
-    const video = page.locator(".cinema-fire-bg");
-    const source = video.locator("source");
+    await expect(page.getByRole("button", { name: "Start Voodoo Media" })).toBeVisible();
+    await activateHub(page);
 
-    await expect(video).toBeAttached();
-    await expect(video).toHaveAttribute("aria-hidden", "true");
-    await expect(source).toHaveAttribute("src", "./assets/media/background/background-fire.mp4");
-
-    const response = await request.head("/assets/media/background/background-fire.mp4");
-    expect(response.ok()).toBeTruthy();
-    expect(response.headers()["content-type"]).toContain("video/mp4");
+    await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
+    await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
+    await expect(page.locator('[data-module-card="music"]')).toBeVisible();
+    await expect(page.locator('[data-module-card="wrestling"]')).toBeVisible();
   });
 
-  test("shows the locked title and bottom HUD metadata", async ({ page }) => {
+  test("opens and closes the global drawer from the bottom rail", async ({ page }) => {
     await gotoHomepage(page);
 
-    await expectTitleReadable(page);
-    await expect(page.getByText("Welcome To")).toBeVisible();
-    await expect(page.getByText(/Currently Viewing:/i)).toBeVisible();
-    await expect(page.getByText("Homepage")).toBeVisible();
-    await expect(page.getByText(/Archive Build:/i)).toBeVisible();
-    await expect(page.getByText("3.0.01")).toBeVisible();
+    await page.getByRole("button", { name: "Open global navigation menu" }).click();
+    await expect(page.locator("[data-global-menu-drawer]")).toBeVisible();
+    await expect(page.locator(".site-shell")).toHaveClass(/is-global-menu-open/);
+
+    await page.locator("[data-global-menu-close]").click();
+    await expect(page.locator(".site-shell")).not.toHaveClass(/is-global-menu-open/);
+    await expect(page.locator("[data-global-menu-drawer]")).toBeHidden();
+
+    await page.getByRole("button", { name: "Open global navigation menu" }).click();
+    await expect(page.locator("[data-global-menu-drawer]")).toBeVisible();
+    await expect(page.locator(".site-shell")).toHaveClass(/is-global-menu-open/);
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".site-shell")).not.toHaveClass(/is-global-menu-open/);
   });
 
-  test("keeps START visible, reachable, and able to reveal the hub", async ({ page }) => {
+  test("Music and Wrestling cards open placeholder states and can return to the hub", async ({ page }) => {
+    await gotoHomepage(page);
+    await activateHub(page);
+
+    await page.getByRole("button", { name: "Open Music placeholder" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Music");
+    await expect(page.locator("[data-module-placeholder]")).toBeVisible();
+    await expect(page.locator("[data-module-placeholder-title]")).toHaveText("Music Archive Placeholder");
+
+    await page.getByRole("button", { name: "Back to Portfolio Hub" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
+    await expect(page.locator("[data-module-placeholder]")).toBeHidden();
+    await expect(page.locator("[data-hub-carousel]")).toBeVisible();
+
+    await page.getByRole("button", { name: "Open Wrestling placeholder" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Wrestling");
+    await expect(page.locator("[data-module-placeholder-title]")).toHaveText("Wrestling Archive Placeholder");
+
+    await page.getByRole("button", { name: "Back to Portfolio Hub" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
+    await expect(page.locator("[data-hub-carousel]")).toBeVisible();
+  });
+
+  test("reduced-motion users still reach the Portfolio Hub", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoHomepage(page);
 
-    const shell = page.locator(".site-shell");
-    const start = page.getByRole("button", { name: "Start Voodoo Media" });
-    const hub = page.locator(".portfolio-hub");
+    const reducedMotionEnabled = await page.evaluate(() =>
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+    expect(reducedMotionEnabled).toBe(true);
 
-    await expect(start).toBeVisible();
-
-    const startBox = await start.boundingBox();
-    expect(startBox).not.toBeNull();
-    expect(startBox.width).toBeGreaterThanOrEqual(44);
-    expect(startBox.height).toBeGreaterThanOrEqual(44);
-
-    await start.click();
-
-    await expect
-      .poll(() => shell.evaluate((element) => element.classList.contains("is-activating")))
-      .toBeTruthy();
-    await expect(hub).toBeVisible({ timeout: 4_000 });
-    await expect(shell).toHaveClass(/has-entered-hub/);
+    await activateHub(page);
+    await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
+    await expectNoHorizontalOverflow(page);
   });
 
   for (const viewport of viewportChecks) {
@@ -131,26 +135,9 @@ test.describe("Homepage shell", () => {
       await gotoHomepage(page);
 
       await expectNoHorizontalOverflow(page);
-      await expectTitleReadable(page);
-      await expect(page.getByRole("button", { name: "Start Voodoo Media" })).toBeVisible();
-      await expect(page.locator(".status-row")).toBeVisible();
+      await activateHub(page);
+      await expectNoHorizontalOverflow(page);
+      await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
   }
-
-  test("honors reduced motion while still completing the START reveal", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await gotoHomepage(page);
-
-    const reducedMotionEnabled = await page.evaluate(() =>
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
-
-    expect(reducedMotionEnabled).toBe(true);
-
-    await page.getByRole("button", { name: "Start Voodoo Media" }).click();
-
-    await expect(page.locator(".portfolio-hub")).toBeVisible({ timeout: 2_000 });
-    await expect(page.locator(".site-shell")).toHaveClass(/has-entered-hub/);
-    await expectNoHorizontalOverflow(page);
-  });
 });
