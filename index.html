@@ -1418,12 +1418,33 @@
     }
 
     .music-nexus-module-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: flex;
+      align-items: stretch;
       gap: clamp(0.56rem, 2.4vw, 0.78rem);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding: 0.04rem 0.08rem 0.44rem;
+      scroll-padding-inline: 0.08rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+    }
+
+    .music-nexus-module-grid::-webkit-scrollbar {
+      height: 0.38rem;
+    }
+
+    .music-nexus-module-grid::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .music-nexus-module-grid::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.42);
     }
 
     .music-nexus-card {
+      appearance: none;
+      flex: 0 0 min(72vw, 11.5rem);
       min-width: 0;
       min-height: clamp(5.7rem, 26vw, 7.15rem);
       display: grid;
@@ -1435,6 +1456,41 @@
         linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
         linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 64%),
         rgba(247, 247, 242, 0.024);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      opacity: 0.64;
+      scroll-snap-align: start;
+      text-align: left;
+      transition:
+        background-color var(--motion-fast) var(--ease-standard),
+        border-color var(--motion-fast) var(--ease-standard),
+        opacity var(--motion-fast) var(--ease-standard),
+        transform var(--motion-fast) var(--ease-standard);
+    }
+
+    .music-nexus-card[aria-pressed="true"] {
+      border-color: rgba(213, 22, 34, 0.42);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 58%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.18), transparent 64%),
+        rgba(247, 247, 242, 0.036);
+      opacity: 1;
+      transform: translate3d(0, -0.08rem, 0);
+    }
+
+    .music-nexus-card:hover {
+      border-color: rgba(247, 247, 242, 0.2);
+      opacity: 0.86;
+    }
+
+    .music-nexus-card[aria-pressed="true"]:hover {
+      opacity: 1;
+    }
+
+    .music-nexus-card:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.18rem;
     }
 
     .music-nexus-card-title {
@@ -1963,7 +2019,11 @@
       }
 
       .music-nexus-module-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        padding-bottom: 0.5rem;
+      }
+
+      .music-nexus-card {
+        flex-basis: clamp(10.5rem, 22%, 12.4rem);
       }
 
       .universal-bottom-rail {
@@ -2188,28 +2248,28 @@
             </p>
           </header>
 
-          <div class="music-nexus-module-grid" aria-label="Music Nexus modules">
-            <article class="music-nexus-card">
+          <div class="music-nexus-module-grid" role="group" aria-label="Music Nexus modules" data-music-nexus-selector>
+            <button class="music-nexus-card" type="button" aria-pressed="true" data-music-nexus-card="bands">
               <h4 class="music-nexus-card-title">Bands</h4>
-            </article>
-            <article class="music-nexus-card">
+            </button>
+            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="shows">
               <h4 class="music-nexus-card-title">Shows</h4>
-            </article>
-            <article class="music-nexus-card">
+            </button>
+            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="people">
               <h4 class="music-nexus-card-title">People</h4>
-            </article>
-            <article class="music-nexus-card">
+            </button>
+            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="venues">
               <h4 class="music-nexus-card-title">Venues</h4>
-            </article>
+            </button>
           </div>
 
           <section class="music-nexus-activity" aria-labelledby="music-activity-title">
             <h4 class="music-nexus-section-title" id="music-activity-title">Recent Music Activity</h4>
-            <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows">
-              <li class="music-activity-row">Band update placeholder</li>
-              <li class="music-activity-row">Show archive placeholder</li>
-              <li class="music-activity-row">People link placeholder</li>
-              <li class="music-activity-row">Venue note placeholder</li>
+            <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows" data-music-activity-list>
+              <li class="music-activity-row">Latest bands placeholder</li>
+              <li class="music-activity-row">Featured artists placeholder</li>
+              <li class="music-activity-row">Band archive updates placeholder</li>
+              <li class="music-activity-row">New music gallery placeholder</li>
             </ul>
           </section>
         </section>
@@ -2312,6 +2372,8 @@
       const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-copy]");
       const moduleBack = document.querySelector("[data-module-back]");
       const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
+      const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
+      const musicActivityList = document.querySelector("[data-music-activity-list]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -2346,6 +2408,33 @@
         },
       };
 
+      const musicActivityContent = {
+        bands: [
+          "Latest bands placeholder",
+          "Featured artists placeholder",
+          "Band archive updates placeholder",
+          "New music gallery placeholder",
+        ],
+        shows: [
+          "Recent concerts placeholder",
+          "Show year index placeholder",
+          "Concert gallery queue placeholder",
+          "Setlist note placeholder",
+        ],
+        people: [
+          "Tagged people placeholder",
+          "Featured musicians placeholder",
+          "New performer links placeholder",
+          "Collaboration notes placeholder",
+        ],
+        venues: [
+          "Venue archive placeholder",
+          "Location index placeholder",
+          "Room history placeholder",
+          "Venue gallery queue placeholder",
+        ],
+      };
+
       function setCurrentView(viewName) {
         if (currentView) {
           currentView.textContent = viewName;
@@ -2366,6 +2455,53 @@
           tag.textContent = tagText;
           spotlightTags.append(tag);
         });
+      }
+
+      function setMusicNexusContext(sectionName, shouldFocusCard = false) {
+        const rows = musicActivityContent[sectionName];
+        if (!rows || !musicActivityList) {
+          return;
+        }
+
+        musicNexusCards.forEach((card) => {
+          const isActive = card.dataset.musicNexusCard === sectionName;
+          card.setAttribute("aria-pressed", String(isActive));
+          if (isActive) {
+            card.setAttribute("tabindex", "0");
+            card.scrollIntoView({
+              behavior: reducedMotion.matches ? "auto" : "smooth",
+              block: "nearest",
+              inline: "nearest",
+            });
+            if (shouldFocusCard) {
+              card.focus({ preventScroll: true });
+            }
+          } else {
+            card.setAttribute("tabindex", "-1");
+          }
+        });
+
+        musicActivityList.replaceChildren();
+        rows.forEach((rowText) => {
+          const row = document.createElement("li");
+          row.className = "music-activity-row";
+          row.textContent = rowText;
+          musicActivityList.append(row);
+        });
+      }
+
+      function moveMusicNexusSelection(direction) {
+        const cards = Array.from(musicNexusCards);
+        if (cards.length === 0) {
+          return;
+        }
+
+        const activeIndex = Math.max(
+          0,
+          cards.findIndex((card) => card.getAttribute("aria-pressed") === "true")
+        );
+        const nextIndex = (activeIndex + direction + cards.length) % cards.length;
+        setMusicNexusContext(cards[nextIndex].dataset.musicNexusCard, true);
       }
 
       function syncSpotlightFromCarousel() {
@@ -2476,6 +2612,7 @@
         musicNexusShell.setAttribute("aria-hidden", "false");
         musicNexusShell.removeAttribute("inert");
         setHubChromeHidden(true);
+        setMusicNexusContext("bands");
         setCurrentView("MUSIC NEXUS");
         if (startButton) {
           startButton.disabled = true;
@@ -2685,6 +2822,32 @@
         if (moduleBack) {
           moduleBack.addEventListener("click", revealHub);
         }
+        musicNexusCards.forEach((card) => {
+          card.addEventListener("click", () => {
+            setMusicNexusContext(card.dataset.musicNexusCard);
+          });
+          card.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+              event.preventDefault();
+              moveMusicNexusSelection(1);
+            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+              event.preventDefault();
+              moveMusicNexusSelection(-1);
+            } else if (event.key === "Home") {
+              event.preventDefault();
+              const firstCard = musicNexusCards[0];
+              if (firstCard) {
+                setMusicNexusContext(firstCard.dataset.musicNexusCard, true);
+              }
+            } else if (event.key === "End") {
+              event.preventDefault();
+              const lastCard = musicNexusCards[musicNexusCards.length - 1];
+              if (lastCard) {
+                setMusicNexusContext(lastCard.dataset.musicNexusCard, true);
+              }
+            }
+          });
+        });
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
           syncSpotlightFromCarousel();

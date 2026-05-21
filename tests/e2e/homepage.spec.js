@@ -99,6 +99,19 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
     await expect(page.getByRole("heading", { name: "MUSIC NEXUS" })).toBeVisible();
     await expect(page.getByText("Recent Music Activity")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Bands" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText("Latest bands placeholder")).toBeVisible();
+
+    await page.getByRole("button", { name: "Shows" }).click();
+    await expect(page.getByRole("button", { name: "Shows" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Bands" })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByText("Recent concerts placeholder")).toBeVisible();
+
+    await page.getByRole("button", { name: "People" }).click();
+    await expect(page.getByText("Tagged people placeholder")).toBeVisible();
+
+    await page.getByRole("button", { name: "Venues" }).click();
+    await expect(page.getByText("Venue archive placeholder")).toBeVisible();
 
     await page.getByRole("button", { name: "Open global navigation menu" }).click();
     await page.locator('[data-shell-nav-target="hub"]').click();
@@ -141,6 +154,8 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await expectNoHorizontalOverflow(page);
       await page.getByRole("button", { name: "Open Music Nexus" }).click();
       await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
+      await page.getByRole("button", { name: "Venues" }).click();
+      await expect(page.getByText("Venue archive placeholder")).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
