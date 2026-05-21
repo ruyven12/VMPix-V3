@@ -1331,6 +1331,172 @@
       outline-offset: 0.2rem;
     }
 
+    .music-nexus-shell {
+      position: relative;
+      z-index: 2;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      align-content: start;
+      gap: clamp(0.86rem, 2.4svh, 1.1rem);
+      padding: clamp(0.95rem, 4vw, 1.35rem);
+      border: 1px solid rgba(247, 247, 242, 0.14);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.045), transparent 48%),
+        radial-gradient(ellipse at 50% 18%, rgba(213, 22, 34, 0.12), transparent min(46vw, 24rem)),
+        rgba(3, 3, 6, 0.58);
+      opacity: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      pointer-events: none;
+      scrollbar-color: rgba(213, 22, 34, 0.46) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+      transform: translate3d(0, 0.36rem, 0);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
+      visibility: hidden;
+    }
+
+    .music-nexus-shell::-webkit-scrollbar {
+      width: 0.42rem;
+    }
+
+    .music-nexus-shell::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .music-nexus-shell::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.46);
+    }
+
+    .music-nexus-shell::before {
+      position: absolute;
+      inset: var(--space-2);
+      content: "";
+      border: 1px solid rgba(213, 22, 34, 0.13);
+      border-radius: var(--radius-sm);
+      pointer-events: none;
+    }
+
+    .music-nexus-header,
+    .music-nexus-module-grid,
+    .music-nexus-activity {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .music-nexus-header {
+      display: grid;
+      gap: clamp(0.58rem, 1.6svh, 0.78rem);
+      padding: clamp(0.25rem, 1vw, 0.45rem) 0 0.1rem;
+    }
+
+    .music-nexus-title {
+      margin: 0;
+      color: var(--color-text);
+      font-size: clamp(1.36rem, 8.4vw, 2.38rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .music-nexus-intro {
+      max-width: 38rem;
+      margin: 0;
+      color: rgba(247, 247, 242, 0.74);
+      font-size: clamp(0.82rem, 3.6vw, 1rem);
+      line-height: 1.42;
+      text-wrap: balance;
+    }
+
+    .music-nexus-module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.56rem, 2.4vw, 0.78rem);
+    }
+
+    .music-nexus-card {
+      min-width: 0;
+      min-height: clamp(5.7rem, 26vw, 7.15rem);
+      display: grid;
+      align-items: end;
+      padding: clamp(0.75rem, 3.4vw, 0.96rem);
+      border: 1px solid rgba(247, 247, 242, 0.11);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 64%),
+        rgba(247, 247, 242, 0.024);
+    }
+
+    .music-nexus-card-title {
+      margin: 0;
+      color: rgba(247, 247, 242, 0.88);
+      font-size: clamp(0.86rem, 4vw, 1.08rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .music-nexus-activity {
+      display: grid;
+      gap: 0.58rem;
+      padding: clamp(0.75rem, 3vw, 0.95rem);
+      border: 1px solid rgba(247, 247, 242, 0.1);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.024);
+    }
+
+    .music-nexus-section-title {
+      margin: 0;
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.78rem, 3.35vw, 0.92rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .music-activity-list {
+      display: grid;
+      gap: 0.42rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .music-activity-row {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.52rem 0.58rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(3, 3, 6, 0.34);
+      color: var(--color-muted);
+      font-size: clamp(0.72rem, 3.2vw, 0.84rem);
+      line-height: 1.16;
+      text-transform: uppercase;
+    }
+
+    .music-activity-row::before {
+      width: 0.4rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(213, 22, 34, 0.72);
+      border-radius: 50%;
+      background: rgba(213, 22, 34, 0.24);
+      content: "";
+    }
+
     .site-shell.is-module-view .hub-carousel,
     .site-shell.is-module-view .hub-context {
       opacity: 0;
@@ -1339,7 +1505,8 @@
       visibility: hidden;
     }
 
-    .site-shell.is-module-view .module-placeholder {
+    .site-shell.is-placeholder-view .module-placeholder,
+    .site-shell.is-music-nexus-view .music-nexus-shell {
       opacity: 1;
       pointer-events: auto;
       transform: translate3d(0, 0, 0);
@@ -1795,6 +1962,10 @@
         scroll-snap-align: start;
       }
 
+      .music-nexus-module-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
       .universal-bottom-rail {
         text-align: left;
       }
@@ -1921,7 +2092,7 @@
 
         <div class="hub-carousel" data-hub-carousel aria-label="Portfolio module carousel">
           <div class="hub-carousel-track">
-            <button class="hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music placeholder">
+            <button class="hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music Nexus">
               <span class="hub-card-kicker">Music</span>
               <span class="hub-card-title">The Soundtrack Archive</span>
               <span class="hub-card-meta">Bands / Shows / People / Venues</span>
@@ -2006,6 +2177,41 @@
           <button class="module-placeholder-back" type="button" data-module-back>
             Back to Portfolio Hub
           </button>
+        </section>
+
+        <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
+          <header class="music-nexus-header">
+            <h3 class="music-nexus-title" id="music-nexus-title">MUSIC NEXUS</h3>
+            <p class="music-nexus-intro">
+              Welcome To The Music Nexus,<br>
+              home to the musical journey that I have had going since 2011
+            </p>
+          </header>
+
+          <div class="music-nexus-module-grid" aria-label="Music Nexus modules">
+            <article class="music-nexus-card">
+              <h4 class="music-nexus-card-title">Bands</h4>
+            </article>
+            <article class="music-nexus-card">
+              <h4 class="music-nexus-card-title">Shows</h4>
+            </article>
+            <article class="music-nexus-card">
+              <h4 class="music-nexus-card-title">People</h4>
+            </article>
+            <article class="music-nexus-card">
+              <h4 class="music-nexus-card-title">Venues</h4>
+            </article>
+          </div>
+
+          <section class="music-nexus-activity" aria-labelledby="music-activity-title">
+            <h4 class="music-nexus-section-title" id="music-activity-title">Recent Music Activity</h4>
+            <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows">
+              <li class="music-activity-row">Band update placeholder</li>
+              <li class="music-activity-row">Show archive placeholder</li>
+              <li class="music-activity-row">People link placeholder</li>
+              <li class="music-activity-row">Venue note placeholder</li>
+            </ul>
+          </section>
         </section>
       </section>
     </main>
@@ -2105,6 +2311,7 @@
       const modulePlaceholderTitle = document.querySelector("[data-module-placeholder-title]");
       const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-copy]");
       const moduleBack = document.querySelector("[data-module-back]");
+      const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -2131,12 +2338,6 @@
       };
 
       const modulePlaceholderContent = {
-        music: {
-          rail: "Music",
-          kicker: "Music Placeholder",
-          title: "Music Archive Placeholder",
-          copy: "Lightweight v1 module state for the Music archive. Full bands, shows, people, venues, and gallery wiring will be added later.",
-        },
         wrestling: {
           rail: "Wrestling",
           kicker: "Wrestling Placeholder",
@@ -2242,13 +2443,44 @@
           return;
         }
 
-        shell.classList.remove("is-module-view");
+        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view");
         if (modulePlaceholder) {
           modulePlaceholder.setAttribute("aria-hidden", "true");
           modulePlaceholder.setAttribute("inert", "");
         }
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(false);
         setCurrentView("Interactive Portfolio");
+      }
+
+      function showMusicNexus() {
+        if (!shell || !portfolioHub || !musicNexusShell) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view");
+        shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        portfolioHub.setAttribute("aria-hidden", "false");
+        portfolioHub.removeAttribute("inert");
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        musicNexusShell.setAttribute("aria-hidden", "false");
+        musicNexusShell.removeAttribute("inert");
+        setHubChromeHidden(true);
+        setCurrentView("MUSIC NEXUS");
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.setAttribute("aria-busy", "false");
+        }
       }
 
       function showModulePlaceholder(moduleName) {
@@ -2258,8 +2490,8 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation");
-        shell.classList.add("has-entered-hub", "is-module-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view");
+        shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
         }
@@ -2267,6 +2499,10 @@
         portfolioHub.removeAttribute("inert");
         modulePlaceholder.setAttribute("aria-hidden", "false");
         modulePlaceholder.removeAttribute("inert");
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         if (modulePlaceholderKicker) {
           modulePlaceholderKicker.textContent = content.kicker;
@@ -2347,7 +2583,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view");
         startButton.disabled = false;
         startButton.setAttribute("aria-busy", "false");
         if (homeFrame) {
@@ -2360,6 +2596,10 @@
         if (modulePlaceholder) {
           modulePlaceholder.setAttribute("aria-hidden", "true");
           modulePlaceholder.setAttribute("inert", "");
+        }
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
         }
         setHubChromeHidden(false);
         setCurrentView("Homepage");
@@ -2433,7 +2673,14 @@
           button.addEventListener("click", handleGlobalMenuAction);
         });
         moduleCards.forEach((card) => {
-          card.addEventListener("click", () => showModulePlaceholder(card.dataset.moduleCard));
+          card.addEventListener("click", () => {
+            if (card.dataset.moduleCard === "music") {
+              showMusicNexus();
+              return;
+            }
+
+            showModulePlaceholder(card.dataset.moduleCard);
+          });
         });
         if (moduleBack) {
           moduleBack.addEventListener("click", revealHub);

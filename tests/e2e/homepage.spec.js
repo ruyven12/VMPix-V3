@@ -90,18 +90,20 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator(".site-shell")).not.toHaveClass(/is-global-menu-open/);
   });
 
-  test("Music and Wrestling cards open placeholder states and can return to the hub", async ({ page }) => {
+  test("Music opens the Nexus shell and Wrestling keeps the placeholder state", async ({ page }) => {
     await gotoHomepage(page);
     await activateHub(page);
 
-    await page.getByRole("button", { name: "Open Music placeholder" }).click();
-    await expect(page.locator("[data-current-view]")).toHaveText("Music");
-    await expect(page.locator("[data-module-placeholder]")).toBeVisible();
-    await expect(page.locator("[data-module-placeholder-title]")).toHaveText("Music Archive Placeholder");
+    await page.getByRole("button", { name: "Open Music Nexus" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("MUSIC NEXUS");
+    await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "MUSIC NEXUS" })).toBeVisible();
+    await expect(page.getByText("Recent Music Activity")).toBeVisible();
 
-    await page.getByRole("button", { name: "Back to Portfolio Hub" }).click();
+    await page.getByRole("button", { name: "Open global navigation menu" }).click();
+    await page.locator('[data-shell-nav-target="hub"]').click();
     await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
-    await expect(page.locator("[data-module-placeholder]")).toBeHidden();
+    await expect(page.locator("[data-music-nexus-shell]")).toBeHidden();
     await expect(page.locator("[data-hub-carousel]")).toBeVisible();
 
     await page.getByRole("button", { name: "Open Wrestling placeholder" }).click();
@@ -136,6 +138,9 @@ test.describe("Interactive Portfolio Hub v1", () => {
 
       await expectNoHorizontalOverflow(page);
       await activateHub(page);
+      await expectNoHorizontalOverflow(page);
+      await page.getByRole("button", { name: "Open Music Nexus" }).click();
+      await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
