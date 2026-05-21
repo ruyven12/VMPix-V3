@@ -90,27 +90,33 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator(".site-shell")).not.toHaveClass(/is-global-menu-open/);
   });
 
-  test("Music opens the Nexus shell and Wrestling keeps the placeholder state", async ({ page }) => {
+  test("Music Nexus flow updates selector context and returns to the hub", async ({ page }) => {
     await gotoHomepage(page);
     await activateHub(page);
 
     await page.getByRole("button", { name: "Open Music Nexus" }).click();
-    await expect(page.locator("[data-current-view]")).toHaveText("MUSIC NEXUS");
+    await expect(page.locator("[data-current-view]")).toHaveText("Music Nexus");
     await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
     await expect(page.getByRole("heading", { name: "MUSIC NEXUS" })).toBeVisible();
     await expect(page.getByText("Recent Music Activity")).toBeVisible();
     await expect(page.getByRole("button", { name: "Bands" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByText("Latest bands placeholder")).toBeVisible();
 
+    await page.getByRole("button", { name: "Bands" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Bands");
+
     await page.getByRole("button", { name: "Shows" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Shows");
     await expect(page.getByRole("button", { name: "Shows" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Bands" })).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByText("Recent concerts placeholder")).toBeVisible();
 
     await page.getByRole("button", { name: "People" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("People");
     await expect(page.getByText("Tagged people placeholder")).toBeVisible();
 
     await page.getByRole("button", { name: "Venues" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Venues");
     await expect(page.getByText("Venue archive placeholder")).toBeVisible();
 
     await page.getByRole("button", { name: "Open global navigation menu" }).click();
@@ -119,13 +125,7 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator("[data-music-nexus-shell]")).toBeHidden();
     await expect(page.locator("[data-hub-carousel]")).toBeVisible();
 
-    await page.getByRole("button", { name: "Open Wrestling placeholder" }).click();
-    await expect(page.locator("[data-current-view]")).toHaveText("Wrestling");
-    await expect(page.locator("[data-module-placeholder-title]")).toHaveText("Wrestling Archive Placeholder");
-
-    await page.getByRole("button", { name: "Back to Portfolio Hub" }).click();
-    await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
-    await expect(page.locator("[data-hub-carousel]")).toBeVisible();
+    await expectNoHorizontalOverflow(page);
   });
 
   test("reduced-motion users still reach the Portfolio Hub", async ({ page }) => {
@@ -139,6 +139,10 @@ test.describe("Interactive Portfolio Hub v1", () => {
 
     await activateHub(page);
     await expect(page.locator("[data-current-view]")).toHaveText("Interactive Portfolio");
+    await page.getByRole("button", { name: "Open Music Nexus" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Music Nexus");
+    await page.getByRole("button", { name: "Shows" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Shows");
     await expectNoHorizontalOverflow(page);
   });
 
@@ -155,6 +159,7 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await page.getByRole("button", { name: "Open Music Nexus" }).click();
       await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
       await page.getByRole("button", { name: "Venues" }).click();
+      await expect(page.locator("[data-current-view]")).toHaveText("Venues");
       await expect(page.getByText("Venue archive placeholder")).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();

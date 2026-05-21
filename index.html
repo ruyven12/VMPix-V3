@@ -1557,7 +1557,7 @@
     .site-shell.is-module-view .hub-context {
       opacity: 0;
       pointer-events: none;
-      transform: translate3d(0, -0.18rem, 0);
+      transform: translate3d(0, 0.22rem, 0);
       visibility: hidden;
     }
 
@@ -2457,16 +2457,18 @@
         });
       }
 
-      function setMusicNexusContext(sectionName, shouldFocusCard = false) {
+      function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdateRail = true) {
         const rows = musicActivityContent[sectionName];
         if (!rows || !musicActivityList) {
           return;
         }
 
+        let activeCardLabel = "";
         musicNexusCards.forEach((card) => {
           const isActive = card.dataset.musicNexusCard === sectionName;
           card.setAttribute("aria-pressed", String(isActive));
           if (isActive) {
+            activeCardLabel = card.textContent.trim();
             card.setAttribute("tabindex", "0");
             card.scrollIntoView({
               behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -2488,6 +2490,10 @@
           row.textContent = rowText;
           musicActivityList.append(row);
         });
+
+        if (shouldUpdateRail && activeCardLabel) {
+          setCurrentView(activeCardLabel);
+        }
       }
 
       function moveMusicNexusSelection(direction) {
@@ -2612,8 +2618,8 @@
         musicNexusShell.setAttribute("aria-hidden", "false");
         musicNexusShell.removeAttribute("inert");
         setHubChromeHidden(true);
-        setMusicNexusContext("bands");
-        setCurrentView("MUSIC NEXUS");
+        setMusicNexusContext("bands", false, false);
+        setCurrentView("Music Nexus");
         if (startButton) {
           startButton.disabled = true;
           startButton.setAttribute("aria-busy", "false");
