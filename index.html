@@ -573,21 +573,24 @@
       cursor: wait;
     }
 
-    .status-row {
+    .universal-bottom-rail {
       position: relative;
       z-index: 1;
+      width: 100%;
       min-width: 0;
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: var(--space-2) var(--space-3);
+      gap: clamp(0.45rem, 2vw, var(--space-4));
       padding:
-        0.85rem
+        0.48rem
         max(var(--space-3), env(safe-area-inset-right))
-        max(0.85rem, env(safe-area-inset-bottom))
+        max(0.48rem, env(safe-area-inset-bottom))
         max(var(--space-3), env(safe-area-inset-left));
       border-top: 1px solid rgba(247, 247, 242, 0.1);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.025), transparent 68%),
+        rgba(1, 1, 3, 0.28);
       color: var(--color-faint);
       font-family: var(--font-display);
       font-size: var(--footer-text-size);
@@ -599,28 +602,63 @@
         color var(--motion-standard) var(--ease-standard);
     }
 
-    .status-row span {
-      flex: 0 0 auto;
-      min-width: max-content;
+    .rail-cluster,
+    .rail-brand {
+      min-width: 0;
       white-space: nowrap;
     }
 
-    .status-label {
+    .rail-cluster {
+      width: 100%;
+      max-width: 100%;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.36rem;
+      overflow: hidden;
+    }
+
+    .rail-cluster--left {
+      justify-self: start;
+    }
+
+    .rail-cluster--right {
+      justify-self: end;
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    .rail-brand {
+      justify-self: center;
+      color: rgba(247, 247, 242, 0.72);
+      font-size: 0.94em;
+      text-align: center;
+      text-shadow: 0 0 0.55rem rgba(247, 247, 242, 0.08);
+    }
+
+    .rail-label,
+    .rail-value {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rail-label {
       color: rgba(247, 247, 242, 0.34);
     }
 
-    .status-value {
+    .rail-value {
       color: rgba(247, 247, 242, 0.52);
     }
 
-    .status-value--view,
-    .status-value--build {
+    .rail-value--view,
+    .rail-value--build {
       color: rgba(213, 22, 34, 0.74);
       text-shadow: 0 0 0.55rem rgba(213, 22, 34, 0.08);
       animation: statusIdlePulse 9.5s var(--ease-breath) infinite;
     }
 
-    .status-value--build {
+    .rail-value--build {
       animation-delay: -3.2s;
       animation-duration: 11.25s;
     }
@@ -773,7 +811,7 @@
       animation: none;
     }
 
-    .site-shell.is-activating .status-row {
+    .site-shell.is-activating .universal-bottom-rail {
       opacity: 0.42;
       color: rgba(247, 247, 242, 0.34);
     }
@@ -821,7 +859,7 @@
 
     .site-shell.is-reduced-activation .home-frame,
     .site-shell.is-reduced-activation .title-group,
-    .site-shell.is-reduced-activation .status-row {
+    .site-shell.is-reduced-activation .universal-bottom-rail {
       opacity: 0.72;
       transform: none;
     }
@@ -1094,36 +1132,32 @@
         padding: var(--space-3);
       }
 
-      .status-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0.35rem;
-        justify-items: stretch;
+      .universal-bottom-rail {
         padding-right: max(var(--space-2), env(safe-area-inset-right));
         padding-left: max(var(--space-2), env(safe-area-inset-left));
-        text-align: left;
-      }
-
-      .status-row > span:last-child {
-        justify-self: end;
       }
     }
 
     @media (max-width: 479px) {
-      .status-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 0.2rem;
-        justify-items: stretch;
-        padding-top: 0.32rem;
-        padding-bottom: max(0.32rem, env(safe-area-inset-bottom));
+      .universal-bottom-rail {
+        grid-template-columns: minmax(5.8rem, 1fr) auto minmax(5.8rem, 1fr);
+        gap: 0.38rem;
+        padding-top: 0.36rem;
+        padding-bottom: max(0.36rem, env(safe-area-inset-bottom));
         font-size: min(var(--footer-text-size), 0.72rem);
         line-height: 1.16;
         text-align: left;
       }
 
-      .status-row > span:last-child {
-        justify-self: end;
+      .rail-cluster {
+        display: grid;
+        gap: 0.08rem;
+        align-items: center;
+        line-height: 1;
+      }
+
+      .rail-label {
+        font-size: 0.76em;
       }
     }
 
@@ -1160,8 +1194,7 @@
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
       }
 
-      .status-row {
-        justify-content: space-between;
+      .universal-bottom-rail {
         text-align: left;
       }
     }
@@ -1212,14 +1245,14 @@
       .start-portal::after,
       .start-button::after,
       .home-frame::after,
-      .status-value--view,
-      .status-value--build {
+      .rail-value--view,
+      .rail-value--build {
         animation: none !important;
       }
 
       .site-shell.is-activating .home-frame,
       .site-shell.is-activating .title-group,
-      .site-shell.is-activating .status-row {
+      .site-shell.is-activating .universal-bottom-rail {
         opacity: 0.72;
         transform: none;
       }
@@ -1281,9 +1314,16 @@
       </section>
     </main>
 
-    <footer class="status-row" aria-label="Homepage status">
-      <span><span class="status-label">Currently Viewing:</span> <span class="status-value status-value--view">Homepage</span></span>
-      <span><span class="status-label">Archive Build:</span> <span class="status-value status-value--build">3.0.01</span></span>
+    <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal portfolio rail">
+      <span class="rail-cluster rail-cluster--left" data-rail-region="current-view">
+        <span class="rail-label status-label">Currently Viewing:</span>
+        <span class="rail-value rail-value--view status-value status-value--view" data-current-view>Homepage</span>
+      </span>
+      <span class="rail-brand" data-rail-brand>Voodoo Media</span>
+      <span class="rail-cluster rail-cluster--right" data-rail-region="archive-build">
+        <span class="rail-label status-label">Archive Build:</span>
+        <span class="rail-value rail-value--build status-value status-value--build" data-archive-build>3.0.01</span>
+      </span>
     </footer>
   </div>
 
