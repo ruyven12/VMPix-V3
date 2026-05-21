@@ -604,9 +604,30 @@
         color var(--motion-standard) var(--ease-standard);
     }
 
+    .rail-menu-trigger {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      padding: 0;
+    }
+
+    .rail-menu-trigger:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.84);
+      outline-offset: -0.28rem;
+    }
+
     .rail-cluster,
     .rail-brand {
+      position: relative;
+      z-index: 1;
       min-width: 0;
+      pointer-events: none;
       white-space: nowrap;
     }
 
@@ -663,6 +684,199 @@
     .rail-value--build {
       animation-delay: -3.2s;
       animation-duration: 11.25s;
+    }
+
+    .global-menu-backdrop,
+    .global-menu-drawer {
+      position: fixed;
+      pointer-events: none;
+    }
+
+    .global-menu-backdrop {
+      inset:
+        0
+        0
+        var(--rail-height, 2.25rem)
+        0;
+      z-index: 6;
+      border: 0;
+      background:
+        radial-gradient(ellipse at 50% 82%, rgba(213, 22, 34, 0.12), transparent min(64vw, 36rem)),
+        rgba(1, 1, 3, 0.48);
+      opacity: 0;
+      transition: opacity var(--motion-standard) var(--ease-standard);
+    }
+
+    .global-menu-drawer {
+      right: max(var(--space-2), env(safe-area-inset-right));
+      bottom: var(--rail-height, 2.25rem);
+      left: max(var(--space-2), env(safe-area-inset-left));
+      z-index: 7;
+      max-height: min(72svh, calc(100vh - var(--rail-height, 2.25rem) - 1rem));
+      max-height: min(72svh, calc(100svh - var(--rail-height, 2.25rem) - 1rem));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border: 1px solid rgba(247, 247, 242, 0.16);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 42%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 54%),
+        rgba(3, 3, 6, 0.94);
+      box-shadow:
+        0 -1rem 2.5rem rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(247, 247, 242, 0.035);
+      opacity: 0;
+      transform: translate3d(0, calc(100% + 0.9rem), 0);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard);
+    }
+
+    .site-shell.is-global-menu-open .global-menu-backdrop,
+    .site-shell.is-global-menu-open .global-menu-drawer {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .site-shell.is-global-menu-open .global-menu-drawer {
+      transform: translate3d(0, 0, 0);
+    }
+
+    .global-menu-inner {
+      position: relative;
+      display: grid;
+      gap: clamp(0.82rem, 2.5svh, 1.1rem);
+      min-width: 0;
+      padding:
+        clamp(0.95rem, 4vw, 1.2rem)
+        clamp(0.9rem, 4vw, 1.25rem)
+        clamp(1rem, 4vw, 1.35rem);
+    }
+
+    .global-menu-inner::before {
+      position: absolute;
+      inset: 0.6rem;
+      content: "";
+      border: 1px solid rgba(213, 22, 34, 0.13);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      pointer-events: none;
+    }
+
+    .global-menu-header,
+    .global-menu-section,
+    .global-menu-actions {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .global-menu-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: var(--space-2);
+    }
+
+    .global-menu-title-group {
+      min-width: 0;
+      display: grid;
+      gap: 0.34rem;
+    }
+
+    .global-menu-kicker,
+    .global-menu-title,
+    .global-menu-section-title {
+      margin: 0;
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .global-menu-kicker {
+      color: rgba(213, 22, 34, 0.76);
+      font-size: clamp(0.66rem, 2.8vw, 0.76rem);
+    }
+
+    .global-menu-title {
+      color: var(--color-text);
+      font-size: clamp(1.02rem, 4.6vw, 1.32rem);
+    }
+
+    .global-menu-close {
+      min-width: 2.35rem;
+      min-height: 2.35rem;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.18);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.035);
+      color: rgba(247, 247, 242, 0.82);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .global-menu-close:focus-visible,
+    .global-menu-button:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.18rem;
+    }
+
+    .global-menu-section {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .global-menu-section-title {
+      color: rgba(247, 247, 242, 0.44);
+      font-size: clamp(0.66rem, 2.7vw, 0.74rem);
+    }
+
+    .global-menu-actions {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .global-menu-button {
+      width: 100%;
+      min-width: 0;
+      min-height: 2.55rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 0.68rem 0.76rem;
+      border: 1px solid rgba(247, 247, 242, 0.1);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, rgba(247, 247, 242, 0.035), transparent 72%),
+        rgba(247, 247, 242, 0.022);
+      color: rgba(247, 247, 242, 0.76);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.74rem, 3.3vw, 0.86rem);
+      line-height: 1;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .global-menu-button::after {
+      width: 0.36rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(213, 22, 34, 0.58);
+      border-radius: 50%;
+      background: rgba(213, 22, 34, 0.18);
+      box-shadow: 0 0 0.5rem rgba(213, 22, 34, 0.1);
+      content: "";
+    }
+
+    .global-menu-button-label--home::before {
+      content: "Back to Homepage";
+    }
+
+    .global-menu-button--local {
+      border-color: rgba(213, 22, 34, 0.22);
+      color: rgba(247, 247, 242, 0.86);
     }
 
     .portfolio-hub {
@@ -1376,6 +1590,11 @@
       .rail-label {
         font-size: 0.76em;
       }
+
+      .global-menu-drawer {
+        right: max(0.5rem, env(safe-area-inset-right));
+        left: max(0.5rem, env(safe-area-inset-left));
+      }
     }
 
     @media (min-width: 480px) {
@@ -1429,6 +1648,22 @@
 
       .universal-bottom-rail {
         text-align: left;
+      }
+
+      .global-menu-drawer {
+        right: auto;
+        left: 50%;
+        width: min(35rem, calc(100vw - 2rem));
+        border-radius: var(--radius-md);
+        transform: translate3d(-50%, calc(100% + 0.9rem), 0);
+      }
+
+      .site-shell.is-global-menu-open .global-menu-drawer {
+        transform: translate3d(-50%, 0, 0);
+      }
+
+      .global-menu-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -1614,6 +1849,16 @@
     </main>
 
     <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal portfolio rail">
+      <button
+        class="rail-menu-trigger"
+        type="button"
+        aria-label="Open global navigation menu"
+        aria-controls="global-nav-drawer"
+        aria-expanded="false"
+        data-rail-menu-trigger
+      >
+        <span class="sr-only">Open global navigation menu</span>
+      </button>
       <span class="rail-cluster rail-cluster--left" data-rail-region="current-view">
         <span class="rail-label status-label">Currently Viewing:</span>
         <span class="rail-value rail-value--view status-value status-value--view" data-current-view>Homepage</span>
@@ -1624,6 +1869,58 @@
         <span class="rail-value rail-value--build status-value status-value--build" data-archive-build>3.0.01</span>
       </span>
     </footer>
+
+    <button
+      class="global-menu-backdrop"
+      type="button"
+      aria-label="Close global navigation menu"
+      data-global-menu-backdrop
+      hidden
+    ></button>
+
+    <aside
+      class="global-menu-drawer"
+      id="global-nav-drawer"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="global-menu-title"
+      aria-hidden="true"
+      data-global-menu-drawer
+      hidden
+    >
+      <div class="global-menu-inner">
+        <header class="global-menu-header">
+          <div class="global-menu-title-group">
+            <p class="global-menu-kicker">Global Navigation</p>
+            <h2 class="global-menu-title" id="global-menu-title">Site Menu</h2>
+          </div>
+          <button class="global-menu-close" type="button" aria-label="Close global navigation menu" data-global-menu-close>
+            X
+          </button>
+        </header>
+
+        <nav class="global-menu-section" aria-label="Global site sections">
+          <h3 class="global-menu-section-title">Site Sections</h3>
+          <div class="global-menu-actions">
+            <button class="global-menu-button" type="button" data-global-nav-target="calendar">Calendar</button>
+            <button class="global-menu-button" type="button" data-global-nav-target="about">About</button>
+            <button class="global-menu-button" type="button" data-global-nav-target="pricing">Pricing</button>
+            <button class="global-menu-button" type="button" data-global-nav-target="contact">Contact</button>
+            <button class="global-menu-button" type="button" data-global-nav-target="admin">Admin</button>
+          </div>
+        </nav>
+
+        <div class="global-menu-section" aria-label="Shell views">
+          <h3 class="global-menu-section-title">Shell Views</h3>
+          <div class="global-menu-actions">
+            <button class="global-menu-button global-menu-button--local" type="button" aria-label="Back to Homepage" data-shell-nav-target="home">
+              <span class="global-menu-button-label--home" aria-hidden="true"></span>
+            </button>
+            <button class="global-menu-button global-menu-button--local" type="button" data-shell-nav-target="hub">Portfolio Hub</button>
+          </div>
+        </div>
+      </div>
+    </aside>
   </div>
 
   <script>
@@ -1632,6 +1929,11 @@
       const startButton = document.querySelector(".start-button");
       const homeFrame = document.querySelector(".home-frame");
       const portfolioHub = document.querySelector(".portfolio-hub");
+      const bottomRail = document.querySelector("[data-shell-bottom-rail]");
+      const railMenuTrigger = document.querySelector("[data-rail-menu-trigger]");
+      const globalMenuDrawer = document.querySelector("[data-global-menu-drawer]");
+      const globalMenuBackdrop = document.querySelector("[data-global-menu-backdrop]");
+      const globalMenuClose = document.querySelector("[data-global-menu-close]");
       const hubCarousel = document.querySelector("[data-hub-carousel]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
@@ -1641,6 +1943,7 @@
         : { matches: false };
       let activationTimer;
       let spotlightFrame;
+      let drawerCloseTimer;
 
       const spotlightContent = {
         music: {
@@ -1728,6 +2031,87 @@
         }
       }
 
+      function syncRailHeight() {
+        if (!bottomRail) {
+          return;
+        }
+
+        document.documentElement.style.setProperty("--rail-height", `${bottomRail.offsetHeight}px`);
+      }
+
+      function openGlobalMenu() {
+        if (!shell || !railMenuTrigger || !globalMenuDrawer || !globalMenuBackdrop) {
+          return;
+        }
+
+        window.clearTimeout(drawerCloseTimer);
+        syncRailHeight();
+        globalMenuDrawer.hidden = false;
+        globalMenuBackdrop.hidden = false;
+        globalMenuDrawer.setAttribute("aria-hidden", "false");
+        railMenuTrigger.setAttribute("aria-expanded", "true");
+        window.requestAnimationFrame(() => {
+          shell.classList.add("is-global-menu-open");
+        });
+      }
+
+      function finishGlobalMenuClose() {
+        if (!globalMenuDrawer || !globalMenuBackdrop) {
+          return;
+        }
+
+        globalMenuDrawer.hidden = true;
+        globalMenuBackdrop.hidden = true;
+      }
+
+      function closeGlobalMenu() {
+        if (!shell || !railMenuTrigger || !globalMenuDrawer || !globalMenuBackdrop) {
+          return;
+        }
+
+        shell.classList.remove("is-global-menu-open");
+        globalMenuDrawer.setAttribute("aria-hidden", "true");
+        railMenuTrigger.setAttribute("aria-expanded", "false");
+        window.clearTimeout(drawerCloseTimer);
+        if (reducedMotion.matches) {
+          finishGlobalMenuClose();
+          return;
+        }
+
+        drawerCloseTimer = window.setTimeout(finishGlobalMenuClose, 320);
+      }
+
+      function showHomepage() {
+        if (!shell || !startButton) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub");
+        startButton.disabled = false;
+        startButton.setAttribute("aria-busy", "false");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "false");
+        }
+        if (portfolioHub) {
+          portfolioHub.setAttribute("aria-hidden", "true");
+          portfolioHub.setAttribute("inert", "");
+        }
+      }
+
+      function handleGlobalMenuAction(event) {
+        const button = event.currentTarget;
+        const shellTarget = button.dataset.shellNavTarget;
+
+        if (shellTarget === "home") {
+          showHomepage();
+        } else if (shellTarget === "hub") {
+          revealHub();
+        }
+
+        closeGlobalMenu();
+      }
+
       function revealHub() {
         shell.classList.remove("is-activating", "is-reduced-activation");
         shell.classList.add("has-entered-hub");
@@ -1765,6 +2149,19 @@
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
         startButton.addEventListener("click", activatePortal);
+        syncRailHeight();
+        if (railMenuTrigger) {
+          railMenuTrigger.addEventListener("click", openGlobalMenu);
+        }
+        if (globalMenuBackdrop) {
+          globalMenuBackdrop.addEventListener("click", closeGlobalMenu);
+        }
+        if (globalMenuClose) {
+          globalMenuClose.addEventListener("click", closeGlobalMenu);
+        }
+        document.querySelectorAll("[data-global-nav-target], [data-shell-nav-target]").forEach((button) => {
+          button.addEventListener("click", handleGlobalMenuAction);
+        });
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
           syncSpotlightFromCarousel();
@@ -1775,8 +2172,15 @@
         } else if (typeof reducedMotion.addListener === "function") {
           reducedMotion.addListener(syncAmbientMotion);
         }
+        window.addEventListener("resize", syncRailHeight);
+        window.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && shell.classList.contains("is-global-menu-open")) {
+            closeGlobalMenu();
+          }
+        });
         window.addEventListener("pagehide", () => {
           window.clearTimeout(activationTimer);
+          window.clearTimeout(drawerCloseTimer);
           if (spotlightFrame) {
             window.cancelAnimationFrame(spotlightFrame);
           }
