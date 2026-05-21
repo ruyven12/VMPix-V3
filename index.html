@@ -116,7 +116,9 @@
     .site-shell {
       position: relative;
       min-width: 0;
+      height: 100vh;
       min-height: 100vh;
+      height: 100svh;
       min-height: 100svh;
       display: grid;
       grid-template-rows: minmax(0, 1fr) auto;
@@ -669,8 +671,10 @@
       width: min(100%, var(--hub-max));
       min-height: var(--stage-min-height);
       display: grid;
-      align-content: center;
+      grid-template-rows: auto minmax(0, 1fr);
+      align-content: stretch;
       justify-items: stretch;
+      gap: clamp(0.72rem, 2.4svh, 1rem);
       padding: clamp(0.85rem, 4vw, 1.55rem);
       border: 1px solid rgba(247, 247, 242, 0.22);
       border-radius: var(--radius-md);
@@ -832,6 +836,148 @@
       border-top: 1px solid color-mix(in srgb, var(--module-accent) 58%, transparent);
       color: rgba(247, 247, 242, 0.82);
       font-size: clamp(0.76rem, 3.4vw, 0.86rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .hub-context {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: clamp(0.62rem, 2svh, 0.8rem);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0 0.2rem 0.16rem;
+      scrollbar-color: rgba(213, 22, 34, 0.48) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+    }
+
+    .hub-context::-webkit-scrollbar {
+      width: 0.42rem;
+    }
+
+    .hub-context::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .hub-context::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.48);
+    }
+
+    .hub-panel {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      align-content: start;
+      gap: 0.62rem;
+      padding: clamp(0.78rem, 3.2vw, 1rem);
+      border: 1px solid rgba(247, 247, 242, 0.12);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 58%),
+        rgba(3, 3, 6, 0.42);
+    }
+
+    .hub-panel::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, transparent 0 28%, rgba(247, 247, 242, 0.09) 50%, transparent 72%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(213, 22, 34, 0.14), transparent 56%) left / 1px 100% no-repeat;
+      pointer-events: none;
+    }
+
+    .hub-panel-title,
+    .activity-list,
+    .spotlight-copy,
+    .spotlight-tags {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .hub-panel-title {
+      margin: 0;
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.78rem, 3.4vw, 0.9rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 0.42rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .activity-item {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.48rem;
+      padding: 0.48rem 0.58rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.028);
+      color: var(--color-muted);
+      font-size: clamp(0.74rem, 3.2vw, 0.84rem);
+      line-height: 1.16;
+      text-transform: uppercase;
+    }
+
+    .activity-marker {
+      width: 0.4rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(213, 22, 34, 0.78);
+      border-radius: 50%;
+      background: rgba(213, 22, 34, 0.28);
+      box-shadow: 0 0 0.58rem rgba(213, 22, 34, 0.14);
+    }
+
+    .activity-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hub-panel--spotlight {
+      align-content: stretch;
+    }
+
+    .spotlight-copy {
+      margin: 0;
+      color: var(--color-muted);
+      font-size: clamp(0.78rem, 3.25vw, 0.9rem);
+      line-height: 1.42;
+    }
+
+    .spotlight-tags {
+      align-self: end;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.36rem;
+      margin-top: 0.2rem;
+    }
+
+    .spotlight-tag {
+      min-width: 0;
+      padding: 0.32rem 0.44rem;
+      border: 1px solid rgba(213, 22, 34, 0.25);
+      border-radius: var(--radius-sm);
+      background: rgba(213, 22, 34, 0.07);
+      color: rgba(247, 247, 242, 0.66);
+      font-size: clamp(0.62rem, 2.7vw, 0.72rem);
       line-height: 1;
       text-transform: uppercase;
       white-space: nowrap;
@@ -1269,6 +1415,12 @@
         width: min(100%, 52rem);
       }
 
+      .hub-context {
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        grid-template-rows: minmax(0, 1fr);
+        overflow: hidden;
+      }
+
       .hub-card {
         flex-basis: clamp(14.75rem, 26vw, 16.6rem);
         height: clamp(13.2rem, 22vw, 15.25rem);
@@ -1421,6 +1573,43 @@
             </article>
           </div>
         </div>
+
+        <div class="hub-context" data-hub-context>
+          <section class="hub-panel hub-panel--activity" aria-labelledby="recent-activity-title">
+            <h3 class="hub-panel-title" id="recent-activity-title">Recent Archive Activity</h3>
+            <ul class="activity-list" aria-label="Recent archive activity placeholders">
+              <li class="activity-item">
+                <span class="activity-marker" aria-hidden="true"></span>
+                <span class="activity-text">New show added</span>
+              </li>
+              <li class="activity-item">
+                <span class="activity-marker" aria-hidden="true"></span>
+                <span class="activity-text">New match added</span>
+              </li>
+              <li class="activity-item">
+                <span class="activity-marker" aria-hidden="true"></span>
+                <span class="activity-text">New photos uploaded</span>
+              </li>
+              <li class="activity-item">
+                <span class="activity-marker" aria-hidden="true"></span>
+                <span class="activity-text">Upcoming event</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="hub-panel hub-panel--spotlight" aria-labelledby="archive-spotlight-title" data-archive-spotlight>
+            <h3 class="hub-panel-title" id="archive-spotlight-title">Archive Spotlight</h3>
+            <p class="spotlight-copy" data-spotlight-copy>
+              Music archive staging is ready for latest shows, band updates, people links, and synced galleries.
+            </p>
+            <div class="spotlight-tags" data-spotlight-tags aria-label="Archive spotlight focus">
+              <span class="spotlight-tag">Latest Shows</span>
+              <span class="spotlight-tag">Band Updates</span>
+              <span class="spotlight-tag">People Links</span>
+              <span class="spotlight-tag">Synced Galleries</span>
+            </div>
+          </section>
+        </div>
       </section>
     </main>
 
@@ -1443,11 +1632,85 @@
       const startButton = document.querySelector(".start-button");
       const homeFrame = document.querySelector(".home-frame");
       const portfolioHub = document.querySelector(".portfolio-hub");
+      const hubCarousel = document.querySelector("[data-hub-carousel]");
+      const spotlightCopy = document.querySelector("[data-spotlight-copy]");
+      const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
       const reducedMotion = window.matchMedia
         ? window.matchMedia("(prefers-reduced-motion: reduce)")
         : { matches: false };
       let activationTimer;
+      let spotlightFrame;
+
+      const spotlightContent = {
+        music: {
+          copy: "Music archive staging is ready for latest shows, band updates, people links, and synced galleries.",
+          tags: ["Latest Shows", "Band Updates", "People Links", "Synced Galleries"],
+        },
+        wrestling: {
+          copy: "Wrestling archive staging is ready for shows, matches, people, tagged albums, and synced galleries.",
+          tags: ["Shows", "Matches", "People", "Tagged Albums", "Synced Galleries"],
+        },
+        future: {
+          copy: "Future portfolio lanes are queued while Music and Wrestling remain the active archive modules.",
+          tags: ["Queued", "Archive Standby", "Future Lane"],
+        },
+      };
+
+      function setSpotlight(moduleName) {
+        if (!spotlightCopy || !spotlightTags) {
+          return;
+        }
+
+        const content = spotlightContent[moduleName] || spotlightContent.future;
+        spotlightCopy.textContent = content.copy;
+        spotlightTags.replaceChildren();
+        content.tags.forEach((tagText) => {
+          const tag = document.createElement("span");
+          tag.className = "spotlight-tag";
+          tag.textContent = tagText;
+          spotlightTags.append(tag);
+        });
+      }
+
+      function syncSpotlightFromCarousel() {
+        if (!hubCarousel) {
+          return;
+        }
+
+        const cards = Array.from(hubCarousel.querySelectorAll("[data-module-card]"));
+        if (cards.length === 0) {
+          return;
+        }
+
+        const carouselRect = hubCarousel.getBoundingClientRect();
+        const carouselCenter = carouselRect.left + carouselRect.width / 2;
+        let nearestCard = cards[0];
+        let nearestDistance = Number.POSITIVE_INFINITY;
+
+        cards.forEach((card) => {
+          const cardRect = card.getBoundingClientRect();
+          const cardCenter = cardRect.left + cardRect.width / 2;
+          const distance = Math.abs(carouselCenter - cardCenter);
+          if (distance < nearestDistance) {
+            nearestCard = card;
+            nearestDistance = distance;
+          }
+        });
+
+        setSpotlight(nearestCard.dataset.moduleState === "active" ? nearestCard.dataset.moduleCard : "future");
+      }
+
+      function scheduleSpotlightSync() {
+        if (spotlightFrame) {
+          return;
+        }
+
+        spotlightFrame = window.requestAnimationFrame(() => {
+          spotlightFrame = 0;
+          syncSpotlightFromCarousel();
+        });
+      }
 
       function syncAmbientMotion() {
         if (!fireVideo) {
@@ -1475,6 +1738,7 @@
           portfolioHub.setAttribute("aria-hidden", "false");
           portfolioHub.removeAttribute("inert");
         }
+        syncSpotlightFromCarousel();
         startButton.setAttribute("aria-busy", "false");
       }
 
@@ -1501,13 +1765,22 @@
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
         startButton.addEventListener("click", activatePortal);
+        if (hubCarousel) {
+          hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
+          syncSpotlightFromCarousel();
+        }
         syncAmbientMotion();
         if (typeof reducedMotion.addEventListener === "function") {
           reducedMotion.addEventListener("change", syncAmbientMotion);
         } else if (typeof reducedMotion.addListener === "function") {
           reducedMotion.addListener(syncAmbientMotion);
         }
-        window.addEventListener("pagehide", () => window.clearTimeout(activationTimer));
+        window.addEventListener("pagehide", () => {
+          window.clearTimeout(activationTimer);
+          if (spotlightFrame) {
+            window.cancelAnimationFrame(spotlightFrame);
+          }
+        });
       }
     })();
   </script>
