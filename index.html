@@ -670,15 +670,15 @@
       min-height: var(--stage-min-height);
       display: grid;
       align-content: center;
-      justify-items: center;
-      gap: clamp(2rem, 7svh, 4.5rem);
-      padding: clamp(1.1rem, 4vw, 2rem);
+      justify-items: stretch;
+      padding: clamp(0.85rem, 4vw, 1.55rem);
       border: 1px solid rgba(247, 247, 242, 0.22);
       border-radius: var(--radius-md);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 42%),
         linear-gradient(135deg, rgba(213, 22, 34, 0.075), transparent 38%),
         rgba(6, 6, 9, 0.68);
+      overflow: hidden;
       opacity: 0;
       pointer-events: none;
       transform: translate3d(0, 0.7rem, 0) scale(0.975);
@@ -701,69 +701,140 @@
         linear-gradient(180deg, transparent 0 45%, rgba(213, 22, 34, 0.12) 50%, transparent 55%) left / 1px 100% no-repeat;
     }
 
-    .hub-header {
-      display: grid;
-      justify-items: center;
-      gap: 0.65rem;
-      min-width: 0;
-      text-align: center;
+    .portfolio-hub[aria-hidden="true"] {
+      visibility: hidden;
     }
 
-    .hub-kicker {
-      margin: 0;
-      color: var(--color-muted);
-      font-size: clamp(0.78rem, 3vw, 0.98rem);
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
-    .hub-title {
-      max-width: 100%;
-      margin: 0;
-      color: var(--color-text);
-      font-size: clamp(1.55rem, 8vw, 2.8rem);
-      font-weight: 400;
-      line-height: 1.05;
-      text-wrap: balance;
-    }
-
-    .hub-future-mount {
+    .hub-carousel {
       position: relative;
-      width: min(100%, 22rem);
-      min-height: clamp(8rem, 22svh, 13rem);
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(247, 247, 242, 0.12);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, rgba(213, 22, 34, 0.11), transparent 58%),
-        radial-gradient(circle, transparent 0 58%, rgba(247, 247, 242, 0.08) 58.4% 58.8%, transparent 59.2%),
-        rgba(5, 5, 7, 0.18);
-      overflow: hidden;
+      z-index: 1;
+      width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding: 0.35rem 0.2rem 0.55rem;
+      scroll-padding-inline: 0.2rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-color: rgba(213, 22, 34, 0.5) rgba(247, 247, 242, 0.08);
+      scrollbar-width: thin;
     }
 
-    .hub-future-mount::before,
-    .hub-future-mount::after {
+    .hub-carousel::-webkit-scrollbar {
+      height: 0.42rem;
+    }
+
+    .hub-carousel::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.08);
+    }
+
+    .hub-carousel::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.5);
+    }
+
+    .hub-carousel-track {
+      min-width: 100%;
+      display: flex;
+      align-items: stretch;
+      gap: clamp(0.72rem, 3vw, 1rem);
+    }
+
+    .hub-card {
+      --module-accent: var(--color-accent);
+      flex: 0 0 min(82vw, 17.5rem);
+      height: clamp(12.75rem, 58vw, 15.7rem);
+      position: relative;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      align-content: start;
+      gap: 0.68rem;
+      min-width: 0;
+      padding: clamp(0.95rem, 4vw, 1.18rem);
+      border: 1px solid rgba(247, 247, 242, 0.12);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 44%),
+        linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 24%, transparent), transparent 54%),
+        rgba(3, 3, 6, 0.58);
+      box-shadow:
+        inset 0 0 0 1px rgba(247, 247, 242, 0.035),
+        0 0 1.8rem color-mix(in srgb, var(--module-accent) 13%, transparent);
+      color: var(--color-text);
+      overflow: hidden;
+      scroll-snap-align: center;
+    }
+
+    .hub-card::before {
       position: absolute;
-      inset: 15%;
+      inset: 0;
       content: "";
-      border: 1px solid rgba(213, 22, 34, 0.22);
-      border-radius: inherit;
+      background:
+        linear-gradient(90deg, transparent 0 18%, color-mix(in srgb, var(--module-accent) 42%, transparent) 50%, transparent 82%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, transparent 0 28%, color-mix(in srgb, var(--module-accent) 24%, transparent) 100%) left / 1px 100% no-repeat;
+      opacity: 0.8;
       pointer-events: none;
     }
 
-    .hub-future-mount::after {
-      inset: 32%;
-      border-color: rgba(247, 247, 242, 0.12);
+    .hub-card--music {
+      --module-accent: #d51622;
     }
 
-    .hub-status {
+    .hub-card--wrestling {
+      --module-accent: #d8a33d;
+    }
+
+    .hub-card--future {
+      --module-accent: rgba(247, 247, 242, 0.38);
+      opacity: 0.62;
+    }
+
+    .hub-card-kicker,
+    .hub-card-title,
+    .hub-card-meta,
+    .hub-card-action {
       position: relative;
       z-index: 1;
-      color: var(--color-muted);
-      font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hub-card-kicker {
+      color: color-mix(in srgb, var(--module-accent) 78%, var(--color-text));
+      font-size: clamp(0.78rem, 3.7vw, 0.94rem);
       line-height: 1;
       text-transform: uppercase;
+    }
+
+    .hub-card-title {
+      color: var(--color-text);
+      font-size: clamp(1.02rem, 5.6vw, 1.42rem);
+      font-weight: 400;
+      line-height: 1.06;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .hub-card-meta {
+      align-self: start;
+      color: var(--color-muted);
+      font-size: clamp(0.75rem, 3.4vw, 0.88rem);
+      line-height: 1.35;
+      text-transform: uppercase;
+      white-space: normal;
+    }
+
+    .hub-card-action {
+      align-self: end;
+      width: fit-content;
+      max-width: 100%;
+      padding-top: 0.58rem;
+      border-top: 1px solid color-mix(in srgb, var(--module-accent) 58%, transparent);
+      color: rgba(247, 247, 242, 0.82);
+      font-size: clamp(0.76rem, 3.4vw, 0.86rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .site-shell.is-activating .ambient-energy {
@@ -1194,6 +1265,16 @@
         padding-inline: max(var(--space-5), env(safe-area-inset-left));
       }
 
+      .portfolio-hub {
+        width: min(100%, 52rem);
+      }
+
+      .hub-card {
+        flex-basis: clamp(14.75rem, 26vw, 16.6rem);
+        height: clamp(13.2rem, 22vw, 15.25rem);
+        scroll-snap-align: start;
+      }
+
       .universal-bottom-rail {
         text-align: left;
       }
@@ -1299,17 +1380,46 @@
         </div>
       </section>
 
-      <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true">
-        <div class="hub-header">
-          <p class="hub-kicker">Interactive Portfolio</p>
-          <h2 class="hub-title" id="portfolio-title">Nexus Awaiting Input</h2>
-        </div>
+      <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true" inert>
+        <h2 class="sr-only" id="portfolio-title">Interactive Portfolio Hub</h2>
 
-        <!-- Future Interactive Portfolio Hub mount:
-             keep this container empty in Homepage v1.
-             Future work will decide the real module selection system. -->
-        <div class="hub-future-mount" data-future-hub-mount aria-label="Future Interactive Portfolio Hub mount">
-          <span class="hub-status">System Ready</span>
+        <div class="hub-carousel" data-hub-carousel aria-label="Portfolio module carousel">
+          <div class="hub-carousel-track">
+            <article class="hub-card hub-card--music" data-module-card="music" data-module-state="active" data-module-route="music">
+              <p class="hub-card-kicker">Music</p>
+              <h3 class="hub-card-title">The Soundtrack Archive</h3>
+              <p class="hub-card-meta">Bands / Shows / People / Venues</p>
+              <span class="hub-card-action">Explore Music</span>
+            </article>
+
+            <article class="hub-card hub-card--wrestling" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling">
+              <p class="hub-card-kicker">Wrestling</p>
+              <h3 class="hub-card-title">The Battleground Archive</h3>
+              <p class="hub-card-meta">Shows / Matches / People / Venues</p>
+              <span class="hub-card-action">Explore Wrestling</span>
+            </article>
+
+            <article class="hub-card hub-card--future" data-module-card="wildlife" data-module-state="future">
+              <p class="hub-card-kicker">Wildlife</p>
+              <h3 class="hub-card-title">Archive Standby</h3>
+              <p class="hub-card-meta">Future Portfolio</p>
+              <span class="hub-card-action">Queued</span>
+            </article>
+
+            <article class="hub-card hub-card--future" data-module-card="skies-above" data-module-state="future">
+              <p class="hub-card-kicker">Skies Above</p>
+              <h3 class="hub-card-title">Archive Standby</h3>
+              <p class="hub-card-meta">Future Portfolio</p>
+              <span class="hub-card-action">Queued</span>
+            </article>
+
+            <article class="hub-card hub-card--future" data-module-card="scenery" data-module-state="future">
+              <p class="hub-card-kicker">Scenery</p>
+              <h3 class="hub-card-title">Archive Standby</h3>
+              <p class="hub-card-meta">Future Portfolio</p>
+              <span class="hub-card-action">Queued</span>
+            </article>
+          </div>
         </div>
       </section>
     </main>
@@ -1363,6 +1473,7 @@
         }
         if (portfolioHub) {
           portfolioHub.setAttribute("aria-hidden", "false");
+          portfolioHub.removeAttribute("inert");
         }
         startButton.setAttribute("aria-busy", "false");
       }
