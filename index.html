@@ -1553,6 +1553,223 @@
       content: "";
     }
 
+    .ring-archive-shell {
+      position: relative;
+      z-index: 2;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      align-content: start;
+      gap: clamp(0.86rem, 2.4svh, 1.1rem);
+      padding: clamp(0.95rem, 4vw, 1.35rem);
+      border: 1px solid rgba(247, 247, 242, 0.14);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 48%),
+        radial-gradient(ellipse at 50% 16%, rgba(213, 22, 34, 0.18), transparent min(48vw, 25rem)),
+        radial-gradient(ellipse at 50% 88%, rgba(88, 4, 9, 0.36), transparent min(54vw, 30rem)),
+        repeating-linear-gradient(90deg, rgba(213, 22, 34, 0.035) 0 1px, transparent 1px 4.2rem),
+        rgba(3, 3, 6, 0.62);
+      opacity: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      pointer-events: none;
+      scrollbar-color: rgba(213, 22, 34, 0.48) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+      transform: translate3d(0, 0.36rem, 0);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
+      visibility: hidden;
+    }
+
+    .ring-archive-shell::-webkit-scrollbar {
+      width: 0.42rem;
+    }
+
+    .ring-archive-shell::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .ring-archive-shell::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.48);
+    }
+
+    .ring-archive-shell::before,
+    .ring-archive-shell::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .ring-archive-shell::before {
+      inset: var(--space-2);
+      border: 1px solid rgba(213, 22, 34, 0.16);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, transparent 0 28%, rgba(247, 247, 242, 0.08) 50%, transparent 72%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(213, 22, 34, 0.18), transparent 56%) left / 1px 100% no-repeat;
+    }
+
+    .ring-archive-shell::after {
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent 0 49%, rgba(213, 22, 34, 0.1) 50%, transparent 51%) 50% 0 / min(22rem, 72vw) 100% no-repeat,
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.024) 0 1px, transparent 1px 5px);
+      opacity: 0.32;
+      mix-blend-mode: screen;
+    }
+
+    .ring-archive-header,
+    .ring-archive-card-grid,
+    .ring-archive-activity,
+    .ring-archive-back {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .ring-archive-header {
+      padding: clamp(0.25rem, 1vw, 0.45rem) 0 0.1rem;
+    }
+
+    .ring-archive-title {
+      margin: 0;
+      color: var(--color-text);
+      font-size: clamp(1.36rem, 8.4vw, 2.38rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 1.1rem rgba(213, 22, 34, 0.18);
+    }
+
+    .ring-archive-card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.56rem, 2.4vw, 0.78rem);
+    }
+
+    .ring-archive-card {
+      position: relative;
+      min-width: 0;
+      min-height: clamp(5.7rem, 26vw, 7.15rem);
+      display: grid;
+      align-items: end;
+      margin: 0;
+      padding: clamp(0.75rem, 3.4vw, 0.96rem);
+      border: 1px solid rgba(247, 247, 242, 0.11);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 58%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.17), transparent 66%),
+        rgba(247, 247, 242, 0.024);
+      overflow: hidden;
+    }
+
+    .ring-archive-card::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, transparent 0 18%, rgba(213, 22, 34, 0.4) 50%, transparent 82%) top / 100% 1px no-repeat,
+        radial-gradient(circle at 88% 18%, rgba(213, 22, 34, 0.2), transparent 38%);
+      opacity: 0.82;
+      pointer-events: none;
+    }
+
+    .ring-archive-card-title {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      color: rgba(247, 247, 242, 0.88);
+      font-size: clamp(0.86rem, 4vw, 1.08rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .ring-archive-activity {
+      display: grid;
+      gap: 0.58rem;
+      padding: clamp(0.75rem, 3vw, 0.95rem);
+      border: 1px solid rgba(247, 247, 242, 0.1);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(213, 22, 34, 0.065), transparent 70%),
+        rgba(247, 247, 242, 0.024);
+    }
+
+    .ring-archive-section-title {
+      margin: 0;
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.78rem, 3.35vw, 0.92rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .ring-activity-list {
+      display: grid;
+      gap: 0.42rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .ring-activity-row {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.52rem 0.58rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(3, 3, 6, 0.36);
+      color: var(--color-muted);
+      font-size: clamp(0.72rem, 3.2vw, 0.84rem);
+      line-height: 1.16;
+      text-transform: uppercase;
+    }
+
+    .ring-activity-row::before {
+      width: 0.4rem;
+      aspect-ratio: 1;
+      border: 1px solid rgba(213, 22, 34, 0.76);
+      border-radius: 50%;
+      background: rgba(213, 22, 34, 0.28);
+      box-shadow: 0 0 0.58rem rgba(213, 22, 34, 0.14);
+      content: "";
+    }
+
+    .ring-archive-back {
+      justify-self: start;
+      min-height: var(--tap-target);
+      padding: 0.72rem 0.9rem;
+      border: 1px solid rgba(213, 22, 34, 0.34);
+      border-radius: var(--radius-sm);
+      background: rgba(213, 22, 34, 0.08);
+      color: rgba(247, 247, 242, 0.84);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.78rem, 3vw, 0.88rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .ring-archive-back:hover {
+      border-color: rgba(247, 247, 242, 0.24);
+    }
+
+    .ring-archive-back:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.2rem;
+    }
     .site-shell.is-module-view .hub-carousel,
     .site-shell.is-module-view .hub-context {
       opacity: 0;
@@ -1562,7 +1779,8 @@
     }
 
     .site-shell.is-placeholder-view .module-placeholder,
-    .site-shell.is-music-nexus-view .music-nexus-shell {
+    .site-shell.is-music-nexus-view .music-nexus-shell,
+    .site-shell.is-ring-archive-view .ring-archive-shell {
       opacity: 1;
       pointer-events: auto;
       transform: translate3d(0, 0, 0);
@@ -2026,6 +2244,10 @@
         flex-basis: clamp(10.5rem, 22%, 12.4rem);
       }
 
+      .ring-archive-card-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
       .universal-bottom-rail {
         text-align: left;
       }
@@ -2159,7 +2381,7 @@
               <span class="hub-card-action">Explore Music</span>
             </button>
 
-            <button class="hub-card hub-card--wrestling" type="button" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling" aria-label="Open Wrestling placeholder">
+            <button class="hub-card hub-card--wrestling" type="button" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling" aria-label="Open Ring Archive">
               <span class="hub-card-kicker">Wrestling</span>
               <span class="hub-card-title">The Battleground Archive</span>
               <span class="hub-card-meta">Shows / Matches / People / Venues</span>
@@ -2273,6 +2495,40 @@
             </ul>
           </section>
         </section>
+        <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
+          <header class="ring-archive-header">
+            <h3 class="ring-archive-title" id="ring-archive-title">RING ARCHIVE</h3>
+          </header>
+
+          <div class="ring-archive-card-grid" aria-label="Ring Archive modules">
+            <article class="ring-archive-card">
+              <h4 class="ring-archive-card-title">Shows</h4>
+            </article>
+            <article class="ring-archive-card">
+              <h4 class="ring-archive-card-title">Matches</h4>
+            </article>
+            <article class="ring-archive-card">
+              <h4 class="ring-archive-card-title">People</h4>
+            </article>
+            <article class="ring-archive-card">
+              <h4 class="ring-archive-card-title">Venues</h4>
+            </article>
+          </div>
+
+          <section class="ring-archive-activity" aria-labelledby="ring-activity-title">
+            <h4 class="ring-archive-section-title" id="ring-activity-title">Recent Ring Activity</h4>
+            <ul class="ring-activity-list" aria-label="Recent Ring Activity placeholder rows">
+              <li class="ring-activity-row">Latest show placeholder</li>
+              <li class="ring-activity-row">Featured match placeholder</li>
+              <li class="ring-activity-row">People archive update placeholder</li>
+              <li class="ring-activity-row">Venue queue placeholder</li>
+            </ul>
+          </section>
+
+          <button class="ring-archive-back" type="button" data-ring-archive-back>
+            Back to Portfolio
+          </button>
+        </section>
       </section>
     </main>
 
@@ -2373,6 +2629,8 @@
       const moduleBack = document.querySelector("[data-module-back]");
       const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
       const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
+      const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
+      const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
       const musicActivityList = document.querySelector("[data-music-activity-list]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
@@ -2399,14 +2657,7 @@
         },
       };
 
-      const modulePlaceholderContent = {
-        wrestling: {
-          rail: "Wrestling",
-          kicker: "Wrestling Placeholder",
-          title: "Wrestling Archive Placeholder",
-          copy: "Lightweight v1 module state for the Wrestling archive. Full shows, matches, people, venues, and tagged gallery wiring will be added later.",
-        },
-      };
+      const modulePlaceholderContent = {};
 
       const musicActivityContent = {
         bands: [
@@ -2585,7 +2836,7 @@
           return;
         }
 
-        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view");
+        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view");
         if (modulePlaceholder) {
           modulePlaceholder.setAttribute("aria-hidden", "true");
           modulePlaceholder.setAttribute("inert", "");
@@ -2593,6 +2844,10 @@
         if (musicNexusShell) {
           musicNexusShell.setAttribute("aria-hidden", "true");
           musicNexusShell.setAttribute("inert", "");
+        }
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
         }
         setHubChromeHidden(false);
         setCurrentView("Interactive Portfolio");
@@ -2604,7 +2859,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -2617,9 +2872,44 @@
         }
         musicNexusShell.setAttribute("aria-hidden", "false");
         musicNexusShell.removeAttribute("inert");
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         setMusicNexusContext("bands", false, false);
         setCurrentView("Music Nexus");
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function showRingArchive() {
+        if (!shell || !portfolioHub || !ringArchiveShell) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view");
+        shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        portfolioHub.setAttribute("aria-hidden", "false");
+        portfolioHub.removeAttribute("inert");
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
+        }
+        ringArchiveShell.setAttribute("aria-hidden", "false");
+        ringArchiveShell.removeAttribute("inert");
+        setHubChromeHidden(true);
+        setCurrentView("Ring Archive");
         if (startButton) {
           startButton.disabled = true;
           startButton.setAttribute("aria-busy", "false");
@@ -2633,7 +2923,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -2645,6 +2935,10 @@
         if (musicNexusShell) {
           musicNexusShell.setAttribute("aria-hidden", "true");
           musicNexusShell.setAttribute("inert", "");
+        }
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
         }
         setHubChromeHidden(true);
         if (modulePlaceholderKicker) {
@@ -2726,7 +3020,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view");
         startButton.disabled = false;
         startButton.setAttribute("aria-busy", "false");
         if (homeFrame) {
@@ -2743,6 +3037,10 @@
         if (musicNexusShell) {
           musicNexusShell.setAttribute("aria-hidden", "true");
           musicNexusShell.setAttribute("inert", "");
+        }
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
         }
         setHubChromeHidden(false);
         setCurrentView("Homepage");
@@ -2821,12 +3119,19 @@
               showMusicNexus();
               return;
             }
+            if (card.dataset.moduleCard === "wrestling") {
+              showRingArchive();
+              return;
+            }
 
             showModulePlaceholder(card.dataset.moduleCard);
           });
         });
         if (moduleBack) {
           moduleBack.addEventListener("click", revealHub);
+        }
+        if (ringArchiveBack) {
+          ringArchiveBack.addEventListener("click", revealHub);
         }
         musicNexusCards.forEach((card) => {
           card.addEventListener("click", () => {
