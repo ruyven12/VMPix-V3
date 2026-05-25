@@ -13,20 +13,9 @@
 
   <style>
     /* =========================================================
-       Homepage v1 source-of-truth implementation
-       Static foundation only. No routes, APIs, modules, or backend behavior.
-
-       Future work not included in v1:
-       - real public shell routing
-       - full Interactive Portfolio Hub design
-       - real module selection system
-       - full Music module
-       - full Wrestling module
-       - full Calendar module
-       - About/Pricing/Contact routes
-       - backend integrations
-       - advanced animation polish
-       - self-hosted fonts if needed
+       VMPix V3 static shell foundation.
+       Shell-level navigation, archive modules, and static content only.
+       No routes, APIs, backend behavior, or live integrations.
        ========================================================= */
 
     :root {
@@ -577,7 +566,7 @@
 
     .universal-bottom-rail {
       position: relative;
-      z-index: 1;
+      z-index: 8;
       width: 100%;
       min-width: 0;
       display: grid;
@@ -709,11 +698,11 @@
 
     .global-menu-drawer {
       right: max(var(--space-2), env(safe-area-inset-right));
-      bottom: var(--rail-height, 2.25rem);
+      bottom: calc(var(--rail-height, 2.25rem) + 0.25rem);
       left: max(var(--space-2), env(safe-area-inset-left));
       z-index: 7;
-      max-height: min(72svh, calc(100vh - var(--rail-height, 2.25rem) - 1rem));
-      max-height: min(72svh, calc(100svh - var(--rail-height, 2.25rem) - 1rem));
+      max-height: min(72svh, calc(100vh - var(--rail-height, 2.25rem) - 1.25rem));
+      max-height: min(72svh, calc(100svh - var(--rail-height, 2.25rem) - 1.25rem));
       overflow-y: auto;
       overscroll-behavior: contain;
       border: 1px solid rgba(247, 247, 242, 0.16);
@@ -3113,7 +3102,7 @@
               Start
             </button>
           </div>
-          <span class="sr-only" id="start-description">Placeholder start control centered inside the VMPix V3 portal shell.</span>
+          <span class="sr-only" id="start-description">Start control centered inside the VMPix V3 portal shell.</span>
         </div>
       </section>
 
@@ -3395,7 +3384,7 @@
       </section>
     </main>
 
-    <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal portfolio rail">
+    <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal shell rail">
       <button
         class="rail-menu-trigger"
         type="button"
@@ -3576,6 +3565,19 @@
         });
       }
 
+      function centerCardInScroller(card, scroller) {
+        if (!card || !scroller) {
+          return;
+        }
+
+        const maxLeft = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+        const targetLeft = card.offsetLeft - (scroller.clientWidth - card.offsetWidth) / 2;
+        scroller.scrollTo({
+          left: Math.max(0, Math.min(targetLeft, maxLeft)),
+          behavior: reducedMotion.matches ? "auto" : "smooth",
+        });
+      }
+
       function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdateRail = true) {
         const rows = musicActivityContent[sectionName];
         if (!rows || !musicActivityList) {
@@ -3589,11 +3591,7 @@
           if (isActive) {
             activeCardLabel = card.textContent.trim();
             card.setAttribute("tabindex", "0");
-            card.scrollIntoView({
-              behavior: reducedMotion.matches ? "auto" : "smooth",
-              block: "nearest",
-              inline: "nearest",
-            });
+            centerCardInScroller(card, card.closest("[data-music-nexus-selector]"));
             if (shouldFocusCard) {
               card.focus({ preventScroll: true });
             }
