@@ -33,6 +33,11 @@
       --color-accent: #d51622;
       --color-accent-soft: rgba(213, 22, 34, 0.18);
       --color-accent-line: rgba(213, 22, 34, 0.58);
+      --accent-music: #8e6cff;
+      --accent-ring: #d51622;
+      --accent-calendar: #00b2be;
+      --accent-shell: #d51622;
+      --accent-future: rgba(0, 178, 190, 0.48);
 
       --font-display: Audiowide, Orbitron, Rajdhani, "Segoe UI", Arial, sans-serif;
 
@@ -45,6 +50,28 @@
 
       --radius-sm: 0.375rem;
       --radius-md: 0.5rem;
+      --v3-card-radius: var(--radius-sm);
+      --v3-card-radius-feature: var(--radius-md);
+      --v3-card-accent: var(--color-accent);
+      --v3-card-gap: clamp(0.42rem, 1.8vw, 0.62rem);
+      --v3-card-gap-tight: 0.34rem;
+      --v3-card-padding: clamp(0.68rem, 2.8vw, 0.95rem);
+      --v3-card-padding-feature: clamp(0.95rem, 4vw, 1.18rem);
+      --v3-card-padding-compact: clamp(0.52rem, 2.4vw, 0.68rem);
+      --v3-card-border: 1px solid rgba(247, 247, 242, 0.1);
+      --v3-card-border-strong: 1px solid rgba(247, 247, 242, 0.14);
+      --v3-card-bg: linear-gradient(180deg, rgba(247, 247, 242, 0.036), transparent 58%), rgba(3, 3, 6, 0.34);
+      --v3-card-bg-accent: linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent, var(--color-accent)) 14%, transparent), transparent 64%);
+      --v3-card-glow: inset 0 0 0 1px rgba(247, 247, 242, 0.03), 0 0 1.2rem color-mix(in srgb, var(--v3-card-accent, var(--color-accent)) 9%, transparent);
+      --v3-card-title-size: clamp(0.82rem, 3.6vw, 1rem);
+      --v3-card-title-size-feature: clamp(1.02rem, 5.6vw, 1.42rem);
+      --v3-card-meta-size: clamp(0.62rem, 2.7vw, 0.74rem);
+      --v3-card-meta-size-feature: clamp(0.75rem, 3.4vw, 0.88rem);
+      --v3-card-transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        background-color var(--motion-fast) var(--ease-standard),
+        box-shadow var(--motion-fast) var(--ease-standard),
+        transform var(--motion-fast) var(--ease-standard);
       --tap-target: 48px;
       --frame-max: 44rem;
       --hub-max: 46rem;
@@ -100,6 +127,63 @@
 
     button {
       font: inherit;
+    }
+
+    .v3-card {
+      position: relative;
+      min-width: 0;
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
+      background:
+        var(--v3-card-bg-accent),
+        var(--v3-card-bg);
+      box-shadow: var(--v3-card-glow);
+      color: inherit;
+      overflow: hidden;
+      transition: var(--v3-card-transition);
+    }
+
+    .v3-card--feature {
+      border-radius: var(--v3-card-radius-feature);
+      padding: var(--v3-card-padding-feature);
+    }
+
+    .v3-card--activity,
+    .v3-card--spotlight,
+    .v3-card--event {
+      padding: var(--v3-card-padding);
+    }
+
+    .v3-card--mini,
+    .v3-card--state {
+      padding: var(--v3-card-padding-compact);
+    }
+
+    .v3-card--state {
+      border-color: color-mix(in srgb, var(--v3-card-accent) 22%, rgba(247, 247, 242, 0.1));
+    }
+
+    .v3-card--interactive {
+      cursor: pointer;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .v3-card--interactive:hover {
+        border-color: color-mix(in srgb, var(--v3-card-accent) 42%, rgba(247, 247, 242, 0.2));
+        box-shadow:
+          var(--v3-card-glow),
+          0 0 1.6rem color-mix(in srgb, var(--v3-card-accent) 12%, transparent);
+        transform: translate3d(0, -0.04rem, 0);
+      }
+    }
+
+    .v3-card--interactive:active {
+      transform: translate3d(0, 0, 0);
+    }
+
+    .v3-card--interactive:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.18rem;
     }
 
     .site-shell {
@@ -697,6 +781,7 @@
     }
 
     .global-menu-drawer {
+      --v3-card-accent: var(--accent-shell);
       right: max(var(--space-2), env(safe-area-inset-right));
       bottom: calc(var(--rail-height, 2.25rem) + 0.25rem);
       left: max(var(--space-2), env(safe-area-inset-left));
@@ -835,8 +920,8 @@
       align-items: center;
       gap: var(--space-2);
       padding: 0.68rem 0.76rem;
-      border: 1px solid rgba(247, 247, 242, 0.1);
-      border-radius: var(--radius-sm);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(90deg, rgba(247, 247, 242, 0.035), transparent 72%),
         rgba(247, 247, 242, 0.022);
@@ -847,6 +932,7 @@
       line-height: 1;
       text-align: left;
       text-transform: uppercase;
+      transition: var(--v3-card-transition);
     }
 
     .global-menu-button::after {
@@ -967,6 +1053,7 @@
 
     .hub-card {
       --module-accent: var(--color-accent);
+      --v3-card-accent: var(--module-accent);
       appearance: none;
       flex: 0 0 min(82vw, 17.5rem);
       height: clamp(12.75rem, 58vw, 15.7rem);
@@ -974,18 +1061,16 @@
       display: grid;
       grid-template-rows: auto auto 1fr auto;
       align-content: start;
-      gap: 0.6rem;
+      gap: var(--v3-card-gap);
       min-width: 0;
-      padding: clamp(0.95rem, 4vw, 1.18rem);
-      border: 1px solid rgba(247, 247, 242, 0.12);
-      border-radius: var(--radius-md);
+      padding: var(--v3-card-padding-feature);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 44%),
         linear-gradient(135deg, color-mix(in srgb, var(--module-accent) 24%, transparent), transparent 54%),
         rgba(3, 3, 6, 0.58);
-      box-shadow:
-        inset 0 0 0 1px rgba(247, 247, 242, 0.035),
-        0 0 1.8rem color-mix(in srgb, var(--module-accent) 13%, transparent);
+      box-shadow: var(--v3-card-glow);
       color: var(--color-text);
       cursor: default;
       font: inherit;
@@ -1011,15 +1096,15 @@
     }
 
     .hub-card--music {
-      --module-accent: #d51622;
+      --module-accent: var(--accent-music);
     }
 
     .hub-card--wrestling {
-      --module-accent: #d8a33d;
+      --module-accent: var(--accent-ring);
     }
 
     .hub-card--future {
-      --module-accent: rgba(247, 247, 242, 0.38);
+      --module-accent: var(--accent-future);
       opacity: 0.62;
     }
 
@@ -1057,7 +1142,7 @@
 
     .hub-card-title {
       color: var(--color-text);
-      font-size: clamp(1.02rem, 5.6vw, 1.42rem);
+      font-size: var(--v3-card-title-size-feature);
       font-weight: 400;
       line-height: 1.06;
       text-transform: uppercase;
@@ -1067,7 +1152,7 @@
     .hub-card-meta {
       align-self: start;
       color: var(--color-muted);
-      font-size: clamp(0.75rem, 3.4vw, 0.88rem);
+      font-size: var(--v3-card-meta-size-feature);
       line-height: 1.35;
       text-transform: uppercase;
       white-space: normal;
@@ -1125,10 +1210,10 @@
       min-height: 0;
       display: grid;
       align-content: start;
-      gap: 0.52rem;
-      padding: clamp(0.7rem, 2.9vw, 0.92rem);
-      border: 1px solid rgba(247, 247, 242, 0.12);
-      border-radius: var(--radius-md);
+      gap: var(--v3-card-gap);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 58%),
         rgba(3, 3, 6, 0.42);
@@ -1203,13 +1288,13 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 0.42rem;
-      padding: 0.42rem 0.52rem;
-      border: 1px solid rgba(247, 247, 242, 0.08);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap-tight);
+      padding: var(--v3-card-padding-compact);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background: rgba(247, 247, 242, 0.028);
       color: var(--color-muted);
-      font-size: clamp(0.74rem, 3.2vw, 0.84rem);
+      font-size: var(--v3-card-meta-size);
       line-height: 1.16;
       text-transform: uppercase;
     }
@@ -1237,7 +1322,7 @@
     .spotlight-copy {
       margin: 0;
       color: var(--color-muted);
-      font-size: clamp(0.78rem, 3.25vw, 0.9rem);
+      font-size: var(--v3-card-title-size);
       line-height: 1.42;
     }
 
@@ -1363,6 +1448,7 @@
     }
 
     .music-nexus-shell {
+      --v3-card-accent: var(--accent-music);
       position: relative;
       z-index: 2;
       grid-column: 1;
@@ -1480,12 +1566,12 @@
       min-height: clamp(5.7rem, 26vw, 7.15rem);
       display: grid;
       align-items: end;
-      padding: clamp(0.75rem, 3.4vw, 0.96rem);
-      border: 1px solid rgba(247, 247, 242, 0.11);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
-        linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 64%),
+        linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent) 16%, transparent), transparent 64%),
         rgba(247, 247, 242, 0.024);
       color: inherit;
       cursor: pointer;
@@ -1501,10 +1587,10 @@
     }
 
     .music-nexus-card[aria-pressed="true"] {
-      border-color: rgba(213, 22, 34, 0.42);
+      border-color: color-mix(in srgb, var(--v3-card-accent) 42%, rgba(247, 247, 242, 0.12));
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 58%),
-        linear-gradient(135deg, rgba(213, 22, 34, 0.18), transparent 64%),
+        linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent) 22%, transparent), transparent 64%),
         rgba(247, 247, 242, 0.036);
       opacity: 1;
       transform: translate3d(0, -0.08rem, 0);
@@ -1527,7 +1613,7 @@
     .music-nexus-card-title {
       margin: 0;
       color: rgba(247, 247, 242, 0.88);
-      font-size: clamp(0.86rem, 4vw, 1.08rem);
+      font-size: var(--v3-card-title-size);
       font-weight: 400;
       line-height: 1;
       text-transform: uppercase;
@@ -1535,10 +1621,10 @@
 
     .music-nexus-activity {
       display: grid;
-      gap: 0.58rem;
-      padding: clamp(0.75rem, 3vw, 0.95rem);
-      border: 1px solid rgba(247, 247, 242, 0.1);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background: rgba(247, 247, 242, 0.024);
     }
 
@@ -1564,13 +1650,13 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.52rem 0.58rem;
-      border: 1px solid rgba(247, 247, 242, 0.08);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap-tight);
+      padding: var(--v3-card-padding-compact);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background: rgba(3, 3, 6, 0.34);
       color: var(--color-muted);
-      font-size: clamp(0.72rem, 3.2vw, 0.84rem);
+      font-size: var(--v3-card-meta-size);
       line-height: 1.16;
       text-transform: uppercase;
     }
@@ -1578,13 +1664,14 @@
     .music-activity-row::before {
       width: 0.4rem;
       aspect-ratio: 1;
-      border: 1px solid rgba(213, 22, 34, 0.72);
+      border: 1px solid color-mix(in srgb, var(--v3-card-accent) 72%, rgba(247, 247, 242, 0.2));
       border-radius: 50%;
-      background: rgba(213, 22, 34, 0.24);
+      background: color-mix(in srgb, var(--v3-card-accent) 24%, transparent);
       content: "";
     }
 
     .ring-archive-shell {
+      --v3-card-accent: var(--accent-ring);
       position: relative;
       z-index: 2;
       grid-column: 1;
@@ -1700,12 +1787,12 @@
       display: grid;
       align-items: end;
       margin: 0;
-      padding: clamp(0.64rem, 2.8vw, 0.9rem);
-      border: 1px solid rgba(247, 247, 242, 0.11);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 58%),
-        linear-gradient(135deg, rgba(213, 22, 34, 0.105), transparent 62%),
+        linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent) 13%, transparent), transparent 62%),
         rgba(247, 247, 242, 0.024);
       overflow: hidden;
     }
@@ -1738,7 +1825,7 @@
       z-index: 1;
       margin: 0;
       color: rgba(247, 247, 242, 0.88);
-      font-size: clamp(0.82rem, 3.7vw, 1.04rem);
+      font-size: var(--v3-card-title-size);
       font-weight: 400;
       line-height: 1;
       text-transform: uppercase;
@@ -1746,10 +1833,10 @@
 
     .ring-archive-activity {
       display: grid;
-      gap: clamp(0.44rem, 1.4svh, 0.56rem);
-      padding: clamp(0.64rem, 2.6vw, 0.86rem);
-      border: 1px solid rgba(247, 247, 242, 0.1);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.032), transparent 58%),
         linear-gradient(90deg, transparent 0 18%, rgba(213, 22, 34, 0.105) 50%, transparent 82%) top / 100% 1px no-repeat,
@@ -1778,13 +1865,13 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 0.46rem;
-      padding: 0.42rem 0.52rem;
-      border: 1px solid rgba(247, 247, 242, 0.075);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap-tight);
+      padding: var(--v3-card-padding-compact);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background: rgba(3, 3, 6, 0.34);
       color: var(--color-muted);
-      font-size: clamp(0.68rem, 2.95vw, 0.82rem);
+      font-size: var(--v3-card-meta-size);
       line-height: 1.16;
       overflow-wrap: anywhere;
       text-transform: uppercase;
@@ -1793,9 +1880,9 @@
     .ring-activity-row::before {
       width: 0.36rem;
       aspect-ratio: 1;
-      border: 1px solid rgba(213, 22, 34, 0.66);
+      border: 1px solid color-mix(in srgb, var(--v3-card-accent) 66%, rgba(247, 247, 242, 0.2));
       border-radius: 50%;
-      background: rgba(213, 22, 34, 0.2);
+      background: color-mix(in srgb, var(--v3-card-accent) 20%, transparent);
       content: "";
     }
 
@@ -1827,6 +1914,7 @@
     }
 
     .about-shell {
+      --v3-card-accent: var(--accent-shell);
       position: relative;
       z-index: 2;
       grid-area: 1 / 1;
@@ -1931,9 +2019,9 @@
       justify-self: center;
       display: grid;
       gap: clamp(0.92rem, 2.6svh, 1.24rem);
-      padding: clamp(0.95rem, 4.1vw, 1.34rem);
-      border: 1px solid rgba(247, 247, 242, 0.11);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding-feature);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.03), transparent 58%),
         linear-gradient(90deg, rgba(213, 22, 34, 0.038), transparent 54%),
@@ -1977,6 +2065,7 @@
     }
 
     .calendar-shell {
+      --v3-card-accent: var(--accent-calendar);
       position: relative;
       z-index: 2;
       grid-area: 1 / 1;
@@ -2055,10 +2144,10 @@
 
     .calendar-events-panel {
       display: grid;
-      gap: clamp(0.58rem, 1.8svh, 0.72rem);
-      padding: clamp(0.68rem, 3vw, 0.95rem);
-      border: 1px solid rgba(247, 247, 242, 0.1);
-      border-radius: var(--radius-sm);
+      gap: var(--v3-card-gap);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
         rgba(247, 247, 242, 0.024);
@@ -2087,11 +2176,11 @@
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
       gap: clamp(0.45rem, 2vw, 0.68rem);
-      padding: clamp(0.58rem, 2.7vw, 0.74rem);
-      border: 1px solid rgba(247, 247, 242, 0.08);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding-compact);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
-        linear-gradient(90deg, rgba(213, 22, 34, 0.065), transparent 52%),
+        linear-gradient(90deg, color-mix(in srgb, var(--v3-card-accent) 9%, transparent), transparent 52%),
         rgba(3, 3, 6, 0.34);
     }
 
@@ -2110,14 +2199,14 @@
     }
 
     .calendar-event-state {
-      color: rgba(213, 22, 34, 0.74);
+      color: color-mix(in srgb, var(--v3-card-accent) 74%, var(--color-text));
       font-size: clamp(0.62rem, 2.6vw, 0.72rem);
       line-height: 1;
     }
 
     .calendar-event-title {
       color: rgba(247, 247, 242, 0.84);
-      font-size: clamp(0.74rem, 3.1vw, 0.88rem);
+      font-size: var(--v3-card-title-size);
       font-weight: 400;
       line-height: 1.18;
       overflow-wrap: anywhere;
@@ -2153,6 +2242,7 @@
     }
 
     .contact-shell {
+      --v3-card-accent: var(--accent-shell);
       position: relative;
       z-index: 2;
       grid-area: 1 / 1;
@@ -2272,9 +2362,9 @@
     .contact-form-shell {
       display: grid;
       gap: clamp(0.58rem, 1.7svh, 0.74rem);
-      padding: clamp(0.72rem, 3vw, 1rem);
-      border: 1px solid rgba(247, 247, 242, 0.11);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
         linear-gradient(90deg, rgba(213, 22, 34, 0.045), transparent 60%),
@@ -2362,14 +2452,14 @@
 
     .contact-method-card {
       display: grid;
-      gap: 0.34rem;
+      gap: var(--v3-card-gap-tight);
       min-height: clamp(4.45rem, 19vw, 5.8rem);
-      padding: clamp(0.66rem, 2.8vw, 0.88rem);
-      border: 1px solid rgba(247, 247, 242, 0.1);
-      border-radius: var(--radius-sm);
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 60%),
-        linear-gradient(135deg, rgba(213, 22, 34, 0.08), transparent 66%),
+        linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent) 9%, transparent), transparent 66%),
         rgba(247, 247, 242, 0.022);
     }
 
@@ -2393,18 +2483,19 @@
     .contact-method-title {
       align-self: end;
       color: rgba(247, 247, 242, 0.88);
-      font-size: clamp(0.82rem, 3.6vw, 1rem);
+      font-size: var(--v3-card-title-size);
       line-height: 1;
     }
 
     .contact-method-meta {
       color: rgba(247, 247, 242, 0.54);
-      font-size: clamp(0.62rem, 2.65vw, 0.72rem);
+      font-size: var(--v3-card-meta-size);
       line-height: 1.18;
       overflow-wrap: anywhere;
     }
 
     .contact-method-card--response {
+      --v3-card-accent: var(--accent-calendar);
       border-color: rgba(0, 178, 190, 0.18);
       background:
         linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 60%),
@@ -3066,7 +3157,9 @@
 
       .portfolio-hub,
       .site-shell.has-entered-hub .portfolio-hub,
-      .site-shell.has-entered-hub .home-frame {
+      .site-shell.has-entered-hub .home-frame,
+      .v3-card--interactive:hover,
+      .v3-card--interactive:active {
         transform: none;
       }
     }
@@ -3111,28 +3204,28 @@
 
         <div class="hub-carousel" data-hub-carousel aria-label="Featured archive worlds carousel">
           <div class="hub-carousel-track">
-            <button class="hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music Nexus">
+            <button class="v3-card v3-card--feature v3-card--interactive hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music Nexus">
               <span class="hub-card-kicker">Music Nexus</span>
               <span class="hub-card-title">The Soundtrack Archive</span>
               <span class="hub-card-meta">Bands / Shows / People / Venues</span>
               <span class="hub-card-action">Explore Music</span>
             </button>
 
-            <button class="hub-card hub-card--wrestling" type="button" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling" aria-label="Open Ring Archive">
+            <button class="v3-card v3-card--feature v3-card--interactive hub-card hub-card--wrestling" type="button" data-module-card="wrestling" data-module-state="active" data-module-route="wrestling" aria-label="Open Ring Archive">
               <span class="hub-card-kicker">Ring Archive</span>
               <span class="hub-card-title">The Battleground Archive</span>
               <span class="hub-card-meta">Shows / Matches / People / Venues</span>
               <span class="hub-card-action">Explore Wrestling</span>
             </button>
 
-            <article class="hub-card hub-card--future" data-module-card="wildlife" data-module-state="future">
+            <article class="v3-card v3-card--feature hub-card hub-card--future" data-module-card="wildlife" data-module-state="future">
               <p class="hub-card-kicker">Wildlife</p>
               <h3 class="hub-card-title">Field Archive</h3>
               <p class="hub-card-meta">Future World</p>
               <span class="hub-card-action">Queued</span>
             </article>
 
-            <article class="hub-card hub-card--future" data-module-card="skies-above" data-module-state="future">
+            <article class="v3-card v3-card--feature hub-card hub-card--future" data-module-card="skies-above" data-module-state="future">
               <p class="hub-card-kicker">Skies Above</p>
               <h3 class="hub-card-title">Sky Archive</h3>
               <p class="hub-card-meta">Future World</p>
@@ -3147,29 +3240,29 @@
             <span class="hub-utility-value">Tags / People / Dates / Venues</span>
           </div>
 
-          <section class="hub-panel hub-panel--activity" aria-labelledby="recent-activity-title">
+          <section class="v3-card v3-card--activity hub-panel hub-panel--activity" aria-labelledby="recent-activity-title">
             <h3 class="hub-panel-title" id="recent-activity-title">World Activity</h3>
             <ul class="activity-list" aria-label="World activity">
-              <li class="activity-item">
+              <li class="v3-card v3-card--mini activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
                 <span class="activity-text">Show added</span>
               </li>
-              <li class="activity-item">
+              <li class="v3-card v3-card--mini activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
                 <span class="activity-text">Match indexed</span>
               </li>
-              <li class="activity-item">
+              <li class="v3-card v3-card--mini activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
                 <span class="activity-text">Gallery updated</span>
               </li>
-              <li class="activity-item">
+              <li class="v3-card v3-card--mini activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
                 <span class="activity-text">Event queued</span>
               </li>
             </ul>
           </section>
 
-          <section class="hub-panel hub-panel--spotlight" aria-labelledby="archive-spotlight-title" data-archive-spotlight>
+          <section class="v3-card v3-card--spotlight hub-panel hub-panel--spotlight" aria-labelledby="archive-spotlight-title" data-archive-spotlight>
             <h3 class="hub-panel-title" id="archive-spotlight-title">World Focus</h3>
             <p class="spotlight-copy" data-spotlight-copy>
               Sound archive lanes are staged for bands, shows, people, and venues.
@@ -3206,16 +3299,16 @@
           </header>
 
           <div class="music-nexus-module-grid" role="group" aria-label="Music Nexus modules" data-music-nexus-selector>
-            <button class="music-nexus-card" type="button" aria-pressed="true" data-music-nexus-card="bands">
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="true" data-music-nexus-card="bands">
               <h4 class="music-nexus-card-title">Bands</h4>
             </button>
-            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="shows">
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="shows">
               <h4 class="music-nexus-card-title">Shows</h4>
             </button>
-            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="people">
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="people">
               <h4 class="music-nexus-card-title">People</h4>
             </button>
-            <button class="music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="venues">
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="venues">
               <h4 class="music-nexus-card-title">Venues</h4>
             </button>
           </div>
@@ -3223,10 +3316,10 @@
           <section class="music-nexus-activity" aria-labelledby="music-activity-title">
             <h4 class="music-nexus-section-title" id="music-activity-title">Recent Music Activity</h4>
             <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows" data-music-activity-list>
-              <li class="music-activity-row">Latest bands placeholder</li>
-              <li class="music-activity-row">Featured artists placeholder</li>
-              <li class="music-activity-row">Band archive updates placeholder</li>
-              <li class="music-activity-row">New music gallery placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">Latest bands placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">Featured artists placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">Band archive updates placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">New music gallery placeholder</li>
             </ul>
           </section>
         </section>
@@ -3236,16 +3329,16 @@
           </header>
 
           <div class="ring-archive-card-grid" aria-label="Ring Archive modules">
-            <article class="ring-archive-card">
+            <article class="v3-card v3-card--mini ring-archive-card">
               <h4 class="ring-archive-card-title">Shows</h4>
             </article>
-            <article class="ring-archive-card">
+            <article class="v3-card v3-card--mini ring-archive-card">
               <h4 class="ring-archive-card-title">Matches</h4>
             </article>
-            <article class="ring-archive-card">
+            <article class="v3-card v3-card--mini ring-archive-card">
               <h4 class="ring-archive-card-title">People</h4>
             </article>
-            <article class="ring-archive-card">
+            <article class="v3-card v3-card--mini ring-archive-card">
               <h4 class="ring-archive-card-title">Venues</h4>
             </article>
           </div>
@@ -3253,10 +3346,10 @@
           <section class="ring-archive-activity" aria-labelledby="ring-activity-title">
             <h4 class="ring-archive-section-title" id="ring-activity-title">Recent Ring Activity</h4>
             <ul class="ring-activity-list" aria-label="Recent Ring Activity placeholder rows">
-              <li class="ring-activity-row">Latest show placeholder</li>
-              <li class="ring-activity-row">Featured match placeholder</li>
-              <li class="ring-activity-row">People archive update placeholder</li>
-              <li class="ring-activity-row">Venue queue placeholder</li>
+              <li class="v3-card v3-card--activity ring-activity-row">Latest show placeholder</li>
+              <li class="v3-card v3-card--activity ring-activity-row">Featured match placeholder</li>
+              <li class="v3-card v3-card--activity ring-activity-row">People archive update placeholder</li>
+              <li class="v3-card v3-card--activity ring-activity-row">Venue queue placeholder</li>
             </ul>
           </section>
 
@@ -3271,7 +3364,7 @@
           <span class="about-divider" aria-hidden="true"></span>
         </header>
 
-        <section class="about-content" aria-labelledby="about-content-title">
+        <section class="v3-card v3-card--spotlight about-content" aria-labelledby="about-content-title">
           <h3 class="about-heading" id="about-content-title">ABOUT THE SITE</h3>
           <p class="about-copy">
             This site is a nearly-100% automated website using coding that reads from the native SmugMug system and creates it in a better customizable UI.
@@ -3292,28 +3385,28 @@
         <section class="calendar-events-panel" aria-labelledby="calendar-events-title">
           <h3 class="calendar-section-title" id="calendar-events-title">Upcoming Events</h3>
           <ul class="calendar-event-list" aria-label="Upcoming Events placeholder cards">
-            <li class="calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card">
               <div class="calendar-event-copy">
                 <p class="calendar-event-state">Busy</p>
                 <h4 class="calendar-event-title">MGPS Open House</h4>
               </div>
               <span class="calendar-event-badge calendar-event-badge--confirmed">CONFIRMED</span>
             </li>
-            <li class="calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card">
               <div class="calendar-event-copy">
                 <p class="calendar-event-state">Busy</p>
                 <h4 class="calendar-event-title">Limitless Wrestling LIVE at Madrid's!</h4>
               </div>
               <span class="calendar-event-badge calendar-event-badge--busy">BUSY</span>
             </li>
-            <li class="calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card">
               <div class="calendar-event-copy">
                 <p class="calendar-event-state">Busy</p>
                 <h4 class="calendar-event-title">25th Annual Appreciation Festival/BBQ/Pool Party</h4>
               </div>
               <span class="calendar-event-badge calendar-event-badge--tentative">TENTATIVE</span>
             </li>
-            <li class="calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card">
               <div class="calendar-event-copy">
                 <p class="calendar-event-state">Busy</p>
                 <h4 class="calendar-event-title">Herd Flock 8</h4>
@@ -3330,7 +3423,7 @@
         </header>
 
         <div class="contact-layout">
-          <div class="contact-form-shell" role="form" aria-label="Contact form shell">
+          <div class="v3-card v3-card--spotlight contact-form-shell" role="form" aria-label="Contact form shell">
             <label class="contact-field">
               <span class="contact-label">Name</span>
               <input class="contact-input" type="text" name="name" autocomplete="name">
@@ -3355,27 +3448,27 @@
           </div>
 
           <div class="contact-methods" aria-label="Contact methods">
-            <article class="contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card">
               <h3 class="contact-method-title">Email</h3>
               <p class="contact-method-meta">Primary channel</p>
             </article>
 
-            <article class="contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card">
               <h3 class="contact-method-title">Instagram</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card">
               <h3 class="contact-method-title">Facebook</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card">
               <h3 class="contact-method-title">X (Twitter)</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="contact-method-card contact-method-card--response">
+            <article class="v3-card v3-card--state contact-method-card contact-method-card--response">
               <h3 class="contact-method-title">Response Time</h3>
               <p class="contact-method-meta">I typically respond within 24&ndash;48 hours.</p>
             </article>
@@ -3603,7 +3696,7 @@
         musicActivityList.replaceChildren();
         rows.forEach((rowText) => {
           const row = document.createElement("li");
-          row.className = "music-activity-row";
+          row.className = "v3-card v3-card--activity music-activity-row";
           row.textContent = rowText;
           musicActivityList.append(row);
         });
