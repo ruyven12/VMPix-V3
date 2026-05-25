@@ -2121,6 +2121,266 @@
       color: rgba(247, 247, 242, 0.64);
     }
 
+    .contact-shell {
+      position: relative;
+      z-index: 2;
+      grid-area: 1 / 1;
+      width: min(100%, 52rem);
+      min-height: var(--stage-min-height);
+      min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: clamp(0.82rem, 2.3svh, 1.18rem);
+      padding: clamp(0.85rem, 4vw, 1.35rem);
+      border: 1px solid rgba(247, 247, 242, 0.16);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 46%),
+        radial-gradient(ellipse at 50% 14%, rgba(213, 22, 34, 0.082), transparent min(44vw, 24rem)),
+        radial-gradient(ellipse at 50% 92%, rgba(0, 178, 190, 0.045), transparent min(56vw, 30rem)),
+        rgba(3, 3, 6, 0.6);
+      opacity: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      pointer-events: none;
+      scrollbar-color: rgba(213, 22, 34, 0.38) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+      transform: translate3d(0, 0.36rem, 0) scale(0.985);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
+      visibility: hidden;
+    }
+
+    .contact-shell::-webkit-scrollbar {
+      width: 0.42rem;
+    }
+
+    .contact-shell::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .contact-shell::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.38);
+    }
+
+    .contact-shell::before,
+    .contact-shell::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .contact-shell::before {
+      inset: var(--space-2);
+      border: 1px solid rgba(213, 22, 34, 0.13);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, transparent 0 26%, rgba(247, 247, 242, 0.08) 50%, transparent 74%) top / 100% 1px no-repeat,
+        linear-gradient(90deg, transparent 0 24%, rgba(0, 178, 190, 0.075) 50%, transparent 76%) bottom / 100% 1px no-repeat,
+        linear-gradient(180deg, transparent 0 22%, rgba(213, 22, 34, 0.095) 50%, transparent 78%) left / 1px 100% no-repeat;
+    }
+
+    .contact-shell::after {
+      inset: clamp(3.1rem, 13vw, 5rem) clamp(1.1rem, 5vw, 2.2rem) auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(213, 22, 34, 0.34), rgba(0, 178, 190, 0.2), transparent);
+      opacity: 0.72;
+    }
+
+    .contact-header,
+    .contact-layout,
+    .contact-form-shell,
+    .contact-methods,
+    .contact-method-card {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .contact-header {
+      display: grid;
+      justify-items: center;
+      gap: clamp(0.38rem, 1.2svh, 0.58rem);
+      padding: clamp(0.12rem, 0.7vw, 0.36rem) 0 0.08rem;
+      text-align: center;
+    }
+
+    .contact-title,
+    .contact-subtitle,
+    .contact-label,
+    .contact-method-title,
+    .contact-method-meta {
+      margin: 0;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .contact-title {
+      color: var(--color-text);
+      font-size: clamp(1.42rem, 8vw, 2.42rem);
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    .contact-subtitle {
+      color: rgba(213, 22, 34, 0.74);
+      font-size: clamp(0.76rem, 3.2vw, 0.9rem);
+      line-height: 1;
+    }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(0.72rem, 2.4vw, 1rem);
+      align-items: start;
+    }
+
+    .contact-form-shell {
+      display: grid;
+      gap: clamp(0.58rem, 1.7svh, 0.74rem);
+      padding: clamp(0.72rem, 3vw, 1rem);
+      border: 1px solid rgba(247, 247, 242, 0.11);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
+        linear-gradient(90deg, rgba(213, 22, 34, 0.045), transparent 60%),
+        rgba(3, 3, 6, 0.36);
+    }
+
+    .contact-field {
+      display: grid;
+      gap: 0.34rem;
+      min-width: 0;
+    }
+
+    .contact-label {
+      color: rgba(247, 247, 242, 0.58);
+      font-size: clamp(0.62rem, 2.65vw, 0.72rem);
+      line-height: 1;
+    }
+
+    .contact-input,
+    .contact-textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(247, 247, 242, 0.12);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 70%),
+        rgba(1, 1, 3, 0.46);
+      color: rgba(247, 247, 242, 0.9);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.3;
+      outline: none;
+      transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        box-shadow var(--motion-fast) var(--ease-standard),
+        background-color var(--motion-fast) var(--ease-standard);
+    }
+
+    .contact-input {
+      min-height: var(--tap-target);
+      padding: 0.72rem 0.78rem;
+    }
+
+    .contact-textarea {
+      min-height: 8.8rem;
+      resize: vertical;
+      padding: 0.78rem;
+    }
+
+    .contact-input:focus,
+    .contact-textarea:focus {
+      border-color: rgba(0, 178, 190, 0.36);
+      box-shadow: 0 0 0 1px rgba(213, 22, 34, 0.16);
+      background-color: rgba(3, 3, 6, 0.62);
+    }
+
+    .contact-send {
+      min-width: min(100%, 11.75rem);
+      min-height: var(--tap-target);
+      margin-top: 0.12rem;
+      padding: 0.72rem 0.92rem;
+      border: 1px solid rgba(213, 22, 34, 0.34);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, rgba(213, 22, 34, 0.12), transparent 72%),
+        rgba(247, 247, 242, 0.028);
+      color: rgba(247, 247, 242, 0.86);
+      cursor: default;
+      font: inherit;
+      font-size: clamp(0.74rem, 3vw, 0.86rem);
+      line-height: 1;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .contact-send:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.2rem;
+    }
+
+    .contact-methods {
+      display: grid;
+      gap: clamp(0.48rem, 1.7vw, 0.64rem);
+    }
+
+    .contact-method-card {
+      display: grid;
+      gap: 0.34rem;
+      min-height: clamp(4.45rem, 19vw, 5.8rem);
+      padding: clamp(0.66rem, 2.8vw, 0.88rem);
+      border: 1px solid rgba(247, 247, 242, 0.1);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 60%),
+        linear-gradient(135deg, rgba(213, 22, 34, 0.08), transparent 66%),
+        rgba(247, 247, 242, 0.022);
+    }
+
+    .contact-method-card::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, transparent 0 22%, rgba(213, 22, 34, 0.18) 50%, transparent 78%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(0, 178, 190, 0.08), transparent 58%) left / 1px 100% no-repeat;
+      pointer-events: none;
+    }
+
+    .contact-method-title,
+    .contact-method-meta {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .contact-method-title {
+      align-self: end;
+      color: rgba(247, 247, 242, 0.88);
+      font-size: clamp(0.82rem, 3.6vw, 1rem);
+      line-height: 1;
+    }
+
+    .contact-method-meta {
+      color: rgba(247, 247, 242, 0.54);
+      font-size: clamp(0.62rem, 2.65vw, 0.72rem);
+      line-height: 1.18;
+      overflow-wrap: anywhere;
+    }
+
+    .contact-method-card--response {
+      border-color: rgba(0, 178, 190, 0.18);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 60%),
+        linear-gradient(135deg, rgba(0, 178, 190, 0.075), transparent 66%),
+        rgba(247, 247, 242, 0.022);
+    }
+
     .site-shell.is-module-view .hub-carousel,
     .site-shell.is-module-view .hub-context {
       opacity: 0;
@@ -2133,7 +2393,8 @@
     .site-shell.is-music-nexus-view .music-nexus-shell,
     .site-shell.is-ring-archive-view .ring-archive-shell,
     .site-shell.is-about-view .about-shell,
-    .site-shell.is-calendar-view .calendar-shell {
+    .site-shell.is-calendar-view .calendar-shell,
+    .site-shell.is-contact-view .contact-shell {
       opacity: 1;
       pointer-events: auto;
       transform: translate3d(0, 0, 0);
@@ -2542,7 +2803,8 @@
       }
 
       .about-shell,
-      .calendar-shell {
+      .calendar-shell,
+      .contact-shell {
         gap: 0.62rem;
         padding: 0.72rem;
       }
@@ -2550,6 +2812,15 @@
       .about-content {
         gap: 0.82rem;
         padding: 0.82rem;
+      }
+
+      .contact-form-shell,
+      .contact-method-card {
+        padding: 0.62rem;
+      }
+
+      .contact-textarea {
+        min-height: 7.7rem;
       }
 
       .calendar-events-panel {
@@ -2669,6 +2940,14 @@
 
       .ring-archive-card {
         min-height: clamp(5.8rem, 10vw, 6.9rem);
+      }
+
+      .contact-layout {
+        grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      }
+
+      .contact-method-card {
+        min-height: 5rem;
       }
 
       .universal-bottom-rail {
@@ -3011,6 +3290,65 @@
           </ul>
         </section>
       </section>
+      <section class="contact-shell" aria-labelledby="contact-title" aria-hidden="true" inert data-contact-shell>
+        <header class="contact-header">
+          <h2 class="contact-title" id="contact-title">CONTACT</h2>
+          <p class="contact-subtitle">LET'S CONNECT</p>
+        </header>
+
+        <div class="contact-layout">
+          <div class="contact-form-shell" role="form" aria-label="Contact form shell">
+            <label class="contact-field">
+              <span class="contact-label">Name</span>
+              <input class="contact-input" type="text" name="name" autocomplete="name">
+            </label>
+
+            <label class="contact-field">
+              <span class="contact-label">Email</span>
+              <input class="contact-input" type="email" name="email" autocomplete="email">
+            </label>
+
+            <label class="contact-field">
+              <span class="contact-label">Subject</span>
+              <input class="contact-input" type="text" name="subject">
+            </label>
+
+            <label class="contact-field">
+              <span class="contact-label">Message</span>
+              <textarea class="contact-textarea" name="message"></textarea>
+            </label>
+
+            <button class="contact-send" type="button">SEND MESSAGE</button>
+          </div>
+
+          <div class="contact-methods" aria-label="Contact methods">
+            <article class="contact-method-card">
+              <h3 class="contact-method-title">Email</h3>
+              <p class="contact-method-meta">Primary channel</p>
+            </article>
+
+            <article class="contact-method-card">
+              <h3 class="contact-method-title">Instagram</h3>
+              <p class="contact-method-meta">Social channel</p>
+            </article>
+
+            <article class="contact-method-card">
+              <h3 class="contact-method-title">Facebook</h3>
+              <p class="contact-method-meta">Social channel</p>
+            </article>
+
+            <article class="contact-method-card">
+              <h3 class="contact-method-title">X (Twitter)</h3>
+              <p class="contact-method-meta">Social channel</p>
+            </article>
+
+            <article class="contact-method-card contact-method-card--response">
+              <h3 class="contact-method-title">Response Time</h3>
+              <p class="contact-method-meta">I typically respond within 24-48 hours.</p>
+            </article>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal portfolio rail">
@@ -3096,6 +3434,7 @@
       const portfolioHub = document.querySelector(".portfolio-hub");
       const aboutShell = document.querySelector("[data-about-shell]");
       const calendarShell = document.querySelector("[data-calendar-shell]");
+      const contactShell = document.querySelector("[data-contact-shell]");
       const bottomRail = document.querySelector("[data-shell-bottom-rail]");
       const railMenuTrigger = document.querySelector("[data-rail-menu-trigger]");
       const globalMenuDrawer = document.querySelector("[data-global-menu-drawer]");
@@ -3319,7 +3658,7 @@
           return;
         }
 
-        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
         if (modulePlaceholder) {
           modulePlaceholder.setAttribute("aria-hidden", "true");
           modulePlaceholder.setAttribute("inert", "");
@@ -3340,6 +3679,10 @@
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
         }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(false);
         setCurrentView("Interactive Portfolio");
       }
@@ -3350,7 +3693,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3375,6 +3718,10 @@
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
         }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         setMusicNexusContext("bands", false, false);
         setCurrentView("Music Nexus");
@@ -3390,7 +3737,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-about-view", "is-calendar-view", "is-contact-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3415,6 +3762,10 @@
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
         }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         setCurrentView("Ring Archive");
         if (startButton) {
@@ -3430,7 +3781,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view", "is-contact-view");
         shell.classList.add("has-entered-hub", "is-about-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3457,6 +3808,10 @@
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
         }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         setCurrentView("About");
         if (startButton) {
@@ -3472,7 +3827,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-contact-view");
         shell.classList.add("has-entered-hub", "is-calendar-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3499,8 +3854,57 @@
         }
         calendarShell.setAttribute("aria-hidden", "false");
         calendarShell.removeAttribute("inert");
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(true);
         setCurrentView("Calendar");
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.setAttribute("aria-busy", "false");
+        }
+      }
+
+      function showContactShell() {
+        if (!shell || !contactShell) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+        shell.classList.add("has-entered-hub", "is-contact-view");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        if (portfolioHub) {
+          portfolioHub.setAttribute("aria-hidden", "true");
+          portfolioHub.setAttribute("inert", "");
+        }
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
+        }
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
+        }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
+        }
+        if (calendarShell) {
+          calendarShell.setAttribute("aria-hidden", "true");
+          calendarShell.setAttribute("inert", "");
+        }
+        contactShell.setAttribute("aria-hidden", "false");
+        contactShell.removeAttribute("inert");
+        setHubChromeHidden(true);
+        setCurrentView("Contact");
         if (startButton) {
           startButton.disabled = true;
           startButton.setAttribute("aria-busy", "false");
@@ -3514,7 +3918,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3538,6 +3942,10 @@
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
+        }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
         }
         setHubChromeHidden(true);
         if (modulePlaceholderKicker) {
@@ -3623,7 +4031,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
         startButton.disabled = false;
         startButton.setAttribute("aria-busy", "false");
         if (homeFrame) {
@@ -3653,6 +4061,10 @@
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
         }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
+        }
         setHubChromeHidden(false);
         setCurrentView("Homepage");
       }
@@ -3669,13 +4081,15 @@
           showAboutShell();
         } else if (button.dataset.globalNavTarget === "calendar") {
           showCalendarShell();
+        } else if (button.dataset.globalNavTarget === "contact") {
+          showContactShell();
         }
 
         closeGlobalMenu();
       }
 
       function revealHub() {
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view", "is-contact-view");
         shell.classList.add("has-entered-hub");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3691,6 +4105,10 @@
         if (aboutShell) {
           aboutShell.setAttribute("aria-hidden", "true");
           aboutShell.setAttribute("inert", "");
+        }
+        if (contactShell) {
+          contactShell.setAttribute("aria-hidden", "true");
+          contactShell.setAttribute("inert", "");
         }
         showPortfolioHubView();
         syncSpotlightFromCarousel();
