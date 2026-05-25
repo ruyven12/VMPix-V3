@@ -1735,6 +1735,7 @@
     .bands-index-mode-tab:focus-visible,
     .bands-letter-button:focus-visible,
     .bands-search-chip:focus-visible,
+    .bands-radar-back:focus-visible,
     .bands-list-row:focus-visible {
       outline: 2px solid rgba(247, 247, 242, 0.82);
       outline-offset: 0.16rem;
@@ -1780,6 +1781,7 @@
 
     .bands-index-panel.is-active {
       display: grid;
+      animation: bandsPanelIn var(--motion-standard) var(--ease-standard) both;
     }
 
     .bands-radar-layout,
@@ -1845,6 +1847,12 @@
       border-radius: var(--radius-sm);
       background: rgba(1, 1, 3, 0.62);
       text-align: center;
+    }
+
+    .music-bands-index.is-letter-filtered .bands-radar-center,
+    .music-bands-index.is-search-filtered .bands-radar-center {
+      border-color: rgba(142, 108, 255, 0.22);
+      box-shadow: 0 0 1rem rgba(142, 108, 255, 0.08);
     }
 
     .bands-radar-letter {
@@ -1948,6 +1956,11 @@
       color: rgba(247, 247, 242, 0.68);
     }
 
+    .bands-letter-button.is-search-match {
+      border-color: rgba(0, 178, 190, 0.24);
+      color: rgba(247, 247, 242, 0.78);
+    }
+
     .bands-letter-button.has-signal::after {
       position: absolute;
       right: 0.28rem;
@@ -1966,6 +1979,84 @@
         linear-gradient(180deg, rgba(247, 247, 242, 0.06), transparent 68%),
         rgba(142, 108, 255, 0.14);
       color: rgba(247, 247, 242, 0.95);
+      box-shadow: 0 0 0.84rem rgba(142, 108, 255, 0.1);
+      animation: bandsLetterPulse 2.4s var(--ease-breath) infinite;
+    }
+
+    .bands-list-filter-bar {
+      display: none;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.46rem;
+      min-width: 0;
+      padding: 0.42rem;
+      border: 1px solid rgba(142, 108, 255, 0.18);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, rgba(142, 108, 255, 0.072), transparent 68%),
+        rgba(1, 1, 3, 0.38);
+    }
+
+    .music-bands-index.is-letter-filtered .bands-list-filter-bar {
+      display: grid;
+    }
+
+    .bands-radar-compact {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.42rem;
+    }
+
+    .bands-radar-compact-letter {
+      width: 2.05rem;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.2);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(142, 108, 255, 0.18), transparent 62%),
+        rgba(247, 247, 242, 0.028);
+      color: rgba(247, 247, 242, 0.9);
+      font-size: 0.82rem;
+      line-height: 1;
+      text-transform: uppercase;
+      box-shadow: 0 0 0.78rem rgba(142, 108, 255, 0.12);
+    }
+
+    .bands-radar-compact-copy {
+      min-width: 0;
+      color: rgba(247, 247, 242, 0.58);
+      font-size: clamp(0.58rem, 2.4vw, 0.68rem);
+      line-height: 1.12;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .bands-radar-back {
+      appearance: none;
+      min-height: 2rem;
+      padding: 0.42rem 0.52rem;
+      border: 1px solid rgba(247, 247, 242, 0.12);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.024);
+      color: rgba(247, 247, 242, 0.72);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .bands-radar-back:hover {
+      border-color: rgba(142, 108, 255, 0.32);
+      background: rgba(142, 108, 255, 0.075);
+      color: rgba(247, 247, 242, 0.86);
     }
 
     .bands-list-viewport {
@@ -2205,6 +2296,14 @@
       text-overflow: ellipsis;
       text-transform: uppercase;
       white-space: nowrap;
+    }
+
+    .bands-search-result-row {
+      min-width: 0;
+    }
+
+    .bands-search-results .bands-list-row {
+      min-height: 3.42rem;
     }
 
     .music-activity-list {
@@ -3415,6 +3514,27 @@
       }
     }
 
+    @keyframes bandsPanelIn {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 0.18rem, 0);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    @keyframes bandsLetterPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0.54rem rgba(142, 108, 255, 0.08);
+      }
+      50% {
+        box-shadow: 0 0 1.05rem rgba(142, 108, 255, 0.18);
+      }
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -3498,6 +3618,14 @@
 
       .bands-radar-core {
         width: min(100%, 15.5rem);
+      }
+
+      .bands-list-filter-bar {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .bands-radar-back {
+        width: 100%;
       }
 
       .bands-list-row {
@@ -3785,6 +3913,8 @@
       .start-button::after,
       .home-frame::after,
       .bands-radar-sweep,
+      .bands-index-panel.is-active,
+      .bands-letter-button[aria-pressed="true"],
       .rail-value--view,
       .rail-value--build {
         animation: none !important;
@@ -3988,6 +4118,13 @@
 
               <section class="bands-index-panel bands-index-panel--list" id="bands-list-panel" role="tabpanel" aria-labelledby="bands-list-tab" aria-hidden="true" inert data-bands-view="list">
                 <div class="bands-list-panel">
+                  <div class="bands-list-filter-bar" data-bands-list-filter-bar hidden>
+                    <div class="bands-radar-compact" aria-live="polite">
+                      <span class="bands-radar-compact-letter" data-bands-filter-letter>A</span>
+                      <span class="bands-radar-compact-copy" data-bands-filter-summary>A lane filtered</span>
+                    </div>
+                    <button class="bands-radar-back" type="button" data-bands-back-radar>Back to Radar</button>
+                  </div>
                   <div class="bands-letter-nav" aria-label="Band alphabet list navigation" data-bands-letter-nav-list></div>
                   <div class="bands-list-viewport" aria-label="Alphabetized bands archive list" data-bands-list></div>
                   <div class="bands-empty-state" data-bands-empty>No matching bands indexed</div>
@@ -4000,6 +4137,7 @@
                     <span class="bands-search-label">Archive Search</span>
                     <input class="bands-search-input" type="search" autocomplete="off" placeholder="Search bands, tiers, status" data-bands-search-input>
                   </label>
+                  <div class="bands-letter-nav" aria-label="Band alphabet search navigation" data-bands-letter-nav-search></div>
 
                   <div class="bands-search-groups">
                     <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
@@ -4293,7 +4431,7 @@
       const musicBandsIndex = document.querySelector("[data-music-bands-index]");
       const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
       const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
-      const bandsLetterNavs = document.querySelectorAll("[data-bands-letter-nav], [data-bands-letter-nav-list]");
+      const bandsLetterNavs = document.querySelectorAll("[data-bands-letter-nav], [data-bands-letter-nav-list], [data-bands-letter-nav-search]");
       const bandsStatus = document.querySelector("[data-bands-status]");
       const bandsRadarLetter = document.querySelector("[data-bands-radar-letter]");
       const bandsRadarCount = document.querySelector("[data-bands-radar-count]");
@@ -4301,6 +4439,10 @@
       const bandsRadarPoints = document.querySelector("[data-bands-radar-points]");
       const bandsList = document.querySelector("[data-bands-list]");
       const bandsEmpty = document.querySelector("[data-bands-empty]");
+      const bandsListFilterBar = document.querySelector("[data-bands-list-filter-bar]");
+      const bandsFilterLetter = document.querySelector("[data-bands-filter-letter]");
+      const bandsFilterSummary = document.querySelector("[data-bands-filter-summary]");
+      const bandsBackRadar = document.querySelector("[data-bands-back-radar]");
       const bandsSearchInput = document.querySelector("[data-bands-search-input]");
       const bandsSearchResults = document.querySelector("[data-bands-search-results]");
       const bandsSearchSummary = document.querySelector("[data-bands-search-summary]");
@@ -4316,6 +4458,7 @@
       let drawerCloseTimer;
       let activeBandsView = "radar";
       let activeBandsLetter = "A";
+      let activeBandsFilterLetter = "";
       let bandsSearchTerm = "";
 
       const spotlightContent = {
@@ -4446,6 +4589,14 @@
         });
       }
 
+      function getListBands(rows) {
+        if (!activeBandsFilterLetter) {
+          return rows;
+        }
+
+        return rows.filter((band) => getBandLetter(band) === activeBandsFilterLetter);
+      }
+
       function getBandLetterCounts(rows) {
         return rows.reduce((counts, band) => {
           const letter = getBandLetter(band);
@@ -4455,6 +4606,11 @@
       }
 
       function syncActiveBandLetter(rows) {
+        if (activeBandsFilterLetter) {
+          activeBandsLetter = activeBandsFilterLetter;
+          return;
+        }
+
         if (rows.length === 0) {
           activeBandsLetter = "A";
           return;
@@ -4477,14 +4633,18 @@
           bandsAlphabet.forEach((letter) => {
             const count = counts.get(letter) || 0;
             const button = document.createElement("button");
-            button.className = `bands-letter-button${count > 0 ? " has-signal" : ""}`;
+            const isSearchMatch = Boolean(bandsSearchTerm) && count > 0;
+            button.className = `bands-letter-button${count > 0 ? " has-signal" : ""}${isSearchMatch ? " is-search-match" : ""}`;
             button.type = "button";
             button.textContent = letter;
             button.disabled = count === 0;
             button.setAttribute("aria-pressed", String(letter === activeBandsLetter));
             button.setAttribute("aria-label", count > 0 ? `${letter}, ${count} band signals` : `${letter}, no band signals`);
             button.addEventListener("click", () => {
-              setBandsLetter(letter);
+              setBandsLetter(letter, {
+                shouldFilterList: true,
+                shouldOpenList: nav.hasAttribute("data-bands-letter-nav") || nav.hasAttribute("data-bands-letter-nav-search"),
+              });
             });
             fragment.append(button);
           });
@@ -4533,7 +4693,7 @@
         }
       }
 
-      function createBandListRow(band) {
+      function createBandListRow(band, options = {}) {
         const letter = getBandLetter(band);
         const row = document.createElement("button");
         row.className = `bands-list-row${letter === activeBandsLetter ? " is-letter-active" : ""}`;
@@ -4576,7 +4736,13 @@
         main.append(name, meta);
         row.append(thumb, main, arrow);
         row.addEventListener("click", () => {
-          setBandsLetter(letter);
+          if (options.skipLetterFilter) {
+            activeBandsLetter = letter;
+            syncBandsIndex();
+            return;
+          }
+
+          setBandsLetter(letter, { shouldFilterList: true });
         });
 
         return row;
@@ -4587,14 +4753,25 @@
           return;
         }
 
+        const listRows = getListBands(rows);
         const fragment = document.createDocumentFragment();
-        rows.forEach((band) => {
+        listRows.forEach((band) => {
           fragment.append(createBandListRow(band));
         });
         bandsList.replaceChildren(fragment);
 
         if (bandsEmpty) {
-          bandsEmpty.classList.toggle("is-active", rows.length === 0);
+          bandsEmpty.classList.toggle("is-active", listRows.length === 0);
+        }
+        if (bandsListFilterBar) {
+          bandsListFilterBar.hidden = !activeBandsFilterLetter;
+        }
+        if (bandsFilterLetter) {
+          bandsFilterLetter.textContent = activeBandsFilterLetter || activeBandsLetter;
+        }
+        if (bandsFilterSummary) {
+          const letter = activeBandsFilterLetter || activeBandsLetter;
+          bandsFilterSummary.textContent = `${letter} lane / ${listRows.length} signal${listRows.length === 1 ? "" : "s"}`;
         }
 
         if (activeBandsView === "list") {
@@ -4619,8 +4796,8 @@
           const fragment = document.createDocumentFragment();
           rows.slice(0, 5).forEach((band) => {
             const item = document.createElement("li");
-            item.className = "bands-search-result";
-            item.textContent = `${band.name} / ${band.region} / ${band.status}`;
+            item.className = "bands-search-result-row";
+            item.append(createBandListRow(band, { skipLetterFilter: true }));
             fragment.append(item);
           });
           if (rows.length === 0) {
@@ -4641,14 +4818,22 @@
           return;
         }
 
-        const activeCount = rows.filter((band) => getBandLetter(band) === activeBandsLetter).length;
+        const listRows = getListBands(rows);
+        const activeCount = activeBandsFilterLetter
+          ? listRows.length
+          : rows.filter((band) => getBandLetter(band) === activeBandsLetter).length;
         const viewLabel = `${activeBandsView.slice(0, 1).toUpperCase()}${activeBandsView.slice(1)}`;
-        bandsStatus.textContent = `${activeBandsLetter} lane / ${activeCount} signal${activeCount === 1 ? "" : "s"} / ${viewLabel}`;
+        const filterLabel = activeBandsFilterLetter ? "filtered" : "lane";
+        bandsStatus.textContent = `${activeBandsLetter} ${filterLabel} / ${activeCount} signal${activeCount === 1 ? "" : "s"} / ${viewLabel}`;
       }
 
       function syncBandsIndex() {
         const rows = getVisibleBands();
         syncActiveBandLetter(rows);
+        if (musicBandsIndex) {
+          musicBandsIndex.classList.toggle("is-letter-filtered", Boolean(activeBandsFilterLetter));
+          musicBandsIndex.classList.toggle("is-search-filtered", Boolean(bandsSearchTerm));
+        }
         renderBandsLetterNavs(rows);
         renderBandsRadar(rows);
         renderBandsList(rows);
@@ -4656,21 +4841,32 @@
         updateBandsStatus(rows);
       }
 
-      function setBandsLetter(letter) {
+      function setBandsLetter(letter, options = {}) {
         if (!bandsAlphabet.includes(letter)) {
           return;
         }
 
         activeBandsLetter = letter;
+        if (options.shouldFilterList) {
+          activeBandsFilterLetter = letter;
+        }
+        if (options.shouldOpenList) {
+          setBandsView("list", false, { preserveFilter: true });
+          return;
+        }
+
         syncBandsIndex();
       }
 
-      function setBandsView(viewName, shouldFocus = false) {
+      function setBandsView(viewName, shouldFocus = false, options = {}) {
         if (!["radar", "list", "search"].includes(viewName)) {
           return;
         }
 
         activeBandsView = viewName;
+        if (viewName !== "list" || !options.preserveFilter) {
+          activeBandsFilterLetter = "";
+        }
         bandsViewButtons.forEach((button) => {
           const isActive = button.dataset.bandsViewTarget === viewName;
           button.setAttribute("aria-selected", String(isActive));
@@ -4694,7 +4890,13 @@
 
       function setBandsSearchTerm(value) {
         bandsSearchTerm = value.trim();
+        activeBandsFilterLetter = "";
         syncBandsIndex();
+      }
+
+      function returnToBandsRadar() {
+        activeBandsFilterLetter = "";
+        setBandsView("radar");
       }
 
       function setBandsIndexVisible(isVisible) {
@@ -5415,6 +5617,9 @@
             setBandsView("search", true);
           });
         });
+        if (bandsBackRadar) {
+          bandsBackRadar.addEventListener("click", returnToBandsRadar);
+        }
         setBandsView("radar");
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
