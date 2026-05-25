@@ -1795,6 +1795,156 @@
       outline-offset: 0.2rem;
     }
 
+    .about-shell {
+      position: relative;
+      z-index: 2;
+      grid-area: 1 / 1;
+      width: min(100%, var(--hub-max));
+      min-height: var(--stage-min-height);
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: clamp(1.25rem, 4svh, 2rem);
+      padding: clamp(1rem, 4.8vw, 1.65rem);
+      border: 1px solid rgba(247, 247, 242, 0.15);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 48%),
+        radial-gradient(ellipse at 50% 18%, rgba(213, 22, 34, 0.08), transparent min(46vw, 23rem)),
+        radial-gradient(ellipse at 50% 86%, rgba(0, 178, 190, 0.055), transparent min(54vw, 28rem)),
+        rgba(3, 3, 6, 0.58);
+      opacity: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      pointer-events: none;
+      scrollbar-color: rgba(213, 22, 34, 0.38) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+      text-align: center;
+      transform: translate3d(0, 0.36rem, 0) scale(0.985);
+      transition:
+        opacity var(--motion-standard) var(--ease-standard),
+        transform var(--motion-standard) var(--ease-standard),
+        visibility var(--motion-standard) var(--ease-standard);
+      visibility: hidden;
+    }
+
+    .about-shell::-webkit-scrollbar {
+      width: 0.42rem;
+    }
+
+    .about-shell::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .about-shell::-webkit-scrollbar-thumb {
+      background: rgba(213, 22, 34, 0.38);
+    }
+
+    .about-shell::before,
+    .about-shell::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .about-shell::before {
+      inset: var(--space-2);
+      border: 1px solid rgba(213, 22, 34, 0.12);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, transparent 0 25%, rgba(247, 247, 242, 0.075) 50%, transparent 75%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, transparent 0 18%, rgba(213, 22, 34, 0.09) 50%, transparent 82%) left / 1px 100% no-repeat,
+        linear-gradient(180deg, transparent 0 20%, rgba(0, 178, 190, 0.08) 50%, transparent 80%) right / 1px 100% no-repeat;
+    }
+
+    .about-shell::after {
+      inset: clamp(2.25rem, 8vw, 3.8rem) clamp(1.35rem, 7vw, 3.2rem);
+      border-top: 1px solid rgba(0, 178, 190, 0.12);
+      border-bottom: 1px solid rgba(213, 22, 34, 0.1);
+      opacity: 0.8;
+    }
+
+    .about-header,
+    .about-content {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .about-header {
+      display: grid;
+      justify-items: center;
+      gap: clamp(0.62rem, 2.1svh, 0.86rem);
+    }
+
+    .about-title {
+      margin: 0;
+      color: var(--color-text);
+      font-size: clamp(1.42rem, 8.2vw, 2.42rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .about-divider {
+      width: min(11rem, 58vw);
+      height: 1px;
+      background:
+        linear-gradient(90deg, transparent, rgba(213, 22, 34, 0.52), rgba(0, 178, 190, 0.28), transparent);
+      opacity: 0.82;
+    }
+
+    .about-content {
+      width: min(100%, 37rem);
+      justify-self: center;
+      display: grid;
+      gap: clamp(1rem, 3svh, 1.35rem);
+      padding: clamp(1rem, 4.5vw, 1.45rem);
+      border: 1px solid rgba(247, 247, 242, 0.11);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
+        linear-gradient(90deg, rgba(213, 22, 34, 0.052), transparent 54%),
+        rgba(3, 3, 6, 0.36);
+      text-align: left;
+    }
+
+    .about-content::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, transparent 0 24%, rgba(247, 247, 242, 0.08) 50%, transparent 76%) top / 100% 1px no-repeat,
+        linear-gradient(90deg, transparent 0 20%, rgba(0, 178, 190, 0.095) 50%, transparent 80%) bottom / 100% 1px no-repeat;
+      pointer-events: none;
+    }
+
+    .about-heading,
+    .about-copy {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+      margin: 0;
+    }
+
+    .about-heading {
+      color: rgba(213, 22, 34, 0.76);
+      font-size: clamp(0.8rem, 3.4vw, 0.94rem);
+      font-weight: 400;
+      line-height: 1;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .about-copy {
+      color: rgba(247, 247, 242, 0.78);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: clamp(0.88rem, 3.65vw, 1.02rem);
+      line-height: 1.56;
+      text-wrap: pretty;
+    }
+
     .calendar-shell {
       position: relative;
       z-index: 2;
@@ -1982,6 +2132,7 @@
     .site-shell.is-placeholder-view .module-placeholder,
     .site-shell.is-music-nexus-view .music-nexus-shell,
     .site-shell.is-ring-archive-view .ring-archive-shell,
+    .site-shell.is-about-view .about-shell,
     .site-shell.is-calendar-view .calendar-shell {
       opacity: 1;
       pointer-events: auto;
@@ -2390,9 +2541,15 @@
         font-size: 0.68rem;
       }
 
+      .about-shell,
       .calendar-shell {
         gap: 0.62rem;
         padding: 0.72rem;
+      }
+
+      .about-content {
+        gap: 0.82rem;
+        padding: 0.82rem;
       }
 
       .calendar-events-panel {
@@ -2796,6 +2953,25 @@
           </button>
         </section>
       </section>
+      <section class="about-shell" aria-labelledby="about-title" aria-hidden="true" inert data-about-shell>
+        <header class="about-header">
+          <h2 class="about-title" id="about-title">ABOUT</h2>
+          <span class="about-divider" aria-hidden="true"></span>
+        </header>
+
+        <section class="about-content" aria-labelledby="about-content-title">
+          <h3 class="about-heading" id="about-content-title">ABOUT THE SITE</h3>
+          <p class="about-copy">
+            This site is a nearly-100% automated website using coding that reads from the native SmugMug system and creates it in a better customizable UI.
+          </p>
+          <p class="about-copy">
+            This website was also created in assistance with ChatGPT.
+          </p>
+          <p class="about-copy">
+            It is also an ever-evolving website and will need work like anything else. If it breaks, let me know.
+          </p>
+        </section>
+      </section>
       <section class="calendar-shell" aria-labelledby="calendar-title" aria-hidden="true" inert data-calendar-shell>
         <header class="calendar-header">
           <h2 class="calendar-title" id="calendar-title">CALENDAR</h2>
@@ -2918,6 +3094,7 @@
       const startButton = document.querySelector(".start-button");
       const homeFrame = document.querySelector(".home-frame");
       const portfolioHub = document.querySelector(".portfolio-hub");
+      const aboutShell = document.querySelector("[data-about-shell]");
       const calendarShell = document.querySelector("[data-calendar-shell]");
       const bottomRail = document.querySelector("[data-shell-bottom-rail]");
       const railMenuTrigger = document.querySelector("[data-rail-menu-trigger]");
@@ -3142,7 +3319,7 @@
           return;
         }
 
-        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
         if (modulePlaceholder) {
           modulePlaceholder.setAttribute("aria-hidden", "true");
           modulePlaceholder.setAttribute("inert", "");
@@ -3154,6 +3331,10 @@
         if (ringArchiveShell) {
           ringArchiveShell.setAttribute("aria-hidden", "true");
           ringArchiveShell.setAttribute("inert", "");
+        }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
         }
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
@@ -3169,7 +3350,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3185,6 +3366,10 @@
         if (ringArchiveShell) {
           ringArchiveShell.setAttribute("aria-hidden", "true");
           ringArchiveShell.setAttribute("inert", "");
+        }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
         }
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
@@ -3205,7 +3390,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-about-view", "is-calendar-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3222,6 +3407,10 @@
         }
         ringArchiveShell.setAttribute("aria-hidden", "false");
         ringArchiveShell.removeAttribute("inert");
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
+        }
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
@@ -3235,13 +3424,55 @@
       }
 
 
+      function showAboutShell() {
+        if (!shell || !aboutShell) {
+          return;
+        }
+
+        window.clearTimeout(activationTimer);
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.add("has-entered-hub", "is-about-view");
+        if (homeFrame) {
+          homeFrame.setAttribute("aria-hidden", "true");
+        }
+        if (portfolioHub) {
+          portfolioHub.setAttribute("aria-hidden", "true");
+          portfolioHub.setAttribute("inert", "");
+        }
+        if (modulePlaceholder) {
+          modulePlaceholder.setAttribute("aria-hidden", "true");
+          modulePlaceholder.setAttribute("inert", "");
+        }
+        if (musicNexusShell) {
+          musicNexusShell.setAttribute("aria-hidden", "true");
+          musicNexusShell.setAttribute("inert", "");
+        }
+        if (ringArchiveShell) {
+          ringArchiveShell.setAttribute("aria-hidden", "true");
+          ringArchiveShell.setAttribute("inert", "");
+        }
+        aboutShell.setAttribute("aria-hidden", "false");
+        aboutShell.removeAttribute("inert");
+        if (calendarShell) {
+          calendarShell.setAttribute("aria-hidden", "true");
+          calendarShell.setAttribute("inert", "");
+        }
+        setHubChromeHidden(true);
+        setCurrentView("About");
+        if (startButton) {
+          startButton.disabled = true;
+          startButton.setAttribute("aria-busy", "false");
+        }
+      }
+
+
       function showCalendarShell() {
         if (!shell || !calendarShell) {
           return;
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view");
         shell.classList.add("has-entered-hub", "is-calendar-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3262,6 +3493,10 @@
           ringArchiveShell.setAttribute("aria-hidden", "true");
           ringArchiveShell.setAttribute("inert", "");
         }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
+        }
         calendarShell.setAttribute("aria-hidden", "false");
         calendarShell.removeAttribute("inert");
         setHubChromeHidden(true);
@@ -3279,7 +3514,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
         shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3295,6 +3530,10 @@
         if (ringArchiveShell) {
           ringArchiveShell.setAttribute("aria-hidden", "true");
           ringArchiveShell.setAttribute("inert", "");
+        }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
         }
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
@@ -3384,7 +3623,7 @@
         }
 
         window.clearTimeout(activationTimer);
-        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
         startButton.disabled = false;
         startButton.setAttribute("aria-busy", "false");
         if (homeFrame) {
@@ -3406,6 +3645,10 @@
           ringArchiveShell.setAttribute("aria-hidden", "true");
           ringArchiveShell.setAttribute("inert", "");
         }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
+        }
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
@@ -3422,6 +3665,8 @@
           showHomepage();
         } else if (shellTarget === "hub") {
           revealHub();
+        } else if (button.dataset.globalNavTarget === "about") {
+          showAboutShell();
         } else if (button.dataset.globalNavTarget === "calendar") {
           showCalendarShell();
         }
@@ -3430,7 +3675,7 @@
       }
 
       function revealHub() {
-        shell.classList.remove("is-activating", "is-reduced-activation", "is-calendar-view");
+        shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view");
         shell.classList.add("has-entered-hub");
         if (homeFrame) {
           homeFrame.setAttribute("aria-hidden", "true");
@@ -3442,6 +3687,10 @@
         if (calendarShell) {
           calendarShell.setAttribute("aria-hidden", "true");
           calendarShell.setAttribute("inert", "");
+        }
+        if (aboutShell) {
+          aboutShell.setAttribute("aria-hidden", "true");
+          aboutShell.setAttribute("inert", "");
         }
         showPortfolioHubView();
         syncSpotlightFromCarousel();
