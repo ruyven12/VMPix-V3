@@ -902,7 +902,7 @@
       grid-template-rows: auto minmax(0, 1fr);
       align-content: stretch;
       justify-items: stretch;
-      gap: clamp(0.72rem, 2.4svh, 1rem);
+      gap: clamp(0.64rem, 2.2svh, 0.9rem);
       padding: clamp(0.85rem, 4vw, 1.55rem);
       border: 1px solid rgba(247, 247, 242, 0.22);
       border-radius: var(--radius-md);
@@ -946,7 +946,7 @@
       min-width: 0;
       overflow-x: auto;
       overscroll-behavior-x: contain;
-      padding: 0.35rem 0.2rem 0.55rem;
+      padding: 0.3rem 0.2rem 0.5rem;
       scroll-padding-inline: 0.2rem;
       scroll-snap-type: x mandatory;
       scrollbar-color: rgba(213, 22, 34, 0.5) rgba(247, 247, 242, 0.08);
@@ -985,7 +985,7 @@
       display: grid;
       grid-template-rows: auto auto 1fr auto;
       align-content: start;
-      gap: 0.68rem;
+      gap: 0.6rem;
       min-width: 0;
       padding: clamp(0.95rem, 4vw, 1.18rem);
       border: 1px solid rgba(247, 247, 242, 0.12);
@@ -1105,8 +1105,8 @@
       min-width: 0;
       min-height: 0;
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      gap: clamp(0.62rem, 2svh, 0.8rem);
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: clamp(0.5rem, 1.75svh, 0.7rem);
       overflow-y: auto;
       overscroll-behavior: contain;
       padding: 0 0.2rem 0.16rem;
@@ -1136,8 +1136,8 @@
       min-height: 0;
       display: grid;
       align-content: start;
-      gap: 0.62rem;
-      padding: clamp(0.78rem, 3.2vw, 1rem);
+      gap: 0.52rem;
+      padding: clamp(0.7rem, 2.9vw, 0.92rem);
       border: 1px solid rgba(247, 247, 242, 0.12);
       border-radius: var(--radius-md);
       background:
@@ -1156,12 +1156,40 @@
     }
 
     .hub-panel-title,
+    .hub-utility-strip,
     .activity-list,
     .spotlight-copy,
     .spotlight-tags {
       position: relative;
       z-index: 1;
       min-width: 0;
+    }
+
+    .hub-utility-strip {
+      display: grid;
+      grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(0.42rem, 2vw, 0.65rem);
+      padding: 0.46rem 0.58rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, rgba(0, 178, 190, 0.045), transparent 62%),
+        rgba(247, 247, 242, 0.018);
+      color: rgba(247, 247, 242, 0.52);
+      font-size: clamp(0.62rem, 2.7vw, 0.72rem);
+      line-height: 1.14;
+      text-transform: uppercase;
+    }
+
+    .hub-utility-label {
+      color: rgba(0, 178, 190, 0.58);
+      white-space: nowrap;
+    }
+
+    .hub-utility-value {
+      min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     .hub-panel-title {
@@ -1175,7 +1203,7 @@
 
     .activity-list {
       display: grid;
-      gap: 0.42rem;
+      gap: 0.34rem;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -1186,8 +1214,8 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 0.48rem;
-      padding: 0.48rem 0.58rem;
+      gap: 0.42rem;
+      padding: 0.42rem 0.52rem;
       border: 1px solid rgba(247, 247, 242, 0.08);
       border-radius: var(--radius-sm);
       background: rgba(247, 247, 242, 0.028);
@@ -1228,8 +1256,8 @@
       align-self: end;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.36rem;
-      margin-top: 0.2rem;
+      gap: 0.32rem;
+      margin-top: 0.14rem;
     }
 
     .spotlight-tag {
@@ -2781,6 +2809,10 @@
         padding: var(--space-3);
       }
 
+      .hub-utility-strip {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
       .ring-archive-shell {
         gap: 0.58rem;
         padding: 0.72rem;
@@ -2930,8 +2962,12 @@
 
       .hub-context {
         grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-        grid-template-rows: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
         overflow: hidden;
+      }
+
+      .hub-utility-strip {
+        grid-column: 1 / -1;
       }
 
       .hub-card {
@@ -3082,9 +3118,9 @@
       </section>
 
       <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true" inert>
-        <h2 class="sr-only" id="portfolio-title">Interactive Portfolio Hub</h2>
+        <h2 class="sr-only" id="portfolio-title">Featured Archive Worlds</h2>
 
-        <div class="hub-carousel" data-hub-carousel aria-label="Portfolio module carousel">
+        <div class="hub-carousel" data-hub-carousel aria-label="Featured archive worlds carousel">
           <div class="hub-carousel-track">
             <button class="hub-card hub-card--music" type="button" data-module-card="music" data-module-state="active" data-module-route="music" aria-label="Open Music Nexus">
               <span class="hub-card-kicker">Music Nexus</span>
@@ -3102,53 +3138,58 @@
 
             <article class="hub-card hub-card--future" data-module-card="wildlife" data-module-state="future">
               <p class="hub-card-kicker">Wildlife</p>
-              <h3 class="hub-card-title">Archive Standby</h3>
-              <p class="hub-card-meta">Future Portfolio</p>
+              <h3 class="hub-card-title">Field Archive</h3>
+              <p class="hub-card-meta">Future World</p>
               <span class="hub-card-action">Queued</span>
             </article>
 
             <article class="hub-card hub-card--future" data-module-card="skies-above" data-module-state="future">
               <p class="hub-card-kicker">Skies Above</p>
-              <h3 class="hub-card-title">Archive Standby</h3>
-              <p class="hub-card-meta">Future Portfolio</p>
+              <h3 class="hub-card-title">Sky Archive</h3>
+              <p class="hub-card-meta">Future World</p>
               <span class="hub-card-action">Queued</span>
             </article>
           </div>
         </div>
 
         <div class="hub-context" data-hub-context>
+          <div class="hub-utility-strip" aria-label="Shared archive utility">
+            <span class="hub-utility-label">Shared Index</span>
+            <span class="hub-utility-value">Tags / People / Dates / Venues</span>
+          </div>
+
           <section class="hub-panel hub-panel--activity" aria-labelledby="recent-activity-title">
-            <h3 class="hub-panel-title" id="recent-activity-title">Recent Archive Activity</h3>
-            <ul class="activity-list" aria-label="Recent archive activity placeholders">
+            <h3 class="hub-panel-title" id="recent-activity-title">World Activity</h3>
+            <ul class="activity-list" aria-label="World activity">
               <li class="activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
-                <span class="activity-text">New show added</span>
+                <span class="activity-text">Show added</span>
               </li>
               <li class="activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
-                <span class="activity-text">New match added</span>
+                <span class="activity-text">Match indexed</span>
               </li>
               <li class="activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
-                <span class="activity-text">New photos uploaded</span>
+                <span class="activity-text">Gallery updated</span>
               </li>
               <li class="activity-item">
                 <span class="activity-marker" aria-hidden="true"></span>
-                <span class="activity-text">Upcoming event</span>
+                <span class="activity-text">Event queued</span>
               </li>
             </ul>
           </section>
 
           <section class="hub-panel hub-panel--spotlight" aria-labelledby="archive-spotlight-title" data-archive-spotlight>
-            <h3 class="hub-panel-title" id="archive-spotlight-title">Archive Spotlight</h3>
+            <h3 class="hub-panel-title" id="archive-spotlight-title">World Focus</h3>
             <p class="spotlight-copy" data-spotlight-copy>
-              Music archive staging is ready for latest shows, band updates, people links, and synced galleries.
+              Sound archive lanes are staged for bands, shows, people, and venues.
             </p>
             <div class="spotlight-tags" data-spotlight-tags aria-label="Archive spotlight focus">
-              <span class="spotlight-tag">Latest Shows</span>
-              <span class="spotlight-tag">Band Updates</span>
-              <span class="spotlight-tag">People Links</span>
-              <span class="spotlight-tag">Synced Galleries</span>
+              <span class="spotlight-tag">Bands</span>
+              <span class="spotlight-tag">Shows</span>
+              <span class="spotlight-tag">People</span>
+              <span class="spotlight-tag">Venues</span>
             </div>
           </section>
         </div>
@@ -3461,16 +3502,16 @@
 
       const spotlightContent = {
         music: {
-          copy: "Music archive staging is ready for latest shows, band updates, people links, and synced galleries.",
-          tags: ["Latest Shows", "Band Updates", "People Links", "Synced Galleries"],
+          copy: "Sound archive lanes are staged for bands, shows, people, and venues.",
+          tags: ["Bands", "Shows", "People", "Venues"],
         },
         wrestling: {
-          copy: "Wrestling archive staging is ready for shows, matches, people, tagged albums, and synced galleries.",
-          tags: ["Shows", "Matches", "People", "Tagged Albums", "Synced Galleries"],
+          copy: "Ring archive lanes are staged for shows, matches, people, and venues.",
+          tags: ["Shows", "Matches", "People", "Venues"],
         },
         future: {
-          copy: "Future portfolio lanes are queued while Music and Wrestling remain the active archive modules.",
-          tags: ["Queued", "Archive Standby", "Future Lane"],
+          copy: "Future world lane reserved for archive expansion.",
+          tags: ["Queued", "Future World"],
         },
       };
 
