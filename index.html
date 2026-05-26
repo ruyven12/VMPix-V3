@@ -1523,7 +1523,13 @@
     .sets-year-timeline,
     .sets-featured-panel,
     .set-detail-placeholder,
-    .sets-list-panel {
+    .sets-list-panel,
+    .set-gallery-screen,
+    .set-gallery-header,
+    .set-gallery-hero,
+    .set-gallery-meta-row,
+    .set-gallery-highlights,
+    .set-gallery-view-all {
       position: relative;
       z-index: 1;
       min-width: 0;
@@ -1543,6 +1549,10 @@
       display: grid;
     }
 
+    .music-nexus-shell.is-set-gallery .set-gallery-screen {
+      display: grid;
+    }
+
     .music-nexus-shell.is-band-detail .music-nexus-header,
     .music-nexus-shell.is-band-detail .music-nexus-module-grid,
     .music-nexus-shell.is-band-detail .music-bands-index,
@@ -1553,7 +1563,14 @@
     .music-nexus-shell.is-sets-archive .music-bands-index,
     .music-nexus-shell.is-sets-archive .music-nexus-activity,
     .music-nexus-shell.is-sets-archive .music-nexus-back,
-    .music-nexus-shell.is-sets-archive .band-detail-screen {
+    .music-nexus-shell.is-sets-archive .band-detail-screen,
+    .music-nexus-shell.is-set-gallery .music-nexus-header,
+    .music-nexus-shell.is-set-gallery .music-nexus-module-grid,
+    .music-nexus-shell.is-set-gallery .music-bands-index,
+    .music-nexus-shell.is-set-gallery .music-nexus-activity,
+    .music-nexus-shell.is-set-gallery .music-nexus-back,
+    .music-nexus-shell.is-set-gallery .band-detail-screen,
+    .music-nexus-shell.is-set-gallery .sets-archive-screen {
       display: none;
     }
 
@@ -1883,7 +1900,9 @@
 
     .sets-archive-back,
     .sets-featured-open,
-    .set-detail-close {
+    .set-detail-close,
+    .set-gallery-back,
+    .set-gallery-view-all {
       appearance: none;
       min-height: 2.55rem;
       padding: 0.58rem 0.78rem;
@@ -1902,6 +1921,8 @@
     .sets-archive-back:focus-visible,
     .sets-featured-open:focus-visible,
     .set-detail-close:focus-visible,
+    .set-gallery-back:focus-visible,
+    .set-gallery-view-all:focus-visible,
     .sets-year-card:focus-visible,
     .sets-list-row:focus-visible {
       outline: 2px solid rgba(247, 247, 242, 0.82);
@@ -1929,6 +1950,18 @@
     .set-detail-copy,
     .set-detail-stat-label,
     .set-detail-stat-value,
+    .set-gallery-band,
+    .set-gallery-label,
+    .set-gallery-date,
+    .set-gallery-title,
+    .set-gallery-fact-label,
+    .set-gallery-fact-value,
+    .set-gallery-meta-label,
+    .set-gallery-meta-value,
+    .set-gallery-highlights-title,
+    .set-gallery-photo-count,
+    .set-gallery-toggle-option,
+    .set-gallery-photo-label,
     .sets-list-date,
     .sets-list-title,
     .sets-list-location,
@@ -2413,6 +2446,296 @@
       font-size: clamp(0.54rem, 2.15vw, 0.64rem);
       line-height: 1.1;
       text-transform: uppercase;
+    }
+
+    .set-gallery-screen {
+      display: none;
+      align-content: start;
+      gap: clamp(0.82rem, 2.3svh, 1.16rem);
+    }
+
+    .set-gallery-header {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(0.56rem, 2.4vw, 0.78rem);
+      padding: 0.1rem 0 0.08rem;
+    }
+
+    .set-gallery-back {
+      width: 2.65rem;
+      padding-inline: 0.4rem;
+      color: rgba(255, 118, 102, 0.84);
+      font-size: clamp(0.78rem, 3vw, 0.94rem);
+    }
+
+    .set-gallery-title-group {
+      min-width: 0;
+      display: grid;
+      gap: 0.22rem;
+    }
+
+    .set-gallery-band {
+      color: rgba(247, 247, 242, 0.9);
+      font-size: clamp(0.88rem, 3.6vw, 1.06rem);
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .set-gallery-label {
+      color: rgba(255, 118, 102, 0.72);
+      font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-hero {
+      display: grid;
+      gap: clamp(0.78rem, 2.8vw, 1.08rem);
+      padding: clamp(0.78rem, 2.8vw, 1.08rem);
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
+        linear-gradient(135deg, rgba(255, 69, 58, 0.07), transparent 70%),
+        rgba(3, 3, 6, 0.38);
+      overflow: hidden;
+    }
+
+    .set-gallery-hero-image,
+    .set-gallery-photo-tile {
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background:
+        radial-gradient(circle at var(--set-image-x, 52%) var(--set-image-y, 42%), var(--set-image-accent, rgba(255, 82, 72, 0.16)), transparent 58%),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.055), transparent 64%),
+        rgba(1, 1, 3, 0.46);
+      color: rgba(247, 247, 242, 0.7);
+      text-transform: uppercase;
+    }
+
+    .set-gallery-hero-image {
+      min-height: clamp(13rem, 52vw, 20rem);
+      overflow: hidden;
+      box-shadow: inset 0 0 1.12rem rgba(0, 0, 0, 0.42);
+    }
+
+    .set-gallery-hero-image span {
+      max-width: 88%;
+      font-size: clamp(2.4rem, 14vw, 5rem);
+      line-height: 1;
+      text-align: center;
+    }
+
+    .set-gallery-copy {
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: clamp(0.6rem, 1.8svh, 0.82rem);
+    }
+
+    .set-gallery-date {
+      color: rgba(255, 118, 102, 0.72);
+      font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-title {
+      color: rgba(247, 247, 242, 0.94);
+      font-size: clamp(1.26rem, 6vw, 1.9rem);
+      font-weight: 400;
+      line-height: 1.04;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .set-gallery-facts {
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .set-gallery-fact {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(6.8rem, auto) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .set-gallery-fact-label {
+      color: rgba(247, 247, 242, 0.42);
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-fact-value {
+      color: rgba(247, 247, 242, 0.76);
+      font-size: clamp(0.68rem, 2.6vw, 0.82rem);
+      line-height: 1.14;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-meta-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.52rem, 2vw, 0.72rem);
+    }
+
+    .set-gallery-meta-card {
+      min-width: 0;
+      display: grid;
+      gap: 0.34rem;
+      padding: clamp(0.64rem, 2.2vw, 0.82rem);
+      border: 1px solid rgba(247, 247, 242, 0.06);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.24);
+    }
+
+    .set-gallery-meta-label {
+      color: rgba(255, 118, 102, 0.6);
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-meta-value {
+      color: rgba(247, 247, 242, 0.72);
+      font-size: clamp(0.66rem, 2.55vw, 0.8rem);
+      line-height: 1.24;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-highlights {
+      display: grid;
+      gap: clamp(0.64rem, 2.2vw, 0.86rem);
+      padding: clamp(0.74rem, 2.6vw, 1rem);
+      border: 1px solid rgba(247, 247, 242, 0.075);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 62%),
+        rgba(3, 3, 6, 0.32);
+    }
+
+    .set-gallery-highlights-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 0.68rem;
+      min-width: 0;
+    }
+
+    .set-gallery-highlights-copy {
+      min-width: 0;
+      display: grid;
+      gap: 0.28rem;
+    }
+
+    .set-gallery-highlights-title {
+      color: rgba(247, 247, 242, 0.82);
+      font-size: clamp(0.78rem, 3vw, 0.92rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-photo-count {
+      color: rgba(247, 247, 242, 0.46);
+      font-size: clamp(0.56rem, 2.2vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-view-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.24rem;
+      padding: 0.22rem;
+      border: 1px solid rgba(247, 247, 242, 0.06);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.24);
+    }
+
+    .set-gallery-toggle-option {
+      min-height: 1.85rem;
+      display: grid;
+      place-items: center;
+      padding: 0.34rem 0.54rem;
+      border-radius: calc(var(--radius-sm) - 0.16rem);
+      color: rgba(247, 247, 242, 0.42);
+      font-size: clamp(0.54rem, 2.1vw, 0.64rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-toggle-option.is-active {
+      background: rgba(255, 82, 72, 0.08);
+      color: rgba(247, 247, 242, 0.72);
+    }
+
+    .set-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.5rem, 2vw, 0.72rem);
+    }
+
+    .set-gallery-photo-tile {
+      min-height: clamp(7.6rem, 34vw, 13.5rem);
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+    }
+
+    .set-gallery-photo-tile:nth-child(3n + 2) {
+      --set-image-x: 38%;
+      --set-image-y: 48%;
+      --set-image-accent: rgba(142, 108, 255, 0.15);
+    }
+
+    .set-gallery-photo-tile:nth-child(3n) {
+      --set-image-x: 64%;
+      --set-image-y: 36%;
+      --set-image-accent: rgba(255, 183, 105, 0.14);
+    }
+
+    .set-gallery-photo-label {
+      color: rgba(247, 247, 242, 0.62);
+      font-size: clamp(0.68rem, 2.7vw, 0.84rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-gallery-view-all {
+      justify-self: center;
+      width: min(100%, 22rem);
+      min-height: 3.2rem;
+      border-color: rgba(255, 82, 72, 0.32);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 62%),
+        rgba(255, 82, 72, 0.095);
+      color: rgba(247, 247, 242, 0.86);
+      font-size: clamp(0.72rem, 2.7vw, 0.84rem);
+    }
+
+    .site-shell.is-set-gallery-view .universal-bottom-rail {
+      border-top-color: rgba(255, 82, 72, 0.16);
+      background:
+        linear-gradient(180deg, rgba(255, 82, 72, 0.045), transparent 72%),
+        rgba(2, 2, 3, 0.42);
+    }
+
+    .site-shell.is-set-gallery-view .rail-brand {
+      color: rgba(247, 247, 242, 0.74);
+      text-shadow: 0 0 0.55rem rgba(255, 82, 72, 0.1);
     }
 
     .band-detail-members {
@@ -4735,12 +5058,18 @@
         gap: 0.64rem;
       }
 
+      .set-gallery-screen {
+        gap: 0.66rem;
+      }
+
       .band-detail-hero,
       .band-detail-panel,
       .band-detail-activity,
       .sets-featured-panel,
       .set-detail-placeholder,
-      .sets-list-panel {
+      .sets-list-panel,
+      .set-gallery-hero,
+      .set-gallery-highlights {
         padding: 0.58rem;
       }
 
@@ -4751,7 +5080,8 @@
       .band-detail-meta-row,
       .band-detail-completion-head,
       .band-activity-row,
-      .sets-featured-meta-row {
+      .sets-featured-meta-row,
+      .set-gallery-fact {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.22rem;
       }
@@ -4785,6 +5115,11 @@
       }
 
       .set-detail-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .set-gallery-meta-row,
+      .set-gallery-grid {
         grid-template-columns: minmax(0, 1fr);
       }
 
@@ -4949,7 +5284,8 @@
       .band-detail-meta-row,
       .band-detail-completion-head,
       .band-activity-row,
-      .sets-featured-meta-row {
+      .sets-featured-meta-row,
+      .set-gallery-fact {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.24rem;
       }
@@ -4977,6 +5313,19 @@
 
       .set-detail-header {
         display: grid;
+      }
+
+      .set-gallery-header {
+        align-items: start;
+      }
+
+      .set-gallery-highlights-head {
+        display: grid;
+        align-items: start;
+      }
+
+      .set-gallery-meta-row {
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .sets-list {
@@ -5121,12 +5470,29 @@
         align-items: stretch;
       }
 
+      .set-gallery-hero {
+        grid-template-columns: minmax(14rem, 0.96fr) minmax(0, 1.04fr);
+        align-items: stretch;
+      }
+
       .sets-featured-image {
         min-height: clamp(16rem, 30vw, 20rem);
       }
 
+      .set-gallery-hero-image {
+        min-height: clamp(17rem, 31vw, 21rem);
+      }
+
       .sets-featured-meta-row {
         grid-template-columns: minmax(7.4rem, auto) minmax(0, 1fr);
+      }
+
+      .set-gallery-fact {
+        grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+      }
+
+      .set-gallery-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
       .sets-list {
@@ -5710,7 +6076,7 @@
               </div>
               <div class="sets-featured-copy">
                 <p class="sets-featured-date" data-sets-featured-date>JAN 18, 2026</p>
-                <h4 class="sets-featured-title" id="sets-featured-title" data-sets-featured-title>Winter Hall Session</h4>
+                <h4 class="sets-featured-title" id="sets-featured-title" data-sets-featured-title>Live @ Asylum</h4>
                 <div class="sets-featured-meta" aria-label="Featured set metadata">
                   <div class="sets-featured-meta-row">
                     <p class="sets-featured-meta-label">Location</p>
@@ -5729,7 +6095,7 @@
                     <p class="sets-featured-meta-value" data-sets-featured-complete>84%</p>
                   </div>
                 </div>
-                <button class="v3-card v3-card--mini v3-card--interactive sets-featured-open" type="button" aria-controls="set-detail-placeholder" aria-expanded="false" data-sets-open-set>
+                <button class="v3-card v3-card--mini v3-card--interactive sets-featured-open" type="button" aria-controls="set-gallery-screen" aria-expanded="false" data-sets-open-set>
                   OPEN SET
                 </button>
               </div>
@@ -5739,7 +6105,7 @@
               <div class="set-detail-header">
                 <div class="set-detail-heading">
                   <p class="set-detail-kicker" data-set-detail-band>Astra Vale</p>
-                  <h4 class="set-detail-title" id="set-detail-title" data-set-detail-title>Winter Hall Session</h4>
+                  <h4 class="set-detail-title" id="set-detail-title" data-set-detail-title>Live @ Asylum</h4>
                 </div>
                 <button class="v3-card v3-card--mini v3-card--interactive set-detail-close" type="button" data-set-detail-close>
                   Close
@@ -5781,11 +6147,11 @@
               </div>
               <ul class="sets-list" aria-label="Sets archive list" data-sets-list>
                 <li>
-                  <button class="sets-list-row is-active" type="button" data-set-row data-set-year="2026" data-set-date="JAN 18, 2026" data-set-title="Winter Hall Session" data-set-location="Portland, Maine" data-set-photos="64" data-set-contributors="3" data-set-complete="84%" data-set-thumb="AV">
+                  <button class="sets-list-row is-active" type="button" data-set-row data-set-year="2026" data-set-date="JAN 18, 2026" data-set-title="Live @ Asylum" data-set-location="Portland, Maine" data-set-venue="Asylum" data-set-photos="64" data-set-contributors="3" data-set-complete="84%" data-set-quality="Archive High" data-set-camera="Canon R6 / 35mm" data-set-notes="Front rail and side-stage selections pending final curation." data-set-thumb="AV">
                     <span class="sets-row-thumb" aria-hidden="true">AV</span>
                     <span class="sets-list-copy">
                       <span class="sets-list-date">JAN 18, 2026</span>
-                      <span class="sets-list-title">Winter Hall Session</span>
+                      <span class="sets-list-title">Live @ Asylum</span>
                       <span class="sets-list-location">Portland, Maine</span>
                       <span class="sets-list-meta">64 Photos / 3 Contributors</span>
                     </span>
@@ -5925,6 +6291,88 @@
                 </li>
               </ul>
             </section>
+          </article>
+
+          <article class="set-gallery-screen" id="set-gallery-screen" aria-labelledby="set-gallery-title" aria-hidden="true" inert data-set-gallery>
+            <header class="set-gallery-header">
+              <button class="v3-card v3-card--mini v3-card--interactive set-gallery-back" type="button" aria-label="Back to Sets Archive" data-set-gallery-back>
+                &lt;
+              </button>
+              <div class="set-gallery-title-group">
+                <p class="set-gallery-band" data-set-gallery-band>Astra Vale</p>
+                <h3 class="set-gallery-label">SETS ARCHIVE</h3>
+              </div>
+            </header>
+
+            <section class="set-gallery-hero" aria-labelledby="set-gallery-title">
+              <div class="set-gallery-hero-image" role="img" aria-label="Live @ Asylum placeholder gallery image" data-set-gallery-image>
+                <span data-set-gallery-thumb>JAN 18</span>
+              </div>
+              <div class="set-gallery-copy">
+                <p class="set-gallery-date" data-set-gallery-date>JAN 18, 2026</p>
+                <h4 class="set-gallery-title" id="set-gallery-title" data-set-gallery-title>Live @ Asylum</h4>
+                <div class="set-gallery-facts" aria-label="Set gallery metadata">
+                  <div class="set-gallery-fact">
+                    <p class="set-gallery-fact-label">City / State</p>
+                    <p class="set-gallery-fact-value" data-set-gallery-city>Portland, Maine</p>
+                  </div>
+                  <div class="set-gallery-fact">
+                    <p class="set-gallery-fact-label">Venue</p>
+                    <p class="set-gallery-fact-value" data-set-gallery-venue>Asylum</p>
+                  </div>
+                  <div class="set-gallery-fact">
+                    <p class="set-gallery-fact-label">Photos</p>
+                    <p class="set-gallery-fact-value" data-set-gallery-photos>64</p>
+                  </div>
+                  <div class="set-gallery-fact">
+                    <p class="set-gallery-fact-label">Contributors</p>
+                    <p class="set-gallery-fact-value" data-set-gallery-contributors>3</p>
+                  </div>
+                  <div class="set-gallery-fact">
+                    <p class="set-gallery-fact-label">Quality</p>
+                    <p class="set-gallery-fact-value" data-set-gallery-quality>Archive High</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="set-gallery-meta-row" aria-label="Set gallery notes">
+              <article class="set-gallery-meta-card">
+                <p class="set-gallery-meta-label">Camera</p>
+                <p class="set-gallery-meta-value" data-set-gallery-camera>Canon R6 / 35mm</p>
+              </article>
+              <article class="set-gallery-meta-card">
+                <p class="set-gallery-meta-label">Notes</p>
+                <p class="set-gallery-meta-value" data-set-gallery-notes>Front rail and side-stage selections pending final curation.</p>
+              </article>
+            </section>
+
+            <section class="set-gallery-highlights" aria-labelledby="set-gallery-highlights-title">
+              <div class="set-gallery-highlights-head">
+                <div class="set-gallery-highlights-copy">
+                  <h4 class="set-gallery-highlights-title" id="set-gallery-highlights-title">Photo Highlights</h4>
+                  <p class="set-gallery-photo-count" data-set-gallery-photo-count>64 Photos</p>
+                </div>
+                <div class="set-gallery-view-toggle" aria-label="Gallery view placeholders">
+                  <span class="set-gallery-toggle-option is-active">Grid</span>
+                  <span class="set-gallery-toggle-option">List</span>
+                </div>
+              </div>
+              <div class="set-gallery-grid" aria-label="Photo highlight previews">
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 01"><span class="set-gallery-photo-label">Photo 01</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 02"><span class="set-gallery-photo-label">Photo 02</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 03"><span class="set-gallery-photo-label">Photo 03</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 04"><span class="set-gallery-photo-label">Photo 04</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 05"><span class="set-gallery-photo-label">Photo 05</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 06"><span class="set-gallery-photo-label">Photo 06</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 07"><span class="set-gallery-photo-label">Photo 07</span></div>
+                <div class="set-gallery-photo-tile" role="img" aria-label="Photo highlight placeholder 08"><span class="set-gallery-photo-label">Photo 08</span></div>
+              </div>
+            </section>
+
+            <button class="v3-card v3-card--interactive set-gallery-view-all" type="button">
+              VIEW ALL PHOTOS
+            </button>
           </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
@@ -6233,6 +6681,21 @@
       const setDetailPhotos = document.querySelector("[data-set-detail-photos]");
       const setDetailContributors = document.querySelector("[data-set-detail-contributors]");
       const setDetailComplete = document.querySelector("[data-set-detail-complete]");
+      const setGallery = document.querySelector("[data-set-gallery]");
+      const setGalleryBack = document.querySelector("[data-set-gallery-back]");
+      const setGalleryBand = document.querySelector("[data-set-gallery-band]");
+      const setGalleryImage = document.querySelector("[data-set-gallery-image]");
+      const setGalleryThumb = document.querySelector("[data-set-gallery-thumb]");
+      const setGalleryDate = document.querySelector("[data-set-gallery-date]");
+      const setGalleryTitle = document.querySelector("[data-set-gallery-title]");
+      const setGalleryCity = document.querySelector("[data-set-gallery-city]");
+      const setGalleryVenue = document.querySelector("[data-set-gallery-venue]");
+      const setGalleryPhotos = document.querySelector("[data-set-gallery-photos]");
+      const setGalleryContributors = document.querySelector("[data-set-gallery-contributors]");
+      const setGalleryQuality = document.querySelector("[data-set-gallery-quality]");
+      const setGalleryCamera = document.querySelector("[data-set-gallery-camera]");
+      const setGalleryNotes = document.querySelector("[data-set-gallery-notes]");
+      const setGalleryPhotoCount = document.querySelector("[data-set-gallery-photo-count]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -6426,6 +6889,7 @@
         musicNexusShell.classList.toggle("is-band-detail", isVisible);
         if (isVisible) {
           setSetsArchiveVisible(false);
+          setSetGalleryVisible(false);
         }
         bandDetail.setAttribute("aria-hidden", String(!isVisible));
         if (isVisible) {
@@ -6441,6 +6905,9 @@
         }
 
         musicNexusShell.classList.toggle("is-sets-archive", isVisible);
+        if (isVisible) {
+          setSetGalleryVisible(false);
+        }
         if (!isVisible) {
           setSetDetailVisible(false);
         }
@@ -6452,7 +6919,28 @@
         }
       }
 
+      function setSetGalleryVisible(isVisible) {
+        if (!musicNexusShell || !setGallery) {
+          return;
+        }
+
+        musicNexusShell.classList.toggle("is-set-gallery", isVisible);
+        if (shell) {
+          shell.classList.toggle("is-set-gallery-view", isVisible);
+        }
+        if (setsFeaturedOpen) {
+          setsFeaturedOpen.setAttribute("aria-expanded", String(isVisible));
+        }
+        setGallery.setAttribute("aria-hidden", String(!isVisible));
+        if (isVisible) {
+          setGallery.removeAttribute("inert");
+        } else {
+          setGallery.setAttribute("inert", "");
+        }
+      }
+
       function showBandsIndexView(options = {}) {
+        setSetGalleryVisible(false);
         setSetsArchiveVisible(false);
         setBandDetailVisible(false);
         setBandsIndexVisible(true);
@@ -6584,12 +7072,102 @@
         }
       }
 
-      function openSelectedSetDetail() {
-        const firstVisibleRow = Array.from(setsRows).find((candidate) => {
+      function getFirstVisibleSetRow() {
+        return Array.from(setsRows).find((candidate) => {
           const item = candidate.closest("li");
           return !item || !item.hidden;
         });
-        const row = activeSetRow || firstVisibleRow || setsRows[0];
+      }
+
+      function getSetVenue(row) {
+        if (!row) {
+          return "Asylum";
+        }
+
+        if (row.dataset.setVenue) {
+          return row.dataset.setVenue;
+        }
+        if ((row.dataset.setTitle || "").toLowerCase().includes("asylum")) {
+          return "Asylum";
+        }
+        return "Archive Venue";
+      }
+
+      function getSetQuality(row) {
+        if (!row) {
+          return "Archive High";
+        }
+
+        if (row.dataset.setQuality) {
+          return row.dataset.setQuality;
+        }
+        const completion = Number.parseInt(row.dataset.setComplete || "0", 10);
+        return completion >= 70 ? "Archive High" : "Archive Review";
+      }
+
+      function getSetCamera(row) {
+        return row && row.dataset.setCamera ? row.dataset.setCamera : "Canon R6 / 35mm";
+      }
+
+      function getSetNotes(row) {
+        return row && row.dataset.setNotes
+          ? row.dataset.setNotes
+          : "Placeholder notes pending final caption pass.";
+      }
+
+      function updateSetGalleryFromRow(row) {
+        if (!row) {
+          return;
+        }
+
+        const setData = row.dataset;
+        const imageAccent = getSetImageAccent(row);
+        if (setGalleryBand) {
+          setGalleryBand.textContent = activeMusicBand ? activeMusicBand.name : "Band Detail";
+        }
+        if (setGalleryImage) {
+          setGalleryImage.setAttribute("aria-label", `${setData.setTitle} placeholder gallery image`);
+          setGalleryImage.style.setProperty("--set-image-x", imageAccent.x);
+          setGalleryImage.style.setProperty("--set-image-y", imageAccent.y);
+          setGalleryImage.style.setProperty("--set-image-accent", imageAccent.color);
+        }
+        if (setGalleryThumb) {
+          setGalleryThumb.textContent = getSetImageLabel(row);
+        }
+        if (setGalleryDate) {
+          setGalleryDate.textContent = setData.setDate || "";
+        }
+        if (setGalleryTitle) {
+          setGalleryTitle.textContent = setData.setTitle || "";
+        }
+        if (setGalleryCity) {
+          setGalleryCity.textContent = setData.setLocation || "";
+        }
+        if (setGalleryVenue) {
+          setGalleryVenue.textContent = getSetVenue(row);
+        }
+        if (setGalleryPhotos) {
+          setGalleryPhotos.textContent = setData.setPhotos || "";
+        }
+        if (setGalleryContributors) {
+          setGalleryContributors.textContent = setData.setContributors || "";
+        }
+        if (setGalleryQuality) {
+          setGalleryQuality.textContent = getSetQuality(row);
+        }
+        if (setGalleryCamera) {
+          setGalleryCamera.textContent = getSetCamera(row);
+        }
+        if (setGalleryNotes) {
+          setGalleryNotes.textContent = getSetNotes(row);
+        }
+        if (setGalleryPhotoCount) {
+          setGalleryPhotoCount.textContent = `${setData.setPhotos || "0"} Photos`;
+        }
+      }
+
+      function openSelectedSetDetail() {
+        const row = activeSetRow || getFirstVisibleSetRow() || setsRows[0];
         if (!row) {
           return;
         }
@@ -6606,6 +7184,38 @@
         setSetDetailVisible(false);
         if (setsFeaturedOpen) {
           setsFeaturedOpen.focus({ preventScroll: true });
+        }
+      }
+
+      function showSetGallery() {
+        const row = activeSetRow || getFirstVisibleSetRow() || setsRows[0];
+        if (!row || !setGallery) {
+          return;
+        }
+
+        updateSetsFeaturedFromRow(row);
+        updateSetGalleryFromRow(row);
+        setSetDetailVisible(false);
+        setSetsArchiveVisible(false);
+        setSetGalleryVisible(true);
+        setCurrentView("LIVE @ ASYLUM");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
+      function returnToSetsArchiveFromGallery() {
+        setSetGalleryVisible(false);
+        setSetsArchiveVisible(true);
+        setCurrentView("SETS 13 HIGH");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
         }
       }
 
@@ -7073,6 +7683,7 @@
 
         setBandDetailVisible(false);
         setSetsArchiveVisible(false);
+        setSetGalleryVisible(false);
         let activeCardLabel = "";
         musicNexusCards.forEach((card) => {
           const isActive = card.dataset.musicNexusCard === sectionName;
@@ -7745,7 +8356,10 @@
           setsArchiveBack.addEventListener("click", returnToBandDetailFromSets);
         }
         if (setsFeaturedOpen) {
-          setsFeaturedOpen.addEventListener("click", openSelectedSetDetail);
+          setsFeaturedOpen.addEventListener("click", showSetGallery);
+        }
+        if (setGalleryBack) {
+          setGalleryBack.addEventListener("click", returnToSetsArchiveFromGallery);
         }
         if (setDetailClose) {
           setDetailClose.addEventListener("click", closeSelectedSetDetail);
