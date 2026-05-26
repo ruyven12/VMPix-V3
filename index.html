@@ -2157,11 +2157,56 @@
       color: rgba(247, 247, 242, 0.48);
       font-size: clamp(0.56rem, 2.25vw, 0.66rem);
       line-height: 1.12;
-      text-transform: uppercase;
+      text-transform: none;
     }
 
-    .bands-row-status {
-      color: rgba(142, 108, 255, 0.72);
+    .bands-row-region,
+    .bands-row-status,
+    .bands-row-count {
+      min-width: 0;
+      min-height: 1.22rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.24rem;
+      padding: 0.16rem 0.34rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.018);
+      line-height: 1;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .bands-row-region {
+      color: rgba(247, 247, 242, 0.58);
+    }
+
+    .bands-row-status::before {
+      width: 0.34rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0.42rem color-mix(in srgb, currentColor 18%, transparent);
+      content: "";
+      flex: 0 0 auto;
+    }
+
+    .bands-row-status--complete {
+      border-color: rgba(116, 214, 147, 0.22);
+      background: rgba(116, 214, 147, 0.045);
+      color: rgba(134, 225, 161, 0.82);
+    }
+
+    .bands-row-status--partial {
+      border-color: rgba(226, 197, 94, 0.24);
+      background: rgba(226, 197, 94, 0.045);
+      color: rgba(230, 204, 111, 0.84);
+    }
+
+    .bands-row-status--needs {
+      border-color: rgba(213, 83, 91, 0.24);
+      background: rgba(213, 83, 91, 0.045);
+      color: rgba(230, 108, 116, 0.82);
     }
 
     .bands-row-count {
@@ -4143,9 +4188,9 @@
                     <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
                       <h5 class="bands-search-group-title" id="bands-recent-searches-title">Recent Searches</h5>
                       <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="tour">Tour</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="complete">Complete</button>
                         <button class="bands-search-chip" type="button" data-bands-search-term="regional">Regional</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="indexed">Indexed</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="partial">Partial</button>
                       </div>
                     </section>
 
@@ -4154,7 +4199,7 @@
                       <div class="bands-search-chip-row">
                         <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
                         <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="staging">Staging</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="needs work">Needs Work</button>
                       </div>
                     </section>
 
@@ -4506,18 +4551,18 @@
       };
 
       const musicBandIndexRows = [
-        { name: "Astra Vale", region: "Coastal Tier", status: "Indexed", albums: 4, thumb: "AV" },
-        { name: "Black Harbor", region: "Regional Tier", status: "Staging", albums: 2, thumb: "BH" },
-        { name: "Crimson Static", region: "Local Tier", status: "Indexed", albums: 5, thumb: "CS" },
-        { name: "Dead Letters", region: "Legacy Tier", status: "Partial", albums: 3, thumb: "DL" },
-        { name: "Echo District", region: "Tour Tier", status: "Indexed", albums: 6, thumb: "ED" },
-        { name: "Glass Ritual", region: "Regional Tier", status: "Queued", albums: 1, thumb: "GR" },
-        { name: "Hollow Signal", region: "Local Tier", status: "Indexed", albums: 3, thumb: "HS" },
-        { name: "Moon Circuit", region: "Tour Tier", status: "Staging", albums: 4, thumb: "MC" },
-        { name: "Neon Saints", region: "Regional Tier", status: "Indexed", albums: 7, thumb: "NS" },
-        { name: "Ritual Bloom", region: "Local Tier", status: "Queued", albums: 2, thumb: "RB" },
-        { name: "Silver Static", region: "Legacy Tier", status: "Partial", albums: 5, thumb: "SS" },
-        { name: "Violet Machines", region: "Tour Tier", status: "Indexed", albums: 8, thumb: "VM" },
+        { name: "Astra Vale", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 12, thumb: "AV" },
+        { name: "Black Harbor", region: "Regional", status: "Partial Archive", statusKey: "partial", albums: 8, thumb: "BH" },
+        { name: "Crimson Static", region: "National", status: "Complete Archive", statusKey: "complete", albums: 34, thumb: "CS" },
+        { name: "Dead Letters", region: "Local", status: "Partial Archive", statusKey: "partial", albums: 4, thumb: "DL" },
+        { name: "Echo District", region: "International", status: "Complete Archive", statusKey: "complete", albums: 18, thumb: "ED" },
+        { name: "Glass Ritual", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 6, thumb: "GR" },
+        { name: "Hollow Signal", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 9, thumb: "HS" },
+        { name: "Moon Circuit", region: "National", status: "Partial Archive", statusKey: "partial", albums: 11, thumb: "MC" },
+        { name: "Neon Saints", region: "International", status: "Complete Archive", statusKey: "complete", albums: 27, thumb: "NS" },
+        { name: "Ritual Bloom", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 5, thumb: "RB" },
+        { name: "Silver Static", region: "National", status: "Partial Archive", statusKey: "partial", albums: 16, thumb: "SS" },
+        { name: "Violet Machines", region: "International", status: "Complete Archive", statusKey: "complete", albums: 22, thumb: "VM" },
       ].sort((a, b) => a.name.localeCompare(b.name));
 
       const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -4584,7 +4629,7 @@
         }
 
         return musicBandIndexRows.filter((band) => {
-          const searchText = `${band.name} ${band.region} ${band.status} ${band.albums} albums`.toLowerCase();
+          const searchText = `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.albums} albums`.toLowerCase();
           return searchText.includes(query);
         });
       }
@@ -4699,7 +4744,7 @@
         row.className = `bands-list-row${letter === activeBandsLetter ? " is-letter-active" : ""}`;
         row.type = "button";
         row.dataset.bandLetter = letter;
-        row.setAttribute("aria-label", `${band.name}, ${band.region}, ${band.status}, ${band.albums} albums`);
+        row.setAttribute("aria-label", `${band.name}, ${band.region}, ${band.status}, ${band.albums} Albums`);
 
         const thumb = document.createElement("span");
         thumb.className = "bands-row-thumb";
@@ -4717,15 +4762,16 @@
         meta.className = "bands-row-meta";
 
         const region = document.createElement("span");
+        region.className = "bands-row-region";
         region.textContent = band.region;
 
         const status = document.createElement("span");
-        status.className = "bands-row-status";
+        status.className = `bands-row-status bands-row-status--${band.statusKey}`;
         status.textContent = band.status;
 
         const count = document.createElement("span");
         count.className = "bands-row-count";
-        count.textContent = `${band.albums} albums`;
+        count.textContent = `${band.albums} Albums`;
 
         const arrow = document.createElement("span");
         arrow.className = "bands-row-arrow";
