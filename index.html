@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#050507">
   <title>Voodoo Media | VMPix V3</title>
+  <link rel="icon" href="data:,">
 
   <!-- Future pass: self-host Audiowide in assets/fonts if offline font delivery is preferred. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1514,16 +1515,29 @@
     .band-detail-stats,
     .band-detail-actions,
     .band-detail-members,
-    .band-detail-activity {
+    .band-detail-activity,
+    .band-detail-back {
       position: relative;
       z-index: 1;
       min-width: 0;
     }
 
     .band-detail-screen {
-      display: grid;
+      display: none;
       align-content: start;
       gap: clamp(0.68rem, 2svh, 0.96rem);
+    }
+
+    .music-nexus-shell.is-band-detail .band-detail-screen {
+      display: grid;
+    }
+
+    .music-nexus-shell.is-band-detail .music-nexus-header,
+    .music-nexus-shell.is-band-detail .music-nexus-module-grid,
+    .music-nexus-shell.is-band-detail .music-bands-index,
+    .music-nexus-shell.is-band-detail .music-nexus-activity,
+    .music-nexus-shell.is-band-detail .music-nexus-back {
+      display: none;
     }
 
     .band-detail-hero {
@@ -1812,6 +1826,26 @@
       outline-offset: 0.16rem;
     }
 
+    .band-detail-back {
+      justify-self: start;
+      min-height: 2.55rem;
+      padding: 0.58rem 0.72rem;
+      border: 1px solid rgba(142, 108, 255, 0.28);
+      border-radius: var(--radius-sm);
+      background: rgba(142, 108, 255, 0.07);
+      color: rgba(247, 247, 242, 0.78);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.62rem, 2.55vw, 0.72rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .band-detail-back:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.16rem;
+    }
+
     .band-detail-members {
       display: grid;
       gap: clamp(0.58rem, 2.2vw, 0.78rem);
@@ -1925,7 +1959,8 @@
     .music-nexus-header,
     .music-nexus-module-grid,
     .music-bands-index,
-    .music-nexus-activity {
+    .music-nexus-activity,
+    .music-nexus-back {
       position: relative;
       z-index: 1;
       min-width: 0;
@@ -2051,6 +2086,26 @@
       background: rgba(247, 247, 242, 0.024);
     }
 
+    .music-nexus-back {
+      justify-self: start;
+      min-height: 2.55rem;
+      padding: 0.58rem 0.72rem;
+      border: 1px solid rgba(142, 108, 255, 0.24);
+      border-radius: var(--radius-sm);
+      background: rgba(142, 108, 255, 0.06);
+      color: rgba(247, 247, 242, 0.72);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.62rem, 2.55vw, 0.72rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .music-nexus-back:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.16rem;
+    }
+
     .music-nexus-section-title {
       margin: 0;
       color: rgba(247, 247, 242, 0.78);
@@ -2156,6 +2211,7 @@
 
     .bands-index-mode-tab:focus-visible,
     .bands-letter-button:focus-visible,
+    .bands-radar-signal-button:focus-visible,
     .bands-search-chip:focus-visible,
     .bands-radar-back:focus-visible,
     .bands-list-row:focus-visible {
@@ -2324,7 +2380,6 @@
 
     .bands-radar-signal {
       min-width: 0;
-      padding: 0.34rem 0.48rem;
       border: 1px solid rgba(142, 108, 255, 0.22);
       border-radius: var(--radius-sm);
       background: rgba(142, 108, 255, 0.06);
@@ -2337,7 +2392,23 @@
       white-space: nowrap;
     }
 
+    .bands-radar-signal-button {
+      appearance: none;
+      width: 100%;
+      min-height: 1.8rem;
+      padding: 0.34rem 0.48rem;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      line-height: inherit;
+      text-transform: inherit;
+      white-space: inherit;
+    }
+
     .bands-radar-empty {
+      padding: 0.34rem 0.48rem;
       color: rgba(247, 247, 242, 0.42);
       border-color: rgba(247, 247, 242, 0.1);
       background: rgba(247, 247, 242, 0.018);
@@ -4612,23 +4683,144 @@
           </button>
         </section>
 
-        <section class="music-nexus-shell" aria-labelledby="band-detail-title" aria-hidden="true" inert data-music-nexus-shell>
-          <article class="band-detail-screen" data-band-detail-placeholder>
+        <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
+          <header class="music-nexus-header">
+            <h3 class="music-nexus-title" id="music-nexus-title">MUSIC NEXUS</h3>
+            <p class="music-nexus-intro">
+              Welcome To The Music Nexus,<br>
+              home to the musical journey that I have had going since 2011
+            </p>
+          </header>
+
+          <div class="music-nexus-module-grid" role="group" aria-label="Music Nexus modules" data-music-nexus-selector>
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="true" data-music-nexus-card="bands">
+              <h4 class="music-nexus-card-title">Bands</h4>
+            </button>
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="shows">
+              <h4 class="music-nexus-card-title">Shows</h4>
+            </button>
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="people">
+              <h4 class="music-nexus-card-title">People</h4>
+            </button>
+            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="venues">
+              <h4 class="music-nexus-card-title">Venues</h4>
+            </button>
+          </div>
+
+          <section class="music-bands-index is-active" aria-labelledby="music-bands-index-title" aria-hidden="false" data-music-bands-index>
+            <header class="music-bands-header">
+              <div class="music-bands-title-row">
+                <h4 class="music-nexus-section-title" id="music-bands-index-title">BANDS INDEX</h4>
+                <div class="music-bands-mode-switch" role="tablist" aria-label="Bands Index view modes">
+                  <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">Radar</button>
+                  <button class="bands-index-mode-tab" id="bands-list-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-list-panel" data-bands-view-target="list">List</button>
+                  <button class="bands-index-mode-tab" id="bands-search-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-search-panel" data-bands-view-target="search">Search</button>
+                </div>
+              </div>
+              <div class="music-bands-status" aria-live="polite" data-bands-status>A lane active</div>
+            </header>
+
+            <div class="music-bands-view-stack">
+              <section class="bands-index-panel bands-index-panel--radar is-active" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
+                <div class="bands-radar-layout">
+                  <div class="bands-radar-core" aria-label="Alphabet radar display">
+                    <span class="bands-radar-sweep" aria-hidden="true"></span>
+                    <span class="bands-radar-points" aria-hidden="true" data-bands-radar-points></span>
+                    <div class="bands-radar-center">
+                      <span class="bands-radar-letter" data-bands-radar-letter>A</span>
+                      <span class="bands-radar-count" data-bands-radar-count>1 signal</span>
+                    </div>
+                  </div>
+                  <ul class="bands-radar-signal-list" aria-label="Active letter band signals" data-bands-radar-signals>
+                    <li class="bands-radar-signal">Astra Vale</li>
+                  </ul>
+                  <div class="bands-letter-nav" aria-label="Band alphabet radar navigation" data-bands-letter-nav></div>
+                </div>
+              </section>
+
+              <section class="bands-index-panel bands-index-panel--list" id="bands-list-panel" role="tabpanel" aria-labelledby="bands-list-tab" aria-hidden="true" inert data-bands-view="list">
+                <div class="bands-list-panel">
+                  <div class="bands-list-filter-bar" data-bands-list-filter-bar hidden>
+                    <div class="bands-radar-compact" aria-live="polite">
+                      <span class="bands-radar-compact-letter" data-bands-filter-letter>A</span>
+                      <span class="bands-radar-compact-copy" data-bands-filter-summary>A lane filtered</span>
+                    </div>
+                    <button class="bands-radar-back" type="button" data-bands-back-radar>Back to Radar</button>
+                  </div>
+                  <div class="bands-letter-nav" aria-label="Band alphabet list navigation" data-bands-letter-nav-list></div>
+                  <div class="bands-list-viewport" aria-label="Alphabetized bands archive list" data-bands-list></div>
+                  <div class="bands-empty-state" data-bands-empty>No matching bands indexed</div>
+                </div>
+              </section>
+
+              <section class="bands-index-panel bands-index-panel--search" id="bands-search-panel" role="tabpanel" aria-labelledby="bands-search-tab" aria-hidden="true" inert data-bands-view="search">
+                <div class="bands-search-panel">
+                  <label class="bands-search-field">
+                    <span class="bands-search-label">Archive Search</span>
+                    <input class="bands-search-input" type="search" autocomplete="off" placeholder="Search bands, tiers, status" data-bands-search-input>
+                  </label>
+                  <div class="bands-letter-nav" aria-label="Band alphabet search navigation" data-bands-letter-nav-search></div>
+
+                  <div class="bands-search-groups">
+                    <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
+                      <h5 class="bands-search-group-title" id="bands-recent-searches-title">Recent Searches</h5>
+                      <div class="bands-search-chip-row">
+                        <button class="bands-search-chip" type="button" data-bands-search-term="complete">Complete</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="regional">Regional</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="partial">Partial</button>
+                      </div>
+                    </section>
+
+                    <section class="bands-search-group" aria-labelledby="bands-search-categories-title">
+                      <h5 class="bands-search-group-title" id="bands-search-categories-title">Filters</h5>
+                      <div class="bands-search-chip-row">
+                        <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="needs work">Needs Work</button>
+                      </div>
+                    </section>
+
+                    <section class="bands-search-group" aria-labelledby="bands-search-results-title">
+                      <h5 class="bands-search-group-title" id="bands-search-results-title">Signals</h5>
+                      <div class="bands-search-summary" data-bands-search-summary>12 rows</div>
+                      <ul class="bands-search-results" data-bands-search-results></ul>
+                    </section>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="v3-card v3-card--spotlight music-nexus-activity" aria-labelledby="music-activity-title">
+            <h4 class="music-nexus-section-title" id="music-activity-title">Recent Music Activity</h4>
+            <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows" data-music-activity-list>
+              <li class="v3-card v3-card--activity music-activity-row">Latest bands placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">Featured artists placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">Band archive updates placeholder</li>
+              <li class="v3-card v3-card--activity music-activity-row">New music gallery placeholder</li>
+            </ul>
+          </section>
+
+          <button class="v3-card v3-card--mini v3-card--interactive music-nexus-back" type="button" data-music-nexus-back>
+            Back to Portfolio
+          </button>
+
+          <article class="band-detail-screen" aria-labelledby="band-detail-title" aria-hidden="true" inert data-band-detail-placeholder>
             <section class="band-detail-hero" aria-labelledby="band-detail-title">
               <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
                 <div class="band-detail-logo" aria-hidden="true">
-                  <span class="band-detail-logo-mark">AV</span>
-                  <span class="band-detail-logo-name">Astra Vale</span>
+                  <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
+                  <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
                 </div>
               </div>
 
               <div class="band-detail-copy">
                 <p class="band-detail-kicker">BAND</p>
-                <h3 class="band-detail-name" id="band-detail-title">Astra Vale</h3>
+                <h3 class="band-detail-name" id="band-detail-title" data-band-detail-name>Astra Vale</h3>
                 <div class="band-detail-tags" aria-label="Band archive tags">
-                  <span class="band-detail-tag">New England</span>
-                  <span class="band-detail-tag">Alt Rock</span>
-                  <span class="band-detail-tag band-detail-tag--active">Active</span>
+                  <span class="band-detail-tag" data-band-detail-region>New England</span>
+                  <span class="band-detail-tag">Music Archive</span>
+                  <span class="band-detail-tag band-detail-tag--active" data-band-detail-status>Active</span>
                 </div>
 
                 <div class="band-detail-meta" aria-label="Band detail metadata">
@@ -4656,15 +4848,15 @@
 
             <section class="band-detail-stats" aria-label="Band archive statistics">
               <article class="band-detail-stat">
-                <p class="band-detail-stat-value">18</p>
+                <p class="band-detail-stat-value" data-band-detail-sets>18</p>
                 <p class="band-detail-stat-label">SETS</p>
               </article>
               <article class="band-detail-stat">
-                <p class="band-detail-stat-value">24</p>
+                <p class="band-detail-stat-value" data-band-detail-total-sets>24</p>
                 <p class="band-detail-stat-label">TOTAL SETS</p>
               </article>
               <article class="band-detail-stat">
-                <p class="band-detail-stat-value">486</p>
+                <p class="band-detail-stat-value" data-band-detail-photos>486</p>
                 <p class="band-detail-stat-label">PHOTOS</p>
               </article>
               <article class="band-detail-stat">
@@ -4755,6 +4947,9 @@
                 </div>
               </div>
             </section>
+            <button class="v3-card v3-card--mini v3-card--interactive band-detail-back" type="button" data-band-detail-back>
+              Back to Bands Index
+            </button>
           </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
@@ -5007,6 +5202,7 @@
       const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
       const musicActivityList = document.querySelector("[data-music-activity-list]");
       const musicBandsIndex = document.querySelector("[data-music-bands-index]");
+      const musicNexusBack = document.querySelector("[data-music-nexus-back]");
       const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
       const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
       const bandsLetterNavs = document.querySelectorAll("[data-bands-letter-nav], [data-bands-letter-nav-list], [data-bands-letter-nav-search]");
@@ -5025,6 +5221,17 @@
       const bandsSearchResults = document.querySelector("[data-bands-search-results]");
       const bandsSearchSummary = document.querySelector("[data-bands-search-summary]");
       const bandsSearchChips = document.querySelectorAll("[data-bands-search-term]");
+      const bandDetail = document.querySelector("[data-band-detail-placeholder]");
+      const bandDetailBack = document.querySelector("[data-band-detail-back]");
+      const bandDetailPoster = document.querySelector(".band-detail-poster");
+      const bandDetailThumb = document.querySelector("[data-band-detail-thumb]");
+      const bandDetailLogoName = document.querySelector("[data-band-detail-logo-name]");
+      const bandDetailName = document.querySelector("[data-band-detail-name]");
+      const bandDetailRegion = document.querySelector("[data-band-detail-region]");
+      const bandDetailStatus = document.querySelector("[data-band-detail-status]");
+      const bandDetailSets = document.querySelector("[data-band-detail-sets]");
+      const bandDetailTotalSets = document.querySelector("[data-band-detail-total-sets]");
+      const bandDetailPhotos = document.querySelector("[data-band-detail-photos]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -5200,6 +5407,85 @@
         }
       }
 
+      function setBandDetailVisible(isVisible) {
+        if (!musicNexusShell || !bandDetail) {
+          return;
+        }
+
+        musicNexusShell.classList.toggle("is-band-detail", isVisible);
+        bandDetail.setAttribute("aria-hidden", String(!isVisible));
+        if (isVisible) {
+          bandDetail.removeAttribute("inert");
+        } else {
+          bandDetail.setAttribute("inert", "");
+        }
+      }
+
+      function showBandsIndexView(options = {}) {
+        setBandDetailVisible(false);
+        setBandsIndexVisible(true);
+        syncBandsIndex();
+        if (options.shouldScroll !== false && musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+        if (options.shouldFocus && musicBandsIndex) {
+          const activeTab = musicBandsIndex.querySelector("[data-bands-view-target][aria-selected='true']");
+          if (activeTab) {
+            activeTab.focus({ preventScroll: true });
+          }
+        }
+        if (options.shouldUpdateRail !== false) {
+          setCurrentView("Music Nexus");
+        }
+      }
+
+      function showBandDetail(band) {
+        if (!band || !bandDetail) {
+          return;
+        }
+
+        if (bandDetailPoster) {
+          bandDetailPoster.setAttribute("aria-label", `${band.name} placeholder band poster`);
+        }
+        if (bandDetailThumb) {
+          bandDetailThumb.textContent = band.thumb || band.name.slice(0, 2).toUpperCase();
+        }
+        if (bandDetailLogoName) {
+          bandDetailLogoName.textContent = band.name;
+        }
+        if (bandDetailName) {
+          bandDetailName.textContent = band.name;
+        }
+        if (bandDetailRegion) {
+          bandDetailRegion.textContent = band.region;
+        }
+        if (bandDetailStatus) {
+          bandDetailStatus.textContent = band.status;
+        }
+        if (bandDetailSets) {
+          bandDetailSets.textContent = String(band.albums);
+        }
+        if (bandDetailTotalSets) {
+          bandDetailTotalSets.textContent = String(band.albums + 4);
+        }
+        if (bandDetailPhotos) {
+          bandDetailPhotos.textContent = String(band.albums * 36);
+        }
+
+        setBandsIndexVisible(false);
+        setBandDetailVisible(true);
+        setCurrentView("Band Detail");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
       function renderBandsLetterNavs(rows) {
         if (bandsLetterNavs.length === 0) {
           return;
@@ -5250,7 +5536,15 @@
             activeRows.slice(0, 4).forEach((band) => {
               const item = document.createElement("li");
               item.className = "bands-radar-signal";
-              item.textContent = band.name;
+              const button = document.createElement("button");
+              button.className = "bands-radar-signal-button";
+              button.type = "button";
+              button.textContent = band.name;
+              button.setAttribute("aria-label", `Open ${band.name} band detail`);
+              button.addEventListener("click", () => {
+                showBandDetail(band);
+              });
+              item.append(button);
               fragment.append(item);
             });
           }
@@ -5277,7 +5571,7 @@
         row.className = `bands-list-row${letter === activeBandsLetter ? " is-letter-active" : ""}`;
         row.type = "button";
         row.dataset.bandLetter = letter;
-        row.setAttribute("aria-label", `${band.name}, ${band.region}, ${band.status}, ${band.albums} Albums`);
+        row.setAttribute("aria-label", `Open ${band.name} band detail, ${band.region}, ${band.status}, ${band.albums} Albums`);
 
         const thumb = document.createElement("span");
         thumb.className = "bands-row-thumb";
@@ -5315,13 +5609,8 @@
         main.append(name, meta);
         row.append(thumb, main, arrow);
         row.addEventListener("click", () => {
-          if (options.skipLetterFilter) {
-            activeBandsLetter = letter;
-            syncBandsIndex();
-            return;
-          }
-
-          setBandsLetter(letter, { shouldFilterList: true });
+          activeBandsLetter = letter;
+          showBandDetail(band);
         });
 
         return row;
@@ -5526,6 +5815,7 @@
           return;
         }
 
+        setBandDetailVisible(false);
         let activeCardLabel = "";
         musicNexusCards.forEach((card) => {
           const isActive = card.dataset.musicNexusCard === sectionName;
@@ -5716,7 +6006,8 @@
         }
         setHubChromeHidden(true);
         setMusicNexusContext("bands", false, false);
-        setCurrentView("Band Detail");
+        showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
+        setCurrentView("Music Nexus");
         setActiveGlobalNav("portfolio");
         if (startButton) {
           startButton.disabled = true;
@@ -6181,6 +6472,14 @@
         }
         if (ringArchiveBack) {
           ringArchiveBack.addEventListener("click", revealHub);
+        }
+        if (musicNexusBack) {
+          musicNexusBack.addEventListener("click", revealHub);
+        }
+        if (bandDetailBack) {
+          bandDetailBack.addEventListener("click", () => {
+            showBandsIndexView({ shouldFocus: true });
+          });
         }
         musicNexusCards.forEach((card) => {
           card.addEventListener("click", () => {
