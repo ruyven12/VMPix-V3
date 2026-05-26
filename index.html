@@ -1522,6 +1522,7 @@
     .sets-archive-stats,
     .sets-year-timeline,
     .sets-featured-panel,
+    .set-detail-placeholder,
     .sets-list-panel {
       position: relative;
       z-index: 1;
@@ -1881,7 +1882,8 @@
     }
 
     .sets-archive-back,
-    .sets-featured-open {
+    .sets-featured-open,
+    .set-detail-close {
       appearance: none;
       min-height: 2.55rem;
       padding: 0.58rem 0.72rem;
@@ -1899,6 +1901,7 @@
 
     .sets-archive-back:focus-visible,
     .sets-featured-open:focus-visible,
+    .set-detail-close:focus-visible,
     .sets-year-card:focus-visible,
     .sets-list-row:focus-visible {
       outline: 2px solid rgba(247, 247, 242, 0.82);
@@ -1921,6 +1924,11 @@
     .sets-featured-title,
     .sets-featured-meta-label,
     .sets-featured-meta-value,
+    .set-detail-kicker,
+    .set-detail-title,
+    .set-detail-copy,
+    .set-detail-stat-label,
+    .set-detail-stat-value,
     .sets-list-date,
     .sets-list-title,
     .sets-list-location,
@@ -2023,6 +2031,11 @@
       text-align: left;
       text-transform: uppercase;
       scroll-snap-align: start;
+      transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
     }
 
     .sets-year-card[aria-pressed="true"] {
@@ -2055,6 +2068,7 @@
         linear-gradient(135deg, rgba(142, 108, 255, 0.085), transparent 66%),
         rgba(3, 3, 6, 0.42);
       overflow: hidden;
+      transition: border-color 180ms ease, background-color 180ms ease;
     }
 
     .sets-featured-image,
@@ -2064,7 +2078,7 @@
       border: 1px solid rgba(247, 247, 242, 0.11);
       border-radius: var(--radius-sm);
       background:
-        radial-gradient(circle at 50% 42%, rgba(142, 108, 255, 0.2), transparent 58%),
+        radial-gradient(circle at var(--set-image-x, 50%) var(--set-image-y, 42%), var(--set-image-accent, rgba(142, 108, 255, 0.2)), transparent 58%),
         linear-gradient(135deg, rgba(247, 247, 242, 0.06), transparent 62%),
         rgba(1, 1, 3, 0.44);
       color: rgba(247, 247, 242, 0.74);
@@ -2075,11 +2089,17 @@
       min-height: clamp(11.5rem, 48vw, 18rem);
       overflow: hidden;
       box-shadow: inset 0 0 1.35rem rgba(0, 0, 0, 0.42);
+      transition:
+        border-color 180ms ease,
+        background 220ms ease,
+        box-shadow 180ms ease;
     }
 
     .sets-featured-image span {
+      max-width: 88%;
       font-size: clamp(2.4rem, 14vw, 5rem);
       line-height: 1;
+      text-align: center;
     }
 
     .sets-featured-copy {
@@ -2139,6 +2159,90 @@
       margin-top: 0.08rem;
     }
 
+    .set-detail-placeholder {
+      display: none;
+      gap: clamp(0.58rem, 2vw, 0.82rem);
+      padding: clamp(0.68rem, 2.6vw, 0.92rem);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 62%),
+        linear-gradient(135deg, rgba(142, 108, 255, 0.065), transparent 68%),
+        rgba(3, 3, 6, 0.38);
+    }
+
+    .set-detail-placeholder.is-active {
+      display: grid;
+    }
+
+    .set-detail-header {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.72rem;
+      min-width: 0;
+    }
+
+    .set-detail-heading {
+      min-width: 0;
+      display: grid;
+      gap: 0.26rem;
+    }
+
+    .set-detail-kicker {
+      color: rgba(142, 108, 255, 0.68);
+      font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-detail-title {
+      color: rgba(247, 247, 242, 0.9);
+      font-size: clamp(0.98rem, 4.5vw, 1.34rem);
+      font-weight: 400;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .set-detail-copy {
+      color: rgba(247, 247, 242, 0.58);
+      font-size: clamp(0.66rem, 2.6vw, 0.78rem);
+      line-height: 1.28;
+      text-transform: uppercase;
+    }
+
+    .set-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(0.34rem, 1.5vw, 0.48rem);
+    }
+
+    .set-detail-stat {
+      min-width: 0;
+      display: grid;
+      gap: 0.26rem;
+      padding: clamp(0.48rem, 1.8vw, 0.62rem);
+      border: 1px solid rgba(247, 247, 242, 0.07);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.24);
+    }
+
+    .set-detail-stat-label {
+      color: rgba(247, 247, 242, 0.42);
+      font-size: clamp(0.54rem, 2.15vw, 0.64rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .set-detail-stat-value {
+      color: rgba(247, 247, 242, 0.76);
+      font-size: clamp(0.68rem, 2.6vw, 0.82rem);
+      line-height: 1.1;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
     .sets-list-panel {
       display: grid;
       gap: 0.56rem;
@@ -2188,6 +2292,7 @@
       scrollbar-color: rgba(142, 108, 255, 0.34) rgba(247, 247, 242, 0.07);
       scrollbar-width: thin;
       -webkit-overflow-scrolling: touch;
+      min-height: min(38svh, 20rem);
     }
 
     .sets-list::-webkit-scrollbar {
@@ -2220,6 +2325,10 @@
       font: inherit;
       text-align: left;
       touch-action: manipulation;
+      transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease;
     }
 
     .sets-list-row.is-active {
@@ -4607,6 +4716,7 @@
       .band-detail-panel,
       .band-detail-activity,
       .sets-featured-panel,
+      .set-detail-placeholder,
       .sets-list-panel {
         padding: 0.58rem;
       }
@@ -4649,6 +4759,10 @@
       .sets-list-row {
         gap: 0.42rem;
         padding: 0.42rem;
+      }
+
+      .set-detail-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .sets-row-thumb {
@@ -4835,6 +4949,10 @@
 
       .sets-featured-image {
         min-height: 10.5rem;
+      }
+
+      .set-detail-header {
+        display: grid;
       }
 
       .sets-list {
@@ -5587,9 +5705,48 @@
                     <p class="sets-featured-meta-value" data-sets-featured-complete>84%</p>
                   </div>
                 </div>
-                <button class="v3-card v3-card--mini v3-card--interactive sets-featured-open" type="button">
+                <button class="v3-card v3-card--mini v3-card--interactive sets-featured-open" type="button" aria-controls="set-detail-placeholder" aria-expanded="false" data-sets-open-set>
                   OPEN SET
                 </button>
+              </div>
+            </section>
+
+            <section class="set-detail-placeholder" id="set-detail-placeholder" aria-labelledby="set-detail-title" aria-hidden="true" inert data-set-detail-placeholder>
+              <div class="set-detail-header">
+                <div class="set-detail-heading">
+                  <p class="set-detail-kicker" data-set-detail-band>Astra Vale</p>
+                  <h4 class="set-detail-title" id="set-detail-title" data-set-detail-title>Winter Hall Session</h4>
+                </div>
+                <button class="v3-card v3-card--mini v3-card--interactive set-detail-close" type="button" data-set-detail-close>
+                  Close
+                </button>
+              </div>
+              <p class="set-detail-copy" data-set-detail-copy>SET DETAIL HOLDING STATE</p>
+              <div class="set-detail-grid" aria-label="Selected set detail metadata">
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">Date</p>
+                  <p class="set-detail-stat-value" data-set-detail-date>JAN 18, 2026</p>
+                </div>
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">Location</p>
+                  <p class="set-detail-stat-value" data-set-detail-location>Portland, Maine</p>
+                </div>
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">Photos</p>
+                  <p class="set-detail-stat-value" data-set-detail-photos>64</p>
+                </div>
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">Contributors</p>
+                  <p class="set-detail-stat-value" data-set-detail-contributors>3</p>
+                </div>
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">Completion</p>
+                  <p class="set-detail-stat-value" data-set-detail-complete>84%</p>
+                </div>
+                <div class="set-detail-stat">
+                  <p class="set-detail-stat-label">State</p>
+                  <p class="set-detail-stat-value">Preview Locked</p>
+                </div>
               </div>
             </section>
 
@@ -6041,6 +6198,17 @@
       const setsFeaturedPhotos = document.querySelector("[data-sets-featured-photos]");
       const setsFeaturedContributors = document.querySelector("[data-sets-featured-contributors]");
       const setsFeaturedComplete = document.querySelector("[data-sets-featured-complete]");
+      const setsFeaturedOpen = document.querySelector("[data-sets-open-set]");
+      const setDetailPlaceholder = document.querySelector("[data-set-detail-placeholder]");
+      const setDetailClose = document.querySelector("[data-set-detail-close]");
+      const setDetailBand = document.querySelector("[data-set-detail-band]");
+      const setDetailTitle = document.querySelector("[data-set-detail-title]");
+      const setDetailCopy = document.querySelector("[data-set-detail-copy]");
+      const setDetailDate = document.querySelector("[data-set-detail-date]");
+      const setDetailLocation = document.querySelector("[data-set-detail-location]");
+      const setDetailPhotos = document.querySelector("[data-set-detail-photos]");
+      const setDetailContributors = document.querySelector("[data-set-detail-contributors]");
+      const setDetailComplete = document.querySelector("[data-set-detail-complete]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -6055,6 +6223,15 @@
       let activeBandsFilterLetter = "";
       let bandsSearchTerm = "";
       let activeMusicBand = null;
+      let activeSetRow = null;
+      let isSetDetailOpen = false;
+
+      const setImageAccents = [
+        { x: "42%", y: "38%", color: "rgba(142, 108, 255, 0.24)" },
+        { x: "58%", y: "36%", color: "rgba(78, 184, 255, 0.2)" },
+        { x: "48%", y: "54%", color: "rgba(255, 186, 108, 0.18)" },
+        { x: "62%", y: "48%", color: "rgba(119, 255, 207, 0.16)" },
+      ];
 
       const spotlightContent = {
         music: {
@@ -6240,6 +6417,9 @@
         }
 
         musicNexusShell.classList.toggle("is-sets-archive", isVisible);
+        if (!isVisible) {
+          setSetDetailVisible(false);
+        }
         setsArchive.setAttribute("aria-hidden", String(!isVisible));
         if (isVisible) {
           setsArchive.removeAttribute("inert");
@@ -6315,21 +6495,118 @@
         }
       }
 
+      function getSetImageLabel(row) {
+        if (!row) {
+          return activeMusicBand ? activeMusicBand.thumb : "SET";
+        }
+
+        const dateCode = (row.dataset.setDate || "").replace(/,.*/, "");
+        return dateCode || row.dataset.setThumb || (activeMusicBand ? activeMusicBand.thumb : "SET");
+      }
+
+      function getSetImageAccent(row) {
+        const key = `${row ? row.dataset.setDate : ""}${row ? row.dataset.setTitle : ""}`;
+        const checksum = Array.from(key).reduce((total, character) => total + character.charCodeAt(0), 0);
+        return setImageAccents[checksum % setImageAccents.length];
+      }
+
+      function updateSetDetailFromRow(row) {
+        if (!row) {
+          return;
+        }
+
+        const setData = row.dataset;
+        if (setDetailBand) {
+          setDetailBand.textContent = activeMusicBand ? activeMusicBand.name : "Band Detail";
+        }
+        if (setDetailTitle) {
+          setDetailTitle.textContent = setData.setTitle || "";
+        }
+        if (setDetailCopy) {
+          setDetailCopy.textContent = `${getSetImageLabel(row)} / SET DETAIL HOLDING STATE`;
+        }
+        if (setDetailDate) {
+          setDetailDate.textContent = setData.setDate || "";
+        }
+        if (setDetailLocation) {
+          setDetailLocation.textContent = setData.setLocation || "";
+        }
+        if (setDetailPhotos) {
+          setDetailPhotos.textContent = setData.setPhotos || "";
+        }
+        if (setDetailContributors) {
+          setDetailContributors.textContent = setData.setContributors || "";
+        }
+        if (setDetailComplete) {
+          setDetailComplete.textContent = setData.setComplete || "";
+        }
+      }
+
+      function setSetDetailVisible(isVisible) {
+        isSetDetailOpen = isVisible;
+        if (!setDetailPlaceholder) {
+          return;
+        }
+
+        setDetailPlaceholder.classList.toggle("is-active", isVisible);
+        setDetailPlaceholder.setAttribute("aria-hidden", String(!isVisible));
+        if (isVisible) {
+          setDetailPlaceholder.removeAttribute("inert");
+        } else {
+          setDetailPlaceholder.setAttribute("inert", "");
+        }
+        if (setsFeaturedOpen) {
+          setsFeaturedOpen.setAttribute("aria-expanded", String(isVisible));
+        }
+      }
+
+      function openSelectedSetDetail() {
+        const firstVisibleRow = Array.from(setsRows).find((candidate) => {
+          const item = candidate.closest("li");
+          return !item || !item.hidden;
+        });
+        const row = activeSetRow || firstVisibleRow || setsRows[0];
+        if (!row) {
+          return;
+        }
+
+        updateSetsFeaturedFromRow(row);
+        updateSetDetailFromRow(row);
+        setSetDetailVisible(true);
+        if (setDetailClose) {
+          setDetailClose.focus({ preventScroll: true });
+        }
+      }
+
+      function closeSelectedSetDetail() {
+        setSetDetailVisible(false);
+        if (setsFeaturedOpen) {
+          setsFeaturedOpen.focus({ preventScroll: true });
+        }
+      }
+
       function updateSetsFeaturedFromRow(row) {
         if (!row) {
           return;
         }
 
+        activeSetRow = row;
         setsRows.forEach((candidate) => {
-          candidate.classList.toggle("is-active", candidate === row);
+          const isActive = candidate === row;
+          candidate.classList.toggle("is-active", isActive);
+          candidate.setAttribute("aria-pressed", String(isActive));
         });
 
         const setData = row.dataset;
+        const imageAccent = getSetImageAccent(row);
         if (setsFeaturedImage) {
           setsFeaturedImage.setAttribute("aria-label", `${setData.setTitle} placeholder featured set image`);
+          setsFeaturedImage.style.setProperty("--set-image-x", imageAccent.x);
+          setsFeaturedImage.style.setProperty("--set-image-y", imageAccent.y);
+          setsFeaturedImage.style.setProperty("--set-image-accent", imageAccent.color);
         }
         if (setsFeaturedThumb) {
-          setsFeaturedThumb.textContent = setData.setThumb || (activeMusicBand ? activeMusicBand.thumb : "SET");
+          setsFeaturedThumb.textContent = getSetImageLabel(row);
         }
         if (setsFeaturedDate) {
           setsFeaturedDate.textContent = setData.setDate || "";
@@ -6349,6 +6626,9 @@
         if (setsFeaturedComplete) {
           setsFeaturedComplete.textContent = setData.setComplete || "";
         }
+        if (isSetDetailOpen) {
+          updateSetDetailFromRow(row);
+        }
       }
 
       function setSetsYear(year, options = {}) {
@@ -6358,6 +6638,13 @@
           const isActive = button.dataset.setsYear === year;
           button.classList.toggle("is-active", isActive);
           button.setAttribute("aria-pressed", String(isActive));
+          if (isActive && options.shouldCenterYear) {
+            button.scrollIntoView({
+              block: "nearest",
+              inline: "center",
+              behavior: reducedMotion.matches ? "auto" : "smooth",
+            });
+          }
         });
 
         setsRows.forEach((row) => {
@@ -6402,6 +6689,7 @@
         setBandsIndexVisible(false);
         setBandDetailVisible(false);
         setSetsArchiveVisible(true);
+        setSetDetailVisible(false);
         setSetsYear("2026");
         setCurrentView("SETS 13 HIGH");
         if (musicNexusShell) {
@@ -6419,6 +6707,7 @@
         }
 
         setSetsArchiveVisible(false);
+        setSetDetailVisible(false);
         setBandDetailVisible(true);
         setCurrentView("Band Detail");
         if (musicNexusShell) {
@@ -7431,9 +7720,15 @@
         if (setsArchiveBack) {
           setsArchiveBack.addEventListener("click", returnToBandDetailFromSets);
         }
+        if (setsFeaturedOpen) {
+          setsFeaturedOpen.addEventListener("click", openSelectedSetDetail);
+        }
+        if (setDetailClose) {
+          setDetailClose.addEventListener("click", closeSelectedSetDetail);
+        }
         setsYearButtons.forEach((button) => {
           button.addEventListener("click", () => {
-            setSetsYear(button.dataset.setsYear);
+            setSetsYear(button.dataset.setsYear, { shouldCenterYear: true });
           });
         });
         setsRows.forEach((row) => {
