@@ -2455,7 +2455,7 @@
     .set-gallery-screen {
       display: none;
       align-content: start;
-      gap: clamp(0.82rem, 2.3svh, 1.16rem);
+      gap: clamp(0.86rem, 2.35svh, 1.18rem);
     }
 
     .set-gallery-header {
@@ -2469,7 +2469,9 @@
     .set-gallery-back {
       width: 2.65rem;
       padding-inline: 0.4rem;
-      color: rgba(255, 118, 102, 0.84);
+      border-color: rgba(255, 118, 102, 0.18);
+      background: rgba(255, 82, 72, 0.04);
+      color: rgba(255, 136, 122, 0.78);
       font-size: clamp(0.78rem, 3vw, 0.94rem);
     }
 
@@ -2490,7 +2492,7 @@
     }
 
     .set-gallery-label {
-      color: rgba(255, 118, 102, 0.72);
+      color: rgba(255, 118, 102, 0.64);
       font-size: clamp(0.62rem, 2.45vw, 0.74rem);
       font-weight: 400;
       line-height: 1;
@@ -2499,14 +2501,14 @@
 
     .set-gallery-hero {
       display: grid;
-      gap: clamp(0.78rem, 2.8vw, 1.08rem);
-      padding: clamp(0.78rem, 2.8vw, 1.08rem);
-      border: 1px solid rgba(247, 247, 242, 0.08);
+      gap: clamp(0.84rem, 2.9vw, 1.12rem);
+      padding: clamp(0.82rem, 2.9vw, 1.12rem);
+      border: 1px solid rgba(247, 247, 242, 0.065);
       border-radius: var(--v3-card-radius-feature);
       background:
-        linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 58%),
-        linear-gradient(135deg, rgba(255, 69, 58, 0.07), transparent 70%),
-        rgba(3, 3, 6, 0.38);
+        linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 60%),
+        linear-gradient(135deg, rgba(255, 69, 58, 0.045), transparent 72%),
+        rgba(3, 3, 6, 0.34);
       overflow: hidden;
     }
 
@@ -2514,20 +2516,20 @@
     .set-gallery-photo-tile {
       display: grid;
       place-items: center;
-      border: 1px solid rgba(247, 247, 242, 0.08);
+      border: 1px solid rgba(247, 247, 242, 0.06);
       border-radius: var(--radius-sm);
       background:
-        radial-gradient(circle at var(--set-image-x, 52%) var(--set-image-y, 42%), var(--set-image-accent, rgba(255, 82, 72, 0.16)), transparent 58%),
-        linear-gradient(135deg, rgba(247, 247, 242, 0.055), transparent 64%),
-        rgba(1, 1, 3, 0.46);
-      color: rgba(247, 247, 242, 0.7);
+        radial-gradient(circle at var(--set-image-x, 52%) var(--set-image-y, 42%), var(--set-image-accent, rgba(255, 82, 72, 0.13)), transparent 60%),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.045), transparent 64%),
+        rgba(1, 1, 3, 0.42);
+      color: rgba(247, 247, 242, 0.66);
       text-transform: uppercase;
     }
 
     .set-gallery-hero-image {
       min-height: clamp(13rem, 52vw, 20rem);
       overflow: hidden;
-      box-shadow: inset 0 0 1.12rem rgba(0, 0, 0, 0.42);
+      box-shadow: inset 0 0 1rem rgba(0, 0, 0, 0.4);
     }
 
     .set-gallery-hero-image span {
@@ -2545,7 +2547,7 @@
     }
 
     .set-gallery-date {
-      color: rgba(255, 118, 102, 0.72);
+      color: rgba(255, 118, 102, 0.68);
       font-size: clamp(0.62rem, 2.45vw, 0.74rem);
       line-height: 1;
       text-transform: uppercase;
@@ -2563,7 +2565,7 @@
 
     .set-gallery-facts {
       display: grid;
-      gap: 0.42rem;
+      gap: 0.46rem;
     }
 
     .set-gallery-fact {
@@ -2592,29 +2594,29 @@
     .set-gallery-meta-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(0.52rem, 2vw, 0.72rem);
+      gap: clamp(0.56rem, 2vw, 0.76rem);
     }
 
     .set-gallery-meta-card {
       min-width: 0;
       display: grid;
-      gap: 0.34rem;
-      padding: clamp(0.64rem, 2.2vw, 0.82rem);
-      border: 1px solid rgba(247, 247, 242, 0.06);
+      gap: 0.32rem;
+      padding: clamp(0.58rem, 2vw, 0.76rem);
+      border: 1px solid rgba(247, 247, 242, 0.045);
       border-radius: var(--radius-sm);
-      background: rgba(1, 1, 3, 0.24);
+      background: rgba(1, 1, 3, 0.18);
     }
 
     .set-gallery-meta-label {
-      color: rgba(255, 118, 102, 0.6);
+      color: rgba(255, 118, 102, 0.5);
       font-size: clamp(0.56rem, 2.25vw, 0.66rem);
       line-height: 1;
       text-transform: uppercase;
     }
 
     .set-gallery-meta-value {
-      color: rgba(247, 247, 242, 0.72);
-      font-size: clamp(0.66rem, 2.55vw, 0.8rem);
+      color: rgba(247, 247, 242, 0.6);
+      font-size: clamp(0.62rem, 2.45vw, 0.76rem);
       line-height: 1.24;
       overflow-wrap: anywhere;
       text-transform: uppercase;
@@ -2622,13 +2624,13 @@
 
     .set-gallery-highlights {
       display: grid;
-      gap: clamp(0.64rem, 2.2vw, 0.86rem);
-      padding: clamp(0.74rem, 2.6vw, 1rem);
-      border: 1px solid rgba(247, 247, 242, 0.075);
+      gap: clamp(0.72rem, 2.35vw, 0.96rem);
+      padding: clamp(0.78rem, 2.7vw, 1.04rem);
+      border: 1px solid rgba(247, 247, 242, 0.06);
       border-radius: var(--v3-card-radius-feature);
       background:
-        linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 62%),
-        rgba(3, 3, 6, 0.32);
+        linear-gradient(180deg, rgba(247, 247, 242, 0.022), transparent 64%),
+        rgba(3, 3, 6, 0.28);
     }
 
     .set-gallery-highlights-head {
@@ -2665,9 +2667,9 @@
       align-items: center;
       gap: 0.24rem;
       padding: 0.22rem;
-      border: 1px solid rgba(247, 247, 242, 0.06);
+      border: 1px solid rgba(247, 247, 242, 0.045);
       border-radius: var(--radius-sm);
-      background: rgba(1, 1, 3, 0.24);
+      background: rgba(1, 1, 3, 0.18);
     }
 
     .set-gallery-toggle-option {
@@ -2683,19 +2685,19 @@
     }
 
     .set-gallery-toggle-option.is-active {
-      background: rgba(255, 82, 72, 0.08);
-      color: rgba(247, 247, 242, 0.72);
+      background: rgba(255, 82, 72, 0.06);
+      color: rgba(247, 247, 242, 0.68);
     }
 
     .set-gallery-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(0.5rem, 2vw, 0.72rem);
+      gap: clamp(0.62rem, 2.15vw, 0.84rem);
     }
 
     .set-gallery-photo-tile {
       appearance: none;
-      min-height: clamp(7.6rem, 34vw, 13.5rem);
+      min-height: clamp(8rem, 34vw, 13.75rem);
       aspect-ratio: 4 / 3;
       cursor: pointer;
       font: inherit;
@@ -2714,22 +2716,24 @@
       position: absolute;
       inset: auto 0 0;
       height: 0.14rem;
-      background: rgba(255, 82, 72, 0.58);
+      background: rgba(255, 104, 92, 0.62);
       opacity: 0;
       transition: opacity 180ms ease;
     }
 
     .set-gallery-photo-tile:hover,
     .set-gallery-photo-tile.is-active {
-      border-color: rgba(255, 82, 72, 0.34);
+      border-color: rgba(255, 104, 92, 0.34);
       background:
-        radial-gradient(circle at var(--set-image-x, 52%) var(--set-image-y, 42%), var(--set-image-accent, rgba(255, 82, 72, 0.18)), transparent 58%),
-        linear-gradient(135deg, rgba(247, 247, 242, 0.065), transparent 64%),
-        rgba(1, 1, 3, 0.52);
+        radial-gradient(circle at var(--set-image-x, 52%) var(--set-image-y, 42%), var(--set-image-accent, rgba(255, 82, 72, 0.16)), transparent 60%),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.055), transparent 64%),
+        rgba(1, 1, 3, 0.48);
     }
 
     .set-gallery-photo-tile.is-active {
-      box-shadow: inset 0 0 0 1px rgba(255, 82, 72, 0.08);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 104, 92, 0.08),
+        0 0 0.7rem rgba(255, 82, 72, 0.055);
     }
 
     .set-gallery-photo-tile.is-active::before {
@@ -2749,21 +2753,25 @@
     }
 
     .set-gallery-photo-label {
-      color: rgba(247, 247, 242, 0.62);
+      color: rgba(247, 247, 242, 0.54);
       font-size: clamp(0.68rem, 2.7vw, 0.84rem);
       line-height: 1;
       text-transform: uppercase;
     }
 
+    .set-gallery-photo-tile.is-active .set-gallery-photo-label {
+      color: rgba(247, 247, 242, 0.76);
+    }
+
     .set-gallery-lightbox-prep {
       display: none;
-      gap: 0.34rem;
-      padding: clamp(0.62rem, 2.2vw, 0.82rem);
-      border: 1px solid rgba(255, 82, 72, 0.14);
+      gap: 0.32rem;
+      padding: clamp(0.58rem, 2vw, 0.78rem);
+      border: 1px solid rgba(255, 82, 72, 0.1);
       border-radius: var(--radius-sm);
       background:
-        linear-gradient(180deg, rgba(255, 82, 72, 0.05), transparent 70%),
-        rgba(1, 1, 3, 0.28);
+        linear-gradient(180deg, rgba(255, 82, 72, 0.032), transparent 72%),
+        rgba(1, 1, 3, 0.22);
     }
 
     .set-gallery-lightbox-prep.is-active {
@@ -2771,14 +2779,14 @@
     }
 
     .set-gallery-lightbox-kicker {
-      color: rgba(255, 118, 102, 0.7);
+      color: rgba(255, 118, 102, 0.62);
       font-size: clamp(0.56rem, 2.2vw, 0.66rem);
       line-height: 1;
       text-transform: uppercase;
     }
 
     .set-gallery-lightbox-title {
-      color: rgba(247, 247, 242, 0.82);
+      color: rgba(247, 247, 242, 0.76);
       font-size: clamp(0.78rem, 3vw, 0.94rem);
       font-weight: 400;
       line-height: 1.08;
@@ -2786,7 +2794,7 @@
     }
 
     .set-gallery-lightbox-copy {
-      color: rgba(247, 247, 242, 0.48);
+      color: rgba(247, 247, 242, 0.42);
       font-size: clamp(0.62rem, 2.45vw, 0.74rem);
       line-height: 1.25;
       text-transform: uppercase;
@@ -2794,33 +2802,33 @@
 
     .set-gallery-view-all {
       justify-self: center;
-      width: min(100%, 22rem);
-      min-height: 3.2rem;
-      border-color: rgba(255, 82, 72, 0.32);
+      width: min(100%, 21rem);
+      min-height: 3.12rem;
+      border-color: rgba(255, 82, 72, 0.26);
       background:
-        linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 62%),
-        rgba(255, 82, 72, 0.095);
-      color: rgba(247, 247, 242, 0.86);
+        linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 64%),
+        rgba(255, 82, 72, 0.08);
+      color: rgba(247, 247, 242, 0.82);
       font-size: clamp(0.72rem, 2.7vw, 0.84rem);
     }
 
     .set-gallery-view-all[aria-expanded="true"] {
-      border-color: rgba(255, 82, 72, 0.42);
+      border-color: rgba(255, 82, 72, 0.34);
       background:
-        linear-gradient(180deg, rgba(247, 247, 242, 0.052), transparent 62%),
-        rgba(255, 82, 72, 0.13);
+        linear-gradient(180deg, rgba(247, 247, 242, 0.044), transparent 64%),
+        rgba(255, 82, 72, 0.105);
     }
 
     .site-shell.is-set-gallery-view .universal-bottom-rail {
-      border-top-color: rgba(255, 82, 72, 0.16);
+      border-top-color: rgba(255, 82, 72, 0.11);
       background:
-        linear-gradient(180deg, rgba(255, 82, 72, 0.045), transparent 72%),
-        rgba(2, 2, 3, 0.42);
+        linear-gradient(180deg, rgba(255, 82, 72, 0.028), transparent 74%),
+        rgba(2, 2, 3, 0.36);
     }
 
     .site-shell.is-set-gallery-view .rail-brand {
       color: rgba(247, 247, 242, 0.74);
-      text-shadow: 0 0 0.55rem rgba(255, 82, 72, 0.1);
+      text-shadow: 0 0 0.46rem rgba(255, 82, 72, 0.075);
     }
 
     .band-detail-members {
@@ -5144,7 +5152,7 @@
       }
 
       .set-gallery-screen {
-        gap: 0.66rem;
+        gap: 0.7rem;
       }
 
       .band-detail-hero,
@@ -5155,7 +5163,7 @@
       .sets-list-panel,
       .set-gallery-hero,
       .set-gallery-highlights {
-        padding: 0.58rem;
+        padding: 0.62rem;
       }
 
       .band-detail-poster {
@@ -5206,6 +5214,10 @@
       .set-gallery-meta-row,
       .set-gallery-grid {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .set-gallery-photo-tile {
+        min-height: clamp(8.4rem, 44vw, 10.5rem);
       }
 
       .sets-row-thumb {
@@ -5407,10 +5419,27 @@
       .set-gallery-highlights-head {
         display: grid;
         align-items: start;
+        gap: 0.52rem;
       }
 
       .set-gallery-meta-row {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .set-gallery-meta-card {
+        padding: 0.58rem;
+      }
+
+      .set-gallery-grid {
+        gap: 0.58rem;
+      }
+
+      .set-gallery-photo-tile {
+        min-height: clamp(7.8rem, 36vw, 10.75rem);
+      }
+
+      .set-gallery-view-all {
+        min-height: 3rem;
       }
 
       .sets-list {
