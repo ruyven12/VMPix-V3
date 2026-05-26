@@ -1525,7 +1525,7 @@
     .band-detail-screen {
       display: none;
       align-content: start;
-      gap: clamp(0.68rem, 2svh, 0.96rem);
+      gap: clamp(0.72rem, 2.1svh, 1.05rem);
     }
 
     .music-nexus-shell.is-band-detail .band-detail-screen {
@@ -1542,8 +1542,9 @@
 
     .band-detail-hero {
       display: grid;
-      gap: clamp(0.72rem, 2.6vw, 1rem);
-      padding: clamp(0.7rem, 3vw, 1rem);
+      align-items: stretch;
+      gap: clamp(0.78rem, 2.8vw, 1.08rem);
+      padding: clamp(0.74rem, 3vw, 1.08rem);
       border: var(--v3-card-border-strong);
       border-radius: var(--v3-card-radius-feature);
       background:
@@ -1564,7 +1565,9 @@
     }
 
     .band-detail-poster {
-      aspect-ratio: 1 / 1.08;
+      width: min(100%, 18.75rem);
+      aspect-ratio: 1 / 0.92;
+      justify-self: center;
       display: grid;
       place-items: center;
       border: 1px solid rgba(247, 247, 242, 0.13);
@@ -1632,7 +1635,7 @@
     .band-detail-copy {
       display: grid;
       align-content: center;
-      gap: clamp(0.56rem, 1.7svh, 0.78rem);
+      gap: clamp(0.62rem, 1.8svh, 0.86rem);
     }
 
     .band-detail-kicker,
@@ -1698,7 +1701,7 @@
 
     .band-detail-meta {
       display: grid;
-      gap: 0.34rem;
+      gap: 0.42rem;
     }
 
     .band-detail-meta-row,
@@ -1732,8 +1735,8 @@
 
     .band-detail-completion {
       display: grid;
-      gap: 0.36rem;
-      margin-top: 0.08rem;
+      gap: 0.42rem;
+      margin-top: 0.1rem;
     }
 
     .band-detail-progress {
@@ -1757,8 +1760,8 @@
     .band-detail-stats {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0.34rem;
-      padding: 0.4rem;
+      gap: clamp(0.3rem, 1.4vw, 0.42rem);
+      padding: clamp(0.36rem, 1.8vw, 0.46rem);
       border: var(--v3-card-border);
       border-radius: var(--v3-card-radius);
       background:
@@ -1770,8 +1773,9 @@
       min-width: 0;
       display: grid;
       justify-items: center;
-      gap: 0.28rem;
-      padding: clamp(0.46rem, 2.2vw, 0.64rem) 0.22rem;
+      align-content: center;
+      gap: 0.3rem;
+      padding: clamp(0.5rem, 2.2vw, 0.7rem) 0.24rem;
       border: 1px solid rgba(247, 247, 242, 0.075);
       border-radius: var(--radius-sm);
       background: rgba(1, 1, 3, 0.34);
@@ -1796,7 +1800,7 @@
     .band-detail-actions {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(0.5rem, 2.3vw, 0.72rem);
+      gap: clamp(0.54rem, 2.3vw, 0.78rem);
     }
 
     .band-detail-action {
@@ -1848,14 +1852,15 @@
 
     .band-detail-members {
       display: grid;
-      gap: clamp(0.58rem, 2.2vw, 0.78rem);
+      gap: clamp(0.64rem, 2.3vw, 0.86rem);
     }
 
     .band-detail-panel {
       min-width: 0;
       display: grid;
-      gap: 0.62rem;
-      padding: var(--v3-card-padding);
+      align-content: start;
+      gap: clamp(0.62rem, 2vw, 0.78rem);
+      padding: clamp(0.68rem, 2.7vw, 0.95rem);
       border: var(--v3-card-border-strong);
       border-radius: var(--v3-card-radius-feature);
       background:
@@ -1873,7 +1878,7 @@
 
     .band-member-list {
       display: grid;
-      gap: 0.42rem;
+      gap: 0.46rem;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -1884,15 +1889,16 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.48rem;
+      gap: 0.54rem;
+      min-height: 3.8rem;
+      padding: 0.5rem;
       border: 1px solid rgba(247, 247, 242, 0.08);
       border-radius: var(--radius-sm);
       background: rgba(247, 247, 242, 0.022);
     }
 
     .band-member-thumb {
-      width: clamp(2.55rem, 10.5vw, 3.15rem);
+      width: clamp(2.62rem, 10.5vw, 3.18rem);
       aspect-ratio: 1;
       display: grid;
       place-items: center;
@@ -1911,7 +1917,7 @@
     .band-member-copy {
       min-width: 0;
       display: grid;
-      gap: 0.22rem;
+      gap: 0.26rem;
     }
 
     .band-member-name {
@@ -1934,8 +1940,8 @@
 
     .band-detail-activity {
       display: grid;
-      gap: 0.58rem;
-      padding: var(--v3-card-padding);
+      gap: clamp(0.62rem, 2vw, 0.82rem);
+      padding: clamp(0.68rem, 2.7vw, 0.95rem);
       border: var(--v3-card-border-strong);
       border-radius: var(--v3-card-radius-feature);
       background:
@@ -1946,11 +1952,11 @@
 
     .band-activity-grid {
       display: grid;
-      gap: 0.38rem;
+      gap: 0.44rem;
     }
 
     .band-activity-row {
-      padding: 0.5rem;
+      padding: 0.54rem;
       border: 1px solid rgba(247, 247, 242, 0.08);
       border-radius: var(--radius-sm);
       background: rgba(247, 247, 242, 0.02);
@@ -2117,8 +2123,8 @@
 
     .music-bands-index {
       display: none;
-      gap: clamp(0.58rem, 1.9svh, 0.82rem);
-      padding: var(--v3-card-padding);
+      gap: clamp(0.62rem, 1.95svh, 0.88rem);
+      padding: clamp(0.68rem, 2.7vw, 0.95rem);
       border: var(--v3-card-border-strong);
       border-radius: var(--v3-card-radius-feature);
       background:
@@ -2154,14 +2160,14 @@
 
     .music-bands-header {
       display: grid;
-      gap: 0.52rem;
+      gap: 0.58rem;
     }
 
     .music-bands-title-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.62rem;
+      gap: 0.68rem;
       flex-wrap: wrap;
     }
 
@@ -2267,7 +2273,7 @@
     .bands-search-panel {
       min-width: 0;
       display: grid;
-      gap: clamp(0.56rem, 2vw, 0.74rem);
+      gap: clamp(0.62rem, 2vw, 0.82rem);
     }
 
     .bands-radar-core {
@@ -2416,8 +2422,8 @@
 
     .bands-letter-nav {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(1.58rem, 1fr));
-      gap: 0.24rem;
+      grid-template-columns: repeat(auto-fit, minmax(1.68rem, 1fr));
+      gap: 0.28rem;
       min-width: 0;
     }
 
@@ -2425,7 +2431,7 @@
       appearance: none;
       position: relative;
       min-width: 0;
-      min-height: 1.95rem;
+      min-height: 2.05rem;
       display: grid;
       place-items: center;
       border: 1px solid rgba(247, 247, 242, 0.08);
@@ -2555,7 +2561,7 @@
     .bands-list-viewport {
       max-height: min(44svh, 21rem);
       display: grid;
-      gap: 0.36rem;
+      gap: 0.42rem;
       min-width: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -2585,8 +2591,8 @@
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
-      gap: 0.52rem;
-      padding: 0.46rem 0.5rem;
+      gap: 0.56rem;
+      padding: 0.5rem 0.54rem;
       border: 1px solid rgba(247, 247, 242, 0.085);
       border-radius: var(--radius-sm);
       background:
@@ -2778,13 +2784,13 @@
     .bands-search-groups {
       min-width: 0;
       display: grid;
-      gap: 0.56rem;
+      gap: 0.64rem;
     }
 
     .bands-search-group {
       min-width: 0;
       display: grid;
-      gap: 0.34rem;
+      gap: 0.42rem;
     }
 
     .bands-search-chip-row {
@@ -2818,7 +2824,7 @@
 
     .bands-search-results {
       display: grid;
-      gap: 0.3rem;
+      gap: 0.36rem;
       max-height: min(36svh, 16rem);
       margin: 0;
       padding: 0 0.08rem 0.08rem 0;
@@ -2867,7 +2873,7 @@
 
     .music-activity-list {
       display: grid;
-      gap: 0.42rem;
+      gap: 0.46rem;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -4166,6 +4172,10 @@
         padding: 0.58rem;
       }
 
+      .band-detail-poster {
+        width: min(100%, 16.75rem);
+      }
+
       .band-detail-meta-row,
       .band-detail-completion-head,
       .band-activity-row {
@@ -4321,6 +4331,50 @@
     }
 
     @media (max-width: 479px) {
+      .band-detail-poster {
+        max-height: 18.25rem;
+      }
+
+      .band-detail-stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .band-detail-stat-label {
+        font-size: clamp(0.48rem, 2.35vw, 0.58rem);
+        white-space: normal;
+        text-align: center;
+      }
+
+      .band-detail-action,
+      .band-detail-back,
+      .music-nexus-back {
+        min-height: 2.8rem;
+      }
+
+      .band-detail-meta-row,
+      .band-detail-completion-head,
+      .band-activity-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.24rem;
+      }
+
+      .music-bands-mode-switch {
+        width: 100%;
+      }
+
+      .bands-index-mode-tab {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .bands-letter-nav {
+        grid-template-columns: repeat(auto-fit, minmax(1.52rem, 1fr));
+      }
+
+      .bands-list-row {
+        min-height: 3.9rem;
+      }
+
       .universal-bottom-rail {
         grid-template-columns: minmax(5.8rem, 1fr) auto minmax(5.8rem, 1fr);
         gap: 0.38rem;
@@ -4415,6 +4469,8 @@
       }
 
       .band-detail-poster {
+        width: 100%;
+        aspect-ratio: 1 / 1.08;
         min-height: clamp(17rem, 35vw, 22rem);
       }
 
