@@ -1516,7 +1516,13 @@
     .band-detail-actions,
     .band-detail-members,
     .band-detail-activity,
-    .band-detail-back {
+    .band-detail-back,
+    .sets-archive-screen,
+    .sets-archive-header,
+    .sets-archive-stats,
+    .sets-year-timeline,
+    .sets-featured-panel,
+    .sets-list-panel {
       position: relative;
       z-index: 1;
       min-width: 0;
@@ -1532,11 +1538,21 @@
       display: grid;
     }
 
+    .music-nexus-shell.is-sets-archive .sets-archive-screen {
+      display: grid;
+    }
+
     .music-nexus-shell.is-band-detail .music-nexus-header,
     .music-nexus-shell.is-band-detail .music-nexus-module-grid,
     .music-nexus-shell.is-band-detail .music-bands-index,
     .music-nexus-shell.is-band-detail .music-nexus-activity,
-    .music-nexus-shell.is-band-detail .music-nexus-back {
+    .music-nexus-shell.is-band-detail .music-nexus-back,
+    .music-nexus-shell.is-sets-archive .music-nexus-header,
+    .music-nexus-shell.is-sets-archive .music-nexus-module-grid,
+    .music-nexus-shell.is-sets-archive .music-bands-index,
+    .music-nexus-shell.is-sets-archive .music-nexus-activity,
+    .music-nexus-shell.is-sets-archive .music-nexus-back,
+    .music-nexus-shell.is-sets-archive .band-detail-screen {
       display: none;
     }
 
@@ -1848,6 +1864,423 @@
     .band-detail-back:focus-visible {
       outline: 2px solid rgba(247, 247, 242, 0.82);
       outline-offset: 0.16rem;
+    }
+
+    .sets-archive-screen {
+      display: none;
+      align-content: start;
+      gap: clamp(0.72rem, 2.1svh, 1.05rem);
+    }
+
+    .sets-archive-header {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(0.56rem, 2.4vw, 0.78rem);
+      padding: 0.1rem 0 0.08rem;
+    }
+
+    .sets-archive-back,
+    .sets-featured-open {
+      appearance: none;
+      min-height: 2.55rem;
+      padding: 0.58rem 0.72rem;
+      border: 1px solid rgba(142, 108, 255, 0.24);
+      border-radius: var(--radius-sm);
+      background: rgba(142, 108, 255, 0.06);
+      color: rgba(247, 247, 242, 0.76);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.62rem, 2.55vw, 0.72rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sets-archive-back:focus-visible,
+    .sets-featured-open:focus-visible,
+    .sets-year-card:focus-visible,
+    .sets-list-row:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.16rem;
+    }
+
+    .sets-archive-title-group {
+      min-width: 0;
+      display: grid;
+      gap: 0.22rem;
+    }
+
+    .sets-archive-band,
+    .sets-archive-label,
+    .sets-stat-value,
+    .sets-stat-label,
+    .sets-year-value,
+    .sets-year-count,
+    .sets-featured-date,
+    .sets-featured-title,
+    .sets-featured-meta-label,
+    .sets-featured-meta-value,
+    .sets-list-date,
+    .sets-list-title,
+    .sets-list-location,
+    .sets-list-meta {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .sets-archive-band {
+      color: rgba(247, 247, 242, 0.9);
+      font-size: clamp(0.88rem, 3.6vw, 1.06rem);
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sets-archive-label {
+      color: rgba(142, 108, 255, 0.72);
+      font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sets-archive-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(0.28rem, 1.4vw, 0.4rem);
+      padding: clamp(0.34rem, 1.6vw, 0.44rem);
+      border: 1px solid rgba(247, 247, 242, 0.09);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.018);
+    }
+
+    .sets-stat {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 0.28rem;
+      padding: clamp(0.46rem, 2vw, 0.62rem) 0.2rem;
+      border: 1px solid rgba(247, 247, 242, 0.065);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.28);
+      text-align: center;
+    }
+
+    .sets-stat-value {
+      color: rgba(247, 247, 242, 0.88);
+      font-size: clamp(0.92rem, 4.8vw, 1.45rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+
+    .sets-stat-label {
+      color: rgba(247, 247, 242, 0.48);
+      font-size: clamp(0.48rem, 2.15vw, 0.64rem);
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .sets-year-timeline {
+      display: flex;
+      gap: clamp(0.42rem, 1.8vw, 0.58rem);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      padding: 0.04rem 0.04rem 0.42rem;
+      scroll-padding-inline: 0.04rem;
+      scrollbar-color: rgba(142, 108, 255, 0.34) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+    }
+
+    .sets-year-timeline::-webkit-scrollbar {
+      height: 0.36rem;
+    }
+
+    .sets-year-timeline::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .sets-year-timeline::-webkit-scrollbar-thumb {
+      background: rgba(142, 108, 255, 0.34);
+    }
+
+    .sets-year-card {
+      appearance: none;
+      flex: 0 0 clamp(5.2rem, 25vw, 6.6rem);
+      min-height: 3.65rem;
+      display: grid;
+      align-content: center;
+      gap: 0.28rem;
+      padding: 0.52rem;
+      border: 1px solid rgba(247, 247, 242, 0.085);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.02);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      text-transform: uppercase;
+      scroll-snap-align: start;
+    }
+
+    .sets-year-card[aria-pressed="true"] {
+      border-color: rgba(142, 108, 255, 0.32);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.045), transparent 62%),
+        rgba(142, 108, 255, 0.075);
+    }
+
+    .sets-year-value {
+      color: rgba(247, 247, 242, 0.86);
+      font-size: clamp(0.82rem, 3.5vw, 1rem);
+      line-height: 1;
+    }
+
+    .sets-year-count {
+      color: rgba(247, 247, 242, 0.5);
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+    }
+
+    .sets-featured-panel {
+      display: grid;
+      gap: clamp(0.72rem, 2.6vw, 1rem);
+      padding: clamp(0.72rem, 2.8vw, 1rem);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.042), transparent 58%),
+        linear-gradient(135deg, rgba(142, 108, 255, 0.085), transparent 66%),
+        rgba(3, 3, 6, 0.42);
+      overflow: hidden;
+    }
+
+    .sets-featured-image,
+    .sets-row-thumb {
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.11);
+      border-radius: var(--radius-sm);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(142, 108, 255, 0.2), transparent 58%),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.06), transparent 62%),
+        rgba(1, 1, 3, 0.44);
+      color: rgba(247, 247, 242, 0.74);
+      text-transform: uppercase;
+    }
+
+    .sets-featured-image {
+      min-height: clamp(11.5rem, 48vw, 18rem);
+      overflow: hidden;
+      box-shadow: inset 0 0 1.35rem rgba(0, 0, 0, 0.42);
+    }
+
+    .sets-featured-image span {
+      font-size: clamp(2.4rem, 14vw, 5rem);
+      line-height: 1;
+    }
+
+    .sets-featured-copy {
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: clamp(0.52rem, 1.7svh, 0.72rem);
+    }
+
+    .sets-featured-date {
+      color: rgba(142, 108, 255, 0.72);
+      font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sets-featured-title {
+      color: rgba(247, 247, 242, 0.92);
+      font-size: clamp(1.14rem, 5.8vw, 1.72rem);
+      font-weight: 400;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .sets-featured-meta {
+      display: grid;
+      gap: 0.38rem;
+    }
+
+    .sets-featured-meta-row {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(6.9rem, auto) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.48rem;
+    }
+
+    .sets-featured-meta-label {
+      color: rgba(247, 247, 242, 0.44);
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sets-featured-meta-value {
+      color: rgba(247, 247, 242, 0.74);
+      font-size: clamp(0.66rem, 2.55vw, 0.8rem);
+      line-height: 1.14;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .sets-featured-open {
+      justify-self: start;
+      margin-top: 0.08rem;
+    }
+
+    .sets-list-panel {
+      display: grid;
+      gap: 0.56rem;
+      padding: clamp(0.68rem, 2.6vw, 0.92rem);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.032), transparent 62%),
+        rgba(3, 3, 6, 0.38);
+    }
+
+    .sets-list-title-bar {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+
+    .sets-list-heading {
+      margin: 0;
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.74rem, 3vw, 0.88rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sets-list-year-label {
+      margin: 0;
+      color: rgba(142, 108, 255, 0.68);
+      font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sets-list {
+      display: grid;
+      gap: 0.42rem;
+      max-height: min(48svh, 27rem);
+      margin: 0;
+      padding: 0 0.06rem 0.06rem 0;
+      list-style: none;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-color: rgba(142, 108, 255, 0.34) rgba(247, 247, 242, 0.07);
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sets-list::-webkit-scrollbar {
+      width: 0.36rem;
+    }
+
+    .sets-list::-webkit-scrollbar-track {
+      background: rgba(247, 247, 242, 0.07);
+    }
+
+    .sets-list::-webkit-scrollbar-thumb {
+      background: rgba(142, 108, 255, 0.34);
+    }
+
+    .sets-list-row {
+      appearance: none;
+      width: 100%;
+      min-width: 0;
+      min-height: 4.25rem;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.58rem;
+      padding: 0.52rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.02);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      touch-action: manipulation;
+    }
+
+    .sets-list-row.is-active {
+      border-color: rgba(142, 108, 255, 0.3);
+      background:
+        linear-gradient(90deg, rgba(142, 108, 255, 0.075), transparent 66%),
+        rgba(247, 247, 242, 0.028);
+    }
+
+    .sets-list-row[hidden] {
+      display: none;
+    }
+
+    .sets-row-thumb {
+      width: clamp(3rem, 13vw, 3.8rem);
+      aspect-ratio: 1.2 / 1;
+      font-size: clamp(0.6rem, 2.35vw, 0.72rem);
+      line-height: 1;
+    }
+
+    .sets-list-copy {
+      min-width: 0;
+      display: grid;
+      gap: 0.26rem;
+    }
+
+    .sets-list-date {
+      color: rgba(142, 108, 255, 0.7);
+      font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .sets-list-title {
+      color: rgba(247, 247, 242, 0.9);
+      font-size: clamp(0.86rem, 3.4vw, 1.06rem);
+      line-height: 1.08;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sets-list-location {
+      color: rgba(247, 247, 242, 0.52);
+      font-size: clamp(0.6rem, 2.35vw, 0.7rem);
+      line-height: 1.12;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sets-list-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.24rem 0.34rem;
+      color: rgba(247, 247, 242, 0.5);
+      font-size: clamp(0.56rem, 2.2vw, 0.66rem);
+      line-height: 1.1;
+      text-transform: uppercase;
     }
 
     .band-detail-members {
@@ -4166,9 +4599,15 @@
         gap: 0.58rem;
       }
 
+      .sets-archive-screen {
+        gap: 0.58rem;
+      }
+
       .band-detail-hero,
       .band-detail-panel,
-      .band-detail-activity {
+      .band-detail-activity,
+      .sets-featured-panel,
+      .sets-list-panel {
         padding: 0.58rem;
       }
 
@@ -4178,7 +4617,8 @@
 
       .band-detail-meta-row,
       .band-detail-completion-head,
-      .band-activity-row {
+      .band-activity-row,
+      .sets-featured-meta-row {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.22rem;
       }
@@ -4188,6 +4628,15 @@
         padding: 0.3rem;
       }
 
+      .sets-archive-stats {
+        gap: 0.24rem;
+        padding: 0.28rem;
+      }
+
+      .sets-stat {
+        padding-inline: 0.1rem;
+      }
+
       .band-detail-stat {
         padding-inline: 0.12rem;
       }
@@ -4195,6 +4644,15 @@
       .band-member {
         gap: 0.4rem;
         padding: 0.42rem;
+      }
+
+      .sets-list-row {
+        gap: 0.42rem;
+        padding: 0.42rem;
+      }
+
+      .sets-row-thumb {
+        width: 2.75rem;
       }
 
       .music-bands-index {
@@ -4353,9 +4811,39 @@
 
       .band-detail-meta-row,
       .band-detail-completion-head,
-      .band-activity-row {
+      .band-activity-row,
+      .sets-featured-meta-row {
         grid-template-columns: minmax(0, 1fr);
         gap: 0.24rem;
+      }
+
+      .sets-archive-header {
+        align-items: start;
+      }
+
+      .sets-archive-stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .sets-stat-label {
+        font-size: clamp(0.46rem, 2.25vw, 0.56rem);
+      }
+
+      .sets-year-card {
+        flex-basis: clamp(4.75rem, 23vw, 5.75rem);
+      }
+
+      .sets-featured-image {
+        min-height: 10.5rem;
+      }
+
+      .sets-list {
+        max-height: min(42svh, 22rem);
+      }
+
+      .sets-list-title,
+      .sets-list-location {
+        white-space: normal;
       }
 
       .music-bands-mode-switch {
@@ -4484,6 +4972,23 @@
 
       .band-activity-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .sets-featured-panel {
+        grid-template-columns: minmax(14rem, 0.92fr) minmax(0, 1.08fr);
+        align-items: stretch;
+      }
+
+      .sets-featured-image {
+        min-height: clamp(16rem, 30vw, 20rem);
+      }
+
+      .sets-featured-meta-row {
+        grid-template-columns: minmax(7.4rem, auto) minmax(0, 1fr);
+      }
+
+      .sets-list {
+        max-height: min(50svh, 30rem);
       }
 
       .music-bands-index {
@@ -4922,7 +5427,7 @@
             </section>
 
             <div class="band-detail-actions" aria-label="Band detail actions">
-              <button class="v3-card v3-card--interactive band-detail-action" type="button">VIEW SETS</button>
+              <button class="v3-card v3-card--interactive band-detail-action" type="button" data-band-detail-view-sets>VIEW SETS</button>
               <button class="v3-card v3-card--interactive band-detail-action" type="button">VIEW TIMELINE</button>
             </div>
 
@@ -5006,6 +5511,239 @@
             <button class="v3-card v3-card--mini v3-card--interactive band-detail-back" type="button" data-band-detail-back>
               Back to Bands Index
             </button>
+          </article>
+
+          <article class="sets-archive-screen" aria-labelledby="sets-archive-title" aria-hidden="true" inert data-sets-archive>
+            <header class="sets-archive-header">
+              <button class="v3-card v3-card--mini v3-card--interactive sets-archive-back" type="button" data-sets-archive-back>
+                Back
+              </button>
+              <div class="sets-archive-title-group">
+                <p class="sets-archive-band" data-sets-archive-band>Astra Vale</p>
+                <h3 class="sets-archive-label" id="sets-archive-title">SETS ARCHIVE</h3>
+              </div>
+            </header>
+
+            <section class="sets-archive-stats" aria-label="Sets archive statistics">
+              <article class="sets-stat">
+                <p class="sets-stat-value">13</p>
+                <p class="sets-stat-label">TOTAL SETS</p>
+              </article>
+              <article class="sets-stat">
+                <p class="sets-stat-value">468</p>
+                <p class="sets-stat-label">PHOTOS</p>
+              </article>
+              <article class="sets-stat">
+                <p class="sets-stat-value">6</p>
+                <p class="sets-stat-label">CONTRIBUTORS</p>
+              </article>
+              <article class="sets-stat">
+                <p class="sets-stat-value">72%</p>
+                <p class="sets-stat-label">ARCHIVE COMPLETE</p>
+              </article>
+            </section>
+
+            <div class="sets-year-timeline" role="group" aria-label="Set years" data-sets-year-timeline>
+              <button class="sets-year-card is-active" type="button" aria-pressed="true" data-sets-year="2026">
+                <span class="sets-year-value">2026</span>
+                <span class="sets-year-count">4 SETS</span>
+              </button>
+              <button class="sets-year-card" type="button" aria-pressed="false" data-sets-year="2025">
+                <span class="sets-year-value">2025</span>
+                <span class="sets-year-count">5 SETS</span>
+              </button>
+              <button class="sets-year-card" type="button" aria-pressed="false" data-sets-year="2024">
+                <span class="sets-year-value">2024</span>
+                <span class="sets-year-count">3 SETS</span>
+              </button>
+              <button class="sets-year-card" type="button" aria-pressed="false" data-sets-year="2023">
+                <span class="sets-year-value">2023</span>
+                <span class="sets-year-count">1 SET</span>
+              </button>
+            </div>
+
+            <section class="sets-featured-panel" aria-labelledby="sets-featured-title">
+              <div class="sets-featured-image" role="img" aria-label="Featured set placeholder image" data-sets-featured-image>
+                <span data-sets-featured-thumb>AV</span>
+              </div>
+              <div class="sets-featured-copy">
+                <p class="sets-featured-date" data-sets-featured-date>JAN 18, 2026</p>
+                <h4 class="sets-featured-title" id="sets-featured-title" data-sets-featured-title>Winter Hall Session</h4>
+                <div class="sets-featured-meta" aria-label="Featured set metadata">
+                  <div class="sets-featured-meta-row">
+                    <p class="sets-featured-meta-label">Location</p>
+                    <p class="sets-featured-meta-value" data-sets-featured-location>Portland, Maine</p>
+                  </div>
+                  <div class="sets-featured-meta-row">
+                    <p class="sets-featured-meta-label">Photos</p>
+                    <p class="sets-featured-meta-value" data-sets-featured-photos>64</p>
+                  </div>
+                  <div class="sets-featured-meta-row">
+                    <p class="sets-featured-meta-label">Contributors</p>
+                    <p class="sets-featured-meta-value" data-sets-featured-contributors>3</p>
+                  </div>
+                  <div class="sets-featured-meta-row">
+                    <p class="sets-featured-meta-label">Completion</p>
+                    <p class="sets-featured-meta-value" data-sets-featured-complete>84%</p>
+                  </div>
+                </div>
+                <button class="v3-card v3-card--mini v3-card--interactive sets-featured-open" type="button">
+                  OPEN SET
+                </button>
+              </div>
+            </section>
+
+            <section class="sets-list-panel" aria-labelledby="sets-list-title">
+              <div class="sets-list-title-bar">
+                <h4 class="sets-list-heading" id="sets-list-title">SETS LIST</h4>
+                <p class="sets-list-year-label" data-sets-list-year-label>2026</p>
+              </div>
+              <ul class="sets-list" aria-label="Sets archive list" data-sets-list>
+                <li>
+                  <button class="sets-list-row is-active" type="button" data-set-row data-set-year="2026" data-set-date="JAN 18, 2026" data-set-title="Winter Hall Session" data-set-location="Portland, Maine" data-set-photos="64" data-set-contributors="3" data-set-complete="84%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">JAN 18, 2026</span>
+                      <span class="sets-list-title">Winter Hall Session</span>
+                      <span class="sets-list-location">Portland, Maine</span>
+                      <span class="sets-list-meta">64 Photos / 3 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2026" data-set-date="MAR 07, 2026" data-set-title="Signal Room Capture" data-set-location="Boston, Massachusetts" data-set-photos="52" data-set-contributors="2" data-set-complete="76%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">MAR 07, 2026</span>
+                      <span class="sets-list-title">Signal Room Capture</span>
+                      <span class="sets-list-location">Boston, Massachusetts</span>
+                      <span class="sets-list-meta">52 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2026" data-set-date="JUN 21, 2026" data-set-title="Summer Stage Archive" data-set-location="Manchester, New Hampshire" data-set-photos="48" data-set-contributors="2" data-set-complete="68%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">JUN 21, 2026</span>
+                      <span class="sets-list-title">Summer Stage Archive</span>
+                      <span class="sets-list-location">Manchester, New Hampshire</span>
+                      <span class="sets-list-meta">48 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2026" data-set-date="SEP 12, 2026" data-set-title="North Pier Set" data-set-location="Portsmouth, New Hampshire" data-set-photos="41" data-set-contributors="1" data-set-complete="64%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">SEP 12, 2026</span>
+                      <span class="sets-list-title">North Pier Set</span>
+                      <span class="sets-list-location">Portsmouth, New Hampshire</span>
+                      <span class="sets-list-meta">41 Photos / 1 Contributor</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2025" data-set-date="FEB 09, 2025" data-set-title="Basement Light Session" data-set-location="Lewiston, Maine" data-set-photos="38" data-set-contributors="2" data-set-complete="71%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">FEB 09, 2025</span>
+                      <span class="sets-list-title">Basement Light Session</span>
+                      <span class="sets-list-location">Lewiston, Maine</span>
+                      <span class="sets-list-meta">38 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2025" data-set-date="APR 26, 2025" data-set-title="Harbor Night Capture" data-set-location="Rockland, Maine" data-set-photos="44" data-set-contributors="3" data-set-complete="75%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">APR 26, 2025</span>
+                      <span class="sets-list-title">Harbor Night Capture</span>
+                      <span class="sets-list-location">Rockland, Maine</span>
+                      <span class="sets-list-meta">44 Photos / 3 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2025" data-set-date="JUL 11, 2025" data-set-title="Warehouse Archive Set" data-set-location="Providence, Rhode Island" data-set-photos="57" data-set-contributors="2" data-set-complete="79%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">JUL 11, 2025</span>
+                      <span class="sets-list-title">Warehouse Archive Set</span>
+                      <span class="sets-list-location">Providence, Rhode Island</span>
+                      <span class="sets-list-meta">57 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2025" data-set-date="OCT 03, 2025" data-set-title="Autumn Room Set" data-set-location="Burlington, Vermont" data-set-photos="36" data-set-contributors="1" data-set-complete="62%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">OCT 03, 2025</span>
+                      <span class="sets-list-title">Autumn Room Set</span>
+                      <span class="sets-list-location">Burlington, Vermont</span>
+                      <span class="sets-list-meta">36 Photos / 1 Contributor</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2025" data-set-date="DEC 14, 2025" data-set-title="Final Signal Set" data-set-location="Portland, Maine" data-set-photos="40" data-set-contributors="2" data-set-complete="69%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">DEC 14, 2025</span>
+                      <span class="sets-list-title">Final Signal Set</span>
+                      <span class="sets-list-location">Portland, Maine</span>
+                      <span class="sets-list-meta">40 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2024" data-set-date="MAY 19, 2024" data-set-title="Civic Hall Archive" data-set-location="Augusta, Maine" data-set-photos="29" data-set-contributors="1" data-set-complete="58%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">MAY 19, 2024</span>
+                      <span class="sets-list-title">Civic Hall Archive</span>
+                      <span class="sets-list-location">Augusta, Maine</span>
+                      <span class="sets-list-meta">29 Photos / 1 Contributor</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2024" data-set-date="AUG 24, 2024" data-set-title="Late Summer Set" data-set-location="Bangor, Maine" data-set-photos="31" data-set-contributors="2" data-set-complete="61%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">AUG 24, 2024</span>
+                      <span class="sets-list-title">Late Summer Set</span>
+                      <span class="sets-list-location">Bangor, Maine</span>
+                      <span class="sets-list-meta">31 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2024" data-set-date="NOV 02, 2024" data-set-title="Mill Room Capture" data-set-location="Biddeford, Maine" data-set-photos="35" data-set-contributors="2" data-set-complete="66%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">NOV 02, 2024</span>
+                      <span class="sets-list-title">Mill Room Capture</span>
+                      <span class="sets-list-location">Biddeford, Maine</span>
+                      <span class="sets-list-meta">35 Photos / 2 Contributors</span>
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button class="sets-list-row" type="button" data-set-row data-set-year="2023" data-set-date="SEP 16, 2023" data-set-title="First Archive Signal" data-set-location="Portland, Maine" data-set-photos="33" data-set-contributors="1" data-set-complete="56%" data-set-thumb="AV">
+                    <span class="sets-row-thumb" aria-hidden="true">AV</span>
+                    <span class="sets-list-copy">
+                      <span class="sets-list-date">SEP 16, 2023</span>
+                      <span class="sets-list-title">First Archive Signal</span>
+                      <span class="sets-list-location">Portland, Maine</span>
+                      <span class="sets-list-meta">33 Photos / 1 Contributor</span>
+                    </span>
+                  </button>
+                </li>
+              </ul>
+            </section>
           </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
@@ -5177,7 +5915,7 @@
         <span class="rail-label status-label">CURRENTLY VIEWING</span>
         <span class="rail-value rail-value--view status-value status-value--view" data-current-view>Homepage</span>
       </span>
-      <span class="rail-brand" data-rail-brand>VMPIX MEDIA ARCHIVE</span>
+      <span class="rail-brand" data-rail-brand>VOODOO MEDIA</span>
       <span class="rail-cluster rail-cluster--right" data-rail-region="archive-build">
         <span class="rail-label status-label">ARCHIVE BUILD</span>
         <span class="rail-value rail-value--build status-value status-value--build" data-archive-build>V3.0.01</span>
@@ -5288,6 +6026,21 @@
       const bandDetailSets = document.querySelector("[data-band-detail-sets]");
       const bandDetailTotalSets = document.querySelector("[data-band-detail-total-sets]");
       const bandDetailPhotos = document.querySelector("[data-band-detail-photos]");
+      const bandDetailViewSets = document.querySelector("[data-band-detail-view-sets]");
+      const setsArchive = document.querySelector("[data-sets-archive]");
+      const setsArchiveBack = document.querySelector("[data-sets-archive-back]");
+      const setsArchiveBand = document.querySelector("[data-sets-archive-band]");
+      const setsYearButtons = document.querySelectorAll("[data-sets-year]");
+      const setsListYearLabel = document.querySelector("[data-sets-list-year-label]");
+      const setsRows = document.querySelectorAll("[data-set-row]");
+      const setsFeaturedImage = document.querySelector("[data-sets-featured-image]");
+      const setsFeaturedThumb = document.querySelector("[data-sets-featured-thumb]");
+      const setsFeaturedDate = document.querySelector("[data-sets-featured-date]");
+      const setsFeaturedTitle = document.querySelector("[data-sets-featured-title]");
+      const setsFeaturedLocation = document.querySelector("[data-sets-featured-location]");
+      const setsFeaturedPhotos = document.querySelector("[data-sets-featured-photos]");
+      const setsFeaturedContributors = document.querySelector("[data-sets-featured-contributors]");
+      const setsFeaturedComplete = document.querySelector("[data-sets-featured-complete]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -5301,6 +6054,7 @@
       let activeBandsLetter = "A";
       let activeBandsFilterLetter = "";
       let bandsSearchTerm = "";
+      let activeMusicBand = null;
 
       const spotlightContent = {
         music: {
@@ -5469,6 +6223,9 @@
         }
 
         musicNexusShell.classList.toggle("is-band-detail", isVisible);
+        if (isVisible) {
+          setSetsArchiveVisible(false);
+        }
         bandDetail.setAttribute("aria-hidden", String(!isVisible));
         if (isVisible) {
           bandDetail.removeAttribute("inert");
@@ -5477,7 +6234,22 @@
         }
       }
 
+      function setSetsArchiveVisible(isVisible) {
+        if (!musicNexusShell || !setsArchive) {
+          return;
+        }
+
+        musicNexusShell.classList.toggle("is-sets-archive", isVisible);
+        setsArchive.setAttribute("aria-hidden", String(!isVisible));
+        if (isVisible) {
+          setsArchive.removeAttribute("inert");
+        } else {
+          setsArchive.setAttribute("inert", "");
+        }
+      }
+
       function showBandsIndexView(options = {}) {
+        setSetsArchiveVisible(false);
         setBandDetailVisible(false);
         setBandsIndexVisible(true);
         syncBandsIndex();
@@ -5503,6 +6275,7 @@
           return;
         }
 
+        activeMusicBand = band;
         if (bandDetailPoster) {
           bandDetailPoster.setAttribute("aria-label", `${band.name} placeholder band poster`);
         }
@@ -5532,6 +6305,120 @@
         }
 
         setBandsIndexVisible(false);
+        setBandDetailVisible(true);
+        setCurrentView("Band Detail");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
+      function updateSetsFeaturedFromRow(row) {
+        if (!row) {
+          return;
+        }
+
+        setsRows.forEach((candidate) => {
+          candidate.classList.toggle("is-active", candidate === row);
+        });
+
+        const setData = row.dataset;
+        if (setsFeaturedImage) {
+          setsFeaturedImage.setAttribute("aria-label", `${setData.setTitle} placeholder featured set image`);
+        }
+        if (setsFeaturedThumb) {
+          setsFeaturedThumb.textContent = setData.setThumb || (activeMusicBand ? activeMusicBand.thumb : "SET");
+        }
+        if (setsFeaturedDate) {
+          setsFeaturedDate.textContent = setData.setDate || "";
+        }
+        if (setsFeaturedTitle) {
+          setsFeaturedTitle.textContent = setData.setTitle || "";
+        }
+        if (setsFeaturedLocation) {
+          setsFeaturedLocation.textContent = setData.setLocation || "";
+        }
+        if (setsFeaturedPhotos) {
+          setsFeaturedPhotos.textContent = setData.setPhotos || "";
+        }
+        if (setsFeaturedContributors) {
+          setsFeaturedContributors.textContent = setData.setContributors || "";
+        }
+        if (setsFeaturedComplete) {
+          setsFeaturedComplete.textContent = setData.setComplete || "";
+        }
+      }
+
+      function setSetsYear(year, options = {}) {
+        let firstVisibleRow = null;
+
+        setsYearButtons.forEach((button) => {
+          const isActive = button.dataset.setsYear === year;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        setsRows.forEach((row) => {
+          const isVisible = row.dataset.setYear === year;
+          const rowItem = row.closest("li");
+          if (rowItem) {
+            rowItem.hidden = !isVisible;
+          }
+          if (isVisible && !firstVisibleRow) {
+            firstVisibleRow = row;
+          }
+        });
+
+        if (setsListYearLabel) {
+          setsListYearLabel.textContent = year;
+        }
+        updateSetsFeaturedFromRow(firstVisibleRow);
+        if (options.shouldFocus && firstVisibleRow) {
+          firstVisibleRow.focus({ preventScroll: true });
+        }
+      }
+
+      function showSetsArchive() {
+        const band = activeMusicBand || musicBandIndexRows[0];
+        if (!band || !setsArchive) {
+          return;
+        }
+
+        activeMusicBand = band;
+        const bandThumb = band.thumb || band.name.slice(0, 2).toUpperCase();
+        if (setsArchiveBand) {
+          setsArchiveBand.textContent = band.name;
+        }
+        setsRows.forEach((row) => {
+          row.dataset.setThumb = bandThumb;
+          const thumb = row.querySelector(".sets-row-thumb");
+          if (thumb) {
+            thumb.textContent = bandThumb;
+          }
+        });
+
+        setBandsIndexVisible(false);
+        setBandDetailVisible(false);
+        setSetsArchiveVisible(true);
+        setSetsYear("2026");
+        setCurrentView("SETS 13 HIGH");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
+      function returnToBandDetailFromSets() {
+        if (!activeMusicBand) {
+          showBandsIndexView({ shouldFocus: true });
+          return;
+        }
+
+        setSetsArchiveVisible(false);
         setBandDetailVisible(true);
         setCurrentView("Band Detail");
         if (musicNexusShell) {
@@ -5872,6 +6759,7 @@
         }
 
         setBandDetailVisible(false);
+        setSetsArchiveVisible(false);
         let activeCardLabel = "";
         musicNexusCards.forEach((card) => {
           const isActive = card.dataset.musicNexusCard === sectionName;
@@ -6537,6 +7425,22 @@
             showBandsIndexView({ shouldFocus: true });
           });
         }
+        if (bandDetailViewSets) {
+          bandDetailViewSets.addEventListener("click", showSetsArchive);
+        }
+        if (setsArchiveBack) {
+          setsArchiveBack.addEventListener("click", returnToBandDetailFromSets);
+        }
+        setsYearButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            setSetsYear(button.dataset.setsYear);
+          });
+        });
+        setsRows.forEach((row) => {
+          row.addEventListener("click", () => {
+            updateSetsFeaturedFromRow(row);
+          });
+        });
         musicNexusCards.forEach((card) => {
           card.addEventListener("click", () => {
             setMusicNexusContext(card.dataset.musicNexusCard);
