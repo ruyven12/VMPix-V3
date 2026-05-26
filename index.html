@@ -1504,6 +1504,424 @@
       pointer-events: none;
     }
 
+    .band-detail-screen,
+    .band-detail-hero,
+    .band-detail-poster,
+    .band-detail-copy,
+    .band-detail-tags,
+    .band-detail-meta,
+    .band-detail-completion,
+    .band-detail-stats,
+    .band-detail-actions,
+    .band-detail-members,
+    .band-detail-activity {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+
+    .band-detail-screen {
+      display: grid;
+      align-content: start;
+      gap: clamp(0.68rem, 2svh, 0.96rem);
+    }
+
+    .band-detail-hero {
+      display: grid;
+      gap: clamp(0.72rem, 2.6vw, 1rem);
+      padding: clamp(0.7rem, 3vw, 1rem);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.046), transparent 58%),
+        linear-gradient(135deg, rgba(142, 108, 255, 0.11), transparent 64%),
+        rgba(3, 3, 6, 0.46);
+      overflow: hidden;
+    }
+
+    .band-detail-hero::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, transparent 0 22%, rgba(142, 108, 255, 0.18) 50%, transparent 78%) top / 100% 1px no-repeat,
+        linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 62%) left / 1px 100% no-repeat;
+      pointer-events: none;
+    }
+
+    .band-detail-poster {
+      aspect-ratio: 1 / 1.08;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.13);
+      border-radius: var(--radius-sm);
+      background:
+        radial-gradient(circle at 50% 36%, rgba(247, 247, 242, 0.13), transparent 0.18rem),
+        radial-gradient(circle at 38% 52%, rgba(142, 108, 255, 0.3), transparent 0.24rem),
+        radial-gradient(circle at 63% 58%, rgba(213, 22, 34, 0.26), transparent 0.22rem),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.09), transparent 34% 66%, rgba(142, 108, 255, 0.08)),
+        rgba(1, 1, 3, 0.58);
+      box-shadow:
+        inset 0 0 1.5rem rgba(0, 0, 0, 0.48),
+        0 0 1.15rem rgba(142, 108, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .band-detail-poster::before,
+    .band-detail-poster::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .band-detail-poster::before {
+      inset: 11%;
+      border: 1px solid rgba(247, 247, 242, 0.14);
+      border-radius: inherit;
+      background:
+        linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.12) 50%, transparent 52%),
+        linear-gradient(0deg, transparent 0 48%, rgba(142, 108, 255, 0.16) 50%, transparent 52%);
+      opacity: 0.58;
+    }
+
+    .band-detail-poster::after {
+      inset: 0;
+      background:
+        linear-gradient(180deg, transparent 0 72%, rgba(1, 1, 3, 0.72)),
+        linear-gradient(90deg, rgba(1, 1, 3, 0.34), transparent 24% 76%, rgba(1, 1, 3, 0.38));
+    }
+
+    .band-detail-logo {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 0.35rem;
+      color: rgba(247, 247, 242, 0.92);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .band-detail-logo-mark {
+      font-size: clamp(2.85rem, 18vw, 5.7rem);
+      line-height: 0.86;
+      text-shadow: 0 0 1.1rem rgba(142, 108, 255, 0.2);
+    }
+
+    .band-detail-logo-name {
+      color: rgba(247, 247, 242, 0.66);
+      font-size: clamp(0.66rem, 2.7vw, 0.82rem);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .band-detail-copy {
+      display: grid;
+      align-content: center;
+      gap: clamp(0.56rem, 1.7svh, 0.78rem);
+    }
+
+    .band-detail-kicker,
+    .band-detail-name,
+    .band-detail-meta-label,
+    .band-detail-meta-value,
+    .band-detail-completion-label,
+    .band-detail-completion-value,
+    .band-detail-stat-label,
+    .band-detail-stat-value,
+    .band-detail-panel-title,
+    .band-member-name,
+    .band-member-role,
+    .band-activity-label,
+    .band-activity-value {
+      margin: 0;
+      min-width: 0;
+    }
+
+    .band-detail-kicker {
+      color: rgba(142, 108, 255, 0.76);
+      font-size: clamp(0.66rem, 2.55vw, 0.78rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .band-detail-name {
+      color: var(--color-text);
+      font-size: clamp(1.62rem, 10vw, 3rem);
+      font-weight: 400;
+      line-height: 0.98;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .band-detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.32rem;
+    }
+
+    .band-detail-tag {
+      min-width: 0;
+      min-height: 1.6rem;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.34rem 0.48rem;
+      border: 1px solid rgba(142, 108, 255, 0.24);
+      border-radius: var(--radius-sm);
+      background: rgba(142, 108, 255, 0.065);
+      color: rgba(247, 247, 242, 0.72);
+      font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .band-detail-tag--active {
+      border-color: rgba(116, 214, 147, 0.26);
+      background: rgba(116, 214, 147, 0.055);
+      color: rgba(134, 225, 161, 0.84);
+    }
+
+    .band-detail-meta {
+      display: grid;
+      gap: 0.34rem;
+    }
+
+    .band-detail-meta-row,
+    .band-detail-completion-head,
+    .band-activity-row {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(6.7rem, auto) minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.48rem;
+    }
+
+    .band-detail-meta-label,
+    .band-detail-completion-label,
+    .band-activity-label {
+      color: rgba(247, 247, 242, 0.44);
+      font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .band-detail-meta-value,
+    .band-detail-completion-value,
+    .band-activity-value {
+      color: rgba(247, 247, 242, 0.76);
+      font-size: clamp(0.68rem, 2.65vw, 0.82rem);
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .band-detail-completion {
+      display: grid;
+      gap: 0.36rem;
+      margin-top: 0.08rem;
+    }
+
+    .band-detail-progress {
+      height: 0.56rem;
+      border: 1px solid rgba(247, 247, 242, 0.1);
+      border-radius: 999px;
+      background: rgba(247, 247, 242, 0.045);
+      overflow: hidden;
+    }
+
+    .band-detail-progress-fill {
+      display: block;
+      width: 72%;
+      height: 100%;
+      border-radius: inherit;
+      background:
+        linear-gradient(90deg, rgba(142, 108, 255, 0.86), rgba(213, 22, 34, 0.72));
+      box-shadow: 0 0 0.78rem rgba(142, 108, 255, 0.18);
+    }
+
+    .band-detail-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.34rem;
+      padding: 0.4rem;
+      border: var(--v3-card-border);
+      border-radius: var(--v3-card-radius);
+      background:
+        linear-gradient(90deg, rgba(142, 108, 255, 0.045), transparent 68%),
+        rgba(247, 247, 242, 0.02);
+    }
+
+    .band-detail-stat {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 0.28rem;
+      padding: clamp(0.46rem, 2.2vw, 0.64rem) 0.22rem;
+      border: 1px solid rgba(247, 247, 242, 0.075);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.34);
+      text-align: center;
+    }
+
+    .band-detail-stat-value {
+      color: rgba(247, 247, 242, 0.9);
+      font-size: clamp(0.98rem, 5.2vw, 1.55rem);
+      line-height: 0.95;
+      text-transform: uppercase;
+    }
+
+    .band-detail-stat-label {
+      color: rgba(142, 108, 255, 0.76);
+      font-size: clamp(0.5rem, 2.12vw, 0.68rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .band-detail-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(0.5rem, 2.3vw, 0.72rem);
+    }
+
+    .band-detail-action {
+      appearance: none;
+      min-width: 0;
+      min-height: clamp(4.2rem, 17vw, 5.85rem);
+      display: grid;
+      align-content: end;
+      padding: clamp(0.7rem, 3vw, 0.95rem);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.044), transparent 58%),
+        linear-gradient(135deg, rgba(142, 108, 255, 0.12), transparent 68%),
+        rgba(3, 3, 6, 0.4);
+      color: rgba(247, 247, 242, 0.86);
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(0.76rem, 3.4vw, 1rem);
+      line-height: 1;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .band-detail-action:focus-visible {
+      outline: 2px solid rgba(247, 247, 242, 0.82);
+      outline-offset: 0.16rem;
+    }
+
+    .band-detail-members {
+      display: grid;
+      gap: clamp(0.58rem, 2.2vw, 0.78rem);
+    }
+
+    .band-detail-panel {
+      min-width: 0;
+      display: grid;
+      gap: 0.62rem;
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
+        rgba(3, 3, 6, 0.4);
+    }
+
+    .band-detail-panel-title {
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.76rem, 3.1vw, 0.9rem);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .band-member-list {
+      display: grid;
+      gap: 0.42rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .band-member {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.48rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.022);
+    }
+
+    .band-member-thumb {
+      width: clamp(2.55rem, 10.5vw, 3.15rem);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(247, 247, 242, 0.13);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(142, 108, 255, 0.22), transparent 58%),
+        rgba(1, 1, 3, 0.48);
+      color: rgba(247, 247, 242, 0.78);
+      font-size: clamp(0.62rem, 2.55vw, 0.75rem);
+      line-height: 1;
+      text-transform: uppercase;
+      box-shadow: 0 0 0.68rem rgba(142, 108, 255, 0.08);
+    }
+
+    .band-member-copy {
+      min-width: 0;
+      display: grid;
+      gap: 0.22rem;
+    }
+
+    .band-member-name {
+      color: rgba(247, 247, 242, 0.86);
+      font-size: clamp(0.74rem, 3vw, 0.9rem);
+      line-height: 1.08;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .band-member-role {
+      color: rgba(247, 247, 242, 0.5);
+      font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .band-detail-activity {
+      display: grid;
+      gap: 0.58rem;
+      padding: var(--v3-card-padding);
+      border: var(--v3-card-border-strong);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
+        linear-gradient(135deg, rgba(0, 178, 190, 0.06), transparent 62%),
+        rgba(3, 3, 6, 0.4);
+    }
+
+    .band-activity-grid {
+      display: grid;
+      gap: 0.38rem;
+    }
+
+    .band-activity-row {
+      padding: 0.5rem;
+      border: 1px solid rgba(247, 247, 242, 0.08);
+      border-radius: var(--radius-sm);
+      background: rgba(247, 247, 242, 0.02);
+    }
+
     .music-nexus-header,
     .music-nexus-module-grid,
     .music-bands-index,
@@ -3667,6 +4085,37 @@
         padding: 0.72rem;
       }
 
+      .band-detail-screen {
+        gap: 0.58rem;
+      }
+
+      .band-detail-hero,
+      .band-detail-panel,
+      .band-detail-activity {
+        padding: 0.58rem;
+      }
+
+      .band-detail-meta-row,
+      .band-detail-completion-head,
+      .band-activity-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.22rem;
+      }
+
+      .band-detail-stats {
+        gap: 0.26rem;
+        padding: 0.3rem;
+      }
+
+      .band-detail-stat {
+        padding-inline: 0.12rem;
+      }
+
+      .band-member {
+        gap: 0.4rem;
+        padding: 0.42rem;
+      }
+
       .music-bands-index {
         gap: 0.5rem;
         padding: 0.58rem;
@@ -3887,6 +4336,27 @@
 
       .music-nexus-card {
         flex-basis: clamp(10.5rem, 22%, 12.4rem);
+      }
+
+      .band-detail-hero {
+        grid-template-columns: minmax(13rem, 0.86fr) minmax(0, 1.14fr);
+        align-items: stretch;
+      }
+
+      .band-detail-poster {
+        min-height: clamp(17rem, 35vw, 22rem);
+      }
+
+      .band-detail-members {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .band-detail-activity {
+        gap: 0.68rem;
+      }
+
+      .band-activity-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .music-bands-index {
@@ -4142,123 +4612,150 @@
           </button>
         </section>
 
-        <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
-          <header class="music-nexus-header">
-            <h3 class="music-nexus-title" id="music-nexus-title">MUSIC NEXUS</h3>
-            <p class="music-nexus-intro">
-              Welcome To The Music Nexus,<br>
-              home to the musical journey that I have had going since 2011
-            </p>
-          </header>
-
-          <div class="music-nexus-module-grid" role="group" aria-label="Music Nexus modules" data-music-nexus-selector>
-            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="true" data-music-nexus-card="bands">
-              <h4 class="music-nexus-card-title">Bands</h4>
-            </button>
-            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="shows">
-              <h4 class="music-nexus-card-title">Shows</h4>
-            </button>
-            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="people">
-              <h4 class="music-nexus-card-title">People</h4>
-            </button>
-            <button class="v3-card v3-card--mini v3-card--state v3-card--interactive music-nexus-card" type="button" aria-pressed="false" data-music-nexus-card="venues">
-              <h4 class="music-nexus-card-title">Venues</h4>
-            </button>
-          </div>
-
-          <section class="music-bands-index is-active" aria-labelledby="music-bands-index-title" aria-hidden="false" data-music-bands-index>
-            <header class="music-bands-header">
-              <div class="music-bands-title-row">
-                <h4 class="music-nexus-section-title" id="music-bands-index-title">BANDS INDEX</h4>
-                <div class="music-bands-mode-switch" role="tablist" aria-label="Bands Index view modes">
-                  <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">Radar</button>
-                  <button class="bands-index-mode-tab" id="bands-list-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-list-panel" data-bands-view-target="list">List</button>
-                  <button class="bands-index-mode-tab" id="bands-search-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-search-panel" data-bands-view-target="search">Search</button>
+        <section class="music-nexus-shell" aria-labelledby="band-detail-title" aria-hidden="true" inert data-music-nexus-shell>
+          <article class="band-detail-screen" data-band-detail-placeholder>
+            <section class="band-detail-hero" aria-labelledby="band-detail-title">
+              <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
+                <div class="band-detail-logo" aria-hidden="true">
+                  <span class="band-detail-logo-mark">AV</span>
+                  <span class="band-detail-logo-name">Astra Vale</span>
                 </div>
               </div>
-              <div class="music-bands-status" aria-live="polite" data-bands-status>A lane active</div>
-            </header>
 
-            <div class="music-bands-view-stack">
-              <section class="bands-index-panel bands-index-panel--radar is-active" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
-                <div class="bands-radar-layout">
-                  <div class="bands-radar-core" aria-label="Alphabet radar display">
-                    <span class="bands-radar-sweep" aria-hidden="true"></span>
-                    <span class="bands-radar-points" aria-hidden="true" data-bands-radar-points></span>
-                    <div class="bands-radar-center">
-                      <span class="bands-radar-letter" data-bands-radar-letter>A</span>
-                      <span class="bands-radar-count" data-bands-radar-count>1 signal</span>
-                    </div>
-                  </div>
-                  <ul class="bands-radar-signal-list" aria-label="Active letter band signals" data-bands-radar-signals>
-                    <li class="bands-radar-signal">Astra Vale</li>
-                  </ul>
-                  <div class="bands-letter-nav" aria-label="Band alphabet radar navigation" data-bands-letter-nav></div>
+              <div class="band-detail-copy">
+                <p class="band-detail-kicker">BAND</p>
+                <h3 class="band-detail-name" id="band-detail-title">Astra Vale</h3>
+                <div class="band-detail-tags" aria-label="Band archive tags">
+                  <span class="band-detail-tag">New England</span>
+                  <span class="band-detail-tag">Alt Rock</span>
+                  <span class="band-detail-tag band-detail-tag--active">Active</span>
                 </div>
-              </section>
 
-              <section class="bands-index-panel bands-index-panel--list" id="bands-list-panel" role="tabpanel" aria-labelledby="bands-list-tab" aria-hidden="true" inert data-bands-view="list">
-                <div class="bands-list-panel">
-                  <div class="bands-list-filter-bar" data-bands-list-filter-bar hidden>
-                    <div class="bands-radar-compact" aria-live="polite">
-                      <span class="bands-radar-compact-letter" data-bands-filter-letter>A</span>
-                      <span class="bands-radar-compact-copy" data-bands-filter-summary>A lane filtered</span>
-                    </div>
-                    <button class="bands-radar-back" type="button" data-bands-back-radar>Back to Radar</button>
+                <div class="band-detail-meta" aria-label="Band detail metadata">
+                  <div class="band-detail-meta-row">
+                    <p class="band-detail-meta-label">Location</p>
+                    <p class="band-detail-meta-value">Portland, Maine</p>
                   </div>
-                  <div class="bands-letter-nav" aria-label="Band alphabet list navigation" data-bands-letter-nav-list></div>
-                  <div class="bands-list-viewport" aria-label="Alphabetized bands archive list" data-bands-list></div>
-                  <div class="bands-empty-state" data-bands-empty>No matching bands indexed</div>
-                </div>
-              </section>
-
-              <section class="bands-index-panel bands-index-panel--search" id="bands-search-panel" role="tabpanel" aria-labelledby="bands-search-tab" aria-hidden="true" inert data-bands-view="search">
-                <div class="bands-search-panel">
-                  <label class="bands-search-field">
-                    <span class="bands-search-label">Archive Search</span>
-                    <input class="bands-search-input" type="search" autocomplete="off" placeholder="Search bands, tiers, status" data-bands-search-input>
-                  </label>
-                  <div class="bands-letter-nav" aria-label="Band alphabet search navigation" data-bands-letter-nav-search></div>
-
-                  <div class="bands-search-groups">
-                    <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
-                      <h5 class="bands-search-group-title" id="bands-recent-searches-title">Recent Searches</h5>
-                      <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="complete">Complete</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="regional">Regional</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="partial">Partial</button>
-                      </div>
-                    </section>
-
-                    <section class="bands-search-group" aria-labelledby="bands-search-categories-title">
-                      <h5 class="bands-search-group-title" id="bands-search-categories-title">Filters</h5>
-                      <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="needs work">Needs Work</button>
-                      </div>
-                    </section>
-
-                    <section class="bands-search-group" aria-labelledby="bands-search-results-title">
-                      <h5 class="bands-search-group-title" id="bands-search-results-title">Signals</h5>
-                      <div class="bands-search-summary" data-bands-search-summary>12 rows</div>
-                      <ul class="bands-search-results" data-bands-search-results></ul>
-                    </section>
+                  <div class="band-detail-meta-row">
+                    <p class="band-detail-meta-label">First Captured</p>
+                    <p class="band-detail-meta-value">Placeholder Date</p>
                   </div>
                 </div>
-              </section>
+
+                <div class="band-detail-completion" aria-label="Archive completion">
+                  <div class="band-detail-completion-head">
+                    <p class="band-detail-completion-label">Archive Completion</p>
+                    <p class="band-detail-completion-value">72%</p>
+                  </div>
+                  <div class="band-detail-progress" aria-hidden="true">
+                    <span class="band-detail-progress-fill"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="band-detail-stats" aria-label="Band archive statistics">
+              <article class="band-detail-stat">
+                <p class="band-detail-stat-value">18</p>
+                <p class="band-detail-stat-label">SETS</p>
+              </article>
+              <article class="band-detail-stat">
+                <p class="band-detail-stat-value">24</p>
+                <p class="band-detail-stat-label">TOTAL SETS</p>
+              </article>
+              <article class="band-detail-stat">
+                <p class="band-detail-stat-value">486</p>
+                <p class="band-detail-stat-label">PHOTOS</p>
+              </article>
+              <article class="band-detail-stat">
+                <p class="band-detail-stat-value">6</p>
+                <p class="band-detail-stat-label">CONTRIBUTORS</p>
+              </article>
+            </section>
+
+            <div class="band-detail-actions" aria-label="Band detail actions">
+              <button class="v3-card v3-card--interactive band-detail-action" type="button">VIEW SETS</button>
+              <button class="v3-card v3-card--interactive band-detail-action" type="button">VIEW TIMELINE</button>
             </div>
-          </section>
 
-          <section class="v3-card v3-card--spotlight music-nexus-activity" aria-labelledby="music-activity-title">
-            <h4 class="music-nexus-section-title" id="music-activity-title">Recent Music Activity</h4>
-            <ul class="music-activity-list" aria-label="Recent Music Activity placeholder rows" data-music-activity-list>
-              <li class="v3-card v3-card--activity music-activity-row">Latest bands placeholder</li>
-              <li class="v3-card v3-card--activity music-activity-row">Featured artists placeholder</li>
-              <li class="v3-card v3-card--activity music-activity-row">Band archive updates placeholder</li>
-              <li class="v3-card v3-card--activity music-activity-row">New music gallery placeholder</li>
-            </ul>
-          </section>
+            <section class="band-detail-members" aria-label="Band membership panels">
+              <article class="band-detail-panel" aria-labelledby="core-members-title">
+                <h4 class="band-detail-panel-title" id="core-members-title">CORE MEMBERS</h4>
+                <ul class="band-member-list">
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">JM</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Jordan Mace</p>
+                      <p class="band-member-role">Vocals / Guitar</p>
+                    </div>
+                  </li>
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">SR</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Sera Rowe</p>
+                      <p class="band-member-role">Bass / Keys</p>
+                    </div>
+                  </li>
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">TK</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Theo Knox</p>
+                      <p class="band-member-role">Drums</p>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+
+              <article class="band-detail-panel" aria-labelledby="past-members-title">
+                <h4 class="band-detail-panel-title" id="past-members-title">PAST MEMBERS</h4>
+                <ul class="band-member-list">
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">LC</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Lena Cruz</p>
+                      <p class="band-member-role">Guitar</p>
+                    </div>
+                  </li>
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">NR</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Nico Reyes</p>
+                      <p class="band-member-role">Drums</p>
+                    </div>
+                  </li>
+                  <li class="band-member">
+                    <span class="band-member-thumb" aria-hidden="true">AP</span>
+                    <div class="band-member-copy">
+                      <p class="band-member-name">Avery Pike</p>
+                      <p class="band-member-role">Keys</p>
+                    </div>
+                  </li>
+                </ul>
+              </article>
+            </section>
+
+            <section class="band-detail-activity" aria-labelledby="archive-activity-title">
+              <h4 class="band-detail-panel-title" id="archive-activity-title">ARCHIVE ACTIVITY</h4>
+              <div class="band-activity-grid">
+                <div class="band-activity-row">
+                  <p class="band-activity-label">Last Updated</p>
+                  <p class="band-activity-value">Placeholder Update</p>
+                </div>
+                <div class="band-activity-row">
+                  <p class="band-activity-label">New Photos</p>
+                  <p class="band-activity-value">Placeholder Count</p>
+                </div>
+                <div class="band-activity-row">
+                  <p class="band-activity-label">Next Show Added</p>
+                  <p class="band-activity-value">Placeholder Show</p>
+                </div>
+                <div class="band-activity-row">
+                  <p class="band-activity-label">Archive Source</p>
+                  <p class="band-activity-value">Placeholder Source</p>
+                </div>
+              </div>
+            </section>
+          </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
           <header class="ring-archive-header">
@@ -4426,13 +4923,13 @@
         <span class="sr-only">Open global navigation menu</span>
       </button>
       <span class="rail-cluster rail-cluster--left" data-rail-region="current-view">
-        <span class="rail-label status-label">Currently Viewing:</span>
+        <span class="rail-label status-label">CURRENTLY VIEWING</span>
         <span class="rail-value rail-value--view status-value status-value--view" data-current-view>Homepage</span>
       </span>
-      <span class="rail-brand" data-rail-brand>Voodoo Media</span>
+      <span class="rail-brand" data-rail-brand>VMPIX MEDIA ARCHIVE</span>
       <span class="rail-cluster rail-cluster--right" data-rail-region="archive-build">
-        <span class="rail-label status-label">Archive Build:</span>
-        <span class="rail-value rail-value--build status-value status-value--build" data-archive-build>3.0.01</span>
+        <span class="rail-label status-label">ARCHIVE BUILD</span>
+        <span class="rail-value rail-value--build status-value status-value--build" data-archive-build>V3.0.01</span>
       </span>
     </footer>
 
@@ -5219,7 +5716,7 @@
         }
         setHubChromeHidden(true);
         setMusicNexusContext("bands", false, false);
-        setCurrentView("Music Nexus");
+        setCurrentView("Band Detail");
         setActiveGlobalNav("portfolio");
         if (startButton) {
           startButton.disabled = true;
