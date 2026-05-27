@@ -35,6 +35,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.music) {
     return { name: "music", canonicalUrl: routePaths.music };
   }
+  if (routePath === routePaths.musicPeople) {
+    return { name: "music-people", canonicalUrl: routePaths.musicPeople };
+  }
   if (routePath === routePaths.musicBands) {
     const view = normalizeBandsView(routeUrl.searchParams.get("view"));
     return { name: "music-bands", view, canonicalUrl: getBandsRouteUrl(view) };
@@ -108,6 +111,15 @@ function syncRoute(route, options = {}) {
     return;
   }
 
+  if (route.name === "music-people") {
+    showMusicNexus();
+    setMusicNexusContext("people");
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
   if (route.name === "music-bands") {
     bandsIndexReturnUrl = route.canonicalUrl;
     showMusicNexus();
@@ -164,4 +176,3 @@ function navigateToRoute(url, options = {}) {
   pushRouteUrl(targetUrl, options.historyState || {});
   syncRoute(route, { ...options, shouldCanonicalize: false });
 }
-

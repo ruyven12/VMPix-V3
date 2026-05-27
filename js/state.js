@@ -30,8 +30,11 @@ const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
 const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
 const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
+const musicActivityPanel = document.querySelector("[data-music-activity-panel]");
 const musicActivityList = document.querySelector("[data-music-activity-list]");
 const musicBandsIndex = document.querySelector("[data-music-bands-index]");
+const musicPeopleIndex = document.querySelector("[data-music-people-index]");
+const musicPeopleList = document.querySelector("[data-music-people-list]");
 const musicNexusBack = document.querySelector("[data-music-nexus-back]");
 const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
 const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
@@ -195,10 +198,6 @@ const musicActivityContent = {
     "Setlist note placeholder",
   ],
   people: [
-    "Tagged people placeholder",
-    "Featured musicians placeholder",
-    "New performer links placeholder",
-    "Collaboration notes placeholder",
   ],
   venues: [
     "Venue archive placeholder",
@@ -223,6 +222,19 @@ const musicBandIndexRows = [
   { bandId: "violet-machines", name: "Violet Machines", region: "International", status: "Complete Archive", statusKey: "complete", albums: 22, thumb: "VM" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
+const musicPeopleRows = [
+  { name: "Avery Stone", role: "Vocalist", band: "Astra Vale", photos: 186, sets: 12, thumb: "AS" },
+  { name: "Mara Quinn", role: "Guitar", band: "Black Harbor", photos: 142, sets: 8, thumb: "MQ" },
+  { name: "Jonas Vale", role: "Drums", band: "Crimson Static", photos: 318, sets: 34, thumb: "JV" },
+  { name: "Selene Cross", role: "Bass", band: "Dead Letters", photos: 74, sets: 4, thumb: "SC" },
+  { name: "Theo Mercer", role: "Keys", band: "Echo District", photos: 221, sets: 18, thumb: "TM" },
+  { name: "Rhea Blake", role: "Vocalist", band: "Glass Ritual", photos: 96, sets: 6, thumb: "RB" },
+  { name: "Cass Wilder", role: "Guitar", band: "Hollow Signal", photos: 136, sets: 9, thumb: "CW" },
+  { name: "Nico Ash", role: "Drums", band: "Moon Circuit", photos: 168, sets: 11, thumb: "NA" },
+  { name: "Iris Fane", role: "Bass", band: "Neon Saints", photos: 284, sets: 27, thumb: "IF" },
+  { name: "Luca Voss", role: "Synth", band: "Violet Machines", photos: 256, sets: 22, thumb: "LV" },
+];
+
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [
   ["-4.8rem", "-5.2rem"],
@@ -235,6 +247,7 @@ const routePaths = {
   portfolio: "/portfolio",
   music: "/music",
   musicBands: "/music/bands",
+  musicPeople: "/music/people",
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [

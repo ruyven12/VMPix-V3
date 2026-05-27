@@ -1331,9 +1331,112 @@ function setBandsIndexVisible(isVisible) {
   }
 }
 
+function formatMusicPeopleCount(value, label) {
+  const count = Number.parseInt(value, 10) || 0;
+  return `${count} ${label}${count === 1 ? "" : "s"}`;
+}
+
+function createMusicPeopleRow(person) {
+  const row = document.createElement("article");
+  row.className = "music-people-row";
+  row.setAttribute("role", "listitem");
+  row.setAttribute(
+    "aria-label",
+    `${person.name}, ${person.role}, ${person.band}, ${formatMusicPeopleCount(person.photos, "Photo")}, ${formatMusicPeopleCount(person.sets, "Set")}`
+  );
+
+  const thumb = document.createElement("span");
+  thumb.className = "music-people-thumb";
+  thumb.setAttribute("aria-hidden", "true");
+  thumb.textContent = person.thumb || person.name.slice(0, 2).toUpperCase();
+
+  const main = document.createElement("span");
+  main.className = "music-people-main";
+
+  const name = document.createElement("span");
+  name.className = "music-people-name";
+  name.textContent = person.name;
+
+  const meta = document.createElement("span");
+  meta.className = "music-people-meta";
+
+  const role = document.createElement("span");
+  role.className = "music-people-role";
+  role.textContent = person.role;
+
+  const band = document.createElement("span");
+  band.className = "music-people-band";
+  band.textContent = person.band;
+
+  const counts = document.createElement("span");
+  counts.className = "music-people-counts";
+  counts.setAttribute("aria-hidden", "true");
+
+  const photoCount = document.createElement("span");
+  photoCount.className = "music-people-count-pill";
+  photoCount.textContent = formatMusicPeopleCount(person.photos, "Photo");
+
+  const setCount = document.createElement("span");
+  setCount.className = "music-people-count-pill";
+  setCount.textContent = formatMusicPeopleCount(person.sets, "Set");
+
+  const arrow = document.createElement("span");
+  arrow.className = "music-people-arrow";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = ">";
+
+  meta.append(role, band);
+  main.append(name, meta);
+  counts.append(photoCount, setCount);
+  row.append(thumb, main, counts, arrow);
+
+  return row;
+}
+
+function renderMusicPeopleIndex() {
+  if (!musicPeopleList) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  musicPeopleRows.forEach((person) => {
+    fragment.append(createMusicPeopleRow(person));
+  });
+  musicPeopleList.replaceChildren(fragment);
+}
+
+function setPeopleIndexVisible(isVisible) {
+  if (!musicPeopleIndex) {
+    return;
+  }
+
+  musicPeopleIndex.classList.toggle("is-active", isVisible);
+  musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) {
+    renderMusicPeopleIndex();
+    musicPeopleIndex.removeAttribute("inert");
+  } else {
+    musicPeopleIndex.setAttribute("inert", "");
+  }
+}
+
+function setMusicActivityPanelVisible(isVisible) {
+  if (!musicActivityPanel) {
+    return;
+  }
+
+  musicActivityPanel.classList.toggle("is-hidden", !isVisible);
+  musicActivityPanel.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) {
+    musicActivityPanel.removeAttribute("inert");
+  } else {
+    musicActivityPanel.setAttribute("inert", "");
+  }
+}
+
 function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdateRail = true) {
-  const rows = musicActivityContent[sectionName];
-  if (!rows || !musicActivityList) {
+  const rows = musicActivityContent[sectionName] || [];
+  if (!musicActivityList) {
     return;
   }
 
@@ -1357,17 +1460,21 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
   });
 
   setBandsIndexVisible(sectionName === "bands");
+  setPeopleIndexVisible(sectionName === "people");
   if (sectionName === "bands") {
     syncBandsIndex();
   }
 
-  musicActivityList.replaceChildren();
-  rows.forEach((rowText) => {
-    const row = document.createElement("li");
-    row.className = "v3-card v3-card--activity music-activity-row";
-    row.textContent = rowText;
-    musicActivityList.append(row);
-  });
+  setMusicActivityPanelVisible(sectionName !== "people");
+  if (sectionName !== "people") {
+    musicActivityList.replaceChildren();
+    rows.forEach((rowText) => {
+      const row = document.createElement("li");
+      row.className = "v3-card v3-card--activity music-activity-row";
+      row.textContent = rowText;
+      musicActivityList.append(row);
+    });
+  }
 
   if (shouldUpdateRail && activeCardLabel) {
     setCurrentView(activeCardLabel);
@@ -1489,7 +1596,12 @@ function initMusicModule() {
         navigateToRoute(getBandsRouteUrl("radar"));
         return;
       }
-      if (getRouteFromUrl().name === "music-bands") {
+      if (musicSection === "people") {
+        navigateToRoute(routePaths.musicPeople);
+        return;
+      }
+      const currentRoute = getRouteFromUrl().name;
+      if (currentRoute === "music-bands" || currentRoute === "music-people") {
         navigateToRoute(routePaths.music);
       }
       setMusicNexusContext(musicSection);
