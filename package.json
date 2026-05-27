@@ -5,6 +5,7 @@
   "description": "Static VMPix V3 frontend QA harness.",
   "scripts": {
     "test:e2e": "playwright test",
+    "test:smoke": "playwright test tests/e2e/routes-smoke.spec.js",
     "test:e2e:headed": "playwright test --headed"
   },
   "devDependencies": {

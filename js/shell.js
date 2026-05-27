@@ -558,11 +558,11 @@ function handleGlobalMenuAction(event) {
   } else if (globalTarget === "portfolio") {
     navigateToRoute(routePaths.portfolio);
   } else if (globalTarget === "about") {
-    showAboutShell();
+    navigateToRoute(routePaths.about);
   } else if (globalTarget === "calendar") {
-    showCalendarShell();
+    navigateToRoute(routePaths.calendar);
   } else if (globalTarget === "contact") {
-    showContactShell();
+    navigateToRoute(routePaths.contact);
   } else if (globalTarget === "admin") {
     window.location.href = "./admin/index.html";
     return;
@@ -648,7 +648,7 @@ if (shell && startButton) {
         return;
       }
       if (card.dataset.moduleCard === "wrestling") {
-        showRingArchive();
+        navigateToRoute(routePaths.wrestling);
         return;
       }
 

@@ -38,6 +38,18 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.musicPeople) {
     return { name: "music-people", canonicalUrl: routePaths.musicPeople };
   }
+  if (routePath === routePaths.wrestling) {
+    return { name: "wrestling", canonicalUrl: routePaths.wrestling };
+  }
+  if (routePath === routePaths.calendar) {
+    return { name: "calendar", canonicalUrl: routePaths.calendar };
+  }
+  if (routePath === routePaths.about) {
+    return { name: "about", canonicalUrl: routePaths.about };
+  }
+  if (routePath === routePaths.contact) {
+    return { name: "contact", canonicalUrl: routePaths.contact };
+  }
 
   const personDetailPrefix = `${routePaths.musicPeople}/`;
   if (routePath.startsWith(personDetailPrefix)) {
@@ -126,6 +138,26 @@ function syncRoute(route, options = {}) {
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
+    return;
+  }
+
+  if (route.name === "wrestling") {
+    showRingArchive();
+    return;
+  }
+
+  if (route.name === "calendar") {
+    showCalendarShell();
+    return;
+  }
+
+  if (route.name === "about") {
+    showAboutShell();
+    return;
+  }
+
+  if (route.name === "contact") {
+    showContactShell();
     return;
   }
 

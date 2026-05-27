@@ -23,24 +23,7 @@ function sendNotFound(response) {
   response.end("Not found");
 }
 
-const server = http.createServer((request, response) => {
-  const requestUrl = new URL(request.url, `http://${host}:${port}`);
-  const pathname = requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
-  const normalizedPath = path.normalize(decodeURIComponent(pathname)).replace(/^(\.\.[/\\])+/, "");
-  const filePath = path.resolve(rootDir, `.${normalizedPath}`);
-
-  if (!filePath.startsWith(rootDir)) {
-    response.writeHead(403, { "content-type": "text/plain; charset=utf-8" });
-    response.end("Forbidden");
-    return;
-  }
-
-  if (pathname === "/favicon.ico" && !fs.existsSync(filePath)) {
-    response.writeHead(204);
-    response.end();
-    return;
-  }
-
+function sendFile(filePath, request, response) {
   fs.stat(filePath, (statError, stats) => {
     if (statError || !stats.isFile()) {
       sendNotFound(response);
@@ -93,6 +76,42 @@ const server = http.createServer((request, response) => {
     }
 
     fs.createReadStream(filePath).pipe(response);
+  });
+}
+
+const server = http.createServer((request, response) => {
+  const requestUrl = new URL(request.url, `http://${host}:${port}`);
+  const pathname = requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
+  const normalizedPath = path.normalize(decodeURIComponent(pathname)).replace(/^(\.\.[/\\])+/, "");
+  const filePath = path.resolve(rootDir, `.${normalizedPath}`);
+
+  if (!filePath.startsWith(rootDir)) {
+    response.writeHead(403, { "content-type": "text/plain; charset=utf-8" });
+    response.end("Forbidden");
+    return;
+  }
+
+  if (pathname === "/favicon.ico" && !fs.existsSync(filePath)) {
+    response.writeHead(204);
+    response.end();
+    return;
+  }
+
+  fs.stat(filePath, (statError, stats) => {
+    if (!statError && stats.isFile()) {
+      sendFile(filePath, request, response);
+      return;
+    }
+
+    if (
+      (request.method === "GET" || request.method === "HEAD") &&
+      !path.extname(pathname)
+    ) {
+      sendFile(path.join(rootDir, "index.html"), request, response);
+      return;
+    }
+
+    sendNotFound(response);
   });
 });
 

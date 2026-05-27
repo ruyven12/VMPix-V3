@@ -315,6 +315,10 @@ const routePaths = {
   music: "/music",
   musicBands: "/music/bands",
   musicPeople: "/music/people",
+  wrestling: "/wrestling",
+  calendar: "/calendar",
+  about: "/about",
+  contact: "/contact",
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [
