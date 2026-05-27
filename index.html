@@ -7679,6 +7679,13 @@
         ["4.2rem", "4.9rem"],
         ["-5.3rem", "3.6rem"],
       ];
+      const routePaths = {
+        home: "/",
+        portfolio: "/portfolio",
+        music: "/music",
+        musicBands: "/music/bands",
+      };
+      const routedBandsViews = ["radar", "list", "search"];
 
       function setCurrentView(viewName) {
         if (currentView) {
@@ -7694,6 +7701,113 @@
             button.removeAttribute("aria-current");
           }
         });
+      }
+
+      function normalizeBandsView(viewName) {
+        return routedBandsViews.includes(viewName) ? viewName : "radar";
+      }
+
+      function getBandsRouteUrl(viewName = activeBandsView) {
+        return `${routePaths.musicBands}?view=${normalizeBandsView(viewName)}`;
+      }
+
+      function normalizeRoutePath(pathname) {
+        const routePath = pathname.replace(/\/+$/, "") || routePaths.home;
+        return routePath.endsWith("/index.html") ? routePaths.home : routePath;
+      }
+
+      function getPathWithSearch(url = window.location.href) {
+        const routeUrl = new URL(url, window.location.href);
+        return `${routeUrl.pathname}${routeUrl.search}`;
+      }
+
+      function getRouteFromUrl(url = window.location.href) {
+        const routeUrl = new URL(url, window.location.href);
+        const routePath = normalizeRoutePath(routeUrl.pathname);
+
+        if (routePath === routePaths.home) {
+          return { name: "home", canonicalUrl: routePaths.home };
+        }
+        if (routePath === routePaths.portfolio) {
+          return { name: "portfolio", canonicalUrl: routePaths.portfolio };
+        }
+        if (routePath === routePaths.music) {
+          return { name: "music", canonicalUrl: routePaths.music };
+        }
+        if (routePath === routePaths.musicBands) {
+          const view = normalizeBandsView(routeUrl.searchParams.get("view"));
+          return { name: "music-bands", view, canonicalUrl: getBandsRouteUrl(view) };
+        }
+
+        return { name: "home", canonicalUrl: routePaths.home, isUnknown: true };
+      }
+
+      function pushRouteUrl(url) {
+        if (!window.history || typeof window.history.pushState !== "function") {
+          return;
+        }
+
+        const targetUrl = new URL(url, window.location.href);
+        const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
+        if (targetPath !== getPathWithSearch()) {
+          window.history.pushState({ route: targetPath }, "", targetPath);
+        }
+      }
+
+      function replaceRouteUrl(url) {
+        if (!window.history || typeof window.history.replaceState !== "function") {
+          return;
+        }
+
+        const targetUrl = new URL(url, window.location.href);
+        const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
+        if (targetPath !== getPathWithSearch()) {
+          window.history.replaceState({ route: targetPath }, "", targetPath);
+        }
+      }
+
+      function syncRoute(route, options = {}) {
+        if (route.name === "home") {
+          showHomepage();
+          return;
+        }
+
+        if (route.name === "portfolio") {
+          if (options.shouldAnimatePortal) {
+            activatePortal();
+          } else {
+            revealHub();
+          }
+          return;
+        }
+
+        if (route.name === "music") {
+          showMusicNexus();
+          setBandsView("radar");
+          return;
+        }
+
+        if (route.name === "music-bands") {
+          showMusicNexus();
+          setBandsView(route.view, Boolean(options.shouldFocusBandsView));
+          if (options.shouldCanonicalize !== false) {
+            replaceRouteUrl(route.canonicalUrl);
+          }
+          return;
+        }
+
+        showHomepage();
+      }
+
+      function syncRouteFromLocation(options = {}) {
+        syncRoute(getRouteFromUrl(), options);
+      }
+
+      function navigateToRoute(url, options = {}) {
+        const route = getRouteFromUrl(url);
+        const targetUrl = route.isUnknown ? url : route.canonicalUrl;
+        pushRouteUrl(targetUrl);
+        syncRoute(route, { ...options, shouldCanonicalize: false });
       }
 
       function setSpotlight(moduleName) {
@@ -8784,7 +8898,11 @@
       }
 
       function setBandsView(viewName, shouldFocus = false, options = {}) {
-        if (!["radar", "list", "search"].includes(viewName)) {
+        if (!routedBandsViews.includes(viewName)) {
+          return;
+        }
+        if (options.shouldRoute) {
+          navigateToRoute(getBandsRouteUrl(viewName), { shouldFocusBandsView: shouldFocus });
           return;
         }
 
@@ -8821,7 +8939,7 @@
 
       function returnToBandsRadar() {
         activeBandsFilterLetter = "";
-        setBandsView("radar");
+        setBandsView("radar", false, { shouldRoute: true });
         scrollBandsIndexIntoView();
       }
 
@@ -9400,9 +9518,9 @@
         }
 
         if (globalTarget === "home") {
-          showHomepage();
+          navigateToRoute(routePaths.home);
         } else if (globalTarget === "portfolio") {
-          revealHub();
+          navigateToRoute(routePaths.portfolio);
         } else if (globalTarget === "about") {
           showAboutShell();
         } else if (globalTarget === "calendar") {
@@ -9471,7 +9589,9 @@
       if (shell && startButton) {
         startButton.setAttribute("aria-busy", "false");
         setActiveGlobalNav("home");
-        startButton.addEventListener("click", activatePortal);
+        startButton.addEventListener("click", () => {
+          navigateToRoute(routePaths.portfolio, { shouldAnimatePortal: true });
+        });
         syncRailHeight();
         if (railMenuTrigger) {
           railMenuTrigger.addEventListener("click", openGlobalMenu);
@@ -9488,7 +9608,7 @@
         moduleCards.forEach((card) => {
           card.addEventListener("click", () => {
             if (card.dataset.moduleCard === "music") {
-              showMusicNexus();
+              navigateToRoute(routePaths.music);
               return;
             }
             if (card.dataset.moduleCard === "wrestling") {
@@ -9506,7 +9626,9 @@
           ringArchiveBack.addEventListener("click", revealHub);
         }
         if (musicNexusBack) {
-          musicNexusBack.addEventListener("click", revealHub);
+          musicNexusBack.addEventListener("click", () => {
+            navigateToRoute(routePaths.portfolio);
+          });
         }
         if (bandDetailBack) {
           bandDetailBack.addEventListener("click", () => {
@@ -9599,7 +9721,15 @@
         });
         musicNexusCards.forEach((card) => {
           card.addEventListener("click", () => {
-            setMusicNexusContext(card.dataset.musicNexusCard);
+            const musicSection = card.dataset.musicNexusCard;
+            if (musicSection === "bands") {
+              navigateToRoute(getBandsRouteUrl("radar"));
+              return;
+            }
+            if (getRouteFromUrl().name === "music-bands") {
+              navigateToRoute(routePaths.music);
+            }
+            setMusicNexusContext(musicSection);
           });
           card.addEventListener("keydown", (event) => {
             if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -9625,7 +9755,7 @@
         });
         bandsViewButtons.forEach((button) => {
           button.addEventListener("click", () => {
-            setBandsView(button.dataset.bandsViewTarget, true);
+            setBandsView(button.dataset.bandsViewTarget, true, { shouldRoute: true });
           });
         });
         if (bandsSearchInput) {
@@ -9636,13 +9766,17 @@
         bandsSearchChips.forEach((chip) => {
           chip.addEventListener("click", () => {
             setBandsSearchTerm(chip.dataset.bandsSearchTerm || "");
-            setBandsView("search", true);
+            setBandsView("search", true, { shouldRoute: true });
           });
         });
         if (bandsBackRadar) {
           bandsBackRadar.addEventListener("click", returnToBandsRadar);
         }
         setBandsView("radar");
+        syncRouteFromLocation();
+        window.addEventListener("popstate", () => {
+          syncRouteFromLocation();
+        });
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
           syncSpotlightFromCarousel();
