@@ -1882,18 +1882,90 @@ function renderMusicPeopleIndex(options = {}) {
   }
 }
 
+const musicShowsYearOptions = ["ALL SHOWS", "2026", "2025", "2024", "2023", "2022", "2021", "MORE"];
+const musicShowsInitialVisibleCount = 4;
+const musicShowsPageSize = 4;
+const musicShowsMonthOrder = {
+  JAN: 1,
+  FEB: 2,
+  MAR: 3,
+  APR: 4,
+  MAY: 5,
+  JUN: 6,
+  JUL: 7,
+  AUG: 8,
+  SEP: 9,
+  OCT: 10,
+  NOV: 11,
+  DEC: 12,
+};
+
+function getMusicShowRouteUrl(show) {
+  return `/music/shows/${encodeURIComponent(show.showId || "")}`;
+}
+
+function getMusicShowTimestamp(show) {
+  const year = Number.parseInt(show.year || "0", 10);
+  const month = musicShowsMonthOrder[String(show.month || "").toUpperCase()] || 0;
+  const day = Number.parseInt(show.day || "0", 10);
+  return (year * 10000) + (month * 100) + day;
+}
+
+function getSortedMusicShows(rows = musicShowsArchiveRows) {
+  return [...rows].sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left));
+}
+
+function getFilteredMusicShows() {
+  const sortedRows = getSortedMusicShows();
+  if (activeMusicShowsYear === "ALL SHOWS") {
+    return sortedRows;
+  }
+  if (activeMusicShowsYear === "MORE") {
+    return sortedRows.filter((show) => Number.parseInt(show.year || "0", 10) <= 2020);
+  }
+  return sortedRows.filter((show) => show.year === activeMusicShowsYear);
+}
+
+function updateMusicShowsYearSelection(yearLabel) {
+  activeMusicShowsYear = musicShowsYearOptions.includes(yearLabel) ? yearLabel : "ALL SHOWS";
+  visibleMusicShowsCount = musicShowsInitialVisibleCount;
+  renderMusicShowsArchive();
+}
+
+function loadMoreMusicShows() {
+  const filteredRows = getFilteredMusicShows();
+  visibleMusicShowsCount = Math.min(filteredRows.length, visibleMusicShowsCount + musicShowsPageSize);
+  renderMusicShowsArchive();
+}
+
+function selectMusicShowDetailHook(show) {
+  if (!musicActivityPanel || !show) {
+    return;
+  }
+
+  musicActivityPanel.dataset.selectedShowRoute = getMusicShowRouteUrl(show);
+  const status = musicActivityPanel.querySelector("[data-music-shows-status]");
+  if (status) {
+    status.textContent = `Show Detail Event Dossier hook ready: ${show.title}`;
+  }
+}
+
 function createMusicShowsYearButton(label, isActive = false) {
   const button = document.createElement("button");
   button.className = "music-shows-year";
   button.type = "button";
   button.textContent = label;
   button.setAttribute("aria-pressed", String(isActive));
+  button.addEventListener("click", () => {
+    updateMusicShowsYearSelection(label);
+  });
   return button;
 }
 
 function createMusicShowsCard(show) {
   const card = document.createElement("article");
   card.className = "music-show-card";
+  card.dataset.showDetailRoute = getMusicShowRouteUrl(show);
 
   const date = document.createElement("div");
   date.className = "music-show-date";
@@ -1950,6 +2022,11 @@ function createMusicShowsCard(show) {
   action.className = "music-show-action";
   action.type = "button";
   action.textContent = "View Details";
+  action.dataset.showDetailRoute = getMusicShowRouteUrl(show);
+  action.setAttribute("aria-label", `View Details for ${show.title}`);
+  action.addEventListener("click", () => {
+    selectMusicShowDetailHook(show);
+  });
 
   footer.append(bandCount, action);
   body.append(title, venue, location, footer);
@@ -1977,8 +2054,8 @@ function renderMusicShowsArchive() {
   yearBar.className = "music-shows-years";
   yearBar.dataset.musicShowsYears = "";
   yearBar.setAttribute("aria-label", "Shows archive years");
-  ["ALL SHOWS", "2026", "2025", "2024", "2023", "2022", "2021", "MORE"].forEach((yearLabel, index) => {
-    yearBar.append(createMusicShowsYearButton(yearLabel, index === 0));
+  musicShowsYearOptions.forEach((yearLabel) => {
+    yearBar.append(createMusicShowsYearButton(yearLabel, yearLabel === activeMusicShowsYear));
   });
   const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
   if (existingYearBar) {
@@ -1986,15 +2063,49 @@ function renderMusicShowsArchive() {
   }
   musicActivityPanel.insertBefore(yearBar, musicActivityList);
 
+  const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
+  if (existingNav) {
+    existingNav.remove();
+  }
+
+  const filteredRows = getFilteredMusicShows();
+  const visibleRows = filteredRows.slice(0, visibleMusicShowsCount);
   const fragment = document.createDocumentFragment();
-  musicShowsArchiveRows.forEach((show) => {
+  visibleRows.forEach((show) => {
     const item = document.createElement("li");
     item.className = "music-shows-item";
     item.append(createMusicShowsCard(show));
     fragment.append(item);
   });
+  if (visibleRows.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "music-shows-empty";
+    empty.textContent = `${activeMusicShowsYear} archive cards pending`;
+    fragment.append(empty);
+  }
 
   musicActivityList.append(fragment);
+
+  const nav = document.createElement("footer");
+  nav.className = "music-shows-nav";
+  nav.dataset.musicShowsNav = "";
+
+  const status = document.createElement("p");
+  status.className = "music-shows-status";
+  status.dataset.musicShowsStatus = "";
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / musicShowsPageSize));
+  const currentPage = Math.max(1, Math.ceil(Math.min(visibleMusicShowsCount, filteredRows.length || 1) / musicShowsPageSize));
+  status.textContent = `${visibleRows.length} of ${filteredRows.length} shows / Page ${currentPage} of ${pageCount}`;
+
+  const loadMore = document.createElement("button");
+  loadMore.className = "music-shows-load-more";
+  loadMore.type = "button";
+  loadMore.textContent = "Load More";
+  loadMore.disabled = visibleRows.length >= filteredRows.length;
+  loadMore.addEventListener("click", loadMoreMusicShows);
+
+  nav.append(status, loadMore);
+  musicActivityPanel.append(nav);
 }
 
 function renderMusicActivityRows(sectionName, rows) {
@@ -2013,6 +2124,11 @@ function renderMusicActivityRows(sectionName, rows) {
   if (existingYearBar) {
     existingYearBar.remove();
   }
+  const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
+  if (existingNav) {
+    existingNav.remove();
+  }
+  delete musicActivityPanel.dataset.selectedShowRoute;
   musicActivityList.className = "music-activity-list";
   musicActivityList.setAttribute("aria-label", `${sectionName} music activity placeholder rows`);
   musicActivityList.replaceChildren();

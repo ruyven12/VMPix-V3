@@ -149,6 +149,8 @@ let isGalleryModeOpen = false;
 let activeLightboxIndex = 0;
 let isLightboxThumbnailStripOpen = false;
 let areLightboxControlsHidden = false;
+let activeMusicShowsYear = "ALL SHOWS";
+let visibleMusicShowsCount = 4;
 
 const setImageAccents = [
   { x: "42%", y: "38%", color: "rgba(142, 108, 255, 0.24)" },
@@ -213,6 +215,7 @@ const musicActivityContent = {
 
 const musicShowsArchiveRows = [
   {
+    showId: "spring-voltage-2026",
     month: "MAY",
     day: "16",
     year: "2026",
@@ -223,6 +226,7 @@ const musicShowsArchiveRows = [
     poster: "SV",
   },
   {
+    showId: "basement-frequency-2026",
     month: "MAR",
     day: "28",
     year: "2026",
@@ -233,6 +237,7 @@ const musicShowsArchiveRows = [
     poster: "BF",
   },
   {
+    showId: "autumn-static-2025",
     month: "NOV",
     day: "09",
     year: "2025",
@@ -243,6 +248,7 @@ const musicShowsArchiveRows = [
     poster: "AS",
   },
   {
+    showId: "late-summer-noise-2025",
     month: "AUG",
     day: "22",
     year: "2025",
@@ -253,6 +259,7 @@ const musicShowsArchiveRows = [
     poster: "LS",
   },
   {
+    showId: "winter-signal-2024",
     month: "DEC",
     day: "14",
     year: "2024",
@@ -263,6 +270,7 @@ const musicShowsArchiveRows = [
     poster: "WS",
   },
   {
+    showId: "labor-day-feedback-2023",
     month: "SEP",
     day: "02",
     year: "2023",
