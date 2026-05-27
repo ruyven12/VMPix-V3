@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: vmpix-v3
+    runtime: static
+    buildCommand: echo "Static VMPix V3 shell"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: /index.html

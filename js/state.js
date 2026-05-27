@@ -35,6 +35,7 @@ const musicActivityList = document.querySelector("[data-music-activity-list]");
 const musicBandsIndex = document.querySelector("[data-music-bands-index]");
 const musicPeopleIndex = document.querySelector("[data-music-people-index]");
 const musicPeopleList = document.querySelector("[data-music-people-list]");
+const personDetail = document.querySelector("[data-person-detail]");
 const musicNexusBack = document.querySelector("[data-music-nexus-back]");
 const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
 const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
@@ -139,6 +140,7 @@ let bandsSearchTerm = "";
 let bandsIndexReturnUrl = "/music/bands?view=radar";
 let activeMusicPeoplePage = 1;
 let activeMusicPeopleId = "";
+let activeMusicPersonDetailId = "";
 let activeMusicBand = null;
 let activeSetRow = null;
 let isSetDetailOpen = false;
@@ -225,7 +227,7 @@ const musicBandIndexRows = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const musicPeopleRows = [
-  { personId: "avery-stone", name: "Avery Stone", role: "Vocalist", band: "Astra Vale", photos: 186, sets: 12, thumb: "AS" },
+  { personId: "adam-begin", name: "Adam Begin", role: "Performer / Vocals", band: "Culling The Herd", photos: 516, sets: 42, thumb: "AB" },
   { personId: "mara-quinn", name: "Mara Quinn", role: "Guitar", band: "Black Harbor", photos: 142, sets: 8, thumb: "MQ" },
   { personId: "jonas-vale", name: "Jonas Vale", role: "Drums", band: "Crimson Static", photos: 318, sets: 34, thumb: "JV" },
   { personId: "selene-cross", name: "Selene Cross", role: "Bass", band: "Dead Letters", photos: 74, sets: 4, thumb: "SC" },
@@ -237,6 +239,57 @@ const musicPeopleRows = [
   { personId: "luca-voss", name: "Luca Voss", role: "Synth", band: "Violet Machines", photos: 256, sets: 22, thumb: "LV" },
 ];
 const musicPeoplePageSize = 5;
+
+const musicPersonDetailPlaceholder = {
+  personId: "adam-begin",
+  imageLabel: "AB",
+  name: "ADAM BEGIN",
+  roleItems: ["Performer", "Vocals"],
+  summaryItems: ["128 Appearances", "42 Shows", "516 Tagged Photos"],
+  seenItems: ["First Seen 06.28.2008", "Latest Seen 04.22.2018"],
+  associatedBands: ["Culling The Herd"],
+  taggedShows: [
+    {
+      showId: "adam-begin-062808",
+      date: { month: "JUN", day: "28", year: "2008" },
+      thumb: "06.28",
+      title: "Culling The Herd / Early Archive Set",
+      venue: "The Underground",
+      location: "Charlotte, NC",
+      taggedPhotos: 18,
+      expanded: true,
+      contributors: "Contributors: Voodoo Media / Archive Hold",
+      notes: "Placeholder notes for photos tagged or captioned with Adam Begin only.",
+      thumbnails: ["AB 01", "AB 02", "AB 03", "AB 04"],
+    },
+    {
+      showId: "adam-begin-091210",
+      date: { month: "SEP", day: "12", year: "2010" },
+      thumb: "09.12",
+      title: "Culling The Herd / Fall Room Archive",
+      venue: "Tremont Music Hall",
+      location: "Charlotte, NC",
+      taggedPhotos: 24,
+      expanded: false,
+      contributors: "Contributors: Voodoo Media",
+      notes: "Person-tagged placeholder subset pending final captions.",
+      thumbnails: ["AB 05", "AB 06", "AB 07"],
+    },
+    {
+      showId: "adam-begin-042218",
+      date: { month: "APR", day: "22", year: "2018" },
+      thumb: "04.22",
+      title: "Culling The Herd / Latest Tagged Appearance",
+      venue: "The Milestone",
+      location: "Charlotte, NC",
+      taggedPhotos: 31,
+      expanded: false,
+      contributors: "Contributors: Voodoo Media / Guest Archive",
+      notes: "Static placeholder for future tagged-show detail expansion.",
+      thumbnails: ["AB 08", "AB 09", "AB 10"],
+    },
+  ],
+};
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [

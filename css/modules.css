@@ -55,6 +55,16 @@
 }
 
 .band-detail-screen,
+.person-detail-screen,
+.person-detail-back,
+.person-detail-hero,
+.person-detail-image,
+.person-detail-copy,
+.person-detail-associated,
+.person-tagged-shows,
+.person-show-card,
+.person-show-summary,
+.person-show-expanded,
 .band-detail-hero,
 .band-detail-poster,
 .band-detail-copy,
@@ -95,7 +105,18 @@
   gap: clamp(0.72rem, 2.1svh, 1.05rem);
 }
 
+.person-detail-screen {
+  display: none;
+  align-content: start;
+  gap: clamp(0.66rem, 2svh, 0.96rem);
+  padding-bottom: clamp(0.3rem, 1.6svh, 0.68rem);
+}
+
 .music-nexus-shell.is-band-detail .band-detail-screen {
+  display: grid;
+}
+
+.music-nexus-shell.is-person-detail .person-detail-screen {
   display: grid;
 }
 
@@ -117,6 +138,17 @@
 .music-nexus-shell.is-band-detail .music-people-index,
 .music-nexus-shell.is-band-detail .music-nexus-activity,
 .music-nexus-shell.is-band-detail .music-nexus-back,
+.music-nexus-shell.is-band-detail .person-detail-screen,
+.music-nexus-shell.is-person-detail .music-nexus-header,
+.music-nexus-shell.is-person-detail .music-nexus-module-grid,
+.music-nexus-shell.is-person-detail .music-bands-index,
+.music-nexus-shell.is-person-detail .music-people-index,
+.music-nexus-shell.is-person-detail .music-nexus-activity,
+.music-nexus-shell.is-person-detail .music-nexus-back,
+.music-nexus-shell.is-person-detail .band-detail-screen,
+.music-nexus-shell.is-person-detail .sets-archive-screen,
+.music-nexus-shell.is-person-detail .set-gallery-screen,
+.music-nexus-shell.is-person-detail .lightbox-screen,
 .music-nexus-shell.is-sets-archive .music-nexus-header,
 .music-nexus-shell.is-sets-archive .music-nexus-module-grid,
 .music-nexus-shell.is-sets-archive .music-bands-index,
@@ -124,6 +156,7 @@
 .music-nexus-shell.is-sets-archive .music-nexus-activity,
 .music-nexus-shell.is-sets-archive .music-nexus-back,
 .music-nexus-shell.is-sets-archive .band-detail-screen,
+.music-nexus-shell.is-sets-archive .person-detail-screen,
 .music-nexus-shell.is-set-gallery .music-nexus-header,
 .music-nexus-shell.is-set-gallery .music-nexus-module-grid,
 .music-nexus-shell.is-set-gallery .music-bands-index,
@@ -131,6 +164,7 @@
 .music-nexus-shell.is-set-gallery .music-nexus-activity,
 .music-nexus-shell.is-set-gallery .music-nexus-back,
 .music-nexus-shell.is-set-gallery .band-detail-screen,
+.music-nexus-shell.is-set-gallery .person-detail-screen,
 .music-nexus-shell.is-set-gallery .sets-archive-screen,
 .music-nexus-shell.is-lightbox .music-nexus-header,
 .music-nexus-shell.is-lightbox .music-nexus-module-grid,
@@ -139,6 +173,7 @@
 .music-nexus-shell.is-lightbox .music-nexus-activity,
 .music-nexus-shell.is-lightbox .music-nexus-back,
 .music-nexus-shell.is-lightbox .band-detail-screen,
+.music-nexus-shell.is-lightbox .person-detail-screen,
 .music-nexus-shell.is-lightbox .sets-archive-screen,
 .music-nexus-shell.is-lightbox .set-gallery-screen {
   display: none;
@@ -2325,6 +2360,426 @@
   white-space: nowrap;
 }
 
+.person-detail-back,
+.person-show-view {
+  appearance: none;
+  min-height: 2.75rem;
+  padding: 0.64rem 0.78rem;
+  border: 1px solid rgba(213, 22, 34, 0.24);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.06);
+  color: rgba(247, 247, 242, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.62rem, 2.45vw, 0.72rem);
+  line-height: 1;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.person-detail-back {
+  justify-self: start;
+}
+
+.person-detail-back:hover,
+.person-show-view:hover {
+  border-color: rgba(255, 118, 102, 0.36);
+  background: rgba(213, 22, 34, 0.1);
+}
+
+.person-detail-back:active,
+.person-show-view:active {
+  transform: translate3d(0, 0.04rem, 0);
+}
+
+.person-detail-back:focus-visible,
+.person-show-summary:focus-visible,
+.person-show-view:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.14rem;
+}
+
+.person-detail-hero {
+  display: grid;
+  gap: clamp(0.74rem, 2.5vw, 1.08rem);
+  padding: clamp(0.72rem, 2.8vw, 1.08rem);
+  border: 1px solid rgba(247, 247, 242, 0.11);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.042), transparent 62%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.094), transparent 70%),
+    rgba(3, 3, 6, 0.5);
+  overflow: hidden;
+}
+
+.person-detail-hero::before,
+.person-detail-associated::before,
+.person-tagged-shows::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.26), transparent 42% 100%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(247, 247, 242, 0.042), transparent 66%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.person-detail-image {
+  width: min(100%, 21rem);
+  aspect-ratio: 4 / 5;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 247, 242, 0.12);
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(247, 247, 242, 0.12), transparent 0.18rem),
+    linear-gradient(180deg, rgba(247, 247, 242, 0.08), transparent 36%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.22), transparent 62%),
+    rgba(1, 1, 3, 0.62);
+  box-shadow: inset 0 0 1.45rem rgba(0, 0, 0, 0.48);
+  overflow: hidden;
+}
+
+.person-detail-image::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(180deg, transparent 0 64%, rgba(1, 1, 3, 0.74)),
+    linear-gradient(90deg, rgba(1, 1, 3, 0.34), transparent 22% 78%, rgba(1, 1, 3, 0.38));
+  pointer-events: none;
+}
+
+.person-detail-image-mark {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(3.4rem, 20vw, 6.1rem);
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.person-detail-copy {
+  display: grid;
+  align-content: center;
+  gap: clamp(0.46rem, 1.55svh, 0.72rem);
+  min-width: 0;
+}
+
+.person-detail-kicker,
+.person-detail-name,
+.person-detail-role-line,
+.person-detail-meta-line,
+.person-detail-seen-line,
+.person-detail-section-title,
+.person-tagged-shows-note,
+.person-show-title,
+.person-show-venue,
+.person-show-location,
+.person-show-expanded-meta,
+.person-show-expanded-notes {
+  min-width: 0;
+  margin: 0;
+}
+
+.person-detail-kicker {
+  color: rgba(255, 118, 102, 0.76);
+  font-size: clamp(0.62rem, 2.35vw, 0.76rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-detail-name {
+  color: rgba(247, 247, 242, 0.94);
+  font-size: clamp(2.05rem, 12vw, 4.65rem);
+  font-weight: 400;
+  line-height: 0.92;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.person-detail-role-line {
+  color: rgba(255, 118, 102, 0.82);
+  font-size: clamp(0.82rem, 3.3vw, 1.02rem);
+  line-height: 1.16;
+  text-transform: uppercase;
+}
+
+.person-detail-meta-line,
+.person-detail-seen-line {
+  color: rgba(247, 247, 242, 0.7);
+  font-size: clamp(0.66rem, 2.55vw, 0.82rem);
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.person-detail-seen-line {
+  color: rgba(247, 247, 242, 0.54);
+}
+
+.person-detail-associated,
+.person-tagged-shows {
+  display: grid;
+  gap: clamp(0.54rem, 1.7svh, 0.74rem);
+  padding: clamp(0.64rem, 2.45vw, 0.88rem);
+  border: 1px solid rgba(247, 247, 242, 0.09);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.03), transparent 64%),
+    rgba(3, 3, 6, 0.42);
+  overflow: hidden;
+}
+
+.person-detail-section-title {
+  color: rgba(247, 247, 242, 0.8);
+  font-size: clamp(0.76rem, 2.9vw, 0.94rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-detail-band-list {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.person-detail-band-tag {
+  min-height: 2.18rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.48rem 0.62rem;
+  border: 1px solid rgba(213, 22, 34, 0.22);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.065);
+  color: rgba(247, 247, 242, 0.8);
+  font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-tagged-shows-header {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.person-tagged-shows-note {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.6rem, 2.3vw, 0.72rem);
+  line-height: 1.32;
+  text-transform: uppercase;
+}
+
+.person-show-list {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  gap: clamp(0.46rem, 1.45vw, 0.62rem);
+}
+
+.person-show-card {
+  min-width: 0;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 62%),
+    rgba(1, 1, 3, 0.34);
+  overflow: hidden;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease;
+}
+
+.person-show-card.is-expanded {
+  border-color: rgba(213, 22, 34, 0.24);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 62%),
+    rgba(1, 1, 3, 0.42);
+}
+
+.person-show-summary {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  min-height: 4.35rem;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.42rem, 1.55vw, 0.62rem);
+  padding: clamp(0.5rem, 1.9vw, 0.68rem);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  touch-action: manipulation;
+}
+
+.person-show-summary:hover {
+  background: rgba(213, 22, 34, 0.045);
+}
+
+.person-show-summary:active {
+  background: rgba(213, 22, 34, 0.075);
+}
+
+.person-show-date {
+  min-width: 2.7rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.12rem;
+  padding: 0.38rem 0.3rem;
+  border: 1px solid rgba(213, 22, 34, 0.18);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.052);
+  text-transform: uppercase;
+}
+
+.person-show-date-month,
+.person-show-date-year {
+  color: rgba(247, 247, 242, 0.5);
+  font-size: clamp(0.5rem, 2vw, 0.6rem);
+  line-height: 1;
+}
+
+.person-show-date-day {
+  color: rgba(247, 247, 242, 0.88);
+  font-size: clamp(0.96rem, 4vw, 1.18rem);
+  line-height: 0.92;
+}
+
+.person-show-thumb {
+  width: clamp(2.85rem, 10vw, 3.45rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(213, 22, 34, 0.16), transparent 66%),
+    rgba(247, 247, 242, 0.035);
+  color: rgba(247, 247, 242, 0.64);
+  font-size: clamp(0.56rem, 2.25vw, 0.66rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-show-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.person-show-title {
+  color: rgba(247, 247, 242, 0.88);
+  font-size: clamp(0.78rem, 2.85vw, 0.96rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.person-show-venue,
+.person-show-location {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.56rem, 2.15vw, 0.68rem);
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.person-show-venue {
+  color: rgba(255, 118, 102, 0.76);
+}
+
+.person-show-count {
+  grid-column: 3 / 5;
+  justify-self: start;
+  min-height: 1.46rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.26rem 0.46rem;
+  border: 1px solid rgba(213, 22, 34, 0.18);
+  border-radius: 999px;
+  background: rgba(213, 22, 34, 0.06);
+  color: rgba(247, 247, 242, 0.68);
+  font-size: clamp(0.52rem, 2.05vw, 0.62rem);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.person-show-toggle {
+  min-width: 1.28rem;
+  display: inline-grid;
+  place-items: center;
+  color: rgba(255, 118, 102, 0.82);
+  font-size: clamp(0.98rem, 3.8vw, 1.12rem);
+  line-height: 1;
+}
+
+.person-show-expanded {
+  display: grid;
+  gap: clamp(0.48rem, 1.45vw, 0.64rem);
+  padding: 0 clamp(0.5rem, 1.9vw, 0.68rem) clamp(0.58rem, 2vw, 0.76rem);
+}
+
+.person-show-expanded[hidden] {
+  display: none;
+}
+
+.person-show-tagged-thumbs {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.42rem;
+}
+
+.person-show-tagged-thumb {
+  min-width: 0;
+  min-height: clamp(4.5rem, 20vw, 6rem);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(213, 22, 34, 0.13), transparent 68%),
+    rgba(247, 247, 242, 0.03);
+  color: rgba(247, 247, 242, 0.68);
+  font-size: clamp(0.58rem, 2.35vw, 0.7rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-show-expanded-meta,
+.person-show-expanded-notes {
+  color: rgba(247, 247, 242, 0.56);
+  font-size: clamp(0.58rem, 2.28vw, 0.7rem);
+  line-height: 1.36;
+  text-transform: uppercase;
+}
+
+.person-show-expanded-notes {
+  color: rgba(247, 247, 242, 0.68);
+}
+
+.person-show-view {
+  justify-self: start;
+}
+
 .music-nexus-back {
   justify-self: start;
   min-height: 2.55rem;
@@ -4399,6 +4854,10 @@
     gap: 0.58rem;
   }
 
+  .person-detail-screen {
+    gap: 0.56rem;
+  }
+
   .sets-archive-screen {
     gap: 0.64rem;
   }
@@ -4408,6 +4867,9 @@
   }
 
   .band-detail-hero,
+  .person-detail-hero,
+  .person-detail-associated,
+  .person-tagged-shows,
   .band-detail-panel,
   .band-detail-activity,
   .sets-featured-panel,
@@ -4420,6 +4882,32 @@
 
   .band-detail-poster {
     width: min(100%, 16.75rem);
+  }
+
+  .person-detail-image {
+    width: min(100%, 15.75rem);
+  }
+
+  .person-show-summary {
+    gap: 0.36rem;
+    padding: 0.44rem;
+  }
+
+  .person-show-date {
+    min-width: 2.45rem;
+    padding-inline: 0.22rem;
+  }
+
+  .person-show-thumb {
+    width: 2.58rem;
+  }
+
+  .person-show-count {
+    padding-inline: 0.36rem;
+  }
+
+  .person-show-expanded {
+    padding: 0 0.44rem 0.54rem;
   }
 
   .band-detail-meta-row,
@@ -4730,6 +5218,28 @@
 @media (max-width: 479px) {
   .band-detail-poster {
     max-height: 18.25rem;
+  }
+
+  .person-detail-image {
+    max-height: 19.5rem;
+  }
+
+  .person-detail-meta-line,
+  .person-detail-seen-line {
+    text-wrap: balance;
+  }
+
+  .person-show-summary {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+  }
+
+  .person-show-count {
+    grid-column: 3 / 5;
+    margin-top: 0.04rem;
+  }
+
+  .person-show-tagged-thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .band-detail-stats {
@@ -5073,10 +5583,47 @@
     align-items: stretch;
   }
 
+  .person-detail-hero {
+    grid-template-columns: minmax(13rem, 0.84fr) minmax(0, 1.16fr);
+    align-items: stretch;
+  }
+
   .band-detail-poster {
     width: 100%;
     aspect-ratio: 1 / 1.08;
     min-height: clamp(17rem, 35vw, 22rem);
+  }
+
+  .person-detail-image {
+    width: 100%;
+    min-height: clamp(18rem, 35vw, 23rem);
+  }
+
+  .person-detail-associated {
+    grid-template-columns: minmax(10rem, auto) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .person-detail-band-list {
+    justify-content: flex-end;
+  }
+
+  .person-tagged-shows-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  .person-show-summary {
+    grid-template-columns: auto auto minmax(0, 1fr) max-content auto;
+  }
+
+  .person-show-count {
+    grid-column: auto;
+    justify-self: end;
+  }
+
+  .person-show-tagged-thumbs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .band-detail-members {
