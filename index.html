@@ -1529,7 +1529,12 @@
     .set-gallery-hero,
     .set-gallery-meta-row,
     .set-gallery-highlights,
-    .set-gallery-view-all {
+    .set-gallery-view-all,
+    .lightbox-screen,
+    .lightbox-topbar,
+    .lightbox-layout,
+    .lightbox-stage,
+    .lightbox-footer-strip {
       position: relative;
       z-index: 1;
       min-width: 0;
@@ -1553,6 +1558,10 @@
       display: grid;
     }
 
+    .music-nexus-shell.is-lightbox .lightbox-screen {
+      display: grid;
+    }
+
     .music-nexus-shell.is-band-detail .music-nexus-header,
     .music-nexus-shell.is-band-detail .music-nexus-module-grid,
     .music-nexus-shell.is-band-detail .music-bands-index,
@@ -1570,7 +1579,15 @@
     .music-nexus-shell.is-set-gallery .music-nexus-activity,
     .music-nexus-shell.is-set-gallery .music-nexus-back,
     .music-nexus-shell.is-set-gallery .band-detail-screen,
-    .music-nexus-shell.is-set-gallery .sets-archive-screen {
+    .music-nexus-shell.is-set-gallery .sets-archive-screen,
+    .music-nexus-shell.is-lightbox .music-nexus-header,
+    .music-nexus-shell.is-lightbox .music-nexus-module-grid,
+    .music-nexus-shell.is-lightbox .music-bands-index,
+    .music-nexus-shell.is-lightbox .music-nexus-activity,
+    .music-nexus-shell.is-lightbox .music-nexus-back,
+    .music-nexus-shell.is-lightbox .band-detail-screen,
+    .music-nexus-shell.is-lightbox .sets-archive-screen,
+    .music-nexus-shell.is-lightbox .set-gallery-screen {
       display: none;
     }
 
@@ -1902,7 +1919,10 @@
     .sets-featured-open,
     .set-detail-close,
     .set-gallery-back,
-    .set-gallery-view-all {
+    .set-gallery-view-all,
+    .lightbox-back,
+    .lightbox-info-toggle,
+    .lightbox-nav-zone {
       appearance: none;
       min-height: 2.55rem;
       padding: 0.58rem 0.78rem;
@@ -1924,6 +1944,9 @@
     .set-gallery-back:focus-visible,
     .set-gallery-view-all:focus-visible,
     .set-gallery-photo-tile:focus-visible,
+    .lightbox-back:focus-visible,
+    .lightbox-info-toggle:focus-visible,
+    .lightbox-nav-zone:focus-visible,
     .sets-year-card:focus-visible,
     .sets-list-row:focus-visible {
       outline: 2px solid rgba(247, 247, 242, 0.82);
@@ -2829,6 +2852,276 @@
     .site-shell.is-set-gallery-view .rail-brand {
       color: rgba(247, 247, 242, 0.74);
       text-shadow: 0 0 0.46rem rgba(255, 82, 72, 0.075);
+    }
+
+    .lightbox-screen {
+      display: none;
+      align-content: start;
+      gap: clamp(0.66rem, 1.95svh, 0.94rem);
+      min-height: min(100%, 49rem);
+    }
+
+    .lightbox-topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(0.46rem, 1.9vw, 0.78rem);
+      padding: 0.08rem 0 0.12rem;
+    }
+
+    .lightbox-back-cluster {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.48rem;
+    }
+
+    .lightbox-back {
+      width: 2.7rem;
+      min-width: 2.7rem;
+      padding-inline: 0.3rem;
+      border-color: rgba(255, 118, 102, 0.18);
+      background: rgba(255, 82, 72, 0.045);
+      color: rgba(255, 136, 122, 0.78);
+      font-size: clamp(0.72rem, 2.8vw, 0.86rem);
+    }
+
+    .lightbox-back-label,
+    .lightbox-counter-label,
+    .lightbox-tool,
+    .lightbox-meta-label,
+    .lightbox-info-label,
+    .lightbox-footer-strip span {
+      color: rgba(247, 247, 242, 0.46);
+      font-size: clamp(0.54rem, 2.15vw, 0.66rem);
+      letter-spacing: 0;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .lightbox-back-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lightbox-counter {
+      min-width: 6.4rem;
+      display: grid;
+      justify-items: center;
+      gap: 0.2rem;
+      text-align: center;
+    }
+
+    .lightbox-counter-value {
+      color: rgba(247, 247, 242, 0.88);
+      font-size: clamp(0.82rem, 3.1vw, 1rem);
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .lightbox-info-toggle {
+      justify-self: end;
+      min-width: 4.55rem;
+      border-color: rgba(255, 118, 102, 0.16);
+      background: rgba(1, 1, 3, 0.32);
+      color: rgba(247, 247, 242, 0.68);
+    }
+
+    .lightbox-info-toggle[aria-expanded="true"] {
+      border-color: rgba(255, 118, 102, 0.3);
+      background: rgba(255, 82, 72, 0.08);
+      color: rgba(247, 247, 242, 0.82);
+    }
+
+    .lightbox-layout {
+      display: grid;
+      gap: clamp(0.7rem, 2.2vw, 0.94rem);
+      align-items: stretch;
+    }
+
+    .lightbox-stage {
+      min-height: clamp(24rem, 68svh, 42rem);
+      display: grid;
+      overflow: hidden;
+      border: 1px solid rgba(247, 247, 242, 0.065);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.022), transparent 58%),
+        rgba(1, 1, 3, 0.58);
+      box-shadow: inset 0 0 1.1rem rgba(0, 0, 0, 0.34);
+    }
+
+    .lightbox-photo {
+      min-height: inherit;
+      display: grid;
+      place-items: center;
+      padding: clamp(2.8rem, 9vw, 5rem) clamp(2.45rem, 8vw, 5.6rem);
+      background:
+        radial-gradient(circle at 46% 38%, rgba(255, 82, 72, 0.15), transparent 28%),
+        radial-gradient(circle at 58% 52%, rgba(142, 108, 255, 0.14), transparent 30%),
+        linear-gradient(135deg, rgba(247, 247, 242, 0.05), transparent 62%),
+        rgba(3, 3, 6, 0.72);
+    }
+
+    .lightbox-photo span {
+      max-width: 100%;
+      color: rgba(247, 247, 242, 0.72);
+      font-size: clamp(3.3rem, 15vw, 8.2rem);
+      line-height: 0.92;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .lightbox-nav-zone {
+      position: absolute;
+      top: 50%;
+      z-index: 3;
+      width: clamp(2.65rem, 9vw, 4.1rem);
+      min-height: clamp(4.2rem, 18svh, 7.2rem);
+      padding: 0.4rem;
+      border-color: rgba(247, 247, 242, 0.055);
+      background: rgba(1, 1, 3, 0.24);
+      color: rgba(247, 247, 242, 0.58);
+      font-size: clamp(1rem, 4vw, 1.34rem);
+      transform: translateY(-50%);
+    }
+
+    .lightbox-nav-zone--prev {
+      left: clamp(0.42rem, 1.8vw, 0.72rem);
+    }
+
+    .lightbox-nav-zone--next {
+      right: clamp(0.42rem, 1.8vw, 0.72rem);
+    }
+
+    .lightbox-photo-meta-rail {
+      position: absolute;
+      right: clamp(0.58rem, 2.1vw, 0.95rem);
+      bottom: clamp(0.58rem, 2.1vw, 0.95rem);
+      left: clamp(0.58rem, 2.1vw, 0.95rem);
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.42rem;
+      padding: clamp(0.52rem, 1.9vw, 0.72rem);
+      border: 1px solid rgba(247, 247, 242, 0.06);
+      border-radius: var(--radius-sm);
+      background: rgba(2, 2, 4, 0.7);
+      backdrop-filter: blur(12px);
+    }
+
+    .lightbox-meta-item {
+      min-width: 0;
+      display: grid;
+      gap: 0.24rem;
+    }
+
+    .lightbox-meta-value,
+    .lightbox-info-value {
+      color: rgba(247, 247, 242, 0.74);
+      font-size: clamp(0.64rem, 2.35vw, 0.78rem);
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+      text-transform: uppercase;
+    }
+
+    .lightbox-tool-strip {
+      justify-self: center;
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.28rem;
+      padding: 0.25rem;
+      border: 1px solid rgba(247, 247, 242, 0.045);
+      border-radius: var(--radius-sm);
+      background: rgba(1, 1, 3, 0.2);
+    }
+
+    .lightbox-tool {
+      min-height: 1.85rem;
+      display: grid;
+      place-items: center;
+      padding: 0.34rem 0.58rem;
+      border-radius: calc(var(--radius-sm) - 0.16rem);
+      background: rgba(247, 247, 242, 0.026);
+    }
+
+    .lightbox-tool.is-active {
+      background: rgba(255, 82, 72, 0.07);
+      color: rgba(247, 247, 242, 0.66);
+    }
+
+    .lightbox-info-panel {
+      display: none;
+      align-content: start;
+      gap: 0.62rem;
+      padding: clamp(0.74rem, 2.5vw, 0.96rem);
+      border: 1px solid rgba(247, 247, 242, 0.06);
+      border-radius: var(--v3-card-radius-feature);
+      background:
+        linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 64%),
+        rgba(3, 3, 6, 0.48);
+    }
+
+    .lightbox-screen.is-info-open .lightbox-info-panel {
+      display: grid;
+    }
+
+    .lightbox-info-title {
+      color: rgba(247, 247, 242, 0.82);
+      font-size: clamp(0.82rem, 3.2vw, 1rem);
+      font-weight: 400;
+      line-height: 1.08;
+      text-transform: uppercase;
+    }
+
+    .lightbox-info-grid {
+      display: grid;
+      gap: 0.46rem;
+    }
+
+    .lightbox-info-item {
+      min-width: 0;
+      display: grid;
+      gap: 0.22rem;
+      padding-bottom: 0.42rem;
+      border-bottom: 1px solid rgba(247, 247, 242, 0.042);
+    }
+
+    .lightbox-info-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .lightbox-footer-strip {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(0.44rem, 1.8vw, 0.72rem);
+      padding: 0.48rem clamp(0.58rem, 2vw, 0.82rem);
+      border-top: 1px solid rgba(255, 82, 72, 0.1);
+      border-bottom: 1px solid rgba(247, 247, 242, 0.035);
+      background:
+        linear-gradient(180deg, rgba(255, 82, 72, 0.028), transparent 74%),
+        rgba(2, 2, 3, 0.34);
+    }
+
+    .lightbox-footer-strip span:nth-child(2) {
+      color: rgba(247, 247, 242, 0.7);
+      text-align: center;
+    }
+
+    .lightbox-footer-strip span:last-child {
+      text-align: right;
+    }
+
+    .site-shell.is-lightbox-view .universal-bottom-rail {
+      border-top-color: rgba(255, 82, 72, 0.1);
+      background:
+        linear-gradient(180deg, rgba(255, 82, 72, 0.026), transparent 76%),
+        rgba(2, 2, 3, 0.36);
     }
 
     .band-detail-members {
@@ -5442,6 +5735,63 @@
         min-height: 3rem;
       }
 
+      .lightbox-screen {
+        gap: 0.58rem;
+      }
+
+      .lightbox-topbar {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 0.32rem;
+      }
+
+      .lightbox-back-cluster {
+        gap: 0.34rem;
+      }
+
+      .lightbox-back-label {
+        max-width: 5.2rem;
+      }
+
+      .lightbox-counter {
+        min-width: 4.85rem;
+      }
+
+      .lightbox-info-toggle {
+        min-width: 3.85rem;
+        padding-inline: 0.48rem;
+      }
+
+      .lightbox-stage {
+        min-height: min(61svh, 30rem);
+      }
+
+      .lightbox-photo {
+        padding: 2.6rem 2.2rem 6.8rem;
+      }
+
+      .lightbox-photo-meta-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .lightbox-tool-strip {
+        width: 100%;
+      }
+
+      .lightbox-tool {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .lightbox-footer-strip {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        text-align: center;
+      }
+
+      .lightbox-footer-strip span:last-child {
+        text-align: center;
+      }
+
       .sets-list {
         max-height: min(42svh, 22rem);
       }
@@ -5595,6 +5945,15 @@
 
       .set-gallery-hero-image {
         min-height: clamp(17rem, 31vw, 21rem);
+      }
+
+      .lightbox-screen.is-info-open .lightbox-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.32fr);
+      }
+
+      .lightbox-info-panel {
+        max-height: min(68svh, 42rem);
+        overflow: auto;
       }
 
       .sets-featured-meta-row {
@@ -6489,9 +6848,105 @@
               </div>
             </section>
 
-            <button class="v3-card v3-card--interactive set-gallery-view-all" type="button" aria-controls="set-gallery-lightbox-prep" aria-expanded="false" data-gallery-view-all>
+            <button class="v3-card v3-card--interactive set-gallery-view-all" type="button" aria-controls="lightbox-screen" aria-expanded="false" data-gallery-view-all>
               VIEW ALL PHOTOS
             </button>
+          </article>
+
+          <article class="lightbox-screen" id="lightbox-screen" aria-labelledby="lightbox-title" aria-hidden="true" inert data-lightbox-screen>
+            <header class="lightbox-topbar">
+              <div class="lightbox-back-cluster">
+                <button class="lightbox-back" type="button" aria-label="Back to Gallery" data-lightbox-back>
+                  X
+                </button>
+                <span class="lightbox-back-label">Back to Gallery</span>
+              </div>
+              <div class="lightbox-counter" aria-label="Current photo">
+                <p class="lightbox-counter-value">25 / 356</p>
+                <p class="lightbox-counter-label">Current / Total</p>
+              </div>
+              <button class="lightbox-info-toggle" type="button" aria-controls="lightbox-info-panel" aria-expanded="false" aria-pressed="false" data-lightbox-info-toggle>
+                Info
+              </button>
+            </header>
+
+            <div class="lightbox-layout">
+              <section class="lightbox-stage" aria-labelledby="lightbox-title">
+                <div class="lightbox-photo" role="img" aria-label="Photo 25 placeholder lightbox image">
+                  <span id="lightbox-title">Photo 25</span>
+                </div>
+                <button class="lightbox-nav-zone lightbox-nav-zone--prev" type="button" aria-label="Previous photo" data-lightbox-prev>
+                  &lt;
+                </button>
+                <button class="lightbox-nav-zone lightbox-nav-zone--next" type="button" aria-label="Next photo" data-lightbox-next>
+                  &gt;
+                </button>
+                <div class="lightbox-photo-meta-rail" aria-label="Photo exposure metadata">
+                  <div class="lightbox-meta-item">
+                    <p class="lightbox-meta-label">Camera</p>
+                    <p class="lightbox-meta-value">Canon R6</p>
+                  </div>
+                  <div class="lightbox-meta-item">
+                    <p class="lightbox-meta-label">Shutter</p>
+                    <p class="lightbox-meta-value">1/250</p>
+                  </div>
+                  <div class="lightbox-meta-item">
+                    <p class="lightbox-meta-label">Aperture</p>
+                    <p class="lightbox-meta-value">f/2.8</p>
+                  </div>
+                  <div class="lightbox-meta-item">
+                    <p class="lightbox-meta-label">ISO</p>
+                    <p class="lightbox-meta-value">3200</p>
+                  </div>
+                </div>
+              </section>
+
+              <aside class="lightbox-info-panel" id="lightbox-info-panel" aria-hidden="true" inert data-lightbox-info-panel>
+                <h4 class="lightbox-info-title">Live @ Asylum</h4>
+                <div class="lightbox-info-grid" aria-label="Lightbox info placeholder">
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Date</p>
+                    <p class="lightbox-info-value">JAN 18, 2026</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">City</p>
+                    <p class="lightbox-info-value">Portland, Maine</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Camera</p>
+                    <p class="lightbox-info-value">Canon R6</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Lens</p>
+                    <p class="lightbox-info-value">35mm</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Shutter</p>
+                    <p class="lightbox-info-value">1/250</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Aperture</p>
+                    <p class="lightbox-info-value">f/2.8</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">ISO</p>
+                    <p class="lightbox-info-value">3200</p>
+                  </div>
+                </div>
+              </aside>
+            </div>
+
+            <div class="lightbox-tool-strip" aria-label="Lightbox view placeholders">
+              <span class="lightbox-tool is-active">Grid</span>
+              <span class="lightbox-tool">Thumbnails</span>
+              <span class="lightbox-tool">Fullscreen</span>
+            </div>
+
+            <footer class="lightbox-footer-strip" aria-label="Lightbox footer language">
+              <span>VMPIX V3</span>
+              <span>UNIVERSAL LIGHTBOX UI</span>
+              <span>PHOTO FIRST // CLEAN // CINEMATIC // FUTURISTIC</span>
+            </footer>
           </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>
@@ -6819,6 +7274,10 @@
       const galleryViewAll = document.querySelector("[data-gallery-view-all]");
       const galleryLightboxPrep = document.querySelector("[data-gallery-lightbox-prep]");
       const galleryLightboxTitle = document.querySelector("[data-gallery-lightbox-title]");
+      const lightboxScreen = document.querySelector("[data-lightbox-screen]");
+      const lightboxBack = document.querySelector("[data-lightbox-back]");
+      const lightboxInfoToggle = document.querySelector("[data-lightbox-info-toggle]");
+      const lightboxInfoPanel = document.querySelector("[data-lightbox-info-panel]");
       const spotlightCopy = document.querySelector("[data-spotlight-copy]");
       const spotlightTags = document.querySelector("[data-spotlight-tags]");
       const fireVideo = document.querySelector(".cinema-fire-bg");
@@ -7015,6 +7474,7 @@
         if (isVisible) {
           setSetsArchiveVisible(false);
           setSetGalleryVisible(false);
+          setLightboxVisible(false);
         }
         bandDetail.setAttribute("aria-hidden", String(!isVisible));
         if (isVisible) {
@@ -7032,6 +7492,7 @@
         musicNexusShell.classList.toggle("is-sets-archive", isVisible);
         if (isVisible) {
           setSetGalleryVisible(false);
+          setLightboxVisible(false);
         }
         if (!isVisible) {
           setSetDetailVisible(false);
@@ -7050,6 +7511,9 @@
         }
 
         musicNexusShell.classList.toggle("is-set-gallery", isVisible);
+        if (isVisible) {
+          setLightboxVisible(false);
+        }
         if (shell) {
           shell.classList.toggle("is-set-gallery-view", isVisible);
         }
@@ -7067,7 +7531,49 @@
         }
       }
 
+      function setLightboxInfoVisible(isVisible) {
+        if (lightboxScreen) {
+          lightboxScreen.classList.toggle("is-info-open", isVisible);
+        }
+        if (lightboxInfoToggle) {
+          lightboxInfoToggle.setAttribute("aria-expanded", String(isVisible));
+          lightboxInfoToggle.setAttribute("aria-pressed", String(isVisible));
+        }
+        if (lightboxInfoPanel) {
+          lightboxInfoPanel.setAttribute("aria-hidden", String(!isVisible));
+          if (isVisible) {
+            lightboxInfoPanel.removeAttribute("inert");
+          } else {
+            lightboxInfoPanel.setAttribute("inert", "");
+          }
+        }
+      }
+
+      function setLightboxVisible(isVisible) {
+        if (!musicNexusShell || !lightboxScreen) {
+          return;
+        }
+
+        musicNexusShell.classList.toggle("is-lightbox", isVisible);
+        if (shell) {
+          shell.classList.toggle("is-lightbox-view", isVisible);
+        }
+        if (!isVisible) {
+          setLightboxInfoVisible(false);
+        }
+        if (galleryViewAll) {
+          galleryViewAll.setAttribute("aria-expanded", String(isVisible));
+        }
+        lightboxScreen.setAttribute("aria-hidden", String(!isVisible));
+        if (isVisible) {
+          lightboxScreen.removeAttribute("inert");
+        } else {
+          lightboxScreen.setAttribute("inert", "");
+        }
+      }
+
       function showBandsIndexView(options = {}) {
+        setLightboxVisible(false);
         setSetGalleryVisible(false);
         setSetsArchiveVisible(false);
         setBandDetailVisible(false);
@@ -7346,6 +7852,38 @@
         if (nextState && galleryLightboxPrep) {
           galleryLightboxPrep.scrollIntoView({
             block: "nearest",
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
+      function showLightbox() {
+        if (!lightboxScreen) {
+          return;
+        }
+
+        if (!activeGalleryPhoto && galleryPhotoTiles[0]) {
+          selectGalleryPhoto(galleryPhotoTiles[0]);
+        }
+        setGalleryModeVisible(false);
+        setSetGalleryVisible(false);
+        setLightboxVisible(true);
+        setCurrentView("Lightbox");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      }
+
+      function returnToSetGalleryFromLightbox() {
+        setLightboxVisible(false);
+        setSetGalleryVisible(true);
+        setCurrentView("LIVE @ ASYLUM");
+        if (musicNexusShell) {
+          musicNexusShell.scrollTo({
+            top: 0,
             behavior: reducedMotion.matches ? "auto" : "smooth",
           });
         }
@@ -8556,7 +9094,15 @@
           });
         });
         if (galleryViewAll) {
-          galleryViewAll.addEventListener("click", toggleGalleryMode);
+          galleryViewAll.addEventListener("click", showLightbox);
+        }
+        if (lightboxBack) {
+          lightboxBack.addEventListener("click", returnToSetGalleryFromLightbox);
+        }
+        if (lightboxInfoToggle) {
+          lightboxInfoToggle.addEventListener("click", () => {
+            setLightboxInfoVisible(!lightboxScreen.classList.contains("is-info-open"));
+          });
         }
         if (setDetailClose) {
           setDetailClose.addEventListener("click", closeSelectedSetDetail);
