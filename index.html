@@ -7687,6 +7687,35 @@
         musicBands: "/music/bands",
       };
       const routedBandsViews = ["radar", "list", "search"];
+      const mockSetCodes = [
+        "102911",
+        "061504",
+        "110398",
+        "091226",
+        "020925",
+        "042625",
+        "071125",
+        "100325",
+        "121425",
+        "051924",
+        "082424",
+        "110224",
+        "091623",
+      ];
+      const setDateMonthCodes = {
+        JAN: "01",
+        FEB: "02",
+        MAR: "03",
+        APR: "04",
+        MAY: "05",
+        JUN: "06",
+        JUL: "07",
+        AUG: "08",
+        SEP: "09",
+        OCT: "10",
+        NOV: "11",
+        DEC: "12",
+      };
 
       function setCurrentView(viewName) {
         if (currentView) {
@@ -7737,6 +7766,81 @@
         };
       }
 
+      function normalizeSetCode(setCode) {
+        return String(setCode || "").trim().toLowerCase();
+      }
+
+      function getSetCodeFromDateLabel(dateLabel) {
+        const match = String(dateLabel || "").trim().toUpperCase().match(/^([A-Z]{3})\s+(\d{1,2}),\s+(\d{4})$/);
+        if (!match) {
+          return "";
+        }
+
+        const month = setDateMonthCodes[match[1]];
+        if (!month) {
+          return "";
+        }
+
+        const day = match[2].padStart(2, "0");
+        const year = match[3].slice(-2);
+        return `${month}${day}${year}`;
+      }
+
+      function getSetCode(row, fallbackIndex = 0) {
+        if (!row || !row.dataset) {
+          return "";
+        }
+
+        return normalizeSetCode(
+          row.dataset.setCode ||
+          getSetCodeFromDateLabel(row.dataset.setDate) ||
+          String(fallbackIndex + 1).padStart(6, "0")
+        );
+      }
+
+      function hydrateSetRouteMetadata() {
+        setsRows.forEach((row, index) => {
+          const setCode = normalizeSetCode(row.dataset.setCode || mockSetCodes[index] || getSetCodeFromDateLabel(row.dataset.setDate));
+          if (setCode) {
+            row.dataset.setCode = setCode;
+          }
+        });
+      }
+
+      function getSetRouteUrl(bandId, setCode) {
+        return `${getBandRouteUrl(bandId)}/sets/${encodeURIComponent(normalizeSetCode(setCode))}`;
+      }
+
+      function findSetRowByCode(setCode) {
+        const normalizedSetCode = normalizeSetCode(setCode);
+        return Array.from(setsRows).find((row, index) => getSetCode(row, index) === normalizedSetCode) || null;
+      }
+
+      function createUnknownSetRow(setCode) {
+        const safeSetCode = normalizeSetCode(setCode) || "unknown-set";
+        return {
+          dataset: {
+            setCode: safeSetCode,
+            setYear: "Pending",
+            setDate: safeSetCode.toUpperCase(),
+            setTitle: `Set ${safeSetCode}`,
+            setLocation: "Pending Index",
+            setPhotos: "0",
+            setContributors: "0",
+            setComplete: "0%",
+            setThumb: activeMusicBand ? activeMusicBand.thumb : "SET",
+          },
+        };
+      }
+
+      function decodeRoutePart(routePart) {
+        try {
+          return decodeURIComponent(routePart);
+        } catch (error) {
+          return "";
+        }
+      }
+
       function normalizeRoutePath(pathname) {
         const routePath = pathname.replace(/\/+$/, "") || routePaths.home;
         return routePath.endsWith("/index.html") ? routePaths.home : routePath;
@@ -7767,10 +7871,15 @@
 
         const bandDetailPrefix = `${routePaths.musicBands}/`;
         if (routePath.startsWith(bandDetailPrefix)) {
-          const encodedBandId = routePath.slice(bandDetailPrefix.length);
-          if (encodedBandId && !encodedBandId.includes("/")) {
-            const bandId = decodeURIComponent(encodedBandId);
+          const routeParts = routePath.slice(bandDetailPrefix.length).split("/");
+          if (routeParts.length === 1 && routeParts[0]) {
+            const bandId = decodeRoutePart(routeParts[0]);
             return { name: "band-detail", bandId, canonicalUrl: getBandRouteUrl(bandId) };
+          }
+          if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "sets" && routeParts[2]) {
+            const bandId = decodeRoutePart(routeParts[0]);
+            const setCode = normalizeSetCode(decodeRoutePart(routeParts[2]));
+            return { name: "set-detail", bandId, setCode, canonicalUrl: getSetRouteUrl(bandId, setCode) };
           }
         }
 
@@ -7865,6 +7974,25 @@
           return;
         }
 
+        if (route.name === "set-detail") {
+          const historyState = options.historyState || window.history.state || {};
+          bandsIndexReturnUrl = normalizeBandsReturnUrl(
+            historyState.returnUrl ||
+            (historyState.fromBandDetail ? bandsIndexReturnUrl : getBandsRouteUrl("radar"))
+          );
+          showMusicNexus();
+          showSetDetailRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), route.setCode);
+          if (options.shouldCanonicalize !== false) {
+            replaceRouteUrl(route.canonicalUrl, {
+              bandUrl: getBandRouteUrl(route.bandId),
+              returnUrl: bandsIndexReturnUrl,
+              fromBandDetail: Boolean(historyState.fromBandDetail),
+              fromBandsIndex: Boolean(historyState.fromBandsIndex),
+            });
+          }
+          return;
+        }
+
         showHomepage();
       }
 
@@ -7899,6 +8027,64 @@
           return;
         }
         navigateToRoute(returnUrl, { shouldFocusBandsView: true });
+      }
+
+      function navigateToSetDetail(row) {
+        const setCode = getSetCode(row, Array.from(setsRows).indexOf(row));
+        const bandId = getBandId(activeMusicBand) || getRouteFromUrl().bandId;
+        if (!bandId || !setCode) {
+          return;
+        }
+
+        const historyState = window.history.state || {};
+        const returnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+        bandsIndexReturnUrl = returnUrl;
+        navigateToRoute(getSetRouteUrl(bandId, setCode), {
+          historyState: {
+            bandUrl: getBandRouteUrl(bandId),
+            returnUrl,
+            fromBandDetail: true,
+            fromBandsIndex: Boolean(historyState.fromBandsIndex),
+          },
+        });
+      }
+
+      function returnToBandDetailRoute() {
+        const historyState = window.history.state || {};
+        const route = getRouteFromUrl();
+        const bandId = route.bandId || getBandId(activeMusicBand);
+        if (!bandId) {
+          returnToBandsIndexRoute();
+          return;
+        }
+
+        const bandUrl = historyState.bandUrl || getBandRouteUrl(bandId);
+        if (route.name === "set-detail" && historyState.bandUrl && historyState.fromBandDetail) {
+          window.history.back();
+          return;
+        }
+
+        navigateToRoute(bandUrl, {
+          historyState: {
+            returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
+            fromBandsIndex: Boolean(historyState.fromBandsIndex),
+          },
+        });
+      }
+
+      function showSetDetailRoute(band, setCode) {
+        if (!band) {
+          return;
+        }
+
+        activeMusicBand = band;
+        const setRow = findSetRowByCode(setCode);
+        showSetsArchive({
+          selectedSetCode: setCode,
+          selectedSetRow: setRow,
+          shouldOpenDetail: true,
+          shouldScroll: false,
+        });
       }
 
       function setSpotlight(moduleName) {
@@ -8546,6 +8732,11 @@
       }
 
       function closeSelectedSetDetail() {
+        if (getRouteFromUrl().name === "set-detail") {
+          returnToBandDetailRoute();
+          return;
+        }
+
         setSetDetailVisible(false);
         if (setsFeaturedOpen) {
           setsFeaturedOpen.focus({ preventScroll: true });
@@ -8670,12 +8861,14 @@
         }
       }
 
-      function showSetsArchive() {
+      function showSetsArchive(options = {}) {
         const band = activeMusicBand || musicBandIndexRows[0];
         if (!band || !setsArchive) {
           return;
         }
 
+        const selectedSetRow = options.selectedSetRow || null;
+        const selectedSetCode = normalizeSetCode(options.selectedSetCode || getSetCode(selectedSetRow));
         activeMusicBand = band;
         const bandThumb = band.thumb || band.name.slice(0, 2).toUpperCase();
         if (setsArchiveBand) {
@@ -8693,9 +8886,18 @@
         setBandDetailVisible(false);
         setSetsArchiveVisible(true);
         setSetDetailVisible(false);
-        setSetsYear("2026");
-        setCurrentView("SETS 13 HIGH");
-        if (musicNexusShell) {
+        setSetsYear(selectedSetRow ? selectedSetRow.dataset.setYear : "2026");
+        if (selectedSetRow) {
+          updateSetsFeaturedFromRow(selectedSetRow);
+        }
+        if (options.shouldOpenDetail) {
+          updateSetDetailFromRow(selectedSetRow || createUnknownSetRow(selectedSetCode));
+          setSetDetailVisible(true);
+          setCurrentView("Set Detail");
+        } else {
+          setCurrentView("SETS 13 HIGH");
+        }
+        if (options.shouldScroll !== false && musicNexusShell) {
           musicNexusShell.scrollTo({
             top: 0,
             behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -9726,10 +9928,12 @@
           bandDetailBack.addEventListener("click", returnToBandsIndexRoute);
         }
         if (bandDetailViewSets) {
-          bandDetailViewSets.addEventListener("click", showSetsArchive);
+          bandDetailViewSets.addEventListener("click", () => {
+            showSetsArchive();
+          });
         }
         if (setsArchiveBack) {
-          setsArchiveBack.addEventListener("click", returnToBandDetailFromSets);
+          setsArchiveBack.addEventListener("click", returnToBandDetailRoute);
         }
         if (setsFeaturedOpen) {
           setsFeaturedOpen.addEventListener("click", showSetGallery);
@@ -9806,7 +10010,7 @@
         });
         setsRows.forEach((row) => {
           row.addEventListener("click", () => {
-            updateSetsFeaturedFromRow(row);
+            navigateToSetDetail(row);
           });
         });
         musicNexusCards.forEach((card) => {
@@ -9862,6 +10066,7 @@
         if (bandsBackRadar) {
           bandsBackRadar.addEventListener("click", returnToBandsRadar);
         }
+        hydrateSetRouteMetadata();
         setBandsView("radar");
         syncRouteFromLocation({ historyState: window.history.state });
         window.addEventListener("popstate", (event) => {
