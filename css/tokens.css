@@ -59,10 +59,15 @@
     box-shadow var(--motion-fast) var(--ease-standard),
     transform var(--motion-fast) var(--ease-standard);
   --tap-target: 48px;
-  --frame-max: 44rem;
-  --hub-max: 46rem;
-  --stage-min-height: clamp(29rem, calc(100vh - 5.75rem), 52rem);
-  --stage-min-height: clamp(29rem, calc(100svh - 5.75rem), 52rem);
+  --shell-viewport-pad-block: clamp(0.62rem, 1.8svh, 1.15rem);
+  --shell-viewport-pad-inline: clamp(0.72rem, 3vw, 2rem);
+  --rail-lift: 0.625rem;
+  --frame-max: 52rem;
+  --hub-max: 58rem;
+  --stage-max-height: 64rem;
+  --stage-min-height: clamp(30rem, calc(100vh - 6rem), var(--stage-max-height));
+  --stage-min-height: clamp(30rem, calc(100svh - 6rem), var(--stage-max-height));
+  --stage-min-height: clamp(30rem, calc(100dvh - 6rem), var(--stage-max-height));
   --title-size: 2rem;
   --kicker-size: 1rem;
   --button-text-size: 0.88rem;

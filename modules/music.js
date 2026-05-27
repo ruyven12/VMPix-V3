@@ -34,13 +34,29 @@ function findMusicPersonById(personId) {
   return musicPeopleRows.find((person) => normalizeMusicPersonId(person.personId) === normalizedPersonId) || null;
 }
 
+function createMusicPersonDetailStateData(stateName, personId) {
+  const normalizedPersonId = normalizeMusicPersonId(personId) || "unknown-person";
+  const person = findMusicPersonById(normalizedPersonId);
+  const stateCopy = musicPersonDetailStateCopy[stateName] || musicPersonDetailStateCopy.error;
+  return {
+    state: stateName,
+    personId: normalizedPersonId,
+    name: person ? person.name.toUpperCase() : "PERSON ARCHIVE",
+    title: stateCopy.title,
+    copy: stateCopy.copy,
+  };
+}
+
 function getMusicPersonDetailData(personId) {
-  const person = findMusicPersonById(personId);
-  if (!person || person.personId === musicPersonDetailPlaceholder.personId) {
-    return musicPersonDetailPlaceholder;
+  const normalizedPersonId = normalizeMusicPersonId(personId);
+  if (normalizedPersonId === "loading") {
+    return createMusicPersonDetailStateData("loading", normalizedPersonId);
+  }
+  if (normalizedPersonId !== musicPersonDetailPlaceholder.personId) {
+    return createMusicPersonDetailStateData("error", normalizedPersonId);
   }
 
-  return musicPersonDetailPlaceholder;
+  return { ...musicPersonDetailPlaceholder, state: "ready" };
 }
 
 function findBandById(bandId) {
@@ -1417,6 +1433,13 @@ function createMusicPersonTag(text) {
   return tag;
 }
 
+function createMusicPersonEmptyState(text) {
+  const emptyState = document.createElement("div");
+  emptyState.className = "person-detail-empty-state";
+  emptyState.textContent = text;
+  return emptyState;
+}
+
 function toggleMusicPersonShowCard(card) {
   const isExpanded = !card.classList.contains("is-expanded");
   const summary = card.querySelector(".person-show-summary");
@@ -1442,7 +1465,7 @@ function createMusicPersonTaggedThumb(label) {
   return thumb;
 }
 
-function createMusicPersonShowCard(show) {
+function createMusicPersonShowCard(show, personName) {
   const card = document.createElement("article");
   const isExpanded = Boolean(show.expanded);
   card.className = "person-show-card";
@@ -1512,10 +1535,15 @@ function createMusicPersonShowCard(show) {
 
   const thumbs = document.createElement("div");
   thumbs.className = "person-show-tagged-thumbs";
-  thumbs.setAttribute("aria-label", `${show.title} Adam Begin tagged photo placeholders`);
-  show.thumbnails.forEach((label) => {
-    thumbs.append(createMusicPersonTaggedThumb(label));
-  });
+  thumbs.setAttribute("aria-label", `${show.title} ${personName} tagged photo placeholders`);
+  const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
+  if (taggedThumbnails.length > 0) {
+    taggedThumbnails.forEach((label) => {
+      thumbs.append(createMusicPersonTaggedThumb(label));
+    });
+  } else {
+    thumbs.append(createMusicPersonEmptyState("No person-tagged photos in this show yet."));
+  }
 
   const meta = document.createElement("p");
   meta.className = "person-show-expanded-meta";
@@ -1535,8 +1563,41 @@ function createMusicPersonShowCard(show) {
   return card;
 }
 
+function renderMusicPersonDetailState(data) {
+  if (!personDetail) {
+    return;
+  }
+
+  const backButton = document.createElement("button");
+  backButton.className = "person-detail-back";
+  backButton.type = "button";
+  backButton.textContent = "Back to People";
+  backButton.addEventListener("click", returnToMusicPeopleRoute);
+
+  const statePanel = document.createElement("section");
+  statePanel.className = "person-detail-state";
+  statePanel.setAttribute("aria-live", data.state === "loading" ? "polite" : "assertive");
+  statePanel.setAttribute("aria-busy", String(data.state === "loading"));
+
+  const title = document.createElement("h3");
+  title.className = "person-detail-state-title";
+  title.id = "person-detail-title";
+  title.textContent = data.title;
+
+  const copy = document.createElement("p");
+  copy.className = "person-detail-state-copy";
+  copy.textContent = data.copy;
+
+  statePanel.append(title, copy);
+  personDetail.replaceChildren(backButton, statePanel);
+}
+
 function renderMusicPersonDetail(data) {
   if (!personDetail) {
+    return;
+  }
+  if (data.state && data.state !== "ready") {
+    renderMusicPersonDetailState(data);
     return;
   }
 
@@ -1593,9 +1654,14 @@ function renderMusicPersonDetail(data) {
 
   const associatedList = document.createElement("div");
   associatedList.className = "person-detail-band-list";
-  data.associatedBands.forEach((bandName) => {
-    associatedList.append(createMusicPersonTag(bandName));
-  });
+  const associatedBands = Array.isArray(data.associatedBands) ? data.associatedBands : [];
+  if (associatedBands.length > 0) {
+    associatedBands.forEach((bandName) => {
+      associatedList.append(createMusicPersonTag(bandName));
+    });
+  } else {
+    associatedList.append(createMusicPersonEmptyState("No associated bands indexed yet."));
+  }
   associated.append(associatedTitle, associatedList);
 
   const taggedShows = document.createElement("section");
@@ -1617,9 +1683,14 @@ function renderMusicPersonDetail(data) {
 
   const showList = document.createElement("div");
   showList.className = "person-show-list";
-  data.taggedShows.forEach((show) => {
-    showList.append(createMusicPersonShowCard(show));
-  });
+  const taggedShowRows = Array.isArray(data.taggedShows) ? data.taggedShows : [];
+  if (taggedShowRows.length > 0) {
+    taggedShowRows.forEach((show) => {
+      showList.append(createMusicPersonShowCard(show, data.name));
+    });
+  } else {
+    showList.append(createMusicPersonEmptyState("No tagged shows indexed for this person yet."));
+  }
 
   taggedShows.append(taggedHeader, showList);
   personDetail.replaceChildren(backButton, hero, associated, taggedShows);

@@ -291,6 +291,17 @@ const musicPersonDetailPlaceholder = {
   ],
 };
 
+const musicPersonDetailStateCopy = {
+  loading: {
+    title: "Loading Person Archive",
+    copy: "Static loading placeholder reserved for future person archive requests.",
+  },
+  error: {
+    title: "Unable To Load Person Archive",
+    copy: "Static error placeholder reserved for future archive recovery.",
+  },
+};
+
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [
   ["-4.8rem", "-5.2rem"],
