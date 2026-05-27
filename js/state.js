@@ -137,6 +137,8 @@ let activeBandsLetter = "A";
 let activeBandsFilterLetter = "";
 let bandsSearchTerm = "";
 let bandsIndexReturnUrl = "/music/bands?view=radar";
+let activeMusicPeoplePage = 1;
+let activeMusicPeopleId = "";
 let activeMusicBand = null;
 let activeSetRow = null;
 let isSetDetailOpen = false;
@@ -223,17 +225,18 @@ const musicBandIndexRows = [
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const musicPeopleRows = [
-  { name: "Avery Stone", role: "Vocalist", band: "Astra Vale", photos: 186, sets: 12, thumb: "AS" },
-  { name: "Mara Quinn", role: "Guitar", band: "Black Harbor", photos: 142, sets: 8, thumb: "MQ" },
-  { name: "Jonas Vale", role: "Drums", band: "Crimson Static", photos: 318, sets: 34, thumb: "JV" },
-  { name: "Selene Cross", role: "Bass", band: "Dead Letters", photos: 74, sets: 4, thumb: "SC" },
-  { name: "Theo Mercer", role: "Keys", band: "Echo District", photos: 221, sets: 18, thumb: "TM" },
-  { name: "Rhea Blake", role: "Vocalist", band: "Glass Ritual", photos: 96, sets: 6, thumb: "RB" },
-  { name: "Cass Wilder", role: "Guitar", band: "Hollow Signal", photos: 136, sets: 9, thumb: "CW" },
-  { name: "Nico Ash", role: "Drums", band: "Moon Circuit", photos: 168, sets: 11, thumb: "NA" },
-  { name: "Iris Fane", role: "Bass", band: "Neon Saints", photos: 284, sets: 27, thumb: "IF" },
-  { name: "Luca Voss", role: "Synth", band: "Violet Machines", photos: 256, sets: 22, thumb: "LV" },
+  { personId: "avery-stone", name: "Avery Stone", role: "Vocalist", band: "Astra Vale", photos: 186, sets: 12, thumb: "AS" },
+  { personId: "mara-quinn", name: "Mara Quinn", role: "Guitar", band: "Black Harbor", photos: 142, sets: 8, thumb: "MQ" },
+  { personId: "jonas-vale", name: "Jonas Vale", role: "Drums", band: "Crimson Static", photos: 318, sets: 34, thumb: "JV" },
+  { personId: "selene-cross", name: "Selene Cross", role: "Bass", band: "Dead Letters", photos: 74, sets: 4, thumb: "SC" },
+  { personId: "theo-mercer", name: "Theo Mercer", role: "Keys", band: "Echo District", photos: 221, sets: 18, thumb: "TM" },
+  { personId: "rhea-blake", name: "Rhea Blake", role: "Vocalist", band: "Glass Ritual", photos: 96, sets: 6, thumb: "RB" },
+  { personId: "cass-wilder", name: "Cass Wilder", role: "Guitar", band: "Hollow Signal", photos: 136, sets: 9, thumb: "CW" },
+  { personId: "nico-ash", name: "Nico Ash", role: "Drums", band: "Moon Circuit", photos: 168, sets: 11, thumb: "NA" },
+  { personId: "iris-fane", name: "Iris Fane", role: "Bass", band: "Neon Saints", photos: 284, sets: 27, thumb: "IF" },
+  { personId: "luca-voss", name: "Luca Voss", role: "Synth", band: "Violet Machines", photos: 256, sets: 22, thumb: "LV" },
 ];
+const musicPeoplePageSize = 5;
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [

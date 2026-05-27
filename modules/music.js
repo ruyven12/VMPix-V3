@@ -1336,10 +1336,35 @@ function formatMusicPeopleCount(value, label) {
   return `${count} ${label}${count === 1 ? "" : "s"}`;
 }
 
+function getMusicPeoplePageCount() {
+  return Math.max(1, Math.ceil(musicPeopleRows.length / musicPeoplePageSize));
+}
+
+function normalizeMusicPeoplePage(page) {
+  const pageNumber = Number.parseInt(page, 10) || 1;
+  return Math.min(Math.max(pageNumber, 1), getMusicPeoplePageCount());
+}
+
+function setActiveMusicPeopleRow(personId) {
+  activeMusicPeopleId = personId;
+  if (!musicPeopleList) {
+    return;
+  }
+
+  musicPeopleList.querySelectorAll(".music-people-row").forEach((row) => {
+    const isActive = row.dataset.personId === personId;
+    row.classList.toggle("is-active", isActive);
+    row.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
 function createMusicPeopleRow(person) {
-  const row = document.createElement("article");
+  const row = document.createElement("button");
   row.className = "music-people-row";
-  row.setAttribute("role", "listitem");
+  row.type = "button";
+  row.dataset.personId = person.personId;
+  row.classList.toggle("is-active", person.personId === activeMusicPeopleId);
+  row.setAttribute("aria-pressed", String(person.personId === activeMusicPeopleId));
   row.setAttribute(
     "aria-label",
     `${person.name}, ${person.role}, ${person.band}, ${formatMusicPeopleCount(person.photos, "Photo")}, ${formatMusicPeopleCount(person.sets, "Set")}`
@@ -1389,20 +1414,105 @@ function createMusicPeopleRow(person) {
   main.append(name, meta);
   counts.append(photoCount, setCount);
   row.append(thumb, main, counts, arrow);
+  row.addEventListener("click", () => {
+    setActiveMusicPeopleRow(person.personId);
+  });
 
   return row;
 }
 
-function renderMusicPeopleIndex() {
+function setMusicPeoplePage(page, options = {}) {
+  const nextPage = normalizeMusicPeoplePage(page);
+  if (activeMusicPeoplePage === nextPage && !options.forceRender) {
+    return;
+  }
+
+  activeMusicPeoplePage = nextPage;
+  renderMusicPeopleIndex({ shouldResetScroll: options.shouldResetScroll !== false });
+}
+
+function renderMusicPeoplePagination() {
+  if (!musicPeopleIndex) {
+    return;
+  }
+
+  const pageCount = getMusicPeoplePageCount();
+  let pagination = musicPeopleIndex.querySelector("[data-music-people-pagination]");
+  if (!pagination) {
+    pagination = document.createElement("nav");
+    pagination.className = "music-people-pagination";
+    pagination.dataset.musicPeoplePagination = "";
+    pagination.setAttribute("aria-label", "Music people archive pages");
+    musicPeopleIndex.append(pagination);
+  }
+
+  const fragment = document.createDocumentFragment();
+  const previous = document.createElement("button");
+  previous.className = "music-people-page-button music-people-page-button--step";
+  previous.type = "button";
+  previous.textContent = "<";
+  previous.disabled = activeMusicPeoplePage === 1;
+  previous.setAttribute("aria-label", "Previous people page");
+  previous.addEventListener("click", () => {
+    setMusicPeoplePage(activeMusicPeoplePage - 1);
+  });
+  fragment.append(previous);
+
+  for (let page = 1; page <= pageCount; page += 1) {
+    const pageButton = document.createElement("button");
+    const isActive = page === activeMusicPeoplePage;
+    pageButton.className = "music-people-page-button";
+    pageButton.type = "button";
+    pageButton.textContent = String(page);
+    pageButton.setAttribute("aria-label", `People page ${page}`);
+    pageButton.setAttribute("aria-current", isActive ? "page" : "false");
+    pageButton.setAttribute("aria-pressed", String(isActive));
+    pageButton.addEventListener("click", () => {
+      setMusicPeoplePage(page);
+    });
+    fragment.append(pageButton);
+  }
+
+  const next = document.createElement("button");
+  next.className = "music-people-page-button music-people-page-button--step";
+  next.type = "button";
+  next.textContent = ">";
+  next.disabled = activeMusicPeoplePage === pageCount;
+  next.setAttribute("aria-label", "Next people page");
+  next.addEventListener("click", () => {
+    setMusicPeoplePage(activeMusicPeoplePage + 1);
+  });
+  fragment.append(next);
+
+  const status = document.createElement("span");
+  status.className = "music-people-pagination-status";
+  status.textContent = `${activeMusicPeoplePage} / ${pageCount}`;
+  fragment.append(status);
+
+  pagination.replaceChildren(fragment);
+}
+
+function renderMusicPeopleIndex(options = {}) {
   if (!musicPeopleList) {
     return;
   }
 
+  activeMusicPeoplePage = normalizeMusicPeoplePage(activeMusicPeoplePage);
+  const pageStart = (activeMusicPeoplePage - 1) * musicPeoplePageSize;
+  const pageRows = musicPeopleRows.slice(pageStart, pageStart + musicPeoplePageSize);
   const fragment = document.createDocumentFragment();
-  musicPeopleRows.forEach((person) => {
+  pageRows.forEach((person) => {
     fragment.append(createMusicPeopleRow(person));
   });
   musicPeopleList.replaceChildren(fragment);
+  renderMusicPeoplePagination();
+
+  if (options.shouldResetScroll && typeof musicPeopleList.scrollTo === "function") {
+    musicPeopleList.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
 }
 
 function setPeopleIndexVisible(isVisible) {
@@ -1413,7 +1523,7 @@ function setPeopleIndexVisible(isVisible) {
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
-    renderMusicPeopleIndex();
+    renderMusicPeopleIndex({ shouldResetScroll: false });
     musicPeopleIndex.removeAttribute("inert");
   } else {
     musicPeopleIndex.setAttribute("inert", "");
