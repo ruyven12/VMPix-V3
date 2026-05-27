@@ -1885,6 +1885,20 @@ function renderMusicPeopleIndex(options = {}) {
 const musicShowsYearOptions = ["ALL SHOWS", "2026", "2025", "2024", "2023", "2022", "2021", "MORE"];
 const musicShowsInitialVisibleCount = 4;
 const musicShowsPageSize = 4;
+const musicShowsStateCopy = {
+  empty: {
+    title: "No Shows Found",
+    copy: "No archive cards are staged for this year yet.",
+  },
+  loading: {
+    title: "Loading Shows Archive",
+    copy: "Archive cards are being prepared.",
+  },
+  error: {
+    title: "Unable To Load Archive",
+    copy: "Shows archive data can be retried when the API is connected.",
+  },
+};
 const musicShowsMonthOrder = {
   JAN: 1,
   FEB: 2,
@@ -1936,6 +1950,54 @@ function loadMoreMusicShows() {
   const filteredRows = getFilteredMusicShows();
   visibleMusicShowsCount = Math.min(filteredRows.length, visibleMusicShowsCount + musicShowsPageSize);
   renderMusicShowsArchive();
+}
+
+function getMusicShowsEmptyCopy() {
+  if (activeMusicShowsYear === "MORE") {
+    return {
+      title: "Older Shows Pending",
+      copy: "Pre-2021 archive cards are reserved for a later import.",
+    };
+  }
+  if (activeMusicShowsYear !== "ALL SHOWS") {
+    return {
+      title: "No Shows Found",
+      copy: `${activeMusicShowsYear} archive cards are not staged yet.`,
+    };
+  }
+  return musicShowsStateCopy.empty;
+}
+
+function createMusicShowsState(stateName, stateCopy = musicShowsStateCopy[stateName] || musicShowsStateCopy.empty) {
+  const state = document.createElement("section");
+  state.className = `music-shows-state music-shows-state--${stateName}`;
+  state.dataset.musicShowsState = stateName;
+  state.setAttribute("aria-live", stateName === "error" ? "assertive" : "polite");
+  state.setAttribute("aria-busy", String(stateName === "loading"));
+
+  const title = document.createElement("h5");
+  title.className = "music-shows-state-title";
+  title.textContent = stateCopy.title;
+
+  const copy = document.createElement("p");
+  copy.className = "music-shows-state-copy";
+  copy.textContent = stateCopy.copy;
+
+  state.append(title, copy);
+  return state;
+}
+
+function createMusicShowsStateTemplates() {
+  const templates = document.createElement("div");
+  templates.className = "music-shows-state-templates";
+  templates.dataset.musicShowsStateTemplates = "";
+  templates.hidden = true;
+  templates.setAttribute("aria-hidden", "true");
+  templates.append(
+    createMusicShowsState("loading"),
+    createMusicShowsState("error")
+  );
+  return templates;
 }
 
 function selectMusicShowDetailHook(show) {
@@ -2067,6 +2129,10 @@ function renderMusicShowsArchive() {
   if (existingNav) {
     existingNav.remove();
   }
+  const existingTemplates = musicActivityPanel.querySelector("[data-music-shows-state-templates]");
+  if (existingTemplates) {
+    existingTemplates.remove();
+  }
 
   const filteredRows = getFilteredMusicShows();
   const visibleRows = filteredRows.slice(0, visibleMusicShowsCount);
@@ -2080,11 +2146,12 @@ function renderMusicShowsArchive() {
   if (visibleRows.length === 0) {
     const empty = document.createElement("li");
     empty.className = "music-shows-empty";
-    empty.textContent = `${activeMusicShowsYear} archive cards pending`;
+    empty.append(createMusicShowsState("empty", getMusicShowsEmptyCopy()));
     fragment.append(empty);
   }
 
   musicActivityList.append(fragment);
+  musicActivityPanel.append(createMusicShowsStateTemplates());
 
   const nav = document.createElement("footer");
   nav.className = "music-shows-nav";
@@ -2127,6 +2194,10 @@ function renderMusicActivityRows(sectionName, rows) {
   const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
   if (existingNav) {
     existingNav.remove();
+  }
+  const existingTemplates = musicActivityPanel.querySelector("[data-music-shows-state-templates]");
+  if (existingTemplates) {
+    existingTemplates.remove();
   }
   delete musicActivityPanel.dataset.selectedShowRoute;
   musicActivityList.className = "music-activity-list";
