@@ -1882,6 +1882,149 @@ function renderMusicPeopleIndex(options = {}) {
   }
 }
 
+function createMusicShowsYearButton(label, isActive = false) {
+  const button = document.createElement("button");
+  button.className = "music-shows-year";
+  button.type = "button";
+  button.textContent = label;
+  button.setAttribute("aria-pressed", String(isActive));
+  return button;
+}
+
+function createMusicShowsCard(show) {
+  const card = document.createElement("article");
+  card.className = "music-show-card";
+
+  const date = document.createElement("div");
+  date.className = "music-show-date";
+  date.setAttribute("aria-label", `${show.month} ${show.day}, ${show.year}`);
+
+  const month = document.createElement("span");
+  month.className = "music-show-month";
+  month.textContent = show.month;
+
+  const day = document.createElement("span");
+  day.className = "music-show-day";
+  day.textContent = show.day;
+
+  const year = document.createElement("span");
+  year.className = "music-show-year";
+  year.textContent = show.year;
+  date.append(month, day, year);
+
+  const poster = document.createElement("div");
+  poster.className = "music-show-poster";
+  poster.setAttribute("role", "img");
+  poster.setAttribute("aria-label", `${show.title} poster placeholder`);
+  poster.dataset.posterMark = show.poster;
+
+  const posterMark = document.createElement("span");
+  posterMark.className = "music-show-poster-mark";
+  posterMark.setAttribute("aria-hidden", "true");
+  posterMark.textContent = show.poster;
+  poster.append(posterMark);
+
+  const body = document.createElement("div");
+  body.className = "music-show-body";
+
+  const title = document.createElement("h5");
+  title.className = "music-show-title";
+  title.textContent = show.title;
+
+  const venue = document.createElement("p");
+  venue.className = "music-show-venue";
+  venue.textContent = show.venue;
+
+  const location = document.createElement("p");
+  location.className = "music-show-location";
+  location.textContent = show.location;
+
+  const footer = document.createElement("div");
+  footer.className = "music-show-footer";
+
+  const bandCount = document.createElement("span");
+  bandCount.className = "music-show-band-count";
+  bandCount.textContent = show.bandCount;
+
+  const action = document.createElement("button");
+  action.className = "music-show-action";
+  action.type = "button";
+  action.textContent = "View Details";
+
+  footer.append(bandCount, action);
+  body.append(title, venue, location, footer);
+  card.append(date, poster, body);
+  return card;
+}
+
+function renderMusicShowsArchive() {
+  if (!musicActivityPanel || !musicActivityList) {
+    return;
+  }
+
+  const title = musicActivityPanel.querySelector(".music-nexus-section-title");
+  if (title) {
+    title.textContent = "";
+    title.classList.add("sr-only");
+  }
+
+  musicActivityPanel.classList.add("music-shows-archive");
+  musicActivityList.className = "music-shows-grid";
+  musicActivityList.setAttribute("aria-label", "Shows archive placeholder cards");
+  musicActivityList.replaceChildren();
+
+  const yearBar = document.createElement("nav");
+  yearBar.className = "music-shows-years";
+  yearBar.dataset.musicShowsYears = "";
+  yearBar.setAttribute("aria-label", "Shows archive years");
+  ["ALL SHOWS", "2026", "2025", "2024", "2023", "2022", "2021", "MORE"].forEach((yearLabel, index) => {
+    yearBar.append(createMusicShowsYearButton(yearLabel, index === 0));
+  });
+  const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
+  if (existingYearBar) {
+    existingYearBar.remove();
+  }
+  musicActivityPanel.insertBefore(yearBar, musicActivityList);
+
+  const fragment = document.createDocumentFragment();
+  musicShowsArchiveRows.forEach((show) => {
+    const item = document.createElement("li");
+    item.className = "music-shows-item";
+    item.append(createMusicShowsCard(show));
+    fragment.append(item);
+  });
+
+  musicActivityList.append(fragment);
+}
+
+function renderMusicActivityRows(sectionName, rows) {
+  if (!musicActivityPanel || !musicActivityList) {
+    return;
+  }
+
+  const title = musicActivityPanel.querySelector(".music-nexus-section-title");
+  if (title) {
+    title.textContent = "Recent Music Activity";
+    title.classList.remove("sr-only");
+  }
+
+  musicActivityPanel.classList.remove("music-shows-archive");
+  const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
+  if (existingYearBar) {
+    existingYearBar.remove();
+  }
+  musicActivityList.className = "music-activity-list";
+  musicActivityList.setAttribute("aria-label", `${sectionName} music activity placeholder rows`);
+  musicActivityList.replaceChildren();
+
+  rows.forEach((rowText) => {
+    const row = document.createElement("li");
+    row.className = "v3-card v3-card--activity music-activity-row";
+    row.textContent = rowText;
+    musicActivityList.append(row);
+  });
+}
+
 function setPeopleIndexVisible(isVisible) {
   if (!musicPeopleIndex) {
     return;
@@ -1945,13 +2088,11 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
 
   setMusicActivityPanelVisible(sectionName !== "people");
   if (sectionName !== "people") {
-    musicActivityList.replaceChildren();
-    rows.forEach((rowText) => {
-      const row = document.createElement("li");
-      row.className = "v3-card v3-card--activity music-activity-row";
-      row.textContent = rowText;
-      musicActivityList.append(row);
-    });
+    if (sectionName === "shows") {
+      renderMusicShowsArchive();
+    } else {
+      renderMusicActivityRows(sectionName, rows);
+    }
   }
 
   if (shouldUpdateRail && activeCardLabel) {
