@@ -112,8 +112,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "music-people") {
-    showMusicNexus();
-    setMusicNexusContext("people");
+    showMusicNexus({ initialSection: "people", currentView: "People" });
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

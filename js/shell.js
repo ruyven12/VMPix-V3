@@ -154,7 +154,7 @@ function showPortfolioHubView() {
   setActiveGlobalNav("portfolio");
 }
 
-function showMusicNexus() {
+function showMusicNexus(options = {}) {
   if (!shell || !portfolioHub || !musicNexusShell) {
     return;
   }
@@ -190,9 +190,12 @@ function showMusicNexus() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
-  setMusicNexusContext("bands", false, false);
-  showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
-  setCurrentView("Music Nexus");
+  const initialSection = options.initialSection || "bands";
+  setMusicNexusContext(initialSection, false, false);
+  if (initialSection === "bands") {
+    showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
+  }
+  setCurrentView(options.currentView || "Music Nexus");
   setActiveGlobalNav("portfolio");
   if (startButton) {
     startButton.disabled = true;
