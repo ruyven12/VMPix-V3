@@ -1,0 +1,89 @@
+/* =========================================================
+   VMPix V3 static shell foundation.
+   Shell-level navigation, archive modules, and static content only.
+   No routes, APIs, backend behavior, or live integrations.
+   ========================================================= */
+
+:root {
+  color-scheme: dark;
+
+  --color-bg: #050507;
+  --color-bg-deep: #010103;
+  --color-panel: rgba(7, 7, 10, 0.56);
+  --color-panel-soft: rgba(255, 255, 255, 0.052);
+  --color-text: #f7f7f2;
+  --color-muted: rgba(247, 247, 242, 0.68);
+  --color-faint: rgba(247, 247, 242, 0.43);
+  --color-line: rgba(247, 247, 242, 0.2);
+  --color-line-strong: rgba(247, 247, 242, 0.24);
+  --color-accent: #d51622;
+  --color-accent-soft: rgba(213, 22, 34, 0.18);
+  --color-accent-line: rgba(213, 22, 34, 0.58);
+  --accent-music: #8e6cff;
+  --accent-ring: #d51622;
+  --accent-calendar: #00b2be;
+  --accent-shell: #d51622;
+  --accent-future: rgba(0, 178, 190, 0.48);
+
+  --font-display: Audiowide, Orbitron, Rajdhani, "Segoe UI", Arial, sans-serif;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --v3-card-radius: var(--radius-sm);
+  --v3-card-radius-feature: var(--radius-md);
+  --v3-card-accent: var(--color-accent);
+  --v3-card-gap: clamp(0.42rem, 1.8vw, 0.62rem);
+  --v3-card-gap-tight: 0.34rem;
+  --v3-card-padding: clamp(0.68rem, 2.8vw, 0.95rem);
+  --v3-card-padding-feature: clamp(0.95rem, 4vw, 1.18rem);
+  --v3-card-padding-compact: clamp(0.52rem, 2.4vw, 0.68rem);
+  --v3-card-border: 1px solid rgba(247, 247, 242, 0.1);
+  --v3-card-border-strong: 1px solid rgba(247, 247, 242, 0.14);
+  --v3-card-bg: linear-gradient(180deg, rgba(247, 247, 242, 0.036), transparent 58%), rgba(3, 3, 6, 0.34);
+  --v3-card-bg-accent: linear-gradient(135deg, color-mix(in srgb, var(--v3-card-accent, var(--color-accent)) 14%, transparent), transparent 64%);
+  --v3-card-glow: inset 0 0 0 1px rgba(247, 247, 242, 0.03), 0 0 1.2rem color-mix(in srgb, var(--v3-card-accent, var(--color-accent)) 9%, transparent);
+  --v3-card-title-size: clamp(0.82rem, 3.6vw, 1rem);
+  --v3-card-title-size-feature: clamp(1.02rem, 5.6vw, 1.42rem);
+  --v3-card-meta-size: clamp(0.62rem, 2.7vw, 0.74rem);
+  --v3-card-meta-size-feature: clamp(0.75rem, 3.4vw, 0.88rem);
+  --v3-card-transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+  --tap-target: 48px;
+  --frame-max: 44rem;
+  --hub-max: 46rem;
+  --stage-min-height: clamp(29rem, calc(100vh - 5.75rem), 52rem);
+  --stage-min-height: clamp(29rem, calc(100svh - 5.75rem), 52rem);
+  --title-size: 2rem;
+  --kicker-size: 1rem;
+  --button-text-size: 0.88rem;
+  --footer-text-size: 0.78rem;
+  --title-gap: 0.82rem;
+  --lockup-gap: clamp(2.2rem, 7svh, 4.9rem);
+  --portal-size: clamp(13.25rem, 68vw, 18.5rem);
+  --portal-button-size: clamp(7rem, 34vw, 9rem);
+  --portal-line: rgba(247, 247, 242, 0.2);
+  --portal-line-soft: rgba(247, 247, 242, 0.12);
+  --portal-red-line: rgba(213, 22, 34, 0.56);
+  --ambient-grid-line: rgba(247, 247, 242, 0.028);
+  --ambient-grid-red: rgba(213, 22, 34, 0.055);
+  --ambient-ring-line: rgba(247, 247, 242, 0.075);
+  --ambient-ring-red: rgba(213, 22, 34, 0.15);
+  --motion-fast: 180ms;
+  --motion-standard: 300ms;
+  --motion-ambient: 18s;
+  --motion-ambient-slow: 32s;
+  --activation-duration: 1260ms;
+  --portal-activation-scale: 1.32;
+  --ease-standard: cubic-bezier(0.22, 0.72, 0.18, 1);
+  --ease-breath: cubic-bezier(0.45, 0, 0.2, 1);
+}
