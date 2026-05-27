@@ -7583,6 +7583,7 @@
       let activeBandsLetter = "A";
       let activeBandsFilterLetter = "";
       let bandsSearchTerm = "";
+      let bandsIndexReturnUrl = "/music/bands?view=radar";
       let activeMusicBand = null;
       let activeSetRow = null;
       let isSetDetailOpen = false;
@@ -7658,18 +7659,18 @@
       };
 
       const musicBandIndexRows = [
-        { name: "Astra Vale", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 12, thumb: "AV" },
-        { name: "Black Harbor", region: "Regional", status: "Partial Archive", statusKey: "partial", albums: 8, thumb: "BH" },
-        { name: "Crimson Static", region: "National", status: "Complete Archive", statusKey: "complete", albums: 34, thumb: "CS" },
-        { name: "Dead Letters", region: "Local", status: "Partial Archive", statusKey: "partial", albums: 4, thumb: "DL" },
-        { name: "Echo District", region: "International", status: "Complete Archive", statusKey: "complete", albums: 18, thumb: "ED" },
-        { name: "Glass Ritual", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 6, thumb: "GR" },
-        { name: "Hollow Signal", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 9, thumb: "HS" },
-        { name: "Moon Circuit", region: "National", status: "Partial Archive", statusKey: "partial", albums: 11, thumb: "MC" },
-        { name: "Neon Saints", region: "International", status: "Complete Archive", statusKey: "complete", albums: 27, thumb: "NS" },
-        { name: "Ritual Bloom", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 5, thumb: "RB" },
-        { name: "Silver Static", region: "National", status: "Partial Archive", statusKey: "partial", albums: 16, thumb: "SS" },
-        { name: "Violet Machines", region: "International", status: "Complete Archive", statusKey: "complete", albums: 22, thumb: "VM" },
+        { bandId: "13-high", name: "Astra Vale", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 12, thumb: "AV" },
+        { bandId: "3fd", name: "Black Harbor", region: "Regional", status: "Partial Archive", statusKey: "partial", albums: 8, thumb: "BH" },
+        { bandId: "4x4-barracuda", name: "Crimson Static", region: "National", status: "Complete Archive", statusKey: "complete", albums: 34, thumb: "CS" },
+        { bandId: "6-gig", name: "Dead Letters", region: "Local", status: "Partial Archive", statusKey: "partial", albums: 4, thumb: "DL" },
+        { bandId: "a-river-of-trees", name: "Echo District", region: "International", status: "Complete Archive", statusKey: "complete", albums: 18, thumb: "ED" },
+        { bandId: "glass-ritual", name: "Glass Ritual", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 6, thumb: "GR" },
+        { bandId: "hollow-signal", name: "Hollow Signal", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 9, thumb: "HS" },
+        { bandId: "moon-circuit", name: "Moon Circuit", region: "National", status: "Partial Archive", statusKey: "partial", albums: 11, thumb: "MC" },
+        { bandId: "neon-saints", name: "Neon Saints", region: "International", status: "Complete Archive", statusKey: "complete", albums: 27, thumb: "NS" },
+        { bandId: "ritual-bloom", name: "Ritual Bloom", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 5, thumb: "RB" },
+        { bandId: "silver-static", name: "Silver Static", region: "National", status: "Partial Archive", statusKey: "partial", albums: 16, thumb: "SS" },
+        { bandId: "violet-machines", name: "Violet Machines", region: "International", status: "Complete Archive", statusKey: "complete", albums: 22, thumb: "VM" },
       ].sort((a, b) => a.name.localeCompare(b.name));
 
       const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -7711,6 +7712,31 @@
         return `${routePaths.musicBands}?view=${normalizeBandsView(viewName)}`;
       }
 
+      function getBandId(band) {
+        return band && typeof band.bandId === "string" ? band.bandId.trim() : "";
+      }
+
+      function getBandRouteUrl(bandId) {
+        return `${routePaths.musicBands}/${encodeURIComponent(String(bandId || "").trim())}`;
+      }
+
+      function findBandById(bandId) {
+        return musicBandIndexRows.find((band) => getBandId(band) === bandId) || null;
+      }
+
+      function createUnknownBand(bandId) {
+        const safeBandId = String(bandId || "unknown-band").trim() || "unknown-band";
+        return {
+          bandId: safeBandId,
+          name: safeBandId,
+          region: "Pending Index",
+          status: "Placeholder Detail",
+          statusKey: "needs",
+          albums: 0,
+          thumb: "ID",
+        };
+      }
+
       function normalizeRoutePath(pathname) {
         const routePath = pathname.replace(/\/+$/, "") || routePaths.home;
         return routePath.endsWith("/index.html") ? routePaths.home : routePath;
@@ -7739,30 +7765,58 @@
           return { name: "music-bands", view, canonicalUrl: getBandsRouteUrl(view) };
         }
 
+        const bandDetailPrefix = `${routePaths.musicBands}/`;
+        if (routePath.startsWith(bandDetailPrefix)) {
+          const encodedBandId = routePath.slice(bandDetailPrefix.length);
+          if (encodedBandId && !encodedBandId.includes("/")) {
+            const bandId = decodeURIComponent(encodedBandId);
+            return { name: "band-detail", bandId, canonicalUrl: getBandRouteUrl(bandId) };
+          }
+        }
+
         return { name: "home", canonicalUrl: routePaths.home, isUnknown: true };
       }
 
-      function pushRouteUrl(url) {
+      function normalizeBandsReturnUrl(url) {
+        const route = getRouteFromUrl(url || getBandsRouteUrl("radar"));
+        return route.name === "music-bands" ? route.canonicalUrl : getBandsRouteUrl("radar");
+      }
+
+      function getActiveBandsReturnUrl() {
+        const route = getRouteFromUrl();
+        if (route.name === "music-bands") {
+          return route.canonicalUrl;
+        }
+        return normalizeBandsReturnUrl(bandsIndexReturnUrl || getBandsRouteUrl(activeBandsView));
+      }
+
+      function pushRouteUrl(url, state = {}) {
         if (!window.history || typeof window.history.pushState !== "function") {
           return;
         }
 
         const targetUrl = new URL(url, window.location.href);
         const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
+        const routeState = { ...state, route: targetPath };
         if (targetPath !== getPathWithSearch()) {
-          window.history.pushState({ route: targetPath }, "", targetPath);
+          window.history.pushState(routeState, "", targetPath);
+        } else if (Object.keys(state).length > 0) {
+          window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
         }
       }
 
-      function replaceRouteUrl(url) {
+      function replaceRouteUrl(url, state = {}) {
         if (!window.history || typeof window.history.replaceState !== "function") {
           return;
         }
 
         const targetUrl = new URL(url, window.location.href);
         const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
+        const routeState = { ...state, route: targetPath };
         if (targetPath !== getPathWithSearch()) {
-          window.history.replaceState({ route: targetPath }, "", targetPath);
+          window.history.replaceState(routeState, "", targetPath);
+        } else if (Object.keys(state).length > 0) {
+          window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
         }
       }
 
@@ -7788,10 +7842,25 @@
         }
 
         if (route.name === "music-bands") {
+          bandsIndexReturnUrl = route.canonicalUrl;
           showMusicNexus();
           setBandsView(route.view, Boolean(options.shouldFocusBandsView));
           if (options.shouldCanonicalize !== false) {
             replaceRouteUrl(route.canonicalUrl);
+          }
+          return;
+        }
+
+        if (route.name === "band-detail") {
+          const historyState = options.historyState || window.history.state || {};
+          bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+          showMusicNexus();
+          showBandDetail(findBandById(route.bandId) || createUnknownBand(route.bandId));
+          if (options.shouldCanonicalize !== false) {
+            replaceRouteUrl(route.canonicalUrl, {
+              returnUrl: bandsIndexReturnUrl,
+              fromBandsIndex: Boolean(historyState.fromBandsIndex),
+            });
           }
           return;
         }
@@ -7806,8 +7875,30 @@
       function navigateToRoute(url, options = {}) {
         const route = getRouteFromUrl(url);
         const targetUrl = route.isUnknown ? url : route.canonicalUrl;
-        pushRouteUrl(targetUrl);
+        pushRouteUrl(targetUrl, options.historyState || {});
         syncRoute(route, { ...options, shouldCanonicalize: false });
+      }
+
+      function navigateToBandDetail(band) {
+        const bandId = getBandId(band);
+        if (!bandId) {
+          return;
+        }
+
+        const returnUrl = getActiveBandsReturnUrl();
+        bandsIndexReturnUrl = returnUrl;
+        navigateToRoute(getBandRouteUrl(bandId), { historyState: { returnUrl, fromBandsIndex: true } });
+      }
+
+      function returnToBandsIndexRoute() {
+        const historyState = window.history.state || {};
+        const returnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+        bandsIndexReturnUrl = returnUrl;
+        if (getRouteFromUrl().name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) {
+          window.history.back();
+          return;
+        }
+        navigateToRoute(returnUrl, { shouldFocusBandsView: true });
       }
 
       function setSpotlight(moduleName) {
@@ -8686,7 +8777,7 @@
               button.textContent = band.name;
               button.setAttribute("aria-label", `Open ${band.name} band detail`);
               button.addEventListener("click", () => {
-                showBandDetail(band);
+                navigateToBandDetail(band);
               });
               item.append(button);
               fragment.append(item);
@@ -8715,6 +8806,7 @@
         row.className = `bands-list-row${letter === activeBandsLetter ? " is-letter-active" : ""}`;
         row.type = "button";
         row.dataset.bandLetter = letter;
+        row.dataset.bandId = getBandId(band);
         row.setAttribute("aria-label", `Open ${band.name} band detail, ${band.region}, ${band.status}, ${band.albums} Albums`);
 
         const thumb = document.createElement("span");
@@ -8754,7 +8846,7 @@
         row.append(thumb, main, arrow);
         row.addEventListener("click", () => {
           activeBandsLetter = letter;
-          showBandDetail(band);
+          navigateToBandDetail(band);
         });
 
         return row;
@@ -9631,9 +9723,7 @@
           });
         }
         if (bandDetailBack) {
-          bandDetailBack.addEventListener("click", () => {
-            showBandsIndexView({ shouldFocus: true });
-          });
+          bandDetailBack.addEventListener("click", returnToBandsIndexRoute);
         }
         if (bandDetailViewSets) {
           bandDetailViewSets.addEventListener("click", showSetsArchive);
@@ -9773,9 +9863,9 @@
           bandsBackRadar.addEventListener("click", returnToBandsRadar);
         }
         setBandsView("radar");
-        syncRouteFromLocation();
-        window.addEventListener("popstate", () => {
-          syncRouteFromLocation();
+        syncRouteFromLocation({ historyState: window.history.state });
+        window.addEventListener("popstate", (event) => {
+          syncRouteFromLocation({ historyState: event.state });
         });
         if (hubCarousel) {
           hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
