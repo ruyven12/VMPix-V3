@@ -95,6 +95,12 @@
 .venue-detail-visual,
 .venue-detail-title-block,
 .venue-detail-stats-strip,
+.venue-relationships,
+.venue-relationships-header,
+.venue-relationship-grid,
+.venue-relationship-card,
+.venue-relationship-media,
+.venue-relationship-copy,
 .venue-detail-content-grid,
 .venue-detail-panel,
 .venue-map-frame,
@@ -2842,6 +2848,10 @@ img.archive-gallery-image {
 .venue-detail-panel-kicker,
 .venue-detail-panel-title,
 .venue-detail-body-copy,
+.venue-relationship-label,
+.venue-relationship-title,
+.venue-relationship-note,
+.venue-relationship-status,
 .venue-timeline-era-kicker,
 .venue-timeline-era-title,
 .venue-timeline-card-year,
@@ -2938,6 +2948,155 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.9);
   font-size: 1.42rem;
   line-height: 0.96;
+}
+
+.venue-relationships {
+  display: grid;
+  gap: 0.66rem;
+  padding: 0.78rem;
+  border: 1px solid rgba(247, 247, 242, 0.085);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.06), transparent 72%),
+    rgba(3, 3, 6, 0.44);
+  overflow: hidden;
+}
+
+.venue-relationships::before,
+.venue-relationship-card::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.2), transparent 42% 100%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(247, 247, 242, 0.036), transparent 66%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.venue-relationships-header {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.venue-relationship-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 0.58rem;
+  min-width: 0;
+}
+
+.venue-relationship-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 17.4rem;
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 62%),
+    rgba(1, 1, 3, 0.34);
+  overflow: hidden;
+}
+
+.venue-relationship-media {
+  min-height: 7.6rem;
+  display: grid;
+  place-items: end start;
+  padding: 0.62rem;
+  border-bottom: 1px solid rgba(247, 247, 242, 0.065);
+  background:
+    radial-gradient(circle at 62% 34%, rgba(247, 247, 242, 0.11), transparent 0.18rem),
+    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.15), transparent 66%),
+    rgba(247, 247, 242, 0.03);
+  overflow: hidden;
+}
+
+.venue-relationship-media::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.08) 50%, transparent 52%),
+    linear-gradient(0deg, transparent 0 48%, rgba(247, 247, 242, 0.055) 50%, transparent 52%);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.venue-relationship-media span {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.88);
+  font-size: 1.88rem;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.venue-relationship-media--shows,
+.venue-relationship-media--history {
+  background:
+    radial-gradient(circle at 62% 34%, rgba(213, 22, 34, 0.22), transparent 0.24rem),
+    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.17), transparent 66%),
+    rgba(247, 247, 242, 0.03);
+}
+
+.venue-relationship-media--bands,
+.venue-relationship-media--photos,
+.venue-relationship-media--region {
+  background:
+    radial-gradient(circle at 44% 36%, rgba(247, 247, 242, 0.11), transparent 0.18rem),
+    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
+    linear-gradient(135deg, rgba(255, 118, 102, 0.12), transparent 68%),
+    rgba(247, 247, 242, 0.028);
+}
+
+.venue-relationship-copy {
+  display: grid;
+  align-content: start;
+  gap: 0.34rem;
+  padding: 0.66rem;
+}
+
+.venue-relationship-label {
+  color: rgba(255, 118, 102, 0.76);
+  font-size: 0.58rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.venue-relationship-title {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: 0.86rem;
+  font-weight: 400;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.venue-relationship-note {
+  color: rgba(247, 247, 242, 0.58);
+  font-size: 0.68rem;
+  line-height: 1.34;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.venue-relationship-status {
+  justify-self: start;
+  min-height: 1.54rem;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.06rem;
+  padding: 0.3rem 0.46rem;
+  border: 1px solid rgba(213, 22, 34, 0.18);
+  border-radius: 999px;
+  background: rgba(213, 22, 34, 0.055);
+  color: rgba(247, 247, 242, 0.62);
+  font-size: 0.54rem;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .venue-detail-content-grid {
@@ -8163,6 +8322,19 @@ img.archive-gallery-image {
     font-size: 1.7rem;
   }
 
+  .venue-relationships {
+    padding: 0.92rem;
+  }
+
+  .venue-relationship-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.62rem;
+  }
+
+  .venue-relationship-card {
+    min-height: 18.4rem;
+  }
+
   .venue-detail-content-grid {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 0.78rem;
@@ -8278,6 +8450,31 @@ img.archive-gallery-image {
 
   .venue-detail-stat-label {
     font-size: 0.52rem;
+  }
+
+  .venue-relationships {
+    gap: 0.54rem;
+    padding: 0.62rem;
+  }
+
+  .venue-relationship-grid {
+    gap: 0.48rem;
+  }
+
+  .venue-relationship-card {
+    min-height: 0;
+  }
+
+  .venue-relationship-media {
+    min-height: 6.4rem;
+  }
+
+  .venue-relationship-copy {
+    padding: 0.58rem;
+  }
+
+  .venue-relationship-status {
+    min-height: 1.72rem;
   }
 
   .venue-map-frame {

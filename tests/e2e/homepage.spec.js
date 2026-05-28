@@ -119,6 +119,10 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
     await expect(page.locator("[data-venue-detail]")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Asylum", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Archive Relationships" })).toBeVisible();
+    await expect(page.getByText("Shows Index Hook")).toBeVisible();
+    await expect(page.getByText("Gallery System Hook")).toBeVisible();
+    await expect(page.getByText("Regional Browse Hook")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Decade Archive" })).toBeVisible();
     await expect(page.getByText("Venue Detail V1 staged")).toBeVisible();
 
@@ -164,6 +168,7 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await page.getByRole("button", { name: "Venues" }).click();
       await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
       await expect(page.locator("[data-venue-detail]")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Archive Relationships" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Decade Archive" })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
