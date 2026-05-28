@@ -8327,7 +8327,6 @@ img.archive-gallery-image {
   }
 
   .venue-relationship-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.62rem;
   }
 
@@ -8454,7 +8453,7 @@ img.archive-gallery-image {
 
   .venue-relationships {
     gap: 0.54rem;
-    padding: 0.62rem;
+    padding: 0.54rem;
   }
 
   .venue-relationship-grid {

@@ -2,7 +2,9 @@ const { test, expect } = require("@playwright/test");
 
 const viewportChecks = [
   { name: "small phone", size: { width: 320, height: 740 } },
+  { name: "social webview", size: { width: 390, height: 760 } },
   { name: "large phone", size: { width: 390, height: 844 } },
+  { name: "s25 ultra", size: { width: 384, height: 854 } },
   { name: "desktop", size: { width: 1366, height: 768 } },
 ];
 
@@ -34,6 +36,59 @@ async function activateHub(page) {
   await page.getByRole("button", { name: "Start Voodoo Media" }).click();
   await expect(page.locator(".portfolio-hub")).toBeVisible({ timeout: 4_000 });
   await expect(page.locator(".site-shell")).toHaveClass(/has-entered-hub/);
+}
+
+async function expectVenueDetailGeometrySafe(page) {
+  const geometry = await page.evaluate(() => {
+    const box = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) {
+        return null;
+      }
+      const rect = element.getBoundingClientRect();
+      return {
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height,
+        scrollWidth: element.scrollWidth,
+        clientWidth: element.clientWidth,
+      };
+    };
+
+    return {
+      publicHome: box(".public-home"),
+      rail: box("[data-shell-bottom-rail]"),
+      shell: box("[data-music-nexus-shell]"),
+      venue: box("[data-venue-detail]"),
+      map: box(".venue-map-frame"),
+      timeline: box(".venue-timeline-system"),
+      timelineTrack: box(".venue-timeline-track"),
+      relationshipCard: box(".venue-relationship-card"),
+      decadeNav: box(".venue-timeline-decade-nav"),
+    };
+  });
+
+  expect(geometry.publicHome).not.toBeNull();
+  expect(geometry.rail).not.toBeNull();
+  expect(geometry.shell).not.toBeNull();
+  expect(geometry.venue).not.toBeNull();
+  expect(geometry.map).not.toBeNull();
+  expect(geometry.timeline).not.toBeNull();
+  expect(geometry.timelineTrack).not.toBeNull();
+  expect(geometry.relationshipCard).not.toBeNull();
+  expect(geometry.decadeNav).not.toBeNull();
+
+  expect(geometry.publicHome.bottom).toBeLessThanOrEqual(geometry.rail.top + 1);
+  expect(geometry.shell.bottom).toBeLessThanOrEqual(geometry.publicHome.bottom + 1);
+  expect(geometry.shell.width).toBeGreaterThan(220);
+  expect(geometry.map.height).toBeGreaterThan(150);
+  expect(geometry.timeline.height).toBeGreaterThan(200);
+  expect(geometry.timelineTrack.width).toBeLessThanOrEqual(geometry.timeline.width + 2);
+  expect(geometry.relationshipCard.width).toBeGreaterThan(180);
+  expect(geometry.decadeNav.height).toBeGreaterThan(34);
 }
 
 test.describe("Interactive Portfolio Hub v1", () => {
@@ -150,6 +205,9 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await expect(page.locator("[data-current-view]")).toHaveText("Music Nexus");
     await page.getByRole("button", { name: "Shows" }).click();
     await expect(page.locator("[data-current-view]")).toHaveText("Shows");
+    await page.getByRole("button", { name: "Venues" }).click();
+    await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
+    await expectVenueDetailGeometrySafe(page);
     await expectNoHorizontalOverflow(page);
   });
 
@@ -170,6 +228,7 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await expect(page.locator("[data-venue-detail]")).toBeVisible();
       await expect(page.getByRole("heading", { name: "Archive Relationships" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Decade Archive" })).toBeVisible();
+      await expectVenueDetailGeometrySafe(page);
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
