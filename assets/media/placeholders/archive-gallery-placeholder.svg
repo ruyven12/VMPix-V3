@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Archive gallery placeholder">
+  <defs>
+    <linearGradient id="frameGlow" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f7f7f2" stop-opacity="0.13"/>
+      <stop offset="0.46" stop-color="#d51622" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#050507" stop-opacity="0.2"/>
+    </linearGradient>
+    <radialGradient id="stageGlow" cx="48%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#d51622" stop-opacity="0.42"/>
+      <stop offset="0.34" stop-color="#d51622" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#010103" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="scanLines" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M0 18H36" stroke="#f7f7f2" stroke-opacity="0.045" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="#020204"/>
+  <rect width="1600" height="1000" fill="url(#stageGlow)"/>
+  <path d="M0 760C244 694 430 710 650 762C925 827 1090 840 1600 695V1000H0Z" fill="#050507" opacity="0.7"/>
+  <path d="M0 120L1600 0V214L0 336Z" fill="url(#frameGlow)" opacity="0.52"/>
+  <path d="M135 780L620 182L956 646L1178 424L1488 780Z" fill="#f7f7f2" opacity="0.055"/>
+  <path d="M126 802H1474" stroke="#f7f7f2" stroke-opacity="0.09" stroke-width="4"/>
+  <path d="M138 184H1462V816H138Z" fill="none" stroke="#f7f7f2" stroke-opacity="0.075" stroke-width="4"/>
+  <path d="M138 184H1462" stroke="#d51622" stroke-opacity="0.22" stroke-width="5"/>
+  <rect width="1600" height="1000" fill="url(#scanLines)" opacity="0.55"/>
+</svg>

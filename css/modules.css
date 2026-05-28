@@ -1357,26 +1357,153 @@
   color: rgba(247, 247, 242, 0.68);
 }
 
-.set-gallery-grid {
+/* Shared archive gallery grid foundation for Music, Wrestling, and future modules. */
+.archive-gallery-grid {
+  --archive-gallery-accent: rgba(255, 82, 72, 0.2);
+  --archive-gallery-accent-line: rgba(255, 104, 92, 0.62);
+  --archive-gallery-gap: clamp(0.68rem, 2.1vw, 0.96rem);
+  --archive-gallery-min-tile: clamp(10rem, 24vw, 13.25rem);
+  --archive-gallery-tile-min: clamp(9.8rem, 32vw, 14rem);
+  --archive-gallery-ratio: 16 / 10;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.62rem, 2.15vw, 0.84rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--archive-gallery-min-tile)), 1fr));
+  gap: var(--archive-gallery-gap);
+  align-items: start;
+  min-width: 0;
 }
 
-.set-gallery-photo-tile {
+.archive-gallery-tile {
   appearance: none;
-  min-height: clamp(8rem, 34vw, 13.75rem);
-  aspect-ratio: 4 / 3;
+  min-width: 0;
+  min-height: max(var(--tap-target), var(--archive-gallery-tile-min));
+  aspect-ratio: var(--archive-gallery-ratio);
+  display: grid;
+  align-items: end;
+  justify-items: stretch;
+  padding: 0;
+  border: 1px solid rgba(247, 247, 242, 0.07);
+  border-radius: var(--radius-sm);
+  background: rgba(1, 1, 3, 0.42);
+  color: rgba(247, 247, 242, 0.66);
   cursor: pointer;
   font: inherit;
   overflow: hidden;
-  padding: 0;
   position: relative;
+  text-align: left;
+  text-transform: uppercase;
   touch-action: manipulation;
   transition:
     border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.archive-gallery-tile::before,
+.archive-gallery-tile::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.archive-gallery-tile::before {
+  inset: auto 0 0;
+  z-index: 3;
+  height: 0.14rem;
+  background: var(--archive-gallery-accent-line);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.archive-gallery-tile::after {
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(1, 1, 3, 0.02), rgba(1, 1, 3, 0.18) 48%, rgba(1, 1, 3, 0.74)),
+    linear-gradient(90deg, rgba(1, 1, 3, 0.28), transparent 30% 70%, rgba(1, 1, 3, 0.28));
+}
+
+.archive-gallery-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  background:
+    radial-gradient(circle at var(--gallery-image-x, 52%) var(--gallery-image-y, 42%), var(--gallery-image-accent, rgba(255, 82, 72, 0.18)), transparent 56%),
+    linear-gradient(135deg, rgba(247, 247, 242, 0.08), transparent 38% 62%, rgba(255, 82, 72, 0.08)),
+    repeating-linear-gradient(90deg, rgba(247, 247, 242, 0.035) 0 1px, transparent 1px 14px),
+    rgba(1, 1, 3, 0.5);
+  filter: saturate(0.86) contrast(1.06);
+  transform: scale(1.01);
+}
+
+img.archive-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.archive-gallery-caption {
+  position: relative;
+  z-index: 4;
+  display: block;
+  max-width: calc(100% - 1.3rem);
+  margin: 0.64rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archive-gallery-tile:hover,
+.archive-gallery-tile:focus-visible,
+.archive-gallery-tile.is-active,
+.archive-gallery-tile[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--archive-gallery-accent-line) 54%, transparent);
+  box-shadow:
+    inset 0 0 0 1px rgba(247, 247, 242, 0.025),
+    0 0 0.82rem color-mix(in srgb, var(--archive-gallery-accent) 38%, transparent);
+}
+
+.archive-gallery-tile:hover {
+  transform: translate3d(0, -0.04rem, 0);
+}
+
+.archive-gallery-tile.is-active::before,
+.archive-gallery-tile[aria-pressed="true"]::before {
+  opacity: 1;
+}
+
+.archive-gallery-tile:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
+.archive-gallery-tile:nth-child(3n + 2) {
+  --gallery-image-x: 38%;
+  --gallery-image-y: 48%;
+  --gallery-image-accent: rgba(142, 108, 255, 0.18);
+}
+
+.archive-gallery-tile:nth-child(3n) {
+  --gallery-image-x: 64%;
+  --gallery-image-y: 36%;
+  --gallery-image-accent: rgba(255, 183, 105, 0.16);
+}
+
+.set-gallery-grid {
+  --archive-gallery-accent: rgba(255, 82, 72, 0.18);
+  --archive-gallery-accent-line: rgba(255, 104, 92, 0.62);
+  --archive-gallery-gap: clamp(0.66rem, 2.15vw, 0.92rem);
+  --archive-gallery-min-tile: clamp(10rem, 24vw, 13.5rem);
+  --archive-gallery-tile-min: clamp(8.6rem, 32vw, 13.75rem);
+}
+
+.set-gallery-photo-tile {
+  --archive-gallery-ratio: 16 / 10;
+  transition:
+    border-color 180ms ease,
     background-color 180ms ease,
-    box-shadow 180ms ease;
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .set-gallery-photo-tile::before {
@@ -6864,7 +6991,8 @@
   }
 
   .set-gallery-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    --archive-gallery-min-tile: clamp(12.2rem, 18vw, 13.8rem);
+    --archive-gallery-tile-min: clamp(10.8rem, 18vw, 13.75rem);
   }
 
   .sets-list {
@@ -7004,6 +7132,8 @@
   .portfolio-hub,
   .site-shell.has-entered-hub .portfolio-hub,
   .site-shell.has-entered-hub .home-frame,
+  .archive-gallery-tile:hover,
+  .archive-gallery-tile:focus-visible,
   .music-show-card:hover,
   .music-show-card:focus-within,
   .music-show-card:hover .music-show-poster,
