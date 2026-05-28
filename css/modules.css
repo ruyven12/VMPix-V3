@@ -82,6 +82,13 @@
 .show-detail-carousel-slide,
 .show-detail-media,
 .show-detail-media-copy,
+.show-detail-relationships,
+.show-detail-relationships-header,
+.show-detail-relationships-grid,
+.show-detail-relationship-panel,
+.show-detail-relationship-rows,
+.show-detail-relationship-row,
+.show-detail-relationship-chips,
 .band-detail-hero,
 .band-detail-poster,
 .band-detail-copy,
@@ -4143,7 +4150,13 @@
 .show-detail-media-kicker,
 .show-detail-media-title,
 .show-detail-media-detail,
-.show-detail-media-caption {
+.show-detail-media-caption,
+.show-detail-relationships-title,
+.show-detail-relationships-state,
+.show-detail-relationship-kicker,
+.show-detail-relationship-title,
+.show-detail-relationship-label,
+.show-detail-relationship-value {
   margin: 0;
   min-width: 0;
 }
@@ -4450,6 +4463,115 @@
 .show-detail-dot:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.16rem;
+}
+
+.show-detail-relationships {
+  width: min(100%, 56rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.48rem, 1.55svh, 0.68rem);
+}
+
+.show-detail-relationships-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.48rem 0.72rem;
+}
+
+.show-detail-relationships-title,
+.show-detail-relationships-state {
+  color: rgba(247, 247, 242, 0.74);
+  font-size: clamp(0.66rem, 2.45vw, 0.78rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.show-detail-relationships-state {
+  color: rgba(213, 22, 34, 0.72);
+}
+
+.show-detail-relationships-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+  gap: clamp(0.44rem, 1.35vw, 0.62rem);
+}
+
+.show-detail-relationship-panel {
+  display: grid;
+  align-content: start;
+  gap: clamp(0.42rem, 1.35svh, 0.58rem);
+  min-height: 9.1rem;
+  padding: clamp(0.58rem, 1.8vw, 0.78rem);
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 58%),
+    radial-gradient(ellipse at 12% 8%, rgba(213, 22, 34, 0.09), transparent 10rem),
+    rgba(4, 4, 7, 0.56);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.22);
+}
+
+.show-detail-relationship-kicker,
+.show-detail-relationship-label,
+.show-detail-relationship-value,
+.show-detail-relationship-chip {
+  font-size: clamp(0.52rem, 2.05vw, 0.62rem);
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.show-detail-relationship-kicker,
+.show-detail-relationship-label {
+  color: rgba(213, 22, 34, 0.66);
+}
+
+.show-detail-relationship-title {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(0.82rem, 3vw, 1rem);
+  font-weight: 400;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.show-detail-relationship-rows {
+  display: grid;
+  gap: 0.26rem;
+}
+
+.show-detail-relationship-row {
+  display: grid;
+  grid-template-columns: minmax(4.2rem, auto) minmax(0, 1fr);
+  gap: 0.36rem;
+  align-items: start;
+}
+
+.show-detail-relationship-label {
+  color: rgba(247, 247, 242, 0.36);
+}
+
+.show-detail-relationship-value {
+  color: rgba(247, 247, 242, 0.58);
+  overflow-wrap: anywhere;
+}
+
+.show-detail-relationship-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+.show-detail-relationship-chip {
+  max-width: 100%;
+  padding: 0.28rem 0.38rem;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: 999px;
+  background: rgba(247, 247, 242, 0.04);
+  color: rgba(247, 247, 242, 0.54);
+  overflow-wrap: anywhere;
 }
 
 .ring-archive-shell {
@@ -5786,6 +5908,15 @@
 
   .show-detail-media-copy {
     width: calc(100% - 3.4rem);
+  }
+
+  .show-detail-relationship-panel {
+    min-height: 0;
+  }
+
+  .show-detail-relationship-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.16rem;
   }
 
   .person-detail-image {

@@ -1983,6 +1983,15 @@ function getMusicShowDisplayId(show) {
   return `${show.poster || "SD"}-${month}${day}${year}`;
 }
 
+function getMusicArchiveSlug(value, fallback = "archive-item") {
+  const slug = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+}
+
 function getMusicShowTimestamp(show) {
   const year = Number.parseInt(show.year || "0", 10);
   const month = musicShowsMonthOrder[String(show.month || "").toUpperCase()] || 0;
@@ -2313,50 +2322,299 @@ function normalizeShowDetailSlideIndex(index, total) {
   return ((index % total) + total) % total;
 }
 
-function getMusicShowCarouselSlides(show) {
-  const dateLabel = getMusicShowDateLabel(show);
+function getMusicShowBandRelationships(show) {
+  const bandTotal = Number.parseInt(getMusicShowBandCount(show), 10) || 0;
+  const relationshipCount = Math.min(Math.max(bandTotal, 1), 4);
+  const sourceBands = musicBandIndexRows.slice(0, relationshipCount);
+
+  if (sourceBands.length === 0) {
+    return [{
+      band_id: `band-${getMusicArchiveSlug(show.showId, "unknown-show")}-pending`,
+      name: "Pending Band",
+      role: "Lineup placeholder",
+      relationship_status: "static-hold",
+    }];
+  }
+
+  return sourceBands.map((band, index) => ({
+    band_id: band.bandId,
+    name: band.name,
+    role: index === 0 ? "Headliner placeholder" : "Lineup placeholder",
+    relationship_status: "static-hook",
+  }));
+}
+
+function getMusicShowMediaRelationships(show) {
+  const showSlug = getMusicArchiveSlug(show.showId, "unknown-show");
   const photoCount = getMusicShowPhotoCount(show);
   const bandCount = getMusicShowBandCount(show);
   const showCode = getMusicShowDisplayId(show);
 
   return [
     {
+      media_id: `${showSlug}-lead-photo`,
+      kind: "photo",
+      gallery_entry_id: `gallery-${showSlug}`,
+      lightbox_entry_id: `lightbox-${showSlug}-lead`,
+      tags: ["lead", "photo"],
       kicker: "Lead Frame",
       title: show.title,
-      detail: dateLabel,
+      detail: getMusicShowDateLabel(show),
       caption: "Primary archive preview",
     },
     {
+      media_id: `${showSlug}-venue-photo`,
+      kind: "photo",
+      gallery_entry_id: `gallery-${showSlug}`,
+      lightbox_entry_id: `lightbox-${showSlug}-venue`,
+      tags: ["venue", "room"],
       kicker: "Room View",
       title: show.venue,
       detail: show.location,
       caption: "Venue atmosphere placeholder",
     },
     {
+      media_id: `${showSlug}-set-photo`,
+      kind: "photo",
+      gallery_entry_id: `gallery-${showSlug}`,
+      lightbox_entry_id: `lightbox-${showSlug}-set`,
+      tags: ["bands", "performance"],
       kicker: "Set Capture",
       title: `${bandCount} Band${bandCount === "1" ? "" : "s"}`,
       detail: "Music Nexus archive",
       caption: "Performance sequence preview",
     },
     {
+      media_id: `${showSlug}-gallery-entry`,
+      kind: "gallery",
+      gallery_entry_id: `gallery-${showSlug}`,
+      lightbox_entry_id: `lightbox-${showSlug}-gallery`,
+      tags: ["gallery", "photos"],
       kicker: "Gallery Queue",
       title: `${photoCount} Photos`,
       detail: "Media pending live gallery source",
       caption: "Future lightbox entry point",
     },
     {
-      kicker: "Archive ID",
-      title: showCode,
-      detail: show.showId,
-      caption: "Show dossier reference",
+      media_id: `${showSlug}-video-hold`,
+      kind: "video",
+      gallery_entry_id: `gallery-${showSlug}`,
+      lightbox_entry_id: `lightbox-${showSlug}-video`,
+      tags: ["video", "hold"],
+      kicker: "Video Hold",
+      title: "Video Slot",
+      detail: showCode,
+      caption: "Reserved media relationship",
     },
   ];
+}
+
+function getMusicShowTags(show) {
+  const locationParts = String(show.location || "").split(",");
+  const region = locationParts.length > 1 ? locationParts[1].trim() : locationParts[0].trim();
+  return [
+    { tag_id: `tag-year-${getMusicArchiveSlug(show.year, "pending")}`, label: show.year || "Pending" },
+    { tag_id: `tag-region-${getMusicArchiveSlug(region, "region")}`, label: region || "Region Hold" },
+    { tag_id: `tag-venue-${getMusicArchiveSlug(show.venue, "venue")}`, label: "Venue Linked" },
+    { tag_id: "tag-media-gallery", label: "Gallery Ready" },
+  ];
+}
+
+function getMusicShowRelationshipSnapshot(show) {
+  const showSlug = getMusicArchiveSlug(show.showId, "unknown-show");
+  const venueId = `venue-${getMusicArchiveSlug(show.venue, "pending-venue")}`;
+  const bands = getMusicShowBandRelationships(show);
+  const media = getMusicShowMediaRelationships(show);
+  const galleryEntryId = `gallery-${showSlug}`;
+  const lightboxEntryId = `lightbox-${showSlug}`;
+
+  return {
+    show_id: show.showId || showSlug,
+    venue_id: venueId,
+    venue: {
+      venue_id: venueId,
+      name: show.venue || "Pending Venue",
+      location: show.location || "Pending City",
+      relationship_status: "static-hook",
+    },
+    band_count: getMusicShowBandCount(show),
+    band_ids: bands.map((band) => band.band_id),
+    bands,
+    media_counts: {
+      photos: getMusicShowPhotoCount(show),
+      videos: "1",
+    },
+    media_ids: media.map((item) => item.media_id),
+    media,
+    tags: getMusicShowTags(show),
+    archive_meta: {
+      show_display_id: getMusicShowDisplayId(show),
+      gallery_entry_id: galleryEntryId,
+      lightbox_entry_id: lightboxEntryId,
+      ingest_state: "static-placeholder",
+      relationship_state: "schema-ready",
+      source: "Music Nexus V3",
+    },
+  };
+}
+
+function getMusicShowCarouselSlides(show, relationships = getMusicShowRelationshipSnapshot(show)) {
+  return relationships.media;
+}
+
+function createShowDetailRelationshipRow(label, value) {
+  const row = document.createElement("div");
+  row.className = "show-detail-relationship-row";
+
+  const rowLabel = document.createElement("span");
+  rowLabel.className = "show-detail-relationship-label";
+  rowLabel.textContent = label;
+
+  const rowValue = document.createElement("span");
+  rowValue.className = "show-detail-relationship-value";
+  rowValue.textContent = value;
+
+  row.append(rowLabel, rowValue);
+  return row;
+}
+
+function createShowDetailRelationshipChip(label, dataset = {}) {
+  const chip = document.createElement("span");
+  chip.className = "show-detail-relationship-chip";
+  chip.textContent = label;
+  Object.entries(dataset).forEach(([key, value]) => {
+    chip.dataset[key] = value;
+  });
+  return chip;
+}
+
+function createShowDetailRelationshipPanel({ kicker, title, rows = [], chips = [], dataset = {} }) {
+  const panel = document.createElement("article");
+  panel.className = "show-detail-relationship-panel";
+  Object.entries(dataset).forEach(([key, value]) => {
+    panel.dataset[key] = value;
+  });
+
+  const panelKicker = document.createElement("p");
+  panelKicker.className = "show-detail-relationship-kicker";
+  panelKicker.textContent = kicker;
+
+  const panelTitle = document.createElement("h5");
+  panelTitle.className = "show-detail-relationship-title";
+  panelTitle.textContent = title;
+
+  const rowList = document.createElement("div");
+  rowList.className = "show-detail-relationship-rows";
+  rows.forEach((row) => {
+    rowList.append(createShowDetailRelationshipRow(row.label, row.value));
+  });
+
+  panel.append(panelKicker, panelTitle, rowList);
+  if (chips.length > 0) {
+    const chipList = document.createElement("div");
+    chipList.className = "show-detail-relationship-chips";
+    chips.forEach((chip) => chipList.append(chip));
+    panel.append(chipList);
+  }
+
+  return panel;
+}
+
+function createShowDetailRelationships(relationships) {
+  const section = document.createElement("section");
+  section.className = "show-detail-relationships";
+  section.setAttribute("aria-labelledby", "show-detail-relationships-title");
+  section.dataset.showId = relationships.show_id;
+  section.dataset.venueId = relationships.venue_id;
+  section.dataset.galleryEntryId = relationships.archive_meta.gallery_entry_id;
+  section.dataset.lightboxEntryId = relationships.archive_meta.lightbox_entry_id;
+
+  const header = document.createElement("div");
+  header.className = "show-detail-relationships-header";
+
+  const title = document.createElement("h4");
+  title.className = "show-detail-relationships-title";
+  title.id = "show-detail-relationships-title";
+  title.textContent = "Archive Links";
+
+  const state = document.createElement("span");
+  state.className = "show-detail-relationships-state";
+  state.textContent = relationships.archive_meta.relationship_state;
+
+  header.append(title, state);
+
+  const grid = document.createElement("div");
+  grid.className = "show-detail-relationships-grid";
+
+  grid.append(
+    createShowDetailRelationshipPanel({
+      kicker: "Venue",
+      title: relationships.venue.name,
+      dataset: { venueId: relationships.venue_id },
+      rows: [
+        { label: "venue_id", value: relationships.venue_id },
+        { label: "Location", value: relationships.venue.location },
+        { label: "Status", value: relationships.venue.relationship_status },
+      ],
+    }),
+    createShowDetailRelationshipPanel({
+      kicker: "Bands",
+      title: `${relationships.band_count} Band${relationships.band_count === "1" ? "" : "s"}`,
+      dataset: { bandIds: relationships.band_ids.join(",") },
+      rows: [
+        { label: "Linked", value: `${relationships.band_ids.length} static hooks` },
+        { label: "Remaining", value: `${Math.max(0, Number.parseInt(relationships.band_count, 10) - relationships.band_ids.length)} slots` },
+      ],
+      chips: relationships.bands.map((band) =>
+        createShowDetailRelationshipChip(band.name, { bandId: band.band_id })
+      ),
+    }),
+    createShowDetailRelationshipPanel({
+      kicker: "Media",
+      title: `${relationships.media_counts.photos} Photos / ${relationships.media_counts.videos} Video`,
+      dataset: {
+        mediaIds: relationships.media_ids.join(","),
+        galleryEntryId: relationships.archive_meta.gallery_entry_id,
+        lightboxEntryId: relationships.archive_meta.lightbox_entry_id,
+      },
+      rows: [
+        { label: "Gallery", value: relationships.archive_meta.gallery_entry_id },
+        { label: "Lightbox", value: relationships.archive_meta.lightbox_entry_id },
+        { label: "Media IDs", value: `${relationships.media_ids.length} staged` },
+      ],
+      chips: [
+        createShowDetailRelationshipChip("Gallery Entry", { galleryEntryId: relationships.archive_meta.gallery_entry_id }),
+        createShowDetailRelationshipChip("Lightbox Entry", { lightboxEntryId: relationships.archive_meta.lightbox_entry_id }),
+      ],
+    }),
+    createShowDetailRelationshipPanel({
+      kicker: "Metadata",
+      title: relationships.archive_meta.show_display_id,
+      dataset: { relationshipState: relationships.archive_meta.relationship_state },
+      rows: [
+        { label: "Source", value: relationships.archive_meta.source },
+        { label: "Ingest", value: relationships.archive_meta.ingest_state },
+      ],
+      chips: relationships.tags.map((tag) =>
+        createShowDetailRelationshipChip(tag.label, { tagId: tag.tag_id })
+      ),
+    })
+  );
+
+  section.append(header, grid);
+  return section;
 }
 
 function renderMusicShowDetail(show) {
   if (!showDetail || !show) {
     return;
   }
+
+  const relationships = getMusicShowRelationshipSnapshot(show);
+  showDetail.dataset.showId = relationships.show_id;
+  showDetail.dataset.venueId = relationships.venue_id;
+  showDetail.dataset.galleryEntryId = relationships.archive_meta.gallery_entry_id;
+  showDetail.dataset.lightboxEntryId = relationships.archive_meta.lightbox_entry_id;
 
   const backButton = document.createElement("button");
   backButton.className = "show-detail-back";
@@ -2404,13 +2662,14 @@ function renderMusicShowDetail(show) {
   mapButton.className = "show-detail-map";
   mapButton.type = "button";
   mapButton.textContent = "Map";
+  mapButton.dataset.venueId = relationships.venue_id;
   mapButton.setAttribute("aria-label", `Map placeholder for ${show.venue}`);
 
   const stats = document.createElement("div");
   stats.className = "show-detail-stats";
   stats.append(
-    createShowDetailStat("Bands", getMusicShowBandCount(show)),
-    createShowDetailStat("Photos", getMusicShowPhotoCount(show)),
+    createShowDetailStat("Bands", relationships.band_count),
+    createShowDetailStat("Photos", relationships.media_counts.photos),
     createShowDetailStat("Year", show.year || "Pending")
   );
 
@@ -2445,7 +2704,7 @@ function renderMusicShowDetail(show) {
   mediaFrame.className = "show-detail-media-frame";
   mediaFrame.setAttribute("aria-roledescription", "carousel");
 
-  const slides = getMusicShowCarouselSlides(show);
+  const slides = getMusicShowCarouselSlides(show, relationships);
   let activeSlideIndex = 0;
 
   const previous = document.createElement("button");
@@ -2465,6 +2724,10 @@ function renderMusicShowDetail(show) {
   const slideElements = slides.map((slide, index) => {
     const slideElement = document.createElement("article");
     slideElement.className = `show-detail-carousel-slide${index === activeSlideIndex ? " is-active" : ""}`;
+    slideElement.dataset.mediaId = slide.media_id;
+    slideElement.dataset.mediaKind = slide.kind;
+    slideElement.dataset.galleryEntryId = slide.gallery_entry_id;
+    slideElement.dataset.lightboxEntryId = slide.lightbox_entry_id;
     slideElement.setAttribute("aria-roledescription", "slide");
     slideElement.setAttribute("aria-label", `${index + 1} of ${slides.length}: ${slide.title}`);
     slideElement.setAttribute("aria-hidden", String(index !== activeSlideIndex));
@@ -2603,7 +2866,7 @@ function renderMusicShowDetail(show) {
   updateCarousel(activeSlideIndex);
 
   viewing.append(viewingHeader, mediaFrame, dots);
-  showDetail.replaceChildren(backButton, hero, viewing);
+  showDetail.replaceChildren(backButton, hero, viewing, createShowDetailRelationships(relationships));
 }
 
 function showMusicShowDetail(showId) {
