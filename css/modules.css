@@ -4104,6 +4104,7 @@
 .show-detail-poster {
   width: min(100%, 15.5rem);
   aspect-ratio: 2 / 3;
+  align-self: center;
   justify-self: center;
   display: grid;
   place-items: center;
@@ -5902,12 +5903,12 @@
   }
 
   .show-detail-carousel-arrow {
-    width: 2.45rem;
-    min-height: 2.45rem;
+    width: 2.75rem;
+    min-height: 2.75rem;
   }
 
   .show-detail-media-copy {
-    width: calc(100% - 3.4rem);
+    width: calc(100% - 4rem);
   }
 
   .show-detail-relationship-panel {
@@ -6333,7 +6334,8 @@
   }
 
   .show-detail-poster {
-    max-height: 17.5rem;
+    width: min(100%, 11.65rem);
+    max-height: none;
   }
 
   .show-detail-stats {
@@ -6348,8 +6350,17 @@
     aspect-ratio: 4 / 3;
   }
 
+  .show-detail-carousel-arrow {
+    width: 46px;
+    min-height: 46px;
+  }
+
   .show-detail-media {
     min-height: 100%;
+  }
+
+  .show-detail-media-copy {
+    width: calc(100% - 4.4rem);
   }
 
   .person-detail-image {
