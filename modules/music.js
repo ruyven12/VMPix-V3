@@ -677,6 +677,42 @@ function updateSetGalleryFromRow(row) {
   }
 }
 
+function setGalleryState(stateName = "ready") {
+  const activeState = ["loading", "empty", "error"].includes(stateName) ? stateName : "ready";
+  const shouldShowGrid = activeState === "ready";
+
+  if (!shouldShowGrid) {
+    setGalleryModeVisible(false);
+  }
+  if (galleryGrid) {
+    galleryGrid.classList.toggle("is-gallery-hidden", !shouldShowGrid);
+  }
+  if (galleryStatesShell) {
+    galleryStatesShell.classList.toggle("is-active", !shouldShowGrid);
+  }
+  galleryPhotoTiles.forEach((tile) => {
+    if (shouldShowGrid) {
+      tile.removeAttribute("tabindex");
+    } else {
+      tile.setAttribute("tabindex", "-1");
+    }
+  });
+  galleryStates.forEach((statePanel) => {
+    const isActive = statePanel.dataset.galleryState === activeState;
+    statePanel.classList.toggle("is-active", isActive);
+    statePanel.setAttribute("aria-hidden", String(!isActive));
+    if (isActive) {
+      statePanel.removeAttribute("inert");
+    } else {
+      statePanel.setAttribute("inert", "");
+    }
+  });
+  if (galleryViewAll) {
+    galleryViewAll.disabled = !shouldShowGrid;
+    galleryViewAll.setAttribute("aria-disabled", String(!shouldShowGrid));
+  }
+}
+
 function getGalleryPhotoLabel(photoTile) {
   return photoTile ? photoTile.dataset.galleryPhotoLabel || photoTile.textContent.trim() : "Photo 01";
 }
@@ -813,6 +849,31 @@ function setLightboxActivePhoto(index, options = {}) {
   if (lightboxCounter) {
     lightboxCounter.textContent = `${data.mockIndex} / ${lightboxTotalPhotos}`;
   }
+  if (lightboxMetaTitle) {
+    lightboxMetaTitle.textContent = data.label;
+  }
+  if (lightboxMetaBandTags) {
+    lightboxMetaBandTags.textContent = activeMusicBand ? activeMusicBand.name : "13 High";
+  }
+  if (lightboxMetaPeopleTags) {
+    lightboxMetaPeopleTags.textContent = "Pending Curation";
+  }
+  if (lightboxMetaShow) {
+    lightboxMetaShow.textContent = activeSetRow && activeSetRow.dataset.setTitle
+      ? activeSetRow.dataset.setTitle
+      : "Live @ Asylum";
+  }
+  if (lightboxMetaVenue) {
+    lightboxMetaVenue.textContent = activeSetRow ? getSetVenue(activeSetRow) : "Asylum";
+  }
+  if (lightboxMetaDate) {
+    lightboxMetaDate.textContent = activeSetRow && activeSetRow.dataset.setDate
+      ? activeSetRow.dataset.setDate
+      : "JAN 18, 2026";
+  }
+  if (lightboxMetaSource) {
+    lightboxMetaSource.textContent = data.mediaId || "Static V3 Placeholder";
+  }
   syncLightboxThumbButtons();
   if (isLightboxThumbnailStripOpen) {
     const activeThumb = Array.from(lightboxThumbButtons)[activeLightboxIndex];
@@ -919,6 +980,13 @@ function handleLightboxKeydown(event) {
 
   if (event.key === "Escape") {
     event.preventDefault();
+    if (lightboxScreen && lightboxScreen.classList.contains("is-info-open")) {
+      setLightboxInfoVisible(false);
+      if (lightboxInfoToggle) {
+        lightboxInfoToggle.focus({ preventScroll: true });
+      }
+      return;
+    }
     returnToSetGalleryFromLightbox();
     return;
   }
@@ -971,6 +1039,7 @@ function showSetGallery() {
 
   updateSetsFeaturedFromRow(row);
   updateSetGalleryFromRow(row);
+  setGalleryState("ready");
   setSetDetailVisible(false);
   setSetsArchiveVisible(false);
   setSetGalleryVisible(true);
@@ -3086,7 +3155,17 @@ function initMusicModule() {
   if (lightboxInfoToggle) {
     lightboxInfoToggle.addEventListener("click", () => {
       setLightboxControlsHidden(false);
-      setLightboxInfoVisible(!lightboxScreen.classList.contains("is-info-open"));
+      const isInfoOpen = Boolean(lightboxScreen && lightboxScreen.classList.contains("is-info-open"));
+      setLightboxInfoVisible(!isInfoOpen);
+    });
+  }
+  if (lightboxDrawerClose) {
+    lightboxDrawerClose.addEventListener("click", () => {
+      setLightboxControlsHidden(false);
+      setLightboxInfoVisible(false);
+      if (lightboxInfoToggle) {
+        lightboxInfoToggle.focus({ preventScroll: true });
+      }
     });
   }
   lightboxViewToggles.forEach((button) => {

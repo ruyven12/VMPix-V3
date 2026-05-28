@@ -763,6 +763,29 @@
                 <button class="archive-gallery-tile set-gallery-photo-tile" type="button" aria-label="Select photo highlight 07" aria-pressed="false" data-gallery-photo data-gallery-photo-label="Photo 07" data-gallery-kind="image" data-gallery-media-id="music-set-photo-007" data-gallery-lightbox-id="music-lightbox-photo-007"><img class="archive-gallery-image" src="/assets/media/placeholders/archive-gallery-placeholder.svg" alt="" loading="lazy" decoding="async"><span class="archive-gallery-caption set-gallery-photo-label">Photo 07</span></button>
                 <button class="archive-gallery-tile set-gallery-photo-tile" type="button" aria-label="Select photo highlight 08" aria-pressed="false" data-gallery-photo data-gallery-photo-label="Photo 08" data-gallery-kind="image" data-gallery-media-id="music-set-photo-008" data-gallery-lightbox-id="music-lightbox-photo-008"><img class="archive-gallery-image" src="/assets/media/placeholders/archive-gallery-placeholder.svg" alt="" loading="lazy" decoding="async"><span class="archive-gallery-caption set-gallery-photo-label">Photo 08</span></button>
               </div>
+              <div class="archive-gallery-states" aria-live="polite" data-gallery-states>
+                <div class="archive-gallery-state archive-gallery-state--loading" aria-hidden="true" inert data-gallery-state="loading">
+                  <span class="archive-gallery-state-mark" aria-hidden="true"></span>
+                  <div class="archive-gallery-state-copy">
+                    <p class="archive-gallery-state-title">Loading gallery</p>
+                    <p class="archive-gallery-state-text">Preparing archive frames.</p>
+                  </div>
+                </div>
+                <div class="archive-gallery-state archive-gallery-state--empty" aria-hidden="true" inert data-gallery-state="empty">
+                  <span class="archive-gallery-state-mark" aria-hidden="true"></span>
+                  <div class="archive-gallery-state-copy">
+                    <p class="archive-gallery-state-title">No images available</p>
+                    <p class="archive-gallery-state-text">This gallery has no staged images yet.</p>
+                  </div>
+                </div>
+                <div class="archive-gallery-state archive-gallery-state--error" aria-hidden="true" inert data-gallery-state="error">
+                  <span class="archive-gallery-state-mark" aria-hidden="true"></span>
+                  <div class="archive-gallery-state-copy">
+                    <p class="archive-gallery-state-title">Failed to load images</p>
+                    <p class="archive-gallery-state-text">Gallery source placeholder failed.</p>
+                  </div>
+                </div>
+              </div>
               <div class="set-gallery-lightbox-prep" id="set-gallery-lightbox-prep" aria-hidden="true" inert data-gallery-lightbox-prep>
                 <p class="set-gallery-lightbox-kicker">Gallery Mode</p>
                 <h4 class="set-gallery-lightbox-title" data-gallery-lightbox-title>Photo 01 selected</h4>
@@ -824,36 +847,44 @@
                 </div>
               </section>
 
-              <aside class="lightbox-info-panel" id="lightbox-info-panel" aria-hidden="true" inert data-lightbox-info-panel>
-                <h4 class="lightbox-info-title">Live @ Asylum</h4>
-                <div class="lightbox-info-grid" aria-label="Lightbox info placeholder">
+              <aside class="v3-lightbox-drawer lightbox-info-panel" id="lightbox-info-panel" aria-hidden="true" inert data-lightbox-drawer data-lightbox-info-panel>
+                <header class="v3-lightbox-drawer-header">
+                  <div class="v3-lightbox-drawer-heading">
+                    <p class="v3-lightbox-drawer-kicker">Archive Metadata</p>
+                    <h4 class="lightbox-info-title">Live @ Asylum</h4>
+                  </div>
+                  <button class="v3-lightbox-drawer-close" type="button" aria-label="Close metadata drawer" data-lightbox-drawer-close>
+                    X
+                  </button>
+                </header>
+                <div class="v3-lightbox-drawer-grid lightbox-info-grid" aria-label="Lightbox metadata placeholder">
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Photo Title</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-title>Photo 01</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Band Tags</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-band-tags>13 High</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">People Tags</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-people-tags>Pending Curation</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Show</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-show>Live @ Asylum</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Venue</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-venue>Asylum</p>
+                  </div>
                   <div class="lightbox-info-item">
                     <p class="lightbox-info-label">Date</p>
-                    <p class="lightbox-info-value">JAN 18, 2026</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-date>JAN 18, 2026</p>
                   </div>
                   <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">City</p>
-                    <p class="lightbox-info-value">Portland, Maine</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Camera</p>
-                    <p class="lightbox-info-value">Canon R6</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Lens</p>
-                    <p class="lightbox-info-value">35mm</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Shutter</p>
-                    <p class="lightbox-info-value">1/250</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Aperture</p>
-                    <p class="lightbox-info-value">f/2.8</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">ISO</p>
-                    <p class="lightbox-info-value">3200</p>
+                    <p class="lightbox-info-label">Archive Source</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-source>Static V3 Placeholder</p>
                   </div>
                 </div>
               </aside>
