@@ -326,6 +326,28 @@ function setMusicShowDetailVisible(isVisible) {
   }
 }
 
+function setVenueDetailVisible(isVisible) {
+  if (!musicNexusShell || !venueDetail) {
+    return;
+  }
+
+  musicNexusShell.classList.toggle("is-venue-detail", isVisible);
+  if (isVisible) {
+    setMusicPersonDetailVisible(false);
+    setMusicShowDetailVisible(false);
+    setBandDetailVisible(false);
+    setSetsArchiveVisible(false);
+    setSetGalleryVisible(false);
+    setLightboxVisible(false);
+  }
+  venueDetail.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) {
+    venueDetail.removeAttribute("inert");
+  } else {
+    venueDetail.setAttribute("inert", "");
+  }
+}
+
 function setBandDetailVisible(isVisible) {
   if (!musicNexusShell || !bandDetail) {
     return;
@@ -3297,6 +3319,7 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
   setSetGalleryVisible(false);
   setMusicPersonDetailVisible(false);
   setMusicShowDetailVisible(false);
+  setVenueDetailVisible(false);
   let activeCardLabel = "";
   musicNexusCards.forEach((card) => {
     const isActive = card.dataset.musicNexusCard === sectionName;
@@ -3315,12 +3338,13 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
 
   setBandsIndexVisible(sectionName === "bands");
   setPeopleIndexVisible(sectionName === "people");
+  setVenueDetailVisible(sectionName === "venues");
   if (sectionName === "bands") {
     syncBandsIndex();
   }
 
-  setMusicActivityPanelVisible(sectionName !== "people");
-  if (sectionName !== "people") {
+  setMusicActivityPanelVisible(sectionName !== "people" && sectionName !== "venues");
+  if (sectionName !== "people" && sectionName !== "venues") {
     if (sectionName === "shows") {
       renderMusicShowsArchive();
     } else {
@@ -3329,7 +3353,7 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
   }
 
   if (shouldUpdateRail && activeCardLabel) {
-    setCurrentView(activeCardLabel);
+    setCurrentView(sectionName === "venues" ? "Venue Detail" : activeCardLabel);
   }
 }
 

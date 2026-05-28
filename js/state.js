@@ -37,6 +37,7 @@ const musicPeopleIndex = document.querySelector("[data-music-people-index]");
 const musicPeopleList = document.querySelector("[data-music-people-list]");
 const personDetail = document.querySelector("[data-person-detail]");
 const showDetail = document.querySelector("[data-show-detail]");
+const venueDetail = document.querySelector("[data-venue-detail]");
 const musicNexusBack = document.querySelector("[data-music-nexus-back]");
 const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
 const bandsViewPanels = document.querySelectorAll("[data-bands-view]");

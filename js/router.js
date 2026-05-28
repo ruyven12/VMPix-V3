@@ -201,7 +201,7 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "music-bands") {
     bandsIndexReturnUrl = route.canonicalUrl;
-    showMusicNexus();
+    showMusicNexus({ currentView: "Bands" });
     setBandsView(route.view, Boolean(options.shouldFocusBandsView));
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);

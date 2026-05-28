@@ -105,19 +105,20 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await page.getByRole("button", { name: "Bands" }).click();
     await expect(page.locator("[data-current-view]")).toHaveText("Bands");
 
-    await page.getByRole("button", { name: "Shows" }).click();
+    await page.getByRole("button", { name: "Shows", exact: true }).click();
     await expect(page.locator("[data-current-view]")).toHaveText("Shows");
-    await expect(page.getByRole("button", { name: "Shows" })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByRole("button", { name: "Bands" })).toHaveAttribute("aria-pressed", "false");
-    await expect(page.getByText("Recent concerts placeholder")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Shows", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Bands", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByText("Spring Voltage")).toBeVisible();
 
     await page.getByRole("button", { name: "People" }).click();
     await expect(page.locator("[data-current-view]")).toHaveText("People");
-    await expect(page.getByText("Tagged people placeholder")).toBeVisible();
+    await expect(page.getByText("Adam Begin")).toBeVisible();
 
     await page.getByRole("button", { name: "Venues" }).click();
-    await expect(page.locator("[data-current-view]")).toHaveText("Venues");
-    await expect(page.getByText("Venue archive placeholder")).toBeVisible();
+    await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
+    await expect(page.locator("[data-venue-detail]")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Asylum" })).toBeVisible();
 
     await page.getByRole("button", { name: "Open global navigation menu" }).click();
     await page.locator('[data-shell-nav-target="hub"]').click();
@@ -159,8 +160,8 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await page.getByRole("button", { name: "Open Music Nexus" }).click();
       await expect(page.locator("[data-music-nexus-shell]")).toBeVisible();
       await page.getByRole("button", { name: "Venues" }).click();
-      await expect(page.locator("[data-current-view]")).toHaveText("Venues");
-      await expect(page.getByText("Venue archive placeholder")).toBeVisible();
+      await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
+      await expect(page.locator("[data-venue-detail]")).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
