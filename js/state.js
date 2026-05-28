@@ -115,6 +115,7 @@ const galleryLightboxTitle = document.querySelector("[data-gallery-lightbox-titl
 const lightboxScreen = document.querySelector("[data-lightbox-screen]");
 const lightboxBack = document.querySelector("[data-lightbox-back]");
 const lightboxPhoto = document.querySelector("[data-lightbox-photo]");
+const lightboxImage = document.querySelector("[data-lightbox-image]");
 const lightboxPhotoTitle = document.querySelector("[data-lightbox-photo-title]");
 const lightboxCounter = document.querySelector("[data-lightbox-counter]");
 const lightboxPrev = document.querySelector("[data-lightbox-prev]");

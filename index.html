@@ -775,10 +775,10 @@
             </button>
           </article>
 
-          <article class="lightbox-screen" id="lightbox-screen" aria-labelledby="lightbox-title" aria-hidden="true" inert data-lightbox-screen>
-            <header class="lightbox-topbar">
+          <article class="v3-lightbox-shell lightbox-screen" id="lightbox-screen" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" aria-hidden="true" tabindex="-1" inert data-lightbox-shell data-lightbox-screen>
+            <header class="v3-lightbox-topbar lightbox-topbar">
               <div class="lightbox-back-cluster">
-                <button class="lightbox-back" type="button" aria-label="Back to Gallery" data-lightbox-back>
+                <button class="v3-lightbox-close lightbox-back" type="button" aria-label="Back to Gallery" data-lightbox-back>
                   X
                 </button>
                 <span class="lightbox-back-label">Back to Gallery</span>
@@ -792,15 +792,16 @@
               </button>
             </header>
 
-            <div class="lightbox-layout">
-              <section class="lightbox-stage" aria-labelledby="lightbox-title">
-                <div class="lightbox-photo" role="img" aria-label="Photo 01 placeholder lightbox image" data-lightbox-photo>
-                  <span id="lightbox-title" data-lightbox-photo-title>Photo 01</span>
+            <div class="v3-lightbox-layout lightbox-layout">
+              <section class="v3-lightbox-stage lightbox-stage" aria-labelledby="lightbox-title">
+                <div class="v3-lightbox-media lightbox-photo" role="img" aria-label="Photo 01 placeholder lightbox image" tabindex="0" data-lightbox-photo>
+                  <img class="v3-lightbox-image" src="/assets/media/placeholders/archive-gallery-placeholder.svg" alt="" loading="eager" decoding="async" data-lightbox-image>
+                  <span class="v3-lightbox-caption" id="lightbox-title" data-lightbox-photo-title>Photo 01</span>
                 </div>
-                <button class="lightbox-nav-zone lightbox-nav-zone--prev" type="button" aria-label="Previous photo" data-lightbox-prev>
+                <button class="v3-lightbox-control v3-lightbox-control--prev lightbox-nav-zone lightbox-nav-zone--prev" type="button" aria-label="Previous photo" data-lightbox-prev>
                   &lt;
                 </button>
-                <button class="lightbox-nav-zone lightbox-nav-zone--next" type="button" aria-label="Next photo" data-lightbox-next>
+                <button class="v3-lightbox-control v3-lightbox-control--next lightbox-nav-zone lightbox-nav-zone--next" type="button" aria-label="Next photo" data-lightbox-next>
                   &gt;
                 </button>
                 <div class="lightbox-photo-meta-rail" aria-label="Photo exposure metadata">

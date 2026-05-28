@@ -437,6 +437,12 @@ function setLightboxVisible(isVisible) {
   lightboxScreen.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
     lightboxScreen.removeAttribute("inert");
+    window.requestAnimationFrame(() => {
+      const focusTarget = lightboxBack || lightboxScreen;
+      if (focusTarget) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
   } else {
     lightboxScreen.setAttribute("inert", "");
   }
@@ -733,6 +739,13 @@ function getGalleryPhotoIndex(photoTile) {
   return index >= 0 ? index : 0;
 }
 
+function getGalleryPhotoImageSrc(photoTile) {
+  const image = photoTile ? photoTile.querySelector(".archive-gallery-image") : null;
+  return image && image.getAttribute("src")
+    ? image.getAttribute("src")
+    : "/assets/media/placeholders/archive-gallery-placeholder.svg";
+}
+
 function normalizeLightboxIndex(index) {
   const photoCount = Math.max(galleryPhotoTiles.length, 1);
   return ((index % photoCount) + photoCount) % photoCount;
@@ -746,7 +759,10 @@ function getLightboxPhotoData(index) {
 
   return {
     accent,
+    imageSrc: getGalleryPhotoImageSrc(tile),
     label,
+    lightboxId: tile ? tile.dataset.galleryLightboxId || "" : "",
+    mediaId: tile ? tile.dataset.galleryMediaId || "" : "",
     mockIndex: lightboxBasePhotoIndex + normalizedIndex,
     normalizedIndex,
     tile,
@@ -779,12 +795,17 @@ function setLightboxActivePhoto(index, options = {}) {
   }
   if (lightboxPhoto) {
     lightboxPhoto.setAttribute("aria-label", `${data.label} placeholder lightbox image`);
+    lightboxPhoto.dataset.galleryMediaId = data.mediaId;
+    lightboxPhoto.dataset.galleryLightboxId = data.lightboxId;
     lightboxPhoto.style.setProperty("--lightbox-photo-ratio", lightboxPhotoRatios[activeLightboxIndex % lightboxPhotoRatios.length]);
     if (data.accent) {
       lightboxPhoto.style.setProperty("--lightbox-photo-x", data.accent.x);
       lightboxPhoto.style.setProperty("--lightbox-photo-y", data.accent.y);
       lightboxPhoto.style.setProperty("--lightbox-photo-accent", data.accent.color);
     }
+  }
+  if (lightboxImage && data.imageSrc) {
+    lightboxImage.setAttribute("src", data.imageSrc);
   }
   if (lightboxPhotoTitle) {
     lightboxPhotoTitle.textContent = data.label;
@@ -873,11 +894,46 @@ function returnToSetGalleryFromLightbox() {
   setLightboxVisible(false);
   setSetGalleryVisible(true);
   setCurrentView("LIVE @ ASYLUM");
+  window.requestAnimationFrame(() => {
+    const focusTarget = activeGalleryPhoto || galleryViewAll;
+    if (focusTarget) {
+      focusTarget.focus({ preventScroll: true });
+    }
+  });
   if (musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
     });
+  }
+}
+
+function isLightboxOpen() {
+  return Boolean(lightboxScreen && lightboxScreen.getAttribute("aria-hidden") === "false");
+}
+
+function handleLightboxKeydown(event) {
+  if (!isLightboxOpen() || event.defaultPrevented) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    returnToSetGalleryFromLightbox();
+    return;
+  }
+
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    setLightboxControlsHidden(false);
+    setLightboxActivePhoto(activeLightboxIndex - 1);
+    return;
+  }
+
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    setLightboxControlsHidden(false);
+    setLightboxActivePhoto(activeLightboxIndex + 1);
   }
 }
 
@@ -3056,6 +3112,7 @@ function initMusicModule() {
       lightboxFullscreenToggle.setAttribute("aria-pressed", String(nextState));
     });
   }
+  window.addEventListener("keydown", handleLightboxKeydown);
   if (setDetailClose) {
     setDetailClose.addEventListener("click", closeSelectedSetDetail);
   }
