@@ -291,6 +291,7 @@ function setMusicPersonDetailVisible(isVisible) {
 
   musicNexusShell.classList.toggle("is-person-detail", isVisible);
   if (isVisible) {
+    setMusicShowDetailVisible(false);
     setBandDetailVisible(false);
     setSetsArchiveVisible(false);
     setSetGalleryVisible(false);
@@ -304,6 +305,27 @@ function setMusicPersonDetailVisible(isVisible) {
   }
 }
 
+function setMusicShowDetailVisible(isVisible) {
+  if (!musicNexusShell || !showDetail) {
+    return;
+  }
+
+  musicNexusShell.classList.toggle("is-show-detail", isVisible);
+  if (isVisible) {
+    setMusicPersonDetailVisible(false);
+    setBandDetailVisible(false);
+    setSetsArchiveVisible(false);
+    setSetGalleryVisible(false);
+    setLightboxVisible(false);
+  }
+  showDetail.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) {
+    showDetail.removeAttribute("inert");
+  } else {
+    showDetail.setAttribute("inert", "");
+  }
+}
+
 function setBandDetailVisible(isVisible) {
   if (!musicNexusShell || !bandDetail) {
     return;
@@ -312,6 +334,7 @@ function setBandDetailVisible(isVisible) {
   musicNexusShell.classList.toggle("is-band-detail", isVisible);
   if (isVisible) {
     setMusicPersonDetailVisible(false);
+    setMusicShowDetailVisible(false);
     setSetsArchiveVisible(false);
     setSetGalleryVisible(false);
     setLightboxVisible(false);
@@ -1918,6 +1941,47 @@ function getMusicShowRouteUrl(show) {
   return `/music/shows/${encodeURIComponent(show.showId || "")}`;
 }
 
+function findMusicShowById(showId) {
+  const normalizedShowId = String(showId || "").trim();
+  return musicShowsArchiveRows.find((show) => show.showId === normalizedShowId) || null;
+}
+
+function createUnknownMusicShow(showId) {
+  const safeShowId = String(showId || "unknown-show").trim() || "unknown-show";
+  return {
+    showId: safeShowId,
+    month: "TBD",
+    day: "00",
+    year: "Pending",
+    title: "Show Detail Event Dossier",
+    venue: "Pending Venue",
+    location: "Pending City",
+    bandCount: "0 bands",
+    poster: "SD",
+  };
+}
+
+function getMusicShowBandCount(show) {
+  const match = String(show.bandCount || "").match(/\d+/);
+  return match ? match[0] : "0";
+}
+
+function getMusicShowPhotoCount(show) {
+  const bands = Number.parseInt(getMusicShowBandCount(show), 10) || 0;
+  return String(Math.max(48, bands * 54));
+}
+
+function getMusicShowDateLabel(show) {
+  return `${show.month} ${show.day}, ${show.year}`;
+}
+
+function getMusicShowDisplayId(show) {
+  const month = String(musicShowsMonthOrder[String(show.month || "").toUpperCase()] || "0").padStart(2, "0");
+  const day = String(show.day || "00").padStart(2, "0");
+  const year = String(show.year || "").slice(-2) || "00";
+  return `${show.poster || "SD"}-${month}${day}${year}`;
+}
+
 function getMusicShowTimestamp(show) {
   const year = Number.parseInt(show.year || "0", 10);
   const month = musicShowsMonthOrder[String(show.month || "").toUpperCase()] || 0;
@@ -2005,11 +2069,13 @@ function selectMusicShowDetailHook(show) {
     return;
   }
 
-  musicActivityPanel.dataset.selectedShowRoute = getMusicShowRouteUrl(show);
+  const showRoute = getMusicShowRouteUrl(show);
+  musicActivityPanel.dataset.selectedShowRoute = showRoute;
   const status = musicActivityPanel.querySelector("[data-music-shows-status]");
   if (status) {
     status.textContent = `Show Detail Event Dossier hook ready: ${show.title}`;
   }
+  navigateToRoute(showRoute, { historyState: { fromShowsArchive: true } });
 }
 
 function createMusicShowsYearButton(label, isActive = false) {
@@ -2212,6 +2278,170 @@ function renderMusicActivityRows(sectionName, rows) {
   });
 }
 
+function returnToMusicShowsArchive() {
+  const historyState = window.history.state || {};
+  if (getRouteFromUrl().name === "show-detail" && historyState.fromShowsArchive) {
+    window.history.back();
+    return;
+  }
+
+  navigateToRoute(routePaths.musicShows);
+}
+
+function createShowDetailStat(label, value) {
+  const stat = document.createElement("div");
+  stat.className = "show-detail-stat";
+
+  const statValue = document.createElement("span");
+  statValue.className = "show-detail-stat-value";
+  statValue.textContent = value;
+
+  const statLabel = document.createElement("span");
+  statLabel.className = "show-detail-stat-label";
+  statLabel.textContent = label;
+
+  stat.append(statValue, statLabel);
+  return stat;
+}
+
+function renderMusicShowDetail(show) {
+  if (!showDetail || !show) {
+    return;
+  }
+
+  const backButton = document.createElement("button");
+  backButton.className = "show-detail-back";
+  backButton.type = "button";
+  backButton.textContent = "Back to Shows";
+  backButton.addEventListener("click", returnToMusicShowsArchive);
+
+  const hero = document.createElement("section");
+  hero.className = "show-detail-hero";
+  hero.setAttribute("aria-labelledby", "show-detail-title");
+
+  const poster = document.createElement("div");
+  poster.className = "show-detail-poster";
+  poster.setAttribute("role", "img");
+  poster.setAttribute("aria-label", `${show.title} show flyer placeholder`);
+
+  const posterMark = document.createElement("span");
+  posterMark.className = "show-detail-poster-mark";
+  posterMark.textContent = show.poster || "SD";
+  poster.append(posterMark);
+
+  const copy = document.createElement("div");
+  copy.className = "show-detail-copy";
+
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "show-detail-eyebrow";
+  eyebrow.textContent = "Show Detail Event Dossier";
+
+  const title = document.createElement("h3");
+  title.className = "show-detail-title";
+  title.id = "show-detail-title";
+  title.textContent = show.title;
+
+  const details = document.createElement("div");
+  details.className = "show-detail-lines";
+
+  [getMusicShowDateLabel(show), show.venue, show.location].forEach((detailText) => {
+    const detail = document.createElement("p");
+    detail.className = "show-detail-line";
+    detail.textContent = detailText;
+    details.append(detail);
+  });
+
+  const mapButton = document.createElement("button");
+  mapButton.className = "show-detail-map";
+  mapButton.type = "button";
+  mapButton.textContent = "Map";
+  mapButton.setAttribute("aria-label", `Map placeholder for ${show.venue}`);
+
+  const stats = document.createElement("div");
+  stats.className = "show-detail-stats";
+  stats.append(
+    createShowDetailStat("Bands", getMusicShowBandCount(show)),
+    createShowDetailStat("Photos", getMusicShowPhotoCount(show)),
+    createShowDetailStat("Show ID", getMusicShowDisplayId(show))
+  );
+
+  copy.append(eyebrow, title, details, mapButton, stats);
+  hero.append(poster, copy);
+
+  const viewing = document.createElement("section");
+  viewing.className = "show-detail-viewing";
+  viewing.setAttribute("aria-labelledby", "show-detail-viewing-title");
+
+  const viewingHeader = document.createElement("div");
+  viewingHeader.className = "show-detail-viewing-header";
+
+  const viewingTitle = document.createElement("h4");
+  viewingTitle.className = "show-detail-viewing-title";
+  viewingTitle.id = "show-detail-viewing-title";
+  viewingTitle.textContent = "Currently Viewing";
+
+  const counter = document.createElement("span");
+  counter.className = "show-detail-slide-counter";
+  counter.textContent = "01 / 05";
+  viewingHeader.append(viewingTitle, counter);
+
+  const mediaFrame = document.createElement("div");
+  mediaFrame.className = "show-detail-media-frame";
+
+  const previous = document.createElement("button");
+  previous.className = "show-detail-carousel-arrow show-detail-carousel-arrow--prev";
+  previous.type = "button";
+  previous.textContent = "<";
+  previous.setAttribute("aria-label", "Previous carousel item");
+
+  const media = document.createElement("div");
+  media.className = "show-detail-media";
+  media.setAttribute("role", "img");
+  media.setAttribute("aria-label", `${show.title} currently viewing media placeholder`);
+
+  const mediaLabel = document.createElement("span");
+  mediaLabel.className = "show-detail-media-label";
+  mediaLabel.textContent = "Archive Media Placeholder";
+  media.append(mediaLabel);
+
+  const next = document.createElement("button");
+  next.className = "show-detail-carousel-arrow show-detail-carousel-arrow--next";
+  next.type = "button";
+  next.textContent = ">";
+  next.setAttribute("aria-label", "Next carousel item");
+
+  mediaFrame.append(previous, media, next);
+
+  const dots = document.createElement("div");
+  dots.className = "show-detail-dots";
+  dots.setAttribute("aria-label", "Carousel position");
+  for (let index = 0; index < 5; index += 1) {
+    const dot = document.createElement("span");
+    dot.className = `show-detail-dot${index === 0 ? " is-active" : ""}`;
+    dot.setAttribute("aria-hidden", "true");
+    dots.append(dot);
+  }
+
+  viewing.append(viewingHeader, mediaFrame, dots);
+  showDetail.replaceChildren(backButton, hero, viewing);
+}
+
+function showMusicShowDetail(showId) {
+  const show = findMusicShowById(showId) || createUnknownMusicShow(showId);
+  renderMusicShowDetail(show);
+  setBandsIndexVisible(false);
+  setPeopleIndexVisible(false);
+  setMusicActivityPanelVisible(false);
+  setMusicShowDetailVisible(true);
+  setCurrentView("Show Detail");
+  if (musicNexusShell) {
+    musicNexusShell.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
+}
+
 function setPeopleIndexVisible(isVisible) {
   if (!musicPeopleIndex) {
     return;
@@ -2251,6 +2481,7 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
   setSetsArchiveVisible(false);
   setSetGalleryVisible(false);
   setMusicPersonDetailVisible(false);
+  setMusicShowDetailVisible(false);
   let activeCardLabel = "";
   musicNexusCards.forEach((card) => {
     const isActive = card.dataset.musicNexusCard === sectionName;
@@ -2404,6 +2635,10 @@ function initMusicModule() {
       }
       if (musicSection === "people") {
         navigateToRoute(routePaths.musicPeople);
+        return;
+      }
+      if (musicSection === "shows") {
+        navigateToRoute(routePaths.musicShows);
         return;
       }
       const currentRoute = getRouteFromUrl().name;

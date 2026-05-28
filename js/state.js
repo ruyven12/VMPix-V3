@@ -36,6 +36,7 @@ const musicBandsIndex = document.querySelector("[data-music-bands-index]");
 const musicPeopleIndex = document.querySelector("[data-music-people-index]");
 const musicPeopleList = document.querySelector("[data-music-people-list]");
 const personDetail = document.querySelector("[data-person-detail]");
+const showDetail = document.querySelector("[data-show-detail]");
 const musicNexusBack = document.querySelector("[data-music-nexus-back]");
 const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
 const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
@@ -385,6 +386,7 @@ const routePaths = {
   portfolio: "/portfolio",
   music: "/music",
   musicBands: "/music/bands",
+  musicShows: "/music/shows",
   musicPeople: "/music/people",
   wrestling: "/wrestling",
   calendar: "/calendar",

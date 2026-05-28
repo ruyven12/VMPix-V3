@@ -35,6 +35,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.music) {
     return { name: "music", canonicalUrl: routePaths.music };
   }
+  if (routePath === routePaths.musicShows) {
+    return { name: "music-shows", canonicalUrl: routePaths.musicShows };
+  }
   if (routePath === routePaths.musicPeople) {
     return { name: "music-people", canonicalUrl: routePaths.musicPeople };
   }
@@ -57,6 +60,15 @@ function getRouteFromUrl(url = window.location.href) {
     if (routeParts.length === 1 && routeParts[0]) {
       const personId = decodeRoutePart(routeParts[0]);
       return { name: "person-detail", personId, canonicalUrl: getMusicPersonRouteUrl(personId) };
+    }
+  }
+
+  const showDetailPrefix = `${routePaths.musicShows}/`;
+  if (routePath.startsWith(showDetailPrefix)) {
+    const routeParts = routePath.slice(showDetailPrefix.length).split("/");
+    if (routeParts.length === 1 && routeParts[0]) {
+      const showId = decodeRoutePart(routeParts[0]);
+      return { name: "show-detail", showId, canonicalUrl: getMusicShowRouteUrl({ showId }) };
     }
   }
 
@@ -133,6 +145,14 @@ function syncRoute(route, options = {}) {
     return;
   }
 
+  if (route.name === "music-shows") {
+    showMusicNexus({ initialSection: "shows", currentView: "Shows" });
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
   if (route.name === "music-people") {
     showMusicNexus({ initialSection: "people", currentView: "People" });
     if (options.shouldCanonicalize !== false) {
@@ -164,6 +184,15 @@ function syncRoute(route, options = {}) {
   if (route.name === "person-detail") {
     showMusicNexus({ initialSection: "people", currentView: "Person Detail" });
     showMusicPersonDetail(route.personId);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "show-detail") {
+    showMusicNexus({ initialSection: "shows", currentView: "Show Detail" });
+    showMusicShowDetail(route.showId);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
