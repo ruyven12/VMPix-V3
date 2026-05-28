@@ -162,6 +162,13 @@ let isGalleryModeOpen = false;
 let activeLightboxIndex = 0;
 let isLightboxThumbnailStripOpen = false;
 let areLightboxControlsHidden = false;
+let lightboxTransitionSourceTimer;
+let lightboxEntryTimer;
+let lightboxImageTransitionTimer;
+let lightboxSwipeCommitTimer;
+let lightboxSwipeGesture = null;
+let lightboxGestureSuppressClick = false;
+let lightboxFallbackAttempted = false;
 let activeMusicShowsYear = "ALL SHOWS";
 let visibleMusicShowsCount = 4;
 
@@ -185,6 +192,12 @@ const lightboxPhotoRatios = [
 
 const lightboxBasePhotoIndex = 25;
 const lightboxTotalPhotos = 356;
+const galleryImageFallbackSrc = "/assets/media/placeholders/archive-gallery-placeholder.svg";
+const lightboxTransitionDuration = 220;
+const lightboxImageTransitionDuration = 180;
+const lightboxGestureThreshold = 46;
+const lightboxGestureVerticalLimit = 82;
+const lightboxGestureMaxDuration = 620;
 
 const spotlightContent = {
   music: {

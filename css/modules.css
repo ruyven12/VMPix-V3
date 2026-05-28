@@ -1393,6 +1393,8 @@
   text-align: left;
   text-transform: uppercase;
   touch-action: manipulation;
+  user-select: none;
+  -webkit-user-drag: none;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -1466,6 +1468,14 @@ img.archive-gallery-image {
 
 .archive-gallery-tile:hover {
   transform: translate3d(0, -0.04rem, 0);
+}
+
+.archive-gallery-tile.is-transition-source {
+  border-color: color-mix(in srgb, var(--archive-gallery-accent-line) 62%, transparent);
+  box-shadow:
+    inset 0 0 0 1px rgba(247, 247, 242, 0.04),
+    0 0 1rem color-mix(in srgb, var(--archive-gallery-accent) 46%, transparent);
+  transform: translate3d(0, -0.08rem, 0) scale(0.992);
 }
 
 .archive-gallery-tile.is-active::before,
@@ -1737,6 +1747,7 @@ img.archive-gallery-image {
 
 .lightbox-screen {
   --v3-lightbox-accent: rgba(255, 82, 72, 0.18);
+  --lightbox-swipe-x: 0px;
   display: none;
   align-content: start;
   gap: clamp(0.66rem, 1.95svh, 0.94rem);
@@ -1751,6 +1762,14 @@ img.archive-gallery-image {
   isolation: isolate;
   overflow-x: clip;
   overscroll-behavior: contain;
+}
+
+.lightbox-screen.is-entering .lightbox-photo {
+  animation: lightboxStageEnter 180ms var(--ease-standard) both;
+}
+
+.lightbox-screen.is-entering .v3-lightbox-image {
+  animation: lightboxImageEnter 190ms var(--ease-standard) both;
 }
 
 .lightbox-screen::before {
@@ -1903,6 +1922,8 @@ img.archive-gallery-image {
     linear-gradient(135deg, rgba(247, 247, 242, 0.05), transparent 62%),
     rgba(3, 3, 6, 0.72);
   transition: background 180ms ease;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .lightbox-photo::before {
@@ -1933,6 +1954,39 @@ img.archive-gallery-image {
     0 1.1rem 2.2rem rgba(0, 0, 0, 0.28),
     0 0 1.15rem color-mix(in srgb, var(--v3-lightbox-accent) 34%, transparent);
   object-fit: contain;
+  opacity: 1;
+  pointer-events: none;
+  transition:
+    filter 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lightbox-photo.is-image-changing .v3-lightbox-image {
+  animation: lightboxImageChange 170ms var(--ease-standard) both;
+}
+
+.lightbox-photo.is-image-loading .v3-lightbox-image {
+  filter: saturate(0.82) contrast(1);
+  opacity: 0.68;
+}
+
+.lightbox-photo.is-image-loaded .v3-lightbox-image {
+  opacity: 1;
+}
+
+.lightbox-photo.is-image-error .v3-lightbox-image {
+  filter: saturate(0.72) contrast(0.96);
+}
+
+.lightbox-photo.is-swipe-tracking .v3-lightbox-image {
+  transform: translate3d(var(--lightbox-swipe-x), 0, 0) scale(0.996);
+}
+
+.lightbox-photo.is-swipe-committing .v3-lightbox-image {
+  animation: lightboxSwipeCommit 160ms var(--ease-standard) both;
 }
 
 .lightbox-photo span {
@@ -2136,9 +2190,10 @@ img.archive-gallery-image {
   transform: translate3d(0, calc(100% + 0.9rem), 0);
   transition:
     opacity 160ms ease,
-    transform 180ms ease,
+    transform 180ms var(--ease-standard),
     visibility 180ms ease;
   visibility: hidden;
+  will-change: opacity, transform;
 }
 
 .lightbox-screen.is-info-open .lightbox-info-panel {
@@ -2249,6 +2304,54 @@ img.archive-gallery-image {
 .v3-lightbox-shell .lightbox-thumbnail-strip,
 .v3-lightbox-shell .lightbox-footer-strip {
   display: none;
+}
+
+@keyframes lightboxStageEnter {
+  from {
+    opacity: 0.84;
+    transform: translate3d(0, 0.18rem, 0) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes lightboxImageEnter {
+  from {
+    opacity: 0.48;
+    transform: translate3d(0, 0.24rem, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes lightboxImageChange {
+  0% {
+    opacity: 0.58;
+    transform: translate3d(0, 0.12rem, 0) scale(0.99);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes lightboxSwipeCommit {
+  from {
+    opacity: 0.72;
+    transform: translate3d(var(--lightbox-swipe-x), 0, 0) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
 .band-detail-members {
@@ -7357,6 +7460,11 @@ img.archive-gallery-image {
   .bands-radar-sweep,
   .bands-index-panel.is-active,
   .bands-letter-button[aria-pressed="true"],
+  .archive-gallery-state--loading .archive-gallery-state-mark::after,
+  .lightbox-screen.is-entering .lightbox-photo,
+  .lightbox-screen.is-entering .v3-lightbox-image,
+  .lightbox-photo.is-image-changing .v3-lightbox-image,
+  .lightbox-photo.is-swipe-committing .v3-lightbox-image,
   .music-show-card,
   .music-show-poster,
   .rail-value--view,
@@ -7376,6 +7484,8 @@ img.archive-gallery-image {
   .site-shell.has-entered-hub .home-frame,
   .archive-gallery-tile:hover,
   .archive-gallery-tile:focus-visible,
+  .archive-gallery-tile.is-transition-source,
+  .lightbox-photo.is-swipe-tracking .v3-lightbox-image,
   .music-show-card:hover,
   .music-show-card:focus-within,
   .music-show-card:hover .music-show-poster,
