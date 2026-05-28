@@ -118,7 +118,9 @@ test.describe("Interactive Portfolio Hub v1", () => {
     await page.getByRole("button", { name: "Venues" }).click();
     await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
     await expect(page.locator("[data-venue-detail]")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Asylum" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Asylum", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Decade Archive" })).toBeVisible();
+    await expect(page.getByText("Venue Detail V1 staged")).toBeVisible();
 
     await page.getByRole("button", { name: "Open global navigation menu" }).click();
     await page.locator('[data-shell-nav-target="hub"]').click();
@@ -162,6 +164,7 @@ test.describe("Interactive Portfolio Hub v1", () => {
       await page.getByRole("button", { name: "Venues" }).click();
       await expect(page.locator("[data-current-view]")).toHaveText("Venue Detail");
       await expect(page.locator("[data-venue-detail]")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Decade Archive" })).toBeVisible();
       await expectNoHorizontalOverflow(page);
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
     });
