@@ -1978,7 +1978,8 @@ function getMusicShowDateLabel(show) {
 function getMusicShowDisplayId(show) {
   const month = String(musicShowsMonthOrder[String(show.month || "").toUpperCase()] || "0").padStart(2, "0");
   const day = String(show.day || "00").padStart(2, "0");
-  const year = String(show.year || "").slice(-2) || "00";
+  const yearText = String(show.year || "");
+  const year = /^\d{4}$/.test(yearText) ? yearText.slice(-2) : "00";
   return `${show.poster || "SD"}-${month}${day}${year}`;
 }
 
@@ -2304,6 +2305,54 @@ function createShowDetailStat(label, value) {
   return stat;
 }
 
+function formatShowDetailSlideCounter(index, total) {
+  return `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+}
+
+function normalizeShowDetailSlideIndex(index, total) {
+  return ((index % total) + total) % total;
+}
+
+function getMusicShowCarouselSlides(show) {
+  const dateLabel = getMusicShowDateLabel(show);
+  const photoCount = getMusicShowPhotoCount(show);
+  const bandCount = getMusicShowBandCount(show);
+  const showCode = getMusicShowDisplayId(show);
+
+  return [
+    {
+      kicker: "Lead Frame",
+      title: show.title,
+      detail: dateLabel,
+      caption: "Primary archive preview",
+    },
+    {
+      kicker: "Room View",
+      title: show.venue,
+      detail: show.location,
+      caption: "Venue atmosphere placeholder",
+    },
+    {
+      kicker: "Set Capture",
+      title: `${bandCount} Band${bandCount === "1" ? "" : "s"}`,
+      detail: "Music Nexus archive",
+      caption: "Performance sequence preview",
+    },
+    {
+      kicker: "Gallery Queue",
+      title: `${photoCount} Photos`,
+      detail: "Media pending live gallery source",
+      caption: "Future lightbox entry point",
+    },
+    {
+      kicker: "Archive ID",
+      title: showCode,
+      detail: show.showId,
+      caption: "Show dossier reference",
+    },
+  ];
+}
+
 function renderMusicShowDetail(show) {
   if (!showDetail || !show) {
     return;
@@ -2362,7 +2411,7 @@ function renderMusicShowDetail(show) {
   stats.append(
     createShowDetailStat("Bands", getMusicShowBandCount(show)),
     createShowDetailStat("Photos", getMusicShowPhotoCount(show)),
-    createShowDetailStat("Show ID", getMusicShowDisplayId(show))
+    createShowDetailStat("Year", show.year || "Pending")
   );
 
   copy.append(eyebrow, title, details, mapButton, stats);
@@ -2375,18 +2424,29 @@ function renderMusicShowDetail(show) {
   const viewingHeader = document.createElement("div");
   viewingHeader.className = "show-detail-viewing-header";
 
+  const viewingHeading = document.createElement("div");
+  viewingHeading.className = "show-detail-viewing-heading";
+
   const viewingTitle = document.createElement("h4");
   viewingTitle.className = "show-detail-viewing-title";
   viewingTitle.id = "show-detail-viewing-title";
   viewingTitle.textContent = "Currently Viewing";
 
+  const showId = document.createElement("span");
+  showId.className = "show-detail-show-id";
+  showId.textContent = `Show ID ${getMusicShowDisplayId(show)}`;
+
   const counter = document.createElement("span");
   counter.className = "show-detail-slide-counter";
-  counter.textContent = "01 / 05";
-  viewingHeader.append(viewingTitle, counter);
+  viewingHeading.append(viewingTitle, showId);
+  viewingHeader.append(viewingHeading, counter);
 
   const mediaFrame = document.createElement("div");
   mediaFrame.className = "show-detail-media-frame";
+  mediaFrame.setAttribute("aria-roledescription", "carousel");
+
+  const slides = getMusicShowCarouselSlides(show);
+  let activeSlideIndex = 0;
 
   const previous = document.createElement("button");
   previous.className = "show-detail-carousel-arrow show-detail-carousel-arrow--prev";
@@ -2394,15 +2454,53 @@ function renderMusicShowDetail(show) {
   previous.textContent = "<";
   previous.setAttribute("aria-label", "Previous carousel item");
 
-  const media = document.createElement("div");
-  media.className = "show-detail-media";
-  media.setAttribute("role", "img");
-  media.setAttribute("aria-label", `${show.title} currently viewing media placeholder`);
+  const viewport = document.createElement("div");
+  viewport.className = "show-detail-carousel-viewport";
+  viewport.setAttribute("tabindex", "0");
+  viewport.setAttribute("aria-label", `${show.title} media carousel`);
 
-  const mediaLabel = document.createElement("span");
-  mediaLabel.className = "show-detail-media-label";
-  mediaLabel.textContent = "Archive Media Placeholder";
-  media.append(mediaLabel);
+  const track = document.createElement("div");
+  track.className = "show-detail-carousel-track";
+
+  const slideElements = slides.map((slide, index) => {
+    const slideElement = document.createElement("article");
+    slideElement.className = `show-detail-carousel-slide${index === activeSlideIndex ? " is-active" : ""}`;
+    slideElement.setAttribute("aria-roledescription", "slide");
+    slideElement.setAttribute("aria-label", `${index + 1} of ${slides.length}: ${slide.title}`);
+    slideElement.setAttribute("aria-hidden", String(index !== activeSlideIndex));
+
+    const media = document.createElement("div");
+    media.className = "show-detail-media";
+    media.setAttribute("role", "img");
+    media.setAttribute("aria-label", `${slide.title} archive media placeholder`);
+
+    const mediaCopy = document.createElement("div");
+    mediaCopy.className = "show-detail-media-copy";
+
+    const mediaKicker = document.createElement("span");
+    mediaKicker.className = "show-detail-media-kicker";
+    mediaKicker.textContent = slide.kicker;
+
+    const mediaTitle = document.createElement("span");
+    mediaTitle.className = "show-detail-media-title";
+    mediaTitle.textContent = slide.title;
+
+    const mediaDetail = document.createElement("span");
+    mediaDetail.className = "show-detail-media-detail";
+    mediaDetail.textContent = slide.detail;
+
+    const mediaCaption = document.createElement("span");
+    mediaCaption.className = "show-detail-media-caption";
+    mediaCaption.textContent = slide.caption;
+
+    mediaCopy.append(mediaKicker, mediaTitle, mediaDetail, mediaCaption);
+    media.append(mediaCopy);
+    slideElement.append(media);
+    track.append(slideElement);
+    return slideElement;
+  });
+
+  viewport.append(track);
 
   const next = document.createElement("button");
   next.className = "show-detail-carousel-arrow show-detail-carousel-arrow--next";
@@ -2410,17 +2508,99 @@ function renderMusicShowDetail(show) {
   next.textContent = ">";
   next.setAttribute("aria-label", "Next carousel item");
 
-  mediaFrame.append(previous, media, next);
+  mediaFrame.append(previous, viewport, next);
 
   const dots = document.createElement("div");
   dots.className = "show-detail-dots";
   dots.setAttribute("aria-label", "Carousel position");
-  for (let index = 0; index < 5; index += 1) {
-    const dot = document.createElement("span");
-    dot.className = `show-detail-dot${index === 0 ? " is-active" : ""}`;
-    dot.setAttribute("aria-hidden", "true");
+
+  const dotButtons = slides.map((slide, index) => {
+    const dot = document.createElement("button");
+    dot.className = `show-detail-dot${index === activeSlideIndex ? " is-active" : ""}`;
+    dot.type = "button";
+    dot.setAttribute("aria-label", `Show carousel item ${index + 1}: ${slide.title}`);
+    if (index === activeSlideIndex) {
+      dot.setAttribute("aria-current", "true");
+    }
     dots.append(dot);
+    return dot;
+  });
+
+  function updateCarousel(nextIndex) {
+    activeSlideIndex = normalizeShowDetailSlideIndex(nextIndex, slides.length);
+    track.style.transform = `translate3d(-${activeSlideIndex * 100}%, 0, 0)`;
+    counter.textContent = formatShowDetailSlideCounter(activeSlideIndex, slides.length);
+
+    slideElements.forEach((slideElement, index) => {
+      const isActive = index === activeSlideIndex;
+      slideElement.classList.toggle("is-active", isActive);
+      slideElement.setAttribute("aria-hidden", String(!isActive));
+    });
+
+    dotButtons.forEach((dot, index) => {
+      const isActive = index === activeSlideIndex;
+      dot.classList.toggle("is-active", isActive);
+      if (isActive) {
+        dot.setAttribute("aria-current", "true");
+      } else {
+        dot.removeAttribute("aria-current");
+      }
+    });
   }
+
+  previous.addEventListener("click", () => updateCarousel(activeSlideIndex - 1));
+  next.addEventListener("click", () => updateCarousel(activeSlideIndex + 1));
+  dotButtons.forEach((dot, index) => {
+    dot.addEventListener("click", () => updateCarousel(index));
+  });
+
+  viewport.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      updateCarousel(activeSlideIndex - 1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      updateCarousel(activeSlideIndex + 1);
+    }
+  });
+
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerId = null;
+
+  function clearPointerState() {
+    pointerId = null;
+    pointerStartX = 0;
+    pointerStartY = 0;
+  }
+
+  viewport.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse") {
+      return;
+    }
+    pointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+  });
+
+  viewport.addEventListener("pointerup", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+      updateCarousel(activeSlideIndex + (deltaX < 0 ? 1 : -1));
+    }
+    clearPointerState();
+  });
+
+  viewport.addEventListener("pointercancel", clearPointerState);
+  viewport.addEventListener("lostpointercapture", clearPointerState);
+
+  updateCarousel(activeSlideIndex);
 
   viewing.append(viewingHeader, mediaFrame, dots);
   showDetail.replaceChildren(backButton, hero, viewing);
