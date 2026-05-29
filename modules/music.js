@@ -9,7 +9,8 @@ function normalizeBandsView(viewName) {
 }
 
 function getBandsRouteUrl(viewName = activeBandsView) {
-  return `${routePaths.musicBands}?view=${normalizeBandsView(viewName)}`;
+  const normalizedView = normalizeBandsView(viewName);
+  return normalizedView === "radar" ? routePaths.musicBands : `${routePaths.musicBands}?view=${normalizedView}`;
 }
 
 function getBandId(band) {
@@ -3532,9 +3533,15 @@ function initMusicModule() {
     });
   });
   musicLandingRouteCards.forEach((card) => {
-    card.addEventListener("click", (event) => {
-      event.preventDefault();
-      navigateToRoute(card.getAttribute("href") || routePaths.music);
+    const navigateToLandingRoute = () => {
+      navigateToRoute(card.dataset.musicLandingRoute || routePaths.music);
+    };
+    card.addEventListener("click", navigateToLandingRoute);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        navigateToLandingRoute();
+      }
     });
   });
   musicNexusCards.forEach((card) => {

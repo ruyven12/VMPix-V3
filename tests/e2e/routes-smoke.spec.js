@@ -12,14 +12,14 @@ const routes = [
     path: "/music",
     rail: "Music Nexus",
     visibleShell: "[data-music-nexus-shell]",
-    links: [
-      { name: "Bands - Browse Artists", href: "/music/bands" },
-      { name: "Shows - Browse Events", href: "/music/shows" },
-      { name: "People - Musicians & Staff", href: "/music/people" },
-      { name: "Venues - Music Locations", href: "/music/venues" },
+    landingRoutes: [
+      { name: "Bands - Browse Artists", route: "/music/bands" },
+      { name: "Shows - Browse Events", route: "/music/shows" },
+      { name: "People - Musicians & Staff", route: "/music/people" },
+      { name: "Venues - Music Locations", route: "/music/venues" },
     ],
   },
-  { path: "/music/bands?view=radar", rail: "Bands", visibleShell: "[data-music-bands-index]", text: "BANDS INDEX", hiddenText: "Recent Music Activity" },
+  { path: "/music/bands", rail: "Bands", visibleShell: "[data-music-bands-index]", text: "BANDS INDEX", hiddenText: "Recent Music Activity" },
   { path: "/music/shows", rail: "Shows", visibleShell: "[data-music-nexus-shell]", text: "Load More" },
   { path: "/music/people", rail: "People", visibleShell: "[data-music-nexus-shell]" },
   { path: "/music/people/adam-begin", rail: "Person Detail", visibleShell: ".person-detail-screen", text: "Adam Begin" },
@@ -83,9 +83,9 @@ for (const viewport of viewports) {
           await expect(visibleShell.getByText(route.text).first()).toBeVisible();
         }
 
-        if (route.links) {
-          for (const link of route.links) {
-            await expect(visibleShell.getByRole("link", { name: link.name })).toHaveAttribute("href", link.href);
+        if (route.landingRoutes) {
+          for (const link of route.landingRoutes) {
+            await expect(visibleShell.getByRole("link", { name: link.name })).toHaveAttribute("data-music-landing-route", link.route);
           }
         }
 

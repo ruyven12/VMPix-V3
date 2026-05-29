@@ -153,7 +153,7 @@ let activeBandsView = "radar";
 let activeBandsLetter = "A";
 let activeBandsFilterLetter = "";
 let bandsSearchTerm = "";
-let bandsIndexReturnUrl = "/music/bands?view=radar";
+let bandsIndexReturnUrl = "/music/bands";
 let activeMusicPeoplePage = 1;
 let activeMusicPeopleId = "";
 let activeMusicPersonDetailId = "";
