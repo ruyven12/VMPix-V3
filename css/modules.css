@@ -14,7 +14,11 @@
   grid-auto-rows: max-content;
   align-content: start;
   gap: clamp(0.86rem, 2.4svh, 1.1rem);
-  padding: clamp(0.95rem, 4vw, 1.35rem);
+  padding:
+    max(clamp(0.95rem, 4vw, 1.35rem), env(safe-area-inset-top))
+    max(clamp(0.95rem, 4vw, 1.35rem), env(safe-area-inset-right))
+    max(clamp(0.95rem, 4vw, 1.35rem), env(safe-area-inset-bottom))
+    max(clamp(0.95rem, 4vw, 1.35rem), env(safe-area-inset-left));
   border: 1px solid rgba(247, 247, 242, 0.14);
   border-radius: var(--radius-md);
   background:
@@ -26,16 +30,19 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   pointer-events: none;
+  scroll-behavior: smooth;
   scroll-padding-block: var(--shell-viewport-pad-block);
   scrollbar-color: rgba(213, 22, 34, 0.46) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  touch-action: pan-y;
   transform: translate3d(0, 0.36rem, 0);
   transition:
     opacity var(--motion-standard) var(--ease-standard),
     transform var(--motion-standard) var(--ease-standard),
     visibility var(--motion-standard) var(--ease-standard);
   visibility: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .music-nexus-shell::-webkit-scrollbar {
@@ -2565,12 +2572,13 @@ img.archive-gallery-image {
   --music-landing-red: rgba(213, 22, 34, 0.5);
   display: grid;
   align-content: start;
-  gap: 0.78rem;
+  gap: clamp(0.62rem, 1.8svh, 0.92rem);
   min-width: 0;
+  padding-bottom: max(0.2rem, env(safe-area-inset-bottom));
 }
 
 .music-landing-hero {
-  min-height: 19rem;
+  min-height: clamp(17rem, 34svh, 19rem);
   display: grid;
   align-items: end;
   padding: 1rem;
@@ -2582,6 +2590,7 @@ img.archive-gallery-image {
     #07070a;
   overflow: hidden;
   contain: paint;
+  isolation: isolate;
 }
 
 .music-landing-hero::before,
@@ -2625,6 +2634,7 @@ img.archive-gallery-image {
   position: absolute;
   inset: 0;
   z-index: 1;
+  overflow: hidden;
 }
 
 .music-landing-light,
@@ -2778,9 +2788,9 @@ img.archive-gallery-image {
 
 .music-landing-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(min(100%, 6.25rem), 1fr));
   gap: 0.46rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .music-landing-stat {
@@ -2824,7 +2834,7 @@ img.archive-gallery-image {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.54rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .music-landing-card {
@@ -2942,6 +2952,7 @@ img.archive-gallery-image {
 .music-landing-activity-card {
   min-width: 0;
   max-width: 100%;
+  min-height: max(var(--tap-target), 5.15rem);
   display: grid;
   gap: 0.32rem;
   padding: 0.62rem;
@@ -2981,6 +2992,15 @@ img.archive-gallery-image {
 }
 
 @media (max-width: 379px) {
+  .music-nexus-shell {
+    padding:
+      max(0.72rem, env(safe-area-inset-top))
+      max(0.72rem, env(safe-area-inset-right))
+      max(0.72rem, env(safe-area-inset-bottom))
+      max(0.72rem, env(safe-area-inset-left));
+    scrollbar-gutter: auto;
+  }
+
   .music-nexus-landing {
     gap: 0.58rem;
   }
@@ -3042,6 +3062,10 @@ img.archive-gallery-image {
 }
 
 @media (max-width: 759px) {
+  .music-nexus-shell {
+    scrollbar-gutter: auto;
+  }
+
   .music-landing-hero {
     min-height: 17rem;
   }
@@ -3070,7 +3094,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(min(100%, 6.4rem), 1fr));
   }
 
   .music-landing-stat:last-child {
@@ -3101,6 +3125,14 @@ img.archive-gallery-image {
 }
 
 @media (max-height: 540px) and (orientation: landscape) {
+  .music-nexus-shell {
+    padding:
+      max(0.52rem, env(safe-area-inset-top))
+      max(0.62rem, env(safe-area-inset-right))
+      max(0.52rem, env(safe-area-inset-bottom))
+      max(0.62rem, env(safe-area-inset-left));
+  }
+
   .music-nexus-landing {
     gap: 0.5rem;
   }
@@ -3174,7 +3206,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-card-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .music-landing-card {
@@ -3183,6 +3215,12 @@ img.archive-gallery-image {
 
   .music-landing-activity-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .music-landing-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
