@@ -481,6 +481,7 @@ function showBandsIndexView(options = {}) {
   setSetsArchiveVisible(false);
   setBandDetailVisible(false);
   setMusicPersonDetailVisible(false);
+  setMusicActivityPanelVisible(false);
   setBandsIndexVisible(true);
   syncBandsIndex();
   if (options.shouldScroll !== false && musicNexusShell) {
@@ -3379,8 +3380,9 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
     syncBandsIndex();
   }
 
-  setMusicActivityPanelVisible(sectionName !== "people" && sectionName !== "venues");
-  if (sectionName !== "people" && sectionName !== "venues") {
+  const shouldShowActivityPanel = sectionName !== "bands" && sectionName !== "people" && sectionName !== "venues";
+  setMusicActivityPanelVisible(shouldShowActivityPanel);
+  if (shouldShowActivityPanel) {
     if (sectionName === "shows") {
       renderMusicShowsArchive();
     } else {

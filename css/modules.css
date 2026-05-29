@@ -4966,6 +4966,7 @@ img.archive-gallery-image {
 
 .music-bands-index {
   display: none;
+  align-content: start;
   gap: clamp(0.62rem, 1.95svh, 0.88rem);
   padding: clamp(0.68rem, 2.7vw, 0.95rem);
   border: var(--v3-card-border-strong);
@@ -4979,6 +4980,10 @@ img.archive-gallery-image {
 
 .music-bands-index.is-active {
   display: grid;
+}
+
+.music-nexus-shell:not(.is-landing) .music-bands-index.is-active {
+  min-height: min(34rem, calc(100svh - 8.5rem));
 }
 
 .music-bands-index::before {
