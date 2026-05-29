@@ -41,6 +41,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.musicPeople) {
     return { name: "music-people", canonicalUrl: routePaths.musicPeople };
   }
+  if (routePath === routePaths.musicVenues) {
+    return { name: "music-venues", canonicalUrl: routePaths.musicVenues };
+  }
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
@@ -154,6 +157,14 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "music-people") {
     showMusicNexus({ initialSection: "people", currentView: "People" });
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "music-venues") {
+    showMusicNexus({ initialSection: "landing", currentView: "Venues" });
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

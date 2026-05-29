@@ -33,12 +33,15 @@ Current `render.yaml` already declares this rewrite behavior.
 | `/` | Homepage | active | Normalized as the home route. `/index.html` is also normalized to `/`. | Shell entry point. |
 | `/portfolio` | Portfolio Hub | active | History API route handled by the shell router. | Hub route after portal entry. |
 | `/music` | Music Nexus | active | History API route handled by the shell router. | Opens the static Music Nexus landing entry point. |
+| `/music/bands` | Music Bands Archive | active | History API route handled by the shell router. | Existing bands route remains separate from the `/music` landing; future radar work belongs here. |
+| `/music/shows` | Music Shows Archive | active | History API route handled by the shell router. | Opens Music Nexus with the Shows section selected. |
 | `/music/people` | Music People | active | History API route handled by the shell router. | Opens Music Nexus with the People section selected. |
 | `/music/people/adam-begin` | Music Person Detail | active | Dynamic person detail route pattern handled by `/music/people/:personId`. | Specific data availability depends on current frontend data. |
-| `/wrestling` | Wrestling Nexus | placeholder | Wrestling can open from the portfolio card as a shell view, but `/wrestling` is not currently registered in `routePaths` or parsed by `js/router.js`. | Direct deep link currently falls through unknown-route behavior. |
-| `/calendar` | Calendar | placeholder | Calendar can open from shell navigation as a view, but `/calendar` is not currently registered in `routePaths` or parsed by `js/router.js`. | Needs URL route registration before deep-link status becomes active. |
-| `/about` | About | placeholder | About can open from shell navigation as a view, but `/about` is not currently registered in `routePaths` or parsed by `js/router.js`. | Needs URL route registration before deep-link status becomes active. |
-| `/contact` | Contact | placeholder | Contact can open from shell navigation as a view, but `/contact` is not currently registered in `routePaths` or parsed by `js/router.js`. | Needs URL route registration before deep-link status becomes active. |
+| `/music/venues` | Music Venues Archive | placeholder | History API route handled by the shell router and currently returns to the static Music Nexus landing. | URL slot is reserved for the future venues archive; no archive screen is built in Music Nexus Landing v1. |
+| `/wrestling` | Wrestling Nexus | active | History API route handled by the shell router. | Opens the current Ring Archive shell view. |
+| `/calendar` | Calendar | active | History API route handled by the shell router. | Opens the current Calendar shell view. |
+| `/about` | About | active | History API route handled by the shell router. | Opens the current About shell view. |
+| `/contact` | Contact | active | History API route handled by the shell router. | Opens the current Contact shell view. |
 | `/admin` | Admin Shell | future | Main shell navigation currently sends admin traffic to `./admin/index.html`; `/admin` is not currently an SPA route. | Future protected admin route should live inside the V3 route contract. |
 
 ## Additional Current Internal Music Routes
@@ -90,6 +93,6 @@ No live backend API is wired into VMPix-V3 yet. VMPix-Data remains the backend/A
 - Active route parsing currently lives in `js/router.js`; route path constants currently live in `js/state.js`.
 - Unknown direct routes fall through to home-shell rendering; the URL may remain the unknown path unless canonicalization is added.
 - Browser `popstate` is handled by the shell and resyncs the active route state.
-- `/wrestling`, `/calendar`, `/about`, and `/contact` currently exist as shell/module views, not full URL-routed public routes.
+- `/wrestling`, `/calendar`, `/about`, and `/contact` currently exist as shell-routed public views.
 - Admin navigation currently targets `./admin/index.html`, not the `/admin` SPA route.
 - Future route work must keep the shell as the owner of routing, layout, navigation, transitions, and viewport behavior.

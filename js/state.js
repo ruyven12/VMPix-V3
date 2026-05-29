@@ -415,6 +415,7 @@ const routePaths = {
   musicBands: "/music/bands",
   musicShows: "/music/shows",
   musicPeople: "/music/people",
+  musicVenues: "/music/venues",
   wrestling: "/wrestling",
   calendar: "/calendar",
   about: "/about",
