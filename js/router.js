@@ -141,7 +141,6 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "music") {
     showMusicNexus();
-    setBandsView("radar");
     return;
   }
 
@@ -201,7 +200,7 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "music-bands") {
     bandsIndexReturnUrl = route.canonicalUrl;
-    showMusicNexus({ currentView: "Bands" });
+    showMusicNexus({ initialSection: "bands", currentView: "Bands" });
     setBandsView(route.view, Boolean(options.shouldFocusBandsView));
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
@@ -212,7 +211,7 @@ function syncRoute(route, options = {}) {
   if (route.name === "band-detail") {
     const historyState = options.historyState || window.history.state || {};
     bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
-    showMusicNexus();
+    showMusicNexus({ initialSection: "bands" });
     showBandDetail(findBandById(route.bandId) || createUnknownBand(route.bandId));
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
@@ -229,7 +228,7 @@ function syncRoute(route, options = {}) {
       historyState.returnUrl ||
       (historyState.fromBandDetail ? bandsIndexReturnUrl : getBandsRouteUrl("radar"))
     );
-    showMusicNexus();
+    showMusicNexus({ initialSection: "bands" });
     showSetDetailRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), route.setCode);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {

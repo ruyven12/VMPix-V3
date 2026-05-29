@@ -3308,7 +3308,43 @@ function setMusicActivityPanelVisible(isVisible) {
   }
 }
 
+function setMusicNexusLandingVisible(isVisible) {
+  if (!musicNexusShell || !musicNexusLanding) {
+    return;
+  }
+
+  musicNexusShell.classList.toggle("is-landing", isVisible);
+  musicNexusLanding.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) {
+    musicNexusLanding.removeAttribute("inert");
+  } else {
+    musicNexusLanding.setAttribute("inert", "");
+  }
+}
+
+function showMusicNexusLanding(options = {}) {
+  setBandDetailVisible(false);
+  setSetsArchiveVisible(false);
+  setSetGalleryVisible(false);
+  setMusicPersonDetailVisible(false);
+  setMusicShowDetailVisible(false);
+  setVenueDetailVisible(false);
+  setBandsIndexVisible(false);
+  setPeopleIndexVisible(false);
+  setMusicActivityPanelVisible(false);
+  setMusicNexusLandingVisible(true);
+
+  if (options.shouldScroll !== false && musicNexusShell) {
+    musicNexusShell.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
+}
+
 function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdateRail = true) {
+  setMusicNexusLandingVisible(false);
+
   const rows = musicActivityContent[sectionName] || [];
   if (!musicActivityList) {
     return;

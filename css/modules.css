@@ -2516,6 +2516,676 @@ img.archive-gallery-image {
   background: rgba(247, 247, 242, 0.02);
 }
 
+.music-nexus-landing,
+.music-landing-hero,
+.music-landing-stage,
+.music-landing-header,
+.music-landing-stats,
+.music-landing-card-grid,
+.music-landing-activity,
+.music-nexus-header,
+.music-nexus-module-grid,
+.music-bands-index,
+.music-people-index,
+.music-nexus-activity,
+.music-nexus-back {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  align-self: start;
+}
+
+.music-nexus-shell:not(.is-landing) .music-nexus-landing {
+  display: none;
+}
+
+.music-nexus-shell.is-landing .music-bands-index,
+.music-nexus-shell.is-landing .music-people-index,
+.music-nexus-shell.is-landing .music-nexus-activity {
+  display: none;
+}
+
+.music-nexus-shell.is-band-detail .music-nexus-landing,
+.music-nexus-shell.is-person-detail .music-nexus-landing,
+.music-nexus-shell.is-show-detail .music-nexus-landing,
+.music-nexus-shell.is-venue-detail .music-nexus-landing,
+.music-nexus-shell.is-sets-archive .music-nexus-landing,
+.music-nexus-shell.is-set-gallery .music-nexus-landing,
+.music-nexus-shell.is-lightbox .music-nexus-landing {
+  display: none;
+}
+
+.music-nexus-landing {
+  --music-landing-ink: rgba(247, 247, 242, 0.94);
+  --music-landing-soft: rgba(247, 247, 242, 0.7);
+  --music-landing-muted: rgba(247, 247, 242, 0.52);
+  --music-landing-line: rgba(247, 247, 242, 0.12);
+  --music-landing-violet: rgba(142, 108, 255, 0.68);
+  --music-landing-cyan: rgba(0, 178, 190, 0.52);
+  --music-landing-red: rgba(213, 22, 34, 0.5);
+  display: grid;
+  align-content: start;
+  gap: 0.78rem;
+  min-width: 0;
+}
+
+.music-landing-hero {
+  min-height: 19rem;
+  display: grid;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.052), transparent 34%),
+    linear-gradient(0deg, rgba(5, 5, 7, 0.36), rgba(5, 5, 7, 0) 46%),
+    #07070a;
+  overflow: hidden;
+  contain: paint;
+}
+
+.music-landing-hero::before,
+.music-landing-hero::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.music-landing-hero::before {
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(142, 108, 255, 0.34), transparent 34%),
+    radial-gradient(ellipse at 74% 8%, rgba(0, 178, 190, 0.24), transparent 32%),
+    radial-gradient(ellipse at 50% 72%, rgba(213, 22, 34, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 62%);
+  opacity: 0.86;
+}
+
+.music-landing-hero::after {
+  right: -5%;
+  bottom: 0;
+  left: -5%;
+  z-index: 0;
+  height: 42%;
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.74)),
+    radial-gradient(circle at 7% 83%, rgba(247, 247, 242, 0.16) 0 0.08rem, transparent 0.1rem),
+    radial-gradient(circle at 19% 73%, rgba(247, 247, 242, 0.14) 0 0.07rem, transparent 0.1rem),
+    radial-gradient(circle at 34% 86%, rgba(247, 247, 242, 0.12) 0 0.08rem, transparent 0.11rem),
+    radial-gradient(circle at 51% 76%, rgba(247, 247, 242, 0.14) 0 0.08rem, transparent 0.1rem),
+    radial-gradient(circle at 68% 86%, rgba(247, 247, 242, 0.13) 0 0.08rem, transparent 0.1rem),
+    radial-gradient(circle at 84% 74%, rgba(247, 247, 242, 0.15) 0 0.07rem, transparent 0.1rem),
+    radial-gradient(circle at 95% 84%, rgba(247, 247, 242, 0.13) 0 0.08rem, transparent 0.1rem),
+    repeating-linear-gradient(90deg, rgba(247, 247, 242, 0.035) 0 1px, transparent 1px 0.82rem);
+  opacity: 0.64;
+}
+
+.music-landing-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.music-landing-light,
+.music-landing-truss,
+.music-landing-performer,
+.music-landing-crowd {
+  position: absolute;
+  pointer-events: none;
+}
+
+.music-landing-light {
+  top: 3%;
+  width: 34%;
+  height: 68%;
+  opacity: 0.68;
+  mix-blend-mode: screen;
+  transform-origin: 50% 0;
+}
+
+.music-landing-light--left {
+  left: 14%;
+  background: linear-gradient(168deg, rgba(142, 108, 255, 0.34), transparent 74%);
+  transform: skewX(-14deg);
+}
+
+.music-landing-light--right {
+  right: 9%;
+  background: linear-gradient(194deg, rgba(0, 178, 190, 0.28), transparent 72%);
+  transform: skewX(16deg);
+}
+
+.music-landing-truss {
+  top: 11%;
+  right: 7%;
+  left: 7%;
+  height: 3.6rem;
+  border-block: 1px solid rgba(247, 247, 242, 0.12);
+  background:
+    repeating-linear-gradient(90deg, transparent 0 0.88rem, rgba(247, 247, 242, 0.09) 0.94rem 1rem, transparent 1.06rem 1.9rem),
+    linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 72%);
+  opacity: 0.62;
+}
+
+.music-landing-performer {
+  bottom: 18%;
+  z-index: 2;
+  width: 1.55rem;
+  height: 5.4rem;
+  border-radius: 999px 999px 0.16rem 0.16rem;
+  background: rgba(0, 0, 0, 0.76);
+  box-shadow: 0 0 1.6rem rgba(0, 0, 0, 0.56);
+}
+
+.music-landing-performer::before,
+.music-landing-performer::after {
+  position: absolute;
+  content: "";
+  background: rgba(0, 0, 0, 0.78);
+  pointer-events: none;
+}
+
+.music-landing-performer--guitar {
+  left: 35%;
+}
+
+.music-landing-performer--guitar::before {
+  top: 2.95rem;
+  left: -1.45rem;
+  width: 3.2rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  transform: rotate(-16deg);
+}
+
+.music-landing-performer--guitar::after {
+  top: 2.55rem;
+  right: -2.9rem;
+  width: 3.4rem;
+  height: 0.22rem;
+  border-radius: 999px;
+  transform: rotate(-21deg);
+  transform-origin: 0 50%;
+}
+
+.music-landing-performer--drums {
+  right: 34%;
+  bottom: 15%;
+  width: 1.3rem;
+  height: 4.2rem;
+}
+
+.music-landing-performer--drums::before {
+  right: -1.8rem;
+  bottom: 0.42rem;
+  width: 4rem;
+  height: 1.4rem;
+  border: 1px solid rgba(247, 247, 242, 0.07);
+  border-radius: 50%;
+}
+
+.music-landing-performer--drums::after {
+  top: 1.2rem;
+  left: -2.3rem;
+  width: 5.8rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.music-landing-crowd {
+  right: -3%;
+  bottom: 0;
+  left: -3%;
+  height: 28%;
+  background:
+    radial-gradient(circle at 8% 58%, rgba(0, 0, 0, 0.82) 0 0.34rem, transparent 0.36rem),
+    radial-gradient(circle at 18% 66%, rgba(0, 0, 0, 0.8) 0 0.28rem, transparent 0.3rem),
+    radial-gradient(circle at 27% 55%, rgba(0, 0, 0, 0.82) 0 0.34rem, transparent 0.36rem),
+    radial-gradient(circle at 41% 68%, rgba(0, 0, 0, 0.8) 0 0.3rem, transparent 0.32rem),
+    radial-gradient(circle at 56% 57%, rgba(0, 0, 0, 0.82) 0 0.34rem, transparent 0.36rem),
+    radial-gradient(circle at 69% 68%, rgba(0, 0, 0, 0.8) 0 0.28rem, transparent 0.3rem),
+    radial-gradient(circle at 84% 56%, rgba(0, 0, 0, 0.82) 0 0.34rem, transparent 0.36rem),
+    radial-gradient(circle at 94% 66%, rgba(0, 0, 0, 0.8) 0 0.3rem, transparent 0.32rem),
+    linear-gradient(180deg, transparent 0 28%, rgba(0, 0, 0, 0.88));
+}
+
+.music-landing-header {
+  z-index: 3;
+  width: min(100%, 36rem);
+  padding: 0 0 0.22rem;
+}
+
+.music-landing-kicker {
+  margin: 0 0 0.28rem;
+  color: rgba(247, 247, 242, 0.72);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.music-landing-title {
+  margin: 0;
+  max-width: 100%;
+  color: var(--music-landing-ink);
+  font-size: 2.7rem;
+  font-weight: 400;
+  line-height: 0.9;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.46rem;
+  overflow: hidden;
+}
+
+.music-landing-stat {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 0.24rem;
+  min-height: 4.45rem;
+  padding: 0.62rem;
+  border: 1px solid var(--music-landing-line);
+  border-radius: 0.45rem;
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 68%),
+    linear-gradient(90deg, transparent, rgba(0, 178, 190, 0.18), transparent) top / 100% 1px no-repeat,
+    rgba(3, 3, 6, 0.54);
+  text-align: center;
+}
+
+.music-landing-stat:last-child {
+  grid-column: 1 / -1;
+}
+
+.music-landing-stat-value {
+  color: var(--music-landing-ink);
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-stat-label {
+  color: var(--music-landing-muted);
+  font-size: 0.68rem;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.54rem;
+  overflow: hidden;
+}
+
+.music-landing-card {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 7.85rem;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.32rem;
+  margin: 0;
+  padding: 0.74rem;
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.042), transparent 58%),
+    linear-gradient(135deg, rgba(142, 108, 255, 0.075), transparent 64%),
+    rgba(3, 3, 6, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(247, 247, 242, 0.025);
+  overflow: hidden;
+  contain: paint;
+}
+
+.music-landing-card::before,
+.music-landing-card::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.music-landing-card::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 178, 190, 0.42), transparent 54%) top / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(247, 247, 242, 0.06), transparent 30% 70%, rgba(247, 247, 242, 0.035)) bottom / 100% 1px no-repeat;
+  opacity: 0.9;
+}
+
+.music-landing-card::after {
+  top: 0.64rem;
+  right: 0.8rem;
+  bottom: 0.64rem;
+  width: 24%;
+  border-right: 1px solid rgba(247, 247, 242, 0.075);
+  border-bottom: 1px solid rgba(247, 247, 242, 0.06);
+}
+
+.music-landing-card-index {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  width: max-content;
+  color: rgba(0, 178, 190, 0.78);
+  font-size: 0.68rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.music-landing-card-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--music-landing-ink);
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-card-copy {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--music-landing-soft);
+  font-size: 0.74rem;
+  line-height: 1.2;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-activity {
+  display: grid;
+  gap: 0.62rem;
+  padding: 0.74rem;
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
+    linear-gradient(90deg, rgba(142, 108, 255, 0.28), transparent 58%) top / 100% 1px no-repeat,
+    rgba(3, 3, 6, 0.5);
+}
+
+.music-landing-section-header {
+  display: grid;
+}
+
+.music-landing-section-title {
+  margin: 0;
+  color: var(--music-landing-ink);
+  font-size: 1.02rem;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.music-landing-activity-list {
+  display: grid;
+  gap: 0.46rem;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.music-landing-activity-card {
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  gap: 0.32rem;
+  padding: 0.62rem;
+  border: 1px solid rgba(247, 247, 242, 0.12);
+  border-left-color: rgba(0, 178, 190, 0.34);
+  border-radius: 0.45rem;
+  background:
+    linear-gradient(90deg, rgba(0, 178, 190, 0.072), transparent 36%),
+    rgba(247, 247, 242, 0.032);
+  overflow: hidden;
+}
+
+.music-landing-activity-type {
+  color: rgba(0, 178, 190, 0.78);
+  font-size: 0.62rem;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.music-landing-activity-title {
+  margin: 0;
+  color: rgba(247, 247, 242, 0.88);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.12;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.music-landing-activity-copy {
+  margin: 0;
+  color: var(--music-landing-muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 379px) {
+  .music-nexus-landing {
+    gap: 0.58rem;
+  }
+
+  .music-landing-hero {
+    min-height: 17.2rem;
+    padding: 0.72rem;
+  }
+
+  .music-landing-kicker {
+    font-size: 0.66rem;
+  }
+
+  .music-landing-title {
+    font-size: 2.08rem;
+    line-height: 0.94;
+  }
+
+  .music-landing-stats,
+  .music-landing-card-grid,
+  .music-landing-activity-list {
+    gap: 0.42rem;
+  }
+
+  .music-landing-stat {
+    min-height: 3.9rem;
+    padding: 0.52rem;
+  }
+
+  .music-landing-stat-value {
+    font-size: 1.02rem;
+  }
+
+  .music-landing-stat-label {
+    font-size: 0.62rem;
+  }
+
+  .music-landing-card {
+    min-height: 6.4rem;
+    padding: 0.58rem;
+  }
+
+  .music-landing-card-title {
+    font-size: 1rem;
+  }
+
+  .music-landing-card-copy {
+    font-size: 0.68rem;
+  }
+
+  .music-landing-activity {
+    gap: 0.42rem;
+    padding: 0.58rem;
+  }
+
+  .music-landing-activity-card {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 759px) {
+  .music-landing-hero {
+    min-height: 17rem;
+  }
+
+  .music-landing-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .music-landing-stat:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .music-landing-card-grid,
+  .music-landing-activity-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 480px) {
+  .music-landing-hero {
+    min-height: 19rem;
+  }
+
+  .music-landing-title {
+    font-size: 3.3rem;
+  }
+
+  .music-landing-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .music-landing-stat:last-child {
+    grid-column: auto;
+  }
+
+  .music-landing-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 620px) {
+  .music-landing-hero {
+    min-height: 22rem;
+  }
+
+  .music-landing-title {
+    font-size: 4.2rem;
+  }
+
+  .music-landing-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .music-landing-card {
+    min-height: 7.8rem;
+  }
+}
+
+@media (max-height: 540px) and (orientation: landscape) {
+  .music-nexus-landing {
+    gap: 0.5rem;
+  }
+
+  .music-landing-hero {
+    min-height: 12.5rem;
+    padding: 0.68rem;
+  }
+
+  .music-landing-title {
+    font-size: 2.9rem;
+  }
+
+  .music-landing-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.38rem;
+  }
+
+  .music-landing-stat,
+  .music-landing-stat:last-child {
+    grid-column: auto;
+    min-height: 3.45rem;
+    padding: 0.45rem;
+  }
+
+  .music-landing-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem;
+  }
+
+  .music-landing-card {
+    min-height: 5.8rem;
+    padding: 0.52rem;
+  }
+
+  .music-landing-activity {
+    gap: 0.42rem;
+    padding: 0.54rem;
+  }
+
+  .music-landing-activity-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.42rem;
+  }
+}
+
+@media (min-width: 760px) {
+  .music-nexus-landing {
+    gap: 1rem;
+  }
+
+  .music-landing-hero {
+    min-height: min(48svh, 30rem);
+    padding: 1.35rem;
+  }
+
+  .music-landing-title {
+    font-size: 5.15rem;
+  }
+
+  .music-landing-kicker {
+    font-size: 0.86rem;
+  }
+
+  .music-landing-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .music-landing-stat:last-child {
+    grid-column: auto;
+  }
+
+  .music-landing-card-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .music-landing-card {
+    min-height: 8.8rem;
+  }
+
+  .music-landing-activity-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .music-nexus-header,
 .music-nexus-module-grid,
 .music-bands-index,

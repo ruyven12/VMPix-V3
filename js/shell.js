@@ -190,10 +190,14 @@ function showMusicNexus(options = {}) {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
-  const initialSection = options.initialSection || "bands";
-  setMusicNexusContext(initialSection, false, false);
-  if (initialSection === "bands") {
-    showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
+  const initialSection = options.initialSection || "landing";
+  if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
+    showMusicNexusLanding({ shouldScroll: false });
+  } else {
+    setMusicNexusContext(initialSection, false, false);
+    if (initialSection === "bands") {
+      showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
+    }
   }
   setCurrentView(options.currentView || "Music Nexus");
   setActiveGlobalNav("portfolio");

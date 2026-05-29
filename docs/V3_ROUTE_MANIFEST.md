@@ -32,7 +32,7 @@ Current `render.yaml` already declares this rewrite behavior.
 | --- | --- | --- | --- | --- |
 | `/` | Homepage | active | Normalized as the home route. `/index.html` is also normalized to `/`. | Shell entry point. |
 | `/portfolio` | Portfolio Hub | active | History API route handled by the shell router. | Hub route after portal entry. |
-| `/music` | Music Nexus | active | History API route handled by the shell router. | Opens the Music Nexus with the default radar/bands view. |
+| `/music` | Music Nexus | active | History API route handled by the shell router. | Opens the static Music Nexus landing entry point. |
 | `/music/people` | Music People | active | History API route handled by the shell router. | Opens Music Nexus with the People section selected. |
 | `/music/people/adam-begin` | Music Person Detail | active | Dynamic person detail route pattern handled by `/music/people/:personId`. | Specific data availability depends on current frontend data. |
 | `/wrestling` | Wrestling Nexus | placeholder | Wrestling can open from the portfolio card as a shell view, but `/wrestling` is not currently registered in `routePaths` or parsed by `js/router.js`. | Direct deep link currently falls through unknown-route behavior. |
@@ -47,7 +47,7 @@ These routes are present in current router code even though they were not part o
 
 | Route | Target | Status | Current behavior | Notes |
 | --- | --- | --- | --- | --- |
-| `/music/bands?view=radar` | Music Bands Radar | active | Parsed as `music-bands`; view is canonicalized to `radar`, `list`, or `search`. | Current default Music Nexus route state. |
+| `/music/bands?view=radar` | Music Bands Radar | active | Parsed as `music-bands`; view is canonicalized to `radar`, `list`, or `search`. | Bands-specific route state; not mounted on the `/music` landing page. |
 | `/music/bands?view=list` | Music Bands List | active | Parsed as `music-bands`. | Query value is normalized. |
 | `/music/bands?view=search` | Music Bands Search | active | Parsed as `music-bands`. | Query value is normalized. |
 | `/music/bands/:bandId` | Band Detail | active | Dynamic band detail route. | Uses current frontend music data or an unknown-band fallback. |
