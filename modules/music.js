@@ -3531,6 +3531,12 @@ function initMusicModule() {
       navigateToSetDetail(row);
     });
   });
+  musicLandingRouteCards.forEach((card) => {
+    card.addEventListener("click", (event) => {
+      event.preventDefault();
+      navigateToRoute(card.getAttribute("href") || routePaths.music);
+    });
+  });
   musicNexusCards.forEach((card) => {
     card.addEventListener("click", () => {
       const musicSection = card.dataset.musicNexusCard;

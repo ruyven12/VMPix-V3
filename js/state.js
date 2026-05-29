@@ -28,6 +28,7 @@ const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-c
 const moduleBack = document.querySelector("[data-module-back]");
 const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
 const musicNexusLanding = document.querySelector("[data-music-nexus-landing]");
+const musicLandingRouteCards = document.querySelectorAll("[data-music-landing-route]");
 const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
 const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
