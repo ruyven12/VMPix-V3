@@ -7132,7 +7132,11 @@ img.archive-gallery-image {
   display: grid;
   align-content: start;
   gap: clamp(0.72rem, 2svh, 1rem);
-  padding: clamp(0.78rem, 3.6vw, 1.18rem);
+  padding:
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-top))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-right))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-bottom))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-left));
   border: 1px solid rgba(247, 247, 242, 0.14);
   border-radius: var(--radius-md);
   background:
@@ -7149,6 +7153,7 @@ img.archive-gallery-image {
   scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
   transform: translate3d(0, 0.36rem, 0);
   transition:
     opacity var(--motion-standard) var(--ease-standard),
@@ -7194,7 +7199,7 @@ img.archive-gallery-image {
 
 .wrestling-shows-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(3.45rem, auto);
   align-items: center;
   gap: clamp(0.7rem, 3vw, 1.1rem);
   padding: clamp(0.1rem, 0.7vw, 0.22rem) 0 clamp(0.16rem, 0.9vw, 0.3rem);
@@ -7212,17 +7217,18 @@ img.archive-gallery-image {
 
 .wrestling-shows-title {
   min-width: 0;
+  max-width: 100%;
   color: var(--color-text);
-  font-size: clamp(1.9rem, 11vw, 4rem);
+  font-size: clamp(1.64rem, 9.4vw, 4rem);
   font-weight: 400;
-  line-height: 0.95;
+  line-height: 0.98;
   overflow-wrap: anywhere;
   text-transform: uppercase;
 }
 
 .wrestling-ticket-stub {
   position: relative;
-  width: clamp(4.8rem, 19vw, 7.2rem);
+  width: clamp(3.45rem, 16vw, 7.2rem);
   aspect-ratio: 1.54 / 1;
   border: 2px solid rgba(213, 22, 34, 0.74);
   border-radius: 0.28rem;
@@ -7267,11 +7273,15 @@ img.archive-gallery-image {
 .wrestling-year-filter {
   width: min(100%, 44rem);
   justify-self: center;
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: clamp(0.34rem, 1.4vw, 0.48rem);
   padding: 0.08rem 0;
+  overflow-x: visible;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .wrestling-year-chip,
@@ -7287,7 +7297,8 @@ img.archive-gallery-image {
 }
 
 .wrestling-year-chip {
-  min-height: 2.34rem;
+  flex: 0 0 auto;
+  min-height: 2.85rem;
   padding: 0.54rem 0.7rem;
   border: 1px solid rgba(247, 247, 242, 0.08);
   background: rgba(247, 247, 242, 0.02);
@@ -7304,6 +7315,7 @@ img.archive-gallery-image {
 
 .wrestling-shows-tools {
   justify-self: end;
+  max-width: 100%;
   display: inline-grid;
   grid-template-columns: auto minmax(7.25rem, auto);
   align-items: center;
@@ -7319,7 +7331,8 @@ img.archive-gallery-image {
 }
 
 .wrestling-sort-select {
-  min-height: 2.38rem;
+  max-width: 100%;
+  min-height: 2.9rem;
   padding: 0.54rem 1.75rem 0.54rem 0.62rem;
   border: 1px solid rgba(247, 247, 242, 0.1);
   background:
@@ -7330,6 +7343,8 @@ img.archive-gallery-image {
 }
 
 .wrestling-show-list {
+  width: min(100%, 58rem);
+  justify-self: center;
   display: grid;
   gap: clamp(0.54rem, 1.8vw, 0.78rem);
   margin: 0;
@@ -7341,7 +7356,7 @@ img.archive-gallery-image {
   position: relative;
   min-width: 0;
   display: grid;
-  grid-template-columns: clamp(4.5rem, 21vw, 5.55rem) minmax(0, 1fr) auto;
+  grid-template-columns: clamp(4.15rem, 19vw, 5.55rem) minmax(0, 1fr) clamp(1.35rem, 5vw, 1.8rem);
   align-items: center;
   gap: clamp(0.56rem, 2.2vw, 0.78rem);
   min-height: clamp(6.9rem, 24vw, 8.2rem);
@@ -7368,6 +7383,7 @@ img.archive-gallery-image {
 .wrestling-show-poster {
   position: relative;
   width: 100%;
+  min-width: 0;
   aspect-ratio: 2 / 3;
   display: grid;
   place-items: center;
@@ -7444,13 +7460,18 @@ img.archive-gallery-image {
 .wrestling-show-arrow {
   position: relative;
   z-index: 1;
-  min-width: 1.25rem;
+  width: clamp(1.35rem, 5vw, 1.8rem);
+  min-width: 0;
+  display: inline-grid;
+  place-items: center;
   color: rgba(213, 22, 34, 0.72);
   font-size: clamp(1.5rem, 6vw, 2rem);
   line-height: 1;
 }
 
 .wrestling-pagination {
+  width: min(100%, 58rem);
+  justify-self: center;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -7460,8 +7481,8 @@ img.archive-gallery-image {
 
 .wrestling-page-button,
 .wrestling-page-ellipsis {
-  min-width: 2.35rem;
-  min-height: 2.35rem;
+  min-width: 3rem;
+  min-height: 3rem;
   display: inline-grid;
   place-items: center;
 }
@@ -7483,6 +7504,161 @@ img.archive-gallery-image {
 .wrestling-page-button:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.16rem;
+}
+
+@media (max-width: 759px) {
+  .wrestling-shows-shell {
+    scrollbar-gutter: auto;
+  }
+
+  .wrestling-year-filter {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0.08rem 0.08rem 0.42rem;
+    scroll-padding-inline: 0.08rem;
+    scrollbar-color: rgba(213, 22, 34, 0.32) rgba(247, 247, 242, 0.045);
+    scrollbar-width: thin;
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar {
+    height: 0.32rem;
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar-track {
+    background: rgba(247, 247, 242, 0.045);
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar-thumb {
+    background: rgba(213, 22, 34, 0.32);
+  }
+
+  .wrestling-shows-tools {
+    width: min(100%, 58rem);
+    justify-self: center;
+    grid-template-columns: auto minmax(0, 9rem);
+  }
+}
+
+@media (max-width: 479px) {
+  .wrestling-shows-shell {
+    gap: 0.62rem;
+    padding:
+      max(0.58rem, env(safe-area-inset-top))
+      max(0.62rem, env(safe-area-inset-right))
+      max(0.62rem, env(safe-area-inset-bottom))
+      max(0.62rem, env(safe-area-inset-left));
+  }
+
+  .wrestling-shows-header {
+    grid-template-columns: minmax(0, 1fr) minmax(3.1rem, auto);
+    gap: 0.44rem;
+  }
+
+  .wrestling-ticket-stub {
+    width: clamp(3.1rem, 15vw, 3.85rem);
+    border-width: 1px;
+  }
+
+  .wrestling-ticket-stub::before {
+    left: 30%;
+  }
+
+  .wrestling-show-entry {
+    grid-template-columns: clamp(3.9rem, 18vw, 4.45rem) minmax(0, 1fr) 1.1rem;
+    gap: 0.44rem;
+    min-height: 6.45rem;
+    padding: 0.42rem;
+  }
+
+  .wrestling-show-copy {
+    gap: 0.2rem;
+  }
+
+  .wrestling-show-arrow {
+    width: 1.1rem;
+    font-size: 1.46rem;
+  }
+
+  .wrestling-pagination {
+    gap: 0.28rem;
+  }
+
+  .wrestling-page-button,
+  .wrestling-page-ellipsis {
+    min-width: 3rem;
+    min-height: 3rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .wrestling-shows-title {
+    font-size: clamp(1.42rem, 8.4vw, 1.72rem);
+  }
+
+  .wrestling-ticket-stub {
+    width: 2.95rem;
+  }
+
+  .wrestling-year-chip {
+    min-height: 2.56rem;
+    padding-inline: 0.58rem;
+  }
+
+  .wrestling-shows-tools {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 0.3rem;
+  }
+
+  .wrestling-sort-label {
+    white-space: normal;
+  }
+
+  .wrestling-show-entry {
+    grid-template-columns: 3.62rem minmax(0, 1fr) 0.95rem;
+    gap: 0.36rem;
+    padding: 0.38rem;
+  }
+
+  .wrestling-show-title {
+    font-size: clamp(0.78rem, 3.6vw, 0.9rem);
+  }
+
+  .wrestling-show-date,
+  .wrestling-show-place,
+  .wrestling-show-location {
+    font-size: clamp(0.56rem, 2.8vw, 0.64rem);
+  }
+
+  .wrestling-show-arrow {
+    width: 0.95rem;
+    font-size: 1.3rem;
+  }
+
+  .wrestling-page-button,
+  .wrestling-page-ellipsis {
+    min-width: 2.9rem;
+    min-height: 2.9rem;
+  }
+}
+
+@media (min-width: 760px) {
+  .wrestling-shows-shell {
+    gap: clamp(0.86rem, 1.8vw, 1.14rem);
+  }
+
+  .wrestling-shows-tools {
+    width: min(100%, 58rem);
+    justify-self: center;
+    justify-content: end;
+  }
+
+  .wrestling-show-entry {
+    grid-template-columns: clamp(5.35rem, 8vw, 6.35rem) minmax(0, 1fr) 2rem;
+    min-height: clamp(8.15rem, 12vw, 9.4rem);
+    padding: clamp(0.62rem, 1.2vw, 0.82rem);
+  }
 }
 
 .about-shell {
