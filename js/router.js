@@ -50,6 +50,14 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestlingShows) {
     return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows };
   }
+  const wrestlingShowDetailPrefix = `${routePaths.wrestlingShows}/`;
+  if (routePath.startsWith(wrestlingShowDetailPrefix)) {
+    const routeParts = routePath.slice(wrestlingShowDetailPrefix.length).split("/");
+    if (routeParts.length === 1 && routeParts[0]) {
+      const showId = decodeRoutePart(routeParts[0]);
+      return { name: "wrestling-show-detail", showId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}` };
+    }
+  }
   if (routePath === routePaths.calendar) {
     return { name: "calendar", canonicalUrl: routePaths.calendar };
   }
@@ -181,6 +189,14 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling-shows") {
     showWrestlingShowsIndex();
+    return;
+  }
+
+  if (route.name === "wrestling-show-detail") {
+    showWrestlingShowDetail(route.showId);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
     return;
   }
 

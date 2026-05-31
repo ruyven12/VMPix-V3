@@ -7663,6 +7663,366 @@ img.archive-gallery-image {
   }
 }
 
+.wrestling-show-detail-shell {
+  --v3-card-accent: var(--accent-ring);
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: clamp(0.72rem, 2svh, 1rem);
+  padding:
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-top))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-right))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-bottom))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-left));
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 50%),
+    radial-gradient(ellipse at 50% 12%, rgba(247, 247, 242, 0.052), transparent min(42vw, 21rem)),
+    radial-gradient(ellipse at 50% 100%, rgba(213, 22, 34, 0.09), transparent min(58vw, 32rem)),
+    rgba(3, 3, 6, 0.64);
+  opacity: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: none;
+  scroll-padding-block: var(--shell-viewport-pad-block);
+  scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  transform: translate3d(0, 0.36rem, 0);
+  transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard),
+    visibility var(--motion-standard) var(--ease-standard);
+  visibility: hidden;
+}
+
+.wrestling-show-detail-shell::-webkit-scrollbar {
+  width: 0.42rem;
+}
+
+.wrestling-show-detail-shell::-webkit-scrollbar-track {
+  background: rgba(247, 247, 242, 0.07);
+}
+
+.wrestling-show-detail-shell::-webkit-scrollbar-thumb {
+  background: rgba(213, 22, 34, 0.42);
+}
+
+.wrestling-show-detail-shell::before {
+  position: absolute;
+  inset: var(--space-2);
+  z-index: 0;
+  content: "";
+  border: 1px solid rgba(213, 22, 34, 0.12);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, transparent 0 22%, rgba(247, 247, 242, 0.08) 50%, transparent 78%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(213, 22, 34, 0.09), transparent 48%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.wrestling-detail-back,
+.wrestling-detail-hero,
+.wrestling-detail-section,
+.wrestling-gallery-card {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.wrestling-detail-back,
+.wrestling-gallery-button {
+  appearance: none;
+  min-height: 2.85rem;
+  border-radius: var(--radius-sm);
+  color: rgba(247, 247, 242, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-detail-back {
+  justify-self: start;
+  padding: 0.6rem 0.72rem;
+  border: 1px solid rgba(213, 22, 34, 0.28);
+  background: rgba(213, 22, 34, 0.075);
+}
+
+.wrestling-detail-hero {
+  display: grid;
+  gap: clamp(0.68rem, 2.4vw, 1rem);
+  padding: clamp(0.58rem, 2.2vw, 0.82rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
+    linear-gradient(130deg, rgba(213, 22, 34, 0.08), transparent 54%),
+    rgba(7, 7, 10, 0.76);
+  overflow: hidden;
+}
+
+.wrestling-detail-poster {
+  position: relative;
+  width: min(100%, 18rem);
+  aspect-ratio: 2 / 3;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 247, 242, 0.13);
+  border-radius: calc(var(--radius-sm) - 0.08rem);
+  background:
+    linear-gradient(180deg, transparent 0 58%, rgba(1, 1, 3, 0.82)),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.34), transparent 56%),
+    linear-gradient(45deg, rgba(247, 247, 242, 0.11), transparent 48%),
+    rgba(16, 16, 19, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.34);
+  overflow: hidden;
+}
+
+.wrestling-detail-poster::before {
+  position: absolute;
+  inset: 9%;
+  content: "";
+  border: 1px solid rgba(247, 247, 242, 0.13);
+}
+
+.wrestling-detail-poster span {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(2rem, 13vw, 4rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-detail-meta {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(0.66rem, 2vw, 0.9rem);
+}
+
+.wrestling-detail-title,
+.wrestling-detail-section-title,
+.wrestling-match-type,
+.wrestling-match-title,
+.wrestling-gallery-title,
+.wrestling-gallery-count,
+.wrestling-detail-facts,
+.wrestling-detail-fact dt,
+.wrestling-detail-fact dd {
+  margin: 0;
+}
+
+.wrestling-detail-title {
+  color: var(--color-text);
+  font-size: clamp(1.7rem, 8.6vw, 3.7rem);
+  font-weight: 400;
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-detail-facts {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.wrestling-detail-fact {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(5.6rem, auto) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.44rem 0;
+  border-bottom: 1px solid rgba(247, 247, 242, 0.07);
+}
+
+.wrestling-detail-fact dt {
+  color: rgba(213, 22, 34, 0.76);
+  font-size: clamp(0.56rem, 2.25vw, 0.68rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-detail-fact dd {
+  color: rgba(247, 247, 242, 0.78);
+  font-size: clamp(0.66rem, 2.6vw, 0.82rem);
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-detail-section {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.52rem, 1.8vw, 0.72rem);
+}
+
+.wrestling-detail-section-title,
+.wrestling-gallery-title {
+  color: rgba(247, 247, 242, 0.9);
+  font-size: clamp(0.92rem, 3.4vw, 1.14rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-match-list {
+  display: grid;
+  gap: clamp(0.46rem, 1.5vw, 0.62rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wrestling-match-card {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  gap: 0.28rem;
+  padding: clamp(0.58rem, 2vw, 0.74rem);
+  border: 1px solid rgba(247, 247, 242, 0.09);
+  border-left-color: rgba(213, 22, 34, 0.32);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.07), transparent 44%),
+    rgba(7, 7, 10, 0.72);
+  overflow: hidden;
+}
+
+.wrestling-match-type {
+  color: rgba(213, 22, 34, 0.78);
+  font-size: clamp(0.56rem, 2.2vw, 0.68rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-match-title {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(0.74rem, 2.8vw, 0.92rem);
+  font-weight: 400;
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-gallery-card {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.58rem, 2vw, 0.82rem);
+  padding: clamp(0.66rem, 2.3vw, 0.9rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 62%),
+    linear-gradient(90deg, rgba(213, 22, 34, 0.08), transparent 54%),
+    rgba(7, 7, 10, 0.76);
+}
+
+.wrestling-gallery-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.34rem;
+}
+
+.wrestling-gallery-count {
+  color: rgba(247, 247, 242, 0.58);
+  font-size: clamp(0.68rem, 2.55vw, 0.82rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-gallery-button {
+  min-width: 8.6rem;
+  padding: 0.68rem 0.82rem;
+  border: 1px solid rgba(213, 22, 34, 0.32);
+  background: rgba(213, 22, 34, 0.085);
+}
+
+.wrestling-detail-back:hover,
+.wrestling-gallery-button:hover {
+  border-color: rgba(247, 247, 242, 0.2);
+  background: rgba(213, 22, 34, 0.12);
+}
+
+.wrestling-detail-back:focus-visible,
+.wrestling-gallery-button:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
+@media (max-width: 759px) {
+  .wrestling-show-detail-shell {
+    scrollbar-gutter: auto;
+  }
+}
+
+@media (max-width: 479px) {
+  .wrestling-show-detail-shell {
+    gap: 0.62rem;
+    padding:
+      max(0.58rem, env(safe-area-inset-top))
+      max(0.62rem, env(safe-area-inset-right))
+      max(0.62rem, env(safe-area-inset-bottom))
+      max(0.62rem, env(safe-area-inset-left));
+  }
+
+  .wrestling-detail-poster {
+    width: min(100%, 13.8rem);
+  }
+
+  .wrestling-detail-fact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.24rem;
+  }
+
+  .wrestling-gallery-card {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .wrestling-gallery-button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 760px) {
+  .wrestling-show-detail-shell {
+    gap: clamp(0.86rem, 1.8vw, 1.14rem);
+  }
+
+  .wrestling-detail-hero {
+    width: min(100%, 58rem);
+    justify-self: center;
+    grid-template-columns: minmax(12rem, 0.42fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .wrestling-detail-poster {
+    width: 100%;
+    min-height: clamp(18rem, 30vw, 24rem);
+  }
+}
+
 .about-shell {
   --v3-card-accent: var(--accent-shell);
   position: relative;
@@ -8277,6 +8637,7 @@ img.archive-gallery-image {
 .site-shell.is-music-nexus-view .music-nexus-shell,
 .site-shell.is-ring-archive-view .ring-archive-shell,
 .site-shell.is-wrestling-shows-view .wrestling-shows-shell,
+.site-shell.is-wrestling-show-detail-view .wrestling-show-detail-shell,
 .site-shell.is-about-view .about-shell,
 .site-shell.is-calendar-view .calendar-shell,
 .site-shell.is-contact-view .contact-shell {
