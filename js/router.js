@@ -47,6 +47,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
+  if (routePath === routePaths.wrestlingShows) {
+    return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows };
+  }
   if (routePath === routePaths.calendar) {
     return { name: "calendar", canonicalUrl: routePaths.calendar };
   }
@@ -173,6 +176,11 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling") {
     showRingArchive();
+    return;
+  }
+
+  if (route.name === "wrestling-shows") {
+    showWrestlingShowsIndex();
     return;
   }
 

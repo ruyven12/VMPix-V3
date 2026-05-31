@@ -119,12 +119,25 @@ function setHubChromeHidden(isHidden) {
   });
 }
 
+function setWrestlingShowsHidden(isHidden) {
+  if (!wrestlingShowsShell) {
+    return;
+  }
+
+  wrestlingShowsShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingShowsShell.setAttribute("inert", "");
+  } else {
+    wrestlingShowsShell.removeAttribute("inert");
+  }
+}
+
 function showPortfolioHubView() {
   if (!shell) {
     return;
   }
 
-  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view", "is-contact-view");
   if (modulePlaceholder) {
     modulePlaceholder.setAttribute("aria-hidden", "true");
     modulePlaceholder.setAttribute("inert", "");
@@ -137,6 +150,7 @@ function showPortfolioHubView() {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -160,7 +174,7 @@ function showMusicNexus(options = {}) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -177,6 +191,7 @@ function showMusicNexus(options = {}) {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -213,7 +228,7 @@ function showRingArchive() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -230,6 +245,7 @@ function showRingArchive() {
   }
   ringArchiveShell.setAttribute("aria-hidden", "false");
   ringArchiveShell.removeAttribute("inert");
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -251,13 +267,60 @@ function showRingArchive() {
   }
 }
 
+function showWrestlingShowsIndex() {
+  if (!shell || !portfolioHub || !wrestlingShowsShell) {
+    return;
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(false);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  setCurrentView("Event Archive");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
 function showAboutShell() {
   if (!shell || !aboutShell) {
     return;
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-about-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -278,6 +341,7 @@ function showAboutShell() {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   aboutShell.setAttribute("aria-hidden", "false");
   aboutShell.removeAttribute("inert");
   if (calendarShell) {
@@ -303,7 +367,7 @@ function showCalendarShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-calendar-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -324,6 +388,7 @@ function showCalendarShell() {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -349,7 +414,7 @@ function showContactShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view");
   shell.classList.add("has-entered-hub", "is-contact-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -370,6 +435,7 @@ function showContactShell() {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -396,7 +462,7 @@ function showModulePlaceholder(moduleName) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -413,6 +479,7 @@ function showModulePlaceholder(moduleName) {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -510,7 +577,7 @@ function showHomepage() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
@@ -532,6 +599,7 @@ function showHomepage() {
     ringArchiveShell.setAttribute("aria-hidden", "true");
     ringArchiveShell.setAttribute("inert", "");
   }
+  setWrestlingShowsHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -664,6 +732,11 @@ if (shell && startButton) {
   }
   if (ringArchiveBack) {
     ringArchiveBack.addEventListener("click", revealHub);
+  }
+  if (ringArchiveShows) {
+    ringArchiveShows.addEventListener("click", () => {
+      navigateToRoute(routePaths.wrestlingShows);
+    });
   }
   if (typeof initMusicModule === "function") {
     initMusicModule();

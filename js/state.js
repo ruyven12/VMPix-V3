@@ -32,6 +32,8 @@ const musicLandingRouteCards = document.querySelectorAll("[data-music-landing-ro
 const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
 const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
+const ringArchiveShows = document.querySelector("[data-ring-archive-shows]");
+const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
 const musicActivityPanel = document.querySelector("[data-music-activity-panel]");
 const musicActivityList = document.querySelector("[data-music-activity-list]");
 const musicBandsIndex = document.querySelector("[data-music-bands-index]");
@@ -418,6 +420,7 @@ const routePaths = {
   musicPeople: "/music/people",
   musicVenues: "/music/venues",
   wrestling: "/wrestling",
+  wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",
   contact: "/contact",
