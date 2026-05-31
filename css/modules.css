@@ -6644,6 +6644,7 @@ img.archive-gallery-image {
   max-height: 100%;
   max-width: 100%;
   display: grid;
+  grid-auto-rows: max-content;
   align-content: start;
   gap: 0.78rem;
   padding:
@@ -7130,6 +7131,7 @@ img.archive-gallery-image {
   min-height: 0;
   max-height: 100%;
   display: grid;
+  grid-auto-rows: max-content;
   align-content: start;
   gap: clamp(0.72rem, 2svh, 1rem);
   padding:
@@ -7511,28 +7513,6 @@ img.archive-gallery-image {
     scrollbar-gutter: auto;
   }
 
-  .wrestling-year-filter {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding: 0.08rem 0.08rem 0.42rem;
-    scroll-padding-inline: 0.08rem;
-    scrollbar-color: rgba(213, 22, 34, 0.32) rgba(247, 247, 242, 0.045);
-    scrollbar-width: thin;
-  }
-
-  .wrestling-year-filter::-webkit-scrollbar {
-    height: 0.32rem;
-  }
-
-  .wrestling-year-filter::-webkit-scrollbar-track {
-    background: rgba(247, 247, 242, 0.045);
-  }
-
-  .wrestling-year-filter::-webkit-scrollbar-thumb {
-    background: rgba(213, 22, 34, 0.32);
-  }
-
   .wrestling-shows-tools {
     width: min(100%, 58rem);
     justify-self: center;
@@ -7591,7 +7571,29 @@ img.archive-gallery-image {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 379px) {
+  .wrestling-year-filter {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0.08rem 0.08rem 0.42rem;
+    scroll-padding-inline: 0.08rem;
+    scrollbar-color: rgba(213, 22, 34, 0.32) rgba(247, 247, 242, 0.045);
+    scrollbar-width: thin;
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar {
+    height: 0.32rem;
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar-track {
+    background: rgba(247, 247, 242, 0.045);
+  }
+
+  .wrestling-year-filter::-webkit-scrollbar-thumb {
+    background: rgba(213, 22, 34, 0.32);
+  }
+
   .wrestling-shows-title {
     font-size: clamp(1.42rem, 8.4vw, 1.72rem);
   }
