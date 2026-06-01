@@ -7156,6 +7156,8 @@ img.archive-gallery-image {
   scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
   transform: translate3d(0, 0.36rem, 0);
   transition:
@@ -7244,6 +7246,7 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.64rem, 2.5vw, 0.76rem);
   line-height: 1.08;
+  touch-action: manipulation;
   text-transform: uppercase;
 }
 
@@ -7257,11 +7260,13 @@ img.archive-gallery-image {
 .wrestling-people-controls {
   display: grid;
   gap: clamp(0.54rem, 1.7vw, 0.72rem);
+  max-width: 100%;
 }
 
 .wrestling-people-search {
   display: grid;
   gap: 0.34rem;
+  min-width: 0;
 }
 
 .wrestling-people-search-label {
@@ -7283,6 +7288,8 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.88);
   font: inherit;
   font-size: clamp(0.76rem, 2.8vw, 0.88rem);
+  min-width: 0;
+  touch-action: manipulation;
 }
 
 .wrestling-people-search-input::placeholder {
@@ -7293,11 +7300,15 @@ img.archive-gallery-image {
   display: flex;
   flex-wrap: wrap;
   gap: 0.36rem;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: visible;
 }
 
 .wrestling-people-chip {
   appearance: none;
-  min-height: 2.72rem;
+  min-height: var(--tap-target);
+  min-width: max(var(--tap-target), 3.25rem);
   padding: 0.54rem 0.7rem;
   border: 1px solid rgba(247, 247, 242, 0.08);
   border-radius: var(--radius-sm);
@@ -7307,6 +7318,7 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.58rem, 2.35vw, 0.7rem);
   line-height: 1;
+  touch-action: manipulation;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -7345,6 +7357,7 @@ img.archive-gallery-image {
   font: inherit;
   overflow: hidden;
   text-align: left;
+  touch-action: manipulation;
 }
 
 .wrestling-person-card::before {
@@ -7419,6 +7432,7 @@ img.archive-gallery-image {
   font-size: clamp(0.88rem, 3.7vw, 1.1rem);
   line-height: 1.04;
   overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7428,6 +7442,7 @@ img.archive-gallery-image {
   font-size: clamp(0.6rem, 2.35vw, 0.72rem);
   line-height: 1.12;
   overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7453,6 +7468,7 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.52);
   font-size: clamp(0.54rem, 2.15vw, 0.64rem);
   line-height: 1;
+  white-space: nowrap;
   text-transform: uppercase;
 }
 
@@ -7500,6 +7516,7 @@ img.archive-gallery-image {
   width: min(100%, 13.6rem);
   justify-self: center;
   aspect-ratio: 4 / 5;
+  max-height: min(48svh, 22rem);
 }
 
 .wrestling-person-detail-photo span {
@@ -7518,6 +7535,7 @@ img.archive-gallery-image {
 .wrestling-person-detail-title {
   font-size: clamp(1.5rem, 7.6vw, 3.6rem);
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .wrestling-person-facts {
@@ -7625,6 +7643,7 @@ img.archive-gallery-image {
 .wrestling-event-history-open {
   justify-self: start;
   padding: 0.58rem 0.7rem;
+  white-space: nowrap;
 }
 
 .wrestling-event-history-open[aria-disabled="true"] {
@@ -7676,14 +7695,22 @@ img.archive-gallery-image {
   }
 
   .wrestling-person-card {
-    grid-template-columns: clamp(3.35rem, 15vw, 3.9rem) minmax(0, 1fr) 1rem;
+    grid-template-columns: clamp(3.18rem, 14vw, 3.72rem) minmax(0, 1fr) 0.95rem;
     gap: 0.42rem;
     min-height: 6rem;
     padding: 0.42rem;
   }
 
+  .wrestling-person-card-thumb {
+    align-self: start;
+  }
+
   .wrestling-person-card-stats {
     gap: 0.24rem;
+  }
+
+  .wrestling-person-card-stat {
+    padding-block: 0.24rem;
   }
 
   .wrestling-person-card-arrow {
@@ -7712,27 +7739,11 @@ img.archive-gallery-image {
   }
 
   .wrestling-people-chip-row {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.3rem;
-    scrollbar-color: rgba(213, 22, 34, 0.32) rgba(247, 247, 242, 0.045);
-    scrollbar-width: thin;
-  }
-
-  .wrestling-people-chip-row::-webkit-scrollbar {
-    height: 0.32rem;
-  }
-
-  .wrestling-people-chip-row::-webkit-scrollbar-track {
-    background: rgba(247, 247, 242, 0.045);
-  }
-
-  .wrestling-people-chip-row::-webkit-scrollbar-thumb {
-    background: rgba(213, 22, 34, 0.32);
+    gap: 0.3rem;
   }
 
   .wrestling-person-card {
-    grid-template-columns: 3.18rem minmax(0, 1fr) 0.9rem;
+    grid-template-columns: 3rem minmax(0, 1fr) 0.8rem;
     gap: 0.34rem;
     padding: 0.38rem;
   }
@@ -7743,6 +7754,7 @@ img.archive-gallery-image {
 
   .wrestling-person-card-stat {
     padding-inline: 0.3rem;
+    font-size: clamp(0.5rem, 2.35vw, 0.58rem);
   }
 
   .wrestling-person-detail-title {
