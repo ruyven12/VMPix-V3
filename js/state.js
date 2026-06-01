@@ -431,10 +431,10 @@ const wrestlingPeopleRows = [
 ];
 
 const wrestlingPersonEventHistoryRows = [
-  { eventName: "Gnomie and the Machine", eventDate: "February 21st, 2026", matchName: "Ace Romero vs Anthony Gangone", matchType: "Singles Match", photoCount: 48 },
-  { eventName: "Limitless Rumble '26", eventDate: "January 16th, 2026", matchName: "Limitless Rumble Entry Sequence", matchType: "Rumble Match", photoCount: 64 },
-  { eventName: "Massacre In Maine", eventDate: "November 8th, 2025", matchName: "Ace Romero and Andrew Palace vs Alexander James and AJ Cruise", matchType: "Tag Team Match", photoCount: 36 },
-  { eventName: "Never Enough", eventDate: "September 20th, 2025", matchName: "Ace Romero vs Alexander James", matchType: "Featured Match", photoCount: 42 },
+  { eventId: "gnomie-and-the-machine", matchId: "ace-romero-vs-anthony-gangone", eventName: "Gnomie and the Machine", eventDate: "February 21st, 2026", matchName: "Ace Romero vs Anthony Gangone", matchType: "Singles Match", photoCount: 48 },
+  { eventId: "limitless-rumble-26", matchId: "limitless-rumble-entry-sequence", eventName: "Limitless Rumble '26", eventDate: "January 16th, 2026", matchName: "Limitless Rumble Entry Sequence", matchType: "Rumble Match", photoCount: 64 },
+  { eventId: "massacre-in-maine", matchId: "ace-romero-and-andrew-palace-vs-alexander-james-and-aj-cruise", eventName: "Massacre In Maine", eventDate: "November 8th, 2025", matchName: "Ace Romero and Andrew Palace vs Alexander James and AJ Cruise", matchType: "Tag Team Match", photoCount: 36 },
+  { eventId: "never-enough", matchId: "ace-romero-vs-alexander-james", eventName: "Never Enough", eventDate: "September 20th, 2025", matchName: "Ace Romero vs Alexander James", matchType: "Featured Match", photoCount: 42 },
 ];
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");

@@ -105,6 +105,36 @@ async function expectTouchTargets(page, selector) {
   expect(offenders).toEqual([]);
 }
 
+test.describe("wrestling people route structure", () => {
+  test.use({ viewport: { width: 1366, height: 768 } });
+
+  test("Ring Archive, People Index, and Person Detail stay connected", async ({ page }) => {
+    await page.goto("/wrestling", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("[data-ring-archive-shell]")).toBeVisible();
+    await page.locator("[data-ring-archive-people]").click();
+    await expect(page).toHaveURL(/\/wrestling\/people$/);
+    await expect(page.locator("[data-wrestling-people-shell]")).toBeVisible();
+
+    await page.getByRole("button", { name: "Open Ace Romero" }).click();
+    await expect(page).toHaveURL(/\/wrestling\/people\/ace-romero$/);
+    await expect(page.locator("[data-wrestling-person-detail-shell]")).toBeVisible();
+
+    const openMatchButtons = page.locator(".wrestling-event-history-open");
+    await expect(openMatchButtons).toHaveCount(4);
+    await expect(openMatchButtons.first()).toBeDisabled();
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-event-id", "gnomie-and-the-machine");
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-id", "ace-romero-vs-anthony-gangone");
+
+    await page.getByRole("button", { name: "Back to People" }).click();
+    await expect(page).toHaveURL(/\/wrestling\/people$/);
+    await expect(page.locator("[data-wrestling-people-shell]")).toBeVisible();
+
+    await page.getByRole("button", { name: "Back to Ring Archive" }).click();
+    await expect(page).toHaveURL(/\/wrestling$/);
+    await expect(page.locator("[data-ring-archive-shell]")).toBeVisible();
+  });
+});
+
 for (const target of targets) {
   test.describe(`wrestling people responsive: ${target.name}`, () => {
     const useOptions = {
@@ -156,6 +186,7 @@ for (const target of targets) {
       await expect(shell.getByRole("heading", { name: "Ace Romero" })).toBeVisible();
       await expect(shell.getByText("EVENT HISTORY")).toBeVisible();
       await expect(shell.locator(".wrestling-event-history-row")).toHaveCount(4);
+      await expect(shell.locator(".wrestling-event-history-open").first()).toBeDisabled();
 
       await expectNoHorizontalOverflow(page);
       await expectNoHorizontalOverflow(page, "[data-wrestling-person-detail-shell]");

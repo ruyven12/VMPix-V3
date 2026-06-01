@@ -61,7 +61,6 @@ function createWrestlingPeopleCard(person) {
   card.className = "wrestling-person-card";
   card.type = "button";
   card.dataset.wrestlingPersonId = person.personId;
-  card.setAttribute("role", "listitem");
   card.setAttribute("aria-pressed", "false");
   card.setAttribute("aria-label", `Open ${person.name}`);
 
@@ -141,6 +140,8 @@ function createWrestlingPersonEventRow(eventRow) {
   const row = document.createElement("article");
   row.className = "wrestling-event-history-row";
   row.setAttribute("role", "listitem");
+  row.dataset.wrestlingEventId = eventRow.eventId;
+  row.dataset.wrestlingMatchId = eventRow.matchId;
 
   const eventBlock = document.createElement("div");
   eventBlock.className = "wrestling-event-history-event";
@@ -173,11 +174,11 @@ function createWrestlingPersonEventRow(eventRow) {
   const openButton = document.createElement("button");
   openButton.className = "wrestling-event-history-open";
   openButton.type = "button";
+  openButton.disabled = true;
   openButton.setAttribute("aria-disabled", "true");
+  openButton.dataset.wrestlingEventId = eventRow.eventId;
+  openButton.dataset.wrestlingMatchId = eventRow.matchId;
   openButton.textContent = "Open Match";
-  openButton.addEventListener("click", (event) => {
-    event.preventDefault();
-  });
 
   row.append(eventBlock, matchBlock, photoCount, openButton);
   return row;
