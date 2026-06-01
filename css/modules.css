@@ -8080,6 +8080,327 @@ img.archive-gallery-image {
   }
 }
 
+.wrestling-match-gallery-shell {
+  --v3-card-accent: var(--accent-ring);
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: clamp(0.68rem, 2svh, 1rem);
+  padding:
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-top))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-right))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-bottom))
+    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-left));
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 52%),
+    radial-gradient(ellipse at 50% 10%, rgba(247, 247, 242, 0.048), transparent min(42vw, 21rem)),
+    radial-gradient(ellipse at 50% 100%, rgba(213, 22, 34, 0.085), transparent min(58vw, 32rem)),
+    rgba(3, 3, 6, 0.64);
+  opacity: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: none;
+  scroll-padding-block: var(--shell-viewport-pad-block);
+  scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+  transform: translate3d(0, 0.36rem, 0);
+  transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard),
+    visibility var(--motion-standard) var(--ease-standard);
+  visibility: hidden;
+}
+
+.wrestling-match-gallery-shell::-webkit-scrollbar {
+  width: 0.42rem;
+}
+
+.wrestling-match-gallery-shell::-webkit-scrollbar-track {
+  background: rgba(247, 247, 242, 0.07);
+}
+
+.wrestling-match-gallery-shell::-webkit-scrollbar-thumb {
+  background: rgba(213, 22, 34, 0.42);
+}
+
+.wrestling-match-gallery-shell::before {
+  position: absolute;
+  inset: var(--space-2);
+  z-index: 0;
+  content: "";
+  border: 1px solid rgba(213, 22, 34, 0.11);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, transparent 0 22%, rgba(247, 247, 242, 0.075) 50%, transparent 78%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(213, 22, 34, 0.085), transparent 48%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.wrestling-match-gallery-back,
+.wrestling-match-gallery-header,
+.wrestling-match-gallery-meta,
+.wrestling-match-gallery-count,
+.wrestling-photo-grid {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.wrestling-match-gallery-back {
+  appearance: none;
+  justify-self: start;
+  min-height: max(2.85rem, 44px);
+  padding: 0.6rem 0.72rem;
+  border: 1px solid rgba(213, 22, 34, 0.28);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.075);
+  color: rgba(247, 247, 242, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-match-gallery-header {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.72rem, 2.5vw, 1rem);
+  padding: clamp(0.76rem, 2.6vw, 1.08rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
+    linear-gradient(130deg, rgba(213, 22, 34, 0.08), transparent 54%),
+    rgba(7, 7, 10, 0.76);
+  overflow: hidden;
+}
+
+.wrestling-match-gallery-kicker,
+.wrestling-match-gallery-title,
+.wrestling-match-gallery-meta,
+.wrestling-match-gallery-count,
+.wrestling-photo-grid {
+  margin: 0;
+}
+
+.wrestling-match-gallery-kicker {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.wrestling-match-gallery-kicker span,
+.wrestling-match-gallery-meta span {
+  color: rgba(213, 22, 34, 0.76);
+  font-size: clamp(0.56rem, 2.2vw, 0.68rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-match-gallery-kicker strong {
+  color: rgba(247, 247, 242, 0.78);
+  font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-match-gallery-title {
+  display: grid;
+  gap: 0.12em;
+  color: var(--color-text);
+  font-size: clamp(1.58rem, 8vw, 3.7rem);
+  font-weight: 400;
+  line-height: 0.96;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-match-gallery-title span:nth-child(2) {
+  color: rgba(213, 22, 34, 0.78);
+  font-size: 0.42em;
+  letter-spacing: 0;
+}
+
+.wrestling-match-gallery-meta {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  gap: 0.42rem;
+}
+
+.wrestling-match-gallery-meta div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(5.6rem, auto) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.44rem 0;
+  border-bottom: 1px solid rgba(247, 247, 242, 0.07);
+}
+
+.wrestling-match-gallery-meta strong {
+  color: rgba(247, 247, 242, 0.78);
+  font-size: clamp(0.66rem, 2.6vw, 0.82rem);
+  font-weight: 400;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-match-gallery-count {
+  width: min(100%, 58rem);
+  justify-self: center;
+  padding: clamp(0.7rem, 2.4vw, 0.94rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.08), transparent 50%),
+    rgba(7, 7, 10, 0.72);
+}
+
+.wrestling-match-gallery-count strong {
+  color: rgba(247, 247, 242, 0.88);
+  font-size: clamp(1.05rem, 4.2vw, 1.38rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-photo-grid {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.46rem, 1.7vw, 0.72rem);
+  padding: 0;
+  list-style: none;
+}
+
+.wrestling-photo-tile {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: end start;
+  padding: clamp(0.42rem, 1.7vw, 0.58rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, transparent 0 58%, rgba(1, 1, 3, 0.78)),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.22), transparent 56%),
+    linear-gradient(45deg, rgba(247, 247, 242, 0.08), transparent 48%),
+    rgba(16, 16, 19, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.32);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.wrestling-photo-tile::before {
+  position: absolute;
+  inset: 8%;
+  content: "";
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  pointer-events: none;
+}
+
+.wrestling-photo-tile::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  content: "";
+  background: linear-gradient(180deg, transparent, rgba(1, 1, 3, 0.68));
+  pointer-events: none;
+}
+
+.wrestling-photo-tile span {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.7);
+  font-size: clamp(0.64rem, 2.4vw, 0.78rem);
+  line-height: 1;
+}
+
+.wrestling-match-gallery-back:hover,
+.wrestling-photo-tile:hover {
+  border-color: rgba(247, 247, 242, 0.16);
+}
+
+.wrestling-match-gallery-back:focus-visible,
+.wrestling-photo-tile:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
+@media (max-width: 759px) {
+  .wrestling-match-gallery-shell {
+    scrollbar-gutter: auto;
+  }
+}
+
+@media (max-width: 479px) {
+  .wrestling-match-gallery-shell {
+    gap: 0.62rem;
+    padding:
+      max(0.58rem, env(safe-area-inset-top))
+      max(0.62rem, env(safe-area-inset-right))
+      max(0.62rem, env(safe-area-inset-bottom))
+      max(0.62rem, env(safe-area-inset-left));
+  }
+
+  .wrestling-match-gallery-meta div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.24rem;
+  }
+}
+
+@media (max-width: 379px) {
+  .wrestling-match-gallery-back {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .wrestling-match-gallery-header,
+  .wrestling-match-gallery-count {
+    padding: 0.56rem;
+  }
+
+  .wrestling-match-gallery-title {
+    font-size: clamp(1.34rem, 7.4vw, 1.72rem);
+  }
+
+  .wrestling-photo-grid {
+    gap: 0.4rem;
+  }
+}
+
+@media (min-width: 620px) {
+  .wrestling-photo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .wrestling-photo-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .about-shell {
   --v3-card-accent: var(--accent-shell);
   position: relative;
@@ -8695,6 +9016,7 @@ img.archive-gallery-image {
 .site-shell.is-ring-archive-view .ring-archive-shell,
 .site-shell.is-wrestling-shows-view .wrestling-shows-shell,
 .site-shell.is-wrestling-show-detail-view .wrestling-show-detail-shell,
+.site-shell.is-wrestling-match-gallery-view .wrestling-match-gallery-shell,
 .site-shell.is-about-view .about-shell,
 .site-shell.is-calendar-view .calendar-shell,
 .site-shell.is-contact-view .contact-shell {
