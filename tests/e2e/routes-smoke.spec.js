@@ -25,6 +25,8 @@ const routes = [
   { path: "/music/people/adam-begin", rail: "Person Detail", visibleShell: ".person-detail-screen", text: "Adam Begin" },
   { path: "/music/venues", rail: "Venues", visibleShell: "[data-music-nexus-landing]", text: "Music Locations" },
   { path: "/wrestling", rail: "Ring Archive", visibleShell: "[data-ring-archive-shell]" },
+  { path: "/wrestling/people", rail: "Wrestling People", visibleShell: "[data-wrestling-people-shell]", text: "WRESTLING PEOPLE" },
+  { path: "/wrestling/people/ace-romero", rail: "Person Detail", visibleShell: "[data-wrestling-person-detail-shell]", text: "EVENT HISTORY" },
   { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },

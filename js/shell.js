@@ -132,6 +132,32 @@ function setWrestlingShowsHidden(isHidden) {
   }
 }
 
+function setWrestlingPeopleHidden(isHidden) {
+  if (!wrestlingPeopleShell) {
+    return;
+  }
+
+  wrestlingPeopleShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingPeopleShell.setAttribute("inert", "");
+  } else {
+    wrestlingPeopleShell.removeAttribute("inert");
+  }
+}
+
+function setWrestlingPersonDetailHidden(isHidden) {
+  if (!wrestlingPersonDetailShell) {
+    return;
+  }
+
+  wrestlingPersonDetailShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingPersonDetailShell.setAttribute("inert", "");
+  } else {
+    wrestlingPersonDetailShell.removeAttribute("inert");
+  }
+}
+
 function setWrestlingShowDetailHidden(isHidden) {
   if (!wrestlingShowDetailShell) {
     return;
@@ -176,7 +202,7 @@ function showPortfolioHubView() {
     return;
   }
 
-  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   if (modulePlaceholder) {
     modulePlaceholder.setAttribute("aria-hidden", "true");
     modulePlaceholder.setAttribute("inert", "");
@@ -190,6 +216,8 @@ function showPortfolioHubView() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -216,7 +244,7 @@ function showMusicNexus(options = {}) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -234,6 +262,8 @@ function showMusicNexus(options = {}) {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -273,7 +303,7 @@ function showRingArchive() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -291,6 +321,8 @@ function showRingArchive() {
   ringArchiveShell.setAttribute("aria-hidden", "false");
   ringArchiveShell.removeAttribute("inert");
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -315,13 +347,123 @@ function showRingArchive() {
   }
 }
 
+function showWrestlingPeopleIndex() {
+  if (!shell || !portfolioHub || !wrestlingPeopleShell) {
+    return;
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-people-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(false);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  if (typeof renderWrestlingPeopleIndex === "function") {
+    renderWrestlingPeopleIndex();
+  }
+  setCurrentView("Wrestling People");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
+function showWrestlingPersonDetail(personId) {
+  if (!shell || !portfolioHub || !wrestlingPersonDetailShell) {
+    return;
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-person-detail-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(false);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  if (typeof renderWrestlingPersonDetailRoute === "function") {
+    renderWrestlingPersonDetailRoute(personId);
+  }
+  setCurrentView("Person Detail");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
 function showWrestlingShowsIndex() {
   if (!shell || !portfolioHub || !wrestlingShowsShell) {
     return;
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -341,6 +483,8 @@ function showWrestlingShowsIndex() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(false);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -371,7 +515,7 @@ function showWrestlingShowDetail() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-show-detail-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -391,6 +535,8 @@ function showWrestlingShowDetail() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(false);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -421,7 +567,7 @@ function showWrestlingMatchGallery() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-match-gallery-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -441,6 +587,8 @@ function showWrestlingMatchGallery() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(false);
   setWrestlingLightboxHidden(true);
@@ -499,7 +647,7 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-lightbox-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -519,6 +667,8 @@ function showWrestlingLightbox(showId, matchId, photoId) {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(false);
@@ -549,7 +699,7 @@ function showAboutShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-about-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -571,6 +721,8 @@ function showAboutShell() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -599,7 +751,7 @@ function showCalendarShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-calendar-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -621,6 +773,8 @@ function showCalendarShell() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -649,7 +803,7 @@ function showContactShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
   shell.classList.add("has-entered-hub", "is-contact-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -671,6 +825,8 @@ function showContactShell() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -700,7 +856,7 @@ function showModulePlaceholder(moduleName) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -718,6 +874,8 @@ function showModulePlaceholder(moduleName) {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -818,7 +976,7 @@ function showHomepage() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
@@ -841,6 +999,8 @@ function showHomepage() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -982,6 +1142,16 @@ if (shell && startButton) {
       navigateToRoute(routePaths.wrestlingShows);
     });
   }
+  if (ringArchivePeople) {
+    ringArchivePeople.addEventListener("click", () => {
+      navigateToRoute(routePaths.wrestlingPeople);
+    });
+  }
+  if (wrestlingPeopleBack) {
+    wrestlingPeopleBack.addEventListener("click", () => {
+      navigateToRoute(routePaths.wrestling);
+    });
+  }
   wrestlingShowEntries.forEach((entry) => {
     const showId = entry.dataset.wrestlingShowId;
     const showTitle = entry.querySelector(".wrestling-show-title")?.textContent?.trim();
@@ -1056,6 +1226,9 @@ if (shell && startButton) {
   }
   if (typeof initMusicModule === "function") {
     initMusicModule();
+  }
+  if (typeof initWrestlingPeopleModule === "function") {
+    initWrestlingPeopleModule();
   }
   syncRouteFromLocation({ historyState: window.history.state });
   window.addEventListener("popstate", (event) => {

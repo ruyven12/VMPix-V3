@@ -1301,11 +1301,11 @@
               <h4 class="ring-archive-card-title">Matches</h4>
               <p class="ring-archive-card-copy">Find Matches</p>
             </article>
-            <article class="ring-archive-card">
+            <button class="ring-archive-card ring-archive-card--button" type="button" data-ring-archive-people>
               <span class="ring-archive-card-index">03</span>
               <h4 class="ring-archive-card-title">People</h4>
               <p class="ring-archive-card-copy">Wrestlers &amp; Staff</p>
-            </article>
+            </button>
             <article class="ring-archive-card">
               <span class="ring-archive-card-index">04</span>
               <h4 class="ring-archive-card-title">Venues</h4>
@@ -1341,6 +1341,31 @@
             Back to Portfolio
           </button>
         </section>
+        <section class="wrestling-people-shell" aria-labelledby="wrestling-people-title" aria-hidden="true" inert data-wrestling-people-shell>
+          <header class="wrestling-people-header">
+            <h2 class="wrestling-people-title" id="wrestling-people-title">WRESTLING PEOPLE</h2>
+            <button class="wrestling-people-back" type="button" data-wrestling-people-back>
+              Back to Ring Archive
+            </button>
+          </header>
+
+          <section class="wrestling-people-controls" aria-label="Wrestling people placeholder controls">
+            <label class="wrestling-people-search">
+              <span class="wrestling-people-search-label">Search</span>
+              <input class="wrestling-people-search-input" type="search" placeholder="Search people" disabled>
+            </label>
+            <div class="wrestling-people-chip-row" aria-label="People categories">
+              <button class="wrestling-people-chip is-active" type="button" aria-pressed="true">All</button>
+              <button class="wrestling-people-chip" type="button" aria-pressed="false">Wrestlers</button>
+              <button class="wrestling-people-chip" type="button" aria-pressed="false">Referees</button>
+              <button class="wrestling-people-chip" type="button" aria-pressed="false">Managers</button>
+              <button class="wrestling-people-chip" type="button" aria-pressed="false">Commentators</button>
+            </div>
+          </section>
+
+          <div class="wrestling-people-list" role="list" aria-label="Wrestling people placeholder cards" data-wrestling-people-list></div>
+        </section>
+        <article class="wrestling-person-detail-shell" aria-labelledby="wrestling-person-detail-title" aria-hidden="true" inert data-wrestling-person-detail-shell></article>
         <section class="wrestling-shows-shell" aria-labelledby="wrestling-shows-title" aria-hidden="true" inert data-wrestling-shows-shell>
           <header class="wrestling-shows-header">
             <h2 class="wrestling-shows-title" id="wrestling-shows-title">EVENT ARCHIVE</h2>
@@ -1811,6 +1836,7 @@
 
   <script src="/js/state.js"></script>
   <script src="/modules/music.js"></script>
+  <script src="/modules/wrestling.js"></script>
   <script src="/js/router.js"></script>
   <script src="/js/shell.js"></script>
 </body>

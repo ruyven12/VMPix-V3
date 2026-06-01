@@ -47,6 +47,17 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
+  if (routePath === routePaths.wrestlingPeople) {
+    return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };
+  }
+  const wrestlingPersonDetailPrefix = `${routePaths.wrestlingPeople}/`;
+  if (routePath.startsWith(wrestlingPersonDetailPrefix)) {
+    const routeParts = routePath.slice(wrestlingPersonDetailPrefix.length).split("/");
+    if (routeParts.length === 1 && routeParts[0]) {
+      const personId = decodeRoutePart(routeParts[0]);
+      return { name: "wrestling-person-detail", personId, canonicalUrl: getWrestlingPersonRouteUrl(personId) };
+    }
+  }
   if (routePath === routePaths.wrestlingShows) {
     return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows };
   }
@@ -195,6 +206,19 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling") {
     showRingArchive();
+    return;
+  }
+
+  if (route.name === "wrestling-people") {
+    showWrestlingPeopleIndex();
+    return;
+  }
+
+  if (route.name === "wrestling-person-detail") {
+    showWrestlingPersonDetail(route.personId);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
     return;
   }
 

@@ -33,6 +33,11 @@ const musicNexusCards = document.querySelectorAll("[data-music-nexus-card]");
 const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
 const ringArchiveShows = document.querySelector("[data-ring-archive-shows]");
+const ringArchivePeople = document.querySelector("[data-ring-archive-people]");
+const wrestlingPeopleShell = document.querySelector("[data-wrestling-people-shell]");
+const wrestlingPeopleList = document.querySelector("[data-wrestling-people-list]");
+const wrestlingPeopleBack = document.querySelector("[data-wrestling-people-back]");
+const wrestlingPersonDetailShell = document.querySelector("[data-wrestling-person-detail-shell]");
 const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
 const wrestlingShowEntries = document.querySelectorAll("[data-wrestling-show-id]");
 const wrestlingShowDetailShell = document.querySelector("[data-wrestling-show-detail-shell]");
@@ -170,6 +175,7 @@ let bandsIndexReturnUrl = "/music/bands";
 let activeMusicPeoplePage = 1;
 let activeMusicPeopleId = "";
 let activeMusicPersonDetailId = "";
+let activeWrestlingPersonId = "";
 let activeMusicBand = null;
 let activeSetRow = null;
 let isSetDetailOpen = false;
@@ -415,6 +421,22 @@ const musicPersonDetailStateCopy = {
   },
 };
 
+const wrestlingPeopleRows = [
+  { personId: "ace-romero", name: "Ace Romero", aliases: ["Acey Baby", "The Big Boofa"], role: "Wrestler", factionTeam: "The Mane Event", debutYear: "2010", matches: 42, photos: 618, thumb: "AR" },
+  { personId: "adam-christopher", name: "Adam Christopher", aliases: ["A. Christopher"], role: "Referee", factionTeam: "Official Crew", debutYear: "2018", matches: 96, photos: 184, thumb: "AC" },
+  { personId: "aj-cruise", name: "AJ Cruise", aliases: ["A.J. Cruise"], role: "Wrestler", factionTeam: "Cruise Control", debutYear: "2016", matches: 28, photos: 312, thumb: "AJ" },
+  { personId: "alexander-james", name: "Alexander James", aliases: ["The Crown Jewel"], role: "Wrestler", factionTeam: "The Embassy", debutYear: "2012", matches: 35, photos: 407, thumb: "AJ" },
+  { personId: "andrew-palace", name: "Andrew Palace", aliases: ["The King Of The North"], role: "Wrestler", factionTeam: "Palace Guard", debutYear: "2014", matches: 31, photos: 366, thumb: "AP" },
+  { personId: "anthony-gangone", name: "Anthony Gangone", aliases: ["The Rogue"], role: "Wrestler", factionTeam: "The Gangone Collective", debutYear: "2013", matches: 39, photos: 452, thumb: "AG" },
+];
+
+const wrestlingPersonEventHistoryRows = [
+  { eventName: "Gnomie and the Machine", eventDate: "February 21st, 2026", matchName: "Ace Romero vs Anthony Gangone", matchType: "Singles Match", photoCount: 48 },
+  { eventName: "Limitless Rumble '26", eventDate: "January 16th, 2026", matchName: "Limitless Rumble Entry Sequence", matchType: "Rumble Match", photoCount: 64 },
+  { eventName: "Massacre In Maine", eventDate: "November 8th, 2025", matchName: "Ace Romero and Andrew Palace vs Alexander James and AJ Cruise", matchType: "Tag Team Match", photoCount: 36 },
+  { eventName: "Never Enough", eventDate: "September 20th, 2025", matchName: "Ace Romero vs Alexander James", matchType: "Featured Match", photoCount: 42 },
+];
+
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [
   ["-4.8rem", "-5.2rem"],
@@ -431,6 +453,7 @@ const routePaths = {
   musicPeople: "/music/people",
   musicVenues: "/music/venues",
   wrestling: "/wrestling",
+  wrestlingPeople: "/wrestling/people",
   wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",
