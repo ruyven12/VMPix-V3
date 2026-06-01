@@ -675,7 +675,7 @@ function showWrestlingShowsIndex() {
   }
 }
 
-function showWrestlingShowDetail() {
+function showWrestlingShowDetail(showId = "warzone-26") {
   if (!shell || !portfolioHub || !wrestlingShowDetailShell) {
     return;
   }
@@ -720,6 +720,9 @@ function showWrestlingShowDetail() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  if (typeof updateWrestlingShowDetailRelationshipHooks === "function") {
+    updateWrestlingShowDetailRelationshipHooks(showId);
+  }
   setCurrentView("Show Detail");
   setActiveGlobalNav("portfolio");
   if (startButton) {
@@ -728,7 +731,7 @@ function showWrestlingShowDetail() {
   }
 }
 
-function showWrestlingMatchGallery() {
+function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richardson-vs-bear-bronson") {
   if (!shell || !portfolioHub || !wrestlingMatchGalleryShell) {
     return;
   }
@@ -773,6 +776,9 @@ function showWrestlingMatchGallery() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  if (typeof updateWrestlingMatchGalleryRelationshipHooks === "function") {
+    updateWrestlingMatchGalleryRelationshipHooks(showId, matchId);
+  }
   setCurrentView("Match Gallery");
   setActiveGlobalNav("portfolio");
   if (startButton) {
@@ -795,7 +801,16 @@ function getWrestlingPhotoNumber(photoId) {
 }
 
 function navigateToWrestlingPhoto(photoNumber) {
-  navigateToRoute(`${routePaths.wrestlingShows}/warzone-26/match/daron-richardson-vs-bear-bronson/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
+  const showId = wrestlingLightboxShell?.dataset.wrestlingShowId ||
+    wrestlingLightboxShell?.dataset.showId ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
+    "warzone-26";
+  const matchId = wrestlingLightboxShell?.dataset.wrestlingMatchId ||
+    wrestlingLightboxShell?.dataset.matchId ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
+    "daron-richardson-vs-bear-bronson";
+
+  navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
 }
 
 function showWrestlingLightbox(showId, matchId, photoId) {
@@ -804,14 +819,23 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   }
 
   const photoNumber = getWrestlingPhotoNumber(photoId);
-  wrestlingLightboxShell.dataset.showId = showId || "warzone-26";
-  wrestlingLightboxShell.dataset.matchId = matchId || "daron-richardson-vs-bear-bronson";
+  const activeShowId = showId || "warzone-26";
+  const activeMatchId = matchId || "daron-richardson-vs-bear-bronson";
+  const activePhotoId = getWrestlingPhotoIdFromNumber(photoNumber);
+  wrestlingLightboxShell.dataset.showId = activeShowId;
+  wrestlingLightboxShell.dataset.matchId = activeMatchId;
+  wrestlingLightboxShell.dataset.wrestlingShowId = activeShowId;
+  wrestlingLightboxShell.dataset.wrestlingMatchId = activeMatchId;
+  wrestlingLightboxShell.dataset.wrestlingPhotoId = activePhotoId;
   wrestlingLightboxShell.dataset.photoNumber = String(photoNumber);
   if (wrestlingLightboxCounter) {
     wrestlingLightboxCounter.textContent = `${photoNumber} / 48`;
   }
   if (wrestlingLightboxPhotoNumber) {
-    wrestlingLightboxPhotoNumber.textContent = getWrestlingPhotoIdFromNumber(photoNumber);
+    wrestlingLightboxPhotoNumber.textContent = activePhotoId;
+  }
+  if (typeof updateWrestlingLightboxRelationshipHooks === "function") {
+    updateWrestlingLightboxRelationshipHooks(activeShowId, activeMatchId, activePhotoId);
   }
 
   window.clearTimeout(activationTimer);
@@ -1363,14 +1387,23 @@ if (shell && startButton) {
   }
   if (wrestlingMatchGalleryBack) {
     wrestlingMatchGalleryBack.addEventListener("click", () => {
-      navigateToRoute(`${routePaths.wrestlingShows}/warzone-26`);
+      const showId = wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
+        wrestlingMatchGalleryShell?.dataset.showId ||
+        "warzone-26";
+      navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}`);
     });
   }
   wrestlingPhotoTiles.forEach((tile) => {
     const photoId = tile.dataset.wrestlingPhotoId;
     tile.addEventListener("click", () => {
       if (photoId) {
-        navigateToRoute(`${routePaths.wrestlingShows}/warzone-26/match/daron-richardson-vs-bear-bronson/photo/${encodeURIComponent(photoId)}`);
+        const showId = tile.dataset.wrestlingShowId ||
+          wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
+          "warzone-26";
+        const matchId = tile.dataset.wrestlingMatchId ||
+          wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
+          "daron-richardson-vs-bear-bronson";
+        navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}`);
       }
     });
     tile.addEventListener("keydown", (event) => {
