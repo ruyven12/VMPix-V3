@@ -172,6 +172,10 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof setActiveGlobalNavForRoute === "function") {
+    setActiveGlobalNavForRoute(route.name);
+  }
+
   if (route.name === "home") {
     showHomepage();
     return;

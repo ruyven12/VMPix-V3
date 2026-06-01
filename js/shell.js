@@ -10,6 +10,76 @@ function setCurrentView(viewName) {
   }
 }
 
+function getShellRouteMeta(routeId) {
+  return shellRouteRegistryById.get(routeId) || null;
+}
+
+function createGlobalMenuButton(routeMeta) {
+  const button = document.createElement("button");
+  const buttonClasses = ["v3-card", "v3-card--mini", "global-menu-button"];
+
+  if (!routeMeta.futurePlaceholder && routeMeta.route) {
+    buttonClasses.push("v3-card--interactive");
+  }
+  if (routeMeta.drawerVariant) {
+    buttonClasses.push(`global-menu-button--${routeMeta.drawerVariant}`);
+  }
+
+  button.className = buttonClasses.join(" ");
+  button.type = "button";
+  button.dataset.globalNavTarget = routeMeta.id;
+  button.dataset.globalNavModuleType = routeMeta.moduleType;
+  button.dataset.globalNavParent = routeMeta.parentSection;
+  button.dataset.globalNavBreadcrumb = routeMeta.breadcrumbLabel;
+  button.dataset.globalNavBottomRail = String(Boolean(routeMeta.bottomRailEligible));
+  if (routeMeta.route) {
+    button.dataset.globalNavRoute = routeMeta.route;
+  }
+  if (routeMeta.futurePlaceholder || !routeMeta.route) {
+    button.setAttribute("aria-disabled", "true");
+  }
+  button.textContent = routeMeta.label;
+
+  return button;
+}
+
+function renderGlobalMenu() {
+  if (!globalMenuActions) {
+    return;
+  }
+
+  globalMenuActions.replaceChildren();
+  shellDrawerGroups.forEach((group) => {
+    const groupRoutes = shellRouteRegistry.filter((routeMeta) => routeMeta.drawerGroup === group.id);
+    if (groupRoutes.length === 0) {
+      return;
+    }
+
+    const section = document.createElement("section");
+    const titleId = `global-menu-${group.id}-title`;
+    section.className = "global-menu-group";
+    section.setAttribute("aria-labelledby", titleId);
+
+    const title = document.createElement("h3");
+    title.className = "global-menu-section-title";
+    title.id = titleId;
+    title.textContent = group.label;
+
+    const list = document.createElement("div");
+    list.className = group.id === "future"
+      ? "global-menu-list global-menu-list--future"
+      : "global-menu-list";
+    groupRoutes.forEach((routeMeta) => {
+      list.append(createGlobalMenuButton(routeMeta));
+    });
+
+    section.append(title, list);
+    globalMenuActions.append(section);
+  });
+
+  globalNavButtons = document.querySelectorAll("[data-global-nav-target]");
+}
+
 function setActiveGlobalNav(targetName) {
   globalNavButtons.forEach((button) => {
     const isCurrent = button.dataset.globalNavTarget === targetName;
@@ -19,6 +89,10 @@ function setActiveGlobalNav(targetName) {
       button.removeAttribute("aria-current");
     }
   });
+}
+
+function setActiveGlobalNavForRoute(routeName) {
+  setActiveGlobalNav(routeNameToGlobalNavTarget[routeName] || "home");
 }
 
 function setSpotlight(moduleName) {
@@ -1226,9 +1300,10 @@ function showHomepage() {
 
 function handleGlobalMenuAction(event) {
   const button = event.currentTarget;
-  const navRoute = button.dataset.globalNavRoute;
+  const routeMeta = getShellRouteMeta(button.dataset.globalNavTarget);
+  const navRoute = routeMeta?.route || button.dataset.globalNavRoute;
 
-  if (button.getAttribute("aria-disabled") === "true") {
+  if (button.getAttribute("aria-disabled") === "true" || routeMeta?.futurePlaceholder) {
     return;
   }
 
@@ -1291,6 +1366,7 @@ function activatePortal() {
 }
 
 if (shell && startButton) {
+  renderGlobalMenu();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", () => {
