@@ -27,6 +27,7 @@ const routes = [
   { path: "/wrestling", rail: "Ring Archive", visibleShell: "[data-ring-archive-shell]" },
   { path: "/wrestling/people", rail: "Wrestling People", visibleShell: "[data-wrestling-people-shell]", text: "WRESTLING PEOPLE" },
   { path: "/wrestling/people/ace-romero", rail: "Person Detail", visibleShell: "[data-wrestling-person-detail-shell]", text: "EVENT HISTORY" },
+  { path: "/wrestling/venues", rail: "Wrestling Venues", visibleShell: "[data-wrestling-venues-shell]", text: "WRESTLING VENUES" },
   { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },

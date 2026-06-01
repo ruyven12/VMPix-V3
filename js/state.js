@@ -34,10 +34,14 @@ const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
 const ringArchiveShows = document.querySelector("[data-ring-archive-shows]");
 const ringArchivePeople = document.querySelector("[data-ring-archive-people]");
+const ringArchiveVenues = document.querySelector("[data-ring-archive-venues]");
 const wrestlingPeopleShell = document.querySelector("[data-wrestling-people-shell]");
 const wrestlingPeopleList = document.querySelector("[data-wrestling-people-list]");
 const wrestlingPeopleBack = document.querySelector("[data-wrestling-people-back]");
 const wrestlingPersonDetailShell = document.querySelector("[data-wrestling-person-detail-shell]");
+const wrestlingVenuesShell = document.querySelector("[data-wrestling-venues-shell]");
+const wrestlingVenuesList = document.querySelector("[data-wrestling-venues-list]");
+const wrestlingVenuesBack = document.querySelector("[data-wrestling-venues-back]");
 const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
 const wrestlingShowEntries = document.querySelectorAll("[data-wrestling-show-id]");
 const wrestlingShowDetailShell = document.querySelector("[data-wrestling-show-detail-shell]");
@@ -437,6 +441,15 @@ const wrestlingPersonEventHistoryRows = [
   { eventId: "never-enough", matchId: "ace-romero-vs-alexander-james", eventName: "Never Enough", eventDate: "September 20th, 2025", matchName: "Ace Romero vs Alexander James", matchType: "Featured Match", photoCount: 42 },
 ];
 
+const wrestlingVenueRows = [
+  { venueId: "portland-expo", name: "Portland Expo", city: "Portland", state: "ME", eventCount: 24, photoCount: 1840, imageLabel: "PX" },
+  { venueId: "westbrook-armory", name: "Westbrook Armory", city: "Westbrook", state: "ME", eventCount: 18, photoCount: 1296, imageLabel: "WA" },
+  { venueId: "portland-club", name: "Portland Club", city: "Portland", state: "ME", eventCount: 12, photoCount: 864, imageLabel: "PC" },
+  { venueId: "auburn-hall", name: "Auburn Hall", city: "Auburn", state: "ME", eventCount: 9, photoCount: 612, imageLabel: "AH" },
+  { venueId: "cross-insurance-center", name: "Cross Insurance Center", city: "Bangor", state: "ME", eventCount: 7, photoCount: 540, imageLabel: "CI" },
+  { venueId: "bissell-brothers-brewing-co", name: "Bissell Brothers Brewing Co.", city: "Portland", state: "ME", eventCount: 5, photoCount: 386, imageLabel: "BB" },
+];
+
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [
   ["-4.8rem", "-5.2rem"],
@@ -454,6 +467,7 @@ const routePaths = {
   musicVenues: "/music/venues",
   wrestling: "/wrestling",
   wrestlingPeople: "/wrestling/people",
+  wrestlingVenues: "/wrestling/venues",
   wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",

@@ -1306,11 +1306,11 @@
               <h4 class="ring-archive-card-title">People</h4>
               <p class="ring-archive-card-copy">Wrestlers &amp; Staff</p>
             </button>
-            <article class="ring-archive-card">
+            <button class="ring-archive-card ring-archive-card--button" type="button" data-ring-archive-venues>
               <span class="ring-archive-card-index">04</span>
               <h4 class="ring-archive-card-title">Venues</h4>
               <p class="ring-archive-card-copy">Ring Locations</p>
-            </article>
+            </button>
           </section>
 
           <section class="ring-archive-activity" aria-labelledby="ring-activity-title">
@@ -1366,6 +1366,31 @@
           <div class="wrestling-people-list" role="list" aria-label="Wrestling people placeholder cards" data-wrestling-people-list></div>
         </section>
         <article class="wrestling-person-detail-shell" aria-labelledby="wrestling-person-detail-title" aria-hidden="true" inert data-wrestling-person-detail-shell></article>
+        <section class="wrestling-venues-shell" aria-labelledby="wrestling-venues-title" aria-hidden="true" inert data-wrestling-venues-shell>
+          <header class="wrestling-venues-header">
+            <h2 class="wrestling-venues-title" id="wrestling-venues-title">WRESTLING VENUES</h2>
+            <button class="wrestling-venues-back" type="button" data-wrestling-venues-back>
+              Back to Ring Archive
+            </button>
+          </header>
+
+          <section class="wrestling-venues-controls" aria-label="Wrestling venues placeholder controls">
+            <label class="wrestling-venues-search">
+              <span class="wrestling-venues-search-label">Search</span>
+              <input class="wrestling-venues-search-input" type="search" placeholder="Search venues" autocomplete="off">
+            </label>
+            <div class="wrestling-venues-chip-row" aria-label="Venue locations">
+              <button class="wrestling-venues-chip is-active" type="button" aria-pressed="true">All</button>
+              <button class="wrestling-venues-chip" type="button" aria-pressed="false">Maine</button>
+              <button class="wrestling-venues-chip" type="button" aria-pressed="false">Portland</button>
+              <button class="wrestling-venues-chip" type="button" aria-pressed="false">Westbrook</button>
+              <button class="wrestling-venues-chip" type="button" aria-pressed="false">Auburn</button>
+              <button class="wrestling-venues-chip" type="button" aria-pressed="false">Bangor</button>
+            </div>
+          </section>
+
+          <div class="wrestling-venues-list" role="list" aria-label="Wrestling venues placeholder cards" data-wrestling-venues-list></div>
+        </section>
         <section class="wrestling-shows-shell" aria-labelledby="wrestling-shows-title" aria-hidden="true" inert data-wrestling-shows-shell>
           <header class="wrestling-shows-header">
             <h2 class="wrestling-shows-title" id="wrestling-shows-title">EVENT ARCHIVE</h2>

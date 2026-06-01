@@ -25,6 +25,23 @@ function findWrestlingPersonById(personId) {
   return wrestlingPeopleRows.find((person) => person.personId === normalizedPersonId) || wrestlingPeopleRows[0];
 }
 
+function normalizeWrestlingVenueId(venueId) {
+  return String(venueId || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getWrestlingVenueRouteUrl(venueId) {
+  const fallbackId = wrestlingVenueRows[0]?.venueId || "";
+  const normalizedVenueId = normalizeWrestlingVenueId(venueId) || fallbackId;
+  return normalizedVenueId
+    ? `${routePaths.wrestlingVenues}/${encodeURIComponent(normalizedVenueId)}`
+    : routePaths.wrestlingVenues;
+}
+
 function formatWrestlingCount(count, label) {
   return `${Number(count).toLocaleString()} ${label}`;
 }
@@ -139,6 +156,86 @@ function renderWrestlingPeopleIndex() {
     wrestlingPeopleList.append(createWrestlingPeopleCard(person));
   });
   setActiveWrestlingPeopleCard();
+}
+
+function getWrestlingVenueCardLabel(venue) {
+  return [
+    `${venue.name} venue detail placeholder`,
+    `${venue.city}, ${venue.state}`,
+    formatWrestlingCount(venue.eventCount, "Events"),
+    formatWrestlingCount(venue.photoCount, "Photos"),
+  ].filter(Boolean).join(", ");
+}
+
+function createWrestlingVenueStat(label, value) {
+  const stat = document.createElement("span");
+  stat.className = "wrestling-venue-card-stat";
+
+  const statValue = document.createElement("strong");
+  statValue.textContent = Number(value).toLocaleString();
+
+  const statLabel = document.createElement("span");
+  statLabel.textContent = label;
+
+  stat.append(statValue, statLabel);
+  return stat;
+}
+
+function createWrestlingVenueCard(venue) {
+  const card = document.createElement("article");
+  card.className = "wrestling-venue-card";
+  card.setAttribute("role", "listitem");
+  card.setAttribute("aria-label", getWrestlingVenueCardLabel(venue));
+  card.dataset.wrestlingVenueId = venue.venueId;
+  card.dataset.wrestlingVenueRoute = getWrestlingVenueRouteUrl(venue.venueId);
+
+  const media = document.createElement("div");
+  media.className = "wrestling-venue-card-media";
+  media.setAttribute("role", "img");
+  media.setAttribute("aria-label", `${venue.name} venue image placeholder`);
+
+  const mediaLabel = document.createElement("span");
+  mediaLabel.setAttribute("aria-hidden", "true");
+  mediaLabel.textContent = venue.imageLabel || venue.name.slice(0, 2).toUpperCase();
+  media.append(mediaLabel);
+
+  const body = document.createElement("div");
+  body.className = "wrestling-venue-card-body";
+
+  const name = document.createElement("h3");
+  name.className = "wrestling-venue-card-name";
+  name.textContent = venue.name;
+
+  const location = document.createElement("p");
+  location.className = "wrestling-venue-card-location";
+  location.textContent = `${venue.city}, ${venue.state}`;
+
+  const stats = document.createElement("div");
+  stats.className = "wrestling-venue-card-stats";
+  stats.append(
+    createWrestlingVenueStat("Events", venue.eventCount),
+    createWrestlingVenueStat("Photos", venue.photoCount)
+  );
+
+  const action = document.createElement("span");
+  action.className = "wrestling-venue-card-action";
+  action.setAttribute("aria-hidden", "true");
+  action.textContent = "Detail >";
+
+  body.append(name, location, stats, action);
+  card.append(media, body);
+  return card;
+}
+
+function renderWrestlingVenuesIndex() {
+  if (!wrestlingVenuesList) {
+    return;
+  }
+
+  wrestlingVenuesList.replaceChildren();
+  wrestlingVenueRows.forEach((venue) => {
+    wrestlingVenuesList.append(createWrestlingVenueCard(venue));
+  });
 }
 
 function createWrestlingPersonMeta(label, value) {
@@ -293,4 +390,5 @@ function renderWrestlingPersonDetailRoute(personId) {
 
 function initWrestlingPeopleModule() {
   renderWrestlingPeopleIndex();
+  renderWrestlingVenuesIndex();
 }

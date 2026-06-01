@@ -158,6 +158,22 @@ function setWrestlingPersonDetailHidden(isHidden) {
   }
 }
 
+function setWrestlingVenuesHidden(isHidden) {
+  if (!wrestlingVenuesShell) {
+    return;
+  }
+
+  if (shell && isHidden) {
+    shell.classList.remove("is-wrestling-venues-view");
+  }
+  wrestlingVenuesShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingVenuesShell.setAttribute("inert", "");
+  } else {
+    wrestlingVenuesShell.removeAttribute("inert");
+  }
+}
+
 function setWrestlingShowDetailHidden(isHidden) {
   if (!wrestlingShowDetailShell) {
     return;
@@ -218,6 +234,7 @@ function showPortfolioHubView() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -264,6 +281,7 @@ function showMusicNexus(options = {}) {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -323,6 +341,7 @@ function showRingArchive() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -375,6 +394,7 @@ function showWrestlingPeopleIndex() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(false);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -433,6 +453,7 @@ function showWrestlingPersonDetail(personId) {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(false);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -456,6 +477,65 @@ function showWrestlingPersonDetail(personId) {
     wrestlingPersonDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Person Detail");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
+function showWrestlingVenuesIndex() {
+  if (!shell || !portfolioHub || !wrestlingVenuesShell) {
+    return;
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(false);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  if (typeof renderWrestlingVenuesIndex === "function") {
+    renderWrestlingVenuesIndex();
+  }
+  if (typeof wrestlingVenuesShell.scrollTo === "function") {
+    wrestlingVenuesShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+  setCurrentView("Wrestling Venues");
   setActiveGlobalNav("portfolio");
   if (startButton) {
     startButton.disabled = true;
@@ -491,6 +571,7 @@ function showWrestlingShowsIndex() {
   setWrestlingShowsHidden(false);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -543,6 +624,7 @@ function showWrestlingShowDetail() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(false);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -595,6 +677,7 @@ function showWrestlingMatchGallery() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(false);
   setWrestlingLightboxHidden(true);
@@ -675,6 +758,7 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(false);
@@ -729,6 +813,7 @@ function showAboutShell() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -781,6 +866,7 @@ function showCalendarShell() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -833,6 +919,7 @@ function showContactShell() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -882,6 +969,7 @@ function showModulePlaceholder(moduleName) {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -1007,6 +1095,7 @@ function showHomepage() {
   setWrestlingShowsHidden(true);
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -1153,8 +1242,18 @@ if (shell && startButton) {
       navigateToRoute(routePaths.wrestlingPeople);
     });
   }
+  if (ringArchiveVenues) {
+    ringArchiveVenues.addEventListener("click", () => {
+      navigateToRoute(routePaths.wrestlingVenues);
+    });
+  }
   if (wrestlingPeopleBack) {
     wrestlingPeopleBack.addEventListener("click", () => {
+      navigateToRoute(routePaths.wrestling);
+    });
+  }
+  if (wrestlingVenuesBack) {
+    wrestlingVenuesBack.addEventListener("click", () => {
       navigateToRoute(routePaths.wrestling);
     });
   }
