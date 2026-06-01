@@ -29,6 +29,17 @@ function formatWrestlingCount(count, label) {
   return `${Number(count).toLocaleString()} ${label}`;
 }
 
+function getWrestlingPeopleCardLabel(person) {
+  return [
+    person.name,
+    person.role,
+    person.factionTeam,
+    formatWrestlingCount(person.matches, "Matches"),
+    formatWrestlingCount(person.photos, "Photos"),
+    "Open profile",
+  ].filter(Boolean).join(", ");
+}
+
 function setActiveWrestlingPeopleCard(personId = activeWrestlingPersonId) {
   if (!wrestlingPeopleList) {
     return;
@@ -62,12 +73,12 @@ function createWrestlingPeopleCard(person) {
   card.type = "button";
   card.dataset.wrestlingPersonId = person.personId;
   card.setAttribute("aria-pressed", "false");
-  card.setAttribute("aria-label", `Open ${person.name}`);
+  card.setAttribute("aria-label", getWrestlingPeopleCardLabel(person));
 
   const thumb = document.createElement("span");
   thumb.className = "wrestling-person-card-thumb";
   thumb.setAttribute("aria-hidden", "true");
-  thumb.textContent = person.thumb;
+  thumb.textContent = person.thumb || person.name.slice(0, 2).toUpperCase();
 
   const body = document.createElement("span");
   body.className = "wrestling-person-card-body";
@@ -86,12 +97,17 @@ function createWrestlingPeopleCard(person) {
 
   const stats = document.createElement("span");
   stats.className = "wrestling-person-card-stats";
+  stats.setAttribute("aria-hidden", "true");
   stats.append(
     createWrestlingPeopleStat("Matches", person.matches),
     createWrestlingPeopleStat("Photos", person.photos)
   );
 
-  body.append(name, meta, faction, stats);
+  body.append(name, meta);
+  if (person.factionTeam) {
+    body.append(faction);
+  }
+  body.append(stats);
 
   const arrow = document.createElement("span");
   arrow.className = "wrestling-person-card-arrow";
