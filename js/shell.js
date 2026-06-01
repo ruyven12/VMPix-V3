@@ -158,12 +158,25 @@ function setWrestlingMatchGalleryHidden(isHidden) {
   }
 }
 
+function setWrestlingLightboxHidden(isHidden) {
+  if (!wrestlingLightboxShell) {
+    return;
+  }
+
+  wrestlingLightboxShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingLightboxShell.setAttribute("inert", "");
+  } else {
+    wrestlingLightboxShell.removeAttribute("inert");
+  }
+}
+
 function showPortfolioHubView() {
   if (!shell) {
     return;
   }
 
-  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   if (modulePlaceholder) {
     modulePlaceholder.setAttribute("aria-hidden", "true");
     modulePlaceholder.setAttribute("inert", "");
@@ -179,6 +192,7 @@ function showPortfolioHubView() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -202,7 +216,7 @@ function showMusicNexus(options = {}) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -222,6 +236,7 @@ function showMusicNexus(options = {}) {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -258,7 +273,7 @@ function showRingArchive() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -278,6 +293,7 @@ function showRingArchive() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -305,7 +321,7 @@ function showWrestlingShowsIndex() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -327,6 +343,7 @@ function showWrestlingShowsIndex() {
   setWrestlingShowsHidden(false);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -354,7 +371,7 @@ function showWrestlingShowDetail() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-show-detail-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -376,6 +393,7 @@ function showWrestlingShowDetail() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(false);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -403,7 +421,7 @@ function showWrestlingMatchGallery() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-match-gallery-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -425,6 +443,7 @@ function showWrestlingMatchGallery() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(false);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -446,13 +465,91 @@ function showWrestlingMatchGallery() {
   }
 }
 
+function getWrestlingPhotoIdFromNumber(photoNumber) {
+  return String(Math.min(Math.max(photoNumber, 1), 48)).padStart(3, "0");
+}
+
+function getWrestlingPhotoNumber(photoId) {
+  const photoNumber = Number.parseInt(photoId, 10);
+  if (Number.isNaN(photoNumber)) {
+    return 12;
+  }
+
+  return Math.min(Math.max(photoNumber, 1), 48);
+}
+
+function navigateToWrestlingPhoto(photoNumber) {
+  navigateToRoute(`${routePaths.wrestlingShows}/warzone-26/match/daron-richardson-vs-bear-bronson/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
+}
+
+function showWrestlingLightbox(showId, matchId, photoId) {
+  if (!shell || !portfolioHub || !wrestlingLightboxShell) {
+    return;
+  }
+
+  const photoNumber = getWrestlingPhotoNumber(photoId);
+  wrestlingLightboxShell.dataset.showId = showId || "warzone-26";
+  wrestlingLightboxShell.dataset.matchId = matchId || "daron-richardson-vs-bear-bronson";
+  wrestlingLightboxShell.dataset.photoNumber = String(photoNumber);
+  if (wrestlingLightboxCounter) {
+    wrestlingLightboxCounter.textContent = `${photoNumber} / 48`;
+  }
+  if (wrestlingLightboxPhotoNumber) {
+    wrestlingLightboxPhotoNumber.textContent = getWrestlingPhotoIdFromNumber(photoNumber);
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-lightbox-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(false);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  setCurrentView("Photo");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
 function showAboutShell() {
   if (!shell || !aboutShell) {
     return;
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-about-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -476,6 +573,7 @@ function showAboutShell() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   aboutShell.setAttribute("aria-hidden", "false");
   aboutShell.removeAttribute("inert");
   if (calendarShell) {
@@ -501,7 +599,7 @@ function showCalendarShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-calendar-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -525,6 +623,7 @@ function showCalendarShell() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -550,7 +649,7 @@ function showContactShell() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
   shell.classList.add("has-entered-hub", "is-contact-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -574,6 +673,7 @@ function showContactShell() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -600,7 +700,7 @@ function showModulePlaceholder(moduleName) {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -620,6 +720,7 @@ function showModulePlaceholder(moduleName) {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -717,7 +818,7 @@ function showHomepage() {
   }
 
   window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
@@ -742,6 +843,7 @@ function showHomepage() {
   setWrestlingShowsHidden(true);
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -909,6 +1011,48 @@ if (shell && startButton) {
     wrestlingMatchGalleryBack.addEventListener("click", () => {
       navigateToRoute(`${routePaths.wrestlingShows}/warzone-26`);
     });
+  }
+  wrestlingPhotoTiles.forEach((tile) => {
+    const photoId = tile.dataset.wrestlingPhotoId;
+    tile.addEventListener("click", () => {
+      if (photoId) {
+        navigateToRoute(`${routePaths.wrestlingShows}/warzone-26/match/daron-richardson-vs-bear-bronson/photo/${encodeURIComponent(photoId)}`);
+      }
+    });
+    tile.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        tile.click();
+      }
+    });
+  });
+  if (wrestlingLightboxPrev) {
+    wrestlingLightboxPrev.addEventListener("click", () => {
+      navigateToWrestlingPhoto(getWrestlingPhotoNumber(wrestlingLightboxShell?.dataset.photoNumber) - 1);
+    });
+  }
+  if (wrestlingLightboxNext) {
+    wrestlingLightboxNext.addEventListener("click", () => {
+      navigateToWrestlingPhoto(getWrestlingPhotoNumber(wrestlingLightboxShell?.dataset.photoNumber) + 1);
+    });
+  }
+  if (wrestlingLightboxShell) {
+    let lightboxTouchStartX = 0;
+    let lightboxTouchStartY = 0;
+    wrestlingLightboxShell.addEventListener("touchstart", (event) => {
+      const touch = event.changedTouches[0];
+      lightboxTouchStartX = touch.clientX;
+      lightboxTouchStartY = touch.clientY;
+    }, { passive: true });
+    wrestlingLightboxShell.addEventListener("touchend", (event) => {
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - lightboxTouchStartX;
+      const deltaY = touch.clientY - lightboxTouchStartY;
+      if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
+        const currentPhoto = getWrestlingPhotoNumber(wrestlingLightboxShell.dataset.photoNumber);
+        navigateToWrestlingPhoto(deltaX < 0 ? currentPhoto + 1 : currentPhoto - 1);
+      }
+    }, { passive: true });
   }
   if (typeof initMusicModule === "function") {
     initMusicModule();

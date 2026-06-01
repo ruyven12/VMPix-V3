@@ -53,6 +53,12 @@ function getRouteFromUrl(url = window.location.href) {
   const wrestlingShowDetailPrefix = `${routePaths.wrestlingShows}/`;
   if (routePath.startsWith(wrestlingShowDetailPrefix)) {
     const routeParts = routePath.slice(wrestlingShowDetailPrefix.length).split("/");
+    if (routeParts.length === 5 && routeParts[0] && routeParts[1] === "match" && routeParts[2] && routeParts[3] === "photo" && routeParts[4]) {
+      const showId = decodeRoutePart(routeParts[0]);
+      const matchId = decodeRoutePart(routeParts[2]);
+      const photoId = decodeRoutePart(routeParts[4]);
+      return { name: "wrestling-lightbox", showId, matchId, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}` };
+    }
     if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "match" && routeParts[2]) {
       const showId = decodeRoutePart(routeParts[0]);
       const matchId = decodeRoutePart(routeParts[2]);
@@ -207,6 +213,14 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling-match-gallery") {
     showWrestlingMatchGallery(route.showId, route.matchId);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "wrestling-lightbox") {
+    showWrestlingLightbox(route.showId, route.matchId, route.photoId);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

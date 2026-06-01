@@ -8401,6 +8401,233 @@ img.archive-gallery-image {
   }
 }
 
+.wrestling-lightbox-shell {
+  --v3-card-accent: var(--accent-ring);
+  position: relative;
+  z-index: 2;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.58rem, 2svh, 0.9rem);
+  padding:
+    max(clamp(0.58rem, 2.8vw, 0.92rem), env(safe-area-inset-top))
+    max(clamp(0.58rem, 2.8vw, 0.92rem), env(safe-area-inset-right))
+    max(clamp(0.58rem, 2.8vw, 0.92rem), env(safe-area-inset-bottom))
+    max(clamp(0.58rem, 2.8vw, 0.92rem), env(safe-area-inset-left));
+  border: 1px solid rgba(247, 247, 242, 0.14);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(247, 247, 242, 0.045), transparent min(44vw, 22rem)),
+    radial-gradient(ellipse at 50% 100%, rgba(213, 22, 34, 0.075), transparent min(58vw, 34rem)),
+    rgba(2, 2, 5, 0.88);
+  opacity: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  pointer-events: none;
+  touch-action: pan-y;
+  transform: translate3d(0, 0.36rem, 0);
+  transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard),
+    visibility var(--motion-standard) var(--ease-standard);
+  visibility: hidden;
+}
+
+.wrestling-lightbox-photo,
+.wrestling-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.wrestling-lightbox-photo {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, transparent 0 58%, rgba(1, 1, 3, 0.74)),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.2), transparent 58%),
+    linear-gradient(45deg, rgba(247, 247, 242, 0.08), transparent 48%),
+    rgba(12, 12, 15, 0.98);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.36);
+  overflow: hidden;
+}
+
+.wrestling-lightbox-photo::before {
+  position: absolute;
+  inset: clamp(0.8rem, 4vw, 1.4rem);
+  content: "";
+  border: 1px solid rgba(247, 247, 242, 0.11);
+  pointer-events: none;
+}
+
+.wrestling-lightbox-photo span {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(3.2rem, 24vw, 9rem);
+  line-height: 1;
+}
+
+.wrestling-lightbox-panel {
+  display: grid;
+  gap: clamp(0.52rem, 1.7vw, 0.78rem);
+  padding: clamp(0.58rem, 2vw, 0.82rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
+    linear-gradient(90deg, rgba(213, 22, 34, 0.075), transparent 54%),
+    rgba(7, 7, 10, 0.82);
+}
+
+.wrestling-lightbox-nav {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.4rem, 1.6vw, 0.62rem);
+}
+
+.wrestling-lightbox-button {
+  appearance: none;
+  min-width: 0;
+  min-height: max(2.75rem, 44px);
+  padding: 0.62rem 0.72rem;
+  border: 1px solid rgba(213, 22, 34, 0.28);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.075);
+  color: rgba(247, 247, 242, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.58rem, 2.35vw, 0.72rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-lightbox-button:last-child {
+  justify-self: stretch;
+}
+
+.wrestling-lightbox-counter,
+.wrestling-lightbox-title,
+.wrestling-lightbox-event,
+.wrestling-lightbox-event dt,
+.wrestling-lightbox-event dd {
+  margin: 0;
+}
+
+.wrestling-lightbox-counter {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(0.72rem, 2.8vw, 0.88rem);
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wrestling-lightbox-context {
+  min-width: 0;
+  display: grid;
+  gap: 0.48rem;
+}
+
+.wrestling-lightbox-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.24rem 0.38rem;
+  color: rgba(247, 247, 242, 0.9);
+  font-size: clamp(0.92rem, 4.1vw, 1.22rem);
+  font-weight: 400;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-lightbox-title span:nth-child(2) {
+  color: rgba(213, 22, 34, 0.78);
+  font-size: 0.72em;
+}
+
+.wrestling-lightbox-event {
+  min-width: 0;
+  display: grid;
+  gap: 0.32rem;
+}
+
+.wrestling-lightbox-event div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(4rem, auto) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.46rem;
+}
+
+.wrestling-lightbox-event dt {
+  color: rgba(213, 22, 34, 0.76);
+  font-size: clamp(0.54rem, 2.1vw, 0.64rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-lightbox-event dd {
+  color: rgba(247, 247, 242, 0.68);
+  font-size: clamp(0.62rem, 2.45vw, 0.76rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-lightbox-button:hover {
+  border-color: rgba(247, 247, 242, 0.16);
+  background: rgba(213, 22, 34, 0.12);
+}
+
+.wrestling-lightbox-button:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
+@media (max-width: 379px) {
+  .wrestling-lightbox-nav {
+    grid-template-columns: minmax(0, 1fr) minmax(3.8rem, auto) minmax(0, 1fr);
+  }
+
+  .wrestling-lightbox-button {
+    padding-inline: 0.42rem;
+  }
+
+  .wrestling-lightbox-event div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .wrestling-lightbox-shell {
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .wrestling-lightbox-panel {
+    align-self: stretch;
+    align-content: center;
+  }
+
+  .wrestling-lightbox-nav {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .about-shell {
   --v3-card-accent: var(--accent-shell);
   position: relative;
@@ -9017,6 +9244,7 @@ img.archive-gallery-image {
 .site-shell.is-wrestling-shows-view .wrestling-shows-shell,
 .site-shell.is-wrestling-show-detail-view .wrestling-show-detail-shell,
 .site-shell.is-wrestling-match-gallery-view .wrestling-match-gallery-shell,
+.site-shell.is-wrestling-lightbox-view .wrestling-lightbox-shell,
 .site-shell.is-about-view .about-shell,
 .site-shell.is-calendar-view .calendar-shell,
 .site-shell.is-contact-view .contact-shell {
