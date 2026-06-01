@@ -1,6 +1,6 @@
 /* =========================================================
    VMPix V3 wrestling module.
-   Static placeholder people archive surfaces only.
+   Static placeholder wrestling archive surfaces only.
    ========================================================= */
 
 function normalizeWrestlingPersonId(personId) {
@@ -42,6 +42,11 @@ function getWrestlingVenueRouteUrl(venueId) {
     : routePaths.wrestlingVenues;
 }
 
+function findWrestlingVenueById(venueId) {
+  const normalizedVenueId = normalizeWrestlingVenueId(venueId);
+  return wrestlingVenueRows.find((venue) => venue.venueId === normalizedVenueId) || wrestlingVenueRows[0];
+}
+
 function formatWrestlingCount(count, label) {
   return `${Number(count).toLocaleString()} ${label}`;
 }
@@ -60,6 +65,10 @@ function getWrestlingMatchRouteUrl(eventRow) {
   return `${routePaths.wrestlingShows}/${encodeURIComponent(eventRow.eventId)}/match/${encodeURIComponent(eventRow.matchId)}`;
 }
 
+function getWrestlingShowRouteUrl(showId) {
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(String(showId || "").trim())}`;
+}
+
 function setActiveWrestlingPeopleCard(personId = activeWrestlingPersonId) {
   if (!wrestlingPeopleList) {
     return;
@@ -68,6 +77,19 @@ function setActiveWrestlingPeopleCard(personId = activeWrestlingPersonId) {
   const normalizedPersonId = normalizeWrestlingPersonId(personId);
   wrestlingPeopleList.querySelectorAll("[data-wrestling-person-id]").forEach((card) => {
     const isActive = card.dataset.wrestlingPersonId === normalizedPersonId;
+    card.classList.toggle("is-active", isActive);
+    card.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function setActiveWrestlingVenueCard(venueId = activeWrestlingVenueId) {
+  if (!wrestlingVenuesList) {
+    return;
+  }
+
+  const normalizedVenueId = normalizeWrestlingVenueId(venueId);
+  wrestlingVenuesList.querySelectorAll("[data-wrestling-venue-id]").forEach((card) => {
+    const isActive = card.dataset.wrestlingVenueId === normalizedVenueId;
     card.classList.toggle("is-active", isActive);
     card.setAttribute("aria-pressed", String(isActive));
   });
@@ -182,10 +204,11 @@ function createWrestlingVenueStat(label, value) {
 }
 
 function createWrestlingVenueCard(venue) {
-  const card = document.createElement("article");
+  const card = document.createElement("button");
   card.className = "wrestling-venue-card";
-  card.setAttribute("role", "listitem");
-  card.setAttribute("aria-label", getWrestlingVenueCardLabel(venue));
+  card.type = "button";
+  card.setAttribute("aria-pressed", "false");
+  card.setAttribute("aria-label", `Open ${getWrestlingVenueCardLabel(venue)}`);
   card.dataset.wrestlingVenueId = venue.venueId;
   card.dataset.wrestlingVenueRoute = getWrestlingVenueRouteUrl(venue.venueId);
 
@@ -224,6 +247,14 @@ function createWrestlingVenueCard(venue) {
 
   body.append(name, location, stats, action);
   card.append(media, body);
+  card.addEventListener("click", () => {
+    activeWrestlingVenueId = venue.venueId;
+    setActiveWrestlingVenueCard(venue.venueId);
+    navigateToRoute(getWrestlingVenueRouteUrl(venue.venueId), {
+      historyState: { fromWrestlingVenuesIndex: true },
+    });
+  });
+
   return card;
 }
 
@@ -236,6 +267,148 @@ function renderWrestlingVenuesIndex() {
   wrestlingVenueRows.forEach((venue) => {
     wrestlingVenuesList.append(createWrestlingVenueCard(venue));
   });
+  setActiveWrestlingVenueCard();
+}
+
+function createWrestlingVenueMeta(label, value) {
+  const fact = document.createElement("div");
+  fact.className = "wrestling-venue-fact";
+
+  const factLabel = document.createElement("dt");
+  factLabel.textContent = label;
+
+  const factValue = document.createElement("dd");
+  factValue.textContent = value;
+
+  fact.append(factLabel, factValue);
+  return fact;
+}
+
+function createWrestlingVenueEventRow(eventRow) {
+  const row = document.createElement("article");
+  row.className = "wrestling-venue-event-row";
+  row.setAttribute("role", "listitem");
+  row.dataset.wrestlingShowId = eventRow.showId;
+
+  const eventBlock = document.createElement("div");
+  eventBlock.className = "wrestling-venue-event-name";
+
+  const eventName = document.createElement("h4");
+  eventName.textContent = eventRow.eventName;
+
+  const promotion = document.createElement("p");
+  promotion.textContent = eventRow.promotion;
+
+  eventBlock.append(eventName, promotion);
+
+  const date = document.createElement("p");
+  date.className = "wrestling-venue-event-date";
+  date.textContent = eventRow.eventDate;
+
+  const photos = document.createElement("p");
+  photos.className = "wrestling-venue-event-photos";
+  photos.textContent = formatWrestlingCount(eventRow.photoCount, "Photos");
+
+  const openButton = document.createElement("button");
+  openButton.className = "wrestling-venue-event-open";
+  openButton.type = "button";
+  openButton.disabled = true;
+  openButton.setAttribute("aria-disabled", "true");
+  openButton.setAttribute("aria-label", `Open event ${eventRow.eventName}`);
+  openButton.title = `Future route: ${getWrestlingShowRouteUrl(eventRow.showId)}`;
+  openButton.dataset.wrestlingShowId = eventRow.showId;
+  openButton.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(eventRow.showId);
+  openButton.textContent = "Open Event";
+
+  row.append(eventBlock, date, photos, openButton);
+  return row;
+}
+
+function returnToWrestlingVenuesRoute() {
+  const currentRoute = getRouteFromUrl();
+  if (
+    currentRoute.name === "wrestling-venue-detail" &&
+    window.history?.state?.fromWrestlingVenuesIndex &&
+    window.history.length > 1
+  ) {
+    window.history.back();
+    return;
+  }
+
+  navigateToRoute(routePaths.wrestlingVenues);
+}
+
+function renderWrestlingVenueDetailRoute(venueId) {
+  if (!wrestlingVenueDetailShell) {
+    return;
+  }
+
+  const venue = findWrestlingVenueById(venueId);
+  activeWrestlingVenueId = venue.venueId;
+  setActiveWrestlingVenueCard(venue.venueId);
+
+  const backButton = document.createElement("button");
+  backButton.className = "wrestling-venue-detail-back";
+  backButton.type = "button";
+  backButton.textContent = "Back to Wrestling Venues";
+  backButton.addEventListener("click", returnToWrestlingVenuesRoute);
+
+  const hero = document.createElement("section");
+  hero.className = "wrestling-venue-detail-hero";
+  hero.setAttribute("aria-label", `${venue.name} placeholder venue dossier`);
+
+  const image = document.createElement("div");
+  image.className = "wrestling-venue-detail-image";
+  image.setAttribute("role", "img");
+  image.setAttribute("aria-label", `${venue.name} venue image placeholder`);
+
+  const imageLabel = document.createElement("span");
+  imageLabel.setAttribute("aria-hidden", "true");
+  imageLabel.textContent = venue.imageLabel;
+  image.append(imageLabel);
+
+  const summary = document.createElement("div");
+  summary.className = "wrestling-venue-detail-summary";
+
+  const name = document.createElement("h2");
+  name.className = "wrestling-venue-detail-title";
+  name.id = "wrestling-venue-detail-title";
+  name.textContent = venue.name;
+
+  const location = document.createElement("p");
+  location.className = "wrestling-venue-detail-location";
+  location.textContent = `${venue.city}, ${venue.state}`;
+
+  const facts = document.createElement("dl");
+  facts.className = "wrestling-venue-facts";
+  facts.append(
+    createWrestlingVenueMeta("Events", Number(venue.eventCount).toLocaleString()),
+    createWrestlingVenueMeta("Total Photos", Number(venue.photoCount).toLocaleString()),
+    createWrestlingVenueMeta("Region", venue.region),
+    createWrestlingVenueMeta("Archive State", venue.archiveState)
+  );
+
+  summary.append(name, location, facts);
+  hero.append(image, summary);
+
+  const eventHistory = document.createElement("section");
+  eventHistory.className = "wrestling-venue-event-history";
+  eventHistory.setAttribute("aria-labelledby", "wrestling-venue-event-history-title");
+
+  const eventTitle = document.createElement("h3");
+  eventTitle.className = "wrestling-venue-event-history-title";
+  eventTitle.id = "wrestling-venue-event-history-title";
+  eventTitle.textContent = "EVENT HISTORY";
+
+  const eventList = document.createElement("div");
+  eventList.className = "wrestling-venue-event-list";
+  eventList.setAttribute("role", "list");
+  wrestlingVenueEventHistoryRows.forEach((eventRow) => {
+    eventList.append(createWrestlingVenueEventRow(eventRow));
+  });
+
+  eventHistory.append(eventTitle, eventList);
+  wrestlingVenueDetailShell.replaceChildren(backButton, hero, eventHistory);
 }
 
 function createWrestlingPersonMeta(label, value) {

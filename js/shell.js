@@ -166,11 +166,30 @@ function setWrestlingVenuesHidden(isHidden) {
   if (shell && isHidden) {
     shell.classList.remove("is-wrestling-venues-view");
   }
+  setWrestlingVenueDetailHidden(true);
   wrestlingVenuesShell.setAttribute("aria-hidden", String(isHidden));
   if (isHidden) {
     wrestlingVenuesShell.setAttribute("inert", "");
   } else {
     wrestlingVenuesShell.removeAttribute("inert");
+  }
+}
+
+function setWrestlingVenueDetailHidden(isHidden) {
+  if (!wrestlingVenueDetailShell) {
+    return;
+  }
+
+  if (shell && isHidden) {
+    shell.classList.remove("is-wrestling-venue-detail-view");
+  } else if (shell) {
+    shell.classList.add("is-wrestling-venue-detail-view");
+  }
+  wrestlingVenueDetailShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    wrestlingVenueDetailShell.setAttribute("inert", "");
+  } else {
+    wrestlingVenueDetailShell.removeAttribute("inert");
   }
 }
 
@@ -536,6 +555,66 @@ function showWrestlingVenuesIndex() {
     wrestlingVenuesShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Wrestling Venues");
+  setActiveGlobalNav("portfolio");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
+function showWrestlingVenueDetail(venueId) {
+  if (!shell || !portfolioHub || !wrestlingVenueDetailShell) {
+    return;
+  }
+
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venue-detail-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingVenueDetailHidden(false);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  if (typeof renderWrestlingVenueDetailRoute === "function") {
+    renderWrestlingVenueDetailRoute(venueId);
+  }
+  if (typeof wrestlingVenueDetailShell.scrollTo === "function") {
+    wrestlingVenueDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+  setCurrentView("Venue Detail");
   setActiveGlobalNav("portfolio");
   if (startButton) {
     startButton.disabled = true;

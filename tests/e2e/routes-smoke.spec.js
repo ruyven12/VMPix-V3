@@ -28,6 +28,7 @@ const routes = [
   { path: "/wrestling/people", rail: "Wrestling People", visibleShell: "[data-wrestling-people-shell]", text: "WRESTLING PEOPLE" },
   { path: "/wrestling/people/ace-romero", rail: "Person Detail", visibleShell: "[data-wrestling-person-detail-shell]", text: "EVENT HISTORY" },
   { path: "/wrestling/venues", rail: "Wrestling Venues", visibleShell: "[data-wrestling-venues-shell]", text: "WRESTLING VENUES" },
+  { path: "/wrestling/venues/portland-expo", rail: "Venue Detail", visibleShell: "[data-wrestling-venue-detail-shell]", text: "Portland Expo" },
   { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },

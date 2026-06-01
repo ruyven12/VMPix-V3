@@ -7121,7 +7121,8 @@ img.archive-gallery-image {
 
 .wrestling-people-shell,
 .wrestling-person-detail-shell,
-.wrestling-venues-shell {
+.wrestling-venues-shell,
+.wrestling-venue-detail-shell {
   --v3-card-accent: var(--accent-ring);
   position: relative;
   z-index: 2;
@@ -7170,25 +7171,29 @@ img.archive-gallery-image {
 
 .wrestling-people-shell::-webkit-scrollbar,
 .wrestling-person-detail-shell::-webkit-scrollbar,
-.wrestling-venues-shell::-webkit-scrollbar {
+.wrestling-venues-shell::-webkit-scrollbar,
+.wrestling-venue-detail-shell::-webkit-scrollbar {
   width: 0.42rem;
 }
 
 .wrestling-people-shell::-webkit-scrollbar-track,
 .wrestling-person-detail-shell::-webkit-scrollbar-track,
-.wrestling-venues-shell::-webkit-scrollbar-track {
+.wrestling-venues-shell::-webkit-scrollbar-track,
+.wrestling-venue-detail-shell::-webkit-scrollbar-track {
   background: rgba(247, 247, 242, 0.07);
 }
 
 .wrestling-people-shell::-webkit-scrollbar-thumb,
 .wrestling-person-detail-shell::-webkit-scrollbar-thumb,
-.wrestling-venues-shell::-webkit-scrollbar-thumb {
+.wrestling-venues-shell::-webkit-scrollbar-thumb,
+.wrestling-venue-detail-shell::-webkit-scrollbar-thumb {
   background: rgba(213, 22, 34, 0.42);
 }
 
 .wrestling-people-shell::before,
 .wrestling-person-detail-shell::before,
-.wrestling-venues-shell::before {
+.wrestling-venues-shell::before,
+.wrestling-venue-detail-shell::before {
   position: absolute;
   inset: var(--space-2);
   z-index: 0;
@@ -7209,7 +7214,10 @@ img.archive-gallery-image {
 .wrestling-venues-list,
 .wrestling-person-detail-back,
 .wrestling-person-detail-hero,
-.wrestling-event-history {
+.wrestling-event-history,
+.wrestling-venue-detail-back,
+.wrestling-venue-detail-hero,
+.wrestling-venue-event-history {
   position: relative;
   z-index: 1;
   min-width: 0;
@@ -7226,7 +7234,9 @@ img.archive-gallery-image {
 .wrestling-people-title,
 .wrestling-venues-title,
 .wrestling-person-detail-title,
-.wrestling-event-history-title {
+.wrestling-event-history-title,
+.wrestling-venue-detail-title,
+.wrestling-venue-event-history-title {
   margin: 0;
   color: var(--color-text);
   font-weight: 400;
@@ -7245,7 +7255,9 @@ img.archive-gallery-image {
 .wrestling-people-back,
 .wrestling-venues-back,
 .wrestling-person-detail-back,
-.wrestling-event-history-open {
+.wrestling-event-history-open,
+.wrestling-venue-detail-back,
+.wrestling-venue-event-open {
   appearance: none;
   min-height: max(var(--tap-target), 2.9rem);
   max-width: 100%;
@@ -7270,7 +7282,8 @@ img.archive-gallery-image {
 
 .wrestling-people-back,
 .wrestling-venues-back,
-.wrestling-person-detail-back {
+.wrestling-person-detail-back,
+.wrestling-venue-detail-back {
   justify-self: start;
   min-width: min(100%, 10.75rem);
   padding: 0.68rem 0.82rem;
@@ -7368,6 +7381,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-venue-card {
+  appearance: none;
   position: relative;
   min-width: 0;
   display: grid;
@@ -7379,7 +7393,12 @@ img.archive-gallery-image {
     linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
     linear-gradient(135deg, rgba(213, 22, 34, 0.08), transparent 62%),
     rgba(7, 7, 10, 0.78);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
   overflow: hidden;
+  text-align: left;
+  touch-action: manipulation;
 }
 
 .wrestling-venue-card::before {
@@ -7499,6 +7518,198 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.62);
   font-size: clamp(0.58rem, 2.25vw, 0.7rem);
   line-height: 1;
+}
+
+.wrestling-venue-card:hover,
+.wrestling-venue-card.is-active,
+.wrestling-venue-card[aria-pressed="true"] {
+  border-color: rgba(247, 247, 242, 0.14);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.046), transparent 64%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.11), transparent 62%),
+    rgba(7, 7, 10, 0.8);
+}
+
+.wrestling-venue-detail-back {
+  margin: 0;
+}
+
+.wrestling-venue-detail-hero {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.62rem, 2vw, 0.9rem);
+  padding: clamp(0.52rem, 2vw, 0.78rem);
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 64%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.07), transparent 62%),
+    rgba(7, 7, 10, 0.76);
+}
+
+.wrestling-venue-detail-image {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(100%, clamp(12rem, 62vw, 18rem));
+  justify-self: center;
+  aspect-ratio: 16 / 10;
+  max-height: min(38svh, 20rem);
+  border: 1px solid rgba(247, 247, 242, 0.12);
+  border-radius: calc(var(--radius-sm) - 0.12rem);
+  background:
+    linear-gradient(180deg, transparent 0 58%, rgba(1, 1, 3, 0.78)),
+    radial-gradient(circle at 66% 34%, rgba(213, 22, 34, 0.2), transparent 0.46rem),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.28), transparent 56%),
+    linear-gradient(45deg, rgba(247, 247, 242, 0.1), transparent 48%),
+    rgba(16, 16, 19, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.32);
+  overflow: hidden;
+}
+
+.wrestling-venue-detail-image::before {
+  position: absolute;
+  inset: 12%;
+  content: "";
+  border: 1px solid rgba(247, 247, 242, 0.14);
+}
+
+.wrestling-venue-detail-image span {
+  position: relative;
+  z-index: 1;
+  color: rgba(247, 247, 242, 0.84);
+  font-size: clamp(1.8rem, 10vw, 3rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.wrestling-venue-detail-summary {
+  min-width: 0;
+  display: grid;
+  gap: clamp(0.52rem, 1.8vw, 0.78rem);
+  align-content: start;
+}
+
+.wrestling-venue-detail-title {
+  font-size: clamp(1.5rem, 7.6vw, 3.6rem);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.wrestling-venue-detail-location {
+  margin: 0;
+  color: rgba(213, 22, 34, 0.76);
+  font-size: clamp(0.72rem, 2.8vw, 0.92rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-venue-facts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.wrestling-venue-fact {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.42fr) minmax(0, 1fr);
+  gap: 0.48rem;
+  align-items: baseline;
+  padding-block: 0.46rem;
+  border-top: 1px solid rgba(247, 247, 242, 0.08);
+}
+
+.wrestling-venue-fact dt,
+.wrestling-venue-fact dd {
+  margin: 0;
+  min-width: 0;
+  font-size: clamp(0.62rem, 2.45vw, 0.74rem);
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-venue-fact dt {
+  color: rgba(213, 22, 34, 0.72);
+}
+
+.wrestling-venue-fact dd {
+  color: rgba(247, 247, 242, 0.78);
+}
+
+.wrestling-venue-event-history {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.54rem, 1.8vw, 0.78rem);
+}
+
+.wrestling-venue-event-history-title {
+  font-size: clamp(1.08rem, 4.6vw, 1.5rem);
+}
+
+.wrestling-venue-event-list {
+  display: grid;
+  gap: clamp(0.48rem, 1.7vw, 0.68rem);
+}
+
+.wrestling-venue-event-row {
+  min-width: 0;
+  display: grid;
+  gap: clamp(0.34rem, 1.35vw, 0.52rem);
+  padding: clamp(0.56rem, 1.8vw, 0.72rem);
+  border: 1px solid rgba(247, 247, 242, 0.09);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.06), transparent 46%),
+    rgba(7, 7, 10, 0.72);
+}
+
+.wrestling-venue-event-name {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.wrestling-venue-event-name h4,
+.wrestling-venue-event-name p,
+.wrestling-venue-event-date,
+.wrestling-venue-event-photos {
+  margin: 0;
+  min-width: 0;
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-venue-event-name h4 {
+  color: rgba(247, 247, 242, 0.9);
+  font-size: clamp(0.82rem, 3.3vw, 1rem);
+  font-weight: 400;
+}
+
+.wrestling-venue-event-name p,
+.wrestling-venue-event-date,
+.wrestling-venue-event-photos {
+  color: rgba(247, 247, 242, 0.5);
+  font-size: clamp(0.58rem, 2.25vw, 0.7rem);
+}
+
+.wrestling-venue-event-name p {
+  color: rgba(213, 22, 34, 0.72);
+}
+
+.wrestling-venue-event-open {
+  justify-self: start;
+  padding: 0.58rem 0.7rem;
+  white-space: nowrap;
+}
+
+.wrestling-venue-event-open[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.72;
 }
 
 .wrestling-person-card {
@@ -7822,7 +8033,9 @@ img.archive-gallery-image {
 .wrestling-people-back:hover,
 .wrestling-venues-back:hover,
 .wrestling-person-detail-back:hover,
-.wrestling-event-history-open:hover {
+.wrestling-event-history-open:hover,
+.wrestling-venue-detail-back:hover,
+.wrestling-venue-event-open:hover {
   border-color: rgba(247, 247, 242, 0.2);
   background: rgba(213, 22, 34, 0.12);
 }
@@ -7830,7 +8043,9 @@ img.archive-gallery-image {
 .wrestling-people-back:active,
 .wrestling-venues-back:active,
 .wrestling-person-detail-back:active,
-.wrestling-person-card:active {
+.wrestling-venue-detail-back:active,
+.wrestling-person-card:active,
+.wrestling-venue-card:active {
   transform: translate3d(0, 0.03rem, 0);
 }
 
@@ -7839,8 +8054,11 @@ img.archive-gallery-image {
 .wrestling-venues-back:focus-visible,
 .wrestling-venues-chip:focus-visible,
 .wrestling-person-card:focus-visible,
+.wrestling-venue-card:focus-visible,
 .wrestling-person-detail-back:focus-visible,
-.wrestling-event-history-open:focus-visible {
+.wrestling-event-history-open:focus-visible,
+.wrestling-venue-detail-back:focus-visible,
+.wrestling-venue-event-open:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.16rem;
 }
@@ -7881,9 +8099,18 @@ img.archive-gallery-image {
     padding: 0.52rem;
   }
 
+  .wrestling-venue-detail-hero {
+    padding: 0.52rem;
+  }
+
   .wrestling-person-detail-photo {
     width: min(100%, clamp(8.25rem, 42vw, 10.4rem));
     max-height: min(34svh, 15rem);
+  }
+
+  .wrestling-venue-detail-image {
+    width: min(100%, clamp(10.5rem, 58vw, 14rem));
+    max-height: min(32svh, 15rem);
   }
 
   .wrestling-person-card-thumb {
@@ -7907,11 +8134,24 @@ img.archive-gallery-image {
     gap: 0.22rem;
   }
 
+  .wrestling-venue-fact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.22rem;
+  }
+
   .wrestling-event-history-open {
     width: 100%;
   }
 
+  .wrestling-venue-event-open {
+    width: 100%;
+  }
+
   .wrestling-event-history-row {
+    padding: 0.54rem;
+  }
+
+  .wrestling-venue-event-row {
     padding: 0.54rem;
   }
 
@@ -7962,9 +8202,18 @@ img.archive-gallery-image {
     font-size: clamp(1.34rem, 7.8vw, 1.66rem);
   }
 
+  .wrestling-venue-detail-title {
+    font-size: clamp(1.34rem, 7.8vw, 1.66rem);
+  }
+
   .wrestling-person-detail-photo {
     width: min(100%, clamp(8rem, 41vw, 9.8rem));
     max-height: min(32svh, 14rem);
+  }
+
+  .wrestling-venue-detail-image {
+    width: min(100%, clamp(9.5rem, 55vw, 12.6rem));
+    max-height: min(30svh, 13.5rem);
   }
 
   .wrestling-venue-card-media {
@@ -8015,13 +8264,28 @@ img.archive-gallery-image {
     align-items: stretch;
   }
 
+  .wrestling-venue-detail-hero {
+    grid-template-columns: minmax(13rem, 0.42fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
   .wrestling-person-detail-photo {
     width: 100%;
     max-width: 17rem;
   }
 
+  .wrestling-venue-detail-image {
+    width: 100%;
+    max-width: 20rem;
+  }
+
   .wrestling-event-history-row {
     grid-template-columns: minmax(10rem, 0.86fr) minmax(0, 1.42fr) minmax(5rem, auto) auto;
+    align-items: center;
+  }
+
+  .wrestling-venue-event-row {
+    grid-template-columns: minmax(12rem, 1fr) minmax(8rem, 0.6fr) minmax(5rem, auto) auto;
     align-items: center;
   }
 }
@@ -10151,6 +10415,7 @@ img.archive-gallery-image {
 .site-shell.is-wrestling-people-view .wrestling-people-shell,
 .site-shell.is-wrestling-person-detail-view .wrestling-person-detail-shell,
 .site-shell.is-wrestling-venues-view .wrestling-venues-shell,
+.site-shell.is-wrestling-venue-detail-view .wrestling-venue-detail-shell,
 .site-shell.is-wrestling-shows-view .wrestling-shows-shell,
 .site-shell.is-wrestling-show-detail-view .wrestling-show-detail-shell,
 .site-shell.is-wrestling-match-gallery-view .wrestling-match-gallery-shell,

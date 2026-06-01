@@ -42,6 +42,7 @@ const wrestlingPersonDetailShell = document.querySelector("[data-wrestling-perso
 const wrestlingVenuesShell = document.querySelector("[data-wrestling-venues-shell]");
 const wrestlingVenuesList = document.querySelector("[data-wrestling-venues-list]");
 const wrestlingVenuesBack = document.querySelector("[data-wrestling-venues-back]");
+const wrestlingVenueDetailShell = document.querySelector("[data-wrestling-venue-detail-shell]");
 const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
 const wrestlingShowEntries = document.querySelectorAll("[data-wrestling-show-id]");
 const wrestlingShowDetailShell = document.querySelector("[data-wrestling-show-detail-shell]");
@@ -180,6 +181,7 @@ let activeMusicPeoplePage = 1;
 let activeMusicPeopleId = "";
 let activeMusicPersonDetailId = "";
 let activeWrestlingPersonId = "";
+let activeWrestlingVenueId = "";
 let activeMusicBand = null;
 let activeSetRow = null;
 let isSetDetailOpen = false;
@@ -442,12 +444,18 @@ const wrestlingPersonEventHistoryRows = [
 ];
 
 const wrestlingVenueRows = [
-  { venueId: "portland-expo", name: "Portland Expo", city: "Portland", state: "ME", eventCount: 24, photoCount: 1840, imageLabel: "PX" },
-  { venueId: "westbrook-armory", name: "Westbrook Armory", city: "Westbrook", state: "ME", eventCount: 18, photoCount: 1296, imageLabel: "WA" },
-  { venueId: "portland-club", name: "Portland Club", city: "Portland", state: "ME", eventCount: 12, photoCount: 864, imageLabel: "PC" },
-  { venueId: "auburn-hall", name: "Auburn Hall", city: "Auburn", state: "ME", eventCount: 9, photoCount: 612, imageLabel: "AH" },
-  { venueId: "cross-insurance-center", name: "Cross Insurance Center", city: "Bangor", state: "ME", eventCount: 7, photoCount: 540, imageLabel: "CI" },
-  { venueId: "bissell-brothers-brewing-co", name: "Bissell Brothers Brewing Co.", city: "Portland", state: "ME", eventCount: 5, photoCount: 386, imageLabel: "BB" },
+  { venueId: "portland-expo", name: "Portland Expo", city: "Portland", state: "ME", region: "Southern Maine", archiveState: "Static venue placeholder", eventCount: 24, photoCount: 1840, imageLabel: "PX" },
+  { venueId: "westbrook-armory", name: "Westbrook Armory", city: "Westbrook", state: "ME", region: "Southern Maine", archiveState: "Static venue placeholder", eventCount: 18, photoCount: 1296, imageLabel: "WA" },
+  { venueId: "portland-club", name: "Portland Club", city: "Portland", state: "ME", region: "Southern Maine", archiveState: "Static venue placeholder", eventCount: 12, photoCount: 864, imageLabel: "PC" },
+  { venueId: "auburn-hall", name: "Auburn Hall", city: "Auburn", state: "ME", region: "Central Maine", archiveState: "Static venue placeholder", eventCount: 9, photoCount: 612, imageLabel: "AH" },
+  { venueId: "cross-insurance-center", name: "Cross Insurance Center", city: "Bangor", state: "ME", region: "Northern Maine", archiveState: "Static venue placeholder", eventCount: 7, photoCount: 540, imageLabel: "CI" },
+  { venueId: "bissell-brothers-brewing-co", name: "Bissell Brothers Brewing Co.", city: "Portland", state: "ME", region: "Southern Maine", archiveState: "Static venue placeholder", eventCount: 5, photoCount: 386, imageLabel: "BB" },
+];
+
+const wrestlingVenueEventHistoryRows = [
+  { showId: "warzone-26", eventName: "Warzone '26", promotion: "Limitless Wrestling", eventDate: "May 8th, 2026", photoCount: 128 },
+  { showId: "limitless-rumble-26", eventName: "Limitless Rumble '26", promotion: "Limitless Wrestling", eventDate: "January 16th, 2026", photoCount: 96 },
+  { showId: "massacre-in-maine", eventName: "Massacre In Maine", promotion: "Limitless Wrestling", eventDate: "November 8th, 2025", photoCount: 74 },
 ];
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
