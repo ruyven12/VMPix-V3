@@ -7369,6 +7369,7 @@ img.archive-gallery-image {
     linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
     linear-gradient(90deg, rgba(213, 22, 34, 0.075), transparent 42%),
     rgba(7, 7, 10, 0.78);
+  cursor: pointer;
   overflow: hidden;
 }
 
@@ -7471,6 +7472,14 @@ img.archive-gallery-image {
   line-height: 1;
 }
 
+.wrestling-show-entry:hover {
+  border-color: rgba(247, 247, 242, 0.14);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.046), transparent 64%),
+    linear-gradient(90deg, rgba(213, 22, 34, 0.095), transparent 42%),
+    rgba(7, 7, 10, 0.8);
+}
+
 .wrestling-pagination {
   width: min(100%, 58rem);
   justify-self: center;
@@ -7503,6 +7512,7 @@ img.archive-gallery-image {
 
 .wrestling-year-chip:focus-visible,
 .wrestling-sort-select:focus-visible,
+.wrestling-show-entry:focus-visible,
 .wrestling-page-button:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.16rem;
@@ -7745,7 +7755,7 @@ img.archive-gallery-image {
 .wrestling-detail-back,
 .wrestling-gallery-button {
   appearance: none;
-  min-height: 2.85rem;
+  min-height: max(2.85rem, 44px);
   border-radius: var(--radius-sm);
   color: rgba(247, 247, 242, 0.78);
   cursor: pointer;
@@ -7763,6 +7773,9 @@ img.archive-gallery-image {
 }
 
 .wrestling-detail-hero {
+  width: min(100%, 58rem);
+  justify-self: center;
+  min-width: 0;
   display: grid;
   gap: clamp(0.68rem, 2.4vw, 1rem);
   padding: clamp(0.58rem, 2.2vw, 0.82rem);
@@ -7778,6 +7791,7 @@ img.archive-gallery-image {
 .wrestling-detail-poster {
   position: relative;
   width: min(100%, 18rem);
+  max-height: min(62svh, 28rem);
   aspect-ratio: 2 / 3;
   justify-self: center;
   display: grid;
@@ -7838,6 +7852,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-detail-facts {
+  min-width: 0;
   display: grid;
   gap: 0.42rem;
 }
@@ -7884,6 +7899,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-match-list {
+  min-width: 0;
   display: grid;
   gap: clamp(0.46rem, 1.5vw, 0.62rem);
   margin: 0;
@@ -7918,7 +7934,9 @@ img.archive-gallery-image {
   font-size: clamp(0.74rem, 2.8vw, 0.92rem);
   font-weight: 400;
   line-height: 1.14;
+  hyphens: auto;
   overflow-wrap: anywhere;
+  word-break: normal;
   text-transform: uppercase;
 }
 
@@ -7953,6 +7971,7 @@ img.archive-gallery-image {
 
 .wrestling-gallery-button {
   min-width: 8.6rem;
+  max-width: 100%;
   padding: 0.68rem 0.82rem;
   border: 1px solid rgba(213, 22, 34, 0.32);
   background: rgba(213, 22, 34, 0.085);
@@ -7988,6 +8007,7 @@ img.archive-gallery-image {
 
   .wrestling-detail-poster {
     width: min(100%, 13.8rem);
+    max-height: min(50svh, 21rem);
   }
 
   .wrestling-detail-fact {
@@ -8005,14 +8025,51 @@ img.archive-gallery-image {
   }
 }
 
+@media (max-width: 379px) {
+  .wrestling-detail-back {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .wrestling-detail-hero {
+    gap: 0.5rem;
+    padding: 0.46rem;
+  }
+
+  .wrestling-detail-poster {
+    width: min(100%, 11.6rem);
+    max-height: min(46svh, 18rem);
+  }
+
+  .wrestling-detail-title {
+    font-size: clamp(1.42rem, 8vw, 1.72rem);
+  }
+
+  .wrestling-detail-facts {
+    gap: 0.28rem;
+  }
+
+  .wrestling-detail-fact {
+    padding-block: 0.34rem;
+  }
+
+  .wrestling-match-card {
+    gap: 0.24rem;
+    padding: 0.5rem;
+  }
+
+  .wrestling-match-title {
+    font-size: clamp(0.68rem, 3.4vw, 0.82rem);
+    line-height: 1.18;
+  }
+}
+
 @media (min-width: 760px) {
   .wrestling-show-detail-shell {
     gap: clamp(0.86rem, 1.8vw, 1.14rem);
   }
 
   .wrestling-detail-hero {
-    width: min(100%, 58rem);
-    justify-self: center;
     grid-template-columns: minmax(12rem, 0.42fr) minmax(0, 1fr);
     align-items: stretch;
   }

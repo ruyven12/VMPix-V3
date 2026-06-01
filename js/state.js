@@ -34,6 +34,7 @@ const ringArchiveShell = document.querySelector("[data-ring-archive-shell]");
 const ringArchiveBack = document.querySelector("[data-ring-archive-back]");
 const ringArchiveShows = document.querySelector("[data-ring-archive-shows]");
 const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
+const wrestlingShowEntries = document.querySelectorAll("[data-wrestling-show-id]");
 const wrestlingShowDetailShell = document.querySelector("[data-wrestling-show-detail-shell]");
 const wrestlingShowDetailBack = document.querySelector("[data-wrestling-show-detail-back]");
 const musicActivityPanel = document.querySelector("[data-music-activity-panel]");

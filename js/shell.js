@@ -808,6 +808,26 @@ if (shell && startButton) {
       navigateToRoute(routePaths.wrestlingShows);
     });
   }
+  wrestlingShowEntries.forEach((entry) => {
+    const showId = entry.dataset.wrestlingShowId;
+    const showTitle = entry.querySelector(".wrestling-show-title")?.textContent?.trim();
+    entry.setAttribute("role", "link");
+    entry.tabIndex = 0;
+    if (showTitle) {
+      entry.setAttribute("aria-label", `Open ${showTitle}`);
+    }
+    entry.addEventListener("click", () => {
+      if (showId) {
+        navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}`);
+      }
+    });
+    entry.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        entry.click();
+      }
+    });
+  });
   if (wrestlingShowDetailBack) {
     wrestlingShowDetailBack.addEventListener("click", () => {
       navigateToRoute(routePaths.wrestlingShows);
