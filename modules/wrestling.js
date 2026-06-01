@@ -31,13 +31,16 @@ function formatWrestlingCount(count, label) {
 
 function getWrestlingPeopleCardLabel(person) {
   return [
-    person.name,
+    `Open ${person.name}`,
     person.role,
     person.factionTeam,
     formatWrestlingCount(person.matches, "Matches"),
     formatWrestlingCount(person.photos, "Photos"),
-    "Open profile",
   ].filter(Boolean).join(", ");
+}
+
+function getWrestlingMatchRouteUrl(eventRow) {
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(eventRow.eventId)}/match/${encodeURIComponent(eventRow.matchId)}`;
 }
 
 function setActiveWrestlingPeopleCard(personId = activeWrestlingPersonId) {
@@ -192,8 +195,11 @@ function createWrestlingPersonEventRow(eventRow) {
   openButton.type = "button";
   openButton.disabled = true;
   openButton.setAttribute("aria-disabled", "true");
+  openButton.setAttribute("aria-label", `Open match ${eventRow.matchName}`);
+  openButton.title = `Future route: ${getWrestlingMatchRouteUrl(eventRow)}`;
   openButton.dataset.wrestlingEventId = eventRow.eventId;
   openButton.dataset.wrestlingMatchId = eventRow.matchId;
+  openButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrl(eventRow);
   openButton.textContent = "Open Match";
 
   row.append(eventBlock, matchBlock, photoCount, openButton);
@@ -226,7 +232,7 @@ function renderWrestlingPersonDetailRoute(personId) {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to People";
+  backButton.textContent = "Back to Wrestling People";
   backButton.addEventListener("click", returnToWrestlingPeopleRoute);
 
   const hero = document.createElement("section");
@@ -235,9 +241,11 @@ function renderWrestlingPersonDetailRoute(personId) {
 
   const photo = document.createElement("div");
   photo.className = "wrestling-person-detail-photo";
-  photo.setAttribute("aria-hidden", "true");
+  photo.setAttribute("role", "img");
+  photo.setAttribute("aria-label", `${person.name} placeholder archive portrait`);
 
   const photoInitials = document.createElement("span");
+  photoInitials.setAttribute("aria-hidden", "true");
   photoInitials.textContent = person.thumb;
   photo.append(photoInitials);
 
@@ -253,6 +261,7 @@ function renderWrestlingPersonDetailRoute(personId) {
   facts.className = "wrestling-person-facts";
   facts.append(
     createWrestlingPersonMeta("Aliases", person.aliases.join(" / ")),
+    createWrestlingPersonMeta("Role", person.role),
     createWrestlingPersonMeta("Faction / Team", person.factionTeam),
     createWrestlingPersonMeta("Debut Year", person.debutYear),
     createWrestlingPersonMeta("Total Matches", Number(person.matches).toLocaleString()),

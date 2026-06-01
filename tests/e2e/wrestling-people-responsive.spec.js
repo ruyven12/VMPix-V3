@@ -124,8 +124,9 @@ test.describe("wrestling people route structure", () => {
     await expect(openMatchButtons.first()).toBeDisabled();
     await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-event-id", "gnomie-and-the-machine");
     await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-id", "ace-romero-vs-anthony-gangone");
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/gnomie-and-the-machine/match/ace-romero-vs-anthony-gangone");
 
-    await page.getByRole("button", { name: "Back to People" }).click();
+    await page.getByRole("button", { name: "Back to Wrestling People" }).click();
     await expect(page).toHaveURL(/\/wrestling\/people$/);
     await expect(page.locator("[data-wrestling-people-shell]")).toBeVisible();
 
@@ -184,9 +185,12 @@ for (const target of targets) {
       await expect(shell).toBeVisible();
       await expect(page.locator("[data-current-view]")).toHaveText("Person Detail");
       await expect(shell.getByRole("heading", { name: "Ace Romero" })).toBeVisible();
+      await expect(shell.getByText("Role")).toBeVisible();
+      await expect(shell.getByText("Wrestler")).toBeVisible();
       await expect(shell.getByText("EVENT HISTORY")).toBeVisible();
       await expect(shell.locator(".wrestling-event-history-row")).toHaveCount(4);
       await expect(shell.locator(".wrestling-event-history-open").first()).toBeDisabled();
+      await expect(shell.locator(".wrestling-event-history-open").first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/gnomie-and-the-machine/match/ace-romero-vs-anthony-gangone");
 
       await expectNoHorizontalOverflow(page);
       await expectNoHorizontalOverflow(page, "[data-wrestling-person-detail-shell]");
