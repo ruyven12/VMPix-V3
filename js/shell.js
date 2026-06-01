@@ -12,7 +12,8 @@ function setCurrentView(viewName) {
 
 function setActiveGlobalNav(targetName) {
   globalNavButtons.forEach((button) => {
-    if (button.dataset.globalNavTarget === targetName) {
+    const isCurrent = button.dataset.globalNavTarget === targetName;
+    if (isCurrent) {
       button.setAttribute("aria-current", "page");
     } else {
       button.removeAttribute("aria-current");
@@ -327,7 +328,11 @@ function showMusicNexus(options = {}) {
     }
   }
   setCurrentView(options.currentView || "Music Nexus");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav(options.globalNavTarget || {
+    bands: "music-bands",
+    people: "music-people",
+    shows: "music-shows",
+  }[initialSection] || "music");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -378,7 +383,7 @@ function showRingArchive() {
   }
   setHubChromeHidden(true);
   setCurrentView("Ring Archive");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -437,7 +442,7 @@ function showWrestlingPeopleIndex() {
     wrestlingPeopleShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Wrestling People");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-people");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -496,7 +501,7 @@ function showWrestlingPersonDetail(personId) {
     wrestlingPersonDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Person Detail");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-people");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -555,7 +560,7 @@ function showWrestlingVenuesIndex() {
     wrestlingVenuesShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Wrestling Venues");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -615,7 +620,7 @@ function showWrestlingVenueDetail(venueId) {
     wrestlingVenueDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Venue Detail");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -668,7 +673,7 @@ function showWrestlingShowsIndex() {
   }
   setHubChromeHidden(true);
   setCurrentView("Event Archive");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-shows");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -724,7 +729,7 @@ function showWrestlingShowDetail(showId = "warzone-26") {
     updateWrestlingShowDetailRelationshipHooks(showId);
   }
   setCurrentView("Show Detail");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-shows");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -780,7 +785,7 @@ function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richa
     updateWrestlingMatchGalleryRelationshipHooks(showId, matchId);
   }
   setCurrentView("Match Gallery");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-shows");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -879,7 +884,7 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   }
   setHubChromeHidden(true);
   setCurrentView("Photo");
-  setActiveGlobalNav("portfolio");
+  setActiveGlobalNav("wrestling-shows");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1221,25 +1226,14 @@ function showHomepage() {
 
 function handleGlobalMenuAction(event) {
   const button = event.currentTarget;
-  const globalTarget = button.dataset.globalNavTarget;
+  const navRoute = button.dataset.globalNavRoute;
 
   if (button.getAttribute("aria-disabled") === "true") {
     return;
   }
 
-  if (globalTarget === "home") {
-    navigateToRoute(routePaths.home);
-  } else if (globalTarget === "portfolio") {
-    navigateToRoute(routePaths.portfolio);
-  } else if (globalTarget === "about") {
-    navigateToRoute(routePaths.about);
-  } else if (globalTarget === "calendar") {
-    navigateToRoute(routePaths.calendar);
-  } else if (globalTarget === "contact") {
-    navigateToRoute(routePaths.contact);
-  } else if (globalTarget === "admin") {
-    window.location.href = "./admin/index.html";
-    return;
+  if (navRoute) {
+    navigateToRoute(navRoute);
   }
 
   closeGlobalMenu();
