@@ -394,6 +394,9 @@ function showWrestlingPeopleIndex() {
   if (typeof renderWrestlingPeopleIndex === "function") {
     renderWrestlingPeopleIndex();
   }
+  if (typeof wrestlingPeopleShell.scrollTo === "function") {
+    wrestlingPeopleShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
   setCurrentView("Wrestling People");
   setActiveGlobalNav("portfolio");
   if (startButton) {
@@ -448,6 +451,9 @@ function showWrestlingPersonDetail(personId) {
   setHubChromeHidden(true);
   if (typeof renderWrestlingPersonDetailRoute === "function") {
     renderWrestlingPersonDetailRoute(personId);
+  }
+  if (typeof wrestlingPersonDetailShell.scrollTo === "function") {
+    wrestlingPersonDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Person Detail");
   setActiveGlobalNav("portfolio");

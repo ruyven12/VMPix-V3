@@ -7136,10 +7136,10 @@ img.archive-gallery-image {
   align-content: start;
   gap: clamp(0.72rem, 2svh, 1rem);
   padding:
-    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-top))
-    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-right))
-    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-bottom))
-    max(clamp(0.78rem, 3.6vw, 1.18rem), env(safe-area-inset-left));
+    calc(env(safe-area-inset-top) + clamp(0.78rem, 3.6vw, 1.18rem))
+    calc(env(safe-area-inset-right) + clamp(0.78rem, 3.6vw, 1.18rem))
+    calc(env(safe-area-inset-bottom) + clamp(0.78rem, 3.6vw, 1.18rem))
+    calc(env(safe-area-inset-left) + clamp(0.78rem, 3.6vw, 1.18rem));
   border: 1px solid rgba(247, 247, 242, 0.14);
   border-radius: var(--radius-md);
   background:
@@ -7236,6 +7236,10 @@ img.archive-gallery-image {
 .wrestling-event-history-open {
   appearance: none;
   min-height: max(var(--tap-target), 2.9rem);
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(213, 22, 34, 0.3);
   border-radius: var(--radius-sm);
   background:
@@ -7246,6 +7250,8 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.64rem, 2.5vw, 0.76rem);
   line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-align: center;
   touch-action: manipulation;
   text-transform: uppercase;
 }
@@ -7519,10 +7525,10 @@ img.archive-gallery-image {
 }
 
 .wrestling-person-detail-photo {
-  width: min(100%, 12.6rem);
+  width: min(100%, clamp(9.25rem, 46vw, 12.25rem));
   justify-self: center;
   aspect-ratio: 4 / 5;
-  max-height: min(44svh, 21rem);
+  max-height: min(40svh, 20rem);
 }
 
 .wrestling-person-detail-photo span {
@@ -7691,10 +7697,10 @@ img.archive-gallery-image {
   .wrestling-person-detail-shell {
     gap: 0.62rem;
     padding:
-      max(0.58rem, env(safe-area-inset-top))
-      max(0.62rem, env(safe-area-inset-right))
-      max(0.62rem, env(safe-area-inset-bottom))
-      max(0.62rem, env(safe-area-inset-left));
+      calc(env(safe-area-inset-top) + 0.58rem)
+      calc(env(safe-area-inset-right) + 0.62rem)
+      calc(env(safe-area-inset-bottom) + 0.62rem)
+      calc(env(safe-area-inset-left) + 0.62rem);
   }
 
   .wrestling-people-title {
@@ -7706,6 +7712,15 @@ img.archive-gallery-image {
     gap: 0.46rem;
     min-height: 6rem;
     padding: 0.42rem;
+  }
+
+  .wrestling-person-detail-hero {
+    padding: 0.52rem;
+  }
+
+  .wrestling-person-detail-photo {
+    width: min(100%, clamp(8.25rem, 42vw, 10.4rem));
+    max-height: min(34svh, 15rem);
   }
 
   .wrestling-person-card-thumb {
@@ -7777,8 +7792,8 @@ img.archive-gallery-image {
   }
 
   .wrestling-person-detail-photo {
-    width: min(100%, 11.2rem);
-    max-height: min(38svh, 17rem);
+    width: min(100%, clamp(8rem, 41vw, 9.8rem));
+    max-height: min(32svh, 14rem);
   }
 }
 
