@@ -8066,7 +8066,8 @@ img.archive-gallery-image {
 @media (max-width: 759px) {
   .wrestling-people-shell,
   .wrestling-person-detail-shell,
-  .wrestling-venues-shell {
+  .wrestling-venues-shell,
+  .wrestling-venue-detail-shell {
     scrollbar-gutter: auto;
   }
 }
@@ -8074,7 +8075,8 @@ img.archive-gallery-image {
 @media (max-width: 479px) {
   .wrestling-people-shell,
   .wrestling-person-detail-shell,
-  .wrestling-venues-shell {
+  .wrestling-venues-shell,
+  .wrestling-venue-detail-shell {
     gap: 0.62rem;
     padding:
       calc(env(safe-area-inset-top) + 0.58rem)
@@ -8168,7 +8170,8 @@ img.archive-gallery-image {
 
   .wrestling-people-back,
   .wrestling-venues-back,
-  .wrestling-person-detail-back {
+  .wrestling-person-detail-back,
+  .wrestling-venue-detail-back {
     width: 100%;
     justify-self: stretch;
   }
@@ -8224,7 +8227,8 @@ img.archive-gallery-image {
 @media (min-width: 760px) {
   .wrestling-people-shell,
   .wrestling-person-detail-shell,
-  .wrestling-venues-shell {
+  .wrestling-venues-shell,
+  .wrestling-venue-detail-shell {
     gap: clamp(0.86rem, 1.8vw, 1.14rem);
   }
 
@@ -8285,7 +8289,7 @@ img.archive-gallery-image {
   }
 
   .wrestling-venue-event-row {
-    grid-template-columns: minmax(12rem, 1fr) minmax(8rem, 0.6fr) minmax(5rem, auto) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.64fr) minmax(5rem, auto) auto;
     align-items: center;
   }
 }
