@@ -5206,6 +5206,7 @@ img.archive-gallery-image {
   display: grid;
   height: 100%;
   min-height: 0;
+  align-self: stretch;
 }
 
 .bands-index-panel {
@@ -5213,13 +5214,17 @@ img.archive-gallery-image {
   grid-row: 1;
   min-width: 0;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
   display: none;
   gap: clamp(0.58rem, 1.8svh, 0.78rem);
+  overflow: hidden;
 }
 
 .bands-index-panel.is-active {
   display: grid;
   height: 100%;
+  max-height: 100%;
   animation: bandsPanelIn var(--motion-standard) var(--ease-standard) both;
 }
 
@@ -5228,8 +5233,16 @@ img.archive-gallery-image {
 .bands-search-panel {
   min-width: 0;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  align-self: stretch;
   display: grid;
+  align-content: stretch;
   gap: clamp(0.62rem, 2vw, 0.82rem);
+}
+
+.bands-radar-layout {
+  grid-template-rows: minmax(0, 1fr) auto auto;
 }
 
 .bands-list-panel {
@@ -5605,6 +5618,7 @@ img.archive-gallery-image {
   display: grid;
   gap: 0.42rem;
   min-width: 0;
+  min-height: 0;
   overflow: visible;
   padding: 0 0.08rem 0.08rem 0;
 }
@@ -5868,6 +5882,8 @@ img.archive-gallery-image {
 .bands-search-groups {
   min-width: 0;
   min-height: 0;
+  height: 100%;
+  max-height: 100%;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   gap: 0.64rem;
@@ -5881,6 +5897,8 @@ img.archive-gallery-image {
 }
 
 .bands-search-group:last-child {
+  height: 100%;
+  max-height: 100%;
   grid-template-rows: auto auto minmax(0, 1fr);
 }
 
@@ -5914,8 +5932,10 @@ img.archive-gallery-image {
 }
 
 .bands-search-results {
+  align-self: stretch;
   display: grid;
   gap: 0.36rem;
+  height: 100%;
   min-height: 0;
   max-height: none;
   margin: 0;
@@ -12391,6 +12411,7 @@ img.archive-gallery-image {
 
   .bands-radar-layout {
     grid-template-columns: minmax(14rem, 0.9fr) minmax(0, 1.1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
     align-items: center;
   }
 
@@ -12400,6 +12421,7 @@ img.archive-gallery-image {
 
   .bands-search-groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .bands-search-group:last-child {
