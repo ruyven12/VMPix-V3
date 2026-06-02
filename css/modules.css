@@ -11865,11 +11865,12 @@ img.archive-gallery-image {
   }
 
   .rail-branding {
-    width: auto;
+    width: min(100%, var(--rail-brand-max));
     max-width: var(--rail-brand-max);
     display: inline-flex;
     align-items: center;
     gap: 0.24rem;
+    justify-content: flex-end;
     white-space: nowrap;
   }
 

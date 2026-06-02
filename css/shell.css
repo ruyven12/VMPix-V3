@@ -765,17 +765,18 @@ button {
 }
 
 .rail-branding {
-  width: auto;
+  width: min(100%, var(--rail-brand-max));
   max-width: var(--rail-brand-max);
   display: inline-flex;
   gap: clamp(0.28rem, 1.2vw, 0.52rem);
+  justify-content: flex-end;
   justify-self: end;
   white-space: nowrap;
 }
 
 .rail-logo-mark {
-  flex: 0 0 min(var(--rail-logo-width), 100%);
-  width: min(var(--rail-logo-width), 100%);
+  flex: 0 0 var(--rail-logo-width);
+  width: var(--rail-logo-width);
   aspect-ratio: 16 / 7;
   display: block;
   justify-self: end;
@@ -811,10 +812,11 @@ button {
 }
 
 .rail-build-stack {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   gap: 0.26rem;
-  min-width: 0;
+  min-width: max-content;
   line-height: 1;
   white-space: nowrap;
 }
@@ -849,8 +851,25 @@ button {
 }
 
 .rail-value--build {
+  display: inline-flex;
+  align-items: center;
   animation-delay: -3.2s;
   animation-duration: 11.25s;
+  gap: 0.18rem;
+  min-width: max-content;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  text-transform: none;
+}
+
+.rail-build-label,
+[data-archive-build] {
+  flex: 0 0 auto;
+}
+
+.rail-build-label {
+  color: rgba(247, 247, 242, 0.44);
 }
 
 @media (max-width: 44rem) {
@@ -878,7 +897,6 @@ button {
   }
 
   .rail-value--build {
-    max-width: 100%;
     font-size: 0.86em;
   }
 }
