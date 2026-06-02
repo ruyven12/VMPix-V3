@@ -2,6 +2,7 @@
    VMPix V3 state.
    Shared DOM references, mock data, and lightweight shell state.
    Extracted from the original single-file shell; keep this pass mechanical.
+   Mock data inventory: docs/V3_MOCK_DATA_INVENTORY.md.
    ========================================================= */
 
 const shell = document.querySelector(".site-shell");
