@@ -10047,13 +10047,15 @@ img.archive-gallery-image {
   z-index: 2;
   grid-area: 1 / 1;
   width: min(100%, var(--hub-max));
-  height: min(100%, var(--stage-max-height));
-  min-height: min(var(--stage-min-height), 100%);
+  height: 100%;
+  min-height: 0;
   min-width: 0;
-  max-height: 100%;
+  max-height: min(100%, var(--stage-max-height));
   display: grid;
+  align-self: stretch;
   align-content: start;
-  gap: clamp(0.78rem, 2.2svh, 1rem);
+  justify-self: center;
+  gap: clamp(0.68rem, 1.9svh, 1rem);
   padding: clamp(0.85rem, 4vw, 1.35rem);
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md);
@@ -10066,16 +10068,19 @@ img.archive-gallery-image {
   overflow-y: auto;
   overscroll-behavior: contain;
   pointer-events: none;
+  scroll-behavior: smooth;
   scroll-padding-block: var(--shell-viewport-pad-block);
   scrollbar-color: rgba(213, 22, 34, 0.42) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  touch-action: pan-y;
   transform: translate3d(0, 0.36rem, 0) scale(0.985);
   transition:
     opacity var(--motion-standard) var(--ease-standard),
     transform var(--motion-standard) var(--ease-standard),
     visibility var(--motion-standard) var(--ease-standard);
   visibility: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .calendar-shell::-webkit-scrollbar {
@@ -10110,13 +10115,25 @@ img.archive-gallery-image {
 }
 
 .calendar-header {
-  padding: clamp(0.18rem, 0.8vw, 0.36rem) 0 0;
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.48rem, 1.6svh, 0.72rem);
+  padding: clamp(0.16rem, 0.8vw, 0.36rem) 0 0.08rem;
+  text-align: center;
+}
+
+.calendar-header::after {
+  width: min(11rem, 56vw);
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(0, 178, 190, 0.46), rgba(213, 22, 34, 0.28), transparent);
+  opacity: 0.82;
 }
 
 .calendar-title {
   margin: 0;
   color: var(--color-text);
-  font-size: clamp(1.34rem, 7.8vw, 2.34rem);
+  font-size: clamp(1.42rem, 8vw, 2.42rem);
   font-weight: 400;
   line-height: 1;
   text-transform: uppercase;
@@ -10124,6 +10141,8 @@ img.archive-gallery-image {
 }
 
 .calendar-events-panel {
+  width: min(100%, 42rem);
+  justify-self: center;
   display: grid;
   gap: var(--v3-card-gap);
   padding: var(--v3-card-padding);
@@ -10144,6 +10163,8 @@ img.archive-gallery-image {
 }
 
 .calendar-event-list {
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: 0.46rem;
   margin: 0;
@@ -10154,8 +10175,8 @@ img.archive-gallery-image {
 .calendar-event-card {
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   gap: clamp(0.45rem, 2vw, 0.68rem);
   padding: var(--v3-card-padding-compact);
   border: var(--v3-card-border);
@@ -10194,8 +10215,11 @@ img.archive-gallery-image {
 }
 
 .calendar-event-badge {
-  justify-self: end;
-  max-width: min(30vw, 7.2rem);
+  justify-self: start;
+  max-width: 100%;
+  min-height: 1.64rem;
+  display: inline-grid;
+  place-items: center;
   padding: 0.34rem 0.44rem;
   border: 1px solid rgba(247, 247, 242, 0.14);
   border-radius: var(--radius-sm);
@@ -10204,7 +10228,7 @@ img.archive-gallery-image {
   font-size: clamp(0.58rem, 2.35vw, 0.68rem);
   line-height: 1;
   text-align: center;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .calendar-event-badge--busy {
@@ -10220,6 +10244,18 @@ img.archive-gallery-image {
 .calendar-event-badge--tentative {
   border-color: rgba(213, 22, 34, 0.22);
   color: rgba(247, 247, 242, 0.64);
+}
+
+@media (min-width: 620px) {
+  .calendar-event-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .calendar-event-badge {
+    justify-self: end;
+    max-width: min(30vw, 7.2rem);
+  }
 }
 
 .contact-shell {
