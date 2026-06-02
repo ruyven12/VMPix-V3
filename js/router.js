@@ -365,7 +365,11 @@ function syncRoute(route, options = {}) {
 }
 
 function syncRouteFromLocation(options = {}) {
-  syncRoute(getRouteFromUrl(), options);
+  const route = getRouteFromUrl();
+  syncRoute(route, options);
+  if (typeof stabilizeShellViewport === "function") {
+    stabilizeShellViewport(route, options);
+  }
 }
 
 function navigateToRoute(url, options = {}) {
@@ -373,4 +377,7 @@ function navigateToRoute(url, options = {}) {
   const targetUrl = route.isUnknown ? url : route.canonicalUrl;
   pushRouteUrl(targetUrl, options.historyState || {});
   syncRoute(route, { ...options, shouldCanonicalize: false });
+  if (typeof stabilizeShellViewport === "function") {
+    stabilizeShellViewport(route, options);
+  }
 }

@@ -1325,12 +1325,75 @@ function showModulePlaceholder(moduleName) {
   }
 }
 
+function updateViewportMetrics() {
+  const viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight;
+  if (viewportHeight) {
+    document.documentElement.style.setProperty("--app-viewport-height", `${Math.round(viewportHeight)}px`);
+  }
+  syncRailHeight();
+}
+
+function setShellDrawerLock(isLocked) {
+  document.body.classList.toggle("is-shell-drawer-open", isLocked);
+}
+
+function getActiveShellScroller(route = getRouteFromUrl()) {
+  const routeScrollerMap = {
+    home: homeFrame?.parentElement || document.querySelector(".public-home"),
+    portfolio: document.querySelector(".public-home"),
+    music: musicNexusShell,
+    "music-bands": musicNexusShell,
+    "band-detail": musicNexusShell,
+    "set-detail": musicNexusShell,
+    "music-people": musicNexusShell,
+    "person-detail": musicNexusShell,
+    "music-shows": musicNexusShell,
+    "show-detail": musicNexusShell,
+    "music-venues": musicNexusShell,
+    wrestling: ringArchiveShell,
+    "wrestling-people": wrestlingPeopleShell,
+    "wrestling-person-detail": wrestlingPersonDetailShell,
+    "wrestling-venues": wrestlingVenuesShell,
+    "wrestling-venue-detail": wrestlingVenueDetailShell,
+    "wrestling-shows": wrestlingShowsShell,
+    "wrestling-show-detail": wrestlingShowDetailShell,
+    "wrestling-match-gallery": wrestlingMatchGalleryShell,
+    "wrestling-lightbox": wrestlingLightboxShell,
+    calendar: calendarShell,
+    about: aboutShell,
+    contact: contactShell,
+  };
+
+  return routeScrollerMap[route.name] || document.querySelector(".public-home");
+}
+
+function resetShellScroller(scroller) {
+  if (!scroller || typeof scroller.scrollTo !== "function") {
+    return;
+  }
+
+  scroller.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}
+
+function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
+  updateViewportMetrics();
+  if (options.shouldResetScroll === false) {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    resetShellScroller(getActiveShellScroller(route));
+  });
+}
+
 function syncRailHeight() {
   if (!bottomRail) {
     return;
   }
 
-  document.documentElement.style.setProperty("--rail-height", `${Math.ceil(bottomRail.getBoundingClientRect().height)}px`);
+  const railHeight = Math.ceil(bottomRail.getBoundingClientRect().height);
+  document.documentElement.style.setProperty("--rail-height", `${railHeight}px`);
+  document.documentElement.style.setProperty("--rail-total-height", `${railHeight + 10}px`);
 }
 
 function openGlobalMenu() {
@@ -1342,6 +1405,7 @@ function openGlobalMenu() {
   syncRailHeight();
   globalMenuDrawer.hidden = false;
   globalMenuBackdrop.hidden = false;
+  setShellDrawerLock(true);
   globalMenuDrawer.setAttribute("aria-hidden", "false");
   railMenuTrigger.setAttribute("aria-expanded", "true");
   window.requestAnimationFrame(() => {
@@ -1377,6 +1441,7 @@ function closeGlobalMenu() {
   globalMenuDrawer.setAttribute("aria-hidden", "true");
   railMenuTrigger.setAttribute("aria-expanded", "false");
   railMenuTrigger.focus({ preventScroll: true });
+  setShellDrawerLock(false);
   window.clearTimeout(drawerCloseTimer);
   if (reducedMotion.matches) {
     finishGlobalMenuClose();
@@ -1512,7 +1577,7 @@ if (shell && startButton) {
   startButton.addEventListener("click", () => {
     navigateToRoute(routePaths.portfolio, { shouldAnimatePortal: true });
   });
-  syncRailHeight();
+  updateViewportMetrics();
   if (railMenuTrigger) {
     railMenuTrigger.addEventListener("click", openGlobalMenu);
   }
@@ -1674,13 +1739,18 @@ if (shell && startButton) {
   } else if (typeof reducedMotion.addListener === "function") {
     reducedMotion.addListener(syncAmbientMotion);
   }
-  window.addEventListener("resize", syncRailHeight);
+  window.addEventListener("resize", updateViewportMetrics);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", updateViewportMetrics);
+    window.visualViewport.addEventListener("scroll", updateViewportMetrics);
+  }
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && globalMenuDrawer && !globalMenuDrawer.hidden) {
       closeGlobalMenu();
     }
   });
   window.addEventListener("pagehide", () => {
+    setShellDrawerLock(false);
     window.clearTimeout(activationTimer);
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {

@@ -59,9 +59,11 @@
     box-shadow var(--motion-fast) var(--ease-standard),
     transform var(--motion-fast) var(--ease-standard);
   --tap-target: 48px;
+  --app-viewport-height: 100dvh;
   --shell-viewport-pad-block: clamp(0.62rem, 1.8svh, 1.15rem);
   --shell-viewport-pad-inline: clamp(0.72rem, 3vw, 2rem);
   --rail-lift: 0.625rem;
+  --rail-total-height: calc(var(--rail-height, 2.25rem) + var(--rail-lift));
   --frame-max: 52rem;
   --hub-max: 58rem;
   --stage-max-height: 64rem;

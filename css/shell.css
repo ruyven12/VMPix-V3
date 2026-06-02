@@ -25,6 +25,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body.is-shell-drawer-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 button {
   font: inherit;
 }
@@ -96,6 +101,8 @@ button {
   min-height: 100svh;
   height: 100dvh;
   min-height: 100dvh;
+  height: var(--app-viewport-height);
+  min-height: var(--app-viewport-height);
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
@@ -372,13 +379,14 @@ button {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-gutter: stable both-edges;
   padding:
     max(var(--shell-viewport-pad-block), env(safe-area-inset-top))
     max(var(--shell-viewport-pad-inline), env(safe-area-inset-right))
-    var(--shell-viewport-pad-block)
+    max(var(--shell-viewport-pad-block), calc(env(safe-area-inset-bottom) + 0.25rem))
     max(var(--shell-viewport-pad-inline), env(safe-area-inset-left));
   scroll-padding-block: var(--shell-viewport-pad-block);
-  scrollbar-gutter: stable both-edges;
+  -webkit-overflow-scrolling: touch;
 }
 
 .home-frame {
@@ -827,6 +835,7 @@ button {
   overflow-x: hidden;
   overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   background:
@@ -862,6 +871,22 @@ button {
     clamp(0.82rem, 3.4vw, 1.05rem)
     clamp(0.8rem, 3.4vw, 1.05rem)
     calc(clamp(0.9rem, 3.6vw, 1.18rem) + env(safe-area-inset-bottom));
+}
+
+.site-shell.is-global-menu-open .public-home,
+.site-shell.is-global-menu-open .music-nexus-shell,
+.site-shell.is-global-menu-open .ring-archive-shell,
+.site-shell.is-global-menu-open .wrestling-people-shell,
+.site-shell.is-global-menu-open .wrestling-person-detail-shell,
+.site-shell.is-global-menu-open .wrestling-venues-shell,
+.site-shell.is-global-menu-open .wrestling-venue-detail-shell,
+.site-shell.is-global-menu-open .wrestling-shows-shell,
+.site-shell.is-global-menu-open .wrestling-show-detail-shell,
+.site-shell.is-global-menu-open .wrestling-match-gallery-shell,
+.site-shell.is-global-menu-open .about-shell,
+.site-shell.is-global-menu-open .calendar-shell,
+.site-shell.is-global-menu-open .contact-shell {
+  overscroll-behavior: none;
 }
 
 .global-menu-inner::before {
