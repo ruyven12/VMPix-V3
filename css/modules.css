@@ -10056,7 +10056,10 @@ img.archive-gallery-image {
   align-content: start;
   justify-self: center;
   gap: clamp(0.68rem, 1.9svh, 1rem);
-  padding: clamp(0.85rem, 4vw, 1.35rem);
+  padding:
+    clamp(2.65rem, 8vw, 3.15rem)
+    clamp(0.85rem, 4vw, 1.35rem)
+    clamp(0.85rem, 4vw, 1.35rem);
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md);
   background:
@@ -11341,6 +11344,10 @@ img.archive-gallery-image {
   .contact-shell {
     gap: 0.62rem;
     padding: 0.72rem;
+  }
+
+  .calendar-shell {
+    padding: clamp(2.65rem, 8vw, 3.15rem) 0.72rem 0.72rem;
   }
 
   .about-content {
