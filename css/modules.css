@@ -5343,12 +5343,13 @@ img.archive-gallery-image {
   font-size: clamp(0.62rem, 2.45vw, 0.72rem);
   line-height: 1.1;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .bands-filter-select option {
   background: #08070d;
   color: rgba(247, 247, 242, 0.9);
+  text-transform: none;
 }
 
 .bands-filter-reset {
