@@ -1751,6 +1751,9 @@ function renderBandsLetterNavs(rows) {
     }
     bandsAlphabet.forEach((letter) => {
       const count = counts.get(letter) || 0;
+      if (isListNav && count === 0) {
+        return;
+      }
       const button = document.createElement("button");
       const isSearchMatch = Boolean(bandsSearchTerm) && count > 0;
       button.className = `bands-letter-button${count > 0 ? " has-signal" : ""}${isSearchMatch ? " is-search-match" : ""}`;
