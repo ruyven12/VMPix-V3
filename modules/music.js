@@ -2074,9 +2074,8 @@ function createBandListRow(band, options = {}) {
     photos.className = "bands-row-stat";
     photos.setAttribute("aria-label", `${formatBandIndexNumber(photoCount)} photos`);
     const photoLabel = document.createElement("span");
-    photoLabel.className = "bands-row-stat-label";
+    photoLabel.className = "bands-row-stat-icon bands-row-stat-icon--photos";
     photoLabel.setAttribute("aria-hidden", "true");
-    photoLabel.textContent = "PH";
     const photoValue = document.createElement("span");
     photoValue.textContent = formatBandIndexNumber(photoCount);
     photos.append(photoLabel, photoValue);
@@ -2085,9 +2084,8 @@ function createBandListRow(band, options = {}) {
     sets.className = "bands-row-stat";
     sets.setAttribute("aria-label", `${formatBandIndexNumber(archivedSetCount)} of ${formatBandIndexNumber(totalSetCount)} sets archived`);
     const setLabel = document.createElement("span");
-    setLabel.className = "bands-row-stat-label";
+    setLabel.className = "bands-row-stat-icon bands-row-stat-icon--sets";
     setLabel.setAttribute("aria-hidden", "true");
-    setLabel.textContent = "SET";
     const setValue = document.createElement("span");
     setValue.textContent = `${formatBandIndexNumber(archivedSetCount)}/${formatBandIndexNumber(totalSetCount)}`;
     sets.append(setLabel, setValue);

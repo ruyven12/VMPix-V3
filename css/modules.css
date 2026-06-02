@@ -5295,16 +5295,18 @@ img.archive-gallery-image {
 .bands-filter-strip {
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: end;
   gap: 0.46rem;
 }
 
 .bands-filter-strip-label {
   grid-column: 1 / -1;
+  justify-self: center;
   color: rgba(247, 247, 242, 0.52);
   font-size: clamp(0.58rem, 2.25vw, 0.68rem);
   line-height: 1;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -5318,6 +5320,7 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.48);
   font-size: clamp(0.55rem, 2.12vw, 0.64rem);
   line-height: 1;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -5339,6 +5342,7 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.62rem, 2.45vw, 0.72rem);
   line-height: 1.1;
+  text-overflow: ellipsis;
   text-transform: uppercase;
 }
 
@@ -5349,6 +5353,9 @@ img.archive-gallery-image {
 
 .bands-filter-reset {
   appearance: none;
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 14rem);
   min-width: 0;
   min-height: 2.42rem;
   padding: 0.56rem 0.68rem;
@@ -5366,6 +5373,27 @@ img.archive-gallery-image {
 .bands-filter-reset:disabled {
   cursor: default;
   opacity: 0.42;
+}
+
+@media (max-width: 520px) {
+  .bands-filter-strip {
+    gap: 0.34rem;
+  }
+
+  .bands-filter-field {
+    gap: 0.24rem;
+  }
+
+  .bands-filter-select {
+    min-height: 2.36rem;
+    padding: 0.52rem 1.12rem 0.52rem 0.42rem;
+    background:
+      linear-gradient(45deg, transparent 50%, rgba(247, 247, 242, 0.58) 50%) calc(100% - 0.7rem) 50% / 0.22rem 0.22rem no-repeat,
+      linear-gradient(135deg, rgba(247, 247, 242, 0.58) 50%, transparent 50%) calc(100% - 0.56rem) 50% / 0.22rem 0.22rem no-repeat,
+      linear-gradient(90deg, rgba(142, 108, 255, 0.07), transparent 62%),
+      rgba(1, 1, 3, 0.48);
+    font-size: clamp(0.54rem, 2.1vw, 0.62rem);
+  }
 }
 
 .bands-list-panel::-webkit-scrollbar {
