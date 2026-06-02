@@ -5065,7 +5065,8 @@ img.archive-gallery-image {
 
 .music-bands-index {
   display: none;
-  align-content: start;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
   gap: clamp(0.62rem, 1.95svh, 0.88rem);
   padding: clamp(0.68rem, 2.7vw, 0.95rem);
   border: var(--v3-card-border-strong);
@@ -5082,7 +5083,7 @@ img.archive-gallery-image {
 }
 
 .music-nexus-shell:not(.is-landing) .music-bands-index.is-active {
-  min-height: min(34rem, calc(100svh - 8.5rem));
+  min-height: min(42rem, calc(100svh - 6.75rem));
 }
 
 .music-bands-index::before {
@@ -5200,12 +5201,14 @@ img.archive-gallery-image {
 
 .music-bands-view-stack {
   display: grid;
+  min-height: 0;
 }
 
 .bands-index-panel {
   grid-column: 1;
   grid-row: 1;
   min-width: 0;
+  min-height: 0;
   display: none;
   gap: clamp(0.58rem, 1.8svh, 0.78rem);
 }
@@ -5219,8 +5222,19 @@ img.archive-gallery-image {
 .bands-list-panel,
 .bands-search-panel {
   min-width: 0;
+  min-height: 0;
   display: grid;
   gap: clamp(0.62rem, 2vw, 0.82rem);
+}
+
+.bands-list-panel {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+
+.music-bands-index[data-bands-data-state="loading"] .bands-list-row,
+.music-bands-index[data-bands-data-state="loading"] .bands-radar-signal,
+.music-bands-index[data-bands-data-state="loading"] .bands-search-result-row {
+  opacity: 0.74;
 }
 
 .bands-radar-core {
@@ -5506,7 +5520,7 @@ img.archive-gallery-image {
 }
 
 .bands-list-viewport {
-  max-height: min(44svh, 21rem);
+  max-height: min(62svh, 34rem);
   display: grid;
   gap: 0.42rem;
   min-width: 0;
@@ -5564,10 +5578,12 @@ img.archive-gallery-image {
 }
 
 .bands-row-thumb {
+  position: relative;
   width: clamp(2.25rem, 10vw, 2.82rem);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border: 1px solid rgba(247, 247, 242, 0.12);
   border-radius: var(--radius-sm);
   background:
@@ -5578,6 +5594,24 @@ img.archive-gallery-image {
   font-size: clamp(0.62rem, 2.5vw, 0.76rem);
   line-height: 1;
   text-transform: uppercase;
+}
+
+.bands-row-initials {
+  position: relative;
+  z-index: 1;
+}
+
+.bands-row-logo {
+  position: absolute;
+  inset: 0.24rem;
+  z-index: 2;
+  width: calc(100% - 0.48rem);
+  height: calc(100% - 0.48rem);
+  object-fit: contain;
+}
+
+.bands-row-thumb.has-logo .bands-row-initials {
+  opacity: 0;
 }
 
 .bands-row-main {
@@ -5599,34 +5633,39 @@ img.archive-gallery-image {
 
 .bands-row-meta {
   min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.24rem 0.34rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.28rem;
   color: rgba(247, 247, 242, 0.48);
   font-size: clamp(0.56rem, 2.25vw, 0.66rem);
   line-height: 1.12;
   text-transform: none;
 }
 
-.bands-row-region,
-.bands-row-status,
-.bands-row-count {
+.bands-row-meta-item {
   min-width: 0;
   min-height: 1.22rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.24rem;
-  padding: 0.16rem 0.34rem;
-  border: 1px solid rgba(247, 247, 242, 0.08);
-  border-radius: var(--radius-sm);
-  background: rgba(247, 247, 242, 0.018);
+  gap: 0.22rem;
   line-height: 1;
-  overflow-wrap: anywhere;
-  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bands-row-region {
+  justify-self: start;
   color: rgba(247, 247, 242, 0.58);
+}
+
+.bands-row-status {
+  justify-self: center;
+  padding: 0.14rem 0.32rem;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background: rgba(247, 247, 242, 0.018);
 }
 
 .bands-row-status::before {
@@ -5657,8 +5696,29 @@ img.archive-gallery-image {
   color: rgba(230, 108, 116, 0.82);
 }
 
-.bands-row-count {
+.bands-row-status--neutral {
+  border-color: rgba(247, 247, 242, 0.13);
+  background: rgba(247, 247, 242, 0.024);
+  color: rgba(247, 247, 242, 0.62);
+}
+
+.bands-row-stats {
+  justify-self: end;
+  justify-content: flex-end;
+  gap: 0.34rem;
   color: rgba(247, 247, 242, 0.58);
+}
+
+.bands-row-stat {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+}
+
+.bands-row-stat-label {
+  color: rgba(142, 108, 255, 0.72);
+  font-size: 0.78em;
 }
 
 .bands-row-arrow {
@@ -11218,11 +11278,16 @@ img.archive-gallery-image {
     gap: 0.2rem 0.24rem;
   }
 
-  .bands-row-region,
-  .bands-row-status,
-  .bands-row-count {
+  .bands-row-meta-item {
     min-height: 1.14rem;
+  }
+
+  .bands-row-status {
     padding: 0.14rem 0.28rem;
+  }
+
+  .bands-row-stats {
+    gap: 0.26rem;
   }
 
   .bands-row-arrow {
@@ -12257,7 +12322,7 @@ img.archive-gallery-image {
   }
 
   .bands-list-viewport {
-    max-height: min(46svh, 24rem);
+    max-height: min(62svh, 36rem);
   }
 
   .ring-archive-shell {
