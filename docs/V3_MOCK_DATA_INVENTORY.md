@@ -2,7 +2,7 @@
 
 Pass: Mock Data Cleanup - Pass 1: Inventory Current Mock Data  
 Scope: public V3 frontend shell, Portfolio Hub, Music, Wrestling, Calendar, About, Contact, and shared shell/navigation systems.  
-Status: documentation only. No mock data was removed, no routes were changed, and no live API wiring was introduced.
+Status: cleanup log for mock data passes. No live API wiring was introduced.
 
 Pass 2 update: `js/state.js` now applies compatibility aliases to active Music and Wrestling mock rows. Legacy render fields remain intact, while mock objects also expose backend-friendlier keys such as `id`, `slug`, `title`, `date`, `status`, `category`, `photo_count`, `venue_details`, `related_people`, `related_shows`, `tagged_people`, and `image_url` where practical.
 
@@ -11,6 +11,8 @@ Pass 3 update: `js/state.js` now attaches `backend_record` objects and static `m
 Pass 4 update: `js/state.js` now exposes lightweight reusable mock-loading helpers: `getMockCollection`, `getMockRecordById`, `getMockRecordBySlug`, `filterMockCollection`, `sortMockCollection`, `getSafeImageUrl`, and `normalizeMockRecord`. Music and Wrestling use these helpers for the obvious lookup/filter/sort paths while keeping existing render fields and UI behavior stable.
 
 Pass 5 update: `js/state.js` now includes reusable mock state helpers for `loading`, `empty`, `error`, and `partial` states. Music, Wrestling, Calendar, and Contact can safely test forced states with query params such as `?mockState=empty&mockScope=musicShows` without connecting live APIs or changing normal mock rendering.
+
+Pass 6 update: Removed the unused `getMockWrestlingShow` helper and aligned Portfolio Hub future cards with the route registry placeholders: Wildlife, Astrophotography, and Sunset.
 
 ## Inventory Rules
 
@@ -25,7 +27,7 @@ Pass 5 update: `js/state.js` now includes reusable mock state helpers for `loadi
 | Area | File | Current mock/static data | Notes |
 | --- | --- | --- | --- |
 | Shared shell/navigation | `js/state.js` | `shellDrawerGroups`, `shellRouteRegistry`, breadcrumb/back route maps | Shell metadata is intentional static navigation data, not content data. Future placeholder status lives here. |
-| Portfolio Hub | `index.html` | Hub cards, future module cards, world activity list, spotlight seed copy | Static markup. Future card naming is not fully aligned with the route registry. |
+| Portfolio Hub | `index.html` | Hub cards, future module cards, world activity list, spotlight seed copy | Static markup. Future cards are aligned with the route registry placeholders. |
 | Portfolio Hub spotlight | `js/state.js` | `spotlightContent` | Used by shell carousel focus. Small static copy/tag object. |
 | Future module placeholder | `index.html`, `js/state.js` | `module-placeholder` markup, `modulePlaceholderContent = {}` | Placeholder surface exists, but content registry is empty. Current future hub cards are not active click targets. |
 | Music landing | `index.html` | Landing stats, entry cards, latest activity cards | Static markup counts and copy. Not sourced from `musicBandIndexRows` or show/person fixtures. |
@@ -71,11 +73,10 @@ Pass 5 update: `js/state.js` now includes reusable mock state helpers for `loadi
 - Music gallery placeholder media appears in repeated static gallery buttons, `galleryImageFallbackSrc`, lightbox labels, and generated media relationship snapshots.
 - Wrestling event/show relationship data overlaps across `wrestlingPersonEventHistoryRows`, `wrestlingVenueEventHistoryRows`, `wrestlingShowRelationshipRows`, and `wrestlingMatchRelationshipRows`.
 - `taggedPeople` appears in several Wrestling arrays with the same conceptual meaning but slightly different role/count values depending on the surface.
-- Future module naming is duplicated between hub cards and `shellRouteRegistry`, with inconsistent labels/IDs.
+- Future module naming is duplicated between hub cards and `shellRouteRegistry`, but the current hub placeholders now use the same route ids.
 
 ## Outdated Or Inconsistent Names
 
-- Portfolio Hub has `data-module-card="skies-above"` and visible label `Skies Above`; the current route registry uses `astrophotography` and `sunset` as future placeholders.
 - Music route registry includes `/music/venues`, but the route currently returns to the Music landing shell instead of a dedicated venues archive.
 - `modulePlaceholderContent` exists but is empty, while the HTML placeholder surface has default copy.
 - Music people rows use `band` as a display string; planned contracts prefer `band_ids`.
@@ -94,6 +95,7 @@ Pass 5 update: `js/state.js` now includes reusable mock state helpers for `loadi
 - Pass 3 added backend-shaped `backend_record` snapshots and mock response envelopes rather than wiring live fetch calls, so future API adapters can be compared against realistic frontend fixtures without changing current module behavior.
 - Pass 4 introduced reusable mock helpers as the frontend adapter boundary for loading, selecting, filtering, sorting, safe fallback images, and normalized fixture records.
 - Pass 5 introduced reusable state rendering for mock-driven loading, empty, error, and partial-data surfaces. Forced states are query-param based and should remain testing-only until live API integration.
+- Pass 6 removed one unused helper and aligned stale future-module hub labels with the route registry. Active placeholders remain intentionally staged.
 - Music show snapshots generated in `modules/music.js` already emit some snake_case keys (`show_id`, `venue_id`, `band_ids`, `media_ids`, `archive_meta`), but they are derived from camelCase frontend rows and display strings.
 - Music fixture rows often store display-ready labels instead of canonical IDs, especially for venues, locations, counts, roles, and dates.
 - Wrestling fixtures are closer to relationship data but still do not match the planned match/show contracts exactly.

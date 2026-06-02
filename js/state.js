@@ -1062,10 +1062,6 @@ function getMockWrestlingVenue(venueId = "") {
   return wrestlingVenueRows.find((venue) => venue.venueId === venueId) || null;
 }
 
-function getMockWrestlingShow(showId = "") {
-  return wrestlingShowRelationshipRows.find((show) => show.showId === showId) || null;
-}
-
 function createMockWrestlingMatchRecord(match, index = 0) {
   const participantRefs = mapMockPeopleRefs(match.personIds || []);
   const refereeRefs = mapMockPeopleRefs(match.refereeIds || []);
