@@ -109,6 +109,22 @@ button {
   isolation: isolate;
 }
 
+.site-shell[data-shell-module="music"] {
+  --shell-nav-accent: var(--accent-music);
+}
+
+.site-shell[data-shell-module="wrestling"] {
+  --shell-nav-accent: var(--accent-ring);
+}
+
+.site-shell[data-shell-module="site"] {
+  --shell-nav-accent: var(--accent-calendar);
+}
+
+.site-shell[data-shell-module="future"] {
+  --shell-nav-accent: var(--accent-future);
+}
+
 .ambient-system,
 .ambient-system::before,
 .ambient-system::after,
@@ -251,19 +267,17 @@ button {
   min-height: 2.2rem;
   display: flex;
   align-items: center;
-  gap: 0.34rem;
+  gap: var(--shell-nav-gap);
   margin: 0;
   padding: 0.46rem 0.62rem;
-  border: 1px solid rgba(247, 247, 242, 0.13);
-  border-radius: var(--radius-sm);
+  border: var(--shell-nav-border);
+  border-radius: var(--shell-nav-radius);
   background:
-    linear-gradient(90deg, rgba(213, 22, 34, 0.1), transparent 72%),
-    rgba(3, 3, 6, 0.58);
-  box-shadow:
-    0 0.65rem 1.5rem rgba(0, 0, 0, 0.2),
-    inset 0 0 0 1px rgba(247, 247, 242, 0.025);
-  color: rgba(247, 247, 242, 0.74);
-  font-size: clamp(0.62rem, 2.65vw, 0.78rem);
+    var(--shell-nav-accent-wash),
+    var(--shell-nav-panel-bg);
+  box-shadow: var(--shell-nav-glow-soft);
+  color: var(--shell-nav-text);
+  font-size: var(--shell-nav-font-size-compact);
   line-height: 1;
   list-style: none;
   overflow: hidden;
@@ -275,7 +289,7 @@ button {
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.34rem;
+  gap: var(--shell-nav-gap);
   overflow: hidden;
 }
 
@@ -283,8 +297,8 @@ button {
   flex: 0 0 auto;
   width: 0.36rem;
   height: 1px;
-  background: rgba(213, 22, 34, 0.48);
-  box-shadow: 0 0 0.36rem rgba(213, 22, 34, 0.14);
+  background: color-mix(in srgb, var(--shell-nav-accent) 48%, transparent);
+  box-shadow: 0 0 0.36rem color-mix(in srgb, var(--shell-nav-accent) 14%, transparent);
   content: "";
 }
 
@@ -295,8 +309,8 @@ button {
 }
 
 .shell-breadcrumb-item[aria-current="page"] .shell-breadcrumb-label {
-  color: rgba(247, 247, 242, 0.92);
-  text-shadow: 0 0 0.5rem rgba(213, 22, 34, 0.12);
+  color: var(--shell-nav-text-strong);
+  text-shadow: 0 0 0.5rem color-mix(in srgb, var(--shell-nav-accent) 12%, transparent);
 }
 
 @media (max-width: 32rem) {
@@ -649,6 +663,7 @@ button {
 }
 
 .universal-bottom-rail {
+  --rail-active-accent: var(--shell-nav-accent);
   position: relative;
   z-index: 8;
   width: 100%;
@@ -664,8 +679,9 @@ button {
     max(var(--space-3), env(safe-area-inset-right))
     max(0.54rem, env(safe-area-inset-bottom))
     max(var(--space-3), env(safe-area-inset-left));
-  border-top: 1px solid rgba(247, 247, 242, 0.1);
+  border-top: var(--shell-nav-border-muted);
   background:
+    linear-gradient(90deg, color-mix(in srgb, var(--rail-active-accent) 8%, transparent), transparent 68%),
     linear-gradient(180deg, rgba(247, 247, 242, 0.025), transparent 68%),
     rgba(1, 1, 3, 0.28);
   color: var(--color-faint);
@@ -677,6 +693,22 @@ button {
   transition:
     opacity var(--motion-standard) var(--ease-standard),
     color var(--motion-standard) var(--ease-standard);
+}
+
+.universal-bottom-rail[data-shell-module="music"] {
+  --rail-active-accent: var(--accent-music);
+}
+
+.universal-bottom-rail[data-shell-module="wrestling"] {
+  --rail-active-accent: var(--accent-ring);
+}
+
+.universal-bottom-rail[data-shell-module="site"] {
+  --rail-active-accent: var(--accent-calendar);
+}
+
+.universal-bottom-rail[data-shell-module="future"] {
+  --rail-active-accent: var(--accent-future);
 }
 
 .rail-menu-trigger {
@@ -697,18 +729,18 @@ button {
   top: 50%;
   left: max(0.58rem, env(safe-area-inset-left));
   z-index: 3;
-  width: 2.35rem;
+  width: var(--shell-nav-control-size);
   min-width: var(--tap-target);
-  height: 2.35rem;
+  height: var(--shell-nav-control-size);
   min-height: var(--tap-target);
   display: inline-grid;
   place-items: center;
-  border: 1px solid rgba(247, 247, 242, 0.15);
-  border-radius: var(--radius-sm);
+  border: var(--shell-nav-border);
+  border-radius: var(--shell-nav-radius);
   background:
-    linear-gradient(135deg, rgba(213, 22, 34, 0.1), transparent 70%),
+    linear-gradient(135deg, color-mix(in srgb, var(--rail-active-accent) 12%, transparent), transparent 70%),
     rgba(247, 247, 242, 0.026);
-  color: rgba(247, 247, 242, 0.78);
+  color: var(--shell-nav-text);
   cursor: pointer;
   font: inherit;
   line-height: 1;
@@ -749,7 +781,7 @@ button {
   max-width: 100%;
   display: inline-flex;
   align-items: baseline;
-  gap: 0.36rem;
+  gap: var(--shell-nav-gap);
   overflow: hidden;
 }
 
@@ -766,7 +798,7 @@ button {
 
 .rail-brand {
   justify-self: center;
-  color: rgba(247, 247, 242, 0.72);
+  color: var(--shell-nav-text);
   font-size: 0.94em;
   text-align: center;
   text-shadow: 0 0 0.55rem rgba(247, 247, 242, 0.08);
@@ -790,8 +822,8 @@ button {
 
 .rail-value--view,
 .rail-value--build {
-  color: rgba(213, 22, 34, 0.74);
-  text-shadow: 0 0 0.55rem rgba(213, 22, 34, 0.08);
+  color: color-mix(in srgb, var(--rail-active-accent) 74%, var(--color-text));
+  text-shadow: 0 0 0.55rem color-mix(in srgb, var(--rail-active-accent) 8%, transparent);
   animation: statusIdlePulse 9.5s var(--ease-breath) infinite;
 }
 
@@ -822,7 +854,7 @@ button {
 }
 
 .global-menu-drawer {
-  --v3-card-accent: var(--accent-shell);
+  --v3-card-accent: var(--shell-nav-accent);
   right: max(var(--space-2), env(safe-area-inset-right));
   bottom: calc(var(--rail-height, 2.25rem) + var(--rail-lift) + 0.25rem);
   left: max(var(--space-2), env(safe-area-inset-left));
@@ -836,20 +868,16 @@ button {
   overscroll-behavior-y: auto;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
-  border: 1px solid rgba(247, 247, 242, 0.16);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border: var(--shell-nav-border);
+  border-radius: var(--shell-nav-radius-panel) var(--shell-nav-radius-panel) 0 0;
   background:
     linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 42%),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.12), transparent 54%),
-    rgba(3, 3, 6, 0.94);
-  box-shadow:
-    0 -1rem 2.5rem rgba(0, 0, 0, 0.42),
-    inset 0 0 0 1px rgba(247, 247, 242, 0.035);
+    linear-gradient(135deg, color-mix(in srgb, var(--shell-nav-accent) 12%, transparent), transparent 54%),
+    var(--shell-nav-panel-bg-strong);
+  box-shadow: var(--shell-nav-glow-panel);
   opacity: 0;
   transform: translate3d(0, 0.2rem, 0);
-  transition:
-    opacity var(--motion-standard) var(--ease-standard),
-    transform var(--motion-standard) var(--ease-standard);
+  transition: var(--shell-nav-transition);
 }
 
 .site-shell.is-global-menu-open .global-menu-backdrop,
@@ -893,8 +921,8 @@ button {
   position: absolute;
   inset: 0.6rem;
   content: "";
-  border: 1px solid rgba(213, 22, 34, 0.13);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border: 1px solid color-mix(in srgb, var(--shell-nav-accent) 13%, transparent);
+  border-radius: var(--shell-nav-radius) var(--shell-nav-radius) 0 0;
   pointer-events: none;
 }
 
@@ -929,8 +957,8 @@ button {
 }
 
 .global-menu-kicker {
-  color: rgba(213, 22, 34, 0.76);
-  font-size: clamp(0.66rem, 2.8vw, 0.76rem);
+  color: var(--shell-nav-accent-text);
+  font-size: var(--shell-nav-font-size);
 }
 
 .global-menu-title {
@@ -939,14 +967,14 @@ button {
 }
 
 .global-menu-close {
-  min-width: 2.35rem;
-  min-height: 2.35rem;
+  min-width: var(--shell-nav-control-size);
+  min-height: var(--shell-nav-control-size);
   display: inline-grid;
   place-items: center;
-  border: 1px solid rgba(247, 247, 242, 0.18);
-  border-radius: var(--radius-sm);
+  border: var(--shell-nav-border);
+  border-radius: var(--shell-nav-radius);
   background: rgba(247, 247, 242, 0.035);
-  color: rgba(247, 247, 242, 0.82);
+  color: var(--shell-nav-text-strong);
   cursor: pointer;
   font-size: 1rem;
   line-height: 1;
@@ -964,8 +992,8 @@ button {
 }
 
 .global-menu-section-title {
-  color: rgba(247, 247, 242, 0.44);
-  font-size: clamp(0.66rem, 2.7vw, 0.74rem);
+  color: var(--shell-nav-text-muted);
+  font-size: var(--shell-nav-font-size-compact);
 }
 
 .global-menu-actions {
@@ -984,7 +1012,7 @@ button {
 }
 
 .global-menu-list {
-  gap: 0.36rem;
+  gap: var(--shell-nav-gap);
 }
 
 .global-menu-button {
@@ -996,12 +1024,12 @@ button {
   align-items: center;
   gap: var(--space-2);
   padding: 0.68rem 0.76rem;
-  border: var(--v3-card-border);
-  border-radius: var(--v3-card-radius);
+  border: var(--shell-nav-border-muted);
+  border-radius: var(--shell-nav-radius);
   background:
     linear-gradient(90deg, rgba(247, 247, 242, 0.035), transparent 72%),
     rgba(247, 247, 242, 0.022);
-  color: rgba(247, 247, 242, 0.76);
+  color: var(--shell-nav-text);
   cursor: pointer;
   font: inherit;
   font-size: clamp(0.74rem, 3.3vw, 0.86rem);
@@ -1013,9 +1041,9 @@ button {
 
 .global-menu-button--module {
   min-height: 3rem;
-  border-color: rgba(213, 22, 34, 0.24);
+  border-color: color-mix(in srgb, var(--shell-nav-accent) 24%, rgba(247, 247, 242, 0.1));
   background:
-    linear-gradient(90deg, rgba(213, 22, 34, 0.11), transparent 68%),
+    var(--shell-nav-accent-wash),
     rgba(247, 247, 242, 0.026);
   color: rgba(247, 247, 242, 0.86);
 }
@@ -1031,7 +1059,7 @@ button {
 .global-menu-button--child::before {
   width: 0.72rem;
   height: 1px;
-  background: rgba(213, 22, 34, 0.34);
+  background: color-mix(in srgb, var(--shell-nav-accent) 34%, transparent);
   content: "";
 }
 
@@ -1042,23 +1070,23 @@ button {
 .global-menu-button::after {
   width: 0.36rem;
   aspect-ratio: 1;
-  border: 1px solid rgba(213, 22, 34, 0.58);
+  border: 1px solid color-mix(in srgb, var(--shell-nav-accent) 58%, transparent);
   border-radius: 50%;
-  background: rgba(213, 22, 34, 0.18);
-  box-shadow: 0 0 0.5rem rgba(213, 22, 34, 0.1);
+  background: color-mix(in srgb, var(--shell-nav-accent) 18%, transparent);
+  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--shell-nav-accent) 10%, transparent);
   content: "";
 }
 
 .global-menu-button[aria-current="page"] {
-  border-color: rgba(213, 22, 34, 0.32);
+  border-color: color-mix(in srgb, var(--shell-nav-accent) 32%, rgba(247, 247, 242, 0.12));
   background:
-    linear-gradient(90deg, rgba(213, 22, 34, 0.12), transparent 72%),
+    var(--shell-nav-accent-wash-strong),
     rgba(247, 247, 242, 0.032);
-  color: rgba(247, 247, 242, 0.9);
+  color: var(--shell-nav-text-strong);
 }
 
 .global-menu-button[aria-current="page"]::after {
-  background: rgba(213, 22, 34, 0.3);
+  background: color-mix(in srgb, var(--shell-nav-accent) 30%, transparent);
 }
 
 .global-menu-button[aria-disabled="true"] {

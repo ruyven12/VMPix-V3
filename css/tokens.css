@@ -58,6 +58,29 @@
     background-color var(--motion-fast) var(--ease-standard),
     box-shadow var(--motion-fast) var(--ease-standard),
     transform var(--motion-fast) var(--ease-standard);
+  --shell-nav-radius: var(--radius-sm);
+  --shell-nav-radius-panel: var(--radius-md);
+  --shell-nav-border: 1px solid rgba(247, 247, 242, 0.14);
+  --shell-nav-border-muted: 1px solid rgba(247, 247, 242, 0.1);
+  --shell-nav-panel-bg: rgba(3, 3, 6, 0.58);
+  --shell-nav-panel-bg-strong: rgba(3, 3, 6, 0.94);
+  --shell-nav-accent: var(--accent-shell);
+  --shell-nav-accent-wash: linear-gradient(90deg, color-mix(in srgb, var(--shell-nav-accent) 10%, transparent), transparent 72%);
+  --shell-nav-accent-wash-strong: linear-gradient(90deg, color-mix(in srgb, var(--shell-nav-accent) 14%, transparent), transparent 70%);
+  --shell-nav-glow-soft: 0 0.65rem 1.5rem rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(247, 247, 242, 0.025);
+  --shell-nav-glow-panel: 0 -1rem 2.5rem rgba(0, 0, 0, 0.42), inset 0 0 0 1px rgba(247, 247, 242, 0.035);
+  --shell-nav-text: rgba(247, 247, 242, 0.76);
+  --shell-nav-text-strong: rgba(247, 247, 242, 0.92);
+  --shell-nav-text-muted: rgba(247, 247, 242, 0.44);
+  --shell-nav-accent-text: color-mix(in srgb, var(--shell-nav-accent) 76%, var(--color-text));
+  --shell-nav-font-size: clamp(0.66rem, 2.7vw, 0.78rem);
+  --shell-nav-font-size-compact: clamp(0.62rem, 2.65vw, 0.74rem);
+  --shell-nav-gap: 0.36rem;
+  --shell-nav-control-size: 2.35rem;
+  --shell-nav-transition:
+    opacity var(--motion-standard) var(--ease-standard),
+    transform var(--motion-standard) var(--ease-standard),
+    visibility var(--motion-standard) var(--ease-standard);
   --tap-target: 48px;
   --app-viewport-height: 100dvh;
   --shell-viewport-pad-block: clamp(0.62rem, 1.8svh, 1.15rem);

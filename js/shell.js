@@ -10,6 +10,36 @@ function setCurrentView(viewName) {
   }
 }
 
+function getShellNavModuleContext(targetName) {
+  const routeMeta = getShellRouteMeta(targetName);
+  if (!routeMeta) {
+    return "shell";
+  }
+
+  if (["music", "wrestling", "site", "future"].includes(routeMeta.drawerGroup)) {
+    return routeMeta.drawerGroup;
+  }
+
+  return routeMeta.moduleType === "future-module" ? "future" : "shell";
+}
+
+function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
+  if (!shell || !route) {
+    return;
+  }
+
+  const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
+  const moduleContext = getShellNavModuleContext(activeTarget);
+  shell.dataset.shellRoute = route.name;
+  shell.dataset.shellActiveTarget = activeTarget;
+  shell.dataset.shellModule = moduleContext;
+  if (bottomRail) {
+    bottomRail.dataset.shellRoute = route.name;
+    bottomRail.dataset.shellActiveTarget = activeTarget;
+    bottomRail.dataset.shellModule = moduleContext;
+  }
+}
+
 function getRouteDrilldownBreadcrumbLabel(route) {
   const fallbackLabel = routeNameToDrilldownBreadcrumb[route.name] || "";
 
@@ -221,6 +251,7 @@ function renderGlobalMenu() {
 }
 
 function setActiveGlobalNav(targetName) {
+  updateShellRouteContext(getRouteFromUrl(), targetName);
   globalNavButtons.forEach((button) => {
     const isCurrent = button.dataset.globalNavTarget === targetName;
     if (isCurrent) {
