@@ -178,6 +178,9 @@ function syncRoute(route, options = {}) {
   if (typeof updateShellBreadcrumb === "function") {
     updateShellBreadcrumb(route);
   }
+  if (typeof updateShellBackState === "function") {
+    updateShellBackState(route);
+  }
 
   if (route.name === "home") {
     showHomepage();

@@ -14,6 +14,7 @@ const contactShell = document.querySelector("[data-contact-shell]");
 const shellBreadcrumb = document.querySelector("[data-shell-breadcrumb]");
 const shellBreadcrumbList = document.querySelector("[data-shell-breadcrumb-list]");
 const bottomRail = document.querySelector("[data-shell-bottom-rail]");
+const shellBackButton = document.querySelector("[data-shell-back]");
 const railMenuTrigger = document.querySelector("[data-rail-menu-trigger]");
 const globalMenuDrawer = document.querySelector("[data-global-menu-drawer]");
 const globalMenuBackdrop = document.querySelector("[data-global-menu-backdrop]");
@@ -960,6 +961,31 @@ const routeNameToDrilldownBreadcrumb = {
   "wrestling-show-detail": "Show Detail",
   "wrestling-match-gallery": "Match Gallery",
   "wrestling-lightbox": "Photo",
+};
+
+const routeNameToShellBackTarget = {
+  portfolio: routePaths.home,
+  music: routePaths.portfolio,
+  "music-bands": routePaths.music,
+  "band-detail": routePaths.musicBands,
+  "set-detail": "",
+  "music-people": routePaths.music,
+  "person-detail": routePaths.musicPeople,
+  "music-shows": routePaths.music,
+  "show-detail": routePaths.musicShows,
+  "music-venues": routePaths.music,
+  wrestling: routePaths.portfolio,
+  "wrestling-shows": routePaths.wrestling,
+  "wrestling-show-detail": routePaths.wrestlingShows,
+  "wrestling-match-gallery": "",
+  "wrestling-lightbox": "",
+  "wrestling-people": routePaths.wrestling,
+  "wrestling-person-detail": routePaths.wrestlingPeople,
+  "wrestling-venues": routePaths.wrestling,
+  "wrestling-venue-detail": routePaths.wrestlingVenues,
+  calendar: routePaths.portfolio,
+  about: routePaths.portfolio,
+  contact: routePaths.portfolio,
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [

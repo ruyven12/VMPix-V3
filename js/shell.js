@@ -70,6 +70,86 @@ function updateShellBreadcrumb(route) {
   shellBreadcrumb.setAttribute("aria-label", `Current location: ${breadcrumbLabels.join(" > ")}`);
 }
 
+function getShellBackTarget(route = getRouteFromUrl(), historyState = window.history.state || {}) {
+  if (!route || route.name === "home") {
+    return "";
+  }
+
+  if (route.name === "band-detail") {
+    return normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl || routeNameToShellBackTarget[route.name]);
+  }
+  if (route.name === "set-detail") {
+    return historyState.bandUrl || getBandRouteUrl(route.bandId);
+  }
+  if (route.name === "wrestling-match-gallery") {
+    return `${routePaths.wrestlingShows}/${encodeURIComponent(route.showId || "warzone-26")}`;
+  }
+  if (route.name === "wrestling-lightbox") {
+    const showId = route.showId || "warzone-26";
+    const matchId = route.matchId || "daron-richardson-vs-bear-bronson";
+    return `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}`;
+  }
+
+  return routeNameToShellBackTarget[route.name] || routePaths.portfolio;
+}
+
+function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = window.history.state || {}) {
+  if (!window.history || window.history.length <= 1 || !route) {
+    return false;
+  }
+
+  return (
+    (route.name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) ||
+    (route.name === "set-detail" && historyState.bandUrl && historyState.fromBandDetail) ||
+    (route.name === "person-detail" && historyState.fromPeopleIndex) ||
+    (route.name === "show-detail" && historyState.fromShowsArchive) ||
+    (route.name === "wrestling-person-detail" && historyState.fromWrestlingPeopleIndex) ||
+    (route.name === "wrestling-venue-detail" && historyState.fromWrestlingVenuesIndex)
+  );
+}
+
+function getShellBackLabel(targetUrl) {
+  if (!targetUrl) {
+    return "";
+  }
+
+  const targetRoute = getRouteFromUrl(targetUrl);
+  const targetId = routeNameToGlobalNavTarget[targetRoute.name];
+  const targetMeta = targetId ? getShellRouteMeta(targetId) : null;
+  return targetMeta?.breadcrumbLabel || targetMeta?.label || "Previous";
+}
+
+function updateShellBackState(route = getRouteFromUrl()) {
+  if (!shellBackButton) {
+    return;
+  }
+
+  const targetUrl = getShellBackTarget(route);
+  const isDisabled = !targetUrl;
+  shellBackButton.disabled = isDisabled;
+  shellBackButton.setAttribute("aria-disabled", String(isDisabled));
+  shellBackButton.dataset.shellBackTarget = targetUrl;
+  shellBackButton.setAttribute("aria-label", isDisabled ? "Back unavailable" : `Back to ${getShellBackLabel(targetUrl)}`);
+}
+
+function performShellBack() {
+  if (!shellBackButton || shellBackButton.disabled || shellBackButton.getAttribute("aria-disabled") === "true") {
+    return;
+  }
+
+  const route = getRouteFromUrl();
+  const historyState = window.history.state || {};
+  if (shouldShellBackUseHistory(route, historyState)) {
+    window.history.back();
+    return;
+  }
+
+  const targetUrl = getShellBackTarget(route, historyState);
+  if (targetUrl) {
+    navigateToRoute(targetUrl, { shouldFocusBandsView: route.name === "band-detail" });
+  }
+}
+
 function getShellRouteMeta(routeId) {
   return shellRouteRegistryById.get(routeId) || null;
 }
@@ -1435,6 +1515,9 @@ if (shell && startButton) {
   syncRailHeight();
   if (railMenuTrigger) {
     railMenuTrigger.addEventListener("click", openGlobalMenu);
+  }
+  if (shellBackButton) {
+    shellBackButton.addEventListener("click", performShellBack);
   }
   if (globalMenuBackdrop) {
     globalMenuBackdrop.addEventListener("click", closeGlobalMenu);
