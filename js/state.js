@@ -949,6 +949,12 @@ const mockStateScopeCopy = {
     error: { title: "Venue Signal Offline", text: "Return to Ring Archive while this lane recovers." },
     partial: { title: "Partial Venue Signal", text: "Some venues are staged without final event rollups." },
   },
+  about: {
+    loading: { title: "Loading About Profile", text: "Preparing static profile copy for the shell." },
+    empty: { title: "About Profile Pending", text: "The About shell is ready for managed profile content." },
+    error: { title: "About Profile Offline", text: "Static site navigation remains available while profile content recovers." },
+    partial: { title: "Partial About Profile", text: "Core profile copy is staged; richer site details can be integrated later." },
+  },
   calendar: {
     loading: { title: "Loading Calendar", text: "Preparing upcoming archive dates." },
     empty: { title: "Calendar Clear", text: "No upcoming mock events are staged." },
@@ -962,6 +968,39 @@ const mockStateScopeCopy = {
     partial: { title: "Partial Contact Relay", text: "The form shell is staged, but submission is not connected yet." },
   },
 };
+
+// Future API adapters should hydrate these static surfaces only after route/nav state has already selected the shell.
+const siteModuleIntegrationPlaceholders = Object.freeze({
+  calendar: Object.freeze({
+    source: "static-calendar-placeholder",
+    states: Object.freeze(["loading", "empty", "error", "partial"]),
+    selectors: Object.freeze({
+      shell: "[data-calendar-shell]",
+      surface: "[data-calendar-event-list]",
+    }),
+    recordShape: Object.freeze(["title", "availability", "status"]),
+  }),
+  about: Object.freeze({
+    source: "static-about-copy",
+    states: Object.freeze(["loading", "empty", "error", "partial"]),
+    selectors: Object.freeze({
+      shell: "[data-about-shell]",
+      surface: "[data-about-content-surface]",
+      stateSurface: "[data-about-state-surface]",
+    }),
+    recordShape: Object.freeze(["heading", "bodyBlocks"]),
+  }),
+  contact: Object.freeze({
+    source: "static-contact-shell",
+    states: Object.freeze(["loading", "empty", "error", "partial"]),
+    selectors: Object.freeze({
+      shell: "[data-contact-shell]",
+      formSurface: "[data-contact-form-shell]",
+      methodsSurface: "[data-contact-methods]",
+    }),
+    recordShape: Object.freeze(["fields", "methods", "responseWindow"]),
+  }),
+});
 
 function getForcedMockState(scope = "") {
   const params = new URLSearchParams(window.location.search || "");

@@ -23,6 +23,95 @@ function getShellNavModuleContext(targetName) {
   return routeMeta.moduleType === "future-module" ? "future" : "shell";
 }
 
+const siteModuleStaticSurfaces = new WeakMap();
+
+function getSiteModuleIntegrationMeta(scope) {
+  if (typeof siteModuleIntegrationPlaceholders === "undefined") {
+    return null;
+  }
+
+  return siteModuleIntegrationPlaceholders[scope] || null;
+}
+
+function captureSiteModuleStaticSurface(surface) {
+  if (!surface || siteModuleStaticSurfaces.has(surface)) {
+    return;
+  }
+
+  siteModuleStaticSurfaces.set(surface, surface.innerHTML);
+}
+
+function markSiteModuleDataState(surface, scope, stateName) {
+  if (!surface || !stateName) {
+    return;
+  }
+
+  const meta = getSiteModuleIntegrationMeta(scope);
+  surface.dataset.siteModuleState = stateName;
+  surface.dataset.siteModuleScope = scope;
+  if (meta?.source) {
+    surface.dataset.siteModuleSource = meta.source;
+  }
+}
+
+function restoreSiteModuleStaticSurface(surface) {
+  if (!surface) {
+    return;
+  }
+
+  if (surface.dataset.siteModuleState && siteModuleStaticSurfaces.has(surface)) {
+    surface.innerHTML = siteModuleStaticSurfaces.get(surface);
+  }
+
+  delete surface.dataset.siteModuleState;
+  delete surface.dataset.siteModuleScope;
+  delete surface.dataset.siteModuleSource;
+}
+
+function appendSiteModulePartialState(surface, scope, renderOptions = {}) {
+  if (!surface) {
+    return null;
+  }
+
+  const existingState = surface.querySelector(`[data-mock-state='partial'][data-mock-scope='${scope}']`);
+  if (existingState) {
+    return existingState;
+  }
+
+  const stateCard = createMockStateCard("partial", scope);
+  const wrapperTag = renderOptions.itemTag || "";
+  if (!wrapperTag) {
+    surface.append(stateCard);
+    return stateCard;
+  }
+
+  const wrapper = document.createElement(wrapperTag);
+  wrapper.className = renderOptions.itemClass || "mock-state-item";
+  wrapper.append(stateCard);
+  surface.append(wrapper);
+  return wrapper;
+}
+
+function renderSiteModuleMockState(surface, scope, stateName, renderOptions = {}) {
+  if (!surface) {
+    return null;
+  }
+
+  captureSiteModuleStaticSurface(surface);
+  if (!stateName) {
+    restoreSiteModuleStaticSurface(surface);
+    return null;
+  }
+
+  restoreSiteModuleStaticSurface(surface);
+  markSiteModuleDataState(surface, scope, stateName);
+  if (stateName === "partial" && renderOptions.partialMode === "append") {
+    return appendSiteModulePartialState(surface, scope, renderOptions);
+  }
+
+  return renderMockState(surface, stateName, scope, renderOptions);
+}
+
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (!shell || !route) {
     return;
@@ -1181,12 +1270,35 @@ function showAboutShell() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  applyAboutMockState();
   setCurrentView("About");
   setActiveGlobalNav("about");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
   }
+}
+
+function applyAboutMockState() {
+  const forcedState = getForcedMockState("about");
+  const stateSurface = aboutShell?.querySelector("[data-about-state-surface]");
+  if (!stateSurface) {
+    return;
+  }
+
+  stateSurface.hidden = true;
+  stateSurface.replaceChildren();
+  delete stateSurface.dataset.siteModuleState;
+  delete stateSurface.dataset.siteModuleScope;
+  delete stateSurface.dataset.siteModuleSource;
+
+  if (!forcedState) {
+    return;
+  }
+
+  stateSurface.hidden = false;
+  renderMockState(stateSurface, forcedState, "about");
+  markSiteModuleDataState(stateSurface, "about", forcedState);
 }
 
 function showCalendarShell() {
@@ -1245,21 +1357,15 @@ function showCalendarShell() {
 
 function applyCalendarMockState() {
   const forcedState = getForcedMockState("calendar");
-  const eventList = calendarShell?.querySelector(".calendar-event-list");
-  if (!forcedState || !eventList) {
+  const eventList = calendarShell?.querySelector("[data-calendar-event-list]") || calendarShell?.querySelector(".calendar-event-list");
+  if (!eventList) {
     return;
   }
 
-  if (forcedState === "partial") {
-    if (!eventList.querySelector("[data-mock-state='partial'][data-mock-scope='calendar']")) {
-      eventList.append(createMockStateCard("partial", "calendar"));
-    }
-    return;
-  }
-
-  renderMockState(eventList, forcedState, "calendar", {
+  renderSiteModuleMockState(eventList, "calendar", forcedState, {
     itemTag: "li",
     itemClass: "v3-card v3-card--event calendar-event-card",
+    partialMode: "append",
   });
 }
 
@@ -1319,19 +1425,14 @@ function showContactShell() {
 
 function applyContactMockState() {
   const forcedState = getForcedMockState("contact");
-  const formShell = contactShell?.querySelector(".contact-form-shell");
-  if (!forcedState || !formShell) {
+  const formShell = contactShell?.querySelector("[data-contact-form-shell]") || contactShell?.querySelector(".contact-form-shell");
+  if (!formShell) {
     return;
   }
 
-  if (forcedState === "partial") {
-    if (!formShell.querySelector("[data-mock-state='partial'][data-mock-scope='contact']")) {
-      formShell.append(createMockStateCard("partial", "contact"));
-    }
-    return;
-  }
-
-  renderMockState(formShell, forcedState, "contact");
+  renderSiteModuleMockState(formShell, "contact", forcedState, {
+    partialMode: "append",
+  });
 }
 
 function showModulePlaceholder(moduleName) {

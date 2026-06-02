@@ -1686,13 +1686,14 @@
           </section>
         </section>
       </section>
-      <section class="about-shell" aria-labelledby="about-title" aria-hidden="true" inert data-about-shell>
+      <!-- Static site module shells: future data hydration should target these surfaces without changing route/nav state. -->
+      <section class="about-shell" aria-labelledby="about-title" aria-hidden="true" inert data-about-shell data-site-module-scope="about">
         <header class="about-header">
           <h2 class="about-title" id="about-title">ABOUT</h2>
           <span class="about-divider" aria-hidden="true"></span>
         </header>
 
-        <section class="v3-card v3-card--spotlight about-content" aria-labelledby="about-content-title">
+        <section class="v3-card v3-card--spotlight about-content" aria-labelledby="about-content-title" data-about-content-surface>
           <h3 class="about-heading" id="about-content-title">ABOUT THE SITE</h3>
           <p class="about-copy">
             This site is a nearly-100% automated website using coding that reads from the native SmugMug system and creates it in a better customizable UI.
@@ -1703,71 +1704,72 @@
           <p class="about-copy">
             It is also an ever-evolving website and will need work like anything else. If it breaks, let me know.
           </p>
+          <div class="about-state-surface" aria-live="polite" hidden data-about-state-surface></div>
         </section>
       </section>
-      <section class="calendar-shell" aria-labelledby="calendar-title" aria-hidden="true" inert data-calendar-shell>
+      <section class="calendar-shell" aria-labelledby="calendar-title" aria-hidden="true" inert data-calendar-shell data-site-module-scope="calendar">
         <header class="calendar-header">
           <h2 class="calendar-title" id="calendar-title">CALENDAR</h2>
         </header>
 
-        <section class="v3-card v3-card--spotlight calendar-events-panel" aria-labelledby="calendar-events-title">
+        <section class="v3-card v3-card--spotlight calendar-events-panel" aria-labelledby="calendar-events-title" data-calendar-events-surface>
           <h3 class="calendar-section-title" id="calendar-events-title">Upcoming Events</h3>
-          <ul class="calendar-event-list" aria-label="Upcoming Events placeholder cards">
-            <li class="v3-card v3-card--event calendar-event-card">
+          <ul class="calendar-event-list" aria-label="Upcoming Events placeholder cards" data-calendar-event-list>
+            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="confirmed">
               <div class="calendar-event-copy">
-                <p class="calendar-event-state">Busy</p>
-                <h4 class="calendar-event-title">MGPS Open House</h4>
+                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
+                <h4 class="calendar-event-title" data-calendar-event-title>MGPS Open House</h4>
               </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed">CONFIRMED</span>
+              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed" data-calendar-event-badge>CONFIRMED</span>
             </li>
-            <li class="v3-card v3-card--event calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="busy">
               <div class="calendar-event-copy">
-                <p class="calendar-event-state">Busy</p>
-                <h4 class="calendar-event-title">Limitless Wrestling LIVE at Madrid's!</h4>
+                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
+                <h4 class="calendar-event-title" data-calendar-event-title>Limitless Wrestling LIVE at Madrid's!</h4>
               </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--busy">BUSY</span>
+              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--busy" data-calendar-event-badge>BUSY</span>
             </li>
-            <li class="v3-card v3-card--event calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="tentative">
               <div class="calendar-event-copy">
-                <p class="calendar-event-state">Busy</p>
-                <h4 class="calendar-event-title">25th Annual Appreciation Festival/BBQ/Pool Party</h4>
+                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
+                <h4 class="calendar-event-title" data-calendar-event-title>25th Annual Appreciation Festival/BBQ/Pool Party</h4>
               </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--tentative">TENTATIVE</span>
+              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--tentative" data-calendar-event-badge>TENTATIVE</span>
             </li>
-            <li class="v3-card v3-card--event calendar-event-card">
+            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="confirmed">
               <div class="calendar-event-copy">
-                <p class="calendar-event-state">Busy</p>
-                <h4 class="calendar-event-title">Herd Flock 8</h4>
+                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
+                <h4 class="calendar-event-title" data-calendar-event-title>Herd Flock 8</h4>
               </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed">CONFIRMED</span>
+              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed" data-calendar-event-badge>CONFIRMED</span>
             </li>
           </ul>
         </section>
       </section>
-      <section class="contact-shell" aria-labelledby="contact-title" aria-hidden="true" inert data-contact-shell>
+      <section class="contact-shell" aria-labelledby="contact-title" aria-hidden="true" inert data-contact-shell data-site-module-scope="contact">
         <header class="contact-header">
           <h2 class="contact-title" id="contact-title">CONTACT</h2>
           <p class="contact-subtitle">LET'S CONNECT</p>
         </header>
 
         <div class="contact-layout">
-          <div class="v3-card v3-card--spotlight contact-form-shell" role="form" aria-label="Contact form shell">
-            <label class="contact-field">
+          <div class="v3-card v3-card--spotlight contact-form-shell" role="form" aria-label="Contact form shell" data-contact-form-shell>
+            <label class="contact-field" data-contact-field="name">
               <span class="contact-label">Name</span>
               <input class="contact-input" type="text" name="name" autocomplete="name">
             </label>
 
-            <label class="contact-field">
+            <label class="contact-field" data-contact-field="email">
               <span class="contact-label">Email</span>
               <input class="contact-input" type="email" name="email" autocomplete="email">
             </label>
 
-            <label class="contact-field">
+            <label class="contact-field" data-contact-field="subject">
               <span class="contact-label">Subject</span>
               <input class="contact-input" type="text" name="subject">
             </label>
 
-            <label class="contact-field">
+            <label class="contact-field" data-contact-field="message">
               <span class="contact-label">Message</span>
               <textarea class="contact-textarea" name="message"></textarea>
             </label>
@@ -1778,28 +1780,28 @@
             <button class="contact-send" type="button" aria-label="Send message placeholder action" aria-describedby="contact-form-note" data-contact-static-action>SEND MESSAGE</button>
           </div>
 
-          <div class="contact-methods" aria-label="Contact methods">
-            <article class="v3-card v3-card--mini contact-method-card">
+          <div class="contact-methods" aria-label="Contact methods" data-contact-methods>
+            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="email">
               <h3 class="contact-method-title">Email</h3>
               <p class="contact-method-meta">Primary channel</p>
             </article>
 
-            <article class="v3-card v3-card--mini contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="instagram">
               <h3 class="contact-method-title">Instagram</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="v3-card v3-card--mini contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="facebook">
               <h3 class="contact-method-title">Facebook</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="v3-card v3-card--mini contact-method-card">
+            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="x">
               <h3 class="contact-method-title">X (Twitter)</h3>
               <p class="contact-method-meta">Social channel</p>
             </article>
 
-            <article class="v3-card v3-card--state contact-method-card contact-method-card--response">
+            <article class="v3-card v3-card--state contact-method-card contact-method-card--response" data-contact-static-response>
               <h3 class="contact-method-title">Response Time</h3>
               <p class="contact-method-meta">I typically respond within 24&ndash;48 hours.</p>
             </article>

@@ -10027,7 +10027,8 @@ img.archive-gallery-image {
 }
 
 .about-heading,
-.about-copy {
+.about-copy,
+.about-state-surface {
   position: relative;
   z-index: 1;
   min-width: 0;
@@ -10051,6 +10052,16 @@ img.archive-gallery-image {
   font-size: clamp(0.92rem, 3.5vw, 1.02rem);
   line-height: 1.58;
   text-wrap: pretty;
+}
+
+.about-state-surface {
+  width: min(100%, 56ch);
+  justify-self: center;
+  display: grid;
+}
+
+.about-state-surface[hidden] {
+  display: none;
 }
 
 .calendar-shell {
