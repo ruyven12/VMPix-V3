@@ -5082,10 +5082,16 @@ img.archive-gallery-image {
   display: grid;
 }
 
-.music-nexus-shell:not(.is-landing) .music-bands-index.is-active {
-  height: min(42rem, calc(100svh - 6.75rem));
+.music-nexus-shell.is-bands-index {
+  grid-auto-rows: minmax(0, 1fr);
+  align-content: stretch;
+}
+
+.music-nexus-shell.is-bands-index .music-bands-index.is-active {
+  align-self: stretch;
+  height: auto;
   min-height: 0;
-  max-height: calc(100svh - 6.75rem);
+  max-height: none;
 }
 
 .music-bands-index::before {

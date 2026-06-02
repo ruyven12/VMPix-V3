@@ -2163,6 +2163,9 @@ function setBandsIndexVisible(isVisible) {
     return;
   }
 
+  if (musicNexusShell) {
+    musicNexusShell.classList.toggle("is-bands-index", isVisible);
+  }
   musicBandsIndex.classList.toggle("is-active", isVisible);
   musicBandsIndex.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
