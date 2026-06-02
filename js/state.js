@@ -899,6 +899,146 @@ function getSafeImageUrl(imageUrl = "", fallbackUrl = galleryImageFallbackSrc) {
   return safeUrl || fallbackUrl || "";
 }
 
+const mockStateCopy = {
+  loading: {
+    title: "Syncing Archive",
+    text: "Preparing static records for this V3 surface.",
+  },
+  empty: {
+    title: "No Records Staged",
+    text: "This archive lane is ready, but no mock rows are currently available.",
+  },
+  error: {
+    title: "Archive Signal Interrupted",
+    text: "Static data could not be prepared. Return to the parent archive and try again.",
+  },
+  partial: {
+    title: "Partial Archive Signal",
+    text: "Some records are staged while the remaining data waits for integration.",
+  },
+};
+
+const mockStateScopeCopy = {
+  musicBands: {
+    loading: { title: "Scanning Band Index", text: "Preparing artist rows and archive status." },
+    empty: { title: "No Bands Matched", text: "Adjust the signal filter or return to the full Music Nexus." },
+    error: { title: "Band Index Offline", text: "Use the Music Nexus landing while this lane recovers." },
+    partial: { title: "Partial Band Index", text: "Some band rows are staged; deeper archive links may be pending." },
+  },
+  musicShows: {
+    loading: { title: "Loading Show Dossiers", text: "Preparing event cards and venue relationships." },
+    empty: { title: "No Shows Found", text: "This year filter has no staged show records." },
+    error: { title: "Show Archive Offline", text: "Return to Music Nexus or try another show lane." },
+    partial: { title: "Partial Show Archive", text: "Some event records are staged without final media counts." },
+  },
+  musicPeople: {
+    loading: { title: "Loading People Index", text: "Preparing performers, roles, and tagged-show links." },
+    empty: { title: "No People Staged", text: "The people lane is ready for artist records." },
+    error: { title: "People Index Offline", text: "Return to Music Nexus while this lane recovers." },
+    partial: { title: "Partial People Index", text: "Some people records are staged without final tagged-show data." },
+  },
+  wrestlingPeople: {
+    loading: { title: "Loading Roster Grid", text: "Preparing people, aliases, and relationship hooks." },
+    empty: { title: "No People Staged", text: "The roster lane is ready for records." },
+    error: { title: "Roster Signal Offline", text: "Return to Ring Archive while this lane recovers." },
+    partial: { title: "Partial Roster Signal", text: "Some profiles are staged; relationship data may be incomplete." },
+  },
+  wrestlingVenues: {
+    loading: { title: "Loading Venue Grid", text: "Preparing venue cards and event relationships." },
+    empty: { title: "No Venues Staged", text: "The venue lane is ready for records." },
+    error: { title: "Venue Signal Offline", text: "Return to Ring Archive while this lane recovers." },
+    partial: { title: "Partial Venue Signal", text: "Some venues are staged without final event rollups." },
+  },
+  calendar: {
+    loading: { title: "Loading Calendar", text: "Preparing upcoming archive dates." },
+    empty: { title: "Calendar Clear", text: "No upcoming mock events are staged." },
+    error: { title: "Calendar Signal Offline", text: "The site remains available while schedule data recovers." },
+    partial: { title: "Partial Calendar", text: "Some upcoming dates are staged without final status." },
+  },
+  contact: {
+    loading: { title: "Preparing Contact Relay", text: "Checking the static form surface." },
+    empty: { title: "Contact Form Pending", text: "The form shell is present and awaiting integration." },
+    error: { title: "Contact Relay Offline", text: "Use another contact method while this form remains static." },
+    partial: { title: "Partial Contact Relay", text: "The form shell is staged, but submission is not connected yet." },
+  },
+};
+
+function getForcedMockState(scope = "") {
+  const params = new URLSearchParams(window.location.search || "");
+  const forcedState = params.get("mockState");
+  const forcedScope = params.get("mockScope") || "all";
+  const state = ["loading", "empty", "error", "partial"].includes(forcedState) ? forcedState : "";
+  if (!state) {
+    return "";
+  }
+  if (forcedScope !== "all" && forcedScope !== scope) {
+    return "";
+  }
+  return state;
+}
+
+function getMockStateCopy(stateName = "empty", scope = "", overrides = {}) {
+  return {
+    ...mockStateCopy[stateName],
+    ...(mockStateScopeCopy[scope]?.[stateName] || {}),
+    ...overrides,
+  };
+}
+
+function createMockStateCard(stateName = "empty", scope = "", overrides = {}) {
+  const copy = getMockStateCopy(stateName, scope, overrides);
+  const card = document.createElement("div");
+  card.className = `mock-state-card mock-state-card--${stateName}`;
+  card.setAttribute("role", stateName === "error" ? "alert" : "status");
+  card.setAttribute("aria-live", stateName === "loading" ? "polite" : "polite");
+  card.dataset.mockState = stateName;
+  if (scope) {
+    card.dataset.mockScope = scope;
+  }
+
+  const mark = document.createElement("span");
+  mark.className = "mock-state-mark";
+  mark.setAttribute("aria-hidden", "true");
+
+  const body = document.createElement("span");
+  body.className = "mock-state-copy";
+
+  const title = document.createElement("strong");
+  title.className = "mock-state-title";
+  title.textContent = copy.title || mockStateCopy.empty.title;
+
+  const text = document.createElement("span");
+  text.className = "mock-state-text";
+  text.textContent = copy.text || mockStateCopy.empty.text;
+
+  body.append(title, text);
+  card.append(mark, body);
+  return card;
+}
+
+function renderMockState(container, stateName = "empty", scope = "", options = {}) {
+  if (!container || !stateName) {
+    return null;
+  }
+
+  if (options.clear !== false) {
+    container.replaceChildren();
+  }
+
+  const stateElement = createMockStateCard(stateName, scope, options.copy || {});
+  const wrapperTag = options.itemTag || "";
+  if (wrapperTag) {
+    const wrapper = document.createElement(wrapperTag);
+    wrapper.className = options.itemClass || "mock-state-item";
+    wrapper.append(stateElement);
+    container.append(wrapper);
+    return wrapper;
+  }
+
+  container.append(stateElement);
+  return stateElement;
+}
+
 function mapMockPeopleRefs(ids = []) {
   return (Array.isArray(ids) ? ids : []).map((id) => {
     const person = wrestlingPeopleRows.find((row) => row.personId === id) || musicPeopleRows.find((row) => row.personId === id);

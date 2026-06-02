@@ -1234,12 +1234,33 @@ function showCalendarShell() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  applyCalendarMockState();
   setCurrentView("Calendar");
   setActiveGlobalNav("calendar");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
   }
+}
+
+function applyCalendarMockState() {
+  const forcedState = getForcedMockState("calendar");
+  const eventList = calendarShell?.querySelector(".calendar-event-list");
+  if (!forcedState || !eventList) {
+    return;
+  }
+
+  if (forcedState === "partial") {
+    if (!eventList.querySelector("[data-mock-state='partial'][data-mock-scope='calendar']")) {
+      eventList.append(createMockStateCard("partial", "calendar"));
+    }
+    return;
+  }
+
+  renderMockState(eventList, forcedState, "calendar", {
+    itemTag: "li",
+    itemClass: "v3-card v3-card--event calendar-event-card",
+  });
 }
 
 function showContactShell() {
@@ -1287,12 +1308,30 @@ function showContactShell() {
   contactShell.setAttribute("aria-hidden", "false");
   contactShell.removeAttribute("inert");
   setHubChromeHidden(true);
+  applyContactMockState();
   setCurrentView("Contact");
   setActiveGlobalNav("contact");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
   }
+}
+
+function applyContactMockState() {
+  const forcedState = getForcedMockState("contact");
+  const formShell = contactShell?.querySelector(".contact-form-shell");
+  if (!forcedState || !formShell) {
+    return;
+  }
+
+  if (forcedState === "partial") {
+    if (!formShell.querySelector("[data-mock-state='partial'][data-mock-scope='contact']")) {
+      formShell.append(createMockStateCard("partial", "contact"));
+    }
+    return;
+  }
+
+  renderMockState(formShell, forcedState, "contact");
 }
 
 function showModulePlaceholder(moduleName) {

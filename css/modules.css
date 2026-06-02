@@ -1665,6 +1665,89 @@ img.archive-gallery-image {
   }
 }
 
+.mock-state-card {
+  --mock-state-accent: rgba(255, 118, 102, 0.58);
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.62rem, 2.4vw, 0.86rem);
+  min-height: clamp(5.8rem, 18vw, 7.6rem);
+  padding: clamp(0.7rem, 2.6vw, 0.96rem);
+  border: 1px solid color-mix(in srgb, var(--mock-state-accent) 22%, rgba(247, 247, 242, 0.08));
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.032), transparent 62%),
+    radial-gradient(circle at 18% 50%, color-mix(in srgb, var(--mock-state-accent) 14%, transparent), transparent 38%),
+    rgba(1, 1, 3, 0.34);
+  box-shadow: inset 0 0 1.1rem rgba(0, 0, 0, 0.22);
+}
+
+.mock-state-card--loading {
+  --mock-state-accent: rgba(142, 108, 255, 0.64);
+}
+
+.mock-state-card--empty {
+  --mock-state-accent: rgba(247, 247, 242, 0.38);
+}
+
+.mock-state-card--partial {
+  --mock-state-accent: rgba(255, 183, 105, 0.64);
+}
+
+.mock-state-card--error {
+  --mock-state-accent: rgba(255, 118, 102, 0.72);
+}
+
+.mock-state-mark {
+  position: relative;
+  width: clamp(2.12rem, 6.6vw, 2.8rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--mock-state-accent) 42%, rgba(247, 247, 242, 0.1));
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--mock-state-accent) 28%, transparent), transparent 58%),
+    rgba(247, 247, 242, 0.026);
+  box-shadow: 0 0 0.78rem color-mix(in srgb, var(--mock-state-accent) 18%, transparent);
+}
+
+.mock-state-mark::after {
+  position: absolute;
+  inset: 0.54rem;
+  content: "";
+  border-radius: inherit;
+  background: var(--mock-state-accent);
+}
+
+.mock-state-card--loading .mock-state-mark::after {
+  animation: archiveGalleryStatePulse 1.1s ease-in-out infinite;
+}
+
+.mock-state-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.mock-state-title {
+  color: rgba(247, 247, 242, 0.8);
+  font-size: clamp(0.72rem, 2.8vw, 0.9rem);
+  font-weight: 400;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+
+.mock-state-text {
+  color: rgba(247, 247, 242, 0.5);
+  font-size: clamp(0.62rem, 2.35vw, 0.76rem);
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.mock-state-item {
+  min-width: 0;
+}
+
 .set-gallery-grid {
   --archive-gallery-accent: rgba(255, 82, 72, 0.18);
   --archive-gallery-accent-line: rgba(255, 104, 92, 0.62);
@@ -12403,6 +12486,7 @@ img.archive-gallery-image {
   .bands-index-panel.is-active,
   .bands-letter-button[aria-pressed="true"],
   .archive-gallery-state--loading .archive-gallery-state-mark::after,
+  .mock-state-card--loading .mock-state-mark::after,
   .lightbox-screen.is-entering .lightbox-photo,
   .lightbox-screen.is-entering .v3-lightbox-image,
   .lightbox-photo.is-image-changing .v3-lightbox-image,

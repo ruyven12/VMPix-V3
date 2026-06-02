@@ -10,6 +10,8 @@ Pass 3 update: `js/state.js` now attaches `backend_record` objects and static `m
 
 Pass 4 update: `js/state.js` now exposes lightweight reusable mock-loading helpers: `getMockCollection`, `getMockRecordById`, `getMockRecordBySlug`, `filterMockCollection`, `sortMockCollection`, `getSafeImageUrl`, and `normalizeMockRecord`. Music and Wrestling use these helpers for the obvious lookup/filter/sort paths while keeping existing render fields and UI behavior stable.
 
+Pass 5 update: `js/state.js` now includes reusable mock state helpers for `loading`, `empty`, `error`, and `partial` states. Music, Wrestling, Calendar, and Contact can safely test forced states with query params such as `?mockState=empty&mockScope=musicShows` without connecting live APIs or changing normal mock rendering.
+
 ## Inventory Rules
 
 - Preserve current static-first visual behavior until a replacement pass is approved.
@@ -91,6 +93,7 @@ Pass 4 update: `js/state.js` now exposes lightweight reusable mock-loading helpe
 - Pass 2 added non-destructive aliases rather than replacing camelCase fields, so both old UI consumers and future adapter-style readers can coexist during cleanup.
 - Pass 3 added backend-shaped `backend_record` snapshots and mock response envelopes rather than wiring live fetch calls, so future API adapters can be compared against realistic frontend fixtures without changing current module behavior.
 - Pass 4 introduced reusable mock helpers as the frontend adapter boundary for loading, selecting, filtering, sorting, safe fallback images, and normalized fixture records.
+- Pass 5 introduced reusable state rendering for mock-driven loading, empty, error, and partial-data surfaces. Forced states are query-param based and should remain testing-only until live API integration.
 - Music show snapshots generated in `modules/music.js` already emit some snake_case keys (`show_id`, `venue_id`, `band_ids`, `media_ids`, `archive_meta`), but they are derived from camelCase frontend rows and display strings.
 - Music fixture rows often store display-ready labels instead of canonical IDs, especially for venues, locations, counts, roles, and dates.
 - Wrestling fixtures are closer to relationship data but still do not match the planned match/show contracts exactly.

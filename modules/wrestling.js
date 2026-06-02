@@ -264,10 +264,18 @@ function renderWrestlingPeopleIndex() {
     return;
   }
 
+  const forcedState = getForcedMockState("wrestlingPeople");
   wrestlingPeopleList.replaceChildren();
+  if (forcedState && forcedState !== "partial") {
+    renderMockState(wrestlingPeopleList, forcedState, "wrestlingPeople");
+    return;
+  }
   wrestlingPeopleRows.forEach((person) => {
     wrestlingPeopleList.append(createWrestlingPeopleCard(person));
   });
+  if (forcedState === "partial") {
+    wrestlingPeopleList.append(createMockStateCard("partial", "wrestlingPeople"));
+  }
   setActiveWrestlingPeopleCard();
 }
 
@@ -355,10 +363,18 @@ function renderWrestlingVenuesIndex() {
     return;
   }
 
+  const forcedState = getForcedMockState("wrestlingVenues");
   wrestlingVenuesList.replaceChildren();
+  if (forcedState && forcedState !== "partial") {
+    renderMockState(wrestlingVenuesList, forcedState, "wrestlingVenues");
+    return;
+  }
   wrestlingVenueRows.forEach((venue) => {
     wrestlingVenuesList.append(createWrestlingVenueCard(venue));
   });
+  if (forcedState === "partial") {
+    wrestlingVenuesList.append(createMockStateCard("partial", "wrestlingVenues"));
+  }
   setActiveWrestlingVenueCard();
 }
 
@@ -499,9 +515,17 @@ function renderWrestlingVenueDetailRoute(venueId) {
   const eventList = document.createElement("div");
   eventList.className = "wrestling-venue-event-list";
   eventList.setAttribute("role", "list");
-  wrestlingVenueEventHistoryRows.forEach((eventRow) => {
+  const forcedState = getForcedMockState("wrestlingVenues");
+  if (forcedState && forcedState !== "partial") {
+    renderMockState(eventList, forcedState, "wrestlingVenues");
+  } else {
+    wrestlingVenueEventHistoryRows.forEach((eventRow) => {
     eventList.append(createWrestlingVenueEventRow(eventRow));
-  });
+    });
+    if (forcedState === "partial") {
+      eventList.append(createMockStateCard("partial", "wrestlingVenues"));
+    }
+  }
 
   eventHistory.append(eventTitle, eventList);
   wrestlingVenueDetailShell.replaceChildren(backButton, hero, eventHistory);
@@ -655,9 +679,17 @@ function renderWrestlingPersonDetailRoute(personId) {
   const eventList = document.createElement("div");
   eventList.className = "wrestling-event-history-list";
   eventList.setAttribute("role", "list");
-  wrestlingPersonEventHistoryRows.forEach((eventRow) => {
+  const forcedState = getForcedMockState("wrestlingPeople");
+  if (forcedState && forcedState !== "partial") {
+    renderMockState(eventList, forcedState, "wrestlingPeople");
+  } else {
+    wrestlingPersonEventHistoryRows.forEach((eventRow) => {
     eventList.append(createWrestlingPersonEventRow(eventRow));
-  });
+    });
+    if (forcedState === "partial") {
+      eventList.append(createMockStateCard("partial", "wrestlingPeople"));
+    }
+  }
 
   eventHistory.append(eventTitle, eventList);
   wrestlingPersonDetailShell.replaceChildren(backButton, hero, eventHistory);
