@@ -27,7 +27,6 @@ let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
 let musicShowsSetsDataState = "fallback";
-let activeSetsArchiveYear = "";
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -964,10 +963,6 @@ function requestMusicShowsSetsData() {
 
 function getSetsRows() {
   return Array.from(document.querySelectorAll("[data-set-row]"));
-}
-
-function getSetsYearButtons() {
-  return Array.from(document.querySelectorAll("[data-sets-year]"));
 }
 
 function getBandLetter(band) {
@@ -2241,46 +2236,24 @@ function getSetsArchiveRowsForBand(band) {
   });
 }
 
-function getSetsArchiveYears(rows) {
-  return Array.from(new Set(rows.map((row) => String(row.year || "").trim()).filter(Boolean)))
-    .sort((a, b) => Number(b) - Number(a));
-}
-
-function createSetsYearButton(year, count, isActive) {
-  const button = document.createElement("button");
-  button.className = "sets-year-card";
-  button.type = "button";
-  button.dataset.setsYear = year;
-  button.setAttribute("aria-pressed", String(isActive));
-  if (isActive) {
-    button.classList.add("is-active");
+function getSetsArchiveDateSort(row) {
+  const existingSort = Number(row?.dateSort);
+  if (Number.isFinite(existingSort) && existingSort > 0) {
+    return existingSort;
   }
 
-  const value = document.createElement("span");
-  value.className = "sets-year-value";
-  value.textContent = year;
-  const countLabel = document.createElement("span");
-  countLabel.className = "sets-year-count";
-  countLabel.textContent = `${formatBandIndexNumber(count)} ${count === 1 ? "SET" : "SETS"}`;
-  button.append(value, countLabel);
-  button.addEventListener("click", () => {
-    setSetsYear(year, { shouldCenterYear: true });
-  });
-  return button;
+  return parseMusicShowDate(row?.rawDate || row?.date || row?.formattedDate)?.getTime() || 0;
 }
 
-function renderSetsYearTimeline(rows, selectedYear) {
-  if (!setsYearTimeline) {
-    return;
-  }
+function getSortedSetsArchiveRows(rows) {
+  return [...rows].sort((a, b) => {
+    const dateDelta = getSetsArchiveDateSort(b) - getSetsArchiveDateSort(a);
+    if (dateDelta !== 0) {
+      return dateDelta;
+    }
 
-  const years = getSetsArchiveYears(rows);
-  const fragment = document.createDocumentFragment();
-  years.forEach((year) => {
-    const yearCount = rows.filter((row) => row.year === year).length;
-    fragment.append(createSetsYearButton(year, yearCount, year === selectedYear));
+    return String(a?.name || "").localeCompare(String(b?.name || ""));
   });
-  setsYearTimeline.replaceChildren(fragment);
 }
 
 function setArchivePosterImage(image, imageSrc, fallbackElement, loadedClassName) {
@@ -2419,22 +2392,14 @@ function renderSetsListRows(rows, selectedSetCode = "") {
 }
 
 function renderSetsArchiveRows(rows, options = {}) {
-  const years = getSetsArchiveYears(rows);
+  const archiveRows = getSortedSetsArchiveRows(rows);
   const selectedSetCode = normalizeSetCode(options.selectedSetCode || "");
-  const selectedRowData = rows.find((row) => normalizeSetCode(row.setCode) === selectedSetCode) || rows[0] || null;
-  const selectedYear = selectedRowData?.year || (years.includes(activeSetsArchiveYear) ? activeSetsArchiveYear : years[0] || "");
+  const selectedRowData = archiveRows.find((row) => normalizeSetCode(row.setCode) === selectedSetCode) || archiveRows[0] || null;
 
-  renderSetsYearTimeline(rows, selectedYear);
-  renderSetsListRows(rows, selectedRowData?.setCode || selectedSetCode);
-
-  if (selectedYear) {
-    setSetsYear(selectedYear, { shouldCenterYear: false });
-  } else {
-    if (setsListYearLabel) {
-      setsListYearLabel.textContent = "No Shows";
-    }
-    updateSetsFeaturedFromRow(null);
-  }
+  renderSetsListRows(archiveRows, selectedRowData?.setCode || selectedSetCode);
+  updateSetsFeaturedFromRow(
+    findSetRowByCode(selectedRowData?.setCode || selectedSetCode) || getSetsRows()[0] || null
+  );
 }
 
 function updateSetsFeaturedFromRow(row) {
@@ -2489,48 +2454,6 @@ function updateSetsFeaturedFromRow(row) {
   }
   if (isSetDetailOpen) {
     updateSetDetailFromRow(row);
-  }
-}
-
-function setSetsYear(year, options = {}) {
-  let firstVisibleRow = null;
-  let activeVisibleRow = null;
-  activeSetsArchiveYear = year;
-
-  getSetsYearButtons().forEach((button) => {
-    const isActive = button.dataset.setsYear === year;
-    button.classList.toggle("is-active", isActive);
-    button.setAttribute("aria-pressed", String(isActive));
-    if (isActive && options.shouldCenterYear) {
-      button.scrollIntoView({
-        block: "nearest",
-        inline: "center",
-        behavior: reducedMotion.matches ? "auto" : "smooth",
-      });
-    }
-  });
-
-  getSetsRows().forEach((row) => {
-    const isVisible = row.dataset.setYear === year;
-    const rowItem = row.closest("li");
-    if (rowItem) {
-      rowItem.hidden = !isVisible;
-    }
-    if (isVisible && !firstVisibleRow) {
-      firstVisibleRow = row;
-    }
-    if (isVisible && row.classList.contains("is-active")) {
-      activeVisibleRow = row;
-    }
-  });
-
-  if (setsListYearLabel) {
-    setsListYearLabel.textContent = year || "No Shows";
-  }
-  const selectedRow = activeVisibleRow || firstVisibleRow;
-  updateSetsFeaturedFromRow(selectedRow);
-  if (options.shouldFocus && selectedRow) {
-    selectedRow.focus({ preventScroll: true });
   }
 }
 
@@ -4906,11 +4829,6 @@ function initMusicModule() {
   if (setDetailClose) {
     setDetailClose.addEventListener("click", closeSelectedSetDetail);
   }
-  setsYearButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      setSetsYear(button.dataset.setsYear, { shouldCenterYear: true });
-    });
-  });
   setsRows.forEach((row) => {
     row.addEventListener("click", () => {
       navigateToSetDetail(row);
