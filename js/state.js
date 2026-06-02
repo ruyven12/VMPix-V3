@@ -689,6 +689,221 @@ const wrestlingMatchRelationshipRows = [
   { showId: "never-enough", matchId: "ace-romero-vs-alexander-james", venueId: "portland-expo", personIds: ["ace-romero", "alexander-james"], taggedPeople: [{ personId: "ace-romero", role: "competitor", tagCount: 21 }, { personId: "alexander-james", role: "competitor", tagCount: 21 }], refereeIds: ["adam-christopher"], managerIds: [], commentatorIds: ["limitless-commentary-desk"], contributorIds: ["voodoo-media"], teamIds: ["the-mane-event", "the-embassy"], factionIds: ["the-mane-event", "the-embassy"], photoIds: [] },
 ];
 
+const mockMonthNumbers = {
+  JAN: "01",
+  FEB: "02",
+  MAR: "03",
+  APR: "04",
+  MAY: "05",
+  JUN: "06",
+  JUL: "07",
+  AUG: "08",
+  SEP: "09",
+  OCT: "10",
+  NOV: "11",
+  DEC: "12",
+};
+
+function createMockSlug(value, fallback = "mock-record") {
+  const slug = String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+}
+
+function parseMockCount(value) {
+  const match = String(value ?? "").match(/\d+/);
+  return match ? Number.parseInt(match[0], 10) : 0;
+}
+
+function createMockDate({ month = "", day = "", year = "", eventDate = "" } = {}) {
+  const display = eventDate || [month, day, year].filter(Boolean).join(" ");
+  const monthNumber = mockMonthNumbers[String(month).toUpperCase()];
+  const dayNumber = String(day || "").padStart(2, "0");
+  const yearText = String(year || "");
+  const iso = /^\d{4}$/.test(yearText) && monthNumber && /^\d{2}$/.test(dayNumber)
+    ? `${yearText}-${monthNumber}-${dayNumber}`
+    : "";
+
+  return { display, iso };
+}
+
+function createMockVenueDetails(venueName = "", location = "", venueId = "") {
+  const [city = "", state = ""] = String(location || "").split(",").map((part) => part.trim());
+  return {
+    id: venueId || createMockSlug(venueName || location, "pending-venue"),
+    name: venueName || "Pending Venue",
+    city,
+    state,
+    location_label: location || [city, state].filter(Boolean).join(", "),
+  };
+}
+
+function mapMockTaggedPeople(taggedPeople = []) {
+  return (Array.isArray(taggedPeople) ? taggedPeople : []).map((person) => ({
+    id: person.personId || person.id || "",
+    person_id: person.personId || person.id || "",
+    role: person.role || "tagged",
+    tag_count: Number(person.tagCount || person.tag_count || 0),
+  }));
+}
+
+function applyMockAliases(record, aliases) {
+  Object.entries(aliases).forEach(([key, value]) => {
+    if (record[key] === undefined) {
+      record[key] = value;
+    }
+  });
+  return record;
+}
+
+function standardizeMusicMockRows() {
+  musicBandIndexRows.forEach((band) => {
+    applyMockAliases(band, {
+      id: band.bandId,
+      slug: band.bandId,
+      title: band.name,
+      category: band.region,
+      photo_count: Number(band.photos || band.albums || 0),
+      image_url: null,
+      related_people: [],
+      related_shows: [],
+    });
+  });
+
+  musicPeopleRows.forEach((person) => {
+    applyMockAliases(person, {
+      id: person.personId,
+      slug: person.personId,
+      title: person.name,
+      category: person.role,
+      photo_count: Number(person.photos || 0),
+      related_people: [],
+      related_shows: [],
+      related_bands: person.band ? [person.band] : [],
+      image_url: null,
+    });
+  });
+
+  musicShowsArchiveRows.forEach((show) => {
+    const bandCount = parseMockCount(show.bandCount);
+    applyMockAliases(show, {
+      id: show.showId,
+      slug: show.showId,
+      date: createMockDate(show),
+      status: "static-placeholder",
+      category: "music-show",
+      photo_count: Math.max(48, bandCount * 54),
+      venue_details: createMockVenueDetails(show.venue, show.location),
+      related_people: [],
+      related_shows: [show.showId],
+      image_url: null,
+    });
+  });
+
+  applyMockAliases(musicPersonDetailPlaceholder, {
+    id: musicPersonDetailPlaceholder.personId,
+    slug: musicPersonDetailPlaceholder.personId,
+    title: musicPersonDetailPlaceholder.name,
+    category: "music-person-detail",
+    photo_count: parseMockCount(musicPersonDetailPlaceholder.summaryItems?.find((item) => /photo/i.test(item))),
+    related_people: [musicPersonDetailPlaceholder.personId],
+    related_shows: musicPersonDetailPlaceholder.taggedShows.map((show) => show.showId),
+    image_url: null,
+  });
+
+  musicPersonDetailPlaceholder.taggedShows.forEach((show) => {
+    applyMockAliases(show, {
+      id: show.showId,
+      slug: show.showId,
+      date: createMockDate(show.date),
+      status: "static-placeholder",
+      category: "music-tagged-show",
+      photo_count: Number(show.taggedPhotos || 0),
+      venue_details: createMockVenueDetails(show.venue, show.location),
+      related_people: [musicPersonDetailPlaceholder.personId],
+      related_shows: [show.showId],
+      image_url: null,
+    });
+  });
+}
+
+function standardizeWrestlingMockRows() {
+  wrestlingPeopleRows.forEach((person) => {
+    applyMockAliases(person, {
+      id: person.personId,
+      slug: person.personId,
+      title: person.name,
+      status: "static-placeholder",
+      category: person.role,
+      photo_count: Number(person.photos || 0),
+      related_people: person.personId ? [person.personId] : [],
+      related_shows: person.showIds || [],
+      image_url: null,
+    });
+  });
+
+  wrestlingVenueRows.forEach((venue) => {
+    applyMockAliases(venue, {
+      id: venue.venueId,
+      slug: venue.venueId,
+      title: venue.name,
+      status: venue.archiveState || "static-placeholder",
+      category: "wrestling-venue",
+      photo_count: Number(venue.photoCount || 0),
+      venue_details: createMockVenueDetails(venue.name, `${venue.city}, ${venue.state}`, venue.venueId),
+      related_people: [],
+      related_shows: venue.showIds || [],
+      image_url: null,
+    });
+  });
+
+  [
+    ...wrestlingPersonEventHistoryRows,
+    ...wrestlingVenueEventHistoryRows,
+    ...wrestlingShowRelationshipRows,
+  ].forEach((eventRow) => {
+    applyMockAliases(eventRow, {
+      id: eventRow.eventId || eventRow.showId,
+      slug: eventRow.eventId || eventRow.showId,
+      title: eventRow.eventName || eventRow.showId,
+      date: createMockDate({ eventDate: eventRow.eventDate }),
+      status: "static-placeholder",
+      category: "wrestling-show",
+      photo_count: Number(eventRow.photoCount || eventRow.photoIds?.length || 0),
+      venue_details: createMockVenueDetails("", "", eventRow.venueId),
+      related_people: eventRow.personIds || [],
+      related_shows: eventRow.showId ? [eventRow.showId] : [],
+      tagged_people: mapMockTaggedPeople(eventRow.taggedPeople),
+      image_url: null,
+    });
+  });
+
+  wrestlingMatchRelationshipRows.forEach((match) => {
+    applyMockAliases(match, {
+      id: match.matchId,
+      slug: match.matchId,
+      title: match.matchName || match.matchId,
+      status: "static-placeholder",
+      category: "wrestling-match",
+      photo_count: Number(match.photoIds?.length || 0),
+      venue_details: createMockVenueDetails("", "", match.venueId),
+      related_people: match.personIds || [],
+      related_shows: match.showId ? [match.showId] : [],
+      tagged_people: mapMockTaggedPeople(match.taggedPeople),
+      image_url: null,
+    });
+  });
+}
+
+// Compatibility aliases let legacy render code keep camelCase fields while
+// future mock/API adapters can read stable backend-friendly names.
+standardizeMusicMockRows();
+standardizeWrestlingMockRows();
+
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [
   ["-4.8rem", "-5.2rem"],

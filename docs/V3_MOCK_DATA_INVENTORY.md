@@ -4,6 +4,8 @@ Pass: Mock Data Cleanup - Pass 1: Inventory Current Mock Data
 Scope: public V3 frontend shell, Portfolio Hub, Music, Wrestling, Calendar, About, Contact, and shared shell/navigation systems.  
 Status: documentation only. No mock data was removed, no routes were changed, and no live API wiring was introduced.
 
+Pass 2 update: `js/state.js` now applies compatibility aliases to active Music and Wrestling mock rows. Legacy render fields remain intact, while mock objects also expose backend-friendlier keys such as `id`, `slug`, `title`, `date`, `status`, `category`, `photo_count`, `venue_details`, `related_people`, `related_shows`, `tagged_people`, and `image_url` where practical.
+
 ## Inventory Rules
 
 - Preserve current static-first visual behavior until a replacement pass is approved.
@@ -82,6 +84,7 @@ Status: documentation only. No mock data was removed, no routes were changed, an
 ## Backend Shape Mismatches To Track
 
 - Current frontend fixtures mostly use camelCase IDs (`bandId`, `personId`, `showId`, `venueId`, `matchId`), while planned backend JSON uses snake_case stable IDs (`band_id`, `person_id`, `show_id`, `venue_id`, `match_id`).
+- Pass 2 added non-destructive aliases rather than replacing camelCase fields, so both old UI consumers and future adapter-style readers can coexist during cleanup.
 - Music show snapshots generated in `modules/music.js` already emit some snake_case keys (`show_id`, `venue_id`, `band_ids`, `media_ids`, `archive_meta`), but they are derived from camelCase frontend rows and display strings.
 - Music fixture rows often store display-ready labels instead of canonical IDs, especially for venues, locations, counts, roles, and dates.
 - Wrestling fixtures are closer to relationship data but still do not match the planned match/show contracts exactly.
