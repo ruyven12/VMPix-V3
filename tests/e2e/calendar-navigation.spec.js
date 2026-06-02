@@ -31,7 +31,7 @@ for (const viewport of viewports) {
   test.describe(`calendar universal navigation: ${viewport.name}`, () => {
     test.use({ viewport: viewport.size });
 
-    test("Calendar uses drawer, active, breadcrumb, rail, and shell back state", async ({ page }) => {
+    test("Calendar uses drawer, active, breadcrumb, rail, and browser back state", async ({ page }) => {
       const { consoleErrors, pageErrors } = collectPageErrors(page);
 
       await page.goto("/portfolio", { waitUntil: "domcontentloaded" });
@@ -65,10 +65,7 @@ for (const viewport of viewports) {
       await expect(breadcrumb).toHaveAttribute("aria-label", "Current location: Portfolio > Calendar");
       await expect(breadcrumb.locator("[aria-current='page'] .shell-breadcrumb-label")).toHaveText("Calendar");
 
-      const shellBack = page.locator("[data-shell-back]");
-      await expect(shellBack).toHaveAttribute("aria-disabled", "false");
-      await expect(shellBack).toHaveAttribute("data-shell-back-target", "/portfolio");
-      await expect(shellBack).toHaveAttribute("aria-label", "Back to Portfolio");
+      await expect(page.locator("[data-shell-back]")).toHaveCount(0);
 
       await page.getByRole("button", { name: "Open global navigation menu" }).click();
       await expect(drawer).toHaveAttribute("aria-hidden", "false");
@@ -77,7 +74,7 @@ for (const viewport of viewports) {
       await page.locator("[data-global-menu-close]").click();
       await expect(drawer).toHaveAttribute("aria-hidden", "true");
 
-      await shellBack.click();
+      await page.goBack();
       await expect(page).toHaveURL(/\/portfolio$/);
       await expect(page.locator(".portfolio-hub")).toBeVisible();
       await expect(page.locator("[data-calendar-shell]")).toHaveAttribute("aria-hidden", "true");

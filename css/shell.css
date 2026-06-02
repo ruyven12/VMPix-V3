@@ -667,14 +667,15 @@ button {
 
 .universal-bottom-rail {
   --rail-active-accent: var(--shell-nav-accent);
-  --rail-logo-width: clamp(5.8rem, 18vw, 9.2rem);
+  --rail-logo-width: clamp(4.9rem, 12vw, 6.8rem);
+  --rail-brand-max: min(58vw, 20rem);
   position: relative;
   z-index: 8;
   width: 100%;
   min-width: 0;
   min-height: calc(var(--tap-target) + 0.18rem);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(5.8rem, var(--rail-logo-width));
+  grid-template-columns: minmax(0, 1fr) minmax(0, var(--rail-brand-max));
   align-items: center;
   gap: clamp(0.45rem, 2vw, var(--space-4));
   margin-bottom: var(--rail-lift);
@@ -728,44 +729,6 @@ button {
   padding: 0;
 }
 
-.shell-back-button {
-  position: absolute;
-  top: 50%;
-  left: max(0.58rem, env(safe-area-inset-left));
-  z-index: 3;
-  width: var(--shell-nav-control-size);
-  min-width: var(--tap-target);
-  height: var(--shell-nav-control-size);
-  min-height: var(--tap-target);
-  display: inline-grid;
-  place-items: center;
-  border: var(--shell-nav-border);
-  border-radius: var(--shell-nav-radius);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--rail-active-accent) 12%, transparent), transparent 70%),
-    rgba(247, 247, 242, 0.026);
-  color: var(--shell-nav-text);
-  cursor: pointer;
-  font: inherit;
-  line-height: 1;
-  transform: translate3d(0, -50%, 0);
-  transition:
-    border-color var(--motion-fast) var(--ease-standard),
-    color var(--motion-fast) var(--ease-standard),
-    opacity var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard);
-}
-
-.shell-back-button:focus-visible {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
-  outline-offset: 0.16rem;
-}
-
-.shell-back-button[aria-disabled="true"] {
-  cursor: default;
-  opacity: 0.32;
-}
-
 .rail-menu-trigger:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.84);
   outline-offset: -0.28rem;
@@ -783,35 +746,36 @@ button {
 .rail-cluster {
   width: 100%;
   max-width: 100%;
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--shell-nav-gap);
+  display: grid;
+  align-content: center;
+  gap: 0.08rem;
   overflow: hidden;
-  white-space: nowrap;
 }
 
 .rail-cluster--left {
   justify-self: start;
-  padding-left: 2.75rem;
+  justify-items: start;
 }
 
 .rail-cluster--right {
   justify-self: end;
   justify-content: flex-end;
-  justify-items: end;
-  align-items: end;
+  align-items: center;
   text-align: right;
 }
 
 .rail-branding {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.16rem;
+  width: auto;
+  max-width: var(--rail-brand-max);
+  display: inline-flex;
+  gap: clamp(0.28rem, 1.2vw, 0.52rem);
   justify-self: end;
+  white-space: nowrap;
 }
 
 .rail-logo-mark {
-  width: min(100%, var(--rail-logo-width));
+  flex: 0 0 min(var(--rail-logo-width), 100%);
+  width: min(var(--rail-logo-width), 100%);
   aspect-ratio: 16 / 7;
   display: block;
   justify-self: end;
@@ -847,10 +811,18 @@ button {
 }
 
 .rail-build-stack {
-  display: grid;
-  gap: 0.08rem;
-  justify-items: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.26rem;
+  min-width: 0;
   line-height: 1;
+  white-space: nowrap;
+}
+
+.rail-build-stack::before {
+  flex: 0 0 auto;
+  content: "-";
+  color: color-mix(in srgb, var(--rail-active-accent) 42%, var(--color-muted));
 }
 
 .rail-label,
@@ -883,17 +855,19 @@ button {
 
 @media (max-width: 44rem) {
   .universal-bottom-rail {
-    --rail-logo-width: clamp(5.2rem, 28vw, 7rem);
-    grid-template-columns: minmax(0, 1fr) minmax(5.2rem, var(--rail-logo-width));
-    gap: 0.42rem;
-  }
-
-  .rail-cluster--left {
-    padding-left: calc(var(--shell-nav-control-size) + 0.68rem);
+    --rail-logo-width: clamp(3.25rem, 16vw, 4.35rem);
+    --rail-brand-max: min(58vw, 11.5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--rail-brand-max));
+    gap: 0.36rem;
   }
 
   .rail-cluster--right {
-    max-width: var(--rail-logo-width);
+    max-width: var(--rail-brand-max);
+  }
+
+  .rail-build-stack {
+    gap: 0.18rem;
+    font-size: 0.82em;
   }
 
   .rail-value--view {
