@@ -10071,7 +10071,7 @@ img.archive-gallery-image {
   padding:
     clamp(2.65rem, 8vw, 3.15rem)
     clamp(0.85rem, 4vw, 1.35rem)
-    clamp(0.85rem, 4vw, 1.35rem);
+    clamp(2.35rem, 7svh, 3.45rem);
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md);
   background:
@@ -10291,7 +10291,7 @@ img.archive-gallery-image {
   padding:
     clamp(2.65rem, 8vw, 3.15rem)
     clamp(0.85rem, 4vw, 1.35rem)
-    clamp(0.85rem, 4vw, 1.35rem);
+    clamp(2.35rem, 7svh, 3.45rem);
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md);
   background:
@@ -10450,7 +10450,7 @@ img.archive-gallery-image {
 }
 
 .contact-input {
-  min-height: var(--tap-target);
+  min-height: max(var(--tap-target), 3.05rem);
   padding: 0.72rem 0.78rem;
 }
 
@@ -10479,7 +10479,7 @@ img.archive-gallery-image {
 .contact-send {
   width: 100%;
   min-width: 0;
-  min-height: var(--tap-target);
+  min-height: max(var(--tap-target), 3.05rem);
   margin-top: 0.12rem;
   padding: 0.72rem 0.92rem;
   border: 1px solid rgba(213, 22, 34, 0.34);
@@ -11391,7 +11391,7 @@ img.archive-gallery-image {
   }
 
   .contact-shell {
-    padding: clamp(2.65rem, 8vw, 3.15rem) 0.72rem 0.72rem;
+    padding: clamp(2.65rem, 8vw, 3.15rem) 0.72rem clamp(2.35rem, 7svh, 3.45rem);
   }
 
   .about-content {
