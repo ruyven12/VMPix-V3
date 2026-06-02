@@ -265,16 +265,34 @@
 
               <section class="bands-index-panel bands-index-panel--list" id="bands-list-panel" role="tabpanel" aria-labelledby="bands-list-tab" aria-hidden="true" inert data-bands-view="list">
                 <div class="bands-list-panel">
-                  <div class="bands-list-filter-bar" data-bands-list-filter-bar hidden>
-                    <div class="bands-radar-compact" aria-live="polite">
-                      <span class="bands-radar-compact-letter" data-bands-filter-letter>A</span>
-                      <span class="bands-radar-compact-copy" data-bands-filter-summary>A lane filtered</span>
-                    </div>
-                    <button class="bands-radar-back" type="button" data-bands-back-radar>Back to Radar</button>
-                  </div>
-                  <div class="bands-list-filter-controls" aria-label="Band list filters">
-                    <span class="bands-list-filter-label">Filters</span>
-                    <div class="bands-letter-nav" aria-label="Band alphabet list navigation" data-bands-letter-nav-list></div>
+                  <div class="bands-filter-strip bands-list-filter-controls" aria-label="Band list filters">
+                    <span class="bands-filter-strip-label">Filters</span>
+                    <label class="bands-filter-field">
+                      <span class="bands-filter-label">Letter</span>
+                      <select class="bands-filter-select" data-bands-filter="letter" aria-label="Filter bands by letter">
+                        <option value="">All</option>
+                      </select>
+                    </label>
+                    <label class="bands-filter-field">
+                      <span class="bands-filter-label">Region</span>
+                      <select class="bands-filter-select" data-bands-filter="region" aria-label="Filter bands by region">
+                        <option value="">All Regions</option>
+                        <option value="local">Local</option>
+                        <option value="regional">Regional</option>
+                        <option value="national">National</option>
+                        <option value="international">International</option>
+                      </select>
+                    </label>
+                    <label class="bands-filter-field">
+                      <span class="bands-filter-label">Archive Status</span>
+                      <select class="bands-filter-select" data-bands-filter="status" aria-label="Filter bands by archive status">
+                        <option value="">All Statuses</option>
+                        <option value="complete">Complete</option>
+                        <option value="partial">Partial</option>
+                        <option value="needs">Needs Work</option>
+                      </select>
+                    </label>
+                    <button class="bands-filter-reset" type="button" data-bands-filter-reset>Reset</button>
                   </div>
                   <div class="bands-list-viewport" aria-label="Alphabetized bands archive list" data-bands-list></div>
                   <div class="bands-empty-state" data-bands-empty>No matching bands indexed</div>
@@ -289,25 +307,35 @@
                   </label>
 
                   <div class="bands-search-groups">
-                    <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
-                      <h5 class="bands-search-group-title" id="bands-recent-searches-title">Quick Regions</h5>
-                      <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="regional">Regional</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="national">National</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="international">International</button>
-                      </div>
-                    </section>
-
-                    <section class="bands-search-group" aria-labelledby="bands-search-categories-title">
-                      <h5 class="bands-search-group-title" id="bands-search-categories-title">Archive State</h5>
-                      <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="complete archive">Complete Archive</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="partial archive">Partial Archive</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="needs work">Needs Work</button>
-                      </div>
-                    </section>
+                    <div class="bands-filter-strip bands-filter-strip--search" aria-label="Band search filters">
+                      <span class="bands-filter-strip-label">Filters</span>
+                      <label class="bands-filter-field">
+                        <span class="bands-filter-label">Letter</span>
+                        <select class="bands-filter-select" data-bands-filter="letter" aria-label="Filter search results by letter">
+                          <option value="">All</option>
+                        </select>
+                      </label>
+                      <label class="bands-filter-field">
+                        <span class="bands-filter-label">Region</span>
+                        <select class="bands-filter-select" data-bands-filter="region" aria-label="Filter search results by region">
+                          <option value="">All Regions</option>
+                          <option value="local">Local</option>
+                          <option value="regional">Regional</option>
+                          <option value="national">National</option>
+                          <option value="international">International</option>
+                        </select>
+                      </label>
+                      <label class="bands-filter-field">
+                        <span class="bands-filter-label">Archive Status</span>
+                        <select class="bands-filter-select" data-bands-filter="status" aria-label="Filter search results by archive status">
+                          <option value="">All Statuses</option>
+                          <option value="complete">Complete</option>
+                          <option value="partial">Partial</option>
+                          <option value="needs">Needs Work</option>
+                        </select>
+                      </label>
+                      <button class="bands-filter-reset" type="button" data-bands-filter-reset>Reset</button>
+                    </div>
 
                     <section class="bands-search-group" aria-labelledby="bands-search-results-title">
                       <h5 class="bands-search-group-title" id="bands-search-results-title">Signals</h5>

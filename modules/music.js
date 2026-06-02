@@ -7,6 +7,17 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
+const bandsRegionFilterLabels = {
+  local: "Local",
+  regional: "Regional",
+  national: "National",
+  international: "International",
+};
+const bandsStatusFilterLabels = {
+  complete: "Complete",
+  partial: "Partial",
+  needs: "Needs Work",
+};
 let musicBandsIndexCollection = getMockCollection("musicBands", { clone: false });
 let musicBandsIndexRequest = null;
 let musicBandsIndexLoaded = false;
@@ -307,10 +318,10 @@ function getBandArchiveStatus(archivedSets, totalSets) {
     return { label: "Needs Work", key: "needs" };
   }
   if (archivedCount > 0 && archivedCount < totalCount) {
-    return { label: "Partial Archive", key: "partial" };
+    return { label: "Partial", key: "partial" };
   }
   if (archivedCount === totalCount && archivedCount > 0) {
-    return { label: "Complete Archive", key: "complete" };
+    return { label: "Complete", key: "complete" };
   }
 
   return { label: "Archive Pending", key: "neutral" };
@@ -476,16 +487,90 @@ function getRadarPointOffset(index, total) {
   return [`${x.toFixed(2)}%`, `${y.toFixed(2)}%`];
 }
 
-function getVisibleBands() {
-  const query = bandsSearchTerm.trim().toLowerCase();
-  if (!query) {
-    return getMusicBandsIndexCollection();
+function shouldUseBandsPanelFilters() {
+  return activeBandsView === "list" || activeBandsView === "search";
+}
+
+function normalizeBandsRegionFilter(value) {
+  const normalizedValue = String(value || "").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(bandsRegionFilterLabels, normalizedValue) ? normalizedValue : "";
+}
+
+function normalizeBandsStatusFilter(value) {
+  const normalizedValue = String(value || "").trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(bandsStatusFilterLabels, normalizedValue) ? normalizedValue : "";
+}
+
+function normalizeBandsLetterFilter(value) {
+  const normalizedValue = String(value || "").trim().toUpperCase();
+  return bandsAlphabet.includes(normalizedValue) ? normalizedValue : "";
+}
+
+function getBandRegionKey(band) {
+  return String(band?.region || band?.stats?.region || "").trim().toLowerCase();
+}
+
+function getBandStatusKey(band) {
+  const statusKey = String(band?.statusKey || band?.status_key || "").trim().toLowerCase();
+  if (Object.prototype.hasOwnProperty.call(bandsStatusFilterLabels, statusKey)) {
+    return statusKey;
   }
 
-  return filterMockCollection(getMusicBandsIndexCollection(), (band) => {
-    const searchText = `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.archived_sets}/${band.total_sets} sets ${band.photo_count} photos`.toLowerCase();
-    return searchText.includes(query);
-  });
+  const statusLabel = String(band?.status || "").trim().toLowerCase();
+  if (statusLabel.includes("complete")) {
+    return "complete";
+  }
+  if (statusLabel.includes("partial")) {
+    return "partial";
+  }
+  if (statusLabel.includes("needs")) {
+    return "needs";
+  }
+  return "";
+}
+
+function getBandSearchText(band) {
+  return `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.archived_sets}/${band.total_sets} sets ${band.photo_count} photos`.toLowerCase();
+}
+
+function getBandsRegionStatusRows(rows) {
+  let filteredRows = rows;
+  if (activeBandsRegionFilter) {
+    filteredRows = filterMockCollection(filteredRows, (band) => getBandRegionKey(band) === activeBandsRegionFilter);
+  }
+  if (activeBandsStatusFilter) {
+    filteredRows = filterMockCollection(filteredRows, (band) => getBandStatusKey(band) === activeBandsStatusFilter);
+  }
+  return filteredRows;
+}
+
+function getBandsFilterOptionRows() {
+  return getBandsRegionStatusRows(getMusicBandsIndexCollection());
+}
+
+function hasActiveBandsPanelFilters() {
+  return Boolean(activeBandsFilterLetter || activeBandsRegionFilter || activeBandsStatusFilter);
+}
+
+function getVisibleBands() {
+  let rows = getMusicBandsIndexCollection();
+  if (!shouldUseBandsPanelFilters()) {
+    return rows;
+  }
+
+  rows = getBandsRegionStatusRows(rows);
+  if (activeBandsFilterLetter) {
+    rows = filterMockCollection(rows, (band) => getBandLetter(band) === activeBandsFilterLetter);
+  }
+
+  if (activeBandsView === "search") {
+    const query = bandsSearchTerm.trim().toLowerCase();
+    if (query) {
+      rows = filterMockCollection(rows, (band) => getBandSearchText(band).includes(query));
+    }
+  }
+
+  return rows;
 }
 
 function getListBands(rows) {
@@ -1724,6 +1809,73 @@ function returnToBandDetailFromSets() {
   }
 }
 
+function createBandsFilterOption(value, label) {
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  return option;
+}
+
+function syncActiveBandsFilterOptions() {
+  if (!shouldUseBandsPanelFilters()) {
+    return;
+  }
+
+  activeBandsRegionFilter = normalizeBandsRegionFilter(activeBandsRegionFilter);
+  activeBandsStatusFilter = normalizeBandsStatusFilter(activeBandsStatusFilter);
+  activeBandsFilterLetter = normalizeBandsLetterFilter(activeBandsFilterLetter);
+
+  if (!activeBandsFilterLetter) {
+    return;
+  }
+
+  const availableLetters = new Set(getBandsFilterOptionRows().map(getBandLetter));
+  if (!availableLetters.has(activeBandsFilterLetter)) {
+    activeBandsFilterLetter = "";
+  }
+}
+
+function renderBandsFilterSelects() {
+  if (bandsFilterSelects.length === 0) {
+    return;
+  }
+
+  const letterCounts = getBandLetterCounts(getBandsFilterOptionRows());
+  bandsFilterSelects.forEach((select) => {
+    const filterType = select.dataset.bandsFilter;
+    if (filterType === "letter") {
+      const fragment = document.createDocumentFragment();
+      fragment.append(createBandsFilterOption("", "All"));
+      bandsAlphabet.forEach((letter) => {
+        if ((letterCounts.get(letter) || 0) > 0) {
+          fragment.append(createBandsFilterOption(letter, letter));
+        }
+      });
+      select.replaceChildren(fragment);
+      select.value = activeBandsFilterLetter && letterCounts.has(activeBandsFilterLetter)
+        ? activeBandsFilterLetter
+        : "";
+      return;
+    }
+
+    if (filterType === "region") {
+      select.value = activeBandsRegionFilter;
+      return;
+    }
+
+    if (filterType === "status") {
+      select.value = activeBandsStatusFilter;
+    }
+  });
+}
+
+function updateBandsFilterResetButtons() {
+  bandsFilterResetButtons.forEach((button) => {
+    button.disabled = !hasActiveBandsPanelFilters();
+    button.setAttribute("aria-disabled", String(button.disabled));
+  });
+}
+
 function renderBandsLetterNavs(rows) {
   if (bandsLetterNavs.length === 0) {
     return;
@@ -1760,7 +1912,7 @@ function renderBandsLetterNavs(rows) {
         return;
       }
       const button = document.createElement("button");
-      const isSearchMatch = Boolean(bandsSearchTerm) && count > 0;
+      const isSearchMatch = activeBandsView === "search" && Boolean(bandsSearchTerm) && count > 0;
       button.className = `bands-letter-button${count > 0 ? " has-signal" : ""}${isSearchMatch ? " is-search-match" : ""}`;
       button.type = "button";
       button.textContent = letter;
@@ -2081,14 +2233,19 @@ function scrollBandsIndexIntoView() {
 }
 
 function syncBandsIndex() {
+  const allRows = getMusicBandsIndexCollection();
+  syncActiveBandsFilterOptions();
   const rows = getVisibleBands();
-  syncActiveBandLetter(rows);
+  syncActiveBandLetter(activeBandsView === "radar" ? allRows : rows);
   if (musicBandsIndex) {
-    musicBandsIndex.classList.toggle("is-letter-filtered", Boolean(activeBandsFilterLetter));
-    musicBandsIndex.classList.toggle("is-search-filtered", Boolean(bandsSearchTerm));
+    musicBandsIndex.classList.toggle("is-letter-filtered", shouldUseBandsPanelFilters() && Boolean(activeBandsFilterLetter));
+    musicBandsIndex.classList.toggle("is-search-filtered", activeBandsView === "search" && Boolean(bandsSearchTerm));
+    musicBandsIndex.classList.toggle("is-select-filtered", shouldUseBandsPanelFilters() && hasActiveBandsPanelFilters());
   }
-  renderBandsLetterNavs(rows);
-  renderBandsRadar(rows);
+  renderBandsFilterSelects();
+  updateBandsFilterResetButtons();
+  renderBandsLetterNavs(allRows);
+  renderBandsRadar(allRows);
   renderBandsList(rows);
   renderBandsSearch(rows);
   updateBandsStatus(rows);
@@ -2122,7 +2279,7 @@ function setBandsView(viewName, shouldFocus = false, options = {}) {
   }
 
   activeBandsView = viewName;
-  if (viewName !== "list" || !options.preserveFilter) {
+  if (viewName === "radar" && !options.preserveFilter) {
     activeBandsFilterLetter = "";
   }
   bandsViewButtons.forEach((button) => {
@@ -2148,12 +2305,48 @@ function setBandsView(viewName, shouldFocus = false, options = {}) {
 
 function setBandsSearchTerm(value) {
   bandsSearchTerm = value.trim();
-  activeBandsFilterLetter = "";
   syncBandsIndex();
+}
+
+function scrollActiveBandsResultsToTop() {
+  const scroller = activeBandsView === "search" ? bandsSearchResults : getBandsListScroller();
+  if (!scroller) {
+    return;
+  }
+  scroller.scrollTo({
+    top: 0,
+    behavior: reducedMotion.matches ? "auto" : "smooth",
+  });
+}
+
+function setBandsFilterValue(filterType, value) {
+  if (filterType === "letter") {
+    activeBandsFilterLetter = normalizeBandsLetterFilter(value);
+    if (activeBandsFilterLetter) {
+      activeBandsLetter = activeBandsFilterLetter;
+    }
+  } else if (filterType === "region") {
+    activeBandsRegionFilter = normalizeBandsRegionFilter(value);
+  } else if (filterType === "status") {
+    activeBandsStatusFilter = normalizeBandsStatusFilter(value);
+  }
+
+  syncBandsIndex();
+  scrollActiveBandsResultsToTop();
+}
+
+function clearBandsPanelFilters() {
+  activeBandsFilterLetter = "";
+  activeBandsRegionFilter = "";
+  activeBandsStatusFilter = "";
+  syncBandsIndex();
+  scrollActiveBandsResultsToTop();
 }
 
 function returnToBandsRadar() {
   activeBandsFilterLetter = "";
+  activeBandsRegionFilter = "";
+  activeBandsStatusFilter = "";
   setBandsView("radar", false, { shouldRoute: true });
   scrollBandsIndexIntoView();
 }
@@ -3991,6 +4184,14 @@ function initMusicModule() {
       setBandsSearchTerm(chip.dataset.bandsSearchTerm || "");
       setBandsView("search", true, { shouldRoute: true });
     });
+  });
+  bandsFilterSelects.forEach((select) => {
+    select.addEventListener("change", (event) => {
+      setBandsFilterValue(event.currentTarget.dataset.bandsFilter, event.currentTarget.value);
+    });
+  });
+  bandsFilterResetButtons.forEach((button) => {
+    button.addEventListener("click", clearBandsPanelFilters);
   });
   if (bandsBackRadar) {
     bandsBackRadar.addEventListener("click", returnToBandsRadar);

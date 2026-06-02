@@ -87,6 +87,8 @@ const bandsSearchInput = document.querySelector("[data-bands-search-input]");
 const bandsSearchResults = document.querySelector("[data-bands-search-results]");
 const bandsSearchSummary = document.querySelector("[data-bands-search-summary]");
 const bandsSearchChips = document.querySelectorAll("[data-bands-search-term]");
+const bandsFilterSelects = document.querySelectorAll("[data-bands-filter]");
+const bandsFilterResetButtons = document.querySelectorAll("[data-bands-filter-reset]");
 const bandDetail = document.querySelector("[data-band-detail-placeholder]");
 const bandDetailBack = document.querySelector("[data-band-detail-back]");
 const bandDetailPoster = document.querySelector(".band-detail-poster");
@@ -180,6 +182,8 @@ let drawerCloseTimer;
 let activeBandsView = "radar";
 let activeBandsLetter = "A";
 let activeBandsFilterLetter = "";
+let activeBandsRegionFilter = "";
+let activeBandsStatusFilter = "";
 let bandsSearchTerm = "";
 let bandsIndexReturnUrl = "/music/bands";
 let activeMusicPeoplePage = 1;
@@ -342,18 +346,18 @@ const musicShowsArchiveRows = [
 ];
 
 const musicBandIndexRows = [
-  { bandId: "13-high", name: "Astra Vale", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 12, thumb: "AV" },
-  { bandId: "3fd", name: "Black Harbor", region: "Regional", status: "Partial Archive", statusKey: "partial", albums: 8, thumb: "BH" },
-  { bandId: "4x4-barracuda", name: "Crimson Static", region: "National", status: "Complete Archive", statusKey: "complete", albums: 34, thumb: "CS" },
-  { bandId: "6-gig", name: "Dead Letters", region: "Local", status: "Partial Archive", statusKey: "partial", albums: 4, thumb: "DL" },
-  { bandId: "a-river-of-trees", name: "Echo District", region: "International", status: "Complete Archive", statusKey: "complete", albums: 18, thumb: "ED" },
+  { bandId: "13-high", name: "Astra Vale", region: "Local", status: "Complete", statusKey: "complete", albums: 12, thumb: "AV" },
+  { bandId: "3fd", name: "Black Harbor", region: "Regional", status: "Partial", statusKey: "partial", albums: 8, thumb: "BH" },
+  { bandId: "4x4-barracuda", name: "Crimson Static", region: "National", status: "Complete", statusKey: "complete", albums: 34, thumb: "CS" },
+  { bandId: "6-gig", name: "Dead Letters", region: "Local", status: "Partial", statusKey: "partial", albums: 4, thumb: "DL" },
+  { bandId: "a-river-of-trees", name: "Echo District", region: "International", status: "Complete", statusKey: "complete", albums: 18, thumb: "ED" },
   { bandId: "glass-ritual", name: "Glass Ritual", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 6, thumb: "GR" },
-  { bandId: "hollow-signal", name: "Hollow Signal", region: "Local", status: "Complete Archive", statusKey: "complete", albums: 9, thumb: "HS" },
-  { bandId: "moon-circuit", name: "Moon Circuit", region: "National", status: "Partial Archive", statusKey: "partial", albums: 11, thumb: "MC" },
-  { bandId: "neon-saints", name: "Neon Saints", region: "International", status: "Complete Archive", statusKey: "complete", albums: 27, thumb: "NS" },
+  { bandId: "hollow-signal", name: "Hollow Signal", region: "Local", status: "Complete", statusKey: "complete", albums: 9, thumb: "HS" },
+  { bandId: "moon-circuit", name: "Moon Circuit", region: "National", status: "Partial", statusKey: "partial", albums: 11, thumb: "MC" },
+  { bandId: "neon-saints", name: "Neon Saints", region: "International", status: "Complete", statusKey: "complete", albums: 27, thumb: "NS" },
   { bandId: "ritual-bloom", name: "Ritual Bloom", region: "Regional", status: "Needs Work", statusKey: "needs", albums: 5, thumb: "RB" },
-  { bandId: "silver-static", name: "Silver Static", region: "National", status: "Partial Archive", statusKey: "partial", albums: 16, thumb: "SS" },
-  { bandId: "violet-machines", name: "Violet Machines", region: "International", status: "Complete Archive", statusKey: "complete", albums: 22, thumb: "VM" },
+  { bandId: "silver-static", name: "Silver Static", region: "National", status: "Partial", statusKey: "partial", albums: 16, thumb: "SS" },
+  { bandId: "violet-machines", name: "Violet Machines", region: "International", status: "Complete", statusKey: "complete", albums: 22, thumb: "VM" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 const musicPeopleRows = [
@@ -913,7 +917,7 @@ const mockStateCopy = {
     text: "Static data could not be prepared. Return to the parent archive and try again.",
   },
   partial: {
-    title: "Partial Archive Signal",
+    title: "Partial Signal",
     text: "Some records are staged while the remaining data waits for integration.",
   },
 };
