@@ -796,6 +796,109 @@ function applyMockAliases(record, aliases) {
   return record;
 }
 
+function normalizeMockLookupValue(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function normalizeMockRecord(record = {}, fallback = {}) {
+  const source = record && typeof record === "object" ? record : {};
+  const fallbackSource = fallback && typeof fallback === "object" ? fallback : {};
+  const id = source.id || source.slug || source.bandId || source.personId || source.showId || source.venueId || source.matchId ||
+    source.band_id || source.person_id || source.show_id || source.venue_id || source.match_id ||
+    fallbackSource.id || fallbackSource.slug || "mock-record";
+  const title = source.title || source.name || source.band || source.venue || source.venue_name || source.show_name ||
+    fallbackSource.title || fallbackSource.name || createMockTitleFromSlug(id);
+
+  return {
+    ...fallbackSource,
+    ...source,
+    id,
+    slug: source.slug || source.id || id,
+    title,
+    image_url: getSafeImageUrl(source.image_url || source.imageUrl || source.logo_url || source.logo || source.poster, fallbackSource.image_url || ""),
+  };
+}
+
+function getMockRecordValue(record = {}, field = "") {
+  if (!record || !field) {
+    return "";
+  }
+
+  return field.split(".").reduce((value, key) => (value && value[key] !== undefined ? value[key] : ""), record);
+}
+
+function getMockCollection(source, options = {}) {
+  const records = Array.isArray(source)
+    ? source
+    : Array.isArray(source?.data)
+      ? source.data
+      : Array.isArray(mockCollections?.[source])
+        ? mockCollections[source]
+        : Array.isArray(mockApiResponses?.[source]?.data)
+          ? mockApiResponses[source].data
+          : [];
+
+  return options.clone === false ? records : records.slice();
+}
+
+function getMockRecordById(source, id, fields = ["id", "bandId", "personId", "showId", "venueId", "matchId", "band_id", "person_id", "show_id", "venue_id", "match_id"]) {
+  const normalizedId = normalizeMockLookupValue(id);
+  if (!normalizedId) {
+    return null;
+  }
+
+  return getMockCollection(source, { clone: false }).find((record) => (
+    fields.some((field) => normalizeMockLookupValue(getMockRecordValue(record, field)) === normalizedId)
+  )) || null;
+}
+
+function getMockRecordBySlug(source, slug, fields = ["slug", "id", "bandId", "personId", "showId", "venueId", "matchId", "show_key"]) {
+  return getMockRecordById(source, slug, fields);
+}
+
+function filterMockCollection(source, matcher = null) {
+  const records = getMockCollection(source);
+  if (!matcher) {
+    return records;
+  }
+  if (typeof matcher === "function") {
+    return records.filter(matcher);
+  }
+  if (typeof matcher !== "object") {
+    return records;
+  }
+
+  return records.filter((record) => Object.entries(matcher).every(([field, expected]) => {
+    const value = getMockRecordValue(record, field);
+    if (Array.isArray(expected)) {
+      return expected.map(normalizeMockLookupValue).includes(normalizeMockLookupValue(value));
+    }
+    return normalizeMockLookupValue(value) === normalizeMockLookupValue(expected);
+  }));
+}
+
+function sortMockCollection(source, sorter = "title", direction = "asc") {
+  const records = getMockCollection(source);
+  const sortDirection = String(direction).toLowerCase() === "desc" ? -1 : 1;
+  if (typeof sorter === "function") {
+    return records.sort(sorter);
+  }
+
+  return records.sort((left, right) => {
+    const leftValue = getMockRecordValue(left, sorter);
+    const rightValue = getMockRecordValue(right, sorter);
+    if (typeof leftValue === "number" && typeof rightValue === "number") {
+      return (leftValue - rightValue) * sortDirection;
+    }
+    return String(leftValue || "").localeCompare(String(rightValue || "")) * sortDirection;
+  });
+}
+
+function getSafeImageUrl(imageUrl = "", fallbackUrl = galleryImageFallbackSrc) {
+  const safeUrl = String(imageUrl || "").trim();
+  return safeUrl || fallbackUrl || "";
+}
+
 function mapMockPeopleRefs(ids = []) {
   return (Array.isArray(ids) ? ids : []).map((id) => {
     const person = wrestlingPeopleRows.find((row) => row.personId === id) || musicPeopleRows.find((row) => row.personId === id);
@@ -1390,6 +1493,19 @@ const mockApiResponses = {
     { type: "postgres", table: "wrestling_venues" },
     wrestlingVenuesStatsMock
   ),
+};
+
+const mockCollections = {
+  musicBands: musicBandIndexRows,
+  musicPeople: musicPeopleRows,
+  musicShows: musicShowsArchiveRows,
+  musicVenues: musicVenuesDbMockRows,
+  wrestlingPeople: wrestlingPeopleRows,
+  wrestlingVenues: wrestlingVenueRows,
+  wrestlingShows: wrestlingShowRelationshipRows,
+  wrestlingMatches: wrestlingMatchRelationshipRows,
+  wrestlingPersonEvents: wrestlingPersonEventHistoryRows,
+  wrestlingVenueEvents: wrestlingVenueEventHistoryRows,
 };
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");

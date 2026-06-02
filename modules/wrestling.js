@@ -22,7 +22,7 @@ function getWrestlingPersonRouteUrl(personId) {
 
 function findWrestlingPersonById(personId) {
   const normalizedPersonId = normalizeWrestlingPersonId(personId);
-  return wrestlingPeopleRows.find((person) => person.personId === normalizedPersonId) || wrestlingPeopleRows[0];
+  return getMockRecordById("wrestlingPeople", normalizedPersonId, ["personId", "id", "slug"]) || wrestlingPeopleRows[0];
 }
 
 function normalizeWrestlingVenueId(venueId) {
@@ -44,7 +44,7 @@ function getWrestlingVenueRouteUrl(venueId) {
 
 function findWrestlingVenueById(venueId) {
   const normalizedVenueId = normalizeWrestlingVenueId(venueId);
-  return wrestlingVenueRows.find((venue) => venue.venueId === normalizedVenueId) || wrestlingVenueRows[0];
+  return getMockRecordById("wrestlingVenues", normalizedVenueId, ["venueId", "id", "slug", "venue_id"]) || wrestlingVenueRows[0];
 }
 
 function getWrestlingRelationshipIds(items, key = "") {
@@ -116,16 +116,16 @@ function setWrestlingRelationshipDataset(element, relationship = {}) {
 }
 
 function findWrestlingShowRelationshipById(showId) {
-  return wrestlingShowRelationshipRows.find((show) => show.showId === String(showId || "").trim()) || null;
+  return getMockRecordById("wrestlingShows", showId, ["showId", "eventId", "id", "slug", "show_id", "show_key"]) || null;
 }
 
 function findWrestlingMatchRelationshipById(matchId, showId = "") {
   const normalizedMatchId = String(matchId || "").trim();
   const normalizedShowId = String(showId || "").trim();
-  return wrestlingMatchRelationshipRows.find((match) => (
+  return filterMockCollection("wrestlingMatches", (match) => (
     match.matchId === normalizedMatchId &&
     (!normalizedShowId || match.showId === normalizedShowId)
-  )) || null;
+  ))[0] || null;
 }
 
 function formatWrestlingCount(count, label) {

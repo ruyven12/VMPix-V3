@@ -32,7 +32,7 @@ function getMusicPersonRouteUrl(personId) {
 
 function findMusicPersonById(personId) {
   const normalizedPersonId = normalizeMusicPersonId(personId);
-  return musicPeopleRows.find((person) => normalizeMusicPersonId(person.personId) === normalizedPersonId) || null;
+  return getMockRecordById("musicPeople", normalizedPersonId, ["personId", "id", "slug"]) || null;
 }
 
 function createMusicPersonDetailStateData(stateName, personId) {
@@ -61,7 +61,7 @@ function getMusicPersonDetailData(personId) {
 }
 
 function findBandById(bandId) {
-  return musicBandIndexRows.find((band) => getBandId(band) === bandId) || null;
+  return getMockRecordById("musicBands", bandId, ["bandId", "id", "slug", "band_id"]) || null;
 }
 
 function createUnknownBand(bandId) {
@@ -243,10 +243,10 @@ function getBandLetter(band) {
 function getVisibleBands() {
   const query = bandsSearchTerm.trim().toLowerCase();
   if (!query) {
-    return musicBandIndexRows;
+    return getMockCollection("musicBands", { clone: false });
   }
 
-  return musicBandIndexRows.filter((band) => {
+  return filterMockCollection("musicBands", (band) => {
     const searchText = `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.albums} albums`.toLowerCase();
     return searchText.includes(query);
   });
@@ -257,7 +257,7 @@ function getListBands(rows) {
     return rows;
   }
 
-  return rows.filter((band) => getBandLetter(band) === activeBandsFilterLetter);
+  return filterMockCollection(rows, (band) => getBandLetter(band) === activeBandsFilterLetter);
 }
 
 function getBandLetterCounts(rows) {
@@ -2338,8 +2338,7 @@ function getMusicShowRouteUrl(show) {
 }
 
 function findMusicShowById(showId) {
-  const normalizedShowId = String(showId || "").trim();
-  return musicShowsArchiveRows.find((show) => show.showId === normalizedShowId) || null;
+  return getMockRecordById("musicShows", showId, ["showId", "id", "slug", "show_id"]) || null;
 }
 
 function createUnknownMusicShow(showId) {
@@ -2396,7 +2395,7 @@ function getMusicShowTimestamp(show) {
 }
 
 function getSortedMusicShows(rows = musicShowsArchiveRows) {
-  return [...rows].sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left));
+  return sortMockCollection(rows, (left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left));
 }
 
 function getFilteredMusicShows() {
@@ -2405,9 +2404,9 @@ function getFilteredMusicShows() {
     return sortedRows;
   }
   if (activeMusicShowsYear === "MORE") {
-    return sortedRows.filter((show) => Number.parseInt(show.year || "0", 10) <= 2020);
+    return filterMockCollection(sortedRows, (show) => Number.parseInt(show.year || "0", 10) <= 2020);
   }
-  return sortedRows.filter((show) => show.year === activeMusicShowsYear);
+  return filterMockCollection(sortedRows, { year: activeMusicShowsYear });
 }
 
 function updateMusicShowsYearSelection(yearLabel) {

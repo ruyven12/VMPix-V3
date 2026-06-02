@@ -8,6 +8,8 @@ Pass 2 update: `js/state.js` now applies compatibility aliases to active Music a
 
 Pass 3 update: `js/state.js` now attaches `backend_record` objects and static `mockApiResponses` envelopes for the current Music and Wrestling DB/stat route patterns. These mocks mirror the backend JSON contracts more closely with snake_case IDs, nested `stats`, `venue_details`, `geo`, relationship arrays, `matches`, `participants`, `winner`/`winners`, `referees`, and `tagged_people`, while the existing camelCase render fields remain in place.
 
+Pass 4 update: `js/state.js` now exposes lightweight reusable mock-loading helpers: `getMockCollection`, `getMockRecordById`, `getMockRecordBySlug`, `filterMockCollection`, `sortMockCollection`, `getSafeImageUrl`, and `normalizeMockRecord`. Music and Wrestling use these helpers for the obvious lookup/filter/sort paths while keeping existing render fields and UI behavior stable.
+
 ## Inventory Rules
 
 - Preserve current static-first visual behavior until a replacement pass is approved.
@@ -88,6 +90,7 @@ Pass 3 update: `js/state.js` now attaches `backend_record` objects and static `m
 - Current frontend fixtures mostly use camelCase IDs (`bandId`, `personId`, `showId`, `venueId`, `matchId`), while planned backend JSON uses snake_case stable IDs (`band_id`, `person_id`, `show_id`, `venue_id`, `match_id`).
 - Pass 2 added non-destructive aliases rather than replacing camelCase fields, so both old UI consumers and future adapter-style readers can coexist during cleanup.
 - Pass 3 added backend-shaped `backend_record` snapshots and mock response envelopes rather than wiring live fetch calls, so future API adapters can be compared against realistic frontend fixtures without changing current module behavior.
+- Pass 4 introduced reusable mock helpers as the frontend adapter boundary for loading, selecting, filtering, sorting, safe fallback images, and normalized fixture records.
 - Music show snapshots generated in `modules/music.js` already emit some snake_case keys (`show_id`, `venue_id`, `band_ids`, `media_ids`, `archive_meta`), but they are derived from camelCase frontend rows and display strings.
 - Music fixture rows often store display-ready labels instead of canonical IDs, especially for venues, locations, counts, roles, and dates.
 - Wrestling fixtures are closer to relationship data but still do not match the planned match/show contracts exactly.
