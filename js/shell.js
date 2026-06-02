@@ -308,35 +308,61 @@ function renderGlobalMenu() {
   }
 
   globalMenuActions.replaceChildren();
-  shellDrawerGroups.forEach((group) => {
-    const groupRoutes = shellRouteRegistry.filter((routeMeta) => routeMeta.drawerGroup === group.id);
-    if (groupRoutes.length === 0) {
+  const visibleRoutes = globalDrawerRouteIds
+    .map((routeId) => getShellRouteMeta(routeId))
+    .filter(Boolean);
+
+  const list = document.createElement("div");
+  list.className = "global-menu-list";
+  visibleRoutes.forEach((routeMeta) => {
+    list.append(createGlobalMenuButton(routeMeta));
+  });
+
+  globalMenuActions.append(list);
+  globalNavButtons = document.querySelectorAll("[data-global-nav-target]");
+}
+
+function syncGlobalMenuArchiveBuild() {
+  const globalMenuArchiveBuild = document.querySelector("[data-global-menu-archive-build]");
+  const archiveBuild = document.querySelector("[data-archive-build]");
+  if (globalMenuArchiveBuild && archiveBuild) {
+    globalMenuArchiveBuild.textContent = archiveBuild.textContent.trim();
+  }
+}
+
+function setGlobalMenuLogoFallback(isFallback) {
+  if (globalMenuDrawer) {
+    globalMenuDrawer.classList.toggle("is-logo-fallback", isFallback);
+  }
+}
+
+function initGlobalMenuLogo() {
+  const logoVideo = document.querySelector("[data-global-menu-logo-video]");
+  const logoFallback = document.querySelector("[data-global-menu-logo-fallback]");
+  if (!logoVideo || !logoFallback) {
+    return;
+  }
+
+  const updateLogoMode = () => {
+    const shouldUseFallback = reducedMotion.matches || logoVideo.error;
+    setGlobalMenuLogoFallback(Boolean(shouldUseFallback));
+    if (shouldUseFallback) {
+      logoVideo.pause();
       return;
     }
 
-    const section = document.createElement("section");
-    const titleId = `global-menu-${group.id}-title`;
-    section.className = "global-menu-group";
-    section.setAttribute("aria-labelledby", titleId);
+    const playResult = logoVideo.play();
+    if (playResult && typeof playResult.catch === "function") {
+      playResult.catch(() => setGlobalMenuLogoFallback(true));
+    }
+  };
 
-    const title = document.createElement("h3");
-    title.className = "global-menu-section-title";
-    title.id = titleId;
-    title.textContent = group.label;
-
-    const list = document.createElement("div");
-    list.className = group.id === "future"
-      ? "global-menu-list global-menu-list--future"
-      : "global-menu-list";
-    groupRoutes.forEach((routeMeta) => {
-      list.append(createGlobalMenuButton(routeMeta));
-    });
-
-    section.append(title, list);
-    globalMenuActions.append(section);
-  });
-
-  globalNavButtons = document.querySelectorAll("[data-global-nav-target]");
+  logoVideo.addEventListener("error", () => setGlobalMenuLogoFallback(true));
+  logoVideo.addEventListener("canplay", updateLogoMode, { once: true });
+  if (typeof reducedMotion.addEventListener === "function") {
+    reducedMotion.addEventListener("change", updateLogoMode);
+  }
+  updateLogoMode();
 }
 
 function setActiveGlobalNav(targetName) {
@@ -662,11 +688,7 @@ function showMusicNexus(options = {}) {
     }
   }
   setCurrentView(options.currentView || "Music Nexus");
-  setActiveGlobalNav(options.globalNavTarget || {
-    bands: "music-bands",
-    people: "music-people",
-    shows: "music-shows",
-  }[initialSection] || "music");
+  setActiveGlobalNav(options.globalNavTarget || "music");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -776,7 +798,7 @@ function showWrestlingPeopleIndex() {
     wrestlingPeopleShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Wrestling People");
-  setActiveGlobalNav("wrestling-people");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -835,7 +857,7 @@ function showWrestlingPersonDetail(personId) {
     wrestlingPersonDetailShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }
   setCurrentView("Person Detail");
-  setActiveGlobalNav("wrestling-people");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1007,7 +1029,7 @@ function showWrestlingShowsIndex() {
   }
   setHubChromeHidden(true);
   setCurrentView("Event Archive");
-  setActiveGlobalNav("wrestling-shows");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1063,7 +1085,7 @@ function showWrestlingShowDetail(showId = "warzone-26") {
     updateWrestlingShowDetailRelationshipHooks(showId);
   }
   setCurrentView("Show Detail");
-  setActiveGlobalNav("wrestling-shows");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1119,7 +1141,7 @@ function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richa
     updateWrestlingMatchGalleryRelationshipHooks(showId, matchId);
   }
   setCurrentView("Match Gallery");
-  setActiveGlobalNav("wrestling-shows");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1218,7 +1240,7 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   }
   setHubChromeHidden(true);
   setCurrentView("Photo");
-  setActiveGlobalNav("wrestling-shows");
+  setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -1603,7 +1625,7 @@ function finishGlobalMenuClose() {
   globalMenuBackdrop.hidden = true;
 }
 
-function closeGlobalMenu() {
+function closeGlobalMenu(options = {}) {
   if (!shell || !railMenuTrigger || !globalMenuDrawer || !globalMenuBackdrop) {
     return;
   }
@@ -1611,7 +1633,9 @@ function closeGlobalMenu() {
   shell.classList.remove("is-global-menu-open");
   globalMenuDrawer.setAttribute("aria-hidden", "true");
   railMenuTrigger.setAttribute("aria-expanded", "false");
-  railMenuTrigger.focus({ preventScroll: true });
+  if (options.shouldRestoreFocus !== false) {
+    railMenuTrigger.focus({ preventScroll: true });
+  }
   setShellDrawerLock(false);
   window.clearTimeout(drawerCloseTimer);
   if (reducedMotion.matches) {
@@ -1683,11 +1707,10 @@ function handleGlobalMenuAction(event) {
     return;
   }
 
+  closeGlobalMenu({ shouldRestoreFocus: false });
   if (navRoute) {
-    navigateToRoute(navRoute);
+    window.requestAnimationFrame(() => navigateToRoute(navRoute));
   }
-
-  closeGlobalMenu();
 }
 
 function revealHub() {
@@ -1743,6 +1766,8 @@ function activatePortal() {
 
 if (shell && startButton) {
   renderGlobalMenu();
+  syncGlobalMenuArchiveBuild();
+  initGlobalMenuLogo();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", () => {

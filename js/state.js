@@ -1709,11 +1709,13 @@ const routePaths = {
 
 const shellDrawerGroups = [
   { id: "shell", label: "Shell" },
-  { id: "music", label: "Music Nexus" },
-  { id: "wrestling", label: "Wrestling Nexus" },
+  { id: "music", label: "The Music Nexus" },
+  { id: "wrestling", label: "The Ring Archive" },
   { id: "site", label: "Site" },
   { id: "future", label: "Future Modules" },
 ];
+
+const globalDrawerRouteIds = ["home", "portfolio", "music", "wrestling", "calendar", "about", "contact"];
 
 const shellRouteRegistry = [
   {
@@ -1741,7 +1743,7 @@ const shellRouteRegistry = [
   {
     id: "music",
     route: routePaths.music,
-    label: "Music Nexus",
+    label: "The Music Nexus",
     parentSection: "Portfolio",
     moduleType: "module",
     drawerGroup: "music",
@@ -1785,7 +1787,7 @@ const shellRouteRegistry = [
   {
     id: "wrestling",
     route: routePaths.wrestling,
-    label: "Wrestling Nexus",
+    label: "The Ring Archive",
     parentSection: "Portfolio",
     moduleType: "module",
     drawerGroup: "wrestling",
@@ -1898,21 +1900,21 @@ const routeNameToGlobalNavTarget = {
   home: "home",
   portfolio: "portfolio",
   music: "music",
-  "music-bands": "music-bands",
-  "band-detail": "music-bands",
-  "set-detail": "music-bands",
-  "music-people": "music-people",
-  "person-detail": "music-people",
-  "music-shows": "music-shows",
-  "show-detail": "music-shows",
+  "music-bands": "music",
+  "band-detail": "music",
+  "set-detail": "music",
+  "music-people": "music",
+  "person-detail": "music",
+  "music-shows": "music",
+  "show-detail": "music",
   "music-venues": "music",
   wrestling: "wrestling",
-  "wrestling-shows": "wrestling-shows",
-  "wrestling-show-detail": "wrestling-shows",
-  "wrestling-match-gallery": "wrestling-shows",
-  "wrestling-lightbox": "wrestling-shows",
-  "wrestling-people": "wrestling-people",
-  "wrestling-person-detail": "wrestling-people",
+  "wrestling-shows": "wrestling",
+  "wrestling-show-detail": "wrestling",
+  "wrestling-match-gallery": "wrestling",
+  "wrestling-lightbox": "wrestling",
+  "wrestling-people": "wrestling",
+  "wrestling-person-detail": "wrestling",
   "wrestling-venues": "wrestling",
   "wrestling-venue-detail": "wrestling",
   calendar: "calendar",

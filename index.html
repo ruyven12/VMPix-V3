@@ -1862,9 +1862,16 @@
     >
       <div class="global-menu-inner">
         <header class="global-menu-header">
-          <div class="global-menu-title-group">
-            <p class="global-menu-kicker">Global Navigation</p>
-            <h2 class="global-menu-title" id="global-menu-title">Site Menu</h2>
+          <div class="global-menu-brand" aria-hidden="true">
+            <video class="global-menu-logo global-menu-logo--video" autoplay muted loop playsinline preload="metadata" poster="/assets/branding/voodoo-logo-static.png" data-global-menu-logo-video>
+              <source src="/assets/branding/logo-animated.mp4" type="video/mp4">
+            </video>
+            <img class="global-menu-logo global-menu-logo--fallback" src="/assets/branding/voodoo-logo-static.png" alt="" loading="eager" decoding="async" data-global-menu-logo-fallback>
+          </div>
+          <h2 class="sr-only" id="global-menu-title">Global navigation</h2>
+          <div class="global-menu-build" aria-label="Archive Build">
+            <span class="global-menu-build-label">Archive Build</span>
+            <span class="global-menu-build-value" data-global-menu-archive-build>V3.0.01</span>
           </div>
           <button class="global-menu-close" type="button" aria-label="Close global navigation menu" data-global-menu-close>
             X

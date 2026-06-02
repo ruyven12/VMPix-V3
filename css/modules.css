@@ -11842,13 +11842,17 @@ img.archive-gallery-image {
   }
 
   .universal-bottom-rail {
-    grid-template-columns: minmax(5.8rem, 1fr) auto minmax(5.8rem, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(4.9rem, auto);
     gap: 0.38rem;
     padding-top: 0.48rem;
     padding-bottom: max(0.52rem, env(safe-area-inset-bottom));
     font-size: min(var(--footer-text-size), 0.72rem);
     line-height: 1.16;
     text-align: left;
+  }
+
+  .rail-brand {
+    display: none;
   }
 
   .rail-cluster {
@@ -11860,6 +11864,12 @@ img.archive-gallery-image {
 
   .rail-label {
     font-size: 0.76em;
+  }
+
+  .rail-value--view {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.12;
   }
 
   .global-menu-drawer {
@@ -12279,7 +12289,7 @@ img.archive-gallery-image {
   .global-menu-drawer {
     right: auto;
     left: 50%;
-    width: min(27rem, calc(100vw - 2rem));
+    width: min(25.5rem, calc(100vw - 2rem));
     border-radius: var(--radius-md);
     transform: translate3d(-50%, 0.2rem, 0);
   }
