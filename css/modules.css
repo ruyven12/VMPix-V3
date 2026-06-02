@@ -5204,6 +5204,7 @@ img.archive-gallery-image {
 
 .music-bands-view-stack {
   display: grid;
+  height: 100%;
   min-height: 0;
 }
 
@@ -5218,6 +5219,7 @@ img.archive-gallery-image {
 
 .bands-index-panel.is-active {
   display: grid;
+  height: 100%;
   animation: bandsPanelIn var(--motion-standard) var(--ease-standard) both;
 }
 
@@ -5232,12 +5234,27 @@ img.archive-gallery-image {
 
 .bands-list-panel {
   grid-template-rows: auto auto minmax(0, 1fr) auto;
+  height: 100%;
+  max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-color: rgba(142, 108, 255, 0.42) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+}
+
+.bands-list-filter-controls {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.bands-list-filter-label {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.58rem, 2.25vw, 0.68rem);
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .bands-list-panel::-webkit-scrollbar {
@@ -5487,6 +5504,23 @@ img.archive-gallery-image {
 
 .bands-letter-button--all {
   min-width: 2.75rem;
+}
+
+.bands-list-filter-controls .bands-letter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.bands-list-filter-controls .bands-letter-button {
+  flex: 0 0 auto;
+  min-width: 2.08rem;
+  padding-inline: 0.42rem;
+}
+
+.bands-list-filter-controls .bands-letter-button--all {
+  min-width: 3.2rem;
 }
 
 .bands-list-filter-bar {
