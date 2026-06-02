@@ -110,7 +110,6 @@ const bandDetailCoreMembers = document.querySelector("[data-band-detail-core-mem
 const bandDetailPastMembers = document.querySelector("[data-band-detail-past-members]");
 const bandDetailViewSets = document.querySelector("[data-band-detail-view-sets]");
 const setsArchive = document.querySelector("[data-sets-archive]");
-const setsArchiveBack = document.querySelector("[data-sets-archive-back]");
 const setsArchiveBand = document.querySelector("[data-sets-archive-band]");
 const setsYearTimeline = document.querySelector("[data-sets-year-timeline]");
 const setsYearButtons = document.querySelectorAll("[data-sets-year]");

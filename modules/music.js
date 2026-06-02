@@ -4810,9 +4810,6 @@ function initMusicModule() {
       showSetsArchive();
     });
   }
-  if (setsArchiveBack) {
-    setsArchiveBack.addEventListener("click", returnToBandDetailRoute);
-  }
   if (setsFeaturedOpen) {
     setsFeaturedOpen.addEventListener("click", showSetGallery);
   }
