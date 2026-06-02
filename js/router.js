@@ -175,6 +175,9 @@ function syncRoute(route, options = {}) {
   if (typeof setActiveGlobalNavForRoute === "function") {
     setActiveGlobalNavForRoute(route.name);
   }
+  if (typeof updateShellBreadcrumb === "function") {
+    updateShellBreadcrumb(route);
+  }
 
   if (route.name === "home") {
     showHomepage();

@@ -10,6 +10,66 @@ function setCurrentView(viewName) {
   }
 }
 
+function getRouteDrilldownBreadcrumbLabel(route) {
+  const fallbackLabel = routeNameToDrilldownBreadcrumb[route.name] || "";
+
+  if (route.name === "band-detail" && typeof findBandById === "function") {
+    return findBandById(route.bandId)?.name || fallbackLabel;
+  }
+  if (route.name === "person-detail" && typeof findMusicPersonById === "function") {
+    return findMusicPersonById(route.personId)?.name || fallbackLabel;
+  }
+  if (route.name === "show-detail" && typeof findMusicShowById === "function") {
+    return findMusicShowById(route.showId)?.title || fallbackLabel;
+  }
+  if (route.name === "wrestling-person-detail" && typeof findWrestlingPersonById === "function") {
+    return findWrestlingPersonById(route.personId)?.name || fallbackLabel;
+  }
+  if (route.name === "wrestling-venue-detail" && typeof findWrestlingVenueById === "function") {
+    return findWrestlingVenueById(route.venueId)?.name || fallbackLabel;
+  }
+  if (route.name === "wrestling-show-detail" && typeof getWrestlingDefaultShowRelationship === "function") {
+    return getWrestlingDefaultShowRelationship(route.showId)?.eventName || fallbackLabel;
+  }
+  if (route.name === "wrestling-match-gallery" && typeof getWrestlingDefaultMatchRelationship === "function") {
+    return getWrestlingDefaultMatchRelationship(route.matchId, route.showId)?.matchName || fallbackLabel;
+  }
+
+  return fallbackLabel;
+}
+
+function updateShellBreadcrumb(route) {
+  if (!shellBreadcrumb || !shellBreadcrumbList || !route) {
+    return;
+  }
+
+  const breadcrumbLabels = (routeNameToBreadcrumbTrail[route.name] || ["home"])
+    .map((routeId) => getShellRouteMeta(routeId)?.breadcrumbLabel)
+    .filter(Boolean);
+  const drilldownLabel = getRouteDrilldownBreadcrumbLabel(route);
+  if (drilldownLabel) {
+    breadcrumbLabels.push(drilldownLabel);
+  }
+
+  shellBreadcrumbList.replaceChildren();
+  breadcrumbLabels.forEach((label, index) => {
+    const item = document.createElement("li");
+    const labelElement = document.createElement("span");
+    item.className = "shell-breadcrumb-item";
+    labelElement.className = "shell-breadcrumb-label";
+    labelElement.textContent = label;
+    if (index === breadcrumbLabels.length - 1) {
+      item.setAttribute("aria-current", "page");
+    }
+    item.append(labelElement);
+    shellBreadcrumbList.append(item);
+  });
+
+  shellBreadcrumb.hidden = breadcrumbLabels.length === 0;
+  shellBreadcrumb.dataset.breadcrumbDepth = String(breadcrumbLabels.length);
+  shellBreadcrumb.setAttribute("aria-label", `Current location: ${breadcrumbLabels.join(" > ")}`);
+}
+
 function getShellRouteMeta(routeId) {
   return shellRouteRegistryById.get(routeId) || null;
 }

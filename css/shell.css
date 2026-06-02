@@ -228,6 +228,87 @@ button {
   animation: ambientDust var(--motion-ambient) var(--ease-standard) infinite;
 }
 
+.shell-breadcrumb {
+  position: fixed;
+  top: max(0.55rem, env(safe-area-inset-top));
+  left: max(var(--space-2), env(safe-area-inset-left));
+  right: max(var(--space-2), env(safe-area-inset-right));
+  z-index: 8;
+  max-width: min(100% - (var(--space-2) * 2), 44rem);
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.shell-breadcrumb-list {
+  min-width: 0;
+  min-height: 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.34rem;
+  margin: 0;
+  padding: 0.46rem 0.62rem;
+  border: 1px solid rgba(247, 247, 242, 0.13);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.1), transparent 72%),
+    rgba(3, 3, 6, 0.58);
+  box-shadow:
+    0 0.65rem 1.5rem rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(247, 247, 242, 0.025);
+  color: rgba(247, 247, 242, 0.74);
+  font-size: clamp(0.62rem, 2.65vw, 0.78rem);
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.shell-breadcrumb-item {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  overflow: hidden;
+}
+
+.shell-breadcrumb-item:not(:first-child)::before {
+  flex: 0 0 auto;
+  width: 0.36rem;
+  height: 1px;
+  background: rgba(213, 22, 34, 0.48);
+  box-shadow: 0 0 0.36rem rgba(213, 22, 34, 0.14);
+  content: "";
+}
+
+.shell-breadcrumb-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shell-breadcrumb-item[aria-current="page"] .shell-breadcrumb-label {
+  color: rgba(247, 247, 242, 0.92);
+  text-shadow: 0 0 0.5rem rgba(213, 22, 34, 0.12);
+}
+
+@media (max-width: 32rem) {
+  .shell-breadcrumb-list {
+    min-height: 2rem;
+    padding-inline: 0.52rem;
+  }
+
+  .shell-breadcrumb-item:not(:first-child):not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+}
+
+@media (min-width: 48rem) {
+  .shell-breadcrumb {
+    top: max(0.72rem, env(safe-area-inset-top));
+  }
+}
+
 @keyframes ambientBreath {
   0%,
   100% {

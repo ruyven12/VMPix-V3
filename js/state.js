@@ -11,6 +11,8 @@ const portfolioHub = document.querySelector(".portfolio-hub");
 const aboutShell = document.querySelector("[data-about-shell]");
 const calendarShell = document.querySelector("[data-calendar-shell]");
 const contactShell = document.querySelector("[data-contact-shell]");
+const shellBreadcrumb = document.querySelector("[data-shell-breadcrumb]");
+const shellBreadcrumbList = document.querySelector("[data-shell-breadcrumb-list]");
 const bottomRail = document.querySelector("[data-shell-bottom-rail]");
 const railMenuTrigger = document.querySelector("[data-rail-menu-trigger]");
 const globalMenuDrawer = document.querySelector("[data-global-menu-drawer]");
@@ -920,6 +922,44 @@ const routeNameToGlobalNavTarget = {
   calendar: "calendar",
   about: "about",
   contact: "contact",
+};
+
+const routeNameToBreadcrumbTrail = {
+  home: ["home"],
+  portfolio: ["portfolio"],
+  music: ["portfolio", "music"],
+  "music-bands": ["portfolio", "music", "music-bands"],
+  "band-detail": ["portfolio", "music", "music-bands"],
+  "set-detail": ["portfolio", "music", "music-bands"],
+  "music-people": ["portfolio", "music", "music-people"],
+  "person-detail": ["portfolio", "music", "music-people"],
+  "music-shows": ["portfolio", "music", "music-shows"],
+  "show-detail": ["portfolio", "music", "music-shows"],
+  "music-venues": ["portfolio", "music"],
+  wrestling: ["portfolio", "wrestling"],
+  "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
+  "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
+  "wrestling-match-gallery": ["portfolio", "wrestling", "wrestling-shows"],
+  "wrestling-lightbox": ["portfolio", "wrestling", "wrestling-shows"],
+  "wrestling-people": ["portfolio", "wrestling", "wrestling-people"],
+  "wrestling-person-detail": ["portfolio", "wrestling", "wrestling-people"],
+  "wrestling-venues": ["portfolio", "wrestling"],
+  "wrestling-venue-detail": ["portfolio", "wrestling"],
+  calendar: ["portfolio", "calendar"],
+  about: ["portfolio", "about"],
+  contact: ["portfolio", "contact"],
+};
+
+const routeNameToDrilldownBreadcrumb = {
+  "band-detail": "Band Detail",
+  "set-detail": "Set Detail",
+  "person-detail": "Person Detail",
+  "show-detail": "Show Detail",
+  "wrestling-person-detail": "Person Detail",
+  "wrestling-venue-detail": "Venue Detail",
+  "wrestling-show-detail": "Show Detail",
+  "wrestling-match-gallery": "Match Gallery",
+  "wrestling-lightbox": "Photo",
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [
