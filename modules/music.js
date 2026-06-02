@@ -17,7 +17,7 @@ function normalizeBandsView(viewName) {
 
 function getBandsRouteUrl(viewName = activeBandsView) {
   const normalizedView = normalizeBandsView(viewName);
-  return normalizedView === "radar" ? routePaths.musicBands : `${routePaths.musicBands}?view=${normalizedView}`;
+  return `${routePaths.musicBands}?view=${normalizedView}`;
 }
 
 function getBandId(band) {
@@ -467,6 +467,15 @@ function getBandLetter(band) {
   return band.name.slice(0, 1).toUpperCase();
 }
 
+function getRadarPointOffset(index, total) {
+  const safeTotal = Math.max(1, total);
+  const angle = (index * 137.508) * (Math.PI / 180);
+  const radius = 8 + (41 * Math.sqrt((index + 1) / (safeTotal + 1)));
+  const x = Math.cos(angle) * radius;
+  const y = Math.sin(angle) * radius;
+  return [`${x.toFixed(2)}%`, `${y.toFixed(2)}%`];
+}
+
 function getVisibleBands() {
   const query = bandsSearchTerm.trim().toLowerCase();
   if (!query) {
@@ -474,7 +483,7 @@ function getVisibleBands() {
   }
 
   return filterMockCollection(getMusicBandsIndexCollection(), (band) => {
-    const searchText = `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.albums} sets ${band.photo_count} photos`.toLowerCase();
+    const searchText = `${band.name} ${band.region} ${band.status} ${band.statusKey} ${band.archived_sets}/${band.total_sets} sets ${band.photo_count} photos`.toLowerCase();
     return searchText.includes(query);
   });
 }
@@ -1718,7 +1727,28 @@ function renderBandsLetterNavs(rows) {
 
   const counts = getBandLetterCounts(rows);
   bandsLetterNavs.forEach((nav) => {
+    const isListNav = nav.hasAttribute("data-bands-letter-nav-list");
     const fragment = document.createDocumentFragment();
+    if (isListNav) {
+      const allButton = document.createElement("button");
+      allButton.className = `bands-letter-button bands-letter-button--all${rows.length > 0 ? " has-signal" : ""}`;
+      allButton.type = "button";
+      allButton.textContent = "All";
+      allButton.disabled = rows.length === 0;
+      allButton.setAttribute("aria-pressed", String(!activeBandsFilterLetter));
+      allButton.setAttribute("aria-label", `${rows.length} total band signals`);
+      allButton.addEventListener("click", () => {
+        activeBandsFilterLetter = "";
+        syncBandsIndex();
+        if (bandsList) {
+          bandsList.scrollTo({
+            top: 0,
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+          });
+        }
+      });
+      fragment.append(allButton);
+    }
     bandsAlphabet.forEach((letter) => {
       const count = counts.get(letter) || 0;
       const button = document.createElement("button");
@@ -1727,12 +1757,12 @@ function renderBandsLetterNavs(rows) {
       button.type = "button";
       button.textContent = letter;
       button.disabled = count === 0;
-      button.setAttribute("aria-pressed", String(letter === activeBandsLetter));
+      button.setAttribute("aria-pressed", String(isListNav ? activeBandsFilterLetter === letter : letter === activeBandsLetter));
       button.setAttribute("aria-label", count > 0 ? `${letter}, ${count} band signals` : `${letter}, no band signals`);
       button.addEventListener("click", () => {
         setBandsLetter(letter, {
           shouldFilterList: true,
-          shouldOpenList: nav.hasAttribute("data-bands-letter-nav") || nav.hasAttribute("data-bands-letter-nav-search"),
+          shouldOpenList: nav.hasAttribute("data-bands-letter-nav"),
         });
       });
       fragment.append(button);
@@ -1764,7 +1794,8 @@ function renderBandsRadar(rows) {
       empty.textContent = "No active signal";
       fragment.append(empty);
     } else {
-      activeRows.slice(0, 4).forEach((band) => {
+      const signalRows = activeRows.slice(0, 8);
+      signalRows.forEach((band) => {
         const item = document.createElement("li");
         item.className = "bands-radar-signal";
         const button = document.createElement("button");
@@ -1778,15 +1809,21 @@ function renderBandsRadar(rows) {
         item.append(button);
         fragment.append(item);
       });
+      if (activeRows.length > signalRows.length) {
+        const summary = document.createElement("li");
+        summary.className = "bands-radar-signal bands-radar-more";
+        summary.textContent = `${activeRows.length - signalRows.length} more`;
+        fragment.append(summary);
+      }
     }
     bandsRadarSignals.replaceChildren(fragment);
   }
   if (bandsRadarPoints) {
     const fragment = document.createDocumentFragment();
-    activeRows.slice(0, 4).forEach((band, index) => {
+    rows.forEach((band, index) => {
       const point = document.createElement("span");
-      const offset = radarPointOffsets[index] || radarPointOffsets[0];
-      point.className = "bands-radar-point";
+      const offset = getRadarPointOffset(index, rows.length);
+      point.className = `bands-radar-point${getBandLetter(band) === activeBandsLetter ? " is-letter-active" : ""}`;
       point.style.setProperty("--radar-x", offset[0]);
       point.style.setProperty("--radar-y", offset[1]);
       point.setAttribute("title", band.name);
@@ -1799,13 +1836,19 @@ function renderBandsRadar(rows) {
 function createBandListRow(band, options = {}) {
   const letter = getBandLetter(band);
   const photoCount = getBandIndexNumber(band.photo_count ?? band.photos ?? band.stats?.totalPhotos) ?? 0;
-  const setCount = getBandIndexNumber(band.total_sets ?? band.albums ?? band.stats?.total_sets) ?? 0;
+  const archivedSetCount = getBandIndexNumber(band.archived_sets ?? band.stats?.archived_sets) ?? 0;
+  const totalSetCount = getBandIndexNumber(band.total_sets ?? band.albums ?? band.stats?.total_sets) ?? 0;
+  const shouldShowArchiveSize = band.statusKey !== "needs";
+  const archiveSizeLabel = shouldShowArchiveSize
+    ? `, ${formatBandIndexNumber(photoCount)} photos, ${formatBandIndexNumber(archivedSetCount)} of ${formatBandIndexNumber(totalSetCount)} sets archived`
+    : "";
   const row = document.createElement("button");
-  row.className = `bands-list-row${letter === activeBandsLetter ? " is-letter-active" : ""}`;
+  const isLetterActive = Boolean(activeBandsFilterLetter && letter === activeBandsLetter && !options.skipLetterFilter);
+  row.className = `bands-list-row${isLetterActive ? " is-letter-active" : ""}`;
   row.type = "button";
   row.dataset.bandLetter = letter;
   row.dataset.bandId = getBandId(band);
-  row.setAttribute("aria-label", `Open ${band.name} band detail, ${band.region}, ${band.status}, ${formatBandIndexNumber(photoCount)} photos, ${formatBandIndexNumber(setCount)} sets`);
+  row.setAttribute("aria-label", `Open ${band.name} band detail, ${band.region}, ${band.status}${archiveSizeLabel}`);
 
   const thumb = document.createElement("span");
   thumb.className = "bands-row-thumb";
@@ -1852,35 +1895,40 @@ function createBandListRow(band, options = {}) {
   const stats = document.createElement("span");
   stats.className = "bands-row-meta-item bands-row-stats";
 
-  const photos = document.createElement("span");
-  photos.className = "bands-row-stat";
-  photos.setAttribute("aria-label", `${formatBandIndexNumber(photoCount)} photos`);
-  const photoLabel = document.createElement("span");
-  photoLabel.className = "bands-row-stat-label";
-  photoLabel.setAttribute("aria-hidden", "true");
-  photoLabel.textContent = "PH";
-  const photoValue = document.createElement("span");
-  photoValue.textContent = formatBandIndexNumber(photoCount);
-  photos.append(photoLabel, photoValue);
+  if (shouldShowArchiveSize) {
+    const photos = document.createElement("span");
+    photos.className = "bands-row-stat";
+    photos.setAttribute("aria-label", `${formatBandIndexNumber(photoCount)} photos`);
+    const photoLabel = document.createElement("span");
+    photoLabel.className = "bands-row-stat-label";
+    photoLabel.setAttribute("aria-hidden", "true");
+    photoLabel.textContent = "PH";
+    const photoValue = document.createElement("span");
+    photoValue.textContent = formatBandIndexNumber(photoCount);
+    photos.append(photoLabel, photoValue);
 
-  const sets = document.createElement("span");
-  sets.className = "bands-row-stat";
-  sets.setAttribute("aria-label", `${formatBandIndexNumber(setCount)} sets`);
-  const setLabel = document.createElement("span");
-  setLabel.className = "bands-row-stat-label";
-  setLabel.setAttribute("aria-hidden", "true");
-  setLabel.textContent = "SET";
-  const setValue = document.createElement("span");
-  setValue.textContent = formatBandIndexNumber(setCount);
-  sets.append(setLabel, setValue);
-  stats.append(photos, sets);
+    const sets = document.createElement("span");
+    sets.className = "bands-row-stat";
+    sets.setAttribute("aria-label", `${formatBandIndexNumber(archivedSetCount)} of ${formatBandIndexNumber(totalSetCount)} sets archived`);
+    const setLabel = document.createElement("span");
+    setLabel.className = "bands-row-stat-label";
+    setLabel.setAttribute("aria-hidden", "true");
+    setLabel.textContent = "SET";
+    const setValue = document.createElement("span");
+    setValue.textContent = `${formatBandIndexNumber(archivedSetCount)}/${formatBandIndexNumber(totalSetCount)}`;
+    sets.append(setLabel, setValue);
+    stats.append(photos, sets);
+  }
 
   const arrow = document.createElement("span");
   arrow.className = "bands-row-arrow";
   arrow.setAttribute("aria-hidden", "true");
   arrow.textContent = ">";
 
-  meta.append(region, status, stats);
+  meta.append(region, status);
+  if (shouldShowArchiveSize) {
+    meta.append(stats);
+  }
   main.append(name, meta);
   row.append(thumb, main, arrow);
   row.addEventListener("click", () => {
@@ -1925,7 +1973,7 @@ function renderBandsList(rows) {
     bandsFilterSummary.textContent = `${letter} lane / ${listRows.length} signal${listRows.length === 1 ? "" : "s"}`;
   }
 
-  if (activeBandsView === "list") {
+  if (activeBandsView === "list" && activeBandsFilterLetter) {
     const activeRow = bandsList.querySelector(`[data-band-letter="${activeBandsLetter}"]`);
     if (activeRow) {
       const listRect = bandsList.getBoundingClientRect();
@@ -1969,11 +2017,11 @@ function renderBandsSearch(rows) {
       item.append(createMockStateCard(forcedState, "musicBands"));
       fragment.append(item);
     } else {
-      rows.slice(0, 5).forEach((band) => {
-      const item = document.createElement("li");
-      item.className = "bands-search-result-row";
-      item.append(createBandListRow(band, { skipLetterFilter: true }));
-      fragment.append(item);
+      rows.forEach((band) => {
+        const item = document.createElement("li");
+        item.className = "bands-search-result-row";
+        item.append(createBandListRow(band, { skipLetterFilter: true }));
+        fragment.append(item);
       });
       if (forcedState === "partial") {
         const item = document.createElement("li");

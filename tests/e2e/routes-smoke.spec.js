@@ -19,7 +19,7 @@ const routes = [
       { name: "Venues - Music Locations", route: "/music/venues" },
     ],
   },
-  { path: "/music/bands", rail: "Bands", visibleShell: "[data-music-bands-index]", text: "BANDS INDEX", hiddenText: "Recent Music Activity" },
+  { path: "/music/bands", rail: "Bands", visibleShell: "[data-music-bands-index]", hiddenText: "Recent Music Activity" },
   { path: "/music/shows", rail: "Shows", visibleShell: "[data-music-nexus-shell]", text: "Load More" },
   { path: "/music/people", rail: "People", visibleShell: "[data-music-nexus-shell]" },
   { path: "/music/people/adam-begin", rail: "Person Detail", visibleShell: ".person-detail-screen", text: "Adam Begin" },

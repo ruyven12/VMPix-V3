@@ -238,18 +238,12 @@
             </section>
           </section>
 
-          <section class="music-bands-index is-active" aria-labelledby="music-bands-index-title" aria-hidden="false" data-music-bands-index>
-            <header class="music-bands-header">
-              <div class="music-bands-title-row">
-                <h4 class="music-nexus-section-title" id="music-bands-index-title">BANDS INDEX</h4>
-                <div class="music-bands-mode-switch" role="tablist" aria-label="Bands Index view modes">
-                  <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">Radar</button>
-                  <button class="bands-index-mode-tab" id="bands-list-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-list-panel" data-bands-view-target="list">List</button>
-                  <button class="bands-index-mode-tab" id="bands-search-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-search-panel" data-bands-view-target="search">Search</button>
-                </div>
-              </div>
-              <div class="music-bands-status" aria-live="polite" data-bands-status>A lane active</div>
-            </header>
+          <section class="music-bands-index is-active" aria-label="Music bands archive" aria-hidden="false" data-music-bands-index>
+            <div class="music-bands-mode-switch" role="tablist" aria-label="Bands Index view modes">
+              <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">Radar</button>
+              <button class="bands-index-mode-tab" id="bands-list-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-list-panel" data-bands-view-target="list">List</button>
+              <button class="bands-index-mode-tab" id="bands-search-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-search-panel" data-bands-view-target="search">Search</button>
+            </div>
 
             <div class="music-bands-view-stack">
               <section class="bands-index-panel bands-index-panel--radar is-active" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
@@ -290,23 +284,24 @@
                     <span class="bands-search-label">Archive Search</span>
                     <input class="bands-search-input" type="search" autocomplete="off" placeholder="Search bands, tiers, status" data-bands-search-input>
                   </label>
-                  <div class="bands-letter-nav" aria-label="Band alphabet search navigation" data-bands-letter-nav-search></div>
 
                   <div class="bands-search-groups">
                     <section class="bands-search-group" aria-labelledby="bands-recent-searches-title">
-                      <h5 class="bands-search-group-title" id="bands-recent-searches-title">Recent Searches</h5>
+                      <h5 class="bands-search-group-title" id="bands-recent-searches-title">Quick Regions</h5>
                       <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="complete">Complete</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
                         <button class="bands-search-chip" type="button" data-bands-search-term="regional">Regional</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="partial">Partial</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="national">National</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="international">International</button>
                       </div>
                     </section>
 
                     <section class="bands-search-group" aria-labelledby="bands-search-categories-title">
-                      <h5 class="bands-search-group-title" id="bands-search-categories-title">Filters</h5>
+                      <h5 class="bands-search-group-title" id="bands-search-categories-title">Archive State</h5>
                       <div class="bands-search-chip-row">
-                        <button class="bands-search-chip" type="button" data-bands-search-term="">All</button>
-                        <button class="bands-search-chip" type="button" data-bands-search-term="local">Local</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="complete archive">Complete Archive</button>
+                        <button class="bands-search-chip" type="button" data-bands-search-term="partial archive">Partial Archive</button>
                         <button class="bands-search-chip" type="button" data-bands-search-term="needs work">Needs Work</button>
                       </div>
                     </section>
