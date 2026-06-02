@@ -448,6 +448,23 @@ function getBandDetailMemberRole(member) {
   return String(member.role || member.instrument || member.position || member.category || roleParts.join(" / ") || "Role Pending").trim();
 }
 
+function getBandDetailMemberKey(member) {
+  return getBandDetailMemberName(member).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+function getUniqueBandDetailMembers(members, excludedKeys = new Set()) {
+  const seenKeys = new Set();
+  return (Array.isArray(members) ? members : []).filter((member) => {
+    const key = getBandDetailMemberKey(member);
+    if (!key || excludedKeys.has(key) || seenKeys.has(key)) {
+      return false;
+    }
+
+    seenKeys.add(key);
+    return true;
+  });
+}
+
 function normalizeBandDetailMembers(members) {
   return (Array.isArray(members) ? members : [])
     .map((member) => {
@@ -1080,8 +1097,10 @@ function showBandDetail(band) {
   const archivedSets = getBandDetailCount(stats.archived_sets, band.archived_sets);
   const totalSets = getBandDetailCount(stats.total_sets, band.total_sets, band.albums);
   const photoCount = getBandDetailCount(stats.totalPhotos, stats.total_photos, band.photo_count, band.photos);
-  const members = Array.isArray(personnel.members) ? personnel.members : [];
-  const pastMembers = Array.isArray(personnel.past_members) ? personnel.past_members : [];
+  const rawPastMembers = Array.isArray(personnel.past_members) ? personnel.past_members : [];
+  const pastMembers = getUniqueBandDetailMembers(rawPastMembers);
+  const pastMemberKeys = new Set(pastMembers.map(getBandDetailMemberKey));
+  const members = getUniqueBandDetailMembers(personnel.members, pastMemberKeys);
   const status = getBandArchiveStatus(archivedSets, totalSets);
   const completion = getBandDetailCompletion(archivedSets, totalSets);
 
@@ -1097,6 +1116,11 @@ function showBandDetail(band) {
     archived_sets: archivedSets,
     total_sets: totalSets,
     photo_count: photoCount,
+    personnel: {
+      ...personnel,
+      members,
+      past_members: pastMembers,
+    },
   };
   if (bandDetailPoster) {
     bandDetailPoster.setAttribute("aria-label", `${name} band logo panel`);
