@@ -5250,9 +5250,11 @@ img.archive-gallery-image {
 }
 
 .bands-radar-layout {
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto auto;
+  align-content: center;
   justify-items: center;
   align-items: center;
+  gap: clamp(0.72rem, 1.8svh, 1rem);
 }
 
 .bands-radar-layout > .bands-letter-nav {
@@ -5390,7 +5392,7 @@ img.archive-gallery-image {
 
 .bands-radar-core {
   position: relative;
-  width: min(100%, 18.5rem);
+  width: min(100%, clamp(18.5rem, 43vw, 27.5rem));
   aspect-ratio: 1;
   justify-self: center;
   align-self: center;
@@ -12531,7 +12533,8 @@ img.archive-gallery-image {
 
   .bands-radar-layout {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-rows: auto auto auto;
+    align-content: center;
     align-items: center;
     justify-items: center;
   }
