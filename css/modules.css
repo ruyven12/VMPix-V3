@@ -885,6 +885,7 @@
 }
 
 .sets-featured-image {
+  height: clamp(11.5rem, 48vw, 18rem);
   min-height: clamp(11.5rem, 48vw, 18rem);
   overflow: hidden;
   box-shadow: inset 0 0 1.1rem rgba(0, 0, 0, 0.38);
@@ -892,6 +893,22 @@
     border-color 180ms ease,
     background 220ms ease,
     box-shadow 180ms ease;
+}
+
+.sets-featured-poster {
+  width: 100%;
+  height: 100%;
+  max-height: clamp(11.5rem, 48vw, 18rem);
+  display: block;
+  object-fit: contain;
+  padding: clamp(0.34rem, 1.6vw, 0.58rem);
+  filter: drop-shadow(0 0 0.6rem rgba(142, 108, 255, 0.1));
+}
+
+.sets-featured-image.has-poster {
+  background:
+    linear-gradient(135deg, rgba(247, 247, 242, 0.035), transparent 62%),
+    rgba(1, 1, 3, 0.58);
 }
 
 .sets-featured-image span {
@@ -963,6 +980,15 @@
   color: rgba(247, 247, 242, 0.84);
 }
 
+.sets-featured-date,
+.sets-featured-title,
+.sets-featured-meta-value,
+.set-detail-title,
+.set-detail-copy,
+.set-detail-stat-value {
+  text-transform: none;
+}
+
 .set-detail-placeholder {
   display: none;
   gap: clamp(0.58rem, 2vw, 0.82rem);
@@ -1018,7 +1044,7 @@
 
 .set-detail-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(0.34rem, 1.5vw, 0.48rem);
 }
 
@@ -1168,6 +1194,27 @@
   aspect-ratio: 1.2 / 1;
   font-size: clamp(0.6rem, 2.35vw, 0.72rem);
   line-height: 1;
+  overflow: hidden;
+}
+
+.sets-row-poster {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  padding: 0.18rem;
+}
+
+.sets-row-fallback {
+  max-width: 92%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sets-row-thumb.has-poster {
+  background:
+    linear-gradient(135deg, rgba(247, 247, 242, 0.035), transparent 62%),
+    rgba(1, 1, 3, 0.58);
 }
 
 .sets-list-copy {
@@ -1211,6 +1258,28 @@
   font-size: clamp(0.54rem, 2.15vw, 0.64rem);
   line-height: 1.1;
   text-transform: uppercase;
+}
+
+.sets-list-date,
+.sets-list-title,
+.sets-list-location {
+  text-transform: none;
+}
+
+.sets-list-empty {
+  min-height: 4.45rem;
+  display: grid;
+  place-items: center;
+  padding: 0.74rem;
+  border: 1px solid rgba(142, 108, 255, 0.12);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(90deg, rgba(142, 108, 255, 0.035), transparent 68%),
+    rgba(247, 247, 242, 0.014);
+  color: rgba(247, 247, 242, 0.62);
+  font-size: clamp(0.66rem, 2.6vw, 0.78rem);
+  line-height: 1.2;
+  text-align: center;
 }
 
 .set-gallery-screen {

@@ -7,6 +7,8 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
+const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows";
+const MUSIC_SHOWS_SETS_TIMEOUT_MS = 8000;
 const bandsRegionFilterLabels = {
   local: "Local",
   regional: "Regional",
@@ -21,6 +23,11 @@ const bandsStatusFilterLabels = {
 let musicBandsIndexCollection = getMockCollection("musicBands", { clone: false });
 let musicBandsIndexRequest = null;
 let musicBandsIndexLoaded = false;
+let musicShowsSetsCollection = [];
+let musicShowsSetsRequest = null;
+let musicShowsSetsLoaded = false;
+let musicShowsSetsDataState = "fallback";
+let activeSetsArchiveYear = "";
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -160,7 +167,7 @@ function getSetCode(row, fallbackIndex = 0) {
 }
 
 function hydrateSetRouteMetadata() {
-  setsRows.forEach((row, index) => {
+  getSetsRows().forEach((row, index) => {
     const setCode = normalizeSetCode(row.dataset.setCode || mockSetCodes[index] || getSetCodeFromDateLabel(row.dataset.setDate));
     if (setCode) {
       row.dataset.setCode = setCode;
@@ -174,7 +181,7 @@ function getSetRouteUrl(bandId, setCode) {
 
 function findSetRowByCode(setCode) {
   const normalizedSetCode = normalizeSetCode(setCode);
-  return Array.from(setsRows).find((row, index) => getSetCode(row, index) === normalizedSetCode) || null;
+  return getSetsRows().find((row, index) => getSetCode(row, index) === normalizedSetCode) || null;
 }
 
 function createUnknownSetRow(setCode) {
@@ -230,7 +237,7 @@ function returnToBandsIndexRoute() {
 }
 
 function navigateToSetDetail(row) {
-  const setCode = getSetCode(row, Array.from(setsRows).indexOf(row));
+  const setCode = getSetCode(row, getSetsRows().indexOf(row));
   const bandId = getBandId(activeMusicBand) || getRouteFromUrl().bandId;
   if (!bandId || !setCode) {
     return;
@@ -724,6 +731,245 @@ function requestMusicBandsIndexData() {
   return musicBandsIndexRequest;
 }
 
+function getMusicShowsPayloadRows(payload) {
+  const candidates = [
+    payload?.data,
+    payload?.rows,
+    payload?.shows,
+    payload?.source?.data,
+    payload?.source?.rows,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((row) => row && typeof row === "object");
+    }
+    if (candidate && typeof candidate === "object") {
+      const nestedRows = Object.values(candidate).flatMap((value) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        return value && typeof value === "object" ? [value] : [];
+      });
+      if (nestedRows.length > 0) {
+        return nestedRows;
+      }
+    }
+  }
+
+  return [];
+}
+
+function parseMusicShowDate(dateValue) {
+  const rawDate = String(dateValue || "").trim();
+  if (!rawDate) {
+    return null;
+  }
+
+  const shortDateMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (shortDateMatch) {
+    const month = Number.parseInt(shortDateMatch[1], 10);
+    const day = Number.parseInt(shortDateMatch[2], 10);
+    const yearValue = Number.parseInt(shortDateMatch[3], 10);
+    const year = shortDateMatch[3].length === 2 ? 2000 + yearValue : yearValue;
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day) {
+      return date;
+    }
+  }
+
+  const parsedDate = new Date(rawDate);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function getOrdinalSuffix(day) {
+  const remainder = day % 100;
+  if (remainder >= 11 && remainder <= 13) {
+    return "th";
+  }
+
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+
+function formatMusicShowDate(dateValue) {
+  const parsedDate = parseMusicShowDate(dateValue);
+  if (!parsedDate) {
+    return String(dateValue || "Date Pending").trim() || "Date Pending";
+  }
+
+  const month = parsedDate.toLocaleString("en-US", { month: "long" });
+  const day = parsedDate.getDate();
+  return `${month} ${day}${getOrdinalSuffix(day)}, ${parsedDate.getFullYear()}`;
+}
+
+function getMusicShowYear(dateValue) {
+  const parsedDate = parseMusicShowDate(dateValue);
+  return parsedDate ? String(parsedDate.getFullYear()) : "Pending";
+}
+
+function getMusicShowLocation(show) {
+  const locationParts = [show?.city, show?.state]
+    .map((part) => String(part || "").trim())
+    .filter(Boolean);
+  return locationParts.length > 0 ? locationParts.join(", ") : "Location Pending";
+}
+
+function getMusicShowBandNames(show) {
+  if (!show || !Array.isArray(show.bands)) {
+    return [];
+  }
+
+  return show.bands
+    .map((band) => String(band?.band || band?.name || band || "").trim())
+    .filter(Boolean);
+}
+
+function normalizeMusicShowSetRow(record, index = 0) {
+  const source = record && typeof record === "object" ? record : {};
+  const name = String(source.name || source.title || source.show_name || `Show ${index + 1}`).trim();
+  const rawDate = String(source.date || source.show_date || source.eventDate || "").trim();
+  const date = parseMusicShowDate(rawDate);
+  const setCode = createBandSlug(`${rawDate || index + 1}-${name}`);
+  const poster = String(source.poster || source.poster_url || source.image_url || source.logo_url || "").trim();
+  const city = String(source.city || source.location_city || "").trim();
+  const state = String(source.state || source.location_state || "").trim();
+
+  return {
+    ...source,
+    showId: source.show_id || source.showId || source.id || setCode,
+    setCode,
+    year: getMusicShowYear(rawDate),
+    rawDate,
+    formattedDate: formatMusicShowDate(rawDate),
+    name,
+    title: name,
+    city,
+    state,
+    location: getMusicShowLocation({ city, state }),
+    poster,
+    bandNames: getMusicShowBandNames(source),
+    dateSort: date ? date.getTime() : 0,
+  };
+}
+
+function normalizeMusicShowSetRows(payload) {
+  return getMusicShowsPayloadRows(payload)
+    .map(normalizeMusicShowSetRow)
+    .filter((show) => show.name)
+    .sort((a, b) => b.dateSort - a.dateSort || a.name.localeCompare(b.name));
+}
+
+function getFallbackSetRowsData() {
+  return Array.from(setsRows).map((row, index) => {
+    const dataset = row.dataset || {};
+    return {
+      showId: dataset.setCode || getSetCode(row, index),
+      setCode: getSetCode(row, index),
+      year: String(dataset.setYear || "2026"),
+      rawDate: dataset.setDate || "",
+      formattedDate: formatMusicShowDate(dataset.setDate),
+      name: dataset.setTitle || `Set ${index + 1}`,
+      title: dataset.setTitle || `Set ${index + 1}`,
+      city: "",
+      state: "",
+      location: dataset.setLocation || "Location Pending",
+      poster: "",
+      bandNames: activeMusicBand ? [activeMusicBand.name] : [],
+      dateSort: parseMusicShowDate(dataset.setDate)?.getTime() || 0,
+      fallbackDataset: { ...dataset },
+    };
+  });
+}
+
+function setMusicShowsSetsCollection(rows, stateName = "fallback") {
+  musicShowsSetsCollection = Array.isArray(rows) ? rows : [];
+  musicShowsSetsDataState = stateName;
+  if (setsArchive) {
+    setsArchive.dataset.setsDataState = stateName;
+    setsArchive.setAttribute("aria-busy", String(stateName === "loading"));
+  }
+}
+
+function restoreMusicShowsSetsFallback() {
+  setMusicShowsSetsCollection(getFallbackSetRowsData(), "fallback");
+}
+
+function requestMusicShowsSetsData() {
+  if (musicShowsSetsLoaded) {
+    return Promise.resolve(true);
+  }
+  if (musicShowsSetsRequest) {
+    return musicShowsSetsRequest;
+  }
+  if (typeof fetch !== "function") {
+    restoreMusicShowsSetsFallback();
+    return Promise.resolve(false);
+  }
+
+  if (setsArchive) {
+    setsArchive.dataset.setsDataState = "loading";
+    setsArchive.setAttribute("aria-busy", "true");
+  }
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_SHOWS_SETS_TIMEOUT_MS)
+    : 0;
+  const apiUrl = new URL(MUSIC_SHOWS_SETS_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+
+  musicShowsSetsRequest = fetch(apiUrl, {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music shows request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const liveRows = normalizeMusicShowSetRows(payload);
+      if (liveRows.length === 0) {
+        throw new Error("Music shows response contained no rows");
+      }
+
+      setMusicShowsSetsCollection(liveRows, "live");
+      musicShowsSetsLoaded = true;
+      return true;
+    })
+    .catch(() => {
+      restoreMusicShowsSetsFallback();
+      return false;
+    })
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      if (setsArchive) {
+        setsArchive.setAttribute("aria-busy", "false");
+      }
+      musicShowsSetsRequest = null;
+    });
+
+  return musicShowsSetsRequest;
+}
+
+function getSetsRows() {
+  return Array.from(document.querySelectorAll("[data-set-row]"));
+}
+
+function getSetsYearButtons() {
+  return Array.from(document.querySelectorAll("[data-sets-year]"));
+}
+
 function getBandLetter(band) {
   return band.name.slice(0, 1).toUpperCase();
 }
@@ -1206,7 +1452,7 @@ function updateSetDetailFromRow(row) {
     setDetailTitle.textContent = setData.setTitle || "";
   }
   if (setDetailCopy) {
-    setDetailCopy.textContent = `${getSetImageLabel(row)} / SET DETAIL HOLDING STATE`;
+    setDetailCopy.textContent = `${setData.setDate || "Date Pending"} / ${setData.setLocation || "Location Pending"}`;
   }
   if (setDetailDate) {
     setDetailDate.textContent = setData.setDate || "";
@@ -1244,7 +1490,7 @@ function setSetDetailVisible(isVisible) {
 }
 
 function getFirstVisibleSetRow() {
-  return Array.from(setsRows).find((candidate) => {
+  return getSetsRows().find((candidate) => {
     const item = candidate.closest("li");
     return !item || !item.hidden;
   });
@@ -1731,7 +1977,7 @@ function showLightbox(photoTile = activeGalleryPhoto) {
 function returnToSetGalleryFromLightbox() {
   setLightboxVisible(false);
   setSetGalleryVisible(true);
-  setCurrentView("LIVE @ ASYLUM");
+  setCurrentView(activeSetRow?.dataset.setTitle || "Set Gallery");
   window.requestAnimationFrame(() => {
     const focusTarget = activeGalleryPhoto || galleryViewAll;
     if (focusTarget) {
@@ -1908,7 +2154,7 @@ function handleLightboxKeydown(event) {
 }
 
 function openSelectedSetDetail() {
-  const row = activeSetRow || getFirstVisibleSetRow() || setsRows[0];
+  const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0];
   if (!row) {
     return;
   }
@@ -1934,7 +2180,7 @@ function closeSelectedSetDetail() {
 }
 
 function showSetGallery() {
-  const row = activeSetRow || getFirstVisibleSetRow() || setsRows[0];
+  const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0];
   if (!row || !setGallery) {
     return;
   }
@@ -1961,7 +2207,7 @@ function showSetGallery() {
 function returnToSetsArchiveFromGallery() {
   setSetGalleryVisible(false);
   setSetsArchiveVisible(true);
-  setCurrentView("SETS 13 HIGH");
+  setCurrentView(activeMusicBand ? `Sets ${activeMusicBand.name}` : "Sets Archive");
   if (musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
@@ -1970,13 +2216,251 @@ function returnToSetsArchiveFromGallery() {
   }
 }
 
+function getSetsArchiveRowsForBand(band) {
+  const rows = musicShowsSetsCollection.length > 0 ? musicShowsSetsCollection : getFallbackSetRowsData();
+  if (musicShowsSetsDataState !== "live" || !band) {
+    return rows;
+  }
+
+  const bandNames = [
+    band.name,
+    band.general?.name,
+    band.band,
+    band.title,
+  ]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+  const bandSlugs = new Set(bandNames.map(createBandSlug));
+
+  return rows.filter((show) => {
+    const showBands = show.bandNames || [];
+    return showBands.some((showBand) => {
+      const normalizedBand = String(showBand || "").trim().toLowerCase();
+      return bandNames.includes(normalizedBand) || bandSlugs.has(createBandSlug(normalizedBand));
+    });
+  });
+}
+
+function getSetsArchiveYears(rows) {
+  return Array.from(new Set(rows.map((row) => String(row.year || "").trim()).filter(Boolean)))
+    .sort((a, b) => Number(b) - Number(a));
+}
+
+function createSetsYearButton(year, count, isActive) {
+  const button = document.createElement("button");
+  button.className = "sets-year-card";
+  button.type = "button";
+  button.dataset.setsYear = year;
+  button.setAttribute("aria-pressed", String(isActive));
+  if (isActive) {
+    button.classList.add("is-active");
+  }
+
+  const value = document.createElement("span");
+  value.className = "sets-year-value";
+  value.textContent = year;
+  const countLabel = document.createElement("span");
+  countLabel.className = "sets-year-count";
+  countLabel.textContent = `${formatBandIndexNumber(count)} ${count === 1 ? "SET" : "SETS"}`;
+  button.append(value, countLabel);
+  button.addEventListener("click", () => {
+    setSetsYear(year, { shouldCenterYear: true });
+  });
+  return button;
+}
+
+function renderSetsYearTimeline(rows, selectedYear) {
+  if (!setsYearTimeline) {
+    return;
+  }
+
+  const years = getSetsArchiveYears(rows);
+  const fragment = document.createDocumentFragment();
+  years.forEach((year) => {
+    const yearCount = rows.filter((row) => row.year === year).length;
+    fragment.append(createSetsYearButton(year, yearCount, year === selectedYear));
+  });
+  setsYearTimeline.replaceChildren(fragment);
+}
+
+function setArchivePosterImage(image, imageSrc, fallbackElement, loadedClassName) {
+  if (!image) {
+    return;
+  }
+
+  const shell = image.parentElement;
+  if (shell && loadedClassName) {
+    shell.classList.remove(loadedClassName);
+  }
+  image.onload = null;
+  image.onerror = null;
+  image.hidden = true;
+  image.removeAttribute("src");
+  if (fallbackElement) {
+    fallbackElement.hidden = false;
+  }
+
+  if (!imageSrc) {
+    return;
+  }
+
+  image.onload = () => {
+    image.hidden = false;
+    if (fallbackElement) {
+      fallbackElement.hidden = true;
+    }
+    if (shell && loadedClassName) {
+      shell.classList.add(loadedClassName);
+    }
+  };
+  image.onerror = () => {
+    image.hidden = true;
+    image.removeAttribute("src");
+    if (fallbackElement) {
+      fallbackElement.hidden = false;
+    }
+    if (shell && loadedClassName) {
+      shell.classList.remove(loadedClassName);
+    }
+  };
+  image.src = imageSrc;
+}
+
+function createSetsListRow(show, isActive = false) {
+  const item = document.createElement("li");
+  const row = document.createElement("button");
+  row.className = "sets-list-row";
+  row.type = "button";
+  row.dataset.setRow = "";
+  row.dataset.setCode = show.setCode;
+  row.dataset.setYear = show.year;
+  row.dataset.setDate = show.formattedDate;
+  row.dataset.setRawDate = show.rawDate || "";
+  row.dataset.setTitle = show.name;
+  row.dataset.setLocation = show.location;
+  row.dataset.setCity = show.city || "";
+  row.dataset.setState = show.state || "";
+  row.dataset.setPoster = show.poster || "";
+  row.dataset.setVenue = show.venue_id || show.venue || "";
+  row.dataset.setPhotos = "0";
+  row.dataset.setContributors = "0";
+  row.dataset.setComplete = "";
+  row.dataset.setThumb = getSetImageLabel({ dataset: { setDate: show.formattedDate, setThumb: activeMusicBand?.thumb || "" } });
+  row.setAttribute("aria-label", `Open ${show.name}, ${show.formattedDate}, ${show.location}`);
+  if (isActive) {
+    row.classList.add("is-active");
+    row.setAttribute("aria-pressed", "true");
+  } else {
+    row.setAttribute("aria-pressed", "false");
+  }
+
+  const thumb = document.createElement("span");
+  thumb.className = "sets-row-thumb";
+  thumb.setAttribute("aria-hidden", "true");
+  const poster = document.createElement("img");
+  poster.className = "sets-row-poster";
+  poster.alt = "";
+  poster.loading = "lazy";
+  poster.decoding = "async";
+  poster.hidden = true;
+  const fallback = document.createElement("span");
+  fallback.className = "sets-row-fallback";
+  fallback.textContent = row.dataset.setThumb;
+  thumb.append(poster, fallback);
+  setArchivePosterImage(poster, show.poster, fallback, "has-poster");
+
+  const copy = document.createElement("span");
+  copy.className = "sets-list-copy";
+  const date = document.createElement("span");
+  date.className = "sets-list-date";
+  date.textContent = show.formattedDate;
+  const title = document.createElement("span");
+  title.className = "sets-list-title";
+  title.textContent = show.name;
+  const location = document.createElement("span");
+  location.className = "sets-list-location";
+  location.textContent = show.location;
+  copy.append(date, title, location);
+  row.append(thumb, copy);
+  row.addEventListener("click", () => {
+    navigateToSetDetail(row);
+  });
+  item.append(row);
+  return item;
+}
+
+function renderSetsEmptyState(message = "No live shows indexed for this band yet.") {
+  if (!setsList) {
+    return;
+  }
+
+  const item = document.createElement("li");
+  item.className = "sets-list-empty";
+  item.textContent = message;
+  setsList.replaceChildren(item);
+}
+
+function renderSetsListRows(rows, selectedSetCode = "") {
+  if (!setsList) {
+    return;
+  }
+
+  if (rows.length === 0) {
+    renderSetsEmptyState();
+    return;
+  }
+
+  const activeCode = selectedSetCode || rows[0].setCode;
+  const fragment = document.createDocumentFragment();
+  rows.forEach((show) => {
+    fragment.append(createSetsListRow(show, show.setCode === activeCode));
+  });
+  setsList.replaceChildren(fragment);
+}
+
+function renderSetsArchiveRows(rows, options = {}) {
+  const years = getSetsArchiveYears(rows);
+  const selectedSetCode = normalizeSetCode(options.selectedSetCode || "");
+  const selectedRowData = rows.find((row) => normalizeSetCode(row.setCode) === selectedSetCode) || rows[0] || null;
+  const selectedYear = selectedRowData?.year || (years.includes(activeSetsArchiveYear) ? activeSetsArchiveYear : years[0] || "");
+
+  renderSetsYearTimeline(rows, selectedYear);
+  renderSetsListRows(rows, selectedRowData?.setCode || selectedSetCode);
+
+  if (selectedYear) {
+    setSetsYear(selectedYear, { shouldCenterYear: false });
+  } else {
+    if (setsListYearLabel) {
+      setsListYearLabel.textContent = "No Shows";
+    }
+    updateSetsFeaturedFromRow(null);
+  }
+}
+
 function updateSetsFeaturedFromRow(row) {
   if (!row) {
+    activeSetRow = null;
+    setArchivePosterImage(setsFeaturedPoster, "", setsFeaturedThumb, "has-poster");
+    if (setsFeaturedImage) {
+      setsFeaturedImage.setAttribute("aria-label", "Featured set placeholder image");
+    }
+    if (setsFeaturedThumb) {
+      setsFeaturedThumb.textContent = activeMusicBand ? getBandInitials(activeMusicBand.name) : "SET";
+    }
+    if (setsFeaturedDate) {
+      setsFeaturedDate.textContent = "Date Pending";
+    }
+    if (setsFeaturedTitle) {
+      setsFeaturedTitle.textContent = "No live shows indexed";
+    }
+    if (setsFeaturedLocation) {
+      setsFeaturedLocation.textContent = "Location Pending";
+    }
     return;
   }
 
   activeSetRow = row;
-  setsRows.forEach((candidate) => {
+  getSetsRows().forEach((candidate) => {
     const isActive = candidate === row;
     candidate.classList.toggle("is-active", isActive);
     candidate.setAttribute("aria-pressed", String(isActive));
@@ -1985,11 +2469,12 @@ function updateSetsFeaturedFromRow(row) {
   const setData = row.dataset;
   const imageAccent = getSetImageAccent(row);
   if (setsFeaturedImage) {
-    setsFeaturedImage.setAttribute("aria-label", `${setData.setTitle} placeholder featured set image`);
+    setsFeaturedImage.setAttribute("aria-label", `${setData.setTitle} featured show poster`);
     setsFeaturedImage.style.setProperty("--set-image-x", imageAccent.x);
     setsFeaturedImage.style.setProperty("--set-image-y", imageAccent.y);
     setsFeaturedImage.style.setProperty("--set-image-accent", imageAccent.color);
   }
+  setArchivePosterImage(setsFeaturedPoster, setData.setPoster || "", setsFeaturedThumb, "has-poster");
   if (setsFeaturedThumb) {
     setsFeaturedThumb.textContent = getSetImageLabel(row);
   }
@@ -2002,15 +2487,6 @@ function updateSetsFeaturedFromRow(row) {
   if (setsFeaturedLocation) {
     setsFeaturedLocation.textContent = setData.setLocation || "";
   }
-  if (setsFeaturedPhotos) {
-    setsFeaturedPhotos.textContent = setData.setPhotos || "";
-  }
-  if (setsFeaturedContributors) {
-    setsFeaturedContributors.textContent = setData.setContributors || "";
-  }
-  if (setsFeaturedComplete) {
-    setsFeaturedComplete.textContent = setData.setComplete || "";
-  }
   if (isSetDetailOpen) {
     updateSetDetailFromRow(row);
   }
@@ -2018,8 +2494,10 @@ function updateSetsFeaturedFromRow(row) {
 
 function setSetsYear(year, options = {}) {
   let firstVisibleRow = null;
+  let activeVisibleRow = null;
+  activeSetsArchiveYear = year;
 
-  setsYearButtons.forEach((button) => {
+  getSetsYearButtons().forEach((button) => {
     const isActive = button.dataset.setsYear === year;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
@@ -2032,7 +2510,7 @@ function setSetsYear(year, options = {}) {
     }
   });
 
-  setsRows.forEach((row) => {
+  getSetsRows().forEach((row) => {
     const isVisible = row.dataset.setYear === year;
     const rowItem = row.closest("li");
     if (rowItem) {
@@ -2041,14 +2519,18 @@ function setSetsYear(year, options = {}) {
     if (isVisible && !firstVisibleRow) {
       firstVisibleRow = row;
     }
+    if (isVisible && row.classList.contains("is-active")) {
+      activeVisibleRow = row;
+    }
   });
 
   if (setsListYearLabel) {
-    setsListYearLabel.textContent = year;
+    setsListYearLabel.textContent = year || "No Shows";
   }
-  updateSetsFeaturedFromRow(firstVisibleRow);
-  if (options.shouldFocus && firstVisibleRow) {
-    firstVisibleRow.focus({ preventScroll: true });
+  const selectedRow = activeVisibleRow || firstVisibleRow;
+  updateSetsFeaturedFromRow(selectedRow);
+  if (options.shouldFocus && selectedRow) {
+    selectedRow.focus({ preventScroll: true });
   }
 }
 
@@ -2061,33 +2543,39 @@ function showSetsArchive(options = {}) {
   const selectedSetRow = options.selectedSetRow || null;
   const selectedSetCode = normalizeSetCode(options.selectedSetCode || getSetCode(selectedSetRow));
   activeMusicBand = band;
-  const bandThumb = band.thumb || band.name.slice(0, 2).toUpperCase();
   if (setsArchiveBand) {
     setsArchiveBand.textContent = band.name;
   }
-  setsRows.forEach((row) => {
-    row.dataset.setThumb = bandThumb;
-    const thumb = row.querySelector(".sets-row-thumb");
-    if (thumb) {
-      thumb.textContent = bandThumb;
-    }
-  });
 
   setBandsIndexVisible(false);
   setBandDetailVisible(false);
   setSetsArchiveVisible(true);
   setSetDetailVisible(false);
-  setSetsYear(selectedSetRow ? selectedSetRow.dataset.setYear : "2026");
-  if (selectedSetRow) {
-    updateSetsFeaturedFromRow(selectedSetRow);
+  if (!musicShowsSetsLoaded && musicShowsSetsCollection.length === 0) {
+    restoreMusicShowsSetsFallback();
   }
+  renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
   if (options.shouldOpenDetail) {
-    updateSetDetailFromRow(selectedSetRow || createUnknownSetRow(selectedSetCode));
+    updateSetDetailFromRow(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode));
     setSetDetailVisible(true);
     setCurrentView("Set Detail");
   } else {
-    setCurrentView("SETS 13 HIGH");
+    setCurrentView(`Sets ${band.name}`);
   }
+  requestMusicShowsSetsData().then(() => {
+    const route = getRouteFromUrl();
+    const isStillSetsContext = setsArchive.getAttribute("aria-hidden") === "false" || route.name === "set-detail";
+    if (!isStillSetsContext || getBandId(activeMusicBand) !== getBandId(band)) {
+      return;
+    }
+
+    renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
+    if (options.shouldOpenDetail) {
+      updateSetDetailFromRow(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode));
+      setSetDetailVisible(true);
+      setCurrentView("Set Detail");
+    }
+  });
   if (options.shouldScroll !== false && musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
