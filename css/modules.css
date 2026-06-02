@@ -363,15 +363,24 @@
   display: grid;
   justify-items: center;
   gap: 0.35rem;
+  width: min(100%, 13rem);
   color: rgba(247, 247, 242, 0.92);
   text-align: center;
-  text-transform: uppercase;
+}
+
+.band-detail-logo-image {
+  width: min(100%, 9.75rem);
+  max-height: clamp(4.8rem, 18vw, 7.8rem);
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 0 0.58rem rgba(142, 108, 255, 0.14));
 }
 
 .band-detail-logo-mark {
   font-size: clamp(2.85rem, 18vw, 5.7rem);
   line-height: 0.86;
   text-shadow: 0 0 1.1rem rgba(142, 108, 255, 0.2);
+  text-transform: uppercase;
 }
 
 .band-detail-logo-name {
@@ -379,6 +388,8 @@
   font-size: clamp(0.66rem, 2.7vw, 0.82rem);
   line-height: 1;
   letter-spacing: 0;
+  text-transform: none;
+  overflow-wrap: anywhere;
 }
 
 .band-detail-copy {
@@ -417,7 +428,7 @@
   font-weight: 400;
   line-height: 0.98;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -446,6 +457,30 @@
   border-color: rgba(116, 214, 147, 0.26);
   background: rgba(116, 214, 147, 0.055);
   color: rgba(134, 225, 161, 0.84);
+}
+
+.band-detail-tag--complete {
+  border-color: rgba(116, 214, 147, 0.26);
+  background: rgba(116, 214, 147, 0.055);
+  color: rgba(134, 225, 161, 0.84);
+}
+
+.band-detail-tag--partial {
+  border-color: rgba(226, 197, 94, 0.26);
+  background: rgba(226, 197, 94, 0.055);
+  color: rgba(230, 204, 111, 0.84);
+}
+
+.band-detail-tag--needs {
+  border-color: rgba(213, 83, 91, 0.26);
+  background: rgba(213, 83, 91, 0.055);
+  color: rgba(230, 108, 116, 0.82);
+}
+
+.band-detail-tag--neutral {
+  border-color: rgba(247, 247, 242, 0.13);
+  background: rgba(247, 247, 242, 0.024);
+  color: rgba(247, 247, 242, 0.62);
 }
 
 .band-detail-meta {
@@ -548,7 +583,7 @@
 
 .band-detail-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(0.54rem, 2.3vw, 0.78rem);
 }
 
@@ -2570,7 +2605,7 @@ img.archive-gallery-image {
   line-height: 1.08;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -2579,7 +2614,18 @@ img.archive-gallery-image {
   font-size: clamp(0.58rem, 2.35vw, 0.68rem);
   line-height: 1.12;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
+}
+
+.band-member--empty {
+  border-color: rgba(142, 108, 255, 0.12);
+  background:
+    linear-gradient(90deg, rgba(142, 108, 255, 0.035), transparent 68%),
+    rgba(247, 247, 242, 0.018);
+}
+
+.band-member--empty .band-member-name {
+  color: rgba(247, 247, 242, 0.68);
 }
 
 .band-detail-activity {
@@ -5308,6 +5354,10 @@ img.archive-gallery-image {
   line-height: 1;
   text-align: center;
   text-transform: uppercase;
+}
+
+.band-detail-meta-value {
+  text-transform: none;
 }
 
 .bands-filter-field {

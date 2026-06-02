@@ -79,7 +79,22 @@ function getMusicPersonDetailData(personId) {
 }
 
 function findBandById(bandId) {
-  return getMockRecordById("musicBands", bandId, ["bandId", "id", "slug", "band_id"]) || null;
+  const normalizedBandId = String(bandId || "").trim().toLowerCase();
+  if (!normalizedBandId) {
+    return null;
+  }
+
+  const liveBand = getMusicBandsIndexCollection().find((band) => {
+    const bandKeys = [
+      getBandId(band),
+      band?.band_id,
+      band?.id,
+      band?.slug,
+    ];
+    return bandKeys.some((key) => String(key || "").trim().toLowerCase() === normalizedBandId);
+  });
+
+  return liveBand || getMockRecordById("musicBands", bandId, ["bandId", "id", "slug", "band_id"]) || null;
 }
 
 function createUnknownBand(bandId) {
@@ -92,6 +107,23 @@ function createUnknownBand(bandId) {
     statusKey: "needs",
     albums: 0,
     thumb: "ID",
+    general: {
+      name: safeBandId,
+      logo_url: "",
+      tags: [],
+    },
+    personnel: {
+      members: [],
+      past_members: [],
+    },
+    stats: {
+      region: "Pending Index",
+      location: "",
+      state: "",
+      totalPhotos: 0,
+      archived_sets: 0,
+      total_sets: 0,
+    },
   };
 }
 
@@ -325,6 +357,207 @@ function getBandArchiveStatus(archivedSets, totalSets) {
   }
 
   return { label: "Archive Pending", key: "neutral" };
+}
+
+function formatBandDetailNumber(value, fallback = "0") {
+  return formatBandIndexNumber(value, fallback);
+}
+
+function getBandDetailObject(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function getBandDetailGeneral(band) {
+  return getBandDetailObject(band?.general);
+}
+
+function getBandDetailStats(band) {
+  return getBandDetailObject(band?.stats);
+}
+
+function getBandDetailPersonnel(band) {
+  return getBandDetailObject(band?.personnel);
+}
+
+function getBandDetailName(band) {
+  const general = getBandDetailGeneral(band);
+  return String(general.name || band?.name || band?.band || band?.title || "Band Detail").trim() || "Band Detail";
+}
+
+function getBandDetailLogoUrl(band, general = getBandDetailGeneral(band)) {
+  return String(general.logo_url || band?.logoUrl || band?.logo_url || band?.logo || band?.image_url || "").trim();
+}
+
+function getBandDetailTags(general) {
+  const sourceTags = general?.tags;
+  const tags = Array.isArray(sourceTags)
+    ? sourceTags
+    : String(sourceTags || "")
+        .split(/[,|]/)
+        .map((tag) => tag.trim());
+
+  return tags
+    .map((tag) => String(tag || "").trim())
+    .filter(Boolean);
+}
+
+function getBandDetailLocation(stats, band) {
+  const locationParts = [
+    stats.location || band?.location,
+    stats.state || band?.state,
+  ]
+    .map((part) => String(part || "").trim())
+    .filter(Boolean);
+
+  return locationParts.length > 0 ? locationParts.join(", ") : "Location Pending";
+}
+
+function getBandDetailCount(...values) {
+  for (const value of values) {
+    const numericValue = getBandIndexNumber(value);
+    if (numericValue !== null) {
+      return numericValue;
+    }
+  }
+
+  return 0;
+}
+
+function getBandDetailCompletion(archivedSets, totalSets) {
+  if (totalSets <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, Math.round((archivedSets / totalSets) * 100)));
+}
+
+function getBandDetailMemberName(member) {
+  if (typeof member === "string") {
+    return member;
+  }
+
+  return String(member?.name || member?.member || member?.person || member?.title || "").trim();
+}
+
+function getBandDetailMemberRole(member) {
+  if (!member || typeof member !== "object") {
+    return "Role Pending";
+  }
+
+  const roleParts = Array.isArray(member.instruments) ? member.instruments : [];
+  return String(member.role || member.instrument || member.position || member.category || roleParts.join(" / ") || "Role Pending").trim();
+}
+
+function normalizeBandDetailMembers(members) {
+  return (Array.isArray(members) ? members : [])
+    .map((member) => {
+      const name = getBandDetailMemberName(member);
+      if (!name) {
+        return null;
+      }
+
+      return {
+        name,
+        role: getBandDetailMemberRole(member),
+        thumb: getBandInitials(name),
+      };
+    })
+    .filter(Boolean);
+}
+
+function renderBandDetailMembers(container, members, emptyText) {
+  if (!container) {
+    return;
+  }
+
+  const normalizedMembers = normalizeBandDetailMembers(members);
+  const fragment = document.createDocumentFragment();
+
+  if (normalizedMembers.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.className = "band-member band-member--empty";
+    const thumb = document.createElement("span");
+    thumb.className = "band-member-thumb";
+    thumb.setAttribute("aria-hidden", "true");
+    thumb.textContent = "ID";
+    const copy = document.createElement("div");
+    copy.className = "band-member-copy";
+    const name = document.createElement("p");
+    name.className = "band-member-name";
+    name.textContent = emptyText;
+    const role = document.createElement("p");
+    role.className = "band-member-role";
+    role.textContent = "Ready for future personnel data";
+    copy.append(name, role);
+    emptyItem.append(thumb, copy);
+    fragment.append(emptyItem);
+  } else {
+    normalizedMembers.forEach((member) => {
+      const item = document.createElement("li");
+      item.className = "band-member";
+      const thumb = document.createElement("span");
+      thumb.className = "band-member-thumb";
+      thumb.setAttribute("aria-hidden", "true");
+      thumb.textContent = member.thumb;
+      const copy = document.createElement("div");
+      copy.className = "band-member-copy";
+      const name = document.createElement("p");
+      name.className = "band-member-name";
+      name.textContent = member.name;
+      const role = document.createElement("p");
+      role.className = "band-member-role";
+      role.textContent = member.role;
+      copy.append(name, role);
+      item.append(thumb, copy);
+      fragment.append(item);
+    });
+  }
+
+  container.replaceChildren(fragment);
+}
+
+function setBandDetailLogo(logoUrl, name) {
+  const logoShell = bandDetailLogoImage?.closest(".band-detail-logo");
+  if (logoShell) {
+    logoShell.classList.remove("has-live-logo");
+  }
+  if (bandDetailThumb) {
+    bandDetailThumb.hidden = false;
+    bandDetailThumb.textContent = getBandInitials(name);
+  }
+  if (!bandDetailLogoImage) {
+    return;
+  }
+
+  bandDetailLogoImage.onload = null;
+  bandDetailLogoImage.onerror = null;
+  bandDetailLogoImage.hidden = true;
+  bandDetailLogoImage.removeAttribute("src");
+
+  if (!logoUrl) {
+    return;
+  }
+
+  bandDetailLogoImage.onload = () => {
+    bandDetailLogoImage.hidden = false;
+    if (bandDetailThumb) {
+      bandDetailThumb.hidden = true;
+    }
+    if (logoShell) {
+      logoShell.classList.add("has-live-logo");
+    }
+  };
+  bandDetailLogoImage.onerror = () => {
+    bandDetailLogoImage.hidden = true;
+    bandDetailLogoImage.removeAttribute("src");
+    if (bandDetailThumb) {
+      bandDetailThumb.hidden = false;
+    }
+    if (logoShell) {
+      logoShell.classList.remove("has-live-logo");
+    }
+  };
+  bandDetailLogoImage.src = logoUrl;
 }
 
 function getMusicBandsPayloadRows(payload) {
@@ -837,34 +1070,78 @@ function showBandDetail(band) {
     return;
   }
 
-  activeMusicBand = band;
+  const general = getBandDetailGeneral(band);
+  const stats = getBandDetailStats(band);
+  const personnel = getBandDetailPersonnel(band);
+  const name = getBandDetailName(band);
+  const region = String(stats.region || band.region || "Region Pending").trim() || "Region Pending";
+  const logoUrl = getBandDetailLogoUrl(band, general);
+  const tags = getBandDetailTags(general);
+  const archivedSets = getBandDetailCount(stats.archived_sets, band.archived_sets);
+  const totalSets = getBandDetailCount(stats.total_sets, band.total_sets, band.albums);
+  const photoCount = getBandDetailCount(stats.totalPhotos, stats.total_photos, band.photo_count, band.photos);
+  const members = Array.isArray(personnel.members) ? personnel.members : [];
+  const pastMembers = Array.isArray(personnel.past_members) ? personnel.past_members : [];
+  const status = getBandArchiveStatus(archivedSets, totalSets);
+  const completion = getBandDetailCompletion(archivedSets, totalSets);
+
+  activeMusicBand = {
+    ...band,
+    name,
+    region,
+    status: status.label,
+    statusKey: status.key,
+    albums: totalSets,
+    thumb: getBandInitials(name),
+    logoUrl,
+    archived_sets: archivedSets,
+    total_sets: totalSets,
+    photo_count: photoCount,
+  };
   if (bandDetailPoster) {
-    bandDetailPoster.setAttribute("aria-label", `${band.name} placeholder band poster`);
+    bandDetailPoster.setAttribute("aria-label", `${name} band logo panel`);
   }
-  if (bandDetailThumb) {
-    bandDetailThumb.textContent = band.thumb || band.name.slice(0, 2).toUpperCase();
-  }
+  setBandDetailLogo(logoUrl, name);
   if (bandDetailLogoName) {
-    bandDetailLogoName.textContent = band.name;
+    bandDetailLogoName.textContent = name;
   }
   if (bandDetailName) {
-    bandDetailName.textContent = band.name;
+    bandDetailName.textContent = name;
   }
   if (bandDetailRegion) {
-    bandDetailRegion.textContent = band.region;
+    bandDetailRegion.textContent = region;
+  }
+  if (bandDetailTags) {
+    bandDetailTags.textContent = tags.join(" / ");
+    bandDetailTags.hidden = tags.length === 0;
   }
   if (bandDetailStatus) {
-    bandDetailStatus.textContent = band.status;
+    bandDetailStatus.className = `band-detail-tag band-detail-tag--${status.key}`;
+    bandDetailStatus.textContent = status.label;
+  }
+  if (bandDetailLocation) {
+    bandDetailLocation.textContent = getBandDetailLocation(stats, band);
+  }
+  if (bandDetailCompletionValue) {
+    bandDetailCompletionValue.textContent = `${completion}%`;
+  }
+  if (bandDetailProgressFill) {
+    bandDetailProgressFill.style.width = `${completion}%`;
   }
   if (bandDetailSets) {
-    bandDetailSets.textContent = String(band.albums);
+    bandDetailSets.textContent = formatBandDetailNumber(archivedSets);
   }
   if (bandDetailTotalSets) {
-    bandDetailTotalSets.textContent = String(band.albums + 4);
+    bandDetailTotalSets.textContent = formatBandDetailNumber(totalSets);
   }
   if (bandDetailPhotos) {
-    bandDetailPhotos.textContent = String(band.albums * 36);
+    bandDetailPhotos.textContent = formatBandDetailNumber(photoCount);
   }
+  if (bandDetailContributors) {
+    bandDetailContributors.textContent = formatBandDetailNumber(members.length);
+  }
+  renderBandDetailMembers(bandDetailCoreMembers, members, "No core members indexed");
+  renderBandDetailMembers(bandDetailPastMembers, pastMembers, "No past members indexed");
 
   setBandsIndexVisible(false);
   setBandDetailVisible(true);

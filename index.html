@@ -644,24 +644,24 @@
             <section class="band-detail-hero" aria-labelledby="band-detail-title">
               <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
                 <div class="band-detail-logo" aria-hidden="true">
+                  <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
                   <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
                   <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
                 </div>
               </div>
 
               <div class="band-detail-copy">
-                <p class="band-detail-kicker">BAND</p>
                 <h3 class="band-detail-name" id="band-detail-title" data-band-detail-name>Astra Vale</h3>
                 <div class="band-detail-tags" aria-label="Band archive tags">
                   <span class="band-detail-tag" data-band-detail-region>New England</span>
-                  <span class="band-detail-tag">Music Archive</span>
+                  <span class="band-detail-tag" data-band-detail-tags hidden></span>
                   <span class="band-detail-tag band-detail-tag--active" data-band-detail-status>Active</span>
                 </div>
 
                 <div class="band-detail-meta" aria-label="Band detail metadata">
                   <div class="band-detail-meta-row">
                     <p class="band-detail-meta-label">Location</p>
-                    <p class="band-detail-meta-value">Portland, Maine</p>
+                    <p class="band-detail-meta-value" data-band-detail-location>Portland, Maine</p>
                   </div>
                   <div class="band-detail-meta-row">
                     <p class="band-detail-meta-label">First Captured</p>
@@ -672,10 +672,10 @@
                 <div class="band-detail-completion" aria-label="Archive completion">
                   <div class="band-detail-completion-head">
                     <p class="band-detail-completion-label">Archive Completion</p>
-                    <p class="band-detail-completion-value">72%</p>
+                    <p class="band-detail-completion-value" data-band-detail-completion-value>72%</p>
                   </div>
                   <div class="band-detail-progress" aria-hidden="true">
-                    <span class="band-detail-progress-fill"></span>
+                    <span class="band-detail-progress-fill" data-band-detail-progress-fill></span>
                   </div>
                 </div>
               </div>
@@ -695,20 +695,19 @@
                 <p class="band-detail-stat-label">PHOTOS</p>
               </article>
               <article class="band-detail-stat">
-                <p class="band-detail-stat-value">6</p>
+                <p class="band-detail-stat-value" data-band-detail-contributors>6</p>
                 <p class="band-detail-stat-label">CONTRIBUTORS</p>
               </article>
             </section>
 
             <div class="band-detail-actions" aria-label="Band detail actions">
               <button class="v3-card v3-card--interactive band-detail-action" type="button" data-band-detail-view-sets>VIEW SETS</button>
-              <button class="v3-card v3-card--interactive band-detail-action" type="button">VIEW TIMELINE</button>
             </div>
 
             <section class="band-detail-members" aria-label="Band membership panels">
               <article class="band-detail-panel" aria-labelledby="core-members-title">
                 <h4 class="band-detail-panel-title" id="core-members-title">CORE MEMBERS</h4>
-                <ul class="band-member-list">
+                <ul class="band-member-list" data-band-detail-core-members>
                   <li class="band-member">
                     <span class="band-member-thumb" aria-hidden="true">JM</span>
                     <div class="band-member-copy">
@@ -735,7 +734,7 @@
 
               <article class="band-detail-panel" aria-labelledby="past-members-title">
                 <h4 class="band-detail-panel-title" id="past-members-title">PAST MEMBERS</h4>
-                <ul class="band-member-list">
+                <ul class="band-member-list" data-band-detail-past-members>
                   <li class="band-member">
                     <span class="band-member-thumb" aria-hidden="true">LC</span>
                     <div class="band-member-copy">
@@ -782,9 +781,6 @@
                 </div>
               </div>
             </section>
-            <button class="v3-card v3-card--mini v3-card--interactive band-detail-back" type="button" data-band-detail-back>
-              Back to Bands Index
-            </button>
           </article>
 
           <article class="sets-archive-screen" aria-labelledby="sets-archive-title" aria-hidden="true" inert data-sets-archive>

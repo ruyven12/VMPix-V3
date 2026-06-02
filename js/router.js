@@ -333,6 +333,14 @@ function syncRoute(route, options = {}) {
     bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
     showMusicNexus({ initialSection: "bands" });
     showBandDetail(findBandById(route.bandId) || createUnknownBand(route.bandId));
+    requestMusicBandsIndexData().then(() => {
+      const currentRoute = getRouteFromUrl();
+      if (currentRoute.name !== "band-detail" || String(currentRoute.bandId || "").toLowerCase() !== String(route.bandId || "").toLowerCase()) {
+        return;
+      }
+
+      showBandDetail(findBandById(currentRoute.bandId) || createUnknownBand(currentRoute.bandId));
+    });
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
         returnUrl: bandsIndexReturnUrl,
