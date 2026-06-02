@@ -5654,7 +5654,7 @@ img.archive-gallery-image {
   line-height: 1.05;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
