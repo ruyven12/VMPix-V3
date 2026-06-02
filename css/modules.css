@@ -5083,7 +5083,9 @@ img.archive-gallery-image {
 }
 
 .music-nexus-shell:not(.is-landing) .music-bands-index.is-active {
-  min-height: min(42rem, calc(100svh - 6.75rem));
+  height: min(42rem, calc(100svh - 6.75rem));
+  min-height: 0;
+  max-height: calc(100svh - 6.75rem);
 }
 
 .music-bands-index::before {
@@ -5230,6 +5232,24 @@ img.archive-gallery-image {
 
 .bands-list-panel {
   grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(142, 108, 255, 0.42) rgba(247, 247, 242, 0.07);
+  scrollbar-width: thin;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bands-list-panel::-webkit-scrollbar {
+  width: 0.38rem;
+}
+
+.bands-list-panel::-webkit-scrollbar-track {
+  background: rgba(247, 247, 242, 0.07);
+}
+
+.bands-list-panel::-webkit-scrollbar-thumb {
+  background: rgba(142, 108, 255, 0.42);
 }
 
 .bands-search-panel {
@@ -5546,21 +5566,17 @@ img.archive-gallery-image {
 }
 
 .bands-list-viewport {
-  height: 100%;
+  height: auto;
   max-height: none;
   display: grid;
   gap: 0.42rem;
   min-width: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: visible;
   padding: 0 0.08rem 0.08rem 0;
-  scrollbar-color: rgba(142, 108, 255, 0.42) rgba(247, 247, 242, 0.07);
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
 }
 
 .bands-list-viewport::-webkit-scrollbar {
-  width: 0.38rem;
+  display: none;
 }
 
 .bands-list-viewport::-webkit-scrollbar-track {
@@ -5590,7 +5606,7 @@ img.archive-gallery-image {
   cursor: pointer;
   font: inherit;
   text-align: left;
-  touch-action: manipulation;
+  touch-action: pan-y;
 }
 
 .bands-list-row.is-letter-active {

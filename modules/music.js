@@ -496,6 +496,10 @@ function getListBands(rows) {
   return filterMockCollection(rows, (band) => getBandLetter(band) === activeBandsFilterLetter);
 }
 
+function getBandsListScroller() {
+  return bandsList ? bandsList.closest(".bands-list-panel") || bandsList : null;
+}
+
 function getBandLetterCounts(rows) {
   return rows.reduce((counts, band) => {
     const letter = getBandLetter(band);
@@ -1740,8 +1744,9 @@ function renderBandsLetterNavs(rows) {
       allButton.addEventListener("click", () => {
         activeBandsFilterLetter = "";
         syncBandsIndex();
-        if (bandsList) {
-          bandsList.scrollTo({
+        const listScroller = getBandsListScroller();
+        if (listScroller) {
+          listScroller.scrollTo({
             top: 0,
             behavior: reducedMotion.matches ? "auto" : "smooth",
           });
@@ -1979,21 +1984,25 @@ function renderBandsList(rows) {
   if (activeBandsView === "list" && activeBandsFilterLetter) {
     const activeRow = bandsList.querySelector(`[data-band-letter="${activeBandsLetter}"]`);
     if (activeRow) {
-      const listRect = bandsList.getBoundingClientRect();
+      const listScroller = getBandsListScroller();
+      if (!listScroller) {
+        return;
+      }
+      const listRect = listScroller.getBoundingClientRect();
       const rowRect = activeRow.getBoundingClientRect();
-      const rowTop = rowRect.top - listRect.top + bandsList.scrollTop;
-      const rowBottom = rowRect.bottom - listRect.top + bandsList.scrollTop;
-      const listBottom = bandsList.scrollTop + bandsList.clientHeight;
+      const rowTop = rowRect.top - listRect.top + listScroller.scrollTop;
+      const rowBottom = rowRect.bottom - listRect.top + listScroller.scrollTop;
+      const listBottom = listScroller.scrollTop + listScroller.clientHeight;
       let targetTop = null;
 
-      if (rowTop < bandsList.scrollTop) {
+      if (rowTop < listScroller.scrollTop) {
         targetTop = rowTop;
       } else if (rowBottom > listBottom) {
-        targetTop = rowBottom - bandsList.clientHeight;
+        targetTop = rowBottom - listScroller.clientHeight;
       }
 
       if (targetTop !== null) {
-        bandsList.scrollTo({
+        listScroller.scrollTo({
           top: Math.max(0, targetTop),
           behavior: reducedMotion.matches ? "auto" : "smooth",
         });
