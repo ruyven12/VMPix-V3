@@ -594,13 +594,17 @@ function getBandLetterCounts(rows) {
 }
 
 function syncActiveBandLetter(rows) {
+  if (activeBandsView === "radar" && !activeBandsLetter) {
+    return;
+  }
+
   if (activeBandsFilterLetter) {
     activeBandsLetter = activeBandsFilterLetter;
     return;
   }
 
   if (rows.length === 0) {
-    activeBandsLetter = "A";
+    activeBandsLetter = activeBandsView === "radar" ? "" : "A";
     return;
   }
 
@@ -1884,20 +1888,25 @@ function renderBandsLetterNavs(rows) {
   const counts = getBandLetterCounts(rows);
   bandsLetterNavs.forEach((nav) => {
     const isListNav = nav.hasAttribute("data-bands-letter-nav-list");
+    const isRadarNav = nav.hasAttribute("data-bands-letter-nav") && !isListNav;
     const fragment = document.createDocumentFragment();
-    if (isListNav) {
+    if (isListNav || isRadarNav) {
       const allButton = document.createElement("button");
       allButton.className = `bands-letter-button bands-letter-button--all${rows.length > 0 ? " has-signal" : ""}`;
       allButton.type = "button";
       allButton.textContent = "All";
       allButton.disabled = rows.length === 0;
-      allButton.setAttribute("aria-pressed", String(!activeBandsFilterLetter));
+      allButton.setAttribute("aria-pressed", String(isRadarNav ? !activeBandsLetter : !activeBandsFilterLetter));
       allButton.setAttribute("aria-label", `${rows.length} total band signals`);
       allButton.addEventListener("click", () => {
-        activeBandsFilterLetter = "";
+        if (isRadarNav) {
+          activeBandsLetter = "";
+        } else {
+          activeBandsFilterLetter = "";
+        }
         syncBandsIndex();
         const listScroller = getBandsListScroller();
-        if (listScroller) {
+        if (!isRadarNav && listScroller) {
           listScroller.scrollTo({
             top: 0,
             behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -1908,7 +1917,7 @@ function renderBandsLetterNavs(rows) {
     }
     bandsAlphabet.forEach((letter) => {
       const count = counts.get(letter) || 0;
-      if (isListNav && count === 0) {
+      if ((isListNav || isRadarNav) && count === 0) {
         return;
       }
       const button = document.createElement("button");
@@ -1921,8 +1930,8 @@ function renderBandsLetterNavs(rows) {
       button.setAttribute("aria-label", count > 0 ? `${letter}, ${count} band signals` : `${letter}, no band signals`);
       button.addEventListener("click", () => {
         setBandsLetter(letter, {
-          shouldFilterList: true,
-          shouldOpenList: nav.hasAttribute("data-bands-letter-nav"),
+          shouldFilterList: isListNav,
+          shouldOpenList: false,
         });
       });
       fragment.append(button);
@@ -1933,10 +1942,15 @@ function renderBandsLetterNavs(rows) {
 
 function renderBandsRadar(rows) {
   const forcedState = getForcedMockState("musicBands");
-  const activeRows = rows.filter((band) => getBandLetter(band) === activeBandsLetter);
+  const isAllRadar = !activeBandsLetter;
+  const activeRows = isAllRadar ? rows : rows.filter((band) => getBandLetter(band) === activeBandsLetter);
 
   if (bandsRadarLetter) {
-    bandsRadarLetter.textContent = activeBandsLetter;
+    bandsRadarLetter.textContent = isAllRadar ? "All" : activeBandsLetter;
+    const radarCore = bandsRadarLetter.closest(".bands-radar-core");
+    if (radarCore) {
+      radarCore.classList.toggle("is-all-mode", isAllRadar);
+    }
   }
   if (bandsRadarCount) {
     bandsRadarCount.textContent = `${activeRows.length} signal${activeRows.length === 1 ? "" : "s"}`;
@@ -1983,7 +1997,7 @@ function renderBandsRadar(rows) {
     rows.forEach((band, index) => {
       const point = document.createElement("span");
       const offset = getRadarPointOffset(index, rows.length);
-      point.className = `bands-radar-point${getBandLetter(band) === activeBandsLetter ? " is-letter-active" : ""}`;
+      point.className = `bands-radar-point${!isAllRadar && getBandLetter(band) === activeBandsLetter ? " is-letter-active" : ""}`;
       point.style.setProperty("--radar-x", offset[0]);
       point.style.setProperty("--radar-y", offset[1]);
       point.setAttribute("title", band.name);
@@ -2213,10 +2227,12 @@ function updateBandsStatus(rows) {
   }
 
   const listRows = getListBands(rows);
-  const activeCount = activeBandsFilterLetter
+  const activeCount = activeBandsView === "radar" && !activeBandsLetter
+    ? rows.length
+    : activeBandsFilterLetter
     ? listRows.length
     : rows.filter((band) => getBandLetter(band) === activeBandsLetter).length;
-  bandsStatus.textContent = `${activeBandsLetter} / ${activeCount} / ${activeBandsView.toUpperCase()}`;
+  bandsStatus.textContent = `${activeBandsLetter || "ALL"} / ${activeCount} / ${activeBandsView.toUpperCase()}`;
 }
 
 function scrollBandsIndexIntoView() {
@@ -2280,6 +2296,7 @@ function setBandsView(viewName, shouldFocus = false, options = {}) {
 
   activeBandsView = viewName;
   if (viewName === "radar" && !options.preserveFilter) {
+    activeBandsLetter = "";
     activeBandsFilterLetter = "";
   }
   bandsViewButtons.forEach((button) => {
@@ -2344,6 +2361,7 @@ function clearBandsPanelFilters() {
 }
 
 function returnToBandsRadar() {
+  activeBandsLetter = "";
   activeBandsFilterLetter = "";
   activeBandsRegionFilter = "";
   activeBandsStatusFilter = "";

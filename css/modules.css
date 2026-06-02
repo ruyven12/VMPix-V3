@@ -5251,6 +5251,27 @@ img.archive-gallery-image {
 
 .bands-radar-layout {
   grid-template-rows: minmax(0, 1fr) auto auto;
+  justify-items: center;
+  align-items: center;
+}
+
+.bands-radar-layout > .bands-letter-nav {
+  width: min(100%, 42rem);
+  justify-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.bands-radar-layout > .bands-letter-nav .bands-letter-button {
+  flex: 0 0 auto;
+  min-width: 2.08rem;
+  padding-inline: 0.42rem;
+}
+
+.bands-radar-layout > .bands-letter-nav .bands-letter-button--all {
+  min-width: 3.2rem;
 }
 
 .bands-list-panel {
@@ -5372,6 +5393,7 @@ img.archive-gallery-image {
   width: min(100%, 18.5rem);
   aspect-ratio: 1;
   justify-self: center;
+  align-self: center;
   display: grid;
   place-items: center;
   border: 1px solid rgba(247, 247, 242, 0.13);
@@ -5437,6 +5459,11 @@ img.archive-gallery-image {
   text-transform: uppercase;
 }
 
+.bands-radar-core.is-all-mode .bands-radar-letter {
+  font-size: clamp(1.35rem, 8vw, 2.35rem);
+  line-height: 1;
+}
+
 .bands-radar-count {
   color: rgba(142, 108, 255, 0.76);
   font-size: clamp(0.58rem, 2.5vw, 0.7rem);
@@ -5476,6 +5503,7 @@ img.archive-gallery-image {
 }
 
 .bands-radar-signal-list {
+  width: min(100%, 38rem);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -12502,9 +12530,10 @@ img.archive-gallery-image {
   }
 
   .bands-radar-layout {
-    grid-template-columns: minmax(14rem, 0.9fr) minmax(0, 1.1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
     align-items: center;
+    justify-items: center;
   }
 
   .bands-letter-nav {

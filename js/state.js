@@ -180,7 +180,7 @@ let activationTimer;
 let spotlightFrame;
 let drawerCloseTimer;
 let activeBandsView = "radar";
-let activeBandsLetter = "A";
+let activeBandsLetter = "";
 let activeBandsFilterLetter = "";
 let activeBandsRegionFilter = "";
 let activeBandsStatusFilter = "";
