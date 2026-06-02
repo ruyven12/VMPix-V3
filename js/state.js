@@ -731,13 +731,49 @@ function createMockDate({ month = "", day = "", year = "", eventDate = "" } = {}
   return { display, iso };
 }
 
+function createMockTitleFromSlug(value = "") {
+  return String(value || "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 function createMockVenueDetails(venueName = "", location = "", venueId = "") {
   const [city = "", state = ""] = String(location || "").split(",").map((part) => part.trim());
+  const id = venueId || createMockSlug(venueName || location, "pending-venue");
+  const name = venueName || "Pending Venue";
+
   return {
-    id: venueId || createMockSlug(venueName || location, "pending-venue"),
-    name: venueName || "Pending Venue",
+    id,
+    venue_id: id,
+    venue_key: id,
+    name,
+    venue: name,
+    venue_name: name,
     city,
     state,
+    country: "US",
+    region: state,
+    latitude: null,
+    longitude: null,
+    status: "static-placeholder",
+    notes: "",
+    geo: {
+      latitude: null,
+      longitude: null,
+      confidence: "mock-placeholder",
+    },
+    location: {
+      gps_lat: "",
+      gps_lng: "",
+    },
+    media: {
+      logo: "",
+    },
+    stats: {
+      showCount: 0,
+    },
     location_label: location || [city, state].filter(Boolean).join(", "),
   };
 }
@@ -760,44 +796,237 @@ function applyMockAliases(record, aliases) {
   return record;
 }
 
+function mapMockPeopleRefs(ids = []) {
+  return (Array.isArray(ids) ? ids : []).map((id) => {
+    const person = wrestlingPeopleRows.find((row) => row.personId === id) || musicPeopleRows.find((row) => row.personId === id);
+    return {
+      id,
+      slug: id,
+      name: person?.name || createMockTitleFromSlug(id),
+    };
+  });
+}
+
+function mapMockMusicBandRefs(names = []) {
+  return (Array.isArray(names) ? names : []).filter(Boolean).map((name) => ({
+    band_id: createMockSlug(name, "pending-band"),
+    band: name,
+    instrument: "",
+  }));
+}
+
+function getMockWrestlingVenue(venueId = "") {
+  return wrestlingVenueRows.find((venue) => venue.venueId === venueId) || null;
+}
+
+function getMockWrestlingShow(showId = "") {
+  return wrestlingShowRelationshipRows.find((show) => show.showId === showId) || null;
+}
+
+function createMockWrestlingMatchRecord(match, index = 0) {
+  const participantRefs = mapMockPeopleRefs(match.personIds || []);
+  const refereeRefs = mapMockPeopleRefs(match.refereeIds || []);
+  const extraPeople = mapMockPeopleRefs([
+    ...(match.managerIds || []),
+    ...(match.commentatorIds || []),
+    ...(match.contributorIds || []),
+  ]);
+
+  return {
+    match_id: match.matchId,
+    match_order: index + 1,
+    match_name: match.matchName || createMockTitleFromSlug(match.matchId),
+    match_type: match.matchType || "",
+    show_id: match.showId,
+    venue_id: match.venueId,
+    side_1: participantRefs.slice(0, Math.ceil(participantRefs.length / 2)),
+    side_2: participantRefs.slice(Math.ceil(participantRefs.length / 2)),
+    participants: participantRefs,
+    extra_people: extraPeople,
+    winner: [],
+    winners: [],
+    referees: refereeRefs,
+    tagged_people: mapMockTaggedPeople(match.taggedPeople),
+    photo_ids: Array.isArray(match.photoIds) ? match.photoIds : [],
+    stats: {
+      photoCount: Number(match.photoIds?.length || 0),
+      participantCount: participantRefs.length,
+    },
+  };
+}
+
+function createMockApiEnvelope(route, source, data, stats = {}) {
+  const count = Array.isArray(data) ? data.length : 0;
+
+  return {
+    ok: true,
+    route,
+    source,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    generatedTime: "Mock Static",
+    count,
+    total: count,
+    page: 1,
+    limit: count || 1,
+    totalPages: count ? 1 : 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    filters: {},
+    sort: {},
+    meta: {
+      route,
+      source,
+      pagination: {
+        count,
+        total: count,
+        page: 1,
+        limit: count || 1,
+        totalPages: count ? 1 : 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+      warnings: ["Static frontend mock response; not wired to the live API."],
+    },
+    stats,
+    data,
+  };
+}
+
+function createMockStatsEnvelope(route, source, stats = {}) {
+  return {
+    ok: true,
+    route,
+    source,
+    generatedAt: "2026-01-01T00:00:00.000Z",
+    generatedTime: "Mock Static",
+    ...stats,
+    stats,
+  };
+}
+
 function standardizeMusicMockRows() {
-  musicBandIndexRows.forEach((band) => {
+  musicBandIndexRows.forEach((band, index) => {
+    const bandId = band.bandId;
+    const photoCount = Number(band.photos || band.albums || 0);
+    const backendRecord = {
+      band: band.name,
+      band_id: bandId,
+      general: {
+        name: band.name,
+        smug_folder: "",
+        logo_url: "",
+        status: band.status,
+        tags: [band.region].filter(Boolean),
+        notes: "",
+      },
+      personnel: {
+        members: [],
+        past_members: [],
+      },
+      stats: {
+        region: band.region,
+        location: "",
+        state: "",
+        country: "US",
+        totalPhotos: photoCount,
+        archived_sets: photoCount,
+        total_sets: photoCount,
+      },
+    };
+
     applyMockAliases(band, {
-      id: band.bandId,
-      slug: band.bandId,
+      id: bandId,
+      band_id: bandId,
+      slug: bandId,
       title: band.name,
       category: band.region,
-      photo_count: Number(band.photos || band.albums || 0),
+      photo_count: photoCount,
+      smug_folder: "",
+      logo_url: "",
+      general: backendRecord.general,
+      personnel: backendRecord.personnel,
+      stats: backendRecord.stats,
+      backend_record: backendRecord,
+      raw_sheet: { mock_row: index + 1 },
       image_url: null,
       related_people: [],
       related_shows: [],
     });
   });
 
-  musicPeopleRows.forEach((person) => {
+  musicPeopleRows.forEach((person, index) => {
+    const personId = index + 1;
+    const bandRefs = mapMockMusicBandRefs(person.band ? [person.band] : []);
+    const backendRecord = {
+      person_id: personId,
+      name: person.name,
+      category: person.role,
+      aliases: [],
+      bands: bandRefs,
+      associations: [],
+      stats: {
+        showCount: Number(person.sets || 0),
+        taggedPhotoCount: Number(person.photos || 0),
+      },
+    };
+
     applyMockAliases(person, {
       id: person.personId,
+      person_id: personId,
       slug: person.personId,
       title: person.name,
       category: person.role,
       photo_count: Number(person.photos || 0),
+      aliases: [],
+      bands: bandRefs,
+      associations: [],
+      stats: backendRecord.stats,
+      backend_record: backendRecord,
       related_people: [],
       related_shows: [],
-      related_bands: person.band ? [person.band] : [],
+      related_bands: bandRefs,
       image_url: null,
     });
   });
 
-  musicShowsArchiveRows.forEach((show) => {
+  musicShowsArchiveRows.forEach((show, index) => {
     const bandCount = parseMockCount(show.bandCount);
+    const date = createMockDate(show);
+    const venueDetails = createMockVenueDetails(show.venue, show.location);
+    const bands = musicBandIndexRows.slice(0, bandCount).map((band) => ({
+      band_id: band.band_id || band.bandId,
+      band: band.name,
+    }));
+    const backendRecord = {
+      show_id: index + 1,
+      name: show.title,
+      venue_id: venueDetails.venue_id,
+      venue: show.venue,
+      venue_details: venueDetails,
+      city: venueDetails.city,
+      state: venueDetails.state,
+      date: date.iso || date.display,
+      poster: show.poster,
+      notes: "",
+      camera_1: "",
+      camera_2: "",
+      bands,
+      stats: { bandCount },
+    };
+
     applyMockAliases(show, {
       id: show.showId,
+      show_id: index + 1,
       slug: show.showId,
-      date: createMockDate(show),
+      date,
       status: "static-placeholder",
       category: "music-show",
       photo_count: Math.max(48, bandCount * 54),
-      venue_details: createMockVenueDetails(show.venue, show.location),
+      venue_id: venueDetails.venue_id,
+      venue_details: venueDetails,
+      bands,
+      stats: backendRecord.stats,
+      backend_record: backendRecord,
       related_people: [],
       related_shows: [show.showId],
       image_url: null,
@@ -815,15 +1044,39 @@ function standardizeMusicMockRows() {
     image_url: null,
   });
 
-  musicPersonDetailPlaceholder.taggedShows.forEach((show) => {
+  musicPersonDetailPlaceholder.taggedShows.forEach((show, index) => {
+    const date = createMockDate(show.date);
+    const venueDetails = createMockVenueDetails(show.venue, show.location);
+    const bands = mapMockMusicBandRefs(musicPersonDetailPlaceholder.associatedBands);
+
     applyMockAliases(show, {
       id: show.showId,
+      show_id: index + 1,
       slug: show.showId,
-      date: createMockDate(show.date),
+      date,
       status: "static-placeholder",
       category: "music-tagged-show",
       photo_count: Number(show.taggedPhotos || 0),
-      venue_details: createMockVenueDetails(show.venue, show.location),
+      venue_id: venueDetails.venue_id,
+      venue_details: venueDetails,
+      bands,
+      stats: { bandCount: bands.length },
+      backend_record: {
+        show_id: index + 1,
+        name: show.title,
+        venue_id: venueDetails.venue_id,
+        venue: show.venue,
+        venue_details: venueDetails,
+        city: venueDetails.city,
+        state: venueDetails.state,
+        date: date.iso || date.display,
+        poster: show.thumb,
+        notes: show.notes || "",
+        camera_1: "",
+        camera_2: "",
+        bands,
+        stats: { bandCount: bands.length },
+      },
       related_people: [musicPersonDetailPlaceholder.personId],
       related_shows: [show.showId],
       image_url: null,
@@ -832,14 +1085,32 @@ function standardizeMusicMockRows() {
 }
 
 function standardizeWrestlingMockRows() {
-  wrestlingPeopleRows.forEach((person) => {
+  wrestlingPeopleRows.forEach((person, index) => {
+    const backendRecord = {
+      id: index + 1,
+      slug: person.personId,
+      name: person.name,
+      category: person.role,
+      aliases: Array.isArray(person.aliases) ? person.aliases : [],
+      teams: person.teamIds || [],
+      notes: person.factionTeam || "",
+    };
+
     applyMockAliases(person, {
       id: person.personId,
+      person_numeric_id: index + 1,
       slug: person.personId,
       title: person.name,
       status: "static-placeholder",
       category: person.role,
       photo_count: Number(person.photos || 0),
+      teams: person.teamIds || [],
+      notes: person.factionTeam || "",
+      stats: {
+        matchCount: Number(person.matches || 0),
+        taggedPhotoCount: Number(person.photos || 0),
+      },
+      backend_record: backendRecord,
       related_people: person.personId ? [person.personId] : [],
       related_shows: person.showIds || [],
       image_url: null,
@@ -847,14 +1118,38 @@ function standardizeWrestlingMockRows() {
   });
 
   wrestlingVenueRows.forEach((venue) => {
+    const venueDetails = createMockVenueDetails(venue.name, `${venue.city}, ${venue.state}`, venue.venueId);
+    venueDetails.region = venue.region;
+    venueDetails.stats.showCount = Number(venue.eventCount || 0);
+
     applyMockAliases(venue, {
       id: venue.venueId,
+      venue_id: venue.venueId,
+      venue_name: venue.name,
       slug: venue.venueId,
       title: venue.name,
       status: venue.archiveState || "static-placeholder",
       category: "wrestling-venue",
       photo_count: Number(venue.photoCount || 0),
-      venue_details: createMockVenueDetails(venue.name, `${venue.city}, ${venue.state}`, venue.venueId),
+      venue_type: "archive-venue",
+      latitude: null,
+      longitude: null,
+      geo: venueDetails.geo,
+      venue_details: venueDetails,
+      backend_record: {
+        venue_id: venue.venueId,
+        venue_name: venue.name,
+        city: venue.city,
+        state: venue.state,
+        country: "US",
+        region: venue.region,
+        venue_type: "archive-venue",
+        status: venue.archiveState || "static-placeholder",
+        latitude: null,
+        longitude: null,
+        notes: "",
+        geo: venueDetails.geo,
+      },
       related_people: [],
       related_shows: venue.showIds || [],
       image_url: null,
@@ -866,15 +1161,52 @@ function standardizeWrestlingMockRows() {
     ...wrestlingVenueEventHistoryRows,
     ...wrestlingShowRelationshipRows,
   ].forEach((eventRow) => {
+    const venue = getMockWrestlingVenue(eventRow.venueId);
+    const venueDetails = createMockVenueDetails(venue?.name || "", venue ? `${venue.city}, ${venue.state}` : "", eventRow.venueId);
+    const date = createMockDate({ eventDate: eventRow.eventDate });
+    const matchRows = (eventRow.matchIds || [])
+      .map((matchId) => wrestlingMatchRelationshipRows.find((match) => match.matchId === matchId))
+      .filter(Boolean)
+      .map(createMockWrestlingMatchRecord);
+    const backendRecord = {
+      show_id: eventRow.show_id || eventRow.showId || eventRow.eventId,
+      show_key: eventRow.showId || eventRow.eventId,
+      promotion: eventRow.promotion || "Limitless Wrestling",
+      show_name: eventRow.eventName || createMockTitleFromSlug(eventRow.showId || eventRow.eventId),
+      date: date.iso || eventRow.eventDate || "",
+      venue_id: eventRow.venueId || "",
+      venue: venue?.name || "",
+      venue_details: venueDetails,
+      city: venue?.city || "",
+      state: venue?.state || "",
+      poster: "",
+      camera_1: "",
+      camera_2: "",
+      matches: matchRows,
+      stats: {
+        matchCount: matchRows.length,
+        participantCount: new Set(eventRow.personIds || []).size,
+      },
+    };
+
     applyMockAliases(eventRow, {
       id: eventRow.eventId || eventRow.showId,
+      show_id: eventRow.showId || eventRow.eventId,
+      show_key: eventRow.showId || eventRow.eventId,
       slug: eventRow.eventId || eventRow.showId,
       title: eventRow.eventName || eventRow.showId,
-      date: createMockDate({ eventDate: eventRow.eventDate }),
+      date,
       status: "static-placeholder",
       category: "wrestling-show",
       photo_count: Number(eventRow.photoCount || eventRow.photoIds?.length || 0),
-      venue_details: createMockVenueDetails("", "", eventRow.venueId),
+      venue_details: venueDetails,
+      matches: matchRows,
+      participants: mapMockPeopleRefs(eventRow.personIds || []),
+      winners: [],
+      winner: [],
+      referees: mapMockPeopleRefs(eventRow.refereeIds || []),
+      stats: backendRecord.stats,
+      backend_record: backendRecord,
       related_people: eventRow.personIds || [],
       related_shows: eventRow.showId ? [eventRow.showId] : [],
       tagged_people: mapMockTaggedPeople(eventRow.taggedPeople),
@@ -882,15 +1214,27 @@ function standardizeWrestlingMockRows() {
     });
   });
 
-  wrestlingMatchRelationshipRows.forEach((match) => {
+  wrestlingMatchRelationshipRows.forEach((match, index) => {
+    const backendRecord = createMockWrestlingMatchRecord(match, index);
+
     applyMockAliases(match, {
       id: match.matchId,
+      match_id: match.matchId,
+      match_order: index + 1,
       slug: match.matchId,
       title: match.matchName || match.matchId,
       status: "static-placeholder",
       category: "wrestling-match",
       photo_count: Number(match.photoIds?.length || 0),
       venue_details: createMockVenueDetails("", "", match.venueId),
+      participants: backendRecord.participants,
+      extra_people: backendRecord.extra_people,
+      winners: backendRecord.winners,
+      winner: backendRecord.winner,
+      referees: backendRecord.referees,
+      photo_ids: backendRecord.photo_ids,
+      stats: backendRecord.stats,
+      backend_record: backendRecord,
       related_people: match.personIds || [],
       related_shows: match.showId ? [match.showId] : [],
       tagged_people: mapMockTaggedPeople(match.taggedPeople),
@@ -900,9 +1244,153 @@ function standardizeWrestlingMockRows() {
 }
 
 // Compatibility aliases let legacy render code keep camelCase fields while
-// future mock/API adapters can read stable backend-friendly names.
+// future mock/API adapters can read stable backend-friendly names. Pass 3 adds
+// backend_record and mock API envelopes without connecting to live endpoints.
 standardizeMusicMockRows();
 standardizeWrestlingMockRows();
+
+const musicVenuesDbMockRows = Array.from(
+  new Map(musicShowsArchiveRows.map((show) => [show.venue_details.venue_id, show.venue_details])).values()
+).map((venue) => ({
+  venue_id: venue.venue_id,
+  venue: venue.venue,
+  city: venue.city,
+  state: venue.state,
+  country: venue.country,
+  region: venue.region,
+  logo: "",
+  latitude: null,
+  longitude: null,
+  status: venue.status,
+  notes: "",
+  geo: venue.geo,
+  description: "",
+  location: venue.location,
+  media: venue.media,
+  stats: venue.stats,
+}));
+
+const musicBandsStatsMock = {
+  bandsTotal: musicBandIndexRows.length,
+  completeArchive: musicBandIndexRows.filter((band) => band.statusKey === "complete").length,
+  partialArchive: musicBandIndexRows.filter((band) => band.statusKey === "partial").length,
+  needsWork: musicBandIndexRows.filter((band) => band.statusKey === "needs").length,
+  totalPhotos: musicBandIndexRows.reduce((sum, band) => sum + Number(band.photo_count || 0), 0),
+};
+const musicPeopleStatsMock = {
+  peopleTotal: musicPeopleRows.length,
+  performersTotal: musicPeopleRows.length,
+  friendsTotal: 0,
+  categoriesTotal: new Set(musicPeopleRows.map((person) => person.category).filter(Boolean)).size,
+  uniqueBands: new Set(musicPeopleRows.flatMap((person) => (person.related_bands || []).map((band) => band.band))).size,
+};
+const musicShowsStatsMock = {
+  showsTotal: musicShowsArchiveRows.length,
+  bandsTotal: musicBandIndexRows.length,
+  venuesTotal: musicVenuesDbMockRows.length,
+  totalBandSlots: musicShowsArchiveRows.reduce((sum, show) => sum + Number(show.stats?.bandCount || 0), 0),
+};
+const musicVenuesStatsMock = {
+  venuesTotal: musicVenuesDbMockRows.length,
+  citiesTotal: new Set(musicVenuesDbMockRows.map((venue) => venue.city).filter(Boolean)).size,
+  statesTotal: new Set(musicVenuesDbMockRows.map((venue) => venue.state).filter(Boolean)).size,
+};
+const wrestlingShowsStatsMock = {
+  showsTotal: wrestlingShowRelationshipRows.length,
+  matchesTotal: wrestlingMatchRelationshipRows.length,
+};
+const wrestlingPeopleStatsMock = {
+  peopleTotal: wrestlingPeopleRows.length,
+  wrestlersTotal: wrestlingPeopleRows.filter((person) => /wrestler/i.test(person.category)).length,
+  refereesTotal: wrestlingPeopleRows.filter((person) => /referee/i.test(person.category)).length,
+  withTeams: wrestlingPeopleRows.filter((person) => person.teams?.length).length,
+  uniqueTeams: new Set(wrestlingPeopleRows.flatMap((person) => person.teams || [])).size,
+};
+const wrestlingVenuesStatsMock = {
+  venuesTotal: wrestlingVenueRows.length,
+  citiesTotal: new Set(wrestlingVenueRows.map((venue) => venue.city).filter(Boolean)).size,
+  statesTotal: new Set(wrestlingVenueRows.map((venue) => venue.state).filter(Boolean)).size,
+};
+
+const mockApiResponses = {
+  "/api/music/bands/db": createMockApiEnvelope(
+    "/api/music/bands/db",
+    "PostgreSQL:music_bands",
+    musicBandIndexRows.map((band) => band.backend_record),
+    musicBandsStatsMock
+  ),
+  "/api/music/bands/stats": createMockStatsEnvelope(
+    "/api/music/bands/stats",
+    "PostgreSQL:music_bands",
+    musicBandsStatsMock
+  ),
+  "/api/music/people/db": createMockApiEnvelope(
+    "/api/music/people/db",
+    { type: "postgres", table: "music_people" },
+    musicPeopleRows.map((person) => person.backend_record),
+    musicPeopleStatsMock
+  ),
+  "/api/music/people/stats": createMockStatsEnvelope(
+    "/api/music/people/stats",
+    { type: "postgres", table: "music_people" },
+    musicPeopleStatsMock
+  ),
+  "/api/music/shows/db": createMockApiEnvelope(
+    "/api/music/shows/db",
+    "PostgreSQL:music_shows",
+    musicShowsArchiveRows.map((show) => show.backend_record),
+    musicShowsStatsMock
+  ),
+  "/api/music/shows/stats": createMockStatsEnvelope(
+    "/api/music/shows/stats",
+    "PostgreSQL:music_shows",
+    musicShowsStatsMock
+  ),
+  "/api/music/venues/db": createMockApiEnvelope(
+    "/api/music/venues/db",
+    { type: "postgres", table: "music_venues" },
+    musicVenuesDbMockRows,
+    musicVenuesStatsMock
+  ),
+  "/api/music/venues/stats": createMockStatsEnvelope(
+    "/api/music/venues/stats",
+    { type: "postgres", table: "music_venues" },
+    musicVenuesStatsMock
+  ),
+  "/api/wrestling/shows/db": createMockApiEnvelope(
+    "/api/wrestling/shows/db",
+    "PostgreSQL:wrestling_shows",
+    wrestlingShowRelationshipRows.map((show) => show.backend_record),
+    wrestlingShowsStatsMock
+  ),
+  "/api/wrestling/shows/stats": createMockStatsEnvelope(
+    "/api/wrestling/shows/stats",
+    "PostgreSQL:wrestling_shows",
+    wrestlingShowsStatsMock
+  ),
+  "/api/wrestling/people/db": createMockApiEnvelope(
+    "/api/wrestling/people/db",
+    { type: "postgres", table: "wrestling_people" },
+    wrestlingPeopleRows.map((person) => person.backend_record),
+    wrestlingPeopleStatsMock
+  ),
+  "/api/wrestling/people/stats": createMockStatsEnvelope(
+    "/api/wrestling/people/stats",
+    { type: "postgres", table: "wrestling_people" },
+    wrestlingPeopleStatsMock
+  ),
+  "/api/wrestling/venues/db": createMockApiEnvelope(
+    "/api/wrestling/venues/db",
+    { type: "postgres", table: "wrestling_venues" },
+    wrestlingVenueRows.map((venue) => venue.backend_record),
+    wrestlingVenuesStatsMock
+  ),
+  "/api/wrestling/venues/stats": createMockStatsEnvelope(
+    "/api/wrestling/venues/stats",
+    { type: "postgres", table: "wrestling_venues" },
+    wrestlingVenuesStatsMock
+  ),
+};
 
 const bandsAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const radarPointOffsets = [

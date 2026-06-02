@@ -6,6 +6,8 @@ Status: documentation only. No mock data was removed, no routes were changed, an
 
 Pass 2 update: `js/state.js` now applies compatibility aliases to active Music and Wrestling mock rows. Legacy render fields remain intact, while mock objects also expose backend-friendlier keys such as `id`, `slug`, `title`, `date`, `status`, `category`, `photo_count`, `venue_details`, `related_people`, `related_shows`, `tagged_people`, and `image_url` where practical.
 
+Pass 3 update: `js/state.js` now attaches `backend_record` objects and static `mockApiResponses` envelopes for the current Music and Wrestling DB/stat route patterns. These mocks mirror the backend JSON contracts more closely with snake_case IDs, nested `stats`, `venue_details`, `geo`, relationship arrays, `matches`, `participants`, `winner`/`winners`, `referees`, and `tagged_people`, while the existing camelCase render fields remain in place.
+
 ## Inventory Rules
 
 - Preserve current static-first visual behavior until a replacement pass is approved.
@@ -85,6 +87,7 @@ Pass 2 update: `js/state.js` now applies compatibility aliases to active Music a
 
 - Current frontend fixtures mostly use camelCase IDs (`bandId`, `personId`, `showId`, `venueId`, `matchId`), while planned backend JSON uses snake_case stable IDs (`band_id`, `person_id`, `show_id`, `venue_id`, `match_id`).
 - Pass 2 added non-destructive aliases rather than replacing camelCase fields, so both old UI consumers and future adapter-style readers can coexist during cleanup.
+- Pass 3 added backend-shaped `backend_record` snapshots and mock response envelopes rather than wiring live fetch calls, so future API adapters can be compared against realistic frontend fixtures without changing current module behavior.
 - Music show snapshots generated in `modules/music.js` already emit some snake_case keys (`show_id`, `venue_id`, `band_ids`, `media_ids`, `archive_meta`), but they are derived from camelCase frontend rows and display strings.
 - Music fixture rows often store display-ready labels instead of canonical IDs, especially for venues, locations, counts, roles, and dates.
 - Wrestling fixtures are closer to relationship data but still do not match the planned match/show contracts exactly.
