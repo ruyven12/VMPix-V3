@@ -322,30 +322,22 @@ function renderGlobalMenu() {
   globalNavButtons = document.querySelectorAll("[data-global-nav-target]");
 }
 
-function syncGlobalMenuArchiveBuild() {
-  const globalMenuArchiveBuild = document.querySelector("[data-global-menu-archive-build]");
-  const archiveBuild = document.querySelector("[data-archive-build]");
-  if (globalMenuArchiveBuild && archiveBuild) {
-    globalMenuArchiveBuild.textContent = archiveBuild.textContent.trim();
+function setShellLogoFallback(isFallback) {
+  if (bottomRail) {
+    bottomRail.classList.toggle("is-logo-fallback", isFallback);
   }
 }
 
-function setGlobalMenuLogoFallback(isFallback) {
-  if (globalMenuDrawer) {
-    globalMenuDrawer.classList.toggle("is-logo-fallback", isFallback);
-  }
-}
-
-function initGlobalMenuLogo() {
-  const logoVideo = document.querySelector("[data-global-menu-logo-video]");
-  const logoFallback = document.querySelector("[data-global-menu-logo-fallback]");
+function initShellRailLogo() {
+  const logoVideo = document.querySelector("[data-shell-logo-video]");
+  const logoFallback = document.querySelector("[data-shell-logo-fallback]");
   if (!logoVideo || !logoFallback) {
     return;
   }
 
   const updateLogoMode = () => {
     const shouldUseFallback = reducedMotion.matches || logoVideo.error;
-    setGlobalMenuLogoFallback(Boolean(shouldUseFallback));
+    setShellLogoFallback(Boolean(shouldUseFallback));
     if (shouldUseFallback) {
       logoVideo.pause();
       return;
@@ -353,11 +345,11 @@ function initGlobalMenuLogo() {
 
     const playResult = logoVideo.play();
     if (playResult && typeof playResult.catch === "function") {
-      playResult.catch(() => setGlobalMenuLogoFallback(true));
+      playResult.catch(() => setShellLogoFallback(true));
     }
   };
 
-  logoVideo.addEventListener("error", () => setGlobalMenuLogoFallback(true));
+  logoVideo.addEventListener("error", () => setShellLogoFallback(true));
   logoVideo.addEventListener("canplay", updateLogoMode, { once: true });
   if (typeof reducedMotion.addEventListener === "function") {
     reducedMotion.addEventListener("change", updateLogoMode);
@@ -1766,8 +1758,7 @@ function activatePortal() {
 
 if (shell && startButton) {
   renderGlobalMenu();
-  syncGlobalMenuArchiveBuild();
-  initGlobalMenuLogo();
+  initShellRailLogo();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", () => {

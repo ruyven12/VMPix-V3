@@ -11842,7 +11842,8 @@ img.archive-gallery-image {
   }
 
   .universal-bottom-rail {
-    grid-template-columns: minmax(0, 1fr) minmax(4.9rem, auto);
+    --rail-logo-width: clamp(5.2rem, 28vw, 7rem);
+    grid-template-columns: minmax(0, 1fr) minmax(5.2rem, var(--rail-logo-width));
     gap: 0.38rem;
     padding-top: 0.48rem;
     padding-bottom: max(0.52rem, env(safe-area-inset-bottom));
@@ -11851,8 +11852,8 @@ img.archive-gallery-image {
     text-align: left;
   }
 
-  .rail-brand {
-    display: none;
+  .rail-cluster--right {
+    max-width: var(--rail-logo-width);
   }
 
   .rail-cluster {
