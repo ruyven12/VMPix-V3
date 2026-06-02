@@ -10279,14 +10279,19 @@ img.archive-gallery-image {
   z-index: 2;
   grid-area: 1 / 1;
   width: min(100%, var(--hub-max));
-  height: min(100%, var(--stage-max-height));
-  min-height: min(var(--stage-min-height), 100%);
+  height: 100%;
+  min-height: 0;
   min-width: 0;
-  max-height: 100%;
+  max-height: min(100%, var(--stage-max-height));
   display: grid;
+  align-self: stretch;
   align-content: start;
-  gap: clamp(0.82rem, 2.3svh, 1.18rem);
-  padding: clamp(0.85rem, 4vw, 1.35rem);
+  justify-self: center;
+  gap: clamp(0.68rem, 1.9svh, 1rem);
+  padding:
+    clamp(2.65rem, 8vw, 3.15rem)
+    clamp(0.85rem, 4vw, 1.35rem)
+    clamp(0.85rem, 4vw, 1.35rem);
   border: 1px solid rgba(247, 247, 242, 0.16);
   border-radius: var(--radius-md);
   background:
@@ -10299,16 +10304,19 @@ img.archive-gallery-image {
   overflow-y: auto;
   overscroll-behavior: contain;
   pointer-events: none;
+  scroll-behavior: smooth;
   scroll-padding-block: var(--shell-viewport-pad-block);
   scrollbar-color: rgba(213, 22, 34, 0.38) rgba(247, 247, 242, 0.07);
   scrollbar-width: thin;
   scrollbar-gutter: stable;
+  touch-action: pan-y;
   transform: translate3d(0, 0.36rem, 0) scale(0.985);
   transition:
     opacity var(--motion-standard) var(--ease-standard),
     transform var(--motion-standard) var(--ease-standard),
     visibility var(--motion-standard) var(--ease-standard);
   visibility: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .contact-shell::-webkit-scrollbar {
@@ -10341,10 +10349,10 @@ img.archive-gallery-image {
 }
 
 .contact-shell::after {
-  inset: clamp(3.1rem, 13vw, 5rem) clamp(1.1rem, 5vw, 2.2rem) auto;
+  inset: clamp(4.1rem, 12vw, 5.35rem) clamp(1.1rem, 5vw, 2.2rem) auto;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(213, 22, 34, 0.34), rgba(0, 178, 190, 0.2), transparent);
-  opacity: 0.72;
+  opacity: 0.64;
 }
 
 .contact-header,
@@ -10389,15 +10397,17 @@ img.archive-gallery-image {
 }
 
 .contact-layout {
+  width: min(100%, 54.5rem);
+  justify-self: center;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: clamp(0.72rem, 2.4vw, 1rem);
+  gap: clamp(0.62rem, 2.2vw, 1rem);
   align-items: start;
 }
 
 .contact-form-shell {
   display: grid;
-  gap: clamp(0.58rem, 1.7svh, 0.74rem);
+  gap: clamp(0.54rem, 1.45svh, 0.72rem);
   padding: var(--v3-card-padding);
   border: var(--v3-card-border);
   border-radius: var(--v3-card-radius);
@@ -10409,7 +10419,7 @@ img.archive-gallery-image {
 
 .contact-field {
   display: grid;
-  gap: 0.34rem;
+  gap: 0.3rem;
   min-width: 0;
 }
 
@@ -10445,7 +10455,7 @@ img.archive-gallery-image {
 }
 
 .contact-textarea {
-  min-height: 8.8rem;
+  min-height: clamp(7.75rem, 21svh, 8.8rem);
   resize: vertical;
   padding: 0.78rem;
 }
@@ -10457,8 +10467,18 @@ img.archive-gallery-image {
   background-color: rgba(3, 3, 6, 0.62);
 }
 
+.contact-form-note {
+  min-width: 0;
+  margin: 0;
+  color: rgba(247, 247, 242, 0.5);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.72rem, 2.8vw, 0.82rem);
+  line-height: 1.35;
+}
+
 .contact-send {
-  min-width: min(100%, 11.75rem);
+  width: 100%;
+  min-width: 0;
   min-height: var(--tap-target);
   margin-top: 0.12rem;
   padding: 0.72rem 0.92rem;
@@ -10476,6 +10496,10 @@ img.archive-gallery-image {
   text-transform: uppercase;
 }
 
+.contact-send[data-contact-static-action] {
+  opacity: 0.78;
+}
+
 .contact-send:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.2rem;
@@ -10483,13 +10507,13 @@ img.archive-gallery-image {
 
 .contact-methods {
   display: grid;
-  gap: clamp(0.48rem, 1.7vw, 0.64rem);
+  gap: clamp(0.42rem, 1.5vw, 0.62rem);
 }
 
 .contact-method-card {
   display: grid;
   gap: var(--v3-card-gap-tight);
-  min-height: clamp(4.45rem, 19vw, 5.8rem);
+  min-height: clamp(3.9rem, 17vw, 5.35rem);
   padding: var(--v3-card-padding);
   border: var(--v3-card-border);
   border-radius: var(--v3-card-radius);
@@ -11363,6 +11387,10 @@ img.archive-gallery-image {
   }
 
   .calendar-shell {
+    padding: clamp(2.65rem, 8vw, 3.15rem) 0.72rem 0.72rem;
+  }
+
+  .contact-shell {
     padding: clamp(2.65rem, 8vw, 3.15rem) 0.72rem 0.72rem;
   }
 
