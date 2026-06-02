@@ -112,6 +112,179 @@ function renderSiteModuleMockState(surface, scope, stateName, renderOptions = {}
   return renderMockState(surface, stateName, scope, renderOptions);
 }
 
+const MUSIC_NEXUS_STATS_API_BASE_URL = "https://vmpix-data.onrender.com";
+const MUSIC_NEXUS_STATS_TIMEOUT_MS = 8000;
+const MUSIC_NEXUS_LIVE_STAT_CONFIG = [
+  { key: "bands", route: "/api/music/bands", field: "bandsTotal" },
+  { key: "shows", route: "/api/music/shows", field: "showsTotal" },
+  { key: "people", route: "/api/music/people", field: "peopleTotal" },
+  { key: "venues", route: "/api/music/venues", field: "venuesTotal" },
+  { key: "photos", route: "/api/music/bands", field: "photosTotal" },
+];
+
+let musicLandingStatsRequest = null;
+let musicLandingStatsLoaded = false;
+
+function formatMusicLandingStatValue(value, fallbackValue = "") {
+  const numericValue = Number(value);
+  if (Number.isFinite(numericValue)) {
+    return numericValue.toLocaleString();
+  }
+
+  return String(fallbackValue || value || "");
+}
+
+function getMusicLandingStatValueElement(key) {
+  return document.querySelector(`[data-music-stat-value='${key}']`);
+}
+
+function setMusicLandingStatsState(stateName) {
+  const statsSurface = document.querySelector("[data-music-landing-stats]");
+  if (!statsSurface) {
+    return;
+  }
+
+  statsSurface.dataset.statsState = stateName;
+  statsSurface.setAttribute("aria-busy", String(stateName === "loading"));
+}
+
+function getFallbackMusicLandingStatValue(key) {
+  const valueElement = getMusicLandingStatValueElement(key);
+  if (!valueElement) {
+    return "";
+  }
+
+  return formatMusicLandingStatValue(valueElement.dataset.fallbackValue || valueElement.textContent);
+}
+
+function setMusicLandingStatValue(key, value, sourceName) {
+  const valueElement = getMusicLandingStatValueElement(key);
+  if (!valueElement) {
+    return;
+  }
+
+  const fallbackValue = getFallbackMusicLandingStatValue(key);
+  valueElement.textContent = formatMusicLandingStatValue(value, fallbackValue);
+  valueElement.dataset.statSource = sourceName;
+}
+
+function restoreMusicLandingStatFallback(key) {
+  setMusicLandingStatValue(key, getFallbackMusicLandingStatValue(key), "fallback");
+}
+
+function readMusicLandingStatField(payload, fieldName) {
+  const candidates = [
+    payload,
+    payload?.stats,
+    payload?.meta,
+    payload?.meta?.stats,
+    payload?.data,
+    payload?.data?.stats,
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate) &&
+      Object.prototype.hasOwnProperty.call(candidate, fieldName)
+    ) {
+      return candidate[fieldName];
+    }
+  }
+
+  if (fieldName.endsWith("Total")) {
+    for (const candidate of candidates) {
+      if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+        continue;
+      }
+      if (Object.prototype.hasOwnProperty.call(candidate, "count")) {
+        return candidate.count;
+      }
+      if (Object.prototype.hasOwnProperty.call(candidate, "total")) {
+        return candidate.total;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+async function fetchMusicLandingStat(statConfig) {
+  const apiUrl = new URL(statConfig.route, MUSIC_NEXUS_STATS_API_BASE_URL);
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_NEXUS_STATS_TIMEOUT_MS)
+    : 0;
+
+  try {
+    const response = await fetch(apiUrl.href, {
+      cache: "no-store",
+      signal: controller?.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Music stat request failed: ${statConfig.route} (${response.status})`);
+    }
+
+    const payload = await response.json();
+    const value = readMusicLandingStatField(payload, statConfig.field);
+    if (value === undefined || value === null || value === "") {
+      throw new Error(`Music stat field missing: ${statConfig.field}`);
+    }
+
+    return value;
+  } finally {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  }
+}
+
+function requestMusicLandingStats() {
+  const statsSurface = document.querySelector("[data-music-landing-stats]");
+  if (!statsSurface || typeof fetch !== "function") {
+    return Promise.resolve(false);
+  }
+
+  if (musicLandingStatsLoaded) {
+    return Promise.resolve(true);
+  }
+  if (musicLandingStatsRequest) {
+    return musicLandingStatsRequest;
+  }
+
+  setMusicLandingStatsState("loading");
+  musicLandingStatsRequest = Promise.all(
+    MUSIC_NEXUS_LIVE_STAT_CONFIG.map((statConfig) => (
+      fetchMusicLandingStat(statConfig)
+        .then((value) => {
+          setMusicLandingStatValue(statConfig.key, value, "live");
+          return true;
+        })
+        .catch(() => {
+          restoreMusicLandingStatFallback(statConfig.key);
+          return false;
+        })
+    ))
+  ).then((results) => {
+    const liveCount = results.filter(Boolean).length;
+    const hasPartialFallback = liveCount > 0 && liveCount < MUSIC_NEXUS_LIVE_STAT_CONFIG.length;
+    musicLandingStatsLoaded = liveCount === MUSIC_NEXUS_LIVE_STAT_CONFIG.length;
+    setMusicLandingStatsState(
+      musicLandingStatsLoaded ? "live" : hasPartialFallback ? "partial" : "fallback"
+    );
+    musicLandingStatsRequest = null;
+    return liveCount > 0;
+  }).catch(() => {
+    MUSIC_NEXUS_LIVE_STAT_CONFIG.forEach((statConfig) => restoreMusicLandingStatFallback(statConfig.key));
+    setMusicLandingStatsState("fallback");
+    musicLandingStatsRequest = null;
+    return false;
+  });
+
+  return musicLandingStatsRequest;
+}
+
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (!shell || !route) {
     return;
@@ -673,6 +846,7 @@ function showMusicNexus(options = {}) {
   const initialSection = options.initialSection || "landing";
   if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
     showMusicNexusLanding({ shouldScroll: false });
+    requestMusicLandingStats();
   } else {
     setMusicNexusContext(initialSection, false, false);
     if (initialSection === "bands") {

@@ -2661,9 +2661,9 @@ img.archive-gallery-image {
 }
 
 .music-landing-hero {
-  min-height: clamp(17rem, 34svh, 19rem);
+  min-height: clamp(8.5rem, 17svh, 9.5rem);
   display: grid;
-  align-items: end;
+  place-items: center;
   padding: 1rem;
   border: 1px solid rgba(247, 247, 242, 0.14);
   border-radius: 0.5rem;
@@ -2846,7 +2846,10 @@ img.archive-gallery-image {
 .music-landing-header {
   z-index: 3;
   width: min(100%, 36rem);
-  padding: 0 0 0.22rem;
+  justify-self: center;
+  align-self: center;
+  padding: 0;
+  text-align: center;
 }
 
 .music-landing-kicker {
@@ -2874,6 +2877,19 @@ img.archive-gallery-image {
   grid-template-columns: repeat(2, minmax(min(100%, 6.25rem), 1fr));
   gap: 0.46rem;
   overflow: visible;
+}
+
+.music-landing-stats[data-stats-state="loading"] .music-landing-stat-value {
+  opacity: 0.68;
+}
+
+.music-landing-stats[data-stats-state="live"] .music-landing-stat,
+.music-landing-stats[data-stats-state="partial"] .music-landing-stat {
+  border-color: color-mix(in srgb, var(--music-landing-cyan) 42%, var(--music-landing-line));
+}
+
+.music-landing-stats[data-stats-state="fallback"] .music-landing-stat {
+  border-color: var(--music-landing-line);
 }
 
 .music-landing-stat {
@@ -3092,7 +3108,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-hero {
-    min-height: 17.2rem;
+    min-height: 8.6rem;
     padding: 0.72rem;
   }
 
@@ -3153,7 +3169,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-hero {
-    min-height: 17rem;
+    min-height: 8.5rem;
   }
 
   .music-landing-stats {
@@ -3172,7 +3188,7 @@ img.archive-gallery-image {
 
 @media (min-width: 480px) {
   .music-landing-hero {
-    min-height: 19rem;
+    min-height: 9.5rem;
   }
 
   .music-landing-title {
@@ -3194,7 +3210,7 @@ img.archive-gallery-image {
 
 @media (min-width: 620px) {
   .music-landing-hero {
-    min-height: 22rem;
+    min-height: 11rem;
   }
 
   .music-landing-title {
@@ -3224,7 +3240,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-hero {
-    min-height: 12.5rem;
+    min-height: 6.25rem;
     padding: 0.68rem;
   }
 
@@ -3271,7 +3287,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-hero {
-    min-height: min(48svh, 30rem);
+    min-height: min(24svh, 15rem);
     padding: 1.35rem;
   }
 
