@@ -6321,6 +6321,10 @@ img.archive-gallery-image {
 }
 
 .music-shows-archive {
+  min-height: min(100%, calc(100svh - 12rem));
+  max-height: calc(100svh - 7.5rem);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(0.64rem, 2svh, 0.9rem);
   padding: clamp(0.58rem, 2.2vw, 0.84rem);
   border-color: rgba(247, 247, 242, 0.09);
@@ -6471,10 +6475,18 @@ img.archive-gallery-image {
 .music-shows-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: clamp(0.54rem, 1.7vw, 0.76rem);
   margin: 0;
-  padding: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 0.12rem 0 0;
   list-style: none;
+  scrollbar-color: rgba(213, 22, 34, 0.36) rgba(247, 247, 242, 0.055);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .music-shows-item,
@@ -6544,12 +6556,10 @@ img.archive-gallery-image {
 }
 
 .music-show-id-value {
-  display: grid;
-  justify-items: center;
-  gap: 0.02rem;
+  display: block;
   color: rgba(247, 247, 242, 0.9);
   font-size: clamp(0.92rem, 3.5vw, 1.2rem);
-  line-height: 0.9;
+  line-height: 1;
   text-transform: none;
   word-break: break-word;
 }
@@ -11815,6 +11825,8 @@ img.archive-gallery-image {
 
   .music-shows-archive {
     gap: 0.5rem;
+    min-height: min(100%, calc(100svh - 9.5rem));
+    max-height: calc(100svh - 5.75rem);
     padding: 0.5rem;
   }
 
@@ -11837,6 +11849,7 @@ img.archive-gallery-image {
 
   .music-shows-grid {
     gap: 0.46rem;
+    padding-right: 0.08rem;
   }
 
   .music-show-card {
@@ -12782,7 +12795,7 @@ img.archive-gallery-image {
   }
 
   .music-shows-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .music-bands-index {

@@ -4531,17 +4531,7 @@ function createMusicShowIdBlock(show) {
 
   const value = document.createElement("span");
   value.className = "music-show-id-value";
-  if (!showId) {
-    value.textContent = "Pending";
-  } else if (/^\d+$/.test(showId) && showId.length <= 4) {
-    showId.split("").forEach((digit) => {
-      const digitSpan = document.createElement("span");
-      digitSpan.textContent = digit;
-      value.append(digitSpan);
-    });
-  } else {
-    value.textContent = showId;
-  }
+  value.textContent = showId || "Pending";
 
   block.append(label, value);
   return block;
