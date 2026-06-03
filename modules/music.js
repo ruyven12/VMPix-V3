@@ -7,7 +7,7 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
-const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows";
+const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db?limit=100";
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 8000;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
@@ -1314,6 +1314,45 @@ function restoreMusicShowsSetsFallback() {
   setMusicShowsSetsCollection(getFallbackSetRowsData(), "fallback");
 }
 
+function getMusicShowsSetsApiUrl(page = 1) {
+  const apiUrl = new URL(MUSIC_SHOWS_SETS_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+  if (!apiUrl.searchParams.has("limit")) {
+    apiUrl.searchParams.set("limit", "100");
+  }
+  apiUrl.searchParams.set("page", String(page));
+  return apiUrl;
+}
+
+function fetchMusicShowsSetsPage(page, signal) {
+  return fetch(getMusicShowsSetsApiUrl(page), {
+    cache: "no-store",
+    signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music shows request failed (${response.status})`);
+      }
+      return response.json();
+    });
+}
+
+function getMusicShowsPayloadPageCount(payload) {
+  const pageCount = Number(payload?.totalPages || payload?.meta?.pagination?.totalPages);
+  return Number.isFinite(pageCount) && pageCount > 0 ? Math.min(Math.trunc(pageCount), 10) : 1;
+}
+
+function mergeMusicShowsPayloadPages(payloads) {
+  const rows = payloads.flatMap(getMusicShowsPayloadRows);
+  return {
+    ...(payloads[0] || {}),
+    data: rows,
+    source: {
+      ...(payloads[0]?.source && typeof payloads[0].source === "object" ? payloads[0].source : {}),
+      data: rows,
+    },
+  };
+}
+
 function requestMusicShowsSetsData() {
   if (musicShowsSetsLoaded) {
     return Promise.resolve(true);
@@ -1334,17 +1373,20 @@ function requestMusicShowsSetsData() {
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), MUSIC_SHOWS_SETS_TIMEOUT_MS)
     : 0;
-  const apiUrl = new URL(MUSIC_SHOWS_SETS_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-
-  musicShowsSetsRequest = fetch(apiUrl, {
-    cache: "no-store",
-    signal: controller?.signal,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Music shows request failed (${response.status})`);
+  musicShowsSetsRequest = fetchMusicShowsSetsPage(1, controller?.signal)
+    .then((firstPayload) => {
+      const totalPages = getMusicShowsPayloadPageCount(firstPayload);
+      if (totalPages <= 1) {
+        return firstPayload;
       }
-      return response.json();
+
+      const pageRequests = [];
+      for (let page = 2; page <= totalPages; page += 1) {
+        pageRequests.push(fetchMusicShowsSetsPage(page, controller?.signal));
+      }
+
+      return Promise.all(pageRequests)
+        .then((remainingPayloads) => mergeMusicShowsPayloadPages([firstPayload, ...remainingPayloads]));
     })
     .then((payload) => requestMusicVenuesData().then(() => payload))
     .then((payload) => {
