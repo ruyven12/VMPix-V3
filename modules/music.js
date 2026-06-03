@@ -1233,13 +1233,36 @@ function getMusicShowNotes(show) {
   return notes || "No notes at the moment.";
 }
 
+function getMusicShowPosterValue(show) {
+  const candidates = [
+    show?.poster,
+    show?.poster_url,
+    show?.posterUrl,
+    show?.poster_image,
+    show?.posterImage,
+    show?.image_url,
+    show?.imageUrl,
+    show?.image,
+    show?.media?.poster,
+    show?.media?.image,
+    show?.images?.poster,
+    show?.images?.full,
+    show?.images?.large,
+    show?.logo_url,
+  ];
+
+  return candidates
+    .map((candidate) => String(candidate || "").trim())
+    .find(Boolean) || "";
+}
+
 function normalizeMusicShowSetRow(record, index = 0) {
   const source = record && typeof record === "object" ? record : {};
   const name = String(source.name || source.title || source.show_name || `Show ${index + 1}`).trim();
   const rawDate = String(source.date || source.show_date || source.eventDate || "").trim();
   const date = parseMusicShowDate(rawDate);
   const setCode = getSetCodeFromDateValue(rawDate) || createBandSlug(`${rawDate || index + 1}-${name}`);
-  const poster = String(source.poster || source.poster_url || source.image_url || source.logo_url || "").trim();
+  const poster = getMusicShowPosterValue(source);
   const city = String(source.city || source.location_city || source.venue_details?.city || source.venueDetails?.city || "").trim();
   const state = String(source.state || source.location_state || source.venue_details?.state || source.venueDetails?.state || "").trim();
   const venue = getMusicShowVenueName(source);
@@ -4268,7 +4291,70 @@ function isMusicShowPosterImageSrc(value) {
 }
 
 function getMusicShowPosterSrc(show) {
-  return isMusicShowPosterImageSrc(show?.poster) ? String(show.poster).trim() : SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  const poster = getMusicShowPosterValue(show);
+  return isMusicShowPosterImageSrc(poster) ? poster : SET_GALLERY_NO_POSTER_IMAGE_SRC;
+}
+
+function setMusicShowPosterImage(image, imageSrc, fallbackElement) {
+  if (!image) {
+    return;
+  }
+
+  const shell = image.parentElement;
+  const nextSrc = String(imageSrc || "").trim();
+  const canLoadImage = isMusicShowPosterImageSrc(nextSrc);
+  if (shell) {
+    shell.classList.remove("has-poster");
+    delete shell.dataset.showPosterSrc;
+  }
+  image.onload = null;
+  image.onerror = null;
+  image.removeAttribute("src");
+  image.hidden = true;
+  image.removeAttribute("data-show-poster-src");
+  if (fallbackElement) {
+    fallbackElement.hidden = false;
+  }
+  if (!canLoadImage) {
+    return;
+  }
+
+  image.dataset.showPosterSrc = nextSrc;
+  if (shell) {
+    shell.dataset.showPosterSrc = nextSrc;
+  }
+  image.referrerPolicy = "strict-origin-when-cross-origin";
+  image.onload = () => {
+    image.hidden = false;
+    if (fallbackElement) {
+      fallbackElement.hidden = true;
+    }
+    if (shell) {
+      shell.classList.add("has-poster");
+    }
+  };
+  image.onerror = () => {
+    image.hidden = true;
+    image.removeAttribute("src");
+    if (fallbackElement) {
+      fallbackElement.hidden = false;
+    }
+    if (shell) {
+      shell.classList.remove("has-poster");
+    }
+  };
+  image.hidden = false;
+  if (fallbackElement) {
+    fallbackElement.hidden = true;
+  }
+  image.src = nextSrc;
+  if (image.complete) {
+    if (image.naturalWidth > 0) {
+      image.onload();
+    } else {
+      image.onerror();
+    }
+  }
 }
 
 function normalizeMusicShowsIndexRow(record, index = 0) {
@@ -4296,7 +4382,7 @@ function normalizeMusicShowsIndexRow(record, index = 0) {
     state,
     location: getMusicShowLocation({ city, state }),
     venue,
-    poster: String(normalized.poster || source.poster || source.poster_url || source.image_url || "").trim(),
+    poster: getMusicShowPosterValue(normalized) || getMusicShowPosterValue(source),
     dateSort: parsedDate ? parsedDate.getTime() : getMusicShowTimestamp(normalized),
   };
 }
@@ -4541,22 +4627,25 @@ function createMusicShowsCard(show) {
   const card = document.createElement("article");
   card.className = "music-show-card";
   card.dataset.showDetailRoute = getMusicShowRouteUrl(show);
+  const posterSrc = getMusicShowPosterSrc(show);
+  card.dataset.showPosterSrc = posterSrc;
 
   const poster = document.createElement("div");
   poster.className = "music-show-poster";
   poster.setAttribute("role", "img");
   poster.setAttribute("aria-label", `${show.name} poster`);
+  poster.dataset.showPosterSrc = posterSrc;
   const posterImage = document.createElement("img");
   posterImage.className = "music-show-poster-image";
   posterImage.alt = "";
-  posterImage.loading = "lazy";
+  posterImage.loading = "eager";
   posterImage.decoding = "async";
   posterImage.hidden = true;
   const posterFallback = document.createElement("span");
   posterFallback.className = "music-show-poster-fallback";
   posterFallback.textContent = "No Poster Available";
   poster.append(posterImage, posterFallback);
-  setArchivePosterImage(posterImage, getMusicShowPosterSrc(show), posterFallback, "has-poster");
+  setMusicShowPosterImage(posterImage, posterSrc, posterFallback);
 
   const body = document.createElement("div");
   body.className = "music-show-body";
