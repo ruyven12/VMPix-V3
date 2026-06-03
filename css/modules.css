@@ -6324,7 +6324,7 @@ img.archive-gallery-image {
   min-height: min(100%, calc(100svh - 12rem));
   max-height: calc(100svh - 7.5rem);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(0.64rem, 2svh, 0.9rem);
   padding: clamp(0.58rem, 2.2vw, 0.84rem);
   border-color: rgba(247, 247, 242, 0.09);
@@ -6466,8 +6466,7 @@ img.archive-gallery-image {
 }
 
 .music-shows-year:focus-visible,
-.music-show-action:focus-visible,
-.music-shows-load-more:focus-visible {
+.music-show-action:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.16rem;
 }
@@ -6486,6 +6485,7 @@ img.archive-gallery-image {
   list-style: none;
   scrollbar-color: rgba(213, 22, 34, 0.36) rgba(247, 247, 242, 0.055);
   scrollbar-width: thin;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -6495,6 +6495,10 @@ img.archive-gallery-image {
 .music-show-body,
 .music-show-footer {
   min-width: 0;
+}
+
+.music-shows-item {
+  touch-action: pan-y;
 }
 
 .music-show-card {
@@ -6515,6 +6519,7 @@ img.archive-gallery-image {
     background-color 180ms ease,
     transform 180ms ease;
   cursor: pointer;
+  touch-action: pan-y;
 }
 
 .music-show-card:hover,
@@ -6667,49 +6672,6 @@ img.archive-gallery-image {
   border-color: rgba(213, 22, 34, 0.42);
   background: rgba(213, 22, 34, 0.12);
   color: rgba(247, 247, 242, 0.86);
-}
-
-.music-shows-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.58rem;
-  padding-top: 0.12rem;
-}
-
-.music-shows-status {
-  margin: 0;
-  min-width: 0;
-  color: rgba(247, 247, 242, 0.48);
-  font-size: clamp(0.58rem, 2.25vw, 0.68rem);
-  line-height: 1.18;
-  text-transform: none;
-}
-
-.music-shows-load-more {
-  appearance: none;
-  min-height: 2.42rem;
-  padding: 0.52rem 0.72rem;
-  border: 1px solid rgba(247, 247, 242, 0.1);
-  border-radius: var(--radius-sm);
-  background: rgba(247, 247, 242, 0.025);
-  color: rgba(247, 247, 242, 0.68);
-  cursor: pointer;
-  font: inherit;
-  font-size: clamp(0.58rem, 2.25vw, 0.68rem);
-  line-height: 1;
-  text-transform: none;
-  white-space: nowrap;
-}
-
-.music-shows-load-more:hover:not(:disabled) {
-  border-color: rgba(213, 22, 34, 0.32);
-  background: rgba(213, 22, 34, 0.07);
-}
-
-.music-shows-load-more:disabled {
-  cursor: default;
-  opacity: 0.42;
 }
 
 .music-shows-empty {
@@ -11878,16 +11840,6 @@ img.archive-gallery-image {
 
   .music-show-action {
     width: 100%;
-  }
-
-  .music-shows-nav {
-    display: grid;
-    gap: 0.42rem;
-  }
-
-  .music-shows-load-more {
-    width: 100%;
-    min-height: 2.7rem;
   }
 
   .music-shows-empty {

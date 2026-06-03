@@ -226,7 +226,6 @@ let activeMusicShowsSearch = "";
 let activeMusicShowsYearFilter = "";
 let activeMusicShowsStateFilter = "";
 let activeMusicShowsVenueFilter = "";
-let visibleMusicShowsCount = 6;
 
 const setImageAccents = [
   { x: "42%", y: "38%", color: "rgba(142, 108, 255, 0.24)" },

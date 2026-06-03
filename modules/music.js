@@ -4162,8 +4162,6 @@ function renderMusicPeopleIndex(options = {}) {
   }
 }
 
-const musicShowsInitialVisibleCount = 6;
-const musicShowsPageSize = 6;
 const musicShowsStateCopy = {
   empty: {
     title: "No shows found.",
@@ -4516,7 +4514,6 @@ function updateMusicShowsFilter(filterName, value) {
   } else if (filterName === "venue") {
     activeMusicShowsVenueFilter = nextValue;
   }
-  visibleMusicShowsCount = musicShowsInitialVisibleCount;
   renderMusicShowsArchive();
 }
 
@@ -4525,13 +4522,6 @@ function resetMusicShowsFilters() {
   activeMusicShowsYearFilter = "";
   activeMusicShowsStateFilter = "";
   activeMusicShowsVenueFilter = "";
-  visibleMusicShowsCount = musicShowsInitialVisibleCount;
-  renderMusicShowsArchive();
-}
-
-function loadMoreMusicShows() {
-  const filteredRows = getFilteredMusicShows();
-  visibleMusicShowsCount = Math.min(filteredRows.length, visibleMusicShowsCount + musicShowsPageSize);
   renderMusicShowsArchive();
 }
 
@@ -4776,7 +4766,6 @@ function requestMusicShowsIndexData() {
   musicShowsIndexDataRequested = true;
   requestMusicShowsSetsData().then(() => {
     if (getRouteFromUrl().name === "music-shows") {
-      visibleMusicShowsCount = Math.max(visibleMusicShowsCount, musicShowsInitialVisibleCount);
       renderMusicShowsArchive({ skipDataRequest: true });
     }
   });
@@ -4822,22 +4811,21 @@ function renderMusicShowsArchive(options = {}) {
 
   const forcedState = getForcedMockState("musicShows");
   const filteredRows = getFilteredMusicShows();
-  const visibleRows = filteredRows.slice(0, visibleMusicShowsCount);
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
     renderMockState(fragment, forcedState, "musicShows", { itemTag: "li", itemClass: "music-shows-empty" });
   } else {
-    visibleRows.forEach((show) => {
-    const item = document.createElement("li");
-    item.className = "music-shows-item";
-    item.append(createMusicShowsCard(show));
-    fragment.append(item);
+    filteredRows.forEach((show) => {
+      const item = document.createElement("li");
+      item.className = "music-shows-item";
+      item.append(createMusicShowsCard(show));
+      fragment.append(item);
     });
     if (forcedState === "partial") {
       renderMockState(fragment, "partial", "musicShows", { itemTag: "li", itemClass: "music-shows-empty" });
     }
   }
-  if (!forcedState && visibleRows.length === 0) {
+  if (!forcedState && filteredRows.length === 0) {
     const empty = document.createElement("li");
     empty.className = "music-shows-empty";
     empty.append(createMusicShowsState("empty"));
@@ -4846,30 +4834,6 @@ function renderMusicShowsArchive(options = {}) {
 
   musicActivityList.append(fragment);
   musicActivityPanel.append(createMusicShowsStateTemplates());
-
-  const nav = document.createElement("footer");
-  nav.className = "music-shows-nav";
-  nav.dataset.musicShowsNav = "";
-
-  const status = document.createElement("p");
-  status.className = "music-shows-status";
-  status.dataset.musicShowsStatus = "";
-  const pageCount = Math.max(1, Math.ceil(filteredRows.length / musicShowsPageSize));
-  const currentPage = Math.max(1, Math.ceil(Math.min(visibleMusicShowsCount, filteredRows.length || 1) / musicShowsPageSize));
-  status.textContent = forcedState && forcedState !== "partial"
-    ? getMockStateCopy(forcedState, "musicShows").title
-    : `${visibleRows.length} of ${filteredRows.length} shows / page ${currentPage} of ${pageCount}`;
-
-  const loadMore = document.createElement("button");
-  loadMore.className = "music-shows-load-more";
-  loadMore.type = "button";
-  loadMore.textContent = "Load More";
-  loadMore.disabled = Boolean(forcedState && forcedState !== "partial") || visibleRows.length >= filteredRows.length;
-  loadMore.hidden = !forcedState && filteredRows.length <= musicShowsInitialVisibleCount;
-  loadMore.addEventListener("click", loadMoreMusicShows);
-
-  nav.append(status, loadMore);
-  musicActivityPanel.append(nav);
   restoreMusicShowsFilterFocus(focusMeta);
   if (!options.skipDataRequest) {
     requestMusicShowsIndexData();
