@@ -30,6 +30,7 @@ let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
 let musicShowsSetsDataState = "fallback";
+let musicShowsIndexDataRequested = false;
 let musicVenuesCollection = [];
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
@@ -4138,20 +4139,19 @@ function renderMusicPeopleIndex(options = {}) {
   }
 }
 
-const musicShowsYearOptions = ["ALL SHOWS", "2026", "2025", "2024", "2023", "2022", "2021", "MORE"];
-const musicShowsInitialVisibleCount = 4;
-const musicShowsPageSize = 4;
+const musicShowsInitialVisibleCount = 6;
+const musicShowsPageSize = 6;
 const musicShowsStateCopy = {
   empty: {
-    title: "No Shows Found",
-    copy: "No archive cards are staged for this year yet.",
+    title: "No shows found.",
+    copy: "Try clearing filters.",
   },
   loading: {
-    title: "Loading Shows Archive",
-    copy: "Archive cards are being prepared.",
+    title: "Loading shows archive",
+    copy: "Archive rows are being prepared.",
   },
   error: {
-    title: "Unable To Load Archive",
+    title: "Unable to load archive",
     copy: "Shows archive data can be retried when the API is connected.",
   },
 };
@@ -4194,25 +4194,46 @@ function createUnknownMusicShow(showId) {
 }
 
 function getMusicShowBandCount(show) {
-  const match = String(show.bandCount || "").match(/\d+/);
+  const directCount = Number.parseInt(show?.stats?.bandCount ?? show?.bandCount ?? "", 10);
+  if (Number.isFinite(directCount) && directCount > 0) {
+    return String(directCount);
+  }
+  if (Array.isArray(show?.bands)) {
+    return String(show.bands.length);
+  }
+  const match = String(show?.bandCount || "").match(/\d+/);
   return match ? match[0] : "0";
 }
 
 function getMusicShowPhotoCount(show) {
+  const photos = Number.parseInt(show?.photo_count ?? show?.photoCount ?? show?.stats?.photos ?? "", 10);
+  if (Number.isFinite(photos) && photos > 0) {
+    return String(photos);
+  }
   const bands = Number.parseInt(getMusicShowBandCount(show), 10) || 0;
   return String(Math.max(48, bands * 54));
 }
 
 function getMusicShowDateLabel(show) {
-  return `${show.month} ${show.day}, ${show.year}`;
+  if (show?.formattedDate) {
+    return show.formattedDate;
+  }
+  if (show?.date || show?.rawDate) {
+    return formatMusicShowDate(show.rawDate || show.date);
+  }
+  return `${show?.month || "TBD"} ${show?.day || "00"}, ${show?.year || "Pending"}`;
 }
 
 function getMusicShowDisplayId(show) {
-  const month = String(musicShowsMonthOrder[String(show.month || "").toUpperCase()] || "0").padStart(2, "0");
-  const day = String(show.day || "00").padStart(2, "0");
-  const yearText = String(show.year || "");
+  const showId = getMusicShowIdValue(show);
+  if (showId) {
+    return showId;
+  }
+  const month = String(musicShowsMonthOrder[String(show?.month || "").toUpperCase()] || "0").padStart(2, "0");
+  const day = String(show?.day || "00").padStart(2, "0");
+  const yearText = String(show?.year || "");
   const year = /^\d{4}$/.test(yearText) ? yearText.slice(-2) : "00";
-  return `${show.poster || "SD"}-${month}${day}${year}`;
+  return `${show?.poster || "SD"}-${month}${day}${year}`;
 }
 
 function getMusicArchiveSlug(value, fallback = "archive-item") {
@@ -4225,29 +4246,148 @@ function getMusicArchiveSlug(value, fallback = "archive-item") {
 }
 
 function getMusicShowTimestamp(show) {
-  const year = Number.parseInt(show.year || "0", 10);
-  const month = musicShowsMonthOrder[String(show.month || "").toUpperCase()] || 0;
-  const day = Number.parseInt(show.day || "0", 10);
+  const existingSort = Number(show?.dateSort);
+  if (Number.isFinite(existingSort) && existingSort > 0) {
+    return existingSort;
+  }
+
+  const parsedDate = parseMusicShowDate(show?.rawDate || show?.date || show?.formattedDate);
+  if (parsedDate) {
+    return parsedDate.getTime();
+  }
+
+  const year = Number.parseInt(show?.year || "0", 10);
+  const month = musicShowsMonthOrder[String(show?.month || "").toUpperCase()] || 0;
+  const day = Number.parseInt(show?.day || "0", 10);
   return (year * 10000) + (month * 100) + day;
 }
 
-function getSortedMusicShows(rows = musicShowsArchiveRows) {
-  return sortMockCollection(rows, (left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left));
+function isMusicShowPosterImageSrc(value) {
+  const poster = String(value || "").trim();
+  return /^(https?:|data:image\/|\/|\.\.?\/)/i.test(poster);
+}
+
+function getMusicShowPosterSrc(show) {
+  return isMusicShowPosterImageSrc(show?.poster) ? String(show.poster).trim() : SET_GALLERY_NO_POSTER_IMAGE_SRC;
+}
+
+function normalizeMusicShowsIndexRow(record, index = 0) {
+  const source = record && typeof record === "object" ? record : {};
+  const normalized = source.name && source.formattedDate !== undefined
+    ? { ...source }
+    : normalizeMusicShowSetRow(source, index);
+  const fallbackTitle = String(source.name || source.title || source.show_name || "").trim() || "Untitled Show";
+  const city = String(normalized.city || source.city || source.location_city || source.venue_details?.city || "").trim();
+  const state = String(normalized.state || source.state || source.location_state || source.venue_details?.state || "").trim();
+  const venue = getMusicShowVenueName(source) || normalized.venue || "Venue Pending";
+  const rawDate = String(normalized.rawDate || source.date || source.show_date || source.eventDate || "").trim();
+  const formattedDate = formatMusicShowDate(rawDate);
+  const parsedDate = parseMusicShowDate(rawDate);
+
+  return {
+    ...normalized,
+    showId: getMusicShowIdValue(source) || normalized.showId || "",
+    year: parsedDate ? String(parsedDate.getFullYear()) : String(normalized.year || "Pending"),
+    rawDate,
+    formattedDate,
+    name: fallbackTitle,
+    title: fallbackTitle,
+    city,
+    state,
+    location: getMusicShowLocation({ city, state }),
+    venue,
+    poster: String(normalized.poster || source.poster || source.poster_url || source.image_url || "").trim(),
+    dateSort: parsedDate ? parsedDate.getTime() : getMusicShowTimestamp(normalized),
+  };
+}
+
+function getMusicShowsIndexSourceRows() {
+  if (musicShowsSetsDataState === "live" && musicShowsSetsCollection.length > 0) {
+    return musicShowsSetsCollection;
+  }
+
+  return musicShowsArchiveRows.map((show) => show.backend_record || show);
+}
+
+function getMusicShowsIndexRows() {
+  return getMusicShowsIndexSourceRows()
+    .map(normalizeMusicShowsIndexRow)
+    .filter((show) => show.name)
+    .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || left.name.localeCompare(right.name));
+}
+
+function getMusicShowsUniqueOptions(rows, valueGetter, sortMode = "alpha") {
+  const values = [...new Set(rows
+    .map(valueGetter)
+    .map((value) => String(value || "").trim())
+    .filter(Boolean))];
+
+  if (sortMode === "year-desc") {
+    return values.sort((left, right) => Number.parseInt(right, 10) - Number.parseInt(left, 10));
+  }
+
+  return values.sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeActiveMusicShowsFilters(rows) {
+  const years = new Set(getMusicShowsUniqueOptions(rows, (show) => show.year, "year-desc"));
+  const states = new Set(getMusicShowsUniqueOptions(rows, (show) => show.state));
+  const venues = new Set(getMusicShowsUniqueOptions(rows, (show) => show.venue === "Venue Pending" ? "" : show.venue));
+  if (activeMusicShowsYearFilter && !years.has(activeMusicShowsYearFilter)) {
+    activeMusicShowsYearFilter = "";
+  }
+  if (activeMusicShowsStateFilter && !states.has(activeMusicShowsStateFilter)) {
+    activeMusicShowsStateFilter = "";
+  }
+  if (activeMusicShowsVenueFilter && !venues.has(activeMusicShowsVenueFilter)) {
+    activeMusicShowsVenueFilter = "";
+  }
 }
 
 function getFilteredMusicShows() {
-  const sortedRows = getSortedMusicShows();
-  if (activeMusicShowsYear === "ALL SHOWS") {
-    return sortedRows;
-  }
-  if (activeMusicShowsYear === "MORE") {
-    return filterMockCollection(sortedRows, (show) => Number.parseInt(show.year || "0", 10) <= 2020);
-  }
-  return filterMockCollection(sortedRows, { year: activeMusicShowsYear });
+  const rows = getMusicShowsIndexRows();
+  normalizeActiveMusicShowsFilters(rows);
+  const searchTerm = activeMusicShowsSearch.trim().toLowerCase();
+
+  return rows.filter((show) => {
+    if (activeMusicShowsYearFilter && show.year !== activeMusicShowsYearFilter) {
+      return false;
+    }
+    if (activeMusicShowsStateFilter && show.state !== activeMusicShowsStateFilter) {
+      return false;
+    }
+    if (activeMusicShowsVenueFilter && show.venue !== activeMusicShowsVenueFilter) {
+      return false;
+    }
+    if (!searchTerm) {
+      return true;
+    }
+
+    return [show.name, show.venue, show.city, show.state, show.location]
+      .some((value) => String(value || "").toLowerCase().includes(searchTerm));
+  });
 }
 
-function updateMusicShowsYearSelection(yearLabel) {
-  activeMusicShowsYear = musicShowsYearOptions.includes(yearLabel) ? yearLabel : "ALL SHOWS";
+function updateMusicShowsFilter(filterName, value) {
+  const nextValue = String(value || "").trim();
+  if (filterName === "search") {
+    activeMusicShowsSearch = nextValue;
+  } else if (filterName === "year") {
+    activeMusicShowsYearFilter = nextValue;
+  } else if (filterName === "state") {
+    activeMusicShowsStateFilter = nextValue;
+  } else if (filterName === "venue") {
+    activeMusicShowsVenueFilter = nextValue;
+  }
+  visibleMusicShowsCount = musicShowsInitialVisibleCount;
+  renderMusicShowsArchive();
+}
+
+function resetMusicShowsFilters() {
+  activeMusicShowsSearch = "";
+  activeMusicShowsYearFilter = "";
+  activeMusicShowsStateFilter = "";
+  activeMusicShowsVenueFilter = "";
   visibleMusicShowsCount = musicShowsInitialVisibleCount;
   renderMusicShowsArchive();
 }
@@ -4256,22 +4396,6 @@ function loadMoreMusicShows() {
   const filteredRows = getFilteredMusicShows();
   visibleMusicShowsCount = Math.min(filteredRows.length, visibleMusicShowsCount + musicShowsPageSize);
   renderMusicShowsArchive();
-}
-
-function getMusicShowsEmptyCopy() {
-  if (activeMusicShowsYear === "MORE") {
-    return {
-      title: "Older Shows Pending",
-      copy: "Pre-2021 archive cards are reserved for a later import.",
-    };
-  }
-  if (activeMusicShowsYear !== "ALL SHOWS") {
-    return {
-      title: "No Shows Found",
-      copy: `${activeMusicShowsYear} archive cards are not staged yet.`,
-    };
-  }
-  return musicShowsStateCopy.empty;
 }
 
 function createMusicShowsState(stateName, stateCopy = musicShowsStateCopy[stateName] || musicShowsStateCopy.empty) {
@@ -4315,21 +4439,112 @@ function selectMusicShowDetailHook(show) {
   musicActivityPanel.dataset.selectedShowRoute = showRoute;
   const status = musicActivityPanel.querySelector("[data-music-shows-status]");
   if (status) {
-    status.textContent = `Show Detail Event Dossier hook ready: ${show.title}`;
+    status.textContent = `Show Detail ready for future wiring: ${show.name || show.title}`;
   }
-  navigateToRoute(showRoute, { historyState: { fromShowsArchive: true } });
 }
 
-function createMusicShowsYearButton(label, isActive = false) {
-  const button = document.createElement("button");
-  button.className = "music-shows-year";
-  button.type = "button";
-  button.textContent = label;
-  button.setAttribute("aria-pressed", String(isActive));
-  button.addEventListener("click", () => {
-    updateMusicShowsYearSelection(label);
+function createMusicShowsFilterField(labelText, fieldName, options, activeValue) {
+  const label = document.createElement("label");
+  label.className = "music-shows-filter-field";
+
+  const labelSpan = document.createElement("span");
+  labelSpan.className = "music-shows-filter-label";
+  labelSpan.textContent = labelText;
+
+  const select = document.createElement("select");
+  select.className = "music-shows-filter-select";
+  select.dataset.musicShowsFilter = fieldName;
+  select.setAttribute("aria-label", `Filter shows by ${labelText.toLowerCase()}`);
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = fieldName === "year" ? "All Years" : fieldName === "state" ? "All States" : "All Venues";
+  select.append(allOption);
+  options.forEach((optionValue) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = optionValue;
+    select.append(option);
   });
-  return button;
+  select.value = activeValue;
+  select.addEventListener("change", () => {
+    updateMusicShowsFilter(fieldName, select.value);
+  });
+
+  label.append(labelSpan, select);
+  return label;
+}
+
+function createMusicShowsFilters(rows) {
+  const filters = document.createElement("section");
+  filters.className = "music-shows-filters";
+  filters.dataset.musicShowsFilters = "";
+  filters.setAttribute("aria-label", "Shows archive filters");
+
+  const searchLabel = document.createElement("label");
+  searchLabel.className = "music-shows-filter-field music-shows-filter-field--search";
+  const searchText = document.createElement("span");
+  searchText.className = "music-shows-filter-label";
+  searchText.textContent = "Search Shows";
+  const searchInput = document.createElement("input");
+  searchInput.className = "music-shows-search-input";
+  searchInput.type = "search";
+  searchInput.autocomplete = "off";
+  searchInput.placeholder = "Search name, venue, city, state";
+  searchInput.value = activeMusicShowsSearch;
+  searchInput.dataset.musicShowsFilter = "search";
+  searchInput.addEventListener("input", () => {
+    updateMusicShowsFilter("search", searchInput.value);
+  });
+  searchLabel.append(searchText, searchInput);
+
+  const years = getMusicShowsUniqueOptions(rows, (show) => show.year, "year-desc").filter((year) => /^\d{4}$/.test(year));
+  const states = getMusicShowsUniqueOptions(rows, (show) => show.state);
+  const venues = getMusicShowsUniqueOptions(rows, (show) => show.venue === "Venue Pending" ? "" : show.venue);
+
+  const resetButton = document.createElement("button");
+  resetButton.className = "music-shows-filter-reset";
+  resetButton.type = "button";
+  resetButton.textContent = "Reset Filters";
+  resetButton.addEventListener("click", resetMusicShowsFilters);
+
+  filters.append(
+    searchLabel,
+    createMusicShowsFilterField("Year", "year", years, activeMusicShowsYearFilter),
+    createMusicShowsFilterField("State", "state", states, activeMusicShowsStateFilter),
+    createMusicShowsFilterField("Venue", "venue", venues, activeMusicShowsVenueFilter),
+    resetButton
+  );
+
+  return filters;
+}
+
+function createMusicShowIdBlock(show) {
+  const showId = String(show.showId || "").trim();
+  const block = document.createElement("div");
+  block.className = "music-show-id-block";
+  block.setAttribute("aria-label", showId ? `Show ${showId}` : "Show Pending");
+
+  const label = document.createElement("span");
+  label.className = "music-show-id-label";
+  label.textContent = "Show";
+
+  const value = document.createElement("span");
+  value.className = "music-show-id-value";
+  if (!showId) {
+    value.textContent = "Pending";
+  } else if (/^\d+$/.test(showId) && showId.length <= 4) {
+    showId.split("").forEach((digit) => {
+      const digitSpan = document.createElement("span");
+      digitSpan.textContent = digit;
+      value.append(digitSpan);
+    });
+  } else {
+    value.textContent = showId;
+  }
+
+  block.append(label, value);
+  return block;
 }
 
 function createMusicShowsCard(show) {
@@ -4337,78 +4552,111 @@ function createMusicShowsCard(show) {
   card.className = "music-show-card";
   card.dataset.showDetailRoute = getMusicShowRouteUrl(show);
 
-  const date = document.createElement("div");
-  date.className = "music-show-date";
-  date.setAttribute("aria-label", `${show.month} ${show.day}, ${show.year}`);
-
-  const month = document.createElement("span");
-  month.className = "music-show-month";
-  month.textContent = show.month;
-
-  const day = document.createElement("span");
-  day.className = "music-show-day";
-  day.textContent = show.day;
-
-  const year = document.createElement("span");
-  year.className = "music-show-year";
-  year.textContent = show.year;
-  date.append(month, day, year);
-
   const poster = document.createElement("div");
   poster.className = "music-show-poster";
   poster.setAttribute("role", "img");
-  poster.setAttribute("aria-label", `${show.title} poster placeholder`);
-  poster.dataset.posterMark = show.poster;
-
-  const posterMark = document.createElement("span");
-  posterMark.className = "music-show-poster-mark";
-  posterMark.setAttribute("aria-hidden", "true");
-  posterMark.textContent = show.poster;
-  poster.append(posterMark);
+  poster.setAttribute("aria-label", `${show.name} poster`);
+  const posterImage = document.createElement("img");
+  posterImage.className = "music-show-poster-image";
+  posterImage.alt = "";
+  posterImage.loading = "lazy";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
+  const posterFallback = document.createElement("span");
+  posterFallback.className = "music-show-poster-fallback";
+  posterFallback.textContent = "No Poster Available";
+  poster.append(posterImage, posterFallback);
+  setArchivePosterImage(posterImage, getMusicShowPosterSrc(show), posterFallback, "has-poster");
 
   const body = document.createElement("div");
   body.className = "music-show-body";
 
   const title = document.createElement("h5");
   title.className = "music-show-title";
-  title.textContent = show.title;
+  title.textContent = show.name || "Untitled Show";
 
   const venue = document.createElement("p");
   venue.className = "music-show-venue";
-  venue.textContent = show.venue;
+  venue.textContent = show.venue || "Venue Pending";
 
   const location = document.createElement("p");
   location.className = "music-show-location";
-  location.textContent = show.location;
+  location.textContent = show.location || "Location Pending";
 
   const footer = document.createElement("div");
   footer.className = "music-show-footer";
 
-  const bandCount = document.createElement("span");
-  bandCount.className = "music-show-band-count";
-  bandCount.textContent = show.bandCount;
+  const showDate = document.createElement("span");
+  showDate.className = "music-show-date-text";
+  showDate.textContent = show.formattedDate || "Date Pending";
 
   const action = document.createElement("button");
   action.className = "music-show-action";
   action.type = "button";
   action.textContent = "View Details";
   action.dataset.showDetailRoute = getMusicShowRouteUrl(show);
-  action.setAttribute("aria-label", `View Details for ${show.title}`);
+  action.setAttribute("aria-label", `View Details for ${show.name || "Untitled Show"}`);
   action.addEventListener("click", () => {
     selectMusicShowDetailHook(show);
   });
 
-  footer.append(bandCount, action);
+  footer.append(showDate, action);
   body.append(title, venue, location, footer);
-  card.append(date, poster, body);
+  card.append(createMusicShowIdBlock(show), poster, body);
   return card;
 }
 
-function renderMusicShowsArchive() {
+function getMusicShowsFilterFocusMeta() {
+  const activeElement = document.activeElement;
+  if (!activeElement || !musicActivityPanel || !musicActivityPanel.contains(activeElement)) {
+    return null;
+  }
+  const filterName = activeElement.dataset?.musicShowsFilter;
+  if (!filterName) {
+    return null;
+  }
+  return {
+    filterName,
+    selectionStart: typeof activeElement.selectionStart === "number" ? activeElement.selectionStart : null,
+    selectionEnd: typeof activeElement.selectionEnd === "number" ? activeElement.selectionEnd : null,
+  };
+}
+
+function restoreMusicShowsFilterFocus(focusMeta) {
+  if (!focusMeta || !musicActivityPanel) {
+    return;
+  }
+  window.requestAnimationFrame(() => {
+    const target = musicActivityPanel.querySelector(`[data-music-shows-filter="${focusMeta.filterName}"]`);
+    if (!target) {
+      return;
+    }
+    target.focus({ preventScroll: true });
+    if (focusMeta.filterName === "search" && focusMeta.selectionStart !== null && typeof target.setSelectionRange === "function") {
+      target.setSelectionRange(focusMeta.selectionStart, focusMeta.selectionEnd ?? focusMeta.selectionStart);
+    }
+  });
+}
+
+function requestMusicShowsIndexData() {
+  if (musicShowsSetsDataState === "live" || musicShowsIndexDataRequested) {
+    return;
+  }
+  musicShowsIndexDataRequested = true;
+  requestMusicShowsSetsData().then(() => {
+    if (getRouteFromUrl().name === "music-shows") {
+      visibleMusicShowsCount = Math.max(visibleMusicShowsCount, musicShowsInitialVisibleCount);
+      renderMusicShowsArchive({ skipDataRequest: true });
+    }
+  });
+}
+
+function renderMusicShowsArchive(options = {}) {
   if (!musicActivityPanel || !musicActivityList) {
     return;
   }
 
+  const focusMeta = getMusicShowsFilterFocusMeta();
   const title = musicActivityPanel.querySelector(".music-nexus-section-title");
   if (title) {
     title.textContent = "";
@@ -4417,21 +4665,20 @@ function renderMusicShowsArchive() {
 
   musicActivityPanel.classList.add("music-shows-archive");
   musicActivityList.className = "music-shows-grid";
-  musicActivityList.setAttribute("aria-label", "Shows archive placeholder cards");
+  musicActivityList.setAttribute("aria-label", "Shows archive rows");
   musicActivityList.replaceChildren();
 
-  const yearBar = document.createElement("nav");
-  yearBar.className = "music-shows-years";
-  yearBar.dataset.musicShowsYears = "";
-  yearBar.setAttribute("aria-label", "Shows archive years");
-  musicShowsYearOptions.forEach((yearLabel) => {
-    yearBar.append(createMusicShowsYearButton(yearLabel, yearLabel === activeMusicShowsYear));
-  });
   const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
   if (existingYearBar) {
     existingYearBar.remove();
   }
-  musicActivityPanel.insertBefore(yearBar, musicActivityList);
+  const existingFilters = musicActivityPanel.querySelector("[data-music-shows-filters]");
+  if (existingFilters) {
+    existingFilters.remove();
+  }
+  const allRows = getMusicShowsIndexRows();
+  normalizeActiveMusicShowsFilters(allRows);
+  musicActivityPanel.insertBefore(createMusicShowsFilters(allRows), musicActivityList);
 
   const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
   if (existingNav) {
@@ -4462,7 +4709,7 @@ function renderMusicShowsArchive() {
   if (!forcedState && visibleRows.length === 0) {
     const empty = document.createElement("li");
     empty.className = "music-shows-empty";
-    empty.append(createMusicShowsState("empty", getMusicShowsEmptyCopy()));
+    empty.append(createMusicShowsState("empty"));
     fragment.append(empty);
   }
 
@@ -4480,17 +4727,22 @@ function renderMusicShowsArchive() {
   const currentPage = Math.max(1, Math.ceil(Math.min(visibleMusicShowsCount, filteredRows.length || 1) / musicShowsPageSize));
   status.textContent = forcedState && forcedState !== "partial"
     ? getMockStateCopy(forcedState, "musicShows").title
-    : `${visibleRows.length} of ${filteredRows.length} shows / Page ${currentPage} of ${pageCount}`;
+    : `${visibleRows.length} of ${filteredRows.length} shows / page ${currentPage} of ${pageCount}`;
 
   const loadMore = document.createElement("button");
   loadMore.className = "music-shows-load-more";
   loadMore.type = "button";
   loadMore.textContent = "Load More";
   loadMore.disabled = Boolean(forcedState && forcedState !== "partial") || visibleRows.length >= filteredRows.length;
+  loadMore.hidden = !forcedState && filteredRows.length <= musicShowsInitialVisibleCount;
   loadMore.addEventListener("click", loadMoreMusicShows);
 
   nav.append(status, loadMore);
   musicActivityPanel.append(nav);
+  restoreMusicShowsFilterFocus(focusMeta);
+  if (!options.skipDataRequest) {
+    requestMusicShowsIndexData();
+  }
 }
 
 function renderMusicActivityRows(sectionName, rows) {
@@ -4508,6 +4760,10 @@ function renderMusicActivityRows(sectionName, rows) {
   const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
   if (existingYearBar) {
     existingYearBar.remove();
+  }
+  const existingFilters = musicActivityPanel.querySelector("[data-music-shows-filters]");
+  if (existingFilters) {
+    existingFilters.remove();
   }
   const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
   if (existingNav) {

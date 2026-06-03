@@ -6331,6 +6331,76 @@ img.archive-gallery-image {
   contain: layout paint;
 }
 
+.music-shows-filters {
+  width: min(100%, 48rem);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: clamp(0.42rem, 1.45vw, 0.62rem);
+  padding: clamp(0.56rem, 1.9vw, 0.74rem);
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 72%),
+    rgba(1, 1, 3, 0.38);
+}
+
+.music-shows-filter-field {
+  min-width: 0;
+  display: grid;
+  gap: 0.26rem;
+}
+
+.music-shows-filter-label {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.56rem, 2.1vw, 0.66rem);
+  line-height: 1;
+  text-transform: none;
+}
+
+.music-shows-search-input,
+.music-shows-filter-select {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.58rem 0.7rem;
+  border: 1px solid rgba(213, 22, 34, 0.22);
+  border-radius: var(--radius-sm);
+  background: rgba(1, 1, 3, 0.58);
+  color: rgba(247, 247, 242, 0.82);
+  font: inherit;
+  font-size: clamp(0.64rem, 2.35vw, 0.74rem);
+  line-height: 1.12;
+  text-transform: none;
+}
+
+.music-shows-search-input::placeholder {
+  color: rgba(247, 247, 242, 0.34);
+}
+
+.music-shows-filter-reset {
+  appearance: none;
+  min-height: 2.65rem;
+  padding: 0.58rem 0.78rem;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(247, 247, 242, 0.024);
+  color: rgba(247, 247, 242, 0.66);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.62rem, 2.25vw, 0.72rem);
+  line-height: 1;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.music-shows-search-input:focus-visible,
+.music-shows-filter-select:focus-visible,
+.music-shows-filter-reset:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
 .music-shows-years {
   width: min(100%, 42rem);
   justify-self: center;
@@ -6400,7 +6470,7 @@ img.archive-gallery-image {
 
 .music-shows-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(0.54rem, 1.7vw, 0.76rem);
   margin: 0;
   padding: 0;
@@ -6409,7 +6479,7 @@ img.archive-gallery-image {
 
 .music-shows-item,
 .music-show-card,
-.music-show-date,
+.music-show-id-block,
 .music-show-poster,
 .music-show-body,
 .music-show-footer {
@@ -6418,10 +6488,10 @@ img.archive-gallery-image {
 
 .music-show-card {
   display: grid;
-  grid-template-columns: auto clamp(4.8rem, 15vw, 5.9rem) minmax(0, 1fr);
+  grid-template-columns: clamp(3.65rem, 9vw, 4.3rem) clamp(4.8rem, 12vw, 5.8rem) minmax(0, 1fr);
   align-items: stretch;
   gap: clamp(0.46rem, 1.55vw, 0.62rem);
-  min-height: clamp(7.1rem, 18vw, 8.2rem);
+  min-height: clamp(7.2rem, 15vw, 8.35rem);
   padding: clamp(0.46rem, 1.8vw, 0.62rem);
   border: 1px solid rgba(247, 247, 242, 0.085);
   border-radius: var(--radius-sm);
@@ -6444,7 +6514,7 @@ img.archive-gallery-image {
   transform: translate3d(0, -0.04rem, 0);
 }
 
-.music-show-date {
+.music-show-id-block {
   width: clamp(2.7rem, 9vw, 3.22rem);
   display: grid;
   align-content: center;
@@ -6457,27 +6527,31 @@ img.archive-gallery-image {
   text-align: center;
 }
 
-.music-show-month,
-.music-show-year,
+.music-show-id-label,
+.music-show-id-value,
 .music-show-title,
 .music-show-venue,
 .music-show-location,
-.music-show-band-count {
+.music-show-date-text {
   margin: 0;
 }
 
-.music-show-month,
-.music-show-year {
+.music-show-id-label {
   color: rgba(247, 247, 242, 0.54);
   font-size: clamp(0.5rem, 2vw, 0.6rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
-.music-show-day {
+.music-show-id-value {
+  display: grid;
+  justify-items: center;
+  gap: 0.02rem;
   color: rgba(247, 247, 242, 0.9);
-  font-size: clamp(1.18rem, 5.4vw, 1.48rem);
-  line-height: 0.95;
+  font-size: clamp(0.92rem, 3.5vw, 1.2rem);
+  line-height: 0.9;
+  text-transform: none;
+  word-break: break-word;
 }
 
 .music-show-poster {
@@ -6515,13 +6589,24 @@ img.archive-gallery-image {
   border: 1px solid rgba(247, 247, 242, 0.13);
 }
 
-.music-show-poster-mark {
+.music-show-poster-image {
   position: relative;
   z-index: 1;
-  color: rgba(247, 247, 242, 0.82);
-  font-size: clamp(1rem, 4.6vw, 1.32rem);
-  line-height: 1;
-  text-transform: uppercase;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.music-show-poster-fallback {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  padding: 0.24rem;
+  color: rgba(247, 247, 242, 0.58);
+  font-size: clamp(0.48rem, 1.9vw, 0.6rem);
+  line-height: 1.12;
+  text-align: center;
+  text-transform: none;
 }
 
 .music-show-body {
@@ -6536,7 +6621,7 @@ img.archive-gallery-image {
   font-weight: 400;
   line-height: 1.05;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -6546,7 +6631,7 @@ img.archive-gallery-image {
   font-size: clamp(0.62rem, 2.35vw, 0.72rem);
   line-height: 1.12;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .music-show-location {
@@ -6561,11 +6646,11 @@ img.archive-gallery-image {
   margin-top: 0.14rem;
 }
 
-.music-show-band-count {
+.music-show-date-text {
   color: rgba(247, 247, 242, 0.48);
   font-size: clamp(0.58rem, 2.25vw, 0.68rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .music-show-action {
@@ -6580,7 +6665,7 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.56rem, 2.15vw, 0.66rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   transition:
     border-color 160ms ease,
@@ -6608,7 +6693,7 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.48);
   font-size: clamp(0.58rem, 2.25vw, 0.68rem);
   line-height: 1.18;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .music-shows-load-more {
@@ -6623,7 +6708,7 @@ img.archive-gallery-image {
   font: inherit;
   font-size: clamp(0.58rem, 2.25vw, 0.68rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -6649,7 +6734,7 @@ img.archive-gallery-image {
   font-size: clamp(0.64rem, 2.55vw, 0.76rem);
   line-height: 1.18;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .music-shows-state {
@@ -11733,6 +11818,12 @@ img.archive-gallery-image {
     padding: 0.5rem;
   }
 
+  .music-shows-filters {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.42rem;
+    padding: 0.5rem;
+  }
+
   .music-shows-years {
     justify-content: flex-start;
     gap: 0.3rem;
@@ -11749,36 +11840,27 @@ img.archive-gallery-image {
   }
 
   .music-show-card {
-    grid-template-columns: clamp(4.05rem, 20vw, 4.5rem) minmax(0, 1fr);
+    grid-template-columns: clamp(3.05rem, 13vw, 3.75rem) clamp(3.8rem, 17vw, 4.6rem) minmax(0, 1fr);
     gap: 0.4rem;
-    min-height: 7.2rem;
+    min-height: 6.9rem;
     padding: 0.44rem;
   }
 
-  .music-show-date {
-    grid-column: 2;
-    grid-row: 1;
+  .music-show-id-block {
     width: auto;
-    min-height: 1.96rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.18rem;
-    padding: 0.34rem 0.42rem;
+    padding: 0.34rem 0.2rem;
   }
 
-  .music-show-day {
-    font-size: clamp(0.82rem, 4vw, 1rem);
+  .music-show-id-value {
+    font-size: clamp(0.82rem, 3.7vw, 1rem);
   }
 
   .music-show-poster {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    max-height: 6.25rem;
+    max-height: 5.9rem;
   }
 
   .music-show-body {
-    grid-column: 2;
+    align-content: center;
   }
 
   .music-show-footer {
@@ -12292,34 +12374,21 @@ img.archive-gallery-image {
   }
 
   .music-show-card {
-    grid-template-columns: clamp(4.45rem, 21vw, 5.05rem) minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: clamp(3.05rem, 13vw, 3.75rem) clamp(3.8rem, 17vw, 4.6rem) minmax(0, 1fr);
+    align-items: stretch;
   }
 
-  .music-show-date {
-    grid-column: 2;
-    grid-row: 1;
+  .music-show-id-block {
     width: auto;
-    min-height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.2rem;
-    padding: 0.34rem 0.42rem;
+    padding: 0.34rem 0.2rem;
   }
 
-  .music-show-day {
+  .music-show-id-value {
     font-size: clamp(0.82rem, 4vw, 1rem);
   }
 
   .music-show-poster {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    max-height: 7rem;
-  }
-
-  .music-show-body {
-    grid-column: 2;
+    max-height: 5.9rem;
   }
 
   .ring-archive-hero {

@@ -222,8 +222,11 @@ let lightboxSwipeCommitTimer;
 let lightboxSwipeGesture = null;
 let lightboxGestureSuppressClick = false;
 let lightboxFallbackAttempted = false;
-let activeMusicShowsYear = "ALL SHOWS";
-let visibleMusicShowsCount = 4;
+let activeMusicShowsSearch = "";
+let activeMusicShowsYearFilter = "";
+let activeMusicShowsStateFilter = "";
+let activeMusicShowsVenueFilter = "";
+let visibleMusicShowsCount = 6;
 
 const setImageAccents = [
   { x: "42%", y: "38%", color: "rgba(142, 108, 255, 0.24)" },
