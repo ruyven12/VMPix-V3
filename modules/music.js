@@ -2494,11 +2494,40 @@ function renderSetsListRows(rows, selectedSetCode = "") {
   setsList.replaceChildren(fragment);
 }
 
+function getSetsArchiveYearValue(row) {
+  const parsedDate = parseMusicShowDate(row?.rawDate || row?.date || row?.formattedDate);
+  if (parsedDate) {
+    return parsedDate.getFullYear();
+  }
+
+  const yearValue = Number.parseInt(row?.year, 10);
+  return Number.isFinite(yearValue) ? yearValue : null;
+}
+
+function updateSetsArchiveSummary(rows = []) {
+  if (!setsArchiveSummary) {
+    return;
+  }
+
+  const setCount = rows.length;
+  const years = rows
+    .map(getSetsArchiveYearValue)
+    .filter((year) => Number.isFinite(year));
+  const minYear = years.length > 0 ? Math.min(...years) : null;
+  const maxYear = years.length > 0 ? Math.max(...years) : null;
+  const yearRange = minYear && maxYear
+    ? (minYear === maxYear ? String(minYear) : `${minYear}\u2013${maxYear}`)
+    : "YEAR PENDING";
+
+  setsArchiveSummary.textContent = `${setCount} SET${setCount === 1 ? "" : "S"} \u2022 ${yearRange}`;
+}
+
 function renderSetsArchiveRows(rows, options = {}) {
   const archiveRows = getSortedSetsArchiveRows(rows);
   const selectedSetCode = normalizeSetCode(options.selectedSetCode || "");
   const selectedRowData = archiveRows.find((row) => normalizeSetCode(row.setCode) === selectedSetCode) || archiveRows[0] || null;
 
+  updateSetsArchiveSummary(archiveRows);
   renderSetsListRows(archiveRows, selectedRowData?.setCode || selectedSetCode);
   updateSetsFeaturedFromRow(
     findSetRowByCode(selectedRowData?.setCode || selectedSetCode) || getSetsRows()[0] || null
@@ -2581,13 +2610,7 @@ function showSetsArchive(options = {}) {
     restoreMusicShowsSetsFallback();
   }
   renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
-  if (options.shouldOpenDetail) {
-    updateSetDetailFromRow(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode));
-    setSetDetailVisible(true);
-    setCurrentView("Set Detail");
-  } else {
-    setCurrentView(`Sets ${band.name}`);
-  }
+  setCurrentView(`Sets ${band.name}`);
   requestMusicShowsSetsData().then(() => {
     const route = getRouteFromUrl();
     const isStillSetsContext = setsArchive.getAttribute("aria-hidden") === "false" || route.name === "set-detail";
@@ -2596,11 +2619,6 @@ function showSetsArchive(options = {}) {
     }
 
     renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
-    if (options.shouldOpenDetail) {
-      updateSetDetailFromRow(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode));
-      setSetDetailVisible(true);
-      setCurrentView("Set Detail");
-    }
   });
   if (options.shouldScroll !== false && musicNexusShell) {
     musicNexusShell.scrollTo({
@@ -4830,6 +4848,9 @@ function initMusicModule() {
   }
   if (bandDetailBack) {
     bandDetailBack.addEventListener("click", returnToBandsIndexRoute);
+  }
+  if (setsArchiveBack) {
+    setsArchiveBack.addEventListener("click", returnToBandDetailRoute);
   }
   if (bandDetailViewSets) {
     bandDetailViewSets.addEventListener("click", navigateToBandSetsArchive);
