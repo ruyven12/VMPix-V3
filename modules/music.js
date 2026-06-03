@@ -4658,22 +4658,9 @@ function createMusicShowsFilters(rows) {
   return filters;
 }
 
-function createMusicShowIdBlock(show) {
+function createMusicShowIdText(show) {
   const showId = String(show.showId || "").trim();
-  const block = document.createElement("div");
-  block.className = "music-show-id-block";
-  block.setAttribute("aria-label", showId ? `Show ${showId}` : "Show Pending");
-
-  const label = document.createElement("span");
-  label.className = "music-show-id-label";
-  label.textContent = "Show";
-
-  const value = document.createElement("span");
-  value.className = "music-show-id-value";
-  value.textContent = showId || "Pending";
-
-  block.append(label, value);
-  return block;
+  return showId ? `Show #${showId}` : "Show Pending";
 }
 
 function createMusicShowsCard(show) {
@@ -4715,12 +4702,16 @@ function createMusicShowsCard(show) {
   location.className = "music-show-location";
   location.textContent = show.location || "Location Pending";
 
-  const footer = document.createElement("div");
-  footer.className = "music-show-footer";
-
   const showDate = document.createElement("span");
   showDate.className = "music-show-date-text";
   showDate.textContent = show.formattedDate || "Date Pending";
+
+  const footer = document.createElement("div");
+  footer.className = "music-show-footer";
+
+  const showNumber = document.createElement("span");
+  showNumber.className = "music-show-number";
+  showNumber.textContent = createMusicShowIdText(show);
 
   const action = document.createElement("button");
   action.className = "music-show-action";
@@ -4740,9 +4731,9 @@ function createMusicShowsCard(show) {
     selectMusicShowDetailHook(show);
   });
 
-  footer.append(showDate, action);
-  body.append(title, venue, location, footer);
-  card.append(createMusicShowIdBlock(show), poster, body);
+  footer.append(showNumber, action);
+  body.append(title, venue, location, showDate);
+  card.append(poster, body, footer);
   return card;
 }
 
