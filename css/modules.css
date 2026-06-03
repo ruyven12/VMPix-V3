@@ -715,7 +715,6 @@
 .set-gallery-meta-label,
 .set-gallery-meta-value,
 .set-gallery-highlights-title,
-.set-gallery-photo-count,
 .set-gallery-toggle-option,
 .set-gallery-photo-label,
 .set-gallery-lightbox-kicker,
@@ -1267,13 +1266,29 @@
     linear-gradient(135deg, rgba(247, 247, 242, 0.045), transparent 64%),
     rgba(1, 1, 3, 0.42);
   color: rgba(247, 247, 242, 0.66);
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-hero-image {
   min-height: clamp(13rem, 52vw, 20rem);
   overflow: hidden;
   box-shadow: inset 0 0 1rem rgba(0, 0, 0, 0.4);
+}
+
+.set-gallery-poster {
+  width: 100%;
+  height: 100%;
+  max-height: clamp(13rem, 52vw, 20rem);
+  display: block;
+  object-fit: contain;
+  padding: clamp(0.38rem, 1.7vw, 0.66rem);
+  filter: drop-shadow(0 0 0.62rem rgba(255, 118, 102, 0.1));
+}
+
+.set-gallery-hero-image.has-poster {
+  background:
+    linear-gradient(135deg, rgba(247, 247, 242, 0.035), transparent 62%),
+    rgba(1, 1, 3, 0.56);
 }
 
 .set-gallery-hero-image span {
@@ -1294,7 +1309,7 @@
   color: rgba(255, 118, 102, 0.68);
   font-size: clamp(0.62rem, 2.45vw, 0.74rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-title {
@@ -1303,7 +1318,7 @@
   font-weight: 400;
   line-height: 1.04;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
   text-wrap: balance;
 }
 
@@ -1324,7 +1339,7 @@
   color: rgba(247, 247, 242, 0.42);
   font-size: clamp(0.56rem, 2.25vw, 0.66rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-fact-value {
@@ -1332,7 +1347,7 @@
   font-size: clamp(0.68rem, 2.6vw, 0.82rem);
   line-height: 1.14;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-meta-row {
@@ -1355,7 +1370,7 @@
   color: rgba(255, 118, 102, 0.5);
   font-size: clamp(0.56rem, 2.25vw, 0.66rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-meta-value {
@@ -1363,7 +1378,7 @@
   font-size: clamp(0.62rem, 2.45vw, 0.76rem);
   line-height: 1.24;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-highlights {
@@ -1396,14 +1411,7 @@
   font-size: clamp(0.78rem, 3vw, 0.92rem);
   font-weight: 400;
   line-height: 1;
-  text-transform: uppercase;
-}
-
-.set-gallery-photo-count {
-  color: rgba(247, 247, 242, 0.46);
-  font-size: clamp(0.56rem, 2.2vw, 0.66rem);
-  line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-view-toggle {
@@ -1425,7 +1433,7 @@
   color: rgba(247, 247, 242, 0.42);
   font-size: clamp(0.54rem, 2.1vw, 0.64rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-toggle-option.is-active {
@@ -1828,7 +1836,7 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.54);
   font-size: clamp(0.68rem, 2.7vw, 0.84rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-photo-tile.is-active .set-gallery-photo-label {
@@ -1854,7 +1862,7 @@ img.archive-gallery-image {
   color: rgba(255, 118, 102, 0.62);
   font-size: clamp(0.56rem, 2.2vw, 0.66rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-lightbox-title {
@@ -1862,14 +1870,14 @@ img.archive-gallery-image {
   font-size: clamp(0.78rem, 3vw, 0.94rem);
   font-weight: 400;
   line-height: 1.08;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-lightbox-copy {
   color: rgba(247, 247, 242, 0.42);
   font-size: clamp(0.62rem, 2.45vw, 0.74rem);
   line-height: 1.25;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .set-gallery-view-all {
@@ -1882,6 +1890,7 @@ img.archive-gallery-image {
     rgba(255, 82, 72, 0.08);
   color: rgba(247, 247, 242, 0.82);
   font-size: clamp(0.72rem, 2.7vw, 0.84rem);
+  text-transform: none;
 }
 
 .set-gallery-view-all[aria-expanded="true"] {

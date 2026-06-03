@@ -952,6 +952,7 @@
 
             <section class="set-gallery-hero" aria-labelledby="set-gallery-title">
               <div class="set-gallery-hero-image" role="img" aria-label="Live @ Asylum placeholder gallery image" data-set-gallery-image>
+                <img class="set-gallery-poster" src="/assets/media/placeholders/no-poster-available.svg" alt="" loading="lazy" decoding="async" data-set-gallery-poster hidden>
                 <span data-set-gallery-thumb>JAN 18</span>
               </div>
               <div class="set-gallery-copy">
@@ -997,7 +998,6 @@
               <div class="set-gallery-highlights-head">
                 <div class="set-gallery-highlights-copy">
                   <h4 class="set-gallery-highlights-title" id="set-gallery-highlights-title">Photo Highlights</h4>
-                  <p class="set-gallery-photo-count" data-set-gallery-photo-count>64 Photos</p>
                 </div>
                 <div class="set-gallery-view-toggle" aria-label="Gallery view placeholders">
                   <span class="set-gallery-toggle-option is-active">Grid</span>
@@ -1044,8 +1044,8 @@
               </div>
             </section>
 
-            <button class="v3-card v3-card--interactive set-gallery-view-all" type="button" aria-controls="lightbox-screen" aria-expanded="false" data-gallery-view-all>
-              VIEW ALL PHOTOS
+            <button class="v3-card v3-card--interactive set-gallery-view-all" type="button" aria-controls="lightbox-screen" aria-expanded="false" aria-disabled="true" disabled data-gallery-view-all>
+              View All Photos
             </button>
           </article>
 

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 900" role="img" aria-label="No Poster Available">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#18131f"/>
+      <stop offset="0.52" stop-color="#050407"/>
+      <stop offset="1" stop-color="#14090d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="58%">
+      <stop offset="0" stop-color="#8e6cff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#8e6cff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="900" fill="url(#bg)"/>
+  <rect x="42" y="42" width="556" height="816" rx="20" fill="none" stroke="#f7f7f2" stroke-opacity="0.12" stroke-width="2"/>
+  <rect x="72" y="72" width="496" height="756" rx="14" fill="url(#glow)" stroke="#8e6cff" stroke-opacity="0.18" stroke-width="1"/>
+  <path d="M165 370h310v160H165z" fill="none" stroke="#f7f7f2" stroke-opacity="0.22" stroke-width="5"/>
+  <path d="m165 530 92-92 56 56 48-48 114 114" fill="none" stroke="#f7f7f2" stroke-opacity="0.22" stroke-width="5"/>
+  <circle cx="398" cy="414" r="27" fill="none" stroke="#f7f7f2" stroke-opacity="0.22" stroke-width="5"/>
+  <text x="320" y="630" fill="#f7f7f2" fill-opacity="0.72" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" letter-spacing="3" text-anchor="middle">NO POSTER</text>
+  <text x="320" y="682" fill="#8e6cff" fill-opacity="0.78" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="3" text-anchor="middle">AVAILABLE</text>
+</svg>

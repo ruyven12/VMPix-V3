@@ -9,6 +9,7 @@ const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows";
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 8000;
+const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
 const bandsRegionFilterLabels = {
   local: "Local",
   regional: "Regional",
@@ -921,13 +922,97 @@ function getMusicShowLocation(show) {
 }
 
 function getMusicShowBandNames(show) {
-  if (!show || !Array.isArray(show.bands)) {
+  if (!show) {
     return [];
   }
 
-  return show.bands
+  const bandCandidates = [
+    show.band,
+    show.band_name,
+    show.bandName,
+  ];
+  if (Array.isArray(show.bands)) {
+    show.bands.forEach((band) => {
+      bandCandidates.push(band?.band, band?.name, band);
+    });
+  }
+
+  return bandCandidates
     .map((band) => String(band?.band || band?.name || band || "").trim())
     .filter(Boolean);
+}
+
+function getMusicShowBandSlugs(show) {
+  const slugCandidates = [
+    show?.band_slug,
+    show?.bandSlug,
+    show?.band_id,
+    show?.bandId,
+    show?.band,
+    show?.band_name,
+    show?.bandName,
+    show?.slug,
+  ];
+  if (Array.isArray(show?.bands)) {
+    show.bands.forEach((band) => {
+      if (band && typeof band === "object") {
+        slugCandidates.push(band.band_slug, band.bandSlug, band.band_id, band.bandId, band.slug, band.band, band.name);
+      } else {
+        slugCandidates.push(band);
+      }
+    });
+  }
+
+  return slugCandidates
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .map((value) => createBandSlug(value))
+    .filter(Boolean);
+}
+
+function getMusicShowVenueName(show) {
+  return String(
+    show?.venue ||
+    show?.venue_name ||
+    show?.venueName ||
+    show?.venue_details?.venue ||
+    show?.venueDetails?.venue ||
+    ""
+  ).trim();
+}
+
+function getMusicShowContributorValue(show, fallbackValue = "Coming Soon") {
+  const candidates = [
+    show?.contributors,
+    show?.contributor_count,
+    show?.contributorCount,
+    show?.contributors_count,
+    show?.stats?.contributors,
+    show?.stats?.contributorCount,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.length > 0 ? String(candidate.length) : fallbackValue;
+    }
+    if (candidate !== undefined && candidate !== null && String(candidate).trim()) {
+      return String(candidate).trim();
+    }
+  }
+
+  return fallbackValue;
+}
+
+function formatMusicShowCameras(show) {
+  const cameras = [show?.camera_1, show?.camera_2]
+    .map((camera) => String(camera || "").trim())
+    .filter(Boolean);
+  return cameras.length > 0 ? cameras.join(" / ") : "N/A";
+}
+
+function getMusicShowNotes(show) {
+  const notes = String(show?.notes || "").trim();
+  return notes || "No notes at the moment.";
 }
 
 function normalizeMusicShowSetRow(record, index = 0) {
@@ -937,8 +1022,10 @@ function normalizeMusicShowSetRow(record, index = 0) {
   const date = parseMusicShowDate(rawDate);
   const setCode = getSetCodeFromDateValue(rawDate) || createBandSlug(`${rawDate || index + 1}-${name}`);
   const poster = String(source.poster || source.poster_url || source.image_url || source.logo_url || "").trim();
-  const city = String(source.city || source.location_city || "").trim();
-  const state = String(source.state || source.location_state || "").trim();
+  const city = String(source.city || source.location_city || source.venue_details?.city || source.venueDetails?.city || "").trim();
+  const state = String(source.state || source.location_state || source.venue_details?.state || source.venueDetails?.state || "").trim();
+  const venue = getMusicShowVenueName(source);
+  const contributors = getMusicShowContributorValue(source);
 
   return {
     ...source,
@@ -952,8 +1039,13 @@ function normalizeMusicShowSetRow(record, index = 0) {
     city,
     state,
     location: getMusicShowLocation({ city, state }),
+    venue,
     poster,
     bandNames: getMusicShowBandNames(source),
+    bandSlugs: getMusicShowBandSlugs(source),
+    contributors,
+    camera: formatMusicShowCameras(source),
+    notes: getMusicShowNotes(source),
     dateSort: date ? date.getTime() : 0,
   };
 }
@@ -979,8 +1071,13 @@ function getFallbackSetRowsData() {
       city: "",
       state: "",
       location: dataset.setLocation || "Location Pending",
+      venue: dataset.setVenue || "",
       poster: "",
       bandNames: activeMusicBand ? [activeMusicBand.name] : [],
+      bandSlugs: activeMusicBand ? [getBandId(activeMusicBand), createBandSlug(activeMusicBand.name)] : [],
+      contributors: dataset.setContributors || "Coming Soon",
+      camera: dataset.setCamera || "N/A",
+      notes: dataset.setNotes || "No notes at the moment.",
       dateSort: parseMusicShowDate(dataset.setDate)?.getTime() || 0,
       fallbackDataset: { ...dataset },
     };
@@ -1591,38 +1688,27 @@ function getFirstVisibleSetRow() {
 
 function getSetVenue(row) {
   if (!row) {
-    return "Asylum";
+    return "Venue Pending";
   }
 
   if (row.dataset.setVenue) {
     return row.dataset.setVenue;
   }
-  if ((row.dataset.setTitle || "").toLowerCase().includes("asylum")) {
-    return "Asylum";
-  }
-  return "Archive Venue";
+  return "Venue Pending";
 }
 
 function getSetQuality(row) {
-  if (!row) {
-    return "Archive High";
-  }
-
-  if (row.dataset.setQuality) {
-    return row.dataset.setQuality;
-  }
-  const completion = Number.parseInt(row.dataset.setComplete || "0", 10);
-  return completion >= 70 ? "Archive High" : "Archive Review";
+  return row && row.dataset.setQuality ? row.dataset.setQuality : "Coming Soon";
 }
 
 function getSetCamera(row) {
-  return row && row.dataset.setCamera ? row.dataset.setCamera : "Canon R6 / 35mm";
+  return row && row.dataset.setCamera ? row.dataset.setCamera : "N/A";
 }
 
 function getSetNotes(row) {
   return row && row.dataset.setNotes
     ? row.dataset.setNotes
-    : "Placeholder notes pending final caption pass.";
+    : "No notes at the moment.";
 }
 
 function updateSetGalleryFromRow(row) {
@@ -1636,13 +1722,19 @@ function updateSetGalleryFromRow(row) {
     setGalleryBand.textContent = activeMusicBand ? activeMusicBand.name : "Band Detail";
   }
   if (setGalleryImage) {
-    setGalleryImage.setAttribute("aria-label", `${setData.setTitle} placeholder gallery image`);
+    setGalleryImage.setAttribute("aria-label", `${setData.setTitle || "Set"} poster`);
     setGalleryImage.style.setProperty("--set-image-x", imageAccent.x);
     setGalleryImage.style.setProperty("--set-image-y", imageAccent.y);
     setGalleryImage.style.setProperty("--set-image-accent", imageAccent.color);
   }
+  setArchivePosterImage(
+    setGalleryPoster,
+    setData.setPoster || SET_GALLERY_NO_POSTER_IMAGE_SRC,
+    setGalleryThumb,
+    "has-poster"
+  );
   if (setGalleryThumb) {
-    setGalleryThumb.textContent = getSetImageLabel(row);
+    setGalleryThumb.textContent = setData.setPoster ? getSetImageLabel(row) : "No Poster Available";
   }
   if (setGalleryDate) {
     setGalleryDate.textContent = setData.setDate || "";
@@ -1657,10 +1749,10 @@ function updateSetGalleryFromRow(row) {
     setGalleryVenue.textContent = getSetVenue(row);
   }
   if (setGalleryPhotos) {
-    setGalleryPhotos.textContent = setData.setPhotos || "";
+    setGalleryPhotos.textContent = "Coming Soon";
   }
   if (setGalleryContributors) {
-    setGalleryContributors.textContent = setData.setContributors || "";
+    setGalleryContributors.textContent = setData.setContributors || "Coming Soon";
   }
   if (setGalleryQuality) {
     setGalleryQuality.textContent = getSetQuality(row);
@@ -1670,9 +1762,6 @@ function updateSetGalleryFromRow(row) {
   }
   if (setGalleryNotes) {
     setGalleryNotes.textContent = getSetNotes(row);
-  }
-  if (setGalleryPhotoCount) {
-    setGalleryPhotoCount.textContent = `${setData.setPhotos || "0"} Photos`;
   }
 }
 
@@ -1707,8 +1796,8 @@ function setGalleryState(stateName = "ready") {
     }
   });
   if (galleryViewAll) {
-    galleryViewAll.disabled = !shouldShowGrid;
-    galleryViewAll.setAttribute("aria-disabled", String(!shouldShowGrid));
+    galleryViewAll.disabled = true;
+    galleryViewAll.setAttribute("aria-disabled", "true");
   }
 }
 
@@ -1751,7 +1840,7 @@ function setGalleryModeVisible(isVisible) {
   }
   if (galleryViewAll) {
     galleryViewAll.setAttribute("aria-expanded", String(isVisible));
-    galleryViewAll.textContent = isVisible ? "GALLERY MODE OPEN" : "VIEW ALL PHOTOS";
+    galleryViewAll.textContent = isVisible ? "Gallery Mode Open" : "View All Photos";
   }
 }
 
@@ -2328,14 +2417,25 @@ function getSetsArchiveRowsForBand(band) {
   ]
     .map((value) => String(value || "").trim().toLowerCase())
     .filter(Boolean);
-  const bandSlugs = new Set(bandNames.map(createBandSlug));
+  const bandSlugs = new Set([
+    getBandId(band),
+    band.band_id,
+    band.id,
+    band.slug,
+    ...bandNames,
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .map(createBandSlug));
 
   return rows.filter((show) => {
     const showBands = show.bandNames || [];
-    return showBands.some((showBand) => {
+    const showBandMatches = showBands.some((showBand) => {
       const normalizedBand = String(showBand || "").trim().toLowerCase();
       return bandNames.includes(normalizedBand) || bandSlugs.has(createBandSlug(normalizedBand));
     });
+    const showSlugMatches = (show.bandSlugs || []).some((showSlug) => bandSlugs.has(createBandSlug(showSlug)));
+    return showBandMatches || showSlugMatches;
   });
 }
 
@@ -2417,10 +2517,13 @@ function createSetsListRow(show, isActive = false) {
   row.dataset.setCity = show.city || "";
   row.dataset.setState = show.state || "";
   row.dataset.setPoster = show.poster || "";
-  row.dataset.setVenue = show.venue_id || show.venue || "";
-  row.dataset.setPhotos = "0";
-  row.dataset.setContributors = "0";
+  row.dataset.setVenue = show.venue || show.venue_id || "";
+  row.dataset.setPhotos = "Coming Soon";
+  row.dataset.setContributors = show.contributors || "Coming Soon";
   row.dataset.setComplete = "";
+  row.dataset.setQuality = "Coming Soon";
+  row.dataset.setCamera = show.camera || "N/A";
+  row.dataset.setNotes = show.notes || "No notes at the moment.";
   row.dataset.setThumb = getSetImageLabel({ dataset: { setDate: show.formattedDate, setThumb: activeMusicBand?.thumb || "" } });
   row.setAttribute("aria-label", `Open ${show.name}, ${show.formattedDate}, ${show.location}`);
   if (isActive) {
@@ -4864,11 +4967,14 @@ function initMusicModule() {
   galleryPhotoTiles.forEach((tile) => {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
     tile.addEventListener("click", () => {
-      showLightbox(tile);
+      selectGalleryPhoto(tile);
     });
   });
   if (galleryViewAll) {
     galleryViewAll.addEventListener("click", () => {
+      if (galleryViewAll.disabled || galleryViewAll.getAttribute("aria-disabled") === "true") {
+        return;
+      }
       showLightbox();
     });
   }
