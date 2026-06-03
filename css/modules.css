@@ -6515,9 +6515,11 @@ img.archive-gallery-image {
     border-color 180ms ease,
     background-color 180ms ease,
     transform 180ms ease;
+  cursor: pointer;
 }
 
 .music-show-card:hover,
+.music-show-card:focus-visible,
 .music-show-card:focus-within {
   border-color: rgba(247, 247, 242, 0.16);
   background:

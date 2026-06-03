@@ -4193,8 +4193,18 @@ const musicShowsMonthOrder = {
   DEC: 12,
 };
 
+function getMusicShowRouteCode(show) {
+  return normalizeSetCode(
+    show?.setCode ||
+    getSetCodeFromDateValue(show?.rawDate || show?.date || show?.show_date || show?.eventDate) ||
+    show?.showId ||
+    show?.show_id ||
+    ""
+  );
+}
+
 function getMusicShowRouteUrl(show) {
-  return `/music/shows/${encodeURIComponent(show.showId || "")}`;
+  return `/music/shows/${encodeURIComponent(getMusicShowRouteCode(show))}`;
 }
 
 function findMusicShowById(showId) {
@@ -4523,10 +4533,12 @@ function selectMusicShowDetailHook(show) {
 
   const showRoute = getMusicShowRouteUrl(show);
   musicActivityPanel.dataset.selectedShowRoute = showRoute;
-  const status = musicActivityPanel.querySelector("[data-music-shows-status]");
-  if (status) {
-    status.textContent = `Show Detail ready for future wiring: ${show.name || show.title}`;
-  }
+  navigateToRoute(showRoute, {
+    historyState: {
+      fromShowsArchive: true,
+      returnUrl: routePaths.musicShows,
+    },
+  });
 }
 
 function createMusicShowsFilterField(labelText, fieldName, options, activeValue) {
@@ -4675,7 +4687,15 @@ function createMusicShowsCard(show) {
   action.textContent = "View Details";
   action.dataset.showDetailRoute = getMusicShowRouteUrl(show);
   action.setAttribute("aria-label", `View Details for ${show.name || "Untitled Show"}`);
-  action.addEventListener("click", () => {
+  action.addEventListener("click", (event) => {
+    event.stopPropagation();
+    selectMusicShowDetailHook(show);
+  });
+
+  card.addEventListener("click", (event) => {
+    if (event.target.closest("button")) {
+      return;
+    }
     selectMusicShowDetailHook(show);
   });
 
