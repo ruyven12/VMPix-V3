@@ -667,6 +667,13 @@
   white-space: nowrap;
 }
 
+.lightbox-back,
+.lightbox-info-toggle,
+.lightbox-nav-zone,
+.v3-lightbox-drawer-close {
+  text-transform: none;
+}
+
 .sets-archive-back:focus-visible,
 .sets-featured-open:focus-visible,
 .set-detail-close:focus-visible,
@@ -2000,7 +2007,7 @@ img.archive-gallery-image {
 
 .lightbox-topbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(0.46rem, 1.9vw, 0.78rem);
   padding: 0.08rem 0 0.12rem;
@@ -2035,7 +2042,7 @@ img.archive-gallery-image {
   font-size: clamp(0.54rem, 2.15vw, 0.66rem);
   letter-spacing: 0;
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .lightbox-back-label {
@@ -2101,7 +2108,7 @@ img.archive-gallery-image {
 }
 
 .lightbox-stage {
-  min-height: clamp(24rem, 68svh, 43rem);
+  min-height: clamp(24rem, 72svh, 44rem);
   display: grid;
   overflow: hidden;
   border: 1px solid rgba(247, 247, 242, 0.065);
@@ -2122,9 +2129,9 @@ img.archive-gallery-image {
   cursor: pointer;
   overflow: hidden;
   padding:
-    clamp(3.1rem, 7vw, 4.8rem)
+    clamp(2.7rem, 6vw, 4rem)
     clamp(3.35rem, 8vw, 5.3rem)
-    clamp(3.8rem, 8vw, 5rem);
+    clamp(2.7rem, 6vw, 4rem);
   background:
     radial-gradient(circle at var(--lightbox-photo-x, 46%) var(--lightbox-photo-y, 38%), var(--lightbox-photo-accent, rgba(255, 82, 72, 0.15)), transparent 28%),
     radial-gradient(circle at 58% 52%, rgba(142, 108, 255, 0.12), transparent 30%),
@@ -2156,7 +2163,7 @@ img.archive-gallery-image {
   width: auto;
   max-width: min(100%, 68rem);
   height: auto;
-  max-height: min(68svh, 41rem);
+  max-height: min(72svh, 43rem);
   border: 1px solid rgba(247, 247, 242, 0.075);
   border-radius: calc(var(--radius-sm) + 0.08rem);
   box-shadow:
@@ -2216,7 +2223,7 @@ img.archive-gallery-image {
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -2277,7 +2284,7 @@ img.archive-gallery-image {
   font-size: clamp(0.64rem, 2.35vw, 0.78rem);
   line-height: 1.12;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .lightbox-tool-strip {
@@ -2375,10 +2382,12 @@ img.archive-gallery-image {
 .lightbox-info-panel {
   position: absolute;
   right: clamp(0.68rem, 2.4vw, 1.1rem);
+  top: clamp(4.2rem, 8svh, 5.2rem);
   bottom: clamp(0.68rem, 2.4vw, 1.1rem);
-  left: clamp(0.68rem, 2.4vw, 1.1rem);
+  left: auto;
   z-index: 5;
-  max-height: min(46svh, 24rem);
+  width: min(22rem, calc(100% - clamp(1.36rem, 4.8vw, 2.2rem)));
+  max-height: calc(100% - clamp(4.9rem, 9svh, 6.1rem));
   display: grid;
   align-content: start;
   gap: 0.72rem;
@@ -2396,7 +2405,7 @@ img.archive-gallery-image {
   opacity: 0;
   overscroll-behavior: contain;
   pointer-events: none;
-  transform: translate3d(0, calc(100% + 0.9rem), 0);
+  transform: translate3d(calc(100% + 1.1rem), 0, 0);
   transition:
     opacity 160ms ease,
     transform 180ms var(--ease-standard),
@@ -2429,7 +2438,7 @@ img.archive-gallery-image {
   color: rgba(255, 118, 102, 0.64);
   font-size: clamp(0.54rem, 2.1vw, 0.66rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .v3-lightbox-drawer-close {
@@ -2457,12 +2466,12 @@ img.archive-gallery-image {
   font-weight: 400;
   line-height: 1.08;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .lightbox-info-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.46rem;
 }
 
@@ -2513,6 +2522,11 @@ img.archive-gallery-image {
 .v3-lightbox-shell .lightbox-thumbnail-strip,
 .v3-lightbox-shell .lightbox-footer-strip {
   display: none;
+}
+
+.v3-lightbox-shell,
+.v3-lightbox-shell * {
+  text-transform: none;
 }
 
 @keyframes lightboxStageEnter {
@@ -11928,7 +11942,7 @@ img.archive-gallery-image {
   }
 
   .lightbox-topbar {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .lightbox-back,
@@ -11944,7 +11958,7 @@ img.archive-gallery-image {
     padding:
       clamp(2.8rem, 7svh, 4rem)
       clamp(0.9rem, 3vw, 1.25rem)
-      clamp(3.85rem, 8svh, 4.8rem);
+      clamp(2.8rem, 7svh, 4rem);
   }
 
   .lightbox-photo::before {
@@ -11971,15 +11985,18 @@ img.archive-gallery-image {
   }
 
   .lightbox-info-panel {
+    top: auto;
     right: max(0.52rem, env(safe-area-inset-right));
     bottom: max(0.52rem, env(safe-area-inset-bottom));
     left: max(0.52rem, env(safe-area-inset-left));
+    width: auto;
     max-height: min(54svh, 24rem);
     border-color: rgba(255, 118, 102, 0.12);
     background:
       linear-gradient(180deg, rgba(247, 247, 242, 0.035), transparent 68%),
       rgba(3, 3, 6, 0.88);
     box-shadow: 0 -0.6rem 1.6rem rgba(0, 0, 0, 0.32);
+    transform: translate3d(0, calc(100% + 0.9rem), 0);
   }
 
   .lightbox-info-grid {
@@ -12151,7 +12168,7 @@ img.archive-gallery-image {
   }
 
   .lightbox-topbar {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.32rem;
   }
 
@@ -12172,12 +12189,16 @@ img.archive-gallery-image {
     padding-inline: 0.48rem;
   }
 
+  .lightbox-info-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .lightbox-stage {
     min-height: min(60svh, 29rem);
   }
 
   .lightbox-photo {
-    padding: 2.7rem 0.95rem 4rem;
+    padding: 2.7rem 0.95rem;
   }
 
   .lightbox-photo::before {
@@ -12488,7 +12509,7 @@ img.archive-gallery-image {
   }
 
   .lightbox-photo {
-    padding: 2.1rem 4rem 3.2rem;
+    padding: 2.1rem 3.85rem 2.6rem;
   }
 
   .lightbox-photo::before {
@@ -12510,10 +12531,13 @@ img.archive-gallery-image {
 
   .lightbox-info-panel {
     position: fixed;
+    top: auto;
     right: max(0.5rem, env(safe-area-inset-right));
     bottom: max(0.5rem, env(safe-area-inset-bottom));
     left: max(0.5rem, env(safe-area-inset-left));
+    width: auto;
     max-height: min(calc(100svh - 1rem), 16rem);
+    transform: translate3d(0, calc(100% + 0.9rem), 0);
   }
 
   .lightbox-thumbnail-strip {

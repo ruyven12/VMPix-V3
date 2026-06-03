@@ -1060,15 +1060,12 @@
           <article class="v3-lightbox-shell lightbox-screen" id="lightbox-screen" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" aria-hidden="true" tabindex="-1" inert data-lightbox-shell data-lightbox-screen>
             <header class="v3-lightbox-topbar lightbox-topbar">
               <div class="lightbox-back-cluster">
-                <button class="v3-lightbox-close lightbox-back" type="button" aria-label="Back to Gallery" data-lightbox-back>
+                <button class="v3-lightbox-close lightbox-back" type="button" aria-label="Close lightbox" data-lightbox-back>
                   X
                 </button>
-                <span class="lightbox-back-label">Back to Gallery</span>
+                <span class="lightbox-back-label">Close</span>
               </div>
-              <div class="lightbox-counter" aria-label="Current photo">
-                <p class="lightbox-counter-value" data-lightbox-counter>25 / 356</p>
-                <p class="lightbox-counter-label">Current / Total</p>
-              </div>
+              <h4 class="sr-only" id="lightbox-title" data-lightbox-photo-title>Photo 01</h4>
               <button class="lightbox-info-toggle" type="button" aria-controls="lightbox-info-panel" aria-expanded="false" aria-pressed="false" data-lightbox-info-toggle>
                 Info
               </button>
@@ -1078,7 +1075,6 @@
               <section class="v3-lightbox-stage lightbox-stage" aria-labelledby="lightbox-title">
                 <div class="v3-lightbox-media lightbox-photo" role="img" aria-label="Photo 01 placeholder lightbox image" tabindex="0" data-lightbox-photo>
                   <img class="v3-lightbox-image" src="/assets/media/placeholders/archive-gallery-placeholder.svg" alt="" loading="eager" decoding="async" data-lightbox-image>
-                  <span class="v3-lightbox-caption" id="lightbox-title" data-lightbox-photo-title>Photo 01</span>
                 </div>
                 <button class="v3-lightbox-control v3-lightbox-control--prev lightbox-nav-zone lightbox-nav-zone--prev" type="button" aria-label="Previous photo" data-lightbox-prev>
                   &lt;
@@ -1086,91 +1082,50 @@
                 <button class="v3-lightbox-control v3-lightbox-control--next lightbox-nav-zone lightbox-nav-zone--next" type="button" aria-label="Next photo" data-lightbox-next>
                   &gt;
                 </button>
-                <div class="lightbox-photo-meta-rail" aria-label="Photo exposure metadata">
-                  <div class="lightbox-meta-item">
-                    <p class="lightbox-meta-label">Camera</p>
-                    <p class="lightbox-meta-value">Canon R6</p>
-                  </div>
-                  <div class="lightbox-meta-item">
-                    <p class="lightbox-meta-label">Shutter</p>
-                    <p class="lightbox-meta-value">1/250</p>
-                  </div>
-                  <div class="lightbox-meta-item">
-                    <p class="lightbox-meta-label">Aperture</p>
-                    <p class="lightbox-meta-value">f/2.8</p>
-                  </div>
-                  <div class="lightbox-meta-item">
-                    <p class="lightbox-meta-label">ISO</p>
-                    <p class="lightbox-meta-value">3200</p>
-                  </div>
-                </div>
               </section>
 
               <aside class="v3-lightbox-drawer lightbox-info-panel" id="lightbox-info-panel" aria-hidden="true" inert data-lightbox-drawer data-lightbox-info-panel>
                 <header class="v3-lightbox-drawer-header">
                   <div class="v3-lightbox-drawer-heading">
-                    <p class="v3-lightbox-drawer-kicker">Archive Metadata</p>
-                    <h4 class="lightbox-info-title">Live @ Asylum</h4>
+                    <p class="v3-lightbox-drawer-kicker">Photo Info</p>
+                    <h4 class="lightbox-info-title">In Yo Face Tour 2018</h4>
                   </div>
-                  <button class="v3-lightbox-drawer-close" type="button" aria-label="Close metadata drawer" data-lightbox-drawer-close>
+                  <button class="v3-lightbox-drawer-close" type="button" aria-label="Close photo info" data-lightbox-drawer-close>
                     X
                   </button>
                 </header>
-                <div class="v3-lightbox-drawer-grid lightbox-info-grid" aria-label="Lightbox metadata placeholder">
+                <div class="v3-lightbox-drawer-grid lightbox-info-grid" aria-label="Lightbox photo info placeholder">
                   <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Photo Title</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-title>Photo 01</p>
-                  </div>
-                  <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Band Tags</p>
+                    <p class="lightbox-info-label">Band</p>
                     <p class="lightbox-info-value" data-lightbox-meta-band-tags>13 High</p>
                   </div>
                   <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">People Tags</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-people-tags>Pending Curation</p>
-                  </div>
-                  <div class="lightbox-info-item">
                     <p class="lightbox-info-label">Show</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-show>Live @ Asylum</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-show>In Yo Face Tour 2018</p>
                   </div>
                   <div class="lightbox-info-item">
                     <p class="lightbox-info-label">Venue</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-venue>Asylum</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-venue>O'Donoghues Pub</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Location</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-location>Brunswick, Maine</p>
                   </div>
                   <div class="lightbox-info-item">
                     <p class="lightbox-info-label">Date</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-date>JAN 18, 2026</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-date>July 14th, 2018</p>
                   </div>
                   <div class="lightbox-info-item">
-                    <p class="lightbox-info-label">Archive Source</p>
-                    <p class="lightbox-info-value" data-lightbox-meta-source>Static V3 Placeholder</p>
+                    <p class="lightbox-info-label">Performance #</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-performance>11th</p>
+                  </div>
+                  <div class="lightbox-info-item">
+                    <p class="lightbox-info-label">Camera</p>
+                    <p class="lightbox-info-value" data-lightbox-meta-camera>Canon EOS 80D</p>
                   </div>
                 </div>
               </aside>
             </div>
-
-            <div class="lightbox-tool-strip" aria-label="Lightbox view placeholders">
-              <button class="lightbox-tool is-active" type="button" aria-controls="lightbox-thumbnail-strip" aria-pressed="true" data-lightbox-view-toggle="grid">Grid</button>
-              <button class="lightbox-tool" type="button" aria-controls="lightbox-thumbnail-strip" aria-pressed="false" data-lightbox-view-toggle="thumbs">Thumbnails</button>
-              <button class="lightbox-tool" type="button" aria-pressed="false" data-lightbox-fullscreen-toggle>Fullscreen</button>
-            </div>
-
-            <div class="lightbox-thumbnail-strip" id="lightbox-thumbnail-strip" aria-hidden="true" inert data-lightbox-thumbnail-strip>
-              <button class="lightbox-thumb-button is-active" type="button" aria-label="Open Photo 01" aria-pressed="true" data-lightbox-thumb data-lightbox-thumb-index="0">Photo 01</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 02" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="1">Photo 02</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 03" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="2">Photo 03</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 04" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="3">Photo 04</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 05" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="4">Photo 05</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 06" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="5">Photo 06</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 07" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="6">Photo 07</button>
-              <button class="lightbox-thumb-button" type="button" aria-label="Open Photo 08" aria-pressed="false" data-lightbox-thumb data-lightbox-thumb-index="7">Photo 08</button>
-            </div>
-
-            <footer class="lightbox-footer-strip" aria-label="Lightbox footer language">
-              <span>VMPIX V3</span>
-              <span>UNIVERSAL LIGHTBOX UI</span>
-              <span>PHOTO FIRST // CLEAN // CINEMATIC // FUTURISTIC</span>
-            </footer>
           </article>
         </section>
         <section class="ring-archive-shell" aria-labelledby="ring-archive-title" aria-hidden="true" inert data-ring-archive-shell>

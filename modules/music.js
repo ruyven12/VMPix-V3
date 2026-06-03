@@ -2355,24 +2355,33 @@ function setLightboxActivePhoto(index, options = {}) {
   if (lightboxMetaBandTags) {
     lightboxMetaBandTags.textContent = activeMusicBand ? activeMusicBand.name : "13 High";
   }
-  if (lightboxMetaPeopleTags) {
-    lightboxMetaPeopleTags.textContent = "Pending Curation";
-  }
   if (lightboxMetaShow) {
     lightboxMetaShow.textContent = activeSetRow && activeSetRow.dataset.setTitle
       ? activeSetRow.dataset.setTitle
-      : "Live @ Asylum";
+      : "In Yo Face Tour 2018";
   }
   if (lightboxMetaVenue) {
-    lightboxMetaVenue.textContent = activeSetRow ? getSetVenue(activeSetRow) : "Asylum";
+    lightboxMetaVenue.textContent = activeSetRow ? getSetVenue(activeSetRow) : "O'Donoghues Pub";
+  }
+  if (lightboxMetaLocation) {
+    lightboxMetaLocation.textContent = activeSetRow && activeSetRow.dataset.setLocation
+      ? activeSetRow.dataset.setLocation
+      : "Brunswick, Maine";
   }
   if (lightboxMetaDate) {
     lightboxMetaDate.textContent = activeSetRow && activeSetRow.dataset.setDate
       ? activeSetRow.dataset.setDate
-      : "JAN 18, 2026";
+      : "July 14th, 2018";
   }
-  if (lightboxMetaSource) {
-    lightboxMetaSource.textContent = data.mediaId || "Static V3 Placeholder";
+  if (lightboxMetaPerformance) {
+    lightboxMetaPerformance.textContent = activeSetRow && activeSetRow.dataset.setPerformance
+      ? activeSetRow.dataset.setPerformance
+      : "11th";
+  }
+  if (lightboxMetaCamera) {
+    lightboxMetaCamera.textContent = activeSetRow && activeSetRow.dataset.setCamera
+      ? activeSetRow.dataset.setCamera
+      : "Canon EOS 80D";
   }
   if (didChangePhoto || options.forceTransition) {
     runLightboxImageTransition();
@@ -2443,6 +2452,7 @@ function showLightbox(photoTile = activeGalleryPhoto) {
   markLightboxTransitionSource(targetTile);
   setGalleryModeVisible(false);
   setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false });
+  setLightboxInfoVisible(false);
   setLightboxThumbnailStripVisible(false);
   setSetGalleryVisible(false);
   setLightboxVisible(true);
