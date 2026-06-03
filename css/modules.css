@@ -6333,9 +6333,13 @@ img.archive-gallery-image {
     linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 58%),
     rgba(2, 2, 5, 0.62);
   contain: layout paint;
+  overflow: hidden;
 }
 
 .music-shows-filters {
+  position: sticky;
+  top: 0;
+  z-index: 4;
   width: min(100%, 48rem);
   justify-self: center;
   display: grid;
@@ -6477,11 +6481,14 @@ img.archive-gallery-image {
   align-content: start;
   gap: clamp(0.54rem, 1.7vw, 0.76rem);
   margin: 0;
+  height: 100%;
+  max-height: 100%;
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0 0.12rem 0 0;
+  pointer-events: auto;
   list-style: none;
   scrollbar-color: rgba(213, 22, 34, 0.36) rgba(247, 247, 242, 0.055);
   scrollbar-width: thin;

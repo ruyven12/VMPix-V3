@@ -7,8 +7,9 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
-const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db?limit=100";
-const MUSIC_SHOWS_SETS_TIMEOUT_MS = 8000;
+const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
+const MUSIC_SHOWS_SETS_API_LIMIT = 100;
+const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
@@ -1340,9 +1341,7 @@ function restoreMusicShowsSetsFallback() {
 
 function getMusicShowsSetsApiUrl(page = 1) {
   const apiUrl = new URL(MUSIC_SHOWS_SETS_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-  if (!apiUrl.searchParams.has("limit")) {
-    apiUrl.searchParams.set("limit", "100");
-  }
+  apiUrl.searchParams.set("limit", String(MUSIC_SHOWS_SETS_API_LIMIT));
   apiUrl.searchParams.set("page", String(page));
   return apiUrl;
 }
@@ -1362,7 +1361,7 @@ function fetchMusicShowsSetsPage(page, signal) {
 
 function getMusicShowsPayloadPageCount(payload) {
   const pageCount = Number(payload?.totalPages || payload?.meta?.pagination?.totalPages);
-  return Number.isFinite(pageCount) && pageCount > 0 ? Math.min(Math.trunc(pageCount), 10) : 1;
+  return Number.isFinite(pageCount) && pageCount > 0 ? Math.trunc(pageCount) : 1;
 }
 
 function mergeMusicShowsPayloadPages(payloads) {
@@ -4800,10 +4799,6 @@ function renderMusicShowsArchive(options = {}) {
   normalizeActiveMusicShowsFilters(allRows);
   musicActivityPanel.insertBefore(createMusicShowsFilters(allRows), musicActivityList);
 
-  const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
-  if (existingNav) {
-    existingNav.remove();
-  }
   const existingTemplates = musicActivityPanel.querySelector("[data-music-shows-state-templates]");
   if (existingTemplates) {
     existingTemplates.remove();
@@ -4859,10 +4854,6 @@ function renderMusicActivityRows(sectionName, rows) {
   const existingFilters = musicActivityPanel.querySelector("[data-music-shows-filters]");
   if (existingFilters) {
     existingFilters.remove();
-  }
-  const existingNav = musicActivityPanel.querySelector("[data-music-shows-nav]");
-  if (existingNav) {
-    existingNav.remove();
   }
   const existingTemplates = musicActivityPanel.querySelector("[data-music-shows-state-templates]");
   if (existingTemplates) {
