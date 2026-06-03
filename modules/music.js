@@ -9,6 +9,8 @@ const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows";
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 8000;
+const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
+const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
 const bandsRegionFilterLabels = {
   local: "Local",
@@ -28,6 +30,9 @@ let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
 let musicShowsSetsDataState = "fallback";
+let musicVenuesCollection = [];
+let musicVenuesRequest = null;
+let musicVenuesLoaded = false;
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -186,6 +191,16 @@ function getSetRouteUrl(bandId, setCode) {
 function findSetRowByCode(setCode) {
   const normalizedSetCode = normalizeSetCode(setCode);
   return getSetsRows().find((row, index) => getSetCode(row, index) === normalizedSetCode) || null;
+}
+
+function findSetDataByCode(setCode, band = activeMusicBand) {
+  const normalizedSetCode = normalizeSetCode(setCode);
+  if (!normalizedSetCode) {
+    return null;
+  }
+
+  return getSetsArchiveRowsForBand(band)
+    .find((show) => normalizeSetCode(show?.setCode) === normalizedSetCode) || null;
 }
 
 function createUnknownSetRow(setCode) {
@@ -847,6 +862,122 @@ function getMusicShowsPayloadRows(payload) {
   return [];
 }
 
+function getMusicVenuesPayloadRows(payload) {
+  const candidates = [
+    payload?.data,
+    payload?.rows,
+    payload?.venues,
+    payload?.source?.data,
+    payload?.source?.rows,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((row) => row && typeof row === "object");
+    }
+    if (candidate && typeof candidate === "object") {
+      const nestedRows = Object.values(candidate).flatMap((value) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        return value && typeof value === "object" ? [value] : [];
+      });
+      if (nestedRows.length > 0) {
+        return nestedRows;
+      }
+    }
+  }
+
+  return [];
+}
+
+function normalizeMusicVenueRow(record) {
+  const source = record && typeof record === "object" ? record : {};
+  const venueId = String(source.venue_id || source.venueId || source.id || source.slug || "").trim();
+  const venueName = String(source.venue || source.name || source.title || "").trim();
+
+  return {
+    ...source,
+    venueId,
+    venueName,
+  };
+}
+
+function normalizeMusicVenues(payload) {
+  return getMusicVenuesPayloadRows(payload)
+    .map(normalizeMusicVenueRow)
+    .filter((venue) => venue.venueId && isReadableMusicVenueName(venue.venueName));
+}
+
+function setMusicVenuesCollection(rows) {
+  musicVenuesCollection = Array.isArray(rows) ? rows : [];
+}
+
+function findMusicVenueById(venueId) {
+  const normalizedVenueId = String(venueId || "").trim().toLowerCase();
+  if (!normalizedVenueId) {
+    return null;
+  }
+
+  return musicVenuesCollection.find((venue) => {
+    const venueKeys = [
+      venue.venueId,
+      venue.venue_id,
+      venue.id,
+      venue.slug,
+    ];
+    return venueKeys.some((key) => String(key || "").trim().toLowerCase() === normalizedVenueId);
+  }) || null;
+}
+
+function requestMusicVenuesData() {
+  if (musicVenuesLoaded) {
+    return Promise.resolve(true);
+  }
+  if (musicVenuesRequest) {
+    return musicVenuesRequest;
+  }
+  if (typeof fetch !== "function") {
+    return Promise.resolve(false);
+  }
+
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_VENUES_TIMEOUT_MS)
+    : 0;
+  const apiUrl = new URL(MUSIC_VENUES_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+
+  musicVenuesRequest = fetch(apiUrl, {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music venues request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const liveRows = normalizeMusicVenues(payload);
+      if (liveRows.length === 0) {
+        throw new Error("Music venues response contained no rows");
+      }
+
+      setMusicVenuesCollection(liveRows);
+      musicVenuesLoaded = true;
+      return true;
+    })
+    .catch(() => false)
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      musicVenuesRequest = null;
+    });
+
+  return musicVenuesRequest;
+}
+
 function parseMusicShowDate(dateValue) {
   const rawDate = String(dateValue || "").trim();
   if (!rawDate) {
@@ -991,17 +1122,25 @@ function isReadableMusicVenueName(venueName) {
 }
 
 function getMusicShowVenueName(show) {
+  const venueRecord = findMusicVenueById(show?.venue_id || show?.venueId);
   const displayCandidates = [
     show?.venue_details?.venue,
     show?.venue_details?.name,
     show?.venueDetails?.venue,
     show?.venueDetails?.name,
     show?.venue,
+    venueRecord?.venueName,
+    venueRecord?.venue,
+    venueRecord?.name,
   ];
 
   return displayCandidates
     .map((venue) => String(venue || "").trim())
     .find(isReadableMusicVenueName) || "";
+}
+
+function getMusicShowIdValue(show) {
+  return String(show?.show_id ?? show?.showId ?? "").trim();
 }
 
 function getMusicShowBandPerformanceValue(show, band, fallbackValue = "Coming Soon") {
@@ -1107,7 +1246,7 @@ function normalizeMusicShowSetRow(record, index = 0) {
 
   return {
     ...source,
-    showId: source.show_id || source.showId || "",
+    showId: getMusicShowIdValue(source),
     setCode,
     year: getMusicShowYear(rawDate),
     rawDate,
@@ -1207,6 +1346,7 @@ function requestMusicShowsSetsData() {
       }
       return response.json();
     })
+    .then((payload) => requestMusicVenuesData().then(() => payload))
     .then((payload) => {
       const liveRows = normalizeMusicShowSetRows(payload);
       if (liveRows.length === 0) {
@@ -1769,10 +1909,30 @@ function getSetVenue(row) {
     return "Venue Pending";
   }
 
-  if (row.dataset.setVenue) {
+  const show = findSetDataByCode(getSetCode(row), activeMusicBand);
+  const liveVenue = show ? getMusicShowVenueName(show) : "";
+  if (liveVenue) {
+    return liveVenue;
+  }
+
+  if (isReadableMusicVenueName(row.dataset.setVenue)) {
     return row.dataset.setVenue;
   }
   return "Venue Pending";
+}
+
+function getSetShowId(row) {
+  if (!row) {
+    return "Pending";
+  }
+
+  const show = findSetDataByCode(getSetCode(row), activeMusicBand);
+  const liveShowId = getMusicShowIdValue(show);
+  if (liveShowId) {
+    return liveShowId;
+  }
+
+  return String(row.dataset.setShowId || "").trim() || "Pending";
 }
 
 function getSetQuality(row) {
@@ -1821,7 +1981,7 @@ function updateSetGalleryFromRow(row) {
     setGalleryTitle.textContent = setData.setTitle || "";
   }
   if (setGalleryShowId) {
-    setGalleryShowId.textContent = setData.setShowId || "Pending";
+    setGalleryShowId.textContent = getSetShowId(row);
   }
   if (setGalleryCity) {
     setGalleryCity.textContent = setData.setLocation || "";
@@ -2607,7 +2767,7 @@ function createSetsListRow(show, isActive = false) {
   row.type = "button";
   row.dataset.setRow = "";
   row.dataset.setCode = show.setCode;
-  row.dataset.setShowId = show.showId || "";
+  row.dataset.setShowId = getMusicShowIdValue(show);
   row.dataset.setYear = show.year;
   row.dataset.setDate = show.formattedDate;
   row.dataset.setRawDate = show.rawDate || "";
@@ -2616,7 +2776,7 @@ function createSetsListRow(show, isActive = false) {
   row.dataset.setCity = show.city || "";
   row.dataset.setState = show.state || "";
   row.dataset.setPoster = show.poster || "";
-  row.dataset.setVenue = show.venue || "";
+  row.dataset.setVenue = getMusicShowVenueName(show);
   row.dataset.setPerformance = getMusicShowBandPerformanceValue(show, activeMusicBand);
   row.dataset.setPhotos = "Coming Soon";
   row.dataset.setContributors = show.contributors || "Coming Soon";
