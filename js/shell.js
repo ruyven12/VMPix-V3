@@ -374,7 +374,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return historyState.bandUrl || getBandRouteUrl(route.bandId);
   }
   if (route.name === "set-detail") {
-    return historyState.bandUrl || getBandRouteUrl(route.bandId);
+    return historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId);
   }
   if (route.name === "wrestling-match-gallery") {
     return `${routePaths.wrestlingShows}/${encodeURIComponent(route.showId || "warzone-26")}`;
@@ -396,7 +396,7 @@ function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = win
   return (
     (route.name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) ||
     (route.name === "sets-archive" && historyState.bandUrl && historyState.fromBandDetail) ||
-    (route.name === "set-detail" && historyState.bandUrl && historyState.fromBandDetail) ||
+    (route.name === "set-detail" && historyState.setsArchiveUrl && historyState.fromSetsArchive) ||
     (route.name === "person-detail" && historyState.fromPeopleIndex) ||
     (route.name === "show-detail" && historyState.fromShowsArchive) ||
     (route.name === "wrestling-person-detail" && historyState.fromWrestlingPeopleIndex) ||

@@ -135,6 +135,11 @@ function getRouteFromUrl(url = window.location.href) {
       const bandId = decodeRoutePart(routeParts[0]);
       return { name: "sets-archive", bandId, canonicalUrl: getBandSetsRouteUrl(bandId) };
     }
+    if (routeParts.length === 2 && routeParts[0] && routeParts[1] !== "sets") {
+      const bandId = decodeRoutePart(routeParts[0]);
+      const setCode = normalizeSetCode(decodeRoutePart(routeParts[1]));
+      return { name: "set-detail", bandId, setCode, canonicalUrl: getSetRouteUrl(bandId, setCode) };
+    }
     if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "sets" && routeParts[2]) {
       const bandId = decodeRoutePart(routeParts[0]);
       const setCode = normalizeSetCode(decodeRoutePart(routeParts[2]));
@@ -382,15 +387,16 @@ function syncRoute(route, options = {}) {
     const historyState = options.historyState || window.history.state || {};
     bandsIndexReturnUrl = normalizeBandsReturnUrl(
       historyState.returnUrl ||
-      (historyState.fromBandDetail ? bandsIndexReturnUrl : getBandsRouteUrl("radar"))
+      ((historyState.fromSetsArchive || historyState.fromBandDetail) ? bandsIndexReturnUrl : getBandsRouteUrl("radar"))
     );
     showMusicNexus({ initialSection: "bands" });
     showSetDetailRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), route.setCode);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
         bandUrl: getBandRouteUrl(route.bandId),
+        setsArchiveUrl: getBandSetsRouteUrl(route.bandId),
         returnUrl: bandsIndexReturnUrl,
-        fromBandDetail: Boolean(historyState.fromBandDetail),
+        fromSetsArchive: Boolean(historyState.fromSetsArchive),
         fromBandsIndex: Boolean(historyState.fromBandsIndex),
       });
     }

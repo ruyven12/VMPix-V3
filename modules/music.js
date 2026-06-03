@@ -141,19 +141,15 @@ function normalizeSetCode(setCode) {
   return String(setCode || "").trim().toLowerCase();
 }
 
-function getSetCodeFromDateLabel(dateLabel) {
-  const match = String(dateLabel || "").trim().toUpperCase().match(/^([A-Z]{3})\s+(\d{1,2}),\s+(\d{4})$/);
-  if (!match) {
+function getSetCodeFromDateValue(dateValue) {
+  const parsedDate = parseMusicShowDate(dateValue);
+  if (!parsedDate) {
     return "";
   }
 
-  const month = setDateMonthCodes[match[1]];
-  if (!month) {
-    return "";
-  }
-
-  const day = match[2].padStart(2, "0");
-  const year = match[3].slice(-2);
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  const year = String(parsedDate.getFullYear()).slice(-2);
   return `${month}${day}${year}`;
 }
 
@@ -164,14 +160,18 @@ function getSetCode(row, fallbackIndex = 0) {
 
   return normalizeSetCode(
     row.dataset.setCode ||
-    getSetCodeFromDateLabel(row.dataset.setDate) ||
+    getSetCodeFromDateValue(row.dataset.setRawDate || row.dataset.setDate) ||
     String(fallbackIndex + 1).padStart(6, "0")
   );
 }
 
 function hydrateSetRouteMetadata() {
   getSetsRows().forEach((row, index) => {
-    const setCode = normalizeSetCode(row.dataset.setCode || mockSetCodes[index] || getSetCodeFromDateLabel(row.dataset.setDate));
+    const setCode = normalizeSetCode(
+      getSetCodeFromDateValue(row.dataset.setRawDate || row.dataset.setDate) ||
+      row.dataset.setCode ||
+      mockSetCodes[index]
+    );
     if (setCode) {
       row.dataset.setCode = setCode;
     }
@@ -179,7 +179,7 @@ function hydrateSetRouteMetadata() {
 }
 
 function getSetRouteUrl(bandId, setCode) {
-  return `${getBandRouteUrl(bandId)}/sets/${encodeURIComponent(normalizeSetCode(setCode))}`;
+  return `${getBandRouteUrl(bandId)}/${encodeURIComponent(normalizeSetCode(setCode))}`;
 }
 
 function findSetRowByCode(setCode) {
@@ -248,12 +248,14 @@ function navigateToSetDetail(row) {
 
   const historyState = window.history.state || {};
   const returnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+  const setsArchiveUrl = getBandSetsRouteUrl(bandId);
   bandsIndexReturnUrl = returnUrl;
   navigateToRoute(getSetRouteUrl(bandId, setCode), {
     historyState: {
       bandUrl: getBandRouteUrl(bandId),
+      setsArchiveUrl,
       returnUrl,
-      fromBandDetail: true,
+      fromSetsArchive: true,
       fromBandsIndex: Boolean(historyState.fromBandsIndex),
     },
   });
@@ -289,8 +291,20 @@ function returnToBandDetailRoute() {
   }
 
   const bandUrl = historyState.bandUrl || getBandRouteUrl(bandId);
-  if (route.name === "set-detail" && historyState.bandUrl && historyState.fromBandDetail) {
+  const setsArchiveUrl = historyState.setsArchiveUrl || getBandSetsRouteUrl(bandId);
+  if (route.name === "set-detail" && historyState.setsArchiveUrl && historyState.fromSetsArchive) {
     window.history.back();
+    return;
+  }
+  if (route.name === "set-detail") {
+    navigateToRoute(setsArchiveUrl, {
+      historyState: {
+        bandUrl,
+        returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
+        fromBandDetail: true,
+        fromBandsIndex: Boolean(historyState.fromBandsIndex),
+      },
+    });
     return;
   }
 
@@ -810,7 +824,19 @@ function parseMusicShowDate(dateValue) {
     }
   }
 
-  const parsedDate = new Date(rawDate);
+  const isoDateMatch = rawDate.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|[T\s])/);
+  if (isoDateMatch) {
+    const year = Number.parseInt(isoDateMatch[1], 10);
+    const month = Number.parseInt(isoDateMatch[2], 10);
+    const day = Number.parseInt(isoDateMatch[3], 10);
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day) {
+      return date;
+    }
+  }
+
+  const cleanedDate = rawDate.replace(/\b(\d{1,2})(st|nd|rd|th)\b/gi, "$1");
+  const parsedDate = new Date(cleanedDate);
   return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
 }
 
@@ -870,7 +896,7 @@ function normalizeMusicShowSetRow(record, index = 0) {
   const name = String(source.name || source.title || source.show_name || `Show ${index + 1}`).trim();
   const rawDate = String(source.date || source.show_date || source.eventDate || "").trim();
   const date = parseMusicShowDate(rawDate);
-  const setCode = createBandSlug(`${rawDate || index + 1}-${name}`);
+  const setCode = getSetCodeFromDateValue(rawDate) || createBandSlug(`${rawDate || index + 1}-${name}`);
   const poster = String(source.poster || source.poster_url || source.image_url || source.logo_url || "").trim();
   const city = String(source.city || source.location_city || "").trim();
   const state = String(source.state || source.location_state || "").trim();
@@ -2187,12 +2213,7 @@ function openSelectedSetDetail() {
     return;
   }
 
-  updateSetsFeaturedFromRow(row);
-  updateSetDetailFromRow(row);
-  setSetDetailVisible(true);
-  if (setDetailClose) {
-    setDetailClose.focus({ preventScroll: true });
-  }
+  navigateToSetDetail(row);
 }
 
 function closeSelectedSetDetail() {
@@ -4765,7 +4786,7 @@ function initMusicModule() {
     bandDetailViewSets.addEventListener("click", navigateToBandSetsArchive);
   }
   if (setsFeaturedOpen) {
-    setsFeaturedOpen.addEventListener("click", showSetGallery);
+    setsFeaturedOpen.addEventListener("click", openSelectedSetDetail);
   }
   if (setGalleryBack) {
     setGalleryBack.addEventListener("click", returnToSetsArchiveFromGallery);
