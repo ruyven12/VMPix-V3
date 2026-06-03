@@ -899,6 +899,16 @@ function getOrdinalSuffix(day) {
   }
 }
 
+function formatOrdinalNumber(value, fallbackValue = "Coming Soon") {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return fallbackValue;
+  }
+
+  const integerValue = Math.trunc(numericValue);
+  return `${integerValue}${getOrdinalSuffix(integerValue)}`;
+}
+
 function formatMusicShowDate(dateValue) {
   const parsedDate = parseMusicShowDate(dateValue);
   if (!parsedDate) {
@@ -971,31 +981,82 @@ function getMusicShowBandSlugs(show) {
     .filter(Boolean);
 }
 
+function isReadableMusicVenueName(venueName) {
+  const normalizedVenue = String(venueName || "").trim();
+  if (!normalizedVenue) {
+    return false;
+  }
+
+  return !normalizedVenue.includes("_") && !/^[a-z0-9]+(?:-[a-z0-9]+)+$/i.test(normalizedVenue);
+}
+
 function getMusicShowVenueName(show) {
   const displayCandidates = [
-    show?.venue_display,
-    show?.venueDisplay,
-    show?.venue_name,
-    show?.venueName,
     show?.venue_details?.venue,
     show?.venue_details?.name,
-    show?.venue_details?.title,
-    show?.venue_details?.label,
-    show?.venue_details?.display_name,
-    show?.venue_details?.displayName,
     show?.venueDetails?.venue,
     show?.venueDetails?.name,
-    show?.venueDetails?.title,
-    show?.venueDetails?.label,
-    show?.venueDetails?.display_name,
-    show?.venueDetails?.displayName,
+    show?.venue,
   ];
-  const rawVenue = String(show?.venue || "").trim();
-  const displayVenue = displayCandidates
-    .map((venue) => String(venue || "").trim())
-    .find(Boolean);
 
-  return displayVenue || rawVenue;
+  return displayCandidates
+    .map((venue) => String(venue || "").trim())
+    .find(isReadableMusicVenueName) || "";
+}
+
+function getMusicShowBandPerformanceValue(show, band, fallbackValue = "Coming Soon") {
+  const showBands = Array.isArray(show?.bands) ? show.bands : [];
+  if (showBands.length === 0) {
+    return fallbackValue;
+  }
+
+  const bandNameKeys = [
+    band?.name,
+    band?.general?.name,
+    band?.band,
+    band?.title,
+  ]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .filter(Boolean);
+  const bandSlugKeys = [
+    getBandId(band),
+    band?.band_id,
+    band?.slug,
+    ...bandNameKeys.map(createBandSlug),
+  ]
+    .map((value) => createBandSlug(value))
+    .filter(Boolean);
+
+  const matchingBand = showBands.find((showBand) => {
+    const candidateNames = [
+      showBand?.band,
+      showBand?.name,
+      showBand?.band_name,
+      showBand?.bandName,
+    ]
+      .map((value) => String(value || "").trim().toLowerCase())
+      .filter(Boolean);
+    const candidateSlugs = [
+      showBand?.band_slug,
+      showBand?.bandSlug,
+      showBand?.band_id,
+      showBand?.bandId,
+      showBand?.slug,
+      ...candidateNames.map(createBandSlug),
+    ]
+      .map((value) => createBandSlug(value))
+      .filter(Boolean);
+
+    return candidateNames.some((candidate) => bandNameKeys.includes(candidate)) ||
+      candidateSlugs.some((candidate) => bandSlugKeys.includes(candidate));
+  }) || (showBands.length === 1 ? showBands[0] : null);
+
+  const rawCount = matchingBand?.bandViewCount ??
+    matchingBand?.band_view_count ??
+    matchingBand?.performanceCount ??
+    matchingBand?.performance_count;
+
+  return formatOrdinalNumber(rawCount, fallbackValue);
 }
 
 function getMusicShowContributorValue(show, fallbackValue = "Coming Soon") {
@@ -1024,7 +1085,7 @@ function formatMusicShowCameras(show) {
   const cameras = [show?.camera_1, show?.camera_2]
     .map((camera) => String(camera || "").trim())
     .filter(Boolean);
-  return cameras.length > 0 ? cameras.join(" / ") : "N/A";
+  return cameras.length > 0 ? cameras.join("\n") : "N/A";
 }
 
 function getMusicShowNotes(show) {
@@ -1046,7 +1107,7 @@ function normalizeMusicShowSetRow(record, index = 0) {
 
   return {
     ...source,
-    showId: source.show_id || source.showId || source.id || setCode,
+    showId: source.show_id || source.showId || "",
     setCode,
     year: getMusicShowYear(rawDate),
     rawDate,
@@ -1078,7 +1139,7 @@ function getFallbackSetRowsData() {
   return Array.from(setsRows).map((row, index) => {
     const dataset = row.dataset || {};
     return {
-      showId: dataset.setCode || getSetCode(row, index),
+      showId: dataset.setShowId || "",
       setCode: getSetCode(row, index),
       year: String(dataset.setYear || "2026"),
       rawDate: dataset.setDate || "",
@@ -1759,11 +1820,17 @@ function updateSetGalleryFromRow(row) {
   if (setGalleryTitle) {
     setGalleryTitle.textContent = setData.setTitle || "";
   }
+  if (setGalleryShowId) {
+    setGalleryShowId.textContent = setData.setShowId || "Pending";
+  }
   if (setGalleryCity) {
     setGalleryCity.textContent = setData.setLocation || "";
   }
   if (setGalleryVenue) {
     setGalleryVenue.textContent = getSetVenue(row);
+  }
+  if (setGalleryPerformance) {
+    setGalleryPerformance.textContent = setData.setPerformance || "Coming Soon";
   }
   if (setGalleryPhotos) {
     setGalleryPhotos.textContent = "Coming Soon";
@@ -2540,6 +2607,7 @@ function createSetsListRow(show, isActive = false) {
   row.type = "button";
   row.dataset.setRow = "";
   row.dataset.setCode = show.setCode;
+  row.dataset.setShowId = show.showId || "";
   row.dataset.setYear = show.year;
   row.dataset.setDate = show.formattedDate;
   row.dataset.setRawDate = show.rawDate || "";
@@ -2548,7 +2616,8 @@ function createSetsListRow(show, isActive = false) {
   row.dataset.setCity = show.city || "";
   row.dataset.setState = show.state || "";
   row.dataset.setPoster = show.poster || "";
-  row.dataset.setVenue = show.venue || show.venue_id || "";
+  row.dataset.setVenue = show.venue || "";
+  row.dataset.setPerformance = getMusicShowBandPerformanceValue(show, activeMusicBand);
   row.dataset.setPhotos = "Coming Soon";
   row.dataset.setContributors = show.contributors || "Coming Soon";
   row.dataset.setComplete = "";
