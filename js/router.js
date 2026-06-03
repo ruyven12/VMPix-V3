@@ -391,6 +391,17 @@ function syncRoute(route, options = {}) {
     );
     showMusicNexus({ initialSection: "bands" });
     showSetDetailRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), route.setCode);
+    requestMusicBandsIndexData().then(() => {
+      const currentRoute = getRouteFromUrl();
+      if (
+        currentRoute.name !== "set-detail" ||
+        String(currentRoute.bandId || "").toLowerCase() !== String(route.bandId || "").toLowerCase()
+      ) {
+        return;
+      }
+
+      showSetDetailRoute(findBandById(currentRoute.bandId) || createUnknownBand(currentRoute.bandId), currentRoute.setCode);
+    });
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
         bandUrl: getBandRouteUrl(route.bandId),

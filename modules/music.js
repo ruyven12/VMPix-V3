@@ -316,18 +316,57 @@ function returnToBandDetailRoute() {
   });
 }
 
+function showSetGalleryRoute(row, options = {}) {
+  if (!row || !setGallery) {
+    return;
+  }
+
+  updateSetsFeaturedFromRow(row);
+  updateSetGalleryFromRow(row);
+  setGalleryState("ready");
+  setBandsIndexVisible(false);
+  setBandDetailVisible(false);
+  setSetDetailVisible(false);
+  setSetsArchiveVisible(false);
+  setSetGalleryVisible(true);
+  setGalleryModeVisible(false);
+  if (galleryPhotoTiles[0]) {
+    selectGalleryPhoto(galleryPhotoTiles[0]);
+  }
+  setCurrentView(row.dataset.setTitle || "Set Detail");
+  if (options.shouldScroll !== false && musicNexusShell) {
+    musicNexusShell.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
+}
+
 function showSetDetailRoute(band, setCode) {
   if (!band) {
     return;
   }
 
   activeMusicBand = band;
-  const setRow = findSetRowByCode(setCode);
-  showSetsArchive({
-    selectedSetCode: setCode,
-    selectedSetRow: setRow,
-    shouldOpenDetail: true,
-    shouldScroll: false,
+  const selectedSetCode = normalizeSetCode(setCode);
+  if (!musicShowsSetsLoaded && musicShowsSetsCollection.length === 0) {
+    restoreMusicShowsSetsFallback();
+  }
+
+  renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
+  showSetGalleryRoute(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode), { shouldScroll: false });
+  requestMusicShowsSetsData().then(() => {
+    const route = getRouteFromUrl();
+    if (
+      route.name !== "set-detail" ||
+      String(route.bandId || "").toLowerCase() !== String(getBandId(band) || "").toLowerCase()
+    ) {
+      return;
+    }
+
+    const currentSetCode = normalizeSetCode(route.setCode || selectedSetCode);
+    renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode: currentSetCode });
+    showSetGalleryRoute(findSetRowByCode(currentSetCode) || createUnknownSetRow(currentSetCode), { shouldScroll: false });
   });
 }
 
@@ -2234,26 +2273,36 @@ function showSetGallery() {
     return;
   }
 
-  updateSetsFeaturedFromRow(row);
-  updateSetGalleryFromRow(row);
-  setGalleryState("ready");
-  setSetDetailVisible(false);
-  setSetsArchiveVisible(false);
-  setSetGalleryVisible(true);
-  setGalleryModeVisible(false);
-  if (galleryPhotoTiles[0]) {
-    selectGalleryPhoto(galleryPhotoTiles[0]);
-  }
-  setCurrentView("LIVE @ ASYLUM");
-  if (musicNexusShell) {
-    musicNexusShell.scrollTo({
-      top: 0,
-      behavior: reducedMotion.matches ? "auto" : "smooth",
-    });
-  }
+  showSetGalleryRoute(row);
 }
 
 function returnToSetsArchiveFromGallery() {
+  const route = getRouteFromUrl();
+  if (route.name === "set-detail") {
+    const historyState = window.history.state || {};
+    const bandId = route.bandId || getBandId(activeMusicBand);
+    if (!bandId) {
+      returnToBandsIndexRoute();
+      return;
+    }
+
+    const setsArchiveUrl = historyState.setsArchiveUrl || getBandSetsRouteUrl(bandId);
+    if (historyState.setsArchiveUrl && historyState.fromSetsArchive) {
+      window.history.back();
+      return;
+    }
+
+    navigateToRoute(setsArchiveUrl, {
+      historyState: {
+        bandUrl: historyState.bandUrl || getBandRouteUrl(bandId),
+        returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
+        fromBandDetail: true,
+        fromBandsIndex: Boolean(historyState.fromBandsIndex),
+      },
+    });
+    return;
+  }
+
   setSetGalleryVisible(false);
   setSetsArchiveVisible(true);
   setCurrentView(activeMusicBand ? `Sets ${activeMusicBand.name}` : "Sets Archive");
