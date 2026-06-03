@@ -5269,7 +5269,7 @@ function initMusicModule() {
   galleryPhotoTiles.forEach((tile) => {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
     tile.addEventListener("click", () => {
-      selectGalleryPhoto(tile);
+      showLightbox(tile);
     });
   });
   galleryViewOptions.forEach((option) => {
