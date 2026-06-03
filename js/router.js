@@ -131,6 +131,10 @@ function getRouteFromUrl(url = window.location.href) {
       const bandId = decodeRoutePart(routeParts[0]);
       return { name: "band-detail", bandId, canonicalUrl: getBandRouteUrl(bandId) };
     }
+    if (routeParts.length === 2 && routeParts[0] && routeParts[1] === "sets") {
+      const bandId = decodeRoutePart(routeParts[0]);
+      return { name: "sets-archive", bandId, canonicalUrl: getBandSetsRouteUrl(bandId) };
+    }
     if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "sets" && routeParts[2]) {
       const bandId = decodeRoutePart(routeParts[0]);
       const setCode = normalizeSetCode(decodeRoutePart(routeParts[2]));
@@ -344,6 +348,30 @@ function syncRoute(route, options = {}) {
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
         returnUrl: bandsIndexReturnUrl,
+        fromBandsIndex: Boolean(historyState.fromBandsIndex),
+      });
+    }
+    return;
+  }
+
+  if (route.name === "sets-archive") {
+    const historyState = options.historyState || window.history.state || {};
+    bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+    showMusicNexus({ initialSection: "bands" });
+    showSetsArchiveRoute(findBandById(route.bandId) || createUnknownBand(route.bandId));
+    requestMusicBandsIndexData().then(() => {
+      const currentRoute = getRouteFromUrl();
+      if (currentRoute.name !== "sets-archive" || String(currentRoute.bandId || "").toLowerCase() !== String(route.bandId || "").toLowerCase()) {
+        return;
+      }
+
+      showSetsArchiveRoute(findBandById(currentRoute.bandId) || createUnknownBand(currentRoute.bandId));
+    });
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl, {
+        bandUrl: getBandRouteUrl(route.bandId),
+        returnUrl: bandsIndexReturnUrl,
+        fromBandDetail: Boolean(historyState.fromBandDetail),
         fromBandsIndex: Boolean(historyState.fromBandsIndex),
       });
     }

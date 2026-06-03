@@ -1913,6 +1913,7 @@ const routeNameToGlobalNavTarget = {
   music: "music",
   "music-bands": "music",
   "band-detail": "music",
+  "sets-archive": "music",
   "set-detail": "music",
   "music-people": "music",
   "person-detail": "music",
@@ -1939,6 +1940,7 @@ const routeNameToBreadcrumbTrail = {
   music: ["portfolio", "music"],
   "music-bands": ["portfolio", "music", "music-bands"],
   "band-detail": ["portfolio", "music", "music-bands"],
+  "sets-archive": ["portfolio", "music", "music-bands"],
   "set-detail": ["portfolio", "music", "music-bands"],
   "music-people": ["portfolio", "music", "music-people"],
   "person-detail": ["portfolio", "music", "music-people"],
@@ -1961,6 +1963,7 @@ const routeNameToBreadcrumbTrail = {
 
 const routeNameToDrilldownBreadcrumb = {
   "band-detail": "Band Detail",
+  "sets-archive": "Sets Archive",
   "set-detail": "Set Detail",
   "person-detail": "Person Detail",
   "show-detail": "Show Detail",
@@ -1976,6 +1979,7 @@ const routeNameToShellBackTarget = {
   music: routePaths.portfolio,
   "music-bands": routePaths.music,
   "band-detail": routePaths.musicBands,
+  "sets-archive": "",
   "set-detail": "",
   "music-people": routePaths.music,
   "person-detail": routePaths.musicPeople,

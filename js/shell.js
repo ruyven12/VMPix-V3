@@ -370,6 +370,9 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
   if (route.name === "band-detail") {
     return normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl || routeNameToShellBackTarget[route.name]);
   }
+  if (route.name === "sets-archive") {
+    return historyState.bandUrl || getBandRouteUrl(route.bandId);
+  }
   if (route.name === "set-detail") {
     return historyState.bandUrl || getBandRouteUrl(route.bandId);
   }
@@ -392,6 +395,7 @@ function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = win
 
   return (
     (route.name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) ||
+    (route.name === "sets-archive" && historyState.bandUrl && historyState.fromBandDetail) ||
     (route.name === "set-detail" && historyState.bandUrl && historyState.fromBandDetail) ||
     (route.name === "person-detail" && historyState.fromPeopleIndex) ||
     (route.name === "show-detail" && historyState.fromShowsArchive) ||
@@ -1703,6 +1707,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     music: musicNexusShell,
     "music-bands": musicNexusShell,
     "band-detail": musicNexusShell,
+    "sets-archive": musicNexusShell,
     "set-detail": musicNexusShell,
     "music-people": musicNexusShell,
     "person-detail": musicNexusShell,

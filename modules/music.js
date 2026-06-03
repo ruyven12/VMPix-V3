@@ -45,6 +45,10 @@ function getBandRouteUrl(bandId) {
   return `${routePaths.musicBands}/${encodeURIComponent(String(bandId || "").trim())}`;
 }
 
+function getBandSetsRouteUrl(bandId) {
+  return `${getBandRouteUrl(bandId)}/sets`;
+}
+
 function normalizeMusicPersonId(personId) {
   return String(personId || "").trim().toLowerCase();
 }
@@ -255,6 +259,26 @@ function navigateToSetDetail(row) {
   });
 }
 
+function navigateToBandSetsArchive() {
+  const bandId = getBandId(activeMusicBand) || getRouteFromUrl().bandId;
+  if (!bandId) {
+    showSetsArchive();
+    return;
+  }
+
+  const historyState = window.history.state || {};
+  const returnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
+  bandsIndexReturnUrl = returnUrl;
+  navigateToRoute(getBandSetsRouteUrl(bandId), {
+    historyState: {
+      bandUrl: getBandRouteUrl(bandId),
+      returnUrl,
+      fromBandDetail: true,
+      fromBandsIndex: Boolean(historyState.fromBandsIndex),
+    },
+  });
+}
+
 function returnToBandDetailRoute() {
   const historyState = window.history.state || {};
   const route = getRouteFromUrl();
@@ -291,6 +315,15 @@ function showSetDetailRoute(band, setCode) {
     shouldOpenDetail: true,
     shouldScroll: false,
   });
+}
+
+function showSetsArchiveRoute(band) {
+  if (!band) {
+    return;
+  }
+
+  showBandDetail(band);
+  showSetsArchive({ shouldScroll: false });
 }
 
 function getMusicBandsIndexCollection() {
@@ -4729,9 +4762,7 @@ function initMusicModule() {
     bandDetailBack.addEventListener("click", returnToBandsIndexRoute);
   }
   if (bandDetailViewSets) {
-    bandDetailViewSets.addEventListener("click", () => {
-      showSetsArchive();
-    });
+    bandDetailViewSets.addEventListener("click", navigateToBandSetsArchive);
   }
   if (setsFeaturedOpen) {
     setsFeaturedOpen.addEventListener("click", showSetGallery);
