@@ -1405,6 +1405,10 @@ button {
   color: color-mix(in srgb, var(--module-accent) 78%, var(--color-text));
 }
 
+.hub-card--wrestling .hub-card-title {
+  color: color-mix(in srgb, var(--module-accent) 78%, var(--color-text));
+}
+
 .hub-card-meta {
   align-self: start;
   color: var(--color-muted);
