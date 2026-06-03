@@ -4208,21 +4208,44 @@ function getMusicShowRouteUrl(show) {
 }
 
 function findMusicShowById(showId) {
-  return getMockRecordById("musicShows", showId, ["showId", "id", "slug", "show_id"]) || null;
+  const targetCode = normalizeSetCode(showId);
+  if (!targetCode) {
+    return null;
+  }
+
+  const indexedShow = getMusicShowsIndexRows().find((show) => {
+    const showKeys = [
+      getMusicShowRouteCode(show),
+      show?.showId,
+      show?.show_id,
+      show?.id,
+      show?.slug,
+    ];
+    return showKeys
+      .map((key) => normalizeSetCode(key))
+      .some((key) => key === targetCode);
+  });
+  if (indexedShow) {
+    return indexedShow;
+  }
+
+  const mockShow = getMockRecordById("musicShows", showId, ["showId", "id", "slug", "show_id"]);
+  return mockShow ? normalizeMusicShowsIndexRow(mockShow) : null;
 }
 
 function createUnknownMusicShow(showId) {
   const safeShowId = String(showId || "unknown-show").trim() || "unknown-show";
   return {
     showId: safeShowId,
+    name: "Show Detail",
     month: "TBD",
     day: "00",
     year: "Pending",
-    title: "Show Detail Event Dossier",
+    title: "Show Detail",
     venue: "Pending Venue",
     location: "Pending City",
     bandCount: "0 bands",
-    poster: "SD",
+    poster: "",
   };
 }
 
@@ -4255,6 +4278,24 @@ function getMusicShowDateLabel(show) {
     return formatMusicShowDate(show.rawDate || show.date);
   }
   return `${show?.month || "TBD"} ${show?.day || "00"}, ${show?.year || "Pending"}`;
+}
+
+function getMusicShowTitle(show) {
+  return String(show?.name || show?.title || "Show Detail").trim() || "Show Detail";
+}
+
+function getMusicShowDetailVenue(show) {
+  return getMusicShowVenueName(show) || "Venue Pending";
+}
+
+function getMusicShowDetailLocation(show) {
+  const city = String(show?.city || show?.venue_details?.city || show?.venueDetails?.city || "").trim();
+  const state = String(show?.state || show?.venue_details?.state || show?.venueDetails?.state || "").trim();
+  const cityStateLocation = getMusicShowLocation({ city, state });
+  if (cityStateLocation !== "Location Pending") {
+    return cityStateLocation;
+  }
+  return String(show?.location || "").trim() || "Location Pending";
 }
 
 function getMusicShowDisplayId(show) {
@@ -5208,6 +5249,10 @@ function renderMusicShowDetail(show) {
   }
 
   const relationships = getMusicShowRelationshipSnapshot(show);
+  const showTitle = getMusicShowTitle(show);
+  const showVenue = getMusicShowDetailVenue(show);
+  const showLocation = getMusicShowDetailLocation(show);
+  const showIdValue = getMusicShowIdValue(show) || "Show Pending";
   showDetail.dataset.showId = relationships.show_id;
   showDetail.dataset.venueId = relationships.venue_id;
   showDetail.dataset.galleryEntryId = relationships.archive_meta.gallery_entry_id;
@@ -5226,51 +5271,52 @@ function renderMusicShowDetail(show) {
   const poster = document.createElement("div");
   poster.className = "show-detail-poster";
   poster.setAttribute("role", "img");
-  poster.setAttribute("aria-label", `${show.title} show flyer placeholder`);
+  poster.setAttribute("aria-label", `${showTitle} poster`);
 
-  const posterMark = document.createElement("span");
-  posterMark.className = "show-detail-poster-mark";
-  posterMark.textContent = show.poster || "SD";
-  poster.append(posterMark);
+  const posterImage = document.createElement("img");
+  posterImage.className = "show-detail-poster-image";
+  posterImage.alt = "";
+  posterImage.loading = "eager";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
+
+  const posterFallback = document.createElement("span");
+  posterFallback.className = "show-detail-poster-fallback";
+  posterFallback.textContent = "No Poster Available";
+  poster.append(posterImage, posterFallback);
+  setMusicShowPosterImage(posterImage, getMusicShowPosterSrc(show), posterFallback);
 
   const copy = document.createElement("div");
   copy.className = "show-detail-copy";
 
   const eyebrow = document.createElement("p");
   eyebrow.className = "show-detail-eyebrow";
-  eyebrow.textContent = "Show Detail Event Dossier";
+  eyebrow.textContent = "Show Detail";
 
   const title = document.createElement("h3");
   title.className = "show-detail-title";
   title.id = "show-detail-title";
-  title.textContent = show.title;
+  title.textContent = showTitle;
 
   const details = document.createElement("div");
   details.className = "show-detail-lines";
 
-  [getMusicShowDateLabel(show), show.venue, show.location].forEach((detailText) => {
+  [getMusicShowDateLabel(show), showVenue, showLocation].forEach((detailText) => {
     const detail = document.createElement("p");
     detail.className = "show-detail-line";
     detail.textContent = detailText;
     details.append(detail);
   });
 
-  const mapButton = document.createElement("button");
-  mapButton.className = "show-detail-map";
-  mapButton.type = "button";
-  mapButton.textContent = "Map";
-  mapButton.dataset.venueId = relationships.venue_id;
-  mapButton.setAttribute("aria-label", `Map placeholder for ${show.venue}`);
-
   const stats = document.createElement("div");
   stats.className = "show-detail-stats";
   stats.append(
     createShowDetailStat("Bands", relationships.band_count),
-    createShowDetailStat("Photos", relationships.media_counts.photos),
-    createShowDetailStat("Year", show.year || "Pending")
+    createShowDetailStat("Photos", "Coming Soon"),
+    createShowDetailStat("Show ID", showIdValue)
   );
 
-  copy.append(eyebrow, title, details, mapButton, stats);
+  copy.append(eyebrow, title, details, stats);
   hero.append(poster, copy);
 
   const viewing = document.createElement("section");
@@ -5467,13 +5513,23 @@ function renderMusicShowDetail(show) {
 }
 
 function showMusicShowDetail(showId) {
-  const show = findMusicShowById(showId) || createUnknownMusicShow(showId);
+  const routeShowCode = normalizeSetCode(showId);
+  const show = findMusicShowById(routeShowCode) || createUnknownMusicShow(routeShowCode);
   renderMusicShowDetail(show);
   setBandsIndexVisible(false);
   setPeopleIndexVisible(false);
   setMusicActivityPanelVisible(false);
   setMusicShowDetailVisible(true);
   setCurrentView("Show Detail");
+  if (!musicShowsSetsLoaded || musicShowsSetsDataState !== "live") {
+    requestMusicShowsSetsData().then(() => {
+      const currentRoute = getRouteFromUrl();
+      if (currentRoute.name !== "show-detail" || normalizeSetCode(currentRoute.showId) !== routeShowCode) {
+        return;
+      }
+      renderMusicShowDetail(findMusicShowById(routeShowCode) || createUnknownMusicShow(routeShowCode));
+    });
+  }
   if (musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
