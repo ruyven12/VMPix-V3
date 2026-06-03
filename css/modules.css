@@ -6500,7 +6500,7 @@ img.archive-gallery-image {
 
 .music-show-card {
   display: grid;
-  grid-template-columns: clamp(3.65rem, 9vw, 4.3rem) clamp(4.8rem, 12vw, 5.8rem) minmax(0, 1fr);
+  grid-template-columns: clamp(3.92rem, calc(9vw + 0.2rem), 4.55rem) clamp(5.425rem, calc(12vw + 0.625rem), 6.425rem) minmax(0, 1fr);
   align-items: stretch;
   gap: clamp(0.46rem, 1.55vw, 0.62rem);
   min-height: clamp(7.2rem, 15vw, 8.35rem);
@@ -6527,7 +6527,8 @@ img.archive-gallery-image {
 }
 
 .music-show-id-block {
-  width: clamp(2.7rem, 9vw, 3.22rem);
+  width: 100%;
+  min-width: 3.32rem;
   display: grid;
   align-content: center;
   justify-items: center;
@@ -6561,7 +6562,8 @@ img.archive-gallery-image {
   font-size: clamp(0.92rem, 3.5vw, 1.2rem);
   line-height: 1;
   text-transform: none;
-  word-break: break-word;
+  white-space: nowrap;
+  word-break: normal;
 }
 
 .music-show-poster {
@@ -11853,14 +11855,15 @@ img.archive-gallery-image {
   }
 
   .music-show-card {
-    grid-template-columns: clamp(3.05rem, 13vw, 3.75rem) clamp(3.8rem, 17vw, 4.6rem) minmax(0, 1fr);
+    grid-template-columns: clamp(3.42rem, calc(13vw + 0.18rem), 4rem) clamp(4.425rem, calc(17vw + 0.625rem), 5.225rem) minmax(0, 1fr);
     gap: 0.4rem;
     min-height: 6.9rem;
     padding: 0.44rem;
   }
 
   .music-show-id-block {
-    width: auto;
+    width: 100%;
+    min-width: 3.28rem;
     padding: 0.34rem 0.2rem;
   }
 
@@ -12387,12 +12390,13 @@ img.archive-gallery-image {
   }
 
   .music-show-card {
-    grid-template-columns: clamp(3.05rem, 13vw, 3.75rem) clamp(3.8rem, 17vw, 4.6rem) minmax(0, 1fr);
+    grid-template-columns: clamp(3.42rem, calc(13vw + 0.18rem), 4rem) clamp(4.425rem, calc(17vw + 0.625rem), 5.225rem) minmax(0, 1fr);
     align-items: stretch;
   }
 
   .music-show-id-block {
-    width: auto;
+    width: 100%;
+    min-width: 3.28rem;
     padding: 0.34rem 0.2rem;
   }
 
