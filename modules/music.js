@@ -325,6 +325,7 @@ function showSetGalleryRoute(row, options = {}) {
   updateSetsFeaturedFromRow(row);
   updateSetGalleryFromRow(row);
   setGalleryState("ready");
+  setGalleryViewMode(activeGalleryViewMode);
   setBandsIndexVisible(false);
   setBandDetailVisible(false);
   setSetDetailVisible(false);
@@ -971,14 +972,30 @@ function getMusicShowBandSlugs(show) {
 }
 
 function getMusicShowVenueName(show) {
-  return String(
-    show?.venue ||
-    show?.venue_name ||
-    show?.venueName ||
-    show?.venue_details?.venue ||
-    show?.venueDetails?.venue ||
-    ""
-  ).trim();
+  const displayCandidates = [
+    show?.venue_display,
+    show?.venueDisplay,
+    show?.venue_name,
+    show?.venueName,
+    show?.venue_details?.venue,
+    show?.venue_details?.name,
+    show?.venue_details?.title,
+    show?.venue_details?.label,
+    show?.venue_details?.display_name,
+    show?.venue_details?.displayName,
+    show?.venueDetails?.venue,
+    show?.venueDetails?.name,
+    show?.venueDetails?.title,
+    show?.venueDetails?.label,
+    show?.venueDetails?.display_name,
+    show?.venueDetails?.displayName,
+  ];
+  const rawVenue = String(show?.venue || "").trim();
+  const displayVenue = displayCandidates
+    .map((venue) => String(venue || "").trim())
+    .find(Boolean);
+
+  return displayVenue || rawVenue;
 }
 
 function getMusicShowContributorValue(show, fallbackValue = "Coming Soon") {
@@ -1825,6 +1842,20 @@ function selectGalleryPhoto(photoTile) {
     tile.setAttribute("aria-pressed", String(isActive));
   });
   syncLightboxPrepTitle();
+}
+
+function setGalleryViewMode(viewMode = "grid") {
+  const normalizedMode = viewMode === "list" ? "list" : "grid";
+  activeGalleryViewMode = normalizedMode;
+  if (galleryGrid) {
+    galleryGrid.classList.toggle("is-list-view", normalizedMode === "list");
+    galleryGrid.setAttribute("data-gallery-view-mode", normalizedMode);
+  }
+  galleryViewOptions.forEach((option) => {
+    const isActive = option.dataset.galleryViewOption === normalizedMode;
+    option.classList.toggle("is-active", isActive);
+    option.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function setGalleryModeVisible(isVisible) {
@@ -4968,6 +4999,11 @@ function initMusicModule() {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
     tile.addEventListener("click", () => {
       selectGalleryPhoto(tile);
+    });
+  });
+  galleryViewOptions.forEach((option) => {
+    option.addEventListener("click", () => {
+      setGalleryViewMode(option.dataset.galleryViewOption);
     });
   });
   if (galleryViewAll) {

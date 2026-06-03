@@ -1425,15 +1425,21 @@
 }
 
 .set-gallery-toggle-option {
+  appearance: none;
   min-height: 1.85rem;
   display: grid;
   place-items: center;
   padding: 0.34rem 0.54rem;
+  border: 0;
   border-radius: calc(var(--radius-sm) - 0.16rem);
+  background: transparent;
   color: rgba(247, 247, 242, 0.42);
+  cursor: pointer;
+  font: inherit;
   font-size: clamp(0.54rem, 2.1vw, 0.64rem);
   line-height: 1;
   text-transform: none;
+  touch-action: manipulation;
 }
 
 .set-gallery-toggle-option.is-active {
@@ -1778,17 +1784,43 @@ img.archive-gallery-image {
   --archive-gallery-accent: rgba(255, 82, 72, 0.18);
   --archive-gallery-accent-line: rgba(255, 104, 92, 0.62);
   --archive-gallery-gap: clamp(0.66rem, 2.15vw, 0.92rem);
-  --archive-gallery-min-tile: clamp(10rem, 24vw, 13.5rem);
-  --archive-gallery-tile-min: clamp(8.6rem, 32vw, 13.75rem);
+  --archive-gallery-min-tile: 0;
+  --archive-gallery-tile-min: clamp(5.2rem, 15vw, 8.25rem);
+}
+
+.set-gallery-grid:not(.is-list-view) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.set-gallery-grid.is-list-view {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .set-gallery-photo-tile {
   --archive-gallery-ratio: 16 / 10;
+  text-transform: none;
   transition:
     border-color 180ms ease,
     background-color 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
+}
+
+.set-gallery-grid.is-list-view .set-gallery-photo-tile {
+  min-height: 3.8rem;
+  aspect-ratio: auto;
+  align-items: center;
+  justify-items: start;
+  padding: 0.72rem 0.82rem;
+}
+
+.set-gallery-grid.is-list-view .archive-gallery-image {
+  opacity: 0.18;
+}
+
+.set-gallery-grid.is-list-view .archive-gallery-caption {
+  margin: 0;
+  max-width: 100%;
 }
 
 .set-gallery-photo-tile::before {
