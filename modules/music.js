@@ -4325,6 +4325,28 @@ function doesMusicPersonShowMatchBands(show, bandMatches) {
   return (show.bandSlugs || []).some((bandSlug) => bandMatches.slugs.has(createBandSlug(bandSlug)));
 }
 
+function getMusicPersonTaggedShowBandContext(show, associatedBands) {
+  if (!show || !Array.isArray(associatedBands) || associatedBands.length === 0) {
+    return "";
+  }
+
+  const showBandNames = new Set((show.bandNames || [])
+    .map((bandName) => getMusicPeopleText(bandName).toLowerCase())
+    .filter(Boolean));
+  const showBandSlugs = new Set([
+    ...(show.bandSlugs || []),
+    ...(show.bandNames || []),
+  ].map(createBandSlug).filter(Boolean));
+
+  const matchedBand = associatedBands.find((band) => {
+    const bandName = getMusicPeopleText(band.name);
+    const bandKeys = [band.name, band.bandId, band.band_id, band.id, band.slug].map(createBandSlug);
+    return showBandNames.has(bandName.toLowerCase()) || bandKeys.some((bandKey) => showBandSlugs.has(bandKey));
+  });
+
+  return getMusicPeopleText(matchedBand?.name || (associatedBands.length === 1 ? associatedBands[0]?.name : ""));
+}
+
 function getMusicPersonShowDateParts(show) {
   const parsedDate = parseMusicShowDate(show?.rawDate || show?.date || show?.show_date || show?.eventDate || show?.formattedDate);
   if (!parsedDate) {
@@ -4366,6 +4388,7 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
         title,
         venue: getMusicPeopleText(show.venue) || "Venue Pending",
         location: getMusicPeopleText(show.location) || getMusicShowLocation(show),
+        bandContext: getMusicPersonTaggedShowBandContext(show, associatedBands),
         taggedPhotosLabel: getMusicPersonTaggedPhotosLabel(show),
         expanded: false,
         contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
@@ -4540,7 +4563,8 @@ function createMusicPersonShowCard(show, personName) {
   summary.type = "button";
   summary.setAttribute("aria-expanded", String(isExpanded));
   const taggedPhotosLabel = getMusicPeopleText(show.taggedPhotosLabel) || formatMusicPeopleCount(show.taggedPhotos, "Tagged Photo");
-  summary.setAttribute("aria-label", `${show.title}, ${show.venue}, ${show.location}, ${taggedPhotosLabel}`);
+  const bandContextLabel = getMusicPeopleText(show.bandContext) ? `with ${show.bandContext}` : "";
+  summary.setAttribute("aria-label", `${show.title}, ${show.venue}, ${show.location}${bandContextLabel ? `, ${bandContextLabel}` : ""}, ${taggedPhotosLabel}`);
 
   const date = document.createElement("span");
   date.className = "person-show-date";
@@ -4574,6 +4598,10 @@ function createMusicPersonShowCard(show, personName) {
   location.textContent = show.location;
   copy.append(title, venue, location);
 
+  const bandContext = document.createElement("span");
+  bandContext.className = "person-show-band-context";
+  bandContext.textContent = bandContextLabel;
+
   const count = document.createElement("span");
   count.className = "person-show-count";
   count.textContent = taggedPhotosLabel;
@@ -4583,7 +4611,11 @@ function createMusicPersonShowCard(show, personName) {
   toggle.setAttribute("aria-hidden", "true");
   toggle.textContent = isExpanded ? "-" : "+";
 
-  summary.append(date, copy, count, toggle);
+  const actionGroup = document.createElement("span");
+  actionGroup.className = "person-show-action";
+  actionGroup.append(count, toggle);
+
+  summary.append(date, copy, bandContext, actionGroup);
   summary.addEventListener("click", () => {
     toggleMusicPersonShowCard(card);
   });
