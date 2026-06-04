@@ -3858,11 +3858,6 @@ function getMusicPeopleRouteId(person) {
     || "unknown-person";
 }
 
-function getMusicPeopleDisplayId(person) {
-  const personId = getMusicPeopleText(person?.person_id ?? person?.backend_record?.person_id ?? person?.numeric_id);
-  return personId ? `#${personId}` : "#--";
-}
-
 function getMusicPeopleCategory(person) {
   const sourceCategory = getMusicPeopleText(person?.category ?? person?.backend_record?.category ?? person?.role);
   if (/fallen/i.test(sourceCategory)) {
@@ -3878,6 +3873,20 @@ function getMusicPeopleCategory(person) {
     return "Performers";
   }
   return sourceCategory;
+}
+
+function getMusicPeopleCategoryDisplay(category) {
+  const categoryFilterValue = getMusicPeopleCategoryFilterValue(category);
+  if (categoryFilterValue === "the fallen") {
+    return "⚘ The Fallen";
+  }
+  if (categoryFilterValue === "friend") {
+    return "Friend";
+  }
+  if (categoryFilterValue === "performers") {
+    return "Performer";
+  }
+  return getMusicPeopleText(category) || "Performer";
 }
 
 function getMusicPeopleCategoryFilterValue(category) {
@@ -3971,6 +3980,9 @@ function normalizeMusicPeopleIndexRow(person) {
   const routeId = getMusicPeopleRouteId(source);
   const name = getMusicPeopleText(source.name ?? source.title) || "Unknown Person";
   const category = getMusicPeopleCategory(source);
+  const categoryFilterValue = getMusicPeopleCategoryFilterValue(category);
+  const categoryDisplay = getMusicPeopleCategoryDisplay(category);
+  const isFriend = categoryFilterValue === "friend";
   const bandNames = getMusicPeopleBandNames(source);
   const instrumentNames = getMusicPeopleInstrumentNames(source);
   const appearances = getMusicPeopleCountValue(
@@ -4005,12 +4017,12 @@ function normalizeMusicPeopleIndexRow(person) {
     personId: routeId,
     name,
     category,
-    categoryFilterValue: getMusicPeopleCategoryFilterValue(category),
-    displayPersonId: getMusicPeopleDisplayId(source),
+    categoryDisplay,
+    categoryFilterValue,
     bandNames,
-    bandText: bandNames.length > 0 ? bandNames.join(", ") : "Bands pending",
+    bandText: bandNames.length > 0 ? bandNames.join(", ") : (isFriend ? "" : "Bands pending"),
     instrumentNames,
-    instrumentText: instrumentNames.length > 0 ? instrumentNames.join(", ") : "Instrument pending",
+    instrumentText: instrumentNames.length > 0 ? instrumentNames.join(", ") : (isFriend ? "" : "Instrument pending"),
     appearances,
     photos,
     letter: getMusicPeopleLetter({ name }),
@@ -4023,6 +4035,19 @@ function normalizeMusicPeopleIndexRow(person) {
       associations.join(" "),
     ].join(" ").toLowerCase(),
   };
+}
+
+function getMusicPeopleRowsWithCategoryNumbers(rows) {
+  const categoryCounts = new Map();
+  return rows.map((person) => {
+    const categoryKey = person.categoryFilterValue || "people";
+    const nextCount = (categoryCounts.get(categoryKey) || 0) + 1;
+    categoryCounts.set(categoryKey, nextCount);
+    return {
+      ...person,
+      categoryNumberText: `${person.categoryDisplay} #${nextCount}`,
+    };
+  });
 }
 
 function getMusicPeopleIndexRows() {
@@ -4397,11 +4422,21 @@ function createMusicPeopleRow(person) {
   row.className = "music-people-row";
   row.type = "button";
   row.dataset.personId = person.personId;
+  row.dataset.peopleCategory = person.categoryFilterValue;
+  row.classList.toggle("is-fallen", person.categoryFilterValue === "the fallen");
   row.classList.toggle("is-active", person.personId === activeMusicPeopleId);
   row.setAttribute("aria-pressed", String(person.personId === activeMusicPeopleId));
   row.setAttribute(
     "aria-label",
-    `${person.name}, ${person.category}, ${person.displayPersonId}, ${person.bandText}, ${person.instrumentText}, ${formatMusicPeopleCount(person.appearances, "Appearance")}, ${formatMusicPeopleCount(person.photos, "Photo")}`
+    [
+      person.name,
+      person.categoryDisplay,
+      person.categoryNumberText,
+      person.bandText,
+      person.instrumentText,
+      formatMusicPeopleCount(person.appearances, "Appearance"),
+      formatMusicPeopleCount(person.photos, "Photo"),
+    ].filter(Boolean).join(", ")
   );
 
   const name = document.createElement("span");
@@ -4410,11 +4445,11 @@ function createMusicPeopleRow(person) {
 
   const category = document.createElement("span");
   category.className = "music-people-category";
-  category.textContent = person.category;
+  category.textContent = person.categoryDisplay;
 
   const personId = document.createElement("span");
   personId.className = "music-people-id";
-  personId.textContent = person.displayPersonId;
+  personId.textContent = person.categoryNumberText;
 
   const band = document.createElement("span");
   band.className = "music-people-band";
@@ -4510,6 +4545,13 @@ function createMusicPeopleFilters(rows) {
   filters.dataset.musicPeopleFilters = "";
   filters.setAttribute("aria-label", "People archive filters");
 
+  const searchRow = document.createElement("div");
+  searchRow.className = "music-people-filter-row music-people-filter-row--search";
+  const selectRow = document.createElement("div");
+  selectRow.className = "music-people-filter-row music-people-filter-row--selects";
+  const actionRow = document.createElement("div");
+  actionRow.className = "music-people-filter-row music-people-filter-row--actions";
+
   const searchLabel = document.createElement("label");
   searchLabel.className = "music-people-filter-field music-people-filter-field--search";
   const searchText = document.createElement("span");
@@ -4537,13 +4579,14 @@ function createMusicPeopleFilters(rows) {
   resetButton.textContent = "Reset Filters";
   resetButton.addEventListener("click", resetMusicPeopleFilters);
 
-  filters.append(
-    searchLabel,
+  searchRow.append(searchLabel);
+  selectRow.append(
     createMusicPeopleFilterField("Letter", "letter", letterOptions, activeMusicPeopleLetterFilter),
     createMusicPeopleFilterField("Category", "category", categoryOptions, activeMusicPeopleCategoryFilter),
-    createMusicPeopleFilterField("Instrument", "instrument", instrumentOptions, activeMusicPeopleInstrumentFilter),
-    resetButton
+    createMusicPeopleFilterField("Instrument", "instrument", instrumentOptions, activeMusicPeopleInstrumentFilter)
   );
+  actionRow.append(resetButton);
+  filters.append(searchRow, selectRow, actionRow);
 
   return filters;
 }
@@ -4634,11 +4677,12 @@ function renderMusicPeopleIndex(options = {}) {
 
   const forcedState = getForcedMockState("musicPeople");
   const filteredRows = getFilteredMusicPeopleRows();
+  const numberedRows = getMusicPeopleRowsWithCategoryNumbers(filteredRows);
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
     renderMockState(fragment, forcedState, "musicPeople");
   } else {
-    filteredRows.forEach((person) => {
+    numberedRows.forEach((person) => {
       fragment.append(createMusicPeopleRow(person));
     });
     if (forcedState === "partial") {
