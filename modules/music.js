@@ -35,6 +35,17 @@ let musicShowsIndexDataRequested = false;
 let musicVenuesCollection = [];
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
+const musicPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const musicPeopleCategoryFilters = [
+  { value: "", label: "All" },
+  { value: "performers", label: "Performers" },
+  { value: "friend", label: "Friend" },
+  { value: "the fallen", label: "The Fallen" },
+];
+let activeMusicPeopleSearch = "";
+let activeMusicPeopleLetterFilter = "";
+let activeMusicPeopleCategoryFilter = "";
+let activeMusicPeopleInstrumentFilter = "";
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -3660,13 +3671,268 @@ function formatMusicPeopleCount(value, label) {
   return `${count} ${label}${count === 1 ? "" : "s"}`;
 }
 
-function getMusicPeoplePageCount() {
-  return Math.max(1, Math.ceil(musicPeopleRows.length / musicPeoplePageSize));
+function formatMusicPeopleNumber(value) {
+  const count = Number.parseInt(value, 10) || 0;
+  return count.toLocaleString();
 }
 
-function normalizeMusicPeoplePage(page) {
-  const pageNumber = Number.parseInt(page, 10) || 1;
-  return Math.min(Math.max(pageNumber, 1), getMusicPeoplePageCount());
+function getMusicPeopleText(value) {
+  return String(value ?? "").trim();
+}
+
+function getMusicPeopleObjectText(value, keys) {
+  if (!value || typeof value !== "object") {
+    return "";
+  }
+  const key = keys.find((candidate) => getMusicPeopleText(value[candidate]));
+  return key ? getMusicPeopleText(value[key]) : "";
+}
+
+function collectMusicPeopleTextValues(value, objectKeys = ["name", "title", "band", "association", "label", "value"]) {
+  const values = Array.isArray(value) ? value : [value];
+  return values.flatMap((item) => {
+    if (Array.isArray(item)) {
+      return collectMusicPeopleTextValues(item, objectKeys);
+    }
+    if (item && typeof item === "object") {
+      const objectText = getMusicPeopleObjectText(item, objectKeys);
+      return objectText ? [objectText] : [];
+    }
+    const text = getMusicPeopleText(item);
+    return text ? [text] : [];
+  });
+}
+
+function uniqueMusicPeopleValues(values) {
+  const seen = new Set();
+  return values
+    .map(getMusicPeopleText)
+    .filter(Boolean)
+    .filter((value) => {
+      const key = value.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
+}
+
+function createMusicPeopleSlug(value) {
+  return getMusicPeopleText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getMusicPeopleRouteId(person) {
+  return getMusicPeopleText(person?.slug)
+    || getMusicPeopleText(person?.personId)
+    || getMusicPeopleText(person?.id)
+    || createMusicPeopleSlug(person?.name)
+    || getMusicPeopleText(person?.person_id)
+    || "unknown-person";
+}
+
+function getMusicPeopleDisplayId(person) {
+  const personId = getMusicPeopleText(person?.person_id ?? person?.backend_record?.person_id ?? person?.numeric_id);
+  return personId ? `#${personId}` : "#--";
+}
+
+function getMusicPeopleCategory(person) {
+  const sourceCategory = getMusicPeopleText(person?.category ?? person?.backend_record?.category ?? person?.role);
+  if (/fallen/i.test(sourceCategory)) {
+    return "The Fallen";
+  }
+  if (/friend/i.test(sourceCategory)) {
+    return "Friend";
+  }
+  if (
+    !sourceCategory
+    || /perform|vocal|guitar|bass|drum|keys|synth|music|artist|band/i.test(sourceCategory)
+  ) {
+    return "Performers";
+  }
+  return sourceCategory;
+}
+
+function getMusicPeopleCategoryFilterValue(category) {
+  const normalizedCategory = getMusicPeopleText(category).toLowerCase();
+  if (normalizedCategory === "the fallen") {
+    return "the fallen";
+  }
+  if (normalizedCategory === "friend") {
+    return "friend";
+  }
+  if (normalizedCategory === "performer" || normalizedCategory === "performers") {
+    return "performers";
+  }
+  return normalizedCategory;
+}
+
+function getMusicPeopleBandNames(person) {
+  return uniqueMusicPeopleValues([
+    ...collectMusicPeopleTextValues(person?.bands, ["band", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.related_bands, ["band", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.bands, ["band", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.band, ["band", "name", "title", "label", "value"]),
+  ]);
+}
+
+function getMusicPeopleInstrumentNames(person) {
+  const directInstruments = uniqueMusicPeopleValues([
+    ...collectMusicPeopleTextValues(person?.instrument, ["instrument", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.instruments, ["instrument", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.instrument, ["instrument", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.instruments, ["instrument", "name", "title", "label", "value"]),
+  ]);
+  if (directInstruments.length > 0) {
+    return directInstruments;
+  }
+
+  const roleText = getMusicPeopleText(person?.role ?? person?.category ?? person?.backend_record?.category);
+  return uniqueMusicPeopleValues(
+    roleText
+      .split(/\s*(?:\/|,|;|\|)\s*/)
+      .map((part) => part.trim())
+      .filter((part) => part && !/^(performer|performers|friend|the fallen)$/i.test(part))
+  );
+}
+
+function getMusicPeopleAssociationValues(person) {
+  return uniqueMusicPeopleValues([
+    ...collectMusicPeopleTextValues(person?.association, ["association", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.associations, ["association", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.association, ["association", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.associations, ["association", "name", "title", "label", "value"]),
+  ]);
+}
+
+function getMusicPeopleAliases(person) {
+  return uniqueMusicPeopleValues([
+    ...collectMusicPeopleTextValues(person?.aliases, ["alias", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.aliases, ["alias", "name", "title", "label", "value"]),
+  ]);
+}
+
+function getMusicPeopleCountValue(...values) {
+  const foundValue = values.find((value) => {
+    const parsedValue = Number.parseInt(value, 10);
+    return Number.isFinite(parsedValue) && parsedValue >= 0;
+  });
+  return Number.parseInt(foundValue, 10) || 0;
+}
+
+function getMusicPeopleLetter(person) {
+  const firstLetter = getMusicPeopleText(person?.name).charAt(0).toUpperCase();
+  return musicPeopleAlphabet.includes(firstLetter) ? firstLetter : "#";
+}
+
+function normalizeMusicPeopleIndexRow(person) {
+  const source = person?.backend_record && typeof person.backend_record === "object"
+    ? { ...person.backend_record, ...person }
+    : { ...person };
+  const routeId = getMusicPeopleRouteId(source);
+  const name = getMusicPeopleText(source.name ?? source.title) || "Unknown Person";
+  const category = getMusicPeopleCategory(source);
+  const bandNames = getMusicPeopleBandNames(source);
+  const instrumentNames = getMusicPeopleInstrumentNames(source);
+  const appearances = getMusicPeopleCountValue(
+    source.appearances,
+    source.appearance_count,
+    source.appearances_count,
+    source.sets,
+    source.set_count,
+    source.show_count,
+    source.stats?.showCount,
+    source.stats?.appearanceCount,
+    source.backend_record?.stats?.showCount,
+    source.backend_record?.stats?.appearanceCount
+  );
+  const photos = getMusicPeopleCountValue(
+    source.photos,
+    source.photo_count,
+    source.tagged_photo_count,
+    source.stats?.taggedPhotoCount,
+    source.stats?.photoCount,
+    source.backend_record?.stats?.taggedPhotoCount,
+    source.backend_record?.stats?.photoCount
+  );
+  const aliases = getMusicPeopleAliases(source);
+  const associations = getMusicPeopleAssociationValues(source);
+
+  return {
+    ...source,
+    personId: routeId,
+    name,
+    category,
+    categoryFilterValue: getMusicPeopleCategoryFilterValue(category),
+    displayPersonId: getMusicPeopleDisplayId(source),
+    bandNames,
+    bandText: bandNames.length > 0 ? bandNames.join(", ") : "Bands pending",
+    instrumentNames,
+    instrumentText: instrumentNames.length > 0 ? instrumentNames.join(", ") : "Instrument pending",
+    appearances,
+    photos,
+    letter: getMusicPeopleLetter({ name }),
+    searchText: [
+      name,
+      category,
+      aliases.join(" "),
+      bandNames.join(" "),
+      instrumentNames.join(" "),
+      associations.join(" "),
+    ].join(" ").toLowerCase(),
+  };
+}
+
+function getMusicPeopleIndexRows() {
+  return musicPeopleRows
+    .map(normalizeMusicPeopleIndexRow)
+    .filter((person) => person.name)
+    .sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function getMusicPeopleInstrumentOptions(rows) {
+  return uniqueMusicPeopleValues(rows.flatMap((person) => person.instrumentNames))
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeActiveMusicPeopleFilters(rows) {
+  const letters = new Set(rows.map((person) => person.letter));
+  const categoryValues = new Set(musicPeopleCategoryFilters.map((filter) => filter.value));
+  const instruments = new Set(getMusicPeopleInstrumentOptions(rows));
+  if (activeMusicPeopleLetterFilter && !letters.has(activeMusicPeopleLetterFilter)) {
+    activeMusicPeopleLetterFilter = "";
+  }
+  if (activeMusicPeopleCategoryFilter && !categoryValues.has(activeMusicPeopleCategoryFilter)) {
+    activeMusicPeopleCategoryFilter = "";
+  }
+  if (activeMusicPeopleInstrumentFilter && !instruments.has(activeMusicPeopleInstrumentFilter)) {
+    activeMusicPeopleInstrumentFilter = "";
+  }
+}
+
+function getFilteredMusicPeopleRows() {
+  const rows = getMusicPeopleIndexRows();
+  normalizeActiveMusicPeopleFilters(rows);
+  const searchTerm = activeMusicPeopleSearch.trim().toLowerCase();
+
+  return rows.filter((person) => {
+    if (activeMusicPeopleLetterFilter && person.letter !== activeMusicPeopleLetterFilter) {
+      return false;
+    }
+    if (activeMusicPeopleCategoryFilter && person.categoryFilterValue !== activeMusicPeopleCategoryFilter) {
+      return false;
+    }
+    if (activeMusicPeopleInstrumentFilter && !person.instrumentNames.includes(activeMusicPeopleInstrumentFilter)) {
+      return false;
+    }
+    if (!searchTerm) {
+      return true;
+    }
+    return person.searchText.includes(searchTerm);
+  });
 }
 
 function setActiveMusicPeopleRow(personId) {
@@ -3996,53 +4262,59 @@ function createMusicPeopleRow(person) {
   row.setAttribute("aria-pressed", String(person.personId === activeMusicPeopleId));
   row.setAttribute(
     "aria-label",
-    `${person.name}, ${person.role}, ${person.band}, ${formatMusicPeopleCount(person.photos, "Photo")}, ${formatMusicPeopleCount(person.sets, "Set")}`
+    `${person.name}, ${person.category}, ${person.displayPersonId}, ${person.bandText}, ${person.instrumentText}, ${formatMusicPeopleCount(person.appearances, "Appearance")}, ${formatMusicPeopleCount(person.photos, "Photo")}`
   );
-
-  const thumb = document.createElement("span");
-  thumb.className = "music-people-thumb";
-  thumb.setAttribute("aria-hidden", "true");
-  thumb.textContent = person.thumb || person.name.slice(0, 2).toUpperCase();
-
-  const main = document.createElement("span");
-  main.className = "music-people-main";
 
   const name = document.createElement("span");
   name.className = "music-people-name";
   name.textContent = person.name;
 
-  const meta = document.createElement("span");
-  meta.className = "music-people-meta";
+  const category = document.createElement("span");
+  category.className = "music-people-category";
+  category.textContent = person.category;
 
-  const role = document.createElement("span");
-  role.className = "music-people-role";
-  role.textContent = person.role;
+  const personId = document.createElement("span");
+  personId.className = "music-people-id";
+  personId.textContent = person.displayPersonId;
 
   const band = document.createElement("span");
   band.className = "music-people-band";
-  band.textContent = person.band;
+  band.textContent = person.bandText;
 
-  const counts = document.createElement("span");
-  counts.className = "music-people-counts";
-  counts.setAttribute("aria-hidden", "true");
+  const instrument = document.createElement("span");
+  instrument.className = "music-people-instrument";
+  instrument.textContent = person.instrumentText;
 
-  const photoCount = document.createElement("span");
-  photoCount.className = "music-people-count-pill";
-  photoCount.textContent = formatMusicPeopleCount(person.photos, "Photo");
+  const stats = document.createElement("span");
+  stats.className = "music-people-stats";
 
-  const setCount = document.createElement("span");
-  setCount.className = "music-people-count-pill";
-  setCount.textContent = formatMusicPeopleCount(person.sets, "Set");
+  const appearances = document.createElement("span");
+  appearances.className = "music-people-stat";
+  appearances.setAttribute("aria-label", `${formatMusicPeopleNumber(person.appearances)} appearances`);
+  const appearancesIcon = document.createElement("span");
+  appearancesIcon.className = "bands-row-stat-icon music-people-stat-icon music-people-stat-icon--appearances";
+  appearancesIcon.setAttribute("aria-hidden", "true");
+  const appearancesValue = document.createElement("span");
+  appearancesValue.textContent = formatMusicPeopleNumber(person.appearances);
+  appearances.append(appearancesIcon, appearancesValue);
 
-  const arrow = document.createElement("span");
-  arrow.className = "music-people-arrow";
-  arrow.setAttribute("aria-hidden", "true");
-  arrow.textContent = ">";
+  const photos = document.createElement("span");
+  photos.className = "music-people-stat";
+  photos.setAttribute("aria-label", `${formatMusicPeopleNumber(person.photos)} photos`);
+  const photosIcon = document.createElement("span");
+  photosIcon.className = "bands-row-stat-icon bands-row-stat-icon--photos music-people-stat-icon";
+  photosIcon.setAttribute("aria-hidden", "true");
+  const photosValue = document.createElement("span");
+  photosValue.textContent = formatMusicPeopleNumber(person.photos);
+  photos.append(photosIcon, photosValue);
 
-  meta.append(role, band);
-  main.append(name, meta);
-  counts.append(photoCount, setCount);
-  row.append(thumb, main, counts, arrow);
+  const statDivider = document.createElement("span");
+  statDivider.className = "music-people-stat-divider";
+  statDivider.setAttribute("aria-hidden", "true");
+  statDivider.textContent = "/";
+
+  stats.append(appearances, statDivider, photos);
+  row.append(name, category, personId, band, instrument, stats);
   row.addEventListener("click", () => {
     setActiveMusicPeopleRow(person.personId);
     navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
@@ -4051,83 +4323,149 @@ function createMusicPeopleRow(person) {
   return row;
 }
 
-function setMusicPeoplePage(page, options = {}) {
-  const nextPage = normalizeMusicPeoplePage(page);
-  if (activeMusicPeoplePage === nextPage && !options.forceRender) {
-    return;
-  }
+function createMusicPeopleFilterField(labelText, fieldName, options, activeValue, allLabel = "All") {
+  const label = document.createElement("label");
+  label.className = "music-people-filter-field";
 
-  activeMusicPeoplePage = nextPage;
-  renderMusicPeopleIndex({ shouldResetScroll: options.shouldResetScroll !== false });
+  const labelSpan = document.createElement("span");
+  labelSpan.className = "music-people-filter-label";
+  labelSpan.textContent = labelText;
+
+  const select = document.createElement("select");
+  select.className = "music-people-filter-select";
+  select.dataset.musicPeopleFilter = fieldName;
+  select.setAttribute("aria-label", `Filter people by ${labelText.toLowerCase()}`);
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = allLabel;
+  select.append(allOption);
+  options.forEach((optionValue) => {
+    const option = document.createElement("option");
+    if (optionValue && typeof optionValue === "object") {
+      option.value = optionValue.value;
+      option.textContent = optionValue.label;
+    } else {
+      option.value = optionValue;
+      option.textContent = optionValue;
+    }
+    select.append(option);
+  });
+  select.value = activeValue;
+  select.addEventListener("change", () => {
+    updateMusicPeopleFilter(fieldName, select.value);
+  });
+
+  label.append(labelSpan, select);
+  return label;
 }
 
-function renderMusicPeoplePagination() {
+function createMusicPeopleFilters(rows) {
+  const filters = document.createElement("section");
+  filters.className = "music-people-filters";
+  filters.dataset.musicPeopleFilters = "";
+  filters.setAttribute("aria-label", "People archive filters");
+
+  const searchLabel = document.createElement("label");
+  searchLabel.className = "music-people-filter-field music-people-filter-field--search";
+  const searchText = document.createElement("span");
+  searchText.className = "music-people-filter-label";
+  searchText.textContent = "Search People";
+  const searchInput = document.createElement("input");
+  searchInput.className = "music-people-search-input";
+  searchInput.type = "search";
+  searchInput.autocomplete = "off";
+  searchInput.placeholder = "Search name, category, alias, band, instrument";
+  searchInput.value = activeMusicPeopleSearch;
+  searchInput.dataset.musicPeopleFilter = "search";
+  searchInput.addEventListener("input", () => {
+    updateMusicPeopleFilter("search", searchInput.value);
+  });
+  searchLabel.append(searchText, searchInput);
+
+  const letterOptions = musicPeopleAlphabet;
+  const categoryOptions = musicPeopleCategoryFilters.filter((filter) => filter.value);
+  const instrumentOptions = getMusicPeopleInstrumentOptions(rows);
+
+  const resetButton = document.createElement("button");
+  resetButton.className = "music-people-filter-reset";
+  resetButton.type = "button";
+  resetButton.textContent = "Reset Filters";
+  resetButton.addEventListener("click", resetMusicPeopleFilters);
+
+  filters.append(
+    searchLabel,
+    createMusicPeopleFilterField("Letter", "letter", letterOptions, activeMusicPeopleLetterFilter),
+    createMusicPeopleFilterField("Category", "category", categoryOptions, activeMusicPeopleCategoryFilter),
+    createMusicPeopleFilterField("Instrument", "instrument", instrumentOptions, activeMusicPeopleInstrumentFilter),
+    resetButton
+  );
+
+  return filters;
+}
+
+function getMusicPeopleFilterFocusMeta() {
+  const activeElement = document.activeElement;
   if (!musicPeopleIndex) {
+    return null;
+  }
+  if (!activeElement || !musicPeopleIndex.contains(activeElement)) {
+    return null;
+  }
+  const filterName = activeElement.dataset?.musicPeopleFilter;
+  if (!filterName) {
+    return null;
+  }
+  return {
+    filterName,
+    selectionStart: typeof activeElement.selectionStart === "number" ? activeElement.selectionStart : null,
+    selectionEnd: typeof activeElement.selectionEnd === "number" ? activeElement.selectionEnd : null,
+  };
+}
+
+function restoreMusicPeopleFilterFocus(focusMeta) {
+  if (!focusMeta || !musicPeopleIndex) {
     return;
   }
-
-  const forcedState = getForcedMockState("musicPeople");
-  const pageCount = getMusicPeoplePageCount();
-  let pagination = musicPeopleIndex.querySelector("[data-music-people-pagination]");
-  if (!pagination) {
-    pagination = document.createElement("nav");
-    pagination.className = "music-people-pagination";
-    pagination.dataset.musicPeoplePagination = "";
-    pagination.setAttribute("aria-label", "Music people archive pages");
-    musicPeopleIndex.append(pagination);
-  }
-
-  if (forcedState && forcedState !== "partial") {
-    pagination.replaceChildren();
-    pagination.hidden = true;
-    return;
-  }
-
-  pagination.hidden = false;
-  const fragment = document.createDocumentFragment();
-  const previous = document.createElement("button");
-  previous.className = "music-people-page-button music-people-page-button--step";
-  previous.type = "button";
-  previous.textContent = "<";
-  previous.disabled = activeMusicPeoplePage === 1;
-  previous.setAttribute("aria-label", "Previous people page");
-  previous.addEventListener("click", () => {
-    setMusicPeoplePage(activeMusicPeoplePage - 1);
+  window.requestAnimationFrame(() => {
+    const target = musicPeopleIndex.querySelector(`[data-music-people-filter="${focusMeta.filterName}"]`);
+    if (!target) {
+      return;
+    }
+    target.focus({ preventScroll: true });
+    if (focusMeta.filterName === "search" && focusMeta.selectionStart !== null && typeof target.setSelectionRange === "function") {
+      target.setSelectionRange(focusMeta.selectionStart, focusMeta.selectionEnd ?? focusMeta.selectionStart);
+    }
   });
-  fragment.append(previous);
+}
 
-  for (let page = 1; page <= pageCount; page += 1) {
-    const pageButton = document.createElement("button");
-    const isActive = page === activeMusicPeoplePage;
-    pageButton.className = "music-people-page-button";
-    pageButton.type = "button";
-    pageButton.textContent = String(page);
-    pageButton.setAttribute("aria-label", `People page ${page}`);
-    pageButton.setAttribute("aria-current", isActive ? "page" : "false");
-    pageButton.setAttribute("aria-pressed", String(isActive));
-    pageButton.addEventListener("click", () => {
-      setMusicPeoplePage(page);
-    });
-    fragment.append(pageButton);
+function updateMusicPeopleFilter(filterName, value) {
+  const nextValue = getMusicPeopleText(value);
+  if (filterName === "search") {
+    activeMusicPeopleSearch = nextValue;
+  } else if (filterName === "letter") {
+    activeMusicPeopleLetterFilter = musicPeopleAlphabet.includes(nextValue) ? nextValue : "";
+  } else if (filterName === "category") {
+    activeMusicPeopleCategoryFilter = nextValue.toLowerCase();
+  } else if (filterName === "instrument") {
+    activeMusicPeopleInstrumentFilter = nextValue;
   }
+  renderMusicPeopleIndex();
+}
 
-  const next = document.createElement("button");
-  next.className = "music-people-page-button music-people-page-button--step";
-  next.type = "button";
-  next.textContent = ">";
-  next.disabled = activeMusicPeoplePage === pageCount;
-  next.setAttribute("aria-label", "Next people page");
-  next.addEventListener("click", () => {
-    setMusicPeoplePage(activeMusicPeoplePage + 1);
-  });
-  fragment.append(next);
+function resetMusicPeopleFilters() {
+  activeMusicPeopleSearch = "";
+  activeMusicPeopleLetterFilter = "";
+  activeMusicPeopleCategoryFilter = "";
+  activeMusicPeopleInstrumentFilter = "";
+  renderMusicPeopleIndex();
+}
 
-  const status = document.createElement("span");
-  status.className = "music-people-pagination-status";
-  status.textContent = `${activeMusicPeoplePage} / ${pageCount}`;
-  fragment.append(status);
-
-  pagination.replaceChildren(fragment);
+function createMusicPeopleEmptyState() {
+  const empty = document.createElement("div");
+  empty.className = "music-people-empty";
+  empty.textContent = "No people found. Try clearing filters.";
+  return empty;
 }
 
 function renderMusicPeopleIndex(options = {}) {
@@ -4135,23 +4473,39 @@ function renderMusicPeopleIndex(options = {}) {
     return;
   }
 
+  const focusMeta = getMusicPeopleFilterFocusMeta();
+  const allRows = getMusicPeopleIndexRows();
+  normalizeActiveMusicPeopleFilters(allRows);
+  if (musicPeopleIndex) {
+    const existingFilters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+    if (existingFilters) {
+      existingFilters.remove();
+    }
+    musicPeopleIndex.insertBefore(createMusicPeopleFilters(allRows), musicPeopleList);
+    const existingPagination = musicPeopleIndex.querySelector("[data-music-people-pagination]");
+    if (existingPagination) {
+      existingPagination.remove();
+    }
+  }
+
   const forcedState = getForcedMockState("musicPeople");
-  activeMusicPeoplePage = normalizeMusicPeoplePage(activeMusicPeoplePage);
-  const pageStart = (activeMusicPeoplePage - 1) * musicPeoplePageSize;
-  const pageRows = musicPeopleRows.slice(pageStart, pageStart + musicPeoplePageSize);
+  const filteredRows = getFilteredMusicPeopleRows();
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
     renderMockState(fragment, forcedState, "musicPeople");
   } else {
-    pageRows.forEach((person) => {
-    fragment.append(createMusicPeopleRow(person));
+    filteredRows.forEach((person) => {
+      fragment.append(createMusicPeopleRow(person));
     });
     if (forcedState === "partial") {
       fragment.append(createMockStateCard("partial", "musicPeople"));
     }
   }
+  if (!forcedState && filteredRows.length === 0) {
+    fragment.append(createMusicPeopleEmptyState());
+  }
   musicPeopleList.replaceChildren(fragment);
-  renderMusicPeoplePagination();
+  restoreMusicPeopleFilterFocus(focusMeta);
 
   if (options.shouldResetScroll && typeof musicPeopleList.scrollTo === "function") {
     musicPeopleList.scrollTo({
