@@ -4181,9 +4181,13 @@ function getMusicPersonInstrumentPills(source, person) {
     ...person.instrumentNames,
     ...roleItems,
   ]).filter((item) => {
-    const normalizedItem = item.toLowerCase();
-    return !/^(performer|performers|friend|the fallen)$/.test(normalizedItem);
+    return isMusicPersonDisplayInstrument(item);
   });
+}
+
+function isMusicPersonDisplayInstrument(value) {
+  const normalizedValue = getMusicPeopleText(value).toLowerCase();
+  return Boolean(normalizedValue) && !/^(performer|performers|friend|the fallen)$/.test(normalizedValue);
 }
 
 function findMusicBandByName(bandName) {
@@ -4208,17 +4212,75 @@ function findMusicBandByName(bandName) {
   }) || null;
 }
 
+function getMusicPersonBandAssociationName(association) {
+  return getMusicPeopleObjectText(association, ["band", "band_name", "bandName", "band_title", "bandTitle", "name", "title", "label", "value"])
+    || getMusicPeopleText(association);
+}
+
+function getMusicPersonBandAssociationEntries(source) {
+  return [
+    source?.associatedBands,
+    source?.associated_bands,
+    source?.bands,
+    source?.relatedBands,
+    source?.related_bands,
+    source?.bandDetails,
+    source?.band_details,
+    source?.backend_record?.associatedBands,
+    source?.backend_record?.associated_bands,
+    source?.backend_record?.bands,
+    source?.backend_record?.relatedBands,
+    source?.backend_record?.related_bands,
+    source?.backend_record?.bandDetails,
+    source?.backend_record?.band_details,
+    source?.band,
+    source?.backend_record?.band,
+  ].flatMap((value) => Array.isArray(value) ? value : [value])
+    .filter(Boolean);
+}
+
+function getMusicPersonBandAssociationInstruments(association) {
+  if (!association || typeof association !== "object") {
+    return [];
+  }
+
+  return splitMusicPeopleInstrumentValues([
+    ...collectMusicPeopleTextValues(association.instrument, ["instrument", "instrument_name", "instrumentName", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.instruments, ["instrument", "instrument_name", "instrumentName", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.instrument_name, ["instrument", "instrument_name", "instrumentName", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.instrumentName, ["instrument", "instrument_name", "instrumentName", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.role, ["role", "instrument", "instrument_name", "instrumentName", "position", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.roles, ["role", "instrument", "instrument_name", "instrumentName", "position", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.position, ["position", "instrument", "instrument_name", "instrumentName", "role", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(association.positions, ["position", "instrument", "instrument_name", "instrumentName", "role", "name", "title", "label", "value"]),
+  ]).filter(isMusicPersonDisplayInstrument);
+}
+
+function getMusicPersonBandSpecificInstruments(source, bandName) {
+  const normalizedBandName = createBandSlug(bandName);
+  if (!normalizedBandName) {
+    return [];
+  }
+
+  return uniqueMusicPeopleValues(getMusicPersonBandAssociationEntries(source)
+    .filter((association) => createBandSlug(getMusicPersonBandAssociationName(association)) === normalizedBandName)
+    .flatMap(getMusicPersonBandAssociationInstruments));
+}
+
 function getMusicPersonAssociatedBandItems(source, person) {
   const associatedBandNames = uniqueMusicPeopleValues([
     ...collectMusicPeopleTextValues(source?.associatedBands, ["band", "name", "title", "label", "value"]),
     ...getMusicPeopleBandNames(source),
     ...person.bandNames,
   ]);
-  const instruments = getMusicPersonInstrumentPills(source, person);
 
   return associatedBandNames.map((bandName) => {
     const band = findMusicBandByName(bandName);
     const name = bandName;
+    const bandInstruments = getMusicPersonBandSpecificInstruments(source, name);
+    const instruments = bandInstruments.length > 0
+      ? bandInstruments
+      : (associatedBandNames.length === 1 ? getMusicPersonInstrumentPills(source, person) : []);
     return {
       name,
       bandId: band ? getBandId(band) : "",
