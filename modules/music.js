@@ -4053,7 +4053,7 @@ function getMusicPeopleRowsWithCategoryNumbers(rows) {
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
-    .filter((person) => person.name)
+    .filter((person) => person.name && person.photos > 0)
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
@@ -4418,11 +4418,13 @@ function returnToMusicPeopleRoute() {
 }
 
 function createMusicPeopleRow(person) {
+  const isFriend = person.categoryFilterValue === "friend";
   const row = document.createElement("button");
   row.className = "music-people-row";
   row.type = "button";
   row.dataset.personId = person.personId;
   row.dataset.peopleCategory = person.categoryFilterValue;
+  row.classList.toggle("is-friend", isFriend);
   row.classList.toggle("is-fallen", person.categoryFilterValue === "the fallen");
   row.classList.toggle("is-active", person.personId === activeMusicPeopleId);
   row.setAttribute("aria-pressed", String(person.personId === activeMusicPeopleId));
@@ -4431,11 +4433,11 @@ function createMusicPeopleRow(person) {
     [
       person.name,
       person.categoryDisplay,
-      person.categoryNumberText,
-      person.bandText,
-      person.instrumentText,
-      formatMusicPeopleCount(person.appearances, "Appearance"),
-      formatMusicPeopleCount(person.photos, "Photo"),
+      isFriend ? "" : person.categoryNumberText,
+      isFriend ? "" : person.bandText,
+      isFriend ? "" : person.instrumentText,
+      !isFriend || person.appearances > 0 ? formatMusicPeopleCount(person.appearances, "Appearance") : "",
+      !isFriend || person.photos > 0 ? formatMusicPeopleCount(person.photos, "Photo") : "",
     ].filter(Boolean).join(", ")
   );
 
@@ -4451,49 +4453,68 @@ function createMusicPeopleRow(person) {
   personId.className = "music-people-id";
   personId.textContent = person.categoryNumberText;
 
-  const band = document.createElement("span");
-  band.className = "music-people-band";
-  band.textContent = person.bandText;
-
-  const instrument = document.createElement("span");
-  instrument.className = "music-people-instrument";
-  instrument.textContent = person.instrumentText;
-
   const stats = document.createElement("span");
   stats.className = "music-people-stats";
+  const renderedStats = [];
 
-  const appearances = document.createElement("span");
-  appearances.className = "music-people-stat";
-  appearances.setAttribute("aria-label", `${formatMusicPeopleNumber(person.appearances)} appearances`);
-  const appearancesIcon = document.createElement("span");
-  appearancesIcon.className = "bands-row-stat-icon music-people-stat-icon music-people-stat-icon--appearances";
-  appearancesIcon.setAttribute("aria-hidden", "true");
-  const appearancesValue = document.createElement("span");
-  appearancesValue.textContent = formatMusicPeopleNumber(person.appearances);
-  appearances.append(appearancesIcon, appearancesValue);
+  if (!isFriend || person.appearances > 0) {
+    const appearances = document.createElement("span");
+    appearances.className = "music-people-stat";
+    appearances.setAttribute("aria-label", `${formatMusicPeopleNumber(person.appearances)} appearances`);
+    const appearancesIcon = document.createElement("span");
+    appearancesIcon.className = "bands-row-stat-icon music-people-stat-icon music-people-stat-icon--appearances";
+    appearancesIcon.setAttribute("aria-hidden", "true");
+    const appearancesValue = document.createElement("span");
+    appearancesValue.textContent = formatMusicPeopleNumber(person.appearances);
+    appearances.append(appearancesIcon, appearancesValue);
+    renderedStats.push(appearances);
+  }
 
-  const photos = document.createElement("span");
-  photos.className = "music-people-stat";
-  photos.setAttribute("aria-label", `${formatMusicPeopleNumber(person.photos)} photos`);
-  const photosIcon = document.createElement("span");
-  photosIcon.className = "bands-row-stat-icon bands-row-stat-icon--photos music-people-stat-icon";
-  photosIcon.setAttribute("aria-hidden", "true");
-  const photosValue = document.createElement("span");
-  photosValue.textContent = formatMusicPeopleNumber(person.photos);
-  photos.append(photosIcon, photosValue);
-
-  const statDivider = document.createElement("span");
-  statDivider.className = "music-people-stat-divider";
-  statDivider.setAttribute("aria-hidden", "true");
-  statDivider.textContent = "/";
+  if (!isFriend || person.photos > 0) {
+    const photos = document.createElement("span");
+    photos.className = "music-people-stat";
+    photos.setAttribute("aria-label", `${formatMusicPeopleNumber(person.photos)} photos`);
+    const photosIcon = document.createElement("span");
+    photosIcon.className = "bands-row-stat-icon bands-row-stat-icon--photos music-people-stat-icon";
+    photosIcon.setAttribute("aria-hidden", "true");
+    const photosValue = document.createElement("span");
+    photosValue.textContent = formatMusicPeopleNumber(person.photos);
+    photos.append(photosIcon, photosValue);
+    renderedStats.push(photos);
+  }
 
   const arrow = document.createElement("span");
   arrow.className = "music-people-arrow";
   arrow.setAttribute("aria-hidden", "true");
   arrow.textContent = ">";
 
-  stats.append(appearances, statDivider, photos);
-  row.append(name, category, personId, band, instrument, stats, arrow);
+  renderedStats.forEach((stat, index) => {
+    if (index > 0) {
+      const statDivider = document.createElement("span");
+      statDivider.className = "music-people-stat-divider";
+      statDivider.setAttribute("aria-hidden", "true");
+      statDivider.textContent = "/";
+      stats.append(statDivider);
+    }
+    stats.append(stat);
+  });
+
+  row.append(name, category);
+  if (!isFriend) {
+    const band = document.createElement("span");
+    band.className = "music-people-band";
+    band.textContent = person.bandText;
+
+    const instrument = document.createElement("span");
+    instrument.className = "music-people-instrument";
+    instrument.textContent = person.instrumentText;
+
+    row.append(personId, band, instrument);
+  }
+  if (renderedStats.length > 0) {
+    row.append(stats);
+  }
+  row.append(arrow);
   row.addEventListener("click", () => {
     setActiveMusicPeopleRow(person.personId);
     navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
