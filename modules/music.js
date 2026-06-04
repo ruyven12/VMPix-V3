@@ -4217,13 +4217,98 @@ function getMusicPersonAssociatedBandItems(source, person) {
 
   return associatedBandNames.map((bandName) => {
     const band = findMusicBandByName(bandName);
-    const name = band ? getBandDetailName(band) : bandName;
+    const name = bandName;
     return {
       name,
+      bandId: band ? getBandId(band) : "",
+      band_id: band?.band_id || "",
+      id: band?.id || "",
+      slug: band?.slug || "",
       logoUrl: band ? getBandDetailLogoUrl(band) : "",
       initials: getBandInitials(name),
     };
   });
+}
+
+function getMusicPersonBandMatchSets(associatedBands) {
+  const names = associatedBands
+    .map((band) => getMusicPeopleText(band.name).toLowerCase())
+    .filter(Boolean);
+  const slugs = associatedBands
+    .flatMap((band) => [band.name, band.bandId, band.band_id, band.id, band.slug])
+    .map(createBandSlug)
+    .filter(Boolean);
+
+  return {
+    names: new Set(names),
+    slugs: new Set(slugs),
+  };
+}
+
+function doesMusicPersonShowMatchBands(show, bandMatches) {
+  if (!show || bandMatches.names.size === 0 && bandMatches.slugs.size === 0) {
+    return false;
+  }
+
+  const showBandNameMatch = (show.bandNames || []).some((bandName) => {
+    const normalizedName = getMusicPeopleText(bandName).toLowerCase();
+    return bandMatches.names.has(normalizedName) || bandMatches.slugs.has(createBandSlug(normalizedName));
+  });
+  if (showBandNameMatch) {
+    return true;
+  }
+
+  return (show.bandSlugs || []).some((bandSlug) => bandMatches.slugs.has(createBandSlug(bandSlug)));
+}
+
+function getMusicPersonShowDateParts(show) {
+  const parsedDate = parseMusicShowDate(show?.rawDate || show?.date || show?.show_date || show?.eventDate || show?.formattedDate);
+  if (!parsedDate) {
+    return { month: "Date", day: "--", year: "Pending" };
+  }
+
+  return {
+    month: parsedDate.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+    day: String(parsedDate.getDate()).padStart(2, "0"),
+    year: String(parsedDate.getFullYear()),
+  };
+}
+
+function getMusicPersonTaggedPhotosLabel(show) {
+  const taggedPhotoCount = getMusicPeopleCountValue(
+    show?.taggedPhotos,
+    show?.tagged_photos,
+    show?.tagged_photo_count,
+    show?.person_tagged_photos,
+    show?.person_tagged_photo_count
+  );
+
+  return taggedPhotoCount > 0 ? formatMusicPeopleCount(taggedPhotoCount, "Tagged Photo") : "Tagged Photos Coming Soon";
+}
+
+function getMusicPersonTaggedShowsForBands(associatedBands) {
+  if (musicShowsSetsDataState !== "live" || musicShowsSetsCollection.length === 0 || associatedBands.length === 0) {
+    return [];
+  }
+
+  const bandMatches = getMusicPersonBandMatchSets(associatedBands);
+  return musicShowsSetsCollection
+    .filter((show) => doesMusicPersonShowMatchBands(show, bandMatches))
+    .map((show, index) => {
+      const title = getMusicPeopleText(show.name || show.title) || `Tagged Show ${index + 1}`;
+      return {
+        showId: getMusicPeopleText(show.showId || show.show_id || show.setCode) || createMusicPeopleSlug(`${title}-${index + 1}`),
+        date: getMusicPersonShowDateParts(show),
+        title,
+        venue: getMusicPeopleText(show.venue) || "Venue Pending",
+        location: getMusicPeopleText(show.location) || getMusicShowLocation(show),
+        taggedPhotosLabel: getMusicPersonTaggedPhotosLabel(show),
+        expanded: false,
+        contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
+        notes: "Person-tagged thumbnails are staged for future SmugMug captions.",
+        thumbnails: ["Photo 01", "Photo 02", "Photo 03", "Photo 04"],
+      };
+    });
 }
 
 function getMusicPersonDetailViewData(source, requestedPersonId) {
@@ -4234,6 +4319,7 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
   const appearances = summaryAppearances ?? person.appearances;
   const photos = summaryPhotos ?? person.photos;
   const instrumentPills = getMusicPersonInstrumentPills(source, person);
+  const associatedBands = getMusicPersonAssociatedBandItems(source, person);
 
   return {
     ...source,
@@ -4249,8 +4335,8 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
       { label: "First Seen", value: getMusicPersonSeenValue(source, "first") },
       { label: "Latest Seen", value: getMusicPersonSeenValue(source, "latest") },
     ],
-    associatedBands: getMusicPersonAssociatedBandItems(source, person),
-    taggedShows: Array.isArray(source?.taggedShows) ? source.taggedShows : [],
+    associatedBands,
+    taggedShows: getMusicPersonTaggedShowsForBands(associatedBands),
   };
 }
 
@@ -4377,7 +4463,8 @@ function createMusicPersonShowCard(show, personName) {
   summary.className = "person-show-summary";
   summary.type = "button";
   summary.setAttribute("aria-expanded", String(isExpanded));
-  summary.setAttribute("aria-label", `${show.title}, ${show.venue}, ${show.location}, ${formatMusicPeopleCount(show.taggedPhotos, "tagged photo")}`);
+  const taggedPhotosLabel = getMusicPeopleText(show.taggedPhotosLabel) || formatMusicPeopleCount(show.taggedPhotos, "Tagged Photo");
+  summary.setAttribute("aria-label", `${show.title}, ${show.venue}, ${show.location}, ${taggedPhotosLabel}`);
 
   const date = document.createElement("span");
   date.className = "person-show-date";
@@ -4413,7 +4500,7 @@ function createMusicPersonShowCard(show, personName) {
 
   const count = document.createElement("span");
   count.className = "person-show-count";
-  count.textContent = formatMusicPeopleCount(show.taggedPhotos, "Tagged Photo");
+  count.textContent = taggedPhotosLabel;
 
   const toggle = document.createElement("span");
   toggle.className = "person-show-toggle";
@@ -4602,7 +4689,11 @@ function showMusicPersonDetail(personId) {
       behavior: reducedMotion.matches ? "auto" : "smooth",
     });
   }
-  requestMusicPeopleIndexData().then(() => {
+  Promise.allSettled([
+    requestMusicPeopleIndexData(),
+    requestMusicBandsIndexData(),
+    requestMusicShowsSetsData(),
+  ]).then(() => {
     const route = getRouteFromUrl();
     if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
       return;
