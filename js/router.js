@@ -227,7 +227,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "music-venues") {
-    showMusicNexus({ initialSection: "landing", currentView: "Venues" });
+    showMusicNexus({ initialSection: "venues", currentView: "Venue Detail" });
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
