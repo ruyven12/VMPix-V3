@@ -4938,10 +4938,7 @@ function createShowDetailBandsOnBill(show) {
 
   heading.append(title);
 
-  const counter = document.createElement("span");
-  counter.className = "show-detail-slide-counter show-detail-bill-counter";
-
-  header.append(heading, counter);
+  header.append(heading);
 
   const mediaFrame = document.createElement("div");
   mediaFrame.className = "show-detail-media-frame show-detail-bill-frame";
@@ -4972,19 +4969,11 @@ function createShowDetailBandsOnBill(show) {
     const mediaCopy = document.createElement("div");
     mediaCopy.className = "show-detail-media-copy show-detail-bill-copy";
 
-    const slot = document.createElement("span");
-    slot.className = "show-detail-media-kicker show-detail-bill-slot";
-    slot.textContent = band.isEmpty ? "Bill Pending" : `Slot ${band.slot || index + 1}`;
-
     const name = document.createElement("h5");
     name.className = "show-detail-media-title show-detail-bill-name";
     name.textContent = band.name;
 
-    const detail = document.createElement("span");
-    detail.className = "show-detail-media-detail show-detail-bill-detail";
-    detail.textContent = band.isEmpty ? "Ready for future bill data" : "On The Bill";
-
-    mediaCopy.append(slot, name, detail);
+    mediaCopy.append(name);
     media.append(mediaCopy);
     slide.append(media);
     track.append(slide);
@@ -5018,7 +5007,6 @@ function createShowDetailBandsOnBill(show) {
   function updateCarousel() {
     activeIndex = normalizeShowDetailSlideIndex(activeIndex, slides.length);
     track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
-    counter.textContent = formatShowDetailSlideCounter(activeIndex, slides.length);
     dotButtons.forEach((dot, index) => {
       dot.classList.toggle("is-active", index === activeIndex);
       dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
@@ -5050,7 +5038,6 @@ function createShowDetailBandsOnBill(show) {
     previousButton.hidden = true;
     nextButton.hidden = true;
     dots.hidden = true;
-    counter.hidden = true;
   }
 
   updateCarousel();
