@@ -201,7 +201,6 @@ let activeBandsRegionFilter = "";
 let activeBandsStatusFilter = "";
 let bandsSearchTerm = "";
 let bandsIndexReturnUrl = "/music/bands";
-let activeMusicPeoplePage = 1;
 let activeMusicPeopleId = "";
 let activeMusicPersonDetailId = "";
 let activeWrestlingPersonId = "";
@@ -390,7 +389,6 @@ const musicPeopleRows = [
   { personId: "iris-fane", name: "Iris Fane", role: "Bass", band: "Neon Saints", photos: 284, sets: 27, thumb: "IF" },
   { personId: "luca-voss", name: "Luca Voss", role: "Synth", band: "Violet Machines", photos: 256, sets: 22, thumb: "LV" },
 ];
-const musicPeoplePageSize = 5;
 
 const musicPersonDetailPlaceholder = {
   personId: "adam-begin",

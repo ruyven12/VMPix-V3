@@ -7,6 +7,8 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
+const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people";
+const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
@@ -27,6 +29,9 @@ const bandsStatusFilterLabels = {
 let musicBandsIndexCollection = getMockCollection("musicBands", { clone: false });
 let musicBandsIndexRequest = null;
 let musicBandsIndexLoaded = false;
+let musicPeopleIndexCollection = getMockCollection("musicPeople", { clone: false });
+let musicPeopleIndexRequest = null;
+let musicPeopleIndexLoaded = false;
 let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
@@ -844,6 +849,125 @@ function requestMusicBandsIndexData() {
     });
 
   return musicBandsIndexRequest;
+}
+
+function getMusicPeopleIndexCollection() {
+  return Array.isArray(musicPeopleIndexCollection) ? musicPeopleIndexCollection : [];
+}
+
+function setMusicPeopleIndexCollection(rows, stateName = "fallback") {
+  musicPeopleIndexCollection = Array.isArray(rows) ? rows : getMockCollection("musicPeople", { clone: false });
+  if (typeof mockCollections !== "undefined") {
+    mockCollections.musicPeople = musicPeopleIndexCollection;
+  }
+  if (musicPeopleIndex) {
+    musicPeopleIndex.dataset.peopleDataState = stateName;
+    musicPeopleIndex.setAttribute("aria-busy", String(stateName === "loading"));
+  }
+}
+
+function getMusicPeoplePayloadRows(payload) {
+  const candidates = [
+    payload?.data,
+    payload?.rows,
+    payload?.people,
+    payload?.source?.data,
+    payload?.source?.rows,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((row) => row && typeof row === "object");
+    }
+    if (candidate && typeof candidate === "object") {
+      const nestedRows = Object.values(candidate).flatMap((value) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        return value && typeof value === "object" ? [value] : [];
+      });
+      if (nestedRows.length > 0) {
+        return nestedRows.filter((row) => row && typeof row === "object");
+      }
+    }
+  }
+
+  return [];
+}
+
+function normalizeLiveMusicPeople(payload) {
+  return getMusicPeoplePayloadRows(payload)
+    .map((person) => ({
+      ...person,
+      backend_record: person.backend_record || person,
+    }))
+    .filter((person) => getMusicPeopleText(person.name ?? person.title))
+    .sort((left, right) => getMusicPeopleText(left.name ?? left.title).localeCompare(getMusicPeopleText(right.name ?? right.title)));
+}
+
+function restoreMusicPeopleFallback() {
+  setMusicPeopleIndexCollection(musicPeopleRows, "fallback");
+}
+
+function requestMusicPeopleIndexData() {
+  if (musicPeopleIndexLoaded) {
+    return Promise.resolve(true);
+  }
+  if (musicPeopleIndexRequest) {
+    return musicPeopleIndexRequest;
+  }
+  if (typeof fetch !== "function") {
+    restoreMusicPeopleFallback();
+    return Promise.resolve(false);
+  }
+
+  if (musicPeopleIndex) {
+    musicPeopleIndex.dataset.peopleDataState = "loading";
+    musicPeopleIndex.setAttribute("aria-busy", "true");
+  }
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_PEOPLE_INDEX_TIMEOUT_MS)
+    : 0;
+
+  const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+  musicPeopleIndexRequest = fetch(apiUrl, {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music people request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const liveRows = normalizeLiveMusicPeople(payload);
+      if (liveRows.length === 0) {
+        throw new Error("Music people response contained no rows");
+      }
+
+      setMusicPeopleIndexCollection(liveRows, "live");
+      musicPeopleIndexLoaded = true;
+      renderMusicPeopleIndex({ shouldResetScroll: false });
+      return true;
+    })
+    .catch(() => {
+      restoreMusicPeopleFallback();
+      renderMusicPeopleIndex({ shouldResetScroll: false });
+      return false;
+    })
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      if (musicPeopleIndex) {
+        musicPeopleIndex.setAttribute("aria-busy", "false");
+      }
+      musicPeopleIndexRequest = null;
+    });
+
+  return musicPeopleIndexRequest;
 }
 
 function getMusicShowsPayloadRows(payload) {
@@ -3779,19 +3903,31 @@ function getMusicPeopleBandNames(person) {
   ]);
 }
 
+function splitMusicPeopleInstrumentValues(values) {
+  return uniqueMusicPeopleValues(
+    values.flatMap((value) => getMusicPeopleText(value)
+      .split(/\s*(?:,|\/|;|\|)\s*/)
+      .map((part) => part.trim())
+      .filter(Boolean))
+  );
+}
+
 function getMusicPeopleInstrumentNames(person) {
-  const directInstruments = uniqueMusicPeopleValues([
+  const directInstruments = splitMusicPeopleInstrumentValues([
     ...collectMusicPeopleTextValues(person?.instrument, ["instrument", "name", "title", "label", "value"]),
     ...collectMusicPeopleTextValues(person?.instruments, ["instrument", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.bands, ["instrument", "role", "position"]),
+    ...collectMusicPeopleTextValues(person?.related_bands, ["instrument", "role", "position"]),
     ...collectMusicPeopleTextValues(person?.backend_record?.instrument, ["instrument", "name", "title", "label", "value"]),
     ...collectMusicPeopleTextValues(person?.backend_record?.instruments, ["instrument", "name", "title", "label", "value"]),
+    ...collectMusicPeopleTextValues(person?.backend_record?.bands, ["instrument", "role", "position"]),
   ]);
   if (directInstruments.length > 0) {
     return directInstruments;
   }
 
   const roleText = getMusicPeopleText(person?.role ?? person?.category ?? person?.backend_record?.category);
-  return uniqueMusicPeopleValues(
+  return splitMusicPeopleInstrumentValues(
     roleText
       .split(/\s*(?:\/|,|;|\|)\s*/)
       .map((part) => part.trim())
@@ -3851,10 +3987,13 @@ function normalizeMusicPeopleIndexRow(person) {
   );
   const photos = getMusicPeopleCountValue(
     source.photos,
+    source.photoCount,
     source.photo_count,
     source.tagged_photo_count,
+    source.taggedPhotoCount,
     source.stats?.taggedPhotoCount,
     source.stats?.photoCount,
+    source.backend_record?.photoCount,
     source.backend_record?.stats?.taggedPhotoCount,
     source.backend_record?.stats?.photoCount
   );
@@ -3887,7 +4026,7 @@ function normalizeMusicPeopleIndexRow(person) {
 }
 
 function getMusicPeopleIndexRows() {
-  return musicPeopleRows
+  return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
     .filter((person) => person.name)
     .sort((left, right) => left.name.localeCompare(right.name));
@@ -4313,8 +4452,13 @@ function createMusicPeopleRow(person) {
   statDivider.setAttribute("aria-hidden", "true");
   statDivider.textContent = "/";
 
+  const arrow = document.createElement("span");
+  arrow.className = "music-people-arrow";
+  arrow.setAttribute("aria-hidden", "true");
+  arrow.textContent = ">";
+
   stats.append(appearances, statDivider, photos);
-  row.append(name, category, personId, band, instrument, stats);
+  row.append(name, category, personId, band, instrument, stats, arrow);
   row.addEventListener("click", () => {
     setActiveMusicPeopleRow(person.personId);
     navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
@@ -6039,6 +6183,11 @@ function setPeopleIndexVisible(isVisible) {
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
     renderMusicPeopleIndex({ shouldResetScroll: false });
+    requestMusicPeopleIndexData().then(() => {
+      if (getRouteFromUrl().name === "music-people") {
+        renderMusicPeopleIndex({ shouldResetScroll: false });
+      }
+    });
     musicPeopleIndex.removeAttribute("inert");
   } else {
     musicPeopleIndex.setAttribute("inert", "");
