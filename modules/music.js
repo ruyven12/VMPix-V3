@@ -4898,6 +4898,63 @@ function createShowDetailStat(label, value) {
   return stat;
 }
 
+function getMusicShowBillBands(show) {
+  const sourceBands = Array.isArray(show?.bands) ? show.bands : [];
+  return sourceBands
+    .map((band, index) => {
+      if (band && typeof band === "object") {
+        const name = String(band.band || band.name || band.band_name || band.bandName || "").trim();
+        const slot = String(band.slot || band.bandSlot || band.band_slot || band.position || index + 1).trim();
+        return name ? { name, slot } : null;
+      }
+
+      const name = String(band || "").trim();
+      return name ? { name, slot: String(index + 1) } : null;
+    })
+    .filter(Boolean);
+}
+
+function createShowDetailBandsOnBill(show) {
+  const section = document.createElement("section");
+  section.className = "show-detail-bill";
+  section.setAttribute("aria-labelledby", "show-detail-bill-title");
+
+  const title = document.createElement("h4");
+  title.className = "show-detail-bill-title";
+  title.id = "show-detail-bill-title";
+  title.textContent = "Bands On The Bill";
+
+  const bands = getMusicShowBillBands(show);
+  const list = document.createElement("div");
+  list.className = "show-detail-bill-list";
+
+  if (bands.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "show-detail-bill-empty";
+    empty.textContent = "No bands indexed for this show yet.";
+    list.append(empty);
+  } else {
+    bands.forEach((band) => {
+      const card = document.createElement("article");
+      card.className = "show-detail-bill-card";
+
+      const slot = document.createElement("span");
+      slot.className = "show-detail-bill-slot";
+      slot.textContent = band.slot ? `Slot ${band.slot}` : "Bill Slot";
+
+      const name = document.createElement("h5");
+      name.className = "show-detail-bill-name";
+      name.textContent = band.name;
+
+      card.append(slot, name);
+      list.append(card);
+    });
+  }
+
+  section.append(title, list);
+  return section;
+}
+
 function formatShowDetailSlideCounter(index, total) {
   return `${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
 }
@@ -5265,6 +5322,12 @@ function renderMusicShowDetail(show) {
   copy.append(eyebrow, title, details, stats);
   hero.append(poster, copy);
 
+  const bill = createShowDetailBandsOnBill(show);
+
+  showDetail.replaceChildren(backButton, hero, bill);
+}
+
+function renderUnusedShowDetailLegacyPreview(show, relationships) {
   const viewing = document.createElement("section");
   viewing.className = "show-detail-viewing";
   viewing.setAttribute("aria-labelledby", "show-detail-viewing-title");
@@ -5455,7 +5518,7 @@ function renderMusicShowDetail(show) {
   updateCarousel(activeSlideIndex);
 
   viewing.append(viewingHeader, mediaFrame, dots);
-  showDetail.replaceChildren(backButton, hero, viewing, createShowDetailRelationships(relationships));
+  return viewing;
 }
 
 function showMusicShowDetail(showId) {

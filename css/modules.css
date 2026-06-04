@@ -6920,6 +6920,77 @@ img.archive-gallery-image {
   text-transform: none;
 }
 
+.show-detail-bill {
+  width: min(100%, 56rem);
+  justify-self: center;
+  display: grid;
+  gap: clamp(0.52rem, 1.75svh, 0.76rem);
+  padding: clamp(0.64rem, 2vw, 0.9rem);
+  border: 1px solid rgba(247, 247, 242, 0.085);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 66%),
+    radial-gradient(ellipse at 15% 8%, rgba(213, 22, 34, 0.11), transparent 14rem),
+    rgba(4, 4, 7, 0.58);
+  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.22);
+}
+
+.show-detail-bill-title,
+.show-detail-bill-name,
+.show-detail-bill-slot,
+.show-detail-bill-empty {
+  margin: 0;
+  min-width: 0;
+  text-transform: none;
+}
+
+.show-detail-bill-title {
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(0.88rem, 3vw, 1.05rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.show-detail-bill-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: clamp(0.42rem, 1.4vw, 0.62rem);
+}
+
+.show-detail-bill-card {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 0.34rem;
+  min-height: 5.2rem;
+  padding: clamp(0.58rem, 1.8vw, 0.78rem);
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.03), transparent 72%),
+    rgba(1, 1, 3, 0.42);
+}
+
+.show-detail-bill-slot {
+  color: rgba(213, 22, 34, 0.7);
+  font-size: clamp(0.54rem, 2.05vw, 0.64rem);
+  line-height: 1;
+}
+
+.show-detail-bill-name {
+  color: rgba(247, 247, 242, 0.9);
+  font-size: clamp(0.92rem, 3.2vw, 1.12rem);
+  font-weight: 400;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.show-detail-bill-empty {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.68rem, 2.4vw, 0.78rem);
+  line-height: 1.22;
+}
+
 .show-detail-viewing {
   width: min(100%, 56rem);
   justify-self: center;
