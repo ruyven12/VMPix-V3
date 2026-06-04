@@ -6934,6 +6934,7 @@ img.archive-gallery-image {
 
 .show-detail-bill-title,
 .show-detail-bill-name,
+.show-detail-bill-active-name,
 .show-detail-bill-slot,
 .show-detail-bill-detail,
 .show-detail-bill-empty {
@@ -6944,9 +6945,20 @@ img.archive-gallery-image {
 
 .show-detail-bill-title {
   color: rgba(247, 247, 242, 0.82);
-  font-size: clamp(0.8rem, 2.65vw, 0.96rem);
+  font-size: clamp(0.82rem, 2.4vw, 0.9rem);
   font-weight: 400;
   line-height: 1;
+}
+
+.show-detail-bill-active-name {
+  max-width: min(58%, 24rem);
+  color: rgba(247, 247, 242, 0.92);
+  font-size: clamp(0.94rem, 2.8vw, 1rem);
+  font-weight: 500;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-align: right;
+  text-wrap: balance;
 }
 
 .show-detail-bill .show-detail-media-kicker,

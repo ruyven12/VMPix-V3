@@ -4938,7 +4938,10 @@ function createShowDetailBandsOnBill(show) {
 
   heading.append(title);
 
-  header.append(heading);
+  const activeBandName = document.createElement("span");
+  activeBandName.className = "show-detail-bill-active-name";
+
+  header.append(heading, activeBandName);
 
   const mediaFrame = document.createElement("div");
   mediaFrame.className = "show-detail-media-frame show-detail-bill-frame";
@@ -4966,15 +4969,6 @@ function createShowDetailBandsOnBill(show) {
     const media = document.createElement("div");
     media.className = "show-detail-media show-detail-bill-media";
 
-    const mediaCopy = document.createElement("div");
-    mediaCopy.className = "show-detail-media-copy show-detail-bill-copy";
-
-    const name = document.createElement("h5");
-    name.className = "show-detail-media-title show-detail-bill-name";
-    name.textContent = band.name;
-
-    mediaCopy.append(name);
-    media.append(mediaCopy);
     slide.append(media);
     track.append(slide);
   });
@@ -5007,6 +5001,7 @@ function createShowDetailBandsOnBill(show) {
   function updateCarousel() {
     activeIndex = normalizeShowDetailSlideIndex(activeIndex, slides.length);
     track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
+    activeBandName.textContent = slides[activeIndex]?.name || "";
     dotButtons.forEach((dot, index) => {
       dot.classList.toggle("is-active", index === activeIndex);
       dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
