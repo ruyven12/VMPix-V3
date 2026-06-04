@@ -4214,6 +4214,7 @@ function getMusicPersonAssociatedBandItems(source, person) {
     ...getMusicPeopleBandNames(source),
     ...person.bandNames,
   ]);
+  const instruments = getMusicPersonInstrumentPills(source, person);
 
   return associatedBandNames.map((bandName) => {
     const band = findMusicBandByName(bandName);
@@ -4226,6 +4227,7 @@ function getMusicPersonAssociatedBandItems(source, person) {
       slug: band?.slug || "",
       logoUrl: band ? getBandDetailLogoUrl(band) : "",
       initials: getBandInitials(name),
+      instruments,
     };
   });
 }
@@ -4268,7 +4270,7 @@ function getMusicPersonShowDateParts(show) {
   }
 
   return {
-    month: parsedDate.toLocaleString("en-US", { month: "short" }).toUpperCase(),
+    month: parsedDate.toLocaleString("en-US", { month: "short" }),
     day: String(parsedDate.getDate()).padStart(2, "0"),
     year: String(parsedDate.getFullYear()),
   };
@@ -4389,6 +4391,7 @@ function createMusicPersonAssociatedBand(band) {
   const mark = document.createElement("span");
   mark.className = "person-detail-band-mark";
   mark.textContent = band.initials;
+  mark.hidden = Boolean(band.logoUrl);
   logo.append(mark);
 
   if (band.logoUrl) {
@@ -4405,18 +4408,29 @@ function createMusicPersonAssociatedBand(band) {
     };
     image.onerror = () => {
       image.hidden = true;
-      image.removeAttribute("src");
-      mark.hidden = false;
       logo.classList.remove("has-logo");
     };
     image.src = band.logoUrl;
     logo.prepend(image);
   }
 
-  const name = document.createElement("p");
-  name.className = "person-detail-band-name";
+  const name = document.createElement("span");
+  name.className = "person-detail-band-name-pill person-detail-pill band-detail-tag band-detail-tag--neutral";
   name.textContent = band.name;
   item.append(logo, name);
+
+  const instruments = uniqueMusicPeopleValues(Array.isArray(band.instruments) ? band.instruments : []);
+  if (instruments.length > 0) {
+    const instrumentList = document.createElement("div");
+    instrumentList.className = "person-detail-band-instruments";
+    instruments.forEach((instrument) => {
+      const pill = document.createElement("span");
+      pill.className = "person-detail-band-instrument-pill person-detail-pill band-detail-tag band-detail-tag--neutral";
+      pill.textContent = instrument;
+      instrumentList.append(pill);
+    });
+    item.append(instrumentList);
+  }
   return item;
 }
 
