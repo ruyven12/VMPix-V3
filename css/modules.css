@@ -4798,6 +4798,7 @@ img.archive-gallery-image {
 
 .person-detail-back {
   justify-self: start;
+  text-transform: none;
 }
 
 .person-detail-back:hover,
@@ -4915,8 +4916,55 @@ img.archive-gallery-image {
   font-weight: 400;
   line-height: 0.92;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
   text-wrap: balance;
+}
+
+.person-detail-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+}
+
+.person-detail-pill {
+  text-transform: none;
+}
+
+.person-detail-archive-data {
+  min-width: 0;
+  display: grid;
+  gap: 0.34rem;
+  margin: 0;
+  padding: clamp(0.46rem, 1.45vw, 0.62rem);
+  border: 1px solid rgba(247, 247, 242, 0.07);
+  border-radius: var(--radius-sm);
+  background: rgba(1, 1, 3, 0.3);
+}
+
+.person-detail-archive-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(5.6rem, auto) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.48rem;
+}
+
+.person-detail-archive-label,
+.person-detail-archive-value {
+  min-width: 0;
+  margin: 0;
+  font-size: clamp(0.6rem, 2.35vw, 0.72rem);
+  line-height: 1.12;
+  text-transform: none;
+}
+
+.person-detail-archive-label {
+  color: rgba(247, 247, 242, 0.44);
+}
+
+.person-detail-archive-value {
+  color: rgba(247, 247, 242, 0.76);
+  overflow-wrap: anywhere;
 }
 
 .person-detail-role-line {
@@ -5012,7 +5060,7 @@ img.archive-gallery-image {
   font-size: clamp(0.76rem, 2.9vw, 0.94rem);
   font-weight: 400;
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .person-detail-band-list {
@@ -5021,7 +5069,65 @@ img.archive-gallery-image {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: start;
   gap: 0.42rem;
+}
+
+.person-detail-band-card {
+  min-width: 0;
+  width: clamp(5.4rem, 18vw, 7.1rem);
+  display: grid;
+  justify-items: center;
+  gap: 0.34rem;
+  text-align: center;
+}
+
+.person-detail-band-thumb {
+  width: clamp(3.65rem, 12vw, 4.6rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  padding: 0.38rem;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(213, 22, 34, 0.14), transparent 66%),
+    rgba(247, 247, 242, 0.032);
+  overflow: hidden;
+}
+
+.person-detail-associated {
+  justify-items: center;
+  text-align: center;
+}
+
+.person-detail-band-thumb.has-logo {
+  background: rgba(247, 247, 242, 0.026);
+}
+
+.person-detail-band-logo {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.person-detail-band-mark {
+  color: rgba(247, 247, 242, 0.72);
+  font-size: clamp(1.16rem, 4.8vw, 1.52rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.person-detail-band-name {
+  min-width: 0;
+  margin: 0;
+  color: rgba(247, 247, 242, 0.72);
+  font-size: clamp(0.58rem, 2.25vw, 0.7rem);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-transform: none;
 }
 
 .person-detail-band-tag {
@@ -5087,7 +5193,7 @@ img.archive-gallery-image {
   min-width: 0;
   min-height: 4.35rem;
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: clamp(0.42rem, 1.55vw, 0.62rem);
   padding: clamp(0.5rem, 1.9vw, 0.68rem);
@@ -5109,6 +5215,8 @@ img.archive-gallery-image {
 }
 
 .person-show-date {
+  grid-column: 1;
+  grid-row: 1 / 3;
   min-width: 2.7rem;
   display: grid;
   justify-items: center;
@@ -5133,23 +5241,9 @@ img.archive-gallery-image {
   line-height: 0.92;
 }
 
-.person-show-thumb {
-  width: clamp(2.85rem, 10vw, 3.45rem);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(247, 247, 242, 0.08);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(135deg, rgba(213, 22, 34, 0.16), transparent 66%),
-    rgba(247, 247, 242, 0.035);
-  color: rgba(247, 247, 242, 0.64);
-  font-size: clamp(0.56rem, 2.25vw, 0.66rem);
-  line-height: 1;
-  text-transform: uppercase;
-}
-
 .person-show-copy {
+  grid-column: 2;
+  grid-row: 1;
   min-width: 0;
   display: grid;
   gap: 0.22rem;
@@ -5169,7 +5263,7 @@ img.archive-gallery-image {
   font-size: clamp(0.56rem, 2.15vw, 0.68rem);
   line-height: 1.14;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .person-show-venue {
@@ -5177,7 +5271,8 @@ img.archive-gallery-image {
 }
 
 .person-show-count {
-  grid-column: 3 / 5;
+  grid-column: 2;
+  grid-row: 2;
   justify-self: start;
   min-height: 1.46rem;
   display: inline-flex;
@@ -5189,11 +5284,13 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.68);
   font-size: clamp(0.52rem, 2.05vw, 0.62rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
 .person-show-toggle {
+  grid-column: 3;
+  grid-row: 1 / 3;
   min-width: 1.28rem;
   display: inline-grid;
   place-items: center;
@@ -6919,7 +7016,7 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.86);
   font-size: clamp(2rem, 12vw, 3.4rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .show-detail-poster-image {
@@ -11893,10 +11990,6 @@ img.archive-gallery-image {
     padding-inline: 0.22rem;
   }
 
-  .person-show-thumb {
-    width: 2.58rem;
-  }
-
   .person-show-count {
     padding-inline: 0.36rem;
   }
@@ -12374,11 +12467,11 @@ img.archive-gallery-image {
   }
 
   .person-show-summary {
-    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .person-show-count {
-    grid-column: 3 / 5;
+    grid-column: 2;
     margin-top: 0.04rem;
   }
 
@@ -12895,12 +12988,13 @@ img.archive-gallery-image {
   }
 
   .person-detail-associated {
-    grid-template-columns: minmax(10rem, auto) minmax(0, 1fr);
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
   }
 
   .person-detail-band-list {
-    justify-content: flex-end;
+    justify-content: center;
   }
 
   .person-tagged-shows-header {
@@ -12909,12 +13003,18 @@ img.archive-gallery-image {
   }
 
   .person-show-summary {
-    grid-template-columns: auto auto minmax(0, 1fr) max-content auto;
+    grid-template-columns: auto minmax(0, 1fr) max-content auto;
   }
 
   .person-show-count {
-    grid-column: auto;
+    grid-column: 3;
+    grid-row: 1;
     justify-self: end;
+  }
+
+  .person-show-toggle {
+    grid-column: 4;
+    grid-row: 1;
   }
 
   .person-show-tagged-thumbs {

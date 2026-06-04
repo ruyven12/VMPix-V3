@@ -84,7 +84,23 @@ function getMusicPersonRouteUrl(personId) {
 
 function findMusicPersonById(personId) {
   const normalizedPersonId = normalizeMusicPersonId(personId);
-  return getMockRecordById("musicPeople", normalizedPersonId, ["personId", "id", "slug"]) || null;
+  const peopleSources = [
+    ...getMusicPeopleIndexCollection(),
+    ...(Array.isArray(musicPeopleRows) ? musicPeopleRows : []),
+  ];
+  return peopleSources.find((person) => {
+    const source = person?.backend_record && typeof person.backend_record === "object"
+      ? { ...person.backend_record, ...person }
+      : person;
+    return [
+      source?.personId,
+      source?.id,
+      source?.slug,
+      source?.person_id,
+      getMusicPeopleRouteId(source),
+      createMusicPeopleSlug(source?.name),
+    ].some((candidate) => normalizeMusicPersonId(candidate) === normalizedPersonId);
+  }) || null;
 }
 
 function createMusicPersonDetailStateData(stateName, personId) {
@@ -105,11 +121,16 @@ function getMusicPersonDetailData(personId) {
   if (normalizedPersonId === "loading") {
     return createMusicPersonDetailStateData("loading", normalizedPersonId);
   }
-  if (normalizedPersonId !== musicPersonDetailPlaceholder.personId) {
+
+  const sourcePerson = findMusicPersonById(normalizedPersonId);
+  const placeholderData = normalizedPersonId === musicPersonDetailPlaceholder.personId
+    ? musicPersonDetailPlaceholder
+    : null;
+  if (!sourcePerson && !placeholderData) {
     return createMusicPersonDetailStateData("error", normalizedPersonId);
   }
 
-  return { ...musicPersonDetailPlaceholder, state: "ready" };
+  return getMusicPersonDetailViewData({ ...placeholderData, ...sourcePerson }, normalizedPersonId);
 }
 
 function findBandById(bandId) {
@@ -4112,18 +4133,205 @@ function setActiveMusicPeopleRow(personId) {
   });
 }
 
-function createMusicPersonMetaLine(items, className) {
-  const line = document.createElement("p");
-  line.className = className;
-  line.textContent = items.join(" \u2022 ");
-  return line;
+function getMusicPersonDisplayName(value) {
+  const name = getMusicPeopleText(value);
+  if (!name) {
+    return "Person Archive";
+  }
+  if (/[a-z]/.test(name)) {
+    return name;
+  }
+  return name.toLowerCase().replace(/\b([a-z])/g, (match) => match.toUpperCase());
 }
 
-function createMusicPersonTag(text) {
-  const tag = document.createElement("span");
-  tag.className = "person-detail-band-tag";
-  tag.textContent = text;
-  return tag;
+function getMusicPersonSummaryCount(source, matcher) {
+  const summaryItems = Array.isArray(source?.summaryItems) ? source.summaryItems : [];
+  const summaryItem = summaryItems.find((item) => matcher.test(getMusicPeopleText(item)));
+  if (!summaryItem) {
+    return null;
+  }
+  const countMatch = getMusicPeopleText(summaryItem).match(/\d[\d,]*/);
+  if (!countMatch) {
+    return null;
+  }
+  const parsedCount = Number.parseInt(countMatch[0].replace(/,/g, ""), 10);
+  return Number.isFinite(parsedCount) ? parsedCount : null;
+}
+
+function getMusicPersonSeenValue(source, type) {
+  const sourceKeys = type === "first"
+    ? ["firstSeen", "first_seen", "first_seen_at", "first_show", "firstShow"]
+    : ["latestSeen", "latest_seen", "latest_seen_at", "latest_show", "latestShow"];
+  const directValue = sourceKeys
+    .map((key) => getMusicPeopleText(source?.[key] ?? source?.stats?.[key] ?? source?.backend_record?.[key]))
+    .find(Boolean);
+  if (directValue) {
+    return directValue;
+  }
+
+  const label = type === "first" ? "First Seen" : "Latest Seen";
+  const seenItems = Array.isArray(source?.seenItems) ? source.seenItems : [];
+  const seenItem = seenItems.find((item) => new RegExp(`^${label}\\b`, "i").test(getMusicPeopleText(item)));
+  return seenItem ? getMusicPeopleText(seenItem).replace(new RegExp(`^${label}\\s*`, "i"), "") : "Pending";
+}
+
+function getMusicPersonInstrumentPills(source, person) {
+  const roleItems = collectMusicPeopleTextValues(source?.roleItems, ["name", "title", "label", "value"]);
+  return uniqueMusicPeopleValues([
+    ...person.instrumentNames,
+    ...roleItems,
+  ]).filter((item) => {
+    const normalizedItem = item.toLowerCase();
+    return !/^(performer|performers|friend|the fallen)$/.test(normalizedItem);
+  });
+}
+
+function findMusicBandByName(bandName) {
+  const normalizedBandName = createBandSlug(bandName);
+  if (!normalizedBandName) {
+    return null;
+  }
+  const bandSources = [
+    ...getMusicBandsIndexCollection(),
+    ...(Array.isArray(musicBandIndexRows) ? musicBandIndexRows : []),
+  ];
+  return bandSources.find((band) => {
+    const general = getBandDetailGeneral(band);
+    return [
+      getBandId(band),
+      band?.band_id,
+      band?.id,
+      band?.slug,
+      general.slug,
+      getBandDetailName(band),
+    ].some((candidate) => createBandSlug(candidate) === normalizedBandName);
+  }) || null;
+}
+
+function getMusicPersonAssociatedBandItems(source, person) {
+  const associatedBandNames = uniqueMusicPeopleValues([
+    ...collectMusicPeopleTextValues(source?.associatedBands, ["band", "name", "title", "label", "value"]),
+    ...getMusicPeopleBandNames(source),
+    ...person.bandNames,
+  ]);
+
+  return associatedBandNames.map((bandName) => {
+    const band = findMusicBandByName(bandName);
+    const name = band ? getBandDetailName(band) : bandName;
+    return {
+      name,
+      logoUrl: band ? getBandDetailLogoUrl(band) : "",
+      initials: getBandInitials(name),
+    };
+  });
+}
+
+function getMusicPersonDetailViewData(source, requestedPersonId) {
+  const person = normalizeMusicPeopleIndexRow(source);
+  const name = getMusicPersonDisplayName(source?.name ?? person.name);
+  const summaryAppearances = getMusicPersonSummaryCount(source, /appearance/i);
+  const summaryPhotos = getMusicPersonSummaryCount(source, /photo/i);
+  const appearances = summaryAppearances ?? person.appearances;
+  const photos = summaryPhotos ?? person.photos;
+  const instrumentPills = getMusicPersonInstrumentPills(source, person);
+
+  return {
+    ...source,
+    state: "ready",
+    personId: normalizeMusicPersonId(person.personId || requestedPersonId),
+    imageLabel: getMusicPeopleText(source?.imageLabel ?? source?.thumb) || getBandInitials(name),
+    name,
+    categoryPill: person.categoryDisplay,
+    instrumentPills,
+    archiveRows: [
+      { label: "Appearances", value: Number.isFinite(appearances) ? formatMusicPeopleNumber(appearances) : "Pending" },
+      { label: "Photos", value: Number.isFinite(photos) ? formatMusicPeopleNumber(photos) : "Pending" },
+      { label: "First Seen", value: getMusicPersonSeenValue(source, "first") },
+      { label: "Latest Seen", value: getMusicPersonSeenValue(source, "latest") },
+    ],
+    associatedBands: getMusicPersonAssociatedBandItems(source, person),
+    taggedShows: Array.isArray(source?.taggedShows) ? source.taggedShows : [],
+  };
+}
+
+function createMusicPersonPill(text) {
+  const pill = document.createElement("span");
+  pill.className = "person-detail-pill band-detail-tag band-detail-tag--neutral";
+  pill.textContent = text;
+  return pill;
+}
+
+function createMusicPersonPillList(data) {
+  const pillList = document.createElement("div");
+  pillList.className = "person-detail-pill-list";
+  const pillValues = uniqueMusicPeopleValues([
+    data.categoryPill,
+    ...(Array.isArray(data.instrumentPills) ? data.instrumentPills : []),
+  ]);
+  pillValues.forEach((pillText) => {
+    pillList.append(createMusicPersonPill(pillText));
+  });
+  return pillList;
+}
+
+function createMusicPersonArchiveBlock(rows) {
+  const archiveBlock = document.createElement("dl");
+  archiveBlock.className = "person-detail-archive-data";
+  rows.forEach((row) => {
+    const item = document.createElement("div");
+    item.className = "person-detail-archive-row";
+    const label = document.createElement("dt");
+    label.className = "person-detail-archive-label";
+    label.textContent = row.label;
+    const value = document.createElement("dd");
+    value.className = "person-detail-archive-value";
+    value.textContent = getMusicPeopleText(row.value) || "Pending";
+    item.append(label, value);
+    archiveBlock.append(item);
+  });
+  return archiveBlock;
+}
+
+function createMusicPersonAssociatedBand(band) {
+  const item = document.createElement("div");
+  item.className = "person-detail-band-card";
+
+  const logo = document.createElement("span");
+  logo.className = "person-detail-band-thumb";
+  logo.setAttribute("aria-hidden", "true");
+
+  const mark = document.createElement("span");
+  mark.className = "person-detail-band-mark";
+  mark.textContent = band.initials;
+  logo.append(mark);
+
+  if (band.logoUrl) {
+    const image = document.createElement("img");
+    image.className = "person-detail-band-logo";
+    image.alt = "";
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.hidden = true;
+    image.onload = () => {
+      image.hidden = false;
+      mark.hidden = true;
+      logo.classList.add("has-logo");
+    };
+    image.onerror = () => {
+      image.hidden = true;
+      image.removeAttribute("src");
+      mark.hidden = false;
+      logo.classList.remove("has-logo");
+    };
+    image.src = band.logoUrl;
+    logo.prepend(image);
+  }
+
+  const name = document.createElement("p");
+  name.className = "person-detail-band-name";
+  name.textContent = band.name;
+  item.append(logo, name);
+  return item;
 }
 
 function createMusicPersonEmptyState(text) {
@@ -4187,11 +4395,6 @@ function createMusicPersonShowCard(show, personName) {
   year.textContent = show.date.year;
   date.append(month, day, year);
 
-  const thumb = document.createElement("span");
-  thumb.className = "person-show-thumb";
-  thumb.setAttribute("aria-hidden", "true");
-  thumb.textContent = show.thumb;
-
   const copy = document.createElement("span");
   copy.className = "person-show-copy";
 
@@ -4217,7 +4420,7 @@ function createMusicPersonShowCard(show, personName) {
   toggle.setAttribute("aria-hidden", "true");
   toggle.textContent = isExpanded ? "-" : "+";
 
-  summary.append(date, thumb, copy, count, toggle);
+  summary.append(date, copy, count, toggle);
   summary.addEventListener("click", () => {
     toggleMusicPersonShowCard(card);
   });
@@ -4264,7 +4467,7 @@ function renderMusicPersonDetailState(data) {
   const backButton = document.createElement("button");
   backButton.className = "person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to People";
+  backButton.textContent = "Back To People";
   backButton.addEventListener("click", returnToMusicPeopleRoute);
 
   const statePanel = document.createElement("section");
@@ -4297,7 +4500,7 @@ function renderMusicPersonDetail(data) {
   const backButton = document.createElement("button");
   backButton.className = "person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to People";
+  backButton.textContent = "Back To People";
   backButton.addEventListener("click", returnToMusicPeopleRoute);
 
   const hero = document.createElement("section");
@@ -4318,21 +4521,15 @@ function renderMusicPersonDetail(data) {
   const copy = document.createElement("div");
   copy.className = "person-detail-copy";
 
-  const kicker = document.createElement("p");
-  kicker.className = "person-detail-kicker";
-  kicker.textContent = "Music Person";
-
   const name = document.createElement("h3");
   name.className = "person-detail-name";
   name.id = "person-detail-title";
   name.textContent = data.name;
 
   copy.append(
-    kicker,
     name,
-    createMusicPersonMetaLine(data.roleItems, "person-detail-role-line"),
-    createMusicPersonMetaLine(data.summaryItems, "person-detail-meta-line"),
-    createMusicPersonMetaLine(data.seenItems, "person-detail-seen-line")
+    createMusicPersonPillList(data),
+    createMusicPersonArchiveBlock(data.archiveRows)
   );
   hero.append(image, copy);
 
@@ -4349,8 +4546,8 @@ function renderMusicPersonDetail(data) {
   associatedList.className = "person-detail-band-list";
   const associatedBands = Array.isArray(data.associatedBands) ? data.associatedBands : [];
   if (associatedBands.length > 0) {
-    associatedBands.forEach((bandName) => {
-      associatedList.append(createMusicPersonTag(bandName));
+    associatedBands.forEach((band) => {
+      associatedList.append(createMusicPersonAssociatedBand(band));
     });
   } else {
     associatedList.append(createMusicPersonEmptyState("No associated bands indexed yet."));
@@ -4405,15 +4602,19 @@ function showMusicPersonDetail(personId) {
       behavior: reducedMotion.matches ? "auto" : "smooth",
     });
   }
+  requestMusicPeopleIndexData().then(() => {
+    const route = getRouteFromUrl();
+    if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
+      return;
+    }
+    const refreshedData = getMusicPersonDetailData(personId);
+    activeMusicPersonDetailId = refreshedData.personId;
+    setActiveMusicPeopleRow(refreshedData.personId);
+    renderMusicPersonDetail(refreshedData);
+  });
 }
 
 function returnToMusicPeopleRoute() {
-  const historyState = window.history.state || {};
-  if (getRouteFromUrl().name === "person-detail" && historyState.fromPeopleIndex) {
-    window.history.back();
-    return;
-  }
-
   navigateToRoute(routePaths.musicPeople);
 }
 
