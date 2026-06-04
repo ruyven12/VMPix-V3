@@ -4916,42 +4916,146 @@ function getMusicShowBillBands(show) {
 
 function createShowDetailBandsOnBill(show) {
   const section = document.createElement("section");
-  section.className = "show-detail-bill";
+  section.className = "show-detail-bill show-detail-viewing";
   section.setAttribute("aria-labelledby", "show-detail-bill-title");
 
+  const bands = getMusicShowBillBands(show);
+  const slides = bands.length > 0
+    ? bands
+    : [{ name: "No bands indexed for this show yet.", slot: "", isEmpty: true }];
+  let activeIndex = 0;
+
+  const header = document.createElement("div");
+  header.className = "show-detail-viewing-header";
+
+  const heading = document.createElement("div");
+  heading.className = "show-detail-viewing-heading";
+
   const title = document.createElement("h4");
-  title.className = "show-detail-bill-title";
+  title.className = "show-detail-viewing-title show-detail-bill-title";
   title.id = "show-detail-bill-title";
   title.textContent = "Bands On The Bill";
 
-  const bands = getMusicShowBillBands(show);
-  const list = document.createElement("div");
-  list.className = "show-detail-bill-list";
+  heading.append(title);
 
-  if (bands.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "show-detail-bill-empty";
-    empty.textContent = "No bands indexed for this show yet.";
-    list.append(empty);
-  } else {
-    bands.forEach((band) => {
-      const card = document.createElement("article");
-      card.className = "show-detail-bill-card";
+  const counter = document.createElement("span");
+  counter.className = "show-detail-slide-counter show-detail-bill-counter";
 
-      const slot = document.createElement("span");
-      slot.className = "show-detail-bill-slot";
-      slot.textContent = band.slot ? `Slot ${band.slot}` : "Bill Slot";
+  header.append(heading, counter);
 
-      const name = document.createElement("h5");
-      name.className = "show-detail-bill-name";
-      name.textContent = band.name;
+  const mediaFrame = document.createElement("div");
+  mediaFrame.className = "show-detail-media-frame show-detail-bill-frame";
+  mediaFrame.setAttribute("aria-roledescription", "carousel");
 
-      card.append(slot, name);
-      list.append(card);
+  const previousButton = document.createElement("button");
+  previousButton.type = "button";
+  previousButton.className = "show-detail-carousel-arrow show-detail-carousel-arrow--prev";
+  previousButton.setAttribute("aria-label", "Previous band");
+  previousButton.textContent = "<";
+
+  const viewport = document.createElement("div");
+  viewport.className = "show-detail-carousel-viewport show-detail-bill-viewport";
+  viewport.tabIndex = 0;
+  viewport.setAttribute("aria-label", "Bands On The Bill carousel");
+
+  const track = document.createElement("div");
+  track.className = "show-detail-carousel-track";
+
+  slides.forEach((band, index) => {
+    const slide = document.createElement("article");
+    slide.className = "show-detail-carousel-slide show-detail-bill-slide";
+    slide.setAttribute("aria-label", `${index + 1} of ${slides.length}`);
+
+    const media = document.createElement("div");
+    media.className = "show-detail-media show-detail-bill-media";
+
+    const mediaCopy = document.createElement("div");
+    mediaCopy.className = "show-detail-media-copy show-detail-bill-copy";
+
+    const slot = document.createElement("span");
+    slot.className = "show-detail-media-kicker show-detail-bill-slot";
+    slot.textContent = band.isEmpty ? "Bill Pending" : `Slot ${band.slot || index + 1}`;
+
+    const name = document.createElement("h5");
+    name.className = "show-detail-media-title show-detail-bill-name";
+    name.textContent = band.name;
+
+    const detail = document.createElement("span");
+    detail.className = "show-detail-media-detail show-detail-bill-detail";
+    detail.textContent = band.isEmpty ? "Ready for future bill data" : "On The Bill";
+
+    mediaCopy.append(slot, name, detail);
+    media.append(mediaCopy);
+    slide.append(media);
+    track.append(slide);
+  });
+
+  viewport.append(track);
+
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "show-detail-carousel-arrow show-detail-carousel-arrow--next";
+  nextButton.setAttribute("aria-label", "Next band");
+  nextButton.textContent = ">";
+
+  mediaFrame.append(previousButton, viewport, nextButton);
+
+  const dots = document.createElement("div");
+  dots.className = "show-detail-dots show-detail-bill-dots";
+  const dotButtons = slides.map((band, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "show-detail-dot";
+    dot.setAttribute("aria-label", `Show ${band.isEmpty ? "pending band" : band.name}`);
+    dot.addEventListener("click", () => {
+      activeIndex = index;
+      updateCarousel();
+    });
+    dots.append(dot);
+    return dot;
+  });
+
+  function updateCarousel() {
+    activeIndex = normalizeShowDetailSlideIndex(activeIndex, slides.length);
+    track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
+    counter.textContent = formatShowDetailSlideCounter(activeIndex, slides.length);
+    dotButtons.forEach((dot, index) => {
+      dot.classList.toggle("is-active", index === activeIndex);
+      dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
     });
   }
 
-  section.append(title, list);
+  previousButton.addEventListener("click", () => {
+    activeIndex -= 1;
+    updateCarousel();
+  });
+
+  nextButton.addEventListener("click", () => {
+    activeIndex += 1;
+    updateCarousel();
+  });
+
+  viewport.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      activeIndex -= 1;
+      updateCarousel();
+    }
+    if (event.key === "ArrowRight") {
+      activeIndex += 1;
+      updateCarousel();
+    }
+  });
+
+  if (slides.length <= 1) {
+    previousButton.hidden = true;
+    nextButton.hidden = true;
+    dots.hidden = true;
+    counter.hidden = true;
+  }
+
+  updateCarousel();
+
+  section.append(header, mediaFrame, dots);
   return section;
 }
 

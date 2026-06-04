@@ -6925,19 +6925,17 @@ img.archive-gallery-image {
   justify-self: center;
   display: grid;
   gap: clamp(0.52rem, 1.75svh, 0.76rem);
-  padding: clamp(0.64rem, 2vw, 0.9rem);
-  border: 1px solid rgba(247, 247, 242, 0.085);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 66%),
-    radial-gradient(ellipse at 15% 8%, rgba(213, 22, 34, 0.11), transparent 14rem),
-    rgba(4, 4, 7, 0.58);
-  box-shadow: inset 0 0 0 1px rgba(1, 1, 3, 0.22);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .show-detail-bill-title,
 .show-detail-bill-name,
 .show-detail-bill-slot,
+.show-detail-bill-detail,
 .show-detail-bill-empty {
   margin: 0;
   min-width: 0;
@@ -6946,9 +6944,25 @@ img.archive-gallery-image {
 
 .show-detail-bill-title {
   color: rgba(247, 247, 242, 0.82);
-  font-size: clamp(0.88rem, 3vw, 1.05rem);
+  font-size: clamp(0.8rem, 2.65vw, 0.96rem);
   font-weight: 400;
   line-height: 1;
+}
+
+.show-detail-bill .show-detail-media-kicker,
+.show-detail-bill .show-detail-media-title,
+.show-detail-bill .show-detail-media-detail,
+.show-detail-bill .show-detail-viewing-title,
+.show-detail-bill .show-detail-slide-counter {
+  text-transform: none;
+}
+
+.show-detail-bill-media {
+  min-height: clamp(15rem, 34vw, 24rem);
+}
+
+.show-detail-bill-copy {
+  width: min(100%, 30rem);
 }
 
 .show-detail-bill-list {
