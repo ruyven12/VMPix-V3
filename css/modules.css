@@ -6957,8 +6957,13 @@ img.archive-gallery-image {
   text-transform: none;
 }
 
+.show-detail-bill .show-detail-bill-viewport {
+  aspect-ratio: 21 / 9;
+  max-height: clamp(12rem, 32svh, 18rem);
+}
+
 .show-detail-bill-media {
-  min-height: clamp(15rem, 34vw, 24rem);
+  min-height: clamp(10.5rem, 28svh, 17rem);
 }
 
 .show-detail-bill-copy {
