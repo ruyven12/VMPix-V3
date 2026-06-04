@@ -3559,7 +3559,6 @@ img.archive-gallery-image {
   display: grid;
   grid-template-areas:
     "logo"
-    "visual"
     "copy";
   gap: clamp(0.66rem, 0.9rem, 1rem);
   padding: clamp(0.72rem, 0.92rem, 1.04rem);
@@ -3629,8 +3628,8 @@ img.archive-gallery-image {
 }
 
 .venue-detail-visual {
-  grid-area: visual;
-  min-height: 15.5rem;
+  grid-area: auto;
+  min-height: clamp(5.7rem, 17vw, 7.6rem);
   border: 1px solid rgba(247, 247, 242, 0.1);
   border-radius: var(--radius-sm);
   background:
@@ -3648,8 +3647,8 @@ img.archive-gallery-image {
   inset: 0;
   content: "";
   background:
-    linear-gradient(rgba(247, 247, 242, 0.035) 1px, transparent 1px) 0 0 / 3.1rem 3.1rem,
-    linear-gradient(90deg, rgba(247, 247, 242, 0.03) 1px, transparent 1px) 0 0 / 3.1rem 3.1rem;
+    linear-gradient(rgba(247, 247, 242, 0.035) 1px, transparent 1px) 0 0 / 2.25rem 2.25rem,
+    linear-gradient(90deg, rgba(247, 247, 242, 0.03) 1px, transparent 1px) 0 0 / 2.25rem 2.25rem;
   mask-image: linear-gradient(180deg, transparent, #000 16%, #000 82%, transparent);
   pointer-events: none;
 }
@@ -3717,17 +3716,17 @@ img.archive-gallery-image {
 
 .venue-detail-visual-label {
   position: absolute;
-  right: 0.72rem;
-  bottom: 0.68rem;
-  left: 0.72rem;
+  right: 0.54rem;
+  bottom: 0.5rem;
+  left: 0.54rem;
   z-index: 1;
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 0.32rem;
+  gap: 0.24rem;
   color: rgba(247, 247, 242, 0.68);
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -3736,7 +3735,7 @@ img.archive-gallery-image {
   grid-area: copy;
   min-width: 0;
   display: grid;
-  align-content: end;
+  align-content: start;
   gap: 0.54rem;
 }
 
@@ -13275,11 +13274,10 @@ img.archive-gallery-image {
 
 @media (min-width: 760px) {
   .venue-detail-hero {
-    grid-template-columns: minmax(11rem, 0.34fr) minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-columns: minmax(11rem, 0.3fr) minmax(0, 1fr);
+    grid-template-rows: auto;
     grid-template-areas:
-      "logo visual"
-      "copy visual";
+      "logo copy";
     align-items: stretch;
     gap: 0.86rem;
     padding: 1rem;
@@ -13294,7 +13292,7 @@ img.archive-gallery-image {
   }
 
   .venue-detail-visual {
-    min-height: 22rem;
+    min-height: clamp(6.25rem, 9vw, 8.2rem);
   }
 
   .venue-detail-title {
@@ -13413,7 +13411,7 @@ img.archive-gallery-image {
   }
 
   .venue-detail-visual {
-    min-height: 13.4rem;
+    min-height: clamp(5.3rem, 28vw, 7.1rem);
   }
 
   .venue-detail-title {
