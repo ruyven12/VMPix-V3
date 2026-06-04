@@ -6952,13 +6952,28 @@ img.archive-gallery-image {
 
 .show-detail-bill-active-name {
   max-width: min(58%, 24rem);
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: rgba(247, 247, 242, 0.92);
+  cursor: pointer;
   font-size: clamp(0.94rem, 2.8vw, 1rem);
   font-weight: 500;
   line-height: 1.08;
   overflow-wrap: anywhere;
   text-align: right;
   text-wrap: balance;
+}
+
+.show-detail-bill-active-name:hover,
+.show-detail-bill-active-name:focus-visible {
+  color: rgba(247, 247, 242, 1);
+}
+
+.show-detail-bill-active-name:focus-visible {
+  outline: 1px solid rgba(213, 22, 34, 0.65);
+  outline-offset: 0.22rem;
 }
 
 .show-detail-bill .show-detail-media-kicker,
@@ -6979,6 +6994,7 @@ img.archive-gallery-image {
   min-height: 100%;
   align-items: start;
   padding: clamp(0.9rem, 2.6vw, 1.2rem) clamp(3.5rem, 8vw, 5.5rem);
+  cursor: pointer;
 }
 
 .show-detail-bill .show-detail-bill-copy {

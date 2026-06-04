@@ -4905,13 +4905,41 @@ function getMusicShowBillBands(show) {
       if (band && typeof band === "object") {
         const name = String(band.band || band.name || band.band_name || band.bandName || "").trim();
         const slot = String(band.slot || band.bandSlot || band.band_slot || band.position || index + 1).trim();
-        return name ? { name, slot } : null;
+        return name ? { name, slot, slug: createBandSlug(name) } : null;
       }
 
       const name = String(band || "").trim();
-      return name ? { name, slot: String(index + 1) } : null;
+      return name ? { name, slot: String(index + 1), slug: createBandSlug(name) } : null;
     })
     .filter(Boolean);
+}
+
+function getShowBillBandSetRoute(show, band) {
+  if (band?.isEmpty) {
+    return "";
+  }
+
+  const bandSlug = createBandSlug(band?.slug || band?.name);
+  const setCode = normalizeSetCode(getSetCodeFromDateValue(show?.date) || getMusicShowRouteCode(show));
+  if (!bandSlug || !setCode) {
+    return "";
+  }
+
+  return getSetRouteUrl(bandSlug, setCode);
+}
+
+function navigateToShowBillBandSet(show, band) {
+  const targetUrl = getShowBillBandSetRoute(show, band);
+  if (!targetUrl) {
+    return;
+  }
+
+  navigateToRoute(targetUrl, {
+    historyState: {
+      fromShowDetail: true,
+      showDetailUrl: getMusicShowRouteUrl(show),
+    },
+  });
 }
 
 function createShowDetailBandsOnBill(show) {
@@ -4938,8 +4966,12 @@ function createShowDetailBandsOnBill(show) {
 
   heading.append(title);
 
-  const activeBandName = document.createElement("span");
+  const activeBandName = document.createElement("button");
+  activeBandName.type = "button";
   activeBandName.className = "show-detail-bill-active-name";
+  activeBandName.addEventListener("click", () => {
+    navigateToShowBillBandSet(show, slides[activeIndex]);
+  });
 
   header.append(heading, activeBandName);
 
@@ -4968,6 +5000,17 @@ function createShowDetailBandsOnBill(show) {
 
     const media = document.createElement("div");
     media.className = "show-detail-media show-detail-bill-media";
+    media.setAttribute("role", "link");
+    media.tabIndex = 0;
+    media.addEventListener("click", () => {
+      navigateToShowBillBandSet(show, band);
+    });
+    media.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        navigateToShowBillBandSet(show, band);
+      }
+    });
 
     slide.append(media);
     track.append(slide);
