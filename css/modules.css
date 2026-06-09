@@ -3853,6 +3853,186 @@ img.archive-gallery-image {
   line-height: 0.96;
 }
 
+.music-venues-archive {
+  display: grid;
+  gap: 0.62rem;
+  padding: 0.78rem;
+  border: 1px solid rgba(247, 247, 242, 0.085);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.032), transparent 64%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.055), transparent 72%),
+    rgba(3, 3, 6, 0.42);
+  overflow: hidden;
+}
+
+.music-venues-archive::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.18), transparent 48% 100%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(247, 247, 242, 0.032), transparent 68%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.music-venues-archive-header,
+.music-venues-state-filters,
+.music-venues-list {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.music-venues-archive-header {
+  display: grid;
+  justify-items: center;
+  gap: 0.24rem;
+  text-align: center;
+}
+
+.music-venues-count {
+  margin: 0;
+  color: rgba(247, 247, 242, 0.48);
+  font-size: clamp(0.58rem, 2.3vw, 0.7rem);
+  line-height: 1;
+  text-transform: none;
+}
+
+.music-venues-state-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.34rem;
+}
+
+.music-venues-state-pill {
+  appearance: none;
+  min-width: 2.72rem;
+  min-height: 2.28rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0.42rem 0.58rem;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  border-radius: 999px;
+  background: rgba(247, 247, 242, 0.034);
+  color: rgba(247, 247, 242, 0.66);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.58rem, 2.3vw, 0.7rem);
+  line-height: 1;
+  text-transform: uppercase;
+  touch-action: manipulation;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.music-venues-state-pill:hover,
+.music-venues-state-pill:focus-visible {
+  border-color: rgba(255, 118, 102, 0.34);
+  background: rgba(213, 22, 34, 0.075);
+  color: rgba(247, 247, 242, 0.84);
+}
+
+.music-venues-state-pill:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.78);
+  outline-offset: 0.14rem;
+}
+
+.music-venues-state-pill:active {
+  transform: translate3d(0, 0.04rem, 0);
+}
+
+.music-venues-state-pill.is-active {
+  border-color: rgba(255, 118, 102, 0.42);
+  background: rgba(213, 22, 34, 0.14);
+  color: rgba(247, 247, 242, 0.92);
+  box-shadow: 0 0 0.8rem rgba(213, 22, 34, 0.11);
+}
+
+.music-venues-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.8rem), 1fr));
+  gap: 0.46rem;
+}
+
+.music-venue-card,
+.music-venues-empty {
+  min-width: 0;
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 62%),
+    rgba(1, 1, 3, 0.3);
+}
+
+.music-venue-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.52rem;
+  padding: 0.56rem;
+}
+
+.music-venue-card-mark {
+  width: 2.65rem;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(213, 22, 34, 0.2);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(213, 22, 34, 0.14), transparent 66%),
+    rgba(247, 247, 242, 0.032);
+  color: rgba(247, 247, 242, 0.78);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.music-venue-card-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.music-venue-card-name,
+.music-venue-card-location,
+.music-venue-card-meta {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+.music-venue-card-name {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(0.74rem, 2.65vw, 0.9rem);
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+.music-venue-card-location {
+  color: rgba(255, 118, 102, 0.72);
+  font-size: clamp(0.58rem, 2.22vw, 0.7rem);
+  line-height: 1.16;
+}
+
+.music-venue-card-meta,
+.music-venues-empty {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.56rem, 2.14vw, 0.66rem);
+  line-height: 1.22;
+}
+
+.music-venues-empty {
+  grid-column: 1 / -1;
+  padding: 0.72rem;
+  text-align: center;
+}
+
 .venue-relationships {
   display: grid;
   gap: 0.66rem;
@@ -13315,6 +13495,14 @@ img.archive-gallery-image {
     padding: 0.92rem;
   }
 
+  .music-venues-archive {
+    padding: 0.92rem;
+  }
+
+  .music-venues-list {
+    gap: 0.58rem;
+  }
+
   .venue-relationship-grid {
     gap: 0.62rem;
   }
@@ -13443,6 +13631,21 @@ img.archive-gallery-image {
   .venue-relationships {
     gap: 0.54rem;
     padding: 0.54rem;
+  }
+
+  .music-venues-archive {
+    gap: 0.52rem;
+    padding: 0.54rem;
+  }
+
+  .music-venues-state-filters {
+    gap: 0.28rem;
+  }
+
+  .music-venues-state-pill {
+    min-width: 2.48rem;
+    min-height: 2.18rem;
+    padding-inline: 0.48rem;
   }
 
   .venue-relationship-grid {

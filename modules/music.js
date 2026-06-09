@@ -37,9 +37,27 @@ let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
 let musicShowsSetsDataState = "fallback";
 let musicShowsIndexDataRequested = false;
-let musicVenuesCollection = [];
+let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
+let activeMusicVenueStateFilter = "";
+const musicVenueStateFilters = [
+  { value: "", label: "ALL" },
+  { value: "ME", label: "ME" },
+  { value: "NH", label: "NH" },
+  { value: "MA", label: "MA" },
+  { value: "CT", label: "CT" },
+  { value: "RI", label: "RI" },
+  { value: "VT", label: "VT" },
+];
+const musicVenueStateAliases = {
+  MAINE: "ME",
+  "NEW HAMPSHIRE": "NH",
+  MASSACHUSETTS: "MA",
+  CONNECTICUT: "CT",
+  "RHODE ISLAND": "RI",
+  VERMONT: "VT",
+};
 const musicPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const musicPeopleCategoryFilters = [
   { value: "", label: "All" },
@@ -1134,6 +1152,158 @@ function requestMusicVenuesData() {
     });
 
   return musicVenuesRequest;
+}
+
+function getMusicVenuesRows() {
+  return musicVenuesCollection.length > 0
+    ? musicVenuesCollection
+    : getMockCollection("musicVenues", { clone: false });
+}
+
+function normalizeMusicVenueState(value) {
+  const rawState = String(value || "").trim();
+  if (!rawState) {
+    return "";
+  }
+  const uppercaseState = rawState.toUpperCase();
+  if (musicVenueStateFilters.some((filter) => filter.value === uppercaseState)) {
+    return uppercaseState;
+  }
+  return musicVenueStateAliases[uppercaseState] || "";
+}
+
+function getMusicVenueState(venue) {
+  return normalizeMusicVenueState(
+    venue?.state
+    || venue?.state_abbr
+    || venue?.stateAbbr
+    || venue?.location_state
+    || venue?.locationState
+    || venue?.venue_details?.state
+    || venue?.venueDetails?.state
+  );
+}
+
+function getMusicVenueName(venue) {
+  return String(venue?.venueName || venue?.venue || venue?.name || venue?.title || "Venue Pending").trim();
+}
+
+function getMusicVenueLocationText(venue) {
+  const city = String(venue?.city || venue?.location_city || venue?.locationCity || venue?.venue_details?.city || venue?.venueDetails?.city || "").trim();
+  const state = getMusicVenueState(venue) || String(venue?.state || venue?.venue_details?.state || venue?.venueDetails?.state || "").trim();
+  return [city, state].filter(Boolean).join(", ") || String(venue?.location || "Location Pending").trim();
+}
+
+function getMusicVenueShowCount(venue) {
+  const count = Number.parseInt(
+    venue?.showCount
+    || venue?.show_count
+    || venue?.eventCount
+    || venue?.event_count
+    || venue?.stats?.showCount
+    || venue?.stats?.shows
+    || venue?.stats?.eventCount,
+    10
+  );
+  return Number.isFinite(count) && count >= 0 ? count : null;
+}
+
+function setMusicVenuesCount(count) {
+  if (!musicVenuesCount) {
+    return;
+  }
+  const numericCount = Number(count) || 0;
+  musicVenuesCount.textContent = `${numericCount.toLocaleString()} venue${numericCount === 1 ? "" : "s"}`;
+}
+
+function renderMusicVenuesStateFilters() {
+  if (!musicVenuesStateFilters) {
+    return;
+  }
+  musicVenuesStateFilters.replaceChildren();
+  musicVenueStateFilters.forEach((filter) => {
+    const button = document.createElement("button");
+    button.className = "music-venues-state-pill";
+    button.type = "button";
+    button.dataset.venueStateFilter = filter.value;
+    button.textContent = filter.label;
+    const isActive = activeMusicVenueStateFilter === filter.value;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+    button.addEventListener("click", () => {
+      activeMusicVenueStateFilter = filter.value;
+      renderMusicVenuesArchive();
+    });
+    musicVenuesStateFilters.append(button);
+  });
+}
+
+function createMusicVenueCard(venue) {
+  const card = document.createElement("article");
+  card.className = "music-venue-card";
+  card.dataset.venueState = getMusicVenueState(venue);
+  card.setAttribute("role", "listitem");
+
+  const mark = document.createElement("span");
+  mark.className = "music-venue-card-mark";
+  mark.setAttribute("aria-hidden", "true");
+  mark.textContent = getBandInitials(getMusicVenueName(venue)) || "VN";
+
+  const copy = document.createElement("div");
+  copy.className = "music-venue-card-copy";
+
+  const name = document.createElement("h5");
+  name.className = "music-venue-card-name";
+  name.textContent = getMusicVenueName(venue);
+
+  const location = document.createElement("p");
+  location.className = "music-venue-card-location";
+  location.textContent = getMusicVenueLocationText(venue);
+
+  const count = getMusicVenueShowCount(venue);
+  const meta = document.createElement("span");
+  meta.className = "music-venue-card-meta";
+  meta.textContent = count === null ? "Archive Ready" : `${count.toLocaleString()} show${count === 1 ? "" : "s"}`;
+
+  copy.append(name, location, meta);
+  card.append(mark, copy);
+  return card;
+}
+
+function renderMusicVenuesArchive() {
+  if (!musicVenuesList) {
+    return;
+  }
+
+  renderMusicVenuesStateFilters();
+  const rows = getMusicVenuesRows();
+  const visibleRows = rows.filter((venue) => {
+    if (!activeMusicVenueStateFilter) {
+      return true;
+    }
+    return getMusicVenueState(venue) === activeMusicVenueStateFilter;
+  });
+
+  musicVenuesList.replaceChildren();
+  visibleRows.forEach((venue) => {
+    musicVenuesList.append(createMusicVenueCard(venue));
+  });
+  if (visibleRows.length === 0) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "music-venues-empty";
+    emptyState.textContent = "No venues indexed for this state yet.";
+    musicVenuesList.append(emptyState);
+  }
+  setMusicVenuesCount(visibleRows.length);
+}
+
+function syncMusicVenuesArchive() {
+  renderMusicVenuesArchive();
+  requestMusicVenuesData().then(() => {
+    if (getRouteFromUrl().name === "music-venues") {
+      renderMusicVenuesArchive();
+    }
+  });
 }
 
 function parseMusicShowDate(dateValue) {
@@ -6742,6 +6912,9 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
   setVenueDetailVisible(sectionName === "venues");
   if (sectionName === "bands") {
     syncBandsIndex();
+  }
+  if (sectionName === "venues") {
+    syncMusicVenuesArchive();
   }
 
   const shouldShowActivityPanel = sectionName !== "bands" && sectionName !== "people" && sectionName !== "venues";
