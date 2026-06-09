@@ -399,37 +399,22 @@
               </div>
             </section>
 
-            <section class="venue-detail-stats-strip" aria-label="Asylum archive statistics">
-              <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value" data-venue-detail-stat="shows">13</p>
-                <p class="venue-detail-stat-label">Shows</p>
-              </article>
-              <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value" data-venue-detail-stat="bands">28</p>
-                <p class="venue-detail-stat-label">Bands</p>
-              </article>
-              <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value" data-venue-detail-stat="photos">486</p>
-                <p class="venue-detail-stat-label">Photos</p>
-              </article>
-            </section>
-
             <section class="venue-relationships" aria-labelledby="venue-relationships-title" data-venue-relationships>
               <header class="venue-relationships-header">
-                <p class="venue-detail-panel-kicker">Relationship Hooks</p>
+                <p class="venue-detail-panel-kicker">Venue Relationships</p>
                 <h4 class="venue-detail-panel-title" id="venue-relationships-title">Archive Relationships</h4>
               </header>
 
-              <div class="venue-relationship-grid" aria-label="Static venue relationship placeholders">
+              <div class="venue-relationship-grid" aria-label="Venue relationship archive cards">
                 <article class="venue-relationship-card" data-venue-relationship="shows" aria-labelledby="venue-relationship-shows-title">
                   <div class="venue-relationship-media venue-relationship-media--shows" aria-hidden="true">
                     <span>13</span>
                   </div>
                   <div class="venue-relationship-copy">
-                    <p class="venue-relationship-label">Venue -> Shows</p>
-                    <h5 class="venue-relationship-title" id="venue-relationship-shows-title">Shows Index Hook</h5>
-                    <p class="venue-relationship-note">Placeholder join surface for future show records linked by venue identity.</p>
-                    <span class="venue-relationship-status">Year browsing ready</span>
+                    <p class="venue-relationship-label">Venue → Shows</p>
+                    <h5 class="venue-relationship-title" id="venue-relationship-shows-title">Archive Events</h5>
+                    <p class="venue-relationship-note">Show records connected to this venue archive.</p>
+                    <span class="venue-relationship-status">Open Event Index</span>
                   </div>
                 </article>
 
@@ -438,10 +423,10 @@
                     <span>28</span>
                   </div>
                   <div class="venue-relationship-copy">
-                    <p class="venue-relationship-label">Venue -> Bands</p>
-                    <h5 class="venue-relationship-title" id="venue-relationship-bands-title">Band Link Hook</h5>
-                    <p class="venue-relationship-note">Static relationship lane for artists appearing in future venue show archives.</p>
-                    <span class="venue-relationship-status">Band joins pending</span>
+                    <p class="venue-relationship-label">Venue → Bands</p>
+                    <h5 class="venue-relationship-title" id="venue-relationship-bands-title">Featured Artists</h5>
+                    <p class="venue-relationship-note">Artists documented at this venue.</p>
+                    <span class="venue-relationship-status">Band Relationships</span>
                   </div>
                 </article>
 
@@ -450,10 +435,10 @@
                     <span>486</span>
                   </div>
                   <div class="venue-relationship-copy">
-                    <p class="venue-relationship-label">Venue -> Photos</p>
-                    <h5 class="venue-relationship-title" id="venue-relationship-photos-title">Gallery System Hook</h5>
-                    <p class="venue-relationship-note">Image archive placeholder for future venue galleries and lightbox entries.</p>
-                    <span class="venue-relationship-status">Gallery data pending</span>
+                    <p class="venue-relationship-label">Venue → Photos</p>
+                    <h5 class="venue-relationship-title" id="venue-relationship-photos-title">Photo Archive</h5>
+                    <p class="venue-relationship-note">Images connected to this venue archive.</p>
+                    <span class="venue-relationship-status">Open Image Archive</span>
                   </div>
                 </article>
 
@@ -462,10 +447,10 @@
                     <span>NE</span>
                   </div>
                   <div class="venue-relationship-copy">
-                    <p class="venue-relationship-label">Venue -> Region</p>
-                    <h5 class="venue-relationship-title" id="venue-relationship-region-title">Regional Browse Hook</h5>
-                    <p class="venue-relationship-note">Placeholder lane for New England browsing and future nearby venue context.</p>
-                    <span class="venue-relationship-status">Map integration ready</span>
+                    <p class="venue-relationship-label">Venue → Region</p>
+                    <h5 class="venue-relationship-title" id="venue-relationship-region-title">Regional Context</h5>
+                    <p class="venue-relationship-note">Nearby archive locations and venue relationships.</p>
+                    <span class="venue-relationship-status">Regional Network</span>
                   </div>
                 </article>
 
@@ -474,10 +459,10 @@
                     <span>V3</span>
                   </div>
                   <div class="venue-relationship-copy">
-                    <p class="venue-relationship-label">Venue -> Timeline</p>
-                    <h5 class="venue-relationship-title" id="venue-relationship-history-title">Archive History Hook</h5>
-                    <p class="venue-relationship-note">Timeline milestone lane prepared for future venue history and media joins.</p>
-                    <span class="venue-relationship-status">Milestones staged</span>
+                    <p class="venue-relationship-label">Venue → History</p>
+                    <h5 class="venue-relationship-title" id="venue-relationship-history-title">Archive History</h5>
+                    <p class="venue-relationship-note">Timeline of activity documented at this venue.</p>
+                    <span class="venue-relationship-status">View Timeline</span>
                   </div>
                 </article>
               </div>
@@ -508,130 +493,6 @@
                 </div>
               </section>
 
-              <section class="venue-detail-panel venue-detail-panel--timeline" aria-labelledby="venue-timeline-title">
-                <p class="venue-detail-panel-kicker">Venue Timeline</p>
-                <h4 class="venue-detail-panel-title" id="venue-timeline-title">Decade Archive</h4>
-                <div class="venue-timeline-system" aria-label="Asylum venue timeline system" data-venue-timeline>
-                  <nav class="venue-timeline-decade-nav" aria-label="Venue timeline decade markers">
-                    <a class="venue-timeline-decade-marker" href="#venue-era-1970s">1970s</a>
-                    <a class="venue-timeline-decade-marker" href="#venue-era-1980s">1980s</a>
-                    <a class="venue-timeline-decade-marker" href="#venue-era-1990s">1990s</a>
-                    <a class="venue-timeline-decade-marker" href="#venue-era-2000s">2000s</a>
-                    <a class="venue-timeline-decade-marker" href="#venue-era-2010s">2010s</a>
-                    <a class="venue-timeline-decade-marker" href="#venue-era-2020s">2020s</a>
-                  </nav>
-
-                  <div class="venue-timeline-track" role="list" aria-label="Venue timeline eras">
-                    <section class="venue-timeline-era" id="venue-era-1970s" role="listitem" aria-labelledby="venue-era-1970s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">City Room Signal</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-1970s-title">1970s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--seventies" aria-hidden="true">
-                          <span>70s</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="1976">1976</time>
-                          <h6 class="venue-timeline-card-title">Portland circuit foundation</h6>
-                          <p class="venue-timeline-card-note">Early downtown live-room footprint staged as pre-venue context.</p>
-                        </div>
-                      </article>
-                    </section>
-
-                    <section class="venue-timeline-era" id="venue-era-1980s" role="listitem" aria-labelledby="venue-era-1980s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">Regional Routes</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-1980s-title">1980s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--eighties" aria-hidden="true">
-                          <span>80s</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="1984">1984</time>
-                          <h6 class="venue-timeline-card-title">Northeast booking lane</h6>
-                          <p class="venue-timeline-card-note">Tour traffic and club-room patterns become part of the later archive map.</p>
-                        </div>
-                      </article>
-                    </section>
-
-                    <section class="venue-timeline-era" id="venue-era-1990s" role="listitem" aria-labelledby="venue-era-1990s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">Venue Identity</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-1990s-title">1990s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--nineties" aria-hidden="true">
-                          <span>AS</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="1997">1997</time>
-                          <h6 class="venue-timeline-card-title">Asylum record established</h6>
-                          <p class="venue-timeline-card-note">Primary venue identity starts here for the static V1 dossier.</p>
-                        </div>
-                      </article>
-                    </section>
-
-                    <section class="venue-timeline-era" id="venue-era-2000s" role="listitem" aria-labelledby="venue-era-2000s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">Archive Runway</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-2000s-title">2000s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--aughts" aria-hidden="true">
-                          <span>00s</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="2008">2008</time>
-                          <h6 class="venue-timeline-card-title">First tagged-era context</h6>
-                          <p class="venue-timeline-card-note">People, show, and room references begin to align for future joins.</p>
-                        </div>
-                      </article>
-                    </section>
-
-                    <section class="venue-timeline-era" id="venue-era-2010s" role="listitem" aria-labelledby="venue-era-2010s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">Music Nexus Era</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-2010s-title">2010s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--tens" aria-hidden="true">
-                          <span>11</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="2011">2011</time>
-                          <h6 class="venue-timeline-card-title">Earliest Music Nexus capture</h6>
-                          <p class="venue-timeline-card-note">The venue enters the long-running music archive capture window.</p>
-                        </div>
-                      </article>
-                    </section>
-
-                    <section class="venue-timeline-era" id="venue-era-2020s" role="listitem" aria-labelledby="venue-era-2020s-title">
-                      <header class="venue-timeline-era-head">
-                        <span class="venue-timeline-era-dot" aria-hidden="true"></span>
-                        <p class="venue-timeline-era-kicker">V3 Shell</p>
-                        <h5 class="venue-timeline-era-title" id="venue-era-2020s-title">2020s</h5>
-                      </header>
-                      <article class="venue-timeline-card">
-                        <div class="venue-timeline-card-media venue-timeline-card-media--twenties" aria-hidden="true">
-                          <span>V3</span>
-                        </div>
-                        <div class="venue-timeline-card-copy">
-                          <time class="venue-timeline-card-year" datetime="2026">2026</time>
-                          <h6 class="venue-timeline-card-title">Venue Detail V1 staged</h6>
-                          <p class="venue-timeline-card-note">Static timeline system lands ahead of live venue data and filters.</p>
-                        </div>
-                      </article>
-                    </section>
-                  </div>
-                </div>
-              </section>
             </div>
           </article>
 

@@ -1655,7 +1655,7 @@ function formatMusicVenueDetailCount(value) {
   const numericValue = Number.parseInt(value, 10);
   return Number.isFinite(numericValue) && numericValue >= 0
     ? numericValue.toLocaleString()
-    : "Pending";
+    : "—";
 }
 
 function setMusicVenueDetailRelationshipCount(type, value) {
@@ -1987,7 +1987,7 @@ function setupVenueShowsRelationshipCard(venue, shows) {
 
   const status = card.querySelector(".venue-relationship-status");
   if (status) {
-    status.textContent = card._linkedVenueShows.length > 0 ? "Click to browse linked shows" : "No linked shows";
+    status.textContent = "Open Event Index";
   }
 
   card.onclick = (event) => {
@@ -2057,15 +2057,6 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   }
   if (venueDetailVisualSecondary) {
     venueDetailVisualSecondary.textContent = region && region !== "Pending" ? `${region} Signal` : "Archive Signal";
-  }
-  venueDetailStatValues.forEach((statValue) => {
-    const statKey = statValue.dataset.venueDetailStat;
-    statValue.textContent = formatMusicVenueDetailCount(stats[statKey]);
-  });
-
-  const statsStrip = venueDetail.querySelector(".venue-detail-stats-strip");
-  if (statsStrip) {
-    statsStrip.setAttribute("aria-label", `${name} archive statistics`);
   }
   const mapFrame = venueDetail.querySelector(".venue-map-frame");
   if (mapFrame) {
