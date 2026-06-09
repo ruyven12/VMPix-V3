@@ -1814,8 +1814,36 @@ function renderVenueShowsPanel(panel, shows) {
   });
 }
 
+function getVenueShowsRelationshipPanel() {
+  if (!venueDetail) {
+    return null;
+  }
+
+  const relationships = venueDetail.querySelector("[data-venue-relationships]");
+  const grid = relationships?.querySelector(".venue-relationship-grid");
+  if (!relationships || !grid) {
+    return null;
+  }
+
+  let panel = Array.from(relationships.children).find((child) => child.hasAttribute("data-venue-shows-panel"));
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.className = "venue-shows-panel";
+    panel.dataset.venueShowsPanel = "";
+    panel.id = "venue-relationship-shows-panel";
+    panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("inert", "");
+  }
+
+  if (panel.previousElementSibling !== grid) {
+    grid.insertAdjacentElement("afterend", panel);
+  }
+
+  return panel;
+}
+
 function setVenueShowsPanelOpen(card, isOpen) {
-  const panel = card.querySelector("[data-venue-shows-panel]");
+  const panel = getVenueShowsRelationshipPanel();
   if (!panel) {
     return;
   }
@@ -1827,6 +1855,7 @@ function setVenueShowsPanelOpen(card, isOpen) {
 
   card.classList.toggle("is-expanded", isOpen);
   card.setAttribute("aria-expanded", String(isOpen));
+  panel.classList.toggle("is-expanded", isOpen);
   panel.setAttribute("aria-hidden", String(!isOpen));
   if (isOpen) {
     panel.removeAttribute("inert");
@@ -1846,17 +1875,17 @@ function setupVenueShowsRelationshipCard(venue, shows) {
   }
 
   const panelId = "venue-relationship-shows-panel";
-  let panel = card.querySelector("[data-venue-shows-panel]");
-  if (!panel) {
-    panel = document.createElement("div");
-    panel.className = "venue-shows-panel";
-    panel.dataset.venueShowsPanel = "";
-    panel.id = panelId;
-    panel.setAttribute("aria-hidden", "true");
-    panel.setAttribute("inert", "");
-    card.append(panel);
+  const staleCardPanel = card.querySelector("[data-venue-shows-panel]");
+  if (staleCardPanel) {
+    staleCardPanel.remove();
   }
 
+  const panel = getVenueShowsRelationshipPanel();
+  if (!panel) {
+    return;
+  }
+
+  panel.id = panelId;
   card.classList.add("venue-relationship-card--expandable");
   card.tabIndex = 0;
   card.setAttribute("role", "button");
