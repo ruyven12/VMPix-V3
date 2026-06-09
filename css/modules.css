@@ -4178,9 +4178,9 @@ img.archive-gallery-image {
 
 .venue-relationship-card {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
   min-width: 0;
-  min-height: 17.4rem;
+  min-height: 10.4rem;
   border: 1px solid rgba(247, 247, 242, 0.075);
   border-radius: var(--radius-sm);
   background:
@@ -13811,7 +13811,7 @@ img.archive-gallery-image {
   }
 
   .venue-relationship-card {
-    min-height: 18.4rem;
+    min-height: 11rem;
   }
 
   .venue-detail-content-grid {
