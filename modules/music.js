@@ -1329,21 +1329,45 @@ function setMusicVenuesCount(count) {
   musicVenuesCount.textContent = `${numericCount.toLocaleString()} venue${numericCount === 1 ? "" : "s"}`;
 }
 
+function getMusicVenuesArchiveRows() {
+  return getMusicVenuesRows()
+    .filter((venue) => getMusicVenueSlug(venue))
+    .sort((left, right) => getMusicVenueName(left).localeCompare(getMusicVenueName(right)));
+}
+
+function getMusicVenueRowsForState(rows, stateFilter = activeMusicVenueStateFilter) {
+  return stateFilter
+    ? rows.filter((venue) => getMusicVenueState(venue) === stateFilter)
+    : rows;
+}
+
+function getMusicVenueSelectOptions(rows, stateFilter = activeMusicVenueStateFilter) {
+  const options = new Map();
+  getMusicVenueRowsForState(rows, stateFilter).forEach((venue) => {
+    const slug = getMusicVenueSlug(venue);
+    const label = getMusicVenueName(venue);
+    if (slug && label && !options.has(slug)) {
+      options.set(slug, { value: slug, label });
+    }
+  });
+  return Array.from(options.values()).sort((left, right) => left.label.localeCompare(right.label));
+}
+
 function normalizeActiveMusicVenueFilters(rows) {
   const stateOptions = new Set(rows.map(getMusicVenueState).filter(Boolean));
-  const venueOptions = new Set(rows.map(getMusicVenueSlug).filter(Boolean));
   if (activeMusicVenueStateFilter && !stateOptions.has(activeMusicVenueStateFilter)) {
     activeMusicVenueStateFilter = "";
   }
+  const venueOptions = new Set(
+    getMusicVenueSelectOptions(rows, activeMusicVenueStateFilter).map((venue) => venue.value)
+  );
   if (activeMusicVenueSlugFilter && !venueOptions.has(activeMusicVenueSlugFilter)) {
     activeMusicVenueSlugFilter = "";
   }
 }
 
 function getFilteredMusicVenues() {
-  const rows = getMusicVenuesRows()
-    .filter((venue) => getMusicVenueSlug(venue))
-    .sort((left, right) => getMusicVenueName(left).localeCompare(getMusicVenueName(right)));
+  const rows = getMusicVenuesArchiveRows();
   normalizeActiveMusicVenueFilters(rows);
   const searchTerm = activeMusicVenueSearch.trim().toLowerCase();
 
@@ -1364,12 +1388,17 @@ function getFilteredMusicVenues() {
 function updateMusicVenuesFilter(filterName, value) {
   if (filterName === "search") {
     activeMusicVenueSearch = String(value || "");
+    renderMusicVenuesResults();
+    return;
   } else if (filterName === "state") {
     activeMusicVenueStateFilter = normalizeMusicVenueState(value);
+    normalizeActiveMusicVenueFilters(getMusicVenuesArchiveRows());
+    renderMusicVenuesFilters();
   } else if (filterName === "venue") {
     activeMusicVenueSlugFilter = normalizeMusicVenueSlugValue(value);
+    normalizeActiveMusicVenueFilters(getMusicVenuesArchiveRows());
   }
-  renderMusicVenuesArchive();
+  renderMusicVenuesResults();
 }
 
 function resetMusicVenuesFilters() {
@@ -1435,10 +1464,7 @@ function createMusicVenuesFilters(rows) {
 
   const states = getMusicShowsUniqueOptions(rows, getMusicVenueState)
     .map((state) => ({ value: state, label: state }));
-  const venues = rows
-    .map((venue) => ({ value: getMusicVenueSlug(venue), label: getMusicVenueName(venue) }))
-    .filter((venue) => venue.value && venue.label)
-    .sort((left, right) => left.label.localeCompare(right.label));
+  const venues = getMusicVenueSelectOptions(rows, activeMusicVenueStateFilter);
 
   const resetButton = document.createElement("button");
   resetButton.className = "music-venues-filter-reset";
@@ -1454,6 +1480,29 @@ function createMusicVenuesFilters(rows) {
   );
 
   return filters;
+}
+
+function renderMusicVenuesFilters(rows = getMusicVenuesArchiveRows()) {
+  if (!musicVenuesFilters) {
+    return;
+  }
+
+  const activeElement = document.activeElement;
+  const shouldRestoreSearchFocus = activeElement?.matches?.("[data-music-venues-filter='search']");
+  const selectionStart = shouldRestoreSearchFocus ? activeElement.selectionStart : null;
+  const selectionEnd = shouldRestoreSearchFocus ? activeElement.selectionEnd : null;
+
+  musicVenuesFilters.replaceChildren(createMusicVenuesFilters(rows));
+
+  if (shouldRestoreSearchFocus) {
+    const searchInput = musicVenuesFilters.querySelector("[data-music-venues-filter='search']");
+    if (searchInput) {
+      searchInput.focus({ preventScroll: true });
+      if (Number.isInteger(selectionStart) && Number.isInteger(selectionEnd)) {
+        searchInput.setSelectionRange(selectionStart, selectionEnd);
+      }
+    }
+  }
 }
 
 function createMusicVenueCard(venue) {
@@ -1506,16 +1555,11 @@ function createMusicVenueCard(venue) {
   return card;
 }
 
-function renderMusicVenuesArchive() {
+function renderMusicVenuesResults() {
   if (!musicVenuesList) {
     return;
   }
 
-  const rows = getMusicVenuesRows();
-  normalizeActiveMusicVenueFilters(rows);
-  if (musicVenuesFilters) {
-    musicVenuesFilters.replaceChildren(createMusicVenuesFilters(rows));
-  }
   const visibleRows = getFilteredMusicVenues();
 
   musicVenuesList.replaceChildren();
@@ -1529,6 +1573,13 @@ function renderMusicVenuesArchive() {
     musicVenuesList.append(emptyState);
   }
   setMusicVenuesCount(visibleRows.length);
+}
+
+function renderMusicVenuesArchive() {
+  const rows = getMusicVenuesArchiveRows();
+  normalizeActiveMusicVenueFilters(rows);
+  renderMusicVenuesFilters(rows);
+  renderMusicVenuesResults();
 }
 
 function syncMusicVenuesArchive() {
