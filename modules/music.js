@@ -44,6 +44,7 @@ let activeMusicVenueSearch = "";
 let activeMusicVenueStateFilter = "";
 let activeMusicVenueSlugFilter = "";
 let activeMusicVenueDetailSlug = "";
+let activeVenueRelationship = "";
 const musicVenueStateCodes = ["ME", "NH", "MA", "CT", "RI", "VT"];
 const musicVenueStateAliases = {
   MAINE: "ME",
@@ -1842,6 +1843,42 @@ function getVenueShowsRelationshipPanel() {
   return panel;
 }
 
+function setVenueRelationshipFocus(activeType = "") {
+  if (!venueDetail) {
+    return;
+  }
+
+  const relationships = venueDetail.querySelector("[data-venue-relationships]");
+  if (!relationships) {
+    return;
+  }
+
+  const cards = Array.from(relationships.querySelectorAll("[data-venue-relationship]"));
+  const normalizedType = String(activeType || "").trim();
+  activeVenueRelationship = cards.some((card) => card.dataset.venueRelationship === normalizedType)
+    ? normalizedType
+    : "";
+
+  relationships.classList.toggle("is-focused", Boolean(activeVenueRelationship));
+  if (activeVenueRelationship) {
+    relationships.dataset.activeVenueRelationship = activeVenueRelationship;
+  } else {
+    delete relationships.dataset.activeVenueRelationship;
+  }
+
+  cards.forEach((card) => {
+    const isInactive = Boolean(activeVenueRelationship) && card.dataset.venueRelationship !== activeVenueRelationship;
+    card.classList.toggle("is-inactive", isInactive);
+    if (isInactive) {
+      card.setAttribute("aria-hidden", "true");
+      card.setAttribute("inert", "");
+    } else {
+      card.removeAttribute("aria-hidden");
+      card.removeAttribute("inert");
+    }
+  });
+}
+
 function setVenueShowsPanelOpen(card, isOpen) {
   const panel = getVenueShowsRelationshipPanel();
   if (!panel) {
@@ -1855,6 +1892,7 @@ function setVenueShowsPanelOpen(card, isOpen) {
 
   card.classList.toggle("is-expanded", isOpen);
   card.setAttribute("aria-expanded", String(isOpen));
+  setVenueRelationshipFocus(isOpen ? "shows" : "");
   panel.classList.toggle("is-expanded", isOpen);
   panel.setAttribute("aria-hidden", String(!isOpen));
   if (isOpen) {
