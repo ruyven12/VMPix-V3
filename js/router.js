@@ -44,6 +44,14 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.musicVenues) {
     return { name: "music-venues", canonicalUrl: routePaths.musicVenues };
   }
+  const musicVenueDetailPrefix = `${routePaths.musicVenues}/`;
+  if (routePath.startsWith(musicVenueDetailPrefix)) {
+    const routeParts = routePath.slice(musicVenueDetailPrefix.length).split("/");
+    if (routeParts.length === 1 && routeParts[0]) {
+      const venueSlug = decodeRoutePart(routeParts[0]);
+      return { name: "music-venue-detail", venueSlug, canonicalUrl: getMusicVenueRouteUrl(venueSlug) };
+    }
+  }
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
@@ -227,7 +235,16 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "music-venues") {
+    showMusicNexus({ initialSection: "venues", currentView: "Venues" });
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "music-venue-detail") {
     showMusicNexus({ initialSection: "venues", currentView: "Venue Detail" });
+    showMusicVenueDetail(route.venueSlug);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

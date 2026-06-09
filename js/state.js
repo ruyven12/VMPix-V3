@@ -69,9 +69,20 @@ const personDetail = document.querySelector("[data-person-detail]");
 const showDetail = document.querySelector("[data-show-detail]");
 const venueDetail = document.querySelector("[data-venue-detail]");
 const musicVenuesIndex = document.querySelector("[data-music-venues-index]");
-const musicVenuesStateFilters = document.querySelector("[data-music-venues-state-filters]");
+const musicVenuesFilters = document.querySelector("[data-music-venues-filters]");
 const musicVenuesList = document.querySelector("[data-music-venues-list]");
 const musicVenuesCount = document.querySelector("[data-music-venues-count]");
+const venueDetailBack = document.querySelector("[data-venue-detail-back]");
+const venueDetailLogoCard = document.querySelector("[data-venue-detail-logo-card]");
+const venueDetailLogoMark = document.querySelector("[data-venue-detail-logo-mark]");
+const venueDetailLogoLabel = document.querySelector("[data-venue-detail-logo-label]");
+const venueDetailTitle = document.querySelector("[data-venue-detail-title]");
+const venueDetailLocation = document.querySelector("[data-venue-detail-location]");
+const venueDetailRegion = document.querySelector("[data-venue-detail-region]");
+const venueDetailVisual = document.querySelector("[data-venue-detail-visual]");
+const venueDetailVisualPrimary = document.querySelector("[data-venue-detail-visual-primary]");
+const venueDetailVisualSecondary = document.querySelector("[data-venue-detail-visual-secondary]");
+const venueDetailStatValues = Array.from(document.querySelectorAll("[data-venue-detail-stat]"));
 const musicNexusBack = document.querySelector("[data-music-nexus-back]");
 const bandsViewButtons = document.querySelectorAll("[data-bands-view-target]");
 const bandsViewPanels = document.querySelectorAll("[data-bands-view]");
@@ -1944,6 +1955,7 @@ const routeNameToGlobalNavTarget = {
   "music-shows": "music",
   "show-detail": "music",
   "music-venues": "music",
+  "music-venue-detail": "music",
   wrestling: "wrestling",
   "wrestling-shows": "wrestling",
   "wrestling-show-detail": "wrestling",
@@ -1971,6 +1983,7 @@ const routeNameToBreadcrumbTrail = {
   "music-shows": ["portfolio", "music", "music-shows"],
   "show-detail": ["portfolio", "music", "music-shows"],
   "music-venues": ["portfolio", "music", "music-venues"],
+  "music-venue-detail": ["portfolio", "music", "music-venues"],
   wrestling: ["portfolio", "wrestling"],
   "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
@@ -1991,6 +2004,7 @@ const routeNameToDrilldownBreadcrumb = {
   "set-detail": "Set Detail",
   "person-detail": "Person Detail",
   "show-detail": "Show Detail",
+  "music-venue-detail": "Venue Detail",
   "wrestling-person-detail": "Person Detail",
   "wrestling-venue-detail": "Venue Detail",
   "wrestling-show-detail": "Show Detail",
@@ -2010,6 +2024,7 @@ const routeNameToShellBackTarget = {
   "music-shows": routePaths.music,
   "show-detail": routePaths.musicShows,
   "music-venues": routePaths.music,
+  "music-venue-detail": routePaths.musicVenues,
   wrestling: routePaths.portfolio,
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,

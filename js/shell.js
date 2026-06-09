@@ -314,6 +314,10 @@ function getRouteDrilldownBreadcrumbLabel(route) {
   if (route.name === "show-detail" && typeof findMusicShowById === "function") {
     return findMusicShowById(route.showId)?.title || fallbackLabel;
   }
+  if (route.name === "music-venue-detail" && typeof venueSlugToVenue === "function" && typeof getMusicVenueName === "function") {
+    const venue = venueSlugToVenue(route.venueSlug);
+    return venue ? getMusicVenueName(venue) : fallbackLabel;
+  }
   if (route.name === "wrestling-person-detail" && typeof findWrestlingPersonById === "function") {
     return findWrestlingPersonById(route.personId)?.name || fallbackLabel;
   }
@@ -399,6 +403,7 @@ function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = win
     (route.name === "set-detail" && historyState.setsArchiveUrl && historyState.fromSetsArchive) ||
     (route.name === "person-detail" && historyState.fromPeopleIndex) ||
     (route.name === "show-detail" && historyState.fromShowsArchive) ||
+    (route.name === "music-venue-detail" && historyState.fromMusicVenuesIndex) ||
     (route.name === "wrestling-person-detail" && historyState.fromWrestlingPeopleIndex) ||
     (route.name === "wrestling-venue-detail" && historyState.fromWrestlingVenuesIndex)
   );
@@ -1714,6 +1719,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "music-shows": musicNexusShell,
     "show-detail": musicNexusShell,
     "music-venues": musicNexusShell,
+    "music-venue-detail": musicNexusShell,
     wrestling: ringArchiveShell,
     "wrestling-people": wrestlingPeopleShell,
     "wrestling-person-detail": wrestlingPersonDetailShell,

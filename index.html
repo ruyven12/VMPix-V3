@@ -350,17 +350,28 @@
           <article class="person-detail-screen" aria-labelledby="person-detail-title" aria-hidden="true" inert data-person-detail></article>
           <article class="show-detail-screen" aria-labelledby="show-detail-title" aria-hidden="true" inert data-show-detail></article>
 
+          <section class="music-venues-archive" aria-labelledby="music-venues-archive-title" aria-hidden="true" inert data-music-venues-index>
+            <header class="music-venues-archive-header">
+              <p class="venue-detail-panel-kicker">Venue Archive</p>
+              <h4 class="venue-detail-panel-title" id="music-venues-archive-title">Venues</h4>
+              <p class="music-venues-count" data-music-venues-count>0 venues</p>
+            </header>
+            <div class="music-venues-filters" aria-label="Venues archive filters" data-music-venues-filters></div>
+            <div class="music-venues-list" role="list" aria-label="Music venues archive list" data-music-venues-list></div>
+          </section>
+
           <article class="venue-detail-screen" aria-labelledby="venue-detail-title" aria-hidden="true" inert data-venue-detail>
+            <button class="venue-detail-back" type="button" data-venue-detail-back>Back To Venues</button>
             <section class="venue-detail-hero" aria-labelledby="venue-detail-title">
-              <div class="venue-detail-logo-card" aria-label="Asylum venue mark">
-                <span class="venue-detail-logo-mark" aria-hidden="true">AS</span>
-                <span class="venue-detail-logo-label">Asylum</span>
+              <div class="venue-detail-logo-card" aria-label="Asylum venue mark" data-venue-detail-logo-card>
+                <span class="venue-detail-logo-mark" aria-hidden="true" data-venue-detail-logo-mark>AS</span>
+                <span class="venue-detail-logo-label" data-venue-detail-logo-label>Asylum</span>
               </div>
 
               <div class="venue-detail-title-block">
                 <p class="venue-detail-kicker">Venue Dossier</p>
-                <h3 class="venue-detail-title" id="venue-detail-title">Asylum</h3>
-                <p class="venue-detail-location">Portland, Maine</p>
+                <h3 class="venue-detail-title" id="venue-detail-title" data-venue-detail-title>Asylum</h3>
+                <p class="venue-detail-location" data-venue-detail-location>Portland, Maine</p>
                 <dl class="venue-detail-meta-row" aria-label="Venue metadata">
                   <div class="venue-detail-meta-item">
                     <dt>Established</dt>
@@ -372,17 +383,17 @@
                   </div>
                   <div class="venue-detail-meta-item">
                     <dt>Region</dt>
-                    <dd>New England</dd>
+                    <dd data-venue-detail-region>New England</dd>
                   </div>
                 </dl>
-                <div class="venue-detail-visual" role="img" aria-label="Compact location visualization for Asylum in Portland, Maine">
+                <div class="venue-detail-visual" role="img" aria-label="Compact location visualization for Asylum in Portland, Maine" data-venue-detail-visual>
                   <span class="venue-detail-visual-line venue-detail-visual-line--one" aria-hidden="true"></span>
                   <span class="venue-detail-visual-line venue-detail-visual-line--two" aria-hidden="true"></span>
                   <span class="venue-detail-visual-pin venue-detail-visual-pin--primary" aria-hidden="true"></span>
                   <span class="venue-detail-visual-pin venue-detail-visual-pin--secondary" aria-hidden="true"></span>
                   <div class="venue-detail-visual-label">
-                    <span>Portland Core</span>
-                    <span>Archive Signal 01</span>
+                    <span data-venue-detail-visual-primary>Portland Core</span>
+                    <span data-venue-detail-visual-secondary>Archive Signal 01</span>
                   </div>
                 </div>
               </div>
@@ -390,27 +401,17 @@
 
             <section class="venue-detail-stats-strip" aria-label="Asylum archive statistics">
               <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value">13</p>
+                <p class="venue-detail-stat-value" data-venue-detail-stat="shows">13</p>
                 <p class="venue-detail-stat-label">Shows</p>
               </article>
               <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value">28</p>
+                <p class="venue-detail-stat-value" data-venue-detail-stat="bands">28</p>
                 <p class="venue-detail-stat-label">Bands</p>
               </article>
               <article class="venue-detail-stat">
-                <p class="venue-detail-stat-value">486</p>
+                <p class="venue-detail-stat-value" data-venue-detail-stat="photos">486</p>
                 <p class="venue-detail-stat-label">Photos</p>
               </article>
-            </section>
-
-            <section class="music-venues-archive" aria-labelledby="music-venues-archive-title" data-music-venues-index>
-              <header class="music-venues-archive-header">
-                <p class="venue-detail-panel-kicker">Venue Archive</p>
-                <h4 class="venue-detail-panel-title" id="music-venues-archive-title">Venues</h4>
-                <p class="music-venues-count" data-music-venues-count>0 venues</p>
-              </header>
-              <div class="music-venues-state-filters" role="list" aria-label="Filter venues by state" data-music-venues-state-filters></div>
-              <div class="music-venues-list" role="list" aria-label="Music venues archive list" data-music-venues-list></div>
             </section>
 
             <section class="venue-relationships" aria-labelledby="venue-relationships-title" data-venue-relationships>
