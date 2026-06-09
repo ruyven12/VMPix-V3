@@ -124,6 +124,9 @@ const MUSIC_NEXUS_LIVE_STAT_CONFIG = [
 
 let musicLandingStatsRequest = null;
 let musicLandingStatsLoaded = false;
+let ringArchiveStatsRequest = null;
+let ringArchiveStatsLoaded = false;
+const ringArchiveApiPayloadRequests = new Map();
 
 function formatMusicLandingStatValue(value, fallbackValue = "") {
   const numericValue = Number(value);
@@ -283,6 +286,405 @@ function requestMusicLandingStats() {
   });
 
   return musicLandingStatsRequest;
+}
+
+const RING_ARCHIVE_STATS_API_BASE_URL = MUSIC_NEXUS_STATS_API_BASE_URL;
+const RING_ARCHIVE_STATS_TIMEOUT_MS = 8000;
+const RING_ARCHIVE_STAT_CONFIG = [
+  {
+    key: "shows",
+    statsRoute: "/api/wrestling/shows/stats",
+    dbRoute: "/api/wrestling/shows/db",
+    fields: ["showsTotal", "totalShows", "shows_total", "total_shows", "showCount", "show_count", "showsCount", "shows_count", "eventsTotal", "totalEvents", "events_total", "total_events", "total", "count"],
+    deriveFromDb: getRingArchiveShowCount,
+    emptyValue: 0,
+  },
+  {
+    key: "matches",
+    statsRoute: "/api/wrestling/shows/stats",
+    dbRoute: "/api/wrestling/shows/db",
+    fields: ["matchesTotal", "totalMatches", "matches_total", "total_matches", "matchCount", "match_count", "matchesCount", "matches_count"],
+    deriveFromDb: getRingArchiveMatchCount,
+    emptyValue: 0,
+  },
+  {
+    key: "people",
+    statsRoute: "/api/wrestling/people/stats",
+    dbRoute: "/api/wrestling/people/db",
+    fields: ["peopleTotal", "totalPeople", "people_total", "total_people", "personCount", "person_count", "peopleCount", "people_count", "total", "count"],
+    deriveFromDb: getRingArchiveRowCount,
+    emptyValue: 0,
+  },
+  {
+    key: "venues",
+    statsRoute: "",
+    dbRoute: "/api/wrestling/venues/db",
+    fields: ["venuesTotal", "totalVenues", "venues_total", "total_venues", "venueCount", "venue_count", "venuesCount", "venues_count", "total", "count"],
+    deriveFromDb: getRingArchiveRowCount,
+    emptyValue: 0,
+  },
+  {
+    key: "promotions",
+    statsRoute: "/api/wrestling/shows/stats",
+    dbRoute: "/api/wrestling/shows/db",
+    fields: ["promotionsTotal", "totalPromotions", "promotions_total", "total_promotions", "promotionCount", "promotion_count", "promotionsCount", "promotions_count", "uniquePromotions", "uniquePromotionsTotal", "unique_promotions", "unique_promotions_total", "byPromotion", "by_promotion"],
+    deriveFromDb: getRingArchivePromotionCount,
+    emptyValue: "N/A",
+  },
+];
+
+function getRingArchiveStatValueElement(key) {
+  return document.querySelector(`[data-ring-archive-stat-value='${key}']`);
+}
+
+function setRingArchiveStatsState(stateName) {
+  const statsSurface = document.querySelector("[data-ring-archive-stats]");
+  if (!statsSurface) {
+    return;
+  }
+
+  statsSurface.dataset.statsState = stateName;
+  statsSurface.setAttribute("aria-busy", String(stateName === "loading"));
+}
+
+function formatRingArchiveStatValue(value, fallbackValue = "N/A") {
+  const fallbackText = String(fallbackValue ?? "N/A").trim() || "N/A";
+  const textValue = String(value ?? "").trim();
+  if (!textValue) {
+    return fallbackText;
+  }
+
+  const numericValue = Number(textValue.replace(/,/g, ""));
+  if (Number.isFinite(numericValue)) {
+    return numericValue.toLocaleString();
+  }
+
+  if (/^(undefined|null|nan)$/i.test(textValue)) {
+    return fallbackText;
+  }
+
+  return textValue;
+}
+
+function setRingArchiveStatValue(key, value, sourceName) {
+  const valueElement = getRingArchiveStatValueElement(key);
+  if (!valueElement) {
+    return;
+  }
+
+  valueElement.textContent = formatRingArchiveStatValue(value, valueElement.dataset.emptyValue || "N/A");
+  valueElement.dataset.statSource = sourceName;
+}
+
+function setRingArchiveStatLoading(key) {
+  const valueElement = getRingArchiveStatValueElement(key);
+  if (!valueElement) {
+    return;
+  }
+
+  valueElement.textContent = "...";
+  valueElement.dataset.statSource = "loading";
+}
+
+function readRingArchiveStatField(payload, fieldNames = []) {
+  const candidates = [
+    payload,
+    payload?.totals,
+    payload?.summary,
+    payload?.stats,
+    payload?.meta,
+    payload?.meta?.totals,
+    payload?.meta?.stats,
+    payload?.data,
+    payload?.data?.totals,
+    payload?.data?.stats,
+    payload?.source,
+    payload?.source?.stats,
+  ];
+
+  for (const candidate of candidates) {
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+      continue;
+    }
+
+    for (const fieldName of fieldNames) {
+      if (Object.prototype.hasOwnProperty.call(candidate, fieldName)) {
+        return candidate[fieldName];
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function getRingArchivePayloadRows(payload) {
+  const candidates = [
+    payload?.data,
+    payload?.rows,
+    payload?.items,
+    payload?.results,
+    payload?.shows,
+    payload?.people,
+    payload?.venues,
+    payload?.source?.data,
+    payload?.source?.rows,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((row) => row && typeof row === "object");
+    }
+    if (candidate && typeof candidate === "object") {
+      const nestedRows = [
+        candidate.data,
+        candidate.rows,
+        candidate.items,
+        candidate.results,
+        candidate.shows,
+        candidate.people,
+        candidate.venues,
+      ].find(Array.isArray);
+      if (nestedRows) {
+        return nestedRows.filter((row) => row && typeof row === "object");
+      }
+    }
+  }
+
+  return [];
+}
+
+function getRingArchiveNumericValue(value) {
+  if (Array.isArray(value)) {
+    return value.length;
+  }
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+
+  const numericValue = Number(String(value).replace(/,/g, ""));
+  return Number.isFinite(numericValue) ? numericValue : undefined;
+}
+
+function getRingArchiveDirectStatValue(payload, fields = []) {
+  return getRingArchiveNumericValue(readRingArchiveStatField(payload, fields));
+}
+
+function getRingArchiveRowCount(payload) {
+  const directCount = getRingArchiveDirectStatValue(payload, ["total", "count"]);
+  if (directCount !== undefined) {
+    return directCount;
+  }
+
+  return getRingArchivePayloadRows(payload).length;
+}
+
+function getRingArchiveShowCount(payload) {
+  const directCount = getRingArchiveDirectStatValue(payload, ["showsTotal", "totalShows", "shows_total", "total_shows", "showCount", "show_count", "showsCount", "shows_count", "eventsTotal", "totalEvents", "events_total", "total_events", "total", "count"]);
+  if (directCount !== undefined) {
+    return directCount;
+  }
+
+  return getRingArchivePayloadRows(payload).length;
+}
+
+function getRingArchiveMatchCount(payload) {
+  const directCount = getRingArchiveDirectStatValue(payload, ["matchesTotal", "totalMatches", "matches_total", "total_matches", "matchCount", "match_count", "matchesCount", "matches_count"]);
+  if (directCount !== undefined) {
+    return directCount;
+  }
+
+  const rows = getRingArchivePayloadRows(payload);
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return rows.reduce((total, row) => {
+    const rowCount = getRingArchiveNumericValue(
+      row?.stats?.matchCount ??
+      row?.stats?.matchesTotal ??
+      row?.matchCount ??
+      row?.match_count ??
+      row?.matchesCount ??
+      row?.matches_count
+    );
+    if (rowCount !== undefined) {
+      return total + rowCount;
+    }
+
+    if (Array.isArray(row?.matches)) {
+      return total + row.matches.length;
+    }
+    if (Array.isArray(row?.matchIds)) {
+      return total + row.matchIds.length;
+    }
+    if (Array.isArray(row?.match_ids)) {
+      return total + row.match_ids.length;
+    }
+
+    return total;
+  }, 0);
+}
+
+function getRingArchivePromotionValues(row) {
+  const directValues = [
+    row?.promotion,
+    row?.promotionName,
+    row?.promotion_name,
+    row?.promoter,
+    row?.company,
+    row?.organization,
+    row?.general?.promotion,
+  ];
+  const arrayValues = [
+    row?.promotions,
+    row?.promotion_names,
+  ].flatMap((value) => Array.isArray(value) ? value : []);
+
+  return [...directValues, ...arrayValues]
+    .map((value) => String(value ?? "").trim())
+    .filter((value) => value && !/^(n\/a|unknown|undefined|null)$/i.test(value));
+}
+
+function getRingArchivePromotionCount(payload) {
+  const directCount = getRingArchiveDirectStatValue(payload, ["promotionsTotal", "totalPromotions", "promotions_total", "total_promotions", "promotionCount", "promotion_count", "promotionsCount", "promotions_count", "uniquePromotions", "uniquePromotionsTotal", "unique_promotions", "unique_promotions_total", "byPromotion", "by_promotion"]);
+  if (directCount !== undefined) {
+    return directCount;
+  }
+
+  const promotions = new Set();
+  getRingArchivePayloadRows(payload).forEach((row) => {
+    getRingArchivePromotionValues(row).forEach((promotion) => {
+      promotions.add(promotion.toLowerCase());
+    });
+  });
+
+  return promotions.size > 0 ? promotions.size : undefined;
+}
+
+async function fetchRingArchiveJson(route) {
+  if (ringArchiveApiPayloadRequests.has(route)) {
+    return ringArchiveApiPayloadRequests.get(route);
+  }
+
+  const apiUrl = new URL(route, RING_ARCHIVE_STATS_API_BASE_URL);
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), RING_ARCHIVE_STATS_TIMEOUT_MS)
+    : 0;
+
+  const request = fetch(apiUrl.href, {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ring Archive stat request failed: ${route} (${response.status})`);
+      }
+
+      return response.json();
+    })
+    .catch((error) => {
+      ringArchiveApiPayloadRequests.delete(route);
+      throw error;
+    })
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    });
+
+  ringArchiveApiPayloadRequests.set(route, request);
+  return request;
+}
+
+async function fetchRingArchiveStat(statConfig) {
+  let statsPayload = null;
+  let hadRequestError = false;
+
+  if (statConfig.statsRoute) {
+    try {
+      statsPayload = await fetchRingArchiveJson(statConfig.statsRoute);
+      const directValue = getRingArchiveDirectStatValue(statsPayload, statConfig.fields);
+      if (directValue !== undefined) {
+        return { value: directValue, source: "stats" };
+      }
+    } catch {
+      hadRequestError = true;
+    }
+  }
+
+  try {
+    const dbPayload = await fetchRingArchiveJson(statConfig.dbRoute);
+    const derivedValue = statConfig.deriveFromDb(dbPayload);
+    if (derivedValue !== undefined) {
+      return { value: derivedValue, source: "db" };
+    }
+
+    return { value: statConfig.emptyValue, source: "missing" };
+  } catch {
+    if (statsPayload) {
+      return { value: statConfig.emptyValue, source: "missing" };
+    }
+    hadRequestError = true;
+  }
+
+  if (hadRequestError) {
+    return { value: "N/A", source: "error" };
+  }
+
+  return { value: statConfig.emptyValue, source: "missing" };
+}
+
+function requestRingArchiveStats() {
+  const statsSurface = document.querySelector("[data-ring-archive-stats]");
+  if (!statsSurface || typeof fetch !== "function") {
+    RING_ARCHIVE_STAT_CONFIG.forEach((statConfig) => {
+      setRingArchiveStatValue(statConfig.key, "N/A", "error");
+    });
+    setRingArchiveStatsState("error");
+    return Promise.resolve(false);
+  }
+
+  if (ringArchiveStatsLoaded) {
+    return Promise.resolve(true);
+  }
+  if (ringArchiveStatsRequest) {
+    return ringArchiveStatsRequest;
+  }
+
+  setRingArchiveStatsState("loading");
+  RING_ARCHIVE_STAT_CONFIG.forEach((statConfig) => setRingArchiveStatLoading(statConfig.key));
+
+  ringArchiveStatsRequest = Promise.all(
+    RING_ARCHIVE_STAT_CONFIG.map((statConfig) => (
+      fetchRingArchiveStat(statConfig)
+        .then((result) => {
+          setRingArchiveStatValue(statConfig.key, result.value, result.source);
+          return result.source !== "error";
+        })
+        .catch(() => {
+          setRingArchiveStatValue(statConfig.key, "N/A", "error");
+          return false;
+        })
+    ))
+  ).then((results) => {
+    const resolvedCount = results.filter(Boolean).length;
+    ringArchiveStatsLoaded = resolvedCount === RING_ARCHIVE_STAT_CONFIG.length;
+    setRingArchiveStatsState(
+      ringArchiveStatsLoaded ? "live" : resolvedCount > 0 ? "partial" : "error"
+    );
+    ringArchiveStatsRequest = null;
+    return resolvedCount > 0;
+  }).catch(() => {
+    RING_ARCHIVE_STAT_CONFIG.forEach((statConfig) => {
+      setRingArchiveStatValue(statConfig.key, "N/A", "error");
+    });
+    setRingArchiveStatsState("error");
+    ringArchiveStatsRequest = null;
+    return false;
+  });
+
+  return ringArchiveStatsRequest;
 }
 
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
@@ -915,6 +1317,7 @@ function showRingArchive() {
   setHubChromeHidden(true);
   setCurrentView("Ring Archive");
   setActiveGlobalNav("wrestling");
+  requestRingArchiveStats();
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
