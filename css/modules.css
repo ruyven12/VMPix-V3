@@ -3949,10 +3949,10 @@ img.archive-gallery-image {
 }
 
 .music-venues-filter-bar {
-  width: min(100%, 42rem);
+  width: min(100%, 50rem);
   justify-self: center;
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.8fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.72fr) minmax(0, 1fr) minmax(0, 0.86fr) auto;
   align-items: end;
   gap: clamp(0.42rem, 1.45vw, 0.62rem);
   padding: clamp(0.56rem, 1.9vw, 0.74rem);
@@ -4088,12 +4088,13 @@ img.archive-gallery-image {
 .music-venue-card-copy {
   min-width: 0;
   display: grid;
-  gap: 0.18rem;
+  gap: 0.22rem;
 }
 
 .music-venue-card-name,
 .music-venue-card-location,
-.music-venue-card-meta {
+.music-venue-card-stats,
+.music-venue-card-status {
   min-width: 0;
   margin: 0;
   overflow-wrap: anywhere;
@@ -4113,11 +4114,128 @@ img.archive-gallery-image {
   line-height: 1.16;
 }
 
-.music-venue-card-meta,
+.music-venue-card-stats,
 .music-venues-empty {
   color: rgba(247, 247, 242, 0.52);
   font-size: clamp(0.56rem, 2.14vw, 0.66rem);
   line-height: 1.22;
+}
+
+.music-venue-card-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.34rem;
+}
+
+.music-venue-card-metric {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  color: rgba(247, 247, 242, 0.6);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.music-venue-card-metric-icon {
+  position: relative;
+  width: 0.84rem;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  color: rgba(255, 118, 102, 0.72);
+}
+
+.music-venue-card-metric-icon--events {
+  border: 1px solid currentColor;
+  border-radius: 0.12rem;
+}
+
+.music-venue-card-metric-icon--events::before {
+  position: absolute;
+  top: 0.18rem;
+  right: 0.12rem;
+  left: 0.12rem;
+  height: 1px;
+  background: currentColor;
+  content: "";
+}
+
+.music-venue-card-metric-icon--events::after {
+  position: absolute;
+  inset: 0.34rem 0.2rem 0.18rem;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 42%, transparent);
+  content: "";
+}
+
+.music-venue-card-metric-icon--photos {
+  border: 1px solid currentColor;
+  border-radius: 0.12rem;
+}
+
+.music-venue-card-metric-icon--photos::before {
+  position: absolute;
+  top: 0.16rem;
+  left: 0.15rem;
+  width: 0.22rem;
+  height: 0.11rem;
+  border-radius: 0.04rem 0.04rem 0 0;
+  background: currentColor;
+  content: "";
+}
+
+.music-venue-card-metric-icon--photos::after {
+  position: absolute;
+  inset: 0.28rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  content: "";
+}
+
+.music-venue-card-status {
+  justify-self: start;
+  width: max-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
+  padding: 0.18rem 0.38rem;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: 999px;
+  background: rgba(247, 247, 242, 0.018);
+  color: rgba(247, 247, 242, 0.62);
+  font-size: clamp(0.54rem, 2vw, 0.62rem);
+  line-height: 1;
+  text-transform: none;
+}
+
+.music-venue-card-status::before {
+  width: 0.32rem;
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0.38rem color-mix(in srgb, currentColor 18%, transparent);
+  content: "";
+}
+
+.music-venue-card-status--complete {
+  border-color: rgba(116, 214, 147, 0.2);
+  background: rgba(116, 214, 147, 0.04);
+  color: rgba(134, 225, 161, 0.78);
+}
+
+.music-venue-card-status--partial {
+  border-color: rgba(226, 197, 94, 0.22);
+  background: rgba(226, 197, 94, 0.04);
+  color: rgba(230, 204, 111, 0.8);
+}
+
+.music-venue-card-status--new {
+  border-color: rgba(255, 118, 102, 0.2);
+  background: rgba(213, 22, 34, 0.04);
+  color: rgba(255, 118, 102, 0.76);
 }
 
 .music-venue-card-action {
