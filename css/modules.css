@@ -3912,7 +3912,7 @@ img.archive-gallery-image {
   align-self: stretch;
   height: auto;
   min-height: 0;
-  max-height: none;
+  max-height: 100%;
 }
 
 .music-venues-archive::before {
@@ -4022,7 +4022,17 @@ img.archive-gallery-image {
 .music-venues-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.8rem), 1fr));
+  align-content: start;
   gap: 0.46rem;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.18rem;
+  scrollbar-color: rgba(213, 22, 34, 0.46) rgba(247, 247, 242, 0.07);
+  scrollbar-width: thin;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .music-venue-card,
