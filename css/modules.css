@@ -4406,6 +4406,138 @@ img.archive-gallery-image {
   padding-block: 0.66rem;
 }
 
+.venue-artists-panel-inner {
+  justify-items: center;
+}
+
+.venue-artists-summary {
+  width: min(100%, 38rem);
+  min-width: 0;
+  display: grid;
+  gap: 0.46rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.venue-artists-title,
+.venue-artists-copy,
+.venue-artists-top-title {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+.venue-artists-title {
+  color: rgba(247, 247, 242, 0.88);
+  font-size: clamp(0.86rem, 2.6vw, 1rem);
+  font-weight: 400;
+  line-height: 1.12;
+}
+
+.venue-artists-copy {
+  color: rgba(247, 247, 242, 0.56);
+  font-size: clamp(0.6rem, 2.08vw, 0.7rem);
+  line-height: 1.25;
+}
+
+.venue-artists-top {
+  width: min(100%, 24rem);
+  min-width: 0;
+  display: grid;
+  gap: 0.32rem;
+  padding: 0.52rem;
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background: rgba(1, 1, 3, 0.28);
+}
+
+.venue-artists-top-title {
+  color: rgba(255, 118, 102, 0.74);
+  font-size: clamp(0.58rem, 2vw, 0.68rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.venue-artists-top-list {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.venue-artists-top-list li {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.28rem;
+  color: rgba(247, 247, 242, 0.68);
+  font-size: clamp(0.58rem, 2vw, 0.68rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.venue-artists-search-field {
+  width: min(100%, 24rem);
+  min-width: 0;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.venue-artists-search-label {
+  color: rgba(247, 247, 242, 0.54);
+  font-size: clamp(0.56rem, 1.95vw, 0.64rem);
+  line-height: 1;
+  text-transform: none;
+}
+
+.venue-artists-search-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.48rem 0.58rem;
+  border: 1px solid rgba(213, 22, 34, 0.18);
+  border-radius: var(--radius-sm);
+  background: rgba(1, 1, 3, 0.48);
+  color: rgba(247, 247, 242, 0.86);
+  font: inherit;
+  font-size: clamp(0.62rem, 2.08vw, 0.72rem);
+  text-align: center;
+  text-transform: none;
+}
+
+.venue-artists-search-input:focus {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.12rem;
+}
+
+.venue-artists-grid {
+  width: min(100%, 40rem);
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+  gap: 0.34rem;
+  justify-content: center;
+}
+
+.venue-artist-pill {
+  min-width: 0;
+  min-height: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.38rem 0.5rem;
+  border: 1px solid rgba(213, 22, 34, 0.16);
+  border-radius: 999px;
+  background: rgba(213, 22, 34, 0.048);
+  color: rgba(247, 247, 242, 0.76);
+  font-size: clamp(0.6rem, 2.02vw, 0.7rem);
+  line-height: 1.12;
+  text-align: center;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
 .venue-shows-year-group {
   min-width: 0;
   display: grid;
