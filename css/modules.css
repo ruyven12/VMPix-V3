@@ -4270,6 +4270,12 @@ img.archive-gallery-image {
   text-align: center;
 }
 
+.venue-relationship-copy > * {
+  justify-self: center;
+  width: 100%;
+  text-align: center;
+}
+
 .venue-relationship-label {
   color: rgba(255, 118, 102, 0.76);
   font-size: 0.58rem;
@@ -4298,6 +4304,9 @@ img.archive-gallery-image {
 
 .venue-relationship-status {
   justify-self: center;
+  justify-content: center;
+  width: max-content;
+  max-width: 100%;
   min-height: 1.3rem;
   display: inline-flex;
   align-items: center;
