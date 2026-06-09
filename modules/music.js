@@ -1932,6 +1932,30 @@ function createVenueArtistPill(artist) {
   return item;
 }
 
+function createVenueArtistLeaderboardCard(artist, index) {
+  const item = document.createElement("li");
+  item.className = "venue-artists-top-card";
+
+  const rank = document.createElement("span");
+  rank.className = "venue-artist-rank";
+  rank.textContent = `#${index + 1}`;
+
+  const count = document.createElement("span");
+  count.className = "venue-artist-count";
+  count.textContent = artist.appearances.toLocaleString();
+
+  const name = document.createElement("span");
+  name.className = "venue-artist-name";
+  name.textContent = artist.name;
+
+  const label = document.createElement("span");
+  label.className = "venue-artist-label";
+  label.textContent = "Documented";
+
+  item.append(rank, count, name, label);
+  return item;
+}
+
 function updateVenueArtistsGrid(grid, artists, searchTerm) {
   if (!grid) {
     return;
@@ -1939,7 +1963,8 @@ function updateVenueArtistsGrid(grid, artists, searchTerm) {
 
   const normalizedSearch = String(searchTerm || "").trim().toLowerCase();
   const filteredArtists = (Array.isArray(artists) ? artists : [])
-    .filter((artist) => !normalizedSearch || artist.name.toLowerCase().includes(normalizedSearch));
+    .filter((artist) => !normalizedSearch || artist.name.toLowerCase().includes(normalizedSearch))
+    .sort((left, right) => left.name.localeCompare(right.name));
 
   grid.replaceChildren();
   if (filteredArtists.length === 0) {
@@ -1985,13 +2010,7 @@ function renderVenueArtistsPanel(panel, artists, card) {
   const topList = document.createElement("ol");
   topList.className = "venue-artists-top-list";
   venueArtists.slice(0, 3).forEach((artist) => {
-    const item = document.createElement("li");
-    const name = document.createElement("span");
-    name.textContent = artist.name;
-    const count = document.createElement("span");
-    count.textContent = `(${artist.appearances.toLocaleString()})`;
-    item.append(name, count);
-    topList.append(item);
+    topList.append(createVenueArtistLeaderboardCard(artist, topList.children.length));
   });
   topArtists.append(topTitle, topList);
   summary.append(title, copy, topArtists);
