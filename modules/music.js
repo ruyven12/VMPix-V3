@@ -1880,6 +1880,53 @@ function setVenueRelationshipFocus(activeType = "") {
   });
 }
 
+function updateVenueRelationshipFocusWithMotion(card, updateFocus) {
+  if (typeof updateFocus !== "function") {
+    return;
+  }
+
+  const shouldReduceMotion = typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!card || shouldReduceMotion) {
+    updateFocus();
+    return;
+  }
+
+  const before = card.getBoundingClientRect();
+  updateFocus();
+  const after = card.getBoundingClientRect();
+  const deltaX = before.left - after.left;
+  const deltaY = before.top - after.top;
+  if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) {
+    return;
+  }
+
+  let didCleanup = false;
+  const cleanup = () => {
+    if (didCleanup) {
+      return;
+    }
+    didCleanup = true;
+    card.style.transition = "";
+    card.style.transform = "";
+    card.removeEventListener("transitionend", handleTransitionEnd);
+  };
+  const handleTransitionEnd = (event) => {
+    if (event.propertyName === "transform") {
+      cleanup();
+    }
+  };
+
+  card.style.transition = "none";
+  card.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+  card.getBoundingClientRect();
+  card.addEventListener("transitionend", handleTransitionEnd);
+  card.style.transition = "transform var(--motion-standard) var(--ease-standard)";
+  card.style.transform = "";
+  window.setTimeout(cleanup, 420);
+}
+
 function setVenueShowsPanelOpen(card, isOpen) {
   const panel = getVenueShowsRelationshipPanel();
   if (!panel) {
@@ -1891,16 +1938,18 @@ function setVenueShowsPanelOpen(card, isOpen) {
     panel.dataset.lazyRendered = "true";
   }
 
-  card.classList.toggle("is-expanded", isOpen);
-  card.setAttribute("aria-expanded", String(isOpen));
-  setVenueRelationshipFocus(isOpen ? "shows" : "");
-  panel.classList.toggle("is-expanded", isOpen);
-  panel.setAttribute("aria-hidden", String(!isOpen));
-  if (isOpen) {
-    panel.removeAttribute("inert");
-  } else {
-    panel.setAttribute("inert", "");
-  }
+  updateVenueRelationshipFocusWithMotion(card, () => {
+    card.classList.toggle("is-expanded", isOpen);
+    card.setAttribute("aria-expanded", String(isOpen));
+    setVenueRelationshipFocus(isOpen ? "shows" : "");
+    panel.classList.toggle("is-expanded", isOpen);
+    panel.setAttribute("aria-hidden", String(!isOpen));
+    if (isOpen) {
+      panel.removeAttribute("inert");
+    } else {
+      panel.setAttribute("inert", "");
+    }
+  });
 }
 
 function setupVenueShowsRelationshipCard(venue, shows) {
