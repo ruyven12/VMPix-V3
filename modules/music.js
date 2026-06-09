@@ -1869,6 +1869,7 @@ function setVenueRelationshipFocus(activeType = "") {
   cards.forEach((card) => {
     const isInactive = Boolean(activeVenueRelationship) && card.dataset.venueRelationship !== activeVenueRelationship;
     card.classList.toggle("is-inactive", isInactive);
+    card.hidden = isInactive;
     if (isInactive) {
       card.setAttribute("aria-hidden", "true");
       card.setAttribute("inert", "");

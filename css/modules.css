@@ -4164,6 +4164,14 @@ img.archive-gallery-image {
   grid-template-columns: minmax(min(100%, 13rem), 18rem);
 }
 
+.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-grid {
+  grid-template-columns: minmax(min(100%, 13rem), 18rem);
+}
+
+.venue-relationships:has(.venue-relationship-card[aria-expanded="true"]) .venue-relationship-grid {
+  grid-template-columns: minmax(min(100%, 13rem), 18rem);
+}
+
 .venue-relationship-card {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -4178,6 +4186,14 @@ img.archive-gallery-image {
 }
 
 .venue-relationships.is-focused .venue-relationship-card.is-inactive {
+  display: none;
+}
+
+.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-card:not(.is-expanded) {
+  display: none;
+}
+
+.venue-relationships:has(.venue-relationship-card[aria-expanded="true"]) .venue-relationship-card:not([aria-expanded="true"]) {
   display: none;
 }
 
