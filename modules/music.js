@@ -1800,15 +1800,16 @@ function renderVenueShowsPanel(panel, shows) {
     const list = document.createElement("div");
     list.className = "venue-shows-list";
     list.setAttribute("role", "list");
-    groupedShows.get(year)
-      .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)))
-      .forEach((show) => {
-        const item = document.createElement("div");
-        item.className = "venue-show-item";
-        item.setAttribute("role", "listitem");
-        item.append(createVenueShowRow(show));
-        list.append(item);
-      });
+    const yearShows = groupedShows.get(year)
+      .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)));
+    list.classList.toggle("venue-shows-list--split", yearShows.length > 1);
+    yearShows.forEach((show) => {
+      const item = document.createElement("div");
+      item.className = "venue-show-item";
+      item.setAttribute("role", "listitem");
+      item.append(createVenueShowRow(show));
+      list.append(item);
+    });
 
     group.append(heading, list);
     inner.append(group);
@@ -2058,19 +2059,6 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (venueDetailVisualSecondary) {
     venueDetailVisualSecondary.textContent = region && region !== "Pending" ? `${region} Signal` : "Archive Signal";
   }
-  const mapFrame = venueDetail.querySelector(".venue-map-frame");
-  if (mapFrame) {
-    mapFrame.setAttribute("aria-label", `Static map visualization centered on ${location || name}`);
-  }
-  const mapPrimary = venueDetail.querySelector(".venue-map-label--primary");
-  if (mapPrimary) {
-    mapPrimary.textContent = name;
-  }
-  const mapRegion = venueDetail.querySelector(".venue-map-label--region");
-  if (mapRegion) {
-    mapRegion.textContent = region || "Pending";
-  }
-
   setMusicVenueDetailRelationshipCount("shows", linkedShows.length);
   setMusicVenueDetailRelationshipCount("bands", stats.bands);
   setMusicVenueDetailRelationshipCount("photos", stats.photos);
