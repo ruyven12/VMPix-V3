@@ -38,6 +38,10 @@ let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
 let musicShowsSetsDataState = "fallback";
 let musicShowsIndexDataRequested = false;
+let musicShowsIndexRowsCache = null;
+let musicShowsIndexRowsCacheState = "";
+let musicShowsIndexRowsCacheSource = null;
+let musicShowsIndexRowsCacheLength = 0;
 let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
@@ -1773,8 +1777,8 @@ function getMusicVenueShows(venue) {
     .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)));
 }
 
-function getMusicVenueDetailStats(venue) {
-  const shows = getMusicVenueShows(venue);
+function getMusicVenueDetailStats(venue, linkedShows = null) {
+  const shows = Array.isArray(linkedShows) ? linkedShows : getMusicVenueShows(venue);
   const uniqueBands = new Set();
   let photoTotal = 0;
 
@@ -1871,9 +1875,10 @@ function getMusicVenueShowArtistNames(show) {
     : getMusicVenueShowTitleArtistNames(show);
 }
 
-function getMusicVenueArtists(venue) {
+function getMusicVenueArtists(venue, linkedShows = null) {
   const artistsByKey = new Map();
-  getMusicVenueShows(venue).forEach((show) => {
+  const shows = Array.isArray(linkedShows) ? linkedShows : getMusicVenueShows(venue);
+  shows.forEach((show) => {
     const showArtists = new Map();
     getMusicVenueShowArtistNames(show).forEach((bandName) => {
       const name = String(bandName || "").trim();
@@ -2508,8 +2513,8 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     : "Pending";
   const slug = hasVenue ? getMusicVenueSlug(venue) : normalizeMusicVenueSlugValue(requestedSlug);
   const linkedShows = hasVenue ? getMusicVenueShows(venue) : [];
-  const stats = hasVenue ? getMusicVenueDetailStats(venue) : { shows: null, bands: null, photos: null };
-  const linkedArtists = hasVenue ? getMusicVenueArtists(venue) : [];
+  const stats = hasVenue ? getMusicVenueDetailStats(venue, linkedShows) : { shows: null, bands: null, photos: null };
+  const linkedArtists = hasVenue ? getMusicVenueArtists(venue, linkedShows) : [];
   const initials = getBandInitials(name) || "VN";
 
   venueDetail.classList.toggle("is-missing", !hasVenue);
@@ -2898,6 +2903,13 @@ function normalizeMusicShowSetRows(payload) {
     .sort((a, b) => b.dateSort - a.dateSort || a.name.localeCompare(b.name));
 }
 
+function resetMusicShowsIndexRowsCache() {
+  musicShowsIndexRowsCache = null;
+  musicShowsIndexRowsCacheState = "";
+  musicShowsIndexRowsCacheSource = null;
+  musicShowsIndexRowsCacheLength = 0;
+}
+
 function getFallbackSetRowsData() {
   return Array.from(setsRows).map((row, index) => {
     const dataset = row.dataset || {};
@@ -2928,6 +2940,7 @@ function getFallbackSetRowsData() {
 function setMusicShowsSetsCollection(rows, stateName = "fallback") {
   musicShowsSetsCollection = Array.isArray(rows) ? rows : [];
   musicShowsSetsDataState = stateName;
+  resetMusicShowsIndexRowsCache();
   if (setsArchive) {
     setsArchive.dataset.setsDataState = stateName;
     setsArchive.setAttribute("aria-busy", String(stateName === "loading"));
@@ -6885,10 +6898,29 @@ function getMusicShowsIndexSourceRows() {
 }
 
 function getMusicShowsIndexRows() {
-  return getMusicShowsIndexSourceRows()
+  const isLiveSource = musicShowsSetsDataState === "live" && musicShowsSetsCollection.length > 0;
+  const sourceRows = getMusicShowsIndexSourceRows();
+  const sourceRef = isLiveSource ? musicShowsSetsCollection : musicShowsArchiveRows;
+  const cacheState = isLiveSource ? "live" : musicShowsSetsDataState;
+
+  if (
+    musicShowsIndexRowsCache &&
+    musicShowsIndexRowsCacheState === cacheState &&
+    musicShowsIndexRowsCacheSource === sourceRef &&
+    musicShowsIndexRowsCacheLength === sourceRows.length
+  ) {
+    return musicShowsIndexRowsCache;
+  }
+
+  musicShowsIndexRowsCache = sourceRows
     .map(normalizeMusicShowsIndexRow)
     .filter((show) => show.name)
     .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || left.name.localeCompare(right.name));
+  musicShowsIndexRowsCacheState = cacheState;
+  musicShowsIndexRowsCacheSource = sourceRef;
+  musicShowsIndexRowsCacheLength = sourceRows.length;
+
+  return musicShowsIndexRowsCache;
 }
 
 function getMusicShowsUniqueOptions(rows, valueGetter, sortMode = "alpha") {
