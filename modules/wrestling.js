@@ -583,6 +583,10 @@ function findLiveWrestlingShowById(showId) {
 
   return wrestlingShowsCollection.find((show) => {
     const candidates = [
+      getWrestlingShowRouteCode(show),
+      show.dateKey,
+      show.date_key,
+      getWrestlingShowDateKey(show.rawDate || show.date || show.eventDate || show.show_date),
       show.showId,
       show.eventId,
       show.showKey,
@@ -1063,7 +1067,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   }
 
   setWrestlingRelationshipDataset(wrestlingShowDetailShell, show);
-  wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show.showId);
+  wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
 
   const backButton = document.createElement("button");
   backButton.className = "wrestling-detail-back";
