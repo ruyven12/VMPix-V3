@@ -2970,7 +2970,8 @@ img.archive-gallery-image {
 
 .music-landing-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(min(100%, 6.25rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
   gap: 0.46rem;
   overflow: visible;
 }
@@ -3016,6 +3017,8 @@ img.archive-gallery-image {
 
 .music-landing-stat--photos {
   grid-column: 1 / -1;
+  width: min(100%, 24rem);
+  justify-self: center;
 }
 
 .music-landing-stat-value {
@@ -3044,7 +3047,7 @@ img.archive-gallery-image {
 
 .music-landing-card-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.54rem;
   overflow: visible;
 }
@@ -3068,6 +3071,15 @@ img.archive-gallery-image {
   box-shadow: inset 0 0 0 1px rgba(247, 247, 242, 0.025);
   overflow: hidden;
   contain: paint;
+}
+
+.music-landing-card[data-music-landing-route] {
+  cursor: pointer;
+}
+
+.music-landing-card[data-music-landing-route]:focus-visible {
+  outline: 2px solid rgba(0, 178, 190, 0.76);
+  outline-offset: 0.16rem;
 }
 
 .music-landing-card::before,
@@ -3094,17 +3106,6 @@ img.archive-gallery-image {
   border-bottom: 1px solid rgba(247, 247, 242, 0.06);
 }
 
-.music-landing-card-index {
-  position: relative;
-  z-index: 1;
-  align-self: start;
-  width: max-content;
-  color: rgba(0, 178, 190, 0.78);
-  font-size: 0.68rem;
-  font-weight: 400;
-  line-height: 1;
-}
-
 .music-landing-card-title {
   position: relative;
   z-index: 1;
@@ -3115,6 +3116,12 @@ img.archive-gallery-image {
   line-height: 1;
   text-transform: none;
   overflow-wrap: anywhere;
+}
+
+.music-landing-card .music-landing-stat-value {
+  position: relative;
+  z-index: 1;
+  justify-self: start;
 }
 
 .music-landing-card-copy {
@@ -3290,14 +3297,17 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .music-landing-stat--photos {
     grid-column: 1 / -1;
   }
 
-  .music-landing-card-grid,
+  .music-landing-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .music-landing-activity-list {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -3313,7 +3323,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .music-landing-stat--photos {
@@ -3335,7 +3345,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .music-landing-card {
@@ -3366,7 +3376,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.38rem;
   }
 
@@ -3419,7 +3429,7 @@ img.archive-gallery-image {
   }
 
   .music-landing-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .music-landing-stat--photos {
@@ -3441,7 +3451,7 @@ img.archive-gallery-image {
 
 @media (min-width: 1024px) {
   .music-landing-card-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
