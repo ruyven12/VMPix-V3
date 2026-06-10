@@ -159,7 +159,7 @@ let wrestlingShowsDataState = "idle";
 let wrestlingShowsDataRequested = false;
 let wrestlingShowsSearchRenderTimer = 0;
 let activeWrestlingShowsSearch = "";
-let activeWrestlingShowsYearFilter = "Upcoming";
+let activeWrestlingShowsYearFilter = "";
 let activeWrestlingShowsPromotionFilter = "";
 let activeWrestlingShowsVenueFilter = "";
 let activeWrestlingShowsSort = "newest";
@@ -171,7 +171,7 @@ const wrestlingShowsStateCopy = {
   },
   empty: {
     title: "No Events Found",
-    copy: "Try a different year or return to Upcoming.",
+    copy: "Try a different filter or search term.",
   },
   error: {
     title: "Event Archive Offline",
@@ -727,7 +727,7 @@ function updateWrestlingShowsFilter(filterName, value) {
 
 function resetWrestlingShowsFilters() {
   activeWrestlingShowsSearch = "";
-  activeWrestlingShowsYearFilter = "Upcoming";
+  activeWrestlingShowsYearFilter = "";
   activeWrestlingShowsPromotionFilter = "";
   activeWrestlingShowsVenueFilter = "";
   renderWrestlingShowsArchiveImmediately();
