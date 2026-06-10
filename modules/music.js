@@ -29,9 +29,10 @@ const bandsStatusFilterLabels = {
 let musicBandsIndexCollection = getMockCollection("musicBands", { clone: false });
 let musicBandsIndexRequest = null;
 let musicBandsIndexLoaded = false;
-let musicPeopleIndexCollection = getMockCollection("musicPeople", { clone: false });
+let musicPeopleIndexCollection = [];
 let musicPeopleIndexRequest = null;
 let musicPeopleIndexLoaded = false;
+let musicPeopleIndexDataState = "idle";
 let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
@@ -898,7 +899,8 @@ function getMusicPeopleIndexCollection() {
 }
 
 function setMusicPeopleIndexCollection(rows, stateName = "fallback") {
-  musicPeopleIndexCollection = Array.isArray(rows) ? rows : getMockCollection("musicPeople", { clone: false });
+  musicPeopleIndexCollection = Array.isArray(rows) ? rows : [];
+  musicPeopleIndexDataState = stateName;
   if (typeof mockCollections !== "undefined") {
     mockCollections.musicPeople = musicPeopleIndexCollection;
   }
@@ -948,7 +950,7 @@ function normalizeLiveMusicPeople(payload) {
 }
 
 function restoreMusicPeopleFallback() {
-  setMusicPeopleIndexCollection(musicPeopleRows, "fallback");
+  setMusicPeopleIndexCollection([], "error");
 }
 
 function requestMusicPeopleIndexData() {
@@ -960,13 +962,11 @@ function requestMusicPeopleIndexData() {
   }
   if (typeof fetch !== "function") {
     restoreMusicPeopleFallback();
+    renderMusicPeopleIndex({ shouldResetScroll: false });
     return Promise.resolve(false);
   }
 
-  if (musicPeopleIndex) {
-    musicPeopleIndex.dataset.peopleDataState = "loading";
-    musicPeopleIndex.setAttribute("aria-busy", "true");
-  }
+  setMusicPeopleIndexCollection([], "loading");
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), MUSIC_PEOPLE_INDEX_TIMEOUT_MS)
@@ -4992,13 +4992,16 @@ function createBandListRow(band, options = {}) {
   arrow.className = "bands-row-arrow";
   arrow.setAttribute("aria-hidden", "true");
   arrow.textContent = ">";
+  const action = document.createElement("span");
+  action.className = "bands-row-action";
 
   meta.append(region, status);
   if (shouldShowArchiveSize) {
-    meta.append(stats);
+    action.append(stats);
   }
   main.append(name, meta);
-  row.append(thumb, main, arrow);
+  action.append(arrow);
+  row.append(thumb, main, action);
   row.addEventListener("click", () => {
     activeBandsLetter = letter;
     navigateToBandDetail(band);
@@ -5543,7 +5546,7 @@ function getMusicPeopleRowsWithCategoryNumbers(rows) {
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
-    .filter((person) => person.name && person.photos > 0)
+    .filter((person) => person.name)
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
@@ -6567,11 +6570,16 @@ function renderMusicPeopleIndex(options = {}) {
   }
 
   const forcedState = getForcedMockState("musicPeople");
+  const dataState = musicPeopleIndexDataState || musicPeopleIndex?.dataset.peopleDataState || "idle";
   const filteredRows = getFilteredMusicPeopleRows();
   const numberedRows = getMusicPeopleRowsWithCategoryNumbers(filteredRows);
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
     renderMockState(fragment, forcedState, "musicPeople");
+  } else if (dataState === "loading" && !musicPeopleIndexLoaded) {
+    renderMockState(fragment, "loading", "musicPeople");
+  } else if (dataState === "error" && numberedRows.length === 0) {
+    renderMockState(fragment, "error", "musicPeople");
   } else {
     numberedRows.forEach((person) => {
       fragment.append(createMusicPeopleRow(person));
@@ -6580,7 +6588,7 @@ function renderMusicPeopleIndex(options = {}) {
       fragment.append(createMockStateCard("partial", "musicPeople"));
     }
   }
-  if (!forcedState && filteredRows.length === 0) {
+  if (!forcedState && !["loading", "error"].includes(dataState) && filteredRows.length === 0) {
     fragment.append(createMusicPeopleEmptyState());
   }
   musicPeopleList.replaceChildren(fragment);
@@ -8118,8 +8126,9 @@ function setPeopleIndexVisible(isVisible) {
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
+    const peopleRequest = requestMusicPeopleIndexData();
     renderMusicPeopleIndex({ shouldResetScroll: false });
-    requestMusicPeopleIndexData().then(() => {
+    peopleRequest.then(() => {
       if (getRouteFromUrl().name === "music-people") {
         renderMusicPeopleIndex({ shouldResetScroll: false });
       }
