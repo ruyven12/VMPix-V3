@@ -10547,6 +10547,42 @@ img.archive-gallery-image {
   list-style: none;
 }
 
+.wrestling-show-state {
+  min-width: 0;
+  display: grid;
+  gap: 0.32rem;
+  padding: clamp(0.72rem, 2.4vw, 0.95rem);
+  border: 1px solid rgba(247, 247, 242, 0.09);
+  border-left-color: rgba(213, 22, 34, 0.32);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
+    linear-gradient(90deg, rgba(213, 22, 34, 0.075), transparent 42%),
+    rgba(7, 7, 10, 0.78);
+}
+
+.wrestling-show-state-title,
+.wrestling-show-state-copy {
+  margin: 0;
+}
+
+.wrestling-show-state-title {
+  color: rgba(247, 247, 242, 0.88);
+  font-size: clamp(0.88rem, 3.4vw, 1.08rem);
+  font-weight: 400;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.wrestling-show-state-copy {
+  color: rgba(247, 247, 242, 0.54);
+  font-size: clamp(0.64rem, 2.5vw, 0.78rem);
+  line-height: 1.24;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
 .wrestling-show-entry {
   position: relative;
   min-width: 0;
@@ -11113,6 +11149,15 @@ img.archive-gallery-image {
     linear-gradient(90deg, rgba(213, 22, 34, 0.07), transparent 44%),
     rgba(7, 7, 10, 0.72);
   overflow: hidden;
+}
+
+.wrestling-match-card[role="link"] {
+  cursor: pointer;
+}
+
+.wrestling-match-card[role="link"]:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
 }
 
 .wrestling-match-type {

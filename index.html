@@ -1117,7 +1117,7 @@
             </div>
           </header>
 
-          <nav class="wrestling-year-filter" aria-label="Wrestling show year filter placeholder">
+          <nav class="wrestling-year-filter" aria-label="Wrestling show year filter">
             <button class="wrestling-year-chip is-active" type="button" aria-pressed="true">Upcoming</button>
             <button class="wrestling-year-chip" type="button" aria-pressed="false">2026</button>
             <button class="wrestling-year-chip" type="button" aria-pressed="false">2025</button>
@@ -1127,80 +1127,17 @@
             <button class="wrestling-year-chip" type="button" aria-pressed="false">2021</button>
           </nav>
 
-          <div class="wrestling-shows-tools" aria-label="Wrestling shows sort placeholder">
+          <div class="wrestling-shows-tools" aria-label="Wrestling shows sort">
             <label class="wrestling-sort-label" for="wrestling-shows-sort">Sort By</label>
             <select class="wrestling-sort-select" id="wrestling-shows-sort" aria-label="Sort wrestling shows">
-              <option>Newest</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
             </select>
           </div>
 
-          <ol class="wrestling-show-list" aria-label="Wrestling show archive placeholder entries">
-            <li class="wrestling-show-entry" data-wrestling-show-id="warzone-26">
-              <div class="wrestling-show-poster" aria-hidden="true"><span>WZ</span></div>
-              <div class="wrestling-show-copy">
-                <p class="wrestling-show-promotion">Limitless Wrestling</p>
-                <h3 class="wrestling-show-title">Warzone &rsquo;26</h3>
-                <p class="wrestling-show-date">May 8th, 2026</p>
-                <p class="wrestling-show-place">Westbrook Armory</p>
-                <p class="wrestling-show-location">Westbrook, MA</p>
-              </div>
-              <span class="wrestling-show-arrow" aria-hidden="true">&rsaquo;</span>
-            </li>
-            <li class="wrestling-show-entry" data-wrestling-show-id="cant-kick-up-the-roots">
-              <div class="wrestling-show-poster" aria-hidden="true"><span>CK</span></div>
-              <div class="wrestling-show-copy">
-                <p class="wrestling-show-promotion">Limitless Wrestling</p>
-                <h3 class="wrestling-show-title">Can&rsquo;t Kick Up The Roots</h3>
-                <p class="wrestling-show-date">April 24th, 2026</p>
-                <p class="wrestling-show-place">Portland Club</p>
-                <p class="wrestling-show-location">Portland, ME</p>
-              </div>
-              <span class="wrestling-show-arrow" aria-hidden="true">&rsaquo;</span>
-            </li>
-            <li class="wrestling-show-entry" data-wrestling-show-id="bissell-brothers-bash-26">
-              <div class="wrestling-show-poster" aria-hidden="true"><span>BB</span></div>
-              <div class="wrestling-show-copy">
-                <p class="wrestling-show-promotion">Limitless Wrestling</p>
-                <h3 class="wrestling-show-title">Bissell Brothers Bash &rsquo;26</h3>
-                <p class="wrestling-show-date">March 27th, 2026</p>
-                <p class="wrestling-show-place">Bissell Brothers Brewing Co.</p>
-                <p class="wrestling-show-location">Portland, ME</p>
-              </div>
-              <span class="wrestling-show-arrow" aria-hidden="true">&rsaquo;</span>
-            </li>
-            <li class="wrestling-show-entry" data-wrestling-show-id="gnomie-and-the-machine">
-              <div class="wrestling-show-poster" aria-hidden="true"><span>GM</span></div>
-              <div class="wrestling-show-copy">
-                <p class="wrestling-show-promotion">Limitless Wrestling</p>
-                <h3 class="wrestling-show-title">Gnomie And The Machine</h3>
-                <p class="wrestling-show-date">February 21st, 2026</p>
-                <p class="wrestling-show-place">Auburn Hall</p>
-                <p class="wrestling-show-location">Auburn, ME</p>
-              </div>
-              <span class="wrestling-show-arrow" aria-hidden="true">&rsaquo;</span>
-            </li>
-            <li class="wrestling-show-entry" data-wrestling-show-id="limitless-rumble-26">
-              <div class="wrestling-show-poster" aria-hidden="true"><span>LR</span></div>
-              <div class="wrestling-show-copy">
-                <p class="wrestling-show-promotion">Limitless Wrestling</p>
-                <h3 class="wrestling-show-title">Limitless Rumble &rsquo;26</h3>
-                <p class="wrestling-show-date">January 16th, 2026</p>
-                <p class="wrestling-show-place">Cross Insurance Center</p>
-                <p class="wrestling-show-location">Bangor, ME</p>
-              </div>
-              <span class="wrestling-show-arrow" aria-hidden="true">&rsaquo;</span>
-            </li>
-          </ol>
+          <ol class="wrestling-show-list" aria-label="Wrestling show archive entries" data-wrestling-show-list></ol>
 
-          <nav class="wrestling-pagination" aria-label="Wrestling shows pagination placeholder">
-            <button class="wrestling-page-button" type="button" aria-label="Previous page">&lsaquo;</button>
-            <button class="wrestling-page-button is-active" type="button" aria-current="page">1</button>
-            <button class="wrestling-page-button" type="button">2</button>
-            <button class="wrestling-page-button" type="button">3</button>
-            <span class="wrestling-page-ellipsis" aria-hidden="true">&hellip;</span>
-            <button class="wrestling-page-button" type="button">43</button>
-            <button class="wrestling-page-button" type="button" aria-label="Next page">&rsaquo;</button>
-          </nav>
+          <nav class="wrestling-pagination" aria-label="Wrestling shows pagination" data-wrestling-pagination hidden></nav>
         </section>
         <section class="wrestling-show-detail-shell" aria-labelledby="wrestling-show-detail-title" aria-hidden="true" inert data-wrestling-show-detail-shell>
           <button class="wrestling-detail-back" type="button" data-wrestling-show-detail-back>

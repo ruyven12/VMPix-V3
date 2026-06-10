@@ -1593,6 +1593,9 @@ function showWrestlingShowsIndex() {
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
+  if (typeof renderWrestlingShowsArchive === "function") {
+    renderWrestlingShowsArchive();
+  }
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");
@@ -1643,6 +1646,9 @@ function showWrestlingShowDetail(showId = "warzone-26") {
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
   setWrestlingVenuesHidden(true);
+  if (typeof renderWrestlingShowDetailRoute === "function") {
+    renderWrestlingShowDetailRoute(showId);
+  }
   setWrestlingShowDetailHidden(false);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
@@ -1659,7 +1665,7 @@ function showWrestlingShowDetail(showId = "warzone-26") {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
-  if (typeof updateWrestlingShowDetailRelationshipHooks === "function") {
+  if (typeof renderWrestlingShowDetailRoute !== "function" && typeof updateWrestlingShowDetailRelationshipHooks === "function") {
     updateWrestlingShowDetailRelationshipHooks(showId);
   }
   setCurrentView("Show Detail");
