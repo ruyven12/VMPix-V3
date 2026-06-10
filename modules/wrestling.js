@@ -145,13 +145,23 @@ const WRESTLING_SHOWS_API_LIMIT = 100;
 const WRESTLING_SHOWS_TIMEOUT_MS = 15000;
 const wrestlingShowList = document.querySelector("[data-wrestling-show-list]") || document.querySelector(".wrestling-show-list");
 const wrestlingShowYearChips = document.querySelectorAll(".wrestling-year-chip");
+const wrestlingShowSearchInput = document.querySelector("[data-wrestling-shows-filter='search']");
+const wrestlingShowYearSelect = document.querySelector("[data-wrestling-shows-filter='year']");
+const wrestlingShowPromotionSelect = document.querySelector("[data-wrestling-shows-filter='promotion']");
+const wrestlingShowVenueSelect = document.querySelector("[data-wrestling-shows-filter='venue']");
+const wrestlingShowFilterReset = document.querySelector("[data-wrestling-shows-filter-reset]");
 const wrestlingShowSortSelect = document.querySelector("#wrestling-shows-sort");
 const wrestlingShowPagination = document.querySelector("[data-wrestling-pagination]") || document.querySelector(".wrestling-pagination");
+const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
 let wrestlingShowsCollection = [];
 let wrestlingShowsRequest = null;
 let wrestlingShowsDataState = "idle";
 let wrestlingShowsDataRequested = false;
+let wrestlingShowsSearchRenderTimer = 0;
+let activeWrestlingShowsSearch = "";
 let activeWrestlingShowsYearFilter = "Upcoming";
+let activeWrestlingShowsPromotionFilter = "";
+let activeWrestlingShowsVenueFilter = "";
 let activeWrestlingShowsSort = "newest";
 
 const wrestlingShowsStateCopy = {
@@ -570,25 +580,157 @@ function getWrestlingShowsIndexRows() {
   });
 }
 
+function getWrestlingShowsUniqueOptions(rows, valueGetter, sortMode = "alpha") {
+  const values = [...new Set(rows
+    .map(valueGetter)
+    .map((value) => String(value || "").trim())
+    .filter(Boolean))];
+
+  if (sortMode === "year-desc") {
+    return values.sort((left, right) => Number.parseInt(right, 10) - Number.parseInt(left, 10));
+  }
+
+  return values.sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeActiveWrestlingShowsFilters(rows) {
+  const years = new Set(getWrestlingShowsUniqueOptions(rows, (show) => show.year, "year-desc").filter((year) => /^\d{4}$/.test(year)));
+  const promotions = new Set(getWrestlingShowsUniqueOptions(rows, (show) => show.promotion === "Promotion Pending" ? "" : show.promotion));
+  const venues = new Set(getWrestlingShowsUniqueOptions(rows, (show) => show.venue === "Venue Pending" ? "" : show.venue));
+  if (activeWrestlingShowsYearFilter && activeWrestlingShowsYearFilter !== "Upcoming" && !years.has(activeWrestlingShowsYearFilter)) {
+    activeWrestlingShowsYearFilter = "";
+  }
+  if (activeWrestlingShowsPromotionFilter && !promotions.has(activeWrestlingShowsPromotionFilter)) {
+    activeWrestlingShowsPromotionFilter = "";
+  }
+  if (activeWrestlingShowsVenueFilter && !venues.has(activeWrestlingShowsVenueFilter)) {
+    activeWrestlingShowsVenueFilter = "";
+  }
+}
+
+function normalizeWrestlingShowsSearchValue(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getWrestlingShowsSearchNeedle(value) {
+  const normalized = normalizeWrestlingShowsSearchValue(value).replace(/["\u201c\u201d]/g, "");
+  if (!normalized) {
+    return null;
+  }
+  return {
+    phrase: normalized,
+    terms: normalized.split(" ").filter(Boolean),
+  };
+}
+
+function doesWrestlingShowMatchSearch(show, searchNeedle) {
+  if (!searchNeedle) {
+    return true;
+  }
+  const haystack = normalizeWrestlingShowsSearchValue([
+    show.title,
+    show.eventName,
+    show.showName,
+    show.promotion,
+    show.venue,
+    show.city,
+    show.state,
+    show.location,
+  ].join(" "));
+  if (haystack.includes(searchNeedle.phrase)) {
+    return true;
+  }
+  return searchNeedle.terms.every((term) => haystack.includes(term));
+}
+
+function scheduleWrestlingShowsArchiveRender() {
+  window.clearTimeout(wrestlingShowsSearchRenderTimer);
+  wrestlingShowsSearchRenderTimer = window.setTimeout(() => {
+    renderWrestlingShowsArchive();
+  }, WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS);
+}
+
+function renderWrestlingShowsArchiveImmediately() {
+  window.clearTimeout(wrestlingShowsSearchRenderTimer);
+  renderWrestlingShowsArchive();
+}
+
 function getFilteredWrestlingShows() {
   const startOfToday = getWrestlingStartOfToday();
-  const rows = getWrestlingShowsIndexRows().filter((show) => {
+  const rows = getWrestlingShowsIndexRows();
+  normalizeActiveWrestlingShowsFilters(rows);
+  const searchNeedle = getWrestlingShowsSearchNeedle(activeWrestlingShowsSearch);
+  const filteredRows = rows.filter((show) => {
     if (activeWrestlingShowsYearFilter === "Upcoming") {
       const timestamp = getWrestlingShowTimestamp(show);
-      return timestamp >= startOfToday;
+      if (timestamp < startOfToday) {
+        return false;
+      }
     }
     if (/^\d{4}$/.test(activeWrestlingShowsYearFilter)) {
-      return show.year === activeWrestlingShowsYearFilter;
+      if (show.year !== activeWrestlingShowsYearFilter) {
+        return false;
+      }
     }
-    return true;
+    if (activeWrestlingShowsPromotionFilter && show.promotion !== activeWrestlingShowsPromotionFilter) {
+      return false;
+    }
+    if (activeWrestlingShowsVenueFilter && show.venue !== activeWrestlingShowsVenueFilter) {
+      return false;
+    }
+    return doesWrestlingShowMatchSearch(show, searchNeedle);
   });
 
-  return rows.sort((left, right) => {
+  return filteredRows.sort((left, right) => {
     const leftTime = getWrestlingShowTimestamp(left);
     const rightTime = getWrestlingShowTimestamp(right);
     const delta = activeWrestlingShowsSort === "oldest" ? leftTime - rightTime : rightTime - leftTime;
     return delta || left.title.localeCompare(right.title);
   });
+}
+
+function updateWrestlingShowsFilter(filterName, value) {
+  if (filterName === "search") {
+    const nextValue = String(value ?? "");
+    if (nextValue === activeWrestlingShowsSearch) {
+      return;
+    }
+    activeWrestlingShowsSearch = nextValue;
+    scheduleWrestlingShowsArchiveRender();
+    return;
+  }
+
+  const nextValue = String(value || "").trim();
+  if (filterName === "year") {
+    if (nextValue === activeWrestlingShowsYearFilter) {
+      return;
+    }
+    activeWrestlingShowsYearFilter = nextValue;
+  } else if (filterName === "promotion") {
+    if (nextValue === activeWrestlingShowsPromotionFilter) {
+      return;
+    }
+    activeWrestlingShowsPromotionFilter = nextValue;
+  } else if (filterName === "venue") {
+    if (nextValue === activeWrestlingShowsVenueFilter) {
+      return;
+    }
+    activeWrestlingShowsVenueFilter = nextValue;
+  } else {
+    return;
+  }
+  renderWrestlingShowsArchiveImmediately();
+}
+
+function resetWrestlingShowsFilters() {
+  activeWrestlingShowsSearch = "";
+  activeWrestlingShowsYearFilter = "Upcoming";
+  activeWrestlingShowsPromotionFilter = "";
+  activeWrestlingShowsVenueFilter = "";
+  renderWrestlingShowsArchiveImmediately();
 }
 
 function createWrestlingShowState(stateName) {
@@ -611,13 +753,71 @@ function createWrestlingShowState(stateName) {
   return item;
 }
 
+function syncWrestlingFilterSelectOptions(select, options, activeValue) {
+  if (!select) {
+    return;
+  }
+  const optionRows = Array.isArray(options) ? options : [];
+  const signature = optionRows.map((option) => `${option.value}\u0000${option.label}`).join("\u0001");
+  if (select.dataset.optionsSignature !== signature) {
+    const fragment = document.createDocumentFragment();
+    optionRows.forEach((optionRow) => {
+      const option = document.createElement("option");
+      option.value = optionRow.value;
+      option.textContent = optionRow.label;
+      fragment.append(option);
+    });
+    select.replaceChildren(fragment);
+    select.dataset.optionsSignature = signature;
+  }
+  select.value = activeValue;
+  if (select.value !== activeValue) {
+    select.value = "";
+  }
+}
+
 function syncWrestlingShowsControls() {
+  const rows = getWrestlingShowsIndexRows();
+  normalizeActiveWrestlingShowsFilters(rows);
+
   wrestlingShowYearChips.forEach((chip) => {
     const chipValue = chip.textContent.trim();
     const isActive = chipValue === activeWrestlingShowsYearFilter;
     chip.classList.toggle("is-active", isActive);
     chip.setAttribute("aria-pressed", String(isActive));
   });
+  if (wrestlingShowSearchInput && wrestlingShowSearchInput.value !== activeWrestlingShowsSearch) {
+    wrestlingShowSearchInput.value = activeWrestlingShowsSearch;
+  }
+  syncWrestlingFilterSelectOptions(
+    wrestlingShowYearSelect,
+    [
+      { value: "Upcoming", label: "Upcoming" },
+      { value: "", label: "All Years" },
+      ...getWrestlingShowsUniqueOptions(rows, (show) => show.year, "year-desc")
+        .filter((year) => /^\d{4}$/.test(year))
+        .map((year) => ({ value: year, label: year })),
+    ],
+    activeWrestlingShowsYearFilter
+  );
+  syncWrestlingFilterSelectOptions(
+    wrestlingShowPromotionSelect,
+    [
+      { value: "", label: "All Promotions" },
+      ...getWrestlingShowsUniqueOptions(rows, (show) => show.promotion === "Promotion Pending" ? "" : show.promotion)
+        .map((promotion) => ({ value: promotion, label: promotion })),
+    ],
+    activeWrestlingShowsPromotionFilter
+  );
+  syncWrestlingFilterSelectOptions(
+    wrestlingShowVenueSelect,
+    [
+      { value: "", label: "All Venues" },
+      ...getWrestlingShowsUniqueOptions(rows, (show) => show.venue === "Venue Pending" ? "" : show.venue)
+        .map((venue) => ({ value: venue, label: venue })),
+    ],
+    activeWrestlingShowsVenueFilter
+  );
   if (wrestlingShowSortSelect) {
     wrestlingShowSortSelect.value = activeWrestlingShowsSort;
   }
@@ -1627,6 +1827,31 @@ function initWrestlingShowsArchive() {
       renderWrestlingShowsArchive();
     });
   });
+
+  if (wrestlingShowSearchInput) {
+    wrestlingShowSearchInput.value = activeWrestlingShowsSearch;
+    wrestlingShowSearchInput.addEventListener("input", () => {
+      updateWrestlingShowsFilter("search", wrestlingShowSearchInput.value);
+    });
+  }
+  if (wrestlingShowYearSelect) {
+    wrestlingShowYearSelect.addEventListener("change", () => {
+      updateWrestlingShowsFilter("year", wrestlingShowYearSelect.value);
+    });
+  }
+  if (wrestlingShowPromotionSelect) {
+    wrestlingShowPromotionSelect.addEventListener("change", () => {
+      updateWrestlingShowsFilter("promotion", wrestlingShowPromotionSelect.value);
+    });
+  }
+  if (wrestlingShowVenueSelect) {
+    wrestlingShowVenueSelect.addEventListener("change", () => {
+      updateWrestlingShowsFilter("venue", wrestlingShowVenueSelect.value);
+    });
+  }
+  if (wrestlingShowFilterReset) {
+    wrestlingShowFilterReset.addEventListener("click", resetWrestlingShowsFilters);
+  }
 
   if (wrestlingShowSortSelect) {
     const hasOldestOption = Array.from(wrestlingShowSortSelect.options).some((option) => option.value === "oldest");

@@ -1117,15 +1117,25 @@
             </div>
           </header>
 
-          <nav class="wrestling-year-filter" aria-label="Wrestling show year filter">
-            <button class="wrestling-year-chip is-active" type="button" aria-pressed="true">Upcoming</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2026</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2025</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2024</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2023</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2022</button>
-            <button class="wrestling-year-chip" type="button" aria-pressed="false">2021</button>
-          </nav>
+          <section class="wrestling-shows-filters" aria-label="Wrestling event archive filters" data-wrestling-shows-filters>
+            <label class="wrestling-filter-field wrestling-filter-field--search">
+              <span class="wrestling-filter-label">Search Events</span>
+              <input class="wrestling-filter-input" type="search" autocomplete="off" placeholder="Search event, promotion, venue, city" data-wrestling-shows-filter="search">
+            </label>
+            <label class="wrestling-filter-field">
+              <span class="wrestling-filter-label">Year</span>
+              <select class="wrestling-filter-select" aria-label="Filter events by year" data-wrestling-shows-filter="year"></select>
+            </label>
+            <label class="wrestling-filter-field">
+              <span class="wrestling-filter-label">Promotion</span>
+              <select class="wrestling-filter-select" aria-label="Filter events by promotion" data-wrestling-shows-filter="promotion"></select>
+            </label>
+            <label class="wrestling-filter-field">
+              <span class="wrestling-filter-label">Venue</span>
+              <select class="wrestling-filter-select" aria-label="Filter events by venue" data-wrestling-shows-filter="venue"></select>
+            </label>
+            <button class="wrestling-filter-reset" type="button" data-wrestling-shows-filter-reset>Reset Filters</button>
+          </section>
 
           <div class="wrestling-shows-tools" aria-label="Wrestling shows sort">
             <label class="wrestling-sort-label" for="wrestling-shows-sort">Sort By</label>

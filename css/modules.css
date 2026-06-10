@@ -10383,6 +10383,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-shows-header,
+.wrestling-shows-filters,
 .wrestling-year-filter,
 .wrestling-shows-tools,
 .wrestling-show-list,
@@ -10463,6 +10464,91 @@ img.archive-gallery-image {
   left: 42%;
   height: 1px;
   background: rgba(213, 22, 34, 0.5);
+}
+
+.wrestling-shows-filters {
+  width: min(100%, 58rem);
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(0.42rem, 1.45vw, 0.62rem);
+  padding: clamp(0.48rem, 1.7vw, 0.66rem);
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-left-color: rgba(213, 22, 34, 0.25);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 72%),
+    linear-gradient(90deg, rgba(213, 22, 34, 0.06), transparent 44%),
+    rgba(1, 1, 3, 0.44);
+}
+
+.wrestling-filter-field {
+  min-width: 0;
+  display: grid;
+  gap: 0.26rem;
+}
+
+.wrestling-filter-field--search,
+.wrestling-filter-reset {
+  grid-column: 1 / -1;
+}
+
+.wrestling-filter-label {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.56rem, 2.1vw, 0.66rem);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wrestling-filter-input,
+.wrestling-filter-select,
+.wrestling-filter-reset {
+  appearance: none;
+  border-radius: var(--radius-sm);
+  color: rgba(247, 247, 242, 0.78);
+  font: inherit;
+  font-size: clamp(0.62rem, 2.35vw, 0.72rem);
+  line-height: 1.1;
+}
+
+.wrestling-filter-input,
+.wrestling-filter-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.7rem;
+  padding: 0.56rem 0.68rem;
+  border: 1px solid rgba(213, 22, 34, 0.22);
+  background: rgba(1, 1, 3, 0.58);
+  text-transform: none;
+}
+
+.wrestling-filter-input {
+  cursor: text;
+}
+
+.wrestling-filter-input::placeholder {
+  color: rgba(247, 247, 242, 0.34);
+}
+
+.wrestling-filter-select {
+  padding-right: 1.7rem;
+  background:
+    linear-gradient(45deg, transparent 50%, rgba(247, 247, 242, 0.62) 50%) right 0.75rem center / 0.34rem 0.34rem no-repeat,
+    linear-gradient(135deg, rgba(213, 22, 34, 0.08), transparent 66%),
+    rgba(7, 7, 10, 0.86);
+  cursor: pointer;
+}
+
+.wrestling-filter-reset {
+  min-height: 2.7rem;
+  min-width: 0;
+  padding: 0.56rem 0.78rem;
+  border: 1px solid rgba(247, 247, 242, 0.1);
+  background: rgba(247, 247, 242, 0.024);
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .wrestling-year-filter {
@@ -10740,6 +10826,9 @@ img.archive-gallery-image {
 }
 
 .wrestling-year-chip:focus-visible,
+.wrestling-filter-input:focus-visible,
+.wrestling-filter-select:focus-visible,
+.wrestling-filter-reset:focus-visible,
 .wrestling-sort-select:focus-visible,
 .wrestling-show-entry:focus-visible,
 .wrestling-page-button:focus-visible {
@@ -10811,6 +10900,15 @@ img.archive-gallery-image {
 }
 
 @media (max-width: 379px) {
+  .wrestling-shows-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.44rem;
+  }
+
+  .wrestling-filter-label {
+    white-space: normal;
+  }
+
   .wrestling-year-filter {
     flex-wrap: nowrap;
     justify-content: flex-start;
@@ -10887,6 +10985,20 @@ img.archive-gallery-image {
 @media (min-width: 760px) {
   .wrestling-shows-shell {
     gap: clamp(0.86rem, 1.8vw, 1.14rem);
+  }
+
+  .wrestling-shows-filters {
+    grid-template-columns:
+      minmax(13rem, 1.35fr)
+      minmax(7rem, 0.72fr)
+      minmax(9rem, 1fr)
+      minmax(9rem, 1fr)
+      auto;
+  }
+
+  .wrestling-filter-field--search,
+  .wrestling-filter-reset {
+    grid-column: auto;
   }
 
   .wrestling-shows-tools {
