@@ -253,6 +253,31 @@ function formatWrestlingShowDate(value) {
   return `${parsed.toLocaleString("en-US", { month: "long" })} ${getWrestlingOrdinal(parsed.getDate())}, ${parsed.getFullYear()}`;
 }
 
+function formatWrestlingDateKeyFromDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+    return "";
+  }
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+  return `${month}${day}${year}`;
+}
+
+function getWrestlingShowDateKey(value) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) {
+    return "";
+  }
+
+  const compactValue = rawValue.replace(/\D/g, "");
+  if (/^\d{6}$/.test(compactValue)) {
+    return compactValue;
+  }
+
+  const parsed = parseWrestlingShowDate(rawValue);
+  return parsed ? formatWrestlingDateKeyFromDate(parsed) : "";
+}
+
 function getWrestlingStartOfToday() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -359,6 +384,9 @@ function normalizeWrestlingShowRow(record = {}, index = 0) {
   const rawId = getWrestlingText(source.show_id || source.showId || source.id);
   const rawDate = getWrestlingText(source.date || source.dateKey || source.eventDate || source.show_date);
   const parsedDate = parseWrestlingShowDate(rawDate);
+  const dateKey = getWrestlingShowDateKey(source.dateKey || source.date_key)
+    || getWrestlingShowDateKey(rawDate)
+    || getWrestlingShowDateKey(showKey);
   const venueId = normalizeWrestlingArchiveSlug(source.venue_id || source.venue_details?.venue_id || getWrestlingVenueName(source), "pending-venue");
   const city = getWrestlingText(source.city || source.venue_details?.city);
   const state = getWrestlingText(source.state || source.venue_details?.state);
@@ -369,6 +397,7 @@ function normalizeWrestlingShowRow(record = {}, index = 0) {
     eventId: showId,
     showKey,
     show_id: rawId || source.show_id,
+    dateKey,
     showName: rawTitle,
     eventName: rawTitle,
     title: rawTitle,
@@ -388,6 +417,7 @@ function normalizeWrestlingShowRow(record = {}, index = 0) {
     participantCount: Number.parseInt(source.stats?.participantCount ?? source.participantCount ?? "0", 10) || 0,
     aliases: [
       showKey,
+      dateKey,
       rawId,
       routeTitleId,
       normalizeWrestlingArchiveSlug(`${rawTitle}-${rawDate}`, ""),
@@ -831,7 +861,7 @@ function createWrestlingShowEntry(show) {
   const item = document.createElement("li");
   item.className = "wrestling-show-entry";
   item.dataset.wrestlingShowId = show.showId;
-  item.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show.showId);
+  item.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
   item.setAttribute("role", "link");
   item.tabIndex = 0;
   item.setAttribute("aria-label", `Open ${show.title}`);
@@ -875,7 +905,7 @@ function createWrestlingShowEntry(show) {
   arrow.textContent = ">";
 
   const navigateToShow = () => {
-    navigateToRoute(getWrestlingShowRouteUrl(show.showId), {
+    navigateToRoute(getWrestlingShowRouteUrl(show), {
       historyState: { fromWrestlingShowsIndex: true },
     });
   };
@@ -1156,8 +1186,21 @@ function getWrestlingMatchRouteUrl(eventRow) {
   return getWrestlingMatchRouteUrlByIds(eventRow.showId || eventRow.eventId, eventRow.matchId);
 }
 
-function getWrestlingShowRouteUrl(showId) {
-  return `${routePaths.wrestlingShows}/${encodeURIComponent(String(showId || "").trim())}`;
+function getWrestlingShowRouteCode(show) {
+  if (show && typeof show === "object") {
+    return getWrestlingText(
+      show.dateKey ||
+      show.date_key ||
+      getWrestlingShowDateKey(show.rawDate || show.date || show.eventDate || show.show_date) ||
+      show.showId ||
+      show.eventId
+    );
+  }
+  return getWrestlingText(show);
+}
+
+function getWrestlingShowRouteUrl(show) {
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(show))}`;
 }
 
 function getWrestlingLightboxRouteUrl(showId, matchId, photoId) {
