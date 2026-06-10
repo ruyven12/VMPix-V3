@@ -10470,7 +10470,7 @@ img.archive-gallery-image {
   width: min(100%, 58rem);
   justify-self: center;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   gap: clamp(0.42rem, 1.45vw, 0.62rem);
   padding: clamp(0.48rem, 1.7vw, 0.66rem);
@@ -10491,7 +10491,7 @@ img.archive-gallery-image {
 
 .wrestling-filter-field--search,
 .wrestling-filter-reset {
-  grid-column: 1 / -1;
+  grid-column: auto;
 }
 
 .wrestling-filter-label {
@@ -10542,6 +10542,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-filter-reset {
+  width: 100%;
   min-height: 2.7rem;
   min-width: 0;
   padding: 0.56rem 0.78rem;
@@ -10848,6 +10849,16 @@ img.archive-gallery-image {
   }
 }
 
+@media (min-width: 520px) {
+  .wrestling-shows-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wrestling-filter-field--search {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 479px) {
   .wrestling-shows-shell {
     gap: 0.62rem;
@@ -10901,7 +10912,6 @@ img.archive-gallery-image {
 
 @media (max-width: 379px) {
   .wrestling-shows-filters {
-    grid-template-columns: minmax(0, 1fr);
     padding: 0.44rem;
   }
 
@@ -10987,20 +10997,6 @@ img.archive-gallery-image {
     gap: clamp(0.86rem, 1.8vw, 1.14rem);
   }
 
-  .wrestling-shows-filters {
-    grid-template-columns:
-      minmax(13rem, 1.35fr)
-      minmax(7rem, 0.72fr)
-      minmax(9rem, 1fr)
-      minmax(9rem, 1fr)
-      auto;
-  }
-
-  .wrestling-filter-field--search,
-  .wrestling-filter-reset {
-    grid-column: auto;
-  }
-
   .wrestling-shows-tools {
     width: min(100%, 58rem);
     justify-self: center;
@@ -11011,6 +11007,22 @@ img.archive-gallery-image {
     grid-template-columns: clamp(5.35rem, 8vw, 6.35rem) minmax(0, 1fr) 2rem;
     min-height: clamp(8.15rem, 12vw, 9.4rem);
     padding: clamp(0.62rem, 1.2vw, 0.82rem);
+  }
+}
+
+@media (min-width: 980px) {
+  .wrestling-shows-filters {
+    grid-template-columns:
+      minmax(14rem, 1.55fr)
+      minmax(7rem, 0.72fr)
+      minmax(9rem, 1fr)
+      minmax(9rem, 1fr)
+      minmax(8.25rem, auto);
+  }
+
+  .wrestling-filter-field--search,
+  .wrestling-filter-reset {
+    grid-column: auto;
   }
 }
 
