@@ -4995,13 +4995,13 @@ function createBandListRow(band, options = {}) {
   const action = document.createElement("span");
   action.className = "bands-row-action";
 
-  meta.append(region, status);
+  meta.append(region);
   if (shouldShowArchiveSize) {
     action.append(stats);
   }
   main.append(name, meta);
   action.append(arrow);
-  row.append(thumb, main, action);
+  row.append(thumb, main, status, action);
   row.addEventListener("click", () => {
     activeBandsLetter = letter;
     navigateToBandDetail(band);
@@ -6919,10 +6919,60 @@ function normalizeActiveMusicShowsFilters(rows) {
   }
 }
 
+const MUSIC_SHOWS_SEARCH_DEBOUNCE_MS = 180;
+let musicShowsSearchRenderTimer = 0;
+
+function normalizeMusicShowsSearchValue(value) {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getMusicShowsSearchNeedle(value) {
+  const normalized = normalizeMusicShowsSearchValue(value).replace(/["\u201c\u201d]/g, "");
+  if (!normalized) {
+    return null;
+  }
+  return {
+    phrase: normalized,
+    terms: normalized.split(" ").filter(Boolean),
+  };
+}
+
+function doesMusicShowMatchSearch(show, searchNeedle) {
+  if (!searchNeedle) {
+    return true;
+  }
+  const haystack = normalizeMusicShowsSearchValue([
+    show.name,
+    show.venue,
+    show.city,
+    show.state,
+    show.location,
+  ].join(" "));
+  if (haystack.includes(searchNeedle.phrase)) {
+    return true;
+  }
+  return searchNeedle.terms.every((term) => haystack.includes(term));
+}
+
+function scheduleMusicShowsArchiveRender() {
+  window.clearTimeout(musicShowsSearchRenderTimer);
+  musicShowsSearchRenderTimer = window.setTimeout(() => {
+    renderMusicShowsArchive();
+  }, MUSIC_SHOWS_SEARCH_DEBOUNCE_MS);
+}
+
+function renderMusicShowsArchiveImmediately() {
+  window.clearTimeout(musicShowsSearchRenderTimer);
+  renderMusicShowsArchive();
+}
+
 function getFilteredMusicShows() {
   const rows = getMusicShowsIndexRows();
   normalizeActiveMusicShowsFilters(rows);
-  const searchTerm = activeMusicShowsSearch.trim().toLowerCase();
+  const searchNeedle = getMusicShowsSearchNeedle(activeMusicShowsSearch);
 
   return rows.filter((show) => {
     if (activeMusicShowsYearFilter && show.year !== activeMusicShowsYearFilter) {
@@ -6934,27 +6984,41 @@ function getFilteredMusicShows() {
     if (activeMusicShowsVenueFilter && show.venue !== activeMusicShowsVenueFilter) {
       return false;
     }
-    if (!searchTerm) {
-      return true;
-    }
-
-    return [show.name, show.venue, show.city, show.state, show.location]
-      .some((value) => String(value || "").toLowerCase().includes(searchTerm));
+    return doesMusicShowMatchSearch(show, searchNeedle);
   });
 }
 
 function updateMusicShowsFilter(filterName, value) {
-  const nextValue = String(value || "").trim();
   if (filterName === "search") {
+    const nextValue = String(value ?? "");
+    if (nextValue === activeMusicShowsSearch) {
+      return;
+    }
     activeMusicShowsSearch = nextValue;
-  } else if (filterName === "year") {
+    scheduleMusicShowsArchiveRender();
+    return;
+  }
+
+  const nextValue = String(value || "").trim();
+  if (filterName === "year") {
+    if (nextValue === activeMusicShowsYearFilter) {
+      return;
+    }
     activeMusicShowsYearFilter = nextValue;
   } else if (filterName === "state") {
+    if (nextValue === activeMusicShowsStateFilter) {
+      return;
+    }
     activeMusicShowsStateFilter = nextValue;
   } else if (filterName === "venue") {
+    if (nextValue === activeMusicShowsVenueFilter) {
+      return;
+    }
     activeMusicShowsVenueFilter = nextValue;
+  } else {
+    return;
   }
-  renderMusicShowsArchive();
+  renderMusicShowsArchiveImmediately();
 }
 
 function resetMusicShowsFilters() {
@@ -6962,7 +7026,7 @@ function resetMusicShowsFilters() {
   activeMusicShowsYearFilter = "";
   activeMusicShowsStateFilter = "";
   activeMusicShowsVenueFilter = "";
-  renderMusicShowsArchive();
+  renderMusicShowsArchiveImmediately();
 }
 
 function createMusicShowsState(stateName, stateCopy = musicShowsStateCopy[stateName] || musicShowsStateCopy.empty) {
