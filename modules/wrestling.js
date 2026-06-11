@@ -1340,10 +1340,12 @@ function getWrestlingMatchRouteUrlByIds(showId, matchRef, matchIndex = -1) {
     ? showId
     : findLiveWrestlingShowById(showId) || showId;
   const showRouteCode = getWrestlingShowRouteCode(showRouteSource);
-  const routeMatchRef = matchRef && typeof matchRef === "object"
+  const rawRouteMatchRef = matchRef && typeof matchRef === "object"
     ? getWrestlingMatchRouteRef(matchRef, matchIndex)
     : getWrestlingText(matchRef);
-  return `${routePaths.wrestlingShows}/${encodeURIComponent(showRouteCode)}/match/${encodeURIComponent(routeMatchRef)}`;
+  const routeMatchRefNumber = getWrestlingMatchRefNumber(rawRouteMatchRef);
+  const routeMatchRef = routeMatchRefNumber ? String(routeMatchRefNumber) : rawRouteMatchRef;
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(showRouteCode)}/match-${encodeURIComponent(routeMatchRef)}`;
 }
 
 function getWrestlingMatchRouteUrl(eventRow) {

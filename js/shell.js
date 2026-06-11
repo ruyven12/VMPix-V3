@@ -791,7 +791,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
   if (route.name === "wrestling-lightbox") {
     const showId = route.dateKey || route.showId || "warzone-26";
     const matchRef = route.matchRef || route.matchId || "1";
-    return `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchRef)}`;
+    return `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match-${encodeURIComponent(matchRef)}`;
   }
 
   return routeNameToShellBackTarget[route.name] || routePaths.portfolio;
@@ -1766,7 +1766,7 @@ function navigateToWrestlingPhoto(photoNumber) {
     wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
     "1";
 
-  navigateToRoute(`${showId}/match/${encodeURIComponent(matchRef)}/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
+  navigateToRoute(`${showId}/match-${encodeURIComponent(matchRef)}/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
 }
 
 function showWrestlingLightbox(showId, matchId, photoId) {
@@ -2484,7 +2484,7 @@ if (shell && startButton) {
           tile.dataset.wrestlingMatchId ||
           wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
           "1";
-        navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}`);
+        navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match-${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}`);
       }
     });
     tile.addEventListener("keydown", (event) => {
