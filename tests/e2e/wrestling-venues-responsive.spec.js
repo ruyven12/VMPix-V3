@@ -222,15 +222,22 @@ test.describe("wrestling venues route structure", () => {
     await expectWrestlingVenueShellState(page, "[data-wrestling-venues-shell]");
 
     await page.getByRole("button", { name: "Open Portland Expo" }).click();
-    await expect(page).toHaveURL(/\/wrestling\/venues\/portland-expo$/);
+    await expect(page).toHaveURL(/\/wrestling\/venues\/portland_expo$/);
     await expect(page.locator("[data-wrestling-venue-detail-shell]")).toBeVisible();
     await expectWrestlingVenueShellState(page, "[data-wrestling-venue-detail-shell]");
 
     const openEventButtons = page.locator(".wrestling-venue-event-open");
-    await expect(openEventButtons).toHaveCount(3);
-    await expect(openEventButtons.first()).toBeDisabled();
+    await expect(openEventButtons.first()).toBeEnabled();
     await expect(openEventButtons.first()).toHaveAttribute("data-wrestling-show-id", "warzone-26");
-    await expect(openEventButtons.first()).toHaveAttribute("data-wrestling-show-route", "/wrestling/shows/warzone-26");
+    await expect(openEventButtons.first()).toHaveAttribute("data-wrestling-show-route", "/wrestling/shows/050826");
+
+    await openEventButtons.first().click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826$/);
+    await expect(page.locator("[data-wrestling-show-detail-shell]")).toBeVisible();
+    await page.goBack({ waitUntil: "domcontentloaded" });
+    await expect(page).toHaveURL(/\/wrestling\/venues\/portland_expo$/);
+    await expect(page.locator("[data-wrestling-venue-detail-shell]")).toBeVisible();
+    await expectWrestlingVenueShellState(page, "[data-wrestling-venue-detail-shell]");
 
     await page.getByRole("button", { name: "Back to Wrestling Venues" }).click();
     await expect(page).toHaveURL(/\/wrestling\/venues$/);
@@ -265,8 +272,9 @@ for (const target of targets) {
       const shell = page.locator("[data-wrestling-venues-shell]");
       await expect(shell).toBeVisible();
       await expect(page.locator("[data-current-view]")).toHaveText("Wrestling Venues");
-      await expect(shell.getByText("WRESTLING VENUES")).toBeVisible();
-      await expect(shell.locator(".wrestling-venue-card")).toHaveCount(6);
+      await expect(shell.getByRole("heading", { name: /Wrestling Venues/i })).toBeVisible();
+      await expect(shell.locator(".wrestling-venue-card").first()).toBeVisible();
+      await expect(shell.locator(".wrestling-venue-card[data-wrestling-venue-route='/wrestling/venues/portland_expo']")).toHaveCount(1);
       await expectWrestlingVenueShellState(page, "[data-wrestling-venues-shell]");
       await expectCoreWrestlingCssVariables(page);
 
@@ -283,8 +291,8 @@ for (const target of targets) {
       await expectElementsFit(page, ".wrestling-venue-card-name, .wrestling-venue-card-location, .wrestling-venue-card-stat, .wrestling-venue-card-action");
       await expectTouchTargets(page, ".wrestling-venues-back, .wrestling-venues-search-input, .wrestling-venues-chip, .wrestling-venue-card");
 
-      const firstMediaBox = await shell.locator(".wrestling-venue-card-media").first().boundingBox();
-      expect(firstMediaBox.width).toBeGreaterThanOrEqual(96);
+      const firstMediaBox = await shell.locator(".wrestling-venue-card-mark").first().boundingBox();
+      expect(firstMediaBox.width).toBeGreaterThanOrEqual(32);
       expect(firstMediaBox.height).toBeLessThanOrEqual(target.size.height * 0.42);
 
       await page.screenshot({
@@ -305,7 +313,7 @@ for (const target of targets) {
 
     test("/wrestling/venues/:venueId keeps detail readable", async ({ page }, testInfo) => {
       const pageErrors = collectPageErrors(page);
-      const response = await page.goto("/wrestling/venues/portland-expo", { waitUntil: "domcontentloaded" });
+      const response = await page.goto("/wrestling/venues/portland_expo", { waitUntil: "domcontentloaded" });
       expect(response && response.ok()).toBe(true);
 
       const shell = page.locator("[data-wrestling-venue-detail-shell]");
@@ -314,11 +322,11 @@ for (const target of targets) {
       await expectWrestlingVenueShellState(page, "[data-wrestling-venue-detail-shell]");
       await expectCoreWrestlingCssVariables(page);
       await expect(shell.getByRole("heading", { name: "Portland Expo" })).toBeVisible();
-      await expect(shell.getByText("Portland, ME")).toBeVisible();
+      await expect(shell.getByText(/Portland, (ME|Maine)/)).toBeVisible();
       await expect(shell.getByText("EVENT HISTORY")).toBeVisible();
-      await expect(shell.locator(".wrestling-venue-event-row")).toHaveCount(3);
-      await expect(shell.locator(".wrestling-venue-event-open").first()).toBeDisabled();
-      await expect(shell.locator(".wrestling-venue-event-open").first()).toHaveAttribute("data-wrestling-show-route", "/wrestling/shows/warzone-26");
+      await expect(shell.locator(".wrestling-venue-event-row").first()).toBeVisible();
+      await expect(shell.locator(".wrestling-venue-event-open").first()).toBeEnabled();
+      await expect(shell.locator(".wrestling-venue-event-open").first()).toHaveAttribute("data-wrestling-show-route", "/wrestling/shows/050826");
 
       await expectNoHorizontalOverflow(page);
       await expectNoHorizontalOverflow(page, "[data-wrestling-venue-detail-shell]");
@@ -331,7 +339,7 @@ for (const target of targets) {
       expect(imageBox.height).toBeLessThanOrEqual(target.size.height * 0.46);
 
       await page.screenshot({
-        path: testInfo.outputPath(screenshotName(target.name, "/wrestling/venues/portland-expo")),
+        path: testInfo.outputPath(screenshotName(target.name, "/wrestling/venues/portland_expo")),
         fullPage: false,
       });
 

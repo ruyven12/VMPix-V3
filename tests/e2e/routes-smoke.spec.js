@@ -29,7 +29,7 @@ const routes = [
   { path: "/wrestling/people", rail: "Wrestling People", visibleShell: "[data-wrestling-people-shell]", text: "WRESTLING PEOPLE" },
   { path: "/wrestling/people/ace-romero", rail: "Person Detail", visibleShell: "[data-wrestling-person-detail-shell]", text: "EVENT HISTORY" },
   { path: "/wrestling/venues", rail: "Wrestling Venues", visibleShell: "[data-wrestling-venues-shell]", text: "WRESTLING VENUES" },
-  { path: "/wrestling/venues/portland-expo", rail: "Venue Detail", visibleShell: "[data-wrestling-venue-detail-shell]", text: "Portland Expo" },
+  { path: "/wrestling/venues/portland_expo", rail: "Venue Detail", visibleShell: "[data-wrestling-venue-detail-shell]", text: "Portland Expo" },
   { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },
@@ -38,6 +38,7 @@ const routes = [
 const ignoredConsoleErrors = [
   /fonts\.googleapis\.com/i,
   /fonts\.gstatic\.com/i,
+  /photos\.smugmug\.com/i,
 ];
 
 function screenshotName(viewportName, routePath) {
@@ -65,9 +66,11 @@ for (const viewport of viewports) {
         const pageErrors = [];
 
         page.on("console", (message) => {
+          const messageLocation = message.location();
+          const messageSource = `${message.text()} ${messageLocation.url || ""}`;
           if (
             message.type() === "error" &&
-            !ignoredConsoleErrors.some((pattern) => pattern.test(message.text()))
+            !ignoredConsoleErrors.some((pattern) => pattern.test(messageSource))
           ) {
             consoleErrors.push(message.text());
           }

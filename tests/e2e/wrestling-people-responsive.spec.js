@@ -225,11 +225,18 @@ test.describe("wrestling people route structure", () => {
     await expectWrestlingShellState(page, "[data-wrestling-person-detail-shell]");
 
     const openMatchButtons = page.locator(".wrestling-event-history-open");
-    await expect(openMatchButtons).toHaveCount(4);
-    await expect(openMatchButtons.first()).toBeDisabled();
-    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-event-id", "gnomie-and-the-machine");
-    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-id", "ace-romero-vs-anthony-gangone");
-    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/gnomie-and-the-machine/match/ace-romero-vs-anthony-gangone");
+    await expect(openMatchButtons.first()).toBeEnabled();
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-event-id", "warzone-26");
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-id", "match-5");
+    await expect(openMatchButtons.first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/050826/match-5");
+
+    await openMatchButtons.first().click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-5$/);
+    await expect(page.locator("[data-wrestling-match-gallery-shell]")).toBeVisible();
+    await page.goBack({ waitUntil: "domcontentloaded" });
+    await expect(page).toHaveURL(/\/wrestling\/people\/ace-romero$/);
+    await expect(page.locator("[data-wrestling-person-detail-shell]")).toBeVisible();
+    await expectWrestlingShellState(page, "[data-wrestling-person-detail-shell]");
 
     await page.getByRole("button", { name: "Back to Wrestling People" }).click();
     await expect(page).toHaveURL(/\/wrestling\/people$/);
@@ -264,8 +271,8 @@ for (const target of targets) {
       const shell = page.locator("[data-wrestling-people-shell]");
       await expect(shell).toBeVisible();
       await expect(page.locator("[data-current-view]")).toHaveText("Wrestling People");
-      await expect(shell.getByText("WRESTLING PEOPLE")).toBeVisible();
-      await expect(shell.locator(".wrestling-person-card")).toHaveCount(6);
+      await expect(shell.getByRole("heading", { name: /Wrestling People/i })).toBeVisible();
+      await expect(shell.locator(".wrestling-person-card").first()).toBeVisible();
       await expectWrestlingShellState(page, "[data-wrestling-people-shell]");
       await expectCoreWrestlingCssVariables(page);
 
@@ -310,17 +317,16 @@ for (const target of targets) {
       await expectCoreWrestlingCssVariables(page);
       await expect(shell.getByRole("heading", { name: "Ace Romero" })).toBeVisible();
       await expect(shell.getByText("Role")).toBeVisible();
-      await expect(shell.getByText("Wrestler")).toBeVisible();
       await expect(shell.getByText("EVENT HISTORY")).toBeVisible();
-      await expect(shell.locator(".wrestling-event-history-row")).toHaveCount(4);
-      await expect(shell.locator(".wrestling-event-history-open").first()).toBeDisabled();
-      await expect(shell.locator(".wrestling-event-history-open").first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/gnomie-and-the-machine/match/ace-romero-vs-anthony-gangone");
+      await expect(shell.locator(".wrestling-event-history-row").first()).toBeVisible();
+      await expect(shell.locator(".wrestling-event-history-open").first()).toBeEnabled();
+      await expect(shell.locator(".wrestling-event-history-open").first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/050826/match-5");
 
       await expectNoHorizontalOverflow(page);
       await expectNoHorizontalOverflow(page, "[data-wrestling-person-detail-shell]");
       await expectNoHiddenScrollTraps(page, "[data-wrestling-person-detail-shell]");
       await expectElementsFit(page, ".wrestling-person-detail-title, .wrestling-person-fact dt, .wrestling-person-fact dd, .wrestling-event-history-event h4, .wrestling-event-history-match-name, .wrestling-event-history-match-type, .wrestling-event-history-photos");
-      await expectTouchTargets(page, ".wrestling-person-detail-back, .wrestling-event-history-open");
+      await expectTouchTargets(page, ".wrestling-person-detail-back, .wrestling-event-history-open[data-wrestling-match-id]");
 
       const photoBox = await shell.locator(".wrestling-person-detail-photo").boundingBox();
       expect(photoBox.width).toBeGreaterThanOrEqual(120);

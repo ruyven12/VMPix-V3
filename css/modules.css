@@ -9939,9 +9939,8 @@ img.archive-gallery-image {
   max-width: 100%;
   color: rgba(213, 22, 34, 0.78);
   font-size: clamp(0.58rem, 2.24vw, 0.7rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .wrestling-person-row-affiliation,
