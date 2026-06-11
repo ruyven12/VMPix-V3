@@ -65,9 +65,42 @@ function getWrestlingVenueRouteUrl(venueId) {
     : routePaths.wrestlingVenues;
 }
 
-function findWrestlingVenueById(venueId) {
+function findWrestlingVenueById(venueId, options = {}) {
   const normalizedVenueId = normalizeWrestlingVenueId(venueId);
-  return getMockRecordById("wrestlingVenues", normalizedVenueId, ["venueId", "id", "slug", "venue_id"]) || wrestlingVenueRows[0];
+  const includeStaticRows = options.includeStatic !== false;
+  const venueSources = [
+    ...(Array.isArray(wrestlingVenuesCollection) ? wrestlingVenuesCollection : []),
+    ...(includeStaticRows && Array.isArray(wrestlingVenueRows) ? wrestlingVenueRows : []),
+    ...(includeStaticRows ? getMockCollection("wrestlingVenues", { clone: false }) : []),
+  ];
+  const seenVenues = new Set();
+  const resolvedVenue = venueSources.find((venue) => {
+    if (!venue || typeof venue !== "object") {
+      return false;
+    }
+    const venueKey = getWrestlingVenueRowId(venue) || normalizeWrestlingVenueId(venue?.venue_id || venue?.id || venue?.slug);
+    if (venueKey && seenVenues.has(venueKey)) {
+      return false;
+    }
+    if (venueKey) {
+      seenVenues.add(venueKey);
+    }
+    return [
+      getWrestlingVenueRowId(venue),
+      venue?.venueId,
+      venue?.venue_id,
+      venue?.id,
+      venue?.slug,
+      venue?.backend_record?.venue_id,
+      venue?.backend_record?.id,
+    ].some((candidate) => normalizeWrestlingVenueId(candidate) === normalizedVenueId);
+  });
+
+  if (resolvedVenue || options.allowFallback === false) {
+    return resolvedVenue || null;
+  }
+
+  return wrestlingVenueRows[0] || null;
 }
 
 function getWrestlingRelationshipIds(items, key = "") {
@@ -2746,6 +2779,204 @@ function renderWrestlingVenuesIndex(options = {}) {
   renderWrestlingVenuesResults();
 }
 
+function getWrestlingVenueGeo(venue) {
+  return venue?.geo ||
+    venue?.venue_details?.geo ||
+    venue?.venueDetails?.geo ||
+    venue?.backend_record?.geo ||
+    venue?.backend_record?.venue_details?.geo ||
+    {};
+}
+
+function getWrestlingVenueDetailLatitude(venue) {
+  return getWrestlingText(
+    venue?.latitude ||
+    venue?.venue_details?.latitude ||
+    venue?.venueDetails?.latitude ||
+    venue?.backend_record?.latitude ||
+    venue?.backend_record?.venue_details?.latitude
+  );
+}
+
+function getWrestlingVenueDetailLongitude(venue) {
+  return getWrestlingText(
+    venue?.longitude ||
+    venue?.venue_details?.longitude ||
+    venue?.venueDetails?.longitude ||
+    venue?.backend_record?.longitude ||
+    venue?.backend_record?.venue_details?.longitude
+  );
+}
+
+function getWrestlingVenueCountry(venue) {
+  return getWrestlingText(
+    venue?.country ||
+    venue?.venue_details?.country ||
+    venue?.venueDetails?.country ||
+    venue?.backend_record?.country ||
+    venue?.backend_record?.venue_details?.country
+  );
+}
+
+function getWrestlingVenueType(venue) {
+  return getWrestlingText(
+    venue?.venue_type ||
+    venue?.venueType ||
+    venue?.type ||
+    venue?.venue_details?.venue_type ||
+    venue?.backend_record?.venue_type
+  );
+}
+
+function getWrestlingVenueStatus(venue) {
+  return getWrestlingText(
+    venue?.archiveState ||
+    venue?.archive_state ||
+    venue?.status ||
+    venue?.venue_details?.status ||
+    venue?.backend_record?.status
+  );
+}
+
+function getWrestlingVenueShowVenueId(show) {
+  return normalizeWrestlingVenueId(
+    show?.venueId ||
+    show?.venue_id ||
+    show?.venue_details?.venue_id ||
+    show?.venueDetails?.venue_id ||
+    show?.venueDetails?.venueId ||
+    show?.backend_record?.venue_id ||
+    show?.backend_record?.venue_details?.venue_id ||
+    getWrestlingVenueName(show)
+  );
+}
+
+function getWrestlingVenueRelatedShowRows(venue) {
+  const venueId = getWrestlingVenueRowId(venue);
+  if (!venueId) {
+    return [];
+  }
+
+  const liveShows = Array.isArray(wrestlingShowsCollection) && wrestlingShowsCollection.length > 0
+    ? wrestlingShowsCollection
+    : [];
+  const relatedShows = liveShows.filter((show) => getWrestlingVenueShowVenueId(show) === venueId);
+  const relatedShowIds = getWrestlingArray(venue?.related_shows || venue?.relatedShows || venue?.showIds || venue?.show_ids);
+  relatedShowIds.forEach((showId) => {
+    const show = findLiveWrestlingShowById(showId) || getMockRecordById("wrestlingShows", showId, ["showId", "eventId", "show_id", "show_key", "id", "slug"]);
+    if (show && !relatedShows.some((row) => getWrestlingShowRouteCode(row) === getWrestlingShowRouteCode(show))) {
+      relatedShows.push(show);
+    }
+  });
+
+  if (relatedShows.length === 0 && liveShows.length === 0) {
+    wrestlingVenueEventHistoryRows
+      .filter((eventRow) => normalizeWrestlingVenueId(eventRow.venueId || eventRow.venue_id) === venueId)
+      .forEach((eventRow) => relatedShows.push(eventRow));
+  }
+
+  return relatedShows.sort((left, right) => {
+    const sortDelta = getWrestlingVenueEventTimestamp(right) - getWrestlingVenueEventTimestamp(left);
+    return sortDelta || getWrestlingVenueEventName(left).localeCompare(getWrestlingVenueEventName(right));
+  });
+}
+
+function getWrestlingVenueEventTimestamp(eventRow) {
+  const explicitTimestamp = Number(eventRow?.dateSort || eventRow?.date_sort || 0);
+  if (Number.isFinite(explicitTimestamp) && explicitTimestamp > 0) {
+    return explicitTimestamp;
+  }
+  const parsedDate = parseWrestlingShowDate(eventRow?.rawDate || eventRow?.date || eventRow?.eventDate || eventRow?.show_date);
+  return parsedDate ? parsedDate.getTime() : 0;
+}
+
+function getWrestlingVenueEventName(eventRow) {
+  return getWrestlingText(
+    eventRow?.title ||
+    eventRow?.showName ||
+    eventRow?.show_name ||
+    eventRow?.eventName ||
+    eventRow?.event_name ||
+    eventRow?.name,
+    "Event Pending"
+  );
+}
+
+function getWrestlingVenueEventDate(eventRow) {
+  return getWrestlingText(
+    eventRow?.eventDate ||
+    eventRow?.formattedDate ||
+    formatWrestlingShowDate(eventRow?.rawDate || eventRow?.date || eventRow?.show_date),
+    "Date Pending"
+  );
+}
+
+function getWrestlingVenueEventPromotion(eventRow) {
+  return getWrestlingText(eventRow?.promotion, "Promotion Pending");
+}
+
+function getWrestlingVenueEventPhotoCount(eventRow) {
+  return getWrestlingVenueCountValue(eventRow, [
+    eventRow?.photoCount,
+    eventRow?.photo_count,
+    eventRow?.stats?.photoCount,
+    eventRow?.stats?.photos,
+    eventRow?.photoIds,
+    eventRow?.photo_ids,
+  ]);
+}
+
+function getWrestlingVenueDetailStats(venue, relatedShows = []) {
+  const eventCount = relatedShows.length || getWrestlingVenueEventCount(venue);
+  const relatedPhotoCount = relatedShows
+    .map(getWrestlingVenueEventPhotoCount)
+    .filter((count) => count !== null && count > 0)
+    .reduce((total, count) => total + count, 0);
+  const photoCount = relatedPhotoCount > 0 ? relatedPhotoCount : getWrestlingVenuePhotoCount(venue);
+  const sortedEvents = [...relatedShows].sort((left, right) => getWrestlingVenueEventTimestamp(left) - getWrestlingVenueEventTimestamp(right));
+  const firstEvent = sortedEvents.find((eventRow) => getWrestlingVenueEventTimestamp(eventRow) > 0) || sortedEvents[0] || null;
+  const latestEvent = [...sortedEvents].reverse().find((eventRow) => getWrestlingVenueEventTimestamp(eventRow) > 0) || sortedEvents[sortedEvents.length - 1] || null;
+
+  return {
+    events: eventCount,
+    photos: photoCount,
+    firstEvent: firstEvent ? getWrestlingVenueEventDate(firstEvent) : "",
+    latestEvent: latestEvent ? getWrestlingVenueEventDate(latestEvent) : "",
+  };
+}
+
+function createWrestlingVenueDetailBackButton() {
+  const backButton = document.createElement("button");
+  backButton.className = "wrestling-venue-detail-back";
+  backButton.type = "button";
+  backButton.textContent = "Back to Wrestling Venues";
+  backButton.addEventListener("click", returnToWrestlingVenuesRoute);
+  return backButton;
+}
+
+function createWrestlingVenueDetailState(stateName = "loading", copy = {}) {
+  const statePanel = document.createElement("section");
+  statePanel.className = "wrestling-venue-event-history";
+  renderMockState(statePanel, stateName, "wrestlingVenues", { copy });
+  return statePanel;
+}
+
+function appendWrestlingVenueMeta(facts, label, value) {
+  const displayValue = getWrestlingText(value);
+  if (!facts || !displayValue) {
+    return;
+  }
+  facts.append(createWrestlingVenueMeta(label, displayValue));
+}
+
+function appendWrestlingVenueCountMeta(facts, label, value) {
+  const numericValue = Number.parseInt(value, 10);
+  if (!facts || !Number.isFinite(numericValue) || numericValue < 0) {
+    return;
+  }
+  facts.append(createWrestlingVenueMeta(label, numericValue.toLocaleString()));
+}
+
 function createWrestlingVenueMeta(label, value) {
   const fact = document.createElement("div");
   fact.className = "wrestling-venue-fact";
@@ -2762,44 +2993,58 @@ function createWrestlingVenueMeta(label, value) {
 
 function createWrestlingVenueEventRow(eventRow) {
   const row = document.createElement("article");
+  const eventNameText = getWrestlingVenueEventName(eventRow);
+  const eventDateText = getWrestlingVenueEventDate(eventRow);
+  const eventPromotionText = getWrestlingVenueEventPromotion(eventRow);
+  const eventPhotoCount = getWrestlingVenueEventPhotoCount(eventRow);
+  const showRoute = getWrestlingShowRouteUrl(eventRow);
   row.className = "wrestling-venue-event-row";
   row.setAttribute("role", "listitem");
-  row.dataset.wrestlingShowId = eventRow.showId;
-  row.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(eventRow.showId);
+  row.dataset.wrestlingShowId = eventRow.showId || eventRow.eventId || eventRow.show_id || "";
+  row.dataset.wrestlingShowRoute = showRoute;
   setWrestlingRelationshipDataset(row, eventRow);
 
   const eventBlock = document.createElement("div");
   eventBlock.className = "wrestling-venue-event-name";
 
   const eventName = document.createElement("h4");
-  eventName.textContent = eventRow.eventName;
+  eventName.textContent = eventNameText;
 
   const promotion = document.createElement("p");
-  promotion.textContent = eventRow.promotion;
+  promotion.textContent = eventPromotionText;
 
   eventBlock.append(eventName, promotion);
 
   const date = document.createElement("p");
   date.className = "wrestling-venue-event-date";
-  date.textContent = eventRow.eventDate;
+  date.textContent = eventDateText;
 
   const photos = document.createElement("p");
   photos.className = "wrestling-venue-event-photos";
-  photos.textContent = formatWrestlingCount(eventRow.photoCount, "Photos");
+  photos.textContent = eventPhotoCount !== null ? formatWrestlingCount(eventPhotoCount, "Photos") : "";
 
   const openButton = document.createElement("button");
   openButton.className = "wrestling-venue-event-open";
   openButton.type = "button";
-  openButton.disabled = true;
-  openButton.setAttribute("aria-disabled", "true");
-  openButton.setAttribute("aria-label", `Open event ${eventRow.eventName}`);
-  openButton.title = `Future route: ${getWrestlingShowRouteUrl(eventRow.showId)}`;
-  openButton.dataset.wrestlingShowId = eventRow.showId;
-  openButton.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(eventRow.showId);
+  openButton.setAttribute("aria-label", `Open event ${eventNameText}`);
+  openButton.dataset.wrestlingShowId = row.dataset.wrestlingShowId;
+  openButton.dataset.wrestlingShowRoute = showRoute;
   setWrestlingRelationshipDataset(openButton, eventRow);
   openButton.textContent = "Open Event";
+  openButton.addEventListener("click", () => {
+    navigateToRoute(showRoute, {
+      historyState: {
+        fromWrestlingVenueDetail: true,
+        venueUrl: getWrestlingVenueRouteUrl(activeWrestlingVenueId),
+      },
+    });
+  });
 
-  row.append(eventBlock, date, photos, openButton);
+  row.append(eventBlock, date);
+  if (photos.textContent) {
+    row.append(photos);
+  }
+  row.append(openButton);
   return row;
 }
 
@@ -2817,34 +3062,73 @@ function returnToWrestlingVenuesRoute() {
   navigateToRoute(routePaths.wrestlingVenues);
 }
 
-function renderWrestlingVenueDetailRoute(venueId) {
+function renderWrestlingVenueDetailRoute(venueId, options = {}) {
   if (!wrestlingVenueDetailShell) {
     return;
   }
 
-  const venue = findWrestlingVenueById(venueId);
-  activeWrestlingVenueId = venue.venueId;
-  setActiveWrestlingVenueCard(venue.venueId);
-  setWrestlingRelationshipDataset(wrestlingVenueDetailShell, venue);
+  const normalizedVenueId = normalizeWrestlingVenueId(venueId);
+  const pendingRequests = [];
+  if (!options.skipDataRequest) {
+    if (wrestlingVenuesDataState !== "live") {
+      if (wrestlingVenuesRequest) {
+        pendingRequests.push(wrestlingVenuesRequest);
+      } else if (!wrestlingVenuesLoaded) {
+        pendingRequests.push(requestWrestlingVenuesData());
+      }
+    }
+    if (wrestlingShowsDataState !== "live") {
+      if (wrestlingShowsRequest) {
+        pendingRequests.push(wrestlingShowsRequest);
+      } else if (!wrestlingShowsDataRequested) {
+        pendingRequests.push(requestWrestlingShowsData());
+      }
+    }
+    if (pendingRequests.length > 0) {
+      Promise.allSettled(pendingRequests).then(() => {
+        const route = getRouteFromUrl();
+        if (route.name === "wrestling-venue-detail" && normalizeWrestlingVenueId(route.venueId) === normalizedVenueId) {
+          renderWrestlingVenueDetailRoute(venueId, { skipDataRequest: true });
+        }
+      });
+    }
+  }
 
-  const backButton = document.createElement("button");
-  backButton.className = "wrestling-venue-detail-back";
-  backButton.type = "button";
-  backButton.textContent = "Back to Wrestling Venues";
-  backButton.addEventListener("click", returnToWrestlingVenuesRoute);
+  const venue = findWrestlingVenueById(venueId, { allowFallback: false });
+  activeWrestlingVenueId = venue ? getWrestlingVenueRowId(venue) : normalizedVenueId;
+  setActiveWrestlingVenueCard(activeWrestlingVenueId);
+
+  const backButton = createWrestlingVenueDetailBackButton();
+
+  if (!venue) {
+    const isLoading = wrestlingVenuesDataState === "idle" || wrestlingVenuesDataState === "loading";
+    const stateName = wrestlingVenuesDataState === "error" ? "error" : isLoading ? "loading" : "empty";
+    const copy = stateName === "empty"
+      ? { title: "Venue Not Found", text: "This wrestling venue could not be found in the venue archive." }
+      : {};
+    wrestlingVenueDetailShell.replaceChildren(backButton, createWrestlingVenueDetailState(stateName, copy));
+    return;
+  }
+
+  const relatedEvents = getWrestlingVenueRelatedShowRows(venue);
+  const venueStats = getWrestlingVenueDetailStats(venue, relatedEvents);
+  const venueName = getWrestlingVenueRowName(venue);
+  const geo = getWrestlingVenueGeo(venue);
+  setWrestlingRelationshipDataset(wrestlingVenueDetailShell, venue);
+  wrestlingVenueDetailShell.dataset.wrestlingVenueId = activeWrestlingVenueId;
 
   const hero = document.createElement("section");
   hero.className = "wrestling-venue-detail-hero";
-  hero.setAttribute("aria-label", `${venue.name} placeholder venue dossier`);
+  hero.setAttribute("aria-label", `${venueName} venue dossier`);
 
   const image = document.createElement("div");
   image.className = "wrestling-venue-detail-image";
   image.setAttribute("role", "img");
-  image.setAttribute("aria-label", `${venue.name} venue image placeholder`);
+  image.setAttribute("aria-label", `${venueName} venue mark`);
 
   const imageLabel = document.createElement("span");
   imageLabel.setAttribute("aria-hidden", "true");
-  imageLabel.textContent = venue.imageLabel;
+  imageLabel.textContent = venue.imageLabel || getWrestlingVenueInitials(venueName);
   image.append(imageLabel);
 
   const summary = document.createElement("div");
@@ -2853,20 +3137,33 @@ function renderWrestlingVenueDetailRoute(venueId) {
   const name = document.createElement("h2");
   name.className = "wrestling-venue-detail-title";
   name.id = "wrestling-venue-detail-title";
-  name.textContent = venue.name;
+  name.textContent = venueName;
 
   const location = document.createElement("p");
   location.className = "wrestling-venue-detail-location";
-  location.textContent = `${venue.city}, ${venue.state}`;
+  location.textContent = getWrestlingVenueLocationText(venue);
 
   const facts = document.createElement("dl");
   facts.className = "wrestling-venue-facts";
-  facts.append(
-    createWrestlingVenueMeta("Events", Number(venue.eventCount).toLocaleString()),
-    createWrestlingVenueMeta("Total Photos", Number(venue.photoCount).toLocaleString()),
-    createWrestlingVenueMeta("Region", venue.region),
-    createWrestlingVenueMeta("Archive State", venue.archiveState)
-  );
+  appendWrestlingVenueMeta(facts, "City", getWrestlingVenueCity(venue));
+  appendWrestlingVenueMeta(facts, "State", getWrestlingVenueDisplayState(venue));
+  appendWrestlingVenueMeta(facts, "Country", getWrestlingVenueCountry(venue));
+  appendWrestlingVenueMeta(facts, "Address", geo.formatted_address);
+  appendWrestlingVenueMeta(facts, "Postal Code", geo.postal_code);
+  appendWrestlingVenueMeta(facts, "County", geo.county);
+  appendWrestlingVenueMeta(facts, "Timezone", geo.timezone);
+  appendWrestlingVenueMeta(facts, "Latitude", getWrestlingVenueDetailLatitude(venue));
+  appendWrestlingVenueMeta(facts, "Longitude", getWrestlingVenueDetailLongitude(venue));
+  appendWrestlingVenueMeta(facts, "GeoHash", geo.geohash);
+  appendWrestlingVenueMeta(facts, "Elevation", geo.elevation);
+  appendWrestlingVenueMeta(facts, "Venue Type", getWrestlingVenueType(venue));
+  appendWrestlingVenueMeta(facts, "Region", venue.region);
+  appendWrestlingVenueMeta(facts, "Status", getWrestlingVenueStatus(venue));
+  appendWrestlingVenueMeta(facts, "First Event", venueStats.firstEvent);
+  appendWrestlingVenueMeta(facts, "Latest Event", venueStats.latestEvent);
+  appendWrestlingVenueCountMeta(facts, "Event Count", venueStats.events);
+  appendWrestlingVenueCountMeta(facts, "Photo Count", venueStats.photos);
+  appendWrestlingVenueMeta(facts, "Notes", venue.notes || venue.backend_record?.notes);
 
   summary.append(name, location, facts);
   hero.append(image, summary);
@@ -2878,7 +3175,7 @@ function renderWrestlingVenueDetailRoute(venueId) {
   const eventTitle = document.createElement("h3");
   eventTitle.className = "wrestling-venue-event-history-title";
   eventTitle.id = "wrestling-venue-event-history-title";
-  eventTitle.textContent = "EVENT HISTORY";
+  eventTitle.textContent = "Event History";
 
   const eventList = document.createElement("div");
   eventList.className = "wrestling-venue-event-list";
@@ -2886,9 +3183,15 @@ function renderWrestlingVenueDetailRoute(venueId) {
   const forcedState = getForcedMockState("wrestlingVenues");
   if (forcedState && forcedState !== "partial") {
     renderMockState(eventList, forcedState, "wrestlingVenues");
+  } else if (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle") {
+    renderMockState(eventList, "loading", "wrestlingVenues");
+  } else if (wrestlingShowsDataState === "error") {
+    renderMockState(eventList, "error", "wrestlingVenues");
+  } else if (relatedEvents.length === 0) {
+    eventList.append(createWrestlingVenuesEmptyState("No event history indexed for this venue yet."));
   } else {
-    wrestlingVenueEventHistoryRows.forEach((eventRow) => {
-    eventList.append(createWrestlingVenueEventRow(eventRow));
+    relatedEvents.forEach((eventRow) => {
+      eventList.append(createWrestlingVenueEventRow(eventRow));
     });
     if (forcedState === "partial") {
       eventList.append(createMockStateCard("partial", "wrestlingVenues"));
