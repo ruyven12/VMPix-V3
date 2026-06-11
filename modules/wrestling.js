@@ -22,9 +22,10 @@ function getWrestlingPersonRouteUrl(personId) {
 
 function findWrestlingPersonById(personId, options = {}) {
   const normalizedPersonId = normalizeWrestlingPersonId(personId);
+  const includeStaticRows = options.includeStatic !== false;
   const peopleSources = [
     ...getWrestlingPeopleCollection(),
-    ...(Array.isArray(wrestlingPeopleRows) ? wrestlingPeopleRows : []),
+    ...(includeStaticRows && Array.isArray(wrestlingPeopleRows) ? wrestlingPeopleRows : []),
   ];
   const resolvedPerson = peopleSources.map(normalizeWrestlingPeopleIndexRow).find((person) => {
     const source = person?.backend_record && typeof person.backend_record === "object"
@@ -1571,11 +1572,47 @@ function getWrestlingPersonRouteId(person) {
 }
 
 function getWrestlingPeopleCountValue(...values) {
-  const foundValue = values.find((value) => {
+  return getOptionalWrestlingPeopleCountValue(...values) ?? 0;
+}
+
+function getOptionalWrestlingPeopleCountValue(...values) {
+  for (const value of values) {
+    if (Array.isArray(value)) {
+      return value.length;
+    }
+    if (value === undefined || value === null || String(value).trim() === "") {
+      continue;
+    }
     const parsedValue = Number.parseInt(value, 10);
-    return Number.isFinite(parsedValue) && parsedValue >= 0;
-  });
-  return Number.parseInt(foundValue, 10) || 0;
+    if (Number.isFinite(parsedValue) && parsedValue >= 0) {
+      return parsedValue;
+    }
+  }
+  return null;
+}
+
+function getWrestlingTaggedPeoplePhotoCount(person) {
+  const taggedPeople = getWrestlingArray(person?.taggedPeople || person?.tagged_people);
+  const counts = taggedPeople
+    .map((taggedPerson) => getOptionalWrestlingPeopleCountValue(
+      taggedPerson?.tagCount,
+      taggedPerson?.tag_count,
+      taggedPerson?.photoCount,
+      taggedPerson?.photo_count
+    ))
+    .filter((count) => count !== null);
+  return counts.length > 0 ? counts.reduce((total, count) => total + count, 0) : null;
+}
+
+function getWrestlingPersonInitials(name) {
+  const characters = getWrestlingText(name)
+    .split(/\s+/)
+    .map((part) => part.match(/[a-z0-9]/i)?.[0] || "")
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  return characters || "WP";
 }
 
 function getWrestlingPersonCategory(person) {
@@ -1611,6 +1648,18 @@ function getWrestlingPersonAffiliations(person) {
     .filter((value, index, values) => values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
 }
 
+function getWrestlingPersonTeamsAndStables(person) {
+  return [
+    getWrestlingText(person?.factionTeam || person?.stable || person?.team),
+    ...getWrestlingLabelArray(person?.teams || person?.teamIds || person?.team_ids),
+    ...getWrestlingLabelArray(person?.stables || person?.stableIds || person?.stable_ids),
+    ...getWrestlingLabelArray(person?.factions || person?.factionIds || person?.faction_ids),
+  ]
+    .filter(Boolean)
+    .map((value) => value.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()))
+    .filter((value, index, values) => values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
+}
+
 function getWrestlingPersonAliases(person) {
   return getWrestlingLabelArray(person?.aliases || person?.alias || person?.ring_names || person?.ringNames);
 }
@@ -1632,23 +1681,72 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
   const categoryFilterValue = getWrestlingPersonCategoryFilterValue(category);
   const aliases = getWrestlingPersonAliases(source);
   const affiliations = getWrestlingPersonAffiliations(source);
-  const matches = getWrestlingPeopleCountValue(
+  const teamsAndStables = getWrestlingPersonTeamsAndStables(source);
+  const eventCount = getOptionalWrestlingPeopleCountValue(
+    source.events,
+    source.event_count,
+    source.events_count,
+    source.show_count,
+    source.shows_count,
+    source.appearances,
+    source.appearance_count,
+    source.showIds,
+    source.show_ids,
+    source.stats?.eventCount,
+    source.stats?.event_count,
+    source.stats?.showCount,
+    source.stats?.show_count
+  );
+  const matchCount = getOptionalWrestlingPeopleCountValue(
     source.matches,
     source.match_count,
     source.matches_count,
+    source.matchIds,
+    source.match_ids,
     source.stats?.matchCount,
     source.stats?.match_count
   );
-  const photos = getWrestlingPeopleCountValue(
-    source.photos,
-    source.photoCount,
-    source.photo_count,
+  const taggedPhotoCount = getOptionalWrestlingPeopleCountValue(
     source.tagged_photo_count,
     source.taggedPhotoCount,
     source.stats?.taggedPhotoCount,
-    source.stats?.photoCount,
     source.stats?.tagged_photo_count,
+    getWrestlingTaggedPeoplePhotoCount(source)
+  );
+  const photoCount = getOptionalWrestlingPeopleCountValue(
+    source.photos,
+    source.photoIds,
+    source.photo_ids,
+    source.photoCount,
+    source.photo_count,
+    source.stats?.photoCount,
     source.stats?.photo_count
+  ) ?? taggedPhotoCount;
+  const firstSeen = getWrestlingText(
+    source.first_seen ||
+    source.firstSeen ||
+    source.first_seen_date ||
+    source.firstSeenDate ||
+    source.first_event_date ||
+    source.firstEventDate ||
+    source.debutYear ||
+    source.debut_year ||
+    source.stats?.firstSeen ||
+    source.stats?.first_seen
+  );
+  const latestSeen = getWrestlingText(
+    source.latest_seen ||
+    source.latestSeen ||
+    source.latest_seen_date ||
+    source.latestSeenDate ||
+    source.last_seen ||
+    source.lastSeen ||
+    source.last_event_date ||
+    source.lastEventDate ||
+    source.stats?.latestSeen ||
+    source.stats?.latest_seen ||
+    source.stats?.lastSeen ||
+    source.stats?.last_seen
   );
 
   return {
@@ -1657,17 +1755,28 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
     name,
     legalName,
     aliases,
+    teamsAndStables,
     category,
     categoryDisplay,
     categoryFilterValue,
     affiliationText: affiliations.length > 0 ? affiliations.join(" / ") : aliases.join(" / "),
-    matches,
-    photos,
+    affiliations,
+    firstSeen,
+    latestSeen,
+    eventCount,
+    matchCount,
+    taggedPhotoCount,
+    photoCount,
+    matches: matchCount ?? 0,
+    photos: photoCount ?? 0,
+    thumb: getWrestlingText(source.thumb || source.initials || source.imageLabel || source.image_label, getWrestlingPersonInitials(name)),
+    isDbBacked: !!source.backend_record,
     letter: getWrestlingPersonLetter({ name }),
     searchText: [
       name,
       legalName,
       aliases.join(" "),
+      teamsAndStables.join(" "),
       affiliations.join(" "),
       category,
     ].join(" ").toLowerCase(),
@@ -2192,6 +2301,11 @@ function renderWrestlingVenueDetailRoute(venueId) {
 }
 
 function createWrestlingPersonMeta(label, value) {
+  const displayValue = getWrestlingPersonFactText(value);
+  if (!displayValue) {
+    return null;
+  }
+
   const fact = document.createElement("div");
   fact.className = "wrestling-person-fact";
 
@@ -2199,10 +2313,127 @@ function createWrestlingPersonMeta(label, value) {
   factLabel.textContent = label;
 
   const factValue = document.createElement("dd");
-  factValue.textContent = value;
+  factValue.textContent = displayValue;
 
   fact.append(factLabel, factValue);
   return fact;
+}
+
+function getWrestlingPersonFactText(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => getWrestlingText(item)).filter(Boolean).join(" / ");
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value.toLocaleString() : "";
+  }
+  return getWrestlingText(value);
+}
+
+function getWrestlingPersonDetailFacts(person) {
+  return [
+    ["Legal Name", person.legalName],
+    ["Role", person.categoryDisplay || person.role],
+    ["Aliases", person.aliases],
+    ["Teams / Stables", person.teamsAndStables],
+    ["First Seen", person.firstSeen],
+    ["Latest Seen", person.latestSeen],
+    ["Event Count", person.eventCount],
+    ["Match Count", person.matchCount],
+    ["Photo Count", person.photoCount],
+  ]
+    .map(([label, value]) => createWrestlingPersonMeta(label, value))
+    .filter(Boolean);
+}
+
+function normalizeWrestlingPersonHistoryRow(row, person) {
+  const source = row && typeof row === "object" ? { ...row } : { matchName: getWrestlingText(row) };
+  const eventName = getWrestlingText(
+    source.eventName ||
+    source.event_name ||
+    source.showName ||
+    source.show_name ||
+    source.title ||
+    source.name
+  );
+  const matchName = getWrestlingText(
+    source.matchName ||
+    source.match_name ||
+    source.matchTitle ||
+    source.match_title ||
+    source.name
+  );
+
+  if (!eventName && !matchName) {
+    return null;
+  }
+
+  return {
+    ...source,
+    showId: getWrestlingText(source.showId || source.show_id || source.eventId || source.event_id || source.id, normalizeWrestlingArchiveSlug(eventName || matchName, "")),
+    eventId: getWrestlingText(source.eventId || source.event_id || source.showId || source.show_id || source.id, normalizeWrestlingArchiveSlug(eventName || matchName, "")),
+    matchId: getWrestlingText(source.matchId || source.match_id || source.id, normalizeWrestlingArchiveSlug(matchName || eventName, "")),
+    eventName: eventName || matchName,
+    eventDate: getWrestlingText(source.eventDate || source.event_date || source.date || source.showDate || source.show_date),
+    matchName: matchName || eventName,
+    matchType: getWrestlingText(source.matchType || source.match_type || source.type || person.categoryDisplay),
+    photoCount: getOptionalWrestlingPeopleCountValue(
+      source.photoCount,
+      source.photo_count,
+      source.photos,
+      source.tagged_photo_count,
+      source.taggedPhotoCount
+    ) ?? 0,
+    personIds: source.personIds || source.person_ids || [person.personId],
+    taggedPeople: source.taggedPeople || source.tagged_people || [],
+  };
+}
+
+function getWrestlingPersonDbHistoryRows(person) {
+  const source = person?.backend_record && typeof person.backend_record === "object"
+    ? { ...person.backend_record, ...person }
+    : person;
+  return [
+    source?.event_history,
+    source?.eventHistory,
+    source?.match_history,
+    source?.matchHistory,
+    source?.history,
+    Array.isArray(source?.events) ? source.events : [],
+    Array.isArray(source?.matches) ? source.matches : [],
+  ]
+    .flatMap((rows) => Array.isArray(rows) ? rows : [])
+    .map((row) => normalizeWrestlingPersonHistoryRow(row, person))
+    .filter(Boolean);
+}
+
+function doesWrestlingHistoryRowReferencePerson(row, personId) {
+  const normalizedPersonId = normalizeWrestlingPersonId(personId);
+  if (!normalizedPersonId) {
+    return false;
+  }
+
+  const taggedPeople = getWrestlingArray(row?.taggedPeople || row?.tagged_people)
+    .map((person) => person?.personId || person?.person_id || person?.id || person);
+  const candidateIds = [
+    row?.personId,
+    row?.person_id,
+    ...getWrestlingArray(row?.personIds || row?.person_ids),
+    ...taggedPeople,
+    ...getWrestlingArray(row?.refereeIds || row?.referee_ids),
+    ...getWrestlingArray(row?.managerIds || row?.manager_ids),
+    ...getWrestlingArray(row?.commentatorIds || row?.commentator_ids),
+    ...getWrestlingArray(row?.contributorIds || row?.contributor_ids),
+  ];
+
+  return candidateIds.some((candidate) => normalizeWrestlingPersonId(candidate) === normalizedPersonId);
+}
+
+function getWrestlingPersonEventHistoryRows(person) {
+  const dbHistoryRows = getWrestlingPersonDbHistoryRows(person);
+  if (person.isDbBacked || dbHistoryRows.length > 0) {
+    return dbHistoryRows;
+  }
+  return wrestlingPersonEventHistoryRows.filter((eventRow) => doesWrestlingHistoryRowReferencePerson(eventRow, person.personId));
 }
 
 function createWrestlingPersonEventRow(eventRow) {
@@ -2284,17 +2515,21 @@ function createWrestlingPersonDetailBackButton() {
   return backButton;
 }
 
-function renderWrestlingPersonDetailPending(personId) {
+function renderWrestlingPersonDetailState(stateName, personId, copy = {}) {
   if (!wrestlingPersonDetailShell) {
     return;
   }
 
-  const stateCard = createMockStateCard("loading", "wrestlingPeople", {
+  const stateCard = createMockStateCard(stateName, "wrestlingPeople", copy);
+  stateCard.dataset.wrestlingPersonId = normalizeWrestlingPersonId(personId);
+  wrestlingPersonDetailShell.replaceChildren(createWrestlingPersonDetailBackButton(), stateCard);
+}
+
+function renderWrestlingPersonDetailPending(personId) {
+  renderWrestlingPersonDetailState("loading", personId, {
     title: "Loading Person",
     text: "Fetching wrestling person data.",
   });
-  stateCard.dataset.wrestlingPersonId = normalizeWrestlingPersonId(personId);
-  wrestlingPersonDetailShell.replaceChildren(createWrestlingPersonDetailBackButton(), stateCard);
 }
 
 function renderWrestlingPersonDetailRoute(personId) {
@@ -2302,9 +2537,7 @@ function renderWrestlingPersonDetailRoute(personId) {
     return;
   }
 
-  let person = findWrestlingPersonById(personId, { allowFallback: false });
   if (
-    !person &&
     !wrestlingPeopleLoaded &&
     (wrestlingPeopleDataState === "idle" || wrestlingPeopleDataState === "loading" || wrestlingPeopleRequest)
   ) {
@@ -2322,7 +2555,20 @@ function renderWrestlingPersonDetailRoute(personId) {
     return;
   }
 
-  person = person || findWrestlingPersonById(personId);
+  let person = findWrestlingPersonById(personId, { allowFallback: false, includeStatic: false });
+
+  if (!person) {
+    renderWrestlingPersonDetailState(
+      wrestlingPeopleDataState === "empty" ? "empty" : "error",
+      personId,
+      {
+        title: "Person Not Found",
+        text: "This wrestling person is not available in the current archive data.",
+      }
+    );
+    return;
+  }
+
   activeWrestlingPersonId = person.personId;
   setActiveWrestlingPeopleCard(person.personId);
   setWrestlingRelationshipDataset(wrestlingPersonDetailShell, person);
@@ -2340,7 +2586,7 @@ function renderWrestlingPersonDetailRoute(personId) {
 
   const photoInitials = document.createElement("span");
   photoInitials.setAttribute("aria-hidden", "true");
-  photoInitials.textContent = person.thumb;
+  photoInitials.textContent = person.thumb || getWrestlingPersonInitials(person.name);
   photo.append(photoInitials);
 
   const summary = document.createElement("div");
@@ -2353,16 +2599,15 @@ function renderWrestlingPersonDetailRoute(personId) {
 
   const facts = document.createElement("dl");
   facts.className = "wrestling-person-facts";
-  facts.append(
-    createWrestlingPersonMeta("Aliases", person.aliases.join(" / ")),
-    createWrestlingPersonMeta("Role", person.role),
-    createWrestlingPersonMeta("Faction / Team", person.factionTeam),
-    createWrestlingPersonMeta("Debut Year", person.debutYear),
-    createWrestlingPersonMeta("Total Matches", Number(person.matches).toLocaleString()),
-    createWrestlingPersonMeta("Total Photos", Number(person.photos).toLocaleString())
-  );
+  const factRows = getWrestlingPersonDetailFacts(person);
+  if (factRows.length > 0) {
+    facts.append(...factRows);
+  }
 
-  summary.append(name, facts);
+  summary.append(name);
+  if (factRows.length > 0) {
+    summary.append(facts);
+  }
   hero.append(photo, summary);
 
   const eventHistory = document.createElement("section");
@@ -2381,9 +2626,14 @@ function renderWrestlingPersonDetailRoute(personId) {
   if (forcedState && forcedState !== "partial") {
     renderMockState(eventList, forcedState, "wrestlingPeople");
   } else {
-    wrestlingPersonEventHistoryRows.forEach((eventRow) => {
-    eventList.append(createWrestlingPersonEventRow(eventRow));
-    });
+    const eventRows = getWrestlingPersonEventHistoryRows(person);
+    if (eventRows.length > 0) {
+      eventRows.forEach((eventRow) => {
+        eventList.append(createWrestlingPersonEventRow(eventRow));
+      });
+    } else {
+      eventList.append(createWrestlingPeopleEmptyState("No event history indexed for this person yet."));
+    }
     if (forcedState === "partial") {
       eventList.append(createMockStateCard("partial", "wrestlingPeople"));
     }

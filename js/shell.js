@@ -721,7 +721,7 @@ function getRouteDrilldownBreadcrumbLabel(route) {
     return venue ? getMusicVenueName(venue) : fallbackLabel;
   }
   if (route.name === "wrestling-person-detail" && typeof findWrestlingPersonById === "function") {
-    return findWrestlingPersonById(route.personId)?.name || fallbackLabel;
+    return findWrestlingPersonById(route.personId, { allowFallback: false, includeStatic: false })?.name || fallbackLabel;
   }
   if (route.name === "wrestling-venue-detail" && typeof findWrestlingVenueById === "function") {
     return findWrestlingVenueById(route.venueId)?.name || fallbackLabel;
