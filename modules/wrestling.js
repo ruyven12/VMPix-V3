@@ -20,8 +20,30 @@ function getWrestlingPersonRouteUrl(personId) {
     : routePaths.wrestlingPeople;
 }
 
-function findWrestlingPersonById(personId) {
+function findWrestlingPersonById(personId, options = {}) {
   const normalizedPersonId = normalizeWrestlingPersonId(personId);
+  const peopleSources = [
+    ...getWrestlingPeopleCollection(),
+    ...(Array.isArray(wrestlingPeopleRows) ? wrestlingPeopleRows : []),
+  ];
+  const resolvedPerson = peopleSources.map(normalizeWrestlingPeopleIndexRow).find((person) => {
+    const source = person?.backend_record && typeof person.backend_record === "object"
+      ? { ...person.backend_record, ...person }
+      : person;
+    return [
+      source?.personId,
+      source?.wrestling_person_id,
+      source?.person_id,
+      source?.id,
+      source?.slug,
+      getWrestlingPersonRouteId(source),
+    ].some((candidate) => normalizeWrestlingPersonId(candidate) === normalizedPersonId);
+  });
+
+  if (resolvedPerson || options.allowFallback === false) {
+    return resolvedPerson || null;
+  }
+
   return getMockRecordById("wrestlingPeople", normalizedPersonId, ["personId", "id", "slug"]) || wrestlingPeopleRows[0];
 }
 
@@ -143,6 +165,8 @@ const WRESTLING_SHOWS_API_BASE_URL = "https://vmpix-data.onrender.com";
 const WRESTLING_SHOWS_API_ROUTE = "/api/wrestling/shows/db";
 const WRESTLING_SHOWS_API_LIMIT = 100;
 const WRESTLING_SHOWS_TIMEOUT_MS = 15000;
+const WRESTLING_PEOPLE_API_ROUTE = "/api/wrestling/people/db";
+const WRESTLING_PEOPLE_TIMEOUT_MS = 8000;
 const wrestlingShowList = document.querySelector("[data-wrestling-show-list]") || document.querySelector(".wrestling-show-list");
 const wrestlingShowYearChips = document.querySelectorAll(".wrestling-year-chip");
 const wrestlingShowSearchInput = document.querySelector("[data-wrestling-shows-filter='search']");
@@ -152,7 +176,13 @@ const wrestlingShowVenueSelect = document.querySelector("[data-wrestling-shows-f
 const wrestlingShowFilterReset = document.querySelector("[data-wrestling-shows-filter-reset]");
 const wrestlingShowSortSelect = document.querySelector("#wrestling-shows-sort");
 const wrestlingShowPagination = document.querySelector("[data-wrestling-pagination]") || document.querySelector(".wrestling-pagination");
+const wrestlingPeopleSearchInput = document.querySelector("[data-wrestling-people-filter='search']");
+const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-people-filter='letter']");
+const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
+const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-people-filter-reset]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
+const wrestlingPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const wrestlingPeopleLetterOptions = ["#", ...wrestlingPeopleAlphabet];
 let wrestlingShowsCollection = [];
 let wrestlingShowsRequest = null;
 let wrestlingShowsDataState = "idle";
@@ -163,6 +193,14 @@ let activeWrestlingShowsYearFilter = "";
 let activeWrestlingShowsPromotionFilter = "";
 let activeWrestlingShowsVenueFilter = "";
 let activeWrestlingShowsSort = "newest";
+let wrestlingPeopleCollection = [];
+let wrestlingPeopleRequest = null;
+let wrestlingPeopleLoaded = false;
+let wrestlingPeopleDataState = "idle";
+let wrestlingPeopleFiltersInitialized = false;
+let activeWrestlingPeopleSearch = "";
+let activeWrestlingPeopleLetterFilter = "";
+let activeWrestlingPeopleCategoryFilter = "";
 
 const wrestlingShowsStateCopy = {
   loading: {
@@ -1402,9 +1440,293 @@ function setActiveWrestlingVenueCard(venueId = activeWrestlingVenueId) {
   });
 }
 
+function getWrestlingPeopleCollection() {
+  return Array.isArray(wrestlingPeopleCollection) ? wrestlingPeopleCollection : [];
+}
+
+function setWrestlingPeopleCollection(rows, stateName = "fallback") {
+  wrestlingPeopleCollection = Array.isArray(rows) ? rows : [];
+  wrestlingPeopleDataState = stateName;
+  if (typeof mockCollections !== "undefined" && wrestlingPeopleCollection.length > 0) {
+    mockCollections.wrestlingPeople = wrestlingPeopleCollection;
+  }
+  if (wrestlingPeopleShell) {
+    wrestlingPeopleShell.dataset.peopleDataState = stateName;
+    wrestlingPeopleShell.setAttribute("aria-busy", String(stateName === "loading"));
+  }
+}
+
+function getWrestlingPeoplePayloadRows(payload) {
+  const candidates = [
+    payload?.data,
+    payload?.rows,
+    payload?.people,
+    payload?.source?.data,
+    payload?.source?.rows,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.filter((row) => row && typeof row === "object");
+    }
+    if (candidate && typeof candidate === "object") {
+      const nestedRows = Object.values(candidate).flatMap((value) => {
+        if (Array.isArray(value)) {
+          return value;
+        }
+        return value && typeof value === "object" ? [value] : [];
+      });
+      if (nestedRows.length > 0) {
+        return nestedRows.filter((row) => row && typeof row === "object");
+      }
+    }
+  }
+
+  return [];
+}
+
+function normalizeLiveWrestlingPeople(payload) {
+  return getWrestlingPeoplePayloadRows(payload)
+    .map((person) => ({
+      ...person,
+      backend_record: person.backend_record || person,
+    }))
+    .filter((person) => getWrestlingText(person.display_name || person.ring_name || person.name || person.title))
+    .sort((left, right) => getWrestlingText(left.display_name || left.ring_name || left.name || left.title).localeCompare(
+      getWrestlingText(right.display_name || right.ring_name || right.name || right.title)
+    ));
+}
+
+function requestWrestlingPeopleData() {
+  if (wrestlingPeopleLoaded) {
+    return Promise.resolve(true);
+  }
+  if (wrestlingPeopleRequest) {
+    return wrestlingPeopleRequest;
+  }
+  if (typeof fetch !== "function") {
+    setWrestlingPeopleCollection([], "error");
+    renderWrestlingPeopleIndex({ skipDataRequest: true });
+    return Promise.resolve(false);
+  }
+
+  setWrestlingPeopleCollection([], "loading");
+  if (wrestlingPeopleShell) {
+    wrestlingPeopleShell.setAttribute("aria-busy", "true");
+  }
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), WRESTLING_PEOPLE_TIMEOUT_MS)
+    : 0;
+  const apiUrl = new URL(WRESTLING_PEOPLE_API_ROUTE, WRESTLING_SHOWS_API_BASE_URL);
+
+  wrestlingPeopleRequest = fetch(apiUrl, {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Wrestling people request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const liveRows = normalizeLiveWrestlingPeople(payload);
+      if (liveRows.length === 0) {
+        setWrestlingPeopleCollection([], "empty");
+      } else {
+        setWrestlingPeopleCollection(liveRows, "live");
+        wrestlingPeopleLoaded = true;
+      }
+      renderWrestlingPeopleIndex({ skipDataRequest: true });
+      return liveRows.length > 0;
+    })
+    .catch(() => {
+      setWrestlingPeopleCollection([], "error");
+      renderWrestlingPeopleIndex({ skipDataRequest: true });
+      return false;
+    })
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      if (wrestlingPeopleShell) {
+        wrestlingPeopleShell.setAttribute("aria-busy", "false");
+      }
+      wrestlingPeopleRequest = null;
+    });
+
+  return wrestlingPeopleRequest;
+}
+
+function getWrestlingPersonRouteId(person) {
+  return getWrestlingText(
+    person?.personId ||
+    person?.wrestling_person_id ||
+    person?.person_id ||
+    person?.slug ||
+    person?.id ||
+    normalizeWrestlingPersonId(person?.display_name || person?.ring_name || person?.name || person?.title)
+  );
+}
+
+function getWrestlingPeopleCountValue(...values) {
+  const foundValue = values.find((value) => {
+    const parsedValue = Number.parseInt(value, 10);
+    return Number.isFinite(parsedValue) && parsedValue >= 0;
+  });
+  return Number.parseInt(foundValue, 10) || 0;
+}
+
+function getWrestlingPersonCategory(person) {
+  const roles = getWrestlingLabelArray(person?.roles || person?.role_ids);
+  return getWrestlingText(
+    person?.category ||
+    person?.role ||
+    roles[0] ||
+    person?.type,
+    "Person"
+  );
+}
+
+function getWrestlingPersonCategoryFilterValue(category) {
+  return normalizeWrestlingArchiveSlug(category, "person");
+}
+
+function getWrestlingPersonCategoryDisplay(category) {
+  return getWrestlingText(category, "Person")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getWrestlingPersonAffiliations(person) {
+  return [
+    getWrestlingText(person?.factionTeam || person?.stable || person?.team || person?.notes),
+    ...getWrestlingLabelArray(person?.teams || person?.teamIds || person?.team_ids),
+    ...getWrestlingLabelArray(person?.stables || person?.stableIds || person?.stable_ids),
+    ...getWrestlingLabelArray(person?.factions || person?.factionIds || person?.faction_ids),
+  ]
+    .filter(Boolean)
+    .map((value) => value.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()))
+    .filter((value, index, values) => values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
+}
+
+function getWrestlingPersonAliases(person) {
+  return getWrestlingLabelArray(person?.aliases || person?.alias || person?.ring_names || person?.ringNames);
+}
+
+function getWrestlingPersonLetter(person) {
+  const firstLetter = getWrestlingText(person?.name || person?.display_name || person?.ring_name).charAt(0).toUpperCase();
+  return wrestlingPeopleAlphabet.includes(firstLetter) ? firstLetter : "#";
+}
+
+function normalizeWrestlingPeopleIndexRow(person = {}) {
+  const source = person?.backend_record && typeof person.backend_record === "object"
+    ? { ...person.backend_record, ...person }
+    : { ...person };
+  const personId = getWrestlingPersonRouteId(source);
+  const name = getWrestlingText(source.display_name || source.ring_name || source.name || source.title || source.legal_name, "Unknown Person");
+  const legalName = getWrestlingText(source.legal_name || source.real_name || source.birth_name);
+  const category = getWrestlingPersonCategory(source);
+  const categoryDisplay = getWrestlingPersonCategoryDisplay(category);
+  const categoryFilterValue = getWrestlingPersonCategoryFilterValue(category);
+  const aliases = getWrestlingPersonAliases(source);
+  const affiliations = getWrestlingPersonAffiliations(source);
+  const matches = getWrestlingPeopleCountValue(
+    source.matches,
+    source.match_count,
+    source.matches_count,
+    source.stats?.matchCount,
+    source.stats?.match_count
+  );
+  const photos = getWrestlingPeopleCountValue(
+    source.photos,
+    source.photoCount,
+    source.photo_count,
+    source.tagged_photo_count,
+    source.taggedPhotoCount,
+    source.stats?.taggedPhotoCount,
+    source.stats?.photoCount,
+    source.stats?.tagged_photo_count,
+    source.stats?.photo_count
+  );
+
+  return {
+    ...source,
+    personId,
+    name,
+    legalName,
+    aliases,
+    category,
+    categoryDisplay,
+    categoryFilterValue,
+    affiliationText: affiliations.length > 0 ? affiliations.join(" / ") : aliases.join(" / "),
+    matches,
+    photos,
+    letter: getWrestlingPersonLetter({ name }),
+    searchText: [
+      name,
+      legalName,
+      aliases.join(" "),
+      affiliations.join(" "),
+      category,
+    ].join(" ").toLowerCase(),
+  };
+}
+
+function getWrestlingPeopleIndexRows() {
+  const sourceRows = wrestlingPeopleDataState === "live" || wrestlingPeopleDataState === "loading" || wrestlingPeopleDataState === "empty"
+    ? getWrestlingPeopleCollection()
+    : wrestlingPeopleRows;
+  return sourceRows
+    .map(normalizeWrestlingPeopleIndexRow)
+    .filter((person) => person.name)
+    .sort((left, right) => left.name.localeCompare(right.name));
+}
+
+function getWrestlingPeopleCategoryOptions(rows) {
+  return [...new Map(rows.map((person) => [
+    person.categoryFilterValue,
+    { value: person.categoryFilterValue, label: person.categoryDisplay },
+  ])).values()]
+    .filter((option) => option.value)
+    .sort((left, right) => left.label.localeCompare(right.label));
+}
+
+function normalizeActiveWrestlingPeopleFilters(rows) {
+  const letters = new Set(rows.map((person) => person.letter));
+  const categories = new Set(rows.map((person) => person.categoryFilterValue));
+  if (activeWrestlingPeopleLetterFilter && !letters.has(activeWrestlingPeopleLetterFilter)) {
+    activeWrestlingPeopleLetterFilter = "";
+  }
+  if (activeWrestlingPeopleCategoryFilter && !categories.has(activeWrestlingPeopleCategoryFilter)) {
+    activeWrestlingPeopleCategoryFilter = "";
+  }
+}
+
+function getFilteredWrestlingPeopleRows() {
+  const rows = getWrestlingPeopleIndexRows();
+  normalizeActiveWrestlingPeopleFilters(rows);
+  const searchTerm = activeWrestlingPeopleSearch.trim().toLowerCase();
+
+  return rows.filter((person) => {
+    if (activeWrestlingPeopleLetterFilter && person.letter !== activeWrestlingPeopleLetterFilter) {
+      return false;
+    }
+    if (activeWrestlingPeopleCategoryFilter && person.categoryFilterValue !== activeWrestlingPeopleCategoryFilter) {
+      return false;
+    }
+    if (searchTerm && !person.searchText.includes(searchTerm)) {
+      return false;
+    }
+    return true;
+  });
+}
+
 function createWrestlingPeopleStat(label, value) {
   const stat = document.createElement("span");
-  stat.className = "wrestling-person-card-stat";
+  stat.className = "wrestling-person-row-stat wrestling-person-card-stat";
+  stat.setAttribute("aria-label", `${Number(value).toLocaleString()} ${label.toLowerCase()}`);
 
   const statValue = document.createElement("strong");
   statValue.textContent = Number(value).toLocaleString();
@@ -1416,57 +1738,62 @@ function createWrestlingPeopleStat(label, value) {
   return stat;
 }
 
-function createWrestlingPeopleCard(person) {
-  const card = document.createElement("button");
-  card.className = "wrestling-person-card";
-  card.type = "button";
-  card.dataset.wrestlingPersonId = person.personId;
-  card.dataset.wrestlingPersonRoute = getWrestlingPersonRouteUrl(person.personId);
-  setWrestlingRelationshipDataset(card, person);
-  card.setAttribute("aria-pressed", "false");
-  card.setAttribute("aria-label", getWrestlingPeopleCardLabel(person));
-
-  const thumb = document.createElement("span");
-  thumb.className = "wrestling-person-card-thumb";
-  thumb.setAttribute("aria-hidden", "true");
-  thumb.textContent = person.thumb || person.name.slice(0, 2).toUpperCase();
-
-  const body = document.createElement("span");
-  body.className = "wrestling-person-card-body";
+function createWrestlingPeopleRow(person) {
+  const row = document.createElement("button");
+  row.className = "wrestling-person-row wrestling-person-card";
+  row.type = "button";
+  row.dataset.wrestlingPersonId = person.personId;
+  row.dataset.wrestlingPersonRoute = getWrestlingPersonRouteUrl(person.personId);
+  row.dataset.wrestlingPeopleCategory = person.categoryFilterValue;
+  row.dataset.wrestlingPeopleLetter = person.letter;
+  setWrestlingRelationshipDataset(row, person);
+  row.classList.toggle("is-active", person.personId === activeWrestlingPersonId);
+  row.setAttribute("aria-pressed", String(person.personId === activeWrestlingPersonId));
+  row.setAttribute("aria-label", getWrestlingPeopleCardLabel(person));
 
   const name = document.createElement("span");
-  name.className = "wrestling-person-card-name";
+  name.className = "wrestling-person-row-name wrestling-person-card-name";
   name.textContent = person.name;
 
-  const meta = document.createElement("span");
-  meta.className = "wrestling-person-card-meta";
-  meta.textContent = person.role;
+  const category = document.createElement("span");
+  category.className = "wrestling-person-row-category wrestling-person-card-meta";
+  category.textContent = person.categoryDisplay;
 
-  const faction = document.createElement("span");
-  faction.className = "wrestling-person-card-team";
-  faction.textContent = person.factionTeam;
+  const affiliation = document.createElement("span");
+  affiliation.className = "wrestling-person-row-affiliation wrestling-person-card-team";
+  affiliation.textContent = person.affiliationText || person.aliases.join(" / ");
 
   const stats = document.createElement("span");
-  stats.className = "wrestling-person-card-stats";
+  stats.className = "wrestling-person-row-stats wrestling-person-card-stats";
   stats.setAttribute("aria-hidden", "true");
-  stats.append(
-    createWrestlingPeopleStat("Matches", person.matches),
-    createWrestlingPeopleStat("Photos", person.photos)
-  );
-
-  body.append(name, meta);
-  if (person.factionTeam) {
-    body.append(faction);
+  if (person.matches > 0) {
+    stats.append(createWrestlingPeopleStat("Matches", person.matches));
   }
-  body.append(stats);
+  if (person.photos > 0) {
+    if (stats.children.length > 0) {
+      const divider = document.createElement("span");
+      divider.className = "wrestling-person-row-stat-divider";
+      divider.setAttribute("aria-hidden", "true");
+      divider.textContent = "/";
+      stats.append(divider);
+    }
+    stats.append(createWrestlingPeopleStat("Photos", person.photos));
+  }
 
   const arrow = document.createElement("span");
-  arrow.className = "wrestling-person-card-arrow";
+  arrow.className = "wrestling-person-row-arrow wrestling-person-card-arrow";
   arrow.setAttribute("aria-hidden", "true");
   arrow.textContent = ">";
 
-  card.append(thumb, body, arrow);
-  card.addEventListener("click", () => {
+  row.append(name, category);
+  if (affiliation.textContent) {
+    row.append(affiliation);
+  }
+  if (stats.children.length > 0) {
+    row.append(stats);
+  }
+  row.append(arrow);
+  row.addEventListener("click", () => {
     activeWrestlingPersonId = person.personId;
     setActiveWrestlingPeopleCard(person.personId);
     navigateToRoute(getWrestlingPersonRouteUrl(person.personId), {
@@ -1474,26 +1801,141 @@ function createWrestlingPeopleCard(person) {
     });
   });
 
-  return card;
+  return row;
 }
 
-function renderWrestlingPeopleIndex() {
+function syncWrestlingPeopleFilters(rows) {
+  if (wrestlingPeopleSearchInput) {
+    wrestlingPeopleSearchInput.value = activeWrestlingPeopleSearch;
+  }
+  if (wrestlingPeopleLetterSelect) {
+    const currentValue = activeWrestlingPeopleLetterFilter;
+    wrestlingPeopleLetterSelect.replaceChildren();
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "All";
+    wrestlingPeopleLetterSelect.append(allOption);
+    const availableLetters = new Set(rows.map((person) => person.letter));
+    wrestlingPeopleLetterOptions.forEach((letter) => {
+      if (!availableLetters.has(letter)) {
+        return;
+      }
+      const option = document.createElement("option");
+      option.value = letter;
+      option.textContent = letter;
+      wrestlingPeopleLetterSelect.append(option);
+    });
+    wrestlingPeopleLetterSelect.value = currentValue && availableLetters.has(currentValue) ? currentValue : "";
+  }
+  if (wrestlingPeopleCategorySelect) {
+    const currentValue = activeWrestlingPeopleCategoryFilter;
+    wrestlingPeopleCategorySelect.replaceChildren();
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "All";
+    wrestlingPeopleCategorySelect.append(allOption);
+    const categoryOptions = getWrestlingPeopleCategoryOptions(rows);
+    categoryOptions.forEach((category) => {
+      const option = document.createElement("option");
+      option.value = category.value;
+      option.textContent = category.label;
+      wrestlingPeopleCategorySelect.append(option);
+    });
+    wrestlingPeopleCategorySelect.value = categoryOptions.some((category) => category.value === currentValue) ? currentValue : "";
+  }
+}
+
+function updateWrestlingPeopleFilter(filterName, value) {
+  const nextValue = getWrestlingText(value);
+  if (filterName === "search") {
+    activeWrestlingPeopleSearch = nextValue;
+  } else if (filterName === "letter") {
+    activeWrestlingPeopleLetterFilter = wrestlingPeopleLetterOptions.includes(nextValue) ? nextValue : "";
+  } else if (filterName === "category") {
+    activeWrestlingPeopleCategoryFilter = normalizeWrestlingArchiveSlug(nextValue, "");
+  } else {
+    return;
+  }
+  renderWrestlingPeopleIndex({ skipDataRequest: true });
+}
+
+function resetWrestlingPeopleFilters() {
+  activeWrestlingPeopleSearch = "";
+  activeWrestlingPeopleLetterFilter = "";
+  activeWrestlingPeopleCategoryFilter = "";
+  renderWrestlingPeopleIndex({ skipDataRequest: true });
+}
+
+function initWrestlingPeopleFilters() {
+  if (wrestlingPeopleFiltersInitialized) {
+    return;
+  }
+  wrestlingPeopleFiltersInitialized = true;
+
+  if (wrestlingPeopleSearchInput) {
+    wrestlingPeopleSearchInput.addEventListener("input", () => {
+      updateWrestlingPeopleFilter("search", wrestlingPeopleSearchInput.value);
+    });
+  }
+  if (wrestlingPeopleLetterSelect) {
+    wrestlingPeopleLetterSelect.addEventListener("change", () => {
+      updateWrestlingPeopleFilter("letter", wrestlingPeopleLetterSelect.value);
+    });
+  }
+  if (wrestlingPeopleCategorySelect) {
+    wrestlingPeopleCategorySelect.addEventListener("change", () => {
+      updateWrestlingPeopleFilter("category", wrestlingPeopleCategorySelect.value);
+    });
+  }
+  if (wrestlingPeopleFilterReset) {
+    wrestlingPeopleFilterReset.addEventListener("click", resetWrestlingPeopleFilters);
+  }
+}
+
+function createWrestlingPeopleEmptyState(copy = "No people found. Try clearing filters.") {
+  const empty = document.createElement("div");
+  empty.className = "wrestling-people-empty";
+  empty.textContent = copy;
+  return empty;
+}
+
+function renderWrestlingPeopleIndex(options = {}) {
   if (!wrestlingPeopleList) {
     return;
   }
 
+  if (!options.skipDataRequest && wrestlingPeopleDataState === "idle" && !wrestlingPeopleRequest && !wrestlingPeopleLoaded) {
+    requestWrestlingPeopleData();
+  }
+
   const forcedState = getForcedMockState("wrestlingPeople");
+  const allRows = getWrestlingPeopleIndexRows();
+  normalizeActiveWrestlingPeopleFilters(allRows);
+  syncWrestlingPeopleFilters(allRows);
+  const filteredRows = getFilteredWrestlingPeopleRows();
+  const fragment = document.createDocumentFragment();
   wrestlingPeopleList.replaceChildren();
   if (forcedState && forcedState !== "partial") {
     renderMockState(wrestlingPeopleList, forcedState, "wrestlingPeople");
     return;
   }
-  wrestlingPeopleRows.forEach((person) => {
-    wrestlingPeopleList.append(createWrestlingPeopleCard(person));
-  });
-  if (forcedState === "partial") {
-    wrestlingPeopleList.append(createMockStateCard("partial", "wrestlingPeople"));
+  if (wrestlingPeopleDataState === "loading" || wrestlingPeopleDataState === "idle") {
+    renderMockState(fragment, "loading", "wrestlingPeople");
+  } else if (wrestlingPeopleDataState === "error") {
+    renderMockState(fragment, "error", "wrestlingPeople");
+  } else if (wrestlingPeopleDataState === "empty") {
+    fragment.append(createWrestlingPeopleEmptyState("No wrestling people found."));
+  } else if (filteredRows.length === 0) {
+    fragment.append(createWrestlingPeopleEmptyState());
+  } else {
+    filteredRows.forEach((person) => {
+      fragment.append(createWrestlingPeopleRow(person));
+    });
   }
+  if (forcedState === "partial") {
+    fragment.append(createMockStateCard("partial", "wrestlingPeople"));
+  }
+  wrestlingPeopleList.append(fragment);
   setActiveWrestlingPeopleCard();
 }
 
@@ -1833,21 +2275,59 @@ function returnToWrestlingPeopleRoute() {
   navigateToRoute(routePaths.wrestlingPeople);
 }
 
-function renderWrestlingPersonDetailRoute(personId) {
-  if (!wrestlingPersonDetailShell) {
-    return;
-  }
-
-  const person = findWrestlingPersonById(personId);
-  activeWrestlingPersonId = person.personId;
-  setActiveWrestlingPeopleCard(person.personId);
-  setWrestlingRelationshipDataset(wrestlingPersonDetailShell, person);
-
+function createWrestlingPersonDetailBackButton() {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-person-detail-back";
   backButton.type = "button";
   backButton.textContent = "Back to Wrestling People";
   backButton.addEventListener("click", returnToWrestlingPeopleRoute);
+  return backButton;
+}
+
+function renderWrestlingPersonDetailPending(personId) {
+  if (!wrestlingPersonDetailShell) {
+    return;
+  }
+
+  const stateCard = createMockStateCard("loading", "wrestlingPeople", {
+    title: "Loading Person",
+    text: "Fetching wrestling person data.",
+  });
+  stateCard.dataset.wrestlingPersonId = normalizeWrestlingPersonId(personId);
+  wrestlingPersonDetailShell.replaceChildren(createWrestlingPersonDetailBackButton(), stateCard);
+}
+
+function renderWrestlingPersonDetailRoute(personId) {
+  if (!wrestlingPersonDetailShell) {
+    return;
+  }
+
+  let person = findWrestlingPersonById(personId, { allowFallback: false });
+  if (
+    !person &&
+    !wrestlingPeopleLoaded &&
+    (wrestlingPeopleDataState === "idle" || wrestlingPeopleDataState === "loading" || wrestlingPeopleRequest)
+  ) {
+    const pendingPeopleRequest = wrestlingPeopleRequest || requestWrestlingPeopleData();
+    renderWrestlingPersonDetailPending(personId);
+    pendingPeopleRequest.then(() => {
+      const currentRoute = getRouteFromUrl();
+      if (
+        currentRoute.name === "wrestling-person-detail" &&
+        normalizeWrestlingPersonId(currentRoute.personId || currentRoute.params?.personId) === normalizeWrestlingPersonId(personId)
+      ) {
+        renderWrestlingPersonDetailRoute(personId);
+      }
+    });
+    return;
+  }
+
+  person = person || findWrestlingPersonById(personId);
+  activeWrestlingPersonId = person.personId;
+  setActiveWrestlingPeopleCard(person.personId);
+  setWrestlingRelationshipDataset(wrestlingPersonDetailShell, person);
+
+  const backButton = createWrestlingPersonDetailBackButton();
 
   const hero = document.createElement("section");
   hero.className = "wrestling-person-detail-hero";
@@ -2234,7 +2714,8 @@ function initWrestlingShowsArchive() {
 }
 
 function initWrestlingPeopleModule() {
-  renderWrestlingPeopleIndex();
+  initWrestlingPeopleFilters();
+  renderWrestlingPeopleIndex({ skipDataRequest: true });
   renderWrestlingVenuesIndex();
   initWrestlingShowsArchive();
   applyStaticWrestlingRelationshipHooks();

@@ -1066,21 +1066,23 @@
             </button>
           </header>
 
-          <section class="wrestling-people-controls" aria-label="Wrestling people placeholder controls">
-            <label class="wrestling-people-search">
-              <span class="wrestling-people-search-label">Search</span>
-              <input class="wrestling-people-search-input" type="search" placeholder="Search people" autocomplete="off">
+          <section class="wrestling-people-controls wrestling-people-filters" aria-label="Wrestling people archive filters" data-wrestling-people-filters>
+            <label class="wrestling-people-filter-field wrestling-people-filter-field--search">
+              <span class="wrestling-people-filter-label">Search People</span>
+              <input class="wrestling-people-search-input" type="search" placeholder="Search ring name, legal name, alias, team" autocomplete="off" data-wrestling-people-filter="search">
             </label>
-            <div class="wrestling-people-chip-row" aria-label="People categories">
-              <button class="wrestling-people-chip is-active" type="button" aria-pressed="true">All</button>
-              <button class="wrestling-people-chip" type="button" aria-pressed="false">Wrestlers</button>
-              <button class="wrestling-people-chip" type="button" aria-pressed="false">Referees</button>
-              <button class="wrestling-people-chip" type="button" aria-pressed="false">Managers</button>
-              <button class="wrestling-people-chip" type="button" aria-pressed="false">Commentators</button>
-            </div>
+            <label class="wrestling-people-filter-field">
+              <span class="wrestling-people-filter-label">Letter</span>
+              <select class="wrestling-people-filter-select" aria-label="Filter wrestling people by letter" data-wrestling-people-filter="letter"></select>
+            </label>
+            <label class="wrestling-people-filter-field">
+              <span class="wrestling-people-filter-label">Category</span>
+              <select class="wrestling-people-filter-select" aria-label="Filter wrestling people by category" data-wrestling-people-filter="category"></select>
+            </label>
+            <button class="wrestling-people-filter-reset" type="button" data-wrestling-people-filter-reset>Reset Filters</button>
           </section>
 
-          <div class="wrestling-people-list" role="list" aria-label="Wrestling people placeholder cards" data-wrestling-people-list></div>
+          <div class="wrestling-people-list" role="list" aria-label="Wrestling people archive rows" data-wrestling-people-list></div>
         </section>
         <article class="wrestling-person-detail-shell" aria-labelledby="wrestling-person-detail-title" aria-hidden="true" inert data-wrestling-person-detail-shell></article>
         <section class="wrestling-venues-shell" aria-labelledby="wrestling-venues-title" aria-hidden="true" inert data-wrestling-venues-shell>

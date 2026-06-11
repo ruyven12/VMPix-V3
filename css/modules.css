@@ -9314,6 +9314,19 @@ img.archive-gallery-image {
   max-width: 100%;
 }
 
+.wrestling-people-filters {
+  width: min(100%, 58rem);
+  justify-self: center;
+  align-items: end;
+  padding: clamp(0.52rem, 1.8vw, 0.72rem);
+  border: 1px solid rgba(247, 247, 242, 0.075);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 72%),
+    rgba(7, 7, 10, 0.5);
+}
+
+.wrestling-people-filter-field,
 .wrestling-people-search,
 .wrestling-venues-search {
   display: grid;
@@ -9321,6 +9334,7 @@ img.archive-gallery-image {
   min-width: 0;
 }
 
+.wrestling-people-filter-label,
 .wrestling-people-search-label,
 .wrestling-venues-search-label {
   color: rgba(247, 247, 242, 0.5);
@@ -9330,6 +9344,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-people-search-input,
+.wrestling-people-filter-select,
 .wrestling-venues-search-input {
   width: 100%;
   min-height: max(var(--tap-target), 3rem);
@@ -9351,7 +9366,25 @@ img.archive-gallery-image {
   color: rgba(247, 247, 242, 0.42);
 }
 
-.wrestling-people-chip-row,
+.wrestling-people-filter-reset {
+  appearance: none;
+  min-height: max(var(--tap-target), 3rem);
+  max-width: 100%;
+  padding: 0.68rem 0.76rem;
+  border: 1px solid rgba(213, 22, 34, 0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.08);
+  color: rgba(247, 247, 242, 0.82);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.62rem, 2.4vw, 0.74rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-align: center;
+  touch-action: manipulation;
+  text-transform: uppercase;
+}
+
 .wrestling-venues-chip-row {
   display: flex;
   flex-wrap: wrap;
@@ -9361,7 +9394,6 @@ img.archive-gallery-image {
   overflow-x: visible;
 }
 
-.wrestling-people-chip,
 .wrestling-venues-chip {
   appearance: none;
   min-height: var(--tap-target);
@@ -9383,7 +9415,6 @@ img.archive-gallery-image {
   white-space: nowrap;
 }
 
-.wrestling-people-chip.is-active,
 .wrestling-venues-chip.is-active {
   border-color: rgba(213, 22, 34, 0.48);
   background: rgba(213, 22, 34, 0.12);
@@ -9730,16 +9761,24 @@ img.archive-gallery-image {
   opacity: 0.72;
 }
 
+.wrestling-person-row,
 .wrestling-person-card {
   appearance: none;
   position: relative;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
+  min-height: clamp(4.08rem, 12vw, 4.8rem);
   display: grid;
-  grid-template-columns: clamp(3.65rem, 16vw, 4.85rem) minmax(0, 1fr) clamp(1.1rem, 4.8vw, 1.55rem);
+  grid-template-columns: minmax(0, 1fr) clamp(1rem, 4vw, 1.24rem);
+  grid-template-areas:
+    "name arrow"
+    "category arrow"
+    "affiliation arrow"
+    "stats arrow";
   align-items: center;
-  gap: clamp(0.56rem, 2vw, 0.78rem);
-  min-height: clamp(6.2rem, 22vw, 7.65rem);
-  padding: clamp(0.48rem, 2vw, 0.66rem);
+  gap: 0.22rem clamp(0.48rem, 1.6vw, 0.72rem);
+  padding: clamp(0.52rem, 1.85vw, 0.68rem);
   border: 1px solid rgba(247, 247, 242, 0.09);
   border-radius: var(--radius-sm);
   background:
@@ -9754,6 +9793,7 @@ img.archive-gallery-image {
   touch-action: manipulation;
 }
 
+.wrestling-person-row::before,
 .wrestling-person-card::before {
   position: absolute;
   inset: 0;
@@ -9764,7 +9804,6 @@ img.archive-gallery-image {
   pointer-events: none;
 }
 
-.wrestling-person-card-thumb,
 .wrestling-person-detail-photo {
   position: relative;
   display: grid;
@@ -9780,12 +9819,6 @@ img.archive-gallery-image {
   overflow: hidden;
 }
 
-.wrestling-person-card-thumb {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-}
-
-.wrestling-person-card-thumb::before,
 .wrestling-person-detail-photo::before {
   position: absolute;
   inset: 14%;
@@ -9793,97 +9826,130 @@ img.archive-gallery-image {
   border: 1px solid rgba(247, 247, 242, 0.14);
 }
 
-.wrestling-person-card-thumb,
-.wrestling-person-card-body,
-.wrestling-person-card-arrow {
+.wrestling-person-row-name,
+.wrestling-person-row-category,
+.wrestling-person-row-affiliation,
+.wrestling-person-row-stats,
+.wrestling-person-row-stat,
+.wrestling-person-row-arrow,
+.wrestling-person-card-name,
+.wrestling-person-card-meta,
+.wrestling-person-card-team,
+.wrestling-person-card-stat,
+.wrestling-person-card-arrow,
+.wrestling-people-empty {
+  position: relative;
   z-index: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.12;
+  text-transform: uppercase;
 }
 
-.wrestling-person-card-thumb,
 .wrestling-person-detail-photo span {
+  position: relative;
+  z-index: 1;
   color: rgba(247, 247, 242, 0.82);
   font-size: clamp(0.92rem, 4vw, 1.2rem);
   line-height: 1;
   text-transform: uppercase;
 }
 
-.wrestling-person-card-body {
-  min-width: 0;
-  display: grid;
-  align-content: center;
-  gap: 0.24rem;
-}
-
-.wrestling-person-card-name,
-.wrestling-person-card-meta,
-.wrestling-person-card-team,
-.wrestling-person-card-stat,
-.wrestling-person-card-arrow {
-  min-width: 0;
-}
-
+.wrestling-person-row-name,
 .wrestling-person-card-name {
+  grid-area: name;
   color: rgba(247, 247, 242, 0.92);
-  font-size: clamp(0.88rem, 3.7vw, 1.1rem);
-  line-height: 1.04;
+  font-size: clamp(0.88rem, 3.7vw, 1.08rem);
+  font-weight: 400;
   overflow-wrap: anywhere;
   text-wrap: balance;
-  text-transform: uppercase;
 }
 
-.wrestling-person-card-meta,
-.wrestling-person-card-team {
-  color: rgba(247, 247, 242, 0.58);
-  font-size: clamp(0.6rem, 2.35vw, 0.72rem);
-  line-height: 1.12;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-  text-transform: uppercase;
-}
-
+.wrestling-person-row-category,
 .wrestling-person-card-meta {
-  color: rgba(213, 22, 34, 0.76);
+  grid-area: category;
+  justify-self: start;
+  max-width: 100%;
+  color: rgba(213, 22, 34, 0.78);
+  font-size: clamp(0.58rem, 2.24vw, 0.7rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.wrestling-person-row-affiliation,
+.wrestling-person-card-team {
+  grid-area: affiliation;
+  display: block;
+  color: rgba(247, 247, 242, 0.56);
+  font-size: clamp(0.56rem, 2.15vw, 0.68rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.wrestling-person-row-stats,
 .wrestling-person-card-stats {
-  display: flex;
-  flex-wrap: wrap;
+  grid-area: stats;
+  min-width: 0;
+  max-width: 100%;
+  display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  padding-top: 0.1rem;
+  justify-content: flex-start;
+  justify-self: start;
+  flex-wrap: wrap;
+  gap: 0.48rem;
+  row-gap: 0.18rem;
+  padding-top: 0.08rem;
 }
 
+.wrestling-person-row-stat,
 .wrestling-person-card-stat {
   display: inline-flex;
   align-items: baseline;
-  gap: 0.22rem;
-  min-height: 1.45rem;
-  padding: 0.28rem 0.42rem;
-  border: 1px solid rgba(247, 247, 242, 0.08);
-  border-radius: 999px;
-  background: rgba(247, 247, 242, 0.028);
-  color: rgba(247, 247, 242, 0.52);
-  font-size: clamp(0.54rem, 2.15vw, 0.64rem);
-  line-height: 1;
+  gap: 0.24rem;
+  color: rgba(247, 247, 242, 0.56);
+  font-size: clamp(0.52rem, 2.05vw, 0.62rem);
   white-space: nowrap;
-  text-transform: uppercase;
 }
 
+.wrestling-person-row-stat strong,
 .wrestling-person-card-stat strong {
   color: rgba(247, 247, 242, 0.86);
   font-weight: 400;
 }
 
-.wrestling-person-card-arrow {
-  display: inline-grid;
-  place-items: center;
-  color: rgba(213, 22, 34, 0.72);
-  font-size: clamp(1.22rem, 5vw, 1.72rem);
+.wrestling-person-row-stat-divider {
+  color: rgba(247, 247, 242, 0.32);
+  font-size: clamp(0.52rem, 2.05vw, 0.62rem);
   line-height: 1;
 }
 
+.wrestling-person-row-arrow,
+.wrestling-person-card-arrow {
+  grid-area: arrow;
+  display: inline-grid;
+  place-items: center;
+  justify-self: end;
+  color: rgba(213, 22, 34, 0.72);
+  font-size: clamp(0.92rem, 3.6vw, 1.12rem);
+  line-height: 1;
+}
+
+.wrestling-people-empty {
+  padding: 0.72rem;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background: rgba(247, 247, 242, 0.02);
+  color: rgba(247, 247, 242, 0.54);
+  font-size: clamp(0.62rem, 2.25vw, 0.72rem);
+}
+
+.wrestling-person-row:hover,
 .wrestling-person-card:hover,
+.wrestling-person-row.is-active,
 .wrestling-person-card.is-active,
+.wrestling-person-row[aria-pressed="true"],
 .wrestling-person-card[aria-pressed="true"] {
   border-color: rgba(247, 247, 242, 0.14);
   background:
@@ -10049,6 +10115,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-people-back:hover,
+.wrestling-people-filter-reset:hover,
 .wrestling-venues-back:hover,
 .wrestling-person-detail-back:hover,
 .wrestling-event-history-open:hover,
@@ -10059,6 +10126,7 @@ img.archive-gallery-image {
 }
 
 .wrestling-people-back:active,
+.wrestling-people-filter-reset:active,
 .wrestling-venues-back:active,
 .wrestling-person-detail-back:active,
 .wrestling-venue-detail-back:active,
@@ -10068,9 +10136,12 @@ img.archive-gallery-image {
 }
 
 .wrestling-people-back:focus-visible,
-.wrestling-people-chip:focus-visible,
+.wrestling-people-search-input:focus-visible,
+.wrestling-people-filter-select:focus-visible,
+.wrestling-people-filter-reset:focus-visible,
 .wrestling-venues-back:focus-visible,
 .wrestling-venues-chip:focus-visible,
+.wrestling-person-row:focus-visible,
 .wrestling-person-card:focus-visible,
 .wrestling-venue-card:focus-visible,
 .wrestling-person-detail-back:focus-visible,
@@ -10108,11 +10179,20 @@ img.archive-gallery-image {
     font-size: clamp(1.28rem, 6.8vw, 1.58rem);
   }
 
+  .wrestling-people-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.5rem;
+  }
+
+  .wrestling-people-filter-reset {
+    width: 100%;
+  }
+
+  .wrestling-person-row,
   .wrestling-person-card {
-    grid-template-columns: clamp(3.18rem, 14vw, 3.72rem) minmax(0, 1fr) 0.95rem;
-    gap: 0.46rem;
-    min-height: 6rem;
-    padding: 0.42rem;
+    min-height: 0;
+    gap: 0.22rem 0.46rem;
+    padding: 0.5rem;
   }
 
   .wrestling-person-detail-hero {
@@ -10133,10 +10213,7 @@ img.archive-gallery-image {
     max-height: min(32svh, 15rem);
   }
 
-  .wrestling-person-card-thumb {
-    align-self: start;
-  }
-
+  .wrestling-person-row-stats,
   .wrestling-person-card-stats {
     gap: 0.24rem;
   }
@@ -10194,19 +10271,17 @@ img.archive-gallery-image {
     justify-self: stretch;
   }
 
-  .wrestling-people-chip-row,
   .wrestling-venues-chip-row {
     gap: 0.3rem;
   }
 
-  .wrestling-people-chip,
   .wrestling-venues-chip {
     flex: 1 1 calc(50% - 0.3rem);
   }
 
+  .wrestling-person-row,
   .wrestling-person-card {
-    grid-template-columns: 3rem minmax(0, 1fr) 0.8rem;
-    gap: 0.34rem;
+    gap: 0.2rem 0.34rem;
     padding: 0.38rem;
   }
 
@@ -10260,25 +10335,52 @@ img.archive-gallery-image {
   .wrestling-venues-controls {
     width: min(100%, 58rem);
     justify-self: center;
-    grid-template-columns: minmax(14rem, 0.54fr) minmax(0, 1fr);
     align-items: end;
   }
 
-  .wrestling-people-chip-row,
+  .wrestling-people-filters {
+    grid-template-columns: minmax(14rem, 1.35fr) minmax(6.6rem, 0.42fr) minmax(9rem, 0.62fr) auto;
+  }
+
+  .wrestling-venues-controls {
+    grid-template-columns: minmax(14rem, 0.54fr) minmax(0, 1fr);
+  }
+
   .wrestling-venues-chip-row {
     justify-content: flex-end;
   }
 
-  .wrestling-people-list,
+  .wrestling-people-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(0.66rem, 1.3vw, 0.9rem);
+  }
+
   .wrestling-venues-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(0.66rem, 1.3vw, 0.9rem);
   }
 
+  .wrestling-person-row,
   .wrestling-person-card {
-    grid-template-columns: clamp(4.35rem, 6.4vw, 5.25rem) minmax(0, 1fr) 1.55rem;
-    min-height: clamp(7rem, 10vw, 8.1rem);
+    grid-template-columns: minmax(0, 1.45fr) minmax(7rem, 0.58fr) minmax(8rem, 0.62fr) 1rem;
+    grid-template-areas:
+      "name category stats arrow"
+      "affiliation category stats arrow";
+    min-height: clamp(3.72rem, 5.2vw, 4.42rem);
     padding: clamp(0.64rem, 1vw, 0.78rem);
+  }
+
+  .wrestling-person-row-category,
+  .wrestling-person-card-meta {
+    justify-self: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .wrestling-person-row-stats,
+  .wrestling-person-card-stats {
+    justify-content: flex-end;
+    justify-self: end;
   }
 
   .wrestling-person-detail-hero {
