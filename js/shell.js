@@ -783,12 +783,15 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId);
   }
   if (route.name === "wrestling-match-gallery") {
-    return `${routePaths.wrestlingShows}/${encodeURIComponent(route.showId || "warzone-26")}`;
+    if (typeof getWrestlingShowRouteUrl === "function") {
+      return getWrestlingShowRouteUrl(route.dateKey || route.showId || "warzone-26");
+    }
+    return `${routePaths.wrestlingShows}/${encodeURIComponent(route.dateKey || route.showId || "warzone-26")}`;
   }
   if (route.name === "wrestling-lightbox") {
-    const showId = route.showId || "warzone-26";
-    const matchId = route.matchId || "daron-richardson-vs-bear-bronson";
-    return `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}`;
+    const showId = route.dateKey || route.showId || "warzone-26";
+    const matchRef = route.matchRef || route.matchId || "1";
+    return `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchRef)}`;
   }
 
   return routeNameToShellBackTarget[route.name] || routePaths.portfolio;
@@ -1746,16 +1749,24 @@ function getWrestlingPhotoNumber(photoId) {
 }
 
 function navigateToWrestlingPhoto(photoNumber) {
-  const showId = wrestlingLightboxShell?.dataset.wrestlingShowId ||
+  const showRoute = wrestlingLightboxShell?.dataset.wrestlingShowRoute ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingShowRoute ||
+    "";
+  const fallbackShowId = wrestlingLightboxShell?.dataset.wrestlingShowId ||
     wrestlingLightboxShell?.dataset.showId ||
     wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
     "warzone-26";
-  const matchId = wrestlingLightboxShell?.dataset.wrestlingMatchId ||
+  const showId = showRoute
+    ? showRoute.replace(/\/$/, "")
+    : `${routePaths.wrestlingShows}/${encodeURIComponent(fallbackShowId)}`;
+  const matchRef = wrestlingLightboxShell?.dataset.wrestlingMatchRef ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchRef ||
+    wrestlingLightboxShell?.dataset.wrestlingMatchId ||
     wrestlingLightboxShell?.dataset.matchId ||
     wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
-    "daron-richardson-vs-bear-bronson";
+    "1";
 
-  navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
+  navigateToRoute(`${showId}/match/${encodeURIComponent(matchRef)}/photo/${getWrestlingPhotoIdFromNumber(photoNumber)}`);
 }
 
 function showWrestlingLightbox(showId, matchId, photoId) {
@@ -2446,6 +2457,11 @@ if (shell && startButton) {
   }
   if (wrestlingMatchGalleryBack) {
     wrestlingMatchGalleryBack.addEventListener("click", () => {
+      const showRoute = wrestlingMatchGalleryShell?.dataset.wrestlingShowRoute;
+      if (showRoute) {
+        navigateToRoute(showRoute);
+        return;
+      }
       const showId = wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
         wrestlingMatchGalleryShell?.dataset.showId ||
         "warzone-26";
@@ -2456,12 +2472,18 @@ if (shell && startButton) {
     const photoId = tile.dataset.wrestlingPhotoId;
     tile.addEventListener("click", () => {
       if (photoId) {
+        if (tile.dataset.wrestlingLightboxRoute) {
+          navigateToRoute(tile.dataset.wrestlingLightboxRoute);
+          return;
+        }
         const showId = tile.dataset.wrestlingShowId ||
           wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
           "warzone-26";
-        const matchId = tile.dataset.wrestlingMatchId ||
+        const matchId = tile.dataset.wrestlingMatchRef ||
+          wrestlingMatchGalleryShell?.dataset.wrestlingMatchRef ||
+          tile.dataset.wrestlingMatchId ||
           wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
-          "daron-richardson-vs-bear-bronson";
+          "1";
         navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}`);
       }
     });

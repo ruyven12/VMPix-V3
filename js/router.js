@@ -84,19 +84,19 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath.startsWith(wrestlingShowDetailPrefix)) {
     const routeParts = routePath.slice(wrestlingShowDetailPrefix.length).split("/");
     if (routeParts.length === 5 && routeParts[0] && routeParts[1] === "match" && routeParts[2] && routeParts[3] === "photo" && routeParts[4]) {
-      const showId = decodeRoutePart(routeParts[0]);
-      const matchId = decodeRoutePart(routeParts[2]);
+      const dateKey = decodeRoutePart(routeParts[0]);
+      const matchRef = decodeRoutePart(routeParts[2]);
       const photoId = decodeRoutePart(routeParts[4]);
-      return { name: "wrestling-lightbox", showId, matchId, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}/photo/${encodeURIComponent(photoId)}` };
+      return { name: "wrestling-lightbox", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/match/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
     }
     if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "match" && routeParts[2]) {
-      const showId = decodeRoutePart(routeParts[0]);
-      const matchId = decodeRoutePart(routeParts[2]);
-      return { name: "wrestling-match-gallery", showId, matchId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}/match/${encodeURIComponent(matchId)}` };
+      const dateKey = decodeRoutePart(routeParts[0]);
+      const matchRef = decodeRoutePart(routeParts[2]);
+      return { name: "wrestling-match-gallery", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/match/${encodeURIComponent(matchRef)}` };
     }
     if (routeParts.length === 1 && routeParts[0]) {
-      const showId = decodeRoutePart(routeParts[0]);
-      return { name: "wrestling-show-detail", showId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(showId)}` };
+      const dateKey = decodeRoutePart(routeParts[0]);
+      return { name: "wrestling-show-detail", showId: dateKey, dateKey, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}` };
     }
   }
   if (routePath === routePaths.calendar) {
@@ -296,7 +296,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-match-gallery") {
-    showWrestlingMatchGallery(route.showId, route.matchId);
+    showWrestlingMatchGallery(route.dateKey || route.showId, route.matchRef || route.matchId);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
@@ -304,7 +304,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-lightbox") {
-    showWrestlingLightbox(route.showId, route.matchId, route.photoId);
+    showWrestlingLightbox(route.dateKey || route.showId, route.matchRef || route.matchId, route.photoId);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

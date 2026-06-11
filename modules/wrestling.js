@@ -205,8 +205,80 @@ function getWrestlingArray(value) {
   return [String(value).trim()];
 }
 
+function getWrestlingLabelArray(value) {
+  const rawValues = Array.isArray(value)
+    ? value
+    : value === undefined || value === null || String(value).trim() === ""
+      ? []
+      : [value];
+  return rawValues
+    .map((item) => {
+      if (item && typeof item === "object") {
+        return getWrestlingText(
+          item.name ||
+          item.display_name ||
+          item.displayName ||
+          item.person_name ||
+          item.personName ||
+          item.wrestler ||
+          item.participant ||
+          item.team_name ||
+          item.teamName ||
+          item.title ||
+          item.id
+        );
+      }
+      return getWrestlingText(item);
+    })
+    .filter(Boolean);
+}
+
 function getWrestlingNameIds(values) {
   return getWrestlingArray(values).map((value) => normalizeWrestlingPersonId(value)).filter(Boolean);
+}
+
+function getWrestlingPositiveNumber(value) {
+  const number = Number.parseInt(value, 10);
+  return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
+function getWrestlingMatchRefNumber(value) {
+  const rawValue = String(value || "").trim();
+  if (/^\d+$/.test(rawValue)) {
+    return getWrestlingPositiveNumber(rawValue);
+  }
+
+  const matchNumber = normalizeWrestlingArchiveSlug(rawValue, "").match(/^match-(\d+)$/);
+  return matchNumber ? getWrestlingPositiveNumber(matchNumber[1]) : 0;
+}
+
+function getWrestlingMatchRouteRef(match, index = -1) {
+  if (match && typeof match === "object") {
+    const numericCandidates = [
+      match.matchRef,
+      match.match_ref,
+      match.matchNumber,
+      match.match_number,
+      match.matchOrder,
+      match.match_order,
+      match.order,
+    ];
+    for (const candidate of numericCandidates) {
+      const number = getWrestlingMatchRefNumber(candidate);
+      if (number) {
+        return String(number);
+      }
+    }
+
+    if (Number.isInteger(index) && index >= 0) {
+      return String(index + 1);
+    }
+
+    return getWrestlingText(match.matchId || match.id || match.slug || match.matchUrl || match.match_url);
+  }
+
+  const number = getWrestlingMatchRefNumber(match);
+  return number ? String(number) : getWrestlingText(match);
 }
 
 function parseWrestlingShowDate(value) {
@@ -345,14 +417,21 @@ function getWrestlingShowsPayloadRows(payload) {
 
 function normalizeWrestlingMatchRow(record = {}, show = {}, index = 0) {
   const order = Number.parseInt(record.match_order ?? record.order ?? index + 1, 10) || index + 1;
-  const sideOne = getWrestlingArray(record.side_1 || record.side1);
-  const sideTwo = getWrestlingArray(record.side_2 || record.side2);
+  const sideOne = getWrestlingLabelArray(record.side_1 || record.side1);
+  const sideTwo = getWrestlingLabelArray(record.side_2 || record.side2);
   const sideTitle = [sideOne.join(", "), sideTwo.join(", ")].filter(Boolean).join(" vs ");
   const title = getWrestlingText(record.title || sideTitle || record.notes, `Match ${order}`);
   const matchType = getWrestlingText(record.stipulation || record.notes || record.match_type || record.matchType, "Match");
   const matchId = normalizeWrestlingArchiveSlug(record.match_url || record.matchUrl || title || `match-${order}`, `match-${order}`);
-  const participants = getWrestlingArray(record.participants).length > 0
-    ? getWrestlingArray(record.participants)
+  const photoCount = Number.parseInt(
+    record.photoCount ??
+    record.photo_count ??
+    record.stats?.photoCount ??
+    (Array.isArray(record.photos) ? record.photos.length : "0"),
+    10
+  ) || 0;
+  const participants = getWrestlingLabelArray(record.participants).length > 0
+    ? getWrestlingLabelArray(record.participants)
     : [...sideOne, ...sideTwo];
   const taggedPeople = getWrestlingArray(record.tagged_people || record.taggedPeople);
   const referees = getWrestlingArray(record.referees);
@@ -366,6 +445,8 @@ function normalizeWrestlingMatchRow(record = {}, show = {}, index = 0) {
     matchName: title,
     matchType,
     matchOrder: order,
+    matchRef: String(order),
+    photoCount,
     participants,
     winners: getWrestlingArray(record.winner || record.winners),
     taggedPeople,
@@ -550,6 +631,10 @@ function requestWrestlingShowsData() {
       const route = getRouteFromUrl();
       if (route.name === "wrestling-show-detail") {
         renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true });
+      } else if (route.name === "wrestling-match-gallery") {
+        updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
+      } else if (route.name === "wrestling-lightbox") {
+        updateWrestlingLightboxRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, route.photoId);
       }
       return liveRows.length > 0;
     })
@@ -559,6 +644,10 @@ function requestWrestlingShowsData() {
       const route = getRouteFromUrl();
       if (route.name === "wrestling-show-detail") {
         renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true });
+      } else if (route.name === "wrestling-match-gallery") {
+        updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
+      } else if (route.name === "wrestling-lightbox") {
+        updateWrestlingLightboxRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, route.photoId);
       }
       return false;
     })
@@ -601,10 +690,68 @@ function findLiveWrestlingShowById(showId) {
 }
 
 function findLiveWrestlingMatchById(matchId, showId = "") {
-  const targetMatchId = normalizeWrestlingArchiveSlug(matchId, "");
   const show = findLiveWrestlingShowById(showId);
   const searchRows = show ? show.matches : wrestlingShowsCollection.flatMap((row) => row.matches || []);
-  return searchRows.find((match) => normalizeWrestlingArchiveSlug(match.matchId, "") === targetMatchId) || null;
+  return findWrestlingMatchInRowsByRef(searchRows, matchId);
+}
+
+function findWrestlingMatchInRowsByRef(rows = [], matchRef = "") {
+  const matchRows = Array.isArray(rows) ? rows : [];
+  const targetNumber = getWrestlingMatchRefNumber(matchRef);
+  if (targetNumber) {
+    return matchRows.find((match, index) => {
+      const routeRef = getWrestlingMatchRefNumber(getWrestlingMatchRouteRef(match, index));
+      return routeRef === targetNumber;
+    }) || null;
+  }
+
+  const targetSlug = normalizeWrestlingArchiveSlug(matchRef, "");
+  if (!targetSlug) {
+    return null;
+  }
+
+  return matchRows.find((match) => {
+    const candidates = [
+      match.matchId,
+      match.id,
+      match.slug,
+      match.matchUrl,
+      match.match_url,
+      match.matchName,
+      match.title,
+    ];
+    return candidates
+      .map((candidate) => normalizeWrestlingArchiveSlug(candidate, ""))
+      .some((candidate) => candidate === targetSlug);
+  }) || null;
+}
+
+function findStaticWrestlingMatchByRef(matchRef, showId = "") {
+  const normalizedShowId = String(showId || "").trim();
+  const showRelationship = getMockRecordById("wrestlingShows", normalizedShowId, ["showId", "eventId", "id", "slug", "show_id", "show_key"]);
+  const staticShowId = showRelationship?.showId || normalizedShowId;
+  const matchRows = filterMockCollection("wrestlingMatches", (match) => (
+    !staticShowId || match.showId === staticShowId
+  ));
+  const targetNumber = getWrestlingMatchRefNumber(matchRef);
+  if (targetNumber) {
+    const orderedMatchId = Array.isArray(showRelationship?.matchIds) ? showRelationship.matchIds[targetNumber - 1] : "";
+    return (orderedMatchId ? findWrestlingMatchRelationshipById(orderedMatchId, staticShowId) : null) ||
+      matchRows[targetNumber - 1] ||
+      null;
+  }
+
+  return findWrestlingMatchRelationshipById(matchRef, staticShowId) ||
+    findWrestlingMatchInRowsByRef(matchRows, matchRef);
+}
+
+function findWrestlingMatchRelationshipByRef(matchRef, showId = "") {
+  const show = findLiveWrestlingShowById(showId);
+  if (show) {
+    return findWrestlingMatchInRowsByRef(show.matches, matchRef);
+  }
+
+  return findStaticWrestlingMatchByRef(matchRef, showId);
 }
 
 function getWrestlingShowsIndexRows() {
@@ -975,12 +1122,16 @@ function createWrestlingDetailFact(label, value) {
   return fact;
 }
 
-function createWrestlingMatchCard(match) {
+function createWrestlingMatchCard(match, show = null, matchIndex = -1) {
   const card = document.createElement("li");
+  const matchRef = getWrestlingMatchRouteRef(match, matchIndex);
+  const matchRoute = getWrestlingMatchRouteUrlByIds(show || match.showId, matchRef);
   card.className = "wrestling-match-card";
   card.dataset.wrestlingShowId = match.showId;
   card.dataset.wrestlingMatchId = match.matchId;
-  card.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(match.showId, match.matchId);
+  card.dataset.wrestlingMatchRef = matchRef;
+  card.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show || match.showId);
+  card.dataset.wrestlingMatchRoute = matchRoute;
   card.setAttribute("role", "link");
   card.tabIndex = 0;
   card.setAttribute("aria-label", `Open match ${match.matchName}`);
@@ -995,7 +1146,7 @@ function createWrestlingMatchCard(match) {
   title.textContent = match.matchName;
 
   const navigateToMatch = () => {
-    navigateToRoute(getWrestlingMatchRouteUrlByIds(match.showId, match.matchId));
+    navigateToRoute(matchRoute);
   };
   card.addEventListener("click", navigateToMatch);
   card.addEventListener("keydown", (event) => {
@@ -1122,8 +1273,8 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   matchList.setAttribute("aria-label", `${show.title || "Event"} matches`);
   const matches = Array.isArray(show.matches) ? show.matches : [];
   if (matches.length > 0) {
-    matches.forEach((match) => {
-      matchList.append(createWrestlingMatchCard(match));
+    matches.forEach((match, matchIndex) => {
+      matchList.append(createWrestlingMatchCard(match, show, matchIndex));
     });
   } else {
     const emptyMatch = document.createElement("li");
@@ -1160,7 +1311,9 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   galleryButton.textContent = "Open Gallery";
   const galleryMatch = matches[0] || null;
   if (galleryMatch) {
-    galleryButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(show.showId, galleryMatch.matchId);
+    galleryButton.dataset.wrestlingMatchRef = getWrestlingMatchRouteRef(galleryMatch, 0);
+    galleryButton.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
+    galleryButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(show, galleryButton.dataset.wrestlingMatchRef);
     setWrestlingRelationshipDataset(galleryButton, galleryMatch);
     galleryButton.addEventListener("click", () => navigateToRoute(galleryButton.dataset.wrestlingMatchRoute));
   } else {
@@ -1182,12 +1335,19 @@ function getWrestlingPeopleCardLabel(person) {
   ].filter(Boolean).join(", ");
 }
 
-function getWrestlingMatchRouteUrlByIds(showId, matchId) {
-  return `${routePaths.wrestlingShows}/${encodeURIComponent(String(showId || "").trim())}/match/${encodeURIComponent(String(matchId || "").trim())}`;
+function getWrestlingMatchRouteUrlByIds(showId, matchRef, matchIndex = -1) {
+  const showRouteSource = showId && typeof showId === "object"
+    ? showId
+    : findLiveWrestlingShowById(showId) || showId;
+  const showRouteCode = getWrestlingShowRouteCode(showRouteSource);
+  const routeMatchRef = matchRef && typeof matchRef === "object"
+    ? getWrestlingMatchRouteRef(matchRef, matchIndex)
+    : getWrestlingText(matchRef);
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(showRouteCode)}/match/${encodeURIComponent(routeMatchRef)}`;
 }
 
 function getWrestlingMatchRouteUrl(eventRow) {
-  return getWrestlingMatchRouteUrlByIds(eventRow.showId || eventRow.eventId, eventRow.matchId);
+  return getWrestlingMatchRouteUrlByIds(eventRow.showId || eventRow.eventId, getWrestlingMatchRouteRef(eventRow));
 }
 
 function getWrestlingShowRouteCode(show) {
@@ -1204,7 +1364,10 @@ function getWrestlingShowRouteCode(show) {
 }
 
 function getWrestlingShowRouteUrl(show) {
-  return `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(show))}`;
+  const showRouteSource = show && typeof show === "object"
+    ? show
+    : findLiveWrestlingShowById(show) || show;
+  return `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(showRouteSource))}`;
 }
 
 function getWrestlingLightboxRouteUrl(showId, matchId, photoId) {
@@ -1753,8 +1916,8 @@ function getWrestlingDefaultShowRelationship(showId = "warzone-26") {
 }
 
 function getWrestlingDefaultMatchRelationship(matchId = "daron-richardson-vs-bear-bronson", showId = "warzone-26") {
-  return findWrestlingMatchRelationshipById(matchId, showId) ||
-    findWrestlingMatchRelationshipById(getWrestlingDefaultShowRelationship(showId)?.galleryMatchId, showId) ||
+  return findWrestlingMatchRelationshipByRef(matchId, showId) ||
+    findWrestlingMatchRelationshipByRef(getWrestlingDefaultShowRelationship(showId)?.galleryMatchId, showId) ||
     wrestlingMatchRelationshipRows[0];
 }
 
@@ -1764,9 +1927,10 @@ function updateWrestlingShowDetailRelationshipHooks(showId = "warzone-26") {
   }
 
   const showRelationship = getWrestlingDefaultShowRelationship(showId);
-  const activeShowId = showId || showRelationship.showId;
+  const activeShowId = showRelationship.showId || showId;
+  const showRouteSource = showRelationship || activeShowId;
   setWrestlingRelationshipDataset(wrestlingShowDetailShell, { ...showRelationship, showId: activeShowId });
-  wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(activeShowId);
+  wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
   const matchRows = Array.isArray(showRelationship.matches) && showRelationship.matches.length > 0
     ? showRelationship.matches
     : wrestlingMatchRelationshipRows;
@@ -1778,7 +1942,9 @@ function updateWrestlingShowDetailRelationshipHooks(showId = "warzone-26") {
     }
 
     setWrestlingRelationshipDataset(card, matchRelationship);
-    card.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(matchRelationship.showId || activeShowId, matchRelationship.matchId);
+    card.dataset.wrestlingMatchRef = getWrestlingMatchRouteRef(matchRelationship, index);
+    card.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
+    card.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, card.dataset.wrestlingMatchRef);
   });
 
   const galleryButton = wrestlingShowDetailShell.querySelector(".wrestling-gallery-button");
@@ -1786,7 +1952,10 @@ function updateWrestlingShowDetailRelationshipHooks(showId = "warzone-26") {
   const galleryMatch = getWrestlingDefaultMatchRelationship(galleryMatchId, showRelationship.showId);
   if (galleryButton && galleryMatch) {
     setWrestlingRelationshipDataset(galleryButton, galleryMatch);
-    galleryButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(galleryMatch.showId || activeShowId, galleryMatch.matchId);
+    const galleryMatchIndex = matchRows.indexOf(galleryMatch);
+    galleryButton.dataset.wrestlingMatchRef = getWrestlingMatchRouteRef(galleryMatch, galleryMatchIndex);
+    galleryButton.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
+    galleryButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, galleryButton.dataset.wrestlingMatchRef);
     if (!galleryButton.dataset.wrestlingRouteBound) {
       galleryButton.dataset.wrestlingRouteBound = "true";
       galleryButton.addEventListener("click", () => {
@@ -1798,16 +1967,147 @@ function updateWrestlingShowDetailRelationshipHooks(showId = "warzone-26") {
   }
 }
 
-function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", matchId = "daron-richardson-vs-bear-bronson") {
+function getWrestlingMatchDisplayName(match) {
+  return getWrestlingText(match?.matchName || match?.title || match?.name || match?.matchId, "Match");
+}
+
+function getWrestlingMatchTitleParts(match) {
+  const sideOne = getWrestlingLabelArray(match?.side_1 || match?.side1 || match?.team_1 || match?.team1);
+  const sideTwo = getWrestlingLabelArray(match?.side_2 || match?.side2 || match?.team_2 || match?.team2);
+  if (sideOne.length > 0 || sideTwo.length > 0) {
+    const parts = [];
+    if (sideOne.length > 0) {
+      parts.push(sideOne.join(", "));
+    }
+    if (sideOne.length > 0 && sideTwo.length > 0) {
+      parts.push("vs");
+    }
+    if (sideTwo.length > 0) {
+      parts.push(sideTwo.join(", "));
+    }
+    return parts;
+  }
+
+  const title = getWrestlingMatchDisplayName(match);
+  const splitTitle = title.split(/\s+v(?:s\.?|\.?)\s+/i).map((part) => part.trim()).filter(Boolean);
+  return splitTitle.length === 2 ? [splitTitle[0], "vs", splitTitle[1]] : [title];
+}
+
+function setWrestlingMatchGalleryTitle(parts) {
+  const title = wrestlingMatchGalleryShell?.querySelector(".wrestling-match-gallery-title");
+  if (!title) {
+    return;
+  }
+
+  title.replaceChildren();
+  parts.forEach((part) => {
+    const span = document.createElement("span");
+    span.textContent = part;
+    title.append(span);
+  });
+}
+
+function getWrestlingGalleryPhotoCount(match) {
+  const photoCount = Number.parseInt(match?.photoCount ?? match?.photo_count ?? match?.stats?.photoCount ?? "0", 10);
+  if (Number.isFinite(photoCount) && photoCount > 0) {
+    return photoCount;
+  }
+  if (Array.isArray(match?.photoIds) && match.photoIds.length > 0) {
+    return match.photoIds.length;
+  }
+  return wrestlingPhotoTiles.length;
+}
+
+function updateWrestlingMatchGalleryDisplay(show, match) {
   if (!wrestlingMatchGalleryShell) {
     return;
   }
 
-  const matchRelationship = getWrestlingDefaultMatchRelationship(matchId, showId);
-  const activeShowId = showId || matchRelationship.showId;
-  const activeMatchId = matchId || matchRelationship.matchId;
+  const kicker = wrestlingMatchGalleryShell.querySelector(".wrestling-match-gallery-kicker strong");
+  if (kicker) {
+    kicker.textContent = getWrestlingText(match?.matchType || match?.match_type || match?.stipulation, "Match");
+  }
+
+  setWrestlingMatchGalleryTitle(getWrestlingMatchTitleParts(match));
+
+  const metaValues = [
+    getWrestlingText(show?.title || show?.eventName || show?.showName, "Event Pending"),
+    getWrestlingText(show?.eventDate || formatWrestlingShowDate(show?.rawDate || show?.date || show?.show_date), "Date Pending"),
+    getWrestlingText(show?.venue || getWrestlingVenueName(show), "Venue Pending"),
+    getWrestlingText(show?.location || getWrestlingShowLocation(show), "Location Pending"),
+  ];
+  wrestlingMatchGalleryShell.querySelectorAll(".wrestling-match-gallery-meta strong").forEach((field, index) => {
+    field.textContent = metaValues[index] || "N/A";
+  });
+
+  const count = wrestlingMatchGalleryShell.querySelector(".wrestling-match-gallery-count strong");
+  if (count) {
+    count.textContent = formatWrestlingCount(getWrestlingGalleryPhotoCount(match), "Photos");
+  }
+
+  const grid = wrestlingMatchGalleryShell.querySelector(".wrestling-photo-grid");
+  if (grid) {
+    grid.setAttribute("aria-label", `${getWrestlingMatchDisplayName(match)} photo placeholders`);
+  }
+}
+
+function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
+  const show = findLiveWrestlingShowById(showId);
+  const title = stateName === "loading" ? "Loading Match" : "Match Not Found";
+  const type = stateName === "loading" ? "Loading" : "Unavailable";
+  const showRouteSource = show || showId;
+  const routeMatchRef = getWrestlingMatchRouteRef(matchRef);
+  wrestlingMatchGalleryShell.dataset.wrestlingShowId = show?.showId || showId;
+  wrestlingMatchGalleryShell.dataset.wrestlingMatchRef = routeMatchRef;
+  wrestlingMatchGalleryShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
+  wrestlingMatchGalleryShell.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, routeMatchRef);
+  updateWrestlingMatchGalleryDisplay(show, { matchName: title, matchType: type, photoCount: 0 });
+}
+
+function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", matchRef = "1", options = {}) {
+  if (!wrestlingMatchGalleryShell) {
+    return;
+  }
+
+  const hasStaticShowRelationship = Boolean(getMockRecordById(
+    "wrestlingShows",
+    showId,
+    ["showId", "eventId", "id", "slug", "show_id", "show_key"]
+  ));
+  const shouldRequestLiveShows = Boolean(getWrestlingShowDateKey(showId) || !hasStaticShowRelationship);
+
+  if (shouldRequestLiveShows && !options.skipDataRequest && wrestlingShowsDataState !== "live" && !wrestlingShowsRequest && !wrestlingShowsDataRequested) {
+    requestWrestlingShowsData();
+  }
+
+  if (shouldRequestLiveShows && (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle")) {
+    updateWrestlingMatchGalleryState(showId, matchRef, "loading");
+    return;
+  }
+
+  const showRelationship = findLiveWrestlingShowById(showId) || (wrestlingShowsDataState === "live" || wrestlingShowsDataState === "empty"
+    ? null
+    : getWrestlingDefaultShowRelationship(showId));
+  const matchRelationship = showRelationship?.matches
+    ? findWrestlingMatchInRowsByRef(showRelationship.matches, matchRef)
+    : findWrestlingMatchRelationshipByRef(matchRef, showId);
+  if (!showRelationship || !matchRelationship) {
+    updateWrestlingMatchGalleryState(showId, matchRef, "empty");
+    return;
+  }
+
+  const activeShowId = showRelationship.showId || showId;
+  const activeMatchId = matchRelationship.matchId || matchRef;
+  const matchRows = Array.isArray(showRelationship.matches) ? showRelationship.matches : [];
+  const matchIndex = matchRows.indexOf(matchRelationship);
+  const activeMatchRef = getWrestlingMatchRouteRef(matchRelationship, matchIndex);
   setWrestlingRelationshipDataset(wrestlingMatchGalleryShell, { ...matchRelationship, showId: activeShowId, matchId: activeMatchId });
-  wrestlingMatchGalleryShell.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(activeShowId, activeMatchId);
+  wrestlingMatchGalleryShell.dataset.wrestlingShowId = activeShowId;
+  wrestlingMatchGalleryShell.dataset.wrestlingMatchId = activeMatchId;
+  wrestlingMatchGalleryShell.dataset.wrestlingMatchRef = activeMatchRef;
+  wrestlingMatchGalleryShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRelationship);
+  wrestlingMatchGalleryShell.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(showRelationship, activeMatchRef);
+  updateWrestlingMatchGalleryDisplay(showRelationship, matchRelationship);
 
   wrestlingPhotoTiles.forEach((tile) => {
     const photoId = tile.dataset.wrestlingPhotoId;
@@ -1818,8 +2118,10 @@ function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", mat
       photoIds: photoId ? [photoId] : matchRelationship.photoIds,
     };
     setWrestlingRelationshipDataset(tile, photoRelationship);
+    tile.dataset.wrestlingMatchRef = activeMatchRef;
+    tile.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRelationship);
     if (photoId) {
-      tile.dataset.wrestlingLightboxRoute = getWrestlingLightboxRouteUrl(activeShowId, activeMatchId, photoId);
+      tile.dataset.wrestlingLightboxRoute = getWrestlingLightboxRouteUrl(showRelationship, activeMatchRef, photoId);
     }
   });
 }
@@ -1829,9 +2131,12 @@ function updateWrestlingLightboxRelationshipHooks(showId = "warzone-26", matchId
     return;
   }
 
-  const matchRelationship = getWrestlingDefaultMatchRelationship(matchId, showId);
-  const activeShowId = showId || matchRelationship.showId;
-  const activeMatchId = matchId || matchRelationship.matchId;
+  const showRelationship = findLiveWrestlingShowById(showId) || getWrestlingDefaultShowRelationship(showId);
+  const matchRelationship = findWrestlingMatchRelationshipByRef(matchId, showId) || getWrestlingDefaultMatchRelationship(matchId, showId);
+  const activeShowId = showRelationship.showId || showId;
+  const activeMatchId = matchRelationship.matchId || matchId;
+  const matchRows = Array.isArray(showRelationship.matches) ? showRelationship.matches : [];
+  const activeMatchRef = getWrestlingMatchRouteRef(matchRelationship, matchRows.indexOf(matchRelationship));
   const activePhotoId = photoId || "001";
   setWrestlingRelationshipDataset(wrestlingLightboxShell, {
     ...matchRelationship,
@@ -1839,8 +2144,12 @@ function updateWrestlingLightboxRelationshipHooks(showId = "warzone-26", matchId
     matchId: activeMatchId,
     photoIds: [activePhotoId],
   });
+  wrestlingLightboxShell.dataset.wrestlingShowId = activeShowId;
+  wrestlingLightboxShell.dataset.wrestlingMatchId = activeMatchId;
+  wrestlingLightboxShell.dataset.wrestlingMatchRef = activeMatchRef;
   wrestlingLightboxShell.dataset.wrestlingPhotoId = activePhotoId;
-  wrestlingLightboxShell.dataset.wrestlingLightboxRoute = getWrestlingLightboxRouteUrl(activeShowId, activeMatchId, activePhotoId);
+  wrestlingLightboxShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRelationship);
+  wrestlingLightboxShell.dataset.wrestlingLightboxRoute = getWrestlingLightboxRouteUrl(showRelationship, activeMatchRef, activePhotoId);
 }
 
 function applyStaticWrestlingRelationshipHooks() {
@@ -1858,7 +2167,8 @@ function applyStaticWrestlingRelationshipHooks() {
   updateWrestlingShowDetailRelationshipHooks(wrestlingShowDetailShell?.dataset.wrestlingShowId || "warzone-26");
   updateWrestlingMatchGalleryRelationshipHooks(
     wrestlingMatchGalleryShell?.dataset.wrestlingShowId || "warzone-26",
-    wrestlingMatchGalleryShell?.dataset.wrestlingMatchId || "daron-richardson-vs-bear-bronson"
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchId || "daron-richardson-vs-bear-bronson",
+    { skipDataRequest: true }
   );
   updateWrestlingLightboxRelationshipHooks(
     wrestlingLightboxShell?.dataset.wrestlingShowId || "warzone-26",
