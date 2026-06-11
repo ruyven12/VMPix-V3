@@ -167,6 +167,7 @@ const WRESTLING_SHOWS_API_ROUTE = "/api/wrestling/shows/db";
 const WRESTLING_SHOWS_API_LIMIT = 100;
 const WRESTLING_SHOWS_TIMEOUT_MS = 15000;
 const WRESTLING_PEOPLE_API_ROUTE = "/api/wrestling/people/db";
+const WRESTLING_PEOPLE_API_LIMIT = 100;
 const WRESTLING_PEOPLE_TIMEOUT_MS = 8000;
 const wrestlingShowList = document.querySelector("[data-wrestling-show-list]") || document.querySelector(".wrestling-show-list");
 const wrestlingShowYearChips = document.querySelectorAll(".wrestling-year-chip");
@@ -1487,15 +1488,58 @@ function getWrestlingPeoplePayloadRows(payload) {
 }
 
 function normalizeLiveWrestlingPeople(payload) {
-  return getWrestlingPeoplePayloadRows(payload)
+  const payloads = Array.isArray(payload) ? payload : [payload];
+  const seenPersonIds = new Set();
+  return payloads
+    .flatMap(getWrestlingPeoplePayloadRows)
     .map((person) => ({
       ...person,
       backend_record: person.backend_record || person,
     }))
     .filter((person) => getWrestlingText(person.display_name || person.ring_name || person.name || person.title))
+    .filter((person) => {
+      const personId = normalizeWrestlingPersonId(getWrestlingPersonRouteId(person));
+      if (!personId || seenPersonIds.has(personId)) {
+        return false;
+      }
+      seenPersonIds.add(personId);
+      return true;
+    })
     .sort((left, right) => getWrestlingText(left.display_name || left.ring_name || left.name || left.title).localeCompare(
       getWrestlingText(right.display_name || right.ring_name || right.name || right.title)
     ));
+}
+
+function getWrestlingPeopleApiUrl(page = 1) {
+  const apiUrl = new URL(WRESTLING_PEOPLE_API_ROUTE, WRESTLING_SHOWS_API_BASE_URL);
+  apiUrl.searchParams.set("limit", String(WRESTLING_PEOPLE_API_LIMIT));
+  apiUrl.searchParams.set("page", String(page));
+  return apiUrl;
+}
+
+function getWrestlingPeoplePayloadTotalPages(payload) {
+  const explicitTotalPages = Number.parseInt(payload?.totalPages || payload?.total_pages, 10);
+  if (Number.isFinite(explicitTotalPages) && explicitTotalPages > 0) {
+    return explicitTotalPages;
+  }
+
+  const totalRows = Number.parseInt(payload?.total || payload?.count, 10);
+  const pageLimit = Number.parseInt(payload?.limit, 10) || WRESTLING_PEOPLE_API_LIMIT;
+  return Number.isFinite(totalRows) && totalRows > pageLimit
+    ? Math.ceil(totalRows / pageLimit)
+    : 1;
+}
+
+function fetchWrestlingPeoplePayload(page, signal) {
+  return fetch(getWrestlingPeopleApiUrl(page), {
+    cache: "no-store",
+    signal,
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Wrestling people request failed (${response.status})`);
+    }
+    return response.json();
+  });
 }
 
 function requestWrestlingPeopleData() {
@@ -1519,20 +1563,18 @@ function requestWrestlingPeopleData() {
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), WRESTLING_PEOPLE_TIMEOUT_MS)
     : 0;
-  const apiUrl = new URL(WRESTLING_PEOPLE_API_ROUTE, WRESTLING_SHOWS_API_BASE_URL);
-
-  wrestlingPeopleRequest = fetch(apiUrl, {
-    cache: "no-store",
-    signal: controller?.signal,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Wrestling people request failed (${response.status})`);
+  wrestlingPeopleRequest = fetchWrestlingPeoplePayload(1, controller?.signal)
+    .then((firstPayload) => {
+      const totalPages = getWrestlingPeoplePayloadTotalPages(firstPayload);
+      const remainingPages = Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => index + 2);
+      if (remainingPages.length === 0) {
+        return [firstPayload];
       }
-      return response.json();
+      return Promise.all(remainingPages.map((page) => fetchWrestlingPeoplePayload(page, controller?.signal)))
+        .then((additionalPayloads) => [firstPayload, ...additionalPayloads]);
     })
-    .then((payload) => {
-      const liveRows = normalizeLiveWrestlingPeople(payload);
+    .then((payloads) => {
+      const liveRows = normalizeLiveWrestlingPeople(payloads);
       if (liveRows.length === 0) {
         setWrestlingPeopleCollection([], "empty");
       } else {
