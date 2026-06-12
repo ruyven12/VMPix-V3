@@ -604,6 +604,168 @@ function getBandDetailCount(...values) {
   return 0;
 }
 
+function getBandDetailTextCandidate(...values) {
+  for (const value of values) {
+    const text = String(value ?? "").trim();
+    if (text && !["null", "undefined", "n/a"].includes(text.toLowerCase())) {
+      return text;
+    }
+  }
+
+  return "";
+}
+
+function formatBandDetailLabelText(value, fallback = "Pending") {
+  const text = getBandDetailTextCandidate(value);
+  if (!text) {
+    return fallback;
+  }
+
+  return text
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getBandDetailYearCandidate(...values) {
+  for (const value of values) {
+    const text = getBandDetailTextCandidate(value);
+    const match = text.match(/\b(19|20)\d{2}\b/);
+    if (match) {
+      return match[0];
+    }
+  }
+
+  return "";
+}
+
+function formatBandDetailCompactDate(value, fallback = "Pending") {
+  const text = getBandDetailTextCandidate(value);
+  if (!text) {
+    return fallback;
+  }
+
+  const numericMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (numericMatch) {
+    const month = numericMatch[1].padStart(2, "0");
+    const day = numericMatch[2].padStart(2, "0");
+    const year = numericMatch[3].slice(-2);
+    return `${month}/${day}/${year}`;
+  }
+
+  const parsedDate = new Date(text);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return fallback;
+  }
+
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+  const year = String(parsedDate.getFullYear()).slice(-2);
+  return `${month}/${day}/${year}`;
+}
+
+function getBandDetailYearsCovered(stats, band) {
+  const directYearsCovered = getBandDetailTextCandidate(
+    stats.years_covered,
+    stats.yearsCovered,
+    band.years_covered,
+    band.yearsCovered
+  );
+  if (directYearsCovered) {
+    return directYearsCovered;
+  }
+
+  const firstYear = getBandDetailYearCandidate(
+    stats.first_year,
+    stats.firstYear,
+    stats.first_seen,
+    stats.firstSeen,
+    band.first_year,
+    band.firstYear,
+    band.first_seen,
+    band.firstSeen
+  );
+  const latestYear = getBandDetailYearCandidate(
+    stats.latest_year,
+    stats.latestYear,
+    stats.latest_seen,
+    stats.latestSeen,
+    band.latest_year,
+    band.latestYear,
+    band.latest_seen,
+    band.latestSeen
+  );
+
+  if (firstYear && latestYear) {
+    return firstYear === latestYear ? firstYear : `${firstYear}\u2013${latestYear}`;
+  }
+
+  // TODO: Replace this placeholder when the bands payload exposes first/latest captured years.
+  return "Pending";
+}
+
+function getBandDetailMostActiveYear(stats, band) {
+  const mostActiveYear = getBandDetailYearCandidate(
+    stats.most_active_year,
+    stats.mostActiveYear,
+    band.most_active_year,
+    band.mostActiveYear
+  );
+
+  // TODO: Replace this placeholder when the bands payload exposes most_active_year.
+  return mostActiveYear || "Pending";
+}
+
+function getBandDetailLatestSeen(stats, band) {
+  const latestSeen = getBandDetailTextCandidate(
+    stats.latest_seen,
+    stats.latestSeen,
+    stats.latest_seen_at,
+    stats.latestSeenAt,
+    stats.latest_show_date,
+    stats.latestShowDate,
+    band.latest_seen,
+    band.latestSeen,
+    band.latest_seen_at,
+    band.latestSeenAt,
+    band.latest_show_date,
+    band.latestShowDate
+  );
+
+  // TODO: Replace this placeholder when the bands payload exposes latest_seen/latest_show_date.
+  return latestSeen ? formatBandDetailCompactDate(latestSeen) : "Pending";
+}
+
+function getBandDetailLastUpdated(stats, band) {
+  const lastUpdated = getBandDetailTextCandidate(
+    stats.last_updated,
+    stats.lastUpdated,
+    stats.updated_at,
+    stats.updatedAt,
+    band.last_updated,
+    band.lastUpdated,
+    band.updated_at,
+    band.updatedAt
+  );
+
+  // TODO: Replace this placeholder when the bands payload exposes last_updated/updated_at.
+  return lastUpdated ? formatBandDetailCompactDate(lastUpdated) : "Pending";
+}
+
+function getBandDetailLifecycleStatus(general, band) {
+  return formatBandDetailLabelText(
+    getBandDetailTextCandidate(
+      general.status,
+      general.lifecycle_status,
+      general.lifecycleStatus,
+      band.lifecycle_status,
+      band.lifecycleStatus
+    ),
+    "Unknown"
+  );
+}
+
 function getBandDetailCompletion(archivedSets, totalSets) {
   if (totalSets <= 0) {
     return 0;
@@ -3465,7 +3627,11 @@ function showBandDetail(band) {
   const pastMembers = getUniqueBandDetailMembers(rawPastMembers);
   const pastMemberKeys = new Set(pastMembers.map(getBandDetailMemberKey));
   const members = getUniqueBandDetailMembers(personnel.members, pastMemberKeys);
+  const contributorCount = members.length > 0
+    ? members.length
+    : getBandDetailCount(band.member_count, band.memberCount, stats.member_count, stats.memberCount);
   const status = getBandArchiveStatus(archivedSets, totalSets);
+  const lifecycleStatus = getBandDetailLifecycleStatus(general, band);
   const completion = getBandDetailCompletion(archivedSets, totalSets);
 
   activeMusicBand = {
@@ -3516,17 +3682,32 @@ function showBandDetail(band) {
   if (bandDetailProgressFill) {
     bandDetailProgressFill.style.width = `${completion}%`;
   }
-  if (bandDetailSets) {
-    bandDetailSets.textContent = formatBandDetailNumber(archivedSets);
+  if (bandDetailYearsCovered) {
+    bandDetailYearsCovered.textContent = getBandDetailYearsCovered(stats, band);
   }
-  if (bandDetailTotalSets) {
-    bandDetailTotalSets.textContent = formatBandDetailNumber(totalSets);
+  if (bandDetailMostActiveYear) {
+    bandDetailMostActiveYear.textContent = getBandDetailMostActiveYear(stats, band);
   }
-  if (bandDetailPhotos) {
-    bandDetailPhotos.textContent = formatBandDetailNumber(photoCount);
+  if (bandDetailTotalPhotos) {
+    bandDetailTotalPhotos.textContent = formatBandDetailNumber(photoCount);
   }
   if (bandDetailContributors) {
-    bandDetailContributors.textContent = formatBandDetailNumber(members.length);
+    bandDetailContributors.textContent = formatBandDetailNumber(contributorCount);
+  }
+  if (bandDetailSetsCaptured) {
+    bandDetailSetsCaptured.textContent = `${formatBandDetailNumber(archivedSets)}/${formatBandDetailNumber(totalSets)}`;
+  }
+  if (bandDetailDataStatus) {
+    bandDetailDataStatus.textContent = status.label;
+  }
+  if (bandDetailLatestSeen) {
+    bandDetailLatestSeen.textContent = getBandDetailLatestSeen(stats, band);
+  }
+  if (bandDetailLifecycleStatus) {
+    bandDetailLifecycleStatus.textContent = lifecycleStatus;
+  }
+  if (bandDetailLastUpdated) {
+    bandDetailLastUpdated.textContent = getBandDetailLastUpdated(stats, band);
   }
   renderBandDetailMembers(bandDetailCoreMembers, members, "No core members indexed");
   renderBandDetailMembers(bandDetailPastMembers, pastMembers, "No past members indexed");

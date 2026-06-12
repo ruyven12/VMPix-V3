@@ -127,6 +127,7 @@
 .band-detail-meta,
 .band-detail-completion,
 .band-detail-stats,
+.band-detail-coverage,
 .band-detail-members,
 .band-detail-activity,
 .band-detail-back,
@@ -408,6 +409,8 @@
 .band-detail-panel-title,
 .band-member-name,
 .band-member-role,
+.band-coverage-label,
+.band-coverage-value,
 .band-activity-label,
 .band-activity-value {
   margin: 0;
@@ -578,6 +581,57 @@
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.band-detail-coverage {
+  display: grid;
+  gap: clamp(0.62rem, 2vw, 0.82rem);
+  padding: clamp(0.68rem, 2.7vw, 0.95rem);
+  border: var(--v3-card-border-strong);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 58%),
+    linear-gradient(135deg, rgba(142, 108, 255, 0.06), transparent 62%),
+    rgba(3, 3, 6, 0.4);
+}
+
+.band-coverage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.44rem;
+}
+
+.band-coverage-item {
+  min-width: 0;
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.54rem;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.026), transparent 70%),
+    rgba(247, 247, 242, 0.02);
+}
+
+.band-coverage-label {
+  color: rgba(247, 247, 242, 0.44);
+  font-size: clamp(0.58rem, 2.35vw, 0.68rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.band-coverage-value {
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(0.76rem, 3vw, 0.94rem);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+@media (min-width: 760px) {
+  .band-coverage-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .band-detail-action {
@@ -13626,6 +13680,7 @@ html.is-lightbox-scroll-locked body {
   .person-detail-associated,
   .person-tagged-shows,
   .band-detail-panel,
+  .band-detail-coverage,
   .band-detail-activity,
   .sets-featured-panel,
   .set-detail-placeholder,
