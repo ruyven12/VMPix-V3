@@ -7726,25 +7726,255 @@ function getMusicShowAlbumViewCountLabel(album) {
     : "";
 }
 
-function getMusicShowAlbumCoverSrc(show, album) {
-  const candidates = [
-    album?.cover_image_url,
-    album?.coverImageUrl,
-    album?.cover_image,
-    album?.coverImage,
-    album?.image_url,
-    album?.imageUrl,
-    album?.poster,
-    album?.poster_url,
+const showSetPreviewCards = new Set();
+let showSetPreviewVisibilityListenerAttached = false;
+
+function isShowSetPreviewReducedMotion() {
+  return Boolean(reducedMotion?.matches);
+}
+
+function addMusicShowImageUrl(urls, value) {
+  const imageUrl = String(value || "").trim();
+  if (imageUrl && isMusicShowPosterImageSrc(imageUrl)) {
+    urls.push(imageUrl);
+  }
+}
+
+function addMusicShowImageUrlsFromObject(urls, source, options = {}) {
+  if (!source || typeof source !== "object") {
+    addMusicShowImageUrl(urls, source);
+    return;
+  }
+
+  [
+    "cover_image_url",
+    "coverImageUrl",
+    "cover_image",
+    "coverImage",
+    "image_url",
+    "imageUrl",
+    "image",
+    "photo_url",
+    "photoUrl",
+    "thumbnail_url",
+    "thumbnailUrl",
+    "thumb_url",
+    "thumbUrl",
+    "medium_url",
+    "mediumUrl",
+    "large_url",
+    "largeUrl",
+    "x2_url",
+    "x2Url",
+    "small",
+    "medium",
+    "large",
+    "xlarge",
+    "x2",
+    "display_url",
+    "displayUrl",
+    "secure_url",
+    "secureUrl",
+    "original_url",
+    "originalUrl",
+    ...(options.includeGenericUrl ? ["url", "src"] : []),
+  ].forEach((key) => addMusicShowImageUrl(urls, source[key]));
+}
+
+function addMusicShowImageUrlsFromCollection(urls, collection) {
+  if (typeof collection === "string" && collection.trim().startsWith("[")) {
+    try {
+      addMusicShowImageUrlsFromCollection(urls, JSON.parse(collection));
+    } catch (error) {
+      return;
+    }
+    return;
+  }
+
+  if (!Array.isArray(collection)) {
+    return;
+  }
+
+  collection.forEach((item) => {
+    addMusicShowImageUrlsFromObject(urls, item, { includeGenericUrl: true });
+  });
+}
+
+function getMusicShowAlbumImageCandidates(show, album) {
+  const urls = [];
+  [
+    album?.preview_images,
+    album?.previewImages,
+    album?.album_images,
+    album?.albumImages,
+    album?.smug_images,
+    album?.smugImages,
+    album?.gallery_images,
+    album?.galleryImages,
+    album?.album_photos,
+    album?.albumPhotos,
+    album?.preview_urls,
+    album?.previewUrls,
+    album?.image_urls,
+    album?.imageUrls,
+    album?.photo_urls,
+    album?.photoUrls,
+    album?.photo_previews,
+    album?.photoPreviews,
+    album?.images,
+    Array.isArray(album?.photos) ? album.photos : null,
+    album?.thumbnails,
+    album?.media,
+    album?.items,
+    album?.results,
+  ].forEach((collection) => addMusicShowImageUrlsFromCollection(urls, collection));
+
+  addMusicShowImageUrlsFromObject(urls, album);
+  [
     show?.cover_image_url,
     show?.coverImageUrl,
     show?.poster,
-  ];
-  const coverSrc = candidates
-    .map((candidate) => String(candidate || "").trim())
-    .find(Boolean) || "";
+  ].forEach((value) => addMusicShowImageUrl(urls, value));
 
+  return Array.from(new Set(urls));
+}
+
+function getRandomizedMusicShowAlbumPreviewImages(show, album) {
+  const urls = getMusicShowAlbumImageCandidates(show, album);
+  if (urls.length <= 1) {
+    return urls.length === 1 ? urls : [SET_GALLERY_NO_POSTER_IMAGE_SRC];
+  }
+
+  return [...urls]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 6);
+}
+
+function getMusicShowAlbumCoverSrc(show, album) {
+  const coverSrc = getMusicShowAlbumImageCandidates(show, album)[0] || "";
   return isMusicShowPosterImageSrc(coverSrc) ? coverSrc : SET_GALLERY_NO_POSTER_IMAGE_SRC;
+}
+
+function createShowSetCardPreviewImage(src, isActive = false) {
+  const image = document.createElement("img");
+  image.className = `show-set-card-image show-set-card-preview-image${isActive ? " is-active" : ""}`;
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.src = src || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  };
+  return image;
+}
+
+function stopShowSetCardPreview(card) {
+  const preview = card?.__showSetPreview;
+  if (!preview?.timerId) {
+    return;
+  }
+
+  window.clearInterval(preview.timerId);
+  preview.timerId = 0;
+}
+
+function advanceShowSetCardPreview(card) {
+  const preview = card?.__showSetPreview;
+  if (!preview || !card.isConnected) {
+    stopShowSetCardPreview(card);
+    return;
+  }
+  if (preview.urls.length <= 1 || document.hidden || isShowSetPreviewReducedMotion()) {
+    return;
+  }
+
+  preview.currentIndex = (preview.currentIndex + 1) % preview.urls.length;
+  const nextSlot = preview.activeSlot === 0 ? 1 : 0;
+  const nextImage = preview.images[nextSlot];
+  const activeImage = preview.images[preview.activeSlot];
+  nextImage.src = preview.urls[preview.currentIndex];
+  nextImage.classList.add("is-active");
+  activeImage.classList.remove("is-active");
+  preview.activeSlot = nextSlot;
+}
+
+function shouldPlayShowSetCardPreview(card) {
+  const preview = card?.__showSetPreview;
+  return Boolean(
+    preview &&
+    preview.urls.length > 1 &&
+    preview.isCarouselActive &&
+    preview.isVisible &&
+    card.isConnected &&
+    !document.hidden &&
+    !isShowSetPreviewReducedMotion()
+  );
+}
+
+function updateShowSetCardPreviewPlayback(card) {
+  const preview = card?.__showSetPreview;
+  if (!preview) {
+    return;
+  }
+
+  if (!card.isConnected) {
+    stopShowSetCardPreview(card);
+    showSetPreviewCards.delete(card);
+    return;
+  }
+
+  if (!shouldPlayShowSetCardPreview(card)) {
+    stopShowSetCardPreview(card);
+    return;
+  }
+
+  if (!preview.timerId) {
+    preview.timerId = window.setInterval(() => {
+      advanceShowSetCardPreview(card);
+    }, 2800);
+  }
+}
+
+function setShowSetCardPreviewActive(card, isActive) {
+  if (!card?.__showSetPreview) {
+    return;
+  }
+
+  card.__showSetPreview.isCarouselActive = isActive;
+  updateShowSetCardPreviewPlayback(card);
+}
+
+function ensureShowSetPreviewVisibilityListener() {
+  if (showSetPreviewVisibilityListenerAttached || typeof document === "undefined") {
+    return;
+  }
+
+  showSetPreviewVisibilityListenerAttached = true;
+  document.addEventListener("visibilitychange", () => {
+    showSetPreviewCards.forEach((card) => updateShowSetCardPreviewPlayback(card));
+  });
+}
+
+function registerShowSetCardPreview(card) {
+  const preview = card?.__showSetPreview;
+  if (!preview || preview.urls.length <= 1) {
+    return;
+  }
+
+  showSetPreviewCards.add(card);
+  ensureShowSetPreviewVisibilityListener();
+  if (typeof IntersectionObserver === "function") {
+    preview.visibilityObserver = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      preview.isVisible = Boolean(entry?.isIntersecting);
+      updateShowSetCardPreviewPlayback(card);
+    }, { threshold: 0.35 });
+    preview.visibilityObserver.observe(card);
+  } else {
+    preview.isVisible = true;
+    updateShowSetCardPreviewPlayback(card);
+  }
 }
 
 function createShowDetailAlbumCard(show, album, index) {
@@ -7752,6 +7982,7 @@ function createShowDetailAlbumCard(show, album, index) {
   const bandId = getMusicShowAlbumBandId(album);
   const dateFolder = getMusicShowAlbumDateFolder(show, album);
   const targetUrl = getMusicShowAlbumSetRoute(show, album);
+  const previewImages = getRandomizedMusicShowAlbumPreviewImages(show, album);
 
   const card = document.createElement("button");
   card.type = "button";
@@ -7759,21 +7990,18 @@ function createShowDetailAlbumCard(show, album, index) {
   card.dataset.showAlbumRoute = targetUrl;
   card.dataset.bandId = bandId;
   card.dataset.dateFolder = dateFolder;
+  card.dataset.previewImageCount = String(previewImages.length);
   card.setAttribute("aria-label", `Open ${bandName} set from ${getMusicShowDateLabel(show)}`);
 
   const media = document.createElement("div");
   media.className = "show-set-card-media";
 
-  const mediaImage = document.createElement("img");
-  mediaImage.className = "show-set-card-image";
-  mediaImage.alt = "";
-  mediaImage.loading = "lazy";
-  mediaImage.decoding = "async";
-  mediaImage.src = getMusicShowAlbumCoverSrc(show, album);
+  const primaryImage = createShowSetCardPreviewImage(previewImages[0], true);
+  const secondaryImage = createShowSetCardPreviewImage(previewImages[1] || previewImages[0], false);
 
   const overlay = document.createElement("div");
   overlay.className = "show-set-card-overlay";
-  media.append(mediaImage, overlay);
+  media.append(primaryImage, secondaryImage, overlay);
 
   const body = document.createElement("div");
   body.className = "show-set-card-body";
@@ -7804,7 +8032,22 @@ function createShowDetailAlbumCard(show, album, index) {
   });
 
   body.append(name, meta);
+  const action = document.createElement("span");
+  action.className = "show-set-card-action";
+  action.textContent = "View Set";
+  body.append(action);
   card.append(media, body);
+  card.__showSetPreview = {
+    urls: previewImages,
+    images: [primaryImage, secondaryImage],
+    activeSlot: 0,
+    currentIndex: 0,
+    timerId: 0,
+    isCarouselActive: false,
+    isVisible: false,
+    visibilityObserver: null,
+  };
+  registerShowSetCardPreview(card);
   card.addEventListener("click", () => {
     if (!targetUrl) {
       return;
@@ -7930,6 +8173,7 @@ function createShowDetailBandsOnBill(show) {
       const isActive = index === activeIndex;
       slide.classList.toggle("is-active", isActive);
       slide.setAttribute("aria-hidden", String(!isActive));
+      setShowSetCardPreviewActive(slide.querySelector(".show-set-card"), isActive);
     });
     dotButtons.forEach((dot, index) => {
       dot.classList.toggle("is-active", index === activeIndex);
