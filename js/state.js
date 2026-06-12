@@ -171,6 +171,7 @@ const galleryGrid = document.querySelector("[data-gallery-grid]");
 const galleryPhotoTiles = document.querySelectorAll("[data-gallery-photo]");
 const galleryViewOptions = document.querySelectorAll("[data-gallery-view-option]");
 const galleryPhotoCount = document.querySelector("[data-gallery-count]");
+const galleryPhotoWarning = document.querySelector("[data-gallery-warning]");
 const galleryStatesShell = document.querySelector("[data-gallery-states]");
 const galleryStates = document.querySelectorAll("[data-gallery-state]");
 const galleryViewAll = document.querySelector("[data-gallery-view-all]");

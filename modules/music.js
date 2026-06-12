@@ -14,6 +14,8 @@ const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE = "/api/music/smugmug/albums";
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT = 12;
+const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
+const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
@@ -3826,6 +3828,7 @@ function updateSetGalleryFromRow(row) {
   }
   activeSetGalleryPhotoMode = "preview";
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
+  setSetGalleryPhotoWarning("");
   updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
   loadSetGalleryPhotoHighlights(row);
 }
@@ -3863,6 +3866,32 @@ function updateSetGalleryPhotoSummary(visibleCount = 0, totalCount = activeSetGa
   );
   const totalText = safeTotalCount > 0 ? safeTotalCount.toLocaleString() : previewCount.toLocaleString();
   galleryPhotoCount.textContent = `Showing ${previewCount.toLocaleString()} of ${totalText} ${getPhotoCountLabel(safeTotalCount || previewCount)}`;
+}
+
+function setSetGalleryPhotoWarning(message = "") {
+  if (!galleryPhotoWarning) {
+    return;
+  }
+
+  const warningText = String(message || "").trim();
+  galleryPhotoWarning.textContent = warningText;
+  galleryPhotoWarning.hidden = !warningText;
+}
+
+function setSetGalleryLoadingCopy(title = "Loading archive photos...", text = "Preparing preview frames.") {
+  const loadingState = Array.from(galleryStates || []).find((statePanel) => statePanel.dataset.galleryState === "loading");
+  if (!loadingState) {
+    return;
+  }
+
+  const titleNode = loadingState.querySelector(".archive-gallery-state-title");
+  const textNode = loadingState.querySelector(".archive-gallery-state-text");
+  if (titleNode) {
+    titleNode.textContent = title;
+  }
+  if (textNode) {
+    textNode.textContent = text;
+  }
 }
 
 function syncSetGalleryPhotoToggleButton(stateName = "ready") {
@@ -4115,12 +4144,25 @@ function normalizeMusicSmugmugAlbumPhotoLimit(limit) {
     : MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
 }
 
-function getMusicSmugmugAlbumPhotosApiUrl(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT) {
+function normalizeMusicSmugmugAlbumPhotoStart(start) {
+  const parsedStart = Number.parseInt(start, 10);
+  return Number.isFinite(parsedStart) && parsedStart > 0 ? parsedStart : 1;
+}
+
+function normalizeMusicSmugmugHasMore(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  return ["1", "true", "yes"].includes(String(value || "").trim().toLowerCase());
+}
+
+function getMusicSmugmugAlbumPhotosApiUrl(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, start = 1) {
   const apiUrl = new URL(
     `${MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE}/${encodeURIComponent(albumId)}/photos`,
     MUSIC_BANDS_INDEX_API_BASE_URL
   );
   apiUrl.searchParams.set("limit", String(normalizeMusicSmugmugAlbumPhotoLimit(limit)));
+  apiUrl.searchParams.set("start", String(normalizeMusicSmugmugAlbumPhotoStart(start)));
   return apiUrl;
 }
 
@@ -4144,9 +4186,11 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
     return null;
   }
 
-  const label = String(photo?.caption || photo?.title || photo?.image_key || `Preview photo ${index + 1}`).trim();
+  const rawImageKey = String(photo?.image_key || photo?.imageKey || "").trim();
+  const label = String(photo?.caption || photo?.title || rawImageKey || `Preview photo ${index + 1}`).trim();
   return {
-    imageKey: String(photo?.image_key || photo?.imageKey || `album-photo-${index + 1}`).trim(),
+    dedupeKey: rawImageKey || imageSrc,
+    imageKey: rawImageKey || `album-photo-${index + 1}`,
     imageSrc,
     label: label || `Preview photo ${index + 1}`,
   };
@@ -4159,19 +4203,28 @@ function normalizeMusicAlbumPhotosPayload(payload, limit = MUSIC_SMUGMUG_ALBUM_P
     .slice(0, safeLimit)
     .map(normalizeMusicAlbumPhoto)
     .filter(Boolean);
+  const nextStart = Number.parseInt(payload?.next_start ?? payload?.nextStart, 10);
 
   return {
     count: getMusicShowDetailCountCandidate(payload?.count, photos.length, normalizedPhotos.length) || normalizedPhotos.length,
+    hasMore: normalizeMusicSmugmugHasMore(payload?.has_more ?? payload?.hasMore),
+    nextStart: Number.isFinite(nextStart) && nextStart > 0 ? nextStart : null,
     photos: normalizedPhotos,
+    total: getMusicShowDetailCountCandidate(payload?.total, payload?.total_count, payload?.totalCount, payload?.count),
   };
 }
 
-function requestMusicSmugmugAlbumPhotos(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT) {
+function getMusicSmugmugAlbumPhotoCacheKey(albumId, type, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, start = 1) {
+  return `${String(albumId || "").trim()}:${type}:${normalizeMusicSmugmugAlbumPhotoLimit(limit)}:${normalizeMusicSmugmugAlbumPhotoStart(start)}`;
+}
+
+function requestMusicSmugmugAlbumPhotosPage(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, start = 1) {
   const safeAlbumId = String(albumId || "").trim();
   const safeLimit = normalizeMusicSmugmugAlbumPhotoLimit(limit);
-  const cacheKey = `${safeAlbumId}:${safeLimit}`;
+  const safeStart = normalizeMusicSmugmugAlbumPhotoStart(start);
+  const cacheKey = getMusicSmugmugAlbumPhotoCacheKey(safeAlbumId, "page", safeLimit, safeStart);
   if (!safeAlbumId || typeof fetch !== "function") {
-    return Promise.resolve({ count: 0, photos: [] });
+    return Promise.resolve({ count: 0, hasMore: false, nextStart: null, photos: [], total: 0 });
   }
   if (musicSmugmugAlbumPhotosCache.has(cacheKey)) {
     return Promise.resolve(musicSmugmugAlbumPhotosCache.get(cacheKey));
@@ -4180,7 +4233,7 @@ function requestMusicSmugmugAlbumPhotos(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHO
     return musicSmugmugAlbumPhotosRequests.get(cacheKey);
   }
 
-  const request = fetch(getMusicSmugmugAlbumPhotosApiUrl(safeAlbumId, safeLimit), { cache: "no-store" })
+  const request = fetch(getMusicSmugmugAlbumPhotosApiUrl(safeAlbumId, safeLimit, safeStart), { cache: "no-store" })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Album photos request failed (${response.status})`);
@@ -4198,6 +4251,91 @@ function requestMusicSmugmugAlbumPhotos(albumId, limit = MUSIC_SMUGMUG_ALBUM_PHO
 
   musicSmugmugAlbumPhotosRequests.set(cacheKey, request);
   return request;
+}
+
+function getUniqueMusicAlbumPhotos(photos) {
+  const seenKeys = new Set();
+  return photos.filter((photo) => {
+    const uniqueKey = String(photo?.dedupeKey || photo?.imageKey || photo?.imageSrc || "").trim();
+    if (!uniqueKey || seenKeys.has(uniqueKey)) {
+      return false;
+    }
+    seenKeys.add(uniqueKey);
+    return true;
+  });
+}
+
+function requestAllMusicSmugmugAlbumPhotos(albumId) {
+  const safeAlbumId = String(albumId || "").trim();
+  const cacheKey = getMusicSmugmugAlbumPhotoCacheKey(safeAlbumId, "all", MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT, 1);
+  if (!safeAlbumId || typeof fetch !== "function") {
+    return Promise.resolve({ isComplete: false, partialError: true, photos: [], total: 0 });
+  }
+  if (musicSmugmugAlbumPhotosCache.has(cacheKey)) {
+    return Promise.resolve(musicSmugmugAlbumPhotosCache.get(cacheKey));
+  }
+  if (musicSmugmugAlbumPhotosRequests.has(cacheKey)) {
+    return musicSmugmugAlbumPhotosRequests.get(cacheKey);
+  }
+
+  const request = (async () => {
+    const photos = [];
+    let start = 1;
+    let total = 0;
+    let hasMore = true;
+    let partialError = false;
+
+    for (let pageIndex = 0; pageIndex < MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES && hasMore; pageIndex += 1) {
+      let page;
+      try {
+        page = await requestMusicSmugmugAlbumPhotosPage(safeAlbumId, MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT, start);
+      } catch (error) {
+        partialError = true;
+        break;
+      }
+
+      photos.push(...page.photos);
+      total = page.total || total || page.count || photos.length;
+      hasMore = Boolean(page.hasMore);
+      if (!hasMore) {
+        break;
+      }
+      if (!page.nextStart || page.nextStart <= start) {
+        partialError = true;
+        break;
+      }
+      start = page.nextStart;
+    }
+
+    if (hasMore) {
+      partialError = true;
+    }
+
+    const uniquePhotos = getUniqueMusicAlbumPhotos(photos);
+    const isComplete = !partialError && (!total || uniquePhotos.length >= total || !hasMore);
+    const result = {
+      count: uniquePhotos.length,
+      isComplete,
+      partialError,
+      photos: uniquePhotos,
+      total: total || uniquePhotos.length,
+    };
+    if (isComplete) {
+      musicSmugmugAlbumPhotosCache.set(cacheKey, result);
+    }
+    return result;
+  })().finally(() => {
+    musicSmugmugAlbumPhotosRequests.delete(cacheKey);
+  });
+
+  musicSmugmugAlbumPhotosRequests.set(cacheKey, request);
+  return request;
+}
+
+function requestMusicSmugmugAlbumPhotos(albumId, options = {}) {
+  return options.mode === "all"
+    ? requestAllMusicSmugmugAlbumPhotos(albumId)
+    : requestMusicSmugmugAlbumPhotosPage(albumId, MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, 1);
 }
 
 function createSetGalleryPhotoTile(photo, index = 0) {
@@ -4247,18 +4385,10 @@ function renderSetGalleryPhotoHighlights(photos) {
   }
 }
 
-function getSetGalleryPhotoRequestLimit(row, mode = activeSetGalleryPhotoMode) {
-  const totalCount = getSetAlbumPhotoTotal(row);
-  return mode === "all" && totalCount > MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT
-    ? totalCount
-    : MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
-}
-
 function loadSetGalleryPhotoHighlights(row, options = {}) {
   const albumId = getSetAlbumId(row);
   const requestedMode = options.mode === "all" ? "all" : "preview";
-  const requestLimit = getSetGalleryPhotoRequestLimit(row, requestedMode);
-  const requestKey = `${albumId}:${requestLimit}`;
+  const requestKey = `${albumId}:${requestedMode}`;
   activeSetGalleryPhotoMode = requestedMode;
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
   activeSetGalleryAlbumRequestKey = requestKey;
@@ -4266,6 +4396,7 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
     setGallery.dataset.albumId = albumId;
     setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
   }
+  setSetGalleryPhotoWarning("");
   if (!albumId) {
     if (galleryGrid) {
       galleryGrid.replaceChildren();
@@ -4276,13 +4407,20 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
   }
 
   updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+  setSetGalleryLoadingCopy(
+    requestedMode === "all" ? "Loading full archive..." : "Loading archive photos...",
+    requestedMode === "all" ? "Fetching album pages." : "Preparing preview frames."
+  );
   setGalleryState("loading");
-  requestMusicSmugmugAlbumPhotos(albumId, requestLimit)
+  requestMusicSmugmugAlbumPhotos(albumId, { mode: requestedMode })
     .then((result) => {
       if (activeSetGalleryAlbumRequestKey !== requestKey) {
         return;
       }
       const photos = result?.photos || [];
+      if (result?.total) {
+        activeSetGalleryPhotoTotal = result.total;
+      }
       if (photos.length === 0) {
         if (galleryGrid) {
           galleryGrid.replaceChildren();
@@ -4292,14 +4430,24 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
         return;
       }
       renderSetGalleryPhotoHighlights(photos);
-      if (!activeSetGalleryPhotoTotal && result?.count) {
-        activeSetGalleryPhotoTotal = result.count;
+      if (requestedMode === "all" && result?.partialError) {
+        setSetGalleryPhotoWarning("Full archive could not fully load.");
       }
       updateSetGalleryPhotoSummary(photos.length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
       setGalleryState("ready");
     })
     .catch(() => {
       if (activeSetGalleryAlbumRequestKey !== requestKey) {
+        return;
+      }
+      if (requestedMode === "all") {
+        activeSetGalleryPhotoMode = "preview";
+        if (setGallery) {
+          setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
+        }
+        setSetGalleryPhotoWarning("Full archive could not fully load.");
+        updateSetGalleryPhotoSummary(getCurrentGalleryPhotoTiles().length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+        setGalleryState("ready");
         return;
       }
       if (galleryGrid) {

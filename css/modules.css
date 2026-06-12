@@ -1432,6 +1432,13 @@
   text-transform: none;
 }
 
+.set-gallery-highlights-warning {
+  color: rgba(255, 183, 105, 0.72);
+  font-size: clamp(0.62rem, 2.2vw, 0.72rem);
+  line-height: 1.2;
+  text-transform: none;
+}
+
 .set-gallery-view-toggle {
   display: inline-flex;
   align-items: center;
