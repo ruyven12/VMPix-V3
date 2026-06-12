@@ -12,6 +12,8 @@ const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
+const MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE = "/api/music/smugmug/albums";
+const MUSIC_SMUGMUG_ALBUM_PHOTOS_LIMIT = 12;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
@@ -42,6 +44,9 @@ let musicShowsIndexRowsCache = null;
 let musicShowsIndexRowsCacheState = "";
 let musicShowsIndexRowsCacheSource = null;
 let musicShowsIndexRowsCacheLength = 0;
+const musicSmugmugAlbumPhotosCache = new Map();
+const musicSmugmugAlbumPhotosRequests = new Map();
+let activeSetGalleryAlbumRequestKey = "";
 let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
@@ -404,7 +409,6 @@ function showSetGalleryRoute(row, options = {}) {
 
   updateSetsFeaturedFromRow(row);
   updateSetGalleryFromRow(row);
-  setGalleryState("ready");
   setGalleryViewMode(activeGalleryViewMode);
   setBandsIndexVisible(false);
   setBandDetailVisible(false);
@@ -412,8 +416,9 @@ function showSetGalleryRoute(row, options = {}) {
   setSetsArchiveVisible(false);
   setSetGalleryVisible(true);
   setGalleryModeVisible(false);
-  if (galleryPhotoTiles[0]) {
-    selectGalleryPhoto(galleryPhotoTiles[0]);
+  const tiles = getCurrentGalleryPhotoTiles();
+  if (tiles[0]) {
+    selectGalleryPhoto(tiles[0]);
   }
   setCurrentView(row.dataset.setTitle || "Set Detail");
   if (options.shouldScroll !== false && musicNexusShell) {
@@ -3388,7 +3393,7 @@ function setLightboxVisible(isVisible) {
     setLightboxControlsHidden(false);
     resetLightboxSwipeState();
     lightboxScreen.classList.remove("is-entering");
-    galleryPhotoTiles.forEach((tile) => {
+    getCurrentGalleryPhotoTiles().forEach((tile) => {
       tile.classList.remove("is-transition-source");
     });
   } else {
@@ -3729,6 +3734,11 @@ function getSetAlbumStatus(row) {
   return getAlbumStatusLabelFromValue(album?.status || row?.dataset?.setAlbumStatus);
 }
 
+function getSetAlbumId(row) {
+  const album = getSetSmugAlbum(row);
+  return String(album?.album_id || album?.albumId || album?.gallery_id || album?.galleryId || "").trim();
+}
+
 function getSetPerformanceValue(row) {
   const setPerformance = String(row?.dataset?.setPerformance || "").trim();
   if (setPerformance && setPerformance.toLowerCase() !== "coming soon") {
@@ -3804,6 +3814,7 @@ function updateSetGalleryFromRow(row) {
   if (setGalleryNotes) {
     setGalleryNotes.textContent = getSetNotes(row);
   }
+  loadSetGalleryPhotoHighlights(row);
 }
 
 function setGalleryState(stateName = "ready") {
@@ -3819,7 +3830,7 @@ function setGalleryState(stateName = "ready") {
   if (galleryStatesShell) {
     galleryStatesShell.classList.toggle("is-active", !shouldShowGrid);
   }
-  galleryPhotoTiles.forEach((tile) => {
+  getCurrentGalleryPhotoTiles().forEach((tile) => {
     if (shouldShowGrid) {
       tile.removeAttribute("tabindex");
     } else {
@@ -3860,7 +3871,7 @@ function selectGalleryPhoto(photoTile) {
   }
 
   activeGalleryPhoto = photoTile;
-  galleryPhotoTiles.forEach((tile) => {
+  getCurrentGalleryPhotoTiles().forEach((tile) => {
     const isActive = tile === photoTile;
     tile.classList.toggle("is-active", isActive);
     tile.setAttribute("aria-pressed", String(isActive));
@@ -3901,8 +3912,9 @@ function setGalleryModeVisible(isVisible) {
 
 function toggleGalleryMode() {
   const nextState = !isGalleryModeOpen;
-  if (!activeGalleryPhoto && galleryPhotoTiles[0]) {
-    selectGalleryPhoto(galleryPhotoTiles[0]);
+  const tiles = getCurrentGalleryPhotoTiles();
+  if (!activeGalleryPhoto && tiles[0]) {
+    selectGalleryPhoto(tiles[0]);
   }
   setGalleryModeVisible(nextState);
   if (nextState && galleryLightboxPrep) {
@@ -3914,7 +3926,7 @@ function toggleGalleryMode() {
 }
 
 function getGalleryPhotoIndex(photoTile) {
-  const index = Array.from(galleryPhotoTiles).indexOf(photoTile);
+  const index = getCurrentGalleryPhotoTiles().indexOf(photoTile);
   return index >= 0 ? index : 0;
 }
 
@@ -3926,7 +3938,7 @@ function getGalleryPhotoImageSrc(photoTile) {
 }
 
 function markLightboxTransitionSource(photoTile) {
-  galleryPhotoTiles.forEach((tile) => {
+  getCurrentGalleryPhotoTiles().forEach((tile) => {
     tile.classList.remove("is-transition-source");
   });
   window.clearTimeout(lightboxTransitionSourceTimer);
@@ -4036,14 +4048,185 @@ function protectArchiveImage(image) {
   image.addEventListener("dragstart", preventArchiveImageDrag);
 }
 
+function getCurrentGalleryPhotoTiles() {
+  return galleryGrid
+    ? Array.from(galleryGrid.querySelectorAll("[data-gallery-photo]"))
+    : Array.from(galleryPhotoTiles || []);
+}
+
+function getMusicSmugmugAlbumPhotosApiUrl(albumId) {
+  const apiUrl = new URL(
+    `${MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE}/${encodeURIComponent(albumId)}/photos`,
+    MUSIC_BANDS_INDEX_API_BASE_URL
+  );
+  apiUrl.searchParams.set("limit", String(MUSIC_SMUGMUG_ALBUM_PHOTOS_LIMIT));
+  return apiUrl;
+}
+
+function getMusicAlbumPhotoImageSrc(photo) {
+  return String(
+    photo?.medium_url ||
+    photo?.mediumUrl ||
+    photo?.small_url ||
+    photo?.smallUrl ||
+    photo?.thumbnail_url ||
+    photo?.thumbnailUrl ||
+    photo?.large_url ||
+    photo?.largeUrl ||
+    ""
+  ).trim();
+}
+
+function normalizeMusicAlbumPhoto(photo, index = 0) {
+  const imageSrc = getMusicAlbumPhotoImageSrc(photo);
+  if (!imageSrc) {
+    return null;
+  }
+
+  const label = String(photo?.caption || photo?.title || photo?.image_key || `Preview photo ${index + 1}`).trim();
+  return {
+    imageKey: String(photo?.image_key || photo?.imageKey || `album-photo-${index + 1}`).trim(),
+    imageSrc,
+    label: label || `Preview photo ${index + 1}`,
+  };
+}
+
+function normalizeMusicAlbumPhotosPayload(payload) {
+  const photos = Array.isArray(payload?.photos) ? payload.photos : [];
+  return photos
+    .slice(0, MUSIC_SMUGMUG_ALBUM_PHOTOS_LIMIT)
+    .map(normalizeMusicAlbumPhoto)
+    .filter(Boolean);
+}
+
+function requestMusicSmugmugAlbumPhotos(albumId) {
+  const safeAlbumId = String(albumId || "").trim();
+  if (!safeAlbumId || typeof fetch !== "function") {
+    return Promise.resolve([]);
+  }
+  if (musicSmugmugAlbumPhotosCache.has(safeAlbumId)) {
+    return Promise.resolve(musicSmugmugAlbumPhotosCache.get(safeAlbumId));
+  }
+  if (musicSmugmugAlbumPhotosRequests.has(safeAlbumId)) {
+    return musicSmugmugAlbumPhotosRequests.get(safeAlbumId);
+  }
+
+  const request = fetch(getMusicSmugmugAlbumPhotosApiUrl(safeAlbumId), { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Album photos request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const photos = normalizeMusicAlbumPhotosPayload(payload);
+      musicSmugmugAlbumPhotosCache.set(safeAlbumId, photos);
+      return photos;
+    })
+    .finally(() => {
+      musicSmugmugAlbumPhotosRequests.delete(safeAlbumId);
+    });
+
+  musicSmugmugAlbumPhotosRequests.set(safeAlbumId, request);
+  return request;
+}
+
+function createSetGalleryPhotoTile(photo, index = 0) {
+  const tile = document.createElement("button");
+  tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
+  tile.type = "button";
+  tile.dataset.galleryPhoto = "";
+  tile.dataset.galleryPhotoLabel = photo.label;
+  tile.dataset.galleryKind = "image";
+  tile.dataset.galleryMediaId = photo.imageKey;
+  tile.dataset.galleryLightboxId = `music-album-photo-${photo.imageKey || index + 1}`;
+  tile.setAttribute("aria-label", photo.label);
+  tile.setAttribute("aria-pressed", String(index === 0));
+
+  const image = document.createElement("img");
+  image.className = "archive-gallery-image";
+  image.src = photo.imageSrc;
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = galleryImageFallbackSrc;
+  };
+  protectArchiveImage(image);
+  tile.append(image);
+  tile.addEventListener("click", () => {
+    selectGalleryPhoto(tile);
+  });
+  return tile;
+}
+
+function renderSetGalleryPhotoHighlights(photos) {
+  if (!galleryGrid) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  photos.forEach((photo, index) => {
+    fragment.append(createSetGalleryPhotoTile(photo, index));
+  });
+  galleryGrid.replaceChildren(fragment);
+  activeGalleryPhoto = null;
+  const firstTile = getCurrentGalleryPhotoTiles()[0] || null;
+  if (firstTile) {
+    selectGalleryPhoto(firstTile);
+  }
+}
+
+function loadSetGalleryPhotoHighlights(row) {
+  const albumId = getSetAlbumId(row);
+  activeSetGalleryAlbumRequestKey = albumId;
+  if (setGallery) {
+    setGallery.dataset.albumId = albumId;
+  }
+  if (!albumId) {
+    if (galleryGrid) {
+      galleryGrid.replaceChildren();
+    }
+    setGalleryState("empty");
+    return;
+  }
+
+  setGalleryState("loading");
+  requestMusicSmugmugAlbumPhotos(albumId)
+    .then((photos) => {
+      if (activeSetGalleryAlbumRequestKey !== albumId) {
+        return;
+      }
+      if (photos.length === 0) {
+        if (galleryGrid) {
+          galleryGrid.replaceChildren();
+        }
+        setGalleryState("empty");
+        return;
+      }
+      renderSetGalleryPhotoHighlights(photos);
+      setGalleryState("ready");
+    })
+    .catch(() => {
+      if (activeSetGalleryAlbumRequestKey !== albumId) {
+        return;
+      }
+      if (galleryGrid) {
+        galleryGrid.replaceChildren();
+      }
+      setGalleryState("error");
+    });
+}
+
 function normalizeLightboxIndex(index) {
-  const photoCount = Math.max(galleryPhotoTiles.length, 1);
+  const photoCount = Math.max(getCurrentGalleryPhotoTiles().length, 1);
   return ((index % photoCount) + photoCount) % photoCount;
 }
 
 function getLightboxPhotoData(index) {
   const normalizedIndex = normalizeLightboxIndex(index);
-  const tile = galleryPhotoTiles[normalizedIndex] || null;
+  const tile = getCurrentGalleryPhotoTiles()[normalizedIndex] || null;
   const label = getGalleryPhotoLabel(tile) || `Photo ${String(normalizedIndex + 1).padStart(2, "0")}`;
   const accent = setImageAccents[normalizedIndex % setImageAccents.length];
 
@@ -4200,7 +4383,7 @@ function showLightbox(photoTile = activeGalleryPhoto) {
   const requestedTile = photoTile && typeof photoTile.matches === "function" && photoTile.matches("[data-gallery-photo]")
     ? photoTile
     : null;
-  const targetTile = requestedTile || activeGalleryPhoto || galleryPhotoTiles[0] || null;
+  const targetTile = requestedTile || activeGalleryPhoto || getCurrentGalleryPhotoTiles()[0] || null;
   if (targetTile) {
     selectGalleryPhoto(targetTile);
   }

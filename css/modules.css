@@ -1807,6 +1807,7 @@ img.archive-gallery-image {
 
 .set-gallery-photo-tile {
   --archive-gallery-ratio: 16 / 10;
+  min-height: var(--tap-target);
   text-transform: none;
   transition:
     border-color 180ms ease,
@@ -14221,7 +14222,7 @@ img.archive-gallery-image {
   }
 
   .set-gallery-photo-tile {
-    min-height: clamp(7.8rem, 36vw, 10.75rem);
+    min-height: var(--tap-target);
   }
 
   .set-gallery-view-all {
