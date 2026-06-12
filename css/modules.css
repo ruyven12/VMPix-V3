@@ -8082,6 +8082,7 @@ img.archive-gallery-image {
 }
 
 .show-detail-eyebrow,
+.show-detail-archive-meta,
 .show-detail-title,
 .show-detail-line,
 .show-detail-stat-value,
@@ -8107,6 +8108,14 @@ img.archive-gallery-image {
   color: rgba(213, 22, 34, 0.82);
   font-size: clamp(0.62rem, 2.45vw, 0.74rem);
   line-height: 1;
+  text-transform: none;
+}
+
+.show-detail-archive-meta {
+  color: rgba(247, 247, 242, 0.54);
+  font-size: clamp(0.62rem, 2.35vw, 0.72rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
   text-transform: none;
 }
 

@@ -6721,6 +6721,144 @@ function getMusicShowPhotoCount(show) {
   return String(Math.max(48, bands * 54));
 }
 
+function getMusicShowDetailCountCandidate(...candidates) {
+  for (const candidate of candidates) {
+    if (candidate === undefined || candidate === null || candidate === "") {
+      continue;
+    }
+
+    if (typeof candidate === "number" && Number.isFinite(candidate)) {
+      return Math.max(0, Math.trunc(candidate));
+    }
+
+    const numericMatch = String(candidate).replace(/,/g, "").match(/\d+/);
+    if (numericMatch) {
+      const parsed = Number.parseInt(numericMatch[0], 10);
+      if (Number.isFinite(parsed)) {
+        return Math.max(0, parsed);
+      }
+    }
+  }
+
+  return null;
+}
+
+function getMusicShowSmugAlbums(show) {
+  const candidates = [
+    show?.smug_albums,
+    show?.smugAlbums,
+    show?.smugmug_albums,
+    show?.smugmugAlbums,
+    show?.stats?.smug_albums,
+    show?.stats?.smugAlbums,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate;
+    }
+
+    if (typeof candidate === "string" && candidate.trim().startsWith("[")) {
+      try {
+        const parsed = JSON.parse(candidate);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (error) {
+        return [];
+      }
+    }
+  }
+
+  return [];
+}
+
+function getMusicShowDetailBandCount(show) {
+  const statsCount = getMusicShowDetailCountCandidate(show?.stats?.bandCount, show?.stats?.band_count);
+  if (statsCount !== null) {
+    return statsCount;
+  }
+
+  if (Array.isArray(show?.bands)) {
+    return show.bands.length;
+  }
+
+  return getMusicShowDetailCountCandidate(show?.bandCount, show?.band_count) ?? 0;
+}
+
+function getMusicShowDetailPhotoCount(show) {
+  const statsCount = getMusicShowDetailCountCandidate(show?.stats?.photoCount, show?.stats?.photo_count);
+  if (statsCount !== null && statsCount > 0) {
+    return statsCount;
+  }
+
+  const directCount = getMusicShowDetailCountCandidate(show?.photoCount, show?.photo_count);
+  if (directCount !== null && directCount > 0) {
+    return directCount;
+  }
+
+  return getMusicShowSmugAlbums(show).reduce((total, album) => {
+    const albumPhotoCount = getMusicShowDetailCountCandidate(
+      album?.photo_count,
+      album?.photoCount,
+      album?.photos,
+      album?.image_count,
+      album?.imageCount
+    );
+    return total + (albumPhotoCount || 0);
+  }, 0);
+}
+
+function getMusicShowDetailAlbumCount(show) {
+  const albums = getMusicShowSmugAlbums(show);
+  if (albums.length === 0) {
+    return 0;
+  }
+
+  const albumsWithStatus = albums.filter((album) => String(album?.status || "").trim());
+  const resolvedAlbums = albums.filter((album) => {
+    const status = String(album?.status || "").trim().toLowerCase();
+    const albumId = String(album?.album_id || album?.albumId || album?.gallery_id || album?.galleryId || "").trim();
+    return status === "resolved" && albumId;
+  });
+
+  if (resolvedAlbums.length > 0) {
+    return resolvedAlbums.length;
+  }
+
+  return albumsWithStatus.length === 0 ? albums.length : 0;
+}
+
+function formatMusicShowDetailStatValue(value, options = {}) {
+  const count = getMusicShowDetailCountCandidate(value);
+  if (count !== null && count > 0) {
+    return count.toLocaleString();
+  }
+
+  return options.pendingWhenEmpty ? "Pending" : "0";
+}
+
+function formatMusicShowArchiveStatusValue(value) {
+  const status = String(value || "").trim();
+  if (!status) {
+    return "";
+  }
+
+  return status
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getMusicShowArchiveStatus(show, albumCount) {
+  if (albumCount > 0) {
+    return "Archive Synced";
+  }
+
+  return formatMusicShowArchiveStatusValue(show?.smug_sync_status || show?.smugSyncStatus) || "Archive Pending";
+}
+
 function getMusicShowDateLabel(show) {
   if (show?.formattedDate) {
     return show.formattedDate;
@@ -6790,6 +6928,37 @@ function getMusicShowTimestamp(show) {
 function isMusicShowPosterImageSrc(value) {
   const poster = String(value || "").trim();
   return /^(https?:|data:image\/|\/|\.\.?\/)/i.test(poster);
+}
+
+function getMusicShowDetailCoverValue(show) {
+  const candidates = [
+    show?.cover_image_url,
+    show?.coverImageUrl,
+    show?.cover_image,
+    show?.coverImage,
+    show?.poster,
+    show?.poster_url,
+    show?.posterUrl,
+    show?.poster_image,
+    show?.posterImage,
+    show?.image_url,
+    show?.imageUrl,
+    show?.image,
+    show?.media?.poster,
+    show?.media?.image,
+    show?.images?.poster,
+    show?.images?.full,
+    show?.images?.large,
+  ];
+
+  return candidates
+    .map((candidate) => String(candidate || "").trim())
+    .find(Boolean) || "";
+}
+
+function getMusicShowDetailCoverSrc(show) {
+  const cover = getMusicShowDetailCoverValue(show);
+  return isMusicShowPosterImageSrc(cover) ? cover : SET_GALLERY_NO_POSTER_IMAGE_SRC;
 }
 
 function getMusicShowPosterSrc(show) {
@@ -7922,6 +8091,10 @@ function renderMusicShowDetail(show) {
   const showVenue = getMusicShowDetailVenue(show);
   const showLocation = getMusicShowDetailLocation(show);
   const showIdValue = getMusicShowIdValue(show) || "Show Pending";
+  const bandCount = getMusicShowDetailBandCount(show);
+  const photoCount = getMusicShowDetailPhotoCount(show);
+  const albumCount = getMusicShowDetailAlbumCount(show);
+  const archiveStatus = getMusicShowArchiveStatus(show, albumCount);
   showDetail.dataset.showId = relationships.show_id;
   showDetail.dataset.venueId = relationships.venue_id;
   showDetail.dataset.galleryEntryId = relationships.archive_meta.gallery_entry_id;
@@ -7953,7 +8126,7 @@ function renderMusicShowDetail(show) {
   posterFallback.className = "show-detail-poster-fallback";
   posterFallback.textContent = "No Poster Available";
   poster.append(posterImage, posterFallback);
-  setMusicShowPosterImage(posterImage, getMusicShowPosterSrc(show), posterFallback);
+  setMusicShowPosterImage(posterImage, getMusicShowDetailCoverSrc(show), posterFallback);
 
   const copy = document.createElement("div");
   copy.className = "show-detail-copy";
@@ -7961,6 +8134,10 @@ function renderMusicShowDetail(show) {
   const eyebrow = document.createElement("p");
   eyebrow.className = "show-detail-eyebrow";
   eyebrow.textContent = "Show Detail";
+
+  const archiveMeta = document.createElement("p");
+  archiveMeta.className = "show-detail-archive-meta";
+  archiveMeta.textContent = `Show ID ${showIdValue} - ${archiveStatus}`;
 
   const title = document.createElement("h3");
   title.className = "show-detail-title";
@@ -7980,12 +8157,12 @@ function renderMusicShowDetail(show) {
   const stats = document.createElement("div");
   stats.className = "show-detail-stats";
   stats.append(
-    createShowDetailStat("Bands", relationships.band_count),
-    createShowDetailStat("Photos", "Coming Soon"),
-    createShowDetailStat("Show ID", showIdValue)
+    createShowDetailStat("Bands", formatMusicShowDetailStatValue(bandCount)),
+    createShowDetailStat("Photos", formatMusicShowDetailStatValue(photoCount, { pendingWhenEmpty: true })),
+    createShowDetailStat("Albums", formatMusicShowDetailStatValue(albumCount, { pendingWhenEmpty: true }))
   );
 
-  copy.append(eyebrow, title, details, stats);
+  copy.append(eyebrow, archiveMeta, title, details, stats);
   hero.append(poster, copy);
 
   const bill = createShowDetailBandsOnBill(show);
