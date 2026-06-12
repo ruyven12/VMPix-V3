@@ -48,6 +48,18 @@ let musicShowsIndexRowsCacheSource = null;
 let musicShowsIndexRowsCacheLength = 0;
 const musicSmugmugAlbumPhotosCache = new Map();
 const musicSmugmugAlbumPhotosRequests = new Map();
+const musicBandArchiveCoverageCache = new Map();
+const musicBandArchiveCoverageRequests = new Map();
+const musicBandArchiveCoverageFields = [
+  "years_covered",
+  "first_capture_year",
+  "last_capture_year",
+  "most_active_year",
+  "most_active_year_photo_count",
+  "latest_seen",
+  "last_updated",
+];
+let activeMusicBandArchiveCoverageRequestKey = "";
 let activeSetGalleryAlbumRequestKey = "";
 let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
@@ -650,7 +662,7 @@ function formatBandDetailCompactDate(value, fallback = "Pending") {
   if (numericMatch) {
     const month = numericMatch[1].padStart(2, "0");
     const day = numericMatch[2].padStart(2, "0");
-    const year = numericMatch[3].slice(-2);
+    const year = numericMatch[3].length === 2 ? `20${numericMatch[3]}` : numericMatch[3];
     return `${month}/${day}/${year}`;
   }
 
@@ -661,7 +673,7 @@ function formatBandDetailCompactDate(value, fallback = "Pending") {
 
   const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
   const day = String(parsedDate.getDate()).padStart(2, "0");
-  const year = String(parsedDate.getFullYear()).slice(-2);
+  const year = String(parsedDate.getFullYear());
   return `${month}/${day}/${year}`;
 }
 
@@ -1065,6 +1077,186 @@ function requestMusicBandsIndexData() {
     });
 
   return musicBandsIndexRequest;
+}
+
+function getMusicBandArchiveCoverageApiUrl(bandId) {
+  const apiUrl = new URL(MUSIC_BANDS_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+  apiUrl.searchParams.set("coverage", "archive");
+  apiUrl.searchParams.set("band_id", String(bandId || "").trim());
+  return apiUrl;
+}
+
+function getMusicBandArchiveCoverageValue(sources, field) {
+  for (const source of sources) {
+    if (!source || typeof source !== "object" || !Object.prototype.hasOwnProperty.call(source, field)) {
+      continue;
+    }
+
+    const value = source[field];
+    if (value == null || String(value).trim() === "") {
+      continue;
+    }
+
+    return value;
+  }
+
+  return null;
+}
+
+function normalizeMusicBandArchiveCoveragePayload(payload) {
+  const archiveCoverage = payload?.archive_coverage && typeof payload.archive_coverage === "object"
+    ? payload.archive_coverage
+    : {};
+  const stats = payload?.stats && typeof payload.stats === "object" ? payload.stats : {};
+  const sources = [archiveCoverage, stats, payload].filter(Boolean);
+  const coverage = {};
+
+  musicBandArchiveCoverageFields.forEach((field) => {
+    const value = getMusicBandArchiveCoverageValue(sources, field);
+    if (value != null) {
+      coverage[field] = value;
+    }
+  });
+
+  return coverage;
+}
+
+function hasMusicBandArchiveCoverageFields(band) {
+  const stats = getBandDetailStats(band);
+  return ["years_covered", "most_active_year", "latest_seen", "last_updated"].every((field) => {
+    return getMusicBandArchiveCoverageValue([stats, band], field) != null;
+  });
+}
+
+function mergeMusicBandArchiveCoverage(band, coverage) {
+  if (!band || !coverage || typeof coverage !== "object" || Object.keys(coverage).length === 0) {
+    return band;
+  }
+
+  const stats = getBandDetailStats(band);
+  const backendRecord = band.backend_record && typeof band.backend_record === "object" ? band.backend_record : null;
+  const backendStats = backendRecord?.stats && typeof backendRecord.stats === "object" ? backendRecord.stats : {};
+  const merged = {
+    ...band,
+    ...coverage,
+    stats: {
+      ...stats,
+      ...coverage,
+    },
+  };
+
+  if (backendRecord) {
+    merged.backend_record = {
+      ...backendRecord,
+      ...coverage,
+      stats: {
+        ...backendStats,
+        ...coverage,
+      },
+    };
+  }
+
+  return merged;
+}
+
+function updateMusicBandArchiveCoverageInCollection(bandId, coverage) {
+  const normalizedBandId = String(bandId || "").trim();
+  if (!normalizedBandId || !coverage || typeof coverage !== "object" || Object.keys(coverage).length === 0) {
+    return;
+  }
+
+  musicBandsIndexCollection = getMusicBandsIndexCollection().map((band) => {
+    return getBandId(band) === normalizedBandId
+      ? mergeMusicBandArchiveCoverage(band, coverage)
+      : band;
+  });
+  if (typeof mockCollections !== "undefined") {
+    mockCollections.musicBands = musicBandsIndexCollection;
+  }
+}
+
+function renderBandDetailArchiveCoverage(band) {
+  if (!band) {
+    return;
+  }
+
+  const stats = getBandDetailStats(band);
+  if (bandDetailYearsCovered) {
+    bandDetailYearsCovered.textContent = getBandDetailYearsCovered(stats, band);
+  }
+  if (bandDetailMostActiveYear) {
+    bandDetailMostActiveYear.textContent = getBandDetailMostActiveYear(stats, band);
+  }
+  if (bandDetailLatestSeen) {
+    bandDetailLatestSeen.textContent = getBandDetailLatestSeen(stats, band);
+  }
+  if (bandDetailLastUpdated) {
+    bandDetailLastUpdated.textContent = getBandDetailLastUpdated(stats, band);
+  }
+}
+
+function requestMusicBandArchiveCoverage(band) {
+  const bandId = getBandId(band);
+  if (!bandId || hasMusicBandArchiveCoverageFields(band) || typeof fetch !== "function") {
+    return Promise.resolve(null);
+  }
+
+  if (musicBandArchiveCoverageCache.has(bandId)) {
+    return Promise.resolve(musicBandArchiveCoverageCache.get(bandId));
+  }
+  if (musicBandArchiveCoverageRequests.has(bandId)) {
+    return musicBandArchiveCoverageRequests.get(bandId);
+  }
+
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_BANDS_INDEX_TIMEOUT_MS)
+    : 0;
+  const request = fetch(getMusicBandArchiveCoverageApiUrl(bandId), {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music band archive coverage request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const coverage = normalizeMusicBandArchiveCoveragePayload(payload);
+      musicBandArchiveCoverageCache.set(bandId, coverage);
+      return coverage;
+    })
+    .catch(() => null)
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      musicBandArchiveCoverageRequests.delete(bandId);
+    });
+
+  musicBandArchiveCoverageRequests.set(bandId, request);
+  return request;
+}
+
+function refreshBandDetailArchiveCoverage(band) {
+  const bandId = getBandId(band);
+  if (!bandId || hasMusicBandArchiveCoverageFields(band)) {
+    return;
+  }
+
+  activeMusicBandArchiveCoverageRequestKey = bandId;
+  requestMusicBandArchiveCoverage(band).then((coverage) => {
+    if (!coverage || Object.keys(coverage).length === 0 || activeMusicBandArchiveCoverageRequestKey !== bandId) {
+      return;
+    }
+
+    updateMusicBandArchiveCoverageInCollection(bandId, coverage);
+    if (activeMusicBand && getBandId(activeMusicBand) === bandId) {
+      activeMusicBand = mergeMusicBandArchiveCoverage(activeMusicBand, coverage);
+      renderBandDetailArchiveCoverage(activeMusicBand);
+    }
+  });
 }
 
 function getMusicPeopleIndexCollection() {
@@ -3715,6 +3907,7 @@ function showBandDetail(band) {
   setBandsIndexVisible(false);
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
+  refreshBandDetailArchiveCoverage(activeMusicBand);
   if (musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
