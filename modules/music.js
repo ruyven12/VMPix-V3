@@ -9056,6 +9056,30 @@ function setShowSetCardPreviewUrls(card, urls) {
   updateShowSetCardPreviewPlayback(card);
 }
 
+function loadShowSetCardPreviewImage(image, src) {
+  const imageSrc = src || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  if (!image) {
+    return Promise.resolve(false);
+  }
+
+  if (image.getAttribute("src") === imageSrc && image.complete && image.naturalWidth > 0) {
+    return Promise.resolve(true);
+  }
+
+  return new Promise((resolve) => {
+    image.onload = () => resolve(true);
+    image.onerror = () => {
+      image.onerror = null;
+      image.src = SET_GALLERY_NO_POSTER_IMAGE_SRC;
+      resolve(false);
+    };
+    image.src = imageSrc;
+    if (image.complete) {
+      resolve(image.naturalWidth > 0);
+    }
+  });
+}
+
 function ensureShowSetCardPreviewAlbumPhotos(card) {
   const preview = card?.__showSetPreview;
   if (
@@ -9104,18 +9128,27 @@ function advanceShowSetCardPreview(card) {
     stopShowSetCardPreview(card);
     return;
   }
-  if (preview.urls.length <= 1 || document.hidden || isShowSetPreviewReducedMotion()) {
+  if (preview.urls.length <= 1 || preview.isAdvancing || document.hidden || isShowSetPreviewReducedMotion()) {
     return;
   }
 
-  preview.currentIndex = (preview.currentIndex + 1) % preview.urls.length;
+  const nextIndex = (preview.currentIndex + 1) % preview.urls.length;
   const nextSlot = preview.activeSlot === 0 ? 1 : 0;
   const nextImage = preview.images[nextSlot];
   const activeImage = preview.images[preview.activeSlot];
-  nextImage.src = preview.urls[preview.currentIndex];
-  nextImage.classList.add("is-active");
-  activeImage.classList.remove("is-active");
-  preview.activeSlot = nextSlot;
+  preview.isAdvancing = true;
+  loadShowSetCardPreviewImage(nextImage, preview.urls[nextIndex]).then(() => {
+    if (!preview || !card.isConnected || document.hidden || isShowSetPreviewReducedMotion()) {
+      return;
+    }
+
+    preview.currentIndex = nextIndex;
+    nextImage.classList.add("is-active");
+    activeImage.classList.remove("is-active");
+    preview.activeSlot = nextSlot;
+  }).finally(() => {
+    preview.isAdvancing = false;
+  });
 }
 
 function shouldPlayShowSetCardPreview(card) {
