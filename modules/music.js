@@ -3638,8 +3638,105 @@ function getSetShowId(row) {
   return String(row.dataset.setShowId || "").trim() || "Pending";
 }
 
-function getSetQuality(row) {
-  return row && row.dataset.setQuality ? row.dataset.setQuality : "Coming Soon";
+function getMusicShowAlbumForBand(show, band = activeMusicBand, dateFolder = "") {
+  const albums = getMusicShowSmugAlbums(show);
+  if (albums.length === 0) {
+    return null;
+  }
+
+  const bandKeys = new Set([
+    getBandId(band),
+    band?.band_id,
+    band?.id,
+    band?.slug,
+    band?.name,
+    band?.general?.name,
+    band?.band,
+    band?.title,
+  ]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .map(createBandSlug));
+  const setCode = normalizeSetCode(dateFolder || getMusicShowRouteCode(show));
+
+  const matchedAlbum = albums.find((album) => {
+    const albumBandKeys = [
+      getMusicShowAlbumBandId(album),
+      getMusicShowAlbumBandName(album),
+      album?.lineupBand,
+      album?.lineup_band,
+      album?.band_folder,
+    ]
+      .map((value) => String(value || "").trim())
+      .filter(Boolean)
+      .map(createBandSlug);
+    const bandMatches = bandKeys.size === 0 || albumBandKeys.some((key) => bandKeys.has(key));
+    const albumDateFolder = getMusicShowAlbumDateFolder(show, album);
+    const dateMatches = !setCode || !albumDateFolder || albumDateFolder === setCode;
+    return bandMatches && dateMatches;
+  });
+
+  return matchedAlbum || (albums.length === 1 ? albums[0] : null);
+}
+
+function getSetSmugAlbum(row) {
+  if (!row) {
+    return null;
+  }
+
+  const show = findSetDataByCode(getSetCode(row), activeMusicBand);
+  return show ? getMusicShowAlbumForBand(show, activeMusicBand, getSetCode(row)) : null;
+}
+
+function getMusicShowAlbumPhotoCount(album) {
+  return getMusicShowDetailCountCandidate(
+    album?.photo_count,
+    album?.photoCount,
+    album?.photos,
+    album?.image_count,
+    album?.imageCount
+  );
+}
+
+function formatSetPhotoCount(row) {
+  const albumPhotoCount = getMusicShowAlbumPhotoCount(getSetSmugAlbum(row));
+  if (albumPhotoCount !== null && albumPhotoCount > 0) {
+    return albumPhotoCount.toLocaleString();
+  }
+
+  const rowPhotoCount = getMusicShowDetailCountCandidate(row?.dataset?.setPhotos);
+  return rowPhotoCount !== null && rowPhotoCount > 0
+    ? rowPhotoCount.toLocaleString()
+    : "Pending";
+}
+
+function getAlbumStatusLabelFromValue(value) {
+  const status = String(value || "").trim().toLowerCase();
+  if (!status) {
+    return "Pending";
+  }
+  if (["resolved", "synced", "sync", "complete", "completed", "success", "ok"].includes(status)) {
+    return "Synced";
+  }
+  if (["error", "failed", "fail", "failure"].includes(status)) {
+    return "Error";
+  }
+  return "Pending";
+}
+
+function getSetAlbumStatus(row) {
+  const album = getSetSmugAlbum(row);
+  return getAlbumStatusLabelFromValue(album?.status || row?.dataset?.setAlbumStatus);
+}
+
+function getSetPerformanceValue(row) {
+  const setPerformance = String(row?.dataset?.setPerformance || "").trim();
+  if (setPerformance && setPerformance.toLowerCase() !== "coming soon") {
+    return setPerformance;
+  }
+
+  const album = getSetSmugAlbum(row);
+  return formatOrdinalNumber(album?.bandViewCount ?? album?.band_view_count, "Pending");
 }
 
 function getSetCamera(row) {
@@ -3693,16 +3790,13 @@ function updateSetGalleryFromRow(row) {
     setGalleryVenue.textContent = getSetVenue(row);
   }
   if (setGalleryPerformance) {
-    setGalleryPerformance.textContent = setData.setPerformance || "Coming Soon";
+    setGalleryPerformance.textContent = getSetPerformanceValue(row);
   }
   if (setGalleryPhotos) {
-    setGalleryPhotos.textContent = "Coming Soon";
+    setGalleryPhotos.textContent = formatSetPhotoCount(row);
   }
   if (setGalleryContributors) {
-    setGalleryContributors.textContent = setData.setContributors || "Coming Soon";
-  }
-  if (setGalleryQuality) {
-    setGalleryQuality.textContent = getSetQuality(row);
+    setGalleryContributors.textContent = getSetAlbumStatus(row);
   }
   if (setGalleryCamera) {
     setGalleryCamera.textContent = getSetCamera(row);
@@ -4476,6 +4570,14 @@ function setArchivePosterImage(image, imageSrc, fallbackElement, loadedClassName
 function createSetsListRow(show, isActive = false) {
   const item = document.createElement("li");
   const row = document.createElement("button");
+  const setAlbum = getMusicShowAlbumForBand(show, activeMusicBand, show.setCode);
+  const setAlbumPhotoCount = getMusicShowAlbumPhotoCount(setAlbum);
+  const setAlbumStatus = getAlbumStatusLabelFromValue(setAlbum?.status);
+  const setPerformance = getMusicShowBandPerformanceValue(
+    show,
+    activeMusicBand,
+    formatOrdinalNumber(setAlbum?.bandViewCount ?? setAlbum?.band_view_count, "Pending")
+  );
   row.className = "sets-list-row";
   row.type = "button";
   row.dataset.setRow = "";
@@ -4490,11 +4592,13 @@ function createSetsListRow(show, isActive = false) {
   row.dataset.setState = show.state || "";
   row.dataset.setPoster = show.poster || "";
   row.dataset.setVenue = getMusicShowVenueName(show);
-  row.dataset.setPerformance = getMusicShowBandPerformanceValue(show, activeMusicBand);
-  row.dataset.setPhotos = "Coming Soon";
+  row.dataset.setPerformance = setPerformance;
+  row.dataset.setPhotos = setAlbumPhotoCount !== null && setAlbumPhotoCount > 0
+    ? String(setAlbumPhotoCount)
+    : "Pending";
+  row.dataset.setAlbumStatus = setAlbumStatus;
   row.dataset.setContributors = show.contributors || "Coming Soon";
   row.dataset.setComplete = "";
-  row.dataset.setQuality = "Coming Soon";
   row.dataset.setCamera = show.camera || "N/A";
   row.dataset.setNotes = show.notes || "No notes at the moment.";
   row.dataset.setThumb = getSetImageLabel({ dataset: { setDate: show.formattedDate, setThumb: activeMusicBand?.thumb || "" } });
