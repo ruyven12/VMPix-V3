@@ -8093,8 +8093,6 @@ function renderMusicShowDetail(show) {
   const showIdValue = getMusicShowIdValue(show) || "Show Pending";
   const bandCount = getMusicShowDetailBandCount(show);
   const photoCount = getMusicShowDetailPhotoCount(show);
-  const albumCount = getMusicShowDetailAlbumCount(show);
-  const archiveStatus = getMusicShowArchiveStatus(show, albumCount);
   showDetail.dataset.showId = relationships.show_id;
   showDetail.dataset.venueId = relationships.venue_id;
   showDetail.dataset.galleryEntryId = relationships.archive_meta.gallery_entry_id;
@@ -8135,10 +8133,6 @@ function renderMusicShowDetail(show) {
   eyebrow.className = "show-detail-eyebrow";
   eyebrow.textContent = "Show Detail";
 
-  const archiveMeta = document.createElement("p");
-  archiveMeta.className = "show-detail-archive-meta";
-  archiveMeta.textContent = `Show ID ${showIdValue} - ${archiveStatus}`;
-
   const title = document.createElement("h3");
   title.className = "show-detail-title";
   title.id = "show-detail-title";
@@ -8157,12 +8151,12 @@ function renderMusicShowDetail(show) {
   const stats = document.createElement("div");
   stats.className = "show-detail-stats";
   stats.append(
+    createShowDetailStat("Show ID", showIdValue),
     createShowDetailStat("Bands", formatMusicShowDetailStatValue(bandCount)),
-    createShowDetailStat("Photos", formatMusicShowDetailStatValue(photoCount, { pendingWhenEmpty: true })),
-    createShowDetailStat("Albums", formatMusicShowDetailStatValue(albumCount, { pendingWhenEmpty: true }))
+    createShowDetailStat("Photos", formatMusicShowDetailStatValue(photoCount, { pendingWhenEmpty: true }))
   );
 
-  copy.append(eyebrow, archiveMeta, title, details, stats);
+  copy.append(eyebrow, title, details, stats);
   hero.append(poster, copy);
 
   const bill = createShowDetailBandsOnBill(show);

@@ -8046,6 +8046,10 @@ img.archive-gallery-image {
   border: 1px solid rgba(247, 247, 242, 0.14);
 }
 
+.show-detail-poster.has-poster::before {
+  display: none;
+}
+
 .show-detail-poster-mark {
   position: relative;
   z-index: 1;
@@ -8121,7 +8125,7 @@ img.archive-gallery-image {
 
 .show-detail-title {
   color: rgba(247, 247, 242, 0.94);
-  font-size: clamp(1.56rem, 8vw, 2.9rem);
+  font-size: clamp(1.2475rem, calc(8vw - 5px), 2.5875rem);
   font-weight: 400;
   line-height: 0.98;
   overflow-wrap: anywhere;
