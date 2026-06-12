@@ -7648,15 +7648,185 @@ function navigateToShowBillBandSet(show, band) {
   });
 }
 
+function getMusicShowAlbumBandName(album) {
+  return String(album?.band || album?.name || album?.band_name || album?.bandName || "").trim();
+}
+
+function getMusicShowAlbumBandId(album) {
+  return String(album?.band_id || album?.bandId || album?.slug || "").trim() || createBandSlug(getMusicShowAlbumBandName(album));
+}
+
+function getMusicShowAlbumDateFolder(show, album) {
+  return normalizeSetCode(
+    album?.date_folder ||
+    album?.dateFolder ||
+    show?.date_folder ||
+    show?.dateFolder ||
+    getMusicShowRouteCode(show)
+  );
+}
+
+function getMusicShowAlbumSetRoute(show, album) {
+  const bandId = getMusicShowAlbumBandId(album);
+  const dateFolder = getMusicShowAlbumDateFolder(show, album);
+  if (!bandId || !dateFolder) {
+    return "";
+  }
+
+  return getSetRouteUrl(bandId, dateFolder);
+}
+
+function getMusicShowAlbumPhotoLabel(album) {
+  const photoCount = getMusicShowDetailCountCandidate(
+    album?.photo_count,
+    album?.photoCount,
+    album?.photos,
+    album?.image_count,
+    album?.imageCount
+  );
+  return photoCount && photoCount > 0
+    ? `${photoCount.toLocaleString()} Photos`
+    : "Pending Photos";
+}
+
+function getMusicShowResolvedAlbums(show) {
+  const albums = getMusicShowSmugAlbums(show);
+  const albumsWithStatus = albums.filter((album) => String(album?.status || "").trim());
+  if (albumsWithStatus.length === 0) {
+    return albums;
+  }
+
+  return albums.filter((album) => String(album?.status || "").trim().toLowerCase() === "resolved");
+}
+
+function getMusicShowAlbumSlotLabel(album, index) {
+  const slot = String(album?.slot || album?.lineupSlot || album?.lineup_slot || album?.position || index + 1).trim();
+  if (!slot) {
+    return "";
+  }
+
+  return /^slot\b/i.test(slot) ? slot : `Slot ${slot}`;
+}
+
+function getMusicShowAlbumStatusLabel(album) {
+  const status = String(album?.status || "").trim();
+  if (!status) {
+    return "Archive Pending";
+  }
+
+  return status.toLowerCase() === "resolved"
+    ? "Archive Synced"
+    : formatMusicShowArchiveStatusValue(status);
+}
+
+function getMusicShowAlbumViewCountLabel(album) {
+  const viewCount = getMusicShowDetailCountCandidate(album?.bandViewCount, album?.band_view_count);
+  return viewCount && viewCount > 0
+    ? `View ${viewCount.toLocaleString()}`
+    : "";
+}
+
+function getMusicShowAlbumCoverSrc(show, album) {
+  const candidates = [
+    album?.cover_image_url,
+    album?.coverImageUrl,
+    album?.cover_image,
+    album?.coverImage,
+    album?.image_url,
+    album?.imageUrl,
+    album?.poster,
+    album?.poster_url,
+    show?.cover_image_url,
+    show?.coverImageUrl,
+    show?.poster,
+  ];
+  const coverSrc = candidates
+    .map((candidate) => String(candidate || "").trim())
+    .find(Boolean) || "";
+
+  return isMusicShowPosterImageSrc(coverSrc) ? coverSrc : SET_GALLERY_NO_POSTER_IMAGE_SRC;
+}
+
+function createShowDetailAlbumCard(show, album, index) {
+  const bandName = getMusicShowAlbumBandName(album) || `Band ${index + 1}`;
+  const bandId = getMusicShowAlbumBandId(album);
+  const dateFolder = getMusicShowAlbumDateFolder(show, album);
+  const targetUrl = getMusicShowAlbumSetRoute(show, album);
+
+  const card = document.createElement("button");
+  card.type = "button";
+  card.className = "show-detail-bill-card show-set-card";
+  card.dataset.showAlbumRoute = targetUrl;
+  card.dataset.bandId = bandId;
+  card.dataset.dateFolder = dateFolder;
+  card.setAttribute("aria-label", `Open ${bandName} set from ${getMusicShowDateLabel(show)}`);
+
+  const media = document.createElement("div");
+  media.className = "show-set-card-media";
+
+  const mediaImage = document.createElement("img");
+  mediaImage.className = "show-set-card-image";
+  mediaImage.alt = "";
+  mediaImage.loading = "lazy";
+  mediaImage.decoding = "async";
+  mediaImage.src = getMusicShowAlbumCoverSrc(show, album);
+
+  const overlay = document.createElement("div");
+  overlay.className = "show-set-card-overlay";
+  media.append(mediaImage, overlay);
+
+  const body = document.createElement("div");
+  body.className = "show-set-card-body";
+
+  const name = document.createElement("span");
+  name.className = "show-detail-bill-name show-set-card-title";
+  name.textContent = bandName;
+
+  const meta = document.createElement("div");
+  meta.className = "show-set-card-meta";
+
+  const metaValues = [
+    { className: "show-detail-bill-count", text: getMusicShowAlbumPhotoLabel(album) },
+    { className: "show-detail-bill-slot", text: getMusicShowAlbumSlotLabel(album, index) },
+    { className: "show-detail-bill-status", text: getMusicShowAlbumStatusLabel(album) },
+    { className: "show-detail-bill-view-count", text: getMusicShowAlbumViewCountLabel(album) },
+  ];
+
+  metaValues.forEach(({ className, text }) => {
+    if (!text) {
+      return;
+    }
+
+    const item = document.createElement("span");
+    item.className = className;
+    item.textContent = text;
+    meta.append(item);
+  });
+
+  body.append(name, meta);
+  card.append(media, body);
+  card.addEventListener("click", () => {
+    if (!targetUrl) {
+      return;
+    }
+
+    navigateToRoute(targetUrl, {
+      historyState: {
+        fromShowDetail: true,
+        showDetailUrl: getMusicShowRouteUrl(show),
+      },
+    });
+  });
+
+  return card;
+}
+
 function createShowDetailBandsOnBill(show) {
   const section = document.createElement("section");
   section.className = "show-detail-bill show-detail-viewing";
   section.setAttribute("aria-labelledby", "show-detail-bill-title");
 
-  const bands = getMusicShowBillBands(show);
-  const slides = bands.length > 0
-    ? bands
-    : [{ name: "No bands indexed for this show yet.", slot: "", isEmpty: true }];
+  const albums = getMusicShowResolvedAlbums(show);
   let activeIndex = 0;
 
   const header = document.createElement("div");
@@ -7676,50 +7846,54 @@ function createShowDetailBandsOnBill(show) {
   activeBandName.type = "button";
   activeBandName.className = "show-detail-bill-active-name";
   activeBandName.addEventListener("click", () => {
-    navigateToShowBillBandSet(show, slides[activeIndex]);
+    const targetUrl = getMusicShowAlbumSetRoute(show, albums[activeIndex]);
+    if (!targetUrl) {
+      return;
+    }
+
+    navigateToRoute(targetUrl, {
+      historyState: {
+        fromShowDetail: true,
+        showDetailUrl: getMusicShowRouteUrl(show),
+      },
+    });
   });
 
   header.append(heading, activeBandName);
 
+  if (albums.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "show-detail-bill-empty";
+    empty.textContent = "No resolved archive albums available.";
+    section.append(header, empty);
+    return section;
+  }
+
   const mediaFrame = document.createElement("div");
-  mediaFrame.className = "show-detail-media-frame show-detail-bill-frame";
+  mediaFrame.className = "show-detail-media-frame show-detail-bill-frame show-set-carousel";
   mediaFrame.setAttribute("aria-roledescription", "carousel");
 
   const previousButton = document.createElement("button");
   previousButton.type = "button";
   previousButton.className = "show-detail-carousel-arrow show-detail-carousel-arrow--prev";
-  previousButton.setAttribute("aria-label", "Previous band");
+  previousButton.setAttribute("aria-label", "Previous band set");
   previousButton.textContent = "<";
 
   const viewport = document.createElement("div");
-  viewport.className = "show-detail-carousel-viewport show-detail-bill-viewport";
+  viewport.className = "show-detail-carousel-viewport show-detail-bill-viewport show-set-carousel-viewport";
   viewport.tabIndex = 0;
   viewport.setAttribute("aria-label", "Bands On The Bill carousel");
 
   const track = document.createElement("div");
-  track.className = "show-detail-carousel-track";
+  track.className = "show-detail-carousel-track show-set-carousel-track";
 
-  slides.forEach((band, index) => {
+  const slideElements = albums.map((album, index) => {
     const slide = document.createElement("article");
-    slide.className = "show-detail-carousel-slide show-detail-bill-slide";
-    slide.setAttribute("aria-label", `${index + 1} of ${slides.length}`);
-
-    const media = document.createElement("div");
-    media.className = "show-detail-media show-detail-bill-media";
-    media.setAttribute("role", "link");
-    media.tabIndex = 0;
-    media.addEventListener("click", () => {
-      navigateToShowBillBandSet(show, band);
-    });
-    media.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        navigateToShowBillBandSet(show, band);
-      }
-    });
-
-    slide.append(media);
+    slide.className = "show-detail-carousel-slide show-set-carousel-slide";
+    slide.setAttribute("aria-label", `${index + 1} of ${albums.length}`);
+    slide.append(createShowDetailAlbumCard(show, album, index));
     track.append(slide);
+    return slide;
   });
 
   viewport.append(track);
@@ -7727,18 +7901,19 @@ function createShowDetailBandsOnBill(show) {
   const nextButton = document.createElement("button");
   nextButton.type = "button";
   nextButton.className = "show-detail-carousel-arrow show-detail-carousel-arrow--next";
-  nextButton.setAttribute("aria-label", "Next band");
+  nextButton.setAttribute("aria-label", "Next band set");
   nextButton.textContent = ">";
 
   mediaFrame.append(previousButton, viewport, nextButton);
 
   const dots = document.createElement("div");
   dots.className = "show-detail-dots show-detail-bill-dots";
-  const dotButtons = slides.map((band, index) => {
+  dots.setAttribute("aria-label", "Band set carousel position");
+  const dotButtons = albums.map((album, index) => {
     const dot = document.createElement("button");
     dot.type = "button";
     dot.className = "show-detail-dot";
-    dot.setAttribute("aria-label", `Show ${band.isEmpty ? "pending band" : band.name}`);
+    dot.setAttribute("aria-label", `Show ${getMusicShowAlbumBandName(album) || `band set ${index + 1}`}`);
     dot.addEventListener("click", () => {
       activeIndex = index;
       updateCarousel();
@@ -7748,9 +7923,14 @@ function createShowDetailBandsOnBill(show) {
   });
 
   function updateCarousel() {
-    activeIndex = normalizeShowDetailSlideIndex(activeIndex, slides.length);
+    activeIndex = normalizeShowDetailSlideIndex(activeIndex, albums.length);
     track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
-    activeBandName.textContent = slides[activeIndex]?.name || "";
+    activeBandName.textContent = getMusicShowAlbumBandName(albums[activeIndex]) || "";
+    slideElements.forEach((slide, index) => {
+      const isActive = index === activeIndex;
+      slide.classList.toggle("is-active", isActive);
+      slide.setAttribute("aria-hidden", String(!isActive));
+    });
     dotButtons.forEach((dot, index) => {
       dot.classList.toggle("is-active", index === activeIndex);
       dot.setAttribute("aria-current", index === activeIndex ? "true" : "false");
@@ -7769,16 +7949,49 @@ function createShowDetailBandsOnBill(show) {
 
   viewport.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
+      event.preventDefault();
       activeIndex -= 1;
       updateCarousel();
     }
     if (event.key === "ArrowRight") {
+      event.preventDefault();
       activeIndex += 1;
       updateCarousel();
     }
   });
 
-  if (slides.length <= 1) {
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerId = null;
+  function clearPointerState() {
+    pointerId = null;
+    pointerStartX = 0;
+    pointerStartY = 0;
+  }
+  viewport.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse") {
+      return;
+    }
+    pointerId = event.pointerId;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+  });
+  viewport.addEventListener("pointerup", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+      activeIndex += deltaX < 0 ? 1 : -1;
+      updateCarousel();
+    }
+    clearPointerState();
+  });
+  viewport.addEventListener("pointercancel", clearPointerState);
+  viewport.addEventListener("lostpointercapture", clearPointerState);
+
+  if (albums.length <= 1) {
     previousButton.hidden = true;
     nextButton.hidden = true;
     dots.hidden = true;
