@@ -4580,11 +4580,13 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
   }
 
   const rawImageKey = String(photo?.image_key || photo?.imageKey || "").trim();
+  const caption = String(photo?.caption || photo?.Caption || "").trim();
   const label = String(photo?.caption || photo?.title || rawImageKey || `Preview photo ${index + 1}`).trim();
   return {
     dedupeKey: rawImageKey || imageSrc,
     imageKey: rawImageKey || `album-photo-${index + 1}`,
     imageSrc,
+    caption,
     label: label || `Preview photo ${index + 1}`,
     lightboxSrc: getMusicAlbumPhotoLightboxSrc(photo) || imageSrc,
   };
@@ -8671,44 +8673,43 @@ function getMusicShowAlbumViewCountLabel(album) {
 
 const showSetPreviewCards = new Set();
 let showSetPreviewVisibilityListenerAttached = false;
+const SHOW_SET_CARD_PREVIEW_IMAGE_LIMIT = 6;
+const SHOW_SET_CARD_PREVIEW_INTERVAL_MIN_MS = 4200;
+const SHOW_SET_CARD_PREVIEW_INTERVAL_JITTER_MS = 1400;
 
 function isShowSetPreviewReducedMotion() {
   return Boolean(reducedMotion?.matches);
 }
 
-function addMusicShowImageUrl(urls, value) {
-  const imageUrl = String(value || "").trim();
-  if (imageUrl && isMusicShowPosterImageSrc(imageUrl)) {
-    urls.push(imageUrl);
-  }
-}
-
-function addMusicShowImageUrlsFromObject(urls, source, options = {}) {
+function getMusicShowImageUrlValue(source, options = {}) {
   if (!source || typeof source !== "object") {
-    addMusicShowImageUrl(urls, source);
-    return;
+    return String(source || "").trim();
   }
 
-  [
+  const keys = [
+    "medium_url",
+    "mediumUrl",
+    "imageSrc",
+    "small_url",
+    "smallUrl",
+    "thumbnail_url",
+    "thumbnailUrl",
+    "thumb_url",
+    "thumbUrl",
+    "large_url",
+    "largeUrl",
+    "lightboxSrc",
+    "x2_url",
+    "x2Url",
     "cover_image_url",
     "coverImageUrl",
     "cover_image",
     "coverImage",
     "image_url",
     "imageUrl",
-    "image",
     "photo_url",
     "photoUrl",
-    "thumbnail_url",
-    "thumbnailUrl",
-    "thumb_url",
-    "thumbUrl",
-    "medium_url",
-    "mediumUrl",
-    "large_url",
-    "largeUrl",
-    "x2_url",
-    "x2Url",
+    "image",
     "small",
     "medium",
     "large",
@@ -8721,7 +8722,27 @@ function addMusicShowImageUrlsFromObject(urls, source, options = {}) {
     "original_url",
     "originalUrl",
     ...(options.includeGenericUrl ? ["url", "src"] : []),
-  ].forEach((key) => addMusicShowImageUrl(urls, source[key]));
+  ];
+
+  for (const key of keys) {
+    const imageUrl = String(source[key] || "").trim();
+    if (imageUrl && isMusicShowPosterImageSrc(imageUrl)) {
+      return imageUrl;
+    }
+  }
+
+  return "";
+}
+
+function addMusicShowImageUrl(urls, value) {
+  const imageUrl = String(value || "").trim();
+  if (imageUrl && isMusicShowPosterImageSrc(imageUrl)) {
+    urls.push(imageUrl);
+  }
+}
+
+function addMusicShowImageUrlsFromObject(urls, source, options = {}) {
+  addMusicShowImageUrl(urls, getMusicShowImageUrlValue(source, options));
 }
 
 function addMusicShowImageUrlsFromCollection(urls, collection) {
@@ -8743,9 +8764,66 @@ function addMusicShowImageUrlsFromCollection(urls, collection) {
   });
 }
 
-function getMusicShowAlbumImageCandidates(show, album) {
-  const urls = [];
-  [
+function getMusicShowPhotoCaption(source) {
+  if (!source || typeof source !== "object") {
+    return "";
+  }
+
+  return String(source.caption || source.Caption || "").trim();
+}
+
+function getMusicShowPhotoDedupeKey(source, imageUrl) {
+  if (!source || typeof source !== "object") {
+    return imageUrl;
+  }
+
+  return String(
+    source.dedupeKey ||
+    source.image_key ||
+    source.imageKey ||
+    source.key ||
+    source.Key ||
+    source.id ||
+    source.Id ||
+    source.imageSrc ||
+    imageUrl ||
+    ""
+  ).trim();
+}
+
+function addMusicShowAlbumPhotoCandidate(candidates, source, options = {}) {
+  const imageUrl = getMusicShowImageUrlValue(source, options);
+  if (!imageUrl || !isMusicShowPosterImageSrc(imageUrl)) {
+    return;
+  }
+
+  candidates.push({
+    url: imageUrl,
+    caption: getMusicShowPhotoCaption(source),
+    dedupeKey: getMusicShowPhotoDedupeKey(source, imageUrl),
+  });
+}
+
+function addMusicShowAlbumPhotoCandidatesFromCollection(candidates, collection) {
+  if (typeof collection === "string" && collection.trim().startsWith("[")) {
+    try {
+      addMusicShowAlbumPhotoCandidatesFromCollection(candidates, JSON.parse(collection));
+    } catch (error) {
+      return;
+    }
+    return;
+  }
+
+  if (!Array.isArray(collection)) {
+    return;
+  }
+
+  collection.forEach((item) => addMusicShowAlbumPhotoCandidate(candidates, item, { includeGenericUrl: true }));
+}
+
+function getMusicShowAlbumPhotoCandidates(show, album, photos = null) {
+  const candidates = [];
+  const photoSource = Array.isArray(photos) && photos.length > 0 ? photos : [
     album?.preview_images,
     album?.previewImages,
     album?.album_images,
@@ -8770,27 +8848,160 @@ function getMusicShowAlbumImageCandidates(show, album) {
     album?.media,
     album?.items,
     album?.results,
-  ].forEach((collection) => addMusicShowImageUrlsFromCollection(urls, collection));
+  ];
 
-  addMusicShowImageUrlsFromObject(urls, album);
-  [
-    show?.cover_image_url,
-    show?.coverImageUrl,
-    show?.poster,
-  ].forEach((value) => addMusicShowImageUrl(urls, value));
+  if (Array.isArray(photos) && photos.length > 0) {
+    photos.forEach((photo) => addMusicShowAlbumPhotoCandidate(candidates, photo, { includeGenericUrl: true }));
+  } else {
+    photoSource.forEach((collection) => addMusicShowAlbumPhotoCandidatesFromCollection(candidates, collection));
+  }
 
-  return Array.from(new Set(urls));
+  if (candidates.length === 0) {
+    addMusicShowAlbumPhotoCandidate(candidates, album, { includeGenericUrl: true });
+    [
+      show?.cover_image_url,
+      show?.coverImageUrl,
+      show?.poster,
+    ].forEach((value) => addMusicShowAlbumPhotoCandidate(candidates, value, { includeGenericUrl: true }));
+  }
+
+  const seen = new Set();
+  return candidates.filter((candidate) => {
+    const key = candidate.dedupeKey || candidate.url;
+    if (!key || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
+function getMusicShowAlbumImageCandidates(show, album) {
+  return getMusicShowAlbumPhotoCandidates(show, album).map((candidate) => candidate.url);
+}
+
+function shuffleMusicShowPreviewItems(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const nextIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[nextIndex]] = [shuffled[nextIndex], shuffled[index]];
+  }
+
+  return shuffled;
+}
+
+function normalizeMusicShowCaptionSearchText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getMusicShowAlbumMemberNames(album) {
+  const bandId = getMusicShowAlbumBandId(album);
+  const bandRecord = findBandById(bandId) || findMusicBandByName(getMusicShowAlbumBandName(album));
+  const personnel = getBandDetailPersonnel(bandRecord);
+  const sources = [
+    album?.members,
+    album?.core_members,
+    album?.coreMembers,
+    album?.band_members,
+    album?.bandMembers,
+    album?.personnel?.members,
+    album?.personnel?.core_members,
+    personnel.members,
+  ];
+  const names = [];
+
+  sources.forEach((source) => {
+    if (Array.isArray(source)) {
+      source.forEach((member) => {
+        const name = getBandDetailMemberName(member);
+        if (name) names.push(name);
+      });
+      return;
+    }
+
+    String(source || "")
+      .split(/[;,|]/)
+      .map((name) => name.trim())
+      .filter(Boolean)
+      .forEach((name) => names.push(name));
+  });
+
+  return Array.from(new Set(names));
+}
+
+function doesMusicShowCaptionMatchMember(caption, memberName) {
+  const captionText = normalizeMusicShowCaptionSearchText(caption);
+  const memberText = normalizeMusicShowCaptionSearchText(memberName);
+  if (!captionText || !memberText) {
+    return false;
+  }
+
+  if (captionText.includes(memberText)) {
+    return true;
+  }
+
+  const memberTerms = memberText.split(" ").filter((term) => term.length > 2);
+  if (memberTerms.length <= 1) {
+    return memberTerms.length === 1 && captionText.split(" ").includes(memberTerms[0]);
+  }
+
+  const captionTerms = new Set(captionText.split(" "));
+  return memberTerms.every((term) => captionTerms.has(term));
+}
+
+function getMusicShowCaptionMatchedPreviewCandidates(candidates, album) {
+  const memberNames = getMusicShowAlbumMemberNames(album);
+  if (memberNames.length === 0) {
+    return [];
+  }
+
+  const selected = [];
+  const selectedKeys = new Set();
+  memberNames.forEach((memberName) => {
+    const matches = candidates.filter((candidate) => {
+      const key = candidate.dedupeKey || candidate.url;
+      return key &&
+        !selectedKeys.has(key) &&
+        doesMusicShowCaptionMatchMember(candidate.caption, memberName);
+    });
+    const match = shuffleMusicShowPreviewItems(matches)[0];
+    if (!match) {
+      return;
+    }
+
+    selected.push(match);
+    selectedKeys.add(match.dedupeKey || match.url);
+  });
+
+  return selected;
+}
+
+function selectMusicShowAlbumPreviewImages(show, album, photos = null) {
+  const candidates = getMusicShowAlbumPhotoCandidates(show, album, photos);
+  if (candidates.length <= 1) {
+    return candidates.length === 1 ? [candidates[0].url] : [SET_GALLERY_NO_POSTER_IMAGE_SRC];
+  }
+
+  const captionMatches = getMusicShowCaptionMatchedPreviewCandidates(candidates, album);
+  const selected = captionMatches.slice(0, SHOW_SET_CARD_PREVIEW_IMAGE_LIMIT);
+  const selectedKeys = new Set(selected.map((candidate) => candidate.dedupeKey || candidate.url));
+  const remaining = candidates.filter((candidate) => !selectedKeys.has(candidate.dedupeKey || candidate.url));
+
+  selected.push(...shuffleMusicShowPreviewItems(remaining).slice(0, SHOW_SET_CARD_PREVIEW_IMAGE_LIMIT - selected.length));
+  if (selected.length === 0) {
+    selected.push(...shuffleMusicShowPreviewItems(candidates).slice(0, SHOW_SET_CARD_PREVIEW_IMAGE_LIMIT));
+  }
+
+  return selected.map((candidate) => candidate.url);
 }
 
 function getRandomizedMusicShowAlbumPreviewImages(show, album) {
-  const urls = getMusicShowAlbumImageCandidates(show, album);
-  if (urls.length <= 1) {
-    return urls.length === 1 ? urls : [SET_GALLERY_NO_POSTER_IMAGE_SRC];
-  }
-
-  return [...urls]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 6);
+  return selectMusicShowAlbumPreviewImages(show, album);
 }
 
 function getMusicShowAlbumCoverSrc(show, album) {
@@ -8810,6 +9021,71 @@ function createShowSetCardPreviewImage(src, isActive = false) {
     image.src = SET_GALLERY_NO_POSTER_IMAGE_SRC;
   };
   return image;
+}
+
+function getMusicShowAlbumPreviewAlbumId(album) {
+  return String(album?.album_id || album?.albumId || album?.gallery_id || album?.galleryId || "").trim();
+}
+
+function getUniqueShowSetPreviewUrls(urls) {
+  return Array.from(new Set((Array.isArray(urls) ? urls : [])
+    .map((url) => String(url || "").trim())
+    .filter((url) => url && isMusicShowPosterImageSrc(url))));
+}
+
+function setShowSetCardPreviewUrls(card, urls) {
+  const preview = card?.__showSetPreview;
+  if (!preview) {
+    return;
+  }
+
+  const uniqueUrls = getUniqueShowSetPreviewUrls(urls);
+  if (uniqueUrls.length === 0) {
+    return;
+  }
+
+  stopShowSetCardPreview(card);
+  preview.urls = uniqueUrls;
+  preview.currentIndex = 0;
+  preview.activeSlot = 0;
+  preview.images.forEach((image, index) => {
+    image.classList.toggle("is-active", index === 0);
+    image.src = uniqueUrls[index] || uniqueUrls[0] || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  });
+  card.dataset.previewImageCount = String(uniqueUrls.length);
+  updateShowSetCardPreviewPlayback(card);
+}
+
+function ensureShowSetCardPreviewAlbumPhotos(card) {
+  const preview = card?.__showSetPreview;
+  if (
+    !preview ||
+    preview.albumPhotosLoaded ||
+    preview.albumPhotosLoading ||
+    !preview.albumId ||
+    isShowSetPreviewReducedMotion()
+  ) {
+    return;
+  }
+
+  preview.albumPhotosLoading = true;
+  requestMusicSmugmugAlbumPhotos(preview.albumId, { mode: "preview" })
+    .then((result) => {
+      preview.albumPhotosLoaded = true;
+      const photos = Array.isArray(result?.photos) ? result.photos : [];
+      if (photos.length === 0 || !card.isConnected) {
+        return;
+      }
+
+      const urls = selectMusicShowAlbumPreviewImages(preview.show, preview.album, photos);
+      setShowSetCardPreviewUrls(card, urls);
+    })
+    .catch(() => {
+      preview.albumPhotosLoaded = true;
+    })
+    .finally(() => {
+      preview.albumPhotosLoading = false;
+    });
 }
 
 function stopShowSetCardPreview(card) {
@@ -8875,7 +9151,7 @@ function updateShowSetCardPreviewPlayback(card) {
   if (!preview.timerId) {
     preview.timerId = window.setInterval(() => {
       advanceShowSetCardPreview(card);
-    }, 2800);
+    }, preview.intervalMs || SHOW_SET_CARD_PREVIEW_INTERVAL_MIN_MS);
   }
 }
 
@@ -8885,7 +9161,22 @@ function setShowSetCardPreviewActive(card, isActive) {
   }
 
   card.__showSetPreview.isCarouselActive = isActive;
+  if (isActive) {
+    ensureShowSetCardPreviewAlbumPhotos(card);
+  }
   updateShowSetCardPreviewPlayback(card);
+}
+
+function cleanupShowSetCardPreviews() {
+  showSetPreviewCards.forEach((card) => {
+    const preview = card?.__showSetPreview;
+    stopShowSetCardPreview(card);
+    if (preview?.visibilityObserver) {
+      preview.visibilityObserver.disconnect();
+      preview.visibilityObserver = null;
+    }
+  });
+  showSetPreviewCards.clear();
 }
 
 function ensureShowSetPreviewVisibilityListener() {
@@ -8901,7 +9192,7 @@ function ensureShowSetPreviewVisibilityListener() {
 
 function registerShowSetCardPreview(card) {
   const preview = card?.__showSetPreview;
-  if (!preview || preview.urls.length <= 1) {
+  if (!preview || (preview.urls.length <= 1 && !preview.albumId)) {
     return;
   }
 
@@ -8925,7 +9216,10 @@ function createShowDetailAlbumCard(show, album, index) {
   const bandId = getMusicShowAlbumBandId(album);
   const dateFolder = getMusicShowAlbumDateFolder(show, album);
   const targetUrl = getMusicShowAlbumSetRoute(show, album);
-  const previewImages = getRandomizedMusicShowAlbumPreviewImages(show, album);
+  const albumId = getMusicShowAlbumPreviewAlbumId(album);
+  const previewImages = (isShowSetPreviewReducedMotion()
+    ? getRandomizedMusicShowAlbumPreviewImages(show, album).slice(0, 1)
+    : getRandomizedMusicShowAlbumPreviewImages(show, album));
 
   const card = document.createElement("button");
   card.type = "button";
@@ -8983,11 +9277,17 @@ function createShowDetailAlbumCard(show, album, index) {
   card.__showSetPreview = {
     urls: previewImages,
     images: [primaryImage, secondaryImage],
+    show,
+    album,
+    albumId,
     activeSlot: 0,
     currentIndex: 0,
     timerId: 0,
+    intervalMs: SHOW_SET_CARD_PREVIEW_INTERVAL_MIN_MS + Math.floor(Math.random() * SHOW_SET_CARD_PREVIEW_INTERVAL_JITTER_MS),
     isCarouselActive: false,
     isVisible: false,
+    albumPhotosLoaded: false,
+    albumPhotosLoading: false,
     visibilityObserver: null,
   };
   registerShowSetCardPreview(card);
@@ -9486,6 +9786,7 @@ function renderMusicShowDetail(show) {
     return;
   }
 
+  cleanupShowSetCardPreviews();
   const relationships = getMusicShowRelationshipSnapshot(show);
   const showTitle = getMusicShowTitle(show);
   const showVenue = getMusicShowDetailVenue(show);
