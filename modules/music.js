@@ -8674,8 +8674,8 @@ function getMusicShowAlbumViewCountLabel(album) {
 const showSetPreviewCards = new Set();
 let showSetPreviewVisibilityListenerAttached = false;
 const SHOW_SET_CARD_PREVIEW_IMAGE_LIMIT = 6;
-const SHOW_SET_CARD_PREVIEW_INTERVAL_MIN_MS = 4200;
-const SHOW_SET_CARD_PREVIEW_INTERVAL_JITTER_MS = 1400;
+const SHOW_SET_CARD_PREVIEW_INTERVAL_MIN_MS = 2000;
+const SHOW_SET_CARD_PREVIEW_INTERVAL_JITTER_MS = 500;
 
 function isShowSetPreviewReducedMotion() {
   return Boolean(reducedMotion?.matches);
