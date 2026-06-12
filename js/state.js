@@ -263,8 +263,6 @@ const lightboxPhotoRatios = [
   "9 / 16",
 ];
 
-const lightboxBasePhotoIndex = 25;
-const lightboxTotalPhotos = 356;
 const galleryImageFallbackSrc = "/assets/media/placeholders/archive-gallery-placeholder.svg";
 const lightboxTransitionDuration = 220;
 const lightboxImageTransitionDuration = 180;

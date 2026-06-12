@@ -3401,8 +3401,8 @@ function setLightboxVisible(isVisible) {
   } else {
     setLightboxControlsHidden(false);
   }
-  if (galleryViewAll) {
-    galleryViewAll.setAttribute("aria-expanded", String(isVisible));
+  if (document.documentElement) {
+    document.documentElement.classList.toggle("is-lightbox-scroll-locked", isVisible);
   }
   lightboxScreen.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
@@ -4020,6 +4020,11 @@ function getGalleryPhotoImageSrc(photoTile) {
     : galleryImageFallbackSrc;
 }
 
+function getGalleryPhotoLightboxSrc(photoTile) {
+  const lightboxSrc = String(photoTile?.dataset?.galleryLightboxSrc || "").trim();
+  return lightboxSrc || getGalleryPhotoImageSrc(photoTile);
+}
+
 function markLightboxTransitionSource(photoTile) {
   getCurrentGalleryPhotoTiles().forEach((tile) => {
     tile.classList.remove("is-transition-source");
@@ -4180,6 +4185,20 @@ function getMusicAlbumPhotoImageSrc(photo) {
   ).trim();
 }
 
+function getMusicAlbumPhotoLightboxSrc(photo) {
+  return String(
+    photo?.large_url ||
+    photo?.largeUrl ||
+    photo?.medium_url ||
+    photo?.mediumUrl ||
+    photo?.small_url ||
+    photo?.smallUrl ||
+    photo?.thumbnail_url ||
+    photo?.thumbnailUrl ||
+    ""
+  ).trim();
+}
+
 function normalizeMusicAlbumPhoto(photo, index = 0) {
   const imageSrc = getMusicAlbumPhotoImageSrc(photo);
   if (!imageSrc) {
@@ -4193,6 +4212,7 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
     imageKey: rawImageKey || `album-photo-${index + 1}`,
     imageSrc,
     label: label || `Preview photo ${index + 1}`,
+    lightboxSrc: getMusicAlbumPhotoLightboxSrc(photo) || imageSrc,
   };
 }
 
@@ -4347,6 +4367,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   tile.dataset.galleryKind = "image";
   tile.dataset.galleryMediaId = photo.imageKey;
   tile.dataset.galleryLightboxId = `music-album-photo-${photo.imageKey || index + 1}`;
+  tile.dataset.galleryLightboxSrc = photo.lightboxSrc || photo.imageSrc;
   tile.setAttribute("aria-label", photo.label);
   tile.setAttribute("aria-pressed", String(index === 0));
 
@@ -4363,7 +4384,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   protectArchiveImage(image);
   tile.append(image);
   tile.addEventListener("click", () => {
-    selectGalleryPhoto(tile);
+    showLightbox(tile);
   });
   return tile;
 }
@@ -4480,6 +4501,7 @@ function normalizeLightboxIndex(index) {
 }
 
 function getLightboxPhotoData(index) {
+  const photoCount = Math.max(getCurrentGalleryPhotoTiles().length, 1);
   const normalizedIndex = normalizeLightboxIndex(index);
   const tile = getCurrentGalleryPhotoTiles()[normalizedIndex] || null;
   const label = getGalleryPhotoLabel(tile) || `Photo ${String(normalizedIndex + 1).padStart(2, "0")}`;
@@ -4487,12 +4509,12 @@ function getLightboxPhotoData(index) {
 
   return {
     accent,
-    imageSrc: getGalleryPhotoImageSrc(tile),
+    imageSrc: getGalleryPhotoLightboxSrc(tile),
     label,
     lightboxId: tile ? tile.dataset.galleryLightboxId || "" : "",
     mediaId: tile ? tile.dataset.galleryMediaId || "" : "",
-    mockIndex: lightboxBasePhotoIndex + normalizedIndex,
     normalizedIndex,
+    photoCount,
     tile,
   };
 }
@@ -4523,7 +4545,7 @@ function setLightboxActivePhoto(index, options = {}) {
     selectGalleryPhoto(data.tile);
   }
   if (lightboxPhoto) {
-    lightboxPhoto.setAttribute("aria-label", `${data.label} placeholder lightbox image`);
+    lightboxPhoto.setAttribute("aria-label", data.label);
     lightboxPhoto.dataset.galleryMediaId = data.mediaId;
     lightboxPhoto.dataset.galleryLightboxId = data.lightboxId;
     lightboxPhoto.style.setProperty("--lightbox-photo-ratio", lightboxPhotoRatios[activeLightboxIndex % lightboxPhotoRatios.length]);
@@ -4540,7 +4562,7 @@ function setLightboxActivePhoto(index, options = {}) {
     lightboxPhotoTitle.textContent = data.label;
   }
   if (lightboxCounter) {
-    lightboxCounter.textContent = `${data.mockIndex} / ${lightboxTotalPhotos}`;
+    lightboxCounter.textContent = `${data.normalizedIndex + 1} / ${data.photoCount}`;
   }
   if (lightboxMetaTitle) {
     lightboxMetaTitle.textContent = data.label;
@@ -4635,13 +4657,18 @@ function showLightbox(photoTile = activeGalleryPhoto) {
     return;
   }
 
+  const tiles = getCurrentGalleryPhotoTiles();
+  if (tiles.length === 0) {
+    return;
+  }
   const requestedTile = photoTile && typeof photoTile.matches === "function" && photoTile.matches("[data-gallery-photo]")
     ? photoTile
     : null;
-  const targetTile = requestedTile || activeGalleryPhoto || getCurrentGalleryPhotoTiles()[0] || null;
-  if (targetTile) {
-    selectGalleryPhoto(targetTile);
+  const targetTile = requestedTile || activeGalleryPhoto || tiles[0] || null;
+  if (!targetTile) {
+    return;
   }
+  selectGalleryPhoto(targetTile);
   markLightboxTransitionSource(targetTile);
   setGalleryModeVisible(false);
   setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false });
@@ -9549,7 +9576,7 @@ function initMusicModule() {
   galleryPhotoTiles.forEach((tile) => {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
     tile.addEventListener("click", () => {
-      selectGalleryPhoto(tile);
+      showLightbox(tile);
     });
   });
   galleryViewOptions.forEach((option) => {
@@ -9582,12 +9609,14 @@ function initMusicModule() {
     setLightboxImageStatus(lightboxImage.complete && lightboxImage.naturalWidth > 0 ? "loaded" : "loading");
   }
   if (lightboxPhoto) {
-    lightboxPhoto.addEventListener("click", () => {
+    lightboxPhoto.addEventListener("click", (event) => {
       if (lightboxGestureSuppressClick) {
         lightboxGestureSuppressClick = false;
         return;
       }
-      setLightboxControlsHidden(!areLightboxControlsHidden);
+      if (event.target === lightboxPhoto) {
+        returnToSetGalleryFromLightbox();
+      }
     });
     if (window.PointerEvent) {
       lightboxPhoto.addEventListener("pointerdown", handleLightboxSwipeStart);

@@ -1979,23 +1979,47 @@ img.archive-gallery-image {
   text-shadow: 0 0 0.46rem rgba(255, 82, 72, 0.075);
 }
 
+html.is-lightbox-scroll-locked,
+html.is-lightbox-scroll-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.site-shell.is-lightbox-view .portfolio-hub,
+.site-shell.is-lightbox-view .music-nexus-shell {
+  transform: none !important;
+}
+
 .lightbox-screen {
   --v3-lightbox-accent: rgba(255, 82, 72, 0.18);
   --lightbox-swipe-x: 0px;
   display: none;
   align-content: start;
   gap: clamp(0.66rem, 1.95svh, 0.94rem);
-  min-height: min(100%, 49rem);
-  padding: clamp(0.64rem, 2.2vw, 0.96rem);
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding:
+    max(clamp(0.64rem, 2.2vw, 0.96rem), env(safe-area-inset-top))
+    max(clamp(0.64rem, 2.2vw, 0.96rem), env(safe-area-inset-right))
+    max(clamp(0.64rem, 2.2vw, 0.96rem), env(safe-area-inset-bottom))
+    max(clamp(0.64rem, 2.2vw, 0.96rem), env(safe-area-inset-left));
   border: 1px solid rgba(247, 247, 242, 0.055);
-  border-radius: var(--v3-card-radius-feature);
+  border-radius: 0;
   background:
     radial-gradient(ellipse at 50% 36%, rgba(255, 82, 72, 0.105), transparent min(58vw, 30rem)),
     linear-gradient(180deg, rgba(1, 1, 3, 0.84), rgba(1, 1, 3, 0.62));
   box-shadow: inset 0 0 2rem rgba(0, 0, 0, 0.28);
   isolation: isolate;
-  overflow-x: clip;
+  overflow: hidden;
   overscroll-behavior: contain;
+}
+
+.music-nexus-shell.is-lightbox .lightbox-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
 }
 
 .lightbox-screen.is-entering .lightbox-photo {
@@ -2089,7 +2113,12 @@ img.archive-gallery-image {
   display: grid;
   justify-items: center;
   gap: 0.2rem;
+  justify-self: end;
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(0.76rem, 2.8vw, 0.94rem);
+  line-height: 1;
   text-align: center;
+  text-transform: none;
 }
 
 .lightbox-counter-value {
@@ -2126,7 +2155,8 @@ img.archive-gallery-image {
 }
 
 .lightbox-stage {
-  min-height: clamp(24rem, 72svh, 44rem);
+  min-height: min(76vh, 44rem);
+  min-height: min(76dvh, 44rem);
   display: grid;
   overflow: hidden;
   border: 1px solid rgba(247, 247, 242, 0.065);
@@ -2179,9 +2209,10 @@ img.archive-gallery-image {
   position: relative;
   z-index: 1;
   width: auto;
-  max-width: min(100%, 68rem);
+  max-width: min(100%, 78rem);
   height: auto;
-  max-height: min(72svh, 43rem);
+  max-height: min(72vh, 43rem);
+  max-height: min(72dvh, 43rem);
   border: 1px solid rgba(247, 247, 242, 0.075);
   border-radius: calc(var(--radius-sm) + 0.08rem);
   box-shadow:
@@ -2422,7 +2453,7 @@ img.archive-gallery-image {
     0 0 1rem rgba(255, 82, 72, 0.06);
   opacity: 0;
   overscroll-behavior: contain;
-  pointer-events: none;
+  pointer-events: auto;
   transform: translate3d(calc(100% + 1.1rem), 0, 0);
   transition:
     opacity 160ms ease,
