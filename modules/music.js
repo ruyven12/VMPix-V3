@@ -7,7 +7,7 @@
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
-const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people";
+const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people/db";
 const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
@@ -89,7 +89,6 @@ const musicPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const musicPeopleCategoryFilters = [
   { value: "", label: "All" },
   { value: "performers", label: "Performers" },
-  { value: "friend", label: "Friend" },
   { value: "the fallen", label: "The Fallen" },
 ];
 let activeMusicPeopleSearch = "";
@@ -6501,10 +6500,14 @@ function getMusicPeopleRowsWithCategoryNumbers(rows) {
   });
 }
 
+function isPublicMusicPeopleIndexRow(person) {
+  return person.categoryFilterValue !== "friend";
+}
+
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
-    .filter((person) => person.name)
+    .filter((person) => person.name && isPublicMusicPeopleIndexRow(person))
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
@@ -6513,9 +6516,31 @@ function getMusicPeopleInstrumentOptions(rows) {
     .sort((left, right) => left.localeCompare(right));
 }
 
+function getMusicPeopleCategoryOptions(rows) {
+  const categoryLabels = new Map();
+  rows.forEach((person) => {
+    const value = person.categoryFilterValue;
+    if (!value || value === "friend") {
+      return;
+    }
+    categoryLabels.set(value, person.categoryDisplay);
+  });
+
+  const preferredOptions = musicPeopleCategoryFilters
+    .filter((filter) => filter.value && categoryLabels.has(filter.value))
+    .map((filter) => ({ ...filter }));
+  const preferredValues = new Set(preferredOptions.map((filter) => filter.value));
+  const dynamicOptions = Array.from(categoryLabels.entries())
+    .filter(([value]) => !preferredValues.has(value))
+    .map(([value, label]) => ({ value, label }))
+    .sort((left, right) => left.label.localeCompare(right.label));
+
+  return [...preferredOptions, ...dynamicOptions];
+}
+
 function normalizeActiveMusicPeopleFilters(rows) {
   const letters = new Set(rows.map((person) => person.letter));
-  const categoryValues = new Set(musicPeopleCategoryFilters.map((filter) => filter.value));
+  const categoryValues = new Set(getMusicPeopleCategoryOptions(rows).map((filter) => filter.value));
   const instruments = new Set(getMusicPeopleInstrumentOptions(rows));
   if (activeMusicPeopleLetterFilter && !letters.has(activeMusicPeopleLetterFilter)) {
     activeMusicPeopleLetterFilter = "";
@@ -7422,7 +7447,7 @@ function createMusicPeopleFilters(rows) {
   searchLabel.append(searchText, searchInput);
 
   const letterOptions = musicPeopleAlphabet;
-  const categoryOptions = musicPeopleCategoryFilters.filter((filter) => filter.value);
+  const categoryOptions = getMusicPeopleCategoryOptions(rows);
   const instrumentOptions = getMusicPeopleInstrumentOptions(rows);
 
   const resetButton = document.createElement("button");
@@ -7500,10 +7525,12 @@ function resetMusicPeopleFilters() {
   renderMusicPeopleIndex();
 }
 
-function createMusicPeopleEmptyState() {
+function createMusicPeopleEmptyState(hasPublicRows = true) {
   const empty = document.createElement("div");
   empty.className = "music-people-empty";
-  empty.textContent = "No people found. Try clearing filters.";
+  empty.textContent = hasPublicRows
+    ? "No people found. Try clearing filters."
+    : "No public people records are available.";
   return empty;
 }
 
@@ -7547,7 +7574,7 @@ function renderMusicPeopleIndex(options = {}) {
     }
   }
   if (!forcedState && !["loading", "error"].includes(dataState) && filteredRows.length === 0) {
-    fragment.append(createMusicPeopleEmptyState());
+    fragment.append(createMusicPeopleEmptyState(allRows.length > 0));
   }
   musicPeopleList.replaceChildren(fragment);
   restoreMusicPeopleFilterFocus(focusMeta);
