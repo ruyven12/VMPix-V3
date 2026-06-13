@@ -8,7 +8,9 @@ const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people/db";
-const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 8000;
+const MUSIC_PEOPLE_INDEX_API_LIMIT = 100;
+const MUSIC_PEOPLE_INDEX_MAX_PAGES = 20;
+const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 15000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
@@ -1303,13 +1305,72 @@ function getMusicPeoplePayloadRows(payload) {
   return [];
 }
 
+function getMusicPeopleIndexApiUrl(page = 1) {
+  const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+  apiUrl.searchParams.set("limit", String(MUSIC_PEOPLE_INDEX_API_LIMIT));
+  apiUrl.searchParams.set("page", String(Math.max(1, Number.parseInt(page, 10) || 1)));
+  return apiUrl;
+}
+
+function getMusicPeoplePayloadTotalPages(payload) {
+  const directTotalPages = Number.parseInt(payload?.totalPages ?? payload?.meta?.pagination?.totalPages, 10);
+  if (Number.isFinite(directTotalPages) && directTotalPages > 0) {
+    return Math.min(MUSIC_PEOPLE_INDEX_MAX_PAGES, directTotalPages);
+  }
+
+  const totalRows = Number.parseInt(payload?.total ?? payload?.meta?.pagination?.total, 10);
+  const pageLimit = Number.parseInt(payload?.limit ?? payload?.meta?.pagination?.limit, 10) || MUSIC_PEOPLE_INDEX_API_LIMIT;
+  if (!Number.isFinite(totalRows) || totalRows <= 0 || pageLimit <= 0) {
+    return 1;
+  }
+
+  return Math.min(MUSIC_PEOPLE_INDEX_MAX_PAGES, Math.ceil(totalRows / pageLimit));
+}
+
+function fetchMusicPeopleIndexPage(page, signal) {
+  return fetch(getMusicPeopleIndexApiUrl(page), {
+    cache: "no-store",
+    signal,
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`Music people request failed (${response.status})`);
+    }
+    return response.json();
+  });
+}
+
+function fetchMusicPeopleIndexPayloads(signal) {
+  return fetchMusicPeopleIndexPage(1, signal).then((firstPayload) => {
+    const totalPages = getMusicPeoplePayloadTotalPages(firstPayload);
+    if (totalPages <= 1) {
+      return [firstPayload];
+    }
+
+    const pageRequests = [];
+    for (let page = 2; page <= totalPages; page += 1) {
+      pageRequests.push(fetchMusicPeopleIndexPage(page, signal));
+    }
+    return Promise.all(pageRequests).then((restPayloads) => [firstPayload, ...restPayloads]);
+  });
+}
+
 function normalizeLiveMusicPeople(payload) {
-  return getMusicPeoplePayloadRows(payload)
+  const payloads = Array.isArray(payload) ? payload : [payload];
+  const seenRows = new Set();
+  return payloads
+    .flatMap(getMusicPeoplePayloadRows)
     .map((person) => ({
       ...person,
       backend_record: person.backend_record || person,
     }))
-    .filter((person) => getMusicPeopleText(person.name ?? person.title))
+    .filter((person) => {
+      const rowKey = getMusicPeopleText(person.person_id ?? person.personId ?? person.id ?? person.slug ?? person.name ?? person.title).toLowerCase();
+      if (!rowKey || seenRows.has(rowKey)) {
+        return false;
+      }
+      seenRows.add(rowKey);
+      return getMusicPeopleText(person.name ?? person.title);
+    })
     .sort((left, right) => getMusicPeopleText(left.name ?? left.title).localeCompare(getMusicPeopleText(right.name ?? right.title)));
 }
 
@@ -1336,19 +1397,9 @@ function requestMusicPeopleIndexData() {
     ? window.setTimeout(() => controller.abort(), MUSIC_PEOPLE_INDEX_TIMEOUT_MS)
     : 0;
 
-  const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-  musicPeopleIndexRequest = fetch(apiUrl, {
-    cache: "no-store",
-    signal: controller?.signal,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Music people request failed (${response.status})`);
-      }
-      return response.json();
-    })
-    .then((payload) => {
-      const liveRows = normalizeLiveMusicPeople(payload);
+  musicPeopleIndexRequest = fetchMusicPeopleIndexPayloads(controller?.signal)
+    .then((payloads) => {
+      const liveRows = normalizeLiveMusicPeople(payloads);
       if (liveRows.length === 0) {
         throw new Error("Music people response contained no rows");
       }
@@ -6325,6 +6376,14 @@ function getMusicPeopleCategory(person) {
   return sourceCategory;
 }
 
+function getMusicPeopleCategoryTokens(category) {
+  return getMusicPeopleText(category)
+    .toLowerCase()
+    .split(/\s*(?:,|\/|;|\|)\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
 function getMusicPeopleCategoryDisplay(category) {
   const categoryFilterValue = getMusicPeopleCategoryFilterValue(category);
   if (categoryFilterValue === "the fallen") {
@@ -6341,13 +6400,14 @@ function getMusicPeopleCategoryDisplay(category) {
 
 function getMusicPeopleCategoryFilterValue(category) {
   const normalizedCategory = getMusicPeopleText(category).toLowerCase();
-  if (normalizedCategory === "the fallen") {
+  const categoryTokens = getMusicPeopleCategoryTokens(category);
+  if (categoryTokens.includes("the fallen")) {
     return "the fallen";
   }
-  if (normalizedCategory === "friend") {
+  if (categoryTokens.includes("friend") || categoryTokens.includes("friends")) {
     return "friend";
   }
-  if (normalizedCategory === "performer" || normalizedCategory === "performers") {
+  if (categoryTokens.includes("performer") || categoryTokens.includes("performers")) {
     return "performers";
   }
   return normalizedCategory;
@@ -6501,7 +6561,14 @@ function getMusicPeopleRowsWithCategoryNumbers(rows) {
 }
 
 function isPublicMusicPeopleIndexRow(person) {
-  return person.categoryFilterValue !== "friend";
+  const categoryTokens = [
+    ...getMusicPeopleCategoryTokens(person?.category),
+    ...getMusicPeopleCategoryTokens(person?.backend_record?.category),
+    ...getMusicPeopleCategoryTokens(person?.role),
+  ];
+  return person.categoryFilterValue !== "friend"
+    && !categoryTokens.includes("friend")
+    && !categoryTokens.includes("friends");
 }
 
 function getMusicPeopleIndexRows() {
