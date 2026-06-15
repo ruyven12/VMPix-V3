@@ -504,6 +504,11 @@ function getWrestlingShowPosterLabel(show) {
   return parts.slice(0, 2).map((part) => part.charAt(0)).join("").toUpperCase();
 }
 
+function isValidWrestlingPosterUrl(value) {
+  const poster = getWrestlingText(value);
+  return /^(https?:\/\/|data:image\/|\/|\.\.?\/)/i.test(poster);
+}
+
 function getWrestlingVenueName(source) {
   return getWrestlingText(
     source?.venue ||
@@ -1190,9 +1195,27 @@ function createWrestlingShowEntry(show) {
   const poster = document.createElement("div");
   poster.className = "wrestling-show-poster";
   poster.setAttribute("aria-hidden", "true");
+  const posterImage = document.createElement("img");
+  posterImage.className = "wrestling-show-poster-image";
+  posterImage.alt = "";
+  posterImage.loading = "lazy";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
   const posterLabel = document.createElement("span");
+  posterLabel.className = "wrestling-show-poster-fallback";
   posterLabel.textContent = getWrestlingShowPosterLabel(show);
-  poster.append(posterLabel);
+  const posterUrl = getWrestlingText(show.poster);
+  if (isValidWrestlingPosterUrl(posterUrl)) {
+    poster.classList.add("has-poster");
+    posterImage.src = posterUrl;
+    posterImage.hidden = false;
+    posterImage.addEventListener("error", () => {
+      poster.classList.remove("has-poster");
+      posterImage.hidden = true;
+      posterImage.removeAttribute("src");
+    }, { once: true });
+  }
+  poster.append(posterImage, posterLabel);
 
   const copy = document.createElement("div");
   copy.className = "wrestling-show-copy";
