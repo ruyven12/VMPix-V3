@@ -11,6 +11,7 @@ const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people/db";
 const MUSIC_PEOPLE_INDEX_API_LIMIT = 100;
 const MUSIC_PEOPLE_INDEX_MAX_PAGES = 20;
 const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 15000;
+const MUSIC_PERSON_DETAIL_SEARCH_LIMIT = 25;
 const MUSIC_PERSON_DETAIL_TIMEOUT_MS = 20000;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
@@ -1331,30 +1332,30 @@ function getMusicPeopleIndexApiUrl(page = 1) {
   return apiUrl;
 }
 
-function getMusicPersonDetailApiUrl(personId) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  if (!normalizedPersonId) {
-    return null;
-  }
-  return new URL(`${MUSIC_PEOPLE_INDEX_API_ROUTE}/${encodeURIComponent(normalizedPersonId)}`, MUSIC_BANDS_INDEX_API_BASE_URL);
+function formatMusicPersonSlugSearchName(personId) {
+  return normalizeMusicPersonId(personId)
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b([a-z])/g, (match) => match.toUpperCase());
 }
 
-function getMusicPersonDetailFallbackSearch(personId) {
+function getMusicPersonDetailSearchName(personId) {
   const sourcePerson = findMusicPersonById(personId);
   return getMusicPeopleText(sourcePerson?.name || sourcePerson?.backend_record?.name)
-    || normalizeMusicPersonId(personId).replace(/[-_]+/g, " ");
+    || formatMusicPersonSlugSearchName(personId);
 }
 
-function getMusicPersonDetailFallbackApiUrl(personId) {
-  const search = getMusicPersonDetailFallbackSearch(personId);
+function getMusicPersonDetailApiUrl(personId) {
+  const search = getMusicPersonDetailSearchName(personId);
   if (!search) {
     return null;
   }
   const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-  apiUrl.searchParams.set("limit", "1");
+  apiUrl.searchParams.set("search", search.toLowerCase());
+  apiUrl.searchParams.set("limit", String(MUSIC_PERSON_DETAIL_SEARCH_LIMIT));
   apiUrl.searchParams.set("page", "1");
   apiUrl.searchParams.set("archive", "cache");
-  apiUrl.searchParams.set("search", search);
   return apiUrl;
 }
 
@@ -1400,12 +1401,35 @@ function fetchMusicPeopleIndexPayloads(signal) {
   });
 }
 
-function getMusicPersonDetailPayloadRow(payload) {
-  const row = payload?.data || payload?.person || payload?.item || payload;
-  if (Array.isArray(row)) {
-    return row.find((item) => item && typeof item === "object") || null;
+function getMusicPersonDetailPayloadRows(payload) {
+  const rows = getMusicPeoplePayloadRows(payload);
+  if (rows.length > 0) {
+    return rows;
   }
-  return row && typeof row === "object" && !Array.isArray(row) ? row : null;
+  return [payload?.person, payload?.item, payload?.data, payload]
+    .filter((row) => row && typeof row === "object" && !Array.isArray(row));
+}
+
+function isExactMusicPersonDetailPayloadRow(row, personId, searchName) {
+  const normalizedPersonId = normalizeMusicPersonId(personId);
+  const normalizedSearchName = getMusicPeopleText(searchName).toLowerCase();
+  const rowName = getMusicPeopleText(row?.name ?? row?.title);
+  const rowNameKey = rowName.toLowerCase();
+  const rowRouteKeys = [
+    row?.slug,
+    row?.personId,
+    row?.id,
+    getMusicPeopleRouteId(row),
+    createMusicPeopleSlug(rowName),
+  ].map(normalizeMusicPersonId).filter(Boolean);
+
+  return Boolean(rowNameKey && rowNameKey === normalizedSearchName)
+    || rowRouteKeys.includes(normalizedPersonId);
+}
+
+function getMusicPersonDetailPayloadRow(payload, personId, searchName) {
+  return getMusicPersonDetailPayloadRows(payload)
+    .find((row) => isExactMusicPersonDetailPayloadRow(row, personId, searchName)) || null;
 }
 
 function normalizeLiveMusicPeople(payload) {
@@ -1443,19 +1467,54 @@ function getMusicPersonCollectionKey(person) {
   );
 }
 
+function getMusicPersonArchiveCacheKeys(person) {
+  const source = person?.backend_record && typeof person.backend_record === "object"
+    ? { ...person.backend_record, ...person }
+    : person;
+  return uniqueMusicPeopleValues([
+    source?.personId,
+    source?.person_id,
+    source?.id,
+    source?.slug,
+    getMusicPeopleRouteId(source),
+    createMusicPeopleSlug(source?.name ?? source?.title),
+  ]).map(normalizeMusicPersonId).filter(Boolean);
+}
+
+function getCachedMusicPersonDetailArchiveRow(personId) {
+  const normalizedPersonId = normalizeMusicPersonId(personId);
+  if (!normalizedPersonId) {
+    return null;
+  }
+  if (musicPersonDetailArchiveRows.has(normalizedPersonId)) {
+    return musicPersonDetailArchiveRows.get(normalizedPersonId);
+  }
+
+  const sourcePerson = findMusicPersonById(normalizedPersonId);
+  const sourceKey = sourcePerson ? getMusicPersonArchiveCacheKeys(sourcePerson)
+    .find((key) => musicPersonDetailArchiveRows.has(key)) : "";
+  return sourceKey ? musicPersonDetailArchiveRows.get(sourceKey) : null;
+}
+
 function mergeMusicPersonDetailArchiveRow(row) {
   const normalizedRows = normalizeLiveMusicPeople({ data: [row] });
   const normalizedRow = normalizedRows[0];
   if (!normalizedRow) {
     return null;
   }
-
-  const rowKey = getMusicPersonCollectionKey(normalizedRow);
-  if (rowKey) {
-    musicPersonDetailArchiveRows.set(rowKey, normalizedRow);
+  if (!isPublicMusicPeopleIndexRow(normalizeMusicPeopleIndexRow(normalizedRow))) {
+    return null;
   }
+
+  const rowKeys = getMusicPersonArchiveCacheKeys(normalizedRow);
+  rowKeys.forEach((rowKey) => {
+    musicPersonDetailArchiveRows.set(rowKey, normalizedRow);
+  });
   const existingRows = getMusicPeopleIndexCollection();
-  const existingIndex = existingRows.findIndex((person) => getMusicPersonCollectionKey(person) === rowKey);
+  const existingIndex = existingRows.findIndex((person) => {
+    const personKeys = getMusicPersonArchiveCacheKeys(person);
+    return personKeys.some((personKey) => rowKeys.includes(personKey));
+  });
   const nextRows = existingRows.slice();
   if (existingIndex >= 0) {
     nextRows[existingIndex] = {
@@ -1479,10 +1538,15 @@ function requestMusicPersonDetailArchive(personId) {
   if (!apiUrl || typeof fetch !== "function") {
     return Promise.resolve(null);
   }
+  const cachedRow = getCachedMusicPersonDetailArchiveRow(normalizedPersonId);
+  if (cachedRow) {
+    return Promise.resolve(cachedRow);
+  }
   if (musicPersonDetailArchiveRequests.has(normalizedPersonId)) {
     return musicPersonDetailArchiveRequests.get(normalizedPersonId);
   }
 
+  const searchName = getMusicPersonDetailSearchName(normalizedPersonId);
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), MUSIC_PERSON_DETAIL_TIMEOUT_MS)
@@ -1499,39 +1563,15 @@ function requestMusicPersonDetailArchive(personId) {
       return response.json();
     })
     .then((payload) => {
-      const row = getMusicPersonDetailPayloadRow(payload);
+      const row = getMusicPersonDetailPayloadRow(payload, normalizedPersonId, searchName);
       return row ? mergeMusicPersonDetailArchiveRow(row) : null;
     })
     .catch((error) => {
       console.warn(
-        `Music person detail endpoint failed for ${normalizedPersonId}; falling back to targeted people list payload.`,
+        `Music person archive search failed for ${normalizedPersonId}.`,
         error && error.message ? error.message : error
       );
-      const fallbackApiUrl = getMusicPersonDetailFallbackApiUrl(normalizedPersonId);
-      if (!fallbackApiUrl) {
-        return null;
-      }
-      return fetch(fallbackApiUrl, {
-        cache: "no-store",
-        signal: controller?.signal,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Music person fallback request failed (${response.status})`);
-          }
-          return response.json();
-        })
-        .then((payload) => {
-          const row = getMusicPersonDetailPayloadRow(payload);
-          return row ? mergeMusicPersonDetailArchiveRow(row) : null;
-        })
-        .catch((fallbackError) => {
-          console.warn(
-            `Music person fallback payload failed for ${normalizedPersonId}.`,
-            fallbackError && fallbackError.message ? fallbackError.message : fallbackError
-          );
-          return null;
-        });
+      return null;
     })
     .finally(() => {
       if (timeoutId) {
@@ -6680,24 +6720,44 @@ function normalizeMusicPeopleIndexRow(person) {
     source.appearances,
     source.appearance_count,
     source.appearances_count,
+    source.show_count,
+    source.showCount,
+    source.event_count,
+    source.eventCount,
+    source.stats?.showCount,
+    source.stats?.show_count,
+    source.stats?.eventCount,
+    source.stats?.event_count,
+    source.stats?.appearanceCount,
     source.sets,
     source.set_count,
-    source.show_count,
-    source.stats?.showCount,
-    source.stats?.appearanceCount,
+    source.setCount,
     source.backend_record?.stats?.showCount,
+    source.backend_record?.stats?.show_count,
+    source.backend_record?.stats?.eventCount,
+    source.backend_record?.stats?.event_count,
     source.backend_record?.stats?.appearanceCount
   );
   const photos = getOptionalMusicPeopleCountValue(
     source.photos,
     source.photoCount,
     source.photo_count,
+    source.matched_photos_count,
+    source.matchedPhotosCount,
     source.tagged_photo_count,
     source.taggedPhotoCount,
+    source.stats?.photo_count,
     source.stats?.taggedPhotoCount,
+    source.stats?.tagged_photo_count,
+    source.stats?.matchedPhotosCount,
+    source.stats?.matched_photos_count,
     source.stats?.photoCount,
     source.backend_record?.photoCount,
+    source.backend_record?.photo_count,
     source.backend_record?.stats?.taggedPhotoCount,
+    source.backend_record?.stats?.tagged_photo_count,
+    source.backend_record?.stats?.matchedPhotosCount,
+    source.backend_record?.stats?.matched_photos_count,
     source.backend_record?.stats?.photoCount
   );
   const aliases = getMusicPeopleAliases(source);
@@ -6861,15 +6921,89 @@ function getMusicPersonSummaryCount(source, matcher) {
   return Number.isFinite(parsedCount) ? parsedCount : null;
 }
 
-function getMusicPersonSeenValue(source, type) {
+function getMusicPersonDateTimeOriginalValue(photo) {
+  if (!photo || typeof photo !== "object") {
+    return "";
+  }
+  return getMusicPeopleText(photo.date_time_original || photo.dateTimeOriginal || photo.DateTimeOriginal);
+}
+
+function getMusicPersonOriginalDateTime(source, type) {
   const sourceKeys = type === "first"
-    ? ["firstSeenDisplay", "first_seen_display", "firstSeen", "first_seen", "first_seen_at", "first_show", "firstShow"]
-    : ["latestSeenDisplay", "latest_seen_display", "latestSeen", "latest_seen", "latest_seen_at", "latest_show", "latestShow"];
+    ? ["first_seen_date_time_original", "firstSeenDateTimeOriginal"]
+    : ["latest_seen_date_time_original", "latestSeenDateTimeOriginal"];
+  return sourceKeys
+    .map((key) => getMusicPeopleText(source?.[key] ?? source?.stats?.[key] ?? source?.backend_record?.[key]))
+    .find(Boolean) || "";
+}
+
+function parseMusicPersonOriginalDateTime(value) {
+  const text = getMusicPeopleText(value);
+  if (!text) {
+    return null;
+  }
+
+  const displayMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (displayMatch) {
+    return Date.UTC(
+      Number.parseInt(displayMatch[3], 10),
+      Number.parseInt(displayMatch[1], 10) - 1,
+      Number.parseInt(displayMatch[2], 10)
+    );
+  }
+
+  const exifMatch = text.match(/^(\d{4})[:/-](\d{1,2})[:/-](\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+  if (exifMatch) {
+    return Date.UTC(
+      Number.parseInt(exifMatch[1], 10),
+      Number.parseInt(exifMatch[2], 10) - 1,
+      Number.parseInt(exifMatch[3], 10),
+      Number.parseInt(exifMatch[4] || "0", 10),
+      Number.parseInt(exifMatch[5] || "0", 10),
+      Number.parseInt(exifMatch[6] || "0", 10)
+    );
+  }
+
+  const parsedTime = Date.parse(text);
+  return Number.isFinite(parsedTime) ? parsedTime : null;
+}
+
+function formatMusicPersonSeenDateTime(time) {
+  const date = new Date(time);
+  return [
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0"),
+    String(date.getUTCFullYear()),
+  ].join("/");
+}
+
+function getMusicPersonOriginalDateTimeCandidates(source, type) {
+  const originalField = getMusicPersonOriginalDateTime(source, type);
+  const matchedPhotoDates = getMusicPersonMatchedPhotos(source).map(getMusicPersonDateTimeOriginalValue);
+  const taggedShowPhotoDates = getMusicPersonTaggedShowRows(source)
+    .flatMap(getMusicPersonTaggedShowPhotos)
+    .map(getMusicPersonDateTimeOriginalValue);
+  return [originalField, ...matchedPhotoDates, ...taggedShowPhotoDates].filter(Boolean);
+}
+
+function getMusicPersonSeenValue(source, type) {
+  const originalTimes = getMusicPersonOriginalDateTimeCandidates(source, type)
+    .map(parseMusicPersonOriginalDateTime)
+    .filter((time) => Number.isFinite(time));
+  if (originalTimes.length > 0) {
+    const targetTime = type === "first" ? Math.min(...originalTimes) : Math.max(...originalTimes);
+    return formatMusicPersonSeenDateTime(targetTime);
+  }
+
+  const sourceKeys = type === "first"
+    ? ["firstSeenDisplay", "first_seen_display", "firstSeen", "first_seen"]
+    : ["latestSeenDisplay", "latest_seen_display", "latestSeen", "latest_seen"];
   const directValue = sourceKeys
     .map((key) => getMusicPeopleText(source?.[key] ?? source?.stats?.[key] ?? source?.backend_record?.[key]))
     .find(Boolean);
   if (directValue) {
-    return directValue;
+    const parsedTime = parseMusicPersonOriginalDateTime(directValue);
+    return Number.isFinite(parsedTime) ? formatMusicPersonSeenDateTime(parsedTime) : directValue;
   }
 
   const label = type === "first" ? "First Seen" : "Latest Seen";
@@ -7079,7 +7213,7 @@ function getMusicPersonMatchedPhotoUrl(photo) {
   if (!photo || typeof photo !== "object") {
     return "";
   }
-  return getMusicPeopleText(photo.thumbnail_url || photo.thumbnailUrl || photo.small_url || photo.smallUrl || photo.medium_url || photo.mediumUrl || photo.large_url || photo.largeUrl || photo.url);
+  return getMusicPeopleText(photo.thumbnail_url || photo.thumbnailUrl || photo.small_url || photo.smallUrl || photo.medium_url || photo.mediumUrl);
 }
 
 function getMusicPersonTaggedShowRows(source) {
@@ -7118,7 +7252,10 @@ function normalizeMusicPersonTaggedShowRow(show, index) {
   const taggedPhotos = getMusicPeopleCountValue(show?.tagged_photo_count, show?.taggedPhotoCount, show?.photo_count, show?.photoCount);
   const photos = getMusicPersonTaggedShowPhotos(show)
     .filter((photo) => typeof photo === "object" ? getMusicPersonMatchedPhotoUrl(photo) : getMusicPeopleText(photo))
+    .slice()
+    .sort(compareMusicPersonMatchedPhotosByOriginalDate)
     .slice(0, 4);
+  const hasRealThumbnails = photos.some((photo) => typeof photo === "object" && getMusicPersonMatchedPhotoUrl(photo));
   return {
     showId: getMusicPeopleText(show?.show_id || show?.showId || show?.album_id || show?.albumId) || createMusicPeopleSlug(`${title}-${index + 1}`),
     date: getMusicPersonShowDateParts(show),
@@ -7127,7 +7264,7 @@ function normalizeMusicPersonTaggedShowRow(show, index) {
     location: getMusicPeopleText(show?.location) || "Location Pending",
     bandContext: getMusicPeopleText(show?.bandContext || show?.band_context),
     taggedPhotosLabel: taggedPhotos > 0 ? formatMusicPeopleCount(taggedPhotos, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Tagged Photo"),
-    expanded: false,
+    expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
     contributors: "Contributors: Coming Soon",
     notes: "Person-tagged thumbnails are matched from SmugMug photo captions.",
     thumbnails: photos,
@@ -7135,8 +7272,8 @@ function normalizeMusicPersonTaggedShowRow(show, index) {
 }
 
 function compareMusicPersonMatchedPhotosByOriginalDate(left, right) {
-  const leftTime = Date.parse(getMusicPeopleText(left?.date_time_original || left?.dateTimeOriginal)) || 0;
-  const rightTime = Date.parse(getMusicPeopleText(right?.date_time_original || right?.dateTimeOriginal)) || 0;
+  const leftTime = parseMusicPersonOriginalDateTime(getMusicPersonDateTimeOriginalValue(left)) || 0;
+  const rightTime = parseMusicPersonOriginalDateTime(getMusicPersonDateTimeOriginalValue(right)) || 0;
   if (rightTime !== leftTime) {
     return rightTime - leftTime;
   }
@@ -7165,7 +7302,7 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
         location: getMusicPeopleText(photo.location) || "Location Pending",
         bandContext: getMusicPeopleText(photo.band_name || photo.bandName),
         taggedPhotosLabel: "",
-        expanded: false,
+        expanded: groups.size === 0,
         contributors: "Contributors: Coming Soon",
         notes: "Person-tagged thumbnails are matched from SmugMug photo captions.",
         thumbnails: [],
@@ -7209,13 +7346,83 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
     });
 }
 
+function getMusicPersonArchiveAppearanceCount(source) {
+  return getOptionalMusicPeopleCountValue(
+    source?.show_count,
+    source?.showCount,
+    source?.event_count,
+    source?.eventCount,
+    source?.tagged_shows_count,
+    source?.taggedShowsCount,
+    source?.stats?.show_count,
+    source?.stats?.showCount,
+    source?.stats?.event_count,
+    source?.stats?.eventCount,
+    source?.stats?.tagged_shows_count,
+    source?.stats?.taggedShowsCount,
+    source?.backend_record?.show_count,
+    source?.backend_record?.showCount,
+    source?.backend_record?.event_count,
+    source?.backend_record?.eventCount,
+    source?.backend_record?.tagged_shows_count,
+    source?.backend_record?.taggedShowsCount,
+    source?.backend_record?.stats?.show_count,
+    source?.backend_record?.stats?.showCount,
+    source?.backend_record?.stats?.event_count,
+    source?.backend_record?.stats?.eventCount,
+    source?.backend_record?.stats?.tagged_shows_count,
+    source?.backend_record?.stats?.taggedShowsCount,
+    source?.set_count,
+    source?.setCount,
+    source?.stats?.set_count,
+    source?.stats?.setCount,
+    source?.backend_record?.set_count,
+    source?.backend_record?.setCount,
+    source?.backend_record?.stats?.set_count,
+    source?.backend_record?.stats?.setCount
+  );
+}
+
+function getMusicPersonArchivePhotoCount(source) {
+  const matchedPhotos = getMusicPersonMatchedPhotos(source);
+  return getOptionalMusicPeopleCountValue(
+    source?.photo_count,
+    source?.photoCount,
+    source?.matched_photos_count,
+    source?.matchedPhotosCount,
+    source?.tagged_photo_count,
+    source?.taggedPhotoCount,
+    source?.stats?.photo_count,
+    source?.stats?.photoCount,
+    source?.stats?.matched_photos_count,
+    source?.stats?.matchedPhotosCount,
+    source?.stats?.tagged_photo_count,
+    source?.stats?.taggedPhotoCount,
+    source?.backend_record?.photo_count,
+    source?.backend_record?.photoCount,
+    source?.backend_record?.matched_photos_count,
+    source?.backend_record?.matchedPhotosCount,
+    source?.backend_record?.tagged_photo_count,
+    source?.backend_record?.taggedPhotoCount,
+    source?.backend_record?.stats?.photo_count,
+    source?.backend_record?.stats?.photoCount,
+    source?.backend_record?.stats?.matched_photos_count,
+    source?.backend_record?.stats?.matchedPhotosCount,
+    source?.backend_record?.stats?.tagged_photo_count,
+    source?.backend_record?.stats?.taggedPhotoCount,
+    matchedPhotos.length > 0 ? matchedPhotos.length : null
+  );
+}
+
 function getMusicPersonDetailViewData(source, requestedPersonId) {
   const person = normalizeMusicPeopleIndexRow(source);
   const name = getMusicPersonDisplayName(source?.name ?? person.name);
   const summaryAppearances = getMusicPersonSummaryCount(source, /appearance/i);
   const summaryPhotos = getMusicPersonSummaryCount(source, /photo/i);
-  const appearances = summaryAppearances ?? person.appearances;
-  const photos = summaryPhotos ?? person.photos;
+  const archiveAppearances = getMusicPersonArchiveAppearanceCount(source);
+  const archivePhotos = getMusicPersonArchivePhotoCount(source);
+  const appearances = archiveAppearances ?? summaryAppearances ?? person.appearances;
+  const photos = archivePhotos ?? summaryPhotos ?? person.photos;
   const instrumentPills = getMusicPersonInstrumentPills(source, person);
   const associatedBands = getMusicPersonAssociatedBandItems(source, person);
   const taggedShowRows = getMusicPersonTaggedShowRows(source);
