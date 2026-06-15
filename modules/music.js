@@ -7279,8 +7279,124 @@ function getMusicPersonTaggedShowVenue(show) {
   return getMusicShowVenueName(matchedShow) || "Venue Pending";
 }
 
-function normalizeMusicPersonTaggedShowRow(show, index) {
+function getMusicPersonBandRouteSlug(band) {
+  return createBandSlug(getBandId(band) || band?.band_id || band?.id || band?.slug || band?.name || band);
+}
+
+function getMusicPersonTaggedShowMatchedShow(show) {
+  return findMusicShowById(
+    show?.show_id ||
+    show?.showId ||
+    show?.setCode ||
+    show?.set_code ||
+    show?.date_folder ||
+    show?.dateFolder
+  );
+}
+
+function getMusicPersonTaggedShowBandSlug(show, associatedBands = [], matchedShow = null) {
+  const showBandSlugs = [
+    show?.band_id,
+    show?.bandId,
+    show?.band_slug,
+    show?.bandSlug,
+    show?.band,
+    show?.band_name,
+    show?.bandName,
+    show?.bandContext,
+    show?.band_context,
+  ].map(createBandSlug).filter(Boolean);
+
+  const matchedBand = associatedBands.find((band) => {
+    const bandSlug = getMusicPersonBandRouteSlug(band);
+    return bandSlug && (
+      showBandSlugs.includes(bandSlug) ||
+      (matchedShow?.bandSlugs || []).some((showSlug) => createBandSlug(showSlug) === bandSlug) ||
+      (matchedShow?.bandNames || []).some((showBand) => createBandSlug(showBand) === bandSlug)
+    );
+  });
+  if (matchedBand) {
+    return getMusicPersonBandRouteSlug(matchedBand);
+  }
+
+  if (associatedBands.length === 1) {
+    return getMusicPersonBandRouteSlug(associatedBands[0]);
+  }
+
+  return showBandSlugs[0] || createBandSlug((matchedShow?.bandSlugs || [])[0] || (matchedShow?.bandNames || [])[0]);
+}
+
+function getMusicPersonTaggedShowAlbumKey(album) {
+  return getMusicPeopleText(
+    album?.album_id ||
+    album?.albumId ||
+    album?.album_key ||
+    album?.albumKey ||
+    album?.gallery_id ||
+    album?.galleryId ||
+    album?.id ||
+    album?.key
+  );
+}
+
+function getMusicPersonTaggedShowAlbum(show, matchedShow, associatedBands = []) {
+  const albums = getMusicShowSmugAlbums(matchedShow);
+  if (albums.length === 0) {
+    return null;
+  }
+
+  const albumId = getMusicPersonTaggedShowAlbumId(show);
+  if (albumId) {
+    const matchingAlbum = albums.find((album) => getMusicPersonTaggedShowAlbumKey(album) === albumId);
+    if (matchingAlbum) {
+      return matchingAlbum;
+    }
+  }
+
+  const bandSlug = getMusicPersonTaggedShowBandSlug(show, associatedBands, matchedShow);
+  return albums.find((album) => {
+    return [getMusicShowAlbumBandId(album), getMusicShowAlbumBandName(album), album?.lineupBand, album?.lineup_band, album?.band_folder]
+      .map(createBandSlug)
+      .some((albumBandSlug) => albumBandSlug && albumBandSlug === bandSlug);
+  }) || (albums.length === 1 ? albums[0] : null);
+}
+
+function getMusicPersonTaggedShowSetCode(show, matchedShow = null, album = null) {
+  return normalizeSetCode(
+    (album && matchedShow ? getMusicShowAlbumDateFolder(matchedShow, album) : "") ||
+    show?.setCode ||
+    show?.set_code ||
+    show?.date_folder ||
+    show?.dateFolder ||
+    show?.album_date_folder ||
+    show?.albumDateFolder ||
+    matchedShow?.date_folder ||
+    matchedShow?.dateFolder ||
+    matchedShow?.setCode ||
+    matchedShow?.set_code ||
+    getSetCodeFromDateValue(show?.rawDate || show?.date || show?.show_date || show?.showDate || show?.eventDate || show?.formattedDate) ||
+    getMusicShowRouteCode(matchedShow)
+  );
+}
+
+function getMusicPersonTaggedShowRoute(show, associatedBands = []) {
+  const matchedShow = getMusicPersonTaggedShowMatchedShow(show);
+  const matchedAlbum = getMusicPersonTaggedShowAlbum(show, matchedShow, associatedBands);
+  if (matchedShow && matchedAlbum) {
+    const albumRoute = getMusicShowAlbumSetRoute(matchedShow, matchedAlbum);
+    if (albumRoute) {
+      return albumRoute;
+    }
+  }
+
+  const bandSlug = getMusicPersonTaggedShowBandSlug(show, associatedBands, matchedShow);
+  const setCode = getMusicPersonTaggedShowSetCode(show, matchedShow, matchedAlbum);
+  return bandSlug && setCode ? getSetRouteUrl(bandSlug, setCode) : "";
+}
+
+function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
   const title = getMusicPeopleText(show?.title || show?.show_name || show?.name) || `Tagged Show ${index + 1}`;
+  const matchedShow = getMusicPersonTaggedShowMatchedShow(show);
   const taggedPhotos = getMusicPeopleCountValue(show?.tagged_photo_count, show?.taggedPhotoCount, show?.photo_count, show?.photoCount);
   const photos = getMusicPersonTaggedShowPhotos(show)
     .filter((photo) => typeof photo === "object" ? getMusicPersonMatchedPhotoUrl(photo) : getMusicPeopleText(photo))
@@ -7295,6 +7411,8 @@ function normalizeMusicPersonTaggedShowRow(show, index) {
     venue: getMusicPersonTaggedShowVenue(show),
     location: getMusicPeopleText(show?.location) || "Location Pending",
     bandContext: getMusicPeopleText(show?.bandContext || show?.band_context),
+    showRoute: getMusicPersonTaggedShowRoute(show, associatedBands),
+    setCode: getMusicPersonTaggedShowSetCode(show, matchedShow),
     taggedPhotosLabel: taggedPhotos > 0 ? formatMusicPeopleCount(taggedPhotos, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Tagged Photo"),
     expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
     contributors: "Contributors: Coming Soon",
@@ -7312,7 +7430,7 @@ function compareMusicPersonMatchedPhotosByOriginalDate(left, right) {
   return getMusicPeopleText(right?.image_key || right?.imageKey).localeCompare(getMusicPeopleText(left?.image_key || left?.imageKey));
 }
 
-function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
+function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []) {
   const photos = getMusicPersonMatchedPhotos(source)
     .filter((photo) => photo && typeof photo === "object" && getMusicPersonMatchedPhotoUrl(photo))
     .slice()
@@ -7329,6 +7447,8 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
       groups.set(groupKey, {
         showId: groupKey,
         albumId: getMusicPersonTaggedShowAlbumId(photo),
+        rawDate: getMusicPeopleText(photo.show_date || photo.showDate || photo.date),
+        dateFolder: getMusicPeopleText(photo.date_folder || photo.dateFolder || photo.album_date_folder || photo.albumDateFolder),
         date: getMusicPersonShowDateParts({ date: photo.show_date || photo.showDate || photo.date }),
         title,
         venue: getMusicPersonTaggedShowVenue(photo),
@@ -7347,6 +7467,8 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
 
   return Array.from(groups.values()).map((group) => ({
     ...group,
+    showRoute: getMusicPersonTaggedShowRoute(group, associatedBands),
+    setCode: getMusicPersonTaggedShowSetCode(group, getMusicPersonTaggedShowMatchedShow(group)),
     taggedPhotosLabel: formatMusicPeopleCount(group.thumbnails.length, "Tagged Photo"),
   }));
 }
@@ -7368,6 +7490,8 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
         venue: getMusicPeopleText(show.venue) || "Venue Pending",
         location: getMusicPeopleText(show.location) || getMusicShowLocation(show),
         bandContext: getMusicPersonTaggedShowBandContext(show, associatedBands),
+        showRoute: getMusicPersonTaggedShowRoute(show, associatedBands),
+        setCode: getMusicPersonTaggedShowSetCode(show, show),
         taggedPhotosLabel: getMusicPersonTaggedPhotosLabel(show),
         expanded: false,
         contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
@@ -7457,9 +7581,9 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
   const instrumentPills = getMusicPersonInstrumentPills(source, person);
   const associatedBands = getMusicPersonAssociatedBandItems(source, person);
   const taggedShowRows = getMusicPersonTaggedShowRows(source);
-  const matchedPhotoShows = getMusicPersonTaggedShowsFromMatchedPhotos(source);
+  const matchedPhotoShows = getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands);
   const taggedShows = taggedShowRows.length > 0
-    ? taggedShowRows.map(normalizeMusicPersonTaggedShowRow)
+    ? taggedShowRows.map((show, index) => normalizeMusicPersonTaggedShowRow(show, index, associatedBands))
     : matchedPhotoShows.length > 0
       ? matchedPhotoShows
     : getMusicPersonTaggedShowsForBands(associatedBands);
@@ -7739,12 +7863,8 @@ function createMusicPersonShowCard(show, personName) {
 
   const venue = document.createElement("span");
   venue.className = "person-show-venue";
-  venue.textContent = show.venue;
-
-  const location = document.createElement("span");
-  location.className = "person-show-location";
-  location.textContent = show.location;
-  copy.append(title, venue, location);
+  venue.textContent = [show.venue, show.location].map(getMusicPeopleText).filter(Boolean).join(" - ");
+  copy.append(title, venue);
 
   const count = document.createElement("span");
   count.className = "person-show-count";
@@ -7768,6 +7888,22 @@ function createMusicPersonShowCard(show, personName) {
   action.className = "person-show-view";
   action.type = "button";
   action.textContent = "View Show";
+  const showRoute = getMusicPeopleText(show.showRoute);
+  if (showRoute) {
+    action.dataset.showRoute = showRoute;
+    action.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const currentRoute = getRouteFromUrl();
+      navigateToRoute(showRoute, {
+        historyState: {
+          fromPersonDetail: true,
+          personDetailUrl: currentRoute.name === "person-detail" ? currentRoute.canonicalUrl : getMusicPersonRouteUrl(getMusicPeopleText(show.personId)),
+        },
+      });
+    });
+  } else {
+    action.disabled = true;
+  }
 
   const expanded = document.createElement("div");
   expanded.className = "person-show-expanded";
@@ -7911,10 +8047,7 @@ function renderMusicPersonDetail(data) {
   taggedTitle.id = "person-tagged-shows-title";
   taggedTitle.textContent = "Tagged Shows";
 
-  const taggedNote = document.createElement("p");
-  taggedNote.className = "person-tagged-shows-note";
-  taggedNote.textContent = "Inline thumbnails show person-tagged archive photos only.";
-  taggedHeader.append(taggedTitle, taggedNote);
+  taggedHeader.append(taggedTitle);
 
   const showList = document.createElement("div");
   showList.className = "person-show-list";

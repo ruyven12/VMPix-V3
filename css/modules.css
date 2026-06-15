@@ -5898,7 +5898,6 @@ html.is-lightbox-scroll-locked body {
 .person-detail-meta-line,
 .person-detail-seen-line,
 .person-detail-section-title,
-.person-tagged-shows-note,
 .person-show-title,
 .person-show-band-context,
 .person-show-venue,
@@ -6195,14 +6194,9 @@ html.is-lightbox-scroll-locked body {
   z-index: 1;
   min-width: 0;
   display: grid;
+  justify-items: center;
   gap: 0.28rem;
-}
-
-.person-tagged-shows-note {
-  color: rgba(247, 247, 242, 0.52);
-  font-size: clamp(0.6rem, 2.3vw, 0.72rem);
-  line-height: 1.32;
-  text-transform: none;
+  text-align: center;
 }
 
 .person-show-list {
@@ -6300,7 +6294,7 @@ html.is-lightbox-scroll-locked body {
 
 .person-show-title {
   color: rgba(247, 247, 242, 0.88);
-  font-size: clamp(0.78rem, 2.85vw, 0.96rem);
+  font-size: clamp(0.5925rem, calc(2.85vw - 3px), 0.7725rem);
   line-height: 1.15;
   overflow-wrap: anywhere;
   text-transform: none;
@@ -14794,8 +14788,8 @@ html.is-lightbox-scroll-locked body {
   }
 
   .person-tagged-shows-header {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
   }
 
   .person-show-summary {
