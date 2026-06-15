@@ -4,6 +4,90 @@
    Extracted from the original single-file shell; keep this pass mechanical.
    ========================================================= */
 
+(() => {
+  if (typeof window === "undefined" || typeof window.fetch !== "function" || typeof window.Response !== "function") {
+    return;
+  }
+
+  const originalFetch = window.fetch.bind(window);
+  const detailRoutePattern = /^\/api\/music\/people\/db\/([^/?#]+)$/;
+
+  function getRequestUrl(input) {
+    if (typeof input === "string") {
+      return input;
+    }
+    return input && typeof input.url === "string" ? input.url : "";
+  }
+
+  function getPersonSearchValue(personId) {
+    return decodeURIComponent(String(personId || ""))
+      .trim()
+      .replace(/[-_]+/g, " ");
+  }
+
+  function createArchiveDetailResponse(payload) {
+    return new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+      },
+    });
+  }
+
+  window.fetch = function fetchWithMusicPersonDetailFallback(input, init) {
+    const requestUrl = getRequestUrl(input);
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(requestUrl, window.location.href);
+    } catch (error) {
+      return originalFetch(input, init);
+    }
+
+    const detailMatch = parsedUrl.pathname.match(detailRoutePattern);
+    if (!detailMatch) {
+      return originalFetch(input, init);
+    }
+
+    const searchValue = getPersonSearchValue(detailMatch[1]);
+    if (!searchValue) {
+      return originalFetch(input, init);
+    }
+
+    const fallbackUrl = new URL("/api/music/people/db", parsedUrl.origin);
+    fallbackUrl.searchParams.set("limit", "1");
+    fallbackUrl.searchParams.set("page", "1");
+    fallbackUrl.searchParams.set("archive", "cache");
+    fallbackUrl.searchParams.set("search", searchValue);
+
+    return originalFetch(input, init).then((response) => {
+      if (response.ok) {
+        return response;
+      }
+
+      console.warn(
+        "Music person detail endpoint unavailable; using targeted archive list fallback.",
+        parsedUrl.pathname
+      );
+
+      return originalFetch(fallbackUrl.toString(), init).then((fallbackResponse) => {
+        if (!fallbackResponse.ok) {
+          return response;
+        }
+
+        return fallbackResponse.json().then((payload) => {
+          const rows = Array.isArray(payload && payload.data) ? payload.data : [];
+          return createArchiveDetailResponse({
+            ...payload,
+            route: "/api/music/people/db/:personId",
+            data: rows[0] || null,
+          });
+        });
+      });
+    });
+  };
+})();
+
 function decodeRoutePart(routePart) {
   try {
     return decodeURIComponent(routePart);
