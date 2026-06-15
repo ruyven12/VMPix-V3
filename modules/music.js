@@ -4850,6 +4850,11 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
     dedupeKey: rawImageKey || imageSrc,
     imageKey: rawImageKey || `album-photo-${index + 1}`,
     imageSrc,
+    thumbnail_url: String(photo?.thumbnail_url || photo?.thumbnailUrl || "").trim(),
+    small_url: String(photo?.small_url || photo?.smallUrl || "").trim(),
+    medium_url: String(photo?.medium_url || photo?.mediumUrl || "").trim(),
+    large_url: String(photo?.large_url || photo?.largeUrl || "").trim(),
+    date_time_original: String(photo?.date_time_original || photo?.dateTimeOriginal || photo?.DateTimeOriginal || "").trim(),
     caption,
     label: label || `Preview photo ${index + 1}`,
     lightboxSrc: getMusicAlbumPhotoLightboxSrc(photo) || imageSrc,
@@ -7226,7 +7231,7 @@ function getMusicPersonMatchedPhotoUrl(photo) {
   if (!photo || typeof photo !== "object") {
     return "";
   }
-  return getMusicPeopleText(photo.thumbnail_url || photo.thumbnailUrl || photo.small_url || photo.smallUrl || photo.medium_url || photo.mediumUrl);
+  return getMusicPeopleText(photo.thumbnail_url || photo.thumbnailUrl || photo.small_url || photo.smallUrl || photo.medium_url || photo.mediumUrl || photo.imageSrc);
 }
 
 function getMusicPersonTaggedShowRows(source) {
@@ -7260,20 +7265,34 @@ function getMusicPersonTaggedShowPhotos(show) {
   ].find((value) => Array.isArray(value) && value.length > 0) || [];
 }
 
+function getMusicPersonTaggedShowAlbumId(show) {
+  return getMusicPeopleText(show?.album_id || show?.albumId || show?.gallery_id || show?.galleryId);
+}
+
+function getMusicPersonTaggedShowVenue(show) {
+  const directVenue = getMusicPeopleText(show?.venue);
+  if (isReadableMusicVenueName(directVenue)) {
+    return directVenue;
+  }
+
+  const matchedShow = findMusicShowById(show?.show_id || show?.showId);
+  return getMusicShowVenueName(matchedShow) || "Venue Pending";
+}
+
 function normalizeMusicPersonTaggedShowRow(show, index) {
   const title = getMusicPeopleText(show?.title || show?.show_name || show?.name) || `Tagged Show ${index + 1}`;
   const taggedPhotos = getMusicPeopleCountValue(show?.tagged_photo_count, show?.taggedPhotoCount, show?.photo_count, show?.photoCount);
   const photos = getMusicPersonTaggedShowPhotos(show)
     .filter((photo) => typeof photo === "object" ? getMusicPersonMatchedPhotoUrl(photo) : getMusicPeopleText(photo))
     .slice()
-    .sort(compareMusicPersonMatchedPhotosByOriginalDate)
-    .slice(0, 4);
+    .sort(compareMusicPersonMatchedPhotosByOriginalDate);
   const hasRealThumbnails = photos.some((photo) => typeof photo === "object" && getMusicPersonMatchedPhotoUrl(photo));
   return {
     showId: getMusicPeopleText(show?.show_id || show?.showId || show?.album_id || show?.albumId) || createMusicPeopleSlug(`${title}-${index + 1}`),
+    albumId: getMusicPersonTaggedShowAlbumId(show),
     date: getMusicPersonShowDateParts(show),
     title,
-    venue: getMusicPeopleText(show?.venue) || "Venue Pending",
+    venue: getMusicPersonTaggedShowVenue(show),
     location: getMusicPeopleText(show?.location) || "Location Pending",
     bandContext: getMusicPeopleText(show?.bandContext || show?.band_context),
     taggedPhotosLabel: taggedPhotos > 0 ? formatMusicPeopleCount(taggedPhotos, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Tagged Photo"),
@@ -7309,9 +7328,10 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
       const title = getMusicPeopleText(photo.show_name || photo.showName || photo.title) || "Tagged Archive Photos";
       groups.set(groupKey, {
         showId: groupKey,
+        albumId: getMusicPersonTaggedShowAlbumId(photo),
         date: getMusicPersonShowDateParts({ date: photo.show_date || photo.showDate || photo.date }),
         title,
-        venue: getMusicPeopleText(photo.venue) || "Venue Pending",
+        venue: getMusicPersonTaggedShowVenue(photo),
         location: getMusicPeopleText(photo.location) || "Location Pending",
         bandContext: getMusicPeopleText(photo.band_name || photo.bandName),
         taggedPhotosLabel: "",
@@ -7322,9 +7342,7 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
       });
     }
     const group = groups.get(groupKey);
-    if (group.thumbnails.length < 4) {
-      group.thumbnails.push(photo);
-    }
+    group.thumbnails.push(photo);
   });
 
   return Array.from(groups.values()).map((group) => ({
@@ -7600,6 +7618,87 @@ function createMusicPersonTaggedThumb(item) {
   return thumb;
 }
 
+function getMusicPersonCaptionNameParts(photo) {
+  return getMusicPeopleText(photo?.caption || photo?.Caption)
+    .split(";")
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+function doesMusicPersonCaptionMatch(photo, personName) {
+  const normalizedPersonName = getMusicPeopleText(personName).toLowerCase();
+  if (!normalizedPersonName) {
+    return false;
+  }
+  return getMusicPersonCaptionNameParts(photo)
+    .some((name) => name.toLowerCase() === normalizedPersonName);
+}
+
+function getMusicPersonShowCardById(showId) {
+  const normalizedShowId = getMusicPeopleText(showId);
+  if (!personDetail || !normalizedShowId) {
+    return null;
+  }
+  return Array.from(personDetail.querySelectorAll(".person-show-card"))
+    .find((card) => getMusicPeopleText(card.dataset.personShowId) === normalizedShowId) || null;
+}
+
+function updateMusicPersonShowCardThumbnails(card, thumbnails) {
+  const thumbGrid = card?.querySelector(".person-show-tagged-thumbs");
+  if (!thumbGrid || !Array.isArray(thumbnails) || thumbnails.length === 0) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  thumbnails.forEach((thumbnail) => {
+    fragment.append(createMusicPersonTaggedThumb(thumbnail));
+  });
+  thumbGrid.replaceChildren(fragment);
+
+  const count = card.querySelector(".person-show-count");
+  if (count) {
+    count.textContent = formatMusicPeopleCount(thumbnails.length, "Tagged Photo");
+  }
+}
+
+function hydrateMusicPersonTaggedShowPhotos(data) {
+  const personId = normalizeMusicPersonId(data?.personId);
+  const personName = getMusicPeopleText(data?.name);
+  const taggedShows = Array.isArray(data?.taggedShows) ? data.taggedShows : [];
+  if (!personId || !personName || taggedShows.length === 0 || typeof fetch !== "function") {
+    return;
+  }
+
+  taggedShows.forEach((show) => {
+    const albumId = getMusicPersonTaggedShowAlbumId(show);
+    const currentThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
+    if (!albumId) {
+      return;
+    }
+
+    requestAllMusicSmugmugAlbumPhotos(albumId)
+      .then((payload) => {
+        const matchedPhotos = getUniqueMusicAlbumPhotos(Array.isArray(payload?.photos) ? payload.photos : [])
+          .filter((photo) => doesMusicPersonCaptionMatch(photo, personName))
+          .sort(compareMusicPersonMatchedPhotosByOriginalDate);
+        if (matchedPhotos.length <= currentThumbnails.length) {
+          return;
+        }
+
+        const route = getRouteFromUrl();
+        if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== personId) {
+          return;
+        }
+
+        const card = getMusicPersonShowCardById(show.showId);
+        if (card) {
+          updateMusicPersonShowCardThumbnails(card, matchedPhotos);
+        }
+      })
+      .catch(() => {});
+  });
+}
+
 function createMusicPersonShowCard(show, personName) {
   const card = document.createElement("article");
   const isExpanded = Boolean(show.expanded);
@@ -7828,6 +7927,7 @@ function renderMusicPersonDetail(data) {
 
   taggedShows.append(taggedHeader, showList);
   personDetail.replaceChildren(backButton, hero, associated, taggedShows);
+  hydrateMusicPersonTaggedShowPhotos(data);
 }
 
 function showMusicPersonDetail(personId) {
