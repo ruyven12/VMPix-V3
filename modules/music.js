@@ -1480,7 +1480,16 @@ function requestMusicPersonDetailArchive(personId) {
       const row = getMusicPersonDetailPayloadRow(payload);
       return row ? mergeMusicPersonDetailArchiveRow(row) : null;
     })
-    .catch(() => null)
+    .catch((error) => {
+      console.warn(
+        `Music person detail endpoint failed for ${normalizedPersonId}; falling back to people list payload.`,
+        error && error.message ? error.message : error
+      );
+      return requestMusicPeopleIndexData().then(() => {
+        const fallbackPerson = findMusicPersonById(normalizedPersonId);
+        return fallbackPerson ? mergeMusicPersonDetailArchiveRow(fallbackPerson) : null;
+      });
+    })
     .finally(() => {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
