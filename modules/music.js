@@ -1339,6 +1339,25 @@ function getMusicPersonDetailApiUrl(personId) {
   return new URL(`${MUSIC_PEOPLE_INDEX_API_ROUTE}/${encodeURIComponent(normalizedPersonId)}`, MUSIC_BANDS_INDEX_API_BASE_URL);
 }
 
+function getMusicPersonDetailFallbackSearch(personId) {
+  const sourcePerson = findMusicPersonById(personId);
+  return getMusicPeopleText(sourcePerson?.name || sourcePerson?.backend_record?.name)
+    || normalizeMusicPersonId(personId).replace(/[-_]+/g, " ");
+}
+
+function getMusicPersonDetailFallbackApiUrl(personId) {
+  const search = getMusicPersonDetailFallbackSearch(personId);
+  if (!search) {
+    return null;
+  }
+  const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
+  apiUrl.searchParams.set("limit", "1");
+  apiUrl.searchParams.set("page", "1");
+  apiUrl.searchParams.set("archive", "cache");
+  apiUrl.searchParams.set("search", search);
+  return apiUrl;
+}
+
 function getMusicPeoplePayloadTotalPages(payload) {
   const directTotalPages = Number.parseInt(payload?.totalPages ?? payload?.meta?.pagination?.totalPages, 10);
   if (Number.isFinite(directTotalPages) && directTotalPages > 0) {
@@ -1383,6 +1402,9 @@ function fetchMusicPeopleIndexPayloads(signal) {
 
 function getMusicPersonDetailPayloadRow(payload) {
   const row = payload?.data || payload?.person || payload?.item || payload;
+  if (Array.isArray(row)) {
+    return row.find((item) => item && typeof item === "object") || null;
+  }
   return row && typeof row === "object" && !Array.isArray(row) ? row : null;
 }
 
@@ -1482,13 +1504,34 @@ function requestMusicPersonDetailArchive(personId) {
     })
     .catch((error) => {
       console.warn(
-        `Music person detail endpoint failed for ${normalizedPersonId}; falling back to people list payload.`,
+        `Music person detail endpoint failed for ${normalizedPersonId}; falling back to targeted people list payload.`,
         error && error.message ? error.message : error
       );
-      return requestMusicPeopleIndexData().then(() => {
-        const fallbackPerson = findMusicPersonById(normalizedPersonId);
-        return fallbackPerson ? mergeMusicPersonDetailArchiveRow(fallbackPerson) : null;
-      });
+      const fallbackApiUrl = getMusicPersonDetailFallbackApiUrl(normalizedPersonId);
+      if (!fallbackApiUrl) {
+        return null;
+      }
+      return fetch(fallbackApiUrl, {
+        cache: "no-store",
+        signal: controller?.signal,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Music person fallback request failed (${response.status})`);
+          }
+          return response.json();
+        })
+        .then((payload) => {
+          const row = getMusicPersonDetailPayloadRow(payload);
+          return row ? mergeMusicPersonDetailArchiveRow(row) : null;
+        })
+        .catch((fallbackError) => {
+          console.warn(
+            `Music person fallback payload failed for ${normalizedPersonId}.`,
+            fallbackError && fallbackError.message ? fallbackError.message : fallbackError
+          );
+          return null;
+        });
     })
     .finally(() => {
       if (timeoutId) {
