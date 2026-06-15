@@ -6406,6 +6406,14 @@ html.is-lightbox-scroll-locked body {
   font-size: clamp(0.58rem, 2.35vw, 0.7rem);
   line-height: 1;
   text-transform: none;
+  overflow: hidden;
+}
+
+.person-show-tagged-thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .person-show-expanded-meta,
