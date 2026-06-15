@@ -5306,13 +5306,17 @@ function setLightboxControlsHidden(isHidden) {
   }
 }
 
+function shouldPreserveLightboxCustomTiles(returnContext) {
+  return ["person-detail", "wrestling-match-gallery"].includes(returnContext?.source);
+}
+
 function showLightbox(photoTile = activeGalleryPhoto, options = {}) {
   if (!lightboxScreen) {
     return;
   }
 
   activeLightboxReturnContext = options.returnContext || { source: "set-gallery" };
-  if (activeLightboxReturnContext.source !== "person-detail") {
+  if (!shouldPreserveLightboxCustomTiles(activeLightboxReturnContext)) {
     activeLightboxCustomTiles = null;
   }
 
@@ -5361,6 +5365,28 @@ function returnToSetGalleryFromLightbox() {
     window.requestAnimationFrame(() => {
       if (musicNexusShell && scrollTop !== null) {
         musicNexusShell.scrollTo({ top: scrollTop, behavior: "auto" });
+      }
+      if (focusTarget) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+    return;
+  }
+
+  if (returnContext?.source === "wrestling-match-gallery") {
+    const focusTarget = returnContext.focusElement && document.contains(returnContext.focusElement)
+      ? returnContext.focusElement
+      : null;
+    const scrollTop = Number.isFinite(returnContext.scrollTop) ? returnContext.scrollTop : null;
+
+    setLightboxVisible(false);
+    if (typeof closeWrestlingMatchLightboxBridge === "function") {
+      closeWrestlingMatchLightboxBridge();
+    }
+    setCurrentView("Match Gallery");
+    window.requestAnimationFrame(() => {
+      if (wrestlingMatchGalleryShell && scrollTop !== null) {
+        wrestlingMatchGalleryShell.scrollTo({ top: scrollTop, behavior: "auto" });
       }
       if (focusTarget) {
         focusTarget.focus({ preventScroll: true });
