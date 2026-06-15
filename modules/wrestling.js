@@ -1425,9 +1425,27 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   const poster = document.createElement("div");
   poster.className = "wrestling-detail-poster";
   poster.setAttribute("aria-hidden", "true");
+  const posterImage = document.createElement("img");
+  posterImage.className = "wrestling-detail-poster-image";
+  posterImage.alt = "";
+  posterImage.loading = "eager";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
   const posterLabel = document.createElement("span");
+  posterLabel.className = "wrestling-detail-poster-fallback";
   posterLabel.textContent = getWrestlingShowPosterLabel(show);
-  poster.append(posterLabel);
+  const posterUrl = getWrestlingText(show.poster);
+  if (isValidWrestlingPosterUrl(posterUrl)) {
+    poster.classList.add("has-poster");
+    posterImage.src = posterUrl;
+    posterImage.hidden = false;
+    posterImage.addEventListener("error", () => {
+      poster.classList.remove("has-poster");
+      posterImage.hidden = true;
+      posterImage.removeAttribute("src");
+    }, { once: true });
+  }
+  poster.append(posterImage, posterLabel);
 
   const meta = document.createElement("div");
   meta.className = "wrestling-detail-meta";
@@ -1444,8 +1462,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
     createWrestlingDetailFact("Promotion", show.promotion),
     createWrestlingDetailFact("Date", show.eventDate),
     createWrestlingDetailFact("Venue", show.venue),
-    createWrestlingDetailFact("Location", show.location),
-    createWrestlingDetailFact("Type", "Live Wrestling Event")
+    createWrestlingDetailFact("Location", show.location)
   );
 
   meta.append(title, facts);
@@ -1482,39 +1499,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   }
   detailSection.append(matchTitle, matchList);
 
-  const gallery = document.createElement("section");
-  gallery.className = "wrestling-gallery-card";
-  gallery.setAttribute("aria-labelledby", "wrestling-gallery-title");
-
-  const galleryCopy = document.createElement("div");
-  galleryCopy.className = "wrestling-gallery-copy";
-  const galleryTitle = document.createElement("h3");
-  galleryTitle.className = "wrestling-gallery-title";
-  galleryTitle.id = "wrestling-gallery-title";
-  galleryTitle.textContent = "Photo Gallery";
-  const galleryCount = document.createElement("p");
-  galleryCount.className = "wrestling-gallery-count";
-  galleryCount.textContent = matches.length > 0 ? `${matches.length} Matches Indexed` : "No Matches Indexed";
-  galleryCopy.append(galleryTitle, galleryCount);
-
-  const galleryButton = document.createElement("button");
-  galleryButton.className = "wrestling-gallery-button";
-  galleryButton.type = "button";
-  galleryButton.textContent = "Open Gallery";
-  const galleryMatch = matches[0] || null;
-  if (galleryMatch) {
-    galleryButton.dataset.wrestlingMatchRef = getWrestlingMatchRouteRef(galleryMatch, 0);
-    galleryButton.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
-    galleryButton.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(show, galleryButton.dataset.wrestlingMatchRef);
-    setWrestlingRelationshipDataset(galleryButton, galleryMatch);
-    galleryButton.addEventListener("click", () => navigateToRoute(galleryButton.dataset.wrestlingMatchRoute));
-  } else {
-    galleryButton.disabled = true;
-    galleryButton.setAttribute("aria-disabled", "true");
-  }
-
-  gallery.append(galleryCopy, galleryButton);
-  wrestlingShowDetailShell.replaceChildren(backButton, hero, detailSection, gallery);
+  wrestlingShowDetailShell.replaceChildren(backButton, hero, detailSection);
 }
 
 function getWrestlingPeopleCardLabel(person) {
