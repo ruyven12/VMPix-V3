@@ -7298,7 +7298,7 @@ function normalizeMusicPersonTaggedShowRow(show, index) {
     taggedPhotosLabel: taggedPhotos > 0 ? formatMusicPeopleCount(taggedPhotos, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Tagged Photo"),
     expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
     contributors: "Contributors: Coming Soon",
-    notes: "Person-tagged thumbnails are matched from SmugMug photo captions.",
+    notes: "",
     thumbnails: photos,
   };
 }
@@ -7337,7 +7337,7 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source) {
         taggedPhotosLabel: "",
         expanded: groups.size === 0,
         contributors: "Contributors: Coming Soon",
-        notes: "Person-tagged thumbnails are matched from SmugMug photo captions.",
+        notes: "",
         thumbnails: [],
       });
     }
@@ -7371,7 +7371,7 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
         taggedPhotosLabel: getMusicPersonTaggedPhotosLabel(show),
         expanded: false,
         contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
-        notes: "Person-tagged thumbnails are staged for future SmugMug captions.",
+        notes: "",
         thumbnails: ["Photo 01", "Photo 02", "Photo 03", "Photo 04"],
       };
     });
@@ -7788,16 +7788,23 @@ function createMusicPersonShowCard(show, personName) {
   meta.className = "person-show-expanded-meta";
   meta.textContent = show.contributors;
 
-  const notes = document.createElement("p");
-  notes.className = "person-show-expanded-notes";
-  notes.textContent = show.notes;
+  const noteText = getMusicPeopleText(show.notes);
+  const notes = noteText ? document.createElement("p") : null;
+  if (notes) {
+    notes.className = "person-show-expanded-notes";
+    notes.textContent = noteText;
+  }
 
   const action = document.createElement("button");
   action.className = "person-show-view";
   action.type = "button";
   action.textContent = "View Show";
 
-  expanded.append(thumbs, meta, notes, action);
+  expanded.append(thumbs, meta);
+  if (notes) {
+    expanded.append(notes);
+  }
+  expanded.append(action);
   card.append(summary, expanded);
   return card;
 }
