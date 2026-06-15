@@ -1301,10 +1301,15 @@ function setMusicPeopleIndexCollection(rows, stateName = "fallback") {
 function getMusicPeoplePayloadRows(payload) {
   const candidates = [
     payload?.data,
+    payload?.items,
     payload?.rows,
     payload?.people,
+    payload?.results,
     payload?.source?.data,
+    payload?.source?.items,
     payload?.source?.rows,
+    payload?.source?.people,
+    payload?.source?.results,
   ];
 
   for (const candidate of candidates) {
@@ -6815,16 +6820,10 @@ function isPublicMusicPeopleIndexRow(person) {
     && !categoryTokens.includes("friends");
 }
 
-function hasVisibleMusicPeopleIndexStats(person) {
-  return Number.isFinite(person?.appearances) && person.appearances > 0
-    || Number.isFinite(person?.photos) && person.photos > 0;
-}
-
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
     .filter((person) => person.name && isPublicMusicPeopleIndexRow(person))
-    .filter(hasVisibleMusicPeopleIndexStats)
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
@@ -7451,8 +7450,8 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
     categoryPill: person.categoryDisplay,
     instrumentPills,
     archiveRows: [
-      { label: "Appearances", value: Number.isFinite(appearances) && appearances > 0 ? formatMusicPeopleNumber(appearances) : "Pending" },
-      { label: "Photos", value: Number.isFinite(photos) && photos > 0 ? formatMusicPeopleNumber(photos) : "Pending" },
+      { label: "Appearances", value: Number.isFinite(appearances) ? formatMusicPeopleNumber(appearances) : "Pending" },
+      { label: "Photos", value: Number.isFinite(photos) ? formatMusicPeopleNumber(photos) : "Pending" },
       { label: "First Seen", value: getMusicPersonSeenValue(source, "first") },
       { label: "Latest Seen", value: getMusicPersonSeenValue(source, "latest") },
     ],
