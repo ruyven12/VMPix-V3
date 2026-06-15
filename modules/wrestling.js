@@ -258,6 +258,7 @@ const wrestlingPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const wrestlingPeopleLetterOptions = ["#", ...wrestlingPeopleAlphabet];
 let wrestlingShowsCollection = [];
 let wrestlingShowsRequest = null;
+let wrestlingMatchPhotoRequests = new Map();
 let wrestlingShowsDataState = "idle";
 let wrestlingShowsDataRequested = false;
 let wrestlingShowsSearchRenderTimer = 0;
@@ -696,10 +697,16 @@ function setWrestlingShowsCollection(rows, stateName = "idle") {
   }
 }
 
-function getWrestlingShowsApiUrl(page = 1) {
+function getWrestlingShowsApiUrl(page = 1, options = {}) {
   const apiUrl = new URL(WRESTLING_SHOWS_API_ROUTE, WRESTLING_SHOWS_API_BASE_URL);
-  apiUrl.searchParams.set("limit", String(WRESTLING_SHOWS_API_LIMIT));
+  apiUrl.searchParams.set("limit", String(options.limit || WRESTLING_SHOWS_API_LIMIT));
   apiUrl.searchParams.set("page", String(page));
+  if (options.includePhotos) {
+    apiUrl.searchParams.set("include_photos", "1");
+  }
+  if (options.search) {
+    apiUrl.searchParams.set("search", String(options.search));
+  }
   return apiUrl;
 }
 
@@ -708,8 +715,8 @@ function getWrestlingPayloadPageCount(payload) {
   return Number.isFinite(totalPages) && totalPages > 0 ? Math.trunc(totalPages) : 1;
 }
 
-function fetchWrestlingShowsPage(page, signal) {
-  return fetch(getWrestlingShowsApiUrl(page), {
+function fetchWrestlingShowsPage(page, signal, options = {}) {
+  return fetch(getWrestlingShowsApiUrl(page, options), {
     cache: "no-store",
     signal,
   }).then((response) => {
@@ -813,29 +820,116 @@ function requestWrestlingShowsData() {
   return wrestlingShowsRequest;
 }
 
-function findLiveWrestlingShowById(showId) {
+function getWrestlingShowIdCandidates(show) {
+  return [
+    getWrestlingShowRouteCode(show),
+    show?.dateKey,
+    show?.date_key,
+    getWrestlingShowDateKey(show?.rawDate || show?.date || show?.eventDate || show?.show_date),
+    show?.showId,
+    show?.eventId,
+    show?.showKey,
+    show?.show_id,
+    show?.id,
+    ...(Array.isArray(show?.aliases) ? show.aliases : []),
+  ].map((candidate) => normalizeWrestlingArchiveSlug(candidate, "")).filter(Boolean);
+}
+
+function doesWrestlingShowMatchId(show, showId) {
   const targetId = normalizeWrestlingArchiveSlug(showId, "");
-  if (!targetId) {
+  return Boolean(targetId && getWrestlingShowIdCandidates(show).includes(targetId));
+}
+
+function findWrestlingShowInRowsById(rows = [], showId) {
+  return (Array.isArray(rows) ? rows : []).find((show) => doesWrestlingShowMatchId(show, showId)) || null;
+}
+
+function mergeWrestlingShowIntoCollection(nextShow) {
+  if (!nextShow) {
     return null;
   }
+  const index = wrestlingShowsCollection.findIndex((show) => (
+    getWrestlingShowIdCandidates(nextShow).some((candidate) => doesWrestlingShowMatchId(show, candidate))
+  ));
+  if (index === -1) {
+    wrestlingShowsCollection.push(nextShow);
+    return nextShow;
+  }
+  wrestlingShowsCollection[index] = {
+    ...wrestlingShowsCollection[index],
+    ...nextShow,
+    matches: Array.isArray(nextShow.matches) && nextShow.matches.length > 0
+      ? nextShow.matches
+      : wrestlingShowsCollection[index].matches,
+  };
+  return wrestlingShowsCollection[index];
+}
 
-  return wrestlingShowsCollection.find((show) => {
-    const candidates = [
-      getWrestlingShowRouteCode(show),
-      show.dateKey,
-      show.date_key,
-      getWrestlingShowDateKey(show.rawDate || show.date || show.eventDate || show.show_date),
-      show.showId,
-      show.eventId,
-      show.showKey,
-      show.show_id,
-      show.id,
-      ...(Array.isArray(show.aliases) ? show.aliases : []),
-    ];
-    return candidates
-      .map((candidate) => normalizeWrestlingArchiveSlug(candidate, ""))
-      .some((candidate) => candidate === targetId);
-  }) || null;
+function getWrestlingShowPhotoRequestSearch(show, showId) {
+  return getWrestlingText(
+    show?.showKey ||
+    show?.show_key ||
+    show?.title ||
+    show?.eventName ||
+    show?.showName ||
+    show?.show_name ||
+    showId
+  );
+}
+
+function requestWrestlingMatchPhotosForRoute(showId, matchRef, show) {
+  if (typeof fetch !== "function") {
+    return Promise.resolve(false);
+  }
+
+  const requestKey = [
+    normalizeWrestlingArchiveSlug(showId, ""),
+    normalizeWrestlingArchiveSlug(matchRef, ""),
+  ].join("|");
+  if (wrestlingMatchPhotoRequests.has(requestKey)) {
+    return wrestlingMatchPhotoRequests.get(requestKey);
+  }
+
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), WRESTLING_SHOWS_TIMEOUT_MS)
+    : 0;
+
+  const request = fetchWrestlingShowsPage(1, controller?.signal, {
+    includePhotos: true,
+    limit: 5,
+    search: getWrestlingShowPhotoRequestSearch(show, showId),
+  })
+    .then((payload) => {
+      const rows = normalizeLiveWrestlingShows(payload);
+      const enrichedShow = findWrestlingShowInRowsById(rows, showId) || rows[0] || null;
+      const mergedShow = mergeWrestlingShowIntoCollection(enrichedShow);
+      if (!mergedShow) {
+        return false;
+      }
+      const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+      if (route?.name === "wrestling-match-gallery") {
+        updateWrestlingMatchGalleryRelationshipHooks(
+          route.dateKey || route.showId || showId,
+          route.matchRef || route.matchId || matchRef,
+          { skipDataRequest: true, skipCanonicalize: true, skipPhotoRequest: true }
+        );
+      }
+      return true;
+    })
+    .catch(() => false)
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    });
+
+  wrestlingMatchPhotoRequests.set(requestKey, request);
+  return request;
+}
+
+function findLiveWrestlingShowById(showId) {
+  return findWrestlingShowInRowsById(wrestlingShowsCollection, showId);
 }
 
 function findLiveWrestlingMatchById(matchId, showId = "") {
@@ -4115,13 +4209,21 @@ function getWrestlingMatchPhotoSourceArrays(match) {
     source?.photos,
     source?.match_photos,
     source?.matchPhotos,
+    source?.gallery,
     source?.gallery_photos,
     source?.galleryPhotos,
+    source?.images,
+    source?.tagged_photos,
+    source?.taggedPhotos,
     source?.matched_photos,
     source?.matchedPhotos,
     source?.stats?.photos,
     source?.stats?.match_photos,
     source?.stats?.matchPhotos,
+    source?.stats?.gallery,
+    source?.stats?.images,
+    source?.stats?.tagged_photos,
+    source?.stats?.taggedPhotos,
   ].filter(Array.isArray);
 }
 
@@ -4146,6 +4248,15 @@ function getWrestlingMatchPhotoThumbnailUrl(photo) {
     "thumbUrl",
     "small_url",
     "smallUrl",
+    "medium_url",
+    "mediumUrl",
+    "large_url",
+    "largeUrl",
+    "url",
+    "image_url",
+    "imageUrl",
+    "smugmug_url",
+    "smugmugUrl",
   ]);
 }
 
@@ -4161,6 +4272,11 @@ function getWrestlingMatchPhotoLightboxUrl(photo) {
     "thumbnailUrl",
     "thumb_url",
     "thumbUrl",
+    "url",
+    "image_url",
+    "imageUrl",
+    "smugmug_url",
+    "smugmugUrl",
   ]);
 }
 
@@ -4530,6 +4646,13 @@ function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", mat
     }
   }
   updateWrestlingMatchGalleryDisplay(showRelationship, matchRelationship);
+  if (
+    liveShowRelationship &&
+    !options.skipPhotoRequest &&
+    getWrestlingMatchPhotoItems(matchRelationship).length === 0
+  ) {
+    requestWrestlingMatchPhotosForRoute(activeShowId, activeMatchRef || activeMatchId, showRelationship);
+  }
 
   wrestlingPhotoTiles.forEach((tile) => {
     const photoId = tile.dataset.wrestlingPhotoId;
