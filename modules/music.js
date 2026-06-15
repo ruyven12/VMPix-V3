@@ -7591,6 +7591,56 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
   }));
 }
 
+function getMusicPersonTaggedShowMergeKeys(show) {
+  if (!show || typeof show !== "object") {
+    return new Set();
+  }
+
+  const date = show.date || {};
+  return new Set([
+    show.showId,
+    show.show_id,
+    show.albumId,
+    show.album_id,
+    show.setCode,
+    show.set_code,
+    show.dateFolder,
+    show.date_folder,
+    show.albumDateFolder,
+    show.album_date_folder,
+    [show.title, show.venue, show.location, date.month, date.day, date.year].map(getMusicPeopleText).join("|"),
+  ].map((value) => getMusicPeopleText(value).toLowerCase()).filter(Boolean));
+}
+
+function findMusicPersonMatchedPhotoShow(show, matchedPhotoShows) {
+  const showKeys = getMusicPersonTaggedShowMergeKeys(show);
+  if (showKeys.size === 0 || !Array.isArray(matchedPhotoShows)) {
+    return null;
+  }
+
+  return matchedPhotoShows.find((matchedShow) => {
+    const matchedKeys = getMusicPersonTaggedShowMergeKeys(matchedShow);
+    return Array.from(matchedKeys).some((key) => showKeys.has(key));
+  }) || null;
+}
+
+function mergeMusicPersonTaggedShowWithMatchedPhotos(show, matchedPhotoShows) {
+  const matchedShow = findMusicPersonMatchedPhotoShow(show, matchedPhotoShows);
+  const matchedThumbnails = Array.isArray(matchedShow?.thumbnails) ? matchedShow.thumbnails : [];
+  const showThumbnails = Array.isArray(show?.thumbnails) ? show.thumbnails : [];
+  if (matchedThumbnails.length <= showThumbnails.length) {
+    return show;
+  }
+
+  return {
+    ...show,
+    showRoute: show.showRoute || matchedShow.showRoute,
+    setCode: show.setCode || matchedShow.setCode,
+    taggedPhotosLabel: show.taggedPhotosLabel || matchedShow.taggedPhotosLabel,
+    thumbnails: matchedThumbnails,
+  };
+}
+
 function getMusicPersonTaggedShowsForBands(associatedBands) {
   if (musicShowsSetsDataState !== "live" || musicShowsSetsCollection.length === 0 || associatedBands.length === 0) {
     return [];
@@ -7701,7 +7751,9 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
   const taggedShowRows = getMusicPersonTaggedShowRows(source);
   const matchedPhotoShows = getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands);
   const taggedShows = taggedShowRows.length > 0
-    ? taggedShowRows.map((show, index) => normalizeMusicPersonTaggedShowRow(show, index, associatedBands))
+    ? taggedShowRows
+      .map((show, index) => normalizeMusicPersonTaggedShowRow(show, index, associatedBands))
+      .map((show) => mergeMusicPersonTaggedShowWithMatchedPhotos(show, matchedPhotoShows))
     : matchedPhotoShows.length > 0
       ? matchedPhotoShows
     : getMusicPersonTaggedShowsForBands(associatedBands);
