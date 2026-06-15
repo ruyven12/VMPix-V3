@@ -20,6 +20,7 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE = "/api/music/smugmug/albums";
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT = 12;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
+const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
@@ -6992,6 +6993,73 @@ function getMusicPersonOriginalDateTime(source, type) {
     .find(Boolean) || "";
 }
 
+function getMusicPersonArchiveDateParts(value) {
+  if (value instanceof Date && Number.isFinite(value.getTime())) {
+    return {
+      year: value.getUTCFullYear(),
+      month: value.getUTCMonth() + 1,
+      day: value.getUTCDate(),
+    };
+  }
+
+  const text = getMusicPeopleText(value);
+  if (!text) {
+    return null;
+  }
+
+  const displayMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (displayMatch) {
+    const yearValue = Number.parseInt(displayMatch[3], 10);
+    return {
+      year: displayMatch[3].length === 2 ? 2000 + yearValue : yearValue,
+      month: Number.parseInt(displayMatch[1], 10),
+      day: Number.parseInt(displayMatch[2], 10),
+    };
+  }
+
+  const archiveMatch = text.match(/^(\d{4})[:/-](\d{1,2})[:/-](\d{1,2})/);
+  if (archiveMatch) {
+    return {
+      year: Number.parseInt(archiveMatch[1], 10),
+      month: Number.parseInt(archiveMatch[2], 10),
+      day: Number.parseInt(archiveMatch[3], 10),
+    };
+  }
+
+  const cleanedDate = text.replace(/\b(\d{1,2})(st|nd|rd|th)\b/gi, "$1");
+  const parsedDate = new Date(cleanedDate);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return {
+    year: parsedDate.getUTCFullYear(),
+    month: parsedDate.getUTCMonth() + 1,
+    day: parsedDate.getUTCDate(),
+  };
+}
+
+function isValidMusicPersonArchiveDateParts(parts) {
+  if (!parts) {
+    return false;
+  }
+
+  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
+  return date.getUTCFullYear() === parts.year &&
+    date.getUTCMonth() === parts.month - 1 &&
+    date.getUTCDate() === parts.day;
+}
+
+function formatMusicPersonArchiveDateParts(parts) {
+  return isValidMusicPersonArchiveDateParts(parts)
+    ? [
+      String(parts.month).padStart(2, "0"),
+      String(parts.day).padStart(2, "0"),
+      String(parts.year),
+    ].join("/")
+    : "";
+}
+
 function parseMusicPersonOriginalDateTime(value) {
   const text = getMusicPeopleText(value);
   if (!text) {
@@ -7024,12 +7092,7 @@ function parseMusicPersonOriginalDateTime(value) {
 }
 
 function formatMusicPersonSeenDateTime(time) {
-  const date = new Date(time);
-  return [
-    String(date.getUTCMonth() + 1).padStart(2, "0"),
-    String(date.getUTCDate()).padStart(2, "0"),
-    String(date.getUTCFullYear()),
-  ].join("/");
+  return formatMusicPersonArchiveDateParts(getMusicPersonArchiveDateParts(new Date(time)));
 }
 
 function getMusicPersonOriginalDateTimeCandidates(source, type) {
@@ -7240,15 +7303,16 @@ function getMusicPersonTaggedShowBandContext(show, associatedBands) {
 }
 
 function getMusicPersonShowDateParts(show) {
-  const parsedDate = parseMusicShowDate(show?.rawDate || show?.date || show?.show_date || show?.eventDate || show?.formattedDate);
-  if (!parsedDate) {
+  const dateParts = getMusicPersonArchiveDateParts(show?.rawDate || show?.date || show?.show_date || show?.eventDate || show?.formattedDate);
+  if (!isValidMusicPersonArchiveDateParts(dateParts)) {
     return { month: "Date", day: "--", year: "Pending" };
   }
 
+  const parsedDate = new Date(Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day));
   return {
-    month: parsedDate.toLocaleString("en-US", { month: "short" }),
-    day: String(parsedDate.getDate()).padStart(2, "0"),
-    year: String(parsedDate.getFullYear()),
+    month: parsedDate.toLocaleString("en-US", { month: "short", timeZone: "UTC" }),
+    day: String(dateParts.day).padStart(2, "0"),
+    year: String(dateParts.year),
   };
 }
 
@@ -7313,6 +7377,8 @@ function getMusicPersonMatchedPhotos(source) {
 
 function getMusicPersonTaggedShowPhotos(show) {
   return [
+    show?.lightbox_photos,
+    show?.lightboxPhotos,
     show?.matched_photos,
     show?.matchedPhotos,
     show?.photos,
@@ -7472,7 +7538,8 @@ function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
     expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
     contributors: "Contributors: Coming Soon",
     notes: "",
-    thumbnails: photos,
+    thumbnails: photos.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT),
+    lightboxPhotos: photos,
   };
 }
 
@@ -7525,6 +7592,8 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
     showRoute: getMusicPersonTaggedShowRoute(group, associatedBands),
     setCode: getMusicPersonTaggedShowSetCode(group, getMusicPersonTaggedShowMatchedShow(group)),
     taggedPhotosLabel: formatMusicPeopleCount(group.thumbnails.length, "Tagged Photo"),
+    lightboxPhotos: group.thumbnails.slice(),
+    thumbnails: group.thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT),
   }));
 }
 
@@ -7552,6 +7621,7 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
         contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
         notes: "",
         thumbnails: ["Photo 01", "Photo 02", "Photo 03", "Photo 04"],
+        lightboxPhotos: [],
       };
     });
 }
@@ -7938,8 +8008,9 @@ function updateMusicPersonShowCardThumbnails(card, thumbnails) {
     },
   };
   const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(thumbnails);
+  const previewThumbnails = thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
   const fragment = document.createDocumentFragment();
-  thumbnails.forEach((thumbnail) => {
+  previewThumbnails.forEach((thumbnail) => {
     fragment.append(createMusicPersonTaggedThumb(thumbnail, { lightboxPhotos, show }));
   });
   thumbGrid.replaceChildren(fragment);
@@ -8085,9 +8156,15 @@ function createMusicPersonShowCard(show, personName) {
   thumbs.className = "person-show-tagged-thumbs";
   thumbs.setAttribute("aria-label", `${show.title} ${personName} tagged photos`);
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
-  if (taggedThumbnails.length > 0) {
-    const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedThumbnails);
-    taggedThumbnails.forEach((label) => {
+  const taggedLightboxSource = Array.isArray(show.lightboxPhotos) && show.lightboxPhotos.length > 0
+    ? show.lightboxPhotos
+    : taggedThumbnails;
+  const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedLightboxSource);
+  const previewThumbnails = taggedThumbnails.length > 0
+    ? taggedThumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT)
+    : taggedLightboxSource.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
+  if (previewThumbnails.length > 0) {
+    previewThumbnails.forEach((label) => {
       thumbs.append(createMusicPersonTaggedThumb(label, { lightboxPhotos, show }));
     });
   } else {
