@@ -6820,10 +6820,15 @@ function isPublicMusicPeopleIndexRow(person) {
     && !categoryTokens.includes("friends");
 }
 
+function hasVisibleMusicPeoplePhotoCount(person) {
+  return Number.isFinite(person?.photos) && person.photos > 0;
+}
+
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
     .filter((person) => person.name && isPublicMusicPeopleIndexRow(person))
+    .filter(hasVisibleMusicPeoplePhotoCount)
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
