@@ -101,6 +101,8 @@ let activeMusicPeopleSearch = "";
 let activeMusicPeopleLetterFilter = "";
 let activeMusicPeopleCategoryFilter = "";
 let activeMusicPeopleInstrumentFilter = "";
+let activeLightboxCustomTiles = null;
+let activeLightboxReturnContext = null;
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -4033,6 +4035,8 @@ function setLightboxVisible(isVisible) {
     });
   } else {
     lightboxScreen.setAttribute("inert", "");
+    activeLightboxCustomTiles = null;
+    activeLightboxReturnContext = null;
   }
 }
 
@@ -4775,6 +4779,10 @@ function protectArchiveImage(image) {
 }
 
 function getCurrentGalleryPhotoTiles() {
+  if (Array.isArray(activeLightboxCustomTiles) && activeLightboxCustomTiles.length > 0) {
+    return activeLightboxCustomTiles;
+  }
+
   return galleryGrid
     ? Array.from(galleryGrid.querySelectorAll("[data-gallery-photo]"))
     : Array.from(galleryPhotoTiles || []);
@@ -5184,6 +5192,7 @@ function syncLightboxThumbButtons() {
 function setLightboxActivePhoto(index, options = {}) {
   const data = getLightboxPhotoData(index);
   const didChangePhoto = activeLightboxIndex !== data.normalizedIndex;
+  const tileDataset = data.tile?.dataset || {};
   activeLightboxIndex = data.normalizedIndex;
 
   if (options.shouldSyncGallery !== false && data.tile) {
@@ -5213,35 +5222,35 @@ function setLightboxActivePhoto(index, options = {}) {
     lightboxMetaTitle.textContent = data.label;
   }
   if (lightboxMetaBandTags) {
-    lightboxMetaBandTags.textContent = activeMusicBand ? activeMusicBand.name : "13 High";
+    lightboxMetaBandTags.textContent = tileDataset.galleryBandTags || (activeMusicBand ? activeMusicBand.name : "13 High");
   }
   if (lightboxMetaShow) {
-    lightboxMetaShow.textContent = activeSetRow && activeSetRow.dataset.setTitle
+    lightboxMetaShow.textContent = tileDataset.galleryShow || (activeSetRow && activeSetRow.dataset.setTitle
       ? activeSetRow.dataset.setTitle
-      : "In Yo Face Tour 2018";
+      : "In Yo Face Tour 2018");
   }
   if (lightboxMetaVenue) {
-    lightboxMetaVenue.textContent = activeSetRow ? getSetVenue(activeSetRow) : "O'Donoghues Pub";
+    lightboxMetaVenue.textContent = tileDataset.galleryVenue || (activeSetRow ? getSetVenue(activeSetRow) : "O'Donoghues Pub");
   }
   if (lightboxMetaLocation) {
-    lightboxMetaLocation.textContent = activeSetRow && activeSetRow.dataset.setLocation
+    lightboxMetaLocation.textContent = tileDataset.galleryLocation || (activeSetRow && activeSetRow.dataset.setLocation
       ? activeSetRow.dataset.setLocation
-      : "Brunswick, Maine";
+      : "Brunswick, Maine");
   }
   if (lightboxMetaDate) {
-    lightboxMetaDate.textContent = activeSetRow && activeSetRow.dataset.setDate
+    lightboxMetaDate.textContent = tileDataset.galleryDate || (activeSetRow && activeSetRow.dataset.setDate
       ? activeSetRow.dataset.setDate
-      : "July 14th, 2018";
+      : "July 14th, 2018");
   }
   if (lightboxMetaPerformance) {
-    lightboxMetaPerformance.textContent = activeSetRow && activeSetRow.dataset.setPerformance
+    lightboxMetaPerformance.textContent = tileDataset.galleryPerformance || (activeSetRow && activeSetRow.dataset.setPerformance
       ? activeSetRow.dataset.setPerformance
-      : "11th";
+      : "11th");
   }
   if (lightboxMetaCamera) {
-    lightboxMetaCamera.textContent = activeSetRow && activeSetRow.dataset.setCamera
+    lightboxMetaCamera.textContent = tileDataset.galleryCamera || (activeSetRow && activeSetRow.dataset.setCamera
       ? activeSetRow.dataset.setCamera
-      : "Canon EOS 80D";
+      : "Canon EOS 80D");
   }
   if (didChangePhoto || options.forceTransition) {
     runLightboxImageTransition();
@@ -5297,9 +5306,14 @@ function setLightboxControlsHidden(isHidden) {
   }
 }
 
-function showLightbox(photoTile = activeGalleryPhoto) {
+function showLightbox(photoTile = activeGalleryPhoto, options = {}) {
   if (!lightboxScreen) {
     return;
+  }
+
+  activeLightboxReturnContext = options.returnContext || { source: "set-gallery" };
+  if (activeLightboxReturnContext.source !== "person-detail") {
+    activeLightboxCustomTiles = null;
   }
 
   const tiles = getCurrentGalleryPhotoTiles();
@@ -5332,6 +5346,29 @@ function showLightbox(photoTile = activeGalleryPhoto) {
 }
 
 function returnToSetGalleryFromLightbox() {
+  const returnContext = activeLightboxReturnContext;
+  if (returnContext?.source === "person-detail") {
+    const previousActiveGalleryPhoto = returnContext.previousActiveGalleryPhoto || null;
+    const focusTarget = returnContext.focusElement && document.contains(returnContext.focusElement)
+      ? returnContext.focusElement
+      : null;
+    const scrollTop = Number.isFinite(returnContext.scrollTop) ? returnContext.scrollTop : null;
+
+    setLightboxVisible(false);
+    activeGalleryPhoto = previousActiveGalleryPhoto;
+    setMusicPersonDetailVisible(true);
+    setCurrentView("Person Detail");
+    window.requestAnimationFrame(() => {
+      if (musicNexusShell && scrollTop !== null) {
+        musicNexusShell.scrollTo({ top: scrollTop, behavior: "auto" });
+      }
+      if (focusTarget) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+    return;
+  }
+
   setLightboxVisible(false);
   setSetGalleryVisible(true);
   setCurrentView(activeSetRow?.dataset.setTitle || "Set Gallery");
@@ -7234,6 +7271,24 @@ function getMusicPersonMatchedPhotoUrl(photo) {
   return getMusicPeopleText(photo.thumbnail_url || photo.thumbnailUrl || photo.small_url || photo.smallUrl || photo.medium_url || photo.mediumUrl || photo.imageSrc);
 }
 
+function getMusicPersonMatchedPhotoLightboxUrl(photo) {
+  if (!photo || typeof photo !== "object") {
+    return "";
+  }
+  return getMusicPeopleText(
+    photo.large_url ||
+    photo.largeUrl ||
+    photo.medium_url ||
+    photo.mediumUrl ||
+    photo.small_url ||
+    photo.smallUrl ||
+    photo.thumbnail_url ||
+    photo.thumbnailUrl ||
+    photo.lightboxSrc ||
+    photo.imageSrc
+  );
+}
+
 function getMusicPersonTaggedShowRows(source) {
   return [
     source?.tagged_shows,
@@ -7724,9 +7779,107 @@ function toggleMusicPersonShowCard(card) {
   }
 }
 
-function createMusicPersonTaggedThumb(item) {
-  const thumb = document.createElement("span");
+function getMusicPersonTaggedLightboxPhotos(items) {
+  return (Array.isArray(items) ? items : [])
+    .filter((item) => item && typeof item === "object" && getMusicPersonMatchedPhotoLightboxUrl(item));
+}
+
+function getMusicPersonTaggedShowDateLabel(show) {
+  const date = show?.date || {};
+  const month = getMusicPeopleText(date.month);
+  const day = getMusicPeopleText(date.day);
+  const year = getMusicPeopleText(date.year);
+  if (!month || !day || !year || month === "Date" || day === "--" || year === "Pending") {
+    return "";
+  }
+  return `${month} ${day}, ${year}`;
+}
+
+function getMusicPersonLightboxPhotoLabel(photo, index = 0) {
+  return getMusicPeopleText(
+    photo?.label ||
+    photo?.title ||
+    photo?.caption ||
+    photo?.Caption ||
+    photo?.image_key ||
+    photo?.imageKey
+  ) || `Tagged photo ${index + 1}`;
+}
+
+function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
+  const imageSrc = getMusicPersonMatchedPhotoUrl(photo) || getMusicPersonMatchedPhotoLightboxUrl(photo);
+  const lightboxSrc = getMusicPersonMatchedPhotoLightboxUrl(photo) || imageSrc;
+  const imageKey = getMusicPeopleText(photo?.image_key || photo?.imageKey || photo?.dedupeKey || lightboxSrc) || `tagged-photo-${index + 1}`;
+  const label = getMusicPersonLightboxPhotoLabel(photo, index);
+  const tile = document.createElement("button");
+  tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
+  tile.type = "button";
+  tile.dataset.galleryPhoto = "";
+  tile.dataset.galleryPhotoLabel = label;
+  tile.dataset.galleryKind = "image";
+  tile.dataset.galleryMediaId = imageKey;
+  tile.dataset.galleryLightboxId = `music-person-tagged-photo-${createMusicPeopleSlug(imageKey) || index + 1}`;
+  tile.dataset.galleryLightboxSrc = lightboxSrc;
+  tile.dataset.galleryBandTags = getMusicPeopleText(show.bandContext);
+  tile.dataset.galleryShow = getMusicPeopleText(show.title);
+  tile.dataset.galleryVenue = getMusicPeopleText(show.venue);
+  tile.dataset.galleryLocation = getMusicPeopleText(show.location);
+  tile.dataset.galleryDate = getMusicPersonTaggedShowDateLabel(show);
+  tile.setAttribute("aria-label", label);
+  tile.setAttribute("aria-pressed", String(index === 0));
+
+  const image = document.createElement("img");
+  image.className = "archive-gallery-image";
+  image.src = imageSrc || lightboxSrc;
+  image.alt = "";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = galleryImageFallbackSrc;
+  };
+  protectArchiveImage(image);
+  tile.append(image);
+  return tile;
+}
+
+function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show) {
+  const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(photos);
+  if (lightboxPhotos.length === 0) {
+    return;
+  }
+
+  const safeIndex = Math.max(0, Math.min(Number.parseInt(photoIndex, 10) || 0, lightboxPhotos.length - 1));
+  const previousActiveGalleryPhoto = activeGalleryPhoto || null;
+  const returnContext = {
+    source: "person-detail",
+    focusElement: trigger || null,
+    previousActiveGalleryPhoto,
+    scrollTop: musicNexusShell ? musicNexusShell.scrollTop : 0,
+  };
+  activeLightboxCustomTiles = lightboxPhotos.map((photo, index) => createMusicPersonTaggedLightboxTile(photo, index, show));
+  const targetTile = activeLightboxCustomTiles[safeIndex] || activeLightboxCustomTiles[0] || null;
+  showLightbox(targetTile, { returnContext });
+}
+
+function createMusicPersonTaggedThumb(item, options = {}) {
+  const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(options.lightboxPhotos);
+  const lightboxIndex = lightboxPhotos.indexOf(item);
+  const canOpenLightbox = lightboxIndex >= 0;
+  const thumb = document.createElement(canOpenLightbox ? "button" : "span");
   thumb.className = "person-show-tagged-thumb";
+  if (canOpenLightbox) {
+    thumb.type = "button";
+    thumb.setAttribute(
+      "aria-label",
+      `Open ${getMusicPeopleText(options.show?.title) || "tagged show"} tagged photo ${lightboxIndex + 1} of ${lightboxPhotos.length}`
+    );
+    thumb.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openMusicPersonTaggedPhotoLightbox(lightboxPhotos, lightboxIndex, thumb, options.show);
+    });
+  }
+
   const imageUrl = getMusicPersonMatchedPhotoUrl(item);
   if (imageUrl) {
     const image = document.createElement("img");
@@ -7773,9 +7926,21 @@ function updateMusicPersonShowCardThumbnails(card, thumbnails) {
     return;
   }
 
+  const show = {
+    title: getMusicPeopleText(card.dataset.personShowTitle),
+    venue: getMusicPeopleText(card.dataset.personShowVenue),
+    location: getMusicPeopleText(card.dataset.personShowLocation),
+    bandContext: getMusicPeopleText(card.dataset.personShowBandContext),
+    date: {
+      month: getMusicPeopleText(card.dataset.personShowDateMonth),
+      day: getMusicPeopleText(card.dataset.personShowDateDay),
+      year: getMusicPeopleText(card.dataset.personShowDateYear),
+    },
+  };
+  const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(thumbnails);
   const fragment = document.createDocumentFragment();
   thumbnails.forEach((thumbnail) => {
-    fragment.append(createMusicPersonTaggedThumb(thumbnail));
+    fragment.append(createMusicPersonTaggedThumb(thumbnail, { lightboxPhotos, show }));
   });
   thumbGrid.replaceChildren(fragment);
 
@@ -7829,6 +7994,13 @@ function createMusicPersonShowCard(show, personName) {
   card.className = "person-show-card";
   card.classList.toggle("is-expanded", isExpanded);
   card.dataset.personShowId = show.showId;
+  card.dataset.personShowTitle = getMusicPeopleText(show.title);
+  card.dataset.personShowVenue = getMusicPeopleText(show.venue);
+  card.dataset.personShowLocation = getMusicPeopleText(show.location);
+  card.dataset.personShowBandContext = getMusicPeopleText(show.bandContext);
+  card.dataset.personShowDateMonth = getMusicPeopleText(show.date?.month);
+  card.dataset.personShowDateDay = getMusicPeopleText(show.date?.day);
+  card.dataset.personShowDateYear = getMusicPeopleText(show.date?.year);
 
   const summary = document.createElement("button");
   summary.className = "person-show-summary";
@@ -7914,8 +8086,9 @@ function createMusicPersonShowCard(show, personName) {
   thumbs.setAttribute("aria-label", `${show.title} ${personName} tagged photos`);
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
   if (taggedThumbnails.length > 0) {
+    const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedThumbnails);
     taggedThumbnails.forEach((label) => {
-      thumbs.append(createMusicPersonTaggedThumb(label));
+      thumbs.append(createMusicPersonTaggedThumb(label, { lightboxPhotos, show }));
     });
   } else {
     thumbs.append(createMusicPersonEmptyState("No person-tagged photos in this show yet."));
