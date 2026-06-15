@@ -41,6 +41,7 @@ let musicPeopleIndexRequest = null;
 let musicPeopleIndexLoaded = false;
 let musicPeopleIndexDataState = "idle";
 const musicPersonDetailArchiveRequests = new Map();
+const musicPersonDetailArchiveRows = new Map();
 let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
@@ -1267,7 +1268,22 @@ function getMusicPeopleIndexCollection() {
 }
 
 function setMusicPeopleIndexCollection(rows, stateName = "fallback") {
-  musicPeopleIndexCollection = Array.isArray(rows) ? rows : [];
+  const sourceRows = Array.isArray(rows) ? rows : [];
+  musicPeopleIndexCollection = sourceRows.map((row) => {
+    const rowKey = getMusicPersonCollectionKey(row);
+    const archiveRow = rowKey ? musicPersonDetailArchiveRows.get(rowKey) : null;
+    if (!archiveRow) {
+      return row;
+    }
+    return {
+      ...row,
+      ...archiveRow,
+      backend_record: {
+        ...(row.backend_record || row),
+        ...(archiveRow.backend_record || archiveRow),
+      },
+    };
+  });
   musicPeopleIndexDataState = stateName;
   if (typeof mockCollections !== "undefined") {
     mockCollections.musicPeople = musicPeopleIndexCollection;
@@ -1311,7 +1327,7 @@ function getMusicPeopleIndexApiUrl(page = 1) {
   const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
   apiUrl.searchParams.set("limit", String(MUSIC_PEOPLE_INDEX_API_LIMIT));
   apiUrl.searchParams.set("page", String(Math.max(1, Number.parseInt(page, 10) || 1)));
-  apiUrl.searchParams.set("archive", "0");
+  apiUrl.searchParams.set("archive", "cache");
   return apiUrl;
 }
 
@@ -1413,6 +1429,9 @@ function mergeMusicPersonDetailArchiveRow(row) {
   }
 
   const rowKey = getMusicPersonCollectionKey(normalizedRow);
+  if (rowKey) {
+    musicPersonDetailArchiveRows.set(rowKey, normalizedRow);
+  }
   const existingRows = getMusicPeopleIndexCollection();
   const existingIndex = existingRows.findIndex((person) => getMusicPersonCollectionKey(person) === rowKey);
   const nextRows = existingRows.slice();
@@ -6573,6 +6592,21 @@ function getMusicPeopleCountValue(...values) {
   return Number.parseInt(foundValue, 10) || 0;
 }
 
+function getOptionalMusicPeopleCountValue(...values) {
+  const foundValue = values.find((value) => {
+    if (value === null || typeof value === "undefined" || value === "") {
+      return false;
+    }
+    const parsedValue = Number.parseInt(value, 10);
+    return Number.isFinite(parsedValue) && parsedValue >= 0;
+  });
+  if (typeof foundValue === "undefined") {
+    return null;
+  }
+  const parsedValue = Number.parseInt(foundValue, 10);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
 function getMusicPeopleLetter(person) {
   const firstLetter = getMusicPeopleText(person?.name).charAt(0).toUpperCase();
   return musicPeopleAlphabet.includes(firstLetter) ? firstLetter : "#";
@@ -6590,7 +6624,7 @@ function normalizeMusicPeopleIndexRow(person) {
   const isFriend = categoryFilterValue === "friend";
   const bandNames = getMusicPeopleBandNames(source);
   const instrumentNames = getMusicPeopleInstrumentNames(source);
-  const appearances = getMusicPeopleCountValue(
+  const appearances = getOptionalMusicPeopleCountValue(
     source.appearances,
     source.appearance_count,
     source.appearances_count,
@@ -6602,7 +6636,7 @@ function normalizeMusicPeopleIndexRow(person) {
     source.backend_record?.stats?.showCount,
     source.backend_record?.stats?.appearanceCount
   );
-  const photos = getMusicPeopleCountValue(
+  const photos = getOptionalMusicPeopleCountValue(
     source.photos,
     source.photoCount,
     source.photo_count,
@@ -7577,6 +7611,8 @@ function returnToMusicPeopleRoute() {
 
 function createMusicPeopleRow(person) {
   const isFriend = person.categoryFilterValue === "friend";
+  const hasAppearances = Number.isFinite(person.appearances);
+  const hasPhotos = Number.isFinite(person.photos);
   const row = document.createElement("button");
   row.className = "music-people-row";
   row.type = "button";
@@ -7594,8 +7630,8 @@ function createMusicPeopleRow(person) {
       isFriend ? "" : person.categoryNumberText,
       isFriend ? "" : person.bandText,
       isFriend ? "" : person.instrumentText,
-      !isFriend || person.appearances > 0 ? formatMusicPeopleCount(person.appearances, "Appearance") : "",
-      !isFriend || person.photos > 0 ? formatMusicPeopleCount(person.photos, "Photo") : "",
+      hasAppearances && (!isFriend || person.appearances > 0) ? formatMusicPeopleCount(person.appearances, "Appearance") : "",
+      hasPhotos && (!isFriend || person.photos > 0) ? formatMusicPeopleCount(person.photos, "Photo") : "",
     ].filter(Boolean).join(", ")
   );
 
@@ -7615,7 +7651,7 @@ function createMusicPeopleRow(person) {
   stats.className = "music-people-stats";
   const renderedStats = [];
 
-  if (!isFriend || person.appearances > 0) {
+  if (hasAppearances && (!isFriend || person.appearances > 0)) {
     const appearances = document.createElement("span");
     appearances.className = "music-people-stat";
     appearances.setAttribute("aria-label", `${formatMusicPeopleNumber(person.appearances)} appearances`);
@@ -7628,7 +7664,7 @@ function createMusicPeopleRow(person) {
     renderedStats.push(appearances);
   }
 
-  if (!isFriend || person.photos > 0) {
+  if (hasPhotos && (!isFriend || person.photos > 0)) {
     const photos = document.createElement("span");
     photos.className = "music-people-stat";
     photos.setAttribute("aria-label", `${formatMusicPeopleNumber(person.photos)} photos`);
