@@ -20,7 +20,6 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE = "/api/music/smugmug/albums";
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT = 12;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
-const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
@@ -7377,8 +7376,6 @@ function getMusicPersonMatchedPhotos(source) {
 
 function getMusicPersonTaggedShowPhotos(show) {
   return [
-    show?.lightbox_photos,
-    show?.lightboxPhotos,
     show?.matched_photos,
     show?.matchedPhotos,
     show?.photos,
@@ -7538,8 +7535,7 @@ function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
     expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
     contributors: "Contributors: Coming Soon",
     notes: "",
-    thumbnails: photos.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT),
-    lightboxPhotos: photos,
+    thumbnails: photos,
   };
 }
 
@@ -7592,8 +7588,6 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
     showRoute: getMusicPersonTaggedShowRoute(group, associatedBands),
     setCode: getMusicPersonTaggedShowSetCode(group, getMusicPersonTaggedShowMatchedShow(group)),
     taggedPhotosLabel: formatMusicPeopleCount(group.thumbnails.length, "Tagged Photo"),
-    lightboxPhotos: group.thumbnails.slice(),
-    thumbnails: group.thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT),
   }));
 }
 
@@ -7621,7 +7615,6 @@ function getMusicPersonTaggedShowsForBands(associatedBands) {
         contributors: getMusicPeopleText(show.contributors) ? `Contributors: ${show.contributors}` : "Contributors: Coming Soon",
         notes: "",
         thumbnails: ["Photo 01", "Photo 02", "Photo 03", "Photo 04"],
-        lightboxPhotos: [],
       };
     });
 }
@@ -8008,9 +8001,8 @@ function updateMusicPersonShowCardThumbnails(card, thumbnails) {
     },
   };
   const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(thumbnails);
-  const previewThumbnails = thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
   const fragment = document.createDocumentFragment();
-  previewThumbnails.forEach((thumbnail) => {
+  thumbnails.forEach((thumbnail) => {
     fragment.append(createMusicPersonTaggedThumb(thumbnail, { lightboxPhotos, show }));
   });
   thumbGrid.replaceChildren(fragment);
@@ -8156,15 +8148,9 @@ function createMusicPersonShowCard(show, personName) {
   thumbs.className = "person-show-tagged-thumbs";
   thumbs.setAttribute("aria-label", `${show.title} ${personName} tagged photos`);
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
-  const taggedLightboxSource = Array.isArray(show.lightboxPhotos) && show.lightboxPhotos.length > 0
-    ? show.lightboxPhotos
-    : taggedThumbnails;
-  const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedLightboxSource);
-  const previewThumbnails = taggedThumbnails.length > 0
-    ? taggedThumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT)
-    : taggedLightboxSource.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
-  if (previewThumbnails.length > 0) {
-    previewThumbnails.forEach((label) => {
+  if (taggedThumbnails.length > 0) {
+    const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedThumbnails);
+    taggedThumbnails.forEach((label) => {
       thumbs.append(createMusicPersonTaggedThumb(label, { lightboxPhotos, show }));
     });
   } else {
