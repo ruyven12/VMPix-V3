@@ -7746,10 +7746,6 @@ function createMusicPersonShowCard(show, personName) {
   location.textContent = show.location;
   copy.append(title, venue, location);
 
-  const bandContext = document.createElement("span");
-  bandContext.className = "person-show-band-context";
-  bandContext.textContent = bandContextLabel;
-
   const count = document.createElement("span");
   count.className = "person-show-count";
   count.textContent = taggedPhotosLabel;
@@ -7763,10 +7759,15 @@ function createMusicPersonShowCard(show, personName) {
   actionGroup.className = "person-show-action";
   actionGroup.append(count, toggle);
 
-  summary.append(date, copy, bandContext, actionGroup);
+  summary.append(date, copy, actionGroup);
   summary.addEventListener("click", () => {
     toggleMusicPersonShowCard(card);
   });
+
+  const action = document.createElement("button");
+  action.className = "person-show-view";
+  action.type = "button";
+  action.textContent = "View Show";
 
   const expanded = document.createElement("div");
   expanded.className = "person-show-expanded";
@@ -7795,17 +7796,11 @@ function createMusicPersonShowCard(show, personName) {
     notes.textContent = noteText;
   }
 
-  const action = document.createElement("button");
-  action.className = "person-show-view";
-  action.type = "button";
-  action.textContent = "View Show";
-
   expanded.append(thumbs, meta);
   if (notes) {
     expanded.append(notes);
   }
-  expanded.append(action);
-  card.append(summary, expanded);
+  card.append(summary, action, expanded);
   return card;
 }
 
