@@ -171,9 +171,12 @@ function getMusicPersonDetailData(personId) {
   if (normalizedPersonId === "loading") {
     return createMusicPersonDetailStateData("loading", normalizedPersonId);
   }
+  if (!musicPeopleIndexLoaded && typeof fetch === "function") {
+    return createMusicPersonDetailStateData("loading", normalizedPersonId);
+  }
 
   const sourcePerson = findMusicPersonById(normalizedPersonId);
-  const placeholderData = normalizedPersonId === musicPersonDetailPlaceholder.personId
+  const placeholderData = !sourcePerson && normalizedPersonId === musicPersonDetailPlaceholder.personId
     ? musicPersonDetailPlaceholder
     : null;
   if (!sourcePerson && !placeholderData) {
@@ -6812,10 +6815,16 @@ function isPublicMusicPeopleIndexRow(person) {
     && !categoryTokens.includes("friends");
 }
 
+function hasVisibleMusicPeopleIndexStats(person) {
+  return Number.isFinite(person?.appearances) && person.appearances > 0
+    || Number.isFinite(person?.photos) && person.photos > 0;
+}
+
 function getMusicPeopleIndexRows() {
   return getMusicPeopleIndexCollection()
     .map(normalizeMusicPeopleIndexRow)
     .filter((person) => person.name && isPublicMusicPeopleIndexRow(person))
+    .filter(hasVisibleMusicPeopleIndexStats)
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
@@ -7442,8 +7451,8 @@ function getMusicPersonDetailViewData(source, requestedPersonId) {
     categoryPill: person.categoryDisplay,
     instrumentPills,
     archiveRows: [
-      { label: "Appearances", value: Number.isFinite(appearances) ? formatMusicPeopleNumber(appearances) : "Pending" },
-      { label: "Photos", value: Number.isFinite(photos) ? formatMusicPeopleNumber(photos) : "Pending" },
+      { label: "Appearances", value: Number.isFinite(appearances) && appearances > 0 ? formatMusicPeopleNumber(appearances) : "Pending" },
+      { label: "Photos", value: Number.isFinite(photos) && photos > 0 ? formatMusicPeopleNumber(photos) : "Pending" },
       { label: "First Seen", value: getMusicPersonSeenValue(source, "first") },
       { label: "Latest Seen", value: getMusicPersonSeenValue(source, "latest") },
     ],
