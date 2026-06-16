@@ -1,0 +1,15 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Chris Kates
+N:Kates;Chris;;;
+ORG:Voodoo Media
+TITLE:Photographer
+EMAIL;TYPE=INTERNET,WORK:ruyven12@gmail.com
+URL;TYPE=WORK:https://vmpix.onrender.com
+item1.URL:https://www.instagram.com/vmpix1
+item1.X-ABLabel:Instagram
+item2.URL:https://www.facebook.com/VMPix
+item2.X-ABLabel:Facebook
+item3.URL:https://x.com/vmpix1
+item3.X-ABLabel:X
+END:VCARD
