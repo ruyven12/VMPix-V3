@@ -66,6 +66,11 @@ body.is-connect-route .public-home {
   --connect-stage-pad-inline-start: max(0.5rem, env(safe-area-inset-left));
   --connect-stage-pad-inline-end: max(0.5rem, env(safe-area-inset-right));
   --connect-card-target-block: calc((var(--connect-vh, 1vh) * 100) - var(--connect-stage-pad-block-start) - var(--connect-stage-pad-block-end));
+  --connect-effect-top: 0px;
+  --connect-effect-right: 0px;
+  --connect-effect-bottom: 0px;
+  --connect-effect-left: 0px;
+  --connect-effect-radius: 22px;
   position: relative;
   width: 100%;
   min-width: 0;
@@ -94,6 +99,13 @@ body.is-connect-route .public-home {
 .connect-sweep {
   position: absolute;
   inset: 0;
+  clip-path: inset(
+    var(--connect-effect-top)
+    var(--connect-effect-right)
+    var(--connect-effect-bottom)
+    var(--connect-effect-left)
+    round var(--connect-effect-radius)
+  );
   pointer-events: none;
 }
 
@@ -134,7 +146,6 @@ body.is-connect-route .public-home {
 
 .connect-atmosphere {
   z-index: 3;
-  inset: -28%;
   background:
     radial-gradient(60% 45% at 50% 40%, rgba(0, 255, 255, 0.16), transparent 60%),
     radial-gradient(45% 35% at 30% 65%, rgba(160, 70, 255, 0.13), transparent 62%),
@@ -149,7 +160,6 @@ body.is-connect-route .public-home {
 
 .connect-smoke {
   z-index: 3;
-  inset: -35%;
   background:
     radial-gradient(55% 40% at 20% 55%, rgba(0, 255, 255, 0.07), transparent 62%),
     radial-gradient(55% 40% at 80% 60%, rgba(0, 255, 255, 0.07), transparent 62%),
@@ -178,8 +188,8 @@ body.is-connect-route .public-home {
 
 .connect-sweep {
   z-index: 5;
-  top: -20%;
-  height: 22%;
+  top: 0;
+  height: 100%;
   background: linear-gradient(
     to bottom,
     rgba(255, 60, 60, 0) 0%,
@@ -210,10 +220,7 @@ body.is-connect-route .public-home {
     clamp(1.14rem, 4.25svh, 1.82rem);
   border: 2px solid var(--connect-red-soft);
   border-radius: 22px;
-  background:
-    radial-gradient(70% 45% at 50% 82%, rgba(0, 255, 255, 0.05), transparent 64%),
-    radial-gradient(70% 50% at 50% 12%, rgba(255, 60, 60, 0.08), transparent 65%),
-    linear-gradient(180deg, var(--connect-panel), var(--connect-panel-soft));
+  background: transparent;
   box-shadow:
     0 14px 36px rgba(0, 0, 0, 0.52),
     inset 0 0 0 1px rgba(255, 60, 60, 0.1),

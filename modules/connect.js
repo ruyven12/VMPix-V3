@@ -9,6 +9,7 @@
   const root = document.documentElement;
   const connectStage = document.querySelector("[data-connect-stage]");
   const canvas = document.querySelector("[data-connect-embers]");
+  const connectPanel = document.querySelector(".connect-panel");
   const logoFrame = document.querySelector("[data-connect-logo-frame]");
   const logoVideo = document.querySelector("[data-connect-logo-video]");
   const logoFallback = document.querySelector("[data-connect-logo-fallback]");
@@ -30,6 +31,7 @@
   let active = false;
   let resizeObserver = null;
   let viewportFrame = 0;
+  let effectBoundsFrame = 0;
 
   function markWebviewContext() {
     root.classList.toggle("connect-webview", Boolean(isSocialWebview));
@@ -63,6 +65,38 @@
     viewportFrame = window.requestAnimationFrame(() => {
       viewportFrame = 0;
       setConnectViewportVars();
+      setConnectEffectBounds();
+    });
+  }
+
+  function setConnectEffectBounds() {
+    if (!connectStage || !connectPanel) {
+      return;
+    }
+
+    const stageRect = connectStage.getBoundingClientRect();
+    const panelRect = connectPanel.getBoundingClientRect();
+    const top = Math.max(0, panelRect.top - stageRect.top);
+    const right = Math.max(0, stageRect.right - panelRect.right);
+    const bottom = Math.max(0, stageRect.bottom - panelRect.bottom);
+    const left = Math.max(0, panelRect.left - stageRect.left);
+    const panelStyle = window.getComputedStyle(connectPanel);
+    const radius = panelStyle.borderTopLeftRadius || "22px";
+
+    connectStage.style.setProperty("--connect-effect-top", `${Math.round(top)}px`);
+    connectStage.style.setProperty("--connect-effect-right", `${Math.round(right)}px`);
+    connectStage.style.setProperty("--connect-effect-bottom", `${Math.round(bottom)}px`);
+    connectStage.style.setProperty("--connect-effect-left", `${Math.round(left)}px`);
+    connectStage.style.setProperty("--connect-effect-radius", radius);
+  }
+
+  function scheduleEffectBoundsSync() {
+    if (effectBoundsFrame) {
+      window.cancelAnimationFrame(effectBoundsFrame);
+    }
+    effectBoundsFrame = window.requestAnimationFrame(() => {
+      effectBoundsFrame = 0;
+      setConnectEffectBounds();
     });
   }
 
@@ -88,6 +122,7 @@
     const nextDpr = Math.min(isSocialWebview ? 1.25 : 1.5, window.devicePixelRatio || 1);
 
     if (nextWidth === width && nextHeight === height && nextDpr === dpr) {
+      setConnectEffectBounds();
       return;
     }
 
@@ -99,6 +134,7 @@
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    setConnectEffectBounds();
     seedParticles();
   }
 
@@ -414,6 +450,7 @@
     if (typeof connectShell.scrollTo === "function") {
       connectShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
+    setConnectEffectBounds();
     startEmbers();
     syncConnectLogoPlayback();
   }
@@ -443,6 +480,7 @@
   function initConnectPage() {
     markWebviewContext();
     setConnectViewportVars();
+    setConnectEffectBounds();
     setConnectLogoFallback(reducedMotionQuery.matches);
 
     document.querySelectorAll("[data-connect-internal-route]").forEach((link) => {
@@ -453,23 +491,33 @@
       resizeObserver = new ResizeObserver(() => {
         if (active) {
           resizeCanvas();
+          setConnectEffectBounds();
         }
       });
       resizeObserver.observe(connectStage);
+      if (connectPanel) {
+        resizeObserver.observe(connectPanel);
+      }
     } else {
       window.addEventListener("resize", () => {
         if (active) {
           resizeCanvas();
+          setConnectEffectBounds();
         }
       }, { passive: true });
     }
 
     window.addEventListener("resize", scheduleViewportSync, { passive: true });
+    window.addEventListener("resize", scheduleEffectBoundsSync, { passive: true });
     window.addEventListener("orientationchange", scheduleViewportSync, { passive: true });
+    window.addEventListener("orientationchange", scheduleEffectBoundsSync, { passive: true });
     window.addEventListener("pageshow", scheduleViewportSync, { passive: true });
+    window.addEventListener("pageshow", scheduleEffectBoundsSync, { passive: true });
     if (window.visualViewport) {
       window.visualViewport.addEventListener("resize", scheduleViewportSync, { passive: true });
+      window.visualViewport.addEventListener("resize", scheduleEffectBoundsSync, { passive: true });
       window.visualViewport.addEventListener("scroll", scheduleViewportSync, { passive: true });
+      window.visualViewport.addEventListener("scroll", scheduleEffectBoundsSync, { passive: true });
     }
 
     document.addEventListener("visibilitychange", () => {
@@ -496,6 +544,10 @@
     window.addEventListener("pagehide", () => {
       stopEmbers();
       pauseConnectLogoVideo();
+      if (effectBoundsFrame) {
+        window.cancelAnimationFrame(effectBoundsFrame);
+        effectBoundsFrame = 0;
+      }
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
