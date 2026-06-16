@@ -270,17 +270,51 @@ body.is-connect-route .public-home {
   padding: clamp(0.06rem, 0.8svh, 0.28rem) 0 clamp(0.12rem, 1svh, 0.36rem);
 }
 
-.connect-logo {
+.connect-logo-frame {
   width: min(74vw, 15.25rem);
-  max-height: 5.85rem;
-  display: block;
-  object-fit: contain;
-  transform-origin: 50% 52%;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   filter:
     drop-shadow(0 0 10px rgba(255, 60, 60, 0.28))
     drop-shadow(0 0 16px rgba(0, 255, 255, 0.08));
-  animation: connectLogoSignal 5.6s ease-in-out infinite;
-  will-change: transform, filter, opacity;
+  overflow: visible;
+}
+
+.connect-logo {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  display: block;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  object-fit: contain;
+  object-position: center;
+}
+
+.connect-logo--video {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.connect-logo--fallback {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.connect-logo-frame.is-fallback .connect-logo--video {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.connect-logo-frame.is-fallback .connect-logo--fallback {
+  opacity: 1;
+  visibility: visible;
 }
 
 .connect-identity {
@@ -466,41 +500,6 @@ body.is-connect-route .public-home {
   }
 }
 
-@keyframes connectLogoSignal {
-  0%,
-  100% {
-    opacity: 0.96;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter:
-      drop-shadow(0 0 10px rgba(255, 60, 60, 0.28))
-      drop-shadow(0 0 16px rgba(0, 255, 255, 0.08));
-  }
-
-  34% {
-    opacity: 1;
-    transform: translate3d(0, -0.04rem, 0) scale(1.018);
-    filter:
-      drop-shadow(0 0 12px rgba(255, 72, 92, 0.34))
-      drop-shadow(0 0 20px rgba(0, 255, 255, 0.13));
-  }
-
-  48% {
-    opacity: 0.98;
-    transform: translate3d(0, 0.02rem, 0) scale(1.006);
-    filter:
-      drop-shadow(0 0 8px rgba(255, 60, 60, 0.24))
-      drop-shadow(0 0 18px rgba(126, 228, 255, 0.16));
-  }
-
-  68% {
-    opacity: 1;
-    transform: translate3d(0, -0.02rem, 0) scale(1.014);
-    filter:
-      drop-shadow(0 0 11px rgba(255, 60, 60, 0.31))
-      drop-shadow(0 0 17px rgba(0, 255, 255, 0.1));
-  }
-}
-
 @media (min-width: 44rem) {
   .connect-stage {
     padding-inline:
@@ -514,9 +513,8 @@ body.is-connect-route .public-home {
     padding: 1.85rem 2rem 2rem;
   }
 
-  .connect-logo {
+  .connect-logo-frame {
     width: min(42vw, 16.75rem);
-    max-height: 6.25rem;
   }
 
   .connect-actions {
@@ -547,7 +545,7 @@ body.is-connect-route .public-home {
     padding-inline: 0.72rem;
   }
 
-  .connect-logo {
+  .connect-logo-frame {
     width: min(70vw, 11.5rem);
   }
 
@@ -558,14 +556,18 @@ body.is-connect-route .public-home {
 
 @media (prefers-reduced-motion: reduce) {
   .connect-shell,
-  .connect-button,
-  .connect-logo {
+  .connect-button {
     transition: none !important;
   }
 
-  .connect-logo {
-    animation: none !important;
-    transform: none !important;
+  .connect-logo--video {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .connect-logo--fallback {
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   .connect-embers {

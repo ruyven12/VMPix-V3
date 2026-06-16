@@ -9,6 +9,9 @@
   const root = document.documentElement;
   const connectStage = document.querySelector("[data-connect-stage]");
   const canvas = document.querySelector("[data-connect-embers]");
+  const logoFrame = document.querySelector("[data-connect-logo-frame]");
+  const logoVideo = document.querySelector("[data-connect-logo-video]");
+  const logoFallback = document.querySelector("[data-connect-logo-fallback]");
   const reducedMotionQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : { matches: false };
   const ua = navigator.userAgent || "";
   const isMessenger = /\bFBAN\/Messenger\b|\bMessenger\b/i.test(ua);
@@ -262,6 +265,47 @@
     }
   }
 
+  function pauseConnectLogoVideo() {
+    if (logoVideo && typeof logoVideo.pause === "function") {
+      logoVideo.pause();
+    }
+  }
+
+  function setConnectLogoFallback(isFallback) {
+    if (!logoFrame || !logoVideo || !logoFallback) {
+      return;
+    }
+
+    logoFrame.classList.toggle("is-fallback", Boolean(isFallback));
+    if (isFallback) {
+      pauseConnectLogoVideo();
+    }
+  }
+
+  function syncConnectLogoPlayback() {
+    if (!logoVideo || !logoFrame) {
+      return;
+    }
+
+    const shouldUseFallback = reducedMotionQuery.matches || Boolean(logoVideo.error);
+    setConnectLogoFallback(shouldUseFallback);
+    logoVideo.muted = true;
+    logoVideo.loop = true;
+    logoVideo.playsInline = true;
+    logoVideo.setAttribute("playsinline", "");
+    logoVideo.removeAttribute("controls");
+
+    if (shouldUseFallback || !active || document.hidden) {
+      pauseConnectLogoVideo();
+      return;
+    }
+
+    const playResult = logoVideo.play();
+    if (playResult && typeof playResult.catch === "function") {
+      playResult.catch(() => setConnectLogoFallback(true));
+    }
+  }
+
   function setElementHidden(element, isHidden) {
     if (!element) {
       return;
@@ -282,6 +326,7 @@
     }
     setElementHidden(connectShell, true);
     stopEmbers();
+    pauseConnectLogoVideo();
   }
 
   function hideOtherShellSurfaces() {
@@ -370,6 +415,7 @@
       connectShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
     startEmbers();
+    syncConnectLogoPlayback();
   }
 
   function handleInternalRouteClick(event) {
@@ -391,11 +437,13 @@
     } else {
       startEmbers();
     }
+    syncConnectLogoPlayback();
   }
 
   function initConnectPage() {
     markWebviewContext();
     setConnectViewportVars();
+    setConnectLogoFallback(reducedMotionQuery.matches);
 
     document.querySelectorAll("[data-connect-internal-route]").forEach((link) => {
       link.addEventListener("click", handleInternalRouteClick);
@@ -427,10 +475,17 @@
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         stopEmbers();
+        pauseConnectLogoVideo();
       } else if (active) {
         startEmbers();
+        syncConnectLogoPlayback();
       }
     });
+
+    if (logoVideo) {
+      logoVideo.addEventListener("error", () => setConnectLogoFallback(true));
+      logoVideo.addEventListener("canplay", syncConnectLogoPlayback);
+    }
 
     if (typeof reducedMotionQuery.addEventListener === "function") {
       reducedMotionQuery.addEventListener("change", syncMotionPreference);
@@ -440,6 +495,7 @@
 
     window.addEventListener("pagehide", () => {
       stopEmbers();
+      pauseConnectLogoVideo();
       if (resizeObserver) {
         resizeObserver.disconnect();
       }

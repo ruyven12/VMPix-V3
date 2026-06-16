@@ -1442,7 +1442,12 @@
 
           <article class="connect-panel" aria-label="Chris Kates photographer connect profile">
             <header class="connect-header">
-              <img class="connect-logo" src="/assets/branding/voodoo-logo-static.png" alt="Voodoo Media" loading="eager" decoding="async">
+              <div class="connect-logo-frame" role="img" aria-label="Voodoo Media" data-connect-logo-frame>
+                <video class="connect-logo connect-logo--video" autoplay muted loop playsinline preload="metadata" poster="/assets/branding/voodoo-logo-static.png" aria-hidden="true" data-connect-logo-video>
+                  <source src="/assets/branding/logo-animated.mp4" type="video/mp4">
+                </video>
+                <img class="connect-logo connect-logo--fallback" src="/assets/branding/voodoo-logo-static.png" alt="" loading="eager" decoding="async" aria-hidden="true" data-connect-logo-fallback>
+              </div>
             </header>
 
             <div class="connect-identity">
