@@ -128,6 +128,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.contact) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
+  if (routePath === routePaths.connect) {
+    return { name: "connect", canonicalUrl: routePaths.connect };
+  }
 
   const personDetailPrefix = `${routePaths.musicPeople}/`;
   if (routePath.startsWith(personDetailPrefix)) {
@@ -209,6 +212,10 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  if (route.name !== "connect" && typeof hideConnectShell === "function") {
+    hideConnectShell();
+  }
+
   if (typeof setActiveGlobalNavForRoute === "function") {
     setActiveGlobalNavForRoute(route.name);
   }
@@ -343,6 +350,11 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "contact") {
     showContactShell();
+    return;
+  }
+
+  if (route.name === "connect") {
+    showConnectShell();
     return;
   }
 

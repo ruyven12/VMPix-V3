@@ -12,6 +12,7 @@ const portfolioHub = document.querySelector(".portfolio-hub");
 const aboutShell = document.querySelector("[data-about-shell]");
 const calendarShell = document.querySelector("[data-calendar-shell]");
 const contactShell = document.querySelector("[data-contact-shell]");
+const connectShell = document.querySelector("[data-connect-shell]");
 const shellBreadcrumb = document.querySelector("[data-shell-breadcrumb]");
 const shellBreadcrumbList = document.querySelector("[data-shell-breadcrumb-list]");
 const bottomRail = document.querySelector("[data-shell-bottom-rail]");
@@ -1747,6 +1748,7 @@ const routePaths = {
   calendar: "/calendar",
   about: "/about",
   contact: "/contact",
+  connect: "/connect",
 };
 
 const shellDrawerGroups = [
@@ -1913,6 +1915,16 @@ const shellRouteRegistry = [
     bottomRailEligible: true,
   },
   {
+    id: "connect",
+    route: routePaths.connect,
+    label: "Connect",
+    parentSection: "Site",
+    moduleType: "shell",
+    drawerGroup: "site",
+    breadcrumbLabel: "Connect",
+    bottomRailEligible: false,
+  },
+  {
     id: "wildlife",
     route: "",
     label: "Wildlife",
@@ -1975,6 +1987,7 @@ const routeNameToGlobalNavTarget = {
   calendar: "calendar",
   about: "about",
   contact: "contact",
+  connect: "connect",
 };
 
 const routeNameToBreadcrumbTrail = {
@@ -2003,6 +2016,7 @@ const routeNameToBreadcrumbTrail = {
   calendar: ["portfolio", "calendar"],
   about: ["portfolio", "about"],
   contact: ["portfolio", "contact"],
+  connect: ["connect"],
 };
 
 const routeNameToDrilldownBreadcrumb = {
@@ -2044,6 +2058,7 @@ const routeNameToShellBackTarget = {
   calendar: routePaths.portfolio,
   about: routePaths.portfolio,
   contact: routePaths.portfolio,
+  connect: routePaths.home,
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [
