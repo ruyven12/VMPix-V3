@@ -234,7 +234,7 @@ const WRESTLING_SHOWS_API_LIMIT = 100;
 const WRESTLING_SHOWS_TIMEOUT_MS = 15000;
 const WRESTLING_PEOPLE_API_ROUTE = "/api/wrestling/people/db";
 const WRESTLING_PEOPLE_API_LIMIT = 100;
-const WRESTLING_PEOPLE_TIMEOUT_MS = 8000;
+const WRESTLING_PEOPLE_TIMEOUT_MS = 20000;
 const WRESTLING_VENUES_API_ROUTE = "/api/wrestling/venues/db";
 const WRESTLING_VENUES_API_LIMIT = 100;
 const WRESTLING_VENUES_TIMEOUT_MS = 8000;
@@ -1760,8 +1760,8 @@ function getWrestlingPeoplePayloadTotalPages(payload) {
     : 1;
 }
 
-function fetchWrestlingPeoplePayload(page, signal) {
-  return fetch(getWrestlingPeopleApiUrl(page), {
+function fetchWrestlingPeoplePayload(page, signal, retries = 1) {
+  const runRequest = (attemptsRemaining) => fetch(getWrestlingPeopleApiUrl(page), {
     cache: "no-store",
     signal,
   }).then((response) => {
@@ -1769,7 +1769,18 @@ function fetchWrestlingPeoplePayload(page, signal) {
       throw new Error(`Wrestling people request failed (${response.status})`);
     }
     return response.json();
+  }).catch((error) => {
+    if (attemptsRemaining > 0 && !signal?.aborted) {
+      return runRequest(attemptsRemaining - 1);
+    }
+    throw error;
   });
+
+  return runRequest(Math.max(Number.parseInt(retries, 10) || 0, 0));
+}
+
+function fetchOptionalWrestlingPeoplePayload(page, signal) {
+  return fetchWrestlingPeoplePayload(page, signal, 1).catch(() => null);
 }
 
 function requestWrestlingPeopleData() {
@@ -1793,15 +1804,15 @@ function requestWrestlingPeopleData() {
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), WRESTLING_PEOPLE_TIMEOUT_MS)
     : 0;
-  wrestlingPeopleRequest = fetchWrestlingPeoplePayload(1, controller?.signal)
+  wrestlingPeopleRequest = fetchWrestlingPeoplePayload(1, controller?.signal, 2)
     .then((firstPayload) => {
       const totalPages = getWrestlingPeoplePayloadTotalPages(firstPayload);
       const remainingPages = Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => index + 2);
       if (remainingPages.length === 0) {
         return [firstPayload];
       }
-      return Promise.all(remainingPages.map((page) => fetchWrestlingPeoplePayload(page, controller?.signal)))
-        .then((additionalPayloads) => [firstPayload, ...additionalPayloads]);
+      return Promise.all(remainingPages.map((page) => fetchOptionalWrestlingPeoplePayload(page, controller?.signal)))
+        .then((additionalPayloads) => [firstPayload, ...additionalPayloads.filter(Boolean)]);
     })
     .then((payloads) => {
       const liveRows = normalizeLiveWrestlingPeople(payloads);
