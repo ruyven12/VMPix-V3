@@ -289,9 +289,7 @@ body.is-connect-route .public-home {
   background: transparent;
   border: 0;
   box-shadow: none;
-  filter:
-    drop-shadow(0 0 10px rgba(255, 60, 60, 0.28))
-    drop-shadow(0 0 16px rgba(0, 255, 255, 0.08));
+  filter: none;
   overflow: visible;
 }
 
@@ -467,7 +465,7 @@ body.is-connect-route .public-home {
   padding-top: clamp(0.82rem, 2.4svh, 1.16rem);
   border-top: 3px solid rgba(255, 60, 60, 0.18);
   color: rgba(255, 210, 210, 0.58);
-  font-size: clamp(0.745rem, 3.1vw, 0.865rem);
+  font-size: clamp(calc(0.745rem + 2px), calc(3.1vw + 2px), calc(0.865rem + 2px));
   line-height: 1.12;
   text-transform: none;
 }
@@ -483,7 +481,7 @@ body.is-connect-route .public-home {
 
 .connect-build strong {
   color: rgba(255, 238, 240, 0.96);
-  font-size: clamp(1.285rem, 6vw, 1.745rem);
+  font-size: clamp(calc(1.285rem + 2px), calc(6vw + 2px), calc(1.745rem + 2px));
   font-weight: 400;
   line-height: 1;
   text-shadow:

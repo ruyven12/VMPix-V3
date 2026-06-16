@@ -357,15 +357,22 @@
     ctx.globalCompositeOperation = previousComposite;
   }
 
-  function getParticleFireColor(phase) {
-    const cycle = (Math.sin(phase * 0.72) + 1) * 0.5;
-    const blend = cycle < 0.5 ? cycle * 2 : (cycle - 0.5) * 2;
-    const start = cycle < 0.5
-      ? { r: 0, g: 210, b: 255 }
-      : { r: 255, g: 142, b: 35 };
-    const end = cycle < 0.5
-      ? { r: 255, g: 142, b: 35 }
-      : { r: 255, g: 45, b: 24 };
+  function getParticleDataColor(phase) {
+    const palette = [
+      { r: 0, g: 214, b: 255 },
+      { r: 108, g: 92, b: 255 },
+      { r: 255, g: 63, b: 176 },
+      { r: 255, g: 142, b: 35 },
+      { r: 255, g: 45, b: 24 },
+      { r: 150, g: 255, b: 82 },
+      { r: 255, g: 235, b: 144 },
+    ];
+    const cycle = ((Math.sin(phase * 0.52) + 1) * 0.5) * palette.length;
+    const startIndex = Math.floor(cycle) % palette.length;
+    const endIndex = (startIndex + 1) % palette.length;
+    const blend = cycle - Math.floor(cycle);
+    const start = palette[startIndex];
+    const end = palette[endIndex];
 
     return {
       r: Math.round(start.r + ((end.r - start.r) * blend)),
@@ -454,8 +461,8 @@
       const flicker = 0.78 + 0.22 * Math.sin(particle.phase);
       const flarePulse = 0.84 + (0.38 * Math.sin(particle.phase * particle.flare));
       const alpha = Math.min(0.35, particle.alpha * flicker * flarePulse * pulse * Math.max(0.18, point.distanceProgress));
-      const coreColor = getParticleFireColor(particle.phase);
-      const haloColor = getParticleFireColor(particle.phase + 1.7);
+      const coreColor = getParticleDataColor(particle.phase + (index * 0.013));
+      const haloColor = getParticleDataColor(particle.phase + 1.7 + (index * 0.021));
       const dashLength = particle.dashLength * point.scale;
       const dashWidth = Math.max(0.8, particle.dashWidth * point.scale);
 
