@@ -10617,6 +10617,11 @@ button.person-show-tagged-thumb:focus-visible {
   color: rgba(247, 247, 242, 0.7);
 }
 
+.wrestling-person-detail-shell,
+.wrestling-person-detail-shell * {
+  text-transform: none;
+}
+
 .wrestling-event-history-expanded-open {
   justify-self: start;
 }

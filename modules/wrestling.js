@@ -1912,6 +1912,7 @@ function getWrestlingPersonAffiliations(person) {
   return [
     getWrestlingText(person?.factionTeam || person?.stable || person?.team || person?.notes),
     ...getWrestlingLabelArray(person?.teams || person?.teamIds || person?.team_ids),
+    ...getWrestlingLabelArray(person?.associations || person?.association || person?.associationIds || person?.association_ids),
     ...getWrestlingLabelArray(person?.stables || person?.stableIds || person?.stable_ids),
     ...getWrestlingLabelArray(person?.factions || person?.factionIds || person?.faction_ids),
   ]
@@ -1924,6 +1925,7 @@ function getWrestlingPersonTeamsAndStables(person) {
   return [
     getWrestlingText(person?.factionTeam || person?.stable || person?.team),
     ...getWrestlingLabelArray(person?.teams || person?.teamIds || person?.team_ids),
+    ...getWrestlingLabelArray(person?.associations || person?.association || person?.associationIds || person?.association_ids),
     ...getWrestlingLabelArray(person?.stables || person?.stableIds || person?.stable_ids),
     ...getWrestlingLabelArray(person?.factions || person?.factionIds || person?.faction_ids),
   ]
@@ -2028,6 +2030,7 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
     legalName,
     aliases,
     teamsAndStables,
+    teamsAndAssociations: teamsAndStables,
     category,
     categoryDisplay,
     categoryFilterValue,
@@ -3356,7 +3359,7 @@ function renderWrestlingVenueDetailRoute(venueId, options = {}) {
   const eventTitle = document.createElement("h3");
   eventTitle.className = "wrestling-venue-event-history-title";
   eventTitle.id = "wrestling-venue-event-history-title";
-  eventTitle.textContent = "Event History";
+  eventTitle.textContent = "EVENT HISTORY";
 
   const eventList = document.createElement("div");
   eventList.className = "wrestling-venue-event-list";
@@ -3413,16 +3416,15 @@ function getWrestlingPersonFactText(value) {
 }
 
 function getWrestlingPersonDetailFacts(person) {
+  const teamAssociationValue = person.teamsAndAssociations || person.teamsAndStables;
   return [
     ["Legal Name", person.legalName],
-    ["Role", person.categoryDisplay || person.role],
+    ["Category", person.categoryDisplay || person.role],
     ["Aliases", person.aliases],
-    ["Teams / Stables", person.teamsAndStables],
-    ["First Seen", person.firstSeen],
-    ["Latest Seen", person.latestSeen],
-    ["Event Count", person.eventCount],
-    ["Match Count", person.matchCount],
-    ["Photo Count", person.photoCount],
+    ["Teams / Associations", teamAssociationValue],
+    ["Events", getWrestlingPeopleCountValue(person.eventCount, person.events, person.event_count, person.show_count)],
+    ["Matches", getWrestlingPeopleCountValue(person.matchCount, person.matches, person.match_count)],
+    ["Photos", getWrestlingPeopleCountValue(person.photoCount, person.photos, person.photo_count)],
   ]
     .map(([label, value]) => createWrestlingPersonMeta(label, value))
     .filter(Boolean);
@@ -3905,7 +3907,7 @@ function createWrestlingPersonEventRow(eventRow) {
 
   const placeholders = document.createElement("div");
   placeholders.className = "wrestling-event-history-photo-placeholders";
-  placeholders.setAttribute("aria-label", `${eventRow.matchName} photo placeholders`);
+  placeholders.setAttribute("aria-label", `${eventRow.matchName} photo summary`);
   placeholders.append(
     createWrestlingEventHistoryPhotoPlaceholder("Match Gallery"),
     createWrestlingEventHistoryPhotoPlaceholder(formatWrestlingCount(photoCountValue, "Photos"))
@@ -4045,12 +4047,12 @@ function renderWrestlingPersonDetailRoute(personId) {
 
   const hero = document.createElement("section");
   hero.className = "wrestling-person-detail-hero";
-  hero.setAttribute("aria-label", `${person.name} placeholder profile`);
+  hero.setAttribute("aria-label", `${person.name} profile`);
 
   const photo = document.createElement("div");
   photo.className = "wrestling-person-detail-photo";
   photo.setAttribute("role", "img");
-  photo.setAttribute("aria-label", `${person.name} placeholder archive portrait`);
+  photo.setAttribute("aria-label", `${person.name} archive profile mark`);
 
   const photoInitials = document.createElement("span");
   photoInitials.setAttribute("aria-hidden", "true");
@@ -4085,7 +4087,7 @@ function renderWrestlingPersonDetailRoute(personId) {
   const eventTitle = document.createElement("h3");
   eventTitle.className = "wrestling-event-history-title";
   eventTitle.id = "wrestling-event-history-title";
-  eventTitle.textContent = "EVENT HISTORY";
+  eventTitle.textContent = "Event History";
 
   const eventList = document.createElement("div");
   eventList.className = "wrestling-event-history-list";
