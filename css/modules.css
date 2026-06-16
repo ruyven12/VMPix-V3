@@ -13318,6 +13318,15 @@ button.person-show-tagged-thumb:focus-visible {
   visibility: visible;
 }
 
+.site-shell.is-lightbox-view .wrestling-show-detail-shell,
+.site-shell.is-lightbox-view .wrestling-match-gallery-shell,
+.site-shell.is-lightbox-view .wrestling-lightbox-shell {
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+  visibility: hidden;
+}
+
 .site-shell.is-activating .ambient-energy {
   opacity: 0.72;
   animation-duration: 7s;

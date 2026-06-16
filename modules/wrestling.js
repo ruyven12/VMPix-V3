@@ -4409,6 +4409,10 @@ function closeWrestlingMatchLightboxBridge() {
     wrestlingMatchGalleryShell.setAttribute("aria-hidden", "false");
     wrestlingMatchGalleryShell.removeAttribute("inert");
   }
+  if (wrestlingLightboxShell) {
+    wrestlingLightboxShell.setAttribute("aria-hidden", "true");
+    wrestlingLightboxShell.setAttribute("inert", "");
+  }
 }
 
 function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, match) {
@@ -4441,7 +4445,12 @@ function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, matc
     shell.classList.add("is-music-nexus-view");
   }
   if (wrestlingMatchGalleryShell) {
+    wrestlingMatchGalleryShell.setAttribute("aria-hidden", "true");
     wrestlingMatchGalleryShell.setAttribute("inert", "");
+  }
+  if (wrestlingLightboxShell) {
+    wrestlingLightboxShell.setAttribute("aria-hidden", "true");
+    wrestlingLightboxShell.setAttribute("inert", "");
   }
   showLightbox(targetTile, { returnContext });
 }
