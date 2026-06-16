@@ -61,10 +61,10 @@ body.is-connect-route .public-home {
 }
 
 .connect-stage {
-  --connect-stage-pad-block-start: max(0.55rem, calc(env(safe-area-inset-top) + var(--connect-vv-top, 0px) + 0.25rem));
-  --connect-stage-pad-block-end: max(0.55rem, calc(env(safe-area-inset-bottom) + var(--connect-vv-bottom, 0px) + 0.25rem));
-  --connect-stage-pad-inline-start: max(0.5rem, env(safe-area-inset-left));
-  --connect-stage-pad-inline-end: max(0.5rem, env(safe-area-inset-right));
+  --connect-stage-pad-block-start: max(0.35rem, calc(env(safe-area-inset-top) + var(--connect-vv-top, 0px) + 0.16rem));
+  --connect-stage-pad-block-end: max(0.35rem, calc(env(safe-area-inset-bottom) + var(--connect-vv-bottom, 0px) + 0.16rem));
+  --connect-stage-pad-inline-start: max(0.35rem, env(safe-area-inset-left));
+  --connect-stage-pad-inline-end: max(0.35rem, env(safe-area-inset-right));
   --connect-card-target-block: calc((var(--connect-vh, 1vh) * 100) - var(--connect-stage-pad-block-start) - var(--connect-stage-pad-block-end));
   --connect-effect-top: 0px;
   --connect-effect-right: 0px;
@@ -207,8 +207,8 @@ body.is-connect-route .public-home {
 .connect-panel {
   position: relative;
   z-index: 10;
-  width: min(100%, 30rem);
-  min-height: min(55rem, var(--connect-card-target-block));
+  width: 100%;
+  min-height: var(--connect-card-target-block);
   min-width: 0;
   display: grid;
   align-content: center;
@@ -523,8 +523,8 @@ body.is-connect-route .public-home {
   }
 
   .connect-panel {
-    width: min(100%, clamp(29.5rem, 34vw, 32.5rem));
-    min-height: min(56rem, var(--connect-card-target-block));
+    width: min(100%, calc(var(--connect-card-target-block) * 9 / 16));
+    min-height: var(--connect-card-target-block);
     gap: clamp(1.28rem, 2.15svh, 1.72rem);
     padding: clamp(1.6rem, 2.45svh, 2.08rem) clamp(1.55rem, 2.3vw, 1.9rem) clamp(1.75rem, 2.75svh, 2.15rem);
   }
