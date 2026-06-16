@@ -103,12 +103,12 @@
   function getParticleCount() {
     const shortSide = Math.min(width || 360, height || 720);
     if (isSocialWebview || shortSide < 520) {
-      return 86;
+      return 2322;
     }
     if (shortSide < 760) {
-      return 112;
+      return 3024;
     }
-    return 148;
+    return 3996;
   }
 
   function resizeCanvas() {
@@ -142,12 +142,15 @@
     particles[index] = {
       x: Math.random() * width,
       y: height + Math.random() * (height * 0.2),
-      radius: 0.65 + Math.random() * 1.65,
-      velocityY: 0.28 + Math.random() * 0.84,
-      velocityX: (Math.random() - 0.5) * 0.48,
-      alpha: 0.1 + Math.random() * 0.24,
-      twinkle: 0.7 + Math.random() * 1.5,
+      radius: 0.55 + Math.random() * 1.85,
+      velocityY: 0.45 + Math.random() * 1.25,
+      velocityX: (Math.random() - 0.5) * 0.8,
+      alpha: 0.34 + Math.random() * 0.26,
+      twinkle: 1.1 + Math.random() * 2.4,
       phase: Math.random() * Math.PI * 2,
+      wobble: 0.45 + Math.random() * 1.35,
+      gust: (Math.random() - 0.5) * 0.9,
+      flare: 0.65 + Math.random() * 1.3,
     };
   }
 
@@ -216,32 +219,57 @@
     ctx.globalCompositeOperation = previousComposite;
   }
 
+  function getParticleFireColor(phase) {
+    const cycle = (Math.sin(phase * 0.72) + 1) * 0.5;
+    const blend = cycle < 0.5 ? cycle * 2 : (cycle - 0.5) * 2;
+    const start = cycle < 0.5
+      ? { r: 0, g: 210, b: 255 }
+      : { r: 255, g: 142, b: 35 };
+    const end = cycle < 0.5
+      ? { r: 255, g: 142, b: 35 }
+      : { r: 255, g: 45, b: 24 };
+
+    return {
+      r: Math.round(start.r + ((end.r - start.r) * blend)),
+      g: Math.round(start.g + ((end.g - start.g) * blend)),
+      b: Math.round(start.b + ((end.b - start.b) * blend)),
+    };
+  }
+
   function drawParticles(delta, pulse) {
     for (let index = 0; index < particles.length; index += 1) {
-      const particle = particles[index];
-      particle.y -= particle.velocityY * (delta / 16.7);
-      particle.x += particle.velocityX * (delta / 16.7);
-      particle.phase += 0.024 * particle.twinkle;
+      let particle = particles[index];
+      const step = delta / 16.7;
+      particle.phase += 0.04 * particle.twinkle * step;
+      const turbulence = (Math.sin(particle.phase * 1.7) * particle.wobble) + (Math.cos(particle.phase * 0.63 + index) * particle.gust);
+      const lift = particle.velocityY * (0.78 + (0.42 * Math.sin(particle.phase * 0.8 + index)));
+      particle.y -= lift * step;
+      particle.x += (particle.velocityX + (turbulence * 0.14)) * step;
 
       if (particle.y < -28 || particle.x < -50 || particle.x > width + 50) {
         spawnParticle(index);
+        particle = particles[index];
       }
 
       const flicker = 0.78 + 0.22 * Math.sin(particle.phase);
-      const alpha = particle.alpha * flicker * pulse;
+      const flarePulse = 0.84 + (0.38 * Math.sin(particle.phase * particle.flare));
+      const alpha = Math.min(0.45, particle.alpha * flicker * flarePulse * pulse);
+      const coreColor = getParticleFireColor(particle.phase);
+      const haloColor = getParticleFireColor(particle.phase + 1.7);
+      const radius = particle.radius * (0.86 + (0.28 * flicker));
 
       ctx.beginPath();
-      ctx.fillStyle = `rgba(0,255,255,${alpha})`;
-      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${coreColor.r},${coreColor.g},${coreColor.b},${alpha})`;
+      ctx.arc(particle.x, particle.y, radius, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.beginPath();
-      ctx.fillStyle = `rgba(160,70,255,${alpha * 0.52})`;
-      ctx.arc(particle.x + 1.2, particle.y, particle.radius * 0.96, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${haloColor.r},${haloColor.g},${haloColor.b},${alpha * 0.52})`;
+      ctx.arc(particle.x + 1.2, particle.y, radius * 0.96, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(0,255,255,${alpha * 0.5})`;
+      ctx.strokeStyle = `rgba(${coreColor.r},${coreColor.g},${coreColor.b},${alpha * 0.5})`;
       ctx.lineWidth = 1;
       ctx.moveTo(particle.x, particle.y);
       ctx.lineTo(particle.x - particle.velocityX * 11, particle.y + particle.velocityY * 13);

@@ -26,6 +26,7 @@
   overscroll-behavior: contain;
   pointer-events: none;
   scrollbar-width: none;
+  text-transform: none;
   touch-action: pan-y;
   transform: translate3d(0, 0.28rem, 0) scale(0.992);
   transition:
@@ -211,11 +212,11 @@ body.is-connect-route .public-home {
   min-height: var(--connect-card-target-block);
   min-width: 0;
   display: grid;
-  align-content: center;
+  align-content: start;
   justify-items: center;
   gap: clamp(1.06rem, 3.35svh, 1.62rem);
   padding:
-    clamp(1.05rem, 3.7svh, 1.7rem)
+    10px
     clamp(0.88rem, 4vw, 1.48rem)
     clamp(1.14rem, 4.25svh, 1.82rem);
   border: 2px solid var(--connect-red-soft);
@@ -281,7 +282,7 @@ body.is-connect-route .public-home {
 .connect-header {
   display: grid;
   justify-items: center;
-  padding: clamp(0.06rem, 0.8svh, 0.28rem) 0 clamp(0.12rem, 1svh, 0.36rem);
+  padding: 0 0 clamp(0.12rem, 1svh, 0.36rem);
 }
 
 .connect-logo-frame {
@@ -357,15 +358,25 @@ body.is-connect-route .public-home {
 
 .connect-role {
   color: rgba(255, 96, 118, 0.84);
+  display: grid;
+  gap: 3px;
+  justify-items: center;
   font-size: clamp(0.78rem, 3.4vw, 0.95rem);
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
+}
+
+.connect-role-since {
+  font-size: calc(1em - 2px);
 }
 
 .connect-copy {
+  width: min(100%, 31ch);
   max-width: 31ch;
+  padding-top: clamp(0.62rem, 1.8svh, 0.92rem);
+  border-top: 3px solid rgba(255, 60, 60, 0.18);
   color: var(--connect-muted);
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
   font-size: clamp(0.92rem, 3.7vw, 1.02rem);
   line-height: 1.48;
   overflow-wrap: anywhere;
@@ -399,7 +410,7 @@ body.is-connect-route .public-home {
   font-size: clamp(0.78rem, 3.2vw, 0.92rem);
   line-height: 1;
   text-decoration: none;
-  text-transform: uppercase;
+  text-transform: none;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
     box-shadow var(--motion-fast) var(--ease-standard),
@@ -458,16 +469,25 @@ body.is-connect-route .public-home {
   gap: 0.34rem;
   margin-top: clamp(0.12rem, 1.1svh, 0.52rem);
   padding-top: clamp(0.82rem, 2.4svh, 1.16rem);
-  border-top: 1px solid rgba(255, 60, 60, 0.18);
+  border-top: 3px solid rgba(255, 60, 60, 0.18);
   color: rgba(255, 210, 210, 0.58);
-  font-size: clamp(0.62rem, 2.8vw, 0.74rem);
+  font-size: clamp(0.745rem, 3.1vw, 0.865rem);
   line-height: 1.12;
-  text-transform: uppercase;
+  text-transform: none;
+}
+
+.connect-build-spacer {
+  width: 1px;
+  height: 0.28rem;
+}
+
+.connect-build-coming {
+  padding-top: 10px;
 }
 
 .connect-build strong {
   color: rgba(255, 238, 240, 0.96);
-  font-size: clamp(1.16rem, 5.6vw, 1.62rem);
+  font-size: clamp(1.285rem, 6vw, 1.745rem);
   font-weight: 400;
   line-height: 1;
   text-shadow:
@@ -526,7 +546,7 @@ body.is-connect-route .public-home {
     width: min(100%, calc(var(--connect-card-target-block) * 9 / 16));
     min-height: var(--connect-card-target-block);
     gap: clamp(1.28rem, 2.15svh, 1.72rem);
-    padding: clamp(1.6rem, 2.45svh, 2.08rem) clamp(1.55rem, 2.3vw, 1.9rem) clamp(1.75rem, 2.75svh, 2.15rem);
+    padding: 10px clamp(1.55rem, 2.3vw, 1.9rem) clamp(1.75rem, 2.75svh, 2.15rem);
   }
 
   .connect-logo-frame {
