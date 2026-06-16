@@ -1599,9 +1599,9 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
 function getWrestlingPeopleCardLabel(person) {
   return [
     `Open ${person.name}`,
-    person.role,
-    person.factionTeam,
-    formatWrestlingCount(person.matches, "Matches"),
+    person.categoryDisplay || person.role,
+    person.affiliationText || person.factionTeam,
+    formatWrestlingCount(person.events, "Events"),
     formatWrestlingCount(person.photos, "Photos"),
   ].filter(Boolean).join(", ");
 }
@@ -2039,6 +2039,7 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
     matchCount,
     taggedPhotoCount,
     photoCount,
+    events: eventCount ?? 0,
     matches: matchCount ?? 0,
     photos: photoCount ?? 0,
     thumb: getWrestlingText(source.thumb || source.initials || source.imageLabel || source.image_label, getWrestlingPersonInitials(name)),
@@ -2104,18 +2105,19 @@ function getFilteredWrestlingPeopleRows() {
   });
 }
 
-function createWrestlingPeopleStat(label, value) {
+function createWrestlingPeopleStat(label, value, iconType = "") {
   const stat = document.createElement("span");
   stat.className = "wrestling-person-row-stat wrestling-person-card-stat";
   stat.setAttribute("aria-label", `${Number(value).toLocaleString()} ${label.toLowerCase()}`);
 
+  const statIcon = document.createElement("span");
+  statIcon.className = `wrestling-person-card-stat-icon wrestling-person-card-stat-icon--${iconType || label.toLowerCase()}`;
+  statIcon.setAttribute("aria-hidden", "true");
+
   const statValue = document.createElement("strong");
   statValue.textContent = Number(value).toLocaleString();
 
-  const statLabel = document.createElement("span");
-  statLabel.textContent = label;
-
-  stat.append(statValue, statLabel);
+  stat.append(statIcon, statValue);
   return stat;
 }
 
@@ -2147,19 +2149,13 @@ function createWrestlingPeopleRow(person) {
   const stats = document.createElement("span");
   stats.className = "wrestling-person-row-stats wrestling-person-card-stats";
   stats.setAttribute("aria-hidden", "true");
-  if (person.matches > 0) {
-    stats.append(createWrestlingPeopleStat("Matches", person.matches));
-  }
-  if (person.photos > 0) {
-    if (stats.children.length > 0) {
-      const divider = document.createElement("span");
-      divider.className = "wrestling-person-row-stat-divider";
-      divider.setAttribute("aria-hidden", "true");
-      divider.textContent = "/";
-      stats.append(divider);
-    }
-    stats.append(createWrestlingPeopleStat("Photos", person.photos));
-  }
+  stats.append(createWrestlingPeopleStat("Events", person.events, "events"));
+  const divider = document.createElement("span");
+  divider.className = "wrestling-person-row-stat-divider";
+  divider.setAttribute("aria-hidden", "true");
+  divider.textContent = "/";
+  stats.append(divider);
+  stats.append(createWrestlingPeopleStat("Photos", person.photos, "photos"));
 
   const arrow = document.createElement("span");
   arrow.className = "wrestling-person-row-arrow wrestling-person-card-arrow";
@@ -2170,9 +2166,7 @@ function createWrestlingPeopleRow(person) {
   if (affiliation.textContent) {
     row.append(affiliation);
   }
-  if (stats.children.length > 0) {
-    row.append(stats);
-  }
+  row.append(stats);
   row.append(arrow);
   row.addEventListener("click", () => {
     activeWrestlingPersonId = person.personId;
