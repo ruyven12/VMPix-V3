@@ -89,6 +89,7 @@
     connectStage.style.setProperty("--connect-effect-bottom", `${Math.round(bottom)}px`);
     connectStage.style.setProperty("--connect-effect-left", `${Math.round(left)}px`);
     connectStage.style.setProperty("--connect-effect-radius", radius);
+    dataRoadMetrics = buildDataRoadMetrics();
   }
 
   function scheduleEffectBoundsSync() {
@@ -104,20 +105,12 @@
   function getParticleCount() {
     const shortSide = Math.min(width || 360, height || 720);
     if (isSocialWebview || shortSide < 520) {
-      return 2322;
+      return 1580;
     }
     if (shortSide < 760) {
-      return 3024;
+      return 2050;
     }
-    return 3996;
-  }
-
-  function getDataLaneCount() {
-    const shortSide = Math.min(width || 360, height || 720);
-    if (shortSide < 520 || isSocialWebview) {
-      return 7;
-    }
-    return 9;
+    return 2720;
   }
 
   function buildDataRoadMetrics() {
@@ -254,6 +247,7 @@
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     setConnectEffectBounds();
+    dataRoadMetrics = buildDataRoadMetrics();
     seedParticles();
   }
 
@@ -271,7 +265,7 @@
       targetOffsetY: (Math.random() - 0.5) * sinkJitter,
       bitOffset: Math.random() * Math.PI * 2,
       bit: Math.random() > 0.5 ? "1" : "0",
-      isGlyph: Math.random() < (isSocialWebview ? 0.06 : 0.1),
+      isGlyph: Math.random() < (isSocialWebview ? 0.035 : 0.065),
       dashLength: 2.6 + Math.random() * 7.8,
       dashWidth: 0.8 + Math.random() * 1.4,
       speed: 1.05 + Math.random() * 2.55,
@@ -384,7 +378,7 @@
   function drawDataHighway(now, pulse) {
     const previousComposite = ctx.globalCompositeOperation;
     const road = getDataRoadMetrics();
-    const lineCount = isSocialWebview || width < 520 ? 18 : 26;
+    const lineCount = isSocialWebview || width < 520 ? 12 : 18;
     const drift = (now / 36000) % 1;
     ctx.globalCompositeOperation = "lighter";
     ctx.lineCap = "round";
@@ -502,7 +496,9 @@
     const delta = Math.min(40, now - (lastTick || now));
     lastTick = now;
     resizeCanvas();
-    dataRoadMetrics = buildDataRoadMetrics();
+    if (!dataRoadMetrics) {
+      dataRoadMetrics = buildDataRoadMetrics();
+    }
 
     ctx.clearRect(0, 0, width, height);
     const pulse = 0.84 + 0.16 * Math.sin((now / 2200) * Math.PI * 2);
