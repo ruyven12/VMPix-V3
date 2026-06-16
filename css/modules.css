@@ -12222,20 +12222,44 @@ button.person-show-tagged-thumb:focus-visible {
 .wrestling-match-gallery-count {
   width: min(100%, 58rem);
   justify-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 0.28rem;
   padding: clamp(0.7rem, 2.4vw, 0.94rem);
   border: 1px solid rgba(247, 247, 242, 0.1);
   border-radius: var(--radius-sm);
   background:
     linear-gradient(90deg, rgba(213, 22, 34, 0.08), transparent 50%),
     rgba(7, 7, 10, 0.72);
+  text-align: center;
+}
+
+.wrestling-match-gallery-highlights-title,
+.wrestling-match-gallery-highlights-count {
+  margin: 0;
+}
+
+.wrestling-match-gallery-highlights-title {
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(0.78rem, 3vw, 0.92rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: none;
+}
+
+.wrestling-match-gallery-highlights-count {
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.64rem, 2.35vw, 0.76rem);
+  line-height: 1.2;
+  text-transform: none;
 }
 
 .wrestling-match-gallery-count strong {
-  color: rgba(247, 247, 242, 0.88);
-  font-size: clamp(1.05rem, 4.2vw, 1.38rem);
+  color: inherit;
+  font-size: inherit;
   font-weight: 400;
-  line-height: 1;
-  text-transform: uppercase;
+  line-height: inherit;
+  text-transform: inherit;
 }
 
 .wrestling-photo-grid {
@@ -12243,6 +12267,7 @@ button.person-show-tagged-thumb:focus-visible {
   justify-self: center;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: clamp(0.46rem, 1.7vw, 0.72rem);
   padding: 0;
   list-style: none;
@@ -12285,21 +12310,25 @@ button.person-show-tagged-thumb:focus-visible {
 }
 
 .wrestling-photo-tile.has-photo {
+  aspect-ratio: auto;
+  min-height: max(var(--tap-target), clamp(6rem, 14vw, 8rem));
   padding: 0;
-  place-items: stretch;
+  place-items: start stretch;
 }
 
-.wrestling-photo-tile.has-photo::before {
+.wrestling-photo-tile.has-photo::before,
+.wrestling-photo-tile.has-photo::after {
   opacity: 0;
 }
 
 .wrestling-photo-image {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  inset: auto;
   z-index: 0;
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 .wrestling-photo-tile span {
@@ -12366,12 +12395,6 @@ button.person-show-tagged-thumb:focus-visible {
 @media (min-width: 620px) {
   .wrestling-photo-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 960px) {
-  .wrestling-photo-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

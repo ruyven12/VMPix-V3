@@ -4404,8 +4404,11 @@ function closeWrestlingMatchLightboxBridge() {
   }
   if (shell) {
     shell.classList.remove("is-music-nexus-view");
+    shell.classList.add("is-wrestling-match-gallery-view");
   }
-  if (wrestlingMatchGalleryShell) {
+  if (typeof setWrestlingMatchGalleryHidden === "function") {
+    setWrestlingMatchGalleryHidden(false);
+  } else if (wrestlingMatchGalleryShell) {
     wrestlingMatchGalleryShell.setAttribute("aria-hidden", "false");
     wrestlingMatchGalleryShell.removeAttribute("inert");
   }
@@ -4466,7 +4469,7 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
 
   const image = document.createElement("img");
   image.className = "wrestling-photo-image";
-  image.src = photo.thumbnailSrc || photo.lightboxSrc;
+  image.src = photo.lightboxSrc || photo.thumbnailSrc;
   image.alt = "";
   image.loading = "lazy";
   image.decoding = "async";
@@ -4556,6 +4559,26 @@ function getWrestlingGalleryPhotoCount(match) {
   return wrestlingPhotoTiles.length;
 }
 
+function getWrestlingGalleryRenderedPhotoCount(match, totalCount = getWrestlingGalleryPhotoCount(match)) {
+  const photos = getWrestlingMatchPhotoItems(match);
+  if (photos.length > 0) {
+    return Math.min(photos.length, totalCount || photos.length);
+  }
+  const photoIds = getWrestlingMatchPhotoIds(match);
+  if (photoIds.length > 0) {
+    return Math.min(photoIds.length, totalCount || photoIds.length);
+  }
+  return totalCount;
+}
+
+function formatWrestlingGalleryPhotoSummary(match) {
+  const totalCount = getWrestlingGalleryPhotoCount(match);
+  const renderedCount = getWrestlingGalleryRenderedPhotoCount(match, totalCount);
+  return totalCount > 0
+    ? `Showing ${Number(renderedCount).toLocaleString()} of ${Number(totalCount).toLocaleString()} Photos`
+    : "Showing 0 Photos";
+}
+
 function updateWrestlingMatchGalleryDisplay(show, match) {
   if (!wrestlingMatchGalleryShell) {
     return;
@@ -4580,7 +4603,7 @@ function updateWrestlingMatchGalleryDisplay(show, match) {
 
   const count = wrestlingMatchGalleryShell.querySelector(".wrestling-match-gallery-count strong");
   if (count) {
-    count.textContent = formatWrestlingCount(getWrestlingGalleryPhotoCount(match), "Photos");
+    count.textContent = formatWrestlingGalleryPhotoSummary(match);
   }
 
   const grid = wrestlingMatchGalleryShell.querySelector(".wrestling-photo-grid");
