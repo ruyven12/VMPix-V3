@@ -116,3 +116,68 @@ for (const viewport of viewports) {
     }
   });
 }
+
+const archiveReliabilityRoutes = [
+  {
+    path: "/music/people/adam-begin",
+    rail: "Person Detail",
+    visibleShell: ".person-detail-screen",
+    text: /Adam Begin/i,
+  },
+  {
+    path: "/music/shows/000000",
+    rail: "Show Detail",
+    visibleShell: "[data-show-detail]",
+    text: /Unable to load archive data|No matching archive record was found/i,
+  },
+  {
+    path: "/wrestling/people/ace-romero",
+    rail: "Person Detail",
+    visibleShell: "[data-wrestling-person-detail-shell]",
+    text: /EVENT HISTORY/i,
+  },
+  {
+    path: "/wrestling/people/missing-person",
+    rail: "Person Detail",
+    visibleShell: "[data-wrestling-person-detail-shell]",
+    text: /Unable to load archive data|No matching archive record was found/i,
+  },
+];
+
+test.describe("archive direct-route reliability", () => {
+  test.use({ viewport: { width: 360, height: 800 } });
+
+  test("valid and invalid Music/Wrestling detail routes render stable shells", async ({ page }) => {
+    await page.route("https://vmpix-data.onrender.com/**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: [],
+          rows: [],
+          people: [],
+          shows: [],
+          venues: [],
+          total: 0,
+          totalPages: 1,
+          limit: 100,
+          source: { data: [] },
+          meta: { pagination: { total: 0, totalPages: 1, limit: 100 } },
+        }),
+      });
+    });
+
+    for (const route of archiveReliabilityRoutes) {
+      const response = await page.goto(route.path, { waitUntil: "domcontentloaded" });
+      expect(response && response.ok()).toBe(true);
+      await expect(page.locator(".site-shell")).toBeVisible();
+      const visibleShell = page.locator(route.visibleShell);
+      await expect(visibleShell).toBeVisible();
+      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
+      await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
+      await expectNoHorizontalOverflow(page);
+    }
+  });
+});

@@ -281,7 +281,10 @@ function getMusicPersonDetailData(personId) {
     ? musicPersonDetailPlaceholder
     : null;
   if (!sourcePerson && !placeholderData) {
-    return createMusicPersonDetailStateData("error", normalizedPersonId);
+    const stateName = musicPeopleIndexDataState === "error" && !musicPeopleIndexLoaded
+      ? "error"
+      : "empty";
+    return createMusicPersonDetailStateData(stateName, normalizedPersonId);
   }
 
   return getMusicPersonDetailViewData({ ...placeholderData, ...sourcePerson }, normalizedPersonId);
@@ -334,6 +337,139 @@ function createUnknownBand(bandId) {
       total_sets: 0,
     },
   };
+}
+
+function getMusicBandDetailStateName() {
+  const dataState = musicBandsIndex?.dataset.bandsDataState || "";
+  if (!musicBandsIndexLoaded && (musicBandsIndexRequest || (typeof fetch === "function" && dataState !== "error"))) {
+    return "loading";
+  }
+  return dataState === "error" ? "error" : "empty";
+}
+
+function createBandDetailStateListItem(stateName, bandId, options = {}) {
+  const item = document.createElement("li");
+  item.className = "band-member band-member--state";
+  item.append(createMusicV3StateCard(stateName, "musicBands", {
+    small: true,
+    title: options.title,
+    text: options.text,
+    detail: bandId ? `Band: ${bandId}` : "",
+    retry: options.retry,
+  }));
+  return item;
+}
+
+function renderBandDetailState(stateName = "empty", bandId = "") {
+  if (!bandDetail) {
+    return;
+  }
+
+  const normalizedBandId = String(bandId || "").trim();
+  const isLoading = stateName === "loading";
+  const isError = stateName === "error";
+  const title = isLoading
+    ? "Loading Band Archive"
+    : isError
+      ? "Unable To Load Archive Data"
+      : "Archive Record Unavailable";
+  const text = isLoading
+    ? "Archive band records are being prepared."
+    : isError
+      ? "Unable to load archive data."
+      : "No matching archive record was found.";
+
+  activeMusicBand = null;
+  setBandDetailLogo("", title);
+  if (bandDetailLogoName) {
+    bandDetailLogoName.textContent = title;
+  }
+  if (bandDetailName) {
+    bandDetailName.textContent = title;
+  }
+  if (bandDetailRegion) {
+    bandDetailRegion.textContent = isLoading ? "Loading" : "Unavailable";
+  }
+  if (bandDetailTags) {
+    bandDetailTags.textContent = normalizedBandId;
+    bandDetailTags.hidden = !normalizedBandId;
+  }
+  if (bandDetailStatus) {
+    bandDetailStatus.className = "band-detail-tag band-detail-tag--needs";
+    bandDetailStatus.textContent = isLoading ? "Loading" : "Unavailable";
+  }
+  if (bandDetailLocation) {
+    bandDetailLocation.textContent = text;
+  }
+  if (bandDetailCompletionValue) {
+    bandDetailCompletionValue.textContent = "0%";
+  }
+  if (bandDetailProgressFill) {
+    bandDetailProgressFill.style.width = "0%";
+  }
+  [
+    bandDetailYearsCovered,
+    bandDetailMostActiveYear,
+    bandDetailTotalPhotos,
+    bandDetailContributors,
+    bandDetailSetsCaptured,
+    bandDetailDataStatus,
+    bandDetailLatestSeen,
+    bandDetailLifecycleStatus,
+    bandDetailLastUpdated,
+  ].forEach((element) => {
+    if (element) {
+      element.textContent = isLoading ? "Loading" : "Unavailable";
+    }
+  });
+  if (bandDetailViewSets) {
+    bandDetailViewSets.disabled = true;
+    bandDetailViewSets.setAttribute("aria-disabled", "true");
+  }
+  if (bandDetailCoreMembers) {
+    bandDetailCoreMembers.replaceChildren(createBandDetailStateListItem(stateName, normalizedBandId, {
+      title,
+      text,
+      retry: isError,
+    }));
+  }
+  if (bandDetailPastMembers) {
+    bandDetailPastMembers.replaceChildren(createBandDetailStateListItem("empty", normalizedBandId, {
+      text: "No member records are available for this route.",
+    }));
+  }
+
+  setBandsIndexVisible(false);
+  setBandDetailVisible(true);
+  setCurrentView("Band Detail");
+  if (musicNexusShell) {
+    musicNexusShell.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
+}
+
+function showBandDetailRoute(bandId, options = {}) {
+  const normalizedBandId = String(bandId || "").trim();
+  const band = findBandById(normalizedBandId);
+  if (band) {
+    showBandDetail(band);
+    return;
+  }
+
+  const stateName = getMusicBandDetailStateName();
+  renderBandDetailState(stateName, normalizedBandId);
+  if (!options.skipDataRequest && stateName === "loading") {
+    const request = musicBandsIndexRequest || requestMusicBandsIndexData();
+    request.then(() => {
+      const route = getRouteFromUrl();
+      if (route.name !== "band-detail" || String(route.bandId || "").toLowerCase() !== normalizedBandId.toLowerCase()) {
+        return;
+      }
+      showBandDetailRoute(route.bandId, { skipDataRequest: true });
+    });
+  }
 }
 
 function normalizeSetCode(setCode) {
@@ -3257,6 +3393,70 @@ function setupVenueShowsRelationshipCard(venue, shows) {
   };
 }
 
+function getMusicVenueDetailUnavailableStateName() {
+  if (!musicVenuesLoaded && (musicVenuesRequest || (typeof fetch === "function" && musicVenuesDataState !== "error"))) {
+    return "loading";
+  }
+  return musicVenuesDataState === "error" && !musicVenuesLoaded ? "error" : "empty";
+}
+
+function setMusicVenueRelationshipsHidden(isHidden) {
+  const relationships = venueDetail?.querySelector("[data-venue-relationships]");
+  if (!relationships) {
+    return;
+  }
+
+  relationships.hidden = Boolean(isHidden);
+  if (isHidden) {
+    relationships.setAttribute("inert", "");
+  } else {
+    relationships.removeAttribute("inert");
+  }
+}
+
+function clearMusicVenueDetailState() {
+  const statePanel = venueDetail?.querySelector("[data-music-venue-detail-state]");
+  if (statePanel) {
+    statePanel.remove();
+  }
+  setMusicVenueRelationshipsHidden(false);
+}
+
+function renderMusicVenueDetailState(venueSlug, stateName = "empty") {
+  if (!venueDetail) {
+    return;
+  }
+
+  const isLoading = stateName === "loading";
+  const isError = stateName === "error";
+  let statePanel = venueDetail.querySelector("[data-music-venue-detail-state]");
+  if (!statePanel) {
+    statePanel = document.createElement("section");
+    statePanel.className = "music-venue-detail-state";
+    statePanel.dataset.musicVenueDetailState = "";
+    statePanel.setAttribute("aria-live", "polite");
+    const relationships = venueDetail.querySelector("[data-venue-relationships]");
+    venueDetail.insertBefore(statePanel, relationships || null);
+  }
+
+  statePanel.dataset.musicVenueDetailState = stateName;
+  statePanel.replaceChildren(createMusicV3StateCard(stateName, "musicVenues", {
+    title: isLoading
+      ? "Loading Venue Archive"
+      : isError
+        ? "Unable To Load Archive Data"
+        : "Archive Record Unavailable",
+    text: isLoading
+      ? "Archive venue records are being prepared."
+      : isError
+        ? "Unable to load archive data."
+        : "No matching archive record was found.",
+    detail: venueSlug ? `Venue: ${venueSlug}` : "",
+    retry: isError,
+  }));
+  setMusicVenueRelationshipsHidden(true);
+}
+
 function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (!venueDetail) {
     return;
@@ -3312,6 +3512,11 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   setMusicVenueDetailRelationshipCount("shows", linkedShows.length);
   setMusicVenueDetailRelationshipCount("bands", hasVenue ? linkedArtists.length : stats.bands);
   setMusicVenueDetailRelationshipCount("photos", stats.photos);
+  if (!hasVenue) {
+    renderMusicVenueDetailState(slug, getMusicVenueDetailUnavailableStateName());
+    return;
+  }
+  clearMusicVenueDetailState();
   setupVenueShowsRelationshipCard(venue, linkedShows);
   setupVenueArtistsRelationshipCard(venue, linkedArtists);
 }
@@ -4208,6 +4413,11 @@ function showBandsIndexView(options = {}) {
 function showBandDetail(band) {
   if (!band || !bandDetail) {
     return;
+  }
+
+  if (bandDetailViewSets) {
+    bandDetailViewSets.disabled = false;
+    bandDetailViewSets.removeAttribute("aria-disabled");
   }
 
   const general = getBandDetailGeneral(band);
@@ -11200,6 +11410,40 @@ function createShowDetailRelationships(relationships) {
   return section;
 }
 
+function renderMusicShowDetailState(stateName = "empty", showId = "") {
+  if (!showDetail) {
+    return;
+  }
+
+  cleanupShowSetCardPreviews();
+  const isLoading = stateName === "loading";
+  const isError = stateName === "error";
+  const backButton = document.createElement("button");
+  backButton.className = "show-detail-back";
+  backButton.type = "button";
+  backButton.textContent = "Back to Shows";
+  backButton.addEventListener("click", returnToMusicShowsArchive);
+
+  const stateSection = document.createElement("section");
+  stateSection.className = `show-detail-state show-detail-state--${stateName}`;
+  stateSection.dataset.musicShowsState = stateName;
+  stateSection.append(createMusicV3StateCard(stateName, "musicShows", {
+    title: isLoading
+      ? "Loading Show Archive"
+      : isError
+        ? "Unable To Load Archive Data"
+        : "Archive Record Unavailable",
+    text: isLoading
+      ? "Archive show records are being prepared."
+      : isError
+        ? "Unable to load archive data."
+        : "No matching archive record was found.",
+    detail: showId ? `Show: ${showId}` : "",
+    retry: isError,
+  }));
+  showDetail.replaceChildren(backButton, stateSection);
+}
+
 function renderMusicShowDetail(show) {
   if (!showDetail || !show) {
     return;
@@ -11478,23 +11722,32 @@ function renderUnusedShowDetailLegacyPreview(show, relationships) {
   return viewing;
 }
 
-function showMusicShowDetail(showId) {
+function showMusicShowDetail(showId, options = {}) {
   const routeShowCode = normalizeSetCode(showId);
-  const show = findMusicShowById(routeShowCode) || createUnknownMusicShow(routeShowCode);
-  renderMusicShowDetail(show);
+  const show = findMusicShowById(routeShowCode);
+  if (show) {
+    renderMusicShowDetail(show);
+  } else {
+    const stateName = !musicShowsSetsLoaded && musicShowsSetsDataState !== "error" && typeof fetch === "function"
+      ? "loading"
+      : musicShowsSetsDataState === "error"
+        ? "error"
+        : "empty";
+    renderMusicShowDetailState(stateName, routeShowCode);
+  }
   setBandsIndexVisible(false);
   setPeopleIndexVisible(false);
   setMusicVenueIndexVisible(false);
   setMusicActivityPanelVisible(false);
   setMusicShowDetailVisible(true);
   setCurrentView("Show Detail");
-  if (!musicShowsSetsLoaded || musicShowsSetsDataState !== "live") {
+  if (!options.skipDataRequest && (!musicShowsSetsLoaded || musicShowsSetsDataState !== "live")) {
     requestMusicShowsSetsData().then(() => {
       const currentRoute = getRouteFromUrl();
       if (currentRoute.name !== "show-detail" || normalizeSetCode(currentRoute.showId) !== routeShowCode) {
         return;
       }
-      renderMusicShowDetail(findMusicShowById(routeShowCode) || createUnknownMusicShow(routeShowCode));
+      showMusicShowDetail(routeShowCode, { skipDataRequest: true });
     });
   }
   if (musicNexusShell) {

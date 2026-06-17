@@ -1602,8 +1602,17 @@ function renderWrestlingShowDetailState(showId, stateName) {
 
   stateSection.append(createWrestlingV3StateCard(stateName, "wrestlingShows", {
     detail: showId ? `Route: ${showId}` : "",
-    title: stateName === "empty" && showId ? "Event Not Found" : copy.title,
-    text: stateName === "empty" && showId ? "No DB-backed event matches this route." : copy.copy,
+    title: stateName === "empty" && showId
+      ? "Archive Record Unavailable"
+      : stateName === "error"
+        ? "Unable To Load Archive Data"
+        : copy.title,
+    text: stateName === "empty" && showId
+      ? "No matching archive record was found."
+      : stateName === "error"
+        ? "Unable to load archive data."
+        : copy.copy,
+    retry: stateName === "error",
   }));
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
 }
@@ -3285,6 +3294,7 @@ function createWrestlingVenueDetailState(stateName = "loading", copy = {}) {
   statePanel.append(createWrestlingV3StateCard(stateName, "wrestlingVenues", {
     title: copy.title,
     text: copy.text || copy.copy,
+    retry: stateName === "error",
   }));
   return statePanel;
 }
@@ -3437,7 +3447,9 @@ function renderWrestlingVenueDetailRoute(venueId, options = {}) {
     const isLoading = wrestlingVenuesDataState === "idle" || wrestlingVenuesDataState === "loading";
     const stateName = wrestlingVenuesDataState === "error" ? "error" : isLoading ? "loading" : "empty";
     const copy = stateName === "empty"
-      ? { title: "Venue Not Found", text: "This wrestling venue could not be found in the venue archive." }
+      ? { title: "Archive Record Unavailable", text: "No matching archive record was found." }
+      : stateName === "error"
+        ? { title: "Unable To Load Archive Data", text: "Unable to load archive data." }
       : {};
     wrestlingVenueDetailShell.replaceChildren(backButton, createWrestlingVenueDetailState(stateName, copy));
     return;
@@ -4725,6 +4737,7 @@ function renderWrestlingPersonDetailState(stateName, personId, copy = {}) {
     title: copy.title,
     text: copy.text || copy.copy,
     detail: personId ? `Person: ${personId}` : "",
+    retry: stateName === "error",
   });
   stateCard.dataset.wrestlingPersonId = normalizeWrestlingPersonId(personId);
   wrestlingPersonDetailShell.replaceChildren(createWrestlingPersonDetailBackButton(), stateCard);
@@ -4765,12 +4778,17 @@ function renderWrestlingPersonDetailRoute(personId) {
   let person = findWrestlingPersonById(personId, { allowFallback: false, includeStatic: true });
 
   if (!person) {
+    const stateName = wrestlingPeopleDataState === "error" && !wrestlingPeopleLoaded
+      ? "error"
+      : "empty";
     renderWrestlingPersonDetailState(
-      wrestlingPeopleDataState === "empty" ? "empty" : "error",
+      stateName,
       personId,
       {
-        title: "Person Not Found",
-        text: "This wrestling person is not available in the current archive data.",
+        title: stateName === "error" ? "Unable To Load Archive Data" : "Archive Record Unavailable",
+        text: stateName === "error"
+          ? "Unable to load archive data."
+          : "No matching archive record was found.",
       }
     );
     return;
@@ -5296,6 +5314,7 @@ function renderWrestlingMatchGalleryGridState(stateName = "empty", options = {})
     small: true,
     title: options.title,
     text: options.text,
+    retry: options.retry,
   }));
   grid.replaceChildren(item);
 }
@@ -5413,7 +5432,11 @@ function updateWrestlingMatchGalleryDisplay(show, match) {
 
 function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
   const show = findLiveWrestlingShowById(showId);
-  const title = stateName === "loading" ? "Loading Match" : "Match Not Found";
+  const title = stateName === "loading"
+    ? "Loading Match"
+    : stateName === "error"
+      ? "Unable To Load Archive Data"
+      : "Archive Record Unavailable";
   const type = stateName === "loading" ? "Loading" : "Unavailable";
   const showRouteSource = show || showId;
   const routeMatchRef = getWrestlingMatchRouteRef(matchRef);
@@ -5427,7 +5450,10 @@ function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
     title,
     text: stateName === "loading"
       ? "Preparing match gallery relationships."
-      : "No match record matches this route.",
+      : stateName === "error"
+        ? "Unable to load archive data."
+        : "No matching archive record was found.",
+    retry: stateName === "error",
   });
 }
 
@@ -5449,6 +5475,10 @@ function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", mat
 
   if (shouldRequestLiveShows && (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle")) {
     updateWrestlingMatchGalleryState(showId, matchRef, "loading");
+    return;
+  }
+  if (shouldRequestLiveShows && wrestlingShowsDataState === "error") {
+    updateWrestlingMatchGalleryState(showId, matchRef, "error");
     return;
   }
 

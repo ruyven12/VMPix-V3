@@ -467,11 +467,15 @@ const musicPersonDetailPlaceholder = {
 const musicPersonDetailStateCopy = {
   loading: {
     title: "Loading Person Archive",
-    copy: "Static loading placeholder reserved for future person archive requests.",
+    copy: "Archive person records are being prepared.",
+  },
+  empty: {
+    title: "Archive Record Unavailable",
+    copy: "No matching archive record was found.",
   },
   error: {
-    title: "Unable To Load Person Archive",
-    copy: "Static error placeholder reserved for future archive recovery.",
+    title: "Unable To Load Archive Data",
+    copy: "Person archive data could not be loaded.",
   },
 };
 

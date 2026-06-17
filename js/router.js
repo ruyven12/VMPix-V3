@@ -390,15 +390,19 @@ function syncRoute(route, options = {}) {
     const historyState = options.historyState || window.history.state || {};
     bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
     showMusicNexus({ initialSection: "bands" });
-    showBandDetail(findBandById(route.bandId) || createUnknownBand(route.bandId));
-    requestMusicBandsIndexData().then(() => {
-      const currentRoute = getRouteFromUrl();
-      if (currentRoute.name !== "band-detail" || String(currentRoute.bandId || "").toLowerCase() !== String(route.bandId || "").toLowerCase()) {
-        return;
-      }
+    if (typeof showBandDetailRoute === "function") {
+      showBandDetailRoute(route.bandId);
+    } else {
+      showBandDetail(findBandById(route.bandId) || createUnknownBand(route.bandId));
+      requestMusicBandsIndexData().then(() => {
+        const currentRoute = getRouteFromUrl();
+        if (currentRoute.name !== "band-detail" || String(currentRoute.bandId || "").toLowerCase() !== String(route.bandId || "").toLowerCase()) {
+          return;
+        }
 
-      showBandDetail(findBandById(currentRoute.bandId) || createUnknownBand(currentRoute.bandId));
-    });
+        showBandDetail(findBandById(currentRoute.bandId) || createUnknownBand(currentRoute.bandId));
+      });
+    }
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl, {
         returnUrl: bandsIndexReturnUrl,

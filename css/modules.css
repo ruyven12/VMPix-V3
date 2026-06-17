@@ -2028,6 +2028,23 @@ img.archive-gallery-image {
   min-width: 0;
 }
 
+.band-member--state,
+.show-detail-state,
+.music-venue-detail-state {
+  min-width: 0;
+}
+
+.band-member--state {
+  grid-column: 1 / -1;
+  display: block;
+}
+
+.show-detail-state,
+.music-venue-detail-state {
+  display: grid;
+  padding: clamp(0.74rem, 3vw, 1rem);
+}
+
 @keyframes v3StatePulse {
   0%,
   100% {
