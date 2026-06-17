@@ -70,6 +70,7 @@ let activeSetGalleryAlbumRequestKey = "";
 let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
+let musicVenuesDataState = "fallback";
 let activeMusicVenueSearch = "";
 let activeMusicVenueStateFilter = "";
 let activeMusicVenueSlugFilter = "";
@@ -103,6 +104,104 @@ let activeMusicPeopleCategoryFilter = "";
 let activeMusicPeopleInstrumentFilter = "";
 let activeLightboxCustomTiles = null;
 let activeLightboxReturnContext = null;
+
+function retryMusicBandsIndexState() {
+  musicBandsIndexLoaded = false;
+  if (musicBandsIndexRequest) {
+    return;
+  }
+
+  setMusicBandsIndexCollection(musicBandIndexRows, "loading");
+  syncBandsIndex();
+  requestMusicBandsIndexData();
+}
+
+function retryMusicPeopleIndexState() {
+  musicPeopleIndexLoaded = false;
+  if (musicPeopleIndexRequest) {
+    return;
+  }
+
+  setMusicPeopleIndexCollection([], "loading");
+  renderMusicPeopleIndex({ shouldResetScroll: false });
+  requestMusicPeopleIndexData();
+}
+
+function retryMusicShowsArchiveState() {
+  musicShowsSetsLoaded = false;
+  musicShowsIndexDataRequested = false;
+  if (musicShowsSetsRequest) {
+    return;
+  }
+
+  musicShowsSetsDataState = "loading";
+  resetMusicShowsIndexRowsCache();
+  renderMusicShowsArchive();
+}
+
+function retryMusicVenuesState() {
+  musicVenuesLoaded = false;
+  if (musicVenuesRequest) {
+    return;
+  }
+
+  musicVenuesDataState = "loading";
+  renderMusicVenuesResults();
+  requestMusicVenuesData().then(() => {
+    if (getRouteFromUrl().name === "music-venues") {
+      renderMusicVenuesArchive();
+    }
+  });
+}
+
+function getMusicV3StateOptions(scope, stateName, options = {}) {
+  const stateOptions = { ...options, scope };
+  const retryByScope = {
+    musicBands: { label: "Retry Bands", onClick: retryMusicBandsIndexState },
+    musicPeople: { label: "Retry People", onClick: retryMusicPeopleIndexState },
+    musicShows: { label: "Retry Shows", onClick: retryMusicShowsArchiveState },
+    musicVenues: { label: "Retry Venues", onClick: retryMusicVenuesState },
+  };
+  if (stateOptions.retry === true && stateName === "error" && retryByScope[scope]) {
+    stateOptions.retry = retryByScope[scope];
+  }
+  return stateOptions;
+}
+
+function createMusicV3StateCard(stateName = "empty", scope = "music", options = {}) {
+  const stateOptions = getMusicV3StateOptions(scope, stateName, options);
+  if (stateName === "loading" && typeof createV3LoadingState === "function") {
+    return createV3LoadingState(stateOptions);
+  }
+  if (stateName === "error" && typeof createV3ErrorState === "function") {
+    return createV3ErrorState(stateOptions);
+  }
+  if (stateName === "empty" && typeof createV3EmptyState === "function") {
+    return createV3EmptyState(stateOptions);
+  }
+  return createV3StateCard(stateName, stateOptions);
+}
+
+function renderMusicV3State(container, stateName = "empty", scope = "music", options = {}) {
+  const stateOptions = getMusicV3StateOptions(scope, stateName, options);
+  if (stateName === "loading" && typeof renderV3LoadingState === "function") {
+    return renderV3LoadingState(container, stateOptions);
+  }
+  if (stateName === "error" && typeof renderV3ErrorState === "function") {
+    return renderV3ErrorState(container, stateOptions);
+  }
+  if (stateName === "empty" && typeof renderV3EmptyState === "function") {
+    return renderV3EmptyState(container, stateOptions);
+  }
+  return renderV3State(container, stateName, stateOptions);
+}
+
+function createMusicV3StateItem(stateName = "empty", scope = "music", options = {}) {
+  const item = document.createElement(options.itemTag || "li");
+  item.className = options.itemClass || "music-state-item";
+  item.append(createMusicV3StateCard(stateName, scope, options));
+  return item;
+}
 
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
@@ -496,7 +595,7 @@ function getMusicBandsIndexCollection() {
 
 function setMusicBandsIndexCollection(rows, stateName = "fallback") {
   musicBandsIndexCollection = Array.isArray(rows) ? rows : getMockCollection("musicBands", { clone: false });
-  if (typeof mockCollections !== "undefined") {
+  if (stateName !== "loading" && typeof mockCollections !== "undefined") {
     mockCollections.musicBands = musicBandsIndexCollection;
   }
   if (musicBandsIndex) {
@@ -1040,10 +1139,8 @@ function requestMusicBandsIndexData() {
     return Promise.resolve(false);
   }
 
-  if (musicBandsIndex) {
-    musicBandsIndex.dataset.bandsDataState = "loading";
-    musicBandsIndex.setAttribute("aria-busy", "true");
-  }
+  setMusicBandsIndexCollection([], "loading");
+  syncBandsIndex();
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), MUSIC_BANDS_INDEX_TIMEOUT_MS)
@@ -1072,7 +1169,7 @@ function requestMusicBandsIndexData() {
       return true;
     })
     .catch(() => {
-      restoreMusicBandsFallback();
+      setMusicBandsIndexCollection(musicBandIndexRows, "error");
       syncBandsIndex();
       return false;
     })
@@ -1792,8 +1889,9 @@ function normalizeMusicVenues(payload) {
     .filter((venue) => venue.venueId && isReadableMusicVenueName(venue.venueName));
 }
 
-function setMusicVenuesCollection(rows) {
+function setMusicVenuesCollection(rows, stateName = "live") {
   musicVenuesCollection = Array.isArray(rows) ? rows : [];
+  musicVenuesDataState = stateName;
 }
 
 function findMusicVenueById(venueId) {
@@ -1838,6 +1936,10 @@ function requestMusicVenuesData() {
     : 0;
   const apiUrl = new URL(MUSIC_VENUES_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
 
+  musicVenuesDataState = "loading";
+  if (getRouteFromUrl().name === "music-venues") {
+    renderMusicVenuesResults();
+  }
   musicVenuesRequest = fetch(apiUrl, {
     cache: "no-store",
     signal: controller?.signal,
@@ -1854,11 +1956,17 @@ function requestMusicVenuesData() {
         throw new Error("Music venues response contained no rows");
       }
 
-      setMusicVenuesCollection(liveRows);
+      setMusicVenuesCollection(liveRows, "live");
       musicVenuesLoaded = true;
       return true;
     })
-    .catch(() => false)
+    .catch(() => {
+      musicVenuesDataState = "error";
+      if (getRouteFromUrl().name === "music-venues") {
+        renderMusicVenuesResults();
+      }
+      return false;
+    })
     .finally(() => {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
@@ -2336,6 +2444,27 @@ function renderMusicVenuesResults() {
     return;
   }
 
+  if (musicVenuesDataState === "loading" && !musicVenuesLoaded) {
+    const loadingState = createMusicV3StateCard("loading", "musicVenues", {
+      text: "Preparing venue cards and event relationships.",
+    });
+    loadingState.classList.add("music-venues-empty");
+    musicVenuesList.replaceChildren(loadingState);
+    setMusicVenuesCount(0);
+    return;
+  }
+
+  if (musicVenuesDataState === "error" && !musicVenuesLoaded) {
+    const errorState = createMusicV3StateCard("error", "musicVenues", {
+      retry: true,
+      text: "Venue records could not load from the archive source.",
+    });
+    errorState.classList.add("music-venues-empty");
+    musicVenuesList.replaceChildren(errorState);
+    setMusicVenuesCount(0);
+    return;
+  }
+
   const visibleRows = getFilteredMusicVenues();
 
   musicVenuesList.replaceChildren();
@@ -2343,9 +2472,10 @@ function renderMusicVenuesResults() {
     musicVenuesList.append(createMusicVenueCard(venue));
   });
   if (visibleRows.length === 0) {
-    const emptyState = document.createElement("div");
-    emptyState.className = "music-venues-empty";
-    emptyState.textContent = "No venues match the current filters.";
+    const emptyState = createMusicV3StateCard("empty", "musicVenues", {
+      text: "No venues match the current filters.",
+    });
+    emptyState.classList.add("music-venues-empty");
     musicVenuesList.append(emptyState);
   }
   setMusicVenuesCount(visibleRows.length);
@@ -2583,9 +2713,11 @@ function getMusicVenueShowSafeCountMeta(show) {
 }
 
 function createVenueShowsEmptyState() {
-  const empty = document.createElement("p");
-  empty.className = "venue-shows-empty";
-  empty.textContent = "No shows linked to this venue.";
+  const empty = createMusicV3StateCard("empty", "musicShows", {
+    small: true,
+    text: "No shows linked to this venue.",
+  });
+  empty.classList.add("venue-shows-empty");
   return empty;
 }
 
@@ -2696,9 +2828,11 @@ function renderVenueShowsPanel(panel, shows) {
 }
 
 function createVenueArtistsEmptyState(text = "No artists linked to this venue.") {
-  const empty = document.createElement("p");
-  empty.className = "venue-shows-empty venue-artists-empty";
-  empty.textContent = text;
+  const empty = createMusicV3StateCard("empty", "musicPeople", {
+    small: true,
+    text,
+  });
+  empty.classList.add("venue-shows-empty", "venue-artists-empty");
   return empty;
 }
 
@@ -3627,6 +3761,8 @@ function requestMusicShowsSetsData() {
     return Promise.resolve(false);
   }
 
+  musicShowsSetsDataState = "loading";
+  resetMusicShowsIndexRowsCache();
   if (setsArchive) {
     setsArchive.dataset.setsDataState = "loading";
     setsArchive.setAttribute("aria-busy", "true");
@@ -3662,7 +3798,8 @@ function requestMusicShowsSetsData() {
       return true;
     })
     .catch(() => {
-      restoreMusicShowsSetsFallback();
+      setMusicShowsSetsCollection(getFallbackSetRowsData(), "error");
+      resetMusicShowsIndexRowsCache();
       return false;
     })
     .finally(() => {
@@ -5825,12 +5962,26 @@ function renderSetsEmptyState(message = "No live shows indexed for this band yet
 
   const item = document.createElement("li");
   item.className = "sets-list-empty";
-  item.textContent = message;
+  item.append(createMusicV3StateCard("empty", "musicShows", {
+    small: true,
+    text: message,
+  }));
   setsList.replaceChildren(item);
 }
 
 function renderSetsListRows(rows, selectedSetCode = "") {
   if (!setsList) {
+    return;
+  }
+
+  if (musicShowsSetsDataState === "error" && !musicShowsSetsLoaded) {
+    const item = document.createElement("li");
+    item.className = "sets-list-empty";
+    item.append(createMusicV3StateCard("error", "musicShows", {
+      small: true,
+      text: "Sets for this band could not load from the archive source.",
+    }));
+    setsList.replaceChildren(item);
     return;
   }
 
@@ -6128,6 +6279,7 @@ function renderBandsLetterNavs(rows) {
 
 function renderBandsRadar(rows) {
   const forcedState = getForcedMockState("musicBands");
+  const dataState = musicBandsIndex?.dataset.bandsDataState || "";
   const isAllRadar = !activeBandsLetter;
   const activeRows = isAllRadar ? rows : rows.filter((band) => getBandLetter(band) === activeBandsLetter);
 
@@ -6146,12 +6298,28 @@ function renderBandsRadar(rows) {
     if (forcedState && forcedState !== "partial") {
       const empty = document.createElement("li");
       empty.className = "bands-radar-signal bands-radar-empty";
-      empty.textContent = getMockStateCopy(forcedState, "musicBands").title;
+      empty.append(createMusicV3StateCard(forcedState, "musicBands", { small: true }));
+      fragment.append(empty);
+    } else if (dataState === "loading" && !musicBandsIndexLoaded) {
+      const empty = document.createElement("li");
+      empty.className = "bands-radar-signal bands-radar-empty";
+      empty.append(createMusicV3StateCard("loading", "musicBands", { small: true }));
+      fragment.append(empty);
+    } else if (dataState === "error" && !musicBandsIndexLoaded) {
+      const empty = document.createElement("li");
+      empty.className = "bands-radar-signal bands-radar-empty";
+      empty.append(createMusicV3StateCard("error", "musicBands", {
+        retry: true,
+        small: true,
+      }));
       fragment.append(empty);
     } else if (activeRows.length === 0) {
       const empty = document.createElement("li");
       empty.className = "bands-radar-signal bands-radar-empty";
-      empty.textContent = "No active signal";
+      empty.append(createMusicV3StateCard("empty", "musicBands", {
+        small: true,
+        text: "No active signal.",
+      }));
       fragment.append(empty);
     } else {
       const signalRows = activeRows.slice(0, 8);
@@ -6306,14 +6474,24 @@ function renderBandsList(rows) {
   }
 
   const forcedState = getForcedMockState("musicBands");
+  const dataState = musicBandsIndex?.dataset.bandsDataState || "";
   const listRows = getListBands(rows);
   if (forcedState && forcedState !== "partial") {
-    renderMockState(bandsList, forcedState, "musicBands", { clear: true });
+    renderMusicV3State(bandsList, forcedState, "musicBands");
+  } else if (dataState === "loading" && !musicBandsIndexLoaded) {
+    renderMusicV3State(bandsList, "loading", "musicBands");
+  } else if (dataState === "error" && !musicBandsIndexLoaded) {
+    renderMusicV3State(bandsList, "error", "musicBands", { retry: true });
   } else {
     const fragment = document.createDocumentFragment();
     listRows.forEach((band) => {
       fragment.append(createBandListRow(band));
     });
+    if (!forcedState && listRows.length === 0) {
+      fragment.append(createMusicV3StateCard("empty", "musicBands", {
+        text: "No bands match the current filters.",
+      }));
+    }
     if (forcedState === "partial") {
       fragment.append(createMockStateCard("partial", "musicBands"));
     }
@@ -6321,7 +6499,7 @@ function renderBandsList(rows) {
   }
 
   if (bandsEmpty) {
-    bandsEmpty.classList.toggle("is-active", !forcedState && listRows.length === 0);
+    bandsEmpty.classList.remove("is-active");
   }
   if (bandsListFilterBar) {
     bandsListFilterBar.hidden = !activeBandsFilterLetter;
@@ -6366,21 +6544,30 @@ function renderBandsList(rows) {
 
 function renderBandsSearch(rows) {
   const forcedState = getForcedMockState("musicBands");
+  const dataState = musicBandsIndex?.dataset.bandsDataState || "";
   if (bandsSearchInput && bandsSearchInput.value !== bandsSearchTerm) {
     bandsSearchInput.value = bandsSearchTerm;
   }
   if (bandsSearchSummary) {
-    bandsSearchSummary.textContent = forcedState && forcedState !== "partial"
+    bandsSearchSummary.textContent = (forcedState && forcedState !== "partial")
       ? getMockStateCopy(forcedState, "musicBands").title
+      : dataState === "loading" && !musicBandsIndexLoaded
+      ? "Loading band rows"
+      : dataState === "error" && !musicBandsIndexLoaded
+      ? getMockStateCopy("error", "musicBands").title
       : `${rows.length} row${rows.length === 1 ? "" : "s"}`;
   }
   if (bandsSearchResults) {
     const fragment = document.createDocumentFragment();
     if (forcedState && forcedState !== "partial") {
-      const item = document.createElement("li");
-      item.className = "bands-search-result-row";
-      item.append(createMockStateCard(forcedState, "musicBands"));
-      fragment.append(item);
+      fragment.append(createMusicV3StateItem(forcedState, "musicBands", { itemClass: "bands-search-result-row" }));
+    } else if (dataState === "loading" && !musicBandsIndexLoaded) {
+      fragment.append(createMusicV3StateItem("loading", "musicBands", { itemClass: "bands-search-result-row" }));
+    } else if (dataState === "error" && !musicBandsIndexLoaded) {
+      fragment.append(createMusicV3StateItem("error", "musicBands", {
+        itemClass: "bands-search-result-row",
+        retry: true,
+      }));
     } else {
       rows.forEach((band) => {
         const item = document.createElement("li");
@@ -6395,11 +6582,11 @@ function renderBandsSearch(rows) {
         fragment.append(item);
       }
     }
-    if (!forcedState && rows.length === 0) {
-      const item = document.createElement("li");
-      item.className = "bands-search-result";
-      item.textContent = "No matching signal";
-      fragment.append(item);
+    if (!forcedState && !["loading", "error"].includes(dataState) && rows.length === 0) {
+      fragment.append(createMusicV3StateItem("empty", "musicBands", {
+        itemClass: "bands-search-result",
+        text: "No matching signal.",
+      }));
     }
     bandsSearchResults.replaceChildren(fragment);
   }
@@ -7896,9 +8083,11 @@ function createMusicPersonAssociatedBand(band) {
 }
 
 function createMusicPersonEmptyState(text) {
-  const emptyState = document.createElement("div");
-  emptyState.className = "person-detail-empty-state";
-  emptyState.textContent = text;
+  const emptyState = createMusicV3StateCard("empty", "musicPeople", {
+    small: true,
+    text,
+  });
+  emptyState.classList.add("person-detail-empty-state");
   return emptyState;
 }
 
@@ -8265,21 +8454,16 @@ function renderMusicPersonDetailState(data) {
   backButton.textContent = "Back To People";
   backButton.addEventListener("click", returnToMusicPeopleRoute);
 
-  const statePanel = document.createElement("section");
-  statePanel.className = "person-detail-state";
-  statePanel.setAttribute("aria-live", data.state === "loading" ? "polite" : "assertive");
-  statePanel.setAttribute("aria-busy", String(data.state === "loading"));
-
-  const title = document.createElement("h3");
-  title.className = "person-detail-state-title";
-  title.id = "person-detail-title";
-  title.textContent = data.title;
-
-  const copy = document.createElement("p");
-  copy.className = "person-detail-state-copy";
-  copy.textContent = data.copy;
-
-  statePanel.append(title, copy);
+  const statePanel = createMusicV3StateCard(data.state === "error" ? "error" : data.state, "musicPeople", {
+    title: data.title,
+    text: data.copy,
+    detail: data.name,
+  });
+  statePanel.classList.add("person-detail-state");
+  const title = statePanel.querySelector(".v3-state-title");
+  if (title) {
+    title.id = "person-detail-title";
+  }
   personDetail.replaceChildren(backButton, statePanel);
 }
 
@@ -8685,11 +8869,12 @@ function resetMusicPeopleFilters() {
 }
 
 function createMusicPeopleEmptyState(hasPublicRows = true) {
-  const empty = document.createElement("div");
-  empty.className = "music-people-empty";
-  empty.textContent = hasPublicRows
-    ? "No people found. Try clearing filters."
-    : "No public people records are available.";
+  const empty = createMusicV3StateCard("empty", "musicPeople", {
+    text: hasPublicRows
+      ? "No people found. Try clearing filters."
+      : "No public people records are available.",
+  });
+  empty.classList.add("music-people-empty");
   return empty;
 }
 
@@ -8719,11 +8904,11 @@ function renderMusicPeopleIndex(options = {}) {
   const numberedRows = getMusicPeopleRowsWithCategoryNumbers(filteredRows);
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
-    renderMockState(fragment, forcedState, "musicPeople");
+    fragment.append(createMusicV3StateCard(forcedState, "musicPeople"));
   } else if (dataState === "loading" && !musicPeopleIndexLoaded) {
-    renderMockState(fragment, "loading", "musicPeople");
+    fragment.append(createMusicV3StateCard("loading", "musicPeople"));
   } else if (dataState === "error" && numberedRows.length === 0) {
-    renderMockState(fragment, "error", "musicPeople");
+    fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
   } else {
     numberedRows.forEach((person) => {
       fragment.append(createMusicPeopleRow(person));
@@ -9362,21 +9547,12 @@ function resetMusicShowsFilters() {
 }
 
 function createMusicShowsState(stateName, stateCopy = musicShowsStateCopy[stateName] || musicShowsStateCopy.empty) {
-  const state = document.createElement("section");
-  state.className = `music-shows-state music-shows-state--${stateName}`;
+  const state = createMusicV3StateCard(stateName, "musicShows", {
+    title: stateCopy.title,
+    text: stateCopy.copy,
+  });
+  state.classList.add("music-shows-state", `music-shows-state--${stateName}`);
   state.dataset.musicShowsState = stateName;
-  state.setAttribute("aria-live", stateName === "error" ? "assertive" : "polite");
-  state.setAttribute("aria-busy", String(stateName === "loading"));
-
-  const title = document.createElement("h5");
-  title.className = "music-shows-state-title";
-  title.textContent = stateCopy.title;
-
-  const copy = document.createElement("p");
-  copy.className = "music-shows-state-copy";
-  copy.textContent = stateCopy.copy;
-
-  state.append(title, copy);
   return state;
 }
 
@@ -9643,9 +9819,24 @@ function renderMusicShowsArchive(options = {}) {
 
   const forcedState = getForcedMockState("musicShows");
   const filteredRows = getFilteredMusicShows();
+  const shouldShowLoadingState = !forcedState
+    && !options.skipDataRequest
+    && !musicShowsSetsLoaded
+    && !musicShowsIndexDataRequested
+    && typeof fetch === "function";
+  const shouldShowErrorState = !forcedState
+    && musicShowsSetsDataState === "error"
+    && !musicShowsSetsLoaded;
   const fragment = document.createDocumentFragment();
   if (forcedState && forcedState !== "partial") {
-    renderMockState(fragment, forcedState, "musicShows", { itemTag: "li", itemClass: "music-shows-empty" });
+    fragment.append(createMusicV3StateItem(forcedState, "musicShows", { itemClass: "music-shows-empty" }));
+  } else if (shouldShowLoadingState) {
+    fragment.append(createMusicV3StateItem("loading", "musicShows", { itemClass: "music-shows-empty" }));
+  } else if (shouldShowErrorState) {
+    fragment.append(createMusicV3StateItem("error", "musicShows", {
+      itemClass: "music-shows-empty",
+      retry: true,
+    }));
   } else {
     filteredRows.forEach((show) => {
       const item = document.createElement("li");
@@ -9657,7 +9848,7 @@ function renderMusicShowsArchive(options = {}) {
       renderMockState(fragment, "partial", "musicShows", { itemTag: "li", itemClass: "music-shows-empty" });
     }
   }
-  if (!forcedState && filteredRows.length === 0) {
+  if (!forcedState && !shouldShowLoadingState && !shouldShowErrorState && filteredRows.length === 0) {
     const empty = document.createElement("li");
     empty.className = "music-shows-empty";
     empty.append(createMusicShowsState("empty"));

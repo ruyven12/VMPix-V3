@@ -1121,6 +1121,212 @@ function renderMockState(container, stateName = "empty", scope = "", options = {
   return stateElement;
 }
 
+const v3StateNames = Object.freeze(["loading", "empty", "error"]);
+
+const v3StateCopy = Object.freeze({
+  loading: Object.freeze({
+    title: "Loading Archive",
+    text: "Preparing this V3 archive lane.",
+  }),
+  empty: Object.freeze({
+    title: "No Records Found",
+    text: "This surface is ready, but no matching records are available.",
+  }),
+  error: Object.freeze({
+    title: "Archive Unavailable",
+    text: "This surface could not load. Try again or return to the parent archive.",
+  }),
+});
+
+function normalizeV3StateName(stateName = "empty") {
+  const normalizedStateName = String(stateName || "").trim().toLowerCase();
+  return v3StateNames.includes(normalizedStateName) ? normalizedStateName : "empty";
+}
+
+function getV3StateCopy(stateName = "empty", options = {}) {
+  const normalizedStateName = normalizeV3StateName(stateName);
+  const scope = String(options.scope || "").trim();
+  const scopedCopy = scope && mockStateScopeCopy[scope]?.[normalizedStateName]
+    ? mockStateScopeCopy[scope][normalizedStateName]
+    : {};
+  const optionCopy = options.copy && typeof options.copy === "object" && !Array.isArray(options.copy)
+    ? options.copy
+    : {};
+  const optionText = typeof options.copy === "string" ? options.copy : "";
+
+  return {
+    title: options.title || optionCopy.title || scopedCopy.title || v3StateCopy[normalizedStateName].title,
+    text: options.text || options.message || optionText || optionCopy.text || optionCopy.copy || scopedCopy.text || v3StateCopy[normalizedStateName].text,
+    detail: options.detail || options.details || optionCopy.detail || optionCopy.details || "",
+  };
+}
+
+function getV3StateVariants(options = {}) {
+  const variant = String(options.variant || "").trim().toLowerCase();
+  return {
+    isSmall: Boolean(options.small || options.isSmall || variant === "small"),
+    isDetail: Boolean(options.detail || options.details || options.isDetail || variant === "detail"),
+  };
+}
+
+function getV3StateRetry(options = {}) {
+  const retryOptions = options.retry && typeof options.retry === "object" ? options.retry : {};
+  const onRetry = typeof options.onRetry === "function"
+    ? options.onRetry
+    : typeof options.retry === "function"
+      ? options.retry
+      : typeof retryOptions.onClick === "function"
+        ? retryOptions.onClick
+        : typeof retryOptions.action === "function"
+          ? retryOptions.action
+          : null;
+
+  if (!onRetry) {
+    return null;
+  }
+
+  return {
+    label: options.retryLabel || options.actionLabel || retryOptions.label || "Retry",
+    ariaLabel: options.retryAriaLabel || retryOptions.ariaLabel || "",
+    onRetry,
+  };
+}
+
+function appendV3StateDetail(body, detail) {
+  const detailItems = Array.isArray(detail)
+    ? detail.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+
+  if (detailItems.length > 0) {
+    const list = document.createElement("ul");
+    list.className = "v3-state-detail-list";
+    detailItems.forEach((item) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = item;
+      list.append(listItem);
+    });
+    body.append(list);
+    return;
+  }
+
+  const detailText = String(detail || "").trim();
+  if (!detailText) {
+    return;
+  }
+
+  const detailNode = document.createElement("span");
+  detailNode.className = "v3-state-detail";
+  detailNode.textContent = detailText;
+  body.append(detailNode);
+}
+
+function createV3StateCard(stateName = "empty", options = {}) {
+  const normalizedStateName = normalizeV3StateName(stateName);
+  const copy = getV3StateCopy(normalizedStateName, options);
+  const variants = getV3StateVariants({ ...options, detail: copy.detail });
+  const retry = getV3StateRetry(options);
+  const scope = String(options.scope || "").trim();
+  const card = document.createElement("div");
+  card.className = [
+    "v3-state-card",
+    `v3-state-card--${normalizedStateName}`,
+    variants.isSmall ? "v3-state-card--small" : "",
+    variants.isDetail ? "v3-state-card--detail" : "",
+    retry ? "v3-state-card--has-action" : "",
+  ].filter(Boolean).join(" ");
+  card.dataset.v3State = normalizedStateName;
+  card.setAttribute("role", normalizedStateName === "error" ? "alert" : "status");
+  card.setAttribute("aria-live", normalizedStateName === "error" ? "assertive" : "polite");
+  card.setAttribute("aria-busy", String(normalizedStateName === "loading"));
+  if (scope) {
+    card.dataset.v3StateScope = scope;
+  }
+
+  const mark = document.createElement("span");
+  mark.className = "v3-state-mark";
+  mark.setAttribute("aria-hidden", "true");
+
+  const body = document.createElement("span");
+  body.className = "v3-state-copy";
+
+  const title = document.createElement("strong");
+  title.className = "v3-state-title";
+  title.textContent = copy.title;
+
+  const text = document.createElement("span");
+  text.className = "v3-state-text";
+  text.textContent = copy.text;
+
+  body.append(title, text);
+  appendV3StateDetail(body, copy.detail);
+
+  if (retry) {
+    const actions = document.createElement("span");
+    actions.className = "v3-state-actions";
+
+    const retryButton = document.createElement("button");
+    retryButton.className = "v3-state-action";
+    retryButton.type = "button";
+    retryButton.textContent = retry.label;
+    if (retry.ariaLabel) {
+      retryButton.setAttribute("aria-label", retry.ariaLabel);
+    }
+    retryButton.addEventListener("click", retry.onRetry);
+    actions.append(retryButton);
+    body.append(actions);
+  }
+
+  card.append(mark, body);
+  return card;
+}
+
+function renderV3State(container, stateName = "empty", options = {}) {
+  if (!container) {
+    return null;
+  }
+
+  if (options.clear !== false) {
+    container.replaceChildren();
+  }
+
+  const stateElement = createV3StateCard(stateName, options);
+  const wrapperTag = options.itemTag || "";
+  if (wrapperTag) {
+    const wrapper = document.createElement(wrapperTag);
+    wrapper.className = options.itemClass || "v3-state-item";
+    wrapper.append(stateElement);
+    container.append(wrapper);
+    return wrapper;
+  }
+
+  container.append(stateElement);
+  return stateElement;
+}
+
+function createV3LoadingState(options = {}) {
+  return createV3StateCard("loading", options);
+}
+
+function createV3EmptyState(options = {}) {
+  return createV3StateCard("empty", options);
+}
+
+function createV3ErrorState(options = {}) {
+  return createV3StateCard("error", options);
+}
+
+function renderV3LoadingState(container, options = {}) {
+  return renderV3State(container, "loading", options);
+}
+
+function renderV3EmptyState(container, options = {}) {
+  return renderV3State(container, "empty", options);
+}
+
+function renderV3ErrorState(container, options = {}) {
+  return renderV3State(container, "error", options);
+}
+
 function mapMockPeopleRefs(ids = []) {
   return (Array.isArray(ids) ? ids : []).map((id) => {
     const person = wrestlingPeopleRows.find((row) => row.personId === id) || musicPeopleRows.find((row) => row.personId === id);

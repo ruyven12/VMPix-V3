@@ -1859,6 +1859,213 @@ img.archive-gallery-image {
   min-width: 0;
 }
 
+.v3-state-card {
+  --v3-state-accent: var(--v3-card-accent, rgba(255, 118, 102, 0.68));
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.58rem, 2.2vw, 0.86rem);
+  min-height: clamp(5.75rem, 18vw, 7.75rem);
+  padding: clamp(0.68rem, 2.6vw, 0.98rem);
+  border: 1px solid color-mix(in srgb, var(--v3-state-accent) 24%, rgba(247, 247, 242, 0.08));
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
+    radial-gradient(circle at 18% 50%, color-mix(in srgb, var(--v3-state-accent) 13%, transparent), transparent 38%),
+    rgba(1, 1, 3, 0.34);
+  box-shadow:
+    inset 0 0 1.1rem rgba(0, 0, 0, 0.22),
+    0 0 1rem color-mix(in srgb, var(--v3-state-accent) 7%, transparent);
+  overflow: hidden;
+}
+
+.v3-state-card[data-v3-state-scope^="music"] {
+  --v3-state-accent: var(--accent-music);
+}
+
+.v3-state-card[data-v3-state-scope^="wrestling"] {
+  --v3-state-accent: var(--accent-ring);
+}
+
+.v3-state-card--empty {
+  --v3-state-accent: rgba(247, 247, 242, 0.42);
+}
+
+.v3-state-card--error {
+  --v3-state-accent: rgba(255, 118, 102, 0.72);
+}
+
+.v3-state-card--small {
+  gap: clamp(0.46rem, 1.8vw, 0.66rem);
+  min-height: clamp(4.2rem, 14vw, 5.2rem);
+  padding: clamp(0.52rem, 2.1vw, 0.72rem);
+}
+
+.v3-state-card--detail {
+  align-items: start;
+  min-height: clamp(7rem, 22vw, 9.8rem);
+}
+
+.v3-state-mark {
+  position: relative;
+  width: clamp(2.1rem, 6.5vw, 2.8rem);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--v3-state-accent) 44%, rgba(247, 247, 242, 0.1));
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--v3-state-accent) 30%, transparent), transparent 58%),
+    rgba(247, 247, 242, 0.026);
+  box-shadow: 0 0 0.78rem color-mix(in srgb, var(--v3-state-accent) 18%, transparent);
+  flex: 0 0 auto;
+}
+
+.v3-state-card--small .v3-state-mark {
+  width: clamp(1.64rem, 5.2vw, 2.1rem);
+}
+
+.v3-state-mark::after {
+  position: absolute;
+  inset: 0.54rem;
+  content: "";
+  border-radius: inherit;
+  background: var(--v3-state-accent);
+}
+
+.v3-state-card--small .v3-state-mark::after {
+  inset: 0.42rem;
+}
+
+.v3-state-card--loading .v3-state-mark::after {
+  animation: v3StatePulse 1.1s ease-in-out infinite;
+}
+
+.v3-state-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.v3-state-title {
+  min-width: 0;
+  color: rgba(247, 247, 242, 0.82);
+  font-size: clamp(0.72rem, 2.8vw, 0.92rem);
+  font-weight: 400;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.v3-state-card--small .v3-state-title {
+  font-size: clamp(0.66rem, 2.5vw, 0.78rem);
+}
+
+.v3-state-text,
+.v3-state-detail,
+.v3-state-detail-list {
+  min-width: 0;
+  color: rgba(247, 247, 242, 0.52);
+  font-size: clamp(0.62rem, 2.35vw, 0.76rem);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.v3-state-card--small .v3-state-text {
+  font-size: clamp(0.58rem, 2.2vw, 0.68rem);
+}
+
+.v3-state-detail,
+.v3-state-detail-list {
+  color: rgba(247, 247, 242, 0.44);
+  text-transform: none;
+}
+
+.v3-state-detail-list {
+  display: grid;
+  gap: 0.22rem;
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.v3-state-actions {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+  margin-top: 0.16rem;
+}
+
+.v3-state-action {
+  appearance: none;
+  max-width: 100%;
+  min-height: 2.28rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0.52rem 0.72rem;
+  border: 1px solid color-mix(in srgb, var(--v3-state-accent) 38%, rgba(247, 247, 242, 0.12));
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.048), transparent 62%),
+    color-mix(in srgb, var(--v3-state-accent) 8%, transparent);
+  color: rgba(247, 247, 242, 0.82);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.6rem, 2.3vw, 0.72rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.v3-state-action:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.16rem;
+}
+
+.v3-state-item {
+  min-width: 0;
+}
+
+@keyframes v3StatePulse {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: scale(0.72);
+  }
+
+  50% {
+    opacity: 0.86;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 420px) {
+  .v3-state-card {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .v3-state-actions,
+  .v3-state-action {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-state-card,
+  .v3-state-action {
+    transition: none;
+  }
+
+  .v3-state-card--loading .v3-state-mark::after {
+    animation: none !important;
+    opacity: 0.72;
+    transform: none;
+  }
+}
+
 .set-gallery-grid {
   --archive-gallery-accent: rgba(255, 82, 72, 0.18);
   --archive-gallery-accent-line: rgba(255, 104, 92, 0.62);
