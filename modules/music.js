@@ -13,6 +13,7 @@ const MUSIC_PEOPLE_INDEX_MAX_PAGES = 20;
 const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 15000;
 const MUSIC_PERSON_DETAIL_SEARCH_LIMIT = 25;
 const MUSIC_PERSON_DETAIL_TIMEOUT_MS = 20000;
+const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
@@ -7415,7 +7416,20 @@ function getMusicPersonDateTimeOriginalValue(photo) {
   if (!photo || typeof photo !== "object") {
     return "";
   }
-  return getMusicPeopleText(photo.date_time_original || photo.dateTimeOriginal || photo.DateTimeOriginal);
+  return getMusicPeopleText(
+    photo.date_time_original ||
+    photo.dateTimeOriginal ||
+    photo.DateTimeOriginal ||
+    photo.date_taken ||
+    photo.dateTaken ||
+    photo.DateTaken ||
+    photo.taken_at ||
+    photo.takenAt ||
+    photo.TakenAt ||
+    photo.show_date ||
+    photo.showDate ||
+    photo.date
+  );
 }
 
 function getMusicPersonOriginalDateTime(source, type) {
@@ -7840,6 +7854,8 @@ function getMusicPersonTaggedShowMatchedShow(show) {
   return findMusicShowById(
     show?.show_id ||
     show?.showId ||
+    show?.show_key ||
+    show?.showKey ||
     show?.setCode ||
     show?.set_code ||
     show?.date_folder ||
@@ -7917,6 +7933,8 @@ function getMusicPersonTaggedShowAlbum(show, matchedShow, associatedBands = []) 
 function getMusicPersonTaggedShowSetCode(show, matchedShow = null, album = null) {
   return normalizeSetCode(
     (album && matchedShow ? getMusicShowAlbumDateFolder(matchedShow, album) : "") ||
+    show?.showKey ||
+    show?.show_key ||
     show?.setCode ||
     show?.set_code ||
     show?.date_folder ||
@@ -7948,7 +7966,7 @@ function getMusicPersonTaggedShowRoute(show, associatedBands = []) {
 }
 
 function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
-  const title = getMusicPeopleText(show?.title || show?.show_name || show?.name) || `Tagged Show ${index + 1}`;
+  const title = getMusicPeopleText(show?.title || show?.show_title || show?.showTitle || show?.show_name || show?.showName || show?.name) || `Tagged Show ${index + 1}`;
   const matchedShow = getMusicPersonTaggedShowMatchedShow(show);
   const taggedPhotos = getMusicPeopleCountValue(show?.tagged_photo_count, show?.taggedPhotoCount, show?.photo_count, show?.photoCount);
   const photos = getMusicPersonTaggedShowPhotos(show)
@@ -7958,6 +7976,7 @@ function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
   const hasRealThumbnails = photos.some((photo) => typeof photo === "object" && getMusicPersonMatchedPhotoUrl(photo));
   return {
     showId: getMusicPeopleText(show?.show_id || show?.showId || show?.album_id || show?.albumId) || createMusicPeopleSlug(`${title}-${index + 1}`),
+    showKey: getMusicPeopleText(show?.show_key || show?.showKey),
     albumId: getMusicPersonTaggedShowAlbumId(show),
     date: getMusicPersonShowDateParts(show),
     title,
@@ -7994,11 +8013,12 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
 
   const groups = new Map();
   photos.forEach((photo) => {
-    const groupKey = getMusicPeopleText(photo.show_id || photo.showId || photo.album_id || photo.albumId || photo.dateKey || "matched-photos");
+    const groupKey = getMusicPeopleText(photo.show_id || photo.showId || photo.show_key || photo.showKey || photo.album_id || photo.albumId || photo.dateKey || "matched-photos");
     if (!groups.has(groupKey)) {
-      const title = getMusicPeopleText(photo.show_name || photo.showName || photo.title) || "Tagged Archive Photos";
+      const title = getMusicPeopleText(photo.show_title || photo.showTitle || photo.show_name || photo.showName || photo.title) || "Tagged Archive Photos";
       groups.set(groupKey, {
         showId: groupKey,
+        showKey: getMusicPeopleText(photo.show_key || photo.showKey),
         albumId: getMusicPersonTaggedShowAlbumId(photo),
         rawDate: getMusicPeopleText(photo.show_date || photo.showDate || photo.date),
         dateFolder: getMusicPeopleText(photo.date_folder || photo.dateFolder || photo.album_date_folder || photo.albumDateFolder),
@@ -8035,6 +8055,8 @@ function getMusicPersonTaggedShowMergeKeys(show) {
   return new Set([
     show.showId,
     show.show_id,
+    show.showKey,
+    show.show_key,
     show.albumId,
     show.album_id,
     show.setCode,
@@ -8488,8 +8510,9 @@ function updateMusicPersonShowCardThumbnails(card, thumbnails) {
     },
   };
   const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(thumbnails);
+  const previewThumbnails = thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
   const fragment = document.createDocumentFragment();
-  thumbnails.forEach((thumbnail) => {
+  previewThumbnails.forEach((thumbnail) => {
     fragment.append(createMusicPersonTaggedThumb(thumbnail, { lightboxPhotos, show }));
   });
   thumbGrid.replaceChildren(fragment);
@@ -8637,7 +8660,7 @@ function createMusicPersonShowCard(show, personName) {
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
   if (taggedThumbnails.length > 0) {
     const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedThumbnails);
-    taggedThumbnails.forEach((label) => {
+    taggedThumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT).forEach((label) => {
       thumbs.append(createMusicPersonTaggedThumb(label, { lightboxPhotos, show }));
     });
   } else {
