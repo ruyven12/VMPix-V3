@@ -366,6 +366,19 @@ function createWrestlingV3StateItem(stateName = "empty", scope = "wrestling", op
   return item;
 }
 
+function applyWrestlingGalleryImageLoading(image, index = 0, options = {}) {
+  if (!image) {
+    return;
+  }
+
+  const isFirstVisible = options.firstVisible === true && index === 0;
+  image.loading = isFirstVisible ? "eager" : "lazy";
+  image.decoding = "async";
+  if (!isFirstVisible) {
+    image.setAttribute("fetchpriority", "low");
+  }
+}
+
 const wrestlingShowsStateCopy = {
   loading: {
     title: "Loading Event Archive",
@@ -4247,8 +4260,7 @@ function createWrestlingPersonTaggedLightboxTile(photo, index = 0, eventRow = {}
   image.className = "archive-gallery-image";
   image.src = imageSrc || lightboxSrc;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyWrestlingGalleryImageLoading(image, index);
   image.onerror = () => {
     image.onerror = null;
     image.src = typeof galleryImageFallbackSrc !== "undefined"
@@ -4466,8 +4478,7 @@ function createWrestlingPersonEventTaggedThumb(photo, index = 0, eventRow = {}, 
   const image = document.createElement("img");
   image.src = imageUrl;
   image.alt = getWrestlingText(photo?.caption || photo?.Caption, `${person?.name || "Person"} tagged photo`);
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyWrestlingGalleryImageLoading(image, index);
   image.onerror = () => {
     image.remove();
     if (!thumb.textContent.trim()) {
@@ -5114,8 +5125,7 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   image.className = "archive-gallery-image";
   image.src = imageSrc;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyWrestlingGalleryImageLoading(image, index);
   image.onerror = () => {
     image.onerror = null;
     image.src = typeof galleryImageFallbackSrc !== "undefined"
@@ -5232,8 +5242,7 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
   image.className = "wrestling-photo-image";
   image.src = photo.lightboxSrc || photo.thumbnailSrc;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyWrestlingGalleryImageLoading(image, index, { firstVisible: true });
   image.onerror = () => {
     tile.classList.remove("has-photo");
     image.remove();

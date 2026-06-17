@@ -5148,6 +5148,19 @@ function requestMusicSmugmugAlbumPhotos(albumId, options = {}) {
     : requestMusicSmugmugAlbumPhotosPage(albumId, MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, 1);
 }
 
+function applyMusicGalleryImageLoading(image, index = 0, options = {}) {
+  if (!image) {
+    return;
+  }
+
+  const isFirstVisible = options.firstVisible === true && index === 0;
+  image.loading = isFirstVisible ? "eager" : "lazy";
+  image.decoding = "async";
+  if (!isFirstVisible) {
+    image.setAttribute("fetchpriority", "low");
+  }
+}
+
 function createSetGalleryPhotoTile(photo, index = 0) {
   const tile = document.createElement("button");
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
@@ -5165,8 +5178,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   image.className = "archive-gallery-image";
   image.src = photo.imageSrc;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyMusicGalleryImageLoading(image, index, { firstVisible: true });
   image.onerror = () => {
     image.onerror = null;
     image.src = galleryImageFallbackSrc;
@@ -8162,8 +8174,7 @@ function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
   image.className = "archive-gallery-image";
   image.src = imageSrc || lightboxSrc;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyMusicGalleryImageLoading(image, index);
   image.onerror = () => {
     image.onerror = null;
     image.src = galleryImageFallbackSrc;
@@ -8214,8 +8225,7 @@ function createMusicPersonTaggedThumb(item, options = {}) {
   if (imageUrl) {
     const image = document.createElement("img");
     image.alt = getMusicPeopleText(item?.caption) || "Tagged archive photo";
-    image.loading = "lazy";
-    image.decoding = "async";
+    applyMusicGalleryImageLoading(image, lightboxIndex >= 0 ? lightboxIndex : 0);
     image.src = imageUrl;
     thumb.append(image);
     return thumb;
@@ -10390,8 +10400,7 @@ function createShowSetCardPreviewImage(src, isActive = false) {
   const image = document.createElement("img");
   image.className = `show-set-card-image show-set-card-preview-image${isActive ? " is-active" : ""}`;
   image.alt = "";
-  image.loading = "lazy";
-  image.decoding = "async";
+  applyMusicGalleryImageLoading(image);
   image.src = src || SET_GALLERY_NO_POSTER_IMAGE_SRC;
   image.onerror = () => {
     image.onerror = null;
