@@ -285,6 +285,87 @@ let wrestlingVenuesDataState = "idle";
 let activeWrestlingVenueSearch = "";
 let activeWrestlingVenueStateFilter = "";
 
+function retryWrestlingShowsState() {
+  if (wrestlingShowsRequest) {
+    return;
+  }
+
+  wrestlingShowsDataRequested = false;
+  setWrestlingShowsCollection([], "loading");
+  renderWrestlingShowsArchive({ skipDataRequest: true });
+  requestWrestlingShowsData();
+}
+
+function retryWrestlingPeopleState() {
+  wrestlingPeopleLoaded = false;
+  if (wrestlingPeopleRequest) {
+    return;
+  }
+
+  setWrestlingPeopleCollection([], "loading");
+  renderWrestlingPeopleIndex({ skipDataRequest: true });
+  requestWrestlingPeopleData();
+}
+
+function retryWrestlingVenuesState() {
+  wrestlingVenuesLoaded = false;
+  if (wrestlingVenuesRequest) {
+    return;
+  }
+
+  setWrestlingVenuesCollection([], "loading");
+  renderWrestlingVenuesIndex({ skipDataRequest: true });
+  requestWrestlingVenuesData();
+}
+
+function getWrestlingV3StateOptions(scope, stateName, options = {}) {
+  const stateOptions = { ...options, scope };
+  const retryByScope = {
+    wrestlingShows: { label: "Retry Shows", onClick: retryWrestlingShowsState },
+    wrestlingPeople: { label: "Retry People", onClick: retryWrestlingPeopleState },
+    wrestlingVenues: { label: "Retry Venues", onClick: retryWrestlingVenuesState },
+  };
+  if (stateOptions.retry === true && stateName === "error" && retryByScope[scope]) {
+    stateOptions.retry = retryByScope[scope];
+  }
+  return stateOptions;
+}
+
+function createWrestlingV3StateCard(stateName = "empty", scope = "wrestling", options = {}) {
+  const stateOptions = getWrestlingV3StateOptions(scope, stateName, options);
+  if (stateName === "loading" && typeof createV3LoadingState === "function") {
+    return createV3LoadingState(stateOptions);
+  }
+  if (stateName === "error" && typeof createV3ErrorState === "function") {
+    return createV3ErrorState(stateOptions);
+  }
+  if (stateName === "empty" && typeof createV3EmptyState === "function") {
+    return createV3EmptyState(stateOptions);
+  }
+  return createV3StateCard(stateName, stateOptions);
+}
+
+function renderWrestlingV3State(container, stateName = "empty", scope = "wrestling", options = {}) {
+  const stateOptions = getWrestlingV3StateOptions(scope, stateName, options);
+  if (stateName === "loading" && typeof renderV3LoadingState === "function") {
+    return renderV3LoadingState(container, stateOptions);
+  }
+  if (stateName === "error" && typeof renderV3ErrorState === "function") {
+    return renderV3ErrorState(container, stateOptions);
+  }
+  if (stateName === "empty" && typeof renderV3EmptyState === "function") {
+    return renderV3EmptyState(container, stateOptions);
+  }
+  return renderV3State(container, stateName, stateOptions);
+}
+
+function createWrestlingV3StateItem(stateName = "empty", scope = "wrestling", options = {}) {
+  const item = document.createElement(options.itemTag || "li");
+  item.className = options.itemClass || "wrestling-state-item";
+  item.append(createWrestlingV3StateCard(stateName, scope, options));
+  return item;
+}
+
 const wrestlingShowsStateCopy = {
   loading: {
     title: "Loading Event Archive",
@@ -1185,23 +1266,16 @@ function resetWrestlingShowsFilters() {
   renderWrestlingShowsArchiveImmediately();
 }
 
-function createWrestlingShowState(stateName) {
+function createWrestlingShowState(stateName, options = {}) {
   const stateCopy = wrestlingShowsStateCopy[stateName] || wrestlingShowsStateCopy.empty;
   const item = document.createElement("li");
   item.className = `wrestling-show-state wrestling-show-state--${stateName}`;
   item.dataset.wrestlingShowsState = stateName;
-  item.setAttribute("aria-live", stateName === "error" ? "assertive" : "polite");
-  item.setAttribute("aria-busy", String(stateName === "loading"));
-
-  const title = document.createElement("h3");
-  title.className = "wrestling-show-state-title";
-  title.textContent = stateCopy.title;
-
-  const copy = document.createElement("p");
-  copy.className = "wrestling-show-state-copy";
-  copy.textContent = stateCopy.copy;
-
-  item.append(title, copy);
+  item.append(createWrestlingV3StateCard(stateName, "wrestlingShows", {
+    title: stateCopy.title,
+    text: stateCopy.copy,
+    retry: options.retry,
+  }));
   return item;
 }
 
@@ -1380,7 +1454,7 @@ function renderWrestlingShowsArchive(options = {}) {
   }
 
   if (wrestlingShowsDataState === "error") {
-    wrestlingShowList.append(createWrestlingShowState("error"));
+    wrestlingShowList.append(createWrestlingShowState("error", { retry: true }));
     return;
   }
 
@@ -1449,6 +1523,54 @@ function createWrestlingMatchCard(match, show = null, matchIndex = -1) {
   return card;
 }
 
+function createWrestlingShowGalleryCard(show, matches = []) {
+  const matchRows = Array.isArray(matches) ? matches : [];
+  const galleryMatchId = show?.galleryMatchId || show?.gallery_match_id || show?.matchIds?.[0] || show?.match_ids?.[0] || "";
+  const galleryMatch = findWrestlingMatchInRowsByRef(matchRows, galleryMatchId) || matchRows[0];
+  if (!galleryMatch) {
+    return null;
+  }
+
+  const galleryMatchIndex = matchRows.indexOf(galleryMatch);
+  const galleryMatchRef = getWrestlingMatchRouteRef(galleryMatch, galleryMatchIndex);
+  const galleryRoute = getWrestlingMatchRouteUrlByIds(show, galleryMatchRef);
+  const photoCount = getWrestlingGalleryPhotoCount(galleryMatch) || getWrestlingPeopleCountValue(show?.photoCount, show?.photo_count, show?.photos);
+
+  const gallerySection = document.createElement("section");
+  gallerySection.className = "wrestling-gallery-card";
+  gallerySection.setAttribute("aria-labelledby", "wrestling-gallery-title");
+
+  const copy = document.createElement("div");
+  copy.className = "wrestling-gallery-copy";
+
+  const title = document.createElement("h3");
+  title.className = "wrestling-gallery-title";
+  title.id = "wrestling-gallery-title";
+  title.textContent = "Photo Gallery";
+
+  const count = document.createElement("p");
+  count.className = "wrestling-gallery-count";
+  count.textContent = formatWrestlingCount(photoCount, "Photos");
+  copy.append(title, count);
+
+  const button = document.createElement("button");
+  button.className = "wrestling-gallery-button";
+  button.type = "button";
+  button.textContent = "Open Gallery";
+  button.dataset.wrestlingMatchRef = galleryMatchRef;
+  button.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
+  button.dataset.wrestlingMatchRoute = galleryRoute;
+  setWrestlingRelationshipDataset(button, {
+    ...galleryMatch,
+    showId: show?.showId || show?.eventId || galleryMatch.showId,
+    matchId: galleryMatchRef || galleryMatch.matchId,
+  });
+  button.addEventListener("click", () => navigateToRoute(galleryRoute));
+
+  gallerySection.append(copy, button);
+  return gallerySection;
+}
+
 function renderWrestlingShowDetailState(showId, stateName) {
   if (!wrestlingShowDetailShell) {
     return;
@@ -1463,19 +1585,13 @@ function renderWrestlingShowDetailState(showId, stateName) {
   const stateSection = document.createElement("section");
   stateSection.className = `wrestling-show-state wrestling-show-state--${stateName}`;
   stateSection.dataset.wrestlingShowsState = stateName;
-  stateSection.setAttribute("aria-live", stateName === "error" ? "assertive" : "polite");
-  stateSection.setAttribute("aria-busy", String(stateName === "loading"));
   const copy = wrestlingShowsStateCopy[stateName] || wrestlingShowsStateCopy.empty;
 
-  const title = document.createElement("h2");
-  title.className = "wrestling-show-state-title";
-  title.textContent = stateName === "empty" && showId ? "Event Not Found" : copy.title;
-
-  const text = document.createElement("p");
-  text.className = "wrestling-show-state-copy";
-  text.textContent = stateName === "empty" && showId ? "No DB-backed event matches this route." : copy.copy;
-
-  stateSection.append(title, text);
+  stateSection.append(createWrestlingV3StateCard(stateName, "wrestlingShows", {
+    detail: showId ? `Route: ${showId}` : "",
+    title: stateName === "empty" && showId ? "Event Not Found" : copy.title,
+    text: stateName === "empty" && showId ? "No DB-backed event matches this route." : copy.copy,
+  }));
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
 }
 
@@ -1585,18 +1701,19 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   } else {
     const emptyMatch = document.createElement("li");
     emptyMatch.className = "wrestling-match-card";
-    const type = document.createElement("p");
-    type.className = "wrestling-match-type";
-    type.textContent = "Matches";
-    const emptyTitle = document.createElement("h4");
-    emptyTitle.className = "wrestling-match-title";
-    emptyTitle.textContent = "No matches listed for this event.";
-    emptyMatch.append(type, emptyTitle);
+    emptyMatch.append(createWrestlingV3StateCard("empty", "wrestlingShows", {
+      small: true,
+      text: "No matches listed for this event.",
+    }));
     matchList.append(emptyMatch);
   }
   detailSection.append(matchTitle, matchList);
 
+  const gallerySection = createWrestlingShowGalleryCard(show, matches);
   wrestlingShowDetailShell.replaceChildren(backButton, hero, detailSection);
+  if (gallerySection) {
+    wrestlingShowDetailShell.append(gallerySection);
+  }
 }
 
 function getWrestlingPeopleCardLabel(person) {
@@ -2285,9 +2402,10 @@ function initWrestlingPeopleFilters() {
 }
 
 function createWrestlingPeopleEmptyState(copy = "No people found. Try clearing filters.") {
-  const empty = document.createElement("div");
-  empty.className = "wrestling-people-empty";
-  empty.textContent = copy;
+  const empty = createWrestlingV3StateCard("empty", "wrestlingPeople", {
+    text: copy,
+  });
+  empty.classList.add("wrestling-people-empty");
   return empty;
 }
 
@@ -2308,13 +2426,13 @@ function renderWrestlingPeopleIndex(options = {}) {
   const fragment = document.createDocumentFragment();
   wrestlingPeopleList.replaceChildren();
   if (forcedState && forcedState !== "partial") {
-    renderMockState(wrestlingPeopleList, forcedState, "wrestlingPeople");
+    renderWrestlingV3State(wrestlingPeopleList, forcedState, "wrestlingPeople");
     return;
   }
   if (wrestlingPeopleDataState === "loading" || wrestlingPeopleDataState === "idle") {
-    renderMockState(fragment, "loading", "wrestlingPeople");
+    fragment.append(createWrestlingV3StateCard("loading", "wrestlingPeople"));
   } else if (wrestlingPeopleDataState === "error") {
-    renderMockState(fragment, "error", "wrestlingPeople");
+    fragment.append(createWrestlingV3StateCard("error", "wrestlingPeople", { retry: true }));
   } else if (wrestlingPeopleDataState === "empty") {
     fragment.append(createWrestlingPeopleEmptyState("No wrestling people found."));
   } else if (filteredRows.length === 0) {
@@ -2922,9 +3040,10 @@ function createWrestlingVenueCard(venue) {
 }
 
 function createWrestlingVenuesEmptyState(message = "No venues match the current filters.") {
-  const emptyState = document.createElement("div");
-  emptyState.className = "wrestling-venues-empty";
-  emptyState.textContent = message;
+  const emptyState = createWrestlingV3StateCard("empty", "wrestlingVenues", {
+    text: message,
+  });
+  emptyState.classList.add("wrestling-venues-empty");
   return emptyState;
 }
 
@@ -2936,16 +3055,16 @@ function renderWrestlingVenuesResults() {
   const forcedState = getForcedMockState("wrestlingVenues");
   wrestlingVenuesList.replaceChildren();
   if (forcedState && forcedState !== "partial") {
-    renderMockState(wrestlingVenuesList, forcedState, "wrestlingVenues");
+    renderWrestlingV3State(wrestlingVenuesList, forcedState, "wrestlingVenues");
     setWrestlingVenuesCount(0);
     return;
   }
 
   const visibleRows = getFilteredWrestlingVenues();
   if (wrestlingVenuesDataState === "loading" || wrestlingVenuesDataState === "idle") {
-    renderMockState(wrestlingVenuesList, "loading", "wrestlingVenues");
+    renderWrestlingV3State(wrestlingVenuesList, "loading", "wrestlingVenues");
   } else if (wrestlingVenuesDataState === "error") {
-    renderMockState(wrestlingVenuesList, "error", "wrestlingVenues");
+    renderWrestlingV3State(wrestlingVenuesList, "error", "wrestlingVenues", { retry: true });
   } else if (wrestlingVenuesDataState === "empty") {
     wrestlingVenuesList.append(createWrestlingVenuesEmptyState("No wrestling venues found."));
   } else if (visibleRows.length === 0) {
@@ -3150,7 +3269,10 @@ function createWrestlingVenueDetailBackButton() {
 function createWrestlingVenueDetailState(stateName = "loading", copy = {}) {
   const statePanel = document.createElement("section");
   statePanel.className = "wrestling-venue-event-history";
-  renderMockState(statePanel, stateName, "wrestlingVenues", { copy });
+  statePanel.append(createWrestlingV3StateCard(stateName, "wrestlingVenues", {
+    title: copy.title,
+    text: copy.text || copy.copy,
+  }));
   return statePanel;
 }
 
@@ -3380,11 +3502,15 @@ function renderWrestlingVenueDetailRoute(venueId, options = {}) {
   eventList.setAttribute("role", "list");
   const forcedState = getForcedMockState("wrestlingVenues");
   if (forcedState && forcedState !== "partial") {
-    renderMockState(eventList, forcedState, "wrestlingVenues");
+    renderWrestlingV3State(eventList, forcedState, "wrestlingVenues");
   } else if (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle") {
-    renderMockState(eventList, "loading", "wrestlingVenues");
+    eventList.append(createWrestlingV3StateCard("loading", "wrestlingVenues", {
+      text: "Loading venue event history.",
+    }));
   } else if (wrestlingShowsDataState === "error") {
-    renderMockState(eventList, "error", "wrestlingVenues");
+    eventList.append(createWrestlingV3StateCard("error", "wrestlingVenues", {
+      text: "Event history could not load from the wrestling show archive.",
+    }));
   } else if (relatedEvents.length === 0) {
     eventList.append(createWrestlingVenuesEmptyState("No event history indexed for this venue yet."));
   } else {
@@ -4584,7 +4710,11 @@ function renderWrestlingPersonDetailState(stateName, personId, copy = {}) {
     return;
   }
 
-  const stateCard = createMockStateCard(stateName, "wrestlingPeople", copy);
+  const stateCard = createWrestlingV3StateCard(stateName, "wrestlingPeople", {
+    title: copy.title,
+    text: copy.text || copy.copy,
+    detail: personId ? `Person: ${personId}` : "",
+  });
   stateCard.dataset.wrestlingPersonId = normalizeWrestlingPersonId(personId);
   wrestlingPersonDetailShell.replaceChildren(createWrestlingPersonDetailBackButton(), stateCard);
 }
@@ -4601,7 +4731,9 @@ function renderWrestlingPersonDetailRoute(personId) {
     return;
   }
 
+  const staticPerson = findWrestlingPersonById(personId, { allowFallback: false, includeStatic: true });
   if (
+    !staticPerson &&
     !wrestlingPeopleLoaded &&
     (wrestlingPeopleDataState === "idle" || wrestlingPeopleDataState === "loading" || wrestlingPeopleRequest)
   ) {
@@ -4619,7 +4751,7 @@ function renderWrestlingPersonDetailRoute(personId) {
     return;
   }
 
-  let person = findWrestlingPersonById(personId, { allowFallback: false, includeStatic: false });
+  let person = findWrestlingPersonById(personId, { allowFallback: false, includeStatic: true });
 
   if (!person) {
     renderWrestlingPersonDetailState(
@@ -4685,14 +4817,14 @@ function renderWrestlingPersonDetailRoute(personId) {
   const eventTitle = document.createElement("h3");
   eventTitle.className = "wrestling-event-history-title";
   eventTitle.id = "wrestling-event-history-title";
-  eventTitle.textContent = "Event History";
+  eventTitle.textContent = "EVENT HISTORY";
 
   const eventList = document.createElement("div");
   eventList.className = "wrestling-event-history-list";
   eventList.setAttribute("role", "list");
   const forcedState = getForcedMockState("wrestlingPeople");
   if (forcedState && forcedState !== "partial") {
-    renderMockState(eventList, forcedState, "wrestlingPeople");
+    renderWrestlingV3State(eventList, forcedState, "wrestlingPeople");
   } else {
     const eventRows = getWrestlingPersonEventHistoryRows(person);
     if (eventRows.length > 0) {
@@ -4700,7 +4832,13 @@ function renderWrestlingPersonDetailRoute(personId) {
         eventList.append(createWrestlingPersonEventRow(eventRow, person));
       });
     } else if (wrestlingShowsDataState === "loading" || wrestlingShowsRequest) {
-      eventList.append(createWrestlingPeopleEmptyState("Loading event history."));
+      eventList.append(createWrestlingV3StateCard("loading", "wrestlingPeople", {
+        text: "Loading event history.",
+      }));
+    } else if (wrestlingShowsDataState === "error") {
+      eventList.append(createWrestlingV3StateCard("error", "wrestlingPeople", {
+        text: "Event history could not load from the wrestling show archive.",
+      }));
     } else {
       eventList.append(createWrestlingPeopleEmptyState("No event history indexed for this person yet."));
     }
@@ -5052,6 +5190,34 @@ function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, matc
   showLightbox(targetTile, { returnContext });
 }
 
+function applyWrestlingMatchPhotoRoute(tile, show = {}, match = {}, index = 0) {
+  if (!tile) {
+    return;
+  }
+
+  const showRouteSource = show?.showId || show?.eventId ? show : (match?.showId || wrestlingMatchGalleryShell?.dataset.wrestlingShowId || "warzone-26");
+  const matchRef = getWrestlingMatchRouteRef(match) ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchRef ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
+    match?.matchId ||
+    "match-1";
+  const routePhotoId = String(index + 1).padStart(3, "0");
+  const matchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, matchRef);
+
+  tile.dataset.wrestlingShowId = show?.showId || show?.eventId || match?.showId || wrestlingMatchGalleryShell?.dataset.wrestlingShowId || "warzone-26";
+  tile.dataset.wrestlingMatchId = matchRef;
+  tile.dataset.wrestlingMatchRef = matchRef;
+  tile.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
+  tile.dataset.wrestlingMatchRoute = matchRoute;
+  tile.dataset.wrestlingLightboxRoute = `${matchRoute}/photo/${encodeURIComponent(routePhotoId)}`;
+  setWrestlingRelationshipDataset(tile, {
+    ...match,
+    showId: tile.dataset.wrestlingShowId,
+    matchId: matchRef,
+    photoIds: [routePhotoId],
+  });
+}
+
 function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {}, match = {}) {
   const tile = document.createElement("li");
   tile.className = "wrestling-photo-tile has-photo";
@@ -5060,6 +5226,7 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
   tile.setAttribute("role", "button");
   tile.tabIndex = 0;
   tile.setAttribute("aria-label", `Open ${photo.label}`);
+  applyWrestlingMatchPhotoRoute(tile, show, match, index);
 
   const image = document.createElement("img");
   image.className = "wrestling-photo-image";
@@ -5079,6 +5246,10 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
 
   tile.append(image);
   tile.addEventListener("click", () => {
+    if (tile.dataset.wrestlingLightboxRoute) {
+      navigateToRoute(tile.dataset.wrestlingLightboxRoute);
+      return;
+    }
     openWrestlingMatchPhotoLightbox(photos, index, tile, show, match);
   });
   tile.addEventListener("keydown", (event) => {
@@ -5090,16 +5261,34 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
   return tile;
 }
 
-function createWrestlingMatchPhotoPlaceholderTile(photoId, index = 0) {
+function createWrestlingMatchPhotoPlaceholderTile(photoId, index = 0, show = {}, match = {}) {
   const tile = document.createElement("li");
   tile.className = "wrestling-photo-tile";
   tile.dataset.wrestlingPhotoId = photoId || String(index + 1).padStart(3, "0");
   tile.setAttribute("aria-label", `Photo ${index + 1} unavailable`);
+  applyWrestlingMatchPhotoRoute(tile, show, match, index);
 
   const label = document.createElement("span");
   label.textContent = String(index + 1).padStart(2, "0");
   tile.append(label);
   return tile;
+}
+
+function renderWrestlingMatchGalleryGridState(stateName = "empty", options = {}) {
+  const grid = wrestlingMatchGalleryShell?.querySelector(".wrestling-photo-grid");
+  if (!grid) {
+    return;
+  }
+
+  const item = document.createElement("li");
+  item.className = "wrestling-photo-state";
+  item.style.gridColumn = "1 / -1";
+  item.append(createWrestlingV3StateCard(stateName, "wrestlingShows", {
+    small: true,
+    title: options.title,
+    text: options.text,
+  }));
+  grid.replaceChildren(item);
 }
 
 function renderWrestlingMatchPhotoGrid(show, match) {
@@ -5109,15 +5298,22 @@ function renderWrestlingMatchPhotoGrid(show, match) {
   }
 
   const photos = getWrestlingMatchPhotoItems(match);
+  const photoIds = getWrestlingMatchPhotoIds(match);
   const fragment = document.createDocumentFragment();
   if (photos.length > 0) {
     photos.forEach((photo, index) => {
       fragment.append(createWrestlingMatchPhotoTile(photo, index, photos, show, match));
     });
     grid.setAttribute("aria-label", `${getWrestlingMatchDisplayName(match)} photos`);
+  } else if (photoIds.length === 0) {
+    renderWrestlingMatchGalleryGridState("empty", {
+      text: "No photo records are available for this match yet.",
+    });
+    grid.setAttribute("aria-label", `${getWrestlingMatchDisplayName(match)} state`);
+    return;
   } else {
-    getWrestlingMatchPhotoIds(match).forEach((photoId, index) => {
-      fragment.append(createWrestlingMatchPhotoPlaceholderTile(photoId, index));
+    photoIds.forEach((photoId, index) => {
+      fragment.append(createWrestlingMatchPhotoPlaceholderTile(photoId, index, show, match));
     });
     grid.setAttribute("aria-label", `${getWrestlingMatchDisplayName(match)} photo placeholders`);
   }
@@ -5218,6 +5414,12 @@ function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
   wrestlingMatchGalleryShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(showRouteSource);
   wrestlingMatchGalleryShell.dataset.wrestlingMatchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, routeMatchRef);
   updateWrestlingMatchGalleryDisplay(show, { matchName: title, matchType: type, photoCount: 0 });
+  renderWrestlingMatchGalleryGridState(stateName, {
+    title,
+    text: stateName === "loading"
+      ? "Preparing match gallery relationships."
+      : "No match record matches this route.",
+  });
 }
 
 function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", matchRef = "1", options = {}) {
