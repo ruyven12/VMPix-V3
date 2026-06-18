@@ -23,6 +23,8 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT = 12;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_TIMEOUT_MS = 15000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
 const bandsRegionFilterLabels = {
   local: "Local",
@@ -77,6 +79,7 @@ let activeMusicVenueStateFilter = "";
 let activeMusicVenueSlugFilter = "";
 let activeMusicVenueSort = "az";
 let activeMusicVenueDetailSlug = "";
+let activeMusicVenuePhotoHighlightsKey = "";
 let activeVenueRelationship = "";
 const musicVenueStateCodes = ["ME", "NH", "MA", "CT", "RI", "VT"];
 const musicVenueStateAliases = {
@@ -105,6 +108,7 @@ let activeMusicPeopleCategoryFilter = "";
 let activeMusicPeopleInstrumentFilter = "";
 let activeLightboxCustomTiles = null;
 let activeLightboxReturnContext = null;
+const musicVenuePhotoHighlightsStates = new Map();
 
 function retryMusicBandsIndexState() {
   musicBandsIndexLoaded = false;
@@ -2797,6 +2801,498 @@ function getMusicVenueArtists(venue, linkedShows = null) {
     .sort((left, right) => right.appearances - left.appearances || left.name.localeCompare(right.name));
 }
 
+function getMusicVenuePhotoHighlightsIdentifier(venue, requestedSlug = "") {
+  const source = venue && typeof venue === "object" ? venue : {};
+  return [
+    source.venue_id,
+    source.venueId,
+    source.venue_key,
+    source.venueKey,
+    source.id,
+    requestedSlug,
+  ].map((value) => String(value || "").trim()).find(Boolean) || "";
+}
+
+function getMusicVenuePhotoHighlightsKey(identifier) {
+  return normalizeMusicVenueSlugValue(identifier) || String(identifier || "").trim().toLowerCase();
+}
+
+function createMusicVenuePhotoHighlightsState(identifier) {
+  return {
+    identifier,
+    key: getMusicVenuePhotoHighlightsKey(identifier),
+    status: "idle",
+    isLoading: false,
+    page: 0,
+    hasMore: false,
+    photos: [],
+    photoKeys: new Set(),
+    summary: {},
+    pagination: {},
+    error: "",
+    venueName: "",
+    venueLocation: "",
+    request: null,
+  };
+}
+
+function getMusicVenuePhotoHighlightsState(identifier) {
+  const key = getMusicVenuePhotoHighlightsKey(identifier);
+  if (!key) {
+    return null;
+  }
+  if (!musicVenuePhotoHighlightsStates.has(key)) {
+    musicVenuePhotoHighlightsStates.set(key, createMusicVenuePhotoHighlightsState(identifier));
+  }
+  const state = musicVenuePhotoHighlightsStates.get(key);
+  state.identifier = identifier;
+  state.key = key;
+  return state;
+}
+
+function buildMusicVenuePhotoHighlightsApiUrl(identifier, page = 1) {
+  const encodedIdentifier = encodeURIComponent(String(identifier || "").trim());
+  const apiUrl = new URL(`${MUSIC_VENUES_API_ROUTE}/${encodedIdentifier}/photos`, MUSIC_BANDS_INDEX_API_BASE_URL);
+  apiUrl.searchParams.set("limit", String(MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT));
+  apiUrl.searchParams.set("page", String(Math.max(1, Number.parseInt(page, 10) || 1)));
+  return apiUrl;
+}
+
+function getMusicVenuePhotoHighlightsSection() {
+  if (!venueDetail) {
+    return null;
+  }
+
+  let section = venueDetail.querySelector("[data-venue-photo-highlights]");
+  if (!section) {
+    section = document.createElement("section");
+    section.className = "venue-photo-highlights";
+    section.dataset.venuePhotoHighlights = "";
+    section.setAttribute("aria-labelledby", "venue-photo-highlights-title");
+
+    const header = document.createElement("header");
+    header.className = "venue-photo-highlights-header";
+
+    const kicker = document.createElement("p");
+    kicker.className = "venue-detail-panel-kicker";
+    kicker.textContent = "Photo Archive";
+
+    const title = document.createElement("h4");
+    title.className = "venue-photo-highlights-title";
+    title.id = "venue-photo-highlights-title";
+    title.textContent = "Venue Photo Highlights";
+
+    const summary = document.createElement("p");
+    summary.className = "venue-photo-highlights-summary";
+    summary.dataset.venuePhotoHighlightsSummary = "";
+
+    header.append(kicker, title, summary);
+
+    const body = document.createElement("div");
+    body.className = "venue-photo-highlights-body";
+    body.dataset.venuePhotoHighlightsBody = "";
+
+    const footer = document.createElement("footer");
+    footer.className = "venue-photo-highlights-footer";
+
+    const button = document.createElement("button");
+    button.className = "venue-photo-highlights-more";
+    button.type = "button";
+    button.dataset.venuePhotoHighlightsMore = "";
+    button.textContent = "Show More Venue Photos";
+    button.addEventListener("click", handleMusicVenuePhotoHighlightsShowMore);
+    footer.append(button);
+
+    section.append(header, body, footer);
+  }
+
+  const relationships = venueDetail.querySelector("[data-venue-relationships]");
+  if (relationships && section.previousElementSibling !== relationships) {
+    relationships.insertAdjacentElement("afterend", section);
+  }
+
+  return section;
+}
+
+function hideMusicVenuePhotoHighlightsSection() {
+  activeMusicVenuePhotoHighlightsKey = "";
+  const section = venueDetail?.querySelector("[data-venue-photo-highlights]");
+  if (!section) {
+    return;
+  }
+  section.hidden = true;
+  section.setAttribute("aria-hidden", "true");
+  section.setAttribute("aria-busy", "false");
+}
+
+function getMusicVenuePhotoHighlightsPayloadPhotos(payload) {
+  return [
+    payload?.photos,
+    payload?.data,
+    payload?.items,
+    payload?.results,
+  ].find((value) => Array.isArray(value)) || [];
+}
+
+function getMusicVenuePhotoHighlightsCount(...values) {
+  for (const value of values) {
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isFinite(parsed) && parsed >= 0) {
+      return parsed;
+    }
+  }
+  return null;
+}
+
+function getMusicVenuePhotoHighlightsHasMore(payload, photos) {
+  const pagination = payload?.pagination || payload?.meta?.pagination || {};
+  if (typeof pagination.has_more === "boolean") return pagination.has_more;
+  if (typeof pagination.hasMore === "boolean") return pagination.hasMore;
+  if (typeof payload?.has_more === "boolean") return payload.has_more;
+  if (typeof payload?.hasMore === "boolean") return payload.hasMore;
+  return Array.isArray(photos) && photos.length >= MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT;
+}
+
+function getMusicVenuePhotoHighlightUrl(photo, fields) {
+  return fields
+    .map((field) => String(photo?.[field] || "").trim())
+    .find(Boolean) || "";
+}
+
+function getMusicVenuePhotoHighlightDedupeKeys(photo) {
+  return [
+    photo?.image_key,
+    photo?.imageKey,
+    photo?.large_url,
+    photo?.largeUrl,
+    photo?.medium_url,
+    photo?.mediumUrl,
+    photo?.small_url,
+    photo?.smallUrl,
+    photo?.thumbnail_url,
+    photo?.thumbnailUrl,
+  ].map((value) => String(value || "").trim().toLowerCase()).filter(Boolean);
+}
+
+function normalizeMusicVenuePhotoHighlight(photo, index = 0) {
+  if (!photo || typeof photo !== "object") {
+    return null;
+  }
+
+  const imageSrc = getMusicVenuePhotoHighlightUrl(photo, ["thumbnail_url", "thumbnailUrl", "small_url", "smallUrl", "medium_url", "mediumUrl", "large_url", "largeUrl"]);
+  const lightboxSrc = getMusicVenuePhotoHighlightUrl(photo, ["large_url", "largeUrl", "medium_url", "mediumUrl", "small_url", "smallUrl", "thumbnail_url", "thumbnailUrl"]);
+  if (!imageSrc && !lightboxSrc) {
+    return null;
+  }
+
+  const imageKey = String(photo.image_key || photo.imageKey || lightboxSrc || imageSrc || `venue-photo-${index + 1}`).trim();
+  const showTitle = String(photo.show_title || photo.showTitle || photo.show_name || photo.showName || photo.title || "").trim();
+  const showDate = String(photo.show_date || photo.showDate || photo.date || photo.date_taken || photo.dateTaken || photo.taken_at || photo.takenAt || "").trim();
+  const caption = String(photo.caption || photo.Caption || "").trim();
+  const label = caption || showTitle || `Venue photo ${index + 1}`;
+
+  return {
+    ...photo,
+    imageKey,
+    dedupeKeys: getMusicVenuePhotoHighlightDedupeKeys(photo),
+    imageSrc: imageSrc || lightboxSrc,
+    lightboxSrc: lightboxSrc || imageSrc,
+    thumbnail_url: String(photo.thumbnail_url || photo.thumbnailUrl || "").trim(),
+    small_url: String(photo.small_url || photo.smallUrl || "").trim(),
+    medium_url: String(photo.medium_url || photo.mediumUrl || "").trim(),
+    large_url: String(photo.large_url || photo.largeUrl || "").trim(),
+    caption,
+    label,
+    showTitle,
+    showDate,
+  };
+}
+
+function mergeMusicVenuePhotoHighlights(state, photos) {
+  if (!state || !Array.isArray(photos)) {
+    return 0;
+  }
+
+  let added = 0;
+  photos
+    .map(normalizeMusicVenuePhotoHighlight)
+    .filter(Boolean)
+    .forEach((photo) => {
+      const keys = photo.dedupeKeys.length > 0 ? photo.dedupeKeys : [String(photo.imageSrc || photo.lightboxSrc || "").trim().toLowerCase()].filter(Boolean);
+      if (keys.some((key) => state.photoKeys.has(key))) {
+        return;
+      }
+      keys.forEach((key) => state.photoKeys.add(key));
+      state.photos.push(photo);
+      added += 1;
+    });
+  return added;
+}
+
+function getMusicVenuePhotoHighlightsSummaryText(state) {
+  if (!state || state.photos.length === 0) {
+    return "";
+  }
+
+  const summary = state.summary || {};
+  const visibleCount = state.photos.length;
+  const scannedCount = getMusicVenuePhotoHighlightsCount(
+    summary.aggregated_photo_count,
+    summary.aggregatedPhotoCount,
+    summary.scanned_photo_count,
+    summary.scannedPhotoCount
+  );
+  if (scannedCount != null) {
+    return `Showing ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"} from ${scannedCount.toLocaleString()} scanned photo${scannedCount === 1 ? "" : "s"}.`;
+  }
+  return `Showing ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"}.`;
+}
+
+function createMusicVenuePhotoHighlightsStateCard(stateName, text) {
+  const stateCard = createMusicV3StateCard(stateName, "musicVenues", {
+    small: true,
+    text,
+  });
+  stateCard.classList.add("venue-photo-highlights-state");
+  return stateCard;
+}
+
+function createMusicVenuePhotoHighlightsGrid(state) {
+  const grid = document.createElement("div");
+  grid.className = "venue-photo-highlights-grid";
+  grid.setAttribute("role", "list");
+  state.photos.forEach((photo, index) => {
+    grid.append(createMusicVenuePhotoHighlightTile(photo, index));
+  });
+  return grid;
+}
+
+function createMusicVenuePhotoHighlightTile(photo, index = 0) {
+  const tile = document.createElement("button");
+  tile.className = "venue-photo-highlight-tile";
+  tile.type = "button";
+  tile.dataset.venuePhotoHighlightTile = "";
+  tile.setAttribute("role", "listitem");
+  tile.setAttribute("aria-label", `Open ${photo.label}`);
+
+  const image = document.createElement("img");
+  image.className = "venue-photo-highlight-image archive-gallery-image";
+  image.alt = "";
+  image.src = photo.imageSrc || photo.lightboxSrc;
+  applyMusicGalleryImageLoading(image, index);
+  image.onerror = () => {
+    image.onerror = null;
+    image.src = galleryImageFallbackSrc;
+  };
+  protectArchiveImage(image);
+  tile.append(image);
+
+  if (photo.showTitle || photo.showDate) {
+    const meta = document.createElement("span");
+    meta.className = "venue-photo-highlight-meta";
+    const title = document.createElement("span");
+    title.className = "venue-photo-highlight-show";
+    title.textContent = photo.showTitle || "Linked Show";
+    const date = document.createElement("span");
+    date.className = "venue-photo-highlight-date";
+    date.textContent = photo.showDate;
+    meta.append(title);
+    if (photo.showDate) {
+      meta.append(date);
+    }
+    tile.append(meta);
+  }
+
+  tile.addEventListener("click", () => {
+    openMusicVenuePhotoHighlightsLightbox(index, tile);
+  });
+  return tile;
+}
+
+function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}) {
+  const tile = document.createElement("button");
+  tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
+  tile.type = "button";
+  tile.dataset.galleryPhoto = "";
+  tile.dataset.galleryPhotoLabel = photo.label;
+  tile.dataset.galleryKind = "image";
+  tile.dataset.galleryMediaId = photo.imageKey;
+  tile.dataset.galleryLightboxId = `music-venue-photo-${normalizeMusicVenueSlugValue(photo.imageKey) || index + 1}`;
+  tile.dataset.galleryLightboxSrc = photo.lightboxSrc || photo.imageSrc;
+  tile.dataset.galleryBandTags = "Venue Highlights";
+  tile.dataset.galleryShow = photo.showTitle || "Linked Show";
+  tile.dataset.galleryVenue = state.venueName || "Venue";
+  tile.dataset.galleryLocation = state.venueLocation || "";
+  tile.dataset.galleryDate = photo.showDate || "";
+  tile.setAttribute("aria-label", photo.label);
+  tile.setAttribute("aria-pressed", String(index === 0));
+
+  const image = document.createElement("img");
+  image.className = "archive-gallery-image";
+  image.alt = "";
+  image.src = photo.imageSrc || photo.lightboxSrc;
+  tile.append(image);
+  return tile;
+}
+
+function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null) {
+  const state = musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey);
+  if (!state || state.photos.length === 0) {
+    return;
+  }
+
+  const safeIndex = Math.max(0, Math.min(Number.parseInt(photoIndex, 10) || 0, state.photos.length - 1));
+  const previousActiveGalleryPhoto = activeGalleryPhoto || null;
+  const returnContext = {
+    source: "music-venue-photo-highlights",
+    focusElement: trigger || null,
+    previousActiveGalleryPhoto,
+    scrollTop: musicNexusShell ? musicNexusShell.scrollTop : 0,
+  };
+  activeLightboxCustomTiles = state.photos.map((photo, index) => createMusicVenuePhotoHighlightLightboxTile(photo, index, state));
+  const targetTile = activeLightboxCustomTiles[safeIndex] || activeLightboxCustomTiles[0] || null;
+  showLightbox(targetTile, { returnContext });
+}
+
+function renderMusicVenuePhotoHighlightsState(state) {
+  const section = getMusicVenuePhotoHighlightsSection();
+  if (!section || !state) {
+    return;
+  }
+
+  section.hidden = false;
+  section.removeAttribute("aria-hidden");
+  section.dataset.venuePhotoHighlightsState = state.status;
+  section.setAttribute("aria-busy", String(Boolean(state.isLoading)));
+
+  const summary = section.querySelector("[data-venue-photo-highlights-summary]");
+  const body = section.querySelector("[data-venue-photo-highlights-body]");
+  const moreButton = section.querySelector("[data-venue-photo-highlights-more]");
+  if (summary) {
+    summary.textContent = getMusicVenuePhotoHighlightsSummaryText(state);
+    summary.hidden = !summary.textContent;
+  }
+  if (!body) {
+    return;
+  }
+
+  body.replaceChildren();
+  if (state.photos.length > 0) {
+    body.append(createMusicVenuePhotoHighlightsGrid(state));
+    if (state.error) {
+      body.append(createMusicVenuePhotoHighlightsStateCard("error", "Venue photo highlights could not be loaded."));
+    }
+  } else if (state.status === "loading") {
+    body.append(createMusicVenuePhotoHighlightsStateCard("loading", "Scanning linked show archives..."));
+  } else if (state.status === "error") {
+    body.append(createMusicVenuePhotoHighlightsStateCard("error", "Venue photo highlights could not be loaded."));
+  } else {
+    body.append(createMusicVenuePhotoHighlightsStateCard("empty", "No venue photo highlights are available yet."));
+  }
+
+  if (moreButton) {
+    const shouldShowMore = state.photos.length > 0 && state.hasMore;
+    moreButton.hidden = !shouldShowMore;
+    moreButton.disabled = Boolean(state.isLoading);
+    moreButton.textContent = state.isLoading && state.photos.length > 0
+      ? "Loading Venue Photos..."
+      : "Show More Venue Photos";
+  }
+}
+
+function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
+  if (!state || !state.identifier || typeof fetch !== "function") {
+    if (state) {
+      state.status = "empty";
+      renderMusicVenuePhotoHighlightsState(state);
+    }
+    return Promise.resolve(false);
+  }
+  if (state.request) {
+    return state.request;
+  }
+
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller
+    ? window.setTimeout(() => controller.abort(), MUSIC_VENUE_PHOTO_HIGHLIGHTS_TIMEOUT_MS)
+    : 0;
+
+  state.isLoading = true;
+  state.error = "";
+  state.status = state.photos.length > 0 ? "ready" : "loading";
+  renderMusicVenuePhotoHighlightsState(state);
+
+  const request = fetch(buildMusicVenuePhotoHighlightsApiUrl(state.identifier, page), {
+    cache: "no-store",
+    signal: controller?.signal,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Music venue photo highlights request failed (${response.status})`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const payloadPhotos = getMusicVenuePhotoHighlightsPayloadPhotos(payload);
+      state.summary = payload?.summary && typeof payload.summary === "object" ? payload.summary : {};
+      state.pagination = payload?.pagination && typeof payload.pagination === "object" ? payload.pagination : {};
+      state.page = Math.max(page, Number.parseInt(state.pagination.page, 10) || page);
+      state.hasMore = getMusicVenuePhotoHighlightsHasMore(payload, payloadPhotos);
+      mergeMusicVenuePhotoHighlights(state, payloadPhotos);
+      state.status = state.photos.length > 0 ? "ready" : "empty";
+      return true;
+    })
+    .catch((error) => {
+      state.error = error && error.message ? error.message : String(error);
+      state.status = state.photos.length > 0 ? "ready" : "error";
+      state.hasMore = state.photos.length > 0 && state.hasMore;
+      return false;
+    })
+    .finally(() => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      state.isLoading = false;
+      state.request = null;
+      if (activeMusicVenuePhotoHighlightsKey === state.key) {
+        renderMusicVenuePhotoHighlightsState(state);
+      }
+    });
+
+  state.request = request;
+  return request;
+}
+
+function handleMusicVenuePhotoHighlightsShowMore() {
+  const state = musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey);
+  if (!state || state.isLoading || !state.hasMore) {
+    return;
+  }
+  requestMusicVenuePhotoHighlightsPage(state, state.page + 1);
+}
+
+function syncMusicVenuePhotoHighlights(venue, requestedSlug = "") {
+  const identifier = getMusicVenuePhotoHighlightsIdentifier(venue, requestedSlug);
+  if (!identifier) {
+    hideMusicVenuePhotoHighlightsSection();
+    return;
+  }
+
+  const state = getMusicVenuePhotoHighlightsState(identifier);
+  if (!state) {
+    hideMusicVenuePhotoHighlightsSection();
+    return;
+  }
+
+  state.venueName = getMusicVenueName(venue);
+  state.venueLocation = getMusicVenueLocationText(venue);
+  activeMusicVenuePhotoHighlightsKey = state.key;
+  renderMusicVenuePhotoHighlightsState(state);
+  if (state.status === "idle") {
+    requestMusicVenuePhotoHighlightsPage(state, 1);
+  }
+}
+
 function formatMusicVenueDetailCount(value) {
   const numericValue = Number.parseInt(value, 10);
   return Number.isFinite(numericValue) && numericValue >= 0
@@ -3514,12 +4010,14 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   setMusicVenueDetailRelationshipCount("bands", hasVenue ? linkedArtists.length : stats.bands);
   setMusicVenueDetailRelationshipCount("photos", stats.photos);
   if (!hasVenue) {
+    hideMusicVenuePhotoHighlightsSection();
     renderMusicVenueDetailState(slug, getMusicVenueDetailUnavailableStateName());
     return;
   }
   clearMusicVenueDetailState();
   setupVenueShowsRelationshipCard(venue, linkedShows);
   setupVenueArtistsRelationshipCard(venue, linkedArtists);
+  syncMusicVenuePhotoHighlights(venue, slug);
 }
 
 function showMusicVenueDetail(venueSlug) {
@@ -5667,7 +6165,7 @@ function setLightboxControlsHidden(isHidden) {
 }
 
 function shouldPreserveLightboxCustomTiles(returnContext) {
-  return ["person-detail", "wrestling-match-gallery"].includes(returnContext?.source);
+  return ["person-detail", "music-venue-photo-highlights", "wrestling-match-gallery"].includes(returnContext?.source);
 }
 
 function showLightbox(photoTile = activeGalleryPhoto, options = {}) {
@@ -5747,6 +6245,28 @@ function returnToSetGalleryFromLightbox() {
     window.requestAnimationFrame(() => {
       if (wrestlingMatchGalleryShell && scrollTop !== null) {
         wrestlingMatchGalleryShell.scrollTo({ top: scrollTop, behavior: "auto" });
+      }
+      if (focusTarget) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+    return;
+  }
+
+  if (returnContext?.source === "music-venue-photo-highlights") {
+    const previousActiveGalleryPhoto = returnContext.previousActiveGalleryPhoto || null;
+    const focusTarget = returnContext.focusElement && document.contains(returnContext.focusElement)
+      ? returnContext.focusElement
+      : null;
+    const scrollTop = Number.isFinite(returnContext.scrollTop) ? returnContext.scrollTop : null;
+
+    setLightboxVisible(false);
+    activeGalleryPhoto = previousActiveGalleryPhoto;
+    setVenueDetailVisible(true);
+    setCurrentView("Venue Detail");
+    window.requestAnimationFrame(() => {
+      if (musicNexusShell && scrollTop !== null) {
+        musicNexusShell.scrollTo({ top: scrollTop, behavior: "auto" });
       }
       if (focusTarget) {
         focusTarget.focus({ preventScroll: true });

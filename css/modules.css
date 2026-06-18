@@ -5226,6 +5226,213 @@ html.is-lightbox-scroll-locked body {
   background: rgba(1, 1, 3, 0.28);
 }
 
+.venue-photo-highlights {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  gap: 0.66rem;
+  padding: 0.78rem;
+  border: 1px solid rgba(247, 247, 242, 0.085);
+  border-radius: var(--v3-card-radius-feature);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
+    linear-gradient(135deg, rgba(213, 22, 34, 0.052), transparent 72%),
+    rgba(3, 3, 6, 0.42);
+  overflow: hidden;
+}
+
+.venue-photo-highlights::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.18), transparent 42% 100%) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 66%) left / 1px 100% no-repeat;
+  pointer-events: none;
+}
+
+.venue-photo-highlights[hidden] {
+  display: none;
+}
+
+.venue-photo-highlights-header,
+.venue-photo-highlights-body,
+.venue-photo-highlights-footer {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.venue-photo-highlights-header {
+  display: grid;
+  justify-items: center;
+  gap: 0.28rem;
+  text-align: center;
+}
+
+.venue-photo-highlights-title,
+.venue-photo-highlights-summary {
+  min-width: 0;
+  margin: 0;
+}
+
+.venue-photo-highlights-title {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.08;
+  text-transform: none;
+}
+
+.venue-photo-highlights-summary {
+  max-width: 34rem;
+  color: rgba(247, 247, 242, 0.56);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.venue-photo-highlights-body {
+  display: grid;
+  gap: 0.58rem;
+}
+
+.venue-photo-highlights-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.4rem), 1fr));
+  gap: 0.52rem;
+}
+
+.venue-photo-highlight-tile {
+  appearance: none;
+  min-width: 0;
+  min-height: 7.25rem;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  padding: 0;
+  border: 1px solid rgba(247, 247, 242, 0.08);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.024), transparent 62%),
+    rgba(1, 1, 3, 0.34);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  overflow: hidden;
+  touch-action: manipulation;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+}
+
+.venue-photo-highlight-tile:hover,
+.venue-photo-highlight-tile:focus-visible {
+  border-color: rgba(255, 118, 102, 0.26);
+  background:
+    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
+    rgba(11, 3, 5, 0.38);
+}
+
+.venue-photo-highlight-tile:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.14rem;
+}
+
+.venue-photo-highlight-tile:active {
+  transform: translate3d(0, 0.04rem, 0);
+}
+
+.venue-photo-highlight-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 0;
+  display: block;
+  object-fit: cover;
+  background: rgba(1, 1, 3, 0.5);
+  pointer-events: none;
+}
+
+.venue-photo-highlight-meta {
+  min-width: 0;
+  display: grid;
+  gap: 0.12rem;
+  padding: 0.42rem 0.5rem 0.48rem;
+  border-top: 1px solid rgba(247, 247, 242, 0.065);
+  background: rgba(1, 1, 3, 0.36);
+  text-align: left;
+  pointer-events: none;
+}
+
+.venue-photo-highlight-show,
+.venue-photo-highlight-date {
+  min-width: 0;
+  display: block;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+.venue-photo-highlight-show {
+  color: rgba(247, 247, 242, 0.78);
+  font-size: 0.66rem;
+}
+
+.venue-photo-highlight-date {
+  color: rgba(255, 118, 102, 0.66);
+  font-size: 0.58rem;
+}
+
+.venue-photo-highlights-state {
+  min-width: 0;
+  padding: 0.7rem;
+}
+
+.venue-photo-highlights-footer {
+  display: flex;
+  justify-content: center;
+}
+
+.venue-photo-highlights-more {
+  appearance: none;
+  min-height: 2.66rem;
+  max-width: 100%;
+  padding: 0.62rem 0.78rem;
+  border: 1px solid rgba(213, 22, 34, 0.22);
+  border-radius: var(--radius-sm);
+  background: rgba(213, 22, 34, 0.06);
+  color: rgba(247, 247, 242, 0.76);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1;
+  text-align: center;
+  text-transform: none;
+  touch-action: manipulation;
+}
+
+.venue-photo-highlights-more:hover,
+.venue-photo-highlights-more:focus-visible {
+  border-color: rgba(255, 118, 102, 0.32);
+  background: rgba(213, 22, 34, 0.095);
+  color: rgba(247, 247, 242, 0.9);
+}
+
+.venue-photo-highlights-more:focus-visible {
+  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline-offset: 0.14rem;
+}
+
+.venue-photo-highlights-more:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.venue-photo-highlights-more[hidden] {
+  display: none;
+}
+
 .venue-detail-content-grid {
   display: grid;
   gap: 0.66rem;
@@ -15424,6 +15631,15 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.92rem;
   }
 
+  .venue-photo-highlights {
+    padding: 0.92rem;
+  }
+
+  .venue-photo-highlights-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+    gap: 0.62rem;
+  }
+
   .music-venues-archive {
     padding: 0.92rem;
   }
@@ -15573,6 +15789,28 @@ button.wrestling-event-history-tagged-thumb {
   .venue-relationships {
     gap: 0.54rem;
     padding: 0.54rem;
+  }
+
+  .venue-photo-highlights {
+    gap: 0.54rem;
+    padding: 0.54rem;
+  }
+
+  .venue-photo-highlights-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.42rem;
+  }
+
+  .venue-photo-highlight-tile {
+    min-height: 0;
+  }
+
+  .venue-photo-highlight-meta {
+    padding: 0.36rem 0.4rem 0.42rem;
+  }
+
+  .venue-photo-highlights-more {
+    width: 100%;
   }
 
   .music-venues-archive {
