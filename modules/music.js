@@ -3422,8 +3422,33 @@ function normalizeMusicVenuePhotoHighlight(photo, index = 0) {
     return null;
   }
 
-  const imageSrc = getMusicVenuePhotoHighlightUrl(photo, ["large_url", "largeUrl", "medium_url", "mediumUrl", "small_url", "smallUrl", "thumbnail_url", "thumbnailUrl"]);
-  const lightboxSrc = getMusicVenuePhotoHighlightUrl(photo, ["large_url", "largeUrl", "medium_url", "mediumUrl", "small_url", "smallUrl", "thumbnail_url", "thumbnailUrl"]);
+  const imageSrc = getMusicVenuePhotoHighlightUrl(photo, [
+    "thumbnail_url",
+    "thumbnailUrl",
+    "thumbnailSrc",
+    "small_url",
+    "smallUrl",
+    "smallSrc",
+    "medium_url",
+    "mediumUrl",
+    "mediumSrc",
+  ]);
+  const lightboxSrc = getMusicVenuePhotoHighlightUrl(photo, [
+    "large_url",
+    "largeUrl",
+    "largest_url",
+    "largestUrl",
+    "lightboxSrc",
+    "medium_url",
+    "mediumUrl",
+    "mediumSrc",
+    "small_url",
+    "smallUrl",
+    "smallSrc",
+    "thumbnail_url",
+    "thumbnailUrl",
+    "thumbnailSrc",
+  ]);
   if (!imageSrc && !lightboxSrc) {
     return null;
   }
