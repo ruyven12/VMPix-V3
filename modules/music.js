@@ -24,7 +24,8 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT = 20;
-const MUSIC_VENUE_PHOTO_HIGHLIGHTS_INTERVAL_MS = 4500;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_HEIGHT_SCALE = 0.8;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_INTERVAL_MS = 3000;
 const MUSIC_VENUE_PHOTO_HIGHLIGHTS_TIMEOUT_MS = 15000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
 const bandsRegionFilterLabels = {
@@ -3048,6 +3049,14 @@ function trimMusicVenuePhotoHighlightCaption(caption, maxLength = 96) {
   return `${text.slice(0, Math.max(0, maxLength - 3)).trim()}...`;
 }
 
+function syncMusicVenuePhotoHighlightStageRatio(stage, image) {
+  if (!stage || !image || image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+    return;
+  }
+  const adjustedHeight = Math.max(1, image.naturalHeight * MUSIC_VENUE_PHOTO_HIGHLIGHTS_HEIGHT_SCALE);
+  stage.style.setProperty("--venue-photo-highlight-ratio", `${image.naturalWidth} / ${adjustedHeight}`);
+}
+
 function getMusicVenuePhotoHighlightUrl(photo, fields) {
   return fields
     .map((field) => String(photo?.[field] || "").trim())
@@ -3178,12 +3187,10 @@ function createMusicVenuePhotoHighlightsCarousel(state) {
   image.loading = "eager";
   image.decoding = "async";
   image.addEventListener("load", () => {
-    if (image.naturalWidth > 0 && image.naturalHeight > 0) {
-      stage.style.setProperty("--venue-photo-highlight-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
-    }
+    syncMusicVenuePhotoHighlightStageRatio(stage, image);
   }, { once: true });
-  if (image.complete && image.naturalWidth > 0 && image.naturalHeight > 0) {
-    stage.style.setProperty("--venue-photo-highlight-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+  if (image.complete) {
+    syncMusicVenuePhotoHighlightStageRatio(stage, image);
   }
   image.onerror = () => {
     image.onerror = null;
@@ -3191,34 +3198,6 @@ function createMusicVenuePhotoHighlightsCarousel(state) {
   };
   protectArchiveImage(image);
   stage.append(image);
-
-  if (photo.showTitle || photo.showDate || photo.captionShort) {
-    const overlay = document.createElement("span");
-    overlay.className = "venue-photo-highlight-overlay";
-
-    if (photo.showTitle) {
-      const title = document.createElement("span");
-      title.className = "venue-photo-highlight-show";
-      title.textContent = photo.showTitle;
-      overlay.append(title);
-    }
-
-    if (photo.showDate) {
-      const date = document.createElement("span");
-      date.className = "venue-photo-highlight-date";
-      date.textContent = photo.showDate;
-      overlay.append(date);
-    }
-
-    if (photo.captionShort) {
-      const caption = document.createElement("span");
-      caption.className = "venue-photo-highlight-caption";
-      caption.textContent = photo.captionShort;
-      overlay.append(caption);
-    }
-
-    stage.append(overlay);
-  }
 
   const controls = document.createElement("div");
   controls.className = "venue-photo-highlights-controls";
