@@ -34,6 +34,12 @@ function getPathWithSearch(url = window.location.href) {
 function getRouteFromUrl(url = window.location.href) {
   const routeUrl = new URL(url, window.location.href);
   const routePath = normalizeRoutePath(routeUrl.pathname);
+  const unknownRoute = (name, canonicalUrl = routePath) => ({
+    name,
+    canonicalUrl,
+    path: routePath,
+    isUnknown: true,
+  });
 
   if (routePath === routePaths.home) {
     return { name: "home", canonicalUrl: routePaths.home };
@@ -178,7 +184,15 @@ function getRouteFromUrl(url = window.location.href) {
     }
   }
 
-  return { name: "home", canonicalUrl: routePaths.home, isUnknown: true };
+  if (routePath === routePaths.music || routePath.startsWith(`${routePaths.music}/`)) {
+    return unknownRoute("music-route-not-found");
+  }
+
+  if (routePath === routePaths.wrestling || routePath.startsWith(`${routePaths.wrestling}/`)) {
+    return unknownRoute("wrestling-route-not-found");
+  }
+
+  return unknownRoute("route-not-found");
 }
 
 function pushRouteUrl(url, state = {}) {
@@ -228,6 +242,15 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "home") {
     showHomepage();
+    return;
+  }
+
+  if (route.name === "route-not-found" || route.name === "music-route-not-found" || route.name === "wrestling-route-not-found") {
+    if (typeof showRouteNotFound === "function") {
+      showRouteNotFound(route);
+    } else {
+      showPortfolioHubView();
+    }
     return;
   }
 

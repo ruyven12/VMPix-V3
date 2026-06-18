@@ -242,6 +242,39 @@ const slowApiReliabilityRoutes = [
   },
 ];
 
+const unknownRouteFallbackRoutes = [
+  {
+    path: "/nope",
+    rail: "Route Not Found",
+    text: /Archive Route Not Found[\s\S]*No matching archive route could be found/i,
+    actions: ["Back to Portfolio", "Back to Home"],
+  },
+  {
+    path: "/music/nope",
+    rail: "Music Route Not Found",
+    text: /Music Route Not Found[\s\S]*No matching Music archive route could be found/i,
+    actions: ["Back to Music", "Back to Portfolio"],
+  },
+  {
+    path: "/music/nope/extra",
+    rail: "Music Route Not Found",
+    text: /Music Route Not Found[\s\S]*No matching Music archive route could be found/i,
+    actions: ["Back to Music", "Back to Portfolio"],
+  },
+  {
+    path: "/wrestling/nope",
+    rail: "Ring Archive Route Not Found",
+    text: /Ring Archive Route Not Found[\s\S]*No matching Wrestling archive route could be found/i,
+    actions: ["Back to Wrestling", "Back to Portfolio"],
+  },
+  {
+    path: "/wrestling/nope/extra",
+    rail: "Ring Archive Route Not Found",
+    text: /Ring Archive Route Not Found[\s\S]*No matching Wrestling archive route could be found/i,
+    actions: ["Back to Wrestling", "Back to Portfolio"],
+  },
+];
+
 test.describe("archive direct-route reliability", () => {
   test.use({ viewport: { width: 360, height: 800 } });
 
@@ -286,6 +319,25 @@ test.describe("archive direct-route reliability", () => {
       await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 6000 });
       await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
       await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
+      await expectNoHorizontalOverflow(page);
+    }
+  });
+
+  test("unknown routes show route-level unavailable states", async ({ page }) => {
+    for (const route of unknownRouteFallbackRoutes) {
+      const response = await page.goto(route.path, { waitUntil: "domcontentloaded" });
+      expect(response && response.ok()).toBe(true);
+      await expect(page.locator(".site-shell")).toBeVisible();
+      const visibleShell = page.locator("[data-module-placeholder]");
+      await expect(visibleShell).toBeVisible();
+      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(visibleShell.getByText(route.text).first()).toBeVisible();
+      await expect(page.locator(".home-frame")).toHaveAttribute("aria-hidden", "true");
+      await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
+      for (const actionLabel of route.actions) {
+        await expect(visibleShell.getByRole("button", { name: actionLabel })).toBeVisible();
+      }
+      await expect(page.getByText(/^Homepage$/i)).toHaveCount(0);
       await expectNoHorizontalOverflow(page);
     }
   });

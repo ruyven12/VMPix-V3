@@ -966,6 +966,15 @@ const mockStateCopy = {
 };
 
 const mockStateScopeCopy = {
+  routeNotFound: {
+    empty: { title: "Archive Route Not Found", text: "No matching archive route could be found." },
+  },
+  musicRouteNotFound: {
+    empty: { title: "Music Route Not Found", text: "No matching Music archive route could be found." },
+  },
+  wrestlingRouteNotFound: {
+    empty: { title: "Ring Archive Route Not Found", text: "No matching Wrestling archive route could be found." },
+  },
   musicBands: {
     loading: { title: "Scanning Band Index", text: "Preparing artist rows and archive status." },
     empty: { title: "No Bands Matched", text: "Adjust the signal filter or return to the full Music Nexus." },
@@ -2180,7 +2189,9 @@ const shellRouteRegistryById = new Map(shellRouteRegistry.map((route) => [route.
 const routeNameToGlobalNavTarget = {
   home: "home",
   portfolio: "portfolio",
+  "route-not-found": "portfolio",
   music: "music",
+  "music-route-not-found": "music",
   "music-bands": "music",
   "band-detail": "music",
   "sets-archive": "music",
@@ -2192,6 +2203,7 @@ const routeNameToGlobalNavTarget = {
   "music-venues": "music",
   "music-venue-detail": "music",
   wrestling: "wrestling",
+  "wrestling-route-not-found": "wrestling",
   "wrestling-shows": "wrestling",
   "wrestling-show-detail": "wrestling",
   "wrestling-match-gallery": "wrestling",
@@ -2209,7 +2221,9 @@ const routeNameToGlobalNavTarget = {
 const routeNameToBreadcrumbTrail = {
   home: ["home"],
   portfolio: ["portfolio"],
+  "route-not-found": ["portfolio"],
   music: ["portfolio", "music"],
+  "music-route-not-found": ["portfolio", "music"],
   "music-bands": ["portfolio", "music", "music-bands"],
   "band-detail": ["portfolio", "music", "music-bands"],
   "sets-archive": ["portfolio", "music", "music-bands"],
@@ -2221,6 +2235,7 @@ const routeNameToBreadcrumbTrail = {
   "music-venues": ["portfolio", "music", "music-venues"],
   "music-venue-detail": ["portfolio", "music", "music-venues"],
   wrestling: ["portfolio", "wrestling"],
+  "wrestling-route-not-found": ["portfolio", "wrestling"],
   "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-match-gallery": ["portfolio", "wrestling", "wrestling-shows"],
@@ -2236,6 +2251,9 @@ const routeNameToBreadcrumbTrail = {
 };
 
 const routeNameToDrilldownBreadcrumb = {
+  "route-not-found": "Route Not Found",
+  "music-route-not-found": "Route Not Found",
+  "wrestling-route-not-found": "Route Not Found",
   "band-detail": "Band Detail",
   "sets-archive": "Sets Archive",
   "set-detail": "Set Detail",
@@ -2251,7 +2269,9 @@ const routeNameToDrilldownBreadcrumb = {
 
 const routeNameToShellBackTarget = {
   portfolio: routePaths.home,
+  "route-not-found": routePaths.portfolio,
   music: routePaths.portfolio,
+  "music-route-not-found": routePaths.music,
   "music-bands": routePaths.music,
   "band-detail": routePaths.musicBands,
   "sets-archive": "",
@@ -2263,6 +2283,7 @@ const routeNameToShellBackTarget = {
   "music-venues": routePaths.music,
   "music-venue-detail": routePaths.musicVenues,
   wrestling: routePaths.portfolio,
+  "wrestling-route-not-found": routePaths.wrestling,
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,
   "wrestling-match-gallery": "",

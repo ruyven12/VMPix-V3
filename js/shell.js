@@ -2064,6 +2064,7 @@ function showModulePlaceholder(moduleName) {
     return;
   }
 
+  resetRouteNotFoundPlaceholder();
   window.clearTimeout(activationTimer);
   shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
@@ -2119,6 +2120,173 @@ function showModulePlaceholder(moduleName) {
   }
 }
 
+const routeNotFoundConfigs = {
+  "route-not-found": {
+    rail: "Route Not Found",
+    scope: "routeNotFound",
+    title: "Archive Route Not Found",
+    text: "No matching archive route could be found.",
+    activeNav: "portfolio",
+    actions: [
+      { label: "Back to Portfolio", route: routePaths.portfolio },
+      { label: "Back to Home", route: routePaths.home },
+    ],
+  },
+  "music-route-not-found": {
+    rail: "Music Route Not Found",
+    scope: "musicRouteNotFound",
+    title: "Music Route Not Found",
+    text: "No matching Music archive route could be found.",
+    activeNav: "music",
+    actions: [
+      { label: "Back to Music", route: routePaths.music },
+      { label: "Back to Portfolio", route: routePaths.portfolio },
+    ],
+  },
+  "wrestling-route-not-found": {
+    rail: "Ring Archive Route Not Found",
+    scope: "wrestlingRouteNotFound",
+    title: "Ring Archive Route Not Found",
+    text: "No matching Wrestling archive route could be found.",
+    activeNav: "wrestling",
+    actions: [
+      { label: "Back to Wrestling", route: routePaths.wrestling },
+      { label: "Back to Portfolio", route: routePaths.portfolio },
+    ],
+  },
+};
+
+function resetRouteNotFoundPlaceholder() {
+  if (!modulePlaceholder) {
+    return;
+  }
+
+  modulePlaceholder.querySelectorAll("[data-route-not-found-state]").forEach((state) => state.remove());
+  const placeholderContent = modulePlaceholder.querySelector(".module-placeholder-content");
+  if (placeholderContent) {
+    placeholderContent.hidden = false;
+  }
+  if (moduleBack) {
+    moduleBack.hidden = false;
+  }
+  modulePlaceholder.setAttribute("aria-labelledby", "module-placeholder-title");
+  modulePlaceholder.removeAttribute("aria-label");
+}
+
+function getRouteNotFoundConfig(route = {}) {
+  return routeNotFoundConfigs[route.name] || routeNotFoundConfigs["route-not-found"];
+}
+
+function appendRouteNotFoundAction(actions, action = {}) {
+  if (!actions || !action.label || !action.route) {
+    return;
+  }
+
+  const button = document.createElement("button");
+  button.className = "v3-state-action";
+  button.type = "button";
+  button.textContent = action.label;
+  button.addEventListener("click", () => navigateToRoute(action.route));
+  actions.append(button);
+}
+
+function createRouteNotFoundCard(route = {}) {
+  const config = getRouteNotFoundConfig(route);
+  const card = typeof createV3EmptyState === "function"
+    ? createV3EmptyState({
+      scope: config.scope,
+      title: config.title,
+      text: config.text,
+      detail: route.path ? `Route: ${route.path}` : "",
+    })
+    : createV3StateCard("empty", {
+      scope: config.scope,
+      title: config.title,
+      text: config.text,
+      detail: route.path ? `Route: ${route.path}` : "",
+    });
+  card.dataset.routeNotFoundCard = "";
+
+  const body = card.querySelector(".v3-state-copy") || card;
+  const actions = document.createElement("span");
+  actions.className = "v3-state-actions";
+  config.actions.forEach((action) => appendRouteNotFoundAction(actions, action));
+  body.append(actions);
+  return card;
+}
+
+function showRouteNotFound(route = {}) {
+  if (!shell || !portfolioHub || !modulePlaceholder) {
+    return;
+  }
+
+  const config = getRouteNotFoundConfig(route);
+  window.clearTimeout(activationTimer);
+  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  modulePlaceholder.setAttribute("aria-hidden", "false");
+  modulePlaceholder.removeAttribute("inert");
+  modulePlaceholder.setAttribute("aria-label", config.rail);
+  modulePlaceholder.removeAttribute("aria-labelledby");
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  resetRouteNotFoundPlaceholder();
+  modulePlaceholder.setAttribute("aria-label", config.rail);
+  modulePlaceholder.removeAttribute("aria-labelledby");
+
+  const placeholderContent = modulePlaceholder.querySelector(".module-placeholder-content");
+  if (placeholderContent) {
+    placeholderContent.hidden = true;
+  }
+  if (moduleBack) {
+    moduleBack.hidden = true;
+  }
+
+  const statePanel = document.createElement("section");
+  statePanel.className = "route-not-found-state";
+  statePanel.dataset.routeNotFoundState = route.name || "route-not-found";
+  statePanel.append(createRouteNotFoundCard(route));
+  modulePlaceholder.append(statePanel);
+
+  setCurrentView(config.rail);
+  setActiveGlobalNav(config.activeNav);
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
 function updateViewportMetrics() {
   const viewportHeight = window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight;
   if (viewportHeight) {
@@ -2135,7 +2303,9 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
   const routeScrollerMap = {
     home: homeFrame?.parentElement || document.querySelector(".public-home"),
     portfolio: document.querySelector(".public-home"),
+    "route-not-found": modulePlaceholder,
     music: musicNexusShell,
+    "music-route-not-found": modulePlaceholder,
     "music-bands": musicNexusShell,
     "band-detail": musicNexusShell,
     "sets-archive": musicNexusShell,
@@ -2147,6 +2317,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
     wrestling: ringArchiveShell,
+    "wrestling-route-not-found": modulePlaceholder,
     "wrestling-people": wrestlingPeopleShell,
     "wrestling-person-detail": wrestlingPersonDetailShell,
     "wrestling-venues": wrestlingVenuesShell,
