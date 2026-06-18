@@ -3580,7 +3580,9 @@ function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}
   const image = document.createElement("img");
   image.className = "archive-gallery-image";
   image.alt = "";
-  image.src = photo.imageSrc || photo.lightboxSrc;
+  if (photo.imageSrc || photo.lightboxSrc) {
+    image.dataset.galleryImageSrc = photo.imageSrc || photo.lightboxSrc;
+  }
   tile.append(image);
   return tile;
 }
@@ -9410,13 +9412,11 @@ function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
 
   const image = document.createElement("img");
   image.className = "archive-gallery-image";
-  image.src = imageSrc || lightboxSrc;
   image.alt = "";
+  if (imageSrc || lightboxSrc) {
+    image.dataset.galleryImageSrc = imageSrc || lightboxSrc;
+  }
   applyMusicGalleryImageLoading(image, index);
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = galleryImageFallbackSrc;
-  };
   protectArchiveImage(image);
   tile.append(image);
   return tile;

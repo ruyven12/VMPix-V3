@@ -4308,15 +4308,11 @@ function createWrestlingPersonTaggedLightboxTile(photo, index = 0, eventRow = {}
 
   const image = document.createElement("img");
   image.className = "archive-gallery-image";
-  image.src = imageSrc || lightboxSrc;
   image.alt = "";
+  if (imageSrc || lightboxSrc) {
+    image.dataset.galleryImageSrc = imageSrc || lightboxSrc;
+  }
   applyWrestlingGalleryImageLoading(image, index);
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = typeof galleryImageFallbackSrc !== "undefined"
-      ? galleryImageFallbackSrc
-      : "/assets/media/placeholders/archive-gallery-placeholder.svg";
-  };
   if (typeof protectArchiveImage === "function") {
     protectArchiveImage(image);
   }
@@ -5045,17 +5041,15 @@ function getWrestlingMatchPhotoThumbnailUrl(photo) {
     "thumbnailUrl",
     "thumb_url",
     "thumbUrl",
+  ]);
+}
+
+function getWrestlingMatchPhotoSmallUrl(photo) {
+  return getWrestlingPhotoField(photo, [
     "small_url",
     "smallUrl",
     "medium_url",
     "mediumUrl",
-    "large_url",
-    "largeUrl",
-    "url",
-    "image_url",
-    "imageUrl",
-    "smugmug_url",
-    "smugmugUrl",
   ]);
 }
 
@@ -5109,12 +5103,13 @@ function getWrestlingMatchPhotoItems(match) {
     .flat()
     .map((photo, index) => {
       const lightboxSrc = getWrestlingMatchPhotoLightboxUrl(photo);
-      const thumbnailSrc = getWrestlingMatchPhotoThumbnailUrl(photo) || lightboxSrc;
-      if (!thumbnailSrc && !lightboxSrc) {
+      const thumbnailSrc = getWrestlingMatchPhotoThumbnailUrl(photo);
+      const smallSrc = getWrestlingMatchPhotoSmallUrl(photo);
+      if (!thumbnailSrc && !smallSrc && !lightboxSrc) {
         return null;
       }
       const photoId = getWrestlingMatchPhotoId(photo, index);
-      const dedupeKey = getWrestlingText(photo?.dedupeKey || photoId || lightboxSrc || thumbnailSrc);
+      const dedupeKey = getWrestlingText(photo?.dedupeKey || photoId || lightboxSrc || thumbnailSrc || smallSrc);
       if (dedupeKey && seen.has(dedupeKey)) {
         return null;
       }
@@ -5130,6 +5125,7 @@ function getWrestlingMatchPhotoItems(match) {
         photoId,
         label: getWrestlingMatchPhotoLabel(photo, index),
         thumbnailSrc,
+        smallSrc,
         lightboxSrc,
       };
     })
@@ -5155,7 +5151,7 @@ function getWrestlingMatchPhotoIds(match) {
 }
 
 function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, match = {}) {
-  const imageSrc = photo.thumbnailSrc || photo.lightboxSrc;
+  const imageSrc = photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc;
   const lightboxSrc = photo.lightboxSrc || imageSrc;
   const imageKey = getWrestlingText(photo.photoId || photo.image_key || photo.imageKey || lightboxSrc, `wrestling-match-photo-${index + 1}`);
   const tile = document.createElement("button");
@@ -5179,15 +5175,11 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
 
   const image = document.createElement("img");
   image.className = "archive-gallery-image";
-  image.src = imageSrc;
   image.alt = "";
+  if (imageSrc) {
+    image.dataset.galleryImageSrc = imageSrc;
+  }
   applyWrestlingGalleryImageLoading(image, index);
-  image.onerror = () => {
-    image.onerror = null;
-    image.src = typeof galleryImageFallbackSrc !== "undefined"
-      ? galleryImageFallbackSrc
-      : "/assets/media/placeholders/archive-gallery-placeholder.svg";
-  };
   if (typeof protectArchiveImage === "function") {
     protectArchiveImage(image);
   }
@@ -5296,7 +5288,7 @@ function createWrestlingMatchPhotoTile(photo, index = 0, photos = [], show = {},
 
   const image = document.createElement("img");
   image.className = "wrestling-photo-image";
-  image.src = photo.lightboxSrc || photo.thumbnailSrc;
+  image.src = photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc;
   image.alt = "";
   applyWrestlingGalleryImageLoading(image, index, { firstVisible: true });
   image.onerror = () => {
