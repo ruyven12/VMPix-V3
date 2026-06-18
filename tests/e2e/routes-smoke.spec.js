@@ -125,10 +125,40 @@ const archiveReliabilityRoutes = [
     text: /Adam Begin/i,
   },
   {
+    path: "/music/bands/fake-band",
+    rail: "Band Detail",
+    visibleShell: "[data-band-detail-placeholder]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
     path: "/music/shows/000000",
     rail: "Show Detail",
     visibleShell: "[data-show-detail]",
     text: /Unable to load archive data|No matching archive record was found/i,
+  },
+  {
+    path: "/music/people/fake-person",
+    rail: "Person Detail",
+    visibleShell: ".person-detail-screen",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/music/venues/fake-venue",
+    rail: "Venue Detail",
+    visibleShell: "[data-venue-detail]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/music/bands/fake-band/sets",
+    rail: "Sets Archive",
+    visibleShell: "[data-sets-archive]",
+    text: /Unable to load archive data|No matching band or set archive could be found|Archive Route Not Found/i,
+  },
+  {
+    path: "/music/bands/fake-band/010101",
+    rail: "Set Detail",
+    visibleShell: "[data-sets-archive]",
+    text: /Unable to load archive data|No matching band or set archive could be found|Archive Route Not Found/i,
   },
   {
     path: "/wrestling/people/ace-romero",

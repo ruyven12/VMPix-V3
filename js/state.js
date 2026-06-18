@@ -984,6 +984,12 @@ const mockStateScopeCopy = {
     error: { title: "People Index Offline", text: "Return to Music Nexus while this lane recovers." },
     partial: { title: "Partial People Index", text: "Some people records are staged without final tagged-show data." },
   },
+  musicVenues: {
+    loading: { title: "Loading Venue Grid", text: "Preparing venue cards and linked-show relationships." },
+    empty: { title: "No Venues Staged", text: "The venue lane is ready for archive records." },
+    error: { title: "Venue Archive Offline", text: "Return to Music Nexus while this lane recovers." },
+    partial: { title: "Partial Venue Archive", text: "Some venues are staged without final linked-show rollups." },
+  },
   wrestlingPeople: {
     loading: { title: "Loading Roster Grid", text: "Preparing people, aliases, and relationship hooks." },
     empty: { title: "No People Staged", text: "The roster lane is ready for records." },

@@ -210,6 +210,100 @@ function createMusicV3StateItem(stateName = "empty", scope = "music", options = 
   return item;
 }
 
+const musicPayloadRowKeys = ["data", "rows", "items", "results", "records", "bands", "shows", "people", "venues"];
+const musicPayloadCountKeys = ["total", "count", "totalCount", "total_count", "returnedCount", "returned_count"];
+
+function isMusicPayloadObject(value) {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function isMusicExplicitZeroCount(value) {
+  if (value === null || typeof value === "undefined" || value === "") {
+    return false;
+  }
+  const numericValue = Number.parseInt(value, 10);
+  return Number.isFinite(numericValue) && numericValue === 0;
+}
+
+function getMusicPayloadCountValues(payload) {
+  const countSources = [
+    payload,
+    payload?.source,
+    payload?.meta,
+    payload?.meta?.pagination,
+    payload?.source?.meta,
+    payload?.source?.meta?.pagination,
+  ].filter(isMusicPayloadObject);
+  return countSources.flatMap((source) => musicPayloadCountKeys.map((key) => source[key]));
+}
+
+function getMusicPayloadArrayFields(payload, rowKeys = musicPayloadRowKeys) {
+  if (Array.isArray(payload)) {
+    return [payload];
+  }
+  if (!isMusicPayloadObject(payload)) {
+    return [];
+  }
+
+  const fields = [];
+  const containers = [payload, payload.source].filter(isMusicPayloadObject);
+  containers.forEach((container) => {
+    rowKeys.forEach((key) => {
+      const candidate = container[key];
+      if (Array.isArray(candidate)) {
+        fields.push(candidate);
+      } else if (isMusicPayloadObject(candidate)) {
+        rowKeys.forEach((nestedKey) => {
+          if (Array.isArray(candidate[nestedKey])) {
+            fields.push(candidate[nestedKey]);
+          }
+        });
+      }
+    });
+  });
+  return fields;
+}
+
+function hasMusicExplicitEmptyPayload(payload, rowKeys = musicPayloadRowKeys) {
+  const payloads = Array.isArray(payload) ? payload : [payload];
+  if (Array.isArray(payload) && payload.length === 0) {
+    return true;
+  }
+
+  return payloads.some((payloadItem) => {
+    if (getMusicPayloadCountValues(payloadItem).some(isMusicExplicitZeroCount)) {
+      return true;
+    }
+    const arrayFields = getMusicPayloadArrayFields(payloadItem, rowKeys);
+    return arrayFields.length > 0 && arrayFields.every((field) => field.length === 0);
+  });
+}
+
+function appendMusicV3StateAction(stateCard, label, onClick) {
+  if (!stateCard || typeof onClick !== "function") {
+    return null;
+  }
+  const body = stateCard.querySelector(".v3-state-copy") || stateCard;
+  let actions = body.querySelector(".v3-state-actions");
+  if (!actions) {
+    actions = document.createElement("span");
+    actions.className = "v3-state-actions";
+    body.append(actions);
+  }
+
+  const action = document.createElement("button");
+  action.className = "v3-state-action";
+  action.type = "button";
+  action.textContent = label;
+  action.addEventListener("click", onClick);
+  actions.append(action);
+  return action;
+}
+
+function isUnknownMusicBandRecord(band) {
+  return Boolean(band?.isUnknownArchiveRecord);
+}
+
 function normalizeBandsView(viewName) {
   return routedBandsViews.includes(viewName) ? viewName : "radar";
 }
@@ -319,6 +413,7 @@ function findBandById(bandId) {
 function createUnknownBand(bandId) {
   const safeBandId = String(bandId || "unknown-band").trim() || "unknown-band";
   return {
+    isUnknownArchiveRecord: true,
     bandId: safeBandId,
     name: safeBandId,
     region: "Pending Index",
@@ -352,6 +447,80 @@ function getMusicBandDetailStateName() {
     return "loading";
   }
   return dataState === "error" ? "error" : "empty";
+}
+
+function getMusicSetArchiveStateName() {
+  if (!musicShowsSetsLoaded && (musicShowsSetsRequest || (typeof fetch === "function" && musicShowsSetsDataState !== "error"))) {
+    return "loading";
+  }
+  return musicShowsSetsDataState === "error" && !musicShowsSetsLoaded ? "error" : "empty";
+}
+
+function createMusicSetRouteStateCard(stateName = "empty", options = {}) {
+  const normalizedStateName = stateName === "loading" || stateName === "error" ? stateName : "empty";
+  const isLoading = normalizedStateName === "loading";
+  const isError = normalizedStateName === "error";
+  const detail = [
+    options.bandId ? `Band: ${options.bandId}` : "",
+    options.setCode ? `Set: ${options.setCode}` : "",
+  ].filter(Boolean);
+  const stateCard = createMusicV3StateCard(normalizedStateName, options.scope || "musicShows", {
+    title: isLoading
+      ? "Loading Set Archive"
+      : isError
+        ? "Unable To Load Archive Data"
+        : "Archive Route Not Found",
+    text: isLoading
+      ? "Checking band and set archive records."
+      : isError
+        ? "Unable to load archive data."
+        : "No matching band or set archive could be found.",
+    detail,
+    retry: isError,
+  });
+  appendMusicV3StateAction(stateCard, "Back to Bands", () => navigateToRoute(routePaths.musicBands));
+  appendMusicV3StateAction(stateCard, "Back to Music", () => navigateToRoute(routePaths.music));
+  return stateCard;
+}
+
+function renderMusicSetRouteState(stateName = "empty", options = {}) {
+  if (!setsArchive) {
+    return;
+  }
+
+  activeMusicBand = options.band && !isUnknownMusicBandRecord(options.band) ? options.band : null;
+  const normalizedStateName = stateName === "loading" || stateName === "error" ? stateName : "empty";
+  if (setsArchiveBand) {
+    setsArchiveBand.textContent = options.bandLabel || options.bandId || "Music Archive";
+  }
+  if (setsArchiveSummary) {
+    setsArchiveSummary.textContent = normalizedStateName === "loading" ? "LOADING" : "ROUTE UNAVAILABLE";
+  }
+  if (setsList) {
+    const item = document.createElement("li");
+    item.className = "sets-list-empty";
+    item.append(createMusicSetRouteStateCard(normalizedStateName, options));
+    setsList.replaceChildren(item);
+  }
+
+  setBandsIndexVisible(false);
+  setPeopleIndexVisible(false);
+  setMusicVenueIndexVisible(false);
+  setMusicActivityPanelVisible(false);
+  setMusicPersonDetailVisible(false);
+  setMusicShowDetailVisible(false);
+  setVenueDetailVisible(false);
+  setBandDetailVisible(false);
+  setSetGalleryVisible(false);
+  setSetDetailVisible(false);
+  setSetsArchiveVisible(true);
+  setCurrentView(options.currentView || "Sets Archive");
+  if (musicNexusShell) {
+    musicNexusShell.scrollTo({
+      top: 0,
+      behavior: reducedMotion.matches ? "auto" : "smooth",
+    });
+  }
 }
 
 function createBandDetailStateListItem(stateName, bandId, options = {}) {
@@ -695,36 +864,121 @@ function showSetGalleryRoute(row, options = {}) {
   }
 }
 
-function showSetDetailRoute(band, setCode) {
+function showSetDetailRoute(band, setCode, options = {}) {
   if (!band) {
     return;
   }
 
-  activeMusicBand = band;
   const selectedSetCode = normalizeSetCode(setCode);
-  if (!musicShowsSetsLoaded && musicShowsSetsCollection.length === 0) {
-    restoreMusicShowsSetsFallback();
+  if (isUnknownMusicBandRecord(band)) {
+    const stateName = getMusicBandDetailStateName();
+    const requestedBandId = getBandId(band);
+    renderMusicSetRouteState(stateName, {
+      band,
+      bandId: requestedBandId,
+      setCode: selectedSetCode,
+      scope: "musicBands",
+      currentView: "Set Detail",
+    });
+    if (!options.skipDataRequest && stateName === "loading") {
+      const request = musicBandsIndexRequest || requestMusicBandsIndexData();
+      request.then(() => {
+        const route = getRouteFromUrl();
+        if (
+          route.name !== "set-detail" ||
+          String(route.bandId || "").toLowerCase() !== requestedBandId.toLowerCase()
+        ) {
+          return;
+        }
+        showSetDetailRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), route.setCode, { skipDataRequest: true });
+      });
+    }
+    return;
   }
 
-  renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
-  showSetGalleryRoute(findSetRowByCode(selectedSetCode) || createUnknownSetRow(selectedSetCode), { shouldScroll: false });
-  requestMusicShowsSetsData().then(() => {
-    const route = getRouteFromUrl();
-    if (
-      route.name !== "set-detail" ||
+  activeMusicBand = band;
+  if (!musicShowsSetsLoaded && musicShowsSetsDataState !== "empty" && musicShowsSetsDataState !== "error") {
+    renderMusicSetRouteState("loading", {
+      band,
+      bandId: getBandId(band),
+      bandLabel: band.name,
+      setCode: selectedSetCode,
+      scope: "musicShows",
+      currentView: "Set Detail",
+    });
+    if (!options.skipDataRequest) {
+      requestMusicShowsSetsData().then(() => {
+        const route = getRouteFromUrl();
+        if (
+          route.name !== "set-detail" ||
+          String(route.bandId || "").toLowerCase() !== String(getBandId(band) || "").toLowerCase()
+        ) {
+          return;
+        }
+        showSetDetailRoute(band, route.setCode, { skipDataRequest: true });
+      });
+    }
+    return;
+  }
+
+  const archiveRows = getSetsArchiveRowsForBand(band);
+  const matchingSet = archiveRows.find((show) => normalizeSetCode(show?.setCode) === selectedSetCode) || null;
+  if (!matchingSet) {
+    renderMusicSetRouteState(getMusicSetArchiveStateName(), {
+      band,
+      bandId: getBandId(band),
+      bandLabel: band.name,
+      setCode: selectedSetCode,
+      scope: "musicShows",
+      currentView: "Set Detail",
+    });
+    return;
+  }
+
+  renderSetsArchiveRows(archiveRows, { selectedSetCode });
+  showSetGalleryRoute(findSetRowByCode(selectedSetCode), { shouldScroll: false });
+  if (!options.skipDataRequest && musicShowsSetsDataState !== "live") {
+    requestMusicShowsSetsData().then(() => {
+      const route = getRouteFromUrl();
+      if (
+        route.name !== "set-detail" ||
       String(route.bandId || "").toLowerCase() !== String(getBandId(band) || "").toLowerCase()
     ) {
       return;
     }
 
-    const currentSetCode = normalizeSetCode(route.setCode || selectedSetCode);
-    renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode: currentSetCode });
-    showSetGalleryRoute(findSetRowByCode(currentSetCode) || createUnknownSetRow(currentSetCode), { shouldScroll: false });
-  });
+      const currentSetCode = normalizeSetCode(route.setCode || selectedSetCode);
+      showSetDetailRoute(band, currentSetCode, { skipDataRequest: true });
+    });
+  }
 }
 
-function showSetsArchiveRoute(band) {
+function showSetsArchiveRoute(band, options = {}) {
   if (!band) {
+    return;
+  }
+  if (isUnknownMusicBandRecord(band)) {
+    const stateName = getMusicBandDetailStateName();
+    const requestedBandId = getBandId(band);
+    renderMusicSetRouteState(stateName, {
+      band,
+      bandId: requestedBandId,
+      scope: "musicBands",
+      currentView: "Sets Archive",
+    });
+    if (!options.skipDataRequest && stateName === "loading") {
+      const request = musicBandsIndexRequest || requestMusicBandsIndexData();
+      request.then(() => {
+        const route = getRouteFromUrl();
+        if (
+          route.name !== "sets-archive" ||
+          String(route.bandId || "").toLowerCase() !== requestedBandId.toLowerCase()
+        ) {
+          return;
+        }
+        showSetsArchiveRoute(findBandById(route.bandId) || createUnknownBand(route.bandId), { skipDataRequest: true });
+      });
+    }
     return;
   }
 
@@ -1547,11 +1801,13 @@ function getMusicPeoplePayloadRows(payload) {
     payload?.rows,
     payload?.people,
     payload?.results,
+    payload?.records,
     payload?.source?.data,
     payload?.source?.items,
     payload?.source?.rows,
     payload?.source?.people,
     payload?.source?.results,
+    payload?.source?.records,
   ];
 
   for (const candidate of candidates) {
@@ -1857,7 +2113,13 @@ function requestMusicPeopleIndexData() {
     .then((payloads) => {
       const liveRows = normalizeLiveMusicPeople(payloads);
       if (liveRows.length === 0) {
-        throw new Error("Music people response contained no rows");
+        if (hasMusicExplicitEmptyPayload(payloads, ["data", "items", "rows", "people", "results", "records"])) {
+          setMusicPeopleIndexCollection([], "empty");
+          musicPeopleIndexLoaded = true;
+          renderMusicPeopleIndex({ shouldResetScroll: false });
+          return true;
+        }
+        throw new Error("Music people response contained no usable rows");
       }
 
       setMusicPeopleIndexCollection(liveRows, "live");
@@ -1887,9 +2149,16 @@ function getMusicShowsPayloadRows(payload) {
   const candidates = [
     payload?.data,
     payload?.rows,
+    payload?.items,
+    payload?.results,
+    payload?.records,
     payload?.shows,
     payload?.source?.data,
     payload?.source?.rows,
+    payload?.source?.items,
+    payload?.source?.results,
+    payload?.source?.records,
+    payload?.source?.shows,
   ];
 
   for (const candidate of candidates) {
@@ -1916,9 +2185,16 @@ function getMusicVenuesPayloadRows(payload) {
   const candidates = [
     payload?.data,
     payload?.rows,
+    payload?.items,
+    payload?.results,
+    payload?.records,
     payload?.venues,
     payload?.source?.data,
     payload?.source?.rows,
+    payload?.source?.items,
+    payload?.source?.results,
+    payload?.source?.records,
+    payload?.source?.venues,
   ];
 
   for (const candidate of candidates) {
@@ -1985,7 +2261,9 @@ function venueSlugToVenue(slug, venues = getMusicVenuesRows()) {
     return null;
   }
 
-  const fallbackVenues = getMockCollection("musicVenues", { clone: false });
+  const fallbackVenues = ["live", "empty"].includes(musicVenuesDataState)
+    ? []
+    : getMockCollection("musicVenues", { clone: false });
   const searchRows = [
     ...(Array.isArray(venues) ? venues : []),
     ...(Array.isArray(fallbackVenues) ? fallbackVenues : []),
@@ -2096,7 +2374,15 @@ function requestMusicVenuesData() {
     .then((payload) => {
       const liveRows = normalizeMusicVenues(payload);
       if (liveRows.length === 0) {
-        throw new Error("Music venues response contained no rows");
+        if (hasMusicExplicitEmptyPayload(payload, ["data", "rows", "items", "results", "records", "venues"])) {
+          setMusicVenuesCollection([], "empty");
+          musicVenuesLoaded = true;
+          if (getRouteFromUrl().name === "music-venues") {
+            renderMusicVenuesResults();
+          }
+          return true;
+        }
+        throw new Error("Music venues response contained no usable rows");
       }
 
       setMusicVenuesCollection(liveRows, "live");
@@ -2121,7 +2407,9 @@ function requestMusicVenuesData() {
 }
 
 function getMusicVenuesRows() {
-  return musicVenuesCollection.length > 0
+  return ["live", "empty"].includes(musicVenuesDataState)
+    ? musicVenuesCollection
+    : musicVenuesCollection.length > 0
     ? musicVenuesCollection
     : getMockCollection("musicVenues", { clone: false });
 }
@@ -4638,7 +4926,12 @@ function requestMusicShowsSetsData() {
     .then((payload) => {
       const liveRows = normalizeMusicShowSetRows(payload);
       if (liveRows.length === 0) {
-        throw new Error("Music shows response contained no rows");
+        if (hasMusicExplicitEmptyPayload(payload, ["data", "rows", "items", "results", "records", "shows"])) {
+          setMusicShowsSetsCollection([], "empty");
+          musicShowsSetsLoaded = true;
+          return true;
+        }
+        throw new Error("Music shows response contained no usable rows");
       }
 
       setMusicShowsSetsCollection(liveRows, "live");
@@ -9908,6 +10201,10 @@ function findMusicShowById(showId) {
     return indexedShow;
   }
 
+  if (["live", "empty"].includes(musicShowsSetsDataState)) {
+    return null;
+  }
+
   const mockShow = getMockRecordById("musicShows", showId, ["showId", "id", "slug", "show_id"]);
   return mockShow ? normalizeMusicShowsIndexRow(mockShow) : null;
 }
@@ -10287,7 +10584,7 @@ function normalizeMusicShowsIndexRow(record, index = 0) {
 }
 
 function getMusicShowsIndexSourceRows() {
-  if (musicShowsSetsDataState === "live" && musicShowsSetsCollection.length > 0) {
+  if (["live", "empty"].includes(musicShowsSetsDataState)) {
     return musicShowsSetsCollection;
   }
 
@@ -10295,7 +10592,7 @@ function getMusicShowsIndexSourceRows() {
 }
 
 function getMusicShowsIndexRows() {
-  const isLiveSource = musicShowsSetsDataState === "live" && musicShowsSetsCollection.length > 0;
+  const isLiveSource = ["live", "empty"].includes(musicShowsSetsDataState);
   const sourceRows = getMusicShowsIndexSourceRows();
   const sourceRef = isLiveSource ? musicShowsSetsCollection : musicShowsArchiveRows;
   const cacheState = isLiveSource ? "live" : musicShowsSetsDataState;
