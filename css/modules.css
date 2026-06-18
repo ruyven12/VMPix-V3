@@ -5297,25 +5297,26 @@ html.is-lightbox-scroll-locked body {
   gap: 0.58rem;
 }
 
-.venue-photo-highlights-grid {
+.venue-photo-highlights-carousel {
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.4rem), 1fr));
-  gap: 0.52rem;
+  gap: 0.58rem;
 }
 
-.venue-photo-highlight-tile {
+.venue-photo-highlight-stage {
   appearance: none;
+  position: relative;
+  width: 100%;
   min-width: 0;
-  min-height: 7.25rem;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  height: auto;
+  aspect-ratio: var(--venue-photo-highlight-ratio, 3 / 2);
+  display: block;
   padding: 0;
-  border: 1px solid rgba(247, 247, 242, 0.08);
+  border: 1px solid rgba(247, 247, 242, 0.09);
   border-radius: var(--radius-sm);
   background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.024), transparent 62%),
-    rgba(1, 1, 3, 0.34);
+    radial-gradient(circle at 50% 18%, rgba(247, 247, 242, 0.08), transparent 32%),
+    rgba(1, 1, 3, 0.44);
   color: inherit;
   cursor: pointer;
   font: inherit;
@@ -5323,50 +5324,52 @@ html.is-lightbox-scroll-locked body {
   touch-action: manipulation;
   transition:
     border-color var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
+    background-color var(--motion-fast) var(--ease-standard);
 }
 
-.venue-photo-highlight-tile:hover,
-.venue-photo-highlight-tile:focus-visible {
+.venue-photo-highlight-stage:hover,
+.venue-photo-highlight-stage:focus-visible {
   border-color: rgba(255, 118, 102, 0.26);
   background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
-    rgba(11, 3, 5, 0.38);
+    radial-gradient(circle at 50% 18%, rgba(247, 247, 242, 0.105), transparent 34%),
+    rgba(11, 3, 5, 0.42);
 }
 
-.venue-photo-highlight-tile:focus-visible {
+.venue-photo-highlight-stage:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.14rem;
 }
 
-.venue-photo-highlight-tile:active {
-  transform: translate3d(0, 0.04rem, 0);
-}
-
 .venue-photo-highlight-image {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 0;
+  height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   background: rgba(1, 1, 3, 0.5);
   pointer-events: none;
 }
 
-.venue-photo-highlight-meta {
+.venue-photo-highlight-image.archive-gallery-image {
+  object-fit: contain;
+}
+
+.venue-photo-highlight-overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
   min-width: 0;
   display: grid;
-  gap: 0.12rem;
-  padding: 0.42rem 0.5rem 0.48rem;
-  border-top: 1px solid rgba(247, 247, 242, 0.065);
-  background: rgba(1, 1, 3, 0.36);
+  gap: 0.16rem;
+  padding: 0.72rem 0.78rem 0.78rem;
+  background: linear-gradient(180deg, transparent, rgba(1, 1, 3, 0.78));
   text-align: left;
   pointer-events: none;
 }
 
 .venue-photo-highlight-show,
-.venue-photo-highlight-date {
+.venue-photo-highlight-date,
+.venue-photo-highlight-caption {
   min-width: 0;
   display: block;
   line-height: 1.15;
@@ -5376,11 +5379,17 @@ html.is-lightbox-scroll-locked body {
 
 .venue-photo-highlight-show {
   color: rgba(247, 247, 242, 0.78);
-  font-size: 0.66rem;
+  font-size: 0.72rem;
 }
 
 .venue-photo-highlight-date {
   color: rgba(255, 118, 102, 0.66);
+  font-size: 0.6rem;
+}
+
+.venue-photo-highlight-caption {
+  max-width: 42rem;
+  color: rgba(247, 247, 242, 0.62);
   font-size: 0.58rem;
 }
 
@@ -5389,48 +5398,57 @@ html.is-lightbox-scroll-locked body {
   padding: 0.7rem;
 }
 
-.venue-photo-highlights-footer {
-  display: flex;
+.venue-photo-highlights-controls {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content)) minmax(0, 1fr);
+  align-items: center;
   justify-content: center;
+  gap: 0.42rem;
 }
 
-.venue-photo-highlights-more {
+.venue-photo-highlights-control {
   appearance: none;
-  min-height: 2.66rem;
-  max-width: 100%;
-  padding: 0.62rem 0.78rem;
-  border: 1px solid rgba(213, 22, 34, 0.22);
+  min-width: 0;
+  min-height: 2.55rem;
+  padding: 0.58rem 0.72rem;
+  border: 1px solid rgba(247, 247, 242, 0.095);
   border-radius: var(--radius-sm);
-  background: rgba(213, 22, 34, 0.06);
-  color: rgba(247, 247, 242, 0.76);
+  background: rgba(247, 247, 242, 0.034);
+  color: rgba(247, 247, 242, 0.72);
   cursor: pointer;
   font: inherit;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   line-height: 1;
   text-align: center;
   text-transform: none;
   touch-action: manipulation;
 }
 
-.venue-photo-highlights-more:hover,
-.venue-photo-highlights-more:focus-visible {
-  border-color: rgba(255, 118, 102, 0.32);
+.venue-photo-highlights-control--primary {
+  border-color: rgba(213, 22, 34, 0.24);
+  background: rgba(213, 22, 34, 0.075);
+  color: rgba(247, 247, 242, 0.84);
+}
+
+.venue-photo-highlights-control:hover,
+.venue-photo-highlights-control:focus-visible {
+  border-color: rgba(255, 118, 102, 0.3);
   background: rgba(213, 22, 34, 0.095);
   color: rgba(247, 247, 242, 0.9);
 }
 
-.venue-photo-highlights-more:focus-visible {
+.venue-photo-highlights-control:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.14rem;
 }
 
-.venue-photo-highlights-more:disabled {
-  cursor: wait;
-  opacity: 0.62;
-}
-
-.venue-photo-highlights-more[hidden] {
-  display: none;
+.venue-photo-highlights-counter {
+  min-width: 0;
+  color: rgba(247, 247, 242, 0.54);
+  font-size: 0.62rem;
+  line-height: 1;
+  text-align: right;
 }
 
 .venue-detail-content-grid {
@@ -15635,11 +15653,6 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.92rem;
   }
 
-  .venue-photo-highlights-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
-    gap: 0.62rem;
-  }
-
   .music-venues-archive {
     padding: 0.92rem;
   }
@@ -15796,21 +15809,28 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.54rem;
   }
 
-  .venue-photo-highlights-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.42rem;
+  .venue-photo-highlight-overlay {
+    padding: 0.58rem 0.62rem 0.62rem;
   }
 
-  .venue-photo-highlight-tile {
-    min-height: 0;
+  .venue-photo-highlight-caption {
+    display: none;
   }
 
-  .venue-photo-highlight-meta {
-    padding: 0.36rem 0.4rem 0.42rem;
+  .venue-photo-highlights-controls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.36rem;
   }
 
-  .venue-photo-highlights-more {
-    width: 100%;
+  .venue-photo-highlights-control {
+    min-height: 2.5rem;
+    padding: 0.54rem 0.36rem;
+    font-size: 0.58rem;
+  }
+
+  .venue-photo-highlights-counter {
+    grid-column: 1 / -1;
+    text-align: center;
   }
 
   .music-venues-archive {

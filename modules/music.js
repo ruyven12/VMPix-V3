@@ -23,7 +23,8 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
-const MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT = 12;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT = 20;
+const MUSIC_VENUE_PHOTO_HIGHLIGHTS_INTERVAL_MS = 4500;
 const MUSIC_VENUE_PHOTO_HIGHLIGHTS_TIMEOUT_MS = 15000;
 const SET_GALLERY_NO_POSTER_IMAGE_SRC = "/assets/media/placeholders/no-poster-available.svg";
 const bandsRegionFilterLabels = {
@@ -2825,6 +2826,9 @@ function createMusicVenuePhotoHighlightsState(identifier) {
     isLoading: false,
     page: 0,
     hasMore: false,
+    activeIndex: 0,
+    timerId: 0,
+    pauseReasons: new Set(),
     photos: [],
     photoKeys: new Set(),
     summary: {},
@@ -2892,18 +2896,25 @@ function getMusicVenuePhotoHighlightsSection() {
     body.className = "venue-photo-highlights-body";
     body.dataset.venuePhotoHighlightsBody = "";
 
-    const footer = document.createElement("footer");
-    footer.className = "venue-photo-highlights-footer";
+    section.addEventListener("pointerenter", () => {
+      setActiveMusicVenuePhotoHighlightsPause("hover", true);
+    });
+    section.addEventListener("pointerleave", () => {
+      setActiveMusicVenuePhotoHighlightsPause("hover", false);
+    });
+    section.addEventListener("focusin", () => {
+      setActiveMusicVenuePhotoHighlightsPause("focus", true);
+    });
+    section.addEventListener("focusout", (event) => {
+      if (!section.contains(event.relatedTarget)) {
+        setActiveMusicVenuePhotoHighlightsPause("focus", false);
+      }
+    });
+    section.addEventListener("touchstart", () => {
+      setActiveMusicVenuePhotoHighlightsPause("touch", true);
+    }, { passive: true });
 
-    const button = document.createElement("button");
-    button.className = "venue-photo-highlights-more";
-    button.type = "button";
-    button.dataset.venuePhotoHighlightsMore = "";
-    button.textContent = "Show More Venue Photos";
-    button.addEventListener("click", handleMusicVenuePhotoHighlightsShowMore);
-    footer.append(button);
-
-    section.append(header, body, footer);
+    section.append(header, body);
   }
 
   const relationships = venueDetail.querySelector("[data-venue-relationships]");
@@ -2915,6 +2926,8 @@ function getMusicVenuePhotoHighlightsSection() {
 }
 
 function hideMusicVenuePhotoHighlightsSection() {
+  const state = musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey);
+  clearMusicVenuePhotoHighlightsAutoplay(state);
   activeMusicVenuePhotoHighlightsKey = "";
   const section = venueDetail?.querySelector("[data-venue-photo-highlights]");
   if (!section) {
@@ -2944,13 +2957,95 @@ function getMusicVenuePhotoHighlightsCount(...values) {
   return null;
 }
 
-function getMusicVenuePhotoHighlightsHasMore(payload, photos) {
-  const pagination = payload?.pagination || payload?.meta?.pagination || {};
-  if (typeof pagination.has_more === "boolean") return pagination.has_more;
-  if (typeof pagination.hasMore === "boolean") return pagination.hasMore;
-  if (typeof payload?.has_more === "boolean") return payload.has_more;
-  if (typeof payload?.hasMore === "boolean") return payload.hasMore;
-  return Array.isArray(photos) && photos.length >= MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT;
+function shuffleMusicVenuePhotoHighlights(photos) {
+  const shuffledPhotos = Array.isArray(photos) ? [...photos] : [];
+  for (let index = shuffledPhotos.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffledPhotos[index], shuffledPhotos[swapIndex]] = [shuffledPhotos[swapIndex], shuffledPhotos[index]];
+  }
+  return shuffledPhotos;
+}
+
+function getActiveMusicVenuePhotoHighlightsState() {
+  return musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey) || null;
+}
+
+function normalizeMusicVenuePhotoHighlightsIndex(state, index) {
+  const photoCount = Math.max(state?.photos?.length || 0, 1);
+  return ((Number.parseInt(index, 10) || 0) % photoCount + photoCount) % photoCount;
+}
+
+function clearMusicVenuePhotoHighlightsAutoplay(state) {
+  if (state?.timerId) {
+    window.clearTimeout(state.timerId);
+    state.timerId = 0;
+  }
+}
+
+function shouldAutoplayMusicVenuePhotoHighlights(state) {
+  return Boolean(
+    state &&
+    activeMusicVenuePhotoHighlightsKey === state.key &&
+    state.status === "ready" &&
+    state.photos.length > 1 &&
+    !reducedMotion.matches &&
+    state.pauseReasons.size === 0
+  );
+}
+
+function scheduleMusicVenuePhotoHighlightsAutoplay(state) {
+  clearMusicVenuePhotoHighlightsAutoplay(state);
+  if (!shouldAutoplayMusicVenuePhotoHighlights(state)) {
+    return;
+  }
+
+  state.timerId = window.setTimeout(() => {
+    state.timerId = 0;
+    advanceMusicVenuePhotoHighlightsCarousel(1, { reason: "auto" });
+  }, MUSIC_VENUE_PHOTO_HIGHLIGHTS_INTERVAL_MS);
+}
+
+function setMusicVenuePhotoHighlightsPause(state, reason, isPaused) {
+  if (!state || !reason) {
+    return;
+  }
+
+  if (isPaused) {
+    state.pauseReasons.add(reason);
+    clearMusicVenuePhotoHighlightsAutoplay(state);
+    return;
+  }
+
+  state.pauseReasons.delete(reason);
+  scheduleMusicVenuePhotoHighlightsAutoplay(state);
+}
+
+function setActiveMusicVenuePhotoHighlightsPause(reason, isPaused) {
+  setMusicVenuePhotoHighlightsPause(getActiveMusicVenuePhotoHighlightsState(), reason, isPaused);
+}
+
+function advanceMusicVenuePhotoHighlightsCarousel(delta, options = {}) {
+  const state = getActiveMusicVenuePhotoHighlightsState();
+  if (!state || state.photos.length === 0) {
+    return;
+  }
+
+  if (options.reason === "manual") {
+    setMusicVenuePhotoHighlightsPause(state, "manual", true);
+  }
+
+  state.activeIndex = normalizeMusicVenuePhotoHighlightsIndex(state, state.activeIndex + delta);
+  renderMusicVenuePhotoHighlightsState(state, {
+    focusControl: options.focusControl || "",
+  });
+}
+
+function trimMusicVenuePhotoHighlightCaption(caption, maxLength = 96) {
+  const text = String(caption || "").replace(/\s+/g, " ").trim();
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, Math.max(0, maxLength - 3)).trim()}...`;
 }
 
 function getMusicVenuePhotoHighlightUrl(photo, fields) {
@@ -2979,7 +3074,7 @@ function normalizeMusicVenuePhotoHighlight(photo, index = 0) {
     return null;
   }
 
-  const imageSrc = getMusicVenuePhotoHighlightUrl(photo, ["thumbnail_url", "thumbnailUrl", "small_url", "smallUrl", "medium_url", "mediumUrl", "large_url", "largeUrl"]);
+  const imageSrc = getMusicVenuePhotoHighlightUrl(photo, ["large_url", "largeUrl", "medium_url", "mediumUrl", "small_url", "smallUrl", "thumbnail_url", "thumbnailUrl"]);
   const lightboxSrc = getMusicVenuePhotoHighlightUrl(photo, ["large_url", "largeUrl", "medium_url", "mediumUrl", "small_url", "smallUrl", "thumbnail_url", "thumbnailUrl"]);
   if (!imageSrc && !lightboxSrc) {
     return null;
@@ -3002,6 +3097,7 @@ function normalizeMusicVenuePhotoHighlight(photo, index = 0) {
     medium_url: String(photo.medium_url || photo.mediumUrl || "").trim(),
     large_url: String(photo.large_url || photo.largeUrl || "").trim(),
     caption,
+    captionShort: trimMusicVenuePhotoHighlightCaption(caption),
     label,
     showTitle,
     showDate,
@@ -3043,9 +3139,9 @@ function getMusicVenuePhotoHighlightsSummaryText(state) {
     summary.scannedPhotoCount
   );
   if (scannedCount != null) {
-    return `Showing ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"} from ${scannedCount.toLocaleString()} scanned photo${scannedCount === 1 ? "" : "s"}.`;
+    return `Cycling ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"} from ${scannedCount.toLocaleString()} scanned photo${scannedCount === 1 ? "" : "s"}.`;
   }
-  return `Showing ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"}.`;
+  return `Cycling ${visibleCount.toLocaleString()} linked-show highlight${visibleCount === 1 ? "" : "s"} from this venue archive.`;
 }
 
 function createMusicVenuePhotoHighlightsStateCard(stateName, text) {
@@ -3057,61 +3153,109 @@ function createMusicVenuePhotoHighlightsStateCard(stateName, text) {
   return stateCard;
 }
 
-function createMusicVenuePhotoHighlightsGrid(state) {
-  const grid = document.createElement("div");
-  grid.className = "venue-photo-highlights-grid";
-  grid.setAttribute("role", "list");
-  state.photos.forEach((photo, index) => {
-    grid.append(createMusicVenuePhotoHighlightTile(photo, index));
-  });
-  return grid;
-}
+function createMusicVenuePhotoHighlightsCarousel(state) {
+  const carousel = document.createElement("div");
+  carousel.className = "venue-photo-highlights-carousel";
+  carousel.dataset.venuePhotoHighlightsCarousel = "";
 
-function createMusicVenuePhotoHighlightTile(photo, index = 0) {
-  const tile = document.createElement("button");
-  tile.className = "venue-photo-highlight-tile";
-  tile.type = "button";
-  tile.dataset.venuePhotoHighlightTile = "";
-  tile.setAttribute("role", "listitem");
-  tile.setAttribute("aria-label", `Open ${photo.label}`);
+  const photo = state.photos[normalizeMusicVenuePhotoHighlightsIndex(state, state.activeIndex)];
+  if (!photo) {
+    carousel.append(createMusicVenuePhotoHighlightsStateCard("empty", "No venue photo highlights are available yet."));
+    return carousel;
+  }
+
+  const stage = document.createElement("button");
+  stage.className = "venue-photo-highlight-stage";
+  stage.type = "button";
+  stage.dataset.venuePhotoHighlightsStage = "";
+  stage.setAttribute("aria-label", `Open ${photo.label}`);
+  stage.addEventListener("click", handleMusicVenuePhotoHighlightsOpenPhoto);
 
   const image = document.createElement("img");
   image.className = "venue-photo-highlight-image archive-gallery-image";
   image.alt = "";
   image.src = photo.imageSrc || photo.lightboxSrc;
-  applyMusicGalleryImageLoading(image, index);
+  image.loading = "eager";
+  image.decoding = "async";
+  image.addEventListener("load", () => {
+    if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+      stage.style.setProperty("--venue-photo-highlight-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+    }
+  }, { once: true });
+  if (image.complete && image.naturalWidth > 0 && image.naturalHeight > 0) {
+    stage.style.setProperty("--venue-photo-highlight-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+  }
   image.onerror = () => {
     image.onerror = null;
     image.src = galleryImageFallbackSrc;
   };
   protectArchiveImage(image);
-  tile.append(image);
+  stage.append(image);
 
-  if (photo.showTitle || photo.showDate) {
-    const meta = document.createElement("span");
-    meta.className = "venue-photo-highlight-meta";
-    const title = document.createElement("span");
-    title.className = "venue-photo-highlight-show";
-    title.textContent = photo.showTitle || "Linked Show";
-    const date = document.createElement("span");
-    date.className = "venue-photo-highlight-date";
-    date.textContent = photo.showDate;
-    meta.append(title);
-    if (photo.showDate) {
-      meta.append(date);
+  if (photo.showTitle || photo.showDate || photo.captionShort) {
+    const overlay = document.createElement("span");
+    overlay.className = "venue-photo-highlight-overlay";
+
+    if (photo.showTitle) {
+      const title = document.createElement("span");
+      title.className = "venue-photo-highlight-show";
+      title.textContent = photo.showTitle;
+      overlay.append(title);
     }
-    tile.append(meta);
+
+    if (photo.showDate) {
+      const date = document.createElement("span");
+      date.className = "venue-photo-highlight-date";
+      date.textContent = photo.showDate;
+      overlay.append(date);
+    }
+
+    if (photo.captionShort) {
+      const caption = document.createElement("span");
+      caption.className = "venue-photo-highlight-caption";
+      caption.textContent = photo.captionShort;
+      overlay.append(caption);
+    }
+
+    stage.append(overlay);
   }
 
-  tile.addEventListener("click", () => {
-    openMusicVenuePhotoHighlightsLightbox(index, tile);
-  });
-  return tile;
+  const controls = document.createElement("div");
+  controls.className = "venue-photo-highlights-controls";
+
+  const previousButton = document.createElement("button");
+  previousButton.className = "venue-photo-highlights-control";
+  previousButton.type = "button";
+  previousButton.dataset.venuePhotoHighlightsPrev = "";
+  previousButton.textContent = "Previous";
+  previousButton.addEventListener("click", handleMusicVenuePhotoHighlightsPrevious);
+
+  const openButton = document.createElement("button");
+  openButton.className = "venue-photo-highlights-control venue-photo-highlights-control--primary";
+  openButton.type = "button";
+  openButton.dataset.venuePhotoHighlightsOpen = "";
+  openButton.textContent = "Open Photo";
+  openButton.addEventListener("click", handleMusicVenuePhotoHighlightsOpenPhoto);
+
+  const nextButton = document.createElement("button");
+  nextButton.className = "venue-photo-highlights-control";
+  nextButton.type = "button";
+  nextButton.dataset.venuePhotoHighlightsNext = "";
+  nextButton.textContent = "Next";
+  nextButton.addEventListener("click", handleMusicVenuePhotoHighlightsNext);
+
+  const counter = document.createElement("span");
+  counter.className = "venue-photo-highlights-counter";
+  counter.textContent = `${normalizeMusicVenuePhotoHighlightsIndex(state, state.activeIndex) + 1} / ${state.photos.length}`;
+
+  controls.append(previousButton, openButton, nextButton, counter);
+  carousel.append(stage, controls);
+  return carousel;
 }
 
 function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}) {
   const tile = document.createElement("button");
-  tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
+  tile.className = `archive-gallery-tile set-gallery-photo-tile${index === state.activeIndex ? " is-active" : ""}`;
   tile.type = "button";
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
@@ -3125,7 +3269,7 @@ function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}
   tile.dataset.galleryLocation = state.venueLocation || "";
   tile.dataset.galleryDate = photo.showDate || "";
   tile.setAttribute("aria-label", photo.label);
-  tile.setAttribute("aria-pressed", String(index === 0));
+  tile.setAttribute("aria-pressed", String(index === state.activeIndex));
 
   const image = document.createElement("img");
   image.className = "archive-gallery-image";
@@ -3142,9 +3286,13 @@ function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null) {
   }
 
   const safeIndex = Math.max(0, Math.min(Number.parseInt(photoIndex, 10) || 0, state.photos.length - 1));
+  state.activeIndex = safeIndex;
+  setMusicVenuePhotoHighlightsPause(state, "manual", true);
+  setMusicVenuePhotoHighlightsPause(state, "lightbox", true);
   const previousActiveGalleryPhoto = activeGalleryPhoto || null;
   const returnContext = {
     source: "music-venue-photo-highlights",
+    carouselKey: state.key,
     focusElement: trigger || null,
     previousActiveGalleryPhoto,
     scrollTop: musicNexusShell ? musicNexusShell.scrollTop : 0,
@@ -3154,7 +3302,7 @@ function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null) {
   showLightbox(targetTile, { returnContext });
 }
 
-function renderMusicVenuePhotoHighlightsState(state) {
+function renderMusicVenuePhotoHighlightsState(state, options = {}) {
   const section = getMusicVenuePhotoHighlightsSection();
   if (!section || !state) {
     return;
@@ -3167,7 +3315,6 @@ function renderMusicVenuePhotoHighlightsState(state) {
 
   const summary = section.querySelector("[data-venue-photo-highlights-summary]");
   const body = section.querySelector("[data-venue-photo-highlights-body]");
-  const moreButton = section.querySelector("[data-venue-photo-highlights-more]");
   if (summary) {
     summary.textContent = getMusicVenuePhotoHighlightsSummaryText(state);
     summary.hidden = !summary.textContent;
@@ -3178,7 +3325,8 @@ function renderMusicVenuePhotoHighlightsState(state) {
 
   body.replaceChildren();
   if (state.photos.length > 0) {
-    body.append(createMusicVenuePhotoHighlightsGrid(state));
+    state.activeIndex = normalizeMusicVenuePhotoHighlightsIndex(state, state.activeIndex);
+    body.append(createMusicVenuePhotoHighlightsCarousel(state));
     if (state.error) {
       body.append(createMusicVenuePhotoHighlightsStateCard("error", "Venue photo highlights could not be loaded."));
     }
@@ -3190,14 +3338,15 @@ function renderMusicVenuePhotoHighlightsState(state) {
     body.append(createMusicVenuePhotoHighlightsStateCard("empty", "No venue photo highlights are available yet."));
   }
 
-  if (moreButton) {
-    const shouldShowMore = state.photos.length > 0 && state.hasMore;
-    moreButton.hidden = !shouldShowMore;
-    moreButton.disabled = Boolean(state.isLoading);
-    moreButton.textContent = state.isLoading && state.photos.length > 0
-      ? "Loading Venue Photos..."
-      : "Show More Venue Photos";
+  if (state.photos.length > 0 && options.focusControl) {
+    window.requestAnimationFrame(() => {
+      const target = section.querySelector(`[data-venue-photo-highlights-${options.focusControl}]`);
+      if (target) {
+        target.focus({ preventScroll: true });
+      }
+    });
   }
+  scheduleMusicVenuePhotoHighlightsAutoplay(state);
 }
 
 function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
@@ -3233,12 +3382,14 @@ function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
       return response.json();
     })
     .then((payload) => {
-      const payloadPhotos = getMusicVenuePhotoHighlightsPayloadPhotos(payload);
+      const payloadPhotos = getMusicVenuePhotoHighlightsPayloadPhotos(payload).slice(0, MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT);
       state.summary = payload?.summary && typeof payload.summary === "object" ? payload.summary : {};
       state.pagination = payload?.pagination && typeof payload.pagination === "object" ? payload.pagination : {};
-      state.page = Math.max(page, Number.parseInt(state.pagination.page, 10) || page);
-      state.hasMore = getMusicVenuePhotoHighlightsHasMore(payload, payloadPhotos);
+      state.page = 1;
+      state.hasMore = false;
       mergeMusicVenuePhotoHighlights(state, payloadPhotos);
+      state.photos = shuffleMusicVenuePhotoHighlights(state.photos).slice(0, MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT);
+      state.activeIndex = 0;
       state.status = state.photos.length > 0 ? "ready" : "empty";
       return true;
     })
@@ -3263,12 +3414,26 @@ function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
   return request;
 }
 
-function handleMusicVenuePhotoHighlightsShowMore() {
+function handleMusicVenuePhotoHighlightsPrevious() {
+  advanceMusicVenuePhotoHighlightsCarousel(-1, {
+    focusControl: "prev",
+    reason: "manual",
+  });
+}
+
+function handleMusicVenuePhotoHighlightsNext() {
+  advanceMusicVenuePhotoHighlightsCarousel(1, {
+    focusControl: "next",
+    reason: "manual",
+  });
+}
+
+function handleMusicVenuePhotoHighlightsOpenPhoto(event) {
   const state = musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey);
-  if (!state || state.isLoading || !state.hasMore) {
+  if (!state || state.photos.length === 0) {
     return;
   }
-  requestMusicVenuePhotoHighlightsPage(state, state.page + 1);
+  openMusicVenuePhotoHighlightsLightbox(state.activeIndex, event?.currentTarget || null);
 }
 
 function syncMusicVenuePhotoHighlights(venue, requestedSlug = "") {
@@ -6262,6 +6427,11 @@ function returnToSetGalleryFromLightbox() {
 
     setLightboxVisible(false);
     activeGalleryPhoto = previousActiveGalleryPhoto;
+    setMusicVenuePhotoHighlightsPause(
+      musicVenuePhotoHighlightsStates.get(returnContext.carouselKey || activeMusicVenuePhotoHighlightsKey),
+      "lightbox",
+      false
+    );
     setVenueDetailVisible(true);
     setCurrentView("Venue Detail");
     window.requestAnimationFrame(() => {
