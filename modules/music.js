@@ -68,6 +68,8 @@ let musicShowsIndexRowsCacheSource = null;
 let musicShowsIndexRowsCacheLength = 0;
 const musicSmugmugAlbumPhotosCache = new Map();
 const musicSmugmugAlbumPhotosRequests = new Map();
+const musicSetGalleryAllModeCache = new Map();
+const musicSetGalleryAllModePageRequests = new Map();
 const musicBandArchiveCoverageCache = new Map();
 const musicBandArchiveCoverageRequests = new Map();
 const musicBandArchiveCoverageFields = [
@@ -81,6 +83,8 @@ const musicBandArchiveCoverageFields = [
 ];
 let activeMusicBandArchiveCoverageRequestKey = "";
 let activeSetGalleryAlbumRequestKey = "";
+let activeSetGalleryAllModeLoading = false;
+let setGalleryLoadMoreButton = null;
 let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
@@ -5868,12 +5872,77 @@ function setSetGalleryLoadingCopy(title = "Loading archive photos...", text = "P
   }
 }
 
+function getSetGalleryAllModeCache(albumId, options = {}) {
+  const safeAlbumId = String(albumId || "").trim();
+  if (!safeAlbumId) {
+    return null;
+  }
+  if (!musicSetGalleryAllModeCache.has(safeAlbumId) && options.create) {
+    musicSetGalleryAllModeCache.set(safeAlbumId, {
+      photos: [],
+      photoKeys: new Set(),
+      loadedStarts: new Set(),
+      loadingStarts: new Set(),
+      nextStart: 1,
+      hasMore: true,
+      partialError: false,
+      total: 0,
+    });
+  }
+  return musicSetGalleryAllModeCache.get(safeAlbumId) || null;
+}
+
+function isSetGalleryAllModeActive(albumId) {
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const safeAlbumId = String(albumId || "").trim();
+  return activeSetGalleryPhotoMode === "all" &&
+    activeSetGalleryAlbumRequestKey === `${safeAlbumId}:all` &&
+    route?.name === "set-detail" &&
+    activeSetRow &&
+    getSetAlbumId(activeSetRow) === safeAlbumId;
+}
+
+function getSetGalleryLoadMoreButton() {
+  if (setGalleryLoadMoreButton || !galleryViewAll || !galleryViewAll.parentElement) {
+    return setGalleryLoadMoreButton;
+  }
+
+  setGalleryLoadMoreButton = document.createElement("button");
+  setGalleryLoadMoreButton.className = "v3-card v3-card--interactive set-gallery-view-all set-gallery-load-more";
+  setGalleryLoadMoreButton.type = "button";
+  setGalleryLoadMoreButton.hidden = true;
+  setGalleryLoadMoreButton.setAttribute("aria-controls", galleryGrid?.id || "set-gallery-photo-grid");
+  setGalleryLoadMoreButton.setAttribute("aria-disabled", "true");
+  setGalleryLoadMoreButton.textContent = "Load More Photos";
+  setGalleryLoadMoreButton.addEventListener("click", loadMoreSetGalleryAllPhotos);
+  galleryViewAll.insertAdjacentElement("afterend", setGalleryLoadMoreButton);
+  return setGalleryLoadMoreButton;
+}
+
+function syncSetGalleryLoadMoreButton(stateName = "ready") {
+  const button = getSetGalleryLoadMoreButton();
+  if (!button) {
+    return;
+  }
+
+  const albumId = setGallery?.dataset.albumId || "";
+  const cache = getSetGalleryAllModeCache(albumId);
+  const shouldShow = stateName === "ready" &&
+    activeSetGalleryPhotoMode === "all" &&
+    Boolean(cache?.hasMore);
+  button.hidden = !shouldShow;
+  button.disabled = !shouldShow || activeSetGalleryAllModeLoading;
+  button.setAttribute("aria-disabled", String(button.disabled));
+  button.textContent = activeSetGalleryAllModeLoading ? "Loading Photos..." : "Load More Photos";
+}
+
 function syncSetGalleryPhotoToggleButton(stateName = "ready") {
   if (!galleryViewAll) {
     return;
   }
 
-  const canTogglePhotos = stateName === "ready" && activeSetGalleryPhotoTotal > MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
+  const canTogglePhotos = stateName === "ready" &&
+    (activeSetGalleryPhotoMode === "all" || activeSetGalleryPhotoTotal > MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT);
   galleryViewAll.disabled = !canTogglePhotos;
   galleryViewAll.hidden = stateName !== "ready" && activeSetGalleryPhotoTotal <= MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
   galleryViewAll.setAttribute("aria-disabled", String(!canTogglePhotos));
@@ -5912,6 +5981,7 @@ function setGalleryState(stateName = "ready") {
     }
   });
   syncSetGalleryPhotoToggleButton(activeState);
+  syncSetGalleryLoadMoreButton(activeState);
 }
 
 function getGalleryPhotoLabel(photoTile) {
@@ -6391,15 +6461,22 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   return tile;
 }
 
-function renderSetGalleryPhotoHighlights(photos) {
+function renderSetGalleryPhotoHighlights(photos, options = {}) {
   if (!galleryGrid) {
     return;
   }
 
   const fragment = document.createDocumentFragment();
+  const appendMode = options.append === true;
+  const startIndex = appendMode ? getCurrentGalleryPhotoTiles().length : 0;
   photos.forEach((photo, index) => {
-    fragment.append(createSetGalleryPhotoTile(photo, index));
+    fragment.append(createSetGalleryPhotoTile(photo, startIndex + index));
   });
+  if (appendMode) {
+    galleryGrid.append(fragment);
+    return;
+  }
+
   galleryGrid.replaceChildren(fragment);
   activeGalleryPhoto = null;
   const firstTile = getCurrentGalleryPhotoTiles()[0] || null;
@@ -6408,13 +6485,198 @@ function renderSetGalleryPhotoHighlights(photos) {
   }
 }
 
+function getSetGalleryAllModePhotoKey(photo) {
+  return String(photo?.dedupeKey || photo?.imageKey || photo?.imageSrc || photo?.lightboxSrc || "").trim();
+}
+
+function appendSetGalleryAllModePhotos(cache, photos) {
+  const appendedPhotos = [];
+  (Array.isArray(photos) ? photos : []).forEach((photo) => {
+    const photoKey = getSetGalleryAllModePhotoKey(photo);
+    if (!photoKey || cache.photoKeys.has(photoKey)) {
+      return;
+    }
+    cache.photoKeys.add(photoKey);
+    cache.photos.push(photo);
+    appendedPhotos.push(photo);
+  });
+  return appendedPhotos;
+}
+
+function updateSetGalleryAllModeControls(albumId, stateName = "ready") {
+  const cache = getSetGalleryAllModeCache(albumId);
+  if (cache?.partialError) {
+    setSetGalleryPhotoWarning("Full archive could not fully load.");
+  }
+  updateSetGalleryPhotoSummary(cache?.photos.length || 0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+  syncSetGalleryPhotoToggleButton(stateName);
+  syncSetGalleryLoadMoreButton(stateName);
+}
+
+function requestSetGalleryAllModePage(albumId, start) {
+  const safeAlbumId = String(albumId || "").trim();
+  const safeStart = normalizeMusicSmugmugAlbumPhotoStart(start);
+  const requestKey = `${safeAlbumId}:${safeStart}`;
+  if (!safeAlbumId) {
+    return Promise.resolve({ count: 0, hasMore: false, nextStart: null, photos: [], total: 0 });
+  }
+  if (musicSetGalleryAllModePageRequests.has(requestKey)) {
+    return musicSetGalleryAllModePageRequests.get(requestKey);
+  }
+  const request = requestMusicSmugmugAlbumPhotosPage(safeAlbumId, MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT, safeStart)
+    .finally(() => {
+      musicSetGalleryAllModePageRequests.delete(requestKey);
+    });
+  musicSetGalleryAllModePageRequests.set(requestKey, request);
+  return request;
+}
+
+function loadNextSetGalleryAllModePage(row, options = {}) {
+  const albumId = getSetAlbumId(row);
+  const cache = getSetGalleryAllModeCache(albumId, { create: true });
+  if (!albumId || !cache || activeSetGalleryAllModeLoading || (!cache.hasMore && cache.photos.length > 0)) {
+    return Promise.resolve(cache);
+  }
+
+  const requestKey = `${albumId}:all`;
+  const start = normalizeMusicSmugmugAlbumPhotoStart(cache.nextStart || 1);
+  if (cache.loadingStarts.has(start)) {
+    return Promise.resolve(cache);
+  }
+
+  activeSetGalleryAllModeLoading = true;
+  cache.loadingStarts.add(start);
+  if (cache.photos.length === 0) {
+    setSetGalleryLoadingCopy("Loading full archive...", "Fetching first photo page.");
+    setGalleryState("loading");
+  } else {
+    syncSetGalleryLoadMoreButton("ready");
+  }
+
+  return requestSetGalleryAllModePage(albumId, start)
+    .then((page) => {
+      if (!isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
+        return cache;
+      }
+
+      cache.loadedStarts.add(start);
+      const pagePhotos = Array.isArray(page?.photos) ? page.photos : [];
+      const appendedPhotos = appendSetGalleryAllModePhotos(cache, pagePhotos);
+      const pageTotal = Number(page?.total) || 0;
+      if (pageTotal > 0) {
+        cache.total = pageTotal;
+        activeSetGalleryPhotoTotal = pageTotal;
+      } else if (cache.photos.length > activeSetGalleryPhotoTotal) {
+        activeSetGalleryPhotoTotal = cache.photos.length;
+      }
+
+      const nextStart = Number.parseInt(page?.nextStart, 10);
+      cache.hasMore = Boolean(page?.hasMore);
+      if (cache.hasMore && Number.isFinite(nextStart) && nextStart > start) {
+        cache.nextStart = nextStart;
+      } else {
+        if (cache.hasMore) {
+          cache.partialError = true;
+        }
+        cache.hasMore = false;
+        cache.nextStart = null;
+      }
+
+      if (cache.photos.length === 0) {
+        if (galleryGrid) {
+          galleryGrid.replaceChildren();
+        }
+        updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+        setGalleryState("empty");
+        return cache;
+      }
+
+      if (options.replace || getCurrentGalleryPhotoTiles().length === 0) {
+        renderSetGalleryPhotoHighlights(cache.photos);
+      } else if (appendedPhotos.length > 0) {
+        renderSetGalleryPhotoHighlights(appendedPhotos, { append: true });
+      }
+      updateSetGalleryAllModeControls(albumId, "ready");
+      setGalleryState("ready");
+      return cache;
+    })
+    .catch(() => {
+      if (!isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
+        return cache;
+      }
+      cache.partialError = true;
+      cache.hasMore = false;
+      if (cache.photos.length > 0) {
+        setSetGalleryPhotoWarning("More archive photos could not load.");
+        updateSetGalleryAllModeControls(albumId, "ready");
+        setGalleryState("ready");
+        return cache;
+      }
+
+      activeSetGalleryPhotoMode = "preview";
+      if (setGallery) {
+        setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
+      }
+      setSetGalleryPhotoWarning("Full archive could not load.");
+      updateSetGalleryPhotoSummary(getCurrentGalleryPhotoTiles().length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+      setGalleryState("ready");
+      return cache;
+    })
+    .finally(() => {
+      cache.loadingStarts.delete(start);
+      if (activeSetGalleryAlbumRequestKey === requestKey) {
+        activeSetGalleryAllModeLoading = false;
+        syncSetGalleryLoadMoreButton(activeSetGalleryPhotoMode === "all" ? "ready" : "loading");
+      }
+    });
+}
+
+function loadSetGalleryAllMode(row) {
+  const albumId = getSetAlbumId(row);
+  const cache = getSetGalleryAllModeCache(albumId, { create: true });
+  activeSetGalleryPhotoMode = "all";
+  activeSetGalleryPhotoTotal = Math.max(getSetAlbumPhotoTotal(row), cache?.total || 0);
+  activeSetGalleryAlbumRequestKey = `${albumId}:all`;
+  activeSetGalleryAllModeLoading = false;
+  if (setGallery) {
+    setGallery.dataset.albumId = albumId;
+    setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
+  }
+  setSetGalleryPhotoWarning("");
+
+  if (!albumId) {
+    if (galleryGrid) {
+      galleryGrid.replaceChildren();
+    }
+    updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+    setGalleryState("empty");
+    return;
+  }
+
+  if (cache?.photos.length > 0) {
+    renderSetGalleryPhotoHighlights(cache.photos);
+    updateSetGalleryAllModeControls(albumId, "ready");
+    setGalleryState("ready");
+    return;
+  }
+
+  updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
+  loadNextSetGalleryAllModePage(row, { replace: true });
+}
+
 function loadSetGalleryPhotoHighlights(row, options = {}) {
   const albumId = getSetAlbumId(row);
   const requestedMode = options.mode === "all" ? "all" : "preview";
+  if (requestedMode === "all") {
+    loadSetGalleryAllMode(row);
+    return;
+  }
+
   const requestKey = `${albumId}:${requestedMode}`;
   activeSetGalleryPhotoMode = requestedMode;
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
   activeSetGalleryAlbumRequestKey = requestKey;
+  activeSetGalleryAllModeLoading = false;
   if (setGallery) {
     setGallery.dataset.albumId = albumId;
     setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
@@ -6479,6 +6741,14 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
       updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
       setGalleryState("error");
     });
+}
+
+function loadMoreSetGalleryAllPhotos() {
+  const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0] || null;
+  if (!row || activeSetGalleryPhotoMode !== "all" || activeSetGalleryAllModeLoading) {
+    return;
+  }
+  loadNextSetGalleryAllModePage(row);
 }
 
 function toggleSetGalleryPhotoRange() {
