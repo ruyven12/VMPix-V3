@@ -9747,11 +9747,18 @@ function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photo
     personName: options.personName,
   });
   const currentPhotos = getMusicPersonTaggedLightboxPhotos(lightboxPhotos);
-  const fallbackOpen = () => {
-    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show);
-  };
   if (!context.albumId || !context.personName || !context.personId || currentPhotos.length === 0) {
-    fallbackOpen();
+    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show);
+    return;
+  }
+
+  const cachedPhotos = getMusicPersonTaggedShowCachedLightboxPhotos(context);
+  const immediatePhotos = cachedPhotos.length > 0 ? cachedPhotos : currentPhotos;
+  const immediateIndex = getMusicPersonTaggedLightboxIndexForPhoto(immediatePhotos, item, photoIndex);
+  openMusicPersonTaggedPhotoLightbox(immediatePhotos, immediateIndex, trigger, show);
+
+  const cached = getMusicPersonTaggedShowHydrationCacheEntry(context);
+  if (Array.isArray(cached?.allPhotos) && cached.allPhotos.length > 0) {
     return;
   }
 
@@ -9763,15 +9770,17 @@ function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photo
     token,
   })
     .then((result) => {
-      if (!isMusicPersonTaggedShowHydrationCurrent(context.personId, token)) {
-        return;
+      if (
+        isMusicPersonTaggedShowHydrationCurrent(context.personId, token) &&
+        !isLightboxVisible()
+      ) {
+        const card = getMusicPersonShowCardById(context.showId);
+        if (card) {
+          applyMusicPersonShowCardHydrationResult(card, result, { token });
+        }
       }
-      const hydratedPhotos = getMusicPersonTaggedLightboxPhotos(result?.matchedPhotos);
-      const targetPhotos = hydratedPhotos.length > 0 ? hydratedPhotos : currentPhotos;
-      const targetIndex = getMusicPersonTaggedLightboxIndexForPhoto(targetPhotos, item, photoIndex);
-      openMusicPersonTaggedPhotoLightbox(targetPhotos, targetIndex, trigger, show);
     })
-    .catch(fallbackOpen)
+    .catch(() => {})
     .finally(() => {
       if (trigger?.isConnected) {
         trigger.removeAttribute("aria-busy");
@@ -9934,6 +9943,21 @@ function getMusicPersonTaggedShowHydrationKey(context = {}) {
     : "";
 }
 
+function getMusicPersonTaggedShowHydrationCacheEntry(context = {}) {
+  const cacheKey = getMusicPersonTaggedShowHydrationKey(context);
+  return cacheKey ? musicPersonTaggedShowHydrationCache.get(cacheKey) || null : null;
+}
+
+function getMusicPersonTaggedShowCachedLightboxPhotos(context = {}) {
+  const cached = getMusicPersonTaggedShowHydrationCacheEntry(context);
+  const cachedPhotos = Array.isArray(cached?.allPhotos) && cached.allPhotos.length > 0
+    ? cached.allPhotos
+    : cached?.isComplete && Array.isArray(cached?.previewPhotos)
+      ? cached.previewPhotos
+      : [];
+  return getMusicPersonTaggedLightboxPhotos(cachedPhotos);
+}
+
 function getMusicPersonTaggedShowHydrationContext(source = {}) {
   if (source?.dataset) {
     return {
@@ -10004,8 +10028,13 @@ async function requestMusicPersonTaggedShowMatchedPhotos(context, options = {}) 
       reachedPreviewLimit: Boolean(cached.reachedPreviewLimit),
     };
   }
-  if (mode === "all" && cached?.isComplete && Array.isArray(cached.allPhotos)) {
-    return { isComplete: true, matchedPhotos: cached.allPhotos, partialError: false };
+  if (mode === "all" && Array.isArray(cached?.allPhotos)) {
+    return {
+      isComplete: Boolean(cached.isComplete),
+      matchedPhotos: cached.allPhotos,
+      partialError: Boolean(cached.partialError),
+      reachedPreviewLimit: false,
+    };
   }
   if (musicPersonTaggedShowHydrationRequests.has(requestKey)) {
     return musicPersonTaggedShowHydrationRequests.get(requestKey);
