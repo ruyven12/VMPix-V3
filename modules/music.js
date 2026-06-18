@@ -70,6 +70,8 @@ const musicSmugmugAlbumPhotosCache = new Map();
 const musicSmugmugAlbumPhotosRequests = new Map();
 const musicSetGalleryAllModeCache = new Map();
 const musicSetGalleryAllModePageRequests = new Map();
+const musicShowAlbumPreviewUrlsCache = new Map();
+const musicShowAlbumPreviewRequests = new Map();
 const musicBandArchiveCoverageCache = new Map();
 const musicBandArchiveCoverageRequests = new Map();
 const musicBandArchiveCoverageFields = [
@@ -11987,15 +11989,18 @@ function getMusicShowImageUrlValue(source, options = {}) {
   }
 
   const keys = [
-    "medium_url",
-    "mediumUrl",
-    "imageSrc",
-    "small_url",
-    "smallUrl",
     "thumbnail_url",
     "thumbnailUrl",
     "thumb_url",
     "thumbUrl",
+    "thumbnailSrc",
+    "small_url",
+    "smallUrl",
+    "smallSrc",
+    "medium_url",
+    "mediumUrl",
+    "mediumSrc",
+    "imageSrc",
     "large_url",
     "largeUrl",
     "lightboxSrc",
@@ -12314,7 +12319,7 @@ function createShowSetCardPreviewImage(src, isActive = false) {
   image.className = `show-set-card-image show-set-card-preview-image${isActive ? " is-active" : ""}`;
   image.alt = "";
   applyMusicGalleryImageLoading(image);
-  image.src = src || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  image.dataset.previewSrc = src || SET_GALLERY_NO_POSTER_IMAGE_SRC;
   image.onerror = () => {
     image.onerror = null;
     image.src = SET_GALLERY_NO_POSTER_IMAGE_SRC;
@@ -12349,9 +12354,11 @@ function setShowSetCardPreviewUrls(card, urls) {
   preview.activeSlot = 0;
   preview.images.forEach((image, index) => {
     image.classList.toggle("is-active", index === 0);
-    image.src = uniqueUrls[index] || uniqueUrls[0] || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+    image.dataset.previewSrc = uniqueUrls[index] || uniqueUrls[0] || SET_GALLERY_NO_POSTER_IMAGE_SRC;
+    image.removeAttribute("src");
   });
   card.dataset.previewImageCount = String(uniqueUrls.length);
+  primeShowSetCardPreviewImage(card);
   updateShowSetCardPreviewPlayback(card);
 }
 
@@ -12360,6 +12367,8 @@ function loadShowSetCardPreviewImage(image, src) {
   if (!image) {
     return Promise.resolve(false);
   }
+
+  image.dataset.previewSrc = imageSrc;
 
   if (image.getAttribute("src") === imageSrc && image.complete && image.naturalWidth > 0) {
     return Promise.resolve(true);
@@ -12379,6 +12388,69 @@ function loadShowSetCardPreviewImage(image, src) {
   });
 }
 
+function isShowSetCardPreviewCurrent(card) {
+  const preview = card?.__showSetPreview;
+  if (!preview || !card?.isConnected) {
+    return false;
+  }
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  return route?.name === "show-detail" &&
+    getMusicShowRouteCode(preview.show) === String(route.showId || "").trim();
+}
+
+function primeShowSetCardPreviewImage(card) {
+  const preview = card?.__showSetPreview;
+  const isActiveSlide = Boolean(card?.closest?.(".show-set-carousel-slide")?.classList.contains("is-active"));
+  if (!preview || !card.isConnected || !preview.isCarouselActive || (!preview.isVisible && !isActiveSlide)) {
+    return Promise.resolve(false);
+  }
+  if (isActiveSlide) {
+    preview.isVisible = true;
+  }
+  const activeImage = preview.images[preview.activeSlot] || preview.images[0];
+  const activeUrl = preview.urls[preview.currentIndex] ||
+    activeImage?.dataset?.previewSrc ||
+    preview.urls[0] ||
+    SET_GALLERY_NO_POSTER_IMAGE_SRC;
+  return loadShowSetCardPreviewImage(activeImage, activeUrl);
+}
+
+function getMusicShowAlbumPreviewCacheKey(albumId) {
+  return String(albumId || "").trim();
+}
+
+function requestMusicShowAlbumPreviewUrls(preview) {
+  const cacheKey = getMusicShowAlbumPreviewCacheKey(preview?.albumId);
+  if (!cacheKey) {
+    return Promise.resolve([]);
+  }
+  if (musicShowAlbumPreviewUrlsCache.has(cacheKey)) {
+    return Promise.resolve(musicShowAlbumPreviewUrlsCache.get(cacheKey));
+  }
+  if (musicShowAlbumPreviewRequests.has(cacheKey)) {
+    return musicShowAlbumPreviewRequests.get(cacheKey);
+  }
+
+  const request = requestMusicSmugmugAlbumPhotos(cacheKey, { mode: "preview" })
+    .then((result) => {
+      const photos = Array.isArray(result?.photos) ? result.photos : [];
+      if (photos.length === 0) {
+        musicShowAlbumPreviewUrlsCache.set(cacheKey, []);
+        return [];
+      }
+      const urls = selectMusicShowAlbumPreviewImages(preview.show, preview.album, photos);
+      const uniqueUrls = getUniqueShowSetPreviewUrls(urls);
+      musicShowAlbumPreviewUrlsCache.set(cacheKey, uniqueUrls);
+      return uniqueUrls;
+    })
+    .finally(() => {
+      musicShowAlbumPreviewRequests.delete(cacheKey);
+    });
+
+  musicShowAlbumPreviewRequests.set(cacheKey, request);
+  return request;
+}
+
 function ensureShowSetCardPreviewAlbumPhotos(card) {
   const preview = card?.__showSetPreview;
   if (
@@ -12392,16 +12464,15 @@ function ensureShowSetCardPreviewAlbumPhotos(card) {
   }
 
   preview.albumPhotosLoading = true;
-  requestMusicSmugmugAlbumPhotos(preview.albumId, { mode: "preview" })
-    .then((result) => {
+  requestMusicShowAlbumPreviewUrls(preview)
+    .then((urls) => {
       preview.albumPhotosLoaded = true;
-      const photos = Array.isArray(result?.photos) ? result.photos : [];
-      if (photos.length === 0 || !card.isConnected) {
+      if (!isShowSetCardPreviewCurrent(card)) {
         return;
       }
-
-      const urls = selectMusicShowAlbumPreviewImages(preview.show, preview.album, photos);
-      setShowSetCardPreviewUrls(card, urls);
+      if (Array.isArray(urls) && urls.length > 0) {
+        setShowSetCardPreviewUrls(card, urls);
+      }
     })
     .catch(() => {
       preview.albumPhotosLoaded = true;
@@ -12475,6 +12546,15 @@ function updateShowSetCardPreviewPlayback(card) {
     return;
   }
 
+  const isActiveSlide = Boolean(card?.closest?.(".show-set-carousel-slide")?.classList.contains("is-active"));
+  if (preview.isCarouselActive && (preview.isVisible || isActiveSlide)) {
+    if (isActiveSlide) {
+      preview.isVisible = true;
+    }
+    primeShowSetCardPreviewImage(card);
+    ensureShowSetCardPreviewAlbumPhotos(card);
+  }
+
   if (!shouldPlayShowSetCardPreview(card)) {
     stopShowSetCardPreview(card);
     return;
@@ -12493,9 +12573,6 @@ function setShowSetCardPreviewActive(card, isActive) {
   }
 
   card.__showSetPreview.isCarouselActive = isActive;
-  if (isActive) {
-    ensureShowSetCardPreviewAlbumPhotos(card);
-  }
   updateShowSetCardPreviewPlayback(card);
 }
 
@@ -12541,6 +12618,16 @@ function registerShowSetCardPreview(card) {
     preview.isVisible = true;
     updateShowSetCardPreviewPlayback(card);
   }
+}
+
+function primeActiveShowSetCardPreview(root = document) {
+  const activeCard = root?.querySelector?.(".show-set-carousel-slide.is-active .show-set-card") || null;
+  const preview = activeCard?.__showSetPreview;
+  if (!preview) {
+    return;
+  }
+  preview.isVisible = true;
+  updateShowSetCardPreviewPlayback(activeCard);
 }
 
 function createShowDetailAlbumCard(show, album, index) {
@@ -13229,6 +13316,9 @@ function renderMusicShowDetail(show) {
   const bill = createShowDetailBandsOnBill(show);
 
   showDetail.replaceChildren(backButton, hero, bill);
+  window.requestAnimationFrame(() => {
+    primeActiveShowSetCardPreview(showDetail);
+  });
 }
 
 function renderUnusedShowDetailLegacyPreview(show, relationships) {
