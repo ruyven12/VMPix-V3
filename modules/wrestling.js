@@ -366,6 +366,44 @@ function createWrestlingV3StateItem(stateName = "empty", scope = "wrestling", op
   return item;
 }
 
+function getWrestlingRequestTimeoutMs(timeoutMs) {
+  const baseTimeoutMs = Number.parseInt(timeoutMs, 10);
+  const overrideMs = Number.parseInt(window.__V3_FRONTEND_REQUEST_TIMEOUT_MS__, 10);
+  if (Number.isFinite(overrideMs) && overrideMs > 0) {
+    return Math.max(50, Math.min(Number.isFinite(baseTimeoutMs) && baseTimeoutMs > 0 ? baseTimeoutMs : overrideMs, overrideMs));
+  }
+  return Number.isFinite(baseTimeoutMs) && baseTimeoutMs > 0 ? baseTimeoutMs : 0;
+}
+
+function createWrestlingRequestTimeoutError(label, timeoutMs) {
+  const error = new Error(`${label || "Wrestling request"} timed out after ${timeoutMs}ms`);
+  error.name = "AbortError";
+  return error;
+}
+
+function withWrestlingRequestTimeout(request, controller = null, timeoutMs = 0, label = "Wrestling request") {
+  const safeTimeoutMs = getWrestlingRequestTimeoutMs(timeoutMs);
+  if (!request || !safeTimeoutMs || typeof window.setTimeout !== "function") {
+    return request;
+  }
+
+  let timeoutId = 0;
+  const timeoutRequest = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      if (controller && typeof controller.abort === "function" && !controller.signal?.aborted) {
+        controller.abort();
+      }
+      reject(createWrestlingRequestTimeoutError(label, safeTimeoutMs));
+    }, safeTimeoutMs);
+  });
+
+  return Promise.race([request, timeoutRequest]).finally(() => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  });
+}
+
 function applyWrestlingGalleryImageLoading(image, index = 0, options = {}) {
   if (!image) {
     return;
@@ -813,10 +851,10 @@ function getWrestlingPayloadPageCount(payload) {
 }
 
 function fetchWrestlingShowsPage(page, signal, options = {}) {
-  return fetch(getWrestlingShowsApiUrl(page, options), {
+  return withWrestlingRequestTimeout(fetch(getWrestlingShowsApiUrl(page, options), {
     cache: "no-store",
     signal,
-  }).then((response) => {
+  }), null, WRESTLING_SHOWS_TIMEOUT_MS, "Wrestling shows").then((response) => {
     if (!response.ok) {
       throw new Error(`Wrestling shows request failed (${response.status})`);
     }
@@ -1903,10 +1941,10 @@ function getWrestlingPeoplePayloadTotalPages(payload) {
 }
 
 function fetchWrestlingPeoplePayload(page, signal, retries = 1) {
-  const runRequest = (attemptsRemaining) => fetch(getWrestlingPeopleApiUrl(page), {
+  const runRequest = (attemptsRemaining) => withWrestlingRequestTimeout(fetch(getWrestlingPeopleApiUrl(page), {
     cache: "no-store",
     signal,
-  }).then((response) => {
+  }), null, WRESTLING_PEOPLE_TIMEOUT_MS, "Wrestling people").then((response) => {
     if (!response.ok) {
       throw new Error(`Wrestling people request failed (${response.status})`);
     }
@@ -2727,10 +2765,10 @@ function getWrestlingVenuesPayloadTotalPages(payload) {
 }
 
 function fetchWrestlingVenuesPayload(page, signal) {
-  return fetch(getWrestlingVenuesApiUrl(page), {
+  return withWrestlingRequestTimeout(fetch(getWrestlingVenuesApiUrl(page), {
     cache: "no-store",
     signal,
-  }).then((response) => {
+  }), null, WRESTLING_VENUES_TIMEOUT_MS, "Wrestling venues").then((response) => {
     if (!response.ok) {
       throw new Error(`Wrestling venues request failed (${response.status})`);
     }

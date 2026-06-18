@@ -21,6 +21,7 @@ const MUSIC_SMUGMUG_ALBUM_PHOTOS_API_ROUTE = "/api/music/smugmug/albums";
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT = 12;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT = 25;
 const MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES = 40;
+const MUSIC_SMUGMUG_ALBUM_PHOTOS_TIMEOUT_MS = 15000;
 const MUSIC_VENUES_API_ROUTE = "/api/music/venues";
 const MUSIC_VENUES_TIMEOUT_MS = 8000;
 const MUSIC_VENUE_PHOTO_HIGHLIGHTS_LIMIT = 20;
@@ -208,6 +209,44 @@ function createMusicV3StateItem(stateName = "empty", scope = "music", options = 
   item.className = options.itemClass || "music-state-item";
   item.append(createMusicV3StateCard(stateName, scope, options));
   return item;
+}
+
+function getMusicRequestTimeoutMs(timeoutMs) {
+  const baseTimeoutMs = Number.parseInt(timeoutMs, 10);
+  const overrideMs = Number.parseInt(window.__V3_FRONTEND_REQUEST_TIMEOUT_MS__, 10);
+  if (Number.isFinite(overrideMs) && overrideMs > 0) {
+    return Math.max(50, Math.min(Number.isFinite(baseTimeoutMs) && baseTimeoutMs > 0 ? baseTimeoutMs : overrideMs, overrideMs));
+  }
+  return Number.isFinite(baseTimeoutMs) && baseTimeoutMs > 0 ? baseTimeoutMs : 0;
+}
+
+function createMusicRequestTimeoutError(label, timeoutMs) {
+  const error = new Error(`${label || "Music request"} timed out after ${timeoutMs}ms`);
+  error.name = "AbortError";
+  return error;
+}
+
+function withMusicRequestTimeout(request, controller = null, timeoutMs = 0, label = "Music request") {
+  const safeTimeoutMs = getMusicRequestTimeoutMs(timeoutMs);
+  if (!request || !safeTimeoutMs || typeof window.setTimeout !== "function") {
+    return request;
+  }
+
+  let timeoutId = 0;
+  const timeoutRequest = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      if (controller && typeof controller.abort === "function" && !controller.signal?.aborted) {
+        controller.abort();
+      }
+      reject(createMusicRequestTimeoutError(label, safeTimeoutMs));
+    }, safeTimeoutMs);
+  });
+
+  return Promise.race([request, timeoutRequest]).finally(() => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+  });
 }
 
 const musicPayloadRowKeys = ["data", "rows", "items", "results", "records", "bands", "shows", "people", "venues"];
@@ -1544,10 +1583,10 @@ function requestMusicBandsIndexData() {
     : 0;
 
   const apiUrl = new URL(MUSIC_BANDS_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-  musicBandsIndexRequest = fetch(apiUrl, {
+  musicBandsIndexRequest = withMusicRequestTimeout(fetch(apiUrl, {
     cache: "no-store",
     signal: controller?.signal,
-  })
+  }), controller, MUSIC_BANDS_INDEX_TIMEOUT_MS, "Music bands")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music bands request failed (${response.status})`);
@@ -1716,10 +1755,10 @@ function requestMusicBandArchiveCoverage(band) {
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), MUSIC_BANDS_INDEX_TIMEOUT_MS)
     : 0;
-  const request = fetch(getMusicBandArchiveCoverageApiUrl(bandId), {
+  const request = withMusicRequestTimeout(fetch(getMusicBandArchiveCoverageApiUrl(bandId), {
     cache: "no-store",
     signal: controller?.signal,
-  })
+  }), controller, MUSIC_BANDS_INDEX_TIMEOUT_MS, "Music band coverage")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music band archive coverage request failed (${response.status})`);
@@ -1881,10 +1920,10 @@ function getMusicPeoplePayloadTotalPages(payload) {
 }
 
 function fetchMusicPeopleIndexPage(page, signal) {
-  return fetch(getMusicPeopleIndexApiUrl(page), {
+  return withMusicRequestTimeout(fetch(getMusicPeopleIndexApiUrl(page), {
     cache: "no-store",
     signal,
-  }).then((response) => {
+  }), null, MUSIC_PEOPLE_INDEX_TIMEOUT_MS, "Music people").then((response) => {
     if (!response.ok) {
       throw new Error(`Music people request failed (${response.status})`);
     }
@@ -2058,10 +2097,10 @@ function requestMusicPersonDetailArchive(personId) {
     ? window.setTimeout(() => controller.abort(), MUSIC_PERSON_DETAIL_TIMEOUT_MS)
     : 0;
 
-  const request = fetch(apiUrl, {
+  const request = withMusicRequestTimeout(fetch(apiUrl, {
     cache: "no-store",
     signal: controller?.signal,
-  })
+  }), controller, MUSIC_PERSON_DETAIL_TIMEOUT_MS, "Music person detail")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music person detail request failed (${response.status})`);
@@ -2361,10 +2400,10 @@ function requestMusicVenuesData() {
   if (getRouteFromUrl().name === "music-venues") {
     renderMusicVenuesResults();
   }
-  musicVenuesRequest = fetch(apiUrl, {
+  musicVenuesRequest = withMusicRequestTimeout(fetch(apiUrl, {
     cache: "no-store",
     signal: controller?.signal,
-  })
+  }), controller, MUSIC_VENUES_TIMEOUT_MS, "Music venues")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music venues request failed (${response.status})`);
@@ -3638,10 +3677,10 @@ function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
   state.status = state.photos.length > 0 ? "ready" : "loading";
   renderMusicVenuePhotoHighlightsState(state);
 
-  const request = fetch(buildMusicVenuePhotoHighlightsApiUrl(state.identifier, page), {
+  const request = withMusicRequestTimeout(fetch(buildMusicVenuePhotoHighlightsApiUrl(state.identifier, page), {
     cache: "no-store",
     signal: controller?.signal,
-  })
+  }), controller, MUSIC_VENUE_PHOTO_HIGHLIGHTS_TIMEOUT_MS, "Music venue photo highlights")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music venue photo highlights request failed (${response.status})`);
@@ -4856,10 +4895,10 @@ function getMusicShowsSetsApiUrl(page = 1) {
 }
 
 function fetchMusicShowsSetsPage(page, signal) {
-  return fetch(getMusicShowsSetsApiUrl(page), {
+  return withMusicRequestTimeout(fetch(getMusicShowsSetsApiUrl(page), {
     cache: "no-store",
     signal,
-  })
+  }), null, MUSIC_SHOWS_SETS_TIMEOUT_MS, "Music shows")
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Music shows request failed (${response.status})`);
@@ -6189,7 +6228,12 @@ function requestMusicSmugmugAlbumPhotosPage(albumId, limit = MUSIC_SMUGMUG_ALBUM
     return musicSmugmugAlbumPhotosRequests.get(cacheKey);
   }
 
-  const request = fetch(getMusicSmugmugAlbumPhotosApiUrl(safeAlbumId, safeLimit, safeStart), { cache: "no-store" })
+  const request = withMusicRequestTimeout(
+    fetch(getMusicSmugmugAlbumPhotosApiUrl(safeAlbumId, safeLimit, safeStart), { cache: "no-store" }),
+    null,
+    MUSIC_SMUGMUG_ALBUM_PHOTOS_TIMEOUT_MS,
+    "Music album photos"
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Album photos request failed (${response.status})`);

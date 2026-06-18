@@ -56,6 +56,29 @@ async function expectNoHorizontalOverflow(page) {
   expect(overflow).toBeLessThanOrEqual(2);
 }
 
+function createEmptyArchivePayload() {
+  return {
+    data: [],
+    rows: [],
+    people: [],
+    shows: [],
+    venues: [],
+    total: 0,
+    totalPages: 1,
+    limit: 100,
+    source: { data: [] },
+    meta: { pagination: { total: 0, totalPages: 1, limit: 100 } },
+  };
+}
+
+async function fulfillEmptyArchiveApi(route) {
+  await route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify(createEmptyArchivePayload()),
+  });
+}
+
 for (const viewport of viewports) {
   test.describe(`core route smoke: ${viewport.name}`, () => {
     test.use({ viewport: viewport.size });
@@ -172,6 +195,51 @@ const archiveReliabilityRoutes = [
     visibleShell: "[data-wrestling-person-detail-shell]",
     text: /Unable to load archive data|No matching archive record was found/i,
   },
+  {
+    path: "/wrestling/shows/000000",
+    rail: "Show Detail",
+    visibleShell: "[data-wrestling-show-detail-shell]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/wrestling/shows/000000/missing-match",
+    rail: "Match Gallery",
+    visibleShell: "[data-wrestling-match-gallery-shell]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/wrestling/venues/missing-venue",
+    rail: "Venue Detail",
+    visibleShell: "[data-wrestling-venue-detail-shell]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+];
+
+const slowApiReliabilityRoutes = [
+  {
+    path: "/music/bands/fake-band",
+    rail: "Band Detail",
+    visibleShell: "[data-band-detail-placeholder]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/music/venues/fake-venue",
+    rail: "Venue Detail",
+    visibleShell: "[data-venue-detail]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/wrestling/shows/000000",
+    rail: "Show Detail",
+    visibleShell: "[data-wrestling-show-detail-shell]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
+  {
+    path: "/wrestling/shows/000000/missing-match",
+    rail: "Match Gallery",
+    visibleShell: "[data-wrestling-match-gallery-shell]",
+    text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
+  },
 ];
 
 test.describe("archive direct-route reliability", () => {
@@ -179,22 +247,7 @@ test.describe("archive direct-route reliability", () => {
 
   test("valid and invalid Music/Wrestling detail routes render stable shells", async ({ page }) => {
     await page.route("https://vmpix-data.onrender.com/**", async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          data: [],
-          rows: [],
-          people: [],
-          shows: [],
-          venues: [],
-          total: 0,
-          totalPages: 1,
-          limit: 100,
-          source: { data: [] },
-          meta: { pagination: { total: 0, totalPages: 1, limit: 100 } },
-        }),
-      });
+      await fulfillEmptyArchiveApi(route);
     });
 
     for (const route of archiveReliabilityRoutes) {
@@ -205,6 +258,32 @@ test.describe("archive direct-route reliability", () => {
       await expect(visibleShell).toBeVisible();
       await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
       await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 10000 });
+      await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
+      await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
+      await expectNoHorizontalOverflow(page);
+    }
+  });
+
+  test("invalid detail routes settle when backend responses exceed frontend timeout", async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__V3_FRONTEND_REQUEST_TIMEOUT_MS__ = 250;
+    });
+
+    await page.route("https://vmpix-data.onrender.com/**", async (route) => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1200);
+      });
+      await fulfillEmptyArchiveApi(route);
+    });
+
+    for (const route of slowApiReliabilityRoutes) {
+      const response = await page.goto(route.path, { waitUntil: "domcontentloaded" });
+      expect(response && response.ok()).toBe(true);
+      await expect(page.locator(".site-shell")).toBeVisible();
+      const visibleShell = page.locator(route.visibleShell);
+      await expect(visibleShell).toBeVisible();
+      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 6000 });
       await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
       await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
       await expectNoHorizontalOverflow(page);
