@@ -14,6 +14,8 @@ const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 15000;
 const MUSIC_PERSON_DETAIL_SEARCH_LIMIT = 25;
 const MUSIC_PERSON_DETAIL_TIMEOUT_MS = 20000;
 const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
+const MUSIC_PERSON_TAGGED_SHOW_HYDRATION_CONCURRENCY = 2;
+const MUSIC_PERSON_TAGGED_SHOW_HYDRATION_ROOT_MARGIN = "420px 0px";
 const MUSIC_SHOWS_SETS_API_ROUTE = "/api/music/shows/db";
 const MUSIC_SHOWS_SETS_API_LIMIT = 100;
 const MUSIC_SHOWS_SETS_TIMEOUT_MS = 15000;
@@ -49,6 +51,12 @@ let musicPeopleIndexLoaded = false;
 let musicPeopleIndexDataState = "idle";
 const musicPersonDetailArchiveRequests = new Map();
 const musicPersonDetailArchiveRows = new Map();
+const musicPersonTaggedShowHydrationCache = new Map();
+const musicPersonTaggedShowHydrationRequests = new Map();
+let musicPersonTaggedShowHydrationQueue = [];
+let musicPersonTaggedShowHydrationActiveCount = 0;
+let musicPersonTaggedShowHydrationObserver = null;
+let musicPersonTaggedShowHydrationToken = 0;
 let musicShowsSetsCollection = [];
 let musicShowsSetsRequest = null;
 let musicShowsSetsLoaded = false;
@@ -9343,6 +9351,15 @@ function createMusicPersonEmptyState(text) {
   return emptyState;
 }
 
+function createMusicPersonTaggedPhotoState(stateName = "empty", text = "") {
+  const stateCard = createMusicV3StateCard(stateName, "musicPeople", {
+    small: true,
+    text,
+  });
+  stateCard.classList.add("person-detail-empty-state");
+  return stateCard;
+}
+
 function toggleMusicPersonShowCard(card) {
   const isExpanded = !card.classList.contains("is-expanded");
   const summary = card.querySelector(".person-show-summary");
@@ -9358,6 +9375,9 @@ function toggleMusicPersonShowCard(card) {
   }
   if (toggle) {
     toggle.textContent = isExpanded ? "-" : "+";
+  }
+  if (isExpanded) {
+    triggerMusicPersonShowCardHydration(card, { priority: true });
   }
 }
 
@@ -9422,6 +9442,46 @@ function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
   return tile;
 }
 
+function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photoIndex, trigger, options = {}) {
+  const show = options.show || {};
+  const context = getMusicPersonTaggedShowHydrationContext({
+    ...show,
+    personId: options.personId || show.personId,
+    personName: options.personName,
+  });
+  const currentPhotos = getMusicPersonTaggedLightboxPhotos(lightboxPhotos);
+  const fallbackOpen = () => {
+    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show);
+  };
+  if (!context.albumId || !context.personName || !context.personId || currentPhotos.length === 0) {
+    fallbackOpen();
+    return;
+  }
+
+  const token = musicPersonTaggedShowHydrationToken;
+  trigger.setAttribute("aria-busy", "true");
+  requestMusicPersonTaggedShowMatchedPhotos(context, {
+    mode: "all",
+    priority: true,
+    token,
+  })
+    .then((result) => {
+      if (!isMusicPersonTaggedShowHydrationCurrent(context.personId, token)) {
+        return;
+      }
+      const hydratedPhotos = getMusicPersonTaggedLightboxPhotos(result?.matchedPhotos);
+      const targetPhotos = hydratedPhotos.length > 0 ? hydratedPhotos : currentPhotos;
+      const targetIndex = getMusicPersonTaggedLightboxIndexForPhoto(targetPhotos, item, photoIndex);
+      openMusicPersonTaggedPhotoLightbox(targetPhotos, targetIndex, trigger, show);
+    })
+    .catch(fallbackOpen)
+    .finally(() => {
+      if (trigger?.isConnected) {
+        trigger.removeAttribute("aria-busy");
+      }
+    });
+}
+
 function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show) {
   const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(photos);
   if (lightboxPhotos.length === 0) {
@@ -9455,7 +9515,7 @@ function createMusicPersonTaggedThumb(item, options = {}) {
     );
     thumb.addEventListener("click", (event) => {
       event.stopPropagation();
-      openMusicPersonTaggedPhotoLightbox(lightboxPhotos, lightboxIndex, thumb, options.show);
+      openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, lightboxIndex, thumb, options);
     });
   }
 
@@ -9498,13 +9558,16 @@ function getMusicPersonShowCardById(showId) {
     .find((card) => getMusicPeopleText(card.dataset.personShowId) === normalizedShowId) || null;
 }
 
-function updateMusicPersonShowCardThumbnails(card, thumbnails) {
+function updateMusicPersonShowCardThumbnails(card, thumbnails, options = {}) {
   const thumbGrid = card?.querySelector(".person-show-tagged-thumbs");
   if (!thumbGrid || !Array.isArray(thumbnails) || thumbnails.length === 0) {
     return;
   }
 
   const show = {
+    personId: getMusicPeopleText(card.dataset.personId),
+    albumId: getMusicPeopleText(card.dataset.personShowAlbumId),
+    showId: getMusicPeopleText(card.dataset.personShowId),
     title: getMusicPeopleText(card.dataset.personShowTitle),
     venue: getMusicPeopleText(card.dataset.personShowVenue),
     location: getMusicPeopleText(card.dataset.personShowLocation),
@@ -9519,60 +9582,359 @@ function updateMusicPersonShowCardThumbnails(card, thumbnails) {
   const previewThumbnails = thumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT);
   const fragment = document.createDocumentFragment();
   previewThumbnails.forEach((thumbnail) => {
-    fragment.append(createMusicPersonTaggedThumb(thumbnail, { lightboxPhotos, show }));
+    fragment.append(createMusicPersonTaggedThumb(thumbnail, {
+      lightboxPhotos,
+      personId: show.personId,
+      personName: getMusicPeopleText(card.dataset.personName),
+      show,
+    }));
   });
   thumbGrid.replaceChildren(fragment);
+  card.dataset.personShowHydration = options.isComplete ? "complete" : "ready";
 
   const count = card.querySelector(".person-show-count");
-  if (count) {
-    count.textContent = formatMusicPeopleCount(thumbnails.length, "Tagged Photo");
+  if (count && options.updateCount !== false) {
+    count.textContent = options.countLabel || formatMusicPeopleCount(thumbnails.length, "Tagged Photo");
+  }
+}
+
+function getMusicPersonTaggedPhotoIdentity(photo) {
+  return getMusicPeopleText(
+    photo?.dedupeKey ||
+    photo?.imageKey ||
+    photo?.image_key ||
+    photo?.large_url ||
+    photo?.largeUrl ||
+    photo?.medium_url ||
+    photo?.mediumUrl ||
+    photo?.small_url ||
+    photo?.smallUrl ||
+    photo?.thumbnail_url ||
+    photo?.thumbnailUrl ||
+    photo?.imageSrc
+  );
+}
+
+function getMusicPersonTaggedLightboxIndexForPhoto(photos, targetPhoto, fallbackIndex = 0) {
+  const targetIdentity = getMusicPersonTaggedPhotoIdentity(targetPhoto);
+  if (targetIdentity) {
+    const matchedIndex = (Array.isArray(photos) ? photos : [])
+      .findIndex((photo) => getMusicPersonTaggedPhotoIdentity(photo) === targetIdentity);
+    if (matchedIndex >= 0) {
+      return matchedIndex;
+    }
+  }
+  return Math.max(0, Number.parseInt(fallbackIndex, 10) || 0);
+}
+
+function getMusicPersonTaggedShowHydrationKey(context = {}) {
+  const personId = normalizeMusicPersonId(context.personId);
+  const personName = getMusicPeopleText(context.personName).toLowerCase();
+  const showId = getMusicPeopleText(context.showId);
+  const albumId = getMusicPeopleText(context.albumId);
+  return personId && personName && albumId
+    ? [personId, personName, showId || "show", albumId].join("::")
+    : "";
+}
+
+function getMusicPersonTaggedShowHydrationContext(source = {}) {
+  if (source?.dataset) {
+    return {
+      personId: getMusicPeopleText(source.dataset.personId),
+      personName: getMusicPeopleText(source.dataset.personName),
+      showId: getMusicPeopleText(source.dataset.personShowId),
+      albumId: getMusicPeopleText(source.dataset.personShowAlbumId),
+    };
+  }
+  return {
+    personId: getMusicPeopleText(source.personId),
+    personName: getMusicPeopleText(source.personName),
+    showId: getMusicPeopleText(source.showId || source.show_id),
+    albumId: getMusicPersonTaggedShowAlbumId(source),
+  };
+}
+
+function isMusicPersonTaggedShowHydrationCurrent(personId, token = musicPersonTaggedShowHydrationToken) {
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  return token === musicPersonTaggedShowHydrationToken &&
+    route?.name === "person-detail" &&
+    normalizeMusicPersonId(route.personId) === normalizeMusicPersonId(personId);
+}
+
+function enqueueMusicPersonTaggedShowHydration(task, options = {}) {
+  return new Promise((resolve, reject) => {
+    const job = { task, resolve, reject };
+    if (options.priority) {
+      musicPersonTaggedShowHydrationQueue.unshift(job);
+    } else {
+      musicPersonTaggedShowHydrationQueue.push(job);
+    }
+    runMusicPersonTaggedShowHydrationQueue();
+  });
+}
+
+function runMusicPersonTaggedShowHydrationQueue() {
+  while (
+    musicPersonTaggedShowHydrationActiveCount < MUSIC_PERSON_TAGGED_SHOW_HYDRATION_CONCURRENCY &&
+    musicPersonTaggedShowHydrationQueue.length > 0
+  ) {
+    const job = musicPersonTaggedShowHydrationQueue.shift();
+    musicPersonTaggedShowHydrationActiveCount += 1;
+    Promise.resolve()
+      .then(job.task)
+      .then(job.resolve, job.reject)
+      .finally(() => {
+        musicPersonTaggedShowHydrationActiveCount = Math.max(0, musicPersonTaggedShowHydrationActiveCount - 1);
+        runMusicPersonTaggedShowHydrationQueue();
+      });
+  }
+}
+
+async function requestMusicPersonTaggedShowMatchedPhotos(context, options = {}) {
+  const mode = options.mode === "all" ? "all" : "preview";
+  const targetLimit = mode === "all" ? Number.POSITIVE_INFINITY : MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT;
+  const cacheKey = getMusicPersonTaggedShowHydrationKey(context);
+  const requestKey = `${cacheKey}:${mode}`;
+  const cached = cacheKey ? musicPersonTaggedShowHydrationCache.get(cacheKey) : null;
+  if (!cacheKey || typeof fetch !== "function") {
+    return { isComplete: false, matchedPhotos: [], partialError: true };
+  }
+  if (mode === "preview" && cached?.previewPhotos) {
+    return {
+      isComplete: Boolean(cached.isComplete),
+      matchedPhotos: cached.previewPhotos,
+      partialError: Boolean(cached.partialError),
+      reachedPreviewLimit: Boolean(cached.reachedPreviewLimit),
+    };
+  }
+  if (mode === "all" && cached?.isComplete && Array.isArray(cached.allPhotos)) {
+    return { isComplete: true, matchedPhotos: cached.allPhotos, partialError: false };
+  }
+  if (musicPersonTaggedShowHydrationRequests.has(requestKey)) {
+    return musicPersonTaggedShowHydrationRequests.get(requestKey);
+  }
+
+  const request = enqueueMusicPersonTaggedShowHydration(async () => {
+    const token = options.token || musicPersonTaggedShowHydrationToken;
+    if (!isMusicPersonTaggedShowHydrationCurrent(context.personId, token) && !options.allowStaleCache) {
+      return { isComplete: false, matchedPhotos: [], partialError: false, stale: true };
+    }
+
+    const matchedPhotos = [];
+    const seenKeys = new Set();
+    let start = 1;
+    let hasMore = true;
+    let partialError = false;
+    let reachedPreviewLimit = false;
+
+    for (let pageIndex = 0; pageIndex < MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES && hasMore; pageIndex += 1) {
+      if (!isMusicPersonTaggedShowHydrationCurrent(context.personId, token) && !options.allowStaleCache) {
+        return { isComplete: false, matchedPhotos, partialError, stale: true };
+      }
+
+      let page;
+      try {
+        page = await requestMusicSmugmugAlbumPhotosPage(context.albumId, MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT, start);
+      } catch (error) {
+        partialError = true;
+        break;
+      }
+
+      const pagePhotos = getUniqueMusicAlbumPhotos(Array.isArray(page?.photos) ? page.photos : [])
+        .filter((photo) => doesMusicPersonCaptionMatch(photo, context.personName));
+      pagePhotos.forEach((photo) => {
+        const identity = getMusicPersonTaggedPhotoIdentity(photo);
+        if (!identity || seenKeys.has(identity)) {
+          return;
+        }
+        seenKeys.add(identity);
+        matchedPhotos.push(photo);
+      });
+
+      hasMore = Boolean(page?.hasMore);
+      if (mode !== "all" && matchedPhotos.length >= targetLimit) {
+        reachedPreviewLimit = true;
+        break;
+      }
+      if (!hasMore) {
+        break;
+      }
+      if (!page?.nextStart || page.nextStart <= start) {
+        partialError = true;
+        break;
+      }
+      start = page.nextStart;
+    }
+
+    if (hasMore && mode === "all") {
+      partialError = true;
+    }
+
+    const sortedPhotos = getUniqueMusicAlbumPhotos(matchedPhotos)
+      .sort(compareMusicPersonMatchedPhotosByOriginalDate);
+    const isComplete = !partialError && !hasMore && !reachedPreviewLimit;
+    const nextCache = {
+      ...(musicPersonTaggedShowHydrationCache.get(cacheKey) || {}),
+      partialError,
+    };
+    if (mode === "all" || isComplete) {
+      nextCache.allPhotos = sortedPhotos;
+      nextCache.previewPhotos = sortedPhotos;
+      nextCache.isComplete = isComplete;
+      nextCache.reachedPreviewLimit = false;
+    } else {
+      nextCache.previewPhotos = sortedPhotos;
+      nextCache.isComplete = false;
+      nextCache.reachedPreviewLimit = reachedPreviewLimit;
+    }
+    if (!partialError || sortedPhotos.length > 0) {
+      musicPersonTaggedShowHydrationCache.set(cacheKey, nextCache);
+    }
+
+    return {
+      isComplete: Boolean(nextCache.isComplete),
+      matchedPhotos: sortedPhotos,
+      partialError,
+      reachedPreviewLimit,
+    };
+  }, options).finally(() => {
+    musicPersonTaggedShowHydrationRequests.delete(requestKey);
+  });
+
+  musicPersonTaggedShowHydrationRequests.set(requestKey, request);
+  return request;
+}
+
+function setMusicPersonShowCardTaggedPhotoState(card, stateName, text) {
+  const thumbGrid = card?.querySelector(".person-show-tagged-thumbs");
+  if (!thumbGrid) {
+    return;
+  }
+  thumbGrid.replaceChildren(createMusicPersonTaggedPhotoState(stateName, text));
+  card.dataset.personShowHydration = stateName === "loading" ? "loading" : stateName;
+}
+
+function applyMusicPersonShowCardHydrationResult(card, result, options = {}) {
+  if (!card?.isConnected || result?.stale) {
+    return;
+  }
+  const personId = card.dataset.personId;
+  if (!isMusicPersonTaggedShowHydrationCurrent(personId, options.token)) {
+    return;
+  }
+  const matchedPhotos = Array.isArray(result?.matchedPhotos) ? result.matchedPhotos : [];
+  if (matchedPhotos.length > 0) {
+    updateMusicPersonShowCardThumbnails(card, matchedPhotos, {
+      isComplete: Boolean(result?.isComplete),
+      updateCount: Boolean(result?.isComplete),
+    });
+    return;
+  }
+  if (result?.partialError) {
+    setMusicPersonShowCardTaggedPhotoState(card, "error", "Tagged photos could not be loaded.");
+    return;
+  }
+  setMusicPersonShowCardTaggedPhotoState(card, "empty", "No person-tagged photos in this show yet.");
+}
+
+function triggerMusicPersonShowCardHydration(card, options = {}) {
+  if (!card || card.dataset.personShowHydration === "complete") {
+    return Promise.resolve(null);
+  }
+  const context = getMusicPersonTaggedShowHydrationContext(card);
+  const token = options.token || musicPersonTaggedShowHydrationToken;
+  if (!context.albumId || !context.personName || !isMusicPersonTaggedShowHydrationCurrent(context.personId, token)) {
+    return Promise.resolve(null);
+  }
+  if (card.dataset.personShowHydration !== "ready") {
+    setMusicPersonShowCardTaggedPhotoState(card, "loading", "Scanning captions...");
+  }
+  return requestMusicPersonTaggedShowMatchedPhotos(context, {
+    mode: options.mode,
+    priority: options.priority,
+    token,
+  })
+    .then((result) => {
+      applyMusicPersonShowCardHydrationResult(card, result, { token });
+      return result;
+    })
+    .catch(() => {
+      if (card?.isConnected && isMusicPersonTaggedShowHydrationCurrent(context.personId, token)) {
+        setMusicPersonShowCardTaggedPhotoState(card, "error", "Tagged photos could not be loaded.");
+      }
+      return null;
+    });
+}
+
+function disconnectMusicPersonTaggedShowHydrationObserver() {
+  if (musicPersonTaggedShowHydrationObserver) {
+    musicPersonTaggedShowHydrationObserver.disconnect();
+    musicPersonTaggedShowHydrationObserver = null;
   }
 }
 
 function hydrateMusicPersonTaggedShowPhotos(data) {
+  disconnectMusicPersonTaggedShowHydrationObserver();
+  musicPersonTaggedShowHydrationToken += 1;
+
+  const token = musicPersonTaggedShowHydrationToken;
   const personId = normalizeMusicPersonId(data?.personId);
   const personName = getMusicPeopleText(data?.name);
-  const taggedShows = Array.isArray(data?.taggedShows) ? data.taggedShows : [];
-  if (!personId || !personName || taggedShows.length === 0 || typeof fetch !== "function") {
+  if (!personId || !personName || typeof fetch !== "function" || !personDetail) {
     return;
   }
 
-  taggedShows.forEach((show) => {
-    const albumId = getMusicPersonTaggedShowAlbumId(show);
-    const currentThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
-    if (!albumId) {
-      return;
+  const cards = Array.from(personDetail.querySelectorAll(".person-show-card[data-person-show-album-id]"))
+    .filter((card) => getMusicPeopleText(card.dataset.personShowAlbumId));
+  if (cards.length === 0) {
+    return;
+  }
+
+  cards.forEach((card) => {
+    if (card.classList.contains("is-expanded")) {
+      triggerMusicPersonShowCardHydration(card, { priority: true, token });
     }
+  });
 
-    requestAllMusicSmugmugAlbumPhotos(albumId)
-      .then((payload) => {
-        const matchedPhotos = getUniqueMusicAlbumPhotos(Array.isArray(payload?.photos) ? payload.photos : [])
-          .filter((photo) => doesMusicPersonCaptionMatch(photo, personName))
-          .sort(compareMusicPersonMatchedPhotosByOriginalDate);
-        if (matchedPhotos.length <= currentThumbnails.length) {
-          return;
-        }
+  if (typeof IntersectionObserver !== "function") {
+    return;
+  }
 
-        const route = getRouteFromUrl();
-        if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== personId) {
-          return;
-        }
+  musicPersonTaggedShowHydrationObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) {
+        return;
+      }
+      const card = entry.target;
+      if (musicPersonTaggedShowHydrationObserver) {
+        musicPersonTaggedShowHydrationObserver.unobserve(card);
+      }
+      triggerMusicPersonShowCardHydration(card, { token });
+    });
+  }, {
+    root: musicNexusShell || null,
+    rootMargin: MUSIC_PERSON_TAGGED_SHOW_HYDRATION_ROOT_MARGIN,
+    threshold: 0.01,
+  });
 
-        const card = getMusicPersonShowCardById(show.showId);
-        if (card) {
-          updateMusicPersonShowCardThumbnails(card, matchedPhotos);
-        }
-      })
-      .catch(() => {});
+  cards.forEach((card) => {
+    if (!card.classList.contains("is-expanded")) {
+      musicPersonTaggedShowHydrationObserver.observe(card);
+    }
   });
 }
 
 function createMusicPersonShowCard(show, personName) {
   const card = document.createElement("article");
   const isExpanded = Boolean(show.expanded);
+  const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
+  const albumId = getMusicPersonTaggedShowAlbumId(show);
   card.className = "person-show-card";
   card.classList.toggle("is-expanded", isExpanded);
+  card.dataset.personId = getMusicPeopleText(show.personId) || activeMusicPersonDetailId || activeMusicPeopleId || "";
+  card.dataset.personName = getMusicPeopleText(personName);
   card.dataset.personShowId = show.showId;
+  card.dataset.personShowAlbumId = albumId;
   card.dataset.personShowTitle = getMusicPeopleText(show.title);
   card.dataset.personShowVenue = getMusicPeopleText(show.venue);
   card.dataset.personShowLocation = getMusicPeopleText(show.location);
@@ -9580,6 +9942,11 @@ function createMusicPersonShowCard(show, personName) {
   card.dataset.personShowDateMonth = getMusicPeopleText(show.date?.month);
   card.dataset.personShowDateDay = getMusicPeopleText(show.date?.day);
   card.dataset.personShowDateYear = getMusicPeopleText(show.date?.year);
+  card.dataset.personShowHydration = taggedThumbnails.length > 0
+    ? "ready"
+    : albumId
+      ? "idle"
+      : "empty";
 
   const summary = document.createElement("button");
   summary.className = "person-show-summary";
@@ -9663,12 +10030,18 @@ function createMusicPersonShowCard(show, personName) {
   const thumbs = document.createElement("div");
   thumbs.className = "person-show-tagged-thumbs";
   thumbs.setAttribute("aria-label", `${show.title} ${personName} tagged photos`);
-  const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
   if (taggedThumbnails.length > 0) {
     const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(taggedThumbnails);
     taggedThumbnails.slice(0, MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT).forEach((label) => {
-      thumbs.append(createMusicPersonTaggedThumb(label, { lightboxPhotos, show }));
+      thumbs.append(createMusicPersonTaggedThumb(label, {
+        lightboxPhotos,
+        personId: card.dataset.personId,
+        personName,
+        show,
+      }));
     });
+  } else if (albumId && typeof fetch === "function") {
+    thumbs.append(createMusicPersonTaggedPhotoState("loading", "Scanning captions..."));
   } else {
     thumbs.append(createMusicPersonEmptyState("No person-tagged photos in this show yet."));
   }
@@ -9720,6 +10093,8 @@ function renderMusicPersonDetail(data) {
   if (!personDetail) {
     return;
   }
+  disconnectMusicPersonTaggedShowHydrationObserver();
+  musicPersonTaggedShowHydrationToken += 1;
   if (data.state && data.state !== "ready") {
     renderMusicPersonDetailState(data);
     return;
