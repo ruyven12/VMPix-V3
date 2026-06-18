@@ -59,6 +59,12 @@
     root.style.setProperty("--connect-vv-bottom", `${Math.round(viewportBottom)}px`);
   }
 
+  function syncConnectRailHeight() {
+    if (typeof syncRailHeight === "function") {
+      syncRailHeight();
+    }
+  }
+
   function scheduleViewportSync() {
     if (viewportFrame) {
       window.cancelAnimationFrame(viewportFrame);
@@ -66,6 +72,7 @@
     viewportFrame = window.requestAnimationFrame(() => {
       viewportFrame = 0;
       setConnectViewportVars();
+      syncConnectRailHeight();
       setConnectEffectBounds();
     });
   }
@@ -691,6 +698,7 @@
     if (typeof connectShell.scrollTo === "function") {
       connectShell.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
+    syncConnectRailHeight();
     setConnectEffectBounds();
     startEmbers();
     syncConnectLogoPlayback();
