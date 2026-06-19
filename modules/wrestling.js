@@ -282,6 +282,9 @@ let activeWrestlingPeopleLetterFilter = "";
 let activeWrestlingPeopleCategoryFilter = "";
 let activeWrestlingPersonLightboxContext = null;
 let isWrestlingPersonLightboxCloseBridgeBound = false;
+let wrestlingMatchLightboxRouteObserver = null;
+let wrestlingMatchLightboxRouteSyncFrame = 0;
+let wrestlingMatchLightboxRoutePath = "";
 let wrestlingVenuesCollection = [];
 let wrestlingVenuesRequest = null;
 let wrestlingVenuesLoaded = false;
@@ -1048,7 +1051,9 @@ function requestWrestlingMatchPhotosForRoute(showId, matchRef, show) {
         return false;
       }
       const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
-      if (route?.name === "wrestling-match-gallery") {
+      if (route?.name === "wrestling-show-detail") {
+        renderWrestlingShowDetailRoute(route.dateKey || route.showId || showId, { skipDataRequest: true });
+      } else if (route?.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(
           route.dateKey || route.showId || showId,
           route.matchRef || route.matchId || matchRef,
@@ -1591,6 +1596,45 @@ function createWrestlingMatchCard(match, show = null, matchIndex = -1) {
   return card;
 }
 
+function getWrestlingShowGalleryCountInfo(show, galleryMatch) {
+  const declaredMatchCount = getWrestlingDeclaredMatchPhotoCount(galleryMatch);
+  if (declaredMatchCount > 0) {
+    return {
+      label: formatWrestlingCount(declaredMatchCount, "Photos"),
+      state: "total",
+    };
+  }
+
+  const renderedPhotoCount = getWrestlingMatchPhotoItems(galleryMatch).length;
+  if (renderedPhotoCount > 0) {
+    return {
+      label: formatWrestlingCount(renderedPhotoCount, "Preview Photos"),
+      state: "preview",
+    };
+  }
+
+  const sourcePhotoIds = getWrestlingMatchSourcePhotoIds(galleryMatch);
+  if (sourcePhotoIds.length > 0) {
+    return {
+      label: formatWrestlingCount(sourcePhotoIds.length, "Preview Photos"),
+      state: "preview",
+    };
+  }
+
+  const eventPhotoCount = getOptionalWrestlingPeopleCountValue(show?.photoCount, show?.photo_count, show?.photos);
+  if (eventPhotoCount !== null && eventPhotoCount > 0) {
+    return {
+      label: formatWrestlingCount(eventPhotoCount, "Event Photos"),
+      state: "event",
+    };
+  }
+
+  return {
+    label: formatWrestlingCount(0, "Photos"),
+    state: "empty",
+  };
+}
+
 function createWrestlingShowGalleryCard(show, matches = []) {
   const matchRows = Array.isArray(matches) ? matches : [];
   const galleryMatchId = show?.galleryMatchId || show?.gallery_match_id || show?.matchIds?.[0] || show?.match_ids?.[0] || "";
@@ -1602,10 +1646,11 @@ function createWrestlingShowGalleryCard(show, matches = []) {
   const galleryMatchIndex = matchRows.indexOf(galleryMatch);
   const galleryMatchRef = getWrestlingMatchRouteRef(galleryMatch, galleryMatchIndex);
   const galleryRoute = getWrestlingMatchRouteUrlByIds(show, galleryMatchRef);
-  const photoCount = getWrestlingGalleryPhotoCount(galleryMatch) || getWrestlingPeopleCountValue(show?.photoCount, show?.photo_count, show?.photos);
+  const countInfo = getWrestlingShowGalleryCountInfo(show, galleryMatch);
 
   const gallerySection = document.createElement("section");
   gallerySection.className = "wrestling-gallery-card";
+  gallerySection.dataset.wrestlingPhotoCountState = countInfo.state;
   gallerySection.setAttribute("aria-labelledby", "wrestling-gallery-title");
 
   const copy = document.createElement("div");
@@ -1618,7 +1663,7 @@ function createWrestlingShowGalleryCard(show, matches = []) {
 
   const count = document.createElement("p");
   count.className = "wrestling-gallery-count";
-  count.textContent = formatWrestlingCount(photoCount, "Photos");
+  count.textContent = countInfo.label;
   copy.append(title, count);
 
   const button = document.createElement("button");
@@ -5234,6 +5279,22 @@ function getWrestlingMatchPhotoSourceArrays(match) {
   ].filter(Array.isArray);
 }
 
+function getWrestlingDeclaredMatchPhotoCount(match) {
+  const source = match?.backend_record && typeof match.backend_record === "object"
+    ? { ...match.backend_record, ...match }
+    : match;
+  const photoCount = Number.parseInt(
+    source?.photoCount ??
+    source?.photo_count ??
+    source?.stats?.photoCount ??
+    source?.stats?.photo_count ??
+    source?.stats?.totalPhotos ??
+    "0",
+    10
+  );
+  return Number.isFinite(photoCount) && photoCount > 0 ? photoCount : 0;
+}
+
 function getWrestlingPhotoField(photo, fields = []) {
   if (typeof photo === "string") {
     return photo.trim();
@@ -5344,7 +5405,7 @@ function getWrestlingMatchPhotoItems(match) {
     .filter(Boolean);
 }
 
-function getWrestlingMatchPhotoIds(match) {
+function getWrestlingMatchSourcePhotoIds(match) {
   const source = match?.backend_record && typeof match.backend_record === "object"
     ? { ...match.backend_record, ...match }
     : match;
@@ -5357,6 +5418,14 @@ function getWrestlingMatchPhotoIds(match) {
   if (ids && ids.length > 0) {
     return ids.map((photoId) => getWrestlingText(photoId)).filter(Boolean);
   }
+  return [];
+}
+
+function getWrestlingMatchPhotoIds(match) {
+  const sourcePhotoIds = getWrestlingMatchSourcePhotoIds(match);
+  if (sourcePhotoIds.length > 0) {
+    return sourcePhotoIds;
+  }
   return Array.from(wrestlingPhotoTiles || [])
     .map((tile) => getWrestlingText(tile?.dataset?.wrestlingPhotoId))
     .filter(Boolean);
@@ -5366,6 +5435,14 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   const imageSrc = photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc;
   const lightboxSrc = photo.lightboxSrc || imageSrc;
   const imageKey = getWrestlingText(photo.photoId || photo.image_key || photo.imageKey || lightboxSrc, `wrestling-match-photo-${index + 1}`);
+  const matchRef = getWrestlingMatchRouteRef(match) ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchRef ||
+    wrestlingMatchGalleryShell?.dataset.wrestlingMatchId ||
+    match?.matchId ||
+    "match-1";
+  const showRouteSource = show?.showId || show?.eventId ? show : (match?.showId || wrestlingMatchGalleryShell?.dataset.wrestlingShowId || "warzone-26");
+  const matchRoute = getWrestlingMatchRouteUrlByIds(showRouteSource, matchRef);
+  const routePhotoId = String(index + 1).padStart(3, "0");
   const tile = document.createElement("button");
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
   tile.type = "button";
@@ -5382,6 +5459,13 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   tile.dataset.galleryDate = getWrestlingText(show?.eventDate || formatWrestlingShowDate(show?.rawDate || show?.date || show?.show_date), "Date Pending");
   tile.dataset.galleryPerformance = getWrestlingText(match?.matchType || match?.match_type || match?.stipulation, "Match");
   tile.dataset.galleryCamera = [show?.camera_1, show?.camera_2].map(getWrestlingText).filter(Boolean).join(" / ");
+  tile.dataset.wrestlingShowId = show?.showId || show?.eventId || match?.showId || wrestlingMatchGalleryShell?.dataset.wrestlingShowId || "warzone-26";
+  tile.dataset.wrestlingMatchId = matchRef;
+  tile.dataset.wrestlingMatchRef = matchRef;
+  tile.dataset.wrestlingMatchRoute = matchRoute;
+  tile.dataset.wrestlingPhotoId = photo.photoId || routePhotoId;
+  tile.dataset.wrestlingPhotoRouteId = routePhotoId;
+  tile.dataset.wrestlingLightboxRoute = `${matchRoute}/photo/${encodeURIComponent(routePhotoId)}`;
   tile.setAttribute("aria-label", photo.label);
   tile.setAttribute("aria-pressed", String(index === 0));
 
@@ -5399,16 +5483,125 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   return tile;
 }
 
+function getActiveWrestlingMatchLightboxTile() {
+  if (typeof activeLightboxCustomTiles === "undefined" || !Array.isArray(activeLightboxCustomTiles)) {
+    return null;
+  }
+
+  const activeTile = activeLightboxCustomTiles.find((tile) => (
+    tile?.dataset?.wrestlingLightboxRoute &&
+    tile.getAttribute("aria-pressed") === "true"
+  ));
+  if (activeTile) {
+    return activeTile;
+  }
+
+  const index = typeof activeLightboxIndex === "number" ? activeLightboxIndex : 0;
+  return activeLightboxCustomTiles[index] || activeLightboxCustomTiles[0] || null;
+}
+
+function isWrestlingMatchLightboxRouteSyncActive() {
+  return Boolean(
+    lightboxScreen?.dataset?.wrestlingLightboxRouteSync === "match-gallery" &&
+    lightboxScreen.getAttribute("aria-hidden") === "false" &&
+    typeof activeLightboxCustomTiles !== "undefined" &&
+    Array.isArray(activeLightboxCustomTiles)
+  );
+}
+
+function syncWrestlingMatchLightboxRoute() {
+  wrestlingMatchLightboxRouteSyncFrame = 0;
+  if (!isWrestlingMatchLightboxRouteSyncActive() || typeof getRouteFromUrl !== "function") {
+    return;
+  }
+
+  const route = getRouteFromUrl();
+  if (route?.name !== "wrestling-lightbox") {
+    return;
+  }
+
+  const activeTile = getActiveWrestlingMatchLightboxTile();
+  const nextRoute = activeTile?.dataset?.wrestlingLightboxRoute || "";
+  if (!nextRoute) {
+    return;
+  }
+
+  const nextUrl = new URL(nextRoute, window.location.href);
+  const nextPath = `${nextUrl.pathname}${nextUrl.search}`;
+  if (nextPath !== wrestlingMatchLightboxRoutePath && nextPath !== `${window.location.pathname}${window.location.search}` && typeof replaceRouteUrl === "function") {
+    replaceRouteUrl(nextRoute, { source: "wrestling-match-lightbox" });
+  }
+  wrestlingMatchLightboxRoutePath = nextPath;
+
+  updateWrestlingLightboxRelationshipHooks(
+    activeTile.dataset.wrestlingShowId,
+    activeTile.dataset.wrestlingMatchRef || activeTile.dataset.wrestlingMatchId,
+    activeTile.dataset.wrestlingPhotoRouteId || activeTile.dataset.wrestlingPhotoId || route.photoId || "001"
+  );
+}
+
+function scheduleWrestlingMatchLightboxRouteSync() {
+  if (wrestlingMatchLightboxRouteSyncFrame || typeof window.requestAnimationFrame !== "function") {
+    return;
+  }
+  wrestlingMatchLightboxRouteSyncFrame = window.requestAnimationFrame(syncWrestlingMatchLightboxRoute);
+}
+
+function ensureWrestlingMatchLightboxRouteObserver() {
+  if (wrestlingMatchLightboxRouteObserver || typeof MutationObserver !== "function") {
+    return;
+  }
+
+  const targets = [
+    [lightboxPhoto, { attributes: true, attributeFilter: ["aria-label", "data-gallery-lightbox-id", "data-gallery-media-id"] }],
+    [lightboxImage, { attributes: true, attributeFilter: ["src"] }],
+    [lightboxCounter, { childList: true, characterData: true, subtree: true }],
+  ].filter(([target]) => target);
+
+  if (targets.length === 0) {
+    return;
+  }
+
+  wrestlingMatchLightboxRouteObserver = new MutationObserver(scheduleWrestlingMatchLightboxRouteSync);
+  targets.forEach(([target, options]) => {
+    wrestlingMatchLightboxRouteObserver.observe(target, options);
+  });
+}
+
+function setWrestlingMatchLightboxRouteSyncActive(isActive) {
+  if (!lightboxScreen) {
+    return;
+  }
+
+  if (isActive) {
+    lightboxScreen.dataset.wrestlingLightboxRouteSync = "match-gallery";
+    ensureWrestlingMatchLightboxRouteObserver();
+    scheduleWrestlingMatchLightboxRouteSync();
+    return;
+  }
+
+  delete lightboxScreen.dataset.wrestlingLightboxRouteSync;
+  wrestlingMatchLightboxRoutePath = "";
+  if (wrestlingMatchLightboxRouteSyncFrame && typeof window.cancelAnimationFrame === "function") {
+    window.cancelAnimationFrame(wrestlingMatchLightboxRouteSyncFrame);
+  }
+  wrestlingMatchLightboxRouteSyncFrame = 0;
+}
+
 function closeWrestlingMatchLightboxBridge() {
-  const matchRoute = wrestlingMatchGalleryShell?.dataset.wrestlingMatchRoute;
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const routeMatchRoute = route?.name === "wrestling-lightbox"
+    ? getWrestlingMatchRouteUrlByIds(route.dateKey || route.showId, route.matchRef || route.matchId)
+    : "";
+  const matchRoute = routeMatchRoute || wrestlingMatchGalleryShell?.dataset.wrestlingMatchRoute;
   if (
     matchRoute &&
-    typeof getRouteFromUrl === "function" &&
     typeof replaceRouteUrl === "function" &&
-    getRouteFromUrl()?.name === "wrestling-lightbox"
+    route?.name === "wrestling-lightbox"
   ) {
     replaceRouteUrl(matchRoute);
   }
+  setWrestlingMatchLightboxRouteSyncActive(false);
   if (musicNexusShell) {
     musicNexusShell.setAttribute("aria-hidden", "true");
     musicNexusShell.setAttribute("inert", "");
@@ -5509,6 +5702,7 @@ function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, matc
     wrestlingLightboxShell.setAttribute("inert", "");
   }
   showLightbox(targetTile, { returnContext });
+  setWrestlingMatchLightboxRouteSyncActive(true);
 }
 
 function applyWrestlingMatchPhotoRoute(tile, show = {}, match = {}, index = 0) {
@@ -5585,12 +5779,25 @@ function createWrestlingMatchPhotoPlaceholderTile(photoId, index = 0, show = {},
   const tile = document.createElement("li");
   tile.className = "wrestling-photo-tile";
   tile.dataset.wrestlingPhotoId = photoId || String(index + 1).padStart(3, "0");
+  tile.setAttribute("role", "button");
+  tile.tabIndex = 0;
   tile.setAttribute("aria-label", `Photo ${index + 1} unavailable`);
   applyWrestlingMatchPhotoRoute(tile, show, match, index);
 
   const label = document.createElement("span");
   label.textContent = String(index + 1).padStart(2, "0");
   tile.append(label);
+  tile.addEventListener("click", () => {
+    if (tile.dataset.wrestlingLightboxRoute) {
+      navigateToRoute(tile.dataset.wrestlingLightboxRoute);
+    }
+  });
+  tile.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      tile.click();
+    }
+  });
   return tile;
 }
 
@@ -5657,15 +5864,16 @@ function setWrestlingMatchGalleryTitle(parts) {
 
 function getWrestlingGalleryPhotoCount(match) {
   const photos = getWrestlingMatchPhotoItems(match);
+  const declaredPhotoCount = getWrestlingDeclaredMatchPhotoCount(match);
+  if (declaredPhotoCount > 0) {
+    return Math.max(declaredPhotoCount, photos.length);
+  }
   if (photos.length > 0) {
     return photos.length;
   }
-  const photoCount = Number.parseInt(match?.photoCount ?? match?.photo_count ?? match?.stats?.photoCount ?? "0", 10);
-  if (Number.isFinite(photoCount) && photoCount > 0) {
-    return photoCount;
-  }
-  if (Array.isArray(match?.photoIds) && match.photoIds.length > 0) {
-    return match.photoIds.length;
+  const sourcePhotoIds = getWrestlingMatchSourcePhotoIds(match);
+  if (sourcePhotoIds.length > 0) {
+    return sourcePhotoIds.length;
   }
   return wrestlingPhotoTiles.length;
 }

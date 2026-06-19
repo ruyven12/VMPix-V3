@@ -1690,6 +1690,9 @@ function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richa
   if (typeof setLightboxVisible === "function") {
     setLightboxVisible(false);
   }
+  if (typeof setWrestlingMatchLightboxRouteSyncActive === "function") {
+    setWrestlingMatchLightboxRouteSyncActive(false);
+  }
   window.clearTimeout(activationTimer);
   shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-match-gallery-view");

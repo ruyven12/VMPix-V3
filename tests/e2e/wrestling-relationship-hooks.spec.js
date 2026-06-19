@@ -57,6 +57,7 @@ test.describe("wrestling relationship placeholder hooks", () => {
 
     const openGallery = showShell.locator(".wrestling-gallery-button");
     await expect(openGallery).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/050826/match-1");
+    await expect(showShell.locator(".wrestling-gallery-count")).not.toHaveText("12 Photos");
     await firstMatch.click();
     await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1$/);
 
@@ -86,7 +87,29 @@ test.describe("wrestling relationship placeholder hooks", () => {
 
     const firstLightboxSrc = await page.locator("[data-lightbox-image]").getAttribute("src");
     await page.locator("[data-lightbox-next]").click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1\/photo\/002$/);
     await expect.poll(async () => page.locator("[data-lightbox-image]").getAttribute("src")).not.toBe(firstLightboxSrc);
+    await expect(page.locator("[data-wrestling-lightbox-shell]")).toHaveAttribute("data-wrestling-photo-id", "002");
+    await page.locator("[data-lightbox-prev]").click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1\/photo\/001$/);
+    await expect(page.locator("[data-wrestling-lightbox-shell]")).toHaveAttribute("data-wrestling-photo-id", "001");
+    await page.locator("[data-lightbox-next]").click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1\/photo\/002$/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1$/);
+    await expect(page.locator("[data-wrestling-match-gallery-shell][aria-hidden='false']")).toBeVisible();
+
+    await page.goto("/wrestling/shows/050826/match-1/photo/001", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("[data-lightbox-screen][aria-hidden='false']")).toBeVisible();
+    await page.locator("[data-lightbox-back]").click();
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1$/);
+    await expect(page.locator("[data-wrestling-match-gallery-shell][aria-hidden='false']")).toBeVisible();
+
+    await page.goto("/wrestling/shows/050826/match-1/photo/001", { waitUntil: "domcontentloaded" });
+    await expect(page.locator("[data-lightbox-screen][aria-hidden='false']")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1$/);
+    await expect(page.locator("[data-wrestling-match-gallery-shell][aria-hidden='false']")).toBeVisible();
 
     await page.goto("/wrestling/people/ace-romero", { waitUntil: "domcontentloaded" });
     const personShell = page.locator("[data-wrestling-person-detail-shell][aria-hidden='false']");
