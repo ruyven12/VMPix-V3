@@ -1054,6 +1054,18 @@ function requestWrestlingMatchPhotosForRoute(showId, matchRef, show) {
           route.matchRef || route.matchId || matchRef,
           { skipDataRequest: true, skipCanonicalize: true, skipPhotoRequest: true }
         );
+      } else if (route?.name === "wrestling-lightbox") {
+        updateWrestlingLightboxRelationshipHooks(
+          route.dateKey || route.showId || showId,
+          route.matchRef || route.matchId || matchRef,
+          route.photoId
+        );
+        openWrestlingMatchPhotoRouteLightbox(
+          route.dateKey || route.showId || showId,
+          route.matchRef || route.matchId || matchRef,
+          route.photoId,
+          { skipPhotoRequest: true }
+        );
       }
       return true;
     })
@@ -5388,6 +5400,15 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
 }
 
 function closeWrestlingMatchLightboxBridge() {
+  const matchRoute = wrestlingMatchGalleryShell?.dataset.wrestlingMatchRoute;
+  if (
+    matchRoute &&
+    typeof getRouteFromUrl === "function" &&
+    typeof replaceRouteUrl === "function" &&
+    getRouteFromUrl()?.name === "wrestling-lightbox"
+  ) {
+    replaceRouteUrl(matchRoute);
+  }
   if (musicNexusShell) {
     musicNexusShell.setAttribute("aria-hidden", "true");
     musicNexusShell.setAttribute("inert", "");
@@ -5406,6 +5427,48 @@ function closeWrestlingMatchLightboxBridge() {
     wrestlingLightboxShell.setAttribute("aria-hidden", "true");
     wrestlingLightboxShell.setAttribute("inert", "");
   }
+}
+
+function getWrestlingRoutePhotoIndex(photos, photoId = "001") {
+  const safePhotos = Array.isArray(photos) ? photos : [];
+  const numericPhoto = Number.parseInt(photoId, 10);
+  if (Number.isFinite(numericPhoto) && numericPhoto > 0) {
+    return Math.max(0, Math.min(numericPhoto - 1, Math.max(safePhotos.length - 1, 0)));
+  }
+
+  const targetPhotoId = normalizeWrestlingArchiveSlug(photoId, "");
+  const matchedIndex = safePhotos.findIndex((photo, index) => {
+    const candidates = [
+      photo?.photoId,
+      photo?.photo_id,
+      photo?.image_key,
+      photo?.imageKey,
+      photo?.key,
+      photo?.id,
+      String(index + 1).padStart(3, "0"),
+    ];
+    return candidates
+      .map((candidate) => normalizeWrestlingArchiveSlug(candidate, ""))
+      .some((candidate) => candidate && candidate === targetPhotoId);
+  });
+  return matchedIndex >= 0 ? matchedIndex : 0;
+}
+
+function openWrestlingMatchPhotoRouteLightbox(showId, matchRef, photoId = "001", options = {}) {
+  const show = findLiveWrestlingShowById(showId);
+  const match = show?.matches ? findWrestlingMatchInRowsByRef(show.matches, matchRef) : null;
+  const photos = getWrestlingMatchPhotoItems(match);
+  if (show && match && photos.length > 0) {
+    const photoIndex = getWrestlingRoutePhotoIndex(photos, photoId);
+    updateWrestlingLightboxRelationshipHooks(showId, matchRef, photoId);
+    openWrestlingMatchPhotoLightbox(photos, photoIndex, null, show, match);
+    return true;
+  }
+
+  if (!options.skipPhotoRequest && showId && matchRef) {
+    requestWrestlingMatchPhotosForRoute(showId, matchRef, show);
+  }
+  return false;
 }
 
 function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, match) {

@@ -77,14 +77,16 @@ test.describe("wrestling relationship placeholder hooks", () => {
     await firstPhoto.click();
     await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1\/photo\/001$/);
 
-    const lightbox = page.locator("[data-wrestling-lightbox-shell][aria-hidden='false']");
+    const lightbox = page.locator("[data-lightbox-screen][aria-hidden='false']");
     await expect(lightbox).toBeVisible();
-    await expect(lightbox).toHaveAttribute("data-wrestling-show-id", "warzone-26");
-    await expect(lightbox).toHaveAttribute("data-wrestling-match-id", "match-1");
-    await expect(lightbox).toHaveAttribute("data-wrestling-photo-id", "001");
+    await expect(page.locator("[data-lightbox-image]")).toBeVisible();
+    await expect(page.locator("[data-wrestling-lightbox-shell]")).toHaveAttribute("data-wrestling-show-id", "warzone-26");
+    await expect(page.locator("[data-wrestling-lightbox-shell]")).toHaveAttribute("data-wrestling-match-id", "match-1");
+    await expect(page.locator("[data-wrestling-lightbox-shell]")).toHaveAttribute("data-wrestling-photo-id", "001");
 
-    await page.locator("[data-wrestling-lightbox-next]").click();
-    await expect(page).toHaveURL(/\/wrestling\/shows\/050826\/match-1\/photo\/002$/);
+    const firstLightboxSrc = await page.locator("[data-lightbox-image]").getAttribute("src");
+    await page.locator("[data-lightbox-next]").click();
+    await expect.poll(async () => page.locator("[data-lightbox-image]").getAttribute("src")).not.toBe(firstLightboxSrc);
 
     await page.goto("/wrestling/people/ace-romero", { waitUntil: "domcontentloaded" });
     const personShell = page.locator("[data-wrestling-person-detail-shell][aria-hidden='false']");

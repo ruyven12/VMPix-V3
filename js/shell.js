@@ -1687,6 +1687,9 @@ function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richa
     return;
   }
 
+  if (typeof setLightboxVisible === "function") {
+    setLightboxVisible(false);
+  }
   window.clearTimeout(activationTimer);
   shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-match-gallery-view");
@@ -1780,9 +1783,16 @@ function showWrestlingLightbox(showId, matchId, photoId) {
     return;
   }
 
-  const photoNumber = getWrestlingPhotoNumber(photoId);
   const activeShowId = showId || "warzone-26";
   const activeMatchId = matchId || "daron-richardson-vs-bear-bronson";
+  if (
+    typeof openWrestlingMatchPhotoRouteLightbox === "function" &&
+    openWrestlingMatchPhotoRouteLightbox(activeShowId, activeMatchId, photoId || "001")
+  ) {
+    return;
+  }
+
+  const photoNumber = getWrestlingPhotoNumber(photoId);
   const activePhotoId = getWrestlingPhotoIdFromNumber(photoNumber);
   wrestlingLightboxShell.dataset.showId = activeShowId;
   wrestlingLightboxShell.dataset.matchId = activeMatchId;
