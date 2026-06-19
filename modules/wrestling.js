@@ -273,6 +273,10 @@ let wrestlingPeopleRequest = null;
 let wrestlingPeopleLoaded = false;
 let wrestlingPeopleDataState = "idle";
 let wrestlingPeopleFiltersInitialized = false;
+let wrestlingPeopleRequestToken = 0;
+let wrestlingPeopleRenderFrame = 0;
+const wrestlingPeoplePagePayloadCache = new Map();
+const wrestlingPeoplePageRequests = new Map();
 let activeWrestlingPeopleSearch = "";
 let activeWrestlingPeopleLetterFilter = "";
 let activeWrestlingPeopleCategoryFilter = "";
@@ -302,6 +306,7 @@ function retryWrestlingPeopleState() {
     return;
   }
 
+  resetWrestlingPeopleSessionCache();
   setWrestlingPeopleCollection([], "loading");
   renderWrestlingPeopleIndex({ skipDataRequest: true });
   requestWrestlingPeopleData();
@@ -1863,9 +1868,124 @@ function setWrestlingPeopleCollection(rows, stateName = "fallback") {
     mockCollections.wrestlingPeople = wrestlingPeopleCollection;
   }
   if (wrestlingPeopleShell) {
+    const isHydratingLiveRows = stateName === "live" && Boolean(wrestlingPeopleRequest) && !wrestlingPeopleLoaded;
     wrestlingPeopleShell.dataset.peopleDataState = stateName;
-    wrestlingPeopleShell.setAttribute("aria-busy", String(stateName === "loading"));
+    wrestlingPeopleShell.setAttribute("aria-busy", String(stateName === "loading" || isHydratingLiveRows));
   }
+}
+
+function resetWrestlingPeopleSessionCache() {
+  wrestlingPeopleRequestToken += 1;
+  wrestlingPeoplePagePayloadCache.clear();
+  wrestlingPeoplePageRequests.clear();
+}
+
+function setWrestlingPeopleBusy(isBusy) {
+  if (wrestlingPeopleShell) {
+    wrestlingPeopleShell.setAttribute("aria-busy", String(Boolean(isBusy)));
+  }
+}
+
+function getActiveWrestlingPeopleRouteName() {
+  if (typeof getRouteFromUrl !== "function") {
+    return "";
+  }
+  return getRouteFromUrl()?.name || "";
+}
+
+function isWrestlingPeopleIndexRouteActive() {
+  const routeName = getActiveWrestlingPeopleRouteName();
+  if (!routeName) {
+    return !wrestlingPeopleShell || wrestlingPeopleShell.getAttribute("aria-hidden") !== "true";
+  }
+  return routeName === "wrestling-people";
+}
+
+function isWrestlingPeopleDataRouteActive() {
+  const routeName = getActiveWrestlingPeopleRouteName();
+  if (!routeName) {
+    return true;
+  }
+  return routeName === "wrestling-people" || routeName === "wrestling-person-detail";
+}
+
+function isCurrentWrestlingPeopleRequest(requestToken) {
+  return requestToken === wrestlingPeopleRequestToken;
+}
+
+function renderWrestlingPeopleIndexForRequest(requestToken) {
+  if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleIndexRouteActive()) {
+    return;
+  }
+  renderWrestlingPeopleIndex({ skipDataRequest: true });
+}
+
+function scheduleWrestlingPeopleIndexRender(requestToken) {
+  if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleIndexRouteActive()) {
+    return;
+  }
+  if (wrestlingPeopleRenderFrame) {
+    return;
+  }
+
+  const renderFrame = () => {
+    wrestlingPeopleRenderFrame = 0;
+    renderWrestlingPeopleIndexForRequest(requestToken);
+  };
+
+  if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+    wrestlingPeopleRenderFrame = window.requestAnimationFrame(renderFrame);
+  } else {
+    renderFrame();
+  }
+}
+
+function waitForWrestlingPeopleHydrationFrame() {
+  return new Promise((resolve) => {
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(() => resolve());
+      return;
+    }
+    setTimeout(resolve, 0);
+  });
+}
+
+function getWrestlingPeopleCollectionKey(person) {
+  return normalizeWrestlingPersonId(getWrestlingPersonRouteId(person));
+}
+
+function getWrestlingPeopleCollectionSortName(person) {
+  return getWrestlingText(person?.display_name || person?.ring_name || person?.name || person?.title);
+}
+
+function mergeWrestlingPeopleCollection(rows, stateName = "live") {
+  const mergedRows = new Map();
+  const mergeRow = (row) => {
+    const rowKey = getWrestlingPeopleCollectionKey(row);
+    if (!rowKey) {
+      return;
+    }
+    const existingRow = mergedRows.get(rowKey);
+    if (existingRow) {
+      mergedRows.set(rowKey, {
+        ...existingRow,
+        ...row,
+        backend_record: {
+          ...(existingRow.backend_record || existingRow),
+          ...(row.backend_record || row),
+        },
+      });
+      return;
+    }
+    mergedRows.set(rowKey, row);
+  };
+
+  getWrestlingPeopleCollection().forEach(mergeRow);
+  (Array.isArray(rows) ? rows : []).forEach(mergeRow);
+  const nextRows = Array.from(mergedRows.values())
+    .sort((left, right) => getWrestlingPeopleCollectionSortName(left).localeCompare(getWrestlingPeopleCollectionSortName(right)));
+  setWrestlingPeopleCollection(nextRows, stateName);
+  return nextRows;
 }
 
 function getWrestlingPeoplePayloadRows(payload) {
@@ -1959,8 +2079,29 @@ function fetchWrestlingPeoplePayload(page, signal, retries = 1) {
   return runRequest(Math.max(Number.parseInt(retries, 10) || 0, 0));
 }
 
+function getCachedWrestlingPeoplePayload(page, signal, retries = 1) {
+  const pageNumber = Math.max(1, Number.parseInt(page, 10) || 1);
+  if (wrestlingPeoplePagePayloadCache.has(pageNumber)) {
+    return Promise.resolve(wrestlingPeoplePagePayloadCache.get(pageNumber));
+  }
+  if (wrestlingPeoplePageRequests.has(pageNumber)) {
+    return wrestlingPeoplePageRequests.get(pageNumber);
+  }
+
+  const request = fetchWrestlingPeoplePayload(pageNumber, signal, retries)
+    .then((payload) => {
+      wrestlingPeoplePagePayloadCache.set(pageNumber, payload);
+      return payload;
+    })
+    .finally(() => {
+      wrestlingPeoplePageRequests.delete(pageNumber);
+    });
+  wrestlingPeoplePageRequests.set(pageNumber, request);
+  return request;
+}
+
 function fetchOptionalWrestlingPeoplePayload(page, signal) {
-  return fetchWrestlingPeoplePayload(page, signal, 1).catch(() => null);
+  return getCachedWrestlingPeoplePayload(page, signal, 1).catch(() => null);
 }
 
 function requestWrestlingPeopleData() {
@@ -1976,49 +2117,103 @@ function requestWrestlingPeopleData() {
     return Promise.resolve(false);
   }
 
-  setWrestlingPeopleCollection([], "loading");
-  if (wrestlingPeopleShell) {
-    wrestlingPeopleShell.setAttribute("aria-busy", "true");
+  const requestToken = wrestlingPeopleRequestToken + 1;
+  wrestlingPeopleRequestToken = requestToken;
+  if (getWrestlingPeopleCollection().length > 0) {
+    setWrestlingPeopleCollection(getWrestlingPeopleCollection(), "live");
+  } else {
+    setWrestlingPeopleCollection([], "loading");
   }
+  setWrestlingPeopleBusy(true);
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const timeoutId = controller
     ? window.setTimeout(() => controller.abort(), WRESTLING_PEOPLE_TIMEOUT_MS)
     : 0;
-  wrestlingPeopleRequest = fetchWrestlingPeoplePayload(1, controller?.signal, 2)
-    .then((firstPayload) => {
-      const totalPages = getWrestlingPeoplePayloadTotalPages(firstPayload);
-      const remainingPages = Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => index + 2);
-      if (remainingPages.length === 0) {
-        return [firstPayload];
-      }
-      return Promise.all(remainingPages.map((page) => fetchOptionalWrestlingPeoplePayload(page, controller?.signal)))
-        .then((additionalPayloads) => [firstPayload, ...additionalPayloads.filter(Boolean)]);
-    })
-    .then((payloads) => {
-      const liveRows = normalizeLiveWrestlingPeople(payloads);
-      if (liveRows.length === 0) {
-        setWrestlingPeopleCollection([], "empty");
-      } else {
-        setWrestlingPeopleCollection(liveRows, "live");
-        wrestlingPeopleLoaded = true;
-      }
-      renderWrestlingPeopleIndex({ skipDataRequest: true });
-      return liveRows.length > 0;
-    })
-    .catch(() => {
-      setWrestlingPeopleCollection([], "error");
-      renderWrestlingPeopleIndex({ skipDataRequest: true });
+
+  const applyPayloadRows = (payload, options = {}) => {
+    if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleDataRouteActive()) {
       return false;
-    })
-    .finally(() => {
+    }
+    const liveRows = normalizeLiveWrestlingPeople(payload);
+    if (liveRows.length === 0) {
+      return false;
+    }
+    mergeWrestlingPeopleCollection(liveRows, "live");
+    if (options.immediate) {
+      renderWrestlingPeopleIndexForRequest(requestToken);
+    } else {
+      scheduleWrestlingPeopleIndexRender(requestToken);
+    }
+    return true;
+  };
+
+  wrestlingPeopleRequest = (async () => {
+    try {
+      const firstPayload = await getCachedWrestlingPeoplePayload(1, controller?.signal, 2);
+      if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleDataRouteActive()) {
+        return getWrestlingPeopleCollection().length > 0;
+      }
+
+      applyPayloadRows(firstPayload, { immediate: true });
+      const totalPages = getWrestlingPeoplePayloadTotalPages(firstPayload);
+      for (let page = 2; page <= totalPages; page += 1) {
+        if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleDataRouteActive()) {
+          if (controller && !controller.signal.aborted) {
+            controller.abort();
+          }
+          return getWrestlingPeopleCollection().length > 0;
+        }
+
+        const payload = await fetchOptionalWrestlingPeoplePayload(page, controller?.signal);
+        if (!isCurrentWrestlingPeopleRequest(requestToken) || !isWrestlingPeopleDataRouteActive()) {
+          if (controller && !controller.signal.aborted) {
+            controller.abort();
+          }
+          return getWrestlingPeopleCollection().length > 0;
+        }
+        if (payload) {
+          applyPayloadRows(payload);
+          await waitForWrestlingPeopleHydrationFrame();
+        }
+      }
+
+      if (!isCurrentWrestlingPeopleRequest(requestToken)) {
+        return getWrestlingPeopleCollection().length > 0;
+      }
+      const hasLiveRows = getWrestlingPeopleCollection().length > 0;
+      wrestlingPeopleLoaded = true;
+      if (hasLiveRows) {
+        setWrestlingPeopleCollection(getWrestlingPeopleCollection(), "live");
+      } else {
+        setWrestlingPeopleCollection([], "empty");
+      }
+      renderWrestlingPeopleIndexForRequest(requestToken);
+      return hasLiveRows;
+    } catch {
+      if (!isCurrentWrestlingPeopleRequest(requestToken)) {
+        return false;
+      }
+      const hasLiveRows = getWrestlingPeopleCollection().length > 0;
+      if (hasLiveRows) {
+        setWrestlingPeopleCollection(getWrestlingPeopleCollection(), "live");
+        renderWrestlingPeopleIndexForRequest(requestToken);
+        return true;
+      }
+      if (isWrestlingPeopleDataRouteActive()) {
+        setWrestlingPeopleCollection([], "error");
+        renderWrestlingPeopleIndexForRequest(requestToken);
+      }
+      return false;
+    } finally {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
       }
-      if (wrestlingPeopleShell) {
-        wrestlingPeopleShell.setAttribute("aria-busy", "false");
+      if (isCurrentWrestlingPeopleRequest(requestToken)) {
+        setWrestlingPeopleBusy(false);
+        wrestlingPeopleRequest = null;
       }
-      wrestlingPeopleRequest = null;
-    });
+    }
+  })();
 
   return wrestlingPeopleRequest;
 }
@@ -2474,7 +2669,12 @@ function renderWrestlingPeopleIndex(options = {}) {
     return;
   }
 
-  if (!options.skipDataRequest && wrestlingPeopleDataState === "idle" && !wrestlingPeopleRequest && !wrestlingPeopleLoaded) {
+  if (
+    !options.skipDataRequest &&
+    !wrestlingPeopleRequest &&
+    !wrestlingPeopleLoaded &&
+    ["idle", "loading", "live"].includes(wrestlingPeopleDataState)
+  ) {
     requestWrestlingPeopleData();
   }
 

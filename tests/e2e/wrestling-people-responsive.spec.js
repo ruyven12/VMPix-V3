@@ -272,7 +272,8 @@ for (const target of targets) {
       await expect(shell).toBeVisible();
       await expect(page.locator("[data-current-view]")).toHaveText("Wrestling People");
       await expect(shell.getByRole("heading", { name: /Wrestling People/i })).toBeVisible();
-      await expect(shell.locator(".wrestling-person-card").first()).toBeVisible();
+      const firstPersonCard = shell.locator(".wrestling-person-card").first();
+      await expect(firstPersonCard).toBeVisible();
       await expectWrestlingShellState(page, "[data-wrestling-people-shell]");
       await expectCoreWrestlingCssVariables(page);
 
@@ -316,8 +317,8 @@ for (const target of targets) {
       await expectWrestlingShellState(page, "[data-wrestling-person-detail-shell]");
       await expectCoreWrestlingCssVariables(page);
       await expect(shell.getByRole("heading", { name: "Ace Romero" })).toBeVisible();
-      await expect(shell.getByText("Role")).toBeVisible();
-      await expect(shell.getByText("EVENT HISTORY")).toBeVisible();
+      await expect(shell.getByText("Category")).toBeVisible();
+      await expect(shell.getByRole("heading", { name: "EVENT HISTORY" })).toBeVisible();
       await expect(shell.locator(".wrestling-event-history-row").first()).toBeVisible();
       await expect(shell.locator(".wrestling-event-history-open").first()).toBeEnabled();
       await expect(shell.locator(".wrestling-event-history-open").first()).toHaveAttribute("data-wrestling-match-route", "/wrestling/shows/050826/match-5");
