@@ -44,6 +44,57 @@
     root.classList.toggle("connect-touch", window.matchMedia && window.matchMedia("(hover: none)").matches);
   }
 
+  function shouldUseViewportEffectLayer() {
+    if (window.matchMedia) {
+      return window.matchMedia("(max-width: 43.999rem)").matches;
+    }
+
+    return (window.innerWidth || document.documentElement.clientWidth || 0) < 704;
+  }
+
+  function getConnectViewportSize() {
+    const viewport = window.visualViewport;
+    const viewportWidth = viewport && viewport.width
+      ? viewport.width
+      : window.innerWidth || document.documentElement.clientWidth || 1;
+    const viewportHeight = viewport && viewport.height
+      ? viewport.height
+      : window.innerHeight || document.documentElement.clientHeight || 1;
+
+    return {
+      width: Math.max(1, Math.floor(viewportWidth)),
+      height: Math.max(1, Math.floor(viewportHeight)),
+    };
+  }
+
+  function getEffectCoordinateRect() {
+    if (shouldUseViewportEffectLayer()) {
+      const viewportSize = getConnectViewportSize();
+      return {
+        left: 0,
+        top: 0,
+        right: viewportSize.width,
+        bottom: viewportSize.height,
+        width: viewportSize.width,
+        height: viewportSize.height,
+      };
+    }
+
+    if (connectStage) {
+      return connectStage.getBoundingClientRect();
+    }
+
+    const viewportSize = getConnectViewportSize();
+    return {
+      left: 0,
+      top: 0,
+      right: viewportSize.width,
+      bottom: viewportSize.height,
+      width: viewportSize.width,
+      height: viewportSize.height,
+    };
+  }
+
   function setConnectViewportVars() {
     const viewport = window.visualViewport;
     const viewportHeight = viewport && viewport.height ? viewport.height : window.innerHeight || document.documentElement.clientHeight;
@@ -122,7 +173,7 @@
     let targetY = height * 0.16;
 
     if (connectStage && connectPanel) {
-      const stageRect = connectStage.getBoundingClientRect();
+      const stageRect = getEffectCoordinateRect();
       const panelRect = connectPanel.getBoundingClientRect();
       if (panelRect.width && panelRect.height) {
         left = Math.max(0, panelRect.left - stageRect.left);
@@ -133,7 +184,7 @@
     }
 
     if (connectStage && logoFrame) {
-      const stageRect = connectStage.getBoundingClientRect();
+      const stageRect = getEffectCoordinateRect();
       const logoRect = logoFrame.getBoundingClientRect();
       if (logoRect.width && logoRect.height) {
         targetX = (logoRect.left - stageRect.left) + (logoRect.width * 0.5);
@@ -228,7 +279,9 @@
       return;
     }
 
-    const rect = connectStage.getBoundingClientRect();
+    const rect = shouldUseViewportEffectLayer()
+      ? getConnectViewportSize()
+      : connectStage.getBoundingClientRect();
     const nextWidth = Math.max(1, Math.floor(rect.width));
     const nextHeight = Math.max(1, Math.floor(rect.height));
     const nextDpr = Math.min(isSocialWebview ? 1.25 : 1.5, window.devicePixelRatio || 1);
