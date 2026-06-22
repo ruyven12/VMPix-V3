@@ -177,7 +177,33 @@ Rules:
 - Avoid blocking shell rendering on live data.
 - Keep CSS and JavaScript understandable and portable.
 
-## 15. Safe-Area Handling
+## 15. Animation Iteration Workflow
+
+For V3 animation and interaction polish, use one-change-at-a-time development.
+
+Rules:
+
+- Add or adjust only one visual or interaction element per pass.
+- Keep each pass surgical and reversible.
+- Do not bundle multiple animation ideas into one edit.
+- Do not redesign nearby systems unless explicitly requested.
+- Prefer CSS-first changes using transform and opacity.
+- Preserve reduced-motion behavior.
+- Preserve mobile and webview performance.
+- Do not change routing, data wiring, module logic, or shell lifecycle unless the prompt explicitly asks.
+
+Testing workflow:
+
+1. Make one scoped change.
+2. Run focused syntax checks or tests when available.
+3. User records the result on the target device when motion is involved.
+4. Review the recording.
+5. Decide: keep, revise, or revert.
+6. Move to the next single element only after the current pass is accepted.
+
+Video recordings are the preferred review method for animation timing, flicker, pacing, mobile smoothness, and transition feel.
+
+## 16. Safe-Area Handling
 
 Safe-area behavior is required, not optional polish.
 
@@ -188,7 +214,7 @@ Rules:
 - Keep critical controls away from unsafe edges.
 - Test viewport changes caused by mobile browser chrome.
 
-## 16. No Route Chaos
+## 17. No Route Chaos
 
 Routing must reinforce the universal shell.
 
@@ -201,13 +227,13 @@ Rules:
 - Internal drilldowns must not strand the user.
 - Modules must not create competing routers or hidden route state.
 
-## 17. No Accidental Redesigns
+## 18. No Accidental Redesigns
 
 Do not make visual, structural, or interaction redesigns unless the task explicitly asks for them.
 
 A bug fix is not permission to redesign a module. A content edit is not permission to change layout. A routing fix is not permission to restyle the shell.
 
-## 18. Complete Ready-To-Use Files When Editing
+## 19. Complete Ready-To-Use Files When Editing
 
 When editing a file, return the file in a complete, ready-to-use state.
 
@@ -219,7 +245,7 @@ Rules:
 - Keep files internally consistent after each edit.
 - Verify syntax where practical before handoff.
 
-## 19. Explicit Non-Goals Unless Approved
+## 20. Explicit Non-Goals Unless Approved
 
 Unless explicitly requested, do not:
 
