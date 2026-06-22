@@ -209,8 +209,10 @@ button {
     archiveDecodePresence 3.35s var(--ease-breath) 10s both;
 }
 .home-archive-message--identity {
+  position: relative;
   clip-path: inset(0 0 0 0);
   width: min(78vw, 15rem);
+  min-height: clamp(2.8rem, 11.5vw, 3.5rem);
   display: grid;
   align-items: center;
   justify-items: center;
@@ -220,9 +222,49 @@ button {
   font-size: clamp(0.95rem, calc(3.2vw + 0.1875rem), 1.23rem);
   text-shadow: none;
   animation: none;
+  isolation: isolate;
+}
+
+.home-archive-message--identity::before,
+.home-archive-message--identity::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center;
+  will-change: opacity, transform, filter;
+}
+
+.home-archive-message--identity::before {
+  z-index: 0;
+  width: clamp(5.9rem, 36vw, 8.8rem);
+  height: clamp(2.05rem, 8.8vw, 2.65rem);
+  border: 1px solid rgba(238, 217, 153, 0.34);
+  border-radius: 0.32rem;
+  background:
+    linear-gradient(90deg, rgba(220, 188, 108, 0.055), rgba(247, 247, 242, 0.026), rgba(220, 188, 108, 0.055));
+  box-shadow:
+    inset 0 0 0.72rem rgba(238, 217, 153, 0.055),
+    0 0 0.85rem rgba(220, 188, 108, 0.1);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.32, 0.86, 1);
+  animation: archiveAccessFieldForm 2.35s var(--ease-breath) 16.55s both;
+}
+
+.home-archive-message--identity::after {
+  z-index: 0;
+  width: clamp(4.6rem, 28vw, 6.9rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(238, 217, 153, 0.54), rgba(247, 247, 242, 0.36), rgba(238, 217, 153, 0.54), transparent);
+  box-shadow: 0 0 0.58rem rgba(238, 217, 153, 0.16);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.18, 1, 1);
+  animation: archiveAccessLineForm 2.35s var(--ease-breath) 16.55s both;
 }
 
 .home-identity-text {
+  position: relative;
+  z-index: 1;
   grid-area: 1 / 1;
   display: inline-block;
   max-width: 100%;
@@ -245,7 +287,7 @@ button {
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
-  animation: archiveIdentityMarkMorph 3.45s var(--ease-breath) 13.62s both;
+  animation: archiveIdentityMarkMorph 5.6s var(--ease-breath) 13.62s both;
 }
 
 .site-shell.is-home-route .home-frame {
@@ -724,26 +766,73 @@ button {
 
 @keyframes archiveIdentityMarkMorph {
   0%,
-  34% {
+  22% {
     opacity: 0;
     filter: blur(0.1rem) brightness(0.86);
     transform: translate3d(0, 0, 0) scale3d(0.72, 0.94, 1);
   }
-  55% {
+  34% {
     opacity: 0.96;
     filter: blur(0.02rem) brightness(1.12);
     transform: translate3d(0, 0, 0) scale3d(1.04, 1, 1);
   }
-  66%,
-  84% {
+  44%,
+  52% {
     opacity: 0.96;
     filter: blur(0) brightness(1);
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
+  68%,
   100% {
+    opacity: 0.96;
+    filter: blur(0) brightness(1.02);
+    transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
+  }
+}
+
+@keyframes archiveAccessFieldForm {
+  0% {
     opacity: 0;
-    filter: blur(0.04rem) brightness(0.9);
-    transform: translate3d(0, 0, 0) scale3d(0.98, 0.98, 1);
+    filter: brightness(0.82);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.32, 0.86, 1);
+  }
+  24% {
+    opacity: 0.62;
+    filter: brightness(1.16);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1, 1);
+  }
+  44% {
+    opacity: 0.48;
+    filter: brightness(0.98);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.98, 1, 1);
+  }
+  100% {
+    opacity: 0.54;
+    filter: brightness(1);
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes archiveAccessLineForm {
+  0% {
+    opacity: 0;
+    filter: brightness(0.85);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.18, 1, 1);
+  }
+  28% {
+    opacity: 0.5;
+    filter: brightness(1.18);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1, 1);
+  }
+  52% {
+    opacity: 0.32;
+    filter: brightness(0.98);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.92, 1, 1);
+  }
+  100% {
+    opacity: 0.38;
+    filter: brightness(1);
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -1822,6 +1911,20 @@ button {
   .home-archive-message--identity {
     opacity: 1;
     animation: none !important;
+  }
+
+  .home-archive-message--identity::before {
+    opacity: 0.54;
+    animation: none !important;
+    filter: none;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .home-archive-message--identity::after {
+    opacity: 0.38;
+    animation: none !important;
+    filter: none;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 
   .home-identity-text {
