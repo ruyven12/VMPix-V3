@@ -210,12 +210,42 @@ button {
 }
 .home-archive-message--identity {
   clip-path: inset(0 0 0 0);
+  width: min(78vw, 15rem);
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  overflow: visible;
+  opacity: 1;
   color: rgba(220, 188, 108, 0.94);
   font-size: clamp(0.76rem, 3.2vw, 1.04rem);
+  text-shadow: none;
+  animation: none;
+}
+
+.home-identity-text {
+  grid-area: 1 / 1;
+  display: inline-block;
+  max-width: 100%;
+  opacity: 0;
+  color: rgba(220, 188, 108, 0.94);
   text-shadow:
     0 0 0.4rem rgba(220, 188, 108, 0.22),
     0 0 1.05rem rgba(220, 188, 108, 0.12);
-  animation: archiveIdentityPresence 1.15s var(--ease-breath) 13.62s both;
+  transform-origin: center;
+  will-change: opacity, transform, filter;
+}
+
+.home-identity-text--full {
+  animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 13.62s both;
+}
+
+.home-identity-text--mark {
+  color: rgba(238, 217, 153, 0.96);
+  font-size: clamp(1rem, 4.8vw, 1.48rem);
+  text-shadow:
+    0 0 0.48rem rgba(238, 217, 153, 0.24),
+    0 0 1.15rem rgba(220, 188, 108, 0.14);
+  animation: archiveIdentityMarkMorph 3.45s var(--ease-breath) 13.62s both;
 }
 
 .site-shell.is-home-route .home-frame {
@@ -663,12 +693,57 @@ button {
   }
 }
 
-@keyframes archiveIdentityPresence {
+@keyframes archiveIdentityFullMorph {
   0% {
     opacity: 0;
+    filter: blur(0.08rem) brightness(0.88);
+    transform: translate3d(0, 0, 0) scale3d(0.985, 0.985, 1);
+  }
+  13% {
+    opacity: 0.94;
+    filter: blur(0) brightness(1.08);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  28% {
+    opacity: 0.94;
+    filter: blur(0) brightness(1);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  56% {
+    opacity: 0.16;
+    filter: blur(0.08rem) brightness(1.16);
+    transform: translate3d(0, 0, 0) scale3d(0.38, 0.92, 1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    filter: blur(0.11rem) brightness(0.82);
+    transform: translate3d(0, 0, 0) scale3d(0.22, 0.9, 1);
+  }
+}
+
+@keyframes archiveIdentityMarkMorph {
+  0%,
+  34% {
+    opacity: 0;
+    filter: blur(0.1rem) brightness(0.86);
+    transform: translate3d(0, 0, 0) scale3d(0.72, 0.94, 1);
+  }
+  55% {
+    opacity: 0.96;
+    filter: blur(0.02rem) brightness(1.12);
+    transform: translate3d(0, 0, 0) scale3d(1.04, 1, 1);
+  }
+  66%,
+  84% {
+    opacity: 0.96;
+    filter: blur(0) brightness(1);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
   100% {
-    opacity: 0.94;
+    opacity: 0;
+    filter: blur(0.04rem) brightness(0.9);
+    transform: translate3d(0, 0, 0) scale3d(0.98, 0.98, 1);
   }
 }
 
@@ -1745,8 +1820,22 @@ button {
   }
 
   .home-archive-message--identity {
-    opacity: 0.94;
+    opacity: 1;
     animation: none !important;
+  }
+
+  .home-identity-text {
+    animation: none !important;
+    filter: none;
+    transform: none;
+  }
+
+  .home-identity-text--full {
+    opacity: 0;
+  }
+
+  .home-identity-text--mark {
+    opacity: 0.94;
   }
 
   .home-lockup::before {
