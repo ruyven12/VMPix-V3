@@ -381,6 +381,29 @@ button {
   }
 }
 
+@keyframes archiveLockHeartbeat {
+  0% {
+    opacity: 0;
+    transform: translateZ(0) scale(0.82);
+  }
+  30% {
+    opacity: 0.34;
+    transform: translateZ(0) scale(0.96);
+  }
+  52% {
+    opacity: 0.2;
+    transform: translateZ(0) scale(1.035);
+  }
+  76% {
+    opacity: 0.1;
+    transform: translateZ(0) scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: translateZ(0) scale(1.12);
+  }
+}
+
 .public-home {
   position: relative;
   z-index: 1;
@@ -468,6 +491,7 @@ button {
 }
 
 .home-lockup {
+  position: relative;
   width: 100%;
   max-width: 38rem;
   min-width: 0;
@@ -477,6 +501,24 @@ button {
   gap: var(--lockup-gap);
   min-height: clamp(20rem, 58svh, 35rem);
   text-align: center;
+  isolation: isolate;
+}
+
+.home-lockup::before {
+  position: absolute;
+  inset: -0.9rem -1.1rem;
+  z-index: -1;
+  content: "";
+  border: 1px solid rgba(247, 247, 242, 0.18);
+  border-radius: 999rem;
+  background:
+    radial-gradient(ellipse at 50% 34%, rgba(247, 247, 242, 0.16), transparent 30%),
+    radial-gradient(ellipse at 50% 52%, rgba(213, 22, 34, 0.2), transparent 48%),
+    radial-gradient(ellipse at 50% 68%, rgba(247, 247, 242, 0.06), transparent 58%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateZ(0) scale(0.82);
+  animation: archiveLockHeartbeat 820ms var(--ease-standard) 960ms 1 both;
 }
 
 .title-group {
@@ -1213,6 +1255,12 @@ button {
 
   .rail-logo--fallback {
     opacity: 1;
+  }
+
+  .home-lockup::before {
+    opacity: 0.08;
+    transform: none;
+    animation: none;
   }
 }
 
