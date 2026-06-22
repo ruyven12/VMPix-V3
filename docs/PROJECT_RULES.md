@@ -63,7 +63,35 @@ The shell owns:
 
 Modules must not take ownership of shell responsibilities.
 
-## 6. Modules Remain Independent
+## 6. Engine Bar Lifecycle Belongs To The Shell
+
+The Home Screen (`/`) is the only route that does not display the persistent Engine Bar by default.
+
+The Home Screen is responsible for:
+
+- Archive activation.
+- Lightning convergence.
+- Title reconstruction.
+- START interaction.
+- Ignition sequence.
+
+The Engine Bar is created during ignition and becomes part of the V3 Shell. After the user enters the portfolio experience, the Engine Bar remains persistent across all routes and modules, including:
+
+- `/portfolio`
+- `/music/*`
+- `/wrestling/*`
+- `/calendar`
+- `/about`
+- `/contact`
+- Future modules.
+
+The Engine Bar is owned by the shell, not by modules. Modules may update Engine Bar content, labels, state, or context, but they may never create, destroy, replace, or manage the Engine Bar lifecycle.
+
+Route changes should update Engine Bar state without rebuilding the component.
+
+Architectural intent: the Engine Bar represents the archive engine powering the V3 experience. It is brought online once and remains active for the duration of the user session.
+
+## 7. Modules Remain Independent
 
 Modules own their own content and local behavior, but they must remain inside the V3 shell contract.
 
@@ -78,7 +106,7 @@ Modules own:
 
 Modules must not become disconnected mini-apps, create isolated routing systems, fork global layout behavior, or bypass shared navigation expectations.
 
-## 7. Static-First Frontend Philosophy
+## 8. Static-First Frontend Philosophy
 
 V3 frontend work is static-first unless explicitly approved otherwise.
 
@@ -91,7 +119,7 @@ Default frontend tools:
 
 Static-first does not mean static forever. It means shell, layout, routing, viewport safety, and interaction behavior must be stable before heavier runtime complexity is introduced.
 
-## 8. Backend-First Data Philosophy
+## 9. Backend-First Data Philosophy
 
 Data authority belongs in the backend/API layer, not hidden inside frontend code.
 
@@ -99,19 +127,19 @@ VMPix-Data is the backend/API source of truth for source data, contracts, relati
 
 Frontend modules may use mock or local data during development, but those mocks must remain replaceable. Do not let frontend fixtures become a permanent source of truth.
 
-## 9. No Frameworks Unless Explicitly Approved
+## 10. No Frameworks Unless Explicitly Approved
 
 Do not add frameworks, build systems, libraries, runtime dependencies, package dependencies, UI kits, routers, state managers, or animation packages unless the user explicitly approves that decision.
 
 Vanilla HTML/CSS/JS remains the default path.
 
-## 10. No Live-Site Edits First
+## 11. No Live-Site Edits First
 
 Do not make the current live V2 site or live deployment the first edit target for V3 work.
 
 V3 should be built and validated independently before any public cutover, deployment swap, or live-system change.
 
-## 11. Surgical Edits Only
+## 12. Surgical Edits Only
 
 Make the smallest coherent change that satisfies the task.
 
@@ -123,7 +151,7 @@ Rules:
 - Do not alter routing, layout, or design systems unless the task requires it.
 - Preserve existing behavior outside the requested scope.
 
-## 12. Restrained Cinematic HUD Style
+## 13. Restrained Cinematic HUD Style
 
 The V3 visual identity should feel premium, cinematic, tactical, and HUD-inspired, but restrained.
 
@@ -135,7 +163,7 @@ Rules:
 - Keep public and future admin areas recognizably part of one V3 system.
 - Do not accidentally redesign the product while making narrow fixes.
 
-## 13. Performance Matters
+## 14. Performance Matters
 
 Performance is part of the V3 design system.
 
@@ -149,7 +177,7 @@ Rules:
 - Avoid blocking shell rendering on live data.
 - Keep CSS and JavaScript understandable and portable.
 
-## 14. Safe-Area Handling
+## 15. Safe-Area Handling
 
 Safe-area behavior is required, not optional polish.
 
@@ -160,7 +188,7 @@ Rules:
 - Keep critical controls away from unsafe edges.
 - Test viewport changes caused by mobile browser chrome.
 
-## 15. No Route Chaos
+## 16. No Route Chaos
 
 Routing must reinforce the universal shell.
 
@@ -173,13 +201,13 @@ Rules:
 - Internal drilldowns must not strand the user.
 - Modules must not create competing routers or hidden route state.
 
-## 16. No Accidental Redesigns
+## 17. No Accidental Redesigns
 
 Do not make visual, structural, or interaction redesigns unless the task explicitly asks for them.
 
 A bug fix is not permission to redesign a module. A content edit is not permission to change layout. A routing fix is not permission to restyle the shell.
 
-## 17. Complete Ready-To-Use Files When Editing
+## 18. Complete Ready-To-Use Files When Editing
 
 When editing a file, return the file in a complete, ready-to-use state.
 
@@ -191,7 +219,7 @@ Rules:
 - Keep files internally consistent after each edit.
 - Verify syntax where practical before handoff.
 
-## 18. Explicit Non-Goals Unless Approved
+## 19. Explicit Non-Goals Unless Approved
 
 Unless explicitly requested, do not:
 
