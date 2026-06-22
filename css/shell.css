@@ -152,6 +152,62 @@ button {
   transform-origin: center;
   animation: voidTransmissionHandshake 6.4s var(--ease-breath) 2.6s both;
 }
+.home-archive-communication {
+  position: fixed;
+  z-index: 7;
+  top: calc(48% + clamp(3.75rem, 10svh, 6rem));
+  left: 52%;
+  width: min(88vw, 34rem);
+  display: none;
+  grid-template: 1fr / 1fr;
+  justify-items: center;
+  pointer-events: none;
+  text-align: center;
+  transform: translate3d(-50%, -50%, 0);
+  contain: layout paint style;
+}
+
+.site-shell.is-home-route .home-archive-communication {
+  display: grid;
+}
+
+.home-archive-message {
+  grid-area: 1 / 1;
+  max-width: 100%;
+  width: max-content;
+  overflow: hidden;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  font-family: var(--font-display);
+  font-size: clamp(0.68rem, 3vw, 0.96rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.25;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translate3d(0, 0, 0);
+  will-change: clip-path, filter, opacity;
+}
+
+.home-archive-message--node {
+  color: color-mix(in srgb, var(--color-accent) 88%, var(--color-text));
+  text-shadow:
+    0 0 0.46rem rgba(213, 22, 34, 0.32),
+    0 0 1.1rem rgba(213, 22, 34, 0.16);
+  animation:
+    archiveNodeType 0.9s steps(18, end) 8.35s both,
+    archiveNodePresence 3.7s linear 8.35s both;
+}
+
+.home-archive-message--decode {
+  color: rgba(247, 247, 242, 0.9);
+  text-shadow:
+    0 0 0.42rem rgba(247, 247, 242, 0.22),
+    0 0 1rem rgba(247, 247, 242, 0.1);
+  animation:
+    archiveDecodeType 1.05s steps(19, end) 12.55s both,
+    archiveDecodePresence 1.25s var(--ease-breath) 12.55s both;
+}
 
 .site-shell.is-home-route .home-frame {
   visibility: hidden;
@@ -516,6 +572,88 @@ button {
   }
 }
 
+@keyframes archiveNodeType {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes archiveNodePresence {
+  0%,
+  3% {
+    opacity: 0;
+    filter: brightness(0.7);
+  }
+  8% {
+    opacity: 0.92;
+    filter: brightness(1.2);
+  }
+  13% {
+    opacity: 0.38;
+    filter: brightness(0.86);
+  }
+  18% {
+    opacity: 1;
+    filter: brightness(1.12);
+  }
+  24% {
+    opacity: 0.7;
+    filter: brightness(0.94);
+  }
+  31%,
+  74% {
+    opacity: 0.96;
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(0.78);
+  }
+}
+
+@keyframes archiveDecodeType {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes archiveDecodePresence {
+  0% {
+    opacity: 0;
+    filter: brightness(0.82);
+  }
+  100% {
+    opacity: 0.92;
+    filter: brightness(1);
+  }
+}
+
+@keyframes archiveNodeReducedPresence {
+  0%,
+  78%,
+  100% {
+    opacity: 0;
+  }
+  16%,
+  62% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes archiveDecodeReducedPresence {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
 @keyframes voidTransmissionHandshake {
   0%,
   6% {
@@ -1551,6 +1689,21 @@ button {
 
   .site-shell.is-home-route .ambient-void-stars {
     opacity: 0.8;
+  }
+  .home-archive-message {
+    clip-path: inset(0 0 0 0);
+    filter: none;
+    transform: none;
+  }
+
+  .home-archive-message--node {
+    opacity: 0;
+    animation: none !important;
+  }
+
+  .home-archive-message--decode {
+    opacity: 0.9;
+    animation: none !important;
   }
 
   .home-lockup::before {
