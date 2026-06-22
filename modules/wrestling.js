@@ -2457,6 +2457,11 @@ function requestWrestlingPeopleData(options = {}) {
         renderWrestlingPeopleIndexForRequest(requestToken);
         return true;
       }
+      if (isWrestlingPeopleIndexRouteActive() && Array.isArray(wrestlingPeopleRows) && wrestlingPeopleRows.length > 0) {
+        setWrestlingPeopleCollection([], "fallback");
+        renderWrestlingPeopleIndexForRequest(requestToken);
+        return false;
+      }
       if (isWrestlingPeopleDataRouteActive()) {
         setWrestlingPeopleCollection([], "error");
         renderWrestlingPeopleIndexForRequest(requestToken);
