@@ -209,6 +209,7 @@ button {
     archiveDecodePresence 3.35s var(--ease-breath) 10s both;
 }
 .home-archive-message--identity {
+  --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
   position: relative;
   clip-path: inset(0 0 0 0);
   width: min(78vw, 15rem);
@@ -221,6 +222,7 @@ button {
   color: rgba(220, 188, 108, 0.94);
   font-size: clamp(0.95rem, calc(3.2vw + 0.1875rem), 1.23rem);
   text-shadow: none;
+  transform: translate3d(0, var(--home-identity-center-correction), 0);
   animation: none;
   isolation: isolate;
 }
@@ -1910,6 +1912,7 @@ button {
 
   .home-archive-message--identity {
     opacity: 1;
+    transform: translate3d(0, var(--home-identity-center-correction), 0);
     animation: none !important;
   }
 
