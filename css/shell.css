@@ -241,27 +241,37 @@ button {
 
 .home-archive-message--identity::before {
   z-index: 0;
-  width: clamp(5.9rem, 36vw, 8.8rem);
-  height: clamp(2.05rem, 8.8vw, 2.65rem);
-  border: 1px solid rgba(238, 217, 153, 0.34);
-  border-radius: 0.32rem;
+  width: clamp(4.65rem, 23vw, 6.1rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(238, 217, 153, 0.38);
+  border-radius: 50%;
   background:
-    linear-gradient(90deg, rgba(220, 188, 108, 0.055), rgba(247, 247, 242, 0.026), rgba(220, 188, 108, 0.055));
+    radial-gradient(circle, rgba(238, 217, 153, 0.055) 0 36%, transparent 47%),
+    radial-gradient(circle, transparent 0 58%, rgba(220, 188, 108, 0.08) 59%, transparent 70%);
   box-shadow:
-    inset 0 0 0.72rem rgba(238, 217, 153, 0.055),
-    0 0 0.85rem rgba(220, 188, 108, 0.1);
-  transform: translate3d(-50%, -50%, 0) scale3d(0.32, 0.86, 1);
-  animation: archiveAccessFieldForm 2.35s var(--ease-breath) 16.55s both;
+    inset 0 0 0.58rem rgba(238, 217, 153, 0.065),
+    inset 0 0 1.2rem rgba(220, 188, 108, 0.035),
+    0 0 0.95rem rgba(220, 188, 108, 0.12);
+  filter: brightness(1);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
+  animation: archiveAccessRingForm 2.35s var(--ease-breath) 16.55s both;
 }
 
 .home-archive-message--identity::after {
   z-index: 0;
-  width: clamp(4.6rem, 28vw, 6.9rem);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(238, 217, 153, 0.54), rgba(247, 247, 242, 0.36), rgba(238, 217, 153, 0.54), transparent);
-  box-shadow: 0 0 0.58rem rgba(238, 217, 153, 0.16);
-  transform: translate3d(-50%, -50%, 0) scale3d(0.18, 1, 1);
-  animation: archiveAccessLineForm 2.35s var(--ease-breath) 16.55s both;
+  width: clamp(3.05rem, 15vw, 4.05rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(247, 247, 242, 0.18);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 52%, rgba(238, 217, 153, 0.13) 53%, transparent 64%),
+    conic-gradient(from 212deg, transparent 0deg 42deg, rgba(238, 217, 153, 0.42) 54deg, transparent 72deg 360deg);
+  box-shadow:
+    inset 0 0 0.5rem rgba(247, 247, 242, 0.04),
+    0 0 0.64rem rgba(238, 217, 153, 0.12);
+  filter: brightness(1);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
+  animation: archiveAccessCoreRingForm 2.35s var(--ease-breath) 16.55s both;
 }
 
 .home-identity-text {
@@ -432,7 +442,7 @@ button {
   background-repeat: no-repeat;
   contain: strict;
   filter: brightness(1.68) contrast(1.08);
-  will-change: opacity, transform;
+  will-change: opacity, transform, filter;
 }
 
 .ambient-void-stars::before,
@@ -444,7 +454,7 @@ button {
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   background-repeat: no-repeat;
-  will-change: opacity, transform;
+  will-change: opacity, transform, filter;
 }
 
 .ambient-void-stars::before {
@@ -480,19 +490,20 @@ button {
   opacity: 0.9;
   animation:
     voidStarReveal 1.8s var(--ease-breath) both,
-    voidStarDrift 112s linear infinite alternate;
+    voidStarDrift 112s linear infinite alternate,
+    voidStarFieldFlicker 37s var(--ease-breath) 2.1s infinite;
 }
 
 .site-shell.is-home-route .ambient-void-stars::before {
   animation:
     voidStarLayerDrift 148s linear infinite alternate,
-    voidStarTwinkle 23s var(--ease-breath) infinite;
+    voidStarTwinkle 41s var(--ease-breath) -7s infinite;
 }
 
 .site-shell.is-home-route .ambient-void-stars::after {
   animation:
     voidStarLayerDrift 181s linear -41s infinite alternate-reverse,
-    voidStarTwinkle 31s var(--ease-breath) -11s infinite;
+    voidStarTwinkleSoft 53s var(--ease-breath) -19s infinite;
 }
 
 .ambient-energy {
@@ -792,21 +803,21 @@ button {
   }
 }
 
-@keyframes archiveAccessFieldForm {
+@keyframes archiveAccessRingForm {
   0% {
     opacity: 0;
     filter: brightness(0.82);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.32, 0.86, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   }
   24% {
-    opacity: 0.62;
-    filter: brightness(1.16);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1, 1);
+    opacity: 0.64;
+    filter: brightness(1.14);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1);
   }
-  44% {
+  48% {
     opacity: 0.48;
     filter: brightness(0.98);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.98, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.97, 0.97, 1);
   }
   100% {
     opacity: 0.54;
@@ -815,24 +826,24 @@ button {
   }
 }
 
-@keyframes archiveAccessLineForm {
+@keyframes archiveAccessCoreRingForm {
   0% {
     opacity: 0;
-    filter: brightness(0.85);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.18, 1, 1);
+    filter: brightness(0.86);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   }
-  28% {
-    opacity: 0.5;
-    filter: brightness(1.18);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1, 1);
+  30% {
+    opacity: 0.42;
+    filter: brightness(1.13);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.05, 1.05, 1);
   }
-  52% {
-    opacity: 0.32;
+  54% {
+    opacity: 0.28;
     filter: brightness(0.98);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.92, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.93, 0.93, 1);
   }
   100% {
-    opacity: 0.38;
+    opacity: 0.34;
     filter: brightness(1);
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
@@ -937,16 +948,45 @@ button {
   }
 }
 
+@keyframes voidStarFieldFlicker {
+  0%,
+  100% {
+    filter: brightness(1.58) contrast(1.07);
+  }
+  31% {
+    filter: brightness(1.72) contrast(1.08);
+  }
+  64% {
+    filter: brightness(1.62) contrast(1.06);
+  }
+  82% {
+    filter: brightness(1.76) contrast(1.09);
+  }
+}
+
 @keyframes voidStarTwinkle {
   0%,
   100% {
-    opacity: 0.72;
+    opacity: 0.7;
   }
-  38% {
-    opacity: 0.9;
+  36% {
+    opacity: 0.86;
   }
-  67% {
-    opacity: 0.78;
+  68% {
+    opacity: 0.76;
+  }
+}
+
+@keyframes voidStarTwinkleSoft {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  42% {
+    opacity: 0.8;
+  }
+  73% {
+    opacity: 0.68;
   }
 }
 
@@ -1924,7 +1964,7 @@ button {
   }
 
   .home-archive-message--identity::after {
-    opacity: 0.38;
+    opacity: 0.34;
     animation: none !important;
     filter: none;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
