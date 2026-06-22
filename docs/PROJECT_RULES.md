@@ -177,7 +177,54 @@ Rules:
 - Avoid blocking shell rendering on live data.
 - Keep CSS and JavaScript understandable and portable.
 
-## 15. Animation Iteration Workflow
+## 15. V3 Story-First Animation Rule
+
+For all Home Screen, Shell, Transition, Gallery, Lightbox, and Module animation work, define the story beat before defining the animation.
+
+Before implementing any animation, identify:
+
+1. What the user is seeing.
+2. What the system is doing.
+3. What the user should feel.
+4. What story beat is being communicated.
+
+Animation is implementation. Story is the requirement.
+
+Review order:
+
+1. Story.
+2. Timing.
+3. Motion.
+4. Visual effects.
+5. Technical implementation.
+
+Before adding any effect, ask:
+
+- What story beat is missing?
+- What feeling is missing?
+- Does this animation communicate something meaningful?
+- Would the experience be weaker without it?
+
+Avoid adding effects only because they look cool.
+
+Prefer:
+
+- Narrative progression.
+- Clarity.
+- Atmosphere.
+- Anticipation.
+- Payoff.
+
+Avoid:
+
+- Visual noise.
+- Effect stacking.
+- Unnecessary motion.
+- Animations that do not support the archive narrative.
+
+For V3, every major animation should support the archive narrative and user journey.
+
+## 16. Animation Iteration Workflow
 
 For V3 animation and interaction polish, use one-change-at-a-time development.
 
@@ -203,7 +250,7 @@ Testing workflow:
 
 Video recordings are the preferred review method for animation timing, flicker, pacing, mobile smoothness, and transition feel.
 
-## 16. Safe-Area Handling
+## 17. Safe-Area Handling
 
 Safe-area behavior is required, not optional polish.
 
@@ -214,7 +261,7 @@ Rules:
 - Keep critical controls away from unsafe edges.
 - Test viewport changes caused by mobile browser chrome.
 
-## 17. No Route Chaos
+## 18. No Route Chaos
 
 Routing must reinforce the universal shell.
 
@@ -227,13 +274,13 @@ Rules:
 - Internal drilldowns must not strand the user.
 - Modules must not create competing routers or hidden route state.
 
-## 18. No Accidental Redesigns
+## 19. No Accidental Redesigns
 
 Do not make visual, structural, or interaction redesigns unless the task explicitly asks for them.
 
 A bug fix is not permission to redesign a module. A content edit is not permission to change layout. A routing fix is not permission to restyle the shell.
 
-## 19. Complete Ready-To-Use Files When Editing
+## 20. Complete Ready-To-Use Files When Editing
 
 When editing a file, return the file in a complete, ready-to-use state.
 
@@ -245,7 +292,7 @@ Rules:
 - Keep files internally consistent after each edit.
 - Verify syntax where practical before handoff.
 
-## 20. Explicit Non-Goals Unless Approved
+## 21. Explicit Non-Goals Unless Approved
 
 Unless explicitly requested, do not:
 
