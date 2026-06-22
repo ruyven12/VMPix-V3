@@ -150,7 +150,7 @@ button {
   mix-blend-mode: screen;
   transform: translate3d(-50%, -50%, 0) scale(0.16);
   transform-origin: center;
-  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 3.1s both;
+  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 2.6s both;
 }
 
 .site-shell.is-home-route .home-frame {
