@@ -133,6 +133,25 @@ button {
   opacity: 0;
   animation: none;
 }
+.site-shell.is-home-route .ambient-system::after {
+  display: block;
+  inset: auto;
+  top: 43%;
+  left: 58%;
+  width: min(64vw, 19rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  background:
+    radial-gradient(circle, transparent 0 52%, rgba(247, 247, 242, 0.16) 53%, rgba(213, 22, 34, 0.1) 55%, transparent 58%),
+    radial-gradient(circle, transparent 0 67%, rgba(247, 247, 242, 0.08) 68%, transparent 71%);
+  box-shadow: 0 0 1.35rem rgba(213, 22, 34, 0.08);
+  filter: blur(0.12px);
+  mix-blend-mode: screen;
+  transform: translate3d(-50%, -50%, 0) scale(0.18);
+  transform-origin: center;
+  animation: voidTransmissionRipple 2.2s var(--ease-breath) 3.15s both;
+}
 
 .site-shell.is-home-route .home-frame {
   visibility: hidden;
@@ -497,6 +516,23 @@ button {
   }
 }
 
+@keyframes voidTransmissionRipple {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(0.18);
+  }
+  30% {
+    opacity: 0.19;
+  }
+  58% {
+    opacity: 0.11;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(2.05);
+  }
+}
 @keyframes voidStarReveal {
   0%,
   18% {
@@ -1470,6 +1506,12 @@ button {
   .site-shell.is-home-route .ambient-void-stars::after {
     animation: none;
     transform: none;
+  }
+  .site-shell.is-home-route .ambient-system::after {
+    display: none;
+    opacity: 0;
+    animation: none;
+    transform: translate3d(-50%, -50%, 0) scale(0.18);
   }
 
   .site-shell.is-home-route .ambient-void-stars {
