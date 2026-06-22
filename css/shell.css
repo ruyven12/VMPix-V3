@@ -150,12 +150,12 @@ button {
   mix-blend-mode: screen;
   transform: translate3d(-50%, -50%, 0) scale(0.16);
   transform-origin: center;
-  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 1.6s both;
+  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 0.7s both;
 }
 .home-archive-communication {
   position: fixed;
   z-index: 7;
-  top: calc(48% + clamp(3.75rem, 10svh, 6rem));
+  top: calc(48% + clamp(2.35rem, 7svh, 4.2rem));
   left: 52%;
   width: min(88vw, 34rem);
   display: none;
@@ -195,8 +195,8 @@ button {
     0 0 0.46rem rgba(213, 22, 34, 0.32),
     0 0 1.1rem rgba(213, 22, 34, 0.16);
   animation:
-    archiveNodeType 0.9s steps(18, end) 6.8s both,
-    archiveNodePresence 3.7s linear 6.8s both;
+    archiveNodeType 0.9s steps(18, end) 5.9s both,
+    archiveNodePresence 3.7s linear 5.9s both;
 }
 
 .home-archive-message--decode {
@@ -205,8 +205,8 @@ button {
     0 0 0.42rem rgba(247, 247, 242, 0.22),
     0 0 1rem rgba(247, 247, 242, 0.1);
   animation:
-    archiveDecodeType 1.05s steps(19, end) 11.05s both,
-    archiveDecodePresence 1.25s var(--ease-breath) 11.05s both;
+    archiveDecodeType 1.05s steps(19, end) 10s both,
+    archiveDecodePresence 1.8s var(--ease-breath) 10s both;
 }
 
 .site-shell.is-home-route .home-frame {
@@ -627,6 +627,22 @@ button {
   0% {
     opacity: 0;
     filter: brightness(0.82);
+  }
+  24% {
+    opacity: 0.84;
+    filter: brightness(1.05);
+  }
+  42% {
+    opacity: 0.76;
+    filter: brightness(0.94);
+  }
+  58% {
+    opacity: 0.92;
+    filter: brightness(1.03);
+  }
+  76% {
+    opacity: 0.86;
+    filter: brightness(0.98);
   }
   100% {
     opacity: 0.92;
