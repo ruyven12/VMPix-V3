@@ -161,10 +161,11 @@ button {
   display: none;
   grid-template: 1fr / 1fr;
   justify-items: center;
+  overflow: visible;
   pointer-events: none;
   text-align: center;
   transform: translate3d(-50%, -50%, 0);
-  contain: layout paint style;
+  contain: layout style;
 }
 
 .site-shell.is-home-route .home-archive-communication {
