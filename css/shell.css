@@ -109,6 +109,14 @@ button {
   isolation: isolate;
 }
 
+.site-shell.is-home-route {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.site-shell.is-home-route .universal-bottom-rail {
+  display: none;
+}
+
 .site-shell[data-shell-module="music"] {
   --shell-nav-accent: var(--accent-music);
 }

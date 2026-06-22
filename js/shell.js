@@ -694,13 +694,22 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
 
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
+  const isHomeRoute = route.name === "home";
   shell.dataset.shellRoute = route.name;
   shell.dataset.shellActiveTarget = activeTarget;
   shell.dataset.shellModule = moduleContext;
+  shell.classList.toggle("is-home-route", isHomeRoute);
   if (bottomRail) {
     bottomRail.dataset.shellRoute = route.name;
     bottomRail.dataset.shellActiveTarget = activeTarget;
     bottomRail.dataset.shellModule = moduleContext;
+    bottomRail.hidden = isHomeRoute;
+    bottomRail.setAttribute("aria-hidden", String(isHomeRoute));
+    if (isHomeRoute) {
+      bottomRail.setAttribute("inert", "");
+    } else {
+      bottomRail.removeAttribute("inert");
+    }
   }
 }
 
@@ -2439,6 +2448,7 @@ function showHomepage() {
   }
 
   window.clearTimeout(activationTimer);
+  closeGlobalMenu({ shouldRestoreFocus: false });
   shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
