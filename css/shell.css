@@ -211,10 +211,14 @@ button {
 }
 .home-archive-message--identity {
   --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
+  --home-access-control-size: clamp(6.25rem, 28vw, 7.4rem);
   position: relative;
-  clip-path: inset(0 0 0 0);
-  width: min(78vw, 15rem);
-  min-height: clamp(2.8rem, 11.5vw, 3.5rem);
+  clip-path: none;
+  width: var(--home-access-control-size);
+  min-width: var(--home-access-control-size);
+  height: var(--home-access-control-size);
+  min-height: var(--home-access-control-size);
+  aspect-ratio: 1;
   display: grid;
   align-items: center;
   justify-items: center;
@@ -276,11 +280,14 @@ button {
 }
 
 .home-identity-text {
-  position: relative;
+  position: absolute;
   z-index: 1;
-  grid-area: 1 / 1;
+  left: 50%;
+  top: 50%;
   display: inline-block;
-  max-width: 100%;
+  width: max-content;
+  max-width: none;
+  translate: -50% -50%;
   opacity: 0;
   color: rgba(220, 188, 108, 0.94);
   text-shadow:
@@ -1952,6 +1959,7 @@ button {
   }
 
   .home-archive-message--identity {
+    clip-path: none;
     opacity: 1;
     transform: translate3d(0, var(--home-identity-center-correction), 0);
     animation: none !important;
