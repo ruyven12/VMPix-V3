@@ -179,7 +179,7 @@ button {
   opacity: 0;
   clip-path: inset(0 100% 0 0);
   font-family: var(--font-display);
-  font-size: clamp(0.68rem, 3vw, 0.96rem);
+  font-size: clamp(0.87rem, calc(3vw + 0.1875rem), 1.15rem);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 1.25;
@@ -217,7 +217,7 @@ button {
   overflow: visible;
   opacity: 1;
   color: rgba(220, 188, 108, 0.94);
-  font-size: clamp(0.76rem, 3.2vw, 1.04rem);
+  font-size: clamp(0.95rem, calc(3.2vw + 0.1875rem), 1.23rem);
   text-shadow: none;
   animation: none;
 }
@@ -241,7 +241,7 @@ button {
 
 .home-identity-text--mark {
   color: rgba(238, 217, 153, 0.96);
-  font-size: clamp(1rem, 4.8vw, 1.48rem);
+  font-size: clamp(1.19rem, calc(4.8vw + 0.1875rem), 1.67rem);
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
