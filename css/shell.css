@@ -273,6 +273,7 @@ button {
     radial-gradient(circle at 91% 68%, rgba(247, 247, 242, 0.22) 0 0.66px, transparent 1.08px);
   background-repeat: no-repeat;
   contain: strict;
+  filter: brightness(1.42);
   will-change: opacity, transform;
 }
 
@@ -318,7 +319,7 @@ button {
 
 .site-shell.is-home-route .ambient-void-stars {
   display: block;
-  opacity: 0.32;
+  opacity: 0.62;
   animation: voidStarDrift 112s linear infinite alternate;
 }
 
@@ -1461,7 +1462,7 @@ button {
   }
 
   .site-shell.is-home-route .ambient-void-stars {
-    opacity: 0.24;
+    opacity: 0.48;
   }
 
   .home-lockup::before {
