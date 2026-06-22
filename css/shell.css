@@ -150,7 +150,7 @@ button {
   mix-blend-mode: screen;
   transform: translate3d(-50%, -50%, 0) scale(0.16);
   transform-origin: center;
-  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 2.6s both;
+  animation: voidTransmissionHandshake 6.4s var(--ease-breath) 1.6s both;
 }
 .home-archive-communication {
   position: fixed;
@@ -195,8 +195,8 @@ button {
     0 0 0.46rem rgba(213, 22, 34, 0.32),
     0 0 1.1rem rgba(213, 22, 34, 0.16);
   animation:
-    archiveNodeType 0.9s steps(18, end) 8.35s both,
-    archiveNodePresence 3.7s linear 8.35s both;
+    archiveNodeType 0.9s steps(18, end) 6.8s both,
+    archiveNodePresence 3.7s linear 6.8s both;
 }
 
 .home-archive-message--decode {
@@ -205,8 +205,8 @@ button {
     0 0 0.42rem rgba(247, 247, 242, 0.22),
     0 0 1rem rgba(247, 247, 242, 0.1);
   animation:
-    archiveDecodeType 1.05s steps(19, end) 12.55s both,
-    archiveDecodePresence 1.25s var(--ease-breath) 12.55s both;
+    archiveDecodeType 1.05s steps(19, end) 11.05s both,
+    archiveDecodePresence 1.25s var(--ease-breath) 11.05s both;
 }
 
 .site-shell.is-home-route .home-frame {
