@@ -207,6 +207,87 @@ button {
   mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.16) 16%, rgba(0, 0, 0, 0.82) 50%, rgba(0, 0, 0, 0.94) 100%);
 }
 
+.ambient-void-stars {
+  z-index: 1;
+  display: none;
+  overflow: hidden;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  background:
+    radial-gradient(circle at 7% 14%, rgba(247, 247, 242, 0.26) 0 0.55px, transparent 1px),
+    radial-gradient(circle at 22% 32%, rgba(213, 22, 34, 0.14) 0 0.75px, transparent 1.2px),
+    radial-gradient(circle at 34% 11%, rgba(247, 247, 242, 0.2) 0 0.52px, transparent 0.95px),
+    radial-gradient(circle at 49% 27%, rgba(247, 247, 242, 0.18) 0 0.48px, transparent 0.9px),
+    radial-gradient(circle at 63% 18%, rgba(247, 247, 242, 0.28) 0 0.7px, transparent 1.15px),
+    radial-gradient(circle at 81% 36%, rgba(247, 247, 242, 0.18) 0 0.5px, transparent 0.95px),
+    radial-gradient(circle at 14% 62%, rgba(247, 247, 242, 0.2) 0 0.58px, transparent 1px),
+    radial-gradient(circle at 37% 74%, rgba(213, 22, 34, 0.11) 0 0.68px, transparent 1.12px),
+    radial-gradient(circle at 56% 58%, rgba(247, 247, 242, 0.3) 0 0.82px, transparent 1.28px),
+    radial-gradient(circle at 72% 78%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.95px),
+    radial-gradient(circle at 91% 68%, rgba(247, 247, 242, 0.22) 0 0.66px, transparent 1.08px);
+  background-repeat: no-repeat;
+  contain: strict;
+  will-change: opacity, transform;
+}
+
+.ambient-void-stars::before,
+.ambient-void-stars::after {
+  position: absolute;
+  inset: -3%;
+  content: "";
+  opacity: 0.62;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  background-repeat: no-repeat;
+  will-change: opacity, transform;
+}
+
+.ambient-void-stars::before {
+  background:
+    radial-gradient(circle at 5% 42%, rgba(247, 247, 242, 0.14) 0 0.45px, transparent 0.88px),
+    radial-gradient(circle at 18% 83%, rgba(247, 247, 242, 0.22) 0 0.62px, transparent 1.02px),
+    radial-gradient(circle at 28% 52%, rgba(247, 247, 242, 0.17) 0 0.5px, transparent 0.92px),
+    radial-gradient(circle at 43% 88%, rgba(213, 22, 34, 0.1) 0 0.58px, transparent 1px),
+    radial-gradient(circle at 54% 39%, rgba(247, 247, 242, 0.24) 0 0.7px, transparent 1.12px),
+    radial-gradient(circle at 67% 53%, rgba(247, 247, 242, 0.16) 0 0.48px, transparent 0.9px),
+    radial-gradient(circle at 76% 12%, rgba(247, 247, 242, 0.18) 0 0.56px, transparent 1px),
+    radial-gradient(circle at 86% 88%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.04px),
+    radial-gradient(circle at 96% 28%, rgba(213, 22, 34, 0.09) 0 0.7px, transparent 1.16px),
+    radial-gradient(circle at 11% 6%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.95px),
+    radial-gradient(circle at 61% 91%, rgba(247, 247, 242, 0.19) 0 0.54px, transparent 0.98px);
+}
+
+.ambient-void-stars::after {
+  opacity: 0.52;
+  background:
+    radial-gradient(circle at 13% 22%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.88px),
+    radial-gradient(circle at 25% 67%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.02px),
+    radial-gradient(circle at 47% 6%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.95px),
+    radial-gradient(circle at 69% 70%, rgba(213, 22, 34, 0.11) 0 0.66px, transparent 1.08px),
+    radial-gradient(circle at 84% 54%, rgba(247, 247, 242, 0.18) 0 0.55px, transparent 0.98px),
+    radial-gradient(circle at 92% 15%, rgba(247, 247, 242, 0.22) 0 0.7px, transparent 1.14px),
+    radial-gradient(circle at 39% 36%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.86px),
+    radial-gradient(circle at 58% 23%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.92px);
+}
+
+.site-shell.is-home-route .ambient-void-stars {
+  display: block;
+  opacity: 0.32;
+  animation: voidStarDrift 112s linear infinite alternate;
+}
+
+.site-shell.is-home-route .ambient-void-stars::before {
+  animation:
+    voidStarLayerDrift 148s linear infinite alternate,
+    voidStarTwinkle 23s var(--ease-breath) infinite;
+}
+
+.site-shell.is-home-route .ambient-void-stars::after {
+  animation:
+    voidStarLayerDrift 181s linear -41s infinite alternate-reverse,
+    voidStarTwinkle 31s var(--ease-breath) -11s infinite;
+}
+
 .ambient-energy {
   z-index: 1;
   background:
@@ -336,8 +417,65 @@ button {
 }
 
 @media (min-width: 48rem) {
+  .ambient-void-stars::after {
+    background:
+      radial-gradient(circle at 13% 22%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.88px),
+      radial-gradient(circle at 25% 67%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.02px),
+      radial-gradient(circle at 47% 6%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.95px),
+      radial-gradient(circle at 69% 70%, rgba(213, 22, 34, 0.11) 0 0.66px, transparent 1.08px),
+      radial-gradient(circle at 84% 54%, rgba(247, 247, 242, 0.18) 0 0.55px, transparent 0.98px),
+      radial-gradient(circle at 92% 15%, rgba(247, 247, 242, 0.22) 0 0.7px, transparent 1.14px),
+      radial-gradient(circle at 39% 36%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.86px),
+      radial-gradient(circle at 58% 23%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.92px),
+      radial-gradient(circle at 4% 72%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.88px),
+      radial-gradient(circle at 19% 48%, rgba(247, 247, 242, 0.17) 0 0.56px, transparent 0.98px),
+      radial-gradient(circle at 31% 19%, rgba(213, 22, 34, 0.08) 0 0.6px, transparent 1.02px),
+      radial-gradient(circle at 44% 64%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.92px),
+      radial-gradient(circle at 52% 82%, rgba(247, 247, 242, 0.18) 0 0.58px, transparent 1px),
+      radial-gradient(circle at 66% 33%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.9px),
+      radial-gradient(circle at 78% 7%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.08px),
+      radial-gradient(circle at 89% 43%, rgba(213, 22, 34, 0.09) 0 0.58px, transparent 1px),
+      radial-gradient(circle at 97% 82%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.92px),
+      radial-gradient(circle at 12% 92%, rgba(247, 247, 242, 0.18) 0 0.56px, transparent 1px),
+      radial-gradient(circle at 73% 92%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.88px),
+      radial-gradient(circle at 96% 5%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.96px);
+  }
+}
+
+@media (min-width: 48rem) {
   .shell-breadcrumb {
     top: max(0.72rem, env(safe-area-inset-top));
+  }
+}
+
+@keyframes voidStarDrift {
+  from {
+    transform: translate3d(-0.14rem, -0.08rem, 0) scale(1.002);
+  }
+  to {
+    transform: translate3d(0.34rem, 0.46rem, 0) scale(1.01);
+  }
+}
+
+@keyframes voidStarLayerDrift {
+  from {
+    transform: translate3d(0.16rem, -0.22rem, 0);
+  }
+  to {
+    transform: translate3d(-0.38rem, 0.32rem, 0);
+  }
+}
+
+@keyframes voidStarTwinkle {
+  0%,
+  100% {
+    opacity: 0.46;
+  }
+  38% {
+    opacity: 0.62;
+  }
+  67% {
+    opacity: 0.5;
   }
 }
 
@@ -1267,6 +1405,17 @@ button {
 
   .rail-logo--fallback {
     opacity: 1;
+  }
+
+  .site-shell.is-home-route .ambient-void-stars,
+  .site-shell.is-home-route .ambient-void-stars::before,
+  .site-shell.is-home-route .ambient-void-stars::after {
+    animation: none;
+    transform: none;
+  }
+
+  .site-shell.is-home-route .ambient-void-stars {
+    opacity: 0.24;
   }
 
   .home-lockup::before {
