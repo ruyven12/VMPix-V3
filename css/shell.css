@@ -117,6 +117,52 @@ button {
   display: none;
 }
 
+/* Home Story Prototype Pass - Void Isolation. Temporary Home-only suppression for story review. */
+.site-shell.is-home-route .ambient-system {
+  background: #010103;
+}
+
+.site-shell.is-home-route .ambient-system::before,
+.site-shell.is-home-route .ambient-system::after,
+.site-shell.is-home-route .cinema-fire-bg,
+.site-shell.is-home-route .ambient-energy,
+.site-shell.is-home-route .ambient-rings,
+.site-shell.is-home-route .ambient-sweep,
+.site-shell.is-home-route .ambient-particles {
+  display: none;
+  opacity: 0;
+  animation: none;
+}
+
+.site-shell.is-home-route .home-frame {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  animation: none;
+}
+
+.site-shell.is-home-route .home-frame::before,
+.site-shell.is-home-route .home-frame::after,
+.site-shell.is-home-route .home-lockup::before,
+.site-shell.is-home-route .title-group,
+.site-shell.is-home-route .start-portal,
+.site-shell.is-home-route .start-portal::before,
+.site-shell.is-home-route .start-portal::after,
+.site-shell.is-home-route .start-button,
+.site-shell.is-home-route .start-button::before,
+.site-shell.is-home-route .start-button::after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: none;
+  text-shadow: none;
+  animation: none;
+}
+
 .site-shell[data-shell-module="music"] {
   --shell-nav-accent: var(--accent-music);
 }
