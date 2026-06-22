@@ -320,8 +320,11 @@ button {
 .site-shell.is-home-route .ambient-void-stars {
   display: block;
   opacity: 0.9;
-  animation: voidStarDrift 112s linear infinite alternate;
+  animation:
+    voidStarReveal 1.8s var(--ease-breath) both,
+    voidStarDrift 112s linear infinite alternate;
 }
+
 .site-shell.is-home-route .ambient-void-stars::before {
   animation:
     voidStarLayerDrift 148s linear infinite alternate,
@@ -494,6 +497,15 @@ button {
   }
 }
 
+@keyframes voidStarReveal {
+  0%,
+  18% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
 @keyframes voidStarDrift {
   from {
     transform: translate3d(-0.14rem, -0.08rem, 0) scale(1.002);
