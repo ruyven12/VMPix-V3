@@ -2604,28 +2604,28 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
   const affiliations = getWrestlingPersonAffiliations(source);
   const teamsAndStables = getWrestlingPersonTeamsAndStables(source);
   const eventCount = getOptionalWrestlingPeopleCountValue(
-    source.events,
     source.event_count,
     source.events_count,
     source.show_count,
     source.shows_count,
+    source.stats?.event_count,
+    source.stats?.show_count,
+    source.events,
     source.appearances,
     source.appearance_count,
     source.showIds,
     source.show_ids,
     source.stats?.eventCount,
-    source.stats?.event_count,
-    source.stats?.showCount,
-    source.stats?.show_count
+    source.stats?.showCount
   );
   const matchCount = getOptionalWrestlingPeopleCountValue(
-    source.matches,
     source.match_count,
     source.matches_count,
+    source.stats?.match_count,
+    source.matches,
     source.matchIds,
     source.match_ids,
-    source.stats?.matchCount,
-    source.stats?.match_count
+    source.stats?.matchCount
   );
   const taggedPhotoCount = getOptionalWrestlingPeopleCountValue(
     source.tagged_photo_count,
@@ -2635,13 +2635,13 @@ function normalizeWrestlingPeopleIndexRow(person = {}) {
     getWrestlingTaggedPeoplePhotoCount(source)
   );
   const photoCount = getOptionalWrestlingPeopleCountValue(
+    source.photo_count,
+    source.stats?.photo_count,
+    source.photoCount,
     source.photos,
     source.photoIds,
     source.photo_ids,
-    source.photoCount,
-    source.photo_count,
-    source.stats?.photoCount,
-    source.stats?.photo_count
+    source.stats?.photoCount
   ) ?? taggedPhotoCount;
   const firstSeen = getWrestlingText(
     source.first_seen ||
