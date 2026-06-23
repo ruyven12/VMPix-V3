@@ -196,8 +196,8 @@ button {
     0 0 0.46rem rgba(213, 22, 34, 0.32),
     0 0 1.1rem rgba(213, 22, 34, 0.16);
   animation:
-    archiveNodeType 0.9s steps(18, end) 5.75s both,
-    archiveNodePresence 3.7s linear 5.75s both;
+    archiveNodeType 0.9s steps(18, end) 5.5s both,
+    archiveNodePresence 3.35s linear 5.5s both;
 }
 
 .home-archive-message--decode {
@@ -206,8 +206,8 @@ button {
     0 0 0.42rem rgba(247, 247, 242, 0.22),
     0 0 1rem rgba(247, 247, 242, 0.1);
   animation:
-    archiveDecodeType 1.05s steps(19, end) 10s both,
-    archiveDecodePresence 3.35s var(--ease-breath) 10s both;
+    archiveDecodeType 1.05s steps(19, end) 9.25s both,
+    archiveDecodePresence 3.05s var(--ease-breath) 9.25s both;
 }
 .home-archive-message--identity {
   --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
@@ -260,9 +260,9 @@ button {
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   animation:
-    archiveAccessRingForm 2.35s var(--ease-breath) 16.55s both,
-    archiveCoreOuterIgnition 4.2s var(--ease-breath) 18.85s forwards,
-    archiveCoreOuterCirculation 12s linear 22.6s infinite;
+    archiveAccessRingForm 2.35s var(--ease-breath) 15.65s both,
+    archiveCoreOuterIgnition 3.75s var(--ease-breath) 17.45s forwards,
+    archiveCoreOuterCirculation 12s linear 20.75s infinite;
 }
 
 .home-archive-message--identity::after {
@@ -280,9 +280,9 @@ button {
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   animation:
-    archiveAccessCoreRingForm 2.35s var(--ease-breath) 16.55s both,
-    archiveCoreInnerIgnition 3.8s var(--ease-breath) 18.95s forwards,
-    archiveCoreInnerCirculation 8.5s linear 22.4s infinite;
+    archiveAccessCoreRingForm 2.35s var(--ease-breath) 15.65s both,
+    archiveCoreInnerIgnition 3.45s var(--ease-breath) 17.55s forwards,
+    archiveCoreInnerCirculation 8.5s linear 20.65s infinite;
 }
 
 .home-identity-text {
@@ -304,7 +304,7 @@ button {
 }
 
 .home-identity-text--full {
-  animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 13.62s both;
+  animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 12.58s both;
 }
 
 .home-identity-text--mark {
@@ -314,8 +314,8 @@ button {
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
-    archiveIdentityMarkMorph 5.6s var(--ease-breath) 13.62s both,
-    archiveIdentityMarkReadySettle 1.3s var(--ease-breath) 23.25s forwards;
+    archiveIdentityMarkMorph 5.6s var(--ease-breath) 12.58s both,
+    archiveIdentityMarkReadySettle 1.15s var(--ease-breath) 21.35s forwards;
 }
 
 .home-identity-text--core,
@@ -333,7 +333,7 @@ button {
 }
 
 .home-identity-text--core {
-  animation: archiveCoreStatusForm 1.2s var(--ease-breath) 23.55s both;
+  animation: archiveCoreStatusForm 1.05s var(--ease-breath) 21.62s both;
 }
 
 .home-identity-text--ready {
@@ -341,7 +341,7 @@ button {
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveAccessReadyForm 1.15s var(--ease-breath) 24.25s both;
+  animation: archiveAccessReadyForm 1s var(--ease-breath) 22.1s both;
 }
 .home-archive-awakening {
   position: fixed;
@@ -407,7 +407,7 @@ button {
     radial-gradient(circle, transparent 0 62%, rgba(247, 247, 242, 0.24) 64%, transparent 70%);
   filter: brightness(1.22) blur(0.06px);
   transform: translate3d(-50%, -50%, 0) scale(0.1);
-  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 14.86s both;
+  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 13.82s both;
 }
 
 
@@ -479,7 +479,7 @@ button {
   --sector-x: 50%;
   --sector-y: 6%;
   --sector-size: clamp(8rem, 24vw, 14.5rem);
-  --sector-delay: 15.05s;
+  --sector-delay: 14.02s;
   --world-x: 52%;
   --world-y: 43%;
   --world-size: clamp(0.68rem, 1.75vw, 1.04rem);
@@ -503,7 +503,7 @@ button {
   --sector-x: 77%;
   --sector-y: 15%;
   --sector-size: clamp(8.8rem, 27vw, 16.5rem);
-  --sector-delay: 15.25s;
+  --sector-delay: 14.22s;
   --world-x: 58%;
   --world-y: 45%;
   --world-size: clamp(0.64rem, 1.58vw, 0.94rem);
@@ -525,7 +525,7 @@ button {
   --sector-x: 96%;
   --sector-y: 43%;
   --sector-size: clamp(9.4rem, 30vw, 18rem);
-  --sector-delay: 15.45s;
+  --sector-delay: 14.42s;
   --world-x: 47%;
   --world-y: 52%;
   --world-size: clamp(0.72rem, 1.85vw, 1.1rem);
@@ -550,7 +550,7 @@ button {
   --sector-x: 84%;
   --sector-y: 78%;
   --sector-size: clamp(9.2rem, 29vw, 17.5rem);
-  --sector-delay: 15.65s;
+  --sector-delay: 14.62s;
   --world-x: 46%;
   --world-y: 43%;
   --world-size: clamp(0.66rem, 1.7vw, 1rem);
@@ -574,7 +574,7 @@ button {
   --sector-x: 52%;
   --sector-y: 94%;
   --sector-size: clamp(8.2rem, 25vw, 15.5rem);
-  --sector-delay: 15.85s;
+  --sector-delay: 14.82s;
   --world-x: 54%;
   --world-y: 45%;
   --world-size: clamp(0.7rem, 1.8vw, 1.08rem);
@@ -599,7 +599,7 @@ button {
   --sector-x: 18%;
   --sector-y: 82%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 16.05s;
+  --sector-delay: 15.02s;
   --world-x: 47%;
   --world-y: 47%;
   --world-size: clamp(0.64rem, 1.64vw, 0.98rem);
@@ -621,7 +621,7 @@ button {
   --sector-x: 4%;
   --sector-y: 51%;
   --sector-size: clamp(8.5rem, 26vw, 16rem);
-  --sector-delay: 16.25s;
+  --sector-delay: 15.22s;
   --world-x: 52%;
   --world-y: 55%;
   --world-size: clamp(0.68rem, 1.7vw, 1.03rem);
@@ -645,7 +645,7 @@ button {
   --sector-x: 18%;
   --sector-y: 16%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 16.45s;
+  --sector-delay: 15.42s;
   --world-x: 47%;
   --world-y: 42%;
   --world-size: clamp(0.62rem, 1.58vw, 0.94rem);
@@ -714,7 +714,7 @@ button {
   opacity: 0;
   pointer-events: none;
   transform: translate3d(0, 3.8rem, 0) scale3d(0.92, 0.92, 1);
-  animation: homeAccessPortalReady 1.15s var(--ease-breath) 24.95s both;
+  animation: homeAccessPortalReady 1s var(--ease-breath) 22.55s both;
 }
 
 .site-shell.is-home-route .start-portal::before,
@@ -729,7 +729,7 @@ button {
   border-color: rgba(238, 217, 153, 0.16);
   background: transparent;
   opacity: 0;
-  animation: homeAccessControlShellReady 1.15s var(--ease-breath) 24.95s both;
+  animation: homeAccessControlShellReady 1s var(--ease-breath) 22.55s both;
 }
 
 .site-shell.is-home-route .start-portal::after {
@@ -738,7 +738,7 @@ button {
   background: transparent;
   box-shadow: none;
   opacity: 0;
-  animation: homeAccessControlInnerReady 1.15s var(--ease-breath) 25.08s both;
+  animation: homeAccessControlInnerReady 1s var(--ease-breath) 22.65s both;
 }
 
 .site-shell.is-home-route .start-button {
@@ -766,7 +766,7 @@ button {
   pointer-events: auto;
   text-shadow: 0 0 0.38rem rgba(238, 217, 153, 0.2);
   transform: translateZ(0) scale3d(0.94, 0.94, 1);
-  animation: homeAccessButtonReady 1.2s var(--ease-breath) 25.2s both;
+  animation: homeAccessButtonReady 1.05s var(--ease-breath) 22.78s both;
 }
 
 .site-shell.is-home-route .start-button::before {
@@ -776,7 +776,7 @@ button {
   box-shadow: none;
   opacity: 0;
   transform: translate3d(-125%, 0, 0) rotate(8deg);
-  animation: homeAccessButtonSweep 1.15s var(--ease-breath) 25.45s both;
+  animation: homeAccessButtonSweep 1s var(--ease-breath) 23.05s both;
 }
 
 .site-shell.is-home-route .start-button::after {
@@ -788,7 +788,7 @@ button {
     radial-gradient(ellipse, rgba(220, 188, 108, 0.08), transparent 62%);
   box-shadow: none;
   opacity: 0;
-  animation: homeAccessButtonCoreReady 1.2s var(--ease-breath) 25.32s both;
+  animation: homeAccessButtonCoreReady 1.05s var(--ease-breath) 22.9s both;
 }
 .site-shell[data-shell-module="music"] {
   --shell-nav-accent: var(--accent-music);
