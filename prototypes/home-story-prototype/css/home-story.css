@@ -354,14 +354,14 @@ body {
   transform: translate3d(0, 0, 0) scale(0.985);
   transform-origin: 50% 50%;
   background:
-    radial-gradient(circle at 27% 33%, rgba(238, 217, 153, 0.76) 0 1.2px, rgba(238, 217, 153, 0.34) 1.32px 3.35px, transparent 4.75px),
-    radial-gradient(circle at 43% 25%, rgba(247, 247, 242, 0.68) 0 1.08px, rgba(220, 188, 108, 0.31) 1.22px 3.05px, transparent 4.45px),
-    radial-gradient(circle at 62% 33%, rgba(238, 217, 153, 0.72) 0 1.24px, rgba(238, 217, 153, 0.3) 1.4px 3.35px, transparent 4.85px),
-    radial-gradient(circle at 74% 49%, rgba(247, 247, 242, 0.62) 0 1.02px, rgba(220, 188, 108, 0.28) 1.16px 2.95px, transparent 4.35px),
-    radial-gradient(circle at 59% 67%, rgba(238, 217, 153, 0.7) 0 1.18px, rgba(238, 217, 153, 0.29) 1.32px 3.25px, transparent 4.65px),
-    radial-gradient(circle at 37% 69%, rgba(247, 247, 242, 0.58) 0 1.08px, rgba(220, 188, 108, 0.26) 1.22px 3px, transparent 4.35px),
-    radial-gradient(circle at 22% 54%, rgba(238, 217, 153, 0.62) 0 1.08px, rgba(238, 217, 153, 0.26) 1.22px 2.95px, transparent 4.3px);
-  filter: drop-shadow(0 0 0.68rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.16));
+    radial-gradient(circle at 27% 33%, rgba(238, 217, 153, 0.36) 0 1.2px, rgba(238, 217, 153, 0.12) 1.32px 3.35px, transparent 4.75px),
+    radial-gradient(circle at 43% 25%, rgba(247, 247, 242, 0.32) 0 1.08px, rgba(220, 188, 108, 0.11) 1.22px 3.05px, transparent 4.45px),
+    radial-gradient(circle at 62% 33%, rgba(238, 217, 153, 0.34) 0 1.24px, rgba(238, 217, 153, 0.11) 1.4px 3.35px, transparent 4.85px),
+    radial-gradient(circle at 74% 49%, rgba(247, 247, 242, 0.28) 0 1.02px, rgba(220, 188, 108, 0.1) 1.16px 2.95px, transparent 4.35px),
+    radial-gradient(circle at 59% 67%, rgba(238, 217, 153, 0.32) 0 1.18px, rgba(238, 217, 153, 0.1) 1.32px 3.25px, transparent 4.65px),
+    radial-gradient(circle at 37% 69%, rgba(247, 247, 242, 0.26) 0 1.08px, rgba(220, 188, 108, 0.09) 1.22px 3px, transparent 4.35px),
+    radial-gradient(circle at 22% 54%, rgba(238, 217, 153, 0.28) 0 1.08px, rgba(238, 217, 153, 0.09) 1.22px 2.95px, transparent 4.3px);
+  filter: drop-shadow(0 0 0.34rem rgba(220, 188, 108, 0.12)) drop-shadow(0 0 0.1rem rgba(247, 247, 242, 0.08));
   will-change: opacity, transform, filter;
   animation: archiveAwakeningNodes 3.2s var(--ease-breath) 15.2s both;
 }
@@ -383,13 +383,13 @@ body {
 .home-archive-awakening::before {
   inset: 0;
   background:
-    linear-gradient(154deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.3) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 27% 25% / 17% 8% no-repeat,
-    linear-gradient(25deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.26) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 43% 25% / 20% 10% no-repeat,
-    linear-gradient(49deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.27) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 61% 33% / 14% 17% no-repeat,
-    linear-gradient(174deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.24) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 37% 65% / 23% 8% no-repeat,
-    linear-gradient(45deg, transparent calc(50% - 0.55px), rgba(220, 188, 108, 0.25) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 21% 53% / 18% 17% no-repeat,
-    linear-gradient(132deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.24) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 58% 49% / 17% 20% no-repeat;
-  filter: drop-shadow(0 0 0.28rem rgba(220, 188, 108, 0.18)) blur(0.03px);
+    linear-gradient(154deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.12) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 27% 25% / 17% 8% no-repeat,
+    linear-gradient(25deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.1) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 43% 25% / 20% 10% no-repeat,
+    linear-gradient(49deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.11) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 61% 33% / 14% 17% no-repeat,
+    linear-gradient(174deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.1) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 37% 65% / 23% 8% no-repeat,
+    linear-gradient(45deg, transparent calc(50% - 0.55px), rgba(220, 188, 108, 0.1) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 21% 53% / 18% 17% no-repeat,
+    linear-gradient(132deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.1) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 58% 49% / 17% 20% no-repeat;
+  filter: drop-shadow(0 0 0.14rem rgba(220, 188, 108, 0.07)) blur(0.03px);
   transform: translate3d(0, 0, 0) scale(0.985);
   animation: archiveAwakeningLines 2.65s var(--ease-breath) 15.95s both;
 }
@@ -500,7 +500,7 @@ body {
   --sector-x: 77%;
   --sector-y: 15%;
   --sector-size: clamp(8.8rem, 27vw, 16.5rem);
-  --sector-delay: 15.18s;
+  --sector-delay: 15.25s;
   --world-x: 58%;
   --world-y: 45%;
   --world-size: clamp(0.64rem, 1.58vw, 0.94rem);
@@ -522,7 +522,7 @@ body {
   --sector-x: 96%;
   --sector-y: 43%;
   --sector-size: clamp(9.4rem, 30vw, 18rem);
-  --sector-delay: 15.31s;
+  --sector-delay: 15.45s;
   --world-x: 47%;
   --world-y: 52%;
   --world-size: clamp(0.72rem, 1.85vw, 1.1rem);
@@ -547,7 +547,7 @@ body {
   --sector-x: 84%;
   --sector-y: 78%;
   --sector-size: clamp(9.2rem, 29vw, 17.5rem);
-  --sector-delay: 15.44s;
+  --sector-delay: 15.65s;
   --world-x: 46%;
   --world-y: 43%;
   --world-size: clamp(0.66rem, 1.7vw, 1rem);
@@ -571,7 +571,7 @@ body {
   --sector-x: 52%;
   --sector-y: 94%;
   --sector-size: clamp(8.2rem, 25vw, 15.5rem);
-  --sector-delay: 15.57s;
+  --sector-delay: 15.85s;
   --world-x: 54%;
   --world-y: 45%;
   --world-size: clamp(0.7rem, 1.8vw, 1.08rem);
@@ -596,7 +596,7 @@ body {
   --sector-x: 18%;
   --sector-y: 82%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 15.7s;
+  --sector-delay: 16.05s;
   --world-x: 47%;
   --world-y: 47%;
   --world-size: clamp(0.64rem, 1.64vw, 0.98rem);
@@ -618,7 +618,7 @@ body {
   --sector-x: 4%;
   --sector-y: 51%;
   --sector-size: clamp(8.5rem, 26vw, 16rem);
-  --sector-delay: 15.83s;
+  --sector-delay: 16.25s;
   --world-x: 52%;
   --world-y: 55%;
   --world-size: clamp(0.68rem, 1.7vw, 1.03rem);
@@ -642,7 +642,7 @@ body {
   --sector-x: 18%;
   --sector-y: 16%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 15.96s;
+  --sector-delay: 16.45s;
   --world-x: 47%;
   --world-y: 42%;
   --world-size: clamp(0.62rem, 1.58vw, 0.94rem);
@@ -885,16 +885,16 @@ body {
   }
   34% {
     opacity: 0.78;
-    filter: drop-shadow(0 0 0.78rem rgba(220, 188, 108, 0.32)) drop-shadow(0 0 0.22rem rgba(247, 247, 242, 0.18)) brightness(1.18);
+    filter: drop-shadow(0 0 0.46rem rgba(220, 188, 108, 0.14)) drop-shadow(0 0 0.12rem rgba(247, 247, 242, 0.08)) brightness(1.05);
     transform: translate3d(0, 0, 0) scale(1);
   }
   58% {
     opacity: 0.63;
-    filter: drop-shadow(0 0 0.64rem rgba(220, 188, 108, 0.25)) drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.12)) brightness(1);
+    filter: drop-shadow(0 0 0.34rem rgba(220, 188, 108, 0.1)) drop-shadow(0 0 0.1rem rgba(247, 247, 242, 0.06)) brightness(0.96);
   }
   100% {
     opacity: 0.8;
-    filter: drop-shadow(0 0 0.7rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.14)) brightness(1.03);
+    filter: drop-shadow(0 0 0.38rem rgba(220, 188, 108, 0.12)) drop-shadow(0 0 0.1rem rgba(247, 247, 242, 0.08)) brightness(0.98);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -903,20 +903,19 @@ body {
   0%,
   18% {
     opacity: 0;
-    filter: drop-shadow(0 0 0.14rem rgba(220, 188, 108, 0.1)) brightness(0.9) blur(0.03px);
+    filter: drop-shadow(0 0 0.08rem rgba(220, 188, 108, 0.06)) brightness(0.86) blur(0.03px);
     transform: translate3d(0, 0, 0) scale(0.985);
   }
   48% {
-    opacity: 0.74;
-    filter: drop-shadow(0 0 0.32rem rgba(220, 188, 108, 0.2)) brightness(1.18) blur(0.03px);
+    opacity: 0.38;
+    filter: drop-shadow(0 0 0.18rem rgba(220, 188, 108, 0.1)) brightness(1.04) blur(0.03px);
   }
   100% {
-    opacity: 0.6;
-    filter: drop-shadow(0 0 0.26rem rgba(220, 188, 108, 0.17)) brightness(1.04) blur(0.03px);
+    opacity: 0.28;
+    filter: drop-shadow(0 0 0.14rem rgba(220, 188, 108, 0.08)) brightness(0.98) blur(0.03px);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
-
 @keyframes archiveSectorDrift {
   0%,
   12% {
@@ -1144,7 +1143,7 @@ body {
   }
 
   .home-archive-awakening::before {
-    opacity: 0.6;
+    opacity: 0.28;
   }
 
   .home-archive-awakening::after {
