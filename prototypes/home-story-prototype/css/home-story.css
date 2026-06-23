@@ -293,8 +293,8 @@ body {
   transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   animation:
     archiveAccessRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreOuterIgnition 3.1s var(--ease-breath) 16.55s forwards,
-    archiveCoreOuterCirculation 12s linear 19.55s infinite;
+    archiveCoreOuterIgnition 2.25s var(--ease-breath) 16.38s forwards,
+    archiveCoreOuterCirculation 12s linear 18.63s infinite;
 }
 
 .home-archive-message--identity::after {
@@ -313,8 +313,8 @@ body {
   transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   animation:
     archiveAccessCoreRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreInnerIgnition 2.9s var(--ease-breath) 16.65s forwards,
-    archiveCoreInnerCirculation 8.5s linear 19.45s infinite;
+    archiveCoreInnerIgnition 2.05s var(--ease-breath) 16.48s forwards,
+    archiveCoreInnerCirculation 8.5s linear 18.53s infinite;
 }
 
 .home-identity-text {
@@ -347,7 +347,7 @@ body {
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
     archiveIdentityMarkMorph 5.6s var(--ease-breath) 12.58s both,
-    archiveIdentityMarkReadySettle 0.95s var(--ease-breath) 19.85s forwards;
+    archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 18.72s forwards;
 }
 
 .home-identity-text--core,
@@ -365,7 +365,7 @@ body {
 }
 
 .home-identity-text--core {
-  animation: archiveCoreStatusForm 0.82s var(--ease-breath) 20.05s both;
+  animation: archiveCoreStatusForm 0.6s var(--ease-breath) 18.88s both;
 }
 
 .home-identity-text--ready {
@@ -373,7 +373,7 @@ body {
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveAccessReadyForm 0.78s var(--ease-breath) 20.38s both;
+  animation: archiveAccessReadyForm 0.56s var(--ease-breath) 19.14s both;
 }
 .home-archive-awakening {
   position: fixed;
