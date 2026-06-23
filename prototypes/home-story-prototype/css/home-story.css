@@ -371,16 +371,16 @@ body {
   z-index: -1;
   left: 50%;
   top: 50%;
-  width: clamp(5.75rem, calc(17vw + 1.85rem), 6.95rem);
+  width: clamp(5.95rem, calc(17.5vw + 1.95rem), 7.15rem);
   aspect-ratio: 1;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  background: conic-gradient(from 18deg, transparent 0deg 28deg, rgba(213, 54, 22, 0.32) 34deg, rgba(238, 126, 52, 0.48) 39deg, rgba(238, 217, 153, 0.22) 44deg, transparent 58deg 360deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 54%, #000 57% 62%, transparent 65%);
-  mask: radial-gradient(circle, transparent 0 54%, #000 57% 62%, transparent 65%);
+  background: conic-gradient(from 18deg, transparent 0deg 28deg, rgba(213, 54, 22, 0.48) 34deg, rgba(238, 126, 52, 0.68) 39deg, rgba(238, 217, 153, 0.34) 45deg, transparent 61deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 53%, #000 56% 64%, transparent 67%);
+  mask: radial-gradient(circle, transparent 0 53%, #000 56% 64%, transparent 67%);
   mix-blend-mode: screen;
-  filter: blur(0.018rem) drop-shadow(0 0 0.3rem rgba(213, 54, 22, 0.16));
+  filter: blur(0.018rem) drop-shadow(0 0 0.48rem rgba(213, 54, 22, 0.26));
   transform: translate3d(-50%, -50%, 0) rotate(-36deg) scale3d(0.96, 0.96, 1);
   transform-origin: center;
   animation: archiveEngageContainedCharge 6.8s linear 19.84s infinite;
@@ -839,7 +839,7 @@ body {
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
   56% {
-    opacity: 0.16;
+    opacity: 0.28;
     filter: blur(0.08rem) brightness(1.16);
     transform: translate3d(0, 0, 0) scale3d(0.38, 0.92, 1);
   }
@@ -929,18 +929,18 @@ body {
     transform: translate3d(-50%, -50%, 0) rotate(-36deg) scale3d(0.96, 0.96, 1);
   }
   8% {
-    opacity: 0.16;
-    filter: blur(0.018rem) drop-shadow(0 0 0.24rem rgba(213, 54, 22, 0.12));
+    opacity: 0.28;
+    filter: blur(0.018rem) drop-shadow(0 0 0.34rem rgba(213, 54, 22, 0.2));
     transform: translate3d(-50%, -50%, 0) rotate(18deg) scale3d(0.985, 0.985, 1);
   }
   16% {
-    opacity: 0.36;
-    filter: blur(0.014rem) drop-shadow(0 0 0.42rem rgba(238, 126, 52, 0.2));
+    opacity: 0.62;
+    filter: blur(0.014rem) drop-shadow(0 0 0.62rem rgba(238, 126, 52, 0.34));
     transform: translate3d(-50%, -50%, 0) rotate(142deg) scale3d(1.01, 1.01, 1);
   }
   27% {
-    opacity: 0.11;
-    filter: blur(0.02rem) drop-shadow(0 0 0.2rem rgba(213, 54, 22, 0.1));
+    opacity: 0.24;
+    filter: blur(0.02rem) drop-shadow(0 0 0.36rem rgba(213, 54, 22, 0.18));
     transform: translate3d(-50%, -50%, 0) rotate(246deg) scale3d(0.99, 0.99, 1);
   }
   36% {
@@ -1523,8 +1523,8 @@ body {
 
   .home-identity-text--engage::before {
     animation: none !important;
-    opacity: 0.16;
-    filter: blur(0.018rem) drop-shadow(0 0 0.28rem rgba(213, 54, 22, 0.12));
+    opacity: 0.26;
+    filter: blur(0.018rem) drop-shadow(0 0 0.44rem rgba(213, 54, 22, 0.22));
     transform: translate3d(-50%, -50%, 0) rotate(34deg) scale3d(1, 1, 1);
   }
 
