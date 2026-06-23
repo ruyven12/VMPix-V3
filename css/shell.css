@@ -196,8 +196,8 @@ button {
     0 0 0.46rem rgba(213, 22, 34, 0.32),
     0 0 1.1rem rgba(213, 22, 34, 0.16);
   animation:
-    archiveNodeType 0.9s steps(18, end) 5.9s both,
-    archiveNodePresence 3.7s linear 5.9s both;
+    archiveNodeType 0.9s steps(18, end) 5.75s both,
+    archiveNodePresence 3.7s linear 5.75s both;
 }
 
 .home-archive-message--decode {
