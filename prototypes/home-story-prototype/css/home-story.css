@@ -243,7 +243,7 @@ body {
 
 .home-archive-message--identity {
   --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
-  --home-access-control-size: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
+  --home-access-control-size: clamp(10rem, calc(34vw + 2.4rem), 12.25rem);
   position: relative;
   clip-path: none;
   width: var(--home-access-control-size);
@@ -278,7 +278,7 @@ body {
 
 .home-archive-message--identity::before {
   z-index: 0;
-  width: clamp(5.9rem, calc(23vw + 1.25rem), 7.35rem);
+  width: clamp(8.8rem, calc(28vw + 3rem), 10.75rem);
   aspect-ratio: 1;
   border: 1px solid rgba(238, 217, 153, 0.38);
   border-radius: 50%;
@@ -299,7 +299,7 @@ body {
 
 .home-archive-message--identity::after {
   z-index: 0;
-  width: clamp(4.3rem, calc(15vw + 1.25rem), 5.3rem);
+  width: clamp(6.9rem, calc(20vw + 2.4rem), 8.05rem);
   aspect-ratio: 1;
   border: 1px solid rgba(247, 247, 242, 0.18);
   border-radius: 50%;
@@ -354,7 +354,7 @@ body {
 .home-identity-text--engage {
   color: rgba(238, 217, 153, 0.94);
   font-family: var(--font-display);
-  font-size: clamp(1.04rem, calc(3.85vw + 0.15rem), 1.42rem);
+  font-size: clamp(1.2rem, calc(4.45vw + 0.16rem), 1.62rem);
   line-height: 1;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -884,34 +884,34 @@ body {
   0% {
     opacity: 0;
     filter: blur(0.06rem) brightness(0.9);
-    transform: translate3d(0, -0.42rem, 0) scale3d(0.92, 0.92, 1);
+    transform: translate3d(0, 0, 0) scale3d(0.9, 0.9, 1);
   }
   48% {
     opacity: 0.98;
     filter: blur(0.01rem) brightness(1.12);
-    transform: translate3d(0, -0.42rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 0, 0) scale3d(1.035, 1.035, 1);
   }
   100% {
     opacity: 0.94;
     filter: blur(0) brightness(1.05);
-    transform: translate3d(0, -0.42rem, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 }
 @keyframes archiveCoreStatusForm {
   0% {
     opacity: 0;
     filter: blur(0.05rem) brightness(0.92);
-    transform: translate3d(0, 2rem, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 5.45rem, 0) scale3d(0.96, 0.96, 1);
   }
   42% {
     opacity: 0.72;
     filter: blur(0.01rem) brightness(1.08);
-    transform: translate3d(0, 2.39rem, 0) scale3d(1.015, 1.015, 1);
+    transform: translate3d(0, 6.12rem, 0) scale3d(1.015, 1.015, 1);
   }
   100% {
     opacity: 0.68;
     filter: blur(0) brightness(1.02);
-    transform: translate3d(0, 2.35rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.05rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -919,17 +919,17 @@ body {
   0% {
     opacity: 0;
     filter: blur(0.06rem) brightness(0.9);
-    transform: translate3d(0, 2.64rem, 0) scale3d(0.95, 0.95, 1);
+    transform: translate3d(0, 6.22rem, 0) scale3d(0.95, 0.95, 1);
   }
   44% {
     opacity: 0.9;
     filter: blur(0.01rem) brightness(1.12);
-    transform: translate3d(0, 3.16rem, 0) scale3d(1.018, 1.018, 1);
+    transform: translate3d(0, 6.82rem, 0) scale3d(1.018, 1.018, 1);
   }
   100% {
     opacity: 0.82;
     filter: blur(0) brightness(1.05);
-    transform: translate3d(0, 3.12rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.78rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -942,20 +942,19 @@ body {
   24% {
     opacity: 0.64;
     filter: brightness(1.14);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.78, 0.78, 1);
   }
   48% {
     opacity: 0.48;
     filter: brightness(0.98);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.97, 0.97, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
   }
   100% {
     opacity: 0.54;
     filter: brightness(1);
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
   }
 }
-
 @keyframes archiveAccessCoreRingForm {
   0% {
     opacity: 0;
@@ -965,26 +964,24 @@ body {
   30% {
     opacity: 0.42;
     filter: brightness(1.13);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.05, 1.05, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1);
   }
   54% {
     opacity: 0.28;
     filter: brightness(0.98);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.93, 0.93, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.68, 0.68, 1);
   }
   100% {
     opacity: 0.34;
     filter: brightness(1);
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.68, 0.68, 1);
   }
 }
-
-
 @keyframes archiveCoreOuterIgnition {
   0% {
     opacity: 0.54;
     filter: brightness(1);
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
     box-shadow:
       inset 0 0 0.58rem rgba(238, 217, 153, 0.065),
       inset 0 0 1.2rem rgba(220, 188, 108, 0.035),
@@ -993,7 +990,7 @@ body {
   34% {
     opacity: 0.68;
     filter: brightness(1.16);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.035, 1.035, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.78, 0.78, 1);
     box-shadow:
       inset 0 0 0.8rem rgba(238, 217, 153, 0.1),
       inset 0 0 1.55rem rgba(220, 188, 108, 0.06),
@@ -1003,7 +1000,7 @@ body {
   68% {
     opacity: 0.58;
     filter: brightness(1.04);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.995, 0.995, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.74, 0.74, 1);
     box-shadow:
       inset 0 0 0.66rem rgba(238, 217, 153, 0.08),
       inset 0 0 1.28rem rgba(220, 188, 108, 0.045),
@@ -1012,7 +1009,7 @@ body {
   100% {
     opacity: 0.62;
     filter: brightness(1.08);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.012, 1.012, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1);
     box-shadow:
       inset 0 0 0.72rem rgba(238, 217, 153, 0.088),
       inset 0 0 1.42rem rgba(220, 188, 108, 0.052),
@@ -1020,12 +1017,16 @@ body {
       0 0 1.85rem rgba(238, 217, 153, 0.055);
   }
 }
-
 @keyframes archiveCoreOuterCirculation {
   0% {
     opacity: 0.62;
     filter: brightness(1.06);
-    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(1.012, 1.012, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.76, 0.76, 1);
+  }
+  8% {
+    opacity: 0.64;
+    filter: brightness(1.1);
+    transform: translate3d(-50%, -50%, 0) rotate(29deg) scale3d(1.012, 1.012, 1);
   }
   50% {
     opacity: 0.66;
@@ -1038,12 +1039,11 @@ body {
     transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(1.012, 1.012, 1);
   }
 }
-
 @keyframes archiveCoreInnerIgnition {
   0% {
     opacity: 0.34;
     filter: brightness(1);
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.68, 0.68, 1);
     box-shadow:
       inset 0 0 0.5rem rgba(247, 247, 242, 0.04),
       0 0 0.64rem rgba(238, 217, 153, 0.12);
@@ -1051,7 +1051,7 @@ body {
   38% {
     opacity: 0.57;
     filter: brightness(1.2);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.045, 1.045, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1);
     box-shadow:
       inset 0 0 0.68rem rgba(247, 247, 242, 0.066),
       inset 0 0 1.2rem rgba(238, 217, 153, 0.061),
@@ -1061,7 +1061,7 @@ body {
   72% {
     opacity: 0.44;
     filter: brightness(1.08);
-    transform: translate3d(-50%, -50%, 0) scale3d(0.99, 0.99, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.69, 0.69, 1);
     box-shadow:
       inset 0 0 0.56rem rgba(247, 247, 242, 0.055),
       0 0 0.78rem rgba(238, 217, 153, 0.154);
@@ -1069,7 +1069,7 @@ body {
   100% {
     opacity: 0.51;
     filter: brightness(1.13);
-    transform: translate3d(-50%, -50%, 0) scale3d(1.018, 1.018, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
     box-shadow:
       inset 0 0 0.62rem rgba(247, 247, 242, 0.061),
       inset 0 0 1.05rem rgba(238, 217, 153, 0.05),
@@ -1077,12 +1077,16 @@ body {
       0 0 1.32rem rgba(220, 188, 108, 0.072);
   }
 }
-
 @keyframes archiveCoreInnerCirculation {
   0% {
     opacity: 0.51;
     filter: brightness(1.11);
-    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(1.018, 1.018, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.72, 0.72, 1);
+  }
+  12% {
+    opacity: 0.53;
+    filter: brightness(1.15);
+    transform: translate3d(-50%, -50%, 0) rotate(-43deg) scale3d(1.018, 1.018, 1);
   }
   50% {
     opacity: 0.55;
@@ -1095,7 +1099,6 @@ body {
     transform: translate3d(-50%, -50%, 0) rotate(-360deg) scale3d(1.018, 1.018, 1);
   }
 }
-
 @keyframes archiveAwakeningPulse {
   0% {
     opacity: 0;
@@ -1463,18 +1466,18 @@ body {
   .home-identity-text--engage {
     opacity: 0.94;
     filter: brightness(1.05);
-    transform: translate3d(0, -0.42rem, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
   .home-identity-text--core {
     opacity: 0.68;
     filter: brightness(1.02);
-    transform: translate3d(0, 2.35rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.05rem, 0) scale3d(1, 1, 1);
   }
 
   .home-identity-text--ready {
     opacity: 0.82;
     filter: brightness(1.05);
-    transform: translate3d(0, 3.12rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.78rem, 0) scale3d(1, 1, 1);
   }
 }
