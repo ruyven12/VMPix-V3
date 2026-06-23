@@ -315,7 +315,22 @@ button {
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
     archiveIdentityMarkMorph 5.6s var(--ease-breath) 12.58s both,
-    archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 18.72s forwards;
+    archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 18.72s forwards,
+    archiveIdentityMarkEngageDissolve 0.52s var(--ease-breath) 19.3s forwards;
+}
+
+.home-identity-text--engage {
+  color: rgba(238, 217, 153, 0.94);
+  font-family: var(--font-display);
+  font-size: clamp(1.04rem, calc(3.85vw + 0.15rem), 1.42rem);
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    0 0 0.48rem rgba(238, 217, 153, 0.28),
+    0 0 1.12rem rgba(220, 188, 108, 0.16);
+  animation: archiveEngageCommandForm 0.58s var(--ease-breath) 19.34s both;
 }
 
 .home-identity-text--core,
@@ -1274,6 +1289,36 @@ button {
   }
 }
 
+@keyframes archiveIdentityMarkEngageDissolve {
+  0% {
+    opacity: 0.9;
+    filter: blur(0) brightness(1.05);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.86, 0.86, 1);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(0.055rem) brightness(0.92);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.82, 0.82, 1);
+  }
+}
+
+@keyframes archiveEngageCommandForm {
+  0% {
+    opacity: 0;
+    filter: blur(0.06rem) brightness(0.9);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.88, 0.88, 1);
+  }
+  48% {
+    opacity: 0.98;
+    filter: blur(0.01rem) brightness(1.12);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.94, 0.94, 1);
+  }
+  100% {
+    opacity: 0.94;
+    filter: blur(0) brightness(1.05);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.9, 0.9, 1);
+  }
+}
 @keyframes archiveCoreStatusForm {
   0% {
     opacity: 0;
@@ -2863,9 +2908,15 @@ button {
   }
 
   .home-identity-text--mark {
-    opacity: 0.9;
+    opacity: 0;
+    filter: brightness(0.92);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.82, 0.82, 1);
+  }
+
+  .home-identity-text--engage {
+    opacity: 0.94;
     filter: brightness(1.05);
-    transform: translate3d(0, -0.68rem, 0) scale3d(0.86, 0.86, 1);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.9, 0.9, 1);
   }
 
   .home-identity-text--core {
