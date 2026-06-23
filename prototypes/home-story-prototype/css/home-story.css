@@ -354,14 +354,14 @@ body {
   transform: translate3d(0, 0, 0) scale(0.985);
   transform-origin: 50% 50%;
   background:
-    radial-gradient(circle at 27% 33%, rgba(238, 217, 153, 0.52) 0 1.15px, rgba(238, 217, 153, 0.2) 1.25px 3px, transparent 4.2px),
-    radial-gradient(circle at 43% 25%, rgba(247, 247, 242, 0.44) 0 1px, rgba(220, 188, 108, 0.18) 1.15px 2.7px, transparent 4px),
-    radial-gradient(circle at 62% 33%, rgba(238, 217, 153, 0.48) 0 1.2px, rgba(238, 217, 153, 0.17) 1.35px 3.1px, transparent 4.4px),
-    radial-gradient(circle at 74% 49%, rgba(247, 247, 242, 0.4) 0 0.95px, rgba(220, 188, 108, 0.16) 1.1px 2.6px, transparent 3.9px),
-    radial-gradient(circle at 59% 67%, rgba(238, 217, 153, 0.46) 0 1.1px, rgba(238, 217, 153, 0.16) 1.25px 2.95px, transparent 4.15px),
-    radial-gradient(circle at 37% 69%, rgba(247, 247, 242, 0.38) 0 1px, rgba(220, 188, 108, 0.14) 1.15px 2.7px, transparent 3.95px),
-    radial-gradient(circle at 22% 54%, rgba(238, 217, 153, 0.4) 0 1px, rgba(238, 217, 153, 0.14) 1.15px 2.65px, transparent 3.9px);
-  filter: drop-shadow(0 0 0.42rem rgba(220, 188, 108, 0.16));
+    radial-gradient(circle at 27% 33%, rgba(238, 217, 153, 0.76) 0 1.2px, rgba(238, 217, 153, 0.34) 1.32px 3.35px, transparent 4.75px),
+    radial-gradient(circle at 43% 25%, rgba(247, 247, 242, 0.68) 0 1.08px, rgba(220, 188, 108, 0.31) 1.22px 3.05px, transparent 4.45px),
+    radial-gradient(circle at 62% 33%, rgba(238, 217, 153, 0.72) 0 1.24px, rgba(238, 217, 153, 0.3) 1.4px 3.35px, transparent 4.85px),
+    radial-gradient(circle at 74% 49%, rgba(247, 247, 242, 0.62) 0 1.02px, rgba(220, 188, 108, 0.28) 1.16px 2.95px, transparent 4.35px),
+    radial-gradient(circle at 59% 67%, rgba(238, 217, 153, 0.7) 0 1.18px, rgba(238, 217, 153, 0.29) 1.32px 3.25px, transparent 4.65px),
+    radial-gradient(circle at 37% 69%, rgba(247, 247, 242, 0.58) 0 1.08px, rgba(220, 188, 108, 0.26) 1.22px 3px, transparent 4.35px),
+    radial-gradient(circle at 22% 54%, rgba(238, 217, 153, 0.62) 0 1.08px, rgba(238, 217, 153, 0.26) 1.22px 2.95px, transparent 4.3px);
+  filter: drop-shadow(0 0 0.68rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.16));
   will-change: opacity, transform, filter;
   animation: archiveAwakeningNodes 3.2s var(--ease-breath) 19.75s both;
 }
@@ -383,13 +383,13 @@ body {
 .home-archive-awakening::before {
   inset: 0;
   background:
-    linear-gradient(154deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.16) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 27% 25% / 17% 8% no-repeat,
-    linear-gradient(25deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.14) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 43% 25% / 20% 10% no-repeat,
-    linear-gradient(49deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.14) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 61% 33% / 14% 17% no-repeat,
-    linear-gradient(174deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.12) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 37% 65% / 23% 8% no-repeat,
-    linear-gradient(45deg, transparent calc(50% - 0.55px), rgba(220, 188, 108, 0.13) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 21% 53% / 18% 17% no-repeat,
-    linear-gradient(132deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.12) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 58% 49% / 17% 20% no-repeat;
-  filter: blur(0.04px);
+    linear-gradient(154deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.3) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 27% 25% / 17% 8% no-repeat,
+    linear-gradient(25deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.26) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 43% 25% / 20% 10% no-repeat,
+    linear-gradient(49deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.27) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 61% 33% / 14% 17% no-repeat,
+    linear-gradient(174deg, transparent calc(50% - 0.55px), rgba(247, 247, 242, 0.24) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 37% 65% / 23% 8% no-repeat,
+    linear-gradient(45deg, transparent calc(50% - 0.55px), rgba(220, 188, 108, 0.25) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 21% 53% / 18% 17% no-repeat,
+    linear-gradient(132deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.24) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 58% 49% / 17% 20% no-repeat;
+  filter: drop-shadow(0 0 0.28rem rgba(220, 188, 108, 0.18)) blur(0.03px);
   transform: translate3d(0, 0, 0) scale(0.985);
   animation: archiveAwakeningLines 2.65s var(--ease-breath) 20.25s both;
 }
@@ -397,14 +397,14 @@ body {
 .home-archive-awakening::after {
   top: 50%;
   left: 50%;
-  width: min(72vw, 26rem);
+  width: min(78vw, 29rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle, transparent 0 42%, rgba(238, 217, 153, 0.24) 43%, rgba(220, 188, 108, 0.12) 45%, transparent 48%),
-    radial-gradient(circle, transparent 0 64%, rgba(247, 247, 242, 0.12) 65%, transparent 69%);
-  filter: brightness(1.08) blur(0.08px);
-  transform: translate3d(-50%, -50%, 0) scale(0.08);
+    radial-gradient(circle, transparent 0 40%, rgba(238, 217, 153, 0.42) 42%, rgba(220, 188, 108, 0.24) 45%, transparent 50%),
+    radial-gradient(circle, transparent 0 62%, rgba(247, 247, 242, 0.24) 64%, transparent 70%);
+  filter: brightness(1.22) blur(0.06px);
+  transform: translate3d(-50%, -50%, 0) scale(0.1);
   animation: archiveAwakeningPulse 2.3s var(--ease-breath) 19.35s both;
 }
 
@@ -605,23 +605,23 @@ body {
 @keyframes archiveAwakeningPulse {
   0% {
     opacity: 0;
-    filter: brightness(0.86) blur(0.08px);
-    transform: translate3d(-50%, -50%, 0) scale(0.08);
+    filter: brightness(0.92) blur(0.06px);
+    transform: translate3d(-50%, -50%, 0) scale(0.1);
   }
   18% {
-    opacity: 0.34;
-    filter: brightness(1.16) blur(0.06px);
-    transform: translate3d(-50%, -50%, 0) scale(0.34);
+    opacity: 0.56;
+    filter: brightness(1.28) blur(0.04px);
+    transform: translate3d(-50%, -50%, 0) scale(0.42);
   }
   72% {
-    opacity: 0.14;
-    filter: brightness(1.04) blur(0.08px);
-    transform: translate3d(-50%, -50%, 0) scale(1.36);
+    opacity: 0.3;
+    filter: brightness(1.14) blur(0.06px);
+    transform: translate3d(-50%, -50%, 0) scale(1.52);
   }
   100% {
     opacity: 0;
-    filter: brightness(0.95) blur(0.1px);
-    transform: translate3d(-50%, -50%, 0) scale(1.9);
+    filter: brightness(1) blur(0.08px);
+    transform: translate3d(-50%, -50%, 0) scale(2.12);
   }
 }
 
@@ -629,21 +629,21 @@ body {
   0%,
   12% {
     opacity: 0;
-    filter: drop-shadow(0 0 0 rgba(220, 188, 108, 0)) brightness(0.82);
+    filter: drop-shadow(0 0 0 rgba(220, 188, 108, 0)) brightness(0.88);
     transform: translate3d(0, 0, 0) scale(0.985);
   }
   34% {
-    opacity: 0.58;
-    filter: drop-shadow(0 0 0.48rem rgba(220, 188, 108, 0.18)) brightness(1.12);
+    opacity: 0.78;
+    filter: drop-shadow(0 0 0.78rem rgba(220, 188, 108, 0.32)) drop-shadow(0 0 0.22rem rgba(247, 247, 242, 0.18)) brightness(1.18);
     transform: translate3d(0, 0, 0) scale(1);
   }
   58% {
-    opacity: 0.44;
-    filter: drop-shadow(0 0 0.38rem rgba(220, 188, 108, 0.14)) brightness(0.98);
+    opacity: 0.63;
+    filter: drop-shadow(0 0 0.64rem rgba(220, 188, 108, 0.25)) drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.12)) brightness(1);
   }
   100% {
-    opacity: 0.62;
-    filter: drop-shadow(0 0 0.42rem rgba(220, 188, 108, 0.16)) brightness(1);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 0.7rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.14)) brightness(1.03);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -652,16 +652,16 @@ body {
   0%,
   18% {
     opacity: 0;
-    filter: brightness(0.82) blur(0.04px);
+    filter: drop-shadow(0 0 0.14rem rgba(220, 188, 108, 0.1)) brightness(0.9) blur(0.03px);
     transform: translate3d(0, 0, 0) scale(0.985);
   }
   48% {
-    opacity: 0.56;
-    filter: brightness(1.12) blur(0.04px);
+    opacity: 0.74;
+    filter: drop-shadow(0 0 0.32rem rgba(220, 188, 108, 0.2)) brightness(1.18) blur(0.03px);
   }
   100% {
-    opacity: 0.44;
-    filter: brightness(1) blur(0.04px);
+    opacity: 0.6;
+    filter: drop-shadow(0 0 0.26rem rgba(220, 188, 108, 0.17)) brightness(1.04) blur(0.03px);
     transform: translate3d(0, 0, 0) scale(1);
   }
 }
@@ -824,11 +824,11 @@ body {
   }
 
   .home-archive-awakening {
-    opacity: 0.58;
+    opacity: 0.76;
   }
 
   .home-archive-awakening::before {
-    opacity: 0.44;
+    opacity: 0.6;
   }
 
   .home-archive-awakening::after {
