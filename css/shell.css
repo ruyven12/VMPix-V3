@@ -390,7 +390,7 @@ button {
   transform: translate3d(-50%, -50%, 0) scale(0.88);
   transform-origin: center;
   will-change: transform, opacity, filter;
-  animation: archiveSectorDrift 4.8s var(--ease-breath) var(--sector-delay) both;
+  animation: archiveSectorDrift 2.1s var(--ease-breath) var(--sector-delay) both;
 }
 
 .home-archive-sector::before,
@@ -406,23 +406,50 @@ button {
 }
 
 .home-archive-sector::before {
+  z-index: 1;
   background: var(--sector-nodes);
   filter: drop-shadow(0 0 0.62rem rgba(220, 188, 108, 0.31)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.18));
-  animation: archiveSectorNodesReveal 4.1s var(--ease-breath) var(--sector-delay) both;
+  animation: archiveSectorNodesReveal 1.28s var(--ease-breath) var(--sector-delay) both;
 }
 
 .home-archive-sector::after {
+  z-index: 3;
   background: var(--sector-lines);
   filter: drop-shadow(0 0 0.3rem rgba(220, 188, 108, 0.2)) blur(0.02px);
   transform: scale(0.98);
-  animation: archiveSectorLinesReveal 3.55s var(--ease-breath) calc(var(--sector-delay) + 0.48s) both;
+  animation: archiveSectorLinesReveal 1.18s var(--ease-breath) calc(var(--sector-delay) + 0.14s) both;
 }
 
+.home-archive-world {
+  position: absolute;
+  left: var(--world-x, 50%);
+  top: var(--world-y, 50%);
+  z-index: 2;
+  width: var(--world-size, clamp(0.58rem, 1.5vw, 0.9rem));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: var(--world-surface, radial-gradient(circle at 34% 28%, rgba(247, 247, 242, 0.8) 0 8%, rgba(238, 217, 153, 0.5) 9% 31%, rgba(109, 91, 45, 0.36) 48%, rgba(8, 7, 8, 0.22) 78%, transparent 100%));
+  box-shadow:
+    0 0 0.58rem rgba(220, 188, 108, 0.26),
+    0 0 0.18rem rgba(247, 247, 242, 0.18),
+    inset -0.12rem -0.15rem 0.26rem rgba(4, 4, 6, 0.72);
+  filter: brightness(1.02) saturate(0.92);
+  transform: translate3d(-50%, -50%, 0) scale(0.58);
+  transform-origin: center;
+  will-change: opacity, transform, filter;
+  animation: archiveWorldReveal 1.18s var(--ease-breath) calc(var(--sector-delay) + 0.08s) both;
+}
 .home-archive-sector--one {
-  --sector-x: 6%;
-  --sector-y: 18%;
-  --sector-size: clamp(9.5rem, 31vw, 18.5rem);
+  --sector-x: 50%;
+  --sector-y: 6%;
+  --sector-size: clamp(8rem, 24vw, 14.5rem);
   --sector-delay: 15.05s;
+  --world-x: 52%;
+  --world-y: 43%;
+  --world-size: clamp(0.62rem, 1.6vw, 0.95rem);
+  --world-surface: radial-gradient(circle at 36% 26%, rgba(247, 247, 242, 0.86) 0 8%, rgba(238, 217, 153, 0.55) 9% 30%, rgba(95, 80, 42, 0.36) 50%, rgba(6, 6, 8, 0.22) 79%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 17% 31%, rgba(238, 217, 153, 0.78) 0 1.14px, rgba(238, 217, 153, 0.29) 1.28px 3.35px, transparent 4.7px),
     radial-gradient(circle at 36% 17%, rgba(247, 247, 242, 0.58) 0 0.95px, rgba(220, 188, 108, 0.22) 1.08px 2.7px, transparent 3.9px),
@@ -439,10 +466,14 @@ button {
 }
 
 .home-archive-sector--two {
-  --sector-x: 31%;
-  --sector-y: 7%;
-  --sector-size: clamp(7.5rem, 22vw, 13rem);
+  --sector-x: 77%;
+  --sector-y: 15%;
+  --sector-size: clamp(8.8rem, 27vw, 16.5rem);
   --sector-delay: 15.18s;
+  --world-x: 58%;
+  --world-y: 45%;
+  --world-size: clamp(0.58rem, 1.45vw, 0.86rem);
+  --world-surface: radial-gradient(circle at 32% 30%, rgba(245, 237, 205, 0.78) 0 7%, rgba(220, 188, 108, 0.48) 8% 29%, rgba(70, 87, 91, 0.24) 49%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 20% 69%, rgba(238, 217, 153, 0.55) 0 0.92px, rgba(238, 217, 153, 0.2) 1.04px 2.55px, transparent 3.8px),
     radial-gradient(circle at 33% 34%, rgba(247, 247, 242, 0.68) 0 1.04px, rgba(220, 188, 108, 0.25) 1.16px 2.95px, transparent 4.2px),
@@ -457,10 +488,14 @@ button {
 }
 
 .home-archive-sector--three {
-  --sector-x: 69%;
-  --sector-y: 11%;
-  --sector-size: clamp(8.8rem, 26vw, 16.25rem);
-  --sector-delay: 15.32s;
+  --sector-x: 96%;
+  --sector-y: 43%;
+  --sector-size: clamp(9.4rem, 30vw, 18rem);
+  --sector-delay: 15.31s;
+  --world-x: 47%;
+  --world-y: 52%;
+  --world-size: clamp(0.66rem, 1.7vw, 1rem);
+  --world-surface: radial-gradient(circle at 38% 24%, rgba(247, 247, 242, 0.84) 0 8%, rgba(238, 217, 153, 0.52) 9% 28%, rgba(112, 78, 47, 0.32) 48%, rgba(6, 6, 8, 0.24) 78%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 15% 42%, rgba(247, 247, 242, 0.5) 0 0.88px, rgba(220, 188, 108, 0.17) 1px 2.35px, transparent 3.6px),
     radial-gradient(circle at 31% 21%, rgba(238, 217, 153, 0.62) 0 1px, rgba(238, 217, 153, 0.22) 1.14px 2.8px, transparent 4.05px),
@@ -478,10 +513,14 @@ button {
 }
 
 .home-archive-sector--four {
-  --sector-x: 94%;
-  --sector-y: 36%;
-  --sector-size: clamp(9.2rem, 30vw, 18rem);
-  --sector-delay: 15.48s;
+  --sector-x: 84%;
+  --sector-y: 78%;
+  --sector-size: clamp(9.2rem, 29vw, 17.5rem);
+  --sector-delay: 15.44s;
+  --world-x: 46%;
+  --world-y: 43%;
+  --world-size: clamp(0.6rem, 1.55vw, 0.92rem);
+  --world-surface: radial-gradient(circle at 34% 32%, rgba(247, 247, 242, 0.8) 0 7%, rgba(220, 188, 108, 0.5) 8% 30%, rgba(72, 91, 77, 0.25) 51%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 15% 20%, rgba(238, 217, 153, 0.66) 0 1.05px, rgba(238, 217, 153, 0.24) 1.18px 2.95px, transparent 4.2px),
     radial-gradient(circle at 29% 48%, rgba(247, 247, 242, 0.48) 0 0.86px, rgba(220, 188, 108, 0.16) 0.98px 2.35px, transparent 3.55px),
@@ -498,10 +537,14 @@ button {
 }
 
 .home-archive-sector--five {
-  --sector-x: 86%;
-  --sector-y: 76%;
-  --sector-size: clamp(9rem, 29vw, 17.5rem);
-  --sector-delay: 15.7s;
+  --sector-x: 52%;
+  --sector-y: 94%;
+  --sector-size: clamp(8.2rem, 25vw, 15.5rem);
+  --sector-delay: 15.57s;
+  --world-x: 54%;
+  --world-y: 45%;
+  --world-size: clamp(0.64rem, 1.65vw, 0.98rem);
+  --world-surface: radial-gradient(circle at 34% 25%, rgba(248, 244, 222, 0.84) 0 8%, rgba(238, 217, 153, 0.48) 9% 31%, rgba(91, 72, 102, 0.22) 51%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 20% 20%, rgba(247, 247, 242, 0.52) 0 0.88px, rgba(220, 188, 108, 0.17) 1px 2.35px, transparent 3.6px),
     radial-gradient(circle at 44% 25%, rgba(238, 217, 153, 0.7) 0 1.08px, rgba(238, 217, 153, 0.25) 1.2px 3.05px, transparent 4.3px),
@@ -519,10 +562,14 @@ button {
 }
 
 .home-archive-sector--six {
-  --sector-x: 52%;
-  --sector-y: 92%;
-  --sector-size: clamp(7.8rem, 23vw, 14.25rem);
-  --sector-delay: 15.92s;
+  --sector-x: 18%;
+  --sector-y: 82%;
+  --sector-size: clamp(8.8rem, 28vw, 16.75rem);
+  --sector-delay: 15.7s;
+  --world-x: 47%;
+  --world-y: 47%;
+  --world-size: clamp(0.58rem, 1.5vw, 0.9rem);
+  --world-surface: radial-gradient(circle at 37% 28%, rgba(247, 247, 242, 0.76) 0 7%, rgba(238, 217, 153, 0.48) 8% 29%, rgba(87, 96, 65, 0.25) 50%, rgba(6, 6, 8, 0.25) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 18% 49%, rgba(238, 217, 153, 0.58) 0 0.98px, rgba(238, 217, 153, 0.21) 1.1px 2.65px, transparent 3.9px),
     radial-gradient(circle at 40% 22%, rgba(247, 247, 242, 0.54) 0 0.92px, rgba(220, 188, 108, 0.18) 1.04px 2.45px, transparent 3.7px),
@@ -537,10 +584,14 @@ button {
 }
 
 .home-archive-sector--seven {
-  --sector-x: 16%;
-  --sector-y: 82%;
-  --sector-size: clamp(8.6rem, 27vw, 16.5rem);
-  --sector-delay: 16.08s;
+  --sector-x: 4%;
+  --sector-y: 51%;
+  --sector-size: clamp(8.5rem, 26vw, 16rem);
+  --sector-delay: 15.83s;
+  --world-x: 52%;
+  --world-y: 55%;
+  --world-size: clamp(0.62rem, 1.55vw, 0.94rem);
+  --world-surface: radial-gradient(circle at 31% 30%, rgba(247, 247, 242, 0.82) 0 8%, rgba(220, 188, 108, 0.5) 9% 30%, rgba(96, 80, 45, 0.34) 50%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 18% 77%, rgba(247, 247, 242, 0.5) 0 0.9px, rgba(220, 188, 108, 0.17) 1.02px 2.4px, transparent 3.6px),
     radial-gradient(circle at 27% 45%, rgba(238, 217, 153, 0.56) 0 0.98px, rgba(238, 217, 153, 0.2) 1.1px 2.65px, transparent 3.9px),
@@ -557,10 +608,14 @@ button {
 }
 
 .home-archive-sector--eight {
-  --sector-x: 4%;
-  --sector-y: 53%;
-  --sector-size: clamp(8.1rem, 24vw, 15rem);
-  --sector-delay: 16.22s;
+  --sector-x: 18%;
+  --sector-y: 16%;
+  --sector-size: clamp(8.8rem, 28vw, 16.75rem);
+  --sector-delay: 15.96s;
+  --world-x: 47%;
+  --world-y: 42%;
+  --world-size: clamp(0.56rem, 1.45vw, 0.86rem);
+  --world-surface: radial-gradient(circle at 35% 27%, rgba(247, 247, 242, 0.8) 0 7%, rgba(238, 217, 153, 0.46) 8% 28%, rgba(66, 82, 96, 0.24) 50%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
     radial-gradient(circle at 35% 12%, rgba(247, 247, 242, 0.54) 0 0.92px, rgba(220, 188, 108, 0.18) 1.04px 2.45px, transparent 3.7px),
     radial-gradient(circle at 65% 28%, rgba(238, 217, 153, 0.68) 0 1.04px, rgba(238, 217, 153, 0.24) 1.16px 2.9px, transparent 4.1px),
@@ -1203,13 +1258,13 @@ button {
     transform: scale(0.96);
   }
   42% {
-    opacity: 0.82;
-    filter: drop-shadow(0 0 0.64rem rgba(220, 188, 108, 0.34)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.2)) brightness(1.18);
+    opacity: 0.86;
+    filter: drop-shadow(0 0 0.68rem rgba(220, 188, 108, 0.36)) drop-shadow(0 0 0.19rem rgba(247, 247, 242, 0.22)) brightness(1.2);
     transform: scale(1);
   }
   100% {
-    opacity: 0.68;
-    filter: drop-shadow(0 0 0.56rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.15rem rgba(247, 247, 242, 0.16)) brightness(1.04);
+    opacity: 0.72;
+    filter: drop-shadow(0 0 0.6rem rgba(220, 188, 108, 0.3)) drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.17)) brightness(1.05);
     transform: scale(1);
   }
 }
@@ -1222,16 +1277,34 @@ button {
     transform: scale(0.98);
   }
   55% {
-    opacity: 0.58;
-    filter: drop-shadow(0 0 0.31rem rgba(220, 188, 108, 0.21)) brightness(1.16) blur(0.02px);
+    opacity: 0.62;
+    filter: drop-shadow(0 0 0.34rem rgba(220, 188, 108, 0.23)) brightness(1.18) blur(0.02px);
   }
   100% {
-    opacity: 0.44;
-    filter: drop-shadow(0 0 0.25rem rgba(220, 188, 108, 0.18)) brightness(1.04) blur(0.02px);
+    opacity: 0.48;
+    filter: drop-shadow(0 0 0.28rem rgba(220, 188, 108, 0.2)) brightness(1.06) blur(0.02px);
     transform: scale(1);
   }
 }
 
+@keyframes archiveWorldReveal {
+  0%,
+  14% {
+    opacity: 0;
+    filter: brightness(0.86) saturate(0.82);
+    transform: translate3d(-50%, -50%, 0) scale(0.58);
+  }
+  48% {
+    opacity: 0.8;
+    filter: brightness(1.16) saturate(0.96);
+    transform: translate3d(-50%, -50%, 0) scale(1.05);
+  }
+  100% {
+    opacity: 0.66;
+    filter: brightness(1.03) saturate(0.9);
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+}
 @keyframes archiveNodeReducedPresence {
   0%,
   78%,
@@ -2342,17 +2415,23 @@ button {
   }
 
   .home-archive-sector::before,
-  .home-archive-sector::after {
+  .home-archive-sector::after,
+  .home-archive-world {
     animation: none !important;
     transform: none;
   }
 
   .home-archive-sector::before {
-    opacity: 0.68;
+    opacity: 0.72;
   }
 
   .home-archive-sector::after {
-    opacity: 0.44;
+    opacity: 0.48;
+  }
+
+  .home-archive-world {
+    opacity: 0.66;
+    transform: translate3d(-50%, -50%, 0) scale(1);
   }
   .home-archive-message {
     clip-path: inset(0 0 0 0);
