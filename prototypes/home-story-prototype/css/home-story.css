@@ -293,8 +293,8 @@ body {
   transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   animation:
     archiveAccessRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreOuterIgnition 3.75s var(--ease-breath) 17.45s forwards,
-    archiveCoreOuterCirculation 12s linear 20.75s infinite;
+    archiveCoreOuterIgnition 3.1s var(--ease-breath) 16.55s forwards,
+    archiveCoreOuterCirculation 12s linear 19.55s infinite;
 }
 
 .home-archive-message--identity::after {
@@ -313,8 +313,8 @@ body {
   transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   animation:
     archiveAccessCoreRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreInnerIgnition 3.45s var(--ease-breath) 17.55s forwards,
-    archiveCoreInnerCirculation 8.5s linear 20.65s infinite;
+    archiveCoreInnerIgnition 2.9s var(--ease-breath) 16.65s forwards,
+    archiveCoreInnerCirculation 8.5s linear 19.45s infinite;
 }
 
 .home-identity-text {
@@ -347,7 +347,7 @@ body {
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
     archiveIdentityMarkMorph 5.6s var(--ease-breath) 12.58s both,
-    archiveIdentityMarkReadySettle 1.15s var(--ease-breath) 21.35s forwards;
+    archiveIdentityMarkReadySettle 0.95s var(--ease-breath) 19.85s forwards;
 }
 
 .home-identity-text--core,
@@ -365,7 +365,7 @@ body {
 }
 
 .home-identity-text--core {
-  animation: archiveCoreStatusForm 1.05s var(--ease-breath) 21.62s both;
+  animation: archiveCoreStatusForm 0.82s var(--ease-breath) 20.05s both;
 }
 
 .home-identity-text--ready {
@@ -373,7 +373,7 @@ body {
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveAccessReadyForm 1s var(--ease-breath) 22.1s both;
+  animation: archiveAccessReadyForm 0.78s var(--ease-breath) 20.38s both;
 }
 .home-archive-awakening {
   position: fixed;
@@ -439,11 +439,11 @@ body {
     radial-gradient(circle, transparent 0 62%, rgba(247, 247, 242, 0.24) 64%, transparent 70%);
   filter: brightness(1.22) blur(0.06px);
   transform: translate3d(-50%, -50%, 0) scale(0.1);
-  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 13.82s both;
+  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 13.72s both;
 }
 
 .home-archive-sector {
-  --sector-delay: 15.1s;
+  --sector-delay: 14.5s;
   --sector-size: clamp(8.5rem, 26vw, 16rem);
   position: absolute;
   left: var(--sector-x);
@@ -510,7 +510,7 @@ body {
   --sector-x: 50%;
   --sector-y: 6%;
   --sector-size: clamp(8rem, 24vw, 14.5rem);
-  --sector-delay: 14.02s;
+  --sector-delay: 13.94s;
   --world-x: 52%;
   --world-y: 43%;
   --world-size: clamp(0.68rem, 1.75vw, 1.04rem);
@@ -534,7 +534,7 @@ body {
   --sector-x: 77%;
   --sector-y: 15%;
   --sector-size: clamp(8.8rem, 27vw, 16.5rem);
-  --sector-delay: 14.22s;
+  --sector-delay: 14.1s;
   --world-x: 58%;
   --world-y: 45%;
   --world-size: clamp(0.64rem, 1.58vw, 0.94rem);
@@ -556,7 +556,7 @@ body {
   --sector-x: 96%;
   --sector-y: 43%;
   --sector-size: clamp(9.4rem, 30vw, 18rem);
-  --sector-delay: 14.42s;
+  --sector-delay: 14.26s;
   --world-x: 47%;
   --world-y: 52%;
   --world-size: clamp(0.72rem, 1.85vw, 1.1rem);
@@ -581,7 +581,7 @@ body {
   --sector-x: 84%;
   --sector-y: 78%;
   --sector-size: clamp(9.2rem, 29vw, 17.5rem);
-  --sector-delay: 14.62s;
+  --sector-delay: 14.42s;
   --world-x: 46%;
   --world-y: 43%;
   --world-size: clamp(0.66rem, 1.7vw, 1rem);
@@ -605,7 +605,7 @@ body {
   --sector-x: 52%;
   --sector-y: 94%;
   --sector-size: clamp(8.2rem, 25vw, 15.5rem);
-  --sector-delay: 14.82s;
+  --sector-delay: 14.58s;
   --world-x: 54%;
   --world-y: 45%;
   --world-size: clamp(0.7rem, 1.8vw, 1.08rem);
@@ -630,7 +630,7 @@ body {
   --sector-x: 18%;
   --sector-y: 82%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 15.02s;
+  --sector-delay: 14.74s;
   --world-x: 47%;
   --world-y: 47%;
   --world-size: clamp(0.64rem, 1.64vw, 0.98rem);
@@ -652,7 +652,7 @@ body {
   --sector-x: 4%;
   --sector-y: 51%;
   --sector-size: clamp(8.5rem, 26vw, 16rem);
-  --sector-delay: 15.22s;
+  --sector-delay: 14.9s;
   --world-x: 52%;
   --world-y: 55%;
   --world-size: clamp(0.68rem, 1.7vw, 1.03rem);
@@ -676,7 +676,7 @@ body {
   --sector-x: 18%;
   --sector-y: 16%;
   --sector-size: clamp(8.8rem, 28vw, 16.75rem);
-  --sector-delay: 15.42s;
+  --sector-delay: 15.06s;
   --world-x: 47%;
   --world-y: 42%;
   --world-size: clamp(0.62rem, 1.58vw, 0.94rem);
@@ -856,17 +856,17 @@ body {
   0% {
     opacity: 0;
     filter: blur(0.05rem) brightness(0.92);
-    transform: translate3d(0, 0.24rem, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 5.12rem, 0) scale3d(0.96, 0.96, 1);
   }
   42% {
     opacity: 0.72;
     filter: blur(0.01rem) brightness(1.08);
-    transform: translate3d(0, 0.58rem, 0) scale3d(1.015, 1.015, 1);
+    transform: translate3d(0, 5.76rem, 0) scale3d(1.015, 1.015, 1);
   }
   100% {
     opacity: 0.68;
     filter: blur(0) brightness(1.02);
-    transform: translate3d(0, 0.64rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 5.72rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -874,17 +874,17 @@ body {
   0% {
     opacity: 0;
     filter: blur(0.06rem) brightness(0.9);
-    transform: translate3d(0, 0.88rem, 0) scale3d(0.95, 0.95, 1);
+    transform: translate3d(0, 5.88rem, 0) scale3d(0.95, 0.95, 1);
   }
   44% {
     opacity: 0.9;
     filter: blur(0.01rem) brightness(1.12);
-    transform: translate3d(0, 1.38rem, 0) scale3d(1.018, 1.018, 1);
+    transform: translate3d(0, 6.54rem, 0) scale3d(1.018, 1.018, 1);
   }
   100% {
     opacity: 0.82;
     filter: blur(0) brightness(1.05);
-    transform: translate3d(0, 1.42rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.5rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -1418,12 +1418,12 @@ body {
   .home-identity-text--core {
     opacity: 0.68;
     filter: brightness(1.02);
-    transform: translate3d(0, 0.64rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 5.72rem, 0) scale3d(1, 1, 1);
   }
 
   .home-identity-text--ready {
     opacity: 0.82;
     filter: brightness(1.05);
-    transform: translate3d(0, 1.42rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 6.5rem, 0) scale3d(1, 1, 1);
   }
 }
