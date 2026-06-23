@@ -313,7 +313,35 @@ button {
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
-  animation: archiveIdentityMarkMorph 5.6s var(--ease-breath) 13.62s both;
+  animation:
+    archiveIdentityMarkMorph 5.6s var(--ease-breath) 13.62s both,
+    archiveIdentityMarkReadySettle 1.3s var(--ease-breath) 23.25s forwards;
+}
+
+.home-identity-text--core,
+.home-identity-text--ready {
+  color: rgba(247, 247, 242, 0.76);
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    0 0 0.42rem rgba(238, 217, 153, 0.22),
+    0 0 1rem rgba(220, 188, 108, 0.12);
+}
+
+.home-identity-text--core {
+  animation: archiveCoreStatusForm 1.2s var(--ease-breath) 23.55s both;
+}
+
+.home-identity-text--ready {
+  color: rgba(238, 217, 153, 0.84);
+  text-shadow:
+    0 0 0.46rem rgba(238, 217, 153, 0.28),
+    0 0 1.12rem rgba(220, 188, 108, 0.16);
+  animation: archiveAccessReadyForm 1.15s var(--ease-breath) 24.25s both;
 }
 .home-archive-awakening {
   position: fixed;
@@ -635,8 +663,8 @@ button {
     linear-gradient(159deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 19% 45% / 30% 28% no-repeat;
 }
 .site-shell.is-home-route .home-frame {
-  visibility: hidden;
-  opacity: 0;
+  visibility: visible;
+  opacity: 1;
   pointer-events: none;
   border-color: transparent;
   background: transparent;
@@ -663,6 +691,105 @@ button {
   animation: none;
 }
 
+.site-shell.is-home-route .home-lockup {
+  min-height: 0;
+  gap: 0;
+  pointer-events: none;
+}
+
+.site-shell.is-home-route .title-group {
+  display: none;
+}
+
+.site-shell.is-home-route .start-portal {
+  visibility: visible;
+  width: auto;
+  min-width: 0;
+  aspect-ratio: auto;
+  overflow: visible;
+  border: 0;
+  border-radius: 999rem;
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 3.8rem, 0) scale3d(0.92, 0.92, 1);
+  animation: homeAccessPortalReady 1.15s var(--ease-breath) 24.95s both;
+}
+
+.site-shell.is-home-route .start-portal::before,
+.site-shell.is-home-route .start-portal::after {
+  visibility: visible;
+  pointer-events: none;
+  animation: none;
+}
+
+.site-shell.is-home-route .start-portal::before {
+  inset: -0.4rem;
+  border-color: rgba(238, 217, 153, 0.16);
+  background: transparent;
+  opacity: 0;
+  animation: homeAccessControlShellReady 1.15s var(--ease-breath) 24.95s both;
+}
+
+.site-shell.is-home-route .start-portal::after {
+  inset: -0.12rem;
+  border-color: rgba(247, 247, 242, 0.1);
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  animation: homeAccessControlInnerReady 1.15s var(--ease-breath) 25.08s both;
+}
+
+.site-shell.is-home-route .start-button {
+  visibility: visible;
+  width: min(72vw, 9rem);
+  max-width: calc(100vw - 2rem);
+  min-width: 7.15rem;
+  height: 2.35rem;
+  min-height: 2.35rem;
+  aspect-ratio: auto;
+  border-color: rgba(238, 217, 153, 0.42);
+  border-radius: 999rem;
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(247, 247, 242, 0.12), transparent 46%),
+    linear-gradient(90deg, rgba(238, 217, 153, 0.05), rgba(5, 5, 7, 0.86) 34% 66%, rgba(220, 188, 108, 0.06)),
+    rgba(3, 3, 6, 0.86);
+  box-shadow:
+    inset 0 0 0.82rem rgba(0, 0, 0, 0.76),
+    inset 0 0 0.5rem rgba(238, 217, 153, 0.045),
+    0 0 0.85rem rgba(220, 188, 108, 0.12),
+    0 0 1.55rem rgba(238, 217, 153, 0.045);
+  color: rgba(247, 247, 242, 0.86);
+  font-size: 0.68rem;
+  opacity: 0;
+  pointer-events: auto;
+  text-shadow: 0 0 0.38rem rgba(238, 217, 153, 0.2);
+  transform: translateZ(0) scale3d(0.94, 0.94, 1);
+  animation: homeAccessButtonReady 1.2s var(--ease-breath) 25.2s both;
+}
+
+.site-shell.is-home-route .start-button::before {
+  visibility: visible;
+  inset: 22% 12%;
+  background: linear-gradient(105deg, transparent 16%, rgba(238, 217, 153, 0.34) 50%, transparent 84%);
+  box-shadow: none;
+  opacity: 0;
+  transform: translate3d(-125%, 0, 0) rotate(8deg);
+  animation: homeAccessButtonSweep 1.15s var(--ease-breath) 25.45s both;
+}
+
+.site-shell.is-home-route .start-button::after {
+  visibility: visible;
+  inset: 0.28rem;
+  border: 1px solid rgba(238, 217, 153, 0.18);
+  background:
+    conic-gradient(from 24deg, transparent 0 72deg, rgba(238, 217, 153, 0.16) 73deg 74deg, transparent 75deg 236deg, rgba(247, 247, 242, 0.06) 237deg 238deg, transparent 239deg 360deg),
+    radial-gradient(ellipse, rgba(220, 188, 108, 0.08), transparent 62%);
+  box-shadow: none;
+  opacity: 0;
+  animation: homeAccessButtonCoreReady 1.2s var(--ease-breath) 25.32s both;
+}
 .site-shell[data-shell-module="music"] {
   --shell-nav-accent: var(--accent-music);
 }
@@ -1134,6 +1261,54 @@ button {
     transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
   }
 }
+@keyframes archiveIdentityMarkReadySettle {
+  0% {
+    opacity: 0.96;
+    filter: blur(0) brightness(1.02);
+    transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
+  }
+  100% {
+    opacity: 0.9;
+    filter: blur(0) brightness(1.05);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.86, 0.86, 1);
+  }
+}
+
+@keyframes archiveCoreStatusForm {
+  0% {
+    opacity: 0;
+    filter: blur(0.05rem) brightness(0.92);
+    transform: translate3d(0, 0.24rem, 0) scale3d(0.96, 0.96, 1);
+  }
+  42% {
+    opacity: 0.72;
+    filter: blur(0.01rem) brightness(1.08);
+    transform: translate3d(0, 0.58rem, 0) scale3d(1.015, 1.015, 1);
+  }
+  100% {
+    opacity: 0.68;
+    filter: blur(0) brightness(1.02);
+    transform: translate3d(0, 0.64rem, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes archiveAccessReadyForm {
+  0% {
+    opacity: 0;
+    filter: blur(0.06rem) brightness(0.9);
+    transform: translate3d(0, 0.88rem, 0) scale3d(0.95, 0.95, 1);
+  }
+  44% {
+    opacity: 0.9;
+    filter: blur(0.01rem) brightness(1.12);
+    transform: translate3d(0, 1.38rem, 0) scale3d(1.018, 1.018, 1);
+  }
+  100% {
+    opacity: 0.82;
+    filter: blur(0) brightness(1.05);
+    transform: translate3d(0, 1.42rem, 0) scale3d(1, 1, 1);
+  }
+}
 
 @keyframes archiveAccessRingForm {
   0% {
@@ -1497,7 +1672,84 @@ button {
     transform: translate3d(-50%, -50%, 0) scale(0.86);
   }
 }
-@keyframes voidStarReveal {
+
+@keyframes homeAccessPortalReady {
+  0% {
+    opacity: 0;
+    filter: brightness(0.94);
+    transform: translate3d(0, 3.55rem, 0) scale3d(0.9, 0.9, 1);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1.02);
+    transform: translate3d(0, 4.05rem, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes homeAccessControlShellReady {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.88, 0.88, 1);
+  }
+  100% {
+    opacity: 0.42;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes homeAccessControlInnerReady {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.9, 0.9, 1);
+  }
+  100% {
+    opacity: 0.24;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes homeAccessButtonReady {
+  0% {
+    opacity: 0;
+    filter: blur(0.04rem) brightness(0.92);
+    transform: translateZ(0) scale3d(0.94, 0.94, 1);
+  }
+  48% {
+    opacity: 0.92;
+    filter: blur(0.01rem) brightness(1.1);
+    transform: translateZ(0) scale3d(1.018, 1.018, 1);
+  }
+  100% {
+    opacity: 0.86;
+    filter: blur(0) brightness(1.03);
+    transform: translateZ(0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes homeAccessButtonSweep {
+  0% {
+    opacity: 0;
+    transform: translate3d(-125%, 0, 0) rotate(8deg);
+  }
+  42% {
+    opacity: 0.42;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(125%, 0, 0) rotate(8deg);
+  }
+}
+
+@keyframes homeAccessButtonCoreReady {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.92, 0.92, 1);
+  }
+  100% {
+    opacity: 0.42;
+    transform: scale3d(1, 1, 1);
+  }
+}@keyframes voidStarReveal {
   0%,
   18% {
     opacity: 0;
@@ -2611,7 +2863,66 @@ button {
   }
 
   .home-identity-text--mark {
-    opacity: 0.94;
+    opacity: 0.9;
+    filter: brightness(1.05);
+    transform: translate3d(0, -0.68rem, 0) scale3d(0.86, 0.86, 1);
+  }
+
+  .home-identity-text--core {
+    opacity: 0.68;
+    filter: brightness(1.02);
+    transform: translate3d(0, 0.64rem, 0) scale3d(1, 1, 1);
+  }
+
+  .home-identity-text--ready {
+    opacity: 0.82;
+    filter: brightness(1.05);
+    transform: translate3d(0, 1.42rem, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-portal,
+  .site-shell.is-home-route .start-portal::before,
+  .site-shell.is-home-route .start-portal::after,
+  .site-shell.is-home-route .start-button,
+  .site-shell.is-home-route .start-button::before,
+  .site-shell.is-home-route .start-button::after {
+    animation: none !important;
+    filter: none;
+  }
+
+  .site-shell.is-home-route .start-portal {
+    visibility: visible;
+    opacity: 1;
+    transform: translate3d(0, 4.05rem, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-portal::before {
+    visibility: visible;
+    opacity: 0.42;
+    transform: scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-portal::after {
+    visibility: visible;
+    opacity: 0.24;
+    transform: scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-button {
+    visibility: visible;
+    opacity: 0.86;
+    transform: translateZ(0) scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-button::before {
+    visibility: visible;
+    opacity: 0;
+  }
+
+  .site-shell.is-home-route .start-button::after {
+    visibility: visible;
+    opacity: 0.42;
+    transform: scale3d(1, 1, 1);
   }
 
   .home-lockup::before {
