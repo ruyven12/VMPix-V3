@@ -211,7 +211,7 @@ button {
 }
 .home-archive-message--identity {
   --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
-  --home-access-control-size: clamp(6.25rem, 28vw, 7.4rem);
+  --home-access-control-size: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
   position: relative;
   clip-path: none;
   width: var(--home-access-control-size);
@@ -246,7 +246,7 @@ button {
 
 .home-archive-message--identity::before {
   z-index: 0;
-  width: clamp(4.65rem, 23vw, 6.1rem);
+  width: clamp(5.9rem, calc(23vw + 1.25rem), 7.35rem);
   aspect-ratio: 1;
   border: 1px solid rgba(238, 217, 153, 0.38);
   border-radius: 50%;
@@ -267,7 +267,7 @@ button {
 
 .home-archive-message--identity::after {
   z-index: 0;
-  width: clamp(3.05rem, 15vw, 4.05rem);
+  width: clamp(4.3rem, calc(15vw + 1.25rem), 5.3rem);
   aspect-ratio: 1;
   border: 1px solid rgba(247, 247, 242, 0.18);
   border-radius: 50%;
@@ -718,92 +718,58 @@ button {
 
 .site-shell.is-home-route .start-portal {
   visibility: visible;
-  width: auto;
-  min-width: 0;
-  aspect-ratio: auto;
+  width: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
+  min-width: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
+  height: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
+  min-height: clamp(7.5rem, calc(28vw + 1.25rem), 8.65rem);
+  aspect-ratio: 1;
   overflow: visible;
   border: 0;
-  border-radius: 999rem;
+  border-radius: 50%;
   background: transparent;
   box-shadow: none;
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
-  transform: translate3d(0, 3.8rem, 0) scale3d(0.92, 0.92, 1);
-  animation: homeAccessPortalReady 0.6s var(--ease-breath) 19.38s both;
+  transform: translate3d(0, 0, 0);
+  animation: none;
 }
 
 .site-shell.is-home-route .start-portal::before,
 .site-shell.is-home-route .start-portal::after {
-  visibility: visible;
+  visibility: hidden;
   pointer-events: none;
+  opacity: 0;
   animation: none;
-}
-
-.site-shell.is-home-route .start-portal::before {
-  inset: -0.4rem;
-  border-color: rgba(238, 217, 153, 0.16);
-  background: transparent;
-  opacity: 0;
-  animation: homeAccessControlShellReady 0.6s var(--ease-breath) 19.38s both;
-}
-
-.site-shell.is-home-route .start-portal::after {
-  inset: -0.12rem;
-  border-color: rgba(247, 247, 242, 0.1);
-  background: transparent;
-  box-shadow: none;
-  opacity: 0;
-  animation: homeAccessControlInnerReady 0.6s var(--ease-breath) 19.46s both;
 }
 
 .site-shell.is-home-route .start-button {
   visibility: visible;
-  width: min(76vw, 10.2rem);
-  max-width: calc(100vw - 2rem);
-  min-width: 8.7rem;
-  height: 2.35rem;
-  min-height: 2.35rem;
-  aspect-ratio: auto;
-  border-color: rgba(238, 217, 153, 0.42);
-  border-radius: 999rem;
-  background:
-    radial-gradient(ellipse at 50% 18%, rgba(247, 247, 242, 0.12), transparent 46%),
-    linear-gradient(90deg, rgba(238, 217, 153, 0.05), rgba(5, 5, 7, 0.86) 34% 66%, rgba(220, 188, 108, 0.06)),
-    rgba(3, 3, 6, 0.86);
-  box-shadow:
-    inset 0 0 0.82rem rgba(0, 0, 0, 0.76),
-    inset 0 0 0.5rem rgba(238, 217, 153, 0.045),
-    0 0 0.85rem rgba(220, 188, 108, 0.12),
-    0 0 1.55rem rgba(238, 217, 153, 0.045);
-  color: rgba(247, 247, 242, 0.86);
-  font-size: 0.64rem;
-  opacity: 0;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: 1;
+  border-color: transparent;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  opacity: 1;
   pointer-events: auto;
-  text-shadow: 0 0 0.38rem rgba(238, 217, 153, 0.2);
-  transform: translateZ(0) scale3d(0.94, 0.94, 1);
-  animation: homeAccessButtonReady 0.65s var(--ease-breath) 19.5s both;
+  text-shadow: none;
+  transform: translateZ(0);
+  animation: none;
 }
 
-.site-shell.is-home-route .start-button::before {
-  visibility: visible;
-  inset: 22% 12%;
-  background: linear-gradient(105deg, transparent 16%, rgba(238, 217, 153, 0.34) 50%, transparent 84%);
-  box-shadow: none;
-  opacity: 0;
-  transform: translate3d(-125%, 0, 0) rotate(8deg);
-  animation: homeAccessButtonSweep 0.58s var(--ease-breath) 19.72s both;
-}
-
+.site-shell.is-home-route .start-button::before,
 .site-shell.is-home-route .start-button::after {
-  visibility: visible;
-  inset: 0.28rem;
-  border: 1px solid rgba(238, 217, 153, 0.18);
-  background:
-    conic-gradient(from 24deg, transparent 0 72deg, rgba(238, 217, 153, 0.16) 73deg 74deg, transparent 75deg 236deg, rgba(247, 247, 242, 0.06) 237deg 238deg, transparent 239deg 360deg),
-    radial-gradient(ellipse, rgba(220, 188, 108, 0.08), transparent 62%);
-  box-shadow: none;
+  visibility: hidden;
   opacity: 0;
-  animation: homeAccessButtonCoreReady 0.65s var(--ease-breath) 19.58s both;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  animation: none;
 }
 .site-shell[data-shell-module="music"] {
   --shell-nav-accent: var(--accent-music);
@@ -1306,34 +1272,34 @@ button {
   0% {
     opacity: 0;
     filter: blur(0.06rem) brightness(0.9);
-    transform: translate3d(0, -0.68rem, 0) scale3d(0.88, 0.88, 1);
+    transform: translate3d(0, -0.42rem, 0) scale3d(0.92, 0.92, 1);
   }
   48% {
     opacity: 0.98;
     filter: blur(0.01rem) brightness(1.12);
-    transform: translate3d(0, -0.68rem, 0) scale3d(0.94, 0.94, 1);
+    transform: translate3d(0, -0.42rem, 0) scale3d(1, 1, 1);
   }
   100% {
     opacity: 0.94;
     filter: blur(0) brightness(1.05);
-    transform: translate3d(0, -0.68rem, 0) scale3d(0.9, 0.9, 1);
+    transform: translate3d(0, -0.42rem, 0) scale3d(0.96, 0.96, 1);
   }
 }
 @keyframes archiveCoreStatusForm {
   0% {
     opacity: 0;
     filter: blur(0.05rem) brightness(0.92);
-    transform: translate3d(0, 5.12rem, 0) scale3d(0.96, 0.96, 1);
+    transform: translate3d(0, 2rem, 0) scale3d(0.96, 0.96, 1);
   }
   42% {
     opacity: 0.72;
     filter: blur(0.01rem) brightness(1.08);
-    transform: translate3d(0, 5.76rem, 0) scale3d(1.015, 1.015, 1);
+    transform: translate3d(0, 2.39rem, 0) scale3d(1.015, 1.015, 1);
   }
   100% {
     opacity: 0.68;
     filter: blur(0) brightness(1.02);
-    transform: translate3d(0, 5.72rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 2.35rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -1341,17 +1307,17 @@ button {
   0% {
     opacity: 0;
     filter: blur(0.06rem) brightness(0.9);
-    transform: translate3d(0, 5.88rem, 0) scale3d(0.95, 0.95, 1);
+    transform: translate3d(0, 2.64rem, 0) scale3d(0.95, 0.95, 1);
   }
   44% {
     opacity: 0.9;
     filter: blur(0.01rem) brightness(1.12);
-    transform: translate3d(0, 6.54rem, 0) scale3d(1.018, 1.018, 1);
+    transform: translate3d(0, 3.16rem, 0) scale3d(1.018, 1.018, 1);
   }
   100% {
     opacity: 0.82;
     filter: blur(0) brightness(1.05);
-    transform: translate3d(0, 6.5rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 3.12rem, 0) scale3d(1, 1, 1);
   }
 }
 
@@ -2916,19 +2882,19 @@ button {
   .home-identity-text--engage {
     opacity: 0.94;
     filter: brightness(1.05);
-    transform: translate3d(0, -0.68rem, 0) scale3d(0.9, 0.9, 1);
+    transform: translate3d(0, -0.42rem, 0) scale3d(0.96, 0.96, 1);
   }
 
   .home-identity-text--core {
     opacity: 0.68;
     filter: brightness(1.02);
-    transform: translate3d(0, 5.72rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 2.35rem, 0) scale3d(1, 1, 1);
   }
 
   .home-identity-text--ready {
     opacity: 0.82;
     filter: brightness(1.05);
-    transform: translate3d(0, 6.5rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 3.12rem, 0) scale3d(1, 1, 1);
   }
 
   .site-shell.is-home-route .start-portal,
@@ -2944,38 +2910,28 @@ button {
   .site-shell.is-home-route .start-portal {
     visibility: visible;
     opacity: 1;
-    transform: translate3d(0, 4.05rem, 0) scale3d(1, 1, 1);
+    transform: translate3d(0, 0, 0);
   }
 
-  .site-shell.is-home-route .start-portal::before {
-    visibility: visible;
-    opacity: 0.42;
-    transform: scale3d(1, 1, 1);
-  }
-
+  .site-shell.is-home-route .start-portal::before,
   .site-shell.is-home-route .start-portal::after {
-    visibility: visible;
-    opacity: 0.24;
+    visibility: hidden;
+    opacity: 0;
     transform: scale3d(1, 1, 1);
   }
 
   .site-shell.is-home-route .start-button {
     visibility: visible;
-    opacity: 0.86;
-    transform: translateZ(0) scale3d(1, 1, 1);
+    opacity: 1;
+    transform: translateZ(0);
   }
 
-  .site-shell.is-home-route .start-button::before {
-    visibility: visible;
-    opacity: 0;
-  }
-
+  .site-shell.is-home-route .start-button::before,
   .site-shell.is-home-route .start-button::after {
-    visibility: visible;
-    opacity: 0.42;
+    visibility: hidden;
+    opacity: 0;
     transform: scale3d(1, 1, 1);
   }
-
   .home-lockup::before {
     opacity: 0.08;
     transform: none;
