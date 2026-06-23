@@ -363,7 +363,7 @@ body {
     radial-gradient(circle at 22% 54%, rgba(238, 217, 153, 0.62) 0 1.08px, rgba(238, 217, 153, 0.26) 1.22px 2.95px, transparent 4.3px);
   filter: drop-shadow(0 0 0.68rem rgba(220, 188, 108, 0.28)) drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.16));
   will-change: opacity, transform, filter;
-  animation: archiveAwakeningNodes 3.2s var(--ease-breath) 19.75s both;
+  animation: archiveAwakeningNodes 3.2s var(--ease-breath) 15.2s both;
 }
 
 .site-shell.is-home-route .home-archive-awakening {
@@ -391,7 +391,7 @@ body {
     linear-gradient(132deg, transparent calc(50% - 0.55px), rgba(238, 217, 153, 0.24) calc(50% - 0.35px) calc(50% + 0.35px), transparent calc(50% + 0.55px)) 58% 49% / 17% 20% no-repeat;
   filter: drop-shadow(0 0 0.28rem rgba(220, 188, 108, 0.18)) blur(0.03px);
   transform: translate3d(0, 0, 0) scale(0.985);
-  animation: archiveAwakeningLines 2.65s var(--ease-breath) 20.25s both;
+  animation: archiveAwakeningLines 2.65s var(--ease-breath) 15.95s both;
 }
 
 .home-archive-awakening::after {
@@ -405,7 +405,176 @@ body {
     radial-gradient(circle, transparent 0 62%, rgba(247, 247, 242, 0.24) 64%, transparent 70%);
   filter: brightness(1.22) blur(0.06px);
   transform: translate3d(-50%, -50%, 0) scale(0.1);
-  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 19.35s both;
+  animation: archiveAwakeningPulse 2.3s var(--ease-breath) 14.86s both;
+}
+
+.home-archive-sector {
+  --sector-delay: 15.1s;
+  --sector-size: clamp(7rem, 23vw, 14rem);
+  position: absolute;
+  left: var(--sector-x);
+  top: var(--sector-y);
+  width: var(--sector-size);
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale(0.88);
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+  animation: archiveSectorDrift 4.8s var(--ease-breath) var(--sector-delay) both;
+}
+
+.home-archive-sector::before,
+.home-archive-sector::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0;
+  background-repeat: no-repeat;
+  transform-origin: center;
+  will-change: opacity, filter, transform;
+}
+
+.home-archive-sector::before {
+  background: var(--sector-nodes);
+  filter: drop-shadow(0 0 0.46rem rgba(220, 188, 108, 0.24)) drop-shadow(0 0 0.14rem rgba(247, 247, 242, 0.14));
+  animation: archiveSectorNodesReveal 4.1s var(--ease-breath) var(--sector-delay) both;
+}
+
+.home-archive-sector::after {
+  background: var(--sector-lines);
+  filter: drop-shadow(0 0 0.24rem rgba(220, 188, 108, 0.16)) blur(0.02px);
+  transform: scale(0.98);
+  animation: archiveSectorLinesReveal 3.55s var(--ease-breath) calc(var(--sector-delay) + 0.48s) both;
+}
+
+.home-archive-sector--one {
+  --sector-x: -3%;
+  --sector-y: 18%;
+  --sector-size: clamp(8.2rem, 28vw, 16rem);
+  --sector-delay: 15.05s;
+  --sector-nodes:
+    radial-gradient(circle at 24% 28%, rgba(238, 217, 153, 0.7) 0 1px, rgba(238, 217, 153, 0.24) 1.1px 3px, transparent 4.2px),
+    radial-gradient(circle at 58% 18%, rgba(247, 247, 242, 0.52) 0 0.9px, rgba(220, 188, 108, 0.2) 1px 2.6px, transparent 3.8px),
+    radial-gradient(circle at 72% 52%, rgba(238, 217, 153, 0.58) 0 1.05px, rgba(238, 217, 153, 0.2) 1.18px 2.8px, transparent 4px),
+    radial-gradient(circle at 39% 75%, rgba(247, 247, 242, 0.46) 0 0.9px, rgba(220, 188, 108, 0.16) 1px 2.4px, transparent 3.6px);
+  --sector-lines:
+    linear-gradient(162deg, transparent calc(50% - 0.5px), rgba(238, 217, 153, 0.24) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 24% 20% / 36% 14% no-repeat,
+    linear-gradient(48deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 55% 36% / 20% 28% no-repeat,
+    linear-gradient(125deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.2) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 36% 48% / 33% 28% no-repeat;
+}
+
+.home-archive-sector--two {
+  --sector-x: 24%;
+  --sector-y: 9%;
+  --sector-size: clamp(6.8rem, 21vw, 12.5rem);
+  --sector-delay: 15.18s;
+  --sector-nodes:
+    radial-gradient(circle at 18% 62%, rgba(238, 217, 153, 0.48) 0 0.9px, rgba(238, 217, 153, 0.16) 1px 2.4px, transparent 3.5px),
+    radial-gradient(circle at 42% 29%, rgba(247, 247, 242, 0.62) 0 1px, rgba(220, 188, 108, 0.22) 1.1px 2.8px, transparent 4px),
+    radial-gradient(circle at 77% 34%, rgba(238, 217, 153, 0.52) 0 0.95px, rgba(238, 217, 153, 0.18) 1.05px 2.5px, transparent 3.8px),
+    radial-gradient(circle at 66% 77%, rgba(247, 247, 242, 0.42) 0 0.85px, rgba(220, 188, 108, 0.15) 0.95px 2.2px, transparent 3.4px);
+  --sector-lines:
+    linear-gradient(121deg, transparent calc(50% - 0.48px), rgba(247, 247, 242, 0.2) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 22% 34% / 24% 29% no-repeat,
+    linear-gradient(7deg, transparent calc(50% - 0.48px), rgba(238, 217, 153, 0.22) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 43% 29% / 34% 9% no-repeat,
+    linear-gradient(58deg, transparent calc(50% - 0.48px), rgba(220, 188, 108, 0.17) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 64% 44% / 16% 33% no-repeat;
+}
+
+.home-archive-sector--three {
+  --sector-x: 76%;
+  --sector-y: 14%;
+  --sector-size: clamp(7.8rem, 23vw, 14.5rem);
+  --sector-delay: 15.32s;
+  --sector-nodes:
+    radial-gradient(circle at 23% 36%, rgba(247, 247, 242, 0.5) 0 0.92px, rgba(220, 188, 108, 0.18) 1.02px 2.45px, transparent 3.7px),
+    radial-gradient(circle at 54% 22%, rgba(238, 217, 153, 0.7) 0 1.08px, rgba(238, 217, 153, 0.24) 1.2px 3px, transparent 4.2px),
+    radial-gradient(circle at 82% 55%, rgba(247, 247, 242, 0.48) 0 0.9px, rgba(220, 188, 108, 0.16) 1px 2.35px, transparent 3.6px),
+    radial-gradient(circle at 45% 79%, rgba(238, 217, 153, 0.5) 0 0.96px, rgba(238, 217, 153, 0.18) 1.06px 2.55px, transparent 3.8px);
+  --sector-lines:
+    linear-gradient(154deg, transparent calc(50% - 0.5px), rgba(238, 217, 153, 0.24) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 26% 25% / 31% 13% no-repeat,
+    linear-gradient(43deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 54% 38% / 29% 24% no-repeat,
+    linear-gradient(116deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 45% 54% / 38% 27% no-repeat;
+}
+
+.home-archive-sector--four {
+  --sector-x: 104%;
+  --sector-y: 44%;
+  --sector-size: clamp(8.4rem, 26vw, 16.5rem);
+  --sector-delay: 15.48s;
+  --sector-nodes:
+    radial-gradient(circle at 16% 26%, rgba(238, 217, 153, 0.56) 0 1px, rgba(238, 217, 153, 0.2) 1.1px 2.75px, transparent 4px),
+    radial-gradient(circle at 39% 57%, rgba(247, 247, 242, 0.46) 0 0.9px, rgba(220, 188, 108, 0.17) 1px 2.45px, transparent 3.7px),
+    radial-gradient(circle at 71% 34%, rgba(238, 217, 153, 0.62) 0 1.05px, rgba(238, 217, 153, 0.21) 1.16px 2.9px, transparent 4.1px),
+    radial-gradient(circle at 84% 73%, rgba(247, 247, 242, 0.44) 0 0.88px, rgba(220, 188, 108, 0.14) 0.98px 2.3px, transparent 3.5px);
+  --sector-lines:
+    linear-gradient(48deg, transparent calc(50% - 0.5px), rgba(238, 217, 153, 0.22) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 16% 29% / 24% 30% no-repeat,
+    linear-gradient(160deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 40% 32% / 32% 25% no-repeat,
+    linear-gradient(56deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.17) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 70% 50% / 15% 25% no-repeat;
+}
+
+.home-archive-sector--five {
+  --sector-x: 78%;
+  --sector-y: 85%;
+  --sector-size: clamp(8rem, 26vw, 15.5rem);
+  --sector-delay: 15.7s;
+  --sector-nodes:
+    radial-gradient(circle at 28% 19%, rgba(247, 247, 242, 0.48) 0 0.9px, rgba(220, 188, 108, 0.17) 1px 2.4px, transparent 3.7px),
+    radial-gradient(circle at 62% 31%, rgba(238, 217, 153, 0.62) 0 1.06px, rgba(238, 217, 153, 0.22) 1.18px 2.95px, transparent 4.1px),
+    radial-gradient(circle at 73% 68%, rgba(247, 247, 242, 0.42) 0 0.86px, rgba(220, 188, 108, 0.14) 0.98px 2.25px, transparent 3.45px),
+    radial-gradient(circle at 36% 79%, rgba(238, 217, 153, 0.56) 0 1px, rgba(238, 217, 153, 0.2) 1.12px 2.75px, transparent 4px);
+  --sector-lines:
+    linear-gradient(14deg, transparent calc(50% - 0.5px), rgba(238, 217, 153, 0.22) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 28% 21% / 35% 13% no-repeat,
+    linear-gradient(64deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.17) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 61% 41% / 13% 27% no-repeat,
+    linear-gradient(145deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 38% 56% / 35% 24% no-repeat;
+}
+
+.home-archive-sector--six {
+  --sector-x: 49%;
+  --sector-y: 96%;
+  --sector-size: clamp(7rem, 22vw, 13.5rem);
+  --sector-delay: 15.92s;
+  --sector-nodes:
+    radial-gradient(circle at 20% 42%, rgba(238, 217, 153, 0.54) 0 0.98px, rgba(238, 217, 153, 0.19) 1.08px 2.6px, transparent 3.8px),
+    radial-gradient(circle at 48% 20%, rgba(247, 247, 242, 0.5) 0 0.92px, rgba(220, 188, 108, 0.17) 1.02px 2.45px, transparent 3.7px),
+    radial-gradient(circle at 76% 48%, rgba(238, 217, 153, 0.58) 0 1px, rgba(238, 217, 153, 0.2) 1.12px 2.75px, transparent 4px),
+    radial-gradient(circle at 53% 79%, rgba(247, 247, 242, 0.4) 0 0.84px, rgba(220, 188, 108, 0.13) 0.96px 2.2px, transparent 3.4px);
+  --sector-lines:
+    linear-gradient(134deg, transparent calc(50% - 0.48px), rgba(247, 247, 242, 0.18) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 22% 28% / 27% 17% no-repeat,
+    linear-gradient(33deg, transparent calc(50% - 0.48px), rgba(238, 217, 153, 0.22) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 47% 28% / 29% 20% no-repeat,
+    linear-gradient(101deg, transparent calc(50% - 0.48px), rgba(220, 188, 108, 0.16) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 53% 49% / 24% 31% no-repeat;
+}
+
+.home-archive-sector--seven {
+  --sector-x: 13%;
+  --sector-y: 80%;
+  --sector-size: clamp(8rem, 25vw, 15rem);
+  --sector-delay: 16.08s;
+  --sector-nodes:
+    radial-gradient(circle at 22% 70%, rgba(247, 247, 242, 0.44) 0 0.9px, rgba(220, 188, 108, 0.16) 1px 2.35px, transparent 3.55px),
+    radial-gradient(circle at 35% 28%, rgba(238, 217, 153, 0.64) 0 1.05px, rgba(238, 217, 153, 0.23) 1.18px 2.9px, transparent 4.1px),
+    radial-gradient(circle at 68% 43%, rgba(247, 247, 242, 0.5) 0 0.94px, rgba(220, 188, 108, 0.18) 1.04px 2.5px, transparent 3.8px),
+    radial-gradient(circle at 76% 78%, rgba(238, 217, 153, 0.48) 0 0.96px, rgba(238, 217, 153, 0.17) 1.06px 2.55px, transparent 3.8px);
+  --sector-lines:
+    linear-gradient(101deg, transparent calc(50% - 0.5px), rgba(238, 217, 153, 0.21) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 24% 29% / 13% 41% no-repeat,
+    linear-gradient(21deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 36% 33% / 33% 12% no-repeat,
+    linear-gradient(58deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.17) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 67% 50% / 10% 29% no-repeat;
+}
+
+.home-archive-sector--eight {
+  --sector-x: -6%;
+  --sector-y: 51%;
+  --sector-size: clamp(7.2rem, 22vw, 13.5rem);
+  --sector-delay: 16.22s;
+  --sector-nodes:
+    radial-gradient(circle at 33% 17%, rgba(247, 247, 242, 0.48) 0 0.9px, rgba(220, 188, 108, 0.16) 1px 2.4px, transparent 3.6px),
+    radial-gradient(circle at 65% 35%, rgba(238, 217, 153, 0.6) 0 1px, rgba(238, 217, 153, 0.21) 1.12px 2.75px, transparent 4px),
+    radial-gradient(circle at 46% 62%, rgba(247, 247, 242, 0.42) 0 0.84px, rgba(220, 188, 108, 0.14) 0.96px 2.25px, transparent 3.45px),
+    radial-gradient(circle at 78% 82%, rgba(238, 217, 153, 0.48) 0 0.95px, rgba(238, 217, 153, 0.17) 1.05px 2.5px, transparent 3.75px);
+  --sector-lines:
+    linear-gradient(28deg, transparent calc(50% - 0.48px), rgba(238, 217, 153, 0.22) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 33% 19% / 34% 18% no-repeat,
+    linear-gradient(124deg, transparent calc(50% - 0.48px), rgba(247, 247, 242, 0.17) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 46% 36% / 20% 29% no-repeat,
+    linear-gradient(50deg, transparent calc(50% - 0.48px), rgba(220, 188, 108, 0.16) calc(50% - 0.28px) calc(50% + 0.28px), transparent calc(50% + 0.48px)) 46% 62% / 33% 22% no-repeat;
 }
 
 @keyframes voidBlackoutRelease {
@@ -666,6 +835,53 @@ body {
   }
 }
 
+@keyframes archiveSectorDrift {
+  0%,
+  12% {
+    transform: translate3d(-50%, -50%, 0) scale(0.88);
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+}
+
+@keyframes archiveSectorNodesReveal {
+  0%,
+  10% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(220, 188, 108, 0)) brightness(0.78);
+    transform: scale(0.96);
+  }
+  42% {
+    opacity: 0.72;
+    filter: drop-shadow(0 0 0.54rem rgba(220, 188, 108, 0.3)) drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.18)) brightness(1.16);
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.56;
+    filter: drop-shadow(0 0 0.42rem rgba(220, 188, 108, 0.22)) drop-shadow(0 0 0.12rem rgba(247, 247, 242, 0.12)) brightness(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes archiveSectorLinesReveal {
+  0%,
+  16% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(220, 188, 108, 0)) brightness(0.82) blur(0.02px);
+    transform: scale(0.98);
+  }
+  55% {
+    opacity: 0.48;
+    filter: drop-shadow(0 0 0.26rem rgba(220, 188, 108, 0.18)) brightness(1.12) blur(0.02px);
+  }
+  100% {
+    opacity: 0.36;
+    filter: drop-shadow(0 0 0.2rem rgba(220, 188, 108, 0.14)) brightness(1) blur(0.02px);
+    transform: scale(1);
+  }
+}
+
 @keyframes voidTransmissionHandshake {
   0%,
   6% {
@@ -833,6 +1049,24 @@ body {
 
   .home-archive-awakening::after {
     opacity: 0;
+  }
+  .home-archive-sector {
+    animation: none !important;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+
+  .home-archive-sector::before,
+  .home-archive-sector::after {
+    animation: none !important;
+    transform: none;
+  }
+
+  .home-archive-sector::before {
+    opacity: 0.58;
+  }
+
+  .home-archive-sector::after {
+    opacity: 0.36;
   }
 
   .home-archive-message {
