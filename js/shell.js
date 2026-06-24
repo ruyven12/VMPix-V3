@@ -2543,8 +2543,8 @@ function revealHub() {
   setActiveGlobalNav("portfolio");
 }
 
-const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 0;
-const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 0;
+const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 860;
+const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 40;
 let homePortfolioTransitionTimer = 0;
 
 function clearHomePortfolioTransitionState() {
