@@ -2575,10 +2575,14 @@ const PORTFOLIO_ORIENTATION_START_OFFSET_MS = 820;
 const PORTFOLIO_ORIENTATION_REDUCED_MOTION_START_OFFSET_MS = 28;
 const PORTFOLIO_ORIENTATION_DURATION_MS = 620;
 const PORTFOLIO_ORIENTATION_REDUCED_MOTION_DURATION_MS = 70;
+const PORTFOLIO_FIRST_TRANSFER_DURATION_MS = 860;
+const PORTFOLIO_FIRST_TRANSFER_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioArrivalTimer = 0;
 let portfolioOrientationStartTimer = 0;
 let portfolioOrientationTimer = 0;
 let portfolioOrientationFocusCard = null;
+let portfolioFirstTransferTimer = 0;
+let portfolioFirstTransferTargetCard = null;
 const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
 const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioDirectArrivalTimer = 0;
@@ -2589,6 +2593,74 @@ function clearPortfolioDirectArrivalState() {
   if (shell) {
     shell.classList.remove("is-portfolio-direct-arriving");
   }
+}
+
+function clearPortfolioFirstTransferState() {
+  window.clearTimeout(portfolioFirstTransferTimer);
+  portfolioFirstTransferTimer = 0;
+  if (portfolioFirstTransferTargetCard) {
+    portfolioFirstTransferTargetCard.classList.remove("is-first-transfer-target");
+    portfolioFirstTransferTargetCard = null;
+  }
+  if (shell) {
+    shell.classList.remove("is-portfolio-transferring");
+    [
+      "--portfolio-transfer-source-x",
+      "--portfolio-transfer-source-y",
+      "--portfolio-transfer-target-x",
+      "--portfolio-transfer-target-y",
+      "--portfolio-transfer-distance",
+      "--portfolio-transfer-angle",
+    ].forEach((propertyName) => shell.style.removeProperty(propertyName));
+  }
+}
+
+function getPortfolioFirstTransferTarget() {
+  if (!portfolioHub) {
+    return null;
+  }
+
+  return (
+    getCenteredHubCard() ||
+    portfolioHub.querySelector('[data-module-card][data-module-state="active"]') ||
+    portfolioHub.querySelector("[data-module-card]")
+  );
+}
+
+function startPortfolioFirstTransfer() {
+  if (!shell || !portfolioHub || !shell.classList.contains("has-entered-hub")) {
+    return;
+  }
+
+  clearPortfolioFirstTransferState();
+  portfolioFirstTransferTargetCard = getPortfolioFirstTransferTarget();
+  if (!portfolioFirstTransferTargetCard) {
+    return;
+  }
+
+  const cardRect = portfolioFirstTransferTargetCard.getBoundingClientRect();
+  const sourceX = window.innerWidth * 0.5;
+  const sourceY = window.innerHeight * 0.5;
+  const targetX = cardRect.left + cardRect.width * 0.5;
+  const targetY = cardRect.top + cardRect.height * 0.38;
+  const deltaX = targetX - sourceX;
+  const deltaY = targetY - sourceY;
+  const distance = Math.hypot(deltaX, deltaY);
+  const angle = Math.atan2(deltaY, deltaX);
+
+  shell.style.setProperty("--portfolio-transfer-source-x", `${sourceX}px`);
+  shell.style.setProperty("--portfolio-transfer-source-y", `${sourceY}px`);
+  shell.style.setProperty("--portfolio-transfer-target-x", `${targetX}px`);
+  shell.style.setProperty("--portfolio-transfer-target-y", `${targetY}px`);
+  shell.style.setProperty("--portfolio-transfer-distance", `${distance}px`);
+  shell.style.setProperty("--portfolio-transfer-angle", `${angle}rad`);
+  portfolioFirstTransferTargetCard.classList.add("is-first-transfer-target");
+  shell.classList.add("is-portfolio-transferring");
+
+  const transferDuration = reducedMotion.matches
+    ? PORTFOLIO_FIRST_TRANSFER_REDUCED_MOTION_DURATION_MS
+    : PORTFOLIO_FIRST_TRANSFER_DURATION_MS;
+  portfolioFirstTransferTimer = window.setTimeout(clearPortfolioFirstTransferState, transferDuration);
 }
 
 function startPortfolioDirectArrival() {
@@ -2615,6 +2687,7 @@ function startPortfolioDirectArrival() {
 function clearPortfolioArrivalState() {
   window.clearTimeout(portfolioArrivalTimer);
   window.clearTimeout(portfolioOrientationStartTimer);
+  clearPortfolioFirstTransferState();
   portfolioArrivalTimer = 0;
   portfolioOrientationStartTimer = 0;
   if (shell) {
@@ -2667,6 +2740,7 @@ function startPortfolioArrival() {
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   shell.classList.add("is-portfolio-arriving");
+  startPortfolioFirstTransfer();
   const arrivalDuration = reducedMotion.matches
     ? PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS
     : PORTFOLIO_ARRIVAL_DURATION_MS;
@@ -2969,6 +3043,7 @@ if (shell && startButton) {
     window.clearTimeout(portfolioOrientationStartTimer);
     window.clearTimeout(portfolioDirectArrivalTimer);
     window.clearTimeout(portfolioOrientationTimer);
+    window.clearTimeout(portfolioFirstTransferTimer);
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {
       window.cancelAnimationFrame(spotlightFrame);
