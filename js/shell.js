@@ -2449,6 +2449,7 @@ function showHomepage() {
 
   window.clearTimeout(activationTimer);
   clearHomePortfolioTransitionState();
+  clearPortfolioArrivalState();
   closeGlobalMenu({ shouldRestoreFocus: false });
   shell.classList.remove("is-home-transitioning", "is-engage-activated", "is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
@@ -2511,8 +2512,9 @@ function handleGlobalMenuAction(event) {
   }
 }
 
-function revealHub() {
+function revealHub(options = {}) {
   clearHomePortfolioTransitionState();
+  clearPortfolioArrivalState();
   shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub");
   if (homeFrame) {
@@ -2541,6 +2543,34 @@ function revealHub() {
   }
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("portfolio");
+  if (options.shouldPlayPortfolioArrival) {
+    startPortfolioArrival();
+  }
+}
+
+const PORTFOLIO_ARRIVAL_DURATION_MS = 920;
+const PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
+let portfolioArrivalTimer = 0;
+
+function clearPortfolioArrivalState() {
+  window.clearTimeout(portfolioArrivalTimer);
+  portfolioArrivalTimer = 0;
+  if (shell) {
+    shell.classList.remove("is-portfolio-arriving");
+  }
+}
+
+function startPortfolioArrival() {
+  if (!shell || !portfolioHub) {
+    return;
+  }
+
+  clearPortfolioArrivalState();
+  shell.classList.add("is-portfolio-arriving");
+  const arrivalDuration = reducedMotion.matches
+    ? PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS
+    : PORTFOLIO_ARRIVAL_DURATION_MS;
+  portfolioArrivalTimer = window.setTimeout(clearPortfolioArrivalState, arrivalDuration);
 }
 
 const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 1740;
@@ -2562,6 +2592,7 @@ function completeHomePortfolioRouteHandoff() {
   homePortfolioTransitionTimer = 0;
   navigateToRoute(routePaths.portfolio, {
     shouldAnimatePortal: true,
+    shouldPlayPortfolioArrival: true,
     historyState: { fromHomeEngage: true },
   });
 }
@@ -2595,7 +2626,7 @@ function beginHomePortfolioTransition() {
   homePortfolioTransitionTimer = window.setTimeout(completeHomePortfolioRouteHandoff, routeDelay);
 }
 
-function activatePortal() {
+function activatePortal(options = {}) {
   if (
     !shell ||
     !startButton ||
@@ -2612,7 +2643,7 @@ function activatePortal() {
   shell.classList.toggle("is-reduced-activation", reducedMotion.matches);
   shell.classList.add("is-activating");
 
-  activationTimer = window.setTimeout(revealHub, reducedMotion.matches ? 460 : 1360);
+  activationTimer = window.setTimeout(() => revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) }), reducedMotion.matches ? 460 : 1360);
 }
 
 if (shell && startButton) {
@@ -2810,6 +2841,7 @@ if (shell && startButton) {
   window.addEventListener("pagehide", () => {
     setShellDrawerLock(false);
     window.clearTimeout(activationTimer);
+    window.clearTimeout(portfolioArrivalTimer);
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {
       window.cancelAnimationFrame(spotlightFrame);

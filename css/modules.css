@@ -13996,6 +13996,142 @@ button.wrestling-event-history-tagged-thumb {
   filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
 }
 
+/* PASS 13 Portfolio Arrival. Receiving-side beat after Home Archive Entry only. */
+.site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub {
+  animation: portfolioArrivalHubWake 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub::after {
+  position: absolute;
+  inset: var(--space-2);
+  z-index: 4;
+  content: "";
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.16) 0 3%, rgba(238, 217, 153, 0.1) 4% 11%, transparent 18%),
+    radial-gradient(circle at 50% 50%, transparent 0 28%, rgba(213, 22, 34, 0.18) 30%, rgba(238, 126, 52, 0.08) 34%, transparent 43%);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale3d(0.26, 0.26, 1);
+  animation: portfolioArrivalReceivingPulse 880ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-carousel,
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-context {
+  animation: portfolioArrivalSurfaceWake 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-card {
+  animation: portfolioArrivalCardWake 860ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-card:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .hub-card:nth-child(4) {
+  animation-delay: 160ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .ambient-energy {
+  animation: portfolioArrivalAmbientEnergy 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-arriving .ambient-rings {
+  animation: portfolioArrivalAmbientRings 920ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
+}
+
+@keyframes portfolioArrivalHubWake {
+  0% {
+    opacity: 0.72;
+    transform: translate3d(0, 0.18rem, 0) scale3d(0.982, 0.982, 1);
+  }
+  46% {
+    opacity: 0.92;
+    transform: translate3d(0, 0.04rem, 0) scale3d(0.994, 0.994, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioArrivalReceivingPulse {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(0.22, 0.22, 1);
+  }
+  24% {
+    opacity: 0.78;
+    transform: translate3d(0, 0, 0) scale3d(0.46, 0.46, 1);
+  }
+  68% {
+    opacity: 0.34;
+    transform: translate3d(0, 0, 0) scale3d(0.86, 0.86, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(1.05, 1.05, 1);
+  }
+}
+
+@keyframes portfolioArrivalSurfaceWake {
+  0% {
+    opacity: 0.58;
+    transform: translate3d(0, 0.2rem, 0) scale3d(0.986, 0.986, 1);
+  }
+  56% {
+    opacity: 0.9;
+    transform: translate3d(0, 0.04rem, 0) scale3d(0.996, 0.996, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioArrivalCardWake {
+  0% {
+    opacity: 0.46;
+    transform: translate3d(0, 0.32rem, 0) scale3d(0.975, 0.975, 1);
+  }
+  52% {
+    opacity: 0.9;
+    transform: translate3d(0, 0.06rem, 0) scale3d(0.996, 0.996, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioArrivalAmbientEnergy {
+  0% {
+    opacity: 0.32;
+  }
+  54% {
+    opacity: 0.72;
+  }
+  100% {
+    opacity: 0.64;
+  }
+}
+
+@keyframes portfolioArrivalAmbientRings {
+  0% {
+    opacity: 0.3;
+  }
+  58% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.72;
+  }
+}
 @keyframes frameSettle {
   from {
     opacity: 1;

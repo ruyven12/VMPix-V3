@@ -256,9 +256,9 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "portfolio") {
     if (options.shouldAnimatePortal) {
-      activatePortal();
+      activatePortal({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) });
     } else {
-      revealHub();
+      revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) });
     }
     return;
   }
