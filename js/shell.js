@@ -2609,6 +2609,8 @@ function clearPortfolioFirstTransferState() {
       "--portfolio-transfer-source-y",
       "--portfolio-transfer-target-x",
       "--portfolio-transfer-target-y",
+      "--portfolio-transfer-impact-x",
+      "--portfolio-transfer-impact-y",
       "--portfolio-transfer-distance",
       "--portfolio-transfer-angle",
     ].forEach((propertyName) => shell.style.removeProperty(propertyName));
@@ -2641,8 +2643,10 @@ function startPortfolioFirstTransfer() {
   const cardRect = portfolioFirstTransferTargetCard.getBoundingClientRect();
   const sourceX = window.innerWidth * 0.5;
   const sourceY = window.innerHeight * 0.5;
-  const targetX = cardRect.left + cardRect.width * 0.5;
-  const targetY = cardRect.top + cardRect.height * 0.38;
+  const targetImpactX = 0.5;
+  const targetImpactY = 0.38;
+  const targetX = cardRect.left + cardRect.width * targetImpactX;
+  const targetY = cardRect.top + cardRect.height * targetImpactY;
   const deltaX = targetX - sourceX;
   const deltaY = targetY - sourceY;
   const distance = Math.hypot(deltaX, deltaY);
@@ -2652,6 +2656,8 @@ function startPortfolioFirstTransfer() {
   shell.style.setProperty("--portfolio-transfer-source-y", `${sourceY}px`);
   shell.style.setProperty("--portfolio-transfer-target-x", `${targetX}px`);
   shell.style.setProperty("--portfolio-transfer-target-y", `${targetY}px`);
+  shell.style.setProperty("--portfolio-transfer-impact-x", `${targetImpactX * 100}%`);
+  shell.style.setProperty("--portfolio-transfer-impact-y", `${targetImpactY * 100}%`);
   shell.style.setProperty("--portfolio-transfer-distance", `${distance}px`);
   shell.style.setProperty("--portfolio-transfer-angle", `${angle}rad`);
   portfolioFirstTransferTargetCard.classList.add("is-first-transfer-target");

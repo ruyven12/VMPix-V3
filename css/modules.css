@@ -14267,7 +14267,7 @@ button.wrestling-event-history-tagged-thumb {
 
 /* PASS 16E First World Energy Transfer.
    JS sets source from the PASS 16B shared center, destination from the centered/default card,
-   and distance/angle for the 300ms transfer beam. */
+   and distance/angle for the 220ms transfer beam. */
 .site-shell.has-entered-hub.is-portfolio-transferring .ambient-system::before {
   display: block;
   inset: auto;
@@ -14275,20 +14275,20 @@ button.wrestling-event-history-tagged-thumb {
   left: var(--portfolio-transfer-source-x, 50vw);
   top: var(--portfolio-transfer-source-y, 50dvh);
   width: var(--portfolio-transfer-distance, 34vw);
-  height: clamp(1px, 0.36vw, 3px);
+  height: clamp(1px, 0.28vw, 2.5px);
   border-radius: 999px;
   opacity: 0;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(64, 216, 255, 0.16) 12%, rgba(64, 216, 255, 0.92) 56%, rgba(247, 247, 242, 0.86) 66%, transparent 100%);
+    linear-gradient(90deg, transparent 0%, rgba(64, 216, 255, 0.08) 10%, rgba(64, 216, 255, 0.96) 58%, rgba(247, 247, 242, 0.92) 68%, transparent 100%);
   background-size: 100% 100%;
   box-shadow:
-    0 0 0.54rem rgba(64, 216, 255, 0.34),
-    0 0 1.08rem rgba(238, 217, 153, 0.12);
+    0 0 0.42rem rgba(64, 216, 255, 0.38),
+    0 0 0.84rem rgba(238, 217, 153, 0.14);
   filter: brightness(1.28) saturate(1.12);
   mask-image: none;
   mix-blend-mode: screen;
   transform-origin: 0 50%;
-  animation: portfolioFirstWorldEnergyTransfer 300ms cubic-bezier(0.12, 0.78, 0.12, 1) 90ms both;
+  animation: portfolioFirstWorldEnergyTransfer 220ms cubic-bezier(0.08, 0.86, 0.1, 1) 70ms both;
 }
 
 .site-shell.has-entered-hub.is-portfolio-transferring .hub-card::after {
@@ -14313,33 +14313,33 @@ button.wrestling-event-history-tagged-thumb {
   border-radius: inherit;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 38%, rgba(247, 247, 242, 0.28) 0 4%, color-mix(in srgb, var(--module-accent) 28%, transparent) 5% 18%, transparent 42%),
-    radial-gradient(circle at 50% 38%, transparent 0 34%, rgba(64, 216, 255, 0.2) 38%, transparent 56%),
+    radial-gradient(circle at var(--portfolio-transfer-impact-x, 50%) var(--portfolio-transfer-impact-y, 38%), rgba(247, 247, 242, 0.34) 0 3.6%, color-mix(in srgb, var(--module-accent) 30%, transparent) 5% 16%, transparent 38%),
+    radial-gradient(circle at var(--portfolio-transfer-impact-x, 50%) var(--portfolio-transfer-impact-y, 38%), transparent 0 31%, rgba(64, 216, 255, 0.22) 35%, transparent 53%),
     linear-gradient(180deg, rgba(247, 247, 242, 0.08), transparent 46%);
   opacity: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.9, 0.9, 1);
-  animation: portfolioFirstWorldLocalResponse 680ms cubic-bezier(0.18, 0.86, 0.16, 1) 180ms both;
+  transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
+  animation: portfolioFirstWorldLocalResponse 560ms cubic-bezier(0.16, 0.88, 0.14, 1) 250ms both;
 }
 
 @keyframes portfolioFirstWorldEnergyTransfer {
   0% {
     opacity: 0;
-    filter: brightness(1.16) saturate(1.08);
-    transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(0.02);
+    filter: brightness(1.2) saturate(1.1);
+    transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(0.01);
   }
-  28% {
-    opacity: 0.9;
-    filter: brightness(1.38) saturate(1.18);
-    transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(0.46);
+  24% {
+    opacity: 0.96;
+    filter: brightness(1.46) saturate(1.2);
+    transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(0.52);
   }
-  72% {
-    opacity: 0.94;
-    filter: brightness(1.48) saturate(1.22);
+  82% {
+    opacity: 0.98;
+    filter: brightness(1.58) saturate(1.25);
     transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(1);
   }
   100% {
     opacity: 0;
-    filter: brightness(1.08) saturate(1.08);
+    filter: brightness(1.1) saturate(1.1);
     transform: translate3d(0, -50%, 0) rotate(var(--portfolio-transfer-angle, 0deg)) scaleX(1);
   }
 }
@@ -14347,23 +14347,23 @@ button.wrestling-event-history-tagged-thumb {
 @keyframes portfolioFirstWorldLocalResponse {
   0% {
     opacity: 0;
-    filter: brightness(1.02);
-    transform: translate3d(0, 0, 0) scale3d(0.9, 0.9, 1);
+    filter: brightness(1.12);
+    transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
   }
-  18% {
-    opacity: 0.78;
-    filter: brightness(1.38);
-    transform: translate3d(0, 0, 0) scale3d(0.99, 0.99, 1);
+  10% {
+    opacity: 0.84;
+    filter: brightness(1.5);
+    transform: translate3d(0, 0, 0) scale3d(0.985, 0.985, 1);
   }
-  68% {
-    opacity: 0.38;
-    filter: brightness(1.16);
-    transform: translate3d(0, 0, 0) scale3d(1.028, 1.028, 1);
+  54% {
+    opacity: 0.34;
+    filter: brightness(1.18);
+    transform: translate3d(0, 0, 0) scale3d(1.022, 1.022, 1);
   }
   100% {
-    opacity: 0.12;
+    opacity: 0.1;
     filter: brightness(1.02);
-    transform: translate3d(0, 0, 0) scale3d(1.058, 1.058, 1);
+    transform: translate3d(0, 0, 0) scale3d(1.046, 1.046, 1);
   }
 }
 @keyframes portfolioArrivalCenterReceive {
