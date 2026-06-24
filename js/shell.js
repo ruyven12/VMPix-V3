@@ -2681,6 +2681,8 @@ const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 1420;
 const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 40;
 const HOME_PORTFOLIO_SEAM_REVEAL_DELAY_MS = 0;
 const HOME_PORTFOLIO_SEAM_REDUCED_REVEAL_DELAY_MS = 0;
+// Temporary animation QA switch. Keep false for normal Home -> Portfolio routing.
+const HOME_PORTFOLIO_DEBUG_HOLD_ON_HOME = false;
 let homePortfolioTransitionTimer = 0;
 
 function clearHomePortfolioTransitionState() {
@@ -2719,6 +2721,11 @@ function beginHomePortfolioTransition() {
   window.clearTimeout(homePortfolioTransitionTimer);
   shell.classList.add("is-home-transitioning", "is-engage-activated");
   startButton.setAttribute("aria-busy", "true");
+
+  if (HOME_PORTFOLIO_DEBUG_HOLD_ON_HOME) {
+    homePortfolioTransitionTimer = 0;
+    return;
+  }
 
   const routeDelay = reducedMotion.matches
     ? HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS
