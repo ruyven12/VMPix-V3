@@ -258,7 +258,10 @@ function syncRoute(route, options = {}) {
     if (options.shouldAnimatePortal) {
       activatePortal({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) });
     } else {
-      revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) });
+      revealHub({
+        shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival),
+        shouldPlayDirectPortfolioArrival: Boolean(options.shouldPlayDirectPortfolioArrival),
+      });
     }
     return;
   }

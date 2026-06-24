@@ -1243,6 +1243,7 @@ function showMusicNexus(options = {}) {
   window.clearTimeout(activationTimer);
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
+  clearPortfolioDirectArrivalState();
   shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
   if (homeFrame) {
@@ -1306,6 +1307,7 @@ function showRingArchive() {
   window.clearTimeout(activationTimer);
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
+  clearPortfolioDirectArrivalState();
   shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
   if (homeFrame) {
@@ -2464,6 +2466,7 @@ function showHomepage() {
   clearHomePortfolioTransitionState();
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
+  clearPortfolioDirectArrivalState();
   closeGlobalMenu({ shouldRestoreFocus: false });
   shell.classList.remove("is-home-transitioning", "is-engage-activated", "is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
@@ -2530,6 +2533,7 @@ function revealHub(options = {}) {
   clearHomePortfolioTransitionState();
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
+  clearPortfolioDirectArrivalState();
   shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub");
   if (homeFrame) {
@@ -2560,6 +2564,8 @@ function revealHub(options = {}) {
   setActiveGlobalNav("portfolio");
   if (options.shouldPlayPortfolioArrival) {
     startPortfolioArrival();
+  } else if (options.shouldPlayDirectPortfolioArrival) {
+    startPortfolioDirectArrival();
   }
 }
 
@@ -2573,6 +2579,38 @@ let portfolioArrivalTimer = 0;
 let portfolioOrientationStartTimer = 0;
 let portfolioOrientationTimer = 0;
 let portfolioOrientationFocusCard = null;
+const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
+const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
+let portfolioDirectArrivalTimer = 0;
+
+function clearPortfolioDirectArrivalState() {
+  window.clearTimeout(portfolioDirectArrivalTimer);
+  portfolioDirectArrivalTimer = 0;
+  if (shell) {
+    shell.classList.remove("is-portfolio-direct-arriving");
+  }
+}
+
+function startPortfolioDirectArrival() {
+  if (
+    !shell ||
+    !portfolioHub ||
+    !shell.classList.contains("has-entered-hub") ||
+    shell.classList.contains("is-module-view") ||
+    shell.classList.contains("is-portfolio-arriving") ||
+    shell.classList.contains("is-portfolio-orienting") ||
+    window.location.pathname !== routePaths.portfolio
+  ) {
+    return;
+  }
+
+  clearPortfolioDirectArrivalState();
+  shell.classList.add("is-portfolio-direct-arriving");
+  const directArrivalDuration = reducedMotion.matches
+    ? PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS
+    : PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS;
+  portfolioDirectArrivalTimer = window.setTimeout(clearPortfolioDirectArrivalState, directArrivalDuration);
+}
 
 function clearPortfolioArrivalState() {
   window.clearTimeout(portfolioArrivalTimer);
@@ -2885,7 +2923,11 @@ if (shell && startButton) {
   if (typeof initWrestlingPeopleModule === "function") {
     initWrestlingPeopleModule();
   }
-  syncRouteFromLocation({ historyState: window.history.state });
+  const initialRoute = getRouteFromUrl();
+  syncRouteFromLocation({
+    historyState: window.history.state,
+    shouldPlayDirectPortfolioArrival: initialRoute.name === "portfolio",
+  });
   window.addEventListener("popstate", (event) => {
     syncRouteFromLocation({ historyState: event.state });
   });
@@ -2914,6 +2956,7 @@ if (shell && startButton) {
     window.clearTimeout(activationTimer);
     window.clearTimeout(portfolioArrivalTimer);
     window.clearTimeout(portfolioOrientationStartTimer);
+    window.clearTimeout(portfolioDirectArrivalTimer);
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {

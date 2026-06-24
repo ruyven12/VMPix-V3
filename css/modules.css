@@ -13996,6 +13996,182 @@ button.wrestling-event-history-tagged-thumb {
   filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
 }
 
+/* PASS 16 Direct Portfolio Arrival. Direct /portfolio entry only; no Home Story replay. */
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub {
+  animation: portfolioDirectArrivalChamberWake 720ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub::after {
+  position: absolute;
+  inset: var(--space-2);
+  z-index: 2;
+  content: "";
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(247, 247, 242, 0.14) 0 5%, rgba(238, 217, 153, 0.09) 6% 14%, transparent 24%),
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--module-accent) 16%, transparent) 0 12%, transparent 42%),
+    linear-gradient(90deg, transparent 0 18%, rgba(247, 247, 242, 0.08) 44% 56%, transparent 82% 100%);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale3d(0.64, 0.64, 1);
+  animation: portfolioDirectArrivalWakeScan 680ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-carousel,
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-context {
+  animation: portfolioDirectArrivalSurfaceOnline 720ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card {
+  animation: portfolioDirectArrivalWorldOnline 560ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card::after {
+  position: absolute;
+  inset: 0.18rem;
+  z-index: 0;
+  content: "";
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--module-accent) 18%, transparent), transparent 48%),
+    linear-gradient(135deg, transparent 0 30%, rgba(247, 247, 242, 0.09) 49% 51%, transparent 70% 100%);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
+  animation: portfolioDirectArrivalWorldGlow 520ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(2),
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(2)::after {
+  animation-delay: 32ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(3),
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(3)::after {
+  animation-delay: 64ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(4),
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(4)::after {
+  animation-delay: 88ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(5),
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card:nth-child(5)::after {
+  animation-delay: 112ms;
+}
+
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .ambient-energy,
+.site-shell.has-entered-hub.is-portfolio-direct-arriving .ambient-rings {
+  animation: portfolioDirectArrivalAmbientWake 620ms cubic-bezier(0.18, 0.86, 0.16, 1);
+}
+
+@keyframes portfolioDirectArrivalChamberWake {
+  0% {
+    opacity: 0.84;
+    transform: translate3d(0, 0.12rem, 0) scale3d(0.988, 0.988, 1);
+  }
+
+  42% {
+    opacity: 0.98;
+    transform: translate3d(0, 0, 0) scale3d(1.002, 1.002, 1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioDirectArrivalWakeScan {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(0.64, 0.64, 1);
+  }
+
+  34% {
+    opacity: 0.46;
+    transform: translate3d(0, 0, 0) scale3d(0.84, 0.84, 1);
+  }
+
+  66% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale3d(1.08, 1.08, 1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(1.16, 1.16, 1);
+  }
+}
+
+@keyframes portfolioDirectArrivalSurfaceOnline {
+  0% {
+    opacity: 0.82;
+    transform: perspective(1000px) translate3d(0, 0.14rem, -0.5rem) scale3d(0.992, 0.992, 1);
+  }
+
+  48% {
+    opacity: 0.98;
+    transform: perspective(1000px) translate3d(0, 0, 0) scale3d(1.002, 1.002, 1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1000px) translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioDirectArrivalWorldOnline {
+  0% {
+    opacity: 0.78;
+    transform: translate3d(0, 0.1rem, 0) scale3d(0.99, 0.99, 1);
+  }
+
+  54% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1.004, 1.004, 1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioDirectArrivalWorldGlow {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
+  }
+
+  44% {
+    opacity: 0.24;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(1.04, 1.04, 1);
+  }
+}
+
+@keyframes portfolioDirectArrivalAmbientWake {
+  0% {
+    opacity: 0.42;
+    transform: translate3d(0, 0, 0) scale3d(0.985, 0.985, 1);
+  }
+
+  58% {
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0) scale3d(1.006, 1.006, 1);
+  }
+
+  100% {
+    opacity: 0.58;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
 /* PASS 13 Portfolio Arrival. Receiving-side beat after Home Archive Entry only. */
 .site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub {
   animation: portfolioArrivalHubWake 860ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
@@ -16232,6 +16408,33 @@ button.wrestling-event-history-tagged-thumb {
     transform: none;
   }
 
+
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub::after,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-carousel,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-context,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card::after,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .ambient-energy,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .ambient-rings {
+    animation: none !important;
+    transform: none;
+  }
+
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-carousel,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-context,
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card {
+    opacity: 1;
+  }
+
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub::after {
+    opacity: 0;
+  }
+
+  .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-card::after {
+    opacity: 0.12;
+  }
   .site-shell.has-entered-hub.is-portfolio-orienting .portfolio-hub::after {
     animation: none !important;
     opacity: 0;
