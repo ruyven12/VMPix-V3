@@ -14173,6 +14173,25 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 /* PASS 13 Portfolio Arrival. Receiving-side beat after Home Archive Entry only. */
+.site-shell.has-entered-hub.is-portfolio-arriving .ambient-system::after {
+  display: block;
+  inset: auto;
+  top: var(--home-portfolio-transition-center-y);
+  left: var(--home-portfolio-transition-center-x);
+  width: var(--home-portfolio-transition-pulse-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(247, 247, 242, 0.2) 0 4%, rgba(238, 217, 153, 0.12) 5% 13%, transparent 20%),
+    radial-gradient(circle, transparent 0 35%, rgba(255, 74, 24, 0.2) 39%, rgba(213, 22, 34, 0.15) 44%, transparent 54%),
+    radial-gradient(circle, transparent 0 60%, rgba(247, 247, 242, 0.12) 62%, transparent 72%);
+  box-shadow:
+    0 0 2.2rem rgba(213, 22, 34, 0.16),
+    0 0 3.4rem rgba(238, 217, 153, 0.08);
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.34, 0.34, 1);
+  animation: portfolioArrivalCenterReceive 760ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
+}
 .site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub {
   animation: portfolioArrivalHubWake 860ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
 }
@@ -14180,7 +14199,7 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub::after {
   position: absolute;
   inset: var(--space-2);
-  z-index: 4;
+  z-index: 2;
   content: "";
   border-radius: var(--radius-sm);
   pointer-events: none;
@@ -14245,6 +14264,24 @@ button.wrestling-event-history-tagged-thumb {
   animation: portfolioArrivalAmbientRings 860ms cubic-bezier(0.18, 0.86, 0.16, 1) both;
 }
 
+@keyframes portfolioArrivalCenterReceive {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.34, 0.34, 1);
+  }
+  26% {
+    opacity: 0.68;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.54, 0.54, 1);
+  }
+  68% {
+    opacity: 0.28;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.92, 0.92, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.12, 1.12, 1);
+  }
+}
 @keyframes portfolioArrivalHubWake {
   0% {
     opacity: 0.72;
@@ -14266,11 +14303,11 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(0.22, 0.22, 1);
   }
   24% {
-    opacity: 0.78;
+    opacity: 0.28;
     transform: translate3d(0, 0, 0) scale3d(0.46, 0.46, 1);
   }
   68% {
-    opacity: 0.34;
+    opacity: 0.12;
     transform: translate3d(0, 0, 0) scale3d(0.86, 0.86, 1);
   }
   100% {
@@ -14399,7 +14436,7 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(0.94, 0.94, 1);
   }
   38% {
-    opacity: 0.68;
+    opacity: 0.44;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
   100% {
@@ -14425,7 +14462,7 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
   48% {
-    transform: translate3d(0, -0.04rem, 0) scale3d(1.016, 1.016, 1);
+    transform: translate3d(0, -0.02rem, 0) scale3d(1.01, 1.01, 1);
   }
   100% {
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
@@ -14438,7 +14475,7 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(0.98, 0.98, 1);
   }
   44% {
-    opacity: 0.72;
+    opacity: 0.46;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
   100% {
@@ -16409,6 +16446,12 @@ button.wrestling-event-history-tagged-thumb {
   }
 
 
+  .site-shell.has-entered-hub.is-portfolio-arriving .ambient-system::after,
+  .site-shell.has-entered-hub.is-portfolio-arriving .portfolio-hub::after {
+    animation: none !important;
+    opacity: 0;
+    transform: none;
+  }
   .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub,
   .site-shell.has-entered-hub.is-portfolio-direct-arriving .portfolio-hub::after,
   .site-shell.has-entered-hub.is-portfolio-direct-arriving .hub-carousel,
