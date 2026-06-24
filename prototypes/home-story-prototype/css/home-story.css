@@ -292,9 +292,9 @@ body {
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   animation:
-    archiveAccessRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreOuterIgnition 2.25s var(--ease-breath) 16.38s forwards,
-    archiveCoreOuterCirculation 12s linear 18.63s infinite;
+    archiveAccessRingForm 0.96s var(--ease-breath) 20.46s both,
+    archiveCoreOuterIgnition 0.92s var(--ease-breath) 21.16s forwards,
+    archiveCoreOuterCirculation 12s linear 22.1s infinite;
 }
 
 .home-archive-message--identity::after {
@@ -312,9 +312,9 @@ body {
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   animation:
-    archiveAccessCoreRingForm 2.35s var(--ease-breath) 15.65s both,
-    archiveCoreInnerIgnition 2.05s var(--ease-breath) 16.48s forwards,
-    archiveCoreInnerCirculation 8.5s linear 18.53s infinite;
+    archiveAccessCoreRingForm 0.96s var(--ease-breath) 20.52s both,
+    archiveCoreInnerIgnition 0.86s var(--ease-breath) 21.22s forwards,
+    archiveCoreInnerCirculation 8.5s linear 22.08s infinite;
 }
 
 .home-identity-text {
@@ -362,40 +362,43 @@ body {
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveEngageCommandForm 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 20.46s both;
+  animation: archiveEngageCommandForm 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 21.5s both;
 }
 
 .home-identity-text--engage::before {
   content: "";
   position: absolute;
-  z-index: -1;
+  z-index: 2;
   left: 50%;
   top: 50%;
-  width: clamp(10.05rem, calc(var(--home-access-control-size) - 0.35rem), 11.75rem);
+  width: clamp(11.35rem, calc(var(--home-access-control-size) + 1.05rem), 13.25rem);
   aspect-ratio: 1;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
   background:
     conic-gradient(from 24deg,
-      transparent 0deg 14deg,
-      rgba(213, 54, 22, 0.3) 19deg,
-      rgba(238, 126, 52, 0.9) 31deg,
-      rgba(238, 217, 153, 0.45) 38deg,
-      rgba(213, 54, 22, 0.34) 50deg,
-      transparent 64deg 108deg,
-      rgba(213, 54, 22, 0.22) 116deg,
-      rgba(238, 126, 52, 0.64) 130deg,
-      rgba(238, 217, 153, 0.3) 142deg,
-      rgba(213, 54, 22, 0.2) 154deg,
-      transparent 170deg 360deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 87%, #000 89% 97%, transparent 99%);
-  mask: radial-gradient(circle, transparent 0 87%, #000 89% 97%, transparent 99%);
+      transparent 0deg 10deg,
+      rgba(213, 54, 22, 0.42) 16deg,
+      rgba(238, 126, 52, 0.98) 30deg,
+      rgba(238, 217, 153, 0.52) 39deg,
+      rgba(213, 54, 22, 0.44) 54deg,
+      transparent 72deg 100deg,
+      rgba(213, 54, 22, 0.3) 110deg,
+      rgba(238, 126, 52, 0.82) 128deg,
+      rgba(238, 217, 153, 0.38) 144deg,
+      rgba(213, 54, 22, 0.28) 160deg,
+      transparent 180deg 252deg,
+      rgba(213, 54, 22, 0.2) 262deg,
+      rgba(238, 126, 52, 0.54) 274deg,
+      transparent 288deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 88%, #000 90% 99%, transparent 100%);
+  mask: radial-gradient(circle, transparent 0 88%, #000 90% 99%, transparent 100%);
   mix-blend-mode: screen;
-  filter: blur(0.01rem) drop-shadow(0 0 0.86rem rgba(213, 54, 22, 0.48)) drop-shadow(0 0 0.38rem rgba(238, 126, 52, 0.42));
+  filter: blur(0.008rem) drop-shadow(0 0 1.05rem rgba(213, 54, 22, 0.58)) drop-shadow(0 0 0.52rem rgba(238, 126, 52, 0.5));
   transform: translate3d(-50%, -50%, 0) rotate(-24deg) scale3d(0.985, 0.985, 1);
   transform-origin: center;
-  animation: archiveEngageOuterLightning 6.8s cubic-bezier(0.38, 0, 0.22, 1) 21.3s infinite;
+  animation: archiveEngageOuterLightning 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
   will-change: opacity, transform, filter;
 }
 
@@ -772,7 +775,7 @@ body {
     filter: brightness(1.2);
   }
   13% {
-    opacity: 0.54;
+    opacity: 0.7;
     filter: brightness(0.86);
   }
   18% {
@@ -951,23 +954,23 @@ body {
     transform: translate3d(-50%, -50%, 0) rotate(-24deg) scale3d(0.985, 0.985, 1);
   }
   9% {
-    opacity: 0.44;
-    filter: blur(0.012rem) drop-shadow(0 0 0.62rem rgba(213, 54, 22, 0.34)) drop-shadow(0 0 0.26rem rgba(238, 126, 52, 0.28));
+    opacity: 0.58;
+    filter: blur(0.01rem) drop-shadow(0 0 0.84rem rgba(213, 54, 22, 0.46)) drop-shadow(0 0 0.38rem rgba(238, 126, 52, 0.38));
     transform: translate3d(-50%, -50%, 0) rotate(28deg) scale3d(0.995, 0.995, 1);
   }
   18% {
-    opacity: 0.82;
-    filter: blur(0.01rem) drop-shadow(0 0 1.08rem rgba(238, 126, 52, 0.55)) drop-shadow(0 0 0.52rem rgba(213, 54, 22, 0.46));
+    opacity: 0.94;
+    filter: blur(0.008rem) drop-shadow(0 0 1.34rem rgba(238, 126, 52, 0.68)) drop-shadow(0 0 0.72rem rgba(213, 54, 22, 0.58));
     transform: translate3d(-50%, -50%, 0) rotate(132deg) scale3d(1.004, 1.004, 1);
   }
   30% {
-    opacity: 0.54;
-    filter: blur(0.014rem) drop-shadow(0 0 0.72rem rgba(213, 54, 22, 0.36)) drop-shadow(0 0 0.32rem rgba(238, 126, 52, 0.3));
+    opacity: 0.7;
+    filter: blur(0.012rem) drop-shadow(0 0 0.96rem rgba(213, 54, 22, 0.48)) drop-shadow(0 0 0.44rem rgba(238, 126, 52, 0.4));
     transform: translate3d(-50%, -50%, 0) rotate(232deg) scale3d(0.998, 0.998, 1);
   }
   42% {
-    opacity: 0.16;
-    filter: blur(0.02rem) drop-shadow(0 0 0.34rem rgba(213, 54, 22, 0.2));
+    opacity: 0.24;
+    filter: blur(0.018rem) drop-shadow(0 0 0.52rem rgba(213, 54, 22, 0.28));
     transform: translate3d(-50%, -50%, 0) rotate(330deg) scale3d(0.99, 0.99, 1);
   }
 }
@@ -1001,7 +1004,7 @@ body {
     transform: translate3d(0, 8.07rem, 0) scale3d(1.018, 1.018, 1);
   }
   100% {
-    opacity: 0.82;
+    opacity: 0.94;
     filter: blur(0) brightness(1.05);
     transform: translate3d(0, 8.03rem, 0) scale3d(1, 1, 1);
   }
@@ -1024,7 +1027,7 @@ body {
     transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
   }
   100% {
-    opacity: 0.54;
+    opacity: 0.7;
     filter: brightness(1);
     transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
   }
@@ -1053,7 +1056,7 @@ body {
 }
 @keyframes archiveCoreOuterIgnition {
   0% {
-    opacity: 0.54;
+    opacity: 0.7;
     filter: brightness(1);
     transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1);
     box-shadow:
@@ -1103,7 +1106,7 @@ body {
     transform: translate3d(-50%, -50%, 0) rotate(29deg) scale3d(1.012, 1.012, 1);
   }
   50% {
-    opacity: 0.82;
+    opacity: 0.94;
     filter: brightness(1.12);
     transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(1.024, 1.024, 1);
   }
@@ -1133,7 +1136,7 @@ body {
       0 0 1.6rem rgba(220, 188, 108, 0.083);
   }
   72% {
-    opacity: 0.44;
+    opacity: 0.58;
     filter: brightness(1.08);
     transform: translate3d(-50%, -50%, 0) scale3d(0.69, 0.69, 1);
     box-shadow:
@@ -1227,7 +1230,7 @@ body {
     transform: translate3d(0, 0, 0) scale(0.985);
   }
   48% {
-    opacity: 0.54;
+    opacity: 0.7;
     filter: drop-shadow(0 0 0.18rem rgba(220, 188, 108, 0.1)) brightness(1.04) blur(0.03px);
   }
   100% {
@@ -1277,7 +1280,7 @@ body {
     filter: drop-shadow(0 0 0.4rem rgba(220, 188, 108, 0.27)) brightness(1.2) blur(0.02px);
   }
   100% {
-    opacity: 0.54;
+    opacity: 0.7;
     filter: drop-shadow(0 0 0.34rem rgba(220, 188, 108, 0.24)) brightness(1.08) blur(0.02px);
     transform: scale(1);
   }
@@ -1308,7 +1311,7 @@ body {
     transform: translate3d(-50%, -50%, 0) scale(0.16);
   }
   13% {
-    opacity: 0.54;
+    opacity: 0.7;
     transform: translate3d(-50%, -50%, 0) scale(0.52);
   }
   24% {
@@ -1486,7 +1489,7 @@ body {
   }
 
   .home-archive-sector::after {
-    opacity: 0.54;
+    opacity: 0.7;
   }
 
   .home-archive-world {
@@ -1545,8 +1548,8 @@ body {
 
   .home-identity-text--engage::before {
     animation: none !important;
-    opacity: 0.36;
-    filter: blur(0.01rem) drop-shadow(0 0 0.74rem rgba(213, 54, 22, 0.34)) drop-shadow(0 0 0.32rem rgba(238, 126, 52, 0.3));
+    opacity: 0.44;
+    filter: blur(0.008rem) drop-shadow(0 0 0.9rem rgba(213, 54, 22, 0.42)) drop-shadow(0 0 0.42rem rgba(238, 126, 52, 0.36));
     transform: translate3d(-50%, -50%, 0) rotate(28deg) scale3d(1, 1, 1);
   }
 
@@ -1557,7 +1560,7 @@ body {
   }
 
   .home-identity-text--ready {
-    opacity: 0.82;
+    opacity: 0.94;
     filter: brightness(1.05);
     transform: translate3d(0, 8.03rem, 0) scale3d(1, 1, 1);
   }
