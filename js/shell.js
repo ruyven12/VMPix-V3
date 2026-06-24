@@ -2448,8 +2448,9 @@ function showHomepage() {
   }
 
   window.clearTimeout(activationTimer);
+  clearHomePortfolioTransitionState();
   closeGlobalMenu({ shouldRestoreFocus: false });
-  shell.classList.remove("is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-home-transitioning", "is-engage-activated", "is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
@@ -2511,6 +2512,7 @@ function handleGlobalMenuAction(event) {
 }
 
 function revealHub() {
+  clearHomePortfolioTransitionState();
   shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub");
   if (homeFrame) {
@@ -2541,6 +2543,58 @@ function revealHub() {
   setActiveGlobalNav("portfolio");
 }
 
+const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 0;
+const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 0;
+let homePortfolioTransitionTimer = 0;
+
+function clearHomePortfolioTransitionState() {
+  window.clearTimeout(homePortfolioTransitionTimer);
+  homePortfolioTransitionTimer = 0;
+  if (shell) {
+    shell.classList.remove("is-home-transitioning", "is-engage-activated");
+  }
+  if (startButton) {
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
+function completeHomePortfolioRouteHandoff() {
+  homePortfolioTransitionTimer = 0;
+  navigateToRoute(routePaths.portfolio, {
+    shouldAnimatePortal: true,
+    historyState: { fromHomeEngage: true },
+  });
+}
+
+function beginHomePortfolioTransition() {
+  if (
+    !shell ||
+    !startButton ||
+    startButton.disabled ||
+    shell.classList.contains("is-home-transitioning") ||
+    shell.classList.contains("is-engage-activated") ||
+    shell.classList.contains("is-activating") ||
+    shell.classList.contains("has-entered-hub")
+  ) {
+    return;
+  }
+
+  window.clearTimeout(homePortfolioTransitionTimer);
+  shell.classList.add("is-home-transitioning", "is-engage-activated");
+  startButton.setAttribute("aria-busy", "true");
+
+  const routeDelay = reducedMotion.matches
+    ? HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS
+    : HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS;
+
+  if (routeDelay <= 0) {
+    completeHomePortfolioRouteHandoff();
+    return;
+  }
+
+  homePortfolioTransitionTimer = window.setTimeout(completeHomePortfolioRouteHandoff, routeDelay);
+}
+
 function activatePortal() {
   if (
     !shell ||
@@ -2566,9 +2620,7 @@ if (shell && startButton) {
   initShellRailLogo();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
-  startButton.addEventListener("click", () => {
-    navigateToRoute(routePaths.portfolio, { shouldAnimatePortal: true });
-  });
+  startButton.addEventListener("click", beginHomePortfolioTransition);
   updateViewportMetrics();
   if (railMenuTrigger) {
     railMenuTrigger.addEventListener("click", openGlobalMenu);

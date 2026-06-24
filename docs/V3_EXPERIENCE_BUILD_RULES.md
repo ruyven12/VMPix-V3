@@ -1,4 +1,4 @@
-﻿# V3 Experience Build Rules
+# V3 Experience Build Rules
 
 These rules are project law for the V3 UI, animation, routing, and story experience phase. Codex must read this file before starting any UI animation task, then follow it unless the user explicitly supersedes a rule in the current task.
 
@@ -105,6 +105,77 @@ If implementation constraints require deviation, document the deviation and keep
 Once an effect, page, or route is approved, treat it as protected. Do not refactor, restyle, retime, or replace it while working elsewhere unless the current task explicitly includes that protected surface.
 
 When touching shared shell code, check approved effects that depend on it.
+
+## Protected Asset – Home Story Sequence
+
+Status: APPROVED
+Version: Home Story v1.0
+Phase: Complete / Ready for Final Mobile Validation
+
+Protected Story Structure:
+
+Void
+↓
+Transmission
+↓
+Archive Discovery
+↓
+Archive Awakening
+↓
+Worlds Online
+↓
+Core Online
+↓
+ENGAGE
+
+Protected Timing Sections:
+
+- Void sequence
+- Transmission sequence
+- ARCHIVE NODE FOUND
+- DECODING ARCHIVE...
+- VOODOO MEDIA
+- V3 identity
+- Archive Worlds Awakening
+- Core Ignition
+- ENGAGE sequence
+
+Protected Visual Assets:
+
+- Archive worlds layout
+- Core ignition behavior
+- ENGAGE final composition
+- Core sizing
+- Status text placement
+- Red kinetic border
+- Hidden /portfolio activation
+- Home-only Engine Bar hidden state
+
+Allowed Future Changes:
+
+- Bug fixes
+- Final mobile QA corrections
+- Accessibility fixes
+- Explicitly approved Home Enhancement passes
+
+Disallowed Without Explicit Approval:
+
+- Story restructuring
+- New Home story chapters
+- Core redesign
+- World redesign
+- Timing redesign
+- ENGAGE redesign
+- Kinetic energy redesign
+
+Development Rule:
+
+Home Story is now a protected asset. Future edits must be scoped as either:
+
+- Home QA Fix
+- Home Enhancement Pass
+
+and must not alter approved assets unless explicitly requested.
 
 ## 15. Experience Before Cleverness
 
