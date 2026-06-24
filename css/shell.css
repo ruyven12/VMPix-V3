@@ -333,41 +333,70 @@ button {
   animation: archiveEngageCommandForm 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 21.5s both;
 }
 
-.home-identity-text--engage::before {
+.home-identity-text--engage::before,
+.home-identity-text--engage::after {
   content: "";
   position: absolute;
-  z-index: 2;
   left: 50%;
   top: 50%;
-  width: clamp(11.35rem, calc(var(--home-access-control-size) + 1.05rem), 13.25rem);
   aspect-ratio: 1;
   border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  background:
-    conic-gradient(from 24deg,
-      transparent 0deg 10deg,
-      rgba(213, 54, 22, 0.42) 16deg,
-      rgba(238, 126, 52, 0.98) 30deg,
-      rgba(238, 217, 153, 0.52) 39deg,
-      rgba(213, 54, 22, 0.44) 54deg,
-      transparent 72deg 100deg,
-      rgba(213, 54, 22, 0.3) 110deg,
-      rgba(238, 126, 52, 0.82) 128deg,
-      rgba(238, 217, 153, 0.38) 144deg,
-      rgba(213, 54, 22, 0.28) 160deg,
-      transparent 180deg 252deg,
-      rgba(213, 54, 22, 0.2) 262deg,
-      rgba(238, 126, 52, 0.54) 274deg,
-      transparent 288deg 360deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 88%, #000 90% 99%, transparent 100%);
-  mask: radial-gradient(circle, transparent 0 88%, #000 90% 99%, transparent 100%);
   mix-blend-mode: screen;
-  filter: blur(0.008rem) drop-shadow(0 0 1.05rem rgba(213, 54, 22, 0.58)) drop-shadow(0 0 0.52rem rgba(238, 126, 52, 0.5));
-  transform: translate3d(-50%, -50%, 0) rotate(-24deg) scale3d(0.985, 0.985, 1);
   transform-origin: center;
-  animation: archiveEngageOuterLightning 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
   will-change: opacity, transform, filter;
+}
+
+.home-identity-text--engage::before {
+  z-index: 2;
+  width: clamp(11.85rem, calc(var(--home-access-control-size) + 1.45rem), 13.8rem);
+  background:
+    radial-gradient(circle, transparent 0 78%, rgba(213, 54, 22, 0.18) 84%, rgba(238, 126, 52, 0.46) 92%, rgba(255, 73, 24, 0.62) 97%, transparent 100%),
+    conic-gradient(from 18deg,
+      transparent 0deg 12deg,
+      rgba(213, 54, 22, 0.34) 18deg,
+      rgba(238, 126, 52, 0.76) 32deg,
+      transparent 50deg 112deg,
+      rgba(255, 67, 22, 0.3) 122deg,
+      rgba(238, 126, 52, 0.58) 140deg,
+      transparent 160deg 246deg,
+      rgba(213, 54, 22, 0.22) 258deg,
+      rgba(238, 126, 52, 0.46) 272deg,
+      transparent 288deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
+  mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
+  filter: blur(0.018rem) drop-shadow(0 0 1.28rem rgba(213, 54, 22, 0.66)) drop-shadow(0 0 0.68rem rgba(238, 126, 52, 0.58));
+  transform: translate3d(-50%, -50%, 0) rotate(-20deg) scale3d(0.99, 0.99, 1);
+  animation: archiveEngageOuterLightningGlow 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
+}
+
+.home-identity-text--engage::after {
+  z-index: 3;
+  width: clamp(12.2rem, calc(var(--home-access-control-size) + 2rem), 14.35rem);
+  background:
+    repeating-conic-gradient(from 8deg,
+      transparent 0deg 6.4deg,
+      rgba(255, 48, 16, 0.96) 7.1deg 9deg,
+      rgba(255, 151, 38, 0.98) 9.4deg 10.6deg,
+      transparent 11.2deg 23.5deg,
+      rgba(213, 54, 22, 0.74) 24.4deg 26.8deg,
+      transparent 27.4deg 42deg),
+    conic-gradient(from 35deg,
+      transparent 0deg 28deg,
+      rgba(255, 58, 20, 0.88) 34deg 46deg,
+      rgba(255, 166, 46, 0.72) 50deg 55deg,
+      transparent 62deg 138deg,
+      rgba(255, 44, 15, 0.82) 146deg 160deg,
+      rgba(238, 126, 52, 0.64) 164deg 171deg,
+      transparent 178deg 246deg,
+      rgba(255, 67, 22, 0.76) 254deg 264deg,
+      transparent 274deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
+  mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
+  filter: blur(0.004rem) drop-shadow(0 0 1.55rem rgba(255, 57, 18, 0.76)) drop-shadow(0 0 0.72rem rgba(238, 126, 52, 0.68));
+  transform: translate3d(-50%, -50%, 0) rotate(12deg) scale3d(0.995, 0.995, 1);
+  animation: archiveEngageOuterLightningSegments 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
 }
 
 .home-identity-text--core,
@@ -1333,33 +1362,63 @@ button {
   }
 }
 
-@keyframes archiveEngageOuterLightning {
+@keyframes archiveEngageOuterLightningGlow {
   0%,
   62%,
   100% {
     opacity: 0;
-    filter: blur(0.018rem) drop-shadow(0 0 0 rgba(213, 54, 22, 0));
-    transform: translate3d(-50%, -50%, 0) rotate(-24deg) scale3d(0.985, 0.985, 1);
+    filter: blur(0.026rem) drop-shadow(0 0 0 rgba(213, 54, 22, 0));
+    transform: translate3d(-50%, -50%, 0) rotate(-20deg) scale3d(0.99, 0.99, 1);
   }
   9% {
-    opacity: 0.58;
-    filter: blur(0.01rem) drop-shadow(0 0 0.84rem rgba(213, 54, 22, 0.46)) drop-shadow(0 0 0.38rem rgba(238, 126, 52, 0.38));
-    transform: translate3d(-50%, -50%, 0) rotate(28deg) scale3d(0.995, 0.995, 1);
+    opacity: 0.48;
+    filter: blur(0.02rem) drop-shadow(0 0 0.94rem rgba(213, 54, 22, 0.5)) drop-shadow(0 0 0.42rem rgba(238, 126, 52, 0.42));
+    transform: translate3d(-50%, -50%, 0) rotate(26deg) scale3d(1, 1, 1);
   }
   18% {
-    opacity: 0.94;
-    filter: blur(0.008rem) drop-shadow(0 0 1.34rem rgba(238, 126, 52, 0.68)) drop-shadow(0 0 0.72rem rgba(213, 54, 22, 0.58));
-    transform: translate3d(-50%, -50%, 0) rotate(132deg) scale3d(1.004, 1.004, 1);
+    opacity: 0.82;
+    filter: blur(0.018rem) drop-shadow(0 0 1.48rem rgba(213, 54, 22, 0.74)) drop-shadow(0 0 0.72rem rgba(238, 126, 52, 0.62));
+    transform: translate3d(-50%, -50%, 0) rotate(126deg) scale3d(1.006, 1.006, 1);
   }
   30% {
-    opacity: 0.7;
-    filter: blur(0.012rem) drop-shadow(0 0 0.96rem rgba(213, 54, 22, 0.48)) drop-shadow(0 0 0.44rem rgba(238, 126, 52, 0.4));
-    transform: translate3d(-50%, -50%, 0) rotate(232deg) scale3d(0.998, 0.998, 1);
+    opacity: 0.56;
+    filter: blur(0.022rem) drop-shadow(0 0 1.08rem rgba(213, 54, 22, 0.56)) drop-shadow(0 0 0.48rem rgba(238, 126, 52, 0.48));
+    transform: translate3d(-50%, -50%, 0) rotate(224deg) scale3d(1, 1, 1);
   }
   42% {
-    opacity: 0.24;
-    filter: blur(0.018rem) drop-shadow(0 0 0.52rem rgba(213, 54, 22, 0.28));
-    transform: translate3d(-50%, -50%, 0) rotate(330deg) scale3d(0.99, 0.99, 1);
+    opacity: 0.22;
+    filter: blur(0.026rem) drop-shadow(0 0 0.54rem rgba(213, 54, 22, 0.3));
+    transform: translate3d(-50%, -50%, 0) rotate(318deg) scale3d(0.992, 0.992, 1);
+  }
+}
+
+@keyframes archiveEngageOuterLightningSegments {
+  0%,
+  62%,
+  100% {
+    opacity: 0;
+    filter: blur(0.01rem) drop-shadow(0 0 0 rgba(255, 57, 18, 0));
+    transform: translate3d(-50%, -50%, 0) rotate(12deg) scale3d(0.995, 0.995, 1);
+  }
+  8% {
+    opacity: 0.62;
+    filter: blur(0.006rem) drop-shadow(0 0 0.98rem rgba(255, 57, 18, 0.58)) drop-shadow(0 0 0.42rem rgba(255, 151, 38, 0.46));
+    transform: translate3d(-50%, -50%, 0) rotate(62deg) scale3d(1, 1, 1);
+  }
+  18% {
+    opacity: 1;
+    filter: blur(0.004rem) drop-shadow(0 0 1.7rem rgba(255, 57, 18, 0.82)) drop-shadow(0 0 0.86rem rgba(255, 151, 38, 0.74));
+    transform: translate3d(-50%, -50%, 0) rotate(156deg) scale3d(1.006, 1.006, 1);
+  }
+  31% {
+    opacity: 0.74;
+    filter: blur(0.006rem) drop-shadow(0 0 1.2rem rgba(255, 57, 18, 0.64)) drop-shadow(0 0 0.56rem rgba(238, 126, 52, 0.54));
+    transform: translate3d(-50%, -50%, 0) rotate(252deg) scale3d(1.002, 1.002, 1);
+  }
+  44% {
+    opacity: 0.28;
+    filter: blur(0.01rem) drop-shadow(0 0 0.58rem rgba(255, 57, 18, 0.34));
+    transform: translate3d(-50%, -50%, 0) rotate(342deg) scale3d(0.996, 0.996, 1);
   }
 }
 @keyframes archiveCoreStatusForm {
@@ -2966,11 +3025,21 @@ button {
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
-  .home-identity-text--engage::before {
+  .home-identity-text--engage::before,
+  .home-identity-text--engage::after {
     animation: none !important;
-    opacity: 0.44;
-    filter: blur(0.008rem) drop-shadow(0 0 0.9rem rgba(213, 54, 22, 0.42)) drop-shadow(0 0 0.42rem rgba(238, 126, 52, 0.36));
-    transform: translate3d(-50%, -50%, 0) rotate(28deg) scale3d(1, 1, 1);
+  }
+
+  .home-identity-text--engage::before {
+    opacity: 0.5;
+    filter: blur(0.018rem) drop-shadow(0 0 1.12rem rgba(213, 54, 22, 0.52)) drop-shadow(0 0 0.52rem rgba(238, 126, 52, 0.44));
+    transform: translate3d(-50%, -50%, 0) rotate(24deg) scale3d(1, 1, 1);
+  }
+
+  .home-identity-text--engage::after {
+    opacity: 0.72;
+    filter: blur(0.004rem) drop-shadow(0 0 1.32rem rgba(255, 57, 18, 0.68)) drop-shadow(0 0 0.66rem rgba(255, 151, 38, 0.56));
+    transform: translate3d(-50%, -50%, 0) rotate(42deg) scale3d(1, 1, 1);
   }
 
   .home-identity-text--core {
