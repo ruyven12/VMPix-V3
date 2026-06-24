@@ -2563,17 +2563,22 @@ function revealHub(options = {}) {
   }
 }
 
-const PORTFOLIO_ARRIVAL_DURATION_MS = 920;
-const PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
-const PORTFOLIO_ORIENTATION_DURATION_MS = 1040;
-const PORTFOLIO_ORIENTATION_REDUCED_MOTION_DURATION_MS = 80;
+const PORTFOLIO_ARRIVAL_DURATION_MS = 860;
+const PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS = 70;
+const PORTFOLIO_ORIENTATION_START_OFFSET_MS = 480;
+const PORTFOLIO_ORIENTATION_REDUCED_MOTION_START_OFFSET_MS = 28;
+const PORTFOLIO_ORIENTATION_DURATION_MS = 760;
+const PORTFOLIO_ORIENTATION_REDUCED_MOTION_DURATION_MS = 70;
 let portfolioArrivalTimer = 0;
+let portfolioOrientationStartTimer = 0;
 let portfolioOrientationTimer = 0;
 let portfolioOrientationFocusCard = null;
 
 function clearPortfolioArrivalState() {
   window.clearTimeout(portfolioArrivalTimer);
+  window.clearTimeout(portfolioOrientationStartTimer);
   portfolioArrivalTimer = 0;
+  portfolioOrientationStartTimer = 0;
   if (shell) {
     shell.classList.remove("is-portfolio-arriving");
   }
@@ -2592,6 +2597,7 @@ function clearPortfolioOrientationState() {
 }
 
 function startPortfolioOrientation() {
+  portfolioOrientationStartTimer = 0;
   if (
     !shell ||
     !portfolioHub ||
@@ -2626,14 +2632,17 @@ function startPortfolioArrival() {
   const arrivalDuration = reducedMotion.matches
     ? PORTFOLIO_ARRIVAL_REDUCED_MOTION_DURATION_MS
     : PORTFOLIO_ARRIVAL_DURATION_MS;
-  portfolioArrivalTimer = window.setTimeout(() => {
-    clearPortfolioArrivalState();
-    startPortfolioOrientation();
-  }, arrivalDuration);
+  const orientationStartOffset = reducedMotion.matches
+    ? PORTFOLIO_ORIENTATION_REDUCED_MOTION_START_OFFSET_MS
+    : PORTFOLIO_ORIENTATION_START_OFFSET_MS;
+  portfolioOrientationStartTimer = window.setTimeout(startPortfolioOrientation, orientationStartOffset);
+  portfolioArrivalTimer = window.setTimeout(clearPortfolioArrivalState, arrivalDuration);
 }
 
-const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 1740;
+const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 1380;
 const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 40;
+const HOME_PORTFOLIO_SEAM_REVEAL_DELAY_MS = 80;
+const HOME_PORTFOLIO_SEAM_REDUCED_REVEAL_DELAY_MS = 16;
 let homePortfolioTransitionTimer = 0;
 
 function clearHomePortfolioTransitionState() {
@@ -2702,7 +2711,10 @@ function activatePortal(options = {}) {
   shell.classList.toggle("is-reduced-activation", reducedMotion.matches);
   shell.classList.add("is-activating");
 
-  activationTimer = window.setTimeout(() => revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) }), reducedMotion.matches ? 460 : 1360);
+  const activationDelay = options.shouldPlayPortfolioArrival
+    ? (reducedMotion.matches ? HOME_PORTFOLIO_SEAM_REDUCED_REVEAL_DELAY_MS : HOME_PORTFOLIO_SEAM_REVEAL_DELAY_MS)
+    : (reducedMotion.matches ? 460 : 1360);
+  activationTimer = window.setTimeout(() => revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) }), activationDelay);
 }
 
 if (shell && startButton) {
@@ -2901,6 +2913,7 @@ if (shell && startButton) {
     setShellDrawerLock(false);
     window.clearTimeout(activationTimer);
     window.clearTimeout(portfolioArrivalTimer);
+    window.clearTimeout(portfolioOrientationStartTimer);
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {
