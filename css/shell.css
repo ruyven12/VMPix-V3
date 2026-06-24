@@ -335,68 +335,8 @@ button {
 
 .home-identity-text--engage::before,
 .home-identity-text--engage::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-  transform-origin: center;
-  will-change: opacity, transform, filter;
-}
-
-.home-identity-text--engage::before {
-  z-index: 2;
-  width: clamp(11.85rem, calc(var(--home-access-control-size) + 1.45rem), 13.8rem);
-  background:
-    radial-gradient(circle, transparent 0 78%, rgba(213, 54, 22, 0.18) 84%, rgba(238, 126, 52, 0.46) 92%, rgba(255, 73, 24, 0.62) 97%, transparent 100%),
-    conic-gradient(from 18deg,
-      transparent 0deg 12deg,
-      rgba(213, 54, 22, 0.34) 18deg,
-      rgba(238, 126, 52, 0.76) 32deg,
-      transparent 50deg 112deg,
-      rgba(255, 67, 22, 0.3) 122deg,
-      rgba(238, 126, 52, 0.58) 140deg,
-      transparent 160deg 246deg,
-      rgba(213, 54, 22, 0.22) 258deg,
-      rgba(238, 126, 52, 0.46) 272deg,
-      transparent 288deg 360deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
-  mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
-  filter: blur(0.018rem) drop-shadow(0 0 1.28rem rgba(213, 54, 22, 0.66)) drop-shadow(0 0 0.68rem rgba(238, 126, 52, 0.58));
-  transform: translate3d(-50%, -50%, 0) rotate(-20deg) scale3d(0.99, 0.99, 1);
-  animation: archiveEngageOuterLightningGlow 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
-}
-
-.home-identity-text--engage::after {
-  z-index: 3;
-  width: clamp(12.2rem, calc(var(--home-access-control-size) + 2rem), 14.35rem);
-  background:
-    repeating-conic-gradient(from 8deg,
-      transparent 0deg 6.4deg,
-      rgba(255, 48, 16, 0.96) 7.1deg 9deg,
-      rgba(255, 151, 38, 0.98) 9.4deg 10.6deg,
-      transparent 11.2deg 23.5deg,
-      rgba(213, 54, 22, 0.74) 24.4deg 26.8deg,
-      transparent 27.4deg 42deg),
-    conic-gradient(from 35deg,
-      transparent 0deg 28deg,
-      rgba(255, 58, 20, 0.88) 34deg 46deg,
-      rgba(255, 166, 46, 0.72) 50deg 55deg,
-      transparent 62deg 138deg,
-      rgba(255, 44, 15, 0.82) 146deg 160deg,
-      rgba(238, 126, 52, 0.64) 164deg 171deg,
-      transparent 178deg 246deg,
-      rgba(255, 67, 22, 0.76) 254deg 264deg,
-      transparent 274deg 360deg);
-  -webkit-mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
-  mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
-  filter: blur(0.004rem) drop-shadow(0 0 1.55rem rgba(255, 57, 18, 0.76)) drop-shadow(0 0 0.72rem rgba(238, 126, 52, 0.68));
-  transform: translate3d(-50%, -50%, 0) rotate(12deg) scale3d(0.995, 0.995, 1);
-  animation: archiveEngageOuterLightningSegments 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
+  content: none;
+  display: none;
 }
 
 .home-identity-text--core,
@@ -802,10 +742,70 @@ button {
 
 .site-shell.is-home-route .start-portal::before,
 .site-shell.is-home-route .start-portal::after {
-  visibility: hidden;
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  visibility: visible;
+  aspect-ratio: 1;
+  border-radius: 50%;
   pointer-events: none;
   opacity: 0;
-  animation: none;
+  mix-blend-mode: screen;
+  transform-origin: center;
+  will-change: opacity, transform, filter;
+}
+
+.site-shell.is-home-route .start-portal::before {
+  z-index: 0;
+  width: clamp(11.85rem, calc(100% + 1.45rem), 13.8rem);
+  background:
+    radial-gradient(circle, transparent 0 78%, rgba(213, 54, 22, 0.18) 84%, rgba(238, 126, 52, 0.46) 92%, rgba(255, 73, 24, 0.62) 97%, transparent 100%),
+    conic-gradient(from 18deg,
+      transparent 0deg 12deg,
+      rgba(213, 54, 22, 0.34) 18deg,
+      rgba(238, 126, 52, 0.76) 32deg,
+      transparent 50deg 112deg,
+      rgba(255, 67, 22, 0.3) 122deg,
+      rgba(238, 126, 52, 0.58) 140deg,
+      transparent 160deg 246deg,
+      rgba(213, 54, 22, 0.22) 258deg,
+      rgba(238, 126, 52, 0.46) 272deg,
+      transparent 288deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
+  mask: radial-gradient(circle, transparent 0 82%, #000 86% 100%);
+  filter: blur(0.018rem) drop-shadow(0 0 1.28rem rgba(213, 54, 22, 0.66)) drop-shadow(0 0 0.68rem rgba(238, 126, 52, 0.58));
+  transform: translate3d(-50%, -50%, 0) rotate(-20deg) scale3d(0.99, 0.99, 1);
+  animation: archiveEngageOuterLightningGlow 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
+}
+
+.site-shell.is-home-route .start-portal::after {
+  z-index: 1;
+  width: clamp(12.2rem, calc(100% + 2rem), 14.35rem);
+  background:
+    repeating-conic-gradient(from 8deg,
+      transparent 0deg 6.4deg,
+      rgba(255, 48, 16, 0.96) 7.1deg 9deg,
+      rgba(255, 151, 38, 0.98) 9.4deg 10.6deg,
+      transparent 11.2deg 23.5deg,
+      rgba(213, 54, 22, 0.74) 24.4deg 26.8deg,
+      transparent 27.4deg 42deg),
+    conic-gradient(from 35deg,
+      transparent 0deg 28deg,
+      rgba(255, 58, 20, 0.88) 34deg 46deg,
+      rgba(255, 166, 46, 0.72) 50deg 55deg,
+      transparent 62deg 138deg,
+      rgba(255, 44, 15, 0.82) 146deg 160deg,
+      rgba(238, 126, 52, 0.64) 164deg 171deg,
+      transparent 178deg 246deg,
+      rgba(255, 67, 22, 0.76) 254deg 264deg,
+      transparent 274deg 360deg);
+  -webkit-mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
+  mask: radial-gradient(circle, transparent 0 85%, #000 89% 100%);
+  filter: blur(0.004rem) drop-shadow(0 0 1.55rem rgba(255, 57, 18, 0.76)) drop-shadow(0 0 0.72rem rgba(238, 126, 52, 0.68));
+  transform: translate3d(-50%, -50%, 0) rotate(12deg) scale3d(0.995, 0.995, 1);
+  animation: archiveEngageOuterLightningSegments 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
 }
 
 .site-shell.is-home-route .start-button {
@@ -1547,20 +1547,15 @@ button {
     filter: brightness(1.06);
     transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.76, 0.76, 1);
   }
-  8% {
+  50% {
     opacity: 0.64;
     filter: brightness(1.1);
-    transform: translate3d(-50%, -50%, 0) rotate(29deg) scale3d(1.012, 1.012, 1);
-  }
-  50% {
-    opacity: 0.94;
-    filter: brightness(1.12);
-    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(1.024, 1.024, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(0.76, 0.76, 1);
   }
   100% {
     opacity: 0.62;
     filter: brightness(1.06);
-    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(1.012, 1.012, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(0.76, 0.76, 1);
   }
 }
 @keyframes archiveCoreInnerIgnition {
@@ -1607,20 +1602,15 @@ button {
     filter: brightness(1.11);
     transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.72, 0.72, 1);
   }
-  12% {
+  50% {
     opacity: 0.53;
     filter: brightness(1.15);
-    transform: translate3d(-50%, -50%, 0) rotate(-43deg) scale3d(1.018, 1.018, 1);
-  }
-  50% {
-    opacity: 0.55;
-    filter: brightness(1.17);
-    transform: translate3d(-50%, -50%, 0) rotate(-180deg) scale3d(1.03, 1.03, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(-180deg) scale3d(0.72, 0.72, 1);
   }
   100% {
     opacity: 0.51;
     filter: brightness(1.11);
-    transform: translate3d(-50%, -50%, 0) rotate(-360deg) scale3d(1.018, 1.018, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(-360deg) scale3d(0.72, 0.72, 1);
   }
 }
 @keyframes archiveAwakeningPulse {
@@ -3027,19 +3017,9 @@ button {
 
   .home-identity-text--engage::before,
   .home-identity-text--engage::after {
+    display: none;
     animation: none !important;
-  }
-
-  .home-identity-text--engage::before {
-    opacity: 0.5;
-    filter: blur(0.018rem) drop-shadow(0 0 1.12rem rgba(213, 54, 22, 0.52)) drop-shadow(0 0 0.52rem rgba(238, 126, 52, 0.44));
-    transform: translate3d(-50%, -50%, 0) rotate(24deg) scale3d(1, 1, 1);
-  }
-
-  .home-identity-text--engage::after {
-    opacity: 0.72;
-    filter: blur(0.004rem) drop-shadow(0 0 1.32rem rgba(255, 57, 18, 0.68)) drop-shadow(0 0 0.66rem rgba(255, 151, 38, 0.56));
-    transform: translate3d(-50%, -50%, 0) rotate(42deg) scale3d(1, 1, 1);
+    opacity: 0;
   }
 
   .home-identity-text--core {
@@ -3072,9 +3052,20 @@ button {
 
   .site-shell.is-home-route .start-portal::before,
   .site-shell.is-home-route .start-portal::after {
-    visibility: hidden;
-    opacity: 0;
-    transform: scale3d(1, 1, 1);
+    visibility: visible;
+    animation: none !important;
+  }
+
+  .site-shell.is-home-route .start-portal::before {
+    opacity: 0.5;
+    filter: blur(0.018rem) drop-shadow(0 0 1.12rem rgba(213, 54, 22, 0.52)) drop-shadow(0 0 0.52rem rgba(238, 126, 52, 0.44));
+    transform: translate3d(-50%, -50%, 0) rotate(24deg) scale3d(1, 1, 1);
+  }
+
+  .site-shell.is-home-route .start-portal::after {
+    opacity: 0.72;
+    filter: blur(0.004rem) drop-shadow(0 0 1.32rem rgba(255, 57, 18, 0.68)) drop-shadow(0 0 0.66rem rgba(255, 151, 38, 0.56));
+    transform: translate3d(-50%, -50%, 0) rotate(42deg) scale3d(1, 1, 1);
   }
 
   .site-shell.is-home-route .start-button {

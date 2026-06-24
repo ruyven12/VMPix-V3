@@ -1159,20 +1159,15 @@ body {
     filter: brightness(1.06);
     transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.76, 0.76, 1);
   }
-  8% {
+  50% {
     opacity: 0.64;
     filter: brightness(1.1);
-    transform: translate3d(-50%, -50%, 0) rotate(29deg) scale3d(1.012, 1.012, 1);
-  }
-  50% {
-    opacity: 0.94;
-    filter: brightness(1.12);
-    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(1.024, 1.024, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(0.76, 0.76, 1);
   }
   100% {
     opacity: 0.62;
     filter: brightness(1.06);
-    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(1.012, 1.012, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(0.76, 0.76, 1);
   }
 }
 @keyframes archiveCoreInnerIgnition {
@@ -1219,20 +1214,15 @@ body {
     filter: brightness(1.11);
     transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.72, 0.72, 1);
   }
-  12% {
+  50% {
     opacity: 0.53;
     filter: brightness(1.15);
-    transform: translate3d(-50%, -50%, 0) rotate(-43deg) scale3d(1.018, 1.018, 1);
-  }
-  50% {
-    opacity: 0.55;
-    filter: brightness(1.17);
-    transform: translate3d(-50%, -50%, 0) rotate(-180deg) scale3d(1.03, 1.03, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(-180deg) scale3d(0.72, 0.72, 1);
   }
   100% {
     opacity: 0.51;
     filter: brightness(1.11);
-    transform: translate3d(-50%, -50%, 0) rotate(-360deg) scale3d(1.018, 1.018, 1);
+    transform: translate3d(-50%, -50%, 0) rotate(-360deg) scale3d(0.72, 0.72, 1);
   }
 }
 @keyframes archiveAwakeningPulse {
