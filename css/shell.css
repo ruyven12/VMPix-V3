@@ -973,7 +973,7 @@ button {
   display: none;
   animation: none;
 }
-/* PASS 21 Chapter 2 first escaping fragment. Post-fracture release only. */
+/* PASS 22 Chapter 2 controlled multi-fragment escape. Primary fragment carrier. */
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after {
   display: block;
   inset: auto;
@@ -996,7 +996,6 @@ button {
   transform-origin: 0 50%;
   animation: homeArchiveFirstFragmentEscape 560ms cubic-bezier(0.06, 0.88, 0.08, 1) 520ms both;
 }
-
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening {
   display: block;
   animation: homeArchiveFixedFieldHold 1040ms cubic-bezier(0.18, 0.86, 0.16, 1) 360ms both;
@@ -1053,6 +1052,68 @@ button {
   content: "ENTERING THE ARCHIVE";
   top: 50%;
   animation: homeArchiveEntryEntering 440ms cubic-bezier(0.22, 0.82, 0.18, 1) 860ms both;
+}
+/* PASS 22 final fragment carriers override legacy entry labels while the route owns Chapter 2. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars {
+  z-index: 8;
+  display: block;
+  opacity: 1;
+  background: transparent;
+  filter: none;
+  animation: none;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
+  content: "";
+  position: fixed;
+  display: block;
+  inset: auto;
+  top: var(--home-portfolio-transition-center-y);
+  left: var(--home-portfolio-transition-center-x);
+  z-index: 8;
+  width: clamp(3.15rem, 12vw, 7.2rem);
+  max-width: none;
+  height: clamp(1.25px, 0.3vw, 2.5px);
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 999px;
+  opacity: 0;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  pointer-events: none;
+  text-shadow: none;
+  text-transform: none;
+  white-space: normal;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(247, 247, 242, 0.04) 8%, rgba(238, 217, 153, 0.86) 34%, rgba(255, 151, 38, 0.94) 52%, rgba(213, 22, 34, 0.62) 68%, transparent 100%);
+  box-shadow:
+    0 0 0.34rem rgba(247, 247, 242, 0.36),
+    0 0 0.78rem rgba(255, 74, 24, 0.32),
+    0 0 1.12rem rgba(220, 188, 108, 0.14);
+  filter: brightness(1.18) saturate(1.06);
+  mix-blend-mode: screen;
+  transform-origin: 0 50%;
+  will-change: opacity, transform, filter;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after {
+  width: clamp(3.7rem, 13vw, 7.8rem);
+  height: clamp(1.25px, 0.32vw, 2.4px);
+  animation: homeArchiveSecondFragmentEscape 520ms cubic-bezier(0.06, 0.88, 0.08, 1) 570ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before {
+  width: clamp(2.9rem, 10vw, 6.2rem);
+  height: clamp(1px, 0.25vw, 2px);
+  animation: homeArchiveThirdFragmentEscape 480ms cubic-bezier(0.06, 0.88, 0.08, 1) 610ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
+  width: clamp(3.35rem, 11.5vw, 7rem);
+  height: clamp(1.15px, 0.28vw, 2.25px);
+  animation: homeArchiveFourthFragmentEscape 540ms cubic-bezier(0.06, 0.88, 0.08, 1) 650ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--core,
@@ -1670,6 +1731,87 @@ button {
     opacity: 0;
     filter: brightness(1.08) saturate(1.04);
     transform: translate3d(calc(-50% + min(88vw, 58rem)), calc(-50% - min(30vh, 17rem)), 0) rotate(-16deg) scaleX(1.08);
+  }
+}
+
+@keyframes homeArchiveSecondFragmentEscape {
+  0%,
+  15% {
+    opacity: 0;
+    filter: brightness(1.03) saturate(1.02);
+    transform: translate3d(-50%, -50%, 0) rotate(24deg) scaleX(0.035);
+  }
+
+  30% {
+    opacity: 0.9;
+    filter: brightness(1.34) saturate(1.1);
+    transform: translate3d(-50%, -50%, 0) rotate(24deg) scaleX(0.16);
+  }
+
+  62% {
+    opacity: 0.96;
+    filter: brightness(1.48) saturate(1.12);
+    transform: translate3d(calc(-50% + min(20vw, 12rem)), calc(-50% + min(12vh, 6rem)), 0) rotate(24deg) scaleX(0.64);
+  }
+
+  100% {
+    opacity: 0;
+    filter: brightness(1.06) saturate(1.03);
+    transform: translate3d(calc(-50% + min(86vw, 56rem)), calc(-50% + min(34vh, 19rem)), 0) rotate(24deg) scaleX(1);
+  }
+}
+
+@keyframes homeArchiveThirdFragmentEscape {
+  0%,
+  12% {
+    opacity: 0;
+    filter: brightness(1.02) saturate(1.01);
+    transform: translate3d(-50%, -50%, 0) rotate(-154deg) scaleX(0.03);
+  }
+
+  28% {
+    opacity: 0.86;
+    filter: brightness(1.32) saturate(1.08);
+    transform: translate3d(-50%, -50%, 0) rotate(-154deg) scaleX(0.14);
+  }
+
+  58% {
+    opacity: 0.92;
+    filter: brightness(1.44) saturate(1.12);
+    transform: translate3d(calc(-50% - min(17vw, 10rem)), calc(-50% - min(6vh, 3.5rem)), 0) rotate(-154deg) scaleX(0.58);
+  }
+
+  100% {
+    opacity: 0;
+    filter: brightness(1.04) saturate(1.02);
+    transform: translate3d(calc(-50% - min(76vw, 50rem)), calc(-50% - min(24vh, 14rem)), 0) rotate(-154deg) scaleX(0.96);
+  }
+}
+
+@keyframes homeArchiveFourthFragmentEscape {
+  0%,
+  18% {
+    opacity: 0;
+    filter: brightness(1.03) saturate(1.02);
+    transform: translate3d(-50%, -50%, 0) rotate(166deg) scaleX(0.035);
+  }
+
+  32% {
+    opacity: 0.88;
+    filter: brightness(1.34) saturate(1.1);
+    transform: translate3d(-50%, -50%, 0) rotate(166deg) scaleX(0.16);
+  }
+
+  62% {
+    opacity: 0.94;
+    filter: brightness(1.46) saturate(1.12);
+    transform: translate3d(calc(-50% - min(18vw, 11rem)), calc(-50% + min(10vh, 5.5rem)), 0) rotate(166deg) scaleX(0.62);
+  }
+
+  100% {
+    opacity: 0;
+    filter: brightness(1.05) saturate(1.03);
+    transform: translate3d(calc(-50% - min(82vw, 54rem)), calc(-50% + min(30vh, 17rem)), 0) rotate(166deg) scaleX(1.02);
   }
 }
 @keyframes homeArchiveExposedDispatchCore {
@@ -3800,6 +3942,16 @@ button {
 
   .home-archive-awakening::after {
     opacity: 0;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
+    animation: none !important;
+    opacity: 0;
+    filter: none;
+    transform: translate3d(-50%, -50%, 0) scaleX(0.04);
   }
   .home-archive-sector {
     animation: none !important;
