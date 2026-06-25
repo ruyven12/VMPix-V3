@@ -1,6 +1,6 @@
 # Website V3 World Bible
 
-Version: 0.1  
+Version: 0.3  
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive
 
@@ -15,6 +15,111 @@ Worlds are narrative assets, not UI themes. Implementations should adapt to the 
 
 A world should be recognizable even if every UI element were removed.
 
+---
+
+# Global Lore
+
+## The Archive
+
+The Archive is older than any individual world.
+
+It is not a city.
+
+It is not a planet.
+
+It is the force that connects every world together.
+
+No one remembers who first created the Archive.
+
+Its purpose has always remained the same:
+
+To preserve memories, relationships, history, creativity, discovery, and legacy.
+
+Every world exists because the Archive remembers.
+
+---
+
+## Archive Energy
+
+Every world is connected by an ancient energy.
+
+This energy is the foundation of the Archive.
+
+It is neither purely technology nor purely magic.
+
+It is both.
+
+Throughout the Archive it may appear as:
+
+- Ancient runes
+- Glyphs
+- Living energy
+- Sacred geometry
+- Voodoo symbols
+- Arcane machinery
+- Light
+- Motion
+
+Each world expresses this energy differently.
+
+It is the invisible force that binds the entire Archive together.
+
+---
+
+## The Eight Worlds
+
+The Archive is experienced through eight primary worlds.
+
+Each world represents a different aspect of the Voodoo Media journey.
+
+Each world possesses:
+
+- its own identity
+- its own atmosphere
+- its own architecture
+- its own philosophy
+- its own immutable law
+- its own symbolism
+
+Although every world is unique, all are connected through Archive Energy.
+
+---
+
+## World Identity
+
+Worlds are narrative places.
+
+They are not themes.
+
+They are not visual skins.
+
+Every design decision should reinforce the identity of the world before introducing visual effects.
+
+Story precedes implementation.
+
+Identity precedes animation.
+
+Atmosphere precedes interface.
+
+---
+
+## The Archive Principle
+
+The Archive does not celebrate fame.
+
+The Archive preserves communities.
+
+It remembers:
+
+- people
+- relationships
+- creativity
+- competition
+- discovery
+- history
+- emotion
+
+Every world reflects this philosophy in its own way.
 ## Global World System
 
 V3 is organized as eight cardinal worlds around the Archive Core.
@@ -22,7 +127,7 @@ V3 is organized as eight cardinal worlds around the Archive Core.
 | Bearing | World | Current Module / Meaning | Status |
 |---|---|---|---|
 | N | The Cosmos | Astrophotos | Planned |
-| NE | The Battleground | Wrestling / Ring Archive | Planned |
+| NE | The Battleground | Wrestling / Ring Archive | LOCKED |
 | E | The Wild | Wildlife | Planned |
 | SE | The Comms | Contact | Planned |
 | S | The Trajectory | Calendar | Planned |
@@ -200,3 +305,198 @@ These ideas are preserved but not required for current implementation:
 ## Arrival Sentence
 
 Welcome to The Soundtrack, a city where music never fades, every performance strengthens the world, and every connection becomes part of a living archive.
+
+---
+
+# World: The Battleground
+
+Status: LOCKED
+
+Compass Position: NE
+
+Current Module: Ring Archive
+
+## Core Identity
+
+The Battleground is an ancient Hall of Legacy built around a timeless colosseum where honorable competition is remembered forever.
+
+The Archive did not create this place.
+
+It discovered it.
+
+Ancient stone, steel, and sacred architecture have been preserved and enhanced by Archive energy, allowing every generation to contribute to its continuing legacy.
+
+This world represents respect, honor, storytelling, perseverance, and the lasting impact of competition.
+
+## Purpose
+
+The Battleground exists to preserve the legacy created through honorable competition.
+
+It is not a world about violence.
+
+It is a world about respect.
+
+Every contest becomes part of history.
+
+Every competitor leaves something behind.
+
+## Core Emotion
+
+- Respect
+- Honor
+- Legacy
+- Determination
+- Reverence
+
+## Atmosphere
+
+The Battleground exists beneath constant storms.
+
+Lightning illuminates ancient stone.
+
+Rain darkens weathered walls.
+
+Embers drift endlessly through the air.
+
+Fire is eternal.
+
+The atmosphere should feel timeless rather than hostile.
+
+## Philosophy
+
+Competition exists to create stories.
+
+Stories become legacy.
+
+Legacy earns respect.
+
+Victory fades.
+
+Legacy remains.
+
+## Population
+
+The Battleground is inhabited by everyone who contributes to the wrestling world.
+
+Including:
+
+- Performers
+- Fans
+- Referees
+- Ring Crew
+- Production Crew
+- Announcers
+- Promoters
+- Photographers
+- Commentators
+- Contributors
+- Veterans
+- Newcomers
+
+Everyone contributes to the Archive.
+
+Everyone contributes to the legacy.
+
+## Geography
+
+The Battleground is centered around an immense ancient colosseum.
+
+Its history expands deeper with every generation.
+
+The world grows through accumulated legacy rather than physical size.
+
+## Architecture
+
+Architecture combines:
+
+- Ancient stone
+- Weathered steel
+- Archive technology
+- Ancient runes
+- Voodoo energy
+- Sacred ceremonial spaces
+
+The Archive preserves the original structures rather than replacing them.
+
+## Landmark
+
+The defining landmark is:
+
+### The Eternal Championship
+
+An immense championship belt forged by the Archive itself.
+
+It belongs to no individual.
+
+It represents every competitor who has ever stepped into the arena.
+
+It is a monument to legacy rather than victory.
+
+## Environment
+
+The Battleground is defined by:
+
+- Eternal flames
+- Ancient stone
+- Storms
+- Embers
+- Lightning
+- Archive runes
+
+The fire never dies.
+
+## Transportation
+
+Movement occurs through Archive Portals.
+
+These ceremonial gateways connect halls, arenas, archives, and districts throughout the Battleground.
+
+## Personality
+
+The Battleground is:
+
+- Respectful
+- Honorable
+- Timeless
+- Powerful
+- Ancient
+- Reverent
+
+## Immutable World Law
+
+Every battle leaves a legacy.
+
+## World Phenomenon
+
+The walls echo with the battles of yesteryear.
+
+Significant moments leave lasting impressions upon the arena itself.
+
+Visitors may occasionally experience subtle echoes of history through atmosphere, sound, or emotion.
+
+The Archive remembers.
+
+## Expansion Rules
+
+Future additions should deepen the history of the Battleground rather than redesign it.
+
+Additional arenas, halls, archives, and districts should feel like natural discoveries within an ancient world.
+
+## Protected Idea Bucket
+
+The following concepts are preserved for future development but are not implementation requirements:
+
+- Hall of Champions
+- Forgotten Arenas
+- Promotion Archives
+- Archive Vaults
+- Ceremonial Gateways
+- Hidden lore
+- Ancient runes
+- Voodoo energy integrated into architecture
+- Historical echoes
+- Future competition expansions beyond wrestling
+
+## Arrival Sentence
+
+Welcome to The Battleground, where every battle leaves a legacy, every step honors those who came before, and the arena remembers all who enter.
