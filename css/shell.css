@@ -973,31 +973,25 @@ button {
   display: none;
   animation: none;
 }
-/* PASS 26/28: non-final destination-awareness anchors for future constellation work. */
+/* PASS 30: five Living World destination anchors for constellation work. */
 .ambient-system {
   --entry-anchor-01-x: min(112vw, 74rem);
-  --entry-anchor-01-y: calc(-1 * min(22vh, 13rem));
-  --entry-anchor-02-x: min(106vw, 70rem);
-  --entry-anchor-02-y: min(50vh, 27rem);
+  --entry-anchor-01-y: calc(-1 * min(10vh, 6rem));
+  --entry-anchor-02-x: min(64vw, 42rem);
+  --entry-anchor-02-y: calc(-1 * min(104vh, 56rem));
   --entry-anchor-03-x: calc(-1 * min(108vw, 72rem));
-  --entry-anchor-03-y: calc(-1 * min(16vh, 9rem));
-  --entry-anchor-04-x: calc(-1 * min(104vw, 68rem));
-  --entry-anchor-04-y: min(54vh, 29rem);
-  --entry-anchor-05-x: min(58vw, 38rem);
-  --entry-anchor-05-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-06-x: min(38vw, 26rem);
-  --entry-anchor-06-y: min(104vh, 56rem);
-  --entry-anchor-07-x: calc(-1 * min(64vw, 42rem));
-  --entry-anchor-07-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-08-x: calc(-1 * min(50vw, 33rem));
-  --entry-anchor-08-y: min(104vh, 56rem);
+  --entry-anchor-03-y: calc(-1 * min(10vh, 6rem));
+  --entry-anchor-04-x: calc(-1 * min(64vw, 42rem));
+  --entry-anchor-04-y: calc(-1 * min(104vh, 56rem));
+  --entry-anchor-05-x: 0px;
+  --entry-anchor-05-y: calc(-1 * min(108vh, 58rem));
   --entry-constellation-01-x: min(34vw, 22rem);
   --entry-constellation-01-y: calc(-1 * min(10vh, 6rem));
   --entry-constellation-02-x: min(30vw, 20rem);
   --entry-constellation-02-y: min(18vh, 10rem);
 }
 
-/* PASS 23 Chapter 2 eight-fragment path scaffold. Neutral escape paths only. */
+/* PASS 30 Chapter 2 five-fragment Living World path scaffold. Neutral escape paths only. */
 .portfolio-entry-fragments {
   position: fixed;
   inset: 0;
@@ -1163,19 +1157,19 @@ button {
 }
 
 .portfolio-entry-fragment--two {
-  --fragment-angle: 19deg;
+  --fragment-angle: -38deg;
   --fragment-delay: 483ms;
   --fragment-duration: 517ms;
   --fragment-width: clamp(3.55rem, 12vw, 7.2rem);
   --fragment-height: clamp(1.2px, 0.3vw, 2.3px);
   --fragment-separate-x: min(8vw, 4.7rem);
-  --fragment-separate-y: min(4.5vh, 2.6rem);
+  --fragment-separate-y: calc(-1 * min(6vh, 3.2rem));
   --fragment-commit-x: min(17vw, 10rem);
-  --fragment-commit-y: min(8.5vh, 4.9rem);
-  --fragment-mid-x: min(32vw, 19rem);
-  --fragment-mid-y: min(18vh, 9.6rem);
-  --fragment-end-x: min(94vw, 62rem);
-  --fragment-end-y: min(42vh, 23rem);
+  --fragment-commit-y: calc(-1 * min(14vh, 7.6rem));
+  --fragment-mid-x: min(30vw, 18rem);
+  --fragment-mid-y: calc(-1 * min(36vh, 19rem));
+  --fragment-end-x: min(62vw, 40rem);
+  --fragment-end-y: calc(-1 * min(86vh, 46rem));
   --fragment-target-x: var(--entry-anchor-02-x);
   --fragment-target-y: var(--entry-anchor-02-y);
   --fragment-commit-scale: 0.34;
@@ -1205,74 +1199,11 @@ button {
 }
 
 .portfolio-entry-fragment--four {
-  --fragment-angle: 154deg;
+  --fragment-angle: -128deg;
   --fragment-delay: 533ms;
   --fragment-duration: 500ms;
   --fragment-width: clamp(3.35rem, 11.2vw, 6.9rem);
   --fragment-height: clamp(1.1px, 0.27vw, 2.15px);
-  --fragment-separate-x: calc(-1 * min(6.8vw, 4.1rem));
-  --fragment-separate-y: min(5.8vh, 3.2rem);
-  --fragment-commit-x: calc(-1 * min(15vw, 8.8rem));
-  --fragment-commit-y: min(10vh, 5.5rem);
-  --fragment-mid-x: calc(-1 * min(29vw, 17rem));
-  --fragment-mid-y: min(20vh, 10.4rem);
-  --fragment-end-x: calc(-1 * min(90vw, 59rem));
-  --fragment-end-y: min(46vh, 25rem);
-  --fragment-target-x: var(--entry-anchor-04-x);
-  --fragment-target-y: var(--entry-anchor-04-y);
-  --fragment-commit-scale: 0.34;
-  --fragment-mid-scale: 0.62;
-  --fragment-end-scale: 0.94;
-}
-
-.portfolio-entry-fragment--five {
-  --fragment-angle: -44deg;
-  --fragment-delay: 467ms;
-  --fragment-duration: 533ms;
-  --fragment-width: clamp(2.85rem, 9.2vw, 5.7rem);
-  --fragment-height: clamp(1px, 0.23vw, 1.9px);
-  --fragment-separate-x: min(5vw, 3rem);
-  --fragment-separate-y: calc(-1 * min(8vh, 4rem));
-  --fragment-commit-x: min(9vw, 5.4rem);
-  --fragment-commit-y: calc(-1 * min(18vh, 9.5rem));
-  --fragment-mid-x: min(18vw, 10.6rem);
-  --fragment-mid-y: calc(-1 * min(36vh, 19rem));
-  --fragment-end-x: min(56vw, 36rem);
-  --fragment-end-y: calc(-1 * min(86vh, 46rem));
-  --fragment-target-x: var(--entry-anchor-05-x);
-  --fragment-target-y: var(--entry-anchor-05-y);
-  --fragment-commit-scale: 0.28;
-  --fragment-mid-scale: 0.5;
-  --fragment-end-scale: 0.86;
-}
-
-.portfolio-entry-fragment--six {
-  --fragment-angle: 65deg;
-  --fragment-delay: 550ms;
-  --fragment-duration: 483ms;
-  --fragment-width: clamp(2.65rem, 8.6vw, 5.2rem);
-  --fragment-height: clamp(1px, 0.22vw, 1.85px);
-  --fragment-separate-x: min(3.8vw, 2.3rem);
-  --fragment-separate-y: min(9vh, 4.6rem);
-  --fragment-commit-x: min(7.5vw, 4.5rem);
-  --fragment-commit-y: min(19vh, 10rem);
-  --fragment-mid-x: min(14vw, 8rem);
-  --fragment-mid-y: min(37vh, 19.5rem);
-  --fragment-end-x: min(40vw, 27rem);
-  --fragment-end-y: min(88vh, 47rem);
-  --fragment-target-x: var(--entry-anchor-06-x);
-  --fragment-target-y: var(--entry-anchor-06-y);
-  --fragment-commit-scale: 0.27;
-  --fragment-mid-scale: 0.49;
-  --fragment-end-scale: 0.84;
-}
-
-.portfolio-entry-fragment--seven {
-  --fragment-angle: -128deg;
-  --fragment-delay: 567ms;
-  --fragment-duration: 483ms;
-  --fragment-width: clamp(2.7rem, 8.9vw, 5.4rem);
-  --fragment-height: clamp(1px, 0.22vw, 1.9px);
   --fragment-separate-x: calc(-1 * min(5.2vw, 3.1rem));
   --fragment-separate-y: calc(-1 * min(8.5vh, 4.3rem));
   --fragment-commit-x: calc(-1 * min(10vw, 5.9rem));
@@ -1281,31 +1212,31 @@ button {
   --fragment-mid-y: calc(-1 * min(35vh, 18rem));
   --fragment-end-x: calc(-1 * min(60vw, 39rem));
   --fragment-end-y: calc(-1 * min(86vh, 46rem));
-  --fragment-target-x: var(--entry-anchor-07-x);
-  --fragment-target-y: var(--entry-anchor-07-y);
-  --fragment-commit-scale: 0.28;
-  --fragment-mid-scale: 0.5;
-  --fragment-end-scale: 0.86;
+  --fragment-target-x: var(--entry-anchor-04-x);
+  --fragment-target-y: var(--entry-anchor-04-y);
+  --fragment-commit-scale: 0.34;
+  --fragment-mid-scale: 0.62;
+  --fragment-end-scale: 0.94;
 }
 
-.portfolio-entry-fragment--eight {
-  --fragment-angle: 116deg;
-  --fragment-delay: 500ms;
-  --fragment-duration: 517ms;
-  --fragment-width: clamp(2.95rem, 9.5vw, 5.8rem);
-  --fragment-height: clamp(1px, 0.24vw, 2px);
-  --fragment-separate-x: calc(-1 * min(4.2vw, 2.6rem));
-  --fragment-separate-y: min(7.5vh, 3.8rem);
-  --fragment-commit-x: calc(-1 * min(8vw, 4.8rem));
-  --fragment-commit-y: min(17vh, 9rem);
-  --fragment-mid-x: calc(-1 * min(16vw, 9.4rem));
-  --fragment-mid-y: min(35vh, 18.5rem);
-  --fragment-end-x: calc(-1 * min(48vw, 31rem));
-  --fragment-end-y: min(88vh, 47rem);
-  --fragment-target-x: var(--entry-anchor-08-x);
-  --fragment-target-y: var(--entry-anchor-08-y);
-  --fragment-commit-scale: 0.29;
-  --fragment-mid-scale: 0.51;
+.portfolio-entry-fragment--five {
+  --fragment-angle: -90deg;
+  --fragment-delay: 467ms;
+  --fragment-duration: 533ms;
+  --fragment-width: clamp(2.85rem, 9.2vw, 5.7rem);
+  --fragment-height: clamp(1px, 0.23vw, 1.9px);
+  --fragment-separate-x: 0px;
+  --fragment-separate-y: calc(-1 * min(8vh, 4rem));
+  --fragment-commit-x: 0px;
+  --fragment-commit-y: calc(-1 * min(18vh, 9.5rem));
+  --fragment-mid-x: 0px;
+  --fragment-mid-y: calc(-1 * min(36vh, 19rem));
+  --fragment-end-x: 0px;
+  --fragment-end-y: calc(-1 * min(86vh, 46rem));
+  --fragment-target-x: var(--entry-anchor-05-x);
+  --fragment-target-y: var(--entry-anchor-05-y);
+  --fragment-commit-scale: 0.28;
+  --fragment-mid-scale: 0.5;
   --fragment-end-scale: 0.86;
 }
 
