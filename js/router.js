@@ -258,6 +258,7 @@ function syncRoute(route, options = {}) {
     revealHub({
       shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival),
       shouldPlayDirectPortfolioArrival: Boolean(options.shouldPlayDirectPortfolioArrival),
+      shouldPlayDirectPortfolioEntrySequence: Boolean(options.shouldPlayDirectPortfolioEntrySequence),
     });
     return;
   }

@@ -13890,6 +13890,17 @@ button.wrestling-event-history-tagged-thumb {
   transform: translate3d(0, 0, 0) scale(1);
 }
 
+/* PASS 21 strict Chapter 2 isolation: /portfolio settles to a black entry stage. */
+.site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub {
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub::after {
+  content: none;
+  display: none;
+}
 .site-shell.has-entered-hub .ambient-energy {
   opacity: 0.64;
 }

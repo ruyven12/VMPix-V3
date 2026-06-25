@@ -2544,6 +2544,8 @@ function revealHub(options = {}) {
   setActiveGlobalNav("portfolio");
   if (options.shouldPlayPortfolioArrival) {
     startPortfolioArrival();
+  } else if (options.shouldPlayDirectPortfolioEntrySequence) {
+    startPortfolioDirectEntrySequenceForQA();
   } else if (options.shouldPlayDirectPortfolioArrival) {
     startPortfolioDirectArrival();
   }
@@ -2563,6 +2565,9 @@ let portfolioOrientationTimer = 0;
 let portfolioOrientationFocusCard = null;
 let portfolioFirstTransferTimer = 0;
 let portfolioFirstTransferTargetCard = null;
+// Temporary Experience Build QA flag: direct /portfolio starts at Chapter 2 entry.
+const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA = true;
+const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 1900;
 const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
 const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioDirectArrivalTimer = 0;
@@ -2750,6 +2755,53 @@ function clearHomePortfolioTransitionState() {
   }
 }
 
+function activatePortfolioEntrySequenceState() {
+  if (!shell) {
+    return;
+  }
+
+  window.clearTimeout(homePortfolioTransitionTimer);
+  homePortfolioTransitionTimer = 0;
+  shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
+  if (startButton) {
+    startButton.setAttribute("aria-busy", "true");
+  }
+}
+
+function schedulePortfolioEntrySequenceCleanup(cleanupDelayOverride) {
+  const transitionCleanupDelay = Number.isFinite(cleanupDelayOverride)
+    ? cleanupDelayOverride
+    : reducedMotion.matches
+      ? HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS
+      : HOME_PORTFOLIO_TRANSITION_CLEANUP_MS;
+
+  if (transitionCleanupDelay <= 0) {
+    clearHomePortfolioTransitionState();
+    return;
+  }
+
+  homePortfolioTransitionTimer = window.setTimeout(clearHomePortfolioTransitionState, transitionCleanupDelay);
+}
+
+function startPortfolioDirectEntrySequenceForQA() {
+  if (!PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA || !shell || window.location.pathname !== routePaths.portfolio) {
+    return;
+  }
+
+  const directEntryStartDelay = reducedMotion.matches ? 0 : 60;
+  window.setTimeout(() => {
+    if (!shell || window.location.pathname !== routePaths.portfolio || shell.classList.contains("is-portfolio-entry-sequence")) {
+      return;
+    }
+
+    activatePortfolioEntrySequenceState();
+    startPortfolioArrival();
+    schedulePortfolioEntrySequenceCleanup(
+      reducedMotion.matches ? HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS : PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS
+    );
+  }, directEntryStartDelay);
+}
+
 // ENGAGE is the reel cut: Chapter 1 ends at click, and /portfolio owns the entry sequence.
 function completeHomePortfolioRouteHandoff() {
   homePortfolioTransitionTimer = 0;
@@ -2772,22 +2824,9 @@ function beginHomePortfolioTransition() {
     return;
   }
 
-  window.clearTimeout(homePortfolioTransitionTimer);
-  shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
-  startButton.setAttribute("aria-busy", "true");
-
+  activatePortfolioEntrySequenceState();
   completeHomePortfolioRouteHandoff();
-
-  const transitionCleanupDelay = reducedMotion.matches
-    ? HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS
-    : HOME_PORTFOLIO_TRANSITION_CLEANUP_MS;
-
-  if (transitionCleanupDelay <= 0) {
-    clearHomePortfolioTransitionState();
-    return;
-  }
-
-  homePortfolioTransitionTimer = window.setTimeout(clearHomePortfolioTransitionState, transitionCleanupDelay);
+  schedulePortfolioEntrySequenceCleanup();
 }
 
 if (shell && startButton) {
@@ -2962,6 +3001,7 @@ if (shell && startButton) {
   syncRouteFromLocation({
     historyState: window.history.state,
     shouldPlayDirectPortfolioArrival: false,
+    shouldPlayDirectPortfolioEntrySequence: PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA && initialRoute.name === "portfolio",
   });
   window.addEventListener("popstate", (event) => {
     syncRouteFromLocation({ historyState: event.state });
