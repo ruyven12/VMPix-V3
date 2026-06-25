@@ -1239,12 +1239,10 @@ function showMusicNexus(options = {}) {
   if (!shell || !portfolioHub || !musicNexusShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-music-nexus-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1303,12 +1301,10 @@ function showRingArchive() {
   if (!shell || !portfolioHub || !ringArchiveShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-ring-archive-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1358,9 +1354,7 @@ function showWrestlingPeopleIndex() {
   if (!shell || !portfolioHub || !wrestlingPeopleShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-people-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1417,9 +1411,7 @@ function showWrestlingPersonDetail(personId) {
   if (!shell || !portfolioHub || !wrestlingPersonDetailShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-person-detail-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1476,9 +1468,7 @@ function showWrestlingVenuesIndex() {
   if (!shell || !portfolioHub || !wrestlingVenuesShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1535,9 +1525,7 @@ function showWrestlingVenueDetail(venueId) {
   if (!shell || !portfolioHub || !wrestlingVenueDetailShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venue-detail-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1595,9 +1583,7 @@ function showWrestlingShowsIndex() {
   if (!shell || !portfolioHub || !wrestlingShowsShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1651,9 +1637,7 @@ function showWrestlingShowDetail(showId = "warzone-26") {
   if (!shell || !portfolioHub || !wrestlingShowDetailShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-show-detail-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1717,8 +1701,7 @@ function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richa
   if (typeof setWrestlingMatchLightboxRouteSyncActive === "function") {
     setWrestlingMatchLightboxRouteSyncActive(false);
   }
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-match-gallery-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1836,9 +1819,7 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   if (typeof updateWrestlingLightboxRelationshipHooks === "function") {
     updateWrestlingLightboxRelationshipHooks(activeShowId, activeMatchId, activePhotoId);
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-lightbox-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1889,9 +1870,7 @@ function showAboutShell() {
   if (!shell || !aboutShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-about-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -1965,9 +1944,7 @@ function showCalendarShell() {
   if (!shell || !calendarShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-contact-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-calendar-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -2033,9 +2010,7 @@ function showContactShell() {
   if (!shell || !contactShell) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
   shell.classList.add("has-entered-hub", "is-contact-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -2102,8 +2077,7 @@ function showModulePlaceholder(moduleName) {
   }
 
   resetRouteNotFoundPlaceholder();
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -2258,8 +2232,7 @@ function showRouteNotFound(route = {}) {
   }
 
   const config = getRouteNotFoundConfig(route);
-  window.clearTimeout(activationTimer);
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-placeholder-view");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -2461,14 +2434,12 @@ function showHomepage() {
   if (!shell || !startButton) {
     return;
   }
-
-  window.clearTimeout(activationTimer);
   clearHomePortfolioTransitionState();
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
   closeGlobalMenu({ shouldRestoreFocus: false });
-  shell.classList.remove("is-home-transitioning", "is-engage-activated", "is-activating", "is-reduced-activation", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-home-transitioning", "is-engage-activated", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
@@ -2530,11 +2501,17 @@ function handleGlobalMenuAction(event) {
 }
 
 function revealHub(options = {}) {
-  clearHomePortfolioTransitionState();
+  const shouldPreserveHomeDispatch = Boolean(options.shouldPlayPortfolioArrival);
+  if (shouldPreserveHomeDispatch) {
+    window.clearTimeout(homePortfolioTransitionTimer);
+    homePortfolioTransitionTimer = 0;
+  } else {
+    clearHomePortfolioTransitionState();
+  }
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
-  shell.classList.remove("is-activating", "is-reduced-activation", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.remove("is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
@@ -2758,10 +2735,8 @@ function startPortfolioArrival() {
   portfolioArrivalTimer = window.setTimeout(clearPortfolioArrivalState, arrivalDuration);
 }
 
-const HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS = 1420;
-const HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS = 40;
-const HOME_PORTFOLIO_SEAM_REVEAL_DELAY_MS = 0;
-const HOME_PORTFOLIO_SEAM_REDUCED_REVEAL_DELAY_MS = 0;
+const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 1420;
+const HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS = 40;
 let homePortfolioTransitionTimer = 0;
 
 function clearHomePortfolioTransitionState() {
@@ -2779,7 +2754,6 @@ function clearHomePortfolioTransitionState() {
 function completeHomePortfolioRouteHandoff() {
   homePortfolioTransitionTimer = 0;
   navigateToRoute(routePaths.portfolio, {
-    shouldAnimatePortal: true,
     shouldPlayPortfolioArrival: true,
     historyState: { fromHomeEngage: true },
   });
@@ -2792,7 +2766,6 @@ function beginHomePortfolioTransition() {
     startButton.disabled ||
     shell.classList.contains("is-home-transitioning") ||
     shell.classList.contains("is-engage-activated") ||
-    shell.classList.contains("is-activating") ||
     shell.classList.contains("has-entered-hub")
   ) {
     return;
@@ -2802,43 +2775,18 @@ function beginHomePortfolioTransition() {
   shell.classList.add("is-home-transitioning", "is-engage-activated");
   startButton.setAttribute("aria-busy", "true");
 
-  const routeDelay = reducedMotion.matches
-    ? HOME_PORTFOLIO_REDUCED_MOTION_ROUTE_DELAY_MS
-    : HOME_PORTFOLIO_TRANSITION_ROUTE_DELAY_MS;
+  completeHomePortfolioRouteHandoff();
 
-  if (routeDelay <= 0) {
-    completeHomePortfolioRouteHandoff();
+  const transitionCleanupDelay = reducedMotion.matches
+    ? HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS
+    : HOME_PORTFOLIO_TRANSITION_CLEANUP_MS;
+
+  if (transitionCleanupDelay <= 0) {
+    clearHomePortfolioTransitionState();
     return;
   }
 
-  homePortfolioTransitionTimer = window.setTimeout(completeHomePortfolioRouteHandoff, routeDelay);
-}
-
-function activatePortal(options = {}) {
-  if (
-    !shell ||
-    !startButton ||
-    startButton.disabled ||
-    shell.classList.contains("is-activating") ||
-    shell.classList.contains("has-entered-hub")
-  ) {
-    return;
-  }
-
-  window.clearTimeout(activationTimer);
-  startButton.disabled = true;
-  startButton.setAttribute("aria-busy", "true");
-  shell.classList.toggle("is-reduced-activation", reducedMotion.matches);
-  shell.classList.add("is-activating");
-
-  const activationDelay = options.shouldPlayPortfolioArrival
-    ? (reducedMotion.matches ? HOME_PORTFOLIO_SEAM_REDUCED_REVEAL_DELAY_MS : HOME_PORTFOLIO_SEAM_REVEAL_DELAY_MS)
-    : (reducedMotion.matches ? 460 : 1360);
-  if (activationDelay <= 0) {
-    revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) });
-    return;
-  }
-  activationTimer = window.setTimeout(() => revealHub({ shouldPlayPortfolioArrival: Boolean(options.shouldPlayPortfolioArrival) }), activationDelay);
+  homePortfolioTransitionTimer = window.setTimeout(clearHomePortfolioTransitionState, transitionCleanupDelay);
 }
 
 if (shell && startButton) {
@@ -3039,7 +2987,6 @@ if (shell && startButton) {
   });
   window.addEventListener("pagehide", () => {
     setShellDrawerLock(false);
-    window.clearTimeout(activationTimer);
     window.clearTimeout(portfolioArrivalTimer);
     window.clearTimeout(portfolioOrientationStartTimer);
     window.clearTimeout(portfolioDirectArrivalTimer);

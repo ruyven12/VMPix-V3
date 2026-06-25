@@ -214,7 +214,6 @@ const fireVideo = document.querySelector(".cinema-fire-bg");
 const reducedMotion = window.matchMedia
   ? window.matchMedia("(prefers-reduced-motion: reduce)")
   : { matches: false };
-let activationTimer;
 let spotlightFrame;
 let drawerCloseTimer;
 let activeBandsView = "radar";

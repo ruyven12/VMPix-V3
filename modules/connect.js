@@ -702,11 +702,8 @@
     if (typeof closeGlobalMenu === "function") {
       closeGlobalMenu({ shouldRestoreFocus: false });
     }
-    window.clearTimeout(activationTimer);
     if (shell) {
       shell.classList.remove(
-        "is-activating",
-        "is-reduced-activation",
         "is-module-view",
         "is-placeholder-view",
         "is-music-nexus-view",

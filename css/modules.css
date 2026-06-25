@@ -13862,114 +13862,6 @@ button.wrestling-event-history-tagged-thumb {
   visibility: hidden;
 }
 
-.site-shell.is-activating .ambient-energy {
-  opacity: 0.72;
-  animation-duration: 7s;
-}
-
-.site-shell.is-activating .ambient-rings {
-  opacity: 0.84;
-  animation-duration: 9s;
-}
-
-.site-shell.is-activating .cinema-fire-bg {
-  opacity: 0.34;
-  filter: brightness(0.42) contrast(1.12) saturate(0.7) blur(1px);
-}
-
-.site-shell.is-activating .ambient-system::after {
-  opacity: 0.86;
-}
-
-.site-shell.is-activating .home-frame {
-  opacity: 0.82;
-  border-color: rgba(213, 22, 34, 0.34);
-  background-color: rgba(9, 9, 12, 0.42);
-  box-shadow:
-    inset 0 0 1.35rem rgba(213, 22, 34, 0.045),
-    0 0 3rem rgba(213, 22, 34, 0.08);
-  animation: none;
-}
-
-.site-shell.is-activating .home-frame::before {
-  opacity: 1;
-  animation-duration: 5s;
-}
-
-.site-shell.is-activating .home-frame::after {
-  opacity: 0.96;
-  animation-duration: 8s;
-}
-
-.site-shell.is-activating .title-group {
-  opacity: 0.46;
-  transform: translate3d(0, -0.24rem, 0);
-  animation: none;
-}
-
-.site-shell.is-activating .universal-bottom-rail {
-  opacity: 0.42;
-  color: rgba(247, 247, 242, 0.34);
-}
-
-.site-shell.is-activating .start-portal {
-  border-color: rgba(247, 247, 242, 0.42);
-  background-color: rgba(213, 22, 34, 0.06);
-  box-shadow:
-    inset 0 0 2.8rem rgba(0, 0, 0, 0.86),
-    inset 0 0 1.1rem rgba(247, 247, 242, 0.055),
-    0 1.5rem 3.4rem rgba(0, 0, 0, 0.52),
-    0 0 4.2rem rgba(213, 22, 34, 0.12);
-  transform: translateZ(0) scale(var(--portal-activation-scale));
-  animation: none;
-}
-
-.site-shell.is-activating .start-portal::before {
-  border-color: rgba(247, 247, 242, 0.28);
-  opacity: 0.96;
-  animation: portalRingSpin 640ms linear infinite;
-}
-
-.site-shell.is-activating .start-portal::after {
-  inset: clamp(1.45rem, 6vw, 2.2rem);
-  border-color: rgba(213, 22, 34, 0.82);
-  opacity: 1;
-  animation: portalRedPulse 780ms var(--ease-standard) infinite;
-}
-
-.site-shell.is-activating .start-button {
-  border-color: rgba(247, 247, 242, 0.8);
-  background-color: rgba(213, 22, 34, 0.16);
-  color: #ffffff;
-  opacity: 0.95;
-  transform: translateZ(0) scale(0.88);
-}
-
-.site-shell.is-activating .start-button::before {
-  animation: activationSweep 820ms var(--ease-standard) both;
-}
-
-.site-shell.is-activating .start-button::after {
-  opacity: 0.5;
-}
-
-.site-shell.is-reduced-activation .home-frame,
-.site-shell.is-reduced-activation .title-group,
-.site-shell.is-reduced-activation .universal-bottom-rail {
-  opacity: 0.72;
-  transform: none;
-}
-
-.site-shell.is-reduced-activation .start-portal {
-  transform: translateZ(0) scale(1.03);
-}
-
-.site-shell.is-reduced-activation .start-portal::before,
-.site-shell.is-reduced-activation .start-portal::after,
-.site-shell.is-reduced-activation .start-button::before {
-  animation: none;
-}
-
 .site-shell.has-entered-hub .home-frame {
   opacity: 0;
   pointer-events: none;
@@ -14729,40 +14621,6 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
-@keyframes portalRingSpin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(180deg);
-  }
-}
-
-@keyframes portalRedPulse {
-  0%,
-  100% {
-    opacity: 0.7;
-    transform: scale(0.98);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-}
-
-@keyframes activationSweep {
-  0% {
-    opacity: 0;
-    transform: translate3d(-130%, 0, 0) rotate(10deg);
-  }
-  32% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(130%, 0, 0) rotate(10deg);
-  }
-}
 
 @keyframes bandsRadarSweep {
   from {
@@ -16490,7 +16348,6 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .cinema-fire-bg,
-  .site-shell.is-activating .cinema-fire-bg,
   .site-shell.has-entered-hub .cinema-fire-bg {
     opacity: 0.1;
     filter: brightness(0.22) contrast(1) saturate(0.42) blur(1.5px);
@@ -16521,12 +16378,6 @@ button.wrestling-event-history-tagged-thumb {
     animation: none !important;
   }
 
-  .site-shell.is-activating .home-frame,
-  .site-shell.is-activating .title-group,
-  .site-shell.is-activating .universal-bottom-rail {
-    opacity: 0.72;
-    transform: none;
-  }
 
   .portfolio-hub,
   .site-shell.has-entered-hub .portfolio-hub,
