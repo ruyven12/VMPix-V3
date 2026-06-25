@@ -865,36 +865,36 @@ button {
   box-shadow: none;
   animation: none;
 }
-/* Post-click ENGAGE acceptance beat. Scoped to PASS 11A handoff state only. */
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication {
+/* Post-click ENGAGE acceptance beat. Scoped to /portfolio entry ownership only. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication {
   display: grid;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-message--identity {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-message--identity {
   animation: homeEngageAcceptanceCore 860ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-message--identity::before {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-message--identity::before {
   animation: homeEngageAcceptanceOuterRing 860ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-message--identity::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-message--identity::after {
   animation: homeEngageAcceptanceInnerRing 860ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage {
   animation: homeEngageAcceptanceLabel 860ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-core-lightning {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-core-lightning {
   animation: homeEngageAcceptanceLightning 760ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-core-lightning__segment {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-core-lightning__segment {
   animation: homeEngageAcceptanceLightningSegment 760ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::before,
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
   content: "";
   position: absolute;
   z-index: 3;
@@ -921,11 +921,11 @@ button {
   will-change: opacity, transform, filter;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::before {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::before {
   animation: homeEngageCoreFractureSlashA 680ms cubic-bezier(0.18, 0.84, 0.2, 1) 320ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
   animation: homeEngageCoreFractureSlashB 640ms cubic-bezier(0.18, 0.84, 0.2, 1) 360ms both;
 }
 .site-shell[data-shell-module="music"] {
@@ -974,7 +974,7 @@ button {
   animation: none;
 }
 /* PASS 21 Chapter 2 first escaping fragment. Post-fracture release only. */
-.site-shell.is-home-transitioning.is-engage-activated .ambient-system::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after {
   display: block;
   inset: auto;
   top: var(--home-portfolio-transition-center-y);
@@ -997,12 +997,12 @@ button {
   animation: homeArchiveFirstFragmentEscape 560ms cubic-bezier(0.06, 0.88, 0.08, 1) 520ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-awakening {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening {
   display: block;
   animation: homeArchiveFixedFieldHold 1040ms cubic-bezier(0.18, 0.86, 0.16, 1) 360ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-awakening::before {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::before {
   background:
     linear-gradient(19deg, transparent calc(50% - 0.6px), rgba(247, 247, 242, 0.22) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(92vw, 38rem) 13% no-repeat,
     linear-gradient(46deg, transparent calc(50% - 0.6px), rgba(255, 74, 24, 0.24) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(86vw, 34rem) 18% no-repeat,
@@ -1012,19 +1012,19 @@ button {
   animation: homeArchiveExposedDispatchStreams 980ms cubic-bezier(0.18, 0.86, 0.16, 1) 420ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-awakening::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after {
   top: var(--home-portfolio-transition-center-y);
   left: var(--home-portfolio-transition-center-x);
   opacity: 0;
   animation: none;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication {
   animation: homeArchiveEntryPull 220ms cubic-bezier(0.18, 0.86, 0.16, 1) 1180ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication::before,
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::after {
   position: absolute;
   left: 50%;
   z-index: 6;
@@ -1043,33 +1043,33 @@ button {
   white-space: nowrap;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication::before {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::before {
   content: "ACCESS GRANTED";
   top: 50%;
   animation: homeArchiveEntryAccessGranted 540ms cubic-bezier(0.22, 0.82, 0.18, 1) 520ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-communication::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::after {
   content: "ENTERING THE ARCHIVE";
   top: 50%;
   animation: homeArchiveEntryEntering 440ms cubic-bezier(0.22, 0.82, 0.18, 1) 860ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--core,
-.site-shell.is-home-transitioning.is-engage-activated .home-identity-text--ready {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--core,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--ready {
   animation: homeArchiveEntryStatusYield 720ms cubic-bezier(0.22, 0.82, 0.18, 1) 560ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-sector {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-sector {
   animation: homeArchiveFixedSectorHold 900ms cubic-bezier(0.18, 0.86, 0.16, 1) 440ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-sector::before,
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-sector::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-sector::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-sector::after {
   animation: homeArchiveFixedSectorDetailHold 900ms cubic-bezier(0.18, 0.86, 0.16, 1) 440ms both;
 }
 
-.site-shell.is-home-transitioning.is-engage-activated .home-archive-world {
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-world {
   animation: homeArchiveFixedWorldHold 900ms cubic-bezier(0.18, 0.86, 0.16, 1) 480ms both;
 }
 .site-shell[data-shell-module="wrestling"] {
@@ -3896,8 +3896,8 @@ button {
 
   .home-identity-text--engage::before,
   .home-identity-text--engage::after,
-  .site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::before,
-  .site-shell.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::before,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage::after {
     content: none;
     display: none;
     animation: none !important;
