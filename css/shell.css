@@ -975,6 +975,23 @@ button {
 }
 /* PASS 23 Chapter 2 eight-fragment path scaffold. Neutral escape paths only. */
 .portfolio-entry-fragments {
+  /* PASS 26: invisible, non-final destination-awareness anchors for future constellation work. */
+  --entry-anchor-01-x: min(112vw, 74rem);
+  --entry-anchor-01-y: calc(-1 * min(22vh, 13rem));
+  --entry-anchor-02-x: min(106vw, 70rem);
+  --entry-anchor-02-y: min(50vh, 27rem);
+  --entry-anchor-03-x: calc(-1 * min(108vw, 72rem));
+  --entry-anchor-03-y: calc(-1 * min(16vh, 9rem));
+  --entry-anchor-04-x: calc(-1 * min(104vw, 68rem));
+  --entry-anchor-04-y: min(54vh, 29rem);
+  --entry-anchor-05-x: min(58vw, 38rem);
+  --entry-anchor-05-y: calc(-1 * min(104vh, 56rem));
+  --entry-anchor-06-x: min(38vw, 26rem);
+  --entry-anchor-06-y: min(104vh, 56rem);
+  --entry-anchor-07-x: calc(-1 * min(64vw, 42rem));
+  --entry-anchor-07-y: calc(-1 * min(104vh, 56rem));
+  --entry-anchor-08-x: calc(-1 * min(50vw, 33rem));
+  --entry-anchor-08-y: min(104vh, 56rem);
   position: fixed;
   inset: 0;
   z-index: 8;
@@ -999,9 +1016,12 @@ button {
   --fragment-mid-y: 0px;
   --fragment-end-x: min(82vw, 54rem);
   --fragment-end-y: 0px;
+  --fragment-target-x: var(--entry-anchor-01-x);
+  --fragment-target-y: var(--entry-anchor-01-y);
   --fragment-commit-scale: 0.38;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 1;
+  --fragment-target-scale: 1.06;
   position: fixed;
   top: var(--home-portfolio-transition-center-y);
   left: var(--home-portfolio-transition-center-x);
@@ -1036,6 +1056,8 @@ button {
   --fragment-mid-y: calc(-1 * min(10vh, 5.8rem));
   --fragment-end-x: min(98vw, 66rem);
   --fragment-end-y: calc(-1 * min(24vh, 14rem));
+  --fragment-target-x: var(--entry-anchor-01-x);
+  --fragment-target-y: var(--entry-anchor-01-y);
   --fragment-commit-scale: 0.36;
   --fragment-mid-scale: 0.72;
   --fragment-end-scale: 1;
@@ -1055,6 +1077,8 @@ button {
   --fragment-mid-y: min(18vh, 9.6rem);
   --fragment-end-x: min(94vw, 62rem);
   --fragment-end-y: min(42vh, 23rem);
+  --fragment-target-x: var(--entry-anchor-02-x);
+  --fragment-target-y: var(--entry-anchor-02-y);
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.64;
   --fragment-end-scale: 0.94;
@@ -1074,6 +1098,8 @@ button {
   --fragment-mid-y: calc(-1 * min(9.5vh, 5.6rem));
   --fragment-end-x: calc(-1 * min(94vw, 62rem));
   --fragment-end-y: calc(-1 * min(19vh, 11rem));
+  --fragment-target-x: var(--entry-anchor-03-x);
+  --fragment-target-y: var(--entry-anchor-03-y);
   --fragment-commit-scale: 0.32;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.96;
@@ -1093,6 +1119,8 @@ button {
   --fragment-mid-y: min(20vh, 10.4rem);
   --fragment-end-x: calc(-1 * min(90vw, 59rem));
   --fragment-end-y: min(46vh, 25rem);
+  --fragment-target-x: var(--entry-anchor-04-x);
+  --fragment-target-y: var(--entry-anchor-04-y);
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.94;
@@ -1112,6 +1140,8 @@ button {
   --fragment-mid-y: calc(-1 * min(36vh, 19rem));
   --fragment-end-x: min(56vw, 36rem);
   --fragment-end-y: calc(-1 * min(86vh, 46rem));
+  --fragment-target-x: var(--entry-anchor-05-x);
+  --fragment-target-y: var(--entry-anchor-05-y);
   --fragment-commit-scale: 0.28;
   --fragment-mid-scale: 0.5;
   --fragment-end-scale: 0.86;
@@ -1131,6 +1161,8 @@ button {
   --fragment-mid-y: min(37vh, 19.5rem);
   --fragment-end-x: min(40vw, 27rem);
   --fragment-end-y: min(88vh, 47rem);
+  --fragment-target-x: var(--entry-anchor-06-x);
+  --fragment-target-y: var(--entry-anchor-06-y);
   --fragment-commit-scale: 0.27;
   --fragment-mid-scale: 0.49;
   --fragment-end-scale: 0.84;
@@ -1150,6 +1182,8 @@ button {
   --fragment-mid-y: calc(-1 * min(35vh, 18rem));
   --fragment-end-x: calc(-1 * min(60vw, 39rem));
   --fragment-end-y: calc(-1 * min(86vh, 46rem));
+  --fragment-target-x: var(--entry-anchor-07-x);
+  --fragment-target-y: var(--entry-anchor-07-y);
   --fragment-commit-scale: 0.28;
   --fragment-mid-scale: 0.5;
   --fragment-end-scale: 0.86;
@@ -1169,6 +1203,8 @@ button {
   --fragment-mid-y: min(35vh, 18.5rem);
   --fragment-end-x: calc(-1 * min(48vw, 31rem));
   --fragment-end-y: min(88vh, 47rem);
+  --fragment-target-x: var(--entry-anchor-08-x);
+  --fragment-target-y: var(--entry-anchor-08-y);
   --fragment-commit-scale: 0.29;
   --fragment-mid-scale: 0.51;
   --fragment-end-scale: 0.86;
@@ -1881,10 +1917,16 @@ button {
     transform: translate3d(calc(-50% + var(--fragment-mid-x)), calc(-50% + var(--fragment-mid-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-mid-scale));
   }
 
+  88% {
+    opacity: 0.34;
+    filter: brightness(1.12) saturate(1.04);
+    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-end-scale));
+  }
+
   100% {
     opacity: 0;
-    filter: brightness(1.06) saturate(1.03);
-    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-end-scale));
+    filter: brightness(1.03) saturate(1.02);
+    transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-target-scale));
   }
 }
 @keyframes homeArchiveFirstFragmentEscape {
