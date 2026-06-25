@@ -1,6 +1,6 @@
 # Website V3 World Bible
 
-Version: 0.3  
+Version: 0.5  
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive
 
@@ -14,6 +14,24 @@ The World Bible defines what each world is.
 Worlds are narrative assets, not UI themes. Implementations should adapt to the world definitions, not redefine them.
 
 A world should be recognizable even if every UI element were removed.
+
+# Creative Source of Truth
+
+This document is the canonical creative reference for Website V3.
+
+It defines the identity of the Archive, its worlds, systems, atmosphere, symbolism, philosophy, and protected creative assets.
+
+Whenever implementation conflicts with this document, implementation should be revised rather than redefining the worlds.
+
+Story precedes implementation.
+
+Identity precedes visuals.
+
+Atmosphere precedes animation.
+
+Worlds are narrative places, not visual themes.
+
+This document evolves only through intentional design approval.
 
 ---
 
@@ -127,13 +145,13 @@ V3 is organized as eight cardinal worlds around the Archive Core.
 
 | Bearing | World | Current Module / Meaning | Status |
 |---|---|---|---|
-| N | The Cosmos | Astrophotos | Planned |
+| N | The Cosmos | Astrophotos | LOCKED |
 | NE | The Battleground | Wrestling / Ring Archive | LOCKED |
-| E | The Wild | Wildlife | Planned |
+| E | The Wild | Wildlife | LOCKED |
 | SE | The Comms | Contact | Planned |
 | S | The Trajectory | Calendar | Planned |
 | SW | The Story | About | Planned |
-| W | The Horizon | Sunset | Planned |
+| W | The Horizon | Sunset | LOCKED |
 | NW | The Soundtrack | Music Nexus | Locked |
 
 ## World Rules
@@ -145,6 +163,36 @@ V3 is organized as eight cardinal worlds around the Archive Core.
 - Effects must support story, usability, and atmosphere.
 - Avoid redesigning a locked world without explicit approval.
 - Idea Bucket items are preserved concepts, not required implementation tasks.
+
+---
+
+# Archive Structure
+
+The Archive contains two destination types.
+
+## Living Worlds
+
+Living Worlds are immersive experiential destinations.
+
+Current locked Living Worlds:
+
+- The Soundtrack
+- The Battleground
+- The Cosmos
+- The Horizon
+- The Wild
+
+## Archive Systems
+
+Archive Systems are functional infrastructure spaces inside the Archive.
+
+Planned Archive Systems:
+
+- The Story
+- The Trajectory
+- The Comms
+
+Archive Systems do not need to behave like full worlds. They may function more like rooms, controls, chambers, or machine interfaces within the Archive.
 
 ---
 
@@ -501,3 +549,382 @@ The following concepts are preserved for future development but are not implemen
 ## Arrival Sentence
 
 Welcome to The Battleground, where every battle leaves a legacy, every step honors those who came before, and the arena remembers all who enter.
+
+---
+
+# World: The Cosmos
+
+Status: LOCKED
+Compass Position: North
+Current Module: Astrophotography
+
+## Core Identity
+
+The Cosmos preserves perspective.
+
+It reminds every world that every memory, photograph, story, and life exists within something vastly greater.
+
+The Cosmos is not simply about photographing space.
+
+It is about discovering our place within it.
+
+## Purpose
+
+The Cosmos exists to preserve curiosity.
+
+It records not only celestial phenomena, but where we are in the universe at the moment memories are made.
+
+Every archived moment exists beneath a particular sky, at a particular point in space and time.
+
+## Core Emotion
+
+- Curiosity
+- Wonder
+- Discovery
+- Perspective
+- Exploration
+
+## Population
+
+The Cosmos belongs to those who look beyond the known:
+
+- Dreamers
+- Explorers
+- Astronomers
+- Stargazers
+- Scientists
+- Researchers
+- Photographers
+- Travelers
+- Curious minds
+- Seekers
+
+## Landmark
+
+### The Contained Singularity
+
+At the center of The Cosmos exists an immense black hole held in equilibrium by ancient Archive runes and Voodoo energy.
+
+The Archive does not control it.
+
+It observes it.
+
+The Singularity represents infinite possibility, mystery, and discovery.
+
+Its true nature remains unknown.
+
+The prevailing belief among the Keepers is that it contains an impossible concentration of primordial darkness whose release could unravel the balance upon which the Archive depends.
+
+Whether this is truth, myth, or something beyond understanding remains unknown.
+
+## Atmosphere
+
+The sky is always alive.
+
+The Cosmos is defined by:
+
+- Constant meteor showers
+- Northern Lights
+- Auroras
+- Nebulae
+- Constellations
+- Celestial motion
+- Rare phenomena
+
+Discovery never sleeps.
+
+## Living Motion
+
+The heavens are always changing.
+
+Meteor trails, auroras, starlight, and cosmic motion make the world feel alive without rushing.
+
+## Philosophy
+
+The universe has always been there.
+
+The Archive simply helps us learn how to see it.
+
+## Immutable World Law
+
+Curiosity is an Infinite Supply.
+
+Never Doubt It.
+
+## Role in the Archive
+
+The Cosmos serves as the North Star of the Archive.
+
+It reminds every world to keep moving forward with curiosity and to continue exploring beyond the known.
+
+## Protected Lore Seed
+
+The Archive did not create the Singularity.
+
+It discovered it.
+
+Its purpose remains unknown.
+
+The First Keeper, Ruyven, may be connected to the first observatory or the discovery of this phenomenon in future Archive Lore.
+
+Do not expand this lore without explicit approval.
+
+## Arrival Sentence
+
+Welcome to The Cosmos, where every discovery begins with curiosity, every question opens another horizon, and the universe reveals itself to those who never stop looking beyond the known.
+
+---
+
+# World: The Horizon
+
+Status: LOCKED
+Compass Position: West
+Current Module: Sunsets / Sunrises
+
+## Core Identity
+
+The Horizon is a world of peace, healing, reflection, and hope.
+
+It reminds visitors that every ending carries the promise of another beginning.
+
+The sunset is not only an ending.
+
+It is a promise that tomorrow will come.
+
+## Purpose
+
+The Horizon preserves moments of stillness.
+
+It exists so visitors may pause, breathe, reflect, remember, heal, and continue forward.
+
+## Core Emotion
+
+- Peace
+- Reflection
+- Healing
+- Hope
+- Renewal
+- Gratitude
+- Remembrance
+
+## Population
+
+The Horizon belongs to:
+
+- Anyone seeking peace
+- Anyone carrying memories
+- Anyone looking for hope
+- Anyone needing a quiet place to reflect
+
+## Landmark
+
+### The Painted Sky
+
+The defining landmark of The Horizon is not a structure.
+
+It is the sky itself.
+
+The sky is always being painted with light, color, memory, and renewal.
+
+## Atmosphere
+
+The Horizon is defined by:
+
+- Warm skies
+- Gentle breezes
+- Changing colors
+- Quiet landscapes
+- Calm water
+- Endless sunsets
+- Endless sunrises
+
+The world should feel peaceful, not sad.
+
+## Living Motion
+
+The sky is always changing.
+
+Every sunset becomes tomorrow's sunrise.
+
+## Philosophy
+
+The setting sun is not the end.
+
+It is tomorrow's promise.
+
+## Immutable World Law
+
+The Light Always Returns.
+
+## Role in the Archive
+
+The Horizon reminds the Archive that healing and hope are as important as discovery, connection, and legacy.
+
+It is the place where visitors pause before continuing forward.
+
+## Protected Inspiration
+
+This world is privately inspired by someone whose love of sunsets continues to influence the creator's understanding of peace, remembrance, and hope.
+
+This inspiration is preserved only within the World Bible and is not intended as public-facing lore.
+
+Do not name or expose this inspiration publicly without explicit approval.
+
+## Idea Bucket
+
+- Quiet overlooks
+- Reflection gardens
+- Shorelines
+- Archive energy subtly reflected in changing skies
+- Sunrises and sunsets carrying equal importance
+- The sky as a living painted surface
+
+## Arrival Sentence
+
+Welcome to The Horizon, where every sunset is a promise, every sunrise is a new beginning, and the light always returns.
+
+---
+
+# World: The Wild
+
+Status: LOCKED
+Compass Position: East
+Current Module: Wildlife
+
+## Core Identity
+
+The Wild is the living world of observation, patience, balance, and life's unseen moments.
+
+It exists to reveal the moments that happen whether humanity is watching or not.
+
+The Wild is not simply about wildlife.
+
+It is about paying attention.
+
+## Purpose
+
+The Wild preserves the quiet stories unfolding around us.
+
+Nature does not perform.
+
+It simply lives.
+
+The Archive exists to notice those moments before they disappear.
+
+## Core Emotion
+
+- Awareness
+- Wonder
+- Patience
+- Respect
+- Balance
+- Discovery
+
+## Population
+
+The Wild belongs to:
+
+- Wildlife
+- Explorers
+- Naturalists
+- Photographers
+- Conservationists
+- Observers
+- Anyone willing to slow down long enough to notice
+
+## Landmark
+
+### The Ancient Grove
+
+The Ancient Grove is the heart of The Wild.
+
+It is the oldest living place within this world.
+
+Everything eventually returns there.
+
+Birds, insects, animals, seasons, paths, and patterns all pass through or around it.
+
+## Atmosphere
+
+The Wild is defined by:
+
+- Living forests
+- Changing seasons
+- Morning mist
+- Running water
+- Wind through leaves
+- Natural patterns
+- Quiet movement
+- Hidden life
+
+## Living Motion
+
+Nature is always moving.
+
+Not dramatically.
+
+Quietly.
+
+Patiently.
+
+Constantly.
+
+## Philosophy
+
+Life is constantly unfolding around us.
+
+Most people never stop long enough to notice.
+
+## Immutable World Law
+
+Every Living Moment Deserves to Be Noticed.
+
+## Role in the Archive
+
+The Wild reminds the Archive that life is happening all around us, even when we fail to see it.
+
+It preserves the unseen, brief, fragile, and ordinary moments that become extraordinary when observed.
+
+## Protected Inspiration
+
+Wildlife photography began as a way to document insects, birds, and animals encountered during everyday life.
+
+During the pandemic, wildlife photography helped keep the creator's photographic skill sharp.
+
+It continues as a way to study manual camera usage, local wildlife patterns, neighborhood bird activity, and the living world close to home.
+
+This inspiration is preserved internally and does not need to be public-facing.
+
+## Idea Bucket
+
+- Quiet open-world exploration feeling inspired by beloved exploration games without directly referencing or recreating any existing game's characters, locations, or assets
+- Seasonal changes
+- Wildlife migration patterns
+- Hidden observation points
+- Archive Energy expressed through living nature rather than machinery or stone
+- The Ancient Grove as a return point
+- Nature rewarding curiosity and patience
+
+## Arrival Sentence
+
+Welcome to The Wild, where life moves quietly, every pattern tells a story, and every living moment deserves to be noticed.
+
+---
+
+# Future Archive Lore
+
+Protected concepts reserved for future development.
+
+Do not expand unless explicitly approved.
+
+- The First Keeper: Ruyven
+- Ruyven as the creator's Archive identity / Keeper figure
+- Archive Keepers
+- The Origin of the Archive
+- The Contained Singularity
+- The Eight Worlds
+- Archive mythology
+- Ancient civilizations
+- Feudal Realms / MUD-era inspiration
+- Role-playing and D&D-inspired lore roots
+- Future easter eggs
