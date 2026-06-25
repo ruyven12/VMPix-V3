@@ -993,6 +993,8 @@ button {
   --entry-anchor-08-y: min(104vh, 56rem);
   --entry-constellation-01-x: min(34vw, 22rem);
   --entry-constellation-01-y: calc(-1 * min(10vh, 6rem));
+  --entry-constellation-02-x: min(30vw, 20rem);
+  --entry-constellation-02-y: min(18vh, 10rem);
 }
 
 /* PASS 23 Chapter 2 eight-fragment path scaffold. Neutral escape paths only. */
@@ -1062,8 +1064,37 @@ button {
   transform: translate3d(-50%, -50%, 0) scale(1);
 }
 
+.portfolio-entry-constellation--second {
+  --constellation-x: var(--entry-constellation-02-x);
+  --constellation-y: var(--entry-constellation-02-y);
+  --constellation-width: clamp(2.25rem, 6.2vw, 4.1rem);
+  --constellation-height: clamp(1.6rem, 4.5vw, 2.9rem);
+  background:
+    radial-gradient(circle at 36% 32%, rgba(247, 247, 242, 0.66) 0 1px, rgba(238, 217, 153, 0.16) 1.25px 2.9px, transparent 4px),
+    radial-gradient(circle at 72% 58%, rgba(238, 217, 153, 0.5) 0 0.86px, rgba(220, 188, 108, 0.12) 1.08px 2.45px, transparent 3.5px),
+    radial-gradient(circle at 18% 76%, rgba(247, 247, 242, 0.36) 0 0.78px, rgba(238, 217, 153, 0.1) 1px 2px, transparent 3.2px);
+}
+
+.portfolio-entry-constellation--second::before {
+  left: 34%;
+  top: 34%;
+  width: 43%;
+  opacity: 0.2;
+  transform: rotate(29deg) scaleX(0.88);
+}
+
+.portfolio-entry-constellation--second::after {
+  left: 73%;
+  top: 58%;
+  opacity: 0.28;
+}
+
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first {
   animation: portfolioFirstConstellationReveal 860ms cubic-bezier(0.18, 0.86, 0.16, 1) 180ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second {
+  animation: portfolioSecondConstellationReveal 760ms cubic-bezier(0.18, 0.86, 0.16, 1) 520ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-constellation {
@@ -2014,6 +2045,28 @@ button {
 
   100% {
     opacity: 0.34;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes portfolioSecondConstellationReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.78, 0.78, 1);
+  }
+
+  46% {
+    opacity: 0.16;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.94, 0.94, 1);
+  }
+
+  76% {
+    opacity: 0.3;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.015, 1.015, 1);
+  }
+
+  100% {
+    opacity: 0.25;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 }
@@ -4269,6 +4322,12 @@ button {
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first {
     animation: none !important;
     opacity: 0.34;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second {
+    animation: none !important;
+    opacity: 0.25;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 
