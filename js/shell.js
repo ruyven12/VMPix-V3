@@ -2557,7 +2557,7 @@ const PORTFOLIO_ORIENTATION_START_OFFSET_MS = 820;
 const PORTFOLIO_ORIENTATION_REDUCED_MOTION_START_OFFSET_MS = 28;
 const PORTFOLIO_ORIENTATION_DURATION_MS = 620;
 const PORTFOLIO_ORIENTATION_REDUCED_MOTION_DURATION_MS = 70;
-const PORTFOLIO_FIRST_TRANSFER_DURATION_MS = 860;
+const PORTFOLIO_FIRST_TRANSFER_DURATION_MS = 760;
 const PORTFOLIO_FIRST_TRANSFER_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioArrivalTimer = 0;
 let portfolioOrientationStartTimer = 0;
@@ -2567,7 +2567,7 @@ let portfolioFirstTransferTimer = 0;
 let portfolioFirstTransferTargetCard = null;
 // Temporary Experience Build QA flag: direct /portfolio starts at Chapter 2 entry.
 const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA = true;
-const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 1220;
+const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 1200;
 const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
 const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioDirectArrivalTimer = 0;
@@ -2740,7 +2740,7 @@ function startPortfolioArrival() {
   portfolioArrivalTimer = window.setTimeout(clearPortfolioArrivalState, arrivalDuration);
 }
 
-const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 1220;
+const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 1200;
 const HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS = 40;
 let homePortfolioTransitionTimer = 0;
 
