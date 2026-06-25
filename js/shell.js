@@ -698,6 +698,9 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shouldHideBottomRail = isHomeRoute || route.name === "portfolio";
   shell.dataset.shellRoute = route.name;
   shell.dataset.shellActiveTarget = activeTarget;
+  if (route.name !== "portfolio") {
+    shell.classList.remove("has-portfolio-entry-constellation");
+  }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (bottomRail) {
@@ -2748,7 +2751,11 @@ function clearHomePortfolioTransitionState() {
   window.clearTimeout(homePortfolioTransitionTimer);
   homePortfolioTransitionTimer = 0;
   if (shell) {
+    const shouldRevealFirstConstellation = shell.classList.contains("is-portfolio-entry-sequence") &&
+      window.location.pathname === routePaths.portfolio &&
+      shell.classList.contains("has-entered-hub");
     shell.classList.remove("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
+    shell.classList.toggle("has-portfolio-entry-constellation", shouldRevealFirstConstellation);
   }
   if (startButton) {
     startButton.setAttribute("aria-busy", "false");
@@ -2762,6 +2769,7 @@ function activatePortfolioEntrySequenceState() {
 
   window.clearTimeout(homePortfolioTransitionTimer);
   homePortfolioTransitionTimer = 0;
+  shell.classList.remove("has-portfolio-entry-constellation");
   shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
   if (startButton) {
     startButton.setAttribute("aria-busy", "true");
