@@ -13868,11 +13868,20 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
   transform: translate3d(0, -0.35rem, 0) scale(0.965);
 }
-
-.site-shell.has-entered-hub.is-portfolio-entry-sequence .home-frame {
-  opacity: 1;
+.site-shell[data-shell-route="portfolio"].has-entered-hub .home-frame {
+  visibility: hidden;
+  opacity: 0;
   pointer-events: none;
-  transform: translate3d(0, 0, 0) scale(1);
+  animation: none;
+  transition: none;
+  transform: none;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.is-portfolio-entry-sequence .home-frame {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: none;
 }
 
 .site-shell.has-entered-hub .portfolio-hub {
@@ -13895,8 +13904,11 @@ button.wrestling-event-history-tagged-thumb {
   filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
 }
 
+.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-void-stars,
 .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-energy,
 .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-rings,
+.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-sweep,
+.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-particles,
 .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .cinema-fire-bg {
   opacity: 0;
   animation: none;

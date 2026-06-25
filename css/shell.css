@@ -119,6 +119,17 @@ button {
 .site-shell.is-home-route .universal-bottom-rail {
   display: none;
 }
+.site-shell[data-shell-route="portfolio"] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.site-shell[data-shell-route="portfolio"] .universal-bottom-rail {
+  display: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"] .shell-breadcrumb {
+  display: none;
+}
 
 /* Home Story Prototype Pass - Void Isolation. Temporary Home-only suppression for story review. */
 .site-shell.is-home-route .ambient-system {
@@ -916,6 +927,47 @@ button {
   --shell-nav-accent: var(--accent-music);
 }
 
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-frame,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-frame::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-frame::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-lockup,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-lockup::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .title-group,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-portal,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-portal::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-portal::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-button,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-button::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .start-button::after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-archive-message,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-identity-text {
+  color: transparent;
+  text-shadow: none;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-identity-text--full,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-identity-text--mark,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-identity-text--core,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-identity-text--ready,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-archive-message--node,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-archive-message--decode {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-archive-communication::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .home-archive-communication::after {
+  content: none;
+  display: none;
+  animation: none;
+}
 /* PASS 12 Archive Entry. Post-acceptance threshold layer only. */
 .site-shell.is-home-transitioning.is-engage-activated .ambient-system::after {
   display: block;

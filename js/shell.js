@@ -695,6 +695,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
   const isHomeRoute = route.name === "home";
+  const shouldHideBottomRail = isHomeRoute || route.name === "portfolio";
   shell.dataset.shellRoute = route.name;
   shell.dataset.shellActiveTarget = activeTarget;
   shell.dataset.shellModule = moduleContext;
@@ -703,9 +704,9 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     bottomRail.dataset.shellRoute = route.name;
     bottomRail.dataset.shellActiveTarget = activeTarget;
     bottomRail.dataset.shellModule = moduleContext;
-    bottomRail.hidden = isHomeRoute;
-    bottomRail.setAttribute("aria-hidden", String(isHomeRoute));
-    if (isHomeRoute) {
+    bottomRail.hidden = shouldHideBottomRail;
+    bottomRail.setAttribute("aria-hidden", String(shouldHideBottomRail));
+    if (shouldHideBottomRail) {
       bottomRail.setAttribute("inert", "");
     } else {
       bottomRail.removeAttribute("inert");
@@ -2960,7 +2961,7 @@ if (shell && startButton) {
   const initialRoute = getRouteFromUrl();
   syncRouteFromLocation({
     historyState: window.history.state,
-    shouldPlayDirectPortfolioArrival: initialRoute.name === "portfolio",
+    shouldPlayDirectPortfolioArrival: false,
   });
   window.addEventListener("popstate", (event) => {
     syncRouteFromLocation({ historyState: event.state });
