@@ -973,28 +973,180 @@ button {
   display: none;
   animation: none;
 }
-/* PASS 22 Chapter 2 controlled multi-fragment escape. Primary fragment carrier. */
-.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after {
-  display: block;
-  inset: auto;
+/* PASS 23 Chapter 2 eight-fragment path scaffold. Neutral escape paths only. */
+.portfolio-entry-fragments {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint style;
+  mix-blend-mode: screen;
+}
+
+.portfolio-entry-fragment {
+  --fragment-angle: 0deg;
+  --fragment-delay: 520ms;
+  --fragment-duration: 540ms;
+  --fragment-width: clamp(3.15rem, 12vw, 7.2rem);
+  --fragment-height: clamp(1.25px, 0.3vw, 2.5px);
+  --fragment-mid-x: min(18vw, 11rem);
+  --fragment-mid-y: 0px;
+  --fragment-end-x: min(82vw, 54rem);
+  --fragment-end-y: 0px;
+  --fragment-mid-scale: 0.62;
+  --fragment-end-scale: 1;
+  position: fixed;
   top: var(--home-portfolio-transition-center-y);
   left: var(--home-portfolio-transition-center-x);
-  z-index: 8;
-  width: clamp(4.75rem, 17vw, 9.5rem);
-  height: clamp(1.5px, 0.38vw, 3px);
-  aspect-ratio: auto;
+  display: block;
+  width: var(--fragment-width);
+  height: var(--fragment-height);
   border-radius: 999px;
   opacity: 0;
+  pointer-events: none;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(247, 247, 242, 0.04) 8%, rgba(238, 217, 153, 0.9) 34%, rgba(255, 151, 38, 0.96) 52%, rgba(213, 22, 34, 0.7) 68%, transparent 100%);
+    linear-gradient(90deg, transparent 0%, rgba(247, 247, 242, 0.04) 8%, rgba(238, 217, 153, 0.88) 34%, rgba(255, 151, 38, 0.94) 52%, rgba(213, 22, 34, 0.64) 68%, transparent 100%);
   box-shadow:
-    0 0 0.38rem rgba(247, 247, 242, 0.4),
-    0 0 0.84rem rgba(255, 74, 24, 0.36),
-    0 0 1.22rem rgba(220, 188, 108, 0.16);
-  filter: brightness(1.22) saturate(1.08);
-  mix-blend-mode: screen;
+    0 0 0.34rem rgba(247, 247, 242, 0.36),
+    0 0 0.78rem rgba(255, 74, 24, 0.32),
+    0 0 1.12rem rgba(220, 188, 108, 0.14);
+  filter: brightness(1.18) saturate(1.06);
   transform-origin: 0 50%;
-  animation: homeArchiveFirstFragmentEscape 560ms cubic-bezier(0.06, 0.88, 0.08, 1) 520ms both;
+  will-change: opacity, transform, filter;
+}
+
+.portfolio-entry-fragment--one {
+  --fragment-angle: -16deg;
+  --fragment-delay: 520ms;
+  --fragment-duration: 560ms;
+  --fragment-width: clamp(4.75rem, 17vw, 9.5rem);
+  --fragment-height: clamp(1.5px, 0.38vw, 3px);
+  --fragment-mid-x: min(24vw, 15rem);
+  --fragment-mid-y: calc(-1 * min(8vh, 4.5rem));
+  --fragment-end-x: min(88vw, 58rem);
+  --fragment-end-y: calc(-1 * min(30vh, 17rem));
+  --fragment-mid-scale: 0.72;
+  --fragment-end-scale: 1.08;
+}
+
+.portfolio-entry-fragment--two {
+  --fragment-angle: 24deg;
+  --fragment-delay: 560ms;
+  --fragment-duration: 520ms;
+  --fragment-width: clamp(3.7rem, 13vw, 7.8rem);
+  --fragment-height: clamp(1.25px, 0.32vw, 2.4px);
+  --fragment-mid-x: min(20vw, 12rem);
+  --fragment-mid-y: min(12vh, 6rem);
+  --fragment-end-x: min(86vw, 56rem);
+  --fragment-end-y: min(34vh, 19rem);
+  --fragment-mid-scale: 0.64;
+  --fragment-end-scale: 1;
+}
+
+.portfolio-entry-fragment--three {
+  --fragment-angle: -154deg;
+  --fragment-delay: 600ms;
+  --fragment-duration: 500ms;
+  --fragment-width: clamp(2.9rem, 10vw, 6.2rem);
+  --fragment-height: clamp(1px, 0.25vw, 2px);
+  --fragment-mid-x: calc(-1 * min(17vw, 10rem));
+  --fragment-mid-y: calc(-1 * min(6vh, 3.5rem));
+  --fragment-end-x: calc(-1 * min(76vw, 50rem));
+  --fragment-end-y: calc(-1 * min(24vh, 14rem));
+  --fragment-mid-scale: 0.58;
+  --fragment-end-scale: 0.96;
+}
+
+.portfolio-entry-fragment--four {
+  --fragment-angle: 166deg;
+  --fragment-delay: 630ms;
+  --fragment-duration: 540ms;
+  --fragment-width: clamp(3.35rem, 11.5vw, 7rem);
+  --fragment-height: clamp(1.15px, 0.28vw, 2.25px);
+  --fragment-mid-x: calc(-1 * min(18vw, 11rem));
+  --fragment-mid-y: min(10vh, 5.5rem);
+  --fragment-end-x: calc(-1 * min(82vw, 54rem));
+  --fragment-end-y: min(30vh, 17rem);
+  --fragment-mid-scale: 0.62;
+  --fragment-end-scale: 1.02;
+}
+
+.portfolio-entry-fragment--five {
+  --fragment-angle: -54deg;
+  --fragment-delay: 650ms;
+  --fragment-duration: 520ms;
+  --fragment-width: clamp(2.85rem, 9.5vw, 5.8rem);
+  --fragment-height: clamp(1px, 0.24vw, 2px);
+  --fragment-mid-x: min(12vw, 7rem);
+  --fragment-mid-y: calc(-1 * min(20vh, 10rem));
+  --fragment-end-x: min(48vw, 31rem);
+  --fragment-end-y: calc(-1 * min(72vh, 38rem));
+  --fragment-mid-scale: 0.56;
+  --fragment-end-scale: 0.98;
+}
+
+.portfolio-entry-fragment--six {
+  --fragment-angle: 58deg;
+  --fragment-delay: 680ms;
+  --fragment-duration: 500ms;
+  --fragment-width: clamp(2.65rem, 9vw, 5.4rem);
+  --fragment-height: clamp(1px, 0.23vw, 1.9px);
+  --fragment-mid-x: min(11vw, 6.5rem);
+  --fragment-mid-y: min(19vh, 9.5rem);
+  --fragment-end-x: min(46vw, 30rem);
+  --fragment-end-y: min(74vh, 39rem);
+  --fragment-mid-scale: 0.54;
+  --fragment-end-scale: 0.94;
+}
+
+.portfolio-entry-fragment--seven {
+  --fragment-angle: -118deg;
+  --fragment-delay: 700ms;
+  --fragment-duration: 520ms;
+  --fragment-width: clamp(2.7rem, 9.2vw, 5.6rem);
+  --fragment-height: clamp(1px, 0.23vw, 1.95px);
+  --fragment-mid-x: calc(-1 * min(11vw, 6.5rem));
+  --fragment-mid-y: calc(-1 * min(18vh, 9rem));
+  --fragment-end-x: calc(-1 * min(50vw, 32rem));
+  --fragment-end-y: calc(-1 * min(70vh, 37rem));
+  --fragment-mid-scale: 0.55;
+  --fragment-end-scale: 0.96;
+}
+
+.portfolio-entry-fragment--eight {
+  --fragment-angle: 122deg;
+  --fragment-delay: 730ms;
+  --fragment-duration: 500ms;
+  --fragment-width: clamp(2.8rem, 9.4vw, 5.7rem);
+  --fragment-height: clamp(1px, 0.24vw, 2px);
+  --fragment-mid-x: calc(-1 * min(12vw, 7rem));
+  --fragment-mid-y: min(18vh, 9rem);
+  --fragment-end-x: calc(-1 * min(52vw, 33rem));
+  --fragment-end-y: min(72vh, 38rem);
+  --fragment-mid-scale: 0.56;
+  --fragment-end-scale: 0.98;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragments {
+  display: block;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragment {
+  animation: homeArchiveEntryFragmentEscape var(--fragment-duration) cubic-bezier(0.06, 0.88, 0.08, 1) var(--fragment-delay) both;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
+  content: "";
+  display: none;
+  opacity: 0;
+  animation: none;
+  background: transparent;
+  box-shadow: none;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening {
   display: block;
@@ -1053,69 +1205,20 @@ button {
   top: 50%;
   animation: homeArchiveEntryEntering 440ms cubic-bezier(0.22, 0.82, 0.18, 1) 860ms both;
 }
-/* PASS 22 final fragment carriers override legacy entry labels while the route owns Chapter 2. */
-.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars {
-  z-index: 8;
-  display: block;
-  opacity: 1;
-  background: transparent;
-  filter: none;
-  animation: none;
-}
+/* PASS 23 keeps legacy entry labels and pseudo-fragment carriers inactive. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-communication::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
-  content: "";
-  position: fixed;
-  display: block;
-  inset: auto;
-  top: var(--home-portfolio-transition-center-y);
-  left: var(--home-portfolio-transition-center-x);
-  z-index: 8;
-  width: clamp(3.15rem, 12vw, 7.2rem);
-  max-width: none;
-  height: clamp(1.25px, 0.3vw, 2.5px);
-  aspect-ratio: auto;
-  border: 0;
-  border-radius: 999px;
+  content: none;
+  display: none;
   opacity: 0;
-  color: transparent;
-  font-size: 0;
-  line-height: 0;
-  pointer-events: none;
-  text-shadow: none;
-  text-transform: none;
-  white-space: normal;
-  background:
-    linear-gradient(90deg, transparent 0%, rgba(247, 247, 242, 0.04) 8%, rgba(238, 217, 153, 0.86) 34%, rgba(255, 151, 38, 0.94) 52%, rgba(213, 22, 34, 0.62) 68%, transparent 100%);
-  box-shadow:
-    0 0 0.34rem rgba(247, 247, 242, 0.36),
-    0 0 0.78rem rgba(255, 74, 24, 0.32),
-    0 0 1.12rem rgba(220, 188, 108, 0.14);
-  filter: brightness(1.18) saturate(1.06);
-  mix-blend-mode: screen;
-  transform-origin: 0 50%;
-  will-change: opacity, transform, filter;
+  animation: none;
+  background: transparent;
+  box-shadow: none;
 }
-
-.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after {
-  width: clamp(3.7rem, 13vw, 7.8rem);
-  height: clamp(1.25px, 0.32vw, 2.4px);
-  animation: homeArchiveSecondFragmentEscape 520ms cubic-bezier(0.06, 0.88, 0.08, 1) 570ms both;
-}
-
-.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before {
-  width: clamp(2.9rem, 10vw, 6.2rem);
-  height: clamp(1px, 0.25vw, 2px);
-  animation: homeArchiveThirdFragmentEscape 480ms cubic-bezier(0.06, 0.88, 0.08, 1) 610ms both;
-}
-
-.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
-  width: clamp(3.35rem, 11.5vw, 7rem);
-  height: clamp(1.15px, 0.28vw, 2.25px);
-  animation: homeArchiveFourthFragmentEscape 540ms cubic-bezier(0.06, 0.88, 0.08, 1) 650ms both;
-}
-
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--core,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--ready {
   animation: homeArchiveEntryStatusYield 720ms cubic-bezier(0.22, 0.82, 0.18, 1) 560ms both;
@@ -1705,6 +1808,32 @@ button {
     opacity: 0.48;
     stroke: rgba(255, 74, 24, 0.7);
     stroke-dashoffset: -15;
+  }
+}
+@keyframes homeArchiveEntryFragmentEscape {
+  0%,
+  14% {
+    opacity: 0;
+    filter: brightness(1.03) saturate(1.02);
+    transform: translate3d(-50%, -50%, 0) rotate(var(--fragment-angle)) scaleX(0.035);
+  }
+
+  28% {
+    opacity: 0.9;
+    filter: brightness(1.34) saturate(1.1);
+    transform: translate3d(-50%, -50%, 0) rotate(var(--fragment-angle)) scaleX(0.16);
+  }
+
+  62% {
+    opacity: 0.96;
+    filter: brightness(1.48) saturate(1.12);
+    transform: translate3d(calc(-50% + var(--fragment-mid-x)), calc(-50% + var(--fragment-mid-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-mid-scale));
+  }
+
+  100% {
+    opacity: 0;
+    filter: brightness(1.06) saturate(1.03);
+    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-end-scale));
   }
 }
 @keyframes homeArchiveFirstFragmentEscape {
@@ -3944,6 +4073,16 @@ button {
     opacity: 0;
   }
 
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragments {
+    display: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragment {
+    animation: none !important;
+    opacity: 0;
+    filter: none;
+    transform: translate3d(-50%, -50%, 0) scaleX(0.04);
+  }
   .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after,
   .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening::after,
   .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
