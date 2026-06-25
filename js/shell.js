@@ -2601,7 +2601,7 @@ function getPortfolioFirstTransferTarget() {
     return null;
   }
 
-  return chapter2Surface || getCenteredHubCard();
+  return portfolioEntryTarget || getCenteredHubCard();
 }
 
 function startPortfolioFirstTransfer() {
@@ -2721,7 +2721,7 @@ function startPortfolioArrival() {
 
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
-  // Chapter 2 begins: Portfolio receives the incoming Home energy.
+  // Portfolio Entry Sequence receives the post-click energy under /portfolio ownership.
   shell.classList.add("is-portfolio-arriving");
   startPortfolioFirstTransfer();
   const arrivalDuration = reducedMotion.matches
@@ -2742,14 +2742,14 @@ function clearHomePortfolioTransitionState() {
   window.clearTimeout(homePortfolioTransitionTimer);
   homePortfolioTransitionTimer = 0;
   if (shell) {
-    shell.classList.remove("is-home-transitioning", "is-engage-activated");
+    shell.classList.remove("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
   }
   if (startButton) {
     startButton.setAttribute("aria-busy", "false");
   }
 }
 
-// Chapter 1 ends at Energy Dispatch; /portfolio continues the story as Chapter 2.
+// ENGAGE is the reel cut: Chapter 1 ends at click, and /portfolio owns the entry sequence.
 function completeHomePortfolioRouteHandoff() {
   homePortfolioTransitionTimer = 0;
   navigateToRoute(routePaths.portfolio, {
@@ -2763,6 +2763,7 @@ function beginHomePortfolioTransition() {
     !shell ||
     !startButton ||
     startButton.disabled ||
+    shell.classList.contains("is-portfolio-entry-sequence") ||
     shell.classList.contains("is-home-transitioning") ||
     shell.classList.contains("is-engage-activated") ||
     shell.classList.contains("has-entered-hub")
@@ -2771,7 +2772,7 @@ function beginHomePortfolioTransition() {
   }
 
   window.clearTimeout(homePortfolioTransitionTimer);
-  shell.classList.add("is-home-transitioning", "is-engage-activated");
+  shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
   startButton.setAttribute("aria-busy", "true");
 
   completeHomePortfolioRouteHandoff();
