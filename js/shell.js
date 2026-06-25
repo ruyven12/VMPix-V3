@@ -1006,7 +1006,9 @@ function getCenteredHubCard() {
     return null;
   }
 
-  const cards = Array.from(hubCarousel.querySelectorAll("[data-module-card]"));
+  const cards = Array.from(hubCarousel.querySelectorAll("[data-module-card]")).filter((card) => (
+    !card.closest("[inert]") && card.getClientRects().length > 0
+  ));
   if (cards.length === 0) {
     return null;
   }
@@ -2599,11 +2601,7 @@ function getPortfolioFirstTransferTarget() {
     return null;
   }
 
-  return (
-    getCenteredHubCard() ||
-    portfolioHub.querySelector('[data-module-card][data-module-state="active"]') ||
-    portfolioHub.querySelector("[data-module-card]")
-  );
+  return chapter2Surface || getCenteredHubCard();
 }
 
 function startPortfolioFirstTransfer() {
@@ -2704,9 +2702,10 @@ function startPortfolioOrientation() {
 
   clearPortfolioOrientationState();
   portfolioOrientationFocusCard = getCenteredHubCard();
-  if (portfolioOrientationFocusCard) {
-    portfolioOrientationFocusCard.classList.add("is-world-focus-target");
+  if (!portfolioOrientationFocusCard) {
+    return;
   }
+  portfolioOrientationFocusCard.classList.add("is-world-focus-target");
   shell.classList.add("is-portfolio-orienting");
 
   const orientationDuration = reducedMotion.matches

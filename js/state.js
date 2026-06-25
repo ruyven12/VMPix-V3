@@ -9,6 +9,7 @@ const shell = document.querySelector(".site-shell");
 const startButton = document.querySelector(".start-button");
 const homeFrame = document.querySelector(".home-frame");
 const portfolioHub = document.querySelector(".portfolio-hub");
+const chapter2Surface = document.querySelector("[data-chapter2-surface]");
 const aboutShell = document.querySelector("[data-about-shell]");
 const calendarShell = document.querySelector("[data-calendar-shell]");
 const contactShell = document.querySelector("[data-contact-shell]");
