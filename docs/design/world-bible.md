@@ -120,6 +120,7 @@ It remembers:
 - emotion
 
 Every world reflects this philosophy in its own way.
+
 ## Global World System
 
 V3 is organized as eight cardinal worlds around the Archive Core.
