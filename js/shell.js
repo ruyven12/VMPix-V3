@@ -10,8 +10,19 @@ function setCurrentView(viewName) {
   }
 }
 
+const ROUTE_TITLE_LABELS = {
+  home: "Welcome to Voodoo Media V3.0.01",
+  portfolio: "The Interactive Portfolio - Voodoo Media V3.0.01",
+};
+
+function setDocumentTitle(title) {
+  if (title) {
+    document.title = title;
+  }
+}
+
 const PORTFOLIO_WORLD_SELECTION_CONFIG = {
-  portfolio: { id: "portfolio", label: "Interactive Portfolio", description: "Destination analysis pending." },
+  portfolio: { id: "portfolio", label: ROUTE_TITLE_LABELS.portfolio, description: "Destination analysis pending." },
   horizon: { id: "horizon", label: "The Horizon", description: "Future projects, ideas, experiments and the road ahead." },
   soundtrack: { id: "soundtrack", label: "The Soundtrack", description: "Music archive documenting live performance." },
   cosmos: { id: "cosmos", label: "The Cosmos", description: "Creative concepts and future worlds." },
@@ -31,6 +42,7 @@ const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-p
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
 const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
 const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
+const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 let portfolioEngineScanTimer = 0;
@@ -137,7 +149,7 @@ function queuePortfolioEngineProjection(worldName) {
       portfolioEngineProjectionTimer = 0;
       showPortfolioEngineProjection(worldName);
     },
-    isPortfolioEngineReducedMotion() ? 80 : PORTFOLIO_ENGINE_SCAN_DURATION_MS
+    isPortfolioEngineReducedMotion() ? 80 : PORTFOLIO_ENGINE_PROJECTION_DELAY_MS
   );
 }
 
@@ -1492,7 +1504,8 @@ function showPortfolioHubView() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(false);
-  setCurrentView("Interactive Portfolio");
+  setCurrentView(ROUTE_TITLE_LABELS.portfolio);
+  setDocumentTitle(ROUTE_TITLE_LABELS.portfolio);
   setPortfolioActiveWorld("portfolio");
   setActiveGlobalNav("portfolio");
 }
@@ -2744,7 +2757,8 @@ function showHomepage() {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(false);
-  setCurrentView("Homepage");
+  setCurrentView(ROUTE_TITLE_LABELS.home);
+  setDocumentTitle(ROUTE_TITLE_LABELS.home);
   setActiveGlobalNav("home");
 }
 
