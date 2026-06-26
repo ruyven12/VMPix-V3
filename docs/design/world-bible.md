@@ -1,6 +1,6 @@
 # Website V3 World Bible
 
-Version: 0.5  
+Version: 0.6  
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive
 
@@ -32,6 +32,15 @@ Atmosphere precedes animation.
 Worlds are narrative places, not visual themes.
 
 This document evolves only through intentional design approval.
+
+---
+
+# Changelog
+
+## 0.6
+
+- APPROVED FOR FUTURE IMPLEMENTATION: Added the Archive Journey, Interactive Portfolio philosophy, Archive Console, Archive Core, Lifeblood System, World Selection, Archive Scan, Archive Projection, World Theme Colors, and Archive Experience Structure.
+- Expanded Meta Worlds definitions for The Story, The Trajectory, and The Comms without replacing existing world definitions.
 
 ---
 
@@ -193,6 +202,300 @@ Planned Archive Systems:
 - The Comms
 
 Archive Systems do not need to behave like full worlds. They may function more like rooms, controls, chambers, or machine interfaces within the Archive.
+
+---
+
+# Archive Journey
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The visitor does not simply navigate V3.
+
+The approved experience is:
+
+Home
+
+↓
+
+Archive Transmission
+
+↓
+
+Wormhole
+
+↓
+
+Interactive Portfolio
+
+↓
+
+World Selection
+
+↓
+
+Archive Analysis
+
+↓
+
+ENTER
+
+↓
+
+World
+
+World selection is intentionally separate from world entry.
+
+Selecting a world prepares the Archive. ENTER performs the journey.
+
+---
+
+# Interactive Portfolio Philosophy
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Interactive Portfolio is an observatory.
+
+The stars represent destinations.
+
+Stars shimmer to invite interaction.
+
+Clicking a star does not immediately travel.
+
+Clicking a star tunes the Archive to that destination.
+
+ENTER performs the journey.
+
+---
+
+# Archive Console
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Engine HUD is not navigation.
+
+It is the Archive Console.
+
+The Archive Console communicates the state of the Archive and its current destination tuning.
+
+Responsibilities:
+
+- Current View
+- Archive Core
+- Archive Seal
+- Archive Build
+- System State
+
+---
+
+# Archive Core
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Archive Core is the heart of the Archive.
+
+Its responsibilities:
+
+- breathing
+- subtle mechanical life
+- world-colored energy
+- restrained pulse
+
+The Archive Core should never resemble:
+
+- lightning
+- excessive glow
+- AI aesthetic
+
+The Core should feel alive, ancient, restrained, and mechanical enough to belong to the Archive.
+
+---
+
+# Lifeblood System
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Archive has a future energy circulation system.
+
+Energy flows:
+
+Archive Core
+
+↓
+
+Engine circulation
+
+↓
+
+Archive Seal
+
+↓
+
+Archive Build
+
+World selection determines the energy color.
+
+This is documented as a future implementation concept.
+
+---
+
+# World Selection
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Selecting a world:
+
+- highlights the destination
+- changes Engine color
+- changes Current View
+- prepares the archive
+
+Selecting a world does not immediately enter the world.
+
+The Archive is tuned first. Entry happens only when ENTER is activated.
+
+---
+
+# Archive Scan
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+After world selection, the Engine projects a scan toward the destination.
+
+Purpose:
+
+Archive acquiring destination.
+
+The scan communicates that the Archive is locating, reading, and preparing the selected destination.
+
+---
+
+# Archive Projection
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Information comes from the Engine.
+
+Information does not come from the stars.
+
+The future projection panel displays:
+
+- title
+- description
+- readiness
+- ENTER
+
+The projection is the Archive Console reporting on the tuned destination.
+
+---
+
+# Meta Worlds
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Meta Worlds are Archive Systems that help visitors understand the Archive, the creator, and the operational pathways around the work.
+
+They extend the existing Archive Systems definition. They do not replace the Living Worlds.
+
+## The Story
+
+Purpose:
+
+The About experience.
+
+Topics:
+
+- Chris
+- Voodoo Media
+- archive origins
+- photography journey
+- why V3 exists
+
+The Story explains the human and creative origin of the Archive.
+
+## The Trajectory
+
+Purpose:
+
+The future of the Archive.
+
+Contains:
+
+- roadmap
+- milestones
+- changelog
+- archive growth
+
+The Trajectory records where the Archive has been and where it is going.
+
+## The Comms
+
+Purpose:
+
+Operations Center.
+
+Contains:
+
+- Contact
+- Booking
+- Calendar
+- Availability
+- Connect/NFC
+- Socials
+- Media Requests
+
+Calendar belongs inside The Comms because availability is part of communication.
+
+The Comms is the operational interface for contact, scheduling, presence, and external connection.
+
+---
+
+# World Theme Colors
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Current approved shell accent color mapping:
+
+| World / Area | Accent Color |
+|---|---|
+| Interactive Portfolio | White |
+| The Horizon | Orange |
+| The Soundtrack | Purple |
+| The Cosmos | Blue |
+| The Battleground | Red |
+| The Wild | Green |
+| The Story | Grey |
+| The Trajectory | Grey |
+| The Comms | Grey |
+
+These are shell accent colors controlled through shared CSS variables.
+
+They are not replacements for world identity, atmosphere, or narrative.
+
+---
+
+# Archive Experience Structure
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Archive experience is structured in three acts.
+
+## Act I
+
+Discover the Archive
+
+Home → Wormhole → Portfolio
+
+## Act II
+
+Understand the Archive
+
+The Story / The Trajectory / The Comms
+
+## Act III
+
+Explore the Archive
+
+The Soundtrack / The Battleground / The Horizon / The Wild / The Cosmos
 
 ---
 
