@@ -1046,33 +1046,48 @@ button {
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
 }
-/* PASS 31: five Living World destination anchors ordered W, NW, N, NE, E. */
+/* PASS 50: five world beacons ordered W, NW, N, NE, E inside the compressed Portfolio field. */
 .ambient-system {
-  --entry-anchor-01-x: calc(-1 * min(108vw, 72rem));
-  --entry-anchor-01-y: 0px;
-  --entry-anchor-02-x: calc(-1 * min(64vw, 42rem));
-  --entry-anchor-02-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-03-x: 0px;
-  --entry-anchor-03-y: calc(-1 * min(108vh, 58rem));
-  --entry-anchor-04-x: min(64vw, 42rem);
-  --entry-anchor-04-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-05-x: min(112vw, 74rem);
-  --entry-anchor-05-y: 0px;
-  --entry-constellation-01-x: calc(-1 * min(42vw, 30rem));
-  --entry-constellation-01-y: 0px;
-  --entry-constellation-02-x: calc(-1 * min(35vw, 25rem));
-  --entry-constellation-02-y: calc(-1 * min(36vh, 22rem));
-  --entry-constellation-03-x: 0px;
-  --entry-constellation-03-y: calc(-1 * min(42vh, 26rem));
-  --entry-constellation-04-x: min(35vw, 25rem);
-  --entry-constellation-04-y: calc(-1 * min(36vh, 22rem));
-  --entry-constellation-05-x: min(42vw, 30rem);
-  --entry-constellation-05-y: 0px;
-  --entry-constellation-01-delay: 1540ms;
-  --entry-constellation-02-delay: 1590ms;
-  --entry-constellation-03-delay: 1670ms;
-  --entry-constellation-04-delay: 1705ms;
-  --entry-constellation-05-delay: 1770ms;
+  --entry-beacon-midline-y: calc(-1 * var(--portfolio-beacon-field-lift, clamp(6rem, 13svh, 8.5rem)));
+  --entry-beacon-upper-y: calc(var(--entry-beacon-midline-y) - clamp(5.1rem, 12svh, 7rem));
+  --entry-beacon-apex-y: calc(var(--entry-beacon-midline-y) - clamp(6.4rem, 15svh, 8.8rem));
+  --entry-beacon-system-y: calc(var(--entry-beacon-midline-y) + clamp(3.8rem, 8svh, 5.6rem));
+  --entry-beacon-01-x: calc(-1 * min(35vw, 23rem));
+  --entry-beacon-01-y: var(--entry-beacon-midline-y);
+  --entry-beacon-02-x: calc(-1 * min(27vw, 18rem));
+  --entry-beacon-02-y: var(--entry-beacon-upper-y);
+  --entry-beacon-03-x: 0px;
+  --entry-beacon-03-y: var(--entry-beacon-apex-y);
+  --entry-beacon-04-x: min(27vw, 18rem);
+  --entry-beacon-04-y: var(--entry-beacon-upper-y);
+  --entry-beacon-05-x: min(35vw, 23rem);
+  --entry-beacon-05-y: var(--entry-beacon-midline-y);
+  --entry-system-01-x: calc(-1 * min(17vw, 10rem));
+  --entry-system-01-y: var(--entry-beacon-system-y);
+  --entry-system-02-x: 0px;
+  --entry-system-02-y: calc(var(--entry-beacon-system-y) + clamp(0.45rem, 1.2svh, 0.85rem));
+  --entry-system-03-x: min(17vw, 10rem);
+  --entry-system-03-y: var(--entry-beacon-system-y);
+  --entry-beacon-01-delay: 1540ms;
+  --entry-beacon-02-delay: 1590ms;
+  --entry-beacon-03-delay: 1670ms;
+  --entry-beacon-04-delay: 1705ms;
+  --entry-beacon-05-delay: 1770ms;
+  --entry-constellation-01-x: var(--entry-beacon-01-x);
+  --entry-constellation-01-y: var(--entry-beacon-01-y);
+  --entry-constellation-02-x: var(--entry-beacon-02-x);
+  --entry-constellation-02-y: var(--entry-beacon-02-y);
+  --entry-constellation-03-x: var(--entry-beacon-03-x);
+  --entry-constellation-03-y: var(--entry-beacon-03-y);
+  --entry-constellation-04-x: var(--entry-beacon-04-x);
+  --entry-constellation-04-y: var(--entry-beacon-04-y);
+  --entry-constellation-05-x: var(--entry-beacon-05-x);
+  --entry-constellation-05-y: var(--entry-beacon-05-y);
+  --entry-constellation-01-delay: var(--entry-beacon-01-delay);
+  --entry-constellation-02-delay: var(--entry-beacon-02-delay);
+  --entry-constellation-03-delay: var(--entry-beacon-03-delay);
+  --entry-constellation-04-delay: var(--entry-beacon-04-delay);
+  --entry-constellation-05-delay: var(--entry-beacon-05-delay);
 }
 
 /* PASS 31 Chapter 2 five-fragment Living World path scaffold. Neutral escape paths only. */
@@ -1088,8 +1103,8 @@ button {
 }
 
 .portfolio-entry-constellation {
-  --constellation-x: var(--entry-constellation-01-x);
-  --constellation-y: var(--entry-constellation-01-y);
+  --constellation-x: var(--entry-beacon-01-x);
+  --constellation-y: var(--entry-beacon-01-y);
   --constellation-width: clamp(3.05rem, 8.2vw, 5.3rem);
   --constellation-height: clamp(2.05rem, 5.7vw, 3.7rem);
   --constellation-impact-delay: var(--entry-constellation-01-delay);
@@ -1148,8 +1163,8 @@ button {
 }
 
 .portfolio-entry-constellation--second {
-  --constellation-x: var(--entry-constellation-02-x);
-  --constellation-y: var(--entry-constellation-02-y);
+  --constellation-x: var(--entry-beacon-02-x);
+  --constellation-y: var(--entry-beacon-02-y);
   --constellation-width: clamp(2.55rem, 6.7vw, 4.4rem);
   --constellation-height: clamp(1.8rem, 4.8vw, 3.1rem);
   --constellation-impact-delay: var(--entry-constellation-02-delay);
@@ -1177,24 +1192,24 @@ button {
 }
 
 .portfolio-entry-constellation--third {
-  --constellation-x: var(--entry-constellation-03-x);
-  --constellation-y: var(--entry-constellation-03-y);
+  --constellation-x: var(--entry-beacon-03-x);
+  --constellation-y: var(--entry-beacon-03-y);
   --constellation-width: clamp(2.7rem, 7.4vw, 4.8rem);
   --constellation-height: clamp(1.9rem, 5vw, 3.35rem);
   --constellation-impact-delay: var(--entry-constellation-03-delay);
 }
 
 .portfolio-entry-constellation--fourth {
-  --constellation-x: var(--entry-constellation-04-x);
-  --constellation-y: var(--entry-constellation-04-y);
+  --constellation-x: var(--entry-beacon-04-x);
+  --constellation-y: var(--entry-beacon-04-y);
   --constellation-width: clamp(2.55rem, 6.7vw, 4.4rem);
   --constellation-height: clamp(1.8rem, 4.8vw, 3.1rem);
   --constellation-impact-delay: var(--entry-constellation-04-delay);
 }
 
 .portfolio-entry-constellation--fifth {
-  --constellation-x: var(--entry-constellation-05-x);
-  --constellation-y: var(--entry-constellation-05-y);
+  --constellation-x: var(--entry-beacon-05-x);
+  --constellation-y: var(--entry-beacon-05-y);
   --constellation-impact-delay: var(--entry-constellation-05-delay);
 }
 
@@ -1259,6 +1274,199 @@ button {
   animation: portfolioConstellationImpactCore 420ms cubic-bezier(0.16, 0.82, 0.24, 1) var(--constellation-impact-delay) both;
 }
 
+/* PASS 50: Stellar Communication Beacon system. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-constellation,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-constellation::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-constellation::after {
+  visibility: hidden;
+  opacity: 0;
+  animation: none !important;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.portfolio-beacon-field {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint style;
+}
+
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field {
+  display: block;
+}
+
+.site-shell.is-home-route .portfolio-beacon-field,
+.site-shell.is-module-view .portfolio-beacon-field {
+  display: none;
+}
+
+.portfolio-beacon {
+  --beacon-x: 0px;
+  --beacon-y: var(--entry-beacon-midline-y);
+  --beacon-size: clamp(1rem, 3.4vw, 1.62rem);
+  --beacon-color: 247 247 242;
+  --beacon-delay: 1540ms;
+  position: fixed;
+  top: calc(var(--home-portfolio-transition-center-y) + var(--beacon-y));
+  left: calc(var(--home-portfolio-transition-center-x) + var(--beacon-x));
+  width: var(--beacon-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.98) 0 1.15px, rgba(247, 247, 242, 0.72) 1.34px 2.05px, transparent 2.55px),
+    linear-gradient(90deg, transparent 0 35%, rgb(var(--beacon-color) / 0.24) 45%, rgba(247, 247, 242, 0.72) 50%, rgb(var(--beacon-color) / 0.24) 55%, transparent 65% 100%),
+    linear-gradient(0deg, transparent 0 35%, rgb(var(--beacon-color) / 0.2) 45%, rgba(247, 247, 242, 0.62) 50%, rgb(var(--beacon-color) / 0.2) 55%, transparent 65% 100%),
+    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.26) 0 12%, transparent 46%);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1) rotate(0deg);
+  transform-origin: center;
+  backface-visibility: hidden;
+  contain: paint;
+  will-change: opacity, transform;
+}
+
+.portfolio-beacon::before,
+.portfolio-beacon::after {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  content: "";
+  pointer-events: none;
+  transform: translate3d(-50%, -50%, 0);
+  transform-origin: center;
+}
+
+.portfolio-beacon::before {
+  width: 0.42rem;
+  aspect-ratio: 1;
+  background:
+    radial-gradient(circle, rgba(247, 247, 242, 1) 0 18%, rgba(247, 247, 242, 0.86) 26% 38%, rgb(var(--beacon-color) / 0.46) 48%, transparent 72%);
+  box-shadow:
+    0 0 0.24rem rgba(247, 247, 242, 0.24),
+    0 0 0.44rem rgb(var(--beacon-color) / 0.2);
+}
+
+.portfolio-beacon::after {
+  width: calc(var(--beacon-size) * 1.72);
+  aspect-ratio: 1;
+  opacity: 0.34;
+  background:
+    radial-gradient(circle, rgb(var(--beacon-color) / 0.34) 0 8%, rgb(var(--beacon-color) / 0.14) 20%, transparent 56%),
+    linear-gradient(90deg, transparent 0 40%, rgb(var(--beacon-color) / 0.14) 49%, transparent 60% 100%),
+    linear-gradient(0deg, transparent 0 41%, rgba(247, 247, 242, 0.14) 50%, transparent 59% 100%);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.78, 0.78, 1) rotate(0deg);
+}
+
+.portfolio-beacon--soundtrack {
+  --beacon-x: var(--entry-beacon-01-x);
+  --beacon-y: var(--entry-beacon-01-y);
+  --beacon-color: 142 108 255;
+  --beacon-delay: var(--entry-beacon-01-delay);
+}
+
+.portfolio-beacon--battleground {
+  --beacon-x: var(--entry-beacon-02-x);
+  --beacon-y: var(--entry-beacon-02-y);
+  --beacon-color: 255 57 46;
+  --beacon-delay: var(--entry-beacon-02-delay);
+}
+
+.portfolio-beacon--wild {
+  --beacon-x: var(--entry-beacon-03-x);
+  --beacon-y: var(--entry-beacon-03-y);
+  --beacon-color: 65 220 132;
+  --beacon-delay: var(--entry-beacon-03-delay);
+}
+
+.portfolio-beacon--cosmos {
+  --beacon-x: var(--entry-beacon-04-x);
+  --beacon-y: var(--entry-beacon-04-y);
+  --beacon-color: 64 172 255;
+  --beacon-delay: var(--entry-beacon-04-delay);
+}
+
+.portfolio-beacon--horizon {
+  --beacon-x: var(--entry-beacon-05-x);
+  --beacon-y: var(--entry-beacon-05-y);
+  --beacon-color: 255 218 93;
+  --beacon-delay: var(--entry-beacon-05-delay);
+}
+
+.portfolio-beacon--system {
+  --beacon-size: clamp(0.68rem, 2.05vw, 0.98rem);
+  --beacon-color: 247 247 242;
+}
+
+.portfolio-beacon--story {
+  --beacon-x: var(--entry-system-01-x);
+  --beacon-y: var(--entry-system-01-y);
+}
+
+.portfolio-beacon--comms {
+  --beacon-x: var(--entry-system-02-x);
+  --beacon-y: var(--entry-system-02-y);
+}
+
+.portfolio-beacon--trajectory {
+  --beacon-x: var(--entry-system-03-x);
+  --beacon-y: var(--entry-system-03-y);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-beacon--world {
+  animation:
+    portfolioWorldBeaconAnswer 920ms cubic-bezier(0.16, 0.84, 0.18, 1) var(--beacon-delay) both,
+    portfolioWorldBeaconBreath 5.8s var(--ease-breath) calc(var(--beacon-delay) + 920ms) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-beacon--world::after {
+  animation:
+    portfolioBeaconCoronaAnswer 920ms cubic-bezier(0.16, 0.84, 0.18, 1) var(--beacon-delay) both,
+    portfolioBeaconCoronaBreath 5.8s var(--ease-breath) calc(var(--beacon-delay) + 920ms) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-beacon--system {
+  animation: portfolioSystemBeaconOnline 760ms var(--ease-breath) 1480ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world {
+  opacity: 0.94;
+  transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  animation: portfolioWorldBeaconBreath 5.8s var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world::after {
+  animation: portfolioBeaconCoronaBreath 5.8s var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system {
+  opacity: 0.68;
+  transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-beacon,
+  .portfolio-beacon::before,
+  .portfolio-beacon::after {
+    animation: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon--world {
+    opacity: 0.94;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon--system {
+    opacity: 0.68;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+}
+
 .portfolio-entry-fragment {
   --fragment-angle: 0deg;
   --fragment-delay: 500ms;
@@ -1273,12 +1481,12 @@ button {
   --fragment-mid-y: 0px;
   --fragment-end-x: min(82vw, 54rem);
   --fragment-end-y: 0px;
-  --fragment-target-x: var(--entry-constellation-01-x);
-  --fragment-target-y: var(--entry-constellation-01-y);
+  --fragment-target-x: var(--entry-beacon-01-x);
+  --fragment-target-y: var(--entry-beacon-01-y);
   --fragment-commit-scale: 0.38;
   --fragment-mid-scale: 0.68;
   --fragment-end-scale: 1;
-  --fragment-target-scale: 0.18;
+  --fragment-target-scale: 0.12;
   --fragment-branch-a-x: 28%;
   --fragment-branch-a-y: -0.2rem;
   --fragment-branch-a-angle: -24deg;
@@ -1313,11 +1521,11 @@ button {
       rgba(213, 22, 34, 0.74) 86%,
       transparent 96% 100%);
   box-shadow:
-    0 0 0.22rem rgba(247, 247, 242, 0.26),
-    0 0 0.52rem rgba(255, 57, 18, 0.34);
+    0 0 0.28rem rgba(247, 247, 242, 0.34),
+    0 0 0.76rem rgba(255, 57, 18, 0.48);
   filter:
-    drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.68))
-    drop-shadow(0 0 0.36rem rgba(213, 22, 34, 0.28));
+    drop-shadow(0 0 0.22rem rgba(255, 57, 18, 0.82))
+    drop-shadow(0 0 0.58rem rgba(213, 22, 34, 0.42));
   transform-origin: 0 50%;
   backface-visibility: hidden;
   contain: paint;
@@ -1332,13 +1540,13 @@ button {
   left: var(--fragment-branch-a-x);
   top: 50%;
   width: var(--fragment-branch-a-width);
-  height: 1px;
+  height: clamp(1px, 0.18vw, 1.65px);
   content: "";
   border-radius: 999px;
   opacity: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(247, 247, 242, 0.62), rgba(255, 57, 18, 0.74) 48%, transparent 100%);
-  box-shadow: 0 0 0.28rem rgba(255, 57, 18, 0.32);
+  background: linear-gradient(90deg, rgba(247, 247, 242, 0.82), rgba(255, 151, 38, 0.64) 30%, rgba(255, 57, 18, 0.9) 56%, transparent 100%);
+  box-shadow: 0 0 0.38rem rgba(255, 57, 18, 0.44);
   transform: translate3d(0, var(--fragment-branch-a-y), 0) rotate(var(--fragment-branch-a-angle)) scaleX(0.72);
   transform-origin: 0 50%;
 }
@@ -1348,7 +1556,7 @@ button {
   --fragment-branch-angle: var(--fragment-branch-b-angle);
   left: var(--fragment-branch-b-x);
   width: var(--fragment-branch-b-width);
-  background: linear-gradient(90deg, rgba(255, 151, 38, 0.54), rgba(213, 22, 34, 0.68) 52%, transparent 100%);
+  background: linear-gradient(90deg, rgba(247, 247, 242, 0.5), rgba(255, 151, 38, 0.72) 34%, rgba(213, 22, 34, 0.86) 58%, transparent 100%);
   transform: translate3d(0, var(--fragment-branch-b-y), 0) rotate(var(--fragment-branch-b-angle)) scaleX(0.58);
 }
 
@@ -1366,8 +1574,8 @@ button {
   --fragment-mid-y: 0px;
   --fragment-end-x: calc(-1 * min(38vw, 27rem));
   --fragment-end-y: 0px;
-  --fragment-target-x: var(--entry-constellation-01-x);
-  --fragment-target-y: var(--entry-constellation-01-y);
+  --fragment-target-x: var(--entry-beacon-01-x);
+  --fragment-target-y: var(--entry-beacon-01-y);
   --fragment-commit-scale: 0.32;
   --fragment-mid-scale: 0.68;
   --fragment-end-scale: 0.8;
@@ -1391,8 +1599,8 @@ button {
   --fragment-mid-y: calc(-1 * min(35vh, 18rem));
   --fragment-end-x: calc(-1 * min(32vw, 22.8rem));
   --fragment-end-y: calc(-1 * min(33vh, 20.2rem));
-  --fragment-target-x: var(--entry-constellation-02-x);
-  --fragment-target-y: var(--entry-constellation-02-y);
+  --fragment-target-x: var(--entry-beacon-02-x);
+  --fragment-target-y: var(--entry-beacon-02-y);
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.68;
   --fragment-end-scale: 0.78;
@@ -1418,8 +1626,8 @@ button {
   --fragment-mid-y: calc(-1 * min(36vh, 19rem));
   --fragment-end-x: 0px;
   --fragment-end-y: calc(-1 * min(39vh, 24rem));
-  --fragment-target-x: var(--entry-constellation-03-x);
-  --fragment-target-y: var(--entry-constellation-03-y);
+  --fragment-target-x: var(--entry-beacon-03-x);
+  --fragment-target-y: var(--entry-beacon-03-y);
   --fragment-commit-scale: 0.28;
   --fragment-mid-scale: 0.58;
   --fragment-end-scale: 0.74;
@@ -1445,8 +1653,8 @@ button {
   --fragment-mid-y: calc(-1 * min(36vh, 19rem));
   --fragment-end-x: min(32vw, 22.8rem);
   --fragment-end-y: calc(-1 * min(33vh, 20.2rem));
-  --fragment-target-x: var(--entry-constellation-04-x);
-  --fragment-target-y: var(--entry-constellation-04-y);
+  --fragment-target-x: var(--entry-beacon-04-x);
+  --fragment-target-y: var(--entry-beacon-04-y);
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.7;
   --fragment-end-scale: 0.78;
@@ -1472,8 +1680,8 @@ button {
   --fragment-mid-y: 0px;
   --fragment-end-x: min(38vw, 27rem);
   --fragment-end-y: 0px;
-  --fragment-target-x: var(--entry-constellation-05-x);
-  --fragment-target-y: var(--entry-constellation-05-y);
+  --fragment-target-x: var(--entry-beacon-05-x);
+  --fragment-target-y: var(--entry-beacon-05-y);
   --fragment-commit-scale: 0.36;
   --fragment-mid-scale: 0.8;
   --fragment-end-scale: 0.8;
@@ -2377,6 +2585,83 @@ button {
     stroke-dashoffset: -15;
   }
 }
+@keyframes portfolioWorldBeaconAnswer {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.48, 0.48, 1) rotate(-2deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.44, 1.44, 1) rotate(2deg);
+  }
+  34% {
+    opacity: 0.72;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.86, 0.86, 1) rotate(-0.8deg);
+  }
+  58% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.12, 1.12, 1) rotate(0.5deg);
+  }
+  100% {
+    opacity: 0.94;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+}
+
+@keyframes portfolioBeaconCoronaAnswer {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.42, 0.42, 1) rotate(0deg);
+  }
+  18% {
+    opacity: 0.92;
+    transform: translate3d(-50%, -50%, 0) scale3d(2.35, 2.35, 1) rotate(6deg);
+  }
+  46% {
+    opacity: 0.42;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.22, 1.22, 1) rotate(-2deg);
+  }
+  100% {
+    opacity: 0.34;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.9, 0.9, 1) rotate(0deg);
+  }
+}
+
+@keyframes portfolioWorldBeaconBreath {
+  0%,
+  100% {
+    opacity: 0.86;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1) rotate(0deg);
+  }
+  46% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.06, 1.06, 1) rotate(0.35deg);
+  }
+}
+
+@keyframes portfolioBeaconCoronaBreath {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.86, 0.86, 1) rotate(0deg);
+  }
+  46% {
+    opacity: 0.42;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(0.8deg);
+  }
+}
+
+@keyframes portfolioSystemBeaconOnline {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1);
+  }
+  100% {
+    opacity: 0.68;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+}
+
 @keyframes homeArchiveEntryFragmentEscape {
   0%,
   5% {
