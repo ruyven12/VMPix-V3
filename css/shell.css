@@ -120,6 +120,9 @@ button {
   display: none;
 }
 .site-shell[data-shell-route="portfolio"] {
+  --portfolio-engine-reserve: clamp(6.25rem, 26svh, 17rem);
+  --portfolio-beacon-field-height: calc(100% - var(--portfolio-engine-reserve));
+  --portfolio-beacon-field-lift: calc(var(--portfolio-engine-reserve) * 0.5);
   grid-template-rows: minmax(0, 1fr);
 }
 
@@ -1867,6 +1870,10 @@ button {
 }
 
 .nebula-stage--4 {
+  background-position:
+    center,
+    center,
+    center calc(50% - var(--portfolio-beacon-field-lift, 0px));
   background-image:
     linear-gradient(180deg, rgba(1, 1, 3, 0.48), rgba(1, 1, 3, 0.16) 42%, rgba(1, 1, 3, 0.74)),
     radial-gradient(ellipse at 50% 48%, transparent 0 42%, rgba(0, 0, 0, 0.42) 76%, rgba(0, 0, 0, 0.78) 100%),
@@ -5294,7 +5301,8 @@ button {
 
 .site-shell[data-shell-route="portfolio"] .portfolio-hub {
   width: 100%;
-  height: 100%;
+  height: var(--portfolio-beacon-field-height);
+  align-self: start;
   min-height: 0;
   padding: 0;
   border: 0;
