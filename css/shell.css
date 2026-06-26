@@ -164,7 +164,7 @@ button {
   height: var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: clamp(2.25rem, 10vw, 3.2rem) minmax(0, 1.15fr) clamp(2.9rem, 12vw, 4rem) minmax(5rem, 0.82fr);
+  grid-template-columns: clamp(2.25rem, 10vw, 3.2rem) minmax(0, 1.25fr) minmax(clamp(2.6rem, 9vw, 6rem), 0.75fr) clamp(2.9rem, 12vw, 4rem) minmax(4.8rem, 0.5fr);
   align-items: center;
   gap: clamp(0.28rem, 1.25vw, 0.72rem);
   padding: clamp(0.34rem, 1.05svh, 0.54rem) clamp(0.42rem, 1.65vw, 0.9rem);
@@ -245,6 +245,7 @@ button {
 }
 
 .portfolio-engine-left-core {
+  grid-column: 1;
   position: relative;
   width: clamp(2.12rem, 9.6vw, 3rem);
   aspect-ratio: 1;
@@ -337,11 +338,13 @@ button {
 }
 
 .portfolio-engine-panel--left {
+  grid-column: 2;
   text-align: left;
   border-radius: 0.18rem 0.08rem 0.08rem 0.18rem;
 }
 
 .portfolio-engine-panel--right {
+  grid-column: 5;
   text-align: right;
   border-radius: 0.08rem 0.18rem 0.18rem 0.08rem;
 }
@@ -375,11 +378,12 @@ button {
 }
 
 .portfolio-engine-reactor {
+  grid-column: 4;
   position: relative;
   min-width: 0;
   align-self: center;
-  justify-self: center;
-  margin-inline-end: calc(-1 * clamp(0.14rem, 0.95vw, 0.42rem));
+  justify-self: end;
+  margin-inline-end: calc(-1 * clamp(0.1rem, 0.7vw, 0.32rem));
   width: clamp(2.7rem, 11.5vw, 3.8rem);
   aspect-ratio: 1;
   display: grid;
@@ -487,15 +491,15 @@ button {
 
 @media (min-width: 64rem) {
   .portfolio-engine {
-    grid-template-columns: clamp(2.6rem, 4vw, 3.4rem) minmax(18rem, 1.15fr) clamp(3.1rem, 5vw, 4.2rem) minmax(11rem, 0.82fr);
+    grid-template-columns: clamp(2.6rem, 4vw, 3.4rem) minmax(18rem, 1.55fr) minmax(7rem, 0.9fr) clamp(3.1rem, 5vw, 4.2rem) minmax(8.4rem, 0.45fr);
     padding-inline: clamp(0.66rem, 1.1vw, 1rem);
   }
 }
 
 @media (max-width: 28rem) {
   .portfolio-engine {
-    grid-template-columns: clamp(2.05rem, 9vw, 2.55rem) minmax(0, 1.1fr) clamp(2.5rem, 11vw, 3.15rem) minmax(4.7rem, 0.82fr);
-    gap: clamp(0.22rem, 1vw, 0.42rem);
+    grid-template-columns: clamp(2.05rem, 9vw, 2.55rem) minmax(0, 1fr) minmax(0.6rem, 0.28fr) clamp(2.45rem, 10.5vw, 3.05rem) minmax(4.55rem, 0.7fr);
+    gap: clamp(0.18rem, 0.85vw, 0.36rem);
     padding-inline: clamp(0.34rem, 1.4vw, 0.52rem);
   }
 
