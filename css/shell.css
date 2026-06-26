@@ -220,7 +220,7 @@ button {
 }
 
 .home-archive-message--decode {
-  color: rgba(247, 247, 242, 0.9);
+  color: rgb(247, 247, 242);
   text-shadow:
     0 0 0.42rem rgba(247, 247, 242, 0.22),
     0 0 1rem rgba(247, 247, 242, 0.1);
@@ -243,7 +243,7 @@ button {
   justify-items: center;
   overflow: visible;
   opacity: 1;
-  color: rgba(220, 188, 108, 0.94);
+  color: rgb(238, 217, 153);
   font-size: clamp(0.95rem, calc(3.2vw + 0.1875rem), 1.23rem);
   text-shadow: none;
   transform: translate3d(0, var(--home-identity-center-correction), 0);
@@ -315,7 +315,7 @@ button {
   max-width: none;
   translate: -50% -50%;
   opacity: 0;
-  color: rgba(220, 188, 108, 0.94);
+  color: rgb(238, 217, 153);
   text-shadow:
     0 0 0.4rem rgba(220, 188, 108, 0.22),
     0 0 1.05rem rgba(220, 188, 108, 0.12);
@@ -328,7 +328,7 @@ button {
 }
 
 .home-identity-text--mark {
-  color: rgba(238, 217, 153, 0.96);
+  color: rgb(247, 247, 242);
   font-size: clamp(1.19rem, calc(4.8vw + 0.1875rem), 1.67rem);
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.24),
@@ -340,7 +340,7 @@ button {
 }
 
 .home-identity-text--engage {
-  color: rgba(238, 217, 153, 0.94);
+  color: rgb(247, 247, 242);
   font-family: var(--font-display);
   font-size: clamp(1.2rem, calc(4.45vw + 0.16rem), 1.62rem);
   line-height: 1;
@@ -431,7 +431,7 @@ button {
 
 .home-identity-text--core,
 .home-identity-text--ready {
-  color: rgba(247, 247, 242, 0.76);
+  color: rgb(247, 247, 242);
   font-family: var(--font-display);
   font-size: 0.66rem;
   line-height: 1;
@@ -448,7 +448,7 @@ button {
 }
 
 .home-identity-text--ready {
-  color: rgba(238, 217, 153, 0.84);
+  color: rgb(238, 217, 153);
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
@@ -463,7 +463,7 @@ button {
   pointer-events: none;
   opacity: 0;
   contain: paint style;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   transform: translate3d(0, 0, 0) scale(0.985);
   transform-origin: 50% 50%;
   background:
@@ -1019,26 +1019,26 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-message--identity {
-  color: rgba(220, 188, 108, 0.94);
+  color: rgb(238, 217, 153);
   clip-path: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage {
-  color: rgba(238, 217, 153, 0.94);
+  color: rgb(247, 247, 242);
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--core {
-  color: rgba(247, 247, 242, 0.76);
+  color: rgb(247, 247, 242);
   text-shadow:
     0 0 0.42rem rgba(238, 217, 153, 0.22),
     0 0 1rem rgba(220, 188, 108, 0.12);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--ready {
-  color: rgba(238, 217, 153, 0.84);
+  color: rgb(238, 217, 153);
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
@@ -1081,7 +1081,7 @@ button {
   overflow: hidden;
   pointer-events: none;
   contain: paint style;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 
 .portfolio-entry-constellation {
@@ -1104,7 +1104,7 @@ button {
   opacity: 0;
   pointer-events: none;
   contain: paint;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   background:
     radial-gradient(circle at 62% 38%, rgba(247, 247, 242, 0.82) 0 1.2px, rgba(238, 217, 153, 0.2) 1.45px 3.4px, transparent 4.6px),
     radial-gradient(circle at 29% 68%, rgba(238, 217, 153, 0.58) 0 0.95px, rgba(220, 188, 108, 0.14) 1.2px 2.7px, transparent 3.8px),
@@ -1196,13 +1196,13 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation {
-  --constellation-trace-opacity: 0.58;
-  --constellation-core-opacity: 0.72;
+  --constellation-trace-opacity: 0.92;
+  --constellation-core-opacity: 1;
   animation: none;
   filter:
     drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.28))
     drop-shadow(0 0 0.55rem rgba(238, 217, 153, 0.22));
-  opacity: 0.72;
+  opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
 }
 
@@ -1224,7 +1224,7 @@ button {
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first,
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
-  opacity: 0.82;
+  opacity: 1;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-constellation {
@@ -1838,6 +1838,8 @@ button {
 .site-shell.is-home-route .ambient-void-stars,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars {
   display: block;
+  z-index: 6;
+  isolation: isolate;
   opacity: 1;
   background: transparent;
   filter: none;
@@ -1847,6 +1849,7 @@ button {
 
 .nebula-stage {
   position: absolute;
+  z-index: 1;
   inset: -4%;
   opacity: 0;
   pointer-events: none;
@@ -1874,12 +1877,12 @@ button {
 }
 
 .site-shell.is-home-route .nebula-stage--1 {
-  opacity: 0.64;
+  opacity: 0.8;
   animation: nebulaIdleDrift 190s linear infinite alternate;
 }
 
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-entry-sequence) .nebula-stage--4 {
-  opacity: 0.64;
+  opacity: 0.8;
   animation: nebulaCoreDrift 220s linear infinite alternate;
 }
 
@@ -1890,23 +1893,23 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .nebula-stage--1 {
-  animation: nebulaWormholeStageOne 2680ms cubic-bezier(0.2, 0.78, 0.16, 1) both;
+  animation: nebulaWormholeStageOne 1540ms cubic-bezier(0.18, 0.78, 0.12, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .nebula-stage--4 {
-  animation: nebulaWormholeStageFour 2680ms cubic-bezier(0.2, 0.78, 0.16, 1) both;
+  animation: nebulaWormholeStageFour 1540ms cubic-bezier(0.18, 0.78, 0.12, 1) both;
 }
 
 .site-shell.is-home-route .ambient-void-stars::before,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars::before {
   inset: -5%;
-  opacity: 0.08;
+  opacity: 0.1;
   background:
     radial-gradient(circle at 12% 22%, rgba(247, 247, 242, 0.22) 0 0.42px, transparent 0.96px),
     radial-gradient(circle at 39% 34%, rgba(247, 247, 242, 0.2) 0 0.44px, transparent 0.98px),
     radial-gradient(circle at 57% 16%, rgba(247, 247, 242, 0.22) 0 0.46px, transparent 1px),
     radial-gradient(circle at 88% 78%, rgba(247, 247, 242, 0.2) 0 0.44px, transparent 0.98px);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   animation:
     voidStarLayerDrift 190s linear infinite alternate,
     nebulaSparkleTwinkle 72s var(--ease-breath) -11s infinite;
@@ -1915,37 +1918,48 @@ button {
 .site-shell.is-home-route .ambient-void-stars::after,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {
   inset: -6%;
-  opacity: 0.04;
+  opacity: 0.06;
   background:
     radial-gradient(circle at 18% 84%, rgba(247, 247, 242, 0.18) 0 0.38px, transparent 0.9px),
     radial-gradient(circle at 49% 74%, rgba(247, 247, 242, 0.18) 0 0.4px, transparent 0.92px),
     radial-gradient(circle at 92% 42%, rgba(238, 217, 153, 0.16) 0 0.36px, transparent 0.86px);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   animation:
     voidStarLayerDrift 250s linear -53s infinite alternate-reverse,
     nebulaSparkleTwinkle 84s var(--ease-breath) -23s infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before {
-  inset: -18%;
+  z-index: 3;
+  inset: -22%;
   opacity: 0;
   background:
-    linear-gradient(86deg, transparent 0 43%, rgba(247, 247, 242, 0.12) 48%, transparent 54% 100%),
-    linear-gradient(94deg, transparent 0 45%, rgba(238, 217, 153, 0.1) 49%, transparent 55% 100%),
-    linear-gradient(34deg, transparent 0 46%, rgba(247, 247, 242, 0.08) 50%, transparent 56% 100%),
-    linear-gradient(146deg, transparent 0 45%, rgba(238, 217, 153, 0.08) 50%, transparent 57% 100%);
-  transform: translate3d(0, 0, 0) scale(0.72) rotate(0deg);
-  animation: nebulaWormholeStreaks 2680ms cubic-bezier(0.2, 0.78, 0.16, 1) both;
+    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.16) 0 0.7%, rgba(255, 74, 24, 0.14) 1.6%, transparent 4.5%),
+    radial-gradient(circle at 50% 50%, transparent 0 12%, rgba(247, 247, 242, 0.09) 15%, transparent 18% 26%, rgba(255, 74, 24, 0.12) 30%, transparent 35% 100%),
+    linear-gradient(90deg, transparent 0 45%, rgba(247, 247, 242, 0.18) 49%, transparent 53% 100%),
+    linear-gradient(0deg, transparent 0 45%, rgba(238, 217, 153, 0.14) 49%, transparent 53% 100%),
+    linear-gradient(32deg, transparent 0 46%, rgba(247, 247, 242, 0.13) 49.5%, transparent 53% 100%),
+    linear-gradient(148deg, transparent 0 46%, rgba(255, 74, 24, 0.12) 49.5%, transparent 53% 100%),
+    linear-gradient(62deg, transparent 0 47%, rgba(247, 247, 242, 0.09) 50%, transparent 54% 100%),
+    linear-gradient(118deg, transparent 0 47%, rgba(238, 217, 153, 0.08) 50%, transparent 54% 100%);
+  mix-blend-mode: normal;
+  transform-origin: 50% 50%;
+  transform: translate3d(0, 0, 0) scale(0.44) rotate(0deg);
+  animation: nebulaWormholeStreaks 1540ms cubic-bezier(0.18, 0.78, 0.12, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
-  inset: -12%;
+  z-index: 2;
+  inset: -18%;
   opacity: 0;
   background:
-    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.14) 0 2%, rgba(238, 217, 153, 0.08) 8%, transparent 18%),
-    radial-gradient(ellipse at 50% 50%, transparent 0 30%, rgba(1, 1, 3, 0.24) 58%, transparent 76%);
-  transform: translate3d(0, 0, 0) scale(0.82) rotate(0deg);
-  animation: nebulaWormholeCore 2680ms cubic-bezier(0.2, 0.78, 0.16, 1) both;
+    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 0.2) 0 1%, rgba(255, 74, 24, 0.13) 2.4%, transparent 6.5%),
+    radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(247, 247, 242, 0.1) 22%, transparent 27% 36%, rgba(255, 74, 24, 0.12) 42%, transparent 49% 100%),
+    radial-gradient(ellipse at 50% 50%, transparent 0 30%, rgba(1, 1, 3, 0.42) 62%, rgba(1, 1, 3, 0.76) 100%);
+  mix-blend-mode: normal;
+  transform-origin: 50% 50%;
+  transform: translate3d(0, 0, 0) scale(0.52) rotate(0deg);
+  animation: nebulaWormholeCore 1540ms cubic-bezier(0.18, 0.78, 0.12, 1) both;
 }
 .ambient-energy {
   z-index: 1;
@@ -3855,84 +3869,103 @@ button {
 
 @keyframes nebulaWormholeStageOne {
   0%,
-  12% {
-    opacity: 0.64;
+  18% {
+    opacity: 0.8;
     transform: translate3d(0, 0, 0) scale(1.018) rotate(0deg);
   }
-  34% {
-    opacity: 0.46;
-    transform: translate3d(-0.08rem, -0.06rem, 0) scale(1.07) rotate(-0.18deg);
+  32% {
+    opacity: 0.68;
+    transform: translate3d(-0.08rem, -0.06rem, 0) scale(1.09) rotate(-0.16deg);
   }
-  62% {
-    opacity: 0.16;
-    transform: translate3d(-0.18rem, -0.12rem, 0) scale(1.16) rotate(-0.42deg);
+  46% {
+    opacity: 0.18;
+    transform: translate3d(-0.18rem, -0.12rem, 0) scale(1.2) rotate(-0.42deg);
   }
-  84%,
+  58%,
   100% {
     opacity: 0;
-    transform: translate3d(-0.24rem, -0.16rem, 0) scale(1.22) rotate(-0.58deg);
+    transform: translate3d(-0.24rem, -0.16rem, 0) scale(1.28) rotate(-0.58deg);
   }
 }
 
 @keyframes nebulaWormholeStageFour {
-  0% {
+  0%,
+  24% {
     opacity: 0;
-    transform: translate3d(0.1rem, 0.06rem, 0) scale(1.2) rotate(0.5deg);
-  }
-  12% {
-    opacity: 0.12;
+    transform: translate3d(0.12rem, 0.08rem, 0) scale(1.28) rotate(0.54deg);
   }
   36% {
-    opacity: 0.38;
-    transform: translate3d(0.06rem, 0.04rem, 0) scale(1.14) rotate(0.34deg);
+    opacity: 0.28;
+    transform: translate3d(0.08rem, 0.05rem, 0) scale(1.2) rotate(0.38deg);
   }
-  66% {
-    opacity: 0.6;
-    transform: translate3d(0.02rem, 0.02rem, 0) scale(1.07) rotate(0.14deg);
+  50% {
+    opacity: 0.76;
+    transform: translate3d(0.03rem, 0.02rem, 0) scale(1.1) rotate(0.16deg);
   }
+  62%,
   100% {
-    opacity: 0.64;
+    opacity: 0.8;
     transform: translate3d(0, 0, 0) scale(1.02) rotate(0deg);
   }
 }
 
 @keyframes nebulaWormholeStreaks {
   0%,
-  14% {
+  10% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.72) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(0.44) rotate(0deg);
   }
-  42% {
-    opacity: 0.26;
-    transform: translate3d(0, 0, 0) scale(1.28) rotate(0.8deg);
+  22% {
+    opacity: 0.34;
+    transform: translate3d(0, 0, 0) scale(0.82) rotate(0.18deg);
   }
-  68% {
-    opacity: 0.18;
-    transform: translate3d(0, 0, 0) scale(1.72) rotate(1.35deg);
+  34% {
+    opacity: 0.72;
+    transform: translate3d(0, 0, 0) scale(1.18) rotate(0.62deg);
+  }
+  48% {
+    opacity: 0.86;
+    transform: translate3d(0, 0, 0) scale(1.64) rotate(1.08deg);
+  }
+  62% {
+    opacity: 0.56;
+    transform: translate3d(0, 0, 0) scale(2.08) rotate(1.42deg);
+  }
+  82% {
+    opacity: 0.16;
+    transform: translate3d(0, 0, 0) scale(2.48) rotate(1.66deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(2.08) rotate(1.6deg);
+    transform: translate3d(0, 0, 0) scale(2.72) rotate(1.74deg);
   }
 }
 
 @keyframes nebulaWormholeCore {
   0%,
-  18% {
+  12% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.82) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(0.52) rotate(0deg);
   }
-  48% {
-    opacity: 0.24;
-    transform: translate3d(0, 0, 0) scale(1.24) rotate(-0.45deg);
+  26% {
+    opacity: 0.36;
+    transform: translate3d(0, 0, 0) scale(0.78) rotate(-0.18deg);
   }
-  78% {
-    opacity: 0.14;
-    transform: translate3d(0, 0, 0) scale(1.66) rotate(-0.78deg);
+  42% {
+    opacity: 0.74;
+    transform: translate3d(0, 0, 0) scale(1.14) rotate(-0.5deg);
+  }
+  58% {
+    opacity: 0.68;
+    transform: translate3d(0, 0, 0) scale(1.54) rotate(-0.76deg);
+  }
+  74% {
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(1.9) rotate(-0.94deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(1.92) rotate(-0.9deg);
+    transform: translate3d(0, 0, 0) scale(2.18) rotate(-1.04deg);
   }
 }
 
@@ -4954,7 +4987,7 @@ button {
   }
 
   .site-shell.is-home-route .nebula-stage--1 {
-    opacity: 0.64;
+    opacity: 0.8;
   }
   .home-archive-awakening,
   .home-archive-awakening::before,
@@ -5008,13 +5041,13 @@ button {
     animation: none !important;
     opacity: 0;
     filter: none;
-    transform: translate3d(-50%, -50%, 0) scaleX(0.04);
+    transform: none;
   }
 
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first,
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
     animation: none !important;
-    opacity: 0.82;
+    opacity: 1;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 
@@ -5022,7 +5055,7 @@ button {
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--third,
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fourth {
     animation: none !important;
-    opacity: 0.72;
+    opacity: 1;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 
@@ -5143,7 +5176,7 @@ button {
   }
 
   .home-core-lightning__segment {
-    opacity: 0.72;
+    opacity: 1;
     stroke: rgba(255, 74, 24, 0.86);
     stroke-dasharray: none;
     stroke-dashoffset: 0;
@@ -5761,6 +5794,6 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"] .nebula-stage--4 {
-    opacity: 0.64;
+    opacity: 0.8;
   }
 }
