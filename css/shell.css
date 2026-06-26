@@ -428,11 +428,6 @@ button {
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
-.site-shell[data-shell-route="portfolio"][data-active-world="portfolio"] .portfolio-engine-panel--left .portfolio-engine-value {
-  font-size: clamp(0.48rem, 1.52vw, 0.68rem);
-  line-height: 1.08;
-}
-
 .portfolio-engine-status {
   display: none;
 }

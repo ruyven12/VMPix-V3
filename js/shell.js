@@ -22,7 +22,7 @@ function setDocumentTitle(title) {
 }
 
 const PORTFOLIO_WORLD_SELECTION_CONFIG = {
-  portfolio: { id: "portfolio", label: ROUTE_TITLE_LABELS.portfolio, description: "Destination analysis pending." },
+  portfolio: { id: "portfolio", label: "Interactive Portfolio", description: "Destination analysis pending." },
   horizon: { id: "horizon", label: "The Horizon", description: "Future projects, ideas, experiments and the road ahead." },
   soundtrack: { id: "soundtrack", label: "The Soundtrack", description: "Music archive documenting live performance." },
   cosmos: { id: "cosmos", label: "The Cosmos", description: "Creative concepts and future worlds." },
