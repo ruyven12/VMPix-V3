@@ -2570,7 +2570,7 @@ let portfolioFirstTransferTimer = 0;
 let portfolioFirstTransferTargetCard = null;
 // Temporary Experience Build QA flag: direct /portfolio starts at Chapter 2 entry.
 const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA = true;
-const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 1900;
+const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 2360;
 const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
 const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioDirectArrivalTimer = 0;
@@ -2743,7 +2743,7 @@ function startPortfolioArrival() {
   portfolioArrivalTimer = window.setTimeout(clearPortfolioArrivalState, arrivalDuration);
 }
 
-const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 1900;
+const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 2360;
 const HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS = 40;
 let homePortfolioTransitionTimer = 0;
 
