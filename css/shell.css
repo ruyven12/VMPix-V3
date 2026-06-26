@@ -1240,6 +1240,14 @@ button {
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 1;
   --fragment-target-scale: 1.06;
+  --fragment-branch-a-x: 28%;
+  --fragment-branch-a-y: -0.2rem;
+  --fragment-branch-a-angle: -24deg;
+  --fragment-branch-a-width: 34%;
+  --fragment-branch-b-x: 58%;
+  --fragment-branch-b-y: 0.18rem;
+  --fragment-branch-b-angle: 19deg;
+  --fragment-branch-b-width: 26%;
   position: fixed;
   top: var(--home-portfolio-transition-center-y);
   left: var(--home-portfolio-transition-center-x);
@@ -1250,13 +1258,59 @@ button {
   opacity: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(247, 247, 242, 0.04) 8%, rgba(238, 217, 153, 0.88) 34%, rgba(255, 151, 38, 0.94) 52%, rgba(213, 22, 34, 0.64) 68%, transparent 100%);
-  box-shadow: 0 0 0.42rem rgba(247, 247, 242, 0.28);
-  filter: none;
+    linear-gradient(90deg,
+      transparent 0 5%,
+      rgba(247, 247, 242, 0.2) 7%,
+      rgba(255, 57, 18, 0.92) 12%,
+      transparent 18% 21%,
+      rgba(255, 151, 38, 0.86) 26%,
+      rgba(255, 57, 18, 0.96) 34%,
+      rgba(247, 247, 242, 0.7) 39%,
+      transparent 45% 48%,
+      rgba(213, 22, 34, 0.98) 54%,
+      rgba(255, 74, 24, 0.88) 61%,
+      transparent 68% 72%,
+      rgba(247, 247, 242, 0.5) 79%,
+      rgba(213, 22, 34, 0.74) 86%,
+      transparent 96% 100%);
+  box-shadow:
+    0 0 0.22rem rgba(247, 247, 242, 0.26),
+    0 0 0.52rem rgba(255, 57, 18, 0.34);
+  filter:
+    drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.68))
+    drop-shadow(0 0 0.36rem rgba(213, 22, 34, 0.28));
   transform-origin: 0 50%;
   backface-visibility: hidden;
   contain: paint;
   will-change: opacity, transform;
+}
+
+.portfolio-entry-fragment::before,
+.portfolio-entry-fragment::after {
+  --fragment-branch-y: var(--fragment-branch-a-y);
+  --fragment-branch-angle: var(--fragment-branch-a-angle);
+  position: absolute;
+  left: var(--fragment-branch-a-x);
+  top: 50%;
+  width: var(--fragment-branch-a-width);
+  height: 1px;
+  content: "";
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(247, 247, 242, 0.62), rgba(255, 57, 18, 0.74) 48%, transparent 100%);
+  box-shadow: 0 0 0.28rem rgba(255, 57, 18, 0.32);
+  transform: translate3d(0, var(--fragment-branch-a-y), 0) rotate(var(--fragment-branch-a-angle)) scaleX(0.72);
+  transform-origin: 0 50%;
+}
+
+.portfolio-entry-fragment::after {
+  --fragment-branch-y: var(--fragment-branch-b-y);
+  --fragment-branch-angle: var(--fragment-branch-b-angle);
+  left: var(--fragment-branch-b-x);
+  width: var(--fragment-branch-b-width);
+  background: linear-gradient(90deg, rgba(255, 151, 38, 0.54), rgba(213, 22, 34, 0.68) 52%, transparent 100%);
+  transform: translate3d(0, var(--fragment-branch-b-y), 0) rotate(var(--fragment-branch-b-angle)) scaleX(0.58);
 }
 
 .portfolio-entry-fragment--one {
@@ -1278,6 +1332,10 @@ button {
   --fragment-commit-scale: 0.32;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.96;
+  --fragment-branch-a-y: 0.13rem;
+  --fragment-branch-a-angle: 21deg;
+  --fragment-branch-b-y: -0.16rem;
+  --fragment-branch-b-angle: -18deg;
 }
 
 .portfolio-entry-fragment--two {
@@ -1299,6 +1357,12 @@ button {
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.94;
+  --fragment-branch-a-x: 32%;
+  --fragment-branch-a-y: -0.2rem;
+  --fragment-branch-a-angle: -22deg;
+  --fragment-branch-b-x: 62%;
+  --fragment-branch-b-y: 0.15rem;
+  --fragment-branch-b-angle: 18deg;
 }
 
 .portfolio-entry-fragment--three {
@@ -1320,6 +1384,12 @@ button {
   --fragment-commit-scale: 0.28;
   --fragment-mid-scale: 0.5;
   --fragment-end-scale: 0.86;
+  --fragment-branch-a-x: 26%;
+  --fragment-branch-a-y: 0.16rem;
+  --fragment-branch-a-angle: 24deg;
+  --fragment-branch-b-x: 56%;
+  --fragment-branch-b-y: -0.18rem;
+  --fragment-branch-b-angle: -20deg;
 }
 
 .portfolio-entry-fragment--four {
@@ -1341,6 +1411,12 @@ button {
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.64;
   --fragment-end-scale: 0.94;
+  --fragment-branch-a-x: 30%;
+  --fragment-branch-a-y: -0.18rem;
+  --fragment-branch-a-angle: -20deg;
+  --fragment-branch-b-x: 64%;
+  --fragment-branch-b-y: 0.14rem;
+  --fragment-branch-b-angle: 17deg;
 }
 
 .portfolio-entry-fragment--five {
@@ -1362,6 +1438,12 @@ button {
   --fragment-commit-scale: 0.36;
   --fragment-mid-scale: 0.72;
   --fragment-end-scale: 1;
+  --fragment-branch-a-x: 24%;
+  --fragment-branch-a-y: -0.14rem;
+  --fragment-branch-a-angle: -17deg;
+  --fragment-branch-b-x: 54%;
+  --fragment-branch-b-y: 0.17rem;
+  --fragment-branch-b-angle: 20deg;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragments {
@@ -1370,6 +1452,11 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragment {
   animation: homeArchiveEntryFragmentEscape var(--fragment-duration) linear var(--fragment-delay) both;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragment::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragment::after {
+  animation: homeArchiveEntryLightningBranch var(--fragment-duration) steps(4, end) var(--fragment-delay) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-system::after,
@@ -1397,11 +1484,17 @@ button {
   width: min(76vw, 32rem);
   height: min(46vw, 17rem);
   background:
-    linear-gradient(19deg, transparent calc(50% - 0.6px), rgba(247, 247, 242, 0.22) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(92vw, 38rem) 13% no-repeat,
-    linear-gradient(46deg, transparent calc(50% - 0.6px), rgba(255, 74, 24, 0.24) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(86vw, 34rem) 18% no-repeat,
-    linear-gradient(86deg, transparent calc(50% - 0.6px), rgba(238, 217, 153, 0.18) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(74vw, 31rem) 13% no-repeat,
-    linear-gradient(134deg, transparent calc(50% - 0.6px), rgba(213, 22, 34, 0.22) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(86vw, 35rem) 17% no-repeat,
-    linear-gradient(168deg, transparent calc(50% - 0.6px), rgba(238, 217, 153, 0.16) calc(50% - 0.36px) calc(50% + 0.36px), transparent calc(50% + 0.6px)) 50% 50% / min(90vw, 37rem) 13% no-repeat;
+    linear-gradient(19deg, transparent 0 43%, rgba(247, 247, 242, 0.36) 44%, rgba(255, 57, 18, 0.82) 46%, transparent 49% 54%, rgba(213, 22, 34, 0.64) 56%, transparent 59% 100%) 50% 50% / min(92vw, 38rem) 13% no-repeat,
+    linear-gradient(46deg, transparent 0 38%, rgba(255, 151, 38, 0.38) 40%, rgba(255, 57, 18, 0.86) 43%, transparent 47% 52%, rgba(247, 247, 242, 0.34) 54%, transparent 58% 100%) 50% 50% / min(86vw, 34rem) 18% no-repeat,
+    linear-gradient(86deg, transparent 0 42%, rgba(247, 247, 242, 0.32) 44%, rgba(213, 22, 34, 0.72) 48%, transparent 52% 57%, rgba(255, 74, 24, 0.5) 59%, transparent 62% 100%) 50% 50% / min(74vw, 31rem) 13% no-repeat,
+    linear-gradient(134deg, transparent 0 40%, rgba(255, 57, 18, 0.8) 42%, rgba(247, 247, 242, 0.3) 45%, transparent 49% 55%, rgba(213, 22, 34, 0.58) 57%, transparent 61% 100%) 50% 50% / min(86vw, 35rem) 17% no-repeat,
+    linear-gradient(168deg, transparent 0 41%, rgba(247, 247, 242, 0.28) 43%, rgba(255, 74, 24, 0.7) 46%, transparent 50% 56%, rgba(213, 22, 34, 0.5) 58%, transparent 62% 100%) 50% 50% / min(90vw, 37rem) 13% no-repeat,
+    linear-gradient(32deg, transparent 0 47%, rgba(255, 57, 18, 0.56) 49%, transparent 53% 100%) 38% 46% / min(25vw, 9rem) 8% no-repeat,
+    linear-gradient(118deg, transparent 0 47%, rgba(255, 151, 38, 0.34) 49%, transparent 53% 100%) 61% 46% / min(24vw, 8.6rem) 8% no-repeat,
+    linear-gradient(158deg, transparent 0 47%, rgba(213, 22, 34, 0.46) 49%, transparent 53% 100%) 42% 56% / min(23vw, 8rem) 8% no-repeat;
+  filter:
+    drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.18))
+    drop-shadow(0 0 0.44rem rgba(255, 57, 18, 0.36));
   animation: homeArchiveExposedDispatchStreams 720ms cubic-bezier(0.22, 0.78, 0.18, 1) 920ms both;
 }
 
@@ -2059,37 +2152,102 @@ button {
   0%,
   5% {
     opacity: 0;
+    filter:
+      drop-shadow(0 0 0.08rem rgba(255, 57, 18, 0.22))
+      drop-shadow(0 0 0.18rem rgba(213, 22, 34, 0.12));
     transform: translate3d(-50%, -50%, 0) rotate(var(--fragment-angle)) scaleX(0.035);
   }
 
   14% {
     opacity: 0.72;
-    transform: translate3d(calc(-50% + var(--fragment-separate-x)), calc(-50% + var(--fragment-separate-y)), 0) rotate(var(--fragment-angle)) scaleX(0.14);
+    filter:
+      drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.72))
+      drop-shadow(0 0 0.42rem rgba(213, 22, 34, 0.36));
+    transform: translate3d(calc(-50% + var(--fragment-separate-x) + 0.16rem), calc(-50% + var(--fragment-separate-y) - 0.04rem), 0) rotate(calc(var(--fragment-angle) + 0.8deg)) scaleX(0.14);
+  }
+
+  22% {
+    opacity: 0.52;
+    filter:
+      drop-shadow(0 0 0.12rem rgba(255, 151, 38, 0.42))
+      drop-shadow(0 0 0.26rem rgba(213, 22, 34, 0.24));
+    transform: translate3d(calc(-50% + var(--fragment-commit-x)), calc(-50% + var(--fragment-commit-y) + 0.1rem), 0) rotate(calc(var(--fragment-angle) - 0.9deg)) scaleX(var(--fragment-commit-scale));
   }
 
   30% {
     opacity: 0.94;
-    transform: translate3d(calc(-50% + var(--fragment-commit-x)), calc(-50% + var(--fragment-commit-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-commit-scale));
+    filter:
+      drop-shadow(0 0 0.2rem rgba(255, 57, 18, 0.82))
+      drop-shadow(0 0 0.52rem rgba(213, 22, 34, 0.42));
+    transform: translate3d(calc(-50% + var(--fragment-commit-x) - 0.08rem), calc(-50% + var(--fragment-commit-y)), 0) rotate(calc(var(--fragment-angle) + 0.45deg)) scaleX(var(--fragment-commit-scale));
+  }
+
+  40% {
+    opacity: 0.68;
+    transform: translate3d(calc(-50% + var(--fragment-mid-x)), calc(-50% + var(--fragment-mid-y) - 0.09rem), 0) rotate(calc(var(--fragment-angle) - 0.55deg)) scaleX(var(--fragment-mid-scale));
   }
 
   52% {
-    opacity: 0.76;
-    transform: translate3d(calc(-50% + var(--fragment-mid-x)), calc(-50% + var(--fragment-mid-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-mid-scale));
+    opacity: 0.82;
+    filter:
+      drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.34))
+      drop-shadow(0 0 0.5rem rgba(255, 57, 18, 0.42));
+    transform: translate3d(calc(-50% + var(--fragment-mid-x) + 0.1rem), calc(-50% + var(--fragment-mid-y)), 0) rotate(calc(var(--fragment-angle) + 0.35deg)) scaleX(var(--fragment-mid-scale));
+  }
+
+  61% {
+    opacity: 0.5;
+    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y) + 0.08rem), 0) rotate(calc(var(--fragment-angle) - 0.7deg)) scaleX(var(--fragment-end-scale));
   }
 
   70% {
     opacity: 0.42;
+    filter:
+      drop-shadow(0 0 0.11rem rgba(255, 74, 24, 0.4))
+      drop-shadow(0 0 0.3rem rgba(213, 22, 34, 0.28));
     transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-end-scale));
   }
 
   86% {
     opacity: 0;
+    filter:
+      drop-shadow(0 0 0.06rem rgba(255, 57, 18, 0.18))
+      drop-shadow(0 0 0.16rem rgba(213, 22, 34, 0.12));
     transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-target-scale));
   }
 
   100% {
     opacity: 0;
     transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-target-scale));
+  }
+}
+
+@keyframes homeArchiveEntryLightningBranch {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.16);
+  }
+
+  18% {
+    opacity: 0.74;
+    transform: translate3d(0.08rem, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.86);
+  }
+
+  34% {
+    opacity: 0.18;
+    transform: translate3d(-0.04rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) - 2deg)) scaleX(0.48);
+  }
+
+  46% {
+    opacity: 0.66;
+    transform: translate3d(0.12rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) + 1.4deg)) scaleX(0.72);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.2);
   }
 }
 
@@ -2303,23 +2461,43 @@ button {
 @keyframes homeArchiveExposedDispatchStreams {
   0% {
     opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale(0.24);
+    filter:
+      drop-shadow(0 0 0.08rem rgba(247, 247, 242, 0.08))
+      drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.16));
+    transform: translate3d(-50%, -50%, 0) scale(0.24) rotate(-0.2deg);
   }
-  20% {
-    opacity: 0.42;
-    transform: translate3d(-50%, -50%, 0) scale(0.58);
+  14% {
+    opacity: 0.52;
+    filter:
+      drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.2))
+      drop-shadow(0 0 0.44rem rgba(255, 57, 18, 0.42));
+    transform: translate3d(calc(-50% + 0.08rem), calc(-50% - 0.04rem), 0) scale(0.56) rotate(0.3deg);
+  }
+  28% {
+    opacity: 0.22;
+    filter:
+      drop-shadow(0 0 0.11rem rgba(255, 151, 38, 0.18))
+      drop-shadow(0 0 0.3rem rgba(213, 22, 34, 0.28));
+    transform: translate3d(calc(-50% - 0.05rem), calc(-50% + 0.06rem), 0) scale(0.74) rotate(-0.4deg);
   }
   46% {
-    opacity: 0.2;
-    transform: translate3d(-50%, -50%, 0) scale(0.92);
+    opacity: 0.38;
+    filter:
+      drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.18))
+      drop-shadow(0 0 0.48rem rgba(255, 57, 18, 0.36));
+    transform: translate3d(calc(-50% + 0.04rem), calc(-50% - 0.02rem), 0) scale(0.94) rotate(0.25deg);
   }
   68% {
-    opacity: 0.04;
-    transform: translate3d(-50%, -50%, 0) scale(1.12);
+    opacity: 0.08;
+    filter:
+      drop-shadow(0 0 0.08rem rgba(255, 74, 24, 0.14))
+      drop-shadow(0 0 0.22rem rgba(213, 22, 34, 0.18));
+    transform: translate3d(-50%, -50%, 0) scale(1.12) rotate(-0.15deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale(1.24);
+    filter: none;
+    transform: translate3d(-50%, -50%, 0) scale(1.24) rotate(0deg);
   }
 }
 @keyframes homeArchiveExposedCenterBurst {
