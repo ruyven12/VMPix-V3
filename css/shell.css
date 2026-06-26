@@ -2958,6 +2958,28 @@ button {
   contain: layout paint style;
 }
 
+.portfolio-observatory-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0) rotate(0deg);
+  transform-origin: var(--home-portfolio-transition-center-x) var(--home-portfolio-transition-center-y);
+  will-change: transform;
+  contain: paint style;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence) .portfolio-observatory-layer {
+  animation: observatoryRotate 240s linear infinite;
+}
+
+.site-shell.is-home-route .portfolio-observatory-layer,
+.site-shell.is-module-view .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-observatory-layer {
+  animation: none;
+  transform: translate3d(0, 0, 0) rotate(0deg);
+}
+
 .ambient-system::before,
 .ambient-system::after {
   content: "";
@@ -3157,6 +3179,10 @@ button {
   animation: none;
 }
 
+.site-shell[data-shell-route="portfolio"] .portfolio-observatory-layer .ambient-void-stars {
+  inset: -30vmax;
+}
+
 .nebula-stage {
   position: absolute;
   z-index: 1;
@@ -3200,6 +3226,11 @@ button {
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-entry-sequence) .nebula-stage--4 {
   opacity: 0.8;
   animation: nebulaCoreDrift 220s linear infinite alternate;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence) .nebula-stage--4 {
+  animation: none;
+  transform: translate3d(0, 0, 0) scale(1.018);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
@@ -3951,6 +3982,16 @@ button {
     opacity: 0;
     filter: blur(1.25px);
     transform: translate3d(-50%, 0.52rem, 0) scale3d(0.99, 0.965, 1);
+  }
+}
+
+@keyframes observatoryRotate {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0) rotate(360deg);
   }
 }
 
@@ -7518,6 +7559,11 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"] .portfolio-observatory-layer {
+    animation: none !important;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
   .site-shell[data-shell-route="portfolio"] .ambient-void-stars,
   .site-shell[data-shell-route="portfolio"] .ambient-void-stars::before,
   .site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {

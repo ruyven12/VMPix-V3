@@ -25,10 +25,6 @@
       <video class="cinema-fire-bg" autoplay muted loop playsinline aria-hidden="true" preload="metadata">
         <source src="/assets/media/background/background-fire.mp4" type="video/mp4">
       </video>
-      <span class="ambient-layer ambient-void-stars" aria-hidden="true">
-        <span class="nebula-stage nebula-stage--1"></span>
-        <span class="nebula-stage nebula-stage--4"></span>
-      </span>
       <span class="portfolio-entry-fragments" aria-hidden="true">
         <span class="portfolio-entry-fragment portfolio-entry-fragment--one"></span>
         <span class="portfolio-entry-fragment portfolio-entry-fragment--two"></span>
@@ -36,11 +32,27 @@
         <span class="portfolio-entry-fragment portfolio-entry-fragment--four"></span>
         <span class="portfolio-entry-fragment portfolio-entry-fragment--five"></span>
       </span>
-      <span class="portfolio-entry-constellation portfolio-entry-constellation--first" aria-hidden="true"></span>
-      <span class="portfolio-entry-constellation portfolio-entry-constellation--second" aria-hidden="true"></span>
-      <span class="portfolio-entry-constellation portfolio-entry-constellation--third" aria-hidden="true"></span>
-      <span class="portfolio-entry-constellation portfolio-entry-constellation--fourth" aria-hidden="true"></span>
-      <span class="portfolio-entry-constellation portfolio-entry-constellation--fifth" aria-hidden="true"></span>
+      <span class="portfolio-observatory-layer">
+        <span class="ambient-layer ambient-void-stars" aria-hidden="true">
+          <span class="nebula-stage nebula-stage--1"></span>
+          <span class="nebula-stage nebula-stage--4"></span>
+        </span>
+        <span class="portfolio-entry-constellation portfolio-entry-constellation--first" aria-hidden="true"></span>
+        <span class="portfolio-entry-constellation portfolio-entry-constellation--second" aria-hidden="true"></span>
+        <span class="portfolio-entry-constellation portfolio-entry-constellation--third" aria-hidden="true"></span>
+        <span class="portfolio-entry-constellation portfolio-entry-constellation--fourth" aria-hidden="true"></span>
+        <span class="portfolio-entry-constellation portfolio-entry-constellation--fifth" aria-hidden="true"></span>
+        <span class="portfolio-beacon-field" role="group" aria-label="Portfolio star coordinates">
+          <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--horizon" type="button" data-portfolio-star="horizon" data-world="horizon" data-world-label="The Horizon" aria-label="Select The Horizon beacon" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--soundtrack" type="button" data-portfolio-star="soundtrack" data-world="soundtrack" data-world-label="The Soundtrack" aria-label="Select The Soundtrack beacon" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--cosmos" type="button" data-portfolio-star="cosmos" data-world="cosmos" data-world-label="The Cosmos" aria-label="Select The Cosmos beacon" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--battleground" type="button" data-portfolio-star="battleground" data-world="battleground" data-world-label="The Battleground" aria-label="Select The Battleground beacon" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--wild" type="button" data-portfolio-star="wild" data-world="wild" data-world-label="The Wild" aria-label="Select The Wild beacon" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--story" type="button" data-portfolio-star="story" data-world="story" data-world-label="The Story" aria-label="Select The Story system" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--trajectory" type="button" data-portfolio-star="trajectory" data-world="trajectory" data-world-label="The Trajectory" aria-label="Select The Trajectory system" aria-pressed="false" disabled></button>
+          <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--comms" type="button" data-portfolio-star="comms" data-world="comms" data-world-label="The Comms" aria-label="Select The Comms system" aria-pressed="false" disabled></button>
+        </span>
+      </span>
       <span class="portfolio-engine-scan-line" aria-hidden="true" data-portfolio-engine-scan-line></span>
       <aside class="portfolio-engine-projection" data-portfolio-engine-projection aria-live="polite" aria-hidden="true">
         <span class="portfolio-engine-projection-kicker">Archive Analysis</span>
@@ -52,16 +64,6 @@
           <span class="portfolio-engine-projection-enter" aria-hidden="true">ENTER</span>
         </span>
       </aside>
-      <span class="portfolio-beacon-field" role="group" aria-label="Portfolio star coordinates">
-        <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--horizon" type="button" data-portfolio-star="horizon" data-world="horizon" data-world-label="The Horizon" aria-label="Select The Horizon beacon" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--soundtrack" type="button" data-portfolio-star="soundtrack" data-world="soundtrack" data-world-label="The Soundtrack" aria-label="Select The Soundtrack beacon" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--cosmos" type="button" data-portfolio-star="cosmos" data-world="cosmos" data-world-label="The Cosmos" aria-label="Select The Cosmos beacon" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--battleground" type="button" data-portfolio-star="battleground" data-world="battleground" data-world-label="The Battleground" aria-label="Select The Battleground beacon" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--world portfolio-beacon--wild" type="button" data-portfolio-star="wild" data-world="wild" data-world-label="The Wild" aria-label="Select The Wild beacon" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--story" type="button" data-portfolio-star="story" data-world="story" data-world-label="The Story" aria-label="Select The Story system" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--trajectory" type="button" data-portfolio-star="trajectory" data-world="trajectory" data-world-label="The Trajectory" aria-label="Select The Trajectory system" aria-pressed="false" disabled></button>
-        <button class="portfolio-beacon portfolio-beacon--system portfolio-beacon--comms" type="button" data-portfolio-star="comms" data-world="comms" data-world-label="The Comms" aria-label="Select The Comms system" aria-pressed="false" disabled></button>
-      </span>
       <span class="home-archive-communication" aria-hidden="true">
         <span class="home-archive-message home-archive-message--node">ARCHIVE NODE FOUND</span>
         <span class="home-archive-message home-archive-message--decode">DECODING ARCHIVE...</span>
