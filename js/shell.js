@@ -11,25 +11,33 @@ function setCurrentView(viewName) {
 }
 
 const PORTFOLIO_WORLD_SELECTION_CONFIG = {
-  portfolio: { id: "portfolio", label: "Interactive Portfolio" },
-  horizon: { id: "horizon", label: "The Horizon" },
-  soundtrack: { id: "soundtrack", label: "The Soundtrack" },
-  cosmos: { id: "cosmos", label: "The Cosmos" },
-  battleground: { id: "battleground", label: "The Battleground" },
-  wild: { id: "wild", label: "The Wild" },
-  story: { id: "story", label: "The Story" },
-  trajectory: { id: "trajectory", label: "The Trajectory" },
-  comms: { id: "comms", label: "The Comms" },
+  portfolio: { id: "portfolio", label: "Interactive Portfolio", description: "Destination analysis pending." },
+  horizon: { id: "horizon", label: "The Horizon", description: "Future projects, ideas, experiments and the road ahead." },
+  soundtrack: { id: "soundtrack", label: "The Soundtrack", description: "Music archive documenting live performance." },
+  cosmos: { id: "cosmos", label: "The Cosmos", description: "Creative concepts and future worlds." },
+  battleground: { id: "battleground", label: "The Battleground", description: "Professional wrestling archive." },
+  wild: { id: "wild", label: "The Wild", description: "Exploration beyond traditional photography." },
+  story: { id: "story", label: "The Story", description: "Origins of Voodoo Media." },
+  trajectory: { id: "trajectory", label: "The Trajectory", description: "Roadmap of the archive." },
+  comms: { id: "comms", label: "The Comms", description: "Booking and communications hub." },
 };
 
 const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
 const portfolioBeaconHotspots = Array.from(document.querySelectorAll("[data-portfolio-star]"));
 const portfolioEngineScanLine = document.querySelector("[data-portfolio-engine-scan-line]");
 const portfolioEngineScanAnchor = document.querySelector(".portfolio-engine-left-core");
+const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
+const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
+const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
+const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
 const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
+const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
+const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 let portfolioEngineScanTimer = 0;
 let portfolioEngineScanFrame = 0;
 let portfolioEngineScanTarget = null;
+let portfolioEngineProjectionTimer = 0;
+let portfolioEngineProjectionRetractTimer = 0;
 
 function getPortfolioWorldSelectionConfig(worldName) {
   return PORTFOLIO_WORLD_SELECTION_CONFIG[worldName] || PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio;
@@ -39,6 +47,10 @@ function setPortfolioEngineHudCurrentView(viewName) {
   if (portfolioEngineCurrentView) {
     portfolioEngineCurrentView.textContent = viewName;
   }
+}
+
+function isPortfolioEngineReducedMotion() {
+  return Boolean(window.matchMedia?.(PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY).matches);
 }
 
 function setPortfolioBeaconHotspotsEnabled(isEnabled) {
@@ -59,6 +71,74 @@ function clearPortfolioEngineScan() {
   if (shell) {
     shell.classList.remove("is-portfolio-scan-active");
   }
+}
+
+function hidePortfolioEngineProjection({ immediate = false } = {}) {
+  window.clearTimeout(portfolioEngineProjectionTimer);
+  portfolioEngineProjectionTimer = 0;
+  window.clearTimeout(portfolioEngineProjectionRetractTimer);
+  portfolioEngineProjectionRetractTimer = 0;
+
+  if (!shell || !portfolioEngineProjection) {
+    return;
+  }
+
+  shell.classList.remove("is-portfolio-projection-active");
+  portfolioEngineProjection.setAttribute("aria-hidden", "true");
+
+  if (immediate || isPortfolioEngineReducedMotion()) {
+    shell.classList.remove("is-portfolio-projection-retracting");
+    return;
+  }
+
+  shell.classList.add("is-portfolio-projection-retracting");
+  portfolioEngineProjectionRetractTimer = window.setTimeout(() => {
+    if (shell) {
+      shell.classList.remove("is-portfolio-projection-retracting");
+    }
+    portfolioEngineProjectionRetractTimer = 0;
+  }, PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS);
+}
+
+function setPortfolioEngineProjectionContent(worldName) {
+  const config = getPortfolioWorldSelectionConfig(worldName);
+  if (portfolioEngineProjectionTitle) {
+    portfolioEngineProjectionTitle.textContent = config.label;
+  }
+  if (portfolioEngineProjectionDescription) {
+    portfolioEngineProjectionDescription.textContent = config.description;
+  }
+  if (portfolioEngineProjectionStatus) {
+    portfolioEngineProjectionStatus.textContent = "READY";
+  }
+}
+
+function showPortfolioEngineProjection(worldName) {
+  if (
+    !shell ||
+    !portfolioEngineProjection ||
+    window.location.pathname !== routePaths.portfolio ||
+    shell.dataset.portfolioEngineReady !== "true"
+  ) {
+    return;
+  }
+
+  setPortfolioEngineProjectionContent(worldName);
+  shell.classList.remove("is-portfolio-projection-retracting");
+  portfolioEngineProjection.setAttribute("aria-hidden", "false");
+  shell.classList.add("is-portfolio-projection-active");
+}
+
+function queuePortfolioEngineProjection(worldName) {
+  hidePortfolioEngineProjection();
+  window.clearTimeout(portfolioEngineProjectionTimer);
+  portfolioEngineProjectionTimer = window.setTimeout(
+    () => {
+      portfolioEngineProjectionTimer = 0;
+      showPortfolioEngineProjection(worldName);
+    },
+    isPortfolioEngineReducedMotion() ? 80 : PORTFOLIO_ENGINE_SCAN_DURATION_MS
+  );
 }
 
 function updatePortfolioEngineScanCoordinates(target) {
@@ -109,6 +189,7 @@ function triggerPortfolioEngineScan(target) {
     return;
   }
 
+  queuePortfolioEngineProjection(target.dataset.portfolioStar || "portfolio");
   shell.classList.remove("is-portfolio-scan-active");
   portfolioEngineScanFrame = window.requestAnimationFrame(() => {
     portfolioEngineScanFrame = 0;
@@ -2774,6 +2855,7 @@ function cancelPortfolioEngineReadyGate() {
 function clearPortfolioEngineReadyState() {
   cancelPortfolioEngineReadyGate();
   clearPortfolioEngineScan();
+  hidePortfolioEngineProjection({ immediate: true });
   setPortfolioBeaconHotspotsEnabled(false);
   setPortfolioActiveWorld("portfolio");
   if (!shell) {
