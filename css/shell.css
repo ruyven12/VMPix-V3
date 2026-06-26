@@ -2510,6 +2510,17 @@ button {
   animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon.is-selected::before,
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon[aria-pressed="true"]::before {
+  animation: none;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon.is-selected::after,
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 0.84;
+  animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portfolio-beacon,
   .portfolio-beacon::before,
@@ -3766,71 +3777,103 @@ button {
 @keyframes portfolioWorldBeaconBreath {
   0%,
   100% {
-    opacity: 0.92;
+    opacity: 0.96;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+    filter: drop-shadow(0 0 0.28rem rgb(var(--beacon-color) / 0.22));
   }
   46% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1) rotate(0deg);
+    filter:
+      drop-shadow(0 0 0.52rem rgb(var(--beacon-color) / 0.42))
+      drop-shadow(0 0 1.05rem rgb(var(--beacon-color) / 0.18));
   }
 }
 
 @keyframes portfolioBeaconCoronaBreath {
   0%,
   100% {
-    opacity: 0.36;
-    transform: translate3d(-50%, -50%, 0) scale3d(0.9, 0.9, 1) rotate(0deg);
+    opacity: 0.5;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.94, 0.94, 1) rotate(0deg);
   }
   46% {
-    opacity: 0.56;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.14, 1.14, 1) rotate(0.8deg);
+    opacity: 0.82;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(0.8deg);
   }
 }
 @keyframes portfolioBeaconCoreShimmer {
   0%,
   100% {
-    opacity: 0.92;
+    opacity: 0.96;
     transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1);
   }
   32% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1);
   }
   54% {
-    opacity: 0.94;
+    opacity: 0.96;
     transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1);
   }
   76% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1);
+  }
+}
+
+@keyframes portfolioSystemBeaconBreath {
+  0%,
+  100% {
+    opacity: 0.86;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+    filter: drop-shadow(0 0 0.22rem rgb(var(--beacon-color) / 0.18));
+  }
+  48% {
     opacity: 0.98;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.1, 1.1, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.03, 1.03, 1);
+    filter:
+      drop-shadow(0 0 0.44rem rgb(var(--beacon-color) / 0.34))
+      drop-shadow(0 0 0.9rem rgb(var(--beacon-color) / 0.14));
   }
 }
 
 @keyframes portfolioBeaconSystemShimmer {
   0%,
   100% {
-    opacity: 0.78;
+    opacity: 0.84;
     transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1);
   }
   44% {
-    opacity: 0.96;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.1, 1.1, 1);
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1);
+  }
+}
+
+@keyframes portfolioBeaconSystemCoronaBreath {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.88, 0.88, 1) rotate(0deg);
+  }
+  48% {
+    opacity: 0.64;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1) rotate(0.5deg);
   }
 }
 
 @keyframes portfolioBeaconSelectedPulse {
   0%,
   100% {
-    opacity: 0.62;
-    transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1) rotate(0deg);
+    opacity: 0.76;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.02, 1.02, 1) rotate(0deg);
   }
   42% {
-    opacity: 0.82;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.26, 1.26, 1) rotate(0.8deg);
+    opacity: 0.96;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1) rotate(0.8deg);
   }
   68% {
-    opacity: 0.7;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.06, 1.06, 1) rotate(-0.2deg);
+    opacity: 0.84;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.14, 1.14, 1) rotate(-0.2deg);
   }
 }
 
