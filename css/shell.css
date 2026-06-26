@@ -1834,6 +1834,56 @@ button {
     voidStarTwinkleSoft 47s var(--ease-breath) -19s infinite;
 }
 
+/* PASS 44: approved nebula image is the Home/Portfolio environmental foundation. */
+.site-shell.is-home-route .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars {
+  background-image:
+    linear-gradient(180deg, rgba(1, 1, 3, 0.44), rgba(1, 1, 3, 0.14) 42%, rgba(1, 1, 3, 0.72)),
+    radial-gradient(ellipse at 50% 48%, transparent 0 42%, rgba(0, 0, 0, 0.44) 76%, rgba(0, 0, 0, 0.78) 100%),
+    url("../assets/media/background/Nebula.png");
+  background-position: center, center, center;
+  background-repeat: no-repeat;
+  background-size: cover, cover, cover;
+  filter: saturate(1.08) brightness(0.86) contrast(1.08);
+  transform: translate3d(0, 0, 0) scale(1.018);
+  animation:
+    voidStarReveal 1.8s var(--ease-breath) both,
+    nebulaEnvironmentDrift 180s linear infinite alternate;
+}
+
+.site-shell.is-home-route .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars::before {
+  inset: -5%;
+  opacity: 0.2;
+  background:
+    radial-gradient(circle at 12% 22%, rgba(247, 247, 242, 0.36) 0 0.56px, transparent 1.08px),
+    radial-gradient(circle at 22% 68%, rgba(238, 217, 153, 0.28) 0 0.48px, transparent 1px),
+    radial-gradient(circle at 39% 34%, rgba(247, 247, 242, 0.3) 0 0.52px, transparent 1.06px),
+    radial-gradient(circle at 57% 16%, rgba(247, 247, 242, 0.34) 0 0.58px, transparent 1.12px),
+    radial-gradient(circle at 74% 48%, rgba(238, 217, 153, 0.26) 0 0.5px, transparent 1.04px),
+    radial-gradient(circle at 88% 78%, rgba(247, 247, 242, 0.32) 0 0.56px, transparent 1.1px);
+  mix-blend-mode: screen;
+  animation:
+    voidStarLayerDrift 190s linear infinite alternate,
+    nebulaSparkleTwinkle 48s var(--ease-breath) -11s infinite;
+}
+
+.site-shell.is-home-route .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {
+  inset: -6%;
+  opacity: 0.12;
+  background:
+    radial-gradient(circle at 18% 84%, rgba(247, 247, 242, 0.24) 0 0.46px, transparent 0.98px),
+    radial-gradient(circle at 31% 12%, rgba(238, 217, 153, 0.22) 0 0.42px, transparent 0.92px),
+    radial-gradient(circle at 49% 74%, rgba(247, 247, 242, 0.26) 0 0.48px, transparent 1px),
+    radial-gradient(circle at 67% 29%, rgba(247, 247, 242, 0.22) 0 0.44px, transparent 0.94px),
+    radial-gradient(circle at 92% 42%, rgba(238, 217, 153, 0.2) 0 0.42px, transparent 0.92px);
+  mix-blend-mode: screen;
+  animation:
+    voidStarLayerDrift 230s linear -53s infinite alternate-reverse,
+    nebulaSparkleTwinkle 62s var(--ease-breath) -23s infinite;
+}
+
 .ambient-energy {
   z-index: 1;
   background:
@@ -3719,6 +3769,28 @@ button {
   }
   to {
     transform: translate3d(0.34rem, 0.46rem, 0) scale(1.01);
+  }
+}
+
+@keyframes nebulaEnvironmentDrift {
+  from {
+    transform: translate3d(-0.18rem, -0.12rem, 0) scale(1.018);
+  }
+  to {
+    transform: translate3d(0.22rem, 0.18rem, 0) scale(1.024);
+  }
+}
+
+@keyframes nebulaSparkleTwinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  46% {
+    opacity: 0.22;
+  }
+  72% {
+    opacity: 0.16;
   }
 }
 
