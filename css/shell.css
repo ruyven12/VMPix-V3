@@ -1774,6 +1774,7 @@ button {
 }
 /* PASS 50: five world beacons ordered W, NW, N, NE, E inside the compressed Portfolio field. */
 .ambient-system {
+  --portfolio-observatory-overscan: max(72vmax, 32rem);
   --entry-beacon-cardinal-push: clamp(1.875rem, 8vw, 2.5rem);
   --entry-beacon-diagonal-push: clamp(1.35rem, 5.5vw, 1.75rem);
   --entry-beacon-midline-y: calc(-1 * var(--portfolio-beacon-field-lift, clamp(6rem, 13svh, 8.5rem)));
@@ -2292,10 +2293,12 @@ button {
   opacity: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 1) 0 1.72px, rgba(247, 247, 242, 0.94) 1.98px 2.82px, rgb(var(--beacon-color) / 0.54) 3.08px 3.72px, transparent 4.52px),
-    linear-gradient(90deg, transparent 0 31%, rgb(var(--beacon-color) / 0.42) 43%, rgba(247, 247, 242, 0.9) 50%, rgb(var(--beacon-color) / 0.42) 57%, transparent 69% 100%),
-    linear-gradient(0deg, transparent 0 31%, rgb(var(--beacon-color) / 0.38) 43%, rgba(247, 247, 242, 0.84) 50%, rgb(var(--beacon-color) / 0.38) 57%, transparent 69% 100%),
-    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.48) 0 17%, rgb(var(--beacon-color) / 0.16) 32%, transparent 58%);
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 1.28px, rgba(247, 247, 242, 0.96) 1.48px 2.12px, rgb(var(--beacon-color) / 0.7) 2.34px 2.86px, transparent 3.34px),
+    linear-gradient(90deg, transparent 0 25%, rgb(var(--beacon-color) / 0.16) 39%, rgba(247, 247, 242, 0.9) 49.2%, rgba(247, 247, 242, 0.9) 50.8%, rgb(var(--beacon-color) / 0.16) 61%, transparent 75% 100%),
+    linear-gradient(0deg, transparent 0 23%, rgb(var(--beacon-color) / 0.14) 38%, rgba(247, 247, 242, 0.82) 49.3%, rgba(247, 247, 242, 0.82) 50.7%, rgb(var(--beacon-color) / 0.14) 62%, transparent 77% 100%),
+    linear-gradient(45deg, transparent 0 39%, rgb(var(--beacon-color) / 0.1) 47.8%, rgba(247, 247, 242, 0.42) 50%, rgb(var(--beacon-color) / 0.1) 52.2%, transparent 61% 100%),
+    linear-gradient(-45deg, transparent 0 41%, rgb(var(--beacon-color) / 0.08) 48.5%, rgba(247, 247, 242, 0.34) 50%, rgb(var(--beacon-color) / 0.08) 51.5%, transparent 59% 100%),
+    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.2) 0 8%, rgb(var(--beacon-color) / 0.08) 22%, transparent 48%);
   background-position: center;
   background-repeat: no-repeat;
   background-size: var(--beacon-size) var(--beacon-size);
@@ -2319,26 +2322,26 @@ button {
 }
 
 .portfolio-beacon::before {
-  width: 0.58rem;
+  width: 0.42rem;
   aspect-ratio: 1;
   border-radius: 50%;
   opacity: 0.96;
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 1) 0 22%, rgba(247, 247, 242, 0.96) 30% 44%, rgb(var(--beacon-color) / 0.72) 58%, transparent 82%);
+    radial-gradient(circle, rgba(255, 255, 255, 1) 0 26%, rgba(247, 247, 242, 0.96) 34% 48%, rgb(var(--beacon-color) / 0.62) 62%, transparent 82%);
   box-shadow:
-    0 0 0.42rem rgba(247, 247, 242, 0.48),
-    0 0 0.94rem rgb(var(--beacon-color) / 0.46),
-    0 0 1.62rem rgb(var(--beacon-color) / 0.22);
+    0 0 0.26rem rgba(247, 247, 242, 0.58),
+    0 0 0.72rem rgb(var(--beacon-color) / 0.42),
+    0 0 1.18rem rgb(var(--beacon-color) / 0.16);
 }
 
 .portfolio-beacon::after {
-  width: calc(var(--beacon-size) * 2.86);
+  width: calc(var(--beacon-size) * 3.05);
   aspect-ratio: 1;
-  opacity: 0.56;
+  opacity: 0.62;
   background:
-    radial-gradient(circle, rgb(var(--beacon-color) / 0.58) 0 7%, rgb(var(--beacon-color) / 0.3) 24%, rgb(var(--beacon-color) / 0.12) 44%, transparent 70%),
-    linear-gradient(90deg, transparent 0 38%, rgb(var(--beacon-color) / 0.26) 49%, transparent 62% 100%),
-    linear-gradient(0deg, transparent 0 39%, rgba(247, 247, 242, 0.22) 50%, transparent 61% 100%);
+    linear-gradient(90deg, transparent 0 27%, rgb(var(--beacon-color) / 0.16) 43%, rgba(247, 247, 242, 0.48) 49.4%, rgba(247, 247, 242, 0.48) 50.6%, rgb(var(--beacon-color) / 0.16) 57%, transparent 73% 100%),
+    linear-gradient(0deg, transparent 0 26%, rgb(var(--beacon-color) / 0.13) 42%, rgba(247, 247, 242, 0.4) 49.4%, rgba(247, 247, 242, 0.4) 50.6%, rgb(var(--beacon-color) / 0.13) 58%, transparent 74% 100%),
+    radial-gradient(circle, rgb(var(--beacon-color) / 0.22) 0 5%, rgb(var(--beacon-color) / 0.12) 18%, rgb(var(--beacon-color) / 0.045) 36%, transparent 64%);
   transform: translate3d(-50%, -50%, 0) scale3d(0.82, 0.82, 1) rotate(0deg);
 }
 
@@ -3180,7 +3183,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"] .portfolio-observatory-layer .ambient-void-stars {
-  inset: -30vmax;
+  inset: calc(var(--portfolio-observatory-overscan, 0px) * -1);
 }
 
 .nebula-stage {
