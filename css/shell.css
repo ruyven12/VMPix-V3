@@ -1244,7 +1244,7 @@ button {
   --fragment-angle: 0deg;
   --fragment-delay: 500ms;
   --fragment-duration: 500ms;
-  --fragment-width: clamp(3.15rem, 12vw, 7.2rem);
+  --fragment-width: clamp(3.45rem, 13.4vw, 8.05rem);
   --fragment-height: clamp(1.25px, 0.3vw, 2.5px);
   --fragment-separate-x: min(8vw, 4.8rem);
   --fragment-separate-y: 0px;
@@ -1257,17 +1257,17 @@ button {
   --fragment-target-x: var(--entry-constellation-01-x);
   --fragment-target-y: var(--entry-constellation-01-y);
   --fragment-commit-scale: 0.38;
-  --fragment-mid-scale: 0.62;
+  --fragment-mid-scale: 0.68;
   --fragment-end-scale: 1;
-  --fragment-target-scale: 0.22;
+  --fragment-target-scale: 0.18;
   --fragment-branch-a-x: 28%;
   --fragment-branch-a-y: -0.2rem;
   --fragment-branch-a-angle: -24deg;
-  --fragment-branch-a-width: 34%;
+  --fragment-branch-a-width: 42%;
   --fragment-branch-b-x: 58%;
   --fragment-branch-b-y: 0.18rem;
   --fragment-branch-b-angle: 19deg;
-  --fragment-branch-b-width: 26%;
+  --fragment-branch-b-width: 35%;
   position: fixed;
   top: var(--home-portfolio-transition-center-y);
   left: var(--home-portfolio-transition-center-x);
@@ -1337,7 +1337,7 @@ button {
   --fragment-angle: -168deg;
   --fragment-delay: 1110ms;
   --fragment-duration: 500ms;
-  --fragment-width: clamp(3.15rem, 10.6vw, 6.6rem);
+  --fragment-width: clamp(3.6rem, 12.2vw, 7.2rem);
   --fragment-height: clamp(1.05px, 0.26vw, 2.05px);
   --fragment-separate-x: calc(-1 * min(7.6vw, 4.5rem));
   --fragment-separate-y: 0px;
@@ -1350,8 +1350,8 @@ button {
   --fragment-target-x: var(--entry-constellation-01-x);
   --fragment-target-y: var(--entry-constellation-01-y);
   --fragment-commit-scale: 0.32;
-  --fragment-mid-scale: 0.62;
-  --fragment-end-scale: 0.74;
+  --fragment-mid-scale: 0.68;
+  --fragment-end-scale: 0.8;
   --fragment-branch-a-y: 0.13rem;
   --fragment-branch-a-angle: 21deg;
   --fragment-branch-b-y: -0.16rem;
@@ -1362,7 +1362,7 @@ button {
   --fragment-angle: -128deg;
   --fragment-delay: 1160ms;
   --fragment-duration: 500ms;
-  --fragment-width: clamp(3.35rem, 11.2vw, 6.9rem);
+  --fragment-width: clamp(3.75rem, 12.7vw, 7.6rem);
   --fragment-height: clamp(1.1px, 0.27vw, 2.15px);
   --fragment-separate-x: calc(-1 * min(5.2vw, 3.1rem));
   --fragment-separate-y: calc(-1 * min(8.5vh, 4.3rem));
@@ -1375,8 +1375,8 @@ button {
   --fragment-target-x: var(--entry-constellation-02-x);
   --fragment-target-y: var(--entry-constellation-02-y);
   --fragment-commit-scale: 0.34;
-  --fragment-mid-scale: 0.62;
-  --fragment-end-scale: 0.72;
+  --fragment-mid-scale: 0.68;
+  --fragment-end-scale: 0.78;
   --fragment-branch-a-x: 32%;
   --fragment-branch-a-y: -0.2rem;
   --fragment-branch-a-angle: -22deg;
@@ -1389,7 +1389,7 @@ button {
   --fragment-angle: -90deg;
   --fragment-delay: 1210ms;
   --fragment-duration: 533ms;
-  --fragment-width: clamp(2.85rem, 9.2vw, 5.7rem);
+  --fragment-width: clamp(3.2rem, 10.2vw, 6.3rem);
   --fragment-height: clamp(1px, 0.23vw, 1.9px);
   --fragment-separate-x: 0px;
   --fragment-separate-y: calc(-1 * min(8vh, 4rem));
@@ -1402,8 +1402,8 @@ button {
   --fragment-target-x: var(--entry-constellation-03-x);
   --fragment-target-y: var(--entry-constellation-03-y);
   --fragment-commit-scale: 0.28;
-  --fragment-mid-scale: 0.5;
-  --fragment-end-scale: 0.68;
+  --fragment-mid-scale: 0.58;
+  --fragment-end-scale: 0.74;
   --fragment-branch-a-x: 26%;
   --fragment-branch-a-y: 0.16rem;
   --fragment-branch-a-angle: 24deg;
@@ -1416,7 +1416,7 @@ button {
   --fragment-angle: -38deg;
   --fragment-delay: 1260ms;
   --fragment-duration: 517ms;
-  --fragment-width: clamp(3.55rem, 12vw, 7.2rem);
+  --fragment-width: clamp(3.95rem, 13.1vw, 7.9rem);
   --fragment-height: clamp(1.2px, 0.3vw, 2.3px);
   --fragment-separate-x: min(8vw, 4.7rem);
   --fragment-separate-y: calc(-1 * min(6vh, 3.2rem));
@@ -1429,8 +1429,8 @@ button {
   --fragment-target-x: var(--entry-constellation-04-x);
   --fragment-target-y: var(--entry-constellation-04-y);
   --fragment-commit-scale: 0.34;
-  --fragment-mid-scale: 0.64;
-  --fragment-end-scale: 0.72;
+  --fragment-mid-scale: 0.7;
+  --fragment-end-scale: 0.78;
   --fragment-branch-a-x: 30%;
   --fragment-branch-a-y: -0.18rem;
   --fragment-branch-a-angle: -20deg;
@@ -1443,7 +1443,7 @@ button {
   --fragment-angle: -11deg;
   --fragment-delay: 1310ms;
   --fragment-duration: 533ms;
-  --fragment-width: clamp(4.5rem, 15.5vw, 8.8rem);
+  --fragment-width: clamp(4.9rem, 17vw, 9.6rem);
   --fragment-height: clamp(1.45px, 0.34vw, 2.75px);
   --fragment-separate-x: min(10vw, 5.8rem);
   --fragment-separate-y: 0px;
@@ -1456,8 +1456,8 @@ button {
   --fragment-target-x: var(--entry-constellation-05-x);
   --fragment-target-y: var(--entry-constellation-05-y);
   --fragment-commit-scale: 0.36;
-  --fragment-mid-scale: 0.72;
-  --fragment-end-scale: 0.74;
+  --fragment-mid-scale: 0.8;
+  --fragment-end-scale: 0.8;
   --fragment-branch-a-x: 24%;
   --fragment-branch-a-y: -0.14rem;
   --fragment-branch-a-angle: -17deg;
@@ -1687,82 +1687,130 @@ button {
   opacity: 0;
   transform: translate3d(0, 0, 0);
   background:
-    radial-gradient(circle at 7% 14%, rgba(244, 244, 236, 0.58) 0 1.15px, transparent 2.2px),
-    radial-gradient(circle at 22% 32%, rgba(224, 78, 86, 0.32) 0 1.25px, transparent 2.35px),
-    radial-gradient(circle at 34% 11%, rgba(236, 236, 228, 0.48) 0 1px, transparent 2px),
-    radial-gradient(circle at 49% 27%, rgba(236, 236, 228, 0.44) 0 0.95px, transparent 1.9px),
-    radial-gradient(circle at 63% 18%, rgba(244, 244, 236, 0.64) 0 1.3px, transparent 2.45px),
-    radial-gradient(circle at 81% 36%, rgba(236, 236, 228, 0.42) 0 1px, transparent 1.95px),
-    radial-gradient(circle at 14% 62%, rgba(236, 236, 228, 0.46) 0 1.1px, transparent 2.1px),
-    radial-gradient(circle at 37% 74%, rgba(224, 78, 86, 0.28) 0 1.2px, transparent 2.3px),
-    radial-gradient(circle at 56% 58%, rgba(244, 244, 236, 0.68) 0 1.45px, transparent 2.65px),
-    radial-gradient(circle at 72% 78%, rgba(236, 236, 228, 0.4) 0 1px, transparent 1.95px),
-    radial-gradient(circle at 91% 68%, rgba(244, 244, 236, 0.52) 0 1.2px, transparent 2.25px);
+    radial-gradient(circle at 4% 8%, rgba(247, 247, 242, 0.28) 0 0.48px, transparent 0.92px),
+    radial-gradient(circle at 9% 18%, rgba(238, 217, 153, 0.2) 0 0.56px, transparent 1.06px),
+    radial-gradient(circle at 16% 7%, rgba(247, 247, 242, 0.22) 0 0.44px, transparent 0.86px),
+    radial-gradient(circle at 23% 19%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.8px),
+    radial-gradient(circle at 31% 9%, rgba(238, 217, 153, 0.18) 0 0.5px, transparent 0.95px),
+    radial-gradient(circle at 42% 16%, rgba(247, 247, 242, 0.26) 0 0.5px, transparent 0.98px),
+    radial-gradient(circle at 58% 9%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.84px),
+    radial-gradient(circle at 69% 17%, rgba(238, 217, 153, 0.2) 0 0.52px, transparent 1px),
+    radial-gradient(circle at 82% 8%, rgba(247, 247, 242, 0.24) 0 0.46px, transparent 0.9px),
+    radial-gradient(circle at 94% 19%, rgba(247, 247, 242, 0.19) 0 0.44px, transparent 0.88px),
+    radial-gradient(circle at 6% 34%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 17% 41%, rgba(238, 217, 153, 0.22) 0 0.54px, transparent 1.06px),
+    radial-gradient(circle at 28% 31%, rgba(247, 247, 242, 0.14) 0 0.36px, transparent 0.78px),
+    radial-gradient(circle at 38% 44%, rgba(247, 247, 242, 0.24) 0 0.48px, transparent 0.94px),
+    radial-gradient(circle at 48% 28%, rgba(238, 217, 153, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 61% 36%, rgba(247, 247, 242, 0.16) 0 0.4px, transparent 0.82px),
+    radial-gradient(circle at 73% 29%, rgba(247, 247, 242, 0.24) 0 0.48px, transparent 0.96px),
+    radial-gradient(circle at 87% 42%, rgba(238, 217, 153, 0.2) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 96% 33%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 3% 57%, rgba(238, 217, 153, 0.18) 0 0.44px, transparent 0.88px),
+    radial-gradient(circle at 12% 68%, rgba(247, 247, 242, 0.24) 0 0.52px, transparent 1.04px),
+    radial-gradient(circle at 24% 55%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.82px),
+    radial-gradient(circle at 33% 72%, rgba(238, 217, 153, 0.19) 0 0.48px, transparent 0.96px),
+    radial-gradient(circle at 46% 61%, rgba(247, 247, 242, 0.2) 0 0.46px, transparent 0.92px),
+    radial-gradient(circle at 57% 73%, rgba(247, 247, 242, 0.14) 0 0.36px, transparent 0.78px),
+    radial-gradient(circle at 68% 57%, rgba(238, 217, 153, 0.21) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 79% 68%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 91% 59%, rgba(247, 247, 242, 0.24) 0 0.5px, transparent 1px),
+    radial-gradient(circle at 7% 88%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 19% 79%, rgba(238, 217, 153, 0.2) 0 0.48px, transparent 0.98px),
+    radial-gradient(circle at 29% 92%, rgba(247, 247, 242, 0.22) 0 0.46px, transparent 0.92px),
+    radial-gradient(circle at 41% 83%, rgba(247, 247, 242, 0.15) 0 0.36px, transparent 0.78px),
+    radial-gradient(circle at 54% 94%, rgba(238, 217, 153, 0.18) 0 0.44px, transparent 0.9px),
+    radial-gradient(circle at 66% 84%, rgba(247, 247, 242, 0.22) 0 0.48px, transparent 0.96px),
+    radial-gradient(circle at 78% 93%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.82px),
+    radial-gradient(circle at 89% 81%, rgba(238, 217, 153, 0.19) 0 0.46px, transparent 0.94px),
+    radial-gradient(circle at 97% 91%, rgba(247, 247, 242, 0.2) 0 0.44px, transparent 0.9px),
+    radial-gradient(circle at 52% 51%, rgba(247, 247, 242, 0.12) 0 0.34px, transparent 0.72px),
+    radial-gradient(circle at 35% 23%, rgba(238, 217, 153, 0.3) 0 0.72px, rgba(238, 217, 153, 0.08) 0.9px 1.56px, transparent 2.1px),
+    radial-gradient(circle at 64% 22%, rgba(247, 247, 242, 0.34) 0 0.76px, rgba(247, 247, 242, 0.1) 0.95px 1.7px, transparent 2.24px),
+    radial-gradient(circle at 15% 52%, rgba(247, 247, 242, 0.32) 0 0.7px, rgba(238, 217, 153, 0.08) 0.88px 1.52px, transparent 2.1px),
+    radial-gradient(circle at 84% 63%, rgba(238, 217, 153, 0.3) 0 0.74px, rgba(238, 217, 153, 0.08) 0.92px 1.62px, transparent 2.18px),
+    radial-gradient(circle at 49% 86%, rgba(247, 247, 242, 0.28) 0 0.66px, rgba(247, 247, 242, 0.08) 0.84px 1.46px, transparent 2.02px);
   background-repeat: no-repeat;
   contain: strict;
-  filter: brightness(1.68) contrast(1.08);
-  will-change: opacity, transform, filter;
+  filter: brightness(1.32) contrast(1.04);
+  will-change: opacity, transform;
 }
 
 .ambient-void-stars::before,
 .ambient-void-stars::after {
   position: absolute;
-  inset: -3%;
+  inset: -4%;
   content: "";
-  opacity: 0.84;
+  opacity: 0.72;
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   background-repeat: no-repeat;
-  will-change: opacity, transform, filter;
+  will-change: opacity, transform;
 }
 
 .ambient-void-stars::before {
   background:
-    radial-gradient(circle at 5% 42%, rgba(236, 236, 228, 0.36) 0 0.9px, transparent 1.75px),
-    radial-gradient(circle at 18% 83%, rgba(244, 244, 236, 0.52) 0 1.18px, transparent 2.18px),
-    radial-gradient(circle at 28% 52%, rgba(236, 236, 228, 0.4) 0 1px, transparent 1.9px),
-    radial-gradient(circle at 43% 88%, rgba(224, 78, 86, 0.25) 0 1.12px, transparent 2.12px),
-    radial-gradient(circle at 54% 39%, rgba(244, 244, 236, 0.56) 0 1.28px, transparent 2.36px),
-    radial-gradient(circle at 67% 53%, rgba(236, 236, 228, 0.38) 0 0.95px, transparent 1.85px),
-    radial-gradient(circle at 76% 12%, rgba(236, 236, 228, 0.44) 0 1.08px, transparent 2.05px),
-    radial-gradient(circle at 86% 88%, rgba(244, 244, 236, 0.48) 0 1.16px, transparent 2.14px),
-    radial-gradient(circle at 96% 28%, rgba(224, 78, 86, 0.23) 0 1.18px, transparent 2.25px),
-    radial-gradient(circle at 11% 6%, rgba(236, 236, 228, 0.42) 0 1px, transparent 1.95px),
-    radial-gradient(circle at 61% 91%, rgba(236, 236, 228, 0.46) 0 1.06px, transparent 2px);
+    radial-gradient(circle at 8% 27%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.82px),
+    radial-gradient(circle at 14% 9%, rgba(238, 217, 153, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 21% 48%, rgba(247, 247, 242, 0.2) 0 0.46px, transparent 0.92px),
+    radial-gradient(circle at 28% 84%, rgba(247, 247, 242, 0.14) 0 0.34px, transparent 0.76px),
+    radial-gradient(circle at 37% 63%, rgba(238, 217, 153, 0.18) 0 0.44px, transparent 0.9px),
+    radial-gradient(circle at 44% 12%, rgba(247, 247, 242, 0.18) 0 0.4px, transparent 0.84px),
+    radial-gradient(circle at 51% 39%, rgba(247, 247, 242, 0.15) 0 0.36px, transparent 0.78px),
+    radial-gradient(circle at 59% 67%, rgba(238, 217, 153, 0.2) 0 0.46px, transparent 0.94px),
+    radial-gradient(circle at 67% 4%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 74% 47%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.8px),
+    radial-gradient(circle at 83% 24%, rgba(238, 217, 153, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 92% 72%, rgba(247, 247, 242, 0.2) 0 0.48px, transparent 0.96px),
+    radial-gradient(circle at 3% 76%, rgba(247, 247, 242, 0.22) 0 0.52px, transparent 1px),
+    radial-gradient(circle at 33% 36%, rgba(247, 247, 242, 0.12) 0 0.32px, transparent 0.72px),
+    radial-gradient(circle at 88% 92%, rgba(238, 217, 153, 0.16) 0 0.38px, transparent 0.82px),
+    radial-gradient(circle at 72% 86%, rgba(247, 247, 242, 0.22) 0 0.54px, rgba(247, 247, 242, 0.08) 0.7px 1.24px, transparent 1.86px),
+    radial-gradient(circle at 11% 61%, rgba(238, 217, 153, 0.24) 0 0.58px, rgba(238, 217, 153, 0.07) 0.78px 1.34px, transparent 1.92px),
+    radial-gradient(circle at 55% 18%, rgba(247, 247, 242, 0.26) 0 0.62px, rgba(247, 247, 242, 0.08) 0.82px 1.42px, transparent 2px);
 }
 
 .ambient-void-stars::after {
-  opacity: 0.78;
+  opacity: 0.66;
   background:
-    radial-gradient(circle at 13% 22%, rgba(236, 236, 228, 0.38) 0 0.95px, transparent 1.78px),
-    radial-gradient(circle at 25% 67%, rgba(244, 244, 236, 0.5) 0 1.16px, transparent 2.16px),
-    radial-gradient(circle at 47% 6%, rgba(236, 236, 228, 0.42) 0 1.04px, transparent 1.98px),
-    radial-gradient(circle at 69% 70%, rgba(224, 78, 86, 0.27) 0 1.18px, transparent 2.22px),
-    radial-gradient(circle at 84% 54%, rgba(236, 236, 228, 0.44) 0 1.06px, transparent 2px),
-    radial-gradient(circle at 92% 15%, rgba(244, 244, 236, 0.52) 0 1.25px, transparent 2.32px),
-    radial-gradient(circle at 39% 36%, rgba(236, 236, 228, 0.36) 0 0.9px, transparent 1.75px),
-    radial-gradient(circle at 58% 23%, rgba(236, 236, 228, 0.4) 0 1px, transparent 1.9px);
+    radial-gradient(circle at 6% 46%, rgba(247, 247, 242, 0.14) 0 0.34px, transparent 0.76px),
+    radial-gradient(circle at 13% 22%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 20% 91%, rgba(238, 217, 153, 0.16) 0 0.38px, transparent 0.82px),
+    radial-gradient(circle at 30% 15%, rgba(247, 247, 242, 0.2) 0 0.46px, transparent 0.92px),
+    radial-gradient(circle at 40% 76%, rgba(247, 247, 242, 0.15) 0 0.36px, transparent 0.78px),
+    radial-gradient(circle at 47% 6%, rgba(238, 217, 153, 0.18) 0 0.44px, transparent 0.9px),
+    radial-gradient(circle at 56% 33%, rgba(247, 247, 242, 0.14) 0 0.34px, transparent 0.76px),
+    radial-gradient(circle at 63% 88%, rgba(247, 247, 242, 0.2) 0 0.48px, transparent 0.96px),
+    radial-gradient(circle at 71% 12%, rgba(247, 247, 242, 0.16) 0 0.38px, transparent 0.8px),
+    radial-gradient(circle at 80% 51%, rgba(238, 217, 153, 0.18) 0 0.42px, transparent 0.86px),
+    radial-gradient(circle at 89% 38%, rgba(247, 247, 242, 0.2) 0 0.46px, transparent 0.92px),
+    radial-gradient(circle at 97% 79%, rgba(247, 247, 242, 0.14) 0 0.34px, transparent 0.76px),
+    radial-gradient(circle at 25% 66%, rgba(247, 247, 242, 0.24) 0 0.56px, rgba(247, 247, 242, 0.08) 0.74px 1.3px, transparent 1.92px),
+    radial-gradient(circle at 69% 72%, rgba(238, 217, 153, 0.22) 0 0.54px, rgba(238, 217, 153, 0.07) 0.72px 1.26px, transparent 1.86px),
+    radial-gradient(circle at 92% 15%, rgba(247, 247, 242, 0.26) 0 0.62px, rgba(247, 247, 242, 0.08) 0.82px 1.44px, transparent 2px);
 }
 
-.site-shell.is-home-route .ambient-void-stars {
+.site-shell.is-home-route .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars {
   display: block;
-  opacity: 0.9;
+  opacity: 0.92;
   animation:
     voidStarReveal 1.8s var(--ease-breath) both,
-    voidStarDrift 112s linear infinite alternate,
-    voidStarFieldFlicker 37s var(--ease-breath) 2.1s infinite;
+    voidStarDrift 132s linear infinite alternate;
 }
 
-.site-shell.is-home-route .ambient-void-stars::before {
+.site-shell.is-home-route .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars::before {
   animation:
-    voidStarLayerDrift 148s linear infinite alternate,
-    voidStarTwinkle 41s var(--ease-breath) -7s infinite;
+    voidStarLayerDrift 168s linear infinite alternate,
+    voidStarTwinkle 34s var(--ease-breath) -7s infinite;
 }
 
-.site-shell.is-home-route .ambient-void-stars::after {
+.site-shell.is-home-route .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {
   animation:
-    voidStarLayerDrift 181s linear -41s infinite alternate-reverse,
-    voidStarTwinkleSoft 53s var(--ease-breath) -19s infinite;
+    voidStarLayerDrift 203s linear -41s infinite alternate-reverse,
+    voidStarTwinkleSoft 47s var(--ease-breath) -19s infinite;
 }
 
 .ambient-energy {
@@ -2018,43 +2066,52 @@ button {
     filter: blur(0) brightness(1.08);
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
-  28% {
+  34% {
     opacity: 0.94;
     filter: blur(0) brightness(1);
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
-  56% {
-    opacity: 0.28;
-    filter: blur(0.08rem) brightness(1.16);
-    transform: translate3d(0, 0, 0) scale3d(0.38, 0.92, 1);
+  48% {
+    opacity: 0.72;
+    filter: blur(0.018rem) brightness(1.08);
+    transform: translate3d(0, 0, 0) scale3d(0.68, 0.98, 1);
   }
-  70%,
+  62% {
+    opacity: 0.32;
+    filter: blur(0.055rem) brightness(1.14);
+    transform: translate3d(0, 0, 0) scale3d(0.32, 0.94, 1);
+  }
+  76%,
   100% {
     opacity: 0;
-    filter: blur(0.11rem) brightness(0.82);
-    transform: translate3d(0, 0, 0) scale3d(0.22, 0.9, 1);
+    filter: blur(0.1rem) brightness(0.86);
+    transform: translate3d(0, 0, 0) scale3d(0.14, 0.9, 1);
   }
 }
 
 @keyframes archiveIdentityMarkMorph {
   0%,
-  22% {
+  30% {
     opacity: 0;
-    filter: blur(0.1rem) brightness(0.86);
-    transform: translate3d(0, 0, 0) scale3d(0.72, 0.94, 1);
+    filter: blur(0.09rem) brightness(0.86);
+    transform: translate3d(0, 0, 0) scale3d(0.34, 0.92, 1);
   }
-  34% {
+  42% {
+    opacity: 0.42;
+    filter: blur(0.035rem) brightness(1.1);
+    transform: translate3d(0, 0, 0) scale3d(0.72, 0.96, 1);
+  }
+  54% {
     opacity: 0.96;
-    filter: blur(0.02rem) brightness(1.12);
-    transform: translate3d(0, 0, 0) scale3d(1.04, 1, 1);
+    filter: blur(0.006rem) brightness(1.12);
+    transform: translate3d(0, 0, 0) scale3d(1.035, 1.01, 1);
   }
-  44%,
-  52% {
+  64% {
     opacity: 0.96;
-    filter: blur(0) brightness(1);
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    filter: blur(0) brightness(1.02);
+    transform: translate3d(0, 0, 0) scale3d(0.99, 0.99, 1);
   }
-  68%,
+  78%,
   100% {
     opacity: 0.96;
     filter: blur(0) brightness(1.02);
@@ -2178,69 +2235,69 @@ button {
     transform: translate3d(-50%, -50%, 0) rotate(var(--fragment-angle)) scaleX(0.035);
   }
 
-  14% {
-    opacity: 0.72;
+  13% {
+    opacity: 0.76;
     filter:
-      drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.72))
-      drop-shadow(0 0 0.42rem rgba(213, 22, 34, 0.36));
-    transform: translate3d(calc(-50% + var(--fragment-separate-x) + 0.16rem), calc(-50% + var(--fragment-separate-y) - 0.04rem), 0) rotate(calc(var(--fragment-angle) + 0.8deg)) scaleX(0.14);
+      drop-shadow(0 0 0.16rem rgba(255, 57, 18, 0.68))
+      drop-shadow(0 0 0.38rem rgba(213, 22, 34, 0.32));
+    transform: translate3d(calc(-50% + var(--fragment-separate-x) - 0.12rem), calc(-50% + var(--fragment-separate-y) - 0.08rem), 0) rotate(calc(var(--fragment-angle) + 1.9deg)) scaleX(0.2);
   }
 
   22% {
+    opacity: 0.48;
+    filter:
+      drop-shadow(0 0 0.1rem rgba(255, 151, 38, 0.38))
+      drop-shadow(0 0 0.24rem rgba(213, 22, 34, 0.22));
+    transform: translate3d(calc(-50% + var(--fragment-commit-x) + 0.14rem), calc(-50% + var(--fragment-commit-y) + 0.12rem), 0) rotate(calc(var(--fragment-angle) - 1.8deg)) scaleX(var(--fragment-commit-scale));
+  }
+
+  31% {
+    opacity: 0.96;
+    filter:
+      drop-shadow(0 0 0.18rem rgba(255, 57, 18, 0.78))
+      drop-shadow(0 0 0.46rem rgba(213, 22, 34, 0.38));
+    transform: translate3d(calc(-50% + var(--fragment-commit-x) - 0.16rem), calc(-50% + var(--fragment-commit-y) - 0.06rem), 0) rotate(calc(var(--fragment-angle) + 1.1deg)) scaleX(calc(var(--fragment-commit-scale) + 0.08));
+  }
+
+  41% {
+    opacity: 0.62;
+    transform: translate3d(calc(-50% + var(--fragment-mid-x) + 0.18rem), calc(-50% + var(--fragment-mid-y) - 0.12rem), 0) rotate(calc(var(--fragment-angle) - 1.35deg)) scaleX(var(--fragment-mid-scale));
+  }
+
+  53% {
+    opacity: 0.86;
+    filter:
+      drop-shadow(0 0 0.14rem rgba(247, 247, 242, 0.3))
+      drop-shadow(0 0 0.42rem rgba(255, 57, 18, 0.38));
+    transform: translate3d(calc(-50% + var(--fragment-mid-x) - 0.1rem), calc(-50% + var(--fragment-mid-y) + 0.08rem), 0) rotate(calc(var(--fragment-angle) + 0.9deg)) scaleX(calc(var(--fragment-mid-scale) + 0.08));
+  }
+
+  62% {
     opacity: 0.52;
-    filter:
-      drop-shadow(0 0 0.12rem rgba(255, 151, 38, 0.42))
-      drop-shadow(0 0 0.26rem rgba(213, 22, 34, 0.24));
-    transform: translate3d(calc(-50% + var(--fragment-commit-x)), calc(-50% + var(--fragment-commit-y) + 0.1rem), 0) rotate(calc(var(--fragment-angle) - 0.9deg)) scaleX(var(--fragment-commit-scale));
-  }
-
-  30% {
-    opacity: 0.94;
-    filter:
-      drop-shadow(0 0 0.2rem rgba(255, 57, 18, 0.82))
-      drop-shadow(0 0 0.52rem rgba(213, 22, 34, 0.42));
-    transform: translate3d(calc(-50% + var(--fragment-commit-x) - 0.08rem), calc(-50% + var(--fragment-commit-y)), 0) rotate(calc(var(--fragment-angle) + 0.45deg)) scaleX(var(--fragment-commit-scale));
-  }
-
-  40% {
-    opacity: 0.68;
-    transform: translate3d(calc(-50% + var(--fragment-mid-x)), calc(-50% + var(--fragment-mid-y) - 0.09rem), 0) rotate(calc(var(--fragment-angle) - 0.55deg)) scaleX(var(--fragment-mid-scale));
-  }
-
-  52% {
-    opacity: 0.82;
-    filter:
-      drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.34))
-      drop-shadow(0 0 0.5rem rgba(255, 57, 18, 0.42));
-    transform: translate3d(calc(-50% + var(--fragment-mid-x) + 0.1rem), calc(-50% + var(--fragment-mid-y)), 0) rotate(calc(var(--fragment-angle) + 0.35deg)) scaleX(var(--fragment-mid-scale));
-  }
-
-  61% {
-    opacity: 0.5;
-    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y) + 0.08rem), 0) rotate(calc(var(--fragment-angle) - 0.7deg)) scaleX(var(--fragment-end-scale));
+    transform: translate3d(calc(-50% + var(--fragment-end-x) - 0.08rem), calc(-50% + var(--fragment-end-y) + 0.12rem), 0) rotate(calc(var(--fragment-angle) - 1.15deg)) scaleX(var(--fragment-end-scale));
   }
 
   70% {
-    opacity: 0.42;
+    opacity: 0.4;
     filter:
-      drop-shadow(0 0 0.11rem rgba(255, 74, 24, 0.4))
-      drop-shadow(0 0 0.3rem rgba(213, 22, 34, 0.28));
-    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-end-scale));
+      drop-shadow(0 0 0.1rem rgba(255, 74, 24, 0.34))
+      drop-shadow(0 0 0.26rem rgba(213, 22, 34, 0.24));
+    transform: translate3d(calc(-50% + var(--fragment-end-x)), calc(-50% + var(--fragment-end-y)), 0) rotate(calc(var(--fragment-angle) + 0.45deg)) scaleX(var(--fragment-end-scale));
   }
 
   80% {
-    opacity: 0.58;
+    opacity: 0.56;
     filter:
-      drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.26))
-      drop-shadow(0 0 0.46rem rgba(255, 57, 18, 0.42));
-    transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(calc(var(--fragment-angle) + 0.28deg)) scaleX(0.38);
+      drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.24))
+      drop-shadow(0 0 0.4rem rgba(255, 57, 18, 0.38));
+    transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(calc(var(--fragment-angle) - 0.36deg)) scaleX(0.32);
   }
 
-  86% {
-    opacity: 0.28;
+  87% {
+    opacity: 0.24;
     filter:
-      drop-shadow(0 0 0.16rem rgba(247, 247, 242, 0.32))
-      drop-shadow(0 0 0.5rem rgba(255, 57, 18, 0.5));
+      drop-shadow(0 0 0.14rem rgba(247, 247, 242, 0.28))
+      drop-shadow(0 0 0.42rem rgba(255, 57, 18, 0.42));
     transform: translate3d(calc(-50% + var(--fragment-target-x)), calc(-50% + var(--fragment-target-y)), 0) rotate(var(--fragment-angle)) scaleX(var(--fragment-target-scale));
   }
 
@@ -2253,30 +2310,35 @@ button {
 
 @keyframes homeArchiveEntryLightningBranch {
   0%,
-  10% {
+  9% {
     opacity: 0;
-    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.16);
+    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.14);
   }
 
-  18% {
-    opacity: 0.74;
-    transform: translate3d(0.08rem, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.86);
+  17% {
+    opacity: 0.78;
+    transform: translate3d(0.1rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) + 3deg)) scaleX(1.04);
   }
 
-  34% {
-    opacity: 0.18;
-    transform: translate3d(-0.04rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) - 2deg)) scaleX(0.48);
+  28% {
+    opacity: 0.24;
+    transform: translate3d(-0.07rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) - 4.6deg)) scaleX(0.52);
   }
 
-  46% {
-    opacity: 0.66;
-    transform: translate3d(0.12rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) + 1.4deg)) scaleX(0.72);
+  43% {
+    opacity: 0.7;
+    transform: translate3d(0.15rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) + 2.8deg)) scaleX(0.92);
   }
 
-  72%,
+  58% {
+    opacity: 0.34;
+    transform: translate3d(-0.04rem, var(--fragment-branch-y), 0) rotate(calc(var(--fragment-branch-angle) - 2.2deg)) scaleX(0.64);
+  }
+
+  74%,
   100% {
     opacity: 0;
-    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.2);
+    transform: translate3d(0, var(--fragment-branch-y), 0) rotate(var(--fragment-branch-angle)) scaleX(0.18);
   }
 }
 
@@ -3647,16 +3709,16 @@ button {
 @keyframes voidStarFieldFlicker {
   0%,
   100% {
-    filter: brightness(1.58) contrast(1.07);
+    opacity: 0.92;
   }
   31% {
-    filter: brightness(1.72) contrast(1.08);
+    opacity: 0.96;
   }
   64% {
-    filter: brightness(1.62) contrast(1.06);
+    opacity: 0.9;
   }
   82% {
-    filter: brightness(1.76) contrast(1.09);
+    opacity: 0.97;
   }
 }
 
@@ -5419,4 +5481,17 @@ button {
 .module-placeholder-back:focus-visible {
   outline: 2px solid rgba(247, 247, 242, 0.82);
   outline-offset: 0.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"] .ambient-void-stars,
+  .site-shell[data-shell-route="portfolio"] .ambient-void-stars::before,
+  .site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {
+    animation: none;
+    transform: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"] .ambient-void-stars {
+    opacity: 0.86;
+  }
 }
