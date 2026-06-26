@@ -1304,6 +1304,8 @@ button {
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-awakening {
   display: block;
+  background: transparent;
+  filter: none;
   animation: homeArchiveFixedFieldHold 660ms cubic-bezier(0.22, 0.78, 0.18, 1) 260ms both;
 }
 
