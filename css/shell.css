@@ -2581,6 +2581,7 @@ button {
   background: transparent;
   filter: none;
   transform: none;
+  --nebula-wormhole-duration: 2360ms;
   animation: none;
 }
 
@@ -2636,11 +2637,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .nebula-stage--1 {
-  animation: nebulaWormholeStageOne 1840ms cubic-bezier(0.16, 0.74, 0.12, 1) both;
+  animation: nebulaWormholeStageOne var(--nebula-wormhole-duration, 2360ms) cubic-bezier(0.16, 0.74, 0.12, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .nebula-stage--4 {
-  animation: nebulaWormholeStageFour 1840ms cubic-bezier(0.16, 0.74, 0.12, 1) both;
+  animation: nebulaWormholeStageFour var(--nebula-wormhole-duration, 2360ms) cubic-bezier(0.16, 0.74, 0.12, 1) both;
 }
 
 .site-shell.is-home-route .ambient-void-stars::before,
@@ -2674,36 +2675,36 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before {
   z-index: 3;
-  inset: -34%;
+  inset: -36%;
   opacity: 0;
   background:
-    radial-gradient(circle at 50% 50%, rgba(248, 252, 255, 0.5) 0 0.72%, rgba(120, 205, 255, 0.32) 1.55%, transparent 4.2%),
-    radial-gradient(circle at 50% 50%, transparent 0 9%, rgba(246, 252, 255, 0.16) 12%, transparent 15% 22%, rgba(80, 174, 255, 0.18) 27%, transparent 32% 100%),
-    radial-gradient(circle at 50% 50%, transparent 0 34%, rgba(210, 238, 255, 0.1) 36%, transparent 39% 100%),
-    linear-gradient(90deg, transparent 0 42%, rgba(238, 250, 255, 0.5) 48.7%, rgba(110, 198, 255, 0.64) 50%, transparent 56% 100%),
-    linear-gradient(0deg, transparent 0 42%, rgba(238, 250, 255, 0.42) 48.5%, rgba(126, 210, 255, 0.56) 50%, transparent 56% 100%),
-    linear-gradient(28deg, transparent 0 43%, rgba(235, 249, 255, 0.34) 49%, rgba(98, 188, 255, 0.48) 50.2%, transparent 56% 100%),
-    linear-gradient(152deg, transparent 0 43%, rgba(247, 252, 255, 0.3) 49%, rgba(84, 176, 255, 0.42) 50.2%, transparent 56% 100%),
-    linear-gradient(62deg, transparent 0 44%, rgba(210, 238, 255, 0.28) 49.4%, transparent 55% 100%),
-    linear-gradient(118deg, transparent 0 44%, rgba(210, 238, 255, 0.26) 49.4%, transparent 55% 100%);
+    radial-gradient(circle at 50% 50%, rgba(248, 252, 255, 0.34) 0 0.64%, rgba(120, 205, 255, 0.24) 1.38%, transparent 4.4%),
+    radial-gradient(circle at 50% 50%, transparent 0 9%, rgba(246, 252, 255, 0.12) 12%, transparent 15% 22%, rgba(80, 174, 255, 0.14) 28%, transparent 34% 100%),
+    radial-gradient(circle at 50% 50%, transparent 0 32%, rgba(210, 238, 255, 0.08) 35%, transparent 40% 100%),
+    linear-gradient(90deg, transparent 0 42%, rgba(238, 250, 255, 0.36) 48.7%, rgba(110, 198, 255, 0.46) 50%, transparent 56% 100%),
+    linear-gradient(0deg, transparent 0 42%, rgba(238, 250, 255, 0.32) 48.5%, rgba(126, 210, 255, 0.42) 50%, transparent 56% 100%),
+    linear-gradient(28deg, transparent 0 43%, rgba(235, 249, 255, 0.26) 49%, rgba(98, 188, 255, 0.36) 50.2%, transparent 56% 100%),
+    linear-gradient(152deg, transparent 0 43%, rgba(247, 252, 255, 0.24) 49%, rgba(84, 176, 255, 0.32) 50.2%, transparent 56% 100%),
+    linear-gradient(62deg, transparent 0 44%, rgba(210, 238, 255, 0.2) 49.4%, transparent 55% 100%),
+    linear-gradient(118deg, transparent 0 44%, rgba(210, 238, 255, 0.2) 49.4%, transparent 55% 100%);
   mix-blend-mode: normal;
   transform-origin: 50% 50%;
-  transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
-  animation: nebulaWormholeStreaks 1840ms cubic-bezier(0.16, 0.74, 0.12, 1) both;
+  transform: translate3d(0, 0, 0) scale(0.26) rotate(0deg);
+  animation: nebulaWormholeStreaks var(--nebula-wormhole-duration, 2360ms) cubic-bezier(0.16, 0.74, 0.12, 1) both;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::after {
   z-index: 2;
-  inset: -24%;
+  inset: -28%;
   opacity: 0;
   background:
-    radial-gradient(circle at 50% 50%, rgba(248, 252, 255, 0.88) 0 0.88%, rgba(127, 211, 255, 0.58) 2.1%, transparent 6.2%),
-    radial-gradient(circle at 50% 50%, transparent 0 15%, rgba(240, 250, 255, 0.2) 19%, transparent 24% 33%, rgba(74, 169, 255, 0.19) 39%, transparent 47% 100%),
-    radial-gradient(ellipse at 50% 50%, transparent 0 25%, rgba(7, 18, 40, 0.34) 54%, rgba(1, 4, 12, 0.86) 100%),
-    linear-gradient(180deg, rgba(1, 4, 12, 0.28), transparent 35% 63%, rgba(1, 4, 12, 0.34));
+    radial-gradient(circle at 50% 50%, rgba(248, 252, 255, 0.6) 0 0.76%, rgba(127, 211, 255, 0.42) 2%, transparent 6.6%),
+    radial-gradient(circle at 50% 50%, transparent 0 14%, rgba(240, 250, 255, 0.16) 18%, transparent 24% 33%, rgba(74, 169, 255, 0.15) 40%, transparent 50% 100%),
+    radial-gradient(ellipse at 50% 50%, transparent 0 24%, rgba(7, 18, 40, 0.3) 52%, rgba(1, 4, 12, 0.82) 100%),
+    linear-gradient(180deg, rgba(1, 4, 12, 0.24), transparent 34% 64%, rgba(1, 4, 12, 0.3));
   mix-blend-mode: normal;
   transform-origin: 50% 50%;
-  transform: translate3d(0, 0, 0) scale(0.38) rotate(0deg);
-  animation: nebulaWormholeCore 1840ms cubic-bezier(0.16, 0.74, 0.12, 1) both;
+  transform: translate3d(0, 0, 0) scale(0.32) rotate(0deg);
+  animation: nebulaWormholeCore var(--nebula-wormhole-duration, 2360ms) cubic-bezier(0.16, 0.74, 0.12, 1) both;
 }
 .ambient-energy {
   z-index: 1;
@@ -4689,48 +4690,50 @@ button {
 }
 
 @keyframes nebulaWormholeStageOne {
-  0%,
-  12% {
+  0% {
     opacity: 0.8;
     transform: translate3d(0, 0, 0) scale(1.018) rotate(0deg);
   }
-  26% {
-    opacity: 0.76;
-    transform: translate3d(-0.05rem, -0.04rem, 0) scale(1.08) rotate(-0.12deg);
+  18% {
+    opacity: 0.72;
+    transform: translate3d(-0.04rem, -0.03rem, 0) scale(1.08) rotate(-0.1deg);
   }
-  42% {
-    opacity: 0.42;
-    transform: translate3d(-0.15rem, -0.1rem, 0) scale(1.19) rotate(-0.3deg);
+  34% {
+    opacity: 0.5;
+    transform: translate3d(-0.1rem, -0.07rem, 0) scale(1.18) rotate(-0.24deg);
   }
-  58% {
-    opacity: 0.08;
-    transform: translate3d(-0.24rem, -0.16rem, 0) scale(1.31) rotate(-0.48deg);
+  52% {
+    opacity: 0.2;
+    transform: translate3d(-0.18rem, -0.12rem, 0) scale(1.29) rotate(-0.42deg);
   }
-  74%,
+  72% {
+    opacity: 0.04;
+    transform: translate3d(-0.26rem, -0.17rem, 0) scale(1.41) rotate(-0.58deg);
+  }
   100% {
     opacity: 0;
-    transform: translate3d(-0.3rem, -0.2rem, 0) scale(1.42) rotate(-0.62deg);
+    transform: translate3d(-0.32rem, -0.21rem, 0) scale(1.52) rotate(-0.68deg);
   }
 }
 @keyframes nebulaWormholeStageFour {
   0%,
-  26% {
+  24% {
     opacity: 0;
-    transform: translate3d(0.16rem, 0.1rem, 0) scale(1.38) rotate(0.6deg);
+    transform: translate3d(0.18rem, 0.11rem, 0) scale(1.44) rotate(0.64deg);
   }
-  40% {
-    opacity: 0.08;
-    transform: translate3d(0.12rem, 0.07rem, 0) scale(1.31) rotate(0.46deg);
+  42% {
+    opacity: 0.14;
+    transform: translate3d(0.12rem, 0.07rem, 0) scale(1.32) rotate(0.46deg);
   }
-  56% {
-    opacity: 0.36;
-    transform: translate3d(0.07rem, 0.04rem, 0) scale(1.2) rotate(0.26deg);
+  60% {
+    opacity: 0.4;
+    transform: translate3d(0.07rem, 0.04rem, 0) scale(1.2) rotate(0.28deg);
   }
-  72% {
-    opacity: 0.74;
-    transform: translate3d(0.02rem, 0.01rem, 0) scale(1.08) rotate(0.1deg);
+  78% {
+    opacity: 0.68;
+    transform: translate3d(0.025rem, 0.015rem, 0) scale(1.09) rotate(0.12deg);
   }
-  88%,
+  94%,
   100% {
     opacity: 0.8;
     transform: translate3d(0, 0, 0) scale(1.02) rotate(0deg);
@@ -4738,64 +4741,64 @@ button {
 }
 @keyframes nebulaWormholeStreaks {
   0%,
-  7% {
+  8% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(0.26) rotate(0deg);
   }
-  18% {
-    opacity: 0.32;
-    transform: translate3d(0, 0, 0) scale(0.78) rotate(0.18deg);
+  22% {
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(0.78) rotate(0.22deg);
   }
-  32% {
-    opacity: 0.82;
-    transform: translate3d(0, 0, 0) scale(1.28) rotate(0.62deg);
+  38% {
+    opacity: 0.66;
+    transform: translate3d(0, 0, 0) scale(1.38) rotate(0.68deg);
   }
-  48% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1.96) rotate(1.08deg);
+  54% {
+    opacity: 0.78;
+    transform: translate3d(0, 0, 0) scale(2.04) rotate(1.08deg);
   }
-  64% {
-    opacity: 0.92;
-    transform: translate3d(0, 0, 0) scale(2.54) rotate(1.46deg);
+  70% {
+    opacity: 0.58;
+    transform: translate3d(0, 0, 0) scale(2.68) rotate(1.42deg);
   }
-  80% {
-    opacity: 0.32;
-    transform: translate3d(0, 0, 0) scale(3.08) rotate(1.72deg);
+  86% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(3.2) rotate(1.68deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(3.34) rotate(1.88deg);
+    transform: translate3d(0, 0, 0) scale(3.56) rotate(1.86deg);
   }
 }
 @keyframes nebulaWormholeCore {
   0%,
   9% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(0.38) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(0.32) rotate(0deg);
   }
-  22% {
-    opacity: 0.36;
-    transform: translate3d(0, 0, 0) scale(0.74) rotate(-0.16deg);
+  24% {
+    opacity: 0.28;
+    transform: translate3d(0, 0, 0) scale(0.72) rotate(-0.16deg);
   }
-  38% {
-    opacity: 0.86;
-    transform: translate3d(0, 0, 0) scale(1.16) rotate(-0.42deg);
+  42% {
+    opacity: 0.58;
+    transform: translate3d(0, 0, 0) scale(1.22) rotate(-0.44deg);
   }
-  54% {
-    opacity: 0.96;
-    transform: translate3d(0, 0, 0) scale(1.7) rotate(-0.72deg);
+  58% {
+    opacity: 0.68;
+    transform: translate3d(0, 0, 0) scale(1.82) rotate(-0.74deg);
   }
-  70% {
-    opacity: 0.72;
-    transform: translate3d(0, 0, 0) scale(2.2) rotate(-0.98deg);
+  74% {
+    opacity: 0.5;
+    transform: translate3d(0, 0, 0) scale(2.36) rotate(-0.98deg);
   }
-  84% {
-    opacity: 0.24;
-    transform: translate3d(0, 0, 0) scale(2.58) rotate(-1.12deg);
+  88% {
+    opacity: 0.22;
+    transform: translate3d(0, 0, 0) scale(2.78) rotate(-1.14deg);
   }
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0) scale(2.78) rotate(-1.2deg);
+    transform: translate3d(0, 0, 0) scale(3.04) rotate(-1.24deg);
   }
 }
 @keyframes nebulaSparkleTwinkle {
