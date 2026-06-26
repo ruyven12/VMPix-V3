@@ -1196,14 +1196,35 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation {
+  --constellation-trace-opacity: 0.58;
+  --constellation-core-opacity: 0.72;
   animation: none;
-  opacity: 0.36;
+  filter:
+    drop-shadow(0 0 0.18rem rgba(247, 247, 242, 0.28))
+    drop-shadow(0 0 0.55rem rgba(238, 217, 153, 0.22));
+  opacity: 0.72;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation::before {
+  opacity: var(--constellation-trace-opacity);
+  background: linear-gradient(90deg, transparent, rgba(238, 217, 153, 0.68) 42%, rgba(247, 247, 242, 0.56), transparent);
+  box-shadow:
+    0 0 0.24rem rgba(238, 217, 153, 0.22),
+    0 0 0.46rem rgba(247, 247, 242, 0.1);
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation::after {
+  opacity: var(--constellation-core-opacity);
+  background: radial-gradient(circle, rgba(247, 247, 242, 0.74) 0 15%, rgba(238, 217, 153, 0.34) 33%, rgba(220, 188, 108, 0.12) 54%, transparent 76%);
+  box-shadow:
+    0 0 0.2rem rgba(247, 247, 242, 0.24),
+    0 0 0.5rem rgba(238, 217, 153, 0.2);
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first,
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
-  opacity: 0.45;
+  opacity: 0.82;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-constellation {
@@ -1732,7 +1753,7 @@ button {
     radial-gradient(circle at 49% 86%, rgba(247, 247, 242, 0.28) 0 0.66px, rgba(247, 247, 242, 0.08) 0.84px 1.46px, transparent 2.02px);
   background-repeat: no-repeat;
   contain: strict;
-  filter: brightness(1.32) contrast(1.04);
+  filter: brightness(1.78) contrast(1.14);
   will-change: opacity, transform;
 }
 
@@ -1741,7 +1762,7 @@ button {
   position: absolute;
   inset: -4%;
   content: "";
-  opacity: 0.72;
+  opacity: 0.86;
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   background-repeat: no-repeat;
@@ -1771,7 +1792,7 @@ button {
 }
 
 .ambient-void-stars::after {
-  opacity: 0.66;
+  opacity: 0.8;
   background:
     radial-gradient(circle at 6% 46%, rgba(247, 247, 242, 0.14) 0 0.34px, transparent 0.76px),
     radial-gradient(circle at 13% 22%, rgba(247, 247, 242, 0.18) 0 0.42px, transparent 0.86px),
@@ -1793,7 +1814,7 @@ button {
 .site-shell.is-home-route .ambient-void-stars,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars {
   display: block;
-  opacity: 0.92;
+  opacity: 1;
   animation:
     voidStarReveal 1.8s var(--ease-breath) both,
     voidStarDrift 132s linear infinite alternate;
@@ -3679,13 +3700,17 @@ button {
     opacity: 0.42;
     transform: scale3d(1, 1, 1);
   }
-}@keyframes voidStarReveal {
-  0%,
+}
+
+@keyframes voidStarReveal {
+  0% {
+    opacity: 0.52;
+  }
   18% {
-    opacity: 0;
+    opacity: 0.68;
   }
   100% {
-    opacity: 0.9;
+    opacity: 1;
   }
 }
 @keyframes voidStarDrift {
@@ -3725,26 +3750,26 @@ button {
 @keyframes voidStarTwinkle {
   0%,
   100% {
-    opacity: 0.7;
+    opacity: 0.82;
   }
   36% {
-    opacity: 0.86;
+    opacity: 0.98;
   }
   68% {
-    opacity: 0.76;
+    opacity: 0.88;
   }
 }
 
 @keyframes voidStarTwinkleSoft {
   0%,
   100% {
-    opacity: 0.62;
+    opacity: 0.74;
   }
   42% {
-    opacity: 0.8;
+    opacity: 0.92;
   }
   73% {
-    opacity: 0.68;
+    opacity: 0.82;
   }
 }
 
@@ -4690,7 +4715,7 @@ button {
   }
 
   .site-shell.is-home-route .ambient-void-stars {
-    opacity: 0.8;
+    opacity: 0.94;
   }
   .home-archive-awakening,
   .home-archive-awakening::before,
@@ -4747,23 +4772,18 @@ button {
     transform: translate3d(-50%, -50%, 0) scaleX(0.04);
   }
 
-  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first {
-    animation: none !important;
-    opacity: 0.45;
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
-  }
-
-  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second {
-    animation: none !important;
-    opacity: 0.36;
-    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
-  }
-
-  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--third,
-  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fourth,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first,
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
     animation: none !important;
-    opacity: 0.36;
+    opacity: 0.82;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--third,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fourth {
+    animation: none !important;
+    opacity: 0.72;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   }
 
@@ -5492,6 +5512,6 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"] .ambient-void-stars {
-    opacity: 0.86;
+    opacity: 0.94;
   }
 }
