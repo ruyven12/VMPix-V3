@@ -587,12 +587,12 @@ button {
   animation: archiveWorldReveal 1.18s var(--ease-breath) calc(var(--sector-delay) + 0.08s) both;
 }
 .home-archive-sector--one {
-  --sector-x: 50%;
-  --sector-y: 6%;
+  --sector-x: 4%;
+  --sector-y: 51%;
   --sector-size: clamp(8rem, 24vw, 14.5rem);
   --sector-delay: 13.94s;
   --world-x: 52%;
-  --world-y: 43%;
+  --world-y: 55%;
   --world-size: clamp(0.68rem, 1.75vw, 1.04rem);
   --world-surface: radial-gradient(circle at 36% 26%, rgba(247, 247, 242, 0.86) 0 8%, rgba(238, 217, 153, 0.55) 9% 30%, rgba(95, 80, 42, 0.36) 50%, rgba(6, 6, 8, 0.22) 79%, transparent 100%);
   --sector-nodes:
@@ -611,12 +611,12 @@ button {
 }
 
 .home-archive-sector--two {
-  --sector-x: 77%;
-  --sector-y: 15%;
+  --sector-x: 18%;
+  --sector-y: 16%;
   --sector-size: clamp(8.8rem, 27vw, 16.5rem);
   --sector-delay: 14.1s;
-  --world-x: 58%;
-  --world-y: 45%;
+  --world-x: 47%;
+  --world-y: 42%;
   --world-size: clamp(0.64rem, 1.58vw, 0.94rem);
   --world-surface: radial-gradient(circle at 32% 30%, rgba(245, 237, 205, 0.78) 0 7%, rgba(220, 188, 108, 0.48) 8% 29%, rgba(70, 87, 91, 0.24) 49%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
@@ -633,12 +633,12 @@ button {
 }
 
 .home-archive-sector--three {
-  --sector-x: 96%;
-  --sector-y: 43%;
+  --sector-x: 50%;
+  --sector-y: 6%;
   --sector-size: clamp(9.4rem, 30vw, 18rem);
   --sector-delay: 14.26s;
-  --world-x: 47%;
-  --world-y: 52%;
+  --world-x: 52%;
+  --world-y: 43%;
   --world-size: clamp(0.72rem, 1.85vw, 1.1rem);
   --world-surface: radial-gradient(circle at 38% 24%, rgba(247, 247, 242, 0.84) 0 8%, rgba(238, 217, 153, 0.52) 9% 28%, rgba(112, 78, 47, 0.32) 48%, rgba(6, 6, 8, 0.24) 78%, transparent 100%);
   --sector-nodes:
@@ -658,12 +658,12 @@ button {
 }
 
 .home-archive-sector--four {
-  --sector-x: 84%;
-  --sector-y: 78%;
+  --sector-x: 77%;
+  --sector-y: 15%;
   --sector-size: clamp(9.2rem, 29vw, 17.5rem);
   --sector-delay: 14.42s;
-  --world-x: 46%;
-  --world-y: 43%;
+  --world-x: 58%;
+  --world-y: 45%;
   --world-size: clamp(0.66rem, 1.7vw, 1rem);
   --world-surface: radial-gradient(circle at 34% 32%, rgba(247, 247, 242, 0.8) 0 7%, rgba(220, 188, 108, 0.5) 8% 30%, rgba(72, 91, 77, 0.25) 51%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
@@ -682,12 +682,12 @@ button {
 }
 
 .home-archive-sector--five {
-  --sector-x: 52%;
-  --sector-y: 94%;
+  --sector-x: 96%;
+  --sector-y: 43%;
   --sector-size: clamp(8.2rem, 25vw, 15.5rem);
   --sector-delay: 14.58s;
-  --world-x: 54%;
-  --world-y: 45%;
+  --world-x: 47%;
+  --world-y: 52%;
   --world-size: clamp(0.7rem, 1.8vw, 1.08rem);
   --world-surface: radial-gradient(circle at 34% 25%, rgba(248, 244, 222, 0.84) 0 8%, rgba(238, 217, 153, 0.48) 9% 31%, rgba(91, 72, 102, 0.22) 51%, rgba(6, 6, 8, 0.24) 80%, transparent 100%);
   --sector-nodes:
@@ -772,6 +772,12 @@ button {
     linear-gradient(66deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.21) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 65% 32% / 14% 27% no-repeat,
     linear-gradient(145deg, transparent calc(50% - 0.5px), rgba(220, 188, 108, 0.21) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 49% 54% / 29% 19% no-repeat,
     linear-gradient(159deg, transparent calc(50% - 0.5px), rgba(247, 247, 242, 0.18) calc(50% - 0.3px) calc(50% + 0.3px), transparent calc(50% + 0.5px)) 19% 45% / 30% 28% no-repeat;
+}
+
+.home-archive-sector--six,
+.home-archive-sector--seven,
+.home-archive-sector--eight {
+  display: none;
 }
 .site-shell.is-home-route .home-frame {
   visibility: visible;
@@ -973,25 +979,31 @@ button {
   display: none;
   animation: none;
 }
-/* PASS 30: five Living World destination anchors for constellation work. */
+/* PASS 31: five Living World destination anchors ordered W, NW, N, NE, E. */
 .ambient-system {
-  --entry-anchor-01-x: min(112vw, 74rem);
-  --entry-anchor-01-y: calc(-1 * min(10vh, 6rem));
-  --entry-anchor-02-x: min(64vw, 42rem);
+  --entry-anchor-01-x: calc(-1 * min(108vw, 72rem));
+  --entry-anchor-01-y: 0px;
+  --entry-anchor-02-x: calc(-1 * min(64vw, 42rem));
   --entry-anchor-02-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-03-x: calc(-1 * min(108vw, 72rem));
-  --entry-anchor-03-y: calc(-1 * min(10vh, 6rem));
-  --entry-anchor-04-x: calc(-1 * min(64vw, 42rem));
+  --entry-anchor-03-x: 0px;
+  --entry-anchor-03-y: calc(-1 * min(108vh, 58rem));
+  --entry-anchor-04-x: min(64vw, 42rem);
   --entry-anchor-04-y: calc(-1 * min(104vh, 56rem));
-  --entry-anchor-05-x: 0px;
-  --entry-anchor-05-y: calc(-1 * min(108vh, 58rem));
-  --entry-constellation-01-x: min(34vw, 22rem);
-  --entry-constellation-01-y: calc(-1 * min(10vh, 6rem));
-  --entry-constellation-02-x: min(30vw, 20rem);
-  --entry-constellation-02-y: min(18vh, 10rem);
+  --entry-anchor-05-x: min(112vw, 74rem);
+  --entry-anchor-05-y: 0px;
+  --entry-constellation-01-x: calc(-1 * min(42vw, 30rem));
+  --entry-constellation-01-y: 0px;
+  --entry-constellation-02-x: calc(-1 * min(35vw, 25rem));
+  --entry-constellation-02-y: calc(-1 * min(36vh, 22rem));
+  --entry-constellation-03-x: 0px;
+  --entry-constellation-03-y: calc(-1 * min(42vh, 26rem));
+  --entry-constellation-04-x: min(35vw, 25rem);
+  --entry-constellation-04-y: calc(-1 * min(36vh, 22rem));
+  --entry-constellation-05-x: min(42vw, 30rem);
+  --entry-constellation-05-y: 0px;
 }
 
-/* PASS 30 Chapter 2 five-fragment Living World path scaffold. Neutral escape paths only. */
+/* PASS 31 Chapter 2 five-fragment Living World path scaffold. Neutral escape paths only. */
 .portfolio-entry-fragments {
   position: fixed;
   inset: 0;
@@ -1083,12 +1095,43 @@ button {
   opacity: 0.28;
 }
 
+.portfolio-entry-constellation--third {
+  --constellation-x: var(--entry-constellation-03-x);
+  --constellation-y: var(--entry-constellation-03-y);
+  --constellation-width: clamp(2.7rem, 7.4vw, 4.8rem);
+  --constellation-height: clamp(1.9rem, 5vw, 3.35rem);
+}
+
+.portfolio-entry-constellation--fourth {
+  --constellation-x: var(--entry-constellation-04-x);
+  --constellation-y: var(--entry-constellation-04-y);
+  --constellation-width: clamp(2.55rem, 6.7vw, 4.4rem);
+  --constellation-height: clamp(1.8rem, 4.8vw, 3.1rem);
+}
+
+.portfolio-entry-constellation--fifth {
+  --constellation-x: var(--entry-constellation-05-x);
+  --constellation-y: var(--entry-constellation-05-y);
+}
+
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--first {
   animation: portfolioFirstConstellationReveal 920ms cubic-bezier(0.2, 0.86, 0.18, 1) 120ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second {
-  animation: portfolioSecondConstellationReveal 860ms cubic-bezier(0.2, 0.86, 0.18, 1) 440ms both;
+  animation: portfolioSecondConstellationReveal 860ms cubic-bezier(0.2, 0.86, 0.18, 1) 260ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--third {
+  animation: portfolioSecondConstellationReveal 860ms cubic-bezier(0.2, 0.86, 0.18, 1) 400ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fourth {
+  animation: portfolioSecondConstellationReveal 860ms cubic-bezier(0.2, 0.86, 0.18, 1) 540ms both;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
+  animation: portfolioFirstConstellationReveal 920ms cubic-bezier(0.2, 0.86, 0.18, 1) 680ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-constellation {
@@ -1136,71 +1179,29 @@ button {
 }
 
 .portfolio-entry-fragment--one {
-  --fragment-angle: -11deg;
-  --fragment-delay: 450ms;
-  --fragment-duration: 533ms;
-  --fragment-width: clamp(4.5rem, 15.5vw, 8.8rem);
-  --fragment-height: clamp(1.45px, 0.34vw, 2.75px);
-  --fragment-separate-x: min(10vw, 5.8rem);
-  --fragment-separate-y: calc(-1 * min(2.5vh, 1.6rem));
-  --fragment-commit-x: min(20vw, 12rem);
-  --fragment-commit-y: calc(-1 * min(5.2vh, 3.1rem));
-  --fragment-mid-x: min(38vw, 23rem);
-  --fragment-mid-y: calc(-1 * min(10vh, 5.8rem));
-  --fragment-end-x: min(98vw, 66rem);
-  --fragment-end-y: calc(-1 * min(24vh, 14rem));
-  --fragment-target-x: var(--entry-anchor-01-x);
-  --fragment-target-y: var(--entry-anchor-01-y);
-  --fragment-commit-scale: 0.36;
-  --fragment-mid-scale: 0.72;
-  --fragment-end-scale: 1;
-}
-
-.portfolio-entry-fragment--two {
-  --fragment-angle: -38deg;
-  --fragment-delay: 483ms;
-  --fragment-duration: 517ms;
-  --fragment-width: clamp(3.55rem, 12vw, 7.2rem);
-  --fragment-height: clamp(1.2px, 0.3vw, 2.3px);
-  --fragment-separate-x: min(8vw, 4.7rem);
-  --fragment-separate-y: calc(-1 * min(6vh, 3.2rem));
-  --fragment-commit-x: min(17vw, 10rem);
-  --fragment-commit-y: calc(-1 * min(14vh, 7.6rem));
-  --fragment-mid-x: min(30vw, 18rem);
-  --fragment-mid-y: calc(-1 * min(36vh, 19rem));
-  --fragment-end-x: min(62vw, 40rem);
-  --fragment-end-y: calc(-1 * min(86vh, 46rem));
-  --fragment-target-x: var(--entry-anchor-02-x);
-  --fragment-target-y: var(--entry-anchor-02-y);
-  --fragment-commit-scale: 0.34;
-  --fragment-mid-scale: 0.64;
-  --fragment-end-scale: 0.94;
-}
-
-.portfolio-entry-fragment--three {
   --fragment-angle: -168deg;
-  --fragment-delay: 517ms;
+  --fragment-delay: 450ms;
   --fragment-duration: 500ms;
   --fragment-width: clamp(3.15rem, 10.6vw, 6.6rem);
   --fragment-height: clamp(1.05px, 0.26vw, 2.05px);
   --fragment-separate-x: calc(-1 * min(7.6vw, 4.5rem));
-  --fragment-separate-y: calc(-1 * min(3vh, 1.8rem));
+  --fragment-separate-y: 0px;
   --fragment-commit-x: calc(-1 * min(16vw, 9.5rem));
-  --fragment-commit-y: calc(-1 * min(5.6vh, 3.3rem));
+  --fragment-commit-y: 0px;
   --fragment-mid-x: calc(-1 * min(31vw, 18.5rem));
-  --fragment-mid-y: calc(-1 * min(9.5vh, 5.6rem));
+  --fragment-mid-y: 0px;
   --fragment-end-x: calc(-1 * min(94vw, 62rem));
-  --fragment-end-y: calc(-1 * min(19vh, 11rem));
-  --fragment-target-x: var(--entry-anchor-03-x);
-  --fragment-target-y: var(--entry-anchor-03-y);
+  --fragment-end-y: 0px;
+  --fragment-target-x: var(--entry-anchor-01-x);
+  --fragment-target-y: var(--entry-anchor-01-y);
   --fragment-commit-scale: 0.32;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.96;
 }
 
-.portfolio-entry-fragment--four {
+.portfolio-entry-fragment--two {
   --fragment-angle: -128deg;
-  --fragment-delay: 533ms;
+  --fragment-delay: 483ms;
   --fragment-duration: 500ms;
   --fragment-width: clamp(3.35rem, 11.2vw, 6.9rem);
   --fragment-height: clamp(1.1px, 0.27vw, 2.15px);
@@ -1212,16 +1213,16 @@ button {
   --fragment-mid-y: calc(-1 * min(35vh, 18rem));
   --fragment-end-x: calc(-1 * min(60vw, 39rem));
   --fragment-end-y: calc(-1 * min(86vh, 46rem));
-  --fragment-target-x: var(--entry-anchor-04-x);
-  --fragment-target-y: var(--entry-anchor-04-y);
+  --fragment-target-x: var(--entry-anchor-02-x);
+  --fragment-target-y: var(--entry-anchor-02-y);
   --fragment-commit-scale: 0.34;
   --fragment-mid-scale: 0.62;
   --fragment-end-scale: 0.94;
 }
 
-.portfolio-entry-fragment--five {
+.portfolio-entry-fragment--three {
   --fragment-angle: -90deg;
-  --fragment-delay: 467ms;
+  --fragment-delay: 517ms;
   --fragment-duration: 533ms;
   --fragment-width: clamp(2.85rem, 9.2vw, 5.7rem);
   --fragment-height: clamp(1px, 0.23vw, 1.9px);
@@ -1233,11 +1234,53 @@ button {
   --fragment-mid-y: calc(-1 * min(36vh, 19rem));
   --fragment-end-x: 0px;
   --fragment-end-y: calc(-1 * min(86vh, 46rem));
-  --fragment-target-x: var(--entry-anchor-05-x);
-  --fragment-target-y: var(--entry-anchor-05-y);
+  --fragment-target-x: var(--entry-anchor-03-x);
+  --fragment-target-y: var(--entry-anchor-03-y);
   --fragment-commit-scale: 0.28;
   --fragment-mid-scale: 0.5;
   --fragment-end-scale: 0.86;
+}
+
+.portfolio-entry-fragment--four {
+  --fragment-angle: -38deg;
+  --fragment-delay: 533ms;
+  --fragment-duration: 517ms;
+  --fragment-width: clamp(3.55rem, 12vw, 7.2rem);
+  --fragment-height: clamp(1.2px, 0.3vw, 2.3px);
+  --fragment-separate-x: min(8vw, 4.7rem);
+  --fragment-separate-y: calc(-1 * min(6vh, 3.2rem));
+  --fragment-commit-x: min(17vw, 10rem);
+  --fragment-commit-y: calc(-1 * min(14vh, 7.6rem));
+  --fragment-mid-x: min(30vw, 18rem);
+  --fragment-mid-y: calc(-1 * min(36vh, 19rem));
+  --fragment-end-x: min(62vw, 40rem);
+  --fragment-end-y: calc(-1 * min(86vh, 46rem));
+  --fragment-target-x: var(--entry-anchor-04-x);
+  --fragment-target-y: var(--entry-anchor-04-y);
+  --fragment-commit-scale: 0.34;
+  --fragment-mid-scale: 0.64;
+  --fragment-end-scale: 0.94;
+}
+
+.portfolio-entry-fragment--five {
+  --fragment-angle: -11deg;
+  --fragment-delay: 550ms;
+  --fragment-duration: 533ms;
+  --fragment-width: clamp(4.5rem, 15.5vw, 8.8rem);
+  --fragment-height: clamp(1.45px, 0.34vw, 2.75px);
+  --fragment-separate-x: min(10vw, 5.8rem);
+  --fragment-separate-y: 0px;
+  --fragment-commit-x: min(20vw, 12rem);
+  --fragment-commit-y: 0px;
+  --fragment-mid-x: min(38vw, 23rem);
+  --fragment-mid-y: 0px;
+  --fragment-end-x: min(98vw, 66rem);
+  --fragment-end-y: 0px;
+  --fragment-target-x: var(--entry-anchor-05-x);
+  --fragment-target-y: var(--entry-anchor-05-y);
+  --fragment-commit-scale: 0.36;
+  --fragment-mid-scale: 0.72;
+  --fragment-end-scale: 1;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .portfolio-entry-fragments {
@@ -4258,6 +4301,14 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--second {
+    animation: none !important;
+    opacity: 0.36;
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--third,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fourth,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-entry-constellation--fifth {
     animation: none !important;
     opacity: 0.36;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
