@@ -134,6 +134,13 @@ button {
   display: none;
 }
 
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-engine-ready) [data-portfolio-engine],
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-engine-ready) .portfolio-engine {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-system::after {
   opacity: 0;
   animation: none;

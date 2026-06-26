@@ -700,6 +700,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name !== "portfolio") {
     shell.classList.remove("has-portfolio-entry-constellation");
+    clearPortfolioEngineReadyState();
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -2444,6 +2445,7 @@ function showHomepage() {
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
+  clearPortfolioEngineReadyState();
   closeGlobalMenu({ shouldRestoreFocus: false });
   shell.classList.remove("is-home-transitioning", "is-engage-activated", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   startButton.disabled = false;
@@ -2551,6 +2553,9 @@ function revealHub(options = {}) {
     startPortfolioDirectEntrySequenceForQA();
   } else if (options.shouldPlayDirectPortfolioArrival) {
     startPortfolioDirectArrival();
+  } else {
+    shell.classList.add("has-portfolio-entry-constellation");
+    schedulePortfolioEngineReadyGate();
   }
 }
 
@@ -2562,6 +2567,10 @@ const PORTFOLIO_ORIENTATION_DURATION_MS = 620;
 const PORTFOLIO_ORIENTATION_REDUCED_MOTION_DURATION_MS = 70;
 const PORTFOLIO_FIRST_TRANSFER_DURATION_MS = 760;
 const PORTFOLIO_FIRST_TRANSFER_REDUCED_MOTION_DURATION_MS = 80;
+const PORTFOLIO_COORDINATE_SELECTOR = ".portfolio-beacon--world, .portfolio-beacon--system";
+const PORTFOLIO_COORDINATE_ONLINE_TOTAL = 8;
+const PORTFOLIO_ENGINE_READY_RETRY_MS = 80;
+const PORTFOLIO_ENGINE_READY_MAX_WAIT_MS = 1600;
 let portfolioArrivalTimer = 0;
 let portfolioOrientationStartTimer = 0;
 let portfolioOrientationTimer = 0;
@@ -2574,6 +2583,108 @@ const PORTFOLIO_DIRECT_ENTRY_SEQUENCE_QA_CLEANUP_MS = 2360;
 const PORTFOLIO_DIRECT_ARRIVAL_DURATION_MS = 720;
 const PORTFOLIO_DIRECT_ARRIVAL_REDUCED_MOTION_DURATION_MS = 80;
 let portfolioDirectArrivalTimer = 0;
+let portfolioEngineReadyTimer = 0;
+let portfolioEngineReadyFrame = 0;
+let portfolioEngineReadyGateStartedAt = 0;
+
+function cancelPortfolioEngineReadyGate() {
+  window.clearTimeout(portfolioEngineReadyTimer);
+  portfolioEngineReadyTimer = 0;
+  if (portfolioEngineReadyFrame) {
+    window.cancelAnimationFrame(portfolioEngineReadyFrame);
+    portfolioEngineReadyFrame = 0;
+  }
+  portfolioEngineReadyGateStartedAt = 0;
+}
+
+function clearPortfolioEngineReadyState() {
+  cancelPortfolioEngineReadyGate();
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.remove("has-portfolio-coordinates-online", "is-portfolio-engine-ready");
+  delete shell.dataset.portfolioCoordinatesOnline;
+  delete shell.dataset.portfolioEngineReady;
+}
+
+function getPortfolioCoordinateElements() {
+  return Array.from(document.querySelectorAll(PORTFOLIO_COORDINATE_SELECTOR));
+}
+
+function isPortfolioCoordinateOnline(coordinate) {
+  if (!coordinate) {
+    return false;
+  }
+
+  const styles = window.getComputedStyle(coordinate);
+  if (styles.display === "none" || styles.visibility === "hidden" || Number(styles.opacity) <= 0.1) {
+    return false;
+  }
+
+  const bounds = coordinate.getBoundingClientRect();
+  return bounds.width > 0 && bounds.height > 0;
+}
+
+function arePortfolioCoordinatesOnline() {
+  if (
+    !shell ||
+    window.location.pathname !== routePaths.portfolio ||
+    !shell.classList.contains("has-entered-hub") ||
+    !shell.classList.contains("has-portfolio-entry-constellation") ||
+    shell.classList.contains("is-module-view")
+  ) {
+    return false;
+  }
+
+  const coordinates = getPortfolioCoordinateElements();
+  return coordinates.length === PORTFOLIO_COORDINATE_ONLINE_TOTAL && coordinates.every(isPortfolioCoordinateOnline);
+}
+
+function markPortfolioEngineReady() {
+  if (!arePortfolioCoordinatesOnline()) {
+    return false;
+  }
+
+  cancelPortfolioEngineReadyGate();
+  shell.classList.add("has-portfolio-coordinates-online", "is-portfolio-engine-ready");
+  shell.dataset.portfolioCoordinatesOnline = String(PORTFOLIO_COORDINATE_ONLINE_TOTAL);
+  shell.dataset.portfolioEngineReady = "true";
+  shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
+    detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
+  }));
+  return true;
+}
+
+function resolvePortfolioEngineReadyGate() {
+  portfolioEngineReadyFrame = 0;
+  if (markPortfolioEngineReady()) {
+    return;
+  }
+
+  if (
+    portfolioEngineReadyGateStartedAt &&
+    window.performance.now() - portfolioEngineReadyGateStartedAt >= PORTFOLIO_ENGINE_READY_MAX_WAIT_MS
+  ) {
+    cancelPortfolioEngineReadyGate();
+    return;
+  }
+
+  portfolioEngineReadyTimer = window.setTimeout(() => {
+    portfolioEngineReadyTimer = 0;
+    portfolioEngineReadyFrame = window.requestAnimationFrame(resolvePortfolioEngineReadyGate);
+  }, PORTFOLIO_ENGINE_READY_RETRY_MS);
+}
+
+function schedulePortfolioEngineReadyGate() {
+  clearPortfolioEngineReadyState();
+  if (!shell || window.location.pathname !== routePaths.portfolio || !shell.classList.contains("has-entered-hub")) {
+    return;
+  }
+
+  portfolioEngineReadyGateStartedAt = window.performance.now();
+  portfolioEngineReadyFrame = window.requestAnimationFrame(resolvePortfolioEngineReadyGate);
+}
 
 function clearPortfolioDirectArrivalState() {
   window.clearTimeout(portfolioDirectArrivalTimer);
@@ -2682,6 +2793,9 @@ function clearPortfolioArrivalState() {
   portfolioOrientationStartTimer = 0;
   if (shell) {
     shell.classList.remove("is-portfolio-arriving");
+    if (window.location.pathname !== routePaths.portfolio) {
+      clearPortfolioEngineReadyState();
+    }
   }
 }
 
@@ -2756,6 +2870,11 @@ function clearHomePortfolioTransitionState() {
       shell.classList.contains("has-entered-hub");
     shell.classList.remove("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
     shell.classList.toggle("has-portfolio-entry-constellation", shouldRevealFirstConstellation);
+    if (shouldRevealFirstConstellation) {
+      schedulePortfolioEngineReadyGate();
+    } else {
+      clearPortfolioEngineReadyState();
+    }
   }
   if (startButton) {
     startButton.setAttribute("aria-busy", "false");
@@ -2769,6 +2888,7 @@ function activatePortfolioEntrySequenceState() {
 
   window.clearTimeout(homePortfolioTransitionTimer);
   homePortfolioTransitionTimer = 0;
+  clearPortfolioEngineReadyState();
   shell.classList.remove("has-portfolio-entry-constellation");
   shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
   if (startButton) {
@@ -3041,6 +3161,7 @@ if (shell && startButton) {
     window.clearTimeout(portfolioDirectArrivalTimer);
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(portfolioFirstTransferTimer);
+    cancelPortfolioEngineReadyGate();
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {
       window.cancelAnimationFrame(spotlightFrame);
