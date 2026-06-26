@@ -14288,8 +14288,14 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell.has-entered-hub.is-portfolio-entry-sequence.is-portfolio-transferring .ambient-system::before,
 .site-shell.has-entered-hub.is-portfolio-entry-sequence.is-portfolio-transferring .portfolio-entry-target.is-first-transfer-target::after,
 .site-shell.has-entered-hub.is-portfolio-entry-sequence.is-portfolio-transferring .hub-card.is-first-transfer-target::after {
+  content: none;
+  display: none;
   animation: none;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
   opacity: 0;
+  transform: none;
 }
 
 @keyframes portfolioFirstWorldEnergyTransfer {

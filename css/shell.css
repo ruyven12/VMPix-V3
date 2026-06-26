@@ -988,6 +988,28 @@ button {
   animation: none;
 }
 
+/* PASS 37: keep legacy Portfolio shell layers out from under the Archive entry story. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .cinema-fire-bg,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-energy,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-rings,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-sweep,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .ambient-particles,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-hub::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .hub-card::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-target::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence .portfolio-entry-target::after {
+  content: none;
+  display: none;
+  opacity: 0;
+  animation: none;
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-archive-message--identity,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--engage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .home-identity-text--core,
