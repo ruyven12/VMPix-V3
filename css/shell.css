@@ -257,21 +257,25 @@ button {
 .portfolio-engine::after {
   inset-inline-start: clamp(0.62rem, 2.2vw, 1.08rem);
   inset-inline-end: clamp(5.65rem, 23vw, 13.25rem);
-  top: 50%;
-  height: clamp(0.42rem, 1.05svh, 0.66rem);
+  inset-block: clamp(0.38rem, 1.05svh, 0.58rem);
   background:
-    linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0.12) 0 9%, rgb(var(--engine-accent-soft) / 0.08) 18%, transparent 31% 100%),
-    linear-gradient(90deg, transparent 0 13%, rgb(var(--engine-accent) / 0) 24%, rgb(var(--engine-accent-glow) / 0.72) 42%, rgba(246, 246, 246, 0.68) 51%, rgb(var(--engine-accent-glow) / 0.72) 60%, rgb(var(--engine-accent) / 0.08) 76%, transparent 94% 100%),
-    repeating-linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0) 0 0.74rem, rgb(var(--engine-accent-soft) / 0.18) 0.74rem 0.8rem, rgb(var(--engine-accent-soft) / 0) 0.8rem 1.32rem);
-  background-size: 100% 100%, 46% 100%, 1.32rem 100%;
-  background-position: 0 0, -48% 0, 0 0;
+    radial-gradient(ellipse at 18% 50%, rgb(var(--engine-accent-glow) / 0.18) 0 12%, transparent 48%),
+    linear-gradient(90deg, transparent 0 8%, rgb(var(--engine-accent-soft) / 0.12) 18%, rgb(var(--engine-accent-soft) / 0.06) 28%, transparent 43% 100%),
+    linear-gradient(90deg, transparent 0 10%, rgb(var(--engine-accent) / 0) 22%, rgb(var(--engine-accent-glow) / 0.5) 38%, rgba(246, 246, 246, 0.46) 50%, rgb(var(--engine-accent-glow) / 0.52) 62%, rgb(var(--engine-accent) / 0.1) 76%, transparent 94% 100%),
+    repeating-linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0) 0 0.68rem, rgb(var(--engine-accent-soft) / 0.14) 0.68rem 0.76rem, rgb(var(--engine-accent-soft) / 0) 0.76rem 1.28rem);
+  background-size: 32% 100%, 100% 100%, 54% 100%, 1.28rem 100%;
+  background-position: 0 0, 0 0, -58% 0, 0 0;
+  border-radius: clamp(0.18rem, 0.7vw, 0.36rem);
   opacity: 0;
   filter: blur(0.04px);
   box-shadow:
-    0 0 0.58rem rgb(var(--engine-accent-glow) / 0.18),
-    0 0 1.1rem rgb(var(--engine-accent-glow) / 0.08);
+    0 0 0.7rem rgb(var(--engine-accent-glow) / 0.16),
+    0 0 1.3rem rgb(var(--engine-accent-glow) / 0.07),
+    inset 0 0 1rem rgb(var(--engine-accent-glow) / 0.045);
   mix-blend-mode: screen;
-  transform: translate3d(0, -50%, 0);
+  transform: scaleX(0.88);
+  transform-origin: 0 50%;
+  mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 88%, transparent 100%);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine {
@@ -389,7 +393,7 @@ button {
 }
 
 .portfolio-engine-panel--left {
-  grid-column: 2;
+  grid-column: 2 / 4;
   text-align: left;
   border-radius: 0.18rem 0.08rem 0.08rem 0.18rem;
 }
@@ -672,34 +676,34 @@ button {
 
 @keyframes portfolioEngineLifebloodPulse {
   0%, 7% {
-    background-position: 0 0, -48% 0, 0 0;
+    background-position: 0 0, 0 0, -58% 0, 0 0;
     opacity: 0;
-    transform: translate3d(0, -50%, 0) scaleX(0.86);
+    transform: scaleX(0.86);
   }
 
   14% {
-    opacity: 0.68;
+    opacity: 0.46;
   }
 
   24% {
-    background-position: 0 0, 34% 0, 0.28rem 0;
-    opacity: 0.58;
+    background-position: 0 0, 0 0, 18% 0, 0.28rem 0;
+    opacity: 0.56;
   }
 
   34% {
-    background-position: 0 0, 78% 0, 0.68rem 0;
-    opacity: 0.66;
+    background-position: 0 0, 0 0, 58% 0, 0.68rem 0;
+    opacity: 0.6;
   }
 
   43% {
-    background-position: 0 0, 116% 0, 1rem 0;
-    opacity: 0.28;
+    background-position: 0 0, 0 0, 96% 0, 1rem 0;
+    opacity: 0.36;
   }
 
   52%, 100% {
-    background-position: 0 0, 142% 0, 1.32rem 0;
+    background-position: 0 0, 0 0, 124% 0, 1.28rem 0;
     opacity: 0;
-    transform: translate3d(0, -50%, 0) scaleX(0.96);
+    transform: scaleX(0.98);
   }
 }
 
@@ -2296,10 +2300,10 @@ button {
   opacity: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 1) 0 1.35px, rgba(247, 247, 242, 0.86) 1.56px 2.32px, rgb(var(--beacon-color) / 0.38) 2.62px 3.2px, transparent 3.92px),
-    linear-gradient(90deg, transparent 0 33%, rgb(var(--beacon-color) / 0.3) 44%, rgba(247, 247, 242, 0.82) 50%, rgb(var(--beacon-color) / 0.3) 56%, transparent 67% 100%),
-    linear-gradient(0deg, transparent 0 33%, rgb(var(--beacon-color) / 0.26) 44%, rgba(247, 247, 242, 0.72) 50%, rgb(var(--beacon-color) / 0.26) 56%, transparent 67% 100%),
-    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.34) 0 14%, transparent 52%);
+    radial-gradient(circle at 50% 50%, rgba(247, 247, 242, 1) 0 1.72px, rgba(247, 247, 242, 0.94) 1.98px 2.82px, rgb(var(--beacon-color) / 0.54) 3.08px 3.72px, transparent 4.52px),
+    linear-gradient(90deg, transparent 0 31%, rgb(var(--beacon-color) / 0.42) 43%, rgba(247, 247, 242, 0.9) 50%, rgb(var(--beacon-color) / 0.42) 57%, transparent 69% 100%),
+    linear-gradient(0deg, transparent 0 31%, rgb(var(--beacon-color) / 0.38) 43%, rgba(247, 247, 242, 0.84) 50%, rgb(var(--beacon-color) / 0.38) 57%, transparent 69% 100%),
+    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.48) 0 17%, rgb(var(--beacon-color) / 0.16) 32%, transparent 58%);
   background-position: center;
   background-repeat: no-repeat;
   background-size: var(--beacon-size) var(--beacon-size);
@@ -2323,26 +2327,26 @@ button {
 }
 
 .portfolio-beacon::before {
-  width: 0.5rem;
+  width: 0.58rem;
   aspect-ratio: 1;
   border-radius: 50%;
   opacity: 0.96;
   background:
-    radial-gradient(circle, rgba(247, 247, 242, 1) 0 20%, rgba(247, 247, 242, 0.92) 28% 42%, rgb(var(--beacon-color) / 0.56) 54%, transparent 78%);
+    radial-gradient(circle, rgba(255, 255, 255, 1) 0 22%, rgba(247, 247, 242, 0.96) 30% 44%, rgb(var(--beacon-color) / 0.72) 58%, transparent 82%);
   box-shadow:
-    0 0 0.32rem rgba(247, 247, 242, 0.34),
-    0 0 0.68rem rgb(var(--beacon-color) / 0.3),
-    0 0 1.12rem rgb(var(--beacon-color) / 0.12);
+    0 0 0.42rem rgba(247, 247, 242, 0.48),
+    0 0 0.94rem rgb(var(--beacon-color) / 0.46),
+    0 0 1.62rem rgb(var(--beacon-color) / 0.22);
 }
 
 .portfolio-beacon::after {
-  width: calc(var(--beacon-size) * 2.18);
+  width: calc(var(--beacon-size) * 2.86);
   aspect-ratio: 1;
-  opacity: 0.44;
+  opacity: 0.56;
   background:
-    radial-gradient(circle, rgb(var(--beacon-color) / 0.42) 0 8%, rgb(var(--beacon-color) / 0.18) 24%, transparent 62%),
-    linear-gradient(90deg, transparent 0 39%, rgb(var(--beacon-color) / 0.17) 49%, transparent 61% 100%),
-    linear-gradient(0deg, transparent 0 40%, rgba(247, 247, 242, 0.17) 50%, transparent 60% 100%);
+    radial-gradient(circle, rgb(var(--beacon-color) / 0.58) 0 7%, rgb(var(--beacon-color) / 0.3) 24%, rgb(var(--beacon-color) / 0.12) 44%, transparent 70%),
+    linear-gradient(90deg, transparent 0 38%, rgb(var(--beacon-color) / 0.26) 49%, transparent 62% 100%),
+    linear-gradient(0deg, transparent 0 39%, rgba(247, 247, 242, 0.22) 50%, transparent 61% 100%);
   transform: translate3d(-50%, -50%, 0) scale3d(0.82, 0.82, 1) rotate(0deg);
 }
 
@@ -2381,17 +2385,17 @@ button {
 .portfolio-beacon.is-selected::before,
 .portfolio-beacon[aria-pressed="true"]::before {
   opacity: 1;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1);
   box-shadow:
-    0 0 0.44rem rgba(247, 247, 242, 0.54),
-    0 0 1.14rem rgb(var(--beacon-color) / 0.62),
-    0 0 1.88rem rgb(var(--beacon-color) / 0.24);
+    0 0 0.54rem rgba(247, 247, 242, 0.62),
+    0 0 1.42rem rgb(var(--beacon-color) / 0.72),
+    0 0 2.28rem rgb(var(--beacon-color) / 0.34);
 }
 
 .portfolio-beacon.is-selected::after,
 .portfolio-beacon[aria-pressed="true"]::after {
-  opacity: 0.72;
-  animation: portfolioBeaconSelectedPulse 4.6s var(--ease-breath) infinite;
+  opacity: 0.84;
+  animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
 .portfolio-beacon--horizon {
@@ -2468,38 +2472,42 @@ button {
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world {
   opacity: 0.98;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
-  animation: portfolioWorldBeaconBreath 5.8s var(--ease-breath) infinite;
+  animation: portfolioWorldBeaconBreath 4.8s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world::before {
-  animation: portfolioBeaconCoreShimmer 3.8s var(--ease-breath) infinite;
+  animation: portfolioBeaconCoreShimmer 3.4s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world::after {
-  animation: portfolioBeaconCoronaBreath 5.8s var(--ease-breath) infinite;
+  animation: portfolioBeaconCoronaBreath 4.8s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system {
-  opacity: 0.82;
+  opacity: 0.9;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
-  animation: none;
+  animation: portfolioSystemBeaconBreath 5.2s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system::before {
-  animation: portfolioBeaconSystemShimmer 5.2s var(--ease-breath) infinite;
+  animation: portfolioBeaconSystemShimmer 4.4s var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system::after {
+  animation: portfolioBeaconSystemCoronaBreath 5.2s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::before,
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::before {
   opacity: 1;
   animation: none;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1);
 }
 
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::after,
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::after {
-  opacity: 0.72;
-  animation: portfolioBeaconSelectedPulse 4.6s var(--ease-breath) infinite;
+  opacity: 0.84;
+  animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
