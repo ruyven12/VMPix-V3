@@ -1,6 +1,6 @@
 # Website V3 World Bible
 
-Version: 0.6  
+Version: 0.7
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive
 
@@ -36,6 +36,12 @@ This document evolves only through intentional design approval.
 ---
 
 # Changelog
+
+## 0.7
+
+- APPROVED FOR FUTURE IMPLEMENTATION: Locked the Interactive Portfolio as a living rotating observatory.
+- Documented the approved nebula/star shared celestial layer, static Engine/UI layer, star behavior, and rotating observatory implementation rules.
+- Confirmed Archive Journey, Archive Console, Meta Worlds, and World Theme Colors in relation to the observatory direction.
 
 ## 0.6
 
@@ -247,6 +253,19 @@ World selection is intentionally separate from world entry.
 
 Selecting a world prepares the Archive. ENTER performs the journey.
 
+Approved storyboard lock:
+
+- Home wakes the Archive.
+- The Wormhole transports the visitor.
+- The Interactive Portfolio reveals the observatory.
+- Stars are destinations.
+- Selecting a star tunes the Archive.
+- The Archive scans and analyzes the destination.
+- The Engine projects information.
+- ENTER performs world entry.
+- The visitor arrives in the selected World.
+- Selection is not the same as travel.
+
 ---
 
 # Interactive Portfolio Philosophy
@@ -267,6 +286,100 @@ ENTER performs the journey.
 
 ---
 
+# Interactive Portfolio Observatory
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+The Interactive Portfolio is a living observatory.
+
+The nebula slowly rotates and swells like a living cosmic system.
+
+Destination stars rotate with the nebula as part of one shared celestial layer.
+
+The observatory is not a page decoration.
+
+It is the Archive universe revealing that it is alive.
+
+The visitor should feel that the Archive universe is breathing, turning, and waiting to be read.
+
+The user should not feel that the page itself is moving.
+
+Static layers:
+
+- Engine HUD
+- projection panel
+- scan line
+- UI controls
+- route and world-entry behavior
+
+Moving celestial layer:
+
+- nebula
+- destination stars
+- shared star field
+- observatory atmosphere
+
+The Engine HUD, projection panel, scan line, and UI stay static while the observatory rotates behind them.
+
+---
+
+# Star Behavior
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Stars shimmer naturally.
+
+Stars are visibly interactive.
+
+Stars remain clickable and tappable.
+
+Stars retain the current compass and world mapping:
+
+| Bearing | Destination | Accent |
+|---|---|---|
+| W | The Horizon | Orange |
+| NW | The Soundtrack | Purple |
+| N | The Cosmos | Blue |
+| NE | The Battleground | Red |
+| E | The Wild | Green |
+| SW | The Story | Grey |
+| S | The Trajectory | Grey |
+| SE | The Comms | Grey |
+
+Star light, shimmer, pulse, scan response, and selection glow should be congruent with the selected world's approved color.
+
+---
+
+# Rotating Observatory Implementation Rules
+
+Status: APPROVED FOR FUTURE IMPLEMENTATION
+
+Future rotating observatory implementation must preserve performance, accessibility, and existing interaction behavior.
+
+Implementation principles:
+
+- Use one rotating wrapper or container for the nebula and destination stars.
+- Do not animate every star individually.
+- Prefer GPU-safe transform rotation.
+- Rotation should be very slow, roughly 160-240 seconds per full cycle.
+- Reduced motion disables rotation.
+- Avoid canvas.
+- Avoid JavaScript animation loops.
+- Avoid heavy filters.
+- Avoid per-frame coordinate recalculation.
+- Preserve current star click behavior.
+- Preserve current star tap behavior.
+- Preserve current keyboard behavior.
+- Preserve current scan behavior.
+- Preserve current projection behavior.
+- Preserve current Engine behavior.
+
+The celestial layer may rotate.
+
+The Archive Console does not rotate.
+
+---
+
 # Archive Console
 
 Status: APPROVED FOR FUTURE IMPLEMENTATION
@@ -277,6 +390,10 @@ It is the Archive Console.
 
 The Archive Console communicates the state of the Archive and its current destination tuning.
 
+The Engine remains static while the observatory rotates.
+
+The Engine is the fixed Archive Console layer, not part of the rotating celestial layer.
+
 Responsibilities:
 
 - Current View
@@ -284,6 +401,12 @@ Responsibilities:
 - Archive Seal
 - Archive Build
 - System State
+
+The Archive Core is the heart of the Engine.
+
+Lifeblood uses the selected world color.
+
+Projection information comes from the Engine, not from the stars.
 
 ---
 
@@ -412,6 +535,8 @@ Topics:
 
 The Story explains the human and creative origin of the Archive.
 
+The Story is the About and origin system for Chris, Voodoo Media, the Archive's beginnings, and why V3 exists.
+
 ## The Trajectory
 
 Purpose:
@@ -426,6 +551,8 @@ Contains:
 - archive growth
 
 The Trajectory records where the Archive has been and where it is going.
+
+The Trajectory is the system for the site roadmap, changelog, archive growth, and future direction.
 
 ## The Comms
 
@@ -446,6 +573,8 @@ Contains:
 Calendar belongs inside The Comms because availability is part of communication.
 
 The Comms is the operational interface for contact, scheduling, presence, and external connection.
+
+The Comms contains Contact, Booking, Calendar, Availability, Connect/NFC, Socials, and Media Requests.
 
 ---
 
@@ -468,6 +597,8 @@ Current approved shell accent color mapping:
 | The Comms | Grey |
 
 These are shell accent colors controlled through shared CSS variables.
+
+Interactive Portfolio is white/greyscale.
 
 They are not replacements for world identity, atmosphere, or narrative.
 
