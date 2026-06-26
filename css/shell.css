@@ -124,6 +124,7 @@ button {
   --portfolio-engine-reserve: clamp(4.85rem, 13svh, 8.5rem);
   --portfolio-engine-bottom-offset: max(0.58rem, env(safe-area-inset-bottom));
   --portfolio-engine-inline-inset: max(0.58rem, env(safe-area-inset-left), env(safe-area-inset-right));
+  --engine-lifeblood-cycle: 7.6s;
   --engine-accent: 242 242 242;
   --engine-accent-soft: 242 242 242;
   --engine-accent-glow: 242 242 242;
@@ -236,32 +237,36 @@ button {
 .portfolio-engine::after {
   position: absolute;
   inset-inline: clamp(0.34rem, 1.4vw, 0.74rem);
+  z-index: 0;
   content: "";
   pointer-events: none;
 }
 
 .portfolio-engine::before {
-  top: clamp(0.24rem, 0.72svh, 0.42rem);
-  height: 1px;
+  inset-block: clamp(0.24rem, 0.72svh, 0.42rem);
   background:
-    linear-gradient(90deg, transparent, rgba(226, 226, 226, 0.2) 14%, rgba(246, 246, 246, 0.48) 50%, rgba(226, 226, 226, 0.2) 86%, transparent),
-    linear-gradient(90deg, transparent 0 38%, rgb(var(--engine-accent) / 0) 43%, rgb(var(--engine-accent-glow) / 0.38) 50%, rgb(var(--engine-accent) / 0) 57%, transparent 62% 100%);
-  background-size: 100% 100%, 240% 100%;
-  background-position: 0 0, -120% 0;
-  opacity: 0.72;
-  box-shadow: 0 0 0.34rem rgb(var(--engine-accent-glow) / 0.08);
+    linear-gradient(90deg, transparent, rgba(226, 226, 226, 0.18) 14%, rgba(246, 246, 246, 0.44) 50%, rgba(226, 226, 226, 0.18) 86%, transparent) top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, rgba(226, 226, 226, 0.14) 16%, rgba(246, 246, 246, 0.3) 50%, rgba(226, 226, 226, 0.14) 84%, transparent) bottom / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent 0 6%, rgb(var(--engine-accent-soft) / 0.1) 11%, transparent 16% 34%, rgb(var(--engine-accent-soft) / 0.08) 44%, transparent 54% 68%, rgb(var(--engine-accent-soft) / 0.08) 78%, transparent 88% 100%) center / 100% 100% no-repeat;
+  opacity: 0.58;
+  box-shadow:
+    0 0 0.34rem rgb(var(--engine-accent-glow) / 0.06),
+    inset 0 0 0.7rem rgb(var(--engine-accent-glow) / 0.018);
 }
 
 .portfolio-engine::after {
-  bottom: clamp(0.24rem, 0.72svh, 0.42rem);
-  height: 1px;
+  top: 50%;
+  height: clamp(0.34rem, 0.9svh, 0.52rem);
   background:
-    linear-gradient(90deg, transparent, rgba(226, 226, 226, 0.16) 16%, rgba(246, 246, 246, 0.34) 50%, rgba(226, 226, 226, 0.16) 84%, transparent),
-    linear-gradient(90deg, transparent 0 40%, rgb(var(--engine-accent) / 0) 45%, rgb(var(--engine-accent-soft) / 0.34) 50%, rgb(var(--engine-accent) / 0) 55%, transparent 60% 100%);
-  background-size: 100% 100%, 260% 100%;
-  background-position: 0 0, 120% 0;
-  opacity: 0.56;
-  box-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.06);
+    linear-gradient(90deg, transparent 0 8%, rgb(var(--engine-accent) / 0.06) 14%, transparent 21% 100%),
+    linear-gradient(90deg, transparent 0 22%, rgb(var(--engine-accent) / 0) 34%, rgb(var(--engine-accent-glow) / 0.5) 47%, rgba(246, 246, 246, 0.48) 50%, rgb(var(--engine-accent-glow) / 0.5) 53%, rgb(var(--engine-accent) / 0) 66%, transparent 78% 100%);
+  background-size: 100% 100%, 34% 100%;
+  background-position: 0 0, -38% 0;
+  opacity: 0;
+  filter: blur(0.08px);
+  box-shadow: 0 0 0.46rem rgb(var(--engine-accent-glow) / 0.12);
+  mix-blend-mode: screen;
+  transform: translate3d(0, -50%, 0);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine {
@@ -284,6 +289,7 @@ button {
 .portfolio-engine-left-core {
   grid-column: 1;
   position: relative;
+  z-index: 1;
   width: clamp(2.12rem, 9.6vw, 3rem);
   aspect-ratio: 1;
   justify-self: center;
@@ -295,8 +301,8 @@ button {
     rgba(0, 0, 0, 0.24);
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.62),
-    inset 0 0 0.5rem rgba(246, 246, 246, 0.045),
-    0 0 0.52rem rgb(var(--engine-accent-glow) / 0.08);
+    inset 0 0 0.5rem rgb(var(--engine-accent-glow) / 0.055),
+    0 0 0.58rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
 .portfolio-engine-left-core::before,
@@ -309,18 +315,21 @@ button {
 
 .portfolio-engine-left-core::before {
   inset: 24%;
-  border: 1px solid rgba(246, 246, 246, 0.28);
-  background: radial-gradient(circle, rgba(246, 246, 246, 0.22), transparent 66%);
+  border: 1px solid rgb(var(--engine-accent-glow) / 0.28);
+  background: radial-gradient(circle, rgb(var(--engine-accent-glow) / 0.22), transparent 66%);
 }
 
 .portfolio-engine-left-core::after {
   inset: 43%;
-  background: rgba(246, 246, 246, 0.72);
-  box-shadow: 0 0 0.34rem rgb(var(--engine-accent-glow) / 0.2);
+  background: rgba(246, 246, 246, 0.78);
+  box-shadow:
+    0 0 0.28rem rgb(var(--engine-accent-glow) / 0.24),
+    0 0 0.62rem rgb(var(--engine-accent-glow) / 0.12);
 }
 
 .portfolio-engine-panel {
   position: relative;
+  z-index: 1;
   min-width: 0;
   display: grid;
   align-content: center;
@@ -358,9 +367,9 @@ button {
   content: "";
   pointer-events: none;
   background:
-    linear-gradient(90deg, transparent 0 18%, rgb(var(--engine-accent) / 0) 30%, rgb(var(--engine-accent-glow) / 0.26) 50%, rgb(var(--engine-accent) / 0) 70%, transparent 82% 100%),
-    repeating-linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0) 0 0.44rem, rgb(var(--engine-accent-soft) / 0.12) 0.44rem 0.48rem, rgb(var(--engine-accent-soft) / 0) 0.48rem 1rem);
-  background-size: 220% 100%, 1rem 100%;
+    linear-gradient(90deg, transparent 0 16%, rgb(var(--engine-accent) / 0) 30%, rgb(var(--engine-accent-glow) / 0.36) 48%, rgba(246, 246, 246, 0.24) 50%, rgb(var(--engine-accent-glow) / 0.34) 52%, rgb(var(--engine-accent) / 0) 70%, transparent 84% 100%),
+    repeating-linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0) 0 0.44rem, rgb(var(--engine-accent-soft) / 0.14) 0.44rem 0.48rem, rgb(var(--engine-accent-soft) / 0) 0.48rem 1rem);
+  background-size: 180% 100%, 1rem 100%;
   opacity: 0.28;
   transform: translate3d(0, -50%, 0);
   box-shadow: 0 0 0.24rem rgb(var(--engine-accent-glow) / 0.08);
@@ -421,6 +430,7 @@ button {
 .portfolio-engine-reactor {
   grid-column: 4;
   position: relative;
+  z-index: 1;
   min-width: 0;
   align-self: center;
   justify-self: end;
@@ -466,7 +476,7 @@ button {
   inset: -5%;
   z-index: 0;
   background: radial-gradient(circle, rgb(var(--engine-accent-glow) / 0.12) 0 12%, rgb(var(--engine-accent-soft) / 0.08) 28%, transparent 66%);
-  opacity: 0.36;
+  opacity: 0.32;
   transform: scale3d(0.94, 0.94, 1);
 }
 
@@ -475,7 +485,7 @@ button {
   z-index: 0;
   border: 1px solid rgb(var(--engine-accent-glow) / 0.16);
   background: radial-gradient(circle, rgb(var(--engine-accent-glow) / 0.18), transparent 60%);
-  opacity: 0.3;
+  opacity: 0.24;
   transform: scale3d(0.82, 0.82, 1);
 }
 
@@ -499,35 +509,47 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine::before {
-  animation: portfolioEngineOuterVeinFlow 10.5s linear infinite;
+  animation: portfolioEngineVeinRest var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine::after {
-  animation: portfolioEngineOuterVeinFlowReverse 11.8s linear infinite;
+  animation: portfolioEngineLifebloodPulse var(--engine-lifeblood-cycle) cubic-bezier(0.18, 0.78, 0.22, 1) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--left::after {
-  animation: portfolioEngineConduitFlowLeft 11s linear infinite;
+  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0.74, 0.24, 1) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--right::after {
-  animation: portfolioEngineConduitFlowRight 11s linear infinite;
+  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0.74, 0.24, 1) 460ms infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-left-core {
+  animation: portfolioEngineArchiveCoreBreath var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-left-core::before {
+  animation: portfolioEngineArchiveCoreRing var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-left-core::after {
+  animation: portfolioEngineArchiveCoreBeat var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-reactor::before {
-  animation: portfolioEngineReactorBreath 7.8s var(--ease-breath) infinite;
+  animation: portfolioEngineReactorBreath var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-reactor::after {
-  animation: portfolioEngineReactorFeed 8.4s var(--ease-breath) 420ms infinite;
+  animation: portfolioEngineReactorFeed var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-reactor-ring {
-  animation: portfolioEngineRingBreath 7.8s var(--ease-breath) infinite;
+  animation: portfolioEngineRingBreath var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-reactor-core {
-  animation: portfolioEngineCoreBreath 7.8s var(--ease-breath) infinite;
+  animation: portfolioEngineCoreBreath var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
 }
 
 @media (min-width: 64rem) {
@@ -565,6 +587,9 @@ button {
 
   .portfolio-engine::before,
   .portfolio-engine::after,
+  .portfolio-engine-left-core,
+  .portfolio-engine-left-core::before,
+  .portfolio-engine-left-core::after,
   .portfolio-engine-panel::after,
   .portfolio-engine-reactor::before,
   .portfolio-engine-reactor::after,
@@ -574,24 +599,44 @@ button {
   }
 
   .portfolio-engine::before {
-    background-position: 0 0, 50% 0;
+    opacity: 0.58;
   }
 
   .portfolio-engine::after {
-    background-position: 0 0, 50% 0;
+    opacity: 0;
   }
 
   .portfolio-engine-panel--left::after,
   .portfolio-engine-panel--right::after {
     background-position: 50% 0, 0 0;
+    opacity: 0.24;
+  }
+
+  .portfolio-engine-left-core {
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.62),
+      inset 0 0 0.5rem rgb(var(--engine-accent-glow) / 0.055),
+      0 0 0.58rem rgb(var(--engine-accent-glow) / 0.1);
+  }
+
+  .portfolio-engine-left-core::before {
+    opacity: 0.72;
+    transform: none;
+  }
+
+  .portfolio-engine-left-core::after {
+    opacity: 0.84;
+    transform: none;
   }
 
   .portfolio-engine-reactor::before {
     transform: scale3d(0.94, 0.94, 1);
+    opacity: 0.32;
   }
 
   .portfolio-engine-reactor::after {
     transform: scale3d(0.82, 0.82, 1);
+    opacity: 0.24;
   }
 
   .portfolio-engine-reactor-ring,
@@ -600,105 +645,221 @@ button {
   }
 }
 
-@keyframes portfolioEngineOuterVeinFlow {
-  0% {
-    background-position: 0 0, -120% 0;
-    opacity: 0.56;
-  }
-
-  50% {
-    opacity: 0.74;
-  }
-
-  100% {
-    background-position: 0 0, 120% 0;
-    opacity: 0.56;
-  }
-}
-
-@keyframes portfolioEngineOuterVeinFlowReverse {
-  0% {
-    background-position: 0 0, 120% 0;
-    opacity: 0.46;
-  }
-
-  50% {
-    opacity: 0.64;
-  }
-
-  100% {
-    background-position: 0 0, -120% 0;
-    opacity: 0.46;
-  }
-}
-
-@keyframes portfolioEngineConduitFlowLeft {
-  0% {
-    background-position: 118% 0, 0 0;
-  }
-
-  100% {
-    background-position: -118% 0, 0 0;
-  }
-}
-
-@keyframes portfolioEngineConduitFlowRight {
-  0% {
-    background-position: -118% 0, 0 0;
-  }
-
-  100% {
-    background-position: 118% 0, 0 0;
-  }
-}
-
-@keyframes portfolioEngineReactorBreath {
+@keyframes portfolioEngineVeinRest {
   0%, 100% {
-    opacity: 0.32;
-    transform: scale3d(0.94, 0.94, 1);
+    opacity: 0.5;
+    box-shadow:
+      0 0 0.26rem rgb(var(--engine-accent-glow) / 0.045),
+      inset 0 0 0.62rem rgb(var(--engine-accent-glow) / 0.012);
   }
 
-  50% {
+  8% {
+    opacity: 0.66;
+    box-shadow:
+      0 0 0.38rem rgb(var(--engine-accent-glow) / 0.08),
+      inset 0 0 0.86rem rgb(var(--engine-accent-glow) / 0.024);
+  }
+
+  36% {
+    opacity: 0.56;
+  }
+}
+
+@keyframes portfolioEngineLifebloodPulse {
+  0%, 5% {
+    background-position: 0 0, -38% 0;
+    opacity: 0;
+    transform: translate3d(0, -50%, 0) scaleX(0.86);
+  }
+
+  11% {
+    opacity: 0.42;
+  }
+
+  18% {
+    background-position: 0 0, 28% 0;
+    opacity: 0.34;
+  }
+
+  25% {
+    background-position: 0 0, 74% 0;
+    opacity: 0.38;
+  }
+
+  31% {
+    background-position: 0 0, 112% 0;
+    opacity: 0.18;
+  }
+
+  38%, 100% {
+    background-position: 0 0, 142% 0;
+    opacity: 0;
+    transform: translate3d(0, -50%, 0) scaleX(0.96);
+  }
+}
+
+@keyframes portfolioEngineConduitReceive {
+  0%, 8% {
+    background-position: 118% 0, 0 0;
+    opacity: 0.18;
+    box-shadow: 0 0 0.14rem rgb(var(--engine-accent-glow) / 0.04);
+  }
+
+  16% {
     opacity: 0.48;
+    box-shadow: 0 0 0.36rem rgb(var(--engine-accent-glow) / 0.16);
+  }
+
+  30% {
+    background-position: -118% 0, 0 0;
+    opacity: 0.3;
+  }
+
+  44%, 100% {
+    background-position: -118% 0, 0 0;
+    opacity: 0.2;
+    box-shadow: 0 0 0.18rem rgb(var(--engine-accent-glow) / 0.06);
+  }
+}
+
+@keyframes portfolioEngineArchiveCoreBreath {
+  0%, 100% {
+    filter: brightness(1);
+    transform: scale3d(1, 1, 1);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.62),
+      inset 0 0 0.5rem rgb(var(--engine-accent-glow) / 0.055),
+      0 0 0.58rem rgb(var(--engine-accent-glow) / 0.1);
+  }
+
+  7% {
+    filter: brightness(1.08);
+    transform: scale3d(1.018, 1.018, 1);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.62),
+      inset 0 0 0.72rem rgb(var(--engine-accent-glow) / 0.095),
+      0 0 0.92rem rgb(var(--engine-accent-glow) / 0.18);
+  }
+
+  18% {
+    filter: brightness(1.03);
+    transform: scale3d(1.006, 1.006, 1);
+  }
+}
+
+@keyframes portfolioEngineArchiveCoreRing {
+  0%, 100% {
+    opacity: 0.68;
+    transform: scale3d(1, 1, 1);
+  }
+
+  7% {
+    opacity: 0.92;
+    transform: scale3d(1.08, 1.08, 1);
+  }
+
+  18% {
+    opacity: 0.74;
     transform: scale3d(1.02, 1.02, 1);
   }
 }
 
-@keyframes portfolioEngineReactorFeed {
+@keyframes portfolioEngineArchiveCoreBeat {
   0%, 100% {
-    opacity: 0.24;
+    opacity: 0.8;
+    transform: scale3d(1, 1, 1);
+  }
+
+  6% {
+    opacity: 1;
+    transform: scale3d(1.24, 1.24, 1);
+  }
+
+  15% {
+    opacity: 0.86;
+    transform: scale3d(1.04, 1.04, 1);
+  }
+}
+
+@keyframes portfolioEngineReactorBreath {
+  0%, 21%, 100% {
+    opacity: 0.3;
+    transform: scale3d(0.94, 0.94, 1);
+  }
+
+  28% {
+    opacity: 0.52;
+    transform: scale3d(1.03, 1.03, 1);
+  }
+
+  38% {
+    opacity: 0.34;
+    transform: scale3d(0.97, 0.97, 1);
+  }
+}
+
+@keyframes portfolioEngineReactorFeed {
+  0%, 23%, 100% {
+    opacity: 0.22;
     transform: scale3d(0.82, 0.82, 1);
   }
 
-  50% {
-    opacity: 0.42;
-    transform: scale3d(1.05, 1.05, 1);
+  30% {
+    opacity: 0.52;
+    transform: scale3d(1.1, 1.1, 1);
+  }
+
+  40% {
+    opacity: 0.28;
+    transform: scale3d(0.9, 0.9, 1);
   }
 }
 
 @keyframes portfolioEngineRingBreath {
-  0%, 100% {
-    opacity: 0.74;
+  0%, 22%, 100% {
+    opacity: 0.72;
     transform: scale3d(0.99, 0.99, 1);
   }
 
-  50% {
-    opacity: 0.9;
-    transform: scale3d(1.025, 1.025, 1);
+  29% {
+    opacity: 0.94;
+    transform: scale3d(1.055, 1.055, 1);
+  }
+
+  39% {
+    opacity: 0.76;
+    transform: scale3d(1.01, 1.01, 1);
   }
 }
 
 @keyframes portfolioEngineCoreBreath {
-  0%, 100% {
+  0%, 22%, 100% {
     opacity: 0.86;
     transform: scale3d(0.995, 0.995, 1);
+    filter:
+      grayscale(1)
+      contrast(1.08)
+      brightness(1.08)
+      drop-shadow(0 0 0.24rem rgb(var(--engine-accent-glow) / 0.18));
   }
 
-  50% {
+  29% {
     opacity: 0.98;
-    transform: scale3d(1.018, 1.018, 1);
+    transform: scale3d(1.022, 1.022, 1);
+    filter:
+      grayscale(1)
+      contrast(1.1)
+      brightness(1.14)
+      drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.28));
   }
-}.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-system::after {
+
+  40% {
+    opacity: 0.9;
+    transform: scale3d(1.002, 1.002, 1);
+  }
+}
+
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-system::after {
   opacity: 0;
   animation: none;
 }
