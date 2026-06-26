@@ -480,7 +480,15 @@ button {
 }
 
 .site-shell.is-home-route .home-archive-awakening {
-  display: block;
+  display: none;
+  opacity: 0;
+  animation: none;
+}
+
+.site-shell.is-home-route .portfolio-entry-constellation {
+  display: none;
+  opacity: 0;
+  animation: none;
 }
 
 .home-archive-awakening::before,
