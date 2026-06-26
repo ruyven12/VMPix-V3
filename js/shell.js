@@ -10,6 +10,84 @@ function setCurrentView(viewName) {
   }
 }
 
+const PORTFOLIO_WORLD_SELECTION_CONFIG = {
+  portfolio: { id: "portfolio", label: "Interactive Portfolio" },
+  horizon: { id: "horizon", label: "The Horizon" },
+  soundtrack: { id: "soundtrack", label: "The Soundtrack" },
+  cosmos: { id: "cosmos", label: "The Cosmos" },
+  battleground: { id: "battleground", label: "The Battleground" },
+  wild: { id: "wild", label: "The Wild" },
+  story: { id: "story", label: "The Story" },
+  trajectory: { id: "trajectory", label: "The Trajectory" },
+  comms: { id: "comms", label: "The Comms" },
+};
+
+const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
+const portfolioBeaconHotspots = Array.from(document.querySelectorAll("[data-portfolio-star]"));
+
+function getPortfolioWorldSelectionConfig(worldName) {
+  return PORTFOLIO_WORLD_SELECTION_CONFIG[worldName] || PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio;
+}
+
+function setPortfolioEngineHudCurrentView(viewName) {
+  if (portfolioEngineCurrentView) {
+    portfolioEngineCurrentView.textContent = viewName;
+  }
+}
+
+function setPortfolioBeaconHotspotsEnabled(isEnabled) {
+  portfolioBeaconHotspots.forEach((button) => {
+    button.disabled = !isEnabled;
+    button.setAttribute("aria-disabled", String(!isEnabled));
+  });
+}
+
+function setPortfolioActiveWorld(worldName = "portfolio") {
+  const config = getPortfolioWorldSelectionConfig(worldName);
+  if (shell) {
+    shell.dataset.activeWorld = config.id;
+  }
+  setPortfolioEngineHudCurrentView(config.label);
+  portfolioBeaconHotspots.forEach((button) => {
+    const isSelected = config.id !== "portfolio" && button.dataset.portfolioStar === config.id;
+    button.classList.toggle("is-selected", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
+function handlePortfolioBeaconHotspotClick(event) {
+  const button = event.currentTarget;
+  if (!button || button.disabled || window.location.pathname !== routePaths.portfolio) {
+    return;
+  }
+
+  event.preventDefault();
+  setPortfolioActiveWorld(button.dataset.portfolioStar || "portfolio");
+}
+
+function handlePortfolioBeaconHotspotKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " " && event.code !== "Space") {
+    return;
+  }
+
+  const button = event.currentTarget;
+  if (!button || button.disabled || window.location.pathname !== routePaths.portfolio) {
+    return;
+  }
+
+  event.preventDefault();
+  setPortfolioActiveWorld(button.dataset.portfolioStar || "portfolio");
+}
+
+function initPortfolioBeaconHotspots() {
+  setPortfolioActiveWorld("portfolio");
+  setPortfolioBeaconHotspotsEnabled(Boolean(shell?.dataset.portfolioEngineReady === "true"));
+  portfolioBeaconHotspots.forEach((button) => {
+    button.addEventListener("click", handlePortfolioBeaconHotspotClick);
+    button.addEventListener("keydown", handlePortfolioBeaconHotspotKeydown);
+  });
+}
+
 function getShellNavModuleContext(targetName) {
   const routeMeta = getShellRouteMeta(targetName);
   if (!routeMeta) {
@@ -1239,6 +1317,7 @@ function showPortfolioHubView() {
   }
   setHubChromeHidden(false);
   setCurrentView("Interactive Portfolio");
+  setPortfolioActiveWorld("portfolio");
   setActiveGlobalNav("portfolio");
 }
 
@@ -2599,6 +2678,8 @@ function cancelPortfolioEngineReadyGate() {
 
 function clearPortfolioEngineReadyState() {
   cancelPortfolioEngineReadyGate();
+  setPortfolioBeaconHotspotsEnabled(false);
+  setPortfolioActiveWorld("portfolio");
   if (!shell) {
     return;
   }
@@ -2650,6 +2731,7 @@ function markPortfolioEngineReady() {
   shell.classList.add("has-portfolio-coordinates-online", "is-portfolio-engine-ready");
   shell.dataset.portfolioCoordinatesOnline = String(PORTFOLIO_COORDINATE_ONLINE_TOTAL);
   shell.dataset.portfolioEngineReady = "true";
+  setPortfolioBeaconHotspotsEnabled(true);
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
   }));
@@ -2960,6 +3042,7 @@ function beginHomePortfolioTransition() {
 if (shell && startButton) {
   renderGlobalMenu();
   initShellRailLogo();
+  initPortfolioBeaconHotspots();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", beginHomePortfolioTransition);

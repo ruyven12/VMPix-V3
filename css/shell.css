@@ -124,9 +124,9 @@ button {
   --portfolio-engine-reserve: clamp(4.85rem, 13svh, 8.5rem);
   --portfolio-engine-bottom-offset: max(0.58rem, env(safe-area-inset-bottom));
   --portfolio-engine-inline-inset: max(0.58rem, env(safe-area-inset-left), env(safe-area-inset-right));
-  --engine-accent: 226 226 226;
-  --engine-accent-soft: 156 156 156;
-  --engine-accent-glow: 246 246 246;
+  --engine-accent: 242 242 242;
+  --engine-accent-soft: 242 242 242;
+  --engine-accent-glow: 242 242 242;
   --engine-line: rgba(226, 226, 226, 0.28);
   --engine-panel-bg: rgba(8, 8, 8, 0.86);
   --engine-panel-edge: rgba(226, 226, 226, 0.2);
@@ -137,6 +137,43 @@ button {
   --portfolio-beacon-field-height: calc(100% - var(--portfolio-engine-reserve));
   --portfolio-beacon-field-lift: calc(var(--portfolio-engine-reserve) * 0.5);
   grid-template-rows: minmax(0, 1fr);
+}
+.site-shell[data-shell-route="portfolio"][data-active-world="horizon"] {
+  --engine-accent: 255 159 46;
+  --engine-accent-soft: 255 159 46;
+  --engine-accent-glow: 255 159 46;
+}
+
+.site-shell[data-shell-route="portfolio"][data-active-world="soundtrack"] {
+  --engine-accent: 163 92 255;
+  --engine-accent-soft: 163 92 255;
+  --engine-accent-glow: 163 92 255;
+}
+
+.site-shell[data-shell-route="portfolio"][data-active-world="cosmos"] {
+  --engine-accent: 77 163 255;
+  --engine-accent-soft: 77 163 255;
+  --engine-accent-glow: 77 163 255;
+}
+
+.site-shell[data-shell-route="portfolio"][data-active-world="battleground"] {
+  --engine-accent: 255 63 63;
+  --engine-accent-soft: 255 63 63;
+  --engine-accent-glow: 255 63 63;
+}
+
+.site-shell[data-shell-route="portfolio"][data-active-world="wild"] {
+  --engine-accent: 82 255 122;
+  --engine-accent-soft: 82 255 122;
+  --engine-accent-glow: 82 255 122;
+}
+
+.site-shell[data-shell-route="portfolio"][data-active-world="story"],
+.site-shell[data-shell-route="portfolio"][data-active-world="trajectory"],
+.site-shell[data-shell-route="portfolio"][data-active-world="comms"] {
+  --engine-accent: 216 216 216;
+  --engine-accent-soft: 216 216 216;
+  --engine-accent-glow: 216 216 216;
 }
 
 .site-shell[data-shell-route="portfolio"] .universal-bottom-rail {
@@ -371,6 +408,10 @@ button {
   font-size: clamp(0.68rem, 2.2vw, 0.96rem);
   line-height: 1.02;
   text-shadow: 0 0 0.42rem rgb(var(--engine-accent-glow) / 0.1);
+}
+.site-shell[data-shell-route="portfolio"] .portfolio-engine-panel--left .portfolio-engine-label {
+  color: rgb(var(--engine-accent) / 0.66);
+  text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
 .portfolio-engine-status {
@@ -1832,14 +1873,21 @@ button {
   --beacon-x: 0px;
   --beacon-y: var(--entry-beacon-midline-y);
   --beacon-size: clamp(1rem, 3.4vw, 1.62rem);
+  --beacon-hit-size: max(44px, calc(var(--beacon-size) * 2.42));
   --beacon-color: 247 247 242;
   --beacon-delay: 1540ms;
   position: fixed;
   top: calc(var(--home-portfolio-transition-center-y) + var(--beacon-y));
   left: calc(var(--home-portfolio-transition-center-x) + var(--beacon-x));
-  width: var(--beacon-size);
-  aspect-ratio: 1;
+  width: var(--beacon-hit-size);
+  height: var(--beacon-hit-size);
+  padding: 0;
+  border: 0;
   border-radius: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  color: inherit;
+  cursor: pointer;
   opacity: 0;
   pointer-events: none;
   background:
@@ -1847,8 +1895,13 @@ button {
     linear-gradient(90deg, transparent 0 35%, rgb(var(--beacon-color) / 0.24) 45%, rgba(247, 247, 242, 0.72) 50%, rgb(var(--beacon-color) / 0.24) 55%, transparent 65% 100%),
     linear-gradient(0deg, transparent 0 35%, rgb(var(--beacon-color) / 0.2) 45%, rgba(247, 247, 242, 0.62) 50%, rgb(var(--beacon-color) / 0.2) 55%, transparent 65% 100%),
     radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.26) 0 12%, transparent 46%);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: var(--beacon-size) var(--beacon-size);
   transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1) rotate(0deg);
   transform-origin: center;
+  outline: 0;
+  -webkit-tap-highlight-color: transparent;
   backface-visibility: hidden;
   contain: paint;
   will-change: opacity, transform;
@@ -1867,6 +1920,8 @@ button {
 .portfolio-beacon::before {
   width: 0.42rem;
   aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.92;
   background:
     radial-gradient(circle, rgba(247, 247, 242, 1) 0 18%, rgba(247, 247, 242, 0.86) 26% 38%, rgb(var(--beacon-color) / 0.46) 48%, transparent 72%);
   box-shadow:
@@ -1885,38 +1940,84 @@ button {
   transform: translate3d(-50%, -50%, 0) scale3d(0.78, 0.78, 1) rotate(0deg);
 }
 
-.portfolio-beacon--soundtrack {
-  --beacon-x: var(--entry-beacon-01-x);
-  --beacon-y: var(--entry-beacon-01-y);
-  --beacon-color: 142 108 255;
-  --beacon-delay: var(--entry-beacon-01-delay);
+.portfolio-beacon:disabled {
+  cursor: default;
 }
 
-.portfolio-beacon--battleground {
-  --beacon-x: var(--entry-beacon-02-x);
-  --beacon-y: var(--entry-beacon-02-y);
-  --beacon-color: 255 57 46;
-  --beacon-delay: var(--entry-beacon-02-delay);
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon:not(:disabled) {
+  pointer-events: auto;
 }
 
-.portfolio-beacon--wild {
-  --beacon-x: var(--entry-beacon-03-x);
-  --beacon-y: var(--entry-beacon-03-y);
-  --beacon-color: 65 220 132;
-  --beacon-delay: var(--entry-beacon-03-delay);
+.portfolio-beacon:focus-visible {
+  outline: 1px solid rgb(var(--beacon-color) / 0.72);
+  outline-offset: -0.08rem;
 }
 
-.portfolio-beacon--cosmos {
-  --beacon-x: var(--entry-beacon-04-x);
-  --beacon-y: var(--entry-beacon-04-y);
-  --beacon-color: 64 172 255;
-  --beacon-delay: var(--entry-beacon-04-delay);
+.portfolio-beacon:not(:disabled):is(:hover, :focus-visible)::before {
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1);
+  box-shadow:
+    0 0 0.3rem rgba(247, 247, 242, 0.34),
+    0 0 0.72rem rgb(var(--beacon-color) / 0.34);
+}
+
+.portfolio-beacon:not(:disabled):is(:hover, :focus-visible)::after {
+  opacity: 0.58;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.14, 1.14, 1) rotate(0.8deg);
+}
+
+.portfolio-beacon.is-selected,
+.portfolio-beacon[aria-pressed="true"] {
+  opacity: 1;
+}
+
+.portfolio-beacon.is-selected::before,
+.portfolio-beacon[aria-pressed="true"]::before {
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1);
+  box-shadow:
+    0 0 0.34rem rgba(247, 247, 242, 0.42),
+    0 0 0.92rem rgb(var(--beacon-color) / 0.48);
+}
+
+.portfolio-beacon.is-selected::after,
+.portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 0.62;
+  animation: portfolioBeaconSelectedPulse 4.6s var(--ease-breath) infinite;
 }
 
 .portfolio-beacon--horizon {
+  --beacon-x: var(--entry-beacon-01-x);
+  --beacon-y: var(--entry-beacon-01-y);
+  --beacon-color: 255 159 46;
+  --beacon-delay: var(--entry-beacon-01-delay);
+}
+
+.portfolio-beacon--soundtrack {
+  --beacon-x: var(--entry-beacon-02-x);
+  --beacon-y: var(--entry-beacon-02-y);
+  --beacon-color: 163 92 255;
+  --beacon-delay: var(--entry-beacon-02-delay);
+}
+
+.portfolio-beacon--cosmos {
+  --beacon-x: var(--entry-beacon-03-x);
+  --beacon-y: var(--entry-beacon-03-y);
+  --beacon-color: 77 163 255;
+  --beacon-delay: var(--entry-beacon-03-delay);
+}
+
+.portfolio-beacon--battleground {
+  --beacon-x: var(--entry-beacon-04-x);
+  --beacon-y: var(--entry-beacon-04-y);
+  --beacon-color: 255 63 63;
+  --beacon-delay: var(--entry-beacon-04-delay);
+}
+
+.portfolio-beacon--wild {
   --beacon-x: var(--entry-beacon-05-x);
   --beacon-y: var(--entry-beacon-05-y);
-  --beacon-color: 255 218 93;
+  --beacon-color: 82 255 122;
   --beacon-delay: var(--entry-beacon-05-delay);
 }
 
@@ -1930,12 +2031,12 @@ button {
   --beacon-y: var(--entry-system-01-y);
 }
 
-.portfolio-beacon--comms {
+.portfolio-beacon--trajectory {
   --beacon-x: var(--entry-system-02-x);
   --beacon-y: var(--entry-system-02-y);
 }
 
-.portfolio-beacon--trajectory {
+.portfolio-beacon--comms {
   --beacon-x: var(--entry-system-03-x);
   --beacon-y: var(--entry-system-03-y);
 }
@@ -1957,9 +2058,13 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world {
-  opacity: 0.94;
+  opacity: 0.96;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   animation: portfolioWorldBeaconBreath 5.8s var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world::before {
+  animation: portfolioBeaconCoreShimmer 3.8s var(--ease-breath) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--world::after {
@@ -1967,9 +2072,26 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system {
-  opacity: 0.68;
+  opacity: 0.72;
   transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
   animation: none;
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon--system::before {
+  animation: portfolioBeaconSystemShimmer 5.2s var(--ease-breath) infinite;
+}
+
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::before,
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::before {
+  opacity: 1;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1);
+}
+
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::after,
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 0.62;
+  animation: portfolioBeaconSelectedPulse 4.6s var(--ease-breath) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3207,6 +3329,53 @@ button {
   46% {
     opacity: 0.42;
     transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(0.8deg);
+  }
+}
+@keyframes portfolioBeaconCoreShimmer {
+  0%,
+  100% {
+    opacity: 0.86;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1);
+  }
+  32% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1);
+  }
+  54% {
+    opacity: 0.9;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1);
+  }
+  76% {
+    opacity: 0.98;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1);
+  }
+}
+
+@keyframes portfolioBeaconSystemShimmer {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.94, 0.94, 1);
+  }
+  44% {
+    opacity: 0.88;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1);
+  }
+}
+
+@keyframes portfolioBeaconSelectedPulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.94, 0.94, 1) rotate(0deg);
+  }
+  42% {
+    opacity: 0.72;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.22, 1.22, 1) rotate(0.8deg);
+  }
+  68% {
+    opacity: 0.58;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.02, 1.02, 1) rotate(-0.2deg);
   }
 }
 
@@ -6299,6 +6468,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"] .ambient-system {
+  z-index: 2;
   background: #010103;
 }
 
