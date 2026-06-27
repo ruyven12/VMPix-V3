@@ -2836,6 +2836,11 @@ function handleGlobalMenuAction(event) {
 
 function revealHub(options = {}) {
   const shouldPreserveHomeDispatch = Boolean(options.shouldPlayPortfolioArrival);
+  const wasHomePortfolioEntrySequence = Boolean(
+    shell?.classList.contains("is-portfolio-entry-sequence") &&
+    shell.classList.contains("is-home-transitioning") &&
+    shell.classList.contains("is-engage-activated")
+  );
   if (shouldPreserveHomeDispatch) {
     window.clearTimeout(homePortfolioTransitionTimer);
     homePortfolioTransitionTimer = 0;
@@ -2875,6 +2880,9 @@ function revealHub(options = {}) {
   setActiveGlobalNav("portfolio");
   if (options.shouldPlayPortfolioArrival) {
     startPortfolioArrival();
+    if (wasHomePortfolioEntrySequence) {
+      shell.classList.add("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
+    }
   } else if (options.shouldPlayDirectPortfolioEntrySequence) {
     startPortfolioDirectEntrySequenceForQA();
   } else if (options.shouldPlayDirectPortfolioArrival) {
