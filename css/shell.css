@@ -124,7 +124,7 @@ button {
   --portfolio-engine-reserve: clamp(4.85rem, 13svh, 8.5rem);
   --portfolio-engine-bottom-offset: max(0.58rem, env(safe-area-inset-bottom));
   --portfolio-engine-inline-inset: max(0.58rem, env(safe-area-inset-left), env(safe-area-inset-right));
-  --engine-lifeblood-cycle: 4.65s;
+  --engine-lifeblood-cycle: 3.85s;
   --engine-accent: 242 242 242;
   --engine-accent-soft: 242 242 242;
   --engine-accent-glow: 242 242 242;
@@ -250,23 +250,54 @@ button {
 .portfolio-engine::after {
   inset-inline-start: clamp(0.62rem, 2.2vw, 1.08rem);
   inset-inline-end: clamp(5.65rem, 23vw, 13.25rem);
-  inset-block: clamp(0.38rem, 1.05svh, 0.58rem);
+  inset-block: clamp(0.44rem, 1.18svh, 0.64rem);
   background:
-    radial-gradient(ellipse at 18% 50%, rgb(var(--engine-accent-glow) / 0.18) 0 12%, transparent 48%),
-    linear-gradient(90deg, transparent 0 8%, rgb(var(--engine-accent-soft) / 0.12) 18%, rgb(var(--engine-accent-soft) / 0.06) 28%, transparent 43% 100%),
-    linear-gradient(90deg, transparent 0 10%, rgb(var(--engine-accent) / 0) 22%, rgb(var(--engine-accent-glow) / 0.5) 38%, rgba(246, 246, 246, 0.46) 50%, rgb(var(--engine-accent-glow) / 0.52) 62%, rgb(var(--engine-accent) / 0.1) 76%, transparent 94% 100%),
-    repeating-linear-gradient(90deg, rgb(var(--engine-accent-soft) / 0) 0 0.68rem, rgb(var(--engine-accent-soft) / 0.14) 0.68rem 0.76rem, rgb(var(--engine-accent-soft) / 0) 0.76rem 1.28rem);
-  background-size: 32% 100%, 100% 100%, 54% 100%, 1.28rem 100%;
-  background-position: 0 0, 0 0, -58% 0, 0 0;
+    radial-gradient(circle at 5% 50%, rgba(246, 246, 246, 0.54) 0 2%, rgb(var(--engine-accent-glow) / 0.42) 4% 12%, transparent 26%),
+    radial-gradient(circle at 96% 50%, rgba(246, 246, 246, 0.5) 0 2%, rgb(var(--engine-accent-glow) / 0.38) 5% 14%, transparent 30%),
+    linear-gradient(108deg, transparent 0 15%, rgb(var(--engine-accent-glow) / 0.46) 16%, rgba(246, 246, 246, 0.74) 17.4%, rgb(var(--engine-accent-glow) / 0.3) 18.8%, transparent 20% 100%),
+    linear-gradient(72deg, transparent 0 30%, rgb(var(--engine-accent-soft) / 0.34) 31%, rgba(246, 246, 246, 0.56) 32.2%, rgb(var(--engine-accent-soft) / 0.22) 33.6%, transparent 35% 100%),
+    linear-gradient(96deg, transparent 0 48%, rgb(var(--engine-accent-glow) / 0.38) 49%, rgba(246, 246, 246, 0.7) 50.2%, rgb(var(--engine-accent-glow) / 0.28) 51.4%, transparent 53% 100%),
+    linear-gradient(90deg, transparent 0 3%, rgb(var(--engine-accent) / 0.2) 8%, rgb(var(--engine-accent-glow) / 0.72) 32%, rgba(246, 246, 246, 0.9) 48%, rgb(var(--engine-accent-glow) / 0.74) 66%, rgb(var(--engine-accent) / 0.26) 91%, transparent 100%);
+  background-size: 100% 100%, 100% 100%, 32% 78%, 34% 70%, 42% 74%, 118% 100%;
+  background-position: 0 0, 0 0, -36% 22%, -28% 58%, -54% 34%, -112% 0;
   border-radius: clamp(0.18rem, 0.7vw, 0.36rem);
   opacity: 0;
-  filter: blur(0.04px);
+  filter:
+    blur(0.02px)
+    brightness(1.14)
+    drop-shadow(0 0 0.12rem rgb(var(--engine-accent-glow) / 0.38));
   box-shadow:
-    0 0 0.7rem rgb(var(--engine-accent-glow) / 0.16),
-    0 0 1.3rem rgb(var(--engine-accent-glow) / 0.07),
-    inset 0 0 1rem rgb(var(--engine-accent-glow) / 0.045);
+    0 0 0.92rem rgb(var(--engine-accent-glow) / 0.24),
+    0 0 1.72rem rgb(var(--engine-accent-glow) / 0.12),
+    inset 0 0 1.08rem rgb(var(--engine-accent-glow) / 0.06);
+  clip-path: polygon(
+    0 50%,
+    7% 42%,
+    13% 56%,
+    20% 45%,
+    29% 53%,
+    38% 38%,
+    47% 58%,
+    56% 45%,
+    66% 55%,
+    76% 40%,
+    86% 52%,
+    100% 46%,
+    100% 58%,
+    88% 66%,
+    78% 53%,
+    68% 69%,
+    58% 56%,
+    49% 72%,
+    40% 51%,
+    30% 64%,
+    21% 55%,
+    14% 68%,
+    7% 54%,
+    0 62%
+  );
   mix-blend-mode: screen;
-  transform: scaleX(0.88);
+  transform: scaleX(0.9) translate3d(0, 0, 0);
   transform-origin: 0 50%;
   mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 88%, transparent 100%);
 }
@@ -508,15 +539,15 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine::after {
-  animation: portfolioEngineLifebloodPulse var(--engine-lifeblood-cycle) linear infinite;
+  animation: portfolioEngineLifebloodPulse var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0, 0.18, 1) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--left::after {
-  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0.74, 0.24, 1) infinite;
+  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0, 0.18, 1) infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--right::after {
-  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0.74, 0.24, 1) 460ms infinite;
+  animation: portfolioEngineConduitReceive var(--engine-lifeblood-cycle) cubic-bezier(0.2, 0, 0.18, 1) 360ms infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-left-core {
@@ -662,118 +693,166 @@ button {
 
 @keyframes portfolioEngineLifebloodPulse {
   0% {
-    background-position: 0 0, 0 0, -74% 0, 0 0;
-    opacity: 0.08;
-    transform: scaleX(0.92);
+    background-position: 0 0, 0 0, -38% 22%, -30% 58%, -58% 34%, -116% 0;
+    opacity: 0;
+    filter:
+      blur(0.02px)
+      brightness(1)
+      drop-shadow(0 0 0 rgb(var(--engine-accent-glow) / 0));
+    transform: scaleX(0.18) translate3d(0, 0, 0);
   }
 
-  8% {
-    background-position: 0 0, 0 0, -52% 0, 0.12rem 0;
-    opacity: 0.2;
-    transform: scaleX(0.94);
+  7% {
+    background-position: 0 0, 0 0, -30% 22%, -22% 58%, -48% 34%, -96% 0;
+    opacity: 0.34;
+    filter:
+      blur(0.018px)
+      brightness(1.35)
+      drop-shadow(0 0 0.16rem rgb(var(--engine-accent-glow) / 0.42));
+    transform: scaleX(0.28) translate3d(0.04rem, -0.01rem, 0);
   }
 
-  16% {
-    background-position: 0 0, 0 0, -28% 0, 0.24rem 0;
-    opacity: 0.36;
-    transform: scaleX(0.955);
+  14% {
+    background-position: 0 0, 0 0, -18% 22%, -10% 58%, -34% 34%, -72% 0;
+    opacity: 0.78;
+    filter:
+      blur(0.015px)
+      brightness(1.74)
+      drop-shadow(0 0 0.24rem rgb(var(--engine-accent-glow) / 0.62));
+    transform: scaleX(0.48) translate3d(0, 0.02rem, 0);
   }
 
-  24% {
-    background-position: 0 0, 0 0, -4% 0, 0.38rem 0;
-    opacity: 0.5;
-    transform: scaleX(0.968);
+  20% {
+    background-position: 0 0, 0 0, -6% 22%, 2% 58%, -18% 34%, -48% 0;
+    opacity: 0.42;
+    filter:
+      blur(0.02px)
+      brightness(1.22)
+      drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.38));
+    transform: scaleX(0.62) translate3d(0.06rem, -0.015rem, 0);
   }
 
-  32% {
-    background-position: 0 0, 0 0, 20% 0, 0.52rem 0;
-    opacity: 0.6;
-    transform: scaleX(0.978);
+  27% {
+    background-position: 0 0, 0 0, 8% 22%, 16% 58%, 0% 34%, -22% 0;
+    opacity: 0.86;
+    filter:
+      blur(0.01px)
+      brightness(1.9)
+      drop-shadow(0 0 0.3rem rgb(var(--engine-accent-glow) / 0.68));
+    transform: scaleX(0.78) translate3d(0, 0.01rem, 0);
   }
 
-  40% {
-    background-position: 0 0, 0 0, 44% 0, 0.68rem 0;
+  34% {
+    background-position: 0 0, 0 0, 22% 22%, 30% 58%, 18% 34%, 4% 0;
+    opacity: 0.52;
+    filter:
+      blur(0.018px)
+      brightness(1.32)
+      drop-shadow(0 0 0.16rem rgb(var(--engine-accent-glow) / 0.42));
+    transform: scaleX(0.9) translate3d(0.05rem, -0.02rem, 0);
+  }
+
+  42% {
+    background-position: 0 0, 0 0, 38% 22%, 46% 58%, 38% 34%, 30% 0;
+    opacity: 0.9;
+    filter:
+      blur(0.008px)
+      brightness(2.02)
+      drop-shadow(0 0 0.34rem rgb(var(--engine-accent-glow) / 0.72));
+    transform: scaleX(1) translate3d(0, 0.012rem, 0);
+  }
+
+  49% {
+    background-position: 0 0, 0 0, 54% 22%, 62% 58%, 58% 34%, 56% 0;
     opacity: 0.64;
-    transform: scaleX(0.986);
+    filter:
+      blur(0.014px)
+      brightness(1.46)
+      drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.5));
+    transform: scaleX(1) translate3d(0.03rem, -0.012rem, 0);
   }
 
-  48% {
-    background-position: 0 0, 0 0, 68% 0, 0.84rem 0;
-    opacity: 0.58;
-    transform: scaleX(0.992);
+  57% {
+    background-position: 0 0, 0 0, 72% 22%, 80% 58%, 78% 34%, 82% 0;
+    opacity: 0.88;
+    filter:
+      blur(0.01px)
+      brightness(1.86)
+      drop-shadow(0 0 0.32rem rgb(var(--engine-accent-glow) / 0.66));
+    transform: scaleX(1) translate3d(0, 0, 0);
   }
 
-  56% {
-    background-position: 0 0, 0 0, 90% 0, 1rem 0;
+  66% {
+    background-position: 0 0, 0 0, 88% 22%, 98% 58%, 96% 34%, 104% 0;
     opacity: 0.46;
-    transform: scaleX(0.996);
+    filter:
+      blur(0.018px)
+      brightness(1.24)
+      drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.38));
+    transform: scaleX(0.98) translate3d(0.04rem, -0.01rem, 0);
   }
 
-  64% {
-    background-position: 0 0, 0 0, 110% 0, 1.12rem 0;
-    opacity: 0.32;
-    transform: scaleX(1);
-  }
-
-  72% {
-    background-position: 0 0, 0 0, 126% 0, 1.24rem 0;
+  76% {
+    background-position: 0 0, 0 0, 106% 22%, 116% 58%, 116% 34%, 124% 0;
     opacity: 0.2;
-    transform: scaleX(0.998);
-  }
-
-  82% {
-    background-position: 0 0, 0 0, 140% 0, 1.36rem 0;
-    opacity: 0.12;
-    transform: scaleX(0.988);
+    filter:
+      blur(0.025px)
+      brightness(1.06)
+      drop-shadow(0 0 0.08rem rgb(var(--engine-accent-glow) / 0.2));
+    transform: scaleX(0.94) translate3d(0, 0, 0);
   }
 
   100% {
-    background-position: 0 0, 0 0, 154% 0, 1.52rem 0;
-    opacity: 0.08;
-    transform: scaleX(0.92);
+    background-position: 0 0, 0 0, 122% 22%, 132% 58%, 136% 34%, 146% 0;
+    opacity: 0;
+    filter:
+      blur(0.03px)
+      brightness(1)
+      drop-shadow(0 0 0 rgb(var(--engine-accent-glow) / 0));
+    transform: scaleX(0.9) translate3d(0, 0, 0);
   }
 }
 
 @keyframes portfolioEngineConduitReceive {
   0% {
     background-position: 118% 0, 0 0;
-    opacity: 0.18;
+    opacity: 0.12;
     box-shadow: 0 0 0.14rem rgb(var(--engine-accent-glow) / 0.04);
   }
 
-  14% {
-    background-position: 82% 0, 0.1rem 0;
-    opacity: 0.3;
-    box-shadow: 0 0 0.24rem rgb(var(--engine-accent-glow) / 0.1);
+  10% {
+    background-position: 84% 0, 0.08rem 0;
+    opacity: 0.34;
+    box-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.12);
   }
 
-  28% {
-    background-position: 38% 0, 0.24rem 0;
-    opacity: 0.5;
-    box-shadow: 0 0 0.4rem rgb(var(--engine-accent-glow) / 0.2);
+  22% {
+    background-position: 44% 0, 0.18rem 0;
+    opacity: 0.7;
+    box-shadow: 0 0 0.54rem rgb(var(--engine-accent-glow) / 0.28);
   }
 
-  42% {
-    background-position: -8% 0, 0.42rem 0;
-    opacity: 0.48;
-    box-shadow: 0 0 0.36rem rgb(var(--engine-accent-glow) / 0.17);
+  31% {
+    background-position: 6% 0, 0.3rem 0;
+    opacity: 0.42;
+    box-shadow: 0 0 0.24rem rgb(var(--engine-accent-glow) / 0.12);
   }
 
-  58% {
-    background-position: -56% 0, 0.62rem 0;
-    opacity: 0.32;
-    box-shadow: 0 0 0.24rem rgb(var(--engine-accent-glow) / 0.1);
+  43% {
+    background-position: -36% 0, 0.48rem 0;
+    opacity: 0.64;
+    box-shadow: 0 0 0.48rem rgb(var(--engine-accent-glow) / 0.24);
   }
 
-  76% {
-    background-position: -96% 0, 0.82rem 0;
+  60% {
+    background-position: -76% 0, 0.72rem 0;
     opacity: 0.22;
     box-shadow: 0 0 0.18rem rgb(var(--engine-accent-glow) / 0.06);
   }
 
   100% {
     background-position: -118% 0, 1rem 0;
-    opacity: 0.18;
+    opacity: 0.12;
     box-shadow: 0 0 0.14rem rgb(var(--engine-accent-glow) / 0.04);
   }
 }
@@ -2386,13 +2465,7 @@ button {
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 1.28px, rgba(247, 247, 242, 0.96) 1.48px 2.12px, rgb(var(--beacon-color) / 0.7) 2.34px 2.86px, transparent 3.34px),
-    linear-gradient(90deg, transparent 0 25%, rgb(var(--beacon-color) / 0.16) 39%, rgba(247, 247, 242, 0.9) 49.2%, rgba(247, 247, 242, 0.9) 50.8%, rgb(var(--beacon-color) / 0.16) 61%, transparent 75% 100%),
-    linear-gradient(0deg, transparent 0 23%, rgb(var(--beacon-color) / 0.14) 38%, rgba(247, 247, 242, 0.82) 49.3%, rgba(247, 247, 242, 0.82) 50.7%, rgb(var(--beacon-color) / 0.14) 62%, transparent 77% 100%),
-    linear-gradient(45deg, transparent 0 39%, rgb(var(--beacon-color) / 0.1) 47.8%, rgba(247, 247, 242, 0.42) 50%, rgb(var(--beacon-color) / 0.1) 52.2%, transparent 61% 100%),
-    linear-gradient(-45deg, transparent 0 41%, rgb(var(--beacon-color) / 0.08) 48.5%, rgba(247, 247, 242, 0.34) 50%, rgb(var(--beacon-color) / 0.08) 51.5%, transparent 59% 100%),
-    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.2) 0 8%, rgb(var(--beacon-color) / 0.08) 22%, transparent 48%);
+  background: transparent;
   background-position: center;
   background-repeat: no-repeat;
   background-size: var(--beacon-size) var(--beacon-size);
@@ -2416,27 +2489,37 @@ button {
 }
 
 .portfolio-beacon::before {
-  width: 0.42rem;
+  width: calc(var(--beacon-size) * 0.54);
   aspect-ratio: 1;
-  border-radius: 50%;
+  border-radius: 0;
   opacity: 0.96;
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 1) 0 26%, rgba(247, 247, 242, 0.96) 34% 48%, rgb(var(--beacon-color) / 0.62) 62%, transparent 82%);
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 7%, rgba(247, 247, 242, 0.98) 8% 13%, rgb(var(--beacon-color) / 0.78) 14% 18%, transparent 24%),
+    linear-gradient(90deg, transparent 0 8%, rgb(var(--beacon-color) / 0.08) 22%, rgba(247, 247, 242, 0.88) 48.8%, rgba(247, 247, 242, 0.88) 51.2%, rgb(var(--beacon-color) / 0.08) 78%, transparent 92% 100%),
+    linear-gradient(0deg, transparent 0 6%, rgb(var(--beacon-color) / 0.1) 21%, rgba(247, 247, 242, 0.94) 48.7%, rgba(247, 247, 242, 0.94) 51.3%, rgb(var(--beacon-color) / 0.1) 79%, transparent 94% 100%),
+    linear-gradient(45deg, transparent 0 32%, rgb(var(--beacon-color) / 0.08) 45%, rgba(247, 247, 242, 0.5) 49.5%, rgba(247, 247, 242, 0.5) 50.5%, rgb(var(--beacon-color) / 0.08) 55%, transparent 68% 100%),
+    linear-gradient(-45deg, transparent 0 32%, rgb(var(--beacon-color) / 0.07) 45%, rgba(247, 247, 242, 0.42) 49.6%, rgba(247, 247, 242, 0.42) 50.4%, rgb(var(--beacon-color) / 0.07) 55%, transparent 68% 100%);
   box-shadow:
-    0 0 0.26rem rgba(247, 247, 242, 0.58),
-    0 0 0.72rem rgb(var(--beacon-color) / 0.42),
-    0 0 1.18rem rgb(var(--beacon-color) / 0.16);
+    0 0 0.18rem rgba(247, 247, 242, 0.58),
+    0 0 0.48rem rgb(var(--beacon-color) / 0.34),
+    0 0 0.86rem rgb(var(--beacon-color) / 0.12);
+  filter: brightness(1.05);
 }
 
 .portfolio-beacon::after {
-  width: calc(var(--beacon-size) * 3.05);
+  width: calc(var(--beacon-size) * 2.25);
   aspect-ratio: 1;
-  opacity: 0.62;
+  opacity: 0.48;
   background:
-    linear-gradient(90deg, transparent 0 27%, rgb(var(--beacon-color) / 0.16) 43%, rgba(247, 247, 242, 0.48) 49.4%, rgba(247, 247, 242, 0.48) 50.6%, rgb(var(--beacon-color) / 0.16) 57%, transparent 73% 100%),
-    linear-gradient(0deg, transparent 0 26%, rgb(var(--beacon-color) / 0.13) 42%, rgba(247, 247, 242, 0.4) 49.4%, rgba(247, 247, 242, 0.4) 50.6%, rgb(var(--beacon-color) / 0.13) 58%, transparent 74% 100%),
-    radial-gradient(circle, rgb(var(--beacon-color) / 0.22) 0 5%, rgb(var(--beacon-color) / 0.12) 18%, rgb(var(--beacon-color) / 0.045) 36%, transparent 64%);
-  transform: translate3d(-50%, -50%, 0) scale3d(0.82, 0.82, 1) rotate(0deg);
+    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.16) 0 5%, rgb(var(--beacon-color) / 0.055) 8% 18%, transparent 32%),
+    linear-gradient(90deg, transparent 0 18%, rgb(var(--beacon-color) / 0.08) 35%, rgba(247, 247, 242, 0.34) 49.4%, rgba(247, 247, 242, 0.34) 50.6%, rgb(var(--beacon-color) / 0.08) 65%, transparent 82% 100%),
+    linear-gradient(0deg, transparent 0 16%, rgb(var(--beacon-color) / 0.075) 34%, rgba(247, 247, 242, 0.3) 49.4%, rgba(247, 247, 242, 0.3) 50.6%, rgb(var(--beacon-color) / 0.075) 66%, transparent 84% 100%),
+    linear-gradient(45deg, transparent 0 37%, rgb(var(--beacon-color) / 0.045) 47%, rgba(247, 247, 242, 0.16) 50%, rgb(var(--beacon-color) / 0.045) 53%, transparent 63% 100%),
+    linear-gradient(-45deg, transparent 0 37%, rgb(var(--beacon-color) / 0.04) 47%, rgba(247, 247, 242, 0.14) 50%, rgb(var(--beacon-color) / 0.04) 53%, transparent 63% 100%);
+  filter:
+    blur(0.01rem)
+    drop-shadow(0 0 0.34rem rgb(var(--beacon-color) / 0.22));
+  transform: translate3d(-50%, -50%, 0) scale3d(0.9, 0.9, 1) rotate(0deg);
 }
 
 .portfolio-beacon:disabled {
@@ -2454,16 +2537,16 @@ button {
 
 .portfolio-beacon:not(:disabled):is(:hover, :focus-visible)::before {
   opacity: 1;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(1.22, 1.22, 1);
   box-shadow:
-    0 0 0.4rem rgba(247, 247, 242, 0.46),
-    0 0 0.96rem rgb(var(--beacon-color) / 0.44),
-    0 0 1.42rem rgb(var(--beacon-color) / 0.18);
+    0 0 0.24rem rgba(247, 247, 242, 0.54),
+    0 0 0.78rem rgb(var(--beacon-color) / 0.46),
+    0 0 1.18rem rgb(var(--beacon-color) / 0.18);
 }
 
 .portfolio-beacon:not(:disabled):is(:hover, :focus-visible)::after {
-  opacity: 0.68;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1) rotate(0.8deg);
+  opacity: 0.64;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(0.45deg);
 }
 
 .portfolio-beacon.is-selected,
@@ -2474,11 +2557,11 @@ button {
 .portfolio-beacon.is-selected::before,
 .portfolio-beacon[aria-pressed="true"]::before {
   opacity: 1;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1);
   box-shadow:
-    0 0 0.54rem rgba(247, 247, 242, 0.62),
-    0 0 1.42rem rgb(var(--beacon-color) / 0.72),
-    0 0 2.28rem rgb(var(--beacon-color) / 0.34);
+    0 0 0.32rem rgba(247, 247, 242, 0.68),
+    0 0 1rem rgb(var(--beacon-color) / 0.72),
+    0 0 1.64rem rgb(var(--beacon-color) / 0.3);
 }
 
 .portfolio-beacon.is-selected::after,
@@ -2590,7 +2673,7 @@ button {
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::before {
   opacity: 1;
   animation: none;
-  transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1);
 }
 
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::after,
@@ -3932,45 +4015,49 @@ button {
   100% {
     opacity: 0.96;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
-    filter: drop-shadow(0 0 0.28rem rgb(var(--beacon-color) / 0.22));
+    filter: drop-shadow(0 0 0.22rem rgb(var(--beacon-color) / 0.18));
   }
   46% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1) rotate(0deg);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.018, 1.018, 1) rotate(0deg);
     filter:
-      drop-shadow(0 0 0.52rem rgb(var(--beacon-color) / 0.42))
-      drop-shadow(0 0 1.05rem rgb(var(--beacon-color) / 0.18));
+      drop-shadow(0 0 0.42rem rgb(var(--beacon-color) / 0.36))
+      drop-shadow(0 0 0.82rem rgb(var(--beacon-color) / 0.13));
   }
 }
 
 @keyframes portfolioBeaconCoronaBreath {
   0%,
   100% {
-    opacity: 0.5;
-    transform: translate3d(-50%, -50%, 0) scale3d(0.94, 0.94, 1) rotate(0deg);
+    opacity: 0.38;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.88, 0.88, 1) rotate(0deg);
   }
   46% {
-    opacity: 0.82;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(0.8deg);
+    opacity: 0.58;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(0.45deg);
   }
 }
 @keyframes portfolioBeaconCoreShimmer {
   0%,
   100% {
     opacity: 0.96;
+    filter: brightness(1.02);
     transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1);
   }
   32% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1);
+    filter: brightness(1.42);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.16, 1.16, 1);
   }
   54% {
     opacity: 0.96;
+    filter: brightness(1.06);
     transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1);
   }
   76% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1);
+    filter: brightness(1.28);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1);
   }
 }
 
@@ -3979,14 +4066,14 @@ button {
   100% {
     opacity: 0.86;
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
-    filter: drop-shadow(0 0 0.22rem rgb(var(--beacon-color) / 0.18));
+    filter: drop-shadow(0 0 0.18rem rgb(var(--beacon-color) / 0.14));
   }
   48% {
     opacity: 0.98;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.03, 1.03, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.014, 1.014, 1);
     filter:
-      drop-shadow(0 0 0.44rem rgb(var(--beacon-color) / 0.34))
-      drop-shadow(0 0 0.9rem rgb(var(--beacon-color) / 0.14));
+      drop-shadow(0 0 0.34rem rgb(var(--beacon-color) / 0.28))
+      drop-shadow(0 0 0.66rem rgb(var(--beacon-color) / 0.1));
   }
 }
 
@@ -3994,39 +4081,41 @@ button {
   0%,
   100% {
     opacity: 0.84;
+    filter: brightness(1.02);
     transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1);
   }
   44% {
     opacity: 1;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1);
+    filter: brightness(1.3);
+    transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1);
   }
 }
 
 @keyframes portfolioBeaconSystemCoronaBreath {
   0%,
   100% {
-    opacity: 0.34;
-    transform: translate3d(-50%, -50%, 0) scale3d(0.88, 0.88, 1) rotate(0deg);
+    opacity: 0.28;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.82, 0.82, 1) rotate(0deg);
   }
   48% {
-    opacity: 0.64;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1) rotate(0.5deg);
+    opacity: 0.46;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.02, 1.02, 1) rotate(0.35deg);
   }
 }
 
 @keyframes portfolioBeaconSelectedPulse {
   0%,
   100% {
-    opacity: 0.76;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.02, 1.02, 1) rotate(0deg);
+    opacity: 0.62;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1) rotate(0deg);
   }
   42% {
-    opacity: 0.96;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.42, 1.42, 1) rotate(0.8deg);
+    opacity: 0.78;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.16, 1.16, 1) rotate(0.55deg);
   }
   68% {
-    opacity: 0.84;
-    transform: translate3d(-50%, -50%, 0) scale3d(1.14, 1.14, 1) rotate(-0.2deg);
+    opacity: 0.68;
+    transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1) rotate(-0.18deg);
   }
 }
 
