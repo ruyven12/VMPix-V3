@@ -22,15 +22,69 @@ function setDocumentTitle(title) {
 }
 
 const PORTFOLIO_WORLD_SELECTION_CONFIG = {
-  portfolio: { id: "portfolio", label: "Interactive Portfolio", description: "Destination analysis pending." },
-  horizon: { id: "horizon", label: "The Horizon", description: "Future projects, ideas, experiments and the road ahead." },
-  soundtrack: { id: "soundtrack", label: "The Soundtrack", description: "Music archive documenting live performance." },
-  cosmos: { id: "cosmos", label: "The Cosmos", description: "Creative concepts and future worlds." },
-  battleground: { id: "battleground", label: "The Battleground", description: "Professional wrestling archive." },
-  wild: { id: "wild", label: "The Wild", description: "Exploration beyond traditional photography." },
-  story: { id: "story", label: "The Story", description: "Origins of Voodoo Media." },
-  trajectory: { id: "trajectory", label: "The Trajectory", description: "Roadmap of the archive." },
-  comms: { id: "comms", label: "The Comms", description: "Booking and communications hub." },
+  portfolio: {
+    id: "portfolio",
+    label: "Interactive Portfolio",
+    description: "Select a destination star to begin archive analysis.",
+    status: "STANDBY",
+    statusType: "standby",
+  },
+  horizon: {
+    id: "horizon",
+    label: "The Horizon",
+    description: "Explore sunsets, landscapes, travel, and the quieter moments that exist beyond the stage and the ring.",
+    status: "COMING SOON",
+    statusType: "coming-soon",
+  },
+  soundtrack: {
+    id: "soundtrack",
+    label: "The Soundtrack",
+    description: "Experience the artists, venues, and performances that shaped the soundtrack of the archive.",
+    status: "DECODING",
+    statusType: "decoding",
+  },
+  cosmos: {
+    id: "cosmos",
+    label: "The Cosmos",
+    description: "Discover the creative universe where ideas, concepts, and the archive itself continue to evolve.",
+    status: "COMING SOON",
+    statusType: "coming-soon",
+  },
+  battleground: {
+    id: "battleground",
+    label: "The Battleground",
+    description: "Step inside the world of professional wrestling through the matches, moments, and personalities captured ringside.",
+    status: "DECODING",
+    statusType: "decoding",
+  },
+  wild: {
+    id: "wild",
+    label: "The Wild",
+    description: "Venture into the unexpected with wildlife, nature, and the untamed side of the archive.",
+    status: "COMING SOON",
+    statusType: "coming-soon",
+  },
+  story: {
+    id: "story",
+    label: "The Story",
+    description: "Discover the journey, passion, and moments that brought this archive to life.",
+    status: "INFORMATION",
+    statusType: "information",
+  },
+  trajectory: {
+    id: "trajectory",
+    label: "The Trajectory",
+    description: "Follow the evolution of the archive through milestones, goals, and what's still to come.",
+    status: "INFORMATION",
+    statusType: "information",
+  },
+  comms: {
+    id: "comms",
+    label: "The Comms",
+    description: "Connect for booking, availability, collaboration, and upcoming events.",
+    status: "INFORMATION",
+    statusType: "information",
+  },
 };
 
 const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
@@ -114,6 +168,9 @@ function hidePortfolioEngineProjection({ immediate = false } = {}) {
 
 function setPortfolioEngineProjectionContent(worldName) {
   const config = getPortfolioWorldSelectionConfig(worldName);
+  if (portfolioEngineProjection) {
+    portfolioEngineProjection.dataset.archiveStatus = config.statusType;
+  }
   if (portfolioEngineProjectionTitle) {
     portfolioEngineProjectionTitle.textContent = config.label;
   }
@@ -121,7 +178,7 @@ function setPortfolioEngineProjectionContent(worldName) {
     portfolioEngineProjectionDescription.textContent = config.description;
   }
   if (portfolioEngineProjectionStatus) {
-    portfolioEngineProjectionStatus.textContent = "READY";
+    portfolioEngineProjectionStatus.textContent = config.status;
   }
 }
 
