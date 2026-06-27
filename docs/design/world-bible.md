@@ -1,6 +1,6 @@
 # Website V3 World Bible
 
-Version: 0.7
+Version: 0.8
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive
 
@@ -37,6 +37,12 @@ This document evolves only through intentional design approval.
 
 # Changelog
 
+## 0.8
+
+- LOCKED: Recorded Interactive Portfolio v1.0 as a protected V3 experience.
+- Added the locked Interactive Portfolio story sequence, protected asset list, Archive Status system, and current build status.
+- Confirmed the Archive Seal transport concept as approved for future implementation, intentionally outside the locked Portfolio v1.0 scope.
+
 ## 0.7
 
 - APPROVED FOR FUTURE IMPLEMENTATION: Locked the Interactive Portfolio as a living rotating observatory.
@@ -47,6 +53,157 @@ This document evolves only through intentional design approval.
 
 - APPROVED FOR FUTURE IMPLEMENTATION: Added the Archive Journey, Interactive Portfolio philosophy, Archive Console, Archive Core, Lifeblood System, World Selection, Archive Scan, Archive Projection, World Theme Colors, and Archive Experience Structure.
 - Expanded Meta Worlds definitions for The Story, The Trajectory, and The Comms without replacing existing world definitions.
+
+---
+
+# Locked Experience
+
+## Interactive Portfolio v1.0
+
+STATUS:
+
+LOCKED
+
+The Interactive Portfolio is now considered a protected V3 experience.
+
+Structural redesigns are no longer permitted without explicit approval.
+
+Future work should be limited to:
+
+- bug fixes
+- accessibility improvements
+- performance improvements
+- compatibility fixes
+- timing refinements
+- additional world content
+
+Protected assets:
+
+- Home -> Portfolio transition
+- Wormhole arrival
+- Interactive Portfolio observatory
+- Deep-space background system
+- Observatory star constellation
+- Interactive world stars
+- Archive Console (Engine HUD)
+- Archive Core
+- Lifeblood system
+- Archive scan
+- Archive Analysis projection
+- World color system
+- Projection descriptions
+- Archive status system
+
+Interactive Portfolio v1.0 is a lock-grade protected experience. Any future structural redesign requires explicit approval.
+
+---
+
+# Interactive Portfolio Story
+
+Status: LOCKED
+
+The finalized story sequence:
+
+The visitor awakens the Archive.
+
+->
+
+The Archive responds.
+
+->
+
+The visitor travels through the Wormhole.
+
+->
+
+The Interactive Portfolio appears.
+
+->
+
+The observatory reveals the available worlds.
+
+->
+
+The visitor selects a destination.
+
+->
+
+The Archive Console acknowledges the selection.
+
+->
+
+The Archive Core energizes.
+
+->
+
+The Archive analyzes the destination.
+
+->
+
+Archive Analysis is projected.
+
+->
+
+The Archive waits for transport.
+
+This sequence is now locked as part of Interactive Portfolio v1.0.
+
+---
+
+# Protected Assets
+
+Protected V3 assets include:
+
+- Interactive Portfolio v1.0
+
+Interactive Portfolio v1.0 is protected against structural redesign unless explicit approval is granted.
+
+Protected Interactive Portfolio assets include:
+
+- Home -> Portfolio transition
+- Wormhole arrival
+- Interactive Portfolio observatory
+- Deep-space background system
+- Observatory star constellation
+- Interactive world stars
+- Archive Console (Engine HUD)
+- Archive Core
+- Lifeblood system
+- Archive scan
+- Archive Analysis projection
+- World color system
+- Projection descriptions
+- Archive status system
+
+---
+
+# Current Build Status
+
+## Home
+
+STATUS:
+
+LOCKED
+
+## Interactive Portfolio
+
+STATUS:
+
+LOCKED
+
+## Current Development Focus
+
+- The Story
+- The Trajectory
+- The Comms
+
+## Future Archive Worlds
+
+- The Soundtrack
+- The Battleground
+- The Horizon
+- The Wild
+- The Cosmos
 
 ---
 
@@ -253,6 +410,14 @@ World selection is intentionally separate from world entry.
 
 Selecting a world prepares the Archive. ENTER performs the journey.
 
+Locked Portfolio v1.0 note:
+
+The Archive Analysis panel no longer exposes ENTER as a transport button.
+
+The Archive now waits for transport after analysis.
+
+Future transport is reserved for the Archive Seal interaction documented in Archive Console.
+
 Approved storyboard lock:
 
 - Home wakes the Archive.
@@ -268,9 +433,32 @@ Approved storyboard lock:
 
 ---
 
+# Interactive Portfolio
+
+Status: LOCKED
+
+Interactive Portfolio v1.0 is the completed observatory experience for V3.
+
+Current implementation:
+
+- Deep-space procedural background
+- Slow observatory rotation
+- Star shimmer
+- Interactive destination stars
+- Engine color inheritance
+- Archive lifeblood
+- Archive scan
+- Projection panel
+- World descriptions
+- Archive status system
+
+The Interactive Portfolio is protected as a completed experience. Future work should refine, repair, optimize, or add world content without structurally redesigning the experience unless explicit approval is granted.
+
+---
+
 # Interactive Portfolio Philosophy
 
-Status: APPROVED FOR FUTURE IMPLEMENTATION
+Status: LOCKED
 
 The Interactive Portfolio is an observatory.
 
@@ -408,6 +596,26 @@ Lifeblood uses the selected world color.
 
 Projection information comes from the Engine, not from the stars.
 
+The Archive Seal will become the future transport mechanism.
+
+Future interaction:
+
+The Engine charges.
+
+->
+
+The Archive Seal becomes energized.
+
+->
+
+The visitor activates the Archive Seal.
+
+->
+
+World transition begins.
+
+This Archive Seal transport interaction is APPROVED FOR FUTURE IMPLEMENTATION, but it is intentionally NOT part of the locked Interactive Portfolio v1.0 experience.
+
 ---
 
 # Archive Core
@@ -500,14 +708,80 @@ Information comes from the Engine.
 
 Information does not come from the stars.
 
-The future projection panel displays:
+The locked Archive Analysis projection displays:
 
 - title
 - description
-- readiness
-- ENTER
+- archive status
 
 The projection is the Archive Console reporting on the tuned destination.
+
+The projection panel does not perform transport in Interactive Portfolio v1.0.
+
+World transport is reserved for the future Archive Seal interaction.
+
+---
+
+# Archive Status
+
+Status: LOCKED
+
+The Archive Status system communicates the current state of the selected destination.
+
+## INFORMATION
+
+Purpose:
+
+Reference and informational worlds.
+
+Current:
+
+- The Story
+- The Trajectory
+- The Comms
+
+Animation:
+
+Amber HUD pulse.
+
+## DECODING
+
+Purpose:
+
+Archive worlds currently being reconstructed.
+
+Current:
+
+- The Soundtrack
+- The Battleground
+
+Animation:
+
+Yellow decode flicker.
+
+## COMING SOON
+
+Purpose:
+
+Future archive worlds.
+
+Current:
+
+- The Horizon
+- The Wild
+- The Cosmos
+
+Animation:
+
+Grey steady state.
+
+## ACTIVE
+
+Reserved.
+
+ACTIVE is not currently used.
+
+ACTIVE will indicate fully operational archive worlds in future versions.
 
 ---
 
