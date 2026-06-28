@@ -261,6 +261,20 @@ button {
   vector-effect: non-scaling-stroke;
 }
 
+.engine-lightning-branch {
+  fill: none;
+  stroke: rgb(var(--engine-accent-soft) / 0.42);
+  stroke-width: 0.82;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+.engine-lightning-branch--alt {
+  stroke: rgb(var(--engine-accent-glow) / 0.36);
+  stroke-width: 0.72;
+}
+
 .portfolio-engine::before {
   inset-inline-start: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(0.92rem, 4.2vw, 1.38rem));
   inset-inline-end: clamp(8rem, 24vw, 14.2rem);
@@ -758,24 +772,16 @@ button {
 }
 
 .portfolio-engine::after {
-  background-image:
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2014%20L18%207%20L35%2016%20L54%205%20L72%2013%20L94%206%20L112%2018%20L134%204%20L153%2012%20L176%206%20L195%2017%20L216%208%20L232%2015%20L240%209%20M54%205%20L47%201%20M112%2018%20L103%2023%20M176%206%20L184%201%20M216%208%20L224%203%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.74%22%20stroke-width%3D%223.6%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E"),
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2012%20L6%2018%20L13%205%20L21%2015%20L29%209%20L37%2021%20L46%207%20L54%2013%20L63%203%20L72%2017%20L80%2010%20L89%2020%20L99%206%20L108%2014%20L118%204%20L127%2019%20L137%2011%20L146%2022%20L156%208%20L166%2016%20L175%205%20L185%2013%20L195%207%20L205%2019%20L216%209%20L228%2017%20L240%2010%20M37%2021%20L30%2011%20M63%203%20L70%2012%20M99%206%20L91%2016%20M127%2019%20L135%208%20M175%205%20L169%2015%20M216%209%20L223%202%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.82%22%20stroke-width%3D%223.8%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E"),
-    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2010%20L8%2015%20L15%208%20L22%2017%20M31%2011%20L39%2020%20L48%209%20L56%2014%20M68%206%20L76%2016%20L85%2010%20L94%2021%20M106%209%20L116%2017%20L126%207%20L135%2013%20M148%205%20L157%2016%20L166%2010%20L176%2019%20M190%208%20L200%2015%20L210%206%20L221%2017%20L232%2010%20L240%2014%20M39%2020%20L34%2023%20M116%2017%20L110%2022%20M200%2015%20L207%2021%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.7%22%20stroke-width%3D%223.6%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E");
-  background-size: 116% 22%, 120% 24%, 118% 22%;
-  background-position: -2% 8%, 5% 50%, 0 92%;
+  background: none;
   background-repeat: no-repeat;
   box-shadow: none;
-  opacity: 0.72;
+  opacity: 0;
   filter: none;
   clip-path: none;
   animation: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 95%, transparent 100%);
-  -webkit-mask-composite: source-over;
-  mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 95%, transparent 100%);
-  mask-composite: add;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
-
 @keyframes portfolioEngineSingleStrandDrift {
   0%, 100% {
     background-position: -2% 8%, 5% 50%, 0 92%;
