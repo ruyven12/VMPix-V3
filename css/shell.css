@@ -586,7 +586,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine::after {
-  animation: portfolioEngineLifebloodPulse var(--engine-lifeblood-cycle) linear infinite;
+  animation: portfolioEngineSingleStrandDrift 4.8s linear infinite;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--left::after {
@@ -677,11 +677,8 @@ button {
 
   .portfolio-engine::after {
     opacity: 0.52;
-    background-position: 0 0, 0 0, 20% 30%, 44% 34%, 28% 50%, 56% 54%, 36% 68%, 66% 72%, 12% 24%, 52% 76%, 50% 50%;
-    filter:
-      blur(0.01px)
-      brightness(1.22)
-      drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.32));
+    background-position: -2% 8%, 5% 50%, 0 92%;
+    filter: none;
   }
 
   .portfolio-engine-panel--left::after,
@@ -731,78 +728,33 @@ button {
 }
 
 .portfolio-engine::after {
-  background: linear-gradient(
-    90deg,
-    transparent 0 5%,
-    rgb(var(--engine-accent-glow) / 0.24) 6% 7%,
-    rgba(246, 246, 246, 0.82) 8% 9.5%,
-    rgb(var(--engine-accent-glow) / 0.3) 10.5% 14%,
-    transparent 15% 16%,
-    rgba(246, 246, 246, 0.74) 17% 18.5%,
-    rgb(var(--engine-accent-soft) / 0.3) 19.5% 25%,
-    transparent 26% 27.5%,
-    rgba(246, 246, 246, 0.86) 28.5% 30%,
-    rgb(var(--engine-accent-glow) / 0.28) 31% 39%,
-    rgba(246, 246, 246, 0.68) 40% 42%,
-    transparent 43% 44.5%,
-    rgb(var(--engine-accent-soft) / 0.32) 45.5% 54%,
-    rgba(246, 246, 246, 0.8) 55% 57%,
-    transparent 58% 59%,
-    rgb(var(--engine-accent-glow) / 0.34) 60% 70%,
-    rgba(246, 246, 246, 0.78) 71% 73%,
-    rgb(var(--engine-accent-soft) / 0.28) 74% 82%,
-    transparent 83% 84.5%,
-    rgba(246, 246, 246, 0.72) 85.5% 87%,
-    rgb(var(--engine-accent-glow) / 0.26) 88% 94%,
-    transparent 96% 100%
-  );
-  background-size: 100% 100%;
-  background-position: 0 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2014%20L18%207%20L35%2016%20L54%205%20L72%2013%20L94%206%20L112%2018%20L134%204%20L153%2012%20L176%206%20L195%2017%20L216%208%20L232%2015%20L240%209%20M54%205%20L47%201%20M112%2018%20L103%2023%20M176%206%20L184%201%20M216%208%20L224%203%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.74%22%20stroke-width%3D%223.6%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2012%20L6%2018%20L13%205%20L21%2015%20L29%209%20L37%2021%20L46%207%20L54%2013%20L63%203%20L72%2017%20L80%2010%20L89%2020%20L99%206%20L108%2014%20L118%204%20L127%2019%20L137%2011%20L146%2022%20L156%208%20L166%2016%20L175%205%20L185%2013%20L195%207%20L205%2019%20L216%209%20L228%2017%20L240%2010%20M37%2021%20L30%2011%20M63%203%20L70%2012%20M99%206%20L91%2016%20M127%2019%20L135%208%20M175%205%20L169%2015%20M216%209%20L223%202%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.82%22%20stroke-width%3D%223.8%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20240%2024%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M0%2010%20L8%2015%20L15%208%20L22%2017%20M31%2011%20L39%2020%20L48%209%20L56%2014%20M68%206%20L76%2016%20L85%2010%20L94%2021%20M106%209%20L116%2017%20L126%207%20L135%2013%20M148%205%20L157%2016%20L166%2010%20L176%2019%20M190%208%20L200%2015%20L210%206%20L221%2017%20L232%2010%20L240%2014%20M39%2020%20L34%2023%20M116%2017%20L110%2022%20M200%2015%20L207%2021%22%20fill%3D%22none%22%20stroke%3D%22%23f6f6f6%22%20stroke-opacity%3D%22.7%22%20stroke-width%3D%223.6%22%20stroke-linecap%3D%22butt%22%20stroke-linejoin%3D%22miter%22%2F%3E%3C%2Fsvg%3E");
+  background-size: 116% 22%, 120% 24%, 118% 22%;
+  background-position: -2% 8%, 5% 50%, 0 92%;
   background-repeat: no-repeat;
   box-shadow: none;
   opacity: 0.72;
   filter: none;
-  clip-path: polygon(
-    0 55%,
-    4% 50%,
-    9% 54%,
-    13% 47%,
-    18% 51%,
-    23% 45%,
-    29% 56%,
-    35% 48%,
-    41% 52%,
-    47% 44%,
-    54% 57%,
-    60% 50%,
-    67% 59%,
-    73% 46%,
-    80% 52%,
-    87% 48%,
-    94% 56%,
-    100% 51%,
-    100% 54%,
-    94% 59%,
-    87% 51%,
-    80% 56%,
-    73% 50%,
-    67% 63%,
-    60% 53%,
-    54% 61%,
-    47% 48%,
-    41% 56%,
-    35% 52%,
-    29% 60%,
-    23% 49%,
-    18% 55%,
-    13% 51%,
-    9% 58%,
-    4% 53%,
-    0 58%
-  );
-  animation: none !important;
+  clip-path: none;
+  animation: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 95%, transparent 100%);
+  -webkit-mask-composite: source-over;
+  mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 95%, transparent 100%);
+  mask-composite: add;
 }
 
+@keyframes portfolioEngineSingleStrandDrift {
+  0%, 100% {
+    background-position: -2% 8%, 5% 50%, 0 92%;
+  }
+
+  50% {
+    background-position: 16% 8%, 24% 50%, 19% 92%;
+  }
+}
 @keyframes portfolioEngineVeinRest {
   0%, 100% {
     opacity: 0.22;
