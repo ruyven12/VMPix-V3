@@ -305,9 +305,11 @@ button {
     linear-gradient(70deg, transparent 0 48%, rgb(var(--engine-accent-soft) / 0.3) 49.1%, rgba(246, 246, 246, 0.9) 50%, rgb(var(--engine-accent-soft) / 0.42) 50.9%, transparent 53.4% 100%),
     linear-gradient(108deg, transparent 0 63%, rgb(var(--engine-accent-glow) / 0.32) 64.1%, rgba(246, 246, 246, 0.96) 65%, rgb(var(--engine-accent-glow) / 0.44) 66%, transparent 68.6% 100%),
     linear-gradient(80deg, transparent 0 79%, rgb(var(--engine-accent-soft) / 0.3) 80.1%, rgba(246, 246, 246, 0.84) 81%, rgb(var(--engine-accent-soft) / 0.4) 81.9%, transparent 84.4% 100%),
-    linear-gradient(90deg, rgb(var(--engine-accent) / 0.08) 0, rgba(246, 246, 246, 0.48) 42%, rgb(var(--engine-accent-glow) / 0.86) 70%, rgb(var(--engine-accent) / 0.34) 100%);
-  background-size: 100% 100%, 100% 100%, 20% 52%, 24% 42%, 30% 54%, 24% 42%, 30% 52%, 24% 42%, 160% 36%;
-  background-position: 0 0, 0 0, 34% 34%, 38% 58%, 42% 22%, 47% 66%, 54% 30%, 59% 60%, 0% 50%;
+    linear-gradient(97deg, transparent 0 29%, rgb(var(--engine-accent-glow) / 0.2) 30%, rgba(246, 246, 246, 0.72) 31%, rgb(var(--engine-accent-glow) / 0.28) 32%, transparent 34.5% 100%),
+    linear-gradient(83deg, transparent 0 56%, rgb(var(--engine-accent-soft) / 0.18) 57%, rgba(246, 246, 246, 0.62) 58%, rgb(var(--engine-accent-soft) / 0.26) 59%, transparent 61.5% 100%),
+    linear-gradient(90deg, transparent 0 100%);
+  background-size: 100% 100%, 100% 100%, 20% 52%, 24% 42%, 30% 54%, 24% 42%, 30% 52%, 24% 42%, 38% 30%, 44% 28%, 160% 36%;
+  background-position: 0 0, 0 0, 34% 34%, 38% 58%, 42% 22%, 47% 66%, 54% 30%, 59% 60%, -18% 24%, -42% 76%, 0% 50%;
   border-radius: 0;
   opacity: 0.58;
   filter:
@@ -674,7 +676,7 @@ button {
 
   .portfolio-engine::after {
     opacity: 0.52;
-    background-position: 0 0, 0 0, 0 0, 34% 34%, 38% 58%, 42% 22%, 47% 66%, 54% 30%, 59% 60%, 50% 50%;
+    background-position: 0 0, 0 0, 0 0, 34% 34%, 38% 58%, 42% 22%, 47% 66%, 54% 30%, 28% 24%, 72% 76%, 50% 50%;
     filter:
       blur(0.01px)
       brightness(1.22)
@@ -742,19 +744,19 @@ button {
 
 @keyframes portfolioEngineLifebloodPulse {
   0%, 100% {
-    background-position: 0 0, 0 0, 24% 34%, 30% 58%, 36% 22%, 44% 66%, 52% 30%, 60% 60%, 0% 50%;
+    background-position: 0 0, 0 0, 24% 34%, 30% 58%, 36% 22%, 44% 66%, 52% 30%, 60% 60%, -18% 24%, -42% 76%, 0% 50%;
   }
 
   25% {
-    background-position: 0 0, 0 0, 14% 38%, 22% 50%, 30% 18%, 42% 70%, 58% 26%, 74% 64%, 38% 50%;
+    background-position: 0 0, 0 0, 14% 38%, 22% 50%, 30% 18%, 42% 70%, 58% 26%, 74% 64%, 28% 18%, -4% 82%, 38% 50%;
   }
 
   50% {
-    background-position: 0 0, 0 0, 4% 34%, 12% 58%, 24% 22%, 40% 66%, 76% 30%, 112% 60%, 76% 50%;
+    background-position: 0 0, 0 0, 4% 34%, 12% 58%, 24% 22%, 40% 66%, 76% 30%, 112% 60%, 78% 26%, 56% 74%, 76% 50%;
   }
 
   75% {
-    background-position: 0 0, 0 0, -10% 38%, -2% 50%, 16% 18%, 38% 70%, 104% 26%, 164% 64%, 118% 50%;
+    background-position: 0 0, 0 0, -10% 38%, -2% 50%, 16% 18%, 38% 70%, 104% 26%, 164% 64%, 132% 20%, 108% 80%, 118% 50%;
   }
 }
 
