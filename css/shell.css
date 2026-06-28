@@ -454,6 +454,7 @@ button {
 
 .portfolio-engine-panel--left {
   grid-column: 2 / 4;
+  top: -0.3125rem;
   text-align: left;
   border-radius: 0.18rem 0.08rem 0.08rem 0.18rem;
 }
