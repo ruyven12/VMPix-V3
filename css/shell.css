@@ -308,7 +308,7 @@ button {
     linear-gradient(97deg, transparent 0 29%, rgb(var(--engine-accent-glow) / 0.2) 30%, rgba(246, 246, 246, 0.72) 31%, rgb(var(--engine-accent-glow) / 0.28) 32%, transparent 34.5% 100%),
     linear-gradient(83deg, transparent 0 56%, rgb(var(--engine-accent-soft) / 0.18) 57%, rgba(246, 246, 246, 0.62) 58%, rgb(var(--engine-accent-soft) / 0.26) 59%, transparent 61.5% 100%),
     linear-gradient(90deg, transparent 0 100%);
-  background-size: 100% 100%, 100% 100%, 18% 26%, 20% 22%, 24% 24%, 20% 22%, 24% 24%, 20% 22%, 34% 18%, 36% 18%, 160% 36%;
+  background-size: 100% 100%, 100% 100%, 18% 26%, 20% 22%, 24% 24%, 0 0, 24% 24%, 20% 22%, 34% 18%, 36% 18%, 160% 36%;
   background-position: 0 0, 0 0, 20% 30%, 44% 34%, 28% 50%, 56% 54%, 36% 68%, 66% 72%, 12% 24%, 52% 76%, 0% 50%;
   background-repeat: no-repeat;
   border-radius: 0;
