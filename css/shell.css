@@ -237,6 +237,21 @@ button {
   pointer-events: none;
 }
 
+.engine-lightning-overlay {
+  --engine-overlay-start: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(1.125rem, 5vw, 1.6rem));
+  --engine-overlay-end: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(1.35rem, 5.75vw, 1.9rem));
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset-inline-start: var(--engine-overlay-start);
+  inset-inline-end: auto;
+  top: 50%;
+  inline-size: calc(100% - var(--engine-overlay-start) - var(--engine-overlay-end));
+  height: clamp(1.8rem, 4.8svh, 2.7rem);
+  overflow: visible;
+  transform: translate3d(0, -50%, 0);
+}
+
 .portfolio-engine::before {
   inset-inline-start: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(0.92rem, 4.2vw, 1.38rem));
   inset-inline-end: clamp(8rem, 24vw, 14.2rem);
@@ -638,6 +653,11 @@ button {
     grid-template-columns: clamp(2.05rem, 9vw, 2.55rem) minmax(0, 1fr) minmax(0.6rem, 0.28fr) clamp(2.45rem, 10.5vw, 3.05rem) minmax(4.55rem, 0.7fr);
     gap: clamp(0.18rem, 0.85vw, 0.36rem);
     padding-inline: clamp(0.34rem, 1.4vw, 0.52rem);
+  }
+
+  .engine-lightning-overlay {
+    --engine-overlay-start: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.025rem, 4.5vw, 1.275rem));
+    --engine-overlay-end: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.35rem, 5.75vw, 1.9rem));
   }
 
   .portfolio-engine-panel {
