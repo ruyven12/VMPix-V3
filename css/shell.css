@@ -723,6 +723,14 @@ button {
   }
 }
 
+.portfolio-engine::before,
+.portfolio-engine::after {
+  background: none;
+  box-shadow: none;
+  opacity: 0;
+  filter: none;
+}
+
 @keyframes portfolioEngineVeinRest {
   0%, 100% {
     opacity: 0.22;
