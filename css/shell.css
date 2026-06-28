@@ -252,6 +252,15 @@ button {
   transform: translate3d(0, -50%, 0);
 }
 
+.engine-lightning-main {
+  fill: none;
+  stroke: rgb(var(--engine-accent-glow) / 0.62);
+  stroke-width: 1.35;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
 .portfolio-engine::before {
   inset-inline-start: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(0.92rem, 4.2vw, 1.38rem));
   inset-inline-end: clamp(8rem, 24vw, 14.2rem);
