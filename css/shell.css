@@ -250,7 +250,7 @@ button {
     linear-gradient(104deg, transparent 0 64%, rgb(var(--engine-accent-soft) / 0.15) 64.8%, rgba(246, 246, 246, 0.17) 65.5%, rgb(var(--engine-accent-soft) / 0.11) 66.3%, transparent 68.6% 100%),
     linear-gradient(80deg, transparent 0 80%, rgb(var(--engine-accent-soft) / 0.13) 80.8%, rgba(246, 246, 246, 0.15) 81.5%, rgb(var(--engine-accent-soft) / 0.1) 82.2%, transparent 84.4% 100%);
   background-size: 100% 100%;
-  opacity: 0.39;
+  opacity: 0;
   filter: blur(0.08px) drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.14));
   clip-path: polygon(
     0 51%,
@@ -671,7 +671,7 @@ button {
   }
 
   .portfolio-engine::before {
-    opacity: 0.34;
+    opacity: 0;
   }
 
   .portfolio-engine::after {
