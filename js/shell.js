@@ -106,8 +106,11 @@ const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const ENGINE_LIGHTNING_BASE_Y = 12;
-const ENGINE_LIGHTNING_MIN_DELAY_MS = 90;
-const ENGINE_LIGHTNING_MAX_DELAY_MS = 140;
+const ENGINE_LIGHTNING_MIN_DELAY_MS = 118;
+const ENGINE_LIGHTNING_MAX_DELAY_MS = 168;
+const ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT = 24;
+const ENGINE_LIGHTNING_BRANCH_MIN_COUNT = 6;
+const ENGINE_LIGHTNING_BRANCH_MAX_COUNT = 12;
 let portfolioEngineScanTimer = 0;
 let portfolioEngineScanFrame = 0;
 let portfolioEngineScanTarget = null;
@@ -116,6 +119,9 @@ let portfolioEngineProjectionRetractTimer = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
 let portfolioEngineLightningBranchPolarity = 0;
+let portfolioEngineLightningMainPoints = null;
+let portfolioEngineLightningBranchPointSets = [];
+let portfolioEngineLightningBranchDirections = [];
 
 function getPortfolioWorldSelectionConfig(worldName) {
   return PORTFOLIO_WORLD_SELECTION_CONFIG[worldName] || PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio;
@@ -156,28 +162,42 @@ function formatPortfolioEngineLightningPath(points) {
 
 function createPortfolioEngineLightningMainPoints() {
   const points = [{ x: 0, y: ENGINE_LIGHTNING_BASE_Y }];
-  let x = 0;
   let direction = Math.random() > 0.5 ? 1 : -1;
 
-  while (x < 100) {
-    x = Math.min(100, x + getPortfolioEngineLightningRandom(5.4, 8.6));
-    if (x >= 100) {
-      points.push({ x: 100, y: ENGINE_LIGHTNING_BASE_Y });
-      break;
-    }
-
+  for (let segment = 1; segment < ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT; segment += 1) {
+    const x = (100 / ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT) * segment;
     direction *= -1;
-    const edgeScale = Math.min(1, Math.min(x, 100 - x) / 16);
-    const lowerChannelBias = x > 9 && x < 78 ? 0.75 : 0;
-    const amplitude = getPortfolioEngineLightningRandom(2.1, 4.8) * edgeScale;
-    const noise = getPortfolioEngineLightningRandom(-0.7, 0.7);
+    const edgeScale = Math.min(1, Math.min(x, 100 - x) / 14);
+    const lowerChannelBias = x > 10 && x < 80 ? 0.66 : 0;
+    const amplitude = getPortfolioEngineLightningRandom(0.85, 2.65) * edgeScale;
+    const harmonic = Math.sin((x / 100) * Math.PI * 3 + portfolioEngineLightningBranchPolarity * 0.42) * 0.36;
+    const noise = getPortfolioEngineLightningRandom(-0.34, 0.34);
     points.push({
       x,
-      y: clampPortfolioEngineLightningY(ENGINE_LIGHTNING_BASE_Y + lowerChannelBias + direction * amplitude + noise),
+      y: clampPortfolioEngineLightningY(ENGINE_LIGHTNING_BASE_Y + lowerChannelBias + direction * amplitude + harmonic + noise),
     });
   }
 
+  points.push({ x: 100, y: ENGINE_LIGHTNING_BASE_Y });
   return points;
+}
+
+function blendPortfolioEngineLightningPoints(previousPoints, nextPoints, nextWeight = 0.58) {
+  if (!previousPoints || previousPoints.length !== nextPoints.length) {
+    return nextPoints;
+  }
+
+  return nextPoints.map((point, index) => {
+    if (index === 0 || index === nextPoints.length - 1) {
+      return point;
+    }
+
+    const previousPoint = previousPoints[index];
+    return {
+      x: previousPoint.x + (point.x - previousPoint.x) * nextWeight,
+      y: previousPoint.y + (point.y - previousPoint.y) * nextWeight,
+    };
+  });
 }
 
 function getPortfolioEngineLightningMainYAt(points, x) {
@@ -196,29 +216,42 @@ function getPortfolioEngineLightningMainYAt(points, x) {
   return ENGINE_LIGHTNING_BASE_Y;
 }
 
-function createPortfolioEngineLightningBranchPoints(mainPoints, branchIndex, branchCount) {
-  const slotWidth = 72 / Math.max(branchCount, 1);
-  const slotStart = 12 + slotWidth * branchIndex;
-  const startX = Math.min(86, Math.max(10, slotStart + getPortfolioEngineLightningRandom(0, Math.max(4, slotWidth - 5))));
-  const branchLength = getPortfolioEngineLightningRandom(8.5, 15.5);
-  const endX = Math.min(96, startX + branchLength);
-  const direction = (portfolioEngineLightningBranchPolarity + branchIndex) % 2 === 0 ? -1 : 1;
+function getPortfolioEngineLightningActiveBranchSlots(branchCapacity, branchCount) {
+  if (branchCount >= branchCapacity) {
+    return Array.from({ length: branchCapacity }, (_, index) => index);
+  }
+
+  if (branchCount <= 1) {
+    return [0];
+  }
+
+  return Array.from({ length: branchCount }, (_, index) => (
+    Math.round(((branchCapacity - 1) * index) / (branchCount - 1))
+  ));
+}
+
+function createPortfolioEngineLightningBranchPoints(mainPoints, slotIndex, slotCount, direction) {
+  const slotSpan = 84 / Math.max(1, slotCount - 1);
+  const slotCenter = 8 + slotSpan * slotIndex;
+  const startX = Math.min(92, Math.max(7, slotCenter + getPortfolioEngineLightningRandom(-1.8, 1.8)));
+  const branchLength = getPortfolioEngineLightningRandom(4.8, 8.6);
+  const endX = Math.min(97, startX + branchLength);
   const startY = getPortfolioEngineLightningMainYAt(mainPoints, startX);
   const endY = getPortfolioEngineLightningMainYAt(mainPoints, endX);
 
   return [
     { x: startX, y: startY },
     {
-      x: startX + branchLength * getPortfolioEngineLightningRandom(0.28, 0.42),
-      y: clampPortfolioEngineLightningY(startY + direction * getPortfolioEngineLightningRandom(3.4, 5.8)),
+      x: startX + branchLength * getPortfolioEngineLightningRandom(0.26, 0.38),
+      y: clampPortfolioEngineLightningY(startY + direction * getPortfolioEngineLightningRandom(2.35, 4.2), 4.8, 19.2),
     },
     {
-      x: startX + branchLength * getPortfolioEngineLightningRandom(0.62, 0.78),
-      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(4.8, 7.4)),
+      x: startX + branchLength * getPortfolioEngineLightningRandom(0.6, 0.76),
+      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(3.1, 5.4), 4.8, 19.2),
     },
     {
       x: endX,
-      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(0.1, 1)),
+      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(0.12, 0.72), 4.8, 19.2),
     },
   ];
 }
@@ -228,24 +261,37 @@ function renderPortfolioEngineLightningPaths() {
     return;
   }
 
-  const mainPoints = createPortfolioEngineLightningMainPoints();
+  const mainTargetPoints = createPortfolioEngineLightningMainPoints();
+  const mainPoints = blendPortfolioEngineLightningPoints(portfolioEngineLightningMainPoints, mainTargetPoints, 0.52);
+  portfolioEngineLightningMainPoints = mainPoints;
   portfolioEngineLightningMainPath.setAttribute("d", formatPortfolioEngineLightningPath(mainPoints));
 
-  const maxBranchCount = Math.min(4, portfolioEngineLightningBranchPaths.length);
-  const minBranchCount = Math.min(2, maxBranchCount);
-  const branchCount = maxBranchCount <= minBranchCount
-    ? maxBranchCount
-    : minBranchCount + Math.floor(Math.random() * (maxBranchCount - minBranchCount + 1));
+  const branchCapacity = Math.min(ENGINE_LIGHTNING_BRANCH_MAX_COUNT, portfolioEngineLightningBranchPaths.length);
+  const minBranchCount = Math.min(ENGINE_LIGHTNING_BRANCH_MIN_COUNT, branchCapacity);
+  const branchCount = branchCapacity <= minBranchCount
+    ? branchCapacity
+    : minBranchCount + Math.floor(Math.random() * (branchCapacity - minBranchCount + 1));
+  const activeSlots = getPortfolioEngineLightningActiveBranchSlots(branchCapacity, branchCount);
 
   portfolioEngineLightningBranchPaths.forEach((path, index) => {
-    if (index >= branchCount) {
+    const branchOrder = activeSlots.indexOf(index);
+    if (branchOrder === -1) {
       path.removeAttribute("d");
       path.style.opacity = "0";
       return;
     }
 
-    path.setAttribute("d", formatPortfolioEngineLightningPath(createPortfolioEngineLightningBranchPoints(mainPoints, index, branchCount)));
+    const branchDirection = (portfolioEngineLightningBranchPolarity + branchOrder) % 2 === 0 ? -1 : 1;
+    const targetPoints = createPortfolioEngineLightningBranchPoints(mainPoints, index, branchCapacity, branchDirection);
+    const previousPoints = portfolioEngineLightningBranchDirections[index] === branchDirection
+      ? portfolioEngineLightningBranchPointSets[index]
+      : null;
+    const branchPoints = blendPortfolioEngineLightningPoints(previousPoints, targetPoints, 0.58);
+    portfolioEngineLightningBranchPointSets[index] = branchPoints;
+    portfolioEngineLightningBranchDirections[index] = branchDirection;
+    path.setAttribute("d", formatPortfolioEngineLightningPath(branchPoints));
     path.style.opacity = "";
+    path.style.setProperty("--engine-lightning-branch-order", String(branchOrder));
   });
   portfolioEngineLightningBranchPolarity = (portfolioEngineLightningBranchPolarity + 1) % 2;
 }
