@@ -258,7 +258,10 @@ button {
   stroke-width: 1.35;
   stroke-linecap: butt;
   stroke-linejoin: miter;
+  stroke-dasharray: 18 6 10 5 6 55;
+  stroke-dashoffset: 118;
   vector-effect: non-scaling-stroke;
+  animation: engineLightningTransmit 1.65s linear infinite;
 }
 
 .engine-lightning-branch {
@@ -267,12 +270,29 @@ button {
   stroke-width: 0.82;
   stroke-linecap: butt;
   stroke-linejoin: miter;
+  stroke-dasharray: 12 18 6 64;
+  stroke-dashoffset: 118;
   vector-effect: non-scaling-stroke;
+  animation: engineLightningTransmit 2.35s linear infinite;
+  animation-delay: -0.42s;
 }
 
 .engine-lightning-branch--alt {
   stroke: rgb(var(--engine-accent-glow) / 0.36);
   stroke-width: 0.72;
+  stroke-dasharray: 16 22 7 55;
+  animation-duration: 3.5s;
+  animation-delay: -1.25s;
+}
+
+@keyframes engineLightningTransmit {
+  from {
+    stroke-dashoffset: 118;
+  }
+
+  to {
+    stroke-dashoffset: -18;
+  }
 }
 
 .portfolio-engine::before {
@@ -625,7 +645,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine::after {
-  animation: portfolioEngineSingleStrandDrift 4.8s linear infinite;
+  animation: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"] .portfolio-engine-panel--left::after {
@@ -713,6 +733,13 @@ button {
   .portfolio-engine-reactor-ring,
   .portfolio-engine-reactor-core {
     animation: none !important;
+  }
+
+  .engine-lightning-main,
+  .engine-lightning-branch {
+    animation: none !important;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
   }
 
   .portfolio-engine::before {
