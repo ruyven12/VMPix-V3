@@ -87,7 +87,13 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
   },
 };
 
+const portfolioEngine = document.querySelector("[data-portfolio-engine]");
 const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
+const portfolioEngineLightningOverlay = portfolioEngine?.querySelector(".engine-lightning-overlay") || null;
+const portfolioEngineLightningMainPath = portfolioEngineLightningOverlay?.querySelector(".engine-lightning-main") || null;
+const portfolioEngineLightningBranchPaths = portfolioEngineLightningOverlay
+  ? Array.from(portfolioEngineLightningOverlay.querySelectorAll(".engine-lightning-branch"))
+  : [];
 const portfolioBeaconHotspots = Array.from(document.querySelectorAll("[data-portfolio-star]"));
 const portfolioEngineScanLine = document.querySelector("[data-portfolio-engine-scan-line]");
 const portfolioEngineScanAnchor = document.querySelector(".portfolio-engine-left-core");
@@ -99,11 +105,17 @@ const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
 const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const ENGINE_LIGHTNING_BASE_Y = 12;
+const ENGINE_LIGHTNING_MIN_DELAY_MS = 90;
+const ENGINE_LIGHTNING_MAX_DELAY_MS = 140;
 let portfolioEngineScanTimer = 0;
 let portfolioEngineScanFrame = 0;
 let portfolioEngineScanTarget = null;
 let portfolioEngineProjectionTimer = 0;
 let portfolioEngineProjectionRetractTimer = 0;
+let portfolioEngineLightningTimer = 0;
+let portfolioEngineLightningFrame = 0;
+let portfolioEngineLightningBranchPolarity = 0;
 
 function getPortfolioWorldSelectionConfig(worldName) {
   return PORTFOLIO_WORLD_SELECTION_CONFIG[worldName] || PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio;
@@ -117,6 +129,196 @@ function setPortfolioEngineHudCurrentView(viewName) {
 
 function isPortfolioEngineReducedMotion() {
   return Boolean(window.matchMedia?.(PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY).matches);
+}
+
+function getPortfolioEngineLightningRandom(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function getPortfolioEngineLightningDelay() {
+  return Math.round(getPortfolioEngineLightningRandom(ENGINE_LIGHTNING_MIN_DELAY_MS, ENGINE_LIGHTNING_MAX_DELAY_MS));
+}
+
+function clampPortfolioEngineLightningY(value, min = 5.1, max = 18.9) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function formatPortfolioEngineLightningCoord(value) {
+  return Number(value.toFixed(2)).toString();
+}
+
+function formatPortfolioEngineLightningPath(points) {
+  return points.map((point, index) => {
+    const command = index === 0 ? "M" : "L";
+    return `${command}${formatPortfolioEngineLightningCoord(point.x)} ${formatPortfolioEngineLightningCoord(point.y)}`;
+  }).join(" ");
+}
+
+function createPortfolioEngineLightningMainPoints() {
+  const points = [{ x: 0, y: ENGINE_LIGHTNING_BASE_Y }];
+  let x = 0;
+  let direction = Math.random() > 0.5 ? 1 : -1;
+
+  while (x < 100) {
+    x = Math.min(100, x + getPortfolioEngineLightningRandom(5.4, 8.6));
+    if (x >= 100) {
+      points.push({ x: 100, y: ENGINE_LIGHTNING_BASE_Y });
+      break;
+    }
+
+    direction *= -1;
+    const edgeScale = Math.min(1, Math.min(x, 100 - x) / 16);
+    const lowerChannelBias = x > 9 && x < 78 ? 0.75 : 0;
+    const amplitude = getPortfolioEngineLightningRandom(2.1, 4.8) * edgeScale;
+    const noise = getPortfolioEngineLightningRandom(-0.7, 0.7);
+    points.push({
+      x,
+      y: clampPortfolioEngineLightningY(ENGINE_LIGHTNING_BASE_Y + lowerChannelBias + direction * amplitude + noise),
+    });
+  }
+
+  return points;
+}
+
+function getPortfolioEngineLightningMainYAt(points, x) {
+  for (let index = 1; index < points.length; index += 1) {
+    const previousPoint = points[index - 1];
+    const nextPoint = points[index];
+    if (nextPoint.x < x) {
+      continue;
+    }
+
+    const span = Math.max(0.001, nextPoint.x - previousPoint.x);
+    const progress = (x - previousPoint.x) / span;
+    return previousPoint.y + (nextPoint.y - previousPoint.y) * progress;
+  }
+
+  return ENGINE_LIGHTNING_BASE_Y;
+}
+
+function createPortfolioEngineLightningBranchPoints(mainPoints, branchIndex, branchCount) {
+  const slotWidth = 72 / Math.max(branchCount, 1);
+  const slotStart = 12 + slotWidth * branchIndex;
+  const startX = Math.min(86, Math.max(10, slotStart + getPortfolioEngineLightningRandom(0, Math.max(4, slotWidth - 5))));
+  const branchLength = getPortfolioEngineLightningRandom(8.5, 15.5);
+  const endX = Math.min(96, startX + branchLength);
+  const direction = (portfolioEngineLightningBranchPolarity + branchIndex) % 2 === 0 ? -1 : 1;
+  const startY = getPortfolioEngineLightningMainYAt(mainPoints, startX);
+  const endY = getPortfolioEngineLightningMainYAt(mainPoints, endX);
+
+  return [
+    { x: startX, y: startY },
+    {
+      x: startX + branchLength * getPortfolioEngineLightningRandom(0.28, 0.42),
+      y: clampPortfolioEngineLightningY(startY + direction * getPortfolioEngineLightningRandom(3.4, 5.8)),
+    },
+    {
+      x: startX + branchLength * getPortfolioEngineLightningRandom(0.62, 0.78),
+      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(4.8, 7.4)),
+    },
+    {
+      x: endX,
+      y: clampPortfolioEngineLightningY(endY + direction * getPortfolioEngineLightningRandom(0.1, 1)),
+    },
+  ];
+}
+
+function renderPortfolioEngineLightningPaths() {
+  if (!portfolioEngineLightningMainPath) {
+    return;
+  }
+
+  const mainPoints = createPortfolioEngineLightningMainPoints();
+  portfolioEngineLightningMainPath.setAttribute("d", formatPortfolioEngineLightningPath(mainPoints));
+
+  const maxBranchCount = Math.min(4, portfolioEngineLightningBranchPaths.length);
+  const minBranchCount = Math.min(2, maxBranchCount);
+  const branchCount = maxBranchCount <= minBranchCount
+    ? maxBranchCount
+    : minBranchCount + Math.floor(Math.random() * (maxBranchCount - minBranchCount + 1));
+
+  portfolioEngineLightningBranchPaths.forEach((path, index) => {
+    if (index >= branchCount) {
+      path.removeAttribute("d");
+      path.style.opacity = "0";
+      return;
+    }
+
+    path.setAttribute("d", formatPortfolioEngineLightningPath(createPortfolioEngineLightningBranchPoints(mainPoints, index, branchCount)));
+    path.style.opacity = "";
+  });
+  portfolioEngineLightningBranchPolarity = (portfolioEngineLightningBranchPolarity + 1) % 2;
+}
+
+function shouldRunPortfolioEngineLightning() {
+  return Boolean(
+    portfolioEngine?.isConnected &&
+    portfolioEngineLightningOverlay?.isConnected &&
+    portfolioEngineLightningMainPath &&
+    !isPortfolioEngineReducedMotion() &&
+    shell?.dataset.portfolioEngineReady === "true"
+  );
+}
+
+function stopPortfolioEngineLightning() {
+  window.clearTimeout(portfolioEngineLightningTimer);
+  portfolioEngineLightningTimer = 0;
+  if (portfolioEngineLightningFrame) {
+    window.cancelAnimationFrame(portfolioEngineLightningFrame);
+    portfolioEngineLightningFrame = 0;
+  }
+  portfolioEngineLightningOverlay?.removeAttribute("data-engine-lightning-state");
+}
+
+function queuePortfolioEngineLightningTick() {
+  if (!shouldRunPortfolioEngineLightning() || portfolioEngineLightningTimer || portfolioEngineLightningFrame) {
+    return;
+  }
+
+  portfolioEngineLightningTimer = window.setTimeout(() => {
+    portfolioEngineLightningTimer = 0;
+    if (!shouldRunPortfolioEngineLightning()) {
+      return;
+    }
+
+    portfolioEngineLightningFrame = window.requestAnimationFrame(() => {
+      portfolioEngineLightningFrame = 0;
+      if (!shouldRunPortfolioEngineLightning()) {
+        return;
+      }
+
+      renderPortfolioEngineLightningPaths();
+      queuePortfolioEngineLightningTick();
+    });
+  }, getPortfolioEngineLightningDelay());
+}
+
+function startPortfolioEngineLightning() {
+  if (!shouldRunPortfolioEngineLightning()) {
+    stopPortfolioEngineLightning();
+    return;
+  }
+
+  portfolioEngineLightningOverlay?.setAttribute("data-engine-lightning-state", "live");
+  renderPortfolioEngineLightningPaths();
+  queuePortfolioEngineLightningTick();
+}
+
+function syncPortfolioEngineLightningMotion() {
+  if (shouldRunPortfolioEngineLightning()) {
+    startPortfolioEngineLightning();
+    return;
+  }
+
+  stopPortfolioEngineLightning();
+}
+
+function initPortfolioEngineLightning() {
+  if (!portfolioEngineLightningMainPath) {
+    return;
+  }
+
+  syncPortfolioEngineLightningMotion();
 }
 
 function setPortfolioBeaconHotspotsEnabled(isEnabled) {
@@ -2934,6 +3136,7 @@ function cancelPortfolioEngineReadyGate() {
 function clearPortfolioEngineReadyState() {
   cancelPortfolioEngineReadyGate();
   clearPortfolioEngineScan();
+  stopPortfolioEngineLightning();
   hidePortfolioEngineProjection({ immediate: true });
   setPortfolioBeaconHotspotsEnabled(false);
   setPortfolioActiveWorld("portfolio");
@@ -2989,6 +3192,7 @@ function markPortfolioEngineReady() {
   shell.dataset.portfolioCoordinatesOnline = String(PORTFOLIO_COORDINATE_ONLINE_TOTAL);
   shell.dataset.portfolioEngineReady = "true";
   setPortfolioBeaconHotspotsEnabled(true);
+  startPortfolioEngineLightning();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
   }));
@@ -3300,6 +3504,7 @@ if (shell && startButton) {
   renderGlobalMenu();
   initShellRailLogo();
   initPortfolioBeaconHotspots();
+  initPortfolioEngineLightning();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", beginHomePortfolioTransition);
@@ -3481,8 +3686,10 @@ if (shell && startButton) {
   syncAmbientMotion();
   if (typeof reducedMotion.addEventListener === "function") {
     reducedMotion.addEventListener("change", syncAmbientMotion);
+    reducedMotion.addEventListener("change", syncPortfolioEngineLightningMotion);
   } else if (typeof reducedMotion.addListener === "function") {
     reducedMotion.addListener(syncAmbientMotion);
+    reducedMotion.addListener(syncPortfolioEngineLightningMotion);
   }
   window.addEventListener("resize", updateViewportMetrics);
   if (window.visualViewport) {
@@ -3502,6 +3709,7 @@ if (shell && startButton) {
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(portfolioFirstTransferTimer);
     cancelPortfolioEngineReadyGate();
+    stopPortfolioEngineLightning();
     window.clearTimeout(drawerCloseTimer);
     if (spotlightFrame) {
       window.cancelAnimationFrame(spotlightFrame);
