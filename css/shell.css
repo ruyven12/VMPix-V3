@@ -268,22 +268,22 @@ button {
 }
 
 .engine-lightning-main {
-  stroke: rgb(var(--engine-accent-glow) / 0.52);
-  stroke-width: 0.62;
+  stroke: rgb(var(--engine-accent-glow) / 0.64);
+  stroke-width: 2.55;
   opacity: 0.44;
   filter:
-    drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.42))
-    drop-shadow(0 0 0.44rem rgb(var(--engine-accent-glow) / 0.21));
+    drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.42))
+    drop-shadow(0 0 0.32rem rgb(var(--engine-accent-glow) / 0.18));
   animation: engineLightningFieldPulse 1120ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .engine-lightning-main--center {
-  stroke: rgb(var(--engine-accent-glow) / 0.8);
-  stroke-width: 1.06;
+  stroke: rgb(var(--engine-accent-glow) / 0.86);
+  stroke-width: 3;
   opacity: 0.84;
   filter:
-    drop-shadow(0 0 0.25rem rgb(var(--engine-accent-glow) / 0.64))
-    drop-shadow(0 0 0.64rem rgb(var(--engine-accent-glow) / 0.32));
+    drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.58))
+    drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.24));
   animation-name: engineLightningMainPulse;
 }
 
@@ -298,21 +298,21 @@ button {
 }
 
 .engine-lightning-branch {
-  stroke: rgb(var(--engine-accent-soft) / 0.42);
-  stroke-width: 0.38;
+  stroke: rgb(var(--engine-accent-soft) / 0.44);
+  stroke-width: 1.04;
   stroke-opacity: 1;
   opacity: 0.38;
-  filter: drop-shadow(0 0 0.13rem rgb(var(--engine-accent-soft) / 0.28));
+  filter: drop-shadow(0 0 0.12rem rgb(var(--engine-accent-soft) / 0.28));
   transition: stroke-opacity 180ms ease-out;
   animation: engineLightningBranchPulse 1120ms cubic-bezier(0.37, 0, 0.25, 1) infinite;
   animation-delay: calc(var(--engine-lightning-branch-order, 0) * -47ms);
 }
 
 .engine-lightning-branch--alt {
-  stroke: rgb(var(--engine-accent-glow) / 0.38);
-  stroke-width: 0.32;
+  stroke: rgb(var(--engine-accent-glow) / 0.4);
+  stroke-width: 0.92;
   opacity: 0.32;
-  filter: drop-shadow(0 0 0.12rem rgb(var(--engine-accent-glow) / 0.24));
+  filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.24));
   animation-name: engineLightningBranchPulseAlt;
 }
 
@@ -320,27 +320,27 @@ button {
   0%,
   100% {
     opacity: 0.28;
-    stroke-width: 0.48;
+    stroke-width: 2.2;
   }
 
   18% {
     opacity: 0.5;
-    stroke-width: 0.66;
+    stroke-width: 2.65;
   }
 
   43% {
     opacity: 0.34;
-    stroke-width: 0.54;
+    stroke-width: 2.35;
   }
 
   68% {
     opacity: 0.58;
-    stroke-width: 0.72;
+    stroke-width: 2.75;
   }
 
   86% {
     opacity: 0.32;
-    stroke-width: 0.5;
+    stroke-width: 2.3;
   }
 }
 
@@ -348,32 +348,32 @@ button {
   0%,
   100% {
     opacity: 0.68;
-    stroke-width: 0.96;
+    stroke-width: 2.85;
   }
 
   16% {
     opacity: 0.86;
-    stroke-width: 1.08;
+    stroke-width: 3.1;
   }
 
   34% {
     opacity: 0.74;
-    stroke-width: 1;
+    stroke-width: 2.95;
   }
 
   55% {
     opacity: 0.9;
-    stroke-width: 1.1;
+    stroke-width: 3.16;
   }
 
   73% {
     opacity: 0.7;
-    stroke-width: 0.98;
+    stroke-width: 2.9;
   }
 
   89% {
     opacity: 0.82;
-    stroke-width: 1.05;
+    stroke-width: 3.05;
   }
 }
 
@@ -381,27 +381,27 @@ button {
   0%,
   100% {
     opacity: 0.16;
-    stroke-width: 0.28;
+    stroke-width: 0.88;
   }
 
   19% {
     opacity: 0.36;
-    stroke-width: 0.38;
+    stroke-width: 1.12;
   }
 
   41% {
     opacity: 0.22;
-    stroke-width: 0.32;
+    stroke-width: 0.98;
   }
 
   64% {
     opacity: 0.42;
-    stroke-width: 0.42;
+    stroke-width: 1.2;
   }
 
   82% {
     opacity: 0.19;
-    stroke-width: 0.3;
+    stroke-width: 0.92;
   }
 }
 
@@ -409,27 +409,27 @@ button {
   0%,
   100% {
     opacity: 0.12;
-    stroke-width: 0.24;
+    stroke-width: 0.76;
   }
 
   23% {
     opacity: 0.3;
-    stroke-width: 0.32;
+    stroke-width: 1;
   }
 
   43% {
     opacity: 0.17;
-    stroke-width: 0.27;
+    stroke-width: 0.86;
   }
 
   67% {
     opacity: 0.36;
-    stroke-width: 0.35;
+    stroke-width: 1.08;
   }
 
   86% {
     opacity: 0.15;
-    stroke-width: 0.26;
+    stroke-width: 0.82;
   }
 }
 
@@ -845,9 +845,20 @@ button {
     --engine-overlay-end: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.35rem, 5.75vw, 1.9rem));
   }
 
-  .engine-lightning-main,
+  .engine-lightning-main {
+    filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.3));
+  }
+
+  .engine-lightning-main--center {
+    filter: drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.38));
+  }
+
   .engine-lightning-branch {
-    filter: none;
+    filter: drop-shadow(0 0 0.07rem rgb(var(--engine-accent-soft) / 0.22));
+  }
+
+  .engine-lightning-branch--alt {
+    filter: drop-shadow(0 0 0.06rem rgb(var(--engine-accent-glow) / 0.2));
   }
 
   .portfolio-engine-panel {
