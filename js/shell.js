@@ -90,7 +90,10 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
 const portfolioEngine = document.querySelector("[data-portfolio-engine]");
 const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
 const portfolioEngineLightningOverlay = portfolioEngine?.querySelector(".engine-lightning-overlay") || null;
-const portfolioEngineLightningMainPath = portfolioEngineLightningOverlay?.querySelector(".engine-lightning-main") || null;
+const portfolioEngineLightningMainPaths = portfolioEngineLightningOverlay
+  ? Array.from(portfolioEngineLightningOverlay.querySelectorAll(".engine-lightning-main"))
+  : [];
+const portfolioEngineLightningMainPath = portfolioEngineLightningOverlay?.querySelector(".engine-lightning-main--center") || portfolioEngineLightningMainPaths[0] || null;
 const portfolioEngineLightningBranchPaths = portfolioEngineLightningOverlay
   ? Array.from(portfolioEngineLightningOverlay.querySelectorAll(".engine-lightning-branch"))
   : [];
@@ -109,6 +112,12 @@ const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
 const ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT = 30;
+const ENGINE_LIGHTNING_PRIMARY_BOLTS = [
+  { yOffset: -2.05, amplitudeScale: 0.66, harmonicOffset: 0.62 },
+  { yOffset: 2.05, amplitudeScale: 0.66, harmonicOffset: -0.62 },
+  { yOffset: 0, amplitudeScale: 1, harmonicOffset: 0 },
+];
+const ENGINE_LIGHTNING_CENTER_BOLT_INDEX = 2;
 const ENGINE_LIGHTNING_BRANCH_MIN_COUNT = 8;
 const ENGINE_LIGHTNING_BRANCH_MAX_COUNT = 12;
 const ENGINE_LIGHTNING_MAIN_EASE_MS = 86;
@@ -121,8 +130,8 @@ let portfolioEngineProjectionRetractTimer = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
 let portfolioEngineLightningBranchPolarity = 0;
-let portfolioEngineLightningMainPoints = null;
-let portfolioEngineLightningMainTargetPoints = null;
+let portfolioEngineLightningMainPointSets = [];
+let portfolioEngineLightningMainTargetPointSets = [];
 let portfolioEngineLightningBranchPointSets = [];
 let portfolioEngineLightningBranchTargetPointSets = [];
 let portfolioEngineLightningBranchDirections = [];
@@ -166,21 +175,24 @@ function formatPortfolioEngineLightningPath(points) {
   }).join(" ");
 }
 
-function createPortfolioEngineLightningMainPoints() {
+function createPortfolioEngineLightningMainPoints(boltIndex = ENGINE_LIGHTNING_CENTER_BOLT_INDEX) {
   const points = [{ x: 0, y: ENGINE_LIGHTNING_BASE_Y }];
-  let direction = Math.random() > 0.5 ? 1 : -1;
+  const boltConfig = ENGINE_LIGHTNING_PRIMARY_BOLTS[boltIndex] || ENGINE_LIGHTNING_PRIMARY_BOLTS[ENGINE_LIGHTNING_CENTER_BOLT_INDEX];
+  let direction = (Math.random() + boltIndex * 0.33) % 1 > 0.5 ? 1 : -1;
 
   for (let segment = 1; segment < ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT; segment += 1) {
     const x = (100 / ENGINE_LIGHTNING_MAIN_SEGMENT_COUNT) * segment;
     direction *= -1;
     const edgeScale = Math.min(1, Math.min(x, 100 - x) / 14);
-    const lowerChannelBias = x > 10 && x < 80 ? 0.54 : 0;
-    const amplitude = getPortfolioEngineLightningRandom(0.62, 2.05) * edgeScale;
-    const harmonic = Math.sin((x / 100) * Math.PI * 3.4 + portfolioEngineLightningBranchPolarity * 0.31) * 0.28;
-    const noise = getPortfolioEngineLightningRandom(-0.24, 0.24);
+    const laneScale = Math.min(1, Math.min(x, 100 - x) / 18);
+    const lowerChannelBias = x > 10 && x < 80 ? 0.38 : 0;
+    const amplitude = getPortfolioEngineLightningRandom(0.54, 1.82) * edgeScale * boltConfig.amplitudeScale;
+    const harmonic = Math.sin((x / 100) * Math.PI * 3.4 + boltConfig.harmonicOffset + portfolioEngineLightningBranchPolarity * 0.31) * 0.24 * boltConfig.amplitudeScale;
+    const noise = getPortfolioEngineLightningRandom(-0.2, 0.2) * boltConfig.amplitudeScale;
+    const laneOffset = boltConfig.yOffset * laneScale;
     points.push({
       x,
-      y: clampPortfolioEngineLightningY(ENGINE_LIGHTNING_BASE_Y + lowerChannelBias + direction * amplitude + harmonic + noise, 6, 18),
+      y: clampPortfolioEngineLightningY(ENGINE_LIGHTNING_BASE_Y + laneOffset + lowerChannelBias + direction * amplitude + harmonic + noise, 5.6, 18.4),
     });
   }
 
@@ -273,11 +285,15 @@ function createPortfolioEngineLightningBranchPoints(mainPoints, slotIndex, slotC
 }
 
 function retargetPortfolioEngineLightning(timestamp = window.performance.now()) {
-  portfolioEngineLightningMainTargetPoints = createPortfolioEngineLightningMainPoints();
-  if (!portfolioEngineLightningMainPoints) {
-    portfolioEngineLightningMainPoints = portfolioEngineLightningMainTargetPoints;
-    portfolioEngineLightningMainPath.setAttribute("d", formatPortfolioEngineLightningPath(portfolioEngineLightningMainPoints));
-  }
+  portfolioEngineLightningMainTargetPointSets = portfolioEngineLightningMainPaths.map((path, index) => {
+    const targetPoints = createPortfolioEngineLightningMainPoints(index);
+    if (!portfolioEngineLightningMainPointSets[index]) {
+      portfolioEngineLightningMainPointSets[index] = targetPoints;
+      path.setAttribute("d", formatPortfolioEngineLightningPath(targetPoints));
+    }
+    return targetPoints;
+  });
+  const centerMainTargetPoints = portfolioEngineLightningMainTargetPointSets[ENGINE_LIGHTNING_CENTER_BOLT_INDEX] || portfolioEngineLightningMainTargetPointSets[0];
 
   const branchCapacity = Math.min(ENGINE_LIGHTNING_BRANCH_MAX_COUNT, portfolioEngineLightningBranchPaths.length);
   portfolioEngineLightningBranchPaths.forEach((path, index) => {
@@ -289,7 +305,7 @@ function retargetPortfolioEngineLightning(timestamp = window.performance.now()) 
 
     const branchDirection = index % 2 === 0 ? -1 : 1;
     const targetPoints = createPortfolioEngineLightningBranchPoints(
-      portfolioEngineLightningMainTargetPoints,
+      centerMainTargetPoints,
       index,
       branchCapacity,
       branchDirection
@@ -300,9 +316,7 @@ function retargetPortfolioEngineLightning(timestamp = window.performance.now()) 
       path.setAttribute("d", formatPortfolioEngineLightningPath(targetPoints));
     }
     portfolioEngineLightningBranchDirections[index] = branchDirection;
-    path.style.strokeOpacity = Math.random() < 0.18
-      ? "0"
-      : formatPortfolioEngineLightningCoord(getPortfolioEngineLightningRandom(0.42, 0.92));
+    path.style.strokeOpacity = formatPortfolioEngineLightningCoord(getPortfolioEngineLightningRandom(0.32, 0.88));
     path.style.setProperty("--engine-lightning-branch-order", String(index));
   });
 
@@ -311,17 +325,24 @@ function retargetPortfolioEngineLightning(timestamp = window.performance.now()) 
 }
 
 function renderPortfolioEngineLightningPaths(deltaMs = 16) {
-  if (!portfolioEngineLightningMainPath || !portfolioEngineLightningMainTargetPoints) {
+  if (!portfolioEngineLightningMainPath || !portfolioEngineLightningMainTargetPointSets.length) {
     return;
   }
 
   const mainWeight = getPortfolioEngineLightningFrameWeight(deltaMs, ENGINE_LIGHTNING_MAIN_EASE_MS);
-  portfolioEngineLightningMainPoints = blendPortfolioEngineLightningPoints(
-    portfolioEngineLightningMainPoints,
-    portfolioEngineLightningMainTargetPoints,
-    mainWeight
-  );
-  portfolioEngineLightningMainPath.setAttribute("d", formatPortfolioEngineLightningPath(portfolioEngineLightningMainPoints));
+  portfolioEngineLightningMainPaths.forEach((path, index) => {
+    const targetPoints = portfolioEngineLightningMainTargetPointSets[index];
+    if (!targetPoints) {
+      return;
+    }
+    const mainPoints = blendPortfolioEngineLightningPoints(
+      portfolioEngineLightningMainPointSets[index],
+      targetPoints,
+      mainWeight
+    );
+    portfolioEngineLightningMainPointSets[index] = mainPoints;
+    path.setAttribute("d", formatPortfolioEngineLightningPath(mainPoints));
+  });
 
   const branchWeight = getPortfolioEngineLightningFrameWeight(deltaMs, ENGINE_LIGHTNING_BRANCH_EASE_MS);
   portfolioEngineLightningBranchPaths.forEach((path, index) => {
@@ -345,6 +366,7 @@ function shouldRunPortfolioEngineLightning() {
     portfolioEngine?.isConnected &&
     portfolioEngineLightningOverlay?.isConnected &&
     portfolioEngineLightningMainPath &&
+    portfolioEngineLightningMainPaths.length >= ENGINE_LIGHTNING_PRIMARY_BOLTS.length &&
     !isPortfolioEngineReducedMotion() &&
     shell?.dataset.portfolioEngineReady === "true"
   );
@@ -377,7 +399,7 @@ function stepPortfolioEngineLightning(timestamp) {
     : 16;
   portfolioEngineLightningLastFrameAt = timestamp;
 
-  if (!portfolioEngineLightningMainTargetPoints || timestamp >= portfolioEngineLightningNextTargetAt) {
+  if (!portfolioEngineLightningMainTargetPointSets.length || timestamp >= portfolioEngineLightningNextTargetAt) {
     retargetPortfolioEngineLightning(timestamp);
   }
 
@@ -400,7 +422,7 @@ function startPortfolioEngineLightning() {
   }
 
   portfolioEngineLightningOverlay?.setAttribute("data-engine-lightning-state", "live");
-  if (!portfolioEngineLightningMainTargetPoints) {
+  if (!portfolioEngineLightningMainTargetPointSets.length) {
     retargetPortfolioEngineLightning(window.performance.now());
   }
   queuePortfolioEngineLightningTick();

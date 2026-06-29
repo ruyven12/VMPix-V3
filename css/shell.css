@@ -268,13 +268,33 @@ button {
 }
 
 .engine-lightning-main {
-  stroke: rgb(var(--engine-accent-glow) / 0.68);
-  stroke-width: 1.02;
-  opacity: 0.82;
+  stroke: rgb(var(--engine-accent-glow) / 0.48);
+  stroke-width: 0.62;
+  opacity: 0.44;
   filter:
-    drop-shadow(0 0 0.08rem rgb(var(--engine-accent-glow) / 0.22))
-    drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.09));
-  animation: engineLightningMainPulse 860ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    drop-shadow(0 0 0.08rem rgb(var(--engine-accent-glow) / 0.2))
+    drop-shadow(0 0 0.19rem rgb(var(--engine-accent-glow) / 0.1));
+  animation: engineLightningFieldPulse 1120ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.engine-lightning-main--center {
+  stroke: rgb(var(--engine-accent-glow) / 0.74);
+  stroke-width: 1.06;
+  opacity: 0.84;
+  filter:
+    drop-shadow(0 0 0.11rem rgb(var(--engine-accent-glow) / 0.31))
+    drop-shadow(0 0 0.28rem rgb(var(--engine-accent-glow) / 0.14));
+  animation-name: engineLightningMainPulse;
+}
+
+.engine-lightning-main--upper {
+  stroke: rgb(var(--engine-accent-soft) / 0.5);
+  animation-delay: -160ms;
+}
+
+.engine-lightning-main--lower {
+  stroke: rgb(var(--engine-accent-glow) / 0.42);
+  animation-delay: -360ms;
 }
 
 .engine-lightning-branch {
@@ -294,6 +314,34 @@ button {
   opacity: 0.32;
   filter: drop-shadow(0 0 0.05rem rgb(var(--engine-accent-glow) / 0.1));
   animation-name: engineLightningBranchPulseAlt;
+}
+
+@keyframes engineLightningFieldPulse {
+  0%,
+  100% {
+    opacity: 0.28;
+    stroke-width: 0.48;
+  }
+
+  18% {
+    opacity: 0.5;
+    stroke-width: 0.66;
+  }
+
+  43% {
+    opacity: 0.34;
+    stroke-width: 0.54;
+  }
+
+  68% {
+    opacity: 0.58;
+    stroke-width: 0.72;
+  }
+
+  86% {
+    opacity: 0.32;
+    stroke-width: 0.5;
+  }
 }
 
 @keyframes engineLightningMainPulse {
@@ -791,6 +839,11 @@ button {
   .engine-lightning-overlay {
     --engine-overlay-start: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.025rem, 4.5vw, 1.275rem));
     --engine-overlay-end: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.35rem, 5.75vw, 1.9rem));
+  }
+
+  .engine-lightning-main,
+  .engine-lightning-branch {
+    filter: none;
   }
 
   .portfolio-engine-panel {
