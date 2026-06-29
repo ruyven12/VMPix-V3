@@ -268,51 +268,51 @@ button {
 }
 
 .engine-lightning-main {
-  stroke: rgb(var(--engine-accent-glow) / 0.48);
+  stroke: rgb(var(--engine-accent-glow) / 0.52);
   stroke-width: 0.62;
   opacity: 0.44;
   filter:
-    drop-shadow(0 0 0.16rem rgb(var(--engine-accent-glow) / 0.36))
-    drop-shadow(0 0 0.38rem rgb(var(--engine-accent-glow) / 0.18));
+    drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.42))
+    drop-shadow(0 0 0.44rem rgb(var(--engine-accent-glow) / 0.21));
   animation: engineLightningFieldPulse 1120ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .engine-lightning-main--center {
-  stroke: rgb(var(--engine-accent-glow) / 0.74);
+  stroke: rgb(var(--engine-accent-glow) / 0.8);
   stroke-width: 1.06;
   opacity: 0.84;
   filter:
-    drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.56))
-    drop-shadow(0 0 0.56rem rgb(var(--engine-accent-glow) / 0.28));
+    drop-shadow(0 0 0.25rem rgb(var(--engine-accent-glow) / 0.64))
+    drop-shadow(0 0 0.64rem rgb(var(--engine-accent-glow) / 0.32));
   animation-name: engineLightningMainPulse;
 }
 
 .engine-lightning-main--upper {
-  stroke: rgb(var(--engine-accent-soft) / 0.5);
+  stroke: rgb(var(--engine-accent-soft) / 0.56);
   animation-delay: -160ms;
 }
 
 .engine-lightning-main--lower {
-  stroke: rgb(var(--engine-accent-glow) / 0.42);
+  stroke: rgb(var(--engine-accent-glow) / 0.48);
   animation-delay: -360ms;
 }
 
 .engine-lightning-branch {
-  stroke: rgb(var(--engine-accent-soft) / 0.38);
+  stroke: rgb(var(--engine-accent-soft) / 0.42);
   stroke-width: 0.38;
   stroke-opacity: 1;
   opacity: 0.38;
-  filter: drop-shadow(0 0 0.11rem rgb(var(--engine-accent-soft) / 0.24));
+  filter: drop-shadow(0 0 0.13rem rgb(var(--engine-accent-soft) / 0.28));
   transition: stroke-opacity 180ms ease-out;
   animation: engineLightningBranchPulse 1120ms cubic-bezier(0.37, 0, 0.25, 1) infinite;
   animation-delay: calc(var(--engine-lightning-branch-order, 0) * -47ms);
 }
 
 .engine-lightning-branch--alt {
-  stroke: rgb(var(--engine-accent-glow) / 0.34);
+  stroke: rgb(var(--engine-accent-glow) / 0.38);
   stroke-width: 0.32;
   opacity: 0.32;
-  filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.2));
+  filter: drop-shadow(0 0 0.12rem rgb(var(--engine-accent-glow) / 0.24));
   animation-name: engineLightningBranchPulseAlt;
 }
 
@@ -585,7 +585,7 @@ button {
   z-index: 3;
   opacity: 1;
   isolation: isolate;
-  width: clamp(2.12rem, 9.6vw, 3rem);
+  width: clamp(2.29rem, 10.4vw, 3.24rem);
   aspect-ratio: 1;
   justify-self: center;
   border-radius: 50%;
@@ -703,11 +703,12 @@ button {
   grid-column: 5;
   position: relative;
   z-index: 2;
+  opacity: 1;
   min-width: 0;
   align-self: center;
   justify-self: end;
   margin-inline-end: 0;
-  width: clamp(2.7rem, 11.5vw, 3.8rem);
+  width: clamp(2.92rem, 12.4vw, 4.1rem);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -716,7 +717,7 @@ button {
   background:
     radial-gradient(circle, rgba(246, 246, 246, 0.18) 0 7%, transparent 9% 28%, rgba(226, 226, 226, 0.12) 29% 32%, transparent 48%),
     conic-gradient(from 18deg, rgba(246, 246, 246, 0.22), transparent 48deg 124deg, rgba(182, 182, 182, 0.18) 146deg, transparent 194deg 286deg, rgba(246, 246, 246, 0.18) 318deg, transparent 360deg),
-    rgba(0, 0, 0, 0.24);
+    rgb(0, 0, 0);
   box-shadow:
     0 0 0.58rem rgb(var(--engine-accent-glow) / 0.08),
     inset 0 0 0 1px rgba(0, 0, 0, 0.62),
@@ -764,6 +765,7 @@ button {
 .portfolio-engine-reactor-core {
   position: relative;
   z-index: 1;
+  opacity: 1;
   display: block;
   width: 82%;
   height: 68%;
@@ -841,9 +843,6 @@ button {
   .engine-lightning-overlay {
     --engine-overlay-start: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.025rem, 4.5vw, 1.275rem));
     --engine-overlay-end: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.35rem, 5.75vw, 1.9rem));
-    filter:
-      drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.34))
-      drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.16));
   }
 
   .engine-lightning-main,
@@ -1174,7 +1173,7 @@ button {
 
 @keyframes portfolioEngineCoreBreath {
   0%, 53%, 100% {
-    opacity: 0.86;
+    opacity: 1;
     transform: scale3d(0.995, 0.995, 1);
     filter:
       grayscale(1)
@@ -1184,7 +1183,7 @@ button {
   }
 
   63% {
-    opacity: 0.98;
+    opacity: 1;
     transform: scale3d(1.022, 1.022, 1);
     filter:
       grayscale(1)
@@ -1194,7 +1193,7 @@ button {
   }
 
   77% {
-    opacity: 0.9;
+    opacity: 1;
     transform: scale3d(1.002, 1.002, 1);
   }
 }
