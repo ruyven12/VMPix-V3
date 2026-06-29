@@ -2655,6 +2655,10 @@ button {
   --beacon-hit-size: max(46px, calc(var(--beacon-size) * 2.42));
   --beacon-color: 247 247 242;
   --beacon-delay: 1540ms;
+  --beacon-core-star-width: 0.72;
+  --beacon-core-star-height: 0.72;
+  --beacon-halo-width: 1.58;
+  --beacon-halo-height: 1.52;
   position: fixed;
   top: calc(var(--home-portfolio-transition-center-y) + var(--beacon-y));
   left: calc(var(--home-portfolio-transition-center-x) + var(--beacon-x));
@@ -2693,36 +2697,34 @@ button {
 }
 
 .portfolio-beacon::before {
-  width: calc(var(--beacon-size) * 0.54);
-  aspect-ratio: 1;
+  width: calc(var(--beacon-size) * var(--beacon-core-star-width));
+  height: calc(var(--beacon-size) * var(--beacon-core-star-height));
   border-radius: 0;
-  opacity: 0.96;
+  opacity: 0.98;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 7%, rgba(247, 247, 242, 0.98) 8% 13%, rgb(var(--beacon-color) / 0.78) 14% 18%, transparent 24%),
-    linear-gradient(90deg, transparent 0 8%, rgb(var(--beacon-color) / 0.08) 22%, rgba(247, 247, 242, 0.88) 48.8%, rgba(247, 247, 242, 0.88) 51.2%, rgb(var(--beacon-color) / 0.08) 78%, transparent 92% 100%),
-    linear-gradient(0deg, transparent 0 6%, rgb(var(--beacon-color) / 0.1) 21%, rgba(247, 247, 242, 0.94) 48.7%, rgba(247, 247, 242, 0.94) 51.3%, rgb(var(--beacon-color) / 0.1) 79%, transparent 94% 100%),
-    linear-gradient(45deg, transparent 0 32%, rgb(var(--beacon-color) / 0.08) 45%, rgba(247, 247, 242, 0.5) 49.5%, rgba(247, 247, 242, 0.5) 50.5%, rgb(var(--beacon-color) / 0.08) 55%, transparent 68% 100%),
-    linear-gradient(-45deg, transparent 0 32%, rgb(var(--beacon-color) / 0.07) 45%, rgba(247, 247, 242, 0.42) 49.6%, rgba(247, 247, 242, 0.42) 50.4%, rgb(var(--beacon-color) / 0.07) 55%, transparent 68% 100%);
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 1) 0 6%, rgba(247, 247, 242, 1) 7% 12%, rgb(var(--beacon-color) / 0.86) 13% 16%, transparent 22%),
+    linear-gradient(90deg, transparent 0 12%, rgb(var(--beacon-color) / 0.045) 29%, rgba(247, 247, 242, 0.96) 49.45%, rgba(247, 247, 242, 0.96) 50.55%, rgb(var(--beacon-color) / 0.045) 71%, transparent 88% 100%),
+    linear-gradient(0deg, transparent 0 10%, rgb(var(--beacon-color) / 0.055) 27%, rgba(247, 247, 242, 1) 49.4%, rgba(247, 247, 242, 1) 50.6%, rgb(var(--beacon-color) / 0.055) 73%, transparent 90% 100%),
+    linear-gradient(45deg, transparent 0 36%, rgb(var(--beacon-color) / 0.045) 46%, rgba(247, 247, 242, 0.38) 49.7%, rgba(247, 247, 242, 0.38) 50.3%, rgb(var(--beacon-color) / 0.045) 54%, transparent 64% 100%),
+    linear-gradient(-45deg, transparent 0 36%, rgb(var(--beacon-color) / 0.04) 46%, rgba(247, 247, 242, 0.34) 49.7%, rgba(247, 247, 242, 0.34) 50.3%, rgb(var(--beacon-color) / 0.04) 54%, transparent 64% 100%);
   box-shadow:
-    0 0 0.18rem rgba(247, 247, 242, 0.58),
-    0 0 0.48rem rgb(var(--beacon-color) / 0.34),
-    0 0 0.86rem rgb(var(--beacon-color) / 0.12);
-  filter: brightness(1.05);
+    0 0 0.12rem rgba(247, 247, 242, 0.72),
+    0 0 0.32rem rgb(var(--beacon-color) / 0.24),
+    0 0 0.56rem rgb(var(--beacon-color) / 0.08);
+  filter: brightness(1.18);
 }
 
 .portfolio-beacon::after {
-  width: calc(var(--beacon-size) * 2.25);
-  aspect-ratio: 1;
-  opacity: 0.48;
+  width: calc(var(--beacon-size) * var(--beacon-halo-width));
+  height: calc(var(--beacon-size) * var(--beacon-halo-height));
+  opacity: 0.36;
   background:
-    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.16) 0 5%, rgb(var(--beacon-color) / 0.055) 8% 18%, transparent 32%),
-    linear-gradient(90deg, transparent 0 18%, rgb(var(--beacon-color) / 0.08) 35%, rgba(247, 247, 242, 0.34) 49.4%, rgba(247, 247, 242, 0.34) 50.6%, rgb(var(--beacon-color) / 0.08) 65%, transparent 82% 100%),
-    linear-gradient(0deg, transparent 0 16%, rgb(var(--beacon-color) / 0.075) 34%, rgba(247, 247, 242, 0.3) 49.4%, rgba(247, 247, 242, 0.3) 50.6%, rgb(var(--beacon-color) / 0.075) 66%, transparent 84% 100%),
-    linear-gradient(45deg, transparent 0 37%, rgb(var(--beacon-color) / 0.045) 47%, rgba(247, 247, 242, 0.16) 50%, rgb(var(--beacon-color) / 0.045) 53%, transparent 63% 100%),
-    linear-gradient(-45deg, transparent 0 37%, rgb(var(--beacon-color) / 0.04) 47%, rgba(247, 247, 242, 0.14) 50%, rgb(var(--beacon-color) / 0.04) 53%, transparent 63% 100%);
-  filter:
-    blur(0.01rem)
-    drop-shadow(0 0 0.34rem rgb(var(--beacon-color) / 0.22));
+    radial-gradient(circle at 50% 50%, rgb(var(--beacon-color) / 0.105) 0 4%, rgb(var(--beacon-color) / 0.034) 7% 14%, transparent 25%),
+    linear-gradient(90deg, transparent 0 18%, rgb(var(--beacon-color) / 0.05) 36%, rgba(247, 247, 242, 0.28) 49.62%, rgba(247, 247, 242, 0.28) 50.38%, rgb(var(--beacon-color) / 0.05) 64%, transparent 82% 100%),
+    linear-gradient(0deg, transparent 0 16%, rgb(var(--beacon-color) / 0.048) 35%, rgba(247, 247, 242, 0.26) 49.62%, rgba(247, 247, 242, 0.26) 50.38%, rgb(var(--beacon-color) / 0.048) 65%, transparent 84% 100%),
+    linear-gradient(45deg, transparent 0 40%, rgb(var(--beacon-color) / 0.026) 48%, rgba(247, 247, 242, 0.11) 50%, rgb(var(--beacon-color) / 0.026) 52%, transparent 60% 100%),
+    linear-gradient(-45deg, transparent 0 40%, rgb(var(--beacon-color) / 0.024) 48%, rgba(247, 247, 242, 0.1) 50%, rgb(var(--beacon-color) / 0.024) 52%, transparent 60% 100%);
+  filter: drop-shadow(0 0 0.24rem rgb(var(--beacon-color) / 0.16));
   transform: translate3d(-50%, -50%, 0) scale3d(0.9, 0.9, 1) rotate(0deg);
 }
 
@@ -2743,13 +2745,13 @@ button {
   opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale3d(1.22, 1.22, 1);
   box-shadow:
-    0 0 0.24rem rgba(247, 247, 242, 0.54),
-    0 0 0.78rem rgb(var(--beacon-color) / 0.46),
-    0 0 1.18rem rgb(var(--beacon-color) / 0.18);
+    0 0 0.16rem rgba(247, 247, 242, 0.66),
+    0 0 0.5rem rgb(var(--beacon-color) / 0.32),
+    0 0 0.78rem rgb(var(--beacon-color) / 0.11);
 }
 
 .portfolio-beacon:not(:disabled):is(:hover, :focus-visible)::after {
-  opacity: 0.64;
+  opacity: 0.5;
   transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(0.45deg);
 }
 
@@ -2763,14 +2765,14 @@ button {
   opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1);
   box-shadow:
-    0 0 0.32rem rgba(247, 247, 242, 0.68),
-    0 0 1rem rgb(var(--beacon-color) / 0.72),
-    0 0 1.64rem rgb(var(--beacon-color) / 0.3);
+    0 0 0.18rem rgba(247, 247, 242, 0.82),
+    0 0 0.64rem rgb(var(--beacon-color) / 0.52),
+    0 0 1.05rem rgb(var(--beacon-color) / 0.18);
 }
 
 .portfolio-beacon.is-selected::after,
 .portfolio-beacon[aria-pressed="true"]::after {
-  opacity: 0.84;
+  opacity: 0.62;
   animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
@@ -2779,6 +2781,10 @@ button {
   --beacon-y: var(--entry-beacon-01-y);
   --beacon-color: 255 159 46;
   --beacon-delay: var(--entry-beacon-01-delay);
+  --beacon-core-star-width: 0.78;
+  --beacon-core-star-height: 0.68;
+  --beacon-halo-width: 1.5;
+  --beacon-halo-height: 1.42;
 }
 
 .portfolio-beacon--soundtrack {
@@ -2786,6 +2792,10 @@ button {
   --beacon-y: var(--entry-beacon-02-y);
   --beacon-color: 163 92 255;
   --beacon-delay: var(--entry-beacon-02-delay);
+  --beacon-core-star-width: 0.68;
+  --beacon-core-star-height: 0.78;
+  --beacon-halo-width: 1.46;
+  --beacon-halo-height: 1.56;
 }
 
 .portfolio-beacon--cosmos {
@@ -2793,6 +2803,10 @@ button {
   --beacon-y: var(--entry-beacon-03-y);
   --beacon-color: 77 163 255;
   --beacon-delay: var(--entry-beacon-03-delay);
+  --beacon-core-star-width: 0.82;
+  --beacon-core-star-height: 0.72;
+  --beacon-halo-width: 1.66;
+  --beacon-halo-height: 1.5;
 }
 
 .portfolio-beacon--battleground {
@@ -2800,6 +2814,10 @@ button {
   --beacon-y: var(--entry-beacon-04-y);
   --beacon-color: 255 63 63;
   --beacon-delay: var(--entry-beacon-04-delay);
+  --beacon-core-star-width: 0.72;
+  --beacon-core-star-height: 0.82;
+  --beacon-halo-width: 1.52;
+  --beacon-halo-height: 1.64;
 }
 
 .portfolio-beacon--wild {
@@ -2807,11 +2825,19 @@ button {
   --beacon-y: var(--entry-beacon-05-y);
   --beacon-color: 82 255 122;
   --beacon-delay: var(--entry-beacon-05-delay);
+  --beacon-core-star-width: 0.76;
+  --beacon-core-star-height: 0.66;
+  --beacon-halo-width: 1.56;
+  --beacon-halo-height: 1.44;
 }
 
 .portfolio-beacon--system {
   --beacon-size: clamp(0.68rem, 2.05vw, 0.98rem);
   --beacon-color: 247 247 242;
+  --beacon-core-star-width: 0.62;
+  --beacon-core-star-height: 0.62;
+  --beacon-halo-width: 1.34;
+  --beacon-halo-height: 1.34;
 }
 
 .portfolio-beacon--story {
@@ -2882,7 +2908,7 @@ button {
 
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon.is-selected::after,
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon[aria-pressed="true"]::after {
-  opacity: 0.84;
+  opacity: 0.62;
   animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
@@ -2893,7 +2919,7 @@ button {
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon.is-selected::after,
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon[aria-pressed="true"]::after {
-  opacity: 0.84;
+  opacity: 0.62;
   animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
