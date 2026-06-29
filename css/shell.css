@@ -3588,7 +3588,17 @@ button {
   z-index: 6;
   isolation: isolate;
   opacity: 1;
-  background: transparent;
+  background:
+    radial-gradient(ellipse 0.72px 0.3px at 6% 18%, rgba(247, 247, 242, 0.28) 0 42%, transparent 78%),
+    radial-gradient(ellipse 0.32px 0.76px at 16% 61%, rgba(247, 247, 242, 0.18) 0 38%, transparent 76%),
+    radial-gradient(ellipse 0.78px 0.32px at 27% 29%, rgba(238, 217, 153, 0.16) 0 40%, transparent 78%),
+    radial-gradient(ellipse 0.3px 0.72px at 35% 83%, rgba(247, 247, 242, 0.2) 0 36%, transparent 76%),
+    radial-gradient(ellipse 0.74px 0.28px at 48% 12%, rgba(247, 247, 242, 0.24) 0 42%, transparent 78%),
+    radial-gradient(ellipse 0.34px 0.78px at 61% 52%, rgba(247, 247, 242, 0.18) 0 38%, transparent 76%),
+    radial-gradient(ellipse 0.78px 0.32px at 74% 25%, rgba(247, 247, 242, 0.22) 0 40%, transparent 78%),
+    radial-gradient(ellipse 0.32px 0.72px at 83% 72%, rgba(238, 217, 153, 0.14) 0 36%, transparent 76%),
+    radial-gradient(ellipse 0.7px 0.28px at 94% 39%, rgba(247, 247, 242, 0.22) 0 42%, transparent 78%);
+  background-repeat: no-repeat;
   filter: none;
   transform: none;
   --nebula-wormhole-duration: 2360ms;
@@ -3667,12 +3677,23 @@ button {
 .site-shell.is-home-route .ambient-void-stars::before,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars::before {
   inset: -5%;
-  opacity: 0.1;
+  opacity: 0.12;
   background:
-    radial-gradient(circle at 12% 22%, rgba(247, 247, 242, 0.22) 0 0.42px, transparent 0.96px),
-    radial-gradient(circle at 39% 34%, rgba(247, 247, 242, 0.2) 0 0.44px, transparent 0.98px),
-    radial-gradient(circle at 57% 16%, rgba(247, 247, 242, 0.22) 0 0.46px, transparent 1px),
-    radial-gradient(circle at 88% 78%, rgba(247, 247, 242, 0.2) 0 0.44px, transparent 0.98px);
+    radial-gradient(ellipse 4.8px 0.42px at 12% 22%, rgba(247, 247, 242, 0.11) 0 32%, transparent 72%),
+    radial-gradient(ellipse 0.42px 4.8px at 12% 22%, rgba(247, 247, 242, 0.08) 0 28%, transparent 72%),
+    radial-gradient(ellipse 0.78px 0.32px at 12% 22%, rgba(247, 247, 242, 0.3) 0 38%, transparent 78%),
+    radial-gradient(ellipse 0.66px 0.28px at 21% 76%, rgba(247, 247, 242, 0.18) 0 40%, transparent 76%),
+    radial-gradient(ellipse 0.34px 0.74px at 31% 18%, rgba(247, 247, 242, 0.2) 0 36%, transparent 76%),
+    radial-gradient(ellipse 0.68px 0.3px at 39% 34%, rgba(247, 247, 242, 0.24) 0 40%, transparent 78%),
+    radial-gradient(ellipse 5.4px 0.44px at 57% 16%, rgba(247, 247, 242, 0.1) 0 30%, transparent 72%),
+    radial-gradient(ellipse 0.44px 5.4px at 57% 16%, rgba(247, 247, 242, 0.07) 0 26%, transparent 72%),
+    radial-gradient(ellipse 0.8px 0.32px at 57% 16%, rgba(247, 247, 242, 0.3) 0 38%, transparent 78%),
+    radial-gradient(ellipse 0.36px 0.72px at 68% 68%, rgba(247, 247, 242, 0.18) 0 36%, transparent 76%),
+    radial-gradient(ellipse 0.72px 0.32px at 79% 41%, rgba(238, 217, 153, 0.16) 0 38%, transparent 78%),
+    radial-gradient(ellipse 4.6px 0.4px at 88% 78%, rgba(247, 247, 242, 0.09) 0 30%, transparent 72%),
+    radial-gradient(ellipse 0.4px 4.6px at 88% 78%, rgba(247, 247, 242, 0.07) 0 26%, transparent 72%),
+    radial-gradient(ellipse 0.74px 0.3px at 88% 78%, rgba(247, 247, 242, 0.24) 0 38%, transparent 78%);
+  background-repeat: no-repeat;
   mix-blend-mode: normal;
   animation:
     voidStarLayerDrift 190s linear infinite alternate,
@@ -3682,11 +3703,19 @@ button {
 .site-shell.is-home-route .ambient-void-stars::after,
 .site-shell[data-shell-route="portfolio"] .ambient-void-stars::after {
   inset: -6%;
-  opacity: 0.06;
+  opacity: 0.08;
   background:
-    radial-gradient(circle at 18% 84%, rgba(247, 247, 242, 0.18) 0 0.38px, transparent 0.9px),
-    radial-gradient(circle at 49% 74%, rgba(247, 247, 242, 0.18) 0 0.4px, transparent 0.92px),
-    radial-gradient(circle at 92% 42%, rgba(238, 217, 153, 0.16) 0 0.36px, transparent 0.86px);
+    radial-gradient(ellipse 4.2px 0.36px at 18% 84%, rgba(247, 247, 242, 0.08) 0 28%, transparent 72%),
+    radial-gradient(ellipse 0.36px 4.2px at 18% 84%, rgba(247, 247, 242, 0.06) 0 24%, transparent 72%),
+    radial-gradient(ellipse 0.68px 0.28px at 18% 84%, rgba(247, 247, 242, 0.22) 0 38%, transparent 76%),
+    radial-gradient(ellipse 0.3px 0.66px at 33% 48%, rgba(247, 247, 242, 0.14) 0 34%, transparent 74%),
+    radial-gradient(ellipse 0.66px 0.28px at 49% 74%, rgba(247, 247, 242, 0.2) 0 38%, transparent 76%),
+    radial-gradient(ellipse 0.32px 0.68px at 62% 31%, rgba(247, 247, 242, 0.13) 0 34%, transparent 74%),
+    radial-gradient(ellipse 3.8px 0.34px at 73% 58%, rgba(238, 217, 153, 0.07) 0 28%, transparent 72%),
+    radial-gradient(ellipse 0.34px 3.8px at 73% 58%, rgba(238, 217, 153, 0.05) 0 24%, transparent 72%),
+    radial-gradient(ellipse 0.7px 0.3px at 73% 58%, rgba(238, 217, 153, 0.16) 0 36%, transparent 76%),
+    radial-gradient(ellipse 0.62px 0.28px at 92% 42%, rgba(238, 217, 153, 0.16) 0 36%, transparent 74%);
+  background-repeat: no-repeat;
   mix-blend-mode: normal;
   animation:
     voidStarLayerDrift 250s linear -53s infinite alternate-reverse,
@@ -3859,26 +3888,31 @@ button {
 @media (min-width: 48rem) {
   .ambient-void-stars::after {
     background:
-      radial-gradient(circle at 13% 22%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.88px),
-      radial-gradient(circle at 25% 67%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.02px),
-      radial-gradient(circle at 47% 6%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.95px),
-      radial-gradient(circle at 69% 70%, rgba(213, 22, 34, 0.11) 0 0.66px, transparent 1.08px),
-      radial-gradient(circle at 84% 54%, rgba(247, 247, 242, 0.18) 0 0.55px, transparent 0.98px),
-      radial-gradient(circle at 92% 15%, rgba(247, 247, 242, 0.22) 0 0.7px, transparent 1.14px),
-      radial-gradient(circle at 39% 36%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.86px),
-      radial-gradient(circle at 58% 23%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.92px),
-      radial-gradient(circle at 4% 72%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.88px),
-      radial-gradient(circle at 19% 48%, rgba(247, 247, 242, 0.17) 0 0.56px, transparent 0.98px),
-      radial-gradient(circle at 31% 19%, rgba(213, 22, 34, 0.08) 0 0.6px, transparent 1.02px),
-      radial-gradient(circle at 44% 64%, rgba(247, 247, 242, 0.16) 0 0.5px, transparent 0.92px),
-      radial-gradient(circle at 52% 82%, rgba(247, 247, 242, 0.18) 0 0.58px, transparent 1px),
-      radial-gradient(circle at 66% 33%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.9px),
-      radial-gradient(circle at 78% 7%, rgba(247, 247, 242, 0.2) 0 0.62px, transparent 1.08px),
-      radial-gradient(circle at 89% 43%, rgba(213, 22, 34, 0.09) 0 0.58px, transparent 1px),
-      radial-gradient(circle at 97% 82%, rgba(247, 247, 242, 0.15) 0 0.48px, transparent 0.92px),
-      radial-gradient(circle at 12% 92%, rgba(247, 247, 242, 0.18) 0 0.56px, transparent 1px),
-      radial-gradient(circle at 73% 92%, rgba(247, 247, 242, 0.14) 0 0.46px, transparent 0.88px),
-      radial-gradient(circle at 96% 5%, rgba(247, 247, 242, 0.17) 0 0.52px, transparent 0.96px);
+      radial-gradient(ellipse 4.4px 0.38px at 13% 22%, rgba(247, 247, 242, 0.08) 0 28%, transparent 72%),
+      radial-gradient(ellipse 0.38px 4.4px at 13% 22%, rgba(247, 247, 242, 0.06) 0 24%, transparent 72%),
+      radial-gradient(ellipse 0.48px 0.2px at 13% 22%, rgba(247, 247, 242, 0.18) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.24px 0.52px at 25% 67%, rgba(247, 247, 242, 0.18) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.46px 0.2px at 47% 6%, rgba(247, 247, 242, 0.16) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.22px 0.48px at 69% 70%, rgba(213, 22, 34, 0.09) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.48px 0.2px at 84% 54%, rgba(247, 247, 242, 0.16) 0 36%, transparent 76%),
+      radial-gradient(ellipse 4.8px 0.4px at 92% 15%, rgba(247, 247, 242, 0.08) 0 28%, transparent 72%),
+      radial-gradient(ellipse 0.4px 4.8px at 92% 15%, rgba(247, 247, 242, 0.06) 0 24%, transparent 72%),
+      radial-gradient(ellipse 0.54px 0.22px at 92% 15%, rgba(247, 247, 242, 0.2) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.22px 0.46px at 39% 36%, rgba(247, 247, 242, 0.14) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.42px 0.18px at 58% 23%, rgba(247, 247, 242, 0.15) 0 36%, transparent 74%),
+      radial-gradient(ellipse 0.2px 0.42px at 4% 72%, rgba(247, 247, 242, 0.13) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.48px 0.2px at 19% 48%, rgba(247, 247, 242, 0.16) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.22px 0.5px at 31% 19%, rgba(213, 22, 34, 0.07) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.44px 0.18px at 44% 64%, rgba(247, 247, 242, 0.14) 0 36%, transparent 74%),
+      radial-gradient(ellipse 0.24px 0.52px at 52% 82%, rgba(247, 247, 242, 0.16) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.42px 0.18px at 66% 33%, rgba(247, 247, 242, 0.13) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.5px 0.22px at 78% 7%, rgba(247, 247, 242, 0.18) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.22px 0.48px at 89% 43%, rgba(213, 22, 34, 0.08) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.42px 0.18px at 97% 82%, rgba(247, 247, 242, 0.13) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.48px 0.2px at 12% 92%, rgba(247, 247, 242, 0.16) 0 36%, transparent 76%),
+      radial-gradient(ellipse 0.22px 0.44px at 73% 92%, rgba(247, 247, 242, 0.13) 0 34%, transparent 74%),
+      radial-gradient(ellipse 0.44px 0.18px at 96% 5%, rgba(247, 247, 242, 0.16) 0 36%, transparent 74%);
+    background-repeat: no-repeat;
   }
 }
 
