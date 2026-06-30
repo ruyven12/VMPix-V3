@@ -147,6 +147,8 @@ const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
 const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 0;
 const PORTFOLIO_GATEWAY_FOCUS_DURATION_MS = 680;
 const PORTFOLIO_GATEWAY_REDUCED_FOCUS_DURATION_MS = 180;
+const PORTFOLIO_GATEWAY_PULL_DURATION_MS = 720;
+const PORTFOLIO_GATEWAY_REDUCED_PULL_DURATION_MS = 180;
 const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
@@ -218,20 +220,45 @@ function clearPortfolioGatewayPhaseTimer() {
   portfolioGatewayPhaseTimer = 0;
 }
 
+function isPortfolioGatewayPhaseCurrent(state, worldName, route) {
+  return Boolean(
+    shell &&
+    window.location.pathname === routePaths.portfolio &&
+    shell.dataset.portfolioGatewayState === state &&
+    shell.dataset.portfolioGatewayWorld === worldName &&
+    shell.dataset.portfolioGatewayRoute === route &&
+    shell.classList.contains("is-portfolio-world-gateway-active")
+  );
+}
+
+function advancePortfolioGatewayToOpeningRing(worldName, route) {
+  portfolioGatewayPhaseTimer = 0;
+  if (!isPortfolioGatewayPhaseCurrent("pulling-universe", worldName, route)) {
+    return;
+  }
+
+  shell.dataset.portfolioGatewayState = "opening-ring";
+  syncPortfolioGatewayTriggerState();
+}
+
+function queuePortfolioGatewayOpeningRing(worldName, route) {
+  clearPortfolioGatewayPhaseTimer();
+  const delay = isPortfolioEngineReducedMotion()
+    ? PORTFOLIO_GATEWAY_REDUCED_PULL_DURATION_MS
+    : PORTFOLIO_GATEWAY_PULL_DURATION_MS;
+  portfolioGatewayPhaseTimer = window.setTimeout(() => {
+    advancePortfolioGatewayToOpeningRing(worldName, route);
+  }, delay);
+}
+
 function advancePortfolioGatewayToPullingUniverse(worldName, route) {
   portfolioGatewayPhaseTimer = 0;
-  if (
-    !shell ||
-    window.location.pathname !== routePaths.portfolio ||
-    shell.dataset.portfolioGatewayState !== "focusing-star" ||
-    shell.dataset.portfolioGatewayWorld !== worldName ||
-    shell.dataset.portfolioGatewayRoute !== route ||
-    !shell.classList.contains("is-portfolio-world-gateway-active")
-  ) {
+  if (!isPortfolioGatewayPhaseCurrent("focusing-star", worldName, route)) {
     return;
   }
 
   shell.dataset.portfolioGatewayState = "pulling-universe";
+  queuePortfolioGatewayOpeningRing(worldName, route);
   syncPortfolioGatewayTriggerState();
 }
 
