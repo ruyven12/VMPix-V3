@@ -115,7 +115,7 @@ const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
 const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
-const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 1530;
+const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 0;
 const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
@@ -619,9 +619,11 @@ function triggerPortfolioStarEmitterCharge(target) {
     portfolioRightEmitterChargingTimer = 0;
     setPortfolioStarEmitterChargeState("ready", config.id);
   }, PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS);
-  portfolioRightEmitterReadyTimer = window.setTimeout(() => {
-    clearPortfolioStarEmitterChargeState();
-  }, PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS);
+  if (PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS > 0) {
+    portfolioRightEmitterReadyTimer = window.setTimeout(() => {
+      clearPortfolioStarEmitterChargeState();
+    }, PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS);
+  }
 }
 
 function clearPortfolioEngineScan() {
