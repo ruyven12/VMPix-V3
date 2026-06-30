@@ -311,6 +311,34 @@ button {
   transition-delay: 0ms;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
+  visibility: visible;
+  opacity: 1;
+  transform: translateZ(0) scale3d(0.974, 0.974, 1);
+  transition-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
+  visibility: visible;
+  transition-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
+  opacity: 1;
+  transform: translateZ(0) scale3d(2.85, 2.85, 1);
+  background:
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-reveal-rgb) / 0.36) 0, rgb(var(--portfolio-gateway-reveal-rgb) / 0.2) var(--portfolio-gateway-focus-core), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.1) var(--portfolio-gateway-focus-ring), rgba(0, 0, 0, 0.9) var(--portfolio-gateway-focus-halo)),
+    linear-gradient(180deg, rgba(1, 1, 4, 0.96), rgba(0, 0, 0, 0.985));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
+  opacity: 0.96;
+  transform: translateZ(0) scale3d(6.2, 6.2, 1);
+  background:
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 var(--portfolio-gateway-focus-core), rgb(var(--portfolio-gateway-reveal-rgb) / 0.5) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), transparent calc(var(--portfolio-gateway-focus-core) + 13px) var(--portfolio-gateway-focus-ring), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.24) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 14px));
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-background {
   opacity: 0.96;
   transform: translateZ(0) scale3d(1.16, 1.16, 1);
@@ -932,6 +960,11 @@ button {
   pointer-events: auto;
   transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   transition-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
+  opacity: 0.12;
+  transform: translate3d(0, 0.35rem, 0) scale3d(0.992, 0.992, 1);
 }
 
 .site-shell.is-home-route .portfolio-engine,
@@ -4096,6 +4129,27 @@ button {
   transform: translate3d(-50%, -50%, 0) scale3d(1.92, 1.92, 1) rotate(0deg);
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"] {
+  opacity: 0.68;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"]::before {
+  opacity: 0.56;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.84, 0.84, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 0.18;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(2.7, 2.7, 1) rotate(0deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portfolio-beacon,
   .portfolio-beacon::before,
@@ -4203,6 +4257,37 @@ button {
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-beacon[aria-pressed="true"]::before,
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-beacon.is-selected::after,
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-beacon[aria-pressed="true"]::after {
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
+    transform: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
+    opacity: 1;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
+    opacity: 0.82;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
+    opacity: 0.12;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"] {
+    transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1);
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected::before,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"]::before,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon.is-selected::after,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon[aria-pressed="true"]::after {
     transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1) rotate(0deg);
   }
 

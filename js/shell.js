@@ -151,6 +151,8 @@ const PORTFOLIO_GATEWAY_PULL_DURATION_MS = 720;
 const PORTFOLIO_GATEWAY_REDUCED_PULL_DURATION_MS = 180;
 const PORTFOLIO_GATEWAY_OPENING_DURATION_MS = 760;
 const PORTFOLIO_GATEWAY_REDUCED_OPENING_DURATION_MS = 180;
+const PORTFOLIO_GATEWAY_REVEAL_DURATION_MS = 780;
+const PORTFOLIO_GATEWAY_REDUCED_REVEAL_DURATION_MS = 180;
 const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
@@ -233,6 +235,26 @@ function isPortfolioGatewayPhaseCurrent(state, worldName, route) {
   );
 }
 
+function advancePortfolioGatewayToFillingScreen(worldName, route) {
+  portfolioGatewayPhaseTimer = 0;
+  if (!isPortfolioGatewayPhaseCurrent("revealing-world", worldName, route)) {
+    return;
+  }
+
+  shell.dataset.portfolioGatewayState = "filling-screen";
+  syncPortfolioGatewayTriggerState();
+}
+
+function queuePortfolioGatewayFillingScreen(worldName, route) {
+  clearPortfolioGatewayPhaseTimer();
+  const delay = isPortfolioEngineReducedMotion()
+    ? PORTFOLIO_GATEWAY_REDUCED_REVEAL_DURATION_MS
+    : PORTFOLIO_GATEWAY_REVEAL_DURATION_MS;
+  portfolioGatewayPhaseTimer = window.setTimeout(() => {
+    advancePortfolioGatewayToFillingScreen(worldName, route);
+  }, delay);
+}
+
 function advancePortfolioGatewayToRevealingWorld(worldName, route) {
   portfolioGatewayPhaseTimer = 0;
   if (!isPortfolioGatewayPhaseCurrent("opening-ring", worldName, route)) {
@@ -240,6 +262,7 @@ function advancePortfolioGatewayToRevealingWorld(worldName, route) {
   }
 
   shell.dataset.portfolioGatewayState = "revealing-world";
+  queuePortfolioGatewayFillingScreen(worldName, route);
   syncPortfolioGatewayTriggerState();
 }
 
