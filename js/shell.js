@@ -203,8 +203,15 @@ function getPortfolioGatewayActiveWorld() {
   return shell?.dataset.activeWorld || "portfolio";
 }
 
+function isPortfolioGatewayActive() {
+  return Boolean(
+    shell?.classList.contains("is-portfolio-world-gateway-active") ||
+    (shell?.dataset.portfolioGatewayState && shell.dataset.portfolioGatewayState !== "idle")
+  );
+}
+
 function shouldEnablePortfolioGatewayTrigger() {
-  if (!shell || !portfolioGatewayTrigger || window.location.pathname !== routePaths.portfolio) {
+  if (!shell || !portfolioGatewayTrigger || window.location.pathname !== routePaths.portfolio || isPortfolioGatewayActive()) {
     return false;
   }
 
@@ -231,9 +238,39 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
 }
 
+function startPortfolioWorldGateway() {
+  if (!shell || window.location.pathname !== routePaths.portfolio || isPortfolioGatewayActive()) {
+    return false;
+  }
+
+  const activeWorld = getPortfolioGatewayActiveWorld();
+  const route = getPortfolioGatewayRoute(activeWorld);
+  if (
+    shell.dataset.portfolioEngineReady !== "true" ||
+    shell.dataset.portfolioStarFeedState !== "ready" ||
+    shell.dataset.portfolioStarFeedSource !== activeWorld ||
+    !isPortfolioGatewayWorldRouteable(activeWorld) ||
+    !route
+  ) {
+    return false;
+  }
+
+  shell.dataset.portfolioGatewayWorld = activeWorld;
+  shell.dataset.portfolioGatewayRoute = route;
+  shell.dataset.portfolioGatewayState = "focusing-star";
+  shell.classList.add("is-portfolio-world-gateway-active");
+  syncPortfolioGatewayTriggerState();
+  return true;
+}
+
 function handlePortfolioGatewayTriggerClick(event) {
   event.preventDefault();
-  syncPortfolioGatewayTriggerState();
+  if (portfolioGatewayTrigger?.disabled) {
+    syncPortfolioGatewayTriggerState();
+    return;
+  }
+
+  startPortfolioWorldGateway();
 }
 
 function setPortfolioEngineHudCurrentView(viewName) {
