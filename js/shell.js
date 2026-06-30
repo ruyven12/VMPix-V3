@@ -100,6 +100,11 @@ const portfolioEngineLightningBranchPaths = portfolioEngineLightningOverlay
 const portfolioBeaconHotspots = Array.from(document.querySelectorAll("[data-portfolio-star]"));
 const portfolioEngineScanLine = document.querySelector("[data-portfolio-engine-scan-line]");
 const portfolioEngineScanAnchor = document.querySelector(".portfolio-engine-left-core");
+const portfolioRightEmitter = document.querySelector(".portfolio-engine-reactor");
+const portfolioStarFeedOverlay = document.querySelector("[data-portfolio-star-feed-overlay]");
+const portfolioStarFeedStrands = portfolioStarFeedOverlay
+  ? Array.from(portfolioStarFeedOverlay.querySelectorAll("[data-portfolio-star-feed-strand]"))
+  : [];
 const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
@@ -133,6 +138,7 @@ let portfolioEngineProjectionRetractTimer = 0;
 let portfolioStarFeedingTimer = 0;
 let portfolioRightEmitterChargingTimer = 0;
 let portfolioRightEmitterReadyTimer = 0;
+let portfolioStarFeedAnimationCycle = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
 let portfolioEngineLightningBranchPolarity = 0;
@@ -179,6 +185,94 @@ function formatPortfolioEngineLightningPath(points) {
     const command = index === 0 ? "M" : "L";
     return `${command}${formatPortfolioEngineLightningCoord(point.x)} ${formatPortfolioEngineLightningCoord(point.y)}`;
   }).join(" ");
+}
+
+function formatPortfolioStarFeedCoord(value) {
+  return Number(value.toFixed(1)).toString();
+}
+
+function createPortfolioStarFeedStrandPath(sourceX, sourceY, targetX, targetY, strandIndex = 0) {
+  const deltaX = targetX - sourceX;
+  const deltaY = targetY - sourceY;
+  const distance = Math.max(1, Math.hypot(deltaX, deltaY));
+  const normalX = -deltaY / distance;
+  const normalY = deltaX / distance;
+  const strandOffsets = [-0.86, 0.42, 1.08, -1.18];
+  const strandOffset = strandOffsets[strandIndex] || 0;
+  const amplitude = Math.min(38, Math.max(11, distance * 0.044)) * (0.72 + strandIndex * 0.1);
+  const seed = ((window.performance?.now?.() || Date.now()) % 997) * 0.013 + strandIndex * 1.87;
+  const points = [];
+
+  for (let segment = 0; segment <= 7; segment += 1) {
+    const t = segment / 7;
+    const edgeFade = Math.sin(Math.PI * t);
+    const splitOffset = strandOffset * amplitude * 0.34 * edgeFade;
+    const wander = Math.sin(seed + t * Math.PI * (2.8 + strandIndex * 0.26)) * amplitude * 0.44 * edgeFade;
+    const kink = (segment % 2 ? 1 : -1) * amplitude * 0.12 * edgeFade;
+    const offset = splitOffset + wander + kink;
+    const x = sourceX + deltaX * t + normalX * offset;
+    const y = sourceY + deltaY * t + normalY * offset;
+    points.push({ x, y });
+  }
+
+  points[0] = { x: sourceX, y: sourceY };
+  points[points.length - 1] = { x: targetX, y: targetY };
+  return points.map((point, index) => {
+    const command = index === 0 ? "M" : "L";
+    return `${command}${formatPortfolioStarFeedCoord(point.x)} ${formatPortfolioStarFeedCoord(point.y)}`;
+  }).join(" ");
+}
+
+function updatePortfolioStarFeedPaths(target) {
+  if (!portfolioStarFeedOverlay || !portfolioStarFeedStrands.length || !portfolioRightEmitter || !target) {
+    return false;
+  }
+
+  const sourceBounds = target.getBoundingClientRect();
+  const emitterBounds = portfolioRightEmitter.getBoundingClientRect();
+  if (!sourceBounds.width || !sourceBounds.height || !emitterBounds.width || !emitterBounds.height) {
+    return false;
+  }
+
+  const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  const sourceX = sourceBounds.left + sourceBounds.width / 2;
+  const sourceY = sourceBounds.top + sourceBounds.height / 2;
+  const targetX = emitterBounds.left + emitterBounds.width / 2;
+  const targetY = emitterBounds.top + emitterBounds.height / 2;
+
+  portfolioStarFeedOverlay.setAttribute("viewBox", `0 0 ${formatPortfolioStarFeedCoord(viewportWidth)} ${formatPortfolioStarFeedCoord(viewportHeight)}`);
+  portfolioStarFeedStrands.forEach((path, index) => {
+    path.setAttribute("d", createPortfolioStarFeedStrandPath(sourceX, sourceY, targetX, targetY, index));
+  });
+  return true;
+}
+
+function clearPortfolioStarFeedAnimation() {
+  portfolioStarFeedStrands.forEach((path) => {
+    path.style.animation = "";
+  });
+}
+
+function restartPortfolioStarFeedAnimation() {
+  if (!shell) {
+    return;
+  }
+
+  portfolioStarFeedAnimationCycle = (portfolioStarFeedAnimationCycle + 1) % 2;
+  const animationName = portfolioStarFeedAnimationCycle === 0 ? "portfolioStarFeedStrand" : "portfolioStarFeedStrandAlt";
+  shell.classList.toggle("is-portfolio-star-feed-cycle-a", portfolioStarFeedAnimationCycle === 0);
+  shell.classList.toggle("is-portfolio-star-feed-cycle-b", portfolioStarFeedAnimationCycle === 1);
+  portfolioStarFeedStrands.forEach((path) => {
+    path.style.animation = "none";
+  });
+  if (portfolioStarFeedOverlay) {
+    portfolioStarFeedOverlay.getBoundingClientRect();
+  }
+  portfolioStarFeedStrands.forEach((path) => {
+    const delay = getComputedStyle(path).getPropertyValue("--portfolio-feed-delay").trim() || "0ms";
+    path.style.animation = `${animationName} 162ms cubic-bezier(0.16, 0.82, 0.18, 1) ${delay} both`;
+  });
 }
 
 function createPortfolioEngineLightningMainPoints(boltIndex = ENGINE_LIGHTNING_CENTER_BOLT_INDEX) {
@@ -459,6 +553,7 @@ function setPortfolioBeaconHotspotsEnabled(isEnabled) {
 }
 
 function clearPortfolioStarEmitterChargeState() {
+  clearPortfolioStarFeedAnimation();
   window.clearTimeout(portfolioStarFeedingTimer);
   window.clearTimeout(portfolioRightEmitterChargingTimer);
   window.clearTimeout(portfolioRightEmitterReadyTimer);
@@ -473,7 +568,9 @@ function clearPortfolioStarEmitterChargeState() {
   shell.classList.remove(
     "is-portfolio-star-feeding",
     "is-portfolio-right-emitter-charging",
-    "is-portfolio-right-emitter-ready"
+    "is-portfolio-right-emitter-ready",
+    "is-portfolio-star-feed-cycle-a",
+    "is-portfolio-star-feed-cycle-b"
   );
   delete shell.dataset.portfolioStarFeedState;
   delete shell.dataset.portfolioStarFeedSource;
@@ -489,6 +586,9 @@ function setPortfolioStarEmitterChargeState(state, sourceWorld) {
   shell.classList.toggle("is-portfolio-star-feeding", state === "feeding");
   shell.classList.toggle("is-portfolio-right-emitter-charging", state === "feeding" || state === "charging");
   shell.classList.toggle("is-portfolio-right-emitter-ready", state === "ready");
+  if (state !== "feeding") {
+    clearPortfolioStarFeedAnimation();
+  }
 }
 
 function triggerPortfolioStarEmitterCharge(target) {
@@ -506,6 +606,10 @@ function triggerPortfolioStarEmitterCharge(target) {
   }
 
   clearPortfolioStarEmitterChargeState();
+  if (!updatePortfolioStarFeedPaths(target)) {
+    return;
+  }
+  restartPortfolioStarFeedAnimation();
   setPortfolioStarEmitterChargeState("feeding", config.id);
   portfolioStarFeedingTimer = window.setTimeout(() => {
     portfolioStarFeedingTimer = 0;
