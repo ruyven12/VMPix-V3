@@ -316,6 +316,52 @@ button {
   animation-name: engineLightningBranchPulseAlt;
 }
 
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-overlay {
+  opacity: 1;
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main {
+  stroke: rgb(var(--engine-accent-glow) / 0.78);
+  filter:
+    drop-shadow(0 0 0.2rem rgb(var(--engine-accent-glow) / 0.68))
+    drop-shadow(0 0 0.55rem rgb(var(--engine-accent-glow) / 0.38))
+    drop-shadow(0 0 0.9rem rgb(var(--engine-accent) / 0.16));
+  animation-name: engineLightningSuperchargedFieldPulse;
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--center {
+  stroke: rgb(var(--engine-accent-glow) / 0.98);
+  filter:
+    drop-shadow(0 0 0.24rem rgb(var(--engine-accent-glow) / 0.86))
+    drop-shadow(0 0 0.68rem rgb(var(--engine-accent-glow) / 0.46))
+    drop-shadow(0 0 1.05rem rgb(var(--engine-accent) / 0.2));
+  animation-name: engineLightningSuperchargedMainPulse;
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--upper {
+  stroke: rgb(var(--engine-accent-soft) / 0.72);
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--lower {
+  stroke: rgb(var(--engine-accent-glow) / 0.64);
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch {
+  stroke: rgb(var(--engine-accent-soft) / 0.62);
+  filter:
+    drop-shadow(0 0 0.16rem rgb(var(--engine-accent-soft) / 0.46))
+    drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.22));
+  animation-name: engineLightningSuperchargedBranchPulse;
+}
+
+.site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch--alt {
+  stroke: rgb(var(--engine-accent-glow) / 0.58);
+  filter:
+    drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.44))
+    drop-shadow(0 0 0.36rem rgb(var(--engine-accent-glow) / 0.18));
+  animation-name: engineLightningSuperchargedBranchPulseAlt;
+}
+
 @keyframes engineLightningFieldPulse {
   0%,
   100% {
@@ -430,6 +476,123 @@ button {
   86% {
     opacity: 0.15;
     stroke-width: 0.82;
+  }
+}
+
+@keyframes engineLightningSuperchargedFieldPulse {
+  0%,
+  100% {
+    opacity: 0.46;
+    stroke-width: 2.6;
+  }
+
+  18% {
+    opacity: 0.76;
+    stroke-width: 3;
+  }
+
+  43% {
+    opacity: 0.56;
+    stroke-width: 2.72;
+  }
+
+  68% {
+    opacity: 0.84;
+    stroke-width: 3.08;
+  }
+
+  86% {
+    opacity: 0.52;
+    stroke-width: 2.66;
+  }
+}
+
+@keyframes engineLightningSuperchargedMainPulse {
+  0%,
+  100% {
+    opacity: 0.82;
+    stroke-width: 3.08;
+  }
+
+  16% {
+    opacity: 1;
+    stroke-width: 3.42;
+  }
+
+  34% {
+    opacity: 0.9;
+    stroke-width: 3.18;
+  }
+
+  55% {
+    opacity: 1;
+    stroke-width: 3.48;
+  }
+
+  73% {
+    opacity: 0.86;
+    stroke-width: 3.14;
+  }
+
+  89% {
+    opacity: 0.96;
+    stroke-width: 3.36;
+  }
+}
+
+@keyframes engineLightningSuperchargedBranchPulse {
+  0%,
+  100% {
+    opacity: 0.28;
+    stroke-width: 1;
+  }
+
+  19% {
+    opacity: 0.56;
+    stroke-width: 1.28;
+  }
+
+  41% {
+    opacity: 0.36;
+    stroke-width: 1.1;
+  }
+
+  64% {
+    opacity: 0.64;
+    stroke-width: 1.36;
+  }
+
+  82% {
+    opacity: 0.32;
+    stroke-width: 1.04;
+  }
+}
+
+@keyframes engineLightningSuperchargedBranchPulseAlt {
+  0%,
+  100% {
+    opacity: 0.22;
+    stroke-width: 0.88;
+  }
+
+  23% {
+    opacity: 0.5;
+    stroke-width: 1.16;
+  }
+
+  43% {
+    opacity: 0.3;
+    stroke-width: 0.98;
+  }
+
+  67% {
+    opacity: 0.58;
+    stroke-width: 1.24;
+  }
+
+  86% {
+    opacity: 0.26;
+    stroke-width: 0.94;
   }
 }
 
@@ -931,6 +1094,25 @@ button {
   .engine-lightning-branch--alt {
     filter: drop-shadow(0 0 0.06rem rgb(var(--engine-accent-glow) / 0.2));
   }
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main {
+    filter:
+      drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.56))
+      drop-shadow(0 0 0.38rem rgb(var(--engine-accent-glow) / 0.3));
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--center {
+    filter:
+      drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.72))
+      drop-shadow(0 0 0.46rem rgb(var(--engine-accent-glow) / 0.36));
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch {
+    filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-soft) / 0.36));
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch--alt {
+    filter: drop-shadow(0 0 0.09rem rgb(var(--engine-accent-glow) / 0.34));
+  }
 
   .portfolio-engine-panel {
     padding-inline: clamp(0.26rem, 1vw, 0.36rem);
@@ -983,6 +1165,26 @@ button {
 
   .engine-lightning-branch {
     opacity: 0.16;
+  }
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-overlay {
+    opacity: 0.62;
+    filter: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main {
+    opacity: 0.52;
+    stroke: rgb(var(--engine-accent-glow) / 0.58);
+    filter: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--center {
+    opacity: 0.76;
+    stroke: rgb(var(--engine-accent-glow) / 0.72);
+  }
+
+  .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch {
+    opacity: 0.22;
+    filter: none;
   }
 
   .portfolio-engine::before {
