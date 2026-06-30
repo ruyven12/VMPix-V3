@@ -146,6 +146,8 @@ let portfolioEngineLightningMainPointSets = [];
 let portfolioEngineLightningMainTargetPointSets = [];
 let portfolioEngineLightningBranchPointSets = [];
 let portfolioEngineLightningBranchTargetPointSets = [];
+let portfolioEngineLightningBranchOpacityValues = [];
+let portfolioEngineLightningBranchTargetOpacityValues = [];
 let portfolioEngineLightningBranchDirections = [];
 let portfolioEngineLightningLastFrameAt = 0;
 let portfolioEngineLightningNextTargetAt = 0;
@@ -399,7 +401,7 @@ function retargetPortfolioEngineLightning(timestamp = window.performance.now()) 
   portfolioEngineLightningBranchPaths.forEach((path, index) => {
     if (index >= branchCapacity) {
       portfolioEngineLightningBranchTargetPointSets[index] = null;
-      path.style.strokeOpacity = "0";
+      portfolioEngineLightningBranchTargetOpacityValues[index] = 0;
       return;
     }
 
@@ -416,7 +418,11 @@ function retargetPortfolioEngineLightning(timestamp = window.performance.now()) 
       path.setAttribute("d", formatPortfolioEngineLightningPath(targetPoints));
     }
     portfolioEngineLightningBranchDirections[index] = branchDirection;
-    path.style.strokeOpacity = formatPortfolioEngineLightningCoord(getPortfolioEngineLightningRandom(0.32, 0.88));
+    portfolioEngineLightningBranchTargetOpacityValues[index] = getPortfolioEngineLightningRandom(0.32, 0.88);
+    if (!Number.isFinite(portfolioEngineLightningBranchOpacityValues[index])) {
+      portfolioEngineLightningBranchOpacityValues[index] = portfolioEngineLightningBranchTargetOpacityValues[index];
+      path.style.strokeOpacity = formatPortfolioEngineLightningCoord(portfolioEngineLightningBranchOpacityValues[index]);
+    }
     path.style.setProperty("--engine-lightning-branch-order", String(index));
   });
 
@@ -446,6 +452,16 @@ function renderPortfolioEngineLightningPaths(deltaMs = 16) {
 
   const branchWeight = getPortfolioEngineLightningFrameWeight(deltaMs, ENGINE_LIGHTNING_BRANCH_EASE_MS);
   portfolioEngineLightningBranchPaths.forEach((path, index) => {
+    const targetOpacity = portfolioEngineLightningBranchTargetOpacityValues[index];
+    if (Number.isFinite(targetOpacity)) {
+      const previousOpacity = Number.isFinite(portfolioEngineLightningBranchOpacityValues[index])
+        ? portfolioEngineLightningBranchOpacityValues[index]
+        : targetOpacity;
+      const nextOpacity = previousOpacity + (targetOpacity - previousOpacity) * branchWeight;
+      portfolioEngineLightningBranchOpacityValues[index] = nextOpacity;
+      path.style.strokeOpacity = formatPortfolioEngineLightningCoord(nextOpacity);
+    }
+
     const targetPoints = portfolioEngineLightningBranchTargetPointSets[index];
     if (!targetPoints) {
       return;
@@ -481,6 +497,8 @@ function stopPortfolioEngineLightning() {
   }
   portfolioEngineLightningLastFrameAt = 0;
   portfolioEngineLightningNextTargetAt = 0;
+  portfolioEngineLightningBranchOpacityValues = [];
+  portfolioEngineLightningBranchTargetOpacityValues = [];
   portfolioEngineLightningBranchPaths.forEach((path) => {
     path.style.strokeOpacity = "";
   });
