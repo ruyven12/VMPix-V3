@@ -108,6 +108,9 @@ const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
 const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
+const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
+const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 1530;
 const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
@@ -127,6 +130,9 @@ let portfolioEngineScanFrame = 0;
 let portfolioEngineScanTarget = null;
 let portfolioEngineProjectionTimer = 0;
 let portfolioEngineProjectionRetractTimer = 0;
+let portfolioStarFeedingTimer = 0;
+let portfolioRightEmitterChargingTimer = 0;
+let portfolioRightEmitterReadyTimer = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
 let portfolioEngineLightningBranchPolarity = 0;
@@ -452,6 +458,68 @@ function setPortfolioBeaconHotspotsEnabled(isEnabled) {
   });
 }
 
+function clearPortfolioStarEmitterChargeState() {
+  window.clearTimeout(portfolioStarFeedingTimer);
+  window.clearTimeout(portfolioRightEmitterChargingTimer);
+  window.clearTimeout(portfolioRightEmitterReadyTimer);
+  portfolioStarFeedingTimer = 0;
+  portfolioRightEmitterChargingTimer = 0;
+  portfolioRightEmitterReadyTimer = 0;
+
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.remove(
+    "is-portfolio-star-feeding",
+    "is-portfolio-right-emitter-charging",
+    "is-portfolio-right-emitter-ready"
+  );
+  delete shell.dataset.portfolioStarFeedState;
+  delete shell.dataset.portfolioStarFeedSource;
+}
+
+function setPortfolioStarEmitterChargeState(state, sourceWorld) {
+  if (!shell) {
+    return;
+  }
+
+  shell.dataset.portfolioStarFeedState = state;
+  shell.dataset.portfolioStarFeedSource = sourceWorld;
+  shell.classList.toggle("is-portfolio-star-feeding", state === "feeding");
+  shell.classList.toggle("is-portfolio-right-emitter-charging", state === "feeding" || state === "charging");
+  shell.classList.toggle("is-portfolio-right-emitter-ready", state === "ready");
+}
+
+function triggerPortfolioStarEmitterCharge(target) {
+  const worldName = target?.dataset.portfolioStar || "portfolio";
+  const config = getPortfolioWorldSelectionConfig(worldName);
+  if (
+    !shell ||
+    !target?.classList.contains("portfolio-beacon--world") ||
+    config.id === "portfolio" ||
+    window.location.pathname !== routePaths.portfolio ||
+    shell.dataset.portfolioEngineReady !== "true"
+  ) {
+    clearPortfolioStarEmitterChargeState();
+    return;
+  }
+
+  clearPortfolioStarEmitterChargeState();
+  setPortfolioStarEmitterChargeState("feeding", config.id);
+  portfolioStarFeedingTimer = window.setTimeout(() => {
+    portfolioStarFeedingTimer = 0;
+    setPortfolioStarEmitterChargeState("charging", config.id);
+  }, PORTFOLIO_STAR_FEEDING_DURATION_MS);
+  portfolioRightEmitterChargingTimer = window.setTimeout(() => {
+    portfolioRightEmitterChargingTimer = 0;
+    setPortfolioStarEmitterChargeState("ready", config.id);
+  }, PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS);
+  portfolioRightEmitterReadyTimer = window.setTimeout(() => {
+    clearPortfolioStarEmitterChargeState();
+  }, PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS);
+}
+
 function clearPortfolioEngineScan() {
   window.clearTimeout(portfolioEngineScanTimer);
   portfolioEngineScanTimer = 0;
@@ -611,6 +679,9 @@ function refreshPortfolioEngineScan() {
 
 function setPortfolioActiveWorld(worldName = "portfolio") {
   const config = getPortfolioWorldSelectionConfig(worldName);
+  if (config.id === "portfolio") {
+    clearPortfolioStarEmitterChargeState();
+  }
   if (shell) {
     shell.dataset.activeWorld = config.id;
   }
@@ -629,8 +700,10 @@ function handlePortfolioBeaconHotspotClick(event) {
   }
 
   event.preventDefault();
-  setPortfolioActiveWorld(button.dataset.portfolioStar || "portfolio");
+  const worldName = button.dataset.portfolioStar || "portfolio";
+  setPortfolioActiveWorld(worldName);
   triggerPortfolioEngineScan(button);
+  triggerPortfolioStarEmitterCharge(button);
 }
 
 function handlePortfolioBeaconHotspotKeydown(event) {
@@ -644,8 +717,10 @@ function handlePortfolioBeaconHotspotKeydown(event) {
   }
 
   event.preventDefault();
-  setPortfolioActiveWorld(button.dataset.portfolioStar || "portfolio");
+  const worldName = button.dataset.portfolioStar || "portfolio";
+  setPortfolioActiveWorld(worldName);
   triggerPortfolioEngineScan(button);
+  triggerPortfolioStarEmitterCharge(button);
 }
 
 function initPortfolioBeaconHotspots() {
