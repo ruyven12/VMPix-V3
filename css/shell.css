@@ -193,6 +193,11 @@ button {
 }
 
 .portfolio-world-gateway {
+  --portfolio-gateway-focus-x: var(--home-portfolio-transition-center-x);
+  --portfolio-gateway-focus-y: var(--home-portfolio-transition-center-y);
+  --portfolio-gateway-focus-core: clamp(1.9rem, 5.8vw, 3.8rem);
+  --portfolio-gateway-focus-ring: clamp(3.3rem, 9.6vw, 6.2rem);
+  --portfolio-gateway-focus-halo: clamp(6.4rem, 20vw, 12.5rem);
   position: fixed;
   inset: 0;
   z-index: 7;
@@ -201,6 +206,11 @@ button {
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
+  transform: translateZ(0) scale3d(1.018, 1.018, 1);
+  transition:
+    opacity 220ms var(--ease-standard),
+    transform 260ms var(--ease-standard),
+    visibility 0ms linear 260ms;
   contain: layout paint style;
 }
 
@@ -212,6 +222,54 @@ button {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
+  transform: translateZ(0) scale3d(1.035, 1.035, 1);
+  transition:
+    opacity 220ms var(--ease-standard),
+    transform 260ms var(--ease-standard),
+    visibility 0ms linear 260ms;
+}
+
+.portfolio-world-gateway-background {
+  background:
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--engine-accent-glow) / 0.18) 0, rgb(var(--engine-accent-glow) / 0.1) var(--portfolio-gateway-focus-core), rgb(var(--engine-accent) / 0.045) var(--portfolio-gateway-focus-ring), transparent var(--portfolio-gateway-focus-halo)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(247, 247, 242, 0.12) 0 1px, transparent 2px);
+}
+
+.portfolio-world-gateway-ring {
+  background:
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 var(--portfolio-gateway-focus-core), rgb(var(--engine-accent-glow) / 0.46) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), transparent calc(var(--portfolio-gateway-focus-core) + 7px) var(--portfolio-gateway-focus-ring), rgb(var(--engine-accent) / 0.3) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 8px));
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="soundtrack"][data-portfolio-gateway-route="/music"] .portfolio-world-gateway {
+  --portfolio-gateway-focus-x: calc(var(--home-portfolio-transition-center-x) + var(--entry-beacon-02-x));
+  --portfolio-gateway-focus-y: calc(var(--home-portfolio-transition-center-y) + var(--entry-beacon-02-y));
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-route="/wrestling"] .portfolio-world-gateway {
+  --portfolio-gateway-focus-x: calc(var(--home-portfolio-transition-center-x) + var(--entry-beacon-04-x));
+  --portfolio-gateway-focus-y: calc(var(--home-portfolio-transition-center-y) + var(--entry-beacon-04-y));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway {
+  visibility: visible;
+  opacity: 1;
+  transform: translateZ(0) scale3d(1, 1, 1);
+  transition-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-ring {
+  visibility: visible;
+  transform: translateZ(0) scale3d(1, 1, 1);
+  transition-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-background {
+  opacity: 1;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-ring {
+  opacity: 0.74;
 }
 
 .portfolio-engine {
@@ -985,6 +1043,11 @@ button {
 .portfolio-world-gateway-trigger:not(:disabled) {
   pointer-events: auto;
   cursor: pointer;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-trigger {
+  pointer-events: none;
+  cursor: default;
 }
 
 .portfolio-engine-reactor-ring {
@@ -3863,6 +3926,31 @@ button {
   animation: portfolioBeaconSelectedPulse 3.8s var(--ease-breath) infinite;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon.is-selected,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon[aria-pressed="true"] {
+  opacity: 1;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.045, 1.045, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon.is-selected::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon[aria-pressed="true"]::before {
+  opacity: 1;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.52, 1.52, 1);
+  box-shadow:
+    0 0 0.2rem rgba(247, 247, 242, 0.88),
+    0 0 0.78rem rgb(var(--beacon-color) / 0.66),
+    0 0 1.32rem rgb(var(--beacon-color) / 0.28);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon.is-selected::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 0.82;
+  animation: none;
+  transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1) rotate(0deg);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portfolio-beacon,
   .portfolio-beacon::before,
@@ -3899,6 +3987,21 @@ button {
   .portfolio-engine-projection-status::before,
   .portfolio-engine-projection-status::after {
     animation: none !important;
+  }
+
+  .portfolio-world-gateway,
+  .portfolio-world-gateway-background,
+  .portfolio-world-gateway-ring {
+    transform: none;
+    transition:
+      opacity 120ms var(--ease-standard),
+      visibility 0ms linear 120ms;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-background,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-ring {
+    transform: none;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-star-feeding .portfolio-star-feed-overlay,
