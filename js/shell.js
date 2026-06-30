@@ -3385,6 +3385,9 @@ function revealHub(options = {}) {
   }
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("portfolio");
+  if (options.shouldUsePortfolioShellRouteContext) {
+    applyPortfolioShellRouteContext();
+  }
   if (options.shouldPlayPortfolioArrival) {
     startPortfolioArrival();
     if (wasHomePortfolioEntrySequence) {
@@ -3427,7 +3430,23 @@ let portfolioDirectArrivalTimer = 0;
 let portfolioEngineReadyTimer = 0;
 let portfolioEngineReadyFrame = 0;
 let portfolioEngineReadyGateStartedAt = 0;
+let isHomePortfolioRouteHandoffPending = false;
 
+function getPortfolioRouteContext() {
+  return getRouteFromUrl(routePaths.portfolio);
+}
+
+function isPortfolioExperienceActive() {
+  return window.location.pathname === routePaths.portfolio || shell?.dataset.shellRoute === "portfolio";
+}
+
+function applyPortfolioShellRouteContext() {
+  if (!shell) {
+    return;
+  }
+
+  updateShellRouteContext(getPortfolioRouteContext(), "portfolio");
+}
 function cancelPortfolioEngineReadyGate() {
   window.clearTimeout(portfolioEngineReadyTimer);
   portfolioEngineReadyTimer = 0;
@@ -3475,7 +3494,7 @@ function isPortfolioCoordinateOnline(coordinate) {
 function arePortfolioCoordinatesOnline() {
   if (
     !shell ||
-    window.location.pathname !== routePaths.portfolio ||
+    !isPortfolioExperienceActive() ||
     !shell.classList.contains("has-entered-hub") ||
     !shell.classList.contains("has-portfolio-entry-constellation") ||
     shell.classList.contains("is-module-view")
@@ -3498,6 +3517,7 @@ function markPortfolioEngineReady() {
   shell.dataset.portfolioEngineReady = "true";
   setPortfolioBeaconHotspotsEnabled(true);
   startPortfolioEngineLightning();
+  completeHomePortfolioRouteHandoff();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
   }));
@@ -3526,7 +3546,7 @@ function resolvePortfolioEngineReadyGate() {
 
 function schedulePortfolioEngineReadyGate() {
   clearPortfolioEngineReadyState();
-  if (!shell || window.location.pathname !== routePaths.portfolio || !shell.classList.contains("has-entered-hub")) {
+  if (!shell || !isPortfolioExperienceActive() || !shell.classList.contains("has-entered-hub")) {
     return;
   }
 
@@ -3641,7 +3661,7 @@ function clearPortfolioArrivalState() {
   portfolioOrientationStartTimer = 0;
   if (shell) {
     shell.classList.remove("is-portfolio-arriving");
-    if (window.location.pathname !== routePaths.portfolio) {
+    if (!isPortfolioExperienceActive()) {
       clearPortfolioEngineReadyState();
     }
   }
@@ -3666,7 +3686,7 @@ function startPortfolioOrientation() {
     !portfolioHub ||
     !shell.classList.contains("has-entered-hub") ||
     shell.classList.contains("is-module-view") ||
-    window.location.pathname !== routePaths.portfolio
+    !isPortfolioExperienceActive()
   ) {
     return;
   }
@@ -3714,7 +3734,7 @@ function clearHomePortfolioTransitionState() {
   homePortfolioTransitionTimer = 0;
   if (shell) {
     const shouldRevealFirstConstellation = shell.classList.contains("is-portfolio-entry-sequence") &&
-      window.location.pathname === routePaths.portfolio &&
+      isPortfolioExperienceActive() &&
       shell.classList.contains("has-entered-hub");
     shell.classList.remove("is-portfolio-entry-sequence", "is-home-transitioning", "is-engage-activated");
     shell.classList.toggle("has-portfolio-entry-constellation", shouldRevealFirstConstellation);
@@ -3778,13 +3798,22 @@ function startPortfolioDirectEntrySequenceForQA() {
   }, directEntryStartDelay);
 }
 
-// ENGAGE is the reel cut: Chapter 1 ends at click, and /portfolio owns the entry sequence.
+// ENGAGE keeps browser history on /home until the Portfolio Engine is visibly live.
 function completeHomePortfolioRouteHandoff() {
+  if (!isHomePortfolioRouteHandoffPending) {
+    return;
+  }
+
+  isHomePortfolioRouteHandoffPending = false;
   homePortfolioTransitionTimer = 0;
-  navigateToRoute(routePaths.portfolio, {
-    shouldPlayPortfolioArrival: true,
-    historyState: { fromHomeEngage: true },
-  });
+  const portfolioRoute = getPortfolioRouteContext();
+  if (window.location.pathname !== routePaths.portfolio) {
+    pushRouteUrl(routePaths.portfolio, { fromHomeEngage: true });
+  }
+  applyPortfolioShellRouteContext();
+  updateShellBreadcrumb(portfolioRoute);
+  updateShellBackState(portfolioRoute);
+  stabilizeShellViewport(portfolioRoute, { historyState: { fromHomeEngage: true } });
 }
 
 function beginHomePortfolioTransition() {
@@ -3800,8 +3829,12 @@ function beginHomePortfolioTransition() {
     return;
   }
 
+  isHomePortfolioRouteHandoffPending = true;
   activatePortfolioEntrySequenceState();
-  completeHomePortfolioRouteHandoff();
+  revealHub({
+    shouldPlayPortfolioArrival: true,
+    shouldUsePortfolioShellRouteContext: true,
+  });
   schedulePortfolioEntrySequenceCleanup();
 }
 

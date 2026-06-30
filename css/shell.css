@@ -199,13 +199,18 @@ button {
   z-index: 8;
   width: auto;
   max-width: 60rem;
+  --engine-emitter-size: clamp(2.92rem, 12.4vw, 4.1rem);
+  --engine-emitter-center: calc(var(--engine-emitter-size) / 2);
+  --engine-inline-padding: clamp(0.42rem, 1.65vw, 0.9rem);
+  --engine-block-padding: clamp(0.34rem, 1.05svh, 0.54rem);
+  --engine-overlay-y: calc(var(--engine-block-padding) + var(--engine-emitter-center));
   height: var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem));
   margin-inline: auto;
   display: grid;
-  grid-template-columns: clamp(2.25rem, 10vw, 3.2rem) minmax(0, 1.25fr) minmax(clamp(2.6rem, 9vw, 6rem), 0.75fr) clamp(2.9rem, 12vw, 4rem) minmax(4.8rem, 0.5fr);
+  grid-template-columns: var(--engine-emitter-size) minmax(0, 1.25fr) minmax(clamp(2.6rem, 9vw, 6rem), 0.75fr) clamp(2.9rem, 12vw, 4rem) minmax(4.8rem, 0.5fr);
   align-items: center;
   gap: clamp(0.28rem, 1.25vw, 0.72rem);
-  padding: clamp(0.34rem, 1.05svh, 0.54rem) clamp(0.42rem, 1.65vw, 0.9rem);
+  padding: var(--engine-block-padding) var(--engine-inline-padding);
   overflow: hidden;
   border: 0;
   border-radius: clamp(0.22rem, 0.85vw, 0.42rem);
@@ -238,14 +243,14 @@ button {
 }
 
 .engine-lightning-overlay {
-  --engine-overlay-start: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(1.125rem, 5vw, 1.6rem));
-  --engine-overlay-end: calc(clamp(0.42rem, 1.65vw, 0.9rem) + clamp(1.35rem, 5.75vw, 1.9rem));
+  --engine-overlay-start: calc(var(--engine-inline-padding) + var(--engine-emitter-center));
+  --engine-overlay-end: calc(var(--engine-inline-padding) + var(--engine-emitter-center));
   position: absolute;
   z-index: 0;
   pointer-events: none;
   inset-inline-start: var(--engine-overlay-start);
   inset-inline-end: auto;
-  top: 50%;
+  top: var(--engine-overlay-y);
   inline-size: calc(100% - var(--engine-overlay-start) - var(--engine-overlay-end));
   height: clamp(1.8rem, 4.8svh, 2.7rem);
   overflow: visible;
@@ -773,9 +778,9 @@ button {
   z-index: 3;
   opacity: 1;
   isolation: isolate;
-  width: clamp(2.29rem, 10.4vw, 3.24rem);
+  width: var(--engine-emitter-size);
   aspect-ratio: 1;
-  justify-self: center;
+  justify-self: start;
   border-radius: 50%;
   border: 1px solid rgba(226, 226, 226, 0.24);
   background:
@@ -896,7 +901,7 @@ button {
   align-self: center;
   justify-self: end;
   margin-inline-end: 0;
-  width: clamp(2.92rem, 12.4vw, 4.1rem);
+  width: var(--engine-emitter-size);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -1094,14 +1099,16 @@ button {
 
 @media (max-width: 28rem) {
   .portfolio-engine {
-    grid-template-columns: clamp(2.05rem, 9vw, 2.55rem) minmax(0, 1fr) minmax(0.6rem, 0.28fr) clamp(2.45rem, 10.5vw, 3.05rem) minmax(4.55rem, 0.7fr);
+    --engine-inline-padding: clamp(0.34rem, 1.4vw, 0.52rem);
+    --engine-overlay-y: 50%;
+    grid-template-columns: var(--engine-emitter-size) minmax(0, 1fr) minmax(0.6rem, 0.28fr) clamp(2.45rem, 10.5vw, 3.05rem) minmax(4.55rem, 0.7fr);
     gap: clamp(0.18rem, 0.85vw, 0.36rem);
-    padding-inline: clamp(0.34rem, 1.4vw, 0.52rem);
+    padding-inline: var(--engine-inline-padding);
   }
 
   .engine-lightning-overlay {
-    --engine-overlay-start: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.025rem, 4.5vw, 1.275rem));
-    --engine-overlay-end: calc(clamp(0.34rem, 1.4vw, 0.52rem) + clamp(1.35rem, 5.75vw, 1.9rem));
+    --engine-overlay-start: calc(var(--engine-inline-padding) + var(--engine-emitter-center));
+    --engine-overlay-end: calc(var(--engine-inline-padding) + var(--engine-emitter-center));
   }
 
   .engine-lightning-main {
