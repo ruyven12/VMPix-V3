@@ -86,6 +86,33 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
     statusType: "information",
   },
 };
+const PORTFOLIO_GATEWAY_WORLD_CONFIG = {
+  horizon: {
+    route: "",
+    background: "horizon",
+    isRouteable: false,
+  },
+  soundtrack: {
+    route: routePaths.music,
+    background: "soundtrack",
+    isRouteable: true,
+  },
+  cosmos: {
+    route: "",
+    background: "cosmos",
+    isRouteable: false,
+  },
+  battleground: {
+    route: routePaths.wrestling,
+    background: "battleground",
+    isRouteable: true,
+  },
+  wild: {
+    route: "",
+    background: "wild",
+    isRouteable: false,
+  },
+};
 
 const portfolioEngine = document.querySelector("[data-portfolio-engine]");
 const portfolioEngineCurrentView = document.querySelector("[data-portfolio-engine-current-view]");
@@ -106,6 +133,7 @@ const portfolioStarFeedStrands = portfolioStarFeedOverlay
   ? Array.from(portfolioStarFeedOverlay.querySelectorAll("[data-portfolio-star-feed-strand]"))
   : [];
 const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
+const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
 const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
@@ -154,6 +182,20 @@ let portfolioEngineLightningNextTargetAt = 0;
 
 function getPortfolioWorldSelectionConfig(worldName) {
   return PORTFOLIO_WORLD_SELECTION_CONFIG[worldName] || PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio;
+}
+
+function getPortfolioGatewayConfig(worldName) {
+  return PORTFOLIO_GATEWAY_WORLD_CONFIG[worldName] || null;
+}
+
+function getPortfolioGatewayRoute(worldName) {
+  const config = getPortfolioGatewayConfig(worldName);
+  return config?.route || "";
+}
+
+function isPortfolioGatewayWorldRouteable(worldName) {
+  const config = getPortfolioGatewayConfig(worldName);
+  return Boolean(config?.isRouteable && config.route);
 }
 
 function setPortfolioEngineHudCurrentView(viewName) {

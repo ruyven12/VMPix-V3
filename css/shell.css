@@ -192,6 +192,28 @@ button {
   pointer-events: none;
 }
 
+.portfolio-world-gateway {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint style;
+}
+
+.portfolio-world-gateway-background,
+.portfolio-world-gateway-ring {
+  position: absolute;
+  inset: 0;
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .portfolio-engine {
   position: fixed;
   inset-inline: var(--portfolio-engine-inline-inset, max(0.58rem, env(safe-area-inset-left), env(safe-area-inset-right)));
