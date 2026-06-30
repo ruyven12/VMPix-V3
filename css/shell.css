@@ -964,6 +964,29 @@ button {
   will-change: filter, transform, box-shadow;
 }
 
+.portfolio-world-gateway-trigger {
+  position: absolute;
+  z-index: 5;
+  inset-block-start: var(--engine-block-padding);
+  inset-inline-end: var(--engine-inline-padding);
+  width: var(--engine-emitter-size);
+  height: var(--engine-emitter-size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  appearance: none;
+  background: transparent;
+  color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  cursor: default;
+}
+
+.portfolio-world-gateway-trigger:not(:disabled) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 .portfolio-engine-reactor-ring {
   position: absolute;
   inset: 18%;

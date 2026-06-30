@@ -134,6 +134,7 @@ const portfolioStarFeedStrands = portfolioStarFeedOverlay
   : [];
 const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
+const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
 const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
@@ -196,6 +197,43 @@ function getPortfolioGatewayRoute(worldName) {
 function isPortfolioGatewayWorldRouteable(worldName) {
   const config = getPortfolioGatewayConfig(worldName);
   return Boolean(config?.isRouteable && config.route);
+}
+
+function getPortfolioGatewayActiveWorld() {
+  return shell?.dataset.activeWorld || "portfolio";
+}
+
+function shouldEnablePortfolioGatewayTrigger() {
+  if (!shell || !portfolioGatewayTrigger || window.location.pathname !== routePaths.portfolio) {
+    return false;
+  }
+
+  const activeWorld = getPortfolioGatewayActiveWorld();
+  return Boolean(
+    shell.dataset.portfolioEngineReady === "true" &&
+    shell.dataset.portfolioStarFeedState === "ready" &&
+    shell.dataset.portfolioStarFeedSource === activeWorld &&
+    isPortfolioGatewayWorldRouteable(activeWorld)
+  );
+}
+
+function syncPortfolioGatewayTriggerState() {
+  if (!portfolioGatewayTrigger) {
+    return;
+  }
+
+  const activeWorld = getPortfolioGatewayActiveWorld();
+  const route = getPortfolioGatewayRoute(activeWorld);
+  const isEnabled = shouldEnablePortfolioGatewayTrigger();
+  portfolioGatewayTrigger.disabled = !isEnabled;
+  portfolioGatewayTrigger.setAttribute("aria-disabled", String(!isEnabled));
+  portfolioGatewayTrigger.dataset.portfolioGatewayWorld = isEnabled ? activeWorld : "";
+  portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
+}
+
+function handlePortfolioGatewayTriggerClick(event) {
+  event.preventDefault();
+  syncPortfolioGatewayTriggerState();
 }
 
 function setPortfolioEngineHudCurrentView(viewName) {
@@ -634,6 +672,7 @@ function clearPortfolioStarEmitterChargeState() {
   );
   delete shell.dataset.portfolioStarFeedState;
   delete shell.dataset.portfolioStarFeedSource;
+  syncPortfolioGatewayTriggerState();
 }
 
 function setPortfolioStarEmitterChargeState(state, sourceWorld) {
@@ -649,6 +688,7 @@ function setPortfolioStarEmitterChargeState(state, sourceWorld) {
   if (state !== "feeding") {
     clearPortfolioStarFeedAnimation();
   }
+  syncPortfolioGatewayTriggerState();
 }
 
 function triggerPortfolioStarEmitterCharge(target) {
@@ -857,6 +897,7 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
     button.classList.toggle("is-selected", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
   });
+  syncPortfolioGatewayTriggerState();
 }
 
 function handlePortfolioBeaconHotspotClick(event) {
@@ -892,6 +933,8 @@ function handlePortfolioBeaconHotspotKeydown(event) {
 function initPortfolioBeaconHotspots() {
   setPortfolioActiveWorld("portfolio");
   setPortfolioBeaconHotspotsEnabled(Boolean(shell?.dataset.portfolioEngineReady === "true"));
+  portfolioGatewayTrigger?.addEventListener("click", handlePortfolioGatewayTriggerClick);
+  syncPortfolioGatewayTriggerState();
   portfolioBeaconHotspots.forEach((button) => {
     button.addEventListener("click", handlePortfolioBeaconHotspotClick);
     button.addEventListener("keydown", handlePortfolioBeaconHotspotKeydown);
@@ -3531,6 +3574,7 @@ function clearPortfolioEngineReadyState() {
   shell.classList.remove("has-portfolio-coordinates-online", "is-portfolio-engine-ready");
   delete shell.dataset.portfolioCoordinatesOnline;
   delete shell.dataset.portfolioEngineReady;
+  syncPortfolioGatewayTriggerState();
 }
 
 function getPortfolioCoordinateElements() {
@@ -3576,6 +3620,7 @@ function markPortfolioEngineReady() {
   shell.dataset.portfolioCoordinatesOnline = String(PORTFOLIO_COORDINATE_ONLINE_TOTAL);
   shell.dataset.portfolioEngineReady = "true";
   setPortfolioBeaconHotspotsEnabled(true);
+  syncPortfolioGatewayTriggerState();
   startPortfolioEngineLightning();
   completeHomePortfolioRouteHandoff();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
