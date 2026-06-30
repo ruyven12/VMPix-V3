@@ -145,6 +145,8 @@ const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)"
 const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
 const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
 const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 0;
+const PORTFOLIO_GATEWAY_FOCUS_DURATION_MS = 680;
+const PORTFOLIO_GATEWAY_REDUCED_FOCUS_DURATION_MS = 180;
 const ENGINE_LIGHTNING_BASE_Y = 12;
 const ENGINE_LIGHTNING_MIN_DELAY_MS = 96;
 const ENGINE_LIGHTNING_MAX_DELAY_MS = 146;
@@ -167,6 +169,7 @@ let portfolioEngineProjectionRetractTimer = 0;
 let portfolioStarFeedingTimer = 0;
 let portfolioRightEmitterChargingTimer = 0;
 let portfolioRightEmitterReadyTimer = 0;
+let portfolioGatewayPhaseTimer = 0;
 let portfolioStarFeedAnimationCycle = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
@@ -210,11 +213,44 @@ function isPortfolioGatewayActive() {
   );
 }
 
+function clearPortfolioGatewayPhaseTimer() {
+  window.clearTimeout(portfolioGatewayPhaseTimer);
+  portfolioGatewayPhaseTimer = 0;
+}
+
+function advancePortfolioGatewayToPullingUniverse(worldName, route) {
+  portfolioGatewayPhaseTimer = 0;
+  if (
+    !shell ||
+    window.location.pathname !== routePaths.portfolio ||
+    shell.dataset.portfolioGatewayState !== "focusing-star" ||
+    shell.dataset.portfolioGatewayWorld !== worldName ||
+    shell.dataset.portfolioGatewayRoute !== route ||
+    !shell.classList.contains("is-portfolio-world-gateway-active")
+  ) {
+    return;
+  }
+
+  shell.dataset.portfolioGatewayState = "pulling-universe";
+  syncPortfolioGatewayTriggerState();
+}
+
+function queuePortfolioGatewayPullingUniverse(worldName, route) {
+  clearPortfolioGatewayPhaseTimer();
+  const delay = isPortfolioEngineReducedMotion()
+    ? PORTFOLIO_GATEWAY_REDUCED_FOCUS_DURATION_MS
+    : PORTFOLIO_GATEWAY_FOCUS_DURATION_MS;
+  portfolioGatewayPhaseTimer = window.setTimeout(() => {
+    advancePortfolioGatewayToPullingUniverse(worldName, route);
+  }, delay);
+}
+
 function clearPortfolioGatewayFocusState() {
   if (!shell || shell.dataset.portfolioGatewayState !== "focusing-star") {
     return false;
   }
 
+  clearPortfolioGatewayPhaseTimer();
   shell.classList.remove("is-portfolio-world-gateway-active");
   shell.dataset.portfolioGatewayWorld = "";
   shell.dataset.portfolioGatewayRoute = "";
@@ -267,10 +303,12 @@ function startPortfolioWorldGateway() {
     return false;
   }
 
+  clearPortfolioGatewayPhaseTimer();
   shell.dataset.portfolioGatewayWorld = activeWorld;
   shell.dataset.portfolioGatewayRoute = route;
   shell.dataset.portfolioGatewayState = "focusing-star";
   shell.classList.add("is-portfolio-world-gateway-active");
+  queuePortfolioGatewayPullingUniverse(activeWorld, route);
   syncPortfolioGatewayTriggerState();
   return true;
 }
