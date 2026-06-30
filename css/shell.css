@@ -844,45 +844,55 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"] .portfolio-engine-reactor-core {
   animation: portfolioRightEmitterChargeCore 250ms cubic-bezier(0.16, 0.82, 0.18, 1) both;
 }
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine {
+  overflow: visible;
+  contain: layout style;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-panel {
+  z-index: 4;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-reactor {
   box-shadow:
-    0 0 0.72rem rgb(var(--engine-accent-glow) / 0.16),
-    0 0 1rem rgb(var(--engine-accent) / 0.08),
+    0 0 0.9rem rgb(var(--engine-accent-glow) / 0.22),
+    0 0 1.32rem rgb(var(--engine-accent) / 0.12),
     inset 0 0 0 1px rgba(0, 0, 0, 0.62),
-    inset 0 0 0.92rem rgb(var(--engine-accent-glow) / 0.08);
+    inset 0 0 1rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-reactor::before {
-  inset: -18%;
-  border: 1px solid rgb(var(--engine-accent-glow) / 0.28);
-  background: radial-gradient(circle, transparent 46%, rgb(var(--engine-accent-glow) / 0.18) 55%, transparent 68%);
+  inset: -42%;
+  border: 1px solid rgb(var(--engine-accent-glow) / 0.36);
+  background: radial-gradient(circle, transparent 46%, rgb(var(--engine-accent-glow) / 0.24) 55%, transparent 68%);
   opacity: 0;
-  transform: scale3d(0.72, 0.72, 1);
+  transform: scale3d(0.68, 0.68, 1);
   animation: portfolioRightEmitterReadyPulsePrimary 860ms cubic-bezier(0.13, 0.72, 0.16, 1) 40ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-reactor::after {
-  inset: -28%;
-  border: 1px solid rgb(var(--engine-accent) / 0.2);
-  background: radial-gradient(circle, transparent 50%, rgb(var(--engine-accent-glow) / 0.14) 58%, transparent 71%);
+  inset: -64%;
+  border: 1px solid rgb(var(--engine-accent) / 0.27);
+  background: radial-gradient(circle, transparent 50%, rgb(var(--engine-accent-glow) / 0.19) 58%, transparent 71%);
   opacity: 0;
-  transform: scale3d(0.64, 0.64, 1);
+  transform: scale3d(0.58, 0.58, 1);
   animation: portfolioRightEmitterReadyPulseSecondary 860ms cubic-bezier(0.13, 0.72, 0.16, 1) 170ms both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-reactor-ring {
   animation: portfolioEngineRingBreath var(--engine-lifeblood-cycle) var(--ease-breath) infinite;
   box-shadow:
-    inset 0 0 0.48rem rgb(var(--engine-accent-glow) / 0.16),
-    0 0 0.48rem rgb(var(--engine-accent-glow) / 0.12);
+    inset 0 0 0.58rem rgb(var(--engine-accent-glow) / 0.2),
+    0 0 0.62rem rgb(var(--engine-accent-glow) / 0.16);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-reactor-core {
   filter:
     grayscale(1)
     contrast(1.1)
-    brightness(1.16)
-    drop-shadow(0 0 0.34rem rgb(var(--engine-accent-glow) / 0.24));
+    brightness(1.18)
+    drop-shadow(0 0 0.38rem rgb(var(--engine-accent-glow) / 0.28));
 }
 
 @media (min-width: 64rem) {
@@ -1458,40 +1468,40 @@ button {
 @keyframes portfolioRightEmitterReadyPulsePrimary {
   0% {
     opacity: 0;
-    transform: scale3d(0.72, 0.72, 1);
+    transform: scale3d(0.68, 0.68, 1);
   }
 
   12% {
-    opacity: 0.46;
+    opacity: 0.6;
   }
 
   58% {
-    opacity: 0.18;
+    opacity: 0.24;
   }
 
   100% {
     opacity: 0;
-    transform: scale3d(1.68, 1.68, 1);
+    transform: scale3d(2.34, 2.34, 1);
   }
 }
 
 @keyframes portfolioRightEmitterReadyPulseSecondary {
   0% {
     opacity: 0;
-    transform: scale3d(0.64, 0.64, 1);
+    transform: scale3d(0.58, 0.58, 1);
   }
 
   16% {
-    opacity: 0.3;
+    opacity: 0.39;
   }
 
   62% {
-    opacity: 0.12;
+    opacity: 0.16;
   }
 
   100% {
     opacity: 0;
-    transform: scale3d(1.88, 1.88, 1);
+    transform: scale3d(2.72, 2.72, 1);
   }
 }
 
