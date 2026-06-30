@@ -210,6 +210,18 @@ function isPortfolioGatewayActive() {
   );
 }
 
+function clearPortfolioGatewayFocusState() {
+  if (!shell || shell.dataset.portfolioGatewayState !== "focusing-star") {
+    return false;
+  }
+
+  shell.classList.remove("is-portfolio-world-gateway-active");
+  shell.dataset.portfolioGatewayWorld = "";
+  shell.dataset.portfolioGatewayRoute = "";
+  shell.dataset.portfolioGatewayState = "idle";
+  return true;
+}
+
 function shouldEnablePortfolioGatewayTrigger() {
   if (!shell || !portfolioGatewayTrigger || window.location.pathname !== routePaths.portfolio || isPortfolioGatewayActive()) {
     return false;
@@ -922,11 +934,16 @@ function refreshPortfolioEngineScan() {
 
 function setPortfolioActiveWorld(worldName = "portfolio") {
   const config = getPortfolioWorldSelectionConfig(worldName);
+  const previousWorld = shell?.dataset.activeWorld || "portfolio";
+  const didChangeActiveWorld = previousWorld !== config.id;
   if (config.id === "portfolio") {
     clearPortfolioStarEmitterChargeState();
   }
   if (shell) {
     shell.dataset.activeWorld = config.id;
+  }
+  if (didChangeActiveWorld) {
+    clearPortfolioGatewayFocusState();
   }
   setPortfolioEngineHudCurrentView(config.label);
   portfolioBeaconHotspots.forEach((button) => {
