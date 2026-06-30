@@ -361,6 +361,31 @@ button {
     drop-shadow(0 0 0.36rem rgb(var(--engine-accent-glow) / 0.18));
   animation-name: engineLightningSuperchargedBranchPulseAlt;
 }
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main {
+  filter:
+    drop-shadow(0 0 0.34rem rgb(var(--engine-accent-glow) / 0.88))
+    drop-shadow(0 0 1.05rem rgb(var(--engine-accent-glow) / 0.58))
+    drop-shadow(0 0 1.55rem rgb(var(--engine-accent) / 0.28));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main--center {
+  filter:
+    drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.98))
+    drop-shadow(0 0 1.32rem rgb(var(--engine-accent-glow) / 0.74))
+    drop-shadow(0 0 1.95rem rgb(var(--engine-accent) / 0.34));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch {
+  filter:
+    drop-shadow(0 0 0.24rem rgb(var(--engine-accent-soft) / 0.7))
+    drop-shadow(0 0 0.78rem rgb(var(--engine-accent-glow) / 0.34));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch--alt {
+  filter:
+    drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.66))
+    drop-shadow(0 0 0.68rem rgb(var(--engine-accent-glow) / 0.28));
+}
 
 @keyframes engineLightningFieldPulse {
   0%,
@@ -1112,6 +1137,25 @@ button {
 
   .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch--alt {
     filter: drop-shadow(0 0 0.09rem rgb(var(--engine-accent-glow) / 0.34));
+  }
+  .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main {
+    filter:
+      drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.72))
+      drop-shadow(0 0 0.64rem rgb(var(--engine-accent-glow) / 0.42));
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main--center {
+    filter:
+      drop-shadow(0 0 0.28rem rgb(var(--engine-accent-glow) / 0.92))
+      drop-shadow(0 0 0.88rem rgb(var(--engine-accent-glow) / 0.56));
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch {
+    filter: drop-shadow(0 0 0.16rem rgb(var(--engine-accent-soft) / 0.5));
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch--alt {
+    filter: drop-shadow(0 0 0.15rem rgb(var(--engine-accent-glow) / 0.48));
   }
 
   .portfolio-engine-panel {
