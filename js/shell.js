@@ -105,6 +105,7 @@ const PORTFOLIO_GATEWAY_WORLD_CONFIG = {
   battleground: {
     route: routePaths.wrestling,
     background: "battleground",
+    backgroundSrc: "/assets/media/background/battleground-main.png",
     isRouteable: true,
   },
   wild: {
