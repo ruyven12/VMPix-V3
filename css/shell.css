@@ -387,9 +387,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
+  z-index: 20;
   visibility: visible;
   opacity: 1;
-  transform: translateZ(0) scale3d(0.966, 0.966, 1);
+  background: rgb(var(--portfolio-gateway-fill-rgb));
+  transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.06) brightness(0.86) contrast(1.05);
   transition-delay: 0ms;
 }
@@ -408,6 +410,9 @@ button {
   opacity: 0.88;
   transform: translateZ(0) scale3d(1.018, 1.018, 1);
   filter: saturate(1.02) brightness(0.88) contrast(1.06);
+  background-position: center, center, center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%, cover;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
@@ -543,8 +548,17 @@ button {
   }
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .cinema-fire-bg,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine-projection,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-entry-fragments,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .nebula-stage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon-field,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-entry-constellation,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine-scan-line {
@@ -557,9 +571,10 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway {
-  z-index: 10;
+  z-index: 20;
   visibility: visible;
   opacity: 1;
+  background: rgb(var(--portfolio-gateway-fill-rgb));
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.04) brightness(0.92) contrast(1.08);
   transition:
@@ -572,6 +587,9 @@ button {
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.01) brightness(0.94) contrast(1.06);
+  background-position: center, center, center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%, 100% 100%, cover;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
@@ -586,9 +604,18 @@ button {
     visibility 0ms linear 100ms;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .cinema-fire-bg,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-entry-fragments,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .nebula-stage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-beacon-field,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-entry-constellation,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-scan-line {
@@ -605,8 +632,17 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-background,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-ring,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .cinema-fire-bg,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-engine-projection,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-entry-fragments,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .nebula-stage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-beacon-field,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-entry-constellation,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-engine-scan-line {
