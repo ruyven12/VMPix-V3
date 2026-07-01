@@ -225,8 +225,7 @@ button {
   filter: saturate(1) brightness(1) contrast(1);
   transition:
     opacity 280ms var(--ease-standard),
-    transform 620ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    filter 620ms cubic-bezier(0.16, 0.82, 0.18, 1),
+    transform 560ms cubic-bezier(0.18, 0.78, 0.18, 1),
     visibility 0ms linear 280ms;
   contain: layout paint style;
 }
@@ -234,7 +233,7 @@ button {
 .portfolio-world-gateway::before {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 0;
   display: block;
   content: "";
   opacity: 0;
@@ -250,9 +249,8 @@ button {
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
   filter: saturate(1.02) brightness(0.78) contrast(1.08);
   transition:
-    opacity 560ms cubic-bezier(0.22, 0.74, 0.16, 1),
-    transform 760ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    filter 760ms cubic-bezier(0.16, 0.82, 0.18, 1);
+    opacity 420ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .portfolio-world-gateway-background,
@@ -268,10 +266,9 @@ button {
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
   filter: saturate(1) brightness(1) contrast(1);
   transition:
-    opacity 360ms var(--ease-standard),
-    transform 680ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    filter 680ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    visibility 0ms linear 360ms;
+    opacity 300ms var(--ease-standard),
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    visibility 0ms linear 300ms;
 }
 
 .portfolio-world-gateway-background {
@@ -341,7 +338,7 @@ button {
   visibility: visible;
   opacity: 1;
   transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.986, 0.99, 1) skew(-0.16deg, 0.1deg);
-  filter: saturate(1.08) brightness(0.94) contrast(1.04);
+  filter: saturate(1.04) brightness(0.96) contrast(1.02);
   transition-delay: 0ms;
 }
 
@@ -355,7 +352,7 @@ button {
   visibility: visible;
   opacity: 1;
   transform: translateZ(0) scale3d(0.978, 0.982, 1);
-  filter: saturate(1.12) brightness(0.9) contrast(1.08);
+  filter: saturate(1.06) brightness(0.92) contrast(1.04);
   transition-delay: 0ms;
 }
 
@@ -369,7 +366,7 @@ button {
   visibility: visible;
   opacity: 1;
   transform: translateZ(0) scale3d(0.978, 0.978, 1);
-  filter: saturate(1.18) brightness(0.88) contrast(1.12);
+  filter: saturate(1.08) brightness(0.9) contrast(1.06);
   transition-delay: 0ms;
 }
 
@@ -379,11 +376,21 @@ button {
   transition-delay: 0ms;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway::before {
+  opacity: 0.16;
+  transform: translateZ(0) scale3d(1.042, 1.042, 1);
+  filter: saturate(1.02) brightness(0.82) contrast(1.06);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
+  opacity: 0.24;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
   visibility: visible;
   opacity: 1;
   transform: translateZ(0) scale3d(0.966, 0.966, 1);
-  filter: saturate(1.22) brightness(0.76) contrast(1.18);
+  filter: saturate(1.06) brightness(0.86) contrast(1.05);
   transition-delay: 0ms;
 }
 
@@ -391,27 +398,26 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
   visibility: visible;
   transition:
-    opacity 220ms var(--ease-standard),
-    transform 360ms cubic-bezier(0.12, 0.78, 0.14, 1),
-    filter 360ms cubic-bezier(0.12, 0.78, 0.14, 1),
+    opacity 170ms var(--ease-standard),
+    transform 520ms cubic-bezier(0.16, 0.74, 0.16, 1),
     visibility 0ms linear 0ms;
   transition-delay: 0ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before {
-  opacity: 0.76;
-  transform: translateZ(0) scale3d(1.026, 1.026, 1);
-  filter: saturate(1.04) brightness(0.82) contrast(1.1);
+  opacity: 0.88;
+  transform: translateZ(0) scale3d(1.018, 1.018, 1);
+  filter: saturate(1.02) brightness(0.88) contrast(1.06);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.84;
+  opacity: 0.96;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
-  opacity: 1;
-  transform: translateZ(0) scale3d(2.8, 2.8, 1);
-  filter: saturate(1.14) brightness(0.72) contrast(1.16);
+  opacity: 0.72;
+  transform: translateZ(0) scale3d(2.42, 2.42, 1);
+  filter: saturate(1.04) brightness(0.82) contrast(1.08);
   background:
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.99) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.78) calc(var(--portfolio-gateway-focus-core) * 1.24), rgba(0, 0, 0, 0.97) calc(var(--portfolio-gateway-focus-ring) * 1.22), rgba(0, 0, 0, 0.995) calc(var(--portfolio-gateway-focus-halo) * 1.72)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgba(247, 247, 242, 0.28) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-signal-alpha)) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem)),
@@ -420,15 +426,15 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
-  opacity: 0.84;
-  transform: translateZ(0) scale3d(6.6, 6.6, 1);
-  filter: saturate(1.14) brightness(1.04) contrast(1.12);
+  opacity: 0.48;
+  transform: translateZ(0) scale3d(5.8, 5.8, 1);
+  filter: saturate(1.04) brightness(0.96) contrast(1.04);
   background:
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.99) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.72) calc(var(--portfolio-gateway-focus-core) * 1.22), transparent calc(var(--portfolio-gateway-focus-ring) * 1.08)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.86), rgba(247, 247, 242, 0.36) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.26) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem), rgb(var(--portfolio-gateway-reveal-rgb) / 0.14) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.88rem)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-halo) * 0.42), rgba(0, 0, 0, 0.86) calc(var(--portfolio-gateway-focus-halo) * 1.22));
-  animation: portfolioGatewayFillOvertake 640ms cubic-bezier(0.1, 0.78, 0.14, 1) both;
-  animation-delay: -90ms;
+  animation: portfolioGatewayFillOvertake 560ms cubic-bezier(0.16, 0.74, 0.16, 1) both;
+  animation-delay: 0ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-background {
@@ -460,7 +466,7 @@ button {
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.78) 0 calc(var(--portfolio-gateway-focus-core) * 0.66), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.48) calc(var(--portfolio-gateway-focus-core) * 0.9), rgba(0, 0, 0, 0.5) calc(var(--portfolio-gateway-focus-core) * 1.18), transparent calc(var(--portfolio-gateway-focus-halo) * 0.9)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.84), rgba(247, 247, 242, 0.42) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.24) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.62rem), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.12) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.72rem)),
     radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.32) calc(var(--portfolio-gateway-focus-core) * 0.7), transparent calc(var(--portfolio-gateway-focus-halo) * 1.04));
-  animation: portfolioGatewayOpeningDepth 760ms cubic-bezier(0.15, 0.78, 0.16, 1) both;
+  animation: portfolioGatewayOpeningDepth 760ms cubic-bezier(0.18, 0.74, 0.16, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
@@ -471,7 +477,7 @@ button {
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.9) 0 calc(var(--portfolio-gateway-focus-core) * 0.72), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.46) calc(var(--portfolio-gateway-focus-core) * 0.95), transparent calc(var(--portfolio-gateway-focus-core) * 1.18)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.82), rgba(247, 247, 242, 0.68) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.34) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 5px), rgba(0, 0, 0, 0.26) calc(var(--portfolio-gateway-focus-core) + 9px), transparent calc(var(--portfolio-gateway-focus-core) + 14px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.5rem)),
     radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-ring) * 0.78), rgba(0, 0, 0, 0.42) calc(var(--portfolio-gateway-focus-ring) * 1.08), transparent calc(var(--portfolio-gateway-focus-halo) * 1.05));
-  animation: portfolioGatewayOpeningRing 760ms cubic-bezier(0.12, 0.78, 0.16, 1) both;
+  animation: portfolioGatewayOpeningRing 760ms cubic-bezier(0.18, 0.74, 0.16, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="pulling-universe"] .portfolio-world-gateway-background {
@@ -496,45 +502,58 @@ button {
 
 @keyframes portfolioGatewayOpeningDepth {
   0% {
-    transform: translateZ(0) scale3d(0.9, 0.9, 1);
-    opacity: 0.74;
-    filter: saturate(1.04) brightness(0.78) contrast(1.04);
+    transform: translateZ(0) scale3d(0.92, 0.92, 1);
+    opacity: 0.7;
+    filter: saturate(1.02) brightness(0.82) contrast(1.02);
   }
 
-  28% {
-    transform: translateZ(0) scale3d(0.82, 0.82, 1);
-    opacity: 0.9;
+  32% {
+    transform: translateZ(0) scale3d(0.86, 0.86, 1);
+    opacity: 0.86;
   }
 
   100% {
     transform: translateZ(0) scale3d(1.02, 1.02, 1);
     opacity: 0.84;
-    filter: saturate(1.1) brightness(0.84) contrast(1.08);
+    filter: saturate(1.06) brightness(0.86) contrast(1.04);
   }
 }
 
 @keyframes portfolioGatewayOpeningRing {
   0% {
-    transform: translateZ(0) scale3d(0.62, 0.62, 1);
-    opacity: 0.74;
-    filter: saturate(1.04) brightness(0.84) contrast(1.04);
+    transform: translateZ(0) scale3d(0.66, 0.66, 1);
+    opacity: 0.7;
+    filter: saturate(1.02) brightness(0.88) contrast(1.02);
   }
 
-  26% {
-    transform: translateZ(0) scale3d(0.54, 0.54, 1);
+  28% {
+    transform: translateZ(0) scale3d(0.6, 0.6, 1);
+    opacity: 0.9;
+  }
+
+  68% {
+    transform: translateZ(0) scale3d(0.92, 0.92, 1);
     opacity: 0.94;
-  }
-
-  64% {
-    transform: translateZ(0) scale3d(0.88, 0.88, 1);
-    opacity: 0.96;
   }
 
   100% {
-    transform: translateZ(0) scale3d(1.12, 1.12, 1);
-    opacity: 0.94;
-    filter: saturate(1.12) brightness(1.04) contrast(1.1);
+    transform: translateZ(0) scale3d(1.1, 1.1, 1);
+    opacity: 0.92;
+    filter: saturate(1.06) brightness(1) contrast(1.04);
   }
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine-projection,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-beacon-field,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-entry-constellation,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine-scan-line {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms var(--ease-standard),
+    visibility 0ms linear 120ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway {
@@ -544,16 +563,15 @@ button {
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.04) brightness(0.92) contrast(1.08);
   transition:
-    opacity 260ms var(--ease-standard),
-    transform 420ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    filter 420ms cubic-bezier(0.16, 0.82, 0.18, 1),
+    opacity 160ms var(--ease-standard),
+    transform 260ms cubic-bezier(0.18, 0.78, 0.18, 1),
     visibility 0ms linear 0ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::before {
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.02) brightness(0.9) contrast(1.08);
+  filter: saturate(1.01) brightness(0.94) contrast(1.06);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
@@ -563,9 +581,9 @@ button {
   animation: none;
   transform: translateZ(0) scale3d(1.72, 1.72, 1);
   transition:
-    opacity 180ms var(--ease-standard),
-    transform 260ms cubic-bezier(0.16, 0.82, 0.18, 1),
-    visibility 0ms linear 180ms;
+    opacity 100ms var(--ease-standard),
+    transform 180ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    visibility 0ms linear 100ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine,
@@ -582,7 +600,7 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway::before {
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.02) brightness(0.9) contrast(1.08);
+  filter: saturate(1.01) brightness(0.94) contrast(1.06);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-background,
@@ -607,18 +625,18 @@ button {
 
 @keyframes portfolioGatewayFillOvertake {
   0% {
-    transform: translateZ(0) scale3d(1.72, 1.72, 1);
-    opacity: 0.88;
+    transform: translateZ(0) scale3d(1.42, 1.42, 1);
+    opacity: 0.58;
   }
 
-  28% {
-    transform: translateZ(0) scale3d(3.08, 3.08, 1);
-    opacity: 0.86;
+  36% {
+    transform: translateZ(0) scale3d(2.72, 2.72, 1);
+    opacity: 0.46;
   }
 
   100% {
-    transform: translateZ(0) scale3d(6.6, 6.6, 1);
-    opacity: 0.84;
+    transform: translateZ(0) scale3d(5.8, 5.8, 1);
+    opacity: 0.2;
   }
 }
 
@@ -1203,8 +1221,14 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
-  opacity: 0.12;
-  transform: translate3d(0, 0.35rem, 0) scale3d(0.992, 0.992, 1);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0.45rem, 0) scale3d(0.99, 0.99, 1);
+  transition:
+    opacity 140ms var(--ease-standard),
+    transform 180ms var(--ease-standard),
+    visibility 0ms linear 140ms;
 }
 
 .site-shell.is-home-route .portfolio-engine,
@@ -1732,7 +1756,9 @@ button {
   }
 
   .portfolio-engine::before {
+    visibility: hidden;
     opacity: 0;
+    pointer-events: none;
   }
 
   .portfolio-engine::after {
@@ -1799,7 +1825,7 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"] .portfolio-engine-reactor-ring {
-    opacity: 0.82;
+    opacity: 0.36;
     transform: none;
     box-shadow:
       inset 0 0 0.42rem rgb(var(--engine-accent-glow) / 0.12),
@@ -2048,7 +2074,7 @@ button {
   }
 
   7% {
-    opacity: 1;
+    opacity: 0.72;
     transform: scale3d(1.24, 1.24, 1);
   }
 
@@ -4510,7 +4536,7 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
-    opacity: 1;
+    opacity: 0.72;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before,
@@ -4519,11 +4545,13 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
-    opacity: 0.82;
+    opacity: 0.36;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
-    opacity: 0.12;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
