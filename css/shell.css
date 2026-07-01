@@ -420,9 +420,11 @@ button {
   opacity: 0.98;
   transform: translateZ(0) scale3d(1.004, 1.004, 1);
   filter: saturate(1) brightness(1) contrast(1);
-  background-position: center, center, center;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
   background-repeat: no-repeat;
-  background-size: 100% 100%, 100% 100%, cover;
+  background-size: cover;
+  background-blend-mode: normal;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
@@ -625,7 +627,7 @@ button {
   z-index: 20;
   visibility: visible;
   opacity: 1;
-  background: #000;
+  background: transparent;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: none;
   transition:
@@ -648,6 +650,8 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-ring {
   visibility: hidden;
   opacity: 0;
+  background: transparent;
+  filter: none;
   animation: none;
   transform: translateZ(0) scale3d(1.72, 1.72, 1);
   transition:
@@ -677,7 +681,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway {
-  background: #000;
+  background: transparent;
   filter: none;
 }
 
@@ -689,6 +693,7 @@ button {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  background-blend-mode: normal;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-background,
