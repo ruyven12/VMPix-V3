@@ -142,7 +142,7 @@ const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-
 const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
 const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
-const PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS = 140;
+const PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS = 96;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
 const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
@@ -934,8 +934,8 @@ function finishPortfolioEngineProjectionGatewayFade(fade) {
 
   portfolioEngineProjection.style.visibility = "hidden";
   portfolioEngineProjection.style.opacity = "0";
-  portfolioEngineProjection.style.filter = "blur(1px)";
-  portfolioEngineProjection.style.transform = "translate3d(0, 0.28rem, 0) scale3d(0.992, 0.985, 1)";
+  portfolioEngineProjection.style.filter = "blur(0.8px)";
+  portfolioEngineProjection.style.transform = "translate3d(0, 0.42rem, 0) scale3d(0.986, 0.968, 1)";
   portfolioEngineProjection.style.transition = "";
   fade.startTimer = 0;
   fade.finishTimer = 0;
@@ -988,8 +988,8 @@ function fadePortfolioEngineProjectionForGateway() {
   portfolioEngineProjectionGatewayFade = projectionFade;
   projectionFadeStyle.transition = `opacity ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1), filter ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1), transform ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1)`;
   projectionFadeStyle.opacity = "0";
-  projectionFadeStyle.filter = "blur(0.9px)";
-  projectionFadeStyle.transform = "translate3d(0, 0.24rem, 0) scale3d(0.993, 0.987, 1)";
+  projectionFadeStyle.filter = "blur(0.7px)";
+  projectionFadeStyle.transform = "translate3d(0, 0.38rem, 0) scale3d(0.988, 0.972, 1)";
 
   projectionFade.finishTimer = window.setTimeout(() => {
     finishPortfolioEngineProjectionGatewayFade(projectionFade);
