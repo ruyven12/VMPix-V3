@@ -142,14 +142,14 @@ const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-
 const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
 const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
-const PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS = 96;
+const PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS = 72;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
 const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
 const PORTFOLIO_RIGHT_EMITTER_READY_DURATION_MS = 0;
-const PORTFOLIO_GATEWAY_FOCUS_DURATION_MS = 420;
+const PORTFOLIO_GATEWAY_FOCUS_DURATION_MS = 300;
 const PORTFOLIO_GATEWAY_REDUCED_FOCUS_DURATION_MS = 180;
-const PORTFOLIO_GATEWAY_PULL_DURATION_MS = 520;
+const PORTFOLIO_GATEWAY_PULL_DURATION_MS = 420;
 const PORTFOLIO_GATEWAY_REDUCED_PULL_DURATION_MS = 180;
 const PORTFOLIO_GATEWAY_OPENING_DURATION_MS = 760;
 const PORTFOLIO_GATEWAY_REDUCED_OPENING_DURATION_MS = 180;
@@ -1094,7 +1094,8 @@ function showPortfolioEngineProjection(worldName) {
     !shell ||
     !portfolioEngineProjection ||
     window.location.pathname !== routePaths.portfolio ||
-    shell.dataset.portfolioEngineReady !== "true"
+    shell.dataset.portfolioEngineReady !== "true" ||
+    isPortfolioGatewayActive()
   ) {
     return;
   }
@@ -1150,7 +1151,8 @@ function triggerPortfolioEngineScan(target) {
     !portfolioEngineScanLine ||
     !target ||
     window.location.pathname !== routePaths.portfolio ||
-    shell.dataset.portfolioEngineReady !== "true"
+    shell.dataset.portfolioEngineReady !== "true" ||
+    isPortfolioGatewayActive()
   ) {
     return;
   }

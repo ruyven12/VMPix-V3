@@ -224,9 +224,9 @@ button {
   isolation: isolate;
   filter: saturate(1) brightness(1) contrast(1);
   transition:
-    opacity 280ms var(--ease-standard),
-    transform 560ms cubic-bezier(0.18, 0.78, 0.18, 1),
-    visibility 0ms linear 280ms;
+    opacity 180ms var(--ease-standard),
+    transform 480ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    visibility 0ms linear 180ms;
   contain: layout paint style;
 }
 
@@ -249,8 +249,8 @@ button {
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
   filter: saturate(1.02) brightness(0.78) contrast(1.08);
   transition:
-    opacity 420ms cubic-bezier(0.2, 0.74, 0.18, 1),
-    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
+    opacity 320ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .portfolio-world-gateway-background,
@@ -266,9 +266,9 @@ button {
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
   filter: saturate(1) brightness(1) contrast(1);
   transition:
-    opacity 300ms var(--ease-standard),
-    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1),
-    visibility 0ms linear 300ms;
+    opacity 220ms var(--ease-standard),
+    transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    visibility 0ms linear 220ms;
 }
 
 .portfolio-world-gateway-background {
@@ -363,11 +363,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.36;
-  filter: saturate(1.03) brightness(0.94) contrast(1.04);
+  opacity: 0.4;
+  filter: saturate(1.03) brightness(0.96) contrast(1.04);
   transition:
-    opacity 340ms cubic-bezier(0.2, 0.74, 0.18, 1),
-    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
+    opacity 260ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background,
@@ -397,11 +397,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.5;
-  filter: saturate(1.02) brightness(0.96) contrast(1.04);
+  opacity: 0.56;
+  filter: saturate(1.02) brightness(0.98) contrast(1.04);
   transition:
-    opacity 360ms cubic-bezier(0.2, 0.74, 0.18, 1),
-    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
+    opacity 320ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
@@ -474,7 +474,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-background {
-  opacity: 0.9;
+  opacity: 0.86;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-ring {
   opacity: 0.96;
@@ -498,7 +498,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-background {
-  opacity: 0.78;
+  opacity: 0.74;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
   opacity: 0.94;
@@ -522,6 +522,14 @@ button {
   transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.68, 0.74, 1) skew(-0.2deg, 0.12deg);
   filter: saturate(1.14) brightness(0.98) contrast(1.08);
 }
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="pulling-universe"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
+  opacity: 0.16;
+  transform: translateZ(0) scale3d(1.058, 1.058, 1);
+  filter: saturate(1.02) brightness(0.9) contrast(1.04);
+  transition:
+    opacity 220ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 560ms cubic-bezier(0.18, 0.78, 0.18, 1);
+}
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="focusing-star"] .portfolio-world-gateway-background {
   opacity: 1;
@@ -535,7 +543,6 @@ button {
   0% {
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.92, 0.92, 1);
     opacity: 0.7;
-    filter: saturate(1.02) brightness(0.82) contrast(1.02);
   }
 
   32% {
@@ -546,7 +553,6 @@ button {
   100% {
     transform: translate3d(0, 0, 0) scale3d(1.02, 1.02, 1);
     opacity: 0.84;
-    filter: saturate(1.06) brightness(0.86) contrast(1.04);
   }
 }
 
@@ -554,7 +560,6 @@ button {
   0% {
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.66, 0.66, 1);
     opacity: 0.7;
-    filter: saturate(1.02) brightness(0.88) contrast(1.02);
   }
 
   28% {
@@ -570,7 +575,6 @@ button {
   100% {
     transform: translate3d(0, 0, 0) scale3d(1.1, 1.1, 1);
     opacity: 0.92;
-    filter: saturate(1.06) brightness(1) contrast(1.04);
   }
 }
 
@@ -584,15 +588,15 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--1,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--4 {
-  opacity: 0.28;
-  transition: opacity 360ms var(--ease-standard);
+  opacity: 0.22;
+  transition: opacity 240ms var(--ease-standard);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-star-feed-overlay,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-beacon-field,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-entry-constellation {
-  opacity: 0.46;
-  transition: opacity 360ms var(--ease-standard);
+  opacity: 0.34;
+  transition: opacity 240ms var(--ease-standard);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-system::before,
@@ -605,15 +609,15 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--1,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--4 {
-  opacity: 0.04;
-  transition: opacity 280ms var(--ease-standard);
+  opacity: 0.02;
+  transition: opacity 180ms var(--ease-standard);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-star-feed-overlay,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-beacon-field,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-entry-constellation {
-  opacity: 0.08;
-  transition: opacity 280ms var(--ease-standard);
+  opacity: 0.04;
+  transition: opacity 180ms var(--ease-standard);
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::after,
@@ -5440,13 +5444,13 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--4 {
-  opacity: 0.28;
-  transition: opacity 360ms var(--ease-standard);
+  opacity: 0.22;
+  transition: opacity 240ms var(--ease-standard);
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--4 {
-  opacity: 0.04;
-  transition: opacity 280ms var(--ease-standard);
+  opacity: 0.02;
+  transition: opacity 180ms var(--ease-standard);
 }
 
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .nebula-stage--4 {
