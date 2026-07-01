@@ -363,7 +363,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.3;
+  opacity: 0.36;
+  filter: saturate(1.03) brightness(0.94) contrast(1.04);
+  transition:
+    opacity 340ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background,
@@ -393,7 +397,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.44;
+  opacity: 0.5;
+  filter: saturate(1.02) brightness(0.96) contrast(1.04);
+  transition:
+    opacity 360ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 680ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
@@ -465,6 +473,9 @@ button {
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(247, 247, 242, 0.12) 0 1px, transparent 2px);
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-background {
+  opacity: 0.9;
+}
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-ring {
   opacity: 0.96;
   transform: translateZ(0) scale3d(1.42, 1.42, 1);
@@ -486,6 +497,9 @@ button {
   animation: portfolioGatewayOpeningDepth 760ms cubic-bezier(0.18, 0.74, 0.16, 1) both;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-background {
+  opacity: 0.78;
+}
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
   opacity: 0.94;
   transform: translateZ(0) scale3d(1.12, 1.12, 1);
