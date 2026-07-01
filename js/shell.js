@@ -141,6 +141,7 @@ const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-
 const PORTFOLIO_ENGINE_SCAN_DURATION_MS = 1320;
 const PORTFOLIO_ENGINE_PROJECTION_DELAY_MS = 820;
 const PORTFOLIO_ENGINE_PROJECTION_RETRACT_MS = 260;
+const PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS = 140;
 const PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const PORTFOLIO_STAR_FEEDING_DURATION_MS = 180;
 const PORTFOLIO_RIGHT_EMITTER_CHARGING_DURATION_MS = 430;
@@ -172,6 +173,7 @@ let portfolioEngineScanFrame = 0;
 let portfolioEngineScanTarget = null;
 let portfolioEngineProjectionTimer = 0;
 let portfolioEngineProjectionRetractTimer = 0;
+let portfolioEngineProjectionGatewayFade = null;
 let portfolioStarFeedingTimer = 0;
 let portfolioRightEmitterChargingTimer = 0;
 let portfolioRightEmitterReadyTimer = 0;
@@ -381,6 +383,7 @@ function startPortfolioWorldGateway() {
   shell.dataset.portfolioGatewayRoute = route;
   shell.dataset.portfolioGatewayState = "focusing-star";
   shell.classList.add("is-portfolio-world-gateway-active");
+  fadePortfolioEngineProjectionForGateway();
   queuePortfolioGatewayPullingUniverse(activeWorld, route);
   syncPortfolioGatewayTriggerState();
   return true;
@@ -899,7 +902,101 @@ function clearPortfolioEngineScan() {
   }
 }
 
+function clearPortfolioEngineProjectionGatewayFadeStyles() {
+  if (!portfolioEngineProjection) {
+    return;
+  }
+
+  portfolioEngineProjection.style.removeProperty("visibility");
+  portfolioEngineProjection.style.removeProperty("opacity");
+  portfolioEngineProjection.style.removeProperty("filter");
+  portfolioEngineProjection.style.removeProperty("transform");
+  portfolioEngineProjection.style.removeProperty("transition");
+}
+
+function clearPortfolioEngineProjectionGatewayFade() {
+  if (!portfolioEngineProjectionGatewayFade) {
+    return false;
+  }
+
+  window.clearTimeout(portfolioEngineProjectionGatewayFade.startTimer);
+  window.clearTimeout(portfolioEngineProjectionGatewayFade.finishTimer);
+  portfolioEngineProjectionGatewayFade = null;
+  clearPortfolioEngineProjectionGatewayFadeStyles();
+  return true;
+}
+
+function finishPortfolioEngineProjectionGatewayFade(fade) {
+  if (portfolioEngineProjectionGatewayFade !== fade || !portfolioEngineProjection) {
+    return;
+  }
+
+  portfolioEngineProjection.style.visibility = "hidden";
+  portfolioEngineProjection.style.opacity = "0";
+  portfolioEngineProjection.style.filter = "blur(1px)";
+  portfolioEngineProjection.style.transform = "translate3d(0, 0.28rem, 0) scale3d(0.992, 0.985, 1)";
+  portfolioEngineProjection.style.transition = "";
+  fade.startTimer = 0;
+  fade.finishTimer = 0;
+}
+
+function fadePortfolioEngineProjectionForGateway() {
+  const hadGatewayProjectionFade = clearPortfolioEngineProjectionGatewayFade();
+  window.clearTimeout(portfolioEngineProjectionTimer);
+  portfolioEngineProjectionTimer = 0;
+  window.clearTimeout(portfolioEngineProjectionRetractTimer);
+  portfolioEngineProjectionRetractTimer = 0;
+
+  if (!shell || !portfolioEngineProjection) {
+    return;
+  }
+
+  const projectionStyle = window.getComputedStyle(portfolioEngineProjection);
+  const startOpacity = Number.parseFloat(projectionStyle.opacity) || 0;
+  const startVisibility = projectionStyle.visibility;
+  const startFilter = projectionStyle.filter;
+  const startTransform = projectionStyle.transform;
+
+  shell.classList.remove("is-portfolio-projection-active", "is-portfolio-projection-retracting");
+  portfolioEngineProjection.setAttribute("aria-hidden", "true");
+
+  if (
+    hadGatewayProjectionFade ||
+    isPortfolioEngineReducedMotion() ||
+    startVisibility === "hidden" ||
+    startOpacity <= 0.01
+  ) {
+    return;
+  }
+
+  const projectionFade = {
+    startTimer: 0,
+    finishTimer: 0,
+  };
+  const projectionFadeStyle = portfolioEngineProjection.style;
+
+  projectionFadeStyle.transition = "none";
+  projectionFadeStyle.visibility = "visible";
+  projectionFadeStyle.opacity = String(startOpacity);
+  projectionFadeStyle.filter = startFilter === "none" ? "blur(0)" : startFilter;
+  projectionFadeStyle.transform = startTransform === "none"
+    ? "translate3d(0, 0, 0) scale3d(1, 1, 1)"
+    : startTransform;
+  void portfolioEngineProjection.offsetWidth;
+
+  portfolioEngineProjectionGatewayFade = projectionFade;
+  projectionFadeStyle.transition = `opacity ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1), filter ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1), transform ${PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS}ms cubic-bezier(0.34, 0, 0.2, 1)`;
+  projectionFadeStyle.opacity = "0";
+  projectionFadeStyle.filter = "blur(0.9px)";
+  projectionFadeStyle.transform = "translate3d(0, 0.24rem, 0) scale3d(0.993, 0.987, 1)";
+
+  projectionFade.finishTimer = window.setTimeout(() => {
+    finishPortfolioEngineProjectionGatewayFade(projectionFade);
+  }, PORTFOLIO_ENGINE_GATEWAY_PROJECTION_FADE_MS + 48);
+}
+
 function hidePortfolioEngineProjection({ immediate = false } = {}) {
+  const hadGatewayProjectionFade = clearPortfolioEngineProjectionGatewayFade();
   window.clearTimeout(portfolioEngineProjectionTimer);
   portfolioEngineProjectionTimer = 0;
   window.clearTimeout(portfolioEngineProjectionRetractTimer);
@@ -912,7 +1009,7 @@ function hidePortfolioEngineProjection({ immediate = false } = {}) {
   shell.classList.remove("is-portfolio-projection-active");
   portfolioEngineProjection.setAttribute("aria-hidden", "true");
 
-  if (immediate || isPortfolioEngineReducedMotion()) {
+  if (hadGatewayProjectionFade || immediate || isPortfolioEngineReducedMotion()) {
     shell.classList.remove("is-portfolio-projection-retracting");
     return;
   }
@@ -952,6 +1049,7 @@ function showPortfolioEngineProjection(worldName) {
     return;
   }
 
+  clearPortfolioEngineProjectionGatewayFade();
   setPortfolioEngineProjectionContent(worldName);
   shell.classList.remove("is-portfolio-projection-retracting");
   portfolioEngineProjection.setAttribute("aria-hidden", "false");
