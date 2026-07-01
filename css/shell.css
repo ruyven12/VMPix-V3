@@ -356,6 +356,16 @@ button {
   transition-delay: 0ms;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway::before {
+  opacity: 0.2;
+  transform: translateZ(0) scale3d(1.046, 1.046, 1);
+  filter: saturate(1.02) brightness(0.88) contrast(1.04);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
+  opacity: 0.3;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
   visibility: visible;
@@ -392,7 +402,7 @@ button {
   opacity: 1;
   background: rgb(var(--portfolio-gateway-fill-rgb));
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.06) brightness(0.86) contrast(1.05);
+  filter: saturate(1.03) brightness(1) contrast(1.02);
   transition-delay: 0ms;
 }
 
@@ -407,9 +417,9 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before {
-  opacity: 0.92;
-  transform: translateZ(0) scale3d(1.008, 1.008, 1);
-  filter: saturate(1.02) brightness(0.94) contrast(1.05);
+  opacity: 0.98;
+  transform: translateZ(0) scale3d(1.004, 1.004, 1);
+  filter: saturate(1) brightness(1) contrast(1);
   background-position: center, center, center;
   background-repeat: no-repeat;
   background-size: 100% 100%, 100% 100%, cover;
@@ -548,6 +558,47 @@ button {
   }
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .cinema-fire-bg,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--1,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--4 {
+  opacity: 0.28;
+  transition: opacity 360ms var(--ease-standard);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-beacon-field,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-entry-constellation {
+  opacity: 0.46;
+  transition: opacity 360ms var(--ease-standard);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-system::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-system::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .cinema-fire-bg,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-observatory-layer,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-void-stars,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .ambient-void-stars::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--1,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--4 {
+  opacity: 0.04;
+  transition: opacity 280ms var(--ease-standard);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-star-feed-overlay,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-beacon-field,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-entry-constellation {
+  opacity: 0.08;
+  transition: opacity 280ms var(--ease-standard);
+}
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .ambient-system::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .cinema-fire-bg,
@@ -566,17 +617,17 @@ button {
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 120ms var(--ease-standard),
-    visibility 0ms linear 120ms;
+    opacity 80ms var(--ease-standard),
+    visibility 0ms linear 0ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway {
   z-index: 20;
   visibility: visible;
   opacity: 1;
-  background: rgb(var(--portfolio-gateway-fill-rgb));
+  background: #000;
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.04) brightness(0.92) contrast(1.08);
+  filter: none;
   transition:
     opacity 160ms var(--ease-standard),
     transform 260ms cubic-bezier(0.18, 0.78, 0.18, 1),
@@ -586,10 +637,11 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::before {
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.01) brightness(0.94) contrast(1.06);
-  background-position: center, center, center;
+  filter: none;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
   background-repeat: no-repeat;
-  background-size: 100% 100%, 100% 100%, cover;
+  background-size: cover;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
@@ -624,10 +676,19 @@ button {
   pointer-events: none;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway {
+  background: #000;
+  filter: none;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway::before {
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
-  filter: saturate(1.01) brightness(0.94) contrast(1.06);
+  filter: none;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-background,
@@ -5357,6 +5418,26 @@ button {
   animation: none;
   opacity: 0.8;
   transform: translate3d(0, 0, 0) scale(1.018);
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .nebula-stage--4 {
+  opacity: 0.28;
+  transition: opacity 360ms var(--ease-standard);
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .nebula-stage--4 {
+  opacity: 0.04;
+  transition: opacity 280ms var(--ease-standard);
+}
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-entry-sequence).is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .nebula-stage--4 {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transition:
+    opacity 80ms var(--ease-standard),
+    visibility 0ms linear 0ms;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-entry-sequence.is-home-transitioning.is-engage-activated .ambient-void-stars::before,
