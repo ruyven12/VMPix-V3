@@ -205,11 +205,9 @@ button {
   --portfolio-gateway-signal-rgb: var(--engine-accent);
   --portfolio-gateway-portal-line-angle: 112deg;
   --portfolio-gateway-portal-line-opacity: 0.035;
-  --portfolio-gateway-fill-core-alpha: 0.48;
-  --portfolio-gateway-fill-signal-alpha: 0.3;
-  --portfolio-gateway-fill-field-alpha: 0.2;
-  --portfolio-gateway-fill-line-opacity: 0.026;
-  --portfolio-gateway-fill-conic-alpha: 0.08;
+  --portfolio-gateway-fill-core-alpha: 0.36;
+  --portfolio-gateway-fill-signal-alpha: 0.2;
+  --portfolio-gateway-fill-field-alpha: 0.12;
   --portfolio-gateway-pull-x: 0rem;
   --portfolio-gateway-pull-y: 0rem;
   position: fixed;
@@ -290,11 +288,9 @@ button {
 
 @media (max-width: 48rem) {
   .portfolio-world-gateway {
-    --portfolio-gateway-fill-core-alpha: 0.56;
-    --portfolio-gateway-fill-signal-alpha: 0.36;
-    --portfolio-gateway-fill-field-alpha: 0.26;
-    --portfolio-gateway-fill-line-opacity: 0.034;
-    --portfolio-gateway-fill-conic-alpha: 0.11;
+    --portfolio-gateway-fill-core-alpha: 0.44;
+    --portfolio-gateway-fill-signal-alpha: 0.26;
+    --portfolio-gateway-fill-field-alpha: 0.17;
   }
 }
 
@@ -370,68 +366,66 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
   opacity: 1;
-  transform: translateZ(0) scale3d(3.45, 3.45, 1);
-  filter: saturate(1.22) brightness(0.76) contrast(1.18);
+  transform: translateZ(0) scale3d(2.8, 2.8, 1);
+  filter: saturate(1.14) brightness(0.72) contrast(1.16);
   background:
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-reveal-rgb) / var(--portfolio-gateway-fill-core-alpha)) 0, rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-signal-alpha)) var(--portfolio-gateway-focus-core), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.84) calc(var(--portfolio-gateway-focus-ring) * 1.06), rgba(1, 1, 4, 0.91) calc(var(--portfolio-gateway-focus-halo) * 0.98), rgba(0, 0, 0, 0.985) calc(var(--portfolio-gateway-focus-halo) * 1.52)),
-    conic-gradient(from var(--portfolio-gateway-portal-line-angle) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0deg, rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-conic-alpha)) 18deg, transparent 42deg, rgb(var(--portfolio-gateway-reveal-secondary-rgb) / calc(var(--portfolio-gateway-fill-conic-alpha) * 0.72)) 92deg, transparent 136deg, rgb(var(--portfolio-gateway-reveal-rgb) / calc(var(--portfolio-gateway-fill-conic-alpha) * 0.58)) 218deg, transparent 286deg, transparent 360deg),
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / 0.48) 0, rgb(var(--portfolio-gateway-reveal-secondary-rgb) / var(--portfolio-gateway-fill-field-alpha)) calc(var(--portfolio-gateway-focus-ring) * 1.42), transparent calc(var(--portfolio-gateway-focus-halo) * 2.04)),
-    repeating-linear-gradient(var(--portfolio-gateway-portal-line-angle), rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-line-opacity)) 0 1px, transparent 1px 1.08rem),
-    linear-gradient(145deg, rgb(var(--portfolio-gateway-fill-rgb) / 0.56), rgba(0, 0, 0, 0.988) 54%, rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.34));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.99) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.74) calc(var(--portfolio-gateway-focus-core) * 1.24), rgba(0, 0, 0, 0.97) calc(var(--portfolio-gateway-focus-ring) * 1.22), rgba(0, 0, 0, 0.995) calc(var(--portfolio-gateway-focus-halo) * 1.72)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgba(247, 247, 242, 0.26) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-signal-alpha)) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem)),
+    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / var(--portfolio-gateway-fill-core-alpha)) 0, rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-field-alpha)) calc(var(--portfolio-gateway-focus-ring) * 1.16), transparent calc(var(--portfolio-gateway-focus-halo) * 1.36)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.992), rgb(var(--portfolio-gateway-fill-rgb) / 0.12) 50%, rgba(0, 0, 0, 0.998));
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
-  opacity: 0.9;
-  transform: translateZ(0) scale3d(8.6, 8.6, 1);
-  filter: saturate(1.22) brightness(1.12) contrast(1.14);
+  opacity: 0.84;
+  transform: translateZ(0) scale3d(6.6, 6.6, 1);
+  filter: saturate(1.14) brightness(1.04) contrast(1.12);
   background:
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / 0.66) 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgb(var(--portfolio-gateway-signal-rgb) / 0.2) calc(var(--portfolio-gateway-focus-core) * 1.18), transparent calc(var(--portfolio-gateway-focus-ring) * 1.02)),
-    conic-gradient(from calc(var(--portfolio-gateway-portal-line-angle) + 24deg) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0deg, rgb(var(--portfolio-gateway-signal-rgb) / 0.075) 24deg, transparent 54deg, rgb(var(--portfolio-gateway-reveal-rgb) / 0.06) 128deg, transparent 174deg, rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.055) 258deg, transparent 314deg, transparent 360deg),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 var(--portfolio-gateway-focus-core), rgb(var(--portfolio-gateway-reveal-rgb) / 0.54) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.22) calc(var(--portfolio-gateway-focus-core) + 3px), transparent calc(var(--portfolio-gateway-focus-core) + 16px) var(--portfolio-gateway-focus-ring), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.28) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 20px)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-halo) * 0.62), rgba(0, 0, 0, 0.72) calc(var(--portfolio-gateway-focus-halo) * 1.34));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.99) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.72) calc(var(--portfolio-gateway-focus-core) * 1.22), transparent calc(var(--portfolio-gateway-focus-ring) * 1.08)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.86), rgba(247, 247, 242, 0.34) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.22) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem), rgb(var(--portfolio-gateway-reveal-rgb) / 0.12) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.88rem)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-halo) * 0.42), rgba(0, 0, 0, 0.86) calc(var(--portfolio-gateway-focus-halo) * 1.22));
   animation: portfolioGatewayFillOvertake 780ms cubic-bezier(0.12, 0.78, 0.14, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-background {
-  opacity: 0.98;
-  transform: translateZ(0) scale3d(1.26, 1.26, 1);
-  filter: saturate(1.18) brightness(0.9) contrast(1.12);
+  opacity: 0.96;
+  transform: translateZ(0) scale3d(1.1, 1.1, 1);
+  filter: saturate(1.14) brightness(0.86) contrast(1.12);
   background:
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.72) 0 calc(var(--portfolio-gateway-focus-core) * 0.74), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.72) calc(var(--portfolio-gateway-focus-core) * 0.96), rgba(0, 0, 0, 0.55) calc(var(--portfolio-gateway-focus-core) * 1.22), transparent calc(var(--portfolio-gateway-focus-halo) * 1.22)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.84), rgba(247, 247, 242, 0.38) calc(var(--portfolio-gateway-focus-core) + 1px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.34) calc(var(--portfolio-gateway-focus-core) + 0.24rem), rgb(var(--portfolio-gateway-signal-rgb) / 0.16) calc(var(--portfolio-gateway-focus-core) + 0.55rem), transparent calc(var(--portfolio-gateway-focus-core) + 1.05rem), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.18) var(--portfolio-gateway-focus-ring), transparent calc(var(--portfolio-gateway-focus-halo) * 1.12)),
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-signal-rgb) / 0.13) 0, rgb(var(--portfolio-gateway-reveal-rgb) / 0.07) var(--portfolio-gateway-focus-ring), transparent calc(var(--portfolio-gateway-focus-halo) * 1.24)),
-    repeating-linear-gradient(var(--portfolio-gateway-portal-line-angle), rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-portal-line-opacity)) 0 1px, transparent 1px 0.86rem),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(247, 247, 242, 0.14) 0 1px, transparent 2px);
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.92) 0 calc(var(--portfolio-gateway-focus-core) * 0.76), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.78) calc(var(--portfolio-gateway-focus-core) * 0.98), rgba(0, 0, 0, 0.74) calc(var(--portfolio-gateway-focus-core) * 1.36), transparent calc(var(--portfolio-gateway-focus-halo) * 0.98)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgba(247, 247, 242, 0.46) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.28) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem), rgb(var(--portfolio-gateway-reveal-rgb) / 0.14) calc(var(--portfolio-gateway-focus-ring) * 0.92), transparent calc(var(--portfolio-gateway-focus-halo) * 0.98)),
+    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / 0.18) 0, rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.07) calc(var(--portfolio-gateway-focus-ring) * 1.02), transparent calc(var(--portfolio-gateway-focus-halo) * 1.28)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(247, 247, 242, 0.12) 0 1px, transparent 2px);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-ring {
-  opacity: 1;
-  transform: translateZ(0) scale3d(1.96, 1.96, 1);
-  filter: saturate(1.2) brightness(1.18) contrast(1.14);
+  opacity: 0.96;
+  transform: translateZ(0) scale3d(1.42, 1.42, 1);
+  filter: saturate(1.16) brightness(1.08) contrast(1.12);
   background:
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.74) 0 calc(var(--portfolio-gateway-focus-core) * 0.74), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.56) calc(var(--portfolio-gateway-focus-core) * 0.9), transparent calc(var(--portfolio-gateway-focus-core) * 1.18)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.8), rgba(247, 247, 242, 0.56) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.6) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 5px), rgb(var(--portfolio-gateway-signal-rgb) / 0.2) calc(var(--portfolio-gateway-focus-core) + 7px), transparent calc(var(--portfolio-gateway-focus-core) + 15px) var(--portfolio-gateway-focus-ring), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.42) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 16px)),
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-signal-rgb) / 0.16) 0, transparent calc(var(--portfolio-gateway-focus-halo) * 1.04));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.92) 0 calc(var(--portfolio-gateway-focus-core) * 0.78), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.64) calc(var(--portfolio-gateway-focus-core) * 0.96), transparent calc(var(--portfolio-gateway-focus-core) * 1.2)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.82), rgba(247, 247, 242, 0.62) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.38) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-core) + 8px), transparent calc(var(--portfolio-gateway-focus-core) + 16px), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.2) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 12px)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-ring) * 0.56), rgba(0, 0, 0, 0.36) calc(var(--portfolio-gateway-focus-ring) * 0.96), transparent calc(var(--portfolio-gateway-focus-halo) * 1.06));
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background {
-  opacity: 0.9;
-  transform: translateZ(0) scale3d(1.1, 1.04, 1);
-  filter: saturate(1.14) brightness(0.88) contrast(1.1);
+  opacity: 0.84;
+  transform: translateZ(0) scale3d(1.02, 1.02, 1);
+  filter: saturate(1.1) brightness(0.84) contrast(1.08);
   background:
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.5) 0 calc(var(--portfolio-gateway-focus-core) * 0.72), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.34) calc(var(--portfolio-gateway-focus-core) * 0.86), transparent calc(var(--portfolio-gateway-focus-core) * 1.48)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.78), rgba(247, 247, 242, 0.32) calc(var(--portfolio-gateway-focus-core) + 1px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.3) calc(var(--portfolio-gateway-focus-core) + 0.18rem), transparent calc(var(--portfolio-gateway-focus-core) + 0.72rem), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.18) calc(var(--portfolio-gateway-focus-ring) + 1px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.82rem)),
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-reveal-rgb) / 0.12) 0, rgb(var(--portfolio-gateway-signal-rgb) / 0.06) var(--portfolio-gateway-focus-ring), transparent var(--portfolio-gateway-focus-halo));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.78) 0 calc(var(--portfolio-gateway-focus-core) * 0.66), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.48) calc(var(--portfolio-gateway-focus-core) * 0.9), rgba(0, 0, 0, 0.5) calc(var(--portfolio-gateway-focus-core) * 1.18), transparent calc(var(--portfolio-gateway-focus-halo) * 0.9)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.84), rgba(247, 247, 242, 0.42) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.24) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.62rem), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.12) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.72rem)),
+    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.32) calc(var(--portfolio-gateway-focus-core) * 0.7), transparent calc(var(--portfolio-gateway-focus-halo) * 1.04));
   animation: portfolioGatewayOpeningDepth 760ms cubic-bezier(0.15, 0.78, 0.16, 1) both;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
-  opacity: 1;
-  transform: translateZ(0) scale3d(1.56, 1.48, 1);
-  filter: saturate(1.18) brightness(1.1) contrast(1.12);
+  opacity: 0.94;
+  transform: translateZ(0) scale3d(1.12, 1.12, 1);
+  filter: saturate(1.12) brightness(1.04) contrast(1.1);
   background:
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.62) 0 calc(var(--portfolio-gateway-focus-core) * 0.72), transparent calc(var(--portfolio-gateway-focus-core) * 1.02)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.76), rgba(247, 247, 242, 0.58) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.62) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), rgba(0, 0, 0, 0.2) calc(var(--portfolio-gateway-focus-core) + 10px), transparent calc(var(--portfolio-gateway-focus-core) + 17px) var(--portfolio-gateway-focus-ring), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.32) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 4px), transparent calc(var(--portfolio-gateway-focus-ring) + 18px));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.9) 0 calc(var(--portfolio-gateway-focus-core) * 0.72), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.46) calc(var(--portfolio-gateway-focus-core) * 0.95), transparent calc(var(--portfolio-gateway-focus-core) * 1.18)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.82), rgba(247, 247, 242, 0.68) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.34) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 5px), rgba(0, 0, 0, 0.26) calc(var(--portfolio-gateway-focus-core) + 9px), transparent calc(var(--portfolio-gateway-focus-core) + 14px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.5rem)),
+    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-ring) * 0.78), rgba(0, 0, 0, 0.42) calc(var(--portfolio-gateway-focus-ring) * 1.08), transparent calc(var(--portfolio-gateway-focus-halo) * 1.05));
   animation: portfolioGatewayOpeningRing 760ms cubic-bezier(0.12, 0.78, 0.16, 1) both;
 }
 
@@ -457,56 +451,61 @@ button {
 
 @keyframes portfolioGatewayOpeningDepth {
   0% {
-    transform: translateZ(0) scale3d(0.96, 0.88, 1);
-    opacity: 0.82;
-    filter: saturate(1.06) brightness(0.82) contrast(1.04);
+    transform: translateZ(0) scale3d(0.9, 0.9, 1);
+    opacity: 0.74;
+    filter: saturate(1.04) brightness(0.78) contrast(1.04);
   }
 
   28% {
-    transform: translateZ(0) scale3d(0.92, 0.8, 1);
-    opacity: 0.92;
+    transform: translateZ(0) scale3d(0.82, 0.82, 1);
+    opacity: 0.9;
   }
 
   100% {
-    transform: translateZ(0) scale3d(1.1, 1.04, 1);
-    opacity: 0.9;
-    filter: saturate(1.14) brightness(0.88) contrast(1.1);
+    transform: translateZ(0) scale3d(1.02, 1.02, 1);
+    opacity: 0.84;
+    filter: saturate(1.1) brightness(0.84) contrast(1.08);
   }
 }
 
 @keyframes portfolioGatewayOpeningRing {
   0% {
-    transform: translateZ(0) scale3d(0.84, 0.68, 1);
-    opacity: 0.82;
-    filter: saturate(1.08) brightness(0.9) contrast(1.04);
+    transform: translateZ(0) scale3d(0.62, 0.62, 1);
+    opacity: 0.74;
+    filter: saturate(1.04) brightness(0.84) contrast(1.04);
   }
 
   26% {
-    transform: translateZ(0) scale3d(0.72, 0.58, 1);
-    opacity: 1;
+    transform: translateZ(0) scale3d(0.54, 0.54, 1);
+    opacity: 0.94;
   }
 
   64% {
-    transform: translateZ(0) scale3d(1.04, 0.94, 1);
-    opacity: 1;
+    transform: translateZ(0) scale3d(0.88, 0.88, 1);
+    opacity: 0.96;
   }
 
   100% {
-    transform: translateZ(0) scale3d(1.56, 1.48, 1);
-    opacity: 1;
-    filter: saturate(1.18) brightness(1.1) contrast(1.12);
+    transform: translateZ(0) scale3d(1.12, 1.12, 1);
+    opacity: 0.94;
+    filter: saturate(1.12) brightness(1.04) contrast(1.1);
   }
 }
 
 @keyframes portfolioGatewayFillOvertake {
   0% {
-    transform: translateZ(0) scale3d(2.1, 2.1, 1);
-    opacity: 0.98;
+    transform: translateZ(0) scale3d(1.42, 1.42, 1);
+    opacity: 0.9;
+  }
+
+  36% {
+    transform: translateZ(0) scale3d(2.4, 2.4, 1);
+    opacity: 0.88;
   }
 
   100% {
-    transform: translateZ(0) scale3d(8.6, 8.6, 1);
-    opacity: 0.9;
+    transform: translateZ(0) scale3d(6.6, 6.6, 1);
+    opacity: 0.84;
   }
 }
 
