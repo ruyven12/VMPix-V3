@@ -253,6 +253,26 @@ button {
     transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
+.portfolio-world-gateway::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: translateZ(0) scale3d(1.07, 1.07, 1);
+  transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
+  filter: none;
+  transition:
+    opacity 320ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
+}
+
 .portfolio-world-gateway-background,
 .portfolio-world-gateway-ring {
   position: absolute;
@@ -370,6 +390,15 @@ button {
     transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway::after {
+  opacity: 0.1;
+  transform: translateZ(0) scale3d(1.05, 1.05, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::after {
+  opacity: 0.26;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-ring {
   visibility: visible;
@@ -404,11 +433,20 @@ button {
     transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway::after {
+  opacity: 0.2;
+  transform: translateZ(0) scale3d(1.032, 1.032, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::after {
+  opacity: 0.64;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
   z-index: 20;
   visibility: visible;
   opacity: 1;
-  background: rgb(var(--portfolio-gateway-fill-rgb));
+  background: transparent;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.03) brightness(1) contrast(1.02);
   transition-delay: 0ms;
@@ -425,39 +463,51 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before {
-  opacity: 0.98;
-  transform: translateZ(0) scale3d(1.004, 1.004, 1);
+  opacity: 1;
+  transform: translateZ(0) scale3d(1.002, 1.002, 1);
   filter: saturate(1) brightness(1) contrast(1);
   background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   background-blend-mode: normal;
+  transition:
+    opacity 240ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1);
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::after {
+  opacity: 1;
+  transform: translateZ(0) scale3d(1.002, 1.002, 1);
+  filter: none;
+  transition:
+    opacity 220ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 0.99;
+  opacity: 1;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
-  opacity: 0.58;
+  opacity: 0.16;
   transform: translateZ(0) scale3d(2.42, 2.42, 1);
-  filter: saturate(1.04) brightness(0.9) contrast(1.06);
+  filter: saturate(1.02) brightness(1) contrast(1.02);
   background:
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.94) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.68) calc(var(--portfolio-gateway-focus-core) * 1.24), rgba(0, 0, 0, 0.88) calc(var(--portfolio-gateway-focus-ring) * 1.22), rgba(0, 0, 0, 0.94) calc(var(--portfolio-gateway-focus-halo) * 1.72)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgba(247, 247, 242, 0.28) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-signal-alpha)) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem)),
-    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / var(--portfolio-gateway-fill-core-alpha)) 0, rgb(var(--portfolio-gateway-signal-rgb) / var(--portfolio-gateway-fill-field-alpha)) calc(var(--portfolio-gateway-focus-ring) * 1.16), transparent calc(var(--portfolio-gateway-focus-halo) * 1.36)),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.94), rgb(var(--portfolio-gateway-fill-rgb) / 0.12) 50%, rgba(0, 0, 0, 0.96));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 1.02), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.24) calc(var(--portfolio-gateway-focus-core) * 1.24), transparent calc(var(--portfolio-gateway-focus-ring) * 1.5)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.88), rgba(247, 247, 242, 0.22) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem)),
+    radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgb(var(--portfolio-gateway-fill-rgb) / 0.1) 0, rgb(var(--portfolio-gateway-signal-rgb) / 0.08) calc(var(--portfolio-gateway-focus-ring) * 1.16), transparent calc(var(--portfolio-gateway-focus-halo) * 1.42)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 44%, rgba(0, 0, 0, 0.2));
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
-  opacity: 0.34;
+  opacity: 0.16;
   transform: translateZ(0) scale3d(5.8, 5.8, 1);
-  filter: saturate(1.04) brightness(1) contrast(1.04);
+  filter: saturate(1.04) brightness(1.05) contrast(1.04);
   background:
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.94) 0 calc(var(--portfolio-gateway-focus-core) * 1.05), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.62) calc(var(--portfolio-gateway-focus-core) * 1.22), transparent calc(var(--portfolio-gateway-focus-ring) * 1.08)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.86), rgba(247, 247, 242, 0.36) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.26) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem), rgb(var(--portfolio-gateway-reveal-rgb) / 0.14) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.88rem)),
-    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-halo) * 0.42), rgba(0, 0, 0, 0.74) calc(var(--portfolio-gateway-focus-halo) * 1.22));
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 1.02), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.22) calc(var(--portfolio-gateway-focus-core) * 1.22), transparent calc(var(--portfolio-gateway-focus-ring) * 1.12)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.86), rgba(247, 247, 242, 0.34) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.24) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), transparent calc(var(--portfolio-gateway-focus-core) + 0.82rem), rgb(var(--portfolio-gateway-reveal-rgb) / 0.12) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.88rem)),
+    radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-halo) * 0.42), rgba(0, 0, 0, 0.12) calc(var(--portfolio-gateway-focus-halo) * 1.22), transparent calc(var(--portfolio-gateway-focus-halo) * 1.62));
   animation: portfolioGatewayFillOvertake 560ms cubic-bezier(0.16, 0.74, 0.16, 1) both;
   animation-delay: 0ms;
 }
@@ -474,7 +524,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-background {
-  opacity: 0.86;
+  opacity: 0.58;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway-ring {
   opacity: 0.96;
@@ -484,6 +534,10 @@ button {
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), rgba(0, 0, 0, 0.92) 0 calc(var(--portfolio-gateway-focus-core) * 0.78), rgb(var(--portfolio-gateway-reveal-depth-rgb) / 0.64) calc(var(--portfolio-gateway-focus-core) * 0.96), transparent calc(var(--portfolio-gateway-focus-core) * 1.2)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.82), rgba(247, 247, 242, 0.62) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.38) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 6px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-core) + 8px), transparent calc(var(--portfolio-gateway-focus-core) + 16px), rgb(var(--portfolio-gateway-reveal-secondary-rgb) / 0.2) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 3px), transparent calc(var(--portfolio-gateway-focus-ring) + 12px)),
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-ring) * 0.56), rgba(0, 0, 0, 0.36) calc(var(--portfolio-gateway-focus-ring) * 0.96), transparent calc(var(--portfolio-gateway-focus-halo) * 1.06));
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-ring {
+  opacity: 0.62;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway-background {
@@ -509,6 +563,10 @@ button {
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-core) * 0.82), rgba(247, 247, 242, 0.68) calc(var(--portfolio-gateway-focus-core) + 1px) calc(var(--portfolio-gateway-focus-core) + 2px), rgb(var(--portfolio-gateway-signal-rgb) / 0.34) calc(var(--portfolio-gateway-focus-core) + 3px) calc(var(--portfolio-gateway-focus-core) + 5px), rgba(0, 0, 0, 0.26) calc(var(--portfolio-gateway-focus-core) + 9px), transparent calc(var(--portfolio-gateway-focus-core) + 14px), rgb(var(--portfolio-gateway-reveal-rgb) / 0.18) calc(var(--portfolio-gateway-focus-ring) + 1px) calc(var(--portfolio-gateway-focus-ring) + 2px), transparent calc(var(--portfolio-gateway-focus-ring) + 0.5rem)),
     radial-gradient(ellipse at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 calc(var(--portfolio-gateway-focus-ring) * 0.78), rgba(0, 0, 0, 0.42) calc(var(--portfolio-gateway-focus-ring) * 1.08), transparent calc(var(--portfolio-gateway-focus-halo) * 1.05));
   animation: portfolioGatewayOpeningRing 760ms cubic-bezier(0.18, 0.74, 0.16, 1) both;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway-ring {
+  opacity: 0.78;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="pulling-universe"] .portfolio-world-gateway-background {
@@ -664,6 +722,16 @@ button {
   background-size: cover;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::after {
+  opacity: 1;
+  transform: translateZ(0) scale3d(1, 1, 1);
+  filter: none;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-ring {
   visibility: hidden;
@@ -714,6 +782,17 @@ button {
   background-blend-mode: normal;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway::after {
+  opacity: 1;
+  transform: translateZ(0) scale3d(1, 1, 1);
+  filter: none;
+  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: normal;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-background,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway-ring,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .ambient-system::before,
@@ -746,17 +825,17 @@ button {
 @keyframes portfolioGatewayFillOvertake {
   0% {
     transform: translateZ(0) scale3d(1.42, 1.42, 1);
-    opacity: 0.58;
+    opacity: 0.22;
   }
 
   36% {
     transform: translateZ(0) scale3d(2.72, 2.72, 1);
-    opacity: 0.46;
+    opacity: 0.16;
   }
 
   100% {
     transform: translateZ(0) scale3d(5.8, 5.8, 1);
-    opacity: 0.2;
+    opacity: 0.08;
   }
 }
 
@@ -4576,6 +4655,7 @@ button {
 
   .portfolio-world-gateway,
   .portfolio-world-gateway::before,
+  .portfolio-world-gateway::after,
   .portfolio-world-gateway-background,
   .portfolio-world-gateway-ring {
     animation: none !important;
@@ -4656,7 +4736,7 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
-    opacity: 0.58;
+    opacity: 0.12;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before,
@@ -4664,8 +4744,13 @@ button {
     opacity: 1;
   }
 
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::after,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::after {
+    opacity: 1;
+  }
+
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
-    opacity: 0.28;
+    opacity: 0.08;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
