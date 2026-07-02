@@ -218,8 +218,8 @@ button {
   --portfolio-gateway-pull-y: 0rem;
   --portfolio-gateway-reveal-radius: 0rem;
   --portfolio-gateway-reveal-opening-radius: clamp(4.75rem, 14vw, 9.5rem);
-  --portfolio-gateway-reveal-world-radius: clamp(17rem, 64vw, 48rem);
-  --portfolio-gateway-reveal-full-radius: 150vmax;
+  --portfolio-gateway-reveal-world-radius: clamp(28rem, 86vw, 70rem);
+  --portfolio-gateway-reveal-full-radius: 96vmax;
   --portfolio-gateway-reveal-feather: clamp(0.55rem, 1.35vw, 1.2rem);
   --portfolio-gateway-reveal-mask-inner: max(0px, calc(var(--portfolio-gateway-reveal-radius) - var(--portfolio-gateway-reveal-feather)));
   --portfolio-gateway-world-fallback: radial-gradient(ellipse at center, rgb(var(--portfolio-gateway-reveal-rgb) / 0.24) 0, rgb(var(--portfolio-gateway-fill-rgb) / 0.82) 54%, #010105 100%);
@@ -458,12 +458,12 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway::after {
-  opacity: 0.32;
-  transform: translateZ(0) scale3d(1.018, 1.018, 1);
+  opacity: 0.36;
+  transform: translateZ(0) scale3d(1.008, 1.008, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::after {
-  opacity: 0.9;
+  opacity: 0.94;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
@@ -499,11 +499,14 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::after {
   opacity: 1;
-  transform: translateZ(0) scale3d(1.002, 1.002, 1);
+  transform: translateZ(0) scale3d(1, 1, 1);
   filter: none;
   transition:
-    opacity 220ms cubic-bezier(0.2, 0.74, 0.18, 1),
-    transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1);
+    opacity 300ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    --portfolio-gateway-reveal-radius 700ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    -webkit-clip-path 700ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    clip-path 700ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
