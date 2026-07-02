@@ -210,6 +210,10 @@ button {
   --portfolio-gateway-fill-field-alpha: 0.14;
   --portfolio-gateway-pull-x: 0rem;
   --portfolio-gateway-pull-y: 0rem;
+  --portfolio-gateway-reveal-radius: 0rem;
+  --portfolio-gateway-reveal-opening-radius: clamp(3rem, 10vw, 7rem);
+  --portfolio-gateway-reveal-world-radius: clamp(10rem, 42vw, 34rem);
+  --portfolio-gateway-reveal-full-radius: 150vmax;
   --portfolio-gateway-world-fallback: radial-gradient(ellipse at center, rgb(var(--portfolio-gateway-reveal-rgb) / 0.24) 0, rgb(var(--portfolio-gateway-fill-rgb) / 0.82) 54%, #010105 100%);
   position: fixed;
   inset: 0;
@@ -240,11 +244,10 @@ button {
   pointer-events: none;
   background-image:
     radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), transparent 0 clamp(2.8rem, 10vw, 7.5rem), rgba(0, 0, 0, 0.32) clamp(8rem, 24vw, 17rem), rgba(0, 0, 0, 0.72) 100%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.1) 42%, rgba(0, 0, 0, 0.68)),
-    var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
+    linear-gradient(180deg, rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.1) 42%, rgba(0, 0, 0, 0.68));
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 100% 100%, 100% 100%, cover;
+  background-size: 100% 100%, 100% 100%;
   transform: translateZ(0) scale3d(1.07, 1.07, 1);
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
   filter: saturate(1.02) brightness(0.78) contrast(1.08);
@@ -267,10 +270,14 @@ button {
   background-size: cover;
   transform: translateZ(0) scale3d(1.07, 1.07, 1);
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
+  -webkit-clip-path: circle(var(--portfolio-gateway-reveal-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
+  clip-path: circle(var(--portfolio-gateway-reveal-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   filter: none;
   transition:
     opacity 320ms cubic-bezier(0.2, 0.74, 0.18, 1),
-    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
+    transform 620ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    -webkit-clip-path 620ms cubic-bezier(0.18, 0.78, 0.18, 1),
+    clip-path 620ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
 .portfolio-world-gateway-background,
@@ -371,6 +378,7 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="opening-ring"] .portfolio-world-gateway {
   visibility: visible;
   opacity: 1;
+  --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-opening-radius);
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.06) brightness(0.92) contrast(1.04);
   transition-delay: 0ms;
@@ -408,6 +416,7 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="revealing-world"] .portfolio-world-gateway {
   visibility: visible;
   opacity: 1;
+  --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-world-radius);
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.08) brightness(0.9) contrast(1.06);
   transition-delay: 0ms;
@@ -446,6 +455,7 @@ button {
   z-index: 20;
   visibility: visible;
   opacity: 1;
+  --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-full-radius);
   background: transparent;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: saturate(1.03) brightness(1) contrast(1.02);
@@ -463,16 +473,12 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before {
-  opacity: 1;
+  opacity: 0;
   transform: translateZ(0) scale3d(1.002, 1.002, 1);
-  filter: saturate(1) brightness(1) contrast(1);
-  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-blend-mode: normal;
+  filter: none;
+  background: transparent;
   transition:
-    opacity 240ms cubic-bezier(0.2, 0.74, 0.18, 1),
+    opacity 140ms cubic-bezier(0.2, 0.74, 0.18, 1),
     transform 520ms cubic-bezier(0.18, 0.78, 0.18, 1);
 }
 
@@ -486,7 +492,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"][data-portfolio-gateway-world="battleground"] .portfolio-world-gateway::before {
-  opacity: 1;
+  opacity: 0;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-background {
@@ -703,6 +709,7 @@ button {
   z-index: 20;
   visibility: visible;
   opacity: 1;
+  --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-full-radius);
   background: transparent;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: none;
@@ -713,13 +720,10 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::before {
-  opacity: 1;
+  opacity: 0;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: none;
-  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background: transparent;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::after {
@@ -768,17 +772,15 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway {
   background: transparent;
+  --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-full-radius);
   filter: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"].is-portfolio-world-arrived .portfolio-world-gateway::before {
-  opacity: 1;
+  opacity: 0;
   transform: translateZ(0) scale3d(1, 1, 1);
   filter: none;
-  background-image: var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback));
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  background: transparent;
   background-blend-mode: normal;
 }
 
@@ -4661,6 +4663,8 @@ button {
     animation: none !important;
     filter: none !important;
     transform: none;
+    -webkit-clip-path: none;
+    clip-path: none;
     transition:
       opacity 120ms var(--ease-standard),
       visibility 0ms linear 120ms;
@@ -4741,7 +4745,7 @@ button {
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::before,
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::before {
-    opacity: 1;
+    opacity: 0;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway::after,
