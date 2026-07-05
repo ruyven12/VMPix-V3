@@ -931,27 +931,27 @@ button {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-start-radius);
   }
 
-  8% {
+  6% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-spark-radius);
   }
 
-  16% {
+  12% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-continuous-opening-radius);
   }
 
-  30% {
+  24% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-glimpse-radius);
   }
 
-  48% {
+  40% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-large-radius);
   }
 
-  66% {
+  60% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-takeover-radius);
   }
 
-  84% {
+  78% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-pre-full-radius);
   }
 
@@ -962,50 +962,50 @@ button {
 
 @keyframes portfolioGatewayDestinationTimeline {
   0% {
-    opacity: 0.1;
+    opacity: 0.14;
     transform: translateZ(0) scale3d(1.06, 1.06, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-start-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-start-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  8% {
-    opacity: 0.28;
+  6% {
+    opacity: 0.32;
     transform: translateZ(0) scale3d(1.052, 1.052, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-spark-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-spark-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  16% {
-    opacity: 0.5;
+  12% {
+    opacity: 0.54;
     transform: translateZ(0) scale3d(1.044, 1.044, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-continuous-opening-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-continuous-opening-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  30% {
+  24% {
     opacity: 0.74;
-    transform: translateZ(0) scale3d(1.032, 1.032, 1);
+    transform: translateZ(0) scale3d(1.034, 1.034, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-glimpse-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-glimpse-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  48% {
-    opacity: 0.9;
-    transform: translateZ(0) scale3d(1.02, 1.02, 1);
+  40% {
+    opacity: 0.88;
+    transform: translateZ(0) scale3d(1.024, 1.024, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-large-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-large-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  66% {
-    opacity: 0.98;
-    transform: translateZ(0) scale3d(1.01, 1.01, 1);
+  60% {
+    opacity: 0.97;
+    transform: translateZ(0) scale3d(1.012, 1.012, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-takeover-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-takeover-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  84% {
-    opacity: 0.995;
-    transform: translateZ(0) scale3d(1.004, 1.004, 1);
+  78% {
+    opacity: 0.994;
+    transform: translateZ(0) scale3d(1.005, 1.005, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-pre-full-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-pre-full-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
@@ -1020,27 +1020,27 @@ button {
 
 @keyframes portfolioGatewayVeilTimeline {
   0%,
-  6% {
+  4% {
     opacity: 0;
     transform: translateZ(0) scale3d(1.07, 1.07, 1);
   }
 
-  18% {
-    opacity: 0.14;
-    transform: translateZ(0) scale3d(1.05, 1.05, 1);
+  14% {
+    opacity: 0.13;
+    transform: translateZ(0) scale3d(1.052, 1.052, 1);
   }
 
-  36% {
-    opacity: 0.12;
-    transform: translateZ(0) scale3d(1.034, 1.034, 1);
+  30% {
+    opacity: 0.11;
+    transform: translateZ(0) scale3d(1.036, 1.036, 1);
   }
 
-  58% {
-    opacity: 0.06;
-    transform: translateZ(0) scale3d(1.016, 1.016, 1);
+  52% {
+    opacity: 0.055;
+    transform: translateZ(0) scale3d(1.018, 1.018, 1);
   }
 
-  76%,
+  72%,
   100% {
     opacity: 0;
     transform: translateZ(0) scale3d(1.002, 1.002, 1);
@@ -1053,32 +1053,32 @@ button {
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.84, 0.86, 1);
   }
 
-  8% {
-    opacity: 0.72;
+  6% {
+    opacity: 0.7;
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.88, 0.9, 1);
   }
 
-  18% {
+  14% {
     opacity: 0.78;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
-  38% {
+  30% {
     opacity: 0.58;
-    transform: translate3d(0, 0, 0) scale3d(1.12, 1.12, 1);
+    transform: translate3d(0, 0, 0) scale3d(1.14, 1.14, 1);
   }
 
-  58% {
-    opacity: 0.28;
-    transform: translate3d(0, 0, 0) scale3d(1.62, 1.62, 1);
+  50% {
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale3d(1.66, 1.66, 1);
   }
 
-  78% {
-    opacity: 0.1;
+  70% {
+    opacity: 0.11;
     transform: translate3d(0, 0, 0) scale3d(2.28, 2.28, 1);
   }
 
-  94%,
+  90%,
   100% {
     opacity: 0;
     transform: translate3d(0, 0, 0) scale3d(2.74, 2.74, 1);
@@ -1091,32 +1091,32 @@ button {
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.56, 0.6, 1);
   }
 
-  8% {
-    opacity: 0.68;
+  6% {
+    opacity: 0.66;
     transform: translate3d(var(--portfolio-gateway-pull-x), var(--portfolio-gateway-pull-y), 0) scale3d(0.7, 0.74, 1);
   }
 
-  18% {
+  14% {
     opacity: 0.82;
     transform: translate3d(0, 0, 0) scale3d(1.06, 1.06, 1);
   }
 
-  38% {
+  30% {
     opacity: 0.62;
     transform: translate3d(0, 0, 0) scale3d(1.42, 1.42, 1);
   }
 
-  58% {
+  50% {
     opacity: 0.34;
     transform: translate3d(0, 0, 0) scale3d(2.4, 2.4, 1);
   }
 
-  78% {
+  70% {
     opacity: 0.12;
     transform: translate3d(0, 0, 0) scale3d(4.4, 4.4, 1);
   }
 
-  94%,
+  90%,
   100% {
     opacity: 0;
     transform: translate3d(0, 0, 0) scale3d(5.8, 5.8, 1);
@@ -1125,20 +1125,20 @@ button {
 
 @keyframes portfolioGatewayPortfolioFade {
   0%,
-  40% {
+  28% {
     opacity: 1;
   }
 
-  58% {
-    opacity: 0.72;
+  48% {
+    opacity: 0.76;
   }
 
-  74% {
-    opacity: 0.36;
+  68% {
+    opacity: 0.42;
   }
 
-  90% {
-    opacity: 0.08;
+  86% {
+    opacity: 0.12;
   }
 
   100% {
@@ -1148,19 +1148,19 @@ button {
 
 @keyframes portfolioGatewayPortfolioSignalFade {
   0%,
-  24% {
+  16% {
     opacity: 1;
   }
 
-  42% {
-    opacity: 0.56;
+  34% {
+    opacity: 0.58;
   }
 
-  62% {
-    opacity: 0.2;
+  52% {
+    opacity: 0.22;
   }
 
-  74%,
+  66%,
   100% {
     opacity: 0;
   }
