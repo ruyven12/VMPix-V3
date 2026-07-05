@@ -1746,6 +1746,21 @@ button {
   transition-delay: 0ms;
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
+  visibility: visible;
+  opacity: 0.42;
+  pointer-events: none;
+  transform: translate3d(0, 0.34rem, 0) scale3d(0.988, 0.988, 1);
+  transition:
+    opacity 120ms var(--ease-standard),
+    transform 160ms var(--ease-standard),
+    visibility 0ms linear 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-world-gateway-trigger {
+  opacity: 0.38;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
   visibility: hidden;
   opacity: 0;
@@ -5093,6 +5108,13 @@ button {
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway-ring {
     opacity: 0.08;
+  }
+
+  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
+    visibility: visible;
+    opacity: 0.42;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-engine {
