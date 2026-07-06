@@ -218,13 +218,13 @@ button {
   --portfolio-gateway-pull-x: 0rem;
   --portfolio-gateway-pull-y: 0rem;
   --portfolio-gateway-reveal-radius: 0rem;
-  --portfolio-gateway-reveal-start-radius: 5vmax;
-  --portfolio-gateway-reveal-spark-radius: 12vmax;
-  --portfolio-gateway-reveal-continuous-opening-radius: 22vmax;
-  --portfolio-gateway-reveal-glimpse-radius: 38vmax;
-  --portfolio-gateway-reveal-large-radius: 58vmax;
-  --portfolio-gateway-reveal-takeover-radius: 78vmax;
-  --portfolio-gateway-reveal-pre-full-radius: 90vmax;
+  --portfolio-gateway-reveal-start-radius: 7vmax;
+  --portfolio-gateway-reveal-spark-radius: 15vmax;
+  --portfolio-gateway-reveal-continuous-opening-radius: 26vmax;
+  --portfolio-gateway-reveal-glimpse-radius: 37vmax;
+  --portfolio-gateway-reveal-large-radius: 48vmax;
+  --portfolio-gateway-reveal-takeover-radius: 64vmax;
+  --portfolio-gateway-reveal-pre-full-radius: 82vmax;
   --portfolio-gateway-reveal-opening-radius: clamp(4.75rem, 14vw, 9.5rem);
   --portfolio-gateway-reveal-world-radius: clamp(28rem, 86vw, 70rem);
   --portfolio-gateway-reveal-full-radius: 96vmax;
@@ -364,13 +364,13 @@ button {
     --portfolio-gateway-fill-core-alpha: 0.46;
     --portfolio-gateway-fill-signal-alpha: 0.28;
     --portfolio-gateway-fill-field-alpha: 0.18;
-    --portfolio-gateway-reveal-start-radius: 8vmax;
-    --portfolio-gateway-reveal-spark-radius: 18vmax;
-    --portfolio-gateway-reveal-continuous-opening-radius: 30vmax;
-    --portfolio-gateway-reveal-glimpse-radius: 46vmax;
-    --portfolio-gateway-reveal-large-radius: 64vmax;
-    --portfolio-gateway-reveal-takeover-radius: 82vmax;
-    --portfolio-gateway-reveal-pre-full-radius: 92vmax;
+    --portfolio-gateway-reveal-start-radius: 7vmax;
+    --portfolio-gateway-reveal-spark-radius: 15vmax;
+    --portfolio-gateway-reveal-continuous-opening-radius: 27vmax;
+    --portfolio-gateway-reveal-glimpse-radius: 39vmax;
+    --portfolio-gateway-reveal-large-radius: 49vmax;
+    --portfolio-gateway-reveal-takeover-radius: 64vmax;
+    --portfolio-gateway-reveal-pre-full-radius: 82vmax;
   }
 }
 
@@ -884,7 +884,7 @@ button {
   visibility: visible;
   opacity: 1;
   transform: translateZ(0) scale3d(1, 1, 1);
-  animation: portfolioGatewayRevealTimeline var(--portfolio-gateway-continuous-duration) cubic-bezier(0.16, 0.74, 0.18, 1) both;
+  animation: portfolioGatewayRevealTimeline var(--portfolio-gateway-continuous-duration) linear both;
   transition-delay: 0ms;
 }
 
@@ -896,7 +896,7 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .portfolio-world-gateway::after {
   -webkit-mask-image: none;
   mask-image: none;
-  animation: portfolioGatewayDestinationTimeline var(--portfolio-gateway-continuous-duration) cubic-bezier(0.16, 0.74, 0.18, 1) both;
+  animation: portfolioGatewayDestinationTimeline var(--portfolio-gateway-continuous-duration) linear both;
   transition: none;
 }
 
@@ -931,23 +931,23 @@ button {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-start-radius);
   }
 
-  6% {
+  4% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-spark-radius);
   }
 
-  12% {
+  10% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-continuous-opening-radius);
   }
 
-  24% {
+  20% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-glimpse-radius);
   }
 
-  40% {
+  36% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-large-radius);
   }
 
-  60% {
+  58% {
     --portfolio-gateway-reveal-radius: var(--portfolio-gateway-reveal-takeover-radius);
   }
 
@@ -962,49 +962,49 @@ button {
 
 @keyframes portfolioGatewayDestinationTimeline {
   0% {
-    opacity: 0.14;
-    transform: translateZ(0) scale3d(1.06, 1.06, 1);
+    opacity: 0.18;
+    transform: translateZ(0) scale3d(1.055, 1.055, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-start-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-start-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  6% {
-    opacity: 0.32;
-    transform: translateZ(0) scale3d(1.052, 1.052, 1);
+  4% {
+    opacity: 0.38;
+    transform: translateZ(0) scale3d(1.048, 1.048, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-spark-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-spark-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  12% {
-    opacity: 0.54;
-    transform: translateZ(0) scale3d(1.044, 1.044, 1);
+  10% {
+    opacity: 0.58;
+    transform: translateZ(0) scale3d(1.04, 1.04, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-continuous-opening-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-continuous-opening-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  24% {
+  20% {
     opacity: 0.74;
-    transform: translateZ(0) scale3d(1.034, 1.034, 1);
+    transform: translateZ(0) scale3d(1.032, 1.032, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-glimpse-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-glimpse-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  40% {
-    opacity: 0.88;
-    transform: translateZ(0) scale3d(1.024, 1.024, 1);
+  36% {
+    opacity: 0.86;
+    transform: translateZ(0) scale3d(1.023, 1.023, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-large-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-large-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
-  60% {
-    opacity: 0.97;
+  58% {
+    opacity: 0.96;
     transform: translateZ(0) scale3d(1.012, 1.012, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-takeover-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-takeover-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   }
 
   78% {
-    opacity: 0.994;
+    opacity: 0.992;
     transform: translateZ(0) scale3d(1.005, 1.005, 1);
     -webkit-clip-path: circle(var(--portfolio-gateway-reveal-pre-full-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
     clip-path: circle(var(--portfolio-gateway-reveal-pre-full-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
@@ -1125,20 +1125,20 @@ button {
 
 @keyframes portfolioGatewayPortfolioFade {
   0%,
-  28% {
+  18% {
     opacity: 1;
   }
 
-  48% {
-    opacity: 0.76;
+  42% {
+    opacity: 0.82;
   }
 
-  68% {
+  62% {
     opacity: 0.42;
   }
 
-  86% {
-    opacity: 0.12;
+  82% {
+    opacity: 0.14;
   }
 
   100% {
