@@ -2790,8 +2790,8 @@ function showBattlegroundGatewayArrivalSurface() {
   }
   setHubChromeHidden(true);
   setPortfolioActiveWorld("battleground");
-  setCurrentView("Planet Daiion - The Battleground");
-  setPortfolioEngineHudCurrentView("Planet Daiion - The Battleground");
+  setCurrentView("Outskirts of Daiion");
+  setPortfolioEngineHudCurrentView("Outskirts of Daiion");
   setDocumentTitle("The Battleground - Voodoo Media V3.0.01");
   syncPortfolioGatewayTriggerState();
   if (startButton) {
