@@ -1035,29 +1035,29 @@ button {
 
   20% {
     --portfolio-gateway-reveal-radius-vmax: 39;
-    --portfolio-gateway-destination-opacity: 0.78;
+    --portfolio-gateway-destination-opacity: 0.83;
     --portfolio-gateway-destination-scale: 1.032;
-    --portfolio-gateway-portfolio-opacity: 0.94;
-    --portfolio-gateway-signal-opacity: 0.24;
-    --portfolio-gateway-rim-opacity: 0.46;
+    --portfolio-gateway-portfolio-opacity: 0.86;
+    --portfolio-gateway-signal-opacity: 0.18;
+    --portfolio-gateway-rim-opacity: 0.38;
   }
 
   36% {
     --portfolio-gateway-reveal-radius-vmax: 49;
-    --portfolio-gateway-destination-opacity: 0.9;
+    --portfolio-gateway-destination-opacity: 0.94;
     --portfolio-gateway-destination-scale: 1.023;
-    --portfolio-gateway-portfolio-opacity: 0.74;
-    --portfolio-gateway-signal-opacity: 0.08;
-    --portfolio-gateway-rim-opacity: 0.34;
+    --portfolio-gateway-portfolio-opacity: 0.58;
+    --portfolio-gateway-signal-opacity: 0.04;
+    --portfolio-gateway-rim-opacity: 0.26;
   }
 
   58% {
     --portfolio-gateway-reveal-radius-vmax: 64;
-    --portfolio-gateway-destination-opacity: 0.97;
+    --portfolio-gateway-destination-opacity: 0.985;
     --portfolio-gateway-destination-scale: 1.012;
-    --portfolio-gateway-portfolio-opacity: 0.34;
+    --portfolio-gateway-portfolio-opacity: 0.2;
     --portfolio-gateway-signal-opacity: 0;
-    --portfolio-gateway-rim-opacity: 0.2;
+    --portfolio-gateway-rim-opacity: 0.14;
   }
 
   78% {
