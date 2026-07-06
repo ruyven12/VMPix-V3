@@ -13891,13 +13891,13 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 0;
   inset-block-start: 0;
   display: block;
-  width: var(--ember-size, 2px);
+  width: var(--ember-size, 2.6px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 239, 190, 0.94) 0 15%, rgba(255, 121, 39, 0.68) 42%, rgba(156, 24, 10, 0.22) 68%, transparent 74%);
+  background: radial-gradient(circle, rgba(255, 244, 205, 0.98) 0 18%, rgba(255, 137, 48, 0.82) 44%, rgba(176, 37, 13, 0.34) 70%, transparent 78%);
   box-shadow:
-    0 0 0.18rem rgba(255, 112, 37, 0.26),
-    0 0 0.38rem rgba(199, 39, 17, 0.12);
+    0 0 0.22rem rgba(255, 124, 40, 0.36),
+    0 0 0.46rem rgba(199, 42, 17, 0.18);
   opacity: 0;
   transform: translate3d(-50%, -50%, 0) scale3d(0.6, 0.6, 1);
   animation: none;
@@ -13910,39 +13910,39 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .daiion-ember--a {
-  --ember-size: clamp(1.5px, 0.42vw, 2.6px);
+  --ember-size: clamp(2px, 0.58vw, 3.4px);
   --ember-rise: 19svh;
   --ember-drift: -0.34rem;
-  --ember-duration: 8.8s;
+  --ember-duration: 8.4s;
   --ember-delay: -1.4s;
-  --ember-peak-opacity: 0.54;
-  --ember-fade-opacity: 0.22;
+  --ember-peak-opacity: 0.72;
+  --ember-fade-opacity: 0.34;
 }
 
 .daiion-ember--b {
-  --ember-size: clamp(1.2px, 0.34vw, 2px);
+  --ember-size: clamp(1.6px, 0.48vw, 2.8px);
   --ember-rise: 15svh;
   --ember-drift: 0.48rem;
-  --ember-duration: 10.6s;
+  --ember-duration: 9.8s;
   --ember-delay: -5.2s;
-  --ember-peak-opacity: 0.4;
-  --ember-fade-opacity: 0.16;
+  --ember-peak-opacity: 0.58;
+  --ember-fade-opacity: 0.25;
 }
 
 .daiion-ember--c {
-  --ember-size: clamp(1px, 0.28vw, 1.8px);
+  --ember-size: clamp(1.3px, 0.38vw, 2.3px);
   --ember-rise: 22svh;
   --ember-drift: 0.08rem;
-  --ember-duration: 12.4s;
+  --ember-duration: 11.2s;
   --ember-delay: -8.1s;
-  --ember-peak-opacity: 0.32;
-  --ember-fade-opacity: 0.12;
+  --ember-peak-opacity: 0.46;
+  --ember-fade-opacity: 0.18;
 }
 
 .daiion-ember-pocket--two .daiion-ember--a,
 .daiion-ember-pocket--four .daiion-ember--a {
   --ember-rise: 21svh;
-  --ember-duration: 9.6s;
+  --ember-duration: 9s;
 }
 
 .daiion-ember-pocket--three .daiion-ember--b {
@@ -13959,20 +13959,20 @@ button.wrestling-event-history-tagged-thumb {
 
 @keyframes daiionEmberRise {
   0%,
-  18% {
+  14% {
     opacity: 0;
     transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1);
   }
 
-  24% {
+  22% {
     opacity: var(--ember-peak-opacity, 0.42);
   }
 
-  58% {
+  62% {
     opacity: var(--ember-fade-opacity, 0.16);
   }
 
-  78%,
+  82%,
   100% {
     opacity: 0;
     transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 18svh)), 0) scale3d(0.24, 0.24, 1);
