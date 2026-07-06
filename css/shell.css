@@ -5201,6 +5201,214 @@ button {
   filter: none;
 }
 
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+  visibility: visible !important;
+  opacity: 0.52 !important;
+  animation: wrestling2TeslaArcIdleOverlay 9.8s cubic-bezier(0.42, 0, 0.24, 1) infinite !important;
+  transition: none;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main {
+  stroke: rgb(var(--engine-accent-glow) / 0.58);
+  stroke-width: 2.25;
+  opacity: 0.3;
+  filter:
+    drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.32))
+    drop-shadow(0 0 0.24rem rgb(var(--engine-accent-glow) / 0.12));
+  animation: wrestling2TeslaArcIdleField 9.8s cubic-bezier(0.42, 0, 0.24, 1) infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main--center {
+  stroke: rgb(var(--engine-accent-glow) / 0.72);
+  stroke-width: 2.68;
+  opacity: 0.5;
+  animation-name: wrestling2TeslaArcIdleCenter !important;
+  animation-duration: 12.6s !important;
+  animation-delay: -1.7s !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main--upper {
+  stroke: rgb(var(--engine-accent-soft) / 0.5);
+  animation-delay: -3.1s !important;
+  animation-duration: 11.4s !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main--lower {
+  stroke: rgb(var(--engine-accent-glow) / 0.45);
+  animation-delay: -5.8s !important;
+  animation-duration: 13.7s !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-branch {
+  stroke: rgb(var(--engine-accent-soft) / 0.34);
+  stroke-width: 0.82;
+  opacity: 0.12;
+  filter: drop-shadow(0 0 0.07rem rgb(var(--engine-accent-soft) / 0.18));
+  animation: wrestling2TeslaArcIdleBranch 7.6s steps(1, end) infinite !important;
+  animation-delay: calc(var(--engine-lightning-branch-order, 0) * -463ms) !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-branch--alt {
+  stroke: rgb(var(--engine-accent-glow) / 0.3);
+  opacity: 0.1;
+  animation-name: wrestling2TeslaArcIdleBranchAlt !important;
+  animation-duration: 10.9s !important;
+}
+
+@keyframes wrestling2TeslaArcIdleOverlay {
+  0%,
+  18%,
+  42%,
+  74%,
+  100% {
+    opacity: 0.48;
+  }
+
+  28% {
+    opacity: 0.56;
+  }
+
+  61% {
+    opacity: 0.64;
+  }
+
+  64% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes wrestling2TeslaArcIdleField {
+  0%,
+  22%,
+  45%,
+  78%,
+  100% {
+    opacity: 0.24;
+    stroke-width: 2.16;
+  }
+
+  12% {
+    opacity: 0.34;
+    stroke-width: 2.22;
+  }
+
+  58% {
+    opacity: 0.38;
+    stroke-width: 2.28;
+  }
+
+  63% {
+    opacity: 0.46;
+    stroke-width: 2.34;
+  }
+
+  67% {
+    opacity: 0.28;
+    stroke-width: 2.18;
+  }
+}
+
+@keyframes wrestling2TeslaArcIdleCenter {
+  0%,
+  24%,
+  52%,
+  82%,
+  100% {
+    opacity: 0.44;
+    stroke-width: 2.56;
+  }
+
+  15% {
+    opacity: 0.56;
+    stroke-width: 2.66;
+  }
+
+  57% {
+    opacity: 0.68;
+    stroke-width: 2.78;
+  }
+
+  61% {
+    opacity: 0.5;
+    stroke-width: 2.6;
+  }
+}
+
+@keyframes wrestling2TeslaArcIdleBranch {
+  0%,
+  15%,
+  18%,
+  33%,
+  54%,
+  57%,
+  73%,
+  100% {
+    opacity: 0.08;
+  }
+
+  16%,
+  55% {
+    opacity: 0.2;
+  }
+
+  17%,
+  56% {
+    opacity: 0.03;
+  }
+}
+
+@keyframes wrestling2TeslaArcIdleBranchAlt {
+  0%,
+  21%,
+  25%,
+  48%,
+  70%,
+  74%,
+  100% {
+    opacity: 0.06;
+  }
+
+  22%,
+  71% {
+    opacity: 0.17;
+  }
+
+  24%,
+  73% {
+    opacity: 0.1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+    visibility: visible !important;
+    opacity: 0.44 !important;
+    animation: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-branch {
+    animation: none !important;
+    filter: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main {
+    opacity: 0.28;
+    stroke: rgb(var(--engine-accent-glow) / 0.48);
+    stroke-width: 2.16;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-main--center {
+    opacity: 0.44;
+    stroke: rgb(var(--engine-accent-glow) / 0.6);
+    stroke-width: 2.52;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-branch {
+    opacity: 0.08;
+  }
+}
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active :is(.portfolio-engine-left-core, .portfolio-engine-reactor, .portfolio-engine-reactor-ring, .portfolio-engine-reactor-core),
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-left-core::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-left-core::after,
