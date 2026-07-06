@@ -13837,15 +13837,18 @@ button.wrestling-event-history-tagged-thumb {
 
 .daiion-title-reveal {
   position: absolute;
-  inset-inline-start: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left));
-  inset-block-end: max(clamp(2.2rem, 8svh, 5.2rem), env(safe-area-inset-bottom));
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
   z-index: 4;
   display: grid;
+  justify-items: center;
   gap: 0.08rem;
   width: min(34rem, calc(100vw - 2rem));
+  text-align: center;
   pointer-events: none;
   visibility: hidden;
   opacity: 0;
+  transform: translate3d(-50%, -50%, 0);
   isolation: isolate;
 }
 
@@ -13876,7 +13879,7 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   color: rgba(247, 247, 242, 0.96);
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 14vw, 6.8rem);
+  font-size: clamp(2.4125rem, calc(14vw - 3px), 6.6125rem);
   font-weight: 800;
   line-height: 0.9;
   letter-spacing: 0;
