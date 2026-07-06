@@ -181,6 +181,7 @@ let portfolioStarFeedingTimer = 0;
 let portfolioRightEmitterChargingTimer = 0;
 let portfolioRightEmitterReadyTimer = 0;
 let portfolioGatewayPhaseTimer = 0;
+let portfolioGatewayRouteHandoffTimer = 0;
 let portfolioStarFeedAnimationCycle = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
@@ -263,20 +264,84 @@ function isPortfolioGatewayPhaseCurrent(state, worldName, route) {
   );
 }
 
-function handoffPortfolioGatewayRoute(worldName) {
-  if (
-    worldName !== "battleground" ||
-    !routePaths.wrestling2 ||
-    window.location.pathname === routePaths.wrestling2 ||
-    typeof pushRouteUrl !== "function"
-  ) {
+function clearPortfolioGatewayRouteHandoffTimer() {
+  window.clearTimeout(portfolioGatewayRouteHandoffTimer);
+  portfolioGatewayRouteHandoffTimer = 0;
+}
+
+function getPortfolioGatewayRouteHandoffTarget() {
+  return routePaths.wrestling2 || "/wrestling2";
+}
+
+function isPortfolioGatewayRouteHandoffReady(worldName) {
+  const gatewayWorld = shell?.dataset.portfolioGatewayWorld || worldName || getPortfolioGatewayActiveWorld();
+  return Boolean(
+    shell &&
+    gatewayWorld === "battleground" &&
+    shell.dataset.portfolioGatewayState === "filling-screen" &&
+    shell.classList.contains("is-portfolio-world-gateway-active") &&
+    shell.classList.contains("is-portfolio-world-arrived")
+  );
+}
+
+function updatePortfolioGatewayRouteHandoffUrl(targetUrl, method = "push") {
+  const handoffState = {
+    fromPortfolioGateway: true,
+    portfolioGatewayWorld: "battleground",
+  };
+
+  if (method === "replace" && typeof replaceRouteUrl === "function") {
+    replaceRouteUrl(targetUrl, handoffState);
     return;
   }
 
-  pushRouteUrl(routePaths.wrestling2, {
-    fromPortfolioGateway: true,
-    portfolioGatewayWorld: worldName,
-  });
+  if (method === "push" && typeof pushRouteUrl === "function") {
+    pushRouteUrl(targetUrl, handoffState);
+    return;
+  }
+
+  const historyMethod = method === "replace" ? "replaceState" : "pushState";
+  if (!window.history || typeof window.history[historyMethod] !== "function") {
+    return;
+  }
+
+  window.history[historyMethod]({ ...handoffState, route: targetUrl }, "", targetUrl);
+}
+
+function confirmPortfolioGatewayRouteHandoff(worldName) {
+  portfolioGatewayRouteHandoffTimer = 0;
+  if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
+    return;
+  }
+
+  const targetUrl = getPortfolioGatewayRouteHandoffTarget();
+  if (window.location.pathname !== targetUrl) {
+    updatePortfolioGatewayRouteHandoffUrl(targetUrl, "replace");
+  }
+
+  shell.dataset.portfolioGatewayHandoff = "complete";
+}
+
+function handoffPortfolioGatewayRoute(worldName) {
+  if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
+    return;
+  }
+
+  const handoffState = shell.dataset.portfolioGatewayHandoff;
+  if (handoffState === "pushed" || handoffState === "complete") {
+    return;
+  }
+
+  const targetUrl = getPortfolioGatewayRouteHandoffTarget();
+  shell.dataset.portfolioGatewayHandoff = "pushed";
+  if (window.location.pathname !== targetUrl) {
+    updatePortfolioGatewayRouteHandoffUrl(targetUrl);
+  }
+
+  clearPortfolioGatewayRouteHandoffTimer();
+  portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
+    confirmPortfolioGatewayRouteHandoff(worldName);
+  }, 320);
 }
 
 function completePortfolioGatewayWorldArrival(worldName, route) {
@@ -384,18 +449,29 @@ function queuePortfolioGatewayPullingUniverse(worldName, route) {
   }, delay);
 }
 
-function clearPortfolioGatewayFocusState() {
-  if (!shell || shell.dataset.portfolioGatewayState !== "focusing-star") {
+function clearPortfolioGatewayState() {
+  if (!shell) {
     return false;
   }
 
+  const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
   clearPortfolioGatewayPhaseTimer();
+  clearPortfolioGatewayRouteHandoffTimer();
+  delete shell.dataset.portfolioGatewayHandoff;
   shell.classList.remove("is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
   shell.dataset.portfolioGatewayWorld = "";
   shell.dataset.portfolioGatewayRoute = "";
   shell.dataset.portfolioGatewayState = "idle";
   clearPortfolioGatewayWorldBackground();
-  return true;
+  return wasActive;
+}
+
+function clearPortfolioGatewayFocusState() {
+  if (!shell || shell.dataset.portfolioGatewayState !== "focusing-star") {
+    return false;
+  }
+
+  return clearPortfolioGatewayState();
 }
 
 function shouldEnablePortfolioGatewayTrigger() {
@@ -444,6 +520,8 @@ function startPortfolioWorldGateway() {
   }
 
   clearPortfolioGatewayPhaseTimer();
+  clearPortfolioGatewayRouteHandoffTimer();
+  delete shell.dataset.portfolioGatewayHandoff;
   shell.classList.remove("is-portfolio-world-arrived");
   applyPortfolioGatewayWorldBackground(activeWorld);
   shell.dataset.portfolioGatewayWorld = activeWorld;
@@ -2474,6 +2552,7 @@ function showPortfolioHubView() {
     return;
   }
 
+  clearPortfolioGatewayState();
   shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   if (modulePlaceholder) {
     modulePlaceholder.setAttribute("aria-hidden", "true");
