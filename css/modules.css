@@ -13865,12 +13865,12 @@ button.wrestling-event-history-tagged-thumb {
   --ember-pocket-x: 14%;
   --ember-pocket-y: 88%;
   --heat-width: clamp(1.65rem, 6vw, 3.35rem);
-  --heat-height: clamp(3.1rem, 8svh, 4.9rem);
+  --heat-height: clamp(3.4rem, 8.8svh, 5.3rem);
   --heat-drift: -0.18rem;
   --heat-drift-start: 0.08rem;
   --heat-skew: -1.2deg;
-  --heat-duration: 10.8s;
-  --heat-duration-soft: 14.2s;
+  --heat-duration: 9.2s;
+  --heat-duration-soft: 12.8s;
   --heat-delay: -2.7s;
 }
 
@@ -13878,12 +13878,12 @@ button.wrestling-event-history-tagged-thumb {
   --ember-pocket-x: 27%;
   --ember-pocket-y: 80%;
   --heat-width: clamp(1.9rem, 7vw, 3.8rem);
-  --heat-height: clamp(3.7rem, 9.4svh, 5.7rem);
+  --heat-height: clamp(4rem, 10.2svh, 6.2rem);
   --heat-drift: 0.24rem;
   --heat-drift-start: -0.12rem;
   --heat-skew: 1.1deg;
-  --heat-duration: 12.6s;
-  --heat-duration-soft: 15.8s;
+  --heat-duration: 10.9s;
+  --heat-duration-soft: 14s;
   --heat-delay: -6.1s;
 }
 
@@ -13891,12 +13891,12 @@ button.wrestling-event-history-tagged-thumb {
   --ember-pocket-x: 43%;
   --ember-pocket-y: 76%;
   --heat-width: clamp(2rem, 7.6vw, 4rem);
-  --heat-height: clamp(4rem, 10svh, 6rem);
+  --heat-height: clamp(4.3rem, 10.8svh, 6.6rem);
   --heat-drift: -0.26rem;
   --heat-drift-start: 0.14rem;
   --heat-skew: -0.8deg;
-  --heat-duration: 13.4s;
-  --heat-duration-soft: 16.6s;
+  --heat-duration: 11.6s;
+  --heat-duration-soft: 14.8s;
   --heat-delay: -8.3s;
 }
 
@@ -13904,12 +13904,12 @@ button.wrestling-event-history-tagged-thumb {
   --ember-pocket-x: 63%;
   --ember-pocket-y: 82%;
   --heat-width: clamp(1.85rem, 7vw, 3.7rem);
-  --heat-height: clamp(3.5rem, 8.8svh, 5.35rem);
+  --heat-height: clamp(3.8rem, 9.6svh, 5.85rem);
   --heat-drift: 0.2rem;
   --heat-drift-start: -0.1rem;
   --heat-skew: 1.4deg;
-  --heat-duration: 11.7s;
-  --heat-duration-soft: 15.1s;
+  --heat-duration: 10.1s;
+  --heat-duration-soft: 13.4s;
   --heat-delay: -4.4s;
 }
 
@@ -13917,12 +13917,12 @@ button.wrestling-event-history-tagged-thumb {
   --ember-pocket-x: 86%;
   --ember-pocket-y: 88%;
   --heat-width: clamp(1.55rem, 5.8vw, 3.15rem);
-  --heat-height: clamp(2.9rem, 7.4svh, 4.55rem);
+  --heat-height: clamp(3.2rem, 8.2svh, 5rem);
   --heat-drift: -0.16rem;
   --heat-drift-start: 0.06rem;
   --heat-skew: -1deg;
-  --heat-duration: 12.9s;
-  --heat-duration-soft: 16.2s;
+  --heat-duration: 11.2s;
+  --heat-duration-soft: 14.5s;
   --heat-delay: -9.5s;
 }
 
@@ -13939,8 +13939,8 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
   opacity: 0;
   background:
-    linear-gradient(90deg, transparent 0 34%, rgba(255, 210, 160, 0.026) 43%, rgba(255, 244, 218, 0.034) 50%, rgba(255, 158, 88, 0.02) 58%, transparent 68% 100%),
-    radial-gradient(ellipse at 50% 100%, rgba(255, 118, 42, 0.038) 0 12%, rgba(255, 156, 76, 0.02) 36%, transparent 72%);
+    linear-gradient(90deg, transparent 0 34%, rgba(255, 210, 160, 0.044) 43%, rgba(255, 244, 218, 0.058) 50%, rgba(255, 158, 88, 0.034) 58%, transparent 68% 100%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 118, 42, 0.062) 0 12%, rgba(255, 156, 76, 0.034) 36%, transparent 72%);
   clip-path: polygon(40% 100%, 58% 100%, 64% 78%, 56% 52%, 61% 24%, 50% 0, 41% 26%, 47% 54%, 36% 78%);
   mix-blend-mode: screen;
   transform: translate3d(var(--heat-drift-start, 0), 0, 0) skewX(var(--heat-skew, -1.4deg)) scale3d(0.92, 0.94, 1);
@@ -13954,8 +13954,8 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: calc(var(--heat-width, 3rem) * 0.72);
   block-size: calc(var(--heat-height, 10svh) * 0.78);
   background:
-    linear-gradient(92deg, transparent 0 40%, rgba(255, 236, 206, 0.025) 48%, rgba(255, 130, 58, 0.018) 56%, transparent 66% 100%),
-    radial-gradient(ellipse at 48% 100%, rgba(255, 92, 37, 0.03) 0 14%, transparent 68%);
+    linear-gradient(92deg, transparent 0 40%, rgba(255, 236, 206, 0.043) 48%, rgba(255, 130, 58, 0.032) 56%, transparent 66% 100%),
+    radial-gradient(ellipse at 48% 100%, rgba(255, 92, 37, 0.05) 0 14%, transparent 68%);
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::before {
@@ -13977,17 +13977,17 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   38% {
-    opacity: 0.18;
+    opacity: 0.28;
   }
 
   58% {
-    opacity: 0.07;
-    transform: translate3d(var(--heat-drift, 0.18rem), -0.36rem, 0) skewX(calc(var(--heat-skew, -1deg) * -0.42)) scale3d(1.04, 1.02, 1);
+    opacity: 0.12;
+    transform: translate3d(var(--heat-drift, 0.18rem), -0.52rem, 0) skewX(calc(var(--heat-skew, -1deg) * -0.42)) scale3d(1.09, 1.08, 1);
   }
 
   76% {
-    opacity: 0.025;
-    transform: translate3d(calc(var(--heat-drift, 0.18rem) * -0.4), -0.72rem, 0) skewX(var(--heat-skew, -1deg)) scale3d(0.96, 1.08, 1);
+    opacity: 0.045;
+    transform: translate3d(calc(var(--heat-drift, 0.18rem) * -0.4), -1.02rem, 0) skewX(var(--heat-skew, -1deg)) scale3d(0.98, 1.16, 1);
   }
 }
 
@@ -14000,12 +14000,12 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   46% {
-    opacity: 0.11;
+    opacity: 0.17;
   }
 
   68% {
-    opacity: 0.035;
-    transform: translate3d(calc(var(--heat-drift, 0.18rem) * 0.7), -0.48rem, 0) skewX(calc(var(--heat-skew, -1deg) * 0.4)) scale3d(1, 1.04, 1);
+    opacity: 0.065;
+    transform: translate3d(calc(var(--heat-drift, 0.18rem) * 0.7), -0.72rem, 0) skewX(calc(var(--heat-skew, -1deg) * 0.4)) scale3d(1.04, 1.1, 1);
   }
 }
 
