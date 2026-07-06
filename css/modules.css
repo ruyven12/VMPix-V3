@@ -13835,6 +13835,112 @@ button.wrestling-event-history-tagged-thumb {
 
 
 
+.daiion-title-reveal {
+  position: absolute;
+  inset-inline-start: max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left));
+  inset-block-end: max(clamp(2.2rem, 8svh, 5.2rem), env(safe-area-inset-bottom));
+  z-index: 4;
+  display: grid;
+  gap: 0.08rem;
+  width: min(34rem, calc(100vw - 2rem));
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  isolation: isolate;
+}
+
+.daiion-title-reveal__planet,
+.daiion-title-reveal__name {
+  display: block;
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  will-change: opacity, transform;
+}
+
+.daiion-title-reveal__planet {
+  color: rgba(255, 214, 202, 0.86);
+  font-family: var(--font-display);
+  font-size: clamp(0.72rem, 1.8vw, 0.86rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-shadow:
+    0 0 0.55rem rgba(214, 30, 34, 0.38),
+    0 0 1.35rem rgba(135, 11, 16, 0.22);
+}
+
+.daiion-title-reveal__name {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  overflow: hidden;
+  color: rgba(247, 247, 242, 0.96);
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 14vw, 6.8rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-shadow:
+    0 0 0.72rem rgba(255, 255, 255, 0.12),
+    0 0 1.6rem rgba(255, 94, 52, 0.14),
+    0 0 2.4rem rgba(0, 0, 0, 0.72);
+  background:
+    linear-gradient(108deg, transparent 0 42%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.18) 54%, transparent 62% 100%) -150% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(210, 207, 198, 0.96) 31%, rgba(104, 99, 92, 0.98) 54%, rgba(248, 246, 238, 0.98) 74%, rgba(157, 151, 139, 0.96) 100%) 0 0 / 100% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
+  visibility: visible;
+  opacity: 1;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
+  animation: daiionTitleReveal 700ms ease-out both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
+  animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
+}
+
+
+@keyframes daiionTitleReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes daiionTitleMetalGlint {
+  0% {
+    background-position: -150% 0, 0 0;
+  }
+
+  100% {
+    background-position: 150% 0, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    animation: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
+    background-position: 150% 0, 0 0;
+  }
+}
 .site-shell.is-placeholder-view .module-placeholder,
 .site-shell.is-music-nexus-view .music-nexus-shell,
 .site-shell.is-ring-archive-view .ring-archive-shell,
