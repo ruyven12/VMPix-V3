@@ -433,6 +433,9 @@ function startPortfolioWorldGateway() {
   shell.dataset.portfolioGatewayRoute = route;
   shell.dataset.portfolioGatewayState = "focusing-star";
   shell.classList.add("is-portfolio-world-gateway-active");
+  clearPortfolioEngineScan();
+  clearPortfolioStarEmitterChargeState();
+  stopPortfolioEngineLightning();
   fadePortfolioEngineProjectionForGateway();
   queuePortfolioGatewayPullingUniverse(activeWorld, route);
   syncPortfolioGatewayTriggerState();
@@ -777,6 +780,7 @@ function shouldRunPortfolioEngineLightning() {
     portfolioEngineLightningMainPath &&
     portfolioEngineLightningMainPaths.length >= ENGINE_LIGHTNING_PRIMARY_BOLTS.length &&
     !isPortfolioEngineReducedMotion() &&
+    !isPortfolioGatewayActive() &&
     shell?.dataset.portfolioEngineReady === "true"
   );
 }
