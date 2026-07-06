@@ -13891,69 +13891,187 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 0;
   inset-block-start: 0;
   display: block;
-  width: var(--ember-size, 2.6px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 244, 205, 0.98) 0 18%, rgba(255, 137, 48, 0.82) 44%, rgba(176, 37, 13, 0.34) 70%, transparent 78%);
+  width: var(--ember-size, 1.8px);
+  aspect-ratio: var(--ember-aspect, 0.86);
+  border-radius: 44% 56% 51% 49%;
+  background:
+    radial-gradient(circle at 42% 38%, rgba(255, 241, 199, var(--ember-core-alpha, 0.78)) 0 12%, transparent 27%),
+    radial-gradient(circle at 56% 54%, rgba(255, 126, 42, var(--ember-heat-alpha, 0.5)) 0 42%, rgba(132, 28, 12, var(--ember-ash-alpha, 0.24)) 64%, transparent 78%);
   box-shadow:
-    0 0 0.22rem rgba(255, 124, 40, 0.36),
-    0 0 0.46rem rgba(199, 42, 17, 0.18);
+    0 0 var(--ember-inner-glow, 0.14rem) rgba(255, 117, 36, var(--ember-glow-alpha, 0.22)),
+    0 0 var(--ember-outer-glow, 0.28rem) rgba(180, 36, 16, var(--ember-haze-alpha, 0.1));
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) scale3d(0.6, 0.6, 1);
+  transform: translate3d(-50%, -50%, 0) scale3d(0.52, 0.52, 1) rotate(var(--ember-tilt, 0deg));
+  transform-origin: 50% 55%;
   animation: none;
   animation-delay: var(--ember-delay, 0s);
   will-change: opacity, transform;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
-  animation: daiionEmberRise var(--ember-duration, 8s) cubic-bezier(0.26, 0.64, 0.34, 1) infinite;
+  animation: var(--ember-animation, daiionEmberRise) var(--ember-duration, 8s) cubic-bezier(0.24, 0.62, 0.34, 1) infinite;
 }
 
 .daiion-ember--a {
-  --ember-size: clamp(2px, 0.58vw, 3.4px);
-  --ember-rise: 19svh;
-  --ember-drift: -0.34rem;
-  --ember-duration: 8.4s;
+  --ember-size: clamp(1.7px, 0.46vw, 2.8px);
+  --ember-aspect: 0.82;
+  --ember-rise: 17svh;
+  --ember-mid-rise: 8.5svh;
+  --ember-drift: -0.42rem;
+  --ember-mid-drift: 0.1rem;
+  --ember-duration: 8.6s;
   --ember-delay: -1.4s;
-  --ember-peak-opacity: 0.72;
-  --ember-fade-opacity: 0.34;
+  --ember-peak-opacity: 0.5;
+  --ember-fade-opacity: 0.2;
+  --ember-core-alpha: 0.76;
+  --ember-heat-alpha: 0.48;
+  --ember-glow-alpha: 0.2;
+  --ember-tilt: -8deg;
 }
 
 .daiion-ember--b {
-  --ember-size: clamp(1.6px, 0.48vw, 2.8px);
-  --ember-rise: 15svh;
-  --ember-drift: 0.48rem;
-  --ember-duration: 9.8s;
+  --ember-size: clamp(1.35px, 0.36vw, 2.2px);
+  --ember-aspect: 0.92;
+  --ember-rise: 13svh;
+  --ember-mid-rise: 6.5svh;
+  --ember-drift: 0.34rem;
+  --ember-mid-drift: -0.08rem;
+  --ember-duration: 7.8s;
   --ember-delay: -5.2s;
-  --ember-peak-opacity: 0.58;
-  --ember-fade-opacity: 0.25;
+  --ember-peak-opacity: 0.38;
+  --ember-fade-opacity: 0.12;
+  --ember-core-alpha: 0.64;
+  --ember-heat-alpha: 0.36;
+  --ember-glow-alpha: 0.15;
+  --ember-animation: daiionEmberRiseShort;
+  --ember-tilt: 11deg;
 }
 
 .daiion-ember--c {
-  --ember-size: clamp(1.3px, 0.38vw, 2.3px);
-  --ember-rise: 22svh;
-  --ember-drift: 0.08rem;
-  --ember-duration: 11.2s;
+  --ember-size: clamp(1px, 0.28vw, 1.7px);
+  --ember-aspect: 0.78;
+  --ember-rise: 11svh;
+  --ember-mid-rise: 5.2svh;
+  --ember-drift: -0.18rem;
+  --ember-mid-drift: 0.14rem;
+  --ember-duration: 6.9s;
   --ember-delay: -8.1s;
-  --ember-peak-opacity: 0.46;
-  --ember-fade-opacity: 0.18;
+  --ember-peak-opacity: 0.28;
+  --ember-fade-opacity: 0.07;
+  --ember-core-alpha: 0.52;
+  --ember-heat-alpha: 0.28;
+  --ember-glow-alpha: 0.1;
+  --ember-haze-alpha: 0.06;
+  --ember-animation: daiionEmberRiseShort;
+  --ember-tilt: -15deg;
+}
+
+.daiion-ember-pocket--one .daiion-ember--a {
+  --ember-drift: -0.28rem;
+  --ember-mid-drift: 0.18rem;
+  --ember-duration: 8.2s;
+}
+
+.daiion-ember-pocket--one .daiion-ember--b {
+  --ember-drift: 0.42rem;
+  --ember-delay: -4.8s;
+}
+
+.daiion-ember-pocket--one .daiion-ember--c {
+  --ember-rise: 9.5svh;
+  --ember-drift: -0.12rem;
+  --ember-delay: -6.2s;
 }
 
 .daiion-ember-pocket--two .daiion-ember--a,
 .daiion-ember-pocket--four .daiion-ember--a {
+  --ember-size: clamp(2px, 0.55vw, 3.2px);
   --ember-rise: 21svh;
-  --ember-duration: 9s;
+  --ember-mid-rise: 10svh;
+  --ember-duration: 10.6s;
+  --ember-peak-opacity: 0.68;
+  --ember-fade-opacity: 0.26;
+  --ember-core-alpha: 0.9;
+  --ember-heat-alpha: 0.62;
+  --ember-glow-alpha: 0.28;
+  --ember-haze-alpha: 0.16;
+  --ember-inner-glow: 0.18rem;
+  --ember-outer-glow: 0.38rem;
+  --ember-animation: daiionEmberRiseLong;
+}
+
+.daiion-ember-pocket--two .daiion-ember--b {
+  --ember-rise: 12svh;
+  --ember-drift: 0.24rem;
+  --ember-delay: -6.6s;
+}
+
+.daiion-ember-pocket--two .daiion-ember--c {
+  --ember-rise: 10svh;
+  --ember-drift: -0.32rem;
+  --ember-duration: 6.4s;
+}
+
+.daiion-ember-pocket--three .daiion-ember--a {
+  --ember-rise: 16svh;
+  --ember-drift: 0.3rem;
+  --ember-delay: -2.6s;
 }
 
 .daiion-ember-pocket--three .daiion-ember--b {
-  --ember-rise: 18svh;
-  --ember-drift: -0.62rem;
+  --ember-size: clamp(1.9px, 0.5vw, 3px);
+  --ember-rise: 20svh;
+  --ember-mid-rise: 9.5svh;
+  --ember-drift: -0.54rem;
+  --ember-mid-drift: 0.16rem;
+  --ember-duration: 10.2s;
   --ember-delay: -3.7s;
+  --ember-peak-opacity: 0.62;
+  --ember-fade-opacity: 0.24;
+  --ember-core-alpha: 0.86;
+  --ember-heat-alpha: 0.58;
+  --ember-glow-alpha: 0.24;
+  --ember-animation: daiionEmberRiseLong;
+}
+
+.daiion-ember-pocket--three .daiion-ember--c {
+  --ember-rise: 12svh;
+  --ember-drift: 0.22rem;
+  --ember-delay: -9.2s;
+}
+
+.daiion-ember-pocket--four .daiion-ember--a {
+  --ember-drift: 0.46rem;
+  --ember-mid-drift: -0.2rem;
+}
+
+.daiion-ember-pocket--four .daiion-ember--b {
+  --ember-rise: 14svh;
+  --ember-drift: -0.38rem;
+  --ember-delay: -1.8s;
+}
+
+.daiion-ember-pocket--four .daiion-ember--c {
+  --ember-rise: 10.5svh;
+  --ember-drift: 0.18rem;
+  --ember-duration: 7.2s;
+}
+
+.daiion-ember-pocket--five .daiion-ember--a {
+  --ember-rise: 15svh;
+  --ember-drift: -0.36rem;
+  --ember-delay: -7.2s;
+}
+
+.daiion-ember-pocket--five .daiion-ember--b {
+  --ember-rise: 12svh;
+  --ember-drift: 0.28rem;
+  --ember-duration: 7.4s;
 }
 
 .daiion-ember-pocket--five .daiion-ember--c {
-  --ember-rise: 13svh;
-  --ember-drift: -0.42rem;
+  --ember-rise: 8.8svh;
+  --ember-drift: -0.28rem;
   --ember-delay: -6.4s;
 }
 
@@ -13961,24 +14079,70 @@ button.wrestling-event-history-tagged-thumb {
   0%,
   14% {
     opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1);
+    transform: translate3d(-50%, -50%, 0) scale3d(0.5, 0.5, 1) rotate(var(--ember-tilt, 0deg));
   }
 
-  22% {
+  23% {
     opacity: var(--ember-peak-opacity, 0.42);
   }
 
-  62% {
+  52% {
     opacity: var(--ember-fade-opacity, 0.16);
+    transform: translate3d(calc(-50% + var(--ember-mid-drift, 0px)), calc(-50% - var(--ember-mid-rise, 7svh)), 0) scale3d(0.78, 0.78, 1) rotate(calc(var(--ember-tilt, 0deg) * -0.35));
   }
 
-  82%,
+  80%,
   100% {
     opacity: 0;
-    transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 18svh)), 0) scale3d(0.24, 0.24, 1);
+    transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 16svh)), 0) scale3d(0.22, 0.22, 1) rotate(calc(var(--ember-tilt, 0deg) * 0.7));
   }
 }
 
+@keyframes daiionEmberRiseShort {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.46, 0.46, 1) rotate(var(--ember-tilt, 0deg));
+  }
+
+  25% {
+    opacity: var(--ember-peak-opacity, 0.32);
+  }
+
+  45% {
+    opacity: var(--ember-fade-opacity, 0.1);
+    transform: translate3d(calc(-50% + var(--ember-mid-drift, 0px)), calc(-50% - var(--ember-mid-rise, 5svh)), 0) scale3d(0.62, 0.62, 1) rotate(calc(var(--ember-tilt, 0deg) * -0.28));
+  }
+
+  66%,
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 10svh)), 0) scale3d(0.16, 0.16, 1) rotate(calc(var(--ember-tilt, 0deg) * 0.62));
+  }
+}
+
+@keyframes daiionEmberRiseLong {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.54, 0.54, 1) rotate(var(--ember-tilt, 0deg));
+  }
+
+  24% {
+    opacity: var(--ember-peak-opacity, 0.62);
+  }
+
+  64% {
+    opacity: var(--ember-fade-opacity, 0.24);
+    transform: translate3d(calc(-50% + var(--ember-mid-drift, 0px)), calc(-50% - var(--ember-mid-rise, 10svh)), 0) scale3d(0.82, 0.82, 1) rotate(calc(var(--ember-tilt, 0deg) * -0.32));
+  }
+
+  88%,
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 21svh)), 0) scale3d(0.2, 0.2, 1) rotate(calc(var(--ember-tilt, 0deg) * 0.78));
+  }
+}
 .daiion-title-reveal {
   position: absolute;
   inset-inline-start: 50%;
