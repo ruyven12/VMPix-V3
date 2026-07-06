@@ -13944,6 +13944,32 @@ button.wrestling-event-history-tagged-thumb {
     background-position: 150% 0, 0 0;
   }
 }
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+  transition:
+    opacity 520ms ease-out 2200ms,
+    transform 620ms cubic-bezier(0.18, 0.86, 0.16, 1) 2200ms,
+    visibility 0ms linear 2200ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
+  cursor: default;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+    transition: none !important;
+  }
+}
 .site-shell.is-placeholder-view .module-placeholder,
 .site-shell.is-music-nexus-view .music-nexus-shell,
 .site-shell.is-ring-archive-view .ring-archive-shell,
