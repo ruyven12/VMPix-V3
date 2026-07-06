@@ -1967,6 +1967,7 @@ const routePaths = {
   musicPeople: "/music/people",
   musicVenues: "/music/venues",
   wrestling: "/wrestling",
+  wrestling2: "/wrestling2",
   wrestlingPeople: "/wrestling/people",
   wrestlingVenues: "/wrestling/venues",
   wrestlingShows: "/wrestling/shows",

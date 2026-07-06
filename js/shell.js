@@ -263,6 +263,22 @@ function isPortfolioGatewayPhaseCurrent(state, worldName, route) {
   );
 }
 
+function handoffPortfolioGatewayRoute(worldName) {
+  if (
+    worldName !== "battleground" ||
+    !routePaths.wrestling2 ||
+    window.location.pathname === routePaths.wrestling2 ||
+    typeof pushRouteUrl !== "function"
+  ) {
+    return;
+  }
+
+  pushRouteUrl(routePaths.wrestling2, {
+    fromPortfolioGateway: true,
+    portfolioGatewayWorld: worldName,
+  });
+}
+
 function completePortfolioGatewayWorldArrival(worldName, route) {
   portfolioGatewayPhaseTimer = 0;
   if (!isPortfolioGatewayPhaseCurrent("filling-screen", worldName, route)) {
@@ -271,6 +287,7 @@ function completePortfolioGatewayWorldArrival(worldName, route) {
 
   shell.classList.add("is-portfolio-world-arrived");
   syncPortfolioGatewayTriggerState();
+  handoffPortfolioGatewayRoute(worldName);
 }
 
 function queuePortfolioGatewayWorldArrival(worldName, route) {
