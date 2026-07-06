@@ -13956,6 +13956,11 @@ button.wrestling-event-history-tagged-thumb {
     visibility 0ms linear 2200ms;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
+  justify-items: center;
+  text-align: center;
+}
+
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
   cursor: default;
   pointer-events: none !important;
