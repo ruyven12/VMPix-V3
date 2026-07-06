@@ -33,7 +33,6 @@ const modulePlaceholderKicker = document.querySelector("[data-module-placeholder
 const modulePlaceholderTitle = document.querySelector("[data-module-placeholder-title]");
 const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-copy]");
 const moduleBack = document.querySelector("[data-module-back]");
-const daiionArrivalShell = document.querySelector("[data-daiion-arrival-shell]");
 const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
 const musicNexusLanding = document.querySelector("[data-music-nexus-landing]");
 const musicLandingRouteCards = document.querySelectorAll("[data-music-landing-route]");
@@ -2080,11 +2079,11 @@ const shellRouteRegistry = [
   {
     id: "wrestling2",
     route: routePaths.wrestling2,
-    label: "DAÏION",
+    label: "Battleground",
     parentSection: "Portfolio",
     moduleType: "module",
     drawerGroup: "wrestling",
-    breadcrumbLabel: "DAÏION",
+    breadcrumbLabel: "Battleground",
     bottomRailEligible: true,
     drawerVariant: "module",
   },

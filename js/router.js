@@ -310,7 +310,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling2") {
-    showDaiionArrivalSurface();
+    showBattlegroundGatewayArrivalSurface();
     return;
   }
 

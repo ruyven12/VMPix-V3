@@ -13834,80 +13834,8 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 
-.daiion-arrival-shell {
-  position: relative;
-  z-index: 2;
-  grid-column: 1;
-  grid-row: 1 / -1;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  align-items: end;
-  justify-items: start;
-  padding:
-    max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-top))
-    max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-right))
-    max(clamp(4.8rem, 11svh, 6.4rem), calc(var(--rail-total-height, 4rem) + 1.25rem))
-    max(clamp(1rem, 4vw, 1.5rem), env(safe-area-inset-left));
-  background:
-    linear-gradient(90deg, rgba(4, 0, 0, 0.74) 0%, rgba(9, 1, 1, 0.28) 34%, transparent 68%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.04) 54%),
-    url("/assets/media/background/battleground-main.png") center / cover no-repeat,
-    #090101;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transform: translate3d(0, 0.22rem, 0);
-  transition:
-    opacity var(--motion-standard) var(--ease-standard),
-    transform var(--motion-standard) var(--ease-standard),
-    visibility var(--motion-standard) var(--ease-standard);
-  visibility: hidden;
-  isolation: isolate;
-}
-
-.daiion-arrival-shell::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse at 18% 82%, rgba(213, 22, 34, 0.24), transparent 42%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.42));
-  content: "";
-  pointer-events: none;
-}
-
-.daiion-arrival-identifier {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 0.1rem;
-  text-transform: uppercase;
-  text-shadow: 0 0 1.15rem rgba(0, 0, 0, 0.92);
-}
-
-.daiion-arrival-kicker {
-  color: rgba(247, 247, 242, 0.72);
-  font-size: clamp(0.72rem, 1.8vw, 0.86rem);
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  line-height: 1;
-}
-
-.daiion-arrival-title {
-  margin: 0;
-  color: rgba(247, 247, 242, 0.96);
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 14vw, 6.8rem);
-  font-weight: 800;
-  letter-spacing: 0;
-  line-height: 0.9;
-}
 
 .site-shell.is-placeholder-view .module-placeholder,
-.site-shell.is-daiion-arrival-view .daiion-arrival-shell,
 .site-shell.is-music-nexus-view .music-nexus-shell,
 .site-shell.is-ring-archive-view .ring-archive-shell,
 .site-shell.is-wrestling-people-view .wrestling-people-shell,

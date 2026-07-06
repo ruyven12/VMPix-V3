@@ -232,6 +232,76 @@ function clearPortfolioGatewayWorldBackground() {
   portfolioWorldGateway?.style.removeProperty("--portfolio-gateway-world-image");
 }
 
+const PORTFOLIO_GATEWAY_SETTLED_SHELL_PROPERTIES = [
+  ["--portfolio-gateway-reveal-radius-vmax", "96"],
+  ["--portfolio-gateway-destination-opacity", "1"],
+  ["--portfolio-gateway-destination-scale", "1"],
+  ["--portfolio-gateway-portfolio-opacity", "0"],
+  ["--portfolio-gateway-signal-opacity", "0"],
+  ["--portfolio-gateway-rim-opacity", "0"],
+];
+
+function getPortfolioGatewaySettledFrameElements() {
+  if (!portfolioWorldGateway) {
+    return [];
+  }
+
+  return [
+    portfolioWorldGateway,
+    ...portfolioWorldGateway.querySelectorAll(".portfolio-world-gateway-background, .portfolio-world-gateway-ring"),
+  ];
+}
+
+function applyPortfolioGatewaySettledFrame() {
+  if (!shell || !portfolioWorldGateway) {
+    return;
+  }
+
+  PORTFOLIO_GATEWAY_SETTLED_SHELL_PROPERTIES.forEach(([propertyName, propertyValue]) => {
+    shell.style.setProperty(propertyName, propertyValue);
+  });
+  portfolioWorldGateway.style.setProperty("--portfolio-gateway-reveal-radius", "var(--portfolio-gateway-reveal-full-radius)");
+  portfolioWorldGateway.style.visibility = "visible";
+  portfolioWorldGateway.style.opacity = "1";
+  portfolioWorldGateway.style.backgroundImage = "var(--portfolio-gateway-world-image, var(--portfolio-gateway-world-fallback))";
+  portfolioWorldGateway.style.backgroundPosition = "center";
+  portfolioWorldGateway.style.backgroundRepeat = "no-repeat";
+  portfolioWorldGateway.style.backgroundSize = "cover";
+  portfolioWorldGateway.style.transform = "translateZ(0) scale3d(1, 1, 1)";
+  portfolioWorldGateway.style.transition = "none";
+
+  getPortfolioGatewaySettledFrameElements().slice(1).forEach((element) => {
+    element.style.visibility = "hidden";
+    element.style.opacity = "0";
+    element.style.transform = "translateZ(0) scale3d(1, 1, 1)";
+    element.style.transition = "none";
+  });
+  // Commit the direct-route final frame before arrived classes are applied.
+  portfolioWorldGateway.getBoundingClientRect();
+}
+
+function clearPortfolioGatewaySettledFrame() {
+  if (shell) {
+    PORTFOLIO_GATEWAY_SETTLED_SHELL_PROPERTIES.forEach(([propertyName]) => {
+      shell.style.removeProperty(propertyName);
+    });
+  }
+
+  if (portfolioWorldGateway) {
+    portfolioWorldGateway.style.removeProperty("--portfolio-gateway-reveal-radius");
+  }
+
+  getPortfolioGatewaySettledFrameElements().forEach((element) => {
+    element.style.removeProperty("visibility");
+    element.style.removeProperty("opacity");
+    element.style.removeProperty("background-image");
+    element.style.removeProperty("background-position");
+    element.style.removeProperty("background-repeat");
+    element.style.removeProperty("background-size");
+    element.style.removeProperty("transform");
+    element.style.removeProperty("transition");
+  });
+}
 function isPortfolioGatewayWorldRouteable(worldName) {
   const config = getPortfolioGatewayConfig(worldName);
   return Boolean(config?.isRouteable && config.route);
@@ -308,13 +378,10 @@ function updatePortfolioGatewayRouteHandoffUrl(targetUrl, method = "push") {
   window.history[historyMethod]({ ...handoffState, route: targetUrl }, "", targetUrl);
 }
 
-function isDaiionArrivalRouteActive() {
-  return Boolean(shell?.dataset.shellRoute === "wrestling2" && shell.classList.contains("is-daiion-arrival-view"));
-}
 
 function confirmPortfolioGatewayRouteHandoff(worldName) {
   portfolioGatewayRouteHandoffTimer = 0;
-  if (!isPortfolioGatewayRouteHandoffReady(worldName) && !isDaiionArrivalRouteActive()) {
+  if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
     return;
   }
 
@@ -339,17 +406,6 @@ function handoffPortfolioGatewayRoute(worldName) {
   const targetUrl = getPortfolioGatewayRouteHandoffTarget();
   if (window.location.pathname !== targetUrl) {
     updatePortfolioGatewayRouteHandoffUrl(targetUrl);
-  }
-  if (typeof syncRouteFromLocation === "function") {
-    syncRouteFromLocation({
-      historyState: {
-        fromPortfolioGateway: true,
-        portfolioGatewayWorld: "battleground",
-      },
-      shouldResetScroll: false,
-    });
-  } else if (typeof showDaiionArrivalSurface === "function") {
-    showDaiionArrivalSurface();
   }
 
   shell.dataset.portfolioGatewayHandoff = "pushed";
@@ -472,6 +528,7 @@ function clearPortfolioGatewayState() {
   const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
   clearPortfolioGatewayPhaseTimer();
   clearPortfolioGatewayRouteHandoffTimer();
+  clearPortfolioGatewaySettledFrame();
   delete shell.dataset.portfolioGatewayHandoff;
   shell.classList.remove("is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
   shell.dataset.portfolioGatewayWorld = "";
@@ -536,6 +593,7 @@ function startPortfolioWorldGateway() {
 
   clearPortfolioGatewayPhaseTimer();
   clearPortfolioGatewayRouteHandoffTimer();
+  clearPortfolioGatewaySettledFrame();
   delete shell.dataset.portfolioGatewayHandoff;
   shell.classList.remove("is-portfolio-world-arrived");
   applyPortfolioGatewayWorldBackground(activeWorld);
@@ -2064,9 +2122,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     shell.classList.remove("has-portfolio-entry-constellation");
     clearPortfolioEngineReadyState();
   }
-  if (route.name !== "wrestling2") {
-    shell.classList.remove("is-daiion-arrival-view");
-    setDaiionArrivalHidden(true);
+  if (route.name !== "portfolio" && route.name !== "wrestling2") {
+    clearPortfolioGatewayState();
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -2453,19 +2510,6 @@ function setHubChromeHidden(isHidden) {
   });
 }
 
-function setDaiionArrivalHidden(isHidden) {
-  if (!daiionArrivalShell) {
-    return;
-  }
-
-  daiionArrivalShell.setAttribute("aria-hidden", String(isHidden));
-  if (isHidden) {
-    daiionArrivalShell.setAttribute("inert", "");
-  } else {
-    daiionArrivalShell.removeAttribute("inert");
-  }
-}
-
 function setWrestlingShowsHidden(isHidden) {
   if (!wrestlingShowsShell) {
     return;
@@ -2686,8 +2730,8 @@ function showMusicNexus(options = {}) {
   }
 }
 
-function showDaiionArrivalSurface() {
-  if (!shell || !portfolioHub || !daiionArrivalShell) {
+function showBattlegroundGatewayArrivalSurface() {
+  if (!shell || !portfolioWorldGateway) {
     showPortfolioHubView();
     return;
   }
@@ -2695,19 +2739,28 @@ function showDaiionArrivalSurface() {
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
-  clearPortfolioGatewayState();
-  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
-  shell.classList.add("has-entered-hub", "is-module-view", "is-daiion-arrival-view");
+  clearPortfolioGatewayPhaseTimer();
+  clearPortfolioGatewayRouteHandoffTimer();
+  applyPortfolioGatewayWorldBackground("battleground");
+  applyPortfolioGatewaySettledFrame();
+  applyPortfolioShellRouteContext();
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
+  shell.dataset.portfolioGatewayWorld = "battleground";
+  shell.dataset.portfolioGatewayRoute = getPortfolioGatewayRoute("battleground");
+  shell.dataset.portfolioGatewayState = "filling-screen";
+  shell.dataset.portfolioGatewayHandoff = "complete";
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
   }
-  portfolioHub.setAttribute("aria-hidden", "false");
-  portfolioHub.removeAttribute("inert");
+  if (portfolioHub) {
+    portfolioHub.setAttribute("aria-hidden", "false");
+    portfolioHub.removeAttribute("inert");
+  }
   if (modulePlaceholder) {
     modulePlaceholder.setAttribute("aria-hidden", "true");
     modulePlaceholder.setAttribute("inert", "");
   }
-  setDaiionArrivalHidden(false);
   if (musicNexusShell) {
     musicNexusShell.setAttribute("aria-hidden", "true");
     musicNexusShell.setAttribute("inert", "");
@@ -2737,14 +2790,15 @@ function showDaiionArrivalSurface() {
   }
   setHubChromeHidden(true);
   setPortfolioActiveWorld("battleground");
-  setCurrentView("DAÏION");
-  setDocumentTitle("DAÏION - Battleground Archive - Voodoo Media V3.0.01");
-  setActiveGlobalNav("wrestling");
+  setCurrentView("Battleground Archive");
+  setDocumentTitle("The Battleground - Voodoo Media V3.0.01");
+  syncPortfolioGatewayTriggerState();
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
   }
 }
+
 function showRingArchive() {
   if (!shell || !portfolioHub || !ringArchiveShell) {
     return;
@@ -3775,7 +3829,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
     wrestling: ringArchiveShell,
-    wrestling2: daiionArrivalShell,
+    wrestling2: document.querySelector(".public-home"),
     "wrestling-route-not-found": modulePlaceholder,
     "wrestling-people": wrestlingPeopleShell,
     "wrestling-person-detail": wrestlingPersonDetailShell,
