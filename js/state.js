@@ -33,6 +33,7 @@ const modulePlaceholderKicker = document.querySelector("[data-module-placeholder
 const modulePlaceholderTitle = document.querySelector("[data-module-placeholder-title]");
 const modulePlaceholderCopy = document.querySelector("[data-module-placeholder-copy]");
 const moduleBack = document.querySelector("[data-module-back]");
+const daiionArrivalShell = document.querySelector("[data-daiion-arrival-shell]");
 const musicNexusShell = document.querySelector("[data-music-nexus-shell]");
 const musicNexusLanding = document.querySelector("[data-music-nexus-landing]");
 const musicLandingRouteCards = document.querySelectorAll("[data-music-landing-route]");
@@ -2077,6 +2078,17 @@ const shellRouteRegistry = [
     drawerVariant: "module",
   },
   {
+    id: "wrestling2",
+    route: routePaths.wrestling2,
+    label: "DAÏION",
+    parentSection: "Portfolio",
+    moduleType: "module",
+    drawerGroup: "wrestling",
+    breadcrumbLabel: "DAÏION",
+    bottomRailEligible: true,
+    drawerVariant: "module",
+  },
+  {
     id: "wrestling-shows",
     route: routePaths.wrestlingShows,
     label: "Shows",
@@ -2204,6 +2216,7 @@ const routeNameToGlobalNavTarget = {
   "music-venues": "music",
   "music-venue-detail": "music",
   wrestling: "wrestling",
+  wrestling2: "wrestling",
   "wrestling-route-not-found": "wrestling",
   "wrestling-shows": "wrestling",
   "wrestling-show-detail": "wrestling",
@@ -2236,6 +2249,7 @@ const routeNameToBreadcrumbTrail = {
   "music-venues": ["portfolio", "music", "music-venues"],
   "music-venue-detail": ["portfolio", "music", "music-venues"],
   wrestling: ["portfolio", "wrestling"],
+  wrestling2: ["portfolio", "wrestling2"],
   "wrestling-route-not-found": ["portfolio", "wrestling"],
   "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
@@ -2284,6 +2298,7 @@ const routeNameToShellBackTarget = {
   "music-venues": routePaths.music,
   "music-venue-detail": routePaths.musicVenues,
   wrestling: routePaths.portfolio,
+  wrestling2: routePaths.portfolio,
   "wrestling-route-not-found": routePaths.wrestling,
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,

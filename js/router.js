@@ -70,6 +70,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
+  if (routePath === routePaths.wrestling2) {
+    return { name: "wrestling2", canonicalUrl: routePaths.wrestling2 };
+  }
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };
   }
@@ -303,6 +306,11 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling") {
     showRingArchive();
+    return;
+  }
+
+  if (route.name === "wrestling2") {
+    showDaiionArrivalSurface();
     return;
   }
 

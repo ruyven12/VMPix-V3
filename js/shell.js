@@ -308,9 +308,13 @@ function updatePortfolioGatewayRouteHandoffUrl(targetUrl, method = "push") {
   window.history[historyMethod]({ ...handoffState, route: targetUrl }, "", targetUrl);
 }
 
+function isDaiionArrivalRouteActive() {
+  return Boolean(shell?.dataset.shellRoute === "wrestling2" && shell.classList.contains("is-daiion-arrival-view"));
+}
+
 function confirmPortfolioGatewayRouteHandoff(worldName) {
   portfolioGatewayRouteHandoffTimer = 0;
-  if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
+  if (!isPortfolioGatewayRouteHandoffReady(worldName) && !isDaiionArrivalRouteActive()) {
     return;
   }
 
@@ -333,11 +337,22 @@ function handoffPortfolioGatewayRoute(worldName) {
   }
 
   const targetUrl = getPortfolioGatewayRouteHandoffTarget();
-  shell.dataset.portfolioGatewayHandoff = "pushed";
   if (window.location.pathname !== targetUrl) {
     updatePortfolioGatewayRouteHandoffUrl(targetUrl);
   }
+  if (typeof syncRouteFromLocation === "function") {
+    syncRouteFromLocation({
+      historyState: {
+        fromPortfolioGateway: true,
+        portfolioGatewayWorld: "battleground",
+      },
+      shouldResetScroll: false,
+    });
+  } else if (typeof showDaiionArrivalSurface === "function") {
+    showDaiionArrivalSurface();
+  }
 
+  shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
     confirmPortfolioGatewayRouteHandoff(worldName);
@@ -2049,6 +2064,10 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     shell.classList.remove("has-portfolio-entry-constellation");
     clearPortfolioEngineReadyState();
   }
+  if (route.name !== "wrestling2") {
+    shell.classList.remove("is-daiion-arrival-view");
+    setDaiionArrivalHidden(true);
+  }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (bottomRail) {
@@ -2434,6 +2453,19 @@ function setHubChromeHidden(isHidden) {
   });
 }
 
+function setDaiionArrivalHidden(isHidden) {
+  if (!daiionArrivalShell) {
+    return;
+  }
+
+  daiionArrivalShell.setAttribute("aria-hidden", String(isHidden));
+  if (isHidden) {
+    daiionArrivalShell.setAttribute("inert", "");
+  } else {
+    daiionArrivalShell.removeAttribute("inert");
+  }
+}
+
 function setWrestlingShowsHidden(isHidden) {
   if (!wrestlingShowsShell) {
     return;
@@ -2654,6 +2686,65 @@ function showMusicNexus(options = {}) {
   }
 }
 
+function showDaiionArrivalSurface() {
+  if (!shell || !portfolioHub || !daiionArrivalShell) {
+    showPortfolioHubView();
+    return;
+  }
+
+  clearPortfolioArrivalState();
+  clearPortfolioOrientationState();
+  clearPortfolioDirectArrivalState();
+  clearPortfolioGatewayState();
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-daiion-arrival-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  setDaiionArrivalHidden(false);
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  setPortfolioActiveWorld("battleground");
+  setCurrentView("DAÏION");
+  setDocumentTitle("DAÏION - Battleground Archive - Voodoo Media V3.0.01");
+  setActiveGlobalNav("wrestling");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
 function showRingArchive() {
   if (!shell || !portfolioHub || !ringArchiveShell) {
     return;
@@ -3684,6 +3775,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
     wrestling: ringArchiveShell,
+    wrestling2: daiionArrivalShell,
     "wrestling-route-not-found": modulePlaceholder,
     "wrestling-people": wrestlingPeopleShell,
     "wrestling-person-detail": wrestlingPersonDetailShell,
