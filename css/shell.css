@@ -4961,11 +4961,16 @@ button {
   z-index: 7;
   isolation: isolate;
   filter: none;
+  animation: none !important;
 }
 
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway::before {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway::before {
   z-index: 1;
+  visibility: hidden !important;
+  opacity: 0 !important;
   filter: none;
+  animation: none !important;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway::after {
@@ -4976,14 +4981,22 @@ button {
   will-change: opacity, transform, clip-path;
 }
 
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-background {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-ring,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-ring {
   z-index: 2;
+  visibility: hidden !important;
+  opacity: 0 !important;
   filter: none;
+  box-shadow: none;
+  animation: none !important;
+  transition: opacity 80ms var(--ease-standard), visibility 0ms linear 80ms;
 }
 
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-ring {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-ring,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-ring {
   z-index: 3;
-  filter: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active :is(.portfolio-star-feed-overlay, .portfolio-star-feed-strand, .portfolio-engine-scan-line, .engine-lightning-overlay),
@@ -5028,18 +5041,70 @@ button {
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor-ring,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-ring {
-  opacity: 0.16;
+  opacity: 0;
   transform: scale3d(0.92, 0.92, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor-core,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-core {
-  opacity: 0.58;
+  opacity: 0;
   transform: translateZ(0) scale3d(0.98, 0.98, 1);
 }
 
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine,
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
-  opacity: 0.24;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  filter: none;
+  animation: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"]),
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"]) {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  filter: none;
+  box-shadow: none;
+  animation: none !important;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.88, 0.88, 1) !important;
+  transition: opacity 80ms var(--ease-standard), visibility 0ms linear 80ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"])::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"])::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"])::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived :is(.portfolio-beacon.is-selected, .portfolio-beacon[aria-pressed="true"])::after {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  filter: none;
+  box-shadow: none;
+  animation: none !important;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.88, 0.88, 1) rotate(0deg) !important;
+  transition: opacity 80ms var(--ease-standard), visibility 0ms linear 80ms;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  filter: none !important;
+  transform: translate3d(0, 0, 0) scale3d(0.98, 0.98, 1) !important;
+  animation: none !important;
+  transition: opacity 80ms var(--ease-standard), visibility 0ms linear 80ms !important;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection-status::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection-status::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection::after,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection-status::before,
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection-status::after {
+  opacity: 0 !important;
+  filter: none !important;
+  animation: none !important;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-trigger {
