@@ -141,6 +141,7 @@ button {
   --portfolio-gateway-signal-opacity: 1;
   --portfolio-gateway-rim-opacity: 0;
   --portfolio-gateway-rim-width: clamp(0.28rem, 0.72vmax, 0.72rem);
+  --portfolio-gateway-edge-overlap: clamp(2px, 0.42vmin, 5px);
   --engine-lifeblood-cycle: 2.65s;
   --engine-accent: 242 242 242;
   --engine-accent-soft: 242 242 242;
@@ -335,10 +336,15 @@ button {
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  transform: translateZ(0) scale3d(var(--portfolio-gateway-destination-scale), var(--portfolio-gateway-destination-scale), 1);
+  transform: translate3d(0, 0, 0) scale3d(var(--portfolio-gateway-destination-scale), var(--portfolio-gateway-destination-scale), 1);
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
-  -webkit-clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + 1px) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
-  clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + 1px) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: paint;
+  isolation: isolate;
+  will-change: opacity, transform, clip-path;
+  -webkit-clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + var(--portfolio-gateway-edge-overlap)) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
+  clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + var(--portfolio-gateway-edge-overlap)) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   -webkit-mask-image: radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), #000 0 var(--portfolio-gateway-reveal-mask-inner), transparent var(--portfolio-gateway-reveal-radius));
   mask-image: radial-gradient(circle at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y), #000 0 var(--portfolio-gateway-reveal-mask-inner), transparent var(--portfolio-gateway-reveal-radius));
   -webkit-mask-repeat: no-repeat;
@@ -360,8 +366,11 @@ button {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  transform: translateZ(0) scale3d(1.035, 1.035, 1);
+  transform: translate3d(0, 0, 0) scale3d(1.035, 1.035, 1);
   transform-origin: var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: paint;
   filter: saturate(1) brightness(1) contrast(1);
   transition:
     opacity 220ms var(--ease-standard),
@@ -414,6 +423,7 @@ button {
 @media (max-width: 48rem) {
   .site-shell[data-shell-route="portfolio"],
   .portfolio-world-gateway {
+    --portfolio-gateway-edge-overlap: clamp(4px, 1.2vmin, 8px);
     --portfolio-gateway-fill-core-alpha: 0.46;
     --portfolio-gateway-fill-signal-alpha: 0.28;
     --portfolio-gateway-fill-field-alpha: 0.18;
@@ -941,7 +951,12 @@ button {
   visibility: visible;
   opacity: 1;
   --portfolio-gateway-reveal-radius: inherit !important;
-  transform: translateZ(0) scale3d(1, 1, 1);
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  overflow: hidden;
+  overflow: clip;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: layout paint style;
   filter: none;
   animation: none !important;
   transition: none;
@@ -957,9 +972,13 @@ button {
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .portfolio-world-gateway::after {
   opacity: var(--portfolio-gateway-destination-opacity) !important;
-  transform: translateZ(0) scale3d(var(--portfolio-gateway-destination-scale), var(--portfolio-gateway-destination-scale), 1) !important;
-  -webkit-clip-path: circle(var(--portfolio-gateway-reveal-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
-  clip-path: circle(var(--portfolio-gateway-reveal-radius) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
+  transform: translate3d(0, 0, 0) scale3d(var(--portfolio-gateway-destination-scale), var(--portfolio-gateway-destination-scale), 1) !important;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: paint;
+  isolation: isolate;
+  -webkit-clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + var(--portfolio-gateway-edge-overlap)) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
+  clip-path: circle(calc(var(--portfolio-gateway-reveal-radius) + var(--portfolio-gateway-edge-overlap)) at var(--portfolio-gateway-focus-x) var(--portfolio-gateway-focus-y));
   -webkit-mask-image: none;
   mask-image: none;
   filter: none;
@@ -979,7 +998,10 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .portfolio-world-gateway-ring {
   visibility: visible !important;
   opacity: var(--portfolio-gateway-rim-opacity) !important;
-  transform: translateZ(0) scale3d(1, 1, 1) !important;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: paint;
   filter: none;
   box-shadow: none;
   mix-blend-mode: screen;
