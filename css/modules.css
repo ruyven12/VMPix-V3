@@ -13835,6 +13835,150 @@ button.wrestling-event-history-tagged-thumb {
 
 
 
+.daiion-ember-field {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  contain: layout paint style;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
+  visibility: visible;
+  opacity: 1;
+}
+
+.daiion-ember-pocket {
+  position: absolute;
+  inset-inline-start: var(--ember-pocket-x);
+  inset-block-start: var(--ember-pocket-y);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.daiion-ember-pocket--one {
+  --ember-pocket-x: 14%;
+  --ember-pocket-y: 88%;
+}
+
+.daiion-ember-pocket--two {
+  --ember-pocket-x: 27%;
+  --ember-pocket-y: 80%;
+}
+
+.daiion-ember-pocket--three {
+  --ember-pocket-x: 43%;
+  --ember-pocket-y: 76%;
+}
+
+.daiion-ember-pocket--four {
+  --ember-pocket-x: 63%;
+  --ember-pocket-y: 82%;
+}
+
+.daiion-ember-pocket--five {
+  --ember-pocket-x: 86%;
+  --ember-pocket-y: 88%;
+}
+
+.daiion-ember {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  display: block;
+  width: var(--ember-size, 2px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 239, 190, 0.94) 0 15%, rgba(255, 121, 39, 0.68) 42%, rgba(156, 24, 10, 0.22) 68%, transparent 74%);
+  box-shadow:
+    0 0 0.18rem rgba(255, 112, 37, 0.26),
+    0 0 0.38rem rgba(199, 39, 17, 0.12);
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale3d(0.6, 0.6, 1);
+  animation: none;
+  animation-delay: var(--ember-delay, 0s);
+  will-change: opacity, transform;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
+  animation: daiionEmberRise var(--ember-duration, 8s) cubic-bezier(0.26, 0.64, 0.34, 1) infinite;
+}
+
+.daiion-ember--a {
+  --ember-size: clamp(1.5px, 0.42vw, 2.6px);
+  --ember-rise: 19svh;
+  --ember-drift: -0.34rem;
+  --ember-duration: 8.8s;
+  --ember-delay: -1.4s;
+  --ember-peak-opacity: 0.54;
+  --ember-fade-opacity: 0.22;
+}
+
+.daiion-ember--b {
+  --ember-size: clamp(1.2px, 0.34vw, 2px);
+  --ember-rise: 15svh;
+  --ember-drift: 0.48rem;
+  --ember-duration: 10.6s;
+  --ember-delay: -5.2s;
+  --ember-peak-opacity: 0.4;
+  --ember-fade-opacity: 0.16;
+}
+
+.daiion-ember--c {
+  --ember-size: clamp(1px, 0.28vw, 1.8px);
+  --ember-rise: 22svh;
+  --ember-drift: 0.08rem;
+  --ember-duration: 12.4s;
+  --ember-delay: -8.1s;
+  --ember-peak-opacity: 0.32;
+  --ember-fade-opacity: 0.12;
+}
+
+.daiion-ember-pocket--two .daiion-ember--a,
+.daiion-ember-pocket--four .daiion-ember--a {
+  --ember-rise: 21svh;
+  --ember-duration: 9.6s;
+}
+
+.daiion-ember-pocket--three .daiion-ember--b {
+  --ember-rise: 18svh;
+  --ember-drift: -0.62rem;
+  --ember-delay: -3.7s;
+}
+
+.daiion-ember-pocket--five .daiion-ember--c {
+  --ember-rise: 13svh;
+  --ember-drift: -0.42rem;
+  --ember-delay: -6.4s;
+}
+
+@keyframes daiionEmberRise {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1);
+  }
+
+  24% {
+    opacity: var(--ember-peak-opacity, 0.42);
+  }
+
+  58% {
+    opacity: var(--ember-fade-opacity, 0.16);
+  }
+
+  78%,
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--ember-drift, 0px)), calc(-50% - var(--ember-rise, 18svh)), 0) scale3d(0.24, 0.24, 1);
+  }
+}
+
 .daiion-title-reveal {
   position: absolute;
   inset-inline-start: 50%;
@@ -13895,7 +14039,6 @@ button.wrestling-event-history-tagged-thumb {
   -webkit-text-fill-color: transparent;
 }
 
-
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
   visibility: visible;
   opacity: 0;
@@ -13910,7 +14053,6 @@ button.wrestling-event-history-tagged-thumb {
   animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
 }
 
-
 @keyframes daiionTitleClear {
   0%,
   66% {
@@ -13923,6 +14065,7 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(-50%, calc(-50% + 12px), 0);
   }
 }
+
 @keyframes daiionTitleReveal {
   0% {
     opacity: 0;
@@ -13946,6 +14089,16 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
+    animation: none;
+    opacity: 0;
+  }
+
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
     visibility: hidden;
     opacity: 0;
@@ -13963,7 +14116,6 @@ button.wrestling-event-history-tagged-thumb {
     background-position: 150% 0, 0 0;
   }
 }
-
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
   visibility: visible !important;
   opacity: 1 !important;
