@@ -13909,7 +13909,7 @@ button.wrestling-event-history-tagged-thumb {
     linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.7) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.7rem 100% no-repeat,
     linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.7) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.7rem 100% no-repeat;
   clip-path: polygon(0.95rem 0, calc(100% - 0.95rem) 0, 100% 52%, calc(100% - 1.65rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.65rem 100%, 0 52%);
-  opacity: 0.94;
+  opacity: 1;
   filter: drop-shadow(0 0 0.32rem rgba(213, 22, 34, 0.31));
 }
 
@@ -13920,7 +13920,7 @@ button.wrestling-event-history-tagged-thumb {
   background:
     repeating-linear-gradient(90deg, rgba(255, 72, 48, 0.42) 0 1px, transparent 1px 1.05rem) top / 100% 0.42rem no-repeat,
     linear-gradient(90deg, transparent, rgba(255, 58, 40, 0.34) 22%, transparent 44% 56%, rgba(255, 58, 40, 0.34) 78%, transparent) bottom / 100% 1px no-repeat;
-  opacity: 0.65;
+  opacity: 0.81;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
@@ -13949,7 +13949,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-top-hud-rail::after {
     inset-block-start: 0.42rem;
     inset-inline: 1.8rem;
-    opacity: 0.46;
+    opacity: 0.58;
   }
 }
 
@@ -13991,7 +13991,7 @@ button.wrestling-event-history-tagged-thumb {
     linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.66) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) top left / 2rem 3rem no-repeat,
     linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.66) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) bottom left / 2rem 3rem no-repeat;
   clip-path: polygon(0 0, 78% 0, 100% 1.5rem, 42% 1.5rem, 42% calc(100% - 1.5rem), 100% calc(100% - 1.5rem), 78% 100%, 0 100%);
-  opacity: 0.84;
+  opacity: 1;
   filter: drop-shadow(0 0 0.28rem rgba(213, 22, 34, 0.24));
 }
 
@@ -14005,7 +14005,7 @@ button.wrestling-event-history-tagged-thumb {
     linear-gradient(90deg, rgba(255, 58, 40, 0.27), transparent 84%) 0 66.66% / 100% 1px no-repeat,
     linear-gradient(90deg, rgba(255, 58, 40, 0.29), transparent 84%) 0 100% / 100% 1px no-repeat,
     repeating-linear-gradient(180deg, rgba(255, 72, 48, 0.33) 0 1px, transparent 1px 0.9rem) left / 0.42rem 100% no-repeat;
-  opacity: 0.69;
+  opacity: 0.86;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
@@ -14034,14 +14034,14 @@ button.wrestling-event-history-tagged-thumb {
       linear-gradient(90deg, rgba(255, 52, 36, 0.42), transparent 74%) top left / 100% 1px no-repeat,
       linear-gradient(90deg, rgba(255, 52, 36, 0.42), transparent 74%) bottom left / 100% 1px no-repeat;
     clip-path: polygon(0 0, 82% 0, 100% 0.82rem, 46% 0.82rem, 46% calc(100% - 0.82rem), 100% calc(100% - 0.82rem), 82% 100%, 0 100%);
-    opacity: 0.76;
+    opacity: 0.95;
   }
 
   .daiion-side-hud-rail::after {
     inset-block: 1.85rem;
     inset-inline-start: 0.32rem;
     inline-size: 0.55rem;
-    opacity: 0.5;
+    opacity: 0.625;
   }
 }
 .daiion-atmosphere-glow {
