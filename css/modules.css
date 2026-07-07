@@ -14090,8 +14090,8 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
   z-index: 4;
   display: grid;
-  inline-size: clamp(11.2rem, 15.4vw, 16.5rem);
-  padding: clamp(0.64rem, 1.1vw, 0.9rem) clamp(0.68rem, 1.1vw, 0.99rem);
+  inline-size: clamp(13.45rem, 18.5vw, 19.8rem);
+  padding: clamp(0.77rem, 1.32vw, 1.08rem) clamp(0.82rem, 1.32vw, 1.19rem);
   color: rgba(245, 246, 248, 0.94);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0.04em;
@@ -14147,7 +14147,7 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 0.55rem;
   align-items: center;
-  min-block-size: clamp(2.2rem, 4.4svh, 2.6rem);
+  min-block-size: clamp(2.64rem, 5.28svh, 3.12rem);
   border-block-end: 1px solid rgba(255, 90, 60, 0.18);
 }
 
@@ -14325,12 +14325,12 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-archive-stats-panel {
     inset-block-start: 4.2rem;
     inset-inline-start: 2.05rem;
-    inline-size: min(11.2rem, calc(100vw - 3.2rem));
-    padding: 0.59rem 0.64rem;
+    inline-size: min(13.45rem, calc(100vw - 3.2rem));
+    padding: 0.71rem 0.77rem;
   }
 
   .daiion-archive-stats-panel__row {
-    min-block-size: 2.07rem;
+    min-block-size: 2.48rem;
     column-gap: 0.42rem;
   }
 }
