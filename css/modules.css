@@ -14255,17 +14255,6 @@ button.wrestling-event-history-tagged-thumb {
   border-block-end: 0;
 }
 
-.daiion-destination-panel__item::before {
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-start: 0;
-  inline-size: 0.42rem;
-  block-size: 1px;
-  content: "";
-  background: rgba(255, 90, 60, 0.62);
-  box-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.24);
-  transform: translateY(-50%);
-}
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
   visibility: visible;
