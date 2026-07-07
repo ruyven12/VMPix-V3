@@ -14112,6 +14112,21 @@ button.wrestling-event-history-tagged-thumb {
   contain: layout paint style;
 }
 
+.daiion-archive-stats-panel::before {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0.55rem;
+  block-size: 1px;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.7) 8%, rgba(255, 90, 60, 0.9) 52%, rgba(255, 231, 208, 0.44) 92%, transparent);
+  box-shadow:
+    0 0 0.28rem rgba(255, 42, 26, 0.32),
+    0 0 0.62rem rgba(255, 90, 60, 0.16);
+  transform: scaleX(0.04);
+  transform-origin: 0 50%;
+}
 .daiion-archive-stats-panel__title {
   display: block;
   padding-block-end: 0.42rem;
@@ -14176,6 +14191,127 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
   visibility: visible;
   opacity: 1;
+  animation: daiionArchiveStatsPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
+  animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row {
+  animation: daiionArchiveStatsContentResolve 180ms ease-out both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title {
+  animation-delay: 4050ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(2) {
+  animation-delay: 4120ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(3) {
+  animation-delay: 4170ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(4) {
+  animation-delay: 4220ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(5) {
+  animation-delay: 4270ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(6) {
+  animation-delay: 4320ms;
+}
+
+@keyframes daiionArchiveStatsProjectionLine {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.04);
+  }
+
+  26% {
+    opacity: 0.9;
+    transform: scaleX(0.04);
+  }
+
+  78% {
+    opacity: 0.86;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes daiionArchiveStatsPanelProject {
+  0% {
+    opacity: 0;
+    border-color: rgba(255, 90, 60, 0);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 231, 208, 0),
+      inset 0 0 0 rgba(255, 42, 26, 0),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0),
+      0 0 0 rgba(255, 42, 26, 0);
+    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
+  }
+
+  12% {
+    opacity: 0.36;
+    border-color: rgba(255, 90, 60, 0.1);
+    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
+  }
+
+  36% {
+    opacity: 0.78;
+    border-color: rgba(255, 90, 60, 0.22);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% 1px, 0 1px, 0 1px, 0 0.55rem);
+  }
+
+  58% {
+    opacity: 0.92;
+    border-color: rgba(255, 90, 60, 0.34);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% 58%, calc(100% - 0.55rem) 64%, 0 64%, 0 0.55rem);
+  }
+
+  72% {
+    opacity: 1;
+    border-color: rgba(255, 90, 60, 0.38);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 231, 208, 0.035),
+      inset 0 0 0.82rem rgba(255, 42, 26, 0.08),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0.32),
+      0 0 0.42rem rgba(255, 42, 26, 0.1);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
+  }
+
+  100% {
+    opacity: 1;
+    border-color: rgba(255, 90, 60, 0.38);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 231, 208, 0.055),
+      inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
+      0 0 0.68rem rgba(255, 42, 26, 0.14);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
+  }
+}
+
+@keyframes daiionArchiveStatsContentResolve {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -0.16rem, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 @media (max-width: 540px) {
@@ -14192,6 +14328,23 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row {
+    animation: none;
+    transform: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
+    opacity: 1;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
+    opacity: 0;
+  }
+}
 .daiion-atmosphere-glow {
   position: absolute;
   inset: 0;
