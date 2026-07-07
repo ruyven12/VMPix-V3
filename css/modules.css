@@ -14476,6 +14476,91 @@ button.wrestling-event-history-tagged-thumb {
       0 0 0.86rem rgba(255, 42, 26, 0.22);
   }
 }
+.daiion-archive-stats-panel__row[data-daiion-stat-target]::after,
+.daiion-archive-focus-panel::before,
+.daiion-archive-focus-panel::after,
+.daiion-destination-panel__item::before,
+.daiion-destination-panel__item::after {
+  position: absolute;
+  inline-size: 0.42rem;
+  block-size: 0.42rem;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid rgba(255, 90, 60, 0.58);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 231, 208, 0.88) 0 18%, rgba(255, 90, 60, 0.52) 19% 38%, rgba(255, 42, 26, 0.1) 39% 100%);
+  box-shadow:
+    0 0 0.26rem rgba(255, 231, 208, 0.24),
+    0 0 0.58rem rgba(255, 42, 26, 0.22);
+  z-index: 2;
+}
+
+
+.daiion-archive-stats-panel__row[data-daiion-stat-target]::after {
+  inset-block-start: 50%;
+  inset-inline-end: calc(clamp(0.78rem, 1.05vw, 1.25rem) * -1);
+  transform: translate3d(50%, -50%, 0);
+}
+
+.daiion-archive-stats-panel__row.is-active::after,
+.daiion-archive-stats-panel__row[aria-current="true"]::after {
+  opacity: 1;
+}
+
+.daiion-archive-focus-panel::before {
+  inset-inline-start: var(--focus-route-port-in-x, 0%);
+  inset-block-start: var(--focus-route-port-in-y, 50%);
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.daiion-archive-focus-panel::after {
+  inset-inline-start: var(--focus-route-port-out-x, 100%);
+  inset-block-start: var(--focus-route-port-out-y, 50%);
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.daiion-archive-focus-panel.is-active::before,
+.daiion-archive-focus-panel.is-active::after {
+  opacity: 1;
+}
+
+.daiion-destination-panel__item::before {
+  inset-block-start: 50%;
+  inset-inline-start: -0.38rem;
+  transform: translate3d(-50%, -50%, 0);
+}
+
+.daiion-destination-panel__item::after {
+  inset-block-end: -0.24rem;
+  inset-inline-start: 50%;
+  transform: translate3d(-50%, 50%, 0);
+}
+
+.daiion-destination-panel__item.is-active::before,
+.daiion-destination-panel__item[aria-pressed="true"]::before,
+.daiion-destination-panel__item.is-active::after,
+.daiion-destination-panel__item[aria-pressed="true"]::after {
+  opacity: 1;
+}
+
+.daiion-energy-route__engine::before {
+  position: absolute;
+  inset: -0.28rem;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid rgba(255, 90, 60, 0.5);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0.24rem rgba(255, 231, 208, 0.2),
+    0 0 0.62rem rgba(255, 42, 26, 0.2);
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine::before {
+  opacity: 1;
+}
 .daiion-archive-stats-panel {
   position: absolute;
   inset-block-start: clamp(4.55rem, 8.6svh, 6.1rem);
@@ -15088,6 +15173,32 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (max-width: 540px) {
+  .daiion-archive-focus-panel[data-daiion-selected-target="campaigns"] {
+    --focus-route-port-in-x: 44%;
+    --focus-route-port-in-y: 0%;
+    --focus-route-port-out-x: 70%;
+    --focus-route-port-out-y: 100%;
+  }
+
+  .daiion-archive-focus-panel[data-daiion-selected-target="combatants"] {
+    --focus-route-port-in-x: 71%;
+    --focus-route-port-in-y: 0%;
+    --focus-route-port-out-x: 70%;
+    --focus-route-port-out-y: 100%;
+  }
+
+  .daiion-archive-focus-panel[data-daiion-selected-target="arenas"] {
+    --focus-route-port-in-x: 74%;
+    --focus-route-port-in-y: 0%;
+    --focus-route-port-out-x: 70%;
+    --focus-route-port-out-y: 100%;
+  }
+
+  .daiion-destination-panel__item::before {
+    inset-block-start: 0;
+    inset-inline-start: 50%;
+    transform: translate3d(-50%, -50%, 0);
+  }
   .daiion-energy-route__engine {
     --route-engine-x: 50%;
     --route-engine-end: 5.55rem;
@@ -15110,7 +15221,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-energy-route--campaigns .daiion-energy-route__segment--focus {
     --route-x: 67.2%;
     --route-y: 67%;
-    --route-w: 20.1vw;
+    --route-w: 15.4vw;
     --route-r: 90deg;
   }
 
@@ -15138,7 +15249,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-energy-route--combatants .daiion-energy-route__segment--focus {
     --route-x: 67.2%;
     --route-y: 67%;
-    --route-w: 29.1vw;
+    --route-w: 24.5vw;
     --route-r: 90deg;
   }
 
@@ -15166,7 +15277,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-energy-route--arenas .daiion-energy-route__segment--focus {
     --route-x: 67.2%;
     --route-y: 67%;
-    --route-w: 38.1vw;
+    --route-w: 33.4vw;
     --route-r: 90deg;
   }
 
