@@ -13912,7 +13912,7 @@ button.wrestling-event-history-tagged-thumb {
     linear-gradient(180deg, rgba(255, 231, 208, 0.2), rgba(255, 90, 60, 0.88) 30%, transparent) right bottom / 1px 1.55rem no-repeat,
     linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.98) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.7rem 100% no-repeat,
     linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.98) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.7rem 100% no-repeat;
-  clip-path: polygon(0.95rem 0, calc(100% - 0.95rem) 0, 100% 52%, calc(100% - 1.65rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.65rem 100%, 0 52%);
+  clip-path: polygon(0.35rem 0, calc(100% - 0.35rem) 0, 100% 52%, calc(100% - 1.65rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.65rem 100%, 0 52%);
   opacity: 1;
   filter:
     drop-shadow(0 0.05rem 0.04rem rgba(0, 0, 0, 0.68))
@@ -13960,7 +13960,7 @@ button.wrestling-event-history-tagged-thumb {
       linear-gradient(180deg, rgba(255, 231, 208, 0.16), rgba(255, 90, 60, 0.72) 30%, transparent) right bottom / 1px 1.1rem no-repeat,
       linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.1rem 100% no-repeat,
       linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.1rem 100% no-repeat;
-    clip-path: polygon(0.7rem 0, calc(100% - 0.7rem) 0, 100% 50%, calc(100% - 1.2rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.2rem 100%, 0 50%);
+    clip-path: polygon(0.25rem 0, calc(100% - 0.25rem) 0, 100% 50%, calc(100% - 1.2rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.2rem 100%, 0 50%);
   }
 
   .daiion-top-hud-rail::after {
@@ -13972,7 +13972,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .daiion-side-hud-rail {
   position: absolute;
-  inset-block-start: clamp(2.65rem, 4.5svh, 3.05rem);
+  inset-block-start: clamp(2.58rem, 4.42svh, 3rem);
   inset-block-end: clamp(5.4rem, 8svh, 6.1rem);
   z-index: 5;
   display: block;
