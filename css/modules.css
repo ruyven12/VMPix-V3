@@ -13872,8 +13872,70 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(1.008, 1.008, 1);
   }
 }
+.daiion-dust-gust {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: clamp(5.5rem, 10svh, 7.4rem);
+  z-index: 2;
+  display: block;
+  inline-size: min(76vw, 38rem);
+  block-size: clamp(2.1rem, 6.4svh, 4rem);
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 24% 54%, rgba(204, 174, 131, 0.2) 0 10%, rgba(143, 105, 79, 0.13) 28%, transparent 62%),
+    radial-gradient(ellipse at 62% 48%, rgba(236, 201, 150, 0.18) 0 8%, rgba(118, 88, 68, 0.12) 26%, transparent 58%),
+    linear-gradient(90deg, transparent, rgba(184, 147, 108, 0.18) 26%, rgba(227, 190, 140, 0.14) 48%, rgba(94, 70, 58, 0.1) 70%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mix-blend-mode: screen;
+  transform: translate3d(-92vw, 0.28rem, 0) scale3d(0.86, 0.72, 1);
+  transform-origin: 50% 50%;
+  will-change: opacity, transform;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
+  visibility: visible;
+  animation: daiionDustGust 32s cubic-bezier(0.24, 0.64, 0.3, 1) 7s infinite;
+}
+
+@keyframes daiionDustGust {
+  0%,
+  10%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-92vw, 0.28rem, 0) scale3d(0.86, 0.72, 1);
+  }
+
+  14% {
+    opacity: 0.26;
+    transform: translate3d(-42vw, 0.16rem, 0) scale3d(0.98, 0.76, 1);
+  }
+
+  19% {
+    opacity: 0.42;
+    transform: translate3d(6vw, 0, 0) scale3d(1.08, 0.8, 1);
+  }
+
+  24% {
+    opacity: 0.18;
+    transform: translate3d(56vw, -0.08rem, 0) scale3d(1.16, 0.72, 1);
+  }
+
+  29% {
+    opacity: 0;
+    transform: translate3d(112vw, -0.12rem, 0) scale3d(1.22, 0.68, 1);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
+    visibility: hidden;
+    opacity: 0;
+    animation: none;
+  }
+
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
     opacity: 0.2;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
