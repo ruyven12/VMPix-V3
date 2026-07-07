@@ -14090,10 +14090,10 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
   z-index: 4;
   display: grid;
-  inline-size: clamp(10.2rem, 14vw, 15rem);
-  padding: clamp(0.58rem, 1vw, 0.82rem) clamp(0.62rem, 1vw, 0.9rem);
+  inline-size: clamp(11.2rem, 15.4vw, 16.5rem);
+  padding: clamp(0.64rem, 1.1vw, 0.9rem) clamp(0.68rem, 1.1vw, 0.99rem);
   color: rgba(245, 246, 248, 0.94);
-  font-family: "Rajdhani", "Orbitron", "Segoe UI", sans-serif;
+  font-family: "Orbitron", "Rajdhani", "Segoe UI", sans-serif;
   letter-spacing: 0.04em;
   pointer-events: none;
   visibility: hidden;
@@ -14146,7 +14146,7 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 0.55rem;
   align-items: center;
-  min-block-size: clamp(2rem, 4svh, 2.35rem);
+  min-block-size: clamp(2.2rem, 4.4svh, 2.6rem);
   border-block-end: 1px solid rgba(255, 90, 60, 0.18);
 }
 
@@ -14318,12 +14318,12 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-archive-stats-panel {
     inset-block-start: 4.2rem;
     inset-inline-start: 2.05rem;
-    inline-size: min(10.2rem, calc(100vw - 3.2rem));
-    padding: 0.54rem 0.58rem;
+    inline-size: min(11.2rem, calc(100vw - 3.2rem));
+    padding: 0.59rem 0.64rem;
   }
 
   .daiion-archive-stats-panel__row {
-    min-block-size: 1.88rem;
+    min-block-size: 2.07rem;
     column-gap: 0.42rem;
   }
 }
