@@ -13872,6 +13872,10 @@ button.wrestling-event-history-tagged-thumb {
     transform: translate3d(0, 0, 0) scale3d(1.008, 1.008, 1);
   }
 }
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+  filter: brightness(1.12) saturate(1.06);
+}
 .daiion-atmosphere-glow {
   position: absolute;
   inset: 0;
@@ -13881,9 +13885,9 @@ button.wrestling-event-history-tagged-thumb {
   visibility: hidden;
   opacity: 0;
   background:
-    radial-gradient(ellipse at 78% 18%, rgba(255, 111, 42, 0.22) 0 7%, rgba(178, 50, 24, 0.15) 18%, transparent 42%),
-    radial-gradient(ellipse at 16% 26%, rgba(255, 94, 37, 0.16) 0 8%, rgba(133, 35, 24, 0.11) 20%, transparent 44%),
-    radial-gradient(ellipse at 54% 8%, rgba(255, 162, 72, 0.08) 0 12%, transparent 36%);
+    radial-gradient(ellipse at 78% 18%, rgba(255, 111, 42, 0.25) 0 7%, rgba(178, 50, 24, 0.17) 18%, transparent 46%),
+    radial-gradient(ellipse at 16% 26%, rgba(255, 94, 37, 0.185) 0 8%, rgba(133, 35, 24, 0.128) 20%, transparent 48%),
+    radial-gradient(ellipse at 54% 8%, rgba(255, 162, 72, 0.096) 0 12%, transparent 40%);
   -webkit-mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.34) 50%, transparent 62%);
   mask-image: linear-gradient(180deg, #000 0 42%, rgba(0, 0, 0, 0.34) 50%, transparent 62%);
   mix-blend-mode: screen;
@@ -13899,26 +13903,36 @@ button.wrestling-event-history-tagged-thumb {
 
 @keyframes daiionAtmosphereGlow {
   0%,
-  64.75%,
-  66.05%,
+  64.2%,
+  66.22%,
   100% {
     opacity: 0;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
-  65.1% {
-    opacity: 0.09;
+  64.58% {
+    opacity: 0.07;
+    transform: translate3d(0, 0, 0) scale3d(1.004, 1.004, 1);
+  }
+
+  65% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) scale3d(1.009, 1.009, 1);
+  }
+
+  65.42% {
+    opacity: 0.27;
+    transform: translate3d(0, 0, 0) scale3d(1.015, 1.015, 1);
+  }
+
+  65.84% {
+    opacity: 0.16;
+    transform: translate3d(0, 0, 0) scale3d(1.011, 1.011, 1);
+  }
+
+  66.12% {
+    opacity: 0.05;
     transform: translate3d(0, 0, 0) scale3d(1.006, 1.006, 1);
-  }
-
-  65.48% {
-    opacity: 0.24;
-    transform: translate3d(0, 0, 0) scale3d(1.012, 1.012, 1);
-  }
-
-  65.78% {
-    opacity: 0.12;
-    transform: translate3d(0, 0, 0) scale3d(1.008, 1.008, 1);
   }
 }
 .daiion-dust-gust {
@@ -14250,6 +14264,25 @@ button.wrestling-event-history-tagged-thumb {
   --ember-tilt: -15deg;
 }
 
+.daiion-ember--d {
+  --ember-size: clamp(1.15px, 0.32vw, 1.95px);
+  --ember-aspect: 0.88;
+  --ember-rise: 12.5svh;
+  --ember-mid-rise: 5.8svh;
+  --ember-drift: 0.2rem;
+  --ember-mid-drift: -0.1rem;
+  --ember-duration: 8.4s;
+  --ember-delay: -3.2s;
+  --ember-peak-opacity: 0.32;
+  --ember-fade-opacity: 0.09;
+  --ember-core-alpha: 0.58;
+  --ember-heat-alpha: 0.32;
+  --ember-glow-alpha: 0.12;
+  --ember-haze-alpha: 0.07;
+  --ember-animation: daiionEmberRiseShort;
+  --ember-tilt: 6deg;
+}
+
 .daiion-ember-pocket--one .daiion-ember--a {
   --ember-drift: -0.28rem;
   --ember-mid-drift: 0.18rem;
@@ -14265,6 +14298,14 @@ button.wrestling-event-history-tagged-thumb {
   --ember-rise: 9.5svh;
   --ember-drift: -0.12rem;
   --ember-delay: -6.2s;
+}
+
+.daiion-ember-pocket--one .daiion-ember--d {
+  --ember-rise: 11.5svh;
+  --ember-drift: 0.18rem;
+  --ember-duration: 8.8s;
+  --ember-delay: -7.3s;
+  --ember-tilt: 7deg;
 }
 
 .daiion-ember-pocket--two .daiion-ember--a,
@@ -14296,6 +14337,16 @@ button.wrestling-event-history-tagged-thumb {
   --ember-duration: 6.4s;
 }
 
+.daiion-ember-pocket--two .daiion-ember--d {
+  --ember-size: clamp(1.3px, 0.36vw, 2.15px);
+  --ember-rise: 14svh;
+  --ember-drift: 0.32rem;
+  --ember-duration: 8.9s;
+  --ember-delay: -2.4s;
+  --ember-peak-opacity: 0.36;
+  --ember-tilt: 12deg;
+}
+
 .daiion-ember-pocket--three .daiion-ember--a {
   --ember-rise: 16svh;
   --ember-drift: 0.3rem;
@@ -14324,6 +14375,15 @@ button.wrestling-event-history-tagged-thumb {
   --ember-delay: -9.2s;
 }
 
+.daiion-ember-pocket--three .daiion-ember--d {
+  --ember-rise: 13.2svh;
+  --ember-mid-rise: 6.4svh;
+  --ember-drift: -0.26rem;
+  --ember-delay: -5.6s;
+  --ember-peak-opacity: 0.34;
+  --ember-tilt: -9deg;
+}
+
 .daiion-ember-pocket--four .daiion-ember--a {
   --ember-drift: 0.46rem;
   --ember-mid-drift: -0.2rem;
@@ -14339,6 +14399,15 @@ button.wrestling-event-history-tagged-thumb {
   --ember-rise: 10.5svh;
   --ember-drift: 0.18rem;
   --ember-duration: 7.2s;
+}
+
+.daiion-ember-pocket--four .daiion-ember--d {
+  --ember-size: clamp(1.25px, 0.34vw, 2.05px);
+  --ember-rise: 13.5svh;
+  --ember-drift: -0.3rem;
+  --ember-duration: 8.1s;
+  --ember-delay: -4.9s;
+  --ember-tilt: -11deg;
 }
 
 .daiion-ember-pocket--five .daiion-ember--a {
@@ -14357,6 +14426,15 @@ button.wrestling-event-history-tagged-thumb {
   --ember-rise: 8.8svh;
   --ember-drift: -0.28rem;
   --ember-delay: -6.4s;
+}
+
+.daiion-ember-pocket--five .daiion-ember--d {
+  --ember-rise: 10.8svh;
+  --ember-drift: 0.16rem;
+  --ember-duration: 7.9s;
+  --ember-delay: -1.7s;
+  --ember-peak-opacity: 0.3;
+  --ember-tilt: 9deg;
 }
 
 @keyframes daiionEmberRise {
