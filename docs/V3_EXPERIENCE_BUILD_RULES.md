@@ -181,7 +181,7 @@ and must not alter approved assets unless explicitly requested.
 
 Choose the solution that makes the experience feel better and remain stable. Avoid clever abstractions, animation frameworks, or routing tricks that increase risk without a clear experiential payoff.
 
-Prefer local, understandable implementation that fits the existing V3 codebase.
+Prefer local, understandable implementation that fits the existing V3 codebase. During Experience Build, prefer refinement over invention. Extend existing systems before creating new ones.
 
 ## 16. Worlds Must Feel Alive
 
@@ -194,3 +194,22 @@ Alive does not mean noisy. Use subtle motion, responsive states, lighting, depth
 Before editing, identify whether the page or effect is already approved. If approved, protect it. If a change might affect it indirectly, verify it. Do not let work on a new page degrade a signed-off page.
 
 When in doubt, assume approved surfaces are fragile and verify before reporting completion.
+## 18. Codex Execution Rules (Experience Build)
+
+Experience Build passes are refinement mode unless explicitly stated otherwise.
+
+- Keep each pass to one story beat.
+- Keep each pass to one visual or interaction change.
+- Use surgical scope only.
+- Use the local repo at `C:\Users\deysx\Documents\GitHub\VMPix-V3`.
+- Do not search or write outside the repo.
+- Inspect only allowed files.
+- Do not run workspace-wide scans.
+- Prefer existing systems, selectors, and components before creating new ones.
+- Stop if the task requires verifier scripts, screenshot comparison, pixel comparison, repo-wide inspection, temporary verification infrastructure, or more than two failed write attempts.
+- Verify only what changed.
+- Reuse the existing local server.
+- Do not restart services unless required.
+- Report browser or Windows ACL failures as tooling issues.
+- Target 5-10 minutes per pass.
+- If a pass exceeds that target, stop and report completed work, the blocker, and the next smallest pass.
