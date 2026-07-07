@@ -2350,7 +2350,59 @@ const daiionArchiveStatsEndpoints = {
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
 const daiionArchiveStatsRowStagger = 80;
+const daiionDestinationTargets = new Set(["campaigns", "combatants", "arenas"]);
 let daiionArchiveStatsRequestId = 0;
+let daiionDestinationSelectedTarget = null;
+
+function syncDaiionDestinationSelection() {
+  const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
+  const panel = document.querySelector(".daiion-destination-panel");
+
+  destinationControls.forEach((control) => {
+    const isActive = control.getAttribute("data-daiion-destination-target") === daiionDestinationSelectedTarget;
+    control.classList.toggle("is-active", isActive);
+    control.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+
+  if (!panel) {
+    return;
+  }
+
+  if (daiionDestinationSelectedTarget) {
+    panel.setAttribute("data-daiion-selected-target", daiionDestinationSelectedTarget);
+  } else {
+    panel.removeAttribute("data-daiion-selected-target");
+  }
+}
+
+function setDaiionDestinationTarget(target) {
+  if (window.location.pathname !== routePaths.wrestling2 || !daiionDestinationTargets.has(target)) {
+    return;
+  }
+
+  daiionDestinationSelectedTarget = target;
+  syncDaiionDestinationSelection();
+}
+
+function initDaiionDestinationPanel() {
+  const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
+  if (!destinationControls.length) {
+    return;
+  }
+
+  destinationControls.forEach((control) => {
+    if (control.getAttribute("data-daiion-destination-bound") === "true") {
+      return;
+    }
+
+    control.setAttribute("data-daiion-destination-bound", "true");
+    control.addEventListener("click", () => {
+      setDaiionDestinationTarget(control.getAttribute("data-daiion-destination-target"));
+    });
+  });
+
+  syncDaiionDestinationSelection();
+}
 
 function getDaiionFiniteStat(source, paths = []) {
   if (!source || typeof source !== "object") {
@@ -2492,3 +2544,5 @@ async function initDaiionArchiveStatsPanel(options = {}) {
     resolveDaiionArchiveStatsValues(valueNodes, {}, animationStartedAt);
   }
 }
+
+initDaiionDestinationPanel();
