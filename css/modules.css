@@ -14170,7 +14170,7 @@ button.wrestling-event-history-tagged-thumb {
 }
 .daiion-archive-stats-panel__term {
   color: rgba(248, 249, 252, 0.96);
-  font-size: clamp(0.63rem, 0.82vw, 0.78rem);
+  font-size: calc(clamp(0.63rem, 0.82vw, 0.78rem) + 2px);
   font-weight: 650;
   line-height: 1.02;
   text-transform: uppercase;
