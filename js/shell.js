@@ -1389,7 +1389,7 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
   if (didChangeActiveWorld) {
     clearPortfolioGatewayFocusState();
   }
-  setPortfolioEngineHudCurrentView(config.label);
+  setPortfolioEngineHudCurrentView(config.id === "battleground" ? "Outskirts of Daiion" : config.label);
   portfolioBeaconHotspots.forEach((button) => {
     const isSelected = config.id !== "portfolio" && button.dataset.portfolioStar === config.id;
     button.classList.toggle("is-selected", isSelected);
