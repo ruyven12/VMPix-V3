@@ -2350,7 +2350,24 @@ const daiionArchiveStatsEndpoints = {
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
 const daiionArchiveStatsRowStagger = 80;
-const daiionDestinationTargets = new Set(["campaigns", "combatants", "arenas"]);
+const daiionArchiveFocusBriefings = {
+  campaigns: {
+    stat: "43 Recorded Campaigns",
+    copy: "Journey through every recorded campaign preserved within the Ring Archive.",
+    status: "TARGET LOCKED",
+  },
+  combatants: {
+    stat: "290 Documented Combatants",
+    copy: "Explore the figures, rivals, allies, and legends documented across Daïion.",
+    status: "TARGET LOCKED",
+  },
+  arenas: {
+    stat: "9 Mapped Arenas",
+    copy: "Visit the battlegrounds where each recorded conflict left its mark.",
+    status: "TARGET LOCKED",
+  },
+};
+const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings));
 let daiionArchiveStatsRequestId = 0;
 let daiionDestinationSelectedTarget = null;
 
@@ -2358,6 +2375,8 @@ function syncDaiionDestinationSelection() {
   const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
   const statRows = Array.from(document.querySelectorAll("[data-daiion-stat-target]"));
   const panel = document.querySelector(".daiion-destination-panel");
+  const focusPanel = document.querySelector("[data-daiion-archive-focus]");
+  const focusBriefing = daiionArchiveFocusBriefings[daiionDestinationSelectedTarget];
 
   destinationControls.forEach((control) => {
     const isActive = control.getAttribute("data-daiion-destination-target") === daiionDestinationSelectedTarget;
@@ -2370,6 +2389,28 @@ function syncDaiionDestinationSelection() {
     row.classList.toggle("is-active", isActive);
     row.setAttribute("aria-current", isActive ? "true" : "false");
   });
+
+  if (focusPanel) {
+    const statNode = focusPanel.querySelector("[data-daiion-archive-focus-stat]");
+    const copyNode = focusPanel.querySelector("[data-daiion-archive-focus-copy]");
+    const statusNode = focusPanel.querySelector("[data-daiion-archive-focus-status]");
+
+    if (focusBriefing) {
+      statNode.textContent = focusBriefing.stat;
+      copyNode.textContent = focusBriefing.copy;
+      statusNode.textContent = focusBriefing.status;
+      focusPanel.classList.add("is-active");
+      focusPanel.setAttribute("aria-hidden", "false");
+      focusPanel.setAttribute("data-daiion-selected-target", daiionDestinationSelectedTarget);
+    } else {
+      statNode.textContent = "";
+      copyNode.textContent = "";
+      statusNode.textContent = "";
+      focusPanel.classList.remove("is-active");
+      focusPanel.setAttribute("aria-hidden", "true");
+      focusPanel.removeAttribute("data-daiion-selected-target");
+    }
+  }
 
   if (!panel) {
     return;
