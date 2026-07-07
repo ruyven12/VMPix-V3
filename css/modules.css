@@ -13883,7 +13883,7 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 50%;
   z-index: 5;
   display: block;
-  inline-size: min(92vw, 70rem);
+  inline-size: calc(100vw - clamp(1.8rem, 3vw, 3rem));
   block-size: clamp(1.7rem, 4.2svh, 2.55rem);
   pointer-events: none;
   visibility: hidden;
@@ -13972,8 +13972,8 @@ button.wrestling-event-history-tagged-thumb {
 
 .daiion-side-hud-rail {
   position: absolute;
-  inset-block-start: clamp(2.72rem, 6.2svh, 4rem);
-  inset-block-end: clamp(6.6rem, 13svh, 8.6rem);
+  inset-block-start: clamp(2.65rem, 4.5svh, 3.05rem);
+  inset-block-end: clamp(5.4rem, 8svh, 6.1rem);
   z-index: 5;
   display: block;
   inline-size: clamp(2.35rem, 5.1vw, 4.35rem);
@@ -14045,7 +14045,7 @@ button.wrestling-event-history-tagged-thumb {
 @media (max-width: 540px) {
   .daiion-side-hud-rail {
     inset-block-start: 2.25rem;
-    inset-block-end: 7.2rem;
+    inset-block-end: 5.55rem;
     inline-size: 1.05rem;
   }
 
