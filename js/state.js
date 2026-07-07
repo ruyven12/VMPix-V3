@@ -2347,6 +2347,9 @@ const daiionArchiveStatsEndpoints = {
   people: "https://vmpix-data.onrender.com/api/wrestling/people/stats",
   venues: "https://vmpix-data.onrender.com/api/wrestling/venues/stats",
 };
+const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+const daiionArchiveStatsDecodeDelay = 4580;
+const daiionArchiveStatsRowStagger = 80;
 
 function getDaiionFiniteStat(source, paths = []) {
   if (!source || typeof source !== "object") {
@@ -2385,6 +2388,58 @@ function formatDaiionArchiveStat(value) {
   return Number.isFinite(value) ? Math.trunc(value).toLocaleString("en-US") : "N/A";
 }
 
+function getDaiionArchiveDecodeFrames(finalValue) {
+  const rawDigits = String(finalValue).replace(/\D/g, "");
+  const numberValue = Number(rawDigits || 0);
+  const hexValue = Number.isFinite(numberValue)
+    ? Math.max(1, Math.min(0xfff, numberValue)).toString(16).toUpperCase().padStart(Math.min(Math.max(rawDigits.length, 2), 3), "0")
+    : "7F";
+
+  return ["░░", "7F", hexValue];
+}
+
+function setDaiionArchiveValueLocked(node, value) {
+  node.textContent = value;
+  node.classList.remove("is-decoding");
+  node.classList.add("is-locked", "is-locking");
+  window.setTimeout(() => node.classList.remove("is-locking"), 320);
+}
+
+function decodeDaiionArchiveValue(node, finalValue, rowIndex) {
+  const decodeFrames = getDaiionArchiveDecodeFrames(finalValue);
+  const rowDelay = 160 + rowIndex * daiionArchiveStatsRowStagger;
+  window.setTimeout(() => {
+    node.classList.remove("is-locked", "is-locking");
+    node.classList.add("is-decoding");
+    decodeFrames.forEach((frame, frameIndex) => {
+      window.setTimeout(() => {
+        node.textContent = frame;
+      }, frameIndex * 76);
+    });
+    window.setTimeout(() => setDaiionArchiveValueLocked(node, finalValue), decodeFrames.length * 76 + 58);
+  }, rowDelay);
+}
+
+function resolveDaiionArchiveStatsValues(valueNodes, mappedStats) {
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const finalValues = valueNodes.map((node) => {
+    const key = node.getAttribute("data-daiion-stat-value");
+    const value = mappedStats[key];
+    return Number.isFinite(value) ? formatDaiionArchiveStat(value) : "N/A";
+  });
+
+  if (reduceMotion) {
+    valueNodes.forEach((node, index) => setDaiionArchiveValueLocked(node, finalValues[index]));
+    return;
+  }
+
+  const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+  const remainingDelay = Math.max(0, daiionArchiveStatsDecodeDelay - (now - daiionArchiveStatsStartedAt));
+  window.setTimeout(() => {
+    valueNodes.forEach((node, index) => decodeDaiionArchiveValue(node, finalValues[index], index));
+  }, remainingDelay);
+}
+
 async function fetchDaiionArchiveStats(endpoint) {
   const response = await fetch(endpoint, { cache: "no-store" });
   if (!response.ok) {
@@ -2412,23 +2467,15 @@ async function initDaiionArchiveStatsPanel() {
     const showsStats = showsResult.status === "fulfilled" ? showsResult.value : null;
     const peopleStats = peopleResult.status === "fulfilled" ? peopleResult.value : null;
     const venuesStats = venuesResult.status === "fulfilled" ? venuesResult.value : null;
-    const mappedStats = {
+    resolveDaiionArchiveStatsValues(valueNodes, {
       promotions: getDaiionPromotionTotal(showsStats),
       venues: getDaiionFiniteStat(venuesStats, ["total_venues", "totalVenues", "venuesTotal", "totals.venuesTotal"]),
       shows: getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]),
       matches: getDaiionFiniteStat(showsStats, ["totals.matchesTotal", "matchesTotal", "totalMatches"]),
       people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
-    };
-
-    valueNodes.forEach((node) => {
-      const key = node.getAttribute("data-daiion-stat-value");
-      const value = mappedStats[key];
-      if (Number.isFinite(value)) {
-        node.textContent = formatDaiionArchiveStat(value);
-      }
     });
   } catch (_error) {
-    // Keep the static N/A fallbacks if the live stats request fails.
+    resolveDaiionArchiveStatsValues(valueNodes, {});
   }
 }
 
