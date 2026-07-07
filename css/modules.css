@@ -14093,7 +14093,7 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: clamp(11.2rem, 15.4vw, 16.5rem);
   padding: clamp(0.64rem, 1.1vw, 0.9rem) clamp(0.68rem, 1.1vw, 0.99rem);
   color: rgba(245, 246, 248, 0.94);
-  font-family: "Orbitron", "Rajdhani", "Segoe UI", sans-serif;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0.04em;
   pointer-events: none;
   visibility: hidden;
@@ -14131,7 +14131,7 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
   padding-block-end: 0.42rem;
   color: rgba(255, 90, 60, 0.96);
-  font-family: "Orbitron", "Rajdhani", "Segoe UI", sans-serif;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: clamp(0.62rem, 0.78vw, 0.78rem);
   font-weight: 700;
   line-height: 1;
@@ -14161,6 +14161,12 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
 }
 
+.daiion-archive-stats-panel__row,
+.daiion-archive-stats-panel__label,
+.daiion-archive-stats-panel__term,
+.daiion-archive-stats-panel__context {
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+}
 .daiion-archive-stats-panel__term {
   color: rgba(248, 249, 252, 0.96);
   font-size: clamp(0.63rem, 0.82vw, 0.78rem);
@@ -14181,7 +14187,7 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-archive-stats-panel__value {
   justify-self: end;
   color: rgba(255, 231, 208, 0.82);
-  font-family: "Orbitron", "Rajdhani", "Segoe UI", sans-serif;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: clamp(0.6rem, 0.78vw, 0.74rem);
   font-weight: 650;
   line-height: 1;
