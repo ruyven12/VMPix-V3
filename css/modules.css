@@ -13902,18 +13902,20 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-top-hud-rail::before {
   inset: 0;
   background:
-    linear-gradient(90deg, transparent 0 4%, rgba(255, 42, 26, 0.95) 4% 28%, transparent 28% 35%, rgba(255, 90, 60, 0.82) 35% 65%, transparent 65% 72%, rgba(255, 42, 26, 0.95) 72% 96%, transparent 96% 100%) top / 100% 1px no-repeat,
-    linear-gradient(90deg, rgba(255, 42, 26, 0.74), rgba(255, 90, 60, 0.56) 14%, transparent 27%, transparent 73%, rgba(255, 90, 60, 0.56) 86%, rgba(255, 42, 26, 0.74)) bottom / 100% 1px no-repeat,
-    linear-gradient(180deg, rgba(255, 90, 60, 0.72), transparent) left bottom / 1px 1.55rem no-repeat,
-    linear-gradient(180deg, rgba(255, 90, 60, 0.72), transparent) right bottom / 1px 1.55rem no-repeat,
-    linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.88) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.7rem 100% no-repeat,
-    linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.88) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.7rem 100% no-repeat;
+    linear-gradient(90deg, transparent 0 4%, rgba(255, 231, 208, 0.24) 4% 5%, rgba(255, 42, 26, 0.96) 5% 28%, transparent 28% 35%, rgba(255, 231, 208, 0.2) 35% 36%, rgba(255, 90, 60, 0.96) 36% 64%, rgba(255, 231, 208, 0.2) 64% 65%, transparent 65% 72%, rgba(255, 42, 26, 0.96) 72% 95%, rgba(255, 231, 208, 0.24) 95% 96%, transparent 96% 100%) top / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 42, 26, 0.84), rgba(255, 90, 60, 0.68) 14%, transparent 27%, transparent 73%, rgba(255, 90, 60, 0.68) 86%, rgba(255, 42, 26, 0.84)) bottom / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(255, 231, 208, 0.2), rgba(255, 90, 60, 0.88) 30%, transparent) left bottom / 1px 1.55rem no-repeat,
+    linear-gradient(180deg, rgba(255, 231, 208, 0.2), rgba(255, 90, 60, 0.88) 30%, transparent) right bottom / 1px 1.55rem no-repeat,
+    linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.98) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.7rem 100% no-repeat,
+    linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.98) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.7rem 100% no-repeat;
   clip-path: polygon(0.95rem 0, calc(100% - 0.95rem) 0, 100% 52%, calc(100% - 1.65rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.65rem 100%, 0 52%);
   opacity: 1;
   filter:
-    drop-shadow(0 0 0.12rem rgba(255, 90, 60, 0.48))
-    drop-shadow(0 0 0.58rem rgba(255, 42, 26, 0.52))
-    drop-shadow(0 0 1.05rem rgba(255, 42, 26, 0.28));
+    drop-shadow(0 0.05rem 0.04rem rgba(0, 0, 0, 0.68))
+    drop-shadow(0 0 0.05rem rgba(255, 231, 208, 0.22))
+    drop-shadow(0 0 0.16rem rgba(255, 90, 60, 0.56))
+    drop-shadow(0 0 0.68rem rgba(255, 42, 26, 0.58))
+    drop-shadow(0 0 1.25rem rgba(255, 42, 26, 0.34));
 }
 
 .daiion-top-hud-rail::after {
@@ -13921,10 +13923,12 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline: clamp(1.3rem, 7vw, 5.8rem);
   block-size: 0.7rem;
   background:
-    repeating-linear-gradient(90deg, rgba(255, 90, 60, 0.58) 0 1px, transparent 1px 1.05rem) top / 100% 0.42rem no-repeat,
-    linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.46) 22%, transparent 44% 56%, rgba(255, 90, 60, 0.46) 78%, transparent) bottom / 100% 1px no-repeat;
-  opacity: 0.88;
-  filter: drop-shadow(0 0 0.3rem rgba(255, 42, 26, 0.3));
+    repeating-linear-gradient(90deg, rgba(255, 231, 208, 0.22) 0 1px, transparent 1px 1.05rem) top / 100% 0.42rem no-repeat,
+    linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.56) 22%, rgba(255, 231, 208, 0.14) 49% 51%, rgba(255, 90, 60, 0.56) 78%, transparent) bottom / 100% 1px no-repeat;
+  opacity: 0.94;
+  filter:
+    drop-shadow(0 0.04rem 0.03rem rgba(0, 0, 0, 0.52))
+    drop-shadow(0 0 0.34rem rgba(255, 42, 26, 0.36));
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
@@ -13941,19 +13945,19 @@ button.wrestling-event-history-tagged-thumb {
 
   .daiion-top-hud-rail::before {
     background:
-      linear-gradient(90deg, transparent 0 5%, rgba(255, 42, 26, 0.86) 5% 30%, transparent 30% 38%, rgba(255, 90, 60, 0.68) 38% 62%, transparent 62% 70%, rgba(255, 42, 26, 0.86) 70% 95%, transparent 95% 100%) top / 100% 1px no-repeat,
-      linear-gradient(90deg, rgba(255, 42, 26, 0.58), rgba(255, 90, 60, 0.42) 18%, transparent 34%, transparent 66%, rgba(255, 90, 60, 0.42) 82%, rgba(255, 42, 26, 0.58)) bottom / 100% 1px no-repeat,
-      linear-gradient(180deg, rgba(255, 90, 60, 0.6), transparent) left bottom / 1px 1.1rem no-repeat,
-      linear-gradient(180deg, rgba(255, 90, 60, 0.6), transparent) right bottom / 1px 1.1rem no-repeat,
-      linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.76) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.1rem 100% no-repeat,
-      linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.76) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.1rem 100% no-repeat;
+      linear-gradient(90deg, transparent 0 5%, rgba(255, 231, 208, 0.18) 5% 6%, rgba(255, 42, 26, 0.92) 6% 30%, transparent 30% 38%, rgba(255, 231, 208, 0.16) 38% 39%, rgba(255, 90, 60, 0.82) 39% 61%, rgba(255, 231, 208, 0.16) 61% 62%, transparent 62% 70%, rgba(255, 42, 26, 0.92) 70% 94%, rgba(255, 231, 208, 0.18) 94% 95%, transparent 95% 100%) top / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255, 42, 26, 0.68), rgba(255, 90, 60, 0.54) 18%, transparent 34%, transparent 66%, rgba(255, 90, 60, 0.54) 82%, rgba(255, 42, 26, 0.68)) bottom / 100% 1px no-repeat,
+      linear-gradient(180deg, rgba(255, 231, 208, 0.16), rgba(255, 90, 60, 0.72) 30%, transparent) left bottom / 1px 1.1rem no-repeat,
+      linear-gradient(180deg, rgba(255, 231, 208, 0.16), rgba(255, 90, 60, 0.72) 30%, transparent) right bottom / 1px 1.1rem no-repeat,
+      linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) left top / 2.1rem 100% no-repeat,
+      linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.9) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) right top / 2.1rem 100% no-repeat;
     clip-path: polygon(0.7rem 0, calc(100% - 0.7rem) 0, 100% 50%, calc(100% - 1.2rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.2rem 100%, 0 50%);
   }
 
   .daiion-top-hud-rail::after {
     inset-block-start: 0.42rem;
     inset-inline: 1.8rem;
-    opacity: 0.58;
+    opacity: 0.66;
   }
 }
 
@@ -13989,17 +13993,19 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-side-hud-rail::before {
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 0 2%, rgba(255, 42, 26, 0.9) 2% 17%, transparent 17% 24%, rgba(255, 90, 60, 0.72) 24% 45%, transparent 45% 55%, rgba(255, 90, 60, 0.72) 55% 76%, transparent 76% 83%, rgba(255, 42, 26, 0.9) 83% 98%, transparent 98% 100%) left / 1px 100% no-repeat,
-    linear-gradient(90deg, rgba(255, 90, 60, 0.7), transparent 78%) top left / 100% 1px no-repeat,
-    linear-gradient(90deg, rgba(255, 90, 60, 0.7), transparent 78%) bottom left / 100% 1px no-repeat,
-    linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.82) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) top left / 2rem 3rem no-repeat,
-    linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.82) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) bottom left / 2rem 3rem no-repeat;
+    linear-gradient(180deg, transparent 0 2%, rgba(255, 231, 208, 0.2) 2% 3%, rgba(255, 42, 26, 0.98) 3% 17%, transparent 17% 24%, rgba(255, 90, 60, 0.8) 24% 45%, transparent 45% 55%, rgba(255, 90, 60, 0.8) 55% 76%, transparent 76% 83%, rgba(255, 42, 26, 0.98) 83% 97%, rgba(255, 231, 208, 0.2) 97% 98%, transparent 98% 100%) left / 1px 100% no-repeat,
+    linear-gradient(90deg, rgba(255, 231, 208, 0.18), rgba(255, 90, 60, 0.86) 20%, transparent 78%) top left / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 231, 208, 0.18), rgba(255, 90, 60, 0.86) 20%, transparent 78%) bottom left / 100% 1px no-repeat,
+    linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.96) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) top left / 2rem 3rem no-repeat,
+    linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 90, 60, 0.96) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) bottom left / 2rem 3rem no-repeat;
   clip-path: polygon(0 0, 78% 0, 100% 1.5rem, 42% 1.5rem, 42% calc(100% - 1.5rem), 100% calc(100% - 1.5rem), 78% 100%, 0 100%);
   opacity: 1;
   filter:
-    drop-shadow(0 0 0.1rem rgba(255, 90, 60, 0.42))
-    drop-shadow(0 0 0.46rem rgba(255, 42, 26, 0.46))
-    drop-shadow(0 0 0.92rem rgba(255, 42, 26, 0.22));
+    drop-shadow(0 0.05rem 0.04rem rgba(0, 0, 0, 0.66))
+    drop-shadow(0 0 0.05rem rgba(255, 231, 208, 0.2))
+    drop-shadow(0 0 0.14rem rgba(255, 90, 60, 0.52))
+    drop-shadow(0 0 0.58rem rgba(255, 42, 26, 0.54))
+    drop-shadow(0 0 1.08rem rgba(255, 42, 26, 0.3));
 }
 
 .daiion-side-hud-rail::after {
@@ -14007,13 +14013,15 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 0.48rem;
   inline-size: clamp(1.25rem, 2.8vw, 2.35rem);
   background:
-    linear-gradient(90deg, rgba(255, 90, 60, 0.42), transparent 84%) 0 0 / 100% 1px no-repeat,
-    linear-gradient(90deg, rgba(255, 90, 60, 0.38), transparent 84%) 0 33.33% / 100% 1px no-repeat,
-    linear-gradient(90deg, rgba(255, 90, 60, 0.38), transparent 84%) 0 66.66% / 100% 1px no-repeat,
-    linear-gradient(90deg, rgba(255, 90, 60, 0.42), transparent 84%) 0 100% / 100% 1px no-repeat,
-    repeating-linear-gradient(180deg, rgba(255, 42, 26, 0.44) 0 1px, transparent 1px 0.9rem) left / 0.42rem 100% no-repeat;
-  opacity: 0.92;
-  filter: drop-shadow(0 0 0.24rem rgba(255, 42, 26, 0.24));
+    linear-gradient(90deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.52) 18%, transparent 84%) 0 0 / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 90, 60, 0.46), transparent 84%) 0 33.33% / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 90, 60, 0.46), transparent 84%) 0 66.66% / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.52) 18%, transparent 84%) 0 100% / 100% 1px no-repeat,
+    repeating-linear-gradient(180deg, rgba(255, 90, 60, 0.52) 0 1px, transparent 1px 0.9rem) left / 0.42rem 100% no-repeat;
+  opacity: 0.96;
+  filter:
+    drop-shadow(0 0.04rem 0.03rem rgba(0, 0, 0, 0.48))
+    drop-shadow(0 0 0.3rem rgba(255, 42, 26, 0.32));
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
@@ -14038,9 +14046,9 @@ button.wrestling-event-history-tagged-thumb {
 
   .daiion-side-hud-rail::before {
     background:
-      linear-gradient(180deg, transparent 0 3%, rgba(255, 42, 26, 0.72) 3% 18%, transparent 18% 27%, rgba(255, 90, 60, 0.54) 27% 45%, transparent 45% 55%, rgba(255, 90, 60, 0.54) 55% 73%, transparent 73% 82%, rgba(255, 42, 26, 0.72) 82% 97%, transparent 97% 100%) left / 1px 100% no-repeat,
-      linear-gradient(90deg, rgba(255, 90, 60, 0.54), transparent 74%) top left / 100% 1px no-repeat,
-      linear-gradient(90deg, rgba(255, 90, 60, 0.54), transparent 74%) bottom left / 100% 1px no-repeat;
+      linear-gradient(180deg, transparent 0 3%, rgba(255, 231, 208, 0.16) 3% 4%, rgba(255, 42, 26, 0.84) 4% 18%, transparent 18% 27%, rgba(255, 90, 60, 0.64) 27% 45%, transparent 45% 55%, rgba(255, 90, 60, 0.64) 55% 73%, transparent 73% 82%, rgba(255, 42, 26, 0.84) 82% 96%, rgba(255, 231, 208, 0.16) 96% 97%, transparent 97% 100%) left / 1px 100% no-repeat,
+      linear-gradient(90deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.66) 24%, transparent 74%) top left / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.66) 24%, transparent 74%) bottom left / 100% 1px no-repeat;
     clip-path: polygon(0 0, 82% 0, 100% 0.82rem, 46% 0.82rem, 46% calc(100% - 0.82rem), 100% calc(100% - 0.82rem), 82% 100%, 0 100%);
     opacity: 1;
   }
@@ -14049,8 +14057,8 @@ button.wrestling-event-history-tagged-thumb {
     inset-block: 1.85rem;
     inset-inline-start: 0.32rem;
     inline-size: 0.55rem;
-    opacity: 0.74;
-    filter: drop-shadow(0 0 0.18rem rgba(255, 42, 26, 0.22));
+    opacity: 0.8;
+    filter: drop-shadow(0 0 0.22rem rgba(255, 42, 26, 0.28));
   }
 }
 .daiion-atmosphere-glow {
