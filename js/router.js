@@ -310,7 +310,11 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling2") {
+    const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     showBattlegroundGatewayArrivalSurface();
+    if (typeof initDaiionArchiveStatsPanel === "function") {
+      initDaiionArchiveStatsPanel({ animationStartedAt });
+    }
     return;
   }
 

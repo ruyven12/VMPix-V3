@@ -2350,6 +2350,7 @@ const daiionArchiveStatsEndpoints = {
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
 const daiionArchiveStatsRowStagger = 80;
+let daiionArchiveStatsRequestId = 0;
 
 function getDaiionFiniteStat(source, paths = []) {
   if (!source || typeof source !== "object") {
@@ -2420,7 +2421,7 @@ function decodeDaiionArchiveValue(node, finalValue, rowIndex) {
   }, rowDelay);
 }
 
-function resolveDaiionArchiveStatsValues(valueNodes, mappedStats) {
+function resolveDaiionArchiveStatsValues(valueNodes, mappedStats, animationStartedAt = daiionArchiveStatsStartedAt) {
   const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   const finalValues = valueNodes.map((node) => {
     const key = node.getAttribute("data-daiion-stat-value");
@@ -2434,7 +2435,8 @@ function resolveDaiionArchiveStatsValues(valueNodes, mappedStats) {
   }
 
   const now = typeof performance !== "undefined" ? performance.now() : Date.now();
-  const remainingDelay = Math.max(0, daiionArchiveStatsDecodeDelay - (now - daiionArchiveStatsStartedAt));
+  const startedAt = Number.isFinite(animationStartedAt) ? animationStartedAt : now;
+  const remainingDelay = Math.max(0, daiionArchiveStatsDecodeDelay - (now - startedAt));
   window.setTimeout(() => {
     valueNodes.forEach((node, index) => decodeDaiionArchiveValue(node, finalValues[index], index));
   }, remainingDelay);
@@ -2448,7 +2450,7 @@ async function fetchDaiionArchiveStats(endpoint) {
   return response.json();
 }
 
-async function initDaiionArchiveStatsPanel() {
+async function initDaiionArchiveStatsPanel(options = {}) {
   if (window.location.pathname !== routePaths.wrestling2 || typeof fetch !== "function") {
     return;
   }
@@ -2458,12 +2460,21 @@ async function initDaiionArchiveStatsPanel() {
     return;
   }
 
+  const requestId = ++daiionArchiveStatsRequestId;
+  const animationStartedAt = Number.isFinite(options.animationStartedAt)
+    ? options.animationStartedAt
+    : (typeof performance !== "undefined" ? performance.now() : Date.now());
+
   try {
     const [showsResult, peopleResult, venuesResult] = await Promise.allSettled([
       fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.shows),
       fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.people),
       fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.venues),
     ]);
+    if (requestId !== daiionArchiveStatsRequestId || window.location.pathname !== routePaths.wrestling2) {
+      return;
+    }
+
     const showsStats = showsResult.status === "fulfilled" ? showsResult.value : null;
     const peopleStats = peopleResult.status === "fulfilled" ? peopleResult.value : null;
     const venuesStats = venuesResult.status === "fulfilled" ? venuesResult.value : null;
@@ -2473,10 +2484,11 @@ async function initDaiionArchiveStatsPanel() {
       shows: getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]),
       matches: getDaiionFiniteStat(showsStats, ["totals.matchesTotal", "matchesTotal", "totalMatches"]),
       people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
-    });
+    }, animationStartedAt);
   } catch (_error) {
-    resolveDaiionArchiveStatsValues(valueNodes, {});
+    if (requestId !== daiionArchiveStatsRequestId || window.location.pathname !== routePaths.wrestling2) {
+      return;
+    }
+    resolveDaiionArchiveStatsValues(valueNodes, {}, animationStartedAt);
   }
 }
-
-initDaiionArchiveStatsPanel();
