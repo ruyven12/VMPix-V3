@@ -14143,6 +14143,7 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .daiion-archive-stats-panel__row {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 0.55rem;
@@ -14155,6 +14156,41 @@ button.wrestling-event-history-tagged-thumb {
   border-block-end: 0;
 }
 
+.daiion-archive-stats-panel__row[data-daiion-stat-target]::before {
+  position: absolute;
+  inset-block-start: 22%;
+  inset-block-end: 22%;
+  inset-inline-start: 0;
+  inline-size: 1px;
+  content: "";
+  opacity: 0;
+  background: rgba(255, 90, 60, 0.72);
+  box-shadow: 0 0 0.34rem rgba(255, 42, 26, 0.24);
+}
+
+.daiion-archive-stats-panel__row.is-active,
+.daiion-archive-stats-panel__row[aria-current="true"] {
+  background:
+    linear-gradient(90deg, rgba(255, 90, 60, 0.1), rgba(255, 42, 26, 0.075) 46%, transparent 92%);
+  border-block-end-color: rgba(255, 90, 60, 0.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 90, 60, 0.11),
+    inset 0 0 0.62rem rgba(255, 42, 26, 0.08),
+    0 0 0.42rem rgba(255, 42, 26, 0.1);
+}
+
+.daiion-archive-stats-panel__row.is-active::before,
+.daiion-archive-stats-panel__row[aria-current="true"]::before {
+  opacity: 1;
+}
+
+.daiion-archive-stats-panel__row.is-active .daiion-archive-stats-panel__term,
+.daiion-archive-stats-panel__row[aria-current="true"] .daiion-archive-stats-panel__term,
+.daiion-archive-stats-panel__row.is-active .daiion-archive-stats-panel__value,
+.daiion-archive-stats-panel__row[aria-current="true"] .daiion-archive-stats-panel__value {
+  color: rgba(255, 231, 208, 0.96);
+  text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.2);
+}
 .daiion-archive-stats-panel__label,
 .daiion-archive-stats-panel__term,
 .daiion-archive-stats-panel__context,

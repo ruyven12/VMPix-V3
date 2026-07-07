@@ -2356,12 +2356,19 @@ let daiionDestinationSelectedTarget = null;
 
 function syncDaiionDestinationSelection() {
   const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
+  const statRows = Array.from(document.querySelectorAll("[data-daiion-stat-target]"));
   const panel = document.querySelector(".daiion-destination-panel");
 
   destinationControls.forEach((control) => {
     const isActive = control.getAttribute("data-daiion-destination-target") === daiionDestinationSelectedTarget;
     control.classList.toggle("is-active", isActive);
     control.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+
+  statRows.forEach((row) => {
+    const isActive = row.getAttribute("data-daiion-stat-target") === daiionDestinationSelectedTarget;
+    row.classList.toggle("is-active", isActive);
+    row.setAttribute("aria-current", isActive ? "true" : "false");
   });
 
   if (!panel) {
