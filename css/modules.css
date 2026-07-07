@@ -13939,6 +13939,9 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
   visibility: visible;
   opacity: 1;
+  transition:
+    opacity 500ms ease-out 2800ms,
+    visibility 0ms linear 2800ms;
 }
 
 @media (max-width: 540px) {
@@ -14040,6 +14043,9 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
   visibility: visible;
   opacity: 1;
+  transition:
+    opacity 500ms ease-out 2800ms,
+    visibility 0ms linear 2800ms;
 }
 
 @media (max-width: 540px) {
@@ -14883,6 +14889,11 @@ button.wrestling-event-history-tagged-thumb {
     opacity: 1 !important;
     pointer-events: none !important;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+    transition: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
     transition: none !important;
   }
 }
