@@ -13948,6 +13948,98 @@ button.wrestling-event-history-tagged-thumb {
     opacity: 0.46;
   }
 }
+
+.daiion-side-hud-rail {
+  position: absolute;
+  inset-block-start: clamp(4.1rem, 10svh, 5.8rem);
+  inset-block-end: clamp(6.6rem, 13svh, 8.6rem);
+  z-index: 5;
+  display: block;
+  inline-size: clamp(2.35rem, 5.1vw, 4.35rem);
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  contain: layout paint style;
+}
+
+.daiion-side-hud-rail--left {
+  inset-inline-start: clamp(0.72rem, 1.7vw, 1.45rem);
+}
+
+.daiion-side-hud-rail--right {
+  inset-inline-end: clamp(0.72rem, 1.7vw, 1.45rem);
+  transform: scaleX(-1);
+}
+
+.daiion-side-hud-rail::before,
+.daiion-side-hud-rail::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.daiion-side-hud-rail::before {
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 0 2%, rgba(255, 42, 34, 0.68) 2% 17%, transparent 17% 24%, rgba(255, 76, 46, 0.5) 24% 45%, transparent 45% 55%, rgba(255, 76, 46, 0.5) 55% 76%, transparent 76% 83%, rgba(255, 42, 34, 0.68) 83% 98%, transparent 98% 100%) left / 1px 100% no-repeat,
+    linear-gradient(90deg, rgba(255, 52, 36, 0.46), transparent 78%) top left / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 52, 36, 0.46), transparent 78%) bottom left / 100% 1px no-repeat,
+    linear-gradient(135deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.58) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) top left / 2rem 3rem no-repeat,
+    linear-gradient(45deg, transparent 0 calc(50% - 1px), rgba(255, 64, 42, 0.58) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)) bottom left / 2rem 3rem no-repeat;
+  clip-path: polygon(0 0, 78% 0, 100% 1.5rem, 42% 1.5rem, 42% calc(100% - 1.5rem), 100% calc(100% - 1.5rem), 78% 100%, 0 100%);
+  opacity: 0.76;
+  filter: drop-shadow(0 0 0.24rem rgba(213, 22, 34, 0.2));
+}
+
+.daiion-side-hud-rail::after {
+  inset-block: clamp(2.15rem, 5svh, 3rem);
+  inset-inline-start: 0.48rem;
+  inline-size: clamp(1.25rem, 2.8vw, 2.35rem);
+  background:
+    linear-gradient(90deg, rgba(255, 58, 40, 0.24), transparent 84%) 0 0 / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 58, 40, 0.22), transparent 84%) 0 33.33% / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 58, 40, 0.22), transparent 84%) 0 66.66% / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 58, 40, 0.24), transparent 84%) 0 100% / 100% 1px no-repeat,
+    repeating-linear-gradient(180deg, rgba(255, 72, 48, 0.28) 0 1px, transparent 1px 0.9rem) left / 0.42rem 100% no-repeat;
+  opacity: 0.62;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (max-width: 540px) {
+  .daiion-side-hud-rail {
+    inset-block-start: 3.25rem;
+    inset-block-end: 7.2rem;
+    inline-size: 1.05rem;
+  }
+
+  .daiion-side-hud-rail--left {
+    inset-inline-start: 0.3rem;
+  }
+
+  .daiion-side-hud-rail--right {
+    inset-inline-end: 0.3rem;
+  }
+
+  .daiion-side-hud-rail::before {
+    background:
+      linear-gradient(180deg, transparent 0 3%, rgba(255, 42, 34, 0.54) 3% 18%, transparent 18% 27%, rgba(255, 76, 46, 0.38) 27% 45%, transparent 45% 55%, rgba(255, 76, 46, 0.38) 55% 73%, transparent 73% 82%, rgba(255, 42, 34, 0.54) 82% 97%, transparent 97% 100%) left / 1px 100% no-repeat,
+      linear-gradient(90deg, rgba(255, 52, 36, 0.36), transparent 74%) top left / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255, 52, 36, 0.36), transparent 74%) bottom left / 100% 1px no-repeat;
+    clip-path: polygon(0 0, 82% 0, 100% 0.82rem, 46% 0.82rem, 46% calc(100% - 0.82rem), 100% calc(100% - 0.82rem), 82% 100%, 0 100%);
+    opacity: 0.68;
+  }
+
+  .daiion-side-hud-rail::after {
+    inset-block: 1.85rem;
+    inset-inline-start: 0.32rem;
+    inline-size: 0.55rem;
+    opacity: 0.44;
+  }
+}
 .daiion-atmosphere-glow {
   position: absolute;
   inset: 0;
