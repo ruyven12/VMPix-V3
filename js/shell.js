@@ -379,6 +379,15 @@ function updatePortfolioGatewayRouteHandoffUrl(targetUrl, method = "push") {
 }
 
 
+function initDaiionArchiveStatsAfterGatewayHandoff() {
+  if (window.location.pathname !== getPortfolioGatewayRouteHandoffTarget() || typeof initDaiionArchiveStatsPanel !== "function") {
+    return;
+  }
+
+  const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+  initDaiionArchiveStatsPanel({ animationStartedAt });
+}
+
 function confirmPortfolioGatewayRouteHandoff(worldName) {
   portfolioGatewayRouteHandoffTimer = 0;
   if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
@@ -391,6 +400,8 @@ function confirmPortfolioGatewayRouteHandoff(worldName) {
   }
 
   shell.dataset.portfolioGatewayHandoff = "complete";
+
+  initDaiionArchiveStatsAfterGatewayHandoff();
 }
 
 function handoffPortfolioGatewayRoute(worldName) {
