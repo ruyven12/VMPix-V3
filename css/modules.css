@@ -14274,16 +14274,16 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
   visibility: visible;
   opacity: 1;
-  animation: daiionDestinationPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 5200ms both;
+  animation: daiionDestinationPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
-  animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 5200ms both;
+  animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title {
   animation: daiionArchiveStatsContentResolve 180ms ease-out both;
-  animation-delay: 6300ms;
+  animation-delay: 4550ms;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item {
@@ -14291,15 +14291,15 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(2) {
-  animation-delay: 6370ms;
+  animation-delay: 4620ms;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(3) {
-  animation-delay: 6450ms;
+  animation-delay: 4700ms;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
-  animation-delay: 6530ms;
+  animation-delay: 4780ms;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
