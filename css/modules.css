@@ -14458,7 +14458,7 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-destination-panel__item::before {
   position: absolute;
   inset-block-start: 50%;
-  inset-inline-start: 50%;
+  inset-inline-start: var(--daiion-route-port-x, 50%);
   inline-size: 0.42rem;
   block-size: 0.42rem;
   content: "";
@@ -15117,10 +15117,10 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .daiion-energy-route--campaigns .daiion-energy-route__segment--stats {
-    --route-x: 33.98%;
-    --route-y: 21.42%;
-    --route-w: 33.19vw;
-    --route-r: 57.2deg;
+    --route-x: 48.72%;
+    --route-y: 21.46%;
+    --route-w: 28.04vw;
+    --route-r: 83.3deg;
   }
 
   .daiion-energy-route--campaigns .daiion-energy-route__segment--planet {
@@ -15145,10 +15145,10 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .daiion-energy-route--combatants .daiion-energy-route__segment--stats {
-    --route-x: 33.98%;
-    --route-y: 30.16%;
-    --route-w: 35.84vw;
-    --route-r: -18.6deg;
+    --route-x: 48.72%;
+    --route-y: 30.13%;
+    --route-w: 22.4vw;
+    --route-r: -30.6deg;
   }
 
   .daiion-energy-route--combatants .daiion-energy-route__segment--planet {
@@ -15173,10 +15173,10 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .daiion-energy-route--arenas .daiion-energy-route__segment--stats {
-    --route-x: 33.98%;
-    --route-y: 17.16%;
-    --route-w: 67.61vw;
-    --route-r: 57.9deg;
+    --route-x: 48.72%;
+    --route-y: 17.13%;
+    --route-w: 61.27vw;
+    --route-r: 69.7deg;
   }
 
   .daiion-energy-route--arenas .daiion-energy-route__segment--planet {
@@ -15225,6 +15225,10 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-archive-stats-panel__row {
     min-block-size: 2.48rem;
     column-gap: 0.42rem;
+  }
+
+  .daiion-archive-stats-panel__row[data-daiion-stat-target] {
+    --daiion-route-port-x: 82%;
   }
 
   .daiion-archive-focus-panel {
