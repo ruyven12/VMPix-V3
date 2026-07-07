@@ -14233,8 +14233,10 @@ button.wrestling-event-history-tagged-thumb {
 
 .daiion-archive-focus-panel {
   position: absolute;
-  inset-block-start: clamp(20.4rem, 38svh, 26rem);
-  inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
+  inset-block-start: auto;
+  inset-block-end: clamp(18.2rem, 32svh, 22rem);
+  inset-inline-start: auto;
+  inset-inline-end: clamp(8.2rem, 15vw, 18rem);
   z-index: 4;
   display: grid;
   row-gap: clamp(0.46rem, 0.75vw, 0.64rem);
@@ -14707,11 +14709,14 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .daiion-archive-focus-panel {
-    inset-block-start: 20.35rem;
-    inset-inline-start: 2.05rem;
+    inset-block-start: auto;
+    inset-block-end: clamp(18rem, 33svh, 19.2rem);
+    inset-inline-start: auto;
+    inset-inline-end: clamp(3.3rem, 15vw, 4.25rem);
     inline-size: min(15.35rem, calc(100vw - 3.2rem));
     padding: 0.68rem 0.78rem;
   }
+
   .daiion-destination-panel {
     inset-block-end: 7.15rem;
     inset-inline-end: 2.05rem;
