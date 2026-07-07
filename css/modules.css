@@ -14613,6 +14613,10 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
 }
 
+.daiion-archive-stats-panel__label {
+  padding-inline-start: 5px;
+}
+
 .daiion-archive-stats-panel__row,
 .daiion-archive-stats-panel__label,
 .daiion-archive-stats-panel__term,
