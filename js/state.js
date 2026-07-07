@@ -2374,6 +2374,7 @@ let daiionDestinationSelectedTarget = null;
 function syncDaiionDestinationSelection() {
   const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
   const statRows = Array.from(document.querySelectorAll("[data-daiion-stat-target]"));
+  const planetNodes = Array.from(document.querySelectorAll("[data-daiion-planet-node]"));
   const panel = document.querySelector(".daiion-destination-panel");
   const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   const focusBriefing = daiionArchiveFocusBriefings[daiionDestinationSelectedTarget];
@@ -2388,6 +2389,11 @@ function syncDaiionDestinationSelection() {
     const isActive = row.getAttribute("data-daiion-stat-target") === daiionDestinationSelectedTarget;
     row.classList.toggle("is-active", isActive);
     row.setAttribute("aria-current", isActive ? "true" : "false");
+  });
+
+  planetNodes.forEach((node) => {
+    const isActive = node.getAttribute("data-daiion-planet-node") === daiionDestinationSelectedTarget;
+    node.classList.toggle("is-active", isActive);
   });
 
   if (focusPanel) {
