@@ -14257,11 +14257,12 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
   min-block-size: clamp(2.2rem, 3.85svh, 2.7rem);
   padding-block: 0.68rem 0.53rem;
-  padding-inline-start: 1.1rem;
+  padding-inline: 0;
   color: rgba(248, 249, 252, 0.92);
   font-size: clamp(0.68rem, 0.82vw, 0.82rem);
   font-weight: 650;
   line-height: 1;
+  text-align: center;
   text-transform: uppercase;
   border-block-end: 1px solid rgba(255, 90, 60, 0.16);
 }
