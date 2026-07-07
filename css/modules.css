@@ -14247,47 +14247,68 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-energy-route__segment {
   inset-inline-start: var(--route-x, 50%);
   inset-block-start: var(--route-y, 50%);
-  inline-size: var(--route-w, 8rem);
-  block-size: 1px;
+  inline-size: var(--route-w, 8vw);
+  block-size: 2px;
   opacity: 0;
+  border-radius: 999px;
   background:
-    linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.36) 12%, rgba(255, 231, 208, 0.34) 48%, rgba(255, 42, 26, 0.28) 82%, transparent),
-    repeating-linear-gradient(90deg, rgba(255, 90, 60, 0.32) 0 0.42rem, transparent 0.42rem 0.68rem);
+    linear-gradient(90deg, rgba(255, 231, 208, 0.5), rgba(255, 90, 60, 0.68) 18%, rgba(255, 42, 26, 0.52) 52%, rgba(255, 90, 60, 0.58) 82%, rgba(255, 231, 208, 0.34)),
+    repeating-linear-gradient(90deg, rgba(255, 231, 208, 0.24) 0 0.34rem, transparent 0.34rem 0.58rem);
   box-shadow:
-    0 0 0.2rem rgba(255, 42, 26, 0.2),
-    0 0 0.5rem rgba(255, 90, 60, 0.08);
+    0 0 0.22rem rgba(255, 42, 26, 0.34),
+    0 0 0.58rem rgba(255, 90, 60, 0.16);
   transform: rotate(var(--route-r, 0deg));
   transform-origin: 0 50%;
 }
 
-.daiion-energy-route__segment::before {
+.daiion-energy-route__segment::before,
+.daiion-energy-route__segment::after {
   position: absolute;
   inset-block-start: 50%;
+  content: "";
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.daiion-energy-route__segment::before {
   inset-inline-start: 0;
   inline-size: 0.22rem;
   block-size: 0.22rem;
-  content: "";
   opacity: 0;
-  border-radius: 50%;
-  background: rgba(255, 231, 208, 0.86);
+  background: rgba(255, 231, 208, 0.9);
   box-shadow:
-    0 0 0.22rem rgba(255, 231, 208, 0.38),
-    0 0 0.5rem rgba(255, 42, 26, 0.26);
+    0 0 0.22rem rgba(255, 231, 208, 0.42),
+    0 0 0.5rem rgba(255, 42, 26, 0.28);
   transform: translate3d(-50%, -50%, 0);
 }
 
-.daiion-energy-route__engine {
-  inset-inline-start: 50%;
-  inset-block-end: clamp(5.85rem, 9.2svh, 7.4rem);
-  inline-size: 0.32rem;
-  block-size: 0.32rem;
+.daiion-energy-route__segment::after {
+  inset-inline-end: 0;
+  inline-size: 0.34rem;
+  block-size: 0.34rem;
   opacity: 0;
-  border: 1px solid rgba(255, 90, 60, 0.34);
-  border-radius: 50%;
-  background: rgba(255, 42, 26, 0.26);
+  background: rgba(255, 231, 208, 0.84);
+  border: 1px solid rgba(255, 90, 60, 0.62);
   box-shadow:
-    0 0 0.28rem rgba(255, 90, 60, 0.26),
-    0 0 0.72rem rgba(255, 42, 26, 0.12);
+    0 0 0.24rem rgba(255, 231, 208, 0.32),
+    0 0 0.54rem rgba(255, 42, 26, 0.24),
+    calc(var(--route-w, 8vw) * -1) 0 0 rgba(255, 231, 208, 0.82),
+    calc(var(--route-w, 8vw) * -1) 0 0.24rem rgba(255, 42, 26, 0.26);
+  transform: translate3d(50%, -50%, 0);
+}
+
+.daiion-energy-route__engine {
+  inset-inline-start: var(--route-engine-x, 75%);
+  inset-block-end: var(--route-engine-end, 4.8rem);
+  inline-size: 0.38rem;
+  block-size: 0.38rem;
+  opacity: 0;
+  border: 1px solid rgba(255, 90, 60, 0.46);
+  border-radius: 50%;
+  background: rgba(255, 42, 26, 0.34);
+  box-shadow:
+    0 0 0.32rem rgba(255, 90, 60, 0.3),
+    0 0 0.78rem rgba(255, 42, 26, 0.14);
   transform: translate3d(-50%, 0, 0);
 }
 
@@ -14302,103 +14323,124 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment {
-  opacity: var(--route-o, 0.42);
+  opacity: var(--route-o, 0.62);
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment::before {
   animation: daiionEnergyRoutePulse 1450ms ease-in-out var(--route-delay, 0ms) infinite;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment::after {
+  opacity: 1;
+}
+
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine {
-  opacity: 0.82;
+  opacity: 0.86;
   animation: daiionEnergyEngineAck 1500ms ease-out infinite;
 }
 
 .daiion-energy-route__segment--destination {
-  --route-x: 76%;
-  --route-y: 71%;
-  --route-w: 12%;
-  --route-r: -146deg;
   --route-delay: 0ms;
-  --route-o: 0.38;
+  --route-o: 0.58;
 }
 
 .daiion-energy-route__segment--focus {
   --route-delay: 180ms;
-  --route-o: 0.42;
+  --route-o: 0.62;
 }
 
 .daiion-energy-route__segment--planet {
   --route-delay: 360ms;
-  --route-o: 0.46;
+  --route-o: 0.66;
 }
 
 .daiion-energy-route__segment--stats {
   --route-delay: 540ms;
-  --route-o: 0.36;
-}
-
-.daiion-energy-route--campaigns .daiion-energy-route__segment--focus {
-  --route-x: 61%;
-  --route-y: 61%;
-  --route-w: 20%;
-  --route-r: -151deg;
-}
-
-.daiion-energy-route--campaigns .daiion-energy-route__segment--planet {
-  --route-x: 43%;
-  --route-y: 42%;
-  --route-w: 9%;
-  --route-r: -156deg;
+  --route-o: 0.62;
 }
 
 .daiion-energy-route--campaigns .daiion-energy-route__segment--stats {
-  --route-x: 31%;
-  --route-y: 34%;
-  --route-w: 15%;
-  --route-r: 19deg;
+  --route-x: 22.7%;
+  --route-y: 23.7%;
+  --route-w: 21.4vw;
+  --route-r: 25deg;
 }
 
-.daiion-energy-route--combatants .daiion-energy-route__segment--focus {
-  --route-x: 68%;
-  --route-y: 61%;
-  --route-w: 21%;
-  --route-r: -98deg;
+.daiion-energy-route--campaigns .daiion-energy-route__segment--planet {
+  --route-x: 42%;
+  --route-y: 40%;
+  --route-w: 27.3vw;
+  --route-r: 25deg;
 }
 
-.daiion-energy-route--combatants .daiion-energy-route__segment--planet {
-  --route-x: 62%;
-  --route-y: 31%;
-  --route-w: 8%;
-  --route-r: -130deg;
+.daiion-energy-route--campaigns .daiion-energy-route__segment--focus {
+  --route-x: 85%;
+  --route-y: 60.7%;
+  --route-w: 9.9vw;
+  --route-r: 113deg;
+}
+
+.daiion-energy-route--campaigns .daiion-energy-route__segment--destination {
+  --route-x: 87%;
+  --route-y: 78.9%;
+  --route-w: 14.2vw;
+  --route-r: 148deg;
 }
 
 .daiion-energy-route--combatants .daiion-energy-route__segment--stats {
-  --route-x: 33%;
-  --route-y: 28%;
-  --route-w: 29%;
-  --route-r: -3deg;
+  --route-x: 22.7%;
+  --route-y: 33%;
+  --route-w: 38.4vw;
+  --route-r: -5deg;
 }
 
-.daiion-energy-route--arenas .daiion-energy-route__segment--focus {
-  --route-x: 69%;
-  --route-y: 62%;
-  --route-w: 11%;
-  --route-r: -112deg;
+.daiion-energy-route--combatants .daiion-energy-route__segment--planet {
+  --route-x: 61%;
+  --route-y: 27%;
+  --route-w: 19.8vw;
+  --route-r: 73deg;
 }
 
-.daiion-energy-route--arenas .daiion-energy-route__segment--planet {
-  --route-x: 68%;
-  --route-y: 50%;
-  --route-w: 7%;
-  --route-r: -168deg;
+.daiion-energy-route--combatants .daiion-energy-route__segment--focus {
+  --route-x: 85%;
+  --route-y: 60.7%;
+  --route-w: 11.9vw;
+  --route-r: 109deg;
+}
+
+.daiion-energy-route--combatants .daiion-energy-route__segment--destination {
+  --route-x: 87%;
+  --route-y: 82.7%;
+  --route-w: 13.2vw;
+  --route-r: 156deg;
 }
 
 .daiion-energy-route--arenas .daiion-energy-route__segment--stats {
-  --route-x: 32%;
-  --route-y: 31%;
-  --route-w: 37%;
-  --route-r: 31deg;
+  --route-x: 22.7%;
+  --route-y: 19.1%;
+  --route-w: 47.3vw;
+  --route-r: 21deg;
+}
+
+.daiion-energy-route--arenas .daiion-energy-route__segment--planet {
+  --route-x: 67%;
+  --route-y: 49%;
+  --route-w: 6.6vw;
+  --route-r: 93deg;
+}
+
+.daiion-energy-route--arenas .daiion-energy-route__segment--focus {
+  --route-x: 85%;
+  --route-y: 60.7%;
+  --route-w: 14vw;
+  --route-r: 106deg;
+}
+
+.daiion-energy-route--arenas .daiion-energy-route__segment--destination {
+  --route-x: 87%;
+  --route-y: 86.6%;
+  --route-w: 12.4vw;
+  --route-r: 165deg;
 }
 
 @keyframes daiionEnergyRoutePulse {
@@ -14409,7 +14451,7 @@ button.wrestling-event-history-tagged-thumb {
 
   20%,
   70% {
-    opacity: 0.85;
+    opacity: 0.9;
   }
 
   100% {
@@ -14421,17 +14463,17 @@ button.wrestling-event-history-tagged-thumb {
 @keyframes daiionEnergyEngineAck {
   0%,
   100% {
-    opacity: 0.36;
+    opacity: 0.4;
     box-shadow:
-      0 0 0.22rem rgba(255, 90, 60, 0.18),
-      0 0 0.48rem rgba(255, 42, 26, 0.08);
+      0 0 0.24rem rgba(255, 90, 60, 0.2),
+      0 0 0.52rem rgba(255, 42, 26, 0.1);
   }
 
   42% {
-    opacity: 0.82;
+    opacity: 0.86;
     box-shadow:
-      0 0 0.34rem rgba(255, 231, 208, 0.26),
-      0 0 0.82rem rgba(255, 42, 26, 0.2);
+      0 0 0.36rem rgba(255, 231, 208, 0.3),
+      0 0 0.86rem rgba(255, 42, 26, 0.22);
   }
 }
 .daiion-archive-stats-panel {
@@ -15046,78 +15088,93 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (max-width: 540px) {
-  .daiion-energy-route__segment--destination {
-    --route-x: 68%;
-    --route-y: 72%;
-    --route-w: 14%;
-    --route-r: -104deg;
-  }
-
   .daiion-energy-route__engine {
-    inset-block-end: 5.9rem;
-  }
-
-  .daiion-energy-route--campaigns .daiion-energy-route__segment--focus {
-    --route-x: 58%;
-    --route-y: 53%;
-    --route-w: 19%;
-    --route-r: -108deg;
-  }
-
-  .daiion-energy-route--campaigns .daiion-energy-route__segment--planet {
-    --route-x: 53%;
-    --route-y: 36%;
-    --route-w: 8%;
-    --route-r: -150deg;
+    --route-engine-x: 50%;
+    --route-engine-end: 5.55rem;
   }
 
   .daiion-energy-route--campaigns .daiion-energy-route__segment--stats {
-    --route-x: 43%;
-    --route-y: 34%;
-    --route-w: 10%;
-    --route-r: 4deg;
+    --route-x: 60.2%;
+    --route-y: 21.4%;
+    --route-w: 29.1vw;
+    --route-r: 106deg;
   }
 
-  .daiion-energy-route--combatants .daiion-energy-route__segment--focus {
-    --route-x: 67%;
-    --route-y: 52%;
-    --route-w: 26%;
-    --route-r: -88deg;
+  .daiion-energy-route--campaigns .daiion-energy-route__segment--planet {
+    --route-x: 52%;
+    --route-y: 34%;
+    --route-w: 39.6vw;
+    --route-r: 90deg;
+  }
+
+  .daiion-energy-route--campaigns .daiion-energy-route__segment--focus {
+    --route-x: 67.2%;
+    --route-y: 67%;
+    --route-w: 20.1vw;
+    --route-r: 90deg;
+  }
+
+  .daiion-energy-route--campaigns .daiion-energy-route__segment--destination {
+    --route-x: 67.2%;
+    --route-y: 78%;
+    --route-w: 31.5vw;
+    --route-r: 123deg;
+  }
+
+  .daiion-energy-route--combatants .daiion-energy-route__segment--stats {
+    --route-x: 60.2%;
+    --route-y: 30.2%;
+    --route-w: 13.8vw;
+    --route-r: -56deg;
   }
 
   .daiion-energy-route--combatants .daiion-energy-route__segment--planet {
     --route-x: 68%;
-    --route-y: 28%;
-    --route-w: 8%;
-    --route-r: -144deg;
+    --route-y: 25%;
+    --route-w: 59.7vw;
+    --route-r: 90deg;
   }
 
-  .daiion-energy-route--combatants .daiion-energy-route__segment--stats {
-    --route-x: 58%;
-    --route-y: 27%;
-    --route-w: 10%;
-    --route-r: -178deg;
+  .daiion-energy-route--combatants .daiion-energy-route__segment--focus {
+    --route-x: 67.2%;
+    --route-y: 67%;
+    --route-w: 29.1vw;
+    --route-r: 90deg;
   }
 
-  .daiion-energy-route--arenas .daiion-energy-route__segment--focus {
-    --route-x: 69%;
-    --route-y: 53%;
-    --route-w: 10%;
-    --route-r: -113deg;
+  .daiion-energy-route--combatants .daiion-energy-route__segment--destination {
+    --route-x: 67.2%;
+    --route-y: 82.1%;
+    --route-w: 24.5vw;
+    --route-r: 135deg;
+  }
+
+  .daiion-energy-route--arenas .daiion-energy-route__segment--stats {
+    --route-x: 60.2%;
+    --route-y: 17.2%;
+    --route-w: 58vw;
+    --route-r: 80deg;
   }
 
   .daiion-energy-route--arenas .daiion-energy-route__segment--planet {
     --route-x: 70%;
-    --route-y: 44%;
-    --route-w: 7%;
-    --route-r: -166deg;
+    --route-y: 43%;
+    --route-w: 22.6vw;
+    --route-r: 90deg;
   }
 
-  .daiion-energy-route--arenas .daiion-energy-route__segment--stats {
-    --route-x: 51%;
-    --route-y: 37%;
-    --route-w: 20%;
-    --route-r: 28deg;
+  .daiion-energy-route--arenas .daiion-energy-route__segment--focus {
+    --route-x: 67.2%;
+    --route-y: 67%;
+    --route-w: 38.1vw;
+    --route-r: 90deg;
+  }
+
+  .daiion-energy-route--arenas .daiion-energy-route__segment--destination {
+    --route-x: 67.2%;
+    --route-y: 86.2%;
+    --route-w: 18.9vw;
+    --route-r: 154deg;
   }
   .daiion-planet-node--campaigns {
     inset-inline-start: 52%;
