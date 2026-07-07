@@ -2342,3 +2342,94 @@ const setDateMonthCodes = {
   NOV: "11",
   DEC: "12",
 };
+const daiionArchiveStatsEndpoints = {
+  shows: "https://vmpix-data.onrender.com/api/wrestling/shows/stats",
+  people: "https://vmpix-data.onrender.com/api/wrestling/people/stats",
+  venues: "https://vmpix-data.onrender.com/api/wrestling/venues/stats",
+};
+
+function getDaiionFiniteStat(source, paths = []) {
+  if (!source || typeof source !== "object") {
+    return null;
+  }
+
+  for (const path of paths) {
+    const value = String(path).split(".").reduce((result, key) => (
+      result && Object.prototype.hasOwnProperty.call(result, key) ? result[key] : undefined
+    ), source);
+    const numberValue = Number(value);
+    if (Number.isFinite(numberValue)) {
+      return numberValue;
+    }
+  }
+
+  return null;
+}
+
+function getDaiionPromotionTotal(showsStats) {
+  const explicitTotal = getDaiionFiniteStat(showsStats, [
+    "totals.promotionsTotal",
+    "totals.promotionCount",
+    "promotionsTotal",
+    "promotionCount",
+  ]);
+
+  if (Number.isFinite(explicitTotal)) {
+    return explicitTotal;
+  }
+
+  return Array.isArray(showsStats?.byPromotion) ? showsStats.byPromotion.length : null;
+}
+
+function formatDaiionArchiveStat(value) {
+  return Number.isFinite(value) ? Math.trunc(value).toLocaleString("en-US") : "N/A";
+}
+
+async function fetchDaiionArchiveStats(endpoint) {
+  const response = await fetch(endpoint, { cache: "no-store" });
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
+}
+
+async function initDaiionArchiveStatsPanel() {
+  if (window.location.pathname !== routePaths.wrestling2 || typeof fetch !== "function") {
+    return;
+  }
+
+  const valueNodes = Array.from(document.querySelectorAll("[data-daiion-stat-value]"));
+  if (!valueNodes.length) {
+    return;
+  }
+
+  try {
+    const [showsResult, peopleResult, venuesResult] = await Promise.allSettled([
+      fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.shows),
+      fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.people),
+      fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.venues),
+    ]);
+    const showsStats = showsResult.status === "fulfilled" ? showsResult.value : null;
+    const peopleStats = peopleResult.status === "fulfilled" ? peopleResult.value : null;
+    const venuesStats = venuesResult.status === "fulfilled" ? venuesResult.value : null;
+    const mappedStats = {
+      promotions: getDaiionPromotionTotal(showsStats),
+      venues: getDaiionFiniteStat(venuesStats, ["total_venues", "totalVenues", "venuesTotal", "totals.venuesTotal"]),
+      shows: getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]),
+      matches: getDaiionFiniteStat(showsStats, ["totals.matchesTotal", "matchesTotal", "totalMatches"]),
+      people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
+    };
+
+    valueNodes.forEach((node) => {
+      const key = node.getAttribute("data-daiion-stat-value");
+      const value = mappedStats[key];
+      if (Number.isFinite(value)) {
+        node.textContent = formatDaiionArchiveStat(value);
+      }
+    });
+  } catch (_error) {
+    // Keep the static N/A fallbacks if the live stats request fails.
+  }
+}
+
+initDaiionArchiveStatsPanel();

@@ -14136,6 +14136,7 @@ button.wrestling-event-history-tagged-thumb {
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.16em;
+  text-align: center;
   text-transform: uppercase;
   border-block-end: 1px solid rgba(255, 90, 60, 0.28);
   text-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.26);
