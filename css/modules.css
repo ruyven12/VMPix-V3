@@ -14565,6 +14565,22 @@ button.wrestling-event-history-tagged-thumb {
     pointer-events: none;
   }
 
+  .daiion-environment-hud-frame__title {
+    position: absolute;
+    inset-block-start: clamp(0.7rem, 1.7vh, 0.96rem);
+    inset-inline: 0.82rem;
+    display: block;
+    color: rgba(255, 90, 60, 0.96);
+    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+    font-size: clamp(0.62rem, 0.78vw, 0.78rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .daiion-environment-hud-frame::before {
     inset-block-start: clamp(1.72rem, 3.1vh, 2.12rem);
     inset-inline: 0.82rem;
