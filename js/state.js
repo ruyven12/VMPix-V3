@@ -2364,8 +2364,9 @@ const daiionArchiveFocusBriefings = {
     status: "TARGET LOCKED",
   },
   arenas: {
+    title: "The Fields of Conflict",
     stat: "9 Mapped Arenas",
-    copy: "Visit the battlegrounds where each recorded conflict left its mark.",
+    copy: "Visit the ancient battlegrounds in which each recorded conflict left its mark.",
     status: "TARGET LOCKED",
   },
 };
