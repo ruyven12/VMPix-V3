@@ -11610,7 +11610,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier {
   position: absolute;
-  inset-block-start: calc(max(0.42rem, env(safe-area-inset-top)) + clamp(1.7rem, 4.2svh, 2.55rem) + 0.625rem);
+  inset-block-start: calc(max(0.42rem, env(safe-area-inset-top)) + clamp(1.7rem, 4.2svh, 2.55rem) + 1.25rem);
   inset-inline-start: 50%;
   z-index: 3;
   display: grid;
@@ -11655,7 +11655,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier {
-    inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 0.625rem);
+    inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 1.25rem);
     inline-size: min(22rem, calc(100vw - 1.45rem));
   }
 
