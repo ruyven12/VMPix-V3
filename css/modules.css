@@ -14527,27 +14527,6 @@ button.wrestling-event-history-tagged-thumb {
   contain: layout paint style;
 }
 
-.daiion-latest-diagnostic-square {
-  position: fixed;
-  inset-block-end: 7.15rem;
-  inset-inline-start: 2.05rem;
-  z-index: 999999;
-  display: grid;
-  place-items: center;
-  inline-size: 100px;
-  block-size: 100px;
-  box-sizing: border-box;
-  pointer-events: auto;
-  visibility: hidden;
-  opacity: 0;
-  background: #ff00ff;
-  border: 4px solid #fff;
-  color: #fff;
-  font-size: 18px;
-  line-height: 1;
-  text-align: center;
-  contain: layout paint style;
-}
 .daiion-archive-stats-panel::before {
   position: absolute;
   inset-block-start: 0;
@@ -15309,10 +15288,7 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.68rem 0.79rem;
   }
 
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-diagnostic-square {
-    visibility: visible;
-    opacity: 1;
-  }.daiion-destination-panel__item {
+  .daiion-destination-panel__item {
     min-block-size: 2.33rem;
     padding-block: 0.68rem 0.51rem;
   }
