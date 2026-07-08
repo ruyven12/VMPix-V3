@@ -14538,22 +14538,23 @@ button.wrestling-event-history-tagged-thumb {
     inset-block-end: clamp(7.5rem, 13vh, 10rem);
     z-index: 3;
     display: block;
-    inline-size: clamp(16rem, 24vw, 27rem);
-    block-size: clamp(9rem, 19vh, 15.5rem);
+    inline-size: clamp(15.75rem, 22vw, 24.5rem);
+    block-size: clamp(8.25rem, 16vh, 13.25rem);
     box-sizing: border-box;
     pointer-events: none;
     visibility: hidden;
     opacity: 0;
     background:
-      linear-gradient(180deg, rgba(255, 231, 208, 0.035), transparent 58%),
-      linear-gradient(135deg, rgba(255, 90, 60, 0.07), transparent 56% 72%, rgba(255, 42, 26, 0.045)),
-      rgba(6, 7, 9, 0.34);
-    border: 1px solid rgba(255, 90, 60, 0.46);
+      linear-gradient(180deg, rgba(255, 231, 208, 0.028), transparent 56%),
+      linear-gradient(135deg, rgba(255, 90, 60, 0.042), transparent 58%),
+      rgba(6, 7, 9, 0.62);
+    border: 1px solid rgba(255, 90, 60, 0.36);
     box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.045),
-      inset 0 0 1.1rem rgba(255, 42, 26, 0.09),
-      0 0 0.7rem rgba(255, 42, 26, 0.12);
-    clip-path: polygon(0.72rem 0, 100% 0, 100% calc(100% - 0.72rem), calc(100% - 0.72rem) 100%, 0 100%, 0 0.72rem);
+      inset 0 0 0 1px rgba(255, 231, 208, 0.04),
+      inset 0 0 1rem rgba(255, 42, 26, 0.09),
+      0 0.38rem 1.2rem rgba(0, 0, 0, 0.32),
+      0 0 0.52rem rgba(255, 42, 26, 0.11);
+    clip-path: polygon(0.58rem 0, 100% 0, 100% calc(100% - 0.58rem), calc(100% - 0.58rem) 100%, 0 100%, 0 0.58rem);
     contain: layout paint style;
   }
 
@@ -14565,26 +14566,27 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .daiion-environment-hud-frame::before {
-    inset: 0.46rem;
-    border: 1px solid rgba(255, 90, 60, 0.16);
-    background:
-      linear-gradient(90deg, rgba(255, 90, 60, 0.78) 0 13%, transparent 13% 19%, rgba(255, 90, 60, 0.4) 19% 31%, transparent 31% 69%, rgba(255, 90, 60, 0.4) 69% 81%, transparent 81% 87%, rgba(255, 90, 60, 0.78) 87% 100%) top / 100% 1px no-repeat,
-      linear-gradient(90deg, rgba(255, 90, 60, 0.62) 0 18%, transparent 18% 29%, rgba(255, 90, 60, 0.36) 29% 42%, transparent 42% 58%, rgba(255, 90, 60, 0.36) 58% 71%, transparent 71% 82%, rgba(255, 90, 60, 0.62) 82% 100%) bottom / 100% 1px no-repeat,
-      linear-gradient(180deg, rgba(255, 90, 60, 0.62), transparent 28% 72%, rgba(255, 90, 60, 0.46)) left / 1px 100% no-repeat,
-      linear-gradient(180deg, rgba(255, 90, 60, 0.46), transparent 28% 72%, rgba(255, 90, 60, 0.62)) right / 1px 100% no-repeat;
-    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-    opacity: 0.84;
+    inset-block-start: 0;
+    inset-inline: 0.52rem;
+    block-size: 1px;
+    opacity: 0.86;
+    background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.54) 8%, rgba(255, 90, 60, 0.78) 52%, rgba(255, 231, 208, 0.34) 92%, transparent);
+    box-shadow:
+      0 0 0.22rem rgba(255, 42, 26, 0.28),
+      0 0 0.52rem rgba(255, 42, 26, 0.12);
   }
 
   .daiion-environment-hud-frame::after {
-    inset: clamp(0.74rem, 1.1vw, 1rem);
+    inset: 0.5rem 0.58rem;
+    border-block-end: 1px solid rgba(255, 90, 60, 0.22);
     background:
-      linear-gradient(90deg, rgba(255, 231, 208, 0.16), rgba(255, 90, 60, 0.48) 26%, transparent 26% 100%) 0 0 / 42% 1px no-repeat,
-      linear-gradient(90deg, transparent 0 28%, rgba(255, 90, 60, 0.36) 28% 56%, rgba(255, 231, 208, 0.12)) 100% 0 / 38% 1px no-repeat,
-      linear-gradient(90deg, rgba(255, 90, 60, 0.4), transparent 72%) 0 100% / 34% 1px no-repeat,
-      linear-gradient(90deg, transparent 0 22%, rgba(255, 90, 60, 0.46) 22% 100%) 100% 100% / 44% 1px no-repeat,
-      repeating-linear-gradient(90deg, rgba(255, 90, 60, 0.28) 0 1px, transparent 1px 0.72rem) 0 50% / 38% 1px no-repeat,
-      repeating-linear-gradient(90deg, transparent 0 0.5rem, rgba(255, 90, 60, 0.24) 0.5rem calc(0.5rem + 1px)) 100% 50% / 32% 1px no-repeat;
+      linear-gradient(90deg, rgba(255, 90, 60, 0.7) 0 10%, transparent 10% 15%, rgba(255, 90, 60, 0.28) 15% 26%, transparent 26% 100%) top left / 48% 1px no-repeat,
+      linear-gradient(90deg, transparent 0 72%, rgba(255, 90, 60, 0.26) 72% 84%, transparent 84% 90%, rgba(255, 90, 60, 0.62) 90% 100%) top right / 48% 1px no-repeat,
+      linear-gradient(90deg, rgba(255, 90, 60, 0.48), transparent 66%) bottom left / 34% 1px no-repeat,
+      linear-gradient(90deg, transparent 0 36%, rgba(255, 90, 60, 0.42) 36% 100%) bottom right / 38% 1px no-repeat,
+      linear-gradient(135deg, rgba(255, 90, 60, 0.62) 0 1px, transparent 1px) top left / 0.72rem 0.72rem no-repeat,
+      linear-gradient(225deg, rgba(255, 90, 60, 0.5) 0 1px, transparent 1px) bottom right / 0.72rem 0.72rem no-repeat,
+      repeating-linear-gradient(90deg, rgba(255, 90, 60, 0.18) 0 1px, transparent 1px 0.82rem) 0 50% / 31% 1px no-repeat;
     opacity: 0.78;
   }
 
