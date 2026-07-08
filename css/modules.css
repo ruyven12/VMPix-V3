@@ -14527,112 +14527,6 @@ button.wrestling-event-history-tagged-thumb {
   contain: layout paint style;
 }
 
-.daiion-environment-hud-frame {
-  display: none;
-}
-
-@media (min-width: 760px) {
-  .daiion-environment-hud-frame {
-    position: absolute;
-    inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
-    inset-block-end: clamp(7.5rem, 13vh, 10rem);
-    z-index: 3;
-    display: block;
-    inline-size: clamp(15.75rem, 22vw, 24.5rem);
-    block-size: clamp(6.85rem, 13.1vh, 10.9rem);
-    box-sizing: border-box;
-    pointer-events: none;
-    visibility: hidden;
-    opacity: 0;
-    background:
-      linear-gradient(135deg, rgba(255, 90, 60, 0.16), transparent 1.5rem) top left / 100% 100% no-repeat,
-      linear-gradient(315deg, rgba(255, 42, 26, 0.1), transparent 1.8rem) bottom right / 100% 100% no-repeat,
-      rgba(6, 7, 9, 0.68);
-    border: 1px solid rgba(255, 90, 60, 0.38);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.055),
-      inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
-      0 0 0.68rem rgba(255, 42, 26, 0.14);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-    contain: layout paint style;
-  }
-
-  .daiion-environment-hud-frame::before,
-  .daiion-environment-hud-frame::after {
-    position: absolute;
-    content: "";
-    pointer-events: none;
-  }
-
-  .daiion-environment-hud-frame__title {
-    position: absolute;
-    inset-block-start: clamp(0.7rem, 1.7vh, 0.96rem);
-    inset-inline: 0.82rem;
-    display: block;
-    color: rgba(255, 90, 60, 0.96);
-    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-    font-size: clamp(0.62rem, 0.78vw, 0.78rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.16em;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-  .daiion-environment-hud-frame__signal {
-    position: absolute;
-    inset-block-start: 50%;
-    inset-inline-start: 50%;
-    display: block;
-    transform: translate(-50%, -50%);
-    color: rgba(248, 249, 252, 0.96);
-    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-    font-size: calc(clamp(0.63rem, 0.82vw, 0.78rem) + 2px);
-    font-weight: 650;
-    line-height: 1.02;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .daiion-environment-hud-frame::before {
-    inset-block-start: clamp(1.72rem, 3.1vh, 2.12rem);
-    inset-inline: 0.82rem;
-    block-size: 1px;
-    opacity: 0.86;
-    background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.7) 8%, rgba(255, 90, 60, 0.9) 52%, rgba(255, 231, 208, 0.44) 92%, transparent);
-    box-shadow:
-      0 0 0.28rem rgba(255, 42, 26, 0.32),
-      0 0 0.62rem rgba(255, 42, 26, 0.16);
-  }
-
-  .daiion-environment-hud-frame::after {
-    inset-block: 0.72rem;
-    inset-inline: 0.82rem;
-    background:
-      linear-gradient(180deg, rgba(255, 90, 60, 0.72), transparent 36%) left / 1px 100% no-repeat,
-      linear-gradient(135deg, rgba(255, 90, 60, 0.68) 0 1px, transparent 1px) top left / 0.62rem 0.62rem no-repeat,
-      linear-gradient(225deg, rgba(255, 90, 60, 0.48) 0 1px, transparent 1px) bottom right / 0.62rem 0.62rem no-repeat;
-    opacity: 0.7;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame {
-    visibility: visible;
-    opacity: 0.7;
-    animation: daiionEnvironmentHudFrameProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__title {
-    animation: daiionArchiveStatsContentResolve 180ms ease-out both;
-    animation-delay: 4550ms;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__signal {
-    animation: daiionEnvironmentHudSignalResolve 220ms ease-out both;
-    animation-delay: 4620ms;
-  }
-}
 .daiion-archive-stats-panel::before {
   position: absolute;
   inset-block-start: 0;
@@ -15121,58 +15015,6 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
-@keyframes daiionEnvironmentHudFrameProject {
-  0% {
-    opacity: 0;
-    border-color: rgba(255, 90, 60, 0);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0),
-      inset 0 0 0 rgba(255, 42, 26, 0),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0),
-      0 0 0 rgba(255, 42, 26, 0);
-    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
-  }
-
-  12% {
-    opacity: 0.25;
-    border-color: rgba(255, 90, 60, 0.1);
-    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
-  }
-
-  36% {
-    opacity: 0.55;
-    border-color: rgba(255, 90, 60, 0.22);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% 1px, 0 1px, 0 1px, 0 0.55rem);
-  }
-
-  58% {
-    opacity: 0.64;
-    border-color: rgba(255, 90, 60, 0.34);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% 58%, calc(100% - 0.55rem) 64%, 0 64%, 0 0.55rem);
-  }
-
-  72% {
-    opacity: 0.7;
-    border-color: rgba(255, 90, 60, 0.38);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.035),
-      inset 0 0 0.82rem rgba(255, 42, 26, 0.08),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0.32),
-      0 0 0.42rem rgba(255, 42, 26, 0.1);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-  }
-
-  100% {
-    opacity: 0.7;
-    border-color: rgba(255, 90, 60, 0.38);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.055),
-      inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
-      0 0 0.68rem rgba(255, 42, 26, 0.14);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-  }
-}
 @keyframes daiionDestinationPanelProject {
   0% {
     opacity: 0;
@@ -15249,17 +15091,6 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
-@keyframes daiionEnvironmentHudSignalResolve {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, calc(-50% + 0.12rem));
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
 @keyframes daiionArchiveStatsValueLock {
   0% {
     color: rgba(255, 231, 208, 0.82);
@@ -15450,96 +15281,6 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.68rem 0.78rem;
   }
 
-  .daiion-environment-hud-frame {
-    position: absolute;
-    inset-inline-start: 2.05rem;
-    inset-block-start: clamp(19.5rem, 34svh, 21rem);
-    z-index: 4;
-    display: block;
-    inline-size: min(13.45rem, calc(100vw - 3.2rem));
-    block-size: clamp(5.2rem, 10svh, 6.2rem);
-    box-sizing: border-box;
-    pointer-events: none;
-    visibility: hidden;
-    opacity: 0;
-    background:
-      linear-gradient(135deg, rgba(255, 90, 60, 0.16), transparent 1.5rem) top left / 100% 100% no-repeat,
-      linear-gradient(315deg, rgba(255, 42, 26, 0.1), transparent 1.8rem) bottom right / 100% 100% no-repeat,
-      rgba(6, 7, 9, 0.68);
-    border: 1px solid rgba(255, 90, 60, 0.38);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.055),
-      inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
-      0 0 0.68rem rgba(255, 42, 26, 0.14);
-    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-    contain: layout paint style;
-  }
-
-  .daiion-environment-hud-frame::before,
-  .daiion-environment-hud-frame::after {
-    position: absolute;
-    content: "";
-    pointer-events: none;
-  }
-
-  .daiion-environment-hud-frame__title {
-    position: absolute;
-    inset-block-start: clamp(0.62rem, 1.55svh, 0.82rem);
-    inset-inline: 0.72rem;
-    display: block;
-    color: rgba(255, 90, 60, 0.96);
-    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-    font-size: clamp(0.56rem, 2.35vw, 0.68rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.16em;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .daiion-environment-hud-frame__signal {
-    position: absolute;
-    inset-block-start: 50%;
-    inset-inline-start: 50%;
-    display: block;
-    transform: translate(-50%, -50%);
-    color: rgba(248, 249, 252, 0.96);
-    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-    font-size: calc(clamp(0.63rem, 0.82vw, 0.78rem) + 2px);
-    font-weight: 650;
-    line-height: 1.02;
-    text-align: center;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .daiion-environment-hud-frame::before {
-    inset-block-start: clamp(1.58rem, 3.05svh, 1.92rem);
-    inset-inline: 0.72rem;
-    block-size: 1px;
-    opacity: 0.86;
-    background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.7) 8%, rgba(255, 90, 60, 0.9) 52%, rgba(255, 231, 208, 0.44) 92%, transparent);
-    box-shadow:
-      0 0 0.28rem rgba(255, 42, 26, 0.32),
-      0 0 0.62rem rgba(255, 42, 26, 0.16);
-  }
-
-  .daiion-environment-hud-frame::after {
-    inset-block: 0.62rem;
-    inset-inline: 0.72rem;
-    background:
-      linear-gradient(180deg, rgba(255, 90, 60, 0.72), transparent 36%) left / 1px 100% no-repeat,
-      linear-gradient(135deg, rgba(255, 90, 60, 0.68) 0 1px, transparent 1px) top left / 0.62rem 0.62rem no-repeat,
-      linear-gradient(225deg, rgba(255, 90, 60, 0.48) 0 1px, transparent 1px) bottom right / 0.62rem 0.62rem no-repeat;
-    opacity: 0.7;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame {
-    visibility: visible;
-    opacity: 1;
-  }
   .daiion-destination-panel {
     inset-block-end: 7.15rem;
     inset-inline-end: 2.05rem;
@@ -15575,25 +15316,6 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
     opacity: 0;
-  }
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__title,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__signal {
-    animation: none;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame {
-    opacity: 0.7;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__title {
-    opacity: 1;
-    transform: none;
-  }
-
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame__signal {
-    opacity: 1;
-    transform: translate(-50%, -50%);
   }
 }
 @media (prefers-reduced-motion: reduce) {

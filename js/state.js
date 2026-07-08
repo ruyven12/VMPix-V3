@@ -2352,8 +2352,9 @@ const daiionArchiveStatsDecodeDelay = 4580;
 const daiionArchiveStatsRowStagger = 80;
 const daiionArchiveFocusBriefings = {
   campaigns: {
+    title: "The Hall of Crusades",
     stat: "43 Recorded Campaigns",
-    copy: "Journey through every recorded campaign preserved within the Ring Archive.",
+    copy: "Journey through a collection of the campaigns that transpired throughout time.",
     status: "TARGET LOCKED",
   },
   combatants: {
@@ -2403,11 +2404,13 @@ function syncDaiionDestinationSelection() {
   });
 
   if (focusPanel) {
+    const titleNode = focusPanel.querySelector(".daiion-archive-focus-panel__title");
     const statNode = focusPanel.querySelector("[data-daiion-archive-focus-stat]");
     const copyNode = focusPanel.querySelector("[data-daiion-archive-focus-copy]");
     const statusNode = focusPanel.querySelector("[data-daiion-archive-focus-status]");
 
     if (focusBriefing) {
+      titleNode.textContent = focusBriefing.title || "ARCHIVE FOCUS";
       statNode.textContent = focusBriefing.stat;
       copyNode.textContent = focusBriefing.copy;
       statusNode.textContent = focusBriefing.status;
@@ -2415,6 +2418,7 @@ function syncDaiionDestinationSelection() {
       focusPanel.setAttribute("aria-hidden", "false");
       focusPanel.setAttribute("data-daiion-selected-target", daiionDestinationSelectedTarget);
     } else {
+      titleNode.textContent = "ARCHIVE FOCUS";
       statNode.textContent = "";
       copyNode.textContent = "";
       statusNode.textContent = "";
