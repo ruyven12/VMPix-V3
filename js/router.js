@@ -93,7 +93,8 @@ function getRouteFromUrl(url = window.location.href) {
     }
   }
   if (routePath === routePaths.wrestlingShows || routePath === routePaths.wrestlingShows2) {
-    return { name: "wrestling-shows", canonicalUrl: routePath };
+    const showsVariant = routePath === routePaths.wrestlingShows2 ? "hall-of-crusades" : "";
+    return { name: "wrestling-shows", canonicalUrl: routePath, showsVariant };
   }
   const wrestlingShowDetailPrefix = `${routePaths.wrestlingShows}/`;
   if (routePath.startsWith(wrestlingShowDetailPrefix)) {
@@ -337,7 +338,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-shows") {
-    showWrestlingShowsIndex();
+    showWrestlingShowsIndex({ showsVariant: route.showsVariant });
     return;
   }
 

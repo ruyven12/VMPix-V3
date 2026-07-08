@@ -3093,7 +3093,7 @@ function showWrestlingVenueDetail(venueId) {
   }
 }
 
-function showWrestlingShowsIndex() {
+function showWrestlingShowsIndex(options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowsShell) {
     return;
   }
@@ -3117,6 +3117,11 @@ function showWrestlingShowsIndex() {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(false);
+  if (options.showsVariant === "hall-of-crusades") {
+    wrestlingShowsShell.dataset.wrestlingShowsVariant = "hall-of-crusades";
+  } else {
+    wrestlingShowsShell.removeAttribute("data-wrestling-shows-variant");
+  }
   setWrestlingPeopleHidden(true);
   setWrestlingPersonDetailHidden(true);
   setWrestlingVenuesHidden(true);
