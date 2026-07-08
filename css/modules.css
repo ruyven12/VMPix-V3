@@ -15740,6 +15740,17 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
+@media (max-height: 540px) and (orientation: landscape) {
+  .daiion-title-reveal {
+    --daiion-title-hud-y: clamp(-8.6rem, -24svh, -6.2rem);
+    --daiion-title-hud-scale: 0.34;
+  }
+
+  .daiion-title-reveal__subtitle {
+    font-size: clamp(0.72rem, 2.2vw, 0.9rem);
+  }
+}
+
 .daiion-title-reveal {
   visibility: visible;
   opacity: 0;

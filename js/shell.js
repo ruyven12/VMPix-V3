@@ -340,7 +340,7 @@ function clearPortfolioGatewayRouteHandoffTimer() {
 }
 
 function getPortfolioGatewayRouteHandoffTarget() {
-  return routePaths.wrestling2 || "/wrestling2";
+  return routePaths.wrestling || "/wrestling";
 }
 
 function isPortfolioGatewayRouteHandoffReady(worldName) {
