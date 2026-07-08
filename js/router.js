@@ -67,8 +67,8 @@ function getRouteFromUrl(url = window.location.href) {
       return { name: "music-venue-detail", venueSlug, canonicalUrl: getMusicVenueRouteUrl(venueSlug) };
     }
   }
-  if (routePath === routePaths.wrestling || routePath === routePaths.wrestling2) {
-    return { name: "wrestling2", canonicalUrl: routePath };
+  if (routePath === routePaths.wrestling) {
+    return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };
@@ -302,11 +302,6 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling") {
-    showRingArchive();
-    return;
-  }
-
-  if (route.name === "wrestling2") {
     const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     showBattlegroundGatewayArrivalSurface();
     if (typeof initDaiionArchiveStatsPanel === "function") {

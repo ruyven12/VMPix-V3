@@ -2133,7 +2133,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     shell.classList.remove("has-portfolio-entry-constellation");
     clearPortfolioEngineReadyState();
   }
-  if (route.name !== "portfolio" && route.name !== "wrestling2") {
+  if (route.name !== "portfolio" && route.name !== "wrestling") {
     clearPortfolioGatewayState();
   }
   shell.dataset.shellModule = moduleContext;
@@ -3840,8 +3840,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "show-detail": musicNexusShell,
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
-    wrestling: ringArchiveShell,
-    wrestling2: document.querySelector(".public-home"),
+    wrestling: document.querySelector(".public-home"),
     "wrestling-route-not-found": modulePlaceholder,
     "wrestling-people": wrestlingPeopleShell,
     "wrestling-person-detail": wrestlingPersonDetailShell,

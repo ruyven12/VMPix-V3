@@ -15751,7 +15751,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
-.daiion-title-reveal {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
   visibility: visible;
   opacity: 0;
   animation:

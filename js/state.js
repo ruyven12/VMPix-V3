@@ -1967,7 +1967,6 @@ const routePaths = {
   musicPeople: "/music/people",
   musicVenues: "/music/venues",
   wrestling: "/wrestling",
-  wrestling2: "/wrestling2",
   wrestlingPeople: "/wrestling/people",
   wrestlingVenues: "/wrestling/venues",
   wrestlingShows: "/wrestling/shows",
@@ -2068,17 +2067,6 @@ const shellRouteRegistry = [
   {
     id: "wrestling",
     route: routePaths.wrestling,
-    label: "The Ring Archive",
-    parentSection: "Portfolio",
-    moduleType: "module",
-    drawerGroup: "wrestling",
-    breadcrumbLabel: "Wrestling",
-    bottomRailEligible: true,
-    drawerVariant: "module",
-  },
-  {
-    id: "wrestling2",
-    route: routePaths.wrestling2,
     label: "Battleground",
     parentSection: "Portfolio",
     moduleType: "module",
@@ -2215,7 +2203,6 @@ const routeNameToGlobalNavTarget = {
   "music-venues": "music",
   "music-venue-detail": "music",
   wrestling: "wrestling",
-  wrestling2: "wrestling",
   "wrestling-route-not-found": "wrestling",
   "wrestling-shows": "wrestling",
   "wrestling-show-detail": "wrestling",
@@ -2248,7 +2235,6 @@ const routeNameToBreadcrumbTrail = {
   "music-venues": ["portfolio", "music", "music-venues"],
   "music-venue-detail": ["portfolio", "music", "music-venues"],
   wrestling: ["portfolio", "wrestling"],
-  wrestling2: ["portfolio", "wrestling2"],
   "wrestling-route-not-found": ["portfolio", "wrestling"],
   "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
@@ -2297,7 +2283,6 @@ const routeNameToShellBackTarget = {
   "music-venues": routePaths.music,
   "music-venue-detail": routePaths.musicVenues,
   wrestling: routePaths.portfolio,
-  wrestling2: routePaths.portfolio,
   "wrestling-route-not-found": routePaths.wrestling,
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,
@@ -2350,7 +2335,7 @@ const daiionArchiveStatsEndpoints = {
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
 function isDaiionArchiveLandingPath(pathname = window.location.pathname) {
-  return pathname === routePaths.wrestling || pathname === routePaths.wrestling2;
+  return pathname === routePaths.wrestling;
 }
 const daiionArchiveStatsRowStagger = 80;
 const daiionArchiveFocusBriefings = {
