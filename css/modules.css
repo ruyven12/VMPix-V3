@@ -15375,20 +15375,20 @@ button.wrestling-event-history-tagged-thumb {
     z-index: 5;
     opacity: 0.84;
     background:
-      linear-gradient(90deg, transparent 0.55rem, rgba(255, 90, 60, 0.24) 0.55rem calc(100% - 0.55rem), transparent calc(100% - 0.55rem)) 0 2.16rem / 100% 1px no-repeat,
-      linear-gradient(135deg, rgba(255, 90, 60, 0.16), transparent 1.5rem) top left / 100% 100% no-repeat,
-      linear-gradient(315deg, rgba(255, 42, 26, 0.1), transparent 1.8rem) bottom right / 100% 100% no-repeat,
-      rgba(6, 7, 9, 0.68);
-    border-color: rgba(255, 90, 60, 0.44);
+      linear-gradient(90deg, transparent 0.55rem, rgba(255, 90, 60, 0.42) 0.55rem calc(100% - 0.55rem), transparent calc(100% - 0.55rem)) 0 2.16rem / 100% 1px no-repeat,
+      linear-gradient(135deg, rgba(255, 90, 60, 0.22), transparent 1.5rem) top left / 100% 100% no-repeat,
+      linear-gradient(315deg, rgba(255, 42, 26, 0.16), transparent 1.8rem) bottom right / 100% 100% no-repeat,
+      rgba(6, 7, 9, 0.86);
+    border-color: rgba(255, 90, 60, 0.68);
     box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.055),
-      inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
-      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
-      0 0 0.68rem rgba(255, 42, 26, 0.14);
+      inset 0 0 0 1px rgba(255, 231, 208, 0.08),
+      inset 0 0 1.35rem rgba(255, 42, 26, 0.16),
+      0 0.48rem 1.55rem rgba(0, 0, 0, 0.48),
+      0 0 0.86rem rgba(255, 42, 26, 0.22);
   }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel::before {
-    opacity: 0.72;
+    opacity: 1;
     transform: scaleX(1);
   }
 }
