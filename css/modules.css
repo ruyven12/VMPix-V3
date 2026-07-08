@@ -11699,6 +11699,7 @@ button.wrestling-event-history-tagged-thumb {
   scrollbar-width: none;
   overscroll-behavior-inline: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   transform: translate3d(-50%, 0, 0);
   contain: layout paint style;
 }

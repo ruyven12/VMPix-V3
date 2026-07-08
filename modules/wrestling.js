@@ -256,6 +256,9 @@ const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-fi
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
 const HALL_CRUSADES_POSTER_STRIP_LIMIT = 7;
+const HALL_CRUSADES_POSTER_ACTIVE_SLOT = Math.floor(HALL_CRUSADES_POSTER_STRIP_LIMIT / 2);
+const HALL_CRUSADES_POSTER_SWIPE_THRESHOLD = 36;
+const HALL_CRUSADES_POSTER_WHEEL_THRESHOLD = 48;
 const wrestlingPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const wrestlingPeopleLetterOptions = ["#", ...wrestlingPeopleAlphabet];
 let wrestlingShowsCollection = [];
@@ -271,6 +274,14 @@ let activeWrestlingShowsYearFilter = "";
 let activeWrestlingShowsPromotionFilter = "";
 let activeWrestlingShowsVenueFilter = "";
 let activeWrestlingShowsSort = "newest";
+let hallCrusadesPosterActiveIndex = HALL_CRUSADES_POSTER_ACTIVE_SLOT;
+let hallCrusadesPosterPointerId = null;
+let hallCrusadesPosterPointerStartX = 0;
+let hallCrusadesPosterPointerStartY = 0;
+let hallCrusadesPosterSuppressClick = false;
+let hallCrusadesPosterSuppressClickTimer = 0;
+let hallCrusadesPosterWheelDelta = 0;
+let isHallCrusadesPosterStripInteractionBound = false;
 let wrestlingPeopleCollection = [];
 let wrestlingPeopleRequest = null;
 let wrestlingPeopleLoaded = false;
@@ -1434,10 +1445,163 @@ function isHallCrusadesShowsVariantActive() {
   return wrestlingShowsShell?.dataset.wrestlingShowsVariant === "hall-of-crusades";
 }
 
-function createHallCrusadesPosterStripItem(show, index = 0) {
+function normalizeHallCrusadesPosterActiveIndex(total) {
+  if (total <= 0) {
+    hallCrusadesPosterActiveIndex = HALL_CRUSADES_POSTER_ACTIVE_SLOT;
+    return;
+  }
+  const activeIndex = Number.isFinite(hallCrusadesPosterActiveIndex)
+    ? Math.trunc(hallCrusadesPosterActiveIndex)
+    : HALL_CRUSADES_POSTER_ACTIVE_SLOT;
+  hallCrusadesPosterActiveIndex = ((activeIndex % total) + total) % total;
+}
+
+function getHallCrusadesPosterWindowRows(rows) {
+  const sourceRows = Array.isArray(rows) ? rows : [];
+  const total = sourceRows.length;
+  const limit = Math.min(total, HALL_CRUSADES_POSTER_STRIP_LIMIT);
+  if (limit === 0) {
+    return [];
+  }
+
+  normalizeHallCrusadesPosterActiveIndex(total);
+  const activeSlot = Math.floor(limit / 2);
+  return Array.from({ length: limit }, (_, slotIndex) => {
+    const sourceIndex = (hallCrusadesPosterActiveIndex + slotIndex - activeSlot + total) % total;
+    return {
+      show: sourceRows[sourceIndex],
+      sourceIndex,
+      isActive: slotIndex === activeSlot,
+    };
+  });
+}
+
+function advanceHallCrusadesPosterActive(direction) {
+  const rows = getWrestlingShowsIndexRows();
+  const total = rows.length;
+  if (!isHallCrusadesShowsVariantActive() || total < 2) {
+    return false;
+  }
+
+  normalizeHallCrusadesPosterActiveIndex(total);
+  const nextIndex = (hallCrusadesPosterActiveIndex + direction + total) % total;
+  if (nextIndex === hallCrusadesPosterActiveIndex) {
+    return false;
+  }
+
+  hallCrusadesPosterActiveIndex = nextIndex;
+  renderHallCrusadesPosterStrip();
+  return true;
+}
+
+function handleHallCrusadesPosterPointerDown(event) {
+  if (!isHallCrusadesShowsVariantActive() || event.pointerType === "mouse") {
+    return;
+  }
+  hallCrusadesPosterPointerId = event.pointerId;
+  hallCrusadesPosterPointerStartX = event.clientX;
+  hallCrusadesPosterPointerStartY = event.clientY;
+  try {
+    hallCrusadesPosterStrip?.setPointerCapture?.(event.pointerId);
+  } catch (error) {
+    // Pointer capture is optional; swipe handling still works without it.
+  }
+}
+
+function handleHallCrusadesPosterPointerMove(event) {
+  if (event.pointerId !== hallCrusadesPosterPointerId) {
+    return;
+  }
+  const deltaX = event.clientX - hallCrusadesPosterPointerStartX;
+  const deltaY = event.clientY - hallCrusadesPosterPointerStartY;
+  if (Math.abs(deltaX) > 12 && Math.abs(deltaX) > Math.abs(deltaY)) {
+    event.preventDefault();
+  }
+}
+
+function handleHallCrusadesPosterPointerEnd(event) {
+  if (event.pointerId !== hallCrusadesPosterPointerId) {
+    return;
+  }
+
+  const deltaX = event.clientX - hallCrusadesPosterPointerStartX;
+  const deltaY = event.clientY - hallCrusadesPosterPointerStartY;
+  hallCrusadesPosterPointerId = null;
+  try {
+    hallCrusadesPosterStrip?.releasePointerCapture?.(event.pointerId);
+  } catch (error) {
+    // Ignore missing pointer capture on synthetic or cancelled touch streams.
+  }
+
+  if (Math.abs(deltaX) < HALL_CRUSADES_POSTER_SWIPE_THRESHOLD || Math.abs(deltaX) <= Math.abs(deltaY)) {
+    return;
+  }
+
+  hallCrusadesPosterSuppressClick = advanceHallCrusadesPosterActive(deltaX < 0 ? 1 : -1);
+  if (hallCrusadesPosterSuppressClick) {
+    window.clearTimeout(hallCrusadesPosterSuppressClickTimer);
+    hallCrusadesPosterSuppressClickTimer = window.setTimeout(() => {
+      hallCrusadesPosterSuppressClick = false;
+      hallCrusadesPosterSuppressClickTimer = 0;
+    }, 0);
+    event.preventDefault();
+  }
+}
+
+function handleHallCrusadesPosterClick(event) {
+  if (!hallCrusadesPosterSuppressClick) {
+    return;
+  }
+  hallCrusadesPosterSuppressClick = false;
+  window.clearTimeout(hallCrusadesPosterSuppressClickTimer);
+  hallCrusadesPosterSuppressClickTimer = 0;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}
+
+function handleHallCrusadesPosterWheel(event) {
+  if (!isHallCrusadesShowsVariantActive()) {
+    return;
+  }
+
+  const absX = Math.abs(event.deltaX);
+  const absY = Math.abs(event.deltaY);
+  if (absX <= absY || absX < 1) {
+    return;
+  }
+
+  event.preventDefault();
+  hallCrusadesPosterWheelDelta += event.deltaX;
+  if (Math.abs(hallCrusadesPosterWheelDelta) < HALL_CRUSADES_POSTER_WHEEL_THRESHOLD) {
+    return;
+  }
+
+  advanceHallCrusadesPosterActive(hallCrusadesPosterWheelDelta > 0 ? 1 : -1);
+  hallCrusadesPosterWheelDelta = 0;
+}
+
+function bindHallCrusadesPosterStripInteraction() {
+  if (!hallCrusadesPosterStrip || isHallCrusadesPosterStripInteractionBound) {
+    return;
+  }
+
+  isHallCrusadesPosterStripInteractionBound = true;
+  hallCrusadesPosterStrip.addEventListener("pointerdown", handleHallCrusadesPosterPointerDown);
+  hallCrusadesPosterStrip.addEventListener("pointermove", handleHallCrusadesPosterPointerMove, { passive: false });
+  hallCrusadesPosterStrip.addEventListener("pointerup", handleHallCrusadesPosterPointerEnd);
+  hallCrusadesPosterStrip.addEventListener("pointercancel", handleHallCrusadesPosterPointerEnd);
+  hallCrusadesPosterStrip.addEventListener("click", handleHallCrusadesPosterClick, true);
+  hallCrusadesPosterStrip.addEventListener("wheel", handleHallCrusadesPosterWheel, { passive: false });
+}
+
+function createHallCrusadesPosterStripItem(show, index = 0, options = {}) {
   const item = document.createElement("li");
   item.className = "hall-crusades-poster-strip__item";
   item.dataset.wrestlingShowId = show.showId;
+  item.dataset.wrestlingShowIndex = String(options.sourceIndex ?? index);
+  if (options.isActive) {
+    item.classList.add("is-active");
+  }
 
   const showRoute = getWrestlingShowRouteUrl(show);
   const record = document.createElement("button");
@@ -1445,12 +1609,15 @@ function createHallCrusadesPosterStripItem(show, index = 0) {
   record.type = "button";
   record.dataset.wrestlingShowRoute = showRoute;
   record.setAttribute("aria-label", `Open ${show.title}`);
+  if (options.isActive) {
+    record.setAttribute("aria-current", "true");
+  }
   setWrestlingRelationshipDataset(record, show);
 
   const posterImage = document.createElement("img");
   posterImage.className = "hall-crusades-poster-strip__image";
   posterImage.alt = "";
-  posterImage.loading = index === 0 ? "eager" : "lazy";
+  posterImage.loading = options.isActive || index === 0 ? "eager" : "lazy";
   posterImage.decoding = "async";
   posterImage.hidden = true;
 
@@ -1492,12 +1659,14 @@ function renderHallCrusadesPosterStrip() {
     return;
   }
 
-  const posterRows = getWrestlingShowsIndexRows().slice(0, HALL_CRUSADES_POSTER_STRIP_LIMIT);
+  bindHallCrusadesPosterStripInteraction();
+  const posterRows = getHallCrusadesPosterWindowRows(getWrestlingShowsIndexRows());
   hallCrusadesPosterStrip.hidden = posterRows.length === 0;
   const fragment = document.createDocumentFragment();
-  posterRows.forEach((show, index) => {
-    fragment.append(createHallCrusadesPosterStripItem(show, index));
+  posterRows.forEach((row, index) => {
+    fragment.append(createHallCrusadesPosterStripItem(row.show, index, row));
   });
+  hallCrusadesPosterStrip.dataset.hallCrusadesActiveIndex = String(hallCrusadesPosterActiveIndex);
   hallCrusadesPosterStrip.replaceChildren(fragment);
 }
 function createWrestlingShowEntry(show) {
