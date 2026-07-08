@@ -13835,7 +13835,7 @@ button.wrestling-event-history-tagged-thumb {
 
 
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -13873,7 +13873,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
   filter: brightness(1.12) saturate(1.06);
 }
 
@@ -13936,7 +13936,7 @@ button.wrestling-event-history-tagged-thumb {
     drop-shadow(0 0 0.34rem rgba(255, 42, 26, 0.36));
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
   visibility: visible;
   opacity: 1;
   transition:
@@ -14040,7 +14040,7 @@ button.wrestling-event-history-tagged-thumb {
     drop-shadow(0 0 0.3rem rgba(255, 42, 26, 0.32));
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
   visibility: visible;
   opacity: 1;
   transition:
@@ -14154,12 +14154,12 @@ button.wrestling-event-history-tagged-thumb {
   inset-block-start: 49%;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node {
   visibility: visible;
   opacity: 0.16;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active {
   opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale(1);
   border-color: rgba(255, 231, 208, 0.58);
@@ -14170,17 +14170,17 @@ button.wrestling-event-history-tagged-thumb {
   animation: daiionPlanetNodePulse 1900ms ease-in-out infinite;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
   opacity: 1;
   animation: daiionPlanetNodeHalo 1900ms ease-out infinite;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::after {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::after {
   opacity: 0.8;
   border-color: rgba(255, 231, 208, 0.48);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active .daiion-planet-node__point {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active .daiion-planet-node__point {
   background: rgba(255, 231, 208, 0.92);
   box-shadow:
     0 0 0.22rem rgba(255, 231, 208, 0.42),
@@ -14293,25 +14293,25 @@ button.wrestling-event-history-tagged-thumb {
   transform: translate3d(-50%, 0, 0);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-routing-layer {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-routing-layer {
   visibility: visible;
   opacity: 1;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active {
   visibility: visible;
   opacity: 1;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment {
   opacity: var(--route-o, 0.56);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__segment::before {
   animation: daiionEnergyRoutePulse 1450ms ease-in-out var(--route-delay, 0ms) infinite;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine {
   opacity: 0.86;
   animation: daiionEnergyEngineAck 1500ms ease-out infinite;
 }
@@ -14496,7 +14496,7 @@ button.wrestling-event-history-tagged-thumb {
     0 0 0.62rem rgba(255, 42, 26, 0.2);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-energy-route.is-active .daiion-energy-route__engine::before {
   opacity: 1;
 }
 .daiion-archive-stats-panel {
@@ -14606,13 +14606,43 @@ button.wrestling-event-history-tagged-thumb {
   color: rgba(255, 231, 208, 0.96);
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.2);
 }
+
+.daiion-archive-stats-panel.daiion-latest-transmissions-test-panel {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__row {
+  grid-template-columns: minmax(0, 1fr);
+  border-block-end: 0;
+}
+
+.daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__label {
+  padding-inline: 0;
+  text-align: center;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel.daiion-latest-transmissions-test-panel,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel::before,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__title,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__label {
+  animation: none;
+  transform: none;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel.daiion-latest-transmissions-test-panel {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
 .daiion-archive-stats-panel__label,
 .daiion-archive-stats-panel__term,
 .daiion-archive-stats-panel__context,
 .daiion-archive-stats-panel__value {
   display: block;
 }
-
 .daiion-archive-stats-panel__label {
   padding-inline-start: 5px;
 }
@@ -14650,7 +14680,6 @@ button.wrestling-event-history-tagged-thumb {
   line-height: 1;
   letter-spacing: 0.08em;
 }
-
 .daiion-archive-focus-panel {
   position: absolute;
   inset-block-start: auto;
@@ -14736,7 +14765,7 @@ button.wrestling-event-history-tagged-thumb {
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.24);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
   visibility: visible;
   opacity: 1;
   animation: daiionArchiveFocusPanelResolve 220ms ease-out both;
@@ -14845,162 +14874,90 @@ button.wrestling-event-history-tagged-thumb {
     0 0 0.32rem rgba(255, 90, 60, 0.32),
     0 0 0.58rem rgba(255, 42, 26, 0.16);
 }
-
-.daiion-latest-transmissions-panel {
-  position: absolute;
-  inset-block-end: clamp(7.1rem, 12svh, 8.8rem);
-  inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
-  z-index: 4;
-  display: grid;
-  align-content: start;
-  inline-size: clamp(11.44rem, 15.4vw, 16.28rem);
-  min-block-size: clamp(9.5rem, 22svh, 13rem);
-  padding: clamp(0.7rem, 1.1vw, 0.92rem) clamp(0.79rem, 1.21vw, 1.08rem);
-  color: rgba(245, 246, 248, 0.86);
-  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-  letter-spacing: 0.04em;
-  pointer-events: none;
-  visibility: hidden;
-  opacity: 0;
-  background:
-    linear-gradient(135deg, rgba(255, 90, 60, 0.12), transparent 1.5rem) top left / 100% 100% no-repeat,
-    linear-gradient(315deg, rgba(255, 42, 26, 0.075), transparent 1.8rem) bottom right / 100% 100% no-repeat,
-    rgba(6, 7, 9, 0.52);
-  border: 1px solid rgba(255, 90, 60, 0.3);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 231, 208, 0.04),
-    inset 0 0 0.9rem rgba(255, 42, 26, 0.085),
-    0 0.42rem 1.1rem rgba(0, 0, 0, 0.3),
-    0 0 0.46rem rgba(255, 42, 26, 0.085);
-  clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
-  contain: layout paint style;
-}
-
-.daiion-latest-transmissions-panel::before {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0.55rem;
-  block-size: 1px;
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.54) 8%, rgba(255, 90, 60, 0.72) 52%, rgba(255, 231, 208, 0.32) 92%, transparent);
-  box-shadow:
-    0 0 0.22rem rgba(255, 42, 26, 0.24),
-    0 0 0.5rem rgba(255, 90, 60, 0.12);
-  transform: scaleX(0.04);
-  transform-origin: 0 50%;
-}
-.daiion-latest-transmissions-panel__title {
-  display: block;
-  padding-block-end: 0.42rem;
-  color: rgba(255, 90, 60, 0.98);
-  font-size: clamp(0.58rem, 0.72vw, 0.72rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-align: center;
-  text-transform: uppercase;
-  border-block-end: 1px solid rgba(255, 90, 60, 0.22);
-  text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.22);
-}
-.daiion-latest-transmissions-panel__empty {
-  display: block;
-  margin-block-start: 1.15rem;
-  color: rgba(255, 231, 208, 0.92);
-  font-size: clamp(0.54rem, 0.68vw, 0.66rem);
-  font-weight: 650;
-  line-height: 1.35;
-  letter-spacing: 0.12em;
-  text-align: center;
-  text-transform: uppercase;
-  text-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.32);
-}
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
   visibility: visible;
   opacity: 1;
   animation: daiionDestinationPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
   animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title {
   animation: daiionArchiveStatsContentResolve 180ms ease-out both;
   animation-delay: 4550ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item {
   animation: daiionArchiveStatsLabelResolve 220ms ease-out both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(2) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(2) {
   animation-delay: 4620ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(3) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(3) {
   animation-delay: 4700ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
   animation-delay: 4780ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
   visibility: visible;
   opacity: 1;
   animation: daiionArchiveStatsPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
   animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title {
   animation: daiionArchiveStatsContentResolve 180ms ease-out both;
   animation-delay: 4550ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label {
   animation: daiionArchiveStatsLabelResolve 220ms ease-out both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(2) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(2) .daiion-archive-stats-panel__label {
   animation-delay: 4620ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(3) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(3) .daiion-archive-stats-panel__label {
   animation-delay: 4700ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(4) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(4) .daiion-archive-stats-panel__label {
   animation-delay: 4780ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(5) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(5) .daiion-archive-stats-panel__label {
   animation-delay: 4860ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(6) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(6) .daiion-archive-stats-panel__label {
   animation-delay: 4940ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value {
   opacity: 0;
   transform: translate3d(0, 0.08rem, 0);
   transition:
     opacity 120ms ease-out,
     transform 120ms ease-out;
 }
-
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-decoding,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locked {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-decoding,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locked {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locking {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locking {
   animation: daiionArchiveStatsValueLock 280ms ease-out both;
 }
 
@@ -15369,7 +15326,8 @@ button.wrestling-event-history-tagged-thumb {
     padding-block: 0.68rem 0.51rem;
   }
 
-  .daiion-latest-transmissions-panel {
+  .daiion-archive-stats-panel.daiion-latest-transmissions-test-panel {
+    inset-block-start: auto;
     inset-block-end: 7.15rem;
     inset-inline-start: 1.1rem;
     box-sizing: border-box;
@@ -15378,17 +15336,29 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.72rem 0.77rem;
   }
 
-  .daiion-latest-transmissions-panel__title {
+  .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__title {
     font-size: 0.48rem;
     letter-spacing: 0.13em;
     white-space: nowrap;
   }
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel {
+
+  .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__row {
+    align-content: center;
+    min-block-size: 4.25rem;
+  }
+
+  .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__term {
+    font-size: 0.58rem;
+    line-height: 1.16;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel.daiion-latest-transmissions-test-panel {
     display: grid;
     visibility: visible;
     z-index: 7;
     opacity: 1;
     pointer-events: auto;
+    animation: none;
     background: rgba(4, 5, 7, 0.96);
     border: 1px solid rgba(255, 42, 26, 0.96);
     box-shadow:
@@ -15398,9 +15368,17 @@ button.wrestling-event-history-tagged-thumb {
       0 0 1rem rgba(255, 42, 26, 0.34);
   }
 
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel::before {
     opacity: 1;
     transform: scaleX(1);
+    animation: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__title,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-test-panel .daiion-archive-stats-panel__label {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }
 
@@ -15414,9 +15392,6 @@ button.wrestling-event-history-tagged-thumb {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel::before,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel__title,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
     animation: none;
     opacity: 1;
@@ -15426,24 +15401,8 @@ button.wrestling-event-history-tagged-thumb {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
     opacity: 1;
   }
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel {
-    display: grid;
-    visibility: visible;
-    z-index: 7;
-    opacity: 1;
-    pointer-events: auto;
-    background: rgba(4, 5, 7, 0.96);
-    border: 1px solid rgba(255, 42, 26, 0.96);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 231, 208, 0.18),
-      inset 0 0 1.55rem rgba(255, 42, 26, 0.2),
-      0 0.52rem 1.65rem rgba(0, 0, 0, 0.62),
-      0 0 1rem rgba(255, 42, 26, 0.34);
-  }
-
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-latest-transmissions-panel::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
     opacity: 0;
   }
 }
@@ -15476,7 +15435,7 @@ button.wrestling-event-history-tagged-thumb {
   will-change: opacity, transform;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
   visibility: visible;
   animation: daiionAtmosphereGlow 58s cubic-bezier(0.42, 0, 0.28, 1) infinite;
 }
@@ -15538,7 +15497,7 @@ button.wrestling-event-history-tagged-thumb {
   will-change: opacity, transform;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
   visibility: visible;
   animation: daiionDustGust 32s cubic-bezier(0.24, 0.64, 0.3, 1) 7s infinite;
 }
@@ -15602,7 +15561,7 @@ button.wrestling-event-history-tagged-thumb {
   contain: layout paint style;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
   visibility: visible;
   opacity: 1;
 }
@@ -15713,12 +15672,12 @@ button.wrestling-event-history-tagged-thumb {
     radial-gradient(ellipse at 48% 100%, rgba(255, 92, 37, 0.05) 0 14%, transparent 68%);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::before {
   animation: daiionHeatShimmerRise var(--heat-duration, 9.6s) cubic-bezier(0.42, 0, 0.28, 1) infinite;
   animation-delay: var(--heat-delay, 0s);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::after {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::after {
   animation: daiionHeatShimmerRiseSoft var(--heat-duration-soft, 12.4s) cubic-bezier(0.46, 0, 0.3, 1) infinite;
   animation-delay: calc(var(--heat-delay, 0s) - 4.6s);
 }
@@ -15786,7 +15745,7 @@ button.wrestling-event-history-tagged-thumb {
   will-change: opacity, transform;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
   animation: var(--ember-animation, daiionEmberRise) var(--ember-duration, 8s) cubic-bezier(0.24, 0.62, 0.34, 1) infinite;
 }
 
@@ -16146,17 +16105,17 @@ button.wrestling-event-history-tagged-thumb {
   -webkit-text-fill-color: transparent;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
   visibility: visible;
   opacity: 0;
   animation: daiionTitleClear 3200ms ease-out both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
   animation: daiionTitleReveal 700ms ease-out both;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
   animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
 }
 
@@ -16225,7 +16184,7 @@ button.wrestling-event-history-tagged-thumb {
     background-position: 150% 0, 0 0;
   }
 }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
   visibility: visible !important;
   opacity: 1 !important;
   pointer-events: none !important;
@@ -16236,7 +16195,7 @@ button.wrestling-event-history-tagged-thumb {
     visibility 0ms linear 2200ms;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
   grid-column: 1 / -1;
@@ -16250,7 +16209,7 @@ button.wrestling-event-history-tagged-thumb {
   transform: translate3d(-50%, -50%, 0);
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
   cursor: default;
   pointer-events: none !important;
 }
@@ -16304,7 +16263,7 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
   transform: translate3d(0, -0.35rem, 0) scale(0.965);
 }
-.site-shell[data-shell-route="portfolio"].has-entered-hub .home-frame {
+  .site-shell[data-shell-route="portfolio"].has-entered-hub .home-frame {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -16313,7 +16272,7 @@ button.wrestling-event-history-tagged-thumb {
   transform: none;
 }
 
-.site-shell[data-shell-route="portfolio"].has-entered-hub.is-portfolio-entry-sequence .home-frame {
+  .site-shell[data-shell-route="portfolio"].has-entered-hub.is-portfolio-entry-sequence .home-frame {
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
@@ -16327,13 +16286,13 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 /* PASS 21 strict Chapter 2 isolation: /portfolio settles to a black entry stage. */
-.site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub {
+  .site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub {
   opacity: 0;
   pointer-events: none;
   transform: none;
 }
 
-.site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub::after {
+  .site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub::after {
   content: none;
   display: none;
 }
@@ -16351,11 +16310,11 @@ button.wrestling-event-history-tagged-thumb {
   filter: brightness(0.38) contrast(1.1) saturate(0.68) blur(1px);
 }
 
-.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-energy,
-.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-rings,
-.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-sweep,
-.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-particles,
-.site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .cinema-fire-bg {
+  .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-energy,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-rings,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-sweep,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .ambient-particles,
+  .site-shell[data-shell-route="portfolio"].has-entered-hub:not(.is-portfolio-entry-sequence):not(.is-portfolio-arriving):not(.is-portfolio-transferring):not(.is-portfolio-direct-arriving) .cinema-fire-bg {
   opacity: 0;
   animation: none;
   transform: none;
