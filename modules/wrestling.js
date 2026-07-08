@@ -247,6 +247,7 @@ const wrestlingShowVenueSelect = document.querySelector("[data-wrestling-shows-f
 const wrestlingShowFilterReset = document.querySelector("[data-wrestling-shows-filter-reset]");
 const wrestlingShowSortSelect = document.querySelector("#wrestling-shows-sort");
 const wrestlingShowPagination = document.querySelector("[data-wrestling-pagination]") || document.querySelector(".wrestling-pagination");
+const hallCrusadesPosterStrip = document.querySelector("[data-hall-crusades-poster-strip]");
 const wrestlingPeopleSearchInput = document.querySelector("[data-wrestling-people-filter='search']");
 const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-people-filter='letter']");
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
@@ -254,6 +255,7 @@ const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-peopl
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
+const HALL_CRUSADES_POSTER_STRIP_LIMIT = 7;
 const wrestlingPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const wrestlingPeopleLetterOptions = ["#", ...wrestlingPeopleAlphabet];
 let wrestlingShowsCollection = [];
@@ -1428,6 +1430,76 @@ function syncWrestlingShowsControls() {
   }
 }
 
+function isHallCrusadesShowsVariantActive() {
+  return wrestlingShowsShell?.dataset.wrestlingShowsVariant === "hall-of-crusades";
+}
+
+function createHallCrusadesPosterStripItem(show, index = 0) {
+  const item = document.createElement("li");
+  item.className = "hall-crusades-poster-strip__item";
+  item.dataset.wrestlingShowId = show.showId;
+
+  const showRoute = getWrestlingShowRouteUrl(show);
+  const record = document.createElement("button");
+  record.className = "hall-crusades-poster-strip__record";
+  record.type = "button";
+  record.dataset.wrestlingShowRoute = showRoute;
+  record.setAttribute("aria-label", `Open ${show.title}`);
+  setWrestlingRelationshipDataset(record, show);
+
+  const posterImage = document.createElement("img");
+  posterImage.className = "hall-crusades-poster-strip__image";
+  posterImage.alt = "";
+  posterImage.loading = index === 0 ? "eager" : "lazy";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
+
+  const posterFallback = document.createElement("span");
+  posterFallback.className = "hall-crusades-poster-strip__fallback";
+  posterFallback.textContent = getWrestlingShowPosterLabel(show);
+
+  const posterUrl = getWrestlingText(show.poster);
+  if (isValidWrestlingPosterUrl(posterUrl)) {
+    record.classList.add("has-poster");
+    posterImage.src = posterUrl;
+    posterImage.hidden = false;
+    posterImage.addEventListener("error", () => {
+      record.classList.remove("has-poster");
+      posterImage.hidden = true;
+      posterImage.removeAttribute("src");
+    }, { once: true });
+  }
+
+  record.append(posterImage, posterFallback);
+  record.addEventListener("click", () => {
+    navigateToRoute(showRoute, {
+      historyState: { fromWrestlingShowsIndex: true },
+    });
+  });
+
+  item.append(record);
+  return item;
+}
+
+function renderHallCrusadesPosterStrip() {
+  if (!hallCrusadesPosterStrip) {
+    return;
+  }
+
+  if (!isHallCrusadesShowsVariantActive() || wrestlingShowsDataState !== "live") {
+    hallCrusadesPosterStrip.hidden = true;
+    hallCrusadesPosterStrip.replaceChildren();
+    return;
+  }
+
+  const posterRows = getWrestlingShowsIndexRows().slice(0, HALL_CRUSADES_POSTER_STRIP_LIMIT);
+  hallCrusadesPosterStrip.hidden = posterRows.length === 0;
+  const fragment = document.createDocumentFragment();
+  posterRows.forEach((show, index) => {
+    fragment.append(createHallCrusadesPosterStripItem(show, index));
+  });
+  hallCrusadesPosterStrip.replaceChildren(fragment);
+}
 function createWrestlingShowEntry(show) {
   const item = document.createElement("li");
   item.className = "wrestling-show-entry";
@@ -1523,6 +1595,7 @@ function renderWrestlingShowsArchive(options = {}) {
   }
 
   syncWrestlingShowsControls();
+  renderHallCrusadesPosterStrip();
   wrestlingShowList.replaceChildren();
 
   if (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle") {
