@@ -11680,9 +11680,9 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none !important;
   transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
   transition:
-    opacity 520ms ease-out 2200ms,
-    transform 620ms cubic-bezier(0.18, 0.86, 0.16, 1) 2200ms,
-    visibility 0ms linear 2200ms;
+    opacity 520ms ease-out,
+    transform 620ms cubic-bezier(0.18, 0.86, 0.16, 1),
+    visibility 0ms linear;
 }
 
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left {
@@ -16138,9 +16138,9 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none !important;
   transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
   transition:
-    opacity 520ms ease-out 2200ms,
-    transform 620ms cubic-bezier(0.18, 0.86, 0.16, 1) 2200ms,
-    visibility 0ms linear 2200ms;
+    opacity 520ms ease-out,
+    transform 620ms cubic-bezier(0.18, 0.86, 0.16, 1),
+    visibility 0ms linear;
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
