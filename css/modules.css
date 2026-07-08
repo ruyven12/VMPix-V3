@@ -11681,6 +11681,48 @@ button.wrestling-event-history-tagged-thumb {
   display: none !important;
 }
 
+.hall-crusades-campaign-info-panel {
+  display: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel {
+  position: fixed;
+  inset-inline-start: 50%;
+  inset-block-end: calc(max(1rem, env(safe-area-inset-bottom)) + var(--engine-emitter-size, 4.6rem) + 10.5px);
+  z-index: 3;
+  display: block;
+  inline-size: min(60rem, calc(100vw - 1.2rem));
+  block-size: clamp(1.72rem, 2.75svh, 1.9rem);
+  box-sizing: border-box;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 90, 60, 0.14), transparent 1.35rem) top left / 100% 100% no-repeat,
+    linear-gradient(315deg, rgba(255, 42, 26, 0.09), transparent 1.6rem) bottom right / 100% 100% no-repeat,
+    rgba(6, 7, 9, 0.62);
+  border: 1px solid rgba(255, 90, 60, 0.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.05),
+    inset 0 0 1rem rgba(255, 42, 26, 0.1),
+    0 0.38rem 1.15rem rgba(0, 0, 0, 0.34),
+    0 0 0.58rem rgba(255, 42, 26, 0.12);
+  clip-path: polygon(0.52rem 0, 100% 0, 100% calc(100% - 0.52rem), calc(100% - 0.52rem) 100%, 0 100%, 0 0.52rem);
+  transform: translate3d(-50%, 0, 0);
+  contain: layout paint style;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel::before {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0.55rem;
+  block-size: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.46) 8%, rgba(255, 90, 60, 0.66) 52%, rgba(255, 231, 208, 0.28) 92%, transparent);
+  box-shadow:
+    0 0 0.24rem rgba(255, 42, 26, 0.26),
+    0 0 0.5rem rgba(255, 90, 60, 0.12);
+}
+
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
   position: absolute;
   inset-block-start: clamp(15.275rem, calc(43svh - 4.725rem), 23.275rem);
@@ -11873,6 +11915,10 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (max-width: 540px) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel {
+    inset-block-end: calc(max(1rem, env(safe-area-inset-bottom)) + var(--engine-emitter-size, 4.6rem) + 7px);
+  }
+
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
     inset-block-start: clamp(16.275rem, calc(42svh - 4.725rem), 19.875rem);
     inline-size: calc(100vw - 1rem);
