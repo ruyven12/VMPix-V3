@@ -14534,7 +14534,7 @@ button.wrestling-event-history-tagged-thumb {
 @media (min-width: 760px) {
   .daiion-environment-hud-frame {
     position: absolute;
-    inset-inline-start: clamp(1.6rem, 4vw, 5rem);
+    inset-inline-start: clamp(2.2rem, 6.2vw, 7.5rem);
     inset-block-end: clamp(7.5rem, 13vh, 10rem);
     z-index: 3;
     display: block;
