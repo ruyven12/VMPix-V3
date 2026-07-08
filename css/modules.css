@@ -15388,6 +15388,7 @@ button.wrestling-event-history-tagged-thumb {
     visibility: visible;
     z-index: 7;
     opacity: 1;
+    pointer-events: auto;
     background: rgba(4, 5, 7, 0.96);
     border: 1px solid rgba(255, 42, 26, 0.96);
     box-shadow:
@@ -15430,6 +15431,7 @@ button.wrestling-event-history-tagged-thumb {
     visibility: visible;
     z-index: 7;
     opacity: 1;
+    pointer-events: auto;
     background: rgba(4, 5, 7, 0.96);
     border: 1px solid rgba(255, 42, 26, 0.96);
     box-shadow:
