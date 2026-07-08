@@ -15561,7 +15561,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-title-reveal {
     --daiion-title-hud-x: calc(50vw - clamp(3.3rem, 15vw, 4.25rem) - min(7.675rem, calc(50vw - 1.6rem)) + 3.58rem);
     --daiion-title-hud-y: clamp(-7.2rem, -12svh, -5.8rem);
-    --daiion-title-hud-scale: 0.495;
+    --daiion-title-hud-scale: 0.396;
   }
 }
 
