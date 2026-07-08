@@ -11528,6 +11528,29 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::before {
   content: none;
 }
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::after {
+  position: absolute;
+  inset-block-start: max(0.58rem, env(safe-area-inset-top));
+  inset-inline-start: max(0.78rem, env(safe-area-inset-left));
+  inset-inline-end: max(0.78rem, env(safe-area-inset-right));
+  z-index: 1;
+  block-size: clamp(2.75rem, 5.4svh, 3.5rem);
+  content: "";
+  border: 1px solid rgba(255, 90, 60, 0.52);
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.78) 0 10%, transparent 10% 11.4%, rgba(255, 90, 60, 0.46) 11.4% 22%, transparent 22% 32%, rgba(255, 90, 60, 0.34) 32% 68%, transparent 68% 78%, rgba(255, 90, 60, 0.46) 78% 88.6%, transparent 88.6% 90%, rgba(255, 42, 26, 0.78) 90% 100%) top / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(255, 90, 60, 0.42) 0 18%, transparent 18% 20%, rgba(255, 231, 208, 0.12) 20% 22%, transparent 22% 78%, rgba(255, 231, 208, 0.12) 78% 80%, transparent 80% 82%, rgba(255, 90, 60, 0.42) 82% 100%) bottom / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.56) 34%, transparent) left top / 1px 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.56) 34%, transparent) right top / 1px 100% no-repeat,
+    linear-gradient(90deg, transparent 0 12%, rgba(255, 90, 60, 0.22) 12% 21%, transparent 21% 79%, rgba(255, 90, 60, 0.22) 79% 88%, transparent 88%) center / 100% 1px no-repeat;
+  clip-path: polygon(0.78rem 0, calc(100% - 0.78rem) 0, 100% 44%, calc(100% - 1.52rem) 100%, 72% 100%, 70% calc(100% - 1px), 30% calc(100% - 1px), 28% 100%, 1.52rem 100%, 0 44%);
+  filter:
+    drop-shadow(0 0 0.06rem rgba(255, 231, 208, 0.2))
+    drop-shadow(0 0 0.22rem rgba(255, 90, 60, 0.46))
+    drop-shadow(0 0 0.78rem rgba(255, 42, 26, 0.26));
+  opacity: 0.86;
+  pointer-events: none;
+}
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > * {
   display: none;
