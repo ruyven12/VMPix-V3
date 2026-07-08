@@ -2074,6 +2074,10 @@ button {
   line-height: 1.02;
   text-shadow: 0 0 0.42rem rgb(var(--engine-accent-glow) / 0.1);
 }
+
+.portfolio-engine-panel--left .portfolio-engine-value {
+  font-size: calc(clamp(0.68rem, 2.2vw, 0.96rem) + 3px);
+}
 .site-shell[data-shell-route="portfolio"] .portfolio-engine-panel--left .portfolio-engine-label {
   color: rgb(var(--engine-accent) / 0.66);
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
@@ -2408,6 +2412,10 @@ button {
 
   .portfolio-engine-value {
     font-size: clamp(0.58rem, 1.85vw, 0.72rem);
+  }
+
+  .portfolio-engine-panel--left .portfolio-engine-value {
+    font-size: calc(clamp(0.58rem, 1.85vw, 0.72rem) + 3px);
   }
 }
 
