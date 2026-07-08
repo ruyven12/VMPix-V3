@@ -1490,6 +1490,9 @@ function advanceHallCrusadesPosterActive(direction) {
   }
 
   hallCrusadesPosterActiveIndex = nextIndex;
+  if (hallCrusadesPosterStrip) {
+    hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection = direction > 0 ? "next" : "previous";
+  }
   renderHallCrusadesPosterStrip();
   return true;
 }
