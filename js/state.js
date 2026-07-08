@@ -2358,8 +2358,9 @@ const daiionArchiveFocusBriefings = {
     status: "TARGET LOCKED",
   },
   combatants: {
+    title: "The Hall of Champions",
     stat: "290 Documented Combatants",
-    copy: "Explore the figures, rivals, allies, and legends documented across Daïion.",
+    copy: "Explore the performers, allies, legends and more that made Daiion's legacy throughout the years.",
     status: "TARGET LOCKED",
   },
   arenas: {
