@@ -15543,7 +15543,7 @@ button.wrestling-event-history-tagged-thumb {
   inset-block-start: 50%;
   z-index: 4;
   --daiion-title-hud-x: calc(50vw - clamp(8.2rem, 15vw, 18rem) - clamp(7.3rem, 10vw, 11rem));
-  --daiion-title-hud-y: clamp(-1.55rem, -1.9svh, -1rem);
+  --daiion-title-hud-y: clamp(-6.8rem, -8.4svh, -5.6rem);
   --daiion-title-hud-scale: 0.75;
   display: grid;
   justify-items: center;
@@ -15561,6 +15561,7 @@ button.wrestling-event-history-tagged-thumb {
   .daiion-title-reveal {
     --daiion-title-hud-x: calc(50vw - clamp(3.3rem, 15vw, 4.25rem) - min(7.675rem, calc(50vw - 1.6rem)) + 1.31rem);
     --daiion-title-hud-y: clamp(-1.55rem, -1.9svh, -1rem);
+    --daiion-title-hud-scale: 0.66;
   }
 }
 
@@ -15606,6 +15607,34 @@ button.wrestling-event-history-tagged-thumb {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.daiion-title-reveal__subtitle {
+  position: absolute;
+  inset-block-start: calc(100% + clamp(0.18rem, 0.34vw, 0.32rem));
+  inset-inline-start: 50%;
+  display: block;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  color: rgba(255, 214, 202, 0.68);
+  font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(1.20625rem, calc(7vw - 1.5px), 3.30625rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow:
+    0 0 0.46rem rgba(214, 30, 34, 0.22),
+    0 0 1.1rem rgba(135, 11, 16, 0.16);
+  opacity: 0;
+  transform: translate3d(-50%, 0.58rem, 0);
+  will-change: opacity, transform;
+}
+
+@media (max-width: 540px) {
+  .daiion-title-reveal__subtitle {
+    font-size: clamp(0.92rem, 4vw, 1.08rem);
+  }
+}
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
   visibility: visible;
@@ -15621,6 +15650,9 @@ button.wrestling-event-history-tagged-thumb {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
   animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
+}
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
+  animation: daiionTitleSubtitleReveal 520ms ease-out 3500ms both;
 }
 
 @keyframes daiionTitleClear {
@@ -15648,6 +15680,17 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
+@keyframes daiionTitleSubtitleReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, 0.58rem, 0);
+  }
+
+  100% {
+    opacity: 0.72;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
 @keyframes daiionTitleReveal {
   0% {
     opacity: 0;
@@ -15694,6 +15737,12 @@ button.wrestling-event-history-tagged-thumb {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
     opacity: 1;
     transform: translate3d(0, 0, 0);
+    animation: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
+    opacity: 0.72;
+    transform: translate3d(-50%, 0, 0);
     animation: none;
   }
 
