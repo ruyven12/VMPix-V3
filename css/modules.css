@@ -11624,36 +11624,9 @@ button.wrestling-event-history-tagged-thumb {
   contain: layout paint style;
 }
 
-.hall-crusades-room-identifier__label {
-  display: grid;
-  grid-template-columns: minmax(2.4rem, 1fr) auto minmax(2.4rem, 1fr);
-  align-items: center;
-  column-gap: clamp(0.55rem, 1.2vw, 0.9rem);
-  inline-size: min(28rem, 100%);
-  color: rgba(255, 90, 60, 0.94);
-  font-size: clamp(0.58rem, 0.82vw, 0.76rem);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-shadow: 0 0 0.45rem rgba(255, 42, 26, 0.3);
-}
-
-.hall-crusades-room-identifier__label::before,
-.hall-crusades-room-identifier__label::after {
-  block-size: 1px;
-  content: "";
-  background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.68), rgba(255, 231, 208, 0.34));
-  box-shadow: 0 0 0.38rem rgba(255, 42, 26, 0.24);
-}
-
-.hall-crusades-room-identifier__label::after {
-  background: linear-gradient(90deg, rgba(255, 231, 208, 0.34), rgba(255, 90, 60, 0.68), transparent);
-}
-
 .hall-crusades-room-identifier__title {
   display: block;
-  margin-block-start: clamp(0.38rem, 0.8vw, 0.62rem);
+  margin-block-start: 0;
   max-inline-size: 100%;
   color: rgba(247, 247, 242, 0.96);
   font-family: var(--font-display);
@@ -11686,15 +11659,8 @@ button.wrestling-event-history-tagged-thumb {
     inline-size: min(22rem, calc(100vw - 1.45rem));
   }
 
-  .hall-crusades-room-identifier__label {
-    grid-template-columns: minmax(1.25rem, 1fr) auto minmax(1.25rem, 1fr);
-    column-gap: 0.5rem;
-    font-size: clamp(0.53rem, 2.45vw, 0.64rem);
-    letter-spacing: 0.14em;
-  }
-
   .hall-crusades-room-identifier__title {
-    margin-block-start: 0.44rem;
+    margin-block-start: 0;
     font-size: clamp(1.95rem, 11.2vw, 2.95rem);
   }
 
