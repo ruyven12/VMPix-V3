@@ -11685,20 +11685,30 @@ button.wrestling-event-history-tagged-thumb {
   display: none;
 }
 
+.hall-crusades-campaign-info-panel[hidden] {
+  display: none !important;
+}
+
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel {
   position: fixed;
   inset-inline-start: 50%;
   inset-block-end: calc(max(1rem, env(safe-area-inset-bottom)) + var(--engine-emitter-size, 4.6rem) + 10.5px);
   z-index: 3;
-  display: block;
+  display: grid;
   inline-size: min(60rem, calc(100vw - 1.2rem));
-  block-size: clamp(1.72rem, 2.75svh, 1.9rem);
+  min-block-size: clamp(4.2rem, 8svh, 5.4rem);
   box-sizing: border-box;
+  align-content: center;
+  gap: 0.18rem;
+  padding: clamp(0.42rem, 1.2vw, 0.68rem) clamp(0.62rem, 1.7vw, 1.05rem);
+  color: rgba(245, 246, 248, 0.94);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0.04em;
   pointer-events: none;
   background:
     linear-gradient(135deg, rgba(255, 90, 60, 0.14), transparent 1.35rem) top left / 100% 100% no-repeat,
     linear-gradient(315deg, rgba(255, 42, 26, 0.09), transparent 1.6rem) bottom right / 100% 100% no-repeat,
-    rgba(6, 7, 9, 0.62);
+    rgba(6, 7, 9, 0.66);
   border: 1px solid rgba(255, 90, 60, 0.36);
   box-shadow:
     inset 0 0 0 1px rgba(255, 231, 208, 0.05),
@@ -11723,6 +11733,104 @@ button.wrestling-event-history-tagged-thumb {
     0 0 0.5rem rgba(255, 90, 60, 0.12);
 }
 
+.hall-crusades-campaign-info-panel__meta,
+.hall-crusades-campaign-info-panel__title,
+.hall-crusades-campaign-info-panel__place,
+.hall-crusades-campaign-info-panel__metrics {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.hall-crusades-campaign-info-panel__meta,
+.hall-crusades-campaign-info-panel__place,
+.hall-crusades-campaign-info-panel__metrics {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.42rem;
+  overflow: hidden;
+  color: rgba(255, 214, 202, 0.72);
+  font-size: clamp(0.48rem, 1.45vw, 0.68rem);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.hall-crusades-campaign-info-panel__promotion,
+.hall-crusades-campaign-info-panel__date,
+.hall-crusades-campaign-info-panel__venue,
+.hall-crusades-campaign-info-panel__location,
+.hall-crusades-campaign-info-panel__metric {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hall-crusades-campaign-info-panel__promotion,
+.hall-crusades-campaign-info-panel__metric {
+  color: rgba(255, 90, 60, 0.9);
+  text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.18);
+}
+
+.hall-crusades-campaign-info-panel__date,
+.hall-crusades-campaign-info-panel__location {
+  color: rgba(255, 231, 208, 0.7);
+}
+
+.hall-crusades-campaign-info-panel__date::before,
+.hall-crusades-campaign-info-panel__location::before,
+.hall-crusades-campaign-info-panel__metric + .hall-crusades-campaign-info-panel__metric::before {
+  margin-inline-end: 0.42rem;
+  color: rgba(255, 90, 60, 0.42);
+  content: "/";
+}
+
+.hall-crusades-campaign-info-panel__title {
+  overflow: hidden;
+  color: rgba(248, 249, 252, 0.96);
+  font-size: clamp(0.72rem, 2.2vw, 1.08rem);
+  font-weight: 700;
+  line-height: 1.04;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 0 0.38rem rgba(255, 255, 255, 0.08),
+    0 0 0.82rem rgba(255, 42, 26, 0.18);
+  white-space: nowrap;
+}
+
+@media (min-width: 760px) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr);
+    column-gap: clamp(0.75rem, 1.8vw, 1.4rem);
+    min-block-size: clamp(2.7rem, 4.2svh, 3.25rem);
+    padding-block: clamp(0.34rem, 0.72vw, 0.48rem);
+  }
+
+  .hall-crusades-campaign-info-panel__meta {
+    grid-column: 1;
+    justify-content: flex-start;
+  }
+
+  .hall-crusades-campaign-info-panel__title {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+
+  .hall-crusades-campaign-info-panel__place {
+    grid-column: 1;
+    justify-content: flex-start;
+  }
+
+  .hall-crusades-campaign-info-panel__metrics {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    justify-content: flex-end;
+  }
+}
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
   position: absolute;
   inset-block-start: clamp(15.275rem, calc(43svh - 4.725rem), 23.275rem);

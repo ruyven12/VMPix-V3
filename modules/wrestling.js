@@ -248,6 +248,7 @@ const wrestlingShowFilterReset = document.querySelector("[data-wrestling-shows-f
 const wrestlingShowSortSelect = document.querySelector("#wrestling-shows-sort");
 const wrestlingShowPagination = document.querySelector("[data-wrestling-pagination]") || document.querySelector(".wrestling-pagination");
 const hallCrusadesPosterStrip = document.querySelector("[data-hall-crusades-poster-strip]");
+const hallCrusadesCampaignInfoPanel = document.querySelector("[data-hall-crusades-campaign-info-panel]");
 const wrestlingPeopleSearchInput = document.querySelector("[data-wrestling-people-filter='search']");
 const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-people-filter='letter']");
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
@@ -1651,20 +1652,94 @@ function createHallCrusadesPosterStripItem(show, index = 0, options = {}) {
   return item;
 }
 
+function clearHallCrusadesCampaignInfoPanel() {
+  if (!hallCrusadesCampaignInfoPanel) {
+    return;
+  }
+
+  hallCrusadesCampaignInfoPanel.hidden = true;
+  hallCrusadesCampaignInfoPanel.replaceChildren();
+  hallCrusadesCampaignInfoPanel.setAttribute("aria-label", "Campaign Information");
+  delete hallCrusadesCampaignInfoPanel.dataset.wrestlingShowId;
+  delete hallCrusadesCampaignInfoPanel.dataset.wrestlingShowRoute;
+}
+
+function createHallCrusadesCampaignInfoText(className, text, tagName = "span") {
+  const element = document.createElement(tagName);
+  element.className = className;
+  element.textContent = text;
+  return element;
+}
+
+function getHallCrusadesCampaignCountText(count, singularLabel, pluralLabel) {
+  const number = Number.parseInt(count, 10) || 0;
+  return formatWrestlingCount(number, number === 1 ? singularLabel : pluralLabel);
+}
+
+function renderHallCrusadesCampaignInfoPanel(show) {
+  if (!hallCrusadesCampaignInfoPanel || !isHallCrusadesShowsVariantActive() || !show) {
+    clearHallCrusadesCampaignInfoPanel();
+    return;
+  }
+
+  const title = getWrestlingText(show.title || show.showName, "Campaign Pending");
+  const promotion = getWrestlingText(show.promotion, "Promotion Pending");
+  const date = getWrestlingText(show.eventDate || formatWrestlingShowDate(show.rawDate || show.date || show.dateKey), "Date Pending");
+  const venue = getWrestlingText(show.venue, "Venue Pending");
+  const location = getWrestlingText(show.location || getWrestlingShowLocation(show), "Location Pending");
+  const matchCount = Number.parseInt(show.matchCount, 10) || getWrestlingArray(show.matches).length;
+  const photoCount = getWrestlingPhotoCount(show);
+  const showRoute = getWrestlingShowRouteUrl(show);
+
+  const meta = document.createElement("p");
+  meta.className = "hall-crusades-campaign-info-panel__meta";
+  meta.append(
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__promotion", promotion),
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__date", date)
+  );
+
+  const titleElement = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__title", title, "h3");
+
+  const place = document.createElement("p");
+  place.className = "hall-crusades-campaign-info-panel__place";
+  place.append(
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__venue", venue),
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__location", location)
+  );
+
+  const metrics = document.createElement("p");
+  metrics.className = "hall-crusades-campaign-info-panel__metrics";
+  metrics.append(createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__metric", getHallCrusadesCampaignCountText(matchCount, "Match", "Matches")));
+  if (photoCount > 0) {
+    metrics.append(createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__metric", getHallCrusadesCampaignCountText(photoCount, "Photo", "Photos")));
+  }
+
+  hallCrusadesCampaignInfoPanel.hidden = false;
+  hallCrusadesCampaignInfoPanel.dataset.wrestlingShowId = show.showId;
+  hallCrusadesCampaignInfoPanel.dataset.wrestlingShowRoute = showRoute;
+  hallCrusadesCampaignInfoPanel.setAttribute("aria-label", `Campaign Information: ${title}`);
+  hallCrusadesCampaignInfoPanel.replaceChildren(meta, titleElement, place, metrics);
+}
+
 function renderHallCrusadesPosterStrip() {
   if (!hallCrusadesPosterStrip) {
+    clearHallCrusadesCampaignInfoPanel();
     return;
   }
 
   if (!isHallCrusadesShowsVariantActive() || wrestlingShowsDataState !== "live") {
     hallCrusadesPosterStrip.hidden = true;
     hallCrusadesPosterStrip.replaceChildren();
+    clearHallCrusadesCampaignInfoPanel();
     return;
   }
 
   bindHallCrusadesPosterStripInteraction();
-  const posterRows = getHallCrusadesPosterWindowRows(getWrestlingShowsIndexRows());
+  const posterSourceRows = getWrestlingShowsIndexRows();
+  const posterRows = getHallCrusadesPosterWindowRows(posterSourceRows);
+  const activeShow = posterSourceRows[hallCrusadesPosterActiveIndex] || null;
   hallCrusadesPosterStrip.hidden = posterRows.length === 0;
+  renderHallCrusadesCampaignInfoPanel(activeShow);
   const fragment = document.createDocumentFragment();
   posterRows.forEach((row, index) => {
     fragment.append(createHallCrusadesPosterStripItem(row.show, index, row));
