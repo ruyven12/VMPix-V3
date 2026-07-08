@@ -15454,7 +15454,7 @@ button.wrestling-event-history-tagged-thumb {
     position: absolute;
     inset-inline-start: 2.05rem;
     inset-block-start: clamp(19.5rem, 34svh, 21rem);
-    z-index: 3;
+    z-index: 4;
     display: block;
     inline-size: min(13.45rem, calc(100vw - 3.2rem));
     block-size: clamp(5.2rem, 10svh, 6.2rem);
@@ -15538,7 +15538,7 @@ button.wrestling-event-history-tagged-thumb {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame {
     visibility: visible;
-    opacity: 0.7;
+    opacity: 1;
   }
   .daiion-destination-panel {
     inset-block-end: 7.15rem;
