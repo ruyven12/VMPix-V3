@@ -14580,6 +14580,19 @@ button.wrestling-event-history-tagged-thumb {
     text-transform: uppercase;
     white-space: nowrap;
   }
+  .daiion-environment-hud-frame__signal {
+    position: absolute;
+    inset-block-start: clamp(3.2rem, 6vh, 4.1rem);
+    inset-inline-start: clamp(1.04rem, 1.52vw, 1.28rem);
+    display: block;
+    color: rgba(248, 249, 252, 0.96);
+    font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+    font-size: calc(clamp(0.63rem, 0.82vw, 0.78rem) + 2px);
+    font-weight: 650;
+    line-height: 1.02;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
   .daiion-environment-hud-frame::before {
     inset-block-start: clamp(1.72rem, 3.1vh, 2.12rem);
@@ -14604,7 +14617,7 @@ button.wrestling-event-history-tagged-thumb {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-environment-hud-frame {
     visibility: visible;
-    opacity: 1;
+    opacity: 0.5;
   }
 }
 .daiion-archive-stats-panel::before {
