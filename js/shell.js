@@ -3097,6 +3097,7 @@ function showWrestlingShowsIndex(options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowsShell) {
     return;
   }
+  const isHallOfCrusadesVariant = options.showsVariant === "hall-of-crusades";
   shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
   if (homeFrame) {
@@ -3117,7 +3118,7 @@ function showWrestlingShowsIndex(options = {}) {
     ringArchiveShell.setAttribute("inert", "");
   }
   setWrestlingShowsHidden(false);
-  if (options.showsVariant === "hall-of-crusades") {
+  if (isHallOfCrusadesVariant) {
     wrestlingShowsShell.dataset.wrestlingShowsVariant = "hall-of-crusades";
   } else {
     wrestlingShowsShell.removeAttribute("data-wrestling-shows-variant");
@@ -3144,7 +3145,16 @@ function showWrestlingShowsIndex(options = {}) {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
-  setCurrentView("Event Archive");
+  if (isHallOfCrusadesVariant) {
+    setPortfolioActiveWorld("battleground");
+    setCurrentView("Daiion – Hall of Crusades");
+    setPortfolioEngineHudCurrentView("Daiion – Hall of Crusades");
+    window.requestAnimationFrame(() => {
+      setPortfolioEngineHudCurrentView("Daiion – Hall of Crusades");
+    });
+  } else {
+    setCurrentView("Event Archive");
+  }
   setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
