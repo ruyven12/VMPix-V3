@@ -67,8 +67,8 @@ function getRouteFromUrl(url = window.location.href) {
       return { name: "music-venue-detail", venueSlug, canonicalUrl: getMusicVenueRouteUrl(venueSlug) };
     }
   }
-  if (routePath === routePaths.wrestling2) {
-    return { name: "wrestling2", canonicalUrl: routePaths.wrestling2 };
+  if (routePath === routePaths.wrestling || routePath === routePaths.wrestling2) {
+    return { name: "wrestling2", canonicalUrl: routePath };
   }
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };

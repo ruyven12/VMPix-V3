@@ -2349,6 +2349,9 @@ const daiionArchiveStatsEndpoints = {
 };
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
+function isDaiionArchiveLandingPath(pathname = window.location.pathname) {
+  return pathname === routePaths.wrestling || pathname === routePaths.wrestling2;
+}
 const daiionArchiveStatsRowStagger = 80;
 const daiionArchiveFocusBriefings = {
   campaigns: {
@@ -2442,7 +2445,7 @@ function syncDaiionDestinationSelection() {
 }
 
 function setDaiionDestinationTarget(target) {
-  if (window.location.pathname !== routePaths.wrestling2 || !daiionDestinationTargets.has(target)) {
+  if (!isDaiionArchiveLandingPath() || !daiionDestinationTargets.has(target)) {
     return;
   }
 
@@ -2569,7 +2572,7 @@ async function fetchDaiionArchiveStats(endpoint) {
 }
 
 async function initDaiionArchiveStatsPanel(options = {}) {
-  if (window.location.pathname !== routePaths.wrestling2 || typeof fetch !== "function") {
+  if (!isDaiionArchiveLandingPath() || typeof fetch !== "function") {
     return;
   }
 
@@ -2589,7 +2592,7 @@ async function initDaiionArchiveStatsPanel(options = {}) {
       fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.people),
       fetchDaiionArchiveStats(daiionArchiveStatsEndpoints.venues),
     ]);
-    if (requestId !== daiionArchiveStatsRequestId || window.location.pathname !== routePaths.wrestling2) {
+    if (requestId !== daiionArchiveStatsRequestId || !isDaiionArchiveLandingPath()) {
       return;
     }
 
@@ -2604,7 +2607,7 @@ async function initDaiionArchiveStatsPanel(options = {}) {
       people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
     }, animationStartedAt);
   } catch (_error) {
-    if (requestId !== daiionArchiveStatsRequestId || window.location.pathname !== routePaths.wrestling2) {
+    if (requestId !== daiionArchiveStatsRequestId || !isDaiionArchiveLandingPath()) {
       return;
     }
     resolveDaiionArchiveStatsValues(valueNodes, {}, animationStartedAt);
