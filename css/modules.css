@@ -14642,6 +14642,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .daiion-archive-stats-panel__value {
   justify-self: end;
+  padding-inline-end: 5px;
   color: rgba(255, 231, 208, 0.82);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: clamp(0.6rem, 0.78vw, 0.74rem);
