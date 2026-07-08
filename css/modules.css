@@ -14739,7 +14739,7 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-archive-stats-panel__context {
   margin-block-start: 0.12rem;
   color: rgba(173, 176, 184, 0.68);
-  font-size: clamp(0.52rem, 0.68vw, 0.66rem);
+  font-size: calc(clamp(0.52rem, 0.68vw, 0.66rem) + 2px);
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.03em;
