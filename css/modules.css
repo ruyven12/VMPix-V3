@@ -14528,27 +14528,24 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .daiion-latest-diagnostic-square {
-  position: absolute;
+  position: fixed;
   inset-block-end: 7.15rem;
   inset-inline-start: 2.05rem;
-  z-index: 4;
-  display: block;
+  z-index: 999999;
+  display: grid;
+  place-items: center;
   inline-size: 100px;
   block-size: 100px;
-  pointer-events: none;
+  box-sizing: border-box;
+  pointer-events: auto;
   visibility: hidden;
   opacity: 0;
-  background:
-    linear-gradient(135deg, rgba(255, 90, 60, 0.16), transparent 1.5rem) top left / 100% 100% no-repeat,
-    linear-gradient(315deg, rgba(255, 42, 26, 0.1), transparent 1.8rem) bottom right / 100% 100% no-repeat,
-    rgba(6, 7, 9, 0.68);
-  border: 1px solid rgba(255, 90, 60, 0.38);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 231, 208, 0.055),
-    inset 0 0 1.15rem rgba(255, 42, 26, 0.12),
-    0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
-    0 0 0.68rem rgba(255, 42, 26, 0.14);
-  clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
+  background: #ff00ff;
+  border: 4px solid #fff;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
   contain: layout paint style;
 }
 .daiion-archive-stats-panel::before {
