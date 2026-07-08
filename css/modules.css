@@ -15542,8 +15542,8 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 50%;
   inset-block-start: 50%;
   z-index: 4;
-  --daiion-title-hud-x: calc(50vw - clamp(8.2rem, 15vw, 18rem) - clamp(7.3rem, 10vw, 11rem));
-  --daiion-title-hud-y: clamp(-6.8rem, -8.4svh, -5.6rem);
+  --daiion-title-hud-x: calc(50vw - clamp(2.2rem, 6.2vw, 7.5rem) - clamp(10.5rem, 11vw, 13.2rem));
+  --daiion-title-hud-y: clamp(-25rem, -36.5svh, -21rem);
   --daiion-title-hud-scale: 0.75;
   display: grid;
   justify-items: center;
@@ -15560,7 +15560,7 @@ button.wrestling-event-history-tagged-thumb {
 @media (max-width: 540px) {
   .daiion-title-reveal {
     --daiion-title-hud-x: calc(50vw - clamp(3.3rem, 15vw, 4.25rem) - min(7.675rem, calc(50vw - 1.6rem)) + 1.31rem);
-    --daiion-title-hud-y: clamp(-1.55rem, -1.9svh, -1rem);
+    --daiion-title-hud-y: clamp(-7.2rem, -12svh, -5.8rem);
     --daiion-title-hud-scale: 0.66;
   }
 }
