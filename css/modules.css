@@ -11710,7 +11710,7 @@ button.wrestling-event-history-tagged-thumb {
 .hall-crusades-poster-strip__item {
   position: relative;
   z-index: 1;
-  flex: 0 0 clamp(4.75rem, 6.85vw, 7.75rem);
+  flex: 0 0 clamp(7.125rem, 10.275vw, 11.625rem);
   min-width: 0;
 }
 
@@ -11822,7 +11822,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-crusades-poster-strip__item {
-    flex-basis: clamp(4.35rem, 18.5vw, 5.1rem);
+    flex-basis: clamp(6.525rem, 27.75vw, 7.65rem);
   }
 }
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .universal-bottom-rail {
