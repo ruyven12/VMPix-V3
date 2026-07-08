@@ -11460,13 +11460,44 @@ button.wrestling-event-history-tagged-thumb {
   visibility: hidden;
 }
 
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) {
+  background:
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
+    url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
+    #030306;
+}
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-hub {
+  position: fixed;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100vh;
+  block-size: 100svh;
+  max-inline-size: none;
+  max-block-size: none;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  background:
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
+    url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
+    #030306;
+  overflow: hidden;
+  transform: none;
+}
+
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-hub::after,
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-energy,
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-rings,
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-sweep,
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-particles,
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .cinema-fire-bg {
+  display: none;
+}
+
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] {
   position: fixed;
-  inset-block-start: calc((100% - 100vh) / 2);
-  inset-block-start: calc((100% - 100svh) / 2);
-  inset-inline-start: calc((100% - 100vw) / 2);
-  inset-block-end: auto;
-  inset-inline-end: auto;
+  inset: 0;
   z-index: 30;
   grid-column: auto;
   grid-row: auto;
@@ -11474,16 +11505,16 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: 100vw;
   block-size: 100vh;
   block-size: 100svh;
-  block-size: calc(100svh + 1.25rem);
+  max-inline-size: none;
   max-block-size: none;
+  max-width: none;
   max-height: none;
+  margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
-    url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
-    #030306;
+  box-shadow: none;
+  background: transparent;
   overflow: hidden;
   overscroll-behavior: none;
   scrollbar-width: none;
