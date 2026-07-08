@@ -14431,7 +14431,7 @@ button.wrestling-event-history-tagged-thumb {
 .daiion-archive-focus-panel__copy {
   padding-block: 0.5rem 0.54rem;
   color: rgba(198, 201, 208, 0.76);
-  font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(0.68rem, 0.78vw, 0.82rem);
   font-weight: 500;
   line-height: 1.18;
@@ -15542,9 +15542,9 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 50%;
   inset-block-start: 50%;
   z-index: 4;
-  --daiion-title-hud-x: calc(50vw - clamp(2.2rem, 6.2vw, 7.5rem) - clamp(10.5rem, 11vw, 13.2rem));
+  --daiion-title-hud-x: calc(50vw - clamp(2.2rem, 6.2vw, 7.5rem) - clamp(9.95rem, 10.2vw, 12.25rem));
   --daiion-title-hud-y: clamp(-25rem, -36.5svh, -21rem);
-  --daiion-title-hud-scale: 0.75;
+  --daiion-title-hud-scale: 0.5625;
   display: grid;
   justify-items: center;
   gap: 0.08rem;
@@ -15559,9 +15559,9 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .daiion-title-reveal {
-    --daiion-title-hud-x: calc(50vw - clamp(3.3rem, 15vw, 4.25rem) - min(7.675rem, calc(50vw - 1.6rem)) + 1.31rem);
+    --daiion-title-hud-x: calc(50vw - clamp(3.3rem, 15vw, 4.25rem) - min(7.675rem, calc(50vw - 1.6rem)) + 3.58rem);
     --daiion-title-hud-y: clamp(-7.2rem, -12svh, -5.8rem);
-    --daiion-title-hud-scale: 0.66;
+    --daiion-title-hud-scale: 0.495;
   }
 }
 
@@ -15615,7 +15615,7 @@ button.wrestling-event-history-tagged-thumb {
   width: max-content;
   max-width: calc(100vw - 2rem);
   color: rgba(255, 214, 202, 0.68);
-  font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.20625rem, calc(7vw - 1.5px), 3.30625rem);
   font-weight: 600;
   line-height: 1;
