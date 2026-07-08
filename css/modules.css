@@ -11683,7 +11683,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
   position: absolute;
-  inset-block-start: clamp(18.5rem, calc(43svh - 1.5rem), 26.5rem);
+  inset-block-start: clamp(15.275rem, calc(43svh - 4.725rem), 23.275rem);
   inset-inline-start: 50%;
   z-index: 3;
   display: flex;
@@ -11695,7 +11695,7 @@ button.wrestling-event-history-tagged-thumb {
   gap: clamp(0.58rem, 1.15vw, 0.95rem);
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.15rem 0.2rem 0.7rem;
+  padding: 3.65rem 0.2rem;
   scrollbar-width: none;
   overscroll-behavior-inline: contain;
   -webkit-overflow-scrolling: touch;
@@ -11710,7 +11710,7 @@ button.wrestling-event-history-tagged-thumb {
 .hall-crusades-poster-strip__item {
   position: relative;
   z-index: 1;
-  flex: 0 0 clamp(10.6875rem, 15.4125vw, 17.4375rem);
+  flex: 0 0 clamp(11.75625rem, 16.95375vw, 19.18125rem);
   min-width: 0;
 }
 
@@ -11771,7 +11771,7 @@ button.wrestling-event-history-tagged-thumb {
     0 0 1rem rgba(223, 42, 28, 0.34),
     0 0 1.7rem rgba(164, 15, 12, 0.24);
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1.25);
 }
 .hall-crusades-poster-strip__record::before {
   position: absolute;
@@ -11812,7 +11812,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
-    inset-block-start: clamp(19.5rem, calc(42svh - 1.5rem), 23.1rem);
+    inset-block-start: clamp(16.275rem, calc(42svh - 4.725rem), 19.875rem);
     inline-size: calc(100vw - 1rem);
     max-inline-size: calc(100vw - 1rem);
     justify-content: flex-start;
@@ -11822,7 +11822,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-crusades-poster-strip__item {
-    flex-basis: clamp(9.7875rem, 41.625vw, 11.475rem);
+    flex-basis: clamp(10.76625rem, 45.7875vw, 12.6225rem);
   }
 }
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .universal-bottom-rail {
