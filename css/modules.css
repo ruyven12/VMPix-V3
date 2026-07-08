@@ -14539,7 +14539,7 @@ button.wrestling-event-history-tagged-thumb {
     z-index: 3;
     display: block;
     inline-size: clamp(15.75rem, 22vw, 24.5rem);
-    block-size: clamp(8.25rem, 16vh, 13.25rem);
+    block-size: clamp(6.85rem, 13.1vh, 10.9rem);
     box-sizing: border-box;
     pointer-events: none;
     visibility: hidden;
