@@ -3005,6 +3005,132 @@ function createHallPrototypeCampaignInfoField(label, value) {
   return field;
 }
 
+function getHallPrototypeMatchSource(match = {}) {
+  return match?.backend_record && typeof match.backend_record === "object"
+    ? { ...match.backend_record, ...match }
+    : match || {};
+}
+
+function getHallPrototypeMatchTypeText(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  return getWrestlingText(
+    source.stipulation ||
+    source.matchType ||
+    source.match_type ||
+    source.type ||
+    source.notes ||
+    source.matchName ||
+    source.title,
+    "Match"
+  );
+}
+
+function getHallPrototypeMatchSideLabels(match = {}, sideNumber = 1) {
+  const source = getHallPrototypeMatchSource(match);
+  const sideFields = sideNumber === 1
+    ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1"]
+    : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2"];
+
+  for (const field of sideFields) {
+    const labels = getWrestlingLabelArray(source[field]);
+    if (labels.length > 0) {
+      return labels;
+    }
+  }
+
+  const titleParts = getWrestlingMatchTitleParts(source);
+  const versusIndex = titleParts.findIndex((part) => String(part).trim().toLowerCase() === "vs");
+  if (versusIndex > 0) {
+    const sideText = sideNumber === 1
+      ? titleParts.slice(0, versusIndex).join(" ")
+      : titleParts.slice(versusIndex + 1).join(" ");
+    const titleLabels = getWrestlingLabelArray(sideText);
+    if (titleLabels.length > 0) {
+      return titleLabels;
+    }
+  }
+
+  const participants = getWrestlingLabelArray(source.participants || source.participant_names || source.participantNames || source.related_people || source.relatedPeople);
+  if (participants.length > 1) {
+    return sideNumber === 1 ? [participants[0]] : participants.slice(1);
+  }
+
+  return sideNumber === 1
+    ? [getWrestlingMatchDisplayName(source)]
+    : ["Side Pending"];
+}
+
+function createHallPrototypeEncounterSide(label, values) {
+  const side = document.createElement("div");
+  side.className = "wrestling-show-prototype-encounter-side";
+
+  const sideLabel = document.createElement("span");
+  sideLabel.className = "wrestling-show-prototype-encounter-side-label";
+  sideLabel.textContent = label;
+
+  const sideValue = document.createElement("p");
+  sideValue.className = "wrestling-show-prototype-encounter-side-value";
+  sideValue.textContent = getWrestlingArray(values).join(", ") || "Side Pending";
+
+  side.append(sideLabel, sideValue);
+  return side;
+}
+
+function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
+  const card = document.createElement("li");
+  card.className = "wrestling-show-prototype-encounter-card";
+
+  const type = document.createElement("p");
+  type.className = "wrestling-show-prototype-encounter-type";
+  type.textContent = getHallPrototypeMatchTypeText(match);
+
+  const combatants = document.createElement("div");
+  combatants.className = "wrestling-show-prototype-encounter-combatants";
+
+  const versus = document.createElement("span");
+  versus.className = "wrestling-show-prototype-encounter-vs";
+  versus.textContent = "VS";
+
+  combatants.append(
+    createHallPrototypeEncounterSide("Side 1", getHallPrototypeMatchSideLabels(match, 1)),
+    versus,
+    createHallPrototypeEncounterSide("Side 2", getHallPrototypeMatchSideLabels(match, 2))
+  );
+
+  card.dataset.wrestlingMatchIndex = String(matchIndex + 1);
+  card.append(type, combatants);
+  return card;
+}
+
+function createHallPrototypeEncounterSection(show = {}) {
+  const section = document.createElement("section");
+  section.className = "wrestling-show-prototype-encounters";
+  section.setAttribute("aria-labelledby", "wrestling-show-prototype-encounters-title");
+
+  const title = document.createElement("h3");
+  title.className = "wrestling-show-prototype-encounters__title";
+  title.id = "wrestling-show-prototype-encounters-title";
+  title.textContent = "Matches / Encounters";
+
+  const list = document.createElement("ol");
+  list.className = "wrestling-show-prototype-encounter-list";
+  list.setAttribute("aria-label", `${show.title || "Campaign"} encounters`);
+
+  const matches = Array.isArray(show.matches) ? show.matches : [];
+  if (matches.length > 0) {
+    matches.forEach((match, matchIndex) => {
+      list.append(createHallPrototypeEncounterCard(match, matchIndex));
+    });
+  } else {
+    const emptyCard = document.createElement("li");
+    emptyCard.className = "wrestling-show-prototype-encounter-card wrestling-show-prototype-encounter-card--empty";
+    emptyCard.textContent = "No encounters logged for this campaign.";
+    list.append(emptyCard);
+  }
+
+  section.append(title, list);
+  return section;
+}
 function renderHallPrototypeShowDetailSurface(show) {
   const showTitle = getWrestlingText(show.title || show.eventName || show.showName, "Campaign Detail");
   const promotion = getWrestlingText(show.promotion, "Promotion Pending");
@@ -3065,7 +3191,11 @@ function renderHallPrototypeShowDetailSurface(show) {
   content.append(title, fields);
   card.append(poster, content);
 
-  wrestlingShowDetailShell.replaceChildren(card);
+  const surface = document.createElement("div");
+  surface.className = "wrestling-show-prototype-surface";
+  surface.append(card, createHallPrototypeEncounterSection(show));
+
+  wrestlingShowDetailShell.replaceChildren(surface);
   if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
     setPortfolioEngineHudCurrentViewDetail(showTitle);
   }
