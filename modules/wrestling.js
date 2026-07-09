@@ -271,6 +271,9 @@ const HALL_CRUSADES_POSTER_STRIP_LIMIT = 7;
 const HALL_CRUSADES_POSTER_ACTIVE_SLOT = Math.floor(HALL_CRUSADES_POSTER_STRIP_LIMIT / 2);
 const HALL_CRUSADES_POSTER_SWIPE_THRESHOLD = 36;
 const HALL_CRUSADES_POSTER_WHEEL_THRESHOLD = 48;
+const HALL_CRUSADES_POSTER_WHEEL_COOLDOWN_MS = 240;
+const HALL_CRUSADES_POSTER_WHEEL_IDLE_RESET_MS = 180;
+const HALL_CRUSADES_POSTER_WHEEL_MAX_DELTA = 60;
 const wrestlingPeopleAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const wrestlingPeopleLetterOptions = ["#", ...wrestlingPeopleAlphabet];
 let wrestlingShowsCollection = [];
@@ -293,6 +296,8 @@ let hallCrusadesPosterPointerStartY = 0;
 let hallCrusadesPosterSuppressClick = false;
 let hallCrusadesPosterSuppressClickTimer = 0;
 let hallCrusadesPosterWheelDelta = 0;
+let hallCrusadesPosterWheelLastAdvanceTime = 0;
+let hallCrusadesPosterWheelResetTimer = 0;
 let isHallCrusadesPosterStripInteractionBound = false;
 let activeHallCrusadesYearFilter = "";
 let activeHallCrusadesBannerFilter = "all";
@@ -2244,33 +2249,83 @@ function handleHallCrusadesPosterClick(event) {
   event.stopImmediatePropagation();
 }
 
+function isHallCrusadesPosterDesktopWheel() {
+  return typeof window === "undefined"
+    || typeof window.matchMedia !== "function"
+    || window.matchMedia("(min-width: 760px)").matches;
+}
+
+function getHallCrusadesPosterWheelModeScale(event) {
+  if (event.deltaMode === 1) {
+    return 16;
+  }
+
+  if (event.deltaMode === 2) {
+    return Math.max(window.innerHeight || 640, 320);
+  }
+
+  return 1;
+}
+
+function normalizeHallCrusadesPosterWheelDelta(event) {
+  const modeScale = getHallCrusadesPosterWheelModeScale(event);
+  const deltaX = event.deltaX * modeScale;
+  const deltaY = event.deltaY * modeScale;
+  const gestureDelta = Math.abs(deltaX) >= 4 ? deltaX : deltaY;
+  if (Math.abs(gestureDelta) < 1) {
+    return 0;
+  }
+
+  return Math.sign(gestureDelta) * Math.min(Math.abs(gestureDelta), HALL_CRUSADES_POSTER_WHEEL_MAX_DELTA);
+}
+
+function resetHallCrusadesPosterWheelDeltaSoon() {
+  window.clearTimeout(hallCrusadesPosterWheelResetTimer);
+  hallCrusadesPosterWheelResetTimer = window.setTimeout(() => {
+    hallCrusadesPosterWheelDelta = 0;
+    hallCrusadesPosterWheelResetTimer = 0;
+  }, HALL_CRUSADES_POSTER_WHEEL_IDLE_RESET_MS);
+}
+
 function handleHallCrusadesPosterWheel(event) {
-  if (!isHallCrusadesShowsVariantActive()) {
+  if (!isHallCrusadesShowsVariantActive() || !isHallCrusadesPosterDesktopWheel()) {
     return;
   }
 
-  const absX = Math.abs(event.deltaX);
-  const absY = Math.abs(event.deltaY);
-  const isDesktopWheel = typeof window === "undefined"
-    || typeof window.matchMedia !== "function"
-    || window.matchMedia("(min-width: 760px)").matches;
-  const horizontalDelta = absX > absY
-    ? event.deltaX
-    : isDesktopWheel && event.shiftKey
-      ? event.deltaY
-      : 0;
-  if (Math.abs(horizontalDelta) < 1) {
+  if (event.target?.closest?.("input, textarea, select, [contenteditable='true']")) {
+    return;
+  }
+
+  const visiblePosterCount = hallCrusadesPosterStrip?.querySelectorAll(".hall-crusades-poster-strip__item").length || 0;
+  if (visiblePosterCount < 2) {
+    return;
+  }
+
+  const wheelDelta = normalizeHallCrusadesPosterWheelDelta(event);
+  if (Math.abs(wheelDelta) < 1) {
     return;
   }
 
   event.preventDefault();
-  hallCrusadesPosterWheelDelta += horizontalDelta;
+  resetHallCrusadesPosterWheelDeltaSoon();
+
+  const now = typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+  if (now - hallCrusadesPosterWheelLastAdvanceTime < HALL_CRUSADES_POSTER_WHEEL_COOLDOWN_MS) {
+    return;
+  }
+
+  hallCrusadesPosterWheelDelta += wheelDelta;
   if (Math.abs(hallCrusadesPosterWheelDelta) < HALL_CRUSADES_POSTER_WHEEL_THRESHOLD) {
     return;
   }
 
-  advanceHallCrusadesPosterActive(hallCrusadesPosterWheelDelta > 0 ? 1 : -1);
+  const didAdvance = advanceHallCrusadesPosterActive(hallCrusadesPosterWheelDelta > 0 ? 1 : -1);
   hallCrusadesPosterWheelDelta = 0;
+  if (didAdvance) {
+    hallCrusadesPosterWheelLastAdvanceTime = now;
+  }
 }
 
 function bindHallCrusadesPosterStripInteraction() {
