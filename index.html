@@ -1196,13 +1196,23 @@
             <span class="hall-crusades-room-identifier__title">The Campaign Archive</span>
             <span class="hall-crusades-room-identifier__subtitle">Every recorded event. Every battle preserved.</span>
           </div>
-          <div class="hall-crusades-archive-crystals" aria-hidden="true">
-            <span class="hall-crusades-archive-crystal">
+          <div class="hall-crusades-archive-crystals" role="group" aria-label="Hall of Crusades archive query crystals">
+            <button class="hall-crusades-archive-crystal hall-crusades-archive-crystal--year" type="button" aria-expanded="false" aria-pressed="false" aria-controls="hall-crusades-year-drawer" data-hall-crusades-year-crystal>
               <span class="hall-crusades-archive-crystal__frame">
                 <span class="hall-crusades-archive-crystal__gem"></span>
               </span>
               <span class="hall-crusades-archive-crystal__label">YEAR</span>
-            </span>
+            </button>
+            <div class="hall-crusades-year-drawer" id="hall-crusades-year-drawer" role="menu" aria-label="Year archive query" data-hall-crusades-year-drawer hidden>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="Upcoming">UPCOMING</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2026">2026</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2025">2025</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2024">2024</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2023">2023</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2022">2022</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="false" data-hall-crusades-year-option="2021">2021</button>
+              <button class="hall-crusades-year-drawer__option" type="button" role="menuitemradio" aria-checked="true" data-hall-crusades-year-option="">ALL YEARS</button>
+            </div>
             <span class="hall-crusades-archive-crystal">
               <span class="hall-crusades-archive-crystal__frame">
                 <span class="hall-crusades-archive-crystal__gem"></span>
