@@ -11628,12 +11628,53 @@ button.wrestling-event-history-tagged-thumb {
   gap: clamp(1.1rem, 3vw, 2.15rem);
   padding: clamp(1rem, 2.8vw, 1.8rem);
   overflow: hidden;
+  isolation: isolate;
   border: 1px solid rgba(255, 90, 60, 0.42);
-  background: rgba(6, 7, 9, 0.72);
+  background:
+    linear-gradient(135deg, rgba(255, 90, 60, 0.1), transparent 1.9rem) top left / 100% 100% no-repeat,
+    linear-gradient(315deg, rgba(255, 42, 26, 0.08), transparent 2.2rem) bottom right / 100% 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 231, 208, 0.035), transparent 42%),
+    rgba(6, 7, 9, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(255, 231, 208, 0.045),
+    inset 0 0 0 1px rgba(255, 231, 208, 0.035),
+    inset 0 0 2.4rem rgba(255, 42, 26, 0.09),
+    0 0 2.2rem rgba(135, 11, 16, 0.28),
+    0 1.1rem 3.4rem rgba(0, 0, 0, 0.46);
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card::before,
+.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card::before {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 42, 26, 0.13), transparent 58%),
+    radial-gradient(circle at 18% 12%, rgba(255, 90, 60, 0.09), transparent 32%);
+  opacity: 0.84;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card::after {
+  background:
+    linear-gradient(90deg, rgba(255, 90, 60, 0.62), transparent 5.8rem) top left / 8rem 1px no-repeat,
+    linear-gradient(180deg, rgba(255, 90, 60, 0.5), transparent 4.8rem) top left / 1px 6.2rem no-repeat,
+    linear-gradient(270deg, rgba(255, 90, 60, 0.52), transparent 5.2rem) top right / 7.2rem 1px no-repeat,
+    linear-gradient(180deg, rgba(255, 90, 60, 0.38), transparent 4.2rem) top right / 1px 5.4rem no-repeat,
+    linear-gradient(90deg, rgba(255, 90, 60, 0.34), transparent 5rem) bottom left / 6.8rem 1px no-repeat,
+    linear-gradient(0deg, rgba(255, 90, 60, 0.32), transparent 3.6rem) bottom left / 1px 4.8rem no-repeat,
+    linear-gradient(270deg, rgba(255, 90, 60, 0.42), transparent 5.6rem) bottom right / 7.4rem 1px no-repeat,
+    linear-gradient(0deg, rgba(255, 90, 60, 0.36), transparent 4rem) bottom right / 1px 5.2rem no-repeat;
+  opacity: 0.58;
 }
 
 .wrestling-show-prototype-card__poster {
   position: relative;
+  z-index: 1;
   min-inline-size: 0;
   inline-size: 100%;
   margin: 0;
@@ -11641,6 +11682,10 @@ button.wrestling-event-history-tagged-thumb {
   border: 1px solid rgba(255, 90, 60, 0.38);
   background: rgba(5, 5, 8, 0.72);
   aspect-ratio: 2 / 3;
+  box-shadow:
+    0 0 0 1px rgba(255, 231, 208, 0.035),
+    0 0.7rem 1.7rem rgba(0, 0, 0, 0.36),
+    0 0 1.15rem rgba(255, 42, 26, 0.12);
 }
 
 .wrestling-show-prototype-card__poster-image {
@@ -11665,6 +11710,8 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-show-prototype-card__content {
+  position: relative;
+  z-index: 1;
   min-width: 0;
   align-self: stretch;
   display: grid;
@@ -11672,7 +11719,14 @@ button.wrestling-event-history-tagged-thumb {
   gap: clamp(0.95rem, 2.25vw, 1.35rem);
   padding: clamp(0.95rem, 2.4vw, 1.55rem);
   border: 1px solid rgba(255, 90, 60, 0.24);
-  background: rgba(12, 8, 9, 0.56);
+  background:
+    linear-gradient(135deg, rgba(255, 90, 60, 0.075), transparent 2rem),
+    linear-gradient(180deg, rgba(255, 231, 208, 0.035), transparent 38%),
+    rgba(12, 8, 9, 0.56);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.035),
+    inset 0 0 1.25rem rgba(255, 42, 26, 0.07),
+    0 0 1rem rgba(0, 0, 0, 0.22);
 }
 
 .wrestling-show-prototype-card__title {
@@ -11684,6 +11738,9 @@ button.wrestling-event-history-tagged-thumb {
   line-height: 1;
   letter-spacing: 0;
   text-transform: none;
+  text-shadow:
+    0 0 0.36rem rgba(255, 231, 208, 0.12),
+    0 0 0.9rem rgba(255, 42, 26, 0.18);
 }
 
 .wrestling-show-prototype-card__fields {
@@ -11693,9 +11750,14 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-show-prototype-card__field {
+  position: relative;
   display: grid;
   gap: 0.22rem;
   min-width: 0;
+}
+
+.wrestling-show-prototype-card__field + .wrestling-show-prototype-card__field {
+  background: linear-gradient(90deg, rgba(255, 90, 60, 0.22), rgba(255, 231, 208, 0.07) 38%, transparent 88%) top / 100% 1px no-repeat;
 }
 
 .wrestling-show-prototype-card__label,
@@ -11726,6 +11788,11 @@ button.wrestling-event-history-tagged-thumb {
     gap: 0.92rem;
     padding: 0.86rem;
     overflow: auto;
+    box-shadow:
+      0 0 0 1px rgba(255, 231, 208, 0.04),
+      inset 0 0 1.8rem rgba(255, 42, 26, 0.075),
+      0 0 1.5rem rgba(135, 11, 16, 0.22),
+      0 0.9rem 2.2rem rgba(0, 0, 0, 0.4);
   }
 
   .wrestling-show-prototype-card__poster {
