@@ -12987,7 +12987,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   display: none;
 }
 
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine {
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]) .universal-bottom-rail {
+  display: none;
+}
+
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine,
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]) .portfolio-engine {
   visibility: visible !important;
   opacity: 1 !important;
   pointer-events: none !important;
@@ -12998,7 +13003,8 @@ button.hall-crusades-archive-crystal:focus-visible {
     visibility 0ms linear;
 }
 
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left {
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left,
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]) .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
   grid-column: 1 / -1;

@@ -3162,7 +3162,7 @@ function showWrestlingShowsIndex(options = {}) {
   }
 }
 
-function showWrestlingShowDetail(showId = "warzone-26") {
+function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowDetailShell) {
     return;
   }
@@ -3190,7 +3190,7 @@ function showWrestlingShowDetail(showId = "warzone-26") {
   setWrestlingPersonDetailHidden(true);
   setWrestlingVenuesHidden(true);
   if (typeof renderWrestlingShowDetailRoute === "function") {
-    renderWrestlingShowDetailRoute(showId);
+    renderWrestlingShowDetailRoute(showId, options);
   }
   setWrestlingShowDetailHidden(false);
   setWrestlingMatchGalleryHidden(true);
@@ -3211,7 +3211,18 @@ function showWrestlingShowDetail(showId = "warzone-26") {
   if (typeof renderWrestlingShowDetailRoute !== "function" && typeof updateWrestlingShowDetailRelationshipHooks === "function") {
     updateWrestlingShowDetailRelationshipHooks(showId);
   }
-  setCurrentView("Show Detail");
+  const activeShowDetailRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const isHallPrototypeShowDetail = options?.showDetailVariant === "hall-prototype" || activeShowDetailRoute?.showDetailVariant === "hall-prototype";
+  if (isHallPrototypeShowDetail) {
+    setPortfolioActiveWorld("battleground");
+    setCurrentView("Daiion - Individual Campaign");
+    setPortfolioEngineHudCurrentView("Daiion - Individual Campaign");
+    window.requestAnimationFrame(() => {
+      setPortfolioEngineHudCurrentView("Daiion - Individual Campaign");
+    });
+  } else {
+    setCurrentView("Show Detail");
+  }
   setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
