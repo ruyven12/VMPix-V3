@@ -44,7 +44,7 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === "/wrestling2") {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling, shouldReplaceUrl: true };
   }
-  if (routePath === "/shows2") {
+  if (routePath === "/shows2" || routePath === "/wrestling/shows2") {
     return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows, showsVariant: "hall-of-crusades", shouldReplaceUrl: true };
   }
 
