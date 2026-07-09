@@ -11814,6 +11814,70 @@ button.wrestling-event-history-tagged-thumb {
   }
 }
 
+.hall-crusades-archive-stats {
+  display: none;
+}
+
+.hall-crusades-archive-stats[hidden] {
+  display: none !important;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-archive-stats {
+  position: absolute;
+  inset-block-start: calc(clamp(14.7rem, calc(28svh - 1.2rem), 17.6rem) - 83px);
+  inset-inline-start: 50%;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  inline-size: min(27rem, calc(100vw - 1rem));
+  min-block-size: 1.7rem;
+  box-sizing: border-box;
+  gap: clamp(0.24rem, 1vw, 0.62rem);
+  padding: 0.22rem clamp(0.42rem, 1.2vw, 0.72rem);
+  color: rgba(255, 231, 208, 0.84);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(10, 5, 7, 0.58) 14%, rgba(32, 6, 7, 0.72) 50%, rgba(10, 5, 7, 0.58) 86%, transparent),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 42, 26, 0.13), transparent 68%);
+  border-block: 1px solid rgba(255, 90, 60, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.035),
+    0 0 0.68rem rgba(255, 42, 26, 0.12);
+  transform: translate3d(-50%, 0, 0);
+  contain: layout paint style;
+}
+
+.hall-crusades-archive-stats__item {
+  display: grid;
+  min-inline-size: 0;
+  justify-items: center;
+  gap: 0.06rem;
+}
+
+.hall-crusades-archive-stats__value {
+  color: rgba(255, 247, 238, 0.94);
+  font-size: clamp(0.72rem, 1.05vw, 0.92rem);
+  font-weight: 700;
+  line-height: 1;
+  text-shadow:
+    0 0 0.32rem rgba(255, 126, 44, 0.22),
+    0 0 0.62rem rgba(223, 42, 28, 0.18);
+}
+
+.hall-crusades-archive-stats__label {
+  overflow: hidden;
+  max-inline-size: 100%;
+  color: rgba(255, 194, 174, 0.68);
+  font-size: clamp(0.46rem, 0.72vw, 0.58rem);
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .hall-crusades-poster-strip {
   display: none;
   margin: 0;
@@ -12705,6 +12769,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-info-panel {
     inset-block-end: calc(max(1rem, env(safe-area-inset-bottom)) + var(--engine-emitter-size, 4.6rem) + 7px);
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-archive-stats {
+    inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 1.32rem);
+    inline-size: min(24rem, calc(100vw - 0.8rem));
+    min-block-size: 1.34rem;
+    gap: 0.18rem;
+    padding: 0.12rem 0.36rem;
+  }
+
+  .hall-crusades-archive-stats__value {
+    font-size: clamp(0.66rem, 3vw, 0.82rem);
+  }
+
+  .hall-crusades-archive-stats__label {
+    font-size: clamp(0.42rem, 2.2vw, 0.54rem);
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-archive-crystals {

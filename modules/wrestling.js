@@ -249,6 +249,8 @@ const wrestlingShowSortSelect = document.querySelector("#wrestling-shows-sort");
 const wrestlingShowPagination = document.querySelector("[data-wrestling-pagination]") || document.querySelector(".wrestling-pagination");
 const hallCrusadesPosterStrip = document.querySelector("[data-hall-crusades-poster-strip]");
 const hallCrusadesPosterNavButtons = document.querySelectorAll("[data-hall-crusades-poster-nav]");
+const hallCrusadesArchiveStats = document.querySelector("[data-hall-crusades-archive-stats]");
+const hallCrusadesArchiveStatValues = document.querySelectorAll("[data-hall-crusades-archive-stat-value]");
 const hallCrusadesCampaignInfoPanel = document.querySelector("[data-hall-crusades-campaign-info-panel]");
 const hallCrusadesYearCrystal = document.querySelector("[data-hall-crusades-year-crystal]");
 const hallCrusadesYearDrawer = document.querySelector("[data-hall-crusades-year-drawer]");
@@ -1633,6 +1635,34 @@ function getHallCrusadesPosterSourceRows() {
   return getHallCrusadesSearchFilterRows(getHallCrusadesFieldFilterRows(getHallCrusadesBannerFilterRows(getHallCrusadesYearFilterRows(rows))));
 }
 
+function getHallCrusadesArchiveStatCounts(rows = []) {
+  const sourceRows = Array.isArray(rows) ? rows : [];
+  return {
+    campaigns: sourceRows.length,
+    banners: getWrestlingShowsUniqueOptions(sourceRows, (show) => show.promotion === "Promotion Pending" ? "" : show.promotion).length,
+    fields: getWrestlingShowsUniqueOptions(sourceRows, getHallCrusadesFieldOptionValue).length,
+    years: getWrestlingShowsUniqueOptions(sourceRows, (show) => show.year, "year-desc").filter((year) => /^\d{4}$/.test(year)).length,
+  };
+}
+
+function renderHallCrusadesArchiveStats(rows = []) {
+  if (!hallCrusadesArchiveStats) {
+    return;
+  }
+
+  const isVisible = isHallCrusadesShowsVariantActive() && wrestlingShowsDataState === "live";
+  const counts = getHallCrusadesArchiveStatCounts(isVisible ? rows : []);
+  hallCrusadesArchiveStats.hidden = !isVisible;
+  hallCrusadesArchiveStatValues.forEach((valueElement) => {
+    const statName = valueElement.dataset.hallCrusadesArchiveStatValue;
+    valueElement.textContent = String(counts[statName] ?? 0);
+  });
+  hallCrusadesArchiveStats.setAttribute(
+    "aria-label",
+    `Hall archive summary: ${counts.campaigns} campaigns, ${counts.banners} banners, ${counts.fields} fields, ${counts.years} years`
+  );
+}
+
 function isHallCrusadesShowAwaitingCommunication(show) {
   const showTimestamp = getWrestlingShowTimestamp(show);
   return Number.isFinite(showTimestamp) && showTimestamp >= getWrestlingStartOfToday();
@@ -2525,6 +2555,7 @@ function renderHallCrusadesCampaignInfoPanel(show) {
 
 function renderHallCrusadesPosterStrip() {
   if (!hallCrusadesPosterStrip) {
+    renderHallCrusadesArchiveStats([]);
     clearHallCrusadesCampaignInfoPanel();
     return;
   }
@@ -2536,6 +2567,7 @@ function renderHallCrusadesPosterStrip() {
     setHallCrusadesSearchPanelOpen(false);
     hallCrusadesPosterStrip.hidden = true;
     hallCrusadesPosterStrip.replaceChildren();
+    renderHallCrusadesArchiveStats([]);
     syncHallCrusadesPosterNavControls(0);
     clearHallCrusadesCampaignInfoPanel();
     return;
@@ -2548,6 +2580,7 @@ function renderHallCrusadesPosterStrip() {
   bindHallCrusadesPosterStripInteraction();
   bindHallCrusadesPosterNavInteraction();
   const posterSourceRows = getHallCrusadesPosterSourceRows();
+  renderHallCrusadesArchiveStats(posterSourceRows);
   const posterRows = getHallCrusadesPosterWindowRows(posterSourceRows);
   const activeShow = posterSourceRows[hallCrusadesPosterActiveIndex] || null;
   hallCrusadesPosterStrip.hidden = posterRows.length === 0;
