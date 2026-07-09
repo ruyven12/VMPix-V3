@@ -301,6 +301,7 @@ let hallCrusadesPosterSuppressClickTimer = 0;
 let hallCrusadesPosterWheelDelta = 0;
 let hallCrusadesPosterWheelLastAdvanceTime = 0;
 let hallCrusadesPosterWheelResetTimer = 0;
+let isHallCrusadesPosterDefaultIndexApplied = false;
 let isHallCrusadesPosterStripInteractionBound = false;
 let isHallCrusadesPosterNavInteractionBound = false;
 let activeHallCrusadesYearFilter = "";
@@ -1668,6 +1669,46 @@ function isHallCrusadesShowAwaitingCommunication(show) {
   return Number.isFinite(showTimestamp) && showTimestamp >= getWrestlingStartOfToday();
 }
 
+function isHallCrusadesDefaultPosterState() {
+  return activeHallCrusadesYearFilter === ""
+    && activeHallCrusadesBannerFilter === "all"
+    && activeHallCrusadesFieldFilter === "all"
+    && activeHallCrusadesSearchQuery.trim() === "";
+}
+
+function getHallCrusadesLatestCompletedPosterIndex(rows = []) {
+  const sourceRows = Array.isArray(rows) ? rows : [];
+  const startOfToday = getWrestlingStartOfToday();
+  let latestCompletedIndex = -1;
+  let latestCompletedTimestamp = 0;
+
+  sourceRows.forEach((show, index) => {
+    const showTimestamp = getWrestlingShowTimestamp(show);
+    if (!Number.isFinite(showTimestamp) || showTimestamp <= 0 || showTimestamp >= startOfToday) {
+      return;
+    }
+
+    if (showTimestamp > latestCompletedTimestamp) {
+      latestCompletedTimestamp = showTimestamp;
+      latestCompletedIndex = index;
+    }
+  });
+
+  return latestCompletedIndex;
+}
+
+function applyHallCrusadesDefaultPosterActiveIndex(rows = []) {
+  if (isHallCrusadesPosterDefaultIndexApplied || !isHallCrusadesDefaultPosterState()) {
+    return;
+  }
+
+  const latestCompletedIndex = getHallCrusadesLatestCompletedPosterIndex(rows);
+  if (latestCompletedIndex >= 0) {
+    hallCrusadesPosterActiveIndex = latestCompletedIndex;
+  }
+  isHallCrusadesPosterDefaultIndexApplied = true;
+}
+
 function syncHallCrusadesYearControls() {
   const isYearFiltered = activeHallCrusadesYearFilter !== "";
   const isDrawerVisible = isHallCrusadesShowsVariantActive() && isHallCrusadesYearDrawerOpen;
@@ -2580,6 +2621,7 @@ function renderHallCrusadesPosterStrip() {
   bindHallCrusadesPosterStripInteraction();
   bindHallCrusadesPosterNavInteraction();
   const posterSourceRows = getHallCrusadesPosterSourceRows();
+  applyHallCrusadesDefaultPosterActiveIndex(posterSourceRows);
   renderHallCrusadesArchiveStats(posterSourceRows);
   const posterRows = getHallCrusadesPosterWindowRows(posterSourceRows);
   const activeShow = posterSourceRows[hallCrusadesPosterActiveIndex] || null;
