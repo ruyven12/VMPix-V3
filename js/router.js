@@ -92,7 +92,7 @@ function getRouteFromUrl(url = window.location.href) {
       return { name: "wrestling-venue-detail", venueId, canonicalUrl: getWrestlingVenueRouteUrl(venueId) };
     }
   }
-  if (routePath === routePaths.wrestlingShows || routePath === routePaths.wrestlingShows2) {
+  if (routePath === routePaths.wrestlingShows) {
     return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows, showsVariant: "hall-of-crusades" };
   }
   const wrestlingShowDetailPrefix = `${routePaths.wrestlingShows}/`;
