@@ -338,9 +338,6 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling-shows") {
     showWrestlingShowsIndex({ showsVariant: route.showsVariant });
-    if (options.shouldCanonicalize !== false && route.canonicalUrl && route.canonicalUrl !== window.location.pathname) {
-      replaceRouteUrl(route.canonicalUrl);
-    }
     return;
   }
 
