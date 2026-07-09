@@ -252,6 +252,8 @@ const hallCrusadesCampaignInfoPanel = document.querySelector("[data-hall-crusade
 const hallCrusadesYearCrystal = document.querySelector("[data-hall-crusades-year-crystal]");
 const hallCrusadesYearDrawer = document.querySelector("[data-hall-crusades-year-drawer]");
 const hallCrusadesYearOptions = document.querySelectorAll("[data-hall-crusades-year-option]");
+const hallCrusadesBannerCrystal = document.querySelector("[data-hall-crusades-banner-crystal]");
+const hallCrusadesBannerDrawer = document.querySelector("[data-hall-crusades-banner-drawer]");
 const wrestlingPeopleSearchInput = document.querySelector("[data-wrestling-people-filter='search']");
 const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-people-filter='letter']");
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
@@ -287,8 +289,11 @@ let hallCrusadesPosterSuppressClickTimer = 0;
 let hallCrusadesPosterWheelDelta = 0;
 let isHallCrusadesPosterStripInteractionBound = false;
 let activeHallCrusadesYearFilter = "";
+let activeHallCrusadesBannerFilter = "all";
 let isHallCrusadesYearDrawerOpen = false;
+let isHallCrusadesBannerDrawerOpen = false;
 let isHallCrusadesYearCrystalInteractionBound = false;
+let isHallCrusadesBannerCrystalInteractionBound = false;
 let wrestlingPeopleCollection = [];
 let wrestlingPeopleRequest = null;
 let wrestlingPeopleLoaded = false;
@@ -1466,8 +1471,43 @@ function getHallCrusadesYearFilterRows(rows = getWrestlingShowsIndexRows()) {
   return sourceRows;
 }
 
+function normalizeHallCrusadesBannerFilterValue(value) {
+  const nextValue = String(value || "").trim();
+  return nextValue && nextValue !== "all" ? nextValue : "all";
+}
+
+function getHallCrusadesBannerOptionRows(rows = getWrestlingShowsIndexRows()) {
+  return [
+    { value: "all", label: "All Banners" },
+    ...getWrestlingShowsUniqueOptions(rows, (show) => show.promotion === "Promotion Pending" ? "" : show.promotion)
+      .map((promotion) => ({ value: promotion, label: promotion })),
+  ];
+}
+
+function normalizeActiveHallCrusadesBannerFilter(rows = getWrestlingShowsIndexRows()) {
+  if (activeHallCrusadesBannerFilter === "all") {
+    return;
+  }
+
+  const promotions = new Set(getWrestlingShowsUniqueOptions(rows, (show) => show.promotion === "Promotion Pending" ? "" : show.promotion));
+  if (!promotions.has(activeHallCrusadesBannerFilter)) {
+    activeHallCrusadesBannerFilter = "all";
+  }
+}
+
+function getHallCrusadesBannerFilterRows(rows = getWrestlingShowsIndexRows()) {
+  const sourceRows = Array.isArray(rows) ? rows : [];
+  if (activeHallCrusadesBannerFilter === "all") {
+    return sourceRows;
+  }
+
+  return sourceRows.filter((show) => show.promotion === activeHallCrusadesBannerFilter);
+}
+
 function getHallCrusadesPosterSourceRows() {
-  return getHallCrusadesYearFilterRows(getWrestlingShowsIndexRows());
+  const rows = getWrestlingShowsIndexRows();
+  normalizeActiveHallCrusadesBannerFilter(rows);
+  return getHallCrusadesBannerFilterRows(getHallCrusadesYearFilterRows(rows));
 }
 
 function isHallCrusadesShowAwaitingCommunication(show) {
@@ -1500,6 +1540,10 @@ function syncHallCrusadesYearControls() {
 
 function setHallCrusadesYearDrawerOpen(isOpen) {
   isHallCrusadesYearDrawerOpen = Boolean(isOpen && isHallCrusadesShowsVariantActive());
+  if (isHallCrusadesYearDrawerOpen) {
+    isHallCrusadesBannerDrawerOpen = false;
+    syncHallCrusadesBannerControls();
+  }
   syncHallCrusadesYearControls();
 }
 
@@ -1564,6 +1608,136 @@ function bindHallCrusadesYearCrystalInteraction() {
   document.addEventListener("click", handleHallCrusadesYearDocumentClick, true);
   document.addEventListener("keydown", handleHallCrusadesYearKeydown);
   syncHallCrusadesYearControls();
+}
+
+
+function renderHallCrusadesBannerOptions() {
+  if (!hallCrusadesBannerDrawer) {
+    return;
+  }
+
+  const optionRows = getHallCrusadesBannerOptionRows(getWrestlingShowsIndexRows());
+  const signature = optionRows.map((option) => `${option.value}\u0000${option.label}`).join("\u0001");
+  if (hallCrusadesBannerDrawer.dataset.optionsSignature === signature) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  optionRows.forEach((optionRow) => {
+    const option = document.createElement("button");
+    option.className = "hall-crusades-year-drawer__option";
+    option.type = "button";
+    option.setAttribute("role", "menuitemradio");
+    option.setAttribute("aria-checked", "false");
+    option.dataset.hallCrusadesBannerOption = optionRow.value;
+    option.textContent = optionRow.label;
+    fragment.append(option);
+  });
+  hallCrusadesBannerDrawer.replaceChildren(fragment);
+  hallCrusadesBannerDrawer.dataset.optionsSignature = signature;
+}
+
+function syncHallCrusadesBannerControls() {
+  normalizeActiveHallCrusadesBannerFilter(getWrestlingShowsIndexRows());
+  renderHallCrusadesBannerOptions();
+  const isBannerFiltered = activeHallCrusadesBannerFilter !== "all";
+  const isDrawerVisible = isHallCrusadesShowsVariantActive() && isHallCrusadesBannerDrawerOpen;
+
+  if (hallCrusadesBannerCrystal) {
+    hallCrusadesBannerCrystal.classList.toggle("is-active", isBannerFiltered);
+    hallCrusadesBannerCrystal.setAttribute("aria-expanded", String(isDrawerVisible));
+    hallCrusadesBannerCrystal.setAttribute("aria-pressed", String(isBannerFiltered));
+    hallCrusadesBannerCrystal.setAttribute("aria-label", isBannerFiltered
+      ? `Banner archive query: ${activeHallCrusadesBannerFilter}`
+      : "Banner archive query: All Banners");
+    hallCrusadesBannerCrystal.dataset.hallCrusadesBannerFilter = activeHallCrusadesBannerFilter;
+  }
+
+  if (hallCrusadesBannerDrawer) {
+    hallCrusadesBannerDrawer.hidden = !isDrawerVisible;
+  }
+
+  hallCrusadesBannerDrawer?.querySelectorAll("[data-hall-crusades-banner-option]").forEach((option) => {
+    const optionValue = normalizeHallCrusadesBannerFilterValue(option.dataset.hallCrusadesBannerOption);
+    const isActive = optionValue === activeHallCrusadesBannerFilter;
+    option.classList.toggle("is-active", isActive);
+    option.setAttribute("aria-checked", String(isActive));
+  });
+}
+
+function setHallCrusadesBannerDrawerOpen(isOpen) {
+  isHallCrusadesBannerDrawerOpen = Boolean(isOpen && isHallCrusadesShowsVariantActive());
+  if (isHallCrusadesBannerDrawerOpen) {
+    isHallCrusadesYearDrawerOpen = false;
+    syncHallCrusadesYearControls();
+  }
+  syncHallCrusadesBannerControls();
+}
+
+function updateHallCrusadesBannerFilter(value) {
+  const nextValue = normalizeHallCrusadesBannerFilterValue(value);
+  if (nextValue !== activeHallCrusadesBannerFilter) {
+    activeHallCrusadesBannerFilter = nextValue;
+    hallCrusadesPosterActiveIndex = 0;
+    if (hallCrusadesPosterStrip) {
+      delete hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection;
+    }
+  }
+
+  setHallCrusadesBannerDrawerOpen(false);
+  renderHallCrusadesPosterStrip();
+}
+
+function handleHallCrusadesBannerCrystalClick(event) {
+  if (!isHallCrusadesShowsVariantActive()) {
+    return;
+  }
+
+  event.preventDefault();
+  setHallCrusadesBannerDrawerOpen(!isHallCrusadesBannerDrawerOpen);
+}
+
+function handleHallCrusadesBannerDrawerClick(event) {
+  const option = event.target?.closest?.("[data-hall-crusades-banner-option]");
+  if (!option || !hallCrusadesBannerDrawer?.contains(option)) {
+    return;
+  }
+
+  updateHallCrusadesBannerFilter(option.dataset.hallCrusadesBannerOption);
+}
+
+function handleHallCrusadesBannerDocumentClick(event) {
+  if (!isHallCrusadesBannerDrawerOpen) {
+    return;
+  }
+
+  const crystalGroup = hallCrusadesBannerCrystal?.closest(".hall-crusades-archive-crystals");
+  if (crystalGroup?.contains(event.target)) {
+    return;
+  }
+
+  setHallCrusadesBannerDrawerOpen(false);
+}
+
+function handleHallCrusadesBannerKeydown(event) {
+  if (event.key === "Escape" && isHallCrusadesBannerDrawerOpen) {
+    event.preventDefault();
+    setHallCrusadesBannerDrawerOpen(false);
+    hallCrusadesBannerCrystal?.focus();
+  }
+}
+
+function bindHallCrusadesBannerCrystalInteraction() {
+  if (isHallCrusadesBannerCrystalInteractionBound) {
+    return;
+  }
+
+  isHallCrusadesBannerCrystalInteractionBound = true;
+  hallCrusadesBannerCrystal?.addEventListener("click", handleHallCrusadesBannerCrystalClick);
+  hallCrusadesBannerDrawer?.addEventListener("click", handleHallCrusadesBannerDrawerClick);
+  document.addEventListener("click", handleHallCrusadesBannerDocumentClick, true);
+  document.addEventListener("keydown", handleHallCrusadesBannerKeydown);
+  syncHallCrusadesBannerControls();
 }
 
 function normalizeHallCrusadesPosterActiveIndex(total) {
@@ -1882,6 +2056,7 @@ function renderHallCrusadesPosterStrip() {
 
   if (!isHallCrusadesShowsVariantActive() || wrestlingShowsDataState !== "live") {
     setHallCrusadesYearDrawerOpen(false);
+    setHallCrusadesBannerDrawerOpen(false);
     hallCrusadesPosterStrip.hidden = true;
     hallCrusadesPosterStrip.replaceChildren();
     clearHallCrusadesCampaignInfoPanel();
@@ -1889,6 +2064,7 @@ function renderHallCrusadesPosterStrip() {
   }
 
   bindHallCrusadesYearCrystalInteraction();
+  bindHallCrusadesBannerCrystalInteraction();
   bindHallCrusadesPosterStripInteraction();
   const posterSourceRows = getHallCrusadesPosterSourceRows();
   const posterRows = getHallCrusadesPosterWindowRows(posterSourceRows);
@@ -1901,8 +2077,10 @@ function renderHallCrusadesPosterStrip() {
   });
   hallCrusadesPosterStrip.dataset.hallCrusadesActiveIndex = String(hallCrusadesPosterActiveIndex);
   hallCrusadesPosterStrip.dataset.hallCrusadesYearFilter = activeHallCrusadesYearFilter || "all";
+  hallCrusadesPosterStrip.dataset.hallCrusadesBannerFilter = activeHallCrusadesBannerFilter;
   hallCrusadesPosterStrip.replaceChildren(fragment);
   syncHallCrusadesYearControls();
+  syncHallCrusadesBannerControls();
 }
 function createWrestlingShowEntry(show) {
   const item = document.createElement("li");
@@ -7366,6 +7544,7 @@ function initWrestlingShowsArchive() {
 
   syncWrestlingShowsControls();
   bindHallCrusadesYearCrystalInteraction();
+  bindHallCrusadesBannerCrystalInteraction();
   if (wrestlingShowList && wrestlingShowList.children.length === 0) {
     wrestlingShowList.append(createWrestlingShowState("loading"));
   }

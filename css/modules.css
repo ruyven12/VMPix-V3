@@ -12038,6 +12038,23 @@ button.hall-crusades-archive-crystal:focus-visible {
   color: rgba(255, 231, 208, 0.9);
 }
 
+.hall-crusades-archive-crystal--banner.is-active .hall-crusades-archive-crystal__frame {
+  border-color: rgba(255, 110, 82, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.08),
+    0 0 0.72rem rgba(255, 42, 26, 0.26);
+}
+
+.hall-crusades-archive-crystal--banner.is-active .hall-crusades-archive-crystal__gem {
+  box-shadow:
+    0 0 0.44rem rgba(255, 42, 26, 0.54),
+    0 0 1rem rgba(164, 15, 12, 0.24);
+}
+
+.hall-crusades-archive-crystal--banner.is-active .hall-crusades-archive-crystal__label {
+  color: rgba(255, 231, 208, 0.9);
+}
+
 .hall-crusades-year-drawer {
   display: none;
 }
@@ -12067,6 +12084,10 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.6rem rgba(255, 42, 26, 0.14);
   clip-path: polygon(0.42rem 0, 100% 0, 100% calc(100% - 0.42rem), calc(100% - 0.42rem) 100%, 0 100%, 0 0.42rem);
   transform: translateX(-50%);
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-banner-drawer {
+  inset-inline-start: 37.5%;
 }
 
 .hall-crusades-year-drawer__option {
