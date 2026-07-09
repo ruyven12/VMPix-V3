@@ -41,6 +41,13 @@ function getRouteFromUrl(url = window.location.href) {
     isUnknown: true,
   });
 
+  if (routePath === "/wrestling2") {
+    return { name: "wrestling", canonicalUrl: routePaths.wrestling, shouldReplaceUrl: true };
+  }
+  if (routePath === "/shows2") {
+    return { name: "wrestling-shows", canonicalUrl: routePaths.wrestlingShows, showsVariant: "hall-of-crusades", shouldReplaceUrl: true };
+  }
+
   if (routePath === routePaths.home) {
     return { name: "home", canonicalUrl: routePaths.home };
   }
@@ -302,6 +309,9 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling") {
+    if (route.shouldReplaceUrl && options.shouldCanonicalize !== false && route.canonicalUrl) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
     const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     showBattlegroundGatewayArrivalSurface();
     if (typeof initDaiionArchiveStatsPanel === "function") {
@@ -337,6 +347,9 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-shows") {
+    if (route.shouldReplaceUrl && options.shouldCanonicalize !== false && route.canonicalUrl) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
     showWrestlingShowsIndex({ showsVariant: route.showsVariant });
     return;
   }
