@@ -2350,7 +2350,8 @@ const daiionArchiveStatsEndpoints = {
 const daiionArchiveStatsStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
 const daiionArchiveStatsDecodeDelay = 4580;
 function isDaiionArchiveLandingPath(pathname = window.location.pathname) {
-  return pathname === routePaths.wrestling;
+  const normalizedPath = String(pathname || "").replace(/\/+$/, "") || "/";
+  return normalizedPath === routePaths.wrestling;
 }
 const daiionArchiveStatsRowStagger = 80;
 const daiionArchiveFocusBriefings = {
