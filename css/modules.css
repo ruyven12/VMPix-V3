@@ -11716,11 +11716,12 @@ button.wrestling-event-history-tagged-thumb {
   min-width: 0;
   align-self: stretch;
   display: grid;
-  align-content: start;
+  align-content: center;
   gap: clamp(0.95rem, 2.25vw, 1.35rem);
   padding: clamp(0.95rem, 2.4vw, 1.55rem);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0.04em;
+  text-align: center;
   border: 1px solid rgba(255, 90, 60, 0.2);
   background:
     linear-gradient(135deg, rgba(255, 90, 60, 0.08), transparent 1.4rem),
@@ -11751,6 +11752,7 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-show-prototype-card__field {
   position: relative;
   display: grid;
+  justify-items: center;
   gap: 0.22rem;
   min-width: 0;
 }
