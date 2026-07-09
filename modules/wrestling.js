@@ -3025,11 +3025,45 @@ function getHallPrototypeMatchTypeText(match = {}) {
   );
 }
 
+function getHallPrototypeGroupedSideValue(source = {}, sideNumber = 1) {
+  const groupedSides = [
+    source.participant_sides,
+    source.participantSides,
+    source.team_sides,
+    source.teamSides,
+    source.sides,
+    source.teams,
+  ].find((candidate) => candidate && (Array.isArray(candidate) || typeof candidate === "object"));
+
+  if (Array.isArray(groupedSides)) {
+    return groupedSides[sideNumber - 1];
+  }
+
+  if (groupedSides && typeof groupedSides === "object") {
+    const groupedFields = sideNumber === 1
+      ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1"]
+      : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2"];
+    for (const field of groupedFields) {
+      if (groupedSides[field]) {
+        return groupedSides[field];
+      }
+    }
+  }
+
+  return null;
+}
+
 function getHallPrototypeMatchSideLabels(match = {}, sideNumber = 1) {
   const source = getHallPrototypeMatchSource(match);
+  const groupedSide = getHallPrototypeGroupedSideValue(source, sideNumber);
+  const groupedLabels = getWrestlingLabelArray(groupedSide);
+  if (groupedLabels.length > 0) {
+    return groupedLabels;
+  }
+
   const sideFields = sideNumber === 1
-    ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1"]
-    : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2"];
+    ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1", "participants_1", "participants1", "participant_side_1", "participantSide1"]
+    : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2", "participants_2", "participants2", "participant_side_2", "participantSide2"];
 
   for (const field of sideFields) {
     const labels = getWrestlingLabelArray(source[field]);
@@ -3060,19 +3094,40 @@ function getHallPrototypeMatchSideLabels(match = {}, sideNumber = 1) {
     : ["Side Pending"];
 }
 
+function getHallPrototypeEncounterSideNames(values) {
+  const names = getWrestlingArray(values)
+    .map((value) => getWrestlingText(value))
+    .filter(Boolean);
+
+  if (names.length === 1 && /,|\sand\s/i.test(names[0])) {
+    const splitNames = names[0]
+      .split(/\s*,\s*|\s+and\s+/i)
+      .map((name) => getWrestlingText(name))
+      .filter(Boolean);
+    if (splitNames.length > 1) {
+      return splitNames;
+    }
+  }
+
+  return names.length > 0 ? names : ["Side Pending"];
+}
+
 function createHallPrototypeEncounterSide(label, values) {
   const side = document.createElement("div");
   side.className = "wrestling-show-prototype-encounter-side";
-
-  const sideLabel = document.createElement("span");
-  sideLabel.className = "wrestling-show-prototype-encounter-side-label";
-  sideLabel.textContent = label;
+  side.setAttribute("aria-label", label);
 
   const sideValue = document.createElement("p");
   sideValue.className = "wrestling-show-prototype-encounter-side-value";
-  sideValue.textContent = getWrestlingArray(values).join(", ") || "Side Pending";
 
-  side.append(sideLabel, sideValue);
+  getHallPrototypeEncounterSideNames(values).forEach((name) => {
+    const nameLine = document.createElement("span");
+    nameLine.className = "wrestling-show-prototype-encounter-side-name";
+    nameLine.textContent = name;
+    sideValue.append(nameLine);
+  });
+
+  side.append(sideValue);
   return side;
 }
 
