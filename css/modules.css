@@ -11617,6 +11617,130 @@ button.wrestling-event-history-tagged-thumb {
     font-size: clamp(2rem, 10vw, 3rem);
   }
 }
+.wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card {
+  position: relative;
+  z-index: 3;
+  inline-size: min(100%, 58rem);
+  max-block-size: min(66svh, 34rem);
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 34%) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(0.85rem, 2.8vw, 1.5rem);
+  padding: clamp(0.85rem, 2.6vw, 1.4rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 90, 60, 0.42);
+  background: rgba(6, 7, 9, 0.7);
+}
+
+.wrestling-show-prototype-card__poster {
+  position: relative;
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 90, 60, 0.38);
+  background: rgba(5, 5, 8, 0.72);
+  aspect-ratio: 2 / 3;
+}
+
+.wrestling-show-prototype-card__poster-image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.wrestling-show-prototype-card__poster-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 231, 208, 0.92);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 8vw, 3.2rem);
+}
+
+.wrestling-show-prototype-card__poster.has-poster .wrestling-show-prototype-card__poster-fallback {
+  display: none;
+}
+
+.wrestling-show-prototype-card__content {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(0.65rem, 2vw, 1rem);
+}
+
+.wrestling-show-prototype-card__title {
+  margin: 0;
+  color: rgba(255, 252, 246, 0.96);
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 5.6vw, 3.1rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wrestling-show-prototype-card__fields {
+  display: grid;
+  gap: clamp(0.5rem, 1.4vw, 0.72rem);
+  margin: 0;
+}
+
+.wrestling-show-prototype-card__field {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.wrestling-show-prototype-card__label,
+.wrestling-show-prototype-card__value {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.wrestling-show-prototype-card__label {
+  color: rgba(255, 90, 60, 0.86);
+  font-size: clamp(0.62rem, 1.55vw, 0.78rem);
+}
+
+.wrestling-show-prototype-card__value {
+  color: rgba(255, 231, 208, 0.94);
+  font-size: clamp(0.86rem, 2.3vw, 1.08rem);
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card {
+    grid-template-columns: minmax(6.6rem, 36%) minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.78rem;
+  }
+
+  .wrestling-show-prototype-card__content {
+    gap: 0.56rem;
+  }
+
+  .wrestling-show-prototype-card__fields {
+    gap: 0.42rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card {
+    grid-template-columns: 1fr;
+    max-block-size: min(68svh, 34rem);
+    overflow: auto;
+  }
+
+  .wrestling-show-prototype-card__poster {
+    inline-size: min(11rem, 72vw);
+    justify-self: center;
+  }
+}
 .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]::-webkit-scrollbar {
   width: 0;
   height: 0;

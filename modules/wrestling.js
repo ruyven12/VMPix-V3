@@ -2989,14 +2989,83 @@ function renderWrestlingShowDetailState(showId, stateName) {
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
 }
 
+function createHallPrototypeCampaignInfoField(label, value) {
+  const field = document.createElement("div");
+  field.className = "wrestling-show-prototype-card__field";
+
+  const labelElement = document.createElement("dt");
+  labelElement.className = "wrestling-show-prototype-card__label";
+  labelElement.textContent = label;
+
+  const valueElement = document.createElement("dd");
+  valueElement.className = "wrestling-show-prototype-card__value";
+  valueElement.textContent = value;
+
+  field.append(labelElement, valueElement);
+  return field;
+}
+
 function renderHallPrototypeShowDetailSurface(show) {
-  const showTitle = show.title || show.eventName || show.showName || "Campaign Detail";
+  const showTitle = getWrestlingText(show.title || show.eventName || show.showName, "Campaign Detail");
+  const promotion = getWrestlingText(show.promotion, "Promotion Pending");
+  const date = getWrestlingText(show.eventDate || formatWrestlingShowDate(show.rawDate || show.date || show.dateKey), "Date Pending");
+  const venue = getWrestlingText(show.venue || getWrestlingVenueName(show), "Venue Pending");
+  const location = getWrestlingText(show.location || getWrestlingShowLocation(show), "Location Pending");
+
+  const card = document.createElement("article");
+  card.className = "wrestling-show-prototype-card";
+  card.setAttribute("aria-labelledby", "wrestling-show-detail-title");
+
+  const poster = document.createElement("figure");
+  poster.className = "wrestling-show-prototype-card__poster";
+  poster.setAttribute("aria-label", `${showTitle} poster artwork`);
+
+  const posterImage = document.createElement("img");
+  posterImage.className = "wrestling-show-prototype-card__poster-image";
+  posterImage.alt = "";
+  posterImage.loading = "eager";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
+
+  const posterFallback = document.createElement("span");
+  posterFallback.className = "wrestling-show-prototype-card__poster-fallback";
+  posterFallback.textContent = getWrestlingShowPosterLabel(show);
+
+  const posterUrl = getWrestlingText(show.poster);
+  if (isValidWrestlingPosterUrl(posterUrl)) {
+    poster.classList.add("has-poster");
+    posterImage.src = posterUrl;
+    posterImage.hidden = false;
+    posterImage.addEventListener("error", () => {
+      poster.classList.remove("has-poster");
+      posterImage.hidden = true;
+      posterImage.removeAttribute("src");
+    }, { once: true });
+  }
+
+  poster.append(posterImage, posterFallback);
+
+  const content = document.createElement("div");
+  content.className = "wrestling-show-prototype-card__content";
+
   const title = document.createElement("h2");
-  title.className = "wrestling-show-prototype-title";
+  title.className = "wrestling-show-prototype-card__title";
   title.id = "wrestling-show-detail-title";
   title.textContent = showTitle;
 
-  wrestlingShowDetailShell.replaceChildren(title);
+  const fields = document.createElement("dl");
+  fields.className = "wrestling-show-prototype-card__fields";
+  fields.append(
+    createHallPrototypeCampaignInfoField("Promotion", promotion),
+    createHallPrototypeCampaignInfoField("Date", date),
+    createHallPrototypeCampaignInfoField("Venue", venue),
+    createHallPrototypeCampaignInfoField("Location", location)
+  );
+
+  content.append(title, fields);
+  card.append(poster, content);
+
+  wrestlingShowDetailShell.replaceChildren(card);
   if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
     setPortfolioEngineHudCurrentViewDetail(showTitle);
   }
