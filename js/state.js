@@ -2344,7 +2344,7 @@ const daiionArchiveFocusBriefings = {
     title: "The Hall of Crusades",
     stat: "43 Recorded Campaigns",
     copy: "Journey through a collection of the campaigns that transpired throughout time.",
-    status: "TARGET LOCKED",
+    status: "Enter the Halls",
   },
   combatants: {
     title: "The Hall of Champions",
@@ -2359,6 +2359,9 @@ const daiionArchiveFocusBriefings = {
     status: "TARGET LOCKED",
   },
 };
+const daiionArchiveRouteTargets = {
+  campaigns: routePaths.wrestlingShows2,
+};
 const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings));
 let daiionArchiveStatsRequestId = 0;
 let daiionDestinationSelectedTarget = null;
@@ -2371,6 +2374,7 @@ function syncDaiionDestinationSelection() {
   const panel = document.querySelector(".daiion-destination-panel");
   const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   const focusBriefing = daiionArchiveFocusBriefings[daiionDestinationSelectedTarget];
+  const focusRoute = daiionArchiveRouteTargets[daiionDestinationSelectedTarget] || "";
 
   destinationControls.forEach((control) => {
     const isActive = control.getAttribute("data-daiion-destination-target") === daiionDestinationSelectedTarget;
@@ -2406,16 +2410,32 @@ function syncDaiionDestinationSelection() {
       copyNode.textContent = focusBriefing.copy;
       statusNode.textContent = focusBriefing.status;
       focusPanel.classList.add("is-active");
+      focusPanel.classList.toggle("is-routeable", Boolean(focusRoute));
       focusPanel.setAttribute("aria-hidden", "false");
       focusPanel.setAttribute("data-daiion-selected-target", daiionDestinationSelectedTarget);
+      if (focusRoute) {
+        focusPanel.setAttribute("role", "button");
+        focusPanel.setAttribute("tabindex", "0");
+        focusPanel.setAttribute("data-daiion-route-target", focusRoute);
+        focusPanel.setAttribute("aria-label", `${focusBriefing.title} - ${focusBriefing.status}`);
+      } else {
+        focusPanel.removeAttribute("role");
+        focusPanel.removeAttribute("tabindex");
+        focusPanel.removeAttribute("data-daiion-route-target");
+        focusPanel.setAttribute("aria-label", "Archive Focus");
+      }
     } else {
       titleNode.textContent = "ARCHIVE FOCUS";
       statNode.textContent = "";
       copyNode.textContent = "";
       statusNode.textContent = "";
-      focusPanel.classList.remove("is-active");
+      focusPanel.classList.remove("is-active", "is-routeable");
       focusPanel.setAttribute("aria-hidden", "true");
       focusPanel.removeAttribute("data-daiion-selected-target");
+      focusPanel.removeAttribute("role");
+      focusPanel.removeAttribute("tabindex");
+      focusPanel.removeAttribute("data-daiion-route-target");
+      focusPanel.setAttribute("aria-label", "Archive Focus");
     }
   }
 
@@ -2439,8 +2459,19 @@ function setDaiionDestinationTarget(target) {
   syncDaiionDestinationSelection();
 }
 
+function routeDaiionArchiveFocusPanel() {
+  const focusPanel = document.querySelector("[data-daiion-archive-focus]");
+  const routeTarget = focusPanel?.getAttribute("data-daiion-route-target");
+  if (!routeTarget || !isDaiionArchiveLandingPath() || !focusPanel.classList.contains("is-active")) {
+    return;
+  }
+
+  navigateToRoute(routeTarget);
+}
+
 function initDaiionDestinationPanel() {
   const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
+  const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   if (!destinationControls.length) {
     return;
   }
@@ -2455,6 +2486,19 @@ function initDaiionDestinationPanel() {
       setDaiionDestinationTarget(control.getAttribute("data-daiion-destination-target"));
     });
   });
+
+  if (focusPanel && focusPanel.getAttribute("data-daiion-archive-focus-bound") !== "true") {
+    focusPanel.setAttribute("data-daiion-archive-focus-bound", "true");
+    focusPanel.addEventListener("click", routeDaiionArchiveFocusPanel);
+    focusPanel.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      routeDaiionArchiveFocusPanel();
+    });
+  }
 
   syncDaiionDestinationSelection();
 }

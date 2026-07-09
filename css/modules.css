@@ -15882,6 +15882,19 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 1;
   animation: daiionArchiveFocusPanelResolve 220ms ease-out both;
 }
+
+.daiion-archive-focus-panel.is-routeable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.daiion-archive-focus-panel.is-routeable:focus-visible {
+  outline: 1px solid rgba(255, 231, 208, 0.58);
+  outline-offset: 0.18rem;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.07),
+    0 0 0.64rem rgba(255, 42, 26, 0.18);
+}
 .daiion-destination-panel {
   position: absolute;
   inset-block-end: clamp(7.1rem, 12svh, 8.8rem);
