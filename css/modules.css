@@ -11726,6 +11726,75 @@ button.wrestling-event-history-tagged-thumb {
     max-inline-size: 100%;
     white-space: nowrap;
   }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier {
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgba(255, 42, 26, 0.18), rgba(88, 8, 10, 0.09) 38%, transparent 68%),
+      linear-gradient(90deg, transparent, rgba(10, 5, 7, 0.34) 18%, rgba(18, 7, 7, 0.42) 50%, rgba(10, 5, 7, 0.34) 82%, transparent);
+    box-shadow:
+      0 0 0 1px rgba(255, 90, 60, 0.12),
+      0 0 1.05rem rgba(255, 42, 26, 0.16),
+      inset 0 0 0 1px rgba(255, 231, 208, 0.035),
+      inset 0 0 1.6rem rgba(255, 42, 26, 0.08);
+    contain: layout style;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier::before,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier::after {
+    position: absolute;
+    content: "";
+    pointer-events: none;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier::before {
+    inset: -0.44rem -0.72rem;
+    z-index: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 231, 208, 0.2), rgba(255, 90, 60, 0.72) 14%, transparent 14% 86%, rgba(255, 90, 60, 0.72) 86%, rgba(255, 231, 208, 0.2)) top / 100% 1px no-repeat,
+      linear-gradient(90deg, rgba(255, 42, 26, 0.54), rgba(255, 126, 44, 0.38) 18%, transparent 18% 82%, rgba(255, 126, 44, 0.38) 82%, rgba(255, 42, 26, 0.54)) bottom / 100% 1px no-repeat,
+      linear-gradient(180deg, rgba(255, 231, 208, 0.22), rgba(255, 90, 60, 0.66), transparent 72%) left top / 1px 1.55rem no-repeat,
+      linear-gradient(180deg, rgba(255, 231, 208, 0.22), rgba(255, 90, 60, 0.66), transparent 72%) right top / 1px 1.55rem no-repeat,
+      linear-gradient(0deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.48), transparent 72%) left bottom / 1px 1.25rem no-repeat,
+      linear-gradient(0deg, rgba(255, 231, 208, 0.14), rgba(255, 90, 60, 0.48), transparent 72%) right bottom / 1px 1.25rem no-repeat;
+    box-shadow:
+      0 0 0.56rem rgba(255, 90, 60, 0.14),
+      0 0 1.3rem rgba(135, 11, 16, 0.2);
+    clip-path: polygon(1.2rem 0, calc(100% - 1.2rem) 0, 100% 44%, calc(100% - 0.92rem) 100%, 0.92rem 100%, 0 44%);
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-room-identifier::after {
+    inset: -0.14rem -0.34rem;
+    z-index: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 126, 44, 0.2) 0 1px, transparent 1px 0.82rem) top / 100% 1px no-repeat,
+      repeating-linear-gradient(90deg, transparent 0 1.18rem, rgba(255, 90, 60, 0.22) 1.18rem 1.24rem, transparent 1.24rem 2.08rem) bottom / 100% 1px no-repeat,
+      linear-gradient(90deg, transparent 0 10%, rgba(255, 90, 60, 0.16) 10% 10.45%, transparent 10.45% 89.55%, rgba(255, 90, 60, 0.16) 89.55% 90%, transparent 90%);
+    opacity: 0.72;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-room-identifier__title,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-room-identifier__subtitle {
+    position: relative;
+    z-index: 1;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-room-identifier__title {
+    color: rgba(255, 252, 246, 0.98);
+    text-shadow:
+      0 0 0.38rem rgba(255, 255, 255, 0.13),
+      0 0 0.86rem rgba(255, 126, 44, 0.22),
+      0 0 1.55rem rgba(223, 42, 28, 0.26),
+      0 0 2.25rem rgba(0, 0, 0, 0.78);
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-room-identifier__subtitle {
+    color: rgba(255, 224, 210, 0.82);
+    text-shadow:
+      0 0 0.42rem rgba(255, 126, 44, 0.18),
+      0 0 0.82rem rgba(135, 11, 16, 0.28),
+      0 0 1.3rem rgba(0, 0, 0, 0.58);
+  }
 }
 
 @media (max-width: 540px) {
