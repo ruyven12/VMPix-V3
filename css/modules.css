@@ -11784,13 +11784,12 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
   inline-size: min(16rem, 76%);
   block-size: 1px;
-  padding-block: 5px;
+  margin-block: 5px;
   justify-self: center;
   background: linear-gradient(90deg, transparent, rgba(255, 231, 208, 0.5) 8%, rgba(255, 90, 60, 0.72) 52%, rgba(255, 231, 208, 0.3) 92%, transparent);
-  background-clip: content-box;
   box-shadow:
-    0 0 0.22rem rgba(255, 42, 26, 0.24),
-    0 0 0.48rem rgba(255, 90, 60, 0.12);
+    0 0 0.28rem rgba(255, 42, 26, 0.34),
+    0 0 0.62rem rgba(255, 90, 60, 0.18);
 }
 
 .hall-crusades-campaign-info-panel__venue-block {
