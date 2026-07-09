@@ -1688,37 +1688,43 @@ function renderHallCrusadesCampaignInfoPanel(show) {
   const venue = getWrestlingText(show.venue, "Venue Pending");
   const location = getWrestlingText(show.location || getWrestlingShowLocation(show), "Location Pending");
   const matchCount = Number.parseInt(show.matchCount, 10) || getWrestlingArray(show.matches).length;
-  const photoCount = getWrestlingPhotoCount(show);
   const showRoute = getWrestlingShowRouteUrl(show);
 
-  const meta = document.createElement("p");
-  meta.className = "hall-crusades-campaign-info-panel__meta";
-  meta.append(
-    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__promotion", promotion),
-    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__date", date)
-  );
-
+  const promotionElement = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__promotion", promotion, "p");
   const titleElement = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__title", title, "h3");
+  const topSeparator = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__separator", "", "span");
+  topSeparator.setAttribute("aria-hidden", "true");
 
-  const place = document.createElement("p");
-  place.className = "hall-crusades-campaign-info-panel__place";
-  place.append(
-    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__venue", venue),
-    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__location", location)
+  const venueBlock = document.createElement("div");
+  venueBlock.className = "hall-crusades-campaign-info-panel__venue-block";
+  venueBlock.dataset.hallCrusadesVenueBlock = "";
+  venueBlock.append(
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__venue", venue, "p"),
+    createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__location", location, "p")
   );
 
-  const metrics = document.createElement("p");
-  metrics.className = "hall-crusades-campaign-info-panel__metrics";
-  metrics.append(createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__metric", getHallCrusadesCampaignCountText(matchCount, "Match", "Matches")));
-  if (photoCount > 0) {
-    metrics.append(createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__metric", getHallCrusadesCampaignCountText(photoCount, "Photo", "Photos")));
-  }
+  const dateElement = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__date", date, "p");
+  const bottomSeparator = createHallCrusadesCampaignInfoText("hall-crusades-campaign-info-panel__separator", "", "span");
+  bottomSeparator.setAttribute("aria-hidden", "true");
+  const segmentCount = createHallCrusadesCampaignInfoText(
+    "hall-crusades-campaign-info-panel__segment-count",
+    getHallCrusadesCampaignCountText(matchCount, "Segment", "Segments"),
+    "p"
+  );
 
   hallCrusadesCampaignInfoPanel.hidden = false;
   hallCrusadesCampaignInfoPanel.dataset.wrestlingShowId = show.showId;
   hallCrusadesCampaignInfoPanel.dataset.wrestlingShowRoute = showRoute;
   hallCrusadesCampaignInfoPanel.setAttribute("aria-label", `Campaign Information: ${title}`);
-  hallCrusadesCampaignInfoPanel.replaceChildren(meta, titleElement, place, metrics);
+  hallCrusadesCampaignInfoPanel.replaceChildren(
+    promotionElement,
+    titleElement,
+    topSeparator,
+    venueBlock,
+    dateElement,
+    bottomSeparator,
+    segmentCount
+  );
 }
 
 function renderHallCrusadesPosterStrip() {
