@@ -304,6 +304,7 @@ let hallCrusadesPosterWheelResetTimer = 0;
 let isHallCrusadesPosterDefaultIndexApplied = false;
 let isHallCrusadesPosterStripInteractionBound = false;
 let isHallCrusadesPosterNavInteractionBound = false;
+let isHallCrusadesPosterKeyboardInteractionBound = false;
 let activeHallCrusadesYearFilter = "";
 let activeHallCrusadesBannerFilter = "all";
 let activeHallCrusadesFieldFilter = "all";
@@ -2288,6 +2289,48 @@ function bindHallCrusadesPosterNavInteraction() {
   syncHallCrusadesPosterNavControls();
 }
 
+function isHallCrusadesPosterDesktopKeyboard() {
+  return typeof window === "undefined"
+    || typeof window.matchMedia !== "function"
+    || window.matchMedia("(min-width: 760px)").matches;
+}
+
+function isHallCrusadesPosterKeyboardIgnoredTarget(target) {
+  return Boolean(target?.closest?.("input, textarea, select, [contenteditable='true'], [role='menu'], .hall-crusades-search-panel"));
+}
+
+function handleHallCrusadesPosterKeyboardNavigation(event) {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+    return;
+  }
+
+  if (event.defaultPrevented || !isHallCrusadesShowsVariantActive() || !isHallCrusadesPosterDesktopKeyboard()) {
+    return;
+  }
+
+  if (isHallCrusadesYearDrawerOpen || isHallCrusadesBannerDrawerOpen || isHallCrusadesFieldDrawerOpen || isHallCrusadesSearchPanelOpen) {
+    return;
+  }
+
+  if (isHallCrusadesPosterKeyboardIgnoredTarget(event.target)) {
+    return;
+  }
+
+  const direction = event.key === "ArrowRight" ? 1 : -1;
+  if (advanceHallCrusadesPosterActive(direction)) {
+    event.preventDefault();
+  }
+}
+
+function bindHallCrusadesPosterKeyboardInteraction() {
+  if (isHallCrusadesPosterKeyboardInteractionBound) {
+    return;
+  }
+
+  isHallCrusadesPosterKeyboardInteractionBound = true;
+  document.addEventListener("keydown", handleHallCrusadesPosterKeyboardNavigation);
+}
+
 function handleHallCrusadesPosterPointerDown(event) {
   if (!isHallCrusadesShowsVariantActive() || event.pointerType === "mouse") {
     return;
@@ -2620,6 +2663,7 @@ function renderHallCrusadesPosterStrip() {
   bindHallCrusadesSearchCrystalInteraction();
   bindHallCrusadesPosterStripInteraction();
   bindHallCrusadesPosterNavInteraction();
+  bindHallCrusadesPosterKeyboardInteraction();
   const posterSourceRows = getHallCrusadesPosterSourceRows();
   applyHallCrusadesDefaultPosterActiveIndex(posterSourceRows);
   renderHallCrusadesArchiveStats(posterSourceRows);
