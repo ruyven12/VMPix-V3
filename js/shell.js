@@ -8,6 +8,9 @@ function setCurrentView(viewName) {
   if (currentView) {
     currentView.textContent = viewName;
   }
+  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
+    setPortfolioEngineHudCurrentViewDetail("");
+  }
 }
 
 const ROUTE_TITLE_LABELS = {
@@ -631,9 +634,39 @@ function handlePortfolioGatewayTriggerClick(event) {
   startPortfolioWorldGateway();
 }
 
-function setPortfolioEngineHudCurrentView(viewName) {
+function setPortfolioEngineHudCurrentViewDetail(detailText = "") {
+  if (!portfolioEngineCurrentView) {
+    return;
+  }
+  const panel = portfolioEngineCurrentView.closest("[data-portfolio-engine-panel='current-view']");
+  if (!panel) {
+    return;
+  }
+  const text = typeof detailText === "string" ? detailText.trim() : "";
+  let detail = panel.querySelector("[data-portfolio-engine-current-view-detail]");
+  if (!text) {
+    if (detail) {
+      detail.remove();
+    }
+    delete panel.dataset.portfolioEngineDetail;
+    return;
+  }
+  if (!detail) {
+    detail = document.createElement("span");
+    detail.className = "portfolio-engine-value portfolio-engine-value--detail";
+    detail.dataset.portfolioEngineCurrentViewDetail = "";
+    panel.append(detail);
+  }
+  detail.textContent = text;
+  panel.dataset.portfolioEngineDetail = "true";
+}
+
+function setPortfolioEngineHudCurrentView(viewName, options = {}) {
   if (portfolioEngineCurrentView) {
     portfolioEngineCurrentView.textContent = viewName;
+  }
+  if (!options.preserveDetail) {
+    setPortfolioEngineHudCurrentViewDetail("");
   }
 }
 
@@ -3214,14 +3247,23 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   const activeShowDetailRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
   const isHallPrototypeShowDetail = options?.showDetailVariant === "hall-prototype" || activeShowDetailRoute?.showDetailVariant === "hall-prototype";
   if (isHallPrototypeShowDetail) {
+    const prototypeEngineDetail = typeof getWrestlingShowDetailEngineTitle === "function"
+      ? getWrestlingShowDetailEngineTitle(showId)
+      : "";
     setPortfolioActiveWorld("battleground");
     setCurrentView("Daiion - Individual Campaign");
-    setPortfolioEngineHudCurrentView("Daiion - Individual Campaign");
+    setPortfolioEngineHudCurrentView("Daiion - Individual Campaign", { preserveDetail: true });
+    setPortfolioEngineHudCurrentViewDetail(prototypeEngineDetail);
     window.requestAnimationFrame(() => {
-      setPortfolioEngineHudCurrentView("Daiion - Individual Campaign");
+      const nextPrototypeEngineDetail = typeof getWrestlingShowDetailEngineTitle === "function"
+        ? getWrestlingShowDetailEngineTitle(showId)
+        : prototypeEngineDetail;
+      setPortfolioEngineHudCurrentView("Daiion - Individual Campaign", { preserveDetail: true });
+      setPortfolioEngineHudCurrentViewDetail(nextPrototypeEngineDetail);
     });
   } else {
     setCurrentView("Show Detail");
+    setPortfolioEngineHudCurrentViewDetail("");
   }
   setActiveGlobalNav("wrestling");
   if (startButton) {

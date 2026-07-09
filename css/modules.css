@@ -11591,6 +11591,32 @@ button.wrestling-event-history-tagged-thumb {
   scrollbar-width: none;
 }
 
+.wrestling-show-prototype-title {
+  position: absolute;
+  inset-block-start: calc(max(0.42rem, env(safe-area-inset-top)) + clamp(1.7rem, 4.2svh, 2.55rem) + clamp(0.58rem, 1.8svh, 1rem));
+  inset-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+  z-index: 3;
+  margin: 0;
+  color: rgba(255, 252, 246, 0.96);
+  font-size: clamp(2rem, 8.6vw, 4.45rem);
+  font-weight: 700;
+  line-height: 0.98;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+  text-shadow:
+    0 0 0.42rem rgba(255, 255, 255, 0.18),
+    0 0 1.15rem rgba(255, 90, 60, 0.32),
+    0 0 2.1rem rgba(135, 11, 16, 0.3),
+    0 0 2.6rem rgba(0, 0, 0, 0.74);
+}
+
+@media (max-width: 540px) {
+  .wrestling-show-prototype-title {
+    inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 0.58rem);
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+}
 .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]::-webkit-scrollbar {
   width: 0;
   height: 0;

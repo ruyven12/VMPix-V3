@@ -2078,6 +2078,22 @@ button {
 .portfolio-engine-panel--left .portfolio-engine-value {
   font-size: calc(clamp(0.68rem, 2.2vw, 0.96rem) + 3px);
 }
+
+.portfolio-engine-panel--left[data-portfolio-engine-detail="true"] {
+  gap: clamp(0.02rem, 0.2svh, 0.08rem);
+}
+
+.portfolio-engine-panel--left .portfolio-engine-value--detail {
+  color: rgba(255, 231, 208, 0.94);
+  font-size: clamp(0.58rem, 1.75vw, 0.82rem);
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 0 0.32rem rgb(var(--engine-accent-glow) / 0.18),
+    0 0 0.74rem rgb(var(--engine-accent) / 0.1);
+  white-space: nowrap;
+}
 .site-shell[data-shell-route="portfolio"] .portfolio-engine-panel--left .portfolio-engine-label {
   color: rgb(var(--engine-accent) / 0.66);
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
@@ -2416,6 +2432,10 @@ button {
 
   .portfolio-engine-panel--left .portfolio-engine-value {
     font-size: calc(clamp(0.58rem, 1.85vw, 0.72rem) + 3px);
+  }
+
+  .portfolio-engine-panel--left .portfolio-engine-value--detail {
+    font-size: clamp(0.54rem, 1.66vw, 0.68rem);
   }
 }
 

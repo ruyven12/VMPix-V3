@@ -2989,8 +2989,22 @@ function renderWrestlingShowDetailState(showId, stateName) {
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
 }
 
-function renderHallPrototypeShowDetailSurface() {
-  wrestlingShowDetailShell.replaceChildren();
+function renderHallPrototypeShowDetailSurface(show) {
+  const showTitle = show.title || show.eventName || show.showName || "Campaign Detail";
+  const title = document.createElement("h2");
+  title.className = "wrestling-show-prototype-title";
+  title.id = "wrestling-show-detail-title";
+  title.textContent = showTitle;
+
+  wrestlingShowDetailShell.replaceChildren(title);
+  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
+    setPortfolioEngineHudCurrentViewDetail(showTitle);
+  }
+}
+
+function getWrestlingShowDetailEngineTitle(showId = "warzone-26") {
+  const show = findLiveWrestlingShowById(showId) || getWrestlingDefaultShowRelationship(showId);
+  return getWrestlingText(show?.title || show?.eventName || show?.showName, "");
 }
 
 function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
