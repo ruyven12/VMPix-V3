@@ -1227,12 +1227,19 @@
               <span class="hall-crusades-archive-crystal__label">FIELD</span>
             </button>
             <div class="hall-crusades-year-drawer hall-crusades-field-drawer" id="hall-crusades-field-drawer" role="menu" aria-label="Field archive query" data-hall-crusades-field-drawer hidden></div>
-            <span class="hall-crusades-archive-crystal">
+            <button class="hall-crusades-archive-crystal hall-crusades-archive-crystal--search" type="button" aria-expanded="false" aria-pressed="false" aria-controls="hall-crusades-search-panel" data-hall-crusades-search-crystal>
               <span class="hall-crusades-archive-crystal__frame">
                 <span class="hall-crusades-archive-crystal__gem"></span>
               </span>
               <span class="hall-crusades-archive-crystal__label">SEARCH</span>
-            </span>
+            </button>
+            <div class="hall-crusades-search-panel" id="hall-crusades-search-panel" role="search" aria-label="Search archive records" data-hall-crusades-search-panel hidden>
+              <label class="hall-crusades-search-panel__field">
+                <span class="hall-crusades-search-panel__label">Archive Query</span>
+                <input class="hall-crusades-search-panel__input" type="search" autocomplete="off" placeholder="Search campaign archive" data-hall-crusades-search-input>
+              </label>
+              <button class="hall-crusades-search-panel__clear" type="button" data-hall-crusades-search-clear>CLEAR</button>
+            </div>
           </div>
           <ol class="hall-crusades-poster-strip" aria-label="Campaign archive records" data-hall-crusades-poster-strip></ol>
           <div class="hall-crusades-campaign-info-panel" data-hall-crusades-campaign-info-panel role="group" aria-label="Campaign Information" aria-live="polite" hidden></div>

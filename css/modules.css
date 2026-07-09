@@ -12055,6 +12055,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   color: rgba(255, 231, 208, 0.9);
 }
 
+.hall-crusades-archive-crystal--search.is-active .hall-crusades-archive-crystal__frame,
 .hall-crusades-archive-crystal--field.is-active .hall-crusades-archive-crystal__frame {
   border-color: rgba(255, 110, 82, 0.72);
   box-shadow:
@@ -12062,16 +12063,111 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.72rem rgba(255, 42, 26, 0.26);
 }
 
+.hall-crusades-archive-crystal--search.is-active .hall-crusades-archive-crystal__gem,
 .hall-crusades-archive-crystal--field.is-active .hall-crusades-archive-crystal__gem {
   box-shadow:
     0 0 0.44rem rgba(255, 42, 26, 0.54),
     0 0 1rem rgba(164, 15, 12, 0.24);
 }
 
+.hall-crusades-archive-crystal--search.is-active .hall-crusades-archive-crystal__label,
 .hall-crusades-archive-crystal--field.is-active .hall-crusades-archive-crystal__label {
   color: rgba(255, 231, 208, 0.9);
 }
 
+
+.hall-crusades-search-panel {
+  display: none;
+}
+
+.hall-crusades-search-panel[hidden] {
+  display: none !important;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-search-panel {
+  position: absolute;
+  inset-block-start: calc(100% + 0.5rem);
+  inset-inline-start: 50%;
+  z-index: 5;
+  inline-size: min(20rem, calc(100vw - 1rem));
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.34rem;
+  padding: 0.3rem;
+  pointer-events: auto;
+  background:
+    linear-gradient(135deg, rgba(255, 90, 60, 0.14), transparent 1.4rem),
+    rgba(5, 5, 8, 0.92);
+  border: 1px solid rgba(255, 90, 60, 0.38);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.05),
+    0 0.38rem 1.05rem rgba(0, 0, 0, 0.42),
+    0 0 0.6rem rgba(255, 42, 26, 0.14);
+  clip-path: polygon(0.42rem 0, 100% 0, 100% calc(100% - 0.42rem), calc(100% - 0.42rem) 100%, 0 100%, 0 0.42rem);
+  transform: translateX(-50%);
+}
+
+.hall-crusades-search-panel__field {
+  min-inline-size: 0;
+}
+
+.hall-crusades-search-panel__label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.hall-crusades-search-panel__input {
+  inline-size: 100%;
+  min-block-size: 1.76rem;
+  border: 1px solid rgba(255, 90, 60, 0.26);
+  border-radius: 0;
+  padding: 0.32rem 0.42rem;
+  background: rgba(3, 3, 6, 0.74);
+  color: rgba(255, 231, 208, 0.92);
+  font: inherit;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0;
+  outline: none;
+}
+
+.hall-crusades-search-panel__input::placeholder {
+  color: rgba(255, 214, 202, 0.42);
+}
+
+.hall-crusades-search-panel__input:focus {
+  border-color: rgba(255, 90, 60, 0.58);
+  box-shadow: 0 0 0.5rem rgba(255, 42, 26, 0.16);
+}
+
+.hall-crusades-search-panel__clear {
+  appearance: none;
+  min-block-size: 1.76rem;
+  border: 1px solid rgba(255, 90, 60, 0.24);
+  padding: 0.3rem 0.48rem;
+  background: rgba(255, 90, 60, 0.06);
+  color: rgba(255, 214, 202, 0.72);
+  cursor: pointer;
+  font: inherit;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: 0.54rem;
+  letter-spacing: 0;
+}
+
+.hall-crusades-search-panel__clear:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+.hall-crusades-search-panel__clear:focus-visible {
+  outline: 2px solid rgba(255, 231, 208, 0.82);
+  outline-offset: 0.12rem;
+}
 .hall-crusades-year-drawer {
   display: none;
 }
@@ -12504,6 +12600,18 @@ button.hall-crusades-archive-crystal:focus-visible {
     gap: 0.28rem;
   }
 
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-search-panel {
+    inline-size: min(22rem, calc(100vw - 1rem));
+    gap: 0.28rem;
+    padding: 0.26rem;
+  }
+
+  .hall-crusades-search-panel__input,
+  .hall-crusades-search-panel__clear {
+    min-block-size: 1.62rem;
+    font-size: 0.5rem;
+  }
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-year-drawer {
     inline-size: min(6.8rem, calc(100vw - 1rem));
     padding: 0.3rem;
