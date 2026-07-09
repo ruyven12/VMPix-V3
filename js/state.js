@@ -1977,6 +1977,20 @@ const routePaths = {
   connect: "/connect",
 };
 
+function routeWrestlingShowsEntryPoint(event) {
+  if (!ringArchiveShows || ringArchiveShows.disabled || ringArchiveShows.getAttribute("aria-disabled") === "true") {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  navigateToRoute(routePaths.wrestlingShows2);
+}
+
+if (ringArchiveShows) {
+  ringArchiveShows.addEventListener("click", routeWrestlingShowsEntryPoint, { capture: true });
+}
+
 const shellDrawerGroups = [
   { id: "shell", label: "Shell" },
   { id: "music", label: "The Music Nexus" },
@@ -2078,7 +2092,7 @@ const shellRouteRegistry = [
   },
   {
     id: "wrestling-shows",
-    route: routePaths.wrestlingShows,
+    route: routePaths.wrestlingShows2,
     label: "Shows",
     parentSection: "Wrestling Nexus",
     moduleType: "module-index",
