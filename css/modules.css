@@ -11876,6 +11876,7 @@ button.wrestling-event-history-tagged-thumb {
   line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-transform: none;
 }
 
 .hall-crusades-poster-strip {
@@ -12303,6 +12304,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: 0.54rem;
   letter-spacing: 0;
+  text-transform: none;
 }
 
 .hall-crusades-search-panel__clear:disabled {
@@ -12367,6 +12369,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   line-height: 1;
   letter-spacing: 0;
   text-align: center;
+  text-transform: none;
 }
 
 .hall-crusades-year-drawer__option[aria-checked="true"] {
@@ -12454,6 +12457,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-overflow: ellipsis;
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.22);
   white-space: nowrap;
+  text-transform: none;
 }
 
 @keyframes hallCrusadesCrystalEbbPulse {
