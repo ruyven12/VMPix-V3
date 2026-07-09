@@ -1984,7 +1984,7 @@ function routeWrestlingShowsEntryPoint(event) {
 
   event.preventDefault();
   event.stopImmediatePropagation();
-  navigateToRoute(routePaths.wrestlingShows2);
+  navigateToRoute(routePaths.wrestlingShows);
 }
 
 if (ringArchiveShows) {
@@ -2092,7 +2092,7 @@ const shellRouteRegistry = [
   },
   {
     id: "wrestling-shows",
-    route: routePaths.wrestlingShows2,
+    route: routePaths.wrestlingShows,
     label: "Shows",
     parentSection: "Wrestling Nexus",
     moduleType: "module-index",
@@ -2374,7 +2374,7 @@ const daiionArchiveFocusBriefings = {
   },
 };
 const daiionArchiveRouteTargets = {
-  campaigns: routePaths.wrestlingShows2,
+  campaigns: routePaths.wrestlingShows,
 };
 const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings));
 let daiionArchiveStatsRequestId = 0;
