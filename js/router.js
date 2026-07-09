@@ -128,7 +128,11 @@ function getRouteFromUrl(url = window.location.href) {
       return { name: "wrestling-match-gallery", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
     }
     if (routeParts.length === 1 && routeParts[0]) {
-      const dateKey = decodeRoutePart(routeParts[0]);
+      const routeShowId = decodeRoutePart(routeParts[0]);
+      if (routeShowId === "050826-2") {
+        return { name: "wrestling-show-detail", showId: "050826", dateKey: "050826", routeShowId, showDetailVariant: "hall-prototype", canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(routeShowId)}` };
+      }
+      const dateKey = routeShowId;
       return { name: "wrestling-show-detail", showId: dateKey, dateKey, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}` };
     }
   }
@@ -355,7 +359,11 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-show-detail") {
-    showWrestlingShowDetail(route.showId);
+    if (route.showDetailVariant) {
+      showWrestlingShowDetail(route.showId, { showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
+    } else {
+      showWrestlingShowDetail(route.showId);
+    }
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

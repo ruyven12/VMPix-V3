@@ -973,7 +973,7 @@ function requestWrestlingShowsData() {
       renderWrestlingShowsArchive({ skipDataRequest: true });
       const route = getRouteFromUrl();
       if (route.name === "wrestling-show-detail") {
-        renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true });
+        renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
       } else if (route.name === "wrestling-lightbox") {
@@ -988,7 +988,7 @@ function requestWrestlingShowsData() {
       renderWrestlingShowsArchive({ skipDataRequest: true });
       const route = getRouteFromUrl();
       if (route.name === "wrestling-show-detail") {
-        renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true });
+        renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
       } else if (route.name === "wrestling-lightbox") {
@@ -1100,7 +1100,7 @@ function requestWrestlingMatchPhotosForRoute(showId, matchRef, show) {
       }
       const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
       if (route?.name === "wrestling-show-detail") {
-        renderWrestlingShowDetailRoute(route.dateKey || route.showId || showId, { skipDataRequest: true });
+        renderWrestlingShowDetailRoute(route.dateKey || route.showId || showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route?.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(
           route.dateKey || route.showId || showId,
@@ -2992,6 +2992,20 @@ function renderWrestlingShowDetailState(showId, stateName) {
 function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   if (!wrestlingShowDetailShell) {
     return;
+  }
+
+  const activeRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const routeMatchesShow = activeRoute?.name === "wrestling-show-detail" && activeRoute.showId === showId;
+  const showDetailVariant = options.showDetailVariant || (routeMatchesShow ? activeRoute.showDetailVariant : "");
+  const routeShowId = options.routeShowId || (routeMatchesShow ? activeRoute.routeShowId : "");
+  if (showDetailVariant) {
+    wrestlingShowDetailShell.dataset.wrestlingShowDetailVariant = showDetailVariant;
+    if (routeShowId) {
+      wrestlingShowDetailShell.dataset.wrestlingShowDetailRouteId = routeShowId;
+    }
+  } else {
+    delete wrestlingShowDetailShell.dataset.wrestlingShowDetailVariant;
+    delete wrestlingShowDetailShell.dataset.wrestlingShowDetailRouteId;
   }
 
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
