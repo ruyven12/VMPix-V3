@@ -11719,6 +11719,8 @@ button.wrestling-event-history-tagged-thumb {
   align-content: start;
   gap: clamp(0.95rem, 2.25vw, 1.35rem);
   padding: clamp(0.95rem, 2.4vw, 1.55rem);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0.04em;
   border: 1px solid rgba(255, 90, 60, 0.2);
   background:
     linear-gradient(135deg, rgba(255, 90, 60, 0.08), transparent 1.4rem),
@@ -11731,11 +11733,11 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-show-prototype-card__title {
   margin: 0;
   color: rgba(248, 249, 252, 0.96);
-  font-family: var(--font-display);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: clamp(1.75rem, 4.8vw, 3.15rem);
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0;
+  letter-spacing: 0.04em;
   text-transform: none;
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.18);
 }
@@ -11760,19 +11762,22 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-show-prototype-card__label,
 .wrestling-show-prototype-card__value {
   margin: 0;
-  font-family: var(--font-display);
-  letter-spacing: 0;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   text-transform: none;
 }
 
 .wrestling-show-prototype-card__label {
-  color: rgba(255, 90, 60, 0.9);
+  color: rgba(255, 90, 60, 0.96);
   font-size: clamp(0.66rem, 1.48vw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .wrestling-show-prototype-card__value {
-  color: rgba(248, 249, 252, 0.94);
+  color: rgba(255, 231, 208, 0.82);
   font-size: clamp(0.92rem, 2.05vw, 1.12rem);
+  font-weight: 650;
+  letter-spacing: 0.04em;
   line-height: 1.22;
   overflow-wrap: anywhere;
 }
