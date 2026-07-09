@@ -11751,7 +11751,7 @@ button.wrestling-event-history-tagged-thumb {
 .hall-crusades-campaign-info-panel__date,
 .hall-crusades-campaign-info-panel__segment-count {
   overflow: hidden;
-  font-size: clamp(0.46rem, 1.3vw, 0.64rem);
+  font-size: clamp(0.6475rem, calc(1.3vw + 0.1875rem), 0.8275rem);
   font-weight: 600;
   line-height: 1;
   text-align: center;
@@ -11769,7 +11769,7 @@ button.wrestling-event-history-tagged-thumb {
 .hall-crusades-campaign-info-panel__title {
   overflow: hidden;
   color: rgba(248, 249, 252, 0.96);
-  font-size: clamp(0.74rem, 2vw, 1.02rem);
+  font-size: clamp(1.0525rem, calc(2vw + 0.3125rem), 1.3325rem);
   font-weight: 700;
   line-height: 1.02;
   text-align: center;
