@@ -11702,7 +11702,7 @@ button.wrestling-event-history-tagged-thumb {
   box-sizing: border-box;
   align-content: center;
   gap: 3px;
-  padding: calc(clamp(0.42rem, 1.2vw, 0.68rem) + 5px) clamp(0.62rem, 1.7vw, 1.05rem);
+  padding: calc(clamp(0.42rem, 1.2vw, 0.68rem) + 5px) calc(clamp(0.62rem, 1.7vw, 1.05rem) + 10px);
   color: rgba(245, 246, 248, 0.94);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0.04em;
@@ -11880,15 +11880,15 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-poster-strip__record {
   transition:
-    opacity 300ms cubic-bezier(0.22, 0.72, 0.2, 1),
-    transform 300ms cubic-bezier(0.22, 0.72, 0.2, 1);
+    opacity 420ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip[data-hall-crusades-flow-direction] .hall-crusades-poster-strip__record {
   --hall-crusades-flow-x: 0%;
   --hall-crusades-flow-scale: 0.62;
   --hall-crusades-flow-opacity: 0.28;
-  animation: hallCrusadesCoverFlowShift 300ms cubic-bezier(0.22, 0.72, 0.2, 1) backwards;
+  animation: hallCrusadesCoverFlowShift 420ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip[data-hall-crusades-flow-direction] .hall-crusades-poster-strip__item:nth-child(1) .hall-crusades-poster-strip__record,
