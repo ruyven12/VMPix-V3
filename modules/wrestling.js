@@ -2989,6 +2989,24 @@ function renderWrestlingShowDetailState(showId, stateName) {
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
 }
 
+function renderHallPrototypeShowDetailSurface(show) {
+  const surface = document.createElement("section");
+  surface.className = "wrestling-show-prototype-surface";
+  surface.setAttribute("aria-labelledby", "wrestling-show-detail-title");
+
+  const context = document.createElement("p");
+  context.className = "wrestling-show-prototype-surface__context";
+  context.textContent = "Daiion - Individual Campaign";
+
+  const title = document.createElement("h2");
+  title.className = "wrestling-show-prototype-surface__title";
+  title.id = "wrestling-show-detail-title";
+  title.textContent = show.title || show.eventName || show.showName || "Campaign Detail";
+
+  surface.append(context, title);
+  wrestlingShowDetailShell.replaceChildren(surface);
+}
+
 function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   if (!wrestlingShowDetailShell) {
     return;
@@ -3034,6 +3052,10 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
 
   setWrestlingRelationshipDataset(wrestlingShowDetailShell, show);
   wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
+  if (showDetailVariant === "hall-prototype") {
+    renderHallPrototypeShowDetailSurface(show);
+    return;
+  }
 
   const backButton = document.createElement("button");
   backButton.className = "wrestling-detail-back";
