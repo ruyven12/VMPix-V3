@@ -12365,6 +12365,54 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 1;
   transform: scale(1.25);
 }
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:not(.is-active) {
+  z-index: 1;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:not(.is-active) .hall-crusades-poster-strip__record {
+  border-color: rgba(223, 42, 28, 0.48);
+  box-shadow:
+    inset 0 0 0 1px rgba(247, 247, 242, 0.04),
+    0 0 0.75rem rgba(164, 15, 12, 0.2);
+  opacity: 0.46;
+  transform: scale(0.7);
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item.is-active),
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item {
+  z-index: 2;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item.is-active) .hall-crusades-poster-strip__record,
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item .hall-crusades-poster-strip__record {
+  opacity: 0.62;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item.is-active),
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item {
+  z-index: 3;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item.is-active) .hall-crusades-poster-strip__record,
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item .hall-crusades-poster-strip__record {
+  opacity: 0.82;
+  transform: scale(0.85);
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active {
+  z-index: 4;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+  border-color: rgba(247, 76, 52, 0.76);
+  box-shadow:
+    inset 0 0 0 1px rgba(247, 247, 242, 0.08),
+    0 0 1rem rgba(223, 42, 28, 0.34),
+    0 0 1.7rem rgba(164, 15, 12, 0.24);
+  opacity: 1;
+  transform: scale(1.25);
+}
 .hall-crusades-poster-strip__item.is-awaiting-communication {
   animation: hallCrusadesAwaitingPosterPulse 2.05s ease-in-out infinite;
 }
