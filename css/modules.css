@@ -12244,8 +12244,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .hall-crusades-archive-crystal__frame {
   position: relative;
-  inline-size: clamp(2.18rem, 7.2vw, 3rem);
-  block-size: clamp(2.18rem, 7.2vw, 3rem);
+  inline-size: clamp(2.38rem, 7.9vw, 3.28rem);
+  block-size: clamp(2.38rem, 7.9vw, 3.28rem);
   display: grid;
   place-items: center;
   background:
@@ -12257,6 +12257,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     inset 0 0 0 1px rgba(255, 231, 208, 0.04),
     0 0 0.54rem rgba(255, 42, 26, 0.14);
   clip-path: polygon(50% 0, 88% 16%, 100% 50%, 88% 84%, 50% 100%, 12% 84%, 0 50%, 12% 16%);
+  animation: hallCrusadesCrystalEbbPulse 3.4s ease-in-out infinite;
 }
 
 .hall-crusades-archive-crystal__frame::before,
@@ -12282,8 +12283,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 .hall-crusades-archive-crystal__gem {
   position: relative;
   z-index: 1;
-  inline-size: clamp(0.68rem, 2.1vw, 0.86rem);
-  block-size: clamp(0.68rem, 2.1vw, 0.86rem);
+  inline-size: clamp(0.78rem, 2.35vw, 0.98rem);
+  block-size: clamp(0.78rem, 2.35vw, 0.98rem);
   background:
     radial-gradient(circle at 34% 26%, rgba(255, 231, 208, 0.72), transparent 18%),
     linear-gradient(135deg, rgba(255, 110, 82, 0.96), rgba(155, 12, 10, 0.94) 62%, rgba(43, 4, 6, 0.98));
@@ -12292,13 +12293,14 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.34rem rgba(255, 42, 26, 0.38),
     0 0 0.76rem rgba(164, 15, 12, 0.16);
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  animation: hallCrusadesCrystalGemEbbPulse 3.4s ease-in-out infinite;
 }
 
 .hall-crusades-archive-crystal__label {
   max-inline-size: 100%;
   color: rgba(255, 214, 202, 0.72);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-  font-size: clamp(0.54rem, 1.95vw, 0.64rem);
+  font-size: clamp(0.66rem, 2.35vw, 0.77rem);
   line-height: 1;
   letter-spacing: 0;
   overflow: hidden;
@@ -12306,6 +12308,39 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-overflow: ellipsis;
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.22);
   white-space: nowrap;
+}
+
+@keyframes hallCrusadesCrystalEbbPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.08rem rgba(255, 90, 60, 0.1));
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 0.28rem rgba(255, 126, 44, 0.22))
+      drop-shadow(0 0 0.62rem rgba(223, 42, 28, 0.14));
+  }
+}
+
+@keyframes hallCrusadesCrystalGemEbbPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.08rem rgba(255, 42, 26, 0.12));
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 0.18rem rgba(255, 126, 44, 0.24))
+      drop-shadow(0 0 0.36rem rgba(223, 42, 28, 0.14));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hall-crusades-archive-crystal__frame,
+  .hall-crusades-archive-crystal__gem {
+    animation: none;
+  }
 }
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-poster-strip {
   position: absolute;
