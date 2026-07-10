@@ -11558,11 +11558,11 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-match-dossier-metadata__item {
   display: grid;
-  grid-template-columns: minmax(4.75rem, max-content) minmax(0, 1fr);
-  align-items: baseline;
-  gap: 0.42rem;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 0.24rem;
   min-width: 0;
-  padding: 0.26rem clamp(0.42rem, 1vw, 0.7rem);
+  padding: clamp(0.46rem, 1vw, 0.68rem) clamp(0.5rem, 1.15vw, 0.82rem);
 }
 
 .wrestling-match-dossier-metadata__item:nth-child(2n) {
@@ -11643,22 +11643,26 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     inline-size: min(100%, 34rem);
-    padding: 0.5rem 0.56rem;
+    padding: 0.46rem 0.5rem;
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item {
-    grid-template-columns: minmax(4.6rem, max-content) minmax(0, 1fr);
-    gap: 0.34rem;
-    padding: 0.24rem 0.22rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+    padding: 0.42rem 0.38rem;
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item:nth-child(2n) {
-    border-inline-start: 0;
+    border-inline-start: 1px solid rgba(255, 42, 26, 0.16);
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item + .wrestling-match-dossier-metadata__item {
+    border-block-start: 0;
+  }
+
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item:nth-child(n + 3) {
     border-block-start: 1px solid rgba(255, 42, 26, 0.14);
   }
 
