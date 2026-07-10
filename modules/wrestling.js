@@ -3013,6 +3013,10 @@ function getHallPrototypeMatchSource(match = {}) {
 
 function getHallPrototypeMatchTypeText(match = {}) {
   const source = getHallPrototypeMatchSource(match);
+  const segmentInfo = getHallPrototypeSegmentInfo(match);
+  if (segmentInfo) {
+    return segmentInfo.label;
+  }
   return getWrestlingText(
     source.stipulation ||
     source.matchType ||
@@ -3023,6 +3027,44 @@ function getHallPrototypeMatchTypeText(match = {}) {
     source.title,
     "Match"
   );
+}
+
+function getHallPrototypeSegmentInfo(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  const normalize = (value) => getWrestlingText(value).replace(/\s+/g, " ").trim();
+  const isSegmentValue = (value) => /\b(segment|promo|attack|angle|incident|interview)\b/i.test(value);
+  const classificationValues = [
+    source.match_type,
+    source.matchType,
+    source.type,
+    source.record_type,
+    source.recordType,
+    source.category,
+    source.classification,
+    source.kind,
+  ].map(normalize).filter(Boolean);
+  const detailValues = [
+    source.stipulation,
+    source.segment_type,
+    source.segmentType,
+    source.title,
+    source.notes,
+  ].map(normalize).filter(Boolean);
+  const primarySource = classificationValues.find(isSegmentValue) || detailValues.find(isSegmentValue);
+  if (!primarySource) {
+    return null;
+  }
+
+  const primary = /\bsegment\b/i.test(primarySource)
+    ? "Segment"
+    : /\bpromo\b/i.test(primarySource)
+      ? "Promo"
+      : "Segment";
+  const secondary = [...detailValues, ...classificationValues]
+    .find((value) => normalizeHallPrototypeWinnerText(value) !== normalizeHallPrototypeWinnerText(primary) && isSegmentValue(value));
+  const labelParts = [primary, secondary].filter(Boolean).map((value) => value.toUpperCase());
+
+  return { label: labelParts.join(" // ") };
 }
 
 function getHallPrototypeGroupedSideValue(source = {}, sideNumber = 1) {
@@ -3243,6 +3285,11 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
 function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   const card = document.createElement("li");
   card.className = "wrestling-show-prototype-encounter-card";
+  const segmentInfo = getHallPrototypeSegmentInfo(match);
+  if (segmentInfo) {
+    card.classList.add("wrestling-show-prototype-encounter-card--segment");
+    card.dataset.hallPrototypeEncounterState = "segment";
+  }
 
   const type = document.createElement("p");
   type.className = "wrestling-show-prototype-encounter-type";
