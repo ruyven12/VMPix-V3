@@ -11460,13 +11460,15 @@ button.wrestling-event-history-tagged-thumb {
   visibility: hidden;
 }
 
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) {
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]),
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] {
   background:
     linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
     url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
     #030306;
 }
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-hub {
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-hub,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .portfolio-hub {
   position: fixed;
   inset: 0;
   inline-size: 100vw;
@@ -11491,8 +11493,26 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-rings,
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-sweep,
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .ambient-particles,
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .cinema-fire-bg {
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .cinema-fire-bg,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .portfolio-hub::after,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .ambient-energy,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .ambient-rings,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .ambient-sweep,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .ambient-particles,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .cinema-fire-bg {
   display: none;
+}
+
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .home-frame,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .module-placeholder,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-shows-shell,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-show-detail-shell,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-gallery-shell,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-lightbox-shell {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] {
@@ -11590,6 +11610,7 @@ button.wrestling-event-history-tagged-thumb {
   overscroll-behavior: none;
   scrollbar-width: none;
 }
+
 
 .wrestling-show-prototype-title {
   position: absolute;
@@ -13972,7 +13993,8 @@ button.hall-crusades-archive-crystal:focus-visible {
     flex-basis: clamp(10.76625rem, 45.7875vw, 12.6225rem);
   }
 }
-.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .universal-bottom-rail {
+.site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .universal-bottom-rail,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .universal-bottom-rail {
   display: none;
 }
 
@@ -13981,7 +14003,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine,
-.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-engine {
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-engine,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .portfolio-engine {
   visibility: visible !important;
   opacity: 1 !important;
   pointer-events: none !important;
@@ -13993,7 +14016,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left,
-.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-engine-panel--left {
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-engine-panel--left,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
   grid-column: 1 / -1;
