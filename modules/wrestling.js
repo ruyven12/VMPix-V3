@@ -3889,6 +3889,7 @@ function createHallPrototypeEncounterSection(show = {}) {
   section.append(title, list);
   return section;
 }
+// Canonical production Wrestling Show Detail renderer; extend this shared Hall path instead of creating parallel renderers.
 function renderHallPrototypeShowDetailSurface(show) {
   const showTitle = getWrestlingText(show.title || show.eventName || show.showName, "Campaign Detail");
   const promotion = getWrestlingText(show.promotion, "Promotion Pending");
