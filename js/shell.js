@@ -3272,6 +3272,68 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   }
 }
 
+function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
+  if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && !isBlankWrestlingMatchDetailPrototypeRoute(route)) {
+    return;
+  }
+  if (!shell || !portfolioHub) {
+    return;
+  }
+
+  if (typeof setLightboxVisible === "function") {
+    setLightboxVisible(false);
+  }
+  if (typeof setWrestlingMatchLightboxRouteSyncActive === "function") {
+    setWrestlingMatchLightboxRouteSyncActive(false);
+  }
+
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-venue-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
+  shell.classList.add("has-entered-hub", "is-module-view");
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+  }
+  portfolioHub.setAttribute("aria-hidden", "false");
+  portfolioHub.removeAttribute("inert");
+  if (modulePlaceholder) {
+    modulePlaceholder.setAttribute("aria-hidden", "true");
+    modulePlaceholder.setAttribute("inert", "");
+  }
+  if (musicNexusShell) {
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.setAttribute("inert", "");
+  }
+  if (ringArchiveShell) {
+    ringArchiveShell.setAttribute("aria-hidden", "true");
+    ringArchiveShell.setAttribute("inert", "");
+  }
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingVenueDetailHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  if (aboutShell) {
+    aboutShell.setAttribute("aria-hidden", "true");
+    aboutShell.setAttribute("inert", "");
+  }
+  if (calendarShell) {
+    calendarShell.setAttribute("aria-hidden", "true");
+    calendarShell.setAttribute("inert", "");
+  }
+  if (contactShell) {
+    contactShell.setAttribute("aria-hidden", "true");
+    contactShell.setAttribute("inert", "");
+  }
+  setHubChromeHidden(true);
+  setActiveGlobalNav("wrestling");
+  if (startButton) {
+    startButton.disabled = true;
+    startButton.setAttribute("aria-busy", "false");
+  }
+}
+
 function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richardson-vs-bear-bronson") {
   if (!shell || !portfolioHub || !wrestlingMatchGalleryShell) {
     return;

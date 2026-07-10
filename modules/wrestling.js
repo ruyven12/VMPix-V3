@@ -972,7 +972,11 @@ function requestWrestlingShowsData() {
       }
       renderWrestlingShowsArchive({ skipDataRequest: true });
       const route = getRouteFromUrl();
-      if (route.name === "wrestling-show-detail") {
+      if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && isBlankWrestlingMatchDetailPrototypeRoute(route)) {
+        if (typeof showWrestlingMatchDetailPrototype === "function") {
+          showWrestlingMatchDetailPrototype(route);
+        }
+      } else if (route.name === "wrestling-show-detail") {
         renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
@@ -987,7 +991,11 @@ function requestWrestlingShowsData() {
       setWrestlingShowsCollection([], "error");
       renderWrestlingShowsArchive({ skipDataRequest: true });
       const route = getRouteFromUrl();
-      if (route.name === "wrestling-show-detail") {
+      if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && isBlankWrestlingMatchDetailPrototypeRoute(route)) {
+        if (typeof showWrestlingMatchDetailPrototype === "function") {
+          showWrestlingMatchDetailPrototype(route);
+        }
+      } else if (route.name === "wrestling-show-detail") {
         renderWrestlingShowDetailRoute(route.showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(route.dateKey || route.showId, route.matchRef || route.matchId, { skipDataRequest: true });
@@ -1099,7 +1107,11 @@ function requestWrestlingMatchPhotosForRoute(showId, matchRef, show) {
         return false;
       }
       const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
-      if (route?.name === "wrestling-show-detail") {
+      if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && isBlankWrestlingMatchDetailPrototypeRoute(route)) {
+        if (typeof showWrestlingMatchDetailPrototype === "function") {
+          showWrestlingMatchDetailPrototype(route);
+        }
+      } else if (route?.name === "wrestling-show-detail") {
         renderWrestlingShowDetailRoute(route.dateKey || route.showId || showId, { skipDataRequest: true, showDetailVariant: route.showDetailVariant, routeShowId: route.routeShowId });
       } else if (route?.name === "wrestling-match-gallery") {
         updateWrestlingMatchGalleryRelationshipHooks(
@@ -8921,6 +8933,14 @@ function updateWrestlingMatchGalleryDisplay(show, match) {
 }
 
 function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
+  const activeRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && isBlankWrestlingMatchDetailPrototypeRoute(activeRoute)) {
+    if (typeof showWrestlingMatchDetailPrototype === "function") {
+      showWrestlingMatchDetailPrototype(activeRoute);
+    }
+    return;
+  }
+
   const show = findLiveWrestlingShowById(showId);
   const title = stateName === "loading"
     ? "Loading Match"
@@ -8949,6 +8969,14 @@ function updateWrestlingMatchGalleryState(showId, matchRef, stateName) {
 
 function updateWrestlingMatchGalleryRelationshipHooks(showId = "warzone-26", matchRef = "1", options = {}) {
   if (!wrestlingMatchGalleryShell) {
+    return;
+  }
+
+  const activeRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && isBlankWrestlingMatchDetailPrototypeRoute(activeRoute)) {
+    if (typeof showWrestlingMatchDetailPrototype === "function") {
+      showWrestlingMatchDetailPrototype(activeRoute);
+    }
     return;
   }
 

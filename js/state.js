@@ -1976,6 +1976,20 @@ const routePaths = {
   connect: "/connect",
 };
 
+const WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID = "062026";
+const WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID = "match-1a";
+
+function isBlankWrestlingMatchDetailPrototypeRoute(route) {
+  if (!route || route.name !== "wrestling-match-detail-prototype" || route.matchDetailPrototype !== "blank") {
+    return false;
+  }
+
+  const routeShowId = String(route.dateKey || route.showId || "").trim().toLowerCase();
+  const routeMatchId = String(route.matchRef || route.matchId || "").trim().toLowerCase();
+  return routeShowId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID &&
+    routeMatchId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID;
+}
+
 function routeWrestlingShowsEntryPoint(event) {
   if (!ringArchiveShows || ringArchiveShows.disabled || ringArchiveShows.getAttribute("aria-disabled") === "true") {
     return;

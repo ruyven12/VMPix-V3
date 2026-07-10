@@ -114,7 +114,7 @@ function getRouteFromUrl(url = window.location.href) {
     if (routeParts.length === 2 && routeParts[0] && routeParts[1]) {
       const dateKey = decodeRoutePart(routeParts[0]);
       const routeMatchId = decodeRoutePart(routeParts[1]).trim().toLowerCase();
-      if (dateKey === "062026" && routeMatchId === "match-1a") {
+      if (dateKey === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID && routeMatchId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID) {
         return { name: "wrestling-match-detail-prototype", showId: dateKey, dateKey, matchId: routeMatchId, matchRef: routeMatchId, matchDetailPrototype: "blank", canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(routeMatchId)}` };
       }
       const matchRef = decodeWrestlingMatchRouteSegment(routeParts[1]);
@@ -371,6 +371,13 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-match-detail-prototype") {
+    if (
+      typeof showWrestlingMatchDetailPrototype === "function" &&
+      typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" &&
+      isBlankWrestlingMatchDetailPrototypeRoute(route)
+    ) {
+      showWrestlingMatchDetailPrototype(route);
+    }
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
