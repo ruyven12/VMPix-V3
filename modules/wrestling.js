@@ -3063,10 +3063,14 @@ function getHallPrototypeExpandedParticipantLabels(values, knownParticipants = [
   };
 
   getHallPrototypeUniqueLabels(values).forEach((label) => {
-    const hasSafeDelimiter = /[,;]/.test(label);
+    const isWrappedRoster = /^\s*\(.+\)\s*$/.test(label) && /[,;]|\s+and\s+/i.test(label);
+    const participantLabel = isWrappedRoster
+      ? label.replace(/^\s*\(\s*/, "").replace(/\s*\)\s*$/, "")
+      : label;
+    const hasSafeDelimiter = /[,;]/.test(participantLabel);
     const delimitedParts = hasSafeDelimiter
-      ? label.split(/\s*[,;]\s*/).filter(Boolean)
-      : [label];
+      ? participantLabel.split(/\s*[,;]\s*/).filter(Boolean)
+      : [participantLabel];
 
     delimitedParts.forEach((part) => {
       const andParts = part.split(/\s+and\s+/i).map(getHallPrototypeSafeText).filter(Boolean);
@@ -3490,6 +3494,8 @@ function getHallPrototypeWinnerTarget(match = {}, sides = []) {
     const names = getHallPrototypeEncounterSideNames(side.names);
     const nameKeys = [...new Set(names.map(normalizeHallPrototypeWinnerText).filter(Boolean))];
     const sideLabels = getWrestlingLabelArray(side.labels).map(getWrestlingText).filter(Boolean);
+    const sideLabelNames = sideLabels.map((label) => getHallPrototypeExpandedParticipantLabels([label], names));
+    const hasExplicitRosterLabel = sideLabelNames.some((labelNames) => labelNames.length > 1);
     const completeSideKeys = new Set();
     const joinedNames = names.map(getWrestlingText).filter(Boolean);
 
@@ -3506,6 +3512,13 @@ function getHallPrototypeWinnerTarget(match = {}, sides = []) {
       if (sideLabelKey) {
         completeSideKeys.add(sideLabelKey);
       }
+    } else if (hasExplicitRosterLabel) {
+      sideLabels.forEach((sideLabel, labelIndex) => {
+        const sideLabelKey = normalizeHallPrototypeWinnerText(sideLabel);
+        if (sideLabelNames[labelIndex].length === 1 && nameKeys.includes(sideLabelKey)) {
+          completeSideKeys.add(sideLabelKey);
+        }
+      });
     }
 
     const matchedParticipantKeys = nameKeys.filter((key) => winnerKeys.has(key));
