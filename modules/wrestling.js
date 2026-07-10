@@ -3099,6 +3099,17 @@ function getHallPrototypeClassificationData(match = {}) {
   const detailFields = ["stipulation", "segment_type", "segmentType", "title"];
   const classificationValues = readValues(classificationFields);
   const detailValues = readValues(detailFields);
+  const battleRoyalClassificationKeys = new Set([
+    "battle royal",
+    "battle royale",
+    "royal rumble",
+    "rumble",
+  ]);
+  const battleRoyalInfo = classificationValues.some((value) =>
+    battleRoyalClassificationKeys.has(normalizeHallPrototypeWinnerText(value))
+  )
+    ? { label: "BATTLE ROYAL" }
+    : null;
   const segmentValues = [...classificationValues, ...detailValues, getHallPrototypeSafeText(rawSource.notes)].filter(Boolean);
   const isSegmentValue = (value) => /\b(segment|promo|attack|angle|incident|interview)\b/i.test(value);
   const primarySource = segmentValues.find(isSegmentValue);
@@ -3146,7 +3157,7 @@ function getHallPrototypeClassificationData(match = {}) {
   ].map(getHallPrototypeSafeText).filter(Boolean);
   const heading = segmentInfo?.label || headingCandidates.find((value) => !/^match(?:\s+\d+)?$/i.test(value)) || "Encounter";
 
-  return { heading, segmentInfo };
+  return { heading, segmentInfo, battleRoyalInfo };
 }
 
 function getHallPrototypeMatchTypeText(match = {}) {
@@ -3514,23 +3525,78 @@ function getHallPrototypeWinnerTarget(match = {}, sides = []) {
   };
 }
 
+function getHallPrototypeBattleRoyalSides(participants = [], fallbackSides = []) {
+  const participantNames = participants.map(getHallPrototypeSafeText).filter(Boolean);
+  const fallbackNames = fallbackSides
+    .flatMap((side) => side.names || [])
+    .map(getHallPrototypeSafeText)
+    .filter((name) => name && normalizeHallPrototypeWinnerText(name) !== "side pending");
+  const entrantNames = participantNames.length > 0 ? participantNames : fallbackNames;
+  if (entrantNames.length === 0) {
+    return null;
+  }
+
+  const midpoint = Math.ceil(entrantNames.length / 2);
+  return [
+    {
+      side: 1,
+      labels: entrantNames.slice(0, midpoint),
+      names: entrantNames.slice(0, midpoint),
+      entrantNumbers: entrantNames.slice(0, midpoint).map((_, index) => index + 1),
+    },
+    {
+      side: 2,
+      labels: entrantNames.slice(midpoint),
+      names: entrantNames.slice(midpoint),
+      entrantNumbers: entrantNames.slice(midpoint).map((_, index) => midpoint + index + 1),
+    },
+  ];
+}
+
+function getHallPrototypeBattleRoyalWinnerTarget(match = {}, sides = []) {
+  const winnerNames = getHallPrototypeMatchWinnerNames(match);
+  if (winnerNames.length !== 1) {
+    return { side: 0, participantWinnerKeys: [] };
+  }
+
+  const winnerKey = normalizeHallPrototypeWinnerText(winnerNames[0]);
+  const matchingSides = sides.filter((side) =>
+    side.names.some((name) => normalizeHallPrototypeWinnerText(name) === winnerKey)
+  );
+  if (!winnerKey || matchingSides.length !== 1) {
+    return { side: 0, participantWinnerKeys: [] };
+  }
+
+  return {
+    side: matchingSides[0].side,
+    participantWinnerKeys: [winnerKey],
+  };
+}
+
 function normalizeHallPrototypeEncounterRecord(match = {}) {
   const classification = getHallPrototypeClassificationData(match);
   const sideData = getHallPrototypeMatchSides(match);
-  const sides = sideData.sides.map((side) => ({
+  const normalizedSides = sideData.sides.map((side) => ({
     side: side.side,
     labels: [...side.labels],
     names: [...side.names],
   }));
+  const battleRoyalSides = classification.battleRoyalInfo
+    ? getHallPrototypeBattleRoyalSides(sideData.participants, normalizedSides)
+    : null;
+  const sides = battleRoyalSides || normalizedSides;
 
   return {
     heading: classification.heading,
     segmentInfo: classification.segmentInfo,
+    battleRoyalInfo: classification.battleRoyalInfo,
     participants: [...sideData.participants],
     sides,
     officials: getHallPrototypeMatchOfficialNames(match),
     notes: getHallPrototypeMatchNotes(match),
-    winnerTarget: getHallPrototypeWinnerTarget(match, sides),
+    winnerTarget: classification.battleRoyalInfo
+      ? getHallPrototypeBattleRoyalWinnerTarget(match, sides)
+      : getHallPrototypeWinnerTarget(match, sides),
   };
 }
 
@@ -3547,10 +3613,27 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
   sideValue.className = "wrestling-show-prototype-encounter-side-value";
   const participantWinnerKeys = new Set(options.participantWinnerKeys || []);
 
-  getHallPrototypeEncounterSideNames(values).forEach((name) => {
+  const entrantNumbers = Array.isArray(options.entrantNumbers) ? options.entrantNumbers : [];
+
+  getHallPrototypeEncounterSideNames(values).forEach((name, index) => {
     const nameLine = document.createElement("span");
     nameLine.className = "wrestling-show-prototype-encounter-side-name";
-    nameLine.textContent = name;
+    const entrantNumber = Number(entrantNumbers[index]);
+    if (Number.isInteger(entrantNumber) && entrantNumber > 0) {
+      nameLine.classList.add("wrestling-show-prototype-encounter-side-name--numbered");
+      nameLine.dataset.hallPrototypeEntrantNumber = String(entrantNumber);
+
+      const number = document.createElement("span");
+      number.className = "wrestling-show-prototype-encounter-entrant-number";
+      number.textContent = entrantNumber + " -";
+
+      const entrantName = document.createElement("span");
+      entrantName.className = "wrestling-show-prototype-encounter-entrant-name";
+      entrantName.textContent = name;
+      nameLine.append(number, entrantName);
+    } else {
+      nameLine.textContent = name;
+    }
     if (participantWinnerKeys.has(normalizeHallPrototypeWinnerText(name))) {
       nameLine.classList.add("wrestling-show-prototype-encounter-side-name--winner");
       nameLine.dataset.hallPrototypeWinnerParticipant = "true";
@@ -3571,10 +3654,23 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     card.classList.add("wrestling-show-prototype-encounter-card--segment");
     card.dataset.hallPrototypeEncounterState = "segment";
   }
+  if (encounter.battleRoyalInfo) {
+    card.classList.add("wrestling-show-prototype-encounter-card--battle-royal");
+    card.dataset.hallPrototypeEncounterState = "battle-royal";
+  }
 
   const type = document.createElement("p");
   type.className = "wrestling-show-prototype-encounter-type";
   type.textContent = encounter.heading;
+
+  const battleRoyalClassification = encounter.battleRoyalInfo &&
+    normalizeHallPrototypeWinnerText(encounter.heading) !== normalizeHallPrototypeWinnerText(encounter.battleRoyalInfo.label)
+      ? document.createElement("p")
+      : null;
+  if (battleRoyalClassification) {
+    battleRoyalClassification.className = "wrestling-show-prototype-encounter-classification";
+    battleRoyalClassification.textContent = encounter.battleRoyalInfo.label;
+  }
 
   const combatants = document.createElement("div");
   combatants.className = "wrestling-show-prototype-encounter-combatants";
@@ -3589,13 +3685,15 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
 
   combatants.append(
     createHallPrototypeEncounterSide("Side 1", sideOne.names, {
-      isWinner: winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
+      isWinner: !encounter.battleRoyalInfo && winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 1 ? winnerTarget.participantWinnerKeys : [],
+      entrantNumbers: sideOne.entrantNumbers,
     }),
     versus,
     createHallPrototypeEncounterSide("Side 2", sideTwo.names, {
-      isWinner: winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
+      isWinner: !encounter.battleRoyalInfo && winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 2 ? winnerTarget.participantWinnerKeys : [],
+      entrantNumbers: sideTwo.entrantNumbers,
     })
   );
 
@@ -3615,7 +3713,11 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   }
 
   card.dataset.wrestlingMatchIndex = String(matchIndex + 1);
-  card.append(type, combatants);
+  card.append(type);
+  if (battleRoyalClassification) {
+    card.append(battleRoyalClassification);
+  }
+  card.append(combatants);
   return card;
 }
 

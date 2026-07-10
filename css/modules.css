@@ -11978,6 +11978,55 @@ button.wrestling-event-history-tagged-thumb {
   background: linear-gradient(90deg, transparent, rgba(255, 132, 36, 0.76), transparent);
   box-shadow: 0 0 0.28rem rgba(255, 112, 26, 0.2);
 }
+
+.wrestling-show-prototype-encounter-card--battle-royal {
+  block-size: auto;
+  min-block-size: 0;
+  overflow: visible;
+}
+
+.wrestling-show-prototype-encounter-classification {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  margin: 0;
+  color: rgba(255, 231, 208, 0.72);
+  font-size: clamp(0.64rem, 0.78vw, 0.76rem);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.14em;
+}
+
+.wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side {
+  justify-items: start;
+  text-align: left;
+}
+
+.wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side-value {
+  inline-size: 100%;
+  gap: 0.16rem;
+}
+
+.wrestling-show-prototype-encounter-side-name--numbered {
+  display: grid;
+  grid-template-columns: minmax(2.25rem, max-content) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 0.28rem;
+  max-inline-size: 100%;
+  text-align: left;
+}
+
+.wrestling-show-prototype-encounter-entrant-number {
+  color: rgba(255, 135, 98, 0.74);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.wrestling-show-prototype-encounter-entrant-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
 .wrestling-show-prototype-encounter-type {
   position: relative;
   z-index: 1;
@@ -12253,6 +12302,19 @@ button.wrestling-event-history-tagged-thumb {
     gap: 0.04rem;
     font-size: clamp(0.68rem, 2.72vw, 0.82rem);
     line-height: 1.08;
+  }
+
+  .wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-combatants {
+    column-gap: clamp(0.2rem, 1.5vw, 0.4rem);
+  }
+
+  .wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side-value {
+    gap: 0.12rem;
+  }
+
+  .wrestling-show-prototype-encounter-side-name--numbered {
+    grid-template-columns: minmax(1.65rem, max-content) minmax(0, 1fr);
+    column-gap: 0.18rem;
   }
 
   .wrestling-show-prototype-encounter-side--winner::before {
