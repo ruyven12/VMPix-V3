@@ -11999,7 +11999,7 @@ button.wrestling-event-history-tagged-thumb {
   text-align: left;
 }
 
-.wrestling-show-prototype-encounter-side:last-child {
+.wrestling-show-prototype-encounter-side:last-of-type {
   justify-items: end;
   padding-inline-end: clamp(0.28rem, 1.1vw, 0.72rem);
   text-align: right;
@@ -12047,9 +12047,9 @@ button.wrestling-event-history-tagged-thumb {
   grid-column: 1 / -1;
   justify-self: center;
   max-inline-size: min(100%, 28rem);
-  margin: clamp(0.36rem, 0.7vw, 0.48rem) 0 0;
+  margin: 5px 0 0;
   color: rgba(255, 231, 208, 0.58);
-  font-size: clamp(0.54rem, 0.78vw, 0.68rem);
+  font-size: clamp(0.665rem, 0.9vw, 0.805rem);
   font-weight: 600;
   line-height: 1.15;
   text-align: center;
@@ -12117,7 +12117,7 @@ button.wrestling-event-history-tagged-thumb {
     text-align: left;
   }
 
-  .wrestling-show-prototype-encounter-side:last-child {
+  .wrestling-show-prototype-encounter-side:last-of-type {
     justify-items: end;
     padding-inline-end: 0;
     text-align: right;
@@ -12137,8 +12137,8 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-show-prototype-encounter-official {
     max-inline-size: 100%;
-    margin-block-start: 0.36rem;
-    font-size: clamp(0.5rem, 2.1vw, 0.62rem);
+    margin-block-start: 5px;
+    font-size: clamp(0.625rem, 2.45vw, 0.745rem);
     line-height: 1.12;
   }
 }
@@ -12248,7 +12248,7 @@ button.wrestling-event-history-tagged-thumb {
     padding-inline-start: clamp(0.16rem, 0.72vw, 0.42rem);
   }
 
-  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-side:last-child {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-side:last-of-type {
     padding-inline-end: clamp(0.16rem, 0.72vw, 0.42rem);
   }
 
@@ -12265,8 +12265,8 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official {
-    margin-block-start: clamp(0.12rem, 0.32svh, 0.2rem);
-    font-size: clamp(0.45rem, 0.55vw, 0.54rem);
+    margin-block-start: 5px;
+    font-size: clamp(0.575rem, 0.68vw, 0.665rem);
     line-height: 1;
   }
 }
