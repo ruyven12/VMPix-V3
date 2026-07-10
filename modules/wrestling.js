@@ -3112,6 +3112,51 @@ function getHallPrototypeEncounterSideNames(values) {
   return names.length > 0 ? names : ["Side Pending"];
 }
 
+function getHallPrototypeMatchOfficialNames(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  const names = [];
+  const seen = new Set();
+  const addName = (value) => {
+    const text = getWrestlingText(value);
+    if (!text) {
+      return;
+    }
+    const key = text.toLowerCase();
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    names.push(text);
+  };
+  const addValues = (values) => {
+    values.forEach((value) => {
+      getWrestlingLabelArray(value).forEach((label) => {
+        label.split(/\s*,\s*/).forEach(addName);
+      });
+    });
+  };
+
+  addValues([
+    source.referees,
+    source.referee,
+    source.referee_names,
+    source.refereeNames,
+    source.referee_name,
+    source.refereeName,
+    source.officials,
+    source.official,
+    source.match_officials,
+    source.matchOfficials,
+    source.match_official,
+    source.matchOfficial,
+  ]);
+
+  if (names.length === 0) {
+    addValues([source.refereeIds, source.referee_ids]);
+  }
+
+  return names;
+}
 function createHallPrototypeEncounterSide(label, values) {
   const side = document.createElement("div");
   side.className = "wrestling-show-prototype-encounter-side";
@@ -3151,6 +3196,14 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     versus,
     createHallPrototypeEncounterSide("Side 2", getHallPrototypeMatchSideLabels(match, 2))
   );
+
+  const officials = getHallPrototypeMatchOfficialNames(match);
+  if (officials.length > 0) {
+    const official = document.createElement("p");
+    official.className = "wrestling-show-prototype-encounter-official";
+    official.textContent = `${officials.length > 1 ? "OFFICIALS" : "OFFICIAL"} • ${officials.join(", ")}`;
+    combatants.append(official);
+  }
 
   card.dataset.wrestlingMatchIndex = String(matchIndex + 1);
   card.append(type, combatants);

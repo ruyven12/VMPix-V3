@@ -12041,6 +12041,20 @@ button.wrestling-event-history-tagged-thumb {
   clip-path: polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
 }
 
+.wrestling-show-prototype-encounter-official {
+  position: relative;
+  z-index: 1;
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-inline-size: min(100%, 28rem);
+  margin: clamp(0.36rem, 0.7vw, 0.48rem) 0 0;
+  color: rgba(255, 231, 208, 0.58);
+  font-size: clamp(0.54rem, 0.78vw, 0.68rem);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  letter-spacing: 0.075em;
+}
 .wrestling-show-prototype-encounter-card--empty {
   color: rgba(255, 231, 208, 0.78);
   font-size: clamp(0.78rem, 1.2vw, 0.95rem);
@@ -12119,6 +12133,13 @@ button.wrestling-event-history-tagged-thumb {
     inline-size: clamp(2rem, 8vw, 2.45rem);
     block-size: clamp(1.36rem, 5.8vw, 1.7rem);
     font-size: clamp(0.58rem, 2.35vw, 0.72rem);
+  }
+
+  .wrestling-show-prototype-encounter-official {
+    max-inline-size: 100%;
+    margin-block-start: 0.36rem;
+    font-size: clamp(0.5rem, 2.1vw, 0.62rem);
+    line-height: 1.12;
   }
 }
 @media (min-width: 900px) {
@@ -12241,6 +12262,12 @@ button.wrestling-event-history-tagged-thumb {
     inline-size: clamp(2.1rem, 2.8vw, 2.45rem);
     block-size: clamp(1.34rem, 1.8vw, 1.55rem);
     font-size: clamp(0.62rem, 0.78vw, 0.72rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official {
+    margin-block-start: clamp(0.12rem, 0.32svh, 0.2rem);
+    font-size: clamp(0.45rem, 0.55vw, 0.54rem);
+    line-height: 1;
   }
 }
 .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]::-webkit-scrollbar {
