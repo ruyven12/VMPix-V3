@@ -11597,6 +11597,57 @@ button.wrestling-event-history-tagged-thumb {
   text-transform: uppercase;
 }
 
+.wrestling-match-dossier-photo-highlights {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  justify-items: center;
+  gap: 0.24rem;
+  inline-size: min(100%, 64rem);
+  margin: 0;
+  padding: clamp(0.62rem, 1.2vw, 0.84rem) clamp(0.72rem, 1.4vw, 1rem);
+  border: 1px solid rgba(255, 42, 26, 0.32);
+  background:
+    linear-gradient(90deg, rgba(213, 22, 34, 0.07), transparent 52%, rgba(213, 22, 34, 0.045)),
+    rgba(3, 4, 7, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.024),
+    0 0.16rem 0.48rem rgba(0, 0, 0, 0.26);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.wrestling-match-dossier-photo-highlights::before {
+  position: absolute;
+  inset: 0.24rem;
+  z-index: -1;
+  content: "";
+  border: 1px solid rgba(255, 90, 60, 0.06);
+  pointer-events: none;
+}
+
+.wrestling-match-dossier-photo-highlights__title,
+.wrestling-match-dossier-photo-highlights__count {
+  margin: 0;
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  line-height: 1.1;
+  letter-spacing: 0.08em;
+}
+
+.wrestling-match-dossier-photo-highlights__title {
+  color: rgba(247, 247, 242, 0.86);
+  font-size: clamp(0.76rem, 1vw, 0.92rem);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.wrestling-match-dossier-photo-highlights__count {
+  color: rgba(255, 231, 208, 0.58);
+  font-size: clamp(0.62rem, 0.82vw, 0.74rem);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero {
   inline-size: min(100%, 64rem);
   min-block-size: clamp(8.2rem, 17vw, 11.5rem);
@@ -11664,6 +11715,12 @@ button.wrestling-event-history-tagged-thumb {
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item:nth-child(n + 3) {
     border-block-start: 1px solid rgba(255, 42, 26, 0.14);
+  }
+
+
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-photo-highlights {
+    inline-size: min(100%, 34rem);
+    padding: 0.58rem 0.72rem;
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
