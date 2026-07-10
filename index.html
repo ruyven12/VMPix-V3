@@ -20,6 +20,15 @@
 </head>
 <body>
   <div class="site-shell is-home-route" data-portfolio-gateway-world="" data-portfolio-gateway-route="" data-portfolio-gateway-state="idle">
+    <script>
+      (() => {
+        const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (routePath === "/wrestling/shows/062026/match-1a") {
+          document.currentScript.parentElement.classList.remove("is-home-route");
+          document.currentScript.parentElement.setAttribute("data-shell-route", "wrestling-match-detail-prototype");
+        }
+      })();
+    </script>
     <div class="ambient-system">
       <video class="cinema-fire-bg" autoplay muted loop playsinline aria-hidden="true" preload="metadata">
         <source src="/assets/media/background/background-fire.mp4" type="video/mp4">
