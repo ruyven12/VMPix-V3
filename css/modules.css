@@ -12073,7 +12073,6 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-show-prototype-encounter-side--winner::after {
   inset: -0.34rem -0.52rem -0.28rem;
   z-index: -1;
-  border-block-end: 1px solid rgba(255, 108, 46, 0.74);
   background:
     linear-gradient(90deg, rgba(255, 58, 26, 0.16), rgba(255, 120, 42, 0.06) 48%, transparent),
     radial-gradient(circle at 50% 100%, rgba(255, 104, 34, 0.18), transparent 68%);
@@ -12142,7 +12141,7 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-show-prototype-encounter-official {
-  margin: 5px 0 0;
+  margin: 10px 0 0;
 }
 
 .wrestling-show-prototype-encounter-note {
@@ -12251,7 +12250,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-show-prototype-encounter-official {
-    margin-block-start: 5px;
+    margin-block-start: 10px;
   }
 
   .wrestling-show-prototype-encounter-note {
@@ -12394,7 +12393,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official {
-    margin-block-start: 5px;
+    margin-block-start: 10px;
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-note {
