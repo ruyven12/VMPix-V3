@@ -3516,6 +3516,12 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   const routeMatchesShow = activeRoute?.name === "wrestling-show-detail" && activeRoute.showId === showId;
   const showDetailVariant = options.showDetailVariant || (routeMatchesShow ? activeRoute.showDetailVariant : "");
   const routeShowId = options.routeShowId || (routeMatchesShow ? activeRoute.routeShowId : "");
+  const usesHallShowDetailPresentation = !showDetailVariant || showDetailVariant === "hall-prototype";
+  if (usesHallShowDetailPresentation) {
+    wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation = "hall";
+  } else {
+    delete wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation;
+  }
   if (showDetailVariant) {
     wrestlingShowDetailShell.dataset.wrestlingShowDetailVariant = showDetailVariant;
     if (routeShowId) {
@@ -3552,7 +3558,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
 
   setWrestlingRelationshipDataset(wrestlingShowDetailShell, show);
   wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
-  if (showDetailVariant === "hall-prototype") {
+  if (usesHallShowDetailPresentation) {
     renderHallPrototypeShowDetailSurface(show);
     return;
   }
