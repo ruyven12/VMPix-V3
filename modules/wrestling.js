@@ -3157,10 +3157,74 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
 
   return names;
 }
-function createHallPrototypeEncounterSide(label, values) {
+
+function normalizeHallPrototypeWinnerText(value) {
+  return getWrestlingText(value)
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function getHallPrototypeMatchWinnerNames(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  const names = [];
+  const seen = new Set();
+  const addName = (value) => {
+    const text = getWrestlingText(value);
+    const key = normalizeHallPrototypeWinnerText(text);
+    if (!key || seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    names.push(text);
+  };
+
+  [source.winner, source.winners].forEach((value) => {
+    getWrestlingLabelArray(value).forEach((label) => {
+      addName(label);
+      if (label.includes(",")) {
+        label.split(/\s*,\s*/).forEach(addName);
+      }
+    });
+  });
+
+  return names;
+}
+
+function getHallPrototypeWinnerSide(match = {}, sideOneNames = [], sideTwoNames = []) {
+  const winners = getHallPrototypeMatchWinnerNames(match).map(normalizeHallPrototypeWinnerText).filter(Boolean);
+  if (winners.length === 0) {
+    return 0;
+  }
+
+  const getSideKeys = (names = []) => {
+    const keys = new Set(names.map(normalizeHallPrototypeWinnerText).filter(Boolean));
+    const joinedNames = names.map(getWrestlingText).filter(Boolean);
+    [joinedNames.join(" "), joinedNames.join(", ")]
+      .map(normalizeHallPrototypeWinnerText)
+      .filter(Boolean)
+      .forEach((key) => keys.add(key));
+    return keys;
+  };
+  const sideOneKeys = getSideKeys(sideOneNames);
+  const sideTwoKeys = getSideKeys(sideTwoNames);
+  const sideOneMatched = winners.some((winner) => sideOneKeys.has(winner));
+  const sideTwoMatched = winners.some((winner) => sideTwoKeys.has(winner));
+
+  if (sideOneMatched === sideTwoMatched) {
+    return 0;
+  }
+  return sideOneMatched ? 1 : 2;
+}
+
+function createHallPrototypeEncounterSide(label, values, options = {}) {
   const side = document.createElement("div");
   side.className = "wrestling-show-prototype-encounter-side";
-  side.setAttribute("aria-label", label);
+  if (options.isWinner) {
+    side.classList.add("wrestling-show-prototype-encounter-side--winner");
+    side.dataset.hallPrototypeWinnerSide = "true";
+  }
+  side.setAttribute("aria-label", options.isWinner ? `${label} winner` : label);
 
   const sideValue = document.createElement("p");
   sideValue.className = "wrestling-show-prototype-encounter-side-value";
@@ -3191,10 +3255,16 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   versus.className = "wrestling-show-prototype-encounter-vs";
   versus.textContent = "VS";
 
+  const sideOneLabels = getHallPrototypeMatchSideLabels(match, 1);
+  const sideTwoLabels = getHallPrototypeMatchSideLabels(match, 2);
+  const sideOneNames = getHallPrototypeEncounterSideNames(sideOneLabels);
+  const sideTwoNames = getHallPrototypeEncounterSideNames(sideTwoLabels);
+  const winnerSide = getHallPrototypeWinnerSide(match, sideOneNames, sideTwoNames);
+
   combatants.append(
-    createHallPrototypeEncounterSide("Side 1", getHallPrototypeMatchSideLabels(match, 1)),
+    createHallPrototypeEncounterSide("Side 1", sideOneLabels, { isWinner: winnerSide === 1 }),
     versus,
-    createHallPrototypeEncounterSide("Side 2", getHallPrototypeMatchSideLabels(match, 2))
+    createHallPrototypeEncounterSide("Side 2", sideTwoLabels, { isWinner: winnerSide === 2 })
   );
 
   const officials = getHallPrototypeMatchOfficialNames(match);
