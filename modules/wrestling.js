@@ -3200,9 +3200,72 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
   return names;
 }
 
+function normalizeHallPrototypeNoteComparison(value) {
+  return getWrestlingText(value)
+    .replace(/[\u2018\u2019'":/\\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function getHallPrototypeNoteComparisonVariants(value) {
+  const normalized = normalizeHallPrototypeNoteComparison(value);
+  if (!normalized) {
+    return [];
+  }
+  const variants = new Set([normalized]);
+  variants.add(normalized.replace(/\s+match$/i, "").trim());
+  return [...variants].filter(Boolean);
+}
+
+function isHallPrototypeDuplicateNote(notes, match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  const noteVariants = getHallPrototypeNoteComparisonVariants(notes);
+  if (noteVariants.length === 0) {
+    return true;
+  }
+
+  const generatedHeading = getHallPrototypeMatchTypeText(match);
+  const generatedHeadingVariants = new Set(getHallPrototypeNoteComparisonVariants(generatedHeading));
+  const noteWordCount = noteVariants[0].split(/\s+/).filter(Boolean).length;
+  if (noteWordCount >= 6 && !noteVariants.some((variant) => generatedHeadingVariants.has(variant))) {
+    return false;
+  }
+
+  const headingValues = [
+    source.match_type,
+    source.matchType,
+    source.stipulation,
+    source.type,
+    generatedHeading,
+  ].map((value) => getWrestlingText(value)).filter(Boolean);
+  const title = getWrestlingText(source.title);
+  if (title && getHallPrototypeNoteComparisonVariants(title).some((variant) => generatedHeadingVariants.has(variant))) {
+    headingValues.push(title);
+  }
+
+  const combinationValues = [];
+  headingValues.forEach((primary, index) => {
+    headingValues.slice(index + 1).forEach((secondary) => {
+      combinationValues.push(`${primary} ${secondary}`, `${primary} / ${secondary}`, `${primary} // ${secondary}`);
+    });
+  });
+
+  const duplicateVariants = new Set(
+    [...headingValues, ...combinationValues]
+      .flatMap(getHallPrototypeNoteComparisonVariants)
+  );
+
+  return noteVariants.some((variant) => duplicateVariants.has(variant));
+}
+
 function getHallPrototypeMatchNotes(match = {}) {
   const source = getHallPrototypeMatchSource(match);
-  return getWrestlingText(source.notes).replace(/\s+/g, " ").trim();
+  const notes = getWrestlingText(source.notes).replace(/\s+/g, " ").trim();
+  if (!notes || isHallPrototypeDuplicateNote(notes, match)) {
+    return "";
+  }
+  return notes;
 }
 
 function normalizeHallPrototypeWinnerText(value) {
