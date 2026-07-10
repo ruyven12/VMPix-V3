@@ -11512,12 +11512,13 @@ button.wrestling-event-history-tagged-thumb {
   inset: 0;
   z-index: 34;
   display: grid;
-  place-items: center;
+  align-items: start;
+  justify-items: center;
   inline-size: 100vw;
   block-size: 100vh;
   block-size: 100svh;
   padding:
-    max(1rem, env(safe-area-inset-top))
+    calc(env(safe-area-inset-top) + clamp(1.25rem, 2.4svh, 1.875rem))
     clamp(1rem, 3vw, 2.4rem)
     calc(var(--engine-emitter-size, 4.6rem) + max(1.2rem, env(safe-area-inset-bottom)) + 1rem);
   box-sizing: border-box;
@@ -11557,13 +11558,13 @@ button.wrestling-event-history-tagged-thumb {
 @media (max-width: 640px) {
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-detail-prototype-shell {
     padding:
-      max(0.86rem, env(safe-area-inset-top))
-      clamp(0.76rem, 4vw, 1rem)
+      calc(env(safe-area-inset-top) + clamp(1.25rem, 2.8svh, 1.75rem))
+      clamp(0.5rem, 2.5vw, 0.75rem)
       calc(var(--engine-emitter-size, 4.6rem) + max(1rem, env(safe-area-inset-bottom)) + 0.72rem);
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero {
-    inline-size: min(100%, 30rem);
+    inline-size: min(100%, 34rem);
     min-block-size: clamp(7.2rem, 31vw, 9.6rem);
     gap: 0.56rem;
     padding: 0.86rem 0.78rem;
