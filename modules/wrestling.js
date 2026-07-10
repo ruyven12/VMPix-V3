@@ -4177,6 +4177,54 @@ function createWrestlingMatchDossierPhotoHighlights(show = null, match = null) {
   section.append(title, count);
   return section;
 }
+
+function getWrestlingMatchDossierPreviewPhotos(match = null) {
+  return getWrestlingMatchPhotoItems(match)
+    .filter((photo) => photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc)
+    .slice(0, 6);
+}
+
+function getWrestlingMatchDossierPreviewPhotoSrc(photo = {}) {
+  return photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc || "";
+}
+
+function createWrestlingMatchDossierPhotoPreviewGrid(match = null) {
+  const photos = getWrestlingMatchDossierPreviewPhotos(match);
+  if (photos.length === 0) {
+    return null;
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "wrestling-match-dossier-photo-preview-grid";
+  grid.dataset.wrestlingPhotoPreviewCount = String(photos.length);
+  grid.setAttribute("role", "list");
+  grid.setAttribute("aria-label", "Match photo preview");
+
+  photos.forEach((photo, index) => {
+    const imageSrc = getWrestlingMatchDossierPreviewPhotoSrc(photo);
+    if (!imageSrc) {
+      return;
+    }
+
+    const tile = document.createElement("div");
+    tile.className = "wrestling-match-dossier-photo-preview-tile";
+    tile.dataset.wrestlingPhotoId = photo.photoId || String(index + 1).padStart(3, "0");
+    tile.setAttribute("role", "listitem");
+
+    const image = document.createElement("img");
+    image.className = "wrestling-match-dossier-photo-preview-image";
+    image.src = imageSrc;
+    image.alt = getWrestlingText(photo.label, `Match photo ${index + 1}`);
+    image.loading = "lazy";
+    image.decoding = "async";
+
+    tile.append(image);
+    grid.append(tile);
+  });
+
+  return grid.childElementCount > 0 ? grid : null;
+}
+
 function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), options = {}) {
   if (
     !wrestlingMatchDetailPrototypeShell ||
@@ -4192,7 +4240,8 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
   const hero = createWrestlingMatchDossierHero(match);
   const metadata = createWrestlingMatchDossierMetadata(show);
   const photoHighlights = createWrestlingMatchDossierPhotoHighlights(show, match);
-  wrestlingMatchDetailPrototypeShell.replaceChildren(...[hero, metadata, photoHighlights].filter(Boolean));
+  const photoPreviewGrid = createWrestlingMatchDossierPhotoPreviewGrid(match);
+  wrestlingMatchDetailPrototypeShell.replaceChildren(...[hero, metadata, photoHighlights, photoPreviewGrid].filter(Boolean));
 
   if (
     !options.skipDataRequest &&
