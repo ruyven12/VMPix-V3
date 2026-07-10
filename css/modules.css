@@ -12045,18 +12045,27 @@ button.wrestling-event-history-tagged-thumb {
   text-align: right;
 }
 
-.wrestling-show-prototype-encounter-side--winner {
+.wrestling-show-prototype-encounter-side--winner,
+.wrestling-show-prototype-encounter-side-name--winner {
   isolation: isolate;
 }
 
+.wrestling-show-prototype-encounter-side-name--winner {
+  position: relative;
+  z-index: 1;
+}
+
 .wrestling-show-prototype-encounter-side--winner::before,
-.wrestling-show-prototype-encounter-side--winner::after {
+.wrestling-show-prototype-encounter-side--winner::after,
+.wrestling-show-prototype-encounter-side-name--winner::before,
+.wrestling-show-prototype-encounter-side-name--winner::after {
   position: absolute;
   pointer-events: none;
   content: "";
 }
 
-.wrestling-show-prototype-encounter-side--winner::before {
+.wrestling-show-prototype-encounter-side--winner::before,
+.wrestling-show-prototype-encounter-side-name--winner::before {
   inset-block-end: calc(100% + 0.1rem);
   inset-inline: 0;
   z-index: 2;
@@ -12070,7 +12079,8 @@ button.wrestling-event-history-tagged-thumb {
   text-shadow: 0 0 0.28rem rgba(255, 80, 28, 0.34);
 }
 
-.wrestling-show-prototype-encounter-side--winner::after {
+.wrestling-show-prototype-encounter-side--winner::after,
+.wrestling-show-prototype-encounter-side-name--winner::after {
   inset: -0.34rem -0.52rem -0.28rem;
   z-index: -1;
   background:
@@ -12083,7 +12093,8 @@ button.wrestling-event-history-tagged-thumb {
   clip-path: polygon(0.22rem 0, 100% 0, calc(100% - 0.22rem) 100%, 0 100%);
 }
 
-.wrestling-show-prototype-encounter-side--winner .wrestling-show-prototype-encounter-side-value {
+.wrestling-show-prototype-encounter-side--winner .wrestling-show-prototype-encounter-side-value,
+.wrestling-show-prototype-encounter-side-name--winner {
   color: rgba(255, 245, 232, 0.98);
   text-shadow:
     0 0 0.28rem rgba(255, 108, 46, 0.28),
@@ -12103,6 +12114,22 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-show-prototype-encounter-side-name {
   display: block;
+}
+
+.wrestling-show-prototype-encounter-side-name--winner::before {
+  inset-block-start: 50%;
+  inset-block-end: auto;
+  inset-inline: auto;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.wrestling-show-prototype-encounter-side:first-child .wrestling-show-prototype-encounter-side-name--winner::before {
+  inset-inline-start: calc(100% + 0.32rem);
+}
+
+.wrestling-show-prototype-encounter-side:last-of-type .wrestling-show-prototype-encounter-side-name--winner::before {
+  inset-inline-end: calc(100% + 0.32rem);
 }
 
 .wrestling-show-prototype-encounter-vs {
@@ -12233,7 +12260,12 @@ button.wrestling-event-history-tagged-thumb {
     font-size: clamp(0.38rem, 1.55vw, 0.5rem);
   }
 
-  .wrestling-show-prototype-encounter-side--winner::after {
+  .wrestling-show-prototype-encounter-side-name--winner::before {
+    font-size: clamp(0.38rem, 1.55vw, 0.5rem);
+  }
+
+  .wrestling-show-prototype-encounter-side--winner::after,
+  .wrestling-show-prototype-encounter-side-name--winner::after {
     inset: -0.28rem -0.36rem -0.22rem;
   }
   .wrestling-show-prototype-encounter-vs {
@@ -12377,7 +12409,12 @@ button.wrestling-event-history-tagged-thumb {
     font-size: clamp(0.36rem, 0.46vw, 0.44rem);
   }
 
-  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side--winner::after {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-name--winner::before {
+    font-size: clamp(0.36rem, 0.46vw, 0.44rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side--winner::after,
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-name--winner::after {
     inset: -0.24rem -0.38rem -0.18rem;
   }
   .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-vs {

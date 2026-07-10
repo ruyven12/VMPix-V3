@@ -3301,30 +3301,78 @@ function getHallPrototypeMatchWinnerNames(match = {}) {
   return names;
 }
 
-function getHallPrototypeWinnerSide(match = {}, sideOneNames = [], sideTwoNames = []) {
-  const winners = getHallPrototypeMatchWinnerNames(match).map(normalizeHallPrototypeWinnerText).filter(Boolean);
-  if (winners.length === 0) {
-    return 0;
-  }
-
-  const getSideKeys = (names = []) => {
-    const keys = new Set(names.map(normalizeHallPrototypeWinnerText).filter(Boolean));
-    const joinedNames = names.map(getWrestlingText).filter(Boolean);
-    [joinedNames.join(" "), joinedNames.join(", ")]
+function getHallPrototypeWinnerTarget(match = {}, sides = []) {
+  const source = getHallPrototypeMatchSource(match);
+  const rawWinnerKeys = new Set(
+    [source.winner, source.winners]
+      .flatMap(getWrestlingLabelArray)
       .map(normalizeHallPrototypeWinnerText)
       .filter(Boolean)
-      .forEach((key) => keys.add(key));
-    return keys;
-  };
-  const sideOneKeys = getSideKeys(sideOneNames);
-  const sideTwoKeys = getSideKeys(sideTwoNames);
-  const sideOneMatched = winners.some((winner) => sideOneKeys.has(winner));
-  const sideTwoMatched = winners.some((winner) => sideTwoKeys.has(winner));
-
-  if (sideOneMatched === sideTwoMatched) {
-    return 0;
+  );
+  const winnerKeys = new Set(
+    getHallPrototypeMatchWinnerNames(match)
+      .map(normalizeHallPrototypeWinnerText)
+      .filter(Boolean)
+  );
+  const emptyTarget = { side: 0, participantWinnerKeys: [] };
+  if (rawWinnerKeys.size === 0 || winnerKeys.size === 0) {
+    return emptyTarget;
   }
-  return sideOneMatched ? 1 : 2;
+
+  const targets = sides.map((side, index) => {
+    const names = getHallPrototypeEncounterSideNames(side.names);
+    const nameKeys = [...new Set(names.map(normalizeHallPrototypeWinnerText).filter(Boolean))];
+    const sideLabels = getWrestlingLabelArray(side.labels).map(getWrestlingText).filter(Boolean);
+    const completeSideKeys = new Set();
+    const joinedNames = names.map(getWrestlingText).filter(Boolean);
+
+    if (nameKeys.length === 1) {
+      completeSideKeys.add(nameKeys[0]);
+    } else if (nameKeys.length > 1) {
+      [joinedNames.join(" "), joinedNames.join(", "), joinedNames.join(" and ")]
+        .map(normalizeHallPrototypeWinnerText)
+        .filter(Boolean)
+        .forEach((key) => completeSideKeys.add(key));
+    }
+    if (sideLabels.length === 1) {
+      const sideLabelKey = normalizeHallPrototypeWinnerText(sideLabels[0]);
+      if (sideLabelKey) {
+        completeSideKeys.add(sideLabelKey);
+      }
+    }
+
+    const matchedParticipantKeys = nameKeys.filter((key) => winnerKeys.has(key));
+    const isFullSideWinner = [...rawWinnerKeys].some((key) => completeSideKeys.has(key)) ||
+      (nameKeys.length > 1 && matchedParticipantKeys.length === nameKeys.length);
+    const participantWinnerKeys = !isFullSideWinner && nameKeys.length > 1 && matchedParticipantKeys.length === 1
+      ? matchedParticipantKeys
+      : [];
+
+    return {
+      side: side.side || index + 1,
+      nameKeys,
+      completeSideKeys,
+      isFullSideWinner,
+      participantWinnerKeys,
+    };
+  });
+  const activeTargets = targets.filter((target) => target.isFullSideWinner || target.participantWinnerKeys.length > 0);
+  if (activeTargets.length !== 1) {
+    return emptyTarget;
+  }
+
+  const target = activeTargets[0];
+  const allWinnerValuesRecognized = [...rawWinnerKeys].every(
+    (key) => target.completeSideKeys.has(key) || target.nameKeys.includes(key)
+  );
+  if (!allWinnerValuesRecognized) {
+    return emptyTarget;
+  }
+
+  return {
+    side: target.side,
+    participantWinnerKeys: target.participantWinnerKeys,
+  };
 }
 
 function createHallPrototypeEncounterSide(label, values, options = {}) {
@@ -3334,15 +3382,21 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
     side.classList.add("wrestling-show-prototype-encounter-side--winner");
     side.dataset.hallPrototypeWinnerSide = "true";
   }
-  side.setAttribute("aria-label", options.isWinner ? `${label} winner` : label);
+  side.setAttribute("aria-label", options.isWinner ? label + " winner" : label);
 
   const sideValue = document.createElement("p");
   sideValue.className = "wrestling-show-prototype-encounter-side-value";
+  const participantWinnerKeys = new Set(options.participantWinnerKeys || []);
 
   getHallPrototypeEncounterSideNames(values).forEach((name) => {
     const nameLine = document.createElement("span");
     nameLine.className = "wrestling-show-prototype-encounter-side-name";
     nameLine.textContent = name;
+    if (participantWinnerKeys.has(normalizeHallPrototypeWinnerText(name))) {
+      nameLine.classList.add("wrestling-show-prototype-encounter-side-name--winner");
+      nameLine.dataset.hallPrototypeWinnerParticipant = "true";
+      nameLine.setAttribute("aria-label", name + " winner");
+    }
     sideValue.append(nameLine);
   });
 
@@ -3374,12 +3428,21 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   const sideTwoLabels = getHallPrototypeMatchSideLabels(match, 2);
   const sideOneNames = getHallPrototypeEncounterSideNames(sideOneLabels);
   const sideTwoNames = getHallPrototypeEncounterSideNames(sideTwoLabels);
-  const winnerSide = getHallPrototypeWinnerSide(match, sideOneNames, sideTwoNames);
+  const winnerTarget = getHallPrototypeWinnerTarget(match, [
+    { side: 1, labels: sideOneLabels, names: sideOneNames },
+    { side: 2, labels: sideTwoLabels, names: sideTwoNames },
+  ]);
 
   combatants.append(
-    createHallPrototypeEncounterSide("Side 1", sideOneLabels, { isWinner: winnerSide === 1 }),
+    createHallPrototypeEncounterSide("Side 1", sideOneLabels, {
+      isWinner: winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
+      participantWinnerKeys: winnerTarget.side === 1 ? winnerTarget.participantWinnerKeys : [],
+    }),
     versus,
-    createHallPrototypeEncounterSide("Side 2", sideTwoLabels, { isWinner: winnerSide === 2 })
+    createHallPrototypeEncounterSide("Side 2", sideTwoLabels, {
+      isWinner: winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
+      participantWinnerKeys: winnerTarget.side === 2 ? winnerTarget.participantWinnerKeys : [],
+    })
   );
 
   const officials = getHallPrototypeMatchOfficialNames(match);
