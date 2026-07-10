@@ -12048,8 +12048,9 @@ button.wrestling-event-history-tagged-thumb {
 }
 @media (max-width: 540px) {
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-surface {
-    max-block-size: min(72svh, 38rem);
-    margin-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 20px - max(1rem, env(safe-area-inset-top)));
+    --hall-prototype-mobile-top-clearance: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 20px - max(1rem, env(safe-area-inset-top)));
+    max-block-size: calc(100svh - max(1rem, env(safe-area-inset-top)) - var(--hall-prototype-mobile-top-clearance) - var(--engine-emitter-size, 4.6rem) - max(1rem, env(safe-area-inset-bottom)) - 20px);
+    margin-block-start: var(--hall-prototype-mobile-top-clearance);
   }
 }
 
