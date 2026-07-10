@@ -3011,147 +3011,290 @@ function getHallPrototypeMatchSource(match = {}) {
     : match || {};
 }
 
-function getHallPrototypeMatchTypeText(match = {}) {
-  const source = getHallPrototypeMatchSource(match);
-  const segmentInfo = getHallPrototypeSegmentInfo(match);
-  if (segmentInfo) {
-    return segmentInfo.label;
+function getHallPrototypeRawMatchSource(match = {}) {
+  return match?.backend_record && typeof match.backend_record === "object"
+    ? match.backend_record
+    : match && typeof match === "object"
+      ? match
+      : {};
+}
+
+function getHallPrototypeSafeText(value) {
+  if (value && typeof value === "object") {
+    return getWrestlingLabelArray(value)
+      .map((label) => getWrestlingText(label).replace(/\s+/g, " ").trim())
+      .find((label) => label && label !== "[object Object]") || "";
   }
-  return getWrestlingText(
-    source.stipulation ||
-    source.matchType ||
-    source.match_type ||
-    source.type ||
-    source.notes ||
-    source.matchName ||
-    source.title,
-    "Match"
+  const text = getWrestlingText(value).replace(/\s+/g, " ").trim();
+  return text === "[object Object]" ? "" : text;
+}
+
+function getHallPrototypeUniqueLabels(value) {
+  const labels = [];
+  const seen = new Set();
+  getWrestlingLabelArray(value).forEach((valueLabel) => {
+    const label = getHallPrototypeSafeText(valueLabel);
+    const key = label.toLowerCase();
+    if (!label || seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    labels.push(label);
+  });
+  return labels;
+}
+
+function getHallPrototypeExpandedParticipantLabels(values, knownParticipants = []) {
+  const knownKeys = new Set(
+    getHallPrototypeUniqueLabels(knownParticipants)
+      .map(normalizeHallPrototypeWinnerText)
+      .filter(Boolean)
   );
+  const names = [];
+  const seen = new Set();
+  const addName = (value) => {
+    const name = getHallPrototypeSafeText(value);
+    const key = normalizeHallPrototypeWinnerText(name);
+    if (!key || seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    names.push(name);
+  };
+
+  getHallPrototypeUniqueLabels(values).forEach((label) => {
+    const hasSafeDelimiter = /[,;]/.test(label);
+    const delimitedParts = hasSafeDelimiter
+      ? label.split(/\s*[,;]\s*/).filter(Boolean)
+      : [label];
+
+    delimitedParts.forEach((part) => {
+      const andParts = part.split(/\s+and\s+/i).map(getHallPrototypeSafeText).filter(Boolean);
+      const canSplitAnd = andParts.length > 1 && (
+        hasSafeDelimiter ||
+        andParts.every((name) => knownKeys.has(normalizeHallPrototypeWinnerText(name)))
+      );
+      (canSplitAnd ? andParts : [part]).forEach(addName);
+    });
+  });
+
+  return names;
+}
+
+function getHallPrototypeClassificationData(match = {}) {
+  const rawSource = getHallPrototypeRawMatchSource(match);
+  const readValues = (fields) => fields
+    .map((field) => getHallPrototypeSafeText(rawSource[field]))
+    .filter(Boolean);
+  const classificationFields = [
+    "match_type",
+    "matchType",
+    "type",
+    "record_type",
+    "recordType",
+    "category",
+    "classification",
+    "kind",
+  ];
+  const detailFields = ["stipulation", "segment_type", "segmentType", "title"];
+  const classificationValues = readValues(classificationFields);
+  const detailValues = readValues(detailFields);
+  const segmentValues = [...classificationValues, ...detailValues, getHallPrototypeSafeText(rawSource.notes)].filter(Boolean);
+  const isSegmentValue = (value) => /\b(segment|promo|attack|angle|incident|interview)\b/i.test(value);
+  const primarySource = segmentValues.find(isSegmentValue);
+  let segmentInfo = null;
+
+  if (primarySource) {
+    const primary = /\bsegment\b/i.test(primarySource)
+      ? "Segment"
+      : /\bpromo\b/i.test(primarySource)
+        ? "Promo"
+        : "Segment";
+    const secondary = [...detailValues, ...classificationValues]
+      .find((value) => normalizeHallPrototypeWinnerText(value) !== normalizeHallPrototypeWinnerText(primary) && isSegmentValue(value));
+    segmentInfo = {
+      label: [primary, secondary].filter(Boolean).map((value) => value.toUpperCase()).join(" // "),
+    };
+  }
+
+  const rawNote = getHallPrototypeSafeText(rawSource.notes);
+  const rawNoteVariants = new Set(getHallPrototypeNoteComparisonVariants(rawNote));
+  const classificationVariants = new Set(
+    [...classificationValues, ...detailValues]
+      .flatMap(getHallPrototypeNoteComparisonVariants)
+  );
+  const noteDuplicatesClassification = [...rawNoteVariants].some((variant) => classificationVariants.has(variant));
+  const shortLegacyLabel = rawNote &&
+    rawNote.split(/\s+/).filter(Boolean).length <= 5 &&
+    !noteDuplicatesClassification
+      ? rawNote
+      : "";
+  const headingCandidates = [
+    rawSource.stipulation,
+    rawSource.matchType,
+    shortLegacyLabel,
+    rawSource.match_type,
+    rawSource.type,
+    rawSource.record_type,
+    rawSource.recordType,
+    rawSource.category,
+    rawSource.classification,
+    rawSource.kind,
+    rawSource.segment_type,
+    rawSource.segmentType,
+    rawSource.title,
+  ].map(getHallPrototypeSafeText).filter(Boolean);
+  const heading = segmentInfo?.label || headingCandidates.find((value) => !/^match(?:\s+\d+)?$/i.test(value)) || "Encounter";
+
+  return { heading, segmentInfo };
+}
+
+function getHallPrototypeMatchTypeText(match = {}) {
+  return getHallPrototypeClassificationData(match).heading;
 }
 
 function getHallPrototypeSegmentInfo(match = {}) {
+  return getHallPrototypeClassificationData(match).segmentInfo;
+}
+
+function getHallPrototypeParticipantLabels(match = {}) {
+  const rawSource = getHallPrototypeRawMatchSource(match);
   const source = getHallPrototypeMatchSource(match);
-  const normalize = (value) => getWrestlingText(value).replace(/\s+/g, " ").trim();
-  const isSegmentValue = (value) => /\b(segment|promo|attack|angle|incident|interview)\b/i.test(value);
-  const classificationValues = [
-    source.match_type,
-    source.matchType,
-    source.type,
-    source.record_type,
-    source.recordType,
-    source.category,
-    source.classification,
-    source.kind,
-  ].map(normalize).filter(Boolean);
-  const detailValues = [
-    source.stipulation,
-    source.segment_type,
-    source.segmentType,
-    source.title,
-    source.notes,
-  ].map(normalize).filter(Boolean);
-  const primarySource = classificationValues.find(isSegmentValue) || detailValues.find(isSegmentValue);
-  if (!primarySource) {
+  const participantFields = [
+    "participants",
+    "participant_names",
+    "participantNames",
+    "related_people",
+    "relatedPeople",
+  ];
+  const candidates = [
+    ...participantFields.map((field) => rawSource[field]),
+    ...(rawSource === source ? [] : participantFields.map((field) => source[field])),
+  ];
+
+  for (const candidate of candidates) {
+    const participants = getHallPrototypeExpandedParticipantLabels(candidate);
+    if (participants.length > 0) {
+      return participants;
+    }
+  }
+  return [];
+}
+
+function getHallPrototypeGroupedSideValue(groupedSides, sideNumber = 1) {
+  if (Array.isArray(groupedSides)) {
+    return groupedSides[sideNumber - 1];
+  }
+  if (!groupedSides || typeof groupedSides !== "object") {
     return null;
   }
 
-  const primary = /\bsegment\b/i.test(primarySource)
-    ? "Segment"
-    : /\bpromo\b/i.test(primarySource)
-      ? "Promo"
-      : "Segment";
-  const secondary = [...detailValues, ...classificationValues]
-    .find((value) => normalizeHallPrototypeWinnerText(value) !== normalizeHallPrototypeWinnerText(primary) && isSegmentValue(value));
-  const labelParts = [primary, secondary].filter(Boolean).map((value) => value.toUpperCase());
-
-  return { label: labelParts.join(" // ") };
+  const groupedFields = sideNumber === 1
+    ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1"]
+    : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2"];
+  for (const field of groupedFields) {
+    if (getHallPrototypeUniqueLabels(groupedSides[field]).length > 0) {
+      return groupedSides[field];
+    }
+  }
+  return groupedSides[sideNumber - 1] || groupedSides[sideNumber] || null;
 }
 
-function getHallPrototypeGroupedSideValue(source = {}, sideNumber = 1) {
-  const groupedSides = [
+function getHallPrototypeSideLabels(match = {}, sideNumber = 1) {
+  const source = getHallPrototypeMatchSource(match);
+  const directFields = sideNumber === 1
+    ? ["side_1", "side1", "side_one", "sideOne"]
+    : ["side_2", "side2", "side_two", "sideTwo"];
+  const aliasFields = sideNumber === 1
+    ? ["team_1", "team1", "team_one", "teamOne", "participant_1", "participant1", "participants_1", "participants1", "participant_side_1", "participantSide1"]
+    : ["team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2", "participants_2", "participants2", "participant_side_2", "participantSide2"];
+
+  for (const field of directFields) {
+    const labels = getHallPrototypeUniqueLabels(source[field]);
+    if (labels.length > 0) {
+      return labels;
+    }
+  }
+
+  const groupedCandidates = [
     source.participant_sides,
     source.participantSides,
     source.team_sides,
     source.teamSides,
     source.sides,
     source.teams,
-  ].find((candidate) => candidate && (Array.isArray(candidate) || typeof candidate === "object"));
-
-  if (Array.isArray(groupedSides)) {
-    return groupedSides[sideNumber - 1];
-  }
-
-  if (groupedSides && typeof groupedSides === "object") {
-    const groupedFields = sideNumber === 1
-      ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1"]
-      : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2"];
-    for (const field of groupedFields) {
-      if (groupedSides[field]) {
-        return groupedSides[field];
-      }
-    }
-  }
-
-  return null;
-}
-
-function getHallPrototypeMatchSideLabels(match = {}, sideNumber = 1) {
-  const source = getHallPrototypeMatchSource(match);
-  const groupedSide = getHallPrototypeGroupedSideValue(source, sideNumber);
-  const groupedLabels = getWrestlingLabelArray(groupedSide);
-  if (groupedLabels.length > 0) {
-    return groupedLabels;
-  }
-
-  const sideFields = sideNumber === 1
-    ? ["side_1", "side1", "side_one", "sideOne", "team_1", "team1", "team_one", "teamOne", "participant_1", "participant1", "participants_1", "participants1", "participant_side_1", "participantSide1"]
-    : ["side_2", "side2", "side_two", "sideTwo", "team_2", "team2", "team_two", "teamTwo", "participant_2", "participant2", "participants_2", "participants2", "participant_side_2", "participantSide2"];
-
-  for (const field of sideFields) {
-    const labels = getWrestlingLabelArray(source[field]);
+  ];
+  for (const groupedSides of groupedCandidates) {
+    const labels = getHallPrototypeUniqueLabels(getHallPrototypeGroupedSideValue(groupedSides, sideNumber));
     if (labels.length > 0) {
       return labels;
     }
   }
 
-  const titleParts = getWrestlingMatchTitleParts(source);
-  const versusIndex = titleParts.findIndex((part) => String(part).trim().toLowerCase() === "vs");
-  if (versusIndex > 0) {
-    const sideText = sideNumber === 1
-      ? titleParts.slice(0, versusIndex).join(" ")
-      : titleParts.slice(versusIndex + 1).join(" ");
-    const titleLabels = getWrestlingLabelArray(sideText);
-    if (titleLabels.length > 0) {
-      return titleLabels;
+  for (const field of aliasFields) {
+    const labels = getHallPrototypeUniqueLabels(source[field]);
+    if (labels.length > 0) {
+      return labels;
     }
   }
-
-  const participants = getWrestlingLabelArray(source.participants || source.participant_names || source.participantNames || source.related_people || source.relatedPeople);
-  if (participants.length > 1) {
-    return sideNumber === 1 ? [participants[0]] : participants.slice(1);
-  }
-
-  return sideNumber === 1
-    ? [getWrestlingMatchDisplayName(source)]
-    : ["Side Pending"];
+  return [];
 }
 
-function getHallPrototypeEncounterSideNames(values) {
-  const names = getWrestlingArray(values)
-    .map((value) => getWrestlingText(value))
-    .filter(Boolean);
+function getHallPrototypeEncounterSideNames(values, knownParticipants = []) {
+  const names = getHallPrototypeExpandedParticipantLabels(values, knownParticipants);
+  return names.length > 0 ? names : ["Side Pending"];
+}
 
-  if (names.length === 1 && /,|\sand\s/i.test(names[0])) {
-    const splitNames = names[0]
-      .split(/\s*,\s*|\s+and\s+/i)
-      .map((name) => getWrestlingText(name))
-      .filter(Boolean);
-    if (splitNames.length > 1) {
-      return splitNames;
+function getHallPrototypeMatchSides(match = {}) {
+  const rawSource = getHallPrototypeRawMatchSource(match);
+  const participants = getHallPrototypeParticipantLabels(match);
+  const sideOneLabels = getHallPrototypeSideLabels(match, 1);
+  const sideTwoLabels = getHallPrototypeSideLabels(match, 2);
+  let sideOneNames = sideOneLabels.length > 0
+    ? getHallPrototypeExpandedParticipantLabels(sideOneLabels, participants)
+    : [];
+  let sideTwoNames = sideTwoLabels.length > 0
+    ? getHallPrototypeExpandedParticipantLabels(sideTwoLabels, participants)
+    : [];
+  let normalizedSideOneLabels = sideOneLabels;
+  let normalizedSideTwoLabels = sideTwoLabels;
+
+  if (sideOneNames.length === 0 && sideTwoNames.length === 0 && participants.length > 0) {
+    const midpoint = Math.ceil(participants.length / 2);
+    sideOneNames = participants.slice(0, midpoint);
+    sideTwoNames = participants.slice(midpoint);
+    normalizedSideOneLabels = [...sideOneNames];
+    normalizedSideTwoLabels = [...sideTwoNames];
+  }
+
+  if (sideOneNames.length === 0 && sideTwoNames.length === 0) {
+    const title = getHallPrototypeSafeText(rawSource.title);
+    const titleSides = title.split(/\s+v(?:s\.?|\.?)\s+/i).map(getHallPrototypeSafeText).filter(Boolean);
+    if (titleSides.length === 2) {
+      normalizedSideOneLabels = [titleSides[0]];
+      normalizedSideTwoLabels = [titleSides[1]];
+      sideOneNames = getHallPrototypeExpandedParticipantLabels(normalizedSideOneLabels);
+      sideTwoNames = getHallPrototypeExpandedParticipantLabels(normalizedSideTwoLabels);
     }
   }
 
-  return names.length > 0 ? names : ["Side Pending"];
+
+  if (sideOneNames.length === 0) {
+    sideOneNames = ["Side Pending"];
+    normalizedSideOneLabels = ["Side Pending"];
+  }
+  if (sideTwoNames.length === 0) {
+    sideTwoNames = ["Side Pending"];
+    normalizedSideTwoLabels = ["Side Pending"];
+  }
+
+  return {
+    participants: [...participants],
+    sides: [
+      { side: 1, labels: [...normalizedSideOneLabels], names: [...sideOneNames] },
+      { side: 2, labels: [...normalizedSideTwoLabels], names: [...sideTwoNames] },
+    ],
+  };
 }
 
 function getHallPrototypeMatchOfficialNames(match = {}) {
@@ -3159,12 +3302,9 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
   const names = [];
   const seen = new Set();
   const addName = (value) => {
-    const text = getWrestlingText(value);
-    if (!text) {
-      return;
-    }
-    const key = text.toLowerCase();
-    if (seen.has(key)) {
+    const text = getHallPrototypeSafeText(value);
+    const key = normalizeHallPrototypeWinnerText(text);
+    if (!key || seen.has(key)) {
       return;
     }
     seen.add(key);
@@ -3172,8 +3312,8 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
   };
   const addValues = (values) => {
     values.forEach((value) => {
-      getWrestlingLabelArray(value).forEach((label) => {
-        label.split(/\s*,\s*/).forEach(addName);
+      getHallPrototypeUniqueLabels(value).forEach((label) => {
+        label.split(/\s*[,;]\s*/).forEach(addName);
       });
     });
   };
@@ -3199,7 +3339,6 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
 
   return names;
 }
-
 function normalizeHallPrototypeNoteComparison(value) {
   return getWrestlingText(value)
     .replace(/[\u2018\u2019'":/\\-]+/g, " ")
@@ -3261,7 +3400,7 @@ function isHallPrototypeDuplicateNote(notes, match = {}) {
 
 function getHallPrototypeMatchNotes(match = {}) {
   const source = getHallPrototypeMatchSource(match);
-  const notes = getWrestlingText(source.notes).replace(/\s+/g, " ").trim();
+  const notes = getHallPrototypeSafeText(source.notes);
   if (!notes || isHallPrototypeDuplicateNote(notes, match)) {
     return "";
   }
@@ -3375,6 +3514,26 @@ function getHallPrototypeWinnerTarget(match = {}, sides = []) {
   };
 }
 
+function normalizeHallPrototypeEncounterRecord(match = {}) {
+  const classification = getHallPrototypeClassificationData(match);
+  const sideData = getHallPrototypeMatchSides(match);
+  const sides = sideData.sides.map((side) => ({
+    side: side.side,
+    labels: [...side.labels],
+    names: [...side.names],
+  }));
+
+  return {
+    heading: classification.heading,
+    segmentInfo: classification.segmentInfo,
+    participants: [...sideData.participants],
+    sides,
+    officials: getHallPrototypeMatchOfficialNames(match),
+    notes: getHallPrototypeMatchNotes(match),
+    winnerTarget: getHallPrototypeWinnerTarget(match, sides),
+  };
+}
+
 function createHallPrototypeEncounterSide(label, values, options = {}) {
   const side = document.createElement("div");
   side.className = "wrestling-show-prototype-encounter-side";
@@ -3405,17 +3564,17 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
 }
 
 function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
+  const encounter = normalizeHallPrototypeEncounterRecord(match);
   const card = document.createElement("li");
   card.className = "wrestling-show-prototype-encounter-card";
-  const segmentInfo = getHallPrototypeSegmentInfo(match);
-  if (segmentInfo) {
+  if (encounter.segmentInfo) {
     card.classList.add("wrestling-show-prototype-encounter-card--segment");
     card.dataset.hallPrototypeEncounterState = "segment";
   }
 
   const type = document.createElement("p");
   type.className = "wrestling-show-prototype-encounter-type";
-  type.textContent = getHallPrototypeMatchTypeText(match);
+  type.textContent = encounter.heading;
 
   const combatants = document.createElement("div");
   combatants.className = "wrestling-show-prototype-encounter-combatants";
@@ -3424,40 +3583,34 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   versus.className = "wrestling-show-prototype-encounter-vs";
   versus.textContent = "VS";
 
-  const sideOneLabels = getHallPrototypeMatchSideLabels(match, 1);
-  const sideTwoLabels = getHallPrototypeMatchSideLabels(match, 2);
-  const sideOneNames = getHallPrototypeEncounterSideNames(sideOneLabels);
-  const sideTwoNames = getHallPrototypeEncounterSideNames(sideTwoLabels);
-  const winnerTarget = getHallPrototypeWinnerTarget(match, [
-    { side: 1, labels: sideOneLabels, names: sideOneNames },
-    { side: 2, labels: sideTwoLabels, names: sideTwoNames },
-  ]);
+  const sideOne = encounter.sides[0];
+  const sideTwo = encounter.sides[1];
+  const winnerTarget = encounter.winnerTarget;
 
   combatants.append(
-    createHallPrototypeEncounterSide("Side 1", sideOneLabels, {
+    createHallPrototypeEncounterSide("Side 1", sideOne.names, {
       isWinner: winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 1 ? winnerTarget.participantWinnerKeys : [],
     }),
     versus,
-    createHallPrototypeEncounterSide("Side 2", sideTwoLabels, {
+    createHallPrototypeEncounterSide("Side 2", sideTwo.names, {
       isWinner: winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 2 ? winnerTarget.participantWinnerKeys : [],
     })
   );
 
-  const officials = getHallPrototypeMatchOfficialNames(match);
-  if (officials.length > 0) {
+  if (encounter.officials.length > 0) {
     const official = document.createElement("p");
     official.className = "wrestling-show-prototype-encounter-official";
-    official.textContent = `${officials.length > 1 ? "OFFICIALS" : "OFFICIAL"} • ${officials.join(", ")}`;
+    official.textContent = (encounter.officials.length > 1 ? "OFFICIALS" : "OFFICIAL") +
+      " " + String.fromCharCode(8226) + " " + encounter.officials.join(", ");
     combatants.append(official);
   }
 
-  const notes = getHallPrototypeMatchNotes(match);
-  if (notes) {
+  if (encounter.notes) {
     const note = document.createElement("p");
     note.className = "wrestling-show-prototype-encounter-note";
-    note.textContent = notes;
+    note.textContent = encounter.notes;
     combatants.append(note);
   }
 
