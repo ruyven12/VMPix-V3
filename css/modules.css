@@ -12003,6 +12003,20 @@ button.wrestling-event-history-tagged-thumb {
   text-align: left;
 }
 
+.wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side:last-of-type {
+  justify-items: end;
+  text-align: right;
+}
+
+.wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side:last-of-type .wrestling-show-prototype-encounter-side-value {
+  justify-items: end;
+}
+
+.wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side:last-of-type .wrestling-show-prototype-encounter-side-name--numbered {
+  justify-self: end;
+  text-align: right;
+}
+
 .wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side-value {
   inline-size: 100%;
   gap: 0.16rem;
