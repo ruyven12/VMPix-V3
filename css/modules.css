@@ -12046,7 +12046,7 @@ button.wrestling-event-history-tagged-thumb {
   font-size: clamp(0.78rem, 1.2vw, 0.95rem);
   text-align: center;
 }
-@media (max-width: 540px) {
+@media (max-width: 640px) {
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-surface {
     --hall-prototype-mobile-top-clearance: calc(max(0.34rem, env(safe-area-inset-top)) + 1.9rem + 20px - max(1rem, env(safe-area-inset-top)));
     grid-template-rows: auto minmax(0, 1fr);
@@ -12056,6 +12056,12 @@ button.wrestling-event-history-tagged-thumb {
     margin-block-start: var(--hall-prototype-mobile-top-clearance);
     padding-block-end: 0;
     overflow: hidden;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-surface .wrestling-show-prototype-card {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 4;
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounters {
