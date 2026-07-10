@@ -3105,10 +3105,27 @@ function getHallPrototypeClassificationData(match = {}) {
     "royal rumble",
     "rumble",
   ]);
+  const championshipClassificationKeys = new Set([
+    "championship",
+    "championship match",
+  ]);
   const battleRoyalInfo = classificationValues.some((value) =>
     battleRoyalClassificationKeys.has(normalizeHallPrototypeWinnerText(value))
   )
     ? { label: "BATTLE ROYAL" }
+    : null;
+  const championshipTitle = getHallPrototypeSafeText(rawSource.title);
+  const championshipInfo = classificationValues.some((value) =>
+    championshipClassificationKeys.has(normalizeHallPrototypeWinnerText(value))
+  )
+    ? {
+        label: "CHAMPIONSHIP",
+        heading: (championshipTitle
+          ? /\bchampionship\b/i.test(championshipTitle)
+            ? championshipTitle
+            : championshipTitle + " Championship"
+          : "Championship").toUpperCase(),
+      }
     : null;
   const segmentValues = [...classificationValues, ...detailValues, getHallPrototypeSafeText(rawSource.notes)].filter(Boolean);
   const isSegmentValue = (value) => /\b(segment|promo|attack|angle|incident|interview)\b/i.test(value);
@@ -3155,9 +3172,9 @@ function getHallPrototypeClassificationData(match = {}) {
     rawSource.segmentType,
     rawSource.title,
   ].map(getHallPrototypeSafeText).filter(Boolean);
-  const heading = segmentInfo?.label || headingCandidates.find((value) => !/^match(?:\s+\d+)?$/i.test(value)) || "Encounter";
+  const heading = segmentInfo?.label || championshipInfo?.heading || headingCandidates.find((value) => !/^match(?:\s+\d+)?$/i.test(value)) || "Encounter";
 
-  return { heading, segmentInfo, battleRoyalInfo };
+  return { heading, segmentInfo, battleRoyalInfo, championshipInfo };
 }
 
 function getHallPrototypeMatchTypeText(match = {}) {
@@ -3573,6 +3590,30 @@ function getHallPrototypeBattleRoyalWinnerTarget(match = {}, sides = []) {
   };
 }
 
+function getHallPrototypeChampionshipSides(sides = []) {
+  const championParticipantKeys = new Set();
+  const normalizedSides = sides.map((side) => ({
+    ...side,
+    names: side.names.map((value) => {
+      const sourceName = getHallPrototypeSafeText(value);
+      const hasChampionSuffix = /\s*\(c\)\s*$/i.test(sourceName);
+      const displayName = hasChampionSuffix
+        ? sourceName.replace(/\s*\(c\)\s*$/i, "").trim()
+        : sourceName;
+      const participantKey = normalizeHallPrototypeWinnerText(displayName);
+      if (hasChampionSuffix && participantKey) {
+        championParticipantKeys.add(participantKey);
+      }
+      return displayName || sourceName;
+    }),
+  }));
+
+  return {
+    sides: normalizedSides,
+    championParticipantKeys: [...championParticipantKeys],
+  };
+}
+
 function normalizeHallPrototypeEncounterRecord(match = {}) {
   const classification = getHallPrototypeClassificationData(match);
   const sideData = getHallPrototypeMatchSides(match);
@@ -3581,15 +3622,20 @@ function normalizeHallPrototypeEncounterRecord(match = {}) {
     labels: [...side.labels],
     names: [...side.names],
   }));
+  const championshipSideData = classification.championshipInfo
+    ? getHallPrototypeChampionshipSides(normalizedSides)
+    : { sides: normalizedSides, championParticipantKeys: [] };
   const battleRoyalSides = classification.battleRoyalInfo
-    ? getHallPrototypeBattleRoyalSides(sideData.participants, normalizedSides)
+    ? getHallPrototypeBattleRoyalSides(sideData.participants, championshipSideData.sides)
     : null;
-  const sides = battleRoyalSides || normalizedSides;
+  const sides = battleRoyalSides || championshipSideData.sides;
 
   return {
     heading: classification.heading,
     segmentInfo: classification.segmentInfo,
     battleRoyalInfo: classification.battleRoyalInfo,
+    championshipInfo: classification.championshipInfo,
+    championParticipantKeys: championshipSideData.championParticipantKeys,
     participants: [...sideData.participants],
     sides,
     officials: getHallPrototypeMatchOfficialNames(match),
@@ -3598,6 +3644,67 @@ function normalizeHallPrototypeEncounterRecord(match = {}) {
       ? getHallPrototypeBattleRoyalWinnerTarget(match, sides)
       : getHallPrototypeWinnerTarget(match, sides),
   };
+}
+
+function createHallPrototypeSvgElement(tagName, attributes = {}) {
+  const element = document.createElementNS("http://www.w3.org/2000/svg", tagName);
+  Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+  return element;
+}
+
+function createHallPrototypeChampionshipBeltWatermark() {
+  const belt = createHallPrototypeSvgElement("svg", {
+    class: "wrestling-show-prototype-encounter-belt-watermark",
+    viewBox: "0 0 720 240",
+    preserveAspectRatio: "none",
+    "aria-hidden": "true",
+    focusable: "false",
+  });
+  const strap = createHallPrototypeSvgElement("path", {
+    class: "wrestling-show-prototype-encounter-belt-watermark__strap",
+    d: "M18 90 C88 70 142 70 205 82 L235 46 H485 L515 82 C578 70 632 70 702 90 V150 C632 170 578 170 515 158 L485 194 H235 L205 158 C142 170 88 170 18 150 Z",
+  });
+  const leftPlate = createHallPrototypeSvgElement("path", {
+    class: "wrestling-show-prototype-encounter-belt-watermark__plate",
+    d: "M72 126 L102 92 L180 84 L207 112 L190 148 L102 156 Z",
+  });
+  const rightPlate = createHallPrototypeSvgElement("path", {
+    class: "wrestling-show-prototype-encounter-belt-watermark__plate",
+    d: "M648 126 L618 92 L540 84 L513 112 L530 148 L618 156 Z",
+  });
+  const centerPlate = createHallPrototypeSvgElement("path", {
+    class: "wrestling-show-prototype-encounter-belt-watermark__plate wrestling-show-prototype-encounter-belt-watermark__plate--center",
+    d: "M264 46 H456 L496 88 L480 160 L438 194 H282 L240 160 L224 88 Z",
+  });
+  const centerDetail = createHallPrototypeSvgElement("path", {
+    class: "wrestling-show-prototype-encounter-belt-watermark__detail",
+    d: "M295 76 H425 L458 104 L446 148 L414 170 H306 L274 148 L262 104 Z M326 96 H394 L416 120 L394 144 H326 L304 120 Z",
+  });
+  belt.append(strap, leftPlate, rightPlate, centerPlate, centerDetail);
+  return belt;
+}
+
+function createHallPrototypeChampionMarker() {
+  const marker = document.createElement("span");
+  marker.className = "wrestling-show-prototype-champion-marker";
+  marker.setAttribute("aria-hidden", "true");
+
+  const belt = createHallPrototypeSvgElement("svg", {
+    viewBox: "0 0 36 18",
+    focusable: "false",
+  });
+  belt.append(
+    createHallPrototypeSvgElement("path", {
+      class: "wrestling-show-prototype-champion-marker__strap",
+      d: "M1 6 L9 5 L12 2 H24 L27 5 L35 6 V12 L27 13 L24 16 H12 L9 13 L1 12 Z",
+    }),
+    createHallPrototypeSvgElement("path", {
+      class: "wrestling-show-prototype-champion-marker__plate",
+      d: "M12 4 H24 L28 9 L24 14 H12 L8 9 Z M15 6 H21 L24 9 L21 12 H15 L12 9 Z",
+    })
+  );
+  marker.append(belt);
+  return marker;
 }
 
 function createHallPrototypeEncounterSide(label, values, options = {}) {
@@ -3612,6 +3719,7 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
   const sideValue = document.createElement("p");
   sideValue.className = "wrestling-show-prototype-encounter-side-value";
   const participantWinnerKeys = new Set(options.participantWinnerKeys || []);
+  const championParticipantKeys = new Set(options.championParticipantKeys || []);
 
   const entrantNumbers = Array.isArray(options.entrantNumbers) ? options.entrantNumbers : [];
 
@@ -3633,6 +3741,11 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
       nameLine.append(number, entrantName);
     } else {
       nameLine.textContent = name;
+    }
+    if (championParticipantKeys.has(normalizeHallPrototypeWinnerText(name))) {
+      nameLine.classList.add("wrestling-show-prototype-encounter-side-name--champion");
+      nameLine.dataset.hallPrototypeChampionParticipant = "true";
+      nameLine.append(createHallPrototypeChampionMarker());
     }
     if (participantWinnerKeys.has(normalizeHallPrototypeWinnerText(name))) {
       nameLine.classList.add("wrestling-show-prototype-encounter-side-name--winner");
@@ -3658,6 +3771,10 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     card.classList.add("wrestling-show-prototype-encounter-card--battle-royal");
     card.dataset.hallPrototypeEncounterState = "battle-royal";
   }
+  if (encounter.championshipInfo) {
+    card.classList.add("wrestling-show-prototype-encounter-card--championship");
+    card.dataset.hallPrototypeEncounterState = "championship";
+  }
 
   const type = document.createElement("p");
   type.className = "wrestling-show-prototype-encounter-type";
@@ -3674,6 +3791,9 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
 
   const combatants = document.createElement("div");
   combatants.className = "wrestling-show-prototype-encounter-combatants";
+  if (encounter.championshipInfo) {
+    combatants.append(createHallPrototypeChampionshipBeltWatermark());
+  }
 
   const versus = document.createElement("span");
   versus.className = "wrestling-show-prototype-encounter-vs";
@@ -3687,12 +3807,14 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     createHallPrototypeEncounterSide("Side 1", sideOne.names, {
       isWinner: !encounter.battleRoyalInfo && winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 1 ? winnerTarget.participantWinnerKeys : [],
+      championParticipantKeys: encounter.championParticipantKeys,
       entrantNumbers: sideOne.entrantNumbers,
     }),
     versus,
     createHallPrototypeEncounterSide("Side 2", sideTwo.names, {
       isWinner: !encounter.battleRoyalInfo && winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
       participantWinnerKeys: winnerTarget.side === 2 ? winnerTarget.participantWinnerKeys : [],
+      championParticipantKeys: encounter.championParticipantKeys,
       entrantNumbers: sideTwo.entrantNumbers,
     })
   );

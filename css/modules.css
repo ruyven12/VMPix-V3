@@ -11979,6 +11979,131 @@ button.wrestling-event-history-tagged-thumb {
   box-shadow: 0 0 0.28rem rgba(255, 112, 26, 0.2);
 }
 
+.wrestling-show-prototype-encounter-card--championship {
+  border-color: rgba(232, 190, 82, 0.72);
+  background:
+    linear-gradient(180deg, rgba(232, 190, 82, 0.075), transparent 48%, rgba(170, 116, 30, 0.05)),
+    rgba(3, 4, 7, 0.88);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 239, 184, 0.045),
+    inset 0 0 0.78rem rgba(232, 190, 82, 0.085),
+    0 0.22rem 0.72rem rgba(0, 0, 0, 0.34),
+    0 0 0.58rem rgba(218, 166, 48, 0.16);
+}
+
+.wrestling-show-prototype-encounter-card--championship::before {
+  background:
+    linear-gradient(90deg, rgba(246, 207, 103, 0.9), transparent 2.45rem) top left / 3.3rem 1px no-repeat,
+    linear-gradient(180deg, rgba(232, 190, 82, 0.82), transparent 2.1rem) top left / 1px 2.9rem no-repeat,
+    linear-gradient(270deg, rgba(246, 207, 103, 0.9), transparent 2.45rem) top right / 3.3rem 1px no-repeat,
+    linear-gradient(180deg, rgba(232, 190, 82, 0.82), transparent 2.1rem) top right / 1px 2.9rem no-repeat,
+    linear-gradient(90deg, rgba(218, 166, 48, 0.82), transparent 2.1rem) bottom left / 3rem 1px no-repeat,
+    linear-gradient(0deg, rgba(218, 166, 48, 0.76), transparent 2rem) bottom left / 1px 2.8rem no-repeat,
+    linear-gradient(270deg, rgba(218, 166, 48, 0.82), transparent 2.1rem) bottom right / 3rem 1px no-repeat,
+    linear-gradient(0deg, rgba(218, 166, 48, 0.76), transparent 2rem) bottom right / 1px 2.8rem no-repeat;
+  opacity: 0.9;
+}
+
+.wrestling-show-prototype-encounter-card--championship::after {
+  border-color: rgba(246, 207, 103, 0.12);
+  box-shadow: inset 0 0 0.48rem rgba(232, 190, 82, 0.065);
+}
+
+.wrestling-show-prototype-encounter-card--championship .wrestling-show-prototype-encounter-type {
+  color: rgba(249, 211, 111, 0.98);
+  text-shadow: 0 0 0.34rem rgba(232, 190, 82, 0.32);
+}
+
+.wrestling-show-prototype-encounter-card--championship .wrestling-show-prototype-encounter-combatants::before,
+.wrestling-show-prototype-encounter-card--championship .wrestling-show-prototype-encounter-combatants::after {
+  background: linear-gradient(90deg, transparent, rgba(232, 190, 82, 0.82), transparent);
+  box-shadow: 0 0 0.3rem rgba(218, 166, 48, 0.24);
+}
+
+.wrestling-show-prototype-encounter-card--championship .wrestling-show-prototype-encounter-vs {
+  border-color: rgba(232, 190, 82, 0.86);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 239, 184, 0.07),
+    0 0 0.42rem rgba(218, 166, 48, 0.28);
+}
+
+.wrestling-show-prototype-encounter-belt-watermark {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  z-index: 0;
+  inline-size: 64%;
+  block-size: 86%;
+  color: rgb(232, 190, 82);
+  pointer-events: none;
+  opacity: 0.56;
+  filter: drop-shadow(0 0 0.28rem rgba(218, 166, 48, 0.24));
+  transform: translate(-50%, -50%);
+}
+
+.wrestling-show-prototype-encounter-belt-watermark__strap {
+  fill: currentColor;
+  fill-opacity: 0.18;
+  stroke: currentColor;
+  stroke-opacity: 0.72;
+  stroke-width: 5;
+}
+
+.wrestling-show-prototype-encounter-belt-watermark__plate {
+  fill: currentColor;
+  fill-opacity: 0.24;
+  stroke: currentColor;
+  stroke-opacity: 0.86;
+  stroke-width: 5;
+}
+
+.wrestling-show-prototype-encounter-belt-watermark__plate--center {
+  fill-opacity: 0.31;
+  stroke-width: 6;
+}
+
+.wrestling-show-prototype-encounter-belt-watermark__detail {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.92;
+  stroke-width: 5;
+}
+
+.wrestling-show-prototype-encounter-side-name--champion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.wrestling-show-prototype-champion-marker {
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: clamp(0.86rem, 1.4vw, 1rem);
+  color: rgb(232, 190, 82);
+  opacity: 0.86;
+  filter: drop-shadow(0 0 0.2rem rgba(218, 166, 48, 0.32));
+}
+
+.wrestling-show-prototype-champion-marker svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.wrestling-show-prototype-champion-marker__strap {
+  fill: currentColor;
+  fill-opacity: 0.24;
+  stroke: currentColor;
+  stroke-width: 1.1;
+}
+
+.wrestling-show-prototype-champion-marker__plate {
+  fill: currentColor;
+  fill-opacity: 0.42;
+  stroke: currentColor;
+  stroke-width: 0.9;
+}
+
 .wrestling-show-prototype-encounter-card--battle-royal {
   block-size: auto;
   min-block-size: 0;
@@ -12324,6 +12449,11 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-show-prototype-encounter-card--battle-royal .wrestling-show-prototype-encounter-side-value {
     gap: 0.12rem;
+  }
+
+  .wrestling-show-prototype-encounter-belt-watermark {
+    inline-size: 74%;
+    block-size: 82%;
   }
 
   .wrestling-show-prototype-encounter-side-name--numbered {
