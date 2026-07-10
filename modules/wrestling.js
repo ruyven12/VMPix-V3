@@ -3653,11 +3653,14 @@ function createHallPrototypeSvgElement(tagName, attributes = {}) {
 }
 
 function createHallPrototypeChampionshipBeltWatermark() {
+  const watermark = document.createElement("span");
+  watermark.className = "wrestling-show-prototype-encounter-belt-watermark";
+  watermark.setAttribute("aria-hidden", "true");
+
   const belt = createHallPrototypeSvgElement("svg", {
-    class: "wrestling-show-prototype-encounter-belt-watermark",
+    class: "wrestling-show-prototype-encounter-belt-watermark__svg",
     viewBox: "0 0 720 240",
     preserveAspectRatio: "none",
-    "aria-hidden": "true",
     focusable: "false",
   });
   const strap = createHallPrototypeSvgElement("path", {
@@ -3681,7 +3684,8 @@ function createHallPrototypeChampionshipBeltWatermark() {
     d: "M295 76 H425 L458 104 L446 148 L414 170 H306 L274 148 L262 104 Z M326 96 H394 L416 120 L394 144 H326 L304 120 Z",
   });
   belt.append(strap, leftPlate, rightPlate, centerPlate, centerDetail);
-  return belt;
+  watermark.append(belt);
+  return watermark;
 }
 
 function createHallPrototypeChampionMarker() {
@@ -3791,9 +3795,6 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
 
   const combatants = document.createElement("div");
   combatants.className = "wrestling-show-prototype-encounter-combatants";
-  if (encounter.championshipInfo) {
-    combatants.append(createHallPrototypeChampionshipBeltWatermark());
-  }
 
   const versus = document.createElement("span");
   versus.className = "wrestling-show-prototype-encounter-vs";
@@ -3840,6 +3841,9 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     card.append(battleRoyalClassification);
   }
   card.append(combatants);
+  if (encounter.championshipInfo) {
+    card.append(createHallPrototypeChampionshipBeltWatermark());
+  }
   return card;
 }
 

@@ -12029,16 +12029,22 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-show-prototype-encounter-belt-watermark {
   position: absolute;
-  inset-block-start: 50%;
+  inset-block: 5px;
   inset-inline-start: 50%;
   z-index: 0;
+  display: block;
   inline-size: 64%;
-  block-size: 86%;
   color: rgb(232, 190, 82);
   pointer-events: none;
   opacity: 0.56;
   filter: drop-shadow(0 0 0.28rem rgba(218, 166, 48, 0.24));
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
+}
+
+.wrestling-show-prototype-encounter-belt-watermark__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
 }
 
 .wrestling-show-prototype-encounter-belt-watermark__strap {
@@ -12072,13 +12078,13 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-show-prototype-encounter-side-name--champion {
   display: inline-flex;
   align-items: center;
-  gap: 0.28rem;
+  gap: 3px;
 }
 
 .wrestling-show-prototype-champion-marker {
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: clamp(0.86rem, 1.4vw, 1rem);
+  inline-size: clamp(1rem, 1.6vw, 1.15rem);
   color: rgb(232, 190, 82);
   opacity: 0.86;
   filter: drop-shadow(0 0 0.2rem rgba(218, 166, 48, 0.32));
@@ -12453,7 +12459,6 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-show-prototype-encounter-belt-watermark {
     inline-size: 74%;
-    block-size: 82%;
   }
 
   .wrestling-show-prototype-encounter-side-name--numbered {
