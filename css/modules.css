@@ -12086,6 +12086,128 @@ button.wrestling-event-history-tagged-thumb {
     min-block-size: 1.7rem;
   }
 }
+@media (min-width: 900px) {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-surface {
+    --hall-prototype-desktop-top-clearance: calc(max(0.42rem, env(safe-area-inset-top)) + clamp(1.7rem, 4.2svh, 2.55rem) + 20px - max(1rem, env(safe-area-inset-top)));
+    inline-size: min(100%, 58rem);
+    max-block-size: calc(100svh - var(--hall-prototype-desktop-top-clearance) - var(--engine-emitter-size, 4.6rem) - max(2.2rem, env(safe-area-inset-bottom)));
+    margin-block-start: var(--hall-prototype-desktop-top-clearance);
+    gap: clamp(0.45rem, 1svh, 0.62rem);
+    padding-block-end: 0;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-surface .wrestling-show-prototype-card {
+    inline-size: min(100%, 58rem);
+    max-block-size: none;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(0.7rem, 1.25vw, 1rem);
+    padding: clamp(0.54rem, 1vw, 0.72rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__poster {
+    inline-size: clamp(9.25rem, 11vw, 12.5rem);
+    justify-self: end;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__content {
+    gap: clamp(0.42rem, 0.86vw, 0.64rem);
+    padding: clamp(0.56rem, 1.05vw, 0.76rem) clamp(0.72rem, 1.32vw, 0.95rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__title {
+    font-size: clamp(1.45rem, 2.1vw, 2.35rem);
+    line-height: 0.98;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__fields {
+    gap: clamp(0.24rem, 0.58vw, 0.38rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__field {
+    gap: 0.08rem;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__label {
+    font-size: clamp(0.56rem, 0.72vw, 0.66rem);
+    line-height: 1;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-card__value {
+    font-size: clamp(0.78rem, 0.98vw, 0.94rem);
+    line-height: 1.08;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounters {
+    inline-size: min(100%, 58rem);
+    gap: clamp(0.28rem, 0.72svh, 0.45rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounters__title {
+    font-size: clamp(0.66rem, 0.82vw, 0.78rem);
+    line-height: 1;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-list {
+    gap: clamp(0.25rem, 0.62svh, 0.4rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-card {
+    gap: clamp(0.12rem, 0.35vw, 0.22rem);
+    min-block-size: clamp(3rem, 5.2svh, 3.45rem);
+    padding: clamp(0.34rem, 0.72vw, 0.48rem) clamp(0.72rem, 1.45vw, 1rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-card::before {
+    inset: 0.18rem;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-card::after {
+    inset: 0.34rem;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-type {
+    font-size: clamp(0.56rem, 0.68vw, 0.66rem);
+    line-height: 1;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-combatants {
+    min-block-size: clamp(1.65rem, 2.6svh, 1.95rem);
+    column-gap: clamp(0.54rem, 1.2vw, 0.84rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-combatants::before,
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-combatants::after {
+    inline-size: clamp(1.7rem, 10vw, 8.4rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-combatants::before {
+    inset-inline-end: calc(50% + 1.48rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-combatants::after {
+    inset-inline-start: calc(50% + 1.48rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-side:first-child {
+    padding-inline-start: clamp(0.16rem, 0.72vw, 0.42rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-side:last-child {
+    padding-inline-end: clamp(0.16rem, 0.72vw, 0.42rem);
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-side-value {
+    gap: 0;
+    font-size: clamp(0.7rem, 0.86vw, 0.86rem);
+    line-height: 1.02;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-vs {
+    inline-size: clamp(2.1rem, 2.8vw, 2.45rem);
+    block-size: clamp(1.34rem, 1.8vw, 1.55rem);
+    font-size: clamp(0.62rem, 0.78vw, 0.72rem);
+  }
+}
 .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]::-webkit-scrollbar {
   width: 0;
   height: 0;
