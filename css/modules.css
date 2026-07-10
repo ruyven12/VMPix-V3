@@ -12126,19 +12126,34 @@ button.wrestling-event-history-tagged-thumb {
   clip-path: polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
 }
 
-.wrestling-show-prototype-encounter-official {
+.wrestling-show-prototype-encounter-official,
+.wrestling-show-prototype-encounter-note {
   position: relative;
   z-index: 1;
   grid-column: 1 / -1;
   justify-self: center;
   max-inline-size: min(100%, 28rem);
-  margin: 5px 0 0;
   color: rgba(255, 231, 208, 0.58);
   font-size: clamp(0.665rem, 0.9vw, 0.805rem);
   font-weight: 600;
   line-height: 1.15;
   text-align: center;
   letter-spacing: 0.075em;
+}
+
+.wrestling-show-prototype-encounter-official {
+  margin: 5px 0 0;
+}
+
+.wrestling-show-prototype-encounter-note {
+  max-inline-size: min(100%, 34rem);
+  margin: 0.18rem 0 0;
+  color: rgba(255, 235, 214, 0.72);
+  font-size: clamp(0.64rem, 0.86vw, 0.78rem);
+  font-weight: 550;
+  line-height: 1.18;
+  letter-spacing: 0.045em;
+  overflow-wrap: anywhere;
 }
 .wrestling-show-prototype-encounter-card--empty {
   color: rgba(255, 231, 208, 0.78);
@@ -12228,11 +12243,19 @@ button.wrestling-event-history-tagged-thumb {
     font-size: clamp(0.58rem, 2.35vw, 0.72rem);
   }
 
-  .wrestling-show-prototype-encounter-official {
+  .wrestling-show-prototype-encounter-official,
+  .wrestling-show-prototype-encounter-note {
     max-inline-size: 100%;
-    margin-block-start: 5px;
     font-size: clamp(0.625rem, 2.45vw, 0.745rem);
     line-height: 1.12;
+  }
+
+  .wrestling-show-prototype-encounter-official {
+    margin-block-start: 5px;
+  }
+
+  .wrestling-show-prototype-encounter-note {
+    margin-block-start: 0.18rem;
   }
 }
 @media (min-width: 900px) {
@@ -12364,10 +12387,18 @@ button.wrestling-event-history-tagged-thumb {
     font-size: clamp(0.62rem, 0.78vw, 0.72rem);
   }
 
-  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official {
-    margin-block-start: 5px;
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official,
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-note {
     font-size: clamp(0.575rem, 0.68vw, 0.665rem);
     line-height: 1;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-official {
+    margin-block-start: 5px;
+  }
+
+  .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"] .wrestling-show-prototype-encounter-note {
+    margin-block-start: 0.14rem;
   }
 }
 .wrestling-show-detail-shell[data-wrestling-show-detail-variant="hall-prototype"]::-webkit-scrollbar {

@@ -3200,6 +3200,11 @@ function getHallPrototypeMatchOfficialNames(match = {}) {
   return names;
 }
 
+function getHallPrototypeMatchNotes(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  return getWrestlingText(source.notes).replace(/\s+/g, " ").trim();
+}
+
 function normalizeHallPrototypeWinnerText(value) {
   return getWrestlingText(value)
     .replace(/\s+/g, " ")
@@ -3320,6 +3325,14 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
     official.className = "wrestling-show-prototype-encounter-official";
     official.textContent = `${officials.length > 1 ? "OFFICIALS" : "OFFICIAL"} • ${officials.join(", ")}`;
     combatants.append(official);
+  }
+
+  const notes = getHallPrototypeMatchNotes(match);
+  if (notes) {
+    const note = document.createElement("p");
+    note.className = "wrestling-show-prototype-encounter-note";
+    note.textContent = notes;
+    combatants.append(note);
   }
 
   card.dataset.wrestlingMatchIndex = String(matchIndex + 1);
