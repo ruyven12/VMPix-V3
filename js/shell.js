@@ -3327,6 +3327,13 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  if (wrestlingMatchDetailPrototypeShell) {
+    wrestlingMatchDetailPrototypeShell.setAttribute("aria-hidden", "false");
+    wrestlingMatchDetailPrototypeShell.removeAttribute("inert");
+  }
+  if (typeof renderWrestlingMatchDetailPrototypeRoute === "function") {
+    renderWrestlingMatchDetailPrototypeRoute(route);
+  }
   setActiveGlobalNav("wrestling");
   if (startButton) {
     startButton.disabled = true;
@@ -3978,6 +3985,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "wrestling-venue-detail": wrestlingVenueDetailShell,
     "wrestling-shows": wrestlingShowsShell,
     "wrestling-show-detail": wrestlingShowDetailShell,
+    "wrestling-match-detail-prototype": wrestlingMatchDetailPrototypeShell,
     "wrestling-match-gallery": wrestlingMatchGalleryShell,
     "wrestling-lightbox": wrestlingLightboxShell,
     calendar: calendarShell,

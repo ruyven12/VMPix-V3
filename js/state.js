@@ -53,6 +53,7 @@ const wrestlingVenueDetailShell = document.querySelector("[data-wrestling-venue-
 const wrestlingShowsShell = document.querySelector("[data-wrestling-shows-shell]");
 const wrestlingShowEntries = document.querySelectorAll("[data-wrestling-show-id]");
 const wrestlingShowDetailShell = document.querySelector("[data-wrestling-show-detail-shell]");
+const wrestlingMatchDetailPrototypeShell = document.querySelector("[data-wrestling-match-detail-prototype-shell]");
 const wrestlingShowDetailBack = document.querySelector("[data-wrestling-show-detail-back]");
 const wrestlingMatchGalleryShell = document.querySelector("[data-wrestling-match-gallery-shell]");
 const wrestlingMatchGalleryBack = document.querySelector("[data-wrestling-match-gallery-back]");
@@ -1978,6 +1979,7 @@ const routePaths = {
 
 const WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID = "062026";
 const WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID = "match-1a";
+const WRESTLING_MATCH_DETAIL_PROTOTYPE_SOURCE_MATCH_ID = "match-1";
 
 function isBlankWrestlingMatchDetailPrototypeRoute(route) {
   if (!route || route.name !== "wrestling-match-detail-prototype" || route.matchDetailPrototype !== "blank") {

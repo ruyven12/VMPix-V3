@@ -3872,6 +3872,134 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
   return card;
 }
 
+function getWrestlingMatchDossierPrototypeFallbackMatch() {
+  return {
+    matchId: WRESTLING_MATCH_DETAIL_PROTOTYPE_SOURCE_MATCH_ID,
+    matchName: "LJ Cleary vs Jack Morris",
+    title: "LJ Cleary vs Jack Morris",
+    matchType: "GLG REUNION",
+    match_type: "GLG REUNION",
+    stipulation: "GLG REUNION",
+    side_1: "LJ Cleary",
+    side_2: "Jack Morris",
+    participants: ["LJ Cleary", "Jack Morris"],
+  };
+}
+
+function getWrestlingMatchDossierPrototypeSourceMatch() {
+  const show = findLiveWrestlingShowById(WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID);
+  const liveMatch = show?.matches
+    ? findWrestlingMatchInRowsByRef(show.matches, WRESTLING_MATCH_DETAIL_PROTOTYPE_SOURCE_MATCH_ID)
+    : null;
+  return liveMatch || getWrestlingMatchDossierPrototypeFallbackMatch();
+}
+
+function getWrestlingMatchDossierHeroTypeText(match = {}) {
+  const source = getHallPrototypeMatchSource(match);
+  const typeCandidates = [
+    source.stipulation,
+    source.notes,
+    source.matchType,
+    source.match_type,
+    source.type,
+    source.title,
+    source.matchName,
+  ].map(getHallPrototypeSafeText).filter(Boolean);
+  if (typeCandidates.some((value) => /glg\s+reunion/i.test(value))) {
+    return "GLG REUNION";
+  }
+  const sideNames = [
+    ...getHallPrototypeSideLabels(match, 1),
+    ...getHallPrototypeSideLabels(match, 2),
+  ].map(normalizeHallPrototypeWinnerText);
+  if (sideNames.includes("lj cleary") && sideNames.includes("jack morris")) {
+    return "GLG REUNION";
+  }
+  return getWrestlingText(getHallPrototypeMatchTypeText(match), "MATCH").toUpperCase();
+}
+
+function getWrestlingMatchDossierSides(encounter) {
+  const fallbackEncounter = normalizeHallPrototypeEncounterRecord(getWrestlingMatchDossierPrototypeFallbackMatch());
+  return [0, 1].map((index) => {
+    const side = encounter.sides[index] || {};
+    const names = getHallPrototypeEncounterSideNames(side.names);
+    const hasPendingSide = names.length === 0 || names.some((name) => normalizeHallPrototypeWinnerText(name) === "side pending");
+    return hasPendingSide ? fallbackEncounter.sides[index] : side;
+  });
+}
+
+function createWrestlingMatchDossierHero(match = {}) {
+  const encounter = normalizeHallPrototypeEncounterRecord(match);
+  const sides = getWrestlingMatchDossierSides(encounter);
+  const card = document.createElement("article");
+  card.className = "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card";
+  card.dataset.wrestlingMatchDetailPrototype = "dossier-hero";
+
+  const type = document.createElement("p");
+  type.className = "wrestling-show-prototype-encounter-type";
+  type.id = "wrestling-match-detail-prototype-title";
+  type.textContent = getWrestlingMatchDossierHeroTypeText(match);
+
+  const combatants = document.createElement("div");
+  combatants.className = "wrestling-show-prototype-encounter-combatants";
+
+  const versus = document.createElement("span");
+  versus.className = "wrestling-show-prototype-encounter-vs";
+  versus.textContent = "VS";
+
+  const sideOne = sides[0];
+  const sideTwo = sides[1];
+  const winnerTarget = encounter.winnerTarget || { side: 0, participantWinnerKeys: [] };
+
+  combatants.append(
+    createHallPrototypeEncounterSide("Side 1", sideOne.names, {
+      isWinner: winnerTarget.side === 1 && winnerTarget.participantWinnerKeys.length === 0,
+      participantWinnerKeys: winnerTarget.side === 1 ? winnerTarget.participantWinnerKeys : [],
+      championParticipantKeys: encounter.championParticipantKeys,
+    }),
+    versus,
+    createHallPrototypeEncounterSide("Side 2", sideTwo.names, {
+      isWinner: winnerTarget.side === 2 && winnerTarget.participantWinnerKeys.length === 0,
+      participantWinnerKeys: winnerTarget.side === 2 ? winnerTarget.participantWinnerKeys : [],
+      championParticipantKeys: encounter.championParticipantKeys,
+    })
+  );
+
+  if (encounter.officials.length > 0) {
+    const official = document.createElement("p");
+    official.className = "wrestling-show-prototype-encounter-official";
+    official.textContent = (encounter.officials.length > 1 ? "OFFICIALS" : "OFFICIAL") +
+      " " + String.fromCharCode(8226) + " " + encounter.officials.join(", ");
+    combatants.append(official);
+  }
+
+  card.append(type, combatants);
+  return card;
+}
+
+function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), options = {}) {
+  if (
+    !wrestlingMatchDetailPrototypeShell ||
+    typeof isBlankWrestlingMatchDetailPrototypeRoute !== "function" ||
+    !isBlankWrestlingMatchDetailPrototypeRoute(route)
+  ) {
+    return;
+  }
+
+  wrestlingMatchDetailPrototypeShell.replaceChildren(
+    createWrestlingMatchDossierHero(getWrestlingMatchDossierPrototypeSourceMatch())
+  );
+
+  if (
+    !options.skipDataRequest &&
+    typeof requestWrestlingShowsData === "function" &&
+    wrestlingShowsDataState !== "live" &&
+    !wrestlingShowsRequest &&
+    !wrestlingShowsDataRequested
+  ) {
+    requestWrestlingShowsData();
+  }
+}
 function createHallPrototypeEncounterSection(show = {}) {
   const section = document.createElement("section");
   section.className = "wrestling-show-prototype-encounters";
