@@ -128,11 +128,7 @@ function getRouteFromUrl(url = window.location.href) {
       return { name: "wrestling-match-gallery", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
     }
     if (routeParts.length === 1 && routeParts[0]) {
-      const routeShowId = decodeRoutePart(routeParts[0]);
-      if (routeShowId === "050826-2") {
-        return { name: "wrestling-show-detail", showId: "050826", dateKey: "050826", routeShowId, showDetailVariant: "hall-prototype", canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(routeShowId)}` };
-      }
-      const dateKey = routeShowId;
+      const dateKey = decodeRoutePart(routeParts[0]);
       return { name: "wrestling-show-detail", showId: dateKey, dateKey, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}` };
     }
   }
