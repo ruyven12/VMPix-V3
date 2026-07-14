@@ -2158,14 +2158,14 @@ function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  const prototypeShowId =
-    typeof WRESTLING_MATCH_DETAIL_SHOW_ID === "string"
-      ? WRESTLING_MATCH_DETAIL_SHOW_ID
-      : "062026";
-  const prototypeMatchId =
-    typeof WRESTLING_MATCH_DETAIL_MATCH_ID === "string"
-      ? WRESTLING_MATCH_DETAIL_MATCH_ID
-      : "match-1";
+  const routeShowId = String(route?.dateKey || route?.showId || "").trim();
+  const routeMatchId = String(route?.matchRef || route?.matchId || "").trim();
+  const prototypeShowId = routeShowId || (
+    typeof WRESTLING_MATCH_DETAIL_SHOW_ID === "string" ? WRESTLING_MATCH_DETAIL_SHOW_ID : "062026"
+  );
+  const prototypeMatchId = routeMatchId || (
+    typeof WRESTLING_MATCH_DETAIL_MATCH_ID === "string" ? WRESTLING_MATCH_DETAIL_MATCH_ID : "match-1"
+  );
 
   if (route?.name === "wrestling-match-detail-photo") {
     return `${routePaths.wrestlingShows}/${prototypeShowId}/${prototypeMatchId}`;

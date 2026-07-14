@@ -23,7 +23,7 @@
     <script>
       (() => {
         const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
-        if (routePath === "/wrestling/shows/062026/match-1" || routePath.startsWith("/wrestling/shows/062026/match-1/photo/")) {
+        if (/^\/wrestling\/shows\/[^/]+\/match-\d+(?:\/photo\/[^/]+)?$/.test(routePath)) {
           document.currentScript.parentElement.classList.remove("is-home-route");
           document.currentScript.parentElement.setAttribute("data-shell-route", "wrestling-match-detail");
         }
