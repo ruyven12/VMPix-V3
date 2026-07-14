@@ -3331,6 +3331,7 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
   }
   setHubChromeHidden(true);
   if (wrestlingMatchDetailPrototypeShell) {
+    wrestlingMatchDetailPrototypeShell.classList.remove("is-lightbox-hidden");
     wrestlingMatchDetailPrototypeShell.setAttribute("aria-hidden", "false");
     wrestlingMatchDetailPrototypeShell.removeAttribute("inert");
   }

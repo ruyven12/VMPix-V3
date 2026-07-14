@@ -11530,6 +11530,12 @@ button.wrestling-event-history-tagged-thumb {
   overflow-y: auto;
 }
 
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-detail-prototype-shell.is-lightbox-hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 .wrestling-match-dossier-metadata {
   position: relative;
   isolation: isolate;
@@ -11765,7 +11771,7 @@ button.wrestling-event-history-tagged-thumb {
   display: block;
   inline-size: 100%;
   block-size: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 

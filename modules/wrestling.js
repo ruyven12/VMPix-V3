@@ -9274,6 +9274,7 @@ function closeWrestlingMatchLightboxBridge() {
       wrestlingMatchGalleryShell.setAttribute("inert", "");
     }
     if (wrestlingMatchDetailPrototypeShell) {
+      wrestlingMatchDetailPrototypeShell.classList.remove("is-lightbox-hidden");
       wrestlingMatchDetailPrototypeShell.setAttribute("aria-hidden", "false");
       wrestlingMatchDetailPrototypeShell.removeAttribute("inert");
     }
@@ -9388,6 +9389,7 @@ function openWrestlingMatchDetailPrototypePhotoRoute(route = getRouteFromUrl(), 
   openWrestlingMatchPhotoLightbox(photos, photoIndex, null, show, match, {
     returnScroller: wrestlingMatchDetailPrototypeShell,
     routeBuilder: (photoRouteId) => getWrestlingMatchDetailPrototypePhotoRouteUrl(photoRouteId),
+    hidePrototypeShell: true,
   });
   return true;
 }
@@ -9425,6 +9427,11 @@ function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, matc
   if (wrestlingMatchGalleryShell) {
     wrestlingMatchGalleryShell.setAttribute("aria-hidden", "true");
     wrestlingMatchGalleryShell.setAttribute("inert", "");
+  }
+  if (options.hidePrototypeShell && wrestlingMatchDetailPrototypeShell) {
+    wrestlingMatchDetailPrototypeShell.classList.add("is-lightbox-hidden");
+    wrestlingMatchDetailPrototypeShell.setAttribute("aria-hidden", "true");
+    wrestlingMatchDetailPrototypeShell.setAttribute("inert", "");
   }
   if (wrestlingLightboxShell) {
     wrestlingLightboxShell.setAttribute("aria-hidden", "true");
