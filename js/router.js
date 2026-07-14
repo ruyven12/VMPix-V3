@@ -107,39 +107,25 @@ function getRouteFromUrl(url = window.location.href) {
     const routeParts = routePath.slice(wrestlingShowDetailPrefix.length).split("/");
     if (routeParts.length === 4 && routeParts[0] && routeParts[1] && routeParts[2] === "photo" && routeParts[3]) {
       const dateKey = decodeRoutePart(routeParts[0]);
-      const routeMatchId = decodeWrestlingMatchRouteSegment(routeParts[1]);
+      const matchRef = decodeWrestlingMatchRouteSegment(routeParts[1]);
       const photoId = decodeRoutePart(routeParts[3]);
-      if (/^match-\d+$/.test(routeMatchId)) {
-        return { name: "wrestling-match-detail-photo", showId: dateKey, dateKey, matchId: routeMatchId, matchRef: routeMatchId, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(routeMatchId)}/photo/${encodeURIComponent(photoId)}` };
-      }
-      const matchRef = routeMatchId;
-      return { name: "wrestling-lightbox", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
+      return { name: "wrestling-match-detail-photo", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
     }
     if (routeParts.length === 2 && routeParts[0] && routeParts[1]) {
       const dateKey = decodeRoutePart(routeParts[0]);
-      const routeMatchId = decodeWrestlingMatchRouteSegment(routeParts[1]);
-      if (/^match-\d+$/.test(routeMatchId)) {
-        return { name: "wrestling-match-detail", showId: dateKey, dateKey, matchId: routeMatchId, matchRef: routeMatchId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(routeMatchId)}` };
-      }
-      const matchRef = routeMatchId;
-      return { name: "wrestling-match-gallery", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
+      const matchRef = decodeWrestlingMatchRouteSegment(routeParts[1]);
+      return { name: "wrestling-match-detail", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
     }
     if (routeParts.length === 5 && routeParts[0] && routeParts[1] === "match" && routeParts[2] && routeParts[3] === "photo" && routeParts[4]) {
       const dateKey = decodeRoutePart(routeParts[0]);
       const matchRef = decodeLegacyWrestlingMatchRouteSegment(routeParts[2]);
       const photoId = decodeRoutePart(routeParts[4]);
-      if (/^match-\d+$/.test(matchRef)) {
-        return { name: "wrestling-match-detail-photo", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
-      }
-      return { name: "wrestling-lightbox", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
+      return { name: "wrestling-match-detail-photo", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
     }
     if (routeParts.length === 3 && routeParts[0] && routeParts[1] === "match" && routeParts[2]) {
       const dateKey = decodeRoutePart(routeParts[0]);
       const matchRef = decodeLegacyWrestlingMatchRouteSegment(routeParts[2]);
-      if (/^match-\d+$/.test(matchRef)) {
-        return { name: "wrestling-match-detail", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
-      }
-      return { name: "wrestling-match-gallery", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
+      return { name: "wrestling-match-detail", showId: dateKey, dateKey, matchId: matchRef, matchRef, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}` };
     }
     if (routeParts.length === 1 && routeParts[0]) {
       const dateKey = decodeRoutePart(routeParts[0]);

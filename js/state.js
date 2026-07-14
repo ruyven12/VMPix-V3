@@ -1992,7 +1992,7 @@ function isWrestlingMatchDetailRoute(route) {
 
   const routeShowId = String(route.dateKey || route.showId || "").trim().toLowerCase();
   const routeMatchId = String(route.matchRef || route.matchId || "").trim().toLowerCase();
-  return Boolean(routeShowId && /^match-\d+$/.test(routeMatchId));
+  return Boolean(routeShowId && routeMatchId);
 }
 
 function isWrestlingMatchDetailPhotoRoute(route) {
