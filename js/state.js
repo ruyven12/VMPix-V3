@@ -47,6 +47,7 @@ const wrestlingPeopleList = document.querySelector("[data-wrestling-people-list]
 const wrestlingPeopleBack = document.querySelector("[data-wrestling-people-back]");
 const wrestlingPersonDetailShell = document.querySelector("[data-wrestling-person-detail-shell]");
 const wrestlingVenuesShell = document.querySelector("[data-wrestling-venues-shell]");
+const wrestlingVenuesPrototypeShell = document.querySelector("[data-wrestling-venues-prototype-shell]");
 const wrestlingVenuesList = document.querySelector("[data-wrestling-venues-list]");
 const wrestlingVenuesBack = document.querySelector("[data-wrestling-venues-back]");
 const wrestlingVenueDetailShell = document.querySelector("[data-wrestling-venue-detail-shell]");
@@ -1970,6 +1971,7 @@ const routePaths = {
   wrestling: "/wrestling",
   wrestlingPeople: "/wrestling/people",
   wrestlingVenues: "/wrestling/venues",
+  wrestlingVenuesPrototype: "/wrestling/venues2",
   wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",

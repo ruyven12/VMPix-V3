@@ -1198,6 +1198,11 @@
 
           <div class="wrestling-venues-list" role="list" aria-label="Wrestling venue archive rows" data-wrestling-venues-list></div>
         </section>
+        <section class="wrestling-venues-prototype-shell" aria-hidden="true" inert data-wrestling-venues-prototype-shell>
+          <div class="fields-of-conflict-prototype-surface" aria-hidden="true">
+            <div class="fields-of-conflict-globe-placeholder" data-fields-of-conflict-globe-placeholder></div>
+          </div>
+        </section>
         <article class="wrestling-venue-detail-shell" aria-labelledby="wrestling-venue-detail-title" aria-hidden="true" inert data-wrestling-venue-detail-shell></article>
         <section class="wrestling-shows-shell" aria-label="Wrestling shows" aria-hidden="true" inert data-wrestling-shows-shell>
 
@@ -1818,6 +1823,67 @@
   <script src="/modules/wrestling.js"></script>
   <script src="/modules/connect.js"></script>
   <script src="/js/router.js"></script>
+  <script>
+    (() => {
+      const getPrototypePath = () => {
+        if (typeof routePaths !== "undefined" && routePaths.wrestlingVenuesPrototype) {
+          return routePaths.wrestlingVenuesPrototype;
+        }
+        return "/wrestling/venues2";
+      };
+      const normalizePath = (value) => {
+        try {
+          const path = new URL(value, window.location.href).pathname.replace(/\/+$/, "");
+          return path || "/";
+        } catch (error) {
+          return "";
+        }
+      };
+      const getPrototypeRoute = (url = window.location.href) => {
+        const prototypePath = normalizePath(getPrototypePath());
+        if (normalizePath(url) !== prototypePath) {
+          return null;
+        }
+        return {
+          name: "wrestling-venues",
+          canonicalUrl: prototypePath,
+          venuesPrototype: "fields-of-conflict",
+          wrestlingVenuesPrototype: "fields-of-conflict",
+        };
+      };
+      const originalGetRouteFromUrl = typeof getRouteFromUrl === "function" ? getRouteFromUrl : null;
+      if (originalGetRouteFromUrl && !originalGetRouteFromUrl.__wrestlingVenuesPrototypeWrapped) {
+        window.getRouteFromUrl = function getRouteFromUrlWithVenuesPrototype(url = window.location.href) {
+          return getPrototypeRoute(url) || originalGetRouteFromUrl(url);
+        };
+        window.getRouteFromUrl.__wrestlingVenuesPrototypeWrapped = true;
+      }
+      window.isWrestlingVenuesPrototypePath = (url = window.location.href) => Boolean(getPrototypeRoute(url));
+      const syncPrototypeShellState = () => {
+        if (!window.isWrestlingVenuesPrototypePath?.()) {
+          return;
+        }
+        const shell = document.querySelector(".site-shell");
+        if (shell) {
+          shell.dataset.shellRoute = "wrestling-venues";
+          shell.dataset.wrestlingVenuesPrototype = "fields-of-conflict";
+          shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
+        }
+        const current = document.querySelector("[data-current-view]");
+        if (current) {
+          current.textContent = "Wrestling Venues";
+        }
+      };
+      window.addEventListener("load", () => {
+        if (window.isWrestlingVenuesPrototypePath?.() && typeof syncRoute === "function") {
+          syncRoute({ shouldCanonicalize: false });
+        }
+        requestAnimationFrame(syncPrototypeShellState);
+        window.setTimeout(syncPrototypeShellState, 100);
+        window.setTimeout(syncPrototypeShellState, 500);
+      }, { once: true });
+    })();
+  </script>
   <script src="/js/shell.js"></script>
 </body>
 </html>
