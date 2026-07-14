@@ -11879,6 +11879,15 @@ button.wrestling-event-history-tagged-thumb {
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
     column-gap: 0;
   }
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:first-child {
+    justify-items: end;
+    text-align: right;
+  }
+
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:last-of-type {
+    justify-items: start;
+    text-align: left;
+  }
 }
 
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-detail-prototype-shell,
