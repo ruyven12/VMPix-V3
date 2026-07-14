@@ -11817,15 +11817,16 @@ button.wrestling-event-history-tagged-thumb {
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero {
     inline-size: min(100%, 34rem);
-    min-block-size: clamp(7.2rem, 31vw, 9.6rem);
+    min-block-size: auto;
     gap: 0;
-    padding: 0.86rem 0.78rem;
+    padding: 0.54rem 0.78rem 0.46rem;
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     inline-size: min(100%, 34rem);
     padding: 0.46rem 0.5rem;
+    margin-block-start: calc(-1 * clamp(0.48rem, 1.1vw, 0.72rem));
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item {
