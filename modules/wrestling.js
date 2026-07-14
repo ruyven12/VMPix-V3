@@ -4018,50 +4018,107 @@ function getWrestlingMatchDossierMetadataValue(value) {
   return text;
 }
 
-function getWrestlingMatchDossierMetadataRows(show = null) {
-  if (!show) {
+function getWrestlingMatchDossierMetadataFirstValue(...values) {
+  return values
+    .map(getWrestlingMatchDossierMetadataValue)
+    .find(Boolean) || "";
+}
+
+function getWrestlingMatchDossierMetadataDisplayValue(value) {
+  return getWrestlingMatchDossierMetadataValue(value) || "N/A";
+}
+
+function createWrestlingMatchDossierMetadataItem(label, value) {
+  const item = document.createElement("div");
+  item.className = "wrestling-match-dossier-metadata__item";
+
+  const labelElement = document.createElement("dt");
+  labelElement.className = "wrestling-match-dossier-metadata__label";
+  labelElement.textContent = label;
+
+  const valueElement = document.createElement("dd");
+  valueElement.className = "wrestling-match-dossier-metadata__value";
+  valueElement.textContent = getWrestlingMatchDossierMetadataDisplayValue(value);
+
+  item.append(labelElement, valueElement);
+  return item;
+}
+
+function getWrestlingMatchDossierMetadataRows(show = null, match = null) {
+  if (!show && !match) {
     return [];
   }
 
-  const event = getWrestlingMatchDossierMetadataValue(show.title || show.eventName || show.showName || show.show_name);
-  const date = getWrestlingMatchDossierMetadataValue(
-    show.eventDate || formatWrestlingShowDate(show.rawDate || show.date || show.show_date || show.dateKey)
+  const safeShow = show || {};
+  const matchSource = getHallPrototypeMatchSource(match);
+  const officialNames = getHallPrototypeMatchOfficialNames(match || {});
+  const officialLabel = officialNames.length > 1 ? "OFFICIALS" : "OFFICIAL";
+
+  const event = getWrestlingMatchDossierMetadataFirstValue(
+    safeShow.title,
+    safeShow.eventName,
+    safeShow.showName,
+    safeShow.show_name
   );
-  const venue = getWrestlingMatchDossierMetadataValue(show.venue || getWrestlingVenueName(show));
-  const location = getWrestlingMatchDossierMetadataValue(show.location || getWrestlingShowLocation(show));
+  const date = getWrestlingMatchDossierMetadataFirstValue(
+    safeShow.eventDate,
+    formatWrestlingShowDate(safeShow.rawDate || safeShow.date || safeShow.show_date || safeShow.dateKey)
+  );
+  const venue = getWrestlingMatchDossierMetadataFirstValue(safeShow.venue, getWrestlingVenueName(safeShow));
+  const location = getWrestlingMatchDossierMetadataFirstValue(safeShow.location, getWrestlingShowLocation(safeShow));
+  const finish = getWrestlingMatchDossierMetadataFirstValue(matchSource.finish_type, matchSource.finishType);
+  const duration = getWrestlingMatchDossierMetadataFirstValue(matchSource.match_duration, matchSource.matchDuration);
 
   return [
-    ["Event", event],
-    ["Date", date],
-    ["Venue", venue],
-    ["Location", location],
-  ].filter((row) => row[1]);
+    {
+      modifier: "context",
+      items: [
+        ["EVENT", event],
+        ["DATE", date],
+        ["VENUE", venue],
+        ["LOCATION", location],
+      ],
+    },
+    {
+      modifier: "personnel",
+      items: [
+        [officialLabel, officialNames.join(", ")],
+        ["ANNOUNCER", matchSource.announcer],
+      ],
+    },
+    {
+      modifier: "outcome",
+      items: [
+        ["BLOOD", matchSource.blood],
+        ["FINISH", finish],
+        ["DURATION", duration],
+      ],
+    },
+  ];
 }
 
-function createWrestlingMatchDossierMetadata(show = null) {
-  const rows = getWrestlingMatchDossierMetadataRows(show);
+function createWrestlingMatchDossierMetadata(show = null, match = null) {
+  const rows = getWrestlingMatchDossierMetadataRows(show, match);
   if (rows.length === 0) {
     return null;
   }
 
   const metadata = document.createElement("dl");
   metadata.className = "wrestling-match-dossier-metadata";
-  metadata.setAttribute("aria-label", "Match event metadata");
+  metadata.setAttribute("aria-label", "Match archive metadata");
 
-  rows.forEach(([label, value]) => {
-    const item = document.createElement("div");
-    item.className = "wrestling-match-dossier-metadata__item";
+  rows.forEach((row) => {
+    const rowElement = document.createElement("div");
+    rowElement.className = [
+      "wrestling-match-dossier-metadata__row",
+      "wrestling-match-dossier-metadata__row--" + row.modifier,
+    ].join(" ");
 
-    const labelElement = document.createElement("dt");
-    labelElement.className = "wrestling-match-dossier-metadata__label";
-    labelElement.textContent = label;
+    row.items.forEach(([label, value]) => {
+      rowElement.append(createWrestlingMatchDossierMetadataItem(label, value));
+    });
 
-    const valueElement = document.createElement("dd");
-    valueElement.className = "wrestling-match-dossier-metadata__value";
-    valueElement.textContent = value;
-
-    item.append(labelElement, valueElement);
-    metadata.append(item);
+    metadata.append(rowElement);
   });
 
   return metadata;
@@ -4520,7 +4577,7 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
   const match = getWrestlingMatchDossierPrototypeSourceMatch();
   requestWrestlingMatchDossierPrototypePhotoCount(show);
   const hero = createWrestlingMatchDossierHero(match);
-  const metadata = createWrestlingMatchDossierMetadata(show);
+  const metadata = createWrestlingMatchDossierMetadata(show, match);
   const photoPagination = getWrestlingMatchDossierPhotoPagination(show, match);
   const photoHighlights = createWrestlingMatchDossierPhotoHighlights(show, match, photoPagination);
   const photoPreviewGrid = createWrestlingMatchDossierPhotoPreviewGrid(photoPagination);

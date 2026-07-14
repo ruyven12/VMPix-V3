@@ -11540,7 +11540,7 @@ button.wrestling-event-history-tagged-thumb {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
   inline-size: min(100%, 64rem);
   margin: 0;
@@ -11565,6 +11565,25 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
 }
 
+.wrestling-match-dossier-metadata__row {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.wrestling-match-dossier-metadata__row + .wrestling-match-dossier-metadata__row {
+  border-block-start: 1px solid rgba(255, 42, 26, 0.14);
+}
+
+.wrestling-match-dossier-metadata__row--context,
+.wrestling-match-dossier-metadata__row--personnel {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wrestling-match-dossier-metadata__row--outcome {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .wrestling-match-dossier-metadata__item {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -11574,11 +11593,13 @@ button.wrestling-event-history-tagged-thumb {
   padding: clamp(0.46rem, 1vw, 0.68rem) clamp(0.5rem, 1.15vw, 0.82rem);
 }
 
-.wrestling-match-dossier-metadata__item:nth-child(2n) {
+.wrestling-match-dossier-metadata__row--context .wrestling-match-dossier-metadata__item:nth-child(2n),
+.wrestling-match-dossier-metadata__row--personnel .wrestling-match-dossier-metadata__item:nth-child(n + 2),
+.wrestling-match-dossier-metadata__row--outcome .wrestling-match-dossier-metadata__item:nth-child(n + 2) {
   border-inline-start: 1px solid rgba(255, 42, 26, 0.16);
 }
 
-.wrestling-match-dossier-metadata__item:nth-child(n + 3) {
+.wrestling-match-dossier-metadata__row--context .wrestling-match-dossier-metadata__item:nth-child(n + 3) {
   border-block-start: 1px solid rgba(255, 42, 26, 0.14);
 }
 
@@ -11823,30 +11844,35 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     inline-size: min(100%, 34rem);
-    padding: 0.46rem 0.5rem;
+    padding: 0.38rem 0.42rem;
     margin-block-start: calc(-1 * clamp(0.48rem, 1.1vw, 0.72rem));
+  }
+
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--context,
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--personnel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--outcome {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0.18rem;
-    padding: 0.42rem 0.38rem;
+    gap: 0.14rem;
+    padding: 0.34rem 0.24rem;
   }
 
-  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item:nth-child(2n) {
-    border-inline-start: 1px solid rgba(255, 42, 26, 0.16);
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__label {
+    font-size: clamp(0.48rem, 2.2vw, 0.56rem);
+    letter-spacing: 0.045em;
   }
 
-  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item + .wrestling-match-dossier-metadata__item {
-    border-block-start: 0;
+  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__value {
+    font-size: clamp(0.54rem, 2.45vw, 0.66rem);
+    letter-spacing: 0.035em;
   }
-
-  .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__item:nth-child(n + 3) {
-    border-block-start: 1px solid rgba(255, 42, 26, 0.14);
-  }
-
 
   .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-photo-highlights {
     inline-size: min(100%, 34rem);
