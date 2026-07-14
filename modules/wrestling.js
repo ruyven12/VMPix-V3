@@ -503,6 +503,24 @@ function getWrestlingText(value, fallback = "") {
   return text || fallback;
 }
 
+function getWrestlingNullableText(value) {
+  if (value === undefined || value === null || Array.isArray(value) || typeof value === "object") {
+    return null;
+  }
+  const text = String(value).trim();
+  return text || null;
+}
+
+function getFirstWrestlingNullableText(...values) {
+  for (const value of values) {
+    const text = getWrestlingNullableText(value);
+    if (text !== null) {
+      return text;
+    }
+  }
+  return null;
+}
+
 function normalizeWrestlingArchiveSlug(value, fallback = "wrestling-show") {
   const slug = String(value || "")
     .trim()
@@ -775,6 +793,11 @@ function normalizeWrestlingMatchRow(record = {}, show = {}, index = 0) {
   const taggedPeople = getWrestlingArray(record.tagged_people || record.taggedPeople);
   const referees = getWrestlingArray(record.referees);
 
+  const finishType = getFirstWrestlingNullableText(record.finish_type, record.finishType);
+  const matchDuration = getFirstWrestlingNullableText(record.match_duration, record.matchDuration);
+  const announcer = getFirstWrestlingNullableText(record.announcer);
+  const blood = getFirstWrestlingNullableText(record.blood);
+
   return {
     ...record,
     showId: show.showId,
@@ -783,6 +806,12 @@ function normalizeWrestlingMatchRow(record = {}, show = {}, index = 0) {
     match_url: sourceMatchUrl || matchId,
     matchUrl: sourceMatchUrl || matchId,
     venueId: show.venueId,
+    finish_type: finishType,
+    finishType,
+    match_duration: matchDuration,
+    matchDuration,
+    announcer,
+    blood,
     matchName: title,
     matchType,
     matchOrder: order,
