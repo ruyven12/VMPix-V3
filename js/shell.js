@@ -2154,20 +2154,20 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "wrestling-match-detail-prototype" || route?.name === "wrestling-match-detail-prototype-photo";
+  return route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   const prototypeShowId =
-    typeof WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID === "string"
-      ? WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID
+    typeof WRESTLING_MATCH_DETAIL_SHOW_ID === "string"
+      ? WRESTLING_MATCH_DETAIL_SHOW_ID
       : "062026";
   const prototypeMatchId =
-    typeof WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID === "string"
-      ? WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID
-      : "match-1a";
+    typeof WRESTLING_MATCH_DETAIL_MATCH_ID === "string"
+      ? WRESTLING_MATCH_DETAIL_MATCH_ID
+      : "match-1";
 
-  if (route?.name === "wrestling-match-detail-prototype-photo") {
+  if (route?.name === "wrestling-match-detail-photo") {
     return `${routePaths.wrestlingShows}/${prototypeShowId}/${prototypeMatchId}`;
   }
 
@@ -2221,7 +2221,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   prototypeEngineReturnEmitter.classList.toggle("is-prototype-return-control", isActive);
   prototypeEngineReturnEmitter.toggleAttribute("data-prototype-engine-return-active", isActive);
   prototypeEngineReturnEmitter.dataset.prototypeEngineReturnState =
-    isActive && route?.name === "wrestling-match-detail-prototype-photo" ? "photo" : "detail";
+    isActive && route?.name === "wrestling-match-detail-photo" ? "photo" : "detail";
 
   if (!prototypeEngineReturnControl) {
     return;
@@ -2240,8 +2240,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
   const isHomeRoute = route.name === "home";
-  const shellRouteName = route.name === "wrestling-match-detail-prototype-photo"
-    ? "wrestling-match-detail-prototype"
+  const shellRouteName = route.name === "wrestling-match-detail-photo"
+    ? "wrestling-match-detail"
     : route.name;
   const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio";
   shell.dataset.shellRoute = shellRouteName;
@@ -3359,7 +3359,7 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
 }
 
 function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
-  if (typeof isBlankWrestlingMatchDetailPrototypeRoute === "function" && !isBlankWrestlingMatchDetailPrototypeRoute(route)) {
+  if (typeof isWrestlingMatchDetailRoute === "function" && !isWrestlingMatchDetailRoute(route)) {
     return;
   }
   if (!shell || !portfolioHub) {
@@ -3430,8 +3430,8 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
 
 function showWrestlingMatchDetailPrototypePhoto(route = getRouteFromUrl()) {
   if (
-    typeof isWrestlingMatchDetailPrototypePhotoRoute === "function" &&
-    !isWrestlingMatchDetailPrototypePhotoRoute(route)
+    typeof isWrestlingMatchDetailPhotoRoute === "function" &&
+    !isWrestlingMatchDetailPhotoRoute(route)
   ) {
     return;
   }
@@ -4086,8 +4086,8 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "wrestling-venue-detail": wrestlingVenueDetailShell,
     "wrestling-shows": wrestlingShowsShell,
     "wrestling-show-detail": wrestlingShowDetailShell,
-    "wrestling-match-detail-prototype": wrestlingMatchDetailPrototypeShell,
-    "wrestling-match-detail-prototype-photo": wrestlingMatchDetailPrototypeShell,
+    "wrestling-match-detail": wrestlingMatchDetailPrototypeShell,
+    "wrestling-match-detail-photo": wrestlingMatchDetailPrototypeShell,
     "wrestling-match-gallery": wrestlingMatchGalleryShell,
     "wrestling-lightbox": wrestlingLightboxShell,
     calendar: calendarShell,
