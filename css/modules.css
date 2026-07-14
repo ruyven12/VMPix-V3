@@ -11584,6 +11584,10 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.wrestling-match-dossier-metadata__row--notes {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .wrestling-match-dossier-metadata__item {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -11930,6 +11934,16 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__label,
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__value {
   text-align: center;
+}
+
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--notes .wrestling-match-dossier-metadata__item {
+  justify-items: start;
+  text-align: left;
+}
+
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--notes .wrestling-match-dossier-metadata__label,
+.site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-metadata__row--notes .wrestling-match-dossier-metadata__value {
+  text-align: left;
 }
 
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .home-frame,

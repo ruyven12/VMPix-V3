@@ -4094,6 +4094,12 @@ function getWrestlingMatchDossierMetadataRows(show = null, match = null) {
         ["DURATION", duration],
       ],
     },
+    {
+      modifier: "notes",
+      items: [
+        ["NOTES", matchSource.notes],
+      ],
+    },
   ];
 }
 
