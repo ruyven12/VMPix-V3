@@ -107,8 +107,12 @@ function getRouteFromUrl(url = window.location.href) {
     const routeParts = routePath.slice(wrestlingShowDetailPrefix.length).split("/");
     if (routeParts.length === 4 && routeParts[0] && routeParts[1] && routeParts[2] === "photo" && routeParts[3]) {
       const dateKey = decodeRoutePart(routeParts[0]);
-      const matchRef = decodeWrestlingMatchRouteSegment(routeParts[1]);
+      const routeMatchId = decodeRoutePart(routeParts[1]).trim().toLowerCase();
       const photoId = decodeRoutePart(routeParts[3]);
+      if (dateKey === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID && routeMatchId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID) {
+        return { name: "wrestling-match-detail-prototype-photo", showId: dateKey, dateKey, matchId: routeMatchId, matchRef: routeMatchId, photoId, matchDetailPrototype: "blank", canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(routeMatchId)}/photo/${encodeURIComponent(photoId)}` };
+      }
+      const matchRef = decodeWrestlingMatchRouteSegment(routeParts[1]);
       return { name: "wrestling-lightbox", showId: dateKey, dateKey, matchId: matchRef, matchRef, photoId, canonicalUrl: `${routePaths.wrestlingShows}/${encodeURIComponent(dateKey)}/${encodeURIComponent(matchRef)}/photo/${encodeURIComponent(photoId)}` };
     }
     if (routeParts.length === 2 && routeParts[0] && routeParts[1]) {
@@ -377,6 +381,20 @@ function syncRoute(route, options = {}) {
       isBlankWrestlingMatchDetailPrototypeRoute(route)
     ) {
       showWrestlingMatchDetailPrototype(route);
+    }
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "wrestling-match-detail-prototype-photo") {
+    if (
+      typeof showWrestlingMatchDetailPrototypePhoto === "function" &&
+      typeof isWrestlingMatchDetailPrototypePhotoRoute === "function" &&
+      isWrestlingMatchDetailPrototypePhotoRoute(route)
+    ) {
+      showWrestlingMatchDetailPrototypePhoto(route);
     }
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);

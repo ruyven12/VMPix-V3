@@ -2159,8 +2159,11 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
   const isHomeRoute = route.name === "home";
-  const shouldHideBottomRail = isHomeRoute || route.name === "portfolio";
-  shell.dataset.shellRoute = route.name;
+  const shellRouteName = route.name === "wrestling-match-detail-prototype-photo"
+    ? "wrestling-match-detail-prototype"
+    : route.name;
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio";
+  shell.dataset.shellRoute = shellRouteName;
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name !== "portfolio") {
     shell.classList.remove("has-portfolio-entry-constellation");
@@ -2172,7 +2175,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (bottomRail) {
-    bottomRail.dataset.shellRoute = route.name;
+    bottomRail.dataset.shellRoute = shellRouteName;
     bottomRail.dataset.shellActiveTarget = activeTarget;
     bottomRail.dataset.shellModule = moduleContext;
     bottomRail.hidden = shouldHideBottomRail;
@@ -3341,6 +3344,20 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
   }
 }
 
+function showWrestlingMatchDetailPrototypePhoto(route = getRouteFromUrl()) {
+  if (
+    typeof isWrestlingMatchDetailPrototypePhotoRoute === "function" &&
+    !isWrestlingMatchDetailPrototypePhotoRoute(route)
+  ) {
+    return;
+  }
+
+  showWrestlingMatchDetailPrototype(route);
+  if (typeof openWrestlingMatchDetailPrototypePhotoRoute === "function") {
+    openWrestlingMatchDetailPrototypePhotoRoute(route);
+  }
+}
+
 function showWrestlingMatchGallery(showId = "warzone-26", matchId = "daron-richardson-vs-bear-bronson") {
   if (!shell || !portfolioHub || !wrestlingMatchGalleryShell) {
     return;
@@ -3986,6 +4003,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "wrestling-shows": wrestlingShowsShell,
     "wrestling-show-detail": wrestlingShowDetailShell,
     "wrestling-match-detail-prototype": wrestlingMatchDetailPrototypeShell,
+    "wrestling-match-detail-prototype-photo": wrestlingMatchDetailPrototypeShell,
     "wrestling-match-gallery": wrestlingMatchGalleryShell,
     "wrestling-lightbox": wrestlingLightboxShell,
     calendar: calendarShell,

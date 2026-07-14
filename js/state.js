@@ -1982,7 +1982,12 @@ const WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID = "match-1a";
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_SOURCE_MATCH_ID = "match-1";
 
 function isBlankWrestlingMatchDetailPrototypeRoute(route) {
-  if (!route || route.name !== "wrestling-match-detail-prototype" || route.matchDetailPrototype !== "blank") {
+  if (!route || route.matchDetailPrototype !== "blank") {
+    return false;
+  }
+
+  const routeName = String(route.name || "");
+  if (routeName !== "wrestling-match-detail-prototype" && routeName !== "wrestling-match-detail-prototype-photo") {
     return false;
   }
 
@@ -1990,6 +1995,10 @@ function isBlankWrestlingMatchDetailPrototypeRoute(route) {
   const routeMatchId = String(route.matchRef || route.matchId || "").trim().toLowerCase();
   return routeShowId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID &&
     routeMatchId === WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID;
+}
+
+function isWrestlingMatchDetailPrototypePhotoRoute(route) {
+  return Boolean(route?.name === "wrestling-match-detail-prototype-photo" && isBlankWrestlingMatchDetailPrototypeRoute(route) && route.photoId);
 }
 
 function routeWrestlingShowsEntryPoint(event) {
@@ -2237,6 +2246,7 @@ const routeNameToGlobalNavTarget = {
   "wrestling-shows": "wrestling",
   "wrestling-show-detail": "wrestling",
   "wrestling-match-detail-prototype": "wrestling",
+  "wrestling-match-detail-prototype-photo": "wrestling",
   "wrestling-match-gallery": "wrestling",
   "wrestling-lightbox": "wrestling",
   "wrestling-people": "wrestling",
@@ -2270,6 +2280,7 @@ const routeNameToBreadcrumbTrail = {
   "wrestling-shows": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-show-detail": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-match-detail-prototype": ["portfolio", "wrestling", "wrestling-shows"],
+  "wrestling-match-detail-prototype-photo": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-match-gallery": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-lightbox": ["portfolio", "wrestling", "wrestling-shows"],
   "wrestling-people": ["portfolio", "wrestling", "wrestling-people"],
@@ -2296,6 +2307,7 @@ const routeNameToDrilldownBreadcrumb = {
   "wrestling-venue-detail": "Venue Detail",
   "wrestling-show-detail": "Show Detail",
   "wrestling-match-detail-prototype": "Match Detail",
+  "wrestling-match-detail-prototype-photo": "Photo",
   "wrestling-match-gallery": "Match Gallery",
   "wrestling-lightbox": "Photo",
 };
@@ -2320,6 +2332,7 @@ const routeNameToShellBackTarget = {
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,
   "wrestling-match-detail-prototype": "",
+  "wrestling-match-detail-prototype-photo": "",
   "wrestling-match-gallery": "",
   "wrestling-lightbox": "",
   "wrestling-people": routePaths.wrestling,
