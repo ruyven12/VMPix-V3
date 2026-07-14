@@ -11778,9 +11778,9 @@ button.wrestling-event-history-tagged-thumb {
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero {
   align-content: start;
   inline-size: min(100%, 64rem);
-  min-block-size: clamp(7.4rem, 15vw, 9.7rem);
+  min-block-size: auto;
   gap: 0;
-  padding: clamp(0.56rem, 1.05vw, 0.82rem) clamp(1rem, 2.7vw, 2rem) clamp(0.82rem, 1.45vw, 1.12rem);
+  padding: clamp(0.8rem, 1.42vw, 1.08rem) clamp(1rem, 2.7vw, 2rem) 5px;
   pointer-events: auto;
 }
 
@@ -11789,7 +11789,8 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
-  min-block-size: clamp(4.2rem, 8vw, 6rem);
+  min-block-size: auto;
+  padding-block-end: 0;
 }
 
 .site-shell[data-shell-route="wrestling-match-detail-prototype"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {

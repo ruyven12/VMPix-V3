@@ -3977,14 +3977,6 @@ function createWrestlingMatchDossierHero(match = {}) {
     })
   );
 
-  if (encounter.officials.length > 0) {
-    const official = document.createElement("p");
-    official.className = "wrestling-show-prototype-encounter-official";
-    official.textContent = (encounter.officials.length > 1 ? "OFFICIALS" : "OFFICIAL") +
-      " " + String.fromCharCode(8226) + " " + encounter.officials.join(", ");
-    combatants.append(official);
-  }
-
   card.append(title, combatants);
   return card;
 }
