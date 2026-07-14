@@ -6715,7 +6715,108 @@ function renderWrestlingVenuesResults() {
   setActiveWrestlingVenueCard();
 }
 
+function normalizeWrestlingVenuesPrototypePath(value) {
+  try {
+    const path = new URL(value || "/wrestling/venues2", window.location.href).pathname.replace(/\/+$/, "");
+    return path || "/";
+  } catch (error) {
+    return String(value || "").replace(/\/+$/, "") || "/";
+  }
+}
+
+function isWrestlingVenuesPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
+  if (route?.wrestlingVenuesPrototype === "fields-of-conflict" || route?.venuesPrototype === "fields-of-conflict") {
+    return true;
+  }
+
+  if (typeof window !== "undefined" && typeof window.isWrestlingVenuesPrototypePath === "function") {
+    return window.isWrestlingVenuesPrototypePath();
+  }
+
+  if (typeof window !== "undefined") {
+    const prototypePath = normalizeWrestlingVenuesPrototypePath(
+      typeof routePaths !== "undefined" && routePaths?.wrestlingVenuesPrototype ? routePaths.wrestlingVenuesPrototype : "/wrestling/venues2"
+    );
+    return normalizeWrestlingVenuesPrototypePath(window.location.pathname) === prototypePath;
+  }
+
+  return false;
+}
+
+function getWrestlingVenuesPrototypeShell() {
+  if (typeof wrestlingVenuesPrototypeShell !== "undefined" && wrestlingVenuesPrototypeShell) {
+    return wrestlingVenuesPrototypeShell;
+  }
+  return document.querySelector("[data-wrestling-venues-prototype-shell]");
+}
+
+function clearWrestlingVenuesPrototypeSourceShell() {
+  if (typeof wrestlingVenuesList !== "undefined" && wrestlingVenuesList) {
+    wrestlingVenuesList.replaceChildren();
+  }
+  if (wrestlingVenuesFilters) {
+    wrestlingVenuesFilters.replaceChildren();
+  }
+  if (wrestlingVenuesCount) {
+    wrestlingVenuesCount.textContent = "";
+  }
+}
+
+function setWrestlingVenuesPrototypeActive(isActive) {
+  const shellElement = document.querySelector(".site-shell");
+  if (shellElement) {
+    if (isActive) {
+      shellElement.dataset.wrestlingVenuesPrototype = "fields-of-conflict";
+      shellElement.dataset.shellRoute = "wrestling-venues";
+      shellElement.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
+    } else {
+      delete shellElement.dataset.wrestlingVenuesPrototype;
+    }
+  }
+
+  if (isActive && typeof currentView !== "undefined" && currentView) {
+    currentView.textContent = "Wrestling Venues";
+  }
+
+  if (typeof wrestlingVenuesShell !== "undefined" && wrestlingVenuesShell) {
+    if (isActive) {
+      wrestlingVenuesShell.setAttribute("aria-hidden", "true");
+      wrestlingVenuesShell.setAttribute("inert", "");
+      wrestlingVenuesShell.setAttribute("aria-busy", "false");
+    } else {
+      let routeName = "";
+      try {
+        routeName = typeof getRouteFromUrl === "function" ? String(getRouteFromUrl()?.name || "") : "";
+      } catch (error) {
+        routeName = "";
+      }
+      if (routeName === "wrestling-venues") {
+        wrestlingVenuesShell.removeAttribute("aria-hidden");
+        wrestlingVenuesShell.removeAttribute("inert");
+      }
+    }
+  }
+
+  const prototypeShell = getWrestlingVenuesPrototypeShell();
+  if (prototypeShell) {
+    prototypeShell.toggleAttribute("inert", !isActive);
+    prototypeShell.setAttribute("aria-hidden", String(!isActive));
+    prototypeShell.dataset.fieldsOfConflictActive = String(isActive);
+  }
+}
+
+function renderWrestlingVenuesPrototypeShell() {
+  cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
+  clearWrestlingVenuesPrototypeSourceShell();
+  setWrestlingVenuesPrototypeActive(true);
+}
 function renderWrestlingVenuesIndex(options = {}) {
+  if (isWrestlingVenuesPrototypeRoute()) {
+    renderWrestlingVenuesPrototypeShell();
+    return;
+  }
+
+  setWrestlingVenuesPrototypeActive(false);
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
 
   if (!options.skipDataRequest && wrestlingVenuesDataState === "idle" && !wrestlingVenuesRequest && !wrestlingVenuesLoaded) {
