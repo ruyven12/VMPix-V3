@@ -3947,10 +3947,10 @@ function createWrestlingMatchDossierHero(match = {}) {
   card.className = "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card";
   card.dataset.wrestlingMatchDetailPrototype = "dossier-hero";
 
-  const type = document.createElement("p");
-  type.className = "wrestling-show-prototype-encounter-type";
-  type.id = "wrestling-match-detail-prototype-title";
-  type.textContent = getWrestlingMatchDossierHeroTypeText(match);
+  const title = document.createElement("h2");
+  title.className = "sr-only";
+  title.id = "wrestling-match-detail-prototype-title";
+  title.textContent = getWrestlingMatchDossierHeroTypeText(match);
 
   const combatants = document.createElement("div");
   combatants.className = "wrestling-show-prototype-encounter-combatants";
@@ -3985,7 +3985,7 @@ function createWrestlingMatchDossierHero(match = {}) {
     combatants.append(official);
   }
 
-  card.append(type, combatants);
+  card.append(title, combatants);
   return card;
 }
 
