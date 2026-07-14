@@ -3825,10 +3825,30 @@ function createHallPrototypeEncounterSide(label, values, options = {}) {
   return side;
 }
 
-function createHallPrototypeEncounterCard(match = {}, matchIndex = 0) {
+function createHallPrototypeEncounterCard(match = {}, matchIndex = 0, show = null) {
   const encounter = normalizeHallPrototypeEncounterRecord(match);
   const card = document.createElement("li");
+  const matchRef = getWrestlingMatchRouteRef(match, matchIndex);
+  const matchRoute = getWrestlingMatchRouteUrlByIds(show || match.showId, matchRef, matchIndex);
   card.className = "wrestling-show-prototype-encounter-card";
+  card.dataset.wrestlingMatchRef = matchRef;
+  card.dataset.wrestlingMatchRoute = matchRoute;
+  card.setAttribute("role", "link");
+  card.tabIndex = 0;
+  card.setAttribute("aria-label", `Open match ${matchIndex + 1}: ${encounter.heading}`);
+
+  const navigateToMatch = () => {
+    if (matchRoute && typeof navigateToRoute === "function") {
+      navigateToRoute(matchRoute);
+    }
+  };
+  card.addEventListener("click", navigateToMatch);
+  card.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      navigateToMatch();
+    }
+  });
   if (encounter.segmentInfo) {
     card.classList.add("wrestling-show-prototype-encounter-card--segment");
     card.dataset.hallPrototypeEncounterState = "segment";
@@ -4619,7 +4639,7 @@ function createHallPrototypeEncounterSection(show = {}) {
   const matches = Array.isArray(show.matches) ? show.matches : [];
   if (matches.length > 0) {
     matches.forEach((match, matchIndex) => {
-      list.append(createHallPrototypeEncounterCard(match, matchIndex));
+      list.append(createHallPrototypeEncounterCard(match, matchIndex, show));
     });
   } else {
     const emptyCard = document.createElement("li");
