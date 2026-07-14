@@ -6767,15 +6767,30 @@ function setWrestlingVenuesPrototypeActive(isActive) {
   if (shellElement) {
     if (isActive) {
       shellElement.dataset.wrestlingVenuesPrototype = "fields-of-conflict";
-      shellElement.dataset.shellRoute = "wrestling-venues";
-      shellElement.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
+      shellElement.dataset.portfolioGatewayWorld = "battleground";
+      shellElement.dataset.portfolioGatewayRoute = "/wrestling";
+      shellElement.dataset.portfolioGatewayState = "filling-screen";
+      shellElement.dataset.activeWorld = "battleground";
+      shellElement.dataset.shellRoute = "portfolio";
+      shellElement.dataset.shellActiveTarget = "portfolio";
+      shellElement.dataset.shellModule = "shell";
+      shellElement.dataset.portfolioGatewayHandoff = "complete";
+      shellElement.classList.remove("is-module-view", "is-wrestling-venues-view", "is-ring-archive-view");
+      shellElement.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
     } else {
       delete shellElement.dataset.wrestlingVenuesPrototype;
     }
   }
 
   if (isActive && typeof currentView !== "undefined" && currentView) {
-    currentView.textContent = "Wrestling Venues";
+    currentView.textContent = "Outskirts of Daiion";
+  }
+
+  if (isActive) {
+    const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+    if (engineCurrent) {
+      engineCurrent.textContent = "Outskirts of Daiion";
+    }
   }
 
   if (typeof wrestlingVenuesShell !== "undefined" && wrestlingVenuesShell) {

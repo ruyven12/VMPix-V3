@@ -1865,13 +1865,25 @@
         }
         const shell = document.querySelector(".site-shell");
         if (shell) {
-          shell.dataset.shellRoute = "wrestling-venues";
           shell.dataset.wrestlingVenuesPrototype = "fields-of-conflict";
-          shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-venues-view");
+          shell.dataset.portfolioGatewayWorld = "battleground";
+          shell.dataset.portfolioGatewayRoute = "/wrestling";
+          shell.dataset.portfolioGatewayState = "filling-screen";
+          shell.dataset.activeWorld = "battleground";
+          shell.dataset.shellRoute = "portfolio";
+          shell.dataset.shellActiveTarget = "portfolio";
+          shell.dataset.shellModule = "shell";
+          shell.dataset.portfolioGatewayHandoff = "complete";
+          shell.classList.remove("is-module-view", "is-wrestling-venues-view", "is-ring-archive-view");
+          shell.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
         }
         const current = document.querySelector("[data-current-view]");
         if (current) {
-          current.textContent = "Wrestling Venues";
+          current.textContent = "Outskirts of Daiion";
+        }
+        const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+        if (engineCurrent) {
+          engineCurrent.textContent = "Outskirts of Daiion";
         }
       };
       window.addEventListener("load", () => {

@@ -21733,14 +21733,24 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-shell {
+  display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
   transform: none !important;
   visibility: hidden !important;
 }
 
-.site-shell[data-shell-route="wrestling-venues"][data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-active="true"],
-.site-shell.is-wrestling-venues-view[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-active="true"] {
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] [data-shell-bottom-rail] {
+  display: none !important;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] [data-portfolio-engine] {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-active="true"] {
   background:
     linear-gradient(180deg, rgba(1, 1, 3, 0.34), rgba(1, 1, 3, 0.52)),
     url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
