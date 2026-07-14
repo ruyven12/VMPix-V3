@@ -11780,7 +11780,7 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: min(100%, 64rem);
   min-block-size: auto;
   gap: 0;
-  padding: clamp(0.8rem, 1.42vw, 1.08rem) clamp(1rem, 2.7vw, 2rem) 5px;
+  padding: clamp(0.8rem, 1.42vw, 1.08rem) clamp(1rem, 2.7vw, 2rem) 10px;
   pointer-events: auto;
 }
 
