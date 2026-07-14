@@ -4200,7 +4200,7 @@ function getWrestlingMatchDossierPreviewPhotos(match = null) {
 }
 
 function getWrestlingMatchDossierPreviewPhotoSrc(photo = {}) {
-  return photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc || "";
+  return photo.lightboxSrc || photo.smallSrc || photo.thumbnailSrc || "";
 }
 
 function getWrestlingMatchDetailPrototypeRouteUrl() {
