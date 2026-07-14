@@ -131,6 +131,8 @@ const portfolioEngineLightningBranchPaths = portfolioEngineLightningOverlay
 const portfolioBeaconHotspots = Array.from(document.querySelectorAll("[data-portfolio-star]"));
 const portfolioEngineScanLine = document.querySelector("[data-portfolio-engine-scan-line]");
 const portfolioEngineScanAnchor = document.querySelector(".portfolio-engine-left-core");
+const prototypeEngineReturnEmitter = portfolioEngineScanAnchor;
+let prototypeEngineReturnControl = null;
 const portfolioRightEmitter = document.querySelector(".portfolio-engine-reactor");
 const portfolioStarFeedOverlay = document.querySelector("[data-portfolio-star-feed-overlay]");
 const portfolioStarFeedStrands = portfolioStarFeedOverlay
@@ -2151,6 +2153,85 @@ function requestRingArchiveStats() {
   return ringArchiveStatsRequest;
 }
 
+function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  return route?.name === "wrestling-match-detail-prototype" || route?.name === "wrestling-match-detail-prototype-photo";
+}
+
+function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  const prototypeShowId =
+    typeof WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID === "string"
+      ? WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_SHOW_ID
+      : "062026";
+  const prototypeMatchId =
+    typeof WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID === "string"
+      ? WRESTLING_BLANK_MATCH_DETAIL_PROTOTYPE_MATCH_ID
+      : "match-1a";
+
+  if (route?.name === "wrestling-match-detail-prototype-photo") {
+    return `${routePaths.wrestlingShows}/${prototypeShowId}/${prototypeMatchId}`;
+  }
+
+  return `${routePaths.wrestlingShows}/${prototypeShowId}`;
+}
+
+function handlePrototypeEngineReturnEmitter(event) {
+  const route = getRouteFromUrl();
+  if (!isPrototypeEngineReturnRoute(route)) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  navigateToRoute(getPrototypeEngineReturnRoute(route));
+}
+
+function initPrototypeEngineReturnEmitter() {
+  if (!prototypeEngineReturnEmitter) {
+    return;
+  }
+
+  prototypeEngineReturnControl = prototypeEngineReturnEmitter.querySelector("[data-prototype-engine-return]");
+  if (prototypeEngineReturnControl) {
+    return;
+  }
+
+  prototypeEngineReturnControl = document.createElement("button");
+  prototypeEngineReturnControl.type = "button";
+  prototypeEngineReturnControl.className = "prototype-engine-return-control";
+  prototypeEngineReturnControl.dataset.prototypeEngineReturn = "true";
+  prototypeEngineReturnControl.setAttribute("aria-label", "Return");
+  prototypeEngineReturnControl.hidden = true;
+  prototypeEngineReturnControl.disabled = true;
+  prototypeEngineReturnControl.innerHTML = `
+    <span class="prototype-engine-return-control__arrow" aria-hidden="true">◀</span>
+    <span class="prototype-engine-return-control__text" aria-hidden="true">RETURN</span>
+  `;
+  prototypeEngineReturnControl.addEventListener("click", handlePrototypeEngineReturnEmitter);
+  prototypeEngineReturnEmitter.appendChild(prototypeEngineReturnControl);
+}
+
+function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
+  if (!prototypeEngineReturnEmitter) {
+    return;
+  }
+
+  initPrototypeEngineReturnEmitter();
+
+  const isActive = isPrototypeEngineReturnRoute(route);
+  prototypeEngineReturnEmitter.classList.toggle("is-prototype-return-control", isActive);
+  prototypeEngineReturnEmitter.toggleAttribute("data-prototype-engine-return-active", isActive);
+  prototypeEngineReturnEmitter.dataset.prototypeEngineReturnState =
+    isActive && route?.name === "wrestling-match-detail-prototype-photo" ? "photo" : "detail";
+
+  if (!prototypeEngineReturnControl) {
+    return;
+  }
+
+  prototypeEngineReturnControl.hidden = !isActive;
+  prototypeEngineReturnControl.disabled = !isActive;
+  prototypeEngineReturnControl.tabIndex = isActive ? 0 : -1;
+}
+
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (!shell || !route) {
     return;
@@ -2186,6 +2267,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
       bottomRail.removeAttribute("inert");
     }
   }
+
+  updatePrototypeEngineReturnEmitter(route);
 }
 
 function getRouteDrilldownBreadcrumbLabel(route) {
@@ -4677,6 +4760,7 @@ if (shell && startButton) {
   initShellRailLogo();
   initPortfolioBeaconHotspots();
   initPortfolioEngineLightning();
+  initPrototypeEngineReturnEmitter();
   startButton.setAttribute("aria-busy", "false");
   setActiveGlobalNav("home");
   startButton.addEventListener("click", beginHomePortfolioTransition);
