@@ -21909,7 +21909,6 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-globe-scan__ring,
 .fields-of-conflict-globe-scan__arc,
-.fields-of-conflict-globe-scan__sweep,
 .fields-of-conflict-globe-scan__pulse {
   position: absolute;
   inset: 0;
@@ -21942,19 +21941,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 0.58;
 }
 
-.fields-of-conflict-globe-scan__sweep {
-  inset: 6%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg 300deg,
-    rgba(255, 92, 28, 0.03) 312deg,
-    rgba(255, 134, 46, 0.24) 340deg,
-    rgba(255, 230, 176, 0.34) 351deg,
-    transparent 360deg
-  );
-  opacity: 0.68;
-  animation: fieldsConflictRadarSweep 18s linear infinite;
-}
 
 .fields-of-conflict-globe-scan__pulse {
   inset: 31%;
@@ -22126,11 +22112,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-@keyframes fieldsConflictRadarSweep {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 @keyframes fieldsConflictScanPulse {
   0%,
@@ -22229,7 +22210,6 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fields-of-conflict-globe-scan__sweep,
   .fields-of-conflict-globe-scan__pulse {
     animation: none;
     opacity: 0;
