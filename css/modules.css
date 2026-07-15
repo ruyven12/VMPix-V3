@@ -21908,6 +21908,98 @@ button.hall-crusades-archive-crystal:focus-visible {
   letter-spacing: clamp(0.055em, 0.48vw, 0.105em);
   text-shadow: 0 0 0.46rem rgba(255, 42, 26, 0.28);
 }
+
+.fields-of-conflict-globe-scan {
+  --fields-globe-scan-size: min(32vw, 44svh, 28rem);
+  position: absolute;
+  inset-block-start: clamp(4.4rem, 18svh, 12rem);
+  inset-inline-start: 50%;
+  z-index: 2;
+  inline-size: var(--fields-globe-scan-size);
+  aspect-ratio: 1;
+  pointer-events: none;
+  contain: layout paint;
+  opacity: 0.82;
+  transform: translateX(-50%);
+}
+
+.fields-of-conflict-globe-scan__ring,
+.fields-of-conflict-globe-scan__arc,
+.fields-of-conflict-globe-scan__sweep,
+.fields-of-conflict-globe-scan__pulse {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.fields-of-conflict-globe-scan__ring {
+  border: 1px solid rgba(255, 122, 48, 0.28);
+  box-shadow:
+    0 0 0.46rem rgba(255, 42, 26, 0.14),
+    inset 0 0 1.2rem rgba(255, 42, 26, 0.08);
+}
+
+.fields-of-conflict-globe-scan__arc {
+  background: conic-gradient(
+    from -28deg,
+    rgba(255, 124, 48, 0.52) 0deg 15deg,
+    transparent 15deg 84deg,
+    rgba(255, 190, 96, 0.44) 84deg 108deg,
+    transparent 108deg 197deg,
+    rgba(255, 124, 48, 0.42) 197deg 220deg,
+    transparent 220deg 303deg,
+    rgba(255, 190, 96, 0.48) 303deg 329deg,
+    transparent 329deg 360deg
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  opacity: 0.58;
+}
+
+.fields-of-conflict-globe-scan__sweep {
+  inset: 6%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 300deg,
+    rgba(255, 92, 28, 0.03) 312deg,
+    rgba(255, 134, 46, 0.24) 340deg,
+    rgba(255, 230, 176, 0.34) 351deg,
+    transparent 360deg
+  );
+  opacity: 0.68;
+  animation: fieldsConflictRadarSweep 18s linear infinite;
+}
+
+.fields-of-conflict-globe-scan__pulse {
+  inset: 31%;
+  border: 1px solid rgba(255, 120, 42, 0.18);
+  box-shadow:
+    0 0 0.62rem rgba(255, 82, 24, 0.16),
+    inset 0 0 0.72rem rgba(255, 120, 42, 0.08);
+  opacity: 0.36;
+  animation: fieldsConflictScanPulse 5.6s ease-in-out infinite;
+}
+
+@keyframes fieldsConflictRadarSweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fieldsConflictScanPulse {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scale(0.96);
+  }
+
+  50% {
+    opacity: 0.52;
+    transform: scale(1.05);
+  }
+}
 .fields-of-conflict-prototype-surface {
   position: relative;
   z-index: 1;
@@ -21958,6 +22050,11 @@ button.hall-crusades-archive-crystal:focus-visible {
     letter-spacing: 0.075em;
   }
 
+  .fields-of-conflict-globe-scan {
+    --fields-globe-scan-size: min(86vw, 43svh, 22rem);
+    inset-block-start: calc(max(0.8rem, env(safe-area-inset-top)) + clamp(5.8rem, 10.6svh, 6.1rem));
+  }
+
   .wrestling-venues-prototype-shell {
     padding:
       calc(max(0.58rem, env(safe-area-inset-top)))
@@ -21984,5 +22081,13 @@ button.hall-crusades-archive-crystal:focus-visible {
       78vw,
       calc(100svh - var(--engine-emitter-size, 4.6rem) - max(1.5rem, env(safe-area-inset-top)) - max(1.5rem, env(safe-area-inset-bottom)))
     );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fields-of-conflict-globe-scan__sweep,
+  .fields-of-conflict-globe-scan__pulse {
+    animation: none;
+    opacity: 0;
   }
 }
