@@ -6750,6 +6750,175 @@ function getWrestlingVenuesPrototypeShell() {
   return document.querySelector("[data-wrestling-venues-prototype-shell]");
 }
 
+const FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID = "yarmouth-amvets";
+const FIELDS_OF_CONFLICT_COORDINATE_DEGREE = String.fromCharCode(176);
+// TODO: Replace temporary Fields of Conflict venue coordinates with backend-provided venue coordinates when available.
+const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
+  {
+    id: "brick-south",
+    name: "Brick South",
+    location: "Portland, Maine",
+    latitude: `43.6520${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.2568${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "colisee",
+    name: "Colis" + String.fromCharCode(233) + "e",
+    location: "Lewiston, Maine",
+    latitude: `44.1004${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.2148${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "fairfield-community-center",
+    name: "Fairfield Community Center",
+    location: "Fairfield, Maine",
+    latitude: `44.5884${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `69.5987${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "live-at-mavericks",
+    name: "Live @ Mavericks",
+    location: "Portland, Maine",
+    latitude: `43.6615${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.2553${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "morgan-hill-event-center",
+    name: "Morgan Hill Event Center",
+    location: "Hermon, Maine",
+    latitude: `44.8037${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `68.9134${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "portland-expo",
+    name: "Portland Expo",
+    location: "Portland, Maine",
+    latitude: `43.6557${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.2790${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "rumors",
+    name: "Rumors",
+    location: "Biddeford, Maine",
+    latitude: `43.4926${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.4534${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "westbrook-armory",
+    name: "Westbrook Armory",
+    location: "Westbrook, Maine",
+    latitude: `43.6770${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.3712${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  },
+  {
+    id: "yarmouth-amvets",
+    name: "Yarmouth Amvets",
+    location: "Yarmouth, Maine",
+    latitude: `43.8000${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
+    longitude: `70.1860${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
+  }
+];
+
+function getFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
+  const normalizedVenueId = String(venueId || "").trim();
+  return FIELDS_OF_CONFLICT_VENUE_CONFIG.find((venue) => venue.id === normalizedVenueId) ||
+    FIELDS_OF_CONFLICT_VENUE_CONFIG.find((venue) => venue.id === FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) ||
+    FIELDS_OF_CONFLICT_VENUE_CONFIG[0];
+}
+
+function getFieldsOfConflictVenueSelect() {
+  return document.querySelector("[data-fields-of-conflict-venue-select]");
+}
+
+function ensureFieldsOfConflictVenueSelectOptions(select = getFieldsOfConflictVenueSelect()) {
+  if (!select) {
+    return;
+  }
+
+  const existingValues = Array.from(select.options || []).map((option) => option.value).join("|");
+  const expectedValues = FIELDS_OF_CONFLICT_VENUE_CONFIG.map((venue) => venue.id).join("|");
+  if (existingValues === expectedValues) {
+    return;
+  }
+
+  const options = FIELDS_OF_CONFLICT_VENUE_CONFIG.map((venue) => {
+    const option = document.createElement("option");
+    option.value = venue.id;
+    option.textContent = venue.name;
+    return option;
+  });
+  select.replaceChildren(...options);
+}
+
+function getFieldsOfConflictCoordinateLabel(venue) {
+  return `Coordinate Status: Coordinate Locked, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
+}
+
+function updateFieldsOfConflictCoordinatePanel(venue) {
+  const panel = document.querySelector("[data-fields-of-conflict-coordinate-hud]");
+  if (!panel || !venue) {
+    return;
+  }
+
+  const venueName = panel.querySelector("[data-fields-of-conflict-coordinate-venue]");
+  const venueLocation = panel.querySelector("[data-fields-of-conflict-coordinate-location]");
+  const latitude = panel.querySelector("[data-fields-of-conflict-coordinate-latitude]");
+  const longitude = panel.querySelector("[data-fields-of-conflict-coordinate-longitude]");
+
+  if (venueName) {
+    venueName.textContent = venue.name;
+  }
+  if (venueLocation) {
+    venueLocation.textContent = venue.location;
+  }
+  if (latitude) {
+    latitude.textContent = venue.latitude;
+  }
+  if (longitude) {
+    longitude.textContent = venue.longitude;
+  }
+  panel.setAttribute("aria-label", getFieldsOfConflictCoordinateLabel(venue));
+}
+
+function updateFieldsOfConflictVenueLock(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
+  const venue = getFieldsOfConflictVenueConfig(venueId);
+  if (!venue) {
+    return;
+  }
+
+  document.querySelectorAll(".fields-of-conflict-venue-marker[data-venue-id]").forEach((marker) => {
+    marker.classList.toggle("is-coordinate-locked", marker.dataset.venueId === venue.id);
+  });
+
+  const select = getFieldsOfConflictVenueSelect();
+  if (select && select.value !== venue.id) {
+    select.value = venue.id;
+  }
+  updateFieldsOfConflictCoordinatePanel(venue);
+}
+
+function bindFieldsOfConflictVenueSelect() {
+  const select = getFieldsOfConflictVenueSelect();
+  if (!select) {
+    updateFieldsOfConflictVenueLock();
+    return;
+  }
+
+  ensureFieldsOfConflictVenueSelectOptions(select);
+  const hasSelectedVenue = FIELDS_OF_CONFLICT_VENUE_CONFIG.some((venue) => venue.id === select.value);
+  if (select.dataset.fieldsOfConflictVenueSelectInitialized !== "true" || !hasSelectedVenue) {
+    select.value = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID;
+    select.dataset.fieldsOfConflictVenueSelectInitialized = "true";
+  }
+  if (select.dataset.fieldsOfConflictVenueSelectBound !== "true") {
+    select.addEventListener("change", () => {
+      updateFieldsOfConflictVenueLock(select.value);
+    });
+    select.dataset.fieldsOfConflictVenueSelectBound = "true";
+  }
+  updateFieldsOfConflictVenueLock(select.value || FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID);
+}
+
 function clearWrestlingVenuesPrototypeSourceShell() {
   if (typeof wrestlingVenuesList !== "undefined" && wrestlingVenuesList) {
     wrestlingVenuesList.replaceChildren();
@@ -6831,6 +7000,10 @@ function setWrestlingVenuesPrototypeActive(isActive) {
     prototypeShell.toggleAttribute("inert", !isActive);
     prototypeShell.setAttribute("aria-hidden", String(!isActive));
     prototypeShell.dataset.fieldsOfConflictActive = String(isActive);
+  }
+
+  if (isActive) {
+    bindFieldsOfConflictVenueSelect();
   }
 }
 
