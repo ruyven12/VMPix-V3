@@ -21745,29 +21745,28 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events: auto;
   visibility: visible;
 }
-
-.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell {
-  display: grid !important;
-  background-color: transparent !important;
-  background-image: url("../assets/images/wrestling/fields-conflict.png") !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-hub {
+  visibility: visible !important;
   opacity: 1 !important;
+  pointer-events: none !important;
+  background: transparent !important;
   transform: none !important;
   transition: none !important;
   animation: none !important;
-  visibility: visible !important;
 }
 
-.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell::before,
-.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell::after {
-  background: transparent !important;
-  opacity: 0 !important;
-  transition: none !important;
-  animation: none !important;
-  visibility: hidden !important;
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-hub::before,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-hub::after {
+  content: none !important;
+  display: none !important;
 }
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-hub > :not(.wrestling-venues-prototype-shell) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .ambient-system,
