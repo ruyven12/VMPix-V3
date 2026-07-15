@@ -6762,6 +6762,33 @@ function clearWrestlingVenuesPrototypeSourceShell() {
   }
 }
 
+const FIELDS_OF_CONFLICT_LOCK_STATUS = "COORDINATE LOCKED";
+const FIELDS_OF_CONFLICT_LOCK_VENUE = "Yarmouth Amvets";
+const FIELDS_OF_CONFLICT_LOCK_LOCATION = "Yarmouth, Maine";
+// TODO: Replace placeholder coordinates with Yarmouth Amvets values from venue data during backend integration.
+const FIELDS_OF_CONFLICT_LOCK_COORDINATES = "43.8000 N, 70.1860 W";
+
+function createFieldsOfConflictLockReadoutLine(className, text) {
+  const line = document.createElement("span");
+  line.className = className;
+  line.textContent = text;
+  return line;
+}
+
+function setFieldsOfConflictEngineLockReadout(engineCurrent) {
+  if (!engineCurrent) {
+    return;
+  }
+
+  engineCurrent.classList.add("fields-of-conflict-lock-readout");
+  engineCurrent.replaceChildren(
+    createFieldsOfConflictLockReadoutLine("fields-of-conflict-lock-readout__status", FIELDS_OF_CONFLICT_LOCK_STATUS),
+    createFieldsOfConflictLockReadoutLine("fields-of-conflict-lock-readout__venue", FIELDS_OF_CONFLICT_LOCK_VENUE),
+    createFieldsOfConflictLockReadoutLine("fields-of-conflict-lock-readout__place", FIELDS_OF_CONFLICT_LOCK_LOCATION),
+    createFieldsOfConflictLockReadoutLine("fields-of-conflict-lock-readout__coordinates", FIELDS_OF_CONFLICT_LOCK_COORDINATES)
+  );
+}
+
 function setWrestlingVenuesPrototypeActive(isActive) {
   const shellElement = document.querySelector(".site-shell");
   if (shellElement) {
@@ -6794,12 +6821,13 @@ function setWrestlingVenuesPrototypeActive(isActive) {
       if (engineCurrentLabel) {
         engineCurrentLabel.textContent = "Coordinate Status:";
       }
-      engineCurrent.textContent = "AWAITING COORDINATE LOCK";
+      setFieldsOfConflictEngineLockReadout(engineCurrent);
     } else {
       if (engineCurrentLabel?.textContent?.trim() === "Coordinate Status:") {
         engineCurrentLabel.textContent = "Current View:";
       }
-      if (engineCurrent.textContent?.trim() === "AWAITING COORDINATE LOCK") {
+      if (engineCurrent.classList.contains("fields-of-conflict-lock-readout") || engineCurrent.textContent?.includes(FIELDS_OF_CONFLICT_LOCK_STATUS)) {
+        engineCurrent.classList.remove("fields-of-conflict-lock-readout");
         engineCurrent.textContent = "Interactive Portfolio";
       }
     }

@@ -1200,9 +1200,12 @@
         </section>
         <section class="wrestling-venues-prototype-shell" aria-hidden="true" inert data-wrestling-venues-prototype-shell>
           <h1 class="fields-of-conflict-title">FIELDS OF CONFLICT</h1>
-          <div class="fields-of-conflict-coordinate-hud" aria-label="Coordinate Status: Awaiting Coordinate Lock">
+          <div class="fields-of-conflict-coordinate-hud" aria-label="Coordinate Status: Coordinate Locked, Yarmouth Amvets, Yarmouth, Maine">
             <span class="fields-of-conflict-coordinate-hud__label">Coordinate Status</span>
-            <span class="fields-of-conflict-coordinate-hud__status">AWAITING COORDINATE LOCK</span>
+            <span class="fields-of-conflict-coordinate-hud__status">COORDINATE LOCKED</span>
+            <span class="fields-of-conflict-coordinate-hud__venue">Yarmouth Amvets</span>
+            <span class="fields-of-conflict-coordinate-hud__place">Yarmouth, Maine</span>
+            <span class="fields-of-conflict-coordinate-hud__coordinates">43.8000 N, 70.1860 W</span>
           </div>
           <div class="fields-of-conflict-globe-scan" aria-hidden="true">
             <span class="fields-of-conflict-globe-scan__ring"></span>
@@ -1211,7 +1214,7 @@
             <div class="fields-of-conflict-globe-beacons" aria-hidden="true">
               <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--1"></span>
               <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--2"></span>
-              <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--3"></span>
+              <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--3 is-coordinate-locked"></span>
               <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--4"></span>
               <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--5"></span>
               <span class="fields-of-conflict-globe-beacon fields-of-conflict-globe-beacon--6"></span>
@@ -1908,7 +1911,14 @@
           if (engineCurrentLabel) {
             engineCurrentLabel.textContent = "Coordinate Status:";
           }
-          engineCurrent.textContent = "AWAITING COORDINATE LOCK";
+          engineCurrent.classList.add("fields-of-conflict-lock-readout");
+          // TODO: Replace placeholder coordinates with Yarmouth Amvets values from venue data during backend integration.
+          engineCurrent.innerHTML = `
+            <span class="fields-of-conflict-lock-readout__status">COORDINATE LOCKED</span>
+            <span class="fields-of-conflict-lock-readout__venue">Yarmouth Amvets</span>
+            <span class="fields-of-conflict-lock-readout__place">Yarmouth, Maine</span>
+            <span class="fields-of-conflict-lock-readout__coordinates">43.8000 N, 70.1860 W</span>
+          `;
         }
       };
       window.addEventListener("load", () => {

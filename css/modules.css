@@ -21869,7 +21869,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-coordinate-hud__label,
-.fields-of-conflict-coordinate-hud__status {
+.fields-of-conflict-coordinate-hud__status,
+.fields-of-conflict-coordinate-hud__venue,
+.fields-of-conflict-coordinate-hud__place,
+.fields-of-conflict-coordinate-hud__coordinates {
   display: block;
   margin: 0;
   line-height: 1;
@@ -21996,6 +21999,33 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translate(-50%, -50%);
 }
 
+.fields-of-conflict-globe-beacon.is-coordinate-locked {
+  --fields-beacon-opacity: 0.94;
+  --fields-beacon-glow: 0.56;
+  z-index: 4;
+  inline-size: clamp(0.58rem, 0.96vw, 0.86rem);
+  border-color: rgba(255, 226, 160, 0.72);
+  background: radial-gradient(circle, rgba(255, 230, 176, 0.34) 0 22%, rgba(255, 92, 36, 0.2) 25% 44%, transparent 48% 100%);
+  box-shadow:
+    0 0 0.36rem rgba(255, 122, 42, 0.42),
+    0 0 0.8rem rgba(255, 52, 26, 0.24),
+    inset 0 0 0.38rem rgba(255, 150, 72, 0.16);
+  animation-name: fieldsConflictLockedBeaconPulse;
+  animation-duration: 4.8s;
+}
+
+.fields-of-conflict-globe-beacon.is-coordinate-locked::after {
+  position: absolute;
+  inset: -64%;
+  content: "";
+  border: 1px solid rgba(255, 128, 52, 0.38);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0.38rem rgba(255, 84, 26, 0.18),
+    inset 0 0 0.34rem rgba(255, 84, 26, 0.1);
+  opacity: 0.76;
+}
+
 .fields-of-conflict-globe-beacon--1 {
   --fields-beacon-x: 48%;
   --fields-beacon-y: 18%;
@@ -22057,6 +22087,19 @@ button.hall-crusades-archive-crystal:focus-visible {
   --fields-beacon-duration: 7.9s;
   --fields-beacon-delay: -5.1s;
 }
+@keyframes fieldsConflictLockedBeaconPulse {
+  0%,
+  100% {
+    opacity: 0.74;
+    filter: brightness(1);
+  }
+
+  48% {
+    opacity: 0.98;
+    filter: brightness(1.22);
+  }
+}
+
 @keyframes fieldsConflictBeaconPulse {
   0%,
   100% {
@@ -22178,6 +22221,12 @@ button.hall-crusades-archive-crystal:focus-visible {
     filter: none;
     opacity: 0.62;
   }
+
+  .fields-of-conflict-globe-beacon.is-coordinate-locked {
+    animation: none;
+    opacity: 0.9;
+    filter: none;
+  }
 }
 /* Fields of Conflict lower HUD composition. */
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud {
@@ -22226,6 +22275,43 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.38rem rgba(255, 42, 26, 0.46),
     0 0 0.9rem rgba(255, 42, 26, 0.18);
   white-space: nowrap;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left .portfolio-engine-value.fields-of-conflict-lock-readout {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.02rem, 0.16svh, 0.1rem);
+  color: rgba(255, 247, 238, 0.94);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: normal;
+}
+
+.fields-of-conflict-lock-readout__status {
+  color: rgba(255, 58, 35, 0.96);
+  font-size: clamp(0.62rem, 0.92vw, 0.84rem);
+  font-weight: 760;
+  letter-spacing: clamp(0.07em, 0.42vw, 0.12em);
+  text-shadow:
+    0 0 0.4rem rgba(255, 42, 26, 0.48),
+    0 0 0.9rem rgba(255, 42, 26, 0.18);
+}
+
+.fields-of-conflict-lock-readout__venue {
+  color: rgba(255, 247, 238, 0.96);
+  font-size: clamp(0.72rem, 1.08vw, 0.98rem);
+  font-weight: 690;
+  letter-spacing: clamp(0.025em, 0.18vw, 0.055em);
+  text-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.24);
+}
+
+.fields-of-conflict-lock-readout__place,
+.fields-of-conflict-lock-readout__coordinates {
+  color: rgba(255, 231, 208, 0.82);
+  font-size: clamp(0.52rem, 0.78vw, 0.68rem);
+  font-weight: 560;
+  letter-spacing: clamp(0.03em, 0.2vw, 0.07em);
+  text-shadow: 0 0 0.3rem rgba(255, 42, 26, 0.22);
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::before,
@@ -22295,6 +22381,21 @@ button.hall-crusades-archive-crystal:focus-visible {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left .portfolio-engine-value {
     font-size: clamp(0.56rem, 2.45vw, 0.76rem);
     letter-spacing: 0.075em;
+  }
+
+  .fields-of-conflict-lock-readout__status {
+    font-size: clamp(0.48rem, 1.92vw, 0.6rem);
+    letter-spacing: 0.075em;
+  }
+
+  .fields-of-conflict-lock-readout__venue {
+    font-size: clamp(0.58rem, 2.32vw, 0.72rem);
+  }
+
+  .fields-of-conflict-lock-readout__place,
+  .fields-of-conflict-lock-readout__coordinates {
+    font-size: clamp(0.42rem, 1.66vw, 0.52rem);
+    letter-spacing: 0.045em;
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::before,
