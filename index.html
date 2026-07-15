@@ -1910,7 +1910,12 @@
         }
         const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
         if (engineCurrent) {
-          engineCurrent.textContent = "Daiion - Fields of Conflict";
+          const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
+          const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
+          if (engineCurrentLabel) {
+            engineCurrentLabel.textContent = "Coordinate Status:";
+          }
+          engineCurrent.textContent = "AWAITING COORDINATE LOCK";
         }
       };
       window.addEventListener("load", () => {

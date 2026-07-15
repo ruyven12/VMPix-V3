@@ -6786,10 +6786,22 @@ function setWrestlingVenuesPrototypeActive(isActive) {
     currentView.textContent = "Daiion - Fields of Conflict";
   }
 
-  if (isActive) {
-    const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
-    if (engineCurrent) {
-      engineCurrent.textContent = "Daiion - Fields of Conflict";
+  const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+  if (engineCurrent) {
+    const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
+    const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
+    if (isActive) {
+      if (engineCurrentLabel) {
+        engineCurrentLabel.textContent = "Coordinate Status:";
+      }
+      engineCurrent.textContent = "AWAITING COORDINATE LOCK";
+    } else {
+      if (engineCurrentLabel?.textContent?.trim() === "Coordinate Status:") {
+        engineCurrentLabel.textContent = "Current View:";
+      }
+      if (engineCurrent.textContent?.trim() === "AWAITING COORDINATE LOCK") {
+        engineCurrent.textContent = "Interactive Portfolio";
+      }
     }
   }
 
