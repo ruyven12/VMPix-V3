@@ -21795,26 +21795,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 @media (min-width: 641px) {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-active="true"] {
-    background-image:
-      url("../assets/images/wrestling/fields-conflict.png"),
-      url("../assets/images/wrestling/fields-conflict.png");
-    background-position:
-      center center,
-      center center;
-    background-repeat:
-      no-repeat,
-      no-repeat;
-    background-size:
-      min(100vw, 1280px) auto,
-      cover;
-  }
-}
-
-@media (min-width: 641px) and (min-aspect-ratio: 1280/853) {
-  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-active="true"] {
-    background-size:
-      auto min(100svh, 853px),
-      cover;
+    background-image: url("../assets/images/wrestling/fields-conflict.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 }
 
@@ -21982,6 +21966,166 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: fieldsConflictScanPulse 5.6s ease-in-out infinite;
 }
 
+.fields-of-conflict-globe-beacons {
+  position: absolute;
+  inset: 8%;
+  z-index: 3;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.fields-of-conflict-globe-beacon {
+  position: absolute;
+  inset-block-start: var(--fields-beacon-y);
+  inset-inline-start: var(--fields-beacon-x);
+  z-index: 2;
+  display: block;
+  inline-size: clamp(0.2rem, 0.42vw, 0.34rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 194, 100, 0.48);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 238, 188, 0.94) 0 18%, rgba(255, 102, 34, 0.72) 34%, rgba(255, 52, 20, 0.24) 62%, transparent 72%);
+  box-shadow:
+    0 0 0.24rem rgba(255, 84, 26, 0.46),
+    0 0 0.62rem rgba(255, 84, 26, 0.22);
+  opacity: 0.64;
+  transform: translate(-50%, -50%);
+  animation: fieldsConflictBeaconPulse var(--fields-beacon-duration, 6.8s) ease-in-out infinite;
+  animation-delay: var(--fields-beacon-delay, 0s);
+}
+
+.fields-of-conflict-globe-beacon-line {
+  position: absolute;
+  inset-block-start: var(--fields-line-y);
+  inset-inline-start: var(--fields-line-x);
+  z-index: 1;
+  display: block;
+  inline-size: var(--fields-line-length);
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 122, 48, 0.26), rgba(255, 210, 132, 0.14), transparent);
+  box-shadow: 0 0 0.32rem rgba(255, 84, 26, 0.12);
+  opacity: 0.38;
+  transform: rotate(var(--fields-line-angle));
+  transform-origin: 0 50%;
+}
+
+.fields-of-conflict-globe-beacon--1 {
+  --fields-beacon-x: 48%;
+  --fields-beacon-y: 16%;
+  --fields-beacon-duration: 6.8s;
+  --fields-beacon-delay: -1.4s;
+}
+
+.fields-of-conflict-globe-beacon--2 {
+  --fields-beacon-x: 63%;
+  --fields-beacon-y: 23%;
+  --fields-beacon-duration: 7.9s;
+  --fields-beacon-delay: -4.1s;
+}
+
+.fields-of-conflict-globe-beacon--3 {
+  --fields-beacon-x: 36%;
+  --fields-beacon-y: 27%;
+  --fields-beacon-duration: 6.1s;
+  --fields-beacon-delay: -2.7s;
+}
+
+.fields-of-conflict-globe-beacon--4 {
+  --fields-beacon-x: 72%;
+  --fields-beacon-y: 39%;
+  --fields-beacon-duration: 8.4s;
+  --fields-beacon-delay: -5.6s;
+}
+
+.fields-of-conflict-globe-beacon--5 {
+  --fields-beacon-x: 52%;
+  --fields-beacon-y: 45%;
+  --fields-beacon-duration: 7.2s;
+  --fields-beacon-delay: -0.8s;
+}
+
+.fields-of-conflict-globe-beacon--6 {
+  --fields-beacon-x: 27%;
+  --fields-beacon-y: 51%;
+  --fields-beacon-duration: 8.1s;
+  --fields-beacon-delay: -6.2s;
+}
+
+.fields-of-conflict-globe-beacon--7 {
+  --fields-beacon-x: 67%;
+  --fields-beacon-y: 59%;
+  --fields-beacon-duration: 6.6s;
+  --fields-beacon-delay: -3.4s;
+}
+
+.fields-of-conflict-globe-beacon--8 {
+  --fields-beacon-x: 42%;
+  --fields-beacon-y: 66%;
+  --fields-beacon-duration: 7.6s;
+  --fields-beacon-delay: -5.1s;
+}
+
+.fields-of-conflict-globe-beacon--9 {
+  --fields-beacon-x: 57%;
+  --fields-beacon-y: 75%;
+  --fields-beacon-duration: 8.8s;
+  --fields-beacon-delay: -2s;
+}
+
+.fields-of-conflict-globe-beacon--10 {
+  --fields-beacon-x: 76%;
+  --fields-beacon-y: 70%;
+  --fields-beacon-duration: 7.4s;
+  --fields-beacon-delay: -6.9s;
+}
+
+.fields-of-conflict-globe-beacon-line--1 {
+  --fields-line-x: 48%;
+  --fields-line-y: 16%;
+  --fields-line-length: 17%;
+  --fields-line-angle: 28deg;
+}
+
+.fields-of-conflict-globe-beacon-line--2 {
+  --fields-line-x: 36%;
+  --fields-line-y: 27%;
+  --fields-line-length: 22%;
+  --fields-line-angle: 43deg;
+}
+
+.fields-of-conflict-globe-beacon-line--3 {
+  --fields-line-x: 52%;
+  --fields-line-y: 45%;
+  --fields-line-length: 19%;
+  --fields-line-angle: 32deg;
+}
+
+.fields-of-conflict-globe-beacon-line--4 {
+  --fields-line-x: 42%;
+  --fields-line-y: 66%;
+  --fields-line-length: 17%;
+  --fields-line-angle: 18deg;
+}
+
+@keyframes fieldsConflictBeaconPulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    filter: brightness(0.9);
+    box-shadow:
+      0 0 0.18rem rgba(255, 84, 26, 0.32),
+      0 0 0.42rem rgba(255, 84, 26, 0.16);
+  }
+
+  47% {
+    opacity: 0.82;
+    filter: brightness(1.16);
+    box-shadow:
+      0 0 0.28rem rgba(255, 120, 42, 0.54),
+      0 0 0.78rem rgba(255, 84, 26, 0.26);
+  }
+}
+
 @keyframes fieldsConflictRadarSweep {
   to {
     transform: rotate(360deg);
@@ -22089,5 +22233,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   .fields-of-conflict-globe-scan__pulse {
     animation: none;
     opacity: 0;
+  }
+
+  .fields-of-conflict-globe-beacon {
+    animation: none;
+    filter: none;
+    opacity: 0.62;
   }
 }
