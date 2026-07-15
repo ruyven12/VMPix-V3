@@ -1200,12 +1200,12 @@
         </section>
         <section class="wrestling-venues-prototype-shell" aria-hidden="true" inert data-wrestling-venues-prototype-shell>
           <h1 class="fields-of-conflict-title">FIELDS OF CONFLICT</h1>
-          <div class="fields-of-conflict-coordinate-hud" aria-label="Coordinate Status: Coordinate Locked, Yarmouth Amvets, Yarmouth, Maine">
-            <span class="fields-of-conflict-coordinate-hud__label">Coordinate Status</span>
+          <div class="fields-of-conflict-coordinate-hud" aria-label="Coordinate Locked: Yarmouth Amvets, Yarmouth, Maine, 43.8000 degrees north, 70.1860 degrees west">
             <span class="fields-of-conflict-coordinate-hud__status">COORDINATE LOCKED</span>
             <span class="fields-of-conflict-coordinate-hud__venue">Yarmouth Amvets</span>
             <span class="fields-of-conflict-coordinate-hud__place">Yarmouth, Maine</span>
-            <span class="fields-of-conflict-coordinate-hud__coordinates">43.8000 N, 70.1860 W</span>
+            <span class="fields-of-conflict-coordinate-hud__coordinates">43.8000° N</span>
+            <span class="fields-of-conflict-coordinate-hud__coordinates">70.1860° W</span>
           </div>
           <div class="fields-of-conflict-globe-scan" aria-hidden="true">
             <span class="fields-of-conflict-globe-scan__ring"></span>
@@ -1902,23 +1902,17 @@
         }
         const current = document.querySelector("[data-current-view]");
         if (current) {
-          current.textContent = "Daiion - Fields of Conflict";
+          current.textContent = "Daïion — Fields of Conflict";
         }
         const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
         if (engineCurrent) {
           const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
           const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
           if (engineCurrentLabel) {
-            engineCurrentLabel.textContent = "Coordinate Status:";
+            engineCurrentLabel.textContent = "Current View:";
           }
-          engineCurrent.classList.add("fields-of-conflict-lock-readout");
-          // TODO: Replace placeholder coordinates with Yarmouth Amvets values from venue data during backend integration.
-          engineCurrent.innerHTML = `
-            <span class="fields-of-conflict-lock-readout__status">COORDINATE LOCKED</span>
-            <span class="fields-of-conflict-lock-readout__venue">Yarmouth Amvets</span>
-            <span class="fields-of-conflict-lock-readout__place">Yarmouth, Maine</span>
-            <span class="fields-of-conflict-lock-readout__coordinates">43.8000 N, 70.1860 W</span>
-          `;
+          engineCurrent.classList.remove("fields-of-conflict-lock-readout");
+          engineCurrent.textContent = "Daïion — Fields of Conflict";
         }
       };
       window.addEventListener("load", () => {

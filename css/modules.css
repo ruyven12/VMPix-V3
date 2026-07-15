@@ -21844,11 +21844,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-coordinate-hud {
+  display: none;
   position: absolute;
   inset-block-start: calc(max(1rem, env(safe-area-inset-top)) + clamp(1rem, 3.6svh, 2.4rem) + clamp(4.15rem, 5.8vw, 5.35rem));
   inset-inline-start: 50%;
   z-index: 3;
-  display: grid;
   justify-items: center;
   gap: clamp(0.14rem, 0.32vw, 0.24rem);
   inline-size: min(calc(100vw - 2rem), 25rem);
@@ -21868,7 +21868,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translateX(-50%);
 }
 
-.fields-of-conflict-coordinate-hud__label,
 .fields-of-conflict-coordinate-hud__status,
 .fields-of-conflict-coordinate-hud__venue,
 .fields-of-conflict-coordinate-hud__place,
@@ -21880,20 +21879,29 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-transform: none;
 }
 
-.fields-of-conflict-coordinate-hud__label {
-  color: rgba(255, 231, 208, 0.88);
-  font-size: clamp(0.66rem, 0.86vw, 0.82rem);
-  font-weight: 520;
-  letter-spacing: 0.045em;
-  text-shadow: 0 0 0.48rem rgba(255, 42, 26, 0.22);
-}
-
 .fields-of-conflict-coordinate-hud__status {
-  color: rgba(255, 247, 238, 0.96);
-  font-size: clamp(0.7rem, 0.96vw, 0.9rem);
-  font-weight: 690;
+  color: rgba(255, 58, 35, 0.96);
+  font-size: clamp(0.64rem, 0.92vw, 0.86rem);
+  font-weight: 720;
   letter-spacing: clamp(0.055em, 0.48vw, 0.105em);
   text-shadow: 0 0 0.46rem rgba(255, 42, 26, 0.28);
+}
+
+.fields-of-conflict-coordinate-hud__venue {
+  color: rgba(255, 247, 238, 0.96);
+  font-size: clamp(0.72rem, 1.06vw, 0.96rem);
+  font-weight: 680;
+  letter-spacing: clamp(0.025em, 0.18vw, 0.055em);
+  text-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.22);
+}
+
+.fields-of-conflict-coordinate-hud__place,
+.fields-of-conflict-coordinate-hud__coordinates {
+  color: rgba(255, 231, 208, 0.82);
+  font-size: clamp(0.52rem, 0.78vw, 0.68rem);
+  font-weight: 560;
+  letter-spacing: clamp(0.03em, 0.2vw, 0.07em);
+  text-shadow: 0 0 0.3rem rgba(255, 42, 26, 0.2);
 }
 
 .fields-of-conflict-globe-scan {
@@ -22160,20 +22168,28 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .fields-of-conflict-coordinate-hud {
-    inset-block-start: calc(max(0.8rem, env(safe-area-inset-top)) + 0.35rem + clamp(3.12rem, 11.2vw, 3.75rem));
-    inline-size: min(calc(100vw - 2rem), 21.5rem);
-    gap: 0.12rem;
-    padding: 0.28rem 0.62rem 0.32rem;
+    inline-size: min(calc(100vw - 4.5rem), 18.5rem);
+    gap: 0.06rem;
+    padding: 0.26rem 0.58rem 0.3rem;
   }
 
-  .fields-of-conflict-coordinate-hud__label {
-    font-size: clamp(0.56rem, 2.25vw, 0.68rem);
-    letter-spacing: 0.035em;
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud {
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(2.55rem, 5.3svh, 3.1rem));
   }
 
   .fields-of-conflict-coordinate-hud__status {
-    font-size: clamp(0.6rem, 2.38vw, 0.74rem);
+    font-size: clamp(0.48rem, 1.92vw, 0.6rem);
     letter-spacing: 0.075em;
+  }
+
+  .fields-of-conflict-coordinate-hud__venue {
+    font-size: clamp(0.58rem, 2.32vw, 0.72rem);
+  }
+
+  .fields-of-conflict-coordinate-hud__place,
+  .fields-of-conflict-coordinate-hud__coordinates {
+    font-size: clamp(0.42rem, 1.66vw, 0.52rem);
+    letter-spacing: 0.045em;
   }
 
   .fields-of-conflict-globe-scan {
@@ -22230,7 +22246,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 /* Fields of Conflict lower HUD composition. */
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud {
-  display: none;
+  inset-block-start: auto;
+  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(5.1rem, 8.2svh, 6rem));
+  inline-size: min(calc(100vw - clamp(1.5rem, 8vw, 9rem)), 24rem);
+  display: grid;
+  gap: clamp(0.06rem, 0.18svh, 0.12rem);
+  padding: clamp(0.34rem, 0.78vw, 0.54rem) clamp(0.72rem, 1.6vw, 1.1rem);
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left {
@@ -22277,42 +22298,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   white-space: nowrap;
 }
 
-.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left .portfolio-engine-value.fields-of-conflict-lock-readout {
-  display: grid;
-  justify-items: center;
-  gap: clamp(0.02rem, 0.16svh, 0.1rem);
-  color: rgba(255, 247, 238, 0.94);
-  line-height: 1;
-  letter-spacing: 0.04em;
-  white-space: normal;
-}
-
-.fields-of-conflict-lock-readout__status {
-  color: rgba(255, 58, 35, 0.96);
-  font-size: clamp(0.62rem, 0.92vw, 0.84rem);
-  font-weight: 760;
-  letter-spacing: clamp(0.07em, 0.42vw, 0.12em);
-  text-shadow:
-    0 0 0.4rem rgba(255, 42, 26, 0.48),
-    0 0 0.9rem rgba(255, 42, 26, 0.18);
-}
-
-.fields-of-conflict-lock-readout__venue {
-  color: rgba(255, 247, 238, 0.96);
-  font-size: clamp(0.72rem, 1.08vw, 0.98rem);
-  font-weight: 690;
-  letter-spacing: clamp(0.025em, 0.18vw, 0.055em);
-  text-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.24);
-}
-
-.fields-of-conflict-lock-readout__place,
-.fields-of-conflict-lock-readout__coordinates {
-  color: rgba(255, 231, 208, 0.82);
-  font-size: clamp(0.52rem, 0.78vw, 0.68rem);
-  font-weight: 560;
-  letter-spacing: clamp(0.03em, 0.2vw, 0.07em);
-  text-shadow: 0 0 0.3rem rgba(255, 42, 26, 0.22);
-}
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::before,
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::after {
@@ -22337,7 +22322,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
   inset-block-start: auto;
-  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(4.75rem, 8.4svh, 6.2rem));
+  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(11.9rem, 17.8svh, 13.6rem));
   inline-size: min(calc(100vw - clamp(9rem, 23vw, 30rem)), 52rem);
   padding: clamp(0.2rem, 0.5vw, 0.34rem) clamp(1rem, 2.6vw, 1.7rem);
   font-size: clamp(2.15rem, 3.25vw, 3.1rem);
@@ -22383,20 +22368,6 @@ button.hall-crusades-archive-crystal:focus-visible {
     letter-spacing: 0.075em;
   }
 
-  .fields-of-conflict-lock-readout__status {
-    font-size: clamp(0.48rem, 1.92vw, 0.6rem);
-    letter-spacing: 0.075em;
-  }
-
-  .fields-of-conflict-lock-readout__venue {
-    font-size: clamp(0.58rem, 2.32vw, 0.72rem);
-  }
-
-  .fields-of-conflict-lock-readout__place,
-  .fields-of-conflict-lock-readout__coordinates {
-    font-size: clamp(0.42rem, 1.66vw, 0.52rem);
-    letter-spacing: 0.045em;
-  }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::before,
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-engine-panel--left::after {
@@ -22404,7 +22375,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
-    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(4.95rem, 9.2svh, 5.8rem));
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(9.35rem, 17.6svh, 10.4rem));
     inline-size: min(calc(100vw - 6.1rem), 21rem);
     padding: 0.2rem 0.5rem;
     font-size: clamp(1.08rem, 5vw, 1.42rem);
