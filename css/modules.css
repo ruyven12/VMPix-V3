@@ -21793,6 +21793,46 @@ button.hall-crusades-archive-crystal:focus-visible {
   visibility: visible;
 }
 
+.fields-of-conflict-title {
+  position: absolute;
+  inset-block-start: calc(max(1rem, env(safe-area-inset-top)) + clamp(1rem, 3.6svh, 2.4rem));
+  inset-inline-start: 50%;
+  z-index: 3;
+  inline-size: min(calc(100vw - 2rem), 52rem);
+  margin: 0;
+  padding: clamp(0.38rem, 0.9vw, 0.58rem) clamp(0.9rem, 2.3vw, 1.45rem);
+  color: rgba(255, 247, 238, 0.96);
+  font-family: var(--font-display);
+  font-size: clamp(2.625rem, 4vw, 3.375rem);
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: clamp(0.055em, 0.7vw, 0.12em);
+  text-align: center;
+  text-shadow:
+    0 0 0.55rem rgba(255, 42, 26, 0.42),
+    0 0 1.25rem rgba(255, 42, 26, 0.18);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.fields-of-conflict-title::before,
+.fields-of-conflict-title::after {
+  position: absolute;
+  inset-inline: clamp(0.2rem, 2.5vw, 1.1rem);
+  block-size: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 42, 26, 0.72) 18%, rgba(255, 231, 208, 0.48) 50%, rgba(255, 42, 26, 0.72) 82%, transparent);
+  box-shadow: 0 0 0.55rem rgba(255, 42, 26, 0.34);
+}
+
+.fields-of-conflict-title::before {
+  inset-block-start: 0;
+}
+
+.fields-of-conflict-title::after {
+  inset-block-end: 0;
+}
 .fields-of-conflict-prototype-surface {
   position: relative;
   z-index: 1;
@@ -21818,6 +21858,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .fields-of-conflict-title {
+    inset-block-start: calc(max(0.8rem, env(safe-area-inset-top)) + 0.35rem);
+    inline-size: min(calc(100vw - 1rem), 31rem);
+    padding: 0.32rem 0.6rem;
+    font-size: clamp(1.55rem, 6.7vw, 2rem);
+    letter-spacing: 0.055em;
+  }
+
   .wrestling-venues-prototype-shell {
     padding:
       calc(max(0.58rem, env(safe-area-inset-top)))
