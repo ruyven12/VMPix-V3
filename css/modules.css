@@ -21961,154 +21961,112 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-globe-beacon {
+  --fields-beacon-opacity: 0.5;
+  --fields-beacon-glow: 0.18;
   position: absolute;
   inset-block-start: var(--fields-beacon-y);
   inset-inline-start: var(--fields-beacon-x);
   z-index: 2;
   display: block;
-  inline-size: clamp(0.2rem, 0.42vw, 0.34rem);
+  inline-size: clamp(0.42rem, 0.72vw, 0.68rem);
   aspect-ratio: 1;
-  border: 1px solid rgba(255, 194, 100, 0.48);
+  border: 1px solid rgba(255, 178, 86, 0.4);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 238, 188, 0.94) 0 18%, rgba(255, 102, 34, 0.72) 34%, rgba(255, 52, 20, 0.24) 62%, transparent 72%);
+  background: radial-gradient(circle, rgba(255, 90, 36, 0.22) 0 24%, transparent 28% 100%);
   box-shadow:
-    0 0 0.24rem rgba(255, 84, 26, 0.46),
-    0 0 0.62rem rgba(255, 84, 26, 0.22);
-  opacity: 0.64;
+    0 0 0.24rem rgba(255, 78, 26, var(--fields-beacon-glow)),
+    inset 0 0 0.26rem rgba(255, 104, 42, 0.12);
+  opacity: var(--fields-beacon-opacity);
   transform: translate(-50%, -50%);
-  animation: fieldsConflictBeaconPulse var(--fields-beacon-duration, 6.8s) ease-in-out infinite;
+  animation: fieldsConflictBeaconPulse var(--fields-beacon-duration, 7.4s) ease-in-out infinite;
   animation-delay: var(--fields-beacon-delay, 0s);
 }
 
-.fields-of-conflict-globe-beacon-line {
+.fields-of-conflict-globe-beacon::before {
   position: absolute;
-  inset-block-start: var(--fields-line-y);
-  inset-inline-start: var(--fields-line-x);
-  z-index: 1;
-  display: block;
-  inline-size: var(--fields-line-length);
-  block-size: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 122, 48, 0.26), rgba(255, 210, 132, 0.14), transparent);
-  box-shadow: 0 0 0.32rem rgba(255, 84, 26, 0.12);
-  opacity: 0.38;
-  transform: rotate(var(--fields-line-angle));
-  transform-origin: 0 50%;
+  inset: 50% auto auto 50%;
+  inline-size: 32%;
+  aspect-ratio: 1;
+  content: "";
+  border-radius: 50%;
+  background: rgba(255, 229, 168, 0.92);
+  box-shadow:
+    0 0 0.22rem rgba(255, 120, 42, 0.5),
+    0 0 0.46rem rgba(255, 56, 28, 0.24);
+  transform: translate(-50%, -50%);
 }
 
 .fields-of-conflict-globe-beacon--1 {
   --fields-beacon-x: 48%;
-  --fields-beacon-y: 16%;
-  --fields-beacon-duration: 6.8s;
+  --fields-beacon-y: 18%;
+  --fields-beacon-duration: 7.1s;
   --fields-beacon-delay: -1.4s;
 }
 
 .fields-of-conflict-globe-beacon--2 {
   --fields-beacon-x: 63%;
-  --fields-beacon-y: 23%;
-  --fields-beacon-duration: 7.9s;
+  --fields-beacon-y: 25%;
+  --fields-beacon-duration: 8.4s;
   --fields-beacon-delay: -4.1s;
+  --fields-beacon-opacity: 0.7;
+  --fields-beacon-glow: 0.28;
 }
 
 .fields-of-conflict-globe-beacon--3 {
   --fields-beacon-x: 36%;
-  --fields-beacon-y: 27%;
-  --fields-beacon-duration: 6.1s;
+  --fields-beacon-y: 29%;
+  --fields-beacon-duration: 6.8s;
   --fields-beacon-delay: -2.7s;
 }
 
 .fields-of-conflict-globe-beacon--4 {
   --fields-beacon-x: 72%;
-  --fields-beacon-y: 39%;
-  --fields-beacon-duration: 8.4s;
+  --fields-beacon-y: 41%;
+  --fields-beacon-duration: 8.9s;
   --fields-beacon-delay: -5.6s;
 }
 
 .fields-of-conflict-globe-beacon--5 {
   --fields-beacon-x: 52%;
-  --fields-beacon-y: 45%;
-  --fields-beacon-duration: 7.2s;
+  --fields-beacon-y: 47%;
+  --fields-beacon-duration: 7.6s;
   --fields-beacon-delay: -0.8s;
+  --fields-beacon-opacity: 0.72;
+  --fields-beacon-glow: 0.3;
 }
 
 .fields-of-conflict-globe-beacon--6 {
-  --fields-beacon-x: 27%;
-  --fields-beacon-y: 51%;
-  --fields-beacon-duration: 8.1s;
+  --fields-beacon-x: 29%;
+  --fields-beacon-y: 53%;
+  --fields-beacon-duration: 8.2s;
   --fields-beacon-delay: -6.2s;
 }
 
 .fields-of-conflict-globe-beacon--7 {
   --fields-beacon-x: 67%;
-  --fields-beacon-y: 59%;
-  --fields-beacon-duration: 6.6s;
+  --fields-beacon-y: 61%;
+  --fields-beacon-duration: 6.9s;
   --fields-beacon-delay: -3.4s;
+  --fields-beacon-opacity: 0.68;
+  --fields-beacon-glow: 0.27;
 }
 
 .fields-of-conflict-globe-beacon--8 {
-  --fields-beacon-x: 42%;
-  --fields-beacon-y: 66%;
-  --fields-beacon-duration: 7.6s;
+  --fields-beacon-x: 43%;
+  --fields-beacon-y: 68%;
+  --fields-beacon-duration: 7.9s;
   --fields-beacon-delay: -5.1s;
 }
-
-.fields-of-conflict-globe-beacon--9 {
-  --fields-beacon-x: 57%;
-  --fields-beacon-y: 75%;
-  --fields-beacon-duration: 8.8s;
-  --fields-beacon-delay: -2s;
-}
-
-.fields-of-conflict-globe-beacon--10 {
-  --fields-beacon-x: 76%;
-  --fields-beacon-y: 70%;
-  --fields-beacon-duration: 7.4s;
-  --fields-beacon-delay: -6.9s;
-}
-
-.fields-of-conflict-globe-beacon-line--1 {
-  --fields-line-x: 48%;
-  --fields-line-y: 16%;
-  --fields-line-length: 17%;
-  --fields-line-angle: 28deg;
-}
-
-.fields-of-conflict-globe-beacon-line--2 {
-  --fields-line-x: 36%;
-  --fields-line-y: 27%;
-  --fields-line-length: 22%;
-  --fields-line-angle: 43deg;
-}
-
-.fields-of-conflict-globe-beacon-line--3 {
-  --fields-line-x: 52%;
-  --fields-line-y: 45%;
-  --fields-line-length: 19%;
-  --fields-line-angle: 32deg;
-}
-
-.fields-of-conflict-globe-beacon-line--4 {
-  --fields-line-x: 42%;
-  --fields-line-y: 66%;
-  --fields-line-length: 17%;
-  --fields-line-angle: 18deg;
-}
-
 @keyframes fieldsConflictBeaconPulse {
   0%,
   100% {
-    opacity: 0.42;
-    filter: brightness(0.9);
-    box-shadow:
-      0 0 0.18rem rgba(255, 84, 26, 0.32),
-      0 0 0.42rem rgba(255, 84, 26, 0.16);
+    opacity: calc(var(--fields-beacon-opacity, 0.5) * 0.72);
+    filter: brightness(0.92);
   }
 
-  47% {
-    opacity: 0.82;
-    filter: brightness(1.16);
-    box-shadow:
-      0 0 0.28rem rgba(255, 120, 42, 0.54),
-      0 0 0.78rem rgba(255, 84, 26, 0.26);
+  46% {
+    opacity: min(0.86, calc(var(--fields-beacon-opacity, 0.5) + 0.18));
+    filter: brightness(1.14);
   }
 }
 
