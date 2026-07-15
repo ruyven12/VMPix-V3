@@ -6783,13 +6783,13 @@ function setWrestlingVenuesPrototypeActive(isActive) {
   }
 
   if (isActive && typeof currentView !== "undefined" && currentView) {
-    currentView.textContent = "Outskirts of Daiion";
+    currentView.textContent = "Daiion - Fields of Conflict";
   }
 
   if (isActive) {
     const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
     if (engineCurrent) {
-      engineCurrent.textContent = "Outskirts of Daiion";
+      engineCurrent.textContent = "Daiion - Fields of Conflict";
     }
   }
 
