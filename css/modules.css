@@ -21746,6 +21746,29 @@ button.hall-crusades-archive-crystal:focus-visible {
   visibility: visible;
 }
 
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell {
+  display: grid !important;
+  background-color: transparent !important;
+  background-image: url("../assets/images/wrestling/fields-conflict.png") !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  visibility: visible !important;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell::before,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell::after {
+  background: transparent !important;
+  opacity: 0 !important;
+  transition: none !important;
+  animation: none !important;
+  visibility: hidden !important;
+}
+
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .ambient-system,
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-world-gateway,
