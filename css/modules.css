@@ -21983,7 +21983,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: fieldsConflictScanPulse 5.6s ease-in-out infinite;
 }
 
-.fields-of-conflict-globe-beacons {
+.fields-of-conflict-globe-markers {
   position: absolute;
   inset: 8%;
   z-index: 3;
@@ -21991,156 +21991,164 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events: none;
 }
 
-.fields-of-conflict-globe-beacon {
-  --fields-beacon-opacity: 0.5;
-  --fields-beacon-glow: 0.18;
+.fields-of-conflict-venue-marker {
+  --fields-marker-opacity: 0.64;
+  --fields-marker-glow: 0.28;
   position: absolute;
-  inset-block-start: var(--fields-beacon-y);
-  inset-inline-start: var(--fields-beacon-x);
+  inset-block-start: var(--fields-marker-y);
+  inset-inline-start: var(--fields-marker-x);
   z-index: 2;
   display: block;
-  inline-size: clamp(0.42rem, 0.72vw, 0.68rem);
+  inline-size: clamp(0.52rem, 0.84vw, 0.78rem);
   aspect-ratio: 1;
-  border: 1px solid rgba(255, 178, 86, 0.4);
+  border: 1px solid rgba(255, 192, 104, 0.58);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 90, 36, 0.22) 0 24%, transparent 28% 100%);
+  background: radial-gradient(circle, rgba(255, 120, 44, 0.28) 0 27%, transparent 31% 100%);
   box-shadow:
-    0 0 0.24rem rgba(255, 78, 26, var(--fields-beacon-glow)),
-    inset 0 0 0.26rem rgba(255, 104, 42, 0.12);
-  opacity: var(--fields-beacon-opacity);
+    0 0 0.32rem rgba(255, 84, 26, var(--fields-marker-glow)),
+    0 0 0.72rem rgba(255, 42, 24, calc(var(--fields-marker-glow) * 0.42)),
+    inset 0 0 0.28rem rgba(255, 126, 48, 0.16);
+  opacity: var(--fields-marker-opacity);
   transform: translate(-50%, -50%);
-  animation: fieldsConflictBeaconPulse var(--fields-beacon-duration, 7.4s) ease-in-out infinite;
-  animation-delay: var(--fields-beacon-delay, 0s);
+  animation: fieldsConflictVenueMarkerPulse var(--fields-marker-duration, 7.4s) ease-in-out infinite;
+  animation-delay: var(--fields-marker-delay, 0s);
 }
 
-.fields-of-conflict-globe-beacon::before {
+.fields-of-conflict-venue-marker::before {
   position: absolute;
   inset: 50% auto auto 50%;
-  inline-size: 32%;
+  inline-size: 38%;
   aspect-ratio: 1;
   content: "";
   border-radius: 50%;
-  background: rgba(255, 229, 168, 0.92);
+  background: rgba(255, 232, 174, 0.96);
   box-shadow:
-    0 0 0.22rem rgba(255, 120, 42, 0.5),
-    0 0 0.46rem rgba(255, 56, 28, 0.24);
+    0 0 0.26rem rgba(255, 138, 52, 0.64),
+    0 0 0.54rem rgba(255, 58, 28, 0.3);
   transform: translate(-50%, -50%);
 }
 
-.fields-of-conflict-globe-beacon.is-coordinate-locked {
-  --fields-beacon-opacity: 0.94;
-  --fields-beacon-glow: 0.56;
+.fields-of-conflict-venue-marker.is-coordinate-locked {
+  --fields-marker-opacity: 0.96;
+  --fields-marker-glow: 0.66;
   z-index: 4;
-  inline-size: clamp(0.58rem, 0.96vw, 0.86rem);
-  border-color: rgba(255, 226, 160, 0.72);
-  background: radial-gradient(circle, rgba(255, 230, 176, 0.34) 0 22%, rgba(255, 92, 36, 0.2) 25% 44%, transparent 48% 100%);
+  inline-size: clamp(0.72rem, 1.12vw, 1rem);
+  border-color: rgba(255, 230, 168, 0.8);
+  background: radial-gradient(circle, rgba(255, 236, 184, 0.38) 0 24%, rgba(255, 100, 38, 0.22) 28% 48%, transparent 52% 100%);
   box-shadow:
-    0 0 0.36rem rgba(255, 122, 42, 0.42),
-    0 0 0.8rem rgba(255, 52, 26, 0.24),
-    inset 0 0 0.38rem rgba(255, 150, 72, 0.16);
-  animation-name: fieldsConflictLockedBeaconPulse;
+    0 0 0.42rem rgba(255, 128, 44, 0.5),
+    0 0 0.95rem rgba(255, 52, 26, 0.3),
+    inset 0 0 0.42rem rgba(255, 152, 72, 0.18);
+  animation-name: fieldsConflictLockedVenueMarkerPulse;
   animation-duration: 4.8s;
 }
 
-.fields-of-conflict-globe-beacon.is-coordinate-locked::after {
+.fields-of-conflict-venue-marker.is-coordinate-locked::after {
   position: absolute;
-  inset: -64%;
+  inset: -62%;
   content: "";
-  border: 1px solid rgba(255, 128, 52, 0.38);
+  border: 1px solid rgba(255, 138, 58, 0.42);
   border-radius: 50%;
   box-shadow:
-    0 0 0.38rem rgba(255, 84, 26, 0.18),
-    inset 0 0 0.34rem rgba(255, 84, 26, 0.1);
-  opacity: 0.76;
+    0 0 0.42rem rgba(255, 84, 26, 0.22),
+    inset 0 0 0.36rem rgba(255, 84, 26, 0.12);
+  opacity: 0.82;
 }
 
-.fields-of-conflict-globe-beacon--1 {
-  --fields-beacon-x: 48%;
-  --fields-beacon-y: 18%;
-  --fields-beacon-duration: 7.1s;
-  --fields-beacon-delay: -1.4s;
+.fields-of-conflict-venue-marker[data-venue-id="brick-south"] {
+  --fields-marker-x: 44%;
+  --fields-marker-y: 20%;
+  --fields-marker-duration: 7.2s;
+  --fields-marker-delay: -1.2s;
 }
 
-.fields-of-conflict-globe-beacon--2 {
-  --fields-beacon-x: 63%;
-  --fields-beacon-y: 25%;
-  --fields-beacon-duration: 8.4s;
-  --fields-beacon-delay: -4.1s;
-  --fields-beacon-opacity: 0.7;
-  --fields-beacon-glow: 0.28;
+.fields-of-conflict-venue-marker[data-venue-id="colisee"] {
+  --fields-marker-x: 58%;
+  --fields-marker-y: 25%;
+  --fields-marker-duration: 8.4s;
+  --fields-marker-delay: -4s;
+  --fields-marker-opacity: 0.72;
+  --fields-marker-glow: 0.34;
 }
 
-.fields-of-conflict-globe-beacon--3 {
-  --fields-beacon-x: 36%;
-  --fields-beacon-y: 29%;
-  --fields-beacon-duration: 6.8s;
-  --fields-beacon-delay: -2.7s;
+.fields-of-conflict-venue-marker[data-venue-id="fairfield-community-center"] {
+  --fields-marker-x: 36%;
+  --fields-marker-y: 33%;
+  --fields-marker-duration: 6.9s;
+  --fields-marker-delay: -2.6s;
 }
 
-.fields-of-conflict-globe-beacon--4 {
-  --fields-beacon-x: 72%;
-  --fields-beacon-y: 41%;
-  --fields-beacon-duration: 8.9s;
-  --fields-beacon-delay: -5.6s;
+.fields-of-conflict-venue-marker[data-venue-id="live-at-mavericks"] {
+  --fields-marker-x: 70%;
+  --fields-marker-y: 40%;
+  --fields-marker-duration: 8.8s;
+  --fields-marker-delay: -5.4s;
 }
 
-.fields-of-conflict-globe-beacon--5 {
-  --fields-beacon-x: 52%;
-  --fields-beacon-y: 47%;
-  --fields-beacon-duration: 7.6s;
-  --fields-beacon-delay: -0.8s;
-  --fields-beacon-opacity: 0.72;
-  --fields-beacon-glow: 0.3;
+.fields-of-conflict-venue-marker[data-venue-id="morgan-hill-event-center"] {
+  --fields-marker-x: 52%;
+  --fields-marker-y: 45%;
+  --fields-marker-duration: 7.7s;
+  --fields-marker-delay: -0.7s;
+  --fields-marker-opacity: 0.74;
+  --fields-marker-glow: 0.36;
 }
 
-.fields-of-conflict-globe-beacon--6 {
-  --fields-beacon-x: 29%;
-  --fields-beacon-y: 53%;
-  --fields-beacon-duration: 8.2s;
-  --fields-beacon-delay: -6.2s;
+.fields-of-conflict-venue-marker[data-venue-id="portland-expo"] {
+  --fields-marker-x: 29%;
+  --fields-marker-y: 52%;
+  --fields-marker-duration: 8.1s;
+  --fields-marker-delay: -6.1s;
 }
 
-.fields-of-conflict-globe-beacon--7 {
-  --fields-beacon-x: 67%;
-  --fields-beacon-y: 61%;
-  --fields-beacon-duration: 6.9s;
-  --fields-beacon-delay: -3.4s;
-  --fields-beacon-opacity: 0.68;
-  --fields-beacon-glow: 0.27;
+.fields-of-conflict-venue-marker[data-venue-id="rumors"] {
+  --fields-marker-x: 65%;
+  --fields-marker-y: 58%;
+  --fields-marker-duration: 6.8s;
+  --fields-marker-delay: -3.2s;
+  --fields-marker-opacity: 0.72;
+  --fields-marker-glow: 0.34;
 }
 
-.fields-of-conflict-globe-beacon--8 {
-  --fields-beacon-x: 43%;
-  --fields-beacon-y: 68%;
-  --fields-beacon-duration: 7.9s;
-  --fields-beacon-delay: -5.1s;
+.fields-of-conflict-venue-marker[data-venue-id="westbrook-armory"] {
+  --fields-marker-x: 43%;
+  --fields-marker-y: 68%;
+  --fields-marker-duration: 7.9s;
+  --fields-marker-delay: -5s;
 }
-@keyframes fieldsConflictLockedBeaconPulse {
+
+.fields-of-conflict-venue-marker[data-venue-id="yarmouth-amvets"] {
+  --fields-marker-x: 36%;
+  --fields-marker-y: 29%;
+  --fields-marker-duration: 6.8s;
+  --fields-marker-delay: -2.7s;
+}
+
+@keyframes fieldsConflictLockedVenueMarkerPulse {
   0%,
   100% {
-    opacity: 0.74;
+    opacity: 0.76;
     filter: brightness(1);
   }
 
   48% {
-    opacity: 0.98;
-    filter: brightness(1.22);
+    opacity: 1;
+    filter: brightness(1.24);
   }
 }
 
-@keyframes fieldsConflictBeaconPulse {
+@keyframes fieldsConflictVenueMarkerPulse {
   0%,
   100% {
-    opacity: calc(var(--fields-beacon-opacity, 0.5) * 0.72);
-    filter: brightness(0.92);
+    opacity: calc(var(--fields-marker-opacity, 0.64) * 0.72);
+    filter: brightness(0.94);
   }
 
   46% {
-    opacity: min(0.86, calc(var(--fields-beacon-opacity, 0.5) + 0.18));
+    opacity: min(0.9, calc(var(--fields-marker-opacity, 0.64) + 0.16));
     filter: brightness(1.14);
   }
 }
-
 
 @keyframes fieldsConflictScanPulse {
   0%,
@@ -22261,13 +22269,13 @@ button.hall-crusades-archive-crystal:focus-visible {
     opacity: 0;
   }
 
-  .fields-of-conflict-globe-beacon {
+  .fields-of-conflict-venue-marker {
     animation: none;
     filter: none;
     opacity: 0.62;
   }
 
-  .fields-of-conflict-globe-beacon.is-coordinate-locked {
+  .fields-of-conflict-venue-marker.is-coordinate-locked {
     animation: none;
     opacity: 0.9;
     filter: none;
