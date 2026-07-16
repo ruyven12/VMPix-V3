@@ -89,7 +89,7 @@ function getRouteFromUrl(url = window.location.href) {
     }
   }
   if (routePath === routePaths.wrestlingVenues) {
-    return { name: "wrestling-venues", canonicalUrl: routePaths.wrestlingVenues };
+    return { name: "wrestling-venues", canonicalUrl: routePaths.wrestlingVenues, venuesPrototype: "fields-of-conflict", wrestlingVenuesPrototype: "fields-of-conflict" };
   }
   const wrestlingVenueDetailPrefix = `${routePaths.wrestlingVenues}/`;
   if (routePath.startsWith(wrestlingVenueDetailPrefix)) {

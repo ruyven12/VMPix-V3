@@ -6746,7 +6746,7 @@ function renderWrestlingVenuesResults() {
 
 function normalizeWrestlingVenuesPrototypePath(value) {
   try {
-    const path = new URL(value || "/wrestling/venues2", window.location.href).pathname.replace(/\/+$/, "");
+    const path = new URL(value || "/wrestling/venues", window.location.href).pathname.replace(/\/+$/, "");
     return path || "/";
   } catch (error) {
     return String(value || "").replace(/\/+$/, "") || "/";
@@ -6764,7 +6764,7 @@ function isWrestlingVenuesPrototypeRoute(route = (typeof getRouteFromUrl === "fu
 
   if (typeof window !== "undefined") {
     const prototypePath = normalizeWrestlingVenuesPrototypePath(
-      typeof routePaths !== "undefined" && routePaths?.wrestlingVenuesPrototype ? routePaths.wrestlingVenuesPrototype : "/wrestling/venues2"
+      typeof routePaths !== "undefined" && routePaths?.wrestlingVenuesPrototype ? routePaths.wrestlingVenuesPrototype : "/wrestling/venues"
     );
     return normalizeWrestlingVenuesPrototypePath(window.location.pathname) === prototypePath;
   }
