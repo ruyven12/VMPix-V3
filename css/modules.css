@@ -22824,6 +22824,26 @@ button.hall-crusades-archive-crystal:focus-visible {
   display: none;
 }
 
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__venue {
+  font-size: calc(clamp(0.82rem, 1.18vw, 1.08rem) + 2px);
+  line-height: 1.05;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__coordinates {
+  font-size: calc(clamp(0.48rem, 0.72vw, 0.62rem) + 2px);
+  line-height: 1.05;
+}
+
+@media (max-width: 640px) {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__venue {
+    font-size: calc(clamp(0.745rem, 2.96vw, 0.885rem) + 2px);
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__coordinates {
+    font-size: calc(clamp(0.525rem, 2.08vw, 0.625rem) + 2px);
+  }
+}
+
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
   inset-block-start: calc(var(--fields-globe-scan-center-y) + (var(--fields-globe-scan-size) / 2) + var(--fields-globe-select-gap));
   inset-block-end: auto;

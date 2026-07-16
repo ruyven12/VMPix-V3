@@ -6917,13 +6917,6 @@ function updateFieldsOfConflictCoordinateStatus(venue) {
   statusBox.setAttribute("aria-label", statusText);
 }
 
-function getFieldsOfConflictVenueFieldPosition(venue) {
-  const venueIndex = FIELDS_OF_CONFLICT_VENUE_CONFIG.findIndex((candidate) => candidate.id === venue?.id);
-  const safeIndex = venueIndex >= 0 ? venueIndex + 1 : 1;
-  const totalFields = Math.max(FIELDS_OF_CONFLICT_VENUE_CONFIG.length, 1);
-  return `FIELD ${String(safeIndex).padStart(2, "0")} / ${String(totalFields).padStart(2, "0")}`;
-}
-
 function getFieldsOfConflictVenueMarkerLayer() {
   return document.querySelector(".fields-of-conflict-globe-markers");
 }
@@ -7029,9 +7022,21 @@ function ensureFieldsOfConflictVenueSelectOptions(select = getFieldsOfConflictVe
   select.replaceChildren(...options);
 }
 
+function getFieldsOfConflictCoordinateLocationLabel(venue) {
+  return String(venue?.location || "").trim().replace(/,\s*Maine$/i, ", ME");
+}
+
+function getFieldsOfConflictCoordinateVenueLine(venue) {
+  const location = getFieldsOfConflictCoordinateLocationLabel(venue);
+  return location ? `${venue.name} - ${location}` : venue.name;
+}
+
+function getFieldsOfConflictCoordinateValuesLine(venue) {
+  return `${venue.latitude} / ${venue.longitude}`;
+}
+
 function getFieldsOfConflictCoordinateLabel(venue) {
-  const fieldPosition = getFieldsOfConflictVenueFieldPosition(venue);
-  return `${fieldPosition}, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
+  return `${getFieldsOfConflictCoordinateVenueLine(venue)}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
 }
 
 function updateFieldsOfConflictCoordinatePanel(venue) {
@@ -7041,26 +7046,14 @@ function updateFieldsOfConflictCoordinatePanel(venue) {
     return;
   }
 
-  const fieldPosition = panel.querySelector("[data-fields-of-conflict-coordinate-field]");
   const venueName = panel.querySelector("[data-fields-of-conflict-coordinate-venue]");
-  const venueLocation = panel.querySelector("[data-fields-of-conflict-coordinate-location]");
-  const latitude = panel.querySelector("[data-fields-of-conflict-coordinate-latitude]");
-  const longitude = panel.querySelector("[data-fields-of-conflict-coordinate-longitude]");
+  const coordinateValues = panel.querySelector("[data-fields-of-conflict-coordinate-values]");
 
-  if (fieldPosition) {
-    fieldPosition.textContent = getFieldsOfConflictVenueFieldPosition(venue);
-  }
   if (venueName) {
-    venueName.textContent = venue.name;
+    venueName.textContent = getFieldsOfConflictCoordinateVenueLine(venue);
   }
-  if (venueLocation) {
-    venueLocation.textContent = venue.location;
-  }
-  if (latitude) {
-    latitude.textContent = venue.latitude;
-  }
-  if (longitude) {
-    longitude.textContent = venue.longitude;
+  if (coordinateValues) {
+    coordinateValues.textContent = getFieldsOfConflictCoordinateValuesLine(venue);
   }
   panel.setAttribute("aria-label", getFieldsOfConflictCoordinateLabel(venue));
 }
