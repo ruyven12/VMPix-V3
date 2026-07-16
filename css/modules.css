@@ -21873,6 +21873,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-coordinate-hud__label,
 .fields-of-conflict-coordinate-hud__status,
+.fields-of-conflict-coordinate-hud__field,
 .fields-of-conflict-coordinate-hud__venue,
 .fields-of-conflict-coordinate-hud__place,
 .fields-of-conflict-coordinate-hud__coordinates {
@@ -21897,6 +21898,14 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-weight: 680;
   letter-spacing: clamp(0.055em, 0.38vw, 0.095em);
   text-shadow: 0 0 0.38rem rgba(255, 42, 26, 0.28);
+}
+
+.fields-of-conflict-coordinate-hud__field {
+  color: rgba(255, 178, 104, 0.9);
+  font-size: clamp(0.5rem, 0.74vw, 0.64rem);
+  font-weight: 650;
+  letter-spacing: clamp(0.055em, 0.34vw, 0.09em);
+  text-shadow: 0 0 0.32rem rgba(255, 88, 30, 0.22);
 }
 
 .fields-of-conflict-coordinate-hud__venue {
@@ -21953,7 +21962,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
-  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(12.15rem, 18.2svh, 13.25rem));
+  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(12.75rem, 18.8svh, 13.85rem));
   display: grid;
 }
 
@@ -22083,6 +22092,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: fieldsConflictVenueMarkerPulse var(--fields-marker-duration, 7.4s) ease-in-out infinite;
   animation-delay: var(--fields-marker-delay, 0s);
   -webkit-tap-highlight-color: transparent;
+}
+
+.fields-of-conflict-venue-marker:focus-visible {
+  outline: 2px solid rgba(255, 177, 92, 0.82);
+  outline-offset: 4px;
 }
 
 .fields-of-conflict-venue-marker::before {
@@ -22277,7 +22291,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
-    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(9.4rem, 16.5svh, 10rem));
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(9.85rem, 17.2svh, 10.45rem));
     grid-template-columns: auto minmax(0, 1fr);
     inline-size: min(calc(100vw - 4.5rem), 18.5rem);
     gap: 0.32rem;
@@ -22304,6 +22318,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   .fields-of-conflict-coordinate-hud__status {
     font-size: clamp(0.44rem, 1.72vw, 0.54rem);
     letter-spacing: 0.075em;
+  }
+
+  .fields-of-conflict-coordinate-hud__field {
+    font-size: clamp(0.42rem, 1.62vw, 0.52rem);
+    letter-spacing: 0.07em;
   }
 
   .fields-of-conflict-coordinate-hud__venue {
@@ -22450,7 +22469,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
   inset-block-start: auto;
-  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(15.05rem, 21.4svh, 16.45rem));
+  inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(15.65rem, 22svh, 17.05rem));
   inline-size: min(calc(100vw - clamp(9rem, 23vw, 30rem)), 52rem);
   padding: clamp(0.2rem, 0.5vw, 0.34rem) clamp(1rem, 2.6vw, 1.7rem);
   font-size: clamp(2.15rem, 3.25vw, 3.1rem);
@@ -22503,7 +22522,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
-    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(12.25rem, 22svh, 13.2rem));
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(12.7rem, 22.7svh, 13.65rem));
     inline-size: min(calc(100vw - 6.1rem), 21rem);
     padding: 0.2rem 0.5rem;
     font-size: clamp(1.08rem, 5vw, 1.42rem);

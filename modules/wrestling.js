@@ -6830,8 +6830,33 @@ function getFieldsOfConflictVenueSelect() {
   return document.querySelector("[data-fields-of-conflict-venue-select]");
 }
 
+function getFieldsOfConflictVenueFieldPosition(venue) {
+  const venueIndex = FIELDS_OF_CONFLICT_VENUE_CONFIG.findIndex((candidate) => candidate.id === venue?.id);
+  const safeIndex = venueIndex >= 0 ? venueIndex + 1 : 1;
+  const totalFields = Math.max(FIELDS_OF_CONFLICT_VENUE_CONFIG.length, 1);
+  return `FIELD ${String(safeIndex).padStart(2, "0")} / ${String(totalFields).padStart(2, "0")}`;
+}
+
 function getFieldsOfConflictVenueMarkerLayer() {
   return document.querySelector(".fields-of-conflict-globe-markers");
+}
+
+function ensureFieldsOfConflictVenueMarkerAccessibility() {
+  const markerLayer = getFieldsOfConflictVenueMarkerLayer();
+  if (!markerLayer) {
+    return;
+  }
+
+  markerLayer.querySelectorAll(".fields-of-conflict-venue-marker[data-venue-id]").forEach((marker) => {
+    const venue = getFieldsOfConflictVenueConfig(marker.dataset.venueId);
+    if (!venue) {
+      return;
+    }
+    marker.setAttribute("role", "button");
+    marker.setAttribute("tabindex", "0");
+    marker.setAttribute("aria-label", `Select ${venue.name}`);
+    marker.setAttribute("aria-pressed", String(marker.classList.contains("is-coordinate-locked")));
+  });
 }
 
 function getFieldsOfConflictMarkerFromPoint(clientX, clientY) {
@@ -6858,7 +6883,12 @@ function getFieldsOfConflictMarkerFromPoint(clientX, clientY) {
 
 function bindFieldsOfConflictVenueMarkers() {
   const markerLayer = getFieldsOfConflictVenueMarkerLayer();
-  if (!markerLayer || markerLayer.dataset.fieldsOfConflictVenueMarkersBound === "true") {
+  if (!markerLayer) {
+    return;
+  }
+
+  ensureFieldsOfConflictVenueMarkerAccessibility();
+  if (markerLayer.dataset.fieldsOfConflictVenueMarkersBound === "true") {
     return;
   }
 
@@ -6880,6 +6910,15 @@ function bindFieldsOfConflictVenueMarkers() {
 
     updateFieldsOfConflictVenueLock(marker.dataset.venueId);
   }, true);
+
+  markerLayer.addEventListener("keydown", (event) => {
+    const marker = event.target?.closest?.(".fields-of-conflict-venue-marker[data-venue-id]");
+    if (!marker || !markerLayer.contains(marker) || (event.key !== "Enter" && event.key !== " ")) {
+      return;
+    }
+    event.preventDefault();
+    updateFieldsOfConflictVenueLock(marker.dataset.venueId);
+  });
   markerLayer.dataset.fieldsOfConflictVenueMarkersBound = "true";
 }
 
@@ -6904,7 +6943,8 @@ function ensureFieldsOfConflictVenueSelectOptions(select = getFieldsOfConflictVe
 }
 
 function getFieldsOfConflictCoordinateLabel(venue) {
-  return `Coordinate Status: Coordinate Locked, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
+  const fieldPosition = getFieldsOfConflictVenueFieldPosition(venue);
+  return `Coordinate Status: Coordinate Locked, ${fieldPosition}, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
 }
 
 function updateFieldsOfConflictCoordinatePanel(venue) {
@@ -6913,11 +6953,15 @@ function updateFieldsOfConflictCoordinatePanel(venue) {
     return;
   }
 
+  const fieldPosition = panel.querySelector("[data-fields-of-conflict-coordinate-field]");
   const venueName = panel.querySelector("[data-fields-of-conflict-coordinate-venue]");
   const venueLocation = panel.querySelector("[data-fields-of-conflict-coordinate-location]");
   const latitude = panel.querySelector("[data-fields-of-conflict-coordinate-latitude]");
   const longitude = panel.querySelector("[data-fields-of-conflict-coordinate-longitude]");
 
+  if (fieldPosition) {
+    fieldPosition.textContent = getFieldsOfConflictVenueFieldPosition(venue);
+  }
   if (venueName) {
     venueName.textContent = venue.name;
   }
@@ -6940,7 +6984,9 @@ function updateFieldsOfConflictVenueLock(venueId = FIELDS_OF_CONFLICT_DEFAULT_VE
   }
 
   document.querySelectorAll(".fields-of-conflict-venue-marker[data-venue-id]").forEach((marker) => {
-    marker.classList.toggle("is-coordinate-locked", marker.dataset.venueId === venue.id);
+    const isActiveMarker = marker.dataset.venueId === venue.id;
+    marker.classList.toggle("is-coordinate-locked", isActiveMarker);
+    marker.setAttribute("aria-pressed", String(isActiveMarker));
   });
 
   const select = getFieldsOfConflictVenueSelect();
