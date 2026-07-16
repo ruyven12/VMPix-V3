@@ -22546,7 +22546,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
-  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-status {
     opacity: 1;
     transform: translateX(-50%);
   }
@@ -22729,7 +22730,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
-.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-status {
   opacity: 0;
   animation: fieldsConflictCoordinateHudReveal 520ms ease-out 3200ms both;
 }
@@ -22761,5 +22763,104 @@ button.hall-crusades-archive-crystal:focus-visible {
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
     opacity: 0.68;
+  }
+}
+
+/* Fields of Conflict HUD stack refinement. */
+.wrestling-venues-prototype-shell {
+  --fields-globe-scan-anchor-size: min(32vw, 44svh, 28rem);
+  --fields-globe-scan-size: min(50vw, 68svh, 44rem);
+  --fields-globe-scan-center-y: calc(clamp(4.4rem, 18svh, 12rem) + (var(--fields-globe-scan-anchor-size) / 2));
+  --fields-globe-select-gap: 15px;
+  --fields-hud-stack-gap: clamp(0.45rem, 0.95svh, 0.62rem);
+  --fields-venue-select-height: clamp(1.9rem, 2.7vw, 2.4rem);
+}
+
+.fields-of-conflict-coordinate-status {
+  display: none;
+  position: absolute;
+  inset-inline-start: 50%;
+  z-index: 4;
+  box-sizing: border-box;
+  inline-size: min(calc(100vw - clamp(1.5rem, 8vw, 9rem)), 24rem);
+  min-block-size: clamp(1.55rem, 2.05vw, 1.85rem);
+  margin: 0;
+  padding: clamp(0.18rem, 0.38vw, 0.26rem) clamp(0.56rem, 1.1vw, 0.72rem);
+  place-items: center;
+  color: rgba(255, 247, 238, 0.9);
+  font-family: var(--font-display);
+  text-align: center;
+  text-transform: none;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.12), rgba(255, 42, 26, 0.04) 46%, rgba(255, 42, 26, 0.12)),
+    rgba(4, 0, 0, 0.48);
+  border: 1px solid rgba(255, 42, 26, 0.28);
+  border-inline-color: rgba(255, 42, 26, 0.18);
+  box-shadow:
+    0 0 0.45rem rgba(255, 42, 26, 0.12),
+    inset 0 0 0.55rem rgba(0, 0, 0, 0.28);
+  transform: translateX(-50%);
+}
+
+.fields-of-conflict-coordinate-status__text {
+  display: block;
+  color: rgba(255, 58, 35, 0.94);
+  font-size: clamp(0.56rem, 0.86vw, 0.72rem);
+  font-weight: 680;
+  line-height: 1;
+  letter-spacing: clamp(0.045em, 0.32vw, 0.08em);
+  text-shadow: 0 0 0.36rem rgba(255, 42, 26, 0.34);
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="pending"] .fields-of-conflict-coordinate-status__text {
+  color: rgba(255, 178, 104, 0.92);
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__label,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__status {
+  display: none;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+  inset-block-start: calc(var(--fields-globe-scan-center-y) + (var(--fields-globe-scan-size) / 2) + var(--fields-globe-select-gap));
+  inset-block-end: auto;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-status {
+  inset-block-start: calc(var(--fields-globe-scan-center-y) + (var(--fields-globe-scan-size) / 2) + var(--fields-globe-select-gap) + var(--fields-venue-select-height) + var(--fields-hud-stack-gap));
+  display: grid;
+  opacity: 0;
+  animation: fieldsConflictCoordinateHudReveal 520ms ease-out 3200ms both;
+}
+
+@media (max-width: 640px) {
+  .wrestling-venues-prototype-shell {
+    --fields-globe-scan-anchor-size: min(86vw, 43svh, 22rem);
+    --fields-globe-scan-size: min(112vw, 56svh, 28.6rem);
+    --fields-globe-scan-center-y: calc(max(0.8rem, env(safe-area-inset-top)) + clamp(5.8rem, 10.6svh, 6.1rem) + (var(--fields-globe-scan-anchor-size) / 2));
+    --fields-hud-stack-gap: 0.45rem;
+    --fields-venue-select-height: 1.9rem;
+  }
+
+  .fields-of-conflict-coordinate-status {
+    inline-size: min(calc(100vw - 4.5rem), 18.5rem);
+    min-block-size: 1.42rem;
+    padding: 0.16rem 0.4rem;
+  }
+
+  .fields-of-conflict-coordinate-status__text {
+    font-size: clamp(0.5rem, 1.95vw, 0.61rem);
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-status {
+    animation: none;
+    opacity: 1;
+    transform: translateX(-50%);
   }
 }

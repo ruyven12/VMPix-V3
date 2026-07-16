@@ -4821,9 +4821,36 @@ function renderHallPrototypeShowDetailSurface(show) {
   }
 }
 
+function getWrestlingShowDetailDisplayName(show) {
+  return getWrestlingText(
+    show?.showName ||
+    show?.show_name ||
+    show?.title ||
+    show?.eventName ||
+    show?.event_name,
+    ""
+  );
+}
+
 function getWrestlingShowDetailEngineTitle(showId = "warzone-26") {
   const show = findLiveWrestlingShowById(showId) || getWrestlingDefaultShowRelationship(showId);
-  return getWrestlingText(show?.title || show?.eventName || show?.showName, "");
+  return getWrestlingShowDetailDisplayName(show);
+}
+
+function syncWrestlingShowDetailDocumentTitle(show) {
+  const showTitle = getWrestlingShowDetailDisplayName(show);
+  if (!showTitle) {
+    return;
+  }
+  document.title = `Campaign - ${showTitle} - Voodoo Media V3.0.01`;
+}
+
+function syncWrestlingShowDetailEngineView(show) {
+  const showTitle = getWrestlingShowDetailDisplayName(show);
+  if (!showTitle || typeof setPortfolioEngineHudCurrentView !== "function") {
+    return;
+  }
+  setPortfolioEngineHudCurrentView(`The Campaign - ${showTitle}`);
 }
 
 function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
@@ -4861,6 +4888,8 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
 
   setWrestlingRelationshipDataset(wrestlingShowDetailShell, show);
   wrestlingShowDetailShell.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
+  syncWrestlingShowDetailDocumentTitle(show);
+  syncWrestlingShowDetailEngineView(show);
   renderHallPrototypeShowDetailSurface(show);
   return;
 
@@ -6830,6 +6859,64 @@ function getFieldsOfConflictVenueSelect() {
   return document.querySelector("[data-fields-of-conflict-venue-select]");
 }
 
+function getFieldsOfConflictCoordinateStatusText(venue) {
+  return `Coordinates: ${venue ? "Locked" : "Pending"}`;
+}
+
+function ensureFieldsOfConflictCoordinateStatusBox() {
+  const prototypeShell = getWrestlingVenuesPrototypeShell();
+  if (!prototypeShell) {
+    return null;
+  }
+
+  const coordinatePanel = prototypeShell.querySelector("[data-fields-of-conflict-coordinate-hud]");
+  coordinatePanel?.querySelectorAll(".fields-of-conflict-coordinate-hud__label, .fields-of-conflict-coordinate-hud__status").forEach((element) => {
+    element.hidden = true;
+    element.setAttribute("aria-hidden", "true");
+  });
+
+  let statusBox = prototypeShell.querySelector("[data-fields-of-conflict-coordinate-status]");
+  if (!statusBox) {
+    statusBox = document.createElement("div");
+    statusBox.className = "fields-of-conflict-coordinate-status";
+    statusBox.dataset.fieldsOfConflictCoordinateStatus = "";
+    statusBox.setAttribute("aria-live", "polite");
+    statusBox.setAttribute("aria-label", getFieldsOfConflictCoordinateStatusText(null));
+
+    const statusText = document.createElement("span");
+    statusText.className = "fields-of-conflict-coordinate-status__text";
+    statusText.dataset.fieldsOfConflictCoordinateStatusText = "";
+    statusText.textContent = getFieldsOfConflictCoordinateStatusText(null);
+    statusBox.append(statusText);
+
+    const venueSelectShell = prototypeShell.querySelector("[data-fields-of-conflict-venue-select-shell]");
+    if (venueSelectShell?.parentElement === prototypeShell) {
+      venueSelectShell.insertAdjacentElement("afterend", statusBox);
+    } else if (coordinatePanel?.parentElement === prototypeShell) {
+      coordinatePanel.insertAdjacentElement("beforebegin", statusBox);
+    } else {
+      prototypeShell.append(statusBox);
+    }
+  }
+
+  return statusBox;
+}
+
+function updateFieldsOfConflictCoordinateStatus(venue) {
+  const statusBox = ensureFieldsOfConflictCoordinateStatusBox();
+  if (!statusBox) {
+    return;
+  }
+
+  const statusText = getFieldsOfConflictCoordinateStatusText(venue);
+  const statusTextElement = statusBox.querySelector("[data-fields-of-conflict-coordinate-status-text]");
+  if (statusTextElement) {
+    statusTextElement.textContent = statusText;
+  }
+  statusBox.dataset.fieldsOfConflictCoordinateState = venue ? "locked" : "pending";
+  statusBox.setAttribute("aria-label", statusText);
+}
+
 function getFieldsOfConflictVenueFieldPosition(venue) {
   const venueIndex = FIELDS_OF_CONFLICT_VENUE_CONFIG.findIndex((candidate) => candidate.id === venue?.id);
   const safeIndex = venueIndex >= 0 ? venueIndex + 1 : 1;
@@ -6944,11 +7031,12 @@ function ensureFieldsOfConflictVenueSelectOptions(select = getFieldsOfConflictVe
 
 function getFieldsOfConflictCoordinateLabel(venue) {
   const fieldPosition = getFieldsOfConflictVenueFieldPosition(venue);
-  return `Coordinate Status: Coordinate Locked, ${fieldPosition}, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
+  return `${fieldPosition}, ${venue.name}, ${venue.location}, ${venue.latitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}, ${venue.longitude.replace(FIELDS_OF_CONFLICT_COORDINATE_DEGREE, " degrees")}`;
 }
 
 function updateFieldsOfConflictCoordinatePanel(venue) {
   const panel = document.querySelector("[data-fields-of-conflict-coordinate-hud]");
+  ensureFieldsOfConflictCoordinateStatusBox();
   if (!panel || !venue) {
     return;
   }
@@ -7086,6 +7174,7 @@ function bindFieldsOfConflictActiveConnectionResize() {
 
 function updateFieldsOfConflictVenueLock(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
   const venue = getFieldsOfConflictVenueConfig(venueId);
+  updateFieldsOfConflictCoordinateStatus(venue);
   if (!venue) {
     return;
   }

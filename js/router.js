@@ -233,6 +233,10 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  if (route.name === "wrestling-shows" && typeof primeWrestlingShowsRouteSurface === "function") {
+    primeWrestlingShowsRouteSurface();
+  }
+
   if (route.name !== "connect" && typeof hideConnectShell === "function") {
     hideConnectShell();
   }

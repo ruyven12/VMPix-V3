@@ -541,6 +541,29 @@ button {
   opacity: 0.94;
 }
 
+
+.site-shell[data-wrestling-shows-route-handoff="active"] .portfolio-world-gateway,
+.site-shell[data-shell-route="wrestling-shows"] .portfolio-world-gateway {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: none !important;
+}
+
+.site-shell[data-wrestling-shows-route-handoff="active"] .portfolio-world-gateway::before,
+.site-shell[data-wrestling-shows-route-handoff="active"] .portfolio-world-gateway::after,
+.site-shell[data-wrestling-shows-route-handoff="active"] .portfolio-world-gateway-background,
+.site-shell[data-wrestling-shows-route-handoff="active"] .portfolio-world-gateway-ring,
+.site-shell[data-shell-route="wrestling-shows"] .portfolio-world-gateway::before,
+.site-shell[data-shell-route="wrestling-shows"] .portfolio-world-gateway::after,
+.site-shell[data-shell-route="wrestling-shows"] .portfolio-world-gateway-background,
+.site-shell[data-shell-route="wrestling-shows"] .portfolio-world-gateway-ring {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  animation: none !important;
+  transition: none !important;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active[data-portfolio-gateway-state="filling-screen"] .portfolio-world-gateway {
   z-index: 20;
   visibility: visible;

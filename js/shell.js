@@ -554,6 +554,28 @@ function clearPortfolioGatewayState() {
   return wasActive;
 }
 
+function primeWrestlingShowsRouteSurface() {
+  if (!shell) {
+    return;
+  }
+
+  shell.dataset.shellRoute = "wrestling-shows";
+  shell.dataset.shellActiveTarget = "wrestling";
+  shell.dataset.wrestlingShowsRouteHandoff = "active";
+  shell.classList.remove("is-portfolio-world-gateway-active", "is-portfolio-world-arrived", "has-portfolio-entry-constellation");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
+  clearPortfolioGatewayState();
+  if (homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+    homeFrame.setAttribute("inert", "");
+  }
+  if (portfolioWorldGateway) {
+    portfolioWorldGateway.style.visibility = "hidden";
+    portfolioWorldGateway.style.opacity = "0";
+    portfolioWorldGateway.style.transition = "none";
+  }
+}
+
 function clearPortfolioGatewayFocusState() {
   if (!shell || shell.dataset.portfolioGatewayState !== "focusing-star") {
     return false;
@@ -2246,6 +2268,11 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio";
   shell.dataset.shellRoute = shellRouteName;
   shell.dataset.shellActiveTarget = activeTarget;
+  if (route.name === "wrestling-shows") {
+    shell.dataset.wrestlingShowsRouteHandoff = "active";
+  } else {
+    delete shell.dataset.wrestlingShowsRouteHandoff;
+  }
   if (route.name !== "portfolio") {
     shell.classList.remove("has-portfolio-entry-constellation");
     clearPortfolioEngineReadyState();
@@ -3216,6 +3243,7 @@ function showWrestlingShowsIndex(options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowsShell) {
     return;
   }
+  primeWrestlingShowsRouteSurface();
   const isHallOfCrusadesVariant = options.showsVariant === "hall-of-crusades";
   shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-shows-view");
@@ -3264,6 +3292,7 @@ function showWrestlingShowsIndex(options = {}) {
     contactShell.setAttribute("inert", "");
   }
   setHubChromeHidden(true);
+  setDocumentTitle("The Campaign Archive - Voodoo Media V3.0.01");
   if (isHallOfCrusadesVariant) {
     setPortfolioActiveWorld("battleground");
     setCurrentView("Daiion – Hall of Crusades");
@@ -3281,10 +3310,31 @@ function showWrestlingShowsIndex(options = {}) {
   }
 }
 
+function getWrestlingShowDetailCampaignName(showId = "") {
+  const resolvedTitle = typeof getWrestlingShowDetailEngineTitle === "function"
+    ? getWrestlingShowDetailEngineTitle(showId)
+    : "";
+  const renderedTitle = document.querySelector("#wrestling-show-detail-title")?.textContent?.trim() || "";
+  return (resolvedTitle && resolvedTitle !== showId ? resolvedTitle : "") || renderedTitle;
+}
+
+function setWrestlingShowDetailDocumentTitle(showId = "") {
+  const showTitle = getWrestlingShowDetailCampaignName(showId);
+  const campaignTitle = showTitle ? `Campaign - ${showTitle}` : "Campaign Detail";
+  setDocumentTitle(`${campaignTitle} - Voodoo Media V3.0.01`);
+}
+
+function setWrestlingShowDetailEngineView(showId = "") {
+  const showTitle = getWrestlingShowDetailCampaignName(showId);
+  setPortfolioEngineHudCurrentView(showTitle ? `The Campaign - ${showTitle}` : "The Campaign");
+}
+
 function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowDetailShell) {
     return;
   }
+  setWrestlingShowDetailDocumentTitle(showId);
+  setWrestlingShowDetailEngineView(showId);
   shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-show-detail-view");
   if (homeFrame) {
@@ -3349,9 +3399,13 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
     });
   } else {
     setCurrentView("Show Detail");
-    setPortfolioEngineHudCurrentViewDetail("");
+    setWrestlingShowDetailEngineView(showId);
   }
   setActiveGlobalNav("wrestling");
+  window.requestAnimationFrame(() => {
+    setWrestlingShowDetailDocumentTitle(showId);
+    setWrestlingShowDetailEngineView(showId);
+  });
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
