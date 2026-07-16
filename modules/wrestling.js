@@ -6776,8 +6776,8 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     longitude: `69.5987${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
   {
-    id: "live-at-mavericks",
-    name: "Live @ Mavericks",
+    id: "live-at-madrids",
+    name: "Live @ Madrids",
     location: "Portland, Maine",
     latitude: `43.6615${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.2553${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`

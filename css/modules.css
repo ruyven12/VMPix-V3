@@ -22197,7 +22197,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   --fields-marker-delay: -2.6s;
 }
 
-.fields-of-conflict-venue-marker[data-venue-id="live-at-mavericks"] {
+.fields-of-conflict-venue-marker[data-venue-id="live-at-madrids"] {
   --fields-marker-x: 81%;
   --fields-marker-y: 43%;
   --fields-marker-duration: 8.8s;
@@ -22395,7 +22395,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     --fields-marker-y: 37%;
   }
 
-  .fields-of-conflict-venue-marker[data-venue-id="live-at-mavericks"] {
+  .fields-of-conflict-venue-marker[data-venue-id="live-at-madrids"] {
     --fields-marker-x: 78%;
     --fields-marker-y: 43%;
   }
