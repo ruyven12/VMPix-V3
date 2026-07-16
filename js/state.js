@@ -1972,6 +1972,7 @@ const routePaths = {
   wrestlingPeople: "/wrestling/people",
   wrestlingVenues: "/wrestling/venues",
   wrestlingVenuesPrototype: "/wrestling/venues",
+  wrestlingVenueDetailPrototype: "/wrestling/venues/colisee2",
   wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",
