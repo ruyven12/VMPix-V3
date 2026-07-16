@@ -7258,6 +7258,263 @@ function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
   return section;
 }
 
+const FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS = Object.freeze([
+  Object.freeze({
+    id: "information",
+    label: "Venue Information",
+    selector: ".fields-of-conflict-dossier__panel",
+  }),
+  Object.freeze({
+    id: "location",
+    label: "Venue Location",
+    selector: "[data-fields-of-conflict-location]",
+  }),
+  Object.freeze({
+    id: "about",
+    label: "About the Venue",
+    selector: "[data-fields-of-conflict-dossier-section=\"about\"]",
+  }),
+  Object.freeze({
+    id: "contributors",
+    label: "Contributors",
+    selector: "[data-fields-of-conflict-dossier-section=\"contributors\"]",
+  }),
+]);
+
+function normalizeFieldsOfConflictDossierCarouselIndex(index, total) {
+  return total > 0 ? ((index % total) + total) % total : 0;
+}
+
+function getFieldsOfConflictDossierCarousel(dossier) {
+  return dossier?.querySelector?.("[data-fields-of-conflict-dossier-carousel]") || null;
+}
+
+function getFieldsOfConflictDossierCarouselTrack(carousel) {
+  return carousel?.querySelector?.("[data-fields-of-conflict-dossier-carousel-track]") || null;
+}
+
+function getFieldsOfConflictDossierCarouselDots(carousel) {
+  return carousel?.querySelector?.("[data-fields-of-conflict-dossier-carousel-dots]") || null;
+}
+
+function getFieldsOfConflictDossierCarouselSlides(carousel) {
+  return Array.from(carousel?.querySelectorAll?.("[data-fields-of-conflict-dossier-carousel-slide]") || []);
+}
+
+function createFieldsOfConflictDossierCarouselSlide(sectionConfig) {
+  const slide = document.createElement("section");
+  slide.className = "fields-of-conflict-dossier-carousel__slide";
+  slide.dataset.fieldsOfConflictDossierCarouselSlide = sectionConfig.id;
+  slide.setAttribute("aria-label", sectionConfig.label);
+  slide.setAttribute("role", "group");
+  return slide;
+}
+
+function createFieldsOfConflictDossierCarouselArrow(direction) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `fields-of-conflict-dossier-carousel__arrow fields-of-conflict-dossier-carousel__arrow--${direction}`;
+  button.dataset.fieldsOfConflictDossierCarouselAction = direction;
+  button.setAttribute("aria-label", direction === "prev" ? "Previous dossier section" : "Next dossier section");
+  button.textContent = direction === "prev" ? "<" : ">";
+  return button;
+}
+
+function updateFieldsOfConflictDossierCarousel(carousel, nextIndex) {
+  const track = getFieldsOfConflictDossierCarouselTrack(carousel);
+  const dots = Array.from(getFieldsOfConflictDossierCarouselDots(carousel)?.querySelectorAll?.("[data-fields-of-conflict-dossier-carousel-dot]") || []);
+  const slides = getFieldsOfConflictDossierCarouselSlides(carousel);
+  const activeIndex = normalizeFieldsOfConflictDossierCarouselIndex(Number.parseInt(nextIndex, 10) || 0, slides.length);
+  if (!carousel || !track || slides.length === 0) {
+    return;
+  }
+
+  carousel.dataset.fieldsOfConflictDossierCarouselIndex = String(activeIndex);
+  track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
+  slides.forEach((slide, index) => {
+    const isActive = index === activeIndex;
+    slide.classList.toggle("is-active", isActive);
+    slide.setAttribute("aria-hidden", String(!isActive));
+  });
+  dots.forEach((dot, index) => {
+    const isActive = index === activeIndex;
+    dot.classList.toggle("is-active", isActive);
+    dot.setAttribute("aria-current", isActive ? "true" : "false");
+  });
+}
+
+function bindFieldsOfConflictDossierCarouselControls(carousel) {
+  if (!carousel || carousel.dataset.fieldsOfConflictDossierCarouselBound === "true") {
+    return;
+  }
+
+  const viewport = carousel.querySelector("[data-fields-of-conflict-dossier-carousel-viewport]");
+  carousel.addEventListener("click", (event) => {
+    const action = event.target?.closest?.("[data-fields-of-conflict-dossier-carousel-action]")?.dataset.fieldsOfConflictDossierCarouselAction;
+    if (!action) {
+      return;
+    }
+    const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
+    updateFieldsOfConflictDossierCarousel(carousel, action === "prev" ? currentIndex - 1 : currentIndex + 1);
+  });
+  carousel.addEventListener("click", (event) => {
+    const dot = event.target?.closest?.("[data-fields-of-conflict-dossier-carousel-dot]");
+    if (!dot) {
+      return;
+    }
+    updateFieldsOfConflictDossierCarousel(carousel, Number.parseInt(dot.dataset.fieldsOfConflictDossierCarouselDot || "0", 10) || 0);
+  });
+
+  if (viewport) {
+    viewport.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+      event.preventDefault();
+      const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
+      updateFieldsOfConflictDossierCarousel(carousel, event.key === "ArrowLeft" ? currentIndex - 1 : currentIndex + 1);
+    });
+
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let pointerId = null;
+    function clearPointerState() {
+      pointerId = null;
+      pointerStartX = 0;
+      pointerStartY = 0;
+    }
+    viewport.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") {
+        return;
+      }
+      pointerId = event.pointerId;
+      pointerStartX = event.clientX;
+      pointerStartY = event.clientY;
+    });
+    viewport.addEventListener("pointerup", (event) => {
+      if (pointerId !== event.pointerId) {
+        return;
+      }
+      const deltaX = event.clientX - pointerStartX;
+      const deltaY = event.clientY - pointerStartY;
+      if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+        const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
+        updateFieldsOfConflictDossierCarousel(carousel, currentIndex + (deltaX < 0 ? 1 : -1));
+      }
+      clearPointerState();
+    });
+    viewport.addEventListener("pointercancel", clearPointerState);
+    viewport.addEventListener("lostpointercapture", clearPointerState);
+  }
+
+  carousel.dataset.fieldsOfConflictDossierCarouselBound = "true";
+}
+
+function createFieldsOfConflictDossierCarousel() {
+  const carousel = document.createElement("div");
+  carousel.className = "fields-of-conflict-dossier-carousel";
+  carousel.dataset.fieldsOfConflictDossierCarousel = "";
+  carousel.dataset.fieldsOfConflictDossierCarouselIndex = "0";
+
+  const previousButton = createFieldsOfConflictDossierCarouselArrow("prev");
+  const viewport = document.createElement("div");
+  viewport.className = "fields-of-conflict-dossier-carousel__viewport";
+  viewport.dataset.fieldsOfConflictDossierCarouselViewport = "";
+  viewport.tabIndex = 0;
+  viewport.setAttribute("aria-label", "Venue dossier sections");
+  viewport.setAttribute("aria-roledescription", "carousel");
+
+  const track = document.createElement("div");
+  track.className = "fields-of-conflict-dossier-carousel__track";
+  track.dataset.fieldsOfConflictDossierCarouselTrack = "";
+  viewport.append(track);
+
+  const nextButton = createFieldsOfConflictDossierCarouselArrow("next");
+  const dots = document.createElement("div");
+  dots.className = "fields-of-conflict-dossier-carousel__dots";
+  dots.dataset.fieldsOfConflictDossierCarouselDots = "";
+  dots.setAttribute("aria-label", "Venue dossier section position");
+
+  carousel.append(previousButton, viewport, nextButton, dots);
+  bindFieldsOfConflictDossierCarouselControls(carousel);
+  return carousel;
+}
+
+function unwrapFieldsOfConflictDossierCarousel(dossier) {
+  const carousel = getFieldsOfConflictDossierCarousel(dossier);
+  if (!dossier || !carousel) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS.forEach((sectionConfig) => {
+    const section = carousel.querySelector(sectionConfig.selector);
+    if (section) {
+      fragment.append(section);
+    }
+  });
+  carousel.replaceWith(fragment);
+}
+
+function syncFieldsOfConflictDossierCarousel(dossier) {
+  if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
+    unwrapFieldsOfConflictDossierCarousel(dossier);
+    return;
+  }
+
+  const sections = FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS
+    .map((sectionConfig) => ({
+      ...sectionConfig,
+      element: dossier.querySelector(sectionConfig.selector),
+    }))
+    .filter(({ element }) => Boolean(element));
+  if (sections.length === 0) {
+    return;
+  }
+
+  const existingCarousel = getFieldsOfConflictDossierCarousel(dossier);
+  const carousel = existingCarousel || createFieldsOfConflictDossierCarousel();
+  const track = getFieldsOfConflictDossierCarouselTrack(carousel);
+  const dots = getFieldsOfConflictDossierCarouselDots(carousel);
+  const previousIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
+  const firstSection = sections[0].element;
+  if (!existingCarousel && firstSection.parentElement === dossier) {
+    dossier.insertBefore(carousel, firstSection);
+  } else if (carousel.parentElement !== dossier) {
+    dossier.append(carousel);
+  }
+
+  sections.forEach((sectionConfig, index) => {
+    const slideSelector = `[data-fields-of-conflict-dossier-carousel-slide="${sectionConfig.id}"]`;
+    const slide = track.querySelector(slideSelector) || createFieldsOfConflictDossierCarouselSlide(sectionConfig);
+    slide.setAttribute("aria-label", sectionConfig.label);
+    if (sectionConfig.element.parentElement !== slide) {
+      slide.replaceChildren(sectionConfig.element);
+    }
+    if (slide.parentElement !== track || track.children[index] !== slide) {
+      track.append(slide);
+    }
+  });
+
+  Array.from(track.children).forEach((slide) => {
+    if (!sections.some((sectionConfig) => slide.dataset.fieldsOfConflictDossierCarouselSlide === sectionConfig.id)) {
+      slide.remove();
+    }
+  });
+
+  dots.replaceChildren(...sections.map((sectionConfig, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "fields-of-conflict-dossier-carousel__dot";
+    dot.dataset.fieldsOfConflictDossierCarouselDot = String(index);
+    dot.setAttribute("aria-label", `Show ${sectionConfig.label}`);
+    return dot;
+  }));
+
+  bindFieldsOfConflictDossierCarouselControls(carousel);
+  updateFieldsOfConflictDossierCarousel(carousel, previousIndex);
+}
+
 function syncFieldsOfConflictDossierFrameworkSections(dossier) {
   const existingSections = Array.from(dossier?.querySelectorAll?.("[data-fields-of-conflict-dossier-section]") || []);
   if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
@@ -7312,6 +7569,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     return;
   }
 
+  unwrapFieldsOfConflictDossierCarousel(dossier);
   const venueName = getWrestlingVenueRowName(venue);
   const initials = dossier.querySelector("[data-fields-of-conflict-dossier-initials]");
   const name = dossier.querySelector("[data-fields-of-conflict-dossier-name]");
@@ -7328,6 +7586,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
   }
   syncFieldsOfConflictVenueLocationSection(dossier);
   syncFieldsOfConflictDossierFrameworkSections(dossier);
+  syncFieldsOfConflictDossierCarousel(dossier);
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);
   dossier.setAttribute("aria-label", `${venueName} venue dossier`);

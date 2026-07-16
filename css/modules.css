@@ -23111,6 +23111,127 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events: none;
   animation: none;
 }
+.fields-of-conflict-dossier-carousel {
+  position: relative;
+  display: grid;
+  gap: clamp(0.42rem, 1vw, 0.62rem);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.fields-of-conflict-dossier-carousel__viewport {
+  inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.fields-of-conflict-dossier-carousel__viewport:focus-visible {
+  outline: 1px solid rgba(255, 90, 60, 0.7);
+  outline-offset: 0.22rem;
+}
+
+.fields-of-conflict-dossier-carousel__track {
+  display: flex;
+  align-items: stretch;
+  inline-size: 100%;
+  min-inline-size: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform 320ms var(--ease-standard);
+}
+
+.fields-of-conflict-dossier-carousel__slide {
+  flex: 0 0 100%;
+  display: grid;
+  align-content: start;
+  box-sizing: border-box;
+  min-inline-size: 100%;
+  padding-inline: 0;
+}
+
+.fields-of-conflict-dossier-carousel__slide > .fields-of-conflict-dossier__panel,
+.fields-of-conflict-dossier-carousel__slide > .fields-of-conflict-location,
+.fields-of-conflict-dossier-carousel__slide > .fields-of-conflict-dossier-section {
+  inline-size: 100%;
+}
+
+.fields-of-conflict-dossier-carousel__arrow {
+  position: absolute;
+  inset-block-start: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: clamp(2rem, 5vw, 2.55rem);
+  min-block-size: clamp(2rem, 5vw, 2.55rem);
+  padding: 0;
+  color: rgba(255, 247, 238, 0.9);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.82rem, 1.8vw, 1rem);
+  line-height: 1;
+  background: rgba(4, 0, 0, 0.68);
+  border: 1px solid rgba(255, 42, 26, 0.32);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0.62rem rgba(255, 42, 26, 0.12),
+    inset 0 0 0.7rem rgba(0, 0, 0, 0.36);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.fields-of-conflict-dossier-carousel__arrow--prev {
+  inset-inline-start: clamp(0.28rem, 1vw, 0.5rem);
+}
+
+.fields-of-conflict-dossier-carousel__arrow--next {
+  inset-inline-end: clamp(0.28rem, 1vw, 0.5rem);
+}
+
+.fields-of-conflict-dossier-carousel__arrow:hover {
+  border-color: rgba(255, 90, 60, 0.52);
+  background: rgba(255, 42, 26, 0.16);
+}
+
+.fields-of-conflict-dossier-carousel__arrow:focus-visible,
+.fields-of-conflict-dossier-carousel__dot:focus-visible {
+  outline: 1px solid rgba(255, 247, 238, 0.82);
+  outline-offset: 0.16rem;
+}
+
+.fields-of-conflict-dossier-carousel__dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.42rem;
+  min-block-size: 1.35rem;
+}
+
+.fields-of-conflict-dossier-carousel__dot {
+  appearance: none;
+  inline-size: 0.56rem;
+  aspect-ratio: 1;
+  padding: 0;
+  background: rgba(255, 247, 238, 0.08);
+  border: 1px solid rgba(255, 247, 238, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background var(--motion-quick) var(--ease-standard),
+    border-color var(--motion-quick) var(--ease-standard),
+    transform var(--motion-quick) var(--ease-standard);
+}
+
+.fields-of-conflict-dossier-carousel__dot.is-active {
+  background: rgba(255, 42, 26, 0.38);
+  border-color: rgba(255, 90, 60, 0.62);
+  transform: scale(1.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fields-of-conflict-dossier-carousel__track,
+  .fields-of-conflict-dossier-carousel__dot {
+    transition: none;
+  }
+}
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
   inset-block-start: calc(env(safe-area-inset-top) + 15px);
   inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(1.2rem, env(safe-area-inset-bottom)) + 1.5rem);
