@@ -23254,6 +23254,109 @@ button.hall-crusades-archive-crystal:focus-visible {
   max-inline-size: 58ch;
 }
 
+.fields-of-conflict-location {
+  display: grid;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  align-content: start;
+}
+
+.fields-of-conflict-location__header {
+  display: grid;
+  grid-template-columns: minmax(1.5rem, 1fr) auto minmax(1.5rem, 1fr);
+  align-items: center;
+  column-gap: clamp(0.5rem, 1.4vw, 0.9rem);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.fields-of-conflict-location__header::before,
+.fields-of-conflict-location__header::after {
+  content: "";
+  display: block;
+  block-size: 1px;
+  min-inline-size: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.5) 38%, rgba(255, 231, 208, 0.22) 50%, rgba(255, 90, 60, 0.42) 62%, transparent);
+  box-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.24);
+}
+
+.fields-of-conflict-location__header::before {
+  transform: scaleX(-1);
+}
+
+.fields-of-conflict-location__title {
+  margin: 0;
+  color: rgba(255, 90, 60, 0.96);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.78rem, 1.15vw, 1rem);
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 0 0.4rem rgba(255, 42, 26, 0.3),
+    0 0 0.9rem rgba(255, 42, 26, 0.16);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fields-of-conflict-location__frame {
+  position: relative;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: clamp(17.5rem, 36vw, 25rem);
+  min-block-size: 17.5rem;
+  max-block-size: 25rem;
+  margin-block-start: clamp(0.58rem, 1.1vw, 0.78rem);
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.08), transparent 18% 82%, rgba(255, 42, 26, 0.08)),
+    radial-gradient(circle at 50% 42%, rgba(255, 90, 60, 0.06), transparent 58%),
+    rgba(4, 0, 0, 0.7);
+  border: 1px solid rgba(255, 42, 26, 0.34);
+  border-inline-color: rgba(255, 42, 26, 0.22);
+  box-shadow:
+    0 0 0.9rem rgba(255, 42, 26, 0.12),
+    inset 0 0 1.15rem rgba(0, 0, 0, 0.42),
+    inset 0 0 0.3rem rgba(255, 42, 26, 0.08);
+}
+
+.fields-of-conflict-location__frame::before,
+.fields-of-conflict-location__frame::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.fields-of-conflict-location__frame::before {
+  inset: 0.42rem;
+  border: 1px solid rgba(255, 90, 60, 0.1);
+  box-shadow: inset 0 0 0.8rem rgba(255, 42, 26, 0.06);
+}
+
+.fields-of-conflict-location__frame::after {
+  inset-inline: 0.72rem;
+  inset-block-start: 0.72rem;
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.34), transparent);
+}
+
+.fields-of-conflict-location__soon {
+  margin: 10px 0 0;
+  color: rgba(255, 90, 60, 0.92);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.76rem, 1vw, 0.96rem);
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow:
+    0 0 0.34rem rgba(255, 42, 26, 0.28),
+    0 0 0.78rem rgba(255, 42, 26, 0.14);
+  text-transform: uppercase;
+}
+
 @media (max-width: 640px) {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);
@@ -23310,5 +23413,21 @@ button.hall-crusades-archive-crystal:focus-visible {
 
   .fields-of-conflict-dossier__fact-value {
     font-size: clamp(0.62rem, 2.55vw, 0.76rem);
+  }
+
+  .fields-of-conflict-location__header {
+    grid-template-columns: minmax(0.85rem, 1fr) auto minmax(0.85rem, 1fr);
+    column-gap: 0.46rem;
+  }
+
+  .fields-of-conflict-location__title,
+  .fields-of-conflict-location__soon {
+    letter-spacing: 0.11em;
+  }
+
+  .fields-of-conflict-location__frame {
+    block-size: 17.5rem;
+    min-block-size: 17.5rem;
+    max-block-size: 17.5rem;
   }
 }

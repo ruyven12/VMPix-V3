@@ -7191,6 +7191,54 @@ function createFieldsOfConflictDossierFact(label, value, modifier = "") {
   return fact;
 }
 
+function createFieldsOfConflictVenueLocationSection() {
+  const section = document.createElement("section");
+  section.className = "fields-of-conflict-location";
+  section.dataset.fieldsOfConflictLocation = "";
+  section.setAttribute("aria-labelledby", "fields-of-conflict-location-title");
+
+  const header = document.createElement("div");
+  header.className = "fields-of-conflict-location__header";
+
+  const title = document.createElement("h3");
+  title.className = "fields-of-conflict-location__title";
+  title.id = "fields-of-conflict-location-title";
+  title.textContent = "VENUE LOCATION";
+  header.append(title);
+
+  const frame = document.createElement("div");
+  frame.className = "fields-of-conflict-location__frame";
+  frame.setAttribute("aria-hidden", "true");
+
+  const comingSoon = document.createElement("p");
+  comingSoon.className = "fields-of-conflict-location__soon";
+  comingSoon.textContent = "COMING SOON";
+
+  section.append(header, frame, comingSoon);
+  return section;
+}
+
+function syncFieldsOfConflictVenueLocationSection(dossier) {
+  const existingSection = dossier?.querySelector?.("[data-fields-of-conflict-location]");
+  if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
+    existingSection?.remove();
+    return;
+  }
+
+  const section = existingSection || createFieldsOfConflictVenueLocationSection();
+  const panel = dossier.querySelector(".fields-of-conflict-dossier__panel");
+  if (panel) {
+    if (panel.nextElementSibling !== section) {
+      panel.insertAdjacentElement("afterend", section);
+    }
+    return;
+  }
+
+  if (section.parentElement !== dossier) {
+    dossier.append(section);
+  }
+}
+
 function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveVenueId()) {
   const dossier = getFieldsOfConflictDossierElement();
   if (!dossier) {
@@ -7216,6 +7264,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
   if (facts) {
     facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
   }
+  syncFieldsOfConflictVenueLocationSection(dossier);
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);
   dossier.setAttribute("aria-label", `${venueName} venue dossier`);
