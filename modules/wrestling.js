@@ -6830,6 +6830,59 @@ function getFieldsOfConflictVenueSelect() {
   return document.querySelector("[data-fields-of-conflict-venue-select]");
 }
 
+function getFieldsOfConflictVenueMarkerLayer() {
+  return document.querySelector(".fields-of-conflict-globe-markers");
+}
+
+function getFieldsOfConflictMarkerFromPoint(clientX, clientY) {
+  const markerLayer = getFieldsOfConflictVenueMarkerLayer();
+  if (!markerLayer) {
+    return null;
+  }
+
+  let closestMarker = null;
+  let closestDistance = Number.POSITIVE_INFINITY;
+  markerLayer.querySelectorAll(".fields-of-conflict-venue-marker[data-venue-id]").forEach((marker) => {
+    const markerRect = marker.getBoundingClientRect();
+    const markerCenterX = markerRect.left + markerRect.width / 2;
+    const markerCenterY = markerRect.top + markerRect.height / 2;
+    const markerHitRadius = Math.max(14, markerRect.width * 1.85);
+    const distance = Math.hypot(clientX - markerCenterX, clientY - markerCenterY);
+    if (distance <= markerHitRadius && distance < closestDistance) {
+      closestMarker = marker;
+      closestDistance = distance;
+    }
+  });
+  return closestMarker;
+}
+
+function bindFieldsOfConflictVenueMarkers() {
+  const markerLayer = getFieldsOfConflictVenueMarkerLayer();
+  if (!markerLayer || markerLayer.dataset.fieldsOfConflictVenueMarkersBound === "true") {
+    return;
+  }
+
+  document.addEventListener("click", (event) => {
+    if (!isWrestlingVenuesPrototypeRoute()) {
+      return;
+    }
+    if (event.target?.closest?.("[data-fields-of-conflict-venue-select-shell]")) {
+      return;
+    }
+
+    const directMarker = event.target?.closest?.(".fields-of-conflict-venue-marker[data-venue-id]");
+    const marker = directMarker && markerLayer.contains(directMarker)
+      ? directMarker
+      : getFieldsOfConflictMarkerFromPoint(event.clientX, event.clientY);
+    if (!marker) {
+      return;
+    }
+
+    updateFieldsOfConflictVenueLock(marker.dataset.venueId);
+  }, true);
+  markerLayer.dataset.fieldsOfConflictVenueMarkersBound = "true";
+}
+
 function ensureFieldsOfConflictVenueSelectOptions(select = getFieldsOfConflictVenueSelect()) {
   if (!select) {
     return;
@@ -6919,6 +6972,13 @@ function bindFieldsOfConflictVenueSelect() {
   updateFieldsOfConflictVenueLock(select.value || FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID);
 }
 
+function ensureWrestlingVenuesPrototypeShellOwnership(shellElement, prototypeShell) {
+  if (!shellElement || !prototypeShell || prototypeShell.parentElement === shellElement) {
+    return;
+  }
+  shellElement.appendChild(prototypeShell);
+}
+
 function clearWrestlingVenuesPrototypeSourceShell() {
   if (typeof wrestlingVenuesList !== "undefined" && wrestlingVenuesList) {
     wrestlingVenuesList.replaceChildren();
@@ -6996,6 +7056,9 @@ function setWrestlingVenuesPrototypeActive(isActive) {
   }
 
   const prototypeShell = getWrestlingVenuesPrototypeShell();
+  if (isActive) {
+    ensureWrestlingVenuesPrototypeShellOwnership(shellElement, prototypeShell);
+  }
   if (prototypeShell) {
     prototypeShell.toggleAttribute("inert", !isActive);
     prototypeShell.setAttribute("aria-hidden", String(!isActive));
@@ -7004,6 +7067,7 @@ function setWrestlingVenuesPrototypeActive(isActive) {
 
   if (isActive) {
     bindFieldsOfConflictVenueSelect();
+    bindFieldsOfConflictVenueMarkers();
   }
 }
 

@@ -21699,7 +21699,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .wrestling-venues-prototype-shell {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   place-items: center;
   box-sizing: border-box;
@@ -21745,6 +21745,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events: auto;
   visibility: visible;
 }
+
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .portfolio-hub {
   visibility: visible !important;
   opacity: 1 !important;
@@ -21789,7 +21790,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   background-repeat: no-repeat;
   background-size: cover;
   opacity: 1;
-  pointer-events: none;
+  pointer-events: auto;
   visibility: visible;
 }
 
@@ -21998,7 +21999,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   z-index: 2;
   inline-size: var(--fields-globe-scan-size);
   aspect-ratio: 1;
-  pointer-events: none;
+  pointer-events: auto;
   contain: layout paint;
   opacity: 0.82;
   transform: translateX(-50%);
@@ -22054,7 +22055,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   inset: 8%;
   z-index: 3;
   border-radius: 50%;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .fields-of-conflict-venue-marker {
@@ -22065,7 +22066,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   inset-inline-start: var(--fields-marker-x);
   z-index: 2;
   display: block;
-  inline-size: clamp(0.52rem, 0.84vw, 0.78rem);
+  inline-size: clamp(0.68rem, 1vw, 0.9rem);
   aspect-ratio: 1;
   border: 1px solid rgba(255, 192, 104, 0.58);
   border-radius: 50%;
@@ -22075,9 +22076,13 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.72rem rgba(255, 42, 24, calc(var(--fields-marker-glow) * 0.42)),
     inset 0 0 0.28rem rgba(255, 126, 48, 0.16);
   opacity: var(--fields-marker-opacity);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
   transform: translate(-50%, -50%);
   animation: fieldsConflictVenueMarkerPulse var(--fields-marker-duration, 7.4s) ease-in-out infinite;
   animation-delay: var(--fields-marker-delay, 0s);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .fields-of-conflict-venue-marker::before {
@@ -22098,7 +22103,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   --fields-marker-opacity: 0.96;
   --fields-marker-glow: 0.66;
   z-index: 4;
-  inline-size: clamp(0.72rem, 1.12vw, 1rem);
+  inline-size: clamp(0.88rem, 1.22vw, 1.1rem);
   border-color: rgba(255, 230, 168, 0.8);
   background: radial-gradient(circle, rgba(255, 236, 184, 0.38) 0 24%, rgba(255, 100, 38, 0.22) 28% 48%, transparent 52% 100%);
   box-shadow:
