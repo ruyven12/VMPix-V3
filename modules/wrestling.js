@@ -7011,6 +7011,22 @@ function closeFieldsOfConflictVenueDossier(options = {}) {
   }
 }
 
+let fieldsOfConflictDossierTriggerDelegated = false;
+
+function handleFieldsOfConflictDossierTriggerClick(event) {
+  if (!isWrestlingVenuesPrototypeRoute()) {
+    return;
+  }
+
+  const trigger = event.target?.closest?.("[data-fields-of-conflict-dossier-trigger]");
+  if (!trigger || trigger.disabled || trigger.dataset.fieldsOfConflictCoordinateState !== "locked") {
+    return;
+  }
+
+  event.preventDefault();
+  openFieldsOfConflictVenueDossier();
+}
+
 function bindFieldsOfConflictVenueDossierControls() {
   const backButton = document.querySelector("[data-fields-of-conflict-dossier-back]");
   if (backButton && backButton.dataset.fieldsOfConflictDossierBackBound !== "true") {
@@ -7018,14 +7034,10 @@ function bindFieldsOfConflictVenueDossierControls() {
     backButton.dataset.fieldsOfConflictDossierBackBound = "true";
   }
 
-  const statusBox = ensureFieldsOfConflictCoordinateStatusBox();
-  if (statusBox && statusBox.dataset.fieldsOfConflictDossierTriggerBound !== "true") {
-    statusBox.addEventListener("click", () => {
-      if (statusBox.dataset.fieldsOfConflictCoordinateState === "locked" && !statusBox.disabled) {
-        openFieldsOfConflictVenueDossier();
-      }
-    });
-    statusBox.dataset.fieldsOfConflictDossierTriggerBound = "true";
+  ensureFieldsOfConflictCoordinateStatusBox();
+  if (!fieldsOfConflictDossierTriggerDelegated) {
+    document.addEventListener("click", handleFieldsOfConflictDossierTriggerClick, true);
+    fieldsOfConflictDossierTriggerDelegated = true;
   }
 }
 
