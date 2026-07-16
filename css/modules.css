@@ -23111,6 +23111,23 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events: none;
   animation: none;
 }
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
+  inset-block-start: calc(max(1rem, env(safe-area-inset-top)) + 1rem);
+  inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(1.2rem, env(safe-area-inset-bottom)) + 1.5rem);
+  align-content: center;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-title,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-globe-markers,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-venue-select,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-coordinate-status,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-coordinate-hud,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-active-connection {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
 
 
 .fields-of-conflict-dossier__panel {
@@ -23237,6 +23254,14 @@ button.hall-crusades-archive-crystal:focus-visible {
   max-inline-size: 58ch;
 }
 
+@media (max-width: 640px) {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
+    inset-block-start: calc(env(safe-area-inset-top) + 15px);
+    inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.85rem, env(safe-area-inset-bottom)) + 0.58rem);
+    align-content: start;
+    inline-size: min(calc(100vw - 1rem), 28rem);
+  }
+}
 @media (max-width: 640px) {
   .fields-of-conflict-dossier {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);

@@ -2253,6 +2253,7 @@ const routeNameToGlobalNavTarget = {
   "wrestling-person-detail": "wrestling",
   "wrestling-venues": "wrestling",
   "wrestling-venue-detail": "wrestling",
+  "wrestling-venue-detail-prototype": "wrestling",
   calendar: "calendar",
   about: "about",
   contact: "contact",
@@ -2287,6 +2288,7 @@ const routeNameToBreadcrumbTrail = {
   "wrestling-person-detail": ["portfolio", "wrestling", "wrestling-people"],
   "wrestling-venues": ["portfolio", "wrestling"],
   "wrestling-venue-detail": ["portfolio", "wrestling"],
+  "wrestling-venue-detail-prototype": ["portfolio", "wrestling"],
   calendar: ["portfolio", "calendar"],
   about: ["portfolio", "about"],
   contact: ["portfolio", "contact"],
@@ -2305,6 +2307,7 @@ const routeNameToDrilldownBreadcrumb = {
   "music-venue-detail": "Venue Detail",
   "wrestling-person-detail": "Person Detail",
   "wrestling-venue-detail": "Venue Detail",
+  "wrestling-venue-detail-prototype": "Venue Detail",
   "wrestling-show-detail": "Show Detail",
   "wrestling-match-detail": "Match Detail",
   "wrestling-match-detail-photo": "Photo",
@@ -2339,6 +2342,7 @@ const routeNameToShellBackTarget = {
   "wrestling-person-detail": routePaths.wrestlingPeople,
   "wrestling-venues": routePaths.wrestling,
   "wrestling-venue-detail": routePaths.wrestlingVenues,
+  "wrestling-venue-detail-prototype": routePaths.wrestlingVenues,
   calendar: routePaths.portfolio,
   about: routePaths.portfolio,
   contact: routePaths.portfolio,
@@ -2403,11 +2407,12 @@ const daiionArchiveFocusBriefings = {
     title: "The Fields of Conflict",
     stat: "9 Mapped Arenas",
     copy: "Visit the ancient battlegrounds in which each recorded conflict left its mark.",
-    status: "TARGET LOCKED",
+    status: "Enter The Halls",
   },
 };
 const daiionArchiveRouteTargets = {
   campaigns: routePaths.wrestlingShows,
+  arenas: routePaths.wrestlingVenues,
 };
 const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings));
 let daiionArchiveStatsRequestId = 0;

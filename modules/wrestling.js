@@ -6754,6 +6754,10 @@ function normalizeWrestlingVenuesPrototypePath(value) {
 }
 
 function isWrestlingVenuesPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
+  if (route?.wrestlingVenueDetailPrototype === "colisee" || route?.name === "wrestling-venue-detail-prototype") {
+    return true;
+  }
+
   if (route?.wrestlingVenuesPrototype === "fields-of-conflict" || route?.venuesPrototype === "fields-of-conflict") {
     return true;
   }
@@ -6780,6 +6784,7 @@ function getWrestlingVenuesPrototypeShell() {
 }
 
 const FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID = "yarmouth-amvets";
+const FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID = "colisee";
 const FIELDS_OF_CONFLICT_COORDINATE_DEGREE = String.fromCharCode(176);
 // TODO: Replace temporary Fields of Conflict venue coordinates with backend-provided venue coordinates when available.
 const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
@@ -6876,6 +6881,13 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     longitude: `70.1860${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   }
 ];
+
+function isWrestlingVenueDetailPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
+  return Boolean(
+    route?.name === "wrestling-venue-detail-prototype" &&
+    normalizeWrestlingVenueId(route.venueId || route.prototypeVenueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID) === FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID
+  );
+}
 
 function getFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
   const normalizedVenueId = String(venueId || "").trim();
@@ -7417,6 +7429,13 @@ function ensureWrestlingVenuesPrototypeShellOwnership(shellElement, prototypeShe
   shellElement.appendChild(prototypeShell);
 }
 
+function clearFieldsOfConflictDetailPrototypeState() {
+  const prototypeShell = getWrestlingVenuesPrototypeShell();
+  if (prototypeShell) {
+    delete prototypeShell.dataset.fieldsOfConflictDetailPrototype;
+  }
+}
+
 function clearWrestlingVenuesPrototypeSourceShell() {
   if (typeof wrestlingVenuesList !== "undefined" && wrestlingVenuesList) {
     wrestlingVenuesList.replaceChildren();
@@ -7511,6 +7530,7 @@ function setWrestlingVenuesPrototypeActive(isActive) {
     bindFieldsOfConflictActiveConnectionResize();
     scheduleFieldsOfConflictActiveConnectionUpdate();
   } else {
+    clearFieldsOfConflictDetailPrototypeState();
     closeFieldsOfConflictVenueDossier({ restoreConnection: false });
     hideFieldsOfConflictActiveConnection();
   }
@@ -7519,10 +7539,44 @@ function setWrestlingVenuesPrototypeActive(isActive) {
 function renderWrestlingVenuesPrototypeShell() {
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
   clearWrestlingVenuesPrototypeSourceShell();
+  clearFieldsOfConflictDetailPrototypeState();
+  closeFieldsOfConflictVenueDossier({ restoreConnection: false });
   setWrestlingVenuesPrototypeActive(true);
 }
+
+function renderWrestlingVenueDetailPrototypeRoute(route = {}) {
+  cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
+  clearWrestlingVenuesPrototypeSourceShell();
+  setWrestlingVenuesPrototypeActive(true);
+  updateFieldsOfConflictVenueLock(route.venueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+  renderFieldsOfConflictVenueDossier(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+
+  const prototypeShell = getWrestlingVenuesPrototypeShell();
+  const dossier = getFieldsOfConflictDossierElement();
+  if (prototypeShell) {
+    prototypeShell.dataset.fieldsOfConflictDetailPrototype = FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
+    prototypeShell.dataset.fieldsOfConflictDossierState = "open";
+  }
+  if (dossier) {
+    dossier.hidden = false;
+    dossier.removeAttribute("aria-hidden");
+    dossier.removeAttribute("inert");
+  }
+  hideFieldsOfConflictActiveConnection();
+}
+
+function showWrestlingVenueDetailPrototype(route = {}) {
+  renderWrestlingVenueDetailPrototypeRoute(route);
+}
+
 function renderWrestlingVenuesIndex(options = {}) {
-  if (isWrestlingVenuesPrototypeRoute()) {
+  const currentRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  if (isWrestlingVenueDetailPrototypeRoute(currentRoute)) {
+    renderWrestlingVenueDetailPrototypeRoute(currentRoute);
+    return;
+  }
+
+  if (isWrestlingVenuesPrototypeRoute(currentRoute)) {
     renderWrestlingVenuesPrototypeShell();
     return;
   }
