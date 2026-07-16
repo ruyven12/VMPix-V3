@@ -6955,12 +6955,19 @@ function getFieldsOfConflictDossierFactRows(venue, config) {
   const latitude = getWrestlingVenueDetailLatitude(venue) || config?.latitude;
   const longitude = getWrestlingVenueDetailLongitude(venue) || config?.longitude;
   const coordinates = [latitude, longitude].filter(Boolean).join(" / ");
+  const relatedEvents = getWrestlingVenueRelatedShowRows(venue);
+  const venueStats = getWrestlingVenueDetailStats(venue, relatedEvents);
+  const geo = getWrestlingVenueGeo(venue);
 
   return [
     { label: "Location", value: [city, state].filter(Boolean).join(", ") || venue.location || config?.location },
     { label: "Region", value: venue.region || venue.venue_details?.region || venue.venueDetails?.region || venue.backend_record?.region },
     { label: "Venue Type", value: getWrestlingVenueType(venue) },
     { label: "Status", value: getWrestlingVenueStatus(venue) },
+    { label: "First Event", value: venueStats.firstEvent },
+    { label: "Last Event", value: venueStats.latestEvent },
+    { label: "Event Count", value: venueStats.events },
+    { label: "Geohash", value: geo.geohash },
     { label: "GPS Coordinates", value: coordinates, modifier: "full" },
     { label: "Notes", value: getFieldsOfConflictDossierVenueNotes(venue), modifier: "full notes" },
   ].map((row) => ({ ...row, value: getFieldsOfConflictDossierDisplayValue(row.value) }));
@@ -7550,6 +7557,30 @@ function renderWrestlingVenueDetailPrototypeRoute(route = {}) {
   setWrestlingVenuesPrototypeActive(true);
   updateFieldsOfConflictVenueLock(route.venueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
   renderFieldsOfConflictVenueDossier(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+
+  const pendingRequests = [];
+  if (wrestlingVenuesDataState !== "live") {
+    if (wrestlingVenuesRequest) {
+      pendingRequests.push(wrestlingVenuesRequest);
+    } else if (!wrestlingVenuesLoaded) {
+      pendingRequests.push(requestWrestlingVenuesData());
+    }
+  }
+  if (wrestlingShowsDataState !== "live") {
+    if (wrestlingShowsRequest) {
+      pendingRequests.push(wrestlingShowsRequest);
+    } else if (!wrestlingShowsDataRequested) {
+      pendingRequests.push(requestWrestlingShowsData());
+    }
+  }
+  if (pendingRequests.length > 0) {
+    Promise.allSettled(pendingRequests).then(() => {
+      const currentRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+      if (isWrestlingVenueDetailPrototypeRoute(currentRoute)) {
+        renderFieldsOfConflictVenueDossier(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+      }
+    });
+  }
 
   const prototypeShell = getWrestlingVenuesPrototypeShell();
   const dossier = getFieldsOfConflictDossierElement();
