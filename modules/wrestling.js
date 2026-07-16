@@ -6787,6 +6787,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "brick-south",
     name: "Brick South",
     location: "Portland, Maine",
+    region: "New England",
+    venue_type: "Event Hall",
+    status: "Active",
     latitude: `43.6520${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.2568${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6794,6 +6797,10 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "colisee",
     name: "Colis" + String.fromCharCode(233) + "e",
     location: "Lewiston, Maine",
+    region: "New England",
+    venue_type: "Sports Arena",
+    status: "Active",
+    notes: "Home of the Maine Maniacs",
     latitude: `44.1004${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.2148${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6801,6 +6808,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "fairfield-community-center",
     name: "Fairfield Community Center",
     location: "Fairfield, Maine",
+    region: "New England",
+    venue_type: "Sports Arena",
+    status: "Active",
     latitude: `44.5884${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `69.5987${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6808,6 +6818,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "live-at-madrids",
     name: "Live @ Madrids",
     location: "Portland, Maine",
+    region: "New England",
+    venue_type: "Event Hall",
+    status: "Active",
     latitude: `43.6615${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.2553${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6815,6 +6828,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "morgan-hill-event-center",
     name: "Morgan Hill Event Center",
     location: "Hermon, Maine",
+    region: "New England",
+    venue_type: "Event Hall",
+    status: "Active",
     latitude: `44.8037${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `68.9134${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6822,6 +6838,10 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "portland-expo",
     name: "Portland Expo",
     location: "Portland, Maine",
+    region: "New England",
+    venue_type: "Sports Arena",
+    status: "Active",
+    notes: "Home of Maine Celtics",
     latitude: `43.6557${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.2790${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6829,6 +6849,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "rumors",
     name: "Rumors",
     location: "Biddeford, Maine",
+    region: "New England",
+    venue_type: "Event Hall",
+    status: "Active",
     latitude: `43.4926${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.4534${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6836,6 +6859,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "westbrook-armory",
     name: "Westbrook Armory",
     location: "Westbrook, Maine",
+    region: "New England",
+    venue_type: "Sports Arena",
+    status: "Active",
     latitude: `43.6770${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.3712${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   },
@@ -6843,6 +6869,9 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     id: "yarmouth-amvets",
     name: "Yarmouth Amvets",
     location: "Yarmouth, Maine",
+    region: "New England",
+    venue_type: "Legion Hall",
+    status: "Active",
     latitude: `43.8000${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} N`,
     longitude: `70.1860${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   }
