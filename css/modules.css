@@ -22739,3 +22739,27 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: fieldsConflictActiveConnectionReveal 520ms ease-out 3200ms both;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title__text,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
+    animation: none;
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
+    opacity: 0.68;
+  }
+}
