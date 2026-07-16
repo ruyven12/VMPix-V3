@@ -22051,7 +22051,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .fields-of-conflict-globe-scan__pulse {
   position: absolute;
   inset: 0;
-  display: block;
+  display: none;
   border-radius: 50%;
   pointer-events: none;
 }
@@ -22109,7 +22109,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   inset-inline-start: var(--fields-marker-x);
   z-index: 2;
   display: block;
-  inline-size: clamp(0.68rem, 1vw, 0.9rem);
+  inline-size: clamp(1.36rem, 2vw, 1.8rem);
   aspect-ratio: 1;
   border: 1px solid rgba(255, 192, 104, 0.58);
   border-radius: 50%;
@@ -22151,7 +22151,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   --fields-marker-opacity: 0.96;
   --fields-marker-glow: 0.66;
   z-index: 4;
-  inline-size: clamp(0.88rem, 1.22vw, 1.1rem);
+  inline-size: clamp(1.76rem, 2.44vw, 2.2rem);
   border-color: rgba(255, 230, 168, 0.8);
   background: radial-gradient(circle, rgba(255, 236, 184, 0.38) 0 24%, rgba(255, 100, 38, 0.22) 28% 48%, transparent 52% 100%);
   box-shadow:
