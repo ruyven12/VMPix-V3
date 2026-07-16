@@ -22175,15 +22175,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="brick-south"] {
-  --fields-marker-x: 48%;
-  --fields-marker-y: 17%;
+  --fields-marker-x: 50%;
+  --fields-marker-y: 10%;
   --fields-marker-duration: 7.2s;
   --fields-marker-delay: -1.2s;
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="colisee"] {
-  --fields-marker-x: 62%;
-  --fields-marker-y: 25%;
+  --fields-marker-x: 68%;
+  --fields-marker-y: 20%;
   --fields-marker-duration: 8.4s;
   --fields-marker-delay: -4s;
   --fields-marker-opacity: 0.72;
@@ -22191,14 +22191,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="fairfield-community-center"] {
-  --fields-marker-x: 30%;
+  --fields-marker-x: 20%;
   --fields-marker-y: 36%;
   --fields-marker-duration: 6.9s;
   --fields-marker-delay: -2.6s;
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="live-at-mavericks"] {
-  --fields-marker-x: 74%;
+  --fields-marker-x: 81%;
   --fields-marker-y: 43%;
   --fields-marker-duration: 8.8s;
   --fields-marker-delay: -5.4s;
@@ -22206,7 +22206,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-venue-marker[data-venue-id="morgan-hill-event-center"] {
   --fields-marker-x: 52%;
-  --fields-marker-y: 48%;
+  --fields-marker-y: 52%;
   --fields-marker-duration: 7.7s;
   --fields-marker-delay: -0.7s;
   --fields-marker-opacity: 0.74;
@@ -22214,15 +22214,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="portland-expo"] {
-  --fields-marker-x: 25%;
-  --fields-marker-y: 56%;
+  --fields-marker-x: 17%;
+  --fields-marker-y: 61%;
   --fields-marker-duration: 8.1s;
   --fields-marker-delay: -6.1s;
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="rumors"] {
-  --fields-marker-x: 67%;
-  --fields-marker-y: 65%;
+  --fields-marker-x: 70%;
+  --fields-marker-y: 75%;
   --fields-marker-duration: 6.8s;
   --fields-marker-delay: -3.2s;
   --fields-marker-opacity: 0.72;
@@ -22230,15 +22230,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="westbrook-armory"] {
-  --fields-marker-x: 43%;
-  --fields-marker-y: 73%;
+  --fields-marker-x: 40%;
+  --fields-marker-y: 84%;
   --fields-marker-duration: 7.9s;
   --fields-marker-delay: -5s;
 }
 
 .fields-of-conflict-venue-marker[data-venue-id="yarmouth-amvets"] {
-  --fields-marker-x: 37%;
-  --fields-marker-y: 25%;
+  --fields-marker-x: 33%;
+  --fields-marker-y: 19%;
   --fields-marker-duration: 6.8s;
   --fields-marker-delay: -2.7s;
 }
@@ -22378,6 +22378,51 @@ button.hall-crusades-archive-crystal:focus-visible {
     --fields-globe-scan-size: min(112vw, 56svh, 28.6rem);
     --fields-globe-scan-ring-scale: 1.045;
     inset-block-start: calc(max(0.8rem, env(safe-area-inset-top)) + clamp(5.8rem, 10.6svh, 6.1rem) + (var(--fields-globe-scan-anchor-size) / 2));
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="brick-south"] {
+    --fields-marker-x: 50%;
+    --fields-marker-y: 11%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="colisee"] {
+    --fields-marker-x: 66%;
+    --fields-marker-y: 21%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="fairfield-community-center"] {
+    --fields-marker-x: 22%;
+    --fields-marker-y: 37%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="live-at-mavericks"] {
+    --fields-marker-x: 78%;
+    --fields-marker-y: 43%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="morgan-hill-event-center"] {
+    --fields-marker-x: 52%;
+    --fields-marker-y: 52%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="portland-expo"] {
+    --fields-marker-x: 19%;
+    --fields-marker-y: 61%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="rumors"] {
+    --fields-marker-x: 68%;
+    --fields-marker-y: 74%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="westbrook-armory"] {
+    --fields-marker-x: 41%;
+    --fields-marker-y: 82%;
+  }
+
+  .fields-of-conflict-venue-marker[data-venue-id="yarmouth-amvets"] {
+    --fields-marker-x: 34%;
+    --fields-marker-y: 20%;
   }
 
   .wrestling-venues-prototype-shell {
