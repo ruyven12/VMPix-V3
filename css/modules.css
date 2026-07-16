@@ -22871,6 +22871,16 @@ button.hall-crusades-archive-crystal:focus-visible {
     padding: 0.16rem 0.4rem;
   }
 
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+    inset-block-start: auto;
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(11.35rem, 19svh, 12.55rem));
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-status {
+    inset-block-start: auto;
+    inset-block-end: calc(max(0.85rem, env(safe-area-inset-bottom)) + clamp(9.15rem, 16.2svh, 10.15rem));
+  }
+
   .fields-of-conflict-coordinate-status__text {
     font-size: clamp(0.5rem, 1.95vw, 0.61rem);
     letter-spacing: 0.06em;
