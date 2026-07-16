@@ -2070,6 +2070,7 @@ img.archive-gallery-image {
   }
 }
 
+
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro {
     visibility: visible;
@@ -21818,12 +21819,29 @@ button.hall-crusades-archive-crystal:focus-visible {
   line-height: 1;
   letter-spacing: clamp(0.055em, 0.7vw, 0.12em);
   text-align: center;
+  text-transform: none;
   text-shadow:
     0 0 0.55rem rgba(255, 42, 26, 0.42),
     0 0 1.25rem rgba(255, 42, 26, 0.18);
   white-space: nowrap;
   transform: translateX(-50%);
   pointer-events: none;
+}
+
+.fields-of-conflict-title__text {
+  display: block;
+  max-width: 100%;
+  color: rgba(255, 247, 238, 0.96);
+  text-transform: none;
+  background:
+    linear-gradient(108deg, transparent 0 42%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.18) 54%, transparent 62% 100%) -150% 0 / 260% 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 230, 214, 0.96) 34%, rgba(156, 71, 56, 0.98) 58%, rgba(255, 246, 236, 0.98) 76%, rgba(198, 119, 94, 0.96) 100%) 0 0 / 100% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  will-change: opacity, transform, background-position;
 }
 
 .fields-of-conflict-title::before,
@@ -21842,6 +21860,65 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-title::after {
   inset-block-end: 0;
+}
+
+@keyframes fieldsConflictTitleClear {
+  0%,
+  66% {
+    visibility: visible;
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translate3d(-50%, 12px, 0);
+  }
+}
+
+@keyframes fieldsConflictTitleReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fieldsConflictTitleMetalGlint {
+  0% {
+    background-position: -150% 0, 0 0;
+  }
+
+  100% {
+    background-position: 150% 0, 0 0;
+  }
+}
+
+@keyframes fieldsConflictCoordinateHudReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, 0.4rem, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes fieldsConflictActiveConnectionReveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0.68;
+  }
 }
 
 .fields-of-conflict-active-connection {
@@ -22455,6 +22532,29 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title__text,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
+    animation: none;
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
+    opacity: 0.68;
+  }
+
   .fields-of-conflict-active-connection {
     transition: none;
   }
@@ -22553,6 +22653,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title {
+  animation:
+    fieldsConflictTitleClear 3200ms ease-out both;
   inset-block-start: auto;
   inset-block-end: calc(max(0.58rem, env(safe-area-inset-bottom)) + clamp(15.65rem, 22svh, 17.05rem));
   inline-size: min(calc(100vw - clamp(9rem, 23vw, 30rem)), 52rem);
@@ -22568,6 +22670,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-shadow:
     0 0 0.44rem rgba(255, 42, 26, 0.48),
     0 0 1.05rem rgba(255, 42, 26, 0.18);
+}
+
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title__text {
+  animation:
+    fieldsConflictTitleReveal 950ms ease-out 180ms both,
+    fieldsConflictTitleMetalGlint 760ms ease-out 1220ms both;
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title::before {
@@ -22618,3 +22727,15 @@ button.hall-crusades-archive-crystal:focus-visible {
     inset-inline: clamp(1.6rem, 14vw, 4rem);
   }
 }
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-venue-select {
+  opacity: 0;
+  animation: fieldsConflictCoordinateHudReveal 520ms ease-out 3200ms both;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-active-connection[data-fields-of-conflict-connection-active="true"] {
+  opacity: 0;
+  animation: fieldsConflictActiveConnectionReveal 520ms ease-out 3200ms both;
+}
+
