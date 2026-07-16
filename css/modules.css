@@ -23112,29 +23112,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: none;
 }
 
-.fields-of-conflict-dossier__back {
-  justify-self: start;
-  appearance: none;
-  border: 1px solid rgba(255, 42, 26, 0.42);
-  border-inline-color: rgba(255, 42, 26, 0.24);
-  background:
-    linear-gradient(90deg, rgba(255, 42, 26, 0.12), rgba(255, 42, 26, 0.04), rgba(255, 42, 26, 0.12)),
-    rgba(4, 0, 0, 0.6);
-  color: rgba(255, 231, 208, 0.92);
-  font: inherit;
-  font-size: clamp(0.58rem, 0.86vw, 0.74rem);
-  font-weight: 720;
-  letter-spacing: 0.055em;
-  padding: clamp(0.42rem, 0.72vw, 0.56rem) clamp(0.72rem, 1.2vw, 0.95rem);
-  text-transform: none;
-  cursor: pointer;
-  box-shadow: 0 0 0.55rem rgba(255, 42, 26, 0.14), inset 0 0 0.8rem rgba(0, 0, 0, 0.34);
-}
-
-.fields-of-conflict-dossier__back:focus-visible {
-  outline: 2px solid rgba(255, 226, 174, 0.9);
-  outline-offset: 3px;
-}
 
 .fields-of-conflict-dossier__panel {
   display: grid;
@@ -23253,12 +23230,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-dossier:not([hidden]) {
     gap: 0.52rem;
   }
-
-  .fields-of-conflict-dossier__back {
-    font-size: clamp(0.54rem, 2.25vw, 0.68rem);
-    padding: 0.38rem 0.62rem;
-  }
-
   .fields-of-conflict-dossier__panel {
     grid-template-columns: 1fr;
     gap: 0.66rem;

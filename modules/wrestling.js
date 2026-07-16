@@ -6986,13 +6986,6 @@ function openFieldsOfConflictVenueDossier() {
   dossier.hidden = false;
   dossier.removeAttribute("aria-hidden");
   dossier.removeAttribute("inert");
-
-  const backButton = dossier.querySelector("[data-fields-of-conflict-dossier-back]");
-  try {
-    backButton?.focus({ preventScroll: true });
-  } catch (error) {
-    backButton?.focus();
-  }
 }
 
 function closeFieldsOfConflictVenueDossier(options = {}) {
@@ -7028,12 +7021,6 @@ function handleFieldsOfConflictDossierTriggerClick(event) {
 }
 
 function bindFieldsOfConflictVenueDossierControls() {
-  const backButton = document.querySelector("[data-fields-of-conflict-dossier-back]");
-  if (backButton && backButton.dataset.fieldsOfConflictDossierBackBound !== "true") {
-    backButton.addEventListener("click", () => closeFieldsOfConflictVenueDossier());
-    backButton.dataset.fieldsOfConflictDossierBackBound = "true";
-  }
-
   ensureFieldsOfConflictCoordinateStatusBox();
   if (!fieldsOfConflictDossierTriggerDelegated) {
     document.addEventListener("click", handleFieldsOfConflictDossierTriggerClick, true);
