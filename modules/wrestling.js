@@ -6890,9 +6890,18 @@ function getFieldsOfConflictLocationPart(location, partIndex) {
     .filter(Boolean)[partIndex] || "";
 }
 
-function formatFieldsOfConflictDossierCount(value) {
-  const numericValue = Number.parseInt(value, 10);
-  return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue.toLocaleString() : "";
+function getFieldsOfConflictDossierDisplayValue(value) {
+  return getWrestlingText(value, "N/A");
+}
+
+function getFieldsOfConflictDossierVenueNotes(venue) {
+  return getWrestlingText(
+    venue?.notes ||
+    venue?.venue_details?.notes ||
+    venue?.venueDetails?.notes ||
+    venue?.backend_record?.notes ||
+    venue?.backend_record?.venue_details?.notes
+  );
 }
 
 function getFieldsOfConflictDossierFactRows(venue, config) {
@@ -6900,32 +6909,25 @@ function getFieldsOfConflictDossierFactRows(venue, config) {
     return [];
   }
 
-  const geo = getWrestlingVenueGeo(venue);
-  const relatedEvents = getWrestlingVenueRelatedShowRows(venue);
-  const venueStats = getWrestlingVenueDetailStats(venue, relatedEvents);
   const city = getWrestlingVenueCity(venue) || getFieldsOfConflictLocationPart(config?.location, 0);
   const state = getWrestlingVenueDisplayState(venue) || getWrestlingVenueState(venue) || getFieldsOfConflictLocationPart(config?.location, 1);
+  const latitude = getWrestlingVenueDetailLatitude(venue) || config?.latitude;
+  const longitude = getWrestlingVenueDetailLongitude(venue) || config?.longitude;
+  const coordinates = [latitude, longitude].filter(Boolean).join(" / ");
 
   return [
-    ["City", city],
-    ["State", state],
-    ["Country", getWrestlingVenueCountry(venue)],
-    ["Latitude", getWrestlingVenueDetailLatitude(venue) || config?.latitude],
-    ["Longitude", getWrestlingVenueDetailLongitude(venue) || config?.longitude],
-    ["Geohash", geo.geohash],
-    ["Venue Type", getWrestlingVenueType(venue)],
-    ["Region", venue.region],
-    ["Status", getWrestlingVenueStatus(venue)],
-    ["First Event", venueStats.firstEvent],
-    ["Latest Event", venueStats.latestEvent],
-    ["Event Count", formatFieldsOfConflictDossierCount(venueStats.events)],
-  ].map(([label, value]) => [label, getWrestlingText(value)])
-    .filter(([, value]) => Boolean(value));
+    { label: "Location", value: [city, state].filter(Boolean).join(", ") || venue.location || config?.location },
+    { label: "Region", value: venue.region || venue.venue_details?.region || venue.venueDetails?.region || venue.backend_record?.region },
+    { label: "Venue Type", value: getWrestlingVenueType(venue) },
+    { label: "Status", value: getWrestlingVenueStatus(venue) },
+    { label: "GPS Coordinates", value: coordinates, modifier: "full" },
+    { label: "Notes", value: getFieldsOfConflictDossierVenueNotes(venue), modifier: "full notes" },
+  ].map((row) => ({ ...row, value: getFieldsOfConflictDossierDisplayValue(row.value) }));
 }
 
-function createFieldsOfConflictDossierFact(label, value) {
+function createFieldsOfConflictDossierFact(label, value, modifier = "") {
   const fact = document.createElement("div");
-  fact.className = "fields-of-conflict-dossier__fact";
+  fact.className = ["fields-of-conflict-dossier__fact", ...String(modifier || "").split(/\s+/).filter(Boolean).map((name) => `fields-of-conflict-dossier__fact--${name}`)].join(" ");
 
   const factLabel = document.createElement("dt");
   factLabel.className = "fields-of-conflict-dossier__fact-label";
@@ -6951,10 +6953,8 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
   }
 
   const venueName = getWrestlingVenueRowName(venue);
-  const locationText = getWrestlingVenueLocationText(venue) || config?.location || "";
   const initials = dossier.querySelector("[data-fields-of-conflict-dossier-initials]");
   const name = dossier.querySelector("[data-fields-of-conflict-dossier-name]");
-  const location = dossier.querySelector("[data-fields-of-conflict-dossier-location]");
   const facts = dossier.querySelector("[data-fields-of-conflict-dossier-facts]");
 
   if (initials) {
@@ -6963,11 +6963,8 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
   if (name) {
     name.textContent = venueName;
   }
-  if (location) {
-    location.textContent = locationText;
-  }
   if (facts) {
-    facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(([label, value]) => createFieldsOfConflictDossierFact(label, value)));
+    facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
   }
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);

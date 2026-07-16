@@ -23157,7 +23157,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .fields-of-conflict-dossier__info {
   display: grid;
   align-content: start;
-  gap: clamp(0.42rem, 0.9vw, 0.72rem);
+  gap: clamp(0.52rem, 0.95vw, 0.78rem);
   min-inline-size: 0;
 }
 
@@ -23168,56 +23168,73 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-weight: 720;
   letter-spacing: clamp(0.045em, 0.45vw, 0.09em);
   line-height: 1.02;
+  text-align: center;
   text-transform: none;
   text-shadow: 0 0 0.7rem rgba(255, 42, 26, 0.3);
-}
-
-.fields-of-conflict-dossier__location {
-  margin: 0;
-  color: rgba(255, 226, 196, 0.82);
-  font-size: clamp(0.74rem, 1.16vw, 0.98rem);
-  line-height: 1.18;
-  letter-spacing: 0.045em;
-  text-transform: none;
 }
 
 .fields-of-conflict-dossier__facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  margin: clamp(0.28rem, 0.72vw, 0.52rem) 0 0;
-  border: 1px solid rgba(255, 42, 26, 0.22);
-  background: rgba(0, 0, 0, 0.2);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 42, 26, 0.26);
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.08), transparent 22% 78%, rgba(255, 42, 26, 0.08)),
+    rgba(4, 0, 0, 0.28);
+  box-shadow: inset 0 0 0.9rem rgba(0, 0, 0, 0.24);
 }
 
 .fields-of-conflict-dossier__fact {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-block-size: clamp(3.25rem, 5.4vw, 4.4rem);
   min-inline-size: 0;
   padding: clamp(0.52rem, 0.86vw, 0.72rem) clamp(0.62rem, 1.05vw, 0.86rem);
-  border-block-end: 1px solid rgba(255, 42, 26, 0.14);
+  border-block-end: 1px solid rgba(255, 42, 26, 0.16);
+  text-align: center;
 }
 
-.fields-of-conflict-dossier__fact:nth-child(odd) {
-  border-inline-end: 1px solid rgba(255, 42, 26, 0.14);
+.fields-of-conflict-dossier__fact:nth-child(odd):not(.fields-of-conflict-dossier__fact--full) {
+  border-inline-end: 1px solid rgba(255, 42, 26, 0.16);
+}
+
+.fields-of-conflict-dossier__fact--full {
+  grid-column: 1 / -1;
+  min-block-size: clamp(3.15rem, 4.8vw, 4rem);
+  border-inline-end: 0;
+}
+
+.fields-of-conflict-dossier__fact:last-child {
+  border-block-end: 0;
 }
 
 .fields-of-conflict-dossier__fact-label {
-  margin: 0 0 0.18rem;
-  color: rgba(255, 58, 35, 0.88);
+  margin: 0 0 0.2rem;
+  color: rgba(255, 58, 35, 0.9);
   font-size: clamp(0.52rem, 0.74vw, 0.64rem);
   font-weight: 720;
   letter-spacing: 0.075em;
   line-height: 1;
+  text-align: center;
   text-transform: none;
 }
 
 .fields-of-conflict-dossier__fact-value {
   margin: 0;
-  color: rgba(255, 247, 238, 0.9);
+  color: rgba(255, 247, 238, 0.92);
   font-size: clamp(0.66rem, 0.98vw, 0.84rem);
   line-height: 1.18;
   letter-spacing: 0.035em;
   overflow-wrap: anywhere;
+  text-align: center;
   text-transform: none;
+}
+
+.fields-of-conflict-dossier__fact--notes .fields-of-conflict-dossier__fact-value {
+  max-inline-size: 58ch;
 }
 
 @media (max-width: 640px) {
@@ -23249,17 +23266,13 @@ button.hall-crusades-archive-crystal:focus-visible {
     text-align: center;
   }
 
-  .fields-of-conflict-dossier__location {
-    text-align: center;
-    font-size: clamp(0.68rem, 3vw, 0.82rem);
-  }
 
   .fields-of-conflict-dossier__facts {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .fields-of-conflict-dossier__fact:nth-child(odd) {
-    border-inline-end: 0;
+  .fields-of-conflict-dossier__fact:nth-child(odd):not(.fields-of-conflict-dossier__fact--full) {
+    border-inline-end: 1px solid rgba(255, 42, 26, 0.16);
   }
 
   .fields-of-conflict-dossier__fact {
