@@ -22033,6 +22033,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .fields-of-conflict-globe-scan {
   --fields-globe-scan-anchor-size: min(32vw, 44svh, 28rem);
   --fields-globe-scan-size: min(50vw, 68svh, 44rem);
+  --fields-globe-scan-ring-scale: 1.09;
   position: absolute;
   inset-block-start: calc(clamp(4.4rem, 18svh, 12rem) + (var(--fields-globe-scan-anchor-size) / 2));
   inset-inline-start: 50%;
@@ -22040,7 +22041,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   inline-size: var(--fields-globe-scan-size);
   aspect-ratio: 1;
   pointer-events: auto;
-  contain: layout paint;
+  contain: layout;
   opacity: 1;
   transform: translate(-50%, -50%);
 }
@@ -22057,6 +22058,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-globe-scan__ring {
   border: 1px solid rgba(255, 122, 48, 1);
+  transform: scale(var(--fields-globe-scan-ring-scale, 1));
+  transform-origin: center;
   box-shadow:
     0 0 0.46rem rgba(255, 42, 26, 0.14),
     inset 0 0 1.2rem rgba(255, 42, 26, 0.08);
@@ -22373,6 +22376,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .fields-of-conflict-globe-scan {
     --fields-globe-scan-anchor-size: min(86vw, 43svh, 22rem);
     --fields-globe-scan-size: min(112vw, 56svh, 28.6rem);
+    --fields-globe-scan-ring-scale: 1.045;
     inset-block-start: calc(max(0.8rem, env(safe-area-inset-top)) + clamp(5.8rem, 10.6svh, 6.1rem) + (var(--fields-globe-scan-anchor-size) / 2));
   }
 
