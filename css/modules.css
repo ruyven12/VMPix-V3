@@ -22916,7 +22916,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-family: var(--font-display);
   text-align: center;
   text-transform: none;
-  pointer-events: none;
+  appearance: none;
+  font: inherit;
+  font-family: var(--font-display);
+  cursor: pointer;
+  pointer-events: auto;
   background:
     linear-gradient(90deg, rgba(255, 42, 26, 0.12), rgba(255, 42, 26, 0.04) 46%, rgba(255, 42, 26, 0.12)),
     rgba(4, 0, 0, 0.48);
@@ -23063,5 +23067,239 @@ button.hall-crusades-archive-crystal:focus-visible {
     animation: none;
     opacity: 1;
     transform: translateX(-50%);
+  }
+}
+
+
+/* Fields of Conflict venue dossier shell. */
+.fields-of-conflict-coordinate-status:disabled {
+  cursor: default;
+}
+
+.fields-of-conflict-dossier {
+  display: none;
+  position: absolute;
+  inset-block-start: clamp(4.4rem, 10svh, 7rem);
+  inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.85rem, env(safe-area-inset-bottom)) + 0.85rem);
+  inset-inline-start: 50%;
+  z-index: 8;
+  box-sizing: border-box;
+  inline-size: min(calc(100vw - clamp(1.5rem, 7vw, 8rem)), 62rem);
+  color: rgba(255, 247, 238, 0.94);
+  font-family: var(--font-display);
+  transform: translateX(-50%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.fields-of-conflict-dossier[hidden] {
+  display: none;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-dossier:not([hidden]) {
+  display: grid;
+  gap: clamp(0.62rem, 1.2vw, 0.9rem);
+  align-content: start;
+}
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-venue-select,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-coordinate-status,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-coordinate-hud,
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-active-connection {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.fields-of-conflict-dossier__back {
+  justify-self: start;
+  appearance: none;
+  border: 1px solid rgba(255, 42, 26, 0.42);
+  border-inline-color: rgba(255, 42, 26, 0.24);
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.12), rgba(255, 42, 26, 0.04), rgba(255, 42, 26, 0.12)),
+    rgba(4, 0, 0, 0.6);
+  color: rgba(255, 231, 208, 0.92);
+  font: inherit;
+  font-size: clamp(0.58rem, 0.86vw, 0.74rem);
+  font-weight: 720;
+  letter-spacing: 0.055em;
+  padding: clamp(0.42rem, 0.72vw, 0.56rem) clamp(0.72rem, 1.2vw, 0.95rem);
+  text-transform: none;
+  cursor: pointer;
+  box-shadow: 0 0 0.55rem rgba(255, 42, 26, 0.14), inset 0 0 0.8rem rgba(0, 0, 0, 0.34);
+}
+
+.fields-of-conflict-dossier__back:focus-visible {
+  outline: 2px solid rgba(255, 226, 174, 0.9);
+  outline-offset: 3px;
+}
+
+.fields-of-conflict-dossier__panel {
+  display: grid;
+  grid-template-columns: minmax(9.5rem, 0.34fr) minmax(0, 1fr);
+  gap: clamp(0.9rem, 2vw, 1.4rem);
+  align-items: stretch;
+  box-sizing: border-box;
+  inline-size: 100%;
+  padding: clamp(0.9rem, 1.8vw, 1.35rem);
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.1), transparent 18% 82%, rgba(255, 42, 26, 0.1)),
+    rgba(4, 0, 0, 0.66);
+  border: 1px solid rgba(255, 42, 26, 0.36);
+  border-inline-color: rgba(255, 42, 26, 0.22);
+  box-shadow:
+    0 0 1rem rgba(255, 42, 26, 0.14),
+    inset 0 0 1.2rem rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(1.5px);
+}
+
+.fields-of-conflict-dossier__identity {
+  display: grid;
+  place-items: center;
+  min-block-size: clamp(9rem, 22vw, 14rem);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 42, 26, 0.16), transparent 58%),
+    rgba(4, 0, 0, 0.5);
+  border: 1px solid rgba(255, 42, 26, 0.24);
+  box-shadow: inset 0 0 1rem rgba(255, 42, 26, 0.08);
+}
+
+.fields-of-conflict-dossier__initials {
+  color: rgba(255, 247, 238, 0.96);
+  font-size: clamp(3.4rem, 7.2vw, 6rem);
+  font-weight: 760;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-shadow:
+    0 0 0.5rem rgba(255, 42, 26, 0.42),
+    0 0 1.1rem rgba(255, 42, 26, 0.18);
+}
+
+.fields-of-conflict-dossier__info {
+  display: grid;
+  align-content: start;
+  gap: clamp(0.42rem, 0.9vw, 0.72rem);
+  min-inline-size: 0;
+}
+
+.fields-of-conflict-dossier__name {
+  margin: 0;
+  color: rgba(255, 247, 238, 0.97);
+  font-size: clamp(1.7rem, 3.4vw, 3rem);
+  font-weight: 720;
+  letter-spacing: clamp(0.045em, 0.45vw, 0.09em);
+  line-height: 1.02;
+  text-transform: none;
+  text-shadow: 0 0 0.7rem rgba(255, 42, 26, 0.3);
+}
+
+.fields-of-conflict-dossier__location {
+  margin: 0;
+  color: rgba(255, 226, 196, 0.82);
+  font-size: clamp(0.74rem, 1.16vw, 0.98rem);
+  line-height: 1.18;
+  letter-spacing: 0.045em;
+  text-transform: none;
+}
+
+.fields-of-conflict-dossier__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: clamp(0.28rem, 0.72vw, 0.52rem) 0 0;
+  border: 1px solid rgba(255, 42, 26, 0.22);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.fields-of-conflict-dossier__fact {
+  min-inline-size: 0;
+  padding: clamp(0.52rem, 0.86vw, 0.72rem) clamp(0.62rem, 1.05vw, 0.86rem);
+  border-block-end: 1px solid rgba(255, 42, 26, 0.14);
+}
+
+.fields-of-conflict-dossier__fact:nth-child(odd) {
+  border-inline-end: 1px solid rgba(255, 42, 26, 0.14);
+}
+
+.fields-of-conflict-dossier__fact-label {
+  margin: 0 0 0.18rem;
+  color: rgba(255, 58, 35, 0.88);
+  font-size: clamp(0.52rem, 0.74vw, 0.64rem);
+  font-weight: 720;
+  letter-spacing: 0.075em;
+  line-height: 1;
+  text-transform: none;
+}
+
+.fields-of-conflict-dossier__fact-value {
+  margin: 0;
+  color: rgba(255, 247, 238, 0.9);
+  font-size: clamp(0.66rem, 0.98vw, 0.84rem);
+  line-height: 1.18;
+  letter-spacing: 0.035em;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+@media (max-width: 640px) {
+  .fields-of-conflict-dossier {
+    inset-block-start: max(0.75rem, env(safe-area-inset-top));
+    inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.85rem, env(safe-area-inset-bottom)) + 0.58rem);
+    inline-size: min(calc(100vw - 1.15rem), 26rem);
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-dossier:not([hidden]) {
+    gap: 0.52rem;
+  }
+
+  .fields-of-conflict-dossier__back {
+    font-size: clamp(0.54rem, 2.25vw, 0.68rem);
+    padding: 0.38rem 0.62rem;
+  }
+
+  .fields-of-conflict-dossier__panel {
+    grid-template-columns: 1fr;
+    gap: 0.66rem;
+    padding: 0.72rem;
+  }
+
+  .fields-of-conflict-dossier__identity {
+    min-block-size: clamp(5.4rem, 18svh, 7.8rem);
+  }
+
+  .fields-of-conflict-dossier__initials {
+    font-size: clamp(2.55rem, 14vw, 4rem);
+  }
+
+  .fields-of-conflict-dossier__name {
+    font-size: clamp(1.24rem, 7vw, 1.7rem);
+    text-align: center;
+  }
+
+  .fields-of-conflict-dossier__location {
+    text-align: center;
+    font-size: clamp(0.68rem, 3vw, 0.82rem);
+  }
+
+  .fields-of-conflict-dossier__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .fields-of-conflict-dossier__fact:nth-child(odd) {
+    border-inline-end: 0;
+  }
+
+  .fields-of-conflict-dossier__fact {
+    padding: 0.48rem 0.58rem;
+  }
+
+  .fields-of-conflict-dossier__fact-label {
+    font-size: clamp(0.48rem, 2vw, 0.58rem);
+  }
+
+  .fields-of-conflict-dossier__fact-value {
+    font-size: clamp(0.62rem, 2.55vw, 0.76rem);
   }
 }
