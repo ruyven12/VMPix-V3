@@ -21899,6 +21899,91 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
+@keyframes fieldsConflictCoordinateLockedSourceText {
+  0%, 28% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) skewX(0deg);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+    text-shadow: 0 0 0.36rem rgba(255, 42, 26, 0.34);
+  }
+
+  31%, 35% {
+    opacity: 0.7;
+    transform: translate3d(calc(-50% - 0.08rem), -50%, 0) skewX(-8deg);
+    filter: saturate(1.45);
+    clip-path: inset(0 0 52% 0);
+    text-shadow:
+      -0.08rem 0 rgba(255, 90, 36, 0.7),
+      0.08rem 0 rgba(255, 212, 146, 0.34);
+  }
+
+  39%, 84% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + 0.12rem), -50%, 0) skewX(10deg);
+    filter: blur(0.03rem);
+    clip-path: inset(47% 0 0 0);
+    text-shadow: none;
+  }
+
+  88%, 92% {
+    opacity: 0.72;
+    transform: translate3d(calc(-50% + 0.08rem), -50%, 0) skewX(7deg);
+    filter: saturate(1.35);
+    clip-path: inset(42% 0 0 0);
+    text-shadow:
+      0.08rem 0 rgba(255, 90, 36, 0.58),
+      -0.08rem 0 rgba(255, 212, 146, 0.26);
+  }
+
+  96%, 100% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) skewX(0deg);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+    text-shadow: 0 0 0.36rem rgba(255, 42, 26, 0.34);
+  }
+}
+
+@keyframes fieldsConflictCoordinateLockedDossierText {
+  0%, 31% {
+    opacity: 0;
+    transform: translate3d(calc(-50% - 0.12rem), -50%, 0) skewX(-10deg);
+    filter: blur(0.03rem);
+    clip-path: inset(0 0 55% 0);
+    text-shadow: none;
+  }
+
+  35%, 39% {
+    opacity: 0.78;
+    transform: translate3d(calc(-50% + 0.08rem), -50%, 0) skewX(8deg);
+    filter: saturate(1.45);
+    clip-path: inset(48% 0 0 0);
+    text-shadow:
+      -0.08rem 0 rgba(255, 90, 36, 0.68),
+      0.08rem 0 rgba(255, 228, 168, 0.34);
+  }
+
+  43%, 84% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) skewX(0deg);
+    filter: none;
+    clip-path: inset(0 0 0 0);
+    text-shadow:
+      0 0 0.42rem rgba(255, 78, 32, 0.74),
+      0 0 0.95rem rgba(255, 42, 26, 0.32),
+      0 0 1.35rem rgba(255, 178, 94, 0.18);
+  }
+
+  88%, 100% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + 0.12rem), -50%, 0) skewX(10deg);
+    filter: blur(0.03rem);
+    clip-path: inset(0 0 50% 0);
+    text-shadow: none;
+  }
+}
+
 @keyframes fieldsConflictCoordinateHudReveal {
   0% {
     opacity: 0;
@@ -21908,6 +21993,23 @@ button.hall-crusades-archive-crystal:focus-visible {
   100% {
     opacity: 1;
     transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes fieldsConflictMarkerLayerReveal {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  1% {
+    visibility: visible;
+    opacity: 0;
+  }
+
+  100% {
+    visibility: visible;
+    opacity: 1;
   }
 }
 
@@ -22556,6 +22658,23 @@ button.hall-crusades-archive-crystal:focus-visible {
     opacity: 0.68;
   }
 
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-globe-markers {
+    visibility: visible;
+    opacity: 1;
+    animation: none;
+  }
+
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text {
+    color: rgba(255, 58, 35, 0.94);
+    text-shadow: 0 0 0.36rem rgba(255, 42, 26, 0.34);
+  }
+
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::before,
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::after {
+    content: none;
+    animation: none;
+  }
+
   .fields-of-conflict-active-connection {
     transition: none;
   }
@@ -22741,6 +22860,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: fieldsConflictActiveConnectionReveal 520ms ease-out 3200ms both;
 }
 
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-globe-markers {
+  visibility: hidden;
+  opacity: 0;
+  animation: fieldsConflictMarkerLayerReveal 420ms ease-out 3820ms both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title,
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-title__text,
@@ -22817,6 +22942,52 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="pending"] .fields-of-conflict-coordinate-status__text {
   color: rgba(255, 178, 104, 0.92);
+}
+
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text {
+  position: relative;
+  display: block;
+  min-inline-size: min(100%, 13.75rem);
+  color: transparent;
+  text-shadow: none;
+}
+
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::before,
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::after {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  display: block;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  content: "Coordinates: Locked";
+  color: rgba(255, 58, 35, 0.96);
+  pointer-events: none;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: opacity, transform, filter, clip-path;
+}
+
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::before {
+  animation: fieldsConflictCoordinateLockedSourceText 3.2s ease-in-out 3720ms 10 both;
+}
+
+.fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::after {
+  content: "View Venue Dossier";
+  color: rgba(255, 226, 174, 0.98);
+  animation: fieldsConflictCoordinateLockedDossierText 3.2s ease-in-out 3720ms 10 both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text {
+    color: rgba(255, 58, 35, 0.94);
+    text-shadow: 0 0 0.36rem rgba(255, 42, 26, 0.34);
+  }
+
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::before,
+  .fields-of-conflict-coordinate-status[data-fields-of-conflict-coordinate-state="locked"] .fields-of-conflict-coordinate-status__text::after {
+    content: none;
+    animation: none;
+  }
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .fields-of-conflict-coordinate-hud__label,
