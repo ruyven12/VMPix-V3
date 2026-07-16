@@ -7218,6 +7218,68 @@ function createFieldsOfConflictVenueLocationSection() {
   return section;
 }
 
+const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
+  Object.freeze({
+    id: "about",
+    title: "ABOUT THE VENUE",
+    text: "Coming Soon \u2014 Need To Write",
+  }),
+  Object.freeze({
+    id: "contributors",
+    title: "CONTRIBUTORS",
+    text: "Coming Soon \u2014 Need To Implement",
+  }),
+]);
+
+function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
+  const section = document.createElement("section");
+  section.className = `fields-of-conflict-dossier-section fields-of-conflict-dossier-section--${sectionConfig.id}`;
+  section.dataset.fieldsOfConflictDossierSection = sectionConfig.id;
+  section.setAttribute("aria-labelledby", `fields-of-conflict-${sectionConfig.id}-title`);
+
+  const header = document.createElement("div");
+  header.className = "fields-of-conflict-dossier-section__header";
+
+  const title = document.createElement("h3");
+  title.className = "fields-of-conflict-dossier-section__title";
+  title.id = `fields-of-conflict-${sectionConfig.id}-title`;
+  title.textContent = sectionConfig.title;
+  header.append(title);
+
+  const frame = document.createElement("div");
+  frame.className = "fields-of-conflict-dossier-section__frame";
+
+  const placeholder = document.createElement("p");
+  placeholder.className = "fields-of-conflict-dossier-section__placeholder";
+  placeholder.textContent = sectionConfig.text;
+  frame.append(placeholder);
+
+  section.append(header, frame);
+  return section;
+}
+
+function syncFieldsOfConflictDossierFrameworkSections(dossier) {
+  const existingSections = Array.from(dossier?.querySelectorAll?.("[data-fields-of-conflict-dossier-section]") || []);
+  if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
+    existingSections.forEach((section) => section.remove());
+    return;
+  }
+
+  let anchor = dossier.querySelector("[data-fields-of-conflict-location]") || dossier.querySelector(".fields-of-conflict-dossier__panel");
+  FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS.forEach((sectionConfig) => {
+    const selector = `[data-fields-of-conflict-dossier-section="${sectionConfig.id}"]`;
+    const section = dossier.querySelector(selector) || createFieldsOfConflictDossierFrameworkSection(sectionConfig);
+    if (anchor) {
+      if (anchor.nextElementSibling !== section) {
+        anchor.insertAdjacentElement("afterend", section);
+      }
+    } else if (section.parentElement !== dossier) {
+      dossier.append(section);
+    }
+    anchor = section;
+  });
+}
+
 function syncFieldsOfConflictVenueLocationSection(dossier) {
   const existingSection = dossier?.querySelector?.("[data-fields-of-conflict-location]");
   if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
@@ -7265,6 +7327,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
   }
   syncFieldsOfConflictVenueLocationSection(dossier);
+  syncFieldsOfConflictDossierFrameworkSections(dossier);
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);
   dossier.setAttribute("aria-label", `${venueName} venue dossier`);

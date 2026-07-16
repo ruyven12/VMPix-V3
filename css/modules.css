@@ -23254,7 +23254,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   max-inline-size: 58ch;
 }
 
-.fields-of-conflict-location {
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
+  gap: 20px;
+}
+
+.fields-of-conflict-location,
+.fields-of-conflict-dossier-section {
   display: grid;
   box-sizing: border-box;
   inline-size: 100%;
@@ -23262,7 +23267,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   align-content: start;
 }
 
-.fields-of-conflict-location__header {
+.fields-of-conflict-location__header,
+.fields-of-conflict-dossier-section__header {
   display: grid;
   grid-template-columns: minmax(1.5rem, 1fr) auto minmax(1.5rem, 1fr);
   align-items: center;
@@ -23272,7 +23278,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-location__header::before,
-.fields-of-conflict-location__header::after {
+.fields-of-conflict-location__header::after,
+.fields-of-conflict-dossier-section__header::before,
+.fields-of-conflict-dossier-section__header::after {
   content: "";
   display: block;
   block-size: 1px;
@@ -23281,11 +23289,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   box-shadow: 0 0 0.42rem rgba(255, 42, 26, 0.24);
 }
 
-.fields-of-conflict-location__header::before {
+.fields-of-conflict-location__header::before,
+.fields-of-conflict-dossier-section__header::before {
   transform: scaleX(-1);
 }
 
-.fields-of-conflict-location__title {
+.fields-of-conflict-location__title,
+.fields-of-conflict-dossier-section__title {
   margin: 0;
   color: rgba(255, 90, 60, 0.96);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
@@ -23304,10 +23314,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 .fields-of-conflict-location__frame {
   position: relative;
   box-sizing: border-box;
+  grid-area: 2 / 1;
   inline-size: 100%;
-  block-size: clamp(17.5rem, 36vw, 25rem);
-  min-block-size: 17.5rem;
-  max-block-size: 25rem;
+  block-size: clamp(18rem, 37vw, 26rem);
+  min-block-size: 18rem;
+  max-block-size: 26rem;
   margin-block-start: clamp(0.58rem, 1.1vw, 0.78rem);
   overflow: hidden;
   background:
@@ -23343,7 +23354,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .fields-of-conflict-location__soon {
-  margin: 10px 0 0;
+  grid-area: 2 / 1;
+  align-self: end;
+  z-index: 1;
+  margin: 0 0 clamp(2.1rem, 3.5vw, 2.65rem);
   color: rgba(255, 90, 60, 0.92);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   font-size: clamp(0.76rem, 1vw, 0.96rem);
@@ -23355,6 +23369,62 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.34rem rgba(255, 42, 26, 0.28),
     0 0 0.78rem rgba(255, 42, 26, 0.14);
   text-transform: uppercase;
+}
+
+.fields-of-conflict-dossier-section__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: clamp(8.75rem, 12vw, 12rem);
+  min-inline-size: 0;
+  margin-block-start: clamp(0.58rem, 1.1vw, 0.78rem);
+  padding: 5px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.08), transparent 18% 82%, rgba(255, 42, 26, 0.08)),
+    radial-gradient(circle at 50% 42%, rgba(255, 90, 60, 0.06), transparent 58%),
+    rgba(4, 0, 0, 0.7);
+  border: 1px solid rgba(255, 42, 26, 0.34);
+  border-inline-color: rgba(255, 42, 26, 0.22);
+  box-shadow:
+    0 0 0.9rem rgba(255, 42, 26, 0.12),
+    inset 0 0 1.15rem rgba(0, 0, 0, 0.42),
+    inset 0 0 0.3rem rgba(255, 42, 26, 0.08);
+}
+
+.fields-of-conflict-dossier-section__frame::before,
+.fields-of-conflict-dossier-section__frame::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.fields-of-conflict-dossier-section__frame::before {
+  inset: 0.42rem;
+  border: 1px solid rgba(255, 90, 60, 0.1);
+  box-shadow: inset 0 0 0.8rem rgba(255, 42, 26, 0.06);
+}
+
+.fields-of-conflict-dossier-section__frame::after {
+  inset-inline: 0.72rem;
+  inset-block-start: 0.72rem;
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.34), transparent);
+}
+
+.fields-of-conflict-dossier-section__placeholder {
+  z-index: 1;
+  margin: 0;
+  color: rgba(255, 247, 238, 0.92);
+  font-family: var(--font-display);
+  font-size: clamp(0.66rem, 0.98vw, 0.84rem);
+  letter-spacing: 0.035em;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-transform: none;
 }
 
 @media (max-width: 640px) {
@@ -23374,6 +23444,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-dossier:not([hidden]) {
     gap: 0.52rem;
+  }
+
+  .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
+    gap: 20px;
   }
   .fields-of-conflict-dossier__panel {
     grid-template-columns: 1fr;
@@ -23415,19 +23489,24 @@ button.hall-crusades-archive-crystal:focus-visible {
     font-size: clamp(0.62rem, 2.55vw, 0.76rem);
   }
 
-  .fields-of-conflict-location__header {
+  .fields-of-conflict-location__header,
+  .fields-of-conflict-dossier-section__header {
     grid-template-columns: minmax(0.85rem, 1fr) auto minmax(0.85rem, 1fr);
     column-gap: 0.46rem;
   }
 
   .fields-of-conflict-location__title,
+  .fields-of-conflict-dossier-section__title,
   .fields-of-conflict-location__soon {
     letter-spacing: 0.11em;
   }
-
   .fields-of-conflict-location__frame {
-    block-size: 17.5rem;
-    min-block-size: 17.5rem;
-    max-block-size: 17.5rem;
+    block-size: 18rem;
+    min-block-size: 18rem;
+    max-block-size: 18rem;
+  }
+
+  .fields-of-conflict-location__soon {
+    margin-block-end: 2.4rem;
   }
 }
