@@ -23432,14 +23432,14 @@ button.hall-crusades-archive-crystal:focus-visible {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);
     inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.85rem, env(safe-area-inset-bottom)) + 0.58rem);
     align-content: start;
-    inline-size: min(calc(100vw - 1rem), 28rem);
+    inline-size: min(calc(100vw - 0.5rem), 30rem);
   }
 }
 @media (max-width: 640px) {
   .fields-of-conflict-dossier {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);
     inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.85rem, env(safe-area-inset-bottom)) + 0.58rem);
-    inline-size: min(calc(100vw - 1.15rem), 26rem);
+    inline-size: min(calc(100vw - 0.5rem), 30rem);
   }
 
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-dossier-state="open"] .fields-of-conflict-dossier:not([hidden]) {
@@ -23452,7 +23452,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .fields-of-conflict-dossier__panel {
     grid-template-columns: 1fr;
     gap: 0.66rem;
-    padding: 0.72rem;
+    padding: 0.5rem;
   }
 
   .fields-of-conflict-dossier__identity {
