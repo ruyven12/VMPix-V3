@@ -22032,7 +22032,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-globe-scan {
   --fields-globe-scan-anchor-size: min(32vw, 44svh, 28rem);
-  --fields-globe-scan-size: min(41.6vw, 57.2svh, 36.4rem);
+  --fields-globe-scan-size: min(50vw, 68svh, 44rem);
   position: absolute;
   inset-block-start: calc(clamp(4.4rem, 18svh, 12rem) + (var(--fields-globe-scan-anchor-size) / 2));
   inset-inline-start: 50%;
