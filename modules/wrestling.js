@@ -6977,6 +6977,113 @@ function updateFieldsOfConflictCoordinatePanel(venue) {
   panel.setAttribute("aria-label", getFieldsOfConflictCoordinateLabel(venue));
 }
 
+let fieldsOfConflictConnectionFrame = 0;
+let fieldsOfConflictConnectionResizeBound = false;
+
+function getFieldsOfConflictActiveConnectionLayer() {
+  return document.querySelector("[data-fields-of-conflict-active-connection]");
+}
+
+function getFieldsOfConflictActiveConnectionPath() {
+  return document.querySelector("[data-fields-of-conflict-active-connection-path]");
+}
+
+function hideFieldsOfConflictActiveConnection() {
+  const connectionLayer = getFieldsOfConflictActiveConnectionLayer();
+  const connectionPath = getFieldsOfConflictActiveConnectionPath();
+  if (connectionLayer) {
+    delete connectionLayer.dataset.fieldsOfConflictConnectionActive;
+  }
+  if (connectionPath) {
+    connectionPath.removeAttribute("d");
+  }
+}
+
+function hasUsableFieldsOfConflictRect(rect) {
+  return Boolean(
+    rect &&
+    Number.isFinite(rect.left) &&
+    Number.isFinite(rect.top) &&
+    Number.isFinite(rect.width) &&
+    Number.isFinite(rect.height) &&
+    rect.width > 0 &&
+    rect.height > 0
+  );
+}
+
+function updateFieldsOfConflictActiveConnection() {
+  const connectionLayer = getFieldsOfConflictActiveConnectionLayer();
+  const connectionPath = getFieldsOfConflictActiveConnectionPath();
+  if (!connectionLayer || !connectionPath || !isWrestlingVenuesPrototypeRoute()) {
+    hideFieldsOfConflictActiveConnection();
+    return;
+  }
+
+  const prototypeShell = getWrestlingVenuesPrototypeShell();
+  const activeMarker = document.querySelector(".fields-of-conflict-venue-marker.is-coordinate-locked[data-venue-id]");
+  const coordinatePanel = document.querySelector("[data-fields-of-conflict-coordinate-hud]");
+  if (!prototypeShell || !activeMarker || !coordinatePanel) {
+    hideFieldsOfConflictActiveConnection();
+    return;
+  }
+
+  const shellRect = prototypeShell.getBoundingClientRect();
+  const markerRect = activeMarker.getBoundingClientRect();
+  const panelRect = coordinatePanel.getBoundingClientRect();
+  if (!hasUsableFieldsOfConflictRect(shellRect) || !hasUsableFieldsOfConflictRect(markerRect) || !hasUsableFieldsOfConflictRect(panelRect)) {
+    hideFieldsOfConflictActiveConnection();
+    return;
+  }
+
+  const markerCenterX = markerRect.left + (markerRect.width / 2) - shellRect.left;
+  const markerCenterY = markerRect.top + (markerRect.height / 2) - shellRect.top;
+  const panelAnchorX = panelRect.left + (panelRect.width / 2) - shellRect.left;
+  const panelAnchorY = panelRect.top - shellRect.top;
+  if (
+    markerCenterX < 0 ||
+    markerCenterX > shellRect.width ||
+    markerCenterY < 0 ||
+    markerCenterY > shellRect.height ||
+    panelAnchorX < 0 ||
+    panelAnchorX > shellRect.width ||
+    panelAnchorY < 0 ||
+    panelAnchorY > shellRect.height
+  ) {
+    hideFieldsOfConflictActiveConnection();
+    return;
+  }
+
+  connectionLayer.setAttribute("viewBox", `0 0 ${shellRect.width.toFixed(1)} ${shellRect.height.toFixed(1)}`);
+  connectionPath.setAttribute(
+    "d",
+    `M ${markerCenterX.toFixed(1)} ${markerCenterY.toFixed(1)} L ${panelAnchorX.toFixed(1)} ${panelAnchorY.toFixed(1)}`
+  );
+  connectionLayer.dataset.fieldsOfConflictConnectionActive = "true";
+}
+
+function scheduleFieldsOfConflictActiveConnectionUpdate() {
+  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+    updateFieldsOfConflictActiveConnection();
+    return;
+  }
+  if (fieldsOfConflictConnectionFrame) {
+    window.cancelAnimationFrame(fieldsOfConflictConnectionFrame);
+  }
+  fieldsOfConflictConnectionFrame = window.requestAnimationFrame(() => {
+    fieldsOfConflictConnectionFrame = 0;
+    updateFieldsOfConflictActiveConnection();
+  });
+}
+
+function bindFieldsOfConflictActiveConnectionResize() {
+  if (fieldsOfConflictConnectionResizeBound || typeof window === "undefined") {
+    return;
+  }
+  window.addEventListener("resize", scheduleFieldsOfConflictActiveConnectionUpdate, { passive: true });
+  window.addEventListener("orientationchange", scheduleFieldsOfConflictActiveConnectionUpdate, { passive: true });
+  fieldsOfConflictConnectionResizeBound = true;
+}
+
 function updateFieldsOfConflictVenueLock(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
   const venue = getFieldsOfConflictVenueConfig(venueId);
   if (!venue) {
@@ -6994,6 +7101,8 @@ function updateFieldsOfConflictVenueLock(venueId = FIELDS_OF_CONFLICT_DEFAULT_VE
     select.value = venue.id;
   }
   updateFieldsOfConflictCoordinatePanel(venue);
+  updateFieldsOfConflictActiveConnection();
+  scheduleFieldsOfConflictActiveConnectionUpdate();
 }
 
 function bindFieldsOfConflictVenueSelect() {
@@ -7114,6 +7223,10 @@ function setWrestlingVenuesPrototypeActive(isActive) {
   if (isActive) {
     bindFieldsOfConflictVenueSelect();
     bindFieldsOfConflictVenueMarkers();
+    bindFieldsOfConflictActiveConnectionResize();
+    scheduleFieldsOfConflictActiveConnectionUpdate();
+  } else {
+    hideFieldsOfConflictActiveConnection();
   }
 }
 
