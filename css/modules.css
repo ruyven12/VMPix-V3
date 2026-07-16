@@ -23112,9 +23112,9 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: none;
 }
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
-  inset-block-start: calc(max(1rem, env(safe-area-inset-top)) + 1rem);
+  inset-block-start: calc(env(safe-area-inset-top) + 15px);
   inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(1.2rem, env(safe-area-inset-bottom)) + 1.5rem);
-  align-content: center;
+  align-content: start;
 }
 
 .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-title,
