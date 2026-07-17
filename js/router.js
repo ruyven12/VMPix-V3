@@ -31,29 +31,53 @@ function getPathWithSearch(url = window.location.href) {
   return `${routeUrl.pathname}${routeUrl.search}`;
 }
 
-function getWrestlingVenueDetailPrototypePath() {
-  return routePaths.wrestlingVenueDetailPrototype || `${routePaths.wrestlingVenues}/colisee2`;
+function getWrestlingVenueDetailPrototypePath(venueSlug = "colisee") {
+  const rawVenueSlug = String(venueSlug || "").trim().replace(/2$/i, "") || "colisee";
+  if (rawVenueSlug === "colisee" && routePaths.wrestlingVenueDetailPrototype) {
+    return routePaths.wrestlingVenueDetailPrototype;
+  }
+  return `${routePaths.wrestlingVenues}/${encodeURIComponent(rawVenueSlug)}2`;
 }
 
-function createWrestlingVenueDetailPrototypeRoute() {
-  const canonicalUrl = getWrestlingVenueDetailPrototypePath();
+function getWrestlingVenueDetailPrototypeSlugFromRoutePart(routePart) {
+  const decodedRoutePart = decodeRoutePart(routePart).trim();
+  if (!decodedRoutePart || !/2$/i.test(decodedRoutePart)) {
+    return "";
+  }
+  return decodedRoutePart.slice(0, -1).trim();
+}
+
+function createWrestlingVenueDetailPrototypeRoute(venueSlug = "colisee") {
+  const prototypeVenueSlug = String(venueSlug || "").trim().replace(/2$/i, "") || "colisee";
+  const canonicalUrl = getWrestlingVenueDetailPrototypePath(prototypeVenueSlug);
   return {
     name: "wrestling-venue-detail-prototype",
-    venueId: "colisee",
+    venueId: prototypeVenueSlug,
+    prototypeVenueSlug,
     canonicalUrl,
     venuesPrototype: "fields-of-conflict",
-    wrestlingVenueDetailPrototype: "colisee",
+    wrestlingVenueDetailPrototype: prototypeVenueSlug,
   };
 }
 
 function getWrestlingVenueDetailPrototypeRouteFromUrl(url = window.location.href) {
   const routeUrl = new URL(url, window.location.href);
   const routePath = normalizeRoutePath(routeUrl.pathname);
-  return routePath === getWrestlingVenueDetailPrototypePath()
-    ? createWrestlingVenueDetailPrototypeRoute()
-    : null;
+  if (routePath === getWrestlingVenueDetailPrototypePath()) {
+    return createWrestlingVenueDetailPrototypeRoute();
+  }
+  const wrestlingVenueDetailPrefix = `${routePaths.wrestlingVenues}/`;
+  if (routePath.startsWith(wrestlingVenueDetailPrefix)) {
+    const routeParts = routePath.slice(wrestlingVenueDetailPrefix.length).split("/");
+    if (routeParts.length === 1 && routeParts[0]) {
+      const prototypeVenueSlug = getWrestlingVenueDetailPrototypeSlugFromRoutePart(routeParts[0]);
+      if (prototypeVenueSlug) {
+        return createWrestlingVenueDetailPrototypeRoute(prototypeVenueSlug);
+      }
+    }
+  }
+  return null;
 }
-
 function getRouteFromUrlWithPrototypePrecedence(url = window.location.href) {
   return getWrestlingVenueDetailPrototypeRouteFromUrl(url) || getRouteFromUrl(url);
 }
@@ -118,8 +142,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestlingVenues) {
     return { name: "wrestling-venues", canonicalUrl: routePaths.wrestlingVenues, venuesPrototype: "fields-of-conflict", wrestlingVenuesPrototype: "fields-of-conflict" };
   }
-  if (routePath === getWrestlingVenueDetailPrototypePath()) {
-    return createWrestlingVenueDetailPrototypeRoute();
+  const wrestlingVenueDetailPrototypeRoute = getWrestlingVenueDetailPrototypeRouteFromUrl(url);
+  if (wrestlingVenueDetailPrototypeRoute) {
+    return wrestlingVenueDetailPrototypeRoute;
   }
   const wrestlingVenueDetailPrefix = `${routePaths.wrestlingVenues}/`;
   if (routePath.startsWith(wrestlingVenueDetailPrefix)) {

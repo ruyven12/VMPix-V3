@@ -51,6 +51,8 @@ function findWrestlingPersonById(personId, options = {}) {
 function normalizeWrestlingVenueId(venueId) {
   return String(venueId || "")
     .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "-")
@@ -6763,12 +6765,32 @@ function isWrestlingVenueDetailPrototypePath(value = (typeof window !== "undefin
     return false;
   }
 
+  if (typeof getWrestlingVenueDetailPrototypeRouteFromUrl === "function") {
+    try {
+      return Boolean(getWrestlingVenueDetailPrototypeRouteFromUrl(value));
+    } catch (error) {
+      // Fall through to the local path check below.
+    }
+  }
+
   const detailPath = normalizeWrestlingVenuesPrototypePath(
     typeof routePaths !== "undefined" && routePaths?.wrestlingVenueDetailPrototype
       ? routePaths.wrestlingVenueDetailPrototype
       : "/wrestling/venues/colisee2"
   );
-  return normalizeWrestlingVenuesPrototypePath(value) === detailPath;
+  const currentPath = normalizeWrestlingVenuesPrototypePath(value);
+  if (currentPath === detailPath) {
+    return true;
+  }
+
+  const venuePrefix = normalizeWrestlingVenuesPrototypePath(
+    typeof routePaths !== "undefined" && routePaths?.wrestlingVenues ? routePaths.wrestlingVenues : "/wrestling/venues"
+  ) + "/";
+  if (!currentPath.startsWith(venuePrefix)) {
+    return false;
+  }
+  const routePart = currentPath.slice(venuePrefix.length);
+  return Boolean(routePart && !routePart.includes("/") && /2$/i.test(routePart));
 }
 
 function isWrestlingVenuesPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
@@ -7115,7 +7137,11 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
   const mapElement = getFieldsOfConflictVenueLocationMapContainer();
   const coordinates = getFieldsOfConflictVenueLocationMapCoordinates(venue, config);
   const Leaflet = typeof window !== "undefined" ? window.L : null;
-  if (!mapElement || !coordinates || !Leaflet) {
+  if (!mapElement || !Leaflet) {
+    return false;
+  }
+  if (!coordinates) {
+    destroyFieldsOfConflictVenueLocationMap();
     return false;
   }
 
@@ -7161,33 +7187,33 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
   return true;
 }
 
+function getFieldsOfConflictRouteVenueId(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
+  return route?.venueId || route?.prototypeVenueSlug || route?.prototypeVenueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
+}
+
 function isWrestlingVenueDetailPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
   if (route?.name === "wrestling-venue-detail-prototype") {
-    const routeVenueId = route.venueId || route.prototypeVenueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
-    const prototypeVenueId = normalizeWrestlingVenueId(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
-    const prototypeCanonicalVenueId = normalizeWrestlingVenueId(`wv-${prototypeVenueId}`);
-    const routeVenueIds = new Set([
-      normalizeWrestlingVenueId(routeVenueId),
-      normalizeWrestlingVenuePublicSlug(routeVenueId),
-    ].filter(Boolean));
-    if (routeVenueIds.has(prototypeVenueId) || routeVenueIds.has(prototypeCanonicalVenueId)) {
-      return true;
-    }
+    return true;
   }
 
   return isWrestlingVenueDetailPrototypePath();
 }
 
-function getFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
+function findFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
   const normalizedVenueId = normalizeWrestlingVenueId(venueId);
   const publicVenueId = normalizeWrestlingVenuePublicSlug(venueId);
   const unprefixedVenueId = normalizedVenueId.replace(/^wv-/, "");
-  const lookupIds = new Set([normalizedVenueId, publicVenueId, unprefixedVenueId].filter(Boolean));
+  const underscoredVenueId = normalizedVenueId.replace(/-/g, "_").replace(/^wv_/, "");
+  const lookupIds = new Set([normalizedVenueId, publicVenueId, unprefixedVenueId, underscoredVenueId].filter(Boolean));
   return FIELDS_OF_CONFLICT_VENUE_CONFIG.find((venue) => {
     const configId = normalizeWrestlingVenueId(venue.id);
     const configPublicId = normalizeWrestlingVenuePublicSlug(venue.id);
     return lookupIds.has(configId) || lookupIds.has(configPublicId);
-  }) ||
+  }) || null;
+}
+
+function getFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
+  return findFieldsOfConflictVenueConfig(venueId) ||
     FIELDS_OF_CONFLICT_VENUE_CONFIG.find((venue) => venue.id === FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) ||
     FIELDS_OF_CONFLICT_VENUE_CONFIG[0];
 }
@@ -7201,7 +7227,7 @@ function getFieldsOfConflictDossierElement() {
 }
 
 function getFieldsOfConflictDetailHydrationRouteKey(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
-  return normalizeWrestlingVenueId(route?.venueId || route?.prototypeVenueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+  return normalizeWrestlingVenueId(getFieldsOfConflictRouteVenueId(route));
 }
 
 function isFieldsOfConflictDetailHydrationRouteActive(routeKey) {
@@ -7307,7 +7333,7 @@ function requestFieldsOfConflictDetailHydration(route = (typeof getRouteFromUrl 
   ]).then(() => {
     fieldsOfConflictDetailHydratedRouteKeys.add(routeKey);
     if (fieldsOfConflictDetailHydrationToken === token && isFieldsOfConflictDetailHydrationRouteActive(routeKey)) {
-      renderFieldsOfConflictVenueDossier(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+      renderFieldsOfConflictVenueDossier(routeKey);
       const prototypeShell = getWrestlingVenuesPrototypeShell();
       const dossier = getFieldsOfConflictDossierElement();
       if (prototypeShell) {
@@ -7340,32 +7366,40 @@ function getFieldsOfConflictActiveVenueId() {
   return activeMarker?.dataset?.venueId || FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID;
 }
 
-function getFieldsOfConflictVenueLookupCandidates(venueId, config = getFieldsOfConflictVenueConfig(venueId)) {
+function getFieldsOfConflictVenueLookupCandidates(venueId, config = findFieldsOfConflictVenueConfig(venueId)) {
   const rawId = getWrestlingText(venueId || config?.id);
   const publicId = normalizeWrestlingVenuePublicSlug(rawId);
   const normalizedId = normalizeWrestlingVenueId(rawId);
   const unprefixedId = normalizedId.replace(/^wv-/, "");
-  const canonicalId = unprefixedId ? `wv_${unprefixedId.replace(/-/g, "_")}` : "";
+  const canonicalUnderscoreId = unprefixedId ? `wv_${unprefixedId.replace(/-/g, "_")}` : "";
+  const canonicalHyphenId = unprefixedId ? `wv-${unprefixedId}` : "";
   return [
     config?.venue_id,
     config?.venueId,
-    canonicalId,
+    canonicalUnderscoreId,
+    canonicalHyphenId,
     rawId,
     publicId,
     normalizedId,
+    unprefixedId,
     config?.id,
     config?.name,
   ].filter(Boolean);
 }
 
 function getFieldsOfConflictDossierVenueSource(venueId = getFieldsOfConflictActiveVenueId()) {
-  const config = getFieldsOfConflictVenueConfig(venueId);
+  let config = findFieldsOfConflictVenueConfig(venueId);
   const resolvedVenue = getFieldsOfConflictVenueLookupCandidates(venueId, config)
     .map((candidate) => findWrestlingVenueById(candidate, { allowFallback: false }))
     .find(Boolean) || null;
+  if (!config && resolvedVenue) {
+    config = findFieldsOfConflictVenueConfig(getWrestlingVenueRowId(resolvedVenue)) ||
+      findFieldsOfConflictVenueConfig(getWrestlingVenuePublicSlug(resolvedVenue));
+  }
   return {
     config,
-    venue: resolvedVenue ? { ...config, ...resolvedVenue } : config,
+    venue: resolvedVenue || config,
+    fallbackConfig: resolvedVenue ? null : config,
   };
 }
 
@@ -7474,7 +7508,7 @@ function createFieldsOfConflictVenueLocationSection() {
   const mapElement = document.createElement("div");
   mapElement.className = "fields-of-conflict-location__map";
   mapElement.dataset.fieldsOfConflictLocationMap = "";
-  mapElement.setAttribute("aria-label", "Colisee venue location map");
+  mapElement.setAttribute("aria-label", "Venue location map");
   frame.append(mapElement);
 
   section.append(header, frame);
@@ -7528,7 +7562,15 @@ function getFieldsOfConflictDossierEventHistoryPhotoText(eventRow) {
   return eventPhotoCount !== null ? formatWrestlingCount(eventPhotoCount, "Photos") : "N/A";
 }
 
-function getFieldsOfConflictVenueDetailPrototypeUrl() {
+function getFieldsOfConflictVenueDetailPrototypeUrl(venue = null) {
+  const route = typeof getRouteFromUrlWithPrototypePrecedence === "function" ? getRouteFromUrlWithPrototypePrecedence() : (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null);
+  const venueSlug = normalizeWrestlingVenuePublicSlug(venue || getFieldsOfConflictRouteVenueId(route));
+  if (venueSlug) {
+    if (typeof getWrestlingVenueDetailPrototypePath === "function") {
+      return getWrestlingVenueDetailPrototypePath(venueSlug);
+    }
+    return `${routePaths.wrestlingVenues}/${encodeURIComponent(venueSlug)}2`;
+  }
   return typeof routePaths !== "undefined" && routePaths?.wrestlingVenueDetailPrototype
     ? routePaths.wrestlingVenueDetailPrototype
     : "/wrestling/venues/colisee2";
@@ -7619,7 +7661,7 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
       navigateToRoute(showRoute, {
         historyState: {
           fromWrestlingVenueDetail: true,
-          venueUrl: getFieldsOfConflictVenueDetailPrototypeUrl(),
+          venueUrl: getFieldsOfConflictVenueDetailPrototypeUrl(venue),
         },
       });
     });
@@ -8034,7 +8076,7 @@ function syncFieldsOfConflictDossierFrameworkSections(dossier, venue = null) {
   });
 }
 
-function syncFieldsOfConflictVenueLocationSection(dossier) {
+function syncFieldsOfConflictVenueLocationSection(dossier, venue = null) {
   const existingSection = dossier?.querySelector?.("[data-fields-of-conflict-location]");
   if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
     destroyFieldsOfConflictVenueLocationMap();
@@ -8043,6 +8085,10 @@ function syncFieldsOfConflictVenueLocationSection(dossier) {
   }
 
   const section = existingSection || createFieldsOfConflictVenueLocationSection();
+  const mapElement = section.querySelector("[data-fields-of-conflict-location-map]");
+  if (mapElement && venue) {
+    mapElement.setAttribute("aria-label", `${getWrestlingVenueRowName(venue)} venue location map`);
+  }
   const panel = dossier.querySelector(".fields-of-conflict-dossier__panel");
   if (panel) {
     if (panel.nextElementSibling !== section) {
@@ -8062,7 +8108,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     return;
   }
 
-  const { config, venue } = getFieldsOfConflictDossierVenueSource(venueId);
+  const { config, venue, fallbackConfig } = getFieldsOfConflictDossierVenueSource(venueId);
   if (!venue) {
     return;
   }
@@ -8080,12 +8126,12 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     name.textContent = venueName;
   }
   if (facts) {
-    facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
+    facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, fallbackConfig).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
   }
-  syncFieldsOfConflictVenueLocationSection(dossier);
+  syncFieldsOfConflictVenueLocationSection(dossier, venue);
   syncFieldsOfConflictDossierFrameworkSections(dossier, venue);
   syncFieldsOfConflictDossierCarousel(dossier);
-  syncFieldsOfConflictVenueLocationMap(venue, config);
+  syncFieldsOfConflictVenueLocationMap(venue, fallbackConfig);
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);
   dossier.setAttribute("aria-label", `${venueName} venue dossier`);
@@ -8626,14 +8672,15 @@ function renderWrestlingVenuesPrototypeShell() {
 function renderWrestlingVenueDetailPrototypeRoute(route = {}) {
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
   clearWrestlingVenuesPrototypeSourceShell();
+  const routeVenueId = normalizeWrestlingVenueId(getFieldsOfConflictRouteVenueId(route)) || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
   setWrestlingVenuesPrototypeActive(true);
-  updateFieldsOfConflictVenueLock(route.venueId || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
-  renderFieldsOfConflictVenueDossier(FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID);
+  updateFieldsOfConflictVenueLock(routeVenueId);
+  renderFieldsOfConflictVenueDossier(routeVenueId);
 
   const prototypeShell = getWrestlingVenuesPrototypeShell();
   const dossier = getFieldsOfConflictDossierElement();
   if (prototypeShell) {
-    prototypeShell.dataset.fieldsOfConflictDetailPrototype = FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
+    prototypeShell.dataset.fieldsOfConflictDetailPrototype = routeVenueId;
     prototypeShell.dataset.fieldsOfConflictDossierState = "open";
   }
   if (dossier) {
