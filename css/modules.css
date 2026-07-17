@@ -11504,6 +11504,105 @@ button.wrestling-event-history-tagged-thumb {
   display: none !important;
 }
 
+.site-shell[data-wrestling-people-prototype="hall-of-champions"] .wrestling-people-prototype-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 34;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  inline-size: 100vw;
+  block-size: 100vh;
+  block-size: 100svh;
+  box-sizing: border-box;
+  padding:
+    calc(env(safe-area-inset-top) + clamp(1rem, 3svh, 2rem))
+    calc(env(safe-area-inset-right) + clamp(0.75rem, 3vw, 2rem))
+    calc(var(--engine-emitter-size, 4.6rem) + max(0.95rem, env(safe-area-inset-bottom)))
+    calc(env(safe-area-inset-left) + clamp(0.75rem, 3vw, 2rem));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hall-of-champions-pedestal {
+  inline-size: clamp(17.5rem, 78vw, 36rem);
+  max-inline-size: 100%;
+  max-block-size: min(58svh, 34rem);
+  display: block;
+  color: rgba(108, 96, 88, 0.46);
+  filter: drop-shadow(0 0.32rem 0.34rem rgba(0, 0, 0, 0.5));
+}
+
+.hall-of-champions-pedestal path,
+.hall-of-champions-pedestal ellipse {
+  vector-effect: non-scaling-stroke;
+}
+
+.hall-of-champions-pedestal__hologram-frame path {
+  fill: rgba(14, 13, 13, 0.78);
+  stroke: rgba(122, 105, 92, 0.34);
+  stroke-width: 1.2;
+}
+
+.hall-of-champions-pedestal__upper-console path:first-child {
+  fill: rgba(18, 16, 15, 0.88);
+  stroke: rgba(126, 106, 88, 0.34);
+  stroke-width: 1.25;
+}
+
+.hall-of-champions-pedestal__upper-console path:nth-child(2) {
+  fill: rgba(10, 9, 9, 0.82);
+  stroke: rgba(92, 80, 70, 0.24);
+  stroke-width: 1;
+}
+
+.hall-of-champions-pedestal__upper-console ellipse {
+  fill: rgba(3, 3, 4, 0.86);
+  stroke: rgba(116, 98, 84, 0.28);
+  stroke-width: 1;
+}
+
+.hall-of-champions-pedestal__body path:first-child {
+  fill: rgba(12, 11, 11, 0.9);
+  stroke: rgba(116, 98, 84, 0.3);
+  stroke-width: 1.2;
+}
+
+.hall-of-champions-pedestal__body path:nth-child(2) {
+  fill: rgba(7, 7, 8, 0.72);
+  stroke: rgba(84, 72, 62, 0.22);
+  stroke-width: 1;
+}
+
+.hall-of-champions-pedestal__base path {
+  fill: rgba(11, 10, 10, 0.92);
+  stroke: rgba(118, 100, 84, 0.3);
+  stroke-width: 1.2;
+}
+
+.hall-of-champions-pedestal__base path:nth-child(2) {
+  fill: rgba(9, 9, 10, 0.95);
+}
+
+.hall-of-champions-pedestal__base path:nth-child(3) {
+  fill: rgba(6, 6, 7, 0.98);
+  stroke-color: rgba(106, 90, 76, 0.26);
+}
+
+@media (max-width: 540px) {
+  .site-shell[data-wrestling-people-prototype="hall-of-champions"] .wrestling-people-prototype-shell {
+    padding:
+      calc(env(safe-area-inset-top) + 0.85rem)
+      calc(env(safe-area-inset-right) + 0.5rem)
+      calc(var(--engine-emitter-size, 4.6rem) + max(0.8rem, env(safe-area-inset-bottom)))
+      calc(env(safe-area-inset-left) + 0.5rem);
+  }
+
+  .hall-of-champions-pedestal {
+    inline-size: min(82vw, 21rem);
+    max-block-size: 42svh;
+  }
+}
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]),
 .site-shell[data-shell-route="wrestling-match-detail"] {
   background:

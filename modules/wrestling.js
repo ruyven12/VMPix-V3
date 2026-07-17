@@ -8564,6 +8564,34 @@ function getWrestlingPeoplePrototypeShell() {
   prototypeShell.setAttribute("inert", "");
   prototypeShell.hidden = true;
 
+  const pedestal = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  pedestal.classList.add("hall-of-champions-pedestal");
+  pedestal.dataset.hallOfChampionsPedestal = "base-silhouette";
+  pedestal.setAttribute("viewBox", "0 0 640 520");
+  pedestal.setAttribute("aria-hidden", "true");
+  pedestal.setAttribute("focusable", "false");
+  pedestal.innerHTML = `
+    <g class="hall-of-champions-pedestal__hologram-frame">
+      <path d="M252 28 L388 28 L410 112 L374 112 L362 64 L278 64 L266 112 L230 112 Z" />
+      <path d="M214 108 L256 108 L236 220 L192 220 Z" />
+      <path d="M384 108 L426 108 L448 220 L404 220 Z" />
+    </g>
+    <g class="hall-of-champions-pedestal__upper-console">
+      <path d="M184 226 L456 226 L510 292 L130 292 Z" />
+      <path d="M226 244 L414 244 L446 282 L194 282 Z" />
+      <ellipse cx="320" cy="263" rx="72" ry="18" />
+    </g>
+    <g class="hall-of-champions-pedestal__body">
+      <path d="M232 292 L408 292 L438 418 L202 418 Z" />
+      <path d="M262 312 L378 312 L394 404 L246 404 Z" />
+    </g>
+    <g class="hall-of-champions-pedestal__base">
+      <path d="M176 406 L464 406 L532 454 L108 454 Z" />
+      <path d="M88 454 L552 454 L606 492 L34 492 Z" />
+      <path d="M18 492 L622 492 L640 520 L0 520 Z" />
+    </g>
+  `;
+  prototypeShell.append(pedestal);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -8600,7 +8628,7 @@ function setWrestlingPeoplePrototypeActive(isActive) {
   }
 
   if (prototypeShell) {
-    prototypeShell.hidden = true;
+    prototypeShell.hidden = !isActive;
     prototypeShell.setAttribute("inert", "");
     prototypeShell.setAttribute("aria-hidden", "true");
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
