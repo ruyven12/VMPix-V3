@@ -2675,6 +2675,7 @@ function setWrestlingShowsHidden(isHidden) {
   wrestlingShowsShell.setAttribute("aria-hidden", String(isHidden));
   if (isHidden) {
     wrestlingShowsShell.setAttribute("inert", "");
+    wrestlingShowsShell.removeAttribute("data-wrestling-shows-variant");
   } else {
     wrestlingShowsShell.removeAttribute("inert");
   }
@@ -2933,6 +2934,9 @@ function showBattlegroundGatewayArrivalSurface() {
   setWrestlingShowDetailHidden(true);
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
+  if (typeof resetDaiionDestinationSelection === "function") {
+    resetDaiionDestinationSelection();
+  }
   if (aboutShell) {
     aboutShell.setAttribute("aria-hidden", "true");
     aboutShell.setAttribute("inert", "");

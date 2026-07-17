@@ -2512,6 +2512,11 @@ function setDaiionDestinationTarget(target) {
   syncDaiionDestinationSelection();
 }
 
+function resetDaiionDestinationSelection() {
+  daiionDestinationSelectedTarget = null;
+  syncDaiionDestinationSelection();
+}
+
 function routeDaiionArchiveFocusPanel() {
   const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   const routeTarget = focusPanel?.getAttribute("data-daiion-route-target");
