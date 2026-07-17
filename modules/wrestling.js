@@ -6981,6 +6981,14 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
       maxZoom: 19,
       attribution: 'Tiles &copy; Esri - Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
     }).addTo(fieldsOfConflictVenueLocationMap);
+    Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19,
+      attribution: 'Transportation &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and MapmyIndia',
+    }).addTo(fieldsOfConflictVenueLocationMap);
+    Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19,
+      attribution: 'Reference &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and the GIS User Community',
+    }).addTo(fieldsOfConflictVenueLocationMap);
     fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates, {
       icon: createFieldsOfConflictVenueLocationMarkerIcon(Leaflet),
       interactive: false,
