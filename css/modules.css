@@ -23805,28 +23805,87 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .fields-of-conflict-event-history__list {
   display: grid;
-  gap: clamp(0.46rem, 0.85vw, 0.62rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: clamp(0.58rem, 1vw, 0.78rem);
   min-inline-size: 0;
+  padding-block-end: 0.08rem;
 }
 
 .fields-of-conflict-event-history__row {
   min-inline-size: 0;
+  min-block-size: clamp(8.6rem, 12vw, 10.4rem);
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(8.2rem, 0.72fr) minmax(5.2rem, auto) auto;
-  align-items: center;
-  gap: clamp(0.42rem, 1vw, 0.72rem);
-  padding: clamp(0.52rem, 1vw, 0.74rem);
+  grid-template-columns: minmax(6.4rem, 0.42fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(0.58rem, 1vw, 0.82rem);
+  padding: clamp(0.52rem, 0.92vw, 0.72rem);
+  overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(255, 42, 26, 0.075), transparent 42%),
-    rgba(5, 0, 0, 0.68);
-  border: 1px solid rgba(255, 42, 26, 0.28);
-  box-shadow: inset 0 0 0.68rem rgba(0, 0, 0, 0.28);
+    linear-gradient(90deg, rgba(255, 42, 26, 0.085), transparent 46%),
+    rgba(5, 0, 0, 0.72);
+  border: 1px solid rgba(255, 42, 26, 0.3);
+  box-shadow: inset 0 0 0.68rem rgba(0, 0, 0, 0.3);
+}
+
+.fields-of-conflict-event-history__poster {
+  position: relative;
+  min-inline-size: 0;
+  min-block-size: clamp(7.3rem, 10.5vw, 9.2rem);
+  block-size: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, rgba(255, 90, 60, 0.16), transparent 62%),
+    rgba(8, 0, 0, 0.74);
+  border: 1px solid rgba(255, 90, 60, 0.26);
+}
+
+.fields-of-conflict-event-history__poster-image {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.fields-of-conflict-event-history__poster-image[hidden] {
+  display: none;
+}
+
+.fields-of-conflict-event-history__poster-fallback {
+  position: relative;
+  z-index: 1;
+  color: rgba(255, 247, 238, 0.82);
+  font-size: clamp(1.05rem, 2vw, 1.46rem);
+  text-shadow: 0 0 0.7rem rgba(255, 42, 26, 0.28);
+}
+
+.fields-of-conflict-event-history__poster.has-poster .fields-of-conflict-event-history__poster-fallback {
+  display: none;
+}
+
+.fields-of-conflict-event-history__details {
+  min-inline-size: 0;
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: clamp(0.38rem, 0.72vw, 0.54rem);
 }
 
 .fields-of-conflict-event-history__summary {
   min-inline-size: 0;
   display: grid;
-  gap: 0.18rem;
+  gap: 0.2rem;
+}
+
+.fields-of-conflict-event-history__meta {
+  min-inline-size: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.24rem 0.72rem;
 }
 
 .fields-of-conflict-event-history__event,
@@ -23857,7 +23916,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   color: rgba(255, 247, 238, 0.74);
   font-size: clamp(0.58rem, 0.78vw, 0.72rem);
   font-weight: 650;
-  text-align: center;
+  text-align: left;
 }
 
 .fields-of-conflict-event-history__action {
@@ -23894,24 +23953,41 @@ button.hall-crusades-archive-crystal:focus-visible {
     gap: 0.42rem;
   }
 
-  .fields-of-conflict-event-history__row {
+  .fields-of-conflict-event-history__list {
     grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
-    gap: 0.34rem;
+    gap: 0.58rem;
+  }
+
+  .fields-of-conflict-event-history__row {
+    min-block-size: clamp(7.8rem, 31vw, 9.15rem);
+    grid-template-columns: minmax(5.1rem, 0.38fr) minmax(0, 1fr);
+    gap: 0.52rem;
     padding: 0.52rem;
-    text-align: center;
+  }
+
+  .fields-of-conflict-event-history__poster {
+    min-block-size: clamp(6.75rem, 29vw, 8.2rem);
+  }
+
+  .fields-of-conflict-event-history__details {
+    gap: 0.34rem;
   }
 
   .fields-of-conflict-event-history__summary {
-    justify-items: center;
+    justify-items: start;
+  }
+
+  .fields-of-conflict-event-history__meta {
+    display: grid;
+    justify-items: start;
+    gap: 0.18rem;
   }
 
   .fields-of-conflict-event-history__action {
-    inline-size: min(100%, 12rem);
+    inline-size: min(100%, 10rem);
     min-block-size: max(var(--tap-target), 2.55rem);
   }
 }
-
 @media (max-width: 640px) {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);

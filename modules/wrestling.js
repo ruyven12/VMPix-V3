@@ -7533,6 +7533,48 @@ function getFieldsOfConflictVenueDetailPrototypeUrl() {
     : "/wrestling/venues/colisee2";
 }
 
+function getFieldsOfConflictDossierEventHistoryPosterUrl(eventRow) {
+  return getWrestlingText(
+    eventRow?.poster ||
+    eventRow?.poster_url ||
+    eventRow?.posterUrl ||
+    eventRow?.image_url ||
+    eventRow?.imageUrl ||
+    eventRow?.coverImageUrl
+  );
+}
+
+function createFieldsOfConflictDossierEventHistoryPoster(eventRow, eventNameText) {
+  const poster = document.createElement("div");
+  poster.className = "fields-of-conflict-event-history__poster";
+
+  const posterImage = document.createElement("img");
+  posterImage.className = "fields-of-conflict-event-history__poster-image";
+  posterImage.alt = eventNameText ? `${eventNameText} event poster` : "Event poster";
+  posterImage.loading = "lazy";
+  posterImage.decoding = "async";
+  posterImage.hidden = true;
+
+  const posterLabel = document.createElement("span");
+  posterLabel.className = "fields-of-conflict-event-history__poster-fallback wrestling-show-poster-fallback";
+  posterLabel.textContent = getWrestlingShowPosterLabel(eventRow);
+
+  const posterUrl = getFieldsOfConflictDossierEventHistoryPosterUrl(eventRow);
+  if (isValidWrestlingPosterUrl(posterUrl)) {
+    poster.classList.add("has-poster");
+    posterImage.src = posterUrl;
+    posterImage.hidden = false;
+    posterImage.addEventListener("error", () => {
+      poster.classList.remove("has-poster");
+      posterImage.hidden = true;
+      posterImage.removeAttribute("src");
+    }, { once: true });
+  }
+
+  poster.append(posterImage, posterLabel);
+  return poster;
+}
+
 function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   const row = document.createElement("article");
   const eventNameText = getWrestlingVenueEventName(eventRow);
@@ -7543,6 +7585,8 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   row.dataset.wrestlingShowId = eventRow.showId || eventRow.eventId || eventRow.show_id || "";
   row.dataset.wrestlingShowRoute = showRoute;
   setWrestlingRelationshipDataset(row, eventRow);
+
+  const poster = createFieldsOfConflictDossierEventHistoryPoster(eventRow, eventNameText);
 
   const eventSummary = document.createElement("div");
   eventSummary.className = "fields-of-conflict-event-history__summary";
@@ -7586,7 +7630,15 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
     action.setAttribute("aria-disabled", "true");
   }
 
-  row.append(eventSummary, date, photos, action);
+  const eventMeta = document.createElement("div");
+  eventMeta.className = "fields-of-conflict-event-history__meta";
+  eventMeta.append(date, photos);
+
+  const eventDetails = document.createElement("div");
+  eventDetails.className = "fields-of-conflict-event-history__details";
+  eventDetails.append(eventSummary, eventMeta, action);
+
+  row.append(poster, eventDetails);
   return row;
 }
 
