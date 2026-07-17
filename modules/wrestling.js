@@ -7258,12 +7258,13 @@ function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
   return section;
 }
 
+const FIELDS_OF_CONFLICT_DOSSIER_STATIC_SECTION = Object.freeze({
+  id: "information",
+  label: "Venue Information",
+  selector: ".fields-of-conflict-dossier__panel",
+});
+
 const FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS = Object.freeze([
-  Object.freeze({
-    id: "information",
-    label: "Venue Information",
-    selector: ".fields-of-conflict-dossier__panel",
-  }),
   Object.freeze({
     id: "location",
     label: "Venue Location",
@@ -7279,6 +7280,11 @@ const FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS = Object.freeze([
     label: "Contributors",
     selector: "[data-fields-of-conflict-dossier-section=\"contributors\"]",
   }),
+]);
+
+const FIELDS_OF_CONFLICT_DOSSIER_RESTORABLE_SECTIONS = Object.freeze([
+  FIELDS_OF_CONFLICT_DOSSIER_STATIC_SECTION,
+  ...FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS,
 ]);
 
 function normalizeFieldsOfConflictDossierCarouselIndex(index, total) {
@@ -7447,7 +7453,7 @@ function unwrapFieldsOfConflictDossierCarousel(dossier) {
   }
 
   const fragment = document.createDocumentFragment();
-  FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS.forEach((sectionConfig) => {
+  FIELDS_OF_CONFLICT_DOSSIER_RESTORABLE_SECTIONS.forEach((sectionConfig) => {
     const section = carousel.querySelector(sectionConfig.selector);
     if (section) {
       fragment.append(section);
