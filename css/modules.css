@@ -23759,6 +23759,159 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-transform: none;
 }
 
+.fields-of-conflict-dossier-section__frame--event-history {
+  place-items: stretch;
+  padding: clamp(0.5rem, 1vw, 0.72rem);
+}
+
+.fields-of-conflict-event-history {
+  position: relative;
+  z-index: 1;
+  inline-size: 100%;
+  min-inline-size: 0;
+  block-size: 100%;
+  min-block-size: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(0.42rem, 0.9vw, 0.64rem);
+}
+
+.fields-of-conflict-event-history__title {
+  margin: 0;
+  color: rgba(255, 90, 60, 0.96);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.68rem, 0.92vw, 0.88rem);
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 0 0.34rem rgba(255, 42, 26, 0.28),
+    0 0 0.78rem rgba(255, 42, 26, 0.14);
+  text-transform: uppercase;
+}
+
+.fields-of-conflict-event-history__viewport {
+  min-inline-size: 0;
+  min-block-size: 0;
+  block-size: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-inline-end: 0.16rem;
+  scrollbar-color: rgba(255, 90, 60, 0.44) rgba(4, 0, 0, 0.52);
+  scrollbar-width: thin;
+}
+
+.fields-of-conflict-event-history__list {
+  display: grid;
+  gap: clamp(0.46rem, 0.85vw, 0.62rem);
+  min-inline-size: 0;
+}
+
+.fields-of-conflict-event-history__row {
+  min-inline-size: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(8.2rem, 0.72fr) minmax(5.2rem, auto) auto;
+  align-items: center;
+  gap: clamp(0.42rem, 1vw, 0.72rem);
+  padding: clamp(0.52rem, 1vw, 0.74rem);
+  background:
+    linear-gradient(90deg, rgba(255, 42, 26, 0.075), transparent 42%),
+    rgba(5, 0, 0, 0.68);
+  border: 1px solid rgba(255, 42, 26, 0.28);
+  box-shadow: inset 0 0 0.68rem rgba(0, 0, 0, 0.28);
+}
+
+.fields-of-conflict-event-history__summary {
+  min-inline-size: 0;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.fields-of-conflict-event-history__event,
+.fields-of-conflict-event-history__promotion,
+.fields-of-conflict-event-history__date,
+.fields-of-conflict-event-history__photos {
+  min-inline-size: 0;
+  margin: 0;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.fields-of-conflict-event-history__event {
+  color: rgba(255, 247, 238, 0.94);
+  font-size: clamp(0.72rem, 0.98vw, 0.9rem);
+  font-weight: 700;
+}
+
+.fields-of-conflict-event-history__promotion {
+  color: rgba(255, 58, 35, 0.88);
+  font-size: clamp(0.54rem, 0.72vw, 0.66rem);
+  font-weight: 720;
+}
+
+.fields-of-conflict-event-history__date,
+.fields-of-conflict-event-history__photos {
+  color: rgba(255, 247, 238, 0.74);
+  font-size: clamp(0.58rem, 0.78vw, 0.72rem);
+  font-weight: 650;
+  text-align: center;
+}
+
+.fields-of-conflict-event-history__action {
+  appearance: none;
+  min-block-size: max(var(--tap-target), 2.45rem);
+  max-inline-size: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.54rem 0.68rem;
+  color: rgba(255, 247, 238, 0.9);
+  font: inherit;
+  font-size: clamp(0.56rem, 0.76vw, 0.7rem);
+  font-weight: 720;
+  line-height: 1.08;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background:
+    linear-gradient(180deg, rgba(255, 247, 238, 0.035), transparent 72%),
+    rgba(255, 42, 26, 0.12);
+  border: 1px solid rgba(255, 90, 60, 0.34);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fields-of-conflict-event-history__action:focus-visible {
+  outline: 1px solid rgba(255, 247, 238, 0.82);
+  outline-offset: 0.16rem;
+}
+
+@media (max-width: 640px) {
+  .fields-of-conflict-event-history {
+    gap: 0.42rem;
+  }
+
+  .fields-of-conflict-event-history__row {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 0.34rem;
+    padding: 0.52rem;
+    text-align: center;
+  }
+
+  .fields-of-conflict-event-history__summary {
+    justify-items: center;
+  }
+
+  .fields-of-conflict-event-history__action {
+    inline-size: min(100%, 12rem);
+    min-block-size: max(var(--tap-target), 2.55rem);
+  }
+}
+
 @media (max-width: 640px) {
   .site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier:not([hidden]) {
     inset-block-start: calc(env(safe-area-inset-top) + 15px);

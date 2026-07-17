@@ -7518,6 +7518,83 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
   }),
 ]);
 
+const FIELDS_OF_CONFLICT_STATIC_EVENT_HISTORY = Object.freeze([
+  Object.freeze({
+    event: "LIMITLESS RUMBLE '26",
+    promotion: "LIMITLESS WRESTLING",
+    date: "JANUARY 16TH, 2026",
+    photos: "0 PHOTOS",
+  }),
+  Object.freeze({
+    event: "VACATIONLAND CUP '25",
+    promotion: "LIMITLESS WRESTLING",
+    date: "AUGUST 9TH, 2025",
+    photos: "0 PHOTOS",
+  }),
+  Object.freeze({
+    event: "VACATIONLAND CUP '24",
+    promotion: "LIMITLESS WRESTLING",
+    date: "AUGUST 17TH, 2024",
+    photos: "0 PHOTOS",
+  }),
+]);
+
+function createFieldsOfConflictDossierEventHistory() {
+  const history = document.createElement("div");
+  history.className = "fields-of-conflict-event-history";
+  history.setAttribute("aria-labelledby", "fields-of-conflict-event-history-title");
+
+  const title = document.createElement("h4");
+  title.className = "fields-of-conflict-event-history__title";
+  title.id = "fields-of-conflict-event-history-title";
+  title.textContent = "EVENT HISTORY";
+
+  const viewport = document.createElement("div");
+  viewport.className = "fields-of-conflict-event-history__viewport";
+
+  const list = document.createElement("div");
+  list.className = "fields-of-conflict-event-history__list";
+  list.setAttribute("role", "list");
+
+  FIELDS_OF_CONFLICT_STATIC_EVENT_HISTORY.forEach((eventRow) => {
+    const row = document.createElement("article");
+    row.className = "fields-of-conflict-event-history__row";
+    row.setAttribute("role", "listitem");
+
+    const eventSummary = document.createElement("div");
+    eventSummary.className = "fields-of-conflict-event-history__summary";
+
+    const eventName = document.createElement("h5");
+    eventName.className = "fields-of-conflict-event-history__event";
+    eventName.textContent = eventRow.event;
+
+    const promotion = document.createElement("p");
+    promotion.className = "fields-of-conflict-event-history__promotion";
+    promotion.textContent = eventRow.promotion;
+    eventSummary.append(eventName, promotion);
+
+    const date = document.createElement("p");
+    date.className = "fields-of-conflict-event-history__date";
+    date.textContent = eventRow.date;
+
+    const photos = document.createElement("p");
+    photos.className = "fields-of-conflict-event-history__photos";
+    photos.textContent = eventRow.photos;
+
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "fields-of-conflict-event-history__action";
+    action.textContent = "OPEN EVENT";
+
+    row.append(eventSummary, date, photos, action);
+    list.append(row);
+  });
+
+  viewport.append(list);
+  history.append(title, viewport);
+  return history;
+}
+
 function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
   const section = document.createElement("section");
   section.className = `fields-of-conflict-dossier-section fields-of-conflict-dossier-section--${sectionConfig.id}`;
@@ -7534,12 +7611,18 @@ function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
   header.append(title);
 
   const frame = document.createElement("div");
-  frame.className = "fields-of-conflict-dossier-section__frame";
+  frame.className = sectionConfig.id === "events"
+    ? "fields-of-conflict-dossier-section__frame fields-of-conflict-dossier-section__frame--event-history"
+    : "fields-of-conflict-dossier-section__frame";
 
-  const placeholder = document.createElement("p");
-  placeholder.className = "fields-of-conflict-dossier-section__placeholder";
-  placeholder.textContent = sectionConfig.text;
-  frame.append(placeholder);
+  if (sectionConfig.id === "events") {
+    frame.append(createFieldsOfConflictDossierEventHistory());
+  } else {
+    const placeholder = document.createElement("p");
+    placeholder.className = "fields-of-conflict-dossier-section__placeholder";
+    placeholder.textContent = sectionConfig.text;
+    frame.append(placeholder);
+  }
 
   section.append(header, frame);
   return section;
