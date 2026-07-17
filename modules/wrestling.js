@@ -8571,6 +8571,33 @@ function getWrestlingPeoplePrototypeShell() {
   pedestal.setAttribute("aria-hidden", "true");
   pedestal.setAttribute("focusable", "false");
   pedestal.innerHTML = `
+    <defs>
+      <linearGradient id="hall-champions-stone-face" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#24201d" />
+        <stop offset="0.46" stop-color="#111010" />
+        <stop offset="1" stop-color="#050506" />
+      </linearGradient>
+      <linearGradient id="hall-champions-stone-side" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#191716" />
+        <stop offset="0.56" stop-color="#0b0b0c" />
+        <stop offset="1" stop-color="#030304" />
+      </linearGradient>
+      <linearGradient id="hall-champions-metal-edge" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#2c2723" />
+        <stop offset="0.5" stop-color="#6a5544" />
+        <stop offset="1" stop-color="#211d1b" />
+      </linearGradient>
+      <linearGradient id="hall-champions-channel-dormant" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#3d0b05" />
+        <stop offset="0.52" stop-color="#9b2a14" />
+        <stop offset="1" stop-color="#321006" />
+      </linearGradient>
+      <radialGradient id="hall-champions-crystal-recess" cx="50%" cy="44%" r="64%">
+        <stop offset="0" stop-color="#1b0804" />
+        <stop offset="0.52" stop-color="#080606" />
+        <stop offset="1" stop-color="#020202" />
+      </radialGradient>
+    </defs>
     <g class="hall-of-champions-pedestal__hologram-frame">
       <path d="M252 28 L388 28 L410 112 L374 112 L362 64 L278 64 L266 112 L230 112 Z" />
       <path d="M214 108 L256 108 L236 220 L192 220 Z" />
