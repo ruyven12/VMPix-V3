@@ -280,6 +280,7 @@ let hallOfChampionsActivationTimer = 0;
 let hallOfChampionsCrystalRiseTimer = 0;
 let hallOfChampionsActivationSettleTimer = 0;
 let hallOfChampionsCrystalRiseFrame = 0;
+let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
@@ -8661,7 +8662,24 @@ function getWrestlingPeoplePrototypeShell() {
       <path d="M18 492 L622 492 L640 520 L0 520 Z" />
     </g>
   `;
-  prototypeShell.append(pedestal);
+  const expandedHologram = document.createElement("div");
+  expandedHologram.id = "hall-of-champions-expanded-hologram";
+  expandedHologram.className = "hall-of-champions-expanded-hologram";
+  expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
+  expandedHologram.setAttribute("aria-hidden", "true");
+
+  const crystalTrigger = document.createElement("button");
+  crystalTrigger.type = "button";
+  crystalTrigger.className = "hall-of-champions-crystal-trigger";
+  crystalTrigger.dataset.hallOfChampionsCrystalTrigger = "true";
+  crystalTrigger.setAttribute("aria-label", "Activate Hall of Champions archive");
+  crystalTrigger.setAttribute("aria-controls", "hall-of-champions-expanded-hologram");
+  crystalTrigger.setAttribute("aria-expanded", "false");
+  crystalTrigger.setAttribute("aria-disabled", "true");
+  crystalTrigger.disabled = true;
+  crystalTrigger.addEventListener("click", handleHallOfChampionsCrystalTrigger);
+
+  prototypeShell.append(pedestal, expandedHologram, crystalTrigger);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -8701,6 +8719,101 @@ function prefersHallOfChampionsReducedMotion() {
     && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
 }
 
+function getHallOfChampionsPrototypeShellFromNode(node) {
+  return node?.closest?.("[data-wrestling-people-prototype-shell]") || null;
+}
+
+function syncHallOfChampionsProjectionGeometry(prototypeShell) {
+  if (!prototypeShell || prototypeShell.hidden) {
+    return;
+  }
+
+  const crystal = prototypeShell.querySelector(".hall-of-champions-pedestal__crystal");
+  const trigger = prototypeShell.querySelector("[data-hall-of-champions-crystal-trigger]");
+  if (!crystal) {
+    return;
+  }
+
+  const crystalRect = crystal.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+  const anchorY = Math.max(0, crystalRect.top);
+  const triggerPadding = 8;
+
+  prototypeShell.style.setProperty("--hall-champions-hologram-anchor-y", `${anchorY}px`);
+  prototypeShell.style.setProperty("--hall-champions-hologram-anchor-bottom", `${Math.max(0, viewportHeight - anchorY)}px`);
+  prototypeShell.style.setProperty("--hall-champions-crystal-trigger-left", `${crystalRect.left - triggerPadding}px`);
+  prototypeShell.style.setProperty("--hall-champions-crystal-trigger-top", `${crystalRect.top - triggerPadding}px`);
+  prototypeShell.style.setProperty("--hall-champions-crystal-trigger-width", `${crystalRect.width + (triggerPadding * 2)}px`);
+  prototypeShell.style.setProperty("--hall-champions-crystal-trigger-height", `${crystalRect.height + (triggerPadding * 2)}px`);
+
+  if (trigger) {
+    trigger.hidden = false;
+  }
+}
+
+function scheduleHallOfChampionsProjectionGeometrySync(prototypeShell) {
+  if (!prototypeShell) {
+    return;
+  }
+
+  if (typeof window.requestAnimationFrame !== "function") {
+    syncHallOfChampionsProjectionGeometry(prototypeShell);
+    return;
+  }
+
+  window.requestAnimationFrame(() => syncHallOfChampionsProjectionGeometry(prototypeShell));
+}
+
+function setHallOfChampionsCrystalTriggerAvailable(prototypeShell, isAvailable) {
+  const trigger = prototypeShell?.querySelector("[data-hall-of-champions-crystal-trigger]");
+  if (!trigger) {
+    return;
+  }
+
+  const isExpanded = prototypeShell.dataset.hallOfChampionsExpanded === "true";
+  const canActivate = Boolean(isAvailable) && !isExpanded;
+  trigger.disabled = !canActivate;
+  trigger.setAttribute("aria-disabled", String(!canActivate));
+  trigger.setAttribute("aria-expanded", String(isExpanded));
+}
+
+function bindHallOfChampionsProjectionResize() {
+  if (isHallOfChampionsProjectionResizeBound || typeof window === "undefined") {
+    return;
+  }
+
+  isHallOfChampionsProjectionResizeBound = true;
+  window.addEventListener("resize", handleHallOfChampionsProjectionResize, { passive: true });
+}
+
+function handleHallOfChampionsProjectionResize() {
+  const prototypeShell = wrestlingPeoplePrototypeShell || document.querySelector("[data-wrestling-people-prototype-shell]");
+  if (!prototypeShell || prototypeShell.dataset.hallOfChampionsActive !== "true") {
+    return;
+  }
+
+  scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+}
+
+function expandHallOfChampionsHologram(prototypeShell) {
+  if (!prototypeShell || prototypeShell.dataset.hallOfChampionsExpanded === "true") {
+    return;
+  }
+
+  syncHallOfChampionsProjectionGeometry(prototypeShell);
+  prototypeShell.dataset.hallOfChampionsExpanded = "true";
+  setHallOfChampionsCrystalTriggerAvailable(prototypeShell, false);
+}
+
+function handleHallOfChampionsCrystalTrigger(event) {
+  event.preventDefault();
+  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
+  if (!prototypeShell || prototypeShell.dataset.hallOfChampionsActivationComplete !== "true") {
+    return;
+  }
+
+  expandHallOfChampionsHologram(prototypeShell);
+}
 function animateHallOfChampionsCrystalRise(prototypeShell) {
   if (!prototypeShell || prototypeShell.dataset.hallOfChampionsActive !== "true") {
     return;
@@ -8748,15 +8861,20 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
   if (prefersHallOfChampionsReducedMotion()) {
     prototypeShell.dataset.hallOfChampionsAwakening = "settled";
     prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
+    scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+    setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
     return;
   }
 
   if (prototypeShell.dataset.hallOfChampionsActivationComplete === "true") {
     prototypeShell.dataset.hallOfChampionsAwakening = "settled";
+    scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+    setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
     return;
   }
 
   prototypeShell.dataset.hallOfChampionsAwakening = "dormant";
+  setHallOfChampionsCrystalTriggerAvailable(prototypeShell, false);
   setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_START_Y);
 
   hallOfChampionsActivationTimer = window.setTimeout(() => {
@@ -8776,6 +8894,8 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
       setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
       prototypeShell.dataset.hallOfChampionsAwakening = "settled";
       prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
+      scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+      setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
     }, HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS);
   }, HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS);
 }
@@ -8810,17 +8930,22 @@ function setWrestlingPeoplePrototypeActive(isActive) {
 
   if (prototypeShell) {
     prototypeShell.hidden = !isActive;
-    prototypeShell.setAttribute("inert", "");
-    prototypeShell.setAttribute("aria-hidden", "true");
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
     if (isActive) {
+      prototypeShell.removeAttribute("inert");
+      prototypeShell.setAttribute("aria-hidden", "false");
+      bindHallOfChampionsProjectionResize();
+      scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
       startHallOfChampionsPedestalActivation(prototypeShell);
     } else {
+      prototypeShell.setAttribute("inert", "");
+      prototypeShell.setAttribute("aria-hidden", "true");
       clearHallOfChampionsActivationTimers();
       prototypeShell.dataset.hallOfChampionsAwakening = prototypeShell.dataset.hallOfChampionsActivationComplete === "true"
         ? "settled"
         : "dormant";
       setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+      setHallOfChampionsCrystalTriggerAvailable(prototypeShell, false);
     }
   }
 

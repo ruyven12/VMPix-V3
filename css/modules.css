@@ -11524,6 +11524,100 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
 }
 
+.hall-of-champions-expanded-hologram {
+  position: fixed;
+  inset-inline-start: 50%;
+  inset-block-end: var(--hall-champions-hologram-anchor-bottom, 15rem);
+  z-index: 35;
+  inline-size: min(92vw, 46rem);
+  max-inline-size: calc(100vw - 20px);
+  block-size: min(calc(var(--hall-champions-hologram-anchor-y, 60vh) - max(10px, env(safe-area-inset-top))), 42rem);
+  box-sizing: border-box;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) scale(0.16, 0.045);
+  transform-origin: 50% 100%;
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 112, 58, 0.08) 0 1px, transparent 1px 18px),
+    linear-gradient(180deg, rgba(255, 92, 42, 0.16), rgba(96, 22, 10, 0.08));
+  border: 1px solid rgba(255, 105, 58, 0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 226, 207, 0.06),
+    inset 0 0 1.2rem rgba(255, 70, 32, 0.08),
+    0 0 1.35rem rgba(125, 24, 12, 0.18);
+  transition:
+    opacity 620ms ease-out,
+    transform 780ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hall-of-champions-expanded-hologram::before,
+.hall-of-champions-expanded-hologram::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.hall-of-champions-expanded-hologram::before {
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 184, 128, 0.14), transparent),
+    repeating-linear-gradient(0deg, rgba(255, 122, 62, 0.08) 0 1px, transparent 1px 22px);
+  opacity: 0.42;
+}
+
+.hall-of-champions-expanded-hologram::after {
+  inset: 0.58rem;
+  border: 1px solid rgba(255, 105, 58, 0.22);
+  clip-path: inherit;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-expanded-hologram {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-plane {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-console {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.hall-of-champions-crystal-trigger {
+  position: fixed;
+  inset-inline-start: var(--hall-champions-crystal-trigger-left, 50%);
+  inset-block-start: var(--hall-champions-crystal-trigger-top, 50%);
+  z-index: 37;
+  inline-size: var(--hall-champions-crystal-trigger-width, 3rem);
+  block-size: var(--hall-champions-crystal-trigger-height, 3rem);
+  appearance: none;
+  border: 1px solid transparent;
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.hall-of-champions-crystal-trigger:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.hall-of-champions-crystal-trigger:focus-visible {
+  border-color: rgba(255, 126, 72, 0.72);
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 229, 207, 0.14),
+    0 0 0.7rem rgba(255, 64, 32, 0.28);
+}
+
 .hall-of-champions-pedestal {
   inline-size: clamp(16.5rem, 72vw, 34rem);
   max-inline-size: 100%;
@@ -11765,6 +11859,17 @@ button.wrestling-event-history-tagged-thumb {
   .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__crystal-facet,
   .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__hologram-plane {
     opacity: 1;
+  }
+
+  .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-plane {
+    opacity: 0;
+  }
+
+  .hall-of-champions-expanded-hologram,
+  .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-expanded-hologram,
+  .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-plane,
+  .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-console {
+    transition: none;
   }
 }
 
