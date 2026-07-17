@@ -11492,111 +11492,18 @@ button.wrestling-event-history-tagged-thumb {
   transform: none;
 }
 
+.site-shell[data-wrestling-people-prototype="hall-of-champions"] .public-home,
 .site-shell[data-wrestling-people-prototype="hall-of-champions"] .portfolio-hub::after,
+.site-shell[data-wrestling-people-prototype="hall-of-champions"] .ambient-system,
 .site-shell[data-wrestling-people-prototype="hall-of-champions"] .ambient-energy,
 .site-shell[data-wrestling-people-prototype="hall-of-champions"] .ambient-rings,
 .site-shell[data-wrestling-people-prototype="hall-of-champions"] .ambient-sweep,
 .site-shell[data-wrestling-people-prototype="hall-of-champions"] .ambient-particles,
-.site-shell[data-wrestling-people-prototype="hall-of-champions"] .cinema-fire-bg {
-  display: none;
+.site-shell[data-wrestling-people-prototype="hall-of-champions"] .cinema-fire-bg,
+.site-shell[data-wrestling-people-prototype="hall-of-champions"] .portfolio-world-gateway > * {
+  display: none !important;
 }
 
-.site-shell[data-wrestling-people-prototype="hall-of-champions"] .wrestling-people-prototype-shell {
-  position: fixed;
-  inset: 0;
-  z-index: 34;
-  display: grid;
-  place-items: center;
-  inline-size: 100vw;
-  block-size: 100vh;
-  block-size: 100svh;
-  box-sizing: border-box;
-  padding:
-    calc(env(safe-area-inset-top) + clamp(1.2rem, 3.6svh, 2.4rem))
-    calc(env(safe-area-inset-right) + clamp(0.85rem, 4vw, 2.25rem))
-    calc(var(--engine-emitter-size, 4.6rem) + max(1.05rem, env(safe-area-inset-bottom)))
-    calc(env(safe-area-inset-left) + clamp(0.85rem, 4vw, 2.25rem));
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.hall-of-champions-arrival {
-  position: relative;
-  isolation: isolate;
-  inline-size: min(100%, 34rem);
-  display: grid;
-  justify-items: center;
-  gap: clamp(0.42rem, 1.4vw, 0.64rem);
-  padding: clamp(0.72rem, 2.1vw, 1.08rem) clamp(0.8rem, 3vw, 1.5rem);
-  color: rgba(255, 247, 238, 0.94);
-  text-align: center;
-  background:
-    linear-gradient(90deg, rgba(255, 42, 26, 0.08), transparent 18% 82%, rgba(255, 42, 26, 0.08)),
-    rgba(5, 0, 0, 0.58);
-  border: 1px solid rgba(255, 66, 42, 0.38);
-  box-shadow:
-    0 0 0.8rem rgba(255, 42, 26, 0.14),
-    inset 0 0 1rem rgba(0, 0, 0, 0.4);
-}
-
-.hall-of-champions-arrival::before,
-.hall-of-champions-arrival::after {
-  position: absolute;
-  inset-inline: clamp(0.7rem, 2.4vw, 1.3rem);
-  content: "";
-  block-size: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.62), transparent);
-  pointer-events: none;
-}
-
-.hall-of-champions-arrival::before {
-  inset-block-start: 0.42rem;
-}
-
-.hall-of-champions-arrival::after {
-  inset-block-end: 0.42rem;
-}
-
-.hall-of-champions-arrival__title {
-  margin: 0;
-  color: rgba(255, 247, 238, 0.96);
-  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-  font-size: clamp(1.28rem, 6.2vw, 3rem);
-  font-weight: 650;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-shadow:
-    0 0 0.42rem rgba(255, 42, 26, 0.36),
-    0 0 0.9rem rgba(255, 42, 26, 0.18);
-  text-transform: none;
-}
-
-.hall-of-champions-arrival__subtitle {
-  max-inline-size: 25rem;
-  margin: 0;
-  color: rgba(255, 220, 204, 0.86);
-  font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
-  font-size: clamp(0.82rem, 3.4vw, 1.08rem);
-  font-weight: 650;
-  letter-spacing: 0.035em;
-  line-height: 1.15;
-  text-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.54);
-  text-transform: none;
-}
-
-@media (max-width: 540px) {
-  .site-shell[data-wrestling-people-prototype="hall-of-champions"] .wrestling-people-prototype-shell {
-    padding:
-      calc(env(safe-area-inset-top) + 1rem)
-      calc(env(safe-area-inset-right) + 0.58rem)
-      calc(var(--engine-emitter-size, 4.6rem) + max(1rem, env(safe-area-inset-bottom)))
-      calc(env(safe-area-inset-left) + 0.58rem);
-  }
-
-  .hall-of-champions-arrival {
-    inline-size: min(100%, 26rem);
-  }
-}
 .site-shell.is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]),
 .site-shell[data-shell-route="wrestling-match-detail"] {
   background:

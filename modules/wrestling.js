@@ -8564,19 +8564,6 @@ function getWrestlingPeoplePrototypeShell() {
   prototypeShell.setAttribute("inert", "");
   prototypeShell.hidden = true;
 
-  const hud = document.createElement("div");
-  hud.className = "hall-of-champions-arrival";
-
-  const title = document.createElement("h1");
-  title.className = "hall-of-champions-arrival__title";
-  title.textContent = "Hall of Champions";
-
-  const subtitle = document.createElement("p");
-  subtitle.className = "hall-of-champions-arrival__subtitle";
-  subtitle.textContent = "Every competitor preserved within the archive.";
-
-  hud.append(title, subtitle);
-  prototypeShell.append(hud);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -8613,9 +8600,9 @@ function setWrestlingPeoplePrototypeActive(isActive) {
   }
 
   if (prototypeShell) {
-    prototypeShell.hidden = !isActive;
-    prototypeShell.toggleAttribute("inert", !isActive);
-    prototypeShell.setAttribute("aria-hidden", String(!isActive));
+    prototypeShell.hidden = true;
+    prototypeShell.setAttribute("inert", "");
+    prototypeShell.setAttribute("aria-hidden", "true");
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
   }
 
@@ -8624,6 +8611,11 @@ function setWrestlingPeoplePrototypeActive(isActive) {
   }
 
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
+
+  if (typeof homeFrame !== "undefined" && homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+    homeFrame.setAttribute("inert", "");
+  }
 
   if (typeof setWrestlingShowsHidden === "function") {
     setWrestlingShowsHidden(true);
