@@ -7605,9 +7605,6 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   date.className = "fields-of-conflict-event-history__date";
   date.textContent = getWrestlingVenueEventDate(eventRow);
 
-  const photos = document.createElement("p");
-  photos.className = "fields-of-conflict-event-history__photos";
-  photos.textContent = getFieldsOfConflictDossierEventHistoryPhotoText(eventRow);
 
   const action = document.createElement("button");
   action.type = "button";
@@ -7633,7 +7630,7 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
 
   const eventMeta = document.createElement("div");
   eventMeta.className = "fields-of-conflict-event-history__meta";
-  eventMeta.append(date, photos);
+  eventMeta.append(date);
 
   const eventDetails = document.createElement("div");
   eventDetails.className = "fields-of-conflict-event-history__details";
