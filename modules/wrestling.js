@@ -270,6 +270,16 @@ const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-peop
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
 const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-people-filter-reset]");
 let wrestlingPeoplePrototypeShell = null;
+const HALL_OF_CHAMPIONS_CRYSTAL_REST_Y = -20;
+const HALL_OF_CHAMPIONS_CRYSTAL_START_Y = -12;
+const HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS = 220;
+const HALL_OF_CHAMPIONS_CRYSTAL_RISE_DELAY_MS = 480;
+const HALL_OF_CHAMPIONS_CRYSTAL_RISE_DURATION_MS = 560;
+const HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS = 2160;
+let hallOfChampionsActivationTimer = 0;
+let hallOfChampionsCrystalRiseTimer = 0;
+let hallOfChampionsActivationSettleTimer = 0;
+let hallOfChampionsCrystalRiseFrame = 0;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
@@ -8653,6 +8663,117 @@ function getWrestlingPeoplePrototypeShell() {
   return wrestlingPeoplePrototypeShell;
 }
 
+function clearHallOfChampionsActivationTimers() {
+  if (hallOfChampionsActivationTimer) {
+    window.clearTimeout(hallOfChampionsActivationTimer);
+    hallOfChampionsActivationTimer = 0;
+  }
+  if (hallOfChampionsCrystalRiseTimer) {
+    window.clearTimeout(hallOfChampionsCrystalRiseTimer);
+    hallOfChampionsCrystalRiseTimer = 0;
+  }
+  if (hallOfChampionsActivationSettleTimer) {
+    window.clearTimeout(hallOfChampionsActivationSettleTimer);
+    hallOfChampionsActivationSettleTimer = 0;
+  }
+  if (hallOfChampionsCrystalRiseFrame && typeof window.cancelAnimationFrame === "function") {
+    window.cancelAnimationFrame(hallOfChampionsCrystalRiseFrame);
+    hallOfChampionsCrystalRiseFrame = 0;
+  }
+}
+
+function setHallOfChampionsCrystalTransform(prototypeShell, yValue) {
+  const crystal = prototypeShell?.querySelector(".hall-of-champions-pedestal__crystal");
+  if (!crystal) {
+    return;
+  }
+  crystal.setAttribute("transform", `translate(0 ${yValue.toFixed(2).replace(/\.00$/, "")})`);
+}
+
+function prefersHallOfChampionsReducedMotion() {
+  return typeof window !== "undefined"
+    && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+}
+
+function animateHallOfChampionsCrystalRise(prototypeShell) {
+  if (!prototypeShell || prototypeShell.dataset.hallOfChampionsActive !== "true") {
+    return;
+  }
+  if (typeof window.requestAnimationFrame !== "function") {
+    setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+    return;
+  }
+
+  const startTime = performance.now();
+  const startY = HALL_OF_CHAMPIONS_CRYSTAL_START_Y;
+  const endY = HALL_OF_CHAMPIONS_CRYSTAL_REST_Y;
+  const distance = endY - startY;
+
+  const step = (timestamp) => {
+    if (prototypeShell.dataset.hallOfChampionsActive !== "true") {
+      hallOfChampionsCrystalRiseFrame = 0;
+      return;
+    }
+
+    const elapsed = Math.min(1, (timestamp - startTime) / HALL_OF_CHAMPIONS_CRYSTAL_RISE_DURATION_MS);
+    const eased = 1 - Math.pow(1 - elapsed, 3);
+    setHallOfChampionsCrystalTransform(prototypeShell, startY + (distance * eased));
+
+    if (elapsed < 1) {
+      hallOfChampionsCrystalRiseFrame = window.requestAnimationFrame(step);
+      return;
+    }
+
+    hallOfChampionsCrystalRiseFrame = 0;
+    setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+  };
+
+  hallOfChampionsCrystalRiseFrame = window.requestAnimationFrame(step);
+}
+
+function startHallOfChampionsPedestalActivation(prototypeShell) {
+  if (!prototypeShell) {
+    return;
+  }
+
+  clearHallOfChampionsActivationTimers();
+  setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+
+  if (prefersHallOfChampionsReducedMotion()) {
+    prototypeShell.dataset.hallOfChampionsAwakening = "settled";
+    prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
+    return;
+  }
+
+  if (prototypeShell.dataset.hallOfChampionsActivationComplete === "true") {
+    prototypeShell.dataset.hallOfChampionsAwakening = "settled";
+    return;
+  }
+
+  prototypeShell.dataset.hallOfChampionsAwakening = "dormant";
+  setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_START_Y);
+
+  hallOfChampionsActivationTimer = window.setTimeout(() => {
+    if (prototypeShell.dataset.hallOfChampionsActive !== "true") {
+      return;
+    }
+
+    prototypeShell.dataset.hallOfChampionsAwakening = "activating";
+    hallOfChampionsCrystalRiseTimer = window.setTimeout(() => {
+      animateHallOfChampionsCrystalRise(prototypeShell);
+    }, HALL_OF_CHAMPIONS_CRYSTAL_RISE_DELAY_MS);
+
+    hallOfChampionsActivationSettleTimer = window.setTimeout(() => {
+      if (prototypeShell.dataset.hallOfChampionsActive !== "true") {
+        return;
+      }
+      setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+      prototypeShell.dataset.hallOfChampionsAwakening = "settled";
+      prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
+    }, HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS);
+  }, HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS);
+}
+
 function setWrestlingPeoplePrototypeActive(isActive) {
   const shellElement = document.querySelector(".site-shell");
   const prototypeShell = isActive
@@ -8686,6 +8807,15 @@ function setWrestlingPeoplePrototypeActive(isActive) {
     prototypeShell.setAttribute("inert", "");
     prototypeShell.setAttribute("aria-hidden", "true");
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
+    if (isActive) {
+      startHallOfChampionsPedestalActivation(prototypeShell);
+    } else {
+      clearHallOfChampionsActivationTimers();
+      prototypeShell.dataset.hallOfChampionsAwakening = prototypeShell.dataset.hallOfChampionsActivationComplete === "true"
+        ? "settled"
+        : "dormant";
+      setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
+    }
   }
 
   if (!isActive) {

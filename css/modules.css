@@ -11639,6 +11639,89 @@ button.wrestling-event-history-tagged-thumb {
   fill-opacity: 0.94;
   stroke-opacity: 0.42;
 }
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="dormant"] .hall-of-champions-pedestal__hologram-plane,
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__hologram-plane {
+  opacity: 0;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="dormant"] .hall-of-champions-pedestal__crystal-core {
+  opacity: 0.44;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="dormant"] .hall-of-champions-pedestal__crystal-facet {
+  opacity: 0.62;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__crystal-core {
+  animation: hallChampionsCrystalInnerWake 480ms ease-out both;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__crystal-facet {
+  animation: hallChampionsCrystalFacetWake 480ms ease-out both;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__hologram-plane {
+  animation: hallChampionsHologramReveal 520ms ease-out 1040ms both;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__upper-console path:nth-child(2),
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__upper-console ellipse,
+.wrestling-people-prototype-shell[data-hall-of-champions-awakening="activating"] .hall-of-champions-pedestal__body path:nth-child(2) {
+  animation: hallChampionsDormantChannelPulse 520ms ease-out 1540ms 1;
+}
+
+@keyframes hallChampionsCrystalInnerWake {
+  from {
+    opacity: 0.44;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hallChampionsCrystalFacetWake {
+  from {
+    opacity: 0.62;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hallChampionsHologramReveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hallChampionsDormantChannelPulse {
+  44% {
+    stroke-opacity: 0.58;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__crystal-core,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__crystal-facet,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__hologram-plane,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__upper-console path:nth-child(2),
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__upper-console ellipse,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__body path:nth-child(2) {
+    animation: none !important;
+  }
+
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__crystal-core,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__crystal-facet,
+  .wrestling-people-prototype-shell[data-hall-of-champions-awakening] .hall-of-champions-pedestal__hologram-plane {
+    opacity: 1;
+  }
+}
 
 @media (max-width: 540px) {
   .site-shell[data-wrestling-people-prototype="hall-of-champions"] .wrestling-people-prototype-shell {
