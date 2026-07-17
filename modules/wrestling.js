@@ -6802,7 +6802,11 @@ function getWrestlingVenuesPrototypeShell() {
 
 const FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID = "yarmouth-amvets";
 const FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID = "colisee";
+const FIELDS_OF_CONFLICT_DETAIL_MAP_ZOOM = 15;
 const FIELDS_OF_CONFLICT_COORDINATE_DEGREE = String.fromCharCode(176);
+let fieldsOfConflictVenueLocationMap = null;
+let fieldsOfConflictVenueLocationMarker = null;
+let fieldsOfConflictVenueLocationMapElement = null;
 // TODO: Replace temporary Fields of Conflict venue coordinates with backend-provided venue coordinates when available.
 const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
   {
@@ -6898,6 +6902,86 @@ const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
     longitude: `70.1860${FIELDS_OF_CONFLICT_COORDINATE_DEGREE} W`
   }
 ];
+
+function parseFieldsOfConflictMapCoordinate(value) {
+  const coordinateText = String(value || "").trim();
+  const coordinateMatch = coordinateText.match(/-?\d+(?:\.\d+)?/);
+  if (!coordinateMatch) {
+    return null;
+  }
+
+  const numericValue = Number(coordinateMatch[0]);
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  if (/\b[SW]\b/i.test(coordinateText) && numericValue > 0) {
+    return -numericValue;
+  }
+  if (/\b[NE]\b/i.test(coordinateText) && numericValue < 0) {
+    return Math.abs(numericValue);
+  }
+  return numericValue;
+}
+
+function getFieldsOfConflictVenueLocationMapCoordinates(venue, config) {
+  const latitude = parseFieldsOfConflictMapCoordinate(getWrestlingVenueDetailLatitude(venue) || config?.latitude);
+  const longitude = parseFieldsOfConflictMapCoordinate(getWrestlingVenueDetailLongitude(venue) || config?.longitude);
+  return Number.isFinite(latitude) && Number.isFinite(longitude) ? [latitude, longitude] : null;
+}
+
+function getFieldsOfConflictVenueLocationMapContainer() {
+  return document.querySelector("[data-fields-of-conflict-location-map]");
+}
+
+function scheduleFieldsOfConflictVenueLocationMapResize() {
+  if (!fieldsOfConflictVenueLocationMap) {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    fieldsOfConflictVenueLocationMap?.invalidateSize?.();
+    window.setTimeout(() => fieldsOfConflictVenueLocationMap?.invalidateSize?.(), 160);
+  });
+}
+
+function destroyFieldsOfConflictVenueLocationMap() {
+  if (fieldsOfConflictVenueLocationMap) {
+    fieldsOfConflictVenueLocationMap.remove();
+  }
+  fieldsOfConflictVenueLocationMap = null;
+  fieldsOfConflictVenueLocationMarker = null;
+  fieldsOfConflictVenueLocationMapElement = null;
+}
+
+function syncFieldsOfConflictVenueLocationMap(venue, config) {
+  const mapElement = getFieldsOfConflictVenueLocationMapContainer();
+  const coordinates = getFieldsOfConflictVenueLocationMapCoordinates(venue, config);
+  const Leaflet = typeof window !== "undefined" ? window.L : null;
+  if (!mapElement || !coordinates || !Leaflet) {
+    return false;
+  }
+
+  if (fieldsOfConflictVenueLocationMap && fieldsOfConflictVenueLocationMapElement !== mapElement) {
+    destroyFieldsOfConflictVenueLocationMap();
+  }
+
+  if (!fieldsOfConflictVenueLocationMap) {
+    fieldsOfConflictVenueLocationMap = Leaflet.map(mapElement);
+    Leaflet.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(fieldsOfConflictVenueLocationMap);
+    fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates).addTo(fieldsOfConflictVenueLocationMap);
+    fieldsOfConflictVenueLocationMapElement = mapElement;
+  } else {
+    fieldsOfConflictVenueLocationMarker?.setLatLng(coordinates);
+  }
+
+  fieldsOfConflictVenueLocationMap.setView(coordinates, FIELDS_OF_CONFLICT_DETAIL_MAP_ZOOM);
+  scheduleFieldsOfConflictVenueLocationMapResize();
+  return true;
+}
 
 function isWrestlingVenueDetailPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
   if (route?.name === "wrestling-venue-detail-prototype") {
@@ -7208,13 +7292,14 @@ function createFieldsOfConflictVenueLocationSection() {
 
   const frame = document.createElement("div");
   frame.className = "fields-of-conflict-location__frame";
-  frame.setAttribute("aria-hidden", "true");
 
-  const comingSoon = document.createElement("p");
-  comingSoon.className = "fields-of-conflict-location__soon";
-  comingSoon.textContent = "COMING SOON";
+  const mapElement = document.createElement("div");
+  mapElement.className = "fields-of-conflict-location__map";
+  mapElement.dataset.fieldsOfConflictLocationMap = "";
+  mapElement.setAttribute("aria-label", "Colisee venue location map");
+  frame.append(mapElement);
 
-  section.append(header, frame, comingSoon);
+  section.append(header, frame);
   return section;
 }
 
@@ -7397,6 +7482,7 @@ function updateFieldsOfConflictDossierCarousel(carousel, nextIndex) {
     dot.classList.toggle("is-active", isActive);
     dot.setAttribute("aria-current", isActive ? "true" : "false");
   });
+  scheduleFieldsOfConflictVenueLocationMapResize();
 }
 
 function bindFieldsOfConflictDossierCarouselControls(carousel) {
@@ -7423,7 +7509,7 @@ function bindFieldsOfConflictDossierCarouselControls(carousel) {
 
   if (viewport) {
     viewport.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+      if (event.target?.closest?.("[data-fields-of-conflict-location-map]") || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) {
         return;
       }
       event.preventDefault();
@@ -7440,7 +7526,7 @@ function bindFieldsOfConflictDossierCarouselControls(carousel) {
       pointerStartY = 0;
     }
     viewport.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "mouse") {
+      if (event.target?.closest?.("[data-fields-of-conflict-location-map]") || event.pointerType === "mouse") {
         return;
       }
       pointerId = event.pointerId;
@@ -7596,6 +7682,7 @@ function syncFieldsOfConflictDossierFrameworkSections(dossier) {
 function syncFieldsOfConflictVenueLocationSection(dossier) {
   const existingSection = dossier?.querySelector?.("[data-fields-of-conflict-location]");
   if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
+    destroyFieldsOfConflictVenueLocationMap();
     existingSection?.remove();
     return;
   }
@@ -7643,6 +7730,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
   syncFieldsOfConflictVenueLocationSection(dossier);
   syncFieldsOfConflictDossierFrameworkSections(dossier);
   syncFieldsOfConflictDossierCarousel(dossier);
+  syncFieldsOfConflictVenueLocationMap(venue, config);
 
   dossier.dataset.fieldsOfConflictVenueId = config?.id || getWrestlingVenueRowId(venue);
   dossier.setAttribute("aria-label", `${venueName} venue dossier`);

@@ -23481,6 +23481,15 @@ button.hall-crusades-archive-crystal:focus-visible {
   background: linear-gradient(90deg, transparent, rgba(255, 90, 60, 0.34), transparent);
 }
 
+.fields-of-conflict-location__map {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 100%;
+  background: rgba(4, 0, 0, 0.72);
+}
+
 .fields-of-conflict-location__soon {
   grid-area: 2 / 1;
   align-self: end;
