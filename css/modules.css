@@ -11553,6 +11553,51 @@ button.wrestling-event-history-tagged-thumb {
   fill-opacity: 0.3;
   stroke: none;
 }
+.hall-of-champions-pedestal__hologram-console {
+  opacity: 0.74;
+  pointer-events: none;
+}
+
+.hall-of-champions-pedestal__hologram-console text {
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  paint-order: stroke fill;
+  stroke: rgba(16, 4, 2, 0.38);
+  stroke-width: 0.65;
+}
+
+.hall-of-champions-pedestal__hologram-console-heading {
+  fill: rgba(255, 223, 204, 0.84);
+  font-size: 16px;
+}
+
+.hall-of-champions-pedestal__hologram-console-label {
+  fill: rgba(255, 116, 68, 0.76);
+  font-size: 10.5px;
+}
+
+.hall-of-champions-pedestal__hologram-console-option {
+  fill: rgba(255, 220, 202, 0.74);
+  font-size: 8.8px;
+}
+
+.hall-of-champions-pedestal__hologram-console-rule,
+.hall-of-champions-pedestal__hologram-console-tick,
+.hall-of-champions-pedestal__hologram-console-selector {
+  fill: none;
+  stroke: rgba(255, 107, 58, 0.52);
+  stroke-width: 0.72;
+  stroke-opacity: 0.62;
+}
+
+.hall-of-champions-pedestal__hologram-console-chip {
+  fill: rgba(58, 13, 7, 0.1);
+  stroke: rgba(255, 105, 58, 0.45);
+  stroke-width: 0.66;
+  stroke-opacity: 0.58;
+}
 
 .hall-of-champions-pedestal__upper-console path:first-child {
   fill: url(#hall-champions-stone-face);

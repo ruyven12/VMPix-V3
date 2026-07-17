@@ -8615,6 +8615,9 @@ function getWrestlingPeoplePrototypeShell() {
       <pattern id="hall-champions-hologram-scan" width="18" height="520" patternUnits="userSpaceOnUse">
         <rect x="8" y="0" width="0.75" height="520" fill="#ff7a3d" opacity="0.16" />
       </pattern>
+      <clipPath id="hall-champions-hologram-plane-clip">
+        <path d="M206 74 L434 74 L386 226 L254 226 Z" />
+      </clipPath>
       <linearGradient id="hall-champions-crystal-core" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#ff8a36" stop-opacity="0.74" />
         <stop offset="0.5" stop-color="#b53a1e" stop-opacity="0.64" />
@@ -8633,6 +8636,32 @@ function getWrestlingPeoplePrototypeShell() {
     <g class="hall-of-champions-pedestal__hologram-plane">
       <path d="M206 74 L434 74 L386 226 L254 226 Z" />
       <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M206 74 L434 74 L386 226 L254 226 Z" />
+      <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)">
+        <g class="hall-of-champions-pedestal__hologram-console-search">
+          <text class="hall-of-champions-pedestal__hologram-console-heading" x="320" y="95">SEARCH</text>
+          <path class="hall-of-champions-pedestal__hologram-console-rule" d="M270 106 H370" />
+          <path class="hall-of-champions-pedestal__hologram-console-tick" d="M282 102 V110 M358 102 V110" />
+        </g>
+        <g class="hall-of-champions-pedestal__hologram-console-az">
+          <text class="hall-of-champions-pedestal__hologram-console-label" x="320" y="122">A-Z</text>
+          <path class="hall-of-champions-pedestal__hologram-console-rule" d="M276 132 H364" />
+          <path class="hall-of-champions-pedestal__hologram-console-tick" d="M286 128 V136 M303 128 V136 M320 128 V136 M337 128 V136 M354 128 V136" />
+        </g>
+        <g class="hall-of-champions-pedestal__hologram-console-category">
+          <text class="hall-of-champions-pedestal__hologram-console-label" x="320" y="145">CATEGORY</text>
+          <path class="hall-of-champions-pedestal__hologram-console-chip" d="M238 154 H286 V170 H238 Z" />
+          <path class="hall-of-champions-pedestal__hologram-console-chip" d="M292 154 H348 V170 H292 Z" />
+          <path class="hall-of-champions-pedestal__hologram-console-chip" d="M354 154 H402 V170 H354 Z" />
+          <text class="hall-of-champions-pedestal__hologram-console-option" x="262" y="163" textLength="38" lengthAdjust="spacingAndGlyphs">Performers</text>
+          <text class="hall-of-champions-pedestal__hologram-console-option" x="320" y="163" textLength="42" lengthAdjust="spacingAndGlyphs">Managers</text>
+          <text class="hall-of-champions-pedestal__hologram-console-option" x="378" y="163" textLength="36" lengthAdjust="spacingAndGlyphs">Legends</text>
+        </g>
+        <g class="hall-of-champions-pedestal__hologram-console-team">
+          <text class="hall-of-champions-pedestal__hologram-console-label" x="320" y="187">TEAM</text>
+          <path class="hall-of-champions-pedestal__hologram-console-selector" d="M278 195 H362 L368 201 L362 207 H278 L272 201 Z" />
+          <path class="hall-of-champions-pedestal__hologram-console-tick" d="M292 201 H348" />
+        </g>
+      </g>
     </g>
     <g class="hall-of-champions-pedestal__upper-console">
       <path d="M184 226 L456 226 L510 292 L130 292 Z" />
