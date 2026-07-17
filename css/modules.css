@@ -11530,7 +11530,7 @@ button.wrestling-event-history-tagged-thumb {
   max-block-size: min(54svh, 32rem);
   display: block;
   color: rgba(108, 96, 88, 0.46);
-  filter: drop-shadow(0 0.32rem 0.34rem rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 0.28rem 0.3rem rgba(0, 0, 0, 0.42));
 }
 
 .hall-of-champions-pedestal path,
@@ -11543,61 +11543,70 @@ button.wrestling-event-history-tagged-thumb {
 .hall-of-champions-pedestal__hologram-frame path {
   fill: url(#hall-champions-stone-side);
   stroke: url(#hall-champions-metal-edge);
-  stroke-opacity: 0.5;
+  fill-opacity: 0.94;
+  stroke-opacity: 0.42;
   stroke-width: 1.15;
 }
 
 .hall-of-champions-pedestal__upper-console path:first-child {
   fill: url(#hall-champions-stone-face);
   stroke: url(#hall-champions-metal-edge);
-  stroke-opacity: 0.56;
+  fill-opacity: 0.97;
+  stroke-opacity: 0.48;
   stroke-width: 1.25;
 }
 
 .hall-of-champions-pedestal__upper-console path:nth-child(2) {
   fill: url(#hall-champions-stone-side);
   stroke: url(#hall-champions-channel-dormant);
-  stroke-opacity: 0.34;
+  fill-opacity: 0.9;
+  stroke-opacity: 0.28;
   stroke-width: 1;
 }
 
 .hall-of-champions-pedestal__upper-console ellipse {
   fill: url(#hall-champions-crystal-recess);
   stroke: url(#hall-champions-channel-dormant);
-  stroke-opacity: 0.45;
+  fill-opacity: 0.9;
+  stroke-opacity: 0.34;
   stroke-width: 1;
 }
 
 .hall-of-champions-pedestal__body path:first-child {
   fill: url(#hall-champions-stone-face);
   stroke: url(#hall-champions-metal-edge);
-  stroke-opacity: 0.48;
+  fill-opacity: 0.96;
+  stroke-opacity: 0.42;
   stroke-width: 1.2;
 }
 
 .hall-of-champions-pedestal__body path:nth-child(2) {
   fill: url(#hall-champions-stone-side);
   stroke: url(#hall-champions-channel-dormant);
-  stroke-opacity: 0.24;
+  fill-opacity: 0.88;
+  stroke-opacity: 0.2;
   stroke-width: 1;
 }
 
 .hall-of-champions-pedestal__base path {
   fill: url(#hall-champions-stone-face);
   stroke: url(#hall-champions-metal-edge);
-  stroke-opacity: 0.45;
+  fill-opacity: 0.96;
+  stroke-opacity: 0.4;
   stroke-width: 1.2;
 }
 
 .hall-of-champions-pedestal__base path:nth-child(2) {
   fill: url(#hall-champions-stone-side);
-  stroke-opacity: 0.38;
+  fill-opacity: 0.94;
+  stroke-opacity: 0.34;
 }
 
 .hall-of-champions-pedestal__base path:nth-child(3) {
   fill: url(#hall-champions-stone-side);
-  stroke: rgba(78, 68, 58, 0.34);
-  stroke-opacity: 0.5;
+  stroke: rgba(106, 75, 56, 0.36);
+  fill-opacity: 0.94;
+  stroke-opacity: 0.42;
 }
 
 @media (max-width: 540px) {
