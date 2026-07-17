@@ -7554,7 +7554,7 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   const promotion = document.createElement("p");
   promotion.className = "fields-of-conflict-event-history__promotion";
   promotion.textContent = getWrestlingVenueEventPromotion(eventRow);
-  eventSummary.append(eventName, promotion);
+  eventSummary.append(promotion, eventName);
 
   const date = document.createElement("p");
   date.className = "fields-of-conflict-event-history__date";
@@ -7567,7 +7567,7 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   const action = document.createElement("button");
   action.type = "button";
   action.className = "fields-of-conflict-event-history__action";
-  action.textContent = "OPEN EVENT";
+  action.textContent = "Open Event";
   action.setAttribute("aria-label", `Open event ${eventNameText}`);
   action.dataset.wrestlingShowId = row.dataset.wrestlingShowId;
   action.dataset.wrestlingShowRoute = showRoute;
@@ -7595,12 +7595,7 @@ function createFieldsOfConflictDossierEventHistory(venue) {
   const relatedEvents = getFieldsOfConflictDossierEventHistoryRows(venue);
   const forcedState = getForcedMockState("wrestlingVenues");
   history.className = "fields-of-conflict-event-history";
-  history.setAttribute("aria-labelledby", "fields-of-conflict-event-history-title");
-
-  const title = document.createElement("h4");
-  title.className = "fields-of-conflict-event-history__title";
-  title.id = "fields-of-conflict-event-history-title";
-  title.textContent = "EVENT HISTORY";
+  history.setAttribute("aria-label", "Venue event history");
 
   const viewport = document.createElement("div");
   viewport.className = "fields-of-conflict-event-history__viewport";
@@ -7631,7 +7626,7 @@ function createFieldsOfConflictDossierEventHistory(venue) {
   }
 
   viewport.append(list);
-  history.append(title, viewport);
+  history.append(viewport);
   return history;
 }
 

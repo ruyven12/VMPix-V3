@@ -23772,7 +23772,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   block-size: 100%;
   min-block-size: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: clamp(0.42rem, 0.9vw, 0.64rem);
 }
 
@@ -23837,7 +23837,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   margin: 0;
   line-height: 1.12;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .fields-of-conflict-event-history__event {
@@ -23874,7 +23874,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-weight: 720;
   line-height: 1.08;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background:
     linear-gradient(180deg, rgba(255, 247, 238, 0.035), transparent 72%),
