@@ -8616,7 +8616,7 @@ function getWrestlingPeoplePrototypeShell() {
         <rect x="8" y="0" width="0.75" height="520" fill="#ff7a3d" opacity="0.16" />
       </pattern>
       <clipPath id="hall-champions-hologram-plane-clip">
-        <path d="M206 74 L434 74 L386 226 L254 226 Z" />
+        <path d="M254 130 L386 130 L380 170 L260 170 Z" />
       </clipPath>
       <linearGradient id="hall-champions-crystal-core" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#ff8a36" stop-opacity="0.74" />
@@ -8634,8 +8634,8 @@ function getWrestlingPeoplePrototypeShell() {
       </linearGradient>
     </defs>
     <g class="hall-of-champions-pedestal__hologram-plane">
-      <path d="M206 74 L434 74 L386 226 L254 226 Z" />
-      <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M206 74 L434 74 L386 226 L254 226 Z" />
+      <path d="M254 130 L386 130 L380 170 L260 170 Z" />
+      <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M254 130 L386 130 L380 170 L260 170 Z" />
       <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)">
         <text class="hall-of-champions-pedestal__hologram-console-heading" x="320" y="150">INTERACT</text>
       </g>
