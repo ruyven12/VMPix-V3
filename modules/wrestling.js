@@ -7484,7 +7484,7 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
   Object.freeze({
     id: "about",
     title: "ABOUT THE VENUE",
-    text: "Coming Soon \u2014 Need To Write",
+    text: "This section will be about the venue itself overall, some notes on the actual venue, and more. It has to be written still and it will be coming in soon.",
   }),
   Object.freeze({
     id: "events",

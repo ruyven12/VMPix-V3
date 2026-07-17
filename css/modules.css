@@ -23758,6 +23758,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-align: center;
   text-transform: none;
 }
+.fields-of-conflict-dossier-section[data-fields-of-conflict-dossier-section="about"] .fields-of-conflict-dossier-section__placeholder {
+  color: rgba(255, 90, 60, 0.96);
+  font-size: clamp(calc(0.66rem + 2px), calc(0.98vw + 2px), calc(0.84rem + 2px));
+}
 
 .fields-of-conflict-dossier-section__frame--event-history {
   place-items: stretch;
