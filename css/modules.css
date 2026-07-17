@@ -23605,24 +23605,52 @@ button.hall-crusades-archive-crystal:focus-visible {
   block-size: 1.25rem;
 }
 
+.fields-of-conflict-location__map .leaflet-bottom.leaflet-right {
+  inset-inline-end: auto;
+  inset-inline-start: 50%;
+  inset-block-end: 0.3rem;
+  display: flex;
+  justify-content: center;
+  inline-size: min(90%, 60rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.fields-of-conflict-location__map .leaflet-bottom.leaflet-right .leaflet-control {
+  pointer-events: auto;
+}
+
 .fields-of-conflict-location__map .leaflet-control-attribution {
-  max-inline-size: min(82vw, 35rem);
-  margin: 0 0.32rem 0.32rem 0;
-  padding: 0.14rem 0.38rem;
-  color: rgba(255, 230, 208, 0.72);
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0.12rem 0.34rem;
+  color: rgba(255, 230, 208, 0.78);
   font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
-  font-size: 0.58rem;
+  font-size: clamp(0.4rem, 1.2vw, 0.62rem);
   font-weight: 600;
-  line-height: 1.15;
+  line-height: normal;
+  text-align: center;
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.18);
-  background: rgba(5, 0, 0, 0.68);
-  border: 1px solid rgba(255, 66, 42, 0.28);
+  white-space: normal;
+  background: rgba(5, 0, 0, 0.7);
+  border: 1px solid rgba(255, 66, 42, 0.3);
   box-shadow: 0 0 0.46rem rgba(0, 0, 0, 0.34);
 }
 
 .fields-of-conflict-location__map .leaflet-control-attribution a {
   color: rgba(255, 184, 138, 0.84);
   text-decoration-color: rgba(255, 126, 86, 0.44);
+}
+
+.fields-of-conflict-location__attribution-break {
+  display: inline-block;
+}
+
+@media (max-width: 47.99rem) {
+  .fields-of-conflict-location__map .leaflet-bottom.leaflet-right {
+    inline-size: min(70%, 60rem);
+  }
 }
 
 .fields-of-conflict-location__marker {

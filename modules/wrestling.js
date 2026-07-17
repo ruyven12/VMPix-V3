@@ -7126,21 +7126,22 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
 
   if (!fieldsOfConflictVenueLocationMap) {
     fieldsOfConflictVenueLocationMap = Leaflet.map(mapElement);
+    fieldsOfConflictVenueLocationMap.attributionControl?.setPrefix?.(false);
     syncFieldsOfConflictVenueLocationMapPanes(fieldsOfConflictVenueLocationMap);
     fieldsOfConflictVenueLocationRecenterControl = createFieldsOfConflictVenueLocationRecenterControl(Leaflet).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
-      attribution: 'Tiles &copy; Esri - Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+      attribution: 'Powered by Esri &middot; &copy; Esri &middot; Maxar &middot; Earthstar Geographics <span class="fields-of-conflict-location__attribution-break">&middot; HERE &middot; Garmin &middot; OpenStreetMap contributors &middot; GIS User Community</span>',
     }).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
       pane: "fields-of-conflict-labels",
-      attribution: 'Transportation &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and MapmyIndia',
+      attribution: 'Powered by Esri &middot; &copy; Esri &middot; Maxar &middot; Earthstar Geographics <span class="fields-of-conflict-location__attribution-break">&middot; HERE &middot; Garmin &middot; OpenStreetMap contributors &middot; GIS User Community</span>',
     }).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
       pane: "fields-of-conflict-labels",
-      attribution: 'Reference &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and the GIS User Community',
+      attribution: 'Powered by Esri &middot; &copy; Esri &middot; Maxar &middot; Earthstar Geographics <span class="fields-of-conflict-location__attribution-break">&middot; HERE &middot; Garmin &middot; OpenStreetMap contributors &middot; GIS User Community</span>',
     }).addTo(fieldsOfConflictVenueLocationMap);
     syncFieldsOfConflictVenueLocationGeohashBoundary(Leaflet, venue);
     fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates, {
