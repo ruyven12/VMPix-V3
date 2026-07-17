@@ -8629,7 +8629,7 @@ function getWrestlingPeoplePrototypeShell() {
       <path d="M226 244 L414 244 L446 282 L194 282 Z" />
       <ellipse cx="320" cy="263" rx="72" ry="18" />
     </g>
-    <g class="hall-of-champions-pedestal__crystal">
+    <g class="hall-of-champions-pedestal__crystal" transform="translate(0 -20)">
       <path class="hall-of-champions-pedestal__crystal-shell" d="M320 232 L354 253 L344 281 L320 296 L296 281 L286 253 Z" />
       <path class="hall-of-champions-pedestal__crystal-core" d="M320 240 L340 256 L333 277 L320 288 L307 277 L300 256 Z" />
       <path class="hall-of-champions-pedestal__crystal-facet hall-of-champions-pedestal__crystal-facet--left" d="M320 240 L300 256 L307 277 L320 288 Z" />
