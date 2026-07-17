@@ -4862,6 +4862,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
     return;
   }
 
+  setWrestlingVenuesPrototypeActive(false);
   wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation = "hall";
   delete wrestlingShowDetailShell.dataset.wrestlingShowDetailVariant;
   delete wrestlingShowDetailShell.dataset.wrestlingShowDetailRouteId;
