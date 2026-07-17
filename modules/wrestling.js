@@ -6954,6 +6954,15 @@ function destroyFieldsOfConflictVenueLocationMap() {
   fieldsOfConflictVenueLocationMapElement = null;
 }
 
+function createFieldsOfConflictVenueLocationMarkerIcon(Leaflet) {
+  return Leaflet.divIcon({
+    className: "fields-of-conflict-location__marker",
+    html: '<span class="fields-of-conflict-location__marker-core" aria-hidden="true"></span>',
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+  });
+}
+
 function syncFieldsOfConflictVenueLocationMap(venue, config) {
   const mapElement = getFieldsOfConflictVenueLocationMapContainer();
   const coordinates = getFieldsOfConflictVenueLocationMapCoordinates(venue, config);
@@ -6972,7 +6981,11 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
       maxZoom: 19,
       attribution: 'Tiles &copy; Esri - Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
     }).addTo(fieldsOfConflictVenueLocationMap);
-    fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates).addTo(fieldsOfConflictVenueLocationMap);
+    fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates, {
+      icon: createFieldsOfConflictVenueLocationMarkerIcon(Leaflet),
+      interactive: false,
+      keyboard: false,
+    }).addTo(fieldsOfConflictVenueLocationMap);
     fieldsOfConflictVenueLocationMapElement = mapElement;
   } else {
     fieldsOfConflictVenueLocationMarker?.setLatLng(coordinates);
