@@ -6807,6 +6807,8 @@ const FIELDS_OF_CONFLICT_COORDINATE_DEGREE = String.fromCharCode(176);
 let fieldsOfConflictVenueLocationMap = null;
 let fieldsOfConflictVenueLocationMarker = null;
 let fieldsOfConflictVenueLocationGeohashBoundary = null;
+let fieldsOfConflictVenueLocationRecenterControl = null;
+let fieldsOfConflictVenueLocationHomeView = null;
 let fieldsOfConflictVenueLocationMapElement = null;
 // TODO: Replace temporary Fields of Conflict venue coordinates with backend-provided venue coordinates when available.
 const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
@@ -6996,6 +6998,8 @@ function destroyFieldsOfConflictVenueLocationMap() {
   fieldsOfConflictVenueLocationMap = null;
   fieldsOfConflictVenueLocationMarker = null;
   fieldsOfConflictVenueLocationGeohashBoundary = null;
+  fieldsOfConflictVenueLocationRecenterControl = null;
+  fieldsOfConflictVenueLocationHomeView = null;
   fieldsOfConflictVenueLocationMapElement = null;
 }
 
@@ -7050,6 +7054,62 @@ function syncFieldsOfConflictVenueLocationGeohashBoundary(Leaflet, venue) {
   return bounds;
 }
 
+function syncFieldsOfConflictVenueLocationHomeView(coordinates) {
+  fieldsOfConflictVenueLocationHomeView = {
+    center: coordinates,
+    zoom: FIELDS_OF_CONFLICT_DETAIL_MAP_ZOOM,
+  };
+}
+
+function isFieldsOfConflictVenueLocationAtHomeView() {
+  if (!fieldsOfConflictVenueLocationMap || !fieldsOfConflictVenueLocationHomeView) {
+    return true;
+  }
+
+  const center = fieldsOfConflictVenueLocationMap.getCenter();
+  const [latitude, longitude] = fieldsOfConflictVenueLocationHomeView.center;
+  return Math.abs(center.lat - latitude) < 0.000001 &&
+    Math.abs(center.lng - longitude) < 0.000001 &&
+    fieldsOfConflictVenueLocationMap.getZoom() === fieldsOfConflictVenueLocationHomeView.zoom;
+}
+
+function recenterFieldsOfConflictVenueLocationMap() {
+  if (!fieldsOfConflictVenueLocationMap || !fieldsOfConflictVenueLocationHomeView || isFieldsOfConflictVenueLocationAtHomeView()) {
+    return;
+  }
+
+  const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const { center, zoom } = fieldsOfConflictVenueLocationHomeView;
+  if (prefersReducedMotion || typeof fieldsOfConflictVenueLocationMap.flyTo !== "function") {
+    fieldsOfConflictVenueLocationMap.setView(center, zoom);
+    return;
+  }
+  fieldsOfConflictVenueLocationMap.flyTo(center, zoom, {
+    animate: true,
+    duration: 0.45,
+    easeLinearity: 0.25,
+  });
+}
+
+function createFieldsOfConflictVenueLocationRecenterControl(Leaflet) {
+  const control = Leaflet.control({ position: "topleft" });
+  control.onAdd = () => {
+    const wrapper = Leaflet.DomUtil.create("div", "leaflet-bar fields-of-conflict-location__recenter-control");
+    const button = Leaflet.DomUtil.create("button", "fields-of-conflict-location__recenter-button", wrapper);
+    button.type = "button";
+    button.setAttribute("aria-label", "Recenter venue map");
+    button.innerHTML = '<span class="fields-of-conflict-location__recenter-icon" aria-hidden="true"></span>';
+    Leaflet.DomEvent.disableClickPropagation(wrapper);
+    Leaflet.DomEvent.disableScrollPropagation(wrapper);
+    Leaflet.DomEvent.on(button, "click", (event) => {
+      Leaflet.DomEvent.preventDefault(event);
+      recenterFieldsOfConflictVenueLocationMap();
+    });
+    return wrapper;
+  };
+  return control;
+}
+
 function syncFieldsOfConflictVenueLocationMap(venue, config) {
   const mapElement = getFieldsOfConflictVenueLocationMapContainer();
   const coordinates = getFieldsOfConflictVenueLocationMapCoordinates(venue, config);
@@ -7058,6 +7118,8 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
     return false;
   }
 
+  syncFieldsOfConflictVenueLocationHomeView(coordinates);
+
   if (fieldsOfConflictVenueLocationMap && fieldsOfConflictVenueLocationMapElement !== mapElement) {
     destroyFieldsOfConflictVenueLocationMap();
   }
@@ -7065,6 +7127,7 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
   if (!fieldsOfConflictVenueLocationMap) {
     fieldsOfConflictVenueLocationMap = Leaflet.map(mapElement);
     syncFieldsOfConflictVenueLocationMapPanes(fieldsOfConflictVenueLocationMap);
+    fieldsOfConflictVenueLocationRecenterControl = createFieldsOfConflictVenueLocationRecenterControl(Leaflet).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
       attribution: 'Tiles &copy; Esri - Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
