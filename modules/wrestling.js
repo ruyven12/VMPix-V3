@@ -6806,6 +6806,7 @@ const FIELDS_OF_CONFLICT_DETAIL_MAP_ZOOM = 15;
 const FIELDS_OF_CONFLICT_COORDINATE_DEGREE = String.fromCharCode(176);
 let fieldsOfConflictVenueLocationMap = null;
 let fieldsOfConflictVenueLocationMarker = null;
+let fieldsOfConflictVenueLocationGeohashBoundary = null;
 let fieldsOfConflictVenueLocationMapElement = null;
 // TODO: Replace temporary Fields of Conflict venue coordinates with backend-provided venue coordinates when available.
 const FIELDS_OF_CONFLICT_VENUE_CONFIG = [
@@ -6930,6 +6931,49 @@ function getFieldsOfConflictVenueLocationMapCoordinates(venue, config) {
   return Number.isFinite(latitude) && Number.isFinite(longitude) ? [latitude, longitude] : null;
 }
 
+function getFieldsOfConflictVenueLocationGeohash(venue) {
+  const geo = getWrestlingVenueGeo(venue);
+  return getWrestlingText(geo?.geohash || venue?.geohash || venue?.backend_record?.geohash);
+}
+
+function decodeFieldsOfConflictGeohashBounds(geohash) {
+  const hash = String(geohash || "").trim().toLowerCase();
+  const alphabet = "0123456789bcdefghjkmnpqrstuvwxyz";
+  if (!hash || /[^0123456789bcdefghjkmnpqrstuvwxyz]/.test(hash)) {
+    return null;
+  }
+
+  const latitudeRange = [-90, 90];
+  const longitudeRange = [-180, 180];
+  let isEvenBit = true;
+  for (const character of hash) {
+    let characterBits = alphabet.indexOf(character);
+    if (characterBits < 0) {
+      return null;
+    }
+
+    for (let mask = 16; mask > 0; mask >>= 1) {
+      const range = isEvenBit ? longitudeRange : latitudeRange;
+      const midpoint = (range[0] + range[1]) / 2;
+      if (characterBits & mask) {
+        range[0] = midpoint;
+      } else {
+        range[1] = midpoint;
+      }
+      isEvenBit = !isEvenBit;
+    }
+  }
+
+  return [
+    [latitudeRange[0], longitudeRange[0]],
+    [latitudeRange[1], longitudeRange[1]],
+  ];
+}
+
+function getFieldsOfConflictVenueLocationGeohashBounds(venue) {
+  return decodeFieldsOfConflictGeohashBounds(getFieldsOfConflictVenueLocationGeohash(venue));
+}
+
 function getFieldsOfConflictVenueLocationMapContainer() {
   return document.querySelector("[data-fields-of-conflict-location-map]");
 }
@@ -6951,6 +6995,7 @@ function destroyFieldsOfConflictVenueLocationMap() {
   }
   fieldsOfConflictVenueLocationMap = null;
   fieldsOfConflictVenueLocationMarker = null;
+  fieldsOfConflictVenueLocationGeohashBoundary = null;
   fieldsOfConflictVenueLocationMapElement = null;
 }
 
@@ -6961,6 +7006,48 @@ function createFieldsOfConflictVenueLocationMarkerIcon(Leaflet) {
     iconSize: [28, 28],
     iconAnchor: [14, 14],
   });
+}
+
+function syncFieldsOfConflictVenueLocationMapPanes(map) {
+  const boundaryPane = map.getPane("fields-of-conflict-geohash-boundary") || map.createPane("fields-of-conflict-geohash-boundary");
+  boundaryPane.style.zIndex = "260";
+  boundaryPane.style.pointerEvents = "none";
+
+  const labelsPane = map.getPane("fields-of-conflict-labels") || map.createPane("fields-of-conflict-labels");
+  labelsPane.style.zIndex = "320";
+  labelsPane.style.pointerEvents = "none";
+}
+
+function syncFieldsOfConflictVenueLocationGeohashBoundary(Leaflet, venue) {
+  if (!fieldsOfConflictVenueLocationMap) {
+    return null;
+  }
+
+  const bounds = getFieldsOfConflictVenueLocationGeohashBounds(venue);
+  if (!bounds) {
+    if (fieldsOfConflictVenueLocationGeohashBoundary) {
+      fieldsOfConflictVenueLocationGeohashBoundary.remove();
+      fieldsOfConflictVenueLocationGeohashBoundary = null;
+    }
+    return null;
+  }
+
+  const rectangleOptions = {
+    pane: "fields-of-conflict-geohash-boundary",
+    color: "#ff4a2f",
+    weight: 1.5,
+    opacity: 0.88,
+    fillColor: "#ff2a1a",
+    fillOpacity: 0.08,
+    interactive: false,
+  };
+  if (!fieldsOfConflictVenueLocationGeohashBoundary) {
+    fieldsOfConflictVenueLocationGeohashBoundary = Leaflet.rectangle(bounds, rectangleOptions).addTo(fieldsOfConflictVenueLocationMap);
+  } else {
+    fieldsOfConflictVenueLocationGeohashBoundary.setBounds(bounds);
+    fieldsOfConflictVenueLocationGeohashBoundary.setStyle(rectangleOptions);
+  }
+  return bounds;
 }
 
 function syncFieldsOfConflictVenueLocationMap(venue, config) {
@@ -6977,18 +7064,22 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
 
   if (!fieldsOfConflictVenueLocationMap) {
     fieldsOfConflictVenueLocationMap = Leaflet.map(mapElement);
+    syncFieldsOfConflictVenueLocationMapPanes(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
       attribution: 'Tiles &copy; Esri - Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community',
     }).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
+      pane: "fields-of-conflict-labels",
       attribution: 'Transportation &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and MapmyIndia',
     }).addTo(fieldsOfConflictVenueLocationMap);
     Leaflet.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 19,
+      pane: "fields-of-conflict-labels",
       attribution: 'Reference &copy; Esri, Garmin, HERE, <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, and the GIS User Community',
     }).addTo(fieldsOfConflictVenueLocationMap);
+    syncFieldsOfConflictVenueLocationGeohashBoundary(Leaflet, venue);
     fieldsOfConflictVenueLocationMarker = Leaflet.marker(coordinates, {
       icon: createFieldsOfConflictVenueLocationMarkerIcon(Leaflet),
       interactive: false,
@@ -6996,6 +7087,7 @@ function syncFieldsOfConflictVenueLocationMap(venue, config) {
     }).addTo(fieldsOfConflictVenueLocationMap);
     fieldsOfConflictVenueLocationMapElement = mapElement;
   } else {
+    syncFieldsOfConflictVenueLocationGeohashBoundary(Leaflet, venue);
     fieldsOfConflictVenueLocationMarker?.setLatLng(coordinates);
   }
 
