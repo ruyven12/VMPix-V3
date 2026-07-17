@@ -8636,9 +8636,10 @@ function setWrestlingVenuesPrototypeActive(isActive) {
 function renderWrestlingVenuesPrototypeShell() {
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
   clearWrestlingVenuesPrototypeSourceShell();
+  setWrestlingVenuesPrototypeActive(true);
   clearFieldsOfConflictDetailPrototypeState();
   closeFieldsOfConflictVenueDossier({ restoreConnection: false });
-  setWrestlingVenuesPrototypeActive(true);
+  updateFieldsOfConflictVenueLock(getFieldsOfConflictActiveVenueId());
 }
 
 function renderWrestlingVenueDetailPrototypeRoute(route = {}) {
