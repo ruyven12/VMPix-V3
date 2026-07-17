@@ -83,7 +83,7 @@ function normalizeWrestlingVenuePublicSlug(venue) {
 
 function getWrestlingVenueRouteUrl(venueId) {
   const fallbackId = wrestlingVenueRows[0]?.venueId || "";
-  const publicVenueSlug = getWrestlingVenuePublicSlug(venueId) || getWrestlingVenuePublicSlug(fallbackId);
+  const publicVenueSlug = normalizeWrestlingVenuePublicSlug(venueId) || normalizeWrestlingVenuePublicSlug(fallbackId);
   return publicVenueSlug
     ? `${routePaths.wrestlingVenues}/${encodeURIComponent(publicVenueSlug)}`
     : routePaths.wrestlingVenues;
@@ -6760,40 +6760,14 @@ function normalizeWrestlingVenuesPrototypePath(value) {
   }
 }
 
-function isWrestlingVenueDetailPrototypePath(value = (typeof window !== "undefined" ? window.location.pathname : "")) {
-  if (!value) {
-    return false;
-  }
-
-  if (typeof getWrestlingVenueDetailPrototypeRouteFromUrl === "function") {
-    try {
-      return Boolean(getWrestlingVenueDetailPrototypeRouteFromUrl(value));
-    } catch (error) {
-      // Fall through to the local path check below.
-    }
-  }
-
-  const detailPath = normalizeWrestlingVenuesPrototypePath(
-    typeof routePaths !== "undefined" && routePaths?.wrestlingVenueDetailPrototype
-      ? routePaths.wrestlingVenueDetailPrototype
-      : "/wrestling/venues/colisee2"
-  );
-  const currentPath = normalizeWrestlingVenuesPrototypePath(value);
-  if (currentPath === detailPath) {
-    return true;
-  }
-
-  const venuePrefix = normalizeWrestlingVenuesPrototypePath(
-    typeof routePaths !== "undefined" && routePaths?.wrestlingVenues ? routePaths.wrestlingVenues : "/wrestling/venues"
-  ) + "/";
-  if (!currentPath.startsWith(venuePrefix)) {
-    return false;
-  }
-  const routePart = currentPath.slice(venuePrefix.length);
-  return Boolean(routePart && !routePart.includes("/") && /2$/i.test(routePart));
+function isWrestlingVenueDetailPrototypePath() {
+  return false;
 }
 
 function isWrestlingVenuesPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
+  if (route?.isUnknown) {
+    return false;
+  }
   if (route?.wrestlingVenueDetailPrototype === "colisee" || route?.name === "wrestling-venue-detail-prototype") {
     return true;
   }
@@ -7192,11 +7166,7 @@ function getFieldsOfConflictRouteVenueId(route = (typeof getRouteFromUrl === "fu
 }
 
 function isWrestlingVenueDetailPrototypeRoute(route = (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null)) {
-  if (route?.name === "wrestling-venue-detail-prototype") {
-    return true;
-  }
-
-  return isWrestlingVenueDetailPrototypePath();
+  return route?.name === "wrestling-venue-detail" || route?.name === "wrestling-venue-detail-prototype";
 }
 
 function findFieldsOfConflictVenueConfig(venueId = FIELDS_OF_CONFLICT_DEFAULT_VENUE_ID) {
@@ -7563,17 +7533,13 @@ function getFieldsOfConflictDossierEventHistoryPhotoText(eventRow) {
 }
 
 function getFieldsOfConflictVenueDetailPrototypeUrl(venue = null) {
-  const route = typeof getRouteFromUrlWithPrototypePrecedence === "function" ? getRouteFromUrlWithPrototypePrecedence() : (typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null);
-  const venueSlug = normalizeWrestlingVenuePublicSlug(venue || getFieldsOfConflictRouteVenueId(route));
-  if (venueSlug) {
-    if (typeof getWrestlingVenueDetailPrototypePath === "function") {
-      return getWrestlingVenueDetailPrototypePath(venueSlug);
-    }
-    return `${routePaths.wrestlingVenues}/${encodeURIComponent(venueSlug)}2`;
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const venueSource = venue || getFieldsOfConflictRouteVenueId(route);
+  if (typeof getWrestlingVenueRouteUrl === "function") {
+    return getWrestlingVenueRouteUrl(venueSource);
   }
-  return typeof routePaths !== "undefined" && routePaths?.wrestlingVenueDetailPrototype
-    ? routePaths.wrestlingVenueDetailPrototype
-    : "/wrestling/venues/colisee2";
+  const venueSlug = normalizeWrestlingVenuePublicSlug(venueSource);
+  return venueSlug ? `${routePaths.wrestlingVenues}/${encodeURIComponent(venueSlug)}` : routePaths.wrestlingVenues;
 }
 
 function getFieldsOfConflictDossierEventHistoryPosterUrl(eventRow) {
@@ -8180,7 +8146,13 @@ function handleFieldsOfConflictDossierTriggerClick(event) {
   }
 
   event.preventDefault();
-  openFieldsOfConflictVenueDossier();
+  const venue = getFieldsOfConflictVenueConfig(getFieldsOfConflictActiveVenueId());
+  if (!venue) {
+    return;
+  }
+  navigateToRoute(getWrestlingVenueRouteUrl(venue), {
+    historyState: { fromWrestlingVenuesIndex: true },
+  });
 }
 
 function bindFieldsOfConflictVenueDossierControls() {
@@ -9051,9 +9023,16 @@ function returnToWrestlingVenuesRoute() {
 }
 
 function renderWrestlingVenueDetailRoute(venueId, options = {}) {
-  if (!wrestlingVenueDetailShell) {
-    return;
-  }
+  const currentRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const route = currentRoute?.name === "wrestling-venue-detail" && normalizeWrestlingVenueId(currentRoute.venueId) === normalizeWrestlingVenueId(venueId)
+    ? currentRoute
+    : {
+      name: "wrestling-venue-detail",
+      venueId,
+      canonicalUrl: typeof getWrestlingVenueRouteUrl === "function" ? getWrestlingVenueRouteUrl(venueId) : "",
+    };
+  renderWrestlingVenueDetailPrototypeRoute(route);
+  return;
 
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
 
