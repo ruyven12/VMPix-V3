@@ -7225,6 +7225,11 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
     text: "Coming Soon \u2014 Need To Write",
   }),
   Object.freeze({
+    id: "events",
+    title: "EVENTS HELD / TIMELINE",
+    text: "Coming Soon - Event History",
+  }),
+  Object.freeze({
     id: "contributors",
     title: "CONTRIBUTORS",
     text: "Coming Soon \u2014 Need To Implement",
@@ -7274,6 +7279,11 @@ const FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS = Object.freeze([
     id: "about",
     label: "About the Venue",
     selector: "[data-fields-of-conflict-dossier-section=\"about\"]",
+  }),
+  Object.freeze({
+    id: "events",
+    label: "Events Held / Timeline",
+    selector: "[data-fields-of-conflict-dossier-section=\"events\"]",
   }),
   Object.freeze({
     id: "contributors",
