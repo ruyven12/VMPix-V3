@@ -7230,6 +7230,21 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
     text: "Coming Soon - Event History",
   }),
   Object.freeze({
+    id: "championship-history",
+    title: "CHAMPIONSHIP HISTORY",
+    text: "Coming Soon - Championship History",
+  }),
+  Object.freeze({
+    id: "notable-moments",
+    title: "NOTABLE MOMENTS",
+    text: "Coming Soon - Notable Moments",
+  }),
+  Object.freeze({
+    id: "exterior-gallery",
+    title: "EXTERIOR GALLERY",
+    text: "Coming Soon - Exterior Gallery",
+  }),
+  Object.freeze({
     id: "highlights",
     title: "HIGHLIGHTS",
     text: "Coming Soon - Archive Highlights",
@@ -7289,6 +7304,21 @@ const FIELDS_OF_CONFLICT_DOSSIER_CAROUSEL_SECTIONS = Object.freeze([
     id: "events",
     label: "Events Held / Timeline",
     selector: "[data-fields-of-conflict-dossier-section=\"events\"]",
+  }),
+  Object.freeze({
+    id: "championship-history",
+    label: "Championship History",
+    selector: "[data-fields-of-conflict-dossier-section=\"championship-history\"]",
+  }),
+  Object.freeze({
+    id: "notable-moments",
+    label: "Notable Moments",
+    selector: "[data-fields-of-conflict-dossier-section=\"notable-moments\"]",
+  }),
+  Object.freeze({
+    id: "exterior-gallery",
+    label: "Exterior Gallery",
+    selector: "[data-fields-of-conflict-dossier-section=\"exterior-gallery\"]",
   }),
   Object.freeze({
     id: "highlights",
