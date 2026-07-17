@@ -7489,7 +7489,7 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
   Object.freeze({
     id: "events",
     title: "EVENTS HELD / TIMELINE",
-    text: "Coming Soon - Event History",
+    text: "",
   }),
   Object.freeze({
     id: "championship-history",
@@ -7518,29 +7518,82 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
   }),
 ]);
 
-const FIELDS_OF_CONFLICT_STATIC_EVENT_HISTORY = Object.freeze([
-  Object.freeze({
-    event: "LIMITLESS RUMBLE '26",
-    promotion: "LIMITLESS WRESTLING",
-    date: "JANUARY 16TH, 2026",
-    photos: "0 PHOTOS",
-  }),
-  Object.freeze({
-    event: "VACATIONLAND CUP '25",
-    promotion: "LIMITLESS WRESTLING",
-    date: "AUGUST 9TH, 2025",
-    photos: "0 PHOTOS",
-  }),
-  Object.freeze({
-    event: "VACATIONLAND CUP '24",
-    promotion: "LIMITLESS WRESTLING",
-    date: "AUGUST 17TH, 2024",
-    photos: "0 PHOTOS",
-  }),
-]);
+function getFieldsOfConflictDossierEventHistoryRows(venue) {
+  return venue ? getWrestlingVenueRelatedShowRows(venue) : [];
+}
 
-function createFieldsOfConflictDossierEventHistory() {
+function getFieldsOfConflictDossierEventHistoryPhotoText(eventRow) {
+  const eventPhotoCount = getWrestlingVenueEventPhotoCount(eventRow);
+  return eventPhotoCount !== null ? formatWrestlingCount(eventPhotoCount, "Photos") : "N/A";
+}
+
+function getFieldsOfConflictVenueDetailPrototypeUrl() {
+  return typeof routePaths !== "undefined" && routePaths?.wrestlingVenueDetailPrototype
+    ? routePaths.wrestlingVenueDetailPrototype
+    : "/wrestling/venues/colisee2";
+}
+
+function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
+  const row = document.createElement("article");
+  const eventNameText = getWrestlingVenueEventName(eventRow);
+  const showRouteCode = getWrestlingShowRouteCode(eventRow);
+  const showRoute = showRouteCode ? getWrestlingShowRouteUrl(eventRow) : "";
+  row.className = "fields-of-conflict-event-history__row";
+  row.setAttribute("role", "listitem");
+  row.dataset.wrestlingShowId = eventRow.showId || eventRow.eventId || eventRow.show_id || "";
+  row.dataset.wrestlingShowRoute = showRoute;
+  setWrestlingRelationshipDataset(row, eventRow);
+
+  const eventSummary = document.createElement("div");
+  eventSummary.className = "fields-of-conflict-event-history__summary";
+
+  const eventName = document.createElement("h5");
+  eventName.className = "fields-of-conflict-event-history__event";
+  eventName.textContent = eventNameText;
+
+  const promotion = document.createElement("p");
+  promotion.className = "fields-of-conflict-event-history__promotion";
+  promotion.textContent = getWrestlingVenueEventPromotion(eventRow);
+  eventSummary.append(eventName, promotion);
+
+  const date = document.createElement("p");
+  date.className = "fields-of-conflict-event-history__date";
+  date.textContent = getWrestlingVenueEventDate(eventRow);
+
+  const photos = document.createElement("p");
+  photos.className = "fields-of-conflict-event-history__photos";
+  photos.textContent = getFieldsOfConflictDossierEventHistoryPhotoText(eventRow);
+
+  const action = document.createElement("button");
+  action.type = "button";
+  action.className = "fields-of-conflict-event-history__action";
+  action.textContent = "OPEN EVENT";
+  action.setAttribute("aria-label", `Open event ${eventNameText}`);
+  action.dataset.wrestlingShowId = row.dataset.wrestlingShowId;
+  action.dataset.wrestlingShowRoute = showRoute;
+  setWrestlingRelationshipDataset(action, eventRow);
+  if (showRoute) {
+    action.addEventListener("click", () => {
+      navigateToRoute(showRoute, {
+        historyState: {
+          fromWrestlingVenueDetail: true,
+          venueUrl: getFieldsOfConflictVenueDetailPrototypeUrl(),
+        },
+      });
+    });
+  } else {
+    action.disabled = true;
+    action.setAttribute("aria-disabled", "true");
+  }
+
+  row.append(eventSummary, date, photos, action);
+  return row;
+}
+
+function createFieldsOfConflictDossierEventHistory(venue) {
   const history = document.createElement("div");
+  const relatedEvents = getFieldsOfConflictDossierEventHistoryRows(venue);
+  const forcedState = getForcedMockState("wrestlingVenues");
   history.className = "fields-of-conflict-event-history";
   history.setAttribute("aria-labelledby", "fields-of-conflict-event-history-title");
 
@@ -7556,46 +7609,41 @@ function createFieldsOfConflictDossierEventHistory() {
   list.className = "fields-of-conflict-event-history__list";
   list.setAttribute("role", "list");
 
-  FIELDS_OF_CONFLICT_STATIC_EVENT_HISTORY.forEach((eventRow) => {
-    const row = document.createElement("article");
-    row.className = "fields-of-conflict-event-history__row";
-    row.setAttribute("role", "listitem");
-
-    const eventSummary = document.createElement("div");
-    eventSummary.className = "fields-of-conflict-event-history__summary";
-
-    const eventName = document.createElement("h5");
-    eventName.className = "fields-of-conflict-event-history__event";
-    eventName.textContent = eventRow.event;
-
-    const promotion = document.createElement("p");
-    promotion.className = "fields-of-conflict-event-history__promotion";
-    promotion.textContent = eventRow.promotion;
-    eventSummary.append(eventName, promotion);
-
-    const date = document.createElement("p");
-    date.className = "fields-of-conflict-event-history__date";
-    date.textContent = eventRow.date;
-
-    const photos = document.createElement("p");
-    photos.className = "fields-of-conflict-event-history__photos";
-    photos.textContent = eventRow.photos;
-
-    const action = document.createElement("button");
-    action.type = "button";
-    action.className = "fields-of-conflict-event-history__action";
-    action.textContent = "OPEN EVENT";
-
-    row.append(eventSummary, date, photos, action);
-    list.append(row);
-  });
+  if (forcedState && forcedState !== "partial") {
+    renderWrestlingV3State(list, forcedState, "wrestlingVenues");
+  } else if (relatedEvents.length > 0) {
+    relatedEvents.forEach((eventRow) => {
+      list.append(createFieldsOfConflictDossierEventHistoryRow(eventRow, venue));
+    });
+    if (forcedState === "partial") {
+      list.append(createMockStateCard("partial", "wrestlingVenues"));
+    }
+  } else if (wrestlingShowsDataState === "loading" || wrestlingShowsDataState === "idle" || wrestlingShowsRequest) {
+    list.append(createWrestlingV3StateCard("loading", "wrestlingVenues", {
+      text: "Loading venue event history.",
+    }));
+  } else if (wrestlingShowsDataState === "error") {
+    list.append(createWrestlingV3StateCard("error", "wrestlingVenues", {
+      text: "Event history could not load from the wrestling show archive.",
+    }));
+  } else {
+    list.append(createWrestlingVenuesEmptyState("No event history indexed for this venue yet."));
+  }
 
   viewport.append(list);
   history.append(title, viewport);
   return history;
 }
 
-function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
+function syncFieldsOfConflictDossierEventHistorySection(section, venue = null) {
+  const frame = section?.querySelector?.(".fields-of-conflict-dossier-section__frame");
+  if (!frame) {
+    return;
+  }
+  frame.replaceChildren(createFieldsOfConflictDossierEventHistory(venue));
+}
+
+function createFieldsOfConflictDossierFrameworkSection(sectionConfig, venue = null) {
   const section = document.createElement("section");
   section.className = `fields-of-conflict-dossier-section fields-of-conflict-dossier-section--${sectionConfig.id}`;
   section.dataset.fieldsOfConflictDossierSection = sectionConfig.id;
@@ -7616,7 +7664,7 @@ function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
     : "fields-of-conflict-dossier-section__frame";
 
   if (sectionConfig.id === "events") {
-    frame.append(createFieldsOfConflictDossierEventHistory());
+    frame.append(createFieldsOfConflictDossierEventHistory(venue));
   } else {
     const placeholder = document.createElement("p");
     placeholder.className = "fields-of-conflict-dossier-section__placeholder";
@@ -7627,7 +7675,6 @@ function createFieldsOfConflictDossierFrameworkSection(sectionConfig) {
   section.append(header, frame);
   return section;
 }
-
 const FIELDS_OF_CONFLICT_DOSSIER_STATIC_SECTION = Object.freeze({
   id: "information",
   label: "Venue Information",
@@ -7917,7 +7964,7 @@ function syncFieldsOfConflictDossierCarousel(dossier) {
   updateFieldsOfConflictDossierCarousel(carousel, previousIndex);
 }
 
-function syncFieldsOfConflictDossierFrameworkSections(dossier) {
+function syncFieldsOfConflictDossierFrameworkSections(dossier, venue = null) {
   const existingSections = Array.from(dossier?.querySelectorAll?.("[data-fields-of-conflict-dossier-section]") || []);
   if (!dossier || !isWrestlingVenueDetailPrototypeRoute()) {
     existingSections.forEach((section) => section.remove());
@@ -7927,7 +7974,10 @@ function syncFieldsOfConflictDossierFrameworkSections(dossier) {
   let anchor = dossier.querySelector("[data-fields-of-conflict-location]") || dossier.querySelector(".fields-of-conflict-dossier__panel");
   FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS.forEach((sectionConfig) => {
     const selector = `[data-fields-of-conflict-dossier-section="${sectionConfig.id}"]`;
-    const section = dossier.querySelector(selector) || createFieldsOfConflictDossierFrameworkSection(sectionConfig);
+    const section = dossier.querySelector(selector) || createFieldsOfConflictDossierFrameworkSection(sectionConfig, venue);
+    if (sectionConfig.id === "events") {
+      syncFieldsOfConflictDossierEventHistorySection(section, venue);
+    }
     if (anchor) {
       if (anchor.nextElementSibling !== section) {
         anchor.insertAdjacentElement("afterend", section);
@@ -7988,7 +8038,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     facts.replaceChildren(...getFieldsOfConflictDossierFactRows(venue, config).map(({ label, value, modifier }) => createFieldsOfConflictDossierFact(label, value, modifier)));
   }
   syncFieldsOfConflictVenueLocationSection(dossier);
-  syncFieldsOfConflictDossierFrameworkSections(dossier);
+  syncFieldsOfConflictDossierFrameworkSections(dossier, venue);
   syncFieldsOfConflictDossierCarousel(dossier);
   syncFieldsOfConflictVenueLocationMap(venue, config);
 
