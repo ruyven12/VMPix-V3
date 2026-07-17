@@ -23682,3 +23682,9 @@ button.hall-crusades-archive-crystal:focus-visible {
     overflow-y: hidden;
   }
 }
+
+.site-shell[data-wrestling-venues-prototype="fields-of-conflict"] .wrestling-venues-prototype-shell[data-fields-of-conflict-detail-prototype="colisee"] .fields-of-conflict-dossier-carousel__slide > .fields-of-conflict-location .fields-of-conflict-location__soon {
+  align-self: center;
+  justify-self: center;
+  margin: clamp(0.2rem, 0.45vw, 0.34rem) 0 0;
+}
