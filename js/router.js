@@ -110,6 +110,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
+  if (routePath === "/wrestling/people2") {
+    return { name: "wrestling-people-prototype", canonicalUrl: "/wrestling/people2", wrestlingPeoplePrototype: "hall-of-champions" };
+  }
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };
   }
@@ -355,6 +358,9 @@ function syncRoute(route, options = {}) {
     if (typeof setWrestlingVenuesPrototypeActive === "function") {
       setWrestlingVenuesPrototypeActive(false);
     }
+    if (typeof setWrestlingPeoplePrototypeActive === "function") {
+      setWrestlingPeoplePrototypeActive(false);
+    }
     const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     showBattlegroundGatewayArrivalSurface();
     if (typeof initDaiionArchiveStatsPanel === "function") {
@@ -363,7 +369,18 @@ function syncRoute(route, options = {}) {
     return;
   }
 
+  if (route.name === "wrestling-people-prototype") {
+    showWrestlingPeoplePrototypeRoute(route);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
   if (route.name === "wrestling-people") {
+    if (typeof setWrestlingPeoplePrototypeActive === "function") {
+      setWrestlingPeoplePrototypeActive(false);
+    }
     showWrestlingPeopleIndex();
     return;
   }

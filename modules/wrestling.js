@@ -269,6 +269,7 @@ const wrestlingPeopleSearchInput = document.querySelector("[data-wrestling-peopl
 const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-people-filter='letter']");
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
 const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-people-filter-reset]");
+let wrestlingPeoplePrototypeShell = null;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
 const WRESTLING_SHOWS_SEARCH_DEBOUNCE_MS = 180;
@@ -8545,7 +8546,135 @@ function clearWrestlingVenuesPrototypeSourceShell() {
   }
 }
 
+function getWrestlingPeoplePrototypeShell() {
+  if (wrestlingPeoplePrototypeShell && document.documentElement.contains(wrestlingPeoplePrototypeShell)) {
+    return wrestlingPeoplePrototypeShell;
+  }
+
+  wrestlingPeoplePrototypeShell = document.querySelector("[data-wrestling-people-prototype-shell]");
+  if (wrestlingPeoplePrototypeShell) {
+    return wrestlingPeoplePrototypeShell;
+  }
+
+  const prototypeShell = document.createElement("section");
+  prototypeShell.className = "wrestling-people-prototype-shell";
+  prototypeShell.dataset.wrestlingPeoplePrototypeShell = "hall-of-champions";
+  prototypeShell.setAttribute("aria-label", "Hall of Champions arrival");
+  prototypeShell.setAttribute("aria-hidden", "true");
+  prototypeShell.setAttribute("inert", "");
+  prototypeShell.hidden = true;
+
+  const hud = document.createElement("div");
+  hud.className = "hall-of-champions-arrival";
+
+  const title = document.createElement("h1");
+  title.className = "hall-of-champions-arrival__title";
+  title.textContent = "Hall of Champions";
+
+  const subtitle = document.createElement("p");
+  subtitle.className = "hall-of-champions-arrival__subtitle";
+  subtitle.textContent = "Every competitor preserved within the archive.";
+
+  hud.append(title, subtitle);
+  prototypeShell.append(hud);
+
+  const shellElement = document.querySelector(".site-shell");
+  (shellElement || document.body).appendChild(prototypeShell);
+  wrestlingPeoplePrototypeShell = prototypeShell;
+  return wrestlingPeoplePrototypeShell;
+}
+
+function setWrestlingPeoplePrototypeActive(isActive) {
+  const shellElement = document.querySelector(".site-shell");
+  const prototypeShell = isActive
+    ? getWrestlingPeoplePrototypeShell()
+    : wrestlingPeoplePrototypeShell || document.querySelector("[data-wrestling-people-prototype-shell]");
+
+  if (isActive && typeof setWrestlingVenuesPrototypeActive === "function") {
+    setWrestlingVenuesPrototypeActive(false);
+  }
+
+  if (shellElement) {
+    if (isActive) {
+      shellElement.dataset.wrestlingPeoplePrototype = "hall-of-champions";
+      shellElement.dataset.portfolioGatewayWorld = "battleground";
+      shellElement.dataset.portfolioGatewayRoute = "/wrestling";
+      shellElement.dataset.portfolioGatewayState = "filling-screen";
+      shellElement.dataset.activeWorld = "battleground";
+      shellElement.dataset.shellRoute = "portfolio";
+      shellElement.dataset.shellActiveTarget = "portfolio";
+      shellElement.dataset.shellModule = "shell";
+      shellElement.dataset.portfolioGatewayHandoff = "complete";
+      shellElement.classList.remove("is-module-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-venues-view", "is-ring-archive-view");
+      shellElement.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
+    } else {
+      delete shellElement.dataset.wrestlingPeoplePrototype;
+    }
+  }
+
+  if (prototypeShell) {
+    prototypeShell.hidden = !isActive;
+    prototypeShell.toggleAttribute("inert", !isActive);
+    prototypeShell.setAttribute("aria-hidden", String(!isActive));
+    prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
+  }
+
+  if (!isActive) {
+    return;
+  }
+
+  cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
+
+  if (typeof setWrestlingShowsHidden === "function") {
+    setWrestlingShowsHidden(true);
+  }
+  if (typeof setWrestlingPeopleHidden === "function") {
+    setWrestlingPeopleHidden(true);
+  }
+  if (typeof setWrestlingPersonDetailHidden === "function") {
+    setWrestlingPersonDetailHidden(true);
+  }
+  if (typeof setWrestlingVenuesHidden === "function") {
+    setWrestlingVenuesHidden(true);
+  }
+  if (typeof setWrestlingShowDetailHidden === "function") {
+    setWrestlingShowDetailHidden(true);
+  }
+  if (typeof setWrestlingMatchGalleryHidden === "function") {
+    setWrestlingMatchGalleryHidden(true);
+  }
+  if (typeof setWrestlingLightboxHidden === "function") {
+    setWrestlingLightboxHidden(true);
+  }
+
+  if (typeof currentView !== "undefined" && currentView) {
+    currentView.textContent = "Daiion - Hall of Champions";
+  }
+
+  const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+  if (engineCurrent) {
+    const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
+    const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
+    if (engineCurrentLabel) {
+      engineCurrentLabel.textContent = "Current View:";
+    }
+    engineCurrent.classList.remove("fields-of-conflict-lock-readout");
+    engineCurrent.textContent = "Hall of Champions";
+  }
+
+  if (typeof setDocumentTitle === "function") {
+    setDocumentTitle("Hall of Champions - Voodoo Media V3.0.01");
+  }
+}
+
+function showWrestlingPeoplePrototypeRoute() {
+  setWrestlingPeoplePrototypeActive(true);
+}
 function setWrestlingVenuesPrototypeActive(isActive) {
+  if (isActive && typeof setWrestlingPeoplePrototypeActive === "function") {
+    setWrestlingPeoplePrototypeActive(false);
+  }
+
   const shellElement = document.querySelector(".site-shell");
   if (shellElement) {
     if (isActive) {
