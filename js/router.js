@@ -352,6 +352,9 @@ function syncRoute(route, options = {}) {
     if (route.shouldReplaceUrl && options.shouldCanonicalize !== false && route.canonicalUrl) {
       replaceRouteUrl(route.canonicalUrl);
     }
+    if (typeof setWrestlingVenuesPrototypeActive === "function") {
+      setWrestlingVenuesPrototypeActive(false);
+    }
     const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     showBattlegroundGatewayArrivalSurface();
     if (typeof initDaiionArchiveStatsPanel === "function") {
