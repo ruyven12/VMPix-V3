@@ -11540,12 +11540,18 @@ button.wrestling-event-history-tagged-thumb {
   stroke-linejoin: round;
 }
 
-.hall-of-champions-pedestal__hologram-frame path {
-  fill: url(#hall-champions-stone-side);
-  stroke: url(#hall-champions-metal-edge);
-  fill-opacity: 0.94;
-  stroke-opacity: 0.42;
-  stroke-width: 1.15;
+.hall-of-champions-pedestal__hologram-plane path:first-child {
+  fill: url(#hall-champions-hologram-plane);
+  fill-opacity: 0.74;
+  stroke: url(#hall-champions-channel-dormant);
+  stroke-opacity: 0.34;
+  stroke-width: 0.9;
+}
+
+.hall-of-champions-pedestal__hologram-plane-scan {
+  fill: url(#hall-champions-hologram-scan);
+  fill-opacity: 0.3;
+  stroke: none;
 }
 
 .hall-of-champions-pedestal__upper-console path:first-child {
@@ -11570,6 +11576,31 @@ button.wrestling-event-history-tagged-thumb {
   fill-opacity: 0.9;
   stroke-opacity: 0.34;
   stroke-width: 1;
+}
+.hall-of-champions-pedestal__crystal-shell {
+  fill: url(#hall-champions-crystal-core);
+  fill-opacity: 0.72;
+  stroke: url(#hall-champions-channel-dormant);
+  stroke-opacity: 0.48;
+  stroke-width: 1.05;
+}
+
+.hall-of-champions-pedestal__crystal-core {
+  fill: url(#hall-champions-crystal-inner);
+  fill-opacity: 0.68;
+  stroke: rgba(255, 112, 52, 0.18);
+  stroke-width: 0.7;
+}
+
+.hall-of-champions-pedestal__crystal-facet {
+  fill: url(#hall-champions-crystal-facet);
+  fill-opacity: 0.34;
+  stroke: rgba(255, 149, 72, 0.18);
+  stroke-width: 0.55;
+}
+
+.hall-of-champions-pedestal__crystal-facet--right {
+  fill-opacity: 0.24;
 }
 
 .hall-of-champions-pedestal__body path:first-child {

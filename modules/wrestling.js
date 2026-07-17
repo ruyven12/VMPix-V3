@@ -8597,16 +8597,43 @@ function getWrestlingPeoplePrototypeShell() {
         <stop offset="0.52" stop-color="#15100e" />
         <stop offset="1" stop-color="#070504" />
       </radialGradient>
+      <linearGradient id="hall-champions-hologram-plane" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#e35a32" stop-opacity="0.28" />
+        <stop offset="0.58" stop-color="#9a301e" stop-opacity="0.12" />
+        <stop offset="1" stop-color="#2a0905" stop-opacity="0.05" />
+      </linearGradient>
+      <pattern id="hall-champions-hologram-scan" width="18" height="520" patternUnits="userSpaceOnUse">
+        <rect x="8" y="0" width="0.75" height="520" fill="#ff7a3d" opacity="0.16" />
+      </pattern>
+      <linearGradient id="hall-champions-crystal-core" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ff8a36" stop-opacity="0.74" />
+        <stop offset="0.5" stop-color="#b53a1e" stop-opacity="0.64" />
+        <stop offset="1" stop-color="#3b0d06" stop-opacity="0.86" />
+      </linearGradient>
+      <radialGradient id="hall-champions-crystal-inner" cx="50%" cy="48%" r="58%">
+        <stop offset="0" stop-color="#ff9d42" stop-opacity="0.5" />
+        <stop offset="0.56" stop-color="#842313" stop-opacity="0.28" />
+        <stop offset="1" stop-color="#2a0905" stop-opacity="0.12" />
+      </radialGradient>
+      <linearGradient id="hall-champions-crystal-facet" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffb15c" stop-opacity="0.42" />
+        <stop offset="1" stop-color="#5d160b" stop-opacity="0.18" />
+      </linearGradient>
     </defs>
-    <g class="hall-of-champions-pedestal__hologram-frame">
-      <path d="M252 28 L388 28 L410 112 L374 112 L362 64 L278 64 L266 112 L230 112 Z" />
-      <path d="M214 108 L256 108 L236 220 L192 220 Z" />
-      <path d="M384 108 L426 108 L448 220 L404 220 Z" />
+    <g class="hall-of-champions-pedestal__hologram-plane">
+      <path d="M206 74 L434 74 L386 226 L254 226 Z" />
+      <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M206 74 L434 74 L386 226 L254 226 Z" />
     </g>
     <g class="hall-of-champions-pedestal__upper-console">
       <path d="M184 226 L456 226 L510 292 L130 292 Z" />
       <path d="M226 244 L414 244 L446 282 L194 282 Z" />
       <ellipse cx="320" cy="263" rx="72" ry="18" />
+    </g>
+    <g class="hall-of-champions-pedestal__crystal">
+      <path class="hall-of-champions-pedestal__crystal-shell" d="M320 232 L354 253 L344 281 L320 296 L296 281 L286 253 Z" />
+      <path class="hall-of-champions-pedestal__crystal-core" d="M320 240 L340 256 L333 277 L320 288 L307 277 L300 256 Z" />
+      <path class="hall-of-champions-pedestal__crystal-facet hall-of-champions-pedestal__crystal-facet--left" d="M320 240 L300 256 L307 277 L320 288 Z" />
+      <path class="hall-of-champions-pedestal__crystal-facet hall-of-champions-pedestal__crystal-facet--right" d="M320 240 L340 256 L333 277 L320 288 Z" />
     </g>
     <g class="hall-of-champions-pedestal__body">
       <path d="M232 292 L408 292 L438 418 L202 418 Z" />
