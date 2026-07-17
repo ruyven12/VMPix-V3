@@ -7514,7 +7514,7 @@ const FIELDS_OF_CONFLICT_DOSSIER_FRAMEWORK_SECTIONS = Object.freeze([
   Object.freeze({
     id: "contributors",
     title: "CONTRIBUTORS",
-    text: "Coming Soon \u2014 Need To Implement",
+    text: "Community contributions to a venue will be implemented later on once the site is all set to go, but it is in the works.",
   }),
 ]);
 
