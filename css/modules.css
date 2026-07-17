@@ -11529,7 +11529,7 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 50%;
   inset-block-end: var(--hall-champions-hologram-anchor-bottom, 15rem);
   z-index: 35;
-  inline-size: min(92vw, 46rem);
+  inline-size: 92vw;
   max-inline-size: calc(100vw - 20px);
   block-size: min(calc(var(--hall-champions-hologram-anchor-y, 60vh) - max(10px, env(safe-area-inset-top))), 42rem);
   box-sizing: border-box;
