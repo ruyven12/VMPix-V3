@@ -9071,6 +9071,40 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
     .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base", numeric: true }));
 }
 
+function mergeHallOfChampionsPeopleArchiveRecords(records) {
+  const seenKeys = new Set();
+  hallOfChampionsPeopleArchiveRecords = [
+    ...hallOfChampionsPeopleArchiveRecords,
+    ...(Array.isArray(records) ? records : []),
+  ]
+    .filter((record) => record?.key)
+    .filter((record) => {
+      if (seenKeys.has(record.key)) {
+        return false;
+      }
+      seenKeys.add(record.key);
+      return true;
+    })
+    .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base", numeric: true }));
+  return hallOfChampionsPeopleArchiveRecords;
+}
+
+function syncHallOfChampionsPeopleArchiveDataset(prototypeShell) {
+  if (!prototypeShell) {
+    return;
+  }
+  prototypeShell.dataset.hallOfChampionsPeopleArchiveState = hallOfChampionsPeopleArchiveState;
+  prototypeShell.dataset.hallOfChampionsPeopleArchiveRecords = String(hallOfChampionsPeopleArchiveRecords.length);
+  prototypeShell.dataset.hallOfChampionsPeopleArchivePages = String(hallOfChampionsPeopleArchivePagesRequested);
+  prototypeShell.dataset.hallOfChampionsPeopleArchiveTotal = String(hallOfChampionsPeopleArchiveTotalRecords);
+}
+
+function mergeHallOfChampionsPeopleArchivePayload(prototypeShell, payload) {
+  mergeHallOfChampionsPeopleArchiveRecords(normalizeHallOfChampionsPeopleArchiveRecords(payload));
+  syncHallOfChampionsPeopleArchiveDataset(prototypeShell);
+  renderHallOfChampionsAzResults(prototypeShell);
+}
+
 function fetchHallOfChampionsPeopleArchivePayload(page, signal) {
   return withWrestlingRequestTimeout(fetch(getHallOfChampionsPeopleArchiveApiUrl(page), {
     cache: "no-store",
@@ -9103,7 +9137,19 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   resultsRegion.dataset.hallOfChampionsAzVisibleRecords = String(matches.length);
   resultsRegion.setAttribute("aria-busy", String(hallOfChampionsPeopleArchiveState === "loading"));
 
-  if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
+  if (hallOfChampionsPeopleArchiveState === "loading" && matches.length > 0) {
+    countElement.textContent = "INDEXING RECORDS";
+    const list = document.createElement("ol");
+    list.className = "hall-of-champions-az-workspace__list";
+    list.setAttribute("role", "list");
+    matches.forEach((record) => {
+      const item = document.createElement("li");
+      item.className = "hall-of-champions-az-workspace__item";
+      item.textContent = record.name;
+      list.append(item);
+    });
+    fragment.append(list);
+  } else if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
     countElement.textContent = "INDEXING RECORDS";
     const message = document.createElement("p");
     const primaryMessage = document.createElement("span");
@@ -9233,28 +9279,35 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
   setHallOfChampionsPeopleArchiveState(prototypeShell, "loading", { error: null, totalRecords: 0 });
 
   hallOfChampionsPeopleArchiveRequest = (async () => {
+    let hasArchiveFailure = false;
     try {
-      const payloads = [];
       const firstPayload = await fetchHallOfChampionsPeopleArchivePayload(1, controller?.signal);
-      payloads.push(firstPayload);
       hallOfChampionsPeopleArchivePagesRequested = 1;
       const totalPages = getHallOfChampionsPeopleArchiveTotalPages(firstPayload);
       hallOfChampionsPeopleArchiveTotalRecords = getHallOfChampionsPeopleArchiveTotalRecords(firstPayload);
+      mergeHallOfChampionsPeopleArchivePayload(prototypeShell, firstPayload);
 
+      const remainingPageRequests = [];
       for (let page = 2; page <= totalPages; page += 1) {
-        const payload = await fetchHallOfChampionsPeopleArchivePayload(page, controller?.signal);
-        payloads.push(payload);
-        hallOfChampionsPeopleArchivePagesRequested = page;
+        remainingPageRequests.push(fetchHallOfChampionsPeopleArchivePayload(page, controller?.signal).then((payload) => {
+          if (hasArchiveFailure) {
+            return payload;
+          }
+          hallOfChampionsPeopleArchivePagesRequested += 1;
+          mergeHallOfChampionsPeopleArchivePayload(prototypeShell, payload);
+          return payload;
+        }));
       }
 
-      const records = normalizeHallOfChampionsPeopleArchiveRecords(payloads);
-      setHallOfChampionsPeopleArchiveState(prototypeShell, records.length > 0 ? "live" : "empty", {
-        records,
+      await Promise.all(remainingPageRequests);
+      setHallOfChampionsPeopleArchiveState(prototypeShell, hallOfChampionsPeopleArchiveRecords.length > 0 ? "live" : "empty", {
+        records: hallOfChampionsPeopleArchiveRecords,
         error: null,
-        totalRecords: hallOfChampionsPeopleArchiveTotalRecords || records.length,
+        totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
-      return records;
+      return hallOfChampionsPeopleArchiveRecords;
     } catch (error) {
+      hasArchiveFailure = true;
       if (!controller?.signal?.aborted) {
         setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
       }
