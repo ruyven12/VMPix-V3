@@ -9138,7 +9138,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   resultsRegion.setAttribute("aria-busy", String(hallOfChampionsPeopleArchiveState === "loading"));
 
   if (hallOfChampionsPeopleArchiveState === "loading" && matches.length > 0) {
-    countElement.textContent = "INDEXING RECORDS";
+    countElement.textContent = `CURRENT INITIAL // ${selectedLetter}          INDEXING RECORDS`;
     const list = document.createElement("ol");
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
@@ -9150,7 +9150,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     });
     fragment.append(list);
   } else if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
-    countElement.textContent = "INDEXING RECORDS";
+    countElement.textContent = `CURRENT INITIAL // ${selectedLetter}          INDEXING RECORDS`;
     const message = document.createElement("p");
     const primaryMessage = document.createElement("span");
     message.className = "hall-of-champions-az-workspace__message";
@@ -9168,7 +9168,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     }
     fragment.append(message);
   } else if (hallOfChampionsPeopleArchiveState === "error") {
-    countElement.textContent = "ARCHIVE LINK UNAVAILABLE";
+    countElement.textContent = `CURRENT INITIAL // ${selectedLetter}          ARCHIVE LINK UNAVAILABLE`;
     const errorPanel = document.createElement("div");
     errorPanel.className = "hall-of-champions-az-workspace__error";
     errorPanel.setAttribute("role", "status");
@@ -9183,14 +9183,14 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     errorPanel.append(message, retryButton);
     fragment.append(errorPanel);
   } else if (matches.length === 0) {
-    countElement.textContent = "0 ARCHIVE RECORDS";
+    countElement.textContent = `CURRENT INITIAL // ${selectedLetter}          0 RECORDS`;
     const message = document.createElement("p");
     message.className = "hall-of-champions-az-workspace__message";
     message.setAttribute("role", "status");
     message.textContent = `NO RECORDS FOUND FOR // ${selectedLetter}`;
     fragment.append(message);
   } else {
-    countElement.textContent = `${matches.length} ARCHIVE ${matches.length === 1 ? "RECORD" : "RECORDS"}`;
+    countElement.textContent = `CURRENT INITIAL // ${selectedLetter}          ${matches.length} ${matches.length === 1 ? "RECORD" : "RECORDS"}`;
     const list = document.createElement("ol");
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
