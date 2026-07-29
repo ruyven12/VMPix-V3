@@ -8731,6 +8731,16 @@ function getWrestlingPeoplePrototypeShell() {
       </div>
       <p class="hall-of-champions-category-workspace__status">SELECT CLASSIFICATION</p>
     </section>
+    <section class="hall-of-champions-team-workspace" data-hall-of-champions-team-workspace aria-label="Hall of Champions team directory workspace" aria-hidden="true" hidden>
+      <div class="hall-of-champions-team-workspace__header">
+        <span class="hall-of-champions-team-workspace__system">HALL OF CHAMPIONS</span>
+        <h2 class="hall-of-champions-team-workspace__title">TEAM DIRECTORY</h2>
+      </div>
+      <div class="hall-of-champions-team-workspace__shell" role="group" aria-label="Dormant team archive directory shell">
+        <span class="hall-of-champions-team-workspace__shell-label" aria-hidden="true">TEAM ARCHIVE</span>
+      </div>
+      <p class="hall-of-champions-team-workspace__status">SELECT AFFILIATION</p>
+    </section>
   `;
 
   const modeSelector = document.createElement("div");
@@ -8902,8 +8912,9 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   const searchWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-search-workspace]");
   const azWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-az-workspace]");
   const categoryWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-category-workspace]");
+  const teamWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-team-workspace]");
   const expandedHologram = prototypeShell?.querySelector("[data-hall-of-champions-expanded-hologram]");
-  if (!modeSelector || (!searchWorkspace && !azWorkspace && !categoryWorkspace)) {
+  if (!modeSelector || (!searchWorkspace && !azWorkspace && !categoryWorkspace && !teamWorkspace)) {
     return;
   }
 
@@ -8921,6 +8932,7 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   setWorkspaceVisibility(searchWorkspace, isReady && activeModeIndex === 0);
   setWorkspaceVisibility(azWorkspace, isReady && activeModeIndex === 1);
   setWorkspaceVisibility(categoryWorkspace, isReady && activeModeIndex === 2);
+  setWorkspaceVisibility(teamWorkspace, isReady && activeModeIndex === 3);
   if (expandedHologram) {
     expandedHologram.setAttribute("aria-hidden", String(!isExpanded));
   }
