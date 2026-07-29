@@ -282,7 +282,10 @@ const HALL_OF_CHAMPIONS_CRYSTAL_ARCHIVE_TRANSITION_MS = 300;
 const HALL_OF_CHAMPIONS_AZ_LETTER_TRANSITION_MS = 210;
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_LIMIT = 500;
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CONNECTION_DELAY_MS = 1400;
-const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_TIMEOUT_MS = 10000;
+const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_TIMEOUT_MS = 20000;
+const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_KEY = "vmpix:wrestling:people:hall-of-champions:v1";
+const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_VERSION = 1;
+const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 30;
 const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A\u2013Z", "CATEGORY", "TEAM"]);
 const HALL_OF_CHAMPIONS_AZ_LETTERS = Object.freeze("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
 let hallOfChampionsActivationTimer = 0;
@@ -303,6 +306,7 @@ let hallOfChampionsPeopleArchivePagesRequested = 0;
 let hallOfChampionsPeopleArchiveTotalRecords = 0;
 let hallOfChampionsPeopleArchiveConnectionTimer = 0;
 let hallOfChampionsPeopleArchiveShowConnectionStatus = false;
+let hallOfChampionsPeopleArchiveCacheHydrated = false;
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -9220,9 +9224,10 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
 
 function mergeHallOfChampionsPeopleArchiveRecords(records) {
   const seenKeys = new Set();
+  const nextRecords = Array.isArray(records) ? records : [];
   hallOfChampionsPeopleArchiveRecords = [
+    ...nextRecords,
     ...hallOfChampionsPeopleArchiveRecords,
-    ...(Array.isArray(records) ? records : []),
   ]
     .filter((record) => record?.key)
     .filter((record) => {
@@ -9236,6 +9241,134 @@ function mergeHallOfChampionsPeopleArchiveRecords(records) {
   return hallOfChampionsPeopleArchiveRecords;
 }
 
+function getHallOfChampionsPeopleArchiveCacheStorage() {
+  try {
+    return typeof window !== "undefined" && window.localStorage ? window.localStorage : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function normalizeHallOfChampionsPeopleArchiveCachedRecords(records) {
+  const seenKeys = new Set();
+  return (Array.isArray(records) ? records : [])
+    .map((record) => {
+      try {
+        const displayName = getWrestlingText(record?.name).trim();
+        const archiveInitial = getHallOfChampionsPeopleArchiveInitial(displayName || record?.initial);
+        const recordKey = getWrestlingText(record?.key || record?.slug || record?.id || displayName).trim().toLowerCase();
+        const photoCount = Number.parseInt(getWrestlingText(record?.photoCount).replace(/[^\d]/g, ""), 10);
+        return displayName && archiveInitial && recordKey
+          ? {
+              id: getWrestlingText(record?.id),
+              slug: getWrestlingText(record?.slug),
+              name: displayName,
+              team: getWrestlingText(record?.team).replace(/\s+/g, " ").trim(),
+              category: getWrestlingText(record?.category).replace(/\s+/g, " ").trim(),
+              photoCount: Number.isFinite(photoCount) ? photoCount : null,
+              initial: archiveInitial,
+              key: recordKey,
+            }
+          : null;
+      } catch (error) {
+        reportHallOfChampionsPeopleArchiveRecordIssue("cache skipped record", error, record);
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .filter((record) => {
+      if (seenKeys.has(record.key)) {
+        return false;
+      }
+      seenKeys.add(record.key);
+      return true;
+    })
+    .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base", numeric: true }));
+}
+
+function readHallOfChampionsPeopleArchiveCache() {
+  const storage = getHallOfChampionsPeopleArchiveCacheStorage();
+  if (!storage) {
+    return null;
+  }
+
+  try {
+    const cachedPayload = JSON.parse(storage.getItem(HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_KEY) || "null");
+    if (!cachedPayload || cachedPayload.version !== HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_VERSION) {
+      return null;
+    }
+
+    const cachedAt = Number.parseInt(cachedPayload.cachedAt, 10);
+    if (Number.isFinite(cachedAt) && Date.now() - cachedAt > HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_MAX_AGE_MS) {
+      return null;
+    }
+
+    const records = normalizeHallOfChampionsPeopleArchiveCachedRecords(cachedPayload.records);
+    return records.length > 0
+      ? {
+          records,
+          totalRecords: Number.parseInt(cachedPayload.totalRecords, 10) || records.length,
+          pagesRequested: Number.parseInt(cachedPayload.pagesRequested, 10) || 0,
+        }
+      : null;
+  } catch (error) {
+    try {
+      storage.removeItem(HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_KEY);
+    } catch (removeError) {
+      // Storage may be unavailable; the live request path still works without cache.
+    }
+    reportHallOfChampionsPeopleArchiveRecordIssue("cache unavailable", error, null);
+    return null;
+  }
+}
+
+function writeHallOfChampionsPeopleArchiveCache() {
+  const storage = getHallOfChampionsPeopleArchiveCacheStorage();
+  if (!storage || hallOfChampionsPeopleArchiveRecords.length === 0) {
+    return;
+  }
+
+  try {
+    storage.setItem(HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_KEY, JSON.stringify({
+      version: HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_VERSION,
+      cachedAt: Date.now(),
+      totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
+      pagesRequested: hallOfChampionsPeopleArchivePagesRequested,
+      records: hallOfChampionsPeopleArchiveRecords.map((record) => ({
+        id: record.id,
+        slug: record.slug,
+        name: record.name,
+        team: record.team,
+        category: record.category,
+        photoCount: record.photoCount,
+        initial: record.initial,
+        key: record.key,
+      })),
+    }));
+  } catch (error) {
+    reportHallOfChampionsPeopleArchiveRecordIssue("cache write unavailable", error, null);
+  }
+}
+
+function hydrateHallOfChampionsPeopleArchiveCache(prototypeShell) {
+  if (hallOfChampionsPeopleArchiveCacheHydrated || hallOfChampionsPeopleArchiveRecords.length > 0) {
+    return false;
+  }
+
+  const cachedArchive = readHallOfChampionsPeopleArchiveCache();
+  hallOfChampionsPeopleArchiveCacheHydrated = true;
+  if (!cachedArchive) {
+    return false;
+  }
+
+  hallOfChampionsPeopleArchivePagesRequested = cachedArchive.pagesRequested;
+  setHallOfChampionsPeopleArchiveState(prototypeShell, "live", {
+    records: cachedArchive.records,
+    error: null,
+    totalRecords: cachedArchive.totalRecords,
+  });
+  return true;
+}
 function syncHallOfChampionsPeopleArchiveDataset(prototypeShell) {
   if (!prototypeShell) {
     return;
@@ -9457,7 +9590,8 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
   if (!prototypeShell) {
     return Promise.resolve([]);
   }
-  if (!options.force && (hallOfChampionsPeopleArchiveState === "live" || hallOfChampionsPeopleArchiveState === "empty")) {
+  const restoredCachedArchive = hydrateHallOfChampionsPeopleArchiveCache(prototypeShell);
+  if (!options.force && !restoredCachedArchive && (hallOfChampionsPeopleArchiveState === "live" || hallOfChampionsPeopleArchiveState === "empty")) {
     renderHallOfChampionsAzResults(prototypeShell);
     return Promise.resolve(hallOfChampionsPeopleArchiveRecords);
   }
@@ -9466,14 +9600,28 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
     return hallOfChampionsPeopleArchiveRequest;
   }
   if (typeof fetch !== "function") {
-    setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error: new Error("Fetch unavailable") });
+    const error = new Error("Fetch unavailable");
+    if (hallOfChampionsPeopleArchiveRecords.length > 0) {
+      reportHallOfChampionsPeopleArchiveRecordIssue("live refresh unavailable; cached archive retained", error, null);
+      setHallOfChampionsPeopleArchiveState(prototypeShell, "live", {
+        records: hallOfChampionsPeopleArchiveRecords,
+        error,
+        totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
+      });
+      return Promise.resolve(hallOfChampionsPeopleArchiveRecords);
+    }
+    setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
     return Promise.resolve([]);
   }
 
   const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const hasCachedArchiveRecords = hallOfChampionsPeopleArchiveRecords.length > 0;
   hallOfChampionsPeopleArchiveRequestController = controller;
   hallOfChampionsPeopleArchivePagesRequested = 0;
-  setHallOfChampionsPeopleArchiveState(prototypeShell, "loading", { error: null, totalRecords: 0 });
+  setHallOfChampionsPeopleArchiveState(prototypeShell, "loading", {
+    error: null,
+    totalRecords: hasCachedArchiveRecords ? hallOfChampionsPeopleArchiveTotalRecords : 0,
+  });
 
   hallOfChampionsPeopleArchiveRequest = (async () => {
     let hasArchiveFailure = false;
@@ -9502,13 +9650,23 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
         error: null,
         totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
+      writeHallOfChampionsPeopleArchiveCache();
       return hallOfChampionsPeopleArchiveRecords;
     } catch (error) {
       hasArchiveFailure = true;
       if (!controller?.signal?.aborted) {
-        setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
+        if (hallOfChampionsPeopleArchiveRecords.length > 0) {
+          reportHallOfChampionsPeopleArchiveRecordIssue("live refresh unavailable; cached archive retained", error, null);
+          setHallOfChampionsPeopleArchiveState(prototypeShell, "live", {
+            records: hallOfChampionsPeopleArchiveRecords,
+            error,
+            totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
+          });
+        } else {
+          setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
+        }
       }
-      return [];
+      return hallOfChampionsPeopleArchiveRecords;
     } finally {
       hallOfChampionsPeopleArchiveRequest = null;
       hallOfChampionsPeopleArchiveRequestController = null;
