@@ -8684,6 +8684,41 @@ function getWrestlingPeoplePrototypeShell() {
       </div>
       <p class="hall-of-champions-search-workspace__status">AWAITING QUERY</p>
     </section>
+    <section class="hall-of-champions-az-workspace" data-hall-of-champions-az-workspace aria-label="Hall of Champions alphabetical index workspace" aria-hidden="true" hidden>
+      <div class="hall-of-champions-az-workspace__header">
+        <span class="hall-of-champions-az-workspace__system">HALL OF CHAMPIONS</span>
+        <h2 class="hall-of-champions-az-workspace__title">ALPHABETICAL INDEX</h2>
+      </div>
+      <div class="hall-of-champions-az-workspace__alphabet" role="group" aria-label="Dormant alphabetical index A through Z">
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">A</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">B</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">C</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">D</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">E</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">F</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">G</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">H</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">I</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">J</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">K</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">L</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">M</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">N</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">O</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">P</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Q</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">R</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">S</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">T</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">U</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">V</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">W</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">X</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Y</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Z</span>
+      </div>
+      <p class="hall-of-champions-az-workspace__status">SELECT INITIAL</p>
+    </section>
   `;
 
   const modeSelector = document.createElement("div");
@@ -8852,19 +8887,26 @@ function updateHallOfChampionsModeSelectorA11y(modeSelector, modeName) {
 
 function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
-  const workspace = prototypeShell?.querySelector("[data-hall-of-champions-search-workspace]");
+  const searchWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-search-workspace]");
+  const azWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-az-workspace]");
   const expandedHologram = prototypeShell?.querySelector("[data-hall-of-champions-expanded-hologram]");
-  if (!modeSelector || !workspace) {
+  if (!modeSelector || (!searchWorkspace && !azWorkspace)) {
     return;
   }
 
   const isExpanded = prototypeShell.dataset.hallOfChampionsExpanded === "true";
-  const isSearchMode = Number(modeSelector.dataset.hallOfChampionsModeIndex || "0") === 0;
-  const isVisible = isExpanded
-    && prototypeShell.dataset.hallOfChampionsModeSelectorReady === "true"
-    && isSearchMode;
-  workspace.hidden = !isVisible;
-  workspace.setAttribute("aria-hidden", String(!isVisible));
+  const isReady = isExpanded && prototypeShell.dataset.hallOfChampionsModeSelectorReady === "true";
+  const activeModeIndex = Number(modeSelector.dataset.hallOfChampionsModeIndex || "0");
+  const setWorkspaceVisibility = (workspace, isVisible) => {
+    if (!workspace) {
+      return;
+    }
+    workspace.hidden = !isVisible;
+    workspace.setAttribute("aria-hidden", String(!isVisible));
+  };
+
+  setWorkspaceVisibility(searchWorkspace, isReady && activeModeIndex === 0);
+  setWorkspaceVisibility(azWorkspace, isReady && activeModeIndex === 1);
   if (expandedHologram) {
     expandedHologram.setAttribute("aria-hidden", String(!isExpanded));
   }
