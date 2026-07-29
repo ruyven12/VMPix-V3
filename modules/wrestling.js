@@ -9042,26 +9042,66 @@ function getHallOfChampionsPeopleArchiveKey(record, displayName) {
   return getWrestlingText(record?.slug || record?.id || displayName).trim().toLowerCase();
 }
 
-function getHallOfChampionsPeopleArchiveDisplayValue(value) {
-  if (Array.isArray(value)) {
-    return value
-      .map(getHallOfChampionsPeopleArchiveDisplayValue)
-      .filter(Boolean)
-      .join(", ");
+function reportHallOfChampionsPeopleArchiveRecordIssue(stage, error, record) {
+  if (typeof console === "undefined" || typeof console.warn !== "function") {
+    return;
   }
+  console.warn(`Hall of Champions people archive ${stage}`, {
+    error,
+    record,
+  });
+}
 
-  if (value && typeof value === "object") {
-    return getHallOfChampionsPeopleArchiveDisplayValue(value.name || value.displayName || value.title || value.label);
+function getHallOfChampionsPeopleArchiveObjectDisplayValue(value, seen) {
+  const fields = ["name", "displayName", "display_name", "title", "label", "value"];
+  for (const field of fields) {
+    try {
+      const fieldValue = value?.[field];
+      if (fieldValue !== undefined && fieldValue !== null) {
+        const displayValue = getHallOfChampionsPeopleArchiveDisplayValue(fieldValue, seen);
+        if (displayValue) {
+          return displayValue;
+        }
+      }
+    } catch (error) {
+      return "";
+    }
   }
+  return "";
+}
 
-  return getWrestlingText(value).replace(/\s+/g, " ").trim();
+function getHallOfChampionsPeopleArchiveDisplayValue(value, seen = new Set()) {
+  try {
+    if (Array.isArray(value)) {
+      return value
+        .map((entry) => getHallOfChampionsPeopleArchiveDisplayValue(entry, seen))
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    if (value && typeof value === "object") {
+      if (seen.has(value)) {
+        return "";
+      }
+      seen.add(value);
+      return getHallOfChampionsPeopleArchiveObjectDisplayValue(value, seen);
+    }
+
+    return getWrestlingText(value).replace(/\s+/g, " ").trim();
+  } catch (error) {
+    return "";
+  }
 }
 
 function getHallOfChampionsPeopleArchiveField(record, fields) {
   for (const field of fields) {
-    const value = getHallOfChampionsPeopleArchiveDisplayValue(record?.[field]);
-    if (value) {
-      return value;
+    try {
+      const value = getHallOfChampionsPeopleArchiveDisplayValue(record?.[field]);
+      if (value) {
+        return value;
+      }
+    } catch (error) {
+      reportHallOfChampionsPeopleArchiveRecordIssue(`field ${field} unavailable`, error, record);
     }
   }
   return "";
@@ -9104,26 +9144,34 @@ function getHallOfChampionsPeopleArchiveCategory(record) {
 }
 
 function getHallOfChampionsPeopleArchivePhotoCount(record) {
-  const candidates = [
-    record?.photoCount,
-    record?.photo_count,
-    record?.photosCount,
-    record?.photos_count,
-    record?.totalPhotos,
-    record?.total_photos,
-    record?.imageCount,
-    record?.image_count,
-    record?.mediaCount,
-    record?.media_count,
-    record?.photos,
+  const fields = [
+    "photoCount",
+    "photo_count",
+    "photosCount",
+    "photos_count",
+    "totalPhotos",
+    "total_photos",
+    "imageCount",
+    "image_count",
+    "mediaCount",
+    "media_count",
+    "photos",
   ];
 
-  for (const candidate of candidates) {
+  for (const field of fields) {
+    let candidate;
+    try {
+      candidate = record?.[field];
+    } catch (error) {
+      reportHallOfChampionsPeopleArchiveRecordIssue(`photo count field ${field} unavailable`, error, record);
+      continue;
+    }
+
     if (Array.isArray(candidate)) {
       return candidate.length;
     }
 
-    const photoCount = Number.parseInt(getWrestlingText(candidate).replace(/[^\d]/g, ""), 10);
+    const photoCount = Number.parseInt(getHallOfChampionsPeopleArchiveDisplayValue(candidate).replace(/[^\d]/g, ""), 10);
     if (Number.isFinite(photoCount) && photoCount >= 0) {
       return photoCount;
     }
@@ -9136,23 +9184,28 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
   return (Array.isArray(payloads) ? payloads : [payloads])
     .flatMap(getHallOfChampionsPeopleArchiveRows)
     .map((record) => {
-      const displayName = getHallOfChampionsPeopleArchiveDisplayName(record);
-      const archiveInitial = getHallOfChampionsPeopleArchiveInitial(displayName);
-      const recordKey = getHallOfChampionsPeopleArchiveKey(record, displayName);
-      const photoCount = getHallOfChampionsPeopleArchivePhotoCount(record);
+      try {
+        const displayName = getHallOfChampionsPeopleArchiveDisplayName(record);
+        const archiveInitial = getHallOfChampionsPeopleArchiveInitial(displayName);
+        const recordKey = getHallOfChampionsPeopleArchiveKey(record, displayName);
+        const photoCount = getHallOfChampionsPeopleArchivePhotoCount(record);
 
-      return displayName && archiveInitial && recordKey
-        ? {
-            id: getWrestlingText(record?.id),
-            slug: getWrestlingText(record?.slug),
-            name: displayName,
-            team: getHallOfChampionsPeopleArchiveTeam(record),
-            category: getHallOfChampionsPeopleArchiveCategory(record),
-            photoCount: Number.isFinite(photoCount) ? photoCount : null,
-            initial: archiveInitial,
-            key: recordKey,
-          }
-        : null;
+        return displayName && archiveInitial && recordKey
+          ? {
+              id: getHallOfChampionsPeopleArchiveField(record, ["id"]),
+              slug: getHallOfChampionsPeopleArchiveField(record, ["slug"]),
+              name: displayName,
+              team: getHallOfChampionsPeopleArchiveTeam(record),
+              category: getHallOfChampionsPeopleArchiveCategory(record),
+              photoCount: Number.isFinite(photoCount) ? photoCount : null,
+              initial: archiveInitial,
+              key: recordKey,
+            }
+          : null;
+      } catch (error) {
+        reportHallOfChampionsPeopleArchiveRecordIssue("normalization skipped record", error, record);
+        return null;
+      }
     })
     .filter(Boolean)
     .filter((record) => {
@@ -9227,37 +9280,51 @@ function createHallOfChampionsArchiveRecordItem(record) {
   const category = document.createElement("span");
   const secondary = document.createElement("span");
   const photoCount = document.createElement("span");
+  const archiveName = getWrestlingText(record?.name).trim();
+
+  if (!archiveName) {
+    throw new Error("Archive record is missing a display name");
+  }
 
   item.className = "hall-of-champions-az-workspace__item";
   marker.className = "hall-of-champions-az-workspace__item-indicator";
   marker.setAttribute("aria-hidden", "true");
   primary.className = "hall-of-champions-az-workspace__item-primary";
-  primary.textContent = record.name;
+  primary.textContent = archiveName;
 
   category.className = "hall-of-champions-az-workspace__item-category";
-  category.textContent = record.category;
+  category.textContent = getWrestlingText(record?.category).trim();
 
   secondary.className = "hall-of-champions-az-workspace__item-secondary";
-  secondary.textContent = record.team;
-  if (!record.team) {
+  secondary.textContent = getWrestlingText(record?.team).trim();
+  if (!secondary.textContent) {
     secondary.hidden = true;
     item.classList.add("hall-of-champions-az-workspace__item--no-team");
   }
 
   photoCount.className = "hall-of-champions-az-workspace__item-photo-count";
-  if (Number.isFinite(record.photoCount)) {
+  if (Number.isFinite(record?.photoCount)) {
     photoCount.textContent = `\u{1F4F7} ${formatHallOfChampionsArchiveRecordPhotoCount(record.photoCount)}`;
   } else {
     photoCount.hidden = true;
   }
 
-  if (!record.category) {
+  if (!category.textContent) {
     category.hidden = true;
   }
 
   item.append(marker, primary, category, secondary, photoCount);
   return item;
 }
+
+function appendHallOfChampionsArchiveRecordItem(list, record) {
+  try {
+    list.append(createHallOfChampionsArchiveRecordItem(record));
+  } catch (error) {
+    reportHallOfChampionsPeopleArchiveRecordIssue("render skipped record", error, record);
+  }
+}
+
 function renderHallOfChampionsAzResults(prototypeShell) {
   const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-az-results]");
   const countElement = prototypeShell?.querySelector("[data-hall-of-champions-az-result-count]");
@@ -9279,7 +9346,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
     matches.forEach((record) => {
-      list.append(createHallOfChampionsArchiveRecordItem(record));
+      appendHallOfChampionsArchiveRecordItem(list, record);
     });
     fragment.append(list);
   } else if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
@@ -9328,7 +9395,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
     matches.forEach((record) => {
-      list.append(createHallOfChampionsArchiveRecordItem(record));
+      appendHallOfChampionsArchiveRecordItem(list, record);
     });
     fragment.append(list);
   }
