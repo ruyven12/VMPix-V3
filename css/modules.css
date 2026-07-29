@@ -12973,6 +12973,12 @@ button.wrestling-event-history-tagged-thumb {
     max-block-size: 40svh;
   }
 
+  .hall-of-champions-expanded-hologram {
+    inline-size: calc(100vw - 20px);
+    max-inline-size: calc(100vw - 20px);
+    block-size: calc(var(--hall-champions-hologram-anchor-y, 60vh) - max(10px, env(safe-area-inset-top)));
+  }
+
   .hall-of-champions-search-workspace,
   .hall-of-champions-az-workspace,
   .hall-of-champions-category-workspace,
