@@ -278,6 +278,7 @@ const HALL_OF_CHAMPIONS_CRYSTAL_RISE_DURATION_MS = 560;
 const HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS = 2160;
 const HALL_OF_CHAMPIONS_EXPANDED_HOLOGRAM_TRANSITION_MS = 780;
 const HALL_OF_CHAMPIONS_MODE_TRANSITION_MS = 220;
+const HALL_OF_CHAMPIONS_CRYSTAL_ARCHIVE_TRANSITION_MS = 300;
 const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A\u2013Z", "CATEGORY", "TEAM"]);
 let hallOfChampionsActivationTimer = 0;
 let hallOfChampionsCrystalRiseTimer = 0;
@@ -285,6 +286,7 @@ let hallOfChampionsActivationSettleTimer = 0;
 let hallOfChampionsCrystalRiseFrame = 0;
 let hallOfChampionsModeSelectorRevealTimer = 0;
 let hallOfChampionsModeTransitionTimer = 0;
+let hallOfChampionsCrystalArchiveTransitionTimer = 0;
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -8812,6 +8814,10 @@ function clearHallOfChampionsActivationTimers() {
     window.clearTimeout(hallOfChampionsModeTransitionTimer);
     hallOfChampionsModeTransitionTimer = 0;
   }
+  if (hallOfChampionsCrystalArchiveTransitionTimer) {
+    window.clearTimeout(hallOfChampionsCrystalArchiveTransitionTimer);
+    hallOfChampionsCrystalArchiveTransitionTimer = 0;
+  }
 }
 
 function setHallOfChampionsCrystalTransform(prototypeShell, yValue) {
@@ -8907,6 +8913,43 @@ function updateHallOfChampionsModeSelectorA11y(modeSelector, modeName) {
   modeSelector.setAttribute("aria-label", `Hall of Champions archive mode selector. Active mode: ${modeName}`);
 }
 
+function setHallOfChampionsCrystalArchiveState(prototypeShell, isArchiveIndexMode) {
+  if (!prototypeShell) {
+    return;
+  }
+  if (isArchiveIndexMode) {
+    prototypeShell.dataset.hallOfChampionsCrystalArchiveState = "az";
+    return;
+  }
+  delete prototypeShell.dataset.hallOfChampionsCrystalArchiveState;
+}
+
+function clearHallOfChampionsCrystalArchiveTransition(prototypeShell) {
+  if (hallOfChampionsCrystalArchiveTransitionTimer) {
+    window.clearTimeout(hallOfChampionsCrystalArchiveTransitionTimer);
+    hallOfChampionsCrystalArchiveTransitionTimer = 0;
+  }
+  if (prototypeShell) {
+    delete prototypeShell.dataset.hallOfChampionsCrystalArchiveTransition;
+  }
+}
+
+function scheduleHallOfChampionsCrystalArchiveTransition(prototypeShell, activeModeIndex) {
+  clearHallOfChampionsCrystalArchiveTransition(prototypeShell);
+  if (!prototypeShell || activeModeIndex !== 1 || prefersHallOfChampionsReducedMotion()) {
+    return;
+  }
+
+  prototypeShell.dataset.hallOfChampionsCrystalArchiveTransition = "az";
+  hallOfChampionsCrystalArchiveTransitionTimer = window.setTimeout(() => {
+    if (prototypeShell.dataset.hallOfChampionsCrystalArchiveTransition === "az") {
+      delete prototypeShell.dataset.hallOfChampionsCrystalArchiveTransition;
+      syncHallOfChampionsSearchWorkspace(prototypeShell);
+    }
+    hallOfChampionsCrystalArchiveTransitionTimer = 0;
+  }, HALL_OF_CHAMPIONS_CRYSTAL_ARCHIVE_TRANSITION_MS);
+}
+
 function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
   const searchWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-search-workspace]");
@@ -8921,6 +8964,10 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   const isExpanded = prototypeShell.dataset.hallOfChampionsExpanded === "true";
   const isReady = isExpanded && prototypeShell.dataset.hallOfChampionsModeSelectorReady === "true";
   const activeModeIndex = Number(modeSelector.dataset.hallOfChampionsModeIndex || "0");
+  const isArchiveIndexMode = isReady && activeModeIndex === 1;
+  const isAwaitingArchiveCrystal = prototypeShell.dataset.hallOfChampionsCrystalArchiveTransition === "az";
+  const canShowWorkspace = isReady && !isAwaitingArchiveCrystal;
+  setHallOfChampionsCrystalArchiveState(prototypeShell, isArchiveIndexMode);
   const setWorkspaceVisibility = (workspace, isVisible) => {
     if (!workspace) {
       return;
@@ -8929,10 +8976,10 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
     workspace.setAttribute("aria-hidden", String(!isVisible));
   };
 
-  setWorkspaceVisibility(searchWorkspace, isReady && activeModeIndex === 0);
-  setWorkspaceVisibility(azWorkspace, isReady && activeModeIndex === 1);
-  setWorkspaceVisibility(categoryWorkspace, isReady && activeModeIndex === 2);
-  setWorkspaceVisibility(teamWorkspace, isReady && activeModeIndex === 3);
+  setWorkspaceVisibility(searchWorkspace, canShowWorkspace && activeModeIndex === 0);
+  setWorkspaceVisibility(azWorkspace, canShowWorkspace && activeModeIndex === 1);
+  setWorkspaceVisibility(categoryWorkspace, canShowWorkspace && activeModeIndex === 2);
+  setWorkspaceVisibility(teamWorkspace, canShowWorkspace && activeModeIndex === 3);
   if (expandedHologram) {
     expandedHologram.setAttribute("aria-hidden", String(!isExpanded));
   }
@@ -8945,6 +8992,9 @@ function setHallOfChampionsModeSelectorAvailable(prototypeShell, isAvailable) {
   }
 
   const isReady = Boolean(isAvailable) && prototypeShell.dataset.hallOfChampionsExpanded === "true";
+  if (!isReady) {
+    clearHallOfChampionsCrystalArchiveTransition(prototypeShell);
+  }
   prototypeShell.dataset.hallOfChampionsModeSelectorReady = String(isReady);
   modeSelector.setAttribute("aria-hidden", String(!isReady));
   modeSelector.querySelectorAll("[data-hall-of-champions-mode-nav]").forEach((button) => {
@@ -8963,6 +9013,7 @@ function resetHallOfChampionsModeSelector(prototypeShell) {
   const defaultMode = HALL_OF_CHAMPIONS_ARCHIVE_MODES[0];
   const currentLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='current']");
   const incomingLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='incoming']");
+  clearHallOfChampionsCrystalArchiveTransition(prototypeShell);
   modeSelector.dataset.hallOfChampionsModeIndex = "0";
   modeSelector.dataset.hallOfChampionsModeStatus = "idle";
   delete modeSelector.dataset.hallOfChampionsModeDirection;
@@ -9021,6 +9072,7 @@ function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
   modeSelector.dataset.hallOfChampionsModeIndex = String(nextIndex);
   modeSelector.dataset.hallOfChampionsModeDirection = direction;
   modeSelector.dataset.hallOfChampionsModeStatus = "changing";
+  scheduleHallOfChampionsCrystalArchiveTransition(prototypeShell, nextIndex);
   updateHallOfChampionsModeSelectorA11y(modeSelector, nextMode);
   syncHallOfChampionsSearchWorkspace(prototypeShell);
 
