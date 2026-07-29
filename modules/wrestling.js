@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    VMPix V3 wrestling module.
    Static placeholder wrestling archive surfaces only.
    ========================================================= */
@@ -9042,6 +9042,95 @@ function getHallOfChampionsPeopleArchiveKey(record, displayName) {
   return getWrestlingText(record?.slug || record?.id || displayName).trim().toLowerCase();
 }
 
+function getHallOfChampionsPeopleArchiveDisplayValue(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map(getHallOfChampionsPeopleArchiveDisplayValue)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  if (value && typeof value === "object") {
+    return getHallOfChampionsPeopleArchiveDisplayValue(value.name || value.displayName || value.title || value.label);
+  }
+
+  return getWrestlingText(value).replace(/\s+/g, " ").trim();
+}
+
+function getHallOfChampionsPeopleArchiveField(record, fields) {
+  for (const field of fields) {
+    const value = getHallOfChampionsPeopleArchiveDisplayValue(record?.[field]);
+    if (value) {
+      return value;
+    }
+  }
+  return "";
+}
+
+function getHallOfChampionsPeopleArchiveTeam(record) {
+  return getHallOfChampionsPeopleArchiveField(record, [
+    "teamStable",
+    "team_stable",
+    "team",
+    "teamName",
+    "team_name",
+    "stable",
+    "stableName",
+    "stable_name",
+    "teams",
+    "stables",
+  ]);
+}
+
+function formatHallOfChampionsPeopleArchiveCategory(value) {
+  const category = getHallOfChampionsPeopleArchiveDisplayValue(value).replace(/[_-]+/g, " ").trim();
+  return category
+    ? category
+        .toLowerCase()
+        .replace(/\b[a-z]/g, (letter) => letter.toUpperCase())
+    : "";
+}
+
+function getHallOfChampionsPeopleArchiveCategory(record) {
+  return formatHallOfChampionsPeopleArchiveCategory(getHallOfChampionsPeopleArchiveField(record, [
+    "category",
+    "categoryName",
+    "category_name",
+    "personCategory",
+    "person_category",
+    "role",
+    "type",
+  ]));
+}
+
+function getHallOfChampionsPeopleArchivePhotoCount(record) {
+  const candidates = [
+    record?.photoCount,
+    record?.photo_count,
+    record?.photosCount,
+    record?.photos_count,
+    record?.totalPhotos,
+    record?.total_photos,
+    record?.imageCount,
+    record?.image_count,
+    record?.mediaCount,
+    record?.media_count,
+    record?.photos,
+  ];
+
+  for (const candidate of candidates) {
+    if (Array.isArray(candidate)) {
+      return candidate.length;
+    }
+
+    const photoCount = Number.parseInt(getWrestlingText(candidate).replace(/[^\d]/g, ""), 10);
+    if (Number.isFinite(photoCount) && photoCount >= 0) {
+      return photoCount;
+    }
+  }
+  return null;
+}
+
 function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
   const seenKeys = new Set();
   return (Array.isArray(payloads) ? payloads : [payloads])
@@ -9050,11 +9139,16 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
       const displayName = getHallOfChampionsPeopleArchiveDisplayName(record);
       const archiveInitial = getHallOfChampionsPeopleArchiveInitial(displayName);
       const recordKey = getHallOfChampionsPeopleArchiveKey(record, displayName);
+      const photoCount = getHallOfChampionsPeopleArchivePhotoCount(record);
+
       return displayName && archiveInitial && recordKey
         ? {
             id: getWrestlingText(record?.id),
             slug: getWrestlingText(record?.slug),
             name: displayName,
+            team: getHallOfChampionsPeopleArchiveTeam(record),
+            category: getHallOfChampionsPeopleArchiveCategory(record),
+            photoCount: Number.isFinite(photoCount) ? photoCount : null,
             initial: archiveInitial,
             key: recordKey,
           }
@@ -9122,6 +9216,48 @@ function getHallOfChampionsAzMatches() {
   return hallOfChampionsPeopleArchiveRecords.filter((record) => record.initial === selectedLetter);
 }
 
+function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
+  return `${photoCount.toLocaleString()} ${photoCount === 1 ? "Photo" : "Photos"}`;
+}
+
+function createHallOfChampionsArchiveRecordItem(record) {
+  const item = document.createElement("li");
+  const marker = document.createElement("span");
+  const primary = document.createElement("span");
+  const category = document.createElement("span");
+  const secondary = document.createElement("span");
+  const photoCount = document.createElement("span");
+
+  item.className = "hall-of-champions-az-workspace__item";
+  marker.className = "hall-of-champions-az-workspace__item-indicator";
+  marker.setAttribute("aria-hidden", "true");
+  primary.className = "hall-of-champions-az-workspace__item-primary";
+  primary.textContent = record.name;
+
+  category.className = "hall-of-champions-az-workspace__item-category";
+  category.textContent = record.category;
+
+  secondary.className = "hall-of-champions-az-workspace__item-secondary";
+  secondary.textContent = record.team;
+  if (!record.team) {
+    secondary.hidden = true;
+    item.classList.add("hall-of-champions-az-workspace__item--no-team");
+  }
+
+  photoCount.className = "hall-of-champions-az-workspace__item-photo-count";
+  if (Number.isFinite(record.photoCount)) {
+    photoCount.textContent = `\u{1F4F7} ${formatHallOfChampionsArchiveRecordPhotoCount(record.photoCount)}`;
+  } else {
+    photoCount.hidden = true;
+  }
+
+  if (!record.category) {
+    category.hidden = true;
+  }
+
+  item.append(marker, primary, category, secondary, photoCount);
+  return item;
+}
 function renderHallOfChampionsAzResults(prototypeShell) {
   const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-az-results]");
   const countElement = prototypeShell?.querySelector("[data-hall-of-champions-az-result-count]");
@@ -9143,10 +9279,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
     matches.forEach((record) => {
-      const item = document.createElement("li");
-      item.className = "hall-of-champions-az-workspace__item";
-      item.textContent = record.name;
-      list.append(item);
+      list.append(createHallOfChampionsArchiveRecordItem(record));
     });
     fragment.append(list);
   } else if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
@@ -9195,10 +9328,7 @@ function renderHallOfChampionsAzResults(prototypeShell) {
     list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
     matches.forEach((record) => {
-      const item = document.createElement("li");
-      item.className = "hall-of-champions-az-workspace__item";
-      item.textContent = record.name;
-      list.append(item);
+      list.append(createHallOfChampionsArchiveRecordItem(record));
     });
     fragment.append(list);
   }
