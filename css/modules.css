@@ -11592,7 +11592,8 @@ button.wrestling-event-history-tagged-thumb {
 .hall-of-champions-search-workspace[hidden],
 .hall-of-champions-az-workspace[hidden],
 .hall-of-champions-category-workspace[hidden],
-.hall-of-champions-team-workspace[hidden] {
+.hall-of-champions-team-workspace[hidden],
+.hall-of-champions-letter-selector[hidden] {
   display: none !important;
 }
 
@@ -11798,6 +11799,16 @@ button.wrestling-event-history-tagged-thumb {
   border: 1px solid rgba(255, 118, 68, 0.18);
   box-shadow: inset 0 0 0.42rem rgba(255, 73, 32, 0.045);
   user-select: none;
+}
+
+.hall-of-champions-az-workspace__readout {
+  margin: 0;
+  color: rgba(255, 226, 207, 0.76);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font-size: clamp(0.58rem, 1.02vw, 0.72rem);
+  line-height: 1.12;
+  letter-spacing: 0;
+  text-shadow: 0 0 0.34rem rgba(255, 92, 42, 0.22);
 }
 
 .hall-of-champions-az-workspace__status {
@@ -12120,6 +12131,173 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: auto;
 }
 
+.hall-of-champions-letter-selector {
+  position: fixed;
+  inset-inline-start: var(--hall-champions-letter-selector-center, 50%);
+  inset-block-start: var(--hall-champions-letter-selector-top, 78%);
+  z-index: 36;
+  display: grid;
+  grid-template-columns: minmax(1.42rem, 30%) minmax(0, 1fr) minmax(1.42rem, 30%);
+  align-items: center;
+  inline-size: min(var(--hall-champions-letter-selector-width, 11rem), 13.25rem);
+  block-size: min(max(var(--hall-champions-letter-selector-height, 2rem), 1.72rem), 2.55rem);
+  box-sizing: border-box;
+  padding: 0 clamp(0.08rem, 0.42vw, 0.22rem);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(0.12rem);
+  clip-path: polygon(7% 0, 93% 0, 100% 100%, 0 100%);
+  background:
+    linear-gradient(90deg, rgba(38, 8, 5, 0.16), rgba(255, 101, 48, 0.12), rgba(38, 8, 5, 0.16)),
+    rgba(11, 5, 3, 0.72);
+  border: 1px solid rgba(255, 104, 58, 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 224, 204, 0.05),
+    inset 0 0 0.46rem rgba(255, 68, 32, 0.08),
+    0 0 0.38rem rgba(72, 12, 6, 0.16);
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-letter-selector-ready="true"] .hall-of-champions-letter-selector {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.hall-of-champions-letter-selector::before,
+.hall-of-champions-letter-selector::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.hall-of-champions-letter-selector::before {
+  inset: 0.34rem 0.48rem;
+  border-block: 1px solid rgba(255, 128, 72, 0.14);
+}
+
+.hall-of-champions-letter-selector::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 8%, rgba(255, 176, 104, 0.14), transparent 92%) top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent 8%, rgba(255, 104, 58, 0.1), transparent 92%) bottom / 100% 1px no-repeat;
+  opacity: 0.64;
+}
+
+.hall-of-champions-letter-selector__control {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(255, 213, 188, 0.78);
+  cursor: pointer;
+  font: 700 clamp(0.78rem, 2.8vw, 1rem) / 1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+  text-shadow: 0 0 0.32rem rgba(255, 82, 42, 0.3);
+}
+
+.hall-of-champions-letter-selector__control:disabled {
+  cursor: default;
+}
+
+.hall-of-champions-letter-selector__control:focus-visible {
+  outline: 1px solid rgba(255, 126, 72, 0.72);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0.38rem rgba(255, 72, 32, 0.16);
+}
+
+.hall-of-champions-letter-selector__readout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  block-size: 100%;
+  overflow: hidden;
+}
+
+.hall-of-champions-letter-selector__letter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  color: rgba(255, 232, 216, 0.92);
+  font: 700 clamp(0.88rem, 3.2vw, 1.18rem) / 1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+  text-align: center;
+  text-shadow:
+    0 0 0.38rem rgba(255, 102, 42, 0.34),
+    0 0 0.04rem rgba(255, 236, 224, 0.56);
+  white-space: nowrap;
+}
+
+.hall-of-champions-letter-selector__letter--incoming {
+  opacity: 0;
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-letter-status="changing"][data-hall-of-champions-letter-direction="next"] .hall-of-champions-letter-selector__letter--current {
+  animation: hallChampionsLetterCurrentNext 210ms ease-out both;
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-letter-status="changing"][data-hall-of-champions-letter-direction="next"] .hall-of-champions-letter-selector__letter--incoming {
+  animation: hallChampionsLetterIncomingNext 210ms ease-out both;
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-letter-status="changing"][data-hall-of-champions-letter-direction="previous"] .hall-of-champions-letter-selector__letter--current {
+  animation: hallChampionsLetterCurrentPrevious 210ms ease-out both;
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-letter-status="changing"][data-hall-of-champions-letter-direction="previous"] .hall-of-champions-letter-selector__letter--incoming {
+  animation: hallChampionsLetterIncomingPrevious 210ms ease-out both;
+}
+
+@keyframes hallChampionsLetterCurrentNext {
+  to {
+    opacity: 0;
+    transform: translateX(-0.44rem);
+  }
+}
+
+@keyframes hallChampionsLetterIncomingNext {
+  from {
+    opacity: 0;
+    transform: translateX(0.44rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes hallChampionsLetterCurrentPrevious {
+  to {
+    opacity: 0;
+    transform: translateX(0.44rem);
+  }
+}
+
+@keyframes hallChampionsLetterIncomingPrevious {
+  from {
+    opacity: 0;
+    transform: translateX(-0.44rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 .hall-of-champions-mode-selector__control {
   position: relative;
   display: grid;
@@ -12521,11 +12699,20 @@ button.wrestling-event-history-tagged-thumb {
     transition: none;
   }
 
+  .hall-of-champions-letter-selector,
   .hall-of-champions-mode-selector__label,
   .hall-of-champions-search-workspace,
   .hall-of-champions-az-workspace,
   .hall-of-champions-category-workspace,
   .hall-of-champions-team-workspace {
+    animation: none !important;
+  }
+
+  .hall-of-champions-letter-selector {
+    transition: none;
+  }
+
+  .hall-of-champions-letter-selector__letter {
     animation: none !important;
   }
 }
@@ -12560,6 +12747,9 @@ button.wrestling-event-history-tagged-thumb {
     font-size: 0.92rem;
   }
 
+  .hall-of-champions-az-workspace__readout {
+    font-size: 0.58rem;
+  }
   .hall-of-champions-search-workspace__field {
     min-block-size: 2.92rem;
     padding-inline: 0.78rem;
