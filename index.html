@@ -24,62 +24,9 @@
     <script>
       (() => {
         const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
-        const shell = document.currentScript.parentElement;
-        const isWrestlingRoute = routePath === "/wrestling" || routePath.startsWith("/wrestling/");
-        if (!shell || !isWrestlingRoute) {
-          return;
-        }
-
-        shell.classList.remove("is-home-route");
-        shell.classList.add("has-entered-hub");
-        shell.dataset.shellActiveTarget = "wrestling";
-        shell.dataset.shellModule = "wrestling";
-
-        if (routePath === "/wrestling") {
-          shell.dataset.shellRoute = "wrestling";
-          shell.dataset.portfolioGatewayWorld = "battleground";
-          shell.dataset.portfolioGatewayRoute = "/wrestling";
-          shell.dataset.portfolioGatewayState = "filling-screen";
-          shell.dataset.activeWorld = "battleground";
-          shell.dataset.portfolioGatewayHandoff = "complete";
-          shell.classList.add("has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
-          return;
-        }
-
-        if (routePath === "/wrestling/people2") {
-          shell.dataset.shellRoute = "wrestling-people-prototype";
-          shell.dataset.wrestlingPeoplePrototype = "hall-of-champions";
-          return;
-        }
-
-        shell.classList.add("is-module-view");
-
-        if (routePath === "/wrestling/people" || routePath.startsWith("/wrestling/people/")) {
-          shell.dataset.shellRoute = routePath === "/wrestling/people" ? "wrestling-people" : "wrestling-person-detail";
-          shell.classList.add(routePath === "/wrestling/people" ? "is-wrestling-people-view" : "is-wrestling-person-detail-view");
-          return;
-        }
-
-        if (routePath === "/wrestling/venues" || routePath.startsWith("/wrestling/venues/")) {
-          shell.dataset.shellRoute = routePath === "/wrestling/venues" ? "wrestling-venues" : "wrestling-venue-detail";
-          shell.dataset.wrestlingVenuesPrototype = "fields-of-conflict";
-          shell.classList.add(routePath === "/wrestling/venues" ? "is-wrestling-venues-view" : "is-wrestling-venue-detail-view");
-          return;
-        }
-
-        if (routePath === "/wrestling/shows") {
-          shell.dataset.shellRoute = "wrestling-shows";
-          shell.dataset.wrestlingShowsRouteHandoff = "active";
-          shell.classList.add("is-wrestling-shows-view");
-          return;
-        }
-
-        if (routePath.startsWith("/wrestling/shows/")) {
-          const showRouteParts = routePath.slice("/wrestling/shows/".length).split("/").filter(Boolean);
-          shell.dataset.shellRoute = showRouteParts.length >= 2 ? "wrestling-match-detail" : "wrestling-show-detail";
-          if (shell.dataset.shellRoute === "wrestling-show-detail") {
-            shell.classList.add("is-wrestling-show-detail-view");
-          }
+        if (/^\/wrestling\/shows\/[^/]+\/match-\d+(?:\/photo\/[^/]+)?$/.test(routePath)) {
+          document.currentScript.parentElement.classList.remove("is-home-route");
+          document.currentScript.parentElement.setAttribute("data-shell-route", "wrestling-match-detail");
         }
       })();
     </script>

@@ -2072,24 +2072,24 @@ img.archive-gallery-image {
 
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro {
     visibility: visible;
     opacity: 1;
     transform: translate3d(-50%, -50%, 0);
     animation: none;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text {
     clip-path: inset(0 0 0 0);
     animation: none;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text::after {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text::after {
     opacity: 0;
     animation: none;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro {
     visibility: hidden;
     opacity: 0;
   }
@@ -18841,26 +18841,9 @@ button.hall-crusades-archive-crystal:focus-visible {
   visibility: hidden;
 }
 
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .home-frame,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .portfolio-entry-target,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .hub-carousel,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .hub-context,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .module-placeholder,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .about-shell,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .calendar-shell,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .contact-shell,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .home-archive-communication,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .home-archive-awakening,
-.site-shell:is([data-shell-active-target="wrestling"], [data-shell-route^="wrestling"], [data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-venues-prototype="fields-of-conflict"]) .portfolio-engine-projection {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-}
 
 
-
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -18898,7 +18881,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
   filter: brightness(1.12) saturate(1.06);
 }
 
@@ -18961,7 +18944,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     drop-shadow(0 0 0.34rem rgba(255, 42, 26, 0.36));
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail {
   visibility: visible;
   opacity: 1;
   transition:
@@ -19065,7 +19048,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     drop-shadow(0 0 0.3rem rgba(255, 42, 26, 0.32));
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
   visibility: visible;
   opacity: 1;
   transition:
@@ -19179,12 +19162,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   inset-block-start: 49%;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node {
   visibility: visible;
   opacity: 0.16;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active {
   opacity: 1;
   transform: translate3d(-50%, -50%, 0) scale(1);
   border-color: rgba(255, 231, 208, 0.58);
@@ -19195,17 +19178,17 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: daiionPlanetNodePulse 1900ms ease-in-out infinite;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
   opacity: 1;
   animation: daiionPlanetNodeHalo 1900ms ease-out infinite;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::after {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::after {
   opacity: 0.8;
   border-color: rgba(255, 231, 208, 0.48);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active .daiion-planet-node__point {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active .daiion-planet-node__point {
   background: rgba(255, 231, 208, 0.92);
   box-shadow:
     0 0 0.22rem rgba(255, 231, 208, 0.42),
@@ -19476,7 +19459,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-shadow: 0 0 0.32rem rgba(255, 42, 26, 0.24);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
   visibility: visible;
   opacity: 1;
   animation: daiionArchiveFocusPanelResolve 220ms ease-out both;
@@ -19598,89 +19581,89 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.32rem rgba(255, 90, 60, 0.32),
     0 0 0.58rem rgba(255, 42, 26, 0.16);
 }
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel {
   visibility: visible;
   opacity: 1;
   animation: daiionDestinationPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
   animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title {
   animation: daiionArchiveStatsContentResolve 180ms ease-out both;
   animation-delay: 4550ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item {
   animation: daiionArchiveStatsLabelResolve 220ms ease-out both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(2) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(2) {
   animation-delay: 4620ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(3) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(3) {
   animation-delay: 4700ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
   animation-delay: 4780ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
   visibility: visible;
   opacity: 1;
   animation: daiionArchiveStatsPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before {
   animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title {
   animation: daiionArchiveStatsContentResolve 180ms ease-out both;
   animation-delay: 4550ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label {
   animation: daiionArchiveStatsLabelResolve 220ms ease-out both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(2) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(2) .daiion-archive-stats-panel__label {
   animation-delay: 4620ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(3) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(3) .daiion-archive-stats-panel__label {
   animation-delay: 4700ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(4) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(4) .daiion-archive-stats-panel__label {
   animation-delay: 4780ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(5) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(5) .daiion-archive-stats-panel__label {
   animation-delay: 4860ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(6) .daiion-archive-stats-panel__label {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__row:nth-child(6) .daiion-archive-stats-panel__label {
   animation-delay: 4940ms;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value {
   opacity: 0;
   transform: translate3d(0, 0.08rem, 0);
   transition:
     opacity 120ms ease-out,
     transform 120ms ease-out;
 }
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-decoding,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locked {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-decoding,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locked {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locking {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value.is-locking {
   animation: daiionArchiveStatsValueLock 280ms ease-out both;
 }
 
@@ -19915,32 +19898,32 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__title,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__label,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel__value,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__title,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-focus-panel.is-active {
     animation: none;
     opacity: 1;
     transform: none;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
     opacity: 1;
   }
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel::before,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel::before {
     opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before {
     animation: none;
   }
 }
@@ -19965,7 +19948,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
   visibility: visible;
   animation: daiionAtmosphereGlow 58s cubic-bezier(0.42, 0, 0.28, 1) infinite;
 }
@@ -20027,7 +20010,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
   visibility: visible;
   animation: daiionDustGust 32s cubic-bezier(0.24, 0.64, 0.3, 1) 7s infinite;
 }
@@ -20062,18 +20045,18 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-atmosphere-glow {
     visibility: hidden;
     opacity: 0;
     animation: none;
   }
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-dust-gust {
     visibility: hidden;
     opacity: 0;
     animation: none;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger::before {
     opacity: 0.2;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     animation: none;
@@ -20091,7 +20074,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   contain: layout paint style;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-field {
   visibility: visible;
   opacity: 1;
 }
@@ -20202,12 +20185,12 @@ button.hall-crusades-archive-crystal:focus-visible {
     radial-gradient(ellipse at 48% 100%, rgba(255, 92, 37, 0.05) 0 14%, transparent 68%);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::before {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::before {
   animation: daiionHeatShimmerRise var(--heat-duration, 9.6s) cubic-bezier(0.42, 0, 0.28, 1) infinite;
   animation-delay: var(--heat-delay, 0s);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::after {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember-pocket::after {
   animation: daiionHeatShimmerRiseSoft var(--heat-duration-soft, 12.4s) cubic-bezier(0.46, 0, 0.3, 1) infinite;
   animation-delay: calc(var(--heat-delay, 0s) - 4.6s);
 }
@@ -20275,7 +20258,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
   animation: var(--ember-animation, daiionEmberRise) var(--ember-duration, 8s) cubic-bezier(0.24, 0.62, 0.34, 1) infinite;
 }
 
@@ -20619,7 +20602,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translateY(0.12em);
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro {
   visibility: visible;
   opacity: 1;
   animation:
@@ -20628,15 +20611,15 @@ button.hall-crusades-archive-crystal:focus-visible {
     daiionDestinationIntroClear 260ms ease-out 8550ms forwards;
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text {
   animation: daiionDestinationIntroType 1850ms steps(48, end) 5400ms both;
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text::after {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text::after {
   animation: daiionDestinationIntroCaret 620ms steps(1, end) 5400ms 5 both;
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro {
   visibility: hidden;
   opacity: 0;
   transform: translate3d(-50%, calc(-50% - 0.18rem), 0);
@@ -20647,8 +20630,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: none;
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro__text,
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro__text::after {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro__text,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway:has(.daiion-destination-panel__item[aria-pressed="true"]) .daiion-destination-intro__text::after {
   animation: none;
 }
 
@@ -20766,7 +20749,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-.site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal {
   visibility: visible;
   opacity: 0;
   animation:
@@ -20774,14 +20757,14 @@ button.hall-crusades-archive-crystal:focus-visible {
     daiionTitleHudProject 720ms cubic-bezier(0.2, 0.74, 0.24, 1) 3200ms forwards;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
   animation: daiionTitleReveal 700ms ease-out both;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
   animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
 }
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
   animation: daiionTitleSubtitleReveal 520ms ease-out 3500ms both;
 }
 
@@ -20908,7 +20891,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
   visibility: visible !important;
   opacity: 1 !important;
   pointer-events: none !important;
@@ -20919,7 +20902,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     visibility 0ms linear;
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
   grid-column: 1 / -1;
@@ -20933,13 +20916,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translate3d(-50%, -50%, 0);
 }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway-trigger {
   cursor: default;
   pointer-events: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: none !important;
@@ -20947,8 +20930,8 @@ button.hall-crusades-archive-crystal:focus-visible {
     transition: none !important;
   }
 
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail,
-  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="wrestling"])[data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-top-hud-rail,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-side-hud-rail {
     transition: none !important;
   }
 }

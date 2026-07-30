@@ -271,22 +271,7 @@ function replaceRouteUrl(url, state = {}) {
   }
 }
 
-function syncWrestlingPrototypeRouteOwnership(route = {}) {
-  const routeName = route?.name || "";
-  const ownsPeoplePrototype = routeName === "wrestling-people-prototype";
-  const ownsVenuesPrototype = routeName === "wrestling-venues" || routeName === "wrestling-venue-detail";
-
-  if (!ownsPeoplePrototype && typeof setWrestlingPeoplePrototypeActive === "function") {
-    setWrestlingPeoplePrototypeActive(false);
-  }
-  if (!ownsVenuesPrototype && typeof setWrestlingVenuesPrototypeActive === "function") {
-    setWrestlingVenuesPrototypeActive(false);
-  }
-}
-
 function syncRoute(route, options = {}) {
-  syncWrestlingPrototypeRouteOwnership(route);
-
   if (route.name === "wrestling-shows" && typeof primeWrestlingShowsRouteSurface === "function") {
     primeWrestlingShowsRouteSurface();
   }
