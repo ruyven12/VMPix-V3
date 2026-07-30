@@ -12029,7 +12029,8 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (min-width: 1024px) {
-  .hall-of-champions-az-workspace .hall-of-champions-az-workspace__list {
+  .hall-of-champions-az-workspace .hall-of-champions-az-workspace__list,
+  .hall-of-champions-team-workspace .hall-of-champions-az-workspace__list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: clamp(0.34rem, 0.58vw, 0.66rem);
     row-gap: 0.3rem;
@@ -12037,7 +12038,8 @@ button.wrestling-event-history-tagged-thumb {
     padding-inline: clamp(0.44rem, 0.72vw, 1rem);
   }
 
-  .hall-of-champions-az-workspace .hall-of-champions-az-workspace__item {
+  .hall-of-champions-az-workspace .hall-of-champions-az-workspace__item,
+  .hall-of-champions-team-workspace .hall-of-champions-az-workspace__item {
     grid-template-columns: auto minmax(0, 1fr) minmax(5.65rem, max-content);
     column-gap: clamp(0.28rem, 0.38vw, 0.46rem);
     padding-inline: clamp(0.34rem, 0.52vw, 0.54rem);
@@ -12203,14 +12205,17 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-team-workspace {
   position: absolute;
-  inset-block-start: clamp(1.15rem, 15%, 6.5rem);
-  inset-inline-start: 50%;
+  inset-block-start: 0.625rem;
+  inset-block-end: 0.625rem;
+  inset-inline-start: clamp(0.625rem, 1.8vw, 2.25rem);
+  inset-inline-end: clamp(0.625rem, 1.8vw, 2.25rem);
   z-index: 1;
   display: grid;
-  gap: clamp(0.62rem, 1.8svh, 0.82rem);
-  inline-size: min(84%, 31rem);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: clamp(0.34rem, 0.8svh, 0.5rem);
+  inline-size: auto;
   box-sizing: border-box;
-  transform: translateX(-50%);
+  transform: none;
   color: rgba(255, 226, 207, 0.86);
   text-align: center;
   pointer-events: none;
@@ -13088,6 +13093,17 @@ button.wrestling-event-history-tagged-thumb {
     inset-inline-start: 0.625rem;
     inset-inline-end: 0.625rem;
     grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.38rem;
+    inline-size: auto;
+    transform: none;
+  }
+
+  .hall-of-champions-team-workspace {
+    inset-block-start: 0.625rem;
+    inset-block-end: 0.625rem;
+    inset-inline-start: 0.625rem;
+    inset-inline-end: 0.625rem;
+    grid-template-rows: auto auto minmax(0, 1fr);
     gap: 0.38rem;
     inline-size: auto;
     transform: none;
