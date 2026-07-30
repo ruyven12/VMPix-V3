@@ -8672,19 +8672,6 @@ function getWrestlingPeoplePrototypeShell() {
   expandedHologram.className = "hall-of-champions-expanded-hologram";
   expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
   expandedHologram.setAttribute("aria-hidden", "true");
-  expandedHologram.innerHTML = `
-    <section class="hall-of-champions-search-workspace" data-hall-of-champions-search-workspace aria-label="Hall of Champions search workspace" aria-hidden="true" hidden>
-      <div class="hall-of-champions-search-workspace__header">
-        <span class="hall-of-champions-search-workspace__system">HALL OF CHAMPIONS</span>
-        <h2 class="hall-of-champions-search-workspace__title">SEARCH THE ARCHIVE</h2>
-      </div>
-      <div class="hall-of-champions-search-workspace__field" aria-label="Dormant search shell: Enter name">
-        <span class="hall-of-champions-search-workspace__field-label">ENTER NAME</span>
-        <span class="hall-of-champions-search-workspace__field-status" aria-hidden="true">QUERY</span>
-      </div>
-      <p class="hall-of-champions-search-workspace__status">AWAITING QUERY</p>
-    </section>
-  `;
 
   const modeSelector = document.createElement("div");
   modeSelector.className = "hall-of-champions-mode-selector";
@@ -8850,26 +8837,6 @@ function updateHallOfChampionsModeSelectorA11y(modeSelector, modeName) {
   modeSelector.setAttribute("aria-label", `Hall of Champions archive mode selector. Active mode: ${modeName}`);
 }
 
-function syncHallOfChampionsSearchWorkspace(prototypeShell) {
-  const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
-  const workspace = prototypeShell?.querySelector("[data-hall-of-champions-search-workspace]");
-  const expandedHologram = prototypeShell?.querySelector("[data-hall-of-champions-expanded-hologram]");
-  if (!modeSelector || !workspace) {
-    return;
-  }
-
-  const isExpanded = prototypeShell.dataset.hallOfChampionsExpanded === "true";
-  const isSearchMode = Number(modeSelector.dataset.hallOfChampionsModeIndex || "0") === 0;
-  const isVisible = isExpanded
-    && prototypeShell.dataset.hallOfChampionsModeSelectorReady === "true"
-    && isSearchMode;
-  workspace.hidden = !isVisible;
-  workspace.setAttribute("aria-hidden", String(!isVisible));
-  if (expandedHologram) {
-    expandedHologram.setAttribute("aria-hidden", String(!isExpanded));
-  }
-}
-
 function setHallOfChampionsModeSelectorAvailable(prototypeShell, isAvailable) {
   const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
   if (!modeSelector) {
@@ -8883,7 +8850,6 @@ function setHallOfChampionsModeSelectorAvailable(prototypeShell, isAvailable) {
     button.disabled = !isReady;
     button.setAttribute("aria-disabled", String(!isReady));
   });
-  syncHallOfChampionsSearchWorkspace(prototypeShell);
 }
 
 function resetHallOfChampionsModeSelector(prototypeShell) {
@@ -8905,7 +8871,6 @@ function resetHallOfChampionsModeSelector(prototypeShell) {
     incomingLabel.textContent = "";
   }
   updateHallOfChampionsModeSelectorA11y(modeSelector, defaultMode);
-  syncHallOfChampionsSearchWorkspace(prototypeShell);
 }
 
 function completeHallOfChampionsModeTransition(modeSelector, nextIndex) {
@@ -8922,7 +8887,6 @@ function completeHallOfChampionsModeTransition(modeSelector, nextIndex) {
   modeSelector.dataset.hallOfChampionsModeStatus = "idle";
   delete modeSelector.dataset.hallOfChampionsModeDirection;
   updateHallOfChampionsModeSelectorA11y(modeSelector, nextMode);
-  syncHallOfChampionsSearchWorkspace(getHallOfChampionsPrototypeShellFromNode(modeSelector));
   hallOfChampionsModeTransitionTimer = 0;
 }
 
@@ -8950,11 +8914,9 @@ function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
 
   currentLabel.textContent = currentMode;
   incomingLabel.textContent = nextMode;
-  modeSelector.dataset.hallOfChampionsModeIndex = String(nextIndex);
   modeSelector.dataset.hallOfChampionsModeDirection = direction;
   modeSelector.dataset.hallOfChampionsModeStatus = "changing";
   updateHallOfChampionsModeSelectorA11y(modeSelector, nextMode);
-  syncHallOfChampionsSearchWorkspace(prototypeShell);
 
   hallOfChampionsModeTransitionTimer = window.setTimeout(() => {
     completeHallOfChampionsModeTransition(modeSelector, nextIndex);
