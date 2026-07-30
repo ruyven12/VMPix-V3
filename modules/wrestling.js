@@ -296,6 +296,7 @@ let hallOfChampionsPeopleArchiveRecords = [];
 let hallOfChampionsPeopleArchiveCategories = [];
 let hallOfChampionsPeopleArchiveTeams = [];
 let hallOfChampionsPeopleArchiveRequest = null;
+let hallOfChampionsPeopleArchiveState = "idle";
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -8683,6 +8684,31 @@ function getWrestlingPeoplePrototypeShell() {
   expandedHologram.className = "hall-of-champions-expanded-hologram";
   expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
   expandedHologram.setAttribute("aria-hidden", "true");
+  expandedHologram.innerHTML = `
+    <section class="hall-of-champions-workspace hall-of-champions-workspace--search" data-hall-of-champions-workspace="search" aria-label="Hall of Champions search workspace" hidden>
+      <h2 class="hall-of-champions-workspace__title">SEARCH ARCHIVE</h2>
+      <p class="hall-of-champions-workspace__status">AWAITING QUERY</p>
+      <div class="hall-of-champions-workspace__placeholder">SEARCH WORKSPACE STANDBY</div>
+    </section>
+    <section class="hall-of-champions-workspace" data-hall-of-champions-workspace="az" aria-label="Hall of Champions alphabetical archive" hidden>
+      <h2 class="hall-of-champions-workspace__title">ALPHABETICAL INDEX</h2>
+      <p class="hall-of-champions-workspace__status" data-hall-of-champions-workspace-status="az">CURRENT INITIAL // A</p>
+      <p class="hall-of-champions-workspace__count" data-hall-of-champions-workspace-count="az">INDEXING RECORDS</p>
+      <div class="hall-of-champions-workspace__viewport" data-hall-of-champions-workspace-results="az" role="region" aria-label="Alphabetical archive records" aria-live="polite"></div>
+    </section>
+    <section class="hall-of-champions-workspace" data-hall-of-champions-workspace="category" aria-label="Hall of Champions category archive" hidden>
+      <h2 class="hall-of-champions-workspace__title">ARCHIVE CATEGORIES</h2>
+      <p class="hall-of-champions-workspace__status" data-hall-of-champions-workspace-status="category">CURRENT CATEGORY // DISCOVERING</p>
+      <p class="hall-of-champions-workspace__count" data-hall-of-champions-workspace-count="category">INDEXING RECORDS</p>
+      <div class="hall-of-champions-workspace__viewport" data-hall-of-champions-workspace-results="category" role="region" aria-label="Category archive records" aria-live="polite"></div>
+    </section>
+    <section class="hall-of-champions-workspace" data-hall-of-champions-workspace="team" aria-label="Hall of Champions team archive" hidden>
+      <h2 class="hall-of-champions-workspace__title">TEAM DIRECTORY</h2>
+      <p class="hall-of-champions-workspace__status" data-hall-of-champions-workspace-status="team">CURRENT TEAM // DISCOVERING</p>
+      <p class="hall-of-champions-workspace__count" data-hall-of-champions-workspace-count="team">INDEXING RECORDS</p>
+      <div class="hall-of-champions-workspace__viewport" data-hall-of-champions-workspace-results="team" role="region" aria-label="Team archive records" aria-live="polite"></div>
+    </section>
+  `;
 
   const crystalTrigger = document.createElement("button");
   crystalTrigger.type = "button";
@@ -9159,6 +9185,7 @@ function completeHallOfChampionsLowerSelectorTransition(selector, modeName) {
   selector.dataset.hallOfChampionsLetterStatus = "idle";
   delete selector.dataset.hallOfChampionsLetterDirection;
   updateHallOfChampionsLowerSelectorReadout(prototypeShell, modeName, getHallOfChampionsLowerSelectorCurrentValue(modeName));
+  syncHallOfChampionsWorkspaces(prototypeShell);
   hallOfChampionsLowerSelectorTransitionTimer = 0;
 }
 
@@ -9189,6 +9216,7 @@ function cycleHallOfChampionsLowerSelector(prototypeShell, direction) {
   const incomingLabel = selector.querySelector("[data-hall-of-champions-letter-label='incoming']");
   if (prefersHallOfChampionsReducedMotion() || !currentLabel || !incomingLabel) {
     updateHallOfChampionsLowerSelectorReadout(prototypeShell, modeName, nextValue);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return;
   }
 
@@ -9309,6 +9337,30 @@ function getHallOfChampionsPeopleArchiveTeam(record) {
   return getHallOfChampionsPeopleArchiveField(record, ["teamStable", "team_stable", "team", "teamName", "team_name", "stable", "stableName", "stable_name", "teams", "stables"]);
 }
 
+function getHallOfChampionsPeopleArchiveDisplayName(record) {
+  return getHallOfChampionsPeopleArchiveField(record, ["name", "displayName", "display_name", "archiveName", "archive_name"]);
+}
+
+function getHallOfChampionsPeopleArchiveInitial(displayName) {
+  const match = getWrestlingText(displayName).trim().match(/[a-z]/i);
+  return match ? match[0].toUpperCase() : "";
+}
+
+function getHallOfChampionsPeopleArchivePhotoCount(record) {
+  const fields = ["photoCount", "photo_count", "photosCount", "photos_count", "totalPhotos", "total_photos", "imageCount", "image_count", "mediaCount", "media_count", "photos"];
+  for (const field of fields) {
+    const value = record?.[field];
+    if (Array.isArray(value)) {
+      return value.length;
+    }
+    const count = Number.parseInt(value, 10);
+    if (Number.isFinite(count) && count >= 0) {
+      return count;
+    }
+  }
+  return null;
+}
+
 function normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(value) {
   return typeof value === "string" ? value.replace(/_/g, " ").replace(/\s+/g, " ").trim() : "";
 }
@@ -9317,10 +9369,19 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
   const seenKeys = new Set();
   return (Array.isArray(payloads) ? payloads : [payloads]).flatMap(getHallOfChampionsPeopleArchiveRows).map((record, index) => {
     try {
-      const key = getWrestlingText(record?.slug || record?.id || record?.name || `record-${index}`).trim().toLowerCase();
-      return key ? { key, category: getHallOfChampionsPeopleArchiveCategory(record), team: getHallOfChampionsPeopleArchiveTeam(record) } : null;
+      const name = getHallOfChampionsPeopleArchiveDisplayName(record);
+      const key = getWrestlingText(record?.slug || record?.id || name || `record-${index}`).trim().toLowerCase();
+      const initial = getHallOfChampionsPeopleArchiveInitial(name);
+      return key && name ? {
+        key,
+        name,
+        initial,
+        category: getHallOfChampionsPeopleArchiveCategory(record),
+        team: getHallOfChampionsPeopleArchiveTeam(record),
+        photoCount: getHallOfChampionsPeopleArchivePhotoCount(record),
+      } : null;
     } catch (error) {
-      reportHallOfChampionsPeopleArchiveRecordIssue("selector normalization skipped record", error, record);
+      reportHallOfChampionsPeopleArchiveRecordIssue("archive display normalization skipped record", error, record);
       return null;
     }
   }).filter(Boolean).filter((record) => {
@@ -9329,7 +9390,7 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
     }
     seenKeys.add(record.key);
     return true;
-  });
+  }).sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base", numeric: true }));
 }
 
 function discoverHallOfChampionsPeopleArchiveCategories() {
@@ -9387,6 +9448,8 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
   if (hallOfChampionsPeopleArchiveRequest || typeof fetch !== "function") {
     return hallOfChampionsPeopleArchiveRequest || Promise.resolve([]);
   }
+  hallOfChampionsPeopleArchiveState = "loading";
+  syncHallOfChampionsWorkspaces(prototypeShell);
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const signal = controller?.signal;
   hallOfChampionsPeopleArchiveRequest = fetchHallOfChampionsPeopleArchiveSelectorPayload(1, signal).then((firstPayload) => {
@@ -9401,10 +9464,14 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
     return Promise.all(pageRequests).then((payloads) => [firstPayload, ...payloads]);
   }).then((payloads) => {
     hallOfChampionsPeopleArchiveRecords = normalizeHallOfChampionsPeopleArchiveRecords(payloads);
+    hallOfChampionsPeopleArchiveState = hallOfChampionsPeopleArchiveRecords.length > 0 ? "live" : "empty";
     syncHallOfChampionsDiscoveredSelectorValues(prototypeShell);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return hallOfChampionsPeopleArchiveRecords;
   }).catch((error) => {
+    hallOfChampionsPeopleArchiveState = "error";
     reportHallOfChampionsPeopleArchiveRecordIssue("selector discovery unavailable", error, null);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return [];
   }).finally(() => {
     hallOfChampionsPeopleArchiveRequest = null;
@@ -9412,6 +9479,156 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
   return hallOfChampionsPeopleArchiveRequest;
 }
 
+function getHallOfChampionsCategoryFilterKey(value) {
+  return formatHallOfChampionsPeopleArchiveCategory(value).toLowerCase();
+}
+
+function getHallOfChampionsTeamFilterKey(value) {
+  return normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(value).toLowerCase();
+}
+
+function getHallOfChampionsPeopleArchiveRecordTeams(record) {
+  return normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(record?.team).split(/[;,]/).map(normalizeHallOfChampionsPeopleArchiveDiscoveredTeam).filter(Boolean);
+}
+
+function getHallOfChampionsActiveWorkspaceMode(prototypeShell) {
+  const activeModeIndex = getHallOfChampionsCurrentModeIndex(prototypeShell);
+  return activeModeIndex === 1 ? "az" : activeModeIndex === 2 ? "category" : activeModeIndex === 3 ? "team" : "search";
+}
+
+function getHallOfChampionsActiveWorkspaceMatches(modeName) {
+  if (modeName === "az") {
+    const selectedLetter = getHallOfChampionsCurrentAzLetter();
+    return hallOfChampionsPeopleArchiveRecords.filter((record) => record.initial === selectedLetter);
+  }
+  if (modeName === "category") {
+    const selectedCategoryKey = getHallOfChampionsCategoryFilterKey(getHallOfChampionsCurrentCategory());
+    return selectedCategoryKey
+      ? hallOfChampionsPeopleArchiveRecords.filter((record) => getHallOfChampionsCategoryFilterKey(record?.category) === selectedCategoryKey)
+      : [];
+  }
+  if (modeName === "team") {
+    const selectedTeamKey = getHallOfChampionsTeamFilterKey(getHallOfChampionsCurrentTeam());
+    return selectedTeamKey
+      ? hallOfChampionsPeopleArchiveRecords.filter((record) => getHallOfChampionsPeopleArchiveRecordTeams(record).some((teamName) => getHallOfChampionsTeamFilterKey(teamName) === selectedTeamKey))
+      : [];
+  }
+  return [];
+}
+
+function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
+  return Number.isFinite(photoCount) ? `${photoCount.toLocaleString()} Photos` : "";
+}
+
+function appendHallOfChampionsArchiveRecord(list, record) {
+  try {
+    const item = document.createElement("li");
+    const marker = document.createElement("span");
+    const primary = document.createElement("span");
+    const secondary = document.createElement("span");
+    const category = document.createElement("span");
+    const photos = document.createElement("span");
+
+    item.className = "hall-of-champions-workspace__record";
+    marker.className = "hall-of-champions-workspace__record-light";
+    marker.setAttribute("aria-hidden", "true");
+    primary.className = "hall-of-champions-workspace__record-name";
+    primary.textContent = getWrestlingText(record?.name).trim();
+    secondary.className = "hall-of-champions-workspace__record-team";
+    secondary.textContent = getWrestlingText(record?.team).trim();
+    if (!secondary.textContent) {
+      secondary.hidden = true;
+    }
+    category.className = "hall-of-champions-workspace__record-category";
+    category.textContent = getWrestlingText(record?.category).trim();
+    if (!category.textContent) {
+      category.hidden = true;
+    }
+    photos.className = "hall-of-champions-workspace__record-photos";
+    const photoText = formatHallOfChampionsArchiveRecordPhotoCount(record?.photoCount);
+    photos.textContent = photoText;
+    if (!photos.textContent) {
+      photos.hidden = true;
+    }
+
+    item.append(marker, primary, category, secondary, photos);
+    list.append(item);
+  } catch (error) {
+    reportHallOfChampionsPeopleArchiveRecordIssue("archive row render skipped record", error, record);
+  }
+}
+
+function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
+  const workspace = prototypeShell?.querySelector(`[data-hall-of-champions-workspace="${modeName}"]`);
+  const status = prototypeShell?.querySelector(`[data-hall-of-champions-workspace-status="${modeName}"]`);
+  const count = prototypeShell?.querySelector(`[data-hall-of-champions-workspace-count="${modeName}"]`);
+  const viewport = prototypeShell?.querySelector(`[data-hall-of-champions-workspace-results="${modeName}"]`);
+  if (!workspace || !viewport || !count) {
+    return;
+  }
+
+  const matches = getHallOfChampionsActiveWorkspaceMatches(modeName);
+  viewport.replaceChildren();
+  workspace.dataset.hallOfChampionsWorkspaceState = hallOfChampionsPeopleArchiveState;
+
+  if (modeName === "az" && status) {
+    status.textContent = `CURRENT INITIAL // ${getHallOfChampionsCurrentAzLetter()}`;
+  } else if (modeName === "category" && status) {
+    status.textContent = getHallOfChampionsCurrentCategory() ? `CURRENT CATEGORY // ${getHallOfChampionsCurrentCategory()}` : "CURRENT CATEGORY // DISCOVERING";
+  } else if (modeName === "team" && status) {
+    status.textContent = getHallOfChampionsCurrentTeam() ? `CURRENT TEAM // ${getHallOfChampionsCurrentTeam()}` : "CURRENT TEAM // DISCOVERING";
+  }
+
+  if (hallOfChampionsPeopleArchiveState === "loading" && matches.length === 0) {
+    count.textContent = "INDEXING RECORDS";
+    const message = document.createElement("p");
+    message.className = "hall-of-champions-workspace__message";
+    message.textContent = "INDEXING RECORDS";
+    message.setAttribute("role", "status");
+    viewport.append(message);
+    return;
+  }
+
+  if (hallOfChampionsPeopleArchiveState === "error" && matches.length === 0) {
+    count.textContent = "ARCHIVE LINK UNAVAILABLE";
+    const message = document.createElement("p");
+    message.className = "hall-of-champions-workspace__message";
+    message.textContent = "ARCHIVE LINK UNAVAILABLE";
+    message.setAttribute("role", "status");
+    viewport.append(message);
+    return;
+  }
+
+  count.textContent = `${matches.length.toLocaleString()} RECORDS`;
+  if (matches.length === 0) {
+    const message = document.createElement("p");
+    message.className = "hall-of-champions-workspace__message";
+    message.textContent = modeName === "az" ? `NO RECORDS FOUND FOR // ${getHallOfChampionsCurrentAzLetter()}` : "NO ARCHIVE RECORDS";
+    message.setAttribute("role", "status");
+    viewport.append(message);
+    return;
+  }
+
+  const list = document.createElement("ul");
+  list.className = "hall-of-champions-workspace__records";
+  matches.forEach((record) => appendHallOfChampionsArchiveRecord(list, record));
+  viewport.append(list);
+}
+
+function syncHallOfChampionsWorkspaces(prototypeShell) {
+  if (!prototypeShell) {
+    return;
+  }
+  const activeModeName = getHallOfChampionsActiveWorkspaceMode(prototypeShell);
+  prototypeShell.querySelectorAll("[data-hall-of-champions-workspace]").forEach((workspace) => {
+    const isActiveWorkspace = workspace.dataset.hallOfChampionsWorkspace === activeModeName;
+    workspace.hidden = !isActiveWorkspace;
+    workspace.setAttribute("aria-hidden", String(!isActiveWorkspace));
+  });
+  if (activeModeName !== "search") {
+    renderHallOfChampionsArchiveRows(prototypeShell, activeModeName);
+  }
+}
 function syncHallOfChampionsLowerSelectorForMode(prototypeShell) {
   if (!prototypeShell || prototypeShell.dataset.hallOfChampionsModeSelectorReady !== "true") {
     return;
@@ -9420,21 +9637,25 @@ function syncHallOfChampionsLowerSelectorForMode(prototypeShell) {
   if (activeModeIndex === 1) {
     updateHallOfChampionsLowerSelectorReadout(prototypeShell, "az", getHallOfChampionsCurrentAzLetter());
     setHallOfChampionsLowerSelectorAvailable(prototypeShell, "az", true);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return;
   }
   if (activeModeIndex === 2) {
     requestHallOfChampionsPeopleSelectorData(prototypeShell);
     updateHallOfChampionsLowerSelectorReadout(prototypeShell, "category", getHallOfChampionsCurrentCategory());
     setHallOfChampionsLowerSelectorAvailable(prototypeShell, "category", hallOfChampionsPeopleArchiveCategories.length > 0);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return;
   }
   if (activeModeIndex === 3) {
     requestHallOfChampionsPeopleSelectorData(prototypeShell);
     updateHallOfChampionsLowerSelectorReadout(prototypeShell, "team", getHallOfChampionsCurrentTeam());
     setHallOfChampionsLowerSelectorAvailable(prototypeShell, "team", hallOfChampionsPeopleArchiveTeams.length > 0);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     return;
   }
   setHallOfChampionsLowerSelectorAvailable(prototypeShell, "az", false);
+  syncHallOfChampionsWorkspaces(prototypeShell);
 }
 function bindHallOfChampionsProjectionResize() {
   if (isHallOfChampionsProjectionResizeBound || typeof window === "undefined") {

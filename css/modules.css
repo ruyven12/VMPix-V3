@@ -11588,6 +11588,172 @@ button.wrestling-event-history-tagged-thumb {
   transition: opacity 180ms ease-out;
 }
 
+
+.hall-of-champions-workspace[hidden] {
+  display: none;
+}
+
+.hall-of-champions-workspace {
+  position: absolute;
+  inset: 0.62rem;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: 0.22rem;
+  box-sizing: border-box;
+  padding: 0.28rem clamp(0.3rem, 1vw, 0.58rem) 0.42rem;
+  color: rgba(255, 226, 208, 0.9);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.hall-of-champions-workspace__title {
+  margin: 0;
+  color: rgba(255, 235, 220, 0.92);
+  font-size: clamp(0.88rem, 3vw, 1.12rem);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 0 0.48rem rgba(255, 118, 56, 0.34);
+}
+
+.hall-of-champions-workspace__status,
+.hall-of-champions-workspace__count {
+  margin: 0;
+  color: rgba(255, 132, 72, 0.86);
+  font-size: clamp(0.58rem, 2vw, 0.78rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 0 0.34rem rgba(255, 74, 34, 0.28);
+  text-transform: uppercase;
+}
+
+.hall-of-champions-workspace__placeholder,
+.hall-of-champions-workspace__message {
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  color: rgba(255, 214, 190, 0.76);
+  font-size: clamp(0.62rem, 2.2vw, 0.84rem);
+  line-height: 1.35;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.hall-of-champions-workspace__viewport {
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+  scrollbar-color: rgba(255, 112, 58, 0.42) rgba(28, 8, 4, 0.24);
+  scrollbar-width: thin;
+}
+
+.hall-of-champions-workspace__viewport::-webkit-scrollbar {
+  inline-size: 0.34rem;
+}
+
+.hall-of-champions-workspace__viewport::-webkit-scrollbar-track {
+  background: rgba(28, 8, 4, 0.24);
+}
+
+.hall-of-champions-workspace__viewport::-webkit-scrollbar-thumb {
+  background: rgba(255, 112, 58, 0.42);
+}
+
+.hall-of-champions-workspace__records {
+  display: grid;
+  gap: 0.18rem;
+  max-inline-size: min(100%, 62rem);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.hall-of-champions-workspace__record {
+  display: grid;
+  grid-template-columns: 0.72rem minmax(0, 1fr) minmax(4.4rem, auto);
+  grid-template-areas:
+    "light name category"
+    "light team photos";
+  column-gap: 0.34rem;
+  row-gap: 0.12rem;
+  align-items: center;
+  min-block-size: 2.35rem;
+  box-sizing: border-box;
+  padding: 0.3rem 0.4rem;
+  background: linear-gradient(90deg, rgba(68, 16, 8, 0.26), rgba(28, 8, 4, 0.12));
+  border-block: 1px solid rgba(255, 112, 58, 0.12);
+  box-shadow: inset 0 0 0.72rem rgba(255, 72, 34, 0.045);
+}
+
+.hall-of-champions-workspace__record-light {
+  grid-area: light;
+  inline-size: 0.28rem;
+  block-size: 0.28rem;
+  border-radius: 50%;
+  justify-self: center;
+  background: rgba(255, 156, 96, 0.86);
+  box-shadow: 0 0 0.24rem rgba(255, 98, 46, 0.74);
+}
+
+.hall-of-champions-workspace__record-name {
+  grid-area: name;
+  min-inline-size: 0;
+  color: rgba(255, 235, 222, 0.94);
+  font-size: clamp(0.7rem, 2.35vw, 0.95rem);
+  font-weight: 700;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.hall-of-champions-workspace__record-team {
+  grid-area: team;
+  min-inline-size: 0;
+  color: rgba(255, 187, 142, 0.74);
+  font-size: clamp(0.52rem, 1.8vw, 0.72rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.hall-of-champions-workspace__record-category,
+.hall-of-champions-workspace__record-photos {
+  justify-self: end;
+  min-inline-size: 0;
+  color: rgba(255, 201, 172, 0.78);
+  font-size: clamp(0.48rem, 1.65vw, 0.66rem);
+  line-height: 1.12;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.hall-of-champions-workspace__record-category {
+  grid-area: category;
+}
+
+.hall-of-champions-workspace__record-photos {
+  grid-area: photos;
+}
+
+@media (min-width: 900px) {
+  .hall-of-champions-workspace {
+    inset: 0.75rem;
+    padding-inline: 1.1rem;
+  }
+
+  .hall-of-champions-workspace__records {
+    max-inline-size: min(100%, 80rem);
+  }
+
+  .hall-of-champions-workspace__record {
+    min-block-size: 2.6rem;
+    padding-inline: 0.62rem;
+  }
+}
 .hall-of-champions-crystal-trigger {
   position: fixed;
   inset-inline-start: var(--hall-champions-crystal-trigger-left, 50%);
