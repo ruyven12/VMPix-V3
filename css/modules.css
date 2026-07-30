@@ -12395,7 +12395,8 @@ button.wrestling-event-history-tagged-thumb {
     transform 180ms ease-out;
 }
 
-.wrestling-people-prototype-shell[data-hall-of-champions-letter-selector-ready="true"] .hall-of-champions-letter-selector {
+.wrestling-people-prototype-shell[data-hall-of-champions-letter-selector-ready="true"] .hall-of-champions-letter-selector,
+.wrestling-people-prototype-shell[data-hall-of-champions-category-selector-ready="true"] .hall-of-champions-letter-selector {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
