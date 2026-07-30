@@ -12030,22 +12030,22 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (min-width: 1024px) {
   .hall-of-champions-az-workspace .hall-of-champions-az-workspace__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    column-gap: clamp(0.42rem, 0.78vw, 0.82rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: clamp(0.34rem, 0.58vw, 0.66rem);
     row-gap: 0.3rem;
     box-sizing: border-box;
-    padding-inline: clamp(0.48rem, 1vw, 1.35rem);
+    padding-inline: clamp(0.44rem, 0.72vw, 1rem);
   }
 
   .hall-of-champions-az-workspace .hall-of-champions-az-workspace__item {
-    grid-template-columns: auto minmax(0, 1fr) minmax(4.75rem, max-content);
-    column-gap: clamp(0.34rem, 0.48vw, 0.56rem);
-    padding-inline: clamp(0.42rem, 0.68vw, 0.64rem);
+    grid-template-columns: auto minmax(0, 1fr) minmax(5.65rem, max-content);
+    column-gap: clamp(0.28rem, 0.38vw, 0.46rem);
+    padding-inline: clamp(0.34rem, 0.52vw, 0.54rem);
   }
 
   .hall-of-champions-az-workspace .hall-of-champions-az-workspace__item-category,
   .hall-of-champions-az-workspace .hall-of-champions-az-workspace__item-photo-count {
-    max-inline-size: min(7.25rem, 34%);
+    max-inline-size: 100%;
   }
 }
 
