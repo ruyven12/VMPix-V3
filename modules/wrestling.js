@@ -299,7 +299,6 @@ let hallOfChampionsAzLetterTransitionTimer = 0;
 let hallOfChampionsAzLetterIndex = 0;
 let hallOfChampionsPeopleArchiveState = "idle";
 let hallOfChampionsPeopleArchiveRecords = [];
-let hallOfChampionsPeopleArchiveCategories = [];
 let hallOfChampionsPeopleArchiveRequest = null;
 let hallOfChampionsPeopleArchiveRequestController = null;
 let hallOfChampionsPeopleArchiveError = null;
@@ -9223,33 +9222,6 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
     .sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: "base", numeric: true }));
 }
 
-function normalizeHallOfChampionsPeopleArchiveDiscoveredCategory(value) {
-  return formatHallOfChampionsPeopleArchiveCategory(value);
-}
-
-function discoverHallOfChampionsPeopleArchiveCategories() {
-  const seenCategories = new Set();
-  hallOfChampionsPeopleArchiveCategories = hallOfChampionsPeopleArchiveRecords
-    .map((record) => {
-      try {
-        return normalizeHallOfChampionsPeopleArchiveDiscoveredCategory(record?.category);
-      } catch (error) {
-        reportHallOfChampionsPeopleArchiveRecordIssue("category discovery skipped record", error, record);
-        return "";
-      }
-    })
-    .filter(Boolean)
-    .filter((categoryName) => {
-      const categoryKey = categoryName.toLowerCase();
-      if (seenCategories.has(categoryKey)) {
-        return false;
-      }
-      seenCategories.add(categoryKey);
-      return true;
-    })
-    .sort((left, right) => left.localeCompare(right, undefined, { sensitivity: "base" }));
-  return hallOfChampionsPeopleArchiveCategories;
-}
 function mergeHallOfChampionsPeopleArchiveRecords(records) {
   const seenKeys = new Set();
   const nextRecords = Array.isArray(records) ? records : [];
@@ -9395,7 +9367,6 @@ function hydrateHallOfChampionsPeopleArchiveCache(prototypeShell) {
     error: null,
     totalRecords: cachedArchive.totalRecords,
   });
-  discoverHallOfChampionsPeopleArchiveCategories();
   return true;
 }
 function syncHallOfChampionsPeopleArchiveDataset(prototypeShell) {
@@ -9637,7 +9608,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
         error,
         totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
-      discoverHallOfChampionsPeopleArchiveCategories();
       return Promise.resolve(hallOfChampionsPeopleArchiveRecords);
     }
     setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
@@ -9680,7 +9650,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
         error: null,
         totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
-      discoverHallOfChampionsPeopleArchiveCategories();
       writeHallOfChampionsPeopleArchiveCache();
       return hallOfChampionsPeopleArchiveRecords;
     } catch (error) {
@@ -9693,7 +9662,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
             error,
             totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
           });
-          discoverHallOfChampionsPeopleArchiveCategories();
         } else {
           setHallOfChampionsPeopleArchiveState(prototypeShell, "error", { error });
         }
