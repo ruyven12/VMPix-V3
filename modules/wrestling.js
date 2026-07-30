@@ -9156,10 +9156,6 @@ function getHallOfChampionsPeopleArchiveCategory(record) {
   ]));
 }
 
-function getHallOfChampionsPeopleArchivePortraitUrl(record) {
-  return getHallOfChampionsPeopleArchiveDisplayValue(record?.portrait_url).trim();
-}
-
 function getHallOfChampionsPeopleArchivePhotoCount(record) {
   const fields = [
     "photoCount",
@@ -9214,7 +9210,6 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
               name: displayName,
               team: getHallOfChampionsPeopleArchiveTeam(record),
               category: getHallOfChampionsPeopleArchiveCategory(record),
-              portraitUrl: getHallOfChampionsPeopleArchivePortraitUrl(record),
               photoCount: Number.isFinite(photoCount) ? photoCount : null,
               initial: archiveInitial,
               key: recordKey,
@@ -9351,7 +9346,6 @@ function normalizeHallOfChampionsPeopleArchiveCachedRecords(records) {
               name: displayName,
               team: getWrestlingText(record?.team).replace(/\s+/g, " ").trim(),
               category: getWrestlingText(record?.category).replace(/\s+/g, " ").trim(),
-              portraitUrl: getWrestlingText(record?.portraitUrl).trim(),
               photoCount: Number.isFinite(photoCount) ? photoCount : null,
               initial: archiveInitial,
               key: recordKey,
@@ -9427,7 +9421,6 @@ function writeHallOfChampionsPeopleArchiveCache() {
         name: record.name,
         team: record.team,
         category: record.category,
-        portraitUrl: record.portraitUrl,
         photoCount: record.photoCount,
         initial: record.initial,
         key: record.key,
