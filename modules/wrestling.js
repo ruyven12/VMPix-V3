@@ -281,8 +281,6 @@ const HALL_OF_CHAMPIONS_MODE_TRANSITION_MS = 220;
 const HALL_OF_CHAMPIONS_CRYSTAL_ARCHIVE_TRANSITION_MS = 300;
 const HALL_OF_CHAMPIONS_AZ_LETTER_TRANSITION_MS = 210;
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_LIMIT = 500;
-const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CONNECTION_DELAY_MS = 1400;
-const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_TIMEOUT_MS = 10000;
 const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A\u2013Z", "CATEGORY", "TEAM"]);
 const HALL_OF_CHAMPIONS_AZ_LETTERS = Object.freeze("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
 let hallOfChampionsActivationTimer = 0;
@@ -301,8 +299,6 @@ let hallOfChampionsPeopleArchiveRequestController = null;
 let hallOfChampionsPeopleArchiveError = null;
 let hallOfChampionsPeopleArchivePagesRequested = 0;
 let hallOfChampionsPeopleArchiveTotalRecords = 0;
-let hallOfChampionsPeopleArchiveConnectionTimer = 0;
-let hallOfChampionsPeopleArchiveShowConnectionStatus = false;
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -9075,7 +9071,7 @@ function fetchHallOfChampionsPeopleArchivePayload(page, signal) {
   return withWrestlingRequestTimeout(fetch(getHallOfChampionsPeopleArchiveApiUrl(page), {
     cache: "no-store",
     signal,
-  }), null, HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_TIMEOUT_MS, "Hall of Champions people archive").then((response) => {
+  }), null, WRESTLING_PEOPLE_TIMEOUT_MS, "Hall of Champions people archive").then((response) => {
     if (!response.ok) {
       throw new Error(`Hall of Champions people archive request failed (${response.status})`);
     }
@@ -9106,20 +9102,9 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   if (hallOfChampionsPeopleArchiveState === "idle" || hallOfChampionsPeopleArchiveState === "loading") {
     countElement.textContent = "INDEXING RECORDS";
     const message = document.createElement("p");
-    const primaryMessage = document.createElement("span");
     message.className = "hall-of-champions-az-workspace__message";
     message.setAttribute("role", "status");
-    primaryMessage.textContent = "INDEXING RECORDS";
-    message.append(primaryMessage);
-    if (hallOfChampionsPeopleArchiveState === "loading" && hallOfChampionsPeopleArchiveShowConnectionStatus) {
-      const connectionMessage = document.createElement("span");
-      connectionMessage.textContent = "CONNECTING TO ARCHIVE...";
-      connectionMessage.style.display = "block";
-      connectionMessage.style.marginTop = "0.28rem";
-      connectionMessage.style.fontSize = "0.9em";
-      connectionMessage.style.opacity = "0.78";
-      message.append(connectionMessage);
-    }
+    message.textContent = "INDEXING RECORDS";
     fragment.append(message);
   } else if (hallOfChampionsPeopleArchiveState === "error") {
     countElement.textContent = "ARCHIVE LINK UNAVAILABLE";
@@ -9160,38 +9145,8 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   scrollElement.replaceChildren(fragment);
 }
 
-function clearHallOfChampionsPeopleArchiveConnectionTimer() {
-  if (hallOfChampionsPeopleArchiveConnectionTimer) {
-    window.clearTimeout(hallOfChampionsPeopleArchiveConnectionTimer);
-    hallOfChampionsPeopleArchiveConnectionTimer = 0;
-  }
-}
-
-function scheduleHallOfChampionsPeopleArchiveConnectionStatus(prototypeShell) {
-  clearHallOfChampionsPeopleArchiveConnectionTimer();
-  hallOfChampionsPeopleArchiveShowConnectionStatus = false;
-  if (typeof window.setTimeout !== "function") {
-    return;
-  }
-
-  hallOfChampionsPeopleArchiveConnectionTimer = window.setTimeout(() => {
-    hallOfChampionsPeopleArchiveConnectionTimer = 0;
-    if (hallOfChampionsPeopleArchiveState !== "loading") {
-      return;
-    }
-    hallOfChampionsPeopleArchiveShowConnectionStatus = true;
-    renderHallOfChampionsAzResults(prototypeShell);
-  }, HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CONNECTION_DELAY_MS);
-}
-
 function setHallOfChampionsPeopleArchiveState(prototypeShell, stateName, options = {}) {
   hallOfChampionsPeopleArchiveState = stateName;
-  if (stateName === "loading") {
-    scheduleHallOfChampionsPeopleArchiveConnectionStatus(prototypeShell);
-  } else {
-    clearHallOfChampionsPeopleArchiveConnectionTimer();
-    hallOfChampionsPeopleArchiveShowConnectionStatus = false;
-  }
   if (options.records) {
     hallOfChampionsPeopleArchiveRecords = options.records;
   }
