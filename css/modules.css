@@ -11701,17 +11701,14 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-az-workspace {
   position: absolute;
-  inset-block-start: 0.625rem;
-  inset-block-end: 0.625rem;
-  inset-inline-start: clamp(0.625rem, 1.2vw, 0.875rem);
-  inset-inline-end: clamp(0.625rem, 1.2vw, 0.875rem);
+  inset-block-start: clamp(1.15rem, 15%, 6.5rem);
+  inset-inline-start: 50%;
   z-index: 1;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: clamp(0.34rem, 0.8svh, 0.5rem);
-  inline-size: auto;
+  gap: clamp(0.34rem, 1.05svh, 0.54rem);
+  inline-size: min(84%, 33rem);
   box-sizing: border-box;
-  transform: none;
+  transform: translateX(-50%);
   color: rgba(255, 226, 207, 0.86);
   text-align: center;
   pointer-events: none;
@@ -11720,12 +11717,11 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-az-workspace__header {
   display: grid;
-  gap: 0;
+  gap: 0.2rem;
   justify-items: center;
 }
 
 .hall-of-champions-az-workspace__system {
-  display: none;
   color: rgba(255, 119, 70, 0.78);
   font: 700 0.62rem / 1.1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0;
@@ -11829,14 +11825,12 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-az-workspace__results {
   position: relative;
-  align-self: stretch;
-  justify-self: stretch;
+  justify-self: center;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(0.34rem, 0.75svh, 0.42rem);
-  inline-size: 100%;
-  block-size: 100%;
-  min-block-size: 0;
+  inline-size: min(100%, 28rem);
+  block-size: clamp(18rem, 43svh, 29rem);
   box-sizing: border-box;
   padding: clamp(0.46rem, 1.1vw, 0.64rem);
   overflow: hidden;
@@ -11889,7 +11883,6 @@ button.wrestling-event-history-tagged-thumb {
   letter-spacing: 0;
   text-align: center;
   text-shadow: 0 0 0.34rem rgba(255, 72, 32, 0.22);
-  white-space: pre;
 }
 
 .hall-of-champions-az-workspace__result-scroll {
@@ -12904,14 +12897,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace {
-    inset-block-start: 0.625rem;
-    inset-block-end: 0.625rem;
-    inset-inline-start: 0.625rem;
-    inset-inline-end: 0.625rem;
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: 0.38rem;
-    inline-size: auto;
-    transform: none;
+    gap: 0.42rem;
   }
 
   .hall-of-champions-search-workspace__title,
@@ -12926,9 +12912,8 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace__results {
-    inline-size: 100%;
-    block-size: 100%;
-    min-block-size: 0;
+    inline-size: min(100%, 21rem);
+    block-size: clamp(21rem, 47svh, 27rem);
     padding: 0.48rem;
   }
 
