@@ -12370,6 +12370,12 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.94);
   margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.03);
 }
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-index="1"] {
+  grid-template-columns: minmax(1rem, 22%) minmax(0, 1fr) minmax(1rem, 22%);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 1.06);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * -0.03);
+}
 .hall-of-champions-letter-selector {
   position: fixed;
   inset-inline-start: var(--hall-champions-letter-selector-center, 50%);
@@ -12406,6 +12412,16 @@ button.wrestling-event-history-tagged-thumb {
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
+
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="az"] {
+  grid-template-columns: minmax(1.12rem, 20%) minmax(0, 1fr) minmax(1.12rem, 20%);
+  inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
+  inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 18.5rem);
+  block-size: min(var(--hall-champions-letter-selector-height, 2rem), 2.34rem);
+  padding-inline: clamp(0.06rem, 0.3vw, 0.16rem);
+  clip-path: polygon(5.8% 0, 94.2% 0, 100% 100%, 0 100%);
+}
+
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] {
   grid-template-columns: clamp(1.05rem, 14%, 1.35rem) minmax(0, 1fr) clamp(1.05rem, 14%, 1.35rem);
   inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
@@ -12975,6 +12991,12 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-columns: minmax(1rem, 20%) minmax(0, 1fr) minmax(1rem, 20%);
   inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.94);
   margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.03);
+}
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-index="1"] {
+  grid-template-columns: minmax(1rem, 22%) minmax(0, 1fr) minmax(1rem, 22%);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 1.06);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * -0.03);
 }
 .hall-of-champions-letter-selector {
     transition: none;
