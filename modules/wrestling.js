@@ -286,6 +286,9 @@ const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_TIMEOUT_MS = 20000;
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_KEY = "vmpix:wrestling:people:hall-of-champions:v1";
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_VERSION = 1;
 const HALL_OF_CHAMPIONS_PEOPLE_ARCHIVE_CACHE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 30;
+const HALL_OF_CHAMPIONS_CATEGORY_CARD_INITIAL_BATCH_SIZE = 12;
+const HALL_OF_CHAMPIONS_CATEGORY_CARD_APPEND_BATCH_SIZE = 12;
+const HALL_OF_CHAMPIONS_CATEGORY_CARD_SCROLL_THRESHOLD_PX = 160;
 const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A\u2013Z", "CATEGORY", "TEAM"]);
 const HALL_OF_CHAMPIONS_AZ_LETTERS = Object.freeze("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
 let hallOfChampionsActivationTimer = 0;
@@ -298,6 +301,8 @@ let hallOfChampionsCrystalArchiveTransitionTimer = 0;
 let hallOfChampionsAzLetterTransitionTimer = 0;
 let hallOfChampionsAzLetterIndex = 0;
 let hallOfChampionsCategoryIndex = 0;
+let hallOfChampionsCategoryBatchKey = "";
+let hallOfChampionsCategoryBatchMountedCount = 0;
 let hallOfChampionsTeamIndex = 0;
 let hallOfChampionsPeopleArchiveState = "idle";
 let hallOfChampionsPeopleArchiveRecords = [];
@@ -9762,6 +9767,67 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   scrollElement.replaceChildren(fragment);
 }
 
+function getHallOfChampionsCategoryBatchMountedCount(categoryKey, matchesLength) {
+  if (!categoryKey || matchesLength <= 0) {
+    hallOfChampionsCategoryBatchKey = categoryKey || "";
+    hallOfChampionsCategoryBatchMountedCount = 0;
+    return 0;
+  }
+
+  if (hallOfChampionsCategoryBatchKey !== categoryKey) {
+    hallOfChampionsCategoryBatchKey = categoryKey;
+    hallOfChampionsCategoryBatchMountedCount = Math.min(HALL_OF_CHAMPIONS_CATEGORY_CARD_INITIAL_BATCH_SIZE, matchesLength);
+    return hallOfChampionsCategoryBatchMountedCount;
+  }
+
+  if (matchesLength <= HALL_OF_CHAMPIONS_CATEGORY_CARD_INITIAL_BATCH_SIZE) {
+    hallOfChampionsCategoryBatchMountedCount = matchesLength;
+  } else {
+    hallOfChampionsCategoryBatchMountedCount = Math.min(
+      Math.max(hallOfChampionsCategoryBatchMountedCount, HALL_OF_CHAMPIONS_CATEGORY_CARD_INITIAL_BATCH_SIZE),
+      matchesLength
+    );
+  }
+  return hallOfChampionsCategoryBatchMountedCount;
+}
+
+function appendHallOfChampionsCategoryCardBatch(prototypeShell) {
+  const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-category-results]");
+  const scrollElement = prototypeShell?.querySelector("[data-hall-of-champions-category-result-scroll]");
+  const list = scrollElement?.querySelector("[data-hall-of-champions-category-card-list]");
+  const categoryKey = getHallOfChampionsCategoryFilterKey(getHallOfChampionsCurrentCategory());
+  if (!resultsRegion || !scrollElement || !list || !categoryKey || hallOfChampionsCategoryBatchKey !== categoryKey) {
+    return;
+  }
+
+  const matches = getHallOfChampionsCategoryMatches();
+  const currentMountedCount = Number.parseInt(list.dataset.hallOfChampionsCategoryMountedRecords || hallOfChampionsCategoryBatchMountedCount, 10) || 0;
+  const nextMountedCount = Math.min(currentMountedCount + HALL_OF_CHAMPIONS_CATEGORY_CARD_APPEND_BATCH_SIZE, matches.length);
+  if (nextMountedCount <= currentMountedCount) {
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  matches.slice(currentMountedCount, nextMountedCount).forEach((record) => {
+    appendHallOfChampionsTeamRosterCard(fragment, record);
+  });
+  list.append(fragment);
+  hallOfChampionsCategoryBatchMountedCount = nextMountedCount;
+  list.dataset.hallOfChampionsCategoryMountedRecords = String(nextMountedCount);
+  resultsRegion.dataset.hallOfChampionsCategoryMountedRecords = String(nextMountedCount);
+}
+
+function handleHallOfChampionsCategoryResultsScroll(prototypeShell, scrollElement) {
+  if (!scrollElement) {
+    return;
+  }
+
+  const distanceFromBottom = scrollElement.scrollHeight - scrollElement.clientHeight - scrollElement.scrollTop;
+  if (distanceFromBottom <= HALL_OF_CHAMPIONS_CATEGORY_CARD_SCROLL_THRESHOLD_PX) {
+    appendHallOfChampionsCategoryCardBatch(prototypeShell);
+  }
+}
+
 function renderHallOfChampionsCategoryResults(prototypeShell) {
   const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-category-results]");
   const countElement = prototypeShell?.querySelector("[data-hall-of-champions-category-result-count]");
@@ -9770,29 +9836,41 @@ function renderHallOfChampionsCategoryResults(prototypeShell) {
     return;
   }
 
+  const selectedCategoryKey = getHallOfChampionsCategoryFilterKey(getHallOfChampionsCurrentCategory());
+  const isNewCategoryBatch = hallOfChampionsCategoryBatchKey !== selectedCategoryKey;
   const matches = getHallOfChampionsCategoryMatches();
+  const mountedCount = getHallOfChampionsCategoryBatchMountedCount(selectedCategoryKey, matches.length);
   const fragment = document.createDocumentFragment();
   resultsRegion.dataset.hallOfChampionsCategoryVisibleRecords = String(matches.length);
+  resultsRegion.dataset.hallOfChampionsCategoryMountedRecords = String(mountedCount);
+  resultsRegion.dataset.hallOfChampionsCategoryBatchSize = String(HALL_OF_CHAMPIONS_CATEGORY_CARD_APPEND_BATCH_SIZE);
   resultsRegion.setAttribute("aria-busy", "false");
   countElement.textContent = `${matches.length} ${matches.length === 1 ? "RECORD" : "RECORDS"}`;
+  scrollElement.onscroll = () => handleHallOfChampionsCategoryResultsScroll(prototypeShell, scrollElement);
 
   if (matches.length === 0) {
+    scrollElement.onscroll = null;
     const message = document.createElement("p");
     message.className = "hall-of-champions-az-workspace__message hall-of-champions-category-workspace__message";
     message.setAttribute("role", "status");
     message.textContent = "NO ARCHIVE RECORDS";
     fragment.append(message);
   } else {
-    const list = document.createElement("ol");
-    list.className = "hall-of-champions-az-workspace__list";
+    const list = document.createElement("ul");
+    list.className = "hall-of-champions-team-workspace__roster hall-of-champions-category-workspace__roster";
     list.setAttribute("role", "list");
-    matches.forEach((record) => {
-      appendHallOfChampionsArchiveRecordItem(list, record);
+    list.setAttribute("data-hall-of-champions-category-card-list", "");
+    list.dataset.hallOfChampionsCategoryMountedRecords = String(mountedCount);
+    matches.slice(0, mountedCount).forEach((record) => {
+      appendHallOfChampionsTeamRosterCard(list, record);
     });
     fragment.append(list);
   }
 
   scrollElement.replaceChildren(fragment);
+  if (isNewCategoryBatch) {
+    scrollElement.scrollTop = 0;
+  }
 }
 
 function renderHallOfChampionsTeamResults(prototypeShell) {
