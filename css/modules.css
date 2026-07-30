@@ -11529,7 +11529,7 @@ button.wrestling-event-history-tagged-thumb {
   inset-inline-start: 50%;
   inset-block-end: var(--hall-champions-hologram-anchor-bottom, 15rem);
   z-index: 35;
-  inline-size: calc(100vw - 20px);
+  inline-size: 92vw;
   max-inline-size: calc(100vw - 20px);
   block-size: min(calc(var(--hall-champions-hologram-anchor-y, 60vh) - max(10px, env(safe-area-inset-top))), 42rem);
   box-sizing: border-box;
@@ -11538,7 +11538,7 @@ button.wrestling-event-history-tagged-thumb {
   opacity: 0;
   transform: translateX(-50%) scale(0.16, 0.045);
   transform-origin: 50% 100%;
-  clip-path: polygon(2% 0, 98% 0, 100% 100%, 0 100%);
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
   background:
     repeating-linear-gradient(90deg, rgba(255, 112, 58, 0.08) 0 1px, transparent 1px 18px),
     linear-gradient(180deg, rgba(255, 92, 42, 0.16), rgba(96, 22, 10, 0.08));
@@ -11703,8 +11703,8 @@ button.wrestling-event-history-tagged-thumb {
   position: absolute;
   inset-block-start: 0.625rem;
   inset-block-end: 0.625rem;
-  inset-inline-start: clamp(0.625rem, 1.8vw, 2.25rem);
-  inset-inline-end: clamp(0.625rem, 1.8vw, 2.25rem);
+  inset-inline-start: clamp(0.625rem, 1.2vw, 0.875rem);
+  inset-inline-end: clamp(0.625rem, 1.2vw, 0.875rem);
   z-index: 1;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -11850,7 +11850,7 @@ button.wrestling-event-history-tagged-thumb {
     inset 0 0 0 1px rgba(255, 228, 210, 0.055),
     inset 0 0 1.08rem rgba(255, 78, 32, 0.07),
     0 0 0.42rem rgba(255, 78, 32, 0.08);
-  clip-path: polygon(0.9% 0, 99.1% 0, 100% 50%, 99.1% 100%, 0.9% 100%, 0 50%);
+  clip-path: polygon(1.8% 0, 98.2% 0, 100% 50%, 98.2% 100%, 1.8% 100%, 0 50%);
   pointer-events: auto;
 }
 
@@ -11894,13 +11894,8 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-az-workspace__result-scroll {
   block-size: 100%;
-  inline-size: auto;
-  justify-self: stretch;
   max-block-size: none;
-  max-inline-size: 100%;
   min-block-size: 0;
-  min-inline-size: 0;
-  box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -11915,12 +11910,8 @@ button.wrestling-event-history-tagged-thumb {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 0.26rem;
-  inline-size: 100%;
-  max-inline-size: 100%;
-  min-inline-size: 0;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   list-style: none;
 }
 
@@ -11933,8 +11924,6 @@ button.wrestling-event-history-tagged-thumb {
   column-gap: clamp(0.42rem, 1vw, 0.68rem);
   row-gap: 0.08rem;
   align-items: center;
-  inline-size: 100%;
-  max-inline-size: 100%;
   min-inline-size: 0;
   min-block-size: clamp(2.18rem, 4.18svh, 2.54rem);
   box-sizing: border-box;
@@ -12384,8 +12373,8 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-mode-selector[data-hall-of-champions-mode-index="1"] {
   grid-template-columns: minmax(1rem, 22%) minmax(0, 1fr) minmax(1rem, 22%);
-  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.67);
-  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.165);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 1.06);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * -0.03);
 }
 .hall-of-champions-letter-selector {
   position: fixed;
@@ -12428,7 +12417,7 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-columns: minmax(1.12rem, 20%) minmax(0, 1fr) minmax(1.12rem, 20%);
   inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
   inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 18.5rem);
-  block-size: min(calc(var(--hall-champions-letter-selector-height, 2rem) * 0.92), 2.15rem);
+  block-size: min(var(--hall-champions-letter-selector-height, 2rem), 2.34rem);
   padding-inline: clamp(0.06rem, 0.3vw, 0.16rem);
   clip-path: polygon(5.8% 0, 94.2% 0, 100% 100%, 0 100%);
 }
@@ -13006,8 +12995,8 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-mode-selector[data-hall-of-champions-mode-index="1"] {
   grid-template-columns: minmax(1rem, 22%) minmax(0, 1fr) minmax(1rem, 22%);
-  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.67);
-  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.165);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 1.06);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * -0.03);
 }
 .hall-of-champions-letter-selector {
     transition: none;
@@ -13097,15 +13086,8 @@ button.wrestling-event-history-tagged-thumb {
     max-block-size: none;
   }
 
-  .hall-of-champions-az-workspace__result-scroll,
-  .hall-of-champions-az-workspace__list,
   .hall-of-champions-az-workspace__item {
-    inline-size: min(100%, calc(100vw - 4rem));
-    max-inline-size: min(100%, calc(100vw - 4rem));
-  }
-
-  .hall-of-champions-az-workspace__item {
-    grid-template-columns: auto minmax(0, 1fr) minmax(5.6rem, 5.6rem);
+    grid-template-columns: auto minmax(0, 1fr) minmax(6rem, max-content);
     column-gap: 0.38rem;
     row-gap: 0.04rem;
     min-block-size: 2.86rem;
@@ -13125,11 +13107,6 @@ button.wrestling-event-history-tagged-thumb {
   .hall-of-champions-az-workspace__item-category,
   .hall-of-champions-az-workspace__item-photo-count {
     font-size: 0.8125rem;
-  }
-
-  .hall-of-champions-az-workspace__item-category,
-  .hall-of-champions-az-workspace__item-photo-count {
-    max-inline-size: 5.6rem;
   }
 
   .hall-of-champions-search-workspace__field {
