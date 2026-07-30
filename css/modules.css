@@ -11916,10 +11916,10 @@ button.wrestling-event-history-tagged-thumb {
   display: grid;
   box-sizing: border-box;
   overflow: hidden;
-  grid-template-columns: minmax(2rem, 0.72fr) minmax(0, 2.9fr) minmax(2rem, 0.72fr);
+  grid-template-columns: minmax(0.86rem, 0.42fr) minmax(0, 4fr) minmax(0.86rem, 0.42fr);
   align-items: center;
   justify-items: center;
-  padding: 0 clamp(0.42rem, 1.2vw, 0.74rem);
+  padding: 0 clamp(0.12rem, 0.45vw, 0.28rem);
   clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
   border: 1px solid rgba(255, 96, 48, 0.46);
   background:
@@ -11978,7 +11978,7 @@ button.wrestling-event-history-tagged-thumb {
   background: transparent;
   color: rgba(255, 217, 197, 0.86);
   font: inherit;
-  font-size: clamp(1.1rem, 3.1vw, 1.55rem);
+  font-size: clamp(0.68rem, 2vw, 1.08rem);
   line-height: 1;
   cursor: pointer;
 }
@@ -12000,7 +12000,7 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   text-align: center;
   text-transform: uppercase;
-  font-size: clamp(0.66rem, 2.5vw, 0.92rem);
+  font-size: clamp(0.44rem, 1.68vw, 0.72rem);
   line-height: 1;
   white-space: nowrap;
 }
@@ -12047,12 +12047,12 @@ button.wrestling-event-history-tagged-thumb {
   inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
   z-index: 38;
   display: grid;
-  grid-template-columns: minmax(1.12rem, 20%) minmax(0, 1fr) minmax(1.12rem, 20%);
+  grid-template-columns: minmax(0.9rem, 16%) minmax(0, 1fr) minmax(0.9rem, 16%);
   align-items: center;
   inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 18.5rem);
   block-size: min(calc(var(--hall-champions-letter-selector-height, 2rem) * 0.92), 2.15rem);
   box-sizing: border-box;
-  padding: 0 clamp(0.06rem, 0.3vw, 0.16rem);
+  padding: 0 clamp(0.04rem, 0.22vw, 0.12rem);
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
@@ -12083,7 +12083,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"],
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"] {
-  grid-template-columns: clamp(1.05rem, 14%, 1.35rem) minmax(0, 1fr) clamp(1.05rem, 14%, 1.35rem);
+  grid-template-columns: clamp(0.72rem, 9.5%, 1.02rem) minmax(0, 1fr) clamp(0.72rem, 9.5%, 1.02rem);
   block-size: min(var(--hall-champions-letter-selector-height, 2rem), 2.34rem);
 }
 
@@ -12120,7 +12120,7 @@ button.wrestling-event-history-tagged-thumb {
   background: transparent;
   color: rgba(255, 213, 188, 0.78);
   cursor: pointer;
-  font: 700 clamp(0.78rem, 2.8vw, 1rem) / 1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font: 700 clamp(0.62rem, 2.05vw, 0.88rem) / 1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0;
   text-shadow: 0 0 0.32rem rgba(255, 82, 42, 0.3);
 }
@@ -12161,22 +12161,27 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] .hall-of-champions-letter-selector__letter,
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"] .hall-of-champions-letter-selector__letter {
-  padding-inline: 0.12rem;
+  padding-inline: 0.04rem;
 }
 
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="short"] .hall-of-champions-letter-selector__letter,
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="short"] .hall-of-champions-letter-selector__letter {
-  font-size: clamp(0.78rem, 2.8vw, 1.05rem);
+  font-size: clamp(0.74rem, 2.55vw, 1rem);
 }
 
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="medium"] .hall-of-champions-letter-selector__letter,
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="medium"] .hall-of-champions-letter-selector__letter {
-  font-size: clamp(0.64rem, 2.35vw, 0.92rem);
+  font-size: clamp(0.56rem, 2.05vw, 0.8rem);
 }
 
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="long"] .hall-of-champions-letter-selector__letter,
 .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="long"] .hall-of-champions-letter-selector__letter {
-  font-size: clamp(0.54rem, 2.15vw, 1rem);
+  font-size: clamp(0.46rem, 1.65vw, 0.68rem);
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="xlong"] .hall-of-champions-letter-selector__letter,
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="xlong"] .hall-of-champions-letter-selector__letter {
+  font-size: clamp(0.4rem, 1.35vw, 0.6rem);
 }
 
 .hall-of-champions-letter-selector__letter--incoming {
@@ -21008,7 +21013,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .show-detail-stat {
-    padding-inline: 0.12rem;
+    padding-inline: 0.04rem;
   }
 
   .show-detail-carousel-arrow {
@@ -21075,7 +21080,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .band-detail-stat {
-    padding-inline: 0.12rem;
+    padding-inline: 0.04rem;
   }
 
   .band-member {

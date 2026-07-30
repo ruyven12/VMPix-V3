@@ -9096,7 +9096,7 @@ function getHallOfChampionsCurrentTeam() {
 
 function setHallOfChampionsLowerSelectorLabelSize(selector, modeName, value) {
   const valueLength = getWrestlingText(value).trim().length;
-  const labelSize = valueLength > 18 ? "long" : valueLength > 10 ? "medium" : "short";
+  const labelSize = valueLength > 18 ? "xlong" : valueLength > 12 ? "long" : valueLength > 7 ? "medium" : "short";
   delete selector.dataset.hallOfChampionsCategoryLabelSize;
   delete selector.dataset.hallOfChampionsTeamLabelSize;
   if (modeName === "category") {
