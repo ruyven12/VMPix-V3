@@ -9589,67 +9589,6 @@ function appendHallOfChampionsArchiveRecordItem(list, record) {
   }
 }
 
-function createHallOfChampionsTeamRosterCard(record) {
-  const item = document.createElement("li");
-  const media = document.createElement("div");
-  const body = document.createElement("div");
-  const heading = document.createElement("div");
-  const marker = document.createElement("span");
-  const primary = document.createElement("span");
-  const category = document.createElement("span");
-  const photoCount = document.createElement("span");
-  const affiliation = document.createElement("span");
-  const archiveName = getWrestlingText(record?.name).trim();
-
-  if (!archiveName) {
-    throw new Error("Team roster card is missing a display name");
-  }
-
-  item.className = "hall-of-champions-team-workspace__card";
-  media.className = "hall-of-champions-team-workspace__card-media";
-  media.setAttribute("aria-hidden", "true");
-  body.className = "hall-of-champions-team-workspace__card-body";
-  heading.className = "hall-of-champions-team-workspace__card-heading";
-  marker.className = "hall-of-champions-team-workspace__card-indicator";
-  marker.setAttribute("aria-hidden", "true");
-  primary.className = "hall-of-champions-team-workspace__card-name";
-  primary.textContent = archiveName;
-
-  category.className = "hall-of-champions-team-workspace__card-category";
-  category.textContent = getWrestlingText(record?.category).trim();
-
-  photoCount.className = "hall-of-champions-team-workspace__card-photo-count";
-  if (Number.isFinite(record?.photoCount)) {
-    photoCount.textContent = `\u{1F4F7} ${formatHallOfChampionsArchiveRecordPhotoCount(record.photoCount)}`;
-  } else {
-    photoCount.hidden = true;
-  }
-
-  affiliation.className = "hall-of-champions-team-workspace__card-affiliation";
-  affiliation.textContent = getWrestlingText(record?.team).trim();
-  if (!affiliation.textContent) {
-    affiliation.hidden = true;
-    item.classList.add("hall-of-champions-team-workspace__card--no-affiliation");
-  }
-
-  if (!category.textContent) {
-    category.hidden = true;
-  }
-
-  heading.append(marker, primary);
-  body.append(heading, category, photoCount, affiliation);
-  item.append(media, body);
-  return item;
-}
-
-function appendHallOfChampionsTeamRosterCard(list, record) {
-  try {
-    list.append(createHallOfChampionsTeamRosterCard(record));
-  } catch (error) {
-    reportHallOfChampionsPeopleArchiveRecordIssue("team roster render skipped record", error, record);
-  }
-}
-
 function renderHallOfChampionsAzResults(prototypeShell) {
   const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-az-results]");
   const countElement = prototypeShell?.querySelector("[data-hall-of-champions-az-result-count]");
@@ -9811,10 +9750,10 @@ function renderHallOfChampionsTeamResults(prototypeShell) {
   } else {
     countElement.textContent = `${matches.length} ${matches.length === 1 ? "RECORD" : "RECORDS"}`;
     const list = document.createElement("ol");
-    list.className = "hall-of-champions-team-workspace__roster";
+    list.className = "hall-of-champions-az-workspace__list";
     list.setAttribute("role", "list");
     matches.forEach((record) => {
-      appendHallOfChampionsTeamRosterCard(list, record);
+      appendHallOfChampionsArchiveRecordItem(list, record);
     });
     fragment.append(list);
   }
