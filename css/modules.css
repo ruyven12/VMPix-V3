@@ -13001,15 +13001,15 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace__readout {
-    font-size: 0.8925rem;
+    font-size: 0.705rem;
   }
 
   .hall-of-champions-az-workspace__title {
-    font-size: 1.2325rem;
+    font-size: 1.045rem;
   }
 
   .hall-of-champions-az-workspace__result-count {
-    font-size: 0.8925rem;
+    font-size: 0.705rem;
   }
 
   .hall-of-champions-az-workspace__results {
@@ -13025,11 +13025,11 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace__item {
-    grid-template-columns: auto minmax(0, 1fr) minmax(6rem, max-content);
+    grid-template-columns: auto minmax(0, 1fr) minmax(5.15rem, max-content);
     column-gap: 0.38rem;
     row-gap: 0.04rem;
-    min-block-size: 2.86rem;
-    padding: 0.34rem 0.52rem;
+    min-block-size: 2.44rem;
+    padding: 0.28rem 0.5rem;
   }
 
   .hall-of-champions-az-workspace__item-indicator {
@@ -13038,13 +13038,13 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace__item-primary {
-    font-size: 0.9925rem;
+    font-size: 0.805rem;
   }
 
   .hall-of-champions-az-workspace__item-secondary,
   .hall-of-champions-az-workspace__item-category,
   .hall-of-champions-az-workspace__item-photo-count {
-    font-size: 0.8125rem;
+    font-size: 0.625rem;
   }
 
   .hall-of-champions-search-workspace__field {
