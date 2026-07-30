@@ -12091,17 +12091,14 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-category-workspace {
   position: absolute;
-  inset-block-start: 0.625rem;
-  inset-block-end: 0.625rem;
-  inset-inline-start: clamp(0.625rem, 1.8vw, 2.25rem);
-  inset-inline-end: clamp(0.625rem, 1.8vw, 2.25rem);
+  inset-block-start: clamp(1.15rem, 15%, 6.5rem);
+  inset-inline-start: 50%;
   z-index: 1;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: clamp(0.34rem, 0.8svh, 0.5rem);
-  inline-size: auto;
+  gap: clamp(0.62rem, 1.8svh, 0.82rem);
+  inline-size: min(84%, 32rem);
   box-sizing: border-box;
-  transform: none;
+  transform: translateX(-50%);
   color: rgba(255, 226, 207, 0.86);
   text-align: center;
   pointer-events: none;
@@ -12328,28 +12325,6 @@ button.wrestling-event-history-tagged-thumb {
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.hall-of-champions-category-workspace__roster.hall-of-champions-team-workspace__roster {
-  --hall-champions-category-card-gap: clamp(0.48rem, 1.1vw, 0.72rem);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: center;
-  gap: var(--hall-champions-category-card-gap);
-  inline-size: min(100%, 42rem);
-}
-
-.hall-of-champions-category-workspace__roster > .hall-of-champions-team-workspace__card {
-  flex: 0 1 calc((100% - var(--hall-champions-category-card-gap)) / 2);
-  max-inline-size: calc((100% - var(--hall-champions-category-card-gap)) / 2);
-}
-
-@media (min-width: 760px) {
-  .hall-of-champions-category-workspace__roster > .hall-of-champions-team-workspace__card {
-    flex-basis: calc((100% - var(--hall-champions-category-card-gap) - var(--hall-champions-category-card-gap)) / 3);
-    max-inline-size: calc((100% - var(--hall-champions-category-card-gap) - var(--hall-champions-category-card-gap)) / 3);
-  }
 }
 
 .hall-of-champions-team-workspace__card {
@@ -13371,39 +13346,65 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-team-workspace__roster {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
-  gap: clamp(0.48rem, 1.1vw, 0.72rem);
-  inline-size: min(100%, 62rem);
-  max-inline-size: 100%;
-  min-inline-size: 0;
-  justify-self: center;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
+    grid-template-columns: minmax(0, 1fr);
+    inline-size: min(100%, calc(100vw - 4rem));
+  }
 
-.hall-of-champions-category-workspace__roster.hall-of-champions-team-workspace__roster {
-  --hall-champions-category-card-gap: clamp(0.48rem, 1.1vw, 0.72rem);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  justify-content: center;
-  gap: var(--hall-champions-category-card-gap);
-  inline-size: min(100%, 42rem);
-}
+  .hall-of-champions-team-workspace__card {
+    min-block-size: 16.7rem;
+  }
 
-.hall-of-champions-category-workspace__roster > .hall-of-champions-team-workspace__card {
-  flex: 0 1 calc((100% - var(--hall-champions-category-card-gap)) / 2);
-  max-inline-size: calc((100% - var(--hall-champions-category-card-gap)) / 2);
-}
+  .hall-of-champions-team-workspace__card-media {
+    min-block-size: 10.65rem;
+  }
 
-@media (min-width: 760px) {
-  .hall-of-champions-category-workspace__roster > .hall-of-champions-team-workspace__card {
-    flex-basis: calc((100% - var(--hall-champions-category-card-gap) - var(--hall-champions-category-card-gap)) / 3);
-    max-inline-size: calc((100% - var(--hall-champions-category-card-gap) - var(--hall-champions-category-card-gap)) / 3);
+  .hall-of-champions-team-workspace__card-name {
+    font-size: 1rem;
+  }
+
+  .hall-of-champions-team-workspace__card-category,
+  .hall-of-champions-team-workspace__card-photo-count,
+  .hall-of-champions-team-workspace__card-affiliation {
+    font-size: 0.8125rem;
+  }
+
+  .hall-of-champions-search-workspace__field {
+    min-block-size: 2.92rem;
+    padding-inline: 0.78rem;
+  }
+
+  .hall-of-champions-az-workspace__alphabet {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.32rem;
+    inline-size: min(100%, 21rem);
+    padding: 0.5rem;
+  }
+
+  .hall-of-champions-az-workspace__letter {
+    min-block-size: 1.86rem;
+    font-size: 0.68rem;
+  }
+
+  .hall-of-champions-category-workspace__group {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.42rem;
+    inline-size: min(100%, 18.5rem);
+    padding: 0.54rem;
+  }
+
+  .hall-of-champions-category-workspace__option {
+    min-block-size: 2.72rem;
+    font-size: 0.68rem;
+  }
+
+  .hall-of-champions-team-workspace__shell {
+    inline-size: min(100%, 20.5rem);
+    min-block-size: 3.65rem;
+    padding: 0.72rem 0.86rem;
+  }
+
+  .hall-of-champions-team-workspace__shell-label {
+    font-size: 0.74rem;
   }
 }
 @media (max-width: 380px) {
