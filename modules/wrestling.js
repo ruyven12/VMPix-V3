@@ -281,7 +281,7 @@ const HALL_OF_CHAMPIONS_AZ_LETTERS = Object.freeze("ABCDEFGHIJKLMNOPQRSTUVWXYZ".
 const HALL_OF_CHAMPIONS_MODE_TRANSITION_MS = 210;
 const HALL_OF_CHAMPIONS_LOWER_SELECTOR_TRANSITION_MS = 210;
 const HALL_OF_CHAMPIONS_SELECTOR_DATA_LIMIT = 500;
-const HALL_OF_CHAMPIONS_SELECTOR_DATA_TIMEOUT_MS = 20000;
+const HALL_OF_CHAMPIONS_SELECTOR_DATA_TIMEOUT_MS = 60000;
 let hallOfChampionsActivationTimer = 0;
 let hallOfChampionsCrystalRiseTimer = 0;
 let hallOfChampionsActivationSettleTimer = 0;
@@ -9442,7 +9442,7 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
   if (!prototypeShell) {
     return Promise.resolve([]);
   }
-  if (hallOfChampionsPeopleArchiveRecords.length > 0) {
+  if (hallOfChampionsPeopleArchiveRecords.length > 0 && hallOfChampionsPeopleArchiveState === "live") {
     return Promise.resolve(hallOfChampionsPeopleArchiveRecords);
   }
   if (hallOfChampionsPeopleArchiveRequest || typeof fetch !== "function") {
@@ -9454,6 +9454,10 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
   const signal = controller?.signal;
   hallOfChampionsPeopleArchiveRequest = fetchHallOfChampionsPeopleArchiveSelectorPayload(1, signal).then((firstPayload) => {
     const totalPages = Math.max(1, getHallOfChampionsPeopleArchiveTotalPages(firstPayload));
+    hallOfChampionsPeopleArchiveRecords = normalizeHallOfChampionsPeopleArchiveRecords([firstPayload]);
+    hallOfChampionsPeopleArchiveState = hallOfChampionsPeopleArchiveRecords.length > 0 ? "live" : "loading";
+    syncHallOfChampionsDiscoveredSelectorValues(prototypeShell);
+    syncHallOfChampionsWorkspaces(prototypeShell);
     if (totalPages <= 1) {
       return [firstPayload];
     }
@@ -9469,16 +9473,15 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
     syncHallOfChampionsWorkspaces(prototypeShell);
     return hallOfChampionsPeopleArchiveRecords;
   }).catch((error) => {
-    hallOfChampionsPeopleArchiveState = "error";
+    hallOfChampionsPeopleArchiveState = hallOfChampionsPeopleArchiveRecords.length > 0 ? "live" : "error";
     reportHallOfChampionsPeopleArchiveRecordIssue("selector discovery unavailable", error, null);
     syncHallOfChampionsWorkspaces(prototypeShell);
-    return [];
+    return hallOfChampionsPeopleArchiveRecords;
   }).finally(() => {
     hallOfChampionsPeopleArchiveRequest = null;
   });
   return hallOfChampionsPeopleArchiveRequest;
 }
-
 function getHallOfChampionsCategoryFilterKey(value) {
   return formatHallOfChampionsPeopleArchiveCategory(value).toLowerCase();
 }
