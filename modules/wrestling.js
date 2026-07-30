@@ -9607,6 +9607,7 @@ function createHallOfChampionsTeamRosterCard(record) {
   const photoCount = document.createElement("span");
   const affiliation = document.createElement("span");
   const archiveName = getWrestlingText(record?.name).trim();
+  const portraitUrl = getWrestlingText(record?.portraitUrl).trim();
 
   if (!archiveName) {
     throw new Error("Team roster card is missing a display name");
@@ -9615,6 +9616,32 @@ function createHallOfChampionsTeamRosterCard(record) {
   item.className = "hall-of-champions-team-workspace__card";
   media.className = "hall-of-champions-team-workspace__card-media";
   media.setAttribute("aria-hidden", "true");
+  media.setAttribute("data-hall-of-champions-team-card-media", "");
+  if (portraitUrl) {
+    const portrait = document.createElement("img");
+    const revealPortrait = () => {
+      media.setAttribute("data-hall-of-champions-team-card-portrait-state", "loaded");
+    };
+    const hideFailedPortrait = () => {
+      media.setAttribute("data-hall-of-champions-team-card-portrait-state", "failed");
+      portrait.hidden = true;
+      portrait.removeAttribute("src");
+    };
+
+    media.setAttribute("data-hall-of-champions-team-card-portrait-state", "loading");
+    portrait.className = "hall-of-champions-team-workspace__card-portrait";
+    portrait.alt = "";
+    portrait.loading = "lazy";
+    portrait.decoding = "async";
+    portrait.draggable = false;
+    portrait.addEventListener("load", revealPortrait, { once: true });
+    portrait.addEventListener("error", hideFailedPortrait, { once: true });
+    portrait.src = portraitUrl;
+    if (portrait.complete && portrait.naturalWidth > 0) {
+      revealPortrait();
+    }
+    media.append(portrait);
+  }
   body.className = "hall-of-champions-team-workspace__card-body";
   heading.className = "hall-of-champions-team-workspace__card-heading";
   marker.className = "hall-of-champions-team-workspace__card-indicator";
