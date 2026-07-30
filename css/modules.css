@@ -12330,9 +12330,9 @@ button.wrestling-event-history-tagged-thumb {
 .hall-of-champions-team-workspace__card {
   position: relative;
   display: grid;
-  grid-template-rows: minmax(5.85rem, auto) auto;
+  grid-template-rows: minmax(8.8rem, auto) auto;
   min-inline-size: 0;
-  min-block-size: clamp(11.25rem, 27svh, 15.25rem);
+  min-block-size: clamp(14.2rem, 34.5svh, 19.45rem);
   overflow: hidden;
   color: rgba(255, 232, 216, 0.86);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
@@ -12352,7 +12352,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .hall-of-champions-team-workspace__card-media {
   position: relative;
-  min-block-size: clamp(5.85rem, 15svh, 8.4rem);
+  min-block-size: clamp(8.8rem, 22.5svh, 12.6rem);
   isolation: isolate;
   overflow: hidden;
   background:
@@ -12371,7 +12371,7 @@ button.wrestling-event-history-tagged-thumb {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
-  object-position: 50% 50%;
+  object-position: 50% 20%;
   opacity: 0;
   pointer-events: none;
   user-select: none;
@@ -13351,11 +13351,11 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-team-workspace__card {
-    min-block-size: 13.15rem;
+    min-block-size: 16.7rem;
   }
 
   .hall-of-champions-team-workspace__card-media {
-    min-block-size: 7.1rem;
+    min-block-size: 10.65rem;
   }
 
   .hall-of-champions-team-workspace__card-name {
