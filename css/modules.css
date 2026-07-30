@@ -1,4 +1,4 @@
-
+﻿
 .music-nexus-shell {
   --v3-card-accent: var(--accent-music);
   position: relative;
@@ -11916,22 +11916,19 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .hall-of-champions-az-workspace__item {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(5.45rem, max-content);
-  grid-template-areas:
-    "indicator primary category"
-    "indicator secondary photo";
-  column-gap: clamp(0.42rem, 1vw, 0.68rem);
-  row-gap: 0.08rem;
+  display: flex;
   align-items: center;
   min-inline-size: 0;
-  min-block-size: clamp(2.32rem, 4.6svh, 2.82rem);
+  min-block-size: clamp(1.36rem, 2.5svh, 1.72rem);
   box-sizing: border-box;
-  padding: clamp(0.28rem, 0.72svh, 0.42rem) clamp(0.54rem, 1.1vw, 0.78rem);
+  padding: 0.16rem 0.58rem;
   overflow: hidden;
   color: rgba(255, 232, 216, 0.86);
-  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  font: 700 clamp(0.58rem, 1vw, 0.7rem) / 1.1 "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   letter-spacing: 0;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background:
     linear-gradient(180deg, rgba(255, 232, 216, 0.035), transparent 72%),
     rgba(34, 8, 5, 0.34);
@@ -11939,76 +11936,6 @@ button.wrestling-event-history-tagged-thumb {
   box-shadow: inset 0 0 0.42rem rgba(255, 73, 32, 0.04);
   pointer-events: none;
   user-select: none;
-}
-
-.hall-of-champions-az-workspace__item-indicator {
-  grid-area: indicator;
-  inline-size: clamp(0.34rem, 0.82vw, 0.44rem);
-  block-size: clamp(0.34rem, 0.82vw, 0.44rem);
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 42% 38%, rgba(255, 245, 220, 0.92), rgba(255, 116, 64, 0.7) 42%, rgba(88, 16, 8, 0.68) 74%);
-  box-shadow:
-    0 0 0 1px rgba(255, 154, 92, 0.34),
-    0 0 0.42rem rgba(255, 86, 40, 0.24);
-}
-
-.hall-of-champions-az-workspace__item-primary,
-.hall-of-champions-az-workspace__item-secondary,
-.hall-of-champions-az-workspace__item-category,
-.hall-of-champions-az-workspace__item-photo-count {
-  min-inline-size: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.hall-of-champions-az-workspace__item-primary {
-  grid-area: primary;
-  color: rgba(255, 235, 222, 0.9);
-  font-size: clamp(0.58rem, 1vw, 0.72rem);
-  font-weight: 700;
-  line-height: 1.08;
-  text-align: left;
-}
-
-.hall-of-champions-az-workspace__item-secondary {
-  grid-area: secondary;
-  color: rgba(255, 178, 130, 0.66);
-  font-size: clamp(0.5rem, 0.86vw, 0.6rem);
-  font-weight: 600;
-  line-height: 1.08;
-  text-align: left;
-}
-
-.hall-of-champions-az-workspace__item-category,
-.hall-of-champions-az-workspace__item-photo-count {
-  justify-self: end;
-  max-inline-size: min(9rem, 34vw);
-  color: rgba(255, 190, 144, 0.72);
-  font-size: clamp(0.5rem, 0.84vw, 0.6rem);
-  font-weight: 600;
-  line-height: 1.08;
-  text-align: right;
-}
-
-.hall-of-champions-az-workspace__item-category {
-  grid-area: category;
-}
-
-.hall-of-champions-az-workspace__item-photo-count {
-  grid-area: photo;
-  color: rgba(255, 219, 194, 0.68);
-}
-
-.hall-of-champions-az-workspace__item-secondary[hidden],
-.hall-of-champions-az-workspace__item-category[hidden],
-.hall-of-champions-az-workspace__item-photo-count[hidden] {
-  display: none;
-}
-
-.hall-of-champions-az-workspace__item--no-team .hall-of-champions-az-workspace__item-primary {
-  align-self: end;
 }
 
 .hall-of-champions-az-workspace__message {
@@ -13011,28 +12938,10 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .hall-of-champions-az-workspace__item {
-    grid-template-columns: auto minmax(0, 1fr) minmax(4.72rem, max-content);
-    column-gap: 0.38rem;
-    row-gap: 0.06rem;
-    min-block-size: 2.34rem;
-    padding: 0.28rem 0.46rem;
-  }
-
-  .hall-of-champions-az-workspace__item-indicator {
-    inline-size: 0.34rem;
-    block-size: 0.34rem;
-  }
-
-  .hall-of-champions-az-workspace__item-primary {
+    min-block-size: 1.38rem;
+    padding-inline: 0.5rem;
     font-size: 0.58rem;
   }
-
-  .hall-of-champions-az-workspace__item-secondary,
-  .hall-of-champions-az-workspace__item-category,
-  .hall-of-champions-az-workspace__item-photo-count {
-    font-size: 0.5rem;
-  }
-
   .hall-of-champions-search-workspace__field {
     min-block-size: 2.92rem;
     padding-inline: 0.78rem;
