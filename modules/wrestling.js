@@ -276,10 +276,14 @@ const HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS = 220;
 const HALL_OF_CHAMPIONS_CRYSTAL_RISE_DELAY_MS = 480;
 const HALL_OF_CHAMPIONS_CRYSTAL_RISE_DURATION_MS = 560;
 const HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS = 2160;
+const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A-Z", "CATEGORY", "TEAM"]);
+const HALL_OF_CHAMPIONS_MODE_TRANSITION_MS = 210;
 let hallOfChampionsActivationTimer = 0;
 let hallOfChampionsCrystalRiseTimer = 0;
 let hallOfChampionsActivationSettleTimer = 0;
 let hallOfChampionsCrystalRiseFrame = 0;
+let hallOfChampionsModeSelectorRevealTimer = 0;
+let hallOfChampionsModeTransitionTimer = 0;
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -8679,7 +8683,33 @@ function getWrestlingPeoplePrototypeShell() {
   crystalTrigger.disabled = true;
   crystalTrigger.addEventListener("click", handleHallOfChampionsCrystalTrigger);
 
-  prototypeShell.append(pedestal, expandedHologram, crystalTrigger);
+  const modeSelector = document.createElement("div");
+  modeSelector.className = "hall-of-champions-mode-selector";
+  modeSelector.dataset.hallOfChampionsModeSelector = "true";
+  modeSelector.dataset.hallOfChampionsModeIndex = "0";
+  modeSelector.dataset.hallOfChampionsModeStatus = "idle";
+  modeSelector.setAttribute("role", "group");
+  modeSelector.setAttribute("aria-label", "Hall of Champions archive mode selector. Active mode: SEARCH");
+  modeSelector.setAttribute("aria-hidden", "true");
+  modeSelector.hidden = true;
+  modeSelector.innerHTML = `
+    <button class="hall-of-champions-mode-selector__control hall-of-champions-mode-selector__control--previous" type="button" data-hall-of-champions-mode-nav="previous" aria-label="Previous archive mode" aria-disabled="true" disabled>
+      <span aria-hidden="true">&lsaquo;</span>
+    </button>
+    <div class="hall-of-champions-mode-selector__readout" aria-live="polite" aria-atomic="true">
+      <span class="hall-of-champions-mode-selector__label hall-of-champions-mode-selector__label--current" data-hall-of-champions-mode-label="current">SEARCH</span>
+      <span class="hall-of-champions-mode-selector__label hall-of-champions-mode-selector__label--incoming" data-hall-of-champions-mode-label="incoming" aria-hidden="true"></span>
+    </div>
+    <button class="hall-of-champions-mode-selector__control hall-of-champions-mode-selector__control--next" type="button" data-hall-of-champions-mode-nav="next" aria-label="Next archive mode" aria-disabled="true" disabled>
+      <span aria-hidden="true">&rsaquo;</span>
+    </button>
+  `;
+  modeSelector.querySelectorAll("[data-hall-of-champions-mode-nav]").forEach((button) => {
+    button.addEventListener("click", handleHallOfChampionsModeNavigation);
+  });
+  modeSelector.addEventListener("keydown", handleHallOfChampionsModeSelectorKeydown);
+
+  prototypeShell.append(pedestal, expandedHologram, crystalTrigger, modeSelector);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -8699,6 +8729,14 @@ function clearHallOfChampionsActivationTimers() {
   if (hallOfChampionsActivationSettleTimer) {
     window.clearTimeout(hallOfChampionsActivationSettleTimer);
     hallOfChampionsActivationSettleTimer = 0;
+  }
+  if (hallOfChampionsModeSelectorRevealTimer) {
+    window.clearTimeout(hallOfChampionsModeSelectorRevealTimer);
+    hallOfChampionsModeSelectorRevealTimer = 0;
+  }
+  if (hallOfChampionsModeTransitionTimer) {
+    window.clearTimeout(hallOfChampionsModeTransitionTimer);
+    hallOfChampionsModeTransitionTimer = 0;
   }
   if (hallOfChampionsCrystalRiseFrame && typeof window.cancelAnimationFrame === "function") {
     window.cancelAnimationFrame(hallOfChampionsCrystalRiseFrame);
@@ -8729,6 +8767,7 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   }
 
   const crystal = prototypeShell.querySelector(".hall-of-champions-pedestal__crystal");
+  const pedestal = prototypeShell.querySelector(".hall-of-champions-pedestal");
   const trigger = prototypeShell.querySelector("[data-hall-of-champions-crystal-trigger]");
   if (!crystal) {
     return;
@@ -8745,6 +8784,16 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   prototypeShell.style.setProperty("--hall-champions-crystal-trigger-top", `${crystalRect.top - triggerPadding}px`);
   prototypeShell.style.setProperty("--hall-champions-crystal-trigger-width", `${crystalRect.width + (triggerPadding * 2)}px`);
   prototypeShell.style.setProperty("--hall-champions-crystal-trigger-height", `${crystalRect.height + (triggerPadding * 2)}px`);
+
+  if (pedestal) {
+    const pedestalRect = pedestal.getBoundingClientRect();
+    if (pedestalRect.width > 0 && pedestalRect.height > 0) {
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * 0.326)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.614)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * 0.348}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * 0.138}px`);
+    }
+  }
 
   if (trigger) {
     trigger.hidden = false;
@@ -8777,6 +8826,156 @@ function setHallOfChampionsCrystalTriggerAvailable(prototypeShell, isAvailable) 
   trigger.setAttribute("aria-expanded", String(isExpanded));
 }
 
+function getHallOfChampionsModeSelector(prototypeShell) {
+  return prototypeShell?.querySelector("[data-hall-of-champions-mode-selector]") || null;
+}
+
+function resetHallOfChampionsModeSelector(prototypeShell) {
+  const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
+  if (!modeSelector) {
+    return;
+  }
+
+  const currentLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='current']");
+  const incomingLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='incoming']");
+  modeSelector.dataset.hallOfChampionsModeIndex = "0";
+  modeSelector.dataset.hallOfChampionsModeStatus = "idle";
+  modeSelector.dataset.hallOfChampionsModeDirection = "none";
+  modeSelector.setAttribute("aria-label", "Hall of Champions archive mode selector. Active mode: SEARCH");
+
+  if (currentLabel) {
+    currentLabel.textContent = HALL_OF_CHAMPIONS_ARCHIVE_MODES[0];
+  }
+  if (incomingLabel) {
+    incomingLabel.textContent = "";
+    incomingLabel.setAttribute("aria-hidden", "true");
+  }
+}
+
+function setHallOfChampionsModeSelectorAvailable(prototypeShell, isAvailable) {
+  const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
+  if (!modeSelector) {
+    return;
+  }
+
+  const isReady = Boolean(isAvailable) && prototypeShell?.dataset.hallOfChampionsExpanded === "true";
+  prototypeShell.dataset.hallOfChampionsModeSelectorReady = String(isReady);
+  modeSelector.hidden = !isReady;
+  modeSelector.setAttribute("aria-hidden", String(!isReady));
+
+  modeSelector.querySelectorAll("[data-hall-of-champions-mode-nav]").forEach((button) => {
+    button.disabled = !isReady;
+    button.setAttribute("aria-disabled", String(!isReady));
+  });
+
+  if (!isReady) {
+    modeSelector.dataset.hallOfChampionsModeStatus = "idle";
+    modeSelector.dataset.hallOfChampionsModeDirection = "none";
+  }
+}
+
+function completeHallOfChampionsModeTransition(modeSelector, nextIndex) {
+  const currentLabel = modeSelector?.querySelector("[data-hall-of-champions-mode-label='current']");
+  const incomingLabel = modeSelector?.querySelector("[data-hall-of-champions-mode-label='incoming']");
+  const nextMode = HALL_OF_CHAMPIONS_ARCHIVE_MODES[nextIndex] || HALL_OF_CHAMPIONS_ARCHIVE_MODES[0];
+
+  if (currentLabel) {
+    currentLabel.textContent = nextMode;
+  }
+  if (incomingLabel) {
+    incomingLabel.textContent = "";
+    incomingLabel.setAttribute("aria-hidden", "true");
+  }
+
+  modeSelector.dataset.hallOfChampionsModeIndex = String(nextIndex);
+  modeSelector.dataset.hallOfChampionsModeStatus = "idle";
+  modeSelector.dataset.hallOfChampionsModeDirection = "none";
+  modeSelector.setAttribute("aria-label", `Hall of Champions archive mode selector. Active mode: ${nextMode}`);
+}
+
+function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
+  const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
+  if (!modeSelector || prototypeShell?.dataset.hallOfChampionsModeSelectorReady !== "true") {
+    return;
+  }
+  if (modeSelector.dataset.hallOfChampionsModeStatus === "changing") {
+    return;
+  }
+
+  const currentIndex = Number.parseInt(modeSelector.dataset.hallOfChampionsModeIndex || "0", 10);
+  const step = direction === "previous" ? -1 : 1;
+  const nextIndex = (currentIndex + step + HALL_OF_CHAMPIONS_ARCHIVE_MODES.length) % HALL_OF_CHAMPIONS_ARCHIVE_MODES.length;
+  const incomingLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='incoming']");
+
+  if (incomingLabel) {
+    incomingLabel.textContent = HALL_OF_CHAMPIONS_ARCHIVE_MODES[nextIndex];
+    incomingLabel.setAttribute("aria-hidden", "false");
+  }
+
+  if (prefersHallOfChampionsReducedMotion()) {
+    completeHallOfChampionsModeTransition(modeSelector, nextIndex);
+    return;
+  }
+
+  modeSelector.dataset.hallOfChampionsModeStatus = "changing";
+  modeSelector.dataset.hallOfChampionsModeDirection = direction === "previous" ? "previous" : "next";
+  if (hallOfChampionsModeTransitionTimer) {
+    window.clearTimeout(hallOfChampionsModeTransitionTimer);
+  }
+  hallOfChampionsModeTransitionTimer = window.setTimeout(() => {
+    hallOfChampionsModeTransitionTimer = 0;
+    completeHallOfChampionsModeTransition(modeSelector, nextIndex);
+  }, HALL_OF_CHAMPIONS_MODE_TRANSITION_MS);
+}
+
+function handleHallOfChampionsModeNavigation(event) {
+  event.preventDefault();
+  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
+  const direction = event.currentTarget?.dataset.hallOfChampionsModeNav === "previous" ? "previous" : "next";
+  cycleHallOfChampionsArchiveMode(prototypeShell, direction);
+}
+
+function handleHallOfChampionsModeSelectorKeydown(event) {
+  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    cycleHallOfChampionsArchiveMode(prototypeShell, "previous");
+    return;
+  }
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    cycleHallOfChampionsArchiveMode(prototypeShell, "next");
+  }
+}
+
+function scheduleHallOfChampionsModeSelectorAvailability(prototypeShell) {
+  if (!prototypeShell) {
+    return;
+  }
+
+  setHallOfChampionsModeSelectorAvailable(prototypeShell, false);
+  resetHallOfChampionsModeSelector(prototypeShell);
+
+  if (hallOfChampionsModeSelectorRevealTimer) {
+    window.clearTimeout(hallOfChampionsModeSelectorRevealTimer);
+    hallOfChampionsModeSelectorRevealTimer = 0;
+  }
+
+  const revealDelay = prefersHallOfChampionsReducedMotion()
+    ? 0
+    : HALL_OF_CHAMPIONS_MODE_TRANSITION_MS;
+
+  hallOfChampionsModeSelectorRevealTimer = window.setTimeout(() => {
+    hallOfChampionsModeSelectorRevealTimer = 0;
+    if (
+      prototypeShell.dataset.hallOfChampionsActive === "true"
+      && prototypeShell.dataset.hallOfChampionsExpanded === "true"
+    ) {
+      setHallOfChampionsModeSelectorAvailable(prototypeShell, true);
+    }
+  }, revealDelay);
+}
+
 function bindHallOfChampionsProjectionResize() {
   if (isHallOfChampionsProjectionResizeBound || typeof window === "undefined") {
     return;
@@ -8803,6 +9002,7 @@ function expandHallOfChampionsHologram(prototypeShell) {
   syncHallOfChampionsProjectionGeometry(prototypeShell);
   prototypeShell.dataset.hallOfChampionsExpanded = "true";
   setHallOfChampionsCrystalTriggerAvailable(prototypeShell, false);
+  scheduleHallOfChampionsModeSelectorAvailability(prototypeShell);
 }
 
 function handleHallOfChampionsCrystalTrigger(event) {
@@ -8863,6 +9063,9 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
     prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
     scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
     setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
+    if (prototypeShell.dataset.hallOfChampionsExpanded === "true") {
+      scheduleHallOfChampionsModeSelectorAvailability(prototypeShell);
+    }
     return;
   }
 
@@ -8870,6 +9073,9 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
     prototypeShell.dataset.hallOfChampionsAwakening = "settled";
     scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
     setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
+    if (prototypeShell.dataset.hallOfChampionsExpanded === "true") {
+      scheduleHallOfChampionsModeSelectorAvailability(prototypeShell);
+    }
     return;
   }
 
@@ -8946,6 +9152,7 @@ function setWrestlingPeoplePrototypeActive(isActive) {
         : "dormant";
       setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
       setHallOfChampionsCrystalTriggerAvailable(prototypeShell, false);
+      setHallOfChampionsModeSelectorAvailable(prototypeShell, false);
     }
   }
 

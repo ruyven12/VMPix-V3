@@ -11618,6 +11618,141 @@ button.wrestling-event-history-tagged-thumb {
     0 0 0.7rem rgba(255, 64, 32, 0.28);
 }
 
+.hall-of-champions-mode-selector {
+  position: fixed;
+  inset-inline-start: var(--hall-champions-mode-selector-left, 50%);
+  inset-block-start: var(--hall-champions-mode-selector-top, 50%);
+  z-index: 38;
+  inline-size: var(--hall-champions-mode-selector-width, 11rem);
+  block-size: var(--hall-champions-mode-selector-height, 4rem);
+  display: grid;
+  box-sizing: border-box;
+  overflow: hidden;
+  grid-template-columns: minmax(2rem, 0.72fr) minmax(0, 2.9fr) minmax(2rem, 0.72fr);
+  align-items: center;
+  justify-items: center;
+  padding: 0 clamp(0.42rem, 1.2vw, 0.74rem);
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  border: 1px solid rgba(255, 96, 48, 0.46);
+  background:
+    linear-gradient(180deg, rgba(67, 15, 7, 0.62), rgba(20, 6, 4, 0.72)),
+    repeating-linear-gradient(90deg, rgba(255, 108, 52, 0.08) 0 1px, transparent 1px 18px);
+  color: rgba(255, 222, 204, 0.88);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.34rem);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 206, 180, 0.05),
+    inset 0 -0.42rem 0.78rem rgba(84, 10, 4, 0.36),
+    0 0 0.72rem rgba(101, 21, 10, 0.14);
+  transition:
+    opacity 210ms ease-out,
+    transform 210ms ease-out;
+}
+
+.wrestling-people-prototype-shell[data-hall-of-champions-mode-selector-ready="true"] .hall-of-champions-mode-selector {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.hall-of-champions-mode-selector[hidden] {
+  display: none;
+}
+
+.hall-of-champions-mode-selector::before,
+.hall-of-champions-mode-selector::after {
+  position: absolute;
+  inset-inline: 10%;
+  block-size: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 108, 58, 0.54), transparent);
+  opacity: 0.58;
+}
+
+.hall-of-champions-mode-selector::before {
+  inset-block-start: 0.44rem;
+}
+
+.hall-of-champions-mode-selector::after {
+  inset-block-end: 0.44rem;
+}
+
+.hall-of-champions-mode-selector__control {
+  inline-size: 100%;
+  block-size: 100%;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(255, 217, 197, 0.86);
+  font: inherit;
+  font-size: clamp(1.1rem, 3.1vw, 1.55rem);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hall-of-champions-mode-selector__control:disabled {
+  cursor: default;
+}
+
+.hall-of-champions-mode-selector__control:focus-visible {
+  outline: 1px solid rgba(255, 150, 96, 0.68);
+  outline-offset: -0.38rem;
+}
+
+.hall-of-champions-mode-selector__readout {
+  position: relative;
+  inline-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 1.2em;
+  overflow: hidden;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: clamp(0.66rem, 2.5vw, 0.92rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hall-of-champions-mode-selector__label {
+  display: block;
+  overflow: hidden;
+  text-overflow: clip;
+  text-shadow: 0 0 0.42rem rgba(255, 92, 46, 0.3);
+  transition:
+    opacity 210ms ease-out,
+    transform 210ms ease-out;
+}
+
+.hall-of-champions-mode-selector__label--incoming {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-status="changing"][data-hall-of-champions-mode-direction="next"] .hall-of-champions-mode-selector__label--current {
+  opacity: 0;
+  transform: translateX(-0.72rem);
+}
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-status="changing"][data-hall-of-champions-mode-direction="next"] .hall-of-champions-mode-selector__label--incoming {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-status="changing"][data-hall-of-champions-mode-direction="previous"] .hall-of-champions-mode-selector__label--current {
+  opacity: 0;
+  transform: translateX(0.72rem);
+}
+
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-status="changing"][data-hall-of-champions-mode-direction="previous"] .hall-of-champions-mode-selector__label--incoming {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 .hall-of-champions-pedestal {
   inline-size: clamp(16.5rem, 72vw, 34rem);
   max-inline-size: 100%;
