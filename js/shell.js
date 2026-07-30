@@ -2901,7 +2901,7 @@ function showBattlegroundGatewayArrivalSurface() {
   clearPortfolioGatewayRouteHandoffTimer();
   applyPortfolioGatewayWorldBackground("battleground");
   applyPortfolioGatewaySettledFrame();
-  updateShellRouteContext(getRouteFromUrl(routePaths.wrestling), "wrestling");
+  applyPortfolioShellRouteContext();
   shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
   shell.dataset.portfolioGatewayWorld = "battleground";
