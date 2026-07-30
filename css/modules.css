@@ -12354,36 +12354,6 @@ button.wrestling-event-history-tagged-thumb {
   fill-opacity: 0.24;
 }
 
-.hall-of-champions-pedestal__crystal-shell,
-.hall-of-champions-pedestal__crystal-core,
-.hall-of-champions-pedestal__crystal-facet {
-  transition:
-    fill-opacity 300ms ease-out,
-    stroke 300ms ease-out,
-    stroke-opacity 300ms ease-out,
-    filter 300ms ease-out;
-}
-
-.wrestling-people-prototype-shell[data-hall-of-champions-crystal-archive-state="az"] .hall-of-champions-pedestal__crystal-shell {
-  fill-opacity: 0.8;
-  stroke-opacity: 0.58;
-  filter: drop-shadow(0 0 0.08rem rgba(255, 174, 82, 0.18));
-}
-
-.wrestling-people-prototype-shell[data-hall-of-champions-crystal-archive-state="az"] .hall-of-champions-pedestal__crystal-core {
-  fill-opacity: 0.82;
-  stroke: rgba(255, 176, 82, 0.28);
-  filter: drop-shadow(0 0 0.1rem rgba(255, 174, 82, 0.22));
-}
-
-.wrestling-people-prototype-shell[data-hall-of-champions-crystal-archive-state="az"] .hall-of-champions-pedestal__crystal-facet {
-  fill-opacity: 0.42;
-  stroke: rgba(255, 194, 104, 0.26);
-}
-
-.wrestling-people-prototype-shell[data-hall-of-champions-crystal-archive-state="az"] .hall-of-champions-pedestal__crystal-facet--right {
-  fill-opacity: 0.32;
-}
 .hall-of-champions-pedestal__body path:first-child {
   fill: url(#hall-champions-stone-face);
   stroke: url(#hall-champions-metal-edge);
@@ -12505,12 +12475,6 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-plane {
     opacity: 0;
-  }
-
-  .hall-of-champions-pedestal__crystal-shell,
-  .hall-of-champions-pedestal__crystal-core,
-  .hall-of-champions-pedestal__crystal-facet {
-    transition: none !important;
   }
 
   .hall-of-champions-expanded-hologram,
