@@ -274,8 +274,6 @@ function applyPortfolioGatewaySettledFrame() {
   portfolioWorldGateway.style.backgroundSize = "cover";
   portfolioWorldGateway.style.transform = "translateZ(0) scale3d(1, 1, 1)";
   portfolioWorldGateway.style.transition = "none";
-  portfolioWorldGateway.setAttribute("aria-hidden", "false");
-  portfolioWorldGateway.removeAttribute("inert");
 
   getPortfolioGatewaySettledFrameElements().slice(1).forEach((element) => {
     element.style.visibility = "hidden";
@@ -296,8 +294,6 @@ function clearPortfolioGatewaySettledFrame() {
 
   if (portfolioWorldGateway) {
     portfolioWorldGateway.style.removeProperty("--portfolio-gateway-reveal-radius");
-    portfolioWorldGateway.setAttribute("aria-hidden", "true");
-    portfolioWorldGateway.setAttribute("inert", "");
   }
 
   getPortfolioGatewaySettledFrameElements().forEach((element) => {
@@ -2914,7 +2910,6 @@ function showBattlegroundGatewayArrivalSurface() {
   shell.dataset.portfolioGatewayHandoff = "complete";
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "true");
-    homeFrame.setAttribute("inert", "");
   }
   if (portfolioHub) {
     portfolioHub.setAttribute("aria-hidden", "false");
@@ -4262,7 +4257,6 @@ function showHomepage() {
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "false");
-    homeFrame.removeAttribute("inert");
   }
   if (portfolioHub) {
     portfolioHub.setAttribute("aria-hidden", "true");
