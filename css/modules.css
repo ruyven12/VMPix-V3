@@ -12353,7 +12353,6 @@ button.wrestling-event-history-tagged-thumb {
 .hall-of-champions-team-workspace__card-media {
   position: relative;
   min-block-size: clamp(5.85rem, 15svh, 8.4rem);
-  isolation: isolate;
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 42%, rgba(255, 205, 172, 0.14), transparent 36%),
@@ -12363,39 +12362,9 @@ button.wrestling-event-history-tagged-thumb {
   border-block-end: 1px solid rgba(255, 124, 72, 0.16);
 }
 
-.hall-of-champions-team-workspace__card-portrait {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: block;
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  object-position: 50% 50%;
-  opacity: 0;
-  pointer-events: none;
-  user-select: none;
-  transition: opacity 180ms ease-out;
-}
-
-.hall-of-champions-team-workspace__card-media[data-hall-of-champions-team-card-portrait-state="loaded"] .hall-of-champions-team-workspace__card-portrait {
-  opacity: 1;
-}
-
-.hall-of-champions-team-workspace__card-portrait[hidden] {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hall-of-champions-team-workspace__card-portrait {
-    transition: none !important;
-  }
-}
-
 .hall-of-champions-team-workspace__card-media::before,
 .hall-of-champions-team-workspace__card-media::after {
   position: absolute;
-  z-index: 2;
   content: "";
   pointer-events: none;
 }
