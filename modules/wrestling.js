@@ -9823,25 +9823,27 @@ function isHallOfChampionsCategoryModeActive(prototypeShell) {
     && Number(modeSelector?.dataset.hallOfChampionsModeIndex || "0") === 2;
 }
 
-function syncHallOfChampionsCategoryLowerSelectorReadout(prototypeShell, currentCategory) {
+function syncHallOfChampionsCategoryLowerSelectorReadout(prototypeShell, currentCategory = getHallOfChampionsCurrentCategory()) {
   const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  const currentLabel = selector?.querySelector("[data-hall-of-champions-letter-label='current']");
-  const incomingLabel = selector?.querySelector("[data-hall-of-champions-letter-label='incoming']");
-  const readout = selector?.querySelector("[data-hall-of-champions-letter-readout]");
   if (!selector) {
     return;
   }
 
+  const selectedCategory = getWrestlingText(currentCategory).trim();
+  const currentLabel = selector.querySelector("[data-hall-of-champions-letter-label='current']");
+  const incomingLabel = selector.querySelector("[data-hall-of-champions-letter-label='incoming']");
+  const readout = selector.querySelector("[data-hall-of-champions-letter-readout]");
   updateHallOfChampionsLowerSelectorMode(selector, "category");
   selector.dataset.hallOfChampionsCategoryIndex = String(hallOfChampionsCategoryIndex);
+  selector.dataset.hallOfChampionsCategoryLabel = selectedCategory;
   if (currentLabel) {
-    currentLabel.textContent = currentCategory || "CATEGORY";
+    currentLabel.textContent = selectedCategory || "CATEGORY";
   }
   if (incomingLabel) {
     incomingLabel.textContent = "";
   }
   if (readout) {
-    readout.setAttribute("aria-label", currentCategory ? `Selected category ${currentCategory}` : "No category selected");
+    readout.setAttribute("aria-label", selectedCategory ? `Selected category ${selectedCategory}` : "No category selected");
   }
 }
 
@@ -9883,26 +9885,8 @@ function syncHallOfChampionsCategorySelectorWhenActive(prototypeShell) {
 }
 
 function updateHallOfChampionsCategorySelectorDisplay(prototypeShell) {
-  const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  const currentCategory = getHallOfChampionsCurrentCategory();
-  const currentLabel = selector?.querySelector("[data-hall-of-champions-letter-label='current']");
-  const incomingLabel = selector?.querySelector("[data-hall-of-champions-letter-label='incoming']");
-  const readout = selector?.querySelector("[data-hall-of-champions-letter-readout]");
-
-  updateHallOfChampionsLowerSelectorMode(selector, "category");
   syncHallOfChampionsCategoryWorkspace(prototypeShell);
-  if (selector) {
-    selector.dataset.hallOfChampionsCategoryIndex = String(hallOfChampionsCategoryIndex);
-  }
-  if (currentLabel) {
-    currentLabel.textContent = currentCategory || "CATEGORY";
-  }
-  if (incomingLabel) {
-    incomingLabel.textContent = "";
-  }
-  if (readout) {
-    readout.setAttribute("aria-label", currentCategory ? `Selected category ${currentCategory}` : "No category selected");
-  }
+  syncHallOfChampionsCategoryLowerSelectorReadout(prototypeShell);
 }
 
 function clearHallOfChampionsAzLetterTransition(prototypeShell) {
