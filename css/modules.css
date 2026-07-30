@@ -12439,8 +12439,7 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-people-prototype-shell[data-hall-of-champions-letter-selector-ready="true"] .hall-of-champions-letter-selector,
-.wrestling-people-prototype-shell[data-hall-of-champions-category-selector-ready="true"] .hall-of-champions-letter-selector,
-.wrestling-people-prototype-shell[data-hall-of-champions-team-selector-ready="true"] .hall-of-champions-letter-selector {
+.wrestling-people-prototype-shell[data-hall-of-champions-category-selector-ready="true"] .hall-of-champions-letter-selector {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
@@ -12455,8 +12454,7 @@ button.wrestling-event-history-tagged-thumb {
   clip-path: polygon(5.8% 0, 94.2% 0, 100% 100%, 0 100%);
 }
 
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"],
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"] {
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] {
   grid-template-columns: clamp(1.05rem, 14%, 1.35rem) minmax(0, 1fr) clamp(1.05rem, 14%, 1.35rem);
   inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
   inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 18.5rem);
@@ -12465,23 +12463,19 @@ button.wrestling-event-history-tagged-thumb {
   clip-path: polygon(5.8% 0, 94.2% 0, 100% 100%, 0 100%);
 }
 
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] .hall-of-champions-letter-selector__letter,
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"] .hall-of-champions-letter-selector__letter {
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] .hall-of-champions-letter-selector__letter {
   padding-inline: 0.12rem;
 }
 
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="short"] .hall-of-champions-letter-selector__letter,
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="short"] .hall-of-champions-letter-selector__letter {
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="short"] .hall-of-champions-letter-selector__letter {
   font-size: clamp(0.78rem, 2.8vw, 1.05rem);
 }
 
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="medium"] .hall-of-champions-letter-selector__letter,
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="medium"] .hall-of-champions-letter-selector__letter {
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="medium"] .hall-of-champions-letter-selector__letter {
   font-size: clamp(0.64rem, 2.35vw, 0.92rem);
 }
 
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="long"] .hall-of-champions-letter-selector__letter,
-.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="team"][data-hall-of-champions-team-label-size="long"] .hall-of-champions-letter-selector__letter {
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="long"] .hall-of-champions-letter-selector__letter {
   font-size: clamp(0.54rem, 2.15vw, 1rem);
 }
 .hall-of-champions-letter-selector::before,
