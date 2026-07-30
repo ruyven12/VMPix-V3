@@ -301,7 +301,6 @@ let hallOfChampionsCategoryIndex = 0;
 let hallOfChampionsPeopleArchiveState = "idle";
 let hallOfChampionsPeopleArchiveRecords = [];
 let hallOfChampionsPeopleArchiveCategories = [];
-let hallOfChampionsPeopleArchiveTeams = [];
 let hallOfChampionsPeopleArchiveRequest = null;
 let hallOfChampionsPeopleArchiveRequestController = null;
 let hallOfChampionsPeopleArchiveError = null;
@@ -9255,43 +9254,6 @@ function discoverHallOfChampionsPeopleArchiveCategories() {
     .sort((left, right) => left.localeCompare(right, undefined, { sensitivity: "base" }));
   return hallOfChampionsPeopleArchiveCategories;
 }
-
-function normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(value) {
-  return typeof value === "string"
-    ? value.replace(/_/g, " ").replace(/\s+/g, " ").trim()
-    : "";
-}
-
-function getHallOfChampionsPeopleArchiveDiscoveredTeams(record) {
-  return normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(record?.team)
-    .split(/[;,]/)
-    .map(normalizeHallOfChampionsPeopleArchiveDiscoveredTeam)
-    .filter(Boolean);
-}
-
-function discoverHallOfChampionsPeopleArchiveTeams() {
-  const seenTeams = new Set();
-  hallOfChampionsPeopleArchiveTeams = hallOfChampionsPeopleArchiveRecords
-    .flatMap((record) => {
-      try {
-        return getHallOfChampionsPeopleArchiveDiscoveredTeams(record);
-      } catch (error) {
-        reportHallOfChampionsPeopleArchiveRecordIssue("team discovery skipped record", error, record);
-        return [];
-      }
-    })
-    .filter((teamName) => {
-      const teamKey = teamName.toLowerCase();
-      if (seenTeams.has(teamKey)) {
-        return false;
-      }
-      seenTeams.add(teamKey);
-      return true;
-    })
-    .sort((left, right) => left.localeCompare(right, undefined, { sensitivity: "base" }));
-  return hallOfChampionsPeopleArchiveTeams;
-}
-
 function mergeHallOfChampionsPeopleArchiveRecords(records) {
   const seenKeys = new Set();
   const nextRecords = Array.isArray(records) ? records : [];
@@ -9438,7 +9400,6 @@ function hydrateHallOfChampionsPeopleArchiveCache(prototypeShell) {
     totalRecords: cachedArchive.totalRecords,
   });
   discoverHallOfChampionsPeopleArchiveCategories();
-  discoverHallOfChampionsPeopleArchiveTeams();
   syncHallOfChampionsCategoryWorkspace(prototypeShell);
   syncHallOfChampionsCategorySelectorWhenActive(prototypeShell);
   return true;
@@ -9455,7 +9416,6 @@ function syncHallOfChampionsPeopleArchiveDataset(prototypeShell) {
 
 function mergeHallOfChampionsPeopleArchivePayload(prototypeShell, payload) {
   mergeHallOfChampionsPeopleArchiveRecords(normalizeHallOfChampionsPeopleArchiveRecords(payload));
-  discoverHallOfChampionsPeopleArchiveTeams();
   syncHallOfChampionsPeopleArchiveDataset(prototypeShell);
   renderHallOfChampionsAzResults(prototypeShell);
   renderHallOfChampionsCategoryResults(prototypeShell);
@@ -9738,7 +9698,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
         totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
       discoverHallOfChampionsPeopleArchiveCategories();
-      discoverHallOfChampionsPeopleArchiveTeams();
       syncHallOfChampionsCategoryWorkspace(prototypeShell);
       syncHallOfChampionsCategorySelectorWhenActive(prototypeShell);
       return Promise.resolve(hallOfChampionsPeopleArchiveRecords);
@@ -9784,7 +9743,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
         totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
       });
       discoverHallOfChampionsPeopleArchiveCategories();
-      discoverHallOfChampionsPeopleArchiveTeams();
       syncHallOfChampionsCategoryWorkspace(prototypeShell);
       syncHallOfChampionsCategorySelectorWhenActive(prototypeShell);
       writeHallOfChampionsPeopleArchiveCache();
@@ -9800,7 +9758,6 @@ function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
             totalRecords: hallOfChampionsPeopleArchiveTotalRecords || hallOfChampionsPeopleArchiveRecords.length,
           });
           discoverHallOfChampionsPeopleArchiveCategories();
-          discoverHallOfChampionsPeopleArchiveTeams();
           syncHallOfChampionsCategoryWorkspace(prototypeShell);
       syncHallOfChampionsCategorySelectorWhenActive(prototypeShell);
         } else {
