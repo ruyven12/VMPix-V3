@@ -9836,7 +9836,7 @@ function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
   }
 
   const list = document.createElement("ul");
-  const usesPortraitCards = modeName === "category" || modeName === "team";
+  const usesPortraitCards = modeName === "az" || modeName === "category" || modeName === "team";
   list.className = usesPortraitCards ? "hall-of-champions-workspace__records hall-of-champions-workspace__records--portrait" : "hall-of-champions-workspace__records";
   matches.forEach((record) => {
     if (usesPortraitCards) {
