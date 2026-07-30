@@ -9836,6 +9836,9 @@ function syncHallOfChampionsCategoryLowerSelectorReadout(prototypeShell, current
   updateHallOfChampionsLowerSelectorMode(selector, "category");
   selector.dataset.hallOfChampionsCategoryIndex = String(hallOfChampionsCategoryIndex);
   selector.dataset.hallOfChampionsCategoryLabel = selectedCategory;
+  selector.dataset.hallOfChampionsCategoryLabelSize = selectedCategory.length > 18
+    ? "long"
+    : selectedCategory.length > 10 ? "medium" : "short";
   if (currentLabel) {
     currentLabel.textContent = selectedCategory || "CATEGORY";
   }

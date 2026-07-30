@@ -12365,6 +12365,11 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: auto;
 }
 
+.hall-of-champions-mode-selector[data-hall-of-champions-mode-index="2"] {
+  grid-template-columns: minmax(1rem, 20%) minmax(0, 1fr) minmax(1rem, 20%);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.94);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.03);
+}
 .hall-of-champions-letter-selector {
   position: fixed;
   inset-inline-start: var(--hall-champions-letter-selector-center, 50%);
@@ -12401,7 +12406,30 @@ button.wrestling-event-history-tagged-thumb {
   transform: translateX(-50%) translateY(0);
   pointer-events: auto;
 }
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] {
+  grid-template-columns: clamp(1.05rem, 14%, 1.35rem) minmax(0, 1fr) clamp(1.05rem, 14%, 1.35rem);
+  inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.3rem);
+  inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 18.5rem);
+  block-size: min(var(--hall-champions-letter-selector-height, 2rem), 2.34rem);
+  padding-inline: clamp(0.06rem, 0.3vw, 0.16rem);
+  clip-path: polygon(5.8% 0, 94.2% 0, 100% 100%, 0 100%);
+}
 
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"] .hall-of-champions-letter-selector__letter {
+  padding-inline: 0.12rem;
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="short"] .hall-of-champions-letter-selector__letter {
+  font-size: clamp(0.78rem, 2.8vw, 1.05rem);
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="medium"] .hall-of-champions-letter-selector__letter {
+  font-size: clamp(0.64rem, 2.35vw, 0.92rem);
+}
+
+.hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="category"][data-hall-of-champions-category-label-size="long"] .hall-of-champions-letter-selector__letter {
+  font-size: clamp(0.54rem, 2.15vw, 1rem);
+}
 .hall-of-champions-letter-selector::before,
 .hall-of-champions-letter-selector::after {
   position: absolute;
@@ -12943,7 +12971,12 @@ button.wrestling-event-history-tagged-thumb {
     animation: none !important;
   }
 
-  .hall-of-champions-letter-selector {
+  .hall-of-champions-mode-selector[data-hall-of-champions-mode-index="2"] {
+  grid-template-columns: minmax(1rem, 20%) minmax(0, 1fr) minmax(1rem, 20%);
+  inline-size: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.94);
+  margin-inline-start: calc(var(--hall-champions-mode-selector-width, 7rem) * 0.03);
+}
+.hall-of-champions-letter-selector {
     transition: none;
   }
 
