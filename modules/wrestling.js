@@ -8728,12 +8728,6 @@ function getWrestlingPeoplePrototypeShell() {
         <h2 class="hall-of-champions-category-workspace__title">ARCHIVE CATEGORIES</h2>
       </div>
       <p class="hall-of-champions-category-workspace__status" data-hall-of-champions-category-readout aria-live="polite" aria-atomic="true">CURRENT CATEGORY // DISCOVERING</p>
-      <div class="hall-of-champions-az-workspace__results hall-of-champions-category-workspace__results" data-hall-of-champions-category-results role="region" aria-label="Category archive records" aria-live="polite" aria-busy="false">
-        <p class="hall-of-champions-az-workspace__result-count hall-of-champions-category-workspace__result-count" data-hall-of-champions-category-result-count aria-live="polite">0 RECORDS</p>
-        <div class="hall-of-champions-az-workspace__result-scroll hall-of-champions-category-workspace__result-scroll" data-hall-of-champions-category-result-scroll>
-          <p class="hall-of-champions-az-workspace__message hall-of-champions-category-workspace__message" role="status">NO ARCHIVE RECORDS</p>
-        </div>
-      </div>
     </section>
     <section class="hall-of-champions-team-workspace" data-hall-of-champions-team-workspace aria-label="Hall of Champions team directory workspace" aria-hidden="true" hidden>
       <div class="hall-of-champions-team-workspace__header">
@@ -9418,7 +9412,6 @@ function mergeHallOfChampionsPeopleArchivePayload(prototypeShell, payload) {
   mergeHallOfChampionsPeopleArchiveRecords(normalizeHallOfChampionsPeopleArchiveRecords(payload));
   syncHallOfChampionsPeopleArchiveDataset(prototypeShell);
   renderHallOfChampionsAzResults(prototypeShell);
-  renderHallOfChampionsCategoryResults(prototypeShell);
 }
 
 function fetchHallOfChampionsPeopleArchivePayload(page, signal) {
@@ -9436,25 +9429,6 @@ function fetchHallOfChampionsPeopleArchivePayload(page, signal) {
 function getHallOfChampionsAzMatches() {
   const selectedLetter = getHallOfChampionsCurrentAzLetter();
   return hallOfChampionsPeopleArchiveRecords.filter((record) => record.initial === selectedLetter);
-}
-
-function getHallOfChampionsCategoryFilterKey(value) {
-  return normalizeHallOfChampionsPeopleArchiveDiscoveredCategory(value).toLowerCase();
-}
-
-function getHallOfChampionsCategoryMatches() {
-  const selectedCategoryKey = getHallOfChampionsCategoryFilterKey(getHallOfChampionsCurrentCategory());
-  if (!selectedCategoryKey) {
-    return [];
-  }
-  return hallOfChampionsPeopleArchiveRecords.filter((record) => {
-    try {
-      return getHallOfChampionsCategoryFilterKey(record?.category) === selectedCategoryKey;
-    } catch (error) {
-      reportHallOfChampionsPeopleArchiveRecordIssue("category filter skipped record", error, record);
-      return false;
-    }
-  });
 }
 
 function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
@@ -9591,39 +9565,6 @@ function renderHallOfChampionsAzResults(prototypeShell) {
   scrollElement.replaceChildren(fragment);
 }
 
-function renderHallOfChampionsCategoryResults(prototypeShell) {
-  const resultsRegion = prototypeShell?.querySelector("[data-hall-of-champions-category-results]");
-  const countElement = prototypeShell?.querySelector("[data-hall-of-champions-category-result-count]");
-  const scrollElement = prototypeShell?.querySelector("[data-hall-of-champions-category-result-scroll]");
-  if (!resultsRegion || !countElement || !scrollElement) {
-    return;
-  }
-
-  const matches = getHallOfChampionsCategoryMatches();
-  const fragment = document.createDocumentFragment();
-  resultsRegion.dataset.hallOfChampionsCategoryVisibleRecords = String(matches.length);
-  resultsRegion.setAttribute("aria-busy", "false");
-  countElement.textContent = `${matches.length} ${matches.length === 1 ? "RECORD" : "RECORDS"}`;
-
-  if (matches.length === 0) {
-    const message = document.createElement("p");
-    message.className = "hall-of-champions-az-workspace__message hall-of-champions-category-workspace__message";
-    message.setAttribute("role", "status");
-    message.textContent = "NO ARCHIVE RECORDS";
-    fragment.append(message);
-  } else {
-    const list = document.createElement("ol");
-    list.className = "hall-of-champions-az-workspace__list";
-    list.setAttribute("role", "list");
-    matches.forEach((record) => {
-      appendHallOfChampionsArchiveRecordItem(list, record);
-    });
-    fragment.append(list);
-  }
-
-  scrollElement.replaceChildren(fragment);
-}
-
 function clearHallOfChampionsPeopleArchiveConnectionTimer() {
   if (hallOfChampionsPeopleArchiveConnectionTimer) {
     window.clearTimeout(hallOfChampionsPeopleArchiveConnectionTimer);
@@ -9672,7 +9613,6 @@ function setHallOfChampionsPeopleArchiveState(prototypeShell, stateName, options
     prototypeShell.dataset.hallOfChampionsPeopleArchiveTotal = String(hallOfChampionsPeopleArchiveTotalRecords);
   }
   renderHallOfChampionsAzResults(prototypeShell);
-  renderHallOfChampionsCategoryResults(prototypeShell);
 }
 
 function requestHallOfChampionsPeopleArchiveData(prototypeShell, options = {}) {
@@ -9834,7 +9774,6 @@ function syncHallOfChampionsCategoryWorkspace(prototypeShell) {
       ? `CURRENT CATEGORY // ${currentCategory}`
       : "CURRENT CATEGORY // DISCOVERING";
   }
-  renderHallOfChampionsCategoryResults(prototypeShell);
 }
 
 function syncHallOfChampionsCategorySelectorWhenActive(prototypeShell) {
