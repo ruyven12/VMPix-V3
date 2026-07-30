@@ -279,9 +279,7 @@ const HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS = 2160;
 const HALL_OF_CHAMPIONS_EXPANDED_HOLOGRAM_TRANSITION_MS = 780;
 const HALL_OF_CHAMPIONS_MODE_TRANSITION_MS = 220;
 const HALL_OF_CHAMPIONS_CRYSTAL_ARCHIVE_TRANSITION_MS = 300;
-const HALL_OF_CHAMPIONS_AZ_LETTER_TRANSITION_MS = 210;
 const HALL_OF_CHAMPIONS_ARCHIVE_MODES = Object.freeze(["SEARCH", "A\u2013Z", "CATEGORY", "TEAM"]);
-const HALL_OF_CHAMPIONS_AZ_LETTERS = Object.freeze("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""));
 let hallOfChampionsActivationTimer = 0;
 let hallOfChampionsCrystalRiseTimer = 0;
 let hallOfChampionsActivationSettleTimer = 0;
@@ -289,8 +287,6 @@ let hallOfChampionsCrystalRiseFrame = 0;
 let hallOfChampionsModeSelectorRevealTimer = 0;
 let hallOfChampionsModeTransitionTimer = 0;
 let hallOfChampionsCrystalArchiveTransitionTimer = 0;
-let hallOfChampionsAzLetterTransitionTimer = 0;
-let hallOfChampionsAzLetterIndex = 0;
 let isHallOfChampionsProjectionResizeBound = false;
 const wrestlingVenuesFilters = document.querySelector("[data-wrestling-venues-filters]");
 const wrestlingVenuesCount = document.querySelector("[data-wrestling-venues-count]");
@@ -8695,7 +8691,34 @@ function getWrestlingPeoplePrototypeShell() {
         <span class="hall-of-champions-az-workspace__system">HALL OF CHAMPIONS</span>
         <h2 class="hall-of-champions-az-workspace__title">ALPHABETICAL INDEX</h2>
       </div>
-      <p class="hall-of-champions-az-workspace__readout" data-hall-of-champions-az-readout aria-live="polite" aria-atomic="true">CURRENT INITIAL // A</p>
+      <div class="hall-of-champions-az-workspace__alphabet" role="group" aria-label="Dormant alphabetical index A through Z">
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">A</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">B</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">C</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">D</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">E</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">F</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">G</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">H</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">I</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">J</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">K</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">L</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">M</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">N</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">O</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">P</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Q</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">R</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">S</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">T</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">U</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">V</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">W</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">X</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Y</span>
+        <span class="hall-of-champions-az-workspace__letter" aria-hidden="true">Z</span>
+      </div>
       <p class="hall-of-champions-az-workspace__status">SELECT INITIAL</p>
     </section>
     <section class="hall-of-champions-category-workspace" data-hall-of-champions-category-workspace aria-label="Hall of Champions archive categories workspace" aria-hidden="true" hidden>
@@ -8747,32 +8770,6 @@ function getWrestlingPeoplePrototypeShell() {
   });
   modeSelector.addEventListener("keydown", handleHallOfChampionsModeSelectorKeydown);
 
-  const azLetterSelector = document.createElement("div");
-  azLetterSelector.className = "hall-of-champions-letter-selector";
-  azLetterSelector.dataset.hallOfChampionsLetterSelector = "true";
-  azLetterSelector.dataset.hallOfChampionsLetterIndex = "0";
-  azLetterSelector.dataset.hallOfChampionsLetterStatus = "idle";
-  azLetterSelector.setAttribute("role", "group");
-  azLetterSelector.setAttribute("aria-label", "Hall of Champions alphabetical initial selector");
-  azLetterSelector.setAttribute("aria-hidden", "true");
-  azLetterSelector.hidden = true;
-  azLetterSelector.innerHTML = `
-    <button class="hall-of-champions-letter-selector__control hall-of-champions-letter-selector__control--previous" type="button" data-hall-of-champions-letter-nav="previous" aria-label="Previous initial" aria-disabled="true" disabled>
-      <span aria-hidden="true">&lsaquo;</span>
-    </button>
-    <div class="hall-of-champions-letter-selector__readout" data-hall-of-champions-letter-readout aria-live="polite" aria-atomic="true" aria-label="Selected initial A">
-      <span class="hall-of-champions-letter-selector__letter hall-of-champions-letter-selector__letter--current" data-hall-of-champions-letter-label="current">A</span>
-      <span class="hall-of-champions-letter-selector__letter hall-of-champions-letter-selector__letter--incoming" data-hall-of-champions-letter-label="incoming" aria-hidden="true"></span>
-    </div>
-    <button class="hall-of-champions-letter-selector__control hall-of-champions-letter-selector__control--next" type="button" data-hall-of-champions-letter-nav="next" aria-label="Next initial" aria-disabled="true" disabled>
-      <span aria-hidden="true">&rsaquo;</span>
-    </button>
-  `;
-  azLetterSelector.querySelectorAll("[data-hall-of-champions-letter-nav]").forEach((button) => {
-    button.addEventListener("click", handleHallOfChampionsAzLetterNavigation);
-  });
-  azLetterSelector.addEventListener("keydown", handleHallOfChampionsAzLetterSelectorKeydown);
-
   const crystalTrigger = document.createElement("button");
   crystalTrigger.type = "button";
   crystalTrigger.className = "hall-of-champions-crystal-trigger";
@@ -8784,7 +8781,7 @@ function getWrestlingPeoplePrototypeShell() {
   crystalTrigger.disabled = true;
   crystalTrigger.addEventListener("click", handleHallOfChampionsCrystalTrigger);
 
-  prototypeShell.append(pedestal, expandedHologram, modeSelector, azLetterSelector, crystalTrigger);
+  prototypeShell.append(pedestal, expandedHologram, modeSelector, crystalTrigger);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -8820,10 +8817,6 @@ function clearHallOfChampionsActivationTimers() {
   if (hallOfChampionsCrystalArchiveTransitionTimer) {
     window.clearTimeout(hallOfChampionsCrystalArchiveTransitionTimer);
     hallOfChampionsCrystalArchiveTransitionTimer = 0;
-  }
-  if (hallOfChampionsAzLetterTransitionTimer) {
-    window.clearTimeout(hallOfChampionsAzLetterTransitionTimer);
-    hallOfChampionsAzLetterTransitionTimer = 0;
   }
 }
 
@@ -8875,10 +8868,6 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
       prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.614)}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * 0.348}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * 0.138}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-center", `${pedestalRect.left + (pedestalRect.width * 0.5)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.802)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-width", `${pedestalRect.width * 0.44}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-height", `${pedestalRect.height * 0.092}px`);
     }
   }
 
@@ -8917,125 +8906,11 @@ function getHallOfChampionsModeSelector(prototypeShell) {
   return prototypeShell?.querySelector("[data-hall-of-champions-mode-selector]") || null;
 }
 
-function getHallOfChampionsAzLetterSelector(prototypeShell) {
-  return prototypeShell?.querySelector("[data-hall-of-champions-letter-selector]") || null;
-}
-
-function getHallOfChampionsCurrentAzLetter() {
-  return HALL_OF_CHAMPIONS_AZ_LETTERS[hallOfChampionsAzLetterIndex] || HALL_OF_CHAMPIONS_AZ_LETTERS[0];
-}
-
-function updateHallOfChampionsAzLetterDisplay(prototypeShell) {
-  const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  const currentLetter = getHallOfChampionsCurrentAzLetter();
-  const currentLabel = selector?.querySelector("[data-hall-of-champions-letter-label='current']");
-  const incomingLabel = selector?.querySelector("[data-hall-of-champions-letter-label='incoming']");
-  const readout = selector?.querySelector("[data-hall-of-champions-letter-readout]");
-  const workspaceReadout = prototypeShell?.querySelector("[data-hall-of-champions-az-readout]");
-
-  if (selector) {
-    selector.dataset.hallOfChampionsLetterIndex = String(hallOfChampionsAzLetterIndex);
-  }
-  if (currentLabel) {
-    currentLabel.textContent = currentLetter;
-  }
-  if (incomingLabel) {
-    incomingLabel.textContent = "";
-  }
-  if (readout) {
-    readout.setAttribute("aria-label", `Selected initial ${currentLetter}`);
-  }
-  if (workspaceReadout) {
-    workspaceReadout.textContent = `CURRENT INITIAL // ${currentLetter}`;
-  }
-}
-
 function updateHallOfChampionsModeSelectorA11y(modeSelector, modeName) {
   if (!modeSelector) {
     return;
   }
   modeSelector.setAttribute("aria-label", `Hall of Champions archive mode selector. Active mode: ${modeName}`);
-}
-
-function clearHallOfChampionsAzLetterTransition(prototypeShell) {
-  if (hallOfChampionsAzLetterTransitionTimer) {
-    window.clearTimeout(hallOfChampionsAzLetterTransitionTimer);
-    hallOfChampionsAzLetterTransitionTimer = 0;
-  }
-
-  const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  if (selector) {
-    selector.dataset.hallOfChampionsLetterStatus = "idle";
-    delete selector.dataset.hallOfChampionsLetterDirection;
-  }
-  updateHallOfChampionsAzLetterDisplay(prototypeShell);
-}
-
-function completeHallOfChampionsAzLetterTransition(selector) {
-  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(selector);
-  if (!selector || !prototypeShell) {
-    hallOfChampionsAzLetterTransitionTimer = 0;
-    return;
-  }
-
-  selector.dataset.hallOfChampionsLetterStatus = "idle";
-  delete selector.dataset.hallOfChampionsLetterDirection;
-  updateHallOfChampionsAzLetterDisplay(prototypeShell);
-  hallOfChampionsAzLetterTransitionTimer = 0;
-}
-
-function setHallOfChampionsAzLetterSelectorAvailable(prototypeShell, isAvailable) {
-  const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  if (!selector) {
-    return;
-  }
-
-  if (!isAvailable) {
-    clearHallOfChampionsAzLetterTransition(prototypeShell);
-  } else {
-    updateHallOfChampionsAzLetterDisplay(prototypeShell);
-  }
-
-  prototypeShell.dataset.hallOfChampionsLetterSelectorReady = String(Boolean(isAvailable));
-  selector.hidden = !isAvailable;
-  selector.setAttribute("aria-hidden", String(!isAvailable));
-  selector.querySelectorAll("[data-hall-of-champions-letter-nav]").forEach((button) => {
-    button.disabled = !isAvailable;
-    button.setAttribute("aria-disabled", String(!isAvailable));
-  });
-}
-
-function cycleHallOfChampionsAzLetter(prototypeShell, direction) {
-  const selector = getHallOfChampionsAzLetterSelector(prototypeShell);
-  if (!selector || prototypeShell?.dataset.hallOfChampionsLetterSelectorReady !== "true") {
-    return;
-  }
-  if (selector.dataset.hallOfChampionsLetterStatus === "changing") {
-    return;
-  }
-
-  const step = direction === "previous" ? -1 : 1;
-  const previousLetter = getHallOfChampionsCurrentAzLetter();
-  const nextIndex = (hallOfChampionsAzLetterIndex + step + HALL_OF_CHAMPIONS_AZ_LETTERS.length) % HALL_OF_CHAMPIONS_AZ_LETTERS.length;
-  const nextLetter = HALL_OF_CHAMPIONS_AZ_LETTERS[nextIndex];
-  const currentLabel = selector.querySelector("[data-hall-of-champions-letter-label='current']");
-  const incomingLabel = selector.querySelector("[data-hall-of-champions-letter-label='incoming']");
-
-  hallOfChampionsAzLetterIndex = nextIndex;
-  if (prefersHallOfChampionsReducedMotion() || !currentLabel || !incomingLabel) {
-    updateHallOfChampionsAzLetterDisplay(prototypeShell);
-    return;
-  }
-
-  currentLabel.textContent = previousLetter;
-  incomingLabel.textContent = nextLetter;
-  selector.dataset.hallOfChampionsLetterIndex = String(nextIndex);
-  selector.dataset.hallOfChampionsLetterDirection = direction;
-  selector.dataset.hallOfChampionsLetterStatus = "changing";
-
-  hallOfChampionsAzLetterTransitionTimer = window.setTimeout(() => {
-    completeHallOfChampionsAzLetterTransition(selector);
-  }, HALL_OF_CHAMPIONS_AZ_LETTER_TRANSITION_MS);
 }
 
 function setHallOfChampionsCrystalArchiveState(prototypeShell, isArchiveIndexMode) {
@@ -9082,7 +8957,6 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   const categoryWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-category-workspace]");
   const teamWorkspace = prototypeShell?.querySelector("[data-hall-of-champions-team-workspace]");
   const expandedHologram = prototypeShell?.querySelector("[data-hall-of-champions-expanded-hologram]");
-  const azLetterSelector = getHallOfChampionsAzLetterSelector(prototypeShell);
   if (!modeSelector || (!searchWorkspace && !azWorkspace && !categoryWorkspace && !teamWorkspace)) {
     return;
   }
@@ -9106,7 +8980,6 @@ function syncHallOfChampionsSearchWorkspace(prototypeShell) {
   setWorkspaceVisibility(azWorkspace, canShowWorkspace && activeModeIndex === 1);
   setWorkspaceVisibility(categoryWorkspace, canShowWorkspace && activeModeIndex === 2);
   setWorkspaceVisibility(teamWorkspace, canShowWorkspace && activeModeIndex === 3);
-  setHallOfChampionsAzLetterSelectorAvailable(prototypeShell, Boolean(azLetterSelector) && canShowWorkspace && activeModeIndex === 1);
   if (expandedHologram) {
     expandedHologram.setAttribute("aria-hidden", String(!isExpanded));
   }
@@ -9217,29 +9090,6 @@ function handleHallOfChampionsModeNavigation(event) {
   const prototypeShell = getHallOfChampionsPrototypeShellFromNode(button);
   const direction = button.dataset.hallOfChampionsModeNav === "previous" ? "previous" : "next";
   cycleHallOfChampionsArchiveMode(prototypeShell, direction);
-}
-
-function handleHallOfChampionsAzLetterNavigation(event) {
-  event.preventDefault();
-  const button = event.currentTarget;
-  if (button.disabled) {
-    return;
-  }
-  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(button);
-  const direction = button.dataset.hallOfChampionsLetterNav === "previous" ? "previous" : "next";
-  cycleHallOfChampionsAzLetter(prototypeShell, direction);
-}
-
-function handleHallOfChampionsAzLetterSelectorKeydown(event) {
-  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-    return;
-  }
-  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
-  if (!prototypeShell || prototypeShell.dataset.hallOfChampionsLetterSelectorReady !== "true") {
-    return;
-  }
-  event.preventDefault();
-  cycleHallOfChampionsAzLetter(prototypeShell, event.key === "ArrowLeft" ? "previous" : "next");
 }
 
 function handleHallOfChampionsModeSelectorKeydown(event) {
