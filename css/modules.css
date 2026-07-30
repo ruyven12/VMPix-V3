@@ -11731,6 +11731,113 @@ button.wrestling-event-history-tagged-thumb {
   overflow-wrap: anywhere;
 }
 
+
+.hall-of-champions-workspace__records--portrait {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.34rem, 1.8vw, 0.62rem);
+  align-items: stretch;
+  max-inline-size: min(100%, 58rem);
+}
+
+.hall-of-champions-workspace__portrait-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-inline-size: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  background:
+    linear-gradient(180deg, rgba(72, 18, 9, 0.38), rgba(22, 7, 4, 0.48)),
+    rgba(18, 6, 3, 0.46);
+  border: 1px solid rgba(255, 112, 58, 0.18);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 226, 207, 0.035),
+    inset 0 0 0.9rem rgba(255, 72, 34, 0.06);
+}
+
+.hall-of-champions-workspace__portrait-media {
+  position: relative;
+  block-size: clamp(5.85rem, 26vw, 9.5rem);
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 116, 62, 0.08) 0 1px, transparent 1px 7px),
+    linear-gradient(135deg, rgba(255, 112, 58, 0.1), rgba(22, 7, 4, 0.5));
+  border-block-end: 1px solid rgba(255, 112, 58, 0.16);
+}
+
+.hall-of-champions-workspace__portrait-media::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  box-shadow: inset 0 0 1rem rgba(255, 72, 34, 0.12);
+}
+
+.hall-of-champions-workspace__portrait-image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+.hall-of-champions-workspace__portrait-body {
+  display: grid;
+  grid-template-columns: 0.48rem minmax(0, 1fr);
+  grid-template-areas:
+    "light name"
+    ". category"
+    ". photos"
+    ". team";
+  align-content: start;
+  column-gap: 0.3rem;
+  row-gap: 0.14rem;
+  min-block-size: 5.2rem;
+  box-sizing: border-box;
+  padding: 0.42rem 0.46rem 0.5rem;
+}
+
+.hall-of-champions-workspace__portrait-light {
+  grid-area: light;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  margin-block-start: 0.2rem;
+  border-radius: 50%;
+  background: rgba(255, 156, 96, 0.86);
+  box-shadow: 0 0 0.24rem rgba(255, 98, 46, 0.74);
+}
+
+.hall-of-champions-workspace__portrait-name {
+  grid-area: name;
+  min-inline-size: 0;
+  color: rgba(255, 235, 222, 0.94);
+  font-size: clamp(0.7rem, 2.4vw, 0.98rem);
+  font-weight: 700;
+  line-height: 1.14;
+  overflow-wrap: anywhere;
+}
+
+.hall-of-champions-workspace__portrait-category,
+.hall-of-champions-workspace__portrait-photos,
+.hall-of-champions-workspace__portrait-team {
+  min-inline-size: 0;
+  color: rgba(255, 201, 172, 0.78);
+  font-size: clamp(0.5rem, 1.8vw, 0.68rem);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+
+.hall-of-champions-workspace__portrait-category {
+  grid-area: category;
+}
+
+.hall-of-champions-workspace__portrait-photos {
+  grid-area: photos;
+}
+
+.hall-of-champions-workspace__portrait-team {
+  grid-area: team;
+  color: rgba(255, 187, 142, 0.74);
+}
 .hall-of-champions-workspace__record-category {
   grid-area: category;
 }
@@ -11740,6 +11847,21 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (min-width: 900px) {
+  .hall-of-champions-workspace__records--portrait {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.66rem;
+    max-inline-size: min(100%, 72rem);
+  }
+
+  .hall-of-champions-workspace__portrait-media {
+    block-size: clamp(8rem, 14vw, 11.5rem);
+  }
+
+  .hall-of-champions-workspace__portrait-body {
+    min-block-size: 5.35rem;
+    padding: 0.48rem 0.56rem 0.58rem;
+  }
+
   .hall-of-champions-workspace {
     inset: 0.75rem;
     padding-inline: 1.1rem;

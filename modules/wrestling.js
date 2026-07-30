@@ -9370,6 +9370,68 @@ function normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(value) {
   return typeof value === "string" ? value.replace(/_/g, " ").replace(/\s+/g, " ").trim() : "";
 }
 
+function getHallOfChampionsPeopleArchiveUrlValue(value, seen = new Set()) {
+  try {
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        const url = getHallOfChampionsPeopleArchiveUrlValue(entry, seen);
+        if (url) {
+          return url;
+        }
+      }
+      return "";
+    }
+    if (value && typeof value === "object") {
+      if (seen.has(value)) {
+        return "";
+      }
+      seen.add(value);
+      for (const field of ["portrait_url", "portraitUrl", "image_url", "imageUrl", "photo_url", "photoUrl", "profile_image_url", "profileImageUrl", "thumbnail_url", "thumbnailUrl", "src", "url", "href"]) {
+        const url = getHallOfChampionsPeopleArchiveUrlValue(value?.[field], seen);
+        if (url) {
+          return url;
+        }
+      }
+      return "";
+    }
+    const url = getWrestlingText(value).trim();
+    return /^(https?:)?\/\//i.test(url) || url.startsWith("/") || /^data:image\//i.test(url) ? url : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function getHallOfChampionsPeopleArchivePortraitUrl(record) {
+  for (const field of [
+    "portrait_url",
+    "portraitUrl",
+    "portrait",
+    "profile_image_url",
+    "profileImageUrl",
+    "profile_image",
+    "profileImage",
+    "headshot_url",
+    "headshotUrl",
+    "image_url",
+    "imageUrl",
+    "image",
+    "photo_url",
+    "photoUrl",
+    "photo",
+    "thumbnail_url",
+    "thumbnailUrl",
+    "thumbnail",
+    "photos",
+    "images",
+  ]) {
+    const url = getHallOfChampionsPeopleArchiveUrlValue(record?.[field]);
+    if (url) {
+      return url;
+    }
+  }
+  return "";
+}
+
 function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
   const seenKeys = new Set();
   return (Array.isArray(payloads) ? payloads : [payloads]).flatMap(getHallOfChampionsPeopleArchiveRows).map((record, index) => {
@@ -9384,6 +9446,7 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
         category: getHallOfChampionsPeopleArchiveCategory(record),
         team: getHallOfChampionsPeopleArchiveTeam(record),
         photoCount: getHallOfChampionsPeopleArchivePhotoCount(record),
+        portraitUrl: getHallOfChampionsPeopleArchivePortraitUrl(record),
       } : null;
     } catch (error) {
       reportHallOfChampionsPeopleArchiveRecordIssue("archive display normalization skipped record", error, record);
@@ -9412,6 +9475,7 @@ function normalizeHallOfChampionsPeopleArchiveCachedRecords(records) {
         category: formatHallOfChampionsPeopleArchiveCategory(record?.category),
         team: normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(record?.team),
         photoCount: Number.isFinite(photoCount) && photoCount >= 0 ? photoCount : null,
+        portraitUrl: getHallOfChampionsPeopleArchiveUrlValue(record?.portraitUrl),
       } : null;
     } catch (error) {
       reportHallOfChampionsPeopleArchiveRecordIssue("cached archive normalization skipped record", error, record);
@@ -9485,6 +9549,7 @@ function writeHallOfChampionsPeopleArchiveCache(records) {
         category: record.category,
         team: record.team,
         photoCount: record.photoCount,
+        portraitUrl: record.portraitUrl,
       })),
     }));
   } catch (error) {
@@ -9665,6 +9730,60 @@ function appendHallOfChampionsArchiveRecord(list, record) {
   }
 }
 
+function appendHallOfChampionsPortraitArchiveCard(list, record) {
+  try {
+    const item = document.createElement("li");
+    const media = document.createElement("div");
+    const body = document.createElement("div");
+    const marker = document.createElement("span");
+    const primary = document.createElement("span");
+    const category = document.createElement("span");
+    const photos = document.createElement("span");
+    const team = document.createElement("span");
+    const portraitUrl = getHallOfChampionsPeopleArchiveUrlValue(record?.portraitUrl);
+
+    item.className = "hall-of-champions-workspace__portrait-card";
+    media.className = "hall-of-champions-workspace__portrait-media";
+    if (portraitUrl) {
+      const image = document.createElement("img");
+      image.className = "hall-of-champions-workspace__portrait-image";
+      image.src = portraitUrl;
+      image.alt = getWrestlingText(record?.name).trim();
+      image.loading = "lazy";
+      image.decoding = "async";
+      media.append(image);
+      item.classList.add("has-portrait");
+    }
+
+    body.className = "hall-of-champions-workspace__portrait-body";
+    marker.className = "hall-of-champions-workspace__portrait-light";
+    marker.setAttribute("aria-hidden", "true");
+    primary.className = "hall-of-champions-workspace__portrait-name";
+    primary.textContent = getWrestlingText(record?.name).trim();
+    category.className = "hall-of-champions-workspace__portrait-category";
+    category.textContent = getWrestlingText(record?.category).trim();
+    if (!category.textContent) {
+      category.hidden = true;
+    }
+    photos.className = "hall-of-champions-workspace__portrait-photos";
+    photos.textContent = formatHallOfChampionsArchiveRecordPhotoCount(record?.photoCount);
+    if (!photos.textContent) {
+      photos.hidden = true;
+    }
+    team.className = "hall-of-champions-workspace__portrait-team";
+    team.textContent = getWrestlingText(record?.team).trim();
+    if (!team.textContent) {
+      team.hidden = true;
+    }
+
+    body.append(marker, primary, category, photos, team);
+    item.append(media, body);
+    list.append(item);
+  } catch (error) {
+    reportHallOfChampionsPeopleArchiveRecordIssue("portrait card render skipped record", error, record);
+  }
+}
+
 function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
   const workspace = prototypeShell?.querySelector(`[data-hall-of-champions-workspace="${modeName}"]`);
   const status = prototypeShell?.querySelector(`[data-hall-of-champions-workspace-status="${modeName}"]`);
@@ -9717,8 +9836,15 @@ function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
   }
 
   const list = document.createElement("ul");
-  list.className = "hall-of-champions-workspace__records";
-  matches.forEach((record) => appendHallOfChampionsArchiveRecord(list, record));
+  const usesPortraitCards = modeName === "category" || modeName === "team";
+  list.className = usesPortraitCards ? "hall-of-champions-workspace__records hall-of-champions-workspace__records--portrait" : "hall-of-champions-workspace__records";
+  matches.forEach((record) => {
+    if (usesPortraitCards) {
+      appendHallOfChampionsPortraitArchiveCard(list, record);
+      return;
+    }
+    appendHallOfChampionsArchiveRecord(list, record);
+  });
   viewport.append(list);
 }
 
