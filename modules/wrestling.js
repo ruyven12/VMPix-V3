@@ -10161,34 +10161,52 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
   expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
   expandedHologram.setAttribute("aria-hidden", "false");
   expandedHologram.innerHTML = `
-    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" aria-label="Ace Romero identity prototype">
-      <div class="wrestling-person-dossier-prototype-identity" aria-labelledby="wrestling-person-dossier-prototype-name">
-        <div class="wrestling-person-dossier-prototype-portrait" aria-label="Prototype portrait reserved for Ace Romero">
-          <span class="wrestling-person-dossier-prototype-portrait__label">Portrait Signal Reserved</span>
-        </div>
-        <div class="wrestling-person-dossier-prototype-identity__text">
-          <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name">ACE ROMERO</h2>
-          <p class="wrestling-person-dossier-prototype-identity__category">PERFORMERS</p>
-          <p class="wrestling-person-dossier-prototype-identity__team">STARSTRUCK</p>
-        </div>
-        <dl class="wrestling-person-dossier-prototype-status" aria-label="Prototype archive status">
-          <div class="wrestling-person-dossier-prototype-status__item">
-            <dt>Archive Status</dt>
-            <dd>Identified</dd>
+    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" aria-label="Ace Romero modular dossier prototype">
+      <div class="wrestling-person-dossier-prototype-framework" aria-labelledby="wrestling-person-dossier-prototype-name">
+        <header class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity">
+          <p class="wrestling-person-dossier-prototype-module__label">Identity Header</p>
+          <div class="wrestling-person-dossier-prototype-identity-summary">
+            <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name">ACE ROMERO</h2>
+            <span class="wrestling-person-dossier-prototype-identity__category">PERFORMERS</span>
+            <span class="wrestling-person-dossier-prototype-identity__team">STARSTRUCK</span>
           </div>
-          <div class="wrestling-person-dossier-prototype-status__item">
-            <dt>Photos</dt>
-            <dd>Reserved</dd>
+        </header>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait" aria-label="Portrait module">
+          <p class="wrestling-person-dossier-prototype-module__label">Portrait Module</p>
+          <div class="wrestling-person-dossier-prototype-portrait" aria-label="Prototype portrait reserved for Ace Romero">
+            <span class="wrestling-person-dossier-prototype-portrait__label">Portrait Signal Reserved</span>
           </div>
-          <div class="wrestling-person-dossier-prototype-status__item">
-            <dt>Matches</dt>
-            <dd>Sealed</dd>
-          </div>
-          <div class="wrestling-person-dossier-prototype-status__item">
-            <dt>Events</dt>
-            <dd>Sealed</dd>
-          </div>
-        </dl>
+        </section>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status" aria-label="Archive status module">
+          <p class="wrestling-person-dossier-prototype-module__label">Archive Status Module</p>
+          <dl class="wrestling-person-dossier-prototype-status" aria-label="Prototype archive status">
+            <div class="wrestling-person-dossier-prototype-status__item">
+              <dt>Archive Status</dt>
+              <dd>Identified</dd>
+            </div>
+            <div class="wrestling-person-dossier-prototype-status__item">
+              <dt>Photos</dt>
+              <dd>Reserved</dd>
+            </div>
+            <div class="wrestling-person-dossier-prototype-status__item">
+              <dt>Matches</dt>
+              <dd>Sealed</dd>
+            </div>
+            <div class="wrestling-person-dossier-prototype-status__item">
+              <dt>Events</dt>
+              <dd>Sealed</dd>
+            </div>
+          </dl>
+        </section>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline module reserved">
+          <p class="wrestling-person-dossier-prototype-module__label">Timeline // Reserved</p>
+        </section>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--matches" aria-label="Match archive reserved">
+          <p class="wrestling-person-dossier-prototype-module__label">Match Archive // Reserved</p>
+        </section>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--photos" aria-label="Photo archive reserved">
+          <p class="wrestling-person-dossier-prototype-module__label">Photo Archive // Reserved</p>
+        </section>
       </div>
     </section>
   `;
