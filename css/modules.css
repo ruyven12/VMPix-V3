@@ -11673,6 +11673,23 @@ button.wrestling-event-history-tagged-thumb {
   transform: translateX(-50%) scale(1);
 }
 
+.site-shell[data-wrestling-person-dossier-prototype="blank"] .wrestling-person-dossier-prototype-shell .hall-of-champions-expanded-hologram {
+  inset-block-start: calc(env(safe-area-inset-top) + 10px);
+  inset-inline-start: calc(env(safe-area-inset-left) + 10px);
+  inset-inline-end: calc(env(safe-area-inset-right) + 10px);
+  inline-size: auto;
+  max-inline-size: none;
+  block-size: auto;
+  clip-path: none;
+}
+
+.site-shell[data-wrestling-person-dossier-prototype="blank"] .wrestling-person-dossier-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-expanded-hologram {
+  transform: none;
+}
+
+.site-shell[data-wrestling-person-dossier-prototype="blank"] .wrestling-person-dossier-prototype-shell .hall-of-champions-expanded-hologram::after {
+  clip-path: none;
+}
 .wrestling-people-prototype-shell[data-hall-of-champions-expanded="true"] .hall-of-champions-pedestal__hologram-plane {
   opacity: 0;
   transition: opacity 180ms ease-out;
