@@ -10161,9 +10161,35 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
   expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
   expandedHologram.setAttribute("aria-hidden", "false");
   expandedHologram.innerHTML = `
-    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" aria-label="Person dossier prototype workspace">
-      <h2 class="hall-of-champions-workspace__title">PERSON DOSSIER</h2>
-      <p class="hall-of-champions-workspace__status">Archive Record Initializing</p>
+    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" aria-label="Ace Romero identity prototype">
+      <div class="wrestling-person-dossier-prototype-identity" aria-labelledby="wrestling-person-dossier-prototype-name">
+        <div class="wrestling-person-dossier-prototype-portrait" aria-label="Prototype portrait reserved for Ace Romero">
+          <span class="wrestling-person-dossier-prototype-portrait__label">Portrait Signal Reserved</span>
+        </div>
+        <div class="wrestling-person-dossier-prototype-identity__text">
+          <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name">ACE ROMERO</h2>
+          <p class="wrestling-person-dossier-prototype-identity__category">PERFORMERS</p>
+          <p class="wrestling-person-dossier-prototype-identity__team">STARSTRUCK</p>
+        </div>
+        <dl class="wrestling-person-dossier-prototype-status" aria-label="Prototype archive status">
+          <div class="wrestling-person-dossier-prototype-status__item">
+            <dt>Archive Status</dt>
+            <dd>Identified</dd>
+          </div>
+          <div class="wrestling-person-dossier-prototype-status__item">
+            <dt>Photos</dt>
+            <dd>Reserved</dd>
+          </div>
+          <div class="wrestling-person-dossier-prototype-status__item">
+            <dt>Matches</dt>
+            <dd>Sealed</dd>
+          </div>
+          <div class="wrestling-person-dossier-prototype-status__item">
+            <dt>Events</dt>
+            <dd>Sealed</dd>
+          </div>
+        </dl>
+      </div>
     </section>
   `;
 
