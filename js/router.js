@@ -110,9 +110,6 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestling) {
     return { name: "wrestling", canonicalUrl: routePaths.wrestling };
   }
-  if (routePath === "/wrestling/people2") {
-    return { name: "wrestling-people-prototype", canonicalUrl: "/wrestling/people2", wrestlingPeoplePrototype: "hall-of-champions" };
-  }
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people-prototype", canonicalUrl: routePaths.wrestlingPeople, wrestlingPeoplePrototype: "hall-of-champions" };
   }
