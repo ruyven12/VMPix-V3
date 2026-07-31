@@ -11528,46 +11528,6 @@ button.wrestling-event-history-tagged-thumb {
   display: none !important;
 }
 
-.wrestling-person-dossier-prototype-shell__back {
-  appearance: none;
-  position: fixed;
-  inset-block-start: calc(env(safe-area-inset-top) + clamp(0.72rem, 2.4svh, 1.1rem));
-  inset-inline-start: calc(env(safe-area-inset-left) + clamp(0.72rem, 3vw, 1.1rem));
-  z-index: 42;
-  min-block-size: max(var(--tap-target), 2.9rem);
-  max-inline-size: min(17rem, calc(100vw - 1.5rem));
-  padding: 0.68rem 0.86rem;
-  border: 1px solid rgba(213, 72, 34, 0.34);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.038), transparent 72%),
-    rgba(78, 18, 10, 0.42);
-  color: rgba(247, 247, 242, 0.84);
-  cursor: pointer;
-  font: inherit;
-  font-size: clamp(0.68rem, 2.3vw, 0.78rem);
-  line-height: 1.08;
-  letter-spacing: 0;
-  text-align: center;
-  text-transform: uppercase;
-  touch-action: manipulation;
-  pointer-events: auto;
-}
-
-.wrestling-person-dossier-prototype-shell__back:hover {
-  border-color: rgba(247, 247, 242, 0.2);
-  background: rgba(213, 72, 34, 0.16);
-}
-
-.wrestling-person-dossier-prototype-shell__back:active {
-  transform: translate3d(0, 0.03rem, 0);
-}
-
-.wrestling-person-dossier-prototype-shell__back:focus-visible {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
-  outline-offset: 0.16rem;
-}
-
 .hall-of-champions-workspace--dossier-prototype {
   display: grid;
   place-content: center;

@@ -10135,6 +10135,20 @@ function showWrestlingPeoplePrototypeRoute() {
   setWrestlingPeoplePrototypeActive(true);
 }
 
+function releaseWrestlingPeoplePrototypeShellForDossierMount() {
+  const sourceShell = wrestlingPeoplePrototypeShell || document.querySelector("[data-wrestling-people-prototype-shell]");
+  if (!sourceShell || sourceShell.dataset.hallOfChampionsActive === "true") {
+    return;
+  }
+
+  if (sourceShell.parentNode) {
+    sourceShell.parentNode.removeChild(sourceShell);
+  }
+  if (wrestlingPeoplePrototypeShell === sourceShell) {
+    wrestlingPeoplePrototypeShell = null;
+  }
+}
+
 function createWrestlingPersonDossierPrototypeHallPresentation() {
   const sourceShell = getWrestlingPeoplePrototypeShell({ skipDataRequest: true });
   const sourcePedestal = sourceShell?.querySelector(".hall-of-champions-pedestal");
@@ -10177,20 +10191,8 @@ function getWrestlingPersonDossierPrototypeShell() {
   prototypeShell.setAttribute("inert", "");
   prototypeShell.hidden = true;
 
-  const backButton = document.createElement("button");
-  backButton.className = "wrestling-person-dossier-prototype-shell__back";
-  backButton.type = "button";
-  backButton.textContent = "Back to Hall of Champions";
-  backButton.addEventListener("click", () => {
-    if (typeof navigateToRoute === "function") {
-      navigateToRoute(routePaths.wrestlingPeople);
-      return;
-    }
-    window.location.href = routePaths.wrestlingPeople;
-  });
-
   const { pedestal, expandedHologram } = createWrestlingPersonDossierPrototypeHallPresentation();
-  prototypeShell.append(backButton, pedestal, expandedHologram);
+  prototypeShell.append(pedestal, expandedHologram);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -10209,6 +10211,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
   }
   if (isActive && typeof setWrestlingPeoplePrototypeActive === "function") {
     setWrestlingPeoplePrototypeActive(false);
+    releaseWrestlingPeoplePrototypeShellForDossierMount();
   }
 
   if (shellElement) {
