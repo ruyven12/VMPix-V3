@@ -11467,7 +11467,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .site-shell[data-wrestling-person-dossier-prototype="blank"] {
   background:
-    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.22)),
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.2)),
     url("../assets/images/wrestling/hall-of-champions.png") center center / cover no-repeat,
     #030306;
 }
@@ -11485,7 +11485,7 @@ button.wrestling-event-history-tagged-thumb {
   margin: 0;
   padding: 0;
   background:
-    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.22)),
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.2)),
     url("../assets/images/wrestling/hall-of-champions.png") center center / cover no-repeat,
     #030306;
   overflow: hidden;
@@ -11509,38 +11509,33 @@ button.wrestling-event-history-tagged-thumb {
   inset: 0;
   z-index: 34;
   display: grid;
+  align-items: end;
   justify-items: center;
   inline-size: 100vw;
   block-size: 100vh;
   block-size: 100svh;
   box-sizing: border-box;
   padding:
-    calc(env(safe-area-inset-top) + clamp(0.72rem, 2.4svh, 1.4rem))
-    calc(env(safe-area-inset-right) + clamp(0.72rem, 3vw, 2rem))
-    calc(var(--engine-emitter-size, 4.6rem) + max(0.72rem, env(safe-area-inset-bottom)))
-    calc(env(safe-area-inset-left) + clamp(0.72rem, 3vw, 2rem));
+    calc(env(safe-area-inset-top) + clamp(1rem, 3svh, 2rem))
+    calc(env(safe-area-inset-right) + clamp(0.75rem, 3vw, 2rem))
+    calc(var(--engine-emitter-size, 4.6rem) + max(0.6rem, env(safe-area-inset-bottom)))
+    calc(env(safe-area-inset-left) + clamp(0.75rem, 3vw, 2rem));
   overflow: hidden;
+  pointer-events: none;
 }
 
 .wrestling-person-dossier-prototype-shell[hidden] {
   display: none !important;
 }
 
-.wrestling-person-dossier-prototype-shell__stage {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: clamp(0.64rem, 1.8svh, 1rem);
-  inline-size: min(100%, 76rem);
-  block-size: 100%;
-  min-block-size: 0;
-  box-sizing: border-box;
-}
-
 .wrestling-person-dossier-prototype-shell__back {
   appearance: none;
-  justify-self: start;
+  position: fixed;
+  inset-block-start: calc(env(safe-area-inset-top) + clamp(0.72rem, 2.4svh, 1.1rem));
+  inset-inline-start: calc(env(safe-area-inset-left) + clamp(0.72rem, 3vw, 1.1rem));
+  z-index: 42;
   min-block-size: max(var(--tap-target), 2.9rem);
-  max-inline-size: 100%;
+  max-inline-size: min(17rem, calc(100vw - 1.5rem));
   padding: 0.68rem 0.86rem;
   border: 1px solid rgba(213, 72, 34, 0.34);
   border-radius: var(--radius-sm);
@@ -11556,6 +11551,7 @@ button.wrestling-event-history-tagged-thumb {
   text-align: center;
   text-transform: uppercase;
   touch-action: manipulation;
+  pointer-events: auto;
 }
 
 .wrestling-person-dossier-prototype-shell__back:hover {
@@ -11572,110 +11568,32 @@ button.wrestling-event-history-tagged-thumb {
   outline-offset: 0.16rem;
 }
 
-.wrestling-person-dossier-prototype-shell__frame {
-  position: relative;
+.hall-of-champions-workspace--dossier-prototype {
   display: grid;
-  min-block-size: 0;
-  box-sizing: border-box;
-  padding: clamp(0.56rem, 1.6vw, 0.9rem);
-  border: 1px solid rgba(224, 77, 34, 0.34);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(245, 108, 54, 0.1), rgba(37, 8, 4, 0.24)),
-    radial-gradient(ellipse at 50% 0%, rgba(255, 183, 112, 0.12), transparent 46%),
-    rgba(6, 5, 6, 0.7);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 126, 58, 0.08),
-    inset 0 0 2.4rem rgba(224, 77, 34, 0.08);
-  overflow: hidden;
-}
-
-.wrestling-person-dossier-prototype-shell__frame::before {
-  position: absolute;
-  inset: clamp(0.38rem, 1.2vw, 0.64rem);
-  content: "";
-  border: 1px solid rgba(255, 130, 62, 0.12);
-  background:
-    linear-gradient(rgba(255, 130, 62, 0.055) 1px, transparent 1px) 0 0 / 100% 1.15rem,
-    linear-gradient(90deg, rgba(255, 130, 62, 0.04) 1px, transparent 1px) 0 0 / 1.15rem 100%;
-  pointer-events: none;
-}
-
-.wrestling-person-dossier-prototype-shell__viewport {
-  position: relative;
-  z-index: 1;
-  min-block-size: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-color: rgba(224, 77, 34, 0.48) rgba(247, 247, 242, 0.06);
-  scrollbar-width: thin;
-}
-
-.wrestling-person-dossier-prototype-shell__viewport::-webkit-scrollbar {
-  width: 0.42rem;
-}
-
-.wrestling-person-dossier-prototype-shell__viewport::-webkit-scrollbar-track {
-  background: rgba(247, 247, 242, 0.06);
-}
-
-.wrestling-person-dossier-prototype-shell__viewport::-webkit-scrollbar-thumb {
-  background: rgba(224, 77, 34, 0.48);
-}
-
-.wrestling-person-dossier-prototype-shell__state {
-  display: grid;
-  min-block-size: 100%;
   place-content: center;
   justify-items: center;
-  gap: clamp(0.5rem, 1.4vw, 0.8rem);
-  padding: clamp(2rem, 8svh, 5rem) clamp(1rem, 4vw, 3rem);
-  box-sizing: border-box;
-  color: rgba(247, 247, 242, 0.88);
+  gap: clamp(0.46rem, 1.2vw, 0.72rem);
   text-align: center;
 }
 
-.wrestling-person-dossier-prototype-shell__state[hidden] {
-  display: none;
+.hall-of-champions-workspace--dossier-prototype .hall-of-champions-workspace__title,
+.hall-of-champions-workspace--dossier-prototype .hall-of-champions-workspace__status {
+  margin-inline: auto;
 }
 
-.wrestling-person-dossier-prototype-shell__kicker,
-.wrestling-person-dossier-prototype-shell__signal {
-  margin: 0;
-  color: rgba(238, 102, 54, 0.78);
-  font-size: clamp(0.68rem, 2.2vw, 0.9rem);
-  letter-spacing: 0;
-  line-height: 1.1;
-  text-transform: uppercase;
-}
-
-.wrestling-person-dossier-prototype-shell__title {
-  margin: 0;
-  color: rgba(247, 247, 242, 0.92);
-  font-size: clamp(1.4rem, 8vw, 4rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 0.98;
-  text-transform: uppercase;
-}
-
-@media (max-width: 479px) {
+@media (max-width: 540px) {
   .site-shell[data-wrestling-person-dossier-prototype="blank"] .wrestling-person-dossier-prototype-shell {
     padding:
-      calc(env(safe-area-inset-top) + 0.62rem)
-      calc(env(safe-area-inset-right) + 0.62rem)
-      calc(var(--engine-emitter-size, 4.6rem) + max(0.62rem, env(safe-area-inset-bottom)))
-      calc(env(safe-area-inset-left) + 0.62rem);
+      calc(env(safe-area-inset-top) + 0.85rem)
+      calc(env(safe-area-inset-right) + 0.5rem)
+      calc(var(--engine-emitter-size, 4.6rem) + max(0.55rem, env(safe-area-inset-bottom)))
+      calc(env(safe-area-inset-left) + 0.5rem);
   }
+}
 
-  .wrestling-person-dossier-prototype-shell__stage {
-    gap: 0.56rem;
-  }
-
-  .wrestling-person-dossier-prototype-shell__frame {
-    padding: 0.52rem;
+@media (max-width: 380px) {
+  .site-shell[data-wrestling-person-dossier-prototype="blank"] .wrestling-person-dossier-prototype-shell {
+    padding-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(0.3rem, env(safe-area-inset-bottom)));
   }
 }
 .wrestling-people-prototype-shell {
