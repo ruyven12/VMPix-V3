@@ -271,6 +271,17 @@ const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-pe
 const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-people-filter-reset]");
 let wrestlingPeoplePrototypeShell = null;
 let wrestlingPersonDossierPrototypeShell = null;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_URL = "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace%20romero&limit=25&page=1";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_SLUG = "ace-romero";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME = "Ace Romero";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK = "UNLISTED";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
+let wrestlingPersonDossierPrototypeAceState = {
+  status: "idle",
+  record: null,
+  error: null,
+  requestPromise: null,
+};
 const HALL_OF_CHAMPIONS_CRYSTAL_REST_Y = -20;
 const HALL_OF_CHAMPIONS_CRYSTAL_START_Y = -12;
 const HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS = 220;
@@ -10149,6 +10160,254 @@ function releaseWrestlingPeoplePrototypeShellForDossierMount() {
   }
 }
 
+function getWrestlingPersonDossierPrototypeText(value) {
+  return String(value ?? "")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function getWrestlingPersonDossierPrototypeDisplayValue(value, fallback = WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK) {
+  const text = getWrestlingPersonDossierPrototypeText(value);
+  return text || fallback;
+}
+
+function normalizeWrestlingPersonDossierPrototypeName(value) {
+  return getWrestlingPersonDossierPrototypeText(value).toLowerCase();
+}
+
+function normalizeWrestlingPersonDossierPrototypeCategory(value) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(value);
+}
+
+function getWrestlingPersonDossierPrototypeTeamStable(record) {
+  const teamFields = [
+    record?.team_stable,
+    record?.teamStable,
+    record?.team,
+    record?.stable,
+    record?.stable_name,
+    record?.faction,
+    record?.affiliation,
+  ];
+
+  for (const value of teamFields) {
+    const text = getWrestlingPersonDossierPrototypeText(value);
+    if (text) {
+      return text;
+    }
+  }
+
+  const teamList = [record?.teams, record?.stables, record?.affiliations]
+    .find((value) => Array.isArray(value) && value.some((entry) => getWrestlingPersonDossierPrototypeText(entry)));
+  if (teamList) {
+    return teamList
+      .map((entry) => getWrestlingPersonDossierPrototypeText(entry))
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  return WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK;
+}
+
+function getWrestlingPersonDossierPrototypeCount(record, fields) {
+  const value = fields.map((field) => record?.[field]).find((candidate) => candidate !== null && candidate !== undefined && candidate !== "");
+  if (value === null || value === undefined || value === "") {
+    return WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED;
+  }
+  const numericValue = Number(value);
+  if (Number.isFinite(numericValue)) {
+    return new Intl.NumberFormat("en-US").format(numericValue);
+  }
+  return getWrestlingPersonDossierPrototypeDisplayValue(value, WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+}
+
+function getWrestlingPersonDossierPrototypeArchiveStatus(record) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(
+    record?.archive_status || record?.archiveStatus || record?.status || record?.photo_count_status,
+    WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED
+  );
+}
+
+function getWrestlingPersonDossierPrototypePortraitUrl(record) {
+  const portraitUrl = getWrestlingPersonDossierPrototypeText(
+    record?.portrait_url || record?.portraitUrl || record?.portrait || record?.image_url || record?.imageUrl
+  );
+
+  if (!portraitUrl) {
+    return "";
+  }
+
+  try {
+    const parsedUrl = new URL(portraitUrl);
+    return ["http:", "https:"].includes(parsedUrl.protocol) ? parsedUrl.href : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function getWrestlingPersonDossierPrototypeRecords(payload) {
+  if (!payload || !Array.isArray(payload.data)) {
+    throw new Error("Unexpected Ace Romero prototype response structure");
+  }
+  return payload.data;
+}
+
+function findWrestlingPersonDossierPrototypeAceRecord(payload) {
+  const records = getWrestlingPersonDossierPrototypeRecords(payload);
+  const slugMatch = records.find((record) => normalizeWrestlingPersonId(record?.slug) === WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_SLUG);
+  if (slugMatch) {
+    return slugMatch;
+  }
+  return records.find((record) => {
+    const normalizedName = normalizeWrestlingPersonDossierPrototypeName(record?.name || record?.display_name || record?.displayName);
+    return normalizedName === normalizeWrestlingPersonDossierPrototypeName(WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
+  }) || null;
+}
+
+function setWrestlingPersonDossierPrototypeText(scope, selector, value) {
+  const element = scope?.querySelector(selector);
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function setWrestlingPersonDossierPrototypeStatusItem(scope, key, value) {
+  const valueElement = scope?.querySelector(`[data-wrestling-person-dossier-prototype-status-value="${key}"]`);
+  if (valueElement) {
+    valueElement.textContent = value;
+  }
+}
+
+function renderWrestlingPersonDossierPrototypePortrait(workspace, record) {
+  const portrait = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait]");
+  const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-image]");
+  const label = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-label]");
+  const portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record);
+
+  if (!portrait || !image || !label || !portraitUrl) {
+    if (portrait) {
+      portrait.classList.remove("has-image");
+    }
+    if (image) {
+      image.hidden = true;
+      image.removeAttribute("src");
+      image.removeAttribute("alt");
+    }
+    if (label) {
+      label.hidden = false;
+      label.textContent = "Portrait Signal Reserved";
+    }
+    return;
+  }
+
+  portrait.classList.add("has-image");
+  image.hidden = false;
+  image.alt = `${getWrestlingPersonDossierPrototypeDisplayValue(record?.name, WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME)} portrait`;
+  image.onerror = () => {
+    portrait.classList.remove("has-image");
+    image.hidden = true;
+    image.removeAttribute("src");
+    label.hidden = false;
+    label.textContent = "Portrait Signal Reserved";
+  };
+  image.src = portraitUrl;
+  label.hidden = true;
+}
+
+function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDossierPrototypeShell) {
+  const workspace = shell?.querySelector("[data-wrestling-person-dossier-prototype-workspace]");
+  if (!workspace) {
+    return;
+  }
+
+  const state = wrestlingPersonDossierPrototypeAceState;
+  workspace.dataset.wrestlingPersonDossierPrototypeState = state.status;
+
+  if (state.status === "loaded" && state.record) {
+    const record = state.record;
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", getWrestlingPersonDossierPrototypeDisplayValue(record?.name, WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME));
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", normalizeWrestlingPersonDossierPrototypeCategory(record?.category));
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", getWrestlingPersonDossierPrototypeTeamStable(record));
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", getWrestlingPersonDossierPrototypeArchiveStatus(record));
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", getWrestlingPersonDossierPrototypeCount(record, ["photo_count", "photoCount", "photos_count"]));
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", getWrestlingPersonDossierPrototypeCount(record, ["match_count", "matchCount", "matches_count"]));
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", getWrestlingPersonDossierPrototypeCount(record, ["event_count", "eventCount", "show_count", "showCount"]));
+    renderWrestlingPersonDossierPrototypePortrait(workspace, record);
+    return;
+  }
+
+  renderWrestlingPersonDossierPrototypePortrait(workspace, null);
+
+  if (state.status === "empty") {
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", "ACE ROMERO RECORD NOT FOUND");
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "RECORD NOT FOUND");
+  } else if (state.status === "error") {
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", "ARCHIVE RECORD UNAVAILABLE");
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "LINK UNAVAILABLE");
+  } else {
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", "ARCHIVE RECORD INITIALIZING");
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "ARCHIVE RECORD INITIALIZING");
+  }
+
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+}
+
+function loadWrestlingPersonDossierPrototypeAceRecord(shell = wrestlingPersonDossierPrototypeShell) {
+  const state = wrestlingPersonDossierPrototypeAceState;
+  if (state.status === "loaded" || state.status === "empty" || state.status === "error") {
+    renderWrestlingPersonDossierPrototypeAceState(shell);
+    return state.requestPromise || Promise.resolve(state.record);
+  }
+
+  if (state.requestPromise) {
+    renderWrestlingPersonDossierPrototypeAceState(shell);
+    return state.requestPromise;
+  }
+
+  state.status = "loading";
+  state.error = null;
+  renderWrestlingPersonDossierPrototypeAceState(shell);
+
+  state.requestPromise = fetch(WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_URL, {
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ace Romero prototype request failed: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const record = findWrestlingPersonDossierPrototypeAceRecord(payload);
+      state.record = record;
+      state.status = record ? "loaded" : "empty";
+      renderWrestlingPersonDossierPrototypeAceState(shell);
+      return record;
+    })
+    .catch((error) => {
+      state.record = null;
+      state.error = error;
+      state.status = "error";
+      renderWrestlingPersonDossierPrototypeAceState(shell);
+      return null;
+    })
+    .finally(() => {
+      state.requestPromise = null;
+    });
+
+  return state.requestPromise;
+}
+
 function createWrestlingPersonDossierPrototypeHallPresentation() {
   const sourceShell = getWrestlingPeoplePrototypeShell({ skipDataRequest: true });
   const sourcePedestal = sourceShell?.querySelector(".hall-of-champions-pedestal");
@@ -10161,20 +10420,21 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
   expandedHologram.dataset.hallOfChampionsExpandedHologram = "true";
   expandedHologram.setAttribute("aria-hidden", "false");
   expandedHologram.innerHTML = `
-    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" aria-label="Ace Romero modular dossier prototype">
+    <section class="hall-of-champions-workspace hall-of-champions-workspace--dossier-prototype" data-wrestling-person-dossier-prototype-workspace="true" data-wrestling-person-dossier-prototype-state="loading" aria-label="Ace Romero modular dossier prototype">
       <div class="wrestling-person-dossier-prototype-framework" aria-labelledby="wrestling-person-dossier-prototype-name">
         <header class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity">
           <p class="wrestling-person-dossier-prototype-module__label">Identity Header</p>
           <div class="wrestling-person-dossier-prototype-identity-summary">
-            <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name">ACE ROMERO</h2>
-            <span class="wrestling-person-dossier-prototype-identity__category">PERFORMERS</span>
-            <span class="wrestling-person-dossier-prototype-identity__team">STARSTRUCK</span>
+            <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name" data-wrestling-person-dossier-prototype-name>ARCHIVE RECORD INITIALIZING</h2>
+            <span class="wrestling-person-dossier-prototype-identity__category" data-wrestling-person-dossier-prototype-category>UNLISTED</span>
+            <span class="wrestling-person-dossier-prototype-identity__team" data-wrestling-person-dossier-prototype-team>UNLISTED</span>
           </div>
         </header>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait" aria-label="Portrait module">
           <p class="wrestling-person-dossier-prototype-module__label">Portrait Module</p>
-          <div class="wrestling-person-dossier-prototype-portrait" aria-label="Prototype portrait reserved for Ace Romero">
-            <span class="wrestling-person-dossier-prototype-portrait__label">Portrait Signal Reserved</span>
+          <div class="wrestling-person-dossier-prototype-portrait" data-wrestling-person-dossier-prototype-portrait aria-label="Prototype portrait reserved for Ace Romero">
+            <img class="wrestling-person-dossier-prototype-portrait__image" data-wrestling-person-dossier-prototype-portrait-image loading="lazy" decoding="async" hidden alt="">
+            <span class="wrestling-person-dossier-prototype-portrait__label" data-wrestling-person-dossier-prototype-portrait-label>Portrait Signal Reserved</span>
           </div>
         </section>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status" aria-label="Archive status module">
@@ -10182,19 +10442,19 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
           <dl class="wrestling-person-dossier-prototype-status" aria-label="Prototype archive status">
             <div class="wrestling-person-dossier-prototype-status__item">
               <dt>Archive Status</dt>
-              <dd>Identified</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="archive">ARCHIVE RECORD INITIALIZING</dd>
             </div>
             <div class="wrestling-person-dossier-prototype-status__item">
               <dt>Photos</dt>
-              <dd>Reserved</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="photos">NOT YET INDEXED</dd>
             </div>
             <div class="wrestling-person-dossier-prototype-status__item">
               <dt>Matches</dt>
-              <dd>Sealed</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="matches">NOT YET INDEXED</dd>
             </div>
             <div class="wrestling-person-dossier-prototype-status__item">
               <dt>Events</dt>
-              <dd>Sealed</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="events">NOT YET INDEXED</dd>
             </div>
           </dl>
         </section>
@@ -10287,6 +10547,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
       prototypeShell.removeAttribute("inert");
       prototypeShell.setAttribute("aria-hidden", "false");
       scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+      loadWrestlingPersonDossierPrototypeAceRecord(prototypeShell);
     } else {
       prototypeShell.setAttribute("inert", "");
       prototypeShell.setAttribute("aria-hidden", "true");

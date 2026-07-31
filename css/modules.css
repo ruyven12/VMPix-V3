@@ -11706,6 +11706,25 @@ button.wrestling-event-history-tagged-thumb {
   background: radial-gradient(circle, rgba(255, 186, 130, 0.16), transparent 67%);
 }
 
+.wrestling-person-dossier-prototype-portrait__image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  opacity: 0.9;
+}
+
+.wrestling-person-dossier-prototype-portrait__image[hidden] {
+  display: none !important;
+}
+
+.wrestling-person-dossier-prototype-portrait.has-image .wrestling-person-dossier-prototype-portrait__label {
+  display: none;
+}
+
 .wrestling-person-dossier-prototype-portrait__label {
   position: relative;
   z-index: 1;
