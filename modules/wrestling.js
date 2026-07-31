@@ -8658,9 +8658,7 @@ function getWrestlingPeoplePrototypeShell() {
     <g class="hall-of-champions-pedestal__hologram-plane">
       <path d="M254 130 L386 130 L380 170 L260 170 Z" />
       <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M254 130 L386 130 L380 170 L260 170 Z" />
-      <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)">
-        <text class="hall-of-champions-pedestal__hologram-console-heading" x="320" y="150">INTERACT</text>
-      </g>
+      <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)"></g>
     </g>
     <g class="hall-of-champions-pedestal__upper-console">
       <path d="M184 226 L456 226 L510 292 L130 292 Z" />
@@ -8862,14 +8860,14 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   if (pedestal) {
     const pedestalRect = pedestal.getBoundingClientRect();
     if (pedestalRect.width > 0 && pedestalRect.height > 0) {
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * 0.326)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * 0.31)}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.614)}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * 0.348}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * 0.38}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * 0.138}px`);
       prototypeShell.style.setProperty("--hall-champions-letter-selector-center", `${pedestalRect.left + (pedestalRect.width * 0.5)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.802)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-width", `${pedestalRect.width * 0.44}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-height", `${pedestalRect.height * 0.092}px`);
+      prototypeShell.style.setProperty("--hall-champions-letter-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.835)}px`);
+      prototypeShell.style.setProperty("--hall-champions-letter-selector-width", `${pedestalRect.width * 0.5}px`);
+      prototypeShell.style.setProperty("--hall-champions-letter-selector-height", `${pedestalRect.height * 0.086}px`);
     }
   }
 
