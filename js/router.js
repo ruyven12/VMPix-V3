@@ -114,7 +114,7 @@ function getRouteFromUrl(url = window.location.href) {
     return { name: "wrestling-people-prototype", canonicalUrl: "/wrestling/people2", wrestlingPeoplePrototype: "hall-of-champions" };
   }
   if (routePath === routePaths.wrestlingPeople) {
-    return { name: "wrestling-people", canonicalUrl: routePaths.wrestlingPeople };
+    return { name: "wrestling-people-prototype", canonicalUrl: routePaths.wrestlingPeople, wrestlingPeoplePrototype: "hall-of-champions" };
   }
   const wrestlingPersonDetailPrefix = `${routePaths.wrestlingPeople}/`;
   if (routePath.startsWith(wrestlingPersonDetailPrefix)) {
