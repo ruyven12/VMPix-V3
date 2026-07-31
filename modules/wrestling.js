@@ -270,6 +270,7 @@ const wrestlingPeopleLetterSelect = document.querySelector("[data-wrestling-peop
 const wrestlingPeopleCategorySelect = document.querySelector("[data-wrestling-people-filter='category']");
 const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-people-filter-reset]");
 let wrestlingPeoplePrototypeShell = null;
+let wrestlingPersonDossierPrototypeShell = null;
 const HALL_OF_CHAMPIONS_CRYSTAL_REST_Y = -20;
 const HALL_OF_CHAMPIONS_CRYSTAL_START_Y = -12;
 const HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS = 220;
@@ -10125,6 +10126,189 @@ function setWrestlingPeoplePrototypeActive(isActive) {
 function showWrestlingPeoplePrototypeRoute() {
   setWrestlingPeoplePrototypeActive(true);
 }
+
+function getWrestlingPersonDossierPrototypeShell() {
+  if (wrestlingPersonDossierPrototypeShell && document.documentElement.contains(wrestlingPersonDossierPrototypeShell)) {
+    return wrestlingPersonDossierPrototypeShell;
+  }
+
+  wrestlingPersonDossierPrototypeShell = document.querySelector("[data-wrestling-person-dossier-prototype-shell]");
+  if (wrestlingPersonDossierPrototypeShell) {
+    return wrestlingPersonDossierPrototypeShell;
+  }
+
+  const prototypeShell = document.createElement("section");
+  prototypeShell.className = "wrestling-person-dossier-prototype-shell";
+  prototypeShell.dataset.wrestlingPersonDossierPrototypeShell = "true";
+  prototypeShell.setAttribute("aria-label", "Wrestling person dossier prototype");
+  prototypeShell.setAttribute("aria-hidden", "true");
+  prototypeShell.setAttribute("inert", "");
+  prototypeShell.hidden = true;
+
+  const stage = document.createElement("div");
+  stage.className = "wrestling-person-dossier-prototype-shell__stage";
+
+  const backButton = document.createElement("button");
+  backButton.className = "wrestling-person-dossier-prototype-shell__back";
+  backButton.type = "button";
+  backButton.textContent = "Back to Hall of Champions";
+  backButton.addEventListener("click", () => {
+    if (typeof navigateToRoute === "function") {
+      navigateToRoute(routePaths.wrestlingPeople);
+      return;
+    }
+    window.location.href = routePaths.wrestlingPeople;
+  });
+
+  const frame = document.createElement("section");
+  frame.className = "wrestling-person-dossier-prototype-shell__frame";
+  frame.dataset.wrestlingPersonDossierPrototypeState = "empty";
+  frame.setAttribute("aria-labelledby", "wrestling-person-dossier-prototype-title");
+
+  const viewport = document.createElement("div");
+  viewport.className = "wrestling-person-dossier-prototype-shell__viewport";
+  viewport.dataset.wrestlingPersonDossierPrototypeViewport = "true";
+  viewport.setAttribute("role", "region");
+  viewport.setAttribute("aria-label", "Person dossier prototype workspace");
+
+  const loadingState = document.createElement("div");
+  loadingState.className = "wrestling-person-dossier-prototype-shell__state";
+  loadingState.dataset.wrestlingPersonDossierPrototypePanel = "loading";
+  loadingState.hidden = true;
+  loadingState.setAttribute("role", "status");
+  loadingState.innerHTML = `
+    <p class="wrestling-person-dossier-prototype-shell__kicker">PERSON DOSSIER</p>
+    <h1 class="wrestling-person-dossier-prototype-shell__title">LOADING WORKSPACE</h1>
+  `;
+
+  const emptyState = document.createElement("div");
+  emptyState.className = "wrestling-person-dossier-prototype-shell__state";
+  emptyState.dataset.wrestlingPersonDossierPrototypePanel = "empty";
+  emptyState.innerHTML = `
+    <p class="wrestling-person-dossier-prototype-shell__kicker">PERSON DOSSIER</p>
+    <h1 class="wrestling-person-dossier-prototype-shell__title" id="wrestling-person-dossier-prototype-title">PROTOTYPE WORKSPACE</h1>
+    <p class="wrestling-person-dossier-prototype-shell__signal">ARCHIVE CHAMBER READY</p>
+  `;
+
+  const errorState = document.createElement("div");
+  errorState.className = "wrestling-person-dossier-prototype-shell__state";
+  errorState.dataset.wrestlingPersonDossierPrototypePanel = "error";
+  errorState.hidden = true;
+  errorState.setAttribute("role", "alert");
+  errorState.innerHTML = `
+    <p class="wrestling-person-dossier-prototype-shell__kicker">PERSON DOSSIER</p>
+    <h1 class="wrestling-person-dossier-prototype-shell__title">PROTOTYPE LINK UNAVAILABLE</h1>
+  `;
+
+  viewport.append(loadingState, emptyState, errorState);
+  frame.append(viewport);
+  stage.append(backButton, frame);
+  prototypeShell.append(stage);
+
+  const shellElement = document.querySelector(".site-shell");
+  (shellElement || document.body).appendChild(prototypeShell);
+  wrestlingPersonDossierPrototypeShell = prototypeShell;
+  return wrestlingPersonDossierPrototypeShell;
+}
+
+function setWrestlingPersonDossierPrototypeActive(isActive) {
+  const shellElement = document.querySelector(".site-shell");
+  const prototypeShell = isActive
+    ? getWrestlingPersonDossierPrototypeShell()
+    : wrestlingPersonDossierPrototypeShell || document.querySelector("[data-wrestling-person-dossier-prototype-shell]");
+
+  if (isActive && typeof setWrestlingVenuesPrototypeActive === "function") {
+    setWrestlingVenuesPrototypeActive(false);
+  }
+  if (isActive && typeof setWrestlingPeoplePrototypeActive === "function") {
+    setWrestlingPeoplePrototypeActive(false);
+  }
+
+  if (shellElement) {
+    if (isActive) {
+      shellElement.dataset.wrestlingPersonDossierPrototype = "blank";
+      shellElement.dataset.portfolioGatewayWorld = "battleground";
+      shellElement.dataset.portfolioGatewayRoute = "/wrestling";
+      shellElement.dataset.portfolioGatewayState = "filling-screen";
+      shellElement.dataset.activeWorld = "battleground";
+      shellElement.dataset.shellRoute = "portfolio";
+      shellElement.dataset.shellActiveTarget = "portfolio";
+      shellElement.dataset.shellModule = "shell";
+      shellElement.dataset.portfolioGatewayHandoff = "complete";
+      shellElement.classList.remove("is-module-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-venues-view", "is-ring-archive-view");
+      shellElement.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
+    } else {
+      delete shellElement.dataset.wrestlingPersonDossierPrototype;
+    }
+  }
+
+  if (prototypeShell) {
+    prototypeShell.hidden = !isActive;
+    prototypeShell.dataset.wrestlingPersonDossierPrototypeActive = String(Boolean(isActive));
+    if (isActive) {
+      prototypeShell.removeAttribute("inert");
+      prototypeShell.setAttribute("aria-hidden", "false");
+    } else {
+      prototypeShell.setAttribute("inert", "");
+      prototypeShell.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  if (!isActive) {
+    return;
+  }
+
+  if (typeof homeFrame !== "undefined" && homeFrame) {
+    homeFrame.setAttribute("aria-hidden", "true");
+    homeFrame.setAttribute("inert", "");
+  }
+
+  if (typeof setWrestlingShowsHidden === "function") {
+    setWrestlingShowsHidden(true);
+  }
+  if (typeof setWrestlingPeopleHidden === "function") {
+    setWrestlingPeopleHidden(true);
+  }
+  if (typeof setWrestlingPersonDetailHidden === "function") {
+    setWrestlingPersonDetailHidden(true);
+  }
+  if (typeof setWrestlingVenuesHidden === "function") {
+    setWrestlingVenuesHidden(true);
+  }
+  if (typeof setWrestlingShowDetailHidden === "function") {
+    setWrestlingShowDetailHidden(true);
+  }
+  if (typeof setWrestlingMatchGalleryHidden === "function") {
+    setWrestlingMatchGalleryHidden(true);
+  }
+  if (typeof setWrestlingLightboxHidden === "function") {
+    setWrestlingLightboxHidden(true);
+  }
+
+  if (typeof currentView !== "undefined" && currentView) {
+    currentView.textContent = "Daiion - Person Dossier Prototype";
+  }
+
+  const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+  if (engineCurrent) {
+    const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
+    const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
+    if (engineCurrentLabel) {
+      engineCurrentLabel.textContent = "Current View:";
+    }
+    engineCurrent.classList.remove("fields-of-conflict-lock-readout");
+    engineCurrent.textContent = "PERSON DOSSIER // PROTOTYPE";
+  }
+
+  if (typeof setDocumentTitle === "function") {
+    setDocumentTitle("Person Dossier Prototype - Voodoo Media V3.0.01");
+  }
+}
+
+function showWrestlingPersonDossierPrototypeRoute() {
+  setWrestlingPersonDossierPrototypeActive(true);
+}
+
 function setWrestlingVenuesPrototypeActive(isActive) {
   if (isActive && typeof setWrestlingPeoplePrototypeActive === "function") {
     setWrestlingPeoplePrototypeActive(false);

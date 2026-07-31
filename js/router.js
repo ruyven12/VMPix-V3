@@ -113,6 +113,10 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people-prototype", canonicalUrl: routePaths.wrestlingPeople, wrestlingPeoplePrototype: "hall-of-champions" };
   }
+  const wrestlingPersonDossierPrototypePath = `${routePaths.wrestlingPeople}/proto`;
+  if (routePath === wrestlingPersonDossierPrototypePath) {
+    return { name: "wrestling-person-dossier-prototype", canonicalUrl: wrestlingPersonDossierPrototypePath };
+  }
   const wrestlingPersonDetailPrefix = `${routePaths.wrestlingPeople}/`;
   if (routePath.startsWith(wrestlingPersonDetailPrefix)) {
     const routeParts = routePath.slice(wrestlingPersonDetailPrefix.length).split("/");
@@ -277,6 +281,10 @@ function syncRoute(route, options = {}) {
     hideConnectShell();
   }
 
+  if (route.name !== "wrestling-person-dossier-prototype" && typeof setWrestlingPersonDossierPrototypeActive === "function") {
+    setWrestlingPersonDossierPrototypeActive(false);
+  }
+
   if (typeof setActiveGlobalNavForRoute === "function") {
     setActiveGlobalNavForRoute(route.name);
   }
@@ -368,6 +376,14 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "wrestling-people-prototype") {
     showWrestlingPeoplePrototypeRoute(route);
+    if (options.shouldCanonicalize !== false) {
+      replaceRouteUrl(route.canonicalUrl);
+    }
+    return;
+  }
+
+  if (route.name === "wrestling-person-dossier-prototype") {
+    showWrestlingPersonDossierPrototypeRoute(route);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
