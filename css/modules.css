@@ -12000,6 +12000,9 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   text-align: center;
   text-transform: uppercase;
+  display: grid;
+  place-items: center;
+  block-size: 100%;
   font-size: clamp(0.46rem, 1.58vw, 0.72rem);
   line-height: 1;
   white-space: nowrap;
@@ -12044,12 +12047,12 @@ button.wrestling-event-history-tagged-thumb {
 .hall-of-champions-letter-selector {
   position: fixed;
   inset-inline-start: var(--hall-champions-letter-selector-center, 50%);
-  inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - 0.2rem);
+  inset-block-start: calc(var(--hall-champions-letter-selector-top, 78%) - clamp(0.52rem, 0.72vw, 0.78rem));
   z-index: 90;
   display: grid;
   grid-template-columns: minmax(0.9rem, 16%) minmax(0, 1fr) minmax(0.9rem, 16%);
   align-items: center;
-  inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.28), 19rem);
+  inline-size: min(calc(var(--hall-champions-letter-selector-width, 11rem) * 1.42), 21.5rem);
   block-size: min(calc(var(--hall-champions-letter-selector-height, 2rem) * 0.96), 2rem);
   box-sizing: border-box;
   padding: 0 clamp(0.04rem, 0.22vw, 0.12rem);
