@@ -12154,6 +12154,14 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
 }
 
+.wrestling-person-dossier-prototype-event-archive__body[data-wrestling-person-dossier-prototype-event-archive-mode="viewer"] {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.wrestling-person-dossier-prototype-event-archive__body[data-wrestling-person-dossier-prototype-event-archive-mode="viewer"] > .wrestling-person-dossier-prototype-event-archive__region {
+  display: none;
+}
+
 .wrestling-person-dossier-prototype-event-archive__region {
   min-block-size: 0;
   border: 1px solid rgba(255, 106, 58, 0.2);
@@ -12277,27 +12285,49 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-event-archive__photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(clamp(4.4rem, 13vw, 7.4rem), 1fr));
-  gap: clamp(0.34rem, 0.9vw, 0.56rem);
+  column-gap: clamp(0.34rem, 0.9vw, 0.56rem);
+  row-gap: clamp(0.54rem, 1.25vw, 0.86rem);
   align-content: start;
   min-block-size: 0;
 }
 
 .wrestling-person-dossier-prototype-event-archive__photo-tile {
+  position: relative;
   display: block;
-  aspect-ratio: 4 / 3;
+  box-sizing: border-box;
+  inline-size: 100%;
   min-inline-size: 0;
+  padding: 0;
   overflow: hidden;
+  color: inherit;
+  font: inherit;
+  line-height: 0;
   border: 1px solid rgba(255, 126, 68, 0.26);
+  appearance: none;
   background: rgba(28, 6, 3, 0.36);
   box-shadow: inset 0 0 0.72rem rgba(255, 72, 32, 0.05);
-  pointer-events: none;
+  cursor: pointer;
+}
+
+.wrestling-person-dossier-prototype-event-archive__photo-tile::before {
+  display: block;
+  padding-block-start: 75%;
+  content: "";
+}
+
+.wrestling-person-dossier-prototype-event-archive__photo-tile:focus-visible {
+  outline: 1px solid rgba(255, 146, 86, 0.54);
+  outline-offset: 2px;
 }
 
 .wrestling-person-dossier-prototype-event-archive__photo-image {
+  position: absolute;
+  inset: 0;
   display: block;
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .wrestling-person-dossier-prototype-event-archive__photo-status {
@@ -12313,6 +12343,154 @@ button.wrestling-event-history-tagged-thumb {
   text-transform: none;
   text-shadow: 0 0 0.54rem rgba(255, 96, 44, 0.18);
   overflow-wrap: anywhere;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer[hidden],
+.wrestling-person-dossier-prototype-event-archive__body[data-wrestling-person-dossier-prototype-event-archive-mode="grid"] > .wrestling-person-dossier-prototype-event-archive__viewer {
+  display: none;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(1.8rem, auto) minmax(0, 1fr) minmax(1.8rem, auto);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.38rem, 0.95vw, 0.66rem);
+  min-block-size: 0;
+  block-size: 100%;
+  padding: clamp(0.5rem, 1.1vw, 0.78rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 106, 58, 0.2);
+  background:
+    linear-gradient(180deg, rgba(12, 2, 1, 0.62), rgba(37, 8, 4, 0.38)),
+    repeating-linear-gradient(0deg, rgba(255, 107, 58, 0.022) 0 1px, transparent 1px 10px),
+    rgba(8, 2, 1, 0.42);
+  box-shadow: inset 0 0 0.92rem rgba(255, 72, 32, 0.05);
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-close {
+  position: absolute;
+  inset-block-start: clamp(0.34rem, 0.9vw, 0.52rem);
+  inset-inline-end: clamp(0.34rem, 0.9vw, 0.52rem);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  inline-size: clamp(1.45rem, 3.2vw, 1.9rem);
+  block-size: clamp(1.45rem, 3.2vw, 1.9rem);
+  padding: 0;
+  color: rgba(255, 230, 214, 0.9);
+  font: inherit;
+  font-size: clamp(0.96rem, 2vw, 1.22rem);
+  line-height: 1;
+  text-transform: none;
+  background: rgba(8, 2, 1, 0.58);
+  border: 1px solid rgba(255, 126, 68, 0.36);
+  cursor: pointer;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-nav {
+  display: grid;
+  place-items: center;
+  align-self: center;
+  inline-size: clamp(1.55rem, 3.5vw, 2.15rem);
+  block-size: clamp(2.3rem, 13svh, 4.4rem);
+  padding: 0;
+  color: rgba(255, 226, 210, 0.86);
+  font: inherit;
+  font-size: clamp(1.2rem, 3.2vw, 1.9rem);
+  line-height: 1;
+  text-transform: none;
+  background: rgba(255, 92, 42, 0.09);
+  border: 1px solid rgba(255, 126, 68, 0.28);
+  cursor: pointer;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-nav:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-close:focus-visible,
+.wrestling-person-dossier-prototype-event-archive__viewer-nav:focus-visible {
+  outline: 1px solid rgba(255, 146, 86, 0.54);
+  outline-offset: 2px;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-nav--previous {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-nav--next {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-figure {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(0.34rem, 0.9vw, 0.54rem);
+  min-inline-size: 0;
+  min-block-size: 0;
+  block-size: 100%;
+  margin: 0;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-inline-size: 0;
+  min-block-size: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 126, 68, 0.2);
+  background: rgba(5, 1, 0, 0.58);
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  object-fit: contain;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-caption {
+  max-block-size: clamp(2.4rem, 12svh, 4rem);
+  margin: 0;
+  overflow: auto;
+  color: rgba(255, 231, 214, 0.84);
+  font-size: clamp(0.62rem, 1.08vw, 0.84rem);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-caption[hidden] {
+  display: none;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-position {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: center;
+  margin: 0;
+  color: rgba(255, 190, 148, 0.78);
+  font-size: clamp(0.58rem, 1vw, 0.78rem);
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+  text-shadow: 0 0 0.45rem rgba(255, 96, 44, 0.16);
 }
 
 .wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-timeline__count,
@@ -12665,7 +12843,20 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-person-dossier-prototype-event-archive__photo-grid {
     grid-template-columns: repeat(auto-fill, minmax(clamp(3.8rem, 24vw, 5.9rem), 1fr));
-    gap: 0.32rem;
+    column-gap: 0.32rem;
+    row-gap: 0.52rem;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__viewer {
+    grid-template-columns: minmax(1.35rem, auto) minmax(0, 1fr) minmax(1.35rem, auto);
+    gap: 0.34rem;
+    padding: 0.42rem;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__viewer-nav {
+    inline-size: 1.35rem;
+    block-size: min(30svh, 3.35rem);
+    font-size: 1.12rem;
   }
 
   .wrestling-person-dossier-prototype-event-archive__identity h3 {
