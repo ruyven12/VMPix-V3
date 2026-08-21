@@ -11796,6 +11796,15 @@ button.wrestling-event-history-tagged-thumb {
   overflow-wrap: anywhere;
 }
 
+@media (min-width: 641px) and (min-height: 980px) {
+  .wrestling-person-dossier-prototype-framework {
+    grid-template-rows:
+      auto
+      minmax(0, calc((39rem - clamp(3.15rem, 9svh, 5rem) - (clamp(0.34rem, 0.85vw, 0.58rem) * 2)) * 0.5894736842))
+      minmax(5.42rem, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .wrestling-person-dossier-prototype-shell .hall-of-champions-workspace--dossier-prototype {
     padding: 0.38rem;
