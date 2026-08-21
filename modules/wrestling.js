@@ -275,6 +275,7 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_URL = "https://vmpix-data.onrender.
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_SLUG = "ace-romero";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME = "Ace Romero";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK = "UNLISTED";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK = "N/A";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
 let wrestlingPersonDossierPrototypeAceState = {
   status: "idle",
@@ -10177,8 +10178,8 @@ function normalizeWrestlingPersonDossierPrototypeName(value) {
   return getWrestlingPersonDossierPrototypeText(value).toLowerCase();
 }
 
-function normalizeWrestlingPersonDossierPrototypeCategory(value) {
-  return getWrestlingPersonDossierPrototypeDisplayValue(value);
+function normalizeWrestlingPersonDossierPrototypeCategory(value, fallback = WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(value, fallback);
 }
 
 function getWrestlingPersonDossierPrototypeTeamStable(record) {
@@ -10208,14 +10209,14 @@ function getWrestlingPersonDossierPrototypeTeamStable(record) {
       .join(", ");
   }
 
-  return WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK;
+  return WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK;
 }
 
 function getWrestlingPersonDossierPrototypeAliases(record) {
   const aliases = getWrestlingPersonAliases(record)
     .map((value) => getWrestlingPersonDossierPrototypeText(value))
     .filter((value, index, values) => value && values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
-  return aliases.length > 0 ? aliases.join(" • ") : "NONE LISTED";
+  return aliases.length > 0 ? aliases.join(" • ") : WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK;
 }
 
 function getWrestlingPersonDossierPrototypeCount(record, fields) {
@@ -10347,9 +10348,9 @@ function bindWrestlingPersonDossierPrototypeMetadataResize() {
 }
 
 function setWrestlingPersonDossierPrototypeMetadataItems(scope, record) {
-  setWrestlingPersonDossierPrototypeStatusItem(scope, "category", record ? normalizeWrestlingPersonDossierPrototypeCategory(record?.category) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
-  setWrestlingPersonDossierPrototypeStatusItem(scope, "aliases", record ? getWrestlingPersonDossierPrototypeAliases(record) : "NONE LISTED");
-  setWrestlingPersonDossierPrototypeStatusItem(scope, "teams", record ? getWrestlingPersonDossierPrototypeTeamStable(record) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "category", record ? normalizeWrestlingPersonDossierPrototypeCategory(record?.category, WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK);
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "aliases", record ? getWrestlingPersonDossierPrototypeAliases(record) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK);
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "teams", record ? getWrestlingPersonDossierPrototypeTeamStable(record) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK);
   scheduleWrestlingPersonDossierPrototypeMetadataFit(scope);
 }
 
@@ -10533,15 +10534,15 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
             </div>
             <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
               <dt>Category</dt>
-              <dd data-wrestling-person-dossier-prototype-status-value="category" data-wrestling-person-dossier-prototype-metadata-fit>UNLISTED</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="category" data-wrestling-person-dossier-prototype-metadata-fit>N/A</dd>
             </div>
             <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
               <dt>Aliases</dt>
-              <dd data-wrestling-person-dossier-prototype-status-value="aliases" data-wrestling-person-dossier-prototype-metadata-fit>NONE LISTED</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="aliases" data-wrestling-person-dossier-prototype-metadata-fit>N/A</dd>
             </div>
             <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
               <dt>Teams / Stables</dt>
-              <dd data-wrestling-person-dossier-prototype-status-value="teams" data-wrestling-person-dossier-prototype-metadata-fit>UNLISTED</dd>
+              <dd data-wrestling-person-dossier-prototype-status-value="teams" data-wrestling-person-dossier-prototype-metadata-fit>N/A</dd>
             </div>
           </dl>
         </section>

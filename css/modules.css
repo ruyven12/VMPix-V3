@@ -11618,6 +11618,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-person-dossier-prototype-module--status {
   grid-area: status;
+  padding: 10px;
 }
 
 .wrestling-person-dossier-prototype-module--timeline {
@@ -11738,7 +11739,8 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-status {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: clamp(0.28rem, 0.9vw, 0.46rem);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.22rem, 0.7vw, 0.38rem);
   inline-size: min(100%, 25rem);
   margin: 0;
 }
@@ -11746,10 +11748,11 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-status__item {
   display: grid;
   grid-column: span 3;
-  gap: 0.12rem;
+  align-content: center;
+  gap: 0.08rem;
   min-inline-size: 0;
-  min-block-size: clamp(2.2rem, 6svh, 3rem);
-  padding: 0.32rem 0.42rem;
+  min-block-size: clamp(1.78rem, 4.7svh, 2.58rem);
+  padding: 0.24rem 0.34rem;
   border-block: 1px solid rgba(255, 107, 58, 0.18);
   background: linear-gradient(90deg, rgba(61, 13, 7, 0.28), rgba(255, 93, 45, 0.05), rgba(61, 13, 7, 0.18));
 }
@@ -11806,6 +11809,10 @@ button.wrestling-event-history-tagged-thumb {
     padding: 0.38rem;
   }
 
+  .wrestling-person-dossier-prototype-module--status {
+    padding: 10px;
+  }
+
   .wrestling-person-dossier-prototype-module--identity {
     min-block-size: 4rem;
   }
@@ -11821,31 +11828,20 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-person-dossier-prototype-status {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.22rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 0.18rem;
   }
 
   .wrestling-person-dossier-prototype-status__item {
-    grid-column: span 1;
-    min-block-size: 2.05rem;
-    padding: 0.24rem 0.22rem;
+    grid-column: span 3;
+    min-block-size: 1.72rem;
+    padding: 0.2rem 0.18rem;
   }
 
   .wrestling-person-dossier-prototype-status__item--metadata {
-    grid-column: 1 / -1;
-    grid-template-columns: minmax(5.05rem, auto) minmax(0, 1fr);
-    align-items: center;
-    column-gap: 0.34rem;
-    min-block-size: 1.78rem;
-  }
-
-  .wrestling-person-dossier-prototype-status__item--metadata dt {
-    text-align: left;
-  }
-
-  .wrestling-person-dossier-prototype-status__item--metadata dd {
-    justify-self: end;
-    text-align: right;
+    grid-column: span 2;
+    min-block-size: 1.72rem;
   }
 }
 
