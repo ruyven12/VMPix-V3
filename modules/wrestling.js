@@ -281,7 +281,7 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD = 44;
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_CLOSE_MS = 260;
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_FOCUSABLE_SELECTOR = "button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
-const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_BATCH_SIZE = 24;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE = 12;
 let wrestlingPersonDossierPrototypeAceState = {
   status: "idle",
   record: null,
@@ -305,7 +305,7 @@ let wrestlingPersonDossierPrototypeEventArchiveState = {
   photoRequests: new Map(),
   photoRequestKey: "",
   photoRenderItems: [],
-  photoRenderIndex: 0,
+  photoGalleryPage: 1,
   mode: "grid",
   selectedPhotoIndex: 0,
   photoGridScrollTop: 0,
@@ -11417,14 +11417,20 @@ function closeWrestlingPersonDossierPrototypeEventArchiveViewer(archive = getWre
     return false;
   }
 
-  const returnIndex = state.viewerReturnPhotoIndex;
+  const photos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
+  const originIndex = state.viewerReturnPhotoIndex;
+  const returnIndex = state.selectedPhotoIndex;
   const scrollTop = state.photoGridScrollTop;
+  const originPage = getWrestlingPersonDossierPrototypeEventArchivePhotoPageForIndex(originIndex);
+  const returnPage = getWrestlingPersonDossierPrototypeEventArchivePhotoPageForIndex(returnIndex);
   setWrestlingPersonDossierPrototypeEventArchiveMode(archive, "grid");
+  state.photoGalleryPage = getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(returnPage, photos);
+  renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, { animate: false, scrollToTop: false });
   resetWrestlingPersonDossierPrototypeEventArchiveViewerState();
   const region = getWrestlingPersonDossierPrototypeEventArchivePhotoGrid(archive);
   window.requestAnimationFrame(() => {
     if (region) {
-      region.scrollTop = scrollTop;
+      region.scrollTop = returnPage === originPage ? scrollTop : 0;
     }
     const focusTarget = archive.querySelector(`[data-wrestling-person-dossier-prototype-event-archive-photo-index="${returnIndex}"]`) || region;
     focusTarget?.focus?.({ preventScroll: true });
@@ -11448,16 +11454,32 @@ function moveWrestlingPersonDossierPrototypeEventArchiveViewerPhoto(delta, archi
   return renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive);
 }
 
-function resetWrestlingPersonDossierPrototypeEventArchivePhotoRender(region) {
+function getWrestlingPersonDossierPrototypeEventArchivePhotoPageCount(photos) {
+  const photoCount = Array.isArray(photos) ? photos.length : 0;
+  return Math.max(1, Math.ceil(photoCount / WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE));
+}
+
+function getWrestlingPersonDossierPrototypeEventArchivePhotoPageForIndex(index) {
+  const value = Number.parseInt(index, 10);
+  return Math.floor(Math.max(0, Number.isFinite(value) ? value : 0) / WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE) + 1;
+}
+
+function getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(page, photos) {
+  const pageCount = getWrestlingPersonDossierPrototypeEventArchivePhotoPageCount(photos);
+  const value = Number.parseInt(page, 10);
+  return Math.min(Math.max(Number.isFinite(value) ? value : 1, 1), pageCount);
+}
+
+function resetWrestlingPersonDossierPrototypeEventArchivePhotoGallery(region) {
   const state = wrestlingPersonDossierPrototypeEventArchiveState;
   state.photoRenderItems = [];
-  state.photoRenderIndex = 0;
+  state.photoGalleryPage = 1;
   if (region) {
     region.onscroll = null;
   }
 }
 
-function createWrestlingPersonDossierPrototypeEventArchivePhotoTile(photo, index) {
+function createWrestlingPersonDossierPrototypeEventArchivePhotoTile(photo, index, pageIndex = index) {
   const imageSrc = getWrestlingPersonMatchedPhotoUrl(photo);
   const tile = document.createElement("button");
   tile.className = "wrestling-person-dossier-prototype-event-archive__photo-tile";
@@ -11472,37 +11494,94 @@ function createWrestlingPersonDossierPrototypeEventArchivePhotoTile(photo, index
   image.className = "wrestling-person-dossier-prototype-event-archive__photo-image";
   image.src = imageSrc;
   image.alt = "";
-  image.loading = index < 8 ? "eager" : "lazy";
+  image.loading = pageIndex < 8 ? "eager" : "lazy";
   image.decoding = "async";
   tile.append(image);
 
   return tile;
 }
 
-function appendWrestlingPersonDossierPrototypeEventArchivePhotoBatch(region) {
-  const state = wrestlingPersonDossierPrototypeEventArchiveState;
-  const grid = region?.querySelector(".wrestling-person-dossier-prototype-event-archive__photo-grid");
-  if (!region || !grid || !Array.isArray(state.photoRenderItems)) {
-    return;
-  }
-
-  const startIndex = state.photoRenderIndex;
-  const endIndex = Math.min(startIndex + WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_BATCH_SIZE, state.photoRenderItems.length);
-  state.photoRenderItems.slice(startIndex, endIndex).forEach((photo, batchIndex) => {
-    grid.append(createWrestlingPersonDossierPrototypeEventArchivePhotoTile(photo, startIndex + batchIndex));
-  });
-  state.photoRenderIndex = endIndex;
-  if (state.photoRenderIndex >= state.photoRenderItems.length) {
-    region.onscroll = null;
-  }
+function createWrestlingPersonDossierPrototypeEventArchivePhotoPageButton(label, isEnabled) {
+  const button = document.createElement("button");
+  button.className = "wrestling-person-dossier-prototype-event-archive__photo-page-button";
+  button.type = "button";
+  button.textContent = label;
+  setWrestlingPersonDossierPrototypeControlEnabled(button, isEnabled, "");
+  return button;
 }
 
-function handleWrestlingPersonDossierPrototypeEventArchivePhotoScroll(event) {
-  const region = event.currentTarget;
-  if (!region || region.scrollTop + region.clientHeight < region.scrollHeight - 80) {
-    return;
+function renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, options = {}) {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  const region = getWrestlingPersonDossierPrototypeEventArchivePhotoGrid(archive);
+  const photos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
+  if (!archive || !region || photos.length === 0) {
+    return false;
   }
-  appendWrestlingPersonDossierPrototypeEventArchivePhotoBatch(region);
+
+  const pageCount = getWrestlingPersonDossierPrototypeEventArchivePhotoPageCount(photos);
+  const page = getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(options.page || state.photoGalleryPage, photos);
+  const startIndex = (page - 1) * WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE;
+  const pagePhotos = photos.slice(startIndex, startIndex + WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE);
+  state.photoGalleryPage = page;
+  region.replaceChildren();
+
+  const grid = document.createElement("div");
+  grid.className = "wrestling-person-dossier-prototype-event-archive__photo-grid";
+  if (options.animate !== false) {
+    grid.classList.add("is-page-transitioning");
+  }
+  pagePhotos.forEach((photo, pageIndex) => {
+    grid.append(createWrestlingPersonDossierPrototypeEventArchivePhotoTile(photo, startIndex + pageIndex, pageIndex));
+  });
+  region.append(grid);
+
+  if (pageCount > 1) {
+    const pagination = document.createElement("nav");
+    pagination.className = "wrestling-person-dossier-prototype-event-archive__photo-pagination";
+    pagination.setAttribute("aria-label", "Event archive photo pages");
+
+    const previous = createWrestlingPersonDossierPrototypeEventArchivePhotoPageButton("Previous", page > 1);
+    previous.dataset.wrestlingPersonDossierPrototypeEventArchivePhotoPagePrevious = "true";
+    previous.addEventListener("click", () => {
+      moveWrestlingPersonDossierPrototypeEventArchivePhotoPage(-1, archive);
+    });
+
+    const indicator = document.createElement("span");
+    indicator.className = "wrestling-person-dossier-prototype-event-archive__photo-page-indicator";
+    indicator.textContent = `${page} of ${pageCount}`;
+    indicator.setAttribute("aria-live", "polite");
+
+    const next = createWrestlingPersonDossierPrototypeEventArchivePhotoPageButton("Next", page < pageCount);
+    next.dataset.wrestlingPersonDossierPrototypeEventArchivePhotoPageNext = "true";
+    next.addEventListener("click", () => {
+      moveWrestlingPersonDossierPrototypeEventArchivePhotoPage(1, archive);
+    });
+
+    pagination.append(previous, indicator, next);
+    region.append(pagination);
+  }
+
+  setWrestlingPersonDossierPrototypeEventArchivePhotoCount(archive, photos.length);
+  if (options.scrollToTop !== false) {
+    region.scrollTop = 0;
+  }
+  return true;
+}
+
+function moveWrestlingPersonDossierPrototypeEventArchivePhotoPage(delta, archive = getWrestlingPersonDossierPrototypeEventArchive()) {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  const photos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
+  if (!archive || photos.length === 0) {
+    return false;
+  }
+
+  const currentPage = getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(state.photoGalleryPage, photos);
+  const nextPage = getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(currentPage + delta, photos);
+  if (nextPage === currentPage) {
+    return false;
+  }
+
+  return renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, { page: nextPage });
 }
 
 function setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, stateName, photos = []) {
@@ -11511,20 +11590,14 @@ function setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, stat
     return;
   }
 
-  resetWrestlingPersonDossierPrototypeEventArchivePhotoRender(region);
+  resetWrestlingPersonDossierPrototypeEventArchivePhotoGallery(region);
   region.dataset.wrestlingPersonDossierPrototypeEventArchivePhotoState = stateName;
   region.replaceChildren();
 
   if (stateName === "loaded" && photos.length > 0) {
-    const grid = document.createElement("div");
-    grid.className = "wrestling-person-dossier-prototype-event-archive__photo-grid";
-    region.append(grid);
     wrestlingPersonDossierPrototypeEventArchiveState.photoRenderItems = photos;
-    appendWrestlingPersonDossierPrototypeEventArchivePhotoBatch(region);
-    if (wrestlingPersonDossierPrototypeEventArchiveState.photoRenderIndex < photos.length) {
-      region.onscroll = handleWrestlingPersonDossierPrototypeEventArchivePhotoScroll;
-    }
-    setWrestlingPersonDossierPrototypeEventArchivePhotoCount(archive, photos.length);
+    wrestlingPersonDossierPrototypeEventArchiveState.photoGalleryPage = 1;
+    renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, { animate: false });
     return;
   }
 
@@ -11708,6 +11781,7 @@ function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPerson
   state.isOpen = true;
   state.trigger = trigger;
   state.eventIndex = context.eventIndex;
+  state.photoGalleryPage = 1;
   resetWrestlingPersonDossierPrototypeEventArchiveViewerState();
   setWrestlingPersonDossierPrototypeEventArchiveMode(archive, "grid");
   loadWrestlingPersonDossierPrototypeEventArchivePhotos(archive, context);
