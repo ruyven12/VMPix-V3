@@ -10426,8 +10426,6 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
           <p class="wrestling-person-dossier-prototype-module__label">Identity Header</p>
           <div class="wrestling-person-dossier-prototype-identity-summary">
             <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name" data-wrestling-person-dossier-prototype-name>ARCHIVE RECORD INITIALIZING</h2>
-            <span class="wrestling-person-dossier-prototype-identity__category" data-wrestling-person-dossier-prototype-category>UNLISTED</span>
-            <span class="wrestling-person-dossier-prototype-identity__team" data-wrestling-person-dossier-prototype-team>UNLISTED</span>
           </div>
         </header>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait" aria-label="Portrait module">
