@@ -10255,6 +10255,43 @@ function getWrestlingPersonDossierPrototypePortraitUrl(record) {
   }
 }
 
+function getWrestlingPersonDossierPrototypePortraitDateSource(record, portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record)) {
+  return getWrestlingPersonDossierPrototypeText(
+    record?.portrait_date ||
+    record?.portraitDate ||
+    record?.portrait_taken_at ||
+    record?.portraitTakenAt ||
+    record?.photo_date ||
+    record?.photoDate ||
+    record?.date_taken ||
+    record?.dateTaken ||
+    record?.taken_at ||
+    record?.takenAt ||
+    record?.image_date ||
+    record?.imageDate ||
+    portraitUrl
+  );
+}
+
+function getWrestlingPersonDossierPrototypePortraitUpdatedDate(record, portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record)) {
+  const dateSource = getWrestlingPersonDossierPrototypePortraitDateSource(record, portraitUrl);
+  const isoMatch = dateSource.match(/\b(\d{4})[-_/](\d{1,2})[-_/](\d{1,2})\b/);
+  if (isoMatch) {
+    return `${Number(isoMatch[2])}/${Number(isoMatch[3])}/${isoMatch[1].slice(-2)}`;
+  }
+
+  const compactMatch = dateSource.match(/(?:^|[^\d])(\d{2})(\d{2})(\d{2})(?:[^\d]|$)/);
+  if (compactMatch) {
+    return `${Number(compactMatch[1])}/${Number(compactMatch[2])}/${compactMatch[3]}`;
+  }
+
+  return WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK;
+}
+
+function getWrestlingPersonDossierPrototypePortraitLabel(record, portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record)) {
+  return `Portrait - Updated ${getWrestlingPersonDossierPrototypePortraitUpdatedDate(record, portraitUrl)}`;
+}
+
 function getWrestlingPersonDossierPrototypeRecords(payload) {
   if (!payload || !Array.isArray(payload.data)) {
     throw new Error("Unexpected Ace Romero prototype response structure");
@@ -10358,7 +10395,12 @@ function renderWrestlingPersonDossierPrototypePortrait(workspace, record) {
   const portrait = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait]");
   const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-image]");
   const label = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-label]");
+  const moduleLabel = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-module-label]");
   const portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record);
+
+  if (moduleLabel) {
+    moduleLabel.textContent = getWrestlingPersonDossierPrototypePortraitLabel(record, portraitUrl);
+  }
 
   if (!portrait || !image || !label || !portraitUrl) {
     if (portrait) {
@@ -10507,7 +10549,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
           </div>
         </header>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait" aria-label="Portrait module">
-          <p class="wrestling-person-dossier-prototype-module__label">Portrait Module</p>
+          <p class="wrestling-person-dossier-prototype-module__label" data-wrestling-person-dossier-prototype-portrait-module-label>Portrait - Updated N/A</p>
           <div class="wrestling-person-dossier-prototype-portrait" data-wrestling-person-dossier-prototype-portrait aria-label="Prototype portrait reserved for Ace Romero">
             <img class="wrestling-person-dossier-prototype-portrait__image" data-wrestling-person-dossier-prototype-portrait-image loading="lazy" decoding="async" hidden alt="">
             <span class="wrestling-person-dossier-prototype-portrait__label" data-wrestling-person-dossier-prototype-portrait-label>Portrait Signal Reserved</span>
