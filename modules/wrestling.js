@@ -272,6 +272,7 @@ const wrestlingPeopleFilterReset = document.querySelector("[data-wrestling-peopl
 let wrestlingPeoplePrototypeShell = null;
 let wrestlingPersonDossierPrototypeShell = null;
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_URL = "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace%20romero&limit=25&page=1";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_HISTORY_URL = "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=Ace%20Romero&sort=date&dir=desc&limit=100&page=1";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_SLUG = "ace-romero";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME = "Ace Romero";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK = "UNLISTED";
@@ -280,6 +281,12 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
 let wrestlingPersonDossierPrototypeAceState = {
   status: "idle",
   record: null,
+  error: null,
+  requestPromise: null,
+};
+let wrestlingPersonDossierPrototypeEventHistoryState = {
+  status: "idle",
+  events: [],
   error: null,
   requestPromise: null,
 };
@@ -10432,6 +10439,321 @@ function renderWrestlingPersonDossierPrototypePortrait(workspace, record) {
   label.hidden = true;
 }
 
+function getWrestlingPersonDossierPrototypeEventHistoryRows(payload) {
+  if (!payload || !Array.isArray(payload.data)) {
+    throw new Error("Unexpected Ace Romero event-history response structure");
+  }
+  return payload.data;
+}
+
+function getWrestlingPersonDossierPrototypeEventHistoryTextList(value) {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => getWrestlingPersonDossierPrototypeEventHistoryTextList(entry));
+  }
+  const text = getWrestlingPersonDossierPrototypeText(value);
+  return text ? [text] : [];
+}
+
+function isWrestlingPersonDossierPrototypeAceIdentity(value) {
+  return normalizeWrestlingPersonDossierPrototypeName(value) === normalizeWrestlingPersonDossierPrototypeName(WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
+}
+
+function getWrestlingPersonDossierPrototypeEventDateKey(row) {
+  return getWrestlingShowDateKey(row?.dateKey || row?.date_key || row?.date || row?.show_date || row?.eventDate || row?.event_date);
+}
+
+function getWrestlingPersonDossierPrototypeEventTimestamp(row) {
+  const parsedDate = parseWrestlingShowDate(row?.date || row?.show_date || row?.eventDate || row?.event_date || row?.dateKey || row?.date_key);
+  return parsedDate ? parsedDate.getTime() : 0;
+}
+
+function getWrestlingPersonDossierPrototypeEventIdentifier(row) {
+  const dateKey = getWrestlingPersonDossierPrototypeEventDateKey(row);
+  const candidates = [
+    row?.show_id,
+    row?.showId,
+    row?.event_id,
+    row?.eventId,
+    row?.show_key,
+    row?.showKey,
+    dateKey,
+    [row?.show_url || row?.showUrl || row?.url, dateKey].filter(Boolean).join("-"),
+  ];
+  return candidates.map((candidate) => getWrestlingPersonDossierPrototypeText(candidate)).find(Boolean) || "";
+}
+
+function getWrestlingPersonDossierPrototypeEventTitle(row) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(row?.show_name || row?.showName || row?.event_name || row?.eventName || row?.title || row?.name, "EVENT TITLE UNLISTED");
+}
+
+function getWrestlingPersonDossierPrototypeEventDate(row) {
+  const dateValue = row?.date || row?.show_date || row?.eventDate || row?.event_date || row?.dateKey || row?.date_key;
+  return getWrestlingPersonDossierPrototypeDisplayValue(formatWrestlingShowDate(dateValue), "DATE UNLISTED");
+}
+
+function getWrestlingPersonDossierPrototypeEventVenue(row) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(row?.venue || row?.venue_name || row?.venueName || row?.venue_details?.venue_name || row?.venue_details?.name, "VENUE UNLISTED");
+}
+
+function getWrestlingPersonDossierPrototypeEventLocation(row) {
+  const city = getWrestlingPersonDossierPrototypeText(row?.city || row?.venue_details?.city);
+  const state = getWrestlingPersonDossierPrototypeText(row?.state || row?.venue_details?.state);
+  return [city, state].filter(Boolean).join(", ") || "LOCATION UNLISTED";
+}
+
+function getWrestlingPersonDossierPrototypeEventPosterUrl(row) {
+  const posterUrl = getWrestlingPersonDossierPrototypeText(row?.poster || row?.poster_url || row?.posterUrl || row?.image_url || row?.imageUrl);
+  return isValidWrestlingPosterUrl(posterUrl) ? posterUrl : "";
+}
+
+function getWrestlingPersonDossierPrototypeMatchSide(match, key) {
+  return getWrestlingPersonDossierPrototypeEventHistoryTextList(match?.[key]);
+}
+
+function getWrestlingPersonDossierPrototypeMatchPeople(match, fields) {
+  return fields.flatMap((field) => getWrestlingPersonDossierPrototypeEventHistoryTextList(match?.[field]));
+}
+
+function hasWrestlingPersonDossierPrototypeAceInMatch(match) {
+  return getWrestlingPersonDossierPrototypeMatchPeople(match, ["participants", "participant_names", "participantNames", "side_1", "side_2", "winner"])
+    .some((value) => isWrestlingPersonDossierPrototypeAceIdentity(value));
+}
+
+function getWrestlingPersonDossierPrototypeAceSideKey(match) {
+  const side1 = getWrestlingPersonDossierPrototypeMatchSide(match, "side_1");
+  const side2 = getWrestlingPersonDossierPrototypeMatchSide(match, "side_2");
+  if (side1.some((value) => isWrestlingPersonDossierPrototypeAceIdentity(value))) {
+    return "side_1";
+  }
+  if (side2.some((value) => isWrestlingPersonDossierPrototypeAceIdentity(value))) {
+    return "side_2";
+  }
+  return "";
+}
+
+function formatWrestlingPersonDossierPrototypeEventHistoryList(values, fallback) {
+  const uniqueValues = values
+    .map((value) => getWrestlingPersonDossierPrototypeText(value))
+    .filter((value, index, list) => value && list.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
+  return uniqueValues.length > 0 ? uniqueValues.join(", ") : fallback;
+}
+
+function getWrestlingPersonDossierPrototypeAppearanceResult(match, aceSideKey, aceSideValues) {
+  const winnerValues = getWrestlingPersonDossierPrototypeEventHistoryTextList(match?.winner);
+  if (winnerValues.some((value) => isWrestlingPersonDossierPrototypeAceIdentity(value))) {
+    return "WINNER";
+  }
+  if (aceSideKey && winnerValues.some((winner) => aceSideValues.some((sideValue) => normalizeWrestlingPersonDossierPrototypeName(sideValue) === normalizeWrestlingPersonDossierPrototypeName(winner)))) {
+    return "WINNER";
+  }
+  return hasWrestlingPersonDossierPrototypeAceInMatch(match) ? "PARTICIPANT" : "RESULT UNLISTED";
+}
+
+function normalizeWrestlingPersonDossierPrototypeAceAppearance(match, matchIndex) {
+  const aceSideKey = getWrestlingPersonDossierPrototypeAceSideKey(match);
+  const opposingSideKey = aceSideKey === "side_1" ? "side_2" : aceSideKey === "side_2" ? "side_1" : "";
+  const aceSideValues = aceSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, aceSideKey) : [WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME];
+  const opposingSideValues = opposingSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, opposingSideKey) : [];
+  const matchOrder = Number(match?.match_order ?? match?.matchOrder ?? match?.order ?? matchIndex + 1);
+
+  return {
+    match,
+    matchOrder: Number.isFinite(matchOrder) ? matchOrder : matchIndex + 1,
+    aceSide: formatWrestlingPersonDossierPrototypeEventHistoryList(aceSideValues, WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME),
+    opposingSide: formatWrestlingPersonDossierPrototypeEventHistoryList(opposingSideValues, "OPPONENT UNLISTED"),
+    matchType: getWrestlingPersonDossierPrototypeDisplayValue(match?.match_type || match?.matchType || match?.stipulation || match?.title, "MATCH TYPE UNLISTED"),
+    result: getWrestlingPersonDossierPrototypeAppearanceResult(match, aceSideKey, aceSideValues),
+  };
+}
+
+function normalizeWrestlingPersonDossierPrototypeEvent(row) {
+  const matches = Array.isArray(row?.matches) ? row.matches : [];
+  const aceAppearances = matches
+    .map((match, matchIndex) => ({ match, matchIndex }))
+    .filter(({ match }) => match && typeof match === "object" && hasWrestlingPersonDossierPrototypeAceInMatch(match))
+    .map(({ match, matchIndex }) => normalizeWrestlingPersonDossierPrototypeAceAppearance(match, matchIndex))
+    .sort((left, right) => left.matchOrder - right.matchOrder);
+
+  if (matches.length > 0 && aceAppearances.length === 0) {
+    return null;
+  }
+
+  const eventId = getWrestlingPersonDossierPrototypeEventIdentifier(row);
+  if (!eventId) {
+    return null;
+  }
+
+  return {
+    id: eventId,
+    raw: row,
+    title: getWrestlingPersonDossierPrototypeEventTitle(row),
+    date: getWrestlingPersonDossierPrototypeEventDate(row),
+    dateKey: getWrestlingPersonDossierPrototypeEventDateKey(row),
+    dateSort: getWrestlingPersonDossierPrototypeEventTimestamp(row),
+    venue: getWrestlingPersonDossierPrototypeEventVenue(row),
+    location: getWrestlingPersonDossierPrototypeEventLocation(row),
+    poster: getWrestlingPersonDossierPrototypeEventPosterUrl(row),
+    aceAppearances,
+  };
+}
+
+function normalizeWrestlingPersonDossierPrototypeEventHistory(payload) {
+  const eventMap = new Map();
+  getWrestlingPersonDossierPrototypeEventHistoryRows(payload).forEach((row) => {
+    const event = normalizeWrestlingPersonDossierPrototypeEvent(row);
+    if (!event) {
+      return;
+    }
+    const existingEvent = eventMap.get(event.id);
+    if (existingEvent) {
+      existingEvent.aceAppearances.push(...event.aceAppearances);
+      existingEvent.aceAppearances.sort((left, right) => left.matchOrder - right.matchOrder);
+      return;
+    }
+    eventMap.set(event.id, event);
+  });
+
+  return [...eventMap.values()].sort((left, right) => right.dateSort - left.dateSort || left.title.localeCompare(right.title));
+}
+
+function getWrestlingPersonDossierPrototypeEventHistoryCount(total) {
+  const count = Number(total);
+  return Number.isFinite(count) && count > 0 ? String(Math.trunc(count)).padStart(2, "0") : "00";
+}
+
+function setWrestlingPersonDossierPrototypeEventPoster(workspace, event) {
+  const poster = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster]");
+  const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster-image]");
+  const title = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster-title]");
+  const mark = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster-mark]");
+  if (!poster || !image || !title || !mark) {
+    return;
+  }
+
+  const posterUrl = event?.poster || "";
+  poster.classList.remove("has-poster");
+  image.hidden = true;
+  image.removeAttribute("src");
+  image.removeAttribute("alt");
+  title.textContent = event?.title || "EVENT HISTORY";
+  mark.textContent = "VMP";
+
+  if (!posterUrl) {
+    return;
+  }
+
+  poster.classList.add("has-poster");
+  image.hidden = false;
+  image.alt = `${event.title} poster`;
+  image.onerror = () => {
+    poster.classList.remove("has-poster");
+    image.hidden = true;
+    image.removeAttribute("src");
+    title.textContent = event.title || "EVENT HISTORY";
+    mark.textContent = "VMP";
+  };
+  image.src = posterUrl;
+}
+
+function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0) {
+  const timeline = workspace?.querySelector(".wrestling-person-dossier-prototype-module--timeline");
+  const selectedAppearance = event?.aceAppearances?.[0] || null;
+  if (timeline) {
+    timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryState = stateName;
+  }
+
+  const countText = stateName === "loaded"
+    ? `01 OF ${getWrestlingPersonDossierPrototypeEventHistoryCount(total)} ARCHIVED EVENTS`
+    : stateName === "empty"
+      ? "00 OF 00 ARCHIVED EVENTS"
+      : "01 OF -- ARCHIVED EVENTS";
+
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-count]", countText);
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-title]", event?.title || (stateName === "empty" ? "NO ARCHIVED EVENTS FOUND" : stateName === "error" ? "EVENT HISTORY UNAVAILABLE" : "EVENT HISTORY INITIALIZING"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-date]", event?.date || (stateName === "loaded" ? "DATE UNLISTED" : "DATE PENDING"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-venue]", event?.venue || (stateName === "loaded" ? "VENUE UNLISTED" : "VENUE PENDING"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-location]", event?.location || (stateName === "loaded" ? "LOCATION UNLISTED" : "LOCATION PENDING"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-opponents]", selectedAppearance?.opposingSide || "OPPONENT UNLISTED");
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-ace-side]", selectedAppearance?.aceSide || WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-match-type]", selectedAppearance?.matchType || "MATCH DATA UNLISTED");
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-result]", selectedAppearance?.result || "RESULT UNLISTED");
+  setWrestlingPersonDossierPrototypeEventPoster(workspace, event);
+}
+
+function renderWrestlingPersonDossierPrototypeEventHistoryState(shell = wrestlingPersonDossierPrototypeShell) {
+  const workspace = shell?.querySelector("[data-wrestling-person-dossier-prototype-workspace]");
+  if (!workspace) {
+    return;
+  }
+
+  const state = wrestlingPersonDossierPrototypeEventHistoryState;
+  if (state.status === "loaded" && state.events.length > 0) {
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[0], state.events.length);
+  } else if (state.status === "empty") {
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "empty");
+  } else if (state.status === "error") {
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "error");
+  } else {
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loading");
+  }
+}
+
+function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPersonDossierPrototypeShell) {
+  const state = wrestlingPersonDossierPrototypeEventHistoryState;
+  if (state.status === "loaded" || state.status === "empty" || state.status === "error") {
+    renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+    return state.requestPromise || Promise.resolve(state.events);
+  }
+
+  if (state.requestPromise) {
+    renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+    return state.requestPromise;
+  }
+
+  if (typeof fetch !== "function") {
+    state.events = [];
+    state.status = "error";
+    renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+    return Promise.resolve([]);
+  }
+
+  state.status = "loading";
+  state.error = null;
+  renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+
+  state.requestPromise = fetch(WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_HISTORY_URL, {
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ace Romero event-history request failed: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then((payload) => {
+      const events = normalizeWrestlingPersonDossierPrototypeEventHistory(payload);
+      state.events = events;
+      state.status = events.length > 0 ? "loaded" : "empty";
+      renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+      return events;
+    })
+    .catch((error) => {
+      state.events = [];
+      state.error = error;
+      state.status = "error";
+      renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+      return [];
+    })
+    .finally(() => {
+      state.requestPromise = null;
+    });
+
+  return state.requestPromise;
+}
+
 function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDossierPrototypeShell) {
   const workspace = shell?.querySelector("[data-wrestling-person-dossier-prototype-workspace]");
   if (!workspace) {
@@ -10588,30 +10910,31 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
             </div>
           </dl>
         </section>
-        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline event history module">
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline event history module" data-wrestling-person-dossier-prototype-event-history-state="loading">
           <div class="wrestling-person-dossier-prototype-timeline__header">
             <p class="wrestling-person-dossier-prototype-module__label">TIMELINE / EVENT HISTORY</p>
-            <p class="wrestling-person-dossier-prototype-timeline__count">05 OF 23 ARCHIVED EVENTS</p>
+            <p class="wrestling-person-dossier-prototype-timeline__count" data-wrestling-person-dossier-prototype-event-count>01 OF -- ARCHIVED EVENTS</p>
           </div>
-          <div class="wrestling-person-dossier-prototype-event-history" aria-label="Static event history carousel shell">
+          <div class="wrestling-person-dossier-prototype-event-history" aria-label="Event history carousel shell">
             <span class="wrestling-person-dossier-prototype-event-history__nav" aria-hidden="true">&lsaquo;</span>
-            <article class="wrestling-person-dossier-prototype-event-history__card" aria-label="Vacationland Cup '26 event preview">
-              <div class="wrestling-person-dossier-prototype-event-history__poster" aria-label="Static event poster placeholder">
-                <span class="wrestling-person-dossier-prototype-event-history__poster-title">VACATIONLAND CUP '26</span>
-                <span class="wrestling-person-dossier-prototype-event-history__poster-mark">VMP</span>
+            <article class="wrestling-person-dossier-prototype-event-history__card" aria-label="Ace Romero event history preview" data-wrestling-person-dossier-prototype-event-card>
+              <div class="wrestling-person-dossier-prototype-event-history__poster" aria-label="Event poster" data-wrestling-person-dossier-prototype-event-poster>
+                <img class="wrestling-person-dossier-prototype-event-history__poster-image" data-wrestling-person-dossier-prototype-event-poster-image loading="lazy" decoding="async" hidden alt="">
+                <span class="wrestling-person-dossier-prototype-event-history__poster-title" data-wrestling-person-dossier-prototype-event-poster-title>EVENT HISTORY</span>
+                <span class="wrestling-person-dossier-prototype-event-history__poster-mark" data-wrestling-person-dossier-prototype-event-poster-mark>VMP</span>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__show">
-                <h3 class="wrestling-person-dossier-prototype-event-history__title">VACATIONLAND CUP '26</h3>
-                <p>AUGUST 8TH, 2026</p>
-                <p>PORTLAND EXPO</p>
-                <p>PORTLAND, MAINE</p>
+                <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title>EVENT HISTORY INITIALIZING</h3>
+                <p data-wrestling-person-dossier-prototype-event-date>DATE PENDING</p>
+                <p data-wrestling-person-dossier-prototype-event-venue>VENUE PENDING</p>
+                <p data-wrestling-person-dossier-prototype-event-location>LOCATION PENDING</p>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__match">
-                <p class="wrestling-person-dossier-prototype-event-history__side">BRG, Oxx Adams</p>
+                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-opponents>OPPONENT UNLISTED</p>
                 <p class="wrestling-person-dossier-prototype-event-history__vs">VS</p>
-                <p class="wrestling-person-dossier-prototype-event-history__side">Ace Romero, Rhino</p>
-                <p class="wrestling-person-dossier-prototype-event-history__type">TAG TEAM</p>
-                <p class="wrestling-person-dossier-prototype-event-history__result">WINNER</p>
+                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-ace-side>ACE ROMERO</p>
+                <p class="wrestling-person-dossier-prototype-event-history__type" data-wrestling-person-dossier-prototype-event-match-type>MATCH DATA PENDING</p>
+                <p class="wrestling-person-dossier-prototype-event-history__result" data-wrestling-person-dossier-prototype-event-result>RESULT PENDING</p>
                 <button class="wrestling-person-dossier-prototype-event-history__action" type="button" disabled>OPEN EVENT</button>
               </div>
             </article>
@@ -10707,6 +11030,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
       bindWrestlingPersonDossierPrototypeMetadataResize();
       scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
       loadWrestlingPersonDossierPrototypeAceRecord(prototypeShell);
+      loadWrestlingPersonDossierPrototypeEventHistory(prototypeShell);
     } else {
       prototypeShell.setAttribute("inert", "");
       prototypeShell.setAttribute("aria-hidden", "true");

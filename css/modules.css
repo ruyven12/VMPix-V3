@@ -11726,6 +11726,27 @@ button.wrestling-event-history-tagged-thumb {
   content: "";
 }
 
+.wrestling-person-dossier-prototype-event-history__poster-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.wrestling-person-dossier-prototype-event-history__poster-image[hidden],
+.wrestling-person-dossier-prototype-event-history__poster.has-poster .wrestling-person-dossier-prototype-event-history__poster-title,
+.wrestling-person-dossier-prototype-event-history__poster.has-poster .wrestling-person-dossier-prototype-event-history__poster-mark {
+  display: none;
+}
+
+.wrestling-person-dossier-prototype-event-history__poster.has-poster::after {
+  z-index: 2;
+}
+
 .wrestling-person-dossier-prototype-event-history__poster-title,
 .wrestling-person-dossier-prototype-event-history__poster-mark {
   z-index: 1;
