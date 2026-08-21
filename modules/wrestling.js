@@ -10588,8 +10588,42 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
             </div>
           </dl>
         </section>
-        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline module reserved">
-          <p class="wrestling-person-dossier-prototype-module__label">Timeline // Reserved</p>
+        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline event history module">
+          <div class="wrestling-person-dossier-prototype-timeline__header">
+            <p class="wrestling-person-dossier-prototype-module__label">TIMELINE / EVENT HISTORY</p>
+            <p class="wrestling-person-dossier-prototype-timeline__count">05 OF 23 ARCHIVED EVENTS</p>
+          </div>
+          <div class="wrestling-person-dossier-prototype-event-history" aria-label="Static event history carousel shell">
+            <span class="wrestling-person-dossier-prototype-event-history__nav" aria-hidden="true">&lsaquo;</span>
+            <article class="wrestling-person-dossier-prototype-event-history__card" aria-label="Vacationland Cup '26 event preview">
+              <div class="wrestling-person-dossier-prototype-event-history__poster" aria-label="Static event poster placeholder">
+                <span class="wrestling-person-dossier-prototype-event-history__poster-title">VACATIONLAND CUP '26</span>
+                <span class="wrestling-person-dossier-prototype-event-history__poster-mark">VMP</span>
+              </div>
+              <div class="wrestling-person-dossier-prototype-event-history__show">
+                <h3 class="wrestling-person-dossier-prototype-event-history__title">VACATIONLAND CUP '26</h3>
+                <p>AUGUST 8TH, 2026</p>
+                <p>PORTLAND EXPO</p>
+                <p>PORTLAND, MAINE</p>
+              </div>
+              <div class="wrestling-person-dossier-prototype-event-history__match">
+                <p class="wrestling-person-dossier-prototype-event-history__side">BRG, Oxx Adams</p>
+                <p class="wrestling-person-dossier-prototype-event-history__vs">VS</p>
+                <p class="wrestling-person-dossier-prototype-event-history__side">Ace Romero, Rhino</p>
+                <p class="wrestling-person-dossier-prototype-event-history__type">TAG TEAM</p>
+                <p class="wrestling-person-dossier-prototype-event-history__result">WINNER</p>
+                <button class="wrestling-person-dossier-prototype-event-history__action" type="button" disabled>OPEN EVENT</button>
+              </div>
+            </article>
+            <span class="wrestling-person-dossier-prototype-event-history__nav" aria-hidden="true">&rsaquo;</span>
+            <div class="wrestling-person-dossier-prototype-event-history__dots" aria-hidden="true">
+              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot wrestling-person-dossier-prototype-event-history__dot--active"></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
+            </div>
+          </div>
         </section>
       </div>
     </section>
