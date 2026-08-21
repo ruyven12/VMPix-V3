@@ -10333,7 +10333,7 @@ function setWrestlingPersonDossierPrototypeStatusItem(scope, key, value) {
 }
 
 function fitWrestlingPersonDossierPrototypeMetadataValues(scope) {
-  const valueElements = scope?.querySelectorAll("[data-wrestling-person-dossier-prototype-metadata-fit]");
+  const valueElements = scope?.querySelectorAll("[data-wrestling-person-dossier-prototype-metadata-fit], [data-wrestling-person-dossier-prototype-event-fit]");
   if (!valueElements || valueElements.length === 0) {
     return;
   }
@@ -10655,9 +10655,23 @@ function setWrestlingPersonDossierPrototypeEventPoster(workspace, event) {
   image.src = posterUrl;
 }
 
-function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0) {
+function setWrestlingPersonDossierPrototypeEventPreview(workspace, position, event) {
+  const preview = workspace?.querySelector(`[data-wrestling-person-dossier-prototype-event-preview="${position}"]`);
+  if (!preview) {
+    return;
+  }
+
+  preview.classList.toggle("is-empty", !event);
+  preview.setAttribute("aria-hidden", event ? "false" : "true");
+  setWrestlingPersonDossierPrototypeText(preview, "[data-wrestling-person-dossier-prototype-event-preview-title]", event?.title || "");
+  setWrestlingPersonDossierPrototypeText(preview, "[data-wrestling-person-dossier-prototype-event-preview-date]", event?.date || "");
+  setWrestlingPersonDossierPrototypeText(preview, "[data-wrestling-person-dossier-prototype-event-preview-venue]", event?.venue || "");
+}
+
+function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0, events = []) {
   const timeline = workspace?.querySelector(".wrestling-person-dossier-prototype-module--timeline");
   const selectedAppearance = event?.aceAppearances?.[0] || null;
+  const activeIndex = 0;
   if (timeline) {
     timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryState = stateName;
   }
@@ -10678,6 +10692,9 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-match-type]", selectedAppearance?.matchType || "MATCH DATA UNLISTED");
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-result]", selectedAppearance?.result || "RESULT UNLISTED");
   setWrestlingPersonDossierPrototypeEventPoster(workspace, event);
+  setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[activeIndex - 1] : null);
+  setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[activeIndex + 1] : null);
+  scheduleWrestlingPersonDossierPrototypeMetadataFit(workspace);
 }
 
 function renderWrestlingPersonDossierPrototypeEventHistoryState(shell = wrestlingPersonDossierPrototypeShell) {
@@ -10688,7 +10705,7 @@ function renderWrestlingPersonDossierPrototypeEventHistoryState(shell = wrestlin
 
   const state = wrestlingPersonDossierPrototypeEventHistoryState;
   if (state.status === "loaded" && state.events.length > 0) {
-    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[0], state.events.length);
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[0], state.events.length, state.events);
   } else if (state.status === "empty") {
     renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "empty");
   } else if (state.status === "error") {
@@ -10916,7 +10933,13 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
             <p class="wrestling-person-dossier-prototype-timeline__count" data-wrestling-person-dossier-prototype-event-count>01 OF -- ARCHIVED EVENTS</p>
           </div>
           <div class="wrestling-person-dossier-prototype-event-history" aria-label="Event history carousel shell">
-            <span class="wrestling-person-dossier-prototype-event-history__nav" aria-hidden="true">&lsaquo;</span>
+            <span class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--previous" aria-hidden="true">&lsaquo;</span>
+            <article class="wrestling-person-dossier-prototype-event-history__preview wrestling-person-dossier-prototype-event-history__preview--previous is-empty" aria-label="Previous event preview" aria-hidden="true" data-wrestling-person-dossier-prototype-event-preview="previous">
+              <p class="wrestling-person-dossier-prototype-event-history__preview-kicker">PREVIOUS</p>
+              <h3 class="wrestling-person-dossier-prototype-event-history__preview-title" data-wrestling-person-dossier-prototype-event-preview-title data-wrestling-person-dossier-prototype-event-fit></h3>
+              <p data-wrestling-person-dossier-prototype-event-preview-date></p>
+              <p data-wrestling-person-dossier-prototype-event-preview-venue></p>
+            </article>
             <article class="wrestling-person-dossier-prototype-event-history__card" aria-label="Ace Romero event history preview" data-wrestling-person-dossier-prototype-event-card>
               <div class="wrestling-person-dossier-prototype-event-history__poster" aria-label="Event poster" data-wrestling-person-dossier-prototype-event-poster>
                 <img class="wrestling-person-dossier-prototype-event-history__poster-image" data-wrestling-person-dossier-prototype-event-poster-image loading="lazy" decoding="async" hidden alt="">
@@ -10924,21 +10947,27 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
                 <span class="wrestling-person-dossier-prototype-event-history__poster-mark" data-wrestling-person-dossier-prototype-event-poster-mark>VMP</span>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__show">
-                <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title>EVENT HISTORY INITIALIZING</h3>
+                <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title data-wrestling-person-dossier-prototype-event-fit>EVENT HISTORY INITIALIZING</h3>
                 <p data-wrestling-person-dossier-prototype-event-date>DATE PENDING</p>
                 <p data-wrestling-person-dossier-prototype-event-venue>VENUE PENDING</p>
                 <p data-wrestling-person-dossier-prototype-event-location>LOCATION PENDING</p>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__match">
-                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-opponents>OPPONENT UNLISTED</p>
+                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-opponents data-wrestling-person-dossier-prototype-event-fit>OPPONENT UNLISTED</p>
                 <p class="wrestling-person-dossier-prototype-event-history__vs">VS</p>
-                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-ace-side>ACE ROMERO</p>
+                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-ace-side data-wrestling-person-dossier-prototype-event-fit>ACE ROMERO</p>
                 <p class="wrestling-person-dossier-prototype-event-history__type" data-wrestling-person-dossier-prototype-event-match-type>MATCH DATA PENDING</p>
                 <p class="wrestling-person-dossier-prototype-event-history__result" data-wrestling-person-dossier-prototype-event-result>RESULT PENDING</p>
                 <button class="wrestling-person-dossier-prototype-event-history__action" type="button" disabled>OPEN EVENT</button>
               </div>
             </article>
-            <span class="wrestling-person-dossier-prototype-event-history__nav" aria-hidden="true">&rsaquo;</span>
+            <article class="wrestling-person-dossier-prototype-event-history__preview wrestling-person-dossier-prototype-event-history__preview--next is-empty" aria-label="Next event preview" aria-hidden="true" data-wrestling-person-dossier-prototype-event-preview="next">
+              <p class="wrestling-person-dossier-prototype-event-history__preview-kicker">NEXT</p>
+              <h3 class="wrestling-person-dossier-prototype-event-history__preview-title" data-wrestling-person-dossier-prototype-event-preview-title data-wrestling-person-dossier-prototype-event-fit></h3>
+              <p data-wrestling-person-dossier-prototype-event-preview-date></p>
+              <p data-wrestling-person-dossier-prototype-event-preview-venue></p>
+            </article>
+            <span class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--next" aria-hidden="true">&rsaquo;</span>
             <div class="wrestling-person-dossier-prototype-event-history__dots" aria-hidden="true">
               <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
               <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
