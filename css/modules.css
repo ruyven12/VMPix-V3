@@ -12129,7 +12129,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-person-dossier-prototype-status__item {
   display: grid;
-  grid-column: span 3;
+  grid-column: span 2;
   align-content: center;
   gap: 0.08rem;
   min-inline-size: 0;
@@ -12159,6 +12159,7 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-person-dossier-prototype-status__item--metadata {
+  grid-row: 3;
   grid-column: span 2;
 }
 
@@ -12321,7 +12322,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-person-dossier-prototype-status__item {
-    grid-column: span 3;
+    grid-column: span 2;
     min-block-size: 0;
     padding: 0.2rem 0.18rem;
   }
