@@ -11961,6 +11961,21 @@ button.wrestling-event-history-tagged-thumb {
   cursor: default;
 }
 
+.wrestling-person-dossier-prototype-event-history__action:not(:disabled) {
+  cursor: pointer;
+}
+
+.wrestling-person-dossier-prototype-event-history__action:disabled,
+.wrestling-person-dossier-prototype-event-history__action.is-disabled {
+  opacity: 0.46;
+  cursor: default;
+}
+
+.wrestling-person-dossier-prototype-event-history__action:focus-visible {
+  outline: 1px solid rgba(255, 146, 86, 0.48);
+  outline-offset: 2px;
+}
+
 .wrestling-person-dossier-prototype-event-history__dots {
   position: absolute;
   inset-inline: 0;
@@ -11982,6 +11997,171 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-event-history__dot--active {
   background: rgba(255, 154, 94, 0.78);
   box-shadow: 0 0 0.45rem rgba(255, 92, 42, 0.28);
+}
+
+.wrestling-person-dossier-prototype-shell[data-wrestling-person-dossier-prototype-event-archive-open="true"] .wrestling-person-dossier-prototype-framework {
+  pointer-events: none;
+}
+
+.wrestling-person-dossier-prototype-event-archive {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: clamp(0.48rem, 2.2vw, 1.35rem);
+  pointer-events: auto;
+}
+
+.wrestling-person-dossier-prototype-event-archive[hidden] {
+  display: none !important;
+}
+
+.wrestling-person-dossier-prototype-event-archive__backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(255, 105, 58, 0.08), transparent 43%),
+    rgba(5, 1, 0, 0.58);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.wrestling-person-dossier-prototype-event-archive__dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  inline-size: min(100%, 58rem);
+  block-size: min(100%, 38rem);
+  min-block-size: 0;
+  box-sizing: border-box;
+  padding: clamp(0.58rem, 1.45vw, 0.94rem);
+  overflow: hidden;
+  color: rgba(255, 232, 216, 0.92);
+  border: 1px solid rgba(255, 126, 68, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 120, 64, 0.1), rgba(26, 5, 2, 0.52)),
+    repeating-linear-gradient(90deg, rgba(255, 107, 58, 0.038) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(0deg, rgba(255, 107, 58, 0.034) 0 1px, transparent 1px 12px),
+    rgba(18, 4, 2, 0.78);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 232, 214, 0.045),
+    inset 0 0 1.2rem rgba(255, 78, 34, 0.08),
+    0 0 2.2rem rgba(0, 0, 0, 0.34);
+  opacity: 0;
+  transform: scale(0.18);
+  transform-origin: 50% 50%;
+  transition:
+    transform 420ms cubic-bezier(0.18, 0.76, 0.22, 1),
+    opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+.wrestling-person-dossier-prototype-event-archive__dialog::before,
+.wrestling-person-dossier-prototype-event-archive__dialog::after {
+  position: absolute;
+  inline-size: clamp(1.4rem, 4vw, 2.8rem);
+  block-size: clamp(0.62rem, 1.5vw, 0.9rem);
+  content: "";
+  pointer-events: none;
+}
+
+.wrestling-person-dossier-prototype-event-archive__dialog::before {
+  inset-block-start: 0.3rem;
+  inset-inline-start: 0.3rem;
+  border-block-start: 1px solid rgba(255, 142, 82, 0.5);
+  border-inline-start: 1px solid rgba(255, 142, 82, 0.3);
+}
+
+.wrestling-person-dossier-prototype-event-archive__dialog::after {
+  inset-block-end: 0.3rem;
+  inset-inline-end: 0.3rem;
+  border-block-end: 1px solid rgba(255, 142, 82, 0.42);
+  border-inline-end: 1px solid rgba(255, 142, 82, 0.26);
+}
+
+.wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="open"] .wrestling-person-dossier-prototype-event-archive__backdrop,
+.wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="closing"] .wrestling-person-dossier-prototype-event-archive__backdrop {
+  opacity: 1;
+}
+
+.wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="open"] .wrestling-person-dossier-prototype-event-archive__dialog {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="closing"] .wrestling-person-dossier-prototype-event-archive__backdrop {
+  opacity: 0;
+}
+
+.wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="closing"] .wrestling-person-dossier-prototype-event-archive__dialog {
+  opacity: 0;
+  transform: scale(0.22);
+  transition-duration: 220ms, 180ms;
+}
+
+.wrestling-person-dossier-prototype-event-archive__header {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-block-size: clamp(2.1rem, 5svh, 3rem);
+  padding-inline: clamp(2rem, 5vw, 3rem);
+}
+
+.wrestling-person-dossier-prototype-event-archive__title {
+  margin: 0;
+  color: rgba(255, 142, 82, 0.82);
+  font-size: clamp(0.72rem, 1.45vw, 1rem);
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 0 0.66rem rgba(255, 94, 44, 0.18);
+}
+
+.wrestling-person-dossier-prototype-event-archive__close {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  inline-size: clamp(1.6rem, 3.8vw, 2rem);
+  block-size: clamp(1.6rem, 3.8vw, 2rem);
+  padding: 0;
+  color: rgba(255, 230, 214, 0.88);
+  font: inherit;
+  font-size: clamp(1rem, 2.3vw, 1.28rem);
+  line-height: 1;
+  text-transform: none;
+  background: rgba(255, 92, 42, 0.1);
+  border: 1px solid rgba(255, 126, 68, 0.34);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.wrestling-person-dossier-prototype-event-archive__close:focus-visible {
+  outline: 1px solid rgba(255, 146, 86, 0.54);
+  outline-offset: 2px;
+}
+
+.wrestling-person-dossier-prototype-event-archive__body {
+  display: grid;
+  grid-template-rows: minmax(0, 0.76fr) minmax(0, 1.24fr);
+  gap: 10px;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.wrestling-person-dossier-prototype-event-archive__region {
+  min-block-size: 0;
+  border: 1px solid rgba(255, 106, 58, 0.2);
+  background:
+    linear-gradient(90deg, rgba(255, 122, 62, 0.055), rgba(24, 6, 3, 0.22)),
+    repeating-linear-gradient(0deg, rgba(255, 107, 58, 0.028) 0 1px, transparent 1px 10px),
+    rgba(18, 5, 3, 0.2);
+  box-shadow: inset 0 0 0.8rem rgba(255, 72, 32, 0.04);
 }
 
 .wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-timeline__count,
@@ -12301,6 +12481,26 @@ button.wrestling-event-history-tagged-thumb {
     block-size: 0.22rem;
   }
 
+  .wrestling-person-dossier-prototype-event-archive {
+    padding: 0.48rem;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__dialog {
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 0.54rem;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__header {
+    min-block-size: 2.15rem;
+    padding-inline: 1.85rem;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__body {
+    grid-template-rows: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 0.48rem;
+  }
+
   .wrestling-person-dossier-prototype-module--identity {
     min-block-size: 4rem;
   }
@@ -12330,6 +12530,21 @@ button.wrestling-event-history-tagged-thumb {
   .wrestling-person-dossier-prototype-status__item--metadata {
     grid-column: span 2;
     min-block-size: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrestling-person-dossier-prototype-event-archive__backdrop,
+  .wrestling-person-dossier-prototype-event-archive__dialog {
+    transition: none !important;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__backdrop,
+  .wrestling-person-dossier-prototype-event-archive__dialog,
+  .wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="closing"] .wrestling-person-dossier-prototype-event-archive__backdrop,
+  .wrestling-person-dossier-prototype-event-archive[data-wrestling-person-dossier-prototype-event-archive-state="closing"] .wrestling-person-dossier-prototype-event-archive__dialog {
+    opacity: 1;
+    transform: none;
   }
 }
 

@@ -279,6 +279,8 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK = "UNLISTED";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK = "N/A";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD = 44;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_CLOSE_MS = 260;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_FOCUSABLE_SELECTOR = "button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 let wrestlingPersonDossierPrototypeAceState = {
   status: "idle",
   record: null,
@@ -293,6 +295,13 @@ let wrestlingPersonDossierPrototypeEventHistoryState = {
   diagnosticsLogKey: "",
   error: null,
   requestPromise: null,
+};
+let wrestlingPersonDossierPrototypeEventArchiveState = {
+  isOpen: false,
+  trigger: null,
+  keydownHandler: null,
+  closeTimer: 0,
+  scrollLock: null,
 };
 let wrestlingPersonDossierPrototypeMetadataFitFrame = 0;
 let isWrestlingPersonDossierPrototypeMetadataResizeBound = false;
@@ -11020,6 +11029,13 @@ function setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateN
     control.classList.toggle("is-disabled", !isEnabled);
     control.setAttribute("aria-disabled", String(!isEnabled));
   });
+
+  const openEvent = timeline.querySelector("[data-wrestling-person-dossier-prototype-event-open]");
+  if (openEvent) {
+    openEvent.disabled = !isLoaded;
+    openEvent.classList.toggle("is-disabled", !isLoaded);
+    openEvent.setAttribute("aria-disabled", String(!isLoaded));
+  }
 }
 
 function setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, activeIndex, total) {
@@ -11064,6 +11080,156 @@ function moveWrestlingPersonDossierPrototypeEventHistory(delta, shell = wrestlin
   return setWrestlingPersonDossierPrototypeEventHistoryIndex((state.activeIndex || 0) + delta, shell);
 }
 
+function getWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPersonDossierPrototypeShell) {
+  return shell?.querySelector("[data-wrestling-person-dossier-prototype-event-archive]");
+}
+
+function getWrestlingPersonDossierPrototypeEventArchiveDialog(shell = wrestlingPersonDossierPrototypeShell) {
+  return shell?.querySelector("[data-wrestling-person-dossier-prototype-event-archive-dialog]");
+}
+
+function setWrestlingPersonDossierPrototypeEventArchiveScrollLock(isLocked) {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  if (isLocked) {
+    if (state.scrollLock || !document?.documentElement || !document?.body) {
+      return;
+    }
+    state.scrollLock = {
+      documentOverflow: document.documentElement.style.overflow,
+      bodyOverflow: document.body.style.overflow,
+    };
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return;
+  }
+
+  if (!state.scrollLock || !document?.documentElement || !document?.body) {
+    state.scrollLock = null;
+    return;
+  }
+  document.documentElement.style.overflow = state.scrollLock.documentOverflow;
+  document.body.style.overflow = state.scrollLock.bodyOverflow;
+  state.scrollLock = null;
+}
+
+function getWrestlingPersonDossierPrototypeEventArchiveFocusable(dialog) {
+  return [...(dialog?.querySelectorAll(WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_FOCUSABLE_SELECTOR) || [])]
+    .filter((element) => element.offsetParent !== null || element === document.activeElement);
+}
+
+function handleWrestlingPersonDossierPrototypeEventArchiveKeydown(event) {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  if (!state.isOpen) {
+    return;
+  }
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeWrestlingPersonDossierPrototypeEventArchive();
+    return;
+  }
+
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const dialog = getWrestlingPersonDossierPrototypeEventArchiveDialog();
+  const focusable = getWrestlingPersonDossierPrototypeEventArchiveFocusable(dialog);
+  if (!dialog || focusable.length === 0) {
+    event.preventDefault();
+    dialog?.focus({ preventScroll: true });
+    return;
+  }
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus({ preventScroll: true });
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus({ preventScroll: true });
+  }
+}
+
+function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPersonDossierPrototypeShell, trigger = null) {
+  const archive = getWrestlingPersonDossierPrototypeEventArchive(shell);
+  const dialog = getWrestlingPersonDossierPrototypeEventArchiveDialog(shell);
+  const framework = shell?.querySelector(".wrestling-person-dossier-prototype-framework");
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  if (!archive || !dialog || wrestlingPersonDossierPrototypeEventHistoryState.status !== "loaded") {
+    return false;
+  }
+
+  if (state.closeTimer) {
+    window.clearTimeout(state.closeTimer);
+    state.closeTimer = 0;
+  }
+
+  state.isOpen = true;
+  state.trigger = trigger;
+  shell.dataset.wrestlingPersonDossierPrototypeEventArchiveOpen = "true";
+  framework?.setAttribute("inert", "");
+  archive.hidden = false;
+  archive.setAttribute("aria-hidden", "false");
+  archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "opening";
+  setWrestlingPersonDossierPrototypeEventArchiveScrollLock(true);
+
+  if (!state.keydownHandler) {
+    state.keydownHandler = handleWrestlingPersonDossierPrototypeEventArchiveKeydown;
+    document.addEventListener("keydown", state.keydownHandler, true);
+  }
+
+  const focusTarget = archive.querySelector("[data-wrestling-person-dossier-prototype-event-archive-close]") || dialog;
+  window.requestAnimationFrame(() => {
+    if (!state.isOpen) {
+      return;
+    }
+    archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "open";
+    focusTarget.focus({ preventScroll: true });
+  });
+  return true;
+}
+
+function closeWrestlingPersonDossierPrototypeEventArchive(options = {}) {
+  const archive = getWrestlingPersonDossierPrototypeEventArchive();
+  const shell = wrestlingPersonDossierPrototypeShell;
+  const framework = shell?.querySelector(".wrestling-person-dossier-prototype-framework");
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  const restoreFocus = options.restoreFocus !== false;
+  const immediate = options.immediate === true || prefersHallOfChampionsReducedMotion();
+  if (!archive || (!state.isOpen && archive.hidden)) {
+    return;
+  }
+
+  state.isOpen = false;
+  if (state.keydownHandler) {
+    document.removeEventListener("keydown", state.keydownHandler, true);
+    state.keydownHandler = null;
+  }
+
+  const finishClose = () => {
+    state.closeTimer = 0;
+    archive.hidden = true;
+    archive.setAttribute("aria-hidden", "true");
+    archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "closed";
+    delete shell?.dataset.wrestlingPersonDossierPrototypeEventArchiveOpen;
+    framework?.removeAttribute("inert");
+    setWrestlingPersonDossierPrototypeEventArchiveScrollLock(false);
+    if (restoreFocus && state.trigger && document.documentElement.contains(state.trigger)) {
+      state.trigger.focus({ preventScroll: true });
+    }
+    state.trigger = null;
+  };
+
+  archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "closing";
+  if (immediate) {
+    finishClose();
+    return;
+  }
+  state.closeTimer = window.setTimeout(finishClose, WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_CLOSE_MS);
+}
+
 function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wrestlingPersonDossierPrototypeShell) {
   const timeline = shell?.querySelector(".wrestling-person-dossier-prototype-module--timeline");
   const carousel = timeline?.querySelector(".wrestling-person-dossier-prototype-event-history");
@@ -11075,9 +11241,17 @@ function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wre
   const navigate = (delta) => moveWrestlingPersonDossierPrototypeEventHistory(delta, shell);
   const previous = timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="previous"]');
   const next = timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="next"]');
+  const openEvent = timeline.querySelector("[data-wrestling-person-dossier-prototype-event-open]");
 
   previous?.addEventListener("click", () => navigate(-1));
   next?.addEventListener("click", () => navigate(1));
+  openEvent?.addEventListener("click", (event) => {
+    if (openEvent.disabled || openEvent.getAttribute("aria-disabled") === "true") {
+      return;
+    }
+    event.preventDefault();
+    openWrestlingPersonDossierPrototypeEventArchive(shell, openEvent);
+  });
   timeline.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
       return;
@@ -11117,6 +11291,10 @@ function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wre
   carousel.addEventListener("pointercancel", () => {
     swipeStart = null;
   }, { passive: true });
+
+  shell.querySelector("[data-wrestling-person-dossier-prototype-event-archive-close]")?.addEventListener("click", () => {
+    closeWrestlingPersonDossierPrototypeEventArchive();
+  });
 }
 
 function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0, events = [], activeIndex = 0) {
@@ -11426,7 +11604,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
                 <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-ace-side data-wrestling-person-dossier-prototype-event-fit>Ace Romero</p>
                 <p class="wrestling-person-dossier-prototype-event-history__type" data-wrestling-person-dossier-prototype-event-match-type>Match Data Pending</p>
                 <p class="wrestling-person-dossier-prototype-event-history__result" data-wrestling-person-dossier-prototype-event-result>Result Pending</p>
-                <button class="wrestling-person-dossier-prototype-event-history__action" type="button" disabled>Open Event</button>
+                <button class="wrestling-person-dossier-prototype-event-history__action" type="button" aria-disabled="true" data-wrestling-person-dossier-prototype-event-open disabled>Open Event</button>
               </div>
             </article>
             <article class="wrestling-person-dossier-prototype-event-history__preview wrestling-person-dossier-prototype-event-history__preview--next is-empty" aria-label="Next event preview" aria-hidden="true" data-wrestling-person-dossier-prototype-event-preview="next">
@@ -11443,6 +11621,19 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
               <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
               <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
             </div>
+          </div>
+        </section>
+      </div>
+      <div class="wrestling-person-dossier-prototype-event-archive" data-wrestling-person-dossier-prototype-event-archive data-wrestling-person-dossier-prototype-event-archive-state="closed" aria-hidden="true" hidden>
+        <div class="wrestling-person-dossier-prototype-event-archive__backdrop" data-wrestling-person-dossier-prototype-event-archive-backdrop></div>
+        <section class="wrestling-person-dossier-prototype-event-archive__dialog" role="dialog" aria-modal="true" aria-labelledby="wrestling-person-dossier-prototype-event-archive-title" tabindex="-1" data-wrestling-person-dossier-prototype-event-archive-dialog>
+          <header class="wrestling-person-dossier-prototype-event-archive__header">
+            <h2 class="wrestling-person-dossier-prototype-event-archive__title" id="wrestling-person-dossier-prototype-event-archive-title">EVENT ARCHIVE</h2>
+            <button class="wrestling-person-dossier-prototype-event-archive__close" type="button" aria-label="Close Event Archive" data-wrestling-person-dossier-prototype-event-archive-close>&times;</button>
+          </header>
+          <div class="wrestling-person-dossier-prototype-event-archive__body">
+            <section class="wrestling-person-dossier-prototype-event-archive__region wrestling-person-dossier-prototype-event-archive__region--summary" aria-label="Event archive details reserved"></section>
+            <section class="wrestling-person-dossier-prototype-event-archive__region wrestling-person-dossier-prototype-event-archive__region--photos" aria-label="Event archive photo grid reserved"></section>
           </div>
         </section>
       </div>
@@ -11512,6 +11703,10 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
     } else {
       delete shellElement.dataset.wrestlingPersonDossierPrototype;
     }
+  }
+
+  if (!isActive) {
+    closeWrestlingPersonDossierPrototypeEventArchive({ restoreFocus: false, immediate: true });
   }
 
   if (prototypeShell) {
