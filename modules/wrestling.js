@@ -300,7 +300,6 @@ let wrestlingPersonDossierPrototypeEventHistoryState = {
 let wrestlingPersonDossierPrototypeEventArchiveState = {
   isOpen: false,
   trigger: null,
-  event: null,
   eventIndex: 0,
   photoCache: new Map(),
   photoRequests: new Map(),
@@ -10351,6 +10350,19 @@ function setWrestlingPersonDossierPrototypeText(scope, selector, value) {
   }
 }
 
+function setWrestlingPersonDossierPrototypeControlEnabled(control, isEnabled, disabledClass = "is-disabled") {
+  if (!control) {
+    return;
+  }
+
+  const enabled = Boolean(isEnabled);
+  control.disabled = !enabled;
+  if (disabledClass) {
+    control.classList.toggle(disabledClass, !enabled);
+  }
+  control.setAttribute("aria-disabled", String(!enabled));
+}
+
 function setWrestlingPersonDossierPrototypeStatusItem(scope, key, value) {
   const valueElement = scope?.querySelector(`[data-wrestling-person-dossier-prototype-status-value="${key}"]`);
   if (valueElement) {
@@ -10958,6 +10970,20 @@ function getWrestlingPersonDossierPrototypeEventHistoryCount(total) {
   return Number.isFinite(count) && count > 0 ? String(Math.trunc(count)).padStart(2, "0") : "00";
 }
 
+function getWrestlingPersonDossierPrototypeSwipeNavigationDelta(swipeStart, event) {
+  if (!swipeStart || event.pointerId !== swipeStart.pointerId) {
+    return 0;
+  }
+
+  const deltaX = event.clientX - swipeStart.x;
+  const deltaY = event.clientY - swipeStart.y;
+  const absoluteX = Math.abs(deltaX);
+  const absoluteY = Math.abs(deltaY);
+  return absoluteX >= WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD && absoluteX >= absoluteY * 1.35
+    ? (deltaX < 0 ? 1 : -1)
+    : 0;
+}
+
 function setWrestlingPersonDossierPrototypeEventPoster(workspace, event) {
   const poster = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster]");
   const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-event-poster-image]");
@@ -11035,20 +11061,11 @@ function setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateN
   timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryTotal = String(isLoaded ? eventTotal : 0);
 
   controls.forEach(([control, isEnabled]) => {
-    if (!control) {
-      return;
-    }
-    control.disabled = !isEnabled;
-    control.classList.toggle("is-disabled", !isEnabled);
-    control.setAttribute("aria-disabled", String(!isEnabled));
+    setWrestlingPersonDossierPrototypeControlEnabled(control, isEnabled);
   });
 
   const openEvent = timeline.querySelector("[data-wrestling-person-dossier-prototype-event-open]");
-  if (openEvent) {
-    openEvent.disabled = !isLoaded;
-    openEvent.classList.toggle("is-disabled", !isLoaded);
-    openEvent.setAttribute("aria-disabled", String(!isLoaded));
-  }
+  setWrestlingPersonDossierPrototypeControlEnabled(openEvent, isLoaded);
 }
 
 function setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, activeIndex, total) {
@@ -11328,6 +11345,14 @@ function setWrestlingPersonDossierPrototypeEventArchiveMode(archive, mode) {
   }
 }
 
+function resetWrestlingPersonDossierPrototypeEventArchiveViewerState() {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  state.selectedPhotoIndex = 0;
+  state.photoGridScrollTop = 0;
+  state.viewerReturnPhotoIndex = 0;
+  state.viewerSwipeStart = null;
+}
+
 function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   const state = wrestlingPersonDossierPrototypeEventArchiveState;
   const viewer = getWrestlingPersonDossierPrototypeEventArchiveViewer(archive);
@@ -11356,14 +11381,8 @@ function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   if (position) {
     position.textContent = getWrestlingPersonDossierPrototypeEventArchivePositionText(state.selectedPhotoIndex, photos.length);
   }
-  if (previous) {
-    previous.disabled = state.selectedPhotoIndex <= 0;
-    previous.setAttribute("aria-disabled", String(previous.disabled));
-  }
-  if (next) {
-    next.disabled = state.selectedPhotoIndex >= photos.length - 1;
-    next.setAttribute("aria-disabled", String(next.disabled));
-  }
+  setWrestlingPersonDossierPrototypeControlEnabled(previous, state.selectedPhotoIndex > 0, "");
+  setWrestlingPersonDossierPrototypeControlEnabled(next, state.selectedPhotoIndex < photos.length - 1, "");
   return true;
 }
 
@@ -11401,8 +11420,7 @@ function closeWrestlingPersonDossierPrototypeEventArchiveViewer(archive = getWre
   const returnIndex = state.viewerReturnPhotoIndex;
   const scrollTop = state.photoGridScrollTop;
   setWrestlingPersonDossierPrototypeEventArchiveMode(archive, "grid");
-  state.selectedPhotoIndex = 0;
-  state.viewerSwipeStart = null;
+  resetWrestlingPersonDossierPrototypeEventArchiveViewerState();
   const region = getWrestlingPersonDossierPrototypeEventArchivePhotoGrid(archive);
   window.requestAnimationFrame(() => {
     if (region) {
@@ -11689,12 +11707,8 @@ function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPerson
 
   state.isOpen = true;
   state.trigger = trigger;
-  state.event = context.event;
   state.eventIndex = context.eventIndex;
-  state.selectedPhotoIndex = 0;
-  state.photoGridScrollTop = 0;
-  state.viewerReturnPhotoIndex = 0;
-  state.viewerSwipeStart = null;
+  resetWrestlingPersonDossierPrototypeEventArchiveViewerState();
   setWrestlingPersonDossierPrototypeEventArchiveMode(archive, "grid");
   loadWrestlingPersonDossierPrototypeEventArchivePhotos(archive, context);
   shell.dataset.wrestlingPersonDossierPrototypeEventArchiveOpen = "true";
@@ -11749,12 +11763,8 @@ function closeWrestlingPersonDossierPrototypeEventArchive(options = {}) {
       state.trigger.focus({ preventScroll: true });
     }
     state.trigger = null;
-    state.event = null;
     state.photoRequestKey = "";
-    state.selectedPhotoIndex = 0;
-    state.photoGridScrollTop = 0;
-    state.viewerReturnPhotoIndex = 0;
-    state.viewerSwipeStart = null;
+    resetWrestlingPersonDossierPrototypeEventArchiveViewerState();
     setWrestlingPersonDossierPrototypeEventArchiveMode(archive, "grid");
   };
 
@@ -11812,17 +11822,13 @@ function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wre
       return;
     }
 
-    const deltaX = event.clientX - swipeStart.x;
-    const deltaY = event.clientY - swipeStart.y;
-    const absoluteX = Math.abs(deltaX);
-    const absoluteY = Math.abs(deltaY);
+    const direction = getWrestlingPersonDossierPrototypeSwipeNavigationDelta(swipeStart, event);
     swipeStart = null;
-
-    if (absoluteX < WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD || absoluteX < absoluteY * 1.35) {
+    if (!direction) {
       return;
     }
 
-    navigate(deltaX < 0 ? 1 : -1);
+    navigate(direction);
   }, { passive: true });
   carousel.addEventListener("pointercancel", () => {
     swipeStart = null;
@@ -11862,17 +11868,13 @@ function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wre
       return;
     }
 
-    const deltaX = event.clientX - swipeStart.x;
-    const deltaY = event.clientY - swipeStart.y;
-    const absoluteX = Math.abs(deltaX);
-    const absoluteY = Math.abs(deltaY);
+    const direction = getWrestlingPersonDossierPrototypeSwipeNavigationDelta(swipeStart, event);
     state.viewerSwipeStart = null;
-
-    if (absoluteX < WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD || absoluteX < absoluteY * 1.35) {
+    if (!direction) {
       return;
     }
 
-    moveWrestlingPersonDossierPrototypeEventArchiveViewerPhoto(deltaX < 0 ? 1 : -1);
+    moveWrestlingPersonDossierPrototypeEventArchiveViewerPhoto(direction);
   }, { passive: true });
   viewer?.addEventListener("pointercancel", () => {
     wrestlingPersonDossierPrototypeEventArchiveState.viewerSwipeStart = null;
