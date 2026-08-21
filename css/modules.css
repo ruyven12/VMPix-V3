@@ -11541,12 +11541,11 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-framework {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  grid-template-rows: auto minmax(0, 1.12fr) minmax(2.6rem, 0.42fr) minmax(2.5rem, 0.36fr);
+  grid-template-rows: auto minmax(0, 1.12fr) minmax(5.42rem, 0.78fr);
   grid-template-areas:
     "identity identity"
     "portrait status"
-    "timeline timeline"
-    "matches photos";
+    "timeline timeline";
   gap: clamp(0.34rem, 0.85vw, 0.58rem);
   inline-size: min(100%, 72rem);
   block-size: min(100%, 39rem);
@@ -11627,6 +11626,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-person-dossier-prototype-module--timeline {
   grid-area: timeline;
+  padding-block-end: 10px;
 }
 
 .wrestling-person-dossier-prototype-module--matches {
@@ -11801,14 +11801,12 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-person-dossier-prototype-framework {
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(8.1rem, 1fr) auto minmax(2.5rem, 0.34fr) minmax(2.35rem, 0.28fr) minmax(2.35rem, 0.28fr);
+    grid-template-rows: auto minmax(8.1rem, 1fr) auto minmax(7.84rem, 0.9fr);
     grid-template-areas:
       "identity"
       "portrait"
       "status"
-      "timeline"
-      "matches"
-      "photos";
+      "timeline";
     gap: 0.32rem;
     block-size: 100%;
   }
@@ -11819,6 +11817,10 @@ button.wrestling-event-history-tagged-thumb {
 
   .wrestling-person-dossier-prototype-module--status {
     padding: 10px;
+  }
+
+  .wrestling-person-dossier-prototype-module--timeline {
+    padding-block-end: 10px;
   }
 
   .wrestling-person-dossier-prototype-module--identity {

@@ -10591,12 +10591,6 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline module reserved">
           <p class="wrestling-person-dossier-prototype-module__label">Timeline // Reserved</p>
         </section>
-        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--matches" aria-label="Match archive reserved">
-          <p class="wrestling-person-dossier-prototype-module__label">Match Archive // Reserved</p>
-        </section>
-        <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--photos" aria-label="Photo archive reserved">
-          <p class="wrestling-person-dossier-prototype-module__label">Photo Archive // Reserved</p>
-        </section>
       </div>
     </section>
   `;
