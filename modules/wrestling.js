@@ -278,6 +278,7 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME = "Ace Romero";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK = "UNLISTED";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_METADATA_FALLBACK = "N/A";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED = "NOT YET INDEXED";
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD = 44;
 let wrestlingPersonDossierPrototypeAceState = {
   status: "idle",
   record: null,
@@ -287,6 +288,7 @@ let wrestlingPersonDossierPrototypeAceState = {
 let wrestlingPersonDossierPrototypeEventHistoryState = {
   status: "idle",
   events: [],
+  activeIndex: 0,
   error: null,
   requestPromise: null,
 };
@@ -10668,32 +10670,172 @@ function setWrestlingPersonDossierPrototypeEventPreview(workspace, position, eve
   setWrestlingPersonDossierPrototypeText(preview, "[data-wrestling-person-dossier-prototype-event-preview-venue]", event?.venue || "");
 }
 
-function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0, events = []) {
+function getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(index, total) {
+  const eventTotal = Math.trunc(Number(total));
+  if (!Number.isFinite(eventTotal) || eventTotal <= 0) {
+    return 0;
+  }
+
+  const requestedIndex = Math.trunc(Number(index));
+  if (!Number.isFinite(requestedIndex)) {
+    return 0;
+  }
+
+  return Math.min(Math.max(requestedIndex, 0), eventTotal - 1);
+}
+
+function setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateName, activeIndex, total) {
+  if (!timeline) {
+    return;
+  }
+
+  const eventTotal = Math.trunc(Number(total));
+  const isLoaded = stateName === "loaded" && Number.isFinite(eventTotal) && eventTotal > 0;
+  const controls = [
+    [timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="previous"]'), isLoaded && activeIndex > 0],
+    [timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="next"]'), isLoaded && activeIndex < eventTotal - 1],
+  ];
+
+  timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryIndex = String(isLoaded ? activeIndex : 0);
+  timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryTotal = String(isLoaded ? eventTotal : 0);
+
+  controls.forEach(([control, isEnabled]) => {
+    if (!control) {
+      return;
+    }
+    control.disabled = !isEnabled;
+    control.classList.toggle("is-disabled", !isEnabled);
+    control.setAttribute("aria-disabled", String(!isEnabled));
+  });
+}
+
+function setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, activeIndex, total) {
+  const dots = timeline ? [...timeline.querySelectorAll("[data-wrestling-person-dossier-prototype-event-dot]")] : [];
+  if (dots.length === 0) {
+    return;
+  }
+
+  const eventTotal = Math.trunc(Number(total));
+  const isLoaded = stateName === "loaded" && Number.isFinite(eventTotal) && eventTotal > 0;
+  const activeDotIndex = isLoaded && eventTotal > 1
+    ? Math.round((activeIndex / (eventTotal - 1)) * (dots.length - 1))
+    : isLoaded
+      ? 0
+      : Math.floor(dots.length / 2);
+
+  dots.forEach((dot, index) => {
+    dot.classList.toggle("wrestling-person-dossier-prototype-event-history__dot--active", index === activeDotIndex);
+  });
+}
+
+function setWrestlingPersonDossierPrototypeEventHistoryIndex(nextIndex, shell = wrestlingPersonDossierPrototypeShell) {
+  const state = wrestlingPersonDossierPrototypeEventHistoryState;
+  if (state.status !== "loaded" || state.events.length === 0) {
+    return false;
+  }
+
+  const boundedIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(nextIndex, state.events.length);
+  const currentIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, state.events.length);
+  if (boundedIndex === currentIndex) {
+    state.activeIndex = currentIndex;
+    return false;
+  }
+
+  state.activeIndex = boundedIndex;
+  renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+  return true;
+}
+
+function moveWrestlingPersonDossierPrototypeEventHistory(delta, shell = wrestlingPersonDossierPrototypeShell) {
+  const state = wrestlingPersonDossierPrototypeEventHistoryState;
+  return setWrestlingPersonDossierPrototypeEventHistoryIndex((state.activeIndex || 0) + delta, shell);
+}
+
+function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wrestlingPersonDossierPrototypeShell) {
+  const timeline = shell?.querySelector(".wrestling-person-dossier-prototype-module--timeline");
+  const carousel = timeline?.querySelector(".wrestling-person-dossier-prototype-event-history");
+  if (!timeline || !carousel || timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryInteractionBound === "true") {
+    return;
+  }
+
+  timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryInteractionBound = "true";
+  const navigate = (delta) => moveWrestlingPersonDossierPrototypeEventHistory(delta, shell);
+  const previous = timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="previous"]');
+  const next = timeline.querySelector('[data-wrestling-person-dossier-prototype-event-nav="next"]');
+
+  previous?.addEventListener("click", () => navigate(-1));
+  next?.addEventListener("click", () => navigate(1));
+  timeline.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+      return;
+    }
+    event.preventDefault();
+    navigate(event.key === "ArrowLeft" ? -1 : 1);
+  });
+
+  let swipeStart = null;
+  carousel.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || (typeof event.button === "number" && event.button !== 0)) {
+      return;
+    }
+    swipeStart = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    };
+  }, { passive: true });
+  carousel.addEventListener("pointerup", (event) => {
+    if (!swipeStart || event.pointerId !== swipeStart.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - swipeStart.x;
+    const deltaY = event.clientY - swipeStart.y;
+    const absoluteX = Math.abs(deltaX);
+    const absoluteY = Math.abs(deltaY);
+    swipeStart = null;
+
+    if (absoluteX < WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD || absoluteX < absoluteY * 1.35) {
+      return;
+    }
+
+    navigate(deltaX < 0 ? 1 : -1);
+  }, { passive: true });
+  carousel.addEventListener("pointercancel", () => {
+    swipeStart = null;
+  }, { passive: true });
+}
+
+function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, stateName, event = null, total = 0, events = [], activeIndex = 0) {
   const timeline = workspace?.querySelector(".wrestling-person-dossier-prototype-module--timeline");
-  const selectedAppearance = event?.aceAppearances?.[0] || null;
-  const activeIndex = 0;
+  const eventTotal = stateName === "loaded" ? events.length : 0;
+  const boundedActiveIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(activeIndex, eventTotal || total);
+  const activeEvent = stateName === "loaded" ? events[boundedActiveIndex] || event : event;
+  const selectedAppearance = activeEvent?.aceAppearances?.[0] || null;
   if (timeline) {
     timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryState = stateName;
   }
 
   const countText = stateName === "loaded"
-    ? `01 of ${getWrestlingPersonDossierPrototypeEventHistoryCount(total)} archived events`
+    ? `${getWrestlingPersonDossierPrototypeEventHistoryCount(boundedActiveIndex + 1)} of ${getWrestlingPersonDossierPrototypeEventHistoryCount(eventTotal)} archived events`
     : stateName === "empty"
       ? "00 of 00 archived events"
       : "01 of -- archived events";
 
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-count]", countText);
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-title]", event?.title || (stateName === "empty" ? "No Archived Events Found" : stateName === "error" ? "Event History Unavailable" : "Event History Initializing"));
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-date]", event?.date || (stateName === "loaded" ? "Date Unlisted" : "Date Pending"));
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-venue]", event?.venue || (stateName === "loaded" ? "Venue Unlisted" : "Venue Pending"));
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-location]", event?.location || (stateName === "loaded" ? "Location Unlisted" : "Location Pending"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-title]", activeEvent?.title || (stateName === "empty" ? "No Archived Events Found" : stateName === "error" ? "Event History Unavailable" : "Event History Initializing"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-date]", activeEvent?.date || (stateName === "loaded" ? "Date Unlisted" : "Date Pending"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-venue]", activeEvent?.venue || (stateName === "loaded" ? "Venue Unlisted" : "Venue Pending"));
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-location]", activeEvent?.location || (stateName === "loaded" ? "Location Unlisted" : "Location Pending"));
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-opponents]", selectedAppearance?.opposingSide || "Opponent Unlisted");
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-ace-side]", selectedAppearance?.aceSide || WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-match-type]", selectedAppearance?.matchType || "Match Data Unlisted");
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-result]", selectedAppearance?.result || "Result Unlisted");
-  setWrestlingPersonDossierPrototypeEventPoster(workspace, event);
-  setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[activeIndex - 1] : null);
-  setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[activeIndex + 1] : null);
+  setWrestlingPersonDossierPrototypeEventPoster(workspace, activeEvent);
+  setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[boundedActiveIndex - 1] : null);
+  setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[boundedActiveIndex + 1] : null);
+  setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateName, boundedActiveIndex, eventTotal);
+  setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, boundedActiveIndex, eventTotal);
   scheduleWrestlingPersonDossierPrototypeMetadataFit(workspace);
 }
 
@@ -10705,12 +10847,17 @@ function renderWrestlingPersonDossierPrototypeEventHistoryState(shell = wrestlin
 
   const state = wrestlingPersonDossierPrototypeEventHistoryState;
   if (state.status === "loaded" && state.events.length > 0) {
-    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[0], state.events.length, state.events);
+    const activeIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, state.events.length);
+    state.activeIndex = activeIndex;
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[activeIndex], state.events.length, state.events, activeIndex);
   } else if (state.status === "empty") {
+    state.activeIndex = 0;
     renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "empty");
   } else if (state.status === "error") {
+    state.activeIndex = 0;
     renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "error");
   } else {
+    state.activeIndex = 0;
     renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loading");
   }
 }
@@ -10753,6 +10900,7 @@ function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPerson
     .then((payload) => {
       const events = normalizeWrestlingPersonDossierPrototypeEventHistory(payload);
       state.events = events;
+      state.activeIndex = 0;
       state.status = events.length > 0 ? "loaded" : "empty";
       renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
       return events;
@@ -10933,7 +11081,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
             <p class="wrestling-person-dossier-prototype-timeline__count" data-wrestling-person-dossier-prototype-event-count>01 of -- archived events</p>
           </div>
           <div class="wrestling-person-dossier-prototype-event-history" aria-label="Event history carousel shell">
-            <span class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--previous" aria-hidden="true">&lsaquo;</span>
+            <button class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--previous" type="button" aria-label="Previous event" aria-disabled="true" data-wrestling-person-dossier-prototype-event-nav="previous" disabled>&lsaquo;</button>
             <article class="wrestling-person-dossier-prototype-event-history__preview wrestling-person-dossier-prototype-event-history__preview--previous is-empty" aria-label="Previous event preview" aria-hidden="true" data-wrestling-person-dossier-prototype-event-preview="previous">
               <p class="wrestling-person-dossier-prototype-event-history__preview-kicker">Previous</p>
               <h3 class="wrestling-person-dossier-prototype-event-history__preview-title" data-wrestling-person-dossier-prototype-event-preview-title data-wrestling-person-dossier-prototype-event-fit></h3>
@@ -10967,13 +11115,13 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
               <p data-wrestling-person-dossier-prototype-event-preview-date></p>
               <p data-wrestling-person-dossier-prototype-event-preview-venue></p>
             </article>
-            <span class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--next" aria-hidden="true">&rsaquo;</span>
+            <button class="wrestling-person-dossier-prototype-event-history__nav wrestling-person-dossier-prototype-event-history__nav--next" type="button" aria-label="Next event" aria-disabled="true" data-wrestling-person-dossier-prototype-event-nav="next" disabled>&rsaquo;</button>
             <div class="wrestling-person-dossier-prototype-event-history__dots" aria-hidden="true">
-              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
-              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
-              <span class="wrestling-person-dossier-prototype-event-history__dot wrestling-person-dossier-prototype-event-history__dot--active"></span>
-              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
-              <span class="wrestling-person-dossier-prototype-event-history__dot"></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot wrestling-person-dossier-prototype-event-history__dot--active" data-wrestling-person-dossier-prototype-event-dot></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
+              <span class="wrestling-person-dossier-prototype-event-history__dot" data-wrestling-person-dossier-prototype-event-dot></span>
             </div>
           </div>
         </section>
@@ -11057,6 +11205,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
       prototypeShell.removeAttribute("inert");
       prototypeShell.setAttribute("aria-hidden", "false");
       bindWrestlingPersonDossierPrototypeMetadataResize();
+      bindWrestlingPersonDossierPrototypeEventHistoryInteractions(prototypeShell);
       scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
       loadWrestlingPersonDossierPrototypeAceRecord(prototypeShell);
       loadWrestlingPersonDossierPrototypeEventHistory(prototypeShell);

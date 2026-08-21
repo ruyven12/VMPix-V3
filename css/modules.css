@@ -11669,6 +11669,8 @@ button.wrestling-event-history-tagged-thumb {
   min-block-size: 0;
   min-inline-size: 0;
   block-size: 100%;
+  pointer-events: auto;
+  touch-action: pan-y;
 }
 
 .wrestling-person-dossier-prototype-event-history__nav {
@@ -11676,11 +11678,30 @@ button.wrestling-event-history-tagged-thumb {
   place-items: center;
   inline-size: clamp(0.72rem, 2.2vw, 1.2rem);
   block-size: 100%;
+  padding: 0;
   color: rgba(255, 146, 86, 0.7);
+  font-family: inherit;
   font-size: clamp(0.9rem, 2.8vw, 1.35rem);
   line-height: 1;
   text-shadow: 0 0 0.5rem rgba(255, 82, 38, 0.22);
+  background: transparent;
+  border: 0;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: auto;
   user-select: none;
+}
+
+.wrestling-person-dossier-prototype-event-history__nav:disabled,
+.wrestling-person-dossier-prototype-event-history__nav.is-disabled {
+  color: rgba(255, 146, 86, 0.3);
+  cursor: default;
+  opacity: 0.48;
+}
+
+.wrestling-person-dossier-prototype-event-history__nav:focus-visible {
+  outline: 1px solid rgba(255, 146, 86, 0.42);
+  outline-offset: 2px;
 }
 
 .wrestling-person-dossier-prototype-event-history__nav--previous {
