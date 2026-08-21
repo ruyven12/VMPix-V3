@@ -11528,13 +11528,15 @@ button.wrestling-event-history-tagged-thumb {
   display: none !important;
 }
 
-.hall-of-champions-workspace--dossier-prototype {
+.wrestling-person-dossier-prototype-shell .hall-of-champions-workspace--dossier-prototype {
   position: absolute;
   inset: 0;
   display: grid;
-  align-items: start;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   box-sizing: border-box;
   padding: clamp(0.42rem, 1.15svh, 0.72rem);
+  padding-block-end: 10px;
   text-align: center;
 }
 
@@ -11548,7 +11550,7 @@ button.wrestling-event-history-tagged-thumb {
     "timeline timeline";
   gap: clamp(0.34rem, 0.85vw, 0.58rem);
   inline-size: min(100%, 72rem);
-  block-size: min(100%, 39rem);
+  block-size: auto;
   margin-inline: auto;
   color: rgba(255, 229, 214, 0.92);
 }
@@ -11795,8 +11797,9 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (max-width: 640px) {
-  .hall-of-champions-workspace--dossier-prototype {
+  .wrestling-person-dossier-prototype-shell .hall-of-champions-workspace--dossier-prototype {
     padding: 0.38rem;
+    padding-block-end: 10px;
   }
 
   .wrestling-person-dossier-prototype-framework {
@@ -11808,7 +11811,7 @@ button.wrestling-event-history-tagged-thumb {
       "status"
       "timeline";
     gap: 0.32rem;
-    block-size: 100%;
+    block-size: auto;
   }
 
   .wrestling-person-dossier-prototype-module {
