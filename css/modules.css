@@ -11631,7 +11631,7 @@ button.wrestling-event-history-tagged-thumb {
   grid-template-rows: auto minmax(0, 1fr);
   align-content: stretch;
   justify-items: stretch;
-  row-gap: clamp(0.2rem, 0.55vw, 0.36rem);
+  row-gap: 10px;
   padding-block-end: 10px;
 }
 
@@ -11661,8 +11661,9 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-event-history {
   display: grid;
   grid-template-columns: auto clamp(5.35rem, 12vw, 9rem) minmax(20rem, 38rem) clamp(5.35rem, 12vw, 9rem) auto;
-  grid-template-rows: minmax(0, 1fr) auto;
-  align-items: center;
+  position: relative;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
   justify-content: center;
   gap: clamp(0.12rem, 0.48vw, 0.26rem) clamp(0.22rem, 0.7vw, 0.48rem);
   min-block-size: 0;
@@ -11770,9 +11771,9 @@ button.wrestling-event-history-tagged-thumb {
   min-block-size: 0;
   min-inline-size: 0;
   inline-size: 100%;
-  block-size: min(100%, clamp(7.1rem, 15svh, 9.2rem));
+  block-size: 100%;
   justify-self: center;
-  align-self: center;
+  align-self: stretch;
   margin: 0;
   padding: clamp(0.32rem, 0.8vw, 0.56rem);
   overflow: hidden;
@@ -11791,7 +11792,7 @@ button.wrestling-event-history-tagged-thumb {
   justify-self: center;
   place-items: center;
   aspect-ratio: 4 / 5;
-  block-size: min(100%, 8.25rem);
+  block-size: min(100%, 12.8rem);
   max-inline-size: 100%;
   min-block-size: 0;
   overflow: hidden;
@@ -11940,7 +11941,10 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-person-dossier-prototype-event-history__dots {
-  grid-column: 3;
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0.22rem;
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   gap: clamp(0.18rem, 0.5vw, 0.34rem);
@@ -11957,6 +11961,25 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-event-history__dot--active {
   background: rgba(255, 154, 94, 0.78);
   box-shadow: 0 0 0.45rem rgba(255, 92, 42, 0.28);
+}
+
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-timeline__count,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__preview-kicker,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__preview-title,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__preview p,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__poster-title,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__poster-mark,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__title,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__show p,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__match p,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-event-history__action,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-identity__name,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-identity__category,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-identity__team,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-portrait__label,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-status__item dt,
+.wrestling-person-dossier-prototype-shell .wrestling-person-dossier-prototype-status__item dd {
+  text-transform: none;
 }
 
 .wrestling-person-dossier-prototype-module--matches {
@@ -12160,7 +12183,7 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-person-dossier-prototype-module--timeline {
-    row-gap: 0.16rem;
+    row-gap: 10px;
     padding: 0.34rem 0.3rem 10px;
   }
 
@@ -12245,7 +12268,8 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-person-dossier-prototype-event-history__dots {
-    grid-column: 2;
+    inset-block-end: 0.12rem;
+    grid-column: 1 / -1;
     gap: 0.18rem;
     min-block-size: 0.24rem;
   }
