@@ -282,6 +282,8 @@ let wrestlingPersonDossierPrototypeAceState = {
   error: null,
   requestPromise: null,
 };
+let wrestlingPersonDossierPrototypeMetadataFitFrame = 0;
+let isWrestlingPersonDossierPrototypeMetadataResizeBound = false;
 const HALL_OF_CHAMPIONS_CRYSTAL_REST_Y = -20;
 const HALL_OF_CHAMPIONS_CRYSTAL_START_Y = -12;
 const HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS = 220;
@@ -10209,6 +10211,13 @@ function getWrestlingPersonDossierPrototypeTeamStable(record) {
   return WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK;
 }
 
+function getWrestlingPersonDossierPrototypeAliases(record) {
+  const aliases = getWrestlingPersonAliases(record)
+    .map((value) => getWrestlingPersonDossierPrototypeText(value))
+    .filter((value, index, values) => value && values.findIndex((candidate) => candidate.toLowerCase() === value.toLowerCase()) === index);
+  return aliases.length > 0 ? aliases.join(" • ") : "NONE LISTED";
+}
+
 function getWrestlingPersonDossierPrototypeCount(record, fields) {
   const value = fields.map((field) => record?.[field]).find((candidate) => candidate !== null && candidate !== undefined && candidate !== "");
   if (value === null || value === undefined || value === "") {
@@ -10278,6 +10287,72 @@ function setWrestlingPersonDossierPrototypeStatusItem(scope, key, value) {
   }
 }
 
+function fitWrestlingPersonDossierPrototypeMetadataValues(scope) {
+  const valueElements = scope?.querySelectorAll("[data-wrestling-person-dossier-prototype-metadata-fit]");
+  if (!valueElements || valueElements.length === 0) {
+    return;
+  }
+
+  valueElements.forEach((valueElement) => {
+    valueElement.style.removeProperty("font-size");
+    valueElement.style.whiteSpace = "nowrap";
+    valueElement.style.overflowWrap = "normal";
+
+    const availableWidth = valueElement.clientWidth;
+    const baseFontSize = Number.parseFloat(window.getComputedStyle(valueElement).fontSize);
+    if (!availableWidth || !Number.isFinite(baseFontSize) || valueElement.scrollWidth <= availableWidth + 1) {
+      return;
+    }
+
+    const minFontSize = Math.max(8, baseFontSize * 0.78);
+    let low = minFontSize;
+    let high = baseFontSize;
+    for (let index = 0; index < 7; index += 1) {
+      const midpoint = (low + high) / 2;
+      valueElement.style.fontSize = `${midpoint}px`;
+      if (valueElement.scrollWidth <= availableWidth + 1) {
+        low = midpoint;
+      } else {
+        high = midpoint;
+      }
+    }
+
+    valueElement.style.fontSize = `${low}px`;
+    if (valueElement.scrollWidth > availableWidth + 1) {
+      valueElement.style.whiteSpace = "normal";
+      valueElement.style.overflowWrap = "anywhere";
+    }
+  });
+}
+
+function scheduleWrestlingPersonDossierPrototypeMetadataFit(scope = wrestlingPersonDossierPrototypeShell) {
+  if (wrestlingPersonDossierPrototypeMetadataFitFrame) {
+    window.cancelAnimationFrame(wrestlingPersonDossierPrototypeMetadataFitFrame);
+  }
+  wrestlingPersonDossierPrototypeMetadataFitFrame = window.requestAnimationFrame(() => {
+    wrestlingPersonDossierPrototypeMetadataFitFrame = 0;
+    const workspace = scope?.matches?.("[data-wrestling-person-dossier-prototype-workspace]")
+      ? scope
+      : scope?.querySelector?.("[data-wrestling-person-dossier-prototype-workspace]") || scope;
+    fitWrestlingPersonDossierPrototypeMetadataValues(workspace);
+  });
+}
+
+function bindWrestlingPersonDossierPrototypeMetadataResize() {
+  if (isWrestlingPersonDossierPrototypeMetadataResizeBound) {
+    return;
+  }
+  isWrestlingPersonDossierPrototypeMetadataResizeBound = true;
+  window.addEventListener("resize", () => scheduleWrestlingPersonDossierPrototypeMetadataFit(), { passive: true });
+}
+
+function setWrestlingPersonDossierPrototypeMetadataItems(scope, record) {
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "category", record ? normalizeWrestlingPersonDossierPrototypeCategory(record?.category) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "aliases", record ? getWrestlingPersonDossierPrototypeAliases(record) : "NONE LISTED");
+  setWrestlingPersonDossierPrototypeStatusItem(scope, "teams", record ? getWrestlingPersonDossierPrototypeTeamStable(record) : WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
+  scheduleWrestlingPersonDossierPrototypeMetadataFit(scope);
+}
+
 function renderWrestlingPersonDossierPrototypePortrait(workspace, record) {
   const portrait = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait]");
   const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-image]");
@@ -10332,6 +10407,7 @@ function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDo
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", getWrestlingPersonDossierPrototypeCount(record, ["photo_count", "photoCount", "photos_count"]));
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", getWrestlingPersonDossierPrototypeCount(record, ["match_count", "matchCount", "matches_count"]));
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", getWrestlingPersonDossierPrototypeCount(record, ["event_count", "eventCount", "show_count", "showCount"]));
+    setWrestlingPersonDossierPrototypeMetadataItems(workspace, record);
     renderWrestlingPersonDossierPrototypePortrait(workspace, record);
     return;
   }
@@ -10358,6 +10434,7 @@ function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDo
   setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
   setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
   setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeMetadataItems(workspace, null);
 }
 
 function loadWrestlingPersonDossierPrototypeAceRecord(shell = wrestlingPersonDossierPrototypeShell) {
@@ -10454,6 +10531,18 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
               <dt>Events</dt>
               <dd data-wrestling-person-dossier-prototype-status-value="events">NOT YET INDEXED</dd>
             </div>
+            <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
+              <dt>Category</dt>
+              <dd data-wrestling-person-dossier-prototype-status-value="category" data-wrestling-person-dossier-prototype-metadata-fit>UNLISTED</dd>
+            </div>
+            <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
+              <dt>Aliases</dt>
+              <dd data-wrestling-person-dossier-prototype-status-value="aliases" data-wrestling-person-dossier-prototype-metadata-fit>NONE LISTED</dd>
+            </div>
+            <div class="wrestling-person-dossier-prototype-status__item wrestling-person-dossier-prototype-status__item--metadata">
+              <dt>Teams / Stables</dt>
+              <dd data-wrestling-person-dossier-prototype-status-value="teams" data-wrestling-person-dossier-prototype-metadata-fit>UNLISTED</dd>
+            </div>
           </dl>
         </section>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline" aria-label="Timeline module reserved">
@@ -10544,6 +10633,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
     if (isActive) {
       prototypeShell.removeAttribute("inert");
       prototypeShell.setAttribute("aria-hidden", "false");
+      bindWrestlingPersonDossierPrototypeMetadataResize();
       scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
       loadWrestlingPersonDossierPrototypeAceRecord(prototypeShell);
     } else {

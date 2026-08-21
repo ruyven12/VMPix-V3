@@ -11737,7 +11737,7 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-person-dossier-prototype-status {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: clamp(0.28rem, 0.9vw, 0.46rem);
   inline-size: min(100%, 25rem);
   margin: 0;
@@ -11745,7 +11745,9 @@ button.wrestling-event-history-tagged-thumb {
 
 .wrestling-person-dossier-prototype-status__item {
   display: grid;
+  grid-column: span 3;
   gap: 0.12rem;
+  min-inline-size: 0;
   min-block-size: clamp(2.2rem, 6svh, 3rem);
   padding: 0.32rem 0.42rem;
   border-block: 1px solid rgba(255, 107, 58, 0.18);
@@ -11769,6 +11771,16 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-status__item dd {
   color: rgba(255, 231, 214, 0.82);
   font-size: clamp(0.62rem, 1.8vw, 0.76rem);
+}
+
+.wrestling-person-dossier-prototype-status__item--metadata {
+  grid-column: span 2;
+}
+
+.wrestling-person-dossier-prototype-status__item--metadata dd {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 640px) {
@@ -11814,8 +11826,26 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-person-dossier-prototype-status__item {
+    grid-column: span 1;
     min-block-size: 2.05rem;
     padding: 0.24rem 0.22rem;
+  }
+
+  .wrestling-person-dossier-prototype-status__item--metadata {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(5.05rem, auto) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.34rem;
+    min-block-size: 1.78rem;
+  }
+
+  .wrestling-person-dossier-prototype-status__item--metadata dt {
+    text-align: left;
+  }
+
+  .wrestling-person-dossier-prototype-status__item--metadata dd {
+    justify-self: end;
+    text-align: right;
   }
 }
 
