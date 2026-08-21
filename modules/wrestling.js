@@ -289,6 +289,8 @@ let wrestlingPersonDossierPrototypeEventHistoryState = {
   status: "idle",
   events: [],
   activeIndex: 0,
+  diagnostics: null,
+  diagnosticsLogKey: "",
   error: null,
   requestPromise: null,
 };
@@ -10660,6 +10662,208 @@ function setWrestlingPersonDossierPrototypeWinParticipantStatus(scope, events) {
   setWrestlingPersonDossierPrototypeStatusItem(scope, "winParticipant", record.wins + " / " + record.participant);
 }
 
+function getWrestlingPersonDossierPrototypePeopleMatchTotal(record) {
+  const value = [record?.match_count, record?.matchCount, record?.matches_count]
+    .map((candidate) => getWrestlingPersonDossierPrototypeText(candidate))
+    .find((candidate) => candidate && Number.isFinite(Number(candidate)));
+  return value ? Number(value) : null;
+}
+
+function getWrestlingPersonDossierPrototypeRawMatchOrder(match, matchIndex) {
+  const matchOrder = Number(match?.match_order ?? match?.matchOrder ?? match?.order ?? matchIndex + 1);
+  return Number.isFinite(matchOrder) ? matchOrder : matchIndex + 1;
+}
+
+function getWrestlingPersonDossierPrototypeRawMatchRecordKey(event, match, matchIndex) {
+  return getWrestlingPersonDossierPrototypeMatchRecordKey(event, {
+    match,
+    matchOrder: getWrestlingPersonDossierPrototypeRawMatchOrder(match, matchIndex),
+  }, matchIndex);
+}
+
+function getWrestlingPersonDossierPrototypeExplicitWinType(match, aceSideKey, aceSideValues) {
+  const winnerValues = getWrestlingPersonDossierPrototypeMatchWinnerValues(match);
+  if (winnerValues.some((value) => isWrestlingPersonDossierPrototypeAceIdentity(value))) {
+    return "directAce";
+  }
+
+  if (!aceSideKey) {
+    return "";
+  }
+
+  const aceSideLabel = formatWrestlingPersonDossierPrototypeEventHistoryList(aceSideValues, WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
+  const hasAceSideWinner = winnerValues.some((winner) => {
+    const normalizedWinner = normalizeWrestlingPersonDossierPrototypeName(winner);
+    return aceSideValues.some((sideValue) => normalizeWrestlingPersonDossierPrototypeName(sideValue) === normalizedWinner) || normalizeWrestlingPersonDossierPrototypeName(aceSideLabel) === normalizedWinner;
+  });
+  return hasAceSideWinner ? "aceSideTeam" : "";
+}
+
+function getWrestlingPersonDossierPrototypeParticipantDiagnosticType(match, aceSideKey) {
+  const winnerValues = getWrestlingPersonDossierPrototypeMatchWinnerValues(match);
+  if (winnerValues.length > 0) {
+    return "explicitNonWinning";
+  }
+  return aceSideKey ? "missingUnknownWinner" : "otherStructuredNonWinning";
+}
+
+function getWrestlingPersonDossierPrototypeWinParticipantDiagnostics(events, peopleRecord) {
+  const diagnostics = {
+    totalTimelineEvents: events.length,
+    eventsWithEmbeddedMatchData: 0,
+    eventsWithoutEmbeddedMatchData: 0,
+    rawEmbeddedMatchRecords: 0,
+    dedupedEmbeddedMatchRecords: 0,
+    qualifyingAceMatches: 0,
+    duplicateMatchesRemoved: 0,
+    explicitDirectAceWins: 0,
+    explicitAceSideTeamWins: 0,
+    ambiguousWinnerTextWins: 0,
+    participant: {
+      total: 0,
+      explicitNonWinning: 0,
+      missingUnknownWinner: 0,
+      otherStructuredNonWinning: 0,
+    },
+    nonMatchSegmentExclusions: 0,
+    ambiguousUnclassifiableRecords: 0,
+    eventBuckets: {
+      aceQualifyingMatchFound: 0,
+      multipleAceQualifyingMatchesFound: 0,
+      embeddedMatchesNoQualifyingAceMatch: 0,
+      noEmbeddedMatchData: 0,
+      nonMatchAceSegmentOnly: 0,
+      ambiguousIncompleteMatchStructure: 0,
+    },
+    peopleMatches: getWrestlingPersonDossierPrototypePeopleMatchTotal(peopleRecord),
+    visibleRecord: getWrestlingPersonDossierPrototypeWinParticipantRecord(events),
+    unreconciledDifference: null,
+  };
+  const seenEmbeddedMatches = new Set();
+  const seenQualifyingMatches = new Set();
+
+  events.forEach((event) => {
+    const rawMatches = Array.isArray(event?.raw?.matches) ? event.raw.matches : [];
+    const appearances = Array.isArray(event?.aceAppearances) ? event.aceAppearances : [];
+    let eventQualifyingMatches = 0;
+    let eventNonMatchAceSegments = 0;
+    let eventAmbiguousRecords = 0;
+
+    if (rawMatches.length === 0) {
+      diagnostics.eventsWithoutEmbeddedMatchData += 1;
+      diagnostics.eventBuckets.noEmbeddedMatchData += 1;
+      return;
+    }
+
+    diagnostics.eventsWithEmbeddedMatchData += 1;
+    diagnostics.rawEmbeddedMatchRecords += rawMatches.length;
+
+    rawMatches.forEach((match, matchIndex) => {
+      if (!match || typeof match !== "object") {
+        diagnostics.ambiguousUnclassifiableRecords += 1;
+        eventAmbiguousRecords += 1;
+        return;
+      }
+
+      const recordKey = getWrestlingPersonDossierPrototypeRawMatchRecordKey(event, match, matchIndex);
+      if (seenEmbeddedMatches.has(recordKey)) {
+        diagnostics.duplicateMatchesRemoved += 1;
+        return;
+      }
+      seenEmbeddedMatches.add(recordKey);
+      diagnostics.dedupedEmbeddedMatchRecords += 1;
+    });
+
+    appearances.forEach((appearance, appearanceIndex) => {
+      const match = appearance?.match;
+      if (!match || typeof match !== "object") {
+        diagnostics.ambiguousUnclassifiableRecords += 1;
+        eventAmbiguousRecords += 1;
+        return;
+      }
+
+      const hasAce = hasWrestlingPersonDossierPrototypeAceInWinParticipantMatch(match);
+      if (isWrestlingPersonDossierPrototypeNonMatchSegment(match) && hasAce) {
+        diagnostics.nonMatchSegmentExclusions += 1;
+        eventNonMatchAceSegments += 1;
+        return;
+      }
+      if (!hasAce) {
+        return;
+      }
+
+      const recordKey = getWrestlingPersonDossierPrototypeMatchRecordKey(event, appearance, appearanceIndex);
+      if (seenQualifyingMatches.has(recordKey)) {
+        return;
+      }
+      seenQualifyingMatches.add(recordKey);
+
+      const aceSideKey = getWrestlingPersonDossierPrototypeAceSideKey(match);
+      const aceSideValues = aceSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, aceSideKey) : [WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME];
+      const explicitWinType = getWrestlingPersonDossierPrototypeExplicitWinType(match, aceSideKey, aceSideValues);
+      diagnostics.qualifyingAceMatches += 1;
+      eventQualifyingMatches += 1;
+
+      if (explicitWinType === "directAce") {
+        diagnostics.explicitDirectAceWins += 1;
+        return;
+      }
+      if (explicitWinType === "aceSideTeam") {
+        diagnostics.explicitAceSideTeamWins += 1;
+        return;
+      }
+
+      const participantType = getWrestlingPersonDossierPrototypeParticipantDiagnosticType(match, aceSideKey);
+      diagnostics.participant.total += 1;
+      diagnostics.participant[participantType] += 1;
+    });
+
+    if (eventQualifyingMatches > 1) {
+      diagnostics.eventBuckets.multipleAceQualifyingMatchesFound += 1;
+    } else if (eventQualifyingMatches === 1) {
+      diagnostics.eventBuckets.aceQualifyingMatchFound += 1;
+    } else if (eventNonMatchAceSegments > 0) {
+      diagnostics.eventBuckets.nonMatchAceSegmentOnly += 1;
+    } else if (eventAmbiguousRecords > 0) {
+      diagnostics.eventBuckets.ambiguousIncompleteMatchStructure += 1;
+    } else {
+      diagnostics.eventBuckets.embeddedMatchesNoQualifyingAceMatch += 1;
+    }
+  });
+
+  const loadedClassifiableTotal = diagnostics.explicitDirectAceWins + diagnostics.explicitAceSideTeamWins + diagnostics.participant.total;
+  diagnostics.unreconciledDifference = Number.isFinite(diagnostics.peopleMatches)
+    ? diagnostics.peopleMatches - loadedClassifiableTotal
+    : null;
+  diagnostics.visibleValue = diagnostics.visibleRecord.wins + " / " + diagnostics.visibleRecord.participant;
+  diagnostics.calculatedValue = (diagnostics.explicitDirectAceWins + diagnostics.explicitAceSideTeamWins) + " / " + diagnostics.participant.total;
+  diagnostics.calculationMatchesVisible = diagnostics.visibleValue === diagnostics.calculatedValue;
+  return diagnostics;
+}
+
+function syncWrestlingPersonDossierPrototypeWinParticipantDiagnostics() {
+  const state = wrestlingPersonDossierPrototypeEventHistoryState;
+  if (state.status !== "loaded" || !Array.isArray(state.events) || state.events.length === 0) {
+    state.diagnostics = null;
+    return null;
+  }
+
+  const diagnostics = getWrestlingPersonDossierPrototypeWinParticipantDiagnostics(state.events, wrestlingPersonDossierPrototypeAceState.record);
+  state.diagnostics = diagnostics;
+  const diagnosticsLogKey = JSON.stringify({
+    totalTimelineEvents: diagnostics.totalTimelineEvents,
+    rawEmbeddedMatchRecords: diagnostics.rawEmbeddedMatchRecords,
+    qualifyingAceMatches: diagnostics.qualifyingAceMatches,
+    calculatedValue: diagnostics.calculatedValue,
+    peopleMatches: diagnostics.peopleMatches,
+  });
+  if (state.diagnosticsLogKey !== diagnosticsLogKey && typeof console !== "undefined" && typeof console.debug === "function") {
+    state.diagnosticsLogKey = diagnosticsLogKey;
+    console.debug("[wrestling-person-dossier-prototype] win-participant diagnostics", diagnostics);
+  }
+  return diagnostics;
+}
+
 function normalizeWrestlingPersonDossierPrototypeAceAppearance(match, matchIndex) {
   const aceSideKey = getWrestlingPersonDossierPrototypeAceSideKey(match);
   const opposingSideKey = aceSideKey === "side_1" ? "side_2" : aceSideKey === "side_2" ? "side_1" : "";
@@ -10944,6 +11148,7 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[boundedActiveIndex - 1] : null);
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[boundedActiveIndex + 1] : null);
   setWrestlingPersonDossierPrototypeWinParticipantStatus(workspace, stateName === "loaded" ? events : []);
+  syncWrestlingPersonDossierPrototypeWinParticipantDiagnostics();
   setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateName, boundedActiveIndex, eventTotal);
   setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, boundedActiveIndex, eventTotal);
   scheduleWrestlingPersonDossierPrototypeMetadataFit(workspace);
@@ -11049,6 +11254,7 @@ function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDo
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", getWrestlingPersonDossierPrototypeCount(record, ["event_count", "eventCount", "show_count", "showCount"]));
     setWrestlingPersonDossierPrototypeMetadataItems(workspace, record);
     renderWrestlingPersonDossierPrototypePortrait(workspace, record);
+    syncWrestlingPersonDossierPrototypeWinParticipantDiagnostics();
     return;
   }
 
