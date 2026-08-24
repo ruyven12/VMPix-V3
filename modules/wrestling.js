@@ -9409,6 +9409,25 @@ function getHallOfChampionsPeopleArchiveDisplayName(record) {
   return getHallOfChampionsPeopleArchiveField(record, ["name", "displayName", "display_name", "archiveName", "archive_name"]);
 }
 
+function getHallOfChampionsPeopleArchiveRouteId(record) {
+  const routeId = getWrestlingText(
+    record?.routeId ||
+    record?.route_id ||
+    record?.personId ||
+    record?.wrestling_person_id ||
+    record?.person_id ||
+    record?.routeSlug ||
+    record?.route_slug ||
+    record?.slug ||
+    record?.id
+  ).trim();
+  if (routeId) {
+    return routeId;
+  }
+  const cacheKey = getWrestlingText(record?.key).trim();
+  return cacheKey && cacheKey === normalizeWrestlingPersonId(cacheKey) ? cacheKey : "";
+}
+
 function getHallOfChampionsPeopleArchiveInitial(displayName) {
   const match = getWrestlingText(displayName).trim().match(/[a-z]/i);
   return match ? match[0].toUpperCase() : "";
@@ -9501,9 +9520,11 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
     try {
       const name = getHallOfChampionsPeopleArchiveDisplayName(record);
       const key = getWrestlingText(record?.slug || record?.id || name || `record-${index}`).trim().toLowerCase();
+      const routeId = getHallOfChampionsPeopleArchiveRouteId(record);
       const initial = getHallOfChampionsPeopleArchiveInitial(name);
       return key && name ? {
         key,
+        routeId,
         name,
         initial,
         category: getHallOfChampionsPeopleArchiveCategory(record),
@@ -9530,9 +9551,11 @@ function normalizeHallOfChampionsPeopleArchiveCachedRecords(records) {
     try {
       const name = getWrestlingText(record?.name).replace(/\s+/g, " ").trim();
       const key = getWrestlingText(record?.key || record?.slug || record?.id || name || `cached-record-${index}`).trim().toLowerCase();
+      const routeId = getHallOfChampionsPeopleArchiveRouteId(record);
       const photoCount = Number.parseInt(record?.photoCount, 10);
       return key && name ? {
         key,
+        routeId,
         name,
         initial: getHallOfChampionsPeopleArchiveInitial(record?.initial || name),
         category: formatHallOfChampionsPeopleArchiveCategory(record?.category),
@@ -9607,6 +9630,7 @@ function writeHallOfChampionsPeopleArchiveCache(records) {
       cachedAt: Date.now(),
       records: records.map((record) => ({
         key: record.key,
+        routeId: record.routeId,
         name: record.name,
         initial: record.initial,
         category: record.category,
@@ -9755,6 +9779,36 @@ function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
   return Number.isFinite(photoCount) ? `${photoCount.toLocaleString()} Photos` : "";
 }
 
+function activateHallOfChampionsArchiveRecordRoute(routeUrl) {
+  navigateToRoute(routeUrl, {
+    historyState: { fromWrestlingPeopleHall: true },
+  });
+}
+
+function bindHallOfChampionsArchiveRecordNavigation(item, record) {
+  const routeId = normalizeWrestlingPersonId(getHallOfChampionsPeopleArchiveRouteId(record));
+  if (!item || !routeId) {
+    return;
+  }
+  const routeUrl = getWrestlingPersonRouteUrl(routeId);
+  item.dataset.wrestlingPersonId = routeId;
+  item.dataset.wrestlingPersonRoute = routeUrl;
+  item.tabIndex = 0;
+  item.setAttribute("role", "link");
+  const name = getWrestlingText(record?.name).trim();
+  if (name) {
+    item.setAttribute("aria-label", `Open ${name} dossier`);
+  }
+  item.addEventListener("click", () => activateHallOfChampionsArchiveRecordRoute(routeUrl));
+  item.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    activateHallOfChampionsArchiveRecordRoute(routeUrl);
+  });
+}
+
 function appendHallOfChampionsArchiveRecord(list, record) {
   try {
     const item = document.createElement("li");
@@ -9787,6 +9841,7 @@ function appendHallOfChampionsArchiveRecord(list, record) {
     }
 
     item.append(marker, primary, category, secondary, photos);
+    bindHallOfChampionsArchiveRecordNavigation(item, record);
     list.append(item);
   } catch (error) {
     reportHallOfChampionsPeopleArchiveRecordIssue("archive row render skipped record", error, record);
@@ -9841,6 +9896,7 @@ function appendHallOfChampionsPortraitArchiveCard(list, record) {
 
     body.append(marker, primary, category, photos, team);
     item.append(media, body);
+    bindHallOfChampionsArchiveRecordNavigation(item, record);
     list.append(item);
   } catch (error) {
     reportHallOfChampionsPeopleArchiveRecordIssue("portrait card render skipped record", error, record);
