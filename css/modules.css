@@ -21462,17 +21462,18 @@ button.hall-crusades-archive-crystal:focus-visible {
   position: absolute;
   inset-block-start: calc(100% + clamp(0.18rem, 0.34vw, 0.32rem));
   inset-inline-start: 50%;
-  display: block;
-  width: max-content;
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.12rem, 0.24vw, 0.2rem);
+  width: min(17.5rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
   color: rgba(255, 214, 202, 0.68);
   font-family: var(--font-display);
-  font-size: clamp(1.20625rem, calc(7vw - 1.5px), 3.30625rem);
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
   text-shadow:
     0 0 0.46rem rgba(214, 30, 34, 0.22),
     0 0 1.1rem rgba(135, 11, 16, 0.16);
@@ -21481,9 +21482,31 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform;
 }
 
+.daiion-title-reveal__secondary,
+.daiion-title-reveal__lore {
+  display: block;
+}
+
+.daiion-title-reveal__secondary {
+  color: rgba(255, 214, 202, 0.78);
+  font-size: clamp(1.46rem, 2.55vw, 2rem);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.daiion-title-reveal__lore {
+  font-size: clamp(0.96rem, 1.3vw, 1.12rem);
+  font-weight: 500;
+  line-height: 1.18;
+}
+
 @media (max-width: 540px) {
+  .daiion-title-reveal { --daiion-title-hud-x: calc(50vw - 8.7rem); --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem); }
+
   .daiion-title-reveal__subtitle {
-    font-size: clamp(0.92rem, 4vw, 1.08rem);
+    width: min(15.4rem, calc(100vw - 2rem));
   }
 }
 
@@ -21638,6 +21661,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   100% {
     background-position: 150% 0, 0 0;
   }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle { animation-delay: 0s !important; }
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-engine {
