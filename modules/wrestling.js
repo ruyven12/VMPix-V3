@@ -8723,7 +8723,9 @@ function getWrestlingPeoplePrototypeShell(options = {}) {
     <g class="hall-of-champions-pedestal__hologram-plane">
       <path d="M254 130 L386 130 L380 170 L260 170 Z" />
       <path class="hall-of-champions-pedestal__hologram-plane-scan" d="M254 130 L386 130 L380 170 L260 170 Z" />
-      <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)"></g>
+      <g class="hall-of-champions-pedestal__hologram-console" clip-path="url(#hall-champions-hologram-plane-clip)">
+        <text class="hall-of-champions-pedestal__hologram-console-interact" x="320" y="153" textLength="114" lengthAdjust="spacingAndGlyphs">Interact</text>
+      </g>
     </g>
     <g class="hall-of-champions-pedestal__upper-console">
       <path d="M184 226 L456 226 L510 292 L130 292 Z" />
@@ -12458,12 +12460,12 @@ function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPerson
   state.requestKey = requestKey;
   renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
 
-  state.requestPromise = fetch(getWrestlingPersonDossierPrototypeEventHistoryUrl(context), {
+  state.requestPromise = withWrestlingRequestTimeout(fetch(getWrestlingPersonDossierPrototypeEventHistoryUrl(context), {
     cache: "no-store",
     headers: {
       Accept: "application/json",
     },
-  })
+  }), null, WRESTLING_SHOWS_TIMEOUT_MS, `${context.displayName} event history`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`${context.displayName} event-history request failed: ${response.status} ${response.statusText}`);
@@ -12592,11 +12594,11 @@ function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestli
   state.requestKey = requestKey;
   renderWrestlingPersonDossierPrototypeSelectedPersonState(shell);
 
-  state.requestPromise = fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
+  state.requestPromise = withWrestlingRequestTimeout(fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
     headers: {
       Accept: "application/json",
     },
-  })
+  }), null, WRESTLING_PEOPLE_TIMEOUT_MS, `${context.displayName} person dossier`)
     .then((response) => {
       if (!response.ok) {
         throw new Error(`${context.displayName} prototype request failed: ${response.status} ${response.statusText}`);
