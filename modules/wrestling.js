@@ -278,6 +278,14 @@ const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SWIPE_THRESHOLD = 44;
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_CLOSE_MS = 260;
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_FOCUSABLE_SELECTOR = "button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
 const WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE = 12;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SESSION_CACHE_TTL_MS = 10 * 60 * 1000;
+const WRESTLING_PERSON_DOSSIER_PROTOTYPE_SESSION_CACHE_MAX = 20;
+const wrestlingPersonDossierPrototypeRecordCache = new Map();
+const wrestlingPersonDossierPrototypeRecordRequests = new Map();
+const wrestlingPersonDossierPrototypeEventHistoryCache = new Map();
+const wrestlingPersonDossierPrototypeEventHistoryRequests = new Map();
+const wrestlingPersonDossierPrototypePhotoMetadataCache = new Map();
+const wrestlingPersonDossierPrototypePhotoMetadataRequests = new Map();
 let wrestlingPersonDossierPrototypeSelectedPersonState = {
   status: "idle",
   record: null,
@@ -10418,6 +10426,63 @@ function getWrestlingPersonDossierPrototypeEventHistoryUrl(context = getWrestlin
   return apiUrl.href;
 }
 
+function getWrestlingPersonDossierPrototypeSessionCacheValue(cache, key, validator = Boolean) {
+  const cacheKey = getWrestlingText(key);
+  const entry = cacheKey ? cache.get(cacheKey) : null;
+  if (!entry || !Number.isFinite(entry.cachedAt) || Date.now() - entry.cachedAt > WRESTLING_PERSON_DOSSIER_PROTOTYPE_SESSION_CACHE_TTL_MS || !validator(entry.value)) {
+    if (cacheKey) {
+      cache.delete(cacheKey);
+    }
+    return null;
+  }
+  cache.delete(cacheKey);
+  entry.cachedAt = Date.now();
+  cache.set(cacheKey, entry);
+  return entry.value;
+}
+
+function setWrestlingPersonDossierPrototypeSessionCacheValue(cache, keys, value) {
+  [...new Set((Array.isArray(keys) ? keys : [keys]).map((key) => getWrestlingText(key)).filter(Boolean))].forEach((cacheKey) => {
+    if (cache.has(cacheKey)) {
+      cache.delete(cacheKey);
+    }
+    cache.set(cacheKey, { cachedAt: Date.now(), value });
+  });
+  while (cache.size > WRESTLING_PERSON_DOSSIER_PROTOTYPE_SESSION_CACHE_MAX) {
+    cache.delete(cache.keys().next().value);
+  }
+  return value;
+}
+
+function getWrestlingPersonDossierPrototypeRecordCacheKeys(context = {}, record = null, requestKey = "") {
+  const source = record?.backend_record && typeof record.backend_record === "object" ? { ...record.backend_record, ...record } : record;
+  return [...new Set([requestKey, context?.seed?.slug, context?.seed?.personId, context?.seed?.searchName, context?.seed?.displayName, context?.stableId, context?.slug, context?.personId, context?.searchName, context?.displayName, source?.personId, source?.wrestling_person_id, source?.person_id, source?.id, source?.slug, source ? getWrestlingPersonRouteId(source) : ""].map((value) => normalizeWrestlingPersonId(value)).filter(Boolean))];
+}
+
+function getWrestlingPersonDossierPrototypeCachedRecord(context, requestKey) {
+  for (const cacheKey of getWrestlingPersonDossierPrototypeRecordCacheKeys(context, null, requestKey)) {
+    const record = getWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypeRecordCache, cacheKey, (value) => value && typeof value === "object");
+    if (record) {
+      return record;
+    }
+  }
+  return null;
+}
+
+function setWrestlingPersonDossierPrototypeCachedRecord(record, context, requestKey) {
+  if (!record || typeof record !== "object") {
+    return record;
+  }
+  const resolvedContext = getWrestlingPersonDossierPrototypeSelectedPersonContext(record);
+  return setWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypeRecordCache, [...getWrestlingPersonDossierPrototypeRecordCacheKeys(context, record, requestKey), ...getWrestlingPersonDossierPrototypeRecordCacheKeys(resolvedContext, record, resolvedContext.stableId)], record);
+}
+
+function getWrestlingPersonDossierPrototypeEventHistoryCacheKey(context = {}) {
+  const personKey = normalizeWrestlingPersonId(context.stableId || context.personId || context.slug || context.displayName);
+  const participantKey = normalizeWrestlingPersonDossierPrototypeName(context.participantName || context.displayName);
+  return personKey && participantKey ? personKey + "|" + participantKey : personKey || participantKey;
+}
+
 function resetWrestlingPersonDossierPrototypeEventHistoryPersonState() {
   const state = wrestlingPersonDossierPrototypeEventHistoryState;
   state.status = "idle";
@@ -11889,29 +11954,41 @@ function loadWrestlingPersonDossierPrototypeEventArchivePhotos(archive, context)
     setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, cachedPhotos.length > 0 ? "loaded" : "empty", cachedPhotos);
     return Promise.resolve(cachedPhotos);
   }
+  const sessionCachedPhotos = getWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypePhotoMetadataCache, requestKey, Array.isArray);
+  if (sessionCachedPhotos) {
+    state.photoCache.set(requestKey, sessionCachedPhotos);
+    setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, sessionCachedPhotos.length > 0 ? "loaded" : "empty", sessionCachedPhotos);
+    return Promise.resolve(sessionCachedPhotos);
+  }
 
   const localPhotos = sortWrestlingPersonDossierPrototypeEventArchivePhotos(getWrestlingPersonDossierPrototypeEventArchiveFilteredPhotos(eventRow, person));
   if (localPhotos.length > 0) {
     state.photoCache.set(requestKey, localPhotos);
+    setWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypePhotoMetadataCache, requestKey, localPhotos);
     setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, "loaded", localPhotos);
     return Promise.resolve(localPhotos);
   }
 
   setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, "loading", []);
-  const request = state.photoRequests.get(requestKey) || requestWrestlingPersonEventTaggedPhotos(eventRow, person)
+  const request = state.photoRequests.get(requestKey) || wrestlingPersonDossierPrototypePhotoMetadataRequests.get(requestKey) || requestWrestlingPersonEventTaggedPhotos(eventRow, person)
     .then((result) => {
       const filteredPhotos = getWrestlingPersonDossierPrototypeEventArchiveFilteredPhotos(result?.match, person);
       const fallbackPhotos = (Array.isArray(result?.photos) ? result.photos : []).filter((photo) => getWrestlingPersonMatchedPhotoUrl(photo));
       const photos = sortWrestlingPersonDossierPrototypeEventArchivePhotos(filteredPhotos.length > 0 ? filteredPhotos : fallbackPhotos);
       state.photoCache.set(requestKey, photos);
+      setWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypePhotoMetadataCache, requestKey, photos);
       return photos;
     })
     .finally(() => {
       state.photoRequests.delete(requestKey);
+      wrestlingPersonDossierPrototypePhotoMetadataRequests.delete(requestKey);
     });
 
   if (!state.photoRequests.has(requestKey)) {
     state.photoRequests.set(requestKey, request);
+  }
+  if (!wrestlingPersonDossierPrototypePhotoMetadataRequests.has(requestKey)) {
+    wrestlingPersonDossierPrototypePhotoMetadataRequests.set(requestKey, request);
   }
 
   return request
@@ -12290,6 +12367,28 @@ function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPerson
     return state.requestPromise;
   }
 
+  const cacheKey = getWrestlingPersonDossierPrototypeEventHistoryCacheKey(context);
+  const cachedEvents = getWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypeEventHistoryCache, cacheKey, Array.isArray);
+  if (cachedEvents) {
+    state.events = cachedEvents;
+    state.activeIndex = 0;
+    state.status = cachedEvents.length > 0 ? "loaded" : "empty";
+    state.error = null;
+    state.requestKey = requestKey;
+    renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+    return Promise.resolve(state.events);
+  }
+
+  const cachedRequest = wrestlingPersonDossierPrototypeEventHistoryRequests.get(cacheKey);
+  if (cachedRequest) {
+    state.status = "loading";
+    state.error = null;
+    state.requestKey = requestKey;
+    state.requestPromise = cachedRequest;
+    renderWrestlingPersonDossierPrototypeEventHistoryState(shell);
+    return cachedRequest;
+  }
+
   if (typeof fetch !== "function") {
     state.events = [];
     state.status = "error";
@@ -12320,6 +12419,7 @@ function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPerson
         return [];
       }
       const events = normalizeWrestlingPersonDossierPrototypeEventHistory(payload, context);
+      setWrestlingPersonDossierPrototypeSessionCacheValue(wrestlingPersonDossierPrototypeEventHistoryCache, cacheKey, events);
       state.events = events;
       state.activeIndex = 0;
       state.status = events.length > 0 ? "loaded" : "empty";
@@ -12336,11 +12436,15 @@ function loadWrestlingPersonDossierPrototypeEventHistory(shell = wrestlingPerson
       return [];
     })
     .finally(() => {
+      wrestlingPersonDossierPrototypeEventHistoryRequests.delete(cacheKey);
       if (state.requestKey === requestKey) {
         state.requestPromise = null;
       }
     });
 
+  if (cacheKey) {
+    wrestlingPersonDossierPrototypeEventHistoryRequests.set(cacheKey, state.requestPromise);
+  }
   return state.requestPromise;
 }
 function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestlingPersonDossierPrototypeShell) {
@@ -12407,6 +12511,26 @@ function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestli
     return state.requestPromise;
   }
 
+  const cachedRecord = getWrestlingPersonDossierPrototypeCachedRecord(context, requestKey);
+  if (cachedRecord) {
+    state.record = cachedRecord;
+    state.status = "loaded";
+    state.error = null;
+    state.requestKey = requestKey;
+    renderWrestlingPersonDossierPrototypeSelectedPersonState(shell);
+    return Promise.resolve(cachedRecord);
+  }
+
+  const cachedRequest = wrestlingPersonDossierPrototypeRecordRequests.get(requestKey);
+  if (cachedRequest) {
+    state.status = "loading";
+    state.error = null;
+    state.requestKey = requestKey;
+    state.requestPromise = cachedRequest;
+    renderWrestlingPersonDossierPrototypeSelectedPersonState(shell);
+    return cachedRequest;
+  }
+
   state.status = "loading";
   state.error = null;
   state.requestKey = requestKey;
@@ -12428,6 +12552,9 @@ function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestli
         return null;
       }
       const record = findWrestlingPersonDossierPrototypeSelectedPersonRecord(payload, context);
+      if (record) {
+        setWrestlingPersonDossierPrototypeCachedRecord(record, context, requestKey);
+      }
       state.record = record;
       state.status = record ? "loaded" : "empty";
       renderWrestlingPersonDossierPrototypeSelectedPersonState(shell);
@@ -12443,11 +12570,13 @@ function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestli
       return null;
     })
     .finally(() => {
+      wrestlingPersonDossierPrototypeRecordRequests.delete(requestKey);
       if (state.requestKey === requestKey) {
         state.requestPromise = null;
       }
     });
 
+  wrestlingPersonDossierPrototypeRecordRequests.set(requestKey, state.requestPromise);
   return state.requestPromise;
 }
 function createWrestlingPersonDossierPrototypeHallPresentation() {
