@@ -21481,6 +21481,27 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translate3d(-50%, 0.58rem, 0);
   will-change: opacity, transform;
 }
+.daiion-title-reveal::before {
+  position: absolute;
+  inset-block: -0.88rem -7rem;
+  inset-inline: -1rem;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 90, 60, 0.16), transparent 1.2rem) top left / 100% 100% no-repeat,
+    linear-gradient(315deg, rgba(255, 42, 26, 0.1), transparent 1.45rem) bottom right / 100% 100% no-repeat,
+    rgba(6, 7, 9, 0.78);
+  border: 1px solid rgba(255, 90, 60, 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 231, 208, 0.045),
+    inset 0 0 0.92rem rgba(255, 42, 26, 0.1),
+    0 0.42rem 1.2rem rgba(0, 0, 0, 0.34),
+    0 0 0.52rem rgba(255, 42, 26, 0.11);
+  clip-path: polygon(0.48rem 0, 100% 0, 100% calc(100% - 0.48rem), calc(100% - 0.48rem) 100%, 0 100%, 0 0.48rem);
+}
 
 .daiion-title-reveal__secondary,
 .daiion-title-reveal__lore {
@@ -21504,6 +21525,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 @media (max-width: 540px) {
   .daiion-title-reveal { --daiion-title-hud-x: calc(50vw - 8.7rem); --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem); }
+  .daiion-title-reveal::before { inset-block-start: -0.08rem; }
 
   .daiion-title-reveal__subtitle {
     width: min(15.4rem, calc(100vw - 2rem));
@@ -21538,6 +21560,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
   animation: daiionTitleSubtitleReveal 520ms ease-out 3500ms both;
+}
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal::before {
+  visibility: visible;
+  animation: daiionDestinationPanelProject 1040ms cubic-bezier(0.2, 0.74, 0.24, 1) 3450ms both;
 }
 
 @keyframes daiionDestinationIntroProject {
@@ -21664,6 +21690,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal::before,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle { animation-delay: 0s !important; }
 }
 
