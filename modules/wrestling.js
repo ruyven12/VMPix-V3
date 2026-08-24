@@ -311,6 +311,8 @@ let wrestlingPersonDossierPrototypeEventArchiveState = {
   photoGridScrollTop: 0,
   viewerReturnPhotoIndex: 0,
   viewerSwipeStart: null,
+  viewerImageRequestKey: 0,
+  viewerHeroPreloadRequests: new Map(),
   keydownHandler: null,
   closeTimer: 0,
   scrollLock: null,
@@ -10441,6 +10443,8 @@ function resetWrestlingPersonDossierPrototypeEventArchivePersonState() {
   state.photoGridScrollTop = 0;
   state.viewerReturnPhotoIndex = 0;
   state.viewerSwipeStart = null;
+  state.viewerImageRequestKey += 1;
+  state.viewerHeroPreloadRequests.clear();
   const archive = getWrestlingPersonDossierPrototypeEventArchive();
   const region = getWrestlingPersonDossierPrototypeEventArchivePhotoGrid(archive);
   if (region) {
@@ -11430,6 +11434,46 @@ function getWrestlingPersonDossierPrototypeEventArchiveHeroPhotoUrl(photo) {
   return getWrestlingPersonTaggedPhotoLightboxUrl(photo) || getWrestlingPersonMatchedPhotoUrl(photo);
 }
 
+function loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(url) {
+  const heroUrl = getWrestlingText(url);
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  if (!heroUrl || typeof Image === "undefined") {
+    return Promise.resolve(false);
+  }
+  const existingRequest = state.viewerHeroPreloadRequests.get(heroUrl);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = new Promise((resolve) => {
+    const preloadImage = new Image();
+    preloadImage.decoding = "async";
+    preloadImage.onload = () => {
+      if (typeof preloadImage.decode === "function") {
+        preloadImage.decode().then(() => resolve(true)).catch(() => resolve(true));
+        return;
+      }
+      resolve(true);
+    };
+    preloadImage.onerror = () => resolve(false);
+    preloadImage.src = heroUrl;
+  });
+  state.viewerHeroPreloadRequests.set(heroUrl, request);
+  return request;
+}
+
+function prepareWrestlingPersonDossierPrototypeAdjacentHeroImages(photos, activeIndex) {
+  if (!Array.isArray(photos) || photos.length === 0) {
+    return;
+  }
+  [activeIndex - 1, activeIndex + 1].forEach((index) => {
+    if (index < 0 || index >= photos.length) {
+      return;
+    }
+    loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(getWrestlingPersonDossierPrototypeEventArchiveHeroPhotoUrl(photos[index]));
+  });
+}
+
 function parseWrestlingPersonDossierPrototypeEventArchivePhotoDate(value) {
   const rawValue = getWrestlingText(value);
   if (!rawValue) {
@@ -11550,6 +11594,8 @@ function resetWrestlingPersonDossierPrototypeEventArchiveViewerState() {
   state.photoGridScrollTop = 0;
   state.viewerReturnPhotoIndex = 0;
   state.viewerSwipeStart = null;
+  state.viewerImageRequestKey += 1;
+  state.viewerHeroPreloadRequests.clear();
 }
 
 function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
@@ -11566,12 +11612,26 @@ function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   const position = viewer.querySelector("[data-wrestling-person-dossier-prototype-event-archive-viewer-position]");
   const previous = viewer.querySelector("[data-wrestling-person-dossier-prototype-event-archive-viewer-previous]");
   const next = viewer.querySelector("[data-wrestling-person-dossier-prototype-event-archive-viewer-next]");
+  const selectedIndex = state.selectedPhotoIndex;
+  const thumbnailUrl = getWrestlingPersonMatchedPhotoUrl(photo);
   const imageUrl = getWrestlingPersonDossierPrototypeEventArchiveHeroPhotoUrl(photo);
+  const immediateImageUrl = thumbnailUrl || imageUrl;
+  const viewerImageRequestKey = state.viewerImageRequestKey + 1;
   const captionText = getWrestlingPersonDossierPrototypeEventArchivePhotoCaption(photo);
 
+  state.viewerImageRequestKey = viewerImageRequestKey;
   if (image) {
-    image.src = imageUrl;
-    image.alt = captionText || `${getWrestlingPersonDossierPrototypeSelectedPersonContext().displayName} event archive photo ${state.selectedPhotoIndex + 1}`;
+    image.src = immediateImageUrl;
+    image.alt = captionText || `${getWrestlingPersonDossierPrototypeSelectedPersonContext().displayName} event archive photo ${selectedIndex + 1}`;
+    if (imageUrl && imageUrl !== immediateImageUrl) {
+      loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(imageUrl).then((isReady) => {
+        const currentPhotos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
+        if (!isReady || state.viewerImageRequestKey !== viewerImageRequestKey || state.selectedPhotoIndex !== selectedIndex || state.mode !== "viewer" || !state.isOpen || currentPhotos[selectedIndex] !== photo) {
+          return;
+        }
+        image.src = imageUrl;
+      });
+    }
   }
   if (caption) {
     caption.textContent = captionText;
@@ -11580,8 +11640,9 @@ function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   if (position) {
     position.textContent = getWrestlingPersonDossierPrototypeEventArchivePositionText(state.selectedPhotoIndex, photos.length);
   }
-  setWrestlingPersonDossierPrototypeControlEnabled(previous, state.selectedPhotoIndex > 0, "");
-  setWrestlingPersonDossierPrototypeControlEnabled(next, state.selectedPhotoIndex < photos.length - 1, "");
+  setWrestlingPersonDossierPrototypeControlEnabled(previous, selectedIndex > 0, "");
+  setWrestlingPersonDossierPrototypeControlEnabled(next, selectedIndex < photos.length - 1, "");
+  prepareWrestlingPersonDossierPrototypeAdjacentHeroImages(photos, selectedIndex);
   return true;
 }
 
