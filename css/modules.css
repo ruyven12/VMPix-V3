@@ -21460,11 +21460,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .daiion-title-reveal__subtitle {
   position: absolute;
-  inset-block-start: calc(100% + clamp(0.18rem, 0.34vw, 0.32rem));
+  inset-block-start: calc(100% + clamp(0.24rem, 0.44vw, 0.4rem));
   inset-inline-start: 50%;
   display: grid;
   justify-items: center;
-  gap: clamp(0.12rem, 0.24vw, 0.2rem);
+  gap: clamp(0.24rem, 0.42vw, 0.36rem);
   width: min(17.5rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
   color: rgba(255, 214, 202, 0.68);
@@ -21483,8 +21483,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .daiion-title-reveal::before {
   position: absolute;
-  inset-block: -0.88rem -7rem;
-  inset-inline: -1rem;
+  inset-block: -1.08rem -7.45rem;
+  inset-inline: -1.16rem;
   z-index: -1;
   content: "";
   pointer-events: none;
@@ -21510,22 +21510,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .daiion-title-reveal__secondary {
   color: rgba(255, 214, 202, 0.78);
-  font-size: clamp(1.46rem, 2.55vw, 2rem);
+  font-size: clamp(1.58rem, 2.7vw, 2.08rem);
   font-weight: 700;
-  line-height: 0.98;
+  line-height: 1.04;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .daiion-title-reveal__lore {
-  font-size: clamp(0.96rem, 1.3vw, 1.12rem);
+  font-size: clamp(1.08rem, 1.42vw, 1.22rem);
   font-weight: 500;
-  line-height: 1.18;
+  line-height: 1.28;
 }
 
 @media (max-width: 540px) {
   .daiion-title-reveal { --daiion-title-hud-x: calc(50vw - 8.7rem); --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem); }
-  .daiion-title-reveal::before { inset-block-start: -0.08rem; }
+  .daiion-title-reveal::before { inset-block: -0.16rem -7.85rem; inset-inline: -1.24rem; }
 
   .daiion-title-reveal__subtitle {
     width: min(15.4rem, calc(100vw - 2rem));
