@@ -113,15 +113,14 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.wrestlingPeople) {
     return { name: "wrestling-people-prototype", canonicalUrl: routePaths.wrestlingPeople, wrestlingPeoplePrototype: "hall-of-champions" };
   }
-  const wrestlingPersonDossierPrototypePath = `${routePaths.wrestlingPeople}/proto`;
-  if (routePath === wrestlingPersonDossierPrototypePath) {
-    return { name: "wrestling-person-dossier-prototype", canonicalUrl: wrestlingPersonDossierPrototypePath };
-  }
   const wrestlingPersonDetailPrefix = `${routePaths.wrestlingPeople}/`;
   if (routePath.startsWith(wrestlingPersonDetailPrefix)) {
     const routeParts = routePath.slice(wrestlingPersonDetailPrefix.length).split("/");
     if (routeParts.length === 1 && routeParts[0]) {
       const personId = decodeRoutePart(routeParts[0]);
+      if (normalizeRoutePath(`${routePaths.wrestlingPeople}/${personId}`) === `${routePaths.wrestlingPeople}/proto`) {
+        return unknownRoute("wrestling-route-not-found");
+      }
       return { name: "wrestling-person-detail", personId, canonicalUrl: getWrestlingPersonRouteUrl(personId) };
     }
   }
@@ -281,7 +280,7 @@ function syncRoute(route, options = {}) {
     hideConnectShell();
   }
 
-  if (route.name !== "wrestling-person-dossier-prototype" && typeof setWrestlingPersonDossierPrototypeActive === "function") {
+  if (route.name !== "wrestling-person-detail" && typeof setWrestlingPersonDossierPrototypeActive === "function") {
     setWrestlingPersonDossierPrototypeActive(false);
   }
 
@@ -382,14 +381,6 @@ function syncRoute(route, options = {}) {
     return;
   }
 
-  if (route.name === "wrestling-person-dossier-prototype") {
-    showWrestlingPersonDossierPrototypeRoute(route);
-    if (options.shouldCanonicalize !== false) {
-      replaceRouteUrl(route.canonicalUrl);
-    }
-    return;
-  }
-
   if (route.name === "wrestling-people") {
     if (typeof setWrestlingPeoplePrototypeActive === "function") {
       setWrestlingPeoplePrototypeActive(false);
@@ -399,7 +390,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "wrestling-person-detail") {
-    showWrestlingPersonDetail(route.personId);
+    showWrestlingPersonDossierRoute(route.personId);
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
