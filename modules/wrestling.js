@@ -16488,10 +16488,43 @@ function initWrestlingShowsArchive() {
   }
 }
 
+function bindWrestlingLandingHallOfChampionsCta() {
+  const panel = document.querySelector("[data-daiion-archive-focus]");
+  if (!panel || panel.dataset.wrestlingHallChampionsCtaBound === "true") return;
+  const statusSelector = "[data-daiion-archive-focus-status]";
+  const getStatus = () => panel.querySelector(statusSelector);
+  const isActive = () => panel.dataset.daiionSelectedTarget === "combatants";
+  const reset = (status) => ["role", "tabindex", "aria-label"].forEach((attr) => status.removeAttribute(attr));
+  const hitsStatus = (event) => { const rect = getStatus()?.getBoundingClientRect(); return rect && event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom; };
+  const sync = () => {
+    const status = getStatus();
+    if (!status) return;
+    if (!isActive()) return reset(status);
+    status.textContent = "ENTER THE HALLS";
+    status.setAttribute("role", "link");
+    status.tabIndex = 0;
+    status.setAttribute("aria-label", "Enter the Hall of Champions");
+  };
+  const open = () => isActive() && navigateToRoute(routePaths.wrestlingPeople);
+  panel.dataset.wrestlingHallChampionsCtaBound = "true";
+  panel.addEventListener("keydown", (event) => {
+    if (event.target.closest(statusSelector) && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      open();
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (isActive() && hitsStatus(event)) open();
+    else if (event.target.closest("[data-daiion-destination-target]")) window.setTimeout(sync, 0);
+  });
+  sync();
+}
+
 function initWrestlingPeopleModule() {
   initWrestlingPeopleFilters();
   renderWrestlingPeopleIndex({ skipDataRequest: true });
   renderWrestlingVenuesIndex({ skipDataRequest: true });
   initWrestlingShowsArchive();
   applyStaticWrestlingRelationshipHooks();
+  bindWrestlingLandingHallOfChampionsCta();
 }
