@@ -10343,6 +10343,37 @@ function findWrestlingPersonDossierPrototypeAceRecord(payload) {
   }) || null;
 }
 
+function getWrestlingPersonDossierPrototypeReadoutName(record = wrestlingPersonDossierPrototypeAceState.record) {
+  return getWrestlingPersonDossierPrototypeDisplayValue(record?.name || record?.display_name || record?.displayName, WRESTLING_PERSON_DOSSIER_PROTOTYPE_ACE_NAME);
+}
+
+function getWrestlingPersonDossierPrototypeReadoutText(record = wrestlingPersonDossierPrototypeAceState.record) {
+  return `Champion Dossier - ${getWrestlingPersonDossierPrototypeReadoutName(record)}`;
+}
+
+function updateWrestlingPersonDossierPrototypeReadout(record = wrestlingPersonDossierPrototypeAceState.record) {
+  const readoutText = getWrestlingPersonDossierPrototypeReadoutText(record);
+
+  if (typeof currentView !== "undefined" && currentView) {
+    currentView.textContent = `Daiion - ${readoutText}`;
+  }
+
+  const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
+  if (engineCurrent) {
+    const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
+    const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
+    if (engineCurrentLabel) {
+      engineCurrentLabel.textContent = "Current View:";
+    }
+    engineCurrent.classList.remove("fields-of-conflict-lock-readout");
+    engineCurrent.textContent = readoutText;
+  }
+
+  if (typeof setDocumentTitle === "function") {
+    setDocumentTitle(`${readoutText} - Voodoo Media V3.0.01`);
+  }
+}
+
 function setWrestlingPersonDossierPrototypeText(scope, selector, value) {
   const element = scope?.querySelector(selector);
   if (element) {
@@ -12090,6 +12121,7 @@ function renderWrestlingPersonDossierPrototypeAceState(shell = wrestlingPersonDo
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", getWrestlingPersonDossierPrototypeCount(record, ["event_count", "eventCount", "show_count", "showCount"]));
     setWrestlingPersonDossierPrototypeMetadataItems(workspace, record);
     renderWrestlingPersonDossierPrototypePortrait(workspace, record);
+    updateWrestlingPersonDossierPrototypeReadout(record);
     syncWrestlingPersonDossierPrototypeWinParticipantDiagnostics();
     return;
   }
@@ -12456,24 +12488,7 @@ function setWrestlingPersonDossierPrototypeActive(isActive) {
     setWrestlingLightboxHidden(true);
   }
 
-  if (typeof currentView !== "undefined" && currentView) {
-    currentView.textContent = "Daiion - Person Dossier Prototype";
-  }
-
-  const engineCurrent = document.querySelector("[data-portfolio-engine-current-view]");
-  if (engineCurrent) {
-    const engineCurrentPanel = engineCurrent.closest("[data-portfolio-engine-panel='current-view']");
-    const engineCurrentLabel = engineCurrentPanel?.querySelector(".portfolio-engine-label");
-    if (engineCurrentLabel) {
-      engineCurrentLabel.textContent = "Current View:";
-    }
-    engineCurrent.classList.remove("fields-of-conflict-lock-readout");
-    engineCurrent.textContent = "PERSON DOSSIER // PROTOTYPE";
-  }
-
-  if (typeof setDocumentTitle === "function") {
-    setDocumentTitle("Person Dossier Prototype - Voodoo Media V3.0.01");
-  }
+  updateWrestlingPersonDossierPrototypeReadout();
 }
 
 function showWrestlingPersonDossierPrototypeRoute() {
