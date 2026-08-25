@@ -16520,6 +16520,16 @@ function bindWrestlingLandingHallOfChampionsCta() {
   sync();
 }
 
+function syncDaiionLoreDestinationOption() {
+  const panel = document.querySelector(".daiion-destination-panel");
+  if (!panel || panel.querySelector("[data-daiion-destination-lore-option]")) return;
+  const loreOption = document.createElement("span");
+  loreOption.className = "daiion-destination-panel__item daiion-destination-panel__item--inert";
+  loreOption.dataset.daiionDestinationLoreOption = "true";
+  loreOption.textContent = "LORE OF DAÏION";
+  panel.append(loreOption);
+}
+
 function syncDaiionRestingIdentityBlock() {
   const identity = document.querySelector(".daiion-title-reveal");
   if (!identity || identity.dataset.daiionRestingIdentitySynced === "true") return;
@@ -16541,5 +16551,6 @@ function initWrestlingPeopleModule() {
   initWrestlingShowsArchive();
   applyStaticWrestlingRelationshipHooks();
   syncDaiionRestingIdentityBlock();
+  syncDaiionLoreDestinationOption();
   bindWrestlingLandingHallOfChampionsCta();
 }

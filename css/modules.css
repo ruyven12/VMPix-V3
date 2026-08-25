@@ -20309,6 +20309,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   border-block-end: 0;
 }
 
+.daiion-destination-panel__item--inert {
+  cursor: default;
+}
+
 .daiion-destination-panel__item:focus-visible {
   outline: 1px solid rgba(255, 231, 208, 0.58);
   outline-offset: -0.18rem;
@@ -20359,6 +20363,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(4) {
   animation-delay: 4780ms;
+}
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-panel__item:nth-child(5) {
+  animation-delay: 4860ms;
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-archive-stats-panel {
