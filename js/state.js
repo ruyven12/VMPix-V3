@@ -2405,6 +2405,12 @@ const daiionArchiveFocusBriefings = {
     copy: "Visit the ancient battlegrounds in which each recorded conflict left its mark.",
     status: "Enter The Halls",
   },
+  lore: {
+    title: "The Fields of Conflict",
+    stat: "9 Mapped Arenas",
+    copy: "Visit the ancient battlegrounds in which each recorded conflict left its mark.",
+    status: "Target locked",
+  },
 };
 const daiionArchiveRouteTargets = {
   campaigns: routePaths.wrestlingShows,

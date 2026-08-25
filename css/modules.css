@@ -20309,9 +20309,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   border-block-end: 0;
 }
 
-.daiion-destination-panel__item--inert {
-  cursor: default;
-}
 
 .daiion-destination-panel__item:focus-visible {
   outline: 1px solid rgba(255, 231, 208, 0.58);

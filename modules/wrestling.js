@@ -16523,11 +16523,15 @@ function bindWrestlingLandingHallOfChampionsCta() {
 function syncDaiionLoreDestinationOption() {
   const panel = document.querySelector(".daiion-destination-panel");
   if (!panel || panel.querySelector("[data-daiion-destination-lore-option]")) return;
-  const loreOption = document.createElement("span");
-  loreOption.className = "daiion-destination-panel__item daiion-destination-panel__item--inert";
+  const loreOption = document.createElement("button");
+  loreOption.className = "daiion-destination-panel__item";
+  loreOption.type = "button";
   loreOption.dataset.daiionDestinationLoreOption = "true";
+  loreOption.dataset.daiionDestinationTarget = "lore";
+  loreOption.setAttribute("aria-pressed", "false");
   loreOption.textContent = "LORE OF DAÏION";
   panel.append(loreOption);
+  if (typeof initDaiionDestinationPanel === "function") initDaiionDestinationPanel();
 }
 
 function syncDaiionRestingIdentityBlock() {
