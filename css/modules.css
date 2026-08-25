@@ -21524,8 +21524,16 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (max-width: 540px) {
-  .daiion-title-reveal { --daiion-title-hud-x: calc(50vw - 8.7rem); --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem); width: min(28rem, calc(100vw - 5rem)); }
-  .daiion-title-reveal::before { inset-block: -0.16rem -9.35rem; inset-inline: -0.72rem; }
+  .daiion-title-reveal {
+    --daiion-title-hud-x: calc(50vw - 8.7rem);
+    --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem);
+    width: clamp(13rem, calc(100vw - 10rem), 15.75rem);
+  }
+
+  .daiion-title-reveal::before {
+    inset-block: -0.72rem -12.2rem;
+    inset-inline: -0.88rem;
+  }
 
   .daiion-title-reveal__subtitle {
     width: 100%;
