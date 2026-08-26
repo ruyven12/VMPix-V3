@@ -21465,12 +21465,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .daiion-title-reveal__subtitle {
   position: absolute;
-  inset-block-start: calc(100% + clamp(0.24rem, 0.44vw, 0.4rem));
+  inset-block-start: calc(100% + clamp(0.34rem, 0.52vw, 0.48rem));
   inset-inline-start: 50%;
   display: grid;
   justify-items: center;
-  gap: clamp(0.24rem, 0.42vw, 0.36rem);
-  width: min(17.5rem, calc(100vw - 2rem));
+  gap: clamp(0.34rem, 0.5vw, 0.46rem);
+  width: min(20.5rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
   color: rgba(255, 214, 202, 0.68);
   font-family: var(--font-display);
@@ -21488,8 +21488,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .daiion-title-reveal::before {
   position: absolute;
-  inset-block: -1.08rem -7.45rem;
-  inset-inline: -1.16rem;
+  inset-block: -1.18rem -8.7rem;
+  inset-inline: -1.28rem;
   z-index: -1;
   content: "";
   pointer-events: none;
@@ -21530,17 +21530,19 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 @media (max-width: 540px) {
   .daiion-title-reveal {
-    --daiion-title-hud-x: calc(50vw - 8.7rem);
-    --daiion-title-hud-y: clamp(-0.9rem, -1.7svh, -0.2rem);
+    --daiion-title-hud-x: calc(50vw - 8.9rem);
+    --daiion-title-hud-y: clamp(-1.35rem, -2.2svh, -0.55rem);
     width: clamp(21.75rem, calc(100vw - 0.75rem), 23.75rem);
   }
 
   .daiion-title-reveal::before {
-    inset-block: -0.72rem -9rem;
-    inset-inline: -0.88rem;
+    inset-block: -1.05rem -6.55rem;
+    inset-inline: -1.16rem;
   }
 
   .daiion-title-reveal__subtitle {
+    inset-block-start: calc(100% + 0.48rem);
+    gap: 0.4rem;
     width: 100%;
     max-width: 100%;
   }
