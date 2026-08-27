@@ -21048,7 +21048,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-ember {
-  animation: var(--ember-animation, daiionEmberRise) var(--ember-duration, 8s) cubic-bezier(0.24, 0.62, 0.34, 1) infinite;
+  animation: var(--ember-animation, daiionEmberRise) var(--ember-duration, 8s) cubic-bezier(0.24, 0.62, 0.34, 1) var(--ember-delay, 0s) infinite;
 }
 
 .daiion-ember--a {

@@ -16608,12 +16608,49 @@ function syncDaiionEnvironmentalCoverage() {
       skew * -0.8,
       duration + 2.1,
     ]));
+    const rhythmProfiles = {
+      baseline: { duration: 5.4, span: 1.9, delay: -1.1, delayStep: 0.47, childDelays: [0, 0.9, 1.75, 2.65], childDurations: [0.15, -0.2, 0.25, -0.1] },
+      flare: { duration: 8.4, span: 3.7, delayStep: 0.38, phaseStep: 5, phaseSlots: 13, childDelays: [0, 0.95, 2.05, 3.15], childDurations: [0.2, -0.45, 0.55, -0.1] },
+      surge: { duration: 13.2, span: 5.6, delayStep: 0.67, phaseStep: 7, phaseSlots: 17, childDelays: [0, 0.55, 1.1, 1.65], childDurations: [0.3, -0.8, 1.1, 0.4] },
+    };
+    const getRhythmTiming = (rhythm, index) => {
+      const profile = rhythmProfiles[rhythm];
+      const duration = profile.duration + ((index * 5) % 7) * (profile.span / 6);
+      const delay = profile.phaseSlots
+        ? -(duration * (((index * profile.phaseStep) % profile.phaseSlots) / profile.phaseSlots)) - Math.floor(index / profile.phaseSlots) * profile.delayStep - (index % 3) * 0.11
+        : profile.delay - (index % 11) * profile.delayStep - Math.floor(index / 11) * 0.53 - (index % 3) * 0.19;
+      return { duration, delay, profile };
+    };
+    const setEmberTiming = (pocket, rhythm, index) => {
+      const { duration, delay, profile } = getRhythmTiming(rhythm, index);
+      pocket.dataset.daiionEmberRhythm = rhythm;
+      [...pocket.querySelectorAll(".daiion-ember")].forEach((ember, childIndex) => {
+        const childOffsetIndex = childIndex % profile.childDelays.length;
+        ember.style.setProperty("--ember-delay", `${(delay - profile.childDelays[childOffsetIndex]).toFixed(2)}s`);
+        ember.style.setProperty("--ember-duration", `${(duration + profile.childDurations[childOffsetIndex]).toFixed(2)}s`);
+      });
+    };
+    const authoredPockets = [...emberField.querySelectorAll(".daiion-ember-pocket:not([data-daiion-generated-ember-pocket])")];
+    authoredPockets.forEach((pocket, index) => setEmberTiming(pocket, "baseline", index));
+    const generatedBaselineIndexes = new Set(Array.from({ length: 13 }, (_, index) => index * 6));
+    const generatedSurgeIndexes = new Set();
+    for (let step = 0; generatedSurgeIndexes.size < 26; step += 1) {
+      const index = (step * 17 + 2) % expandedEmberSpecs.length;
+      if (!generatedBaselineIndexes.has(index)) generatedSurgeIndexes.add(index);
+    }
+    const getGeneratedRhythm = (index) => {
+      if (generatedBaselineIndexes.has(index)) return "baseline";
+      if (generatedSurgeIndexes.has(index)) return "surge";
+      return "flare";
+    };
     const fragment = document.createDocumentFragment();
-    expandedEmberSpecs.forEach(([x, y, tier, delay, drift, skew, duration]) => {
+    expandedEmberSpecs.forEach(([x, y, tier, delay, drift, skew, duration], specIndex) => {
       const pocket = document.createElement("span");
       pocket.className = "daiion-ember-pocket";
       pocket.dataset.daiionGeneratedEmberPocket = "true";
+      const rhythm = getGeneratedRhythm(specIndex);
       pocket.dataset.daiionEmberTier = tier;
+      pocket.dataset.daiionEmberRhythm = rhythm;
       pocket.setAttribute("aria-hidden", "true");
       setVars(pocket, {
         ...tiers[tier],
@@ -16626,13 +16663,12 @@ function syncDaiionEnvironmentalCoverage() {
         "--heat-duration-soft": `${(duration + 3.4).toFixed(1)}s`,
         "--heat-delay": `${delay}s`,
       });
-      ["a", "b", "c", "d"].forEach((variant, index) => {
+      ["a", "b", "c", "d"].forEach((variant) => {
         const ember = document.createElement("span");
         ember.className = `daiion-ember daiion-ember--${variant}`;
-        ember.style.setProperty("--ember-delay", `${(delay - [0, 2.15, 4.8, 6.45][index]).toFixed(2)}s`);
-        ember.style.setProperty("--ember-duration", `${(duration + [0.1, -0.7, -1.2, 0.55][index]).toFixed(2)}s`);
         pocket.append(ember);
       });
+      setEmberTiming(pocket, rhythm, authoredPockets.length + specIndex);
       fragment.append(pocket);
     });
     emberField.append(fragment);
