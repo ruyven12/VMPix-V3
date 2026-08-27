@@ -21278,6 +21278,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   --ember-tilt: 9deg;
 }
 
+.daiion-ember-pocket .daiion-ember.daiion-ember {
+  --ember-peak-opacity: 1;
+  --ember-fade-opacity: 1;
+}
+
 @keyframes daiionEmberRise {
   0%,
   14% {

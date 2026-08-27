@@ -16576,7 +16576,7 @@ function syncDaiionEnvironmentalCoverage() {
       medium: { "--heat-width": "clamp(1.65rem, 5.8vw, 3.45rem)", "--heat-height": "clamp(3.4rem, 8.8svh, 5.4rem)" },
       faint: { "--heat-width": "clamp(1.25rem, 4.8vw, 2.8rem)", "--heat-height": "clamp(2.8rem, 7.2svh, 4.35rem)" },
     };
-    const emberSpecs = [
+    const baseEmberSpecs = [
       [7, 84, "foreground", -5.6, -0.24, -1.4, 8.7], [12, 69, "faint", -11.4, 0.18, 1, 10.6], [18, 92, "medium", -3.2, 0.28, 0.7, 9.4],
       [24, 60, "faint", -8.8, -0.16, -1.1, 12.2], [31, 87, "foreground", -13.2, 0.34, 1.2, 10.1], [36, 73, "medium", -6.7, -0.22, -0.7, 8.9],
       [40, 94, "foreground", -9.7, 0.2, 0.9, 11.2], [49, 89, "medium", -1.8, -0.3, -1.3, 9.8], [53, 65, "faint", -12.8, 0.14, 0.8, 12.7],
@@ -16585,8 +16585,31 @@ function syncDaiionEnvironmentalCoverage() {
       [4, 63, "faint", -7.1, 0.1, 0.6, 12.5], [33, 53, "faint", -15.3, -0.18, -1.2, 13.6], [55, 94, "medium", -2.4, 0.22, 1.4, 8.6],
       [75, 82, "foreground", -6.2, -0.28, -1, 9.5], [91, 76, "medium", -9.1, 0.26, 0.8, 10.2], [97, 69, "faint", -13.9, -0.14, -0.6, 12.9],
     ];
+    const tierCycle = ["foreground", "medium", "faint"];
+    const shiftPercent = (value, offset) => ((value + offset + 98) % 98) + 1;
+    const clampPercent = (value, min, max) => Math.min(max, Math.max(min, value));
+    const waveOffsets = [[0, 0, 0, 1, 0], [5, -7, -3.35, 0.96, 1], [-8, 6, -6.7, 1.08, 2]];
+    const expandedEmberSpecs = waveOffsets.flatMap(([xOffset, yOffset, delayOffset, durationScale, tierOffset]) =>
+      baseEmberSpecs.map(([x, y, tier, delay, drift, skew, duration], index) => [
+        shiftPercent(x, xOffset + ((index % 4) - 1.5) * 1.6),
+        clampPercent(y + yOffset + ((index % 5) - 2) * 1.2, 51, 96),
+        tierCycle[(tierCycle.indexOf(tier) + tierOffset) % tierCycle.length],
+        delay + delayOffset - (index % 3) * 0.37,
+        drift * (durationScale > 1 ? 1.08 : 0.92),
+        skew + (tierOffset - 1) * 0.35,
+        duration * durationScale,
+      ])
+    ).concat(baseEmberSpecs.slice(0, 10).map(([x, y, tier, delay, drift, skew, duration], index) => [
+      shiftPercent(x, index % 2 ? 12 : -13),
+      clampPercent(y + (index % 3 === 0 ? -11 : 9), 51, 96),
+      tierCycle[(tierCycle.indexOf(tier) + 1) % tierCycle.length],
+      delay - 9.4 - index * 0.23,
+      drift * -0.74,
+      skew * -0.8,
+      duration + 2.1,
+    ]));
     const fragment = document.createDocumentFragment();
-    emberSpecs.forEach(([x, y, tier, delay, drift, skew, duration]) => {
+    expandedEmberSpecs.forEach(([x, y, tier, delay, drift, skew, duration]) => {
       const pocket = document.createElement("span");
       pocket.className = "daiion-ember-pocket";
       pocket.dataset.daiionGeneratedEmberPocket = "true";
