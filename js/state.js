@@ -2387,8 +2387,16 @@ function isDaiionArchiveLandingPath(pathname = window.location.pathname) {
 }
 const daiionArchiveStatsRowStagger = 80;
 let daiionArchiveCampaignsTotal = null;
+let daiionArchiveCombatantsTotal = null;
+let daiionArchiveArenasTotal = null;
 function getDaiionArchiveCampaignFocusStat() {
   return formatDaiionArchiveStat(daiionArchiveCampaignsTotal) + " Recorded Campaigns";
+}
+function getDaiionArchiveCombatantFocusStat() {
+  return formatDaiionArchiveStat(daiionArchiveCombatantsTotal) + " Documented Combatants";
+}
+function getDaiionArchiveArenaFocusStat() {
+  return formatDaiionArchiveStat(daiionArchiveArenasTotal) + " Mapped Arenas";
 }
 const daiionArchiveFocusBriefings = {
   campaigns: {
@@ -2399,13 +2407,13 @@ const daiionArchiveFocusBriefings = {
   },
   combatants: {
     title: "The Hall of Champions",
-    stat: "290 Documented Combatants",
+    stat: getDaiionArchiveCombatantFocusStat,
     copy: "Explore the performers, allies, legends and more that made Daiion's legacy throughout the years.",
     status: "TARGET LOCKED",
   },
   arenas: {
     title: "The Fields of Conflict",
-    stat: "9 Mapped Arenas",
+    stat: getDaiionArchiveArenaFocusStat,
     copy: "Visit the ancient battlegrounds in which each recorded conflict left its mark.",
     status: "Enter The Halls",
   },
@@ -2693,13 +2701,17 @@ async function initDaiionArchiveStatsPanel(options = {}) {
     const peopleStats = peopleResult.status === "fulfilled" ? peopleResult.value : null;
     const venuesStats = venuesResult.status === "fulfilled" ? venuesResult.value : null;
     const showsTotal = getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]);
+    const venuesTotal = getDaiionFiniteStat(venuesStats, ["total_venues", "totalVenues", "venuesTotal", "totals.venuesTotal"]);
+    const peopleTotal = getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]);
     daiionArchiveCampaignsTotal = showsTotal;
+    daiionArchiveArenasTotal = venuesTotal;
+    daiionArchiveCombatantsTotal = peopleTotal;
     resolveDaiionArchiveStatsValues(valueNodes, {
       promotions: getDaiionPromotionTotal(showsStats),
-      venues: getDaiionFiniteStat(venuesStats, ["total_venues", "totalVenues", "venuesTotal", "totals.venuesTotal"]),
+      venues: venuesTotal,
       shows: showsTotal,
       matches: getDaiionFiniteStat(showsStats, ["totals.matchesTotal", "matchesTotal", "totalMatches"]),
-      people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
+      people: peopleTotal,
     }, animationStartedAt);
     syncDaiionDestinationSelection();
   } catch (_error) {
@@ -2707,6 +2719,8 @@ async function initDaiionArchiveStatsPanel(options = {}) {
       return;
     }
     daiionArchiveCampaignsTotal = null;
+    daiionArchiveArenasTotal = null;
+    daiionArchiveCombatantsTotal = null;
     resolveDaiionArchiveStatsValues(valueNodes, {}, animationStartedAt);
     syncDaiionDestinationSelection();
   }
