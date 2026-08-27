@@ -16567,6 +16567,70 @@ function bindDaiionLoreFocusPanelContent() {
   syncDaiionLoreFocusPanel();
 }
 
+function syncDaiionEnvironmentalCoverage() {
+  const emberField = document.querySelector(".daiion-ember-field");
+  const setVars = (node, vars) => Object.entries(vars).forEach(([name, value]) => node.style.setProperty(name, value));
+  if (emberField && !emberField.querySelector("[data-daiion-generated-ember-pocket]")) {
+    const tiers = {
+      foreground: { "--heat-width": "clamp(1.95rem, 6.8vw, 4rem)", "--heat-height": "clamp(4.1rem, 10.8svh, 6.8rem)" },
+      medium: { "--heat-width": "clamp(1.65rem, 5.8vw, 3.45rem)", "--heat-height": "clamp(3.4rem, 8.8svh, 5.4rem)" },
+      faint: { "--heat-width": "clamp(1.25rem, 4.8vw, 2.8rem)", "--heat-height": "clamp(2.8rem, 7.2svh, 4.35rem)" },
+    };
+    const emberSpecs = [
+      [7, 84, "foreground", -5.6, -0.24, -1.4, 8.7], [12, 69, "faint", -11.4, 0.18, 1, 10.6], [18, 92, "medium", -3.2, 0.28, 0.7, 9.4],
+      [24, 60, "faint", -8.8, -0.16, -1.1, 12.2], [31, 87, "foreground", -13.2, 0.34, 1.2, 10.1], [36, 73, "medium", -6.7, -0.22, -0.7, 8.9],
+      [40, 94, "foreground", -9.7, 0.2, 0.9, 11.2], [49, 89, "medium", -1.8, -0.3, -1.3, 9.8], [53, 65, "faint", -12.8, 0.14, 0.8, 12.7],
+      [58, 82, "foreground", -4.4, 0.36, 1.5, 9.1], [68, 72, "medium", -10.3, -0.2, -0.9, 10.8], [73, 91, "medium", -7.6, 0.24, 1.1, 9.7],
+      [79, 57, "faint", -14.6, -0.12, -0.8, 13.1], [88, 64, "faint", -5.1, 0.18, 1.2, 11.9], [94, 87, "foreground", -12.1, -0.32, -1.5, 10.4],
+      [4, 63, "faint", -7.1, 0.1, 0.6, 12.5], [33, 53, "faint", -15.3, -0.18, -1.2, 13.6], [55, 94, "medium", -2.4, 0.22, 1.4, 8.6],
+      [75, 82, "foreground", -6.2, -0.28, -1, 9.5], [91, 76, "medium", -9.1, 0.26, 0.8, 10.2], [97, 69, "faint", -13.9, -0.14, -0.6, 12.9],
+    ];
+    const fragment = document.createDocumentFragment();
+    emberSpecs.forEach(([x, y, tier, delay, drift, skew, duration]) => {
+      const pocket = document.createElement("span");
+      pocket.className = "daiion-ember-pocket";
+      pocket.dataset.daiionGeneratedEmberPocket = "true";
+      pocket.dataset.daiionEmberTier = tier;
+      pocket.setAttribute("aria-hidden", "true");
+      setVars(pocket, {
+        ...tiers[tier],
+        "--ember-pocket-x": `${x}%`,
+        "--ember-pocket-y": `${y}%`,
+        "--heat-drift": `${drift}rem`,
+        "--heat-drift-start": `${(drift * -0.42).toFixed(2)}rem`,
+        "--heat-skew": `${skew}deg`,
+        "--heat-duration": `${duration}s`,
+        "--heat-duration-soft": `${(duration + 3.4).toFixed(1)}s`,
+        "--heat-delay": `${delay}s`,
+      });
+      ["a", "b", "c", "d"].forEach((variant, index) => {
+        const ember = document.createElement("span");
+        ember.className = `daiion-ember daiion-ember--${variant}`;
+        ember.style.setProperty("--ember-delay", `${(delay - [0, 2.15, 4.8, 6.45][index]).toFixed(2)}s`);
+        ember.style.setProperty("--ember-duration", `${(duration + [0.1, -0.7, -1.2, 0.55][index]).toFixed(2)}s`);
+        pocket.append(ember);
+      });
+      fragment.append(pocket);
+    });
+    emberField.append(fragment);
+  }
+
+  const dustGust = document.querySelector(".daiion-dust-gust");
+  if (!dustGust?.parentElement || dustGust.parentElement.querySelector("[data-daiion-generated-dust-gust]")) return;
+  [
+    { "--dust-block-end": "clamp(8.4rem, 15svh, 10.8rem)", "--dust-inline-size": "min(70vw, 35rem)", "--dust-block-size": "clamp(1.8rem, 5.4svh, 3.2rem)", "--dust-duration": "41s", "--dust-delay": "-7.5s", "--dust-y-start": "-0.12rem", "--dust-y-entry": "-0.18rem", "--dust-y-peak": "-0.38rem", "--dust-y-exit": "-0.5rem", "--dust-y-end": "-0.52rem", "--dust-scale-x-peak": "1.1", "--dust-scale-y-peak": "0.76" },
+    { "--dust-block-end": "clamp(3.8rem, 6.8svh, 5.2rem)", "--dust-inline-size": "min(92vw, 48rem)", "--dust-block-size": "clamp(1.5rem, 4.8svh, 3rem)", "--dust-duration": "49s", "--dust-delay": "18s", "--dust-x-start": "-104vw", "--dust-x-entry": "-56vw", "--dust-x-peak": "-2vw", "--dust-x-exit": "64vw", "--dust-x-end": "118vw", "--dust-y-start": "0.45rem", "--dust-y-entry": "0.32rem", "--dust-y-peak": "0.08rem", "--dust-y-exit": "-0.08rem", "--dust-y-end": "-0.12rem" },
+    { "--dust-block-end": "clamp(11.2rem, 20svh, 14rem)", "--dust-inline-size": "min(56vw, 30rem)", "--dust-block-size": "clamp(1.35rem, 3.9svh, 2.55rem)", "--dust-duration": "55s", "--dust-delay": "31s", "--dust-x-start": "-74vw", "--dust-x-entry": "-34vw", "--dust-x-peak": "18vw", "--dust-x-exit": "72vw", "--dust-x-end": "116vw", "--dust-y-start": "-0.34rem", "--dust-y-entry": "-0.28rem", "--dust-y-peak": "-0.5rem", "--dust-y-exit": "-0.68rem", "--dust-y-end": "-0.72rem", "--dust-scale-x-peak": "1.04", "--dust-scale-y-peak": "0.7" },
+  ].forEach((vars) => {
+    const gust = document.createElement(dustGust.tagName.toLowerCase());
+    gust.className = "daiion-dust-gust";
+    gust.dataset.daiionGeneratedDustGust = "true";
+    gust.setAttribute("aria-hidden", "true");
+    setVars(gust, vars);
+    dustGust.parentElement.append(gust);
+  });
+}
+
 function syncDaiionRestingIdentityBlock() {
   const identity = document.querySelector(".daiion-title-reveal");
   if (!identity || identity.dataset.daiionRestingIdentitySynced === "true") return;
@@ -16587,6 +16651,7 @@ function initWrestlingPeopleModule() {
   renderWrestlingVenuesIndex({ skipDataRequest: true });
   initWrestlingShowsArchive();
   applyStaticWrestlingRelationshipHooks();
+  syncDaiionEnvironmentalCoverage();
   syncDaiionRestingIdentityBlock();
   syncDaiionLoreDestinationOption();
   bindWrestlingLandingHallOfChampionsCta();
