@@ -5524,7 +5524,7 @@ button {
   --engine-title-exclusion-end: 76%;
   --engine-title-exclusion-feather: 1.4%;
   visibility: visible !important;
-  opacity: 0.52 !important;
+  opacity: 0.72 !important;
   animation: wrestling2TeslaArcIdleOverlay 9.8s cubic-bezier(0.42, 0, 0.24, 1) infinite !important;
   transition: none;
   -webkit-mask-image:
@@ -5588,6 +5588,7 @@ button {
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-hybrid {
   display: block;
+  filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.34));
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture {
@@ -5694,58 +5695,58 @@ button {
 }
 
 @keyframes daiionEngineHybridFracture {
-  0%, 100% { opacity: 0.72; stroke-dashoffset: 0; }
-  17% { opacity: 1; stroke-dashoffset: -5; }
-  31% { opacity: 0.68; stroke-dashoffset: -11; }
-  46% { opacity: 0.96; stroke-dashoffset: -17; }
-  68% { opacity: 0.74; stroke-dashoffset: -23; }
-  83% { opacity: 1; stroke-dashoffset: -31; }
+  0%, 100% { opacity: 0.72; stroke-width: 1.28; stroke-dashoffset: 0; }
+  17% { opacity: 1; stroke-width: 1.42; stroke-dashoffset: -5; }
+  31% { opacity: 0.68; stroke-width: 1.24; stroke-dashoffset: -11; }
+  46% { opacity: 0.96; stroke-width: 1.38; stroke-dashoffset: -17; }
+  68% { opacity: 0.74; stroke-width: 1.28; stroke-dashoffset: -23; }
+  83% { opacity: 1; stroke-width: 1.44; stroke-dashoffset: -31; }
 }
 
 @keyframes daiionEngineHybridFractureLow {
-  0%, 100% { opacity: 0.6; stroke-dashoffset: 0; }
-  24% { opacity: 0.86; stroke-dashoffset: -7; }
-  41% { opacity: 0.56; stroke-dashoffset: -13; }
-  63% { opacity: 0.82; stroke-dashoffset: -21; }
-  79% { opacity: 0.62; stroke-dashoffset: -26; }
+  0%, 100% { opacity: 0.6; stroke-width: 1.18; stroke-dashoffset: 0; }
+  24% { opacity: 0.88; stroke-width: 1.3; stroke-dashoffset: -7; }
+  41% { opacity: 0.56; stroke-width: 1.16; stroke-dashoffset: -13; }
+  63% { opacity: 0.84; stroke-width: 1.28; stroke-dashoffset: -21; }
+  79% { opacity: 0.62; stroke-width: 1.2; stroke-dashoffset: -26; }
 }
 
 @keyframes daiionEngineHybridFractureCrown {
-  0%, 100% { opacity: 0.76; stroke-dashoffset: 0; }
-  14% { opacity: 1; stroke-dashoffset: -6; }
-  37% { opacity: 0.7; stroke-dashoffset: -14; }
-  58% { opacity: 1; stroke-dashoffset: -22; }
-  76% { opacity: 0.78; stroke-dashoffset: -32; }
+  0%, 100% { opacity: 0.76; stroke-width: 1.52; stroke-dashoffset: 0; }
+  14% { opacity: 1; stroke-width: 1.68; stroke-dashoffset: -6; }
+  37% { opacity: 0.7; stroke-width: 1.44; stroke-dashoffset: -14; }
+  58% { opacity: 1; stroke-width: 1.66; stroke-dashoffset: -22; }
+  76% { opacity: 0.78; stroke-width: 1.5; stroke-dashoffset: -32; }
 }
 
 @keyframes daiionEngineHybridPulsePrimary {
-  0% { stroke-dashoffset: 0; opacity: 0.92; }
-  34% { opacity: 1; }
-  68% { opacity: 0.9; }
-  100% { stroke-dashoffset: -66; opacity: 0.96; }
+  0% { stroke-dashoffset: 0; opacity: 0.94; stroke-width: 1.96; }
+  34% { opacity: 1; stroke-width: 2.16; }
+  68% { opacity: 0.92; stroke-width: 2.02; }
+  100% { stroke-dashoffset: -66; opacity: 0.98; stroke-width: 2.1; }
 }
 
 @keyframes daiionEngineHybridPulseSecondary {
-  0% { stroke-dashoffset: 0; opacity: 0.62; }
-  42% { opacity: 0.84; }
-  100% { stroke-dashoffset: 54; opacity: 0.7; }
+  0% { stroke-dashoffset: 0; opacity: 0.62; stroke-width: 1.24; }
+  42% { opacity: 0.84; stroke-width: 1.36; }
+  100% { stroke-dashoffset: 54; opacity: 0.7; stroke-width: 1.28; }
 }
 
 @keyframes daiionEngineHybridNodeIgnition {
   0%, 22%, 100% { opacity: 0.66; transform: scale(1); }
-  29% { opacity: 1; transform: scale(1.6); }
-  36% { opacity: 0.84; transform: scale(1.12); }
+  29%, 34% { opacity: 1; transform: scale(1.6); }
+  41% { opacity: 0.84; transform: scale(1.12); }
   64% { opacity: 0.72; transform: scale(1); }
-  72% { opacity: 0.98; transform: scale(1.34); }
-  80% { opacity: 0.7; transform: scale(1); }
+  72%, 76% { opacity: 0.98; transform: scale(1.34); }
+  84% { opacity: 0.7; transform: scale(1); }
 }
 
 @keyframes daiionEngineHybridNodeIgnitionAlt {
   0%, 100% { opacity: 0.68; transform: scale(1); }
-  18% { opacity: 0.9; transform: scale(1.22); }
-  24% { opacity: 0.7; transform: scale(1); }
-  57% { opacity: 1; transform: scale(1.52); }
-  66% { opacity: 0.78; transform: scale(1.08); }
+  18%, 22% { opacity: 0.9; transform: scale(1.22); }
+  28% { opacity: 0.7; transform: scale(1); }
+  57%, 62% { opacity: 1; transform: scale(1.52); }
+  70% { opacity: 0.78; transform: scale(1.08); }
 }
 @keyframes wrestling2TeslaArcIdleOverlay {
   0%,
@@ -5874,7 +5875,7 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
     visibility: visible !important;
-    opacity: 0.44 !important;
+    opacity: 0.56 !important;
     animation: none !important;
   }
 
@@ -5901,6 +5902,7 @@ button {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-hybrid,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse-node {
