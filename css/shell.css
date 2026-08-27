@@ -5578,31 +5578,38 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture {
-  opacity: 0.42;
+  stroke: rgb(var(--engine-accent-soft) / 0.94);
+  stroke-width: 1.28;
+  opacity: 0.92;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--lower-left,
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--lower-right {
-  opacity: 0.3;
+  opacity: 0.76;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--crown {
-  stroke: rgb(var(--engine-accent-glow) / 0.48);
-  stroke-width: 0.86;
-  opacity: 0.46;
+  stroke: rgb(var(--engine-accent-glow) / 0.98);
+  stroke-width: 1.52;
+  opacity: 0.98;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse {
-  opacity: 0.56;
+  stroke: rgb(var(--engine-accent-glow) / 0.98);
+  stroke-width: 1.92;
+  opacity: 0.94;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse--secondary {
-  stroke-width: 0.78;
-  opacity: 0.34;
+  stroke-width: 1.24;
+  opacity: 0.72;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse-node {
-  opacity: 0.66;
+  fill: rgb(var(--engine-accent-glow) / 0.98);
+  stroke: rgb(var(--engine-accent-soft) / 0.82);
+  stroke-width: 0.34;
+  opacity: 1;
 }
 @keyframes wrestling2TeslaArcIdleOverlay {
   0%,
