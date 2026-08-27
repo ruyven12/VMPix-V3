@@ -1535,6 +1535,66 @@ button {
   pointer-events: none;
   opacity: 0;
 }
+
+.engine-emitter-energy {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: -12%;
+  inset-inline-start: -12%;
+  display: none;
+  inline-size: 124%;
+  block-size: 124%;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: opacity, filter;
+}
+
+.engine-emitter-energy-ring,
+.engine-emitter-energy-discharge {
+  fill: none;
+  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.engine-emitter-energy-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.engine-emitter-energy-ring--outer {
+  stroke: rgb(var(--engine-accent-glow) / 0.86);
+  stroke-width: 1.28;
+  stroke-dasharray: 16 9 7 13 5 50;
+  opacity: 0.78;
+}
+
+.engine-emitter-energy-ring--middle {
+  stroke: rgb(var(--engine-accent-soft) / 0.78);
+  stroke-width: 0.96;
+  stroke-dasharray: 10 10 5 17 8 50;
+  opacity: 0.68;
+}
+
+.engine-emitter-energy-ring--feed {
+  stroke: rgb(var(--engine-accent-glow) / 0.94);
+  stroke-width: 1.12;
+  stroke-dasharray: 12 18 8 62;
+  opacity: 0.74;
+}
+
+.engine-emitter-energy-discharge {
+  stroke: rgb(var(--engine-accent-glow) / 0.92);
+  stroke-width: 1.04;
+  stroke-dasharray: 12 88;
+  stroke-dashoffset: 12;
+  opacity: 0;
+}
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-overlay {
   opacity: 1;
 }
@@ -5686,6 +5746,102 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse-node--far {
   animation: daiionEngineHybridNodeIgnitionAlt 6.8s cubic-bezier(0.4, 0, 0.2, 1) -5.1s infinite;
 }
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy {
+  display: block;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-glow) / 0.34));
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--left .engine-emitter-energy-ring--outer {
+  transform: rotate(-14deg);
+  --engine-emitter-ring-offset: 0;
+  animation: daiionEmitterRingClockwise 7.2s linear -1.3s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--left .engine-emitter-energy-ring--middle {
+  transform: rotate(21deg);
+  --engine-emitter-ring-offset: -18;
+  animation: daiionEmitterRingCounter 9.6s linear -4.4s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--left .engine-emitter-energy-ring--feed {
+  transform: rotate(4deg);
+  --engine-emitter-ring-offset: -4;
+  animation: daiionEmitterRingClockwise 5.8s linear -2.1s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--right .engine-emitter-energy-ring--outer {
+  transform: rotate(16deg);
+  --engine-emitter-ring-offset: -50;
+  animation: daiionEmitterRingCounter 8.1s linear -3.2s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--right .engine-emitter-energy-ring--middle {
+  transform: rotate(-24deg);
+  --engine-emitter-ring-offset: -36;
+  animation: daiionEmitterRingClockwise 10.4s linear -1.7s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--right .engine-emitter-energy-ring--feed {
+  transform: rotate(-7deg);
+  --engine-emitter-ring-offset: -48;
+  animation: daiionEmitterRingCounter 6.3s linear -4.9s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--left-crown {
+  animation: daiionEmitterDischarge 4.6s steps(1, end) -0.8s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--left-feed {
+  animation: daiionEmitterDischargeFeed 3.9s steps(1, end) -2.2s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--left-lower {
+  animation: daiionEmitterDischargeAlt 5.7s steps(1, end) -4.5s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--right-crown {
+  animation: daiionEmitterDischargeAlt 5.2s steps(1, end) -1.5s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--right-feed {
+  animation: daiionEmitterDischargeFeed 4.3s steps(1, end) -3.3s infinite;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--right-lower {
+  animation: daiionEmitterDischarge 6.1s steps(1, end) -0.4s infinite;
+}
+
+@keyframes daiionEmitterRingClockwise {
+  0% { opacity: 0.74; stroke-dashoffset: var(--engine-emitter-ring-offset, 0); }
+  42% { opacity: 0.96; }
+  100% { opacity: 0.78; stroke-dashoffset: -100; }
+}
+
+@keyframes daiionEmitterRingCounter {
+  0% { opacity: 0.68; stroke-dashoffset: var(--engine-emitter-ring-offset, 0); }
+  48% { opacity: 0.9; }
+  100% { opacity: 0.72; stroke-dashoffset: 100; }
+}
+
+@keyframes daiionEmitterDischarge {
+  0%, 58%, 64%, 100% { opacity: 0; stroke-width: 1.04; stroke-dashoffset: 12; }
+  59% { opacity: 0.82; stroke-width: 1.5; stroke-dashoffset: 0; }
+  62% { opacity: 0.34; stroke-width: 1.14; stroke-dashoffset: -10; }
+}
+
+@keyframes daiionEmitterDischargeAlt {
+  0%, 33%, 39%, 100% { opacity: 0; stroke-width: 0.98; stroke-dashoffset: 12; }
+  34% { opacity: 0.68; stroke-width: 1.36; stroke-dashoffset: 0; }
+  37% { opacity: 0.26; stroke-width: 1.08; stroke-dashoffset: -8; }
+}
+
+@keyframes daiionEmitterDischargeFeed {
+  0%, 72%, 79%, 100% { opacity: 0; stroke-width: 1.08; stroke-dashoffset: 14; }
+  73% { opacity: 0.9; stroke-width: 1.62; stroke-dashoffset: 0; }
+  77% { opacity: 0.38; stroke-width: 1.18; stroke-dashoffset: -11; }
+}
 @media (min-width: 64rem) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
     --engine-title-exclusion-start: 36%;
@@ -5873,6 +6029,22 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-ring,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge {
+    animation: none !important;
+    filter: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy {
+    opacity: 0.74;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge {
+    opacity: 0.24;
+    stroke-dashoffset: 0;
+  }
+
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
     visibility: visible !important;
     opacity: 0.56 !important;
