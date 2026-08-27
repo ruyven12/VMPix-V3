@@ -1502,6 +1502,39 @@ button {
   animation-name: engineLightningBranchPulseAlt;
 }
 
+
+.engine-lightning-hybrid {
+  display: none;
+}
+
+.engine-lightning-fracture,
+.engine-lightning-pulse {
+  fill: none;
+  pointer-events: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.engine-lightning-fracture {
+  stroke: rgb(var(--engine-accent-soft) / 0.5);
+  stroke-width: 0.72;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  opacity: 0;
+}
+
+.engine-lightning-pulse {
+  stroke: rgb(var(--engine-accent-glow) / 0.58);
+  stroke-width: 1.12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.engine-lightning-pulse-node {
+  fill: rgb(var(--engine-accent-glow) / 0.72);
+  pointer-events: none;
+  opacity: 0;
+}
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-overlay {
   opacity: 1;
 }
@@ -5540,6 +5573,37 @@ button {
   animation-duration: 10.9s !important;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-hybrid {
+  display: block;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture {
+  opacity: 0.42;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--lower-left,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--lower-right {
+  opacity: 0.3;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-fracture--crown {
+  stroke: rgb(var(--engine-accent-glow) / 0.48);
+  stroke-width: 0.86;
+  opacity: 0.46;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse {
+  opacity: 0.56;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse--secondary {
+  stroke-width: 0.78;
+  opacity: 0.34;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-pulse-node {
+  opacity: 0.66;
+}
 @keyframes wrestling2TeslaArcIdleOverlay {
   0%,
   18%,
