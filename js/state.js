@@ -2386,10 +2386,14 @@ function isDaiionArchiveLandingPath(pathname = window.location.pathname) {
   return normalizedPath === routePaths.wrestling;
 }
 const daiionArchiveStatsRowStagger = 80;
+let daiionArchiveCampaignsTotal = null;
+function getDaiionArchiveCampaignFocusStat() {
+  return formatDaiionArchiveStat(daiionArchiveCampaignsTotal) + " Recorded Campaigns";
+}
 const daiionArchiveFocusBriefings = {
   campaigns: {
     title: "The Hall of Crusades",
-    stat: "43 Recorded Campaigns",
+    stat: getDaiionArchiveCampaignFocusStat,
     copy: "Journey through a collection of the campaigns that transpired throughout time.",
     status: "Enter the Halls",
   },
@@ -2460,7 +2464,7 @@ function syncDaiionDestinationSelection() {
 
     if (focusBriefing) {
       titleNode.textContent = focusBriefing.title || "ARCHIVE FOCUS";
-      statNode.textContent = focusBriefing.stat;
+      statNode.textContent = typeof focusBriefing.stat === "function" ? focusBriefing.stat() : focusBriefing.stat;
       copyNode.textContent = focusBriefing.copy;
       statusNode.textContent = focusBriefing.status;
       focusPanel.classList.add("is-active");
@@ -2688,18 +2692,23 @@ async function initDaiionArchiveStatsPanel(options = {}) {
     const showsStats = showsResult.status === "fulfilled" ? showsResult.value : null;
     const peopleStats = peopleResult.status === "fulfilled" ? peopleResult.value : null;
     const venuesStats = venuesResult.status === "fulfilled" ? venuesResult.value : null;
+    const showsTotal = getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]);
+    daiionArchiveCampaignsTotal = showsTotal;
     resolveDaiionArchiveStatsValues(valueNodes, {
       promotions: getDaiionPromotionTotal(showsStats),
       venues: getDaiionFiniteStat(venuesStats, ["total_venues", "totalVenues", "venuesTotal", "totals.venuesTotal"]),
-      shows: getDaiionFiniteStat(showsStats, ["totals.showsTotal", "showsTotal", "totalShows"]),
+      shows: showsTotal,
       matches: getDaiionFiniteStat(showsStats, ["totals.matchesTotal", "matchesTotal", "totalMatches"]),
       people: getDaiionFiniteStat(peopleStats, ["totalPeople", "peopleTotal", "totals.peopleTotal"]),
     }, animationStartedAt);
+    syncDaiionDestinationSelection();
   } catch (_error) {
     if (requestId !== daiionArchiveStatsRequestId || !isDaiionArchiveLandingPath()) {
       return;
     }
+    daiionArchiveCampaignsTotal = null;
     resolveDaiionArchiveStatsValues(valueNodes, {}, animationStartedAt);
+    syncDaiionDestinationSelection();
   }
 }
 
