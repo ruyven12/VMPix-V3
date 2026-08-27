@@ -20197,6 +20197,20 @@ button.hall-crusades-archive-crystal:focus-visible {
   border-block: 1px solid rgba(255, 90, 60, 0.15);
 }
 
+.daiion-archive-focus-panel[data-daiion-selected-target="lore"] .daiion-archive-focus-panel__stat {
+  display: none;
+}
+
+.daiion-archive-focus-panel__copy-intro,
+.daiion-archive-focus-panel__copy-lore {
+  display: block;
+}
+
+.daiion-archive-focus-panel__copy-intro {
+  margin-block-end: 0.42rem;
+  color: rgba(255, 231, 208, 0.88);
+}
+
 .daiion-archive-focus-panel__status {
   color: rgba(255, 90, 60, 0.9);
   font-size: clamp(0.56rem, 0.68vw, 0.68rem);

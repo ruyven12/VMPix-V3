@@ -16534,6 +16534,39 @@ function syncDaiionLoreDestinationOption() {
   if (typeof initDaiionDestinationPanel === "function") initDaiionDestinationPanel();
 }
 
+function syncDaiionLoreFocusPanel() {
+  const panel = document.querySelector("[data-daiion-archive-focus]");
+  if (!panel || panel.dataset.daiionSelectedTarget !== "lore") return;
+  const title = panel.querySelector(".daiion-archive-focus-panel__title");
+  const stat = panel.querySelector("[data-daiion-archive-focus-stat]");
+  const copy = panel.querySelector("[data-daiion-archive-focus-copy]");
+  const status = panel.querySelector("[data-daiion-archive-focus-status]");
+  if (title) title.textContent = "LORE OF DAÏION";
+  if (stat) stat.textContent = "";
+  if (copy) {
+    copy.replaceChildren(
+      Object.assign(document.createElement("span"), {
+        className: "daiion-archive-focus-panel__copy-intro",
+        textContent: "Explore the history and lore of Daïion",
+      }),
+      Object.assign(document.createElement("span"), {
+        className: "daiion-archive-focus-panel__copy-lore",
+        textContent: "Once a beacon of life and prosperity, Daïion was consumed by the power that built it. Discover the Draegin, Patient Zero, the Syraxi, and the events that transformed a thriving world into The Battleground.",
+      })
+    );
+  }
+  if (status) status.textContent = "TARGET LOCKED";
+}
+
+function bindDaiionLoreFocusPanelContent() {
+  if (document.body?.dataset.daiionLoreFocusPanelContentBound === "true") return;
+  document.body.dataset.daiionLoreFocusPanelContentBound = "true";
+  document.addEventListener("click", (event) => {
+    if (event.target.closest("[data-daiion-destination-target]")) syncDaiionLoreFocusPanel();
+  });
+  syncDaiionLoreFocusPanel();
+}
+
 function syncDaiionRestingIdentityBlock() {
   const identity = document.querySelector(".daiion-title-reveal");
   if (!identity || identity.dataset.daiionRestingIdentitySynced === "true") return;
@@ -16557,4 +16590,5 @@ function initWrestlingPeopleModule() {
   syncDaiionRestingIdentityBlock();
   syncDaiionLoreDestinationOption();
   bindWrestlingLandingHallOfChampionsCta();
+  bindDaiionLoreFocusPanelContent();
 }
