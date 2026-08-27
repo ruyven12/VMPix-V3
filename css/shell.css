@@ -5758,7 +5758,7 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--left .engine-emitter-energy-ring--outer {
   --engine-emitter-ring-angle: -14deg;
   --engine-emitter-ring-offset: 0;
-  animation: daiionEmitterRingClockwise 7.2s linear -1.3s infinite;
+  animation: daiionEmitterChargeClockwise 7.2s linear -1.3s infinite;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--left .engine-emitter-energy-ring--middle {
@@ -5775,7 +5775,7 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--right .engine-emitter-energy-ring--outer {
   --engine-emitter-ring-angle: 16deg;
   --engine-emitter-ring-offset: -50;
-  animation: daiionEmitterRingCounter 8.1s linear -3.2s infinite;
+  animation: daiionEmitterChargeCounter 8.1s linear -3.2s infinite;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy--right .engine-emitter-energy-ring--middle {
@@ -5794,7 +5794,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--left-feed {
-  animation: daiionEmitterDischargeFlash 3.9s steps(1, end) -2.2s infinite;
+  animation: daiionEmitterInwardDischargeSnap 4.9s steps(1, end) -1.1s infinite;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--left-lower {
@@ -5806,7 +5806,7 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--right-feed {
-  animation: daiionEmitterDischargeFlash 4.3s steps(1, end) -3.3s infinite;
+  animation: daiionEmitterInwardDischargeSnap 5.4s steps(1, end) -3.6s infinite;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-emitter-energy-discharge--right-lower {
@@ -5825,11 +5825,33 @@ button {
   100% { opacity: 0.72; transform: rotate(calc(var(--engine-emitter-ring-angle, 0deg) - 360deg)); }
 }
 
+@keyframes daiionEmitterChargeClockwise {
+  0% { opacity: 0.74; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; transform: rotate(var(--engine-emitter-ring-angle, 0deg)); }
+  50% { opacity: 0.86; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; }
+  58% { opacity: 1; stroke-width: 1.68; stroke-dasharray: 24 7 10 9 7 43; }
+  63% { opacity: 0.92; stroke-width: 1.44; stroke-dasharray: 19 8 8 11 6 48; }
+  100% { opacity: 0.78; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; transform: rotate(calc(var(--engine-emitter-ring-angle, 0deg) + 360deg)); }
+}
+
+@keyframes daiionEmitterChargeCounter {
+  0% { opacity: 0.68; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; transform: rotate(var(--engine-emitter-ring-angle, 0deg)); }
+  42% { opacity: 0.82; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; }
+  52% { opacity: 1; stroke-width: 1.64; stroke-dasharray: 22 8 10 9 7 44; }
+  57% { opacity: 0.9; stroke-width: 1.42; stroke-dasharray: 18 9 8 11 6 48; }
+  100% { opacity: 0.72; stroke-width: 1.34; stroke-dasharray: 16 9 7 13 5 50; transform: rotate(calc(var(--engine-emitter-ring-angle, 0deg) - 360deg)); }
+}
 @keyframes daiionEmitterDischargeFlash {
   0%, 58%, 65%, 100% { opacity: 0.12; }
   59% { opacity: 0.86; }
   62% { opacity: 0.34; }
 }
+
+@keyframes daiionEmitterInwardDischargeSnap {
+  0%, 54%, 62%, 100% { opacity: 0.12; stroke-width: 1.04; stroke-dashoffset: 0; }
+  55% { opacity: 1; stroke-width: 1.72; stroke-dashoffset: -9; }
+  58% { opacity: 0.42; stroke-width: 1.22; stroke-dashoffset: -16; }
+}
+
 @media (min-width: 64rem) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
     --engine-title-exclusion-start: 36%;
