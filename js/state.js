@@ -2434,6 +2434,7 @@ let daiionDestinationSelectedTarget = null;
 let daiionCrusadesConvergenceInProgress = false;
 let daiionCrusadesImpactTimer = 0;
 let daiionCrusadesWarpTimer = 0;
+let daiionCrusadesApertureTimer = 0;
 
 function resetDaiionCrusadesConvergencePrototype() {
   const shell = document.querySelector(".site-shell");
@@ -2441,6 +2442,8 @@ function resetDaiionCrusadesConvergencePrototype() {
   daiionCrusadesImpactTimer = 0;
   window.clearTimeout(daiionCrusadesWarpTimer);
   daiionCrusadesWarpTimer = 0;
+  window.clearTimeout(daiionCrusadesApertureTimer);
+  daiionCrusadesApertureTimer = 0;
   daiionCrusadesConvergenceInProgress = false;
 
   document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
@@ -2452,7 +2455,7 @@ function resetDaiionCrusadesConvergencePrototype() {
     return;
   }
 
-  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping");
+  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping", "is-daiion-crusades-aperture-opening");
   shell.style.removeProperty("--daiion-crusades-left-converge-x");
   shell.style.removeProperty("--daiion-crusades-left-converge-y");
   shell.style.removeProperty("--daiion-crusades-right-converge-x");
@@ -2500,6 +2503,7 @@ function startDaiionCrusadesConvergencePrototype() {
 
   window.clearTimeout(daiionCrusadesImpactTimer);
   window.clearTimeout(daiionCrusadesWarpTimer);
+  window.clearTimeout(daiionCrusadesApertureTimer);
   daiionCrusadesImpactTimer = window.setTimeout(() => {
     if (!daiionCrusadesConvergenceInProgress || shouldReduceMotion) {
       daiionCrusadesImpactTimer = 0;
@@ -2518,6 +2522,15 @@ function startDaiionCrusadesConvergencePrototype() {
     shell.classList.add("is-daiion-crusades-warping");
     daiionCrusadesWarpTimer = 0;
   }, shouldReduceMotion ? 220 : 1570);
+  daiionCrusadesApertureTimer = window.setTimeout(() => {
+    if (!daiionCrusadesConvergenceInProgress) {
+      daiionCrusadesApertureTimer = 0;
+      return;
+    }
+
+    shell.classList.add("is-daiion-crusades-aperture-opening");
+    daiionCrusadesApertureTimer = 0;
+  }, shouldReduceMotion ? 420 : 2640);
 }
 
 

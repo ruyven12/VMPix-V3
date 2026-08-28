@@ -6114,6 +6114,36 @@ button {
   transition: opacity 180ms ease-out;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer {
+  visibility: visible;
+  opacity: 1;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__shockwave {
+  z-index: 3;
+  opacity: 1;
+  border: 0.06rem solid rgba(255, 248, 236, 0.88);
+  border-radius: 50%;
+  background: #000;
+  box-shadow:
+    0 0 0 0.1rem rgb(var(--engine-accent-glow) / 0.62),
+    0 0 0.2rem rgb(var(--engine-accent) / 0.44);
+  clip-path: none;
+  animation: daiionCrusadesApertureOpen 420ms cubic-bezier(0.12, 0.84, 0.12, 1) forwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--primary {
+  animation: daiionCrusadesAperturePrimary 420ms cubic-bezier(0.16, 0.78, 0.12, 1) forwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--secondary {
+  animation: daiionCrusadesApertureSecondary 390ms cubic-bezier(0.16, 0.72, 0.12, 1) 30ms forwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--fractures {
+  animation: daiionCrusadesApertureFractures 380ms cubic-bezier(0.18, 0.68, 0.12, 1) 40ms forwards;
+}
+
 @keyframes daiionCrusadesWarpCover {
   0% { opacity: 0; }
   12% { opacity: 0.18; }
@@ -6156,6 +6186,35 @@ button {
   100% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
 }
 
+@keyframes daiionCrusadesApertureOpen {
+  0% { opacity: 0.96; transform: translate3d(-50%, -50%, 0) scale3d(0.06, 0.06, 1); }
+  19% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.05, 0.05, 1); }
+  52% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1); }
+  81% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1); }
+  100% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.72, 1.72, 1); }
+}
+
+@keyframes daiionCrusadesAperturePrimary {
+  0% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.36, 1.36, 1) rotate(-14deg); }
+  19% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.28, 1.28, 1) rotate(-12deg); }
+  64% { opacity: 0.66; transform: translate3d(-50%, -50%, 0) scale3d(1.52, 1.52, 1) rotate(-16deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.68, 1.68, 1) rotate(-18deg); }
+}
+
+@keyframes daiionCrusadesApertureSecondary {
+  0% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(15deg); }
+  22% { opacity: 0.78; transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1) rotate(13deg); }
+  68% { opacity: 0.46; transform: translate3d(-50%, -50%, 0) scale3d(1.44, 1.44, 1) rotate(18deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.58, 1.58, 1) rotate(20deg); }
+}
+
+@keyframes daiionCrusadesApertureFractures {
+  0% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
+  21% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1) rotate(-8deg); }
+  72% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(-14deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.64, 1.64, 1) rotate(-16deg); }
+}
+
 @keyframes daiionCrusadesReducedWarpCover {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -6188,6 +6247,17 @@ button {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__shockwave,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__cover {
+    background: #000;
+    opacity: 1;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__shockwave,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks {
     animation: none !important;
     opacity: 0;
   }
