@@ -2433,11 +2433,14 @@ let daiionArchiveStatsRequestId = 0;
 let daiionDestinationSelectedTarget = null;
 let daiionCrusadesConvergenceInProgress = false;
 let daiionCrusadesImpactTimer = 0;
+let daiionCrusadesWarpTimer = 0;
 
 function resetDaiionCrusadesConvergencePrototype() {
   const shell = document.querySelector(".site-shell");
   window.clearTimeout(daiionCrusadesImpactTimer);
   daiionCrusadesImpactTimer = 0;
+  window.clearTimeout(daiionCrusadesWarpTimer);
+  daiionCrusadesWarpTimer = 0;
   daiionCrusadesConvergenceInProgress = false;
 
   document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
@@ -2449,11 +2452,13 @@ function resetDaiionCrusadesConvergencePrototype() {
     return;
   }
 
-  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting");
+  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping");
   shell.style.removeProperty("--daiion-crusades-left-converge-x");
   shell.style.removeProperty("--daiion-crusades-left-converge-y");
   shell.style.removeProperty("--daiion-crusades-right-converge-x");
   shell.style.removeProperty("--daiion-crusades-right-converge-y");
+  shell.style.removeProperty("--daiion-crusades-impact-x");
+  shell.style.removeProperty("--daiion-crusades-impact-y");
 }
 
 function startDaiionCrusadesConvergencePrototype() {
@@ -2474,6 +2479,8 @@ function startDaiionCrusadesConvergencePrototype() {
   const rightRect = rightEmitter.getBoundingClientRect();
   const targetX = engineRect.left + engineRect.width / 2;
   const targetY = engineRect.top + engineRect.height / 2;
+  shell.style.setProperty("--daiion-crusades-impact-x", `${targetX}px`);
+  shell.style.setProperty("--daiion-crusades-impact-y", `${targetY}px`);
   const setEmitterOffset = (side, rect) => {
     shell.style.setProperty(`--daiion-crusades-${side}-converge-x`, `${targetX - (rect.left + rect.width / 2)}px`);
     shell.style.setProperty(`--daiion-crusades-${side}-converge-y`, `${targetY - (rect.top + rect.height / 2)}px`);
@@ -2489,9 +2496,11 @@ function startDaiionCrusadesConvergencePrototype() {
     control.setAttribute("aria-disabled", "true");
   });
 
+  const shouldReduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   window.clearTimeout(daiionCrusadesImpactTimer);
+  window.clearTimeout(daiionCrusadesWarpTimer);
   daiionCrusadesImpactTimer = window.setTimeout(() => {
-    const shouldReduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!daiionCrusadesConvergenceInProgress || shouldReduceMotion) {
       daiionCrusadesImpactTimer = 0;
       return;
@@ -2500,6 +2509,15 @@ function startDaiionCrusadesConvergencePrototype() {
     shell.classList.add("is-daiion-crusades-impacting");
     daiionCrusadesImpactTimer = 0;
   }, 1150);
+  daiionCrusadesWarpTimer = window.setTimeout(() => {
+    if (!daiionCrusadesConvergenceInProgress) {
+      daiionCrusadesWarpTimer = 0;
+      return;
+    }
+
+    shell.classList.add("is-daiion-crusades-warping");
+    daiionCrusadesWarpTimer = 0;
+  }, shouldReduceMotion ? 220 : 1570);
 }
 
 
