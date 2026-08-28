@@ -16690,6 +16690,45 @@ function syncDaiionEnvironmentalCoverage() {
   });
 }
 
+function ensureDaiionCrusadesInterfaceInsignia() {
+  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-daiion-crusades-interface-insignia]")) return;
+  const insignia = document.createElement("span");
+  insignia.className = "hall-crusades-archive-insignia";
+  insignia.dataset.daiionCrusadesInterfaceInsignia = "true";
+  insignia.setAttribute("aria-hidden", "true");
+  const crystals = wrestlingShowsShell.querySelector(".hall-crusades-archive-crystals");
+  if (crystals) wrestlingShowsShell.insertBefore(insignia, crystals);
+  else wrestlingShowsShell.append(insignia);
+}
+
+function preloadDaiionCrusadesInterfaceData() {
+  if (wrestlingShowsDataState === "live" || wrestlingShowsRequest || wrestlingShowsDataRequested) return;
+  requestWrestlingShowsData();
+}
+
+function prepareDaiionCrusadesInterfacePreview() {
+  if (!wrestlingShowsShell) return;
+  ensureDaiionCrusadesInterfaceInsignia();
+  const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
+  const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");
+  if (title) {
+    title.textContent = "THE CAMPAIGN ARCHIVE";
+  }
+  if (subtitle) {
+    subtitle.textContent = "Every recorded event. Every battle preserved.";
+  }
+  if (wrestlingShowsDataState !== "live") {
+    renderHallCrusadesArchiveStats([]);
+    return;
+  }
+  const rows = getHallCrusadesPosterSourceRows();
+  renderHallCrusadesArchiveStats(rows);
+  syncHallCrusadesYearControls();
+  syncHallCrusadesBannerControls();
+  syncHallCrusadesFieldControls();
+  syncHallCrusadesSearchControls();
+}
+
 function syncDaiionRestingIdentityBlock() {
   const identity = document.querySelector(".daiion-title-reveal");
   if (!identity || identity.dataset.daiionRestingIdentitySynced === "true") return;
