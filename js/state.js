@@ -2432,9 +2432,12 @@ const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings
 let daiionArchiveStatsRequestId = 0;
 let daiionDestinationSelectedTarget = null;
 let daiionCrusadesConvergenceInProgress = false;
+let daiionCrusadesImpactTimer = 0;
 
 function resetDaiionCrusadesConvergencePrototype() {
   const shell = document.querySelector(".site-shell");
+  window.clearTimeout(daiionCrusadesImpactTimer);
+  daiionCrusadesImpactTimer = 0;
   daiionCrusadesConvergenceInProgress = false;
 
   document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
@@ -2446,7 +2449,7 @@ function resetDaiionCrusadesConvergencePrototype() {
     return;
   }
 
-  shell.classList.remove("is-daiion-crusades-converging");
+  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting");
   shell.style.removeProperty("--daiion-crusades-left-converge-x");
   shell.style.removeProperty("--daiion-crusades-left-converge-y");
   shell.style.removeProperty("--daiion-crusades-right-converge-x");
@@ -2485,6 +2488,18 @@ function startDaiionCrusadesConvergencePrototype() {
   document.querySelectorAll("[data-daiion-destination-target]").forEach((control) => {
     control.setAttribute("aria-disabled", "true");
   });
+
+  window.clearTimeout(daiionCrusadesImpactTimer);
+  daiionCrusadesImpactTimer = window.setTimeout(() => {
+    const shouldReduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!daiionCrusadesConvergenceInProgress || shouldReduceMotion) {
+      daiionCrusadesImpactTimer = 0;
+      return;
+    }
+
+    shell.classList.add("is-daiion-crusades-impacting");
+    daiionCrusadesImpactTimer = 0;
+  }, 1150);
 }
 
 
