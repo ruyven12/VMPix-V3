@@ -12227,3 +12227,230 @@ button {
     transform: translate3d(0, 0, 0) scale(1.018) !important;
   }
 }
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .portfolio-engine {
+  z-index: 96;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none;
+  filter: none;
+  animation: none !important;
+  transition: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .portfolio-engine-left-core {
+  animation: daiionCrusadesEngineRestoreLeft 860ms cubic-bezier(0.14, 0.78, 0.18, 1) forwards !important;
+  will-change: transform;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .portfolio-engine-reactor {
+  animation: daiionCrusadesEngineRestoreRight 860ms cubic-bezier(0.14, 0.78, 0.18, 1) forwards !important;
+  will-change: transform;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored :is(.portfolio-engine-left-core, .portfolio-engine-reactor) {
+  animation: none !important;
+  transform: translate3d(0, 0, 0) !important;
+  will-change: auto;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-emitter-energy {
+  opacity: 1 !important;
+  animation: daiionCrusadesEngineEmitterReactivate 860ms ease-out forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-emitter-energy :is(.engine-emitter-energy-ring--outer, .engine-emitter-energy-ring--middle, .engine-emitter-energy-ring--feed) {
+  animation: daiionCrusadesEngineRingReactivate 860ms ease-out forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-emitter-energy .engine-emitter-energy-discharge {
+  animation: daiionCrusadesEngineDischargeReactivate 860ms steps(1, end) forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy {
+  display: block;
+  opacity: 0.9 !important;
+  filter: none;
+  animation: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy-ring--middle {
+  animation: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy--left .engine-emitter-energy-ring--outer {
+  animation: daiionEmitterChargeClockwise 7.2s linear -1.3s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy--left .engine-emitter-energy-ring--feed {
+  animation: daiionEmitterRingClockwise 5.8s linear -2.1s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy--right .engine-emitter-energy-ring--outer {
+  animation: daiionEmitterChargeCounter 8.1s linear -3.2s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy--right .engine-emitter-energy-ring--feed {
+  animation: daiionEmitterRingCounter 6.3s linear -4.9s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy-discharge--left-crown {
+  animation: daiionEmitterDischargeFlash 4.6s steps(1, end) -0.8s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy-discharge--left-feed {
+  animation: daiionEmitterInwardDischargeSnap 4.9s steps(1, end) -1.1s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy-discharge--right-crown {
+  animation: daiionEmitterDischargeFlash 5.2s steps(1, end) -1.5s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-emitter-energy-discharge--right-feed {
+  animation: daiionEmitterInwardDischargeSnap 5.4s steps(1, end) -3.6s infinite !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-lightning-overlay {
+  visibility: visible !important;
+  opacity: 0.72 !important;
+  transform: translate3d(0, -50%, 0) scaleX(0.14);
+  transform-origin: 50% 50%;
+  animation: daiionCrusadesEngineEnergyReform 860ms cubic-bezier(0.18, 0.72, 0.18, 1) forwards !important;
+  transition: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-lightning-main,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-lightning-branch {
+  animation: daiionCrusadesEngineMainReform 860ms ease-out forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .engine-lightning-fracture {
+  animation: daiionCrusadesEngineFractureReform 860ms steps(1, end) forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing :is(.engine-lightning-pulse, .engine-lightning-pulse-node) {
+  animation: daiionCrusadesEnginePulseReform 860ms ease-out forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .engine-lightning-overlay {
+  visibility: visible !important;
+  opacity: 0.72 !important;
+  transform: translate3d(0, -50%, 0) scaleX(1) !important;
+  animation: wrestling2TeslaArcIdleOverlay 9.8s cubic-bezier(0.42, 0, 0.24, 1) infinite !important;
+  transition: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .portfolio-engine-panel--left {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0.12rem, 0) scale3d(0.96, 0.96, 1);
+  animation: daiionCrusadesEngineTitleReturn 860ms ease-out forwards !important;
+  transition: none !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .portfolio-engine-panel--left :is(.portfolio-engine-label, [data-portfolio-engine-current-view]) {
+  animation: daiionCrusadesEngineTitleTextReturn 860ms ease-out forwards !important;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .portfolio-engine-panel--left {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+@keyframes daiionCrusadesEngineRestoreLeft {
+  0%, 16% { transform: translate3d(var(--daiion-crusades-left-converge-x, 0px), var(--daiion-crusades-left-converge-y, 0px), 0); }
+  70%, 100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes daiionCrusadesEngineRestoreRight {
+  0%, 16% { transform: translate3d(var(--daiion-crusades-right-converge-x, 0px), var(--daiion-crusades-right-converge-y, 0px), 0); }
+  70%, 100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes daiionCrusadesEngineEmitterReactivate {
+  0%, 12% { opacity: 1; }
+  54% { opacity: 0.98; }
+  100% { opacity: 0.9; }
+}
+
+@keyframes daiionCrusadesEngineRingReactivate {
+  0%, 16% { opacity: 1; stroke-width: 1.8; }
+  48% { opacity: 0.92; stroke-width: 1.5; }
+  100% { opacity: 0.78; stroke-width: 1.34; }
+}
+
+@keyframes daiionCrusadesEngineDischargeReactivate {
+  0%, 22%, 100% { opacity: 0.16; stroke-width: 1.04; }
+  14% { opacity: 1; stroke-width: 1.76; }
+  48% { opacity: 0.42; stroke-width: 1.26; }
+}
+
+@keyframes daiionCrusadesEngineEnergyReform {
+  0%, 24% { opacity: 0; transform: translate3d(0, -50%, 0) scaleX(0.14); }
+  52% { opacity: 0.34; transform: translate3d(0, -50%, 0) scaleX(0.58); }
+  76% { opacity: 0.58; transform: translate3d(0, -50%, 0) scaleX(0.9); }
+  100% { opacity: 0.72; transform: translate3d(0, -50%, 0) scaleX(1); }
+}
+
+@keyframes daiionCrusadesEngineMainReform {
+  0%, 20% { opacity: 0.08; }
+  52% { opacity: 0.24; }
+  100% { opacity: 0.44; }
+}
+
+@keyframes daiionCrusadesEngineFractureReform {
+  0%, 34% { opacity: 0; }
+  48% { opacity: 0.82; }
+  100% { opacity: 0.92; }
+}
+
+@keyframes daiionCrusadesEnginePulseReform {
+  0%, 58% { opacity: 0; transform: scale(0.92); }
+  78% { opacity: 0.7; transform: scale(1.04); }
+  100% { opacity: 0.96; transform: scale(1); }
+}
+
+@keyframes daiionCrusadesEngineTitleReturn {
+  0%, 68% { opacity: 1; transform: translate3d(0, 0.12rem, 0) scale3d(0.96, 0.96, 1); }
+  82% { opacity: 1; }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+}
+
+@keyframes daiionCrusadesEngineTitleTextReturn {
+  0%, 68% { opacity: 0; }
+  82% { opacity: 0.52; }
+  100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) :is(.portfolio-engine-left-core, .portfolio-engine-reactor) {
+    animation: none !important;
+    transform: translate3d(0, 0, 0) !important;
+    will-change: auto;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .engine-lightning-overlay {
+    visibility: visible !important;
+    opacity: 0.56 !important;
+    transform: translate3d(0, -50%, 0) scaleX(1) !important;
+    animation: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .portfolio-engine-panel--left {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+    animation: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .portfolio-engine-panel--left :is(.portfolio-engine-label, [data-portfolio-engine-current-view]) {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .engine-emitter-energy :is(.engine-emitter-energy-ring, .engine-emitter-energy-discharge) {
+    animation: none !important;
+  }
+}
