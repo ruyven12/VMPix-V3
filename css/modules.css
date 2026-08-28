@@ -20435,6 +20435,16 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: daiionArchiveStatsValueLock 280ms ease-out both;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-converging :is(.daiion-archive-focus-panel, .daiion-destination-panel, .daiion-archive-stats-panel, .daiion-title-reveal, .daiion-destination-intro, .daiion-planet-node.is-active) {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  animation: none !important;
+  transition:
+    opacity 170ms ease-out,
+    visibility 0ms linear 180ms !important;
+}
+
 @keyframes daiionArchiveFocusPanelResolve {
   0% {
     opacity: 0;

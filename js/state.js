@@ -2431,6 +2431,62 @@ const daiionArchiveRouteTargets = {
 const daiionDestinationTargets = new Set(Object.keys(daiionArchiveFocusBriefings));
 let daiionArchiveStatsRequestId = 0;
 let daiionDestinationSelectedTarget = null;
+let daiionCrusadesConvergenceInProgress = false;
+
+function resetDaiionCrusadesConvergencePrototype() {
+  const shell = document.querySelector(".site-shell");
+  daiionCrusadesConvergenceInProgress = false;
+
+  document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
+  document.querySelectorAll("[data-daiion-destination-target]").forEach((control) => {
+    control.removeAttribute("aria-disabled");
+  });
+
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.remove("is-daiion-crusades-converging");
+  shell.style.removeProperty("--daiion-crusades-left-converge-x");
+  shell.style.removeProperty("--daiion-crusades-left-converge-y");
+  shell.style.removeProperty("--daiion-crusades-right-converge-x");
+  shell.style.removeProperty("--daiion-crusades-right-converge-y");
+}
+
+function startDaiionCrusadesConvergencePrototype() {
+  if (daiionCrusadesConvergenceInProgress || !isDaiionArchiveLandingPath() || daiionDestinationSelectedTarget !== "campaigns") {
+    return;
+  }
+
+  const shell = document.querySelector(".site-shell");
+  const engine = document.querySelector("[data-portfolio-engine]");
+  const leftEmitter = document.querySelector(".portfolio-engine-left-core");
+  const rightEmitter = document.querySelector(".portfolio-engine-reactor");
+  if (!shell || !engine || !leftEmitter || !rightEmitter) {
+    return;
+  }
+
+  const engineRect = engine.getBoundingClientRect();
+  const leftRect = leftEmitter.getBoundingClientRect();
+  const rightRect = rightEmitter.getBoundingClientRect();
+  const targetX = engineRect.left + engineRect.width / 2;
+  const targetY = engineRect.top + engineRect.height / 2;
+  const setEmitterOffset = (side, rect) => {
+    shell.style.setProperty(`--daiion-crusades-${side}-converge-x`, `${targetX - (rect.left + rect.width / 2)}px`);
+    shell.style.setProperty(`--daiion-crusades-${side}-converge-y`, `${targetY - (rect.top + rect.height / 2)}px`);
+  };
+
+  setEmitterOffset("left", leftRect);
+  setEmitterOffset("right", rightRect);
+  daiionCrusadesConvergenceInProgress = true;
+  shell.classList.add("is-daiion-crusades-converging");
+
+  document.querySelector("[data-daiion-archive-focus]")?.setAttribute("aria-disabled", "true");
+  document.querySelectorAll("[data-daiion-destination-target]").forEach((control) => {
+    control.setAttribute("aria-disabled", "true");
+  });
+}
+
 
 function syncDaiionDestinationSelection() {
   const destinationControls = Array.from(document.querySelectorAll("[data-daiion-destination-target]"));
@@ -2517,7 +2573,7 @@ function syncDaiionDestinationSelection() {
 }
 
 function setDaiionDestinationTarget(target) {
-  if (!isDaiionArchiveLandingPath() || !daiionDestinationTargets.has(target)) {
+  if (daiionCrusadesConvergenceInProgress || !isDaiionArchiveLandingPath() || !daiionDestinationTargets.has(target)) {
     return;
   }
 
@@ -2526,6 +2582,7 @@ function setDaiionDestinationTarget(target) {
 }
 
 function resetDaiionDestinationSelection() {
+  resetDaiionCrusadesConvergencePrototype();
   daiionDestinationSelectedTarget = null;
   syncDaiionDestinationSelection();
 }
@@ -2534,6 +2591,11 @@ function routeDaiionArchiveFocusPanel() {
   const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   const routeTarget = focusPanel?.getAttribute("data-daiion-route-target");
   if (!routeTarget || !isDaiionArchiveLandingPath() || !focusPanel.classList.contains("is-active")) {
+    return;
+  }
+
+  if (routeTarget === routePaths.wrestlingShows && daiionDestinationSelectedTarget === "campaigns") {
+    startDaiionCrusadesConvergencePrototype();
     return;
   }
 
