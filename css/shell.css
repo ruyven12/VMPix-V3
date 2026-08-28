@@ -6079,9 +6079,10 @@ button {
 }
 
 .daiion-crusades-warp-layer__shockwave {
-  z-index: 4;
+  z-index: 2;
   opacity: 0;
-  background: radial-gradient(circle, transparent 0 42.4%, rgba(255, 248, 236, 0.96) 43% 43.34%, rgb(var(--engine-accent-glow) / 0.86) 43.62% 44.08%, rgb(var(--engine-accent) / 0.62) 44.3% 44.78%, transparent 45.12%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 1.1%, rgb(var(--engine-accent-glow) / 0.86) 1.55% 3.2%, transparent 5.8% 27.8%, rgb(var(--engine-accent) / 0.1) 29.4% 34.6%, rgb(var(--engine-accent-glow) / 0.24) 35.5% 39.4%, rgba(255, 248, 236, 0.48) 40.2% 41.7%, rgba(255, 248, 236, 0.98) 42.1% 42.55%, rgb(var(--engine-accent-glow) / 0.9) 42.9% 43.6%, rgb(var(--engine-accent) / 0.62) 43.86% 44.7%, transparent 45.32%);
   clip-path: polygon(50% 0, 57% 4%, 64% 1%, 69% 8%, 78% 6%, 82% 15%, 91% 20%, 89% 30%, 98% 39%, 94% 47%, 100% 56%, 91% 63%, 94% 74%, 84% 78%, 78% 89%, 67% 87%, 59% 98%, 50% 93%, 40% 100%, 33% 89%, 22% 91%, 17% 81%, 6% 76%, 10% 64%, 0 57%, 6% 48%, 1% 38%, 10% 31%, 8% 20%, 19% 16%, 24% 6%, 36% 9%, 43% 2%);
 }
 
@@ -6154,11 +6155,11 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-streak-group--secondary {
-  animation: daiionCrusadesWarpStreakSecondary 1080ms cubic-bezier(0.14, 0.72, 0.16, 1) 90ms forwards;
+  animation: daiionCrusadesWarpStreakSecondary 1080ms cubic-bezier(0.14, 0.72, 0.16, 1) 35ms forwards;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-streak-group--fractures {
-  animation: daiionCrusadesWarpStreakFractures 1020ms cubic-bezier(0.16, 0.68, 0.18, 1) 150ms forwards;
+  animation: daiionCrusadesWarpStreakFractures 1020ms cubic-bezier(0.16, 0.68, 0.18, 1) 95ms forwards;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .portfolio-engine {
@@ -6212,12 +6213,14 @@ button {
 }
 
 @keyframes daiionCrusadesWarpShockwave {
-  0% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(0.02, 0.02, 1); }
-  12% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.13, 0.13, 1); }
-  30% { opacity: 0.88; transform: translate3d(-50%, -50%, 0) scale3d(0.42, 0.42, 1); }
-  54% { opacity: 0.54; transform: translate3d(-50%, -50%, 0) scale3d(0.86, 0.86, 1); }
-  78% { opacity: 0.2; transform: translate3d(-50%, -50%, 0) scale3d(1.22, 1.22, 1); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.48, 1.48, 1); }
+  0% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(0.025, 0.025, 1); }
+  5% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.075, 0.075, 1); }
+  16% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(0.25, 0.25, 1); }
+  24% { opacity: 0.84; transform: translate3d(-50%, -50%, 0) scale3d(0.43, 0.43, 1); }
+  30% { opacity: 0.68; transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1); }
+  38% { opacity: 0.24; transform: translate3d(-50%, -50%, 0) scale3d(0.92, 0.92, 1); }
+  43% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1); }
 }
 
 @keyframes daiionCrusadesWarpStreakField {
@@ -6234,26 +6237,26 @@ button {
 
 @keyframes daiionCrusadesWarpStreakPrimary {
   0% { opacity: 0; }
-  8% { opacity: 0.66; }
-  24% { opacity: 0.96; }
+  6% { opacity: 0.72; }
+  18% { opacity: 0.96; }
   58% { opacity: 1; }
   100% { opacity: 0.96; }
 }
 
 @keyframes daiionCrusadesWarpStreakSecondary {
   0% { opacity: 0; }
-  14% { opacity: 0.36; }
-  36% { opacity: 0.72; }
-  74% { opacity: 0.86; }
-  100% { opacity: 0.74; }
+  10% { opacity: 0.42; }
+  28% { opacity: 0.68; }
+  70% { opacity: 0.78; }
+  100% { opacity: 0.68; }
 }
 
 @keyframes daiionCrusadesWarpStreakFractures {
   0% { opacity: 0; }
-  18% { opacity: 0.26; }
-  50% { opacity: 0.58; }
-  82% { opacity: 0.78; }
-  100% { opacity: 0.62; }
+  14% { opacity: 0.2; }
+  42% { opacity: 0.48; }
+  78% { opacity: 0.68; }
+  100% { opacity: 0.54; }
 }
 @keyframes daiionCrusadesPortalReveal {
   0% {
