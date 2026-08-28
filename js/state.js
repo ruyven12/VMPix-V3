@@ -2522,6 +2522,59 @@ function setDaiionCrusadesInterfacePreview(isVisible) {
   }
 }
 
+function completeDaiionCrusadesRoutePromotion() {
+  const shell = document.querySelector(".site-shell");
+  const showsShell = getDaiionCrusadesInterfaceShell();
+  daiionCrusadesConvergenceInProgress = false;
+
+  document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
+  document.querySelectorAll("[data-daiion-destination-target]").forEach((control) => {
+    control.removeAttribute("aria-disabled");
+  });
+
+  if (showsShell) {
+    showsShell.dataset.wrestlingShowsVariant = "hall-of-crusades";
+    delete showsShell.dataset.daiionCrusadesInterfacePreview;
+    showsShell.setAttribute("aria-hidden", "false");
+    showsShell.removeAttribute("inert");
+  }
+  setDaiionCrusadesInterfaceControlsEnabled(true);
+
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping", "is-daiion-crusades-aperture-opening", "is-daiion-crusades-engine-reconstructing", "is-daiion-crusades-engine-restored", "is-daiion-crusades-interface-initializing", "is-daiion-crusades-interface-ready", "is-daiion-crusades-carousel-revealing", "is-daiion-crusades-carousel-ready", "is-daiion-crusades-campaign-info-revealing", "is-daiion-crusades-campaign-info-ready");
+  shell.style.removeProperty("--daiion-crusades-left-converge-x");
+  shell.style.removeProperty("--daiion-crusades-left-converge-y");
+  shell.style.removeProperty("--daiion-crusades-right-converge-x");
+  shell.style.removeProperty("--daiion-crusades-right-converge-y");
+  shell.style.removeProperty("--daiion-crusades-impact-x");
+  shell.style.removeProperty("--daiion-crusades-impact-y");
+}
+
+function isDaiionCrusadesRoutePromotionReady(shell) {
+  return Boolean(
+    shell &&
+      shell.classList.contains("is-daiion-crusades-engine-restored") &&
+      shell.classList.contains("is-daiion-crusades-interface-ready") &&
+      shell.classList.contains("is-daiion-crusades-carousel-ready") &&
+      shell.classList.contains("is-daiion-crusades-campaign-info-ready")
+  );
+}
+
+function promoteDaiionCrusadesToHallOfCrusadesRoute() {
+  const shell = document.querySelector(".site-shell");
+  if (!daiionCrusadesConvergenceInProgress || typeof navigateToRoute !== "function" || !isDaiionCrusadesRoutePromotionReady(shell)) {
+    return;
+  }
+
+  navigateToRoute(routePaths.wrestlingShows, {
+    historyState: { fromDaiionCrusadesTransition: true },
+  });
+  completeDaiionCrusadesRoutePromotion();
+}
+
 function resetDaiionCrusadesConvergencePrototype() {
   const shell = document.querySelector(".site-shell");
   window.clearTimeout(daiionCrusadesImpactTimer);
@@ -2694,6 +2747,7 @@ function startDaiionCrusadesConvergencePrototype() {
           shell.classList.remove("is-daiion-crusades-campaign-info-revealing");
           shell.classList.add("is-daiion-crusades-campaign-info-ready");
           daiionCrusadesCampaignInfoReadyTimer = 0;
+          promoteDaiionCrusadesToHallOfCrusadesRoute();
         }, shouldReduceMotion ? 220 : 820);
         daiionCrusadesCarouselReadyTimer = 0;
       }, shouldReduceMotion ? 260 : 940);

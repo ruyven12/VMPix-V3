@@ -2966,6 +2966,9 @@ function renderWrestlingShowsArchive(options = {}) {
   }
 
   syncWrestlingShowsControls();
+  if (isHallCrusadesShowsVariantActive()) {
+    prepareHallCrusadesInterfaceChrome();
+  }
   renderHallCrusadesPosterStrip();
   wrestlingShowList.replaceChildren();
 
@@ -16736,7 +16739,7 @@ function preloadDaiionCrusadesInterfaceData() {
   requestWrestlingShowsData();
 }
 
-function prepareDaiionCrusadesInterfacePreview() {
+function prepareHallCrusadesInterfaceChrome() {
   if (!wrestlingShowsShell) return;
   ensureDaiionCrusadesInterfaceInsignia();
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
@@ -16747,6 +16750,11 @@ function prepareDaiionCrusadesInterfacePreview() {
   if (subtitle) {
     subtitle.textContent = "Every recorded event. Every battle preserved.";
   }
+}
+
+function prepareDaiionCrusadesInterfacePreview() {
+  if (!wrestlingShowsShell) return;
+  prepareHallCrusadesInterfaceChrome();
   if (wrestlingShowsDataState !== "live") {
     renderHallCrusadesArchiveStats([]);
     return;
