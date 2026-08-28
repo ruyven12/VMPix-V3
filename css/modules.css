@@ -22051,11 +22051,22 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: none;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .public-home {
+  z-index: 95;
+  pointer-events: none;
+}
+
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .portfolio-hub:has(.wrestling-shows-shell[data-daiion-crusades-interface-preview="true"]) {
   visibility: visible;
   opacity: 1;
   pointer-events: none;
   transform: none;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .portfolio-world-gateway {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
   .site-shell[data-shell-route="portfolio"].has-entered-hub .portfolio-hub::after {
