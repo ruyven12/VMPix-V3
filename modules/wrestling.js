@@ -1634,6 +1634,11 @@ function isHallCrusadesShowsVariantActive() {
   return wrestlingShowsShell?.dataset.wrestlingShowsVariant === "hall-of-crusades";
 }
 
+function isDaiionCrusadesCarouselRevealLocked() {
+  const shell = document.querySelector(".site-shell");
+  return Boolean(shell?.classList.contains("is-daiion-crusades-carousel-revealing") && !shell.classList.contains("is-daiion-crusades-carousel-ready"));
+}
+
 function getHallCrusadesYearFilterRows(rows = getWrestlingShowsIndexRows()) {
   const sourceRows = Array.isArray(rows) ? rows : [];
   if (activeHallCrusadesYearFilter === "Upcoming") {
@@ -2394,7 +2399,7 @@ function getHallCrusadesPosterWindowRows(rows) {
 function advanceHallCrusadesPosterActive(direction) {
   const rows = getHallCrusadesPosterSourceRows();
   const total = rows.length;
-  if (!isHallCrusadesShowsVariantActive() || total < 2) {
+  if (isDaiionCrusadesCarouselRevealLocked() || !isHallCrusadesShowsVariantActive() || total < 2) {
     return false;
   }
 
@@ -2413,11 +2418,22 @@ function advanceHallCrusadesPosterActive(direction) {
 }
 
 function syncHallCrusadesPosterNavControls(total = getHallCrusadesPosterSourceRows().length) {
-  const canNavigate = isHallCrusadesShowsVariantActive() && wrestlingShowsDataState === "live" && total > 1;
+  const isRevealLocked = isDaiionCrusadesCarouselRevealLocked();
+  const canOpenRecord = isHallCrusadesShowsVariantActive() && wrestlingShowsDataState === "live" && total > 0 && !isRevealLocked;
+  const canNavigate = canOpenRecord && total > 1;
   hallCrusadesPosterNavButtons.forEach((button) => {
     button.disabled = !canNavigate;
     button.setAttribute("aria-disabled", String(!canNavigate));
     button.classList.toggle("is-muted", !canNavigate);
+  });
+  hallCrusadesPosterStrip?.querySelectorAll(".hall-crusades-poster-strip__record").forEach((record) => {
+    record.disabled = !canOpenRecord;
+    record.setAttribute("aria-disabled", String(!canOpenRecord));
+    if (canOpenRecord) {
+      record.removeAttribute("tabindex");
+    } else {
+      record.setAttribute("tabindex", "-1");
+    }
   });
 }
 
@@ -2642,6 +2658,19 @@ function bindHallCrusadesPosterStripInteraction() {
   hallCrusadesPosterStrip.addEventListener("click", handleHallCrusadesPosterClick, true);
   hallCrusadesPosterStrip.addEventListener("wheel", handleHallCrusadesPosterWheel, { passive: false });
 }
+function syncHallCrusadesPosterStripScrollPosition() {
+  if (!hallCrusadesPosterStrip) {
+    return;
+  }
+
+  const activeItem = hallCrusadesPosterStrip.querySelector(".hall-crusades-poster-strip__item.is-active");
+  if (!activeItem) {
+    return;
+  }
+
+  const nextScrollLeft = activeItem.offsetLeft + activeItem.offsetWidth / 2 - hallCrusadesPosterStrip.clientWidth / 2;
+  hallCrusadesPosterStrip.scrollLeft = Math.max(0, nextScrollLeft);
+}
 
 function createHallCrusadesPosterStripItem(show, index = 0, options = {}) {
   const item = document.createElement("li");
@@ -2835,6 +2864,7 @@ function renderHallCrusadesPosterStrip() {
   hallCrusadesPosterStrip.dataset.hallCrusadesFieldFilter = activeHallCrusadesFieldFilter;
   hallCrusadesPosterStrip.dataset.hallCrusadesSearchQuery = activeHallCrusadesSearchQuery;
   hallCrusadesPosterStrip.replaceChildren(fragment);
+  syncHallCrusadesPosterStripScrollPosition();
   syncHallCrusadesPosterNavControls(posterSourceRows.length);
   syncHallCrusadesYearControls();
   syncHallCrusadesBannerControls();
@@ -16723,6 +16753,7 @@ function prepareDaiionCrusadesInterfacePreview() {
   }
   const rows = getHallCrusadesPosterSourceRows();
   renderHallCrusadesArchiveStats(rows);
+  renderHallCrusadesPosterStrip();
   syncHallCrusadesYearControls();
   syncHallCrusadesBannerControls();
   syncHallCrusadesFieldControls();

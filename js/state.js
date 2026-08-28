@@ -2438,6 +2438,7 @@ let daiionCrusadesApertureTimer = 0;
 let daiionCrusadesReconstructionTimer = 0;
 let daiionCrusadesRestoredTimer = 0;
 let daiionCrusadesInterfaceReadyTimer = 0;
+let daiionCrusadesCarouselReadyTimer = 0;
 
 function setDaiionCrusadesEngineBarDestinationTitle() {
   const title = "Daiion – Hall of Crusades";
@@ -2516,6 +2517,8 @@ function resetDaiionCrusadesConvergencePrototype() {
   daiionCrusadesRestoredTimer = 0;
   window.clearTimeout(daiionCrusadesInterfaceReadyTimer);
   daiionCrusadesInterfaceReadyTimer = 0;
+  window.clearTimeout(daiionCrusadesCarouselReadyTimer);
+  daiionCrusadesCarouselReadyTimer = 0;
   daiionCrusadesConvergenceInProgress = false;
 
   document.querySelector("[data-daiion-archive-focus]")?.removeAttribute("aria-disabled");
@@ -2528,7 +2531,7 @@ function resetDaiionCrusadesConvergencePrototype() {
     return;
   }
 
-  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping", "is-daiion-crusades-aperture-opening", "is-daiion-crusades-engine-reconstructing", "is-daiion-crusades-engine-restored", "is-daiion-crusades-interface-initializing", "is-daiion-crusades-interface-ready");
+  shell.classList.remove("is-daiion-crusades-converging", "is-daiion-crusades-impacting", "is-daiion-crusades-warping", "is-daiion-crusades-aperture-opening", "is-daiion-crusades-engine-reconstructing", "is-daiion-crusades-engine-restored", "is-daiion-crusades-interface-initializing", "is-daiion-crusades-interface-ready", "is-daiion-crusades-carousel-revealing", "is-daiion-crusades-carousel-ready");
   shell.style.removeProperty("--daiion-crusades-left-converge-x");
   shell.style.removeProperty("--daiion-crusades-left-converge-y");
   shell.style.removeProperty("--daiion-crusades-right-converge-x");
@@ -2583,6 +2586,7 @@ function startDaiionCrusadesConvergencePrototype() {
   window.clearTimeout(daiionCrusadesReconstructionTimer);
   window.clearTimeout(daiionCrusadesRestoredTimer);
   window.clearTimeout(daiionCrusadesInterfaceReadyTimer);
+  window.clearTimeout(daiionCrusadesCarouselReadyTimer);
   daiionCrusadesImpactTimer = window.setTimeout(() => {
     if (!daiionCrusadesConvergenceInProgress || shouldReduceMotion) {
       daiionCrusadesImpactTimer = 0;
@@ -2639,8 +2643,24 @@ function startDaiionCrusadesConvergencePrototype() {
         daiionCrusadesInterfaceReadyTimer = 0;
         return;
       }
-      shell.classList.add("is-daiion-crusades-interface-ready");
+      shell.classList.add("is-daiion-crusades-interface-ready", "is-daiion-crusades-carousel-revealing");
       setDaiionCrusadesInterfaceControlsEnabled(true);
+      if (typeof syncHallCrusadesPosterNavControls === "function") {
+        syncHallCrusadesPosterNavControls();
+      }
+      window.clearTimeout(daiionCrusadesCarouselReadyTimer);
+      daiionCrusadesCarouselReadyTimer = window.setTimeout(() => {
+        if (!daiionCrusadesConvergenceInProgress) {
+          daiionCrusadesCarouselReadyTimer = 0;
+          return;
+        }
+        shell.classList.remove("is-daiion-crusades-carousel-revealing");
+        shell.classList.add("is-daiion-crusades-carousel-ready");
+        if (typeof syncHallCrusadesPosterNavControls === "function") {
+          syncHallCrusadesPosterNavControls();
+        }
+        daiionCrusadesCarouselReadyTimer = 0;
+      }, shouldReduceMotion ? 260 : 940);
       daiionCrusadesInterfaceReadyTimer = 0;
     }, shouldReduceMotion ? 360 : 1640);
     daiionCrusadesRestoredTimer = 0;

@@ -17164,11 +17164,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   visibility: visible;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :not(.hall-crusades-room-identifier):not(.hall-crusades-archive-stats):not(.hall-crusades-archive-insignia):not(.hall-crusades-archive-crystals) {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :not(.hall-crusades-room-identifier):not(.hall-crusades-archive-stats):not(.hall-crusades-archive-insignia):not(.hall-crusades-archive-crystals):not(.hall-crusades-poster-strip):not(.hall-crusades-poster-nav) {
   display: none !important;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :is(.hall-crusades-poster-strip, .hall-crusades-poster-nav, .hall-crusades-campaign-info-panel) {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-initializing:not(.is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :is(.hall-crusades-poster-strip, .hall-crusades-poster-nav, .hall-crusades-campaign-info-panel),
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-ready .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-campaign-info-panel,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-ready:not(.is-daiion-crusades-carousel-revealing):not(.is-daiion-crusades-carousel-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :is(.hall-crusades-poster-strip, .hall-crusades-poster-nav) {
   display: none !important;
   visibility: hidden !important;
 }
@@ -17270,6 +17272,57 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-ready .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-archive-crystal:not(:disabled) {
   pointer-events: auto;
 }
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-ready:is(.is-daiion-crusades-carousel-revealing, .is-daiion-crusades-carousel-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-strip {
+  visibility: visible;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-strip {
+  pointer-events: none;
+  touch-action: none;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-ready .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-strip {
+  pointer-events: auto;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__record {
+  --daiion-crusades-carousel-reveal-scale: 0.68;
+  pointer-events: none;
+  animation: daiionCrusadesCarouselCardReveal 420ms cubic-bezier(0.16, 0.82, 0.18, 1) 300ms backwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+  --daiion-crusades-carousel-reveal-scale: 0.92;
+  animation-delay: 0ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item.is-active) .hall-crusades-poster-strip__record,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item .hall-crusades-poster-strip__record {
+  --daiion-crusades-carousel-reveal-scale: 0.78;
+  animation-delay: 120ms;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__item:has(+ .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item.is-active) .hall-crusades-poster-strip__record,
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__item.is-active + .hall-crusades-poster-strip__item + .hall-crusades-poster-strip__item .hall-crusades-poster-strip__record {
+  animation-delay: 260ms;
+}
+
+@media (min-width: 760px) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-ready:is(.is-daiion-crusades-carousel-revealing, .is-daiion-crusades-carousel-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-nav {
+    visibility: visible;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-nav {
+    opacity: 0;
+    pointer-events: none;
+    animation: daiionCrusadesCarouselControlsOnline 180ms ease-out 760ms forwards;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-ready .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-nav:not(:disabled) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
 
 @keyframes daiionCrusadesInterfaceFrameDrawOffset {
   to { opacity: 1; transform: translate3d(-50%, 0, 0) scaleX(1); }
@@ -17295,6 +17348,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 @keyframes daiionCrusadesInterfaceCrystalReveal {
   to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
+@keyframes daiionCrusadesCarouselCardReveal {
+  from { opacity: 0; transform: translate3d(0, 0.18rem, 0) scale(var(--daiion-crusades-carousel-reveal-scale)); }
+}
+
+@keyframes daiionCrusadesCarouselControlsOnline {
+  to { opacity: 1; }
+}
+
+@keyframes daiionCrusadesCarouselOpacityReveal {
+  from { opacity: 0; }
+}
 
 @media (max-width: 540px) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-room-identifier__title {
@@ -17319,6 +17383,17 @@ button.hall-crusades-archive-crystal:focus-visible {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-initializing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"]::after {
     animation-duration: 180ms !important;
     animation-delay: 0ms !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-poster-strip__record {
+    animation-name: daiionCrusadesCarouselOpacityReveal;
+    animation-duration: 180ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-carousel-revealing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-poster-nav {
+    animation-duration: 120ms !important;
+    animation-delay: 120ms !important;
   }
 }
 
