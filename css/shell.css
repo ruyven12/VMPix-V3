@@ -6065,7 +6065,10 @@ button {
 }
 
 .daiion-crusades-warp-layer__shockwave,
-.daiion-crusades-warp-layer__streaks {
+.daiion-crusades-warp-layer__streak-field {
+  position: absolute;
+  display: block;
+  pointer-events: none;
   left: var(--daiion-crusades-impact-x, 50vw);
   top: var(--daiion-crusades-impact-y, 88vh);
   inline-size: max(130vw, 130vh);
@@ -6082,27 +6085,53 @@ button {
   clip-path: polygon(50% 0, 57% 4%, 64% 1%, 69% 8%, 78% 6%, 82% 15%, 91% 20%, 89% 30%, 98% 39%, 94% 47%, 100% 56%, 91% 63%, 94% 74%, 84% 78%, 78% 89%, 67% 87%, 59% 98%, 50% 93%, 40% 100%, 33% 89%, 22% 91%, 17% 81%, 6% 76%, 10% 64%, 0 57%, 6% 48%, 1% 38%, 10% 31%, 8% 20%, 19% 16%, 24% 6%, 36% 9%, 43% 2%);
 }
 
-.daiion-crusades-warp-layer__streaks {
+.daiion-crusades-warp-layer__streak-field {
   z-index: 3;
+  overflow: visible;
   opacity: 0;
-  -webkit-mask-image: radial-gradient(circle, transparent 0 6%, #000 9% 86%, transparent 91%);
-  mask-image: radial-gradient(circle, transparent 0 6%, #000 9% 86%, transparent 91%);
+  fill: none;
 }
 
-.daiion-crusades-warp-layer__streaks--primary {
-  background: conic-gradient(from 3deg, transparent 0deg 4.6deg, rgba(255, 247, 230, 0.92) 4.82deg 5.08deg, rgb(var(--engine-accent-glow) / 0.8) 5.22deg 5.86deg, transparent 6.12deg 23.4deg, rgb(var(--engine-accent) / 0.58) 23.82deg 25.16deg, transparent 25.64deg 51.7deg, rgb(var(--engine-accent-glow) / 0.72) 52.22deg 53.48deg, transparent 54deg 89.6deg, rgb(var(--engine-accent) / 0.54) 90.3deg 91.82deg, transparent 92.3deg 145.2deg, rgb(var(--engine-accent-glow) / 0.66) 146.1deg 147.7deg, transparent 148.3deg 207.4deg, rgb(var(--engine-accent) / 0.52) 208.2deg 210.1deg, transparent 210.8deg 273.9deg, rgb(var(--engine-accent-glow) / 0.78) 274.8deg 276.04deg, transparent 276.7deg 329.4deg, rgb(var(--engine-accent) / 0.5) 330.2deg 332.1deg, transparent 332.7deg 360deg);
+.daiion-crusades-warp-streak-group {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 50% 50%;
 }
 
-.daiion-crusades-warp-layer__streaks--secondary {
-  background: conic-gradient(from -17deg, transparent 0deg 12.6deg, rgb(var(--engine-accent) / 0.42) 13.1deg 14.7deg, transparent 15.4deg 43.2deg, rgb(var(--engine-accent-glow) / 0.5) 43.92deg 45.08deg, transparent 45.8deg 101.4deg, rgb(var(--engine-accent) / 0.38) 102deg 104.2deg, transparent 104.9deg 167.8deg, rgb(var(--engine-accent-glow) / 0.48) 168.4deg 169.86deg, transparent 170.5deg 235.4deg, rgb(var(--engine-accent) / 0.36) 236.2deg 238.1deg, transparent 238.9deg 302.4deg, rgb(var(--engine-accent-glow) / 0.44) 303.1deg 304.7deg, transparent 305.4deg 360deg);
+.daiion-crusades-warp-streak {
+  fill: none;
+  stroke: rgb(var(--engine-accent-glow) / 0.68);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 0.42;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: geometricPrecision;
 }
 
-.daiion-crusades-warp-layer__streaks--fractures {
-  background:
-    conic-gradient(from 11deg, transparent 0deg 17.8deg, rgb(var(--engine-accent-glow) / 0.32) 18.16deg 18.72deg, transparent 19.2deg 45.4deg, rgb(var(--engine-accent) / 0.22) 45.86deg 46.42deg, transparent 47deg 96.6deg, rgb(var(--engine-accent-glow) / 0.28) 97.1deg 97.8deg, transparent 98.4deg 184.2deg, rgb(var(--engine-accent-glow) / 0.24) 184.8deg 185.34deg, transparent 186deg 254.3deg, rgb(var(--engine-accent) / 0.2) 254.82deg 255.38deg, transparent 256deg 321.5deg, rgb(var(--engine-accent-glow) / 0.26) 322.04deg 322.76deg, transparent 323.4deg 360deg),
-    radial-gradient(circle, transparent 0 18%, rgb(var(--engine-accent) / 0.24) 19% 19.7%, transparent 20.6% 100%);
+.daiion-crusades-warp-streak--hot {
+  stroke: rgba(255, 247, 230, 0.9);
+  stroke-width: 0.72;
 }
 
+.daiion-crusades-warp-streak--primary {
+  stroke: rgb(var(--engine-accent-glow) / 0.76);
+  stroke-width: 0.56;
+}
+
+.daiion-crusades-warp-streak--medium {
+  stroke: rgb(var(--engine-accent) / 0.56);
+  stroke-width: 0.44;
+}
+
+.daiion-crusades-warp-streak--faint {
+  stroke: rgb(var(--engine-accent-glow) / 0.34);
+  stroke-width: 0.3;
+}
+
+.daiion-crusades-warp-streak--fracture {
+  stroke: rgb(var(--engine-accent) / 0.48);
+  stroke-width: 0.34;
+}
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer {
   visibility: visible;
   opacity: 1;
@@ -6116,15 +6145,19 @@ button {
   animation: daiionCrusadesWarpShockwave 1150ms cubic-bezier(0.12, 0.78, 0.16, 1) forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks--primary {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streak-field {
+  animation: daiionCrusadesWarpStreakField 1150ms cubic-bezier(0.12, 0.78, 0.16, 1) forwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-streak-group--primary {
   animation: daiionCrusadesWarpStreakPrimary 1150ms cubic-bezier(0.12, 0.78, 0.16, 1) forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks--secondary {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-streak-group--secondary {
   animation: daiionCrusadesWarpStreakSecondary 1080ms cubic-bezier(0.14, 0.72, 0.16, 1) 90ms forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks--fractures {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-streak-group--fractures {
   animation: daiionCrusadesWarpStreakFractures 1020ms cubic-bezier(0.16, 0.68, 0.18, 1) 150ms forwards;
 }
 
@@ -6155,18 +6188,21 @@ button {
   animation: daiionCrusadesApertureOpen 420ms cubic-bezier(0.12, 0.84, 0.12, 1) forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--primary {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streak-field {
+  animation: daiionCrusadesApertureField 420ms cubic-bezier(0.16, 0.78, 0.12, 1) forwards;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-streak-group--primary {
   animation: daiionCrusadesAperturePrimary 420ms cubic-bezier(0.16, 0.78, 0.12, 1) forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--secondary {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-streak-group--secondary {
   animation: daiionCrusadesApertureSecondary 390ms cubic-bezier(0.16, 0.72, 0.12, 1) 30ms forwards;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks--fractures {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-streak-group--fractures {
   animation: daiionCrusadesApertureFractures 380ms cubic-bezier(0.18, 0.68, 0.12, 1) 40ms forwards;
 }
-
 @keyframes daiionCrusadesWarpCover {
   0% { opacity: 0; }
   12% { opacity: 0.18; }
@@ -6184,31 +6220,41 @@ button {
   100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.48, 1.48, 1); }
 }
 
-@keyframes daiionCrusadesWarpStreakPrimary {
+@keyframes daiionCrusadesWarpStreakField {
   0% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(0.04, 0.04, 1) rotate(0deg); }
-  12% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1) rotate(1deg); }
-  34% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(0.52, 0.52, 1) rotate(-3deg); }
-  62% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.98, 0.98, 1) rotate(-8deg); }
-  92% { opacity: 0.92; transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1) rotate(-13deg); }
-  100% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.36, 1.36, 1) rotate(-14deg); }
+  8% { opacity: 0.46; transform: translate3d(-50%, -50%, 0) scale3d(0.14, 0.14, 1) rotate(-0.6deg); }
+  18% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(0.29, 0.29, 1) rotate(-1.8deg); }
+  30% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(0.48, 0.48, 1) rotate(-3.1deg); }
+  44% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.72, 0.72, 1) rotate(-5.2deg); }
+  58% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(0.96, 0.96, 1) rotate(-7.4deg); }
+  74% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(1.16, 1.16, 1) rotate(-10.2deg); }
+  90% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.31, 1.31, 1) rotate(-12.6deg); }
+  100% { opacity: 0.88; transform: translate3d(-50%, -50%, 0) scale3d(1.38, 1.38, 1) rotate(-14deg); }
+}
+
+@keyframes daiionCrusadesWarpStreakPrimary {
+  0% { opacity: 0; }
+  8% { opacity: 0.66; }
+  24% { opacity: 0.96; }
+  58% { opacity: 1; }
+  100% { opacity: 0.96; }
 }
 
 @keyframes daiionCrusadesWarpStreakSecondary {
-  0% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(0.08, 0.08, 1) rotate(0deg); }
-  16% { opacity: 0.42; transform: translate3d(-50%, -50%, 0) scale3d(0.24, 0.24, 1) rotate(-2deg); }
-  42% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(0.66, 0.66, 1) rotate(4deg); }
-  74% { opacity: 0.86; transform: translate3d(-50%, -50%, 0) scale3d(1.04, 1.04, 1) rotate(11deg); }
-  100% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(15deg); }
+  0% { opacity: 0; }
+  14% { opacity: 0.36; }
+  36% { opacity: 0.72; }
+  74% { opacity: 0.86; }
+  100% { opacity: 0.74; }
 }
 
 @keyframes daiionCrusadesWarpStreakFractures {
-  0% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1) rotate(0deg); }
-  20% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(0.32, 0.32, 1) rotate(3deg); }
-  50% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1) rotate(-2deg); }
-  82% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(-7deg); }
-  100% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
+  0% { opacity: 0; }
+  18% { opacity: 0.26; }
+  50% { opacity: 0.58; }
+  82% { opacity: 0.78; }
+  100% { opacity: 0.62; }
 }
-
 @keyframes daiionCrusadesPortalReveal {
   0% {
     opacity: 0.96;
@@ -6275,45 +6321,42 @@ button {
   100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.72, 1.72, 1); }
 }
 
+@keyframes daiionCrusadesApertureField {
+  0% { opacity: 0.88; transform: translate3d(-50%, -50%, 0) scale3d(1.38, 1.38, 1) rotate(-14deg); }
+  8% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.41, 1.41, 1) rotate(-14.4deg); }
+  16% { opacity: 0.88; transform: translate3d(-50%, -50%, 0) scale3d(1.45, 1.45, 1) rotate(-14.9deg); }
+  24% { opacity: 0.78; transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(-15.4deg); }
+  34% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1) rotate(-16deg); }
+  44% { opacity: 0.48; transform: translate3d(-50%, -50%, 0) scale3d(1.62, 1.62, 1) rotate(-16.6deg); }
+  58% { opacity: 0.32; transform: translate3d(-50%, -50%, 0) scale3d(1.7, 1.7, 1) rotate(-17.2deg); }
+  72% { opacity: 0.18; transform: translate3d(-50%, -50%, 0) scale3d(1.77, 1.77, 1) rotate(-17.7deg); }
+  86% { opacity: 0.08; transform: translate3d(-50%, -50%, 0) scale3d(1.82, 1.82, 1) rotate(-18.1deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.86, 1.86, 1) rotate(-18.4deg); }
+}
+
 @keyframes daiionCrusadesAperturePrimary {
-  0% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.36, 1.36, 1) rotate(-14deg); }
-  8% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(1.38, 1.38, 1) rotate(-14.4deg); }
-  16% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(1.41, 1.41, 1) rotate(-14.8deg); }
-  24% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(1.45, 1.45, 1) rotate(-15.2deg); }
-  34% { opacity: 0.84; transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(-15.8deg); }
-  44% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1) rotate(-16.4deg); }
-  58% { opacity: 0.54; transform: translate3d(-50%, -50%, 0) scale3d(1.64, 1.64, 1) rotate(-17deg); }
-  72% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(1.71, 1.71, 1) rotate(-17.5deg); }
-  86% { opacity: 0.16; transform: translate3d(-50%, -50%, 0) scale3d(1.78, 1.78, 1) rotate(-18deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.84, 1.84, 1) rotate(-18.4deg); }
+  0% { opacity: 0.96; }
+  20% { opacity: 0.98; }
+  44% { opacity: 0.64; }
+  72% { opacity: 0.22; }
+  100% { opacity: 0; }
 }
 
 @keyframes daiionCrusadesApertureSecondary {
-  0% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(15deg); }
-  8% { opacity: 0.76; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(15.4deg); }
-  16% { opacity: 0.78; transform: translate3d(-50%, -50%, 0) scale3d(1.35, 1.35, 1) rotate(15.9deg); }
-  24% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(1.39, 1.39, 1) rotate(16.4deg); }
-  34% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.44, 1.44, 1) rotate(17deg); }
-  44% { opacity: 0.5; transform: translate3d(-50%, -50%, 0) scale3d(1.49, 1.49, 1) rotate(17.6deg); }
-  58% { opacity: 0.36; transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1) rotate(18.4deg); }
-  72% { opacity: 0.22; transform: translate3d(-50%, -50%, 0) scale3d(1.63, 1.63, 1) rotate(19.1deg); }
-  86% { opacity: 0.1; transform: translate3d(-50%, -50%, 0) scale3d(1.69, 1.69, 1) rotate(19.7deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.74, 1.74, 1) rotate(20.2deg); }
+  0% { opacity: 0.74; }
+  24% { opacity: 0.7; }
+  50% { opacity: 0.42; }
+  76% { opacity: 0.14; }
+  100% { opacity: 0; }
 }
 
 @keyframes daiionCrusadesApertureFractures {
-  0% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
-  8% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1) rotate(-10.5deg); }
-  16% { opacity: 0.76; transform: translate3d(-50%, -50%, 0) scale3d(1.37, 1.37, 1) rotate(-11deg); }
-  24% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.41, 1.41, 1) rotate(-11.6deg); }
-  34% { opacity: 0.58; transform: translate3d(-50%, -50%, 0) scale3d(1.46, 1.46, 1) rotate(-12.2deg); }
-  44% { opacity: 0.46; transform: translate3d(-50%, -50%, 0) scale3d(1.52, 1.52, 1) rotate(-12.9deg); }
-  58% { opacity: 0.32; transform: translate3d(-50%, -50%, 0) scale3d(1.6, 1.6, 1) rotate(-13.8deg); }
-  72% { opacity: 0.18; transform: translate3d(-50%, -50%, 0) scale3d(1.68, 1.68, 1) rotate(-14.7deg); }
-  86% { opacity: 0.08; transform: translate3d(-50%, -50%, 0) scale3d(1.74, 1.74, 1) rotate(-15.5deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.8, 1.8, 1) rotate(-16.2deg); }
+  0% { opacity: 0.62; }
+  24% { opacity: 0.7; }
+  52% { opacity: 0.38; }
+  78% { opacity: 0.1; }
+  100% { opacity: 0; }
 }
-
 @keyframes daiionCrusadesReducedWarpCover {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -6345,7 +6388,7 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__shockwave,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streak-field {
     animation: none !important;
     opacity: 0;
   }
@@ -6361,7 +6404,7 @@ button {
   }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__shockwave,
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streaks {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__streak-field {
     animation: none !important;
     opacity: 0;
   }
