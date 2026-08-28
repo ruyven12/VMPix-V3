@@ -6212,23 +6212,48 @@ button {
 @keyframes daiionCrusadesPortalReveal {
   0% {
     opacity: 0.96;
-    -webkit-clip-path: circle(3.9vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
-    clip-path: circle(3.9vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    -webkit-clip-path: circle(3.6vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(3.6vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
   }
-  19% {
+  8% {
+    opacity: 0.98;
+    -webkit-clip-path: circle(5.4vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(5.4vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  16% {
     opacity: 1;
-    -webkit-clip-path: circle(3.25vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
-    clip-path: circle(3.25vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    -webkit-clip-path: circle(8.8vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(8.8vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
   }
-  52% {
+  24% {
+    opacity: 1;
+    -webkit-clip-path: circle(14.6vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(14.6vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  34% {
+    opacity: 1;
+    -webkit-clip-path: circle(24vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(24vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  44% {
     opacity: 1;
     -webkit-clip-path: circle(37vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
     clip-path: circle(37vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
   }
-  81% {
+  58% {
     opacity: 1;
-    -webkit-clip-path: circle(86vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
-    clip-path: circle(86vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    -webkit-clip-path: circle(58vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(58vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  72% {
+    opacity: 1;
+    -webkit-clip-path: circle(78vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(78vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  86% {
+    opacity: 1;
+    -webkit-clip-path: circle(98vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(98vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
   }
   100% {
     opacity: 1;
@@ -6238,32 +6263,55 @@ button {
 }
 
 @keyframes daiionCrusadesApertureOpen {
-  0% { opacity: 0.96; transform: translate3d(-50%, -50%, 0) scale3d(0.06, 0.06, 1); }
-  19% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.05, 0.05, 1); }
-  52% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.58, 0.58, 1); }
-  81% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1); }
-  100% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.72, 1.72, 1); }
+  0% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(0.035, 0.035, 1); }
+  8% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(0.055, 0.055, 1); }
+  16% { opacity: 0.96; transform: translate3d(-50%, -50%, 0) scale3d(0.09, 0.09, 1); }
+  24% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.15, 0.15, 1); }
+  34% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(0.25, 0.25, 1); }
+  44% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(0.4, 0.4, 1); }
+  58% { opacity: 0.92; transform: translate3d(-50%, -50%, 0) scale3d(0.66, 0.66, 1); }
+  72% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(1, 1, 1); }
+  86% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.72, 1.72, 1); }
 }
 
 @keyframes daiionCrusadesAperturePrimary {
   0% { opacity: 0.9; transform: translate3d(-50%, -50%, 0) scale3d(1.36, 1.36, 1) rotate(-14deg); }
-  19% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale3d(1.28, 1.28, 1) rotate(-12deg); }
-  64% { opacity: 0.66; transform: translate3d(-50%, -50%, 0) scale3d(1.52, 1.52, 1) rotate(-16deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.68, 1.68, 1) rotate(-18deg); }
+  8% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(1.38, 1.38, 1) rotate(-14.4deg); }
+  16% { opacity: 0.98; transform: translate3d(-50%, -50%, 0) scale3d(1.41, 1.41, 1) rotate(-14.8deg); }
+  24% { opacity: 0.94; transform: translate3d(-50%, -50%, 0) scale3d(1.45, 1.45, 1) rotate(-15.2deg); }
+  34% { opacity: 0.84; transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(-15.8deg); }
+  44% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1) rotate(-16.4deg); }
+  58% { opacity: 0.54; transform: translate3d(-50%, -50%, 0) scale3d(1.64, 1.64, 1) rotate(-17deg); }
+  72% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(1.71, 1.71, 1) rotate(-17.5deg); }
+  86% { opacity: 0.16; transform: translate3d(-50%, -50%, 0) scale3d(1.78, 1.78, 1) rotate(-18deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.84, 1.84, 1) rotate(-18.4deg); }
 }
 
 @keyframes daiionCrusadesApertureSecondary {
   0% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.3, 1.3, 1) rotate(15deg); }
-  22% { opacity: 0.78; transform: translate3d(-50%, -50%, 0) scale3d(1.2, 1.2, 1) rotate(13deg); }
-  68% { opacity: 0.46; transform: translate3d(-50%, -50%, 0) scale3d(1.44, 1.44, 1) rotate(18deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.58, 1.58, 1) rotate(20deg); }
+  8% { opacity: 0.76; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(15.4deg); }
+  16% { opacity: 0.78; transform: translate3d(-50%, -50%, 0) scale3d(1.35, 1.35, 1) rotate(15.9deg); }
+  24% { opacity: 0.72; transform: translate3d(-50%, -50%, 0) scale3d(1.39, 1.39, 1) rotate(16.4deg); }
+  34% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.44, 1.44, 1) rotate(17deg); }
+  44% { opacity: 0.5; transform: translate3d(-50%, -50%, 0) scale3d(1.49, 1.49, 1) rotate(17.6deg); }
+  58% { opacity: 0.36; transform: translate3d(-50%, -50%, 0) scale3d(1.56, 1.56, 1) rotate(18.4deg); }
+  72% { opacity: 0.22; transform: translate3d(-50%, -50%, 0) scale3d(1.63, 1.63, 1) rotate(19.1deg); }
+  86% { opacity: 0.1; transform: translate3d(-50%, -50%, 0) scale3d(1.69, 1.69, 1) rotate(19.7deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.74, 1.74, 1) rotate(20.2deg); }
 }
 
 @keyframes daiionCrusadesApertureFractures {
   0% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
-  21% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(1.18, 1.18, 1) rotate(-8deg); }
-  72% { opacity: 0.34; transform: translate3d(-50%, -50%, 0) scale3d(1.5, 1.5, 1) rotate(-14deg); }
-  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.64, 1.64, 1) rotate(-16deg); }
+  8% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.34, 1.34, 1) rotate(-10.5deg); }
+  16% { opacity: 0.76; transform: translate3d(-50%, -50%, 0) scale3d(1.37, 1.37, 1) rotate(-11deg); }
+  24% { opacity: 0.7; transform: translate3d(-50%, -50%, 0) scale3d(1.41, 1.41, 1) rotate(-11.6deg); }
+  34% { opacity: 0.58; transform: translate3d(-50%, -50%, 0) scale3d(1.46, 1.46, 1) rotate(-12.2deg); }
+  44% { opacity: 0.46; transform: translate3d(-50%, -50%, 0) scale3d(1.52, 1.52, 1) rotate(-12.9deg); }
+  58% { opacity: 0.32; transform: translate3d(-50%, -50%, 0) scale3d(1.6, 1.6, 1) rotate(-13.8deg); }
+  72% { opacity: 0.18; transform: translate3d(-50%, -50%, 0) scale3d(1.68, 1.68, 1) rotate(-14.7deg); }
+  86% { opacity: 0.08; transform: translate3d(-50%, -50%, 0) scale3d(1.74, 1.74, 1) rotate(-15.5deg); }
+  100% { opacity: 0; transform: translate3d(-50%, -50%, 0) scale3d(1.8, 1.8, 1) rotate(-16.2deg); }
 }
 
 @keyframes daiionCrusadesReducedWarpCover {
