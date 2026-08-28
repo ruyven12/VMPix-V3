@@ -12342,8 +12342,7 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-reconstructing .portfolio-engine-panel--left {
   visibility: visible !important;
   opacity: 1 !important;
-  transform: translate3d(0, 0.12rem, 0) scale3d(0.96, 0.96, 1);
-  animation: daiionCrusadesEngineTitleReturn 860ms ease-out forwards !important;
+  animation: none !important;
   transition: none !important;
 }
 
@@ -12354,7 +12353,6 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .portfolio-engine-panel--left {
   visibility: visible !important;
   opacity: 1 !important;
-  transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
   animation: none !important;
   transition: none !important;
 }
@@ -12441,7 +12439,6 @@ button {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-engine-reconstructing, .is-daiion-crusades-engine-restored) .portfolio-engine-panel--left {
     visibility: visible !important;
     opacity: 1 !important;
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
     animation: none !important;
   }
 
