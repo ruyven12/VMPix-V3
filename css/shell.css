@@ -6028,7 +6028,23 @@ button {
   opacity: 0;
   overflow: hidden;
   contain: layout paint style;
+  isolation: isolate;
   will-change: opacity;
+}
+
+.daiion-crusades-warp-layer::before {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: "";
+  opacity: 0;
+  background:
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
+    url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
+    #030306;
+  -webkit-clip-path: circle(0 at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  clip-path: circle(0 at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  will-change: clip-path, opacity;
 }
 
 .daiion-crusades-warp-layer > span {
@@ -6038,6 +6054,7 @@ button {
 }
 
 .daiion-crusades-warp-layer__cover {
+  z-index: 1;
   inset: 0;
   opacity: 0;
   will-change: opacity;
@@ -6059,29 +6076,31 @@ button {
 }
 
 .daiion-crusades-warp-layer__shockwave {
+  z-index: 4;
   opacity: 0;
-  background: radial-gradient(circle, transparent 0 42%, rgba(255, 248, 236, 0.96) 43% 43.6%, rgb(var(--engine-accent-glow) / 0.86) 44% 45%, rgb(var(--engine-accent) / 0.62) 45.4% 46.3%, transparent 47%);
+  background: radial-gradient(circle, transparent 0 42.4%, rgba(255, 248, 236, 0.96) 43% 43.34%, rgb(var(--engine-accent-glow) / 0.86) 43.62% 44.08%, rgb(var(--engine-accent) / 0.62) 44.3% 44.78%, transparent 45.12%);
   clip-path: polygon(50% 0, 57% 4%, 64% 1%, 69% 8%, 78% 6%, 82% 15%, 91% 20%, 89% 30%, 98% 39%, 94% 47%, 100% 56%, 91% 63%, 94% 74%, 84% 78%, 78% 89%, 67% 87%, 59% 98%, 50% 93%, 40% 100%, 33% 89%, 22% 91%, 17% 81%, 6% 76%, 10% 64%, 0 57%, 6% 48%, 1% 38%, 10% 31%, 8% 20%, 19% 16%, 24% 6%, 36% 9%, 43% 2%);
 }
 
 .daiion-crusades-warp-layer__streaks {
+  z-index: 3;
   opacity: 0;
-  -webkit-mask-image: radial-gradient(circle, transparent 0 5%, #000 8% 78%, transparent 82%);
-  mask-image: radial-gradient(circle, transparent 0 5%, #000 8% 78%, transparent 82%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 6%, #000 9% 86%, transparent 91%);
+  mask-image: radial-gradient(circle, transparent 0 6%, #000 9% 86%, transparent 91%);
 }
 
 .daiion-crusades-warp-layer__streaks--primary {
-  background: conic-gradient(from 3deg, transparent 0deg 4deg, rgba(255, 247, 230, 0.92) 4.5deg 5.1deg, rgb(var(--engine-accent-glow) / 0.8) 5.4deg 7deg, transparent 7.4deg 24deg, rgb(var(--engine-accent) / 0.58) 24.8deg 27deg, transparent 27.6deg 52deg, rgb(var(--engine-accent-glow) / 0.72) 53deg 55deg, transparent 55.8deg 91deg, rgb(var(--engine-accent) / 0.54) 92deg 94deg, transparent 95deg 147deg, rgb(var(--engine-accent-glow) / 0.66) 148deg 151deg, transparent 152deg 211deg, rgb(var(--engine-accent) / 0.52) 212deg 215deg, transparent 216deg 276deg, rgb(var(--engine-accent-glow) / 0.78) 277deg 279deg, transparent 280deg 332deg, rgb(var(--engine-accent) / 0.5) 333deg 336deg, transparent 337deg 360deg);
+  background: conic-gradient(from 3deg, transparent 0deg 4.6deg, rgba(255, 247, 230, 0.92) 4.82deg 5.08deg, rgb(var(--engine-accent-glow) / 0.8) 5.22deg 5.86deg, transparent 6.12deg 23.4deg, rgb(var(--engine-accent) / 0.58) 23.82deg 25.16deg, transparent 25.64deg 51.7deg, rgb(var(--engine-accent-glow) / 0.72) 52.22deg 53.48deg, transparent 54deg 89.6deg, rgb(var(--engine-accent) / 0.54) 90.3deg 91.82deg, transparent 92.3deg 145.2deg, rgb(var(--engine-accent-glow) / 0.66) 146.1deg 147.7deg, transparent 148.3deg 207.4deg, rgb(var(--engine-accent) / 0.52) 208.2deg 210.1deg, transparent 210.8deg 273.9deg, rgb(var(--engine-accent-glow) / 0.78) 274.8deg 276.04deg, transparent 276.7deg 329.4deg, rgb(var(--engine-accent) / 0.5) 330.2deg 332.1deg, transparent 332.7deg 360deg);
 }
 
 .daiion-crusades-warp-layer__streaks--secondary {
-  background: conic-gradient(from -21deg, transparent 0deg 13deg, rgb(var(--engine-accent) / 0.42) 14deg 17deg, transparent 18deg 44deg, rgb(var(--engine-accent-glow) / 0.5) 45deg 47deg, transparent 48deg 103deg, rgb(var(--engine-accent) / 0.38) 104deg 108deg, transparent 109deg 169deg, rgb(var(--engine-accent-glow) / 0.48) 170deg 173deg, transparent 174deg 238deg, rgb(var(--engine-accent) / 0.36) 239deg 242deg, transparent 243deg 306deg, rgb(var(--engine-accent-glow) / 0.44) 307deg 310deg, transparent 311deg 360deg);
+  background: conic-gradient(from -17deg, transparent 0deg 12.6deg, rgb(var(--engine-accent) / 0.42) 13.1deg 14.7deg, transparent 15.4deg 43.2deg, rgb(var(--engine-accent-glow) / 0.5) 43.92deg 45.08deg, transparent 45.8deg 101.4deg, rgb(var(--engine-accent) / 0.38) 102deg 104.2deg, transparent 104.9deg 167.8deg, rgb(var(--engine-accent-glow) / 0.48) 168.4deg 169.86deg, transparent 170.5deg 235.4deg, rgb(var(--engine-accent) / 0.36) 236.2deg 238.1deg, transparent 238.9deg 302.4deg, rgb(var(--engine-accent-glow) / 0.44) 303.1deg 304.7deg, transparent 305.4deg 360deg);
 }
 
 .daiion-crusades-warp-layer__streaks--fractures {
   background:
-    repeating-conic-gradient(from 8deg, transparent 0deg 18deg, rgb(var(--engine-accent-glow) / 0.32) 18.6deg 19.4deg, transparent 20deg 47deg),
-    radial-gradient(circle, transparent 0 18%, rgb(var(--engine-accent) / 0.24) 19% 20%, transparent 21% 100%);
+    conic-gradient(from 11deg, transparent 0deg 17.8deg, rgb(var(--engine-accent-glow) / 0.32) 18.16deg 18.72deg, transparent 19.2deg 45.4deg, rgb(var(--engine-accent) / 0.22) 45.86deg 46.42deg, transparent 47deg 96.6deg, rgb(var(--engine-accent-glow) / 0.28) 97.1deg 97.8deg, transparent 98.4deg 184.2deg, rgb(var(--engine-accent-glow) / 0.24) 184.8deg 185.34deg, transparent 186deg 254.3deg, rgb(var(--engine-accent) / 0.2) 254.82deg 255.38deg, transparent 256deg 321.5deg, rgb(var(--engine-accent-glow) / 0.26) 322.04deg 322.76deg, transparent 323.4deg 360deg),
+    radial-gradient(circle, transparent 0 18%, rgb(var(--engine-accent) / 0.24) 19% 19.7%, transparent 20.6% 100%);
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer {
@@ -6119,15 +6138,19 @@ button {
   opacity: 1;
 }
 
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer::before {
+  animation: daiionCrusadesPortalReveal 420ms cubic-bezier(0.12, 0.84, 0.12, 1) forwards;
+}
+
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer__shockwave {
-  z-index: 3;
+  z-index: 4;
   opacity: 1;
   border: 0.06rem solid rgba(255, 248, 236, 0.88);
   border-radius: 50%;
-  background: #000;
+  background: transparent;
   box-shadow:
-    0 0 0 0.1rem rgb(var(--engine-accent-glow) / 0.62),
-    0 0 0.2rem rgb(var(--engine-accent) / 0.44);
+    0 0 0 0.08rem rgb(var(--engine-accent-glow) / 0.56),
+    0 0 0.14rem rgb(var(--engine-accent) / 0.36);
   clip-path: none;
   animation: daiionCrusadesApertureOpen 420ms cubic-bezier(0.12, 0.84, 0.12, 1) forwards;
 }
@@ -6184,6 +6207,34 @@ button {
   50% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(0.76, 0.76, 1) rotate(-2deg); }
   82% { opacity: 0.82; transform: translate3d(-50%, -50%, 0) scale3d(1.08, 1.08, 1) rotate(-7deg); }
   100% { opacity: 0.62; transform: translate3d(-50%, -50%, 0) scale3d(1.32, 1.32, 1) rotate(-10deg); }
+}
+
+@keyframes daiionCrusadesPortalReveal {
+  0% {
+    opacity: 0.96;
+    -webkit-clip-path: circle(3.9vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(3.9vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  19% {
+    opacity: 1;
+    -webkit-clip-path: circle(3.25vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(3.25vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  52% {
+    opacity: 1;
+    -webkit-clip-path: circle(37vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(37vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  81% {
+    opacity: 1;
+    -webkit-clip-path: circle(86vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(86vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
+  100% {
+    opacity: 1;
+    -webkit-clip-path: circle(112vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+    clip-path: circle(112vmax at var(--daiion-crusades-impact-x, 50vw) var(--daiion-crusades-impact-y, 88vh));
+  }
 }
 
 @keyframes daiionCrusadesApertureOpen {
@@ -6247,6 +6298,11 @@ button {
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__shockwave,
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-warping .daiion-crusades-warp-layer__streaks {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-aperture-opening .daiion-crusades-warp-layer::before {
     animation: none !important;
     opacity: 0;
   }
