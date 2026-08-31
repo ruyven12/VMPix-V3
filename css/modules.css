@@ -16178,7 +16178,7 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   pointer-events: none;
   contain: paint;
-  opacity: 0.92;
+  opacity: 0.46;
   background:
     radial-gradient(ellipse at 2% 39%, rgba(102, 13, 18, 0.18), rgba(37, 4, 7, 0.12) 36%, transparent 64%),
     radial-gradient(ellipse at 98% 42%, rgba(96, 12, 17, 0.17), rgba(35, 4, 7, 0.1) 38%, transparent 66%),
@@ -16330,7 +16330,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (min-width: 760px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.9;
+    opacity: 0.45;
     background:
       radial-gradient(ellipse at 7% 34%, rgba(96, 12, 17, 0.2), rgba(35, 4, 7, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 93% 36%, rgba(91, 11, 16, 0.18), rgba(34, 4, 7, 0.11) 38%, transparent 67%),
@@ -16390,7 +16390,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.94;
+    opacity: 0.47;
     background:
       radial-gradient(ellipse at -12% 50%, rgba(109, 13, 18, 0.22), rgba(38, 5, 8, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 112% 48%, rgba(103, 12, 17, 0.2), rgba(36, 5, 8, 0.12) 38%, transparent 66%),
@@ -16465,7 +16465,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.82;
+    opacity: 0.41;
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before,
