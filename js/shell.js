@@ -694,6 +694,87 @@ function setPortfolioEngineHudCurrentView(viewName, options = {}) {
   }
 }
 
+const HALL_ENGINE_TITLE_PRIMARY = "Daiion - Hall of Crusades";
+const HALL_ENGINE_TITLE_ALTERNATE = "(Wrestling Show Archive)";
+const HALL_ENGINE_TITLE_HOLD_MS = 1500;
+const HALL_ENGINE_TITLE_MORPH_MS = 430;
+const HALL_ENGINE_TITLE_REST_MS = 2300;
+let hallEngineTitleMorphTimer = 0;
+let hallEngineTitleMorphCycle = 0;
+
+function getHallEngineTitlePanel() {
+  return portfolioEngineCurrentView?.closest("[data-portfolio-engine-panel='current-view']") || null;
+}
+
+function clearHallEngineTitleMorph() {
+  hallEngineTitleMorphCycle += 1;
+  if (hallEngineTitleMorphTimer) {
+    window.clearTimeout(hallEngineTitleMorphTimer);
+    hallEngineTitleMorphTimer = 0;
+  }
+  getHallEngineTitlePanel()?.classList.remove("has-hall-engine-title-morph", "is-hall-engine-title-morphing");
+  if (portfolioEngineCurrentView) {
+    portfolioEngineCurrentView.classList.remove("is-hall-engine-title-morphing");
+    delete portfolioEngineCurrentView.dataset.hallEngineTitleState;
+  }
+}
+
+function isHallEngineTitleMorphRouteActive() {
+  return Boolean(
+    shell?.dataset.shellRoute === "wrestling-shows" &&
+    shell.classList.contains("is-wrestling-shows-view") &&
+    wrestlingShowsShell?.dataset.wrestlingShowsVariant === "hall-of-crusades"
+  );
+}
+
+function queueHallEngineTitleMorphStep(cycle, delay, callback) {
+  hallEngineTitleMorphTimer = window.setTimeout(() => {
+    hallEngineTitleMorphTimer = 0;
+    if (cycle !== hallEngineTitleMorphCycle || !isHallEngineTitleMorphRouteActive()) {
+      clearHallEngineTitleMorph();
+      return;
+    }
+    callback();
+  }, delay);
+}
+
+function morphHallEngineTitle(cycle, nextTitle, nextState, nextDelay, nextStep) {
+  const panel = getHallEngineTitlePanel();
+  if (!panel || !portfolioEngineCurrentView || !isHallEngineTitleMorphRouteActive() || isPortfolioEngineReducedMotion()) {
+    clearHallEngineTitleMorph();
+    return;
+  }
+  panel.classList.add("is-hall-engine-title-morphing");
+  portfolioEngineCurrentView.classList.add("is-hall-engine-title-morphing");
+  queueHallEngineTitleMorphStep(cycle, Math.round(HALL_ENGINE_TITLE_MORPH_MS * 0.48), () => {
+    setPortfolioEngineHudCurrentView(nextTitle);
+    portfolioEngineCurrentView.dataset.hallEngineTitleState = nextState;
+    queueHallEngineTitleMorphStep(cycle, Math.round(HALL_ENGINE_TITLE_MORPH_MS * 0.52), () => {
+      panel.classList.remove("is-hall-engine-title-morphing");
+      portfolioEngineCurrentView.classList.remove("is-hall-engine-title-morphing");
+      queueHallEngineTitleMorphStep(cycle, nextDelay, nextStep);
+    });
+  });
+}
+
+function startHallEngineTitleMorph() {
+  clearHallEngineTitleMorph();
+  if (!isHallEngineTitleMorphRouteActive() || !portfolioEngineCurrentView) {
+    return;
+  }
+  setPortfolioEngineHudCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+  portfolioEngineCurrentView.dataset.hallEngineTitleState = "lore";
+  getHallEngineTitlePanel()?.classList.add("has-hall-engine-title-morph");
+  if (isPortfolioEngineReducedMotion()) {
+    return;
+  }
+  const cycle = hallEngineTitleMorphCycle + 1;
+  hallEngineTitleMorphCycle = cycle;
+  const showArchiveTitle = () => morphHallEngineTitle(cycle, HALL_ENGINE_TITLE_ALTERNATE, "archive", HALL_ENGINE_TITLE_HOLD_MS, showLoreTitle);
+  const showLoreTitle = () => morphHallEngineTitle(cycle, HALL_ENGINE_TITLE_PRIMARY, "lore", HALL_ENGINE_TITLE_REST_MS, showArchiveTitle);
+  queueHallEngineTitleMorphStep(cycle, HALL_ENGINE_TITLE_HOLD_MS, showArchiveTitle);
+}
+
 function isPortfolioEngineReducedMotion() {
   return Boolean(window.matchMedia?.(PORTFOLIO_ENGINE_REDUCED_MOTION_QUERY).matches);
 }
@@ -3299,12 +3380,11 @@ function showWrestlingShowsIndex(options = {}) {
   setDocumentTitle("The Campaign Archive - Voodoo Media V3.0.01");
   if (isHallOfCrusadesVariant) {
     setPortfolioActiveWorld("battleground");
-    setCurrentView("Daiion – Hall of Crusades");
-    setPortfolioEngineHudCurrentView("Daiion – Hall of Crusades");
-    window.requestAnimationFrame(() => {
-      setPortfolioEngineHudCurrentView("Daiion – Hall of Crusades");
-    });
+    setCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+    setPortfolioEngineHudCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+    window.requestAnimationFrame(startHallEngineTitleMorph);
   } else {
+    clearHallEngineTitleMorph();
     setCurrentView("Event Archive");
   }
   setActiveGlobalNav("wrestling");
