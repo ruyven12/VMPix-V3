@@ -16777,6 +16777,26 @@ function ensureHallCrusadesFirelight() {
   wrestlingShowsShell.prepend(firelight);
 }
 
+function ensureHallCrusadesHaze() {
+  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-haze]")) return;
+
+  const haze = document.createElement("div");
+  haze.className = "hall-crusades-haze";
+  haze.dataset.hallCrusadesHaze = "true";
+  haze.setAttribute("aria-hidden", "true");
+
+  ["left-depth", "right-depth", "lower-depth", "left-recess", "right-recess"].forEach((region) => {
+    const mass = document.createElement("span");
+    mass.className = `hall-crusades-haze__mass hall-crusades-haze__mass--${region}`;
+    mass.setAttribute("aria-hidden", "true");
+    haze.append(mass);
+  });
+
+  const firelight = wrestlingShowsShell.querySelector("[data-hall-crusades-firelight]");
+  if (firelight?.nextSibling) wrestlingShowsShell.insertBefore(haze, firelight.nextSibling);
+  else wrestlingShowsShell.prepend(haze);
+}
+
 function ensureDaiionCrusadesInterfaceInsignia() {
   if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-daiion-crusades-interface-insignia]")) return;
   const insignia = document.createElement("span");
@@ -16796,6 +16816,7 @@ function preloadDaiionCrusadesInterfaceData() {
 function prepareHallCrusadesInterfaceChrome() {
   if (!wrestlingShowsShell) return;
   ensureHallCrusadesFirelight();
+  ensureHallCrusadesHaze();
   ensureDaiionCrusadesInterfaceInsignia();
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
   const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");
