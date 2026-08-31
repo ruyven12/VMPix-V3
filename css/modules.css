@@ -16178,248 +16178,330 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   pointer-events: none;
   contain: paint;
-  opacity: 0.98;
-  mix-blend-mode: screen;
-  --hall-crusades-haze-left-x: -7vw;
-  --hall-crusades-haze-right-x: 52vw;
-  --hall-crusades-haze-lower-x: 18vw;
-  --hall-crusades-haze-side-y: 35svh;
-  --hall-crusades-haze-lower-y: 67svh;
+  opacity: 0.92;
+  background:
+    radial-gradient(ellipse at 2% 39%, rgba(102, 13, 18, 0.18), rgba(37, 4, 7, 0.12) 36%, transparent 64%),
+    radial-gradient(ellipse at 98% 42%, rgba(96, 12, 17, 0.17), rgba(35, 4, 7, 0.1) 38%, transparent 66%),
+    radial-gradient(ellipse at 48% 83%, rgba(120, 19, 16, 0.14), rgba(25, 4, 5, 0.12) 42%, transparent 70%),
+    linear-gradient(108deg, rgba(6, 4, 5, 0.08), transparent 28%, rgba(83, 9, 12, 0.07) 58%, transparent 86%);
+  --hall-crusades-haze-smoke-x-start: -2vw;
+  --hall-crusades-haze-smoke-y-start: 0.5svh;
+  --hall-crusades-haze-smoke-x-mid: 2.2vw;
+  --hall-crusades-haze-smoke-y-mid: -0.65svh;
+  --hall-crusades-haze-smoke-x-late: -1.15vw;
+  --hall-crusades-haze-smoke-y-late: 0.8svh;
+  --hall-crusades-haze-glow-x-start: 1.6vw;
+  --hall-crusades-haze-glow-y-start: -0.35svh;
+  --hall-crusades-haze-glow-x-mid: -2.3vw;
+  --hall-crusades-haze-glow-y-mid: 0.55svh;
+  --hall-crusades-haze-glow-x-late: 0.95vw;
+  --hall-crusades-haze-glow-y-late: -0.5svh;
+  --hall-crusades-haze-back-x-start: -1.4vw;
+  --hall-crusades-haze-back-y-start: 0.35svh;
+  --hall-crusades-haze-back-x-mid: 2.7vw;
+  --hall-crusades-haze-back-y-mid: -0.55svh;
+  --hall-crusades-haze-back-x-late: -1vw;
+  --hall-crusades-haze-back-y-late: 0.8svh;
+  --hall-crusades-haze-cross-x-start: 1.8vw;
+  --hall-crusades-haze-cross-y-start: -0.15svh;
+  --hall-crusades-haze-cross-x-mid: -2.5vw;
+  --hall-crusades-haze-cross-y-mid: 0.45svh;
+  --hall-crusades-haze-cross-x-late: 1.05vw;
+  --hall-crusades-haze-cross-y-late: -0.55svh;
+  --hall-crusades-haze-floor-x-start: -1.2vw;
+  --hall-crusades-haze-floor-y-start: 0.4svh;
+  --hall-crusades-haze-floor-x-mid: 2.1vw;
+  --hall-crusades-haze-floor-y-mid: -0.35svh;
+  --hall-crusades-haze-floor-x-late: -1.8vw;
+  --hall-crusades-haze-floor-y-late: 0.65svh;
 }
 
-.hall-crusades-haze__mass {
-  position: absolute;
-  display: block;
-  inline-size: var(--hall-crusades-haze-width);
-  block-size: var(--hall-crusades-haze-height);
-  border-radius: var(--hall-crusades-haze-radius, 47% 55% 49% 42%);
-  background: var(--hall-crusades-haze-gradient);
-  opacity: var(--hall-crusades-haze-opacity, 0.58);
-  transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(var(--hall-crusades-haze-scale-x, 1), var(--hall-crusades-haze-scale-y, 1), 1);
-  transform-origin: var(--hall-crusades-haze-origin, 50% 58%);
-  will-change: opacity, transform;
-}
-
-.hall-crusades-haze__mass::before,
-.hall-crusades-haze__mass::after {
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before,
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::after {
   position: absolute;
   content: "";
   pointer-events: none;
-  border-radius: inherit;
+  will-change: opacity, transform;
 }
 
-.hall-crusades-haze__mass::before {
-  inset: 7% 10% 11% 5%;
-  background: var(--hall-crusades-haze-vein);
-  opacity: 0.82;
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before {
+  inset: -19% -34% -17%;
+  background:
+    radial-gradient(ellipse at 9% 32%, rgba(12, 5, 7, 0.36), rgba(78, 9, 14, 0.18) 37%, transparent 66%),
+    radial-gradient(ellipse at 90% 35%, rgba(12, 5, 7, 0.34), rgba(70, 8, 13, 0.16) 39%, transparent 68%),
+    radial-gradient(ellipse at 46% 72%, rgba(22, 5, 6, 0.32), rgba(83, 10, 12, 0.14) 45%, transparent 72%),
+    linear-gradient(101deg, transparent 0 12%, rgba(11, 5, 6, 0.18) 24%, transparent 40% 54%, rgba(70, 8, 12, 0.13) 69%, transparent 88%);
+  opacity: 0.38;
+  mix-blend-mode: multiply;
+  transform: translate3d(var(--hall-crusades-haze-smoke-x-start), var(--hall-crusades-haze-smoke-y-start), 0) scale3d(1.02, 1, 1);
+  animation: hallCrusadesAtmosphereSmokeDrift 44s ease-in-out -12s infinite;
 }
 
-.hall-crusades-haze__mass::after {
-  inset: 18% 7% 5% 14%;
-  background: var(--hall-crusades-haze-wisp);
-  opacity: 0.72;
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::after {
+  inset: -24% -38% -20%;
+  background:
+    radial-gradient(ellipse at -6% 58%, rgba(186, 38, 31, 0.24), rgba(112, 14, 17, 0.16) 34%, transparent 62%),
+    radial-gradient(ellipse at 104% 52%, rgba(178, 35, 30, 0.22), rgba(102, 13, 16, 0.14) 35%, transparent 63%),
+    radial-gradient(ellipse at 52% 70%, rgba(202, 65, 38, 0.13), rgba(96, 12, 13, 0.1) 39%, transparent 72%),
+    linear-gradient(74deg, transparent 0 18%, rgba(140, 19, 21, 0.1) 33%, transparent 46% 60%, rgba(221, 80, 42, 0.09) 74%, transparent 90%);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  transform: translate3d(var(--hall-crusades-haze-glow-x-start), var(--hall-crusades-haze-glow-y-start), 0) scale3d(1, 1.015, 1);
+  animation: hallCrusadesAtmosphereGlowDrift 37s ease-in-out -5s infinite;
 }
 
-.hall-crusades-haze__mass--left-depth {
-  --hall-crusades-haze-x: var(--hall-crusades-haze-left-x);
-  --hall-crusades-haze-y: var(--hall-crusades-haze-side-y);
-  --hall-crusades-haze-width: clamp(13rem, 48vw, 18.5rem);
-  --hall-crusades-haze-height: clamp(15rem, 42svh, 22.5rem);
-  --hall-crusades-haze-opacity: 0.72;
-  --hall-crusades-haze-radius: 53% 39% 57% 43%;
-  --hall-crusades-haze-origin: 32% 62%;
-  --hall-crusades-haze-gradient:
-    radial-gradient(ellipse at 30% 61%, rgba(172, 30, 27, 0.52), rgba(116, 13, 16, 0.38) 30%, rgba(54, 6, 8, 0.23) 54%, transparent 82%),
-    radial-gradient(ellipse at 71% 34%, rgba(224, 92, 52, 0.28), rgba(95, 13, 14, 0.15) 40%, transparent 68%);
-  --hall-crusades-haze-vein: radial-gradient(ellipse at 42% 44%, rgba(238, 110, 66, 0.32), rgba(124, 17, 18, 0.22) 42%, transparent 76%);
-  --hall-crusades-haze-wisp: radial-gradient(ellipse at 62% 68%, rgba(154, 25, 23, 0.32), rgba(82, 10, 12, 0.16) 48%, transparent 70%);
-  animation: hallCrusadesHazeLeftDepth 24s ease-in-out -5.5s infinite;
+.hall-crusades-haze__field {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  will-change: opacity, transform;
 }
 
-.hall-crusades-haze__mass--right-depth {
-  --hall-crusades-haze-x: var(--hall-crusades-haze-right-x);
-  --hall-crusades-haze-y: 38svh;
-  --hall-crusades-haze-width: clamp(13rem, 47vw, 18.5rem);
-  --hall-crusades-haze-height: clamp(14rem, 40svh, 22rem);
-  --hall-crusades-haze-opacity: 0.68;
-  --hall-crusades-haze-radius: 41% 56% 44% 59%;
-  --hall-crusades-haze-origin: 66% 58%;
-  --hall-crusades-haze-gradient:
-    radial-gradient(ellipse at 69% 58%, rgba(166, 27, 27, 0.52), rgba(108, 12, 15, 0.37) 31%, rgba(50, 6, 9, 0.23) 55%, transparent 82%),
-    radial-gradient(ellipse at 24% 37%, rgba(219, 88, 52, 0.27), rgba(91, 11, 13, 0.14) 41%, transparent 68%);
-  --hall-crusades-haze-vein: radial-gradient(ellipse at 56% 39%, rgba(232, 101, 62, 0.3), rgba(114, 15, 17, 0.21) 40%, transparent 76%);
-  --hall-crusades-haze-wisp: radial-gradient(ellipse at 36% 70%, rgba(146, 23, 23, 0.31), rgba(80, 10, 12, 0.15) 48%, transparent 70%);
-  animation: hallCrusadesHazeRightDepth 29s ease-in-out -13s infinite;
+.hall-crusades-haze__field--backfield {
+  inset: -18% -42% -16%;
+  background:
+    radial-gradient(ellipse at 8% 34%, rgba(126, 15, 21, 0.28), rgba(44, 5, 8, 0.16) 35%, transparent 67%),
+    radial-gradient(ellipse at 91% 29%, rgba(116, 14, 20, 0.24), rgba(38, 5, 8, 0.14) 38%, transparent 69%),
+    radial-gradient(ellipse at 58% 50%, rgba(46, 6, 9, 0.2), rgba(124, 20, 18, 0.1) 44%, transparent 77%),
+    linear-gradient(92deg, transparent 0 10%, rgba(126, 18, 20, 0.1) 24%, transparent 43% 56%, rgba(12, 5, 6, 0.16) 73%, transparent 94%);
+  opacity: 0.62;
+  mix-blend-mode: screen;
+  transform: translate3d(var(--hall-crusades-haze-back-x-start), var(--hall-crusades-haze-back-y-start), 0) scale3d(1.02, 1.01, 1);
+  transform-origin: 46% 44%;
+  animation: hallCrusadesAtmosphereBackfield 41s ease-in-out -17s infinite;
 }
 
-.hall-crusades-haze__mass--lower-depth {
-  --hall-crusades-haze-x: var(--hall-crusades-haze-lower-x);
-  --hall-crusades-haze-y: var(--hall-crusades-haze-lower-y);
-  --hall-crusades-haze-width: clamp(17rem, 68vw, 26rem);
-  --hall-crusades-haze-height: clamp(9rem, 26svh, 16rem);
-  --hall-crusades-haze-opacity: 0.62;
-  --hall-crusades-haze-radius: 59% 47% 52% 41%;
-  --hall-crusades-haze-origin: 52% 72%;
-  --hall-crusades-haze-gradient:
-    radial-gradient(ellipse at 47% 67%, rgba(157, 27, 24, 0.5), rgba(99, 11, 13, 0.34) 33%, rgba(46, 5, 7, 0.2) 57%, transparent 82%),
-    radial-gradient(ellipse at 16% 44%, rgba(220, 90, 50, 0.24), rgba(94, 13, 13, 0.13) 40%, transparent 66%),
-    radial-gradient(ellipse at 84% 39%, rgba(202, 72, 43, 0.22), rgba(88, 11, 12, 0.12) 42%, transparent 68%);
-  --hall-crusades-haze-vein: radial-gradient(ellipse at 44% 56%, rgba(236, 106, 60, 0.28), rgba(116, 16, 16, 0.2) 44%, transparent 77%);
-  --hall-crusades-haze-wisp: radial-gradient(ellipse at 63% 73%, rgba(146, 22, 21, 0.3), rgba(77, 9, 10, 0.15) 48%, transparent 70%);
-  animation: hallCrusadesHazeLowerDepth 34s ease-in-out -19s infinite;
+.hall-crusades-haze__field--crossflow {
+  inset: -12% -50% -12%;
+  background:
+    radial-gradient(ellipse at 22% 47%, rgba(185, 38, 32, 0.16), rgba(98, 12, 15, 0.12) 33%, transparent 63%),
+    radial-gradient(ellipse at 78% 54%, rgba(172, 33, 29, 0.15), rgba(87, 10, 13, 0.11) 35%, transparent 64%),
+    linear-gradient(113deg, transparent 0 16%, rgba(23, 5, 7, 0.2) 26%, rgba(94, 10, 13, 0.11) 39%, transparent 53% 65%, rgba(210, 71, 40, 0.08) 78%, transparent 92%);
+  opacity: 0.54;
+  mix-blend-mode: screen;
+  transform: translate3d(var(--hall-crusades-haze-cross-x-start), var(--hall-crusades-haze-cross-y-start), 0) scale3d(1.04, 0.99, 1);
+  transform-origin: 52% 55%;
+  animation: hallCrusadesAtmosphereCrossflow 33s ease-in-out -7.5s infinite;
 }
 
-.hall-crusades-haze__mass--left-recess {
-  --hall-crusades-haze-x: 0vw;
-  --hall-crusades-haze-y: 56svh;
-  --hall-crusades-haze-width: clamp(9rem, 32vw, 13rem);
-  --hall-crusades-haze-height: clamp(8rem, 20svh, 12rem);
-  --hall-crusades-haze-opacity: 0.56;
-  --hall-crusades-haze-radius: 44% 58% 42% 54%;
-  --hall-crusades-haze-gradient: radial-gradient(ellipse at 39% 58%, rgba(201, 58, 41, 0.46), rgba(105, 13, 14, 0.3) 39%, rgba(44, 5, 7, 0.16) 58%, transparent 78%);
-  --hall-crusades-haze-vein: radial-gradient(ellipse at 55% 43%, rgba(238, 104, 60, 0.24), rgba(103, 14, 14, 0.15) 42%, transparent 67%);
-  --hall-crusades-haze-wisp: radial-gradient(ellipse at 35% 72%, rgba(135, 18, 19, 0.26), transparent 68%);
-  animation: hallCrusadesHazeLeftRecess 21s ease-in-out -9s infinite;
+.hall-crusades-haze__field--floor-bank {
+  inset: 39% -30% -24%;
+  background:
+    radial-gradient(ellipse at 18% 74%, rgba(142, 18, 18, 0.24), rgba(42, 5, 6, 0.16) 39%, transparent 69%),
+    radial-gradient(ellipse at 82% 70%, rgba(128, 16, 18, 0.22), rgba(39, 5, 6, 0.14) 38%, transparent 68%),
+    radial-gradient(ellipse at 50% 84%, rgba(216, 72, 38, 0.12), rgba(83, 10, 10, 0.11) 39%, transparent 68%),
+    linear-gradient(89deg, transparent 0 14%, rgba(103, 11, 12, 0.1) 31%, transparent 45% 55%, rgba(96, 10, 12, 0.09) 72%, transparent 88%);
+  opacity: 0.58;
+  mix-blend-mode: screen;
+  transform: translate3d(var(--hall-crusades-haze-floor-x-start), var(--hall-crusades-haze-floor-y-start), 0) scale3d(1.03, 0.98, 1);
+  transform-origin: 50% 82%;
+  animation: hallCrusadesAtmosphereFloorBank 29s ease-in-out -21s infinite;
 }
 
-.hall-crusades-haze__mass--right-recess {
-  --hall-crusades-haze-x: 67vw;
-  --hall-crusades-haze-y: 55svh;
-  --hall-crusades-haze-width: clamp(9rem, 32vw, 13rem);
-  --hall-crusades-haze-height: clamp(8rem, 20svh, 12rem);
-  --hall-crusades-haze-opacity: 0.54;
-  --hall-crusades-haze-radius: 57% 43% 55% 39%;
-  --hall-crusades-haze-gradient: radial-gradient(ellipse at 61% 57%, rgba(193, 52, 39, 0.44), rgba(99, 12, 14, 0.29) 39%, rgba(42, 5, 7, 0.16) 58%, transparent 78%);
-  --hall-crusades-haze-vein: radial-gradient(ellipse at 45% 42%, rgba(232, 98, 59, 0.22), rgba(101, 13, 14, 0.14) 42%, transparent 67%);
-  --hall-crusades-haze-wisp: radial-gradient(ellipse at 66% 70%, rgba(132, 18, 19, 0.25), transparent 68%);
-  animation: hallCrusadesHazeRightRecess 27s ease-in-out -2s infinite;
+@keyframes hallCrusadesAtmosphereSmokeDrift {
+  0%, 100% { opacity: 0.34; transform: translate3d(var(--hall-crusades-haze-smoke-x-start), var(--hall-crusades-haze-smoke-y-start), 0) scale3d(1.02, 1, 1); }
+  37% { opacity: 0.44; transform: translate3d(var(--hall-crusades-haze-smoke-x-mid), var(--hall-crusades-haze-smoke-y-mid), 0) scale3d(1.055, 1.025, 1); }
+  71% { opacity: 0.38; transform: translate3d(var(--hall-crusades-haze-smoke-x-late), var(--hall-crusades-haze-smoke-y-late), 0) scale3d(1.01, 1.04, 1); }
 }
 
-@keyframes hallCrusadesHazeLeftDepth {
-  0%, 100% { opacity: 0.56; transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(0.98, 1.02, 1); }
-  31% { opacity: 0.78; transform: translate3d(calc(var(--hall-crusades-haze-x) + 3.2vw), calc(var(--hall-crusades-haze-y) - 1.65svh), 0) scale3d(1.07, 0.96, 1); }
-  67% { opacity: 0.64; transform: translate3d(calc(var(--hall-crusades-haze-x) - 2vw), calc(var(--hall-crusades-haze-y) + 1.15svh), 0) scale3d(1.01, 1.05, 1); }
+@keyframes hallCrusadesAtmosphereGlowDrift {
+  0%, 100% { opacity: 0.44; transform: translate3d(var(--hall-crusades-haze-glow-x-start), var(--hall-crusades-haze-glow-y-start), 0) scale3d(1, 1.015, 1); }
+  41% { opacity: 0.58; transform: translate3d(var(--hall-crusades-haze-glow-x-mid), var(--hall-crusades-haze-glow-y-mid), 0) scale3d(1.035, 0.99, 1); }
+  76% { opacity: 0.48; transform: translate3d(var(--hall-crusades-haze-glow-x-late), var(--hall-crusades-haze-glow-y-late), 0) scale3d(1.015, 1.035, 1); }
 }
 
-@keyframes hallCrusadesHazeRightDepth {
-  0%, 100% { opacity: 0.54; transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(1.02, 0.98, 1); }
-  28% { opacity: 0.74; transform: translate3d(calc(var(--hall-crusades-haze-x) - 3vw), calc(var(--hall-crusades-haze-y) - 1.35svh), 0) scale3d(1.05, 1.01, 1); }
-  72% { opacity: 0.62; transform: translate3d(calc(var(--hall-crusades-haze-x) + 1.8vw), calc(var(--hall-crusades-haze-y) + 1.6svh), 0) scale3d(0.96, 1.06, 1); }
+@keyframes hallCrusadesAtmosphereBackfield {
+  0%, 100% { opacity: 0.52; transform: translate3d(var(--hall-crusades-haze-back-x-start), var(--hall-crusades-haze-back-y-start), 0) scale3d(1.02, 1.01, 1); }
+  35% { opacity: 0.68; transform: translate3d(var(--hall-crusades-haze-back-x-mid), var(--hall-crusades-haze-back-y-mid), 0) scale3d(1.07, 1.025, 1); }
+  73% { opacity: 0.58; transform: translate3d(var(--hall-crusades-haze-back-x-late), var(--hall-crusades-haze-back-y-late), 0) scale3d(1.015, 1.045, 1); }
 }
 
-@keyframes hallCrusadesHazeLowerDepth {
-  0%, 100% { opacity: 0.48; transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(1.05, 0.95, 1); }
-  37% { opacity: 0.68; transform: translate3d(calc(var(--hall-crusades-haze-x) + 2.4vw), calc(var(--hall-crusades-haze-y) - 1svh), 0) scale3d(1.12, 1, 1); }
-  76% { opacity: 0.56; transform: translate3d(calc(var(--hall-crusades-haze-x) - 2.7vw), calc(var(--hall-crusades-haze-y) + 1.15svh), 0) scale3d(0.99, 1.06, 1); }
+@keyframes hallCrusadesAtmosphereCrossflow {
+  0%, 100% { opacity: 0.46; transform: translate3d(var(--hall-crusades-haze-cross-x-start), var(--hall-crusades-haze-cross-y-start), 0) scale3d(1.04, 0.99, 1); }
+  43% { opacity: 0.6; transform: translate3d(var(--hall-crusades-haze-cross-x-mid), var(--hall-crusades-haze-cross-y-mid), 0) scale3d(1.075, 1.015, 1); }
+  79% { opacity: 0.5; transform: translate3d(var(--hall-crusades-haze-cross-x-late), var(--hall-crusades-haze-cross-y-late), 0) scale3d(1.01, 1.035, 1); }
 }
 
-@keyframes hallCrusadesHazeLeftRecess {
-  0%, 100% { opacity: 0.44; transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(1, 1, 1); }
-  45% { opacity: 0.62; transform: translate3d(calc(var(--hall-crusades-haze-x) + 2.1vw), calc(var(--hall-crusades-haze-y) - 1.15svh), 0) scale3d(1.09, 0.95, 1); }
-}
-
-@keyframes hallCrusadesHazeRightRecess {
-  0%, 100% { opacity: 0.42; transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(0.99, 1.01, 1); }
-  42% { opacity: 0.6; transform: translate3d(calc(var(--hall-crusades-haze-x) - 2vw), calc(var(--hall-crusades-haze-y) - 1.05svh), 0) scale3d(1.08, 0.97, 1); }
+@keyframes hallCrusadesAtmosphereFloorBank {
+  0%, 100% { opacity: 0.46; transform: translate3d(var(--hall-crusades-haze-floor-x-start), var(--hall-crusades-haze-floor-y-start), 0) scale3d(1.03, 0.98, 1); }
+  39% { opacity: 0.62; transform: translate3d(var(--hall-crusades-haze-floor-x-mid), var(--hall-crusades-haze-floor-y-mid), 0) scale3d(1.085, 1.01, 1); }
+  78% { opacity: 0.52; transform: translate3d(var(--hall-crusades-haze-floor-x-late), var(--hall-crusades-haze-floor-y-late), 0) scale3d(1, 1.035, 1); }
 }
 
 @media (min-width: 760px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.98;
-    --hall-crusades-haze-left-x: 4vw;
-    --hall-crusades-haze-right-x: 66vw;
-    --hall-crusades-haze-lower-x: 34vw;
-    --hall-crusades-haze-side-y: 25svh;
-    --hall-crusades-haze-lower-y: 61svh;
+    opacity: 0.9;
+    background:
+      radial-gradient(ellipse at 7% 34%, rgba(96, 12, 17, 0.2), rgba(35, 4, 7, 0.13) 36%, transparent 65%),
+      radial-gradient(ellipse at 93% 36%, rgba(91, 11, 16, 0.18), rgba(34, 4, 7, 0.11) 38%, transparent 67%),
+      radial-gradient(ellipse at 51% 80%, rgba(125, 19, 16, 0.13), rgba(22, 4, 5, 0.11) 43%, transparent 72%),
+      linear-gradient(108deg, rgba(6, 4, 5, 0.07), transparent 28%, rgba(83, 9, 12, 0.065) 58%, transparent 86%);
+    --hall-crusades-haze-smoke-x-start: -4.8vw;
+    --hall-crusades-haze-smoke-y-start: 0.55svh;
+    --hall-crusades-haze-smoke-x-mid: 6.4vw;
+    --hall-crusades-haze-smoke-y-mid: -1.2svh;
+    --hall-crusades-haze-smoke-x-late: -2.5vw;
+    --hall-crusades-haze-smoke-y-late: 1.35svh;
+    --hall-crusades-haze-glow-x-start: 3.2vw;
+    --hall-crusades-haze-glow-y-start: -0.45svh;
+    --hall-crusades-haze-glow-x-mid: -5.6vw;
+    --hall-crusades-haze-glow-y-mid: 0.95svh;
+    --hall-crusades-haze-glow-x-late: 2.4vw;
+    --hall-crusades-haze-glow-y-late: -0.9svh;
+    --hall-crusades-haze-back-x-start: -4.1vw;
+    --hall-crusades-haze-back-y-start: 0.4svh;
+    --hall-crusades-haze-back-x-mid: 7.2vw;
+    --hall-crusades-haze-back-y-mid: -1.15svh;
+    --hall-crusades-haze-back-x-late: -3vw;
+    --hall-crusades-haze-back-y-late: 1.3svh;
+    --hall-crusades-haze-cross-x-start: 4.8vw;
+    --hall-crusades-haze-cross-y-start: -0.2svh;
+    --hall-crusades-haze-cross-x-mid: -7.4vw;
+    --hall-crusades-haze-cross-y-mid: 0.85svh;
+    --hall-crusades-haze-cross-x-late: 3.2vw;
+    --hall-crusades-haze-cross-y-late: -1.05svh;
+    --hall-crusades-haze-floor-x-start: -3.2vw;
+    --hall-crusades-haze-floor-y-start: 0.45svh;
+    --hall-crusades-haze-floor-x-mid: 5.4vw;
+    --hall-crusades-haze-floor-y-mid: -0.65svh;
+    --hall-crusades-haze-floor-x-late: -4.8vw;
+    --hall-crusades-haze-floor-y-late: 0.95svh;
   }
 
-  .hall-crusades-haze__mass--left-depth {
-    --hall-crusades-haze-width: clamp(25rem, 31vw, 40rem);
-    --hall-crusades-haze-height: clamp(23rem, 42svh, 34rem);
+  .hall-crusades-haze__field--backfield {
+    inset: -24% -46% -18%;
+    background:
+      radial-gradient(ellipse at 9% 31%, rgba(130, 15, 21, 0.3), rgba(43, 5, 8, 0.16) 35%, transparent 68%),
+      radial-gradient(ellipse at 91% 28%, rgba(118, 14, 20, 0.26), rgba(38, 5, 8, 0.14) 39%, transparent 70%),
+      radial-gradient(ellipse at 55% 49%, rgba(46, 6, 9, 0.18), rgba(124, 20, 18, 0.1) 43%, transparent 78%),
+      linear-gradient(92deg, transparent 0 11%, rgba(126, 18, 20, 0.09) 25%, transparent 44% 57%, rgba(12, 5, 6, 0.15) 74%, transparent 94%);
   }
 
-  .hall-crusades-haze__mass--right-depth {
-    --hall-crusades-haze-width: clamp(24rem, 30vw, 38rem);
-    --hall-crusades-haze-height: clamp(22rem, 40svh, 33rem);
+  .hall-crusades-haze__field--crossflow {
+    inset: -17% -58% -14%;
+    opacity: 0.5;
   }
 
-  .hall-crusades-haze__mass--lower-depth {
-    --hall-crusades-haze-width: clamp(28rem, 37vw, 48rem);
-    --hall-crusades-haze-height: clamp(14rem, 25svh, 21rem);
-  }
-
-  .hall-crusades-haze__mass--left-recess {
-    --hall-crusades-haze-x: 12vw;
-    --hall-crusades-haze-y: 50svh;
-    --hall-crusades-haze-width: clamp(16rem, 18vw, 24rem);
-    --hall-crusades-haze-height: clamp(11rem, 19svh, 16rem);
-  }
-
-  .hall-crusades-haze__mass--right-recess {
-    --hall-crusades-haze-x: 70vw;
-    --hall-crusades-haze-y: 49svh;
-    --hall-crusades-haze-width: clamp(16rem, 18vw, 24rem);
-    --hall-crusades-haze-height: clamp(11rem, 19svh, 16rem);
+  .hall-crusades-haze__field--floor-bank {
+    inset: 42% -34% -28%;
+    opacity: 0.54;
   }
 }
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.98;
-    --hall-crusades-haze-left-x: -16vw;
-    --hall-crusades-haze-right-x: 44vw;
-    --hall-crusades-haze-lower-x: 14vw;
-    --hall-crusades-haze-side-y: 47svh;
-    --hall-crusades-haze-lower-y: 64svh;
+    opacity: 0.94;
+    background:
+      radial-gradient(ellipse at -12% 50%, rgba(109, 13, 18, 0.22), rgba(38, 5, 8, 0.13) 36%, transparent 65%),
+      radial-gradient(ellipse at 112% 48%, rgba(103, 12, 17, 0.2), rgba(36, 5, 8, 0.12) 38%, transparent 66%),
+      radial-gradient(ellipse at 50% 88%, rgba(132, 20, 16, 0.12), rgba(18, 4, 5, 0.08) 43%, transparent 71%),
+      linear-gradient(96deg, rgba(6, 4, 5, 0.07), transparent 34%, rgba(73, 8, 11, 0.055) 63%, transparent 88%);
+    --hall-crusades-haze-smoke-x-start: -1.3vw;
+    --hall-crusades-haze-smoke-y-start: 0.35svh;
+    --hall-crusades-haze-smoke-x-mid: 1.7vw;
+    --hall-crusades-haze-smoke-y-mid: -0.45svh;
+    --hall-crusades-haze-smoke-x-late: -0.85vw;
+    --hall-crusades-haze-smoke-y-late: 0.55svh;
+    --hall-crusades-haze-glow-x-start: 1.1vw;
+    --hall-crusades-haze-glow-y-start: -0.25svh;
+    --hall-crusades-haze-glow-x-mid: -1.9vw;
+    --hall-crusades-haze-glow-y-mid: 0.35svh;
+    --hall-crusades-haze-glow-x-late: 0.75vw;
+    --hall-crusades-haze-glow-y-late: -0.35svh;
+    --hall-crusades-haze-back-x-start: -0.95vw;
+    --hall-crusades-haze-back-y-start: 0.25svh;
+    --hall-crusades-haze-back-x-mid: 1.9vw;
+    --hall-crusades-haze-back-y-mid: -0.35svh;
+    --hall-crusades-haze-back-x-late: -0.7vw;
+    --hall-crusades-haze-back-y-late: 0.5svh;
+    --hall-crusades-haze-cross-x-start: 1.2vw;
+    --hall-crusades-haze-cross-y-start: -0.1svh;
+    --hall-crusades-haze-cross-x-mid: -2.1vw;
+    --hall-crusades-haze-cross-y-mid: 0.28svh;
+    --hall-crusades-haze-cross-x-late: 0.8vw;
+    --hall-crusades-haze-cross-y-late: -0.35svh;
+    --hall-crusades-haze-floor-x-start: -0.8vw;
+    --hall-crusades-haze-floor-y-start: 0.3svh;
+    --hall-crusades-haze-floor-x-mid: 1.7vw;
+    --hall-crusades-haze-floor-y-mid: -0.25svh;
+    --hall-crusades-haze-floor-x-late: -1.25vw;
+    --hall-crusades-haze-floor-y-late: 0.42svh;
   }
 
-  .hall-crusades-haze__mass--left-depth {
-    --hall-crusades-haze-width: clamp(11.5rem, 58vw, 15rem);
-    --hall-crusades-haze-height: clamp(14rem, 40svh, 19rem);
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before {
+    inset: -14% -46% -16%;
+    opacity: 0.34;
   }
 
-  .hall-crusades-haze__mass--right-depth {
-    --hall-crusades-haze-width: clamp(11.5rem, 57vw, 15rem);
-    --hall-crusades-haze-height: clamp(13rem, 38svh, 18.5rem);
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::after {
+    inset: -17% -52% -20%;
+    opacity: 0.46;
   }
 
-  .hall-crusades-haze__mass--lower-depth {
-    --hall-crusades-haze-width: clamp(15rem, 64vw, 18.5rem);
-    --hall-crusades-haze-height: clamp(8.5rem, 24svh, 13rem);
-    --hall-crusades-haze-opacity: 0.56;
+  .hall-crusades-haze__field--backfield {
+    inset: -12% -54% -15%;
+    background:
+      radial-gradient(ellipse at -3% 48%, rgba(132, 16, 22, 0.3), rgba(43, 5, 8, 0.16) 35%, transparent 67%),
+      radial-gradient(ellipse at 103% 45%, rgba(122, 15, 20, 0.27), rgba(39, 5, 8, 0.14) 38%, transparent 69%),
+      radial-gradient(ellipse at 50% 83%, rgba(43, 6, 8, 0.14), rgba(120, 19, 17, 0.08) 43%, transparent 74%),
+      linear-gradient(94deg, transparent 0 13%, rgba(126, 18, 20, 0.08) 27%, transparent 45% 60%, rgba(12, 5, 6, 0.12) 76%, transparent 94%);
+    opacity: 0.58;
   }
 
-  .hall-crusades-haze__mass--left-recess {
-    --hall-crusades-haze-x: -8vw;
-    --hall-crusades-haze-y: 62svh;
-    --hall-crusades-haze-width: clamp(8rem, 38vw, 10.5rem);
-    --hall-crusades-haze-height: clamp(6.5rem, 17svh, 9rem);
+  .hall-crusades-haze__field--crossflow {
+    inset: -8% -64% -13%;
+    opacity: 0.48;
+    background:
+      radial-gradient(ellipse at 12% 55%, rgba(185, 38, 32, 0.15), rgba(96, 12, 15, 0.1) 34%, transparent 63%),
+      radial-gradient(ellipse at 88% 54%, rgba(172, 33, 29, 0.14), rgba(84, 10, 13, 0.1) 36%, transparent 64%),
+      linear-gradient(104deg, transparent 0 18%, rgba(23, 5, 7, 0.16) 30%, rgba(94, 10, 13, 0.09) 40%, transparent 53% 66%, rgba(210, 71, 40, 0.065) 78%, transparent 92%);
   }
 
-  .hall-crusades-haze__mass--right-recess {
-    --hall-crusades-haze-x: 63vw;
-    --hall-crusades-haze-y: 61svh;
-    --hall-crusades-haze-width: clamp(8rem, 38vw, 10.5rem);
-    --hall-crusades-haze-height: clamp(6.5rem, 17svh, 9rem);
+  .hall-crusades-haze__field--floor-bank {
+    inset: 48% -36% -24%;
+    opacity: 0.56;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.78;
+    opacity: 0.82;
   }
 
-  .hall-crusades-haze__mass,
-  .hall-crusades-haze__mass--left-depth,
-  .hall-crusades-haze__mass--right-depth,
-  .hall-crusades-haze__mass--lower-depth,
-  .hall-crusades-haze__mass--left-recess,
-  .hall-crusades-haze__mass--right-recess {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::after,
+  .hall-crusades-haze__field,
+  .hall-crusades-haze__field--backfield,
+  .hall-crusades-haze__field--crossflow,
+  .hall-crusades-haze__field--floor-bank {
     animation: none;
-    transform: translate3d(var(--hall-crusades-haze-x), var(--hall-crusades-haze-y), 0) scale3d(1.02, 0.99, 1);
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before {
+    opacity: 0.34;
+    transform: translate3d(var(--hall-crusades-haze-smoke-x-start), var(--hall-crusades-haze-smoke-y-start), 0) scale3d(1.025, 1.01, 1);
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::after {
+    opacity: 0.46;
+    transform: translate3d(var(--hall-crusades-haze-glow-x-start), var(--hall-crusades-haze-glow-y-start), 0) scale3d(1.01, 1.015, 1);
+  }
+
+  .hall-crusades-haze__field--backfield {
+    opacity: 0.56;
+    transform: translate3d(var(--hall-crusades-haze-back-x-start), var(--hall-crusades-haze-back-y-start), 0) scale3d(1.03, 1.01, 1);
+  }
+
+  .hall-crusades-haze__field--crossflow {
+    opacity: 0.5;
+    transform: translate3d(var(--hall-crusades-haze-cross-x-start), var(--hall-crusades-haze-cross-y-start), 0) scale3d(1.04, 1, 1);
+  }
+
+  .hall-crusades-haze__field--floor-bank {
+    opacity: 0.5;
+    transform: translate3d(var(--hall-crusades-haze-floor-x-start), var(--hall-crusades-haze-floor-y-start), 0) scale3d(1.03, 0.99, 1);
   }
 }
-
 .hall-crusades-room-identifier {
   display: none;
 }

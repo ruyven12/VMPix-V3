@@ -16785,11 +16785,11 @@ function ensureHallCrusadesHaze() {
   haze.dataset.hallCrusadesHaze = "true";
   haze.setAttribute("aria-hidden", "true");
 
-  ["left-depth", "right-depth", "lower-depth", "left-recess", "right-recess"].forEach((region) => {
-    const mass = document.createElement("span");
-    mass.className = `hall-crusades-haze__mass hall-crusades-haze__mass--${region}`;
-    mass.setAttribute("aria-hidden", "true");
-    haze.append(mass);
+  ["backfield", "crossflow", "floor-bank"].forEach((layer) => {
+    const field = document.createElement("span");
+    field.className = `hall-crusades-haze__field hall-crusades-haze__field--${layer}`;
+    field.setAttribute("aria-hidden", "true");
+    haze.append(field);
   });
 
   const firelight = wrestlingShowsShell.querySelector("[data-hall-crusades-firelight]");
