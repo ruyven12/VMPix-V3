@@ -16797,6 +16797,89 @@ function ensureHallCrusadesHaze() {
   else wrestlingShowsShell.prepend(haze);
 }
 
+function ensureHallCrusadesCinders() {
+  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-cinders]")) return;
+
+  const sourcePattern = ["left", "right", "left", "right", "left", "right", "center", "left", "right", "left", "right", "center"];
+  const shapePattern = ["flake", "sliver", "shard", "speck", "chip", "splinter"];
+  const tonePattern = ["charcoal", "ash", "umber", "charcoal", "ash", "warm", "charcoal", "ember"];
+  const sourceX = {
+    left: { desktop: 22, mobile: 24 },
+    right: { desktop: 78, mobile: 76 },
+    center: { desktop: 50, mobile: 51 },
+  };
+
+  const setVar = (node, name, value) => node.style.setProperty(name, value);
+  const round = (value) => Number.parseFloat(value.toFixed(2));
+  const createLayer = (depth, count) => {
+    const layer = document.createElement("div");
+    layer.className = `hall-crusades-cinders hall-crusades-cinders--${depth}`;
+    layer.dataset.hallCrusadesCinders = depth;
+    layer.setAttribute("aria-hidden", "true");
+
+    Array.from({ length: count }, (_, index) => {
+      const source = sourcePattern[(index + (depth === "foreground" ? 4 : 0)) % sourcePattern.length];
+      const shape = shapePattern[(index * 5 + (depth === "foreground" ? 2 : 0)) % shapePattern.length];
+      const tone = tonePattern[(index * 3 + (depth === "foreground" ? 5 : 0)) % tonePattern.length];
+      const spread = ((index * 37) % 19) - 9;
+      const direction = source === "left" ? 1 : source === "right" ? -1 : index % 2 === 0 ? -1 : 1;
+      const depthBias = depth === "foreground" ? 1 : 0;
+      const particle = document.createElement("span");
+
+      particle.className = `hall-crusades-cinder hall-crusades-cinder--${depth} hall-crusades-cinder--${shape} hall-crusades-cinder--${tone}`;
+      particle.setAttribute("aria-hidden", "true");
+
+      const desktopSpread = source === "center" ? spread * 0.42 : spread * 0.68;
+      const mobileSpread = source === "center" ? spread * 0.34 : spread * 0.58;
+      const desktopY = 83.5 + ((index * 11) % 9) * 0.82 + depthBias * 2.4;
+      const mobileY = 102.5 + ((index * 13) % 10) * 0.68 + depthBias * 1.5;
+      const driftEnd = direction * (depth === "foreground" ? 7 + ((index * 5) % 13) : 5 + ((index * 5) % 12));
+      const driftMid = driftEnd * (0.36 + ((index * 7) % 8) / 38) + (((index * 17) % 9) - 4) * 0.24;
+      const midY = -(depth === "foreground" ? 16 + ((index * 23) % 19) : 20 + ((index * 19) % 28));
+      const endY = -(depth === "foreground" ? 34 + ((index * 29) % 24) : 44 + ((index * 23) % 34));
+      const duration = depth === "foreground" ? 11.5 + ((index * 5) % 9) : 18 + ((index * 7) % 14);
+      const delay = -(((index * 3.7) + (depth === "foreground" ? 2.8 : 0)) % duration);
+      const width = depth === "foreground" ? 2.8 + ((index * 7) % 9) * 0.46 : 1.25 + ((index * 5) % 7) * 0.28;
+      const height = width * (shape === "sliver" || shape === "splinter" ? 2.15 : shape === "shard" ? 1.55 : 0.82 + ((index * 3) % 5) * 0.15);
+      const startOpacity = depth === "foreground" ? 0.3 + ((index * 7) % 6) * 0.045 : 0.16 + ((index * 5) % 7) * 0.032;
+      const peakOpacity = Math.min(0.72, startOpacity + (depth === "foreground" ? 0.18 : 0.13));
+      const fadeOpacity = Math.max(0.06, startOpacity - 0.08);
+      const rotateStart = ((index * 47) % 180) - 90;
+      const rotateMid = rotateStart + direction * (42 + ((index * 13) % 70));
+      const rotateEnd = rotateMid + direction * (80 + ((index * 17) % 150));
+
+      setVar(particle, "--hall-cinder-x-desktop", `${round(sourceX[source].desktop + desktopSpread)}vw`);
+      setVar(particle, "--hall-cinder-x-mobile", `${round(sourceX[source].mobile + mobileSpread)}vw`);
+      setVar(particle, "--hall-cinder-y-desktop", `${round(desktopY)}svh`);
+      setVar(particle, "--hall-cinder-y-mobile", `${round(mobileY)}svh`);
+      setVar(particle, "--hall-cinder-mid-x", `${round(driftMid)}vw`);
+      setVar(particle, "--hall-cinder-end-x", `${round(driftEnd)}vw`);
+      setVar(particle, "--hall-cinder-mid-y", `${round(midY)}svh`);
+      setVar(particle, "--hall-cinder-end-y", `${round(endY)}svh`);
+      setVar(particle, "--hall-cinder-duration", `${round(duration)}s`);
+      setVar(particle, "--hall-cinder-delay", `${round(delay)}s`);
+      setVar(particle, "--hall-cinder-width", `${round(width)}px`);
+      setVar(particle, "--hall-cinder-height", `${round(height)}px`);
+      setVar(particle, "--hall-cinder-start-opacity", round(startOpacity).toString());
+      setVar(particle, "--hall-cinder-peak-opacity", round(peakOpacity).toString());
+      setVar(particle, "--hall-cinder-fade-opacity", round(fadeOpacity).toString());
+      setVar(particle, "--hall-cinder-rotate-start", `${round(rotateStart)}deg`);
+      setVar(particle, "--hall-cinder-rotate-mid", `${round(rotateMid)}deg`);
+      setVar(particle, "--hall-cinder-rotate-end", `${round(rotateEnd)}deg`);
+      layer.append(particle);
+    });
+
+    return layer;
+  };
+
+  const fragment = document.createDocumentFragment();
+  fragment.append(createLayer("distant", 34), createLayer("foreground", 8));
+
+  const haze = wrestlingShowsShell.querySelector("[data-hall-crusades-haze]");
+  if (haze?.nextSibling) wrestlingShowsShell.insertBefore(fragment, haze.nextSibling);
+  else wrestlingShowsShell.append(fragment);
+}
+
 function ensureDaiionCrusadesInterfaceInsignia() {
   if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-daiion-crusades-interface-insignia]")) return;
   const insignia = document.createElement("span");
@@ -16817,6 +16900,7 @@ function prepareHallCrusadesInterfaceChrome() {
   if (!wrestlingShowsShell) return;
   ensureHallCrusadesFirelight();
   ensureHallCrusadesHaze();
+  ensureHallCrusadesCinders();
   ensureDaiionCrusadesInterfaceInsignia();
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
   const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");

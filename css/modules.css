@@ -16178,7 +16178,7 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   pointer-events: none;
   contain: paint;
-  opacity: 0.46;
+  opacity: 0.414;
   background:
     radial-gradient(ellipse at 2% 39%, rgba(102, 13, 18, 0.18), rgba(37, 4, 7, 0.12) 36%, transparent 64%),
     radial-gradient(ellipse at 98% 42%, rgba(96, 12, 17, 0.17), rgba(35, 4, 7, 0.1) 38%, transparent 66%),
@@ -16330,7 +16330,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (min-width: 760px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.45;
+    opacity: 0.405;
     background:
       radial-gradient(ellipse at 7% 34%, rgba(96, 12, 17, 0.2), rgba(35, 4, 7, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 93% 36%, rgba(91, 11, 16, 0.18), rgba(34, 4, 7, 0.11) 38%, transparent 67%),
@@ -16390,7 +16390,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.47;
+    opacity: 0.423;
     background:
       radial-gradient(ellipse at -12% 50%, rgba(109, 13, 18, 0.22), rgba(38, 5, 8, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 112% 48%, rgba(103, 12, 17, 0.2), rgba(36, 5, 8, 0.12) 38%, transparent 66%),
@@ -16465,7 +16465,7 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.41;
+    opacity: 0.369;
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before,
@@ -16500,6 +16500,156 @@ button.wrestling-event-history-tagged-thumb {
   .hall-crusades-haze__field--floor-bank {
     opacity: 0.5;
     transform: translate3d(var(--hall-crusades-haze-floor-x-start), var(--hall-crusades-haze-floor-y-start), 0) scale3d(1.03, 0.99, 1);
+  }
+}
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-cinders {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-cinders--foreground {
+  z-index: 5;
+}
+
+.hall-crusades-cinder {
+  position: absolute;
+  inset-inline-start: var(--hall-cinder-x-mobile);
+  inset-block-start: var(--hall-cinder-y-mobile);
+  display: block;
+  inline-size: var(--hall-cinder-width);
+  block-size: var(--hall-cinder-height);
+  border-radius: var(--hall-cinder-radius, 43% 57% 48% 35%);
+  background:
+    linear-gradient(135deg, var(--hall-cinder-edge, rgba(103, 83, 70, 0.86)), var(--hall-cinder-fill, rgba(17, 13, 12, 0.92)) 44%, var(--hall-cinder-shadow, rgba(3, 3, 4, 0.96)));
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.68);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) rotate(var(--hall-cinder-rotate-start)) scale3d(0.62, 0.62, 1);
+  transform-origin: 50% 50%;
+  will-change: opacity, transform;
+  animation: hallCrusadesCinderRise var(--hall-cinder-duration) cubic-bezier(0.32, 0, 0.26, 1) var(--hall-cinder-delay) infinite both;
+}
+
+.hall-crusades-cinder::after {
+  position: absolute;
+  inset: -20%;
+  content: "";
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 48% 64%, rgba(255, 126, 44, 0.62), rgba(154, 28, 18, 0.32) 38%, transparent 72%);
+  opacity: var(--hall-cinder-ember-opacity, 0);
+  pointer-events: none;
+}
+
+.hall-crusades-cinder--distant {
+  --hall-cinder-scale-mid: 0.88;
+  --hall-cinder-scale-end: 0.72;
+}
+
+.hall-crusades-cinder--foreground {
+  --hall-cinder-scale-mid: 1.06;
+  --hall-cinder-scale-end: 0.9;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.78);
+}
+
+.hall-crusades-cinder--charcoal {
+  --hall-cinder-edge: rgba(76, 64, 57, 0.78);
+  --hall-cinder-fill: rgba(15, 12, 11, 0.95);
+  --hall-cinder-shadow: rgba(3, 3, 4, 0.98);
+}
+
+.hall-crusades-cinder--ash {
+  --hall-cinder-edge: rgba(112, 101, 91, 0.74);
+  --hall-cinder-fill: rgba(38, 33, 30, 0.9);
+  --hall-cinder-shadow: rgba(9, 8, 8, 0.96);
+}
+
+.hall-crusades-cinder--umber {
+  --hall-cinder-edge: rgba(111, 62, 44, 0.76);
+  --hall-cinder-fill: rgba(35, 16, 13, 0.92);
+  --hall-cinder-shadow: rgba(7, 5, 5, 0.98);
+}
+
+.hall-crusades-cinder--warm {
+  --hall-cinder-edge: rgba(156, 70, 42, 0.82);
+  --hall-cinder-fill: rgba(45, 18, 13, 0.93);
+  --hall-cinder-ember-opacity: 0.24;
+}
+
+.hall-crusades-cinder--ember {
+  --hall-cinder-edge: rgba(186, 82, 44, 0.84);
+  --hall-cinder-fill: rgba(51, 19, 13, 0.94);
+  --hall-cinder-ember-opacity: 0.34;
+}
+
+.hall-crusades-cinder--flake {
+  --hall-cinder-radius: 22% 56% 34% 61%;
+  clip-path: polygon(8% 20%, 64% 0, 100% 35%, 76% 88%, 22% 100%, 0 58%);
+}
+
+.hall-crusades-cinder--sliver {
+  --hall-cinder-radius: 28% 44% 32% 52%;
+  clip-path: polygon(36% 0, 72% 8%, 60% 100%, 18% 88%);
+}
+
+.hall-crusades-cinder--shard {
+  --hall-cinder-radius: 14% 62% 24% 48%;
+  clip-path: polygon(14% 8%, 96% 22%, 72% 92%, 0 76%);
+}
+
+.hall-crusades-cinder--speck {
+  --hall-cinder-radius: 45% 28% 56% 34%;
+  clip-path: polygon(28% 0, 84% 18%, 100% 67%, 52% 100%, 8% 73%, 0 24%);
+}
+
+.hall-crusades-cinder--chip {
+  --hall-cinder-radius: 18% 38% 48% 22%;
+  clip-path: polygon(0 28%, 42% 0, 100% 16%, 86% 78%, 28% 100%);
+}
+
+.hall-crusades-cinder--splinter {
+  --hall-cinder-radius: 18% 48% 22% 58%;
+  clip-path: polygon(48% 0, 78% 4%, 58% 100%, 22% 95%);
+}
+
+@keyframes hallCrusadesCinderRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--hall-cinder-rotate-start)) scale3d(0.62, 0.62, 1);
+  }
+
+  9% {
+    opacity: var(--hall-cinder-start-opacity);
+  }
+
+  42% {
+    opacity: var(--hall-cinder-peak-opacity);
+    transform: translate3d(var(--hall-cinder-mid-x), var(--hall-cinder-mid-y), 0) rotate(var(--hall-cinder-rotate-mid)) scale3d(var(--hall-cinder-scale-mid), var(--hall-cinder-scale-mid), 1);
+  }
+
+  72% {
+    opacity: var(--hall-cinder-fade-opacity);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--hall-cinder-end-x), var(--hall-cinder-end-y), 0) rotate(var(--hall-cinder-rotate-end)) scale3d(var(--hall-cinder-scale-end), var(--hall-cinder-scale-end), 1);
+  }
+}
+
+@media (min-width: 760px) {
+  .hall-crusades-cinder {
+    inset-inline-start: var(--hall-cinder-x-desktop);
+    inset-block-start: var(--hall-cinder-y-desktop);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-cinders {
+    display: none !important;
   }
 }
 .hall-crusades-room-identifier {
