@@ -19981,7 +19981,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay,
+  .site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .engine-lightning-overlay {
   filter: brightness(1.12) saturate(1.06);
 }
 

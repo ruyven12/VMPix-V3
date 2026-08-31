@@ -119,7 +119,8 @@ button {
 .site-shell.is-home-route .universal-bottom-rail {
   display: none;
 }
-.site-shell[data-shell-route="portfolio"] {
+.site-shell[data-shell-route="portfolio"],
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) {
   --portfolio-engine-height: clamp(3.35rem, 7.8svh, 4.7rem);
   --portfolio-engine-reserve: clamp(4.85rem, 13svh, 8.5rem);
   --portfolio-engine-bottom-offset: max(0.58rem, env(safe-area-inset-bottom));
@@ -175,7 +176,8 @@ button {
   --engine-accent-glow: 77 163 255;
 }
 
-.site-shell[data-shell-route="portfolio"][data-active-world="battleground"] {
+.site-shell[data-shell-route="portfolio"][data-active-world="battleground"],
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) {
   --engine-accent: 255 63 63;
   --engine-accent-soft: 255 63 63;
   --engine-accent-glow: 255 63 63;
@@ -2445,7 +2447,8 @@ button {
     0 0 0.74rem rgb(var(--engine-accent) / 0.1);
   white-space: nowrap;
 }
-.site-shell[data-shell-route="portfolio"] .portfolio-engine-panel--left .portfolio-engine-label {
+.site-shell[data-shell-route="portfolio"] .portfolio-engine-panel--left .portfolio-engine-label,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left .portfolio-engine-label {
   color: rgb(var(--engine-accent) / 0.66);
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
 }
@@ -6672,26 +6675,35 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-left-core::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-left-core::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::before,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::after,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) :is(.portfolio-engine-left-core, .portfolio-engine-reactor, .portfolio-engine-reactor-ring, .portfolio-engine-reactor-core),
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-left-core::before,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-left-core::after,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor::before,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor::after {
   animation: none !important;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::before,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor::after,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor::before,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor::after {
   opacity: 0;
   transform: scale3d(0.72, 0.72, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor-ring,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-ring {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-ring,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor-ring {
   opacity: 0;
   transform: scale3d(0.92, 0.92, 1);
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-reactor-core,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-core {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-reactor-core,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-reactor-core {
   opacity: 0;
   transform: translateZ(0) scale3d(0.98, 0.98, 1);
 }
@@ -6730,7 +6742,8 @@ button {
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine-projection,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-projection {
   visibility: hidden !important;
   opacity: 0 !important;
   filter: none !important;
@@ -6746,7 +6759,11 @@ button {
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection::before,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection::after,
 .site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection-status::before,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection-status::after {
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine-projection-status::after,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-projection::before,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-projection::after,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-projection-status::before,
+.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-projection-status::after {
   opacity: 0 !important;
   filter: none !important;
   animation: none !important;
