@@ -15957,11 +15957,16 @@ button.wrestling-event-history-tagged-thumb {
     clip-path: polygon(0.25rem 0, calc(100% - 0.25rem) 0, 100% 50%, calc(100% - 1.2rem) 100%, 70% 100%, 68% calc(100% - 1px), 32% calc(100% - 1px), 30% 100%, 1.2rem 100%, 0 50%);
   }
 
-  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::after,
-  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::after {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::after {
     inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 0.42rem);
     inset-inline: 1.8rem;
     opacity: 0.66;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::after {
+    inset-block-start: calc(max(0.34rem, env(safe-area-inset-top)) + 0.42rem);
+    inset-inline: 1.8rem;
+    opacity: 0.94;
   }
 }
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > * {
@@ -22223,6 +22228,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .public-home {
   z-index: 95;
   pointer-events: none;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) {
+  background:
+    linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
+    url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
+    #030306;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].has-entered-hub.is-daiion-crusades-engine-restored:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .portfolio-hub:has(.wrestling-shows-shell[data-daiion-crusades-interface-preview="true"]) {
