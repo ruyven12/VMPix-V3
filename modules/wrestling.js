@@ -2373,7 +2373,7 @@ function normalizeHallCrusadesPosterActiveIndex(total) {
   const activeIndex = Number.isFinite(hallCrusadesPosterActiveIndex)
     ? Math.trunc(hallCrusadesPosterActiveIndex)
     : HALL_CRUSADES_POSTER_ACTIVE_SLOT;
-  hallCrusadesPosterActiveIndex = ((activeIndex % total) + total) % total;
+  hallCrusadesPosterActiveIndex = Math.min(Math.max(activeIndex, 0), total - 1);
 }
 
 function getHallCrusadesPosterWindowRows(rows) {
@@ -2387,16 +2387,31 @@ function getHallCrusadesPosterWindowRows(rows) {
   normalizeHallCrusadesPosterActiveIndex(total);
   const activeSlot = Math.floor(limit / 2);
   return Array.from({ length: limit }, (_, slotIndex) => {
-    const sourceIndex = (hallCrusadesPosterActiveIndex + slotIndex - activeSlot + total) % total;
+    const sourceIndex = hallCrusadesPosterActiveIndex + slotIndex - activeSlot;
+    if (sourceIndex < 0 || sourceIndex >= total) {
+      return {
+        show: null,
+        sourceIndex,
+        isActive: false,
+        isEmpty: true,
+      };
+    }
+
     return {
       show: sourceRows[sourceIndex],
       sourceIndex,
-      isActive: slotIndex === activeSlot,
+      isActive: sourceIndex === hallCrusadesPosterActiveIndex,
+      isEmpty: false,
     };
   });
 }
 
 function advanceHallCrusadesPosterActive(direction) {
+  const directionStep = Math.sign(Number(direction) || 0);
+  if (!directionStep) {
+    return false;
+  }
+
   const rows = getHallCrusadesPosterSourceRows();
   const total = rows.length;
   if (isDaiionCrusadesCarouselRevealLocked() || !isHallCrusadesShowsVariantActive() || total < 2) {
@@ -2404,27 +2419,35 @@ function advanceHallCrusadesPosterActive(direction) {
   }
 
   normalizeHallCrusadesPosterActiveIndex(total);
-  const nextIndex = (hallCrusadesPosterActiveIndex + direction + total) % total;
-  if (nextIndex === hallCrusadesPosterActiveIndex) {
+  const nextIndex = hallCrusadesPosterActiveIndex + directionStep;
+  if (nextIndex < 0 || nextIndex >= total || nextIndex === hallCrusadesPosterActiveIndex) {
     return false;
   }
 
   hallCrusadesPosterActiveIndex = nextIndex;
   if (hallCrusadesPosterStrip) {
-    hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection = direction > 0 ? "next" : "previous";
+    hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection = directionStep > 0 ? "next" : "previous";
   }
   renderHallCrusadesPosterStrip();
   return true;
 }
 
 function syncHallCrusadesPosterNavControls(total = getHallCrusadesPosterSourceRows().length) {
+  if (total > 0) {
+    normalizeHallCrusadesPosterActiveIndex(total);
+  }
+
   const isRevealLocked = isDaiionCrusadesCarouselRevealLocked();
   const canOpenRecord = isHallCrusadesShowsVariantActive() && wrestlingShowsDataState === "live" && total > 0 && !isRevealLocked;
   const canNavigate = canOpenRecord && total > 1;
+  const canMovePrevious = canNavigate && hallCrusadesPosterActiveIndex > 0;
+  const canMoveNext = canNavigate && hallCrusadesPosterActiveIndex < total - 1;
   hallCrusadesPosterNavButtons.forEach((button) => {
-    button.disabled = !canNavigate;
-    button.setAttribute("aria-disabled", String(!canNavigate));
-    button.classList.toggle("is-muted", !canNavigate);
+    const direction = button.dataset.hallCrusadesPosterNav;
+    const canUseButton = direction === "previous" ? canMovePrevious : canMoveNext;
+    button.disabled = !canUseButton;
+    button.setAttribute("aria-disabled", String(!canUseButton));
+    button.classList.toggle("is-muted", !canUseButton);
   });
   hallCrusadesPosterStrip?.querySelectorAll(".hall-crusades-poster-strip__record").forEach((record) => {
     record.disabled = !canOpenRecord;
@@ -2672,6 +2695,15 @@ function syncHallCrusadesPosterStripScrollPosition() {
   hallCrusadesPosterStrip.scrollLeft = Math.max(0, nextScrollLeft);
 }
 
+function createHallCrusadesPosterStripEmptySlot(index = 0, options = {}) {
+  const item = document.createElement("li");
+  item.className = "hall-crusades-poster-strip__item is-empty";
+  item.dataset.hallCrusadesArchiveSlot = "empty";
+  item.dataset.wrestlingShowIndex = String(Number.isFinite(options.sourceIndex) ? options.sourceIndex : index);
+  item.setAttribute("aria-hidden", "true");
+  return item;
+}
+
 function createHallCrusadesPosterStripItem(show, index = 0, options = {}) {
   const item = document.createElement("li");
   item.className = "hall-crusades-poster-strip__item";
@@ -2856,7 +2888,11 @@ function renderHallCrusadesPosterStrip() {
   renderHallCrusadesCampaignInfoPanel(activeShow);
   const fragment = document.createDocumentFragment();
   posterRows.forEach((row, index) => {
-    fragment.append(createHallCrusadesPosterStripItem(row.show, index, row));
+    fragment.append(
+      row.isEmpty
+        ? createHallCrusadesPosterStripEmptySlot(index, row)
+        : createHallCrusadesPosterStripItem(row.show, index, row)
+    );
   });
   hallCrusadesPosterStrip.dataset.hallCrusadesActiveIndex = String(hallCrusadesPosterActiveIndex);
   hallCrusadesPosterStrip.dataset.hallCrusadesYearFilter = activeHallCrusadesYearFilter || "all";
@@ -16723,6 +16759,24 @@ function syncDaiionEnvironmentalCoverage() {
   });
 }
 
+function ensureHallCrusadesFirelight() {
+  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-firelight]")) return;
+
+  const firelight = document.createElement("div");
+  firelight.className = "hall-crusades-firelight";
+  firelight.dataset.hallCrusadesFirelight = "true";
+  firelight.setAttribute("aria-hidden", "true");
+
+  ["left", "right"].forEach((side) => {
+    const pool = document.createElement("span");
+    pool.className = `hall-crusades-firelight__pool hall-crusades-firelight__pool--${side}`;
+    pool.setAttribute("aria-hidden", "true");
+    firelight.append(pool);
+  });
+
+  wrestlingShowsShell.prepend(firelight);
+}
+
 function ensureDaiionCrusadesInterfaceInsignia() {
   if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-daiion-crusades-interface-insignia]")) return;
   const insignia = document.createElement("span");
@@ -16741,6 +16795,7 @@ function preloadDaiionCrusadesInterfaceData() {
 
 function prepareHallCrusadesInterfaceChrome() {
   if (!wrestlingShowsShell) return;
+  ensureHallCrusadesFirelight();
   ensureDaiionCrusadesInterfaceInsignia();
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
   const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");
