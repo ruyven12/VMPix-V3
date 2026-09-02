@@ -16802,7 +16802,7 @@ function ensureHallCrusadesCinders() {
 
   const sourcePattern = ["left", "right", "left", "right", "left", "right", "center", "left", "right", "left", "right", "center"];
   const shapePattern = ["flake", "sliver", "shard", "speck", "chip", "splinter"];
-  const tonePattern = ["charcoal", "ash", "umber", "charcoal", "ash", "warm", "charcoal", "ember"];
+  const tonePattern = ["charcoal", "ash", "umber", "redblack", "ash", "warm", "charcoal", "ember", "charcoal", "warm"];
   const sourceX = {
     left: { desktop: 22, mobile: 24 },
     right: { desktop: 78, mobile: 76 },
@@ -16833,17 +16833,17 @@ function ensureHallCrusadesCinders() {
       const mobileSpread = source === "center" ? spread * 0.34 : spread * 0.58;
       const desktopY = 83.5 + ((index * 11) % 9) * 0.82 + depthBias * 2.4;
       const mobileY = 102.5 + ((index * 13) % 10) * 0.68 + depthBias * 1.5;
-      const driftEnd = direction * (depth === "foreground" ? 7 + ((index * 5) % 13) : 5 + ((index * 5) % 12));
+      const driftEnd = direction * (depth === "foreground" ? 10 + ((index * 7) % 15) : 6.5 + ((index * 5) % 13));
       const driftMid = driftEnd * (0.36 + ((index * 7) % 8) / 38) + (((index * 17) % 9) - 4) * 0.24;
-      const midY = -(depth === "foreground" ? 16 + ((index * 23) % 19) : 20 + ((index * 19) % 28));
-      const endY = -(depth === "foreground" ? 34 + ((index * 29) % 24) : 44 + ((index * 23) % 34));
-      const duration = depth === "foreground" ? 11.5 + ((index * 5) % 9) : 18 + ((index * 7) % 14);
+      const midY = -(depth === "foreground" ? 22 + ((index * 23) % 24) : 28 + ((index * 19) % 34));
+      const endY = -(depth === "foreground" ? 44 + ((index * 29) % 30) : 58 + ((index * 23) % 42));
+      const duration = depth === "foreground" ? 12.5 + ((index * 7) % 10) : 19 + ((index * 7) % 15);
       const delay = -(((index * 3.7) + (depth === "foreground" ? 2.8 : 0)) % duration);
-      const width = depth === "foreground" ? 2.8 + ((index * 7) % 9) * 0.46 : 1.25 + ((index * 5) % 7) * 0.28;
+      const width = depth === "foreground" ? 4.2 + ((index * 7) % 9) * 0.7 : 1.75 + ((index * 5) % 7) * 0.36;
       const height = width * (shape === "sliver" || shape === "splinter" ? 2.15 : shape === "shard" ? 1.55 : 0.82 + ((index * 3) % 5) * 0.15);
-      const startOpacity = depth === "foreground" ? 0.3 + ((index * 7) % 6) * 0.045 : 0.16 + ((index * 5) % 7) * 0.032;
-      const peakOpacity = Math.min(0.72, startOpacity + (depth === "foreground" ? 0.18 : 0.13));
-      const fadeOpacity = Math.max(0.06, startOpacity - 0.08);
+      const startOpacity = depth === "foreground" ? 0.42 + ((index * 7) % 6) * 0.052 : 0.24 + ((index * 5) % 7) * 0.038;
+      const peakOpacity = Math.min(0.86, startOpacity + (depth === "foreground" ? 0.22 : 0.17));
+      const fadeOpacity = Math.max(0.08, startOpacity - (depth === "foreground" ? 0.14 : 0.13));
       const rotateStart = ((index * 47) % 180) - 90;
       const rotateMid = rotateStart + direction * (42 + ((index * 13) % 70));
       const rotateEnd = rotateMid + direction * (80 + ((index * 17) % 150));
