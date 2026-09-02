@@ -1998,6 +1998,12 @@ function setHallCrusadesCampaignExpansionGeometry(record) {
     const raisedTargetY = topClearance + Math.max(8, viewportHeight * 0.01);
     targetY = Math.min(targetY, raisedTargetY);
     targetHeight = Math.max(rect.height, targetBottom - targetY);
+
+    const mobileFrameTopLift = 10;
+    const mobileFrameBottomExtension = Math.min(20, Math.max(0, bottomLimit - (targetY + targetHeight)));
+    const mobileTargetBottom = targetY + targetHeight + mobileFrameBottomExtension;
+    targetY = Math.max(0, targetY - mobileFrameTopLift);
+    targetHeight = Math.max(rect.height, mobileTargetBottom - targetY);
   }
   const overshootScale = isDesktop ? 1.028 : 1.035;
   const overshootSideClearance = Math.max(10, sideClearance * 0.58);
