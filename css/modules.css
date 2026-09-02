@@ -16978,6 +16978,29 @@ button.wrestling-event-history-tagged-thumb {
 .hall-crusades-poster-strip[hidden] {
   display: none !important;
 }
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > :is(.hall-crusades-room-identifier, .hall-crusades-archive-stats, .hall-crusades-archive-insignia, .hall-crusades-archive-crystals, .hall-crusades-poster-nav, .hall-crusades-campaign-info-panel) {
+  transition:
+    opacity 360ms ease-out,
+    filter 360ms ease-out;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > :is(.hall-crusades-room-identifier, .hall-crusades-archive-stats, .hall-crusades-archive-insignia, .hall-crusades-archive-crystals, .hall-crusades-poster-nav, .hall-crusades-campaign-info-panel):not([hidden]) {
+  opacity: 0;
+  filter: saturate(0.62) brightness(0.74);
+  pointer-events: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > .hall-crusades-poster-strip {
+  overflow-x: hidden;
+  touch-action: none;
+  overscroll-behavior-inline: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > .hall-crusades-poster-strip .hall-crusades-poster-strip__record {
+  pointer-events: none;
+}
+
 .hall-crusades-poster-nav {
   display: none;
 }
@@ -17697,6 +17720,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > :is(.hall-crusades-room-identifier, .hall-crusades-archive-stats, .hall-crusades-archive-insignia, .hall-crusades-archive-crystals, .hall-crusades-poster-nav, .hall-crusades-campaign-info-panel),
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] .hall-crusades-poster-strip__record {
     transition: none;
   }
@@ -17785,6 +17809,20 @@ button.hall-crusades-archive-crystal:focus-visible {
     inset 0 0 0 1px rgba(247, 247, 242, 0.08),
     0 0 1rem rgba(223, 42, 28, 0.34),
     0 0 1.7rem rgba(164, 15, 12, 0.24);
+  opacity: 1;
+  transform: scale(1.25);
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:not(.is-active):not(.is-empty) {
+  pointer-events: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > .hall-crusades-poster-strip .hall-crusades-poster-strip__item:not(.is-active):not(.is-empty) .hall-crusades-poster-strip__record {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-locking > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
   opacity: 1;
   transform: scale(1.25);
 }
