@@ -3210,6 +3210,7 @@ function renderWrestlingShowDetailState(showId, stateName) {
     retry: stateName === "error",
   }));
   wrestlingShowDetailShell.replaceChildren(backButton, stateSection);
+  prepareHallCrusadesShowDetailAmbient();
 }
 
 function createHallPrototypeCampaignInfoField(label, value) {
@@ -4981,6 +4982,7 @@ function renderHallPrototypeShowDetailSurface(show) {
   surface.append(card, createHallPrototypeEncounterSection(show));
 
   wrestlingShowDetailShell.replaceChildren(surface);
+  prepareHallCrusadesShowDetailAmbient();
   if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
     setPortfolioEngineHudCurrentViewDetail("");
   }
@@ -16761,8 +16763,29 @@ function syncDaiionEnvironmentalCoverage() {
   });
 }
 
-function ensureHallCrusadesFirelight() {
-  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-firelight]")) return;
+function getHallCrusadesAmbientHosts() {
+  return [wrestlingShowsShell, wrestlingShowDetailShell].filter(Boolean);
+}
+
+function findHallCrusadesAmbientNode(selector) {
+  for (const host of getHallCrusadesAmbientHosts()) {
+    const node = host.querySelector(selector);
+    if (node) return node;
+  }
+  return null;
+}
+
+function ensureHallCrusadesFirelight(targetShell = wrestlingShowsShell) {
+  const ambientHost = targetShell || wrestlingShowsShell;
+  if (!ambientHost) return null;
+
+  const existingFirelight = findHallCrusadesAmbientNode("[data-hall-crusades-firelight]");
+  if (existingFirelight) {
+    if (existingFirelight.parentElement !== ambientHost || ambientHost.firstElementChild !== existingFirelight) {
+      ambientHost.prepend(existingFirelight);
+    }
+    return existingFirelight;
+  }
 
   const firelight = document.createElement("div");
   firelight.className = "hall-crusades-firelight";
@@ -16776,31 +16799,41 @@ function ensureHallCrusadesFirelight() {
     firelight.append(pool);
   });
 
-  wrestlingShowsShell.prepend(firelight);
+  ambientHost.prepend(firelight);
+  return firelight;
 }
 
-function ensureHallCrusadesHaze() {
-  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-haze]")) return;
+function ensureHallCrusadesHaze(targetShell = wrestlingShowsShell) {
+  const ambientHost = targetShell || wrestlingShowsShell;
+  if (!ambientHost) return null;
 
-  const haze = document.createElement("div");
-  haze.className = "hall-crusades-haze";
-  haze.dataset.hallCrusadesHaze = "true";
-  haze.setAttribute("aria-hidden", "true");
+  let haze = findHallCrusadesAmbientNode("[data-hall-crusades-haze]");
+  if (!haze) {
+    haze = document.createElement("div");
+    haze.className = "hall-crusades-haze";
+    haze.dataset.hallCrusadesHaze = "true";
+    haze.setAttribute("aria-hidden", "true");
 
-  ["backfield", "crossflow", "floor-bank"].forEach((layer) => {
-    const field = document.createElement("span");
-    field.className = `hall-crusades-haze__field hall-crusades-haze__field--${layer}`;
-    field.setAttribute("aria-hidden", "true");
-    haze.append(field);
-  });
+    ["backfield", "crossflow", "floor-bank"].forEach((layer) => {
+      const field = document.createElement("span");
+      field.className = `hall-crusades-haze__field hall-crusades-haze__field--${layer}`;
+      field.setAttribute("aria-hidden", "true");
+      haze.append(field);
+    });
+  }
 
-  const firelight = wrestlingShowsShell.querySelector("[data-hall-crusades-firelight]");
-  if (firelight?.nextSibling) wrestlingShowsShell.insertBefore(haze, firelight.nextSibling);
-  else wrestlingShowsShell.prepend(haze);
+  const firelight = ambientHost.querySelector("[data-hall-crusades-firelight]");
+  if (firelight) {
+    if (firelight.nextSibling !== haze) ambientHost.insertBefore(haze, firelight.nextSibling);
+  } else if (haze.parentElement !== ambientHost || ambientHost.firstElementChild !== haze) {
+    ambientHost.prepend(haze);
+  }
+  return haze;
 }
 
-function ensureHallCrusadesCinders() {
-  if (!wrestlingShowsShell || wrestlingShowsShell.querySelector("[data-hall-crusades-cinders]")) return;
+function ensureHallCrusadesCinders(targetShell = wrestlingShowsShell) {
+  const ambientHost = targetShell || wrestlingShowsShell;
+  if (!ambientHost) return null;
 
   const sourcePattern = ["left", "right", "left", "right", "left", "right", "center", "left", "right", "left", "right", "center"];
   const shapePattern = ["flake", "sliver", "shard", "speck", "chip", "splinter"];
@@ -16878,11 +16911,14 @@ function ensureHallCrusadesCinders() {
   const isMobileCinderViewport = window.matchMedia?.("(max-width: 540px)")?.matches ?? window.innerWidth <= 540;
   const distantCinderCount = isMobileCinderViewport ? 140 : 250;
   const fragment = document.createDocumentFragment();
-  fragment.append(createLayer("distant", distantCinderCount), createLayer("foreground", 15));
+  const distantLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="distant"]') || createLayer("distant", distantCinderCount);
+  const foregroundLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="foreground"]') || createLayer("foreground", 15);
+  fragment.append(distantLayer, foregroundLayer);
 
-  const haze = wrestlingShowsShell.querySelector("[data-hall-crusades-haze]");
-  if (haze?.nextSibling) wrestlingShowsShell.insertBefore(fragment, haze.nextSibling);
-  else wrestlingShowsShell.append(fragment);
+  const haze = ambientHost.querySelector("[data-hall-crusades-haze]");
+  if (haze?.nextSibling) ambientHost.insertBefore(fragment, haze.nextSibling);
+  else ambientHost.append(fragment);
+  return fragment;
 }
 
 function ensureDaiionCrusadesInterfaceInsignia() {
@@ -16901,11 +16937,21 @@ function preloadDaiionCrusadesInterfaceData() {
   requestWrestlingShowsData();
 }
 
+function prepareHallCrusadesAmbient(targetShell = wrestlingShowsShell) {
+  if (!targetShell) return;
+  ensureHallCrusadesFirelight(targetShell);
+  ensureHallCrusadesHaze(targetShell);
+  ensureHallCrusadesCinders(targetShell);
+}
+
+function prepareHallCrusadesShowDetailAmbient() {
+  if (!wrestlingShowDetailShell || wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation !== "hall") return;
+  prepareHallCrusadesAmbient(wrestlingShowDetailShell);
+}
+
 function prepareHallCrusadesInterfaceChrome() {
   if (!wrestlingShowsShell) return;
-  ensureHallCrusadesFirelight();
-  ensureHallCrusadesHaze();
-  ensureHallCrusadesCinders();
+  prepareHallCrusadesAmbient(wrestlingShowsShell);
   ensureDaiionCrusadesInterfaceInsignia();
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
   const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");
