@@ -2690,6 +2690,9 @@ function startDaiionCrusadesConvergencePrototype() {
     }
 
     syncDaiionCrusadesImpactPointFromEmitters();
+    if (typeof prepareDaiionCrusadesInterfacePreview === "function") {
+      prepareDaiionCrusadesInterfacePreview();
+    }
     shell.classList.add("is-daiion-crusades-aperture-opening");
     daiionCrusadesApertureTimer = 0;
   }, shouldReduceMotion ? 420 : 2640);

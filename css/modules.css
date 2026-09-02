@@ -16178,7 +16178,8 @@ button.wrestling-event-history-tagged-thumb {
   overflow: hidden;
   pointer-events: none;
   contain: paint;
-  opacity: 0.414;
+  --hall-crusades-haze-opacity: 0.414;
+  opacity: var(--hall-crusades-haze-opacity);
   background:
     radial-gradient(ellipse at 2% 39%, rgba(102, 13, 18, 0.18), rgba(37, 4, 7, 0.12) 36%, transparent 64%),
     radial-gradient(ellipse at 98% 42%, rgba(96, 12, 17, 0.17), rgba(35, 4, 7, 0.1) 38%, transparent 66%),
@@ -16330,7 +16331,8 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (min-width: 760px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.405;
+    --hall-crusades-haze-opacity: 0.405;
+    opacity: var(--hall-crusades-haze-opacity);
     background:
       radial-gradient(ellipse at 7% 34%, rgba(96, 12, 17, 0.2), rgba(35, 4, 7, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 93% 36%, rgba(91, 11, 16, 0.18), rgba(34, 4, 7, 0.11) 38%, transparent 67%),
@@ -16390,7 +16392,8 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (max-width: 540px) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.423;
+    --hall-crusades-haze-opacity: 0.423;
+    opacity: var(--hall-crusades-haze-opacity);
     background:
       radial-gradient(ellipse at -12% 50%, rgba(109, 13, 18, 0.22), rgba(38, 5, 8, 0.13) 36%, transparent 65%),
       radial-gradient(ellipse at 112% 48%, rgba(103, 12, 17, 0.2), rgba(36, 5, 8, 0.12) 38%, transparent 66%),
@@ -16465,7 +16468,8 @@ button.wrestling-event-history-tagged-thumb {
 
 @media (prefers-reduced-motion: reduce) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze {
-    opacity: 0.369;
+    --hall-crusades-haze-opacity: 0.369;
+    opacity: var(--hall-crusades-haze-opacity);
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-haze::before,
@@ -16508,7 +16512,9 @@ button.wrestling-event-history-tagged-thumb {
   z-index: 2;
   display: block;
   overflow: hidden;
+  opacity: 1;
   pointer-events: none;
+  visibility: visible;
   contain: paint;
 }
 
@@ -16689,6 +16695,59 @@ button.wrestling-event-history-tagged-thumb {
 @media (prefers-reduced-motion: reduce) {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-cinders {
     display: none !important;
+  }
+}
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :is(.hall-crusades-firelight, .hall-crusades-haze, .hall-crusades-cinders) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-firelight {
+  visibility: visible;
+  animation: hallCrusadesAmbientFirelightIgnite 680ms cubic-bezier(0.2, 0.74, 0.22, 1) both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-haze {
+  visibility: visible;
+  animation: hallCrusadesAmbientHazeBuild 940ms cubic-bezier(0.2, 0.74, 0.22, 1) 360ms both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-cinders--distant {
+  visibility: visible;
+  animation: hallCrusadesAmbientCindersWake 640ms ease-out 820ms both;
+}
+
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-cinders--foreground {
+  visibility: visible;
+  animation: hallCrusadesAmbientCindersWake 640ms ease-out 1040ms both;
+}
+
+@keyframes hallCrusadesAmbientFirelightIgnite {
+  from { opacity: 0; }
+  to { opacity: 0.68; }
+}
+
+@keyframes hallCrusadesAmbientHazeBuild {
+  from { opacity: 0; }
+  to { opacity: var(--hall-crusades-haze-opacity, 0.414); }
+}
+
+@keyframes hallCrusadesAmbientCindersWake {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-firelight {
+    opacity: 0.68;
+    visibility: visible;
+    animation: none;
+  }
+
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-engine-restored .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-haze {
+    opacity: var(--hall-crusades-haze-opacity, 0.414);
+    visibility: visible;
+    animation: none;
   }
 }
 .hall-crusades-room-identifier {
@@ -17936,7 +17995,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   visibility: visible;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :not(.hall-crusades-room-identifier):not(.hall-crusades-archive-stats):not(.hall-crusades-archive-insignia):not(.hall-crusades-archive-crystals):not(.hall-crusades-poster-strip):not(.hall-crusades-poster-nav):not(.hall-crusades-campaign-info-panel) {
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > :not(.hall-crusades-firelight):not(.hall-crusades-haze):not(.hall-crusades-cinders):not(.hall-crusades-room-identifier):not(.hall-crusades-archive-stats):not(.hall-crusades-archive-insignia):not(.hall-crusades-archive-crystals):not(.hall-crusades-poster-strip):not(.hall-crusades-poster-nav):not(.hall-crusades-campaign-info-panel) {
   display: none !important;
 }
 
