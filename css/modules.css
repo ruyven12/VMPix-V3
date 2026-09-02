@@ -18026,7 +18026,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived:is(.is-daiion-crusades-interface-initializing, .is-daiion-crusades-interface-ready) .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] .hall-crusades-room-identifier__title {
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived.is-daiion-crusades-interface-initializing .wrestling-shows-shell[data-daiion-crusades-interface-preview="true"] > .hall-crusades-archive-stats {

@@ -16908,10 +16908,10 @@ function prepareHallCrusadesInterfaceChrome() {
   const title = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__title");
   const subtitle = wrestlingShowsShell.querySelector(".hall-crusades-room-identifier__subtitle");
   if (title) {
-    title.textContent = "THE CAMPAIGN ARCHIVE";
+    title.textContent = "The Hall of Crusades";
   }
   if (subtitle) {
-    subtitle.textContent = "Every recorded event. Every battle preserved.";
+    subtitle.textContent = "(The Wrestling Show Archive)";
   }
 }
 
