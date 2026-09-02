@@ -370,8 +370,10 @@ const HALL_CRUSADES_POSTER_WHEEL_COOLDOWN_MS = 240;
 const HALL_CRUSADES_POSTER_WHEEL_IDLE_RESET_MS = 180;
 const HALL_CRUSADES_POSTER_WHEEL_MAX_DELTA = 60;
 const HALL_CRUSADES_CAMPAIGN_CHARGE_DELAY_MS = 360;
-const HALL_CRUSADES_CAMPAIGN_CHARGE_DURATION_MS = 940;
+const HALL_CRUSADES_CAMPAIGN_CHARGE_DURATION_MS = 470;
 const HALL_CRUSADES_CAMPAIGN_CHARGE_REDUCED_MOTION_MS = 80;
+const HALL_CRUSADES_CAMPAIGN_EXPANSION_DURATION_MS = 760;
+const HALL_CRUSADES_CAMPAIGN_EXPANSION_REDUCED_MOTION_MS = 140;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_PAGE_SIZE = 6;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_SWIPE_THRESHOLD = 48;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_RETRY_DELAY_MS = 1800;
@@ -412,8 +414,12 @@ let isHallCrusadesCampaignLocking = false;
 let hallCrusadesCampaignLockShowId = "";
 let isHallCrusadesCampaignCharging = false;
 let isHallCrusadesCampaignRuptureReady = false;
+let isHallCrusadesCampaignExpanding = false;
+let isHallCrusadesCampaignExpanded = false;
 let hallCrusadesCampaignChargeStartTimer = 0;
 let hallCrusadesCampaignRuptureReadyTimer = 0;
+let hallCrusadesCampaignExpansionFrame = 0;
+let hallCrusadesCampaignExpansionCompleteTimer = 0;
 let activeHallCrusadesYearFilter = "";
 let activeHallCrusadesBannerFilter = "all";
 let activeHallCrusadesFieldFilter = "all";
@@ -1657,11 +1663,27 @@ function getHallCrusadesCampaignChargeState() {
     return "";
   }
 
+  if (isHallCrusadesCampaignExpanded) {
+    return "expanded";
+  }
+
+  if (isHallCrusadesCampaignExpanding) {
+    return "expanding";
+  }
+
   if (isHallCrusadesCampaignRuptureReady) {
     return "rupture-ready";
   }
 
   return isHallCrusadesCampaignCharging ? "charging" : "locked";
+}
+
+function getHallCrusadesCampaignExpansionState() {
+  if (!isHallCrusadesCampaignLockActive() || !isHallCrusadesCampaignExpanding) {
+    return "";
+  }
+
+  return isHallCrusadesCampaignExpanded ? "expanded" : "expanding";
 }
 
 function syncHallCrusadesCampaignLockShell() {
@@ -1672,15 +1694,26 @@ function syncHallCrusadesCampaignLockShell() {
   const isLockActive = isHallCrusadesCampaignLockActive();
   const isCharging = isLockActive && isHallCrusadesCampaignCharging;
   const isRuptureReady = isLockActive && isHallCrusadesCampaignRuptureReady;
+  const isExpanding = isLockActive && isHallCrusadesCampaignExpanding;
+  const isExpanded = isLockActive && isHallCrusadesCampaignExpanded;
   wrestlingShowsShell.classList.toggle("is-campaign-locking", isLockActive);
   wrestlingShowsShell.classList.toggle("is-campaign-charging", isCharging);
   wrestlingShowsShell.classList.toggle("is-campaign-rupture-ready", isRuptureReady);
+  wrestlingShowsShell.classList.toggle("is-campaign-expanding", isExpanding);
+  wrestlingShowsShell.classList.toggle("is-campaign-expanded", isExpanded);
   if (isLockActive && hallCrusadesCampaignLockShowId) {
     wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId = hallCrusadesCampaignLockShowId;
     wrestlingShowsShell.dataset.hallCrusadesCampaignChargeState = getHallCrusadesCampaignChargeState();
+    const expansionState = getHallCrusadesCampaignExpansionState();
+    if (expansionState) {
+      wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState = expansionState;
+    } else {
+      delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
+    }
   } else {
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignChargeState;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
   }
 }
 
@@ -1691,8 +1724,33 @@ function clearHallCrusadesCampaignChargeTimers() {
 
   window.clearTimeout(hallCrusadesCampaignChargeStartTimer);
   window.clearTimeout(hallCrusadesCampaignRuptureReadyTimer);
+  window.cancelAnimationFrame(hallCrusadesCampaignExpansionFrame);
+  window.clearTimeout(hallCrusadesCampaignExpansionCompleteTimer);
   hallCrusadesCampaignChargeStartTimer = 0;
   hallCrusadesCampaignRuptureReadyTimer = 0;
+  hallCrusadesCampaignExpansionFrame = 0;
+  hallCrusadesCampaignExpansionCompleteTimer = 0;
+}
+
+function clearHallCrusadesCampaignExpansionGeometry() {
+  if (!wrestlingShowsShell) {
+    return;
+  }
+
+  [
+    "--hall-crusades-campaign-start-x",
+    "--hall-crusades-campaign-start-y",
+    "--hall-crusades-campaign-start-width",
+    "--hall-crusades-campaign-start-height",
+    "--hall-crusades-campaign-target-x",
+    "--hall-crusades-campaign-target-y",
+    "--hall-crusades-campaign-target-width",
+    "--hall-crusades-campaign-target-height",
+    "--hall-crusades-campaign-overshoot-x",
+    "--hall-crusades-campaign-overshoot-y",
+    "--hall-crusades-campaign-overshoot-width",
+    "--hall-crusades-campaign-overshoot-height",
+  ].forEach((property) => wrestlingShowsShell.style.removeProperty(property));
 }
 
 function clearHallCrusadesCampaignLock() {
@@ -1701,6 +1759,9 @@ function clearHallCrusadesCampaignLock() {
   hallCrusadesCampaignLockShowId = "";
   isHallCrusadesCampaignCharging = false;
   isHallCrusadesCampaignRuptureReady = false;
+  isHallCrusadesCampaignExpanding = false;
+  isHallCrusadesCampaignExpanded = false;
+  clearHallCrusadesCampaignExpansionGeometry();
   syncHallCrusadesCampaignLockShell();
 }
 
@@ -1719,15 +1780,129 @@ function isHallCrusadesCampaignReducedMotion() {
   return Boolean(typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
 }
 
+function getHallCrusadesCampaignActiveRecord() {
+  return hallCrusadesPosterStrip?.querySelector?.(".hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record") || null;
+}
+
+function getHallCrusadesCampaignEngineTop(viewportHeight) {
+  const engine = document.querySelector("[data-portfolio-engine], .wrestling-engine-bar");
+  const rect = engine?.getBoundingClientRect?.();
+  if (!rect || rect.top <= viewportHeight * 0.46 || rect.top >= viewportHeight) {
+    return viewportHeight;
+  }
+
+  return rect.top;
+}
+
+function formatHallCrusadesCampaignPixelValue(value) {
+  return `${Number(value.toFixed(2))}px`;
+}
+
+function setHallCrusadesCampaignExpansionGeometry(record) {
+  if (!wrestlingShowsShell || typeof window === "undefined" || !record?.getBoundingClientRect) {
+    return false;
+  }
+
+  const rect = record.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    return false;
+  }
+
+  const viewportWidth = Math.max(document.documentElement?.clientWidth || 0, window.innerWidth || 0);
+  const viewportHeight = Math.max(document.documentElement?.clientHeight || 0, window.innerHeight || 0);
+  const isDesktop = viewportWidth >= 900;
+  const sideClearance = isDesktop
+    ? Math.min(108, Math.max(56, viewportWidth * 0.055))
+    : Math.max(16, viewportWidth * 0.04);
+  const topClearance = isDesktop
+    ? Math.min(128, Math.max(88, viewportHeight * 0.1))
+    : Math.min(96, Math.max(68, viewportHeight * 0.085));
+  const engineTop = getHallCrusadesCampaignEngineTop(viewportHeight);
+  const bottomLimit = Math.min(viewportHeight - Math.max(18, viewportHeight * 0.025), engineTop - 18);
+  const availableWidth = Math.max(rect.width, viewportWidth - sideClearance * 2);
+  const availableHeight = Math.max(rect.height, bottomLimit - topClearance);
+  const targetWidth = isDesktop
+    ? Math.max(rect.width, Math.min(1120, availableWidth, viewportWidth * 0.72))
+    : Math.max(rect.width, viewportWidth - sideClearance * 2);
+  const targetHeight = isDesktop
+    ? Math.max(rect.height, Math.min(660, availableHeight, targetWidth / 1.58))
+    : Math.max(rect.height, Math.min(availableHeight, Math.max(rect.height * 1.24, targetWidth * 1.45)));
+  const targetX = (viewportWidth - targetWidth) / 2;
+  const targetY = topClearance + Math.max(0, (availableHeight - targetHeight) * 0.45);
+  const overshootScale = isDesktop ? 1.028 : 1.035;
+  const overshootSideClearance = Math.max(10, sideClearance * 0.58);
+  const overshootWidth = Math.max(targetWidth, Math.min(viewportWidth - overshootSideClearance * 2, targetWidth * overshootScale));
+  const overshootHeight = Math.max(targetHeight, Math.min(availableHeight, targetHeight * overshootScale));
+  const targetCenterX = targetX + targetWidth / 2;
+  const targetCenterY = targetY + targetHeight / 2;
+  const overshootX = targetCenterX - overshootWidth / 2;
+  const overshootY = targetCenterY - overshootHeight / 2;
+  const setVar = (name, value) => wrestlingShowsShell.style.setProperty(name, formatHallCrusadesCampaignPixelValue(value));
+
+  setVar("--hall-crusades-campaign-start-x", rect.left);
+  setVar("--hall-crusades-campaign-start-y", rect.top);
+  setVar("--hall-crusades-campaign-start-width", rect.width);
+  setVar("--hall-crusades-campaign-start-height", rect.height);
+  setVar("--hall-crusades-campaign-target-x", targetX);
+  setVar("--hall-crusades-campaign-target-y", targetY);
+  setVar("--hall-crusades-campaign-target-width", targetWidth);
+  setVar("--hall-crusades-campaign-target-height", targetHeight);
+  setVar("--hall-crusades-campaign-overshoot-x", overshootX);
+  setVar("--hall-crusades-campaign-overshoot-y", overshootY);
+  setVar("--hall-crusades-campaign-overshoot-width", overshootWidth);
+  setVar("--hall-crusades-campaign-overshoot-height", overshootHeight);
+  return true;
+}
+
+function beginHallCrusadesCampaignExpansion() {
+  if (!isHallCrusadesCampaignLockActive()) {
+    return;
+  }
+
+  const record = getHallCrusadesCampaignActiveRecord();
+  if (!setHallCrusadesCampaignExpansionGeometry(record)) {
+    return;
+  }
+
+  isHallCrusadesCampaignExpanding = true;
+  isHallCrusadesCampaignExpanded = false;
+  syncHallCrusadesCampaignLockShell();
+
+  if (typeof window === "undefined") {
+    isHallCrusadesCampaignExpanded = true;
+    syncHallCrusadesCampaignLockShell();
+    return;
+  }
+
+  const isReducedMotion = isHallCrusadesCampaignReducedMotion();
+  const expansionDuration = isReducedMotion
+    ? HALL_CRUSADES_CAMPAIGN_EXPANSION_REDUCED_MOTION_MS
+    : HALL_CRUSADES_CAMPAIGN_EXPANSION_DURATION_MS;
+  hallCrusadesCampaignExpansionCompleteTimer = window.setTimeout(() => {
+    hallCrusadesCampaignExpansionCompleteTimer = 0;
+    if (!isHallCrusadesCampaignLockActive()) {
+      return;
+    }
+
+    isHallCrusadesCampaignExpanded = true;
+    syncHallCrusadesCampaignLockShell();
+  }, expansionDuration);
+}
+
 function scheduleHallCrusadesCampaignCharge() {
   clearHallCrusadesCampaignChargeTimers();
   isHallCrusadesCampaignCharging = false;
   isHallCrusadesCampaignRuptureReady = false;
+  isHallCrusadesCampaignExpanding = false;
+  isHallCrusadesCampaignExpanded = false;
+  clearHallCrusadesCampaignExpansionGeometry();
   syncHallCrusadesCampaignLockShell();
 
   if (typeof window === "undefined") {
     isHallCrusadesCampaignCharging = true;
     isHallCrusadesCampaignRuptureReady = true;
+    isHallCrusadesCampaignExpanding = true;
+    isHallCrusadesCampaignExpanded = true;
     syncHallCrusadesCampaignLockShell();
     return;
   }
@@ -1754,6 +1929,14 @@ function scheduleHallCrusadesCampaignCharge() {
 
       isHallCrusadesCampaignRuptureReady = true;
       syncHallCrusadesCampaignLockShell();
+      if (isReducedMotion) {
+        beginHallCrusadesCampaignExpansion();
+      } else {
+        hallCrusadesCampaignExpansionFrame = window.requestAnimationFrame(() => {
+          hallCrusadesCampaignExpansionFrame = 0;
+          beginHallCrusadesCampaignExpansion();
+        });
+      }
     }, readyDelay);
   }, chargeDelay);
 }
