@@ -16874,7 +16874,7 @@ function ensureHallCrusadesCinders() {
   };
 
   const isMobileCinderViewport = window.matchMedia?.("(max-width: 540px)")?.matches ?? window.innerWidth <= 540;
-  const distantCinderCount = isMobileCinderViewport ? 175 : 250;
+  const distantCinderCount = isMobileCinderViewport ? 140 : 250;
   const fragment = document.createDocumentFragment();
   fragment.append(createLayer("distant", distantCinderCount), createLayer("foreground", 15));
 
