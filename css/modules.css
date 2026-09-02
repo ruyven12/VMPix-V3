@@ -18368,6 +18368,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   padding-block: 0.08rem;
 }
 
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side {
+  transform: translateY(0.1rem);
+}
+
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-value {
   font-size: clamp(0.68rem, 0.8vw, 0.8rem);
   letter-spacing: 0.025em;
@@ -18448,9 +18452,12 @@ button.hall-crusades-archive-crystal:focus-visible {
     block-size: 100%;
     min-block-size: 0;
     max-block-size: 100%;
+    box-sizing: border-box;
+    padding-block-end: 8px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scroll-padding-block-end: 8px;
     scrollbar-width: none;
   }
 
@@ -18503,6 +18510,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-card__value {
     font-size: clamp(0.66rem, 2.4vw, 0.78rem);
     line-height: 1.08;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side {
+    transform: translateY(0.66rem);
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-value {
