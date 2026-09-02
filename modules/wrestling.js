@@ -16802,7 +16802,7 @@ function ensureHallCrusadesCinders() {
 
   const sourcePattern = ["left", "right", "left", "right", "left", "right", "center", "left", "right", "left", "right", "center"];
   const shapePattern = ["flake", "sliver", "shard", "speck", "chip", "splinter"];
-  const tonePattern = ["charcoal", "ash", "umber", "redblack", "ash", "warm", "charcoal", "ember", "charcoal", "warm"];
+  const tonePattern = ["charcoal", "redblack", "ash", "warm", "umber", "redblack", "ash", "ember", "charcoal", "warm", "redblack"];
   const sourceX = {
     left: { desktop: 22, mobile: 24 },
     right: { desktop: 78, mobile: 76 },
@@ -16839,11 +16839,11 @@ function ensureHallCrusadesCinders() {
       const endY = -(depth === "foreground" ? 44 + ((index * 29) % 30) : 58 + ((index * 23) % 42));
       const duration = depth === "foreground" ? 12.5 + ((index * 7) % 10) : 19 + ((index * 7) % 15);
       const delay = -(((index * 3.7) + (depth === "foreground" ? 2.8 : 0)) % duration);
-      const width = depth === "foreground" ? 4.2 + ((index * 7) % 9) * 0.7 : 1.75 + ((index * 5) % 7) * 0.36;
+      const width = depth === "foreground" ? 6.5 + ((index * 7) % 9) * 1.18 : 2.8 + ((index * 5) % 7) * 0.7;
       const height = width * (shape === "sliver" || shape === "splinter" ? 2.15 : shape === "shard" ? 1.55 : 0.82 + ((index * 3) % 5) * 0.15);
-      const startOpacity = depth === "foreground" ? 0.42 + ((index * 7) % 6) * 0.052 : 0.24 + ((index * 5) % 7) * 0.038;
-      const peakOpacity = Math.min(0.86, startOpacity + (depth === "foreground" ? 0.22 : 0.17));
-      const fadeOpacity = Math.max(0.08, startOpacity - (depth === "foreground" ? 0.14 : 0.13));
+      const startOpacity = depth === "foreground" ? 0.58 + ((index * 7) % 6) * 0.065 : 0.34 + ((index * 5) % 7) * 0.052;
+      const peakOpacity = Math.min(depth === "foreground" ? 0.96 : 0.84, startOpacity + (depth === "foreground" ? 0.2 : 0.2));
+      const fadeOpacity = Math.max(depth === "foreground" ? 0.18 : 0.12, startOpacity - (depth === "foreground" ? 0.24 : 0.22));
       const rotateStart = ((index * 47) % 180) - 90;
       const rotateMid = rotateStart + direction * (42 + ((index * 13) % 70));
       const rotateEnd = rotateMid + direction * (80 + ((index * 17) % 150));

@@ -16525,10 +16525,10 @@ button.wrestling-event-history-tagged-thumb {
   block-size: var(--hall-cinder-height);
   border-radius: var(--hall-cinder-radius, 43% 57% 48% 35%);
   background:
-    linear-gradient(135deg, var(--hall-cinder-rim, rgba(177, 137, 106, 0.46)) 0 16%, var(--hall-cinder-edge, rgba(118, 96, 78, 0.88)) 35%, var(--hall-cinder-fill, rgba(20, 15, 13, 0.94)) 61%, var(--hall-cinder-shadow, rgba(3, 3, 4, 0.98)));
+    linear-gradient(135deg, var(--hall-cinder-rim, rgba(213, 171, 130, 0.58)) 0 22%, var(--hall-cinder-edge, rgba(148, 122, 96, 0.92)) 42%, var(--hall-cinder-fill, rgba(24, 17, 14, 0.96)) 66%, var(--hall-cinder-shadow, rgba(3, 3, 4, 0.99)));
   box-shadow:
-    0 0 0 0.45px rgba(238, 185, 132, var(--hall-cinder-rim-opacity, 0.12)),
-    0 0 1.25px rgba(0, 0, 0, 0.82);
+    0 0 0 0.7px rgba(255, 190, 132, var(--hall-cinder-rim-opacity, 0.18)),
+    0 0 1.6px rgba(0, 0, 0, 0.88);
   opacity: 0;
   transform: translate3d(0, 0, 0) rotate(var(--hall-cinder-rotate-start)) scale3d(0.62, 0.62, 1);
   transform-origin: 50% 50%;
@@ -16548,67 +16548,73 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .hall-crusades-cinder--distant {
-  --hall-cinder-scale-mid: 0.96;
-  --hall-cinder-scale-end: 0.78;
+  --hall-cinder-scale-mid: 1.02;
+  --hall-cinder-scale-end: 0.82;
 }
 
 .hall-crusades-cinder--foreground {
-  --hall-cinder-scale-mid: 1.14;
-  --hall-cinder-scale-end: 0.96;
+  --hall-cinder-scale-mid: 1.2;
+  --hall-cinder-scale-end: 1;
   box-shadow:
-    0 0 0 0.5px rgba(238, 185, 132, var(--hall-cinder-rim-opacity, 0.14)),
-    0 0 1.6px rgba(0, 0, 0, 0.86);
+    0 0 0 0.85px rgba(255, 190, 132, var(--hall-cinder-rim-opacity, 0.2)),
+    0 0 2px rgba(0, 0, 0, 0.9);
 }
 
 .hall-crusades-cinder--charcoal {
-  --hall-cinder-rim: rgba(126, 105, 88, 0.48);
-  --hall-cinder-rim-opacity: 0.1;
-  --hall-cinder-edge: rgba(98, 82, 70, 0.86);
-  --hall-cinder-fill: rgba(18, 14, 12, 0.96);
-  --hall-cinder-shadow: rgba(3, 3, 4, 0.99);
+  --hall-cinder-rim: rgba(159, 135, 112, 0.6);
+  --hall-cinder-rim-opacity: 0.18;
+  --hall-cinder-edge: rgba(126, 106, 88, 0.92);
+  --hall-cinder-fill: rgba(20, 15, 12, 0.98);
+  --hall-cinder-shadow: rgba(3, 3, 4, 1);
 }
 
 .hall-crusades-cinder--ash {
-  --hall-cinder-rim: rgba(168, 153, 132, 0.5);
-  --hall-cinder-rim-opacity: 0.15;
-  --hall-cinder-edge: rgba(142, 128, 111, 0.84);
-  --hall-cinder-fill: rgba(47, 40, 35, 0.92);
-  --hall-cinder-shadow: rgba(9, 8, 8, 0.98);
+  --hall-cinder-rim: rgba(214, 198, 166, 0.62);
+  --hall-cinder-rim-opacity: 0.26;
+  --hall-cinder-edge: rgba(184, 166, 139, 0.9);
+  --hall-cinder-fill: rgba(58, 48, 39, 0.94);
+  --hall-cinder-shadow: rgba(9, 8, 8, 0.99);
 }
 
 .hall-crusades-cinder--umber {
-  --hall-cinder-rim: rgba(161, 84, 55, 0.48);
-  --hall-cinder-rim-opacity: 0.13;
-  --hall-cinder-edge: rgba(130, 70, 47, 0.86);
-  --hall-cinder-fill: rgba(41, 18, 14, 0.94);
-  --hall-cinder-shadow: rgba(7, 5, 5, 0.99);
+  --hall-cinder-rim: rgba(196, 103, 64, 0.6);
+  --hall-cinder-rim-opacity: 0.23;
+  --hall-cinder-edge: rgba(162, 82, 51, 0.92);
+  --hall-cinder-fill: rgba(49, 20, 14, 0.96);
+  --hall-cinder-shadow: rgba(7, 5, 5, 1);
 }
 
 .hall-crusades-cinder--redblack {
-  --hall-cinder-rim: rgba(180, 67, 43, 0.46);
-  --hall-cinder-rim-opacity: 0.16;
-  --hall-cinder-edge: rgba(118, 42, 33, 0.86);
-  --hall-cinder-fill: rgba(32, 10, 9, 0.95);
-  --hall-cinder-shadow: rgba(6, 3, 4, 0.99);
-  --hall-cinder-ember-opacity: 0.14;
+  --hall-cinder-rim: rgba(215, 79, 48, 0.6);
+  --hall-cinder-rim-opacity: 0.3;
+  --hall-cinder-edge: rgba(152, 50, 35, 0.92);
+  --hall-cinder-fill: rgba(39, 10, 8, 0.97);
+  --hall-cinder-shadow: rgba(6, 3, 4, 1);
+  --hall-cinder-ember-opacity: 0.24;
+  --hall-cinder-ember-mid-opacity: 0.13;
+  --hall-cinder-ember-fade-opacity: 0.04;
 }
 
 .hall-crusades-cinder--warm {
-  --hall-cinder-rim: rgba(225, 122, 62, 0.58);
-  --hall-cinder-rim-opacity: 0.21;
-  --hall-cinder-edge: rgba(176, 80, 44, 0.88);
-  --hall-cinder-fill: rgba(50, 19, 13, 0.94);
-  --hall-cinder-shadow: rgba(9, 4, 4, 0.99);
-  --hall-cinder-ember-opacity: 0.3;
+  --hall-cinder-rim: rgba(255, 145, 72, 0.72);
+  --hall-cinder-rim-opacity: 0.38;
+  --hall-cinder-edge: rgba(216, 94, 47, 0.94);
+  --hall-cinder-fill: rgba(63, 22, 13, 0.97);
+  --hall-cinder-shadow: rgba(9, 4, 4, 1);
+  --hall-cinder-ember-opacity: 0.46;
+  --hall-cinder-ember-mid-opacity: 0.25;
+  --hall-cinder-ember-fade-opacity: 0.08;
 }
 
 .hall-crusades-cinder--ember {
-  --hall-cinder-rim: rgba(244, 144, 72, 0.62);
-  --hall-cinder-rim-opacity: 0.25;
-  --hall-cinder-edge: rgba(204, 92, 47, 0.9);
-  --hall-cinder-fill: rgba(58, 20, 13, 0.95);
-  --hall-cinder-shadow: rgba(10, 4, 4, 0.99);
-  --hall-cinder-ember-opacity: 0.4;
+  --hall-cinder-rim: rgba(255, 170, 84, 0.78);
+  --hall-cinder-rim-opacity: 0.44;
+  --hall-cinder-edge: rgba(238, 112, 52, 0.96);
+  --hall-cinder-fill: rgba(70, 24, 13, 0.98);
+  --hall-cinder-shadow: rgba(10, 4, 4, 1);
+  --hall-cinder-ember-opacity: 0.58;
+  --hall-cinder-ember-mid-opacity: 0.32;
+  --hall-cinder-ember-fade-opacity: 0.1;
 }
 
 .hall-crusades-cinder--flake {
@@ -16643,8 +16649,8 @@ button.wrestling-event-history-tagged-thumb {
 
 @keyframes hallCrusadesCinderHeatFade {
   0%, 12% { opacity: var(--hall-cinder-ember-opacity, 0); }
-  42% { opacity: calc(var(--hall-cinder-ember-opacity, 0) * 0.64); }
-  72% { opacity: calc(var(--hall-cinder-ember-opacity, 0) * 0.18); }
+  42% { opacity: var(--hall-cinder-ember-mid-opacity, 0); }
+  72% { opacity: var(--hall-cinder-ember-fade-opacity, 0); }
   100% { opacity: 0; }
 }
 
