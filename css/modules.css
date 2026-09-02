@@ -18444,7 +18444,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-list {
+    align-self: stretch;
+    block-size: 100%;
     min-block-size: 0;
+    max-block-size: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
