@@ -16873,8 +16873,10 @@ function ensureHallCrusadesCinders() {
     return layer;
   };
 
+  const isMobileCinderViewport = window.matchMedia?.("(max-width: 540px)")?.matches ?? window.innerWidth <= 540;
+  const distantCinderCount = isMobileCinderViewport ? 175 : 250;
   const fragment = document.createDocumentFragment();
-  fragment.append(createLayer("distant", 250), createLayer("foreground", 15));
+  fragment.append(createLayer("distant", distantCinderCount), createLayer("foreground", 15));
 
   const haze = wrestlingShowsShell.querySelector("[data-hall-crusades-haze]");
   if (haze?.nextSibling) wrestlingShowsShell.insertBefore(fragment, haze.nextSibling);
