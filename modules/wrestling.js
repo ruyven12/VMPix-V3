@@ -1811,6 +1811,8 @@ function setHallCrusadesCampaignExpansionGeometry(record) {
   const viewportWidth = Math.max(document.documentElement?.clientWidth || 0, window.innerWidth || 0);
   const viewportHeight = Math.max(document.documentElement?.clientHeight || 0, window.innerHeight || 0);
   const isDesktop = viewportWidth >= 900;
+  const rootFontSize = Number.parseFloat(window.getComputedStyle?.(document.documentElement)?.fontSize) || 16;
+  const clampValue = (min, value, max) => Math.min(max, Math.max(min, value));
   const sideClearance = isDesktop
     ? Math.min(108, Math.max(56, viewportWidth * 0.055))
     : Math.max(16, viewportWidth * 0.04);
@@ -1819,20 +1821,38 @@ function setHallCrusadesCampaignExpansionGeometry(record) {
     : Math.min(96, Math.max(68, viewportHeight * 0.085));
   const engineTop = getHallCrusadesCampaignEngineTop(viewportHeight);
   const bottomLimit = Math.min(viewportHeight - Math.max(18, viewportHeight * 0.025), engineTop - 18);
-  const availableWidth = Math.max(rect.width, viewportWidth - sideClearance * 2);
   const availableHeight = Math.max(rect.height, bottomLimit - topClearance);
+  const desktopDetailSurfaceWidth = Math.min(viewportWidth - rootFontSize * 2, rootFontSize * 58);
   const targetWidth = isDesktop
-    ? Math.max(rect.width, Math.min(1120, availableWidth, viewportWidth * 0.72))
+    ? Math.max(rect.width, Math.min(viewportWidth - 20, desktopDetailSurfaceWidth + 20))
     : Math.max(rect.width, viewportWidth - sideClearance * 2);
-  const targetHeight = isDesktop
-    ? Math.max(rect.height, Math.min(660, availableHeight, targetWidth / 1.58))
+  let targetHeight = isDesktop
+    ? rect.height
     : Math.max(rect.height, Math.min(availableHeight, Math.max(rect.height * 1.24, targetWidth * 1.45)));
   const targetX = (viewportWidth - targetWidth) / 2;
-  const targetY = topClearance + Math.max(0, (availableHeight - targetHeight) * 0.45);
+  let targetY = topClearance + Math.max(0, (availableHeight - targetHeight) * 0.45);
+  if (isDesktop) {
+    const detailTopRailHeight = clampValue(rootFontSize * 1.7, viewportHeight * 0.042, rootFontSize * 2.55);
+    const detailShellTopPadding = rootFontSize;
+    const detailTopClearance = Math.max(rootFontSize * 0.42, 0) + detailTopRailHeight + 20 - detailShellTopPadding;
+    const detailTargetY = detailShellTopPadding + detailTopClearance;
+    const detailTargetHeight = viewportHeight - detailTopClearance - rootFontSize * 4.6 - Math.max(rootFontSize * 2.2, 0);
+    const detailEngineHeightCap = engineTop - detailTargetY - Math.max(8, rootFontSize * 0.5);
+    targetY = detailTargetY;
+    targetHeight = Math.max(rect.height, Math.min(detailTargetHeight, detailEngineHeightCap));
+  } else {
+    const targetBottom = targetY + targetHeight;
+    const raisedTargetY = topClearance + Math.max(8, viewportHeight * 0.01);
+    targetY = Math.min(targetY, raisedTargetY);
+    targetHeight = Math.max(rect.height, targetBottom - targetY);
+  }
   const overshootScale = isDesktop ? 1.028 : 1.035;
   const overshootSideClearance = Math.max(10, sideClearance * 0.58);
   const overshootWidth = Math.max(targetWidth, Math.min(viewportWidth - overshootSideClearance * 2, targetWidth * overshootScale));
-  const overshootHeight = Math.max(targetHeight, Math.min(availableHeight, targetHeight * overshootScale));
+  const overshootAvailableHeight = isDesktop
+    ? Math.max(targetHeight, engineTop - targetY - Math.max(8, rootFontSize * 0.5))
+    : availableHeight;
+  const overshootHeight = Math.max(targetHeight, Math.min(overshootAvailableHeight, targetHeight * overshootScale));
   const targetCenterX = targetX + targetWidth / 2;
   const targetCenterY = targetY + targetHeight / 2;
   const overshootX = targetCenterX - overshootWidth / 2;
