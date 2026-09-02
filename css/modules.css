@@ -17826,6 +17826,216 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 1;
   transform: scale(1.25);
 }
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+  border-color: rgba(255, 160, 96, 0.92);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 232, 0.16),
+    inset 0 0 1.08rem rgba(255, 90, 60, 0.16),
+    0 0 0.82rem rgba(255, 231, 208, 0.18),
+    0 0 1.55rem rgba(255, 90, 60, 0.42),
+    0 0 2.4rem rgba(164, 15, 12, 0.32);
+  animation: hallCrusadesCampaignRecordCharge 940ms cubic-bezier(0.16, 0.92, 0.22, 1) forwards;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::before {
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(255, 244, 224, 0.78), rgba(255, 126, 44, 0.86) 18%, transparent 36% 64%, rgba(223, 42, 28, 0.74) 82%, rgba(255, 244, 224, 0.58)) top / 100% 2px no-repeat,
+    linear-gradient(90deg, rgba(223, 42, 28, 0.72), rgba(255, 126, 44, 0.82) 22%, transparent 42% 58%, rgba(255, 244, 224, 0.62) 82%, rgba(223, 42, 28, 0.68)) bottom / 100% 2px no-repeat,
+    linear-gradient(180deg, rgba(255, 244, 224, 0.54), rgba(255, 90, 60, 0.74) 24%, transparent 46% 62%, rgba(223, 42, 28, 0.58) 88%, rgba(255, 126, 44, 0.42)) left / 2px 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 126, 44, 0.52), rgba(223, 42, 28, 0.66) 18%, transparent 42% 58%, rgba(255, 244, 224, 0.68) 82%, rgba(255, 90, 60, 0.5)) right / 2px 100% no-repeat,
+    radial-gradient(circle at 50% 50%, transparent 54%, rgba(255, 126, 44, 0.11) 72%, rgba(223, 42, 28, 0.2));
+  opacity: 1;
+  mix-blend-mode: screen;
+  animation: hallCrusadesCampaignFrameJitter 94ms steps(2, end) 500ms 5;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::after {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  content: "";
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 10%, rgba(255, 248, 230, 0.98) 18%, rgba(255, 126, 44, 0.78) 28%, transparent 46%) top left / 220% 2px no-repeat,
+    linear-gradient(180deg, transparent 0 12%, rgba(255, 248, 230, 0.88) 22%, rgba(223, 42, 28, 0.76) 34%, transparent 52%) top right / 2px 220% no-repeat,
+    linear-gradient(270deg, transparent 0 9%, rgba(255, 248, 230, 0.9) 18%, rgba(255, 90, 60, 0.76) 30%, transparent 48%) bottom right / 220% 2px no-repeat,
+    linear-gradient(0deg, transparent 0 13%, rgba(255, 248, 230, 0.82) 22%, rgba(255, 126, 44, 0.72) 36%, transparent 54%) bottom left / 2px 220% no-repeat,
+    radial-gradient(circle at 0 0, rgba(255, 248, 230, 0.62), transparent 16%) top left / 18% 12% no-repeat,
+    radial-gradient(circle at 100% 0, rgba(255, 228, 188, 0.56), transparent 17%) top right / 18% 12% no-repeat,
+    radial-gradient(circle at 100% 100%, rgba(255, 248, 230, 0.68), transparent 18%) bottom right / 18% 12% no-repeat,
+    radial-gradient(circle at 0 100%, rgba(255, 126, 44, 0.52), transparent 18%) bottom left / 18% 12% no-repeat;
+  background-position:
+    -130% 0,
+    100% -130%,
+    230% 100%,
+    0 230%,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation:
+    hallCrusadesCampaignPerimeterCharge 940ms cubic-bezier(0.16, 0.92, 0.22, 1) forwards,
+    hallCrusadesCampaignFrameJitter 94ms steps(2, end) 560ms 5;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-rupture-ready > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+  border-color: rgba(255, 221, 192, 0.98);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 230, 0.22),
+    inset 0 0 1.25rem rgba(255, 126, 44, 0.2),
+    0 0 0.95rem rgba(255, 248, 230, 0.22),
+    0 0 1.75rem rgba(255, 90, 60, 0.48),
+    0 0 2.75rem rgba(164, 15, 12, 0.36);
+  animation: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-rupture-ready > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::before {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-rupture-ready > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::after {
+  background-position:
+    36% 0,
+    100% 34%,
+    64% 100%,
+    0 68%,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%;
+  opacity: 0.94;
+  transform: none;
+  animation: none;
+}
+
+@keyframes hallCrusadesCampaignRecordCharge {
+  0% {
+    border-color: rgba(247, 76, 52, 0.76);
+    box-shadow:
+      inset 0 0 0 1px rgba(247, 247, 242, 0.08),
+      0 0 1rem rgba(223, 42, 28, 0.34),
+      0 0 1.7rem rgba(164, 15, 12, 0.24);
+  }
+
+  38% {
+    border-color: rgba(255, 126, 44, 0.86);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 231, 208, 0.13),
+      inset 0 0 0.72rem rgba(255, 90, 60, 0.1),
+      0 0 0.84rem rgba(255, 126, 44, 0.24),
+      0 0 1.85rem rgba(223, 42, 28, 0.3);
+  }
+
+  72% {
+    border-color: rgba(255, 198, 150, 0.94);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 248, 230, 0.18),
+      inset 0 0 1.08rem rgba(255, 126, 44, 0.18),
+      0 0 0.96rem rgba(255, 248, 230, 0.18),
+      0 0 1.7rem rgba(255, 90, 60, 0.44),
+      0 0 2.55rem rgba(164, 15, 12, 0.32);
+  }
+
+  100% {
+    border-color: rgba(255, 221, 192, 0.98);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 248, 230, 0.22),
+      inset 0 0 1.25rem rgba(255, 126, 44, 0.2),
+      0 0 0.95rem rgba(255, 248, 230, 0.22),
+      0 0 1.75rem rgba(255, 90, 60, 0.48),
+      0 0 2.75rem rgba(164, 15, 12, 0.36);
+  }
+}
+
+@keyframes hallCrusadesCampaignPerimeterCharge {
+  0% {
+    opacity: 0.08;
+    background-position:
+      -130% 0,
+      100% -130%,
+      230% 100%,
+      0 230%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%;
+  }
+
+  36% {
+    opacity: 0.48;
+    background-position:
+      -54% 0,
+      100% -42%,
+      156% 100%,
+      0 148%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%;
+  }
+
+  72% {
+    opacity: 0.82;
+    background-position:
+      8% 0,
+      100% 12%,
+      98% 100%,
+      0 96%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%;
+  }
+
+  100% {
+    opacity: 0.94;
+    background-position:
+      36% 0,
+      100% 34%,
+      64% 100%,
+      0 68%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%;
+  }
+}
+
+@keyframes hallCrusadesCampaignFrameJitter {
+  0%,
+  100% { transform: translate3d(0, 0, 0); }
+  28% { transform: translate3d(0.45px, -0.35px, 0); }
+  56% { transform: translate3d(-0.55px, 0.42px, 0); }
+  78% { transform: translate3d(0.28px, 0.5px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::before,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::after {
+    animation: none;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]:is(.is-campaign-charging, .is-campaign-rupture-ready) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::after {
+    background-position:
+      36% 0,
+      100% 34%,
+      64% 100%,
+      0 68%,
+      0 0,
+      100% 0,
+      100% 100%,
+      0 100%;
+    opacity: 0.82;
+  }
+}
 .hall-crusades-poster-strip__item.is-awaiting-communication {
   animation: hallCrusadesAwaitingPosterPulse 2.05s ease-in-out infinite;
 }
