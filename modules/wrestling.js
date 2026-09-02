@@ -16822,21 +16822,22 @@ function ensureHallCrusadesCinders() {
       const shape = shapePattern[(index * 5 + (depth === "foreground" ? 2 : 0)) % shapePattern.length];
       const tone = tonePattern[(index * 3 + (depth === "foreground" ? 5 : 0)) % tonePattern.length];
       const spread = ((index * 37) % 19) - 9;
-      const direction = source === "left" ? 1 : source === "right" ? -1 : index % 2 === 0 ? -1 : 1;
+      const edgeWander = index % 4 === 0;
+      const direction = source === "left" ? (edgeWander ? -1 : 1) : source === "right" ? (edgeWander ? 1 : -1) : index % 2 === 0 ? -1 : 1;
       const depthBias = depth === "foreground" ? 1 : 0;
       const particle = document.createElement("span");
 
       particle.className = `hall-crusades-cinder hall-crusades-cinder--${depth} hall-crusades-cinder--${shape} hall-crusades-cinder--${tone}`;
       particle.setAttribute("aria-hidden", "true");
 
-      const desktopSpread = source === "center" ? spread * 0.42 : spread * 0.68;
-      const mobileSpread = source === "center" ? spread * 0.34 : spread * 0.58;
-      const desktopY = 83.5 + ((index * 11) % 9) * 0.82 + depthBias * 2.4;
+      const desktopSpread = source === "center" ? spread * 0.64 : spread * 1.12;
+      const mobileSpread = source === "center" ? spread * 0.54 : spread * 1;
+      const desktopY = 92.2 + ((index * 11) % 9) * 0.82 + depthBias * 2.1;
       const mobileY = 102.5 + ((index * 13) % 10) * 0.68 + depthBias * 1.5;
-      const driftEnd = direction * (depth === "foreground" ? 10 + ((index * 7) % 15) : 6.5 + ((index * 5) % 13));
-      const driftMid = driftEnd * (0.36 + ((index * 7) % 8) / 38) + (((index * 17) % 9) - 4) * 0.24;
-      const midY = -(depth === "foreground" ? 22 + ((index * 23) % 24) : 28 + ((index * 19) % 34));
-      const endY = -(depth === "foreground" ? 44 + ((index * 29) % 30) : 58 + ((index * 23) % 42));
+      const driftEnd = direction * (depth === "foreground" ? 13 + ((index * 7) % 19) : 9 + ((index * 5) % 18));
+      const driftMid = driftEnd * (0.42 + ((index * 7) % 8) / 34) + (((index * 17) % 9) - 4) * 0.3;
+      const midY = -(depth === "foreground" ? 30 + ((index * 23) % 30) : 38 + ((index * 19) % 46));
+      const endY = -(depth === "foreground" ? 62 + ((index * 29) % 46) : 82 + ((index * 23) % 58));
       const duration = depth === "foreground" ? 12.5 + ((index * 7) % 10) : 19 + ((index * 7) % 15);
       const delay = -(((index * 3.7) + (depth === "foreground" ? 2.8 : 0)) % duration);
       const width = depth === "foreground" ? 6.5 + ((index * 7) % 9) * 1.18 : 2.8 + ((index * 5) % 7) * 0.7;
