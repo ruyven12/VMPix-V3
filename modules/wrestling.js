@@ -4982,7 +4982,7 @@ function renderHallPrototypeShowDetailSurface(show) {
 
   wrestlingShowDetailShell.replaceChildren(surface);
   if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-    setPortfolioEngineHudCurrentViewDetail(showTitle);
+    setPortfolioEngineHudCurrentViewDetail("");
   }
 }
 
@@ -5011,13 +5011,15 @@ function syncWrestlingShowDetailDocumentTitle(show) {
 }
 
 function syncWrestlingShowDetailEngineView(show) {
+  if (wrestlingShowDetailShell?.dataset.wrestlingShowDetailPresentation === "hall") {
+    return;
+  }
   const showTitle = getWrestlingShowDetailDisplayName(show);
   if (!showTitle || typeof setPortfolioEngineHudCurrentView !== "function") {
     return;
   }
   setPortfolioEngineHudCurrentView(`The Campaign - ${showTitle}`);
 }
-
 function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   if (!wrestlingShowDetailShell) {
     return;

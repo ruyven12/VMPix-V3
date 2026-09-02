@@ -696,6 +696,7 @@ function setPortfolioEngineHudCurrentView(viewName, options = {}) {
 
 const HALL_ENGINE_TITLE_PRIMARY = "Daiion - Hall of Crusades";
 const HALL_ENGINE_TITLE_ALTERNATE = "(Wrestling Show Archive)";
+const HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE = "(Campaign Record)";
 const HALL_ENGINE_TITLE_HOLD_MS = 1500;
 const HALL_ENGINE_TITLE_MORPH_MS = 430;
 const HALL_ENGINE_TITLE_REST_MS = 2300;
@@ -719,7 +720,7 @@ function clearHallEngineTitleMorph() {
   }
 }
 
-function isHallEngineTitleMorphRouteActive() {
+function isHallEngineShowsRouteActive() {
   return Boolean(
     shell?.dataset.shellRoute === "wrestling-shows" &&
     shell.classList.contains("is-wrestling-shows-view") &&
@@ -727,6 +728,21 @@ function isHallEngineTitleMorphRouteActive() {
   );
 }
 
+function isHallEngineShowDetailRouteActive() {
+  return Boolean(
+    shell?.dataset.shellRoute === "wrestling-show-detail" &&
+    shell.classList.contains("is-wrestling-show-detail-view") &&
+    wrestlingShowDetailShell?.dataset.wrestlingShowDetailPresentation === "hall"
+  );
+}
+
+function isHallEngineTitleMorphRouteActive() {
+  return isHallEngineShowsRouteActive() || isHallEngineShowDetailRouteActive();
+}
+
+function getHallEngineTitleAlternate() {
+  return isHallEngineShowDetailRouteActive() ? HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE : HALL_ENGINE_TITLE_ALTERNATE;
+}
 function queueHallEngineTitleMorphStep(cycle, delay, callback) {
   hallEngineTitleMorphTimer = window.setTimeout(() => {
     hallEngineTitleMorphTimer = 0;
@@ -770,7 +786,9 @@ function startHallEngineTitleMorph() {
   }
   const cycle = hallEngineTitleMorphCycle + 1;
   hallEngineTitleMorphCycle = cycle;
-  const showArchiveTitle = () => morphHallEngineTitle(cycle, HALL_ENGINE_TITLE_ALTERNATE, "archive", HALL_ENGINE_TITLE_HOLD_MS, showLoreTitle);
+  const alternateTitle = getHallEngineTitleAlternate();
+  const alternateState = isHallEngineShowDetailRouteActive() ? "record" : "archive";
+  const showArchiveTitle = () => morphHallEngineTitle(cycle, alternateTitle, alternateState, HALL_ENGINE_TITLE_HOLD_MS, showLoreTitle);
   const showLoreTitle = () => morphHallEngineTitle(cycle, HALL_ENGINE_TITLE_PRIMARY, "lore", HALL_ENGINE_TITLE_REST_MS, showArchiveTitle);
   queueHallEngineTitleMorphStep(cycle, HALL_ENGINE_TITLE_HOLD_MS, showArchiveTitle);
 }
@@ -3417,8 +3435,16 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   if (!shell || !portfolioHub || !wrestlingShowDetailShell) {
     return;
   }
+  const activeShowDetailRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const isHallShowDetailPath = window.location?.pathname?.startsWith("/wrestling/shows/") === true;
+  let isHallPrototypeShowDetail = options?.showDetailVariant === "hall-prototype" || activeShowDetailRoute?.showDetailVariant === "hall-prototype" || isHallShowDetailPath;
   setWrestlingShowDetailDocumentTitle(showId);
-  setWrestlingShowDetailEngineView(showId);
+  if (isHallPrototypeShowDetail) {
+    setPortfolioEngineHudCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+    setPortfolioEngineHudCurrentViewDetail("");
+  } else {
+    setWrestlingShowDetailEngineView(showId);
+  }
   shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-wrestling-show-detail-view");
   if (homeFrame) {
@@ -3446,6 +3472,7 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
     renderWrestlingShowDetailRoute(showId, options);
   }
   setWrestlingShowDetailHidden(false);
+  isHallPrototypeShowDetail = isHallPrototypeShowDetail || wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation === "hall";
   setWrestlingMatchGalleryHidden(true);
   setWrestlingLightboxHidden(true);
   if (aboutShell) {
@@ -3464,23 +3491,11 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   if (typeof renderWrestlingShowDetailRoute !== "function" && typeof updateWrestlingShowDetailRelationshipHooks === "function") {
     updateWrestlingShowDetailRelationshipHooks(showId);
   }
-  const activeShowDetailRoute = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
-  const isHallPrototypeShowDetail = options?.showDetailVariant === "hall-prototype" || activeShowDetailRoute?.showDetailVariant === "hall-prototype";
   if (isHallPrototypeShowDetail) {
-    const prototypeEngineDetail = typeof getWrestlingShowDetailEngineTitle === "function"
-      ? getWrestlingShowDetailEngineTitle(showId)
-      : "";
     setPortfolioActiveWorld("battleground");
-    setCurrentView("Daiion - Individual Campaign");
-    setPortfolioEngineHudCurrentView("Daiion - Individual Campaign", { preserveDetail: true });
-    setPortfolioEngineHudCurrentViewDetail(prototypeEngineDetail);
-    window.requestAnimationFrame(() => {
-      const nextPrototypeEngineDetail = typeof getWrestlingShowDetailEngineTitle === "function"
-        ? getWrestlingShowDetailEngineTitle(showId)
-        : prototypeEngineDetail;
-      setPortfolioEngineHudCurrentView("Daiion - Individual Campaign", { preserveDetail: true });
-      setPortfolioEngineHudCurrentViewDetail(nextPrototypeEngineDetail);
-    });
+    setCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+    setPortfolioEngineHudCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+    setPortfolioEngineHudCurrentViewDetail("");
   } else {
     setCurrentView("Show Detail");
     setWrestlingShowDetailEngineView(showId);
@@ -3488,7 +3503,13 @@ function showWrestlingShowDetail(showId = "warzone-26", options = {}) {
   setActiveGlobalNav("wrestling");
   window.requestAnimationFrame(() => {
     setWrestlingShowDetailDocumentTitle(showId);
-    setWrestlingShowDetailEngineView(showId);
+    if (isHallPrototypeShowDetail) {
+      setPortfolioEngineHudCurrentView(HALL_ENGINE_TITLE_PRIMARY);
+      setPortfolioEngineHudCurrentViewDetail("");
+      startHallEngineTitleMorph();
+    } else {
+      setWrestlingShowDetailEngineView(showId);
+    }
   });
   if (startButton) {
     startButton.disabled = true;

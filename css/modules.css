@@ -18320,17 +18320,17 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translate3d(-50%, -50%, 0);
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left {
   overflow: hidden;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left .portfolio-engine-label {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left .portfolio-engine-label {
   display: none;
   visibility: hidden;
   opacity: 0;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) [data-portfolio-engine-current-view] {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) [data-portfolio-engine-current-view] {
   display: inline-block;
   box-sizing: border-box;
   max-inline-size: 100%;
@@ -18344,12 +18344,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform, filter;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) [data-portfolio-engine-current-view].is-hall-engine-title-morphing {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) [data-portfolio-engine-current-view].is-hall-engine-title-morphing {
   animation: hallCrusadesEngineTitleTextBridge 430ms cubic-bezier(0.22, 0.82, 0.18, 1) both;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.has-hall-engine-title-morph::before,
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.has-hall-engine-title-morph::before,
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
   position: absolute;
   inset-block-start: 50%;
   inset-inline-start: 50%;
@@ -18371,17 +18371,17 @@ button.hall-crusades-archive-crystal:focus-visible {
   will-change: opacity, transform, filter;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
   block-size: 0.18rem;
   background: radial-gradient(ellipse at center, rgba(255, 247, 226, 0.76) 0%, rgba(255, 151, 38, 0.34) 34%, transparent 72%);
   filter: blur(0.12rem);
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.is-hall-engine-title-morphing::before {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.is-hall-engine-title-morphing::before {
   animation: hallCrusadesEngineTitleShimmer 430ms cubic-bezier(0.18, 0.84, 0.2, 1) both;
 }
 
-.site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.is-hall-engine-title-morphing::after {
+.site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.is-hall-engine-title-morphing::after {
   animation: hallCrusadesEngineTitleShimmerBloom 430ms cubic-bezier(0.18, 0.84, 0.2, 1) both;
 }
 
@@ -18468,15 +18468,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) [data-portfolio-engine-current-view].is-hall-engine-title-morphing {
+  .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) [data-portfolio-engine-current-view].is-hall-engine-title-morphing {
     opacity: 1;
     filter: none;
     transform: none;
     animation: none !important;
   }
 
-  .site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.has-hall-engine-title-morph::before,
-  .site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
+  .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.has-hall-engine-title-morph::before,
+  .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .portfolio-engine-panel--left.has-hall-engine-title-morph::after {
     content: none;
     display: none;
     opacity: 0;
@@ -20921,7 +20921,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .engine-lightning-overlay,
-  .site-shell[data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]) .engine-lightning-overlay {
+  .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), [data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"])) .engine-lightning-overlay {
   filter: brightness(1.12) saturate(1.06);
 }
 
