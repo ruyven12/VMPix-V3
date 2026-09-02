@@ -16873,7 +16873,7 @@ function ensureHallCrusadesCinders() {
   };
 
   const fragment = document.createDocumentFragment();
-  fragment.append(createLayer("distant", 34), createLayer("foreground", 8));
+  fragment.append(createLayer("distant", 102), createLayer("foreground", 24));
 
   const haze = wrestlingShowsShell.querySelector("[data-hall-crusades-haze]");
   if (haze?.nextSibling) wrestlingShowsShell.insertBefore(fragment, haze.nextSibling);
