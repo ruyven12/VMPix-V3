@@ -374,6 +374,10 @@ const HALL_CRUSADES_CAMPAIGN_CHARGE_DURATION_MS = 470;
 const HALL_CRUSADES_CAMPAIGN_CHARGE_REDUCED_MOTION_MS = 80;
 const HALL_CRUSADES_CAMPAIGN_EXPANSION_DURATION_MS = 760;
 const HALL_CRUSADES_CAMPAIGN_EXPANSION_REDUCED_MOTION_MS = 140;
+const HALL_CRUSADES_CAMPAIGN_RESOLUTION_IDENTITY_DELAY_MS = 90;
+const HALL_CRUSADES_CAMPAIGN_RESOLUTION_METADATA_DELAY_MS = 250;
+const HALL_CRUSADES_CAMPAIGN_RESOLUTION_MATCH_DELAY_MS = 500;
+const HALL_CRUSADES_CAMPAIGN_RESOLUTION_REDUCED_STEP_MS = 40;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_PAGE_SIZE = 6;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_SWIPE_THRESHOLD = 48;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_RETRY_DELAY_MS = 1800;
@@ -412,6 +416,7 @@ let isHallCrusadesPosterNavInteractionBound = false;
 let isHallCrusadesPosterKeyboardInteractionBound = false;
 let isHallCrusadesCampaignLocking = false;
 let hallCrusadesCampaignLockShowId = "";
+let hallCrusadesCampaignLockShow = null;
 let isHallCrusadesCampaignCharging = false;
 let isHallCrusadesCampaignRuptureReady = false;
 let isHallCrusadesCampaignExpanding = false;
@@ -420,6 +425,8 @@ let hallCrusadesCampaignChargeStartTimer = 0;
 let hallCrusadesCampaignRuptureReadyTimer = 0;
 let hallCrusadesCampaignExpansionFrame = 0;
 let hallCrusadesCampaignExpansionCompleteTimer = 0;
+let hallCrusadesCampaignResolutionState = "";
+let hallCrusadesCampaignResolutionTimers = [];
 let activeHallCrusadesYearFilter = "";
 let activeHallCrusadesBannerFilter = "all";
 let activeHallCrusadesFieldFilter = "all";
@@ -1701,6 +1708,7 @@ function syncHallCrusadesCampaignLockShell() {
   wrestlingShowsShell.classList.toggle("is-campaign-rupture-ready", isRuptureReady);
   wrestlingShowsShell.classList.toggle("is-campaign-expanding", isExpanding);
   wrestlingShowsShell.classList.toggle("is-campaign-expanded", isExpanded);
+  wrestlingShowsShell.classList.toggle("is-campaign-record-resolving", Boolean(isExpanded && hallCrusadesCampaignResolutionState));
   if (isLockActive && hallCrusadesCampaignLockShowId) {
     wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId = hallCrusadesCampaignLockShowId;
     wrestlingShowsShell.dataset.hallCrusadesCampaignChargeState = getHallCrusadesCampaignChargeState();
@@ -1710,10 +1718,16 @@ function syncHallCrusadesCampaignLockShell() {
     } else {
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
     }
+    if (isExpanded && hallCrusadesCampaignResolutionState) {
+      wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState = hallCrusadesCampaignResolutionState;
+    } else {
+      delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
+    }
   } else {
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignChargeState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
   }
 }
 
@@ -1730,6 +1744,8 @@ function clearHallCrusadesCampaignChargeTimers() {
   hallCrusadesCampaignRuptureReadyTimer = 0;
   hallCrusadesCampaignExpansionFrame = 0;
   hallCrusadesCampaignExpansionCompleteTimer = 0;
+  hallCrusadesCampaignResolutionTimers.forEach((timer) => window.clearTimeout(timer));
+  hallCrusadesCampaignResolutionTimers = [];
 }
 
 function clearHallCrusadesCampaignExpansionGeometry() {
@@ -1757,10 +1773,12 @@ function clearHallCrusadesCampaignLock() {
   clearHallCrusadesCampaignChargeTimers();
   isHallCrusadesCampaignLocking = false;
   hallCrusadesCampaignLockShowId = "";
+  hallCrusadesCampaignLockShow = null;
   isHallCrusadesCampaignCharging = false;
   isHallCrusadesCampaignRuptureReady = false;
   isHallCrusadesCampaignExpanding = false;
   isHallCrusadesCampaignExpanded = false;
+  clearHallCrusadesCampaignRecordResolution();
   clearHallCrusadesCampaignExpansionGeometry();
   syncHallCrusadesCampaignLockShell();
 }
@@ -1796,6 +1814,141 @@ function getHallCrusadesCampaignEngineTop(viewportHeight) {
 
 function formatHallCrusadesCampaignPixelValue(value) {
   return `${Number(value.toFixed(2))}px`;
+}
+
+function getHallCrusadesCampaignSelectedShow() {
+  return hallCrusadesCampaignLockShow ||
+    findLiveWrestlingShowById(hallCrusadesCampaignLockShowId) ||
+    findWrestlingShowRelationshipById(hallCrusadesCampaignLockShowId);
+}
+
+function getHallCrusadesCampaignRecordDetailHost() {
+  if (!wrestlingShowsShell) {
+    return null;
+  }
+
+  let host = wrestlingShowsShell.querySelector("[data-hall-crusades-campaign-record-detail]");
+  if (!host) {
+    host = document.createElement("section");
+    host.className = "hall-crusades-campaign-record-detail wrestling-show-detail-shell";
+    host.dataset.hallCrusadesCampaignRecordDetail = "true";
+    host.dataset.wrestlingShowDetailPresentation = "hall";
+    host.setAttribute("aria-hidden", "true");
+    wrestlingShowsShell.append(host);
+  }
+
+  return host;
+}
+
+function markHallCrusadesCampaignResolutionParts(surface) {
+  const setPart = (selector, part) => {
+    const element = surface?.querySelector?.(selector);
+    if (element) {
+      element.dataset.hallCrusadesResolutionPart = part;
+    }
+  };
+
+  setPart(".wrestling-show-prototype-card", "identity");
+  setPart(".wrestling-show-prototype-card__fields", "metadata");
+  setPart(".wrestling-show-prototype-encounters", "matches");
+}
+
+function setHallCrusadesCampaignResolutionState(state) {
+  hallCrusadesCampaignResolutionState = state;
+  const host = wrestlingShowsShell?.querySelector?.("[data-hall-crusades-campaign-record-detail]");
+  if (host) {
+    host.setAttribute("aria-hidden", state && state !== "empty" ? "false" : "true");
+  }
+  syncHallCrusadesCampaignLockShell();
+}
+
+function clearHallCrusadesCampaignRecordResolution() {
+  if (typeof window !== "undefined") {
+    hallCrusadesCampaignResolutionTimers.forEach((timer) => window.clearTimeout(timer));
+  }
+  hallCrusadesCampaignResolutionTimers = [];
+  hallCrusadesCampaignResolutionState = "";
+  wrestlingShowsShell?.querySelector?.("[data-hall-crusades-campaign-record-detail]")?.remove();
+  if (wrestlingShowsShell) {
+    wrestlingShowsShell.classList.remove("is-campaign-record-resolving");
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
+  }
+}
+
+function renderHallCrusadesCampaignRecordResolution() {
+  const show = getHallCrusadesCampaignSelectedShow();
+  const host = getHallCrusadesCampaignRecordDetailHost();
+  if (!show || !host) {
+    return false;
+  }
+
+  setWrestlingRelationshipDataset(host, show);
+  host.dataset.wrestlingShowRoute = getWrestlingShowRouteUrl(show);
+  host.dataset.hallCrusadesCampaignRecordShowId = show.showId || show.eventId || hallCrusadesCampaignLockShowId;
+  const surface = renderHallPrototypeShowDetailSurface(show, {
+    targetShell: host,
+    prepareAmbient: false,
+    syncEngine: false,
+  });
+  if (!surface) {
+    return false;
+  }
+
+  const title = surface.querySelector("#wrestling-show-detail-title");
+  const card = surface.querySelector(".wrestling-show-prototype-card");
+  if (title && card) {
+    title.id = "hall-crusades-campaign-record-title";
+    card.setAttribute("aria-labelledby", title.id);
+  }
+
+  const encountersTitle = surface.querySelector("#wrestling-show-prototype-encounters-title");
+  const encounters = surface.querySelector(".wrestling-show-prototype-encounters");
+  if (encountersTitle && encounters) {
+    encountersTitle.id = "hall-crusades-campaign-record-encounters-title";
+    encounters.setAttribute("aria-labelledby", encountersTitle.id);
+  }
+
+  markHallCrusadesCampaignResolutionParts(surface);
+  return true;
+}
+
+function scheduleHallCrusadesCampaignRecordResolution() {
+  if (typeof window !== "undefined") {
+    hallCrusadesCampaignResolutionTimers.forEach((timer) => window.clearTimeout(timer));
+  }
+  hallCrusadesCampaignResolutionTimers = [];
+  if (!renderHallCrusadesCampaignRecordResolution()) {
+    return;
+  }
+
+  setHallCrusadesCampaignResolutionState("empty");
+  if (typeof window === "undefined") {
+    setHallCrusadesCampaignResolutionState("matches");
+    return;
+  }
+
+  const isReducedMotion = isHallCrusadesCampaignReducedMotion();
+  const stages = isReducedMotion
+    ? [
+        ["identity", 0],
+        ["metadata", HALL_CRUSADES_CAMPAIGN_RESOLUTION_REDUCED_STEP_MS],
+        ["matches", HALL_CRUSADES_CAMPAIGN_RESOLUTION_REDUCED_STEP_MS * 2],
+      ]
+    : [
+        ["identity", HALL_CRUSADES_CAMPAIGN_RESOLUTION_IDENTITY_DELAY_MS],
+        ["metadata", HALL_CRUSADES_CAMPAIGN_RESOLUTION_METADATA_DELAY_MS],
+        ["matches", HALL_CRUSADES_CAMPAIGN_RESOLUTION_MATCH_DELAY_MS],
+      ];
+
+  stages.forEach(([state, delay]) => {
+    const timer = window.setTimeout(() => {
+      hallCrusadesCampaignResolutionTimers = hallCrusadesCampaignResolutionTimers.filter((entry) => entry !== timer);
+      if (isHallCrusadesCampaignLockActive() && isHallCrusadesCampaignExpanded) {
+        setHallCrusadesCampaignResolutionState(state);
+      }
+    }, delay);
+    hallCrusadesCampaignResolutionTimers.push(timer);
+  });
 }
 
 function setHallCrusadesCampaignExpansionGeometry(record) {
@@ -1890,6 +2043,7 @@ function beginHallCrusadesCampaignExpansion() {
 
   if (typeof window === "undefined") {
     isHallCrusadesCampaignExpanded = true;
+    scheduleHallCrusadesCampaignRecordResolution();
     syncHallCrusadesCampaignLockShell();
     return;
   }
@@ -1905,6 +2059,7 @@ function beginHallCrusadesCampaignExpansion() {
     }
 
     isHallCrusadesCampaignExpanded = true;
+    scheduleHallCrusadesCampaignRecordResolution();
     syncHallCrusadesCampaignLockShell();
   }, expansionDuration);
 }
@@ -1915,6 +2070,7 @@ function scheduleHallCrusadesCampaignCharge() {
   isHallCrusadesCampaignRuptureReady = false;
   isHallCrusadesCampaignExpanding = false;
   isHallCrusadesCampaignExpanded = false;
+  clearHallCrusadesCampaignRecordResolution();
   clearHallCrusadesCampaignExpansionGeometry();
   syncHallCrusadesCampaignLockShell();
 
@@ -1923,6 +2079,7 @@ function scheduleHallCrusadesCampaignCharge() {
     isHallCrusadesCampaignRuptureReady = true;
     isHallCrusadesCampaignExpanding = true;
     isHallCrusadesCampaignExpanded = true;
+    scheduleHallCrusadesCampaignRecordResolution();
     syncHallCrusadesCampaignLockShell();
     return;
   }
@@ -1976,7 +2133,8 @@ function beginHallCrusadesCampaignLock(show, record) {
   }
 
   isHallCrusadesCampaignLocking = true;
-  hallCrusadesCampaignLockShowId = show.showId || "";
+  hallCrusadesCampaignLockShow = show;
+  hallCrusadesCampaignLockShowId = show.showId || show.eventId || getWrestlingShowRouteCode(show) || "";
   syncHallCrusadesCampaignLockShell();
   closeHallCrusadesCampaignLockControls();
 
@@ -5355,7 +5513,12 @@ function createHallPrototypeEncounterSection(show = {}) {
   return section;
 }
 // Canonical production Wrestling Show Detail renderer; extend this shared Hall path instead of creating parallel renderers.
-function renderHallPrototypeShowDetailSurface(show) {
+function renderHallPrototypeShowDetailSurface(show, options = {}) {
+  const targetShell = options.targetShell || wrestlingShowDetailShell;
+  if (!targetShell) {
+    return null;
+  }
+
   const showTitle = getWrestlingText(show.title || show.eventName || show.showName, "Campaign Detail");
   const promotion = getWrestlingText(show.promotion, "Promotion Pending");
   const date = getWrestlingText(show.eventDate || formatWrestlingShowDate(show.rawDate || show.date || show.dateKey), "Date Pending");
@@ -5419,11 +5582,14 @@ function renderHallPrototypeShowDetailSurface(show) {
   surface.className = "wrestling-show-prototype-surface";
   surface.append(card, createHallPrototypeEncounterSection(show));
 
-  wrestlingShowDetailShell.replaceChildren(surface);
-  prepareHallCrusadesShowDetailAmbient();
-  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
+  targetShell.replaceChildren(surface);
+  if (options.prepareAmbient !== false && targetShell === wrestlingShowDetailShell) {
+    prepareHallCrusadesShowDetailAmbient();
+  }
+  if (options.syncEngine !== false && typeof setPortfolioEngineHudCurrentViewDetail === "function") {
     setPortfolioEngineHudCurrentViewDetail("");
   }
+  return surface;
 }
 
 function getWrestlingShowDetailDisplayName(show) {
