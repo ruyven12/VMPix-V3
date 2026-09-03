@@ -1880,6 +1880,38 @@ function getHallCrusadesCampaignRoutePath(url = window.location.href) {
   }
 }
 
+function isHallCrusadesCampaignRecordProductionRoute(path = getHallCrusadesCampaignRoutePath()) {
+  return Boolean(path && path.startsWith(`${routePaths.wrestlingShows}/`));
+}
+
+function syncHallCrusadesCampaignRecordEngineBar(path = getHallCrusadesCampaignRoutePath()) {
+  if (!isHallCrusadesCampaignRecordProductionRoute(path)) {
+    return;
+  }
+  if (typeof clearHallEngineTitleMorph === "function") {
+    clearHallEngineTitleMorph();
+  }
+  if (typeof setPortfolioEngineHudCurrentView === "function") {
+    setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
+  }
+  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
+    setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
+  }
+}
+
+function scheduleHallCrusadesCampaignRecordEngineBarSync(path = getHallCrusadesCampaignRoutePath()) {
+  syncHallCrusadesCampaignRecordEngineBar(path);
+  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+    return;
+  }
+  window.requestAnimationFrame(() => {
+    syncHallCrusadesCampaignRecordEngineBar(path);
+    window.requestAnimationFrame(() => {
+      syncHallCrusadesCampaignRecordEngineBar(path);
+    });
+  });
+}
+
 function getHallCrusadesCampaignExistingRecordDetailHost() {
   return wrestlingShowsShell?.querySelector?.("[data-hall-crusades-campaign-record-detail]") || null;
 }
@@ -2004,26 +2036,7 @@ function promoteHallCrusadesCampaignResolvedRecord(show, routeUrl) {
       fromHallCrusadesCampaignRecord: true,
     },
   });
-  if (typeof setPortfolioEngineHudCurrentView === "function") {
-    setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
-  }
-  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-    setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
-  }
-  if (typeof window !== "undefined") {
-    const promotedPath = getHallCrusadesCampaignRoutePath(routeUrl);
-    window.requestAnimationFrame(() => {
-      if (getHallCrusadesCampaignRoutePath() !== promotedPath) {
-        return;
-      }
-      if (typeof setPortfolioEngineHudCurrentView === "function") {
-        setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
-      }
-      if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-        setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
-      }
-    });
-  }
+  scheduleHallCrusadesCampaignRecordEngineBarSync(getHallCrusadesCampaignRoutePath(routeUrl));
 }
 
 function scheduleHallCrusadesCampaignRoutePromotion() {
@@ -2080,32 +2093,19 @@ function completeHallCrusadesCampaignRoutePromotion(show, surface) {
   const scrollState = hallCrusadesCampaignRoutePromotion.scrollState;
   applyHallCrusadesCampaignRecordScrollState(scrollState);
   clearHallCrusadesCampaignLock();
-  if (typeof setPortfolioEngineHudCurrentView === "function") {
-    setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
-  }
-  if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-    setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
-  }
+  scheduleHallCrusadesCampaignRecordEngineBarSync();
   if (typeof window === "undefined") {
     return;
   }
 
   window.cancelAnimationFrame(hallCrusadesCampaignRoutePromotionCleanupFrame);
-  const syncCampaignRecordEngineBar = () => {
-    if (typeof setPortfolioEngineHudCurrentView === "function") {
-      setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
-    }
-    if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-      setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
-    }
-  };
   hallCrusadesCampaignRoutePromotionCleanupFrame = window.requestAnimationFrame(() => {
     applyHallCrusadesCampaignRecordScrollState(scrollState);
-    syncCampaignRecordEngineBar();
+    syncHallCrusadesCampaignRecordEngineBar();
     hallCrusadesCampaignRoutePromotionCleanupFrame = window.requestAnimationFrame(() => {
       hallCrusadesCampaignRoutePromotionCleanupFrame = 0;
       applyHallCrusadesCampaignRecordScrollState(scrollState);
-      syncCampaignRecordEngineBar();
+      syncHallCrusadesCampaignRecordEngineBar();
     });
   });
 }
@@ -5942,12 +5942,7 @@ function renderHallPrototypeShowDetailSurface(show, options = {}) {
     prepareHallCrusadesShowDetailAmbient();
   }
   if (options.syncEngine !== false) {
-    if (typeof setPortfolioEngineHudCurrentView === "function") {
-      setPortfolioEngineHudCurrentView("Daiion - Hall of Crusades", { preserveDetail: true });
-    }
-    if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
-      setPortfolioEngineHudCurrentViewDetail("(Campaign Record)");
-    }
+    scheduleHallCrusadesCampaignRecordEngineBarSync();
   }
   return surface;
 }
