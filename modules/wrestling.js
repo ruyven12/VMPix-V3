@@ -17867,10 +17867,11 @@ function ensureHallCrusadesHaze(targetShell = wrestlingShowsShell) {
   };
 
   const isMobileCinderViewport = window.matchMedia?.("(max-width: 540px)")?.matches ?? window.innerWidth <= 540;
-  const distantCinderCount = isMobileCinderViewport ? 140 : 250;
+  const distantCinderCount = isMobileCinderViewport ? 70 : 250;
+  const foregroundCinderCount = isMobileCinderViewport ? 8 : 15;
   const fragment = document.createDocumentFragment();
   const distantLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="distant"]') || createLayer("distant", distantCinderCount);
-  const foregroundLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="foreground"]') || createLayer("foreground", 15);
+  const foregroundLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="foreground"]') || createLayer("foreground", foregroundCinderCount);
   fragment.append(distantLayer, foregroundLayer);
 
   const haze = ambientHost.querySelector("[data-hall-crusades-haze]");
