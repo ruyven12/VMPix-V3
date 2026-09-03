@@ -2079,6 +2079,9 @@ function applyHallCrusadesCampaignRecordScrollState(scrollState, targetShell = w
 
 function setHallCrusadesCampaignRoutePromotionShellState(isPromoting) {
   document.querySelector(".site-shell")?.classList.toggle("is-hall-crusades-campaign-route-promoting", Boolean(isPromoting));
+  if (!isPromoting && wrestlingShowsShell) {
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignIndexSuppressed;
+  }
 }
 
 function clearHallCrusadesCampaignRoutePromotion(options = {}) {
@@ -2157,7 +2160,10 @@ function promoteHallCrusadesCampaignResolvedRecord(show, routeUrl) {
     wrestlingShowDetailShell.dataset.wrestlingShowRoute = routeUrl;
     wrestlingShowDetailShell.setAttribute("aria-hidden", "false");
     wrestlingShowDetailShell.removeAttribute("inert");
-    promoteHallCrusadesCampaignResolvedRecordSurface(show, wrestlingShowDetailShell);
+    const promotedSurface = promoteHallCrusadesCampaignResolvedRecordSurface(show, wrestlingShowDetailShell);
+    if (promotedSurface && wrestlingShowsShell) {
+      wrestlingShowsShell.dataset.hallCrusadesCampaignIndexSuppressed = "true";
+    }
   }
 
   const promoteRoute = () => {
