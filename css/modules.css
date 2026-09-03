@@ -14768,6 +14768,83 @@ button.wrestling-event-history-tagged-thumb {
   scrollbar-width: none;
 }
 
+.hall-crusades-campaign-record-frame {
+  display: none;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail]) > .hall-crusades-campaign-record-frame {
+  position: fixed;
+  inset-inline-start: var(--hall-crusades-campaign-target-x);
+  inset-block-start: var(--hall-crusades-campaign-target-y);
+  z-index: 2;
+  display: block;
+  inline-size: var(--hall-crusades-campaign-target-width);
+  block-size: var(--hall-crusades-campaign-target-height);
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(255, 198, 150, 0.92);
+  border-radius: 0.12rem;
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(255, 90, 60, 0.1), transparent 43%),
+    linear-gradient(135deg, rgba(223, 42, 28, 0.12), transparent 52%),
+    linear-gradient(0deg, rgba(2, 2, 4, 0.95), rgba(10, 6, 8, 0.88));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 230, 0.18),
+    inset 0 0 1.25rem rgba(255, 126, 44, 0.14),
+    0 0 0.8rem rgba(255, 248, 230, 0.14),
+    0 0 1.65rem rgba(255, 90, 60, 0.34),
+    0 0 2.35rem rgba(164, 15, 12, 0.28);
+  opacity: 1;
+  pointer-events: none;
+  transform: none;
+  transition: none;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail]) > .hall-crusades-campaign-record-frame::before,
+.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail]) > .hall-crusades-campaign-record-frame::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: none;
+  animation: none;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail]) > .hall-crusades-campaign-record-frame::before {
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(255, 244, 224, 0.78), rgba(255, 126, 44, 0.86) 18%, transparent 36% 64%, rgba(223, 42, 28, 0.74) 82%, rgba(255, 244, 224, 0.58)) top / 100% 2px no-repeat,
+    linear-gradient(90deg, rgba(223, 42, 28, 0.72), rgba(255, 126, 44, 0.82) 22%, transparent 42% 58%, rgba(255, 244, 224, 0.62) 82%, rgba(223, 42, 28, 0.68)) bottom / 100% 2px no-repeat,
+    linear-gradient(180deg, rgba(255, 244, 224, 0.54), rgba(255, 90, 60, 0.74) 24%, transparent 46% 62%, rgba(223, 42, 28, 0.58) 88%, rgba(255, 126, 44, 0.42)) left / 2px 100% no-repeat,
+    linear-gradient(180deg, rgba(255, 126, 44, 0.52), rgba(223, 42, 28, 0.66) 18%, transparent 42% 58%, rgba(255, 244, 224, 0.68) 82%, rgba(255, 90, 60, 0.5)) right / 2px 100% no-repeat,
+    radial-gradient(circle at 50% 50%, transparent 54%, rgba(255, 126, 44, 0.11) 72%, rgba(223, 42, 28, 0.2));
+  opacity: 1;
+}
+
+.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail]) > .hall-crusades-campaign-record-frame::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, transparent 0 10%, rgba(255, 248, 230, 0.98) 18%, rgba(255, 126, 44, 0.78) 28%, transparent 46%) top left / 220% 2px no-repeat,
+    linear-gradient(180deg, transparent 0 12%, rgba(255, 248, 230, 0.88) 22%, rgba(223, 42, 28, 0.76) 34%, transparent 52%) top right / 2px 220% no-repeat,
+    linear-gradient(270deg, transparent 0 9%, rgba(255, 248, 230, 0.9) 18%, rgba(255, 90, 60, 0.76) 30%, transparent 48%) bottom right / 220% 2px no-repeat,
+    linear-gradient(0deg, transparent 0 13%, rgba(255, 248, 230, 0.82) 22%, rgba(255, 126, 44, 0.72) 36%, transparent 54%) bottom left / 2px 220% no-repeat,
+    radial-gradient(circle at 0 0, rgba(255, 248, 230, 0.62), transparent 16%) top left / 18% 12% no-repeat,
+    radial-gradient(circle at 100% 0, rgba(255, 228, 188, 0.56), transparent 17%) top right / 18% 12% no-repeat,
+    radial-gradient(circle at 100% 100%, rgba(255, 248, 230, 0.68), transparent 18%) bottom right / 18% 12% no-repeat,
+    radial-gradient(circle at 0 100%, rgba(255, 126, 44, 0.52), transparent 18%) bottom left / 18% 12% no-repeat;
+  background-position:
+    36% 0,
+    100% 34%,
+    64% 100%,
+    0 68%,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%;
+  opacity: 0.36;
+}
+
 .site-shell.is-hall-crusades-campaign-route-promoting .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] {
   opacity: 1;
   transform: translate3d(0, 0, 0);

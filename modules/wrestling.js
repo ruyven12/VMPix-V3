@@ -379,6 +379,20 @@ const HALL_CRUSADES_CAMPAIGN_RESOLUTION_METADATA_DELAY_MS = 250;
 const HALL_CRUSADES_CAMPAIGN_RESOLUTION_MATCH_DELAY_MS = 500;
 const HALL_CRUSADES_CAMPAIGN_RESOLUTION_REDUCED_STEP_MS = 40;
 const HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS = 80;
+const HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES = [
+  "--hall-crusades-campaign-start-x",
+  "--hall-crusades-campaign-start-y",
+  "--hall-crusades-campaign-start-width",
+  "--hall-crusades-campaign-start-height",
+  "--hall-crusades-campaign-target-x",
+  "--hall-crusades-campaign-target-y",
+  "--hall-crusades-campaign-target-width",
+  "--hall-crusades-campaign-target-height",
+  "--hall-crusades-campaign-overshoot-x",
+  "--hall-crusades-campaign-overshoot-y",
+  "--hall-crusades-campaign-overshoot-width",
+  "--hall-crusades-campaign-overshoot-height",
+];
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_PAGE_SIZE = 6;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_SWIPE_THRESHOLD = 48;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_RETRY_DELAY_MS = 1800;
@@ -1775,20 +1789,7 @@ function clearHallCrusadesCampaignExpansionGeometry() {
     return;
   }
 
-  [
-    "--hall-crusades-campaign-start-x",
-    "--hall-crusades-campaign-start-y",
-    "--hall-crusades-campaign-start-width",
-    "--hall-crusades-campaign-start-height",
-    "--hall-crusades-campaign-target-x",
-    "--hall-crusades-campaign-target-y",
-    "--hall-crusades-campaign-target-width",
-    "--hall-crusades-campaign-target-height",
-    "--hall-crusades-campaign-overshoot-x",
-    "--hall-crusades-campaign-overshoot-y",
-    "--hall-crusades-campaign-overshoot-width",
-    "--hall-crusades-campaign-overshoot-height",
-  ].forEach((property) => wrestlingShowsShell.style.removeProperty(property));
+  HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES.forEach((property) => wrestlingShowsShell.style.removeProperty(property));
 }
 
 function clearHallCrusadesCampaignLock() {
@@ -1836,6 +1837,114 @@ function getHallCrusadesCampaignEngineTop(viewportHeight) {
 
 function formatHallCrusadesCampaignPixelValue(value) {
   return `${Number(value.toFixed(2))}px`;
+}
+
+function getHallCrusadesCampaignExpansionGeometryState(source = wrestlingShowsShell) {
+  if (!source?.style) {
+    return null;
+  }
+
+  const computedStyle = typeof window !== "undefined" && typeof window.getComputedStyle === "function"
+    ? window.getComputedStyle(source)
+    : null;
+  const state = {};
+  let hasValue = false;
+  HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES.forEach((property) => {
+    const value = source.style.getPropertyValue(property) || computedStyle?.getPropertyValue(property) || "";
+    if (value) {
+      state[property] = value.trim();
+      hasValue = true;
+    }
+  });
+  return hasValue ? state : null;
+}
+
+function applyHallCrusadesCampaignExpansionGeometryState(target, state) {
+  if (!target?.style || !state) {
+    return false;
+  }
+
+  let applied = false;
+  HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES.forEach((property) => {
+    const value = state[property];
+    if (value) {
+      target.style.setProperty(property, value);
+      applied = true;
+    }
+  });
+  return applied;
+}
+
+function getHallCrusadesCampaignReferenceRecordRect() {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const activeRecord = getHallCrusadesCampaignActiveRecord();
+  const activeRect = activeRecord?.getBoundingClientRect?.();
+  if (activeRect?.width && activeRect?.height) {
+    return activeRect;
+  }
+
+  const measurementShell = document.createElement("div");
+  measurementShell.className = "wrestling-shows-shell";
+  measurementShell.dataset.wrestlingShowsVariant = "hall-of-crusades";
+  measurementShell.setAttribute("aria-hidden", "true");
+  measurementShell.style.cssText = "position:fixed;inset:0;z-index:-1;visibility:hidden;pointer-events:none;overflow:hidden;contain:layout paint style;";
+
+  const strip = document.createElement("div");
+  strip.className = "hall-crusades-poster-strip";
+  Array.from({ length: HALL_CRUSADES_POSTER_STRIP_LIMIT }, (_, index) => {
+    const item = document.createElement("div");
+    item.className = "hall-crusades-poster-strip__item";
+    if (index === HALL_CRUSADES_POSTER_ACTIVE_SLOT) {
+      item.classList.add("is-active");
+    }
+    const record = document.createElement("button");
+    record.className = "hall-crusades-poster-strip__record";
+    record.type = "button";
+    item.append(record);
+    strip.append(item);
+  });
+  measurementShell.append(strip);
+  document.body.append(measurementShell);
+
+  const referenceRecord = strip.children[HALL_CRUSADES_POSTER_ACTIVE_SLOT]?.querySelector?.(".hall-crusades-poster-strip__record");
+  const rect = referenceRecord?.getBoundingClientRect?.();
+  const snapshot = rect?.width && rect?.height
+    ? {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      }
+    : null;
+  measurementShell.remove();
+  return snapshot;
+}
+
+function syncHallCrusadesCampaignProductionRecordFrame(targetShell = wrestlingShowDetailShell) {
+  if (!targetShell || targetShell.dataset.hallCrusadesCampaignRecordDetail === "true") {
+    return null;
+  }
+
+  let frame = targetShell.querySelector(":scope > [data-hall-crusades-campaign-record-frame]");
+  if (!frame) {
+    frame = document.createElement("div");
+    frame.className = "hall-crusades-campaign-record-frame";
+    frame.dataset.hallCrusadesCampaignRecordFrame = "true";
+    frame.setAttribute("aria-hidden", "true");
+  }
+
+  const promotedGeometry = hallCrusadesCampaignRoutePromotion?.frameGeometry;
+  if (!applyHallCrusadesCampaignExpansionGeometryState(targetShell, promotedGeometry)) {
+    const referenceRect = getHallCrusadesCampaignReferenceRecordRect();
+    if (referenceRect) {
+      setHallCrusadesCampaignExpansionGeometry({ getBoundingClientRect: () => referenceRect }, targetShell);
+    }
+  }
+
+  return frame;
 }
 
 function getHallCrusadesCampaignSelectedShow() {
@@ -2026,6 +2135,7 @@ function promoteHallCrusadesCampaignResolvedRecord(show, routeUrl) {
   hallCrusadesCampaignRoutePromotion = {
     routeUrl,
     recordShowId: getHallCrusadesCampaignRecordShowId(show),
+    frameGeometry: getHallCrusadesCampaignExpansionGeometryState(wrestlingShowsShell),
     scrollState: getHallCrusadesCampaignRecordScrollState(),
   };
   clearHallCrusadesCampaignRoutePromotion({ keepPending: true });
@@ -2291,8 +2401,8 @@ function scheduleHallCrusadesCampaignRecordResolution() {
   });
 }
 
-function setHallCrusadesCampaignExpansionGeometry(record) {
-  if (!wrestlingShowsShell || typeof window === "undefined" || !record?.getBoundingClientRect) {
+function setHallCrusadesCampaignExpansionGeometry(record, variableTarget = wrestlingShowsShell) {
+  if (!variableTarget || typeof window === "undefined" || !record?.getBoundingClientRect) {
     return false;
   }
 
@@ -2356,7 +2466,7 @@ function setHallCrusadesCampaignExpansionGeometry(record) {
   const targetCenterY = targetY + targetHeight / 2;
   const overshootX = targetCenterX - overshootWidth / 2;
   const overshootY = targetCenterY - overshootHeight / 2;
-  const setVar = (name, value) => wrestlingShowsShell.style.setProperty(name, formatHallCrusadesCampaignPixelValue(value));
+  const setVar = (name, value) => variableTarget.style.setProperty(name, formatHallCrusadesCampaignPixelValue(value));
 
   setVar("--hall-crusades-campaign-start-x", rect.left);
   setVar("--hall-crusades-campaign-start-y", rect.top);
@@ -5937,7 +6047,12 @@ function renderHallPrototypeShowDetailSurface(show, options = {}) {
   surface.className = "wrestling-show-prototype-surface";
   surface.append(card, createHallPrototypeEncounterSection(show));
 
-  targetShell.replaceChildren(surface);
+  const productionRecordFrame = syncHallCrusadesCampaignProductionRecordFrame(targetShell);
+  if (productionRecordFrame) {
+    targetShell.replaceChildren(productionRecordFrame, surface);
+  } else {
+    targetShell.replaceChildren(surface);
+  }
   if (options.prepareAmbient !== false && targetShell === wrestlingShowDetailShell) {
     prepareHallCrusadesShowDetailAmbient();
   }
