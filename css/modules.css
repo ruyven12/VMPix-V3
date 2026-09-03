@@ -14729,6 +14729,7 @@ button.wrestling-event-history-tagged-thumb {
   transform: none;
 }
 
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-hub::before,
 .site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .portfolio-hub::after,
 .site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .ambient-energy,
 .site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .ambient-rings,
