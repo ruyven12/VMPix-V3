@@ -14721,11 +14721,23 @@ button.wrestling-event-history-tagged-thumb {
   max-height: none;
   margin: 0;
   padding: 0;
+  border: 0;
+  box-shadow: none;
   background:
     linear-gradient(180deg, rgba(3, 3, 6, 0.08), rgba(3, 3, 6, 0.18)),
     url("../assets/media/background/hall-of-crusades-main.png") center center / cover no-repeat,
     #030306;
   overflow: hidden;
+  transform: none;
+}
+
+.site-shell.is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .home-frame {
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+  transition: none;
   transform: none;
 }
 
