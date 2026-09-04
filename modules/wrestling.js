@@ -1754,6 +1754,7 @@ function syncHallCrusadesCampaignLockShell() {
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
   }
 }
 
@@ -2106,6 +2107,7 @@ function clearHallCrusadesCampaignRoutePromotion(options = {}) {
     hallCrusadesCampaignRoutePromotion = null;
     if (wrestlingShowsShell) {
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
+      delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
     }
     setHallCrusadesCampaignRoutePromotionShellState(false);
   }
@@ -2143,63 +2145,13 @@ function promoteHallCrusadesCampaignResolvedRecord(show, routeUrl) {
     return;
   }
 
-  const detailHost = getHallCrusadesCampaignExistingRecordDetailHost();
-  const detailSurface = detailHost?.querySelector?.(".wrestling-show-prototype-surface") || null;
-  const recordFrame = wrestlingShowsShell?.querySelector?.(".hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record") || null;
-  hallCrusadesCampaignRoutePromotion = {
-    routeUrl,
-    recordShowId: getHallCrusadesCampaignRecordShowId(show),
-    frameGeometry: getHallCrusadesCampaignExpansionGeometryState(wrestlingShowsShell),
-    scrollState: getHallCrusadesCampaignRecordScrollState(),
-    detailHost,
-    detailSurface,
-    recordFrame,
-    promotedFrame: null,
-    promotedSurface: null,
-    didPromoteDom: false,
-  };
-  clearHallCrusadesCampaignRoutePromotion({ keepPending: true });
-  setHallCrusadesCampaignRoutePromotionShellState(true);
-  if (wrestlingShowDetailShell) {
-    wrestlingShowDetailShell.dataset.wrestlingShowDetailPresentation = "hall";
-    delete wrestlingShowDetailShell.dataset.wrestlingShowDetailVariant;
-    delete wrestlingShowDetailShell.dataset.wrestlingShowDetailRouteId;
-    setWrestlingRelationshipDataset(wrestlingShowDetailShell, show);
-    wrestlingShowDetailShell.dataset.wrestlingShowRoute = routeUrl;
-    wrestlingShowDetailShell.setAttribute("aria-hidden", "false");
-    wrestlingShowDetailShell.removeAttribute("inert");
-    const promotedSurface = promoteHallCrusadesCampaignResolvedRecordSurface(show, wrestlingShowDetailShell);
-    if (promotedSurface && wrestlingShowsShell) {
-      wrestlingShowsShell.dataset.hallCrusadesCampaignIndexSuppressed = "true";
-    }
-  }
-
-  const promoteRoute = () => {
-    navigateToRoute(routeUrl, {
-      historyState: {
-        fromWrestlingShowsIndex: true,
-        fromHallCrusadesCampaignRecord: true,
-      },
-    });
-    scheduleHallCrusadesCampaignRecordEngineBarSync(getHallCrusadesCampaignRoutePath(routeUrl));
-  };
-
-  if (typeof window === "undefined") {
-    promoteRoute();
-    return;
-  }
-
-  const routeSettleHoldMs = isHallCrusadesCampaignReducedMotion() ? 40 : 80;
-  hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
-    hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
-      hallCrusadesCampaignRoutePromotionFrame = 0;
-      window.clearTimeout(hallCrusadesCampaignRoutePromotionTimer);
-      hallCrusadesCampaignRoutePromotionTimer = window.setTimeout(() => {
-        hallCrusadesCampaignRoutePromotionTimer = 0;
-        promoteRoute();
-      }, routeSettleHoldMs);
-    });
+  navigateToRoute(routeUrl, {
+    historyState: {
+      fromWrestlingShowsIndex: true,
+      fromHallCrusadesCampaignRecord: true,
+    },
   });
+  scheduleHallCrusadesCampaignRecordEngineBarSync(getHallCrusadesCampaignRoutePath(routeUrl));
 }
 
 function scheduleHallCrusadesCampaignRoutePromotion() {
@@ -2221,6 +2173,23 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
   const promote = () => promoteHallCrusadesCampaignResolvedRecord(show, routeUrl);
   const waitMs = getHallCrusadesCampaignRoutePromotionTransitionMs(matchesPart);
   let isFadeQueued = false;
+  let isRouteQueued = false;
+  const routeAfterPerimeterFade = () => {
+    if (isRouteQueued) {
+      return;
+    }
+    isRouteQueued = true;
+    if (wrestlingShowsShell) {
+      wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded = "true";
+    }
+    window.clearTimeout(hallCrusadesCampaignPerimeterFadeTimer);
+    hallCrusadesCampaignPerimeterFadeTimer = 0;
+    hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
+      hallCrusadesCampaignRoutePromotionFrame = 0;
+      clearHallCrusadesCampaignRoutePromotion({ keepPending: true });
+      promote();
+    });
+  };
   const queuePerimeterFade = () => {
     if (isFadeQueued) {
       return;
@@ -2235,11 +2204,17 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
     if (wrestlingShowsShell) {
       wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade = "true";
     }
-    hallCrusadesCampaignPerimeterFadeTimer = window.setTimeout(() => {
-      hallCrusadesCampaignPerimeterFadeTimer = 0;
-      clearHallCrusadesCampaignRoutePromotion({ keepPending: true });
-      promote();
-    }, HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS);
+    const recordFrame = wrestlingShowsShell?.querySelector?.(".hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record") || null;
+    if (!isHallCrusadesCampaignReducedMotion() && recordFrame) {
+      const fadeListener = (event) => {
+        if (event.target === recordFrame && event.elapsedTime >= HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS / 1000) {
+          routeAfterPerimeterFade();
+        }
+      };
+      hallCrusadesCampaignRoutePromotionWait = { element: recordFrame, listener: fadeListener };
+      recordFrame.addEventListener("transitionend", fadeListener);
+    }
+    hallCrusadesCampaignPerimeterFadeTimer = window.setTimeout(routeAfterPerimeterFade, HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS);
   };
   if (isHallCrusadesCampaignReducedMotion() || waitMs <= 0) {
     hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
@@ -2333,6 +2308,7 @@ function clearHallCrusadesCampaignRecordResolutionState() {
     wrestlingShowsShell.classList.remove("is-campaign-record-resolving");
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
   }
 }
 
