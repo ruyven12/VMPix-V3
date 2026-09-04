@@ -2238,8 +2238,84 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
   hallCrusadesCampaignRoutePromotionTimer = window.setTimeout(queuePerimeterFade, waitMs + HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS);
 }
 
+function setHallCrusadesCampaignDirectRouteHandoffShellStyles() {
+  const setStyles = (element, styles) => {
+    if (!element) {
+      return;
+    }
+    Object.entries(styles).forEach(([property, value]) => {
+      element.style.setProperty(property, value);
+    });
+  };
+
+  setStyles(wrestlingShowsShell, {
+    transition: "none",
+    opacity: "0",
+    visibility: "hidden",
+    "pointer-events": "none",
+    transform: "none",
+  });
+  setStyles(wrestlingShowDetailShell, {
+    transition: "none",
+    opacity: "1",
+    visibility: "visible",
+    "pointer-events": "auto",
+    transform: "none",
+  });
+}
+
+function clearHallCrusadesCampaignDirectRouteHandoffShellStyles() {
+  [wrestlingShowsShell, wrestlingShowDetailShell].forEach((element) => {
+    if (!element) {
+      return;
+    }
+    ["transition", "opacity", "visibility", "pointer-events", "transform"].forEach((property) => {
+      element.style.removeProperty(property);
+    });
+  });
+}
+
+function queueHallCrusadesCampaignDirectRouteHandoffStyleCleanup() {
+  if (typeof window === "undefined") {
+    clearHallCrusadesCampaignDirectRouteHandoffShellStyles();
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      clearHallCrusadesCampaignDirectRouteHandoffShellStyles();
+    });
+  });
+}
+
+function completeHallCrusadesCampaignDirectRoutePromotion(show, surface) {
+  if (!surface || !wrestlingShowsShell || typeof window === "undefined") {
+    return false;
+  }
+
+  const historyState = window.history?.state || {};
+  const recordShowId = getHallCrusadesCampaignRecordShowId(show);
+  const lockedShowId = wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId || "";
+  const didFadePerimeter = wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded === "true";
+  if (!historyState.fromHallCrusadesCampaignRecord || !didFadePerimeter || !recordShowId || lockedShowId !== recordShowId) {
+    return false;
+  }
+
+  setHallCrusadesCampaignDirectRouteHandoffShellStyles();
+  clearHallCrusadesCampaignLock({ keepRoutePromotion: true });
+  scheduleHallCrusadesCampaignRecordEngineBarSync();
+  clearHallCrusadesCampaignRoutePromotion();
+  queueHallCrusadesCampaignDirectRouteHandoffStyleCleanup();
+  return true;
+}
+
 function completeHallCrusadesCampaignRoutePromotion(show, surface) {
-  if (!hallCrusadesCampaignRoutePromotion || !surface) {
+  if (!surface) {
+    return;
+  }
+
+  if (!hallCrusadesCampaignRoutePromotion) {
+    completeHallCrusadesCampaignDirectRoutePromotion(show, surface);
     return;
   }
 
