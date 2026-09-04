@@ -16091,6 +16091,16 @@ button.wrestling-event-history-tagged-thumb {
     drop-shadow(0 0 0.34rem rgba(255, 42, 26, 0.36));
 }
 
+@media (min-width: 900px) {
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::before,
+  .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::after,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::before,
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::after {
+    display: none;
+    content: none;
+  }
+}
+
 @keyframes hallCrusadesAwaitingPosterPulse {
   0%,
   100% {
