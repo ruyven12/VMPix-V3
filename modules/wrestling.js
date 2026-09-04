@@ -6051,11 +6051,7 @@ function getHallCrusadesCampaignPromotionRecordFrame(targetShell = wrestlingShow
     return null;
   }
 
-  const isDesktopPromotionViewport = typeof window === "undefined"
-    || (window.matchMedia?.("(min-width: 900px)")?.matches ?? window.innerWidth >= 900);
-  if (isDesktopPromotionViewport) {
-    applyHallCrusadesCampaignExpansionGeometryState(targetShell, hallCrusadesCampaignRoutePromotion.frameGeometry);
-  }
+  applyHallCrusadesCampaignExpansionGeometryState(targetShell, hallCrusadesCampaignRoutePromotion.frameGeometry);
   frame.classList.add("hall-crusades-campaign-record-frame");
   frame.dataset.hallCrusadesCampaignRecordFrame = "true";
   frame.dataset.hallCrusadesCampaignPromotedFrame = "true";
