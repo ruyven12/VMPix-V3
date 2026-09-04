@@ -14861,6 +14861,15 @@ button.wrestling-event-history-tagged-thumb {
   visibility: visible;
 }
 
+@media (min-width: 900px) {
+  .site-shell.is-wrestling-show-detail-view .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: none;
+    visibility: visible;
+  }
+}
+
 .site-shell.is-hall-crusades-campaign-route-promoting .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"][data-hall-crusades-campaign-index-suppressed="true"] {
   opacity: 0 !important;
   pointer-events: none !important;
