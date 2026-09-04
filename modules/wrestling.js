@@ -2181,9 +2181,16 @@ function promoteHallCrusadesCampaignResolvedRecord(show, routeUrl) {
     return;
   }
 
+  const routeSettleHoldMs = isHallCrusadesCampaignReducedMotion() ? 40 : 80;
   hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
-    hallCrusadesCampaignRoutePromotionFrame = 0;
-    promoteRoute();
+    hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
+      hallCrusadesCampaignRoutePromotionFrame = 0;
+      window.clearTimeout(hallCrusadesCampaignRoutePromotionTimer);
+      hallCrusadesCampaignRoutePromotionTimer = window.setTimeout(() => {
+        hallCrusadesCampaignRoutePromotionTimer = 0;
+        promoteRoute();
+      }, routeSettleHoldMs);
+    });
   });
 }
 
@@ -6076,16 +6083,11 @@ function promoteHallCrusadesCampaignResolvedRecordSurface(show, targetShell = wr
   }
 
   const { detailHost, detailSurface } = promotionSurface;
-  const recordFrame = getHallCrusadesCampaignPromotionRecordFrame(targetShell) || syncHallCrusadesCampaignProductionRecordFrame(targetShell);
-  if (recordFrame) {
-    targetShell.replaceChildren(recordFrame, detailSurface);
-  } else {
-    targetShell.replaceChildren(detailSurface);
-  }
+  targetShell.replaceChildren(detailSurface);
 
   detailSurface.dataset.hallCrusadesCampaignPromotedRecord = "true";
   detailHost.dataset.hallCrusadesCampaignRecordTransferred = "true";
-  hallCrusadesCampaignRoutePromotion.promotedFrame = recordFrame;
+  hallCrusadesCampaignRoutePromotion.promotedFrame = null;
   hallCrusadesCampaignRoutePromotion.promotedSurface = detailSurface;
   hallCrusadesCampaignRoutePromotion.didPromoteDom = true;
 
@@ -6174,12 +6176,7 @@ function renderHallPrototypeShowDetailSurface(show, options = {}) {
   surface.className = "wrestling-show-prototype-surface";
   surface.append(card, createHallPrototypeEncounterSection(show));
 
-  const productionRecordFrame = syncHallCrusadesCampaignProductionRecordFrame(targetShell);
-  if (productionRecordFrame) {
-    targetShell.replaceChildren(productionRecordFrame, surface);
-  } else {
-    targetShell.replaceChildren(surface);
-  }
+  targetShell.replaceChildren(surface);
   if (options.prepareAmbient !== false && targetShell === wrestlingShowDetailShell) {
     prepareHallCrusadesShowDetailAmbient();
   }
