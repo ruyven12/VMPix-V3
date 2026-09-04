@@ -380,6 +380,8 @@ const HALL_CRUSADES_CAMPAIGN_RESOLUTION_MATCH_DELAY_MS = 500;
 const HALL_CRUSADES_CAMPAIGN_RESOLUTION_REDUCED_STEP_MS = 40;
 const HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS = 80;
 const HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS = 1000;
+const HALL_CRUSADES_CAMPAIGN_MOBILE_COVER_DURATION_MS = 560;
+const HALL_CRUSADES_CAMPAIGN_MOBILE_COVER_REDUCED_MOTION_MS = 80;
 const HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES = [
   "--hall-crusades-campaign-start-x",
   "--hall-crusades-campaign-start-y",
@@ -393,6 +395,10 @@ const HALL_CRUSADES_CAMPAIGN_EXPANSION_GEOMETRY_PROPERTIES = [
   "--hall-crusades-campaign-overshoot-y",
   "--hall-crusades-campaign-overshoot-width",
   "--hall-crusades-campaign-overshoot-height",
+  "--hall-crusades-campaign-mobile-cover-x",
+  "--hall-crusades-campaign-mobile-cover-y",
+  "--hall-crusades-campaign-mobile-cover-width",
+  "--hall-crusades-campaign-mobile-cover-height",
 ];
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_PHOTO_PAGE_SIZE = 6;
 const WRESTLING_MATCH_DETAIL_PROTOTYPE_SWIPE_THRESHOLD = 48;
@@ -449,6 +455,7 @@ let hallCrusadesCampaignResolutionTimers = [];
 let hallCrusadesCampaignRoutePromotion = null;
 let hallCrusadesCampaignRoutePromotionFrame = 0;
 let hallCrusadesCampaignRoutePromotionTimer = 0;
+let hallCrusadesCampaignMobileCoverTimer = 0;
 let hallCrusadesCampaignPerimeterFadeTimer = 0;
 let hallCrusadesCampaignRoutePromotionWait = null;
 let hallCrusadesCampaignRoutePromotionCleanupFrame = 0;
@@ -1755,6 +1762,7 @@ function syncHallCrusadesCampaignLockShell() {
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignMobileCover;
   }
 }
 
@@ -1825,6 +1833,62 @@ function isHallCrusadesCampaignReducedMotion() {
   return Boolean(typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
 }
 
+function isHallCrusadesCampaignMobileCoverViewport() {
+  return Boolean(typeof window !== "undefined" && window.matchMedia?.("(max-width: 640px)")?.matches);
+}
+
+function setHallCrusadesCampaignMobileCoverGeometry(variableTarget = wrestlingShowsShell) {
+  if (!variableTarget || typeof window === "undefined") {
+    return false;
+  }
+
+  const viewportWidth = Math.max(document.documentElement?.clientWidth || 0, window.innerWidth || 0);
+  const viewportHeight = Math.max(document.documentElement?.clientHeight || 0, window.innerHeight || 0);
+  if (!viewportWidth || !viewportHeight) {
+    return false;
+  }
+
+  const engineTop = getHallCrusadesCampaignEngineTop(viewportHeight);
+  const coverHeight = Math.max(0, Math.min(viewportHeight, engineTop));
+  if (!coverHeight) {
+    return false;
+  }
+
+  const setVar = (name, value) => variableTarget.style.setProperty(name, formatHallCrusadesCampaignPixelValue(value));
+  setVar("--hall-crusades-campaign-mobile-cover-x", 0);
+  setVar("--hall-crusades-campaign-mobile-cover-y", 0);
+  setVar("--hall-crusades-campaign-mobile-cover-width", viewportWidth);
+  setVar("--hall-crusades-campaign-mobile-cover-height", coverHeight);
+  return true;
+}
+
+function queueHallCrusadesCampaignMobileCover(next) {
+  if (!isHallCrusadesCampaignMobileCoverViewport()) {
+    next?.();
+    return false;
+  }
+
+  if (!setHallCrusadesCampaignMobileCoverGeometry()) {
+    next?.();
+    return false;
+  }
+
+  if (wrestlingShowsShell) {
+    wrestlingShowsShell.dataset.hallCrusadesCampaignMobileCover = "expanding";
+  }
+
+  window.clearTimeout(hallCrusadesCampaignMobileCoverTimer);
+  hallCrusadesCampaignMobileCoverTimer = window.setTimeout(() => {
+    hallCrusadesCampaignMobileCoverTimer = 0;
+    if (wrestlingShowsShell?.dataset.hallCrusadesCampaignMobileCover) {
+      wrestlingShowsShell.dataset.hallCrusadesCampaignMobileCover = "covered";
+    }
+    next?.();
+  }, isHallCrusadesCampaignReducedMotion()
+    ? HALL_CRUSADES_CAMPAIGN_MOBILE_COVER_REDUCED_MOTION_MS
+    : HALL_CRUSADES_CAMPAIGN_MOBILE_COVER_DURATION_MS);
+  return true;
+}
 function getHallCrusadesCampaignActiveRecord() {
   return hallCrusadesPosterStrip?.querySelector?.(".hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record") || null;
 }
@@ -2092,6 +2156,7 @@ function clearHallCrusadesCampaignRoutePromotion(options = {}) {
   if (typeof window !== "undefined") {
     window.cancelAnimationFrame(hallCrusadesCampaignRoutePromotionFrame);
     window.clearTimeout(hallCrusadesCampaignRoutePromotionTimer);
+    window.clearTimeout(hallCrusadesCampaignMobileCoverTimer);
     window.clearTimeout(hallCrusadesCampaignPerimeterFadeTimer);
     window.cancelAnimationFrame(hallCrusadesCampaignRoutePromotionCleanupFrame);
   }
@@ -2100,6 +2165,7 @@ function clearHallCrusadesCampaignRoutePromotion(options = {}) {
   }
   hallCrusadesCampaignRoutePromotionFrame = 0;
   hallCrusadesCampaignRoutePromotionTimer = 0;
+  hallCrusadesCampaignMobileCoverTimer = 0;
   hallCrusadesCampaignPerimeterFadeTimer = 0;
   hallCrusadesCampaignRoutePromotionWait = null;
   hallCrusadesCampaignRoutePromotionCleanupFrame = 0;
@@ -2108,6 +2174,7 @@ function clearHallCrusadesCampaignRoutePromotion(options = {}) {
     if (wrestlingShowsShell) {
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
+      delete wrestlingShowsShell.dataset.hallCrusadesCampaignMobileCover;
     }
     setHallCrusadesCampaignRoutePromotionShellState(false);
   }
@@ -2173,6 +2240,7 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
   const promote = () => promoteHallCrusadesCampaignResolvedRecord(show, routeUrl);
   const waitMs = getHallCrusadesCampaignRoutePromotionTransitionMs(matchesPart);
   let isFadeQueued = false;
+  let isMobileCoverQueued = false;
   let isRouteQueued = false;
   const routeAfterPerimeterFade = () => {
     if (isRouteQueued) {
@@ -2189,6 +2257,19 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
       clearHallCrusadesCampaignRoutePromotion({ keepPending: true });
       promote();
     });
+  };
+  const queueMobileCoverThenPerimeterFade = () => {
+    if (isMobileCoverQueued) {
+      return;
+    }
+    isMobileCoverQueued = true;
+    if (hallCrusadesCampaignRoutePromotionWait?.element && hallCrusadesCampaignRoutePromotionWait.listener) {
+      hallCrusadesCampaignRoutePromotionWait.element.removeEventListener("transitionend", hallCrusadesCampaignRoutePromotionWait.listener);
+      hallCrusadesCampaignRoutePromotionWait = null;
+    }
+    window.clearTimeout(hallCrusadesCampaignRoutePromotionTimer);
+    hallCrusadesCampaignRoutePromotionTimer = 0;
+    queueHallCrusadesCampaignMobileCover(queuePerimeterFade);
   };
   const queuePerimeterFade = () => {
     if (isFadeQueued) {
@@ -2221,7 +2302,7 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
       hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
         hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {
           hallCrusadesCampaignRoutePromotionFrame = 0;
-          queuePerimeterFade();
+          queueMobileCoverThenPerimeterFade();
         });
       });
     });
@@ -2230,12 +2311,12 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
 
   const listener = (event) => {
     if (event.target === matchesPart && (event.propertyName === "opacity" || event.propertyName === "transform")) {
-      queuePerimeterFade();
+      queueMobileCoverThenPerimeterFade();
     }
   };
   hallCrusadesCampaignRoutePromotionWait = { element: matchesPart, listener };
   matchesPart?.addEventListener("transitionend", listener);
-  hallCrusadesCampaignRoutePromotionTimer = window.setTimeout(queuePerimeterFade, waitMs + HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS);
+  hallCrusadesCampaignRoutePromotionTimer = window.setTimeout(queueMobileCoverThenPerimeterFade, waitMs + HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS);
 }
 
 function setHallCrusadesCampaignDirectRouteHandoffShellStyles() {
@@ -2385,6 +2466,7 @@ function clearHallCrusadesCampaignRecordResolutionState() {
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade;
     delete wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFaded;
+    delete wrestlingShowsShell.dataset.hallCrusadesCampaignMobileCover;
   }
 }
 
