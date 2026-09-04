@@ -9921,6 +9921,16 @@ button.person-show-tagged-thumb:focus-visible {
   width: 0.42rem;
 }
 
+@media (max-width: 640px) {
+  .site-shell[data-hall-crusades-campaign-direct-route-handoff="true"].is-wrestling-show-detail-view .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translate3d(0, 0, 0) !important;
+    transition: none !important;
+    visibility: visible !important;
+  }
+}
+
 .wrestling-people-shell::-webkit-scrollbar-track,
 .wrestling-person-detail-shell::-webkit-scrollbar-track,
 .wrestling-venues-shell::-webkit-scrollbar-track,
