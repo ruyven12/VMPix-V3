@@ -18250,7 +18250,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 0.36;
   transform: none;
   animation: none;
-  transition: opacity 500ms ease-out;
+  transition: opacity 1000ms ease-out;
 }
 
 .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"][data-hall-crusades-campaign-perimeter-fade="true"].is-campaign-expanded > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record::after {
