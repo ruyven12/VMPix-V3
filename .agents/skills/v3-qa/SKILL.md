@@ -23,6 +23,22 @@ The current configuration uses `http://127.0.0.1:4173`, Chrome by default (`PLAY
 
 No package installation, backend changes, new scripts, or temporary infrastructure is authorized by this skill. Missing dependencies/browser/tool access are verification limitations to report. Current State records Wrestling tests with outdated selectors/routes and an older S25 viewport; inspect relevance rather than silently rewriting tests or treating their presence as a passing result. Never alter protected behavior to satisfy a stale assertion.
 
+## Executable harness (PASS 16)
+
+Prefer the repository harness when it fits the task; retain specialized browser inspection for behavior it does not assert.
+
+- `npm run v3:qa` or `npm run v3:qa -- smoke`: existing route smoke coverage.
+- `npm run v3:qa -- route /wrestling/shows/080826`: one local route, at 360×800, 412×915 and 1920×1080, each with normal and reduced motion.
+- `npm run v3:qa -- wrestling`: current Wrestling route-smoke cases plus generic gateway/Hall/show health.
+- `npm run v3:qa -- all`: complete existing suite plus generic gateway/Hall/show health. Never default to all for a surgical pass.
+- `npm run v3:qa -- --help`: syntax. Quote routes containing query strings. External URLs, protocol-relative paths and traversal are rejected (exit 2).
+
+The runner uses the existing Playwright server/configuration and two workers, preserves test exit codes and prints elapsed time. Generic checks use live resources, not mocked data; a healthy loading/error presentation does not establish API or archive-data correctness. They check rendering, application errors, horizontal overflow, in-viewport accessible controls and functioning scroll containers. They do not replace full control accessibility, nested clipping, carousel, photo, timeout, performance, physical-device or creative review. Hidden/inert controls are not accessibility-audited by this layer; the known Engine Return exposure/overhang still needs dedicated QA.
+
+Generic failures retain screenshots/traces in the existing test-results folder and HTML report; passing generic tests do not save screenshots. Existing specialized specs may still save their own screenshots. Reports are replaced by subsequent runs, so review/copy important failure evidence before running again. No dependencies or Playwright defaults were changed.
+
+Legacy Wrestling specs still contain retired Ring Archive/card selectors, old venue URLs and rigid placeholder relationship assumptions. Wrestling mode explicitly excludes the three specialized specs (wrestling-people-responsive, wrestling-venues-responsive and wrestling-relationship-hooks): their index/detail mounts, card selectors and placeholder IDs describe retired surfaces. It reuses Wrestling cases from routes-smoke instead. All/test:e2e retain the legacy specs unchanged. The runner prints these coverage gaps; classify failures before interpreting them as application regressions. Existing Home/Calendar tests also require separate drift review. A harness run returning nonzero is never a passing signoff.
+
 ## Select and perform relevant checks
 
 | Concern | Verification |

@@ -4,6 +4,7 @@
   "private": true,
   "description": "Static VMPix V3 frontend QA harness.",
   "scripts": {
+    "v3:qa": "node scripts/v3-qa.js",
     "test:e2e": "playwright test",
     "test:smoke": "playwright test tests/e2e/routes-smoke.spec.js",
     "test:e2e:headed": "playwright test --headed"

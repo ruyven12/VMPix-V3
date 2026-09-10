@@ -6,8 +6,8 @@ const viewports = [
 ];
 
 const routes = [
-  { path: "/", rail: "Homepage", visibleShell: ".home-frame" },
-  { path: "/portfolio", rail: "Interactive Portfolio", visibleShell: ".portfolio-hub" },
+  { path: "/", rail: /Welcome to Voodoo Media/, visibleShell: ".home-frame" },
+  { path: "/portfolio", rail: /Interactive Portfolio/, visibleShell: ".portfolio-hub" },
   {
     path: "/music",
     rail: "Music Nexus",
@@ -25,11 +25,11 @@ const routes = [
   { path: "/music/people/adam-begin", rail: "Person Detail", visibleShell: ".person-detail-screen", text: "Adam Begin" },
   { path: "/music/venues", rail: "Venues", visibleShell: "[data-music-venues-index]", text: "Venue Archive" },
   { path: "/music/venues/asylum", rail: "Venue Detail", visibleShell: "[data-venue-detail]", text: "Asylum" },
-  { path: "/wrestling", rail: "Ring Archive", visibleShell: "[data-ring-archive-shell]" },
-  { path: "/wrestling/people", rail: "Wrestling People", visibleShell: "[data-wrestling-people-shell]", text: "WRESTLING PEOPLE" },
-  { path: "/wrestling/people/ace-romero", rail: "Person Detail", visibleShell: "[data-wrestling-person-detail-shell]", text: "EVENT HISTORY" },
-  { path: "/wrestling/venues", rail: "Wrestling Venues", visibleShell: "[data-wrestling-venues-shell]", text: "WRESTLING VENUES" },
-  { path: "/wrestling/venues/portland_expo", rail: "Venue Detail", visibleShell: "[data-wrestling-venue-detail-shell]", text: "Portland Expo" },
+  { path: "/wrestling", rail: /Outskirts of Daiion|Daiion/, visibleShell: ".portfolio-hub" },
+  { path: "/wrestling/people", rail: /Hall of Champions/, visibleShell: ".wrestling-people-prototype-shell" },
+  { path: "/wrestling/people/ace-romero", rail: /Champion Dossier/, visibleShell: ".wrestling-person-dossier-prototype-shell", text: /TIMELINE \/ EVENT HISTORY/ },
+  { path: "/wrestling/venues", rail: /Fields of Conflict/, visibleShell: ".wrestling-venues-prototype-shell" },
+  { path: "/wrestling/venues/portland_expo", rail: /Fields of Conflict/, visibleShell: ".fields-of-conflict-dossier", text: "Portland Expo" },
   { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },
@@ -40,11 +40,6 @@ const ignoredConsoleErrors = [
   /fonts\.gstatic\.com/i,
   /photos\.smugmug\.com/i,
 ];
-
-function screenshotName(viewportName, routePath) {
-  const routeName = routePath === "/" ? "home" : routePath.replace(/^\/+/, "").replace(/[/?#]+/g, "-");
-  return `${viewportName}-${routeName}.png`;
-}
 
 async function expectNoHorizontalOverflow(page) {
   const overflow = await page.evaluate(() => {
@@ -84,7 +79,8 @@ for (const viewport of viewports) {
     test.use({ viewport: viewport.size });
 
     for (const route of routes) {
-      test(`${route.path} loads the V3 shell`, async ({ page }, testInfo) => {
+      test(`${route.path} loads the V3 shell`, async ({ page }) => {
+        await page.setViewportSize(viewport.size);
         const consoleErrors = [];
         const pageErrors = [];
 
@@ -107,8 +103,10 @@ for (const viewport of viewports) {
         const visibleShell = page.locator(route.visibleShell);
 
         await expect(visibleShell).toBeVisible();
-        await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
-        await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
+        await expect(page.locator(route.context || "[data-current-view]")).toHaveText(route.rail);
+        if (route.path !== "/") {
+          await expect(page.locator("[data-portfolio-engine]:visible, [data-shell-bottom-rail]:visible").first()).toBeVisible();
+        }
 
         if (route.text) {
           await expect(visibleShell.getByText(route.text).first()).toBeVisible();
@@ -128,10 +126,7 @@ for (const viewport of viewports) {
         await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
         await expectNoHorizontalOverflow(page);
 
-        await page.screenshot({
-          path: testInfo.outputPath(screenshotName(viewport.name, route.path)),
-          fullPage: false,
-        });
+        // Failure screenshots and traces are retained by playwright.config.js.
 
         expect(pageErrors).toEqual([]);
         expect(consoleErrors).toEqual([]);
@@ -185,32 +180,33 @@ const archiveReliabilityRoutes = [
   },
   {
     path: "/wrestling/people/ace-romero",
-    rail: "Person Detail",
-    visibleShell: "[data-wrestling-person-detail-shell]",
+    rail: /Champion Dossier/,
+    visibleShell: ".wrestling-person-dossier-prototype-shell",
     text: /EVENT HISTORY/i,
   },
   {
     path: "/wrestling/people/missing-person",
-    rail: "Person Detail",
-    visibleShell: "[data-wrestling-person-detail-shell]",
-    text: /Unable to load archive data|No matching archive record was found/i,
+    rail: /Champion Dossier/,
+    visibleShell: ".wrestling-person-dossier-prototype-shell",
+    text: /Record Not Found/i,
   },
   {
     path: "/wrestling/shows/000000",
-    rail: "Show Detail",
+    rail: /Hall of Crusades/,
     visibleShell: "[data-wrestling-show-detail-shell]",
     text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
   },
   {
     path: "/wrestling/shows/000000/missing-match",
-    rail: "Match Gallery",
-    visibleShell: "[data-wrestling-match-gallery-shell]",
+    context: "[data-portfolio-engine-current-view]",
+    rail: /Hall of Crusades/,
+    visibleShell: ".wrestling-match-detail-prototype-shell",
     text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
   },
   {
     path: "/wrestling/venues/missing-venue",
-    rail: "Venue Detail",
-    visibleShell: "[data-wrestling-venue-detail-shell]",
+    rail: /Fields of Conflict/,
+    visibleShell: ".fields-of-conflict-dossier",
     text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
   },
 ];
@@ -230,14 +226,15 @@ const slowApiReliabilityRoutes = [
   },
   {
     path: "/wrestling/shows/000000",
-    rail: "Show Detail",
+    rail: /Hall of Crusades/,
     visibleShell: "[data-wrestling-show-detail-shell]",
     text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
   },
   {
     path: "/wrestling/shows/000000/missing-match",
-    rail: "Match Gallery",
-    visibleShell: "[data-wrestling-match-gallery-shell]",
+    context: "[data-portfolio-engine-current-view]",
+    rail: /Hall of Crusades/,
+    visibleShell: ".wrestling-match-detail-prototype-shell",
     text: /Unable to load archive data|No matching archive record was found|Archive Record Unavailable/i,
   },
 ];
@@ -289,7 +286,7 @@ test.describe("archive direct-route reliability", () => {
       await expect(page.locator(".site-shell")).toBeVisible();
       const visibleShell = page.locator(route.visibleShell);
       await expect(visibleShell).toBeVisible();
-      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(page.locator(route.context || "[data-current-view]")).toHaveText(route.rail);
       await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 10000 });
       await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
       await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
@@ -315,7 +312,7 @@ test.describe("archive direct-route reliability", () => {
       await expect(page.locator(".site-shell")).toBeVisible();
       const visibleShell = page.locator(route.visibleShell);
       await expect(visibleShell).toBeVisible();
-      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(page.locator(route.context || "[data-current-view]")).toHaveText(route.rail);
       await expect(visibleShell.getByText(route.text).first()).toBeVisible({ timeout: 6000 });
       await expect(page.getByText(/Render Not Found/i)).toHaveCount(0);
       await expect(page.getByText(/^Not found$/i)).toHaveCount(0);
@@ -330,7 +327,7 @@ test.describe("archive direct-route reliability", () => {
       await expect(page.locator(".site-shell")).toBeVisible();
       const visibleShell = page.locator("[data-module-placeholder]");
       await expect(visibleShell).toBeVisible();
-      await expect(page.locator("[data-current-view]")).toHaveText(route.rail);
+      await expect(page.locator(route.context || "[data-current-view]")).toHaveText(route.rail);
       await expect(visibleShell.getByText(route.text).first()).toBeVisible();
       await expect(page.locator(".home-frame")).toHaveAttribute("aria-hidden", "true");
       await expect(page.locator("[data-shell-bottom-rail]")).toBeVisible();
