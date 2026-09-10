@@ -2349,16 +2349,20 @@ function scheduleHallCrusadesCampaignRoutePromotion() {
       wrestlingShowsShell.dataset.hallCrusadesCampaignPerimeterFade = "true";
     }
     const recordFrame = wrestlingShowsShell?.querySelector?.(".hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record") || null;
-    if (!isHallCrusadesCampaignReducedMotion() && recordFrame) {
+    const isMobilePreparedFade = isHallCrusadesCampaignMobileCoverViewport() && isHallCrusadesCampaignMobilePreparedExpansion;
+    const isReducedMotion = isHallCrusadesCampaignReducedMotion();
+    if (!isReducedMotion && recordFrame) {
       const fadeListener = (event) => {
-        if (event.target === recordFrame && event.elapsedTime >= HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS / 1000) {
+        const isFrameFade = !isMobilePreparedFade || (event.propertyName === "opacity" && !event.pseudoElement);
+        if (event.target === recordFrame && isFrameFade && event.elapsedTime >= HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS / 1000) {
           routeAfterPerimeterFade();
         }
       };
       hallCrusadesCampaignRoutePromotionWait = { element: recordFrame, listener: fadeListener };
       recordFrame.addEventListener("transitionend", fadeListener);
     }
-    hallCrusadesCampaignPerimeterFadeTimer = window.setTimeout(routeAfterPerimeterFade, HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS);
+    const fadeFallbackBuffer = isMobilePreparedFade && !isReducedMotion ? HALL_CRUSADES_CAMPAIGN_ROUTE_PROMOTION_FALLBACK_BUFFER_MS : 0;
+    hallCrusadesCampaignPerimeterFadeTimer = window.setTimeout(routeAfterPerimeterFade, HALL_CRUSADES_CAMPAIGN_PERIMETER_FADE_MS + fadeFallbackBuffer);
   };
   if (isHallCrusadesCampaignReducedMotion() || waitMs <= 0) {
     hallCrusadesCampaignRoutePromotionFrame = window.requestAnimationFrame(() => {

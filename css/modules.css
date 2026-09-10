@@ -18763,6 +18763,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-expanded:not([data-hall-crusades-campaign-mobile-cover]) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+    transition:
+      border-color 1000ms ease-out,
+      box-shadow 1000ms ease-out,
+      opacity 1000ms ease-out;
+  }
+
+  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"][data-hall-crusades-campaign-perimeter-fade="true"].is-campaign-expanded:not([data-hall-crusades-campaign-mobile-cover]) > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
+    opacity: 0;
+  }
+
     .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] {
     padding:
       max(1rem, env(safe-area-inset-top))
