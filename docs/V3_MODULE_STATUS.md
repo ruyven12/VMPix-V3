@@ -1,5 +1,11 @@
 # V3 Module Status
 
+## Authority and status dimensions
+
+Classification: **CURRENT / SPECIALIZED** readiness reference under [PROJECT_RULES.md](PROJECT_RULES.md). The table is a retained implementation snapshot and **needs runtime verification**; PASS 2 did not establish new module or QA statuses.
+
+Keep implementation readiness, route handling, creative canon/protection, and QA/signoff separate. "active" here is not World Bible's in-world ACTIVE label or a signed-off experience. World Bible records Home and Interactive Portfolio as protected and focuses current creative work on The Story, The Trajectory, and The Comms. The older Portfolio card-launcher wording and Wrestling summary below need reconciliation with that record and the more detailed mock inventory. Preserve them as unverified snapshots, not instructions to rebuild protected work.
+
 This document tracks current V3 module readiness. It is documentation only and does not create modules, edit app code, change routes, wire APIs, or add dependencies.
 
 ## Status Labels

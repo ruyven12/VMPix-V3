@@ -1,5 +1,11 @@
 # VMPix-V3 Frontend Structure Plan
 
+## Historical authority notice
+
+Classification: **HISTORICAL / FOUNDATIONAL** rationale and **FUTURE / PLANNING** folder, deployment, and cutover proposals from initial structure planning. Useful ownership and staging rationale is preserved. [PROJECT_RULES.md](../PROJECT_RULES.md), [Experience Build rules](../V3_EXPERIENCE_BUILD_RULES.md), and [World Bible](../design/world-bible.md) govern current work in their domains.
+
+The proposed assets/js tree is not an asserted current file map or a migration instruction; current technical references describe other locations. Planning-stage prohibitions on building screens/components are **SUPERSEDED / RETIRED as blanket current-phase restrictions**, but are retained as historical scope. Framework/dependency necessity never substitutes for explicit approval. Deployment/live-site claims need separate verification; no cutover is authorized here.
+
 This document defines the initial frontend structure plan for VMPix-V3. It is planning documentation only. It does not build UI, create the admin shell, create route files, move files, wire backend APIs, or add frameworks/dependencies.
 
 ## 1. Purpose of the Frontend Repo

@@ -1,5 +1,11 @@
 # V3 Data Contracts
 
+## Authority and contract status
+
+Classification: **CURRENT / SPECIALIZED** for frontend data principles and tolerance requirements; payloads labeled planned are **FUTURE / PLANNING**. [PROJECT_RULES.md](PROJECT_RULES.md) governs engineering policy. PostgreSQL/VMPix-Data owns backend data authority; these frontend proposals do not establish a verified deployed backend schema.
+
+Current placeholder descriptions **need runtime verification** before migration work. Preserve the examples pending contract review: Wrestling relationships use person_id while Wrestling People defines wrestling_person_id; confirm that mapping with backend ownership rather than silently renaming fields.
+
 This document records current frontend placeholder shapes and planned backend/API JSON contracts for VMPix-V3. It is documentation only. It does not alter schemas, backend code, frontend code, imports, routes, or V2 systems.
 
 ## Contract Principles

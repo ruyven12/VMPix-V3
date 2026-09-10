@@ -1,5 +1,11 @@
 ﻿# Codex UI Animation Checklist
 
+## Authority and verification scope
+
+Classification: **CURRENT / SPECIALIZED**. This checklist implements [PROJECT_RULES.md](PROJECT_RULES.md) and [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md); it does not create a separate policy hierarchy. Consult [World Bible](design/world-bible.md) for protected creative decisions.
+
+Scope stays small; verification may be thorough. Use existing browser/QA automation and relevant comparisons within the authorized scope, correct findings, and retest. Check all affected protected behavior when shared code changes. New test artifacts require an allowed location. Report passed, failed, and skipped checks separately; technical readiness is not Chris's subjective animation approval. Include device-recording review status where applicable.
+
 Use this checklist before, during, and after every V3 UI animation edit.
 
 ## Before Editing

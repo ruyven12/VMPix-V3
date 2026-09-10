@@ -1,5 +1,36 @@
 ﻿# VMPix-V3 Project Rules
 
+## Authority and rule preservation
+
+Classification: **CURRENT / AUTHORITATIVE**. This is permanent V3 engineering/project law. Read this document first, then [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), then [World Bible](design/world-bible.md) for creative work and the task-relevant specialized references. [README](../README.md) owns the documentation reading map. A future root AGENTS.md will be the concise Codex operating entry point; it is not created by this pass.
+
+Current explicit decisions supersede old planning assumptions. Creative identity and protected assets remain governed by World Bible; engineering rules do not authorize creative redesign, and creative direction does not waive architecture, accessibility, performance, or approval requirements. Preserve and flag unresolved conflicts for Chris instead of silently choosing a new decision.
+
+Instruction classifications:
+
+- **CURRENT / AUTHORITATIVE**: permanent project law and current Experience Build process in their respective domains.
+- **CURRENT / SPECIALIZED**: task-specific contracts, route references, and QA procedures; they do not override governing law.
+- **PROTECTED DECISION**: approved architecture, prototype, effect, page, component, or creative identity; redesign requires explicit approval.
+- **HISTORICAL / FOUNDATIONAL**: retained rationale from initial V3 foundation work; no independent authority over current law.
+- **FUTURE / PLANNING**: proposed work, not proof of implementation or authorization to build it.
+- **SUPERSEDED / RETIRED**: identified wording no longer governing execution; preserve useful historical context.
+
+### Current principles supplement
+
+The detailed rules below remain in force. Experience Build is the current phase.
+
+- Modules own local state as well as content, drilldowns, rendering, and contained data states. No opportunistic refactors.
+- PostgreSQL/VMPix-Data is the backend source of truth; frontend/experience and backend/data responsibilities remain separate. This ownership decision does not claim that live integration is complete.
+- Preserve stable IDs, relationship-first data architecture, and diagnostics-first backend work. Data-driven features require loading, empty, partial, unavailable, and error states, with graceful API-failure handling wherever practical.
+- Photo/archive content remains the hero within a cinematic, futuristic, premium, immersive identity with restrained effects. Performance and long-session comfort matter.
+- Mobile defines the experience; desktop enhances it. Prevent flicker, jitter, timing drift, layout shift, and unnecessary frame loss.
+- Approved prototypes remain canonical unless explicitly superseded. Approved effects, pages, and components become protected assets.
+- Creative passes use one story beat and one meaningful visual or interaction change unless explicitly approved otherwise. Scope stays small; verification may be thorough. Complete and verify affected behavior before technical handoff, and distinguish technical readiness from Chris's subjective visual/device signoff.
+
+### Open documentation questions
+
+Engine Bar ownership and persistence below are protected decisions. Cold entry to non-Home deep routes and return-to-Home lifecycle details still need an explicit documented contract; do not invent lifecycle changes. The Home START/lightning shorthand below must not override the protected Home Story sequence in Experience Build rules. Confirm terminology during a later focused decision pass.
+
 This file is the persistent source of truth for VMPix-V3 project behavior. Future Codex sessions and contributors should read it before making changes.
 
 ## 1. V3 Is The Definitive Rebuild

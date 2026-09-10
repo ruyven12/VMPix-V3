@@ -1,5 +1,11 @@
 # V3 Admin Editing Roadmap
 
+## Authority and phase
+
+Classification: **FUTURE / PLANNING** for admin editing phases and example payloads; authentication, diagnostics, stable IDs, import conflict protection, and audit safeguards remain **CURRENT / SPECIALIZED** constraints on future admin work. [PROJECT_RULES.md](PROJECT_RULES.md) and the current [Experience Build process](V3_EXPERIENCE_BUILD_RULES.md) supersede this document's general execution policy.
+
+This roadmap preserves the ingestion-to-DB editing rationale. "Current/planned starting point" is a historical planning label, not verified backend status. Static mock admin prototypes do not waive authentication before DB-backed admin exposure or edit tools. No live implementation or deployment is authorized by this roadmap.
+
 This document defines the planned path from Sheets-driven ingestion to safe DB-backed admin editing for VMPix-V3 and VMPix-Data. It is documentation only. It does not build DB editing UI, change backend code, alter schemas, wire APIs, or touch V2.
 
 ## Core Rule

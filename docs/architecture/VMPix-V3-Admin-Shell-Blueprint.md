@@ -1,5 +1,11 @@
 # VMPix-V3 Admin Shell Blueprint
 
+## Planning authority notice
+
+Classification: **FUTURE / PLANNING**, with **HISTORICAL / FOUNDATIONAL** rationale from initial admin Alpha 1 planning. Preserve its module, UX, and Shell integration ideas for future approved work. [PROJECT_RULES.md](../PROJECT_RULES.md) owns engineering law, [Experience Build rules](../V3_EXPERIENCE_BUILD_RULES.md) owns current execution, and [World Bible](../design/world-bible.md) owns creative canon.
+
+Framework necessity language is **SUPERSEDED / RETIRED as an authorization rule**; explicit approval remains required. Deferred authentication applies to static mock prototyping, not DB-backed exposure or editing: [Admin Editing Roadmap](../V3_ADMIN_EDITING_ROADMAP.md) safeguards govern those later phases. Layout regions and route examples remain proposals, not implemented or approved-to-build facts.
+
 This document defines the initial architecture and UX planning direction for the future VMPix-V3 admin shell. It is planning documentation only. It does not create the admin shell, UI files, layouts, components, routes, backend/API wiring, authentication, or framework dependencies.
 
 ## 1. Admin Shell Purpose

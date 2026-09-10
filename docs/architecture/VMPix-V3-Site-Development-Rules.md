@@ -1,5 +1,11 @@
 # VMPix-V3 Site Development Rules
 
+## Historical authority notice
+
+Classification: **HISTORICAL / FOUNDATIONAL**. This document records initial V3 frontend foundation decisions and remains useful architectural rationale. [PROJECT_RULES.md](../PROJECT_RULES.md) now owns permanent engineering policy; [Experience Build rules](../V3_EXPERIENCE_BUILD_RULES.md) owns current execution/signoff, and [World Bible](../design/world-bible.md) owns creative canon.
+
+Compatible Shell, module, mobile, viewport, donor, and performance principles remain current through those governing documents. Older wording allowing frameworks when complexity requires them is **SUPERSEDED / RETIRED as an authorization rule**: explicit approval is required. "Later" admin/auth/data language belongs to foundation planning; consult the Admin Editing Roadmap for safeguards before DB exposure or editing. This document cannot override current law.
+
 This document defines the initial frontend foundation rules for VMPix-V3. It is documentation only: it does not start the admin shell, create screens, port V2 components, or wire live backend data.
 
 ## 1. Project Ownership

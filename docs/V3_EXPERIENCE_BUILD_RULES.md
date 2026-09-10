@@ -1,5 +1,11 @@
 # V3 Experience Build Rules
 
+## Authority and phase
+
+Classification: **CURRENT / AUTHORITATIVE** for the current Experience Build process, subordinate to [PROJECT_RULES.md](PROJECT_RULES.md) engineering law. [World Bible](design/world-bible.md) owns creative canon and protected Portfolio decisions. Reveal Build and Ultimate Build describe delivery stages, not blanket approval to add technology. Heavier media, frameworks, libraries, and dependencies remain subject to explicit project approval requirements.
+
+The Home Story section is a **PROTECTED DECISION**. APPROVED/LOCKED means design protection; it does not establish completed device QA. Its existing "Ready for Final Mobile Validation" status remains pending evidence. Codex verifies technical readiness; Chris provides subjective visual/animation signoff. Device recordings remain valuable for final human judgment.
+
 These rules are project law for the V3 UI, animation, routing, and story experience phase. Codex must read this file before starting any UI animation task, then follow it unless the user explicitly supersedes a rule in the current task.
 
 ## V3 Reveal Build vs Ultimate Build
@@ -198,18 +204,22 @@ When in doubt, assume approved surfaces are fragile and verify before reporting 
 
 Experience Build passes are refinement mode unless explicitly stated otherwise.
 
-- Keep each pass to one story beat.
-- Keep each pass to one visual or interaction change.
+- Keep each creative pass to one story beat unless explicitly approved otherwise.
+- Keep each creative pass to one meaningful visual or interaction change unless explicitly approved otherwise.
 - Use surgical scope only.
 - Use the local repo at `C:\Users\deysx\Documents\GitHub\VMPix-V3`.
 - Do not search or write outside the repo.
 - Inspect only allowed files.
 - Do not run workspace-wide scans.
 - Prefer existing systems, selectors, and components before creating new ones.
-- Stop if the task requires verifier scripts, screenshot comparison, pixel comparison, repo-wide inspection, temporary verification infrastructure, or more than two failed write attempts.
-- Verify only what changed.
+- Use browser inspection, screenshot/pixel comparison, verifier scripts, Playwright, or existing QA automation when useful within the approved scope. New verification files or infrastructure must also fit the approved file scope; usefulness does not authorize unrelated files, dependencies, service changes, or repo-wide inspection.
+- Verify changed behavior and affected dependencies/pages, including protected surfaces affected by shared code. Implement, inspect, test, correct, and retest within the approved scope; do not expand into unrelated refactors or autonomous redesign.
 - Reuse the existing local server.
 - Do not restart services unless required.
 - Report browser or Windows ACL failures as tooling issues.
-- Target 5-10 minutes per pass.
-- If a pass exceeds that target, stop and report completed work, the blocker, and the next smallest pass.
+- Prefer 5-10 minutes for a small surgical implementation, but treat this as a planning preference, not a completion or verification deadline.
+- Continue required verification and scoped self-correction beyond that preference. Stop for a genuine blocker or required scope/approval change, report what is complete and unverified, and identify the next smallest action. Never claim signoff for skipped checks.
+
+### Superseded execution safeguards
+
+Classification: **SUPERSEDED / RETIRED**. The blanket stop rules for useful verifier scripts, screenshot/pixel comparison, temporary verification infrastructure, more than two failed writes, and exceeding 5-10 minutes no longer govern. "Verify only what changed" is replaced by verification of affected behavior. Diagnose failed writes and tooling/ACL failures; do not bypass permissions or retry blindly. Approved-files-only discipline, no workspace-wide scans, protected assets, and human creative signoff remain in force.

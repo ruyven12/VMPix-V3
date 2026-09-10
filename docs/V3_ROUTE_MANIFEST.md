@@ -1,5 +1,11 @@
 # V3 Route Manifest
 
+## Authority and freshness
+
+Classification: **CURRENT / SPECIALIZED** route reference under [PROJECT_RULES.md](PROJECT_RULES.md). Future public/admin/API targets are **FUTURE / PLANNING**, not implementation permission.
+
+Route "active" means documented handling, not module completeness, creative approval, or QA signoff. Current-code and deployment statements below are retained records and **need runtime/configuration verification** before being used as proof; PASS 2 did not inspect application code or Render configuration. The future /admin/locks example in the Admin Shell Blueprint is not listed here; reconcile the planned route inventory in a later approved pass, without adding routes now.
+
 This document tracks the intended V3 route map and the current route behavior in the VMPix-V3 frontend repo. It is documentation only and does not create routes, change routing, wire APIs, or alter deployment behavior.
 
 ## Status Labels

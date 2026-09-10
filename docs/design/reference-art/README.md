@@ -1,5 +1,11 @@
 ﻿# V3 Design Reference Art
 
+## Authority and catalog status
+
+Classification: **CURRENT / SPECIALIZED** reference handling policy. Individual targets remain **FUTURE / PLANNING** while Draft; a Locked target is a **PROTECTED DECISION** within its explicitly approved scope. [World Bible](../world-bible.md) owns creative canon; [PROJECT_RULES.md](../../PROJECT_RULES.md) and [Experience Build rules](../../V3_EXPERIENCE_BUILD_RULES.md) govern implementation.
+
+Catalog status describes reference approval, not the implementation or protection status of similarly named components. Draft Home, Engine, or Portfolio entries do not unlock existing protected experiences. The entries below list no reference filenames; no assets were inspected or added by PASS 2.
+
 ## Purpose
 
 This folder stores visual design targets for the V3 experience.

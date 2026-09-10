@@ -1,5 +1,11 @@
 # V3 Mock Data Inventory
 
+## Authority and historical scope
+
+Classification: **HISTORICAL / FOUNDATIONAL** cleanup log covering mock passes 1-6, with **CURRENT / SPECIALIZED** fixture-reference value subject to verification. [PROJECT_RULES.md](PROJECT_RULES.md), [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), and [Data Contracts](V3_DATA_CONTRACTS.md) govern new work.
+
+Original findings, line locations, and later pass updates are retained for traceability and **need runtime verification** before reuse. They are not a new cleanup authorization. The recommendation to align future module IDs is **SUPERSEDED / RETIRED as an open action in this log** by its recorded pass 6 completion; runtime freshness remains unverified. Original missing-field statements describe legacy render rows and must be read alongside pass 3 backend_record additions, not as proof those snapshots lack the fields. Other recommendations remain unverified future work.
+
 Pass: Mock Data Cleanup - Pass 1: Inventory Current Mock Data  
 Scope: public V3 frontend shell, Portfolio Hub, Music, Wrestling, Calendar, About, Contact, and shared shell/navigation systems.  
 Status: cleanup log for mock data passes. No live API wiring was introduced.

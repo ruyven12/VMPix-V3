@@ -1,5 +1,20 @@
 # Website V3 World Bible
 
+## Authority, protection, and status interpretation
+
+Classification: **PROTECTED DECISION** for approved creative canon, world identity, lore, prototypes, and locked experience definitions. [PROJECT_RULES.md](../PROJECT_RULES.md) governs engineering; [Experience Build rules](../V3_EXPERIENCE_BUILD_RULES.md) governs the current process and signoff. Neither authorizes silently changing this creative canon, and creative authority does not waive engineering constraints.
+
+Design APPROVED/LOCKED means protection, not completed runtime implementation, device QA, or human signoff. "APPROVED FOR FUTURE IMPLEMENTATION" denotes a planned concept, not permission to build it in an unrelated pass. In-world Archive Status labels are interface lore, separate from route and module status. Development snapshots below are retained and **need runtime verification**; PASS 2 changes no lore, approved timings, or creative version.
+
+### Status reconciliation notes and unresolved decisions
+
+- The v0.8 locked Portfolio note explicitly supersedes older ENTER-as-panel-transport wording: Portfolio v1.0 waits after analysis; Archive Seal transport remains future and outside the lock. Older ENTER wording is **SUPERSEDED / RETIRED for the locked Portfolio v1.0 interaction**, retained as journey history, not an instruction to restore that button.
+- Completed/current descriptions overlap future labels for observatory rotation, Core, lifeblood, scan, and projection. Read those as mixed development snapshots; do not rebuild protected systems or promote future details to completed status without verification.
+- Calendar remains mapped to The Trajectory in the Global World System table, while Meta Worlds places it inside The Comms and defines Trajectory as roadmap/changelog. **Unresolved creative contradiction for Chris**: no ownership or route change is made here.
+- Home is protected/LOCKED, while Experience Build records final mobile validation as pending. Protection does not prove QA completion.
+- "Website V3 Master Parameters" is an unresolved reference not identified in the allowed documentation inventory. Use the linked governing documents for engineering/process authority; confirm the intended source with Chris.
+- Reference-art catalog Draft entries are unapproved reference targets, not permission to redesign already protected Home/Portfolio assets.
+
 Version: 0.8
 Status: Active Design Reference  
 Project: Website V3 / VMPix Archive

@@ -1,5 +1,11 @@
 # Codex Pass Template
 
+## Required reading and authority
+
+Classification: **CURRENT / SPECIALIZED** task template. Read [PROJECT_RULES.md](PROJECT_RULES.md), [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), [World Bible](design/world-bible.md) for creative/protected work, and task-relevant route, data, status, and [animation QA](CODEX_UI_ANIMATION_CHECKLIST.md) references, in that order. [README](../README.md) provides the full authority map.
+
+Permanent rules below remain intentionally repeated until a later root AGENTS.md establishes the operating entry point. This template does not supersede governing instructions. Retain exact task scope, one story beat/change for creative passes, affected protected surfaces, supplied references, acceptance criteria, and explicit exceptions. Technical completion and Chris's subjective creative/device signoff must be reported separately.
+
 Use this template when starting a VMPix-V3 Codex pass. Fill in the bracketed fields before handing the task to Codex.
 
 ## Project Name
