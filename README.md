@@ -16,6 +16,7 @@ Current explicit decisions win over old planning assumptions. Engineering law, c
 
 ## Current-state and specialized references
 
+- [Current State](docs/CURRENT_STATE.md) — read after AGENTS.md for current priorities, protected experiences, implementation evidence, and pending QA.
 - [Route Manifest](docs/V3_ROUTE_MANIFEST.md) — route inventory, planned targets, and SPA fallback.
 - [Module Status](docs/V3_MODULE_STATUS.md) — recorded readiness and QA needs.
 - [Data Contracts](docs/V3_DATA_CONTRACTS.md) — frontend tolerance principles and proposed backend payloads.
