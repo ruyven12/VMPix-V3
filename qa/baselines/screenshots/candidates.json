@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "note": "Browser candidates only. Chris approval pending. Not automated screenshot assertions or physical-device evidence. Captured application unchanged from sourceRevision; PASS 27 documentation/QA artifact changes were uncommitted.",
+  "captures": [
+    {
+      "file": "qa/baselines/screenshots/360x800/wrestling-shows--360x800.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:37.696Z",
+      "route": "/wrestling/shows",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": "11th-anniversary-show-night-2",
+        "activeRecord": "Open 11th Anniversary Show - Night 2",
+        "documentWidth": 360,
+        "viewportWidth": 360
+      },
+      "sha256": "2373899bd2c015bcc7561903903b7f25c7fec239930b1eac3d7652e8cd3507f7",
+      "bytes": 478772,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary.",
+        "Current long campaign title is truncated on mobile; this capture does not approve that behavior."
+      ]
+    },
+    {
+      "file": "qa/baselines/screenshots/360x800/wrestling-show-080826--360x800.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:40.374Z",
+      "route": "/wrestling/shows/080826",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows/080826",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": null,
+        "activeRecord": null,
+        "documentWidth": 360,
+        "viewportWidth": 360
+      },
+      "sha256": "ef72d21db9641613f1876cd165f518c0eca94ced103404c44b5a97dab0bc82f3",
+      "bytes": 376368,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary."
+      ]
+    },
+    {
+      "file": "qa/baselines/screenshots/412x915/wrestling-shows--412x915.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:42.969Z",
+      "route": "/wrestling/shows",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": "11th-anniversary-show-night-2",
+        "activeRecord": "Open 11th Anniversary Show - Night 2",
+        "documentWidth": 412,
+        "viewportWidth": 412
+      },
+      "sha256": "771b569797842aeb5f7f5af030b208cfd2810a24a483fd8bbc8cd79c9cfba44f",
+      "bytes": 607430,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary.",
+        "Current long campaign title is truncated on mobile; this capture does not approve that behavior."
+      ]
+    },
+    {
+      "file": "qa/baselines/screenshots/412x915/wrestling-show-080826--412x915.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:45.565Z",
+      "route": "/wrestling/shows/080826",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows/080826",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": null,
+        "activeRecord": null,
+        "documentWidth": 412,
+        "viewportWidth": 412
+      },
+      "sha256": "37afcc56464d799a41b5def7fe364d1bea0693f6def2a7722e275aa62efaed72",
+      "bytes": 471435,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary."
+      ]
+    },
+    {
+      "file": "qa/baselines/screenshots/1920x1080/wrestling-shows--1920x1080.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:48.978Z",
+      "route": "/wrestling/shows",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": "11th-anniversary-show-night-2",
+        "activeRecord": "Open 11th Anniversary Show - Night 2",
+        "documentWidth": 1920,
+        "viewportWidth": 1920
+      },
+      "sha256": "32bc47968a07b40204d7bcc19dd6eb1d6921d4c5e819842a98c0f6c10be18ee1",
+      "bytes": 2855776,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary.",
+        "Current long campaign title is truncated on mobile; this capture does not approve that behavior."
+      ]
+    },
+    {
+      "file": "qa/baselines/screenshots/1920x1080/wrestling-show-080826--1920x1080.png",
+      "status": "candidate",
+      "approval": null,
+      "capturedAt": "2026-09-10T16:59:52.283Z",
+      "route": "/wrestling/shows/080826",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "browser": "Chrome 152.0.7977.84",
+      "deviceScaleFactor": 1,
+      "reducedMotion": "no-preference",
+      "capturePoint": "Direct entry; live record visible, controls ready where applicable, fonts and visible images settled, then 1500 ms. Viewport only; ambient animation continues.",
+      "sourceRevision": "3d9f02d56699029f586cad7e9f329c05e40af764",
+      "dataSource": "Existing live application API bindings; no interception or fixtures.",
+      "state": {
+        "url": "/wrestling/shows/080826",
+        "devicePixelRatio": 1,
+        "scrollX": 0,
+        "scrollY": 0,
+        "activeShowId": null,
+        "activeRecord": null,
+        "documentWidth": 1920,
+        "viewportWidth": 1920
+      },
+      "sha256": "1e77e04fbb6e2266828cedb2c755bbab0619e68b8eb01969ffefd1e9a5e3f4f2",
+      "bytes": 2373229,
+      "limitations": [
+        "Viewport capture, not full scroll coverage or motion acceptance.",
+        "Live data, running particles and Engine title morph can vary."
+      ]
+    }
+  ]
+}

@@ -28,6 +28,7 @@ Current explicit decisions win over old planning assumptions. Engineering law, c
 - [$v3-qa Skill](.agents/skills/v3-qa/SKILL.md) — proportional QA selection, browser/evidence procedure, and result format.
 - Project roles: [Scout](.codex/agents/v3-scout.toml), [Builder](.codex/agents/v3-builder.toml), [QA](.codex/agents/v3-qa.toml), [Reviewer](.codex/agents/v3-reviewer.toml). The parent coordinates; Builder is the application-writing subagent.
 - [QA harness](scripts/v3-qa.js): `npm run v3:qa -- route /wrestling/shows`; modes are `smoke`, `route /path`, `wrestling`, and `all`. Use proportional coverage; generic route health includes standard responsive/reduced-motion checks.
+- [Visual Baselines](docs/V3_VISUAL_BASELINES.md) — browser/mobile/desktop candidates, motion references, physical-device evidence and human approval; consult for relevant visual changes and regression review.
 - [Design Reference Art](docs/design/reference-art/README.md) — reference-only asset policy and Draft/Locked catalog.
 
 The workflow is operational for normal Experience Build; Current State distinguishes repository-verified tooling from dated execution reports, older module snapshots, pending upgrades, and physical/human signoff. Module Blueprint supplies reuse contracts without changing world identity. Governing creative canon and unresolved decisions remain unchanged.

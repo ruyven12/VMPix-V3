@@ -39,7 +39,7 @@ Within approved scope, investigate → implement → inspect → test → correc
 
 Use existing browser, Playwright, screenshot comparison, or verification tooling where useful. Reuse existing services. Temporary infrastructure must be necessary, proportionate, and within approved file/task scope. Verification needs do not authorize new dependencies or scope expansion. Do not stop merely because required verification exceeds an old 5–10 minute preference.
 
-Verify affected behavior, including protected surfaces affected through shared code. As applicable, check mobile/responsive layouts, direct routes and back navigation, reduced motion, overflow/scrolling, data failure states, and console/runtime failures. Correct problems and retest when safely possible. Review changed-file scope before handoff. Report tooling/ACL failures and skipped checks honestly; never present them as passed.
+Verify affected behavior, including protected surfaces affected through shared code. As applicable, check mobile/responsive layouts, direct routes and back navigation, reduced motion, overflow/scrolling, data failure states, and console/runtime failures. Correct problems and retest when safely possible. For protected surfaces, major responsive layout, approved transitions or visual regression review, consult [Visual Baselines](docs/V3_VISUAL_BASELINES.md) and relevant approved evidence; unrelated tiny changes need no baseline comparison. Review changed-file scope before handoff. Report tooling/ACL failures and skipped checks honestly; never present them as passed.
 
 ## Human approval
 

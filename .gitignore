@@ -2,3 +2,6 @@ node_modules/
 test-results/
 playwright-report/
 .playwright-cache/
+/qa-temp/playwright_chromiumdev_profile-*/
+/qa-temp/server-out.txt
+/qa-temp/server-err.txt
