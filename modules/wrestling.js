@@ -9703,6 +9703,8 @@ function syncFieldsOfConflictVenueLocationSection(dossier, venue = null) {
   }
 }
 
+let fieldsOfConflictDossierSavedContent = null;
+
 function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveVenueId()) {
   const dossier = getFieldsOfConflictDossierElement();
   if (!dossier) {
@@ -9711,7 +9713,28 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
 
   const { config, venue, fallbackConfig } = getFieldsOfConflictDossierVenueSource(venueId);
   if (!venue) {
+    destroyFieldsOfConflictVenueLocationMap();
+    if (!fieldsOfConflictDossierSavedContent) {
+      fieldsOfConflictDossierSavedContent = document.createDocumentFragment();
+      fieldsOfConflictDossierSavedContent.append(...dossier.childNodes);
+    }
+    const backButton = document.createElement("button");
+    backButton.type = "button";
+    backButton.className = "wrestling-detail-back";
+    backButton.textContent = "Back to Fields of Conflict";
+    backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingVenues));
+    dossier.replaceChildren(backButton, createWrestlingV3StateCard("unavailable", "wrestlingVenues", {
+      title: "Archive Record Unavailable",
+      text: "No matching venue record was found. Return to Fields of Conflict.",
+      retry: false,
+    }));
+    delete dossier.dataset.fieldsOfConflictVenueId;
+    dossier.setAttribute("aria-label", "Venue archive record unavailable");
     return;
+  }
+  if (fieldsOfConflictDossierSavedContent) {
+    dossier.replaceChildren(fieldsOfConflictDossierSavedContent);
+    fieldsOfConflictDossierSavedContent = null;
   }
 
   unwrapFieldsOfConflictDossierCarousel(dossier);
