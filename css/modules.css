@@ -15756,7 +15756,8 @@ button.wrestling-event-history-tagged-thumb {
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side {
-    transform: translateY(0.66rem);
+    transform: none;
+    margin-block-start: 0.66rem;
   }
 
   .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-value {
@@ -15802,6 +15803,8 @@ button.wrestling-event-history-tagged-thumb {
     overflow-y: auto;
     overscroll-behavior: contain;
     scroll-padding-block-end: 8px;
+    grid-auto-rows: max-content;
+    align-content: start;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
@@ -18838,7 +18841,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side {
-    transform: translateY(0.66rem);
+    transform: none;
+    margin-block-start: 0.66rem;
   }
 
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"] > .hall-crusades-campaign-record-detail.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] .wrestling-show-prototype-encounter-side-value {
@@ -18877,6 +18881,8 @@ button.hall-crusades-archive-crystal:focus-visible {
     overflow-y: auto;
     overscroll-behavior: contain;
     scroll-padding-block-end: 8px;
+    grid-auto-rows: max-content;
+    align-content: start;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
