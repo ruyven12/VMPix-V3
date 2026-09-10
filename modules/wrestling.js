@@ -424,6 +424,7 @@ let activeWrestlingShowsPromotionFilter = "";
 let activeWrestlingShowsVenueFilter = "";
 let activeWrestlingShowsSort = "newest";
 let hallCrusadesPosterActiveIndex = HALL_CRUSADES_POSTER_ACTIVE_SLOT;
+let hallCrusadesPosterCenteredGeometry = null;
 let hallCrusadesPosterPointerId = null;
 let hallCrusadesPosterPointerStartX = 0;
 let hallCrusadesPosterPointerStartY = 0;
@@ -3724,7 +3725,7 @@ function advanceHallCrusadesPosterActive(direction) {
   if (hallCrusadesPosterStrip) {
     hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection = directionStep > 0 ? "next" : "previous";
   }
-  renderHallCrusadesPosterStrip();
+  renderHallCrusadesPosterStrip({ mobileIndexAdvance: !isHallCrusadesPosterDesktopKeyboard() });
   return true;
 }
 
@@ -4019,6 +4020,11 @@ function syncHallCrusadesPosterStripScrollPosition() {
 
   const nextScrollLeft = activeItem.offsetLeft + activeItem.offsetWidth / 2 - hallCrusadesPosterStrip.clientWidth / 2;
   hallCrusadesPosterStrip.scrollLeft = Math.max(0, nextScrollLeft);
+  hallCrusadesPosterCenteredGeometry = {
+    slotCount: hallCrusadesPosterStrip.childElementCount,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
 }
 
 function createHallCrusadesPosterStripEmptySlot(index = 0, options = {}) {
@@ -4185,7 +4191,7 @@ function renderHallCrusadesCampaignInfoPanel(show) {
   );
 }
 
-function renderHallCrusadesPosterStrip() {
+function renderHallCrusadesPosterStrip({ mobileIndexAdvance = false } = {}) {
   if (!hallCrusadesPosterStrip) {
     renderHallCrusadesArchiveStats([]);
     clearHallCrusadesCampaignInfoPanel();
@@ -4200,6 +4206,7 @@ function renderHallCrusadesPosterStrip() {
     setHallCrusadesSearchPanelOpen(false);
     hallCrusadesPosterStrip.hidden = true;
     hallCrusadesPosterStrip.replaceChildren();
+    hallCrusadesPosterCenteredGeometry = null;
     renderHallCrusadesArchiveStats([]);
     syncHallCrusadesPosterNavControls(0);
     clearHallCrusadesCampaignInfoPanel();
@@ -4235,11 +4242,19 @@ function renderHallCrusadesPosterStrip() {
   hallCrusadesPosterStrip.dataset.hallCrusadesFieldFilter = activeHallCrusadesFieldFilter;
   hallCrusadesPosterStrip.dataset.hallCrusadesSearchQuery = activeHallCrusadesSearchQuery;
   hallCrusadesPosterStrip.replaceChildren(fragment);
-  syncHallCrusadesPosterStripScrollPosition();
+  // Index-only mobile moves retain the centered slot, including endpoint placeholders.
+  const canRetainCenter = mobileIndexAdvance
+    && hallCrusadesPosterCenteredGeometry?.slotCount === posterRows.length
+    && hallCrusadesPosterCenteredGeometry.width === window.innerWidth
+    && hallCrusadesPosterCenteredGeometry.height === window.innerHeight;
+  if (!canRetainCenter) {
+    syncHallCrusadesPosterStripScrollPosition();
+  }
   syncHallCrusadesPosterNavControls(posterSourceRows.length);
   if (!isHallCrusadesCampaignLockActive() && activeShow && !isHallCrusadesCampaignRecordResolutionPrepared(activeShow)) {
     clearHallCrusadesCampaignRecordResolution();
-    queueHallCrusadesCampaignRecordPreparation(activeShow, 60);
+    // Keep speculative dossier work outside the existing 420 ms mobile cover-flow animation.
+    queueHallCrusadesCampaignRecordPreparation(activeShow, mobileIndexAdvance ? 420 : 60);
   }
   syncHallCrusadesYearControls();
   syncHallCrusadesBannerControls();
