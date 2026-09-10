@@ -8,6 +8,8 @@ VMPix-V3 is the definitive frontend rebuild. Experience Build is the current pha
 2. [PROJECT_RULES.md](docs/PROJECT_RULES.md) — permanent engineering and architectural law.
 3. [V3_EXPERIENCE_BUILD_RULES.md](docs/V3_EXPERIENCE_BUILD_RULES.md) — current workflow, protection, verification, and signoff.
 4. [World Bible](docs/design/world-bible.md) — creative, narrative, lore, world identity, and protected creative authority.
+   Consult [Protected Decisions](docs/V3_PROTECTED_DECISIONS.md) before touching protected experiences, shared Shell, Engine Bar, approved animation, established world identity, or task-implicated route/data conventions.
+
 5. Relevant specialized references: [Route Manifest](docs/V3_ROUTE_MANIFEST.md), [Module Status](docs/V3_MODULE_STATUS.md), [Data Contracts](docs/V3_DATA_CONTRACTS.md), and [UI Animation Checklist](docs/CODEX_UI_ANIMATION_CHECKLIST.md). Use [README](README.md) to locate other directly relevant references.
 6. Historical/future plans — reference only; never override current governing documents or authorize implementation.
 

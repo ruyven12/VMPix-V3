@@ -9,6 +9,8 @@ Start with root [AGENTS.md](AGENTS.md), the active AI/Codex operating entry poin
 1. [PROJECT_RULES.md](docs/PROJECT_RULES.md) — **CURRENT / AUTHORITATIVE** permanent engineering/project law and instruction classifications.
 2. [V3_EXPERIENCE_BUILD_RULES.md](docs/V3_EXPERIENCE_BUILD_RULES.md) — **CURRENT / AUTHORITATIVE** phase process, scoped iteration, verification, and human signoff.
 3. [World Bible](docs/design/world-bible.md) — creative/narrative authority and **PROTECTED DECISION** records for worlds, lore, Home, and Interactive Portfolio.
+   Consult [Protected Decisions](docs/V3_PROTECTED_DECISIONS.md) for the sourced index of locked experiences, protected systems, approval boundaries, and unresolved decisions before relevant changes.
+
 4. Read the task-relevant specialized references below.
 5. Consult historical/future plans for rationale, never to override current governing rules.
 
