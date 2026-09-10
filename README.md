@@ -4,7 +4,7 @@ Frontend source of truth for the VMPix V3 public experience, universal Shell, sh
 
 ## Documentation authority and reading order
 
-A future root AGENTS.md will become Codex's concise operating entry point. It is deliberately not created in PASS 2. Until then, start here:
+Start with root [AGENTS.md](AGENTS.md), the active AI/Codex operating entry point, then follow this governing documentation order:
 
 1. [PROJECT_RULES.md](docs/PROJECT_RULES.md) — **CURRENT / AUTHORITATIVE** permanent engineering/project law and instruction classifications.
 2. [V3_EXPERIENCE_BUILD_RULES.md](docs/V3_EXPERIENCE_BUILD_RULES.md) — **CURRENT / AUTHORITATIVE** phase process, scoped iteration, verification, and human signoff.
@@ -20,7 +20,7 @@ Current explicit decisions win over old planning assumptions. Engineering law, c
 - [Module Status](docs/V3_MODULE_STATUS.md) — recorded readiness and QA needs.
 - [Data Contracts](docs/V3_DATA_CONTRACTS.md) — frontend tolerance principles and proposed backend payloads.
 - [UI Animation Checklist](docs/CODEX_UI_ANIMATION_CHECKLIST.md) — focused inspection, regression checks, and handoff evidence.
-- [Codex Pass Template](docs/CODEX_PASS_TEMPLATE.md) — task scope and acceptance details; retained pending later AGENTS.md simplification.
+- [Codex Pass Template](docs/CODEX_PASS_TEMPLATE.md) — concise task scope and acceptance details; permanent rules are inherited from AGENTS.md and governing documentation.
 - [Design Reference Art](docs/design/reference-art/README.md) — reference-only asset policy and Draft/Locked catalog.
 
 Current-state claims are retained documentation snapshots, not runtime verification performed by PASS 2. World Bible records Home/Portfolio as protected and identifies The Story, The Trajectory, and The Comms as the creative focus; pending QA and contradictory status labels remain flagged in the relevant documents.

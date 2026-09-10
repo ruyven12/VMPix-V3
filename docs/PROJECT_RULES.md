@@ -2,7 +2,7 @@
 
 ## Authority and rule preservation
 
-Classification: **CURRENT / AUTHORITATIVE**. This is permanent V3 engineering/project law. Read this document first, then [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), then [World Bible](design/world-bible.md) for creative work and the task-relevant specialized references. [README](../README.md) owns the documentation reading map. A future root AGENTS.md will be the concise Codex operating entry point; it is not created by this pass.
+Classification: **CURRENT / AUTHORITATIVE**. This is permanent V3 engineering/project law. After root [AGENTS.md](../AGENTS.md), read this document, then [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), then [World Bible](design/world-bible.md) for creative work and the task-relevant specialized references. [README](../README.md) owns the documentation reading map. Root [AGENTS.md](../AGENTS.md) is the active AI/Codex operating entry point.
 
 Current explicit decisions supersede old planning assumptions. Creative identity and protected assets remain governed by World Bible; engineering rules do not authorize creative redesign, and creative direction does not waive architecture, accessibility, performance, or approval requirements. Preserve and flag unresolved conflicts for Chris instead of silently choosing a new decision.
 

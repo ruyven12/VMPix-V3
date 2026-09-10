@@ -1,146 +1,64 @@
 # Codex Pass Template
 
-## Required reading and authority
+Fill in the task fields below. Permanent rules are inherited from root [AGENTS.md](../AGENTS.md), [PROJECT_RULES.md](PROJECT_RULES.md), and [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), in that reading order. Follow their authority hierarchy and relevant specialized references; this template does not replace them.
 
-Classification: **CURRENT / SPECIALIZED** task template. Read [PROJECT_RULES.md](PROJECT_RULES.md), [Experience Build rules](V3_EXPERIENCE_BUILD_RULES.md), [World Bible](design/world-bible.md) for creative/protected work, and task-relevant route, data, status, and [animation QA](CODEX_UI_ANIMATION_CHECKLIST.md) references, in that order. [README](../README.md) provides the full authority map.
-
-Permanent rules below remain intentionally repeated until a later root AGENTS.md establishes the operating entry point. This template does not supersede governing instructions. Retain exact task scope, one story beat/change for creative passes, affected protected surfaces, supplied references, acceptance criteria, and explicit exceptions. Technical completion and Chris's subjective creative/device signoff must be reported separately.
-
-Use this template when starting a VMPix-V3 Codex pass. Fill in the bracketed fields before handing the task to Codex.
-
-## Project Name
+## Project
 
 Website-V3 / VMPix-V3
 
-## Current Task
+## Task
 
-[Describe the exact task for this pass.]
+[Exact task for this pass.]
 
-## Repo Path
+## Story / Intended Result
 
-```text
-C:\Users\deysx\Documents\GitHub\VMPix-V3
-```
+[What the user should see, what the system should do, and what the experience should communicate. For non-creative work, describe the functional end state.]
 
 ## Files Allowed
 
-- [List exact files or directories Codex may edit.]
-- Keep the allowed scope as small as possible.
-- Documentation-only tasks should stay inside `docs/` unless explicitly stated.
+- Inspect: [Exact files necessary for this pass, in addition to governing instructions.]
+- Edit: [Exact files that may be changed.]
 
-## Files Not Allowed
+Keep scope as small as practical.
 
-- [List exact files or directories Codex must not edit.]
-- V2 repositories and live-site systems are not allowed.
-- Do not edit unrelated app files.
-- Do not edit dependency files unless explicitly approved.
+## Files Forbidden / Protected
 
-## Goal
+[Specific forbidden files and protected surfaces potentially affected by this pass.]
 
-[Describe the intended end state.]
+Permanent restrictions are inherited; do not recopy them. Listing a protected surface does not authorize redesign.
 
-The result should be complete, ready to use, and consistent with V3 project rules.
+## Acceptance Criteria
 
-## Design Rules
+[Measurable or observable conditions defining completion.]
 
-- Preserve the existing V3 design language.
-- No accidental redesigns.
-- Use the restrained cinematic HUD style already established by V3.
-- Keep visual changes scoped to the task.
-- Favor clarity, usability, and consistency over spectacle.
-- Avoid broad restyling unless explicitly requested.
+Include only relevant criteria: exact behavior/data result, visual target/timing, route/back behavior, required devices/viewports, reduced motion, or specific regression protections.
 
-## Architecture Rules
+## References
 
-- Surgical edits only.
-- Shell-first: the shell owns routing, layout, transitions, navigation, viewport behavior, overlays, and global shell state.
-- Modules remain independent and own content, local drilldowns, data rendering, loading states, empty states, and error states.
-- Static-first: default to HTML, CSS, and vanilla JavaScript.
-- Backend-first: VMPix-Data is the future backend/API source of truth.
-- No frameworks unless explicitly approved.
-- No new dependencies unless explicitly approved.
-- No V2 edits.
-- Do not move, rename, or rewrite unrelated files.
+[Optional screenshots, recordings, approved prototypes, donor files, API routes, or documentation; identify the relevant part and purpose.]
 
-## Responsive Requirements
+## Explicit Exceptions
 
-- Mobile-first always.
-- Samsung S25 Ultra and mobile webview safety matter.
-- Test mobile and desktop when UI behavior changes.
-- Avoid horizontal overflow.
-- Avoid text, controls, media, cards, overlays, and navigation overlap.
-- Keep touch targets usable.
-- Account for safe areas and dynamic mobile viewport behavior.
-- Avoid nested scroll traps.
+[Only restrictions this task explicitly authorizes overriding, with exact scope.]
 
-## Route Requirements
+None.
 
-- Do not change routes unless explicitly requested.
-- Keep public routes stable.
-- Check direct routes when route behavior changes.
-- Browser/back behavior must remain predictable.
-- Deep links should resolve to coherent shell states.
-- Modules must not create competing routers.
-- Preserve the Render SPA fallback requirement:
+## Verification
 
-```text
-Source: /*
-Destination: /index.html
-Action: Rewrite
-```
+Follow AGENTS.md and relevant specialized documentation. [Specify any task-specific required checks or evidence.]
 
-## Performance/Safety Rules
+Use proportional syntax/runtime checks, existing Playwright/browser inspection, screenshots, responsive checks, direct-route/back checks, reduced-motion checks, console checks, and diff review as relevant.
 
-- Performance matters.
-- Prefer lightweight animation.
-- Use transform and opacity for motion where possible.
-- Respect reduced-motion preferences.
-- Avoid heavy blur stacks, excessive particles, giant shadows, and expensive filters on mobile.
-- Critical UI must remain usable if advanced effects, media, API data, or scripts fail.
-- Frontend modules must tolerate missing, partial, delayed, or failed API data.
-- Do not block shell rendering on live data.
+**Scope stays small. Verification may be thorough.**
 
-## Do Not List
+Implement → inspect → test → correct → retest within approved scope.
 
-Do not:
+## Return
 
-- Edit app code for documentation-only tasks.
-- Change routes unless explicitly requested.
-- Touch V2.
-- Add dependencies.
-- Introduce frameworks.
-- Rework layout architecture without approval.
-- Replace the shell pattern.
-- Wire live backend data unless explicitly requested.
-- Change deployment targets.
-- Make destructive edits.
-- Perform broad formatting churn.
-- Leave placeholder-only or partial files unless the task is explicitly a template or planning document.
+Keep the handoff concise:
 
-## Sanity Checks
-
-Before returning, Codex should check:
-
-- Files edited are only within the allowed list.
-- No files from the not-allowed list were touched.
-- No dependencies were added.
-- No routes were changed unless requested.
-- No V2 files were touched.
-- Existing design language was preserved.
-- Mobile-first constraints were considered.
-- Horizontal overflow risk was checked for UI changes.
-- Mobile and desktop were tested when UI behavior changed.
-- Direct routes were checked when route behavior changed.
-- Loading, empty, and error states were considered when data behavior changed.
-- The final files are complete and ready to use.
-
-## Return Format
-
-Return:
-
-- Files edited.
-- Summary of changes.
-- Test results or sanity-check results.
-- Any known limitations or follow-up work.
-
-For UI or route work, include mobile/desktop test results and direct-route checks. For documentation-only work, state that no app code, routes, V2 files, or dependencies were changed.
+- Files inspected.
+- Files changed.
+- Result.
+- Verification.
+- Remaining human-review item or limitation, if any.
