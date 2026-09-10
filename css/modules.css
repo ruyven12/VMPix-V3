@@ -16203,6 +16203,12 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 @media (max-width: 540px) {
+  .site-shell.is-wrestling-show-detail-view:not(.is-hall-crusades-campaign-route-promoting):has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail])::before,
+  .site-shell.is-wrestling-show-detail-view:not(.is-hall-crusades-campaign-route-promoting):has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]) .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]:not([data-hall-crusades-campaign-record-detail])::after {
+    content: "";
+    display: block;
+  }
+
   .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::before,
   .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]::before {
     inset-block-start: max(0.34rem, env(safe-area-inset-top));
