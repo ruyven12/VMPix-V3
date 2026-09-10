@@ -6,11 +6,11 @@
 - Purpose: Current project-state snapshot
 - Status: Active / frequently updated
 - Last reviewed: 2026-09-10
-- Basis: Chris's PASS 5 direction and the linked documentation; no application, API, browser, or physical-device validation was performed in this pass.
+- Basis: Chris's PASS 5 direction, PASS 6 Wrestling source inspection, and PASS 7 documentation synchronization (2026-09-10). No browser, remote-service, or physical-device validation was performed in PASS 6 or PASS 7.
 
 Read [AGENTS.md](../AGENTS.md) first. This file records **state, not permanent law**; engineering, workflow, and creative authority remain in the governing documents.
 
-Evidence labels: **Approved/documented decision** records direction or protection; **Documented implementation — runtime verification pending** records reported or previously documented work, not a passing runtime check; **Pending QA/signoff** means evidence or human acceptance remains outstanding. Future work is not implemented or newly authorized by this record. No application-runtime facts were newly verified in PASS 5.
+Evidence labels: **Approved/documented decision** records direction or protection; **Documented implementation — runtime verification pending** records reported or previously documented work, not a passing runtime check; **Pending QA/signoff** means evidence or human acceptance remains outstanding. Future work is not implemented or newly authorized by this record. **Source-verified implementation** means code presence confirmed in PASS 6. Runtime/browser verification, physical-device QA, and human creative signoff are separate evidence stages; none implies the next.
 
 ## 2. Current Build Phase
 
@@ -39,19 +39,29 @@ Canonical protection details: [Project Rules](PROJECT_RULES.md), [Home Story / E
 
 ## 5. Wrestling Current State
 
-Current work is experience completion/polish. Chris's PASS 5 direction identifies these areas; it does not certify their completion:
+PASS 6 confirms a current Shell-integrated implementation with frontend API bindings, beyond the earlier mock-only inventory. These statuses describe source implementation, not runtime acceptance or human visual signoff.
 
-| Area | Current evidence/state |
+| Surface | Source-verified status |
 | --- | --- |
-| Daïion / Wrestling landing | Current name supplied by Chris; /wrestling is documented in the route manifest. |
-| Hall of Crusades / Shows | Current name supplied by Chris; show relationships and show detail/gallery surfaces are recorded in the mock inventory. |
-| Hall of Champions / People | Current name supplied by Chris; people/officials, person detail, and event/match history are documented. |
-| Fields of Conflict / Venues | Current name supplied by Chris; venues and venue/event detail histories are documented. |
-| Galleries/lightbox | Show/match/media relationship hooks and gallery/lightbox surfaces are documented. |
+| Daïion / Wrestling landing | Implemented/current. |
+| Hall of Crusades / Shows | Implemented/current. |
+| Hall of Champions / People | Implemented/current. |
+| Fields of Conflict / Venues | Partial/in progress: some coordinate configuration remains temporary. |
+| Person dossier | Implemented/current. |
+| Venue dossier | Implemented/current with partial-data fallback. |
+| Show / Campaign detail | Implemented/current. |
+| Match dossier/gallery | Partial/in progress: failure-state behavior remains incomplete. |
+| Match photo lightbox | Implemented/current; runtime acceptance still pending. |
 
-All rows: **Documented implementation — runtime verification pending**. The names above describe current areas, not new lore or invented URLs. Exact Wrestling drilldown path patterns are not established by the inspected route manifest; verify them before recording or changing contracts.
+The [Route Manifest](V3_ROUTE_MANIFEST.md) owns the exact nine canonical routes, compatibility inputs, retired paths, and API endpoint inventory. [Module Status](V3_MODULE_STATUS.md) records per-surface live/fallback behavior. The earlier [mock inventory](V3_MOCK_DATA_INVENTORY.md) and [Data Contracts](V3_DATA_CONTRACTS.md) remain historical/proposal references, not proof of current API behavior.
 
-Architecture evidence shows a Shell-routed world with module rendering/adaptation and people, venues, shows, matches, participants/winners, referees, and tagged-media relationships. [Mock inventory](V3_MOCK_DATA_INVENTORY.md) records earlier adapter/snapshot implementation; [Data Contracts](V3_DATA_CONTRACTS.md) records relationship proposals. These support architecture history, not proof of current live API wiring. Per-surface completion, API binding, and signoff evidence remain to be recorded.
+Shell integration is source-verified: shared routing/state, browser `popstate` synchronization, Engine/back mappings for drilldowns, and direct mounts that can establish entered-state without Home ignition. **Engine Bar cold-entry / return-Home lifecycle still requires explicit contract verification.**
+
+Some Wrestling module and inline venue code directly mutates Shell classes/datasets. **Architecture review item — not authorization to refactor.** Protected Shell ownership and Engine Bar behavior remain governing rules.
+
+**Factual unfinished area:** Match dossier/gallery failure-state behavior remains incomplete. An unresolved match falls back to a generic `Side Pending` record.
+
+**Recommended next Wrestling implementation pass:** verify missing-show, missing-match, and timeout behavior in-browser, then implement one clear recoverable unavailable state if needed. This recommendation does not start or authorize implementation.
 
 ## 6. Music Current State
 
@@ -70,7 +80,7 @@ PostgreSQL/VMPix-Data remains the backend source of truth. Chris reports substan
 
 Relationship architecture is documented through stable IDs, venue joins, shows/matches/people, winners, tags, and derived counts. Earlier frontend adapters and backend-shaped snapshots are recorded; diagnostics requirements and editing safeguards are documented in the [Admin Editing Roadmap](V3_ADMIN_EDITING_ROADMAP.md).
 
-Exact deployed diagnostics coverage, payload compatibility, and frontend API integration by surface are **verification pending**. The inspected references do not establish those current operational facts. Do not reuse old blanket "no API integration" claims, infer that every surface is live, or treat historical mock envelopes as live responses.
+Wrestling frontend bindings to `https://vmpix-data.onrender.com` are source-verified: shows/people/venues statistics and database endpoints. **Source binding verified; remote service success was not runtime-tested in PASS 6.** See the [endpoint inventory](V3_ROUTE_MANIFEST.md) and [surface fallback summary](V3_MODULE_STATUS.md). Deployed diagnostics, payload compatibility, and non-Wrestling integration remain **verification pending**. Do not infer that every surface is live or treat historical mock envelopes as live responses.
 
 ## 8. QA State
 
@@ -81,7 +91,9 @@ Current target matrix supplied by Chris:
 - 1920×1080.
 - iPhone Safari; Facebook, Messenger, and Instagram webviews.
 
-Automated/browser QA: no current application test results established by this documentation pass. Older Music landing coverage is recorded, but needs current evidence before a pass claim.
+PASS 6 inspected test assertions for Wrestling route navigation, detail drilldowns, photo navigation/back, overflow, touch targets, console errors, and empty/delayed/missing-data cases. These are coverage in test source, not passing results; no tests were run in PASS 6 or PASS 7.
+
+Known drift/gaps: the existing "S25 Ultra" test uses 384×854 rather than 412×915; no verified 1920×1080 Wrestling coverage was found; explicit reduced-motion assertions were not found; some selectors, routes, and assertions target replaced UI. The standard 360×800, 412×915, and 1920×1080 targets remain required, with no current pass claimed. Webview emulation is not physical webview verification. Remote API success and missing-show/missing-match/timeout recovery still need browser verification. Older Music coverage remains unverified here.
 
 Physical-device QA: tracked separately from viewport emulation; Home final mobile validation remains pending in its source. Other device coverage requires confirmation.
 
