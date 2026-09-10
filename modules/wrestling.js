@@ -444,6 +444,7 @@ let isHallCrusadesCampaignCharging = false;
 let isHallCrusadesCampaignRuptureReady = false;
 let isHallCrusadesCampaignExpanding = false;
 let isHallCrusadesCampaignExpanded = false;
+let isHallCrusadesCampaignMobilePreparedExpansion = false;
 let hallCrusadesCampaignChargeStartTimer = 0;
 let hallCrusadesCampaignRuptureReadyTimer = 0;
 let hallCrusadesCampaignExpansionFrame = 0;
@@ -1736,12 +1737,13 @@ function syncHallCrusadesCampaignLockShell() {
   const isRuptureReady = isLockActive && isHallCrusadesCampaignRuptureReady;
   const isExpanding = isLockActive && isHallCrusadesCampaignExpanding;
   const isExpanded = isLockActive && isHallCrusadesCampaignExpanded;
+  const canRevealRecord = isExpanded || (isExpanding && isHallCrusadesCampaignMobilePreparedExpansion && isHallCrusadesCampaignRecordResolutionPrepared());
   wrestlingShowsShell.classList.toggle("is-campaign-locking", isLockActive);
   wrestlingShowsShell.classList.toggle("is-campaign-charging", isCharging);
   wrestlingShowsShell.classList.toggle("is-campaign-rupture-ready", isRuptureReady);
   wrestlingShowsShell.classList.toggle("is-campaign-expanding", isExpanding);
   wrestlingShowsShell.classList.toggle("is-campaign-expanded", isExpanded);
-  wrestlingShowsShell.classList.toggle("is-campaign-record-resolving", Boolean(isExpanded && hallCrusadesCampaignResolutionState));
+  wrestlingShowsShell.classList.toggle("is-campaign-record-resolving", Boolean(canRevealRecord && hallCrusadesCampaignResolutionState));
   if (isLockActive && hallCrusadesCampaignLockShowId) {
     wrestlingShowsShell.dataset.hallCrusadesCampaignLockShowId = hallCrusadesCampaignLockShowId;
     wrestlingShowsShell.dataset.hallCrusadesCampaignChargeState = getHallCrusadesCampaignChargeState();
@@ -1751,7 +1753,7 @@ function syncHallCrusadesCampaignLockShell() {
     } else {
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignExpansionState;
     }
-    if (isExpanded && hallCrusadesCampaignResolutionState) {
+    if (canRevealRecord && hallCrusadesCampaignResolutionState) {
       wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState = hallCrusadesCampaignResolutionState;
     } else {
       delete wrestlingShowsShell.dataset.hallCrusadesCampaignResolutionState;
@@ -1798,6 +1800,7 @@ function clearHallCrusadesCampaignRecordPreparationRequest() {
 }
 
 function clearHallCrusadesCampaignExpansionGeometry() {
+  isHallCrusadesCampaignMobilePreparedExpansion = false;
   if (!wrestlingShowsShell) {
     return;
   }
@@ -1876,6 +1879,12 @@ function queueHallCrusadesCampaignMobileCover(next) {
   if (!isHallCrusadesCampaignMobileCoverViewport()) {
     next?.();
     return false;
+  }
+
+  if (isHallCrusadesCampaignMobilePreparedExpansion && hallCrusadesCampaignResolutionState === "matches" && isHallCrusadesCampaignRecordResolutionPrepared()) {
+    // The frame already fits the visible dossier; proceed directly to its perimeter fade.
+    next?.();
+    return true;
   }
 
   const record = getHallCrusadesCampaignActiveRecord();
@@ -2650,6 +2659,11 @@ function scheduleHallCrusadesCampaignRecordResolution() {
     return;
   }
 
+  if (isHallCrusadesCampaignMobilePreparedExpansion && hallCrusadesCampaignResolutionState === "matches") {
+    scheduleHallCrusadesCampaignRoutePromotion();
+    return;
+  }
+
   setHallCrusadesCampaignResolutionState("empty");
   if (typeof window === "undefined") {
     setHallCrusadesCampaignResolutionState("matches");
@@ -2759,6 +2773,22 @@ function setHallCrusadesCampaignExpansionGeometry(record, variableTarget = wrest
   setVar("--hall-crusades-campaign-overshoot-y", overshootY);
   setVar("--hall-crusades-campaign-overshoot-width", overshootWidth);
   setVar("--hall-crusades-campaign-overshoot-height", overshootHeight);
+  if (variableTarget === wrestlingShowsShell) {
+    isHallCrusadesCampaignMobilePreparedExpansion = false;
+    if (isHallCrusadesCampaignMobileCoverViewport() && isHallCrusadesCampaignRecordResolutionPrepared()) {
+      const surfaceRect = getHallCrusadesCampaignExistingRecordDetailHost()?.querySelector(".wrestling-show-prototype-surface")?.getBoundingClientRect();
+      if (surfaceRect?.width > 0 && surfaceRect?.height > 0) {
+        // Land on the prepared dossier once, without overshooting or a second viewport growth.
+        ["target", "overshoot"].forEach((stage) => {
+          setVar(`--hall-crusades-campaign-${stage}-x`, surfaceRect.left);
+          setVar(`--hall-crusades-campaign-${stage}-y`, surfaceRect.top);
+          setVar(`--hall-crusades-campaign-${stage}-width`, surfaceRect.width);
+          setVar(`--hall-crusades-campaign-${stage}-height`, surfaceRect.height);
+        });
+        isHallCrusadesCampaignMobilePreparedExpansion = true;
+      }
+    }
+  }
   return true;
 }
 
@@ -2767,6 +2797,10 @@ function beginHallCrusadesCampaignExpansion() {
     return;
   }
 
+  if (isHallCrusadesCampaignMobileCoverViewport()) {
+    clearHallCrusadesCampaignRecordPreparationRequest();
+    prepareHallCrusadesCampaignRecordResolution();
+  }
   const record = getHallCrusadesCampaignActiveRecord();
   if (!setHallCrusadesCampaignExpansionGeometry(record)) {
     return;
@@ -2787,6 +2821,16 @@ function beginHallCrusadesCampaignExpansion() {
   const expansionDuration = isReducedMotion
     ? HALL_CRUSADES_CAMPAIGN_EXPANSION_REDUCED_MOTION_MS
     : HALL_CRUSADES_CAMPAIGN_EXPANSION_DURATION_MS;
+  if (isHallCrusadesCampaignMobilePreparedExpansion) {
+    // Overlap the existing 320 ms content reveal with the final part of expansion.
+    const revealTimer = window.setTimeout(() => {
+      hallCrusadesCampaignResolutionTimers = hallCrusadesCampaignResolutionTimers.filter((timer) => timer !== revealTimer);
+      if (isHallCrusadesCampaignLockActive() && isHallCrusadesCampaignExpanding && isHallCrusadesCampaignRecordResolutionPrepared()) {
+        setHallCrusadesCampaignResolutionState("matches");
+      }
+    }, isReducedMotion ? 0 : Math.max(0, expansionDuration - 320));
+    hallCrusadesCampaignResolutionTimers.push(revealTimer);
+  }
   hallCrusadesCampaignExpansionCompleteTimer = window.setTimeout(() => {
     hallCrusadesCampaignExpansionCompleteTimer = 0;
     if (!isHallCrusadesCampaignLockActive()) {
