@@ -1,0 +1,38 @@
+{
+  "decodes": [
+    {
+      "t": 2252.1999999997206,
+      "src": "https://qa.invalid/0.png"
+    },
+    {
+      "t": 2254.6999999997206,
+      "src": "https://qa.invalid/1.png"
+    },
+    {
+      "t": 2256.7999999998137,
+      "src": "https://qa.invalid/2.png"
+    },
+    {
+      "t": 2259.399999999907,
+      "src": "https://qa.invalid/3.png"
+    },
+    {
+      "t": 2262.399999999907,
+      "src": "https://qa.invalid/4.png"
+    },
+    {
+      "t": 2265,
+      "src": "https://qa.invalid/5.png"
+    }
+  ],
+  "data": {
+    "recordPreloadStarted": "2137.5999999996275",
+    "recordHeaderSettled": "2897.1999999997206",
+    "recordInfoState": "visible",
+    "recordPhotoState": "partial",
+    "recordPhotosReady": "6",
+    "recordPhotoReveal": "3114.7999999998137",
+    "recordFirstRevealReady": "6",
+    "recordRemainderStarted": "3114.899999999907"
+  }
+}

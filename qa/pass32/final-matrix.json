@@ -1,0 +1,590 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "motion": "no-preference",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "1908.6000000000931",
+        "recordHeaderSettled": "2567.399999999907",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2801.399999999907",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2801.399999999907"
+      },
+      "hero": {
+        "x": 9,
+        "y": 22.390625,
+        "width": 342,
+        "height": 53.734375,
+        "top": 22.390625,
+        "right": 351,
+        "bottom": 76.125,
+        "left": 9
+      },
+      "content": {
+        "x": 0,
+        "y": 76.125,
+        "width": 360,
+        "height": 570.28125,
+        "top": 76.125,
+        "right": 360,
+        "bottom": 646.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 9,
+        "y": 76.125,
+        "width": 342,
+        "height": 171.296875,
+        "top": 76.125,
+        "right": 351,
+        "bottom": 247.421875,
+        "left": 9
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077508747
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077508748
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077508748
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077508749
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077508750
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077508750
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077509564
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077509564
+      }
+    ],
+    "errs": []
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "motion": "reduce",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "2166.5",
+        "recordHeaderSettled": "2264.7000000001863",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2296.7000000001863",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2296.7000000001863"
+      },
+      "hero": {
+        "x": 9,
+        "y": 22.390625,
+        "width": 342,
+        "height": 53.734375,
+        "top": 22.390625,
+        "right": 351,
+        "bottom": 76.125,
+        "left": 9
+      },
+      "content": {
+        "x": 0,
+        "y": 76.125,
+        "width": 360,
+        "height": 570.28125,
+        "top": 76.125,
+        "right": 360,
+        "bottom": 646.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 9,
+        "y": 76.125,
+        "width": 342,
+        "height": 171.296875,
+        "top": 76.125,
+        "right": 351,
+        "bottom": 247.421875,
+        "left": 9
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077512408
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077512411
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077512411
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077512412
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077512413
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077512413
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077512464
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077512465
+      }
+    ],
+    "errs": []
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "motion": "no-preference",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "2116.899999999907",
+        "recordHeaderSettled": "2760.600000000093",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2978",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2978"
+      },
+      "hero": {
+        "x": 10.296875,
+        "y": 25.609375,
+        "width": 391.40625,
+        "height": 47.09375,
+        "top": 25.609375,
+        "right": 401.703125,
+        "bottom": 72.703125,
+        "left": 10.296875
+      },
+      "content": {
+        "x": 0,
+        "y": 72.703125,
+        "width": 412,
+        "height": 688.703125,
+        "top": 72.703125,
+        "right": 412,
+        "bottom": 761.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 10.296875,
+        "y": 72.703125,
+        "width": 391.40625,
+        "height": 183.15625,
+        "top": 72.703125,
+        "right": 401.703125,
+        "bottom": 255.859375,
+        "left": 10.296875
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077515178
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077515179
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077515183
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077515183
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077515184
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077515184
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077515970
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077515970
+      }
+    ],
+    "errs": []
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "motion": "reduce",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "2141.399999999907",
+        "recordHeaderSettled": "2239.399999999907",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2271.5",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2271.5"
+      },
+      "hero": {
+        "x": 10.296875,
+        "y": 25.609375,
+        "width": 391.40625,
+        "height": 47.09375,
+        "top": 25.609375,
+        "right": 401.703125,
+        "bottom": 72.703125,
+        "left": 10.296875
+      },
+      "content": {
+        "x": 0,
+        "y": 72.703125,
+        "width": 412,
+        "height": 688.703125,
+        "top": 72.703125,
+        "right": 412,
+        "bottom": 761.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 10.296875,
+        "y": 72.703125,
+        "width": 391.40625,
+        "height": 183.15625,
+        "top": 72.703125,
+        "right": 401.703125,
+        "bottom": 255.859375,
+        "left": 10.296875
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077518765
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077518766
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077518769
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077518770
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077518770
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077518771
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077518820
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077518821
+      }
+    ],
+    "errs": []
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "motion": "no-preference",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "2459.100000000093",
+        "recordHeaderSettled": "3210.7000000001863",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "3444.5",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "3444.5"
+      },
+      "hero": {
+        "x": 448,
+        "y": 25.90625,
+        "width": 1024,
+        "height": 65.265625,
+        "top": 25.90625,
+        "right": 1472,
+        "bottom": 91.171875,
+        "left": 448
+      },
+      "content": {
+        "x": 0,
+        "y": 91.171875,
+        "width": 1920,
+        "height": 835.234375,
+        "top": 91.171875,
+        "right": 1920,
+        "bottom": 926.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 448,
+        "y": 102.6875,
+        "width": 1024,
+        "height": 268.453125,
+        "top": 102.6875,
+        "right": 1472,
+        "bottom": 371.140625,
+        "left": 448
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077521916
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077521917
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077521917
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077521918
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077521918
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077521919
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077522827
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077522827
+      }
+    ],
+    "errs": []
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "motion": "reduce",
+    "result": {
+      "data": {
+        "recordPreloadStarted": "2161.100000000093",
+        "recordHeaderSettled": "2257.5",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2291.1999999997206",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2291.1999999997206"
+      },
+      "hero": {
+        "x": 448,
+        "y": 25.90625,
+        "width": 1024,
+        "height": 65.265625,
+        "top": 25.90625,
+        "right": 1472,
+        "bottom": 91.171875,
+        "left": 448
+      },
+      "content": {
+        "x": 0,
+        "y": 91.171875,
+        "width": 1920,
+        "height": 835.234375,
+        "top": 91.171875,
+        "right": 1920,
+        "bottom": 926.40625,
+        "left": 0
+      },
+      "metadata": {
+        "x": 448,
+        "y": 102.6875,
+        "width": 1024,
+        "height": 268.453125,
+        "top": 102.6875,
+        "right": 1472,
+        "bottom": 371.140625,
+        "left": 448
+      },
+      "overflow": 0,
+      "ids": [
+        "qa-0",
+        "qa-1",
+        "qa-2",
+        "qa-3",
+        "qa-4",
+        "qa-5"
+      ],
+      "ready": true
+    },
+    "next": [
+      "qa-6",
+      "qa-7"
+    ],
+    "req": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789077526538
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789077526538
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789077526539
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789077526540
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789077526540
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789077526540
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789077526594
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789077526596
+      }
+    ],
+    "errs": []
+  }
+]
