@@ -5421,20 +5421,18 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0, show = nul
   card.className = "wrestling-show-prototype-encounter-card";
   card.dataset.wrestlingMatchRef = matchRef;
   card.dataset.wrestlingMatchRoute = matchRoute;
-  card.setAttribute("role", "link");
+  card.setAttribute("role", "button");
   card.tabIndex = 0;
-  card.setAttribute("aria-label", `Open match ${matchIndex + 1}: ${encounter.heading}`);
+  card.setAttribute("aria-label", `Preview match ${matchIndex + 1}: ${encounter.heading}`);
 
-  const navigateToMatch = () => {
-    if (matchRoute && typeof navigateToRoute === "function") {
-      navigateToRoute(matchRoute);
-    }
+  const previewMatch = () => {
+    startHallEncounterSelectionPrototype(card, match);
   };
-  card.addEventListener("click", navigateToMatch);
+  card.addEventListener("click", previewMatch);
   card.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      navigateToMatch();
+      previewMatch();
     }
   });
   if (encounter.segmentInfo) {
@@ -5517,6 +5515,277 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0, show = nul
   return card;
 }
 
+// PASS 31 is local visual state: the destination factory supplies only its header.
+let hallEncounterSelectionPrototype = null;
+
+function startHallEncounterSelectionPrototype(card, match) {
+  if (hallEncounterSelectionPrototype || !card.isConnected) return;
+  const surface = card.closest(".wrestling-show-prototype-surface");
+  const site = card.closest(".site-shell");
+  if (!surface || !site) return;
+  const sourceRect = card.getBoundingClientRect();
+  if (!sourceRect.width || !sourceRect.height) return;
+
+  const root = document.createElement("div");
+  root.className = "wrestling-encounter-selection-prototype";
+  const targetShell = document.createElement("div");
+  targetShell.className = "wrestling-match-detail-prototype-shell";
+  const hero = createWrestlingMatchDossierHero(match);
+  hero.querySelector("h2").removeAttribute("id");
+  hero.tabIndex = 0;
+  hero.setAttribute("role", "button");
+  hero.setAttribute("aria-label", `${normalizeHallPrototypeEncounterRecord(match).heading}. Return to campaign encounters`);
+  const resetButton = document.createElement("button");
+  resetButton.className = "wrestling-encounter-selection-reset";
+  resetButton.type = "button";
+  resetButton.textContent = "Return to encounters";
+  targetShell.append(hero);
+  root.append(targetShell, resetButton);
+  root.style.visibility = "hidden";
+  site.append(root);
+  const targetRect = hero.getBoundingClientRect();
+
+  // Freeze the painted source before moving its cover outside the scrolling list.
+  const cover = card.cloneNode(true);
+  const originals = [card, ...card.querySelectorAll("*")];
+  const copies = [cover, ...cover.querySelectorAll("*")];
+  const coverStyles = document.createElement("style");
+  originals.forEach((element, index) => {
+    const computed = getComputedStyle(element);
+    for (const property of computed) copies[index].style.setProperty(property, computed.getPropertyValue(property));
+    // Scoped campaign pseudo-elements (including winner labels) must travel too.
+    copies[index].dataset.encounterCoverNode = String(index);
+    ["::before", "::after"].forEach((pseudo) => {
+      const painted = getComputedStyle(element, pseudo);
+      if (painted.content === "none" || painted.content === "normal") return;
+      const declarations = Array.from(painted, (property) => `${property}:${painted.getPropertyValue(property)};`).join("");
+      coverStyles.textContent += `.wrestling-encounter-selection-prototype [data-encounter-cover-node="${index}"]${pseudo}{${declarations}}`;
+    });
+    copies[index].removeAttribute("id");
+    copies[index].removeAttribute("tabindex");
+  });
+  cover.removeAttribute("role");
+  cover.setAttribute("aria-hidden", "true");
+  Object.assign(cover.style, {
+    position: "fixed", left: `${sourceRect.left}px`, top: `${sourceRect.top}px`,
+    width: `${sourceRect.width}px`, height: `${sourceRect.height}px`,
+    minWidth: "0", minHeight: "0", margin: "0", boxSizing: "border-box",
+    transformOrigin: "top left", pointerEvents: "none", zIndex: "35",
+  });
+  root.append(coverStyles, cover);
+
+  const animations = [];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const list = card.parentElement;
+  const savedScroll = list.scrollTop;
+  const savedSurfaceScroll = surface.scrollTop;
+  const savedVisibility = card.style.visibility;
+  const savedInert = surface.inert;
+  let stopped = false;
+  let observer;
+  const reset = (restoreFocus = true) => {
+    if (stopped) return;
+    stopped = true;
+    animations.forEach((animation) => animation.cancel());
+    observer?.disconnect();
+    document.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("resize", onResize);
+    root.remove();
+    card.style.visibility = savedVisibility;
+    surface.inert = savedInert;
+    delete surface.dataset.encounterSelection;
+    list.scrollTop = savedScroll;
+    surface.scrollTop = savedSurfaceScroll;
+    hallEncounterSelectionPrototype = null;
+    if (restoreFocus && card.isConnected) card.focus({ preventScroll: true });
+  };
+  const onKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      reset();
+    }
+  };
+  const onResize = () => reset();
+  hallEncounterSelectionPrototype = { reset };
+  resetButton.addEventListener("click", () => reset());
+  hero.addEventListener("click", () => reset());
+  hero.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      reset();
+    }
+  });
+  document.addEventListener("keydown", onKeyDown);
+  window.addEventListener("resize", onResize);
+  observer = new MutationObserver(() => {
+    if (!surface.isConnected || !card.isConnected || site.dataset.shellRoute !== "wrestling-show-detail") reset(false);
+  });
+  observer.observe(site, { attributes: true, attributeFilter: ["data-shell-route"], childList: true, subtree: true });
+
+  const animate = (element, frames, duration, easing = "ease-out") => {
+    const animation = element.animate(frames, { duration: reducedMotion ? 1 : duration, easing, fill: "both" });
+    animations.push(animation);
+    return animation;
+  };
+  surface.dataset.encounterSelection = "promoting";
+  surface.inert = true;
+  card.style.visibility = "hidden";
+  root.style.visibility = "visible";
+  hero.style.transformOrigin = "top left";
+  const surrounding = [surface.firstElementChild, surface.querySelector(".wrestling-show-prototype-encounters__title"),
+    ...list.children].filter((element) => element && element !== card);
+  surrounding.forEach((element, index) => animate(element,
+    [{ opacity: 1 }, { opacity: 0 }], index === 0 ? 220 : 260));
+
+  const dx = sourceRect.left - targetRect.left;
+  const dy = sourceRect.top - targetRect.top;
+  const scaleX = sourceRect.width / targetRect.width;
+  const scaleY = sourceRect.height / targetRect.height;
+  const travel = "cubic-bezier(0.22, 0.72, 0.18, 1)";
+  // Range rectangles preserve painted glyphs, including source alignment and
+  // line wrapping. Each glyph travels once; the canonical identity is revealed
+  // only after every proxy coincides with its final painted position.
+  const identityLayer = document.createElement("div");
+  Object.assign(identityLayer.style, { position: "fixed", inset: "0", zIndex: "36", pointerEvents: "none" });
+  identityLayer.setAttribute("aria-hidden", "true");
+  root.append(identityLayer);
+  const glyphs = (element) => {
+    const result = [];
+    if (!element) return result;
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const style = getComputedStyle(node.parentElement);
+      for (let offset = 0; offset < node.length; offset += 1) {
+        if (/\s/.test(node.data[offset])) continue;
+        const range = document.createRange();
+        range.setStart(node, offset);
+        range.setEnd(node, offset + 1);
+        result.push({ text: node.data[offset], rect: range.getBoundingClientRect(), style });
+      }
+    }
+    return result;
+  };
+  const measureWinner = (owner) => {
+    const computed = getComputedStyle(owner, "::before");
+    if (!computed.content.includes("WINNER")) return [];
+    const box = owner.getBoundingClientRect();
+    const host = document.createElement("div");
+    Object.assign(host.style, { position: "fixed", left: `${box.left}px`, top: `${box.top}px`, width: `${box.width}px`, height: `${box.height}px`, visibility: "hidden" });
+    const label = document.createElement("span");
+    for (const property of computed) label.style.setProperty(property, computed.getPropertyValue(property));
+    label.textContent = computed.content.slice(1, -1);
+    host.append(label);
+    root.append(host);
+    const result = glyphs(label);
+    // CSSStyleDeclaration remains live, so snapshot typography before removal.
+    const snapshot = {};
+    for (const property of computed) snapshot[property] = computed.getPropertyValue(property);
+    result.forEach((glyph) => { glyph.style = snapshot; });
+    host.remove();
+    return result;
+  };
+  const typography = ["font-family", "font-size", "font-weight", "font-style", "letter-spacing", "color", "text-shadow"];
+  const flyGlyphs = (from, to) => {
+    // Source and canonical labels can differ (WINNERS -> WINNER). Release an
+    // unmatched trailing glyph smoothly instead of dropping it at activation.
+    from.slice(to.length).forEach((source) => {
+      const proxy = document.createElement("span");
+      typography.forEach((property) => proxy.style.setProperty(property, source.style[property]));
+      proxy.textContent = source.text;
+      Object.assign(proxy.style, { position: "fixed", left: "0", top: "0", whiteSpace: "pre", lineHeight: "1" });
+      identityLayer.append(proxy);
+      const painted = glyphs(proxy)[0].rect;
+      proxy.style.left = `${source.rect.left - painted.left}px`;
+      proxy.style.top = `${source.rect.top - painted.top}px`;
+      const destination = to[to.length - 1]?.rect || source.rect;
+      animate(proxy, [
+        { transform: "none", opacity: 1 },
+        { transform: reducedMotion ? "none" : `translate(${destination.right - source.rect.left}px, ${destination.top - source.rect.top}px)`, opacity: 0 },
+      ], 560, travel);
+    });
+    to.forEach((destination, index) => {
+      const source = from[index];
+      if (!source || !destination.rect.width || !destination.rect.height) return;
+      const proxy = document.createElement("span");
+      typography.forEach((property) => proxy.style.setProperty(property, destination.style[property]));
+      proxy.textContent = destination.text;
+      Object.assign(proxy.style, { position: "fixed", left: "0", top: "0", whiteSpace: "pre", lineHeight: "1", transformOrigin: "top left" });
+      identityLayer.append(proxy);
+      const painted = glyphs(proxy)[0].rect;
+      proxy.style.transformOrigin = `${painted.left}px ${painted.top}px`;
+      proxy.style.left = `${destination.rect.left - painted.left}px`;
+      proxy.style.top = `${destination.rect.top - painted.top}px`;
+      animate(proxy, [
+        { transform: reducedMotion ? "none" : `translate(${source.rect.left - destination.rect.left}px, ${source.rect.top - destination.rect.top}px) scale(${source.rect.width / destination.rect.width}, ${source.rect.height / destination.rect.height})`, fontWeight: source.style["font-weight"], color: source.style.color, textShadow: source.style["text-shadow"] },
+        { transform: "none", fontWeight: destination.style["font-weight"], color: destination.style.color, textShadow: destination.style["text-shadow"] },
+      ], 560, travel);
+    });
+  };
+  const identitySelector = ".wrestling-show-prototype-encounter-side-name, .wrestling-show-prototype-encounter-vs";
+  const sourceIdentities = card.querySelectorAll(identitySelector);
+  hero.querySelectorAll(identitySelector).forEach((element, index) => {
+    const source = sourceIdentities[index];
+    const entrantName = source?.querySelector(".wrestling-show-prototype-encounter-entrant-name");
+    const entrantNumber = source?.querySelector(".wrestling-show-prototype-encounter-entrant-number");
+    // Numbered campaign entries have a prefix that the canonical hero omits.
+    // Pair the actual name, and release its source-only number independently.
+    flyGlyphs(glyphs(entrantName || source), glyphs(element));
+    if (entrantNumber) flyGlyphs(glyphs(entrantNumber), []);
+  });
+  const winnerSelector = ".wrestling-show-prototype-encounter-side--winner, .wrestling-show-prototype-encounter-side-name--winner";
+  const sourceWinners = card.querySelectorAll(winnerSelector);
+  hero.querySelectorAll(winnerSelector).forEach((element, index) => {
+    if (sourceWinners[index]) flyGlyphs(measureWinner(sourceWinners[index]), measureWinner(element));
+  });
+  cover.querySelectorAll(".wrestling-show-prototype-encounter-side-name, .wrestling-show-prototype-encounter-side-name *, .wrestling-show-prototype-encounter-vs").forEach((element) => {
+    element.style.color = "transparent";
+    element.style.webkitTextFillColor = "transparent";
+    element.style.textShadow = "none";
+  });
+  cover.querySelectorAll(winnerSelector).forEach((element) => {
+    coverStyles.textContent += `.wrestling-encounter-selection-prototype [data-encounter-cover-node="${element.dataset.encounterCoverNode}"]::before{color:transparent;-webkit-text-fill-color:transparent;text-shadow:none;}`;
+  });
+  root.classList.add("is-glyph-flight");
+  // Preserve the scrollport's visible source crop at the activation frame.
+  // Release that crop during promotion instead of revealing clipped content at once.
+  let visibleTop = Math.max(0, sourceRect.top);
+  let visibleBottom = Math.min(window.innerHeight, sourceRect.bottom);
+  for (let ancestor = card.parentElement; ancestor && ancestor !== site; ancestor = ancestor.parentElement) {
+    const overflow = getComputedStyle(ancestor).overflowY;
+    if (/auto|scroll|hidden|clip/.test(overflow)) {
+      const bounds = ancestor.getBoundingClientRect();
+      visibleTop = Math.max(visibleTop, bounds.top);
+      visibleBottom = Math.min(visibleBottom, bounds.bottom);
+    }
+  }
+  if (visibleTop > sourceRect.top || visibleBottom < sourceRect.bottom) {
+    [targetShell, identityLayer].forEach((layer) => animate(layer, [
+      { clipPath: `inset(${visibleTop}px 0 ${Math.max(0, window.innerHeight - visibleBottom)}px 0)` },
+      { clipPath: "inset(0px 0px 0px 0px)" },
+    ], 180, travel));
+    animate(cover, [
+      { clipPath: `inset(${Math.max(0, visibleTop - sourceRect.top)}px 0 ${Math.max(0, sourceRect.bottom - visibleBottom)}px 0)` },
+      { clipPath: "inset(0px 0px 0px 0px)" },
+    ], 180, travel);
+  }
+  animate(cover, [
+    { transform: "none", opacity: 1 },
+    { transform: reducedMotion ? "none" : `translate(${-dx}px, ${-dy}px) scale(${1 / scaleX}, ${1 / scaleY})`, opacity: 0 },
+  ], 560, travel);
+  const promotion = animate(hero, [
+    { transform: reducedMotion ? "none" : `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`, opacity: 0 },
+    { transform: "none", opacity: 1 },
+  ], 560, travel);
+  animate(resetButton, [{ opacity: 0 }, { opacity: 1 }], 560);
+  resetButton.focus({ preventScroll: true });
+  promotion.finished.then(() => {
+    if (stopped) return;
+    root.classList.remove("is-glyph-flight");
+    identityLayer.remove();
+    cover.remove();
+    surface.dataset.encounterSelection = "held";
+  }).catch(() => {});
+}
 function getWrestlingMatchDetailRouteShowId(route = getRouteFromUrl()) {
   return String(route?.dateKey || route?.showId || WRESTLING_MATCH_DETAIL_SHOW_ID || "").trim().toLowerCase();
 }

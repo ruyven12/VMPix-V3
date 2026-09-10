@@ -14224,7 +14224,7 @@ button.wrestling-event-history-tagged-thumb {
   display: none;
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-detail-prototype-shell {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-detail-prototype-shell {
   position: fixed;
   inset: 0;
   z-index: 34;
@@ -14247,7 +14247,7 @@ button.wrestling-event-history-tagged-thumb {
   overflow-y: auto;
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-detail-prototype-shell.is-lightbox-hidden {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-detail-prototype-shell.is-lightbox-hidden {
   display: none !important;
   pointer-events: none !important;
   visibility: hidden !important;
@@ -14527,7 +14527,7 @@ button.wrestling-event-history-tagged-thumb {
   object-position: center;
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero {
   align-content: start;
   inline-size: min(100%, 64rem);
   min-block-size: auto;
@@ -14536,38 +14536,38 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: auto;
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-type {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-type {
   font-size: clamp(0.82rem, 1.25vw, 1.08rem);
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
   min-block-size: auto;
   padding-block-end: 0;
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
   font-size: clamp(1.08rem, 2.35vw, 1.72rem);
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-vs {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-vs {
   inline-size: clamp(2.75rem, 4.4vw, 3.55rem);
   block-size: clamp(1.82rem, 2.9vw, 2.25rem);
   font-size: clamp(0.76rem, 1.1vw, 0.96rem);
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-official {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-official {
   margin-block-start: clamp(0.34rem, 0.86vw, 0.58rem);
 }
 
 @media (max-width: 640px) {
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-detail-prototype-shell {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-detail-prototype-shell {
     padding:
       calc(env(safe-area-inset-top) + clamp(1.25rem, 2.8svh, 1.75rem))
       clamp(0.5rem, 2.5vw, 0.75rem)
       calc(var(--engine-emitter-size, 4.6rem) + max(1rem, env(safe-area-inset-bottom)));
   }
 
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero {
     inline-size: min(100%, 34rem);
     min-block-size: auto;
     gap: 0;
@@ -14631,25 +14631,25 @@ button.wrestling-event-history-tagged-thumb {
     gap: 0.42rem;
     padding: 0.34rem;
   }
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
     font-size: clamp(0.82rem, 4.6vw, 1.08rem);
   }
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-combatants {
     column-gap: 0;
   }
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:first-child {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:first-child {
     justify-items: end;
     text-align: right;
   }
 
-  .site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:last-of-type {
+  :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side:last-of-type {
     justify-items: start;
     text-align: left;
   }
 }
 
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-detail-prototype-shell,
-.site-shell[data-shell-route="wrestling-match-detail"] .wrestling-match-detail-prototype-shell * {
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-detail-prototype-shell,
+:is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-detail-prototype-shell * {
   text-transform: none;
 }
 
@@ -29446,4 +29446,45 @@ button.hall-crusades-archive-crystal:focus-visible {
   align-self: center;
   justify-self: center;
   margin: clamp(0.2rem, 0.45vw, 0.34rem) 0 0;
+}
+
+/* Local encounter preview shares the canonical header; the actual route never mounts. */
+.wrestling-encounter-selection-prototype {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+.wrestling-encounter-selection-prototype .wrestling-match-detail-prototype-shell {
+  overflow: visible;
+}
+.wrestling-encounter-selection-prototype .wrestling-match-dossier-hero {
+  cursor: pointer;
+}
+.wrestling-encounter-selection-reset {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: calc(var(--engine-emitter-size, 4.6rem) + max(1.2rem, env(safe-area-inset-bottom)));
+  transform: translateX(-50%);
+  min-block-size: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 72, 50, 0.5);
+  background: rgba(3, 4, 7, 0.9);
+  color: rgba(255, 231, 208, 0.9);
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.wrestling-encounter-selection-reset:focus-visible,
+.wrestling-encounter-selection-prototype .wrestling-match-dossier-hero:focus-visible {
+  outline: 2px solid rgba(255, 231, 208, 0.8);
+  outline-offset: 3px;
+}
+
+.wrestling-encounter-selection-prototype.is-glyph-flight .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-name,
+.wrestling-encounter-selection-prototype.is-glyph-flight .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-vs,
+.wrestling-encounter-selection-prototype.is-glyph-flight .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side--winner::before,
+.wrestling-encounter-selection-prototype.is-glyph-flight .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-name--winner::before {
+  color: transparent !important;
+  text-shadow: none !important;
 }

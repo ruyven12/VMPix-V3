@@ -10,6 +10,8 @@
 
 Read [AGENTS.md](../AGENTS.md) first. This file records **state, not permanent law**; engineering, workflow, and creative authority remain in the governing documents.
 
+[Lore Master](design/V3_LORE_MASTER.md) consolidates lore/story context (PASS 29) beneath World Bible authority; provisional, inspired, deferred, and unresolved material is preserved without promoting canon.
+
 Evidence labels: **Approved/documented decision** records direction or protection; **Documented implementation — runtime verification pending** records reported or previously documented work, not a passing runtime check; **Pending QA/signoff** means evidence or human acceptance remains outstanding. Future work is not implemented or newly authorized by this record. **Source-verified implementation** means code presence confirmed in PASS 6. Runtime/browser verification, physical-device QA, and human creative signoff are separate evidence stages; none implies the next.
 
 ## 2. Current Build Phase
@@ -134,6 +136,8 @@ The engineering workflow upgrade is **substantially complete for normal Experien
 - [$v3-qa](../.agents/skills/v3-qa/SKILL.md) provides reusable QA selection/reporting. `npm run v3:qa` provides execution; modes and evidence limits are summarized in §8.
 - [V3 Module Blueprint](V3_MODULE_BLUEPRINT.md), created in PASS 25, defines reusable gateways, indexes, details, media, Shell/Engine, data/recovery, responsive, and signoff contracts for Music and future Portfolio worlds. It preserves each world's independent creative identity.
 
+- Render integration is available (PASS 28, 2026-09-10): read-only inspection may be used for V3 deployment/backend troubleshooting. Write/deploy operations require explicit Chris approval; see [AGENTS.md](../AGENTS.md).
+
 | Project role | Responsibility |
 | --- | --- |
 | [v3_scout](../.codex/agents/v3-scout.toml) | Investigate the actual path and evidence; recommend minimum scope; no implementation. |
@@ -142,6 +146,8 @@ The engineering workflow upgrade is **substantially complete for normal Experien
 | [v3_reviewer](../.codex/agents/v3-reviewer.toml) | Review the final diff and QA evidence; no writes. Technical review does not replace Chris's approval. |
 
 The parent coordinates Scout → Builder → QA → Reviewer when appropriate, chooses proportional checks, and relays findings directly. For an in-scope defect, return it to Builder, then QA retests before review/handoff. Chris need not relay routine findings. Not every pass needs all four roles; no competing implementations or silent scope expansion.
+
+- Creative/lore workflow is available via [$v3-lore](../.agents/skills/v3-lore/SKILL.md) and [v3_lore](../.codex/agents/v3-lore.toml) → [v3_story](../.codex/agents/v3-story.toml) → [v3_canon_reviewer](../.codex/agents/v3-canon-reviewer.toml), used proportionally. PASS 30 verified enabled repository-skill discovery and three read-only behavioral delegation exercises; automatic TOML activation and role-specific sandbox enforcement remain unverified. Chris approval precedes later authorized canon updates and Builder implementation; canon remains unchanged.
 
 ### Runtime and implementation evidence
 
@@ -154,10 +160,8 @@ Repository files verify the workflow's definitions and commands in PASS 26. Exec
 ### Remaining upgrade items
 
 - Reusable visual baseline/reference workflow remains pending; individual screenshots/frame comparisons are not that complete system.
-- Render workflow integration remains pending as an upgrade; this is not a claim that the existing deployment is absent or broken.
 - Stale-test modernization remains incremental and scoped.
 - Optional hooks, worktree, and security workflow enhancements remain future work.
-- A creative/lore agent layer is intentionally deferred; creative canon and Chris's authority remain unchanged.
 
 These are recorded follow-ups, not permission to design or implement them in this pass.
 

@@ -1,0 +1,1727 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "index": 0,
+    "actual": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 35.75,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 67.765625,
+          "left": 22.46875
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.328125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.328125,
+          "right": 202,
+          "bottom": 64.4375,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 98.671875,
+          "height": 17.875,
+          "top": 40.953125,
+          "right": 300.671875,
+          "bottom": 58.828125,
+          "left": 202
+        },
+        "text": "Alec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 35.75,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 67.765625,
+          "left": 22.46875
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.328125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.328125,
+          "right": 202,
+          "bottom": 64.4375,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 98.671875,
+          "height": 17.875,
+          "top": 40.953125,
+          "right": 300.671875,
+          "bottom": 58.828125,
+          "left": 202
+        },
+        "text": "Alec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "index": 2,
+    "actual": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 69.484375,
+          "left": 9
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 49.71875,
+          "y": 37.625,
+          "width": 108.28125,
+          "height": 17.875,
+          "top": 37.625,
+          "right": 158,
+          "bottom": 55.5,
+          "left": 49.71875
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 32.015625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 32.015625,
+          "right": 202,
+          "bottom": 61.125,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 37.625,
+          "width": 123,
+          "height": 17.875,
+          "top": 37.625,
+          "right": 325,
+          "bottom": 55.5,
+          "left": 202
+        },
+        "text": "Cowboy Way"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 69.484375,
+          "left": 9
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 49.71875,
+          "y": 37.625,
+          "width": 108.28125,
+          "height": 17.875,
+          "top": 37.625,
+          "right": 158,
+          "bottom": 55.5,
+          "left": 49.71875
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 32.015625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 32.015625,
+          "right": 202,
+          "bottom": 61.125,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 37.625,
+          "width": 123,
+          "height": 17.875,
+          "top": 37.625,
+          "right": 325,
+          "bottom": 55.5,
+          "left": 202
+        },
+        "text": "Cowboy Way"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "index": 5,
+    "actual": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.75,
+          "left": 9
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 49.8125,
+          "y": 32.015625,
+          "width": 108.1875,
+          "height": 36.375,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 68.390625,
+          "left": 49.8125
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.640625,
+          "right": 202,
+          "bottom": 64.75,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 32.015625,
+          "width": 116.40625,
+          "height": 36.375,
+          "top": 32.015625,
+          "right": 318.40625,
+          "bottom": 68.390625,
+          "left": 202
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.75,
+          "left": 9
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 49.8125,
+          "y": 32.015625,
+          "width": 108.1875,
+          "height": 36.375,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 68.390625,
+          "left": 49.8125
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.640625,
+          "right": 202,
+          "bottom": 64.75,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 32.015625,
+          "width": 116.40625,
+          "height": 36.375,
+          "top": 32.015625,
+          "right": 318.40625,
+          "bottom": 68.390625,
+          "left": 202
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "index": 7,
+    "actual": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 72.234375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 94.625,
+          "left": 9
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 54.25,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 86.265625,
+          "left": 22.46875
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 44.578125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 44.578125,
+          "right": 202,
+          "bottom": 73.6875,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 120.609375,
+          "height": 36.375,
+          "top": 40.953125,
+          "right": 322.609375,
+          "bottom": 77.328125,
+          "left": 202
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 72.234375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 94.625,
+          "left": 9
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 54.25,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 86.265625,
+          "left": 22.46875
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 44.578125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 44.578125,
+          "right": 202,
+          "bottom": 73.6875,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 120.609375,
+          "height": 36.375,
+          "top": 40.953125,
+          "right": 322.609375,
+          "bottom": 77.328125,
+          "left": 202
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "index": 8,
+    "actual": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 35.75,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 67.765625,
+          "left": 22.46875
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.328125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.328125,
+          "right": 202,
+          "bottom": 64.4375,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 123.8125,
+          "height": 17.875,
+          "top": 40.953125,
+          "right": 325.8125,
+          "bottom": 58.828125,
+          "left": 202
+        },
+        "text": "Gabby Forza"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 22.46875,
+          "y": 32.015625,
+          "width": 135.53125,
+          "height": 35.75,
+          "top": 32.015625,
+          "right": 158,
+          "bottom": 67.765625,
+          "left": 22.46875
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 158,
+          "y": 35.328125,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.328125,
+          "right": 202,
+          "bottom": 64.4375,
+          "left": 158
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 202,
+          "y": 40.953125,
+          "width": 123.8125,
+          "height": 17.875,
+          "top": 40.953125,
+          "right": 325.8125,
+          "bottom": 58.828125,
+          "left": 202
+        },
+        "text": "Gabby Forza"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "index": 0,
+    "actual": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 27.6875,
+          "y": 40.453125,
+          "width": 156.3125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 27.6875
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 102.953125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 330.953125,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Alec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 27.6875,
+          "y": 40.453125,
+          "width": 156.3125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 27.6875
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 102.953125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 330.953125,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Alec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "index": 2,
+    "actual": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 71.015625,
+          "y": 40.453125,
+          "width": 112.984375,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 71.015625
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 128.34375,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 356.34375,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Cowboy Way"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 71.015625,
+          "y": 40.453125,
+          "width": 112.984375,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 71.015625
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 128.34375,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 356.34375,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Cowboy Way"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "index": 5,
+    "actual": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 71.109375,
+          "y": 35.234375,
+          "width": 112.890625,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 184,
+          "bottom": 73.171875,
+          "left": 71.109375
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 39.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 39.640625,
+          "right": 228,
+          "bottom": 68.75,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 35.234375,
+          "width": 121.46875,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 349.46875,
+          "bottom": 73.171875,
+          "left": 228
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 71.109375,
+          "y": 35.234375,
+          "width": 112.890625,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 184,
+          "bottom": 73.171875,
+          "left": 71.109375
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 39.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 39.640625,
+          "right": 228,
+          "bottom": 68.75,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 35.234375,
+          "width": 121.46875,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 349.46875,
+          "bottom": 73.171875,
+          "left": 228
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "index": 7,
+    "actual": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 41.8125,
+          "y": 35.234375,
+          "width": 142.1875,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 184,
+          "bottom": 73.171875,
+          "left": 41.8125
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 39.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 39.640625,
+          "right": 228,
+          "bottom": 68.75,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 35.234375,
+          "width": 125.859375,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 353.859375,
+          "bottom": 73.171875,
+          "left": 228
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 41.8125,
+          "y": 35.234375,
+          "width": 142.1875,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 184,
+          "bottom": 73.171875,
+          "left": 41.8125
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 39.640625,
+          "width": 44,
+          "height": 29.109375,
+          "top": 39.640625,
+          "right": 228,
+          "bottom": 68.75,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 35.234375,
+          "width": 125.859375,
+          "height": 37.9375,
+          "top": 35.234375,
+          "right": 353.859375,
+          "bottom": 73.171875,
+          "left": 228
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "index": 8,
+    "actual": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 23.84375,
+          "y": 40.453125,
+          "width": 160.15625,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 23.84375
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 129.203125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 357.203125,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Gabby Forza"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 23.84375,
+          "y": 40.453125,
+          "width": 160.15625,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 184,
+          "bottom": 59.109375,
+          "left": 23.84375
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 184,
+          "y": 35.234375,
+          "width": 44,
+          "height": 29.109375,
+          "top": 35.234375,
+          "right": 228,
+          "bottom": 64.34375,
+          "left": 184
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 228,
+          "y": 40.453125,
+          "width": 129.203125,
+          "height": 18.65625,
+          "top": 40.453125,
+          "right": 357.203125,
+          "bottom": 59.109375,
+          "left": 228
+        },
+        "text": "Gabby Forza"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "index": 0,
+    "actual": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 248.9375,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 741.453125,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1263.515625,
+          "y": 46.34375,
+          "width": 163.96875,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1263.515625
+        },
+        "text": "Alec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "VLC TOURNAMENTCalvin TankmanVSAlec Price"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 248.9375,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 741.453125,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Calvin Tankman"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1263.515625,
+          "y": 46.34375,
+          "width": 163.96875,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1263.515625
+        },
+        "text": "Alec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "index": 2,
+    "actual": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 179.9375,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 672.453125,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1223.078125,
+          "y": 46.34375,
+          "width": 204.40625,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1223.078125
+        },
+        "text": "Cowboy Way"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "TAG TEAMStarstruckVSCowboy Way"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 179.9375,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 672.453125,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Starstruck"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1223.078125,
+          "y": 46.34375,
+          "width": 204.40625,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1223.078125
+        },
+        "text": "Cowboy Way"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "index": 5,
+    "actual": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 44.171875,
+          "width": 179.78125,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 672.296875,
+          "bottom": 108.40625,
+          "left": 492.515625
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 58.28125,
+          "width": 56.796875,
+          "height": 36,
+          "top": 58.28125,
+          "right": 988.390625,
+          "bottom": 94.28125,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1234.046875,
+          "y": 44.171875,
+          "width": 193.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 1427.484375,
+          "bottom": 108.40625,
+          "left": 1234.046875
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "text": "TAG TEAMBRGOxx AdamsVSAce RomeroRhino"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 44.171875,
+          "width": 179.78125,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 672.296875,
+          "bottom": 108.40625,
+          "left": 492.515625
+        },
+        "text": "BRGOxx Adams"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 58.28125,
+          "width": 56.796875,
+          "height": 36,
+          "top": 58.28125,
+          "right": 988.390625,
+          "bottom": 94.28125,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1234.046875,
+          "y": 44.171875,
+          "width": 193.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 1427.484375,
+          "bottom": 108.40625,
+          "left": 1234.046875
+        },
+        "text": "Ace RomeroRhino"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "index": 7,
+    "actual": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 44.171875,
+          "width": 226.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 718.953125,
+          "bottom": 108.40625,
+          "left": 492.515625
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 58.28125,
+          "width": 56.796875,
+          "height": 36,
+          "top": 58.28125,
+          "right": 988.390625,
+          "bottom": 94.28125,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1227.046875,
+          "y": 44.171875,
+          "width": 200.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 1427.484375,
+          "bottom": 108.40625,
+          "left": 1227.046875
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "text": "VLC TOURNAMENT FINALS CHAMPIONSHIPB3CCAAaron RourkeVSAiden AggroAlec Price"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 44.171875,
+          "width": 226.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 718.953125,
+          "bottom": 108.40625,
+          "left": 492.515625
+        },
+        "text": "B3CCAAaron Rourke"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 58.28125,
+          "width": 56.796875,
+          "height": 36,
+          "top": 58.28125,
+          "right": 988.390625,
+          "bottom": 94.28125,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1227.046875,
+          "y": 44.171875,
+          "width": 200.4375,
+          "height": 64.234375,
+          "top": 44.171875,
+          "right": 1427.484375,
+          "bottom": 108.40625,
+          "left": 1227.046875
+        },
+        "text": "Aiden AggroAlec Price"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "index": 8,
+    "actual": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 247.96875,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 740.484375,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1221.734375,
+          "y": 46.34375,
+          "width": 205.75,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1221.734375
+        },
+        "text": "Gabby Forza"
+      }
+    ],
+    "reference": [
+      {
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "text": "LIMITLESS WORLD CHAMPIONSHIPDonovan DijakVSGabby Forza"
+      },
+      {
+        "rect": {
+          "x": 492.515625,
+          "y": 46.34375,
+          "width": 247.96875,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 740.484375,
+          "bottom": 77.984375,
+          "left": 492.515625
+        },
+        "text": "Donovan Dijak"
+      },
+      {
+        "rect": {
+          "x": 931.59375,
+          "y": 44.171875,
+          "width": 56.796875,
+          "height": 36,
+          "top": 44.171875,
+          "right": 988.390625,
+          "bottom": 80.171875,
+          "left": 931.59375
+        },
+        "text": "VS"
+      },
+      {
+        "rect": {
+          "x": 1221.734375,
+          "y": 46.34375,
+          "width": 205.75,
+          "height": 31.640625,
+          "top": 46.34375,
+          "right": 1427.484375,
+          "bottom": 77.984375,
+          "left": 1221.734375
+        },
+        "text": "Gabby Forza"
+      }
+    ]
+  }
+]

@@ -1,0 +1,1598 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375,
+          "top": 298.734375,
+          "right": 344,
+          "bottom": 391.21875,
+          "left": 16
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375,
+          "top": 298.734375,
+          "right": 344,
+          "bottom": 391.21875,
+          "left": 16
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.32984733581543,
+          "y": 272.2783203125,
+          "width": 329.3403015136719,
+          "height": 88.77459716796875,
+          "top": 272.2783203125,
+          "right": 344.6701488494873,
+          "bottom": 361.05291748046875,
+          "left": 15.32984733581543
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.32984733581543,
+          "y": 272.2783203125,
+          "width": 329.3403015136719,
+          "height": 88.77459716796875,
+          "top": 272.2783203125,
+          "right": 344.6701488494873,
+          "bottom": 361.05291748046875,
+          "left": 15.32984733581543
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 12.58044147491455,
+          "y": 163.73814392089844,
+          "width": 334.839111328125,
+          "height": 73.55467224121094,
+          "top": 163.73814392089844,
+          "right": 347.41955280303955,
+          "bottom": 237.29281616210938,
+          "left": 12.58044147491455
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 12.58044147491455,
+          "y": 163.73814392089844,
+          "width": 334.8391418457031,
+          "height": 73.55467224121094,
+          "top": 163.73814392089844,
+          "right": 347.4195833206177,
+          "bottom": 237.29281616210938,
+          "left": 12.58044147491455
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.513435363769531,
+          "y": 82.13754272460938,
+          "width": 338.9731140136719,
+          "height": 62.11231994628906,
+          "top": 82.13754272460938,
+          "right": 349.4865493774414,
+          "bottom": 144.24986267089844,
+          "left": 10.513435363769531
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.513435363769531,
+          "y": 82.13754272460938,
+          "width": 338.9731140136719,
+          "height": 62.11231994628906,
+          "top": 82.13754272460938,
+          "right": 349.4865493774414,
+          "bottom": 144.24986267089844,
+          "left": 10.513435363769531
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.4555082321167,
+          "y": 40.373046875,
+          "width": 341.0889892578125,
+          "height": 56.25593566894531,
+          "top": 40.373046875,
+          "right": 350.5444974899292,
+          "bottom": 96.62898254394531,
+          "left": 9.4555082321167
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.455509185791016,
+          "y": 40.373046875,
+          "width": 341.0889892578125,
+          "height": 56.25593566894531,
+          "top": 40.373046875,
+          "right": 350.5444984436035,
+          "bottom": 96.62898254394531,
+          "left": 9.455509185791016
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.055712699890137,
+          "y": 24.59003257751465,
+          "width": 341.8885803222656,
+          "height": 54.04278564453125,
+          "top": 24.59003257751465,
+          "right": 350.94429302215576,
+          "bottom": 78.6328182220459,
+          "left": 9.055712699890137
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.055712699890137,
+          "y": 24.59002685546875,
+          "width": 341.8885803222656,
+          "height": 54.04278564453125,
+          "top": 24.59002685546875,
+          "right": 350.94429302215576,
+          "bottom": 78.6328125,
+          "left": 9.055712699890137
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "first",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.125,
+          "left": 9
+        },
+        "opacity": "0"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 253.484375,
+          "width": 328,
+          "height": 104.015625,
+          "top": 253.484375,
+          "right": 344,
+          "bottom": 357.5,
+          "left": 16
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 253.484375,
+          "width": 328,
+          "height": 104.015625,
+          "top": 253.484375,
+          "right": 344,
+          "bottom": 357.5,
+          "left": 16
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.32984733581543,
+          "y": 231.36036682128906,
+          "width": 329.3403015136719,
+          "height": 99.26173400878906,
+          "top": 231.36036682128906,
+          "right": 344.6701488494873,
+          "bottom": 330.6221008300781,
+          "left": 15.32984733581543
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.32984733581543,
+          "y": 231.36036682128906,
+          "width": 329.3403015136719,
+          "height": 99.26173400878906,
+          "top": 231.36036682128906,
+          "right": 344.6701488494873,
+          "bottom": 330.6221008300781,
+          "left": 15.32984733581543
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 12.58044147491455,
+          "y": 140.5931396484375,
+          "width": 334.839111328125,
+          "height": 79.75813293457031,
+          "top": 140.5931396484375,
+          "right": 347.41955280303955,
+          "bottom": 220.3512725830078,
+          "left": 12.58044147491455
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 12.58044147491455,
+          "y": 140.5931396484375,
+          "width": 334.8391418457031,
+          "height": 79.75813293457031,
+          "top": 140.5931396484375,
+          "right": 347.4195833206177,
+          "bottom": 220.3512725830078,
+          "left": 12.58044147491455
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.513435363769531,
+          "y": 72.35426330566406,
+          "width": 338.9731140136719,
+          "height": 65.09530639648438,
+          "top": 72.35426330566406,
+          "right": 349.4865493774414,
+          "bottom": 137.44956970214844,
+          "left": 10.513435363769531
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.513435363769531,
+          "y": 72.35426330566406,
+          "width": 338.9731140136719,
+          "height": 65.09532165527344,
+          "top": 72.35426330566406,
+          "right": 349.4865493774414,
+          "bottom": 137.4495849609375,
+          "left": 10.513435363769531
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.4555082321167,
+          "y": 37.42851257324219,
+          "width": 341.0889892578125,
+          "height": 57.59063720703125,
+          "top": 37.42851257324219,
+          "right": 350.5444974899292,
+          "bottom": 95.01914978027344,
+          "left": 9.4555082321167
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.455509185791016,
+          "y": 37.42851257324219,
+          "width": 341.0889892578125,
+          "height": 57.59063720703125,
+          "top": 37.42851257324219,
+          "right": 350.5444984436035,
+          "bottom": 95.01914978027344,
+          "left": 9.455509185791016
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.055712699890137,
+          "y": 24.229890823364258,
+          "width": 341.8885803222656,
+          "height": 54.75458526611328,
+          "top": 24.229890823364258,
+          "right": 350.94429302215576,
+          "bottom": 78.98447608947754,
+          "left": 9.055712699890137
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9.055712699890137,
+          "y": 24.229888916015625,
+          "width": 341.8885803222656,
+          "height": 54.75458526611328,
+          "top": 24.229888916015625,
+          "right": 350.94429302215576,
+          "bottom": 78.9844741821289,
+          "left": 9.055712699890137
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "selection": "partial",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.75,
+          "left": 9
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375,
+          "top": 22.390625,
+          "right": 351,
+          "bottom": 76.75,
+          "left": 9
+        },
+        "opacity": "0"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125,
+          "top": 329.9375,
+          "right": 396,
+          "bottom": 423.71875,
+          "left": 16
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125,
+          "top": 329.9375,
+          "right": 396,
+          "bottom": 423.71875,
+          "left": 16
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.454005241394043,
+          "y": 300.8023376464844,
+          "width": 381.09197998046875,
+          "height": 89.31155395507812,
+          "top": 300.8023376464844,
+          "right": 396.5459852218628,
+          "bottom": 390.1138916015625,
+          "left": 15.454005241394043
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.454005241394043,
+          "y": 300.8023376464844,
+          "width": 381.09197998046875,
+          "height": 89.31158447265625,
+          "top": 300.8023376464844,
+          "right": 396.5459852218628,
+          "bottom": 390.1139221191406,
+          "left": 15.454005241394043
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 13.21397590637207,
+          "y": 181.27066040039062,
+          "width": 385.5720520019531,
+          "height": 70.97401428222656,
+          "top": 181.27066040039062,
+          "right": 398.7860279083252,
+          "bottom": 252.2446746826172,
+          "left": 13.21397590637207
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 13.21397590637207,
+          "y": 181.27066040039062,
+          "width": 385.57208251953125,
+          "height": 70.97402954101562,
+          "top": 181.27066040039062,
+          "right": 398.7860584259033,
+          "bottom": 252.24468994140625,
+          "left": 13.21397590637207
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 11.529919624328613,
+          "y": 91.40665435791016,
+          "width": 388.9401550292969,
+          "height": 57.187828063964844,
+          "top": 91.40665435791016,
+          "right": 400.4700746536255,
+          "bottom": 148.594482421875,
+          "left": 11.529919624328613
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 11.529919624328613,
+          "y": 91.40666198730469,
+          "width": 388.940185546875,
+          "height": 57.18782043457031,
+          "top": 91.40666198730469,
+          "right": 400.4701051712036,
+          "bottom": 148.594482421875,
+          "left": 11.529919624328613
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.66799259185791,
+          "y": 45.412818908691406,
+          "width": 390.6640319824219,
+          "height": 50.13182830810547,
+          "top": 45.412818908691406,
+          "right": 401.3320245742798,
+          "bottom": 95.54464721679688,
+          "left": 10.66799259185791
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.66799259185791,
+          "y": 45.412811279296875,
+          "width": 390.66400146484375,
+          "height": 50.1318359375,
+          "top": 45.412811279296875,
+          "right": 401.33199405670166,
+          "bottom": 95.54464721679688,
+          "left": 10.66799259185791
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.342266082763672,
+          "y": 28.031509399414062,
+          "width": 391.3154602050781,
+          "height": 47.46533203125,
+          "top": 28.031509399414062,
+          "right": 401.6577262878418,
+          "bottom": 75.49684143066406,
+          "left": 10.342266082763672
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.342266082763672,
+          "y": 28.031524658203125,
+          "width": 391.3154602050781,
+          "height": 47.46533203125,
+          "top": 28.031524658203125,
+          "right": 401.6577262878418,
+          "bottom": 75.49685668945312,
+          "left": 10.342266082763672
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "first",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 72.703125,
+          "left": 10.296875
+        },
+        "opacity": "0"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 373.171875,
+          "width": 380,
+          "height": 104.125,
+          "top": 373.171875,
+          "right": 396,
+          "bottom": 477.296875,
+          "left": 16
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 16,
+          "y": 373.171875,
+          "width": 380,
+          "height": 104.125,
+          "top": 373.171875,
+          "right": 396,
+          "bottom": 477.296875,
+          "left": 16
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.454005241394043,
+          "y": 339.8976135253906,
+          "width": 381.09197998046875,
+          "height": 99.51022338867188,
+          "top": 339.8976135253906,
+          "right": 396.5459852218628,
+          "bottom": 439.4078369140625,
+          "left": 15.454005241394043
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 15.454005241394043,
+          "y": 339.8976135253906,
+          "width": 381.09197998046875,
+          "height": 99.51022338867188,
+          "top": 339.8976135253906,
+          "right": 396.5459852218628,
+          "bottom": 439.4078369140625,
+          "left": 15.454005241394043
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 13.21397590637207,
+          "y": 203.3846893310547,
+          "width": 385.5720520019531,
+          "height": 80.57737731933594,
+          "top": 203.3846893310547,
+          "right": 398.7860279083252,
+          "bottom": 283.9620666503906,
+          "left": 13.21397590637207
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 13.21397590637207,
+          "y": 203.3846893310547,
+          "width": 385.57208251953125,
+          "height": 80.57737731933594,
+          "top": 203.3846893310547,
+          "right": 398.7860584259033,
+          "bottom": 283.9620666503906,
+          "left": 13.21397590637207
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 11.529919624328613,
+          "y": 100.754150390625,
+          "width": 388.9401550292969,
+          "height": 66.3436279296875,
+          "top": 100.754150390625,
+          "right": 400.4700746536255,
+          "bottom": 167.0977783203125,
+          "left": 11.529919624328613
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 11.529919624328613,
+          "y": 100.754150390625,
+          "width": 388.940185546875,
+          "height": 66.3436279296875,
+          "top": 100.754150390625,
+          "right": 400.4701051712036,
+          "bottom": 167.0977783203125,
+          "left": 11.529919624328613
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.66799259185791,
+          "y": 48.226192474365234,
+          "width": 390.6640319824219,
+          "height": 59.0585823059082,
+          "top": 48.226192474365234,
+          "right": 401.3320245742798,
+          "bottom": 107.28477478027344,
+          "left": 10.66799259185791
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.66799259185791,
+          "y": 48.2261962890625,
+          "width": 390.66400146484375,
+          "height": 59.05857849121094,
+          "top": 48.2261962890625,
+          "right": 401.33199405670166,
+          "bottom": 107.28477478027344,
+          "left": 10.66799259185791
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.342266082763672,
+          "y": 28.3756103515625,
+          "width": 391.3154602050781,
+          "height": 56.305519104003906,
+          "top": 28.3756103515625,
+          "right": 401.6577262878418,
+          "bottom": 84.6811294555664,
+          "left": 10.342266082763672
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.342266082763672,
+          "y": 28.3756103515625,
+          "width": 391.3154602050781,
+          "height": 56.30552673339844,
+          "top": 28.3756103515625,
+          "right": 401.6577262878418,
+          "bottom": 84.68113708496094,
+          "left": 10.342266082763672
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "selection": "partial",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875,
+          "top": 25.609375,
+          "right": 401.703125,
+          "bottom": 81.53125,
+          "left": 10.296875
+        },
+        "opacity": "0"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375,
+          "top": 424.125,
+          "right": 1424,
+          "bottom": 480.109375,
+          "left": 496
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375,
+          "top": 424.125,
+          "right": 1424,
+          "bottom": 480.109375,
+          "left": 496
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 491.4046630859375,
+          "y": 386.0010986328125,
+          "width": 937.190673828125,
+          "height": 56.8729248046875,
+          "top": 386.0010986328125,
+          "right": 1428.5953369140625,
+          "bottom": 442.8740234375,
+          "left": 491.4046630859375
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 491.4046630859375,
+          "y": 386.0010986328125,
+          "width": 937.1905517578125,
+          "height": 56.8729248046875,
+          "top": 386.0010986328125,
+          "right": 1428.59521484375,
+          "bottom": 442.8740234375,
+          "left": 491.4046630859375
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 472.5516052246094,
+          "y": 229.59181213378906,
+          "width": 974.896728515625,
+          "height": 60.51835632324219,
+          "top": 229.59181213378906,
+          "right": 1447.4483337402344,
+          "bottom": 290.11016845703125,
+          "left": 472.5516052246094
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 472.5516052246094,
+          "y": 229.59181213378906,
+          "width": 974.896728515625,
+          "height": 60.51835632324219,
+          "top": 229.59181213378906,
+          "right": 1447.4483337402344,
+          "bottom": 290.11016845703125,
+          "left": 472.5516052246094
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 458.3778381347656,
+          "y": 112.00315856933594,
+          "width": 1003.244384765625,
+          "height": 63.25897216796875,
+          "top": 112.00315856933594,
+          "right": 1461.6222229003906,
+          "bottom": 175.2621307373047,
+          "left": 458.3778381347656
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 458.3778381347656,
+          "y": 112.003173828125,
+          "width": 1003.244384765625,
+          "height": 63.25897216796875,
+          "top": 112.003173828125,
+          "right": 1461.6222229003906,
+          "bottom": 175.26214599609375,
+          "left": 458.3778381347656
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 451.12347412109375,
+          "y": 51.81940460205078,
+          "width": 1017.7529907226562,
+          "height": 64.66166687011719,
+          "top": 51.81940460205078,
+          "right": 1468.87646484375,
+          "bottom": 116.48107147216797,
+          "left": 451.12347412109375
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 451.12347412109375,
+          "y": 51.81939697265625,
+          "width": 1017.7529907226562,
+          "height": 64.66167449951172,
+          "top": 51.81939697265625,
+          "right": 1468.87646484375,
+          "bottom": 116.48107147216797,
+          "left": 451.12347412109375
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448.38201904296875,
+          "y": 29.07565689086914,
+          "width": 1023.2359008789062,
+          "height": 65.19175720214844,
+          "top": 29.07565689086914,
+          "right": 1471.617919921875,
+          "bottom": 94.26741409301758,
+          "left": 448.38201904296875
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448.38201904296875,
+          "y": 29.075653076171875,
+          "width": 1023.2359008789062,
+          "height": 65.19175720214844,
+          "top": 29.075653076171875,
+          "right": 1471.617919921875,
+          "bottom": 94.26741027832031,
+          "left": 448.38201904296875
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "first",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 91.171875,
+          "left": 448
+        },
+        "opacity": "0"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 0,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56,
+          "top": 736.015625,
+          "right": 1424,
+          "bottom": 792.015625,
+          "left": 496
+        },
+        "opacity": "0"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56,
+          "top": 736.015625,
+          "right": 1424,
+          "bottom": 792.015625,
+          "left": 496
+        },
+        "opacity": "1"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 16,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 491.4046630859375,
+          "y": 668.0325317382812,
+          "width": 937.190673828125,
+          "height": 59.590087890625,
+          "top": 668.0325317382812,
+          "right": 1428.5953369140625,
+          "bottom": 727.6226196289062,
+          "left": 491.4046630859375
+        },
+        "opacity": "0.095736"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 491.4046630859375,
+          "y": 668.0325927734375,
+          "width": 937.1905517578125,
+          "height": 59.590087890625,
+          "top": 668.0325927734375,
+          "right": 1428.59521484375,
+          "bottom": 727.6226806640625,
+          "left": 491.4046630859375
+        },
+        "opacity": "0.904264"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 80,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 472.5516052246094,
+          "y": 389.1212463378906,
+          "width": 974.896728515625,
+          "height": 74.31906127929688,
+          "top": 389.1212463378906,
+          "right": 1447.4483337402344,
+          "bottom": 463.4403076171875,
+          "left": 472.5516052246094
+        },
+        "opacity": "0.488508"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 472.5516052246094,
+          "y": 389.1212463378906,
+          "width": 974.896728515625,
+          "height": 74.31906127929688,
+          "top": 389.1212463378906,
+          "right": 1447.4483337402344,
+          "bottom": 463.4403076171875,
+          "left": 472.5516052246094
+        },
+        "opacity": "0.511492"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 160,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 458.3778381347656,
+          "y": 179.4355010986328,
+          "width": 1003.244384765625,
+          "height": 85.39231872558594,
+          "top": 179.4355010986328,
+          "right": 1461.6222229003906,
+          "bottom": 264.82781982421875,
+          "left": 458.3778381347656
+        },
+        "opacity": "0.783795"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 458.3778381347656,
+          "y": 179.43548583984375,
+          "width": 1003.244384765625,
+          "height": 85.39230346679688,
+          "top": 179.43548583984375,
+          "right": 1461.6222229003906,
+          "bottom": 264.8277893066406,
+          "left": 458.3778381347656
+        },
+        "opacity": "0.216205"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 280,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 451.12347412109375,
+          "y": 72.11495971679688,
+          "width": 1017.7529907226562,
+          "height": 91.05978393554688,
+          "top": 72.11495971679688,
+          "right": 1468.87646484375,
+          "bottom": 163.17474365234375,
+          "left": 451.12347412109375
+        },
+        "opacity": "0.934927"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 451.12347412109375,
+          "y": 72.114990234375,
+          "width": 1017.7529907226562,
+          "height": 91.05978393554688,
+          "top": 72.114990234375,
+          "right": 1468.87646484375,
+          "bottom": 163.17477416992188,
+          "left": 451.12347412109375
+        },
+        "opacity": "0.0650727"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 440,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448.38201904296875,
+          "y": 31.557979583740234,
+          "width": 1023.2359008789062,
+          "height": 93.2015380859375,
+          "top": 31.557979583740234,
+          "right": 1471.617919921875,
+          "bottom": 124.75951766967773,
+          "left": 448.38201904296875
+        },
+        "opacity": "0.992041"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448.38201904296875,
+          "y": 31.5579833984375,
+          "width": 1023.2359008789062,
+          "height": 93.2015380859375,
+          "top": 31.5579833984375,
+          "right": 1471.617919921875,
+          "bottom": 124.759521484375,
+          "left": 448.38201904296875
+        },
+        "opacity": "0.00795896"
+      }
+    ]
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "selection": "partial",
+    "t": 560,
+    "geometry": [
+      {
+        "cls": "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "opacity": "1"
+      },
+      {
+        "cls": "wrestling-show-prototype-encounter-card",
+        "rect": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5,
+          "top": 25.90625,
+          "right": 1472,
+          "bottom": 119.40625,
+          "left": 448
+        },
+        "opacity": "0"
+      }
+    ]
+  }
+]

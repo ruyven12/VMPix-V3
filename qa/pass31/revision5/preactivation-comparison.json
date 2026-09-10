@@ -1,0 +1,56 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "sameContent": true,
+    "count": 9,
+    "rootRect": {
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 800,
+      "top": 0,
+      "right": 360,
+      "bottom": 800,
+      "left": 0
+    }
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "sameContent": true,
+    "count": 9,
+    "rootRect": {
+      "x": 0,
+      "y": 0,
+      "width": 412,
+      "height": 915,
+      "top": 0,
+      "right": 412,
+      "bottom": 915,
+      "left": 0
+    }
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "sameContent": true,
+    "count": 9,
+    "rootRect": {
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "top": 0,
+      "right": 1920,
+      "bottom": 1080,
+      "left": 0
+    }
+  }
+]

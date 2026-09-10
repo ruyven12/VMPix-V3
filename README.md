@@ -19,6 +19,8 @@ Current explicit decisions win over old planning assumptions. Engineering law, c
 ## Current-state and specialized references
 
 - [Current State](docs/CURRENT_STATE.md) — read after AGENTS.md for current priorities, protected experiences, implementation evidence, and pending QA.
+- [Lore Master](docs/design/V3_LORE_MASTER.md) — consolidated lore/story notebook beneath World Bible authority, with protected, working, proposed, inspired, deferred, and unresolved material kept distinct.
+- [$v3-lore](.agents/skills/v3-lore/SKILL.md) — safe lore/story development with [v3_lore](.codex/agents/v3-lore.toml), [v3_story](.codex/agents/v3-story.toml), and [v3_canon_reviewer](.codex/agents/v3-canon-reviewer.toml); use proportionally, preserve source statuses, and obtain Chris approval before later canon promotion or protected changes.
 - [Module Blueprint](docs/V3_MODULE_BLUEPRINT.md) — reusable module journey and contracts; read when planning or building a module after the governing rules.
 - [Route Manifest](docs/V3_ROUTE_MANIFEST.md) — route inventory, planned targets, and SPA fallback.
 - [Module Status](docs/V3_MODULE_STATUS.md) — recorded readiness and QA needs.

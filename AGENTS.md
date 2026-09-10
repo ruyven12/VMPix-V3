@@ -8,6 +8,7 @@ VMPix-V3 is the definitive frontend rebuild. Experience Build is the current pha
 2. [PROJECT_RULES.md](docs/PROJECT_RULES.md) — permanent engineering and architectural law.
 3. [V3_EXPERIENCE_BUILD_RULES.md](docs/V3_EXPERIENCE_BUILD_RULES.md) — current workflow, protection, verification, and signoff.
 4. [World Bible](docs/design/world-bible.md) — creative, narrative, lore, world identity, and protected creative authority.
+   Use [Lore Master](docs/design/V3_LORE_MASTER.md) as the evolving consolidation notebook beneath World Bible authority; provisional lore, inspiration, deferred concepts, and unresolved questions retain their labels.
    Consult [Protected Decisions](docs/V3_PROTECTED_DECISIONS.md) before touching protected experiences, shared Shell, Engine Bar, approved animation, established world identity, or task-implicated route/data conventions.
 
 5. Relevant specialized references: [Module Blueprint](docs/V3_MODULE_BLUEPRINT.md) for module planning/builds, [Route Manifest](docs/V3_ROUTE_MANIFEST.md), [Module Status](docs/V3_MODULE_STATUS.md), [Data Contracts](docs/V3_DATA_CONTRACTS.md), and [UI Animation Checklist](docs/CODEX_UI_ANIMATION_CHECKLIST.md). Use [README](README.md) to locate other directly relevant references.
@@ -46,6 +47,14 @@ Verify affected behavior, including protected surfaces affected through shared c
 Existing explicit task approval counts; do not request the same approval again. Obtain human approval before changes to architecture, public route contracts, protected experience designs, established story beats, creative canon, approved effect replacement, dependencies/frameworks, destructive data operations, deployment architecture, or material scope expansion.
 
 Technical verification does not replace Chris's subjective animation/cinematic signoff. Device recordings remain valuable for final visual judgment.
+
+## Render inspection
+
+Render integration is available (verified in PASS 28). Use read-only inspection when relevant to V3 deployment/backend troubleshooting; ordinary local CSS/UI passes do not require Render. Explicit Chris approval is required before deployments, environment-variable changes, service restarts/recreation, database configuration changes or writes, resource creation/removal, or deployment architecture changes. Never expose secrets in reports.
+
+## Creative/lore workflow
+
+Use [$v3-lore](.agents/skills/v3-lore/SKILL.md) for lore/story work: World Bible → Lore Master → Protected Decisions / Current State as supporting context. Use [v3_lore](.codex/agents/v3-lore.toml) for sourced development, [v3_story](.codex/agents/v3-story.toml) for story structure, and [v3_canon_reviewer](.codex/agents/v3-canon-reviewer.toml) for independent review, proportionally. They return text only; Chris approval precedes later authorized canon/documentation updates and Builder implementation. Preserve all lore status labels and unresolved questions; no automatic canon promotion.
 
 ## Conflicts and unresolved decisions
 

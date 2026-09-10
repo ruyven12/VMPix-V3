@@ -1,0 +1,1106 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "motion": "no-preference",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375
+        },
+        "after": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 16,
+          "y": 502.234375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 502.234375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 16,
+          "y": 444.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 444.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 16,
+          "y": 546.484375,
+          "width": 328,
+          "height": 104.015625
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375
+        },
+        "after": {
+          "x": 16,
+          "y": 546.484375,
+          "width": 328,
+          "height": 104.015625
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 16,
+          "y": 463.515625,
+          "width": 328,
+          "height": 117.359375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 72.234375
+        },
+        "after": {
+          "x": 16,
+          "y": 463.515625,
+          "width": 328,
+          "height": 117.359375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 16,
+          "y": 590.140625,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375
+        },
+        "after": {
+          "x": 16,
+          "y": 590.140625,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "motion": "reduce",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375
+        },
+        "after": {
+          "x": 16,
+          "y": 298.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 16,
+          "y": 502.234375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 502.234375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 16,
+          "y": 444.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 444.734375,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 16,
+          "y": 546.484375,
+          "width": 328,
+          "height": 104.015625
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 54.359375
+        },
+        "after": {
+          "x": 16,
+          "y": 546.484375,
+          "width": 328,
+          "height": 104.015625
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 16,
+          "y": 463.515625,
+          "width": 328,
+          "height": 117.359375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 72.234375
+        },
+        "after": {
+          "x": 16,
+          "y": 463.515625,
+          "width": 328,
+          "height": 117.359375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 16,
+          "y": 590.140625,
+          "width": 328,
+          "height": 92.484375
+        },
+        "held": {
+          "x": 9,
+          "y": 22.390625,
+          "width": 342,
+          "height": 53.734375
+        },
+        "after": {
+          "x": 16,
+          "y": 590.140625,
+          "width": 328,
+          "height": 92.484375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "motion": "no-preference",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 16,
+          "y": 536.03125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 536.03125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 16,
+          "y": 704.125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 704.125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 16,
+          "y": 511.171875,
+          "width": 380,
+          "height": 104.125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875
+        },
+        "after": {
+          "x": 16,
+          "y": 511.171875,
+          "width": 380,
+          "height": 104.125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 16,
+          "y": 694.609375,
+          "width": 380,
+          "height": 104.125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875
+        },
+        "after": {
+          "x": 16,
+          "y": 694.609375,
+          "width": 380,
+          "height": 104.125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 16,
+          "y": 703,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 703,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "motion": "reduce",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 329.9375,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 16,
+          "y": 536.03125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 536.03125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 16,
+          "y": 704.125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 704.125,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 16,
+          "y": 511.171875,
+          "width": 380,
+          "height": 104.125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875
+        },
+        "after": {
+          "x": 16,
+          "y": 511.171875,
+          "width": 380,
+          "height": 104.125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 16,
+          "y": 694.609375,
+          "width": 380,
+          "height": 104.125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 55.921875
+        },
+        "after": {
+          "x": 16,
+          "y": 694.609375,
+          "width": 380,
+          "height": 104.125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 16,
+          "y": 703,
+          "width": 380,
+          "height": 93.78125
+        },
+        "held": {
+          "x": 10.296875,
+          "y": 25.609375,
+          "width": 391.40625,
+          "height": 47.09375
+        },
+        "after": {
+          "x": 16,
+          "y": 703,
+          "width": 380,
+          "height": 93.78125
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "motion": "no-preference",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 496,
+          "y": 548.875,
+          "width": 928,
+          "height": 55.984375
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 548.875,
+          "width": 928,
+          "height": 55.984375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 496,
+          "y": 673.625,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 673.625,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5
+        },
+        "after": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 496,
+          "y": 860.796875,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5
+        },
+        "after": {
+          "x": 496,
+          "y": 860.796875,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 496,
+          "y": 923.1875,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 923.1875,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "motion": "reduce",
+    "cycles": [
+      {
+        "index": 0,
+        "before": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 424.125,
+          "width": 928,
+          "height": 55.984375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 2,
+        "before": {
+          "x": 496,
+          "y": 548.875,
+          "width": 928,
+          "height": 55.984375
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 548.875,
+          "width": 928,
+          "height": 55.984375
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 4,
+        "before": {
+          "x": 496,
+          "y": 673.625,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 673.625,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 5,
+        "before": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5
+        },
+        "after": {
+          "x": 496,
+          "y": 736.015625,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 7,
+        "before": {
+          "x": 496,
+          "y": 860.796875,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 93.5
+        },
+        "after": {
+          "x": 496,
+          "y": 860.796875,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      },
+      {
+        "index": 8,
+        "before": {
+          "x": 496,
+          "y": 923.1875,
+          "width": 928,
+          "height": 56
+        },
+        "held": {
+          "x": 448,
+          "y": 25.90625,
+          "width": 1024,
+          "height": 65.265625
+        },
+        "after": {
+          "x": 496,
+          "y": 923.1875,
+          "width": 928,
+          "height": 56
+        },
+        "state": {
+          "len": 2,
+          "state": "null",
+          "url": "http://127.0.0.1:4173/wrestling/shows/080826",
+          "route": "wrestling-show-detail",
+          "calls": [],
+          "overflow": 0
+        }
+      }
+    ],
+    "errors": []
+  }
+]

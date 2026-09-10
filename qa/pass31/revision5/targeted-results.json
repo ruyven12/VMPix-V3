@@ -1,0 +1,58 @@
+[
+  {
+    "width": 360,
+    "reducedMotion": "no-preference",
+    "mode": "normal",
+    "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price",
+    "reset": true
+  },
+  {
+    "width": 360,
+    "reducedMotion": "no-preference",
+    "mode": "numbered",
+    "text": "BATTLE ROYAL\n\nCalvin Tankman\nAlec Price\n\nVS\n\nBRG\nOxx Adams",
+    "reset": true
+  },
+  {
+    "width": 360,
+    "reducedMotion": "reduce",
+    "mode": "normal",
+    "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price",
+    "reset": true
+  },
+  {
+    "width": 360,
+    "reducedMotion": "reduce",
+    "mode": "numbered",
+    "text": "BATTLE ROYAL\n\nCalvin Tankman\nAlec Price\n\nVS\n\nBRG\nOxx Adams",
+    "reset": true
+  },
+  {
+    "width": 412,
+    "reducedMotion": "no-preference",
+    "mode": "normal",
+    "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price",
+    "reset": true
+  },
+  {
+    "width": 412,
+    "reducedMotion": "no-preference",
+    "mode": "numbered",
+    "text": "BATTLE ROYAL\n\nCalvin Tankman\nAlec Price\n\nVS\n\nBRG\nOxx Adams",
+    "reset": true
+  },
+  {
+    "width": 412,
+    "reducedMotion": "reduce",
+    "mode": "normal",
+    "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price",
+    "reset": true
+  },
+  {
+    "width": 412,
+    "reducedMotion": "reduce",
+    "mode": "numbered",
+    "text": "BATTLE ROYAL\n\nCalvin Tankman\nAlec Price\n\nVS\n\nBRG\nOxx Adams",
+    "reset": true
+  }
+]
