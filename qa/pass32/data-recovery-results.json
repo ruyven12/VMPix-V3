@@ -1,0 +1,32 @@
+[
+  {
+    "mode": "failed-data",
+    "atReveal": "PHOTO HIGHLIGHTS\n\nPHOTO COUNT UNAVAILABLE\n\nPhoto archive unavailable. Return to encounters to try again.",
+    "header": "TAG TEAM\n\nStarstruck\n\nVS\n\nCowboy Way",
+    "requests": [
+      1789077460789,
+      1789077461695
+    ],
+    "reset": true
+  },
+  {
+    "mode": "hanging-data",
+    "atReveal": "PHOTO HIGHLIGHTS\n\nPHOTO COUNT LOADING\n\nRetrieving photo highlights…",
+    "header": "TAG TEAM\n\nStarstruck\n\nVS\n\nCowboy Way",
+    "requests": [
+      1789077467495,
+      1789077469119
+    ],
+    "reset": true
+  },
+  {
+    "mode": "delayed-data",
+    "atReveal": "PHOTO HIGHLIGHTS\n\nPHOTO COUNT LOADING\n\nRetrieving photo highlights…",
+    "header": "TAG TEAM\n\nStarstruck\n\nVS\n\nCowboy Way",
+    "requests": [
+      1789077475605,
+      1789077477211
+    ],
+    "reset": true
+  }
+]

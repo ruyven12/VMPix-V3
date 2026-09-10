@@ -1,0 +1,440 @@
+[
+  {
+    "scenario": "six",
+    "first": {
+      "at": 1789077409348,
+      "data": {
+        "recordPreloadStarted": "2097.3000000002794",
+        "recordHeaderSettled": "2721.7000000001863",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2939.100000000093",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2939.100000000093"
+      },
+      "imgs": [
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/0.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/1.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/2.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/3.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/4.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/six/5.png"
+        }
+      ]
+    },
+    "current": {
+      "recordPreloadStarted": "2097.3000000002794",
+      "recordHeaderSettled": "2721.7000000001863",
+      "recordInfoState": "visible",
+      "recordPhotoState": "ready",
+      "recordPhotosReady": "8",
+      "recordPhotoReveal": "2939.100000000093",
+      "recordFirstRevealReady": "6",
+      "recordRemainderStarted": "2939.100000000093"
+    },
+    "imgs": [
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/0.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/1.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/2.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/3.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/4.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/six/5.png"
+      }
+    ],
+    "text": "PHOTO HIGHLIGHTS\n\n8 PHOTOS · 8 READY\n\n1 / 2",
+    "req": [
+      {
+        "n": 0,
+        "t": 1789077408562
+      },
+      {
+        "n": 1,
+        "t": 1789077408563
+      },
+      {
+        "n": 2,
+        "t": 1789077408564
+      },
+      {
+        "n": 3,
+        "t": 1789077408565
+      },
+      {
+        "n": 4,
+        "t": 1789077408566
+      },
+      {
+        "n": 5,
+        "t": 1789077408566
+      },
+      {
+        "n": 6,
+        "t": 1789077409350
+      },
+      {
+        "n": 7,
+        "t": 1789077409350
+      }
+    ]
+  },
+  {
+    "scenario": "fewer",
+    "first": {
+      "at": 1789077412684,
+      "data": {
+        "recordPreloadStarted": "1946.6000000000931",
+        "recordHeaderSettled": "2557",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "3",
+        "recordPhotoReveal": "2774.2999999998137",
+        "recordFirstRevealReady": "3",
+        "recordRemainderStarted": "2774.399999999907"
+      },
+      "imgs": [
+        {
+          "ready": true,
+          "src": "https://qa.invalid/fewer/0.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/fewer/1.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/fewer/2.png"
+        }
+      ]
+    },
+    "current": {
+      "recordPreloadStarted": "1946.6000000000931",
+      "recordHeaderSettled": "2557",
+      "recordInfoState": "visible",
+      "recordPhotoState": "ready",
+      "recordPhotosReady": "3",
+      "recordPhotoReveal": "2774.2999999998137",
+      "recordFirstRevealReady": "3",
+      "recordRemainderStarted": "2774.399999999907"
+    },
+    "imgs": [
+      {
+        "ready": true,
+        "src": "https://qa.invalid/fewer/0.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/fewer/1.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/fewer/2.png"
+      }
+    ],
+    "text": "PHOTO HIGHLIGHTS\n\n3 PHOTOS · 3 READY\n\n1 / 1",
+    "req": [
+      {
+        "n": 0,
+        "t": 1789077411897
+      },
+      {
+        "n": 1,
+        "t": 1789077411897
+      },
+      {
+        "n": 2,
+        "t": 1789077411902
+      }
+    ]
+  },
+  {
+    "scenario": "delay",
+    "first": {
+      "at": 1789077416708,
+      "data": {
+        "recordPreloadStarted": "1946.4000000003725",
+        "recordHeaderSettled": "2556.100000000093",
+        "recordInfoState": "visible",
+        "recordPhotoState": "loading",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "3476.5",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "3476.600000000093"
+      },
+      "imgs": []
+    },
+    "current": {
+      "recordPreloadStarted": "1946.4000000003725",
+      "recordHeaderSettled": "2556.100000000093",
+      "recordInfoState": "visible",
+      "recordPhotoState": "ready",
+      "recordPhotosReady": "8",
+      "recordPhotoReveal": "3476.5",
+      "recordFirstRevealReady": "0",
+      "recordRemainderStarted": "3476.600000000093"
+    },
+    "imgs": [
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/0.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/1.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/2.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/3.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/4.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/delay/5.png"
+      }
+    ],
+    "text": "PHOTO HIGHLIGHTS\n\n8 PHOTOS · 8 READY\n\n1 / 2",
+    "req": [
+      {
+        "n": 0,
+        "t": 1789077415220
+      },
+      {
+        "n": 1,
+        "t": 1789077415221
+      },
+      {
+        "n": 2,
+        "t": 1789077415221
+      },
+      {
+        "n": 3,
+        "t": 1789077415221
+      },
+      {
+        "n": 4,
+        "t": 1789077415221
+      },
+      {
+        "n": 5,
+        "t": 1789077415221
+      },
+      {
+        "n": 6,
+        "t": 1789077417064
+      },
+      {
+        "n": 7,
+        "t": 1789077417064
+      }
+    ]
+  },
+  {
+    "scenario": "failed",
+    "first": {
+      "at": 1789077422061,
+      "data": {
+        "recordPreloadStarted": "1965.2999999998137",
+        "recordHeaderSettled": "2575.100000000093",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2792.6999999997206",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2792.6999999997206"
+      },
+      "imgs": [
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/1.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/2.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/3.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/4.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/5.png"
+        },
+        {
+          "ready": true,
+          "src": "https://qa.invalid/failed/6.png"
+        }
+      ]
+    },
+    "current": {
+      "recordPreloadStarted": "1965.2999999998137",
+      "recordHeaderSettled": "2575.100000000093",
+      "recordInfoState": "visible",
+      "recordPhotoState": "ready",
+      "recordPhotosReady": "7",
+      "recordPhotoReveal": "2792.6999999997206",
+      "recordFirstRevealReady": "6",
+      "recordRemainderStarted": "2792.6999999997206"
+    },
+    "imgs": [
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/1.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/2.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/3.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/4.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/5.png"
+      },
+      {
+        "ready": true,
+        "src": "https://qa.invalid/failed/6.png"
+      }
+    ],
+    "text": "PHOTO HIGHLIGHTS\n\n8 PHOTOS · 7 READY\n\n1 / 2\n\n1 photo could not be prepared.",
+    "req": [
+      {
+        "n": 0,
+        "t": 1789077421275
+      },
+      {
+        "n": 1,
+        "t": 1789077421275
+      },
+      {
+        "n": 2,
+        "t": 1789077421276
+      },
+      {
+        "n": 3,
+        "t": 1789077421276
+      },
+      {
+        "n": 4,
+        "t": 1789077421277
+      },
+      {
+        "n": 5,
+        "t": 1789077421277
+      },
+      {
+        "n": 6,
+        "t": 1789077421285
+      },
+      {
+        "n": 7,
+        "t": 1789077422061
+      }
+    ]
+  },
+  {
+    "scenario": "hang",
+    "first": {
+      "at": 1789077426068,
+      "data": {
+        "recordPreloadStarted": "1931.2999999998137",
+        "recordHeaderSettled": "2539.7999999998137",
+        "recordInfoState": "visible",
+        "recordPhotoState": "loading",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "3460.899999999907",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "3460.899999999907"
+      },
+      "imgs": []
+    },
+    "current": {
+      "recordPreloadStarted": "1931.2999999998137",
+      "recordHeaderSettled": "2539.7999999998137",
+      "recordInfoState": "visible",
+      "recordPhotoState": "loading",
+      "recordPhotosReady": "0",
+      "recordPhotoReveal": "3460.899999999907",
+      "recordFirstRevealReady": "0",
+      "recordRemainderStarted": "3460.899999999907"
+    },
+    "imgs": [],
+    "text": "PHOTO HIGHLIGHTS\n\n8 PHOTOS · 0 READY\n\n1 / 2\n\nRetrieving photo highlights…",
+    "req": [
+      {
+        "n": 0,
+        "t": 1789077424580
+      },
+      {
+        "n": 1,
+        "t": 1789077424580
+      },
+      {
+        "n": 2,
+        "t": 1789077424580
+      },
+      {
+        "n": 3,
+        "t": 1789077424580
+      },
+      {
+        "n": 4,
+        "t": 1789077424580
+      },
+      {
+        "n": 5,
+        "t": 1789077424580
+      }
+    ]
+  }
+]
