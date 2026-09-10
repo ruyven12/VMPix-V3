@@ -41,6 +41,8 @@ Canonical protection details: [Project Rules](PROJECT_RULES.md), [Home Story / E
 
 PASS 6 confirms a current Shell-integrated implementation with frontend API bindings, beyond the earlier mock-only inventory. These statuses describe source implementation, not runtime acceptance or human visual signoff.
 
+**Historical protection records:** PASS 9 migrated the user-supplied prior approvals for Daïion identity/atmosphere, Wrestling Engine energy, Daïion-to-Hall continuity, Hall of Crusades structure/title morph/atmosphere, Hall of Champions structure, Fields of Conflict production structure, and venue dossier organization into [Protected Decisions](V3_PROTECTED_DECISIONS.md). Definitions and approval boundaries live there. These historical creative/structural approvals do not establish current runtime or physical-device acceptance; the source implementation statuses, unfinished coordinates/data, match failure-state work, and pending QA below remain unchanged.
+
 | Surface | Source-verified status |
 | --- | --- |
 | Daïion / Wrestling landing | Implemented/current. |
