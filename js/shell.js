@@ -736,12 +736,19 @@ function isHallEngineShowDetailRouteActive() {
   );
 }
 
+function isHallEngineMatchRouteActive() {
+  // Match-photo routes share the match Shell context.
+  return shell?.dataset.shellRoute === "wrestling-match-detail";
+}
+
 function isHallEngineTitleMorphRouteActive() {
-  return isHallEngineShowsRouteActive() || isHallEngineShowDetailRouteActive();
+  return isHallEngineShowsRouteActive() || isHallEngineShowDetailRouteActive() || isHallEngineMatchRouteActive();
 }
 
 function getHallEngineTitleAlternate() {
-  return isHallEngineShowDetailRouteActive() ? HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE : HALL_ENGINE_TITLE_ALTERNATE;
+  return isHallEngineShowDetailRouteActive() || isHallEngineMatchRouteActive()
+    ? HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE
+    : HALL_ENGINE_TITLE_ALTERNATE;
 }
 function queueHallEngineTitleMorphStep(cycle, delay, callback) {
   hallEngineTitleMorphTimer = window.setTimeout(() => {
@@ -787,7 +794,7 @@ function startHallEngineTitleMorph() {
   const cycle = hallEngineTitleMorphCycle + 1;
   hallEngineTitleMorphCycle = cycle;
   const alternateTitle = getHallEngineTitleAlternate();
-  const alternateState = isHallEngineShowDetailRouteActive() ? "record" : "archive";
+  const alternateState = isHallEngineShowDetailRouteActive() || isHallEngineMatchRouteActive() ? "record" : "archive";
   const showArchiveTitle = () => morphHallEngineTitle(cycle, alternateTitle, alternateState, HALL_ENGINE_TITLE_HOLD_MS, showLoreTitle);
   const showLoreTitle = () => morphHallEngineTitle(cycle, HALL_ENGINE_TITLE_PRIMARY, "lore", HALL_ENGINE_TITLE_REST_MS, showArchiveTitle);
   queueHallEngineTitleMorphStep(cycle, HALL_ENGINE_TITLE_HOLD_MS, showArchiveTitle);
@@ -2374,7 +2381,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   }
   if (route.name !== "portfolio") {
     shell.classList.remove("has-portfolio-entry-constellation");
-    clearPortfolioEngineReadyState();
+    clearPortfolioEngineReadyState({ preserveWorld: route.name === "wrestling-show-detail" || shellRouteName === "wrestling-match-detail" });
   }
   if (route.name !== "portfolio" && route.name !== "wrestling") {
     clearPortfolioGatewayState();
@@ -3581,6 +3588,15 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
     renderWrestlingMatchDetailPrototypeRoute(route);
   }
   setActiveGlobalNav("wrestling");
+  if (shell.dataset.activeWorld !== "battleground") {
+    setPortfolioActiveWorld("battleground");
+  }
+  if (
+    !getHallEngineTitlePanel()?.classList.contains("has-hall-engine-title-morph") ||
+    ![HALL_ENGINE_TITLE_PRIMARY, HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE].includes(portfolioEngineCurrentView?.textContent)
+  ) {
+    startHallEngineTitleMorph();
+  }
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -4531,13 +4547,15 @@ function cancelPortfolioEngineReadyGate() {
   portfolioEngineReadyGateStartedAt = 0;
 }
 
-function clearPortfolioEngineReadyState() {
+function clearPortfolioEngineReadyState(options = {}) {
   cancelPortfolioEngineReadyGate();
   clearPortfolioEngineScan();
   stopPortfolioEngineLightning();
   hidePortfolioEngineProjection({ immediate: true });
   setPortfolioBeaconHotspotsEnabled(false);
-  setPortfolioActiveWorld("portfolio");
+  if (!options.preserveWorld) {
+    setPortfolioActiveWorld("portfolio");
+  }
   if (!shell) {
     return;
   }

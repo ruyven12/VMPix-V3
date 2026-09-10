@@ -6194,6 +6194,36 @@ function createWrestlingMatchDossierPhotoPreviewGrid(pagination = null) {
   return grid.childElementCount > 0 ? grid : null;
 }
 
+function renderWrestlingMatchDossierState(route, stateName) {
+  const showId = getWrestlingMatchDetailRouteShowId(route);
+  const section = document.createElement("section");
+  section.className = "wrestling-match-dossier-state";
+  section.dataset.wrestlingMatchState = stateName;
+  const backButton = document.createElement("button");
+  backButton.type = "button";
+  backButton.className = "wrestling-detail-back";
+  backButton.textContent = "Back to Show";
+  backButton.addEventListener("click", () => navigateToRoute(
+    `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(showId))}`
+  ));
+  section.append(backButton, createWrestlingV3StateCard(stateName, "wrestlingShows", {
+    title: stateName === "loading" ? "Loading Encounter Archive" : "Archive Record Unavailable",
+    text: stateName === "loading"
+      ? "The requested encounter record is being retrieved."
+      : stateName === "error"
+        ? "Unable to load the encounter archive. Retry or return to the parent show."
+        : "No matching encounter record was found. Return to the parent show.",
+    retry: stateName === "error" ? {
+      label: "Retry Encounter",
+      onClick: () => {
+        retryWrestlingShowsState();
+        renderWrestlingMatchDetailPrototypeRoute(getRouteFromUrl(), { skipDataRequest: true });
+      },
+    } : false,
+  }));
+  wrestlingMatchDetailPrototypeShell.replaceChildren(section);
+}
+
 // Canonical production Wrestling Match Detail renderer.
 // Extend this shared path rather than creating parallel Match Detail renderers.
 function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), options = {}) {
@@ -6205,16 +6235,6 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
     return;
   }
 
-  const show = getWrestlingMatchDossierPrototypeSourceShow(route);
-  const match = getWrestlingMatchDossierPrototypeSourceMatch(route, show);
-  requestWrestlingMatchDossierPrototypePhotoCount(show);
-  const hero = createWrestlingMatchDossierHero(match);
-  const metadata = createWrestlingMatchDossierMetadata(show, match);
-  const photoPagination = getWrestlingMatchDossierPhotoPagination(show, match);
-  const photoHighlights = createWrestlingMatchDossierPhotoHighlights(show, match, photoPagination);
-  const photoPreviewGrid = createWrestlingMatchDossierPhotoPreviewGrid(photoPagination);
-  wrestlingMatchDetailPrototypeShell.replaceChildren(...[hero, metadata, photoHighlights, photoPreviewGrid].filter(Boolean));
-
   if (
     !options.skipDataRequest &&
     typeof requestWrestlingShowsData === "function" &&
@@ -6224,6 +6244,31 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
   ) {
     requestWrestlingShowsData();
   }
+
+  if (wrestlingShowsDataState === "idle" || wrestlingShowsDataState === "loading") {
+    renderWrestlingMatchDossierState(route, "loading");
+    return;
+  }
+  if (wrestlingShowsDataState === "error") {
+    renderWrestlingMatchDossierState(route, "error");
+    return;
+  }
+  const show = getWrestlingMatchDossierPrototypeSourceShow(route);
+  const match = show?.matches
+    ? findWrestlingMatchInRowsByRef(show.matches, getWrestlingMatchDetailRouteMatchRef(route))
+    : null;
+  if (!match) {
+    renderWrestlingMatchDossierState(route, "empty");
+    return;
+  }
+  requestWrestlingMatchDossierPrototypePhotoCount(show);
+  const hero = createWrestlingMatchDossierHero(match);
+  const metadata = createWrestlingMatchDossierMetadata(show, match);
+  const photoPagination = getWrestlingMatchDossierPhotoPagination(show, match);
+  const photoHighlights = createWrestlingMatchDossierPhotoHighlights(show, match, photoPagination);
+  const photoPreviewGrid = createWrestlingMatchDossierPhotoPreviewGrid(photoPagination);
+  wrestlingMatchDetailPrototypeShell.replaceChildren(...[hero, metadata, photoHighlights, photoPreviewGrid].filter(Boolean));
+
 }
 
 function createHallPrototypeEncounterSection(show = {}) {

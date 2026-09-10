@@ -14253,6 +14253,16 @@ button.wrestling-event-history-tagged-thumb {
   visibility: hidden !important;
 }
 
+.wrestling-match-dossier-state {
+  grid-row: 1 / -1;
+  align-self: start;
+  display: grid;
+  gap: 1rem;
+  inline-size: min(100%, 52rem);
+  min-inline-size: 0;
+  pointer-events: auto;
+}
+
 .wrestling-match-dossier-metadata {
   position: relative;
   isolation: isolate;
