@@ -25,9 +25,12 @@ Current explicit decisions win over old planning assumptions. Engineering law, c
 - [Data Contracts](docs/V3_DATA_CONTRACTS.md) — frontend tolerance principles and proposed backend payloads.
 - [UI Animation Checklist](docs/CODEX_UI_ANIMATION_CHECKLIST.md) — focused inspection, regression checks, and handoff evidence.
 - [Codex Pass Template](docs/CODEX_PASS_TEMPLATE.md) — concise task scope and acceptance details; permanent rules are inherited from AGENTS.md and governing documentation.
+- [$v3-qa Skill](.agents/skills/v3-qa/SKILL.md) — proportional QA selection, browser/evidence procedure, and result format.
+- Project roles: [Scout](.codex/agents/v3-scout.toml), [Builder](.codex/agents/v3-builder.toml), [QA](.codex/agents/v3-qa.toml), [Reviewer](.codex/agents/v3-reviewer.toml). The parent coordinates; Builder is the application-writing subagent.
+- [QA harness](scripts/v3-qa.js): `npm run v3:qa -- route /wrestling/shows`; modes are `smoke`, `route /path`, `wrestling`, and `all`. Use proportional coverage; generic route health includes standard responsive/reduced-motion checks.
 - [Design Reference Art](docs/design/reference-art/README.md) — reference-only asset policy and Draft/Locked catalog.
 
-Current-state claims are retained documentation snapshots, not runtime verification performed by PASS 2. World Bible records Home/Portfolio as protected and identifies The Story, The Trajectory, and The Comms as the creative focus; pending QA and contradictory status labels remain flagged in the relevant documents.
+The workflow is operational for normal Experience Build; Current State distinguishes repository-verified tooling from dated execution reports, older module snapshots, pending upgrades, and physical/human signoff. Module Blueprint supplies reuse contracts without changing world identity. Governing creative canon and unresolved decisions remain unchanged.
 
 ## Historical and future-planning references
 

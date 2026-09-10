@@ -8,6 +8,10 @@ Scope stays small; verification may be thorough. Use existing browser/QA automat
 
 Use this checklist before, during, and after every V3 UI animation edit.
 
+Use [$v3-qa](../.agents/skills/v3-qa/SKILL.md) to choose proportional checks and `npm run v3:qa -- route /wrestling/shows` (substitute the affected route) for generic responsive/reduced-motion health. Generic checks do not replace gesture, frame/pixel, or device review; do not default to `all`. Modes and current workflow status live in [Current State](CURRENT_STATE.md).
+
+Where multi-agent work is appropriate, the parent coordinates Scout diagnosis → Builder implementation → independent QA → Reviewer. QA reports in-scope defects to Builder through the parent for correction/retest; QA/Reviewer do not repair application code. Chris does not relay routine findings. Keep Source Verified, Browser Verified, Automated Test Verified, Device Verified, and Human Visual Signoff distinct; AI review never supplies Chris's cinematic approval.
+
 ## Before Editing
 
 - Read `docs/V3_EXPERIENCE_BUILD_RULES.md` first.
@@ -34,10 +38,10 @@ Use this checklist before, during, and after every V3 UI animation edit.
 
 ## After Editing
 
-- Check mobile first.
-- Check desktop after mobile behavior is stable.
+- Check mobile first at 360×800 and 412×915; check affected breakpoint boundaries too.
+- Check desktop at 1920×1080 after mobile behavior is stable.
 - Check reduced motion.
-- Check no flicker, no overlap, no layout shift, and no hidden loading flash.
+- Check no flicker, no overlap, no layout shift, and no hidden loading flash. For changed transitions, inspect visible start/handoff/cleanup frames and repeat/cancel behavior; computed visibility alone is insufficient.
 - Check no horizontal overflow.
 - Check scroll behavior on long pages.
 - Check route, deep-link, SPA navigation, and browser back behavior.

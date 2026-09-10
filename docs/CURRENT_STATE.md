@@ -5,8 +5,8 @@
 - Project: Website-V3 / VMPix-V3
 - Purpose: Current project-state snapshot
 - Status: Active / frequently updated
-- Last reviewed: 2026-09-10
-- Basis: Chris's PASS 5 direction, PASS 6 Wrestling source inspection, and PASS 7 documentation synchronization (2026-09-10). No browser, remote-service, or physical-device validation was performed in PASS 6 or PASS 7.
+- Last reviewed: 2026-09-10 — PASS 26 workflow refresh
+- Basis: PASS 5 direction and PASS 6–7 implementation snapshots; PASS 26 verifies current workflow files and records completed PASS 10–25/follow-up reports from this task history. No application re-audit, browser/E2E rerun, or physical-device validation was performed in PASS 26.
 
 Read [AGENTS.md](../AGENTS.md) first. This file records **state, not permanent law**; engineering, workflow, and creative authority remain in the governing documents.
 
@@ -37,13 +37,13 @@ This sequence comes from Chris's PASS 5 direction and supersedes older developme
 
 Canonical protection details: [Project Rules](PROJECT_RULES.md), [Home Story / Experience Build](V3_EXPERIENCE_BUILD_RULES.md), and [World Bible](design/world-bible.md). LOCKED is not proof that all device checks passed; do not reopen approved design merely because QA evidence needs recording.
 
-## 5. Wrestling Current State
+## 5. Wrestling Implementation Snapshot and Later Milestones
 
-PASS 6 confirms a current Shell-integrated implementation with frontend API bindings, beyond the earlier mock-only inventory. These statuses describe source implementation, not runtime acceptance or human visual signoff.
+The table and source details below retain the PASS 6–7 snapshot, not a fresh completeness audit. Later pass reports supersede its match-failure recommendation: PASS 12 completed explicit match loading/unavailable/error handling; PASS 17 fixed missing-venue substitution. PASS 19–24/follow-up delivered scoped multi-agent Hall refinements with browser QA and review, while physical/creative acceptance remains separate. See §§8 and 11 for workflow evidence. No broad application audit is claimed here.
 
-**Historical protection records:** PASS 9 migrated the user-supplied prior approvals for Daïion identity/atmosphere, Wrestling Engine energy, Daïion-to-Hall continuity, Hall of Crusades structure/title morph/atmosphere, Hall of Champions structure, Fields of Conflict production structure, and venue dossier organization into [Protected Decisions](V3_PROTECTED_DECISIONS.md). Definitions and approval boundaries live there. These historical creative/structural approvals do not establish current runtime or physical-device acceptance; the source implementation statuses, unfinished coordinates/data, match failure-state work, and pending QA below remain unchanged.
+**Historical protection records:** PASS 9 migrated the user-supplied prior approvals for Daïion identity/atmosphere, Wrestling Engine energy, Daïion-to-Hall continuity, Hall of Crusades structure/title morph/atmosphere, Hall of Champions structure, Fields of Conflict production structure, and venue dossier organization into [Protected Decisions](V3_PROTECTED_DECISIONS.md). Definitions and approval boundaries live there. These historical creative/structural approvals do not establish current runtime or physical-device acceptance. The retained source snapshot below must be read alongside the later milestones above.
 
-| Surface | Source-verified status |
+| Surface | PASS 6 source-verified snapshot |
 | --- | --- |
 | Daïion / Wrestling landing | Implemented/current. |
 | Hall of Crusades / Shows | Implemented/current. |
@@ -61,9 +61,9 @@ Shell integration is source-verified: shared routing/state, browser `popstate` s
 
 Some Wrestling module and inline venue code directly mutates Shell classes/datasets. **Architecture review item — not authorization to refactor.** Protected Shell ownership and Engine Bar behavior remain governing rules.
 
-**Factual unfinished area:** Match dossier/gallery failure-state behavior remains incomplete. An unresolved match falls back to a generic `Side Pending` record.
+**Historical PASS 6 finding, superseded by the PASS 12 report:** unresolved matches rendered generic `Side Pending` content. This is retained as the reason for subsequent failure-state work, not a current next-task instruction.
 
-**Recommended next Wrestling implementation pass:** verify missing-show, missing-match, and timeout behavior in-browser, then implement one clear recoverable unavailable state if needed. This recommendation does not start or authorize implementation.
+**Next Wrestling step:** use current task-specific evidence and pending physical/visual review to select the next surface; do not restart the superseded PASS 6 failure-state recommendation from this snapshot.
 
 ## 6. Music Current State
 
@@ -86,20 +86,22 @@ Wrestling frontend bindings to `https://vmpix-data.onrender.com` are source-veri
 
 ## 8. QA State
 
-Current target matrix supplied by Chris:
+The [QA Skill](../.agents/skills/v3-qa/SKILL.md) selects proportional checks; the [existing harness](../scripts/v3-qa.js), exposed by [package.json](../package.json), executes them using Playwright. These mechanisms are operational, not future work.
 
-- 360×800.
-- 412×915 — primary Samsung S25 Ultra-sized target.
-- 1920×1080.
-- iPhone Safari; Facebook, Messenger, and Instagram webviews.
+| Mode | Current role |
+| --- | --- |
+| `npm run v3:qa -- smoke` | Existing route smoke coverage; default when no mode is supplied. |
+| `npm run v3:qa -- route /wrestling/shows` | One route at 360×800, 412×915, and 1920×1080, each with normal and reduced motion: six health checks. |
+| `npm run v3:qa -- wrestling` | Current Wrestling smoke cases plus generic gateway/Hall/show health. |
+| `npm run v3:qa -- all` | Complete existing E2E suite plus generic routes; includes legacy assertions and is not the default for surgical changes. |
 
-PASS 6 inspected test assertions for Wrestling route navigation, detail drilldowns, photo navigation/back, overflow, touch targets, console errors, and empty/delayed/missing-data cases. These are coverage in test source, not passing results; no tests were run in PASS 6 or PASS 7.
+Generic health covers rendering, application runtime errors, horizontal overflow, accessible control bounds, and scrolling. It does not establish data correctness, full accessibility, interaction/animation quality, or physical-device acceptance. Supplement it with relevant browser gestures, visible-pixel/frame inspection, failure checks, and device evidence. Existing failure screenshots/traces support diagnosis; reports may be replaced by later runs.
 
-Known drift/gaps: the existing "S25 Ultra" test uses 384×854 rather than 412×915; no verified 1920×1080 Wrestling coverage was found; explicit reduced-motion assertions were not found; some selectors, routes, and assertions target replaced UI. The standard 360×800, 412×915, and 1920×1080 targets remain required, with no current pass claimed. Webview emulation is not physical webview verification. Remote API success and missing-show/missing-match/timeout recovery still need browser verification. Older Music coverage remains unverified here.
+**Recorded results, not reruns in PASS 26:** PASS 17 reached **37/37 green smoke checks** after the missing-venue defect was fixed, without weakening its assertion. PASS 19–24 and the rail-breakpoint follow-up repeatedly used successful scoped route-health runs and independent browser checks. The follow-up recorded **12/12** Hall/show checks and **565 transition frames** at 412px and 591px. These results describe those tested builds and routes, not a current all-suite or deployment guarantee.
 
-Physical-device QA: tracked separately from viewport emulation; Home final mobile validation remains pending in its source. Other device coverage requires confirmation.
+**Remaining test drift:** Wrestling mode explicitly excludes the legacy people-responsive, venues-responsive, and relationship-hooks specs; they remain available unchanged in `all`/`test:e2e`. Retired selectors/routes and old viewport/placeholder assumptions still require incremental modernization when relevant work touches them. Home/Calendar assertions also need triage. The PASS 6 absence of verified 1920px/reduced-motion coverage is historical; the generic layer now supplies both, without modernizing every specialized test.
 
-Subjective animation signoff: Chris's review is required for cinematic feel, animation quality, and device-specific visual judgment; recordings support it. Existing creative approvals remain protected. Use the [UI Animation Checklist](CODEX_UI_ANIMATION_CHECKLIST.md); record tested build, target, result, and evidence when verification occurs.
+Physical Samsung S25 Ultra, iPhone Safari, and embedded-webview verification remain separate from viewport emulation. Chris's supplied recordings/screenshots prompted follow-up fixes; they do not automatically approve the resulting builds. Final cinematic/device acceptance for recent Hall refinements remains pending. Use the [animation checklist](CODEX_UI_ANIMATION_CHECKLIST.md) and keep source, browser, automated-test, physical-device, and human-visual evidence distinct.
 
 ## 9. Current Known Unresolved Decisions
 
@@ -112,7 +114,7 @@ None is resolved here. They do not block unrelated development; raise them when 
 
 ## 10. Near-Term Development Sequence
 
-1. Finish the AI/Codex workflow upgrade.
+1. Use the operational AI/Codex workflow for normal Experience Build; keep optional upgrades separately scoped.
 2. Resume the current Wrestling Experience Build surface; identify its exact next story beat and acceptance criteria before editing.
 3. Complete and sign off Wrestling surfaces.
 4. Build Music using proven V3 architecture and reusable workflow.
@@ -124,7 +126,40 @@ Future stages are direction, not blanket implementation or deployment approval.
 
 ## 11. Current AI Development Workflow
 
-Root AGENTS.md, governing-document inheritance, and the [concise pass template](CODEX_PASS_TEMPLATE.md) are in place. Surgical file scope and self-verification within approved scope are the current workflow. Reusable skills, subagents, and expanded QA automation are future workflow work, not claimed installed or complete. Tools support implementation and preserve human approval boundaries.
+### Operational now
+
+The engineering workflow upgrade is **substantially complete for normal Experience Build use**; optional enhancements are not all complete.
+
+- [AGENTS.md](../AGENTS.md) supplies inherited operating rules; the [short pass template](CODEX_PASS_TEMPLATE.md) supplies task-specific scope and acceptance criteria.
+- [$v3-qa](../.agents/skills/v3-qa/SKILL.md) provides reusable QA selection/reporting. `npm run v3:qa` provides execution; modes and evidence limits are summarized in §8.
+- [V3 Module Blueprint](V3_MODULE_BLUEPRINT.md), created in PASS 25, defines reusable gateways, indexes, details, media, Shell/Engine, data/recovery, responsive, and signoff contracts for Music and future Portfolio worlds. It preserves each world's independent creative identity.
+
+| Project role | Responsibility |
+| --- | --- |
+| [v3_scout](../.codex/agents/v3-scout.toml) | Investigate the actual path and evidence; recommend minimum scope; no implementation. |
+| [v3_builder](../.codex/agents/v3-builder.toml) | Designated, sole application-writing subagent; implement authorized changes and in-scope corrections. |
+| [v3_qa](../.codex/agents/v3-qa.toml) | Independently verify with the Skill/harness/browser tools; ordinary QA artifacts allowed, no application/test/documentation repairs. |
+| [v3_reviewer](../.codex/agents/v3-reviewer.toml) | Review the final diff and QA evidence; no writes. Technical review does not replace Chris's approval. |
+
+The parent coordinates Scout → Builder → QA → Reviewer when appropriate, chooses proportional checks, and relays findings directly. For an in-scope defect, return it to Builder, then QA retests before review/handoff. Chris need not relay routine findings. Not every pass needs all four roles; no competing implementations or silent scope expansion.
+
+### Runtime and implementation evidence
+
+PASS 18 created the four project role definitions. PASS 18B successfully ran all four named read-only delegation exercises; PASS 19–24 and the rail follow-up used the roles for real Wrestling diagnosis, implementation, independent QA, and final review. Recent examples include measured carousel opacity continuity, prepared-dossier geometry/visibility handoff, fade completion before cleanup, and rail breakpoint verification. Review verdicts retained **human visual review required** where applicable.
+
+Runtime qualification: delegated task names and role-instruction use were verified. Automatic TOML configuration application, effective model/reasoning, role-specific sandbox enforcement, and interactive `/agent` switching were not established by PASS 18B. Successful role-guided delegation is not proof of those unavailable metadata or enforcement details.
+
+Repository files verify the workflow's definitions and commands in PASS 26. Execution outcomes above come from completed pass reports in this task history; no browser/E2E or physical-device runs occurred in this documentation pass.
+
+### Remaining upgrade items
+
+- Reusable visual baseline/reference workflow remains pending; individual screenshots/frame comparisons are not that complete system.
+- Render workflow integration remains pending as an upgrade; this is not a claim that the existing deployment is absent or broken.
+- Stale-test modernization remains incremental and scoped.
+- Optional hooks, worktree, and security workflow enhancements remain future work.
+- A creative/lore agent layer is intentionally deferred; creative canon and Chris's authority remain unchanged.
+
+These are recorded follow-ups, not permission to design or implement them in this pass.
 
 ## 12. Update Policy
 
