@@ -1,0 +1,288 @@
+[
+  {
+    "w": 360,
+    "motion": "no-preference",
+    "x": {
+      "label": {
+        "x": 19.3984375,
+        "y": 727.5,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 727.5,
+        "right": 56.7265625,
+        "bottom": 737.734375,
+        "left": 19.3984375
+      },
+      "button": {
+        "x": 15.703125,
+        "y": 737.734375,
+        "width": 44.71875,
+        "height": 44.71875,
+        "top": 737.734375,
+        "right": 60.421875,
+        "bottom": 782.453125,
+        "left": 15.703125
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "clips": [
+        {
+          "cls": "portfolio-engine",
+          "top": 728.34375,
+          "labelTop": 727.5,
+          "overflow": "hidden"
+        }
+      ],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "opacity": "0.815216",
+      "shadow": "none",
+      "overflow": false
+    }
+  },
+  {
+    "w": 360,
+    "motion": "reduce",
+    "x": {
+      "label": {
+        "x": 19.3984375,
+        "y": 727.5,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 727.5,
+        "right": 56.7265625,
+        "bottom": 737.734375,
+        "left": 19.3984375
+      },
+      "button": {
+        "x": 15.703125,
+        "y": 737.734375,
+        "width": 44.71875,
+        "height": 44.71875,
+        "top": 737.734375,
+        "right": 60.421875,
+        "bottom": 782.453125,
+        "left": 15.703125
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "clips": [
+        {
+          "cls": "portfolio-engine",
+          "top": 728.34375,
+          "labelTop": 727.5,
+          "overflow": "hidden"
+        }
+      ],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "none",
+      "opacity": "0.82",
+      "shadow": "none",
+      "overflow": false
+    }
+  },
+  {
+    "w": 412,
+    "motion": "no-preference",
+    "x": {
+      "label": {
+        "x": 21.8984375,
+        "y": 835.28125,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 835.28125,
+        "right": 59.2265625,
+        "bottom": 845.515625,
+        "left": 21.8984375
+      },
+      "button": {
+        "x": 16.03125,
+        "y": 845.515625,
+        "width": 49.078125,
+        "height": 49.078125,
+        "top": 845.515625,
+        "right": 65.109375,
+        "bottom": 894.59375,
+        "left": 16.03125
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "clips": [],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "opacity": "0.804097",
+      "shadow": "none",
+      "overflow": false
+    }
+  },
+  {
+    "w": 412,
+    "motion": "reduce",
+    "x": {
+      "label": {
+        "x": 21.8984375,
+        "y": 835.28125,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 835.28125,
+        "right": 59.2265625,
+        "bottom": 845.515625,
+        "left": 21.8984375
+      },
+      "button": {
+        "x": 16.03125,
+        "y": 845.515625,
+        "width": 49.078125,
+        "height": 49.078125,
+        "top": 845.515625,
+        "right": 65.109375,
+        "bottom": 894.59375,
+        "left": 16.03125
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "clips": [],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "none",
+      "opacity": "0.82",
+      "shadow": "none",
+      "overflow": false
+    }
+  },
+  {
+    "w": 1920,
+    "motion": "no-preference",
+    "x": {
+      "label": {
+        "x": 510.1328125,
+        "y": 994.9375,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 994.9375,
+        "right": 547.4609375,
+        "bottom": 1005.171875,
+        "left": 510.1328125
+      },
+      "button": {
+        "x": 497,
+        "y": 1005.171875,
+        "width": 63.59375,
+        "height": 63.59375,
+        "top": 1005.171875,
+        "right": 560.59375,
+        "bottom": 1068.765625,
+        "left": 497
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "clips": [
+        {
+          "cls": "portfolio-engine",
+          "top": 995.546875,
+          "labelTop": 994.9375,
+          "overflow": "hidden"
+        }
+      ],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "opacity": "0.798618",
+      "shadow": "none",
+      "overflow": false
+    }
+  },
+  {
+    "w": 1920,
+    "motion": "reduce",
+    "x": {
+      "label": {
+        "x": 510.1328125,
+        "y": 994.9375,
+        "width": 37.328125,
+        "height": 10.234375,
+        "top": 994.9375,
+        "right": 547.4609375,
+        "bottom": 1005.171875,
+        "left": 510.1328125
+      },
+      "button": {
+        "x": 497,
+        "y": 1005.171875,
+        "width": 63.59375,
+        "height": 63.59375,
+        "top": 1005.171875,
+        "right": 560.59375,
+        "bottom": 1068.765625,
+        "left": 497
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "clips": [
+        {
+          "cls": "portfolio-engine",
+          "top": 995.546875,
+          "labelTop": 994.9375,
+          "overflow": "hidden"
+        }
+      ],
+      "font": "10.24px",
+      "text": "BACK",
+      "animation": "none",
+      "opacity": "0.82",
+      "shadow": "none",
+      "overflow": false
+    }
+  }
+]
