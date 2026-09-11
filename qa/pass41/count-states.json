@@ -1,0 +1,62 @@
+[
+  {
+    "mode": "one",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n1 / 1 LOADED\n\n100%\n\n1 / 1",
+      "now": "1",
+      "max": "1",
+      "pct": "100%",
+      "state": "ready"
+    }
+  },
+  {
+    "mode": "five",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n5 / 5 LOADED\n\n100%\n\n1 / 1",
+      "now": "5",
+      "max": "5",
+      "pct": "100%",
+      "state": "ready"
+    }
+  },
+  {
+    "mode": "six",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n6 / 6 LOADED\n\n100%\n\n1 / 1",
+      "now": "6",
+      "max": "6",
+      "pct": "100%",
+      "state": "ready"
+    }
+  },
+  {
+    "mode": "partial64",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n52 / 64 LOADED\n\n81%\n\n1 / 10",
+      "now": "52",
+      "max": "64",
+      "pct": "81%",
+      "state": "partial"
+    }
+  },
+  {
+    "mode": "failed8",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n7 / 8 LOADED\n\n88%\n\n1 / 2",
+      "now": "7",
+      "max": "8",
+      "pct": "88%",
+      "state": "partial"
+    }
+  },
+  {
+    "mode": "hang",
+    "x": {
+      "text": "PHOTO HIGHLIGHTS\n\n0 / 8 LOADED\n\n0%\n\n1 / 1",
+      "now": "0",
+      "max": "8",
+      "pct": "0%",
+      "state": "loading"
+    }
+  }
+]

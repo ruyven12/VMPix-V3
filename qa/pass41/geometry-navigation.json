@@ -1,0 +1,329 @@
+[
+  {
+    "w": 360,
+    "baseline": {
+      ".wrestling-match-dossier-hero": {
+        "x": 9,
+        "y": 22.390625,
+        "width": 342,
+        "height": 53.734375,
+        "top": 22.390625,
+        "right": 351,
+        "bottom": 76.125,
+        "left": 9
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 9,
+        "y": 76.125,
+        "width": 342,
+        "height": 171.296875,
+        "top": 76.125,
+        "right": 351,
+        "bottom": 247.421875,
+        "left": 9
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 9,
+        "y": 255.09375,
+        "width": 342,
+        "height": 48.625,
+        "top": 255.09375,
+        "right": 351,
+        "bottom": 303.71875,
+        "left": 9
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 9,
+        "y": 308.71875,
+        "width": 342,
+        "height": 416,
+        "top": 308.71875,
+        "right": 351,
+        "bottom": 724.71875,
+        "left": 9
+      },
+      "[data-portfolio-engine]": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      }
+    },
+    "current": {
+      ".wrestling-match-dossier-hero": {
+        "x": 9,
+        "y": 22.390625,
+        "width": 342,
+        "height": 53.734375,
+        "top": 22.390625,
+        "right": 351,
+        "bottom": 76.125,
+        "left": 9
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 9,
+        "y": 76.125,
+        "width": 342,
+        "height": 171.296875,
+        "top": 76.125,
+        "right": 351,
+        "bottom": 247.421875,
+        "left": 9
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 9,
+        "y": 255.09375,
+        "width": 342,
+        "height": 48.625,
+        "top": 255.09375,
+        "right": 351,
+        "bottom": 303.71875,
+        "left": 9
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 9,
+        "y": 308.71875,
+        "width": 342,
+        "height": 416,
+        "top": 308.71875,
+        "right": 351,
+        "bottom": 724.71875,
+        "left": 9
+      },
+      "[data-portfolio-engine]": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      }
+    },
+    "navigation": true,
+    "identical": true
+  },
+  {
+    "w": 412,
+    "baseline": {
+      ".wrestling-match-dossier-hero": {
+        "x": 10.296875,
+        "y": 25.609375,
+        "width": 391.40625,
+        "height": 47.09375,
+        "top": 25.609375,
+        "right": 401.703125,
+        "bottom": 72.703125,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 10.296875,
+        "y": 72.703125,
+        "width": 391.40625,
+        "height": 183.15625,
+        "top": 72.703125,
+        "right": 401.703125,
+        "bottom": 255.859375,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 10.296875,
+        "y": 263.53125,
+        "width": 391.40625,
+        "height": 48.625,
+        "top": 263.53125,
+        "right": 401.703125,
+        "bottom": 312.15625,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 10.296875,
+        "y": 317.15625,
+        "width": 391.40625,
+        "height": 505.578125,
+        "top": 317.15625,
+        "right": 401.703125,
+        "bottom": 822.734375,
+        "left": 10.296875
+      },
+      "[data-portfolio-engine]": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      }
+    },
+    "current": {
+      ".wrestling-match-dossier-hero": {
+        "x": 10.296875,
+        "y": 25.609375,
+        "width": 391.40625,
+        "height": 47.09375,
+        "top": 25.609375,
+        "right": 401.703125,
+        "bottom": 72.703125,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 10.296875,
+        "y": 72.703125,
+        "width": 391.40625,
+        "height": 183.15625,
+        "top": 72.703125,
+        "right": 401.703125,
+        "bottom": 255.859375,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 10.296875,
+        "y": 263.53125,
+        "width": 391.40625,
+        "height": 48.625,
+        "top": 263.53125,
+        "right": 401.703125,
+        "bottom": 312.15625,
+        "left": 10.296875
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 10.296875,
+        "y": 317.15625,
+        "width": 391.40625,
+        "height": 505.578125,
+        "top": 317.15625,
+        "right": 401.703125,
+        "bottom": 822.734375,
+        "left": 10.296875
+      },
+      "[data-portfolio-engine]": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      }
+    },
+    "navigation": true,
+    "identical": true
+  },
+  {
+    "w": 1920,
+    "baseline": {
+      ".wrestling-match-dossier-hero": {
+        "x": 448,
+        "y": 25.90625,
+        "width": 1024,
+        "height": 65.265625,
+        "top": 25.90625,
+        "right": 1472,
+        "bottom": 91.171875,
+        "left": 448
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 448,
+        "y": 102.6875,
+        "width": 1024,
+        "height": 268.453125,
+        "top": 102.6875,
+        "right": 1472,
+        "bottom": 371.140625,
+        "left": 448
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 448,
+        "y": 382.65625,
+        "width": 1024,
+        "height": 61.90625,
+        "top": 382.65625,
+        "right": 1472,
+        "bottom": 444.5625,
+        "left": 448
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 448,
+        "y": 449.5625,
+        "width": 1024,
+        "height": 531.125,
+        "top": 449.5625,
+        "right": 1472,
+        "bottom": 980.6875,
+        "left": 448
+      },
+      "[data-portfolio-engine]": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      }
+    },
+    "current": {
+      ".wrestling-match-dossier-hero": {
+        "x": 448,
+        "y": 25.90625,
+        "width": 1024,
+        "height": 65.265625,
+        "top": 25.90625,
+        "right": 1472,
+        "bottom": 91.171875,
+        "left": 448
+      },
+      ".wrestling-match-dossier-metadata": {
+        "x": 448,
+        "y": 102.6875,
+        "width": 1024,
+        "height": 268.453125,
+        "top": 102.6875,
+        "right": 1472,
+        "bottom": 371.140625,
+        "left": 448
+      },
+      ".wrestling-match-dossier-photo-highlights": {
+        "x": 448,
+        "y": 382.65625,
+        "width": 1024,
+        "height": 61.90625,
+        "top": 382.65625,
+        "right": 1472,
+        "bottom": 444.5625,
+        "left": 448
+      },
+      ".wrestling-match-dossier-photo-preview-grid": {
+        "x": 448,
+        "y": 449.5625,
+        "width": 1024,
+        "height": 531.125,
+        "top": 449.5625,
+        "right": 1472,
+        "bottom": 980.6875,
+        "left": 448
+      },
+      "[data-portfolio-engine]": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      }
+    },
+    "navigation": true,
+    "identical": true
+  }
+]

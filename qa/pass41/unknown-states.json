@@ -1,0 +1,47 @@
+[
+  {
+    "mode": "total",
+    "early": {
+      "text": "PHOTO HIGHLIGHTS PREPARING ARCHIVE",
+      "state": "indeterminate",
+      "now": null,
+      "max": null
+    },
+    "final": {
+      "text": "PHOTO HIGHLIGHTS\n\n8 / 8 LOADED\n\n100%\n\n1 / 2",
+      "barVisible": true,
+      "now": "8",
+      "max": "8"
+    }
+  },
+  {
+    "mode": "zero",
+    "early": {
+      "text": "PHOTO HIGHLIGHTS PREPARING ARCHIVE",
+      "state": "indeterminate",
+      "now": null,
+      "max": null
+    },
+    "final": {
+      "text": "PHOTO HIGHLIGHTS\n\nNO PHOTOS ARCHIVED",
+      "barVisible": false,
+      "now": null,
+      "max": null
+    }
+  },
+  {
+    "mode": "unavailable",
+    "early": {
+      "text": "PHOTO HIGHLIGHTS PREPARING ARCHIVE",
+      "state": "indeterminate",
+      "now": null,
+      "max": null
+    },
+    "final": {
+      "text": "PHOTO HIGHLIGHTS\n\nPHOTO COUNT UNAVAILABLE",
+      "barVisible": false,
+      "now": null,
+      "max": null
+    }
+  }
+]
