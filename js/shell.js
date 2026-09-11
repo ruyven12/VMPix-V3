@@ -702,6 +702,7 @@ const HALL_ENGINE_TITLE_MORPH_MS = 430;
 const HALL_ENGINE_TITLE_REST_MS = 2300;
 let hallEngineTitleMorphTimer = 0;
 let hallEngineTitleMorphCycle = 0;
+const adoptedDossierEngineTitles = new WeakMap();
 
 function getHallEngineTitlePanel() {
   return portfolioEngineCurrentView?.closest("[data-portfolio-engine-panel='current-view']") || null;
@@ -3598,9 +3599,36 @@ function showWrestlingMatchDetailPrototype(route = getRouteFromUrl()) {
   if (shell.dataset.activeWorld !== "battleground") {
     setPortfolioActiveWorld("battleground");
   }
+  // A photo keeps its ordinary title treatment; only the still-live adopted
+  // session can restore its arriving Campaign title when the dossier returns.
+  const adoptedSession = shell.dataset.encounterDossierAdopted === "true" &&
+    typeof wrestlingMatchDossierPreparedRecord !== "undefined" ? wrestlingMatchDossierPreparedRecord : null;
+  if (adoptedSession) {
+    let title = adoptedDossierEngineTitles.get(adoptedSession);
+    if (route.name === "wrestling-match-detail") {
+      if (!title) {
+        title = {
+          text: portfolioEngineCurrentView?.textContent || "",
+          detail: getHallEngineTitlePanel()?.querySelector("[data-portfolio-engine-current-view-detail]")?.textContent || "",
+          morph: getHallEngineTitlePanel()?.classList.contains("has-hall-engine-title-morph"),
+          returningFromPhoto: false,
+        };
+        adoptedDossierEngineTitles.set(adoptedSession, title);
+      } else if (title.returningFromPhoto) {
+        clearHallEngineTitleMorph();
+        if (title.morph) startHallEngineTitleMorph();
+        setPortfolioEngineHudCurrentView(title.text);
+        setPortfolioEngineHudCurrentViewDetail(title.detail);
+        title.returningFromPhoto = false;
+      }
+    } else if (title && isWrestlingMatchDetailPhotoRoute(route)) {
+      title.returningFromPhoto = true;
+    }
+  }
   if (
-    !getHallEngineTitlePanel()?.classList.contains("has-hall-engine-title-morph") ||
-    ![HALL_ENGINE_TITLE_PRIMARY, HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE].includes(portfolioEngineCurrentView?.textContent)
+    !(route.name === "wrestling-match-detail" && shell.dataset.encounterDossierAdopted === "true") &&
+    (!getHallEngineTitlePanel()?.classList.contains("has-hall-engine-title-morph") ||
+      ![HALL_ENGINE_TITLE_PRIMARY, HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE].includes(portfolioEngineCurrentView?.textContent))
   ) {
     startHallEngineTitleMorph();
   }

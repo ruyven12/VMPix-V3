@@ -1,0 +1,227 @@
+[
+  {
+    "w": 360,
+    "x": {
+      "before": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    RETURN\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    RETURN",
+          "r": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "o": "1"
+        }
+      ],
+      "after": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    BACK\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    BACK",
+          "r": {
+            "x": 15.703125,
+            "y": 737.734375,
+            "width": 44.71875,
+            "height": 44.71875,
+            "top": 737.734375,
+            "right": 60.421875,
+            "bottom": 782.453125,
+            "left": 15.703125
+          },
+          "o": "1"
+        }
+      ],
+      "marker": true,
+      "reset": {
+        "marker": false,
+        "cards": true
+      }
+    },
+    "frames": 65
+  },
+  {
+    "w": 412,
+    "x": {
+      "before": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    RETURN\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    RETURN",
+          "r": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "o": "1"
+        }
+      ],
+      "after": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    BACK\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    BACK",
+          "r": {
+            "x": 16.03125,
+            "y": 845.515625,
+            "width": 49.078125,
+            "height": 49.078125,
+            "top": 845.515625,
+            "right": 65.109375,
+            "bottom": 894.59375,
+            "left": 16.03125
+          },
+          "o": "1"
+        }
+      ],
+      "marker": true,
+      "reset": {
+        "marker": false,
+        "cards": true
+      }
+    },
+    "frames": 65
+  },
+  {
+    "w": 1920,
+    "x": {
+      "before": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    RETURN\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    RETURN",
+          "r": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "o": "1"
+        }
+      ],
+      "after": [
+        {
+          "cls": "portfolio-engine",
+          "text": "◀\n    BACK\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+          "r": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "o": "1"
+        },
+        {
+          "cls": "prototype-engine-return-control",
+          "text": "◀\n    BACK",
+          "r": {
+            "x": 497,
+            "y": 1005.171875,
+            "width": 63.59375,
+            "height": 63.59375,
+            "top": 1005.171875,
+            "right": 560.59375,
+            "bottom": 1068.765625,
+            "left": 497
+          },
+          "o": "1"
+        }
+      ],
+      "marker": true,
+      "reset": {
+        "marker": false,
+        "cards": true
+      }
+    },
+    "frames": 46
+  }
+]

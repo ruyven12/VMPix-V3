@@ -1,0 +1,17 @@
+{
+  "classes": [
+    "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+    "wrestling-match-dossier-metadata",
+    "wrestling-match-dossier-photo-highlights",
+    "wrestling-match-dossier-photo-preview-grid"
+  ],
+  "photo": {
+    "marker": false,
+    "label": "RETURN"
+  },
+  "unavailable": {
+    "text": "Archive Record Unavailable\nNo matching encounter record was found. Return to the parent show.",
+    "back": "inline-block",
+    "marker": true
+  }
+}

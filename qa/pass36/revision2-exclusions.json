@@ -1,0 +1,19 @@
+{
+  "before": {
+    "marker": true,
+    "engine": "◀\n    BACK\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      (Campaign Record)\n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01"
+  },
+  "photo": {
+    "marker": false,
+    "label": "RETURN"
+  },
+  "after": {
+    "marker": true,
+    "engine": "◀\n    BACK\n  \n      \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n      \n\n      \n        Current View:\n        Daiion - Hall of Crusades\n      \n\n      \n        \n          \n          \n          \n          \n          \n          \n        \n        \n        \n      \n\n      \n\n      \n        Archive Build\n        3.0.01",
+    "back": "BACK"
+  },
+  "direct": {
+    "marker": false,
+    "back": "BACK"
+  }
+}

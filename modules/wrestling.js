@@ -5547,6 +5547,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
   let dataState = "loading";
   let pageIndex = options.canonical ? (Number.parseInt(wrestlingMatchDetailPrototypePhotoPageStates.get(options.pageKey), 10) || 0) : 0;
   let update = () => {};
+  let adoptView = null;
   let firstResolve;
   const firstReady = new Promise((resolve) => { firstResolve = resolve; });
   const schedule = (callback, delay, onCancel = () => {}) => {
@@ -5659,6 +5660,12 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
     }).finally(() => clearTimer(timeout));
   }
   return {
+    adopt(shell) {
+      if (cancelled || !adoptView) return false;
+      mergeWrestlingShowIntoCollection(show);
+      adoptView(shell);
+      return true;
+    },
     refresh() {
       if (options.canonical) pageIndex = Number.parseInt(wrestlingMatchDetailPrototypePhotoPageStates.get(options.pageKey), 10) || 0;
       update();
@@ -5680,7 +5687,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       root.dataset.recordHeaderSettled = String(performance.now());
       await Promise.race([firstReady, wait(700)]);
       if (cancelled) return;
-      const content = options.canonical ? targetShell : document.createElement("div");
+      let content = options.canonical ? targetShell : document.createElement("div");
       if (!options.canonical) content.className = "wrestling-encounter-record-content";
       content.tabIndex = 0;
       content.setAttribute("aria-label", "Match information and photo highlights");
@@ -5689,7 +5696,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       if (metadata) content.append(metadata);
       if (!options.canonical) root.append(content);
       root.dataset.recordInfoState = "revealing";
-      const gallery = options.canonical ? targetShell : document.createElement("div");
+      let gallery = options.canonical ? targetShell : document.createElement("div");
       if (!options.canonical) gallery.className = "wrestling-encounter-record-gallery";
       gallery.tabIndex = 0;
       gallery.setAttribute("aria-label", "Photo highlights. Use left and right arrow keys to change pages.");
@@ -5716,7 +5723,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         const archiveCount = Math.max(photos.length, getWrestlingMatchDossierPhotoCount(match));
         const pagination = {
           pageIndex, pageNumber: totalPages ? pageIndex + 1 : 0, totalPages, totalPhotos: available.length,
-          archiveCount, pagePhotos, pageKey: options.pageKey, localOnly: !options.canonical, preparedImages: prepared, schedule,
+          archiveCount, pagePhotos, pageKey: options.pageKey, localOnly: !options.canonical, preparedImages: prepared, schedule, route: options.route,
           sourceIndices: new Map(photos.map((photo, index) => [photo.photoId, index])),
           onPageChange(nextIndex) {
             pageIndex = Math.max(0, Math.min(nextIndex, totalPages - 1));
@@ -5752,6 +5759,17 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
           renderGallery();
         }
       };
+      adoptView = (shell) => {
+        gallery.removeEventListener("keydown", onGalleryKeyDown);
+        for (const [name, value] of Object.entries(root.dataset)) {
+          if (name.startsWith("record")) shell.dataset[name] = value;
+        }
+        shell.replaceChildren(...targetShell.childNodes);
+        root = targetShell = content = gallery = shell;
+        gallery.tabIndex = 0;
+        gallery.setAttribute("aria-label", "Photo highlights. Use left and right arrow keys to change pages.");
+        gallery.addEventListener("keydown", onGalleryKeyDown);
+      };
       gallery.addEventListener("keydown", onGalleryKeyDown);
       cleanups.push(() => gallery.removeEventListener("keydown", onGalleryKeyDown));
       update = renderGallery;
@@ -5770,14 +5788,19 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
           renderGallery();
         }
       }).catch(() => {});
+      const onInitialReveal = options.onInitialReveal;
+      delete options.onInitialReveal;
+      onInitialReveal?.();
+      if (cancelled) return;
       revealed = true;
       root.dataset.recordRemainderStarted = String(performance.now());
       pump();
     },
   };
 }
-// PASS 31 is local visual state: the destination factory supplies only its header.
+// The selection owns preparation until the canonical renderer consumes its handoff.
 let hallEncounterSelectionPrototype = null;
+let wrestlingMatchDossierPendingAdoption = null;
 
 function startHallEncounterSelectionPrototype(card, match, show = null) {
   if (hallEncounterSelectionPrototype || !card.isConnected) return;
@@ -5787,7 +5810,12 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
   const sourceRect = card.getBoundingClientRect();
   if (!sourceRect.width || !sourceRect.height) return;
 
-  const recordPreview = createHallEncounterRecordPreview(show, match, card.dataset.wrestlingMatchRef);
+  const destination = getRouteFromUrlWithPrototypePrecedence(card.dataset.wrestlingMatchRoute);
+  if (!isWrestlingMatchDetailRoute(destination)) return;
+  const pageKey = getWrestlingMatchDossierPhotoPageKey(show, match, destination);
+  const recordPreview = createHallEncounterRecordPreview(show, match, card.dataset.wrestlingMatchRef, {
+    canonical: true, pageKey, route: destination, onInitialReveal: () => handoff(),
+  });
   const root = document.createElement("div");
   root.className = "wrestling-encounter-selection-prototype";
   const targetShell = document.createElement("div");
@@ -5845,21 +5873,26 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
   const savedInert = surface.inert;
   let stopped = false;
   let observer;
-  const reset = (restoreFocus = true) => {
-    if (stopped) return;
-    stopped = true;
-    recordPreview.cancel();
-    animations.forEach((animation) => animation.cancel());
+  const release = () => {
     observer?.disconnect();
     document.removeEventListener("keydown", onKeyDown);
     window.removeEventListener("resize", onResize);
-    root.remove();
+    hero.removeEventListener("click", onHeroClick);
+    hero.removeEventListener("keydown", onHeroKeyDown);
     card.style.visibility = savedVisibility;
     surface.inert = savedInert;
     delete surface.dataset.encounterSelection;
     list.scrollTop = savedScroll;
     surface.scrollTop = savedSurfaceScroll;
     hallEncounterSelectionPrototype = null;
+  };
+  const reset = (restoreFocus = true) => {
+    if (stopped) return;
+    stopped = true;
+    recordPreview.cancel();
+    animations.forEach((animation) => animation.cancel());
+    release();
+    root.remove();
     if (restoreFocus && card.isConnected) card.focus({ preventScroll: true });
   };
   const onKeyDown = (event) => {
@@ -5871,13 +5904,15 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
   const onResize = () => reset();
   hallEncounterSelectionPrototype = { reset };
   resetButton.addEventListener("click", () => reset());
-  hero.addEventListener("click", () => reset());
-  hero.addEventListener("keydown", (event) => {
+  const onHeroClick = () => reset();
+  const onHeroKeyDown = (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       reset();
     }
-  });
+  };
+  hero.addEventListener("click", onHeroClick);
+  hero.addEventListener("keydown", onHeroKeyDown);
   document.addEventListener("keydown", onKeyDown);
   window.addEventListener("resize", onResize);
   observer = new MutationObserver(() => {
@@ -5885,6 +5920,33 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
   });
   observer.observe(site, { attributes: true, attributeFilter: ["data-shell-route"], childList: true, subtree: true });
 
+  const handoff = () => {
+    if (stopped) return;
+    const current = getRouteFromUrl();
+    if (!card.isConnected || current.name !== "wrestling-show-detail" ||
+        getWrestlingMatchDetailRouteShowId(current) !== getWrestlingMatchDetailRouteShowId(destination)) {
+      reset(false);
+      return;
+    }
+    const transfer = { pageKey, destination, show, match, coordinator: recordPreview, hero, animations,
+      source: targetShell, root, card, consumed: false };
+    wrestlingMatchDossierPendingAdoption = transfer;
+    stopped = true;
+    release();
+    resetButton.remove();
+    ["tabindex", "role", "aria-label"].forEach((name) => hero.removeAttribute(name));
+    hero.querySelector("h2").id = "wrestling-match-detail-prototype-title";
+    try {
+      navigateToRoute(card.dataset.wrestlingMatchRoute, { shouldResetScroll: false });
+    } finally {
+      if (wrestlingMatchDossierPendingAdoption === transfer) wrestlingMatchDossierPendingAdoption = null;
+      if (!transfer.consumed) {
+        recordPreview.cancel();
+        animations.forEach((animation) => animation.cancel());
+      }
+      root.remove();
+    }
+  };
   const animate = (element, frames, duration, easing = "ease-out") => {
     const animation = element.animate(frames, { duration: reducedMotion ? 1 : duration, easing, fill: "both" });
     animations.push(animation);
@@ -6781,7 +6843,7 @@ function createWrestlingMatchDossierPhotoPreviewGrid(pagination = null) {
     tile.dataset.wrestlingPhotoId = routePhotoId;
     tile.dataset.wrestlingSourcePhotoId = photo.photoId || "";
     tile.dataset.wrestlingPhotoIndex = String(sourceIndex + 1);
-    if (!pagination.localOnly) tile.dataset.wrestlingLightboxRoute = getWrestlingMatchDetailPrototypePhotoRouteUrl(routePhotoId);
+    if (!pagination.localOnly) tile.dataset.wrestlingLightboxRoute = getWrestlingMatchDetailPrototypePhotoRouteUrl(routePhotoId, pagination.route || getRouteFromUrl());
     tile.setAttribute("aria-label", `${pagination.localOnly ? "Photo" : "Open photo"} ${sourceIndex + 1} of ${pagination.archiveCount || pagination.totalPhotos}`);
     if (!pagination.localOnly) tile.addEventListener("click", () => {
       if (grid.dataset.wrestlingSwipeHandled === "true" || grid.dataset.wrestlingPointerMoved === "true") {
@@ -6848,12 +6910,31 @@ function cancelWrestlingMatchDossierPreparedRecord() {
   const session = wrestlingMatchDossierPreparedRecord;
   if (!session) return;
   wrestlingMatchDossierPreparedRecord = null;
+  delete session.shell.closest(".site-shell").dataset.encounterDossierAdopted;
   session.observer.disconnect();
   session.coordinator.cancel();
   session.animations.forEach((animation) => animation.cancel());
   for (const name of Object.keys(session.shell.dataset)) {
     if (name.startsWith("record")) delete session.shell.dataset[name];
   }
+}
+function ownWrestlingMatchDossierPreparedRecord(pageKey, coordinator, hero, shell, animations, route) {
+  const routeShowId = getWrestlingMatchDetailRouteShowId(route);
+  const matchRef = getWrestlingMatchDetailRouteMatchRef(route);
+  const observer = new MutationObserver(() => {
+    if (wrestlingMatchDossierPreparedRecord !== session) return;
+    const current = getRouteFromUrl();
+    const sameEncounter = getWrestlingMatchDetailRouteShowId(current) === routeShowId &&
+      getWrestlingMatchDetailRouteMatchRef(current) === matchRef &&
+      (isWrestlingMatchDetailRoute(current) || isWrestlingMatchDetailPhotoRoute(current));
+    if (!sameEncounter || hero.parentElement !== shell) cancelWrestlingMatchDossierPreparedRecord();
+  });
+  const session = { pageKey, coordinator, hero, shell, animations, observer };
+  wrestlingMatchDossierPreparedRecord = session;
+  observer.observe(shell.closest(".site-shell"), {
+    attributes: true, attributeFilter: ["data-shell-route"], childList: true, subtree: true,
+  });
+  return session;
 }
 // Canonical production Wrestling Match Detail renderer.
 // Extend this shared path rather than creating parallel Match Detail renderers.
@@ -6864,6 +6945,27 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
     !isWrestlingMatchDetailRoute(route)
   ) {
     return;
+  }
+
+  const transfer = wrestlingMatchDossierPendingAdoption;
+  if (transfer) {
+    wrestlingMatchDossierPendingAdoption = null;
+    const valid = transfer.destination.canonicalUrl === route.canonicalUrl &&
+      transfer.pageKey === getWrestlingMatchDossierPhotoPageKey(transfer.show, transfer.match, route) &&
+      transfer.root.isConnected && transfer.card.isConnected && transfer.hero.parentElement === transfer.source;
+    if (valid) {
+      cancelWrestlingMatchDossierPreparedRecord();
+      if (transfer.coordinator.adopt(wrestlingMatchDetailPrototypeShell)) {
+        ownWrestlingMatchDossierPreparedRecord(transfer.pageKey, transfer.coordinator, transfer.hero,
+          wrestlingMatchDetailPrototypeShell, transfer.animations, route);
+        wrestlingMatchDetailPrototypeShell.closest(".site-shell").dataset.encounterDossierAdopted = "true";
+        transfer.consumed = true;
+        return;
+      }
+    }
+    transfer.coordinator.cancel();
+    transfer.animations.forEach((animation) => animation.cancel());
+    transfer.root.remove();
   }
 
   if (
@@ -6896,7 +6998,6 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
     return;
   }
   const matchRef = getWrestlingMatchDetailRouteMatchRef(route);
-  const routeShowId = getWrestlingMatchDetailRouteShowId(route);
   const pageKey = getWrestlingMatchDossierPhotoPageKey(show, match, route);
   const previous = wrestlingMatchDossierPreparedRecord;
   if (previous?.pageKey === pageKey && previous.hero.parentElement === wrestlingMatchDetailPrototypeShell) {
@@ -6917,19 +7018,7 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
     animations.push(animation);
     return animation;
   };
-  const observer = new MutationObserver(() => {
-    if (wrestlingMatchDossierPreparedRecord !== session) return;
-    const current = getRouteFromUrl();
-    const sameEncounter = getWrestlingMatchDetailRouteShowId(current) === routeShowId &&
-      getWrestlingMatchDetailRouteMatchRef(current) === matchRef &&
-      (isWrestlingMatchDetailRoute(current) || isWrestlingMatchDetailPhotoRoute(current));
-    if (!sameEncounter || hero.parentElement !== shell) cancelWrestlingMatchDossierPreparedRecord();
-  });
-  const session = { pageKey, coordinator, hero, shell, animations, observer };
-  wrestlingMatchDossierPreparedRecord = session;
-  observer.observe(shell.closest(".site-shell"), {
-    attributes: true, attributeFilter: ["data-shell-route"], childList: true, subtree: true,
-  });
+  const session = ownWrestlingMatchDossierPreparedRecord(pageKey, coordinator, hero, shell, animations, route);
   coordinator.reveal(shell, shell, hero, animate).catch(() => {
     if (wrestlingMatchDossierPreparedRecord !== session) return;
     const status = document.createElement("p");

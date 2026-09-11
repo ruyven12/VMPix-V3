@@ -1,0 +1,950 @@
+[
+  {
+    "width": 360,
+    "reducedMotion": "no-preference",
+    "x": {
+      "adoption": {
+        "at": 2434.2999999998137,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 9,
+            "y": 22.390625,
+            "width": 342,
+            "height": 53.734375,
+            "top": 22.390625,
+            "right": 351,
+            "bottom": 76.125,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 76.125,
+            "width": 342,
+            "height": 171.296875,
+            "top": 76.125,
+            "right": 351,
+            "bottom": 247.421875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 255.09375,
+            "width": 342,
+            "height": 48.625,
+            "top": 255.09375,
+            "right": 351,
+            "bottom": 303.71875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 308.71875,
+            "width": 342,
+            "height": 416,
+            "top": 308.71875,
+            "right": 351,
+            "bottom": 724.71875,
+            "left": 9
+          }
+        ],
+        "after": [
+          {
+            "x": 9,
+            "y": 22.390625,
+            "width": 342,
+            "height": 53.734375,
+            "top": 22.390625,
+            "right": 351,
+            "bottom": 76.125,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 76.125,
+            "width": 342,
+            "height": 171.296875,
+            "top": 76.125,
+            "right": 351,
+            "bottom": 247.421875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 255.09375,
+            "width": 342,
+            "height": 48.625,
+            "top": 255.09375,
+            "right": 351,
+            "bottom": 303.71875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 308.71875,
+            "width": 342,
+            "height": 416,
+            "top": 308.71875,
+            "right": 351,
+            "bottom": 724.71875,
+            "left": 9
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1777.7999999998137",
+          "recordHeaderSettled": "2423",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "2427.5",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132823886
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132823888
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132823889
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132823890
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132823891
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132823891
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132824498
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132824498
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "reducedMotion": "reduce",
+    "x": {
+      "adoption": {
+        "at": 1737.5,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 9,
+            "y": 22.390625,
+            "width": 342,
+            "height": 53.734375,
+            "top": 22.390625,
+            "right": 351,
+            "bottom": 76.125,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 76.125,
+            "width": 342,
+            "height": 171.296875,
+            "top": 76.125,
+            "right": 351,
+            "bottom": 247.421875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 255.09375,
+            "width": 342,
+            "height": 48.625,
+            "top": 255.09375,
+            "right": 351,
+            "bottom": 303.71875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 308.71875,
+            "width": 342,
+            "height": 416,
+            "top": 308.71875,
+            "right": 351,
+            "bottom": 724.71875,
+            "left": 9
+          }
+        ],
+        "after": [
+          {
+            "x": 9,
+            "y": 22.390625,
+            "width": 342,
+            "height": 53.734375,
+            "top": 22.390625,
+            "right": 351,
+            "bottom": 76.125,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 76.125,
+            "width": 342,
+            "height": 171.296875,
+            "top": 76.125,
+            "right": 351,
+            "bottom": 247.421875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 255.09375,
+            "width": 342,
+            "height": 48.625,
+            "top": 255.09375,
+            "right": 351,
+            "bottom": 303.71875,
+            "left": 9
+          },
+          {
+            "x": 9,
+            "y": 308.71875,
+            "width": 342,
+            "height": 416,
+            "top": 308.71875,
+            "right": 351,
+            "bottom": 724.71875,
+            "left": 9
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1602.6000000005588",
+          "recordHeaderSettled": "1700.7000000001863",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "1727",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132826604
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132826605
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132826606
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132826607
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132826608
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132826608
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132826699
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132826699
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "reducedMotion": "no-preference",
+    "x": {
+      "adoption": {
+        "at": 2337.2000000001863,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 10.296875,
+            "y": 25.609375,
+            "width": 391.40625,
+            "height": 47.09375,
+            "top": 25.609375,
+            "right": 401.703125,
+            "bottom": 72.703125,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 72.703125,
+            "width": 391.40625,
+            "height": 183.15625,
+            "top": 72.703125,
+            "right": 401.703125,
+            "bottom": 255.859375,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 263.53125,
+            "width": 391.40625,
+            "height": 48.625,
+            "top": 263.53125,
+            "right": 401.703125,
+            "bottom": 312.15625,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 317.15625,
+            "width": 391.40625,
+            "height": 505.578125,
+            "top": 317.15625,
+            "right": 401.703125,
+            "bottom": 822.734375,
+            "left": 10.296875
+          }
+        ],
+        "after": [
+          {
+            "x": 10.296875,
+            "y": 25.609375,
+            "width": 391.40625,
+            "height": 47.09375,
+            "top": 25.609375,
+            "right": 401.703125,
+            "bottom": 72.703125,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 72.703125,
+            "width": 391.40625,
+            "height": 183.15625,
+            "top": 72.703125,
+            "right": 401.703125,
+            "bottom": 255.859375,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 263.53125,
+            "width": 391.40625,
+            "height": 48.625,
+            "top": 263.53125,
+            "right": 401.703125,
+            "bottom": 312.15625,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 317.15625,
+            "width": 391.40625,
+            "height": 505.578125,
+            "top": 317.15625,
+            "right": 401.703125,
+            "bottom": 822.734375,
+            "left": 10.296875
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1683.2000000001863",
+          "recordHeaderSettled": "2328.5999999996275",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "2331.5999999996275",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132828711
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132828713
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132828714
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132828715
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132828716
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132828717
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132829316
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132829316
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "reducedMotion": "reduce",
+    "x": {
+      "adoption": {
+        "at": 1774.300000000745,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 10.296875,
+            "y": 25.609375,
+            "width": 391.40625,
+            "height": 47.09375,
+            "top": 25.609375,
+            "right": 401.703125,
+            "bottom": 72.703125,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 72.703125,
+            "width": 391.40625,
+            "height": 183.15625,
+            "top": 72.703125,
+            "right": 401.703125,
+            "bottom": 255.859375,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 263.53125,
+            "width": 391.40625,
+            "height": 48.625,
+            "top": 263.53125,
+            "right": 401.703125,
+            "bottom": 312.15625,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 317.15625,
+            "width": 391.40625,
+            "height": 505.578125,
+            "top": 317.15625,
+            "right": 401.703125,
+            "bottom": 822.734375,
+            "left": 10.296875
+          }
+        ],
+        "after": [
+          {
+            "x": 10.296875,
+            "y": 25.609375,
+            "width": 391.40625,
+            "height": 47.09375,
+            "top": 25.609375,
+            "right": 401.703125,
+            "bottom": 72.703125,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 72.703125,
+            "width": 391.40625,
+            "height": 183.15625,
+            "top": 72.703125,
+            "right": 401.703125,
+            "bottom": 255.859375,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 263.53125,
+            "width": 391.40625,
+            "height": 48.625,
+            "top": 263.53125,
+            "right": 401.703125,
+            "bottom": 312.15625,
+            "left": 10.296875
+          },
+          {
+            "x": 10.296875,
+            "y": 317.15625,
+            "width": 391.40625,
+            "height": 505.578125,
+            "top": 317.15625,
+            "right": 401.703125,
+            "bottom": 822.734375,
+            "left": 10.296875
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1624.5",
+          "recordHeaderSettled": "1732.4000000003725",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "1763.9000000003725",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132831459
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132831460
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132831462
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132831463
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132831464
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132831474
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132831559
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132831559
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "reducedMotion": "no-preference",
+    "x": {
+      "adoption": {
+        "at": 2545.2000000001863,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 448,
+            "y": 25.90625,
+            "width": 1024,
+            "height": 65.265625,
+            "top": 25.90625,
+            "right": 1472,
+            "bottom": 91.171875,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 102.6875,
+            "width": 1024,
+            "height": 268.453125,
+            "top": 102.6875,
+            "right": 1472,
+            "bottom": 371.140625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 382.65625,
+            "width": 1024,
+            "height": 61.90625,
+            "top": 382.65625,
+            "right": 1472,
+            "bottom": 444.5625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 449.5625,
+            "width": 1024,
+            "height": 531.125,
+            "top": 449.5625,
+            "right": 1472,
+            "bottom": 980.6875,
+            "left": 448
+          }
+        ],
+        "after": [
+          {
+            "x": 448,
+            "y": 25.90625,
+            "width": 1024,
+            "height": 65.265625,
+            "top": 25.90625,
+            "right": 1472,
+            "bottom": 91.171875,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 102.6875,
+            "width": 1024,
+            "height": 268.453125,
+            "top": 102.6875,
+            "right": 1472,
+            "bottom": 371.140625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 382.65625,
+            "width": 1024,
+            "height": 61.90625,
+            "top": 382.65625,
+            "right": 1472,
+            "bottom": 444.5625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 449.5625,
+            "width": 1024,
+            "height": 531.125,
+            "top": 449.5625,
+            "right": 1472,
+            "bottom": 980.6875,
+            "left": 448
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1780.2999999998137",
+          "recordHeaderSettled": "2524.899999999441",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "2537.7000000001863",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132833713
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132833714
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132833715
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132833716
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132833717
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132833718
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132834422
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132834422
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "reducedMotion": "reduce",
+    "x": {
+      "adoption": {
+        "at": 1753.2000000001863,
+        "same": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "sameImages": true,
+        "sameEngine": true,
+        "sameButton": true,
+        "before": [
+          {
+            "x": 448,
+            "y": 25.90625,
+            "width": 1024,
+            "height": 65.265625,
+            "top": 25.90625,
+            "right": 1472,
+            "bottom": 91.171875,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 102.6875,
+            "width": 1024,
+            "height": 268.453125,
+            "top": 102.6875,
+            "right": 1472,
+            "bottom": 371.140625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 382.65625,
+            "width": 1024,
+            "height": 61.90625,
+            "top": 382.65625,
+            "right": 1472,
+            "bottom": 444.5625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 449.5625,
+            "width": 1024,
+            "height": 531.125,
+            "top": 449.5625,
+            "right": 1472,
+            "bottom": 980.6875,
+            "left": 448
+          }
+        ],
+        "after": [
+          {
+            "x": 448,
+            "y": 25.90625,
+            "width": 1024,
+            "height": 65.265625,
+            "top": 25.90625,
+            "right": 1472,
+            "bottom": 91.171875,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 102.6875,
+            "width": 1024,
+            "height": 268.453125,
+            "top": 102.6875,
+            "right": 1472,
+            "bottom": 371.140625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 382.65625,
+            "width": 1024,
+            "height": 61.90625,
+            "top": 382.65625,
+            "right": 1472,
+            "bottom": 444.5625,
+            "left": 448
+          },
+          {
+            "x": 448,
+            "y": 449.5625,
+            "width": 1024,
+            "height": 531.125,
+            "top": 449.5625,
+            "right": 1472,
+            "bottom": 980.6875,
+            "left": 448
+          }
+        ],
+        "infoBefore": "0",
+        "infoAfter": "0",
+        "data": {
+          "wrestlingMatchDetailPrototypeShell": "",
+          "recordPreloadStarted": "1615.6000000005588",
+          "recordHeaderSettled": "1714.9000000003725",
+          "recordInfoState": "revealing",
+          "recordPhotoState": "partial",
+          "recordPhotosReady": "6",
+          "recordPhotoReveal": "1742.6000000005588",
+          "recordFirstRevealReady": "6"
+        },
+        "marker": true,
+        "label": "BACK",
+        "url": "/wrestling/shows/080826/match-1"
+      },
+      "count": 1,
+      "focus": {
+        "tag": "BODY",
+        "connected": true
+      },
+      "overlay": 0,
+      "pending": false
+    },
+    "requests": [
+      {
+        "url": "https://qa.invalid/0.png",
+        "at": 1789132836926
+      },
+      {
+        "url": "https://qa.invalid/1.png",
+        "at": 1789132836928
+      },
+      {
+        "url": "https://qa.invalid/2.png",
+        "at": 1789132836928
+      },
+      {
+        "url": "https://qa.invalid/3.png",
+        "at": 1789132836929
+      },
+      {
+        "url": "https://qa.invalid/4.png",
+        "at": 1789132836930
+      },
+      {
+        "url": "https://qa.invalid/5.png",
+        "at": 1789132836931
+      },
+      {
+        "url": "https://qa.invalid/6.png",
+        "at": 1789132837027
+      },
+      {
+        "url": "https://qa.invalid/7.png",
+        "at": 1789132837027
+      }
+    ]
+  }
+]

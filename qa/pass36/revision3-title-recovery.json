@@ -1,0 +1,23 @@
+{
+  "out": [
+    {
+      "marker": true,
+      "title": true,
+      "back": "BACK"
+    },
+    {
+      "marker": true,
+      "title": true,
+      "back": "BACK"
+    },
+    {
+      "marker": true,
+      "title": true,
+      "back": "BACK"
+    }
+  ],
+  "direct": {
+    "marker": false,
+    "title": false
+  }
+}

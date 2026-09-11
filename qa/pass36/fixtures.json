@@ -1,0 +1,136 @@
+[
+  {
+    "mode": "fewer",
+    "early": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "1466.2000000001863",
+      "recordHeaderSettled": "2123.4000000003725",
+      "recordInfoState": "revealing",
+      "recordPhotoState": "ready",
+      "recordPhotosReady": "3",
+      "recordPhotoReveal": "2128",
+      "recordFirstRevealReady": "3",
+      "recordRemainderStarted": "2163.2000000001863"
+    },
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1466.2000000001863",
+        "recordHeaderSettled": "2123.4000000003725",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "3",
+        "recordPhotoReveal": "2128",
+        "recordFirstRevealReady": "3",
+        "recordRemainderStarted": "2163.2000000001863"
+      },
+      "images": [],
+      "roots": 1,
+      "back": "Back to Campaign Record"
+    },
+    "errors": []
+  },
+  {
+    "mode": "delay",
+    "early": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "1455.7999999998137",
+      "recordHeaderSettled": "2101.9000000003725",
+      "recordInfoState": "revealing",
+      "recordPhotoState": "loading",
+      "recordPhotosReady": "0",
+      "recordPhotoReveal": "2803.4000000003725",
+      "recordFirstRevealReady": "0",
+      "recordRemainderStarted": "2836"
+    },
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1455.7999999998137",
+        "recordHeaderSettled": "2101.9000000003725",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2803.4000000003725",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2836"
+      },
+      "images": [],
+      "roots": 1,
+      "back": "Back to Campaign Record"
+    },
+    "errors": []
+  },
+  {
+    "mode": "fail",
+    "early": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "1603.5999999996275",
+      "recordHeaderSettled": "2248.2999999998137",
+      "recordInfoState": "revealing",
+      "recordPhotoState": "unavailable",
+      "recordPhotosReady": "0",
+      "recordPhotoReveal": "2251",
+      "recordFirstRevealReady": "0",
+      "recordRemainderStarted": "2282.7999999998137"
+    },
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1603.5999999996275",
+        "recordHeaderSettled": "2248.2999999998137",
+        "recordInfoState": "visible",
+        "recordPhotoState": "unavailable",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "2251",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2282.7999999998137"
+      },
+      "images": [],
+      "roots": 1,
+      "back": "Back to Campaign Record"
+    },
+    "errors": []
+  },
+  {
+    "mode": "hang",
+    "early": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "1599.5999999996275",
+      "recordHeaderSettled": "2245.7999999998137",
+      "recordInfoState": "revealing",
+      "recordPhotoState": "loading",
+      "recordPhotosReady": "0",
+      "recordPhotoReveal": "2949.2999999998137",
+      "recordFirstRevealReady": "0",
+      "recordRemainderStarted": "2982.899999999441"
+    },
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1599.5999999996275",
+        "recordHeaderSettled": "2245.7999999998137",
+        "recordInfoState": "visible",
+        "recordPhotoState": "loading",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "2949.2999999998137",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2982.899999999441"
+      },
+      "images": [],
+      "roots": 1,
+      "back": "Back to Campaign Record"
+    },
+    "errors": []
+  },
+  {
+    "mode": "cancel",
+    "x": {
+      "url": "/wrestling/shows/080826",
+      "overlay": false,
+      "pending": false,
+      "inert": 35
+    },
+    "errors": []
+  }
+]
