@@ -1,0 +1,145 @@
+{
+  "frames": 333,
+  "ready": [
+    "6",
+    "7",
+    "8",
+    "9",
+    "10"
+  ],
+  "headerOpacity": [
+    "1"
+  ],
+  "infoOpacity": [
+    "1"
+  ],
+  "engineOpacity": [
+    "1"
+  ],
+  "headerRects": 1,
+  "infoRects": 1,
+  "engineRects": 1,
+  "delayedEntries": 10,
+  "apiRequests": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "decodes": [
+    46,
+    31,
+    44,
+    31,
+    40,
+    31,
+    47,
+    30,
+    37,
+    30
+  ],
+  "duplicates": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "matrix": [
+    {
+      "entry": 0,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 1,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 2,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 6,
+      "uniqueDecode": 6
+    },
+    {
+      "entry": 3,
+      "req": 8,
+      "uniqueReq": 8,
+      "decode": 6,
+      "uniqueDecode": 6
+    },
+    {
+      "entry": 4,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 5,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 6,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 6,
+      "uniqueDecode": 6
+    },
+    {
+      "entry": 7,
+      "req": 8,
+      "uniqueReq": 8,
+      "decode": 6,
+      "uniqueDecode": 6
+    },
+    {
+      "entry": 8,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 9,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 10,
+      "uniqueDecode": 10
+    },
+    {
+      "entry": 10,
+      "req": 10,
+      "uniqueReq": 10,
+      "decode": 6,
+      "uniqueDecode": 6
+    },
+    {
+      "entry": 11,
+      "req": 8,
+      "uniqueReq": 8,
+      "decode": 6,
+      "uniqueDecode": 6
+    }
+  ]
+}

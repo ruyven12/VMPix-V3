@@ -1,0 +1,11 @@
+{
+  "early": "Loading Encounter Archive\nThe requested encounter record is being retrieved.",
+  "x": {
+    "hero": true,
+    "state": null
+  },
+  "requests": [
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=100&page=1",
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=limitless-wrestling-vacationland-cup-26-2026-08-08"
+  ]
+}

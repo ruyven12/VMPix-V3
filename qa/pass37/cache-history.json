@@ -1,0 +1,24 @@
+{
+  "initial": [
+    "https://qa.invalid/0.png",
+    "https://qa.invalid/1.png",
+    "https://qa.invalid/2.png",
+    "https://qa.invalid/3.png",
+    "https://qa.invalid/4.png",
+    "https://qa.invalid/5.png",
+    "https://qa.invalid/6.png",
+    "https://qa.invalid/7.png"
+  ],
+  "historyRequests": [],
+  "warmRequests": [
+    "https://qa.invalid/6.png",
+    "https://qa.invalid/7.png"
+  ],
+  "hydration": [],
+  "x": {
+    "hero": true,
+    "state": null,
+    "ready": "8",
+    "imgs": 6
+  }
+}

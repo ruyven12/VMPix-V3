@@ -1,0 +1,37 @@
+{
+  "changes": [
+    {
+      "removed": [
+        "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card"
+      ],
+      "added": []
+    },
+    {
+      "removed": [
+        "wrestling-match-dossier-metadata"
+      ],
+      "added": []
+    },
+    {
+      "removed": [
+        "wrestling-match-dossier-photo-highlights",
+        "wrestling-encounter-record-status"
+      ],
+      "added": [
+        "wrestling-match-dossier-hero wrestling-show-prototype-encounter-card",
+        "wrestling-match-dossier-metadata",
+        "wrestling-match-dossier-photo-highlights",
+        "wrestling-encounter-record-status"
+      ]
+    }
+  ],
+  "before": {
+    "connected": true,
+    "state": "live"
+  },
+  "after": {
+    "connected": false,
+    "session": false,
+    "text": "Loading Encounter Archive\nThe requested encounter record is being retrieved."
+  }
+}

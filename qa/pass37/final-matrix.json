@@ -1,0 +1,644 @@
+[
+  {
+    "entry": 0,
+    "w": 360,
+    "mode": "ready",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1560.300000000745",
+        "recordHeaderSettled": "1656.699999999255",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "1704.9000000003725",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "1746"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 1,
+    "w": 412,
+    "mode": "late",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1368.5",
+        "recordHeaderSettled": "2016",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "2717.5",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2739"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 2,
+    "w": 360,
+    "mode": "fail",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1387.199999999255",
+        "recordHeaderSettled": "2048.0999999996275",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2051.199999999255",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2074.5999999996275"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 3,
+    "w": 412,
+    "mode": "hang",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1357.2000000011176",
+        "recordHeaderSettled": "1454.5",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "1518.4000000003725",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "1563.2000000011176"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 4,
+    "w": 360,
+    "mode": "ready",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1384.4000000003725",
+        "recordHeaderSettled": "2031",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "2034.199999999255",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2059.0999999996275"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 5,
+    "w": 412,
+    "mode": "late",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1356.4000000003725",
+        "recordHeaderSettled": "2016.2000000011176",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "2735.5",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2764.5"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 6,
+    "w": 360,
+    "mode": "fail",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1435.699999999255",
+        "recordHeaderSettled": "1533.199999999255",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "1587",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "1627.5"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 7,
+    "w": 412,
+    "mode": "hang",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1366.9000000003725",
+        "recordHeaderSettled": "2013.5",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2017.1000000014901",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2040.7000000011176"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 8,
+    "w": 360,
+    "mode": "ready",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1338.2000000011176",
+        "recordHeaderSettled": "2001.4000000003725",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "2005.0999999996275",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2028"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 9,
+    "w": 412,
+    "mode": "late",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png",
+        "https://qa.invalid/6.png",
+        "https://qa.invalid/7.png",
+        "https://qa.invalid/8.png",
+        "https://qa.invalid/9.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1174.9000000003725",
+        "recordHeaderSettled": "1272.199999999255",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "10",
+        "recordPhotoReveal": "1983.699999999255",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2026.5999999996275"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 10,
+    "w": 360,
+    "mode": "fail",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1401.0999999996275",
+        "recordHeaderSettled": "2046.5999999996275",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2050.699999999255",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2073.2999999988824"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  },
+  {
+    "entry": 11,
+    "w": 1920,
+    "mode": "hang",
+    "req": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "x": {
+      "calls": 1,
+      "decodes": [
+        "https://qa.invalid/0.png",
+        "https://qa.invalid/1.png",
+        "https://qa.invalid/2.png",
+        "https://qa.invalid/3.png",
+        "https://qa.invalid/4.png",
+        "https://qa.invalid/5.png"
+      ],
+      "removed": [],
+      "refs": {
+        "nodes": true,
+        "images": true
+      },
+      "states": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1388.5999999996275",
+        "recordHeaderSettled": "2034.5",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "2037.5",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2061.4000000003725"
+      },
+      "bad": 0,
+      "overflow": false
+    }
+  }
+]
