@@ -18957,7 +18957,15 @@ function syncDaiionEnvironmentalCoverage() {
       });
     };
     const authoredPockets = [...emberField.querySelectorAll(".daiion-ember-pocket:not([data-daiion-generated-ember-pocket])")];
-    authoredPockets.forEach((pocket, index) => setEmberTiming(pocket, "baseline", index));
+    // Keep ten sparks distributed across the existing field and rhythm profiles.
+    const emberBudget = 10;
+    const emberStride = Math.ceil((authoredPockets.length + expandedEmberSpecs.length) * 4 / emberBudget);
+    authoredPockets.forEach((pocket, index) => {
+      [...pocket.querySelectorAll(".daiion-ember")].forEach((ember, childIndex) => {
+        if ((index * 4 + childIndex) % emberStride !== 0) ember.remove();
+      });
+      setEmberTiming(pocket, "baseline", index);
+    });
     const generatedBaselineIndexes = new Set(Array.from({ length: 13 }, (_, index) => index * 6));
     const generatedSurgeIndexes = new Set();
     for (let step = 0; generatedSurgeIndexes.size < 26; step += 1) {
@@ -18989,7 +18997,8 @@ function syncDaiionEnvironmentalCoverage() {
         "--heat-duration-soft": `${(duration + 3.4).toFixed(1)}s`,
         "--heat-delay": `${delay}s`,
       });
-      ["a", "b", "c", "d"].forEach((variant) => {
+      ["a", "b", "c", "d"].forEach((variant, childIndex) => {
+        if (((authoredPockets.length + specIndex) * 4 + childIndex) % emberStride !== 0) return;
         const ember = document.createElement("span");
         ember.className = `daiion-ember daiion-ember--${variant}`;
         pocket.append(ember);
@@ -19159,9 +19168,9 @@ function ensureHallCrusadesHaze(targetShell = wrestlingShowsShell) {
     return layer;
   };
 
-  const isMobileCinderViewport = window.matchMedia?.("(max-width: 540px)")?.matches ?? window.innerWidth <= 540;
-  const distantCinderCount = isMobileCinderViewport ? 15 : 250;
-  const foregroundCinderCount = isMobileCinderViewport ? 4 : 15;
+  // Shared ten-particle budget for every route that adopts this atmosphere.
+  const distantCinderCount = 8;
+  const foregroundCinderCount = 2;
   const fragment = document.createDocumentFragment();
   const distantLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="distant"]') || createLayer("distant", distantCinderCount);
   const foregroundLayer = findHallCrusadesAmbientNode('[data-hall-crusades-cinders="foreground"]') || createLayer("foreground", foregroundCinderCount);
