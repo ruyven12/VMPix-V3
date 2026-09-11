@@ -5746,13 +5746,17 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
             return true;
           },
         });
-        const countInfo = archiveCount > 0
-          ? { label: `${formatWrestlingCount(archiveCount, "Photos").toUpperCase()} · ${prepared.size} READY`, state: "loaded" }
-          : { label: dataState === "loading" ? "PHOTO COUNT LOADING" : confirmedEmpty ? "NO PHOTOS ARCHIVED" : "PHOTO COUNT UNAVAILABLE", state: dataState };
+        const countInfo = dataState === "unavailable"
+          ? { label: "PHOTO COUNT UNAVAILABLE", state: "unavailable" }
+          : archiveCount > 0
+            ? { label: `${prepared.size} / ${archiveCount} LOADED`, state: "loaded", progress: { loaded: prepared.size, total: archiveCount } }
+            : confirmedEmpty
+              ? { label: "NO PHOTOS ARCHIVED", state: "empty" }
+              : dataState === "loading"
+                ? { label: "PREPARING ARCHIVE", state: "loading", progress: { loaded: prepared.size, total: null } }
+                : { label: "PHOTO COUNT UNAVAILABLE", state: "unavailable" };
         if (!heading) heading = createWrestlingMatchDossierPhotoHighlights(show, match, pagination, { countInfo });
-        heading.dataset.wrestlingPhotoCountState = countInfo.state;
-        const count = heading.querySelector(".wrestling-match-dossier-photo-highlights__count");
-        if (count.textContent !== countInfo.label) count.textContent = countInfo.label;
+        updateWrestlingMatchDossierPhotoProgress(heading, countInfo);
         let controls = heading.querySelector(".wrestling-match-dossier-photo-pagination");
         if (totalPages > 0 && !controls) {
           controls = createWrestlingMatchDossierPhotoPaginationControls(pagination);
@@ -5771,7 +5775,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         pagination.reuseGrid = grid;
         grid = createWrestlingMatchDossierPhotoPreviewGrid(pagination);
         status.textContent = dataState === "unavailable" ? "Photo archive unavailable. Return to encounters to try again."
-          : !done() ? (options.canonical && pagePhotos.length === 6 ? "" : pagePhotos.length ? "Preparing the remaining photo archive…" : "Retrieving photo highlights…")
+          : !done() ? ""
           : failed.size ? `${failed.size} photo${failed.size === 1 ? "" : "s"} could not be prepared.`
           : archiveCount > photos.length ? "Some archived photo records are unavailable in this response."
           : confirmedEmpty ? "No photos are archived for this encounter." : photos.length ? "" : "Photo archive information is unavailable.";
@@ -6581,6 +6585,59 @@ function getWrestlingMatchDossierPhotoCountInfo(show = null, match = null) {
   return { label: "NO PHOTOS ARCHIVED", state: "empty", count: 0 };
 }
 
+function updateWrestlingMatchDossierPhotoProgress(section, countInfo) {
+  section.dataset.wrestlingPhotoCountState = countInfo.state;
+  const count = section.querySelector(".wrestling-match-dossier-photo-highlights__count");
+  if (count.textContent !== countInfo.label) count.textContent = countInfo.label;
+  let track = section.querySelector(".wrestling-match-dossier-photo-highlights__progress-track");
+  let percent = section.querySelector(".wrestling-match-dossier-photo-highlights__percent");
+  section.classList.toggle("has-photo-progress", Boolean(countInfo.progress));
+  if (!countInfo.progress) {
+    if (track) track.hidden = true;
+    if (percent) percent.hidden = true;
+    return;
+  }
+  if (!track) {
+    const row = document.createElement("div");
+    row.className = "wrestling-match-dossier-photo-highlights__progress-row";
+    count.before(row);
+    percent = document.createElement("p");
+    percent.className = "wrestling-match-dossier-photo-highlights__percent";
+    percent.setAttribute("aria-hidden", "true");
+    row.append(count, percent);
+    track = document.createElement("div");
+    track.className = "wrestling-match-dossier-photo-highlights__progress-track";
+    track.setAttribute("role", "progressbar");
+    track.setAttribute("aria-label", "Photo Highlights loading progress");
+    const fill = document.createElement("div");
+    fill.className = "wrestling-match-dossier-photo-highlights__progress-fill";
+    track.append(fill);
+    section.append(track);
+  }
+  track.hidden = false;
+  const total = countInfo.progress.total;
+  const determinate = Number.isFinite(total) && total > 0;
+  track.dataset.photoProgressState = determinate ? "determinate" : "indeterminate";
+  percent.hidden = !determinate;
+  if (!determinate) {
+    track.removeAttribute("aria-valuemin");
+    track.removeAttribute("aria-valuemax");
+    track.removeAttribute("aria-valuenow");
+    track.setAttribute("aria-valuetext", "Preparing archive; total photo count is not yet known");
+    track.style.removeProperty("--wrestling-photo-progress-scale");
+    percent.textContent = "";
+    return;
+  }
+  const loaded = Math.max(0, Math.min(total, countInfo.progress.loaded));
+  // Incomplete archives must never display 100%, even when rounding up.
+  const percentage = loaded === total ? 100 : Math.min(99, Math.round(loaded / total * 100));
+  percent.textContent = `${percentage}%`;
+  track.setAttribute("aria-valuemin", "0");
+  track.setAttribute("aria-valuemax", String(total));
+  track.setAttribute("aria-valuenow", String(loaded));
+  track.setAttribute("aria-valuetext", `${loaded} of ${total} photos loaded, ${percentage}%`);
+  track.style.setProperty("--wrestling-photo-progress-scale", String(loaded / total));
+}
 function createWrestlingMatchDossierPhotoHighlights(show = null, match = null, pagination = null, options = {}) {
   const countInfo = options.countInfo || getWrestlingMatchDossierPhotoCountInfo(show, match);
   const section = document.createElement("section");
@@ -6598,6 +6655,7 @@ function createWrestlingMatchDossierPhotoHighlights(show = null, match = null, p
   count.textContent = countInfo.label;
 
   section.append(title, count);
+  updateWrestlingMatchDossierPhotoProgress(section, countInfo);
   if (pagination?.totalPages > 0) {
     section.append(createWrestlingMatchDossierPhotoPaginationControls(pagination));
   }

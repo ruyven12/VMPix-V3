@@ -9921,6 +9921,7 @@ button.person-show-tagged-thumb:focus-visible {
   width: 0.42rem;
 }
 
+
 @media (max-width: 640px) {
   .site-shell[data-hall-crusades-campaign-direct-route-handoff="true"].is-wrestling-show-detail-view .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"] {
     opacity: 1 !important;
@@ -14388,7 +14389,8 @@ button.wrestling-event-history-tagged-thumb {
 }
 
 .wrestling-match-dossier-photo-highlights__title,
-.wrestling-match-dossier-photo-highlights__count {
+.wrestling-match-dossier-photo-highlights__count,
+.wrestling-match-dossier-photo-highlights__percent {
   margin: 0;
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
   line-height: 1.1;
@@ -14400,6 +14402,7 @@ button.wrestling-event-history-tagged-thumb {
   font-size: clamp(0.76rem, 1vw, 0.92rem);
   font-weight: 500;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .wrestling-match-dossier-photo-highlights__count {
@@ -14409,7 +14412,56 @@ button.wrestling-event-history-tagged-thumb {
   overflow-wrap: anywhere;
   text-transform: uppercase;
 }
-
+.wrestling-match-dossier-photo-highlights__progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  inline-size: 100%;
+}
+.wrestling-match-dossier-photo-highlights.has-photo-progress .wrestling-match-dossier-photo-highlights__count {
+  color: rgba(255, 231, 208, 0.92);
+  text-align: left;
+}
+.wrestling-match-dossier-photo-highlights__percent {
+  color: rgba(255, 231, 208, 0.86);
+  font-size: clamp(0.62rem, 0.82vw, 0.74rem);
+  font-weight: 600;
+  text-align: right;
+}
+/* The thin track uses existing bottom padding, leaving gallery geometry intact. */
+.wrestling-match-dossier-photo-highlights__progress-track {
+  position: absolute;
+  inset-inline: clamp(0.72rem, 1.4vw, 1rem);
+  inset-block-end: 0.2rem;
+  block-size: 0.22rem;
+  overflow: hidden;
+  background: rgba(7, 7, 11, 0.9);
+  box-shadow: 0 0 0 1px rgba(255, 72, 50, 0.25);
+}
+.wrestling-match-dossier-photo-highlights__progress-track::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: repeating-linear-gradient(90deg, transparent 0 0.55rem, rgba(3, 4, 7, 0.8) 0.55rem 0.66rem);
+  pointer-events: none;
+}
+.wrestling-match-dossier-photo-highlights__progress-fill {
+  inline-size: 100%;
+  block-size: 100%;
+  transform-origin: left center;
+  transform: scaleX(var(--wrestling-photo-progress-scale, 0));
+  background: linear-gradient(90deg, #d73520, #ff8437);
+  transition: transform 120ms ease-out;
+}
+.wrestling-match-dossier-photo-highlights__progress-track[data-photo-progress-state="indeterminate"] .wrestling-match-dossier-photo-highlights__progress-fill {
+  transform: none;
+  background: repeating-linear-gradient(90deg, rgba(255, 108, 46, 0.35) 0 0.55rem, transparent 0.55rem 0.66rem);
+}
+.wrestling-match-dossier-photo-highlights.has-photo-progress .wrestling-match-dossier-photo-pagination {
+  inset-block-start: clamp(0.62rem, 1.2vw, 0.84rem);
+  transform: none;
+}
 .wrestling-match-dossier-photo-pagination {
   position: absolute;
   inset-block-start: 50%;
@@ -14631,6 +14683,7 @@ button.wrestling-event-history-tagged-thumb {
     gap: 0.42rem;
     padding: 0.34rem;
   }
+
   :is(.site-shell[data-shell-route="wrestling-match-detail"], .wrestling-encounter-selection-prototype) .wrestling-match-dossier-hero .wrestling-show-prototype-encounter-side-value {
     font-size: clamp(0.82rem, 4.6vw, 1.08rem);
   }
@@ -29568,4 +29621,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-encounter-dossier-adopted][data-match-dossier-back] .wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]::after {
   content: none;
   display: none;
+}
+@media (max-width: 640px) {
+  .wrestling-match-dossier-photo-highlights.has-photo-progress .wrestling-match-dossier-photo-pagination {
+    inset-block-start: 0.58rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wrestling-match-dossier-photo-highlights__progress-fill { transition: none !important; }
+}
+
+.wrestling-match-dossier-photo-highlights:not(.has-photo-progress) .wrestling-match-dossier-photo-highlights__progress-row {
+  justify-content: center;
+}
+@media (min-width: 641px) {
+  .wrestling-match-dossier-photo-highlights.has-photo-progress .wrestling-match-dossier-photo-highlights__progress-row {
+    box-sizing: border-box;
+    padding-inline-end: 10rem;
+  }
 }
