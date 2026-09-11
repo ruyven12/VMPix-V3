@@ -5524,17 +5524,16 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0, show = nul
   return card;
 }
 
-// One exact-encounter hydration/decode coordinator serves local and routed dossiers.
+// Successful hydration is cached by exact encounter, without mutating route data.
 const hallEncounterRecordCache = new Map();
 
-function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, options = {}) {
+function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef) {
   const startedAt = performance.now();
   const showId = initialShow?.showId || initialMatch?.showId || "";
   const key = getWrestlingMatchDossierPrototypePhotoRequestKey(showId, matchRef);
   const controller = new AbortController();
   const timers = new Map();
   const imageRequests = new Set();
-  const cleanups = [];
   const prepared = new Map();
   const failed = new Set();
   let show = initialShow;
@@ -5545,7 +5544,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
   let cancelled = false;
   let revealed = false;
   let dataState = "loading";
-  let pageIndex = options.canonical ? (Number.parseInt(wrestlingMatchDetailPrototypePhotoPageStates.get(options.pageKey), 10) || 0) : 0;
+  let pageIndex = 0;
   let update = () => {};
   let firstResolve;
   const firstReady = new Promise((resolve) => { firstResolve = resolve; });
@@ -5628,7 +5627,6 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
     if (cancelled) return;
     show = record.show;
     match = record.match;
-    if (options.canonical) mergeWrestlingShowIntoCollection(show);
     photos = getWrestlingMatchDossierPreviewPhotos(match);
     dataState = "loaded";
     pump();
@@ -5659,14 +5657,9 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
     }).finally(() => clearTimer(timeout));
   }
   return {
-    refresh() {
-      if (options.canonical) pageIndex = Number.parseInt(wrestlingMatchDetailPrototypePhotoPageStates.get(options.pageKey), 10) || 0;
-      update();
-    },
     cancel() {
       cancelled = true;
       controller.abort();
-      cleanups.splice(0).forEach((cleanup) => cleanup());
       [...imageRequests].forEach((cancel) => cancel());
       timers.forEach((settle, timer) => { window.clearTimeout(timer); settle(); });
       timers.clear();
@@ -5678,32 +5671,28 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       if (cancelled) return;
       root.dataset.recordPreloadStarted = String(startedAt);
       root.dataset.recordHeaderSettled = String(performance.now());
-      await Promise.race([firstReady, wait(700)]);
-      if (cancelled) return;
-      const content = options.canonical ? targetShell : document.createElement("div");
-      if (!options.canonical) content.className = "wrestling-encounter-record-content";
+      const content = document.createElement("div");
+      content.className = "wrestling-encounter-record-content";
       content.tabIndex = 0;
       content.setAttribute("aria-label", "Match information and photo highlights");
       root.style.setProperty("--encounter-record-top", `${hero.getBoundingClientRect().bottom}px`);
       let metadata = createWrestlingMatchDossierMetadata(show, match);
       if (metadata) content.append(metadata);
-      if (!options.canonical) root.append(content);
+      root.append(content);
       root.dataset.recordInfoState = "revealing";
-      const gallery = options.canonical ? targetShell : document.createElement("div");
-      if (!options.canonical) gallery.className = "wrestling-encounter-record-gallery";
+      const infoAnimation = animate(content, [{ opacity: 0 }, { opacity: 1 }], 200);
+      try { await infoAnimation.finished; } catch { return; }
+      if (cancelled) return;
+      root.dataset.recordInfoState = "visible";
+      await Promise.race([firstReady, wait(700)]);
+      if (cancelled) return;
+      const gallery = document.createElement("div");
+      gallery.className = "wrestling-encounter-record-gallery";
       gallery.tabIndex = 0;
       gallery.setAttribute("aria-label", "Photo highlights. Use left and right arrow keys to change pages.");
-      if (!options.canonical) content.append(gallery);
-      let initialReveal = null;
-      let refreshAfterReveal = false;
+      content.append(gallery);
       const renderGallery = () => {
         if (cancelled) return;
-        // Keep the painted nodes until their initial fade finishes. Decoding
-        // and page selection continue; only their DOM refresh is coalesced.
-        if (options.canonical && initialReveal) {
-          refreshAfterReveal = true;
-          return;
-        }
         const refreshedMetadata = createWrestlingMatchDossierMetadata(show, match);
         if (refreshedMetadata && metadata && refreshedMetadata.textContent !== metadata.textContent) {
           metadata.replaceWith(refreshedMetadata);
@@ -5716,14 +5705,9 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         const archiveCount = Math.max(photos.length, getWrestlingMatchDossierPhotoCount(match));
         const pagination = {
           pageIndex, pageNumber: totalPages ? pageIndex + 1 : 0, totalPages, totalPhotos: available.length,
-          archiveCount, pagePhotos, pageKey: options.pageKey, localOnly: !options.canonical, preparedImages: prepared, schedule,
+          archiveCount, pagePhotos, localOnly: true, preparedImages: prepared, schedule,
           sourceIndices: new Map(photos.map((photo, index) => [photo.photoId, index])),
-          onPageChange(nextIndex) {
-            pageIndex = Math.max(0, Math.min(nextIndex, totalPages - 1));
-            if (options.canonical) wrestlingMatchDetailPrototypePhotoPageStates.set(options.pageKey, pageIndex);
-            renderGallery();
-            return true;
-          },
+          onPageChange(nextIndex) { pageIndex = Math.max(0, Math.min(nextIndex, totalPages - 1)); renderGallery(); return true; },
         };
         const countInfo = archiveCount > 0
           ? { label: `${formatWrestlingCount(archiveCount, "Photos").toUpperCase()} · ${prepared.size} READY`, state: "loaded" }
@@ -5734,42 +5718,28 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         status.className = "wrestling-encounter-record-status";
         status.setAttribute("role", "status");
         status.textContent = dataState === "unavailable" ? "Photo archive unavailable. Return to encounters to try again."
-          : !done() ? (options.canonical && pagePhotos.length === 6 ? "" : pagePhotos.length ? "Preparing the remaining photo archive…" : "Retrieving photo highlights…")
+          : !done() ? (pagePhotos.length ? "Preparing the remaining photo archive…" : "Retrieving photo highlights…")
           : failed.size ? `${failed.size} photo${failed.size === 1 ? "" : "s"} could not be prepared.`
           : archiveCount > photos.length ? "Some archived photo records are unavailable in this response."
           : photos.length ? "" : "No photos are archived for this encounter.";
         const focusedLabel = gallery.contains(document.activeElement) ? document.activeElement.getAttribute("aria-label") : "";
-        gallery.replaceChildren(...(options.canonical ? [hero, metadata].filter(Boolean) : []), heading, ...(grid ? [grid] : []), ...(status.textContent ? [status] : []));
+        gallery.replaceChildren(heading, ...(grid ? [grid] : []), ...(status.textContent ? [status] : []));
         if (focusedLabel) [...gallery.querySelectorAll("button")].find((button) => button.getAttribute("aria-label") === focusedLabel && !button.disabled)?.focus({ preventScroll: true });
         root.dataset.recordPhotoState = done() ? (archiveCount > photos.length ? "partial" : prepared.size ? "ready" : "unavailable") : (pagePhotos.length ? "partial" : "loading");
         root.dataset.recordPhotosReady = String(prepared.size);
       };
-      const onGalleryKeyDown = (event) => {
+      gallery.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
           event.preventDefault();
           pageIndex += event.key === "ArrowRight" ? 1 : -1;
-          if (options.canonical) wrestlingMatchDetailPrototypePhotoPageStates.set(options.pageKey, pageIndex);
           renderGallery();
         }
-      };
-      gallery.addEventListener("keydown", onGalleryKeyDown);
-      cleanups.push(() => gallery.removeEventListener("keydown", onGalleryKeyDown));
+      });
       update = renderGallery;
       renderGallery();
       root.dataset.recordPhotoReveal = String(performance.now());
       root.dataset.recordFirstRevealReady = String(prepared.size);
-      const revealNodes = options.canonical ? [...targetShell.children].filter((node) => node !== hero) : [content];
-      const reveals = revealNodes.map((node) => animate(node, [{ opacity: 0 }, { opacity: 1 }], 200));
-      initialReveal = reveals[0] || null;
-      Promise.all(reveals.map((animation) => animation.finished)).then(() => {
-        if (cancelled) return;
-        initialReveal = null;
-        root.dataset.recordInfoState = "visible";
-        if (refreshAfterReveal) {
-          refreshAfterReveal = false;
-          renderGallery();
-        }
-      }).catch(() => {});
+      animate(gallery, [{ opacity: 0 }, { opacity: 1 }], 200);
       revealed = true;
       root.dataset.recordRemainderStarted = String(performance.now());
       pump();
@@ -6842,19 +6812,6 @@ function renderWrestlingMatchDossierState(route, stateName) {
   wrestlingMatchDetailPrototypeShell.replaceChildren(section);
 }
 
-let wrestlingMatchDossierPreparedRecord = null;
-
-function cancelWrestlingMatchDossierPreparedRecord() {
-  const session = wrestlingMatchDossierPreparedRecord;
-  if (!session) return;
-  wrestlingMatchDossierPreparedRecord = null;
-  session.observer.disconnect();
-  session.coordinator.cancel();
-  session.animations.forEach((animation) => animation.cancel());
-  for (const name of Object.keys(session.shell.dataset)) {
-    if (name.startsWith("record")) delete session.shell.dataset[name];
-  }
-}
 // Canonical production Wrestling Match Detail renderer.
 // Extend this shared path rather than creating parallel Match Detail renderers.
 function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), options = {}) {
@@ -6877,12 +6834,10 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
   }
 
   if (wrestlingShowsDataState === "idle" || wrestlingShowsDataState === "loading") {
-    cancelWrestlingMatchDossierPreparedRecord();
     renderWrestlingMatchDossierState(route, "loading");
     return;
   }
   if (wrestlingShowsDataState === "error") {
-    cancelWrestlingMatchDossierPreparedRecord();
     renderWrestlingMatchDossierState(route, "error");
     return;
   }
@@ -6891,55 +6846,19 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
     ? findWrestlingMatchInRowsByRef(show.matches, getWrestlingMatchDetailRouteMatchRef(route))
     : null;
   if (!match) {
-    cancelWrestlingMatchDossierPreparedRecord();
     renderWrestlingMatchDossierState(route, "empty");
     return;
   }
-  const matchRef = getWrestlingMatchDetailRouteMatchRef(route);
-  const routeShowId = getWrestlingMatchDetailRouteShowId(route);
-  const pageKey = getWrestlingMatchDossierPhotoPageKey(show, match, route);
-  const previous = wrestlingMatchDossierPreparedRecord;
-  if (previous?.pageKey === pageKey && previous.hero.parentElement === wrestlingMatchDetailPrototypeShell) {
-    previous.coordinator.refresh();
-    return;
-  }
-  cancelWrestlingMatchDossierPreparedRecord();
-  const coordinator = createHallEncounterRecordPreview(show, match, matchRef, { canonical: true, pageKey });
+  requestWrestlingMatchDossierPrototypePhotoCount(show);
   const hero = createWrestlingMatchDossierHero(match);
-  const shell = wrestlingMatchDetailPrototypeShell;
-  shell.replaceChildren(hero);
-  const animations = [];
-  const animate = (element, frames, duration) => {
-    const animation = element.animate(frames, {
-      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : duration,
-      easing: "ease-out", fill: "both",
-    });
-    animations.push(animation);
-    return animation;
-  };
-  const observer = new MutationObserver(() => {
-    if (wrestlingMatchDossierPreparedRecord !== session) return;
-    const current = getRouteFromUrl();
-    const sameEncounter = getWrestlingMatchDetailRouteShowId(current) === routeShowId &&
-      getWrestlingMatchDetailRouteMatchRef(current) === matchRef &&
-      (isWrestlingMatchDetailRoute(current) || isWrestlingMatchDetailPhotoRoute(current));
-    if (!sameEncounter || hero.parentElement !== shell) cancelWrestlingMatchDossierPreparedRecord();
-  });
-  const session = { pageKey, coordinator, hero, shell, animations, observer };
-  wrestlingMatchDossierPreparedRecord = session;
-  observer.observe(shell.closest(".site-shell"), {
-    attributes: true, attributeFilter: ["data-shell-route"], childList: true, subtree: true,
-  });
-  coordinator.reveal(shell, shell, hero, animate).catch(() => {
-    if (wrestlingMatchDossierPreparedRecord !== session) return;
-    const status = document.createElement("p");
-    status.className = "wrestling-encounter-record-status";
-    status.setAttribute("role", "status");
-    status.textContent = "This encounter record could not be prepared. Return to the campaign to try again.";
-    cancelWrestlingMatchDossierPreparedRecord();
-    shell.append(status);
-  });
+  const metadata = createWrestlingMatchDossierMetadata(show, match);
+  const photoPagination = getWrestlingMatchDossierPhotoPagination(show, match);
+  const photoHighlights = createWrestlingMatchDossierPhotoHighlights(show, match, photoPagination);
+  const photoPreviewGrid = createWrestlingMatchDossierPhotoPreviewGrid(photoPagination);
+  wrestlingMatchDetailPrototypeShell.replaceChildren(...[hero, metadata, photoHighlights, photoPreviewGrid].filter(Boolean));
+
 }
+
 function createHallPrototypeEncounterSection(show = {}) {
   const section = document.createElement("section");
   section.className = "wrestling-show-prototype-encounters";

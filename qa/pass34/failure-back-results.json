@@ -1,0 +1,54 @@
+[
+  {
+    "mode": "failed",
+    "state": {
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 0 READY\n\nPhoto archive unavailable. Return to encounters to try again.",
+      "meta": true,
+      "engine": true,
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1733.7000000001863",
+        "recordHeaderSettled": "1735.2000000001863",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "1769.4000000003725",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "1769.7000000001863"
+      }
+    },
+    "back": true
+  },
+  {
+    "mode": "hang",
+    "state": {
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 0 READY\n\nRetrieving photo highlights…",
+      "meta": true,
+      "engine": true,
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1580.6999999997206",
+        "recordHeaderSettled": "1582.0999999996275",
+        "recordInfoState": "visible",
+        "recordPhotoState": "loading",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "2289.1999999997206",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "2289.5"
+      }
+    },
+    "back": true
+  },
+  {
+    "mode": "missing",
+    "state": {
+      "text": "Back to Show\nArchive Record Unavailable\nNo matching encounter record was found. Return to the parent show.",
+      "meta": false,
+      "engine": true,
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": ""
+      }
+    },
+    "back": true
+  }
+]

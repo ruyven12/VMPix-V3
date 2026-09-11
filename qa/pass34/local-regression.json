@@ -1,0 +1,287 @@
+[
+  {
+    "reducedMotion": "no-preference",
+    "data": {
+      "frames": [
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1796.6000000000931",
+            "recordHeaderSettled": "2438.600000000093",
+            "recordInfoState": "revealing",
+            "recordPhotoState": "partial",
+            "recordPhotosReady": "6",
+            "recordPhotoReveal": "2443.2000000001863",
+            "recordFirstRevealReady": "6",
+            "recordRemainderStarted": "2443.3000000002794"
+          },
+          "m": true,
+          "g": true
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1796.6000000000931",
+            "recordHeaderSettled": "2438.600000000093",
+            "recordInfoState": "revealing",
+            "recordPhotoState": "partial",
+            "recordPhotosReady": "6",
+            "recordPhotoReveal": "2443.2000000001863",
+            "recordFirstRevealReady": "6",
+            "recordRemainderStarted": "2443.3000000002794"
+          },
+          "m": true,
+          "g": true
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1796.6000000000931",
+            "recordHeaderSettled": "2438.600000000093",
+            "recordInfoState": "revealing",
+            "recordPhotoState": "ready",
+            "recordPhotosReady": "8",
+            "recordPhotoReveal": "2443.2000000001863",
+            "recordFirstRevealReady": "6",
+            "recordRemainderStarted": "2443.3000000002794"
+          },
+          "m": true,
+          "g": true
+        }
+      ],
+      "state": {
+        "recordPreloadStarted": "1796.6000000000931",
+        "recordHeaderSettled": "2438.600000000093",
+        "recordInfoState": "revealing",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "2443.2000000001863",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "2443.3000000002794"
+      }
+    }
+  },
+  {
+    "reducedMotion": "reduce",
+    "data": {
+      "frames": [
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {},
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1639.3999999999069",
+            "recordHeaderSettled": "1735.3999999999069"
+          },
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1639.3999999999069",
+            "recordHeaderSettled": "1735.3999999999069"
+          },
+          "m": false,
+          "g": false
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1639.3999999999069",
+            "recordHeaderSettled": "1735.3999999999069",
+            "recordInfoState": "revealing",
+            "recordPhotoState": "partial",
+            "recordPhotosReady": "7",
+            "recordPhotoReveal": "1756.1000000000931",
+            "recordFirstRevealReady": "6",
+            "recordRemainderStarted": "1756.1999999997206"
+          },
+          "m": true,
+          "g": true
+        },
+        {
+          "data": {
+            "recordPreloadStarted": "1639.3999999999069",
+            "recordHeaderSettled": "1735.3999999999069",
+            "recordInfoState": "revealing",
+            "recordPhotoState": "ready",
+            "recordPhotosReady": "8",
+            "recordPhotoReveal": "1756.1000000000931",
+            "recordFirstRevealReady": "6",
+            "recordRemainderStarted": "1756.1999999997206"
+          },
+          "m": true,
+          "g": true
+        }
+      ],
+      "state": {
+        "recordPreloadStarted": "1639.3999999999069",
+        "recordHeaderSettled": "1735.3999999999069",
+        "recordInfoState": "revealing",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "8",
+        "recordPhotoReveal": "1756.1000000000931",
+        "recordFirstRevealReady": "6",
+        "recordRemainderStarted": "1756.1999999997206"
+      }
+    }
+  }
+]

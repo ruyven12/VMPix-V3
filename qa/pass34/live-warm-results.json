@@ -1,0 +1,106 @@
+{
+  "data": {
+    "data": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "2284",
+      "recordHeaderSettled": "2285",
+      "recordInfoState": "visible",
+      "recordPhotoState": "partial",
+      "recordPhotosReady": "15",
+      "recordPhotoReveal": "2296.600000000093",
+      "recordFirstRevealReady": "6",
+      "recordRemainderStarted": "2296.7000000001863"
+    },
+    "decodes": [
+      {
+        "t": 2295.399999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-3FHj6CT/0/M4wgFRnqSmH5hj2KS6khGxvDBt6F6B6WxcG534s8S/X3/2026-08-08%20-%20Match%201-1-X3.jpg"
+      },
+      {
+        "t": 2295.399999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-2FBnjjZ/0/MpDB8QqVwzMn63gDV7rh75v2mHRfXW6Jfs8QFhxxr/X3/2026-08-08%20-%20Match%201-2-X3.jpg"
+      },
+      {
+        "t": 2295.5,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-fFN2nvP/0/M7X9XFbz97x3QxPz93zVJJzL5KGnf3gDv2whr9bdV/X3/2026-08-08%20-%20Match%201-3-X3.jpg"
+      },
+      {
+        "t": 2295.5,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-9QqmrLM/0/KxC4DknWvRbrcFnzXSzwFdxhNCZsgWPd37ktWgDWk/X3/2026-08-08%20-%20Match%201-4-X3.jpg"
+      },
+      {
+        "t": 2295.5,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-J7GDVsB/0/KQcnWrPgrtHX6kq3fTKhKwj4gG6vVxd486s4z7WPK/X3/2026-08-08%20-%20Match%201-5-X3.jpg"
+      },
+      {
+        "t": 2295.5,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-XdkKjW5/0/MzTMvRkBJRrPKXr4TrZfkqRsmrJZ6J2HQzWGrnczD/X3/2026-08-08%20-%20Match%201-6-X3.jpg"
+      },
+      {
+        "t": 2332,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-3KSTWpL/0/K3p4Hr6McrpjqvsCghZJ2Q4d5CXGpSLtx9cXfxbbj/X3/2026-08-08%20-%20Match%201-7-X3.jpg"
+      },
+      {
+        "t": 2359.399999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-pP6BgK6/0/LzkSBn5PNRwmJfbdmDjhFKvC8TBgMdkzW3xXMBHxz/X3/2026-08-08%20-%20Match%201-8-X3.jpg"
+      },
+      {
+        "t": 2392.7000000001863,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-mdfXfDh/0/NWQnB9PMb39Mnr9zrSb8qhDcf64nPJ7tfd7x9xXVj/X3/2026-08-08%20-%20Match%201-9-X3.jpg"
+      },
+      {
+        "t": 2424.8000000002794,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-7g93BJS/0/L9Jv96dSCJTpPTzfKBMrsJDmGNCHJM4F7HrfF69Vf/X3/2026-08-08%20-%20Match%201-10-X3.jpg"
+      },
+      {
+        "t": 2452.899999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-z3qDzmf/0/Lmm8wnzrrZkjZPPNvBGRMFpqBtkRNd3gBX6cRr44k/X3/2026-08-08%20-%20Match%201-11-X3.jpg"
+      },
+      {
+        "t": 2476.3000000002794,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-HsT7XZ8/0/NMp5gbdGj7xZxBVZXFCpCPd5RvrN4DWdDBqpZf7b8/X3/2026-08-08%20-%20Match%201-12-X3.jpg"
+      },
+      {
+        "t": 2498,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-Zf2ZNkQ/0/KFXXQZv4HB43rjmnBThLWtPD79hbCqWZ8pLKpWrTv/X3/2026-08-08%20-%20Match%201-13-X3.jpg"
+      },
+      {
+        "t": 2532.899999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-XWBRR5T/0/MCntmfG2GmMMKwmXxp8nKDN5hz3ZTncWcQsmtnvjf/X3/2026-08-08%20-%20Match%201-14-X3.jpg"
+      },
+      {
+        "t": 2553.899999999907,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-V338Xcs/0/KTWCKMJ75ZLVhLKw3VWxVSLMm5LdbLzTjHfkmr6Ww/X3/2026-08-08%20-%20Match%201-15-X3.jpg"
+      }
+    ],
+    "imgs": [
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-3FHj6CT/0/M4wgFRnqSmH5hj2KS6khGxvDBt6F6B6WxcG534s8S/X3/2026-08-08%20-%20Match%201-1-X3.jpg"
+      },
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-2FBnjjZ/0/MpDB8QqVwzMn63gDV7rh75v2mHRfXW6Jfs8QFhxxr/X3/2026-08-08%20-%20Match%201-2-X3.jpg"
+      },
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-fFN2nvP/0/M7X9XFbz97x3QxPz93zVJJzL5KGnf3gDv2whr9bdV/X3/2026-08-08%20-%20Match%201-3-X3.jpg"
+      },
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-9QqmrLM/0/KxC4DknWvRbrcFnzXSzwFdxhNCZsgWPd37ktWgDWk/X3/2026-08-08%20-%20Match%201-4-X3.jpg"
+      },
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-J7GDVsB/0/KQcnWrPgrtHX6kq3fTKhKwj4gG6vVxd486s4z7WPK/X3/2026-08-08%20-%20Match%201-5-X3.jpg"
+      },
+      {
+        "ready": true,
+        "src": "https://photos.smugmug.com/Wrestling/Limitless/080826/Match-1/i-XdkKjW5/0/MzTMvRkBJRrPKXr4TrZfkqRsmrJZ6J2HQzWGrnczD/X3/2026-08-08%20-%20Match%201-6-X3.jpg"
+      }
+    ]
+  },
+  "hydrationRequests": [
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=limitless-wrestling-vacationland-cup-26-2026-08-08"
+  ]
+}
