@@ -1,0 +1,407 @@
+[
+  {
+    "width": 360,
+    "baseline": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 14.703125,
+            "y": 736.734375,
+            "width": 46.71875,
+            "height": 46.71875,
+            "top": 736.734375,
+            "right": 61.421875,
+            "bottom": 783.453125,
+            "left": 14.703125
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 95.4921875,
+            "y": 762.6015625,
+            "width": 169,
+            "height": 12.515625,
+            "top": 762.6015625,
+            "right": 264.4921875,
+            "bottom": 775.1171875,
+            "left": 95.4921875
+          }
+        }
+      ],
+      "label": {
+        "x": 16.323436737060547,
+        "y": 755.453125,
+        "width": 40.76937484741211,
+        "height": 9.28125,
+        "top": 755.453125,
+        "right": 57.092811584472656,
+        "bottom": 764.734375,
+        "left": 16.323436737060547
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      }
+    },
+    "current": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 14.703125,
+            "y": 736.734375,
+            "width": 46.71875,
+            "height": 46.71875,
+            "top": 736.734375,
+            "right": 61.421875,
+            "bottom": 783.453125,
+            "left": 14.703125
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 95.4921875,
+            "y": 762.6015625,
+            "width": 169,
+            "height": 12.515625,
+            "top": 762.6015625,
+            "right": 264.4921875,
+            "bottom": 775.1171875,
+            "left": 95.4921875
+          }
+        }
+      ],
+      "label": {
+        "x": 20.9609375,
+        "y": 728.453125,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 728.453125,
+        "right": 55.1640625,
+        "bottom": 737.734375,
+        "left": 20.9609375
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      }
+    }
+  },
+  {
+    "width": 412,
+    "baseline": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 15.03125,
+            "y": 844.515625,
+            "width": 51.078125,
+            "height": 51.078125,
+            "top": 844.515625,
+            "right": 66.109375,
+            "bottom": 895.59375,
+            "left": 15.03125
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 121.4921875,
+            "y": 873.234375,
+            "width": 169,
+            "height": 12.515625,
+            "top": 873.234375,
+            "right": 290.4921875,
+            "bottom": 885.75,
+            "left": 121.4921875
+          }
+        }
+      ],
+      "label": {
+        "x": 18.823436737060547,
+        "y": 865.3984375,
+        "width": 40.76937484741211,
+        "height": 9.28125,
+        "top": 865.3984375,
+        "right": 59.592811584472656,
+        "bottom": 874.6796875,
+        "left": 18.823436737060547
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      }
+    },
+    "current": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 15.03125,
+            "y": 844.515625,
+            "width": 51.078125,
+            "height": 51.078125,
+            "top": 844.515625,
+            "right": 66.109375,
+            "bottom": 895.59375,
+            "left": 15.03125
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 121.4921875,
+            "y": 873.234375,
+            "width": 169,
+            "height": 12.515625,
+            "top": 873.234375,
+            "right": 290.4921875,
+            "bottom": 885.75,
+            "left": 121.4921875
+          }
+        }
+      ],
+      "label": {
+        "x": 23.4609375,
+        "y": 836.234375,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 836.234375,
+        "right": 57.6640625,
+        "bottom": 845.515625,
+        "left": 23.4609375
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      }
+    }
+  },
+  {
+    "width": 1920,
+    "baseline": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 496,
+            "y": 1004.171875,
+            "width": 65.59375,
+            "height": 65.59375,
+            "top": 1004.171875,
+            "right": 561.59375,
+            "bottom": 1069.765625,
+            "left": 496
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 833.65625,
+            "y": 1034.5703125,
+            "width": 252.671875,
+            "height": 18.71875,
+            "top": 1034.5703125,
+            "right": 1086.328125,
+            "bottom": 1053.2890625,
+            "left": 833.65625
+          }
+        }
+      ],
+      "label": {
+        "x": 502.05780029296875,
+        "y": 1031.203125,
+        "width": 50.609375,
+        "height": 11.515625,
+        "top": 1031.203125,
+        "right": 552.6671752929688,
+        "bottom": 1042.71875,
+        "left": 502.05780029296875
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      }
+    },
+    "current": {
+      "geometry": [
+        {
+          "selector": "[data-portfolio-engine]",
+          "rect": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          }
+        },
+        {
+          "selector": ".portfolio-engine-left-core",
+          "rect": {
+            "x": 496,
+            "y": 1004.171875,
+            "width": 65.59375,
+            "height": 65.59375,
+            "top": 1004.171875,
+            "right": 561.59375,
+            "bottom": 1069.765625,
+            "left": 496
+          }
+        },
+        {
+          "selector": ".portfolio-engine-right-core"
+        },
+        {
+          "selector": "[data-portfolio-engine-current-view]",
+          "rect": {
+            "x": 833.65625,
+            "y": 1034.5703125,
+            "width": 252.671875,
+            "height": 18.71875,
+            "top": 1034.5703125,
+            "right": 1086.328125,
+            "bottom": 1053.2890625,
+            "left": 833.65625
+          }
+        }
+      ],
+      "label": {
+        "x": 511.6953125,
+        "y": 995.890625,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 995.890625,
+        "right": 545.8984375,
+        "bottom": 1005.171875,
+        "left": 511.6953125
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      }
+    }
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "width": 360,
+    "mode": "missing",
+    "state": {
+      "text": "Archive Record Unavailable\nNo matching encounter record was found. Return to the parent show.",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        }
+      ]
+    },
+    "return": true
+  },
+  {
+    "width": 360,
+    "mode": "error",
+    "state": {
+      "text": "Archive Record Unavailable\nUnable to load the encounter archive. Retry or return to the parent show.\nRetry Encounter",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        },
+        {
+          "text": "Retry Encounter",
+          "visible": true
+        }
+      ]
+    },
+    "return": true
+  },
+  {
+    "width": 412,
+    "mode": "missing",
+    "state": {
+      "text": "Archive Record Unavailable\nNo matching encounter record was found. Return to the parent show.",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        }
+      ]
+    },
+    "return": true
+  },
+  {
+    "width": 412,
+    "mode": "error",
+    "state": {
+      "text": "Archive Record Unavailable\nUnable to load the encounter archive. Retry or return to the parent show.\nRetry Encounter",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        },
+        {
+          "text": "Retry Encounter",
+          "visible": true
+        }
+      ]
+    },
+    "return": true
+  },
+  {
+    "width": 1920,
+    "mode": "missing",
+    "state": {
+      "text": "Archive Record Unavailable\nNo matching encounter record was found. Return to the parent show.",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        }
+      ]
+    },
+    "return": true
+  },
+  {
+    "width": 1920,
+    "mode": "error",
+    "state": {
+      "text": "Archive Record Unavailable\nUnable to load the encounter archive. Retry or return to the parent show.\nRetry Encounter",
+      "buttons": [
+        {
+          "text": "Back to Show",
+          "visible": false
+        },
+        {
+          "text": "Retry Encounter",
+          "visible": true
+        }
+      ]
+    },
+    "return": true
+  }
+]

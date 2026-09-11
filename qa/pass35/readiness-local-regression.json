@@ -1,0 +1,25 @@
+{
+  "state": {
+    "data": {
+      "wrestlingMatchDetailPrototypeShell": "",
+      "recordPreloadStarted": "1715.6000000005588",
+      "recordHeaderSettled": "1717.1000000005588",
+      "recordInfoState": "revealing",
+      "recordPhotoState": "partial",
+      "recordPhotosReady": "6",
+      "recordPhotoReveal": "1792",
+      "recordFirstRevealReady": "6",
+      "recordRemainderStarted": "1792.2000000001863"
+    },
+    "metadata": true,
+    "imgs": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "localResetRetained": true
+}

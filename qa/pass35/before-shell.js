@@ -2346,11 +2346,6 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   initPrototypeEngineReturnEmitter();
 
   const isActive = isPrototypeEngineReturnRoute(route);
-  const isMatchDetailBack = route?.name === "wrestling-match-detail";
-  // Photo routes retain their existing control, without the new BACK treatment.
-  shell?.toggleAttribute("data-match-dossier-back", isMatchDetailBack);
-  if (isMatchDetailBack) prototypeEngineReturnEmitter.removeAttribute("aria-hidden");
-  else prototypeEngineReturnEmitter.setAttribute("aria-hidden", "true");
   prototypeEngineReturnEmitter.classList.toggle("is-prototype-return-control", isActive);
   prototypeEngineReturnEmitter.toggleAttribute("data-prototype-engine-return-active", isActive);
   prototypeEngineReturnEmitter.dataset.prototypeEngineReturnState =
@@ -2360,8 +2355,6 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
     return;
   }
 
-  prototypeEngineReturnControl.setAttribute("aria-label", isMatchDetailBack ? "Back to Campaign Record" : "Return");
-  prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isMatchDetailBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
   prototypeEngineReturnControl.disabled = !isActive;
   prototypeEngineReturnControl.tabIndex = isActive ? 0 : -1;

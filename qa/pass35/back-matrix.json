@@ -1,0 +1,254 @@
+[
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "reducedMotion": "no-preference",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 15.703125,
+        "y": 737.734375,
+        "width": 44.71875,
+        "height": 44.71875,
+        "top": 737.734375,
+        "right": 60.421875,
+        "bottom": 782.453125,
+        "left": 15.703125
+      },
+      "labelRect": {
+        "x": 20.9609375,
+        "y": 722.859375,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 722.859375,
+        "right": 55.1640625,
+        "bottom": 732.140625,
+        "left": 20.9609375
+      },
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  },
+  {
+    "v": {
+      "width": 360,
+      "height": 800
+    },
+    "reducedMotion": "reduce",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 15.703125,
+        "y": 737.734375,
+        "width": 44.71875,
+        "height": 44.71875,
+        "top": 737.734375,
+        "right": 60.421875,
+        "bottom": 782.453125,
+        "left": 15.703125
+      },
+      "labelRect": {
+        "x": 20.9609375,
+        "y": 722.859375,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 722.859375,
+        "right": 55.1640625,
+        "bottom": 732.140625,
+        "left": 20.9609375
+      },
+      "text": "BACK",
+      "animation": "none",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "reducedMotion": "no-preference",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 16.03125,
+        "y": 845.515625,
+        "width": 49.078125,
+        "height": 49.078125,
+        "top": 845.515625,
+        "right": 65.109375,
+        "bottom": 894.59375,
+        "left": 16.03125
+      },
+      "labelRect": {
+        "x": 23.4609375,
+        "y": 830.640625,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 830.640625,
+        "right": 57.6640625,
+        "bottom": 839.921875,
+        "left": 23.4609375
+      },
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  },
+  {
+    "v": {
+      "width": 412,
+      "height": 915
+    },
+    "reducedMotion": "reduce",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 16.03125,
+        "y": 845.515625,
+        "width": 49.078125,
+        "height": 49.078125,
+        "top": 845.515625,
+        "right": 65.109375,
+        "bottom": 894.59375,
+        "left": 16.03125
+      },
+      "labelRect": {
+        "x": 23.4609375,
+        "y": 830.640625,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 830.640625,
+        "right": 57.6640625,
+        "bottom": 839.921875,
+        "left": 23.4609375
+      },
+      "text": "BACK",
+      "animation": "none",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "reducedMotion": "no-preference",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 497,
+        "y": 1005.171875,
+        "width": 63.59375,
+        "height": 63.59375,
+        "top": 1005.171875,
+        "right": 560.59375,
+        "bottom": 1068.765625,
+        "left": 497
+      },
+      "labelRect": {
+        "x": 511.6953125,
+        "y": 990.296875,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 990.296875,
+        "right": 545.8984375,
+        "bottom": 999.578125,
+        "left": 511.6953125
+      },
+      "text": "BACK",
+      "animation": "matchDossierBackGlow",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  },
+  {
+    "v": {
+      "width": 1920,
+      "height": 1080
+    },
+    "reducedMotion": "reduce",
+    "state": {
+      "tag": "BUTTON",
+      "label": "Back to Campaign Record",
+      "disabled": false,
+      "hiddenAncestor": false,
+      "rect": {
+        "x": 497,
+        "y": 1005.171875,
+        "width": 63.59375,
+        "height": 63.59375,
+        "top": 1005.171875,
+        "right": 560.59375,
+        "bottom": 1068.765625,
+        "left": 497
+      },
+      "labelRect": {
+        "x": 511.6953125,
+        "y": 990.296875,
+        "width": 34.203125,
+        "height": 9.28125,
+        "top": 990.296875,
+        "right": 545.8984375,
+        "bottom": 999.578125,
+        "left": 511.6953125
+      },
+      "text": "BACK",
+      "animation": "none",
+      "overflow": 0
+    },
+    "focus": {
+      "visible": true,
+      "outline": "solid"
+    },
+    "errors": [],
+    "repeats3": true
+  }
+]
