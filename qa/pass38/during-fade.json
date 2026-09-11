@@ -1,0 +1,1961 @@
+{
+  "decode": 2858.79999999993,
+  "samples": [
+    {
+      "t": 2788.5999999999767,
+      "count": 0,
+      "info": "0",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2793.5999999999767,
+      "count": 0,
+      "info": "0",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2795.0999999999767,
+      "count": 0,
+      "info": "0",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2804.899999999907,
+      "count": 0,
+      "info": "0.135171",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2821.5,
+      "count": 0,
+      "info": "0.260914",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2838.0999999999767,
+      "count": 0,
+      "info": "0.37822",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2855.1999999999534,
+      "count": 0,
+      "info": "0.488638",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "0"
+    },
+    {
+      "t": 2873.899999999907,
+      "count": 1,
+      "info": "0.591162",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2888.29999999993,
+      "count": 1,
+      "info": "0.685245",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2905,
+      "count": 1,
+      "info": "0.77008",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2921.5999999999767,
+      "count": 1,
+      "info": "0.844161",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2938.1999999999534,
+      "count": 1,
+      "info": "0.906913",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2954.899999999907,
+      "count": 1,
+      "info": "0.955861",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2971.5,
+      "count": 1,
+      "info": "0.988091",
+      "hero": "1",
+      "infoState": "revealing",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 2988.5999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3004.899999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3021.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3038.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3055,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3071.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3088.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3105,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3121.79999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3138.29999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3155.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3171.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3188.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3205.0999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3221.899999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3238.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3255.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3271.899999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3288.5999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3305.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3322,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3338.5999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3355.29999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3372,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3388.5999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3405.29999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3422,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3438.5999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3455.5,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3472,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3488.79999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3505.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3522.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3538.79999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3555.5,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3572.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3588.79999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3605.5,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3622.29999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3638.899999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3655.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3672.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3688.899999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3705.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3722.399999999907,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3739.0999999999767,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3755.6999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3772.29999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3789.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3805.79999999993,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3823.1999999999534,
+      "count": 1,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "1"
+    },
+    {
+      "t": 3842.1999999999534,
+      "count": 4,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "4"
+    },
+    {
+      "t": 3858.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3872.6999999999534,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3889.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3906,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3922.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3939.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3956,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3972.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 3989.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4005.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4022.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4039.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4056.0999999999767,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4072.6999999999534,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4089.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4106.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4122.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4139.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4156.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4172.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4189.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4206.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4222.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4239.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4256.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4272.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4289.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4306.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4323,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4339.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4356.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4373,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4389.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4406.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4423.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4439.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4456.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4473,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4489.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4506.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4523.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4539.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4556.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4573.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4590,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4606.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4623.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4639.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4656.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4673.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4690,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4706.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4723.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4740.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4756.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4773.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4790.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4806.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4823.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4840.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4856.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4873.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4890.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4906.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4923.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4940.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4957,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4973.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 4990.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5007,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5023.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5040.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5057,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5073.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5090.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5106.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5123.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5140.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5157.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5173.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5190.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5207.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5224.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5241.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5257.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5274.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5290.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5307.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5324,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5340.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5357.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5374.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5390.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5407.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5424.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5440.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5457.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5474,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5490.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5507.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5524.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5540.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5557.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5574.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5590.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5607.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5624.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5640.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5657.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5674.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5691.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5707.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5724.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5741.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5757.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5774.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5791.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5808,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5824.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5841.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5857.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5874.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5891.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5908,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5924.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5941.099999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5957.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5974.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 5991.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6008,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6024.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6041.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6058,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6074.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6091.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6108,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6124.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6141.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6158.399999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "6"
+    },
+    {
+      "t": 6177.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6191.599999999977,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6208.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6224.899999999907,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6241.5,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6258.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6274.79999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6291.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6308.199999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6325,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6341.699999999953,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    },
+    {
+      "t": 6358.29999999993,
+      "count": 6,
+      "info": "1",
+      "hero": "1",
+      "infoState": "visible",
+      "empty": false,
+      "ready": "8"
+    }
+  ],
+  "removed": [],
+  "delta": 15.099999999976717,
+  "painted": 105
+}

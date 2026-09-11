@@ -1,0 +1,24 @@
+[
+  {
+    "count": 2,
+    "w": 360,
+    "initial": 2
+  },
+  {
+    "count": 5,
+    "w": 412,
+    "initial": 5
+  },
+  {
+    "count": 8,
+    "w": 1920,
+    "initial": 6,
+    "page2": 2
+  },
+  {
+    "count": 8,
+    "w": 412,
+    "initial": 6,
+    "page2": 2
+  }
+]

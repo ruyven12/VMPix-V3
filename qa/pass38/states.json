@@ -1,0 +1,225 @@
+[
+  {
+    "mode": "one",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1059.5",
+        "recordHeaderSettled": "1374.9000000000233",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "1",
+        "recordPhotoReveal": "1378.1000000000931",
+        "recordFirstRevealReady": "1",
+        "recordRemainderStarted": "1423.6000000000931"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n1 PHOTOS · 1 READY\n\n1 / 1",
+      "imgs": [
+        {
+          "width": 412,
+          "complete": true
+        }
+      ]
+    }
+  },
+  {
+    "mode": "three",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "1233.2000000000698",
+        "recordHeaderSettled": "1329.6000000000931",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "3",
+        "recordPhotoReveal": "1339.2000000000698",
+        "recordFirstRevealReady": "1",
+        "recordRemainderStarted": "1381.3000000000466"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n3 PHOTOS · 3 READY\n\n1 / 1",
+      "imgs": [
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        }
+      ]
+    }
+  },
+  {
+    "mode": "six",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "679.2999999999302",
+        "recordHeaderSettled": "777.0999999999767",
+        "recordInfoState": "visible",
+        "recordPhotoState": "ready",
+        "recordPhotosReady": "6",
+        "recordPhotoReveal": "787.3999999999069",
+        "recordFirstRevealReady": "1",
+        "recordRemainderStarted": "833.1999999999534"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 6 READY\n\n1 / 1",
+      "imgs": [
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        }
+      ]
+    }
+  },
+  {
+    "mode": "somefail",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "694.5",
+        "recordHeaderSettled": "792.4000000000233",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "3",
+        "recordPhotoReveal": "803.0999999999767",
+        "recordFirstRevealReady": "1",
+        "recordRemainderStarted": "850.5999999999767"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 3 READY\n\n1 / 1\n\n3 photos could not be prepared.",
+      "imgs": [
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        },
+        {
+          "width": 412,
+          "complete": true
+        }
+      ]
+    }
+  },
+  {
+    "mode": "mostfail",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "891.6999999999534",
+        "recordHeaderSettled": "985.5999999999767",
+        "recordInfoState": "visible",
+        "recordPhotoState": "partial",
+        "recordPhotosReady": "1",
+        "recordPhotoReveal": "994.5999999999767",
+        "recordFirstRevealReady": "1",
+        "recordRemainderStarted": "1036.1999999999534"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 1 READY\n\n1 / 1\n\n5 photos could not be prepared.",
+      "imgs": [
+        {
+          "width": 412,
+          "complete": true
+        }
+      ]
+    }
+  },
+  {
+    "mode": "allfail",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "915.5999999999767",
+        "recordHeaderSettled": "1011.1999999999534",
+        "recordInfoState": "visible",
+        "recordPhotoState": "unavailable",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "1014",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "1054.1999999999534"
+      },
+      "text": "VLC TOURNAMENT\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n6 PHOTOS · 0 READY\n\n6 photos could not be prepared.",
+      "imgs": []
+    }
+  },
+  {
+    "mode": "zero",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "846.5999999999767",
+        "recordHeaderSettled": "957.5",
+        "recordInfoState": "visible",
+        "recordPhotoState": "empty",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "960.1999999999534",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "999.9000000000233"
+      },
+      "text": "ENCOUNTER\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\nNO PHOTOS ARCHIVED\n\nNo photos are archived for this encounter.",
+      "imgs": []
+    }
+  },
+  {
+    "mode": "unknown",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "977.6999999999534",
+        "recordHeaderSettled": "1074.2999999999302",
+        "recordInfoState": "visible",
+        "recordPhotoState": "unavailable",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "1077.5",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "1117.6999999999534"
+      },
+      "text": "ENCOUNTER\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\nPHOTO COUNT UNAVAILABLE\n\nPhoto archive unavailable. Return to encounters to try again.",
+      "imgs": []
+    }
+  },
+  {
+    "mode": "positive",
+    "x": {
+      "data": {
+        "wrestlingMatchDetailPrototypeShell": "",
+        "recordPreloadStarted": "881.6999999999534",
+        "recordHeaderSettled": "976.8999999999069",
+        "recordInfoState": "visible",
+        "recordPhotoState": "unavailable",
+        "recordPhotosReady": "0",
+        "recordPhotoReveal": "979.7999999999302",
+        "recordFirstRevealReady": "0",
+        "recordRemainderStarted": "1019.3999999999069"
+      },
+      "text": "ENCOUNTER\n\nCalvin Tankman\n\nVS\n\nAlec Price\n\nEVENT\nVacationland Cup '26\nDATE\nAugust 8th, 2026\nVENUE\nPortland Expo\nLOCATION\nPortland, Maine\nOFFICIAL\nGina Monti\nANNOUNCER\nRich Palladino\nBLOOD\nNo\nFINISH\nPinfall\nDURATION\n12:08\nNOTES\nN/A\nPHOTO HIGHLIGHTS\n\n5 PHOTOS · 0 READY\n\nPhoto archive unavailable. Return to encounters to try again.",
+      "imgs": []
+    }
+  }
+]

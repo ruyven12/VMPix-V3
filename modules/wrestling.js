@@ -5545,6 +5545,8 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
   let cancelled = false;
   let revealed = false;
   let dataState = "loading";
+  let confirmedEmpty = false;
+  let knownArchiveCount = getWrestlingMatchDossierPhotoCount(initialMatch);
   let pageIndex = options.canonical ? (Number.parseInt(wrestlingMatchDetailPrototypePhotoPageStates.get(options.pageKey), 10) || 0) : 0;
   let update = () => {};
   let adoptView = null;
@@ -5559,7 +5561,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
   const clearTimer = (timer) => { window.clearTimeout(timer); timers.delete(timer); };
   const done = () => dataState !== "loading" && active === 0 && cursor >= photos.length;
   const checkFirst = () => {
-    if (prepared.size >= Math.min(6, photos.length) && dataState === "loaded" || done()) firstResolve();
+    if (prepared.size > 0 || done()) firstResolve();
   };
   const loadImage = (photo, priority) => new Promise((resolve) => {
     const candidates = [...new Set([getWrestlingMatchDossierPreviewPhotoSrc(photo), photo.smallSrc, photo.thumbnailSrc].filter(Boolean))];
@@ -5609,11 +5611,13 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
   });
   const pump = () => {
     if (cancelled || dataState !== "loaded") return;
-    const concurrency = revealed ? 2 : 6;
-    while (active < concurrency && cursor < photos.length && (revealed || prepared.size + active < 6)) {
+    // The first six keep their priority even if the grace window or the
+    // first usable image has already revealed the dossier.
+    while (cursor < photos.length && active < (cursor < 6 ? 6 : 2) && (cursor < 6 || revealed)) {
+      const initialBatch = cursor < 6;
       const photo = photos[cursor++];
       active += 1;
-      loadImage(photo, revealed ? "low" : "high").then((image) => {
+      loadImage(photo, initialBatch ? "high" : "low").then((image) => {
         active -= 1;
         if (cancelled) return;
         if (image) prepared.set(photo.photoId, image);
@@ -5625,20 +5629,31 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
     }
     checkFirst();
   };
-  const accept = (record) => {
+  const accept = (record, hydrated = false) => {
     if (cancelled) return;
     show = record.show;
     match = record.match;
     if (options.canonical) mergeWrestlingShowIntoCollection(show);
     photos = getWrestlingMatchDossierPreviewPhotos(match);
-    dataState = "loaded";
+    knownArchiveCount = Math.max(knownArchiveCount, getWrestlingMatchDossierPhotoCount(match), photos.length);
+    const raw = match?.backend_record || match;
+    const arrays = getWrestlingMatchPhotoSourceArrays(raw);
+    const countFields = ["photoCount", "photo_count", "photosCount", "photos_count", "imageCount", "image_count", "taggedPhotoCount", "tagged_photo_count", "totalPhotos", "total_photos", "photos", "images", "gallery"];
+    const explicitZero = [raw, raw?.stats].some((source) => countFields.some((field) => {
+      const value = source?.[field];
+      return (typeof value === "number" || typeof value === "string" && value.trim() !== "") && Number(value) === 0;
+    }));
+    confirmedEmpty = hydrated && knownArchiveCount === 0 && getWrestlingMatchSourcePhotoIds(match).length === 0 &&
+      arrays.every((items) => items.length === 0) && (explicitZero || arrays.length > 0);
+    dataState = photos.length > 0 || confirmedEmpty ? "loaded" : "unavailable";
     pump();
+    checkFirst();
     update();
   };
   const cached = hallEncounterRecordCache.get(key);
   const existing = getWrestlingMatchDossierPreviewPhotos(match);
   if (cached || existing.length > 0 && existing.length >= getWrestlingMatchDossierPhotoCount(match)) {
-    accept(cached || { show, match });
+    accept(cached || { show, match }, Boolean(cached));
   } else {
     const timeout = schedule(() => controller.abort(), WRESTLING_SHOWS_TIMEOUT_MS);
     fetchWrestlingShowsPage(1, controller.signal, {
@@ -5651,7 +5666,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       const record = { show: hydratedShow, match: hydratedMatch };
       hallEncounterRecordCache.set(key, record);
       if (hallEncounterRecordCache.size > 24) hallEncounterRecordCache.delete(hallEncounterRecordCache.keys().next().value);
-      accept(record);
+      accept(record, true);
     }).catch(() => {
       if (cancelled) return;
       dataState = "unavailable";
@@ -5701,8 +5716,6 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       gallery.tabIndex = 0;
       gallery.setAttribute("aria-label", "Photo highlights. Use left and right arrow keys to change pages.");
       if (!options.canonical) content.append(gallery);
-      let initialReveal = null;
-      let refreshAfterReveal = false;
       let heading = null;
       let grid = null;
       const pagination = {};
@@ -5711,12 +5724,8 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       status.setAttribute("role", "status");
       const renderGallery = () => {
         if (cancelled) return;
-        // Keep the painted nodes until their initial fade finishes. Decoding
-        // and page selection continue; only their DOM refresh is coalesced.
-        if (options.canonical && initialReveal) {
-          refreshAfterReveal = true;
-          return;
-        }
+        // Stable sections and keyed tiles can update during the initial fade
+        // without detaching the header/info or postponing the first usable photo.
         const refreshedMetadata = createWrestlingMatchDossierMetadata(show, match);
         if (refreshedMetadata && metadata && refreshedMetadata.textContent !== metadata.textContent) {
           metadata.replaceChildren(...refreshedMetadata.childNodes);
@@ -5725,7 +5734,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         const totalPages = Math.ceil(available.length / 6);
         pageIndex = Math.max(0, Math.min(pageIndex, Math.max(0, totalPages - 1)));
         const pagePhotos = available.slice(pageIndex * 6, pageIndex * 6 + 6).filter((photo) => prepared.has(photo.photoId));
-        const archiveCount = Math.max(photos.length, getWrestlingMatchDossierPhotoCount(match));
+        const archiveCount = knownArchiveCount;
         Object.assign(pagination, {
           pageIndex, pageNumber: totalPages ? pageIndex + 1 : 0, totalPages, totalPhotos: available.length,
           archiveCount, pagePhotos, pageKey: options.pageKey, localOnly: !options.canonical, preparedImages: prepared, schedule, route: options.route,
@@ -5739,7 +5748,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
         });
         const countInfo = archiveCount > 0
           ? { label: `${formatWrestlingCount(archiveCount, "Photos").toUpperCase()} · ${prepared.size} READY`, state: "loaded" }
-          : { label: dataState === "loading" ? "PHOTO COUNT LOADING" : dataState === "unavailable" ? "PHOTO COUNT UNAVAILABLE" : "NO PHOTOS ARCHIVED", state: dataState };
+          : { label: dataState === "loading" ? "PHOTO COUNT LOADING" : confirmedEmpty ? "NO PHOTOS ARCHIVED" : "PHOTO COUNT UNAVAILABLE", state: dataState };
         if (!heading) heading = createWrestlingMatchDossierPhotoHighlights(show, match, pagination, { countInfo });
         heading.dataset.wrestlingPhotoCountState = countInfo.state;
         const count = heading.querySelector(".wrestling-match-dossier-photo-highlights__count");
@@ -5765,7 +5774,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
           : !done() ? (options.canonical && pagePhotos.length === 6 ? "" : pagePhotos.length ? "Preparing the remaining photo archive…" : "Retrieving photo highlights…")
           : failed.size ? `${failed.size} photo${failed.size === 1 ? "" : "s"} could not be prepared.`
           : archiveCount > photos.length ? "Some archived photo records are unavailable in this response."
-          : photos.length ? "" : "No photos are archived for this encounter.";
+          : confirmedEmpty ? "No photos are archived for this encounter." : photos.length ? "" : "Photo archive information is unavailable.";
         const focusedLabel = gallery.contains(document.activeElement) ? document.activeElement.getAttribute("aria-label") : "";
         // Keep the established dossier and current page connected while other
         // images settle; only insert newly available media/status nodes.
@@ -5775,7 +5784,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
           if (status.parentElement !== gallery) gallery.append(status);
         } else status.remove();
         if (focusedLabel) [...gallery.querySelectorAll("button")].find((button) => button.getAttribute("aria-label") === focusedLabel && !button.disabled)?.focus({ preventScroll: true });
-        root.dataset.recordPhotoState = done() ? (archiveCount > photos.length ? "partial" : prepared.size ? "ready" : "unavailable") : (pagePhotos.length ? "partial" : "loading");
+        root.dataset.recordPhotoState = confirmedEmpty ? "empty" : done() ? (prepared.size ? (failed.size || archiveCount > photos.length ? "partial" : "ready") : "unavailable") : (pagePhotos.length ? "partial" : "loading");
         root.dataset.recordPhotosReady = String(prepared.size);
       };
       const onGalleryKeyDown = (event) => {
@@ -5805,15 +5814,9 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       root.dataset.recordFirstRevealReady = String(prepared.size);
       const revealNodes = options.canonical ? [...targetShell.children].filter((node) => node !== hero) : [content];
       const reveals = revealNodes.map((node) => animate(node, [{ opacity: 0 }, { opacity: 1 }], 200));
-      initialReveal = reveals[0] || null;
       Promise.all(reveals.map((animation) => animation.finished)).then(() => {
         if (cancelled) return;
-        initialReveal = null;
         root.dataset.recordInfoState = "visible";
-        if (refreshAfterReveal) {
-          refreshAfterReveal = false;
-          renderGallery();
-        }
       }).catch(() => {});
       const onInitialReveal = options.onInitialReveal;
       delete options.onInitialReveal;
