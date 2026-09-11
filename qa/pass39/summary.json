@@ -1,0 +1,93 @@
+{
+  "revision": "4d9932627583fe9a54ccbd20d383b1136cb39514",
+  "photos": [
+    {
+      "photo": 1,
+      "min": 12.300000000745058,
+      "max": 54.40000000037253
+    },
+    {
+      "photo": 2,
+      "min": 6.5,
+      "max": 13.299999998882413
+    },
+    {
+      "photo": 3,
+      "min": 3.899999998509884,
+      "max": 12.5
+    },
+    {
+      "photo": 4,
+      "min": 5.5,
+      "max": 17.300000000745058
+    },
+    {
+      "photo": 5,
+      "min": 8.599999999627471,
+      "max": 16.5
+    },
+    {
+      "photo": 6,
+      "min": 4.900000000372529,
+      "max": 16
+    }
+  ],
+  "cases": 6,
+  "samples": 1041,
+  "requests": [
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    },
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    },
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    },
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    },
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    },
+    {
+      "total": 6,
+      "unique": 6,
+      "decode": 6,
+      "removed": 0,
+      "scrollValues": [
+        0
+      ]
+    }
+  ]
+}
