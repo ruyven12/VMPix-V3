@@ -29533,18 +29533,3 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .wrestling-encounter-record-content,
 .wrestling-encounter-record-content * { text-transform: none; }
-
-/* Neighboring posters remain swipe surfaces, not encounter-entry controls. */
-.hall-crusades-poster-strip__item:not(.is-active) .hall-crusades-poster-strip__record {
-  cursor: default;
-}
-
-@media (max-width: 640px) {
-  /* Keep the expansion's painted background through the held perimeter fade. */
-  .wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"].is-campaign-expanded > .hall-crusades-poster-strip .hall-crusades-poster-strip__item.is-active .hall-crusades-poster-strip__record {
-    background:
-      radial-gradient(ellipse at 50% 18%, rgba(255, 90, 60, 0.16), transparent 42%),
-      linear-gradient(135deg, rgba(223, 42, 28, 0.16), transparent 50%),
-      linear-gradient(0deg, rgba(2, 2, 4, 0.94), rgba(12, 6, 8, 0.88));
-  }
-}

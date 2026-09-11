@@ -1,0 +1,38 @@
+[
+  {
+    "width": 360,
+    "point": {
+      "x": 292,
+      "y": 340
+    },
+    "edgeIgnored": true,
+    "swipe": true,
+    "centerTap": true,
+    "backCancel": true,
+    "keyboard": true
+  },
+  {
+    "width": 412,
+    "point": {
+      "x": 324,
+      "y": 388
+    },
+    "edgeIgnored": true,
+    "swipe": true,
+    "centerTap": true,
+    "backCancel": true,
+    "keyboard": true
+  },
+  {
+    "width": 1920,
+    "point": {
+      "x": 1156,
+      "y": 468
+    },
+    "edgeIgnored": true,
+    "swipe": true,
+    "centerTap": true,
+    "backCancel": true,
+    "keyboard": true
+  }
+]

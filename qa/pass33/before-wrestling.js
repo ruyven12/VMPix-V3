@@ -4109,16 +4109,15 @@ function createHallCrusadesPosterStripEmptySlot(index = 0, options = {}) {
   }
 
   const showRoute = getWrestlingShowRouteUrl(show);
-  const record = document.createElement(options.isActive ? "button" : "div");
+  const record = document.createElement("button");
   record.className = "hall-crusades-poster-strip__record";
-  if (options.isActive) record.type = "button";
-  else record.setAttribute("role", "img");
+  record.type = "button";
   record.dataset.wrestlingShowRoute = showRoute;
   if (isAwaitingCommunication) {
     record.classList.add("is-awaiting-communication");
     record.dataset.hallCrusadesAwaitingCommunication = "true";
   }
-  record.setAttribute("aria-label", options.isActive ? `Open ${show.title}` : show.title);
+  record.setAttribute("aria-label", `Open ${show.title}`);
   if (options.isActive) {
     record.setAttribute("aria-current", "true");
   }
@@ -4148,15 +4147,7 @@ function createHallCrusadesPosterStripEmptySlot(index = 0, options = {}) {
   }
 
   record.append(posterImage, posterFallback);
-  let pointerStartedOnRecord = true;
-  record.addEventListener("pointerdown", (event) => {
-    // Touch adjustment can target this button outside its actual painted hit area.
-    // Capture the raw point before the browser moves the synthesized click.
-    pointerStartedOnRecord = record.contains(document.elementFromPoint(event.clientX, event.clientY));
-  });
   record.addEventListener("click", (event) => {
-    if (!options.isActive || !item.classList.contains("is-active")) return;
-    if (event.detail > 0 && !pointerStartedOnRecord) return;
     if (beginHallCrusadesCampaignLock(show, record)) {
       event.preventDefault();
       event.stopPropagation();

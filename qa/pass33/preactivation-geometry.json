@@ -1,0 +1,236 @@
+[
+  {
+    "width": 360,
+    "exact": true,
+    "records": [
+      {
+        "id": "11th-anniversary-show-night-2",
+        "rect": {
+          "x": 72.609375,
+          "y": 286.484375,
+          "width": 215.3125,
+          "height": 322.96875,
+          "top": 286.484375,
+          "right": 287.921875,
+          "bottom": 609.453125,
+          "left": 72.609375
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(247, 76, 52, 0.76)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "11th-anniversary-show-night-1",
+        "rect": {
+          "x": 288.10626220703125,
+          "y": 338.15936279296875,
+          "width": 146.4124755859375,
+          "height": 219.6187744140625,
+          "top": 338.15936279296875,
+          "right": 434.51873779296875,
+          "bottom": 557.7781372070312,
+          "left": 288.10626220703125
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "vacationland-cup-26",
+        "rect": {
+          "x": 482.0718688964844,
+          "y": 357.5375061035156,
+          "width": 120.57498168945312,
+          "height": 180.86251831054688,
+          "top": 357.5375061035156,
+          "right": 602.6468505859375,
+          "bottom": 538.4000244140625,
+          "left": 482.0718688964844
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "crunch-time-26",
+        "rect": {
+          "x": 663.1187744140625,
+          "y": 357.5375061035156,
+          "width": 120.574951171875,
+          "height": 180.86251831054688,
+          "top": 357.5375061035156,
+          "right": 783.6937255859375,
+          "bottom": 538.4000244140625,
+          "left": 663.1187744140625
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "exact": true,
+    "records": [
+      {
+        "id": "11th-anniversary-show-night-2",
+        "rect": {
+          "x": 87.732421875,
+          "y": 331.708984375,
+          "width": 235.80078125,
+          "height": 353.69140625,
+          "top": 331.708984375,
+          "right": 323.533203125,
+          "bottom": 685.400390625,
+          "left": 87.732421875
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(247, 76, 52, 0.76)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "11th-anniversary-show-night-1",
+        "rect": {
+          "x": 322.8980407714844,
+          "y": 388.29962158203125,
+          "width": 160.34454345703125,
+          "height": 240.5101318359375,
+          "top": 388.29962158203125,
+          "right": 483.2425842285156,
+          "bottom": 628.8097534179688,
+          "left": 322.8980407714844
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "vacationland-cup-26",
+        "rect": {
+          "x": 534.4835815429688,
+          "y": 409.5210876464844,
+          "width": 132.0484619140625,
+          "height": 198.06716918945312,
+          "top": 409.5210876464844,
+          "right": 666.5320434570312,
+          "bottom": 607.5882568359375,
+          "left": 534.4835815429688
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "crunch-time-26",
+        "rect": {
+          "x": 731.9210815429688,
+          "y": 409.5210876464844,
+          "width": 132.0484619140625,
+          "height": 198.06716918945312,
+          "top": 409.5210876464844,
+          "right": 863.9695434570312,
+          "bottom": 607.5882568359375,
+          "left": 731.9210815429688
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "exact": true,
+    "records": [
+      {
+        "id": "11th-anniversary-show-night-2",
+        "rect": {
+          "x": 767.201171875,
+          "y": 373.240234375,
+          "width": 383.61328125,
+          "height": 575.41015625,
+          "top": 373.240234375,
+          "right": 1150.814453125,
+          "bottom": 948.650390625,
+          "left": 767.201171875
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(247, 76, 52, 0.76)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "11th-anniversary-show-night-1",
+        "rect": {
+          "x": 1150.657470703125,
+          "y": 465.30584716796875,
+          "width": 260.85693359375,
+          "height": 391.2789306640625,
+          "top": 465.30584716796875,
+          "right": 1411.514404296875,
+          "bottom": 856.5847778320312,
+          "left": 1150.657470703125
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "vacationland-cup-26",
+        "rect": {
+          "x": 1495.7523193359375,
+          "y": 499.8304748535156,
+          "width": 214.823486328125,
+          "height": 322.2297058105469,
+          "top": 499.8304748535156,
+          "right": 1710.5758056640625,
+          "bottom": 822.0601806640625,
+          "left": 1495.7523193359375
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      },
+      {
+        "id": "crunch-time-26",
+        "rect": {
+          "x": 1817.8304443359375,
+          "y": 499.8304748535156,
+          "width": 214.823486328125,
+          "height": 322.2297058105469,
+          "top": 499.8304748535156,
+          "right": 2032.6539306640625,
+          "bottom": 822.0601806640625,
+          "left": 1817.8304443359375
+        },
+        "bg": "linear-gradient(rgba(247, 247, 242, 0.035), rgba(0, 0, 0, 0) 32%), linear-gradient(135deg, rgba(223, 42, 28, 0.22), rgba(0, 0, 0, 0) 54%), linear-gradient(0deg, rgba(2, 2, 4, 0.88), rgba(10, 7, 8, 0.76))",
+        "font": "16px Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif",
+        "border": "1px solid rgba(223, 42, 28, 0.48)",
+        "padding": "0px",
+        "display": "grid"
+      }
+    ]
+  }
+]

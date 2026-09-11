@@ -1,0 +1,92 @@
+[
+  {
+    "type": "pointerdown",
+    "x": 324,
+    "y": 388,
+    "target": "hall-crusades-poster-strip__record has-poster",
+    "item": "hall-crusades-poster-strip__item",
+    "hit": "hall-crusades-poster-strip__item",
+    "active": {
+      "x": 87.732421875,
+      "y": 331.708984375,
+      "width": 235.80078125,
+      "height": 353.69140625,
+      "top": 331.708984375,
+      "right": 323.533203125,
+      "bottom": 685.400390625,
+      "left": 87.732421875
+    }
+  },
+  {
+    "type": "click",
+    "x": 324,
+    "y": 388,
+    "target": "hall-crusades-poster-strip__record has-poster",
+    "item": "hall-crusades-poster-strip__item",
+    "hit": "hall-crusades-poster-strip__item",
+    "active": {
+      "x": 87.732421875,
+      "y": 331.708984375,
+      "width": 235.80078125,
+      "height": 353.69140625,
+      "top": 331.708984375,
+      "right": 323.533203125,
+      "bottom": 685.400390625,
+      "left": 87.732421875
+    }
+  },
+  {
+    "type": "pointerdown",
+    "x": 324,
+    "y": 388,
+    "target": "hall-crusades-poster-strip__image",
+    "item": "hall-crusades-poster-strip__item is-active",
+    "hit": "hall-crusades-poster-strip__item",
+    "active": {
+      "x": 87.732421875,
+      "y": 331.708984375,
+      "width": 235.80078125,
+      "height": 353.69140625,
+      "top": 331.708984375,
+      "right": 323.533203125,
+      "bottom": 685.400390625,
+      "left": 87.732421875
+    }
+  },
+  {
+    "type": "touchstart",
+    "x": 324,
+    "y": 388,
+    "target": "hall-crusades-poster-strip__image",
+    "item": "hall-crusades-poster-strip__item is-active",
+    "hit": "hall-crusades-poster-strip__item",
+    "active": {
+      "x": 87.732421875,
+      "y": 331.708984375,
+      "width": 235.80078125,
+      "height": 353.69140625,
+      "top": 331.708984375,
+      "right": 323.533203125,
+      "bottom": 685.400390625,
+      "left": 87.732421875
+    }
+  },
+  {
+    "type": "click",
+    "x": 319,
+    "y": 388,
+    "target": "hall-crusades-poster-strip__image",
+    "item": "hall-crusades-poster-strip__item is-active",
+    "hit": "hall-crusades-poster-strip__item is-active",
+    "active": {
+      "x": 87.732421875,
+      "y": 331.708984375,
+      "width": 235.80078125,
+      "height": 353.69140625,
+      "top": 331.708984375,
+      "right": 323.533203125,
+      "bottom": 685.400390625,
+      "left": 87.732421875
+    }
+  }
+]
