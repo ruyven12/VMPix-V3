@@ -1,0 +1,428 @@
+[
+  {
+    "w": 360,
+    "motion": "no-preference",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": 0.0000152587890625,
+        "clearance": 22.5577392578125,
+        "actions": {
+          "x": 14,
+          "y": 636.2235107421875,
+          "width": 332,
+          "height": 69.5625,
+          "top": 636.2235107421875,
+          "right": 346,
+          "bottom": 705.7860107421875,
+          "left": 14
+        },
+        "image": {
+          "x": 17.0625,
+          "y": 74.37973022460938,
+          "width": 325.859375,
+          "height": 488.7969055175781,
+          "top": 74.37973022460938,
+          "right": 342.921875,
+          "bottom": 563.1766357421875,
+          "left": 17.0625
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": -0.0078125,
+        "clearance": 111.09375,
+        "actions": {
+          "x": 13,
+          "y": 532.578125,
+          "width": 334,
+          "height": 84.671875,
+          "top": 532.578125,
+          "right": 347,
+          "bottom": 617.25,
+          "left": 13
+        },
+        "image": {
+          "x": 13,
+          "y": 162.734375,
+          "width": 334,
+          "height": 223.328125,
+          "top": 162.734375,
+          "right": 347,
+          "bottom": 386.0625,
+          "left": 13
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  },
+  {
+    "w": 360,
+    "motion": "reduce",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": 0,
+        "clearance": 21.640625,
+        "actions": {
+          "x": 13,
+          "y": 637.140625,
+          "width": 334,
+          "height": 69.5625,
+          "top": 637.140625,
+          "right": 347,
+          "bottom": 706.703125,
+          "left": 13
+        },
+        "image": {
+          "x": 16.40625,
+          "y": 73.296875,
+          "width": 327.1875,
+          "height": 490.796875,
+          "top": 73.296875,
+          "right": 343.59375,
+          "bottom": 564.09375,
+          "left": 16.40625
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": -0.0078125,
+        "clearance": 111.09375,
+        "actions": {
+          "x": 13,
+          "y": 532.578125,
+          "width": 334,
+          "height": 84.671875,
+          "top": 532.578125,
+          "right": 347,
+          "bottom": 617.25,
+          "left": 13
+        },
+        "image": {
+          "x": 13,
+          "y": 162.734375,
+          "width": 334,
+          "height": 223.328125,
+          "top": 162.734375,
+          "right": 347,
+          "bottom": 386.0625,
+          "left": 13
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  },
+  {
+    "w": 412,
+    "motion": "no-preference",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": -0.007816314697265625,
+        "clearance": 27.49566650390625,
+        "actions": {
+          "x": 14,
+          "y": 737.3168334960938,
+          "width": 384,
+          "height": 69.5625,
+          "top": 737.3168334960938,
+          "right": 398,
+          "bottom": 806.8793334960938,
+          "left": 14
+        },
+        "image": {
+          "x": 14,
+          "y": 88.26996612548828,
+          "width": 384,
+          "height": 576,
+          "top": 88.26996612548828,
+          "right": 398,
+          "bottom": 664.2699661254883,
+          "left": 14
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": 0,
+        "clearance": 142.28125,
+        "actions": {
+          "x": 13,
+          "y": 607.421875,
+          "width": 386,
+          "height": 84.671875,
+          "top": 607.421875,
+          "right": 399,
+          "bottom": 692.09375,
+          "left": 13
+        },
+        "image": {
+          "x": 13,
+          "y": 202.90625,
+          "width": 386,
+          "height": 258,
+          "top": 202.90625,
+          "right": 399,
+          "bottom": 460.90625,
+          "left": 13
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  },
+  {
+    "w": 412,
+    "motion": "reduce",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": -0.0078125,
+        "clearance": 26.078125,
+        "actions": {
+          "x": 13,
+          "y": 738.734375,
+          "width": 386,
+          "height": 69.5625,
+          "top": 738.734375,
+          "right": 399,
+          "bottom": 808.296875,
+          "left": 13
+        },
+        "image": {
+          "x": 13,
+          "y": 86.6875,
+          "width": 386,
+          "height": 579,
+          "top": 86.6875,
+          "right": 399,
+          "bottom": 665.6875,
+          "left": 13
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": 0,
+        "clearance": 142.28125,
+        "actions": {
+          "x": 13,
+          "y": 607.421875,
+          "width": 386,
+          "height": 84.671875,
+          "top": 607.421875,
+          "right": 399,
+          "bottom": 692.09375,
+          "left": 13
+        },
+        "image": {
+          "x": 13,
+          "y": 202.90625,
+          "width": 386,
+          "height": 258,
+          "top": 202.90625,
+          "right": 399,
+          "bottom": 460.90625,
+          "left": 13
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  },
+  {
+    "w": 1920,
+    "motion": "no-preference",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": -0.0078125,
+        "clearance": 9.60479736328125,
+        "actions": {
+          "x": 651,
+          "y": 916.3795776367188,
+          "width": 608,
+          "height": 69.5625,
+          "top": 916.3795776367188,
+          "right": 1259,
+          "bottom": 985.9420776367188,
+          "left": 651
+        },
+        "image": {
+          "x": 700.0625,
+          "y": 74.20770263671875,
+          "width": 509.859375,
+          "height": 764.796875,
+          "top": 74.20770263671875,
+          "right": 1209.921875,
+          "bottom": 839.0045776367188,
+          "left": 700.0625
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "actions": {
+          "x": 656,
+          "y": 917.1875,
+          "width": 608,
+          "height": 69.5625,
+          "top": 917.1875,
+          "right": 1264,
+          "bottom": 986.75,
+          "left": 656
+        },
+        "image": {
+          "x": 433.65625,
+          "y": 73.234375,
+          "width": 1052.6875,
+          "height": 702.453125,
+          "top": 73.234375,
+          "right": 1486.34375,
+          "bottom": 775.6875,
+          "left": 433.65625
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  },
+  {
+    "w": 1920,
+    "motion": "reduce",
+    "states": [
+      {
+        "href": "http://127.0.0.1:4173/qa-media/one-large.svg",
+        "download": "vmpix-photo-1",
+        "target": "",
+        "rel": "",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Save the available image file.",
+        "center": -0.0078125,
+        "clearance": 8.6875,
+        "actions": {
+          "x": 656,
+          "y": 917.296875,
+          "width": 608,
+          "height": 69.5625,
+          "top": 917.296875,
+          "right": 1264,
+          "bottom": 986.859375,
+          "left": 656
+        },
+        "image": {
+          "x": 704.40625,
+          "y": 73.125,
+          "width": 511.1875,
+          "height": 766.796875,
+          "top": 73.125,
+          "right": 1215.59375,
+          "bottom": 839.921875,
+          "left": 704.40625
+        },
+        "overflow": false
+      },
+      {
+        "href": "https://qa.invalid/two-large.svg",
+        "download": null,
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "buyDisabled": true,
+        "buyLabel": "Buy print. Coming soon; print purchasing is not available.",
+        "note": "Opens the image in a new tab. Use your browser’s Save Image option.",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "actions": {
+          "x": 656,
+          "y": 917.1875,
+          "width": 608,
+          "height": 69.5625,
+          "top": 917.1875,
+          "right": 1264,
+          "bottom": 986.75,
+          "left": 656
+        },
+        "image": {
+          "x": 433.65625,
+          "y": 73.234375,
+          "width": 1052.6875,
+          "height": 702.453125,
+          "top": 73.234375,
+          "right": 1486.34375,
+          "bottom": 775.6875,
+          "left": 433.65625
+        },
+        "overflow": false
+      }
+    ],
+    "hrefBack": "http://127.0.0.1:4173/qa-media/one-large.svg"
+  }
+]

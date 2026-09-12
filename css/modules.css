@@ -29700,3 +29700,58 @@ button.hall-crusades-archive-crystal:focus-visible {
   overflow-wrap: anywhere;
 }
 .v3-lightbox-in-frame[hidden] { display: none; }
+
+.v3-lightbox-photo-actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.6rem;
+  width: min(100%, 38rem);
+  text-align: center;
+}
+.v3-lightbox-photo-actions > a,
+.v3-lightbox-photo-actions > button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 44px;
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 95, 53, 0.55);
+  border-radius: 3px;
+  background: rgba(58, 14, 9, 0.88);
+  color: #fff0e7;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+.v3-lightbox-photo-actions > a:focus-visible {
+  outline: 2px solid #ffbb8e;
+  outline-offset: 2px;
+}
+.v3-lightbox-photo-actions > button:disabled,
+.v3-lightbox-photo-actions > a[aria-disabled="true"] {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(15, 15, 19, 0.88);
+  color: #b8b4b1;
+  cursor: default;
+}
+.v3-lightbox-photo-actions__buy span { font-size: 0.65rem; }
+.v3-lightbox-photo-actions__note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #bdb7b1;
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+.v3-lightbox-photo-actions[hidden] { display: none; }
+@media (max-width: 320px) {
+  .v3-lightbox-photo-actions { grid-template-columns: 1fr; }
+}
+.lightbox-screen.has-match-in-frame .lightbox-nav-zone {
+  top: var(--in-frame-photo-center, 50%);
+}

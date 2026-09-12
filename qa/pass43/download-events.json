@@ -1,0 +1,48 @@
+{
+  "local": [
+    {
+      "method": "click",
+      "filename": "vmpix-photo-1.png",
+      "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001"
+    },
+    {
+      "method": "tap",
+      "filename": "vmpix-photo-1.png",
+      "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001"
+    },
+    {
+      "method": "keyboard",
+      "filename": "vmpix-photo-1.png",
+      "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001"
+    }
+  ],
+  "cross": [
+    {
+      "method": "click",
+      "pages": 1,
+      "url": "https://qa.invalid/large.png",
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "opener": false
+    },
+    {
+      "method": "tap",
+      "pages": 1,
+      "url": "https://qa.invalid/large.png",
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "opener": false
+    },
+    {
+      "method": "keyboard",
+      "pages": 1,
+      "url": "https://qa.invalid/large.png",
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "opener": false
+    }
+  ]
+}

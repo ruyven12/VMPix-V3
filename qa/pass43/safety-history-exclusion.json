@@ -1,0 +1,155 @@
+{
+  "idle": 0,
+  "safety": {
+    "preferred": "https://qa.invalid/viewer.png",
+    "unsafe": "",
+    "disabled": {
+      "href": null,
+      "disabled": "true",
+      "tab": -1
+    }
+  },
+  "count": "2 / 2 LOADED",
+  "music": {
+    "hidden": true,
+    "href": null,
+    "marker": false,
+    "arrowVar": ""
+  },
+  "history": true,
+  "direct": true,
+  "requests": [
+    {
+      "url": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001",
+      "type": "document"
+    },
+    {
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+      "type": "stylesheet"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css2?family=Audiowide&display=swap",
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/background/nebula-stage-1.png",
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4173/css/tokens.css",
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4173/css/shell.css",
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4173/css/modules.css",
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4173/css/connect.css",
+      "type": "stylesheet"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/placeholders/no-poster-available.svg",
+      "type": "image"
+    },
+    {
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/placeholders/archive-gallery-placeholder.svg",
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/branding/voodoo-logo-static.png",
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/voodoo-doll-center.png",
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4173/js/state.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/modules/music.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/modules/music-person-detail-fallback.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/modules/wrestling.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/modules/connect.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/js/router.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/js/shell.js",
+      "type": "script"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/background/hall-of-crusades-main.png",
+      "type": "image"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/media/background/background-fire.mp4",
+      "type": "media"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/branding/logo-animated.mp4",
+      "type": "media"
+    },
+    {
+      "url": "http://127.0.0.1:4173/assets/branding/voodoo-logo-animated.mp4",
+      "type": "media"
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/audiowide/v22/l7gdbjpo0cum0ckerWCdlg_O.woff2",
+      "type": "font"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=100&page=1",
+      "type": "fetch"
+    },
+    {
+      "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+      "type": "image"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/music/bands",
+      "type": "fetch"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/music/shows",
+      "type": "fetch"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/music/people",
+      "type": "fetch"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/music/venues",
+      "type": "fetch"
+    },
+    {
+      "url": "https://vmpix-data.onrender.com/api/music/bands",
+      "type": "fetch"
+    },
+    {
+      "url": "https://photos.smugmug.com/photos/i-9KV4w27/0/LVgNhnzzHr5H57fMn4ZrhTxcXGHvMgc47sVhtB3C6/X4/i-9KV4w27-X4.jpg",
+      "type": "image"
+    }
+  ]
+}
