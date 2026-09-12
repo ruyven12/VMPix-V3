@@ -5646,6 +5646,11 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
     confirmedEmpty = hydrated && knownArchiveCount === 0 && getWrestlingMatchSourcePhotoIds(match).length === 0 &&
       arrays.every((items) => items.length === 0) && (explicitZero || arrays.length > 0);
     dataState = photos.length > 0 || confirmedEmpty ? "loaded" : "unavailable";
+    if (photos.length > 0 && options.onPhotosAvailable) {
+      const onPhotosAvailable = options.onPhotosAvailable;
+      delete options.onPhotosAvailable;
+      queueMicrotask(() => { if (!cancelled) onPhotosAvailable(); });
+    }
     pump();
     checkFirst();
     update();
@@ -7102,7 +7107,18 @@ function renderWrestlingMatchDetailPrototypeRoute(route = getRouteFromUrl(), opt
   const matchRef = getWrestlingMatchDetailRouteMatchRef(route);
   const pageKey = getWrestlingMatchDossierPhotoPageKey(show, match, route);
   cancelWrestlingMatchDossierPreparedRecord();
-  const coordinator = createHallEncounterRecordPreview(show, match, matchRef, { canonical: true, pageKey });
+  const coordinator = createHallEncounterRecordPreview(show, match, matchRef, {
+    canonical: true, pageKey,
+    onPhotosAvailable: () => {
+      const current = getRouteFromUrl();
+      if (wrestlingMatchDossierPreparedRecord !== session ||
+        !isWrestlingMatchDetailPhotoRoute(current) ||
+        getWrestlingMatchDetailRouteShowId(current) !== session.routeShowId ||
+        getWrestlingMatchDetailRouteMatchRef(current) !== session.matchRef ||
+        lightboxScreen?.getAttribute("aria-hidden") === "false") return;
+      openWrestlingMatchDetailPrototypePhotoRoute(current, { skipDataRequest: true });
+    },
+  });
   const hero = createWrestlingMatchDossierHero(match);
   const shell = wrestlingMatchDetailPrototypeShell;
   shell.replaceChildren(hero);
@@ -18095,6 +18111,7 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   tile.type = "button";
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
+  tile.dataset.galleryInFrameTags = JSON.stringify(getWrestlingPersonCaptionNameParts(photo));
   tile.dataset.galleryKind = "image";
   tile.dataset.galleryMediaId = imageKey;
   tile.dataset.galleryLightboxId = `wrestling-match-photo-${normalizeWrestlingArchiveSlug(imageKey, String(index + 1))}`;

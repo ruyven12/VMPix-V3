@@ -5368,6 +5368,7 @@ function setLightboxVisible(isVisible) {
     shell.classList.toggle("is-lightbox-view", isVisible);
   }
   if (!isVisible) {
+    syncLightboxInFrame();
     setLightboxInfoVisible(false);
     setLightboxThumbnailStripVisible(false);
     setLightboxControlsHidden(false);
@@ -6835,10 +6836,69 @@ function syncLightboxThumbButtons() {
   });
 }
 
+let lightboxInFrameStrip = null;
+let lightboxInFrameResizeObserver = null;
+let lightboxInFrameLayoutFrame = 0;
+
+function layoutLightboxInFrame() {
+  lightboxInFrameLayoutFrame = 0;
+  if (!lightboxScreen?.classList.contains("has-match-in-frame") || !lightboxImage || !lightboxPhoto) return;
+  const stage = lightboxPhoto.parentElement;
+  const gap = Number.parseFloat(getComputedStyle(stage).rowGap) || 0;
+  const availableHeight = Math.max(1, stage.clientHeight - lightboxInFrameStrip.offsetHeight - gap);
+  const ratio = lightboxImage.naturalWidth && lightboxImage.naturalHeight
+    ? lightboxImage.naturalWidth / lightboxImage.naturalHeight : 1;
+  const width = Math.min(stage.clientWidth, availableHeight * ratio, lightboxImage.naturalWidth || stage.clientWidth);
+  lightboxPhoto.style.setProperty("--in-frame-photo-width", `${width}px`);
+  lightboxPhoto.style.setProperty("--in-frame-photo-height", `${width / ratio}px`);
+}
+
+function scheduleLightboxInFrameLayout() {
+  if (!lightboxInFrameLayoutFrame) lightboxInFrameLayoutFrame = requestAnimationFrame(layoutLightboxInFrame);
+}
+
+function syncLightboxInFrame(tileDataset = null) {
+  const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
+  const enabled = Boolean(tileDataset?.galleryInFrameTags && tileDataset.wrestlingMatchRef &&
+    typeof isWrestlingMatchDetailPhotoRoute === "function" && isWrestlingMatchDetailPhotoRoute(route));
+  lightboxScreen?.classList.toggle("has-match-in-frame", enabled);
+  if (!enabled) {
+    if (lightboxInFrameStrip) { lightboxInFrameStrip.hidden = true; lightboxInFrameStrip.querySelector("p").textContent = ""; }
+    lightboxInFrameResizeObserver?.disconnect();
+    cancelAnimationFrame(lightboxInFrameLayoutFrame);
+    lightboxInFrameLayoutFrame = 0;
+    lightboxPhoto?.style.removeProperty("--in-frame-photo-width");
+    lightboxPhoto?.style.removeProperty("--in-frame-photo-height");
+    return;
+  }
+  if (!lightboxInFrameStrip) {
+    lightboxInFrameStrip = document.createElement("section");
+    lightboxInFrameStrip.className = "v3-lightbox-in-frame";
+    lightboxInFrameStrip.setAttribute("aria-label", "Photo caption tags");
+    const label = document.createElement("span");
+    label.className = "v3-lightbox-in-frame__label";
+    label.textContent = "IN FRAME";
+    const names = document.createElement("p");
+    names.className = "v3-lightbox-in-frame__names";
+    lightboxInFrameStrip.append(label, names);
+    lightboxPhoto.parentElement.append(lightboxInFrameStrip);
+    lightboxImage.addEventListener("load", scheduleLightboxInFrameLayout);
+    lightboxInFrameResizeObserver = new ResizeObserver(scheduleLightboxInFrameLayout);
+  }
+  let tags = [];
+  try { tags = JSON.parse(tileDataset.galleryInFrameTags); } catch { /* Missing caption remains unknown. */ }
+  if (!Array.isArray(tags)) tags = [];
+  lightboxInFrameStrip.querySelector("p").textContent = tags.length ? tags.join(" · ") : "No tags recorded";
+  lightboxInFrameStrip.hidden = false;
+  lightboxInFrameResizeObserver.observe(lightboxPhoto.parentElement);
+  lightboxInFrameResizeObserver.observe(lightboxInFrameStrip);
+  scheduleLightboxInFrameLayout();
+}
 function setLightboxActivePhoto(index, options = {}) {
   const data = getLightboxPhotoData(index);
   const didChangePhoto = activeLightboxIndex !== data.normalizedIndex;
   const tileDataset = data.tile?.dataset || {};
+  syncLightboxInFrame(tileDataset);
   activeLightboxIndex = data.normalizedIndex;
 
   if (options.shouldSyncGallery !== false && data.tile) {

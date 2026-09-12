@@ -1,0 +1,22 @@
+{
+  "long": {
+    "scroll": 150,
+    "caption": "IN FRAME\n\nRecorded Person With A Very Long Name 0 · Recorded Person With A Very Long Name 1 · Recorded Person With A Very Long Name 2 · Recorded Person With A Very Long Name 3 · Recorded Person With A Very Long Name 4 · Recorded Person With A Very Long Name 5 · Recorded Person With A Very Long Name 6 · Recorded Person With A Very Long Name 7 · Recorded Person With A Very Long Name 8 · Recorded Person With A Very Long Name 9 · Recorded Person With A Very Long Name 10 · Recorded Person With A Very Long Name 11",
+    "centerDelta": -0.0078125,
+    "stripBottom": 706.984375,
+    "engineTop": 728.34375
+  },
+  "back": "http://127.0.0.1:4173/wrestling/shows/080826/match-1",
+  "forward": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+  "forwardNames": "Short Name",
+  "closed": {
+    "marker": false,
+    "hidden": true
+  },
+  "music": {
+    "marker": false,
+    "hidden": true,
+    "width": "",
+    "tiles": 1
+  }
+}
