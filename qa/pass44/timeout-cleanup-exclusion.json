@@ -1,0 +1,16 @@
+{
+  "cleanup": {
+    "created": [
+      "blob:http://127.0.0.1:4173/ed69b703-a7f8-49ae-bc64-89d7298fcabe"
+    ],
+    "revoked": [
+      "blob:http://127.0.0.1:4173/ed69b703-a7f8-49ae-bc64-89d7298fcabe"
+    ]
+  },
+  "timeoutMs": 20051,
+  "exclusion": {
+    "session": false,
+    "hidden": true,
+    "marker": false
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "success": [
+    {
+      "method": "click",
+      "filename": "vmpix-match-1-Alice Example.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001",
+      "fetch": 2,
+      "created": 1,
+      "revoked": 0,
+      "temp": 0,
+      "note": "Photo download started."
+    },
+    {
+      "method": "tap",
+      "filename": "vmpix-match-1-Bob Example.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "fetch": 3,
+      "created": 2,
+      "revoked": 1,
+      "temp": 0,
+      "note": "Photo download started."
+    },
+    {
+      "method": "keyboard",
+      "filename": "vmpix-match-1-Alice Example.png",
+      "bytes": 545611,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/001",
+      "fetch": 4,
+      "created": 3,
+      "revoked": 2,
+      "temp": 0,
+      "note": "Photo download started."
+    }
+  ],
+  "failure": [
+    {
+      "mode": "http",
+      "pages": 1,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "note": "Direct download unavailable. Select Download Photo again to open the image and save."
+    },
+    {
+      "mode": "nonimage",
+      "pages": 1,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "note": "Direct download unavailable. Select Download Photo again to open the image and save."
+    },
+    {
+      "mode": "cors",
+      "pages": 1,
+      "route": "http://127.0.0.1:4173/wrestling/shows/080826/match-1/photo/002",
+      "note": "Direct download unavailable. Select Download Photo again to open the image and save."
+    }
+  ],
+  "cancel": [
+    {
+      "action": "photo",
+      "requests": 1,
+      "created": 3,
+      "busy": null,
+      "session": true
+    },
+    {
+      "action": "close",
+      "requests": 1,
+      "created": 3,
+      "busy": null,
+      "session": false
+    }
+  ],
+  "cleanup": {
+    "fetch": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=100&page=1",
+        "time": 292.8000000002794,
+        "signal": true
+      },
+      {
+        "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+        "time": 806.3000000002794,
+        "signal": true
+      },
+      {
+        "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+        "time": 1183.2000000001863,
+        "signal": true
+      },
+      {
+        "url": "http://127.0.0.1:4173/qa/pass34/live-warm-ready.png",
+        "time": 1417.3999999999069,
+        "signal": true
+      }
+    ],
+    "created": [
+      "blob:http://127.0.0.1:4173/fefd8fad-f379-4150-900c-d114c1e21880",
+      "blob:http://127.0.0.1:4173/ab871059-87f8-4420-a9b5-59c8067487a2",
+      "blob:http://127.0.0.1:4173/55f6b27d-506a-4591-a938-3989969eaea2"
+    ],
+    "revoked": [
+      "blob:http://127.0.0.1:4173/fefd8fad-f379-4150-900c-d114c1e21880",
+      "blob:http://127.0.0.1:4173/ab871059-87f8-4420-a9b5-59c8067487a2",
+      "blob:http://127.0.0.1:4173/55f6b27d-506a-4591-a938-3989969eaea2"
+    ]
+  }
+}

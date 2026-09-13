@@ -18129,7 +18129,11 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   tile.dataset.galleryInFrameTags = JSON.stringify(getWrestlingPersonCaptionNameParts(photo));
   tile.dataset.galleryDownloadUrl = getWrestlingMatchPhotoDownloadUrl(photo);
   const downloadExtension = tile.dataset.galleryDownloadUrl.match(/\.(jpe?g|png|webp|avif|gif)(?:[?#]|$)/i)?.[1] || "";
-  tile.dataset.galleryDownloadFilename = `vmpix-photo-${index + 1}${downloadExtension ? `.${downloadExtension}` : ""}`;
+  const downloadName = getWrestlingText(photo.filename || photo.label || photo.photoId, `photo-${index + 1}`)
+    .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]/g, "-").replace(/\.[a-z0-9]{1,5}$/i, "")
+    .replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 100) || `photo-${index + 1}`;
+  const downloadMatch = String(matchRef).replace(/[^a-z0-9_-]/gi, "-").slice(0, 40);
+  tile.dataset.galleryDownloadFilename = `vmpix-${downloadMatch}-${downloadName}${downloadExtension ? `.${downloadExtension}` : ""}`;
   tile.dataset.galleryKind = "image";
   tile.dataset.galleryMediaId = imageKey;
   tile.dataset.galleryLightboxId = `wrestling-match-photo-${normalizeWrestlingArchiveSlug(imageKey, String(index + 1))}`;

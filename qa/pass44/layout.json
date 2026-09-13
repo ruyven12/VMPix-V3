@@ -1,0 +1,140 @@
+[
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "no-preference",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 21.578125,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": 0,
+        "clearance": 21.515625,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "reduce",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 21.578125,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": 0,
+        "clearance": 21.515625,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "no-preference",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 12.609375,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": 0,
+        "clearance": 12.546875,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "reduce",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 12.609375,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": 0,
+        "clearance": 12.546875,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "no-preference",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "reduce",
+    "states": [
+      {
+        "state": "pending",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "overflow": false,
+        "note": "Preparing photo download…",
+        "arrowClear": true
+      },
+      {
+        "state": "fallback",
+        "center": -0.0078125,
+        "clearance": 8.796875,
+        "overflow": false,
+        "note": "Direct download unavailable. Select Download Photo again to open the image and save.",
+        "arrowClear": true
+      }
+    ]
+  }
+]
