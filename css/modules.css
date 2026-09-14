@@ -30004,3 +30004,29 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: translateX(-50%);
   clip-path: polygon(-1% 0, 101% 0, 109% 100%, -9% 100%);
 }
+
+/* Hall archive polish: edge controls and more usable mobile projection space. */
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control--previous {
+  inset-inline-start: 8px;
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control--next {
+  inset-inline-end: 8px;
+}
+.wrestling-people-prototype-shell [data-hall-of-champions-workspace="team"] .hall-of-champions-workspace__status {
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.wrestling-people-prototype-shell [data-hall-of-champions-workspace="team"] .hall-of-champions-workspace__portrait-team {
+  margin-block-start: 0.15rem;
+  font-size: max(11px, 0.68rem);
+  line-height: 1.35;
+}
+@media (max-width: 640px) {
+  .wrestling-people-prototype-shell .hall-of-champions-expanded-hologram {
+    inset-inline-start: calc(50% + (env(safe-area-inset-left) - env(safe-area-inset-right)) / 2);
+    inline-size: calc(100vw - 8px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    max-inline-size: none;
+    block-size: max(0px, calc(var(--hall-champions-hologram-anchor-y, 60vh) - env(safe-area-inset-top) - 4px));
+  }
+}

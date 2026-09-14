@@ -1,0 +1,80 @@
+[
+  {
+    "width": 360,
+    "before": {
+      "x": 14.40625,
+      "y": 10.015625,
+      "width": 331.1875,
+      "height": 576.46875,
+      "top": 10.015625,
+      "right": 345.59375,
+      "bottom": 586.484375,
+      "left": 14.40625
+    },
+    "after": {
+      "x": 4,
+      "y": 4.015625,
+      "width": 352,
+      "height": 582.46875,
+      "top": 4.015625,
+      "right": 356,
+      "bottom": 586.484375,
+      "left": 4
+    },
+    "crystalSame": true,
+    "engineSame": true,
+    "pedestalSame": true
+  },
+  {
+    "width": 412,
+    "before": {
+      "x": 16.484375,
+      "y": 10.015625,
+      "width": 379.03125,
+      "height": 667.953125,
+      "top": 10.015625,
+      "right": 395.515625,
+      "bottom": 677.96875,
+      "left": 16.484375
+    },
+    "after": {
+      "x": 4,
+      "y": 4.015625,
+      "width": 404,
+      "height": 673.953125,
+      "top": 4.015625,
+      "right": 408,
+      "bottom": 677.96875,
+      "left": 4
+    },
+    "crystalSame": true,
+    "engineSame": true,
+    "pedestalSame": true
+  },
+  {
+    "width": 1920,
+    "before": {
+      "x": 76.8046875,
+      "y": 63.015625,
+      "width": 1766.390625,
+      "height": 672,
+      "top": 63.015625,
+      "right": 1843.1953125,
+      "bottom": 735.015625,
+      "left": 76.8046875
+    },
+    "after": {
+      "x": 76.8046875,
+      "y": 63.015625,
+      "width": 1766.390625,
+      "height": 672,
+      "top": 63.015625,
+      "right": 1843.1953125,
+      "bottom": 735.015625,
+      "left": 76.8046875
+    },
+    "crystalSame": true,
+    "engineSame": true,
+    "pedestalSame": true
+  }
+]
