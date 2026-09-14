@@ -29947,3 +29947,60 @@ button.hall-crusades-archive-crystal:focus-visible {
   justify-content: center;
   padding-block-end: 1px;
 }
+
+/* Five-layer mapping: mode label/gray-side arrows on level 2; values on level 4. */
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  clip-path: polygon(12.72% 0, 87.28% 0, 98.59% 100%, 1.41% 100%);
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector::before,
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector::after { display: none; }
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__readout {
+  position: absolute;
+  inset-inline-start: var(--hall-champions-mode-readout-left);
+  inset-block-start: var(--hall-champions-mode-readout-top);
+  inline-size: var(--hall-champions-mode-readout-width);
+  block-size: var(--hall-champions-mode-readout-height);
+  clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%);
+  border: 1px solid rgba(255, 96, 48, 0.46);
+  background:
+    linear-gradient(180deg, rgba(67, 15, 7, 0.62), rgba(20, 6, 4, 0.72)),
+    repeating-linear-gradient(90deg, rgba(255, 108, 52, 0.08) 0 1px, transparent 1px 18px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 206, 180, 0.05),
+    inset 0 -0.42rem 0.78rem rgba(84, 10, 4, 0.36),
+    0 0 0.72rem rgba(101, 21, 10, 0.14);
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control {
+  position: absolute;
+  inset-block-start: var(--hall-champions-mode-arrow-top);
+  inline-size: var(--hall-champions-mode-arrow-width);
+  block-size: var(--hall-champions-mode-arrow-height);
+  align-items: center;
+  padding: 0;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control--previous {
+  inset-inline-start: var(--hall-champions-mode-arrow-side);
+  clip-path: polygon(40.91% 0, 100% 0, 81.82% 100%, 0 100%);
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control--next {
+  inset-inline-end: var(--hall-champions-mode-arrow-side);
+  clip-path: polygon(0 0, 59.09% 0, 100% 100%, 18.18% 100%);
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control {
+  padding-block-start: 0.7px;
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control > span { transform: none; }
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__readout {
+  padding-inline: 6%;
+}
+
+/* Keep level-4 paint and hit regions inside their face throughout readiness fades. */
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode] {
+  transform: translateX(-50%);
+  clip-path: polygon(-1% 0, 101% 0, 109% 100%, -9% 100%);
+}

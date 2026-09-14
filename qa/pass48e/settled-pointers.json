@@ -1,0 +1,347 @@
+[
+  {
+    "width": 360,
+    "results": [
+      {
+        "rect": {
+          "x": 100.9453125,
+          "y": 677.734375,
+          "width": 44,
+          "height": 38.59375,
+          "top": 677.734375,
+          "right": 144.9453125,
+          "bottom": 716.328125,
+          "left": 100.9453125
+        },
+        "outside": []
+      },
+      {
+        "rect": {
+          "x": 215.0234375,
+          "y": 677.734375,
+          "width": 44,
+          "height": 38.59375,
+          "top": 677.734375,
+          "right": 259.0234375,
+          "bottom": 716.328125,
+          "left": 215.0234375
+        },
+        "outside": []
+      }
+    ],
+    "styles": [
+      {
+        "s": "[data-hall-of-champions-mode-selector]",
+        "rect": {
+          "x": 128.21875,
+          "y": 621.578125,
+          "width": 103.53125,
+          "height": 49.125,
+          "top": 621.578125,
+          "right": 231.75,
+          "bottom": 670.703125,
+          "left": 128.21875
+        },
+        "clip": "polygon(12.72% 0px, 87.28% 0px, 98.59% 100%, 1.41% 100%)",
+        "overflow": "hidden",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)"
+      },
+      {
+        "s": ".hall-of-champions-mode-selector__readout",
+        "rect": {
+          "x": 153.65625,
+          "y": 631.21875,
+          "width": 52.640625,
+          "height": 38.59375,
+          "top": 631.21875,
+          "right": 206.296875,
+          "bottom": 669.8125,
+          "left": 153.65625
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 206, 180, 0.05) 0px 0px 0px 1px inset, rgba(84, 10, 4, 0.36) 0px -6.72px 12.48px 0px inset, rgba(101, 21, 10, 0.14) 0px 0px 11.52px 0px",
+        "background": "linear-gradient(rgba(67, 15, 7, 0.62), rgba(20, 6, 4, 0.72)), repeating-linear-gradient(90deg, rgba(255, 108, 52, 0.08) 0px, rgba(255, 108, 52, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px)",
+        "transform": "none"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-selector]",
+        "rect": {
+          "x": 65.9140625,
+          "y": 677.734375,
+          "width": 228.140625,
+          "height": 38.59375,
+          "top": 677.734375,
+          "right": 294.0546875,
+          "bottom": 716.328125,
+          "left": 65.9140625
+        },
+        "clip": "none",
+        "overflow": "visible",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, -114.07, 0)"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-readout]",
+        "rect": {
+          "x": 50.1171875,
+          "y": 688.25,
+          "width": 259.71875,
+          "height": 28.078125,
+          "top": 688.25,
+          "right": 309.8359375,
+          "bottom": 716.328125,
+          "left": 50.1171875
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 224, 204, 0.05) 0px 0px 0px 1px inset, rgba(255, 68, 32, 0.08) 0px 0px 7.36px 0px inset, rgba(72, 12, 6, 0.16) 0px 0px 6.08px 0px",
+        "background": "linear-gradient(90deg, rgba(38, 8, 5, 0.16), rgba(255, 101, 48, 0.12), rgba(38, 8, 5, 0.16)), none",
+        "transform": "matrix(1, 0, 0, 1, -129.859, 0)"
+      }
+    ],
+    "face": {
+      "x": 43.98527526855469,
+      "y": 675.9812622070312,
+      "width": 272.0137939453125,
+      "height": 41.24078369140625,
+      "top": 675.9812622070312,
+      "right": 315.9990692138672,
+      "bottom": 717.2220458984375,
+      "left": 43.98527526855469
+    }
+  },
+  {
+    "width": 412,
+    "results": [
+      {
+        "rect": {
+          "x": 118.703125,
+          "y": 782.390625,
+          "width": 44,
+          "height": 44.171875,
+          "top": 782.390625,
+          "right": 162.703125,
+          "bottom": 826.5625,
+          "left": 118.703125
+        },
+        "outside": []
+      },
+      {
+        "rect": {
+          "x": 249.265625,
+          "y": 782.390625,
+          "width": 44,
+          "height": 44.171875,
+          "top": 782.390625,
+          "right": 293.265625,
+          "bottom": 826.5625,
+          "left": 249.265625
+        },
+        "outside": []
+      }
+    ],
+    "styles": [
+      {
+        "s": "[data-hall-of-champions-mode-selector]",
+        "rect": {
+          "x": 146.734375,
+          "y": 718.125,
+          "width": 118.5,
+          "height": 56.234375,
+          "top": 718.125,
+          "right": 265.234375,
+          "bottom": 774.359375,
+          "left": 146.734375
+        },
+        "clip": "polygon(12.72% 0px, 87.28% 0px, 98.59% 100%, 1.41% 100%)",
+        "overflow": "hidden",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)"
+      },
+      {
+        "s": ".hall-of-champions-mode-selector__readout",
+        "rect": {
+          "x": 175.84375,
+          "y": 729.15625,
+          "width": 60.25,
+          "height": 44.171875,
+          "top": 729.15625,
+          "right": 236.09375,
+          "bottom": 773.328125,
+          "left": 175.84375
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 206, 180, 0.05) 0px 0px 0px 1px inset, rgba(84, 10, 4, 0.36) 0px -6.72px 12.48px 0px inset, rgba(101, 21, 10, 0.14) 0px 0px 11.52px 0px",
+        "background": "linear-gradient(rgba(67, 15, 7, 0.62), rgba(20, 6, 4, 0.72)), repeating-linear-gradient(90deg, rgba(255, 108, 52, 0.08) 0px, rgba(255, 108, 52, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px)",
+        "transform": "none"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-selector]",
+        "rect": {
+          "x": 75.4375,
+          "y": 782.390625,
+          "width": 261.09375,
+          "height": 44.171875,
+          "top": 782.390625,
+          "right": 336.53125,
+          "bottom": 826.5625,
+          "left": 75.4375
+        },
+        "clip": "none",
+        "overflow": "visible",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, -130.547, 0)"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-readout]",
+        "rect": {
+          "x": 57.3671875,
+          "y": 794.4375,
+          "width": 297.234375,
+          "height": 32.125,
+          "top": 794.4375,
+          "right": 354.6015625,
+          "bottom": 826.5625,
+          "left": 57.3671875
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 224, 204, 0.05) 0px 0px 0px 1px inset, rgba(255, 68, 32, 0.08) 0px 0px 7.36px 0px inset, rgba(72, 12, 6, 0.16) 0px 0px 6.08px 0px",
+        "background": "linear-gradient(90deg, rgba(38, 8, 5, 0.16), rgba(255, 101, 48, 0.12), rgba(38, 8, 5, 0.16)), none",
+        "transform": "matrix(1, 0, 0, 1, -148.617, 0)"
+      }
+    ],
+    "face": {
+      "x": 50.340145111083984,
+      "y": 780.390625,
+      "width": 311.3040771484375,
+      "height": 47.19775390625,
+      "top": 780.390625,
+      "right": 361.6442222595215,
+      "bottom": 827.58837890625,
+      "left": 50.340145111083984
+    }
+  },
+  {
+    "width": 1920,
+    "results": [
+      {
+        "rect": {
+          "x": 827.5,
+          "y": 911.8125,
+          "width": 44,
+          "height": 74.796875,
+          "top": 911.8125,
+          "right": 871.5,
+          "bottom": 986.609375,
+          "left": 827.5
+        },
+        "outside": []
+      },
+      {
+        "rect": {
+          "x": 1048.5,
+          "y": 911.8125,
+          "width": 44,
+          "height": 74.796875,
+          "top": 911.8125,
+          "right": 1092.5,
+          "bottom": 986.609375,
+          "left": 1048.5
+        },
+        "outside": []
+      }
+    ],
+    "styles": [
+      {
+        "s": "[data-hall-of-champions-mode-selector]",
+        "rect": {
+          "x": 859.6875,
+          "y": 803,
+          "width": 200.59375,
+          "height": 95.1875,
+          "top": 803,
+          "right": 1060.28125,
+          "bottom": 898.1875,
+          "left": 859.6875
+        },
+        "clip": "polygon(12.72% 0px, 87.28% 0px, 98.59% 100%, 1.41% 100%)",
+        "overflow": "hidden",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, 0, 0)"
+      },
+      {
+        "s": ".hall-of-champions-mode-selector__readout",
+        "rect": {
+          "x": 908.984375,
+          "y": 821.6875,
+          "width": 102,
+          "height": 74.796875,
+          "top": 821.6875,
+          "right": 1010.984375,
+          "bottom": 896.484375,
+          "left": 908.984375
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 206, 180, 0.05) 0px 0px 0px 1px inset, rgba(84, 10, 4, 0.36) 0px -6.72px 12.48px 0px inset, rgba(101, 21, 10, 0.14) 0px 0px 11.52px 0px",
+        "background": "linear-gradient(rgba(67, 15, 7, 0.62), rgba(20, 6, 4, 0.72)), repeating-linear-gradient(90deg, rgba(255, 108, 52, 0.08) 0px, rgba(255, 108, 52, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px)",
+        "transform": "none"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-selector]",
+        "rect": {
+          "x": 739,
+          "y": 911.8125,
+          "width": 442,
+          "height": 74.796875,
+          "top": 911.8125,
+          "right": 1181,
+          "bottom": 986.609375,
+          "left": 739
+        },
+        "clip": "none",
+        "overflow": "visible",
+        "shadow": "none",
+        "background": "none",
+        "transform": "matrix(1, 0, 0, 1, -221, 0)"
+      },
+      {
+        "s": "[data-hall-of-champions-letter-readout]",
+        "rect": {
+          "x": 708.40625,
+          "y": 932.203125,
+          "width": 503.1875,
+          "height": 54.390625,
+          "top": 932.203125,
+          "right": 1211.59375,
+          "bottom": 986.59375,
+          "left": 708.40625
+        },
+        "clip": "polygon(8% 0px, 92% 0px, 100% 100%, 0px 100%)",
+        "overflow": "hidden",
+        "shadow": "rgba(255, 224, 204, 0.05) 0px 0px 0px 1px inset, rgba(255, 68, 32, 0.08) 0px 0px 7.36px 0px inset, rgba(72, 12, 6, 0.16) 0px 0px 6.08px 0px",
+        "background": "linear-gradient(90deg, rgba(38, 8, 5, 0.16), rgba(255, 101, 48, 0.12), rgba(38, 8, 5, 0.16)), none",
+        "transform": "matrix(1, 0, 0, 1, -251.594, 0)"
+      }
+    ],
+    "face": {
+      "x": 696.5,
+      "y": 908.4124755859375,
+      "width": 527,
+      "height": 79.9000244140625,
+      "top": 908.4124755859375,
+      "right": 1223.5,
+      "bottom": 988.3125,
+      "left": 696.5
+    }
+  }
+]
