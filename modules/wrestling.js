@@ -11195,8 +11195,10 @@ function getWrestlingPeoplePrototypeShell(options = {}) {
   expandedHologram.innerHTML = `
     <section class="hall-of-champions-workspace hall-of-champions-workspace--search" data-hall-of-champions-workspace="search" aria-label="Hall of Champions search workspace" hidden>
       <h2 class="hall-of-champions-workspace__title">SEARCH ARCHIVE</h2>
-      <p class="hall-of-champions-workspace__status">AWAITING QUERY</p>
-      <div class="hall-of-champions-workspace__placeholder">SEARCH WORKSPACE STANDBY</div>
+      <label class="hall-of-champions-search-label" for="hall-of-champions-search">Name or alias</label>
+      <input id="hall-of-champions-search" class="hall-of-champions-search-input" data-hall-of-champions-search type="search" autocomplete="off" placeholder="Search names and aliases">
+      <p class="hall-of-champions-workspace__count" data-hall-of-champions-workspace-count="search">AWAITING QUERY</p>
+      <div class="hall-of-champions-workspace__viewport" data-hall-of-champions-workspace-results="search" role="region" aria-label="Search archive records" aria-live="polite"></div>
     </section>
     <section class="hall-of-champions-workspace" data-hall-of-champions-workspace="az" aria-label="Hall of Champions alphabetical archive" hidden>
       <h2 class="hall-of-champions-workspace__title">ALPHABETICAL INDEX</h2>
@@ -11218,6 +11220,10 @@ function getWrestlingPeoplePrototypeShell(options = {}) {
     </section>
   `;
 
+  expandedHologram.querySelector("[data-hall-of-champions-search]").addEventListener("input", (event) => {
+    hallOfChampionsSearchQuery = event.currentTarget.value;
+    renderHallOfChampionsArchiveRows(prototypeShell, "search");
+  });
   const crystalTrigger = document.createElement("button");
   crystalTrigger.type = "button";
   crystalTrigger.className = "hall-of-champions-crystal-trigger";
@@ -11539,7 +11545,8 @@ function scheduleHallOfChampionsModeSelectorAvailability(prototypeShell) {
 
   setHallOfChampionsModeSelectorAvailable(prototypeShell, false);
   setHallOfChampionsLowerSelectorAvailable(prototypeShell, "az", false);
-  resetHallOfChampionsModeSelector(prototypeShell);
+  if (prototypeShell.dataset.hallOfChampionsRestoring !== "true") resetHallOfChampionsModeSelector(prototypeShell);
+  delete prototypeShell.dataset.hallOfChampionsRestoring;
 
   if (hallOfChampionsModeSelectorRevealTimer) {
     window.clearTimeout(hallOfChampionsModeSelectorRevealTimer);
@@ -11968,6 +11975,7 @@ function normalizeHallOfChampionsPeopleArchiveRecords(payloads) {
         routeId,
         name,
         initial,
+        aliases: getWrestlingPersonAliases(record),
         category: getHallOfChampionsPeopleArchiveCategory(record),
         team: getHallOfChampionsPeopleArchiveTeam(record),
         photoCount: getHallOfChampionsPeopleArchivePhotoCount(record),
@@ -11999,6 +12007,7 @@ function normalizeHallOfChampionsPeopleArchiveCachedRecords(records) {
         routeId,
         name,
         initial: getHallOfChampionsPeopleArchiveInitial(record?.initial || name),
+        aliases: getWrestlingPersonAliases(record),
         category: formatHallOfChampionsPeopleArchiveCategory(record?.category),
         team: normalizeHallOfChampionsPeopleArchiveDiscoveredTeam(record?.team),
         photoCount: Number.isFinite(photoCount) && photoCount >= 0 ? photoCount : null,
@@ -12074,6 +12083,7 @@ function writeHallOfChampionsPeopleArchiveCache(records) {
         routeId: record.routeId,
         name: record.name,
         initial: record.initial,
+        aliases: record.aliases,
         category: record.category,
         team: record.team,
         photoCount: record.photoCount,
@@ -12196,7 +12206,47 @@ function getHallOfChampionsActiveWorkspaceMode(prototypeShell) {
   return activeModeIndex === 1 ? "az" : activeModeIndex === 2 ? "category" : activeModeIndex === 3 ? "team" : "search";
 }
 
+let hallOfChampionsSearchQuery = "";
+const hallOfChampionsReturnSnapshots = new Map();
+let hallOfChampionsReturnSequence = 0;
+let hallOfChampionsPersonReturn = null;
+
+function restoreHallOfChampionsReturn(prototypeShell) {
+  const token = window.history.state?.hallOfChampionsReturnToken || hallOfChampionsPersonReturn?.token;
+  const snapshot = hallOfChampionsReturnSnapshots.get(token);
+  hallOfChampionsPersonReturn = null;
+  const matching = snapshot && snapshot.sourcePath === location.pathname;
+  hallOfChampionsSearchQuery = matching ? snapshot.query : "";
+  prototypeShell.querySelector("[data-hall-of-champions-search]").value = hallOfChampionsSearchQuery;
+  hallOfChampionsAzLetterIndex = matching ? Math.max(0, HALL_OF_CHAMPIONS_AZ_LETTERS.indexOf(snapshot.letter)) : 0;
+  hallOfChampionsCategoryIndex = matching ? Math.max(0, hallOfChampionsPeopleArchiveCategories.indexOf(snapshot.category)) : 0;
+  hallOfChampionsTeamIndex = matching ? Math.max(0, hallOfChampionsPeopleArchiveTeams.indexOf(snapshot.team)) : 0;
+  prototypeShell.dataset.hallOfChampionsExpanded = String(Boolean(matching && snapshot.expanded));
+  if (!matching) { resetHallOfChampionsModeSelector(prototypeShell); return; }
+  replaceRouteUrl(location.pathname + location.search, { ...window.history.state, hallOfChampionsReturnToken: token });
+  prototypeShell.dataset.hallOfChampionsRestoring = "true";
+  prototypeShell.hallOfChampionsReturnFocus = snapshot;
+  completeHallOfChampionsModeTransition(getHallOfChampionsModeSelector(prototypeShell), snapshot.modeIndex);
+}
+
+function restoreHallOfChampionsReturnFocus(prototypeShell, viewport) {
+  const snapshot = prototypeShell.hallOfChampionsReturnFocus;
+  if (!snapshot || prototypeShell.dataset.hallOfChampionsActive !== "true" ||
+    prototypeShell.dataset.hallOfChampionsModeSelectorReady !== "true") return;
+  const item = [...viewport.querySelectorAll("[data-wrestling-person-id]")]
+    .find((node) => node.dataset.wrestlingPersonId === snapshot.personId);
+  if (!item) return;
+  item.focus({ preventScroll: true });
+  viewport.scrollTop = snapshot.scrollTop;
+  delete prototypeShell.hallOfChampionsReturnFocus;
+}
+
 function getHallOfChampionsActiveWorkspaceMatches(modeName) {
+  if (modeName === "search") {
+    const query = hallOfChampionsSearchQuery.trim().toLowerCase();
+    return query ? hallOfChampionsPeopleArchiveRecords.filter((record) =>
+      [record.name, ...(record.aliases || [])].some((name) => String(name).toLowerCase().includes(query))) : [];
+  }
   if (modeName === "az") {
     const selectedLetter = getHallOfChampionsCurrentAzLetter();
     return hallOfChampionsPeopleArchiveRecords.filter((record) => record.initial === selectedLetter);
@@ -12221,8 +12271,22 @@ function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
 }
 
 function activateHallOfChampionsArchiveRecordRoute(routeUrl) {
+  const prototypeShell = wrestlingPeoplePrototypeShell;
+  const mode = getHallOfChampionsActiveWorkspaceMode(prototypeShell);
+  const token = "hall-return-" + (++hallOfChampionsReturnSequence);
+  const personId = normalizeWrestlingPersonId(new URL(routeUrl, location.href).pathname.split("/").pop());
+  hallOfChampionsReturnSnapshots.set(token, {
+    sourcePath: location.pathname, personPath: new URL(routeUrl, location.href).pathname,
+    modeIndex: getHallOfChampionsCurrentModeIndex(prototypeShell),
+    letter: getHallOfChampionsCurrentAzLetter(), category: getHallOfChampionsCurrentCategory(),
+    team: getHallOfChampionsCurrentTeam(), query: hallOfChampionsSearchQuery,
+    expanded: prototypeShell.dataset.hallOfChampionsExpanded === "true", personId,
+    scrollTop: prototypeShell.querySelector('[data-hall-of-champions-workspace-results="' + mode + '"]')?.scrollTop || 0,
+  });
+  if (hallOfChampionsReturnSnapshots.size > 24) hallOfChampionsReturnSnapshots.delete(hallOfChampionsReturnSnapshots.keys().next().value);
+  replaceRouteUrl(location.pathname + location.search, { ...window.history.state, hallOfChampionsReturnToken: token });
   navigateToRoute(routeUrl, {
-    historyState: { fromWrestlingPeopleHall: true },
+    historyState: { fromWrestlingPeopleHall: true, fromWrestlingPeopleIndex: true, hallOfChampionsReturnToken: token },
   });
 }
 
@@ -12354,7 +12418,17 @@ function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
   }
 
   const matches = getHallOfChampionsActiveWorkspaceMatches(modeName);
+  const focusedPerson = viewport.contains(document.activeElement) ? document.activeElement.dataset.wrestlingPersonId : "";
+  const previousScroll = viewport.scrollTop;
   viewport.replaceChildren();
+  if (modeName === "search" && !hallOfChampionsSearchQuery.trim()) {
+    count.textContent = "AWAITING QUERY";
+    const standby = document.createElement("p");
+    standby.className = "hall-of-champions-workspace__placeholder";
+    standby.textContent = "SEARCH WORKSPACE STANDBY";
+    viewport.append(standby);
+    return;
+  }
   workspace.dataset.hallOfChampionsWorkspaceState = hallOfChampionsPeopleArchiveState;
 
   if (modeName === "az" && status) {
@@ -12389,14 +12463,14 @@ function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
   if (matches.length === 0) {
     const message = document.createElement("p");
     message.className = "hall-of-champions-workspace__message";
-    message.textContent = modeName === "az" ? `NO RECORDS FOUND FOR // ${getHallOfChampionsCurrentAzLetter()}` : "NO ARCHIVE RECORDS";
+    message.textContent = modeName === "search" ? "NO MATCHING RECORDS" : modeName === "az" ? `NO RECORDS FOUND FOR // ${getHallOfChampionsCurrentAzLetter()}` : "NO ARCHIVE RECORDS";
     message.setAttribute("role", "status");
     viewport.append(message);
     return;
   }
 
   const list = document.createElement("ul");
-  const usesPortraitCards = modeName === "az" || modeName === "category" || modeName === "team";
+  const usesPortraitCards = modeName === "search" || modeName === "az" || modeName === "category" || modeName === "team";
   list.className = usesPortraitCards ? "hall-of-champions-workspace__records hall-of-champions-workspace__records--portrait" : "hall-of-champions-workspace__records";
   matches.forEach((record) => {
     if (usesPortraitCards) {
@@ -12406,6 +12480,11 @@ function renderHallOfChampionsArchiveRows(prototypeShell, modeName) {
     appendHallOfChampionsArchiveRecord(list, record);
   });
   viewport.append(list);
+  if (focusedPerson) {
+    [...viewport.querySelectorAll("[data-wrestling-person-id]")].find((node) => node.dataset.wrestlingPersonId === focusedPerson)?.focus({ preventScroll: true });
+    viewport.scrollTop = previousScroll;
+  }
+  restoreHallOfChampionsReturnFocus(prototypeShell, viewport);
 }
 
 function syncHallOfChampionsWorkspaces(prototypeShell) {
@@ -12431,9 +12510,7 @@ function syncHallOfChampionsWorkspaces(prototypeShell) {
     workspace.setAttribute("aria-hidden", "true");
     workspace.setAttribute("inert", "");
   });
-  if (activeModeName !== "search") {
-    renderHallOfChampionsArchiveRows(prototypeShell, activeModeName);
-  }
+  renderHallOfChampionsArchiveRows(prototypeShell, activeModeName);
 }
 function syncHallOfChampionsLowerSelectorForMode(prototypeShell) {
   if (!prototypeShell || prototypeShell.dataset.hallOfChampionsModeSelectorReady !== "true") {
@@ -12590,6 +12667,9 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
       prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
       scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
       setHallOfChampionsCrystalTriggerAvailable(prototypeShell, true);
+      if (prototypeShell.dataset.hallOfChampionsExpanded === "true") {
+        scheduleHallOfChampionsModeSelectorAvailability(prototypeShell);
+      }
     }, HALL_OF_CHAMPIONS_ACTIVATION_SETTLE_MS);
   }, HALL_OF_CHAMPIONS_ACTIVATION_DELAY_MS);
 }
@@ -12624,6 +12704,7 @@ function setWrestlingPeoplePrototypeActive(isActive) {
 
   if (prototypeShell) {
     prototypeShell.hidden = !isActive;
+    if (isActive && prototypeShell.dataset.hallOfChampionsActive !== "true") restoreHallOfChampionsReturn(prototypeShell);
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
     syncHallOfChampionsWorkspaces(prototypeShell);
     if (isActive) {
@@ -15279,6 +15360,14 @@ function getWrestlingPersonDossierPrototypeShell() {
 }
 
 function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
+  if (isActive) {
+    const token = window.history.state?.hallOfChampionsReturnToken;
+    const snapshot = hallOfChampionsReturnSnapshots.get(token);
+    hallOfChampionsPersonReturn = window.history.state?.fromWrestlingPeopleHall && snapshot?.personPath === location.pathname
+      ? { token, sourcePath: snapshot.sourcePath } : null;
+  } else if (hallOfChampionsPersonReturn?.sourcePath !== location.pathname) {
+    hallOfChampionsPersonReturn = null;
+  }
   const activation = isActive ? {
     generation: ++wrestlingPersonDossierActivationGeneration,
     routeKey: getActiveWrestlingPersonDossierRequestKey(), requestKeys: new Set(),
