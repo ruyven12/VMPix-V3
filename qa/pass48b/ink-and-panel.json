@@ -1,0 +1,188 @@
+[
+  {
+    "width": 360,
+    "az": {
+      "fontSize": "14.08px",
+      "fontFamily": "Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif"
+    },
+    "arrows": [
+      {
+        "range": {
+          "x": 147.09375,
+          "y": 669.34375,
+          "width": 4.34375,
+          "height": 13,
+          "top": 669.34375,
+          "right": 151.4375,
+          "bottom": 682.34375,
+          "left": 147.09375
+        },
+        "metrics": {
+          "fontAscent": 10,
+          "fontDescent": 3,
+          "inkAscent": 5,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 146.09375,
+          "y": 674.34375,
+          "right": 153.09375,
+          "bottom": 679.34375
+        },
+        "clearanceAbove": 3.640625,
+        "inside": true
+      },
+      {
+        "range": {
+          "x": 208.53125,
+          "y": 669.34375,
+          "width": 4.34375,
+          "height": 13,
+          "top": 669.34375,
+          "right": 212.875,
+          "bottom": 682.34375,
+          "left": 208.53125
+        },
+        "metrics": {
+          "fontAscent": 10,
+          "fontDescent": 3,
+          "inkAscent": 5,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 206.53125,
+          "y": 674.34375,
+          "right": 214.53125,
+          "bottom": 679.34375
+        },
+        "clearanceAbove": 3.640625,
+        "inside": true
+      }
+    ],
+    "panelBad": []
+  },
+  {
+    "width": 412,
+    "az": {
+      "fontSize": "11.5px",
+      "fontFamily": "Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif"
+    },
+    "arrows": [
+      {
+        "range": {
+          "x": 168.6640625,
+          "y": 773.375,
+          "width": 4.34375,
+          "height": 13,
+          "top": 773.375,
+          "right": 173.0078125,
+          "bottom": 786.375,
+          "left": 168.6640625
+        },
+        "metrics": {
+          "fontAscent": 10,
+          "fontDescent": 3,
+          "inkAscent": 5,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 167.6640625,
+          "y": 778.375,
+          "right": 174.6640625,
+          "bottom": 783.375
+        },
+        "clearanceAbove": 4.015625,
+        "inside": true
+      },
+      {
+        "range": {
+          "x": 238.9609375,
+          "y": 773.375,
+          "width": 4.34375,
+          "height": 13,
+          "top": 773.375,
+          "right": 243.3046875,
+          "bottom": 786.375,
+          "left": 238.9609375
+        },
+        "metrics": {
+          "fontAscent": 10,
+          "fontDescent": 3,
+          "inkAscent": 5,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 236.9609375,
+          "y": 778.375,
+          "right": 244.9609375,
+          "bottom": 783.375
+        },
+        "clearanceAbove": 4.015625,
+        "inside": true
+      }
+    ],
+    "panelBad": []
+  },
+  {
+    "width": 1920,
+    "az": {
+      "fontSize": "11.5px",
+      "fontFamily": "Audiowide, Orbitron, Rajdhani, \"Segoe UI\", Arial, sans-serif"
+    },
+    "arrows": [
+      {
+        "range": {
+          "x": 897.421875,
+          "y": 899.3125,
+          "width": 6.15625,
+          "height": 18,
+          "top": 899.3125,
+          "right": 903.578125,
+          "bottom": 917.3125,
+          "left": 897.421875
+        },
+        "metrics": {
+          "fontAscent": 14,
+          "fontDescent": 4,
+          "inkAscent": 7,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 896.421875,
+          "y": 906.3125,
+          "right": 905.421875,
+          "bottom": 913.3125
+        },
+        "clearanceAbove": 8.109375,
+        "inside": true
+      },
+      {
+        "range": {
+          "x": 1016.421875,
+          "y": 899.3125,
+          "width": 6.15625,
+          "height": 18,
+          "top": 899.3125,
+          "right": 1022.578125,
+          "bottom": 917.3125,
+          "left": 1016.421875
+        },
+        "metrics": {
+          "fontAscent": 14,
+          "fontDescent": 4,
+          "inkAscent": 7,
+          "inkDescent": 0
+        },
+        "ink": {
+          "x": 1014.421875,
+          "y": 906.3125,
+          "right": 1023.421875,
+          "bottom": 913.3125
+        },
+        "clearanceAbove": 8.109375,
+        "inside": true
+      }
+    ],
+    "panelBad": []
+  }
+]

@@ -11372,9 +11372,9 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   if (pedestal) {
     const pedestalRect = pedestal.getBoundingClientRect();
     if (pedestalRect.width > 0 && pedestalRect.height > 0) {
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * (234 / 640))}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * (226 / 640))}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * (300 / 520))}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (172 / 640)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (188 / 640)}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * (104 / 520)}px`);
       const baseFaces = pedestal.querySelectorAll(".hall-of-champions-pedestal__base path");
       const face = baseFaces[0];
@@ -11386,7 +11386,7 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
         const center = (points[0] + points[2]) / 2;
         const top = points[1] + 4;
         const controlsBottom = points[5] - 8;
-        const labelTop = middle.y - 5;
+        const labelTop = middle.y - 25.5;
         const labelBottom = bottom.y + bottom.height - 2;
         const origin = new DOMPoint(center, top).matrixTransform(matrix);
         const scaleX = Math.hypot(matrix.a, matrix.b);
@@ -11396,7 +11396,7 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
         prototypeShell.style.setProperty("--hall-champions-letter-selector-width", (points[2] - points[0] - 8) * scaleX + "px");
         prototypeShell.style.setProperty("--hall-champions-letter-selector-height", (labelBottom - top) * scaleY + "px");
         prototypeShell.style.setProperty("--hall-champions-letter-controls-height", (controlsBottom - top) * scaleY + "px");
-        prototypeShell.style.setProperty("--hall-champions-letter-label-width", (points[4] - points[6] - 20) * scaleX + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-label-width", (points[4] - points[6] - 6) * scaleX + "px");
         prototypeShell.style.setProperty("--hall-champions-letter-label-height", (labelBottom - labelTop) * scaleY + "px");
         prototypeShell.style.setProperty("--hall-champions-letter-label-gap", (labelTop - controlsBottom) * scaleY + "px");
       }

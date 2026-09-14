@@ -1,0 +1,20 @@
+[
+  {
+    "width": 360,
+    "mode": "letter",
+    "font": "11.5px",
+    "expected": 14.08
+  },
+  {
+    "width": 412,
+    "mode": "letter",
+    "font": "11.5px",
+    "expected": 14.08
+  },
+  {
+    "width": 1920,
+    "mode": "letter",
+    "font": "11.5px",
+    "expected": 18.88
+  }
+]
