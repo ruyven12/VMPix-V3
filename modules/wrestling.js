@@ -11372,10 +11372,10 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   if (pedestal) {
     const pedestalRect = pedestal.getBoundingClientRect();
     if (pedestalRect.width > 0 && pedestalRect.height > 0) {
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * (226 / 640))}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * (300 / 520))}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (188 / 640)}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * (104 / 520)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * (260 / 640))}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * (314 / 520))}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (120 / 640)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * (88 / 520)}px`);
       const baseFaces = pedestal.querySelectorAll(".hall-of-champions-pedestal__base path");
       const face = baseFaces[0];
       const matrix = face?.getScreenCTM();

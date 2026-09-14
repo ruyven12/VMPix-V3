@@ -29924,3 +29924,26 @@ button.hall-crusades-archive-crystal:focus-visible {
 .wrestling-people-prototype-shell .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode="az"] .hall-of-champions-letter-selector__letter {
   font-size: clamp(0.88rem, 3.2vw, 1.18rem);
 }
+
+/* The middle selector is mounted inside the smaller black inset face. */
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector {
+  grid-template-rows: minmax(24px, 1fr) 12px;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__readout {
+  box-sizing: border-box;
+  padding-inline: 8%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__label {
+  max-inline-size: 100%;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control {
+  grid-row: 1 / -1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-block-end: 1px;
+}
