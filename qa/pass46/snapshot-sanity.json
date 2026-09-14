@@ -1,0 +1,16 @@
+{
+  "hall": {
+    "title": "Hall of Champions - Voodoo Media V3.0.01",
+    "engine": "Hall of Champions",
+    "shells": 1,
+    "holograms": 1,
+    "accessibleLinks": [
+      "Open Ace Romero dossier",
+      "Open Alex Test dossier"
+    ]
+  },
+  "person": {
+    "title": "Champion Dossier - Ace Romero - Voodoo Media V3.0.01",
+    "engine": "Champion Dossier - Ace Romero"
+  }
+}
