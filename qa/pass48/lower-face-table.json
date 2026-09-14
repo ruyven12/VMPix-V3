@@ -1,0 +1,32 @@
+[
+  {
+    "width": 360,
+    "coreWidth": 122.84375,
+    "faceWidthAt410": 131.32581845238096,
+    "coreSideInset": 4.241034226190479,
+    "labelWidth": 177.234375,
+    "faceWidthAt449": 179.8052269345238,
+    "labelSideInset": 1.2854259672619008,
+    "engineClearance": 7.625
+  },
+  {
+    "width": 412,
+    "coreWidth": 140.578125,
+    "faceWidthAt410": 150.28470982142858,
+    "coreSideInset": 4.853292410714289,
+    "labelWidth": 202.84375,
+    "faceWidthAt449": 205.76286272321428,
+    "labelSideInset": 1.4595563616071416,
+    "engineClearance": 2.78125
+  },
+  {
+    "width": 1920,
+    "coreWidth": 238,
+    "faceWidthAt410": 254.4333333333333,
+    "coreSideInset": 8.216666666666654,
+    "labelWidth": 343.390625,
+    "faceWidthAt449": 348.3583333333333,
+    "labelSideInset": 2.483854166666646,
+    "engineClearance": 0.4375
+  }
+]

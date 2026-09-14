@@ -29809,3 +29809,69 @@ button.hall-crusades-archive-crystal:focus-visible {
 .wrestling-people-prototype-shell .hall-of-champions-workspace {
   inset-inline: calc(4% + 2px);
 }
+
+/* Lower Hall controls stay on the first step; the label uses existing depth below it. */
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode] {
+  inset-block-start: var(--hall-champions-letter-selector-top);
+  inline-size: var(--hall-champions-letter-selector-width);
+  block-size: var(--hall-champions-letter-selector-height);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: var(--hall-champions-letter-controls-height) var(--hall-champions-letter-label-height);
+  row-gap: var(--hall-champions-letter-label-gap);
+  justify-items: center;
+  padding: 0;
+  overflow: visible;
+  clip-path: none;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector::before {
+  inset: 0 0 auto;
+  block-size: var(--hall-champions-letter-controls-height);
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 104, 58, 0.34);
+  background: rgba(11, 5, 3, 0.64);
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector::after { display: none; }
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control {
+  grid-row: 1;
+  inline-size: min(44px, 100%);
+  block-size: 100%;
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control--previous { grid-column: 1; }
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control--next { grid-column: 2; }
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__readout {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  inline-size: var(--hall-champions-letter-label-width);
+  block-size: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 104, 58, 0.25);
+  background: rgba(11, 5, 3, 0.68);
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector[data-hall-of-champions-lower-selector-mode] .hall-of-champions-letter-selector__letter {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: normal;
+  text-transform: none;
+  overflow-wrap: normal;
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__control {
+  grid-row: 1 / -1;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-block-start: calc(var(--hall-champions-letter-controls-height) / 2 - 0.5em);
+}
+.wrestling-people-prototype-shell .hall-of-champions-letter-selector__readout { pointer-events: none; }

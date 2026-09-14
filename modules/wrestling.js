@@ -11376,10 +11376,30 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
       prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * (300 / 520))}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (172 / 640)}px`);
       prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * (104 / 520)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-center", `${pedestalRect.left + (pedestalRect.width * 0.5)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.835)}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-width", `${pedestalRect.width * 0.5}px`);
-      prototypeShell.style.setProperty("--hall-champions-letter-selector-height", `${pedestalRect.height * 0.086}px`);
+      const baseFaces = pedestal.querySelectorAll(".hall-of-champions-pedestal__base path");
+      const face = baseFaces[0];
+      const matrix = face?.getScreenCTM();
+      if (matrix && baseFaces.length >= 3) {
+        const points = face.getAttribute("d").match(/-?\d+(?:\.\d+)?/g).map(Number);
+        const middle = baseFaces[1].getBBox();
+        const bottom = baseFaces[2].getBBox();
+        const center = (points[0] + points[2]) / 2;
+        const top = points[1] + 4;
+        const controlsBottom = points[5] - 8;
+        const labelTop = middle.y - 5;
+        const labelBottom = bottom.y + bottom.height - 2;
+        const origin = new DOMPoint(center, top).matrixTransform(matrix);
+        const scaleX = Math.hypot(matrix.a, matrix.b);
+        const scaleY = Math.hypot(matrix.c, matrix.d);
+        prototypeShell.style.setProperty("--hall-champions-letter-selector-center", origin.x + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-selector-top", origin.y + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-selector-width", (points[2] - points[0] - 8) * scaleX + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-selector-height", (labelBottom - top) * scaleY + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-controls-height", (controlsBottom - top) * scaleY + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-label-width", (points[4] - points[6] - 20) * scaleX + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-label-height", (labelBottom - labelTop) * scaleY + "px");
+        prototypeShell.style.setProperty("--hall-champions-letter-label-gap", (labelTop - controlsBottom) * scaleY + "px");
+      }
     }
   }
 

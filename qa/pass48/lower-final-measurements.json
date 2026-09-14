@@ -1,0 +1,2592 @@
+[
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "no-preference",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 112.65625,
+              "y": 697.5625,
+              "width": 134.65625,
+              "height": 16,
+              "top": 697.5625,
+              "right": 247.3125,
+              "bottom": 713.5625,
+              "left": 112.65625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 106.59375,
+              "y": 691.5625,
+              "width": 146.78125,
+              "height": 16,
+              "top": 691.5625,
+              "right": 253.375,
+              "bottom": 707.5625,
+              "left": 106.59375
+            },
+            {
+              "x": 124.328125,
+              "y": 703.5625,
+              "width": 111.328125,
+              "height": 16,
+              "top": 703.5625,
+              "right": 235.65625,
+              "bottom": 719.5625,
+              "left": 124.328125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 97.453125,
+              "y": 691.5625,
+              "width": 165.078125,
+              "height": 16,
+              "top": 691.5625,
+              "right": 262.53125,
+              "bottom": 707.5625,
+              "left": 97.453125
+            },
+            {
+              "x": 93.78125,
+              "y": 703.5625,
+              "width": 172.421875,
+              "height": 16,
+              "top": 703.5625,
+              "right": 266.203125,
+              "bottom": 719.5625,
+              "left": 93.78125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "no-preference",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 138.6640625,
+              "y": 806.25,
+              "width": 134.65625,
+              "height": 16,
+              "top": 806.25,
+              "right": 273.3203125,
+              "bottom": 822.25,
+              "left": 138.6640625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 132.6015625,
+              "y": 800.25,
+              "width": 146.78125,
+              "height": 16,
+              "top": 800.25,
+              "right": 279.3828125,
+              "bottom": 816.25,
+              "left": 132.6015625
+            },
+            {
+              "x": 150.3203125,
+              "y": 812.25,
+              "width": 111.328125,
+              "height": 16,
+              "top": 812.25,
+              "right": 261.6484375,
+              "bottom": 828.25,
+              "left": 150.3203125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 115.0234375,
+              "y": 800.25,
+              "width": 181.921875,
+              "height": 16,
+              "top": 800.25,
+              "right": 296.9453125,
+              "bottom": 816.25,
+              "left": 115.0234375
+            },
+            {
+              "x": 128.1953125,
+              "y": 812.25,
+              "width": 155.578125,
+              "height": 16,
+              "top": 812.25,
+              "right": 283.7734375,
+              "bottom": 828.25,
+              "left": 128.1953125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "no-preference",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 892.671875,
+              "y": 957.765625,
+              "width": 134.65625,
+              "height": 16,
+              "top": 957.765625,
+              "right": 1027.328125,
+              "bottom": 973.765625,
+              "left": 892.671875
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 829.296875,
+              "y": 957.765625,
+              "width": 261.40625,
+              "height": 16,
+              "top": 957.765625,
+              "right": 1090.703125,
+              "bottom": 973.765625,
+              "left": 829.296875
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 816.5,
+              "y": 951.765625,
+              "width": 287,
+              "height": 16,
+              "top": 951.765625,
+              "right": 1103.5,
+              "bottom": 967.765625,
+              "left": 816.5
+            },
+            {
+              "x": 934.765625,
+              "y": 963.765625,
+              "width": 50.484375,
+              "height": 16,
+              "top": 963.765625,
+              "right": 985.25,
+              "bottom": 979.765625,
+              "left": 934.765625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "reduce",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 112.65625,
+              "y": 697.5625,
+              "width": 134.65625,
+              "height": 16,
+              "top": 697.5625,
+              "right": 247.3125,
+              "bottom": 713.5625,
+              "left": 112.65625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 106.59375,
+              "y": 691.5625,
+              "width": 146.78125,
+              "height": 16,
+              "top": 691.5625,
+              "right": 253.375,
+              "bottom": 707.5625,
+              "left": 106.59375
+            },
+            {
+              "x": 124.328125,
+              "y": 703.5625,
+              "width": 111.328125,
+              "height": 16,
+              "top": 703.5625,
+              "right": 235.65625,
+              "bottom": 719.5625,
+              "left": 124.328125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 118.5625,
+            "y": 673.34375,
+            "width": 122.84375,
+            "height": 47.375,
+            "top": 673.34375,
+            "right": 241.40625,
+            "bottom": 720.71875,
+            "left": 118.5625
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 91.375,
+            "y": 690.4375,
+            "width": 177.234375,
+            "height": 30.265625,
+            "top": 690.4375,
+            "right": 268.609375,
+            "bottom": 720.703125,
+            "left": 91.375
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 92.375,
+            "y": 691.4375,
+            "width": 175.234375,
+            "height": 28.265625,
+            "top": 691.4375,
+            "right": 267.609375,
+            "bottom": 719.703125,
+            "left": 92.375
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 175,
+          "clientWidth": 175,
+          "scrollHeight": 28,
+          "clientHeight": 28,
+          "lines": [
+            {
+              "x": 97.453125,
+              "y": 691.5625,
+              "width": 165.078125,
+              "height": 16,
+              "top": 691.5625,
+              "right": 262.53125,
+              "bottom": 707.5625,
+              "left": 97.453125
+            },
+            {
+              "x": 93.78125,
+              "y": 703.5625,
+              "width": 172.421875,
+              "height": 16,
+              "top": 703.5625,
+              "right": 266.203125,
+              "bottom": 719.5625,
+              "left": 93.78125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 127.265625,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 171.265625,
+              "bottom": 720.703125,
+              "left": 127.265625
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 188.6875,
+              "y": 673.34375,
+              "width": 44,
+              "height": 47.359375,
+              "top": 673.34375,
+              "right": 232.6875,
+              "bottom": 720.703125,
+              "left": 188.6875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 47,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 728.34375,
+          "width": 341.46875,
+          "height": 62.390625,
+          "top": 728.34375,
+          "right": 350.734375,
+          "bottom": 790.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "reduce",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 138.6640625,
+              "y": 806.25,
+              "width": 134.65625,
+              "height": 16,
+              "top": 806.25,
+              "right": 273.3203125,
+              "bottom": 822.25,
+              "left": 138.6640625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 132.6015625,
+              "y": 800.25,
+              "width": 146.78125,
+              "height": 16,
+              "top": 800.25,
+              "right": 279.3828125,
+              "bottom": 816.25,
+              "left": 132.6015625
+            },
+            {
+              "x": 150.3203125,
+              "y": 812.25,
+              "width": 111.328125,
+              "height": 16,
+              "top": 812.25,
+              "right": 261.6484375,
+              "bottom": 828.25,
+              "left": 150.3203125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 135.6953125,
+            "y": 777.375,
+            "width": 140.578125,
+            "height": 54.21875,
+            "top": 777.375,
+            "right": 276.2734375,
+            "bottom": 831.59375,
+            "left": 135.6953125
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 104.5703125,
+            "y": 796.9375,
+            "width": 202.84375,
+            "height": 34.640625,
+            "top": 796.9375,
+            "right": 307.4140625,
+            "bottom": 831.578125,
+            "left": 104.5703125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 105.5703125,
+            "y": 797.9375,
+            "width": 200.84375,
+            "height": 32.640625,
+            "top": 797.9375,
+            "right": 306.4140625,
+            "bottom": 830.578125,
+            "left": 105.5703125
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 201,
+          "clientWidth": 201,
+          "scrollHeight": 33,
+          "clientHeight": 33,
+          "lines": [
+            {
+              "x": 115.0234375,
+              "y": 800.25,
+              "width": 181.921875,
+              "height": 16,
+              "top": 800.25,
+              "right": 296.9453125,
+              "bottom": 816.25,
+              "left": 115.0234375
+            },
+            {
+              "x": 128.1953125,
+              "y": 812.25,
+              "width": 155.578125,
+              "height": 16,
+              "top": 812.25,
+              "right": 283.7734375,
+              "bottom": 828.25,
+              "left": 128.1953125
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 148.8359375,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 192.8359375,
+              "bottom": 831.578125,
+              "left": 148.8359375
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 219.1171875,
+              "y": 777.375,
+              "width": 44,
+              "height": 54.203125,
+              "top": 777.375,
+              "right": 263.1171875,
+              "bottom": 831.578125,
+              "left": 219.1171875
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 54,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "engine": {
+          "x": 9.265625,
+          "y": 834.375,
+          "width": 393.46875,
+          "height": 71.359375,
+          "top": 834.375,
+          "right": 402.734375,
+          "bottom": 905.734375,
+          "left": 9.265625
+        },
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "reduce",
+    "states": [
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "Announcers Commentary",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 892.671875,
+              "y": 957.765625,
+              "width": 134.65625,
+              "height": 16,
+              "top": 957.765625,
+              "right": 1027.328125,
+              "bottom": 973.765625,
+              "left": 892.671875
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "International Championship Wrestling Performers",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 829.296875,
+              "y": 957.765625,
+              "width": 261.40625,
+              "height": 16,
+              "top": 957.765625,
+              "right": 1090.703125,
+              "bottom": 973.765625,
+              "left": 829.296875
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      },
+      {
+        "selector": {
+          "rect": {
+            "x": 841,
+            "y": 903.3125,
+            "width": 238,
+            "height": 91.796875,
+            "top": 903.3125,
+            "right": 1079,
+            "bottom": 995.109375,
+            "left": 841
+          },
+          "pointsContained": true
+        },
+        "readout": {
+          "rect": {
+            "x": 788.3125,
+            "y": 936.453125,
+            "width": 343.390625,
+            "height": 58.640625,
+            "top": 936.453125,
+            "right": 1131.703125,
+            "bottom": 995.09375,
+            "left": 788.3125
+          },
+          "pointsContained": true
+        },
+        "label": {
+          "rect": {
+            "x": 789.3125,
+            "y": 937.453125,
+            "width": 341.390625,
+            "height": 56.640625,
+            "top": 937.453125,
+            "right": 1130.703125,
+            "bottom": 994.09375,
+            "left": 789.3125
+          },
+          "pointsContained": true,
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12px",
+          "lineHeight": "12px",
+          "overflow": "visible",
+          "scrollWidth": 341,
+          "clientWidth": 341,
+          "scrollHeight": 57,
+          "clientHeight": 57,
+          "lines": [
+            {
+              "x": 816.5,
+              "y": 951.765625,
+              "width": 287,
+              "height": 16,
+              "top": 951.765625,
+              "right": 1103.5,
+              "bottom": 967.765625,
+              "left": 816.5
+            },
+            {
+              "x": 934.765625,
+              "y": 963.765625,
+              "width": 50.484375,
+              "height": 16,
+              "top": 963.765625,
+              "right": 985.25,
+              "bottom": 979.765625,
+              "left": 934.765625
+            }
+          ]
+        },
+        "buttons": [
+          {
+            "rect": {
+              "x": 878.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 922.5,
+              "bottom": 995.09375,
+              "left": 878.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Previous value"
+          },
+          {
+            "rect": {
+              "x": 997.5,
+              "y": 903.3125,
+              "width": 44,
+              "height": 91.78125,
+              "top": 903.3125,
+              "right": 1041.5,
+              "bottom": 995.09375,
+              "left": 997.5
+            },
+            "pointsContained": true,
+            "effectiveWidth": 44,
+            "effectiveHeight": 92,
+            "label": "Next value"
+          }
+        ],
+        "upper": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "engine": {
+          "x": 480,
+          "y": 995.546875,
+          "width": 960,
+          "height": 75.1875,
+          "top": 995.546875,
+          "right": 1440,
+          "bottom": 1070.734375,
+          "left": 480
+        },
+        "overflow": false
+      }
+    ]
+  }
+]

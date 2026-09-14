@@ -1,0 +1,21 @@
+{
+  "before": "Announcers Commentary",
+  "after": "Crew",
+  "restored": "Announcers Commentary",
+  "keyboard": "Crew",
+  "hit": {
+    "total": 2068,
+    "hits": 2068,
+    "rect": {
+      "x": 188.6875,
+      "y": 673.34375,
+      "width": 44,
+      "height": 47.359375,
+      "top": 673.34375,
+      "right": 232.6875,
+      "bottom": 720.703125,
+      "left": 188.6875
+    }
+  },
+  "tapRegion": "3px above bottom of extended44px-wide button"
+}
