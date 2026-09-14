@@ -1,0 +1,3596 @@
+[
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "no-preference",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "SEARCH",
+          "font": "12px",
+          "rect": {
+            "x": 156.90625,
+            "y": 629.890625,
+            "width": 46.125,
+            "height": 12,
+            "top": 629.890625,
+            "right": 203.03125,
+            "bottom": 641.890625,
+            "left": 156.90625
+          },
+          "paint": {
+            "x": 156.90625,
+            "y": 627.890625,
+            "width": 46.125,
+            "height": 16,
+            "top": 627.890625,
+            "right": 203.03125,
+            "bottom": 643.890625,
+            "left": 156.90625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 162.6326141357422,
+            "y": 629.890625,
+            "width": 20.578125,
+            "height": 12,
+            "top": 629.890625,
+            "right": 183.2107391357422,
+            "bottom": 641.890625,
+            "left": 162.6326141357422
+          },
+          "paint": {
+            "x": 162.6326141357422,
+            "y": 627.890625,
+            "width": 20.578125,
+            "height": 16,
+            "top": 627.890625,
+            "right": 183.2107391357422,
+            "bottom": 643.890625,
+            "left": 162.6326141357422
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 139.34341430664062,
+            "y": 629.890625,
+            "width": 61.140625,
+            "height": 12,
+            "top": 629.890625,
+            "right": 200.48403930664062,
+            "bottom": 641.890625,
+            "left": 139.34341430664062
+          },
+          "paint": {
+            "x": 139.34341430664062,
+            "y": 627.890625,
+            "width": 61.140625,
+            "height": 16,
+            "top": 627.890625,
+            "right": 200.48403930664062,
+            "bottom": 643.890625,
+            "left": 139.34341430664062
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 154.56243896484375,
+            "y": 629.890625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 629.890625,
+            "right": 188.07806396484375,
+            "bottom": 641.890625,
+            "left": 154.56243896484375
+          },
+          "paint": {
+            "x": 154.56243896484375,
+            "y": 627.890625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 627.890625,
+            "right": 188.07806396484375,
+            "bottom": 643.890625,
+            "left": 154.56243896484375
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "no-preference",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 189.21875,
+            "y": 729.6875,
+            "width": 33.515625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 222.734375,
+            "bottom": 741.6875,
+            "left": 189.21875
+          },
+          "paint": {
+            "x": 189.21875,
+            "y": 727.6875,
+            "width": 33.515625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 222.734375,
+            "bottom": 743.6875,
+            "left": 189.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 188.64871215820312,
+            "y": 729.6875,
+            "width": 20.578125,
+            "height": 12,
+            "top": 729.6875,
+            "right": 209.22683715820312,
+            "bottom": 741.6875,
+            "left": 188.64871215820312
+          },
+          "paint": {
+            "x": 188.64871215820312,
+            "y": 727.6875,
+            "width": 20.578125,
+            "height": 16,
+            "top": 727.6875,
+            "right": 209.22683715820312,
+            "bottom": 743.6875,
+            "left": 188.64871215820312
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 165.36679077148438,
+            "y": 729.6875,
+            "width": 61.140625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 226.50741577148438,
+            "bottom": 741.6875,
+            "left": 165.36679077148438
+          },
+          "paint": {
+            "x": 165.36679077148438,
+            "y": 727.6875,
+            "width": 61.140625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 226.50741577148438,
+            "bottom": 743.6875,
+            "left": 165.36679077148438
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 179.1815185546875,
+            "y": 729.6875,
+            "width": 33.515625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 212.6971435546875,
+            "bottom": 741.6875,
+            "left": 179.1815185546875
+          },
+          "paint": {
+            "x": 179.1815185546875,
+            "y": 727.6875,
+            "width": 33.515625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 212.6971435546875,
+            "bottom": 743.6875,
+            "left": 179.1815185546875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "no-preference",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 943.21875,
+            "y": 826.40625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 976.734375,
+            "bottom": 838.40625,
+            "left": 943.21875
+          },
+          "paint": {
+            "x": 943.21875,
+            "y": 824.40625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 976.734375,
+            "bottom": 840.40625,
+            "left": 943.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 942.3785400390625,
+            "y": 826.40625,
+            "width": 20.578125,
+            "height": 12,
+            "top": 826.40625,
+            "right": 962.9566650390625,
+            "bottom": 838.40625,
+            "left": 942.3785400390625
+          },
+          "paint": {
+            "x": 942.3785400390625,
+            "y": 824.40625,
+            "width": 20.578125,
+            "height": 16,
+            "top": 824.40625,
+            "right": 962.9566650390625,
+            "bottom": 840.40625,
+            "left": 942.3785400390625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 919.3717041015625,
+            "y": 826.40625,
+            "width": 61.140625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 980.5123291015625,
+            "bottom": 838.40625,
+            "left": 919.3717041015625
+          },
+          "paint": {
+            "x": 919.3717041015625,
+            "y": 824.40625,
+            "width": 61.140625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 980.5123291015625,
+            "bottom": 840.40625,
+            "left": 919.3717041015625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 933.1838989257812,
+            "y": 826.40625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 966.6995239257812,
+            "bottom": 838.40625,
+            "left": 933.1838989257812
+          },
+          "paint": {
+            "x": 933.1838989257812,
+            "y": 824.40625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 966.6995239257812,
+            "bottom": 840.40625,
+            "left": 933.1838989257812
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "reduce",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 163.21875,
+            "y": 629.890625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 629.890625,
+            "right": 196.734375,
+            "bottom": 641.890625,
+            "left": 163.21875
+          },
+          "paint": {
+            "x": 163.21875,
+            "y": 627.890625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 627.890625,
+            "right": 196.734375,
+            "bottom": 643.890625,
+            "left": 163.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 169.6875,
+            "y": 629.890625,
+            "width": 20.578125,
+            "height": 12,
+            "top": 629.890625,
+            "right": 190.265625,
+            "bottom": 641.890625,
+            "left": 169.6875
+          },
+          "paint": {
+            "x": 169.6875,
+            "y": 627.890625,
+            "width": 20.578125,
+            "height": 16,
+            "top": 627.890625,
+            "right": 190.265625,
+            "bottom": 643.890625,
+            "left": 169.6875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 149.40625,
+            "y": 629.890625,
+            "width": 61.140625,
+            "height": 12,
+            "top": 629.890625,
+            "right": 210.546875,
+            "bottom": 641.890625,
+            "left": 149.40625
+          },
+          "paint": {
+            "x": 149.40625,
+            "y": 627.890625,
+            "width": 61.140625,
+            "height": 16,
+            "top": 627.890625,
+            "right": 210.546875,
+            "bottom": 643.890625,
+            "left": 149.40625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 142.25,
+          "y": 625.078125,
+          "width": 75.453125,
+          "height": 45.625,
+          "top": 625.078125,
+          "right": 217.703125,
+          "bottom": 670.703125,
+          "left": 142.25
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 163.21875,
+            "y": 629.890625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 629.890625,
+            "right": 196.734375,
+            "bottom": 641.890625,
+            "left": 163.21875
+          },
+          "paint": {
+            "x": 163.21875,
+            "y": 627.890625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 627.890625,
+            "right": 196.734375,
+            "bottom": 643.890625,
+            "left": 163.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 145.25,
+              "y": 645.703125,
+              "width": 34.71875,
+              "height": 24,
+              "top": 645.703125,
+              "right": 179.96875,
+              "bottom": 669.703125,
+              "left": 145.25
+            },
+            "effectiveCenterWidth": 34,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 179.96875,
+              "y": 645.703125,
+              "width": 34.734375,
+              "height": 24,
+              "top": 645.703125,
+              "right": 214.703125,
+              "bottom": 669.703125,
+              "left": 179.96875
+            },
+            "effectiveCenterWidth": 35,
+            "effectiveCenterHeight": 24,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 14.40625,
+          "y": 10.015625,
+          "width": 331.1875,
+          "height": 576.46875,
+          "top": 10.015625,
+          "right": 345.59375,
+          "bottom": 586.484375,
+          "left": 14.40625
+        },
+        "crystal": {
+          "x": 165.07530212402344,
+          "y": 586.4799194335938,
+          "width": 29.833770751953125,
+          "height": 28.078857421875,
+          "top": 586.4799194335938,
+          "right": 194.90907287597656,
+          "bottom": 614.5587768554688,
+          "left": 165.07530212402344
+        },
+        "workspace": {
+          "x": 30.5625,
+          "y": 20.921875,
+          "width": 298.875,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 329.4375,
+          "bottom": 575.578125,
+          "left": 30.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "reduce",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 189.21875,
+            "y": 729.6875,
+            "width": 33.515625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 222.734375,
+            "bottom": 741.6875,
+            "left": 189.21875
+          },
+          "paint": {
+            "x": 189.21875,
+            "y": 727.6875,
+            "width": 33.515625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 222.734375,
+            "bottom": 743.6875,
+            "left": 189.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 195.6875,
+            "y": 729.6875,
+            "width": 20.578125,
+            "height": 12,
+            "top": 729.6875,
+            "right": 216.265625,
+            "bottom": 741.6875,
+            "left": 195.6875
+          },
+          "paint": {
+            "x": 195.6875,
+            "y": 727.6875,
+            "width": 20.578125,
+            "height": 16,
+            "top": 727.6875,
+            "right": 216.265625,
+            "bottom": 743.6875,
+            "left": 195.6875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 175.40625,
+            "y": 729.6875,
+            "width": 61.140625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 236.546875,
+            "bottom": 741.6875,
+            "left": 175.40625
+          },
+          "paint": {
+            "x": 175.40625,
+            "y": 727.6875,
+            "width": 61.140625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 236.546875,
+            "bottom": 743.6875,
+            "left": 175.40625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 162.796875,
+          "y": 722.140625,
+          "width": 86.359375,
+          "height": 52.21875,
+          "top": 722.140625,
+          "right": 249.15625,
+          "bottom": 774.359375,
+          "left": 162.796875
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 189.21875,
+            "y": 729.6875,
+            "width": 33.515625,
+            "height": 12,
+            "top": 729.6875,
+            "right": 222.734375,
+            "bottom": 741.6875,
+            "left": 189.21875
+          },
+          "paint": {
+            "x": 189.21875,
+            "y": 727.6875,
+            "width": 33.515625,
+            "height": 16,
+            "top": 727.6875,
+            "right": 222.734375,
+            "bottom": 743.6875,
+            "left": 189.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 165.796875,
+              "y": 748.25,
+              "width": 40.171875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 205.96875,
+              "bottom": 773.359375,
+              "left": 165.796875
+            },
+            "effectiveCenterWidth": 39,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 205.96875,
+              "y": 748.25,
+              "width": 40.1875,
+              "height": 25.109375,
+              "top": 748.25,
+              "right": 246.15625,
+              "bottom": 773.359375,
+              "left": 205.96875
+            },
+            "effectiveCenterWidth": 40,
+            "effectiveCenterHeight": 25,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 16.484375,
+          "y": 10.015625,
+          "width": 379.03125,
+          "height": 667.953125,
+          "top": 10.015625,
+          "right": 395.515625,
+          "bottom": 677.96875,
+          "left": 16.484375
+        },
+        "crystal": {
+          "x": 188.92066955566406,
+          "y": 677.9615478515625,
+          "width": 34.143035888671875,
+          "height": 32.1346435546875,
+          "top": 677.9615478515625,
+          "right": 223.06370544433594,
+          "bottom": 710.09619140625,
+          "left": 188.92066955566406
+        },
+        "workspace": {
+          "x": 34.5625,
+          "y": 20.921875,
+          "width": 342.875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 377.4375,
+          "bottom": 667.0625,
+          "left": 34.5625
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "reduce",
+    "states": [
+      {
+        "mode": "0",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 943.21875,
+            "y": 826.40625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 976.734375,
+            "bottom": 838.40625,
+            "left": 943.21875
+          },
+          "paint": {
+            "x": 943.21875,
+            "y": 824.40625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 976.734375,
+            "bottom": 840.40625,
+            "left": 943.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "1",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "A-Z",
+          "font": "12px",
+          "rect": {
+            "x": 949.6875,
+            "y": 826.40625,
+            "width": 20.578125,
+            "height": 12,
+            "top": 826.40625,
+            "right": 970.265625,
+            "bottom": 838.40625,
+            "left": 949.6875
+          },
+          "paint": {
+            "x": 949.6875,
+            "y": 824.40625,
+            "width": 20.578125,
+            "height": 16,
+            "top": 824.40625,
+            "right": 970.265625,
+            "bottom": 840.40625,
+            "left": 949.6875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "2",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "CATEGORY",
+          "font": "12px",
+          "rect": {
+            "x": 929.40625,
+            "y": 826.40625,
+            "width": 61.140625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 990.546875,
+            "bottom": 838.40625,
+            "left": 929.40625
+          },
+          "paint": {
+            "x": 929.40625,
+            "y": 824.40625,
+            "width": 61.140625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 990.546875,
+            "bottom": 840.40625,
+            "left": 929.40625
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      },
+      {
+        "mode": "3",
+        "selector": {
+          "x": 886.890625,
+          "y": 809.8125,
+          "width": 146.1875,
+          "height": 88.390625,
+          "top": 809.8125,
+          "right": 1033.078125,
+          "bottom": 898.203125,
+          "left": 886.890625
+        },
+        "selectorCornersInFace": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "label": {
+          "text": "TEAM",
+          "font": "12px",
+          "rect": {
+            "x": 943.21875,
+            "y": 826.40625,
+            "width": 33.515625,
+            "height": 12,
+            "top": 826.40625,
+            "right": 976.734375,
+            "bottom": 838.40625,
+            "left": 943.21875
+          },
+          "paint": {
+            "x": 943.21875,
+            "y": 824.40625,
+            "width": 33.515625,
+            "height": 16,
+            "top": 824.40625,
+            "right": 976.734375,
+            "bottom": 840.40625,
+            "left": 943.21875
+          }
+        },
+        "buttons": [
+          {
+            "label": "Previous archive mode",
+            "rect": {
+              "x": 889.890625,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 959.984375,
+              "bottom": 897.203125,
+              "left": 889.890625
+            },
+            "effectiveCenterWidth": 69,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": false,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          },
+          {
+            "label": "Next archive mode",
+            "rect": {
+              "x": 959.984375,
+              "y": 854,
+              "width": 70.09375,
+              "height": 43.203125,
+              "top": 854,
+              "right": 1030.078125,
+              "bottom": 897.203125,
+              "left": 959.984375
+            },
+            "effectiveCenterWidth": 70,
+            "effectiveCenterHeight": 43,
+            "corners": [
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              },
+              {
+                "hit": true,
+                "inFace": true
+              }
+            ]
+          }
+        ],
+        "screen": {
+          "x": 76.8046875,
+          "y": 63.015625,
+          "width": 1766.390625,
+          "height": 672,
+          "top": 63.015625,
+          "right": 1843.1953125,
+          "bottom": 735.015625,
+          "left": 76.8046875
+        },
+        "crystal": {
+          "x": 931.0999755859375,
+          "y": 735.0125122070312,
+          "width": 57.800048828125,
+          "height": 54.39996337890625,
+          "top": 735.0125122070312,
+          "right": 988.9000244140625,
+          "bottom": 789.4124755859375,
+          "left": 931.0999755859375
+        },
+        "workspace": {
+          "x": 150.3671875,
+          "y": 76.015625,
+          "width": 1619.265625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1769.6328125,
+          "bottom": 722.015625,
+          "left": 150.3671875
+        },
+        "workspaceCornersSafe": [
+          true,
+          true,
+          true,
+          true
+        ],
+        "overflow": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,398 @@
+[
+  {
+    "width": 360,
+    "height": 800,
+    "screen": {
+      "x": 14.40625,
+      "y": 10.015625,
+      "width": 331.1875,
+      "height": 576.46875,
+      "top": 10.015625,
+      "right": 345.59375,
+      "bottom": 586.484375,
+      "left": 14.40625
+    },
+    "crystal": {
+      "x": 165.07530212402344,
+      "y": 586.4799194335938,
+      "width": 29.833770751953125,
+      "height": 28.078857421875,
+      "top": 586.4799194335938,
+      "right": 194.90907287597656,
+      "bottom": 614.5587768554688,
+      "left": 165.07530212402344
+    },
+    "screenCss": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "matrix(1, 0, 0, 1, -165.594, 0)",
+      "overflow": "hidden",
+      "background": "repeating-linear-gradient(90deg, rgba(255, 112, 58, 0.08) 0px, rgba(255, 112, 58, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px), linear-gradient(rgba(255, 92, 42, 0.16), rgba(96, 22, 10, 0.08))",
+      "mask": "none"
+    },
+    "before": {
+      "clipPath": "none",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(255, 184, 128, 0.14), rgba(0, 0, 0, 0)), repeating-linear-gradient(0deg, rgba(255, 122, 62, 0.08) 0px, rgba(255, 122, 62, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 22px)",
+      "mask": "none"
+    },
+    "after": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "none",
+      "mask": "none"
+    },
+    "workspace": [
+      {
+        "class": "hall-of-champions-workspace hall-of-champions-workspace--search",
+        "hidden": false,
+        "rect": {
+          "x": 25.3125,
+          "y": 20.921875,
+          "width": 309.375,
+          "height": 554.65625,
+          "top": 20.921875,
+          "right": 334.6875,
+          "bottom": 575.578125,
+          "left": 25.3125
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "screen": {
+      "x": 16.484375,
+      "y": 10.015625,
+      "width": 379.03125,
+      "height": 667.953125,
+      "top": 10.015625,
+      "right": 395.515625,
+      "bottom": 677.96875,
+      "left": 16.484375
+    },
+    "crystal": {
+      "x": 188.92066955566406,
+      "y": 677.9615478515625,
+      "width": 34.143035888671875,
+      "height": 32.1346435546875,
+      "top": 677.9615478515625,
+      "right": 223.06370544433594,
+      "bottom": 710.09619140625,
+      "left": 188.92066955566406
+    },
+    "screenCss": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "matrix(1, 0, 0, 1, -189.516, 0)",
+      "overflow": "hidden",
+      "background": "repeating-linear-gradient(90deg, rgba(255, 112, 58, 0.08) 0px, rgba(255, 112, 58, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px), linear-gradient(rgba(255, 92, 42, 0.16), rgba(96, 22, 10, 0.08))",
+      "mask": "none"
+    },
+    "before": {
+      "clipPath": "none",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(255, 184, 128, 0.14), rgba(0, 0, 0, 0)), repeating-linear-gradient(0deg, rgba(255, 122, 62, 0.08) 0px, rgba(255, 122, 62, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 22px)",
+      "mask": "none"
+    },
+    "after": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "none",
+      "mask": "none"
+    },
+    "workspace": [
+      {
+        "class": "hall-of-champions-workspace hall-of-champions-workspace--search",
+        "hidden": false,
+        "rect": {
+          "x": 27.390625,
+          "y": 20.921875,
+          "width": 357.21875,
+          "height": 646.140625,
+          "top": 20.921875,
+          "right": 384.609375,
+          "bottom": 667.0625,
+          "left": 27.390625
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      }
+    ],
+    "overflow": false
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "screen": {
+      "x": 76.8046875,
+      "y": 63.015625,
+      "width": 1766.390625,
+      "height": 672,
+      "top": 63.015625,
+      "right": 1843.1953125,
+      "bottom": 735.015625,
+      "left": 76.8046875
+    },
+    "crystal": {
+      "x": 931.0999755859375,
+      "y": 735.0125122070312,
+      "width": 57.800048828125,
+      "height": 54.39996337890625,
+      "top": 735.0125122070312,
+      "right": 988.9000244140625,
+      "bottom": 789.4124755859375,
+      "left": 931.0999755859375
+    },
+    "screenCss": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "matrix(1, 0, 0, 1, -883.195, 0)",
+      "overflow": "hidden",
+      "background": "repeating-linear-gradient(90deg, rgba(255, 112, 58, 0.08) 0px, rgba(255, 112, 58, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 18px), linear-gradient(rgba(255, 92, 42, 0.16), rgba(96, 22, 10, 0.08))",
+      "mask": "none"
+    },
+    "before": {
+      "clipPath": "none",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(255, 184, 128, 0.14), rgba(0, 0, 0, 0)), repeating-linear-gradient(0deg, rgba(255, 122, 62, 0.08) 0px, rgba(255, 122, 62, 0.08) 1px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0) 22px)",
+      "mask": "none"
+    },
+    "after": {
+      "clipPath": "polygon(4% 0px, 96% 0px, 100% 100%, 0px 100%)",
+      "transform": "none",
+      "overflow": "visible",
+      "background": "none",
+      "mask": "none"
+    },
+    "workspace": [
+      {
+        "class": "hall-of-champions-workspace hall-of-champions-workspace--search",
+        "hidden": false,
+        "rect": {
+          "x": 89.8046875,
+          "y": 76.015625,
+          "width": 1740.390625,
+          "height": 646,
+          "top": 76.015625,
+          "right": 1830.1953125,
+          "bottom": 722.015625,
+          "left": 89.8046875
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      },
+      {
+        "class": "hall-of-champions-workspace",
+        "hidden": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "css": {
+          "clipPath": "none",
+          "transform": "none",
+          "overflow": "visible",
+          "background": "none",
+          "mask": "none"
+        }
+      }
+    ],
+    "overflow": false
+  }
+]

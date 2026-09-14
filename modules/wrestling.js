@@ -11372,10 +11372,10 @@ function syncHallOfChampionsProjectionGeometry(prototypeShell) {
   if (pedestal) {
     const pedestalRect = pedestal.getBoundingClientRect();
     if (pedestalRect.width > 0 && pedestalRect.height > 0) {
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * 0.31)}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.614)}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * 0.38}px`);
-      prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * 0.138}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-left", `${pedestalRect.left + (pedestalRect.width * (234 / 640))}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-top", `${pedestalRect.top + (pedestalRect.height * (300 / 520))}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-width", `${pedestalRect.width * (172 / 640)}px`);
+      prototypeShell.style.setProperty("--hall-champions-mode-selector-height", `${pedestalRect.height * (104 / 520)}px`);
       prototypeShell.style.setProperty("--hall-champions-letter-selector-center", `${pedestalRect.left + (pedestalRect.width * 0.5)}px`);
       prototypeShell.style.setProperty("--hall-champions-letter-selector-top", `${pedestalRect.top + (pedestalRect.height * 0.835)}px`);
       prototypeShell.style.setProperty("--hall-champions-letter-selector-width", `${pedestalRect.width * 0.5}px`);

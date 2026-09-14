@@ -29782,3 +29782,30 @@ button.hall-crusades-archive-crystal:focus-visible {
   outline: 2px solid #ffb18a;
   outline-offset: 2px;
 }
+
+/* Keep Hall controls and content inside their existing decorative faces. */
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(16px, 1fr) minmax(24px, 1fr);
+  padding: 0 2px;
+  clip-path: none;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__readout {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  font-family: "Rajdhani", "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control {
+  grid-row: 2;
+  min-height: 24px;
+}
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control--previous { grid-column: 1; }
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector__control--next { grid-column: 2; }
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector::before { inset-block-start: 2px; }
+.wrestling-people-prototype-shell .hall-of-champions-mode-selector::after { inset-block-end: 2px; }
+.wrestling-people-prototype-shell .hall-of-champions-workspace {
+  inset-inline: calc(4% + 2px);
+}
