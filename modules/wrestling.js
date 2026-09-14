@@ -15170,6 +15170,27 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
   setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", pending ? "PENDING" : WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
   setWrestlingPersonDossierPrototypeMetadataItems(workspace, null);
 }
+function getWrestlingPersonDossierPrototypeRecordRequest(context, cacheKey) {
+  let rawRequest = wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey);
+  if (!rawRequest) {
+    rawRequest = new Promise((resolve) => resolve(withWrestlingRequestTimeout(fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
+       headers: { Accept: "application/json" },
+    }), null, WRESTLING_PEOPLE_TIMEOUT_MS, context.displayName)))
+      .then((response) => {
+        if (!response.ok) throw new Error("Person archive request failed: " + response.status + " " + response.statusText);
+        return response.json();
+      }).then((payload) => {
+        const result = findWrestlingPersonDossierPrototypeSelectedPersonRecord(payload, context);
+        if (result) setWrestlingPersonDossierPrototypeCachedRecord(result, context, cacheKey);
+        return result;
+      }).finally(() => {
+        if (wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey) === rawRequest) wrestlingPersonDossierPrototypeRecordRequests.delete(cacheKey);
+      });
+    wrestlingPersonDossierPrototypeRecordRequests.set(cacheKey, rawRequest);
+  }
+  return rawRequest;
+}
+
 function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestlingPersonDossierPrototypeShell) {
   const activation = wrestlingPersonDossierActivation;
   if (!isCurrentWrestlingPersonDossierRequest("", activation)) return Promise.resolve(null);
@@ -15201,23 +15222,7 @@ function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestli
   state.requestKey = requestKey;
   state.requestActivation = activation;
   renderWrestlingPersonDossierPrototypeSelectedPersonState(shell);
-  let rawRequest = wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey);
-  if (!rawRequest) {
-    rawRequest = Promise.resolve().then(() => withWrestlingRequestTimeout(fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
-       headers: { Accept: "application/json" },
-    }), null, WRESTLING_PEOPLE_TIMEOUT_MS, context.displayName))
-      .then((response) => {
-        if (!response.ok) throw new Error("Person archive request failed: " + response.status + " " + response.statusText);
-        return response.json();
-      }).then((payload) => {
-        const result = findWrestlingPersonDossierPrototypeSelectedPersonRecord(payload, context);
-        if (result) setWrestlingPersonDossierPrototypeCachedRecord(result, context, requestKey);
-        return result;
-      }).finally(() => {
-        if (wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey) === rawRequest) wrestlingPersonDossierPrototypeRecordRequests.delete(cacheKey);
-      });
-    wrestlingPersonDossierPrototypeRecordRequests.set(cacheKey, rawRequest);
-  }
+  const rawRequest = getWrestlingPersonDossierPrototypeRecordRequest(context, cacheKey);
   const ownsRequest = () => isCurrentWrestlingPersonDossierRequest(requestKey, activation) &&
     state.requestKey === requestKey && state.requestPromise === consumer;
   const consumer = rawRequest.then((result) => {
@@ -15476,6 +15481,17 @@ function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
     routeKey: getActiveWrestlingPersonDossierRequestKey(), requestKeys: new Set(),
   } : null;
   wrestlingPersonDossierActivation = activation;
+  if (isActive) {
+    const context = setWrestlingPersonDossierPrototypeSelectedSubject(subject || {});
+    const requestKey = context.stableId || context.normalizedDisplayName;
+    const state = wrestlingPersonDossierPrototypeSelectedPersonState;
+    // Begin the same authoritative request before constructing or measuring the dossier.
+    if (isCurrentWrestlingPersonDossierRequest("", activation) &&
+      !(["loaded", "empty"].includes(state.status) && state.requestKey === requestKey) &&
+      !getWrestlingPersonDossierPrototypeCachedRecord(context, requestKey)) {
+      getWrestlingPersonDossierPrototypeRecordRequest(context, requestKey);
+    }
+  }
   const shellElement = document.querySelector(".site-shell");
   const prototypeShell = isActive
     ? getWrestlingPersonDossierPrototypeShell()
@@ -15523,7 +15539,6 @@ function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
       bindWrestlingPersonDossierPrototypeMetadataResize();
       bindWrestlingPersonDossierPrototypeEventHistoryInteractions(prototypeShell);
       syncHallOfChampionsProjectionGeometry(prototypeShell);
-      setWrestlingPersonDossierPrototypeSelectedSubject(subject || {});
       if (wrestlingPersonDossierPrototypeEventHistoryState.status === "idle") {
         renderWrestlingPersonDossierPrototypeEventHistoryState(prototypeShell);
       }

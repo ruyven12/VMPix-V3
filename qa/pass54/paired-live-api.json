@@ -1,0 +1,266 @@
+[
+  {
+    "pair": 0,
+    "slug": "aaron-rourke",
+    "version": "before",
+    "a": {
+      "shell": 465.1000000014901,
+      "core": 965.8000000007451,
+      "timeline": 965.8000000007451
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 453.5,
+        "end": 625.6000000014901
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 629,
+        "end": 744.6000000014901
+      }
+    ]
+  },
+  {
+    "pair": 0,
+    "slug": "aaron-rourke",
+    "version": "after",
+    "a": {
+      "shell": 495.19999999925494,
+      "core": 551.3000000007451,
+      "timeline": 796.4000000022352
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 406.6000000014901,
+        "end": 535.6000000014901
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 541.4000000022352,
+        "end": 707.6999999992549
+      }
+    ]
+  },
+  {
+    "pair": 0,
+    "slug": "ace-romero",
+    "version": "before",
+    "a": {
+      "shell": 511.30000000074506,
+      "core": 624.8000000007451,
+      "timeline": 729.5
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 508.3999999985099,
+        "end": 595.8000000007451
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 620.8000000007451,
+        "end": 712.3999999985099
+      }
+    ]
+  },
+  {
+    "pair": 0,
+    "slug": "ace-romero",
+    "version": "after",
+    "a": {
+      "shell": 506.3999999985099,
+      "core": 539,
+      "timeline": 737
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 405.79999999701977,
+        "end": 488
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 537.7999999970198,
+        "end": 618.5
+      }
+    ]
+  },
+  {
+    "pair": 1,
+    "slug": "aaron-rourke",
+    "version": "before",
+    "a": {
+      "shell": 564.1999999992549,
+      "core": 700.1999999992549,
+      "timeline": 834.6000000014901
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 561.3000000007451,
+        "end": 673.9000000022352
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 689,
+        "end": 777
+      }
+    ]
+  },
+  {
+    "pair": 1,
+    "slug": "aaron-rourke",
+    "version": "after",
+    "a": {
+      "shell": 590.9000000022352,
+      "core": 636.1000000014901,
+      "timeline": 801.3000000007451
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 485.4000000022352,
+        "end": 585.6000000014901
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 626,
+        "end": 706.4000000022352
+      }
+    ]
+  },
+  {
+    "pair": 1,
+    "slug": "ace-romero",
+    "version": "before",
+    "a": {
+      "shell": 648.6999999992549,
+      "core": 789.3999999985099,
+      "timeline": 899.1999999992549
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 633,
+        "end": 734.1000000014901
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 740.8000000007451,
+        "end": 815.8000000007451
+      }
+    ]
+  },
+  {
+    "pair": 1,
+    "slug": "ace-romero",
+    "version": "after",
+    "a": {
+      "shell": 514.1999999992549,
+      "core": 565.8000000007451,
+      "timeline": 714.6999999992549
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 408.69999999925494,
+        "end": 518.8999999985099
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 555.5,
+        "end": 632.1999999992549
+      }
+    ]
+  },
+  {
+    "pair": 2,
+    "slug": "aaron-rourke",
+    "version": "before",
+    "a": {
+      "shell": 526.0999999977648,
+      "core": 628.6999999992549,
+      "timeline": 734.7999999970198
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 518.3999999985099,
+        "end": 620
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 626.6999999992549,
+        "end": 725.7999999970198
+      }
+    ]
+  },
+  {
+    "pair": 2,
+    "slug": "aaron-rourke",
+    "version": "after",
+    "a": {
+      "shell": 447.30000000074506,
+      "core": 488.80000000074506,
+      "timeline": 580.8000000007451
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+rourke&limit=25&page=1",
+        "start": 366.6000000014901,
+        "end": 450.5
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+rourke&sort=date&dir=desc&limit=100&page=1",
+        "start": 474.9000000022352,
+        "end": 550.3000000007451
+      }
+    ]
+  },
+  {
+    "pair": 2,
+    "slug": "ace-romero",
+    "version": "before",
+    "a": {
+      "shell": 449.5999999977648,
+      "core": 538.0999999977648,
+      "timeline": 671.0999999977648
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 443.29999999701977,
+        "end": 530.1999999992549
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 532.5999999977648,
+        "end": 618.2999999970198
+      }
+    ]
+  },
+  {
+    "pair": 2,
+    "slug": "ace-romero",
+    "version": "after",
+    "a": {
+      "shell": 470.29999999701977,
+      "core": 494.79999999701977,
+      "timeline": 601.0999999977648
+    },
+    "net": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=ace+romero&limit=25&page=1",
+        "start": 399.79999999701977,
+        "end": 480.19999999925494
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=ace+romero&sort=date&dir=desc&limit=100&page=1",
+        "start": 494.0999999977648,
+        "end": 569.5
+      }
+    ]
+  }
+]
