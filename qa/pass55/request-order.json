@@ -1,0 +1,26 @@
+[
+  {
+    "version": "before",
+    "slug": "aaron-rourke",
+    "activationToFetch": 0.7999999970197678,
+    "fetchBeforeFit": 49.900000002235174
+  },
+  {
+    "version": "before",
+    "slug": "ace-romero",
+    "activationToFetch": 0.5,
+    "fetchBeforeFit": 49.599999997764826
+  },
+  {
+    "version": "after",
+    "slug": "aaron-rourke",
+    "activationToFetch": 0.6000000014901161,
+    "fetchBeforeFit": 49.19999999925494
+  },
+  {
+    "version": "after",
+    "slug": "ace-romero",
+    "activationToFetch": 0.5,
+    "fetchBeforeFit": 52.599999997764826
+  }
+]

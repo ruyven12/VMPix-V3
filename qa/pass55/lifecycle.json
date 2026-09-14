@@ -1,0 +1,116 @@
+[
+  {
+    "width": 360,
+    "motion": "no-preference",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  },
+  {
+    "width": 360,
+    "motion": "reduce",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  },
+  {
+    "width": 412,
+    "motion": "no-preference",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  },
+  {
+    "width": 412,
+    "motion": "reduce",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "motion": "no-preference",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "motion": "reduce",
+    "counts": {
+      "aaron": 2,
+      "ace": 1,
+      "history": 1
+    },
+    "back": {
+      "same": true,
+      "query": "Aaron",
+      "focus": "Open Aaron Rourke dossier",
+      "pedestal": true
+    },
+    "warm": "Aaron Rourke",
+    "staleGuard": true,
+    "retry": true,
+    "errors": []
+  }
+]

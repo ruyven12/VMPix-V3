@@ -13294,41 +13294,60 @@ function setWrestlingPersonDossierPrototypeStatusItem(scope, key, value) {
   }
 }
 
+const wrestlingPersonDossierPrototypeFitCache = new WeakMap();
+let wrestlingPersonDossierPrototypeFitFontRevision = 0;
+document.fonts?.addEventListener("loadingdone", () => { wrestlingPersonDossierPrototypeFitFontRevision += 1; });
+
 function fitWrestlingPersonDossierPrototypeMetadataValues(scope) {
   const valueElements = scope?.querySelectorAll("[data-wrestling-person-dossier-prototype-metadata-fit], [data-wrestling-person-dossier-prototype-event-fit]");
-  if (!valueElements || valueElements.length === 0) {
-    return;
+  if (!valueElements?.length) return;
+
+  const environment = [window.innerWidth, window.innerHeight, window.devicePixelRatio, document.fonts?.status, wrestlingPersonDossierPrototypeFitFontRevision].join("|");
+  const signature = (element) => {
+    const style = window.getComputedStyle(element);
+    return JSON.stringify([environment, element.textContent, element.clientWidth, element.style.cssText,
+      style.fontFamily, style.fontSize, style.fontWeight, style.fontStyle, style.fontStretch,
+      style.fontVariant, style.letterSpacing, style.wordSpacing, style.lineHeight, style.textTransform]);
+  };
+  // Validate without writing styles, so unchanged fields do not force another fit.
+  const pending = [...valueElements].filter((element) => {
+    const cached = wrestlingPersonDossierPrototypeFitCache.get(element);
+    return !cached || cached !== signature(element);
+  });
+  if (!pending.length) return;
+
+  pending.forEach((element) => {
+    element.style.removeProperty("font-size");
+    element.style.whiteSpace = "nowrap";
+    element.style.overflowWrap = "normal";
+  });
+  const measurements = pending.map((element) => {
+    const width = element.clientWidth;
+    const base = Number.parseFloat(window.getComputedStyle(element).fontSize);
+    return { element, width, low: Math.max(8, base * 0.78), high: base,
+      needsFit: width > 0 && Number.isFinite(base) && element.scrollWidth > width + 1 };
+  });
+  const fitting = measurements.filter((item) => item.needsFit);
+  // Keep the original seven-step search, with all writes before each round of reads.
+  for (let index = 0; index < 7 && fitting.length; index += 1) {
+    fitting.forEach((item) => {
+      item.midpoint = (item.low + item.high) / 2;
+      item.element.style.fontSize = item.midpoint + "px";
+    });
+    fitting.forEach((item) => {
+      if (item.element.scrollWidth <= item.width + 1) item.low = item.midpoint;
+      else item.high = item.midpoint;
+    });
   }
-
-  valueElements.forEach((valueElement) => {
-    valueElement.style.removeProperty("font-size");
-    valueElement.style.whiteSpace = "nowrap";
-    valueElement.style.overflowWrap = "normal";
-
-    const availableWidth = valueElement.clientWidth;
-    const baseFontSize = Number.parseFloat(window.getComputedStyle(valueElement).fontSize);
-    if (!availableWidth || !Number.isFinite(baseFontSize) || valueElement.scrollWidth <= availableWidth + 1) {
-      return;
-    }
-
-    const minFontSize = Math.max(8, baseFontSize * 0.78);
-    let low = minFontSize;
-    let high = baseFontSize;
-    for (let index = 0; index < 7; index += 1) {
-      const midpoint = (low + high) / 2;
-      valueElement.style.fontSize = `${midpoint}px`;
-      if (valueElement.scrollWidth <= availableWidth + 1) {
-        low = midpoint;
-      } else {
-        high = midpoint;
-      }
-    }
-
-    valueElement.style.fontSize = `${low}px`;
-    if (valueElement.scrollWidth > availableWidth + 1) {
-      valueElement.style.whiteSpace = "normal";
-      valueElement.style.overflowWrap = "anywhere";
-    }
+  fitting.forEach((item) => { item.element.style.fontSize = item.low + "px"; });
+  const wrapping = fitting.filter((item) => item.element.scrollWidth > item.width + 1);
+  wrapping.forEach(({ element }) => {
+    element.style.whiteSpace = "normal";
+    element.style.overflowWrap = "anywhere";
+  });
+  measurements.forEach(({ element, width }) => {
+    if (width) wrestlingPersonDossierPrototypeFitCache.set(element, signature(element));
+    else wrestlingPersonDossierPrototypeFitCache.delete(element);
   });
 }
 
