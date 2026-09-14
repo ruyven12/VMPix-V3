@@ -1,0 +1,290 @@
+[
+  {
+    "width": 360,
+    "pedestal": {
+      "x": 39.59375,
+      "y": 493.46875,
+      "width": 280.796875,
+      "height": 228.140625,
+      "top": 493.46875,
+      "right": 320.390625,
+      "bottom": 721.609375,
+      "left": 39.59375
+    },
+    "upper": {
+      "x": 126.640625,
+      "y": 633.546875,
+      "width": 106.6875,
+      "height": 31.46875,
+      "top": 633.546875,
+      "right": 233.328125,
+      "bottom": 665.015625,
+      "left": 126.640625
+    },
+    "upperInner": {
+      "x": 143.625,
+      "y": 634.546875,
+      "width": 72.71875,
+      "height": 29.46875,
+      "top": 634.546875,
+      "right": 216.34375,
+      "bottom": 664.015625,
+      "left": 143.625
+    },
+    "lower": {
+      "x": 80.3046875,
+      "y": 675.640625,
+      "width": 199.359375,
+      "height": 20.390625,
+      "top": 675.640625,
+      "right": 279.6640625,
+      "bottom": 696.03125,
+      "left": 80.3046875
+    },
+    "lowerInner": {
+      "x": 109.4921875,
+      "y": 676.640625,
+      "width": 140.984375,
+      "height": 18.390625,
+      "top": 676.640625,
+      "right": 250.4765625,
+      "bottom": 695.03125,
+      "left": 109.4921875
+    },
+    "hologram": {
+      "x": 14.40625,
+      "y": 10.015625,
+      "width": 331.1875,
+      "height": 576.46875,
+      "top": 10.015625,
+      "right": 345.59375,
+      "bottom": 586.484375,
+      "left": 14.40625
+    },
+    "engineTop": 728.34375,
+    "upperFont": "7.36px",
+    "categoryFont": "6.88px",
+    "long": {
+      "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+      "rect": {
+        "x": 109.4921875,
+        "y": 676.640625,
+        "width": 140.984375,
+        "height": 18.390625,
+        "top": 676.640625,
+        "right": 250.4765625,
+        "bottom": 695.03125,
+        "left": 109.4921875
+      },
+      "paint": {
+        "x": 110.1171875,
+        "y": 680.390625,
+        "width": 247.171875,
+        "height": 9,
+        "top": 680.390625,
+        "right": 357.2890625,
+        "bottom": 689.390625,
+        "left": 110.1171875
+      },
+      "font": "6.88px",
+      "transform": "none",
+      "scrollWidth": 248,
+      "clientWidth": 141
+    },
+    "frameCount": 66,
+    "maxFrameGap": 33.40000000000009,
+    "settledAnchorError": 0.00445556640625
+  },
+  {
+    "width": 412,
+    "pedestal": {
+      "x": 45.3125,
+      "y": 571.515625,
+      "width": 321.359375,
+      "height": 261.09375,
+      "top": 571.515625,
+      "right": 366.671875,
+      "bottom": 832.609375,
+      "left": 45.3125
+    },
+    "upper": {
+      "x": 144.921875,
+      "y": 731.8125,
+      "width": 122.109375,
+      "height": 36.015625,
+      "top": 731.8125,
+      "right": 267.03125,
+      "bottom": 767.828125,
+      "left": 144.921875
+    },
+    "upperInner": {
+      "x": 161.90625,
+      "y": 732.8125,
+      "width": 88.140625,
+      "height": 34.015625,
+      "top": 732.8125,
+      "right": 250.046875,
+      "bottom": 766.828125,
+      "left": 161.90625
+    },
+    "lower": {
+      "x": 91.90625,
+      "y": 781.203125,
+      "width": 228.15625,
+      "height": 23.34375,
+      "top": 781.203125,
+      "right": 320.0625,
+      "bottom": 804.546875,
+      "left": 91.90625
+    },
+    "lowerInner": {
+      "x": 125.21875,
+      "y": 782.203125,
+      "width": 161.53125,
+      "height": 21.34375,
+      "top": 782.203125,
+      "right": 286.75,
+      "bottom": 803.546875,
+      "left": 125.21875
+    },
+    "hologram": {
+      "x": 16.484375,
+      "y": 10.015625,
+      "width": 379.03125,
+      "height": 667.953125,
+      "top": 10.015625,
+      "right": 395.515625,
+      "bottom": 677.96875,
+      "left": 16.484375
+    },
+    "engineTop": 834.375,
+    "upperFont": "7.36px",
+    "categoryFont": "6.88px",
+    "long": {
+      "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+      "rect": {
+        "x": 125.21875,
+        "y": 782.203125,
+        "width": 161.53125,
+        "height": 21.34375,
+        "top": 782.203125,
+        "right": 286.75,
+        "bottom": 803.546875,
+        "left": 125.21875
+      },
+      "paint": {
+        "x": 125.84375,
+        "y": 787.4375,
+        "width": 247.171875,
+        "height": 9,
+        "top": 787.4375,
+        "right": 373.015625,
+        "bottom": 796.4375,
+        "left": 125.84375
+      },
+      "font": "6.88px",
+      "transform": "none",
+      "scrollWidth": 248,
+      "clientWidth": 162
+    },
+    "frameCount": 67,
+    "maxFrameGap": 16.800000000000182,
+    "settledAnchorError": 0.0072021484375
+  },
+  {
+    "width": 1920,
+    "pedestal": {
+      "x": 688,
+      "y": 554.8125,
+      "width": 544,
+      "height": 442,
+      "top": 554.8125,
+      "right": 1232,
+      "bottom": 996.8125,
+      "left": 688
+    },
+    "upper": {
+      "x": 856.625,
+      "y": 826.1875,
+      "width": 206.71875,
+      "height": 60.984375,
+      "top": 826.1875,
+      "right": 1063.34375,
+      "bottom": 887.171875,
+      "left": 856.625
+    },
+    "upperInner": {
+      "x": 881.15625,
+      "y": 827.1875,
+      "width": 157.640625,
+      "height": 58.984375,
+      "top": 827.1875,
+      "right": 1038.796875,
+      "bottom": 886.171875,
+      "left": 881.15625
+    },
+    "lower": {
+      "x": 788,
+      "y": 911.390625,
+      "width": 344,
+      "height": 33.265625,
+      "top": 911.390625,
+      "right": 1132,
+      "bottom": 944.65625,
+      "left": 788
+    },
+    "lowerInner": {
+      "x": 838.25,
+      "y": 912.390625,
+      "width": 243.5,
+      "height": 31.265625,
+      "top": 912.390625,
+      "right": 1081.75,
+      "bottom": 943.65625,
+      "left": 838.25
+    },
+    "hologram": {
+      "x": 76.8046875,
+      "y": 63.015625,
+      "width": 1766.390625,
+      "height": 672,
+      "top": 63.015625,
+      "right": 1843.1953125,
+      "bottom": 735.015625,
+      "left": 76.8046875
+    },
+    "engineTop": 995.546875,
+    "upperFont": "11.52px",
+    "categoryFont": "9.92px",
+    "long": {
+      "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+      "rect": {
+        "x": 838.25,
+        "y": 912.390625,
+        "width": 243.5,
+        "height": 31.265625,
+        "top": 912.390625,
+        "right": 1081.75,
+        "bottom": 943.65625,
+        "left": 838.25
+      },
+      "paint": {
+        "x": 838.875,
+        "y": 921.0625,
+        "width": 356.375,
+        "height": 13,
+        "top": 921.0625,
+        "right": 1195.25,
+        "bottom": 934.0625,
+        "left": 838.875
+      },
+      "font": "9.92px",
+      "transform": "none",
+      "scrollWidth": 357,
+      "clientWidth": 244
+    },
+    "frameCount": 67,
+    "maxFrameGap": 16.800000000000182,
+    "settledAnchorError": 0.00311279296875
+  }
+]

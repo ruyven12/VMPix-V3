@@ -1,0 +1,327 @@
+{
+  "warm": {
+    "count": 296,
+    "state": "live",
+    "complete": false
+  },
+  "category": {
+    "text": "International Championship Wrestling Performers",
+    "font": "6.88px",
+    "client": 162,
+    "scroll": 190,
+    "paint": {
+      "x": 125.84375,
+      "y": 787.4375,
+      "width": 189.046875,
+      "height": 9,
+      "top": 787.4375,
+      "right": 314.890625,
+      "bottom": 796.4375,
+      "left": 125.84375
+    }
+  },
+  "frames": [
+    {
+      "ms": 4.900000000139698,
+      "path": "/wrestling/people",
+      "oldConnected": true,
+      "detail": false,
+      "focus": "BUTTON",
+      "engine": "Hall of Champions"
+    },
+    {
+      "ms": 21.600000000139516,
+      "path": "/wrestling/people",
+      "oldConnected": true,
+      "detail": false,
+      "focus": "BUTTON",
+      "engine": "Hall of Champions"
+    },
+    {
+      "ms": 38.4000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - aaron orion"
+    },
+    {
+      "ms": 105.00000000013961,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - aaron orion"
+    },
+    {
+      "ms": 121.80000000013979,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 205.10000000013952,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 221.8000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 238.5000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 255.20000000013988,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 271.9000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 288.6000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 305.2000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 321.9000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 338.6000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 355.3000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 372.0000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 388.7000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 405.3000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 422.1000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 438.7000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 455.5000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 472.1000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 488.8000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 505.5000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 522.1000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 538.8000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 555.7000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 572.2000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 588.9000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 605.5000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 622.2000000001399,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 638.9000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 655.5000000001396,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 672.3000000001398,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 688.9000000001397,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    },
+    {
+      "ms": 705.6000000001395,
+      "path": "/wrestling/people/aaron-orion",
+      "oldConnected": false,
+      "detail": true,
+      "focus": "BODY",
+      "engine": "Champion Dossier - Aaron Orion"
+    }
+  ],
+  "returned": {
+    "same": false,
+    "focus": "BODY"
+  },
+  "calls": [
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=2&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=3&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=2&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=3&sort=name_asc",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1"
+  ]
+}

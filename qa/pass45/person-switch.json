@@ -1,0 +1,14 @@
+{
+  "switchCalls": [
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+    "https://vmpix-data.onrender.com/api/wrestling/people/db?search=bobby+example&limit=25&page=1",
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=bobby+example&sort=date&dir=desc&limit=100&page=1",
+    "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1"
+  ],
+  "switched": {
+    "url": "/wrestling/people/aaron-orion",
+    "name": "Aaron Orion",
+    "engine": "Champion Dossier - Aaron Orion",
+    "status": "loaded"
+  }
+}

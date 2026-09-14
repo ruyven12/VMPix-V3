@@ -1,0 +1,243 @@
+[
+  {
+    "mode": "empty",
+    "initial": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": null
+    },
+    "final": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive"
+    },
+    "tab": {
+      "inside": true,
+      "label": "Close Event Archive"
+    },
+    "close": {
+      "open": false,
+      "focus": "Open Event",
+      "overflow": ""
+    },
+    "calls": [
+      "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=102922"
+    ]
+  },
+  {
+    "mode": "error",
+    "initial": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n—\n\nPHOTO ARCHIVE UNAVAILABLE",
+      "active": "Close Event Archive"
+    },
+    "final": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n—\n\nPHOTO ARCHIVE UNAVAILABLE",
+      "active": "Close Event Archive"
+    },
+    "tab": {
+      "inside": true,
+      "label": "Close Event Archive"
+    },
+    "close": {
+      "open": false,
+      "focus": "Open Event",
+      "overflow": ""
+    },
+    "calls": [
+      "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=102922"
+    ]
+  },
+  {
+    "mode": "delayed-success",
+    "initial": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n—\n\nPHOTO ARCHIVE INITIALIZING",
+      "active": "Close Event Archive"
+    },
+    "final": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [
+          {
+            "photoId": "qa-one",
+            "image_url": "https://qa.invalid/one.svg",
+            "caption": "Aaron Orion",
+            "label": "Aaron Orion",
+            "thumbnailSrc": "https://qa.invalid/one.svg",
+            "smallSrc": "https://qa.invalid/one.svg",
+            "lightboxSrc": "https://qa.invalid/one.svg",
+            "__wrestlingPersonDossierPrototypeSourceIndex": 0
+          },
+          {
+            "photoId": "qa-two",
+            "image_url": "https://qa.invalid/two.svg",
+            "caption": "Aaron Orion",
+            "label": "Aaron Orion",
+            "thumbnailSrc": "https://qa.invalid/two.svg",
+            "smallSrc": "https://qa.invalid/two.svg",
+            "lightboxSrc": "https://qa.invalid/two.svg",
+            "__wrestlingPersonDossierPrototypeSourceIndex": 1
+          }
+        ],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n2",
+      "active": "Close Event Archive"
+    },
+    "tab": {
+      "inside": true,
+      "label": "Aaron Orion"
+    },
+    "close": {
+      "open": false,
+      "focus": "Open Event",
+      "overflow": ""
+    },
+    "calls": [
+      "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=102922"
+    ]
+  },
+  {
+    "mode": "partial-positive",
+    "initial": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive"
+    },
+    "final": {
+      "state": {
+        "isOpen": true,
+        "trigger": "ref: <Node>",
+        "eventIndex": 0,
+        "photoRequestKey": "52|102922|match-6",
+        "photoRenderItems": [],
+        "photoGalleryPage": 1,
+        "mode": "grid",
+        "selectedPhotoIndex": 0,
+        "photoGridScrollTop": 0,
+        "viewerReturnPhotoIndex": 0,
+        "viewerSwipeStart": null,
+        "viewerImageRequestKey": 2,
+        "closeTimer": 0
+      },
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive"
+    },
+    "tab": {
+      "inside": true,
+      "label": "Close Event Archive"
+    },
+    "close": {
+      "open": false,
+      "focus": "Open Event",
+      "overflow": ""
+    },
+    "calls": [
+      "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+      "https://vmpix-data.onrender.com/api/wrestling/shows/db?limit=5&page=1&include_photos=1&search=102922"
+    ]
+  }
+]

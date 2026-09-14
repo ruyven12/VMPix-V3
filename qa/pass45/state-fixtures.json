@@ -1,0 +1,154 @@
+[
+  {
+    "scenario": "delayed-leave",
+    "before": {
+      "url": "/wrestling/people",
+      "title": "Hall of Champions - Voodoo Media V3.0.01",
+      "engine": "Hall of Champions",
+      "identity": "loading",
+      "history": "idle",
+      "hall": "live",
+      "text": "\n    \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n      \n      \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n      \n    \n    \n      \n      \n      \n        Interact\n      \n    \n    \n      \n      \n      \n    \n    \n      \n      \n      \n      \n    \n    \n      \n      \n    \n    \n      \n      \n      \n    \n  \n    \n      \n        \n          Identity Header\n          \n            ARCHIVE RECORD INITIALIZING\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Portrait Signal Reserved\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              ARCHIVE RECORD INITIALIZING\n            \n            \n              Photos\n              NOT YET INDEXED\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              N/A\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of -- archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Event History\n                VMP\n              \n              \n                Event History Initializing\n                Date Pending\n                Venue Pending\n                Location Pending\n              \n              \n                Opponent Unlisted\n                VS\n                Selected Person\n                Match Data Pending\n                Result Pending\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    \n  "
+    },
+    "after": {
+      "url": "/wrestling/people",
+      "title": "Champion Dossier - Aaron Orion - Voodoo Media V3.0.01",
+      "engine": "Champion Dossier - Aaron Orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "hall": "live",
+      "text": "\n    \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n      \n      \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n        \n      \n      \n        \n        \n      \n    \n    \n      \n      \n      \n        Interact\n      \n    \n    \n      \n      \n      \n    \n    \n      \n      \n      \n      \n    \n    \n      \n      \n    \n    \n      \n      \n      \n    \n  \n    \n      \n        \n          Identity Header\n          \n            Aaron Orion\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Portrait Signal Reserved\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              computed\n            \n            \n              Photos\n              0\n            \n            \n              Matches\n              1\n            \n            \n              Events\n              1\n            \n            \n              WIN/PATRICIPANT\n              0 / 1\n            \n            \n              Category\n              Performers\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fresh Blood '22\n                VMP\n              \n              \n                Fresh Blood '22\n                October 29th, 2022\n                Yarmouth Amvets\n                Yarmouth, Maine\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Orion\n                Tag Team\n                Participant\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    \n  "
+    },
+    "calls": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+        "time": 1789386886369
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386886909
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=2&sort=name_asc",
+        "time": 1789386886915
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=3&sort=name_asc",
+        "time": 1789386886916
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+        "time": 1789386888178
+      }
+    ]
+  },
+  {
+    "scenario": "sticky-error",
+    "before": {
+      "url": "/wrestling/people/aaron-orion",
+      "title": "Champion Dossier - aaron orion - Voodoo Media V3.0.01",
+      "engine": "Champion Dossier - aaron orion",
+      "identity": "error",
+      "history": "loaded",
+      "hall": "idle",
+      "text": "Interact\n\nIDENTITY HEADER\n\nARCHIVE RECORD UNAVAILABLE\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\nLINK UNAVAILABLE\nPhotos\nNOT YET INDEXED\nMatches\nNOT YET INDEXED\nEvents\nNOT YET INDEXED\nWIN/PATRICIPANT\n0 / 1\nCategory\nN/A\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\naaron orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›"
+    },
+    "after": {
+      "url": "/wrestling/people/aaron-orion",
+      "title": "Champion Dossier - aaron orion - Voodoo Media V3.0.01",
+      "engine": "Champion Dossier - aaron orion",
+      "identity": "error",
+      "history": "loaded",
+      "hall": "live",
+      "text": "Interact\n\nIDENTITY HEADER\n\nARCHIVE RECORD UNAVAILABLE\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\nLINK UNAVAILABLE\nPhotos\nNOT YET INDEXED\nMatches\nNOT YET INDEXED\nEvents\nNOT YET INDEXED\nWIN/PATRICIPANT\n0 / 1\nCategory\nN/A\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\naaron orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›"
+    },
+    "calls": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+        "time": 1789386889857
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+        "time": 1789386889898
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386890745
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=2&sort=name_asc",
+        "time": 1789386890751
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=3&sort=name_asc",
+        "time": 1789386890752
+      }
+    ]
+  },
+  {
+    "scenario": "empty",
+    "after": {
+      "url": "/wrestling/people/aaron-orion",
+      "title": "Champion Dossier - aaron orion - Voodoo Media V3.0.01",
+      "engine": "Champion Dossier - aaron orion",
+      "identity": "empty",
+      "history": "loaded",
+      "hall": "idle",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAARON ORION RECORD NOT FOUND\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\nRECORD NOT FOUND\nPhotos\nNOT YET INDEXED\nMatches\nNOT YET INDEXED\nEvents\nNOT YET INDEXED\nWIN/PATRICIPANT\n0 / 1\nCategory\nN/A\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\naaron orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›"
+    },
+    "calls": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?search=aaron+orion&limit=25&page=1",
+        "time": 1789386891870
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/shows/db?participant=aaron+orion&sort=date&dir=desc&limit=100&page=1",
+        "time": 1789386891962
+      }
+    ]
+  },
+  {
+    "scenario": "hall-error",
+    "after": {
+      "url": "/wrestling/people",
+      "title": "Hall of Champions - Voodoo Media V3.0.01",
+      "engine": "Hall of Champions",
+      "identity": "idle",
+      "history": "idle",
+      "hall": "error",
+      "hallText": "Interact\nALPHABETICAL INDEX\n\nCURRENT INITIAL // A\n\nARCHIVE LINK UNAVAILABLE\n\nARCHIVE LINK UNAVAILABLE\n\n‹\nA-Z\n›\n‹\nA\n›"
+    },
+    "calls": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386893567
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386894747
+      }
+    ]
+  },
+  {
+    "scenario": "hall-empty",
+    "after": {
+      "url": "/wrestling/people",
+      "title": "Hall of Champions - Voodoo Media V3.0.01",
+      "engine": "Hall of Champions",
+      "identity": "idle",
+      "history": "idle",
+      "hall": "empty",
+      "hallText": "Interact\nALPHABETICAL INDEX\n\nCURRENT INITIAL // A\n\n0 RECORDS\n\nNO RECORDS FOUND FOR // A\n\n‹\nA-Z\n›\n‹\nA\n›"
+    },
+    "calls": [
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386895613
+      },
+      {
+        "url": "https://vmpix-data.onrender.com/api/wrestling/people/db?limit=500&page=1&sort=name_asc",
+        "time": 1789386896799
+      }
+    ]
+  }
+]

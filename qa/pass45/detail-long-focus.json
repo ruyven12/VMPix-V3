@@ -1,0 +1,545 @@
+[
+  {
+    "width": 360,
+    "overlap": {
+      "header": {
+        "x": 22.875,
+        "y": 447,
+        "width": 314.25,
+        "height": 11.6875,
+        "top": 447,
+        "right": 337.125,
+        "bottom": 458.6875,
+        "left": 22.875
+      },
+      "title": {
+        "x": 16.15625,
+        "y": 445,
+        "width": 185.6875,
+        "height": 15,
+        "top": 445,
+        "right": 201.84375,
+        "bottom": 460,
+        "left": 16.15625
+      },
+      "count": {
+        "x": 205.359375,
+        "y": 445.78125,
+        "width": 138.484375,
+        "height": 13,
+        "top": 445.78125,
+        "right": 343.84375,
+        "bottom": 458.78125,
+        "left": 205.359375
+      },
+      "font": "11.68px"
+    },
+    "focus": {
+      "text": "Open Event",
+      "open": false
+    },
+    "long": {
+      "nodes": [
+        {
+          "text": "Aaron Orion the International Championship Wrestling Veteran",
+          "font": "18.56px",
+          "rect": {
+            "x": 24.15625,
+            "y": 37.4375,
+            "width": 311.6875,
+            "height": 52.875,
+            "top": 37.4375,
+            "right": 335.84375,
+            "bottom": 90.3125,
+            "left": 24.15625
+          },
+          "paint": {
+            "x": 26.375,
+            "y": 34.4375,
+            "width": 307.25,
+            "height": 58.25,
+            "top": 34.4375,
+            "right": 333.625,
+            "bottom": 92.6875,
+            "left": 26.375
+          },
+          "scroll": 312,
+          "client": 312,
+          "overflow": "visible"
+        },
+        {
+          "text": "WIN/PATRICIPANT",
+          "font": "11.68px",
+          "rect": {
+            "x": 133.1875,
+            "y": 337.0625,
+            "width": 122.40625,
+            "height": 12.265625,
+            "top": 337.0625,
+            "right": 255.59375,
+            "bottom": 349.328125,
+            "left": 133.1875
+          },
+          "paint": {
+            "x": 133.1875,
+            "y": 335.0625,
+            "width": 122.40625,
+            "height": 15,
+            "top": 335.0625,
+            "right": 255.59375,
+            "bottom": 350.0625,
+            "left": 133.1875
+          },
+          "scroll": 122,
+          "client": 122,
+          "overflow": "visible"
+        },
+        {
+          "text": "International Championship Wrestling Performers",
+          "font": "10.8576px",
+          "rect": {
+            "x": 30.953125,
+            "y": 391.28125,
+            "width": 93.609375,
+            "height": 45.5625,
+            "top": 391.28125,
+            "right": 124.5625,
+            "bottom": 436.84375,
+            "left": 30.953125
+          },
+          "paint": {
+            "x": 36.84375,
+            "y": 389.28125,
+            "width": 81.8125,
+            "height": 48.171875,
+            "top": 389.28125,
+            "right": 118.65625,
+            "bottom": 437.453125,
+            "left": 36.84375
+          },
+          "scroll": 94,
+          "client": 94,
+          "overflow": "visible"
+        },
+        {
+          "text": "The International Championship Wrestling Veteran • The Northern Territory Champion",
+          "font": "10.8576px",
+          "rect": {
+            "x": 133.1875,
+            "y": 368.5,
+            "width": 93.609375,
+            "height": 91.125,
+            "top": 368.5,
+            "right": 226.796875,
+            "bottom": 459.625,
+            "left": 133.1875
+          },
+          "paint": {
+            "x": 139.078125,
+            "y": 366.5,
+            "width": 81.8125,
+            "height": 93.734375,
+            "top": 366.5,
+            "right": 220.890625,
+            "bottom": 460.234375,
+            "left": 139.078125
+          },
+          "scroll": 94,
+          "client": 94,
+          "overflow": "visible"
+        },
+        {
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "10.8576px",
+          "rect": {
+            "x": 235.421875,
+            "y": 391.71875,
+            "width": 93.625,
+            "height": 56.953125,
+            "top": 391.71875,
+            "right": 329.046875,
+            "bottom": 448.671875,
+            "left": 235.421875
+          },
+          "paint": {
+            "x": 240.234375,
+            "y": 389.71875,
+            "width": 84,
+            "height": 59.5625,
+            "top": 389.71875,
+            "right": 324.234375,
+            "bottom": 449.28125,
+            "left": 240.234375
+          },
+          "scroll": 94,
+          "client": 94,
+          "overflow": "visible"
+        }
+      ],
+      "pageOverflow": false,
+      "scroll": []
+    }
+  },
+  {
+    "width": 412,
+    "overlap": {
+      "header": {
+        "x": 22.875,
+        "y": 477.953125,
+        "width": 366.25,
+        "height": 11.6875,
+        "top": 477.953125,
+        "right": 389.125,
+        "bottom": 489.640625,
+        "left": 22.875
+      },
+      "title": {
+        "x": 36.125,
+        "y": 475.953125,
+        "width": 185.6875,
+        "height": 15,
+        "top": 475.953125,
+        "right": 221.8125,
+        "bottom": 490.953125,
+        "left": 36.125
+      },
+      "count": {
+        "x": 225.328125,
+        "y": 476.296875,
+        "width": 150.53125,
+        "height": 14,
+        "top": 476.296875,
+        "right": 375.859375,
+        "bottom": 490.296875,
+        "left": 225.328125
+      },
+      "font": "11.68px"
+    },
+    "focus": {
+      "text": "Open Event",
+      "open": false
+    },
+    "long": {
+      "nodes": [
+        {
+          "text": "Aaron Orion the International Championship Wrestling Veteran",
+          "font": "19.776px",
+          "rect": {
+            "x": 24.15625,
+            "y": 37.921875,
+            "width": 363.6875,
+            "height": 37.5625,
+            "top": 37.921875,
+            "right": 387.84375,
+            "bottom": 75.484375,
+            "left": 24.15625
+          },
+          "paint": {
+            "x": 28.765625,
+            "y": 33.921875,
+            "width": 354.46875,
+            "height": 44.78125,
+            "top": 33.921875,
+            "right": 383.234375,
+            "bottom": 78.703125,
+            "left": 28.765625
+          },
+          "scroll": 364,
+          "client": 364,
+          "overflow": "visible"
+        },
+        {
+          "text": "WIN/PATRICIPANT",
+          "font": "11.68px",
+          "rect": {
+            "x": 150.515625,
+            "y": 375.640625,
+            "width": 122.40625,
+            "height": 12.265625,
+            "top": 375.640625,
+            "right": 272.921875,
+            "bottom": 387.90625,
+            "left": 150.515625
+          },
+          "paint": {
+            "x": 150.515625,
+            "y": 373.640625,
+            "width": 122.40625,
+            "height": 15,
+            "top": 373.640625,
+            "right": 272.921875,
+            "bottom": 388.640625,
+            "left": 150.515625
+          },
+          "scroll": 122,
+          "client": 122,
+          "overflow": "visible"
+        },
+        {
+          "text": "International Championship Wrestling Performers",
+          "font": "10.8576px",
+          "rect": {
+            "x": 30.953125,
+            "y": 465.125,
+            "width": 110.9375,
+            "height": 45.5625,
+            "top": 465.125,
+            "right": 141.890625,
+            "bottom": 510.6875,
+            "left": 30.953125
+          },
+          "paint": {
+            "x": 45.515625,
+            "y": 463.125,
+            "width": 81.8125,
+            "height": 48.171875,
+            "top": 463.125,
+            "right": 127.328125,
+            "bottom": 511.296875,
+            "left": 45.515625
+          },
+          "scroll": 111,
+          "client": 111,
+          "overflow": "visible"
+        },
+        {
+          "text": "The International Championship Wrestling Veteran • The Northern Territory Champion",
+          "font": "10.8576px",
+          "rect": {
+            "x": 150.515625,
+            "y": 453.734375,
+            "width": 110.953125,
+            "height": 68.34375,
+            "top": 453.734375,
+            "right": 261.46875,
+            "bottom": 522.078125,
+            "left": 150.515625
+          },
+          "paint": {
+            "x": 151.390625,
+            "y": 451.734375,
+            "width": 109.203125,
+            "height": 70.953125,
+            "top": 451.734375,
+            "right": 260.59375,
+            "bottom": 522.6875,
+            "left": 151.390625
+          },
+          "scroll": 111,
+          "client": 111,
+          "overflow": "visible"
+        },
+        {
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "10.8576px",
+          "rect": {
+            "x": 270.09375,
+            "y": 459.421875,
+            "width": 110.9375,
+            "height": 56.953125,
+            "top": 459.421875,
+            "right": 381.03125,
+            "bottom": 516.375,
+            "left": 270.09375
+          },
+          "paint": {
+            "x": 271.75,
+            "y": 457.421875,
+            "width": 107.609375,
+            "height": 59.5625,
+            "top": 457.421875,
+            "right": 379.359375,
+            "bottom": 516.984375,
+            "left": 271.75
+          },
+          "scroll": 111,
+          "client": 111,
+          "overflow": "visible"
+        }
+      ],
+      "pageOverflow": false,
+      "scroll": []
+    }
+  },
+  {
+    "width": 1920,
+    "overlap": {
+      "header": {
+        "x": 396.1875,
+        "y": 442.953125,
+        "width": 1127.625,
+        "height": 13.921875,
+        "top": 442.953125,
+        "right": 1523.8125,
+        "bottom": 456.875,
+        "left": 396.1875
+      },
+      "title": {
+        "x": 752.078125,
+        "y": 439.953125,
+        "width": 221.296875,
+        "height": 18,
+        "top": 439.953125,
+        "right": 973.375,
+        "bottom": 457.953125,
+        "left": 752.078125
+      },
+      "count": {
+        "x": 986.171875,
+        "y": 441.265625,
+        "width": 181.734375,
+        "height": 17,
+        "top": 441.265625,
+        "right": 1167.90625,
+        "bottom": 458.265625,
+        "left": 986.171875
+      },
+      "font": "13.92px"
+    },
+    "focus": {
+      "text": "Open Event",
+      "open": false
+    },
+    "long": {
+      "nodes": [
+        {
+          "text": "Aaron Orion the International Championship Wrestling Veteran",
+          "font": "32.8px",
+          "rect": {
+            "x": 396.1875,
+            "y": 51.984375,
+            "width": 1127.625,
+            "height": 62.3125,
+            "top": 51.984375,
+            "right": 1523.8125,
+            "bottom": 114.296875,
+            "left": 396.1875
+          },
+          "paint": {
+            "x": 467.5,
+            "y": 46.984375,
+            "width": 984.984375,
+            "height": 72.15625,
+            "top": 46.984375,
+            "right": 1452.484375,
+            "bottom": 119.140625,
+            "left": 467.5
+          },
+          "scroll": 1128,
+          "client": 1128,
+          "overflow": "visible"
+        },
+        {
+          "text": "WIN/PATRICIPANT",
+          "font": "13.92px",
+          "rect": {
+            "x": 1135.734375,
+            "y": 288.03125,
+            "width": 183.4375,
+            "height": 14.609375,
+            "top": 288.03125,
+            "right": 1319.171875,
+            "bottom": 302.640625,
+            "left": 1135.734375
+          },
+          "paint": {
+            "x": 1154.515625,
+            "y": 286.03125,
+            "width": 145.875,
+            "height": 18,
+            "top": 286.03125,
+            "right": 1300.390625,
+            "bottom": 304.03125,
+            "left": 1154.515625
+          },
+          "scroll": 183,
+          "client": 183,
+          "overflow": "visible"
+        },
+        {
+          "text": "International Championship Wrestling Performers",
+          "font": "12.6048px",
+          "rect": {
+            "x": 935.359375,
+            "y": 382.09375,
+            "width": 183.421875,
+            "height": 39.703125,
+            "top": 382.09375,
+            "right": 1118.78125,
+            "bottom": 421.796875,
+            "left": 935.359375
+          },
+          "paint": {
+            "x": 944.171875,
+            "y": 380.09375,
+            "width": 165.78125,
+            "height": 42.46875,
+            "top": 380.09375,
+            "right": 1109.953125,
+            "bottom": 422.5625,
+            "left": 944.171875
+          },
+          "scroll": 183,
+          "client": 183,
+          "overflow": "visible"
+        },
+        {
+          "text": "The International Championship Wrestling Veteran • The Northern Territory Champion",
+          "font": "12.6048px",
+          "rect": {
+            "x": 1135.734375,
+            "y": 375.46875,
+            "width": 183.4375,
+            "height": 52.9375,
+            "top": 375.46875,
+            "right": 1319.171875,
+            "bottom": 428.40625,
+            "left": 1135.734375
+          },
+          "paint": {
+            "x": 1144.5625,
+            "y": 373.46875,
+            "width": 165.78125,
+            "height": 55.703125,
+            "top": 373.46875,
+            "right": 1310.34375,
+            "bottom": 429.171875,
+            "left": 1144.5625
+          },
+          "scroll": 183,
+          "client": 183,
+          "overflow": "visible"
+        },
+        {
+          "text": "The Butcher and the Blade with All Elite Championship Wrestling",
+          "font": "12.6048px",
+          "rect": {
+            "x": 1336.125,
+            "y": 382.09375,
+            "width": 183.4375,
+            "height": 39.703125,
+            "top": 382.09375,
+            "right": 1519.5625,
+            "bottom": 421.796875,
+            "left": 1336.125
+          },
+          "paint": {
+            "x": 1344.953125,
+            "y": 380.09375,
+            "width": 165.78125,
+            "height": 42.46875,
+            "top": 380.09375,
+            "right": 1510.734375,
+            "bottom": 422.5625,
+            "left": 1344.953125
+          },
+          "scroll": 183,
+          "client": 183,
+          "overflow": "visible"
+        }
+      ],
+      "pageOverflow": false,
+      "scroll": []
+    }
+  }
+]

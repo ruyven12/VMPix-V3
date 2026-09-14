@@ -1,0 +1,530 @@
+[
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "no-preference",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 800,
+        "top": 0,
+        "right": 360,
+        "bottom": 800,
+        "left": 0
+      },
+      "engine": {
+        "x": 9.273574829101562,
+        "y": 728.3917236328125,
+        "width": 341.452880859375,
+        "height": 62.3876953125,
+        "top": 728.3917236328125,
+        "right": 350.72645568847656,
+        "bottom": 790.7794189453125,
+        "left": 9.273574829101562
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 22.875,
+            "y": 468.6875,
+            "width": 10.875,
+            "height": 95.796875,
+            "top": 468.6875,
+            "right": 33.75,
+            "bottom": 564.484375,
+            "left": 22.875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 231.359375,
+            "y": 537.78125,
+            "width": 78.421875,
+            "height": 17.5,
+            "top": 537.78125,
+            "right": 309.78125,
+            "bottom": 555.28125,
+            "left": 231.359375
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 326.25,
+            "y": 468.6875,
+            "width": 10.875,
+            "height": 95.796875,
+            "top": 468.6875,
+            "right": 337.125,
+            "bottom": 564.484375,
+            "left": 326.25
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "×"
+  },
+  {
+    "width": 360,
+    "height": 800,
+    "motion": "reduce",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 800,
+        "top": 0,
+        "right": 360,
+        "bottom": 800,
+        "left": 0
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 22.875,
+            "y": 468.6875,
+            "width": 10.875,
+            "height": 95.796875,
+            "top": 468.6875,
+            "right": 33.75,
+            "bottom": 564.484375,
+            "left": 22.875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 231.359375,
+            "y": 537.78125,
+            "width": 78.421875,
+            "height": 17.5,
+            "top": 537.78125,
+            "right": 309.78125,
+            "bottom": 555.28125,
+            "left": 231.359375
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 326.25,
+            "y": 468.6875,
+            "width": 10.875,
+            "height": 95.796875,
+            "top": 468.6875,
+            "right": 337.125,
+            "bottom": 564.484375,
+            "left": 326.25
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "Open Event"
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "no-preference",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 915,
+        "top": 0,
+        "right": 412,
+        "bottom": 915,
+        "left": 0
+      },
+      "engine": {
+        "x": 9.270767211914062,
+        "y": 834.4020385742188,
+        "width": 393.45849609375,
+        "height": 71.35748291015625,
+        "top": 834.4020385742188,
+        "right": 402.72926330566406,
+        "bottom": 905.759521484375,
+        "left": 9.270767211914062
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 22.875,
+            "y": 499.640625,
+            "width": 10.875,
+            "height": 156.328125,
+            "top": 499.640625,
+            "right": 33.75,
+            "bottom": 655.96875,
+            "left": 22.875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 273.65625,
+            "y": 599.4375,
+            "width": 78.421875,
+            "height": 17.5,
+            "top": 599.4375,
+            "right": 352.078125,
+            "bottom": 616.9375,
+            "left": 273.65625
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 378.25,
+            "y": 499.640625,
+            "width": 10.875,
+            "height": 156.328125,
+            "top": 499.640625,
+            "right": 389.125,
+            "bottom": 655.96875,
+            "left": 378.25
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "×"
+  },
+  {
+    "width": 412,
+    "height": 915,
+    "motion": "reduce",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 915,
+        "top": 0,
+        "right": 412,
+        "bottom": 915,
+        "left": 0
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 22.875,
+            "y": 499.640625,
+            "width": 10.875,
+            "height": 156.328125,
+            "top": 499.640625,
+            "right": 33.75,
+            "bottom": 655.96875,
+            "left": 22.875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 273.65625,
+            "y": 599.4375,
+            "width": 78.421875,
+            "height": 17.5,
+            "top": 599.4375,
+            "right": 352.078125,
+            "bottom": 616.9375,
+            "left": 273.65625
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 378.25,
+            "y": 499.640625,
+            "width": 10.875,
+            "height": 156.328125,
+            "top": 499.640625,
+            "right": 389.125,
+            "bottom": 655.96875,
+            "left": 378.25
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "Open Event"
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "no-preference",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080,
+        "top": 0,
+        "right": 1920,
+        "bottom": 1080,
+        "left": 0
+      },
+      "engine": {
+        "x": 480.03631591796875,
+        "y": 995.6253051757812,
+        "width": 959.9273071289062,
+        "height": 75.18182373046875,
+        "top": 995.6253051757812,
+        "right": 1439.963623046875,
+        "bottom": 1070.80712890625,
+        "left": 480.03631591796875
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 477.46875,
+            "y": 466.875,
+            "width": 19.1875,
+            "height": 246.140625,
+            "top": 466.875,
+            "right": 496.65625,
+            "bottom": 713.015625,
+            "left": 477.46875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 1097.84375,
+            "y": 619.453125,
+            "width": 98.015625,
+            "height": 23.359375,
+            "top": 619.453125,
+            "right": 1195.859375,
+            "bottom": 642.8125,
+            "left": 1097.84375
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 1423.34375,
+            "y": 466.875,
+            "width": 19.1875,
+            "height": 246.140625,
+            "top": 466.875,
+            "right": 1442.53125,
+            "bottom": 713.015625,
+            "left": 1423.34375
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "×"
+  },
+  {
+    "width": 1920,
+    "height": 1080,
+    "motion": "reduce",
+    "state": {
+      "url": "/wrestling/people/aaron-orion",
+      "identity": "loaded",
+      "history": "loaded",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080,
+        "top": 0,
+        "right": 1920,
+        "bottom": 1080,
+        "left": 0
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "overflow": false,
+      "active": "BODY",
+      "engineText": "Champion Dossier - Aaron Orion",
+      "text": "Interact\n\nIDENTITY HEADER\n\nAaron Orion\n\nPORTRAIT - UPDATED N/A\n\nPortrait Signal Reserved\n\nARCHIVE STATUS MODULE\n\nArchive Status\ncomputed\nPhotos\n0\nMatches\n1\nEvents\n1\nWIN/PATRICIPANT\n0 / 1\nCategory\nPerformers\nAliases\nN/A\nTeams / Stables\nN/A\n\nTIMELINE / EVENT HISTORY\n\n01 of 01 archived events\n\n‹\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nOpponent Unlisted\n\nVS\n\nAaron Orion\n\nTag Team\n\nParticipant\n\nOpen Event\n›",
+      "scroll": [],
+      "buttons": [
+        {
+          "label": "Previous event",
+          "disabled": true,
+          "rect": {
+            "x": 477.46875,
+            "y": 466.875,
+            "width": 19.1875,
+            "height": 246.140625,
+            "top": 466.875,
+            "right": 496.65625,
+            "bottom": 713.015625,
+            "left": 477.46875
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Open Event",
+          "disabled": false,
+          "rect": {
+            "x": 1097.84375,
+            "y": 619.453125,
+            "width": 98.015625,
+            "height": 23.359375,
+            "top": 619.453125,
+            "right": 1195.859375,
+            "bottom": 642.8125,
+            "left": 1097.84375
+          },
+          "ariaHiddenAncestor": false
+        },
+        {
+          "label": "Next event",
+          "disabled": true,
+          "rect": {
+            "x": 1423.34375,
+            "y": 466.875,
+            "width": 19.1875,
+            "height": 246.140625,
+            "top": 466.875,
+            "right": 1442.53125,
+            "bottom": 713.015625,
+            "left": 1423.34375
+          },
+          "ariaHiddenAncestor": false
+        }
+      ]
+    },
+    "event": {
+      "text": "EVENT ARCHIVE\n×\nFresh Blood '22\n\nOctober 29th, 2022\n\nYarmouth Amvets\n\nYarmouth, Maine\n\nMATCH TYPE\nTag Team\nOPPONENT\nOpponent Unlisted\nRESULT\nParticipant\nPHOTOS\n0\n\nNO ARCHIVED PHOTOS FOUND",
+      "active": "Close Event Archive",
+      "route": "/wrestling/people/aaron-orion"
+    },
+    "closeFocus": "Open Event"
+  }
+]
