@@ -11569,6 +11569,17 @@ function scheduleHallOfChampionsModeSelectorAvailability(prototypeShell) {
     return;
   }
 
+  if (prototypeShell.dataset.hallOfChampionsRestoring === "true") {
+    delete prototypeShell.dataset.hallOfChampionsRestoring;
+    if (hallOfChampionsModeSelectorRevealTimer) {
+      window.clearTimeout(hallOfChampionsModeSelectorRevealTimer);
+      hallOfChampionsModeSelectorRevealTimer = 0;
+    }
+    setHallOfChampionsModeSelectorAvailable(prototypeShell, true);
+    syncHallOfChampionsLowerSelectorForMode(prototypeShell);
+    return;
+  }
+
   setHallOfChampionsModeSelectorAvailable(prototypeShell, false);
   setHallOfChampionsLowerSelectorAvailable(prototypeShell, "az", false);
   if (prototypeShell.dataset.hallOfChampionsRestoring !== "true") resetHallOfChampionsModeSelector(prototypeShell);
@@ -12729,8 +12740,8 @@ function setWrestlingPeoplePrototypeActive(isActive) {
   }
 
   if (prototypeShell) {
-    prototypeShell.hidden = !isActive;
     if (isActive && prototypeShell.dataset.hallOfChampionsActive !== "true") restoreHallOfChampionsReturn(prototypeShell);
+    prototypeShell.hidden = !isActive;
     prototypeShell.dataset.hallOfChampionsActive = String(Boolean(isActive));
     syncHallOfChampionsWorkspaces(prototypeShell);
     if (isActive) {
@@ -13152,6 +13163,12 @@ function setWrestlingPersonDossierPrototypeSelectedSubject(subject = {}) {
   const state = wrestlingPersonDossierPrototypeSelectedPersonState;
   const seed = { ...(subject || {}) };
   const nextKey = normalizeWrestlingPersonId(seed.slug || seed.personId || seed.searchName || seed.displayName || seed.name);
+  const hallRecord = hallOfChampionsPeopleArchiveRecords.find((record) =>
+    normalizeWrestlingPersonId(getHallOfChampionsPeopleArchiveRouteId(record)) === nextKey);
+  state.initialIdentity = hallRecord ? {
+    name: getWrestlingText(hallRecord.name).trim(),
+    portrait_url: getHallOfChampionsPeopleArchiveUrlValue(hallRecord.portraitUrl),
+  } : null;
   if (state.subjectKey === nextKey) {
     return getWrestlingPersonDossierPrototypeSelectedPersonContext();
   }
@@ -13348,41 +13365,52 @@ function renderWrestlingPersonDossierPrototypePortrait(workspace, context = getW
   const image = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-image]");
   const label = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-label]");
   const moduleLabel = workspace?.querySelector("[data-wrestling-person-dossier-prototype-portrait-module-label]");
+  if (!portrait || !image || !label) return;
   const record = context?.record || null;
   const portraitUrl = getWrestlingPersonDossierPrototypePortraitUrl(record);
-
-  if (moduleLabel) {
-    moduleLabel.textContent = getWrestlingPersonDossierPrototypePortraitLabel(record, portraitUrl);
-  }
-
-  if (!portrait || !image || !label || !portraitUrl) {
-    if (portrait) {
-      portrait.classList.remove("has-image");
-    }
-    if (image) {
-      image.hidden = true;
-      image.removeAttribute("src");
-      image.removeAttribute("alt");
-    }
-    if (label) {
-      label.hidden = false;
-      label.textContent = "Portrait Signal Reserved";
-    }
+  if (moduleLabel) moduleLabel.textContent = getWrestlingPersonDossierPrototypePortraitLabel(record, portraitUrl);
+  const subjectKey = wrestlingPersonDossierPrototypeSelectedPersonState.subjectKey;
+  const routeKey = getActiveWrestlingPersonDossierRequestKey();
+  const sourceKey = subjectKey + "|" + portraitUrl;
+  const current = () => getActiveWrestlingPersonDossierRequestKey() === routeKey &&
+    wrestlingPersonDossierPrototypeSelectedPersonState.subjectKey === subjectKey && image.dataset.portraitSource === sourceKey;
+  const settle = (loaded) => {
+    if (!current()) return;
+    portrait.dataset.portraitState = loaded ? "loaded" : "error";
+    portrait.setAttribute("aria-busy", "false");
+    portrait.classList.toggle("has-image", loaded);
+    image.hidden = !loaded;
+    label.hidden = loaded;
+    label.textContent = loaded ? "" : "Portrait unavailable";
+  };
+  image.alt = context.displayName + " portrait";
+  if (image.dataset.portraitSource === sourceKey && portraitUrl) {
+    if (portrait.dataset.portraitState === "loading" && image.complete) settle(image.naturalWidth > 0);
     return;
   }
-
-  portrait.classList.add("has-image");
-  image.hidden = false;
-  image.alt = `${context.displayName} portrait`;
-  image.onerror = () => {
-    portrait.classList.remove("has-image");
-    image.hidden = true;
+  image.onload = null;
+  image.onerror = null;
+  image.dataset.portraitSource = sourceKey;
+  portrait.classList.remove("has-image");
+  image.hidden = true;
+  label.hidden = false;
+  if (!portraitUrl) {
     image.removeAttribute("src");
-    label.hidden = false;
-    label.textContent = "Portrait Signal Reserved";
-  };
+    image.removeAttribute("alt");
+    const loading = ["idle", "loading"].includes(wrestlingPersonDossierPrototypeSelectedPersonState.status);
+    portrait.dataset.portraitState = loading ? "pending" : "empty";
+    portrait.setAttribute("aria-busy", String(loading));
+    label.textContent = loading ? "Retrieving portrait record" : "No portrait available";
+    return;
+  }
+  portrait.dataset.portraitState = "loading";
+  portrait.setAttribute("aria-busy", "true");
+  label.textContent = "Retrieving portrait";
+  image.onload = () => settle(true);
+  image.onerror = () => settle(false);
+  image.loading = "eager";
   image.src = portraitUrl;
-  label.hidden = true;
+  if (image.complete) settle(image.naturalWidth > 0);
 }
 function getWrestlingPersonDossierPrototypeEventHistoryRows(payload) {
   if (!payload || !Array.isArray(payload.data)) {
@@ -13901,28 +13929,46 @@ function setWrestlingPersonDossierPrototypeEventPoster(workspace, event) {
   }
 
   const posterUrl = event?.poster || "";
-  poster.classList.remove("has-poster");
-  image.hidden = true;
-  image.removeAttribute("src");
-  image.removeAttribute("alt");
-  title.textContent = event?.title || "Event History";
-  mark.textContent = "VMP";
-
-  if (!posterUrl) {
+  const subjectKey = wrestlingPersonDossierPrototypeSelectedPersonState.subjectKey;
+  const routeKey = getActiveWrestlingPersonDossierRequestKey();
+  const sourceKey = subjectKey + "|" + posterUrl;
+  const settle = (loaded) => {
+    if (image.dataset.posterSource !== sourceKey || getActiveWrestlingPersonDossierRequestKey() !== routeKey ||
+      wrestlingPersonDossierPrototypeSelectedPersonState.subjectKey !== subjectKey) return;
+    poster.dataset.posterState = loaded ? "loaded" : "error";
+    poster.setAttribute("aria-busy", "false");
+    poster.classList.toggle("has-poster", loaded);
+    image.hidden = !loaded;
+    title.textContent = loaded ? event.title : "Artwork unavailable";
+  };
+  if (posterUrl) image.alt = event.title + " poster";
+  if (image.dataset.posterSource === sourceKey && posterUrl) {
+    if (poster.dataset.posterState === "loading" && image.complete) settle(image.naturalWidth > 0);
     return;
   }
-
-  poster.classList.add("has-poster");
-  image.hidden = false;
-  image.alt = `${event.title} poster`;
-  image.onerror = () => {
-    poster.classList.remove("has-poster");
-    image.hidden = true;
+  image.onload = null;
+  image.onerror = null;
+  image.dataset.posterSource = sourceKey;
+  poster.classList.remove("has-poster");
+  image.hidden = true;
+  title.textContent = event?.title || "Event History";
+  mark.textContent = "VMP";
+  if (!posterUrl) {
     image.removeAttribute("src");
-    title.textContent = event.title || "Event History";
-    mark.textContent = "VMP";
-  };
+    image.removeAttribute("alt");
+    poster.dataset.posterState = "empty";
+    poster.setAttribute("aria-busy", "false");
+    return;
+  }
+  poster.dataset.posterState = "loading";
+  poster.setAttribute("aria-busy", "true");
+  title.textContent = "Retrieving artwork";
+  image.alt = event.title + " poster";
+  image.loading = "eager";
+  image.onload = () => settle(true);
+  image.onerror = () => settle(false);
   image.src = posterUrl;
+  if (image.complete) settle(image.naturalWidth > 0);
 }
 
 function setWrestlingPersonDossierPrototypeEventPreview(workspace, position, event) {
@@ -14961,7 +15007,11 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   setWrestlingPersonDossierPrototypeEventPoster(workspace, activeEvent);
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[boundedActiveIndex - 1] : null);
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[boundedActiveIndex + 1] : null);
-  setWrestlingPersonDossierPrototypeWinParticipantStatus(workspace, stateName === "loaded" ? events : [], context);
+  if (stateName === "loaded" || stateName === "empty") {
+    setWrestlingPersonDossierPrototypeWinParticipantStatus(workspace, events, context);
+  } else {
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "winParticipant", stateName === "error" ? "UNAVAILABLE" : "PENDING");
+  }
   syncWrestlingPersonDossierPrototypeWinParticipantDiagnostics();
   setWrestlingPersonDossierPrototypeEventHistoryControls(timeline, stateName, boundedActiveIndex, eventTotal);
   setWrestlingPersonDossierPrototypeEventHistoryIndicator(timeline, stateName, boundedActiveIndex, eventTotal);
@@ -15070,6 +15120,12 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
   const state = wrestlingPersonDossierPrototypeSelectedPersonState;
   const context = getWrestlingPersonDossierPrototypeSelectedPersonContext(state.record);
   workspace.dataset.wrestlingPersonDossierPrototypeState = state.status;
+  const pending = state.status === "idle" || state.status === "loading";
+  const initialIdentity = pending ? state.initialIdentity : null;
+  const identity = workspace.querySelector(".wrestling-person-dossier-prototype-module--identity");
+  const statusPanel = workspace.querySelector(".wrestling-person-dossier-prototype-module--status");
+  if (identity) identity.setAttribute("aria-busy", String(pending && !initialIdentity?.name));
+  if (statusPanel) statusPanel.setAttribute("aria-busy", String(pending));
 
   if (state.status === "loaded" && state.record) {
     const record = state.record;
@@ -15089,7 +15145,8 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
     return;
   }
 
-  renderWrestlingPersonDossierPrototypePortrait(workspace, context);
+  renderWrestlingPersonDossierPrototypePortrait(workspace, initialIdentity
+    ? { ...context, displayName: initialIdentity.name, record: initialIdentity } : context);
 
   if (state.status === "empty") {
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", `${context.displayName.toUpperCase()} RECORD NOT FOUND`);
@@ -15102,15 +15159,15 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "LINK UNAVAILABLE");
   } else {
-    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", "ARCHIVE RECORD INITIALIZING");
+    setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", initialIdentity?.name || "RETRIEVING RECORD");
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", WRESTLING_PERSON_DOSSIER_PROTOTYPE_FALLBACK);
-    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "ARCHIVE RECORD INITIALIZING");
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", "RETRIEVING RECORD");
   }
 
-  setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
-  setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
-  setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", pending ? "PENDING" : WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", pending ? "PENDING" : WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
+  setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", pending ? "PENDING" : WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
   setWrestlingPersonDossierPrototypeMetadataItems(workspace, null);
 }
 function loadWrestlingPersonDossierPrototypeSelectedPersonRecord(shell = wrestlingPersonDossierPrototypeShell) {
@@ -15190,6 +15247,26 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
   const sourceHologram = sourceShell?.querySelector(".hall-of-champions-expanded-hologram");
   const pedestal = sourcePedestal?.cloneNode(true) || document.createElement("div");
   const expandedHologram = sourceHologram?.cloneNode(false) || document.createElement("div");
+
+  // Each mounted SVG owns its paint servers, even while the other route is hidden.
+  const paintIds = new Map([...pedestal.querySelectorAll("[id]")]
+    .map((node) => [node.id, "person-dossier-" + node.id]));
+  const remapPaintReference = (value) => value.replace(/#([\w-]+)/g,
+    (reference, id) => paintIds.has(id) ? "#" + paintIds.get(id) : reference);
+  const sourceNodes = sourcePedestal ? [...sourcePedestal.querySelectorAll("*")] : [];
+  [...pedestal.querySelectorAll("*")].forEach((node, index) => {
+    [...node.attributes].forEach((attribute) => {
+      if (attribute.name === "id") node.id = paintIds.get(attribute.value);
+      else node.setAttribute(attribute.name, remapPaintReference(attribute.value));
+    });
+    if (!sourceNodes[index]) return;
+    const paint = window.getComputedStyle(sourceNodes[index]);
+    ["fill", "stroke", "clip-path"].forEach((property) => {
+      const value = paint.getPropertyValue(property);
+      const mapped = remapPaintReference(value);
+      if (mapped !== value) node.style.setProperty(property, mapped);
+    });
+  });
 
   expandedHologram.id = "wrestling-person-dossier-prototype-hologram";
   expandedHologram.className = "hall-of-champions-expanded-hologram";
@@ -15409,7 +15486,6 @@ function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
   }
   if (isActive && typeof setWrestlingPeoplePrototypeActive === "function") {
     setWrestlingPeoplePrototypeActive(false);
-    releaseWrestlingPeoplePrototypeShellForDossierMount();
   }
 
   if (shellElement) {
@@ -15446,8 +15522,11 @@ function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
       prototypeShell.setAttribute("aria-hidden", "false");
       bindWrestlingPersonDossierPrototypeMetadataResize();
       bindWrestlingPersonDossierPrototypeEventHistoryInteractions(prototypeShell);
-      scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
+      syncHallOfChampionsProjectionGeometry(prototypeShell);
       setWrestlingPersonDossierPrototypeSelectedSubject(subject || {});
+      if (wrestlingPersonDossierPrototypeEventHistoryState.status === "idle") {
+        renderWrestlingPersonDossierPrototypeEventHistoryState(prototypeShell);
+      }
       const selectedContext = getWrestlingPersonDossierPrototypeSelectedPersonContext();
       loadWrestlingPersonDossierPrototypeSelectedPersonRecord(prototypeShell)
         .finally(() => {
@@ -15456,6 +15535,12 @@ function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
           }
           loadWrestlingPersonDossierPrototypeEventHistory(prototypeShell);
         });
+      // Settle the existing text fitting before the first visible dossier frame.
+      if (wrestlingPersonDossierPrototypeMetadataFitFrame) {
+        window.cancelAnimationFrame(wrestlingPersonDossierPrototypeMetadataFitFrame);
+        wrestlingPersonDossierPrototypeMetadataFitFrame = 0;
+      }
+      fitWrestlingPersonDossierPrototypeMetadataValues(prototypeShell);
     } else {
       prototypeShell.setAttribute("inert", "");
       prototypeShell.setAttribute("aria-hidden", "true");

@@ -1,0 +1,105 @@
+[
+  {
+    "scenario": "portrait-hang",
+    "first": {
+      "name": "Aaron Rourke",
+      "state": "loaded",
+      "text": "\n      \n        \n          Identity Header\n          \n            Aaron Rourke\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Retrieving portrait\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Artwork unavailable\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    ",
+      "portrait": "loading",
+      "poster": "error",
+      "history": "loaded",
+      "core": "false"
+    },
+    "last": {
+      "name": "Aaron Rourke",
+      "state": "loaded",
+      "text": "\n      \n        \n          Identity Header\n          \n            Aaron Rourke\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Retrieving portrait\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Artwork unavailable\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    ",
+      "portrait": "loading",
+      "poster": "error",
+      "history": "loaded",
+      "core": "false"
+    },
+    "req": [
+      {
+        "kind": "identity",
+        "isB": false
+      },
+      {
+        "kind": "history",
+        "isB": false
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-a-portrait.png"
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-a-poster.png"
+      }
+    ]
+  },
+  {
+    "scenario": "switch",
+    "first": {
+      "name": "Aaron Rourke",
+      "state": "loaded",
+      "text": "\n      \n        \n          Identity Header\n          \n            Aaron Rourke\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Retrieving portrait\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fixture Aaron Event\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    ",
+      "portrait": "loading",
+      "poster": "loaded",
+      "history": "loaded",
+      "core": "false"
+    },
+    "early": {
+      "name": "RETRIEVING RECORD",
+      "state": "loading",
+      "text": "\n      \n        \n          Identity Header\n          \n            RETRIEVING RECORD\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            Retrieving portrait record\n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              RETRIEVING RECORD\n            \n            \n              Photos\n              RETRIEVING\n            \n            \n              Matches\n              RETRIEVING\n            \n            \n              Events\n              RETRIEVING\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              N/A\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of -- archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Event History\n                VMP\n              \n              \n                Event History Initializing\n                Date Pending\n                Venue Pending\n                Location Pending\n              \n              \n                Opponent Unlisted\n                VS\n                ace romero\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    ",
+      "portrait": "pending",
+      "poster": "empty",
+      "history": "idle",
+      "core": "true"
+    },
+    "last": {
+      "name": "Ace Romero",
+      "state": "loaded",
+      "text": "\n      \n        \n          Identity Header\n          \n            Ace Romero\n          \n        \n        \n          Portrait - Updated N/A\n          \n            \n            \n          \n        \n        \n          Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A\n            \n          \n        \n        \n          \n            TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fixture Ace Event\n                VMP\n              \n              \n                Fixture Ace Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Ace Romero\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›\n            \n              \n              \n              \n              \n              \n            \n          \n        \n      \n      \n        \n        \n          \n            EVENT ARCHIVE\n            ×\n          \n          \n            \n              \n                \n                \n                \n                \n              \n              \n                \n                  MATCH TYPE\n                  \n                \n                \n                  OPPONENT\n                  \n                \n                \n                  RESULT\n                  \n                \n                \n                  PHOTOS\n                  \n                \n              \n            \n            \n            \n              ×\n              ‹\n              \n                \n                  \n                \n                \n              \n              ›\n              \n            \n          \n        \n      \n    ",
+      "portrait": "loaded",
+      "poster": "loaded",
+      "history": "loaded",
+      "core": "false"
+    },
+    "req": [
+      {
+        "kind": "identity",
+        "isB": false
+      },
+      {
+        "kind": "history",
+        "isB": false
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-a-portrait.png"
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-a-poster.png"
+      },
+      {
+        "kind": "identity",
+        "isB": true
+      },
+      {
+        "kind": "history",
+        "isB": true
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-b-portrait.png"
+      },
+      {
+        "kind": "image",
+        "u": "http://127.0.0.1:4173/qa-b-poster.png"
+      }
+    ]
+  }
+]

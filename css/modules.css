@@ -30030,3 +30030,9 @@ button.hall-crusades-archive-crystal:focus-visible {
     block-size: max(0px, calc(var(--hall-champions-hologram-anchor-y, 60vh) - env(safe-area-inset-top) - 4px));
   }
 }
+
+/* Retrieval and unavailable values stay inside their reserved status cells. */
+.wrestling-person-dossier-prototype-module--status .wrestling-person-dossier-prototype-status__item dd {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}

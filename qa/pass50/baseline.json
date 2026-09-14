@@ -1,0 +1,287 @@
+{
+  "head": "292201b35f877b9171b62311ab44034eac2c096b",
+  "before": {
+    "path": "/wrestling/people",
+    "hallCount": 1,
+    "mode": "TEAM",
+    "svgDefs": [
+      {
+        "id": "hall-champions-stone-face",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-stone-side",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-metal-edge",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-channel-dormant",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-crystal-recess",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "radialGradient"
+      },
+      {
+        "id": "hall-champions-hologram-plane",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-hologram-scan",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "pattern"
+      },
+      {
+        "id": "hall-champions-hologram-plane-clip",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "clipPath"
+      },
+      {
+        "id": "hall-champions-crystal-core",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-crystal-inner",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "radialGradient"
+      },
+      {
+        "id": "hall-champions-crystal-facet",
+        "count": 1,
+        "ownerInHall": true,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      }
+    ],
+    "fills": [
+      {
+        "fill": "rgb(0, 0, 0)",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-hologram-plane\")",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-hologram-scan\")",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M184 226 L456 226 L510 292 L130 292 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M226 244 L414 244 L446 282 L194 282 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-core\")",
+        "d": "M320 232 L354 253 L344 281 L320 296 L296 281 L286 253 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-inner\")",
+        "d": "M320 240 L340 256 L333 277 L320 288 L307 277 L300 256 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-facet\")",
+        "d": "M320 240 L300 256 L307 277 L320 288 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-facet\")",
+        "d": "M320 240 L340 256 L333 277 L320 288 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M232 292 L408 292 L438 418 L202 418 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M262 312 L378 312 L394 404 L246 404 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M70 406 L570 406 L580 416 L60 416 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M56 416 L584 416 L630 510 L10 510 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M6 510 L634 510 L640 520 L0 520 Z"
+      }
+    ]
+  },
+  "after": {
+    "path": "/wrestling/people",
+    "hallCount": 1,
+    "mode": "TEAM",
+    "svgDefs": [
+      {
+        "id": "hall-champions-stone-face",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-stone-side",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-metal-edge",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-channel-dormant",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-crystal-recess",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "radialGradient"
+      },
+      {
+        "id": "hall-champions-hologram-plane",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-hologram-scan",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "pattern"
+      },
+      {
+        "id": "hall-champions-hologram-plane-clip",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "clipPath"
+      },
+      {
+        "id": "hall-champions-crystal-core",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      },
+      {
+        "id": "hall-champions-crystal-inner",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "radialGradient"
+      },
+      {
+        "id": "hall-champions-crystal-facet",
+        "count": 2,
+        "ownerInHall": false,
+        "ownerHidden": true,
+        "ownerTag": "linearGradient"
+      }
+    ],
+    "fills": [
+      {
+        "fill": "rgb(0, 0, 0)",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-hologram-plane\")",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-hologram-scan\")",
+        "d": "M254 130 L386 130 L380 170 L260 170 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M184 226 L456 226 L510 292 L130 292 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M226 244 L414 244 L446 282 L194 282 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-core\")",
+        "d": "M320 232 L354 253 L344 281 L320 296 L296 281 L286 253 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-inner\")",
+        "d": "M320 240 L340 256 L333 277 L320 288 L307 277 L300 256 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-facet\")",
+        "d": "M320 240 L300 256 L307 277 L320 288 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-crystal-facet\")",
+        "d": "M320 240 L340 256 L333 277 L320 288 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M232 292 L408 292 L438 418 L202 418 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M262 312 L378 312 L394 404 L246 404 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-face\")",
+        "d": "M70 406 L570 406 L580 416 L60 416 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M56 416 L584 416 L630 510 L10 510 Z"
+      },
+      {
+        "fill": "url(\"#hall-champions-stone-side\")",
+        "d": "M6 510 L634 510 L640 520 L0 520 Z"
+      }
+    ]
+  }
+}

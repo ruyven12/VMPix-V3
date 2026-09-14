@@ -1,0 +1,28 @@
+{
+  "failed": {
+    "identity": 1,
+    "history": 1,
+    "state": "error"
+  },
+  "before": {
+    "scroll": 4442,
+    "focus": true
+  },
+  "recovered": {
+    "identity": 2,
+    "history": 1,
+    "name": "Aaron Rourke"
+  },
+  "back": {
+    "sameHall": true,
+    "scroll": 4442,
+    "focus": "Open Aaron Rourke dossier",
+    "text": "Aaron RourkeWrestler42 Photos",
+    "query": "Aaron"
+  },
+  "forward": {
+    "identity": 2,
+    "history": 1,
+    "name": "Aaron Rourke"
+  }
+}

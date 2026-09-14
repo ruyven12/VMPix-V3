@@ -1,0 +1,371 @@
+[
+  {
+    "width": 360,
+    "before": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 32.59375,
+            "y": 17.078125,
+            "width": 294.8125,
+            "height": 64,
+            "top": 17.078125,
+            "right": 327.40625,
+            "bottom": 81.078125,
+            "left": 32.59375
+          },
+          "text": "Identity Header\n          \n            RETRIEVING RECORD"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 32.59375,
+            "y": 86.1875,
+            "width": 294.8125,
+            "height": 129.59375,
+            "top": 86.1875,
+            "right": 327.40625,
+            "bottom": 215.78125,
+            "left": 32.59375
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            Retrieving portrait record"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 32.59375,
+            "y": 220.890625,
+            "width": 294.8125,
+            "height": 224.046875,
+            "top": 220.890625,
+            "right": 327.40625,
+            "bottom": 444.9375,
+            "left": 32.59375
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              RETRIEVING RECORD\n            \n            \n              Photos\n              RETRIEVING\n            \n            \n              Matches\n              RETRIEVING\n            \n            \n              Events\n              RETRIEVING\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              N/A\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 32.59375,
+            "y": 450.046875,
+            "width": 294.8125,
+            "height": 125.4375,
+            "top": 450.046875,
+            "right": 327.40625,
+            "bottom": 575.484375,
+            "left": 32.59375
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of -- archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Event History\n                VMP\n              \n              \n                Event History Initializing\n                Date Pending\n                Venue Pending\n                Location Pending\n              \n              \n                Opponent Unlisted\n                VS\n                aaron rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    },
+    "after": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 32.59375,
+            "y": 17.078125,
+            "width": 294.8125,
+            "height": 64,
+            "top": 17.078125,
+            "right": 327.40625,
+            "bottom": 81.078125,
+            "left": 32.59375
+          },
+          "text": "Identity Header\n          \n            Aaron Rourke"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 32.59375,
+            "y": 86.1875,
+            "width": 294.8125,
+            "height": 129.59375,
+            "top": 86.1875,
+            "right": 327.40625,
+            "bottom": 215.78125,
+            "left": 32.59375
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            No portrait available"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 32.59375,
+            "y": 220.890625,
+            "width": 294.8125,
+            "height": 224.046875,
+            "top": 220.890625,
+            "right": 327.40625,
+            "bottom": 444.9375,
+            "left": 32.59375
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 32.59375,
+            "y": 450.046875,
+            "width": 294.8125,
+            "height": 125.4375,
+            "top": 450.046875,
+            "right": 327.40625,
+            "bottom": 575.484375,
+            "left": 32.59375
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fixture Aaron Event\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    }
+  },
+  {
+    "width": 412,
+    "before": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 34.671875,
+            "y": 17.078125,
+            "width": 342.65625,
+            "height": 64,
+            "top": 17.078125,
+            "right": 377.328125,
+            "bottom": 81.078125,
+            "left": 34.671875
+          },
+          "text": "Identity Header\n          \n            RETRIEVING RECORD"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 34.671875,
+            "y": 86.1875,
+            "width": 342.65625,
+            "height": 194.09375,
+            "top": 86.1875,
+            "right": 377.328125,
+            "bottom": 280.28125,
+            "left": 34.671875
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            Retrieving portrait record"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 34.671875,
+            "y": 285.390625,
+            "width": 342.65625,
+            "height": 201.765625,
+            "top": 285.390625,
+            "right": 377.328125,
+            "bottom": 487.15625,
+            "left": 34.671875
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              RETRIEVING RECORD\n            \n            \n              Photos\n              RETRIEVING\n            \n            \n              Matches\n              RETRIEVING\n            \n            \n              Events\n              RETRIEVING\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              N/A\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 34.671875,
+            "y": 492.265625,
+            "width": 342.65625,
+            "height": 174.703125,
+            "top": 492.265625,
+            "right": 377.328125,
+            "bottom": 666.96875,
+            "left": 34.671875
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of -- archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Event History\n                VMP\n              \n              \n                Event History Initializing\n                Date Pending\n                Venue Pending\n                Location Pending\n              \n              \n                Opponent Unlisted\n                VS\n                aaron rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    },
+    "after": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 34.671875,
+            "y": 17.078125,
+            "width": 342.65625,
+            "height": 64,
+            "top": 17.078125,
+            "right": 377.328125,
+            "bottom": 81.078125,
+            "left": 34.671875
+          },
+          "text": "Identity Header\n          \n            Aaron Rourke"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 34.671875,
+            "y": 86.1875,
+            "width": 342.65625,
+            "height": 194.09375,
+            "top": 86.1875,
+            "right": 377.328125,
+            "bottom": 280.28125,
+            "left": 34.671875
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            No portrait available"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 34.671875,
+            "y": 285.390625,
+            "width": 342.65625,
+            "height": 201.765625,
+            "top": 285.390625,
+            "right": 377.328125,
+            "bottom": 487.15625,
+            "left": 34.671875
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 34.671875,
+            "y": 492.265625,
+            "width": 342.65625,
+            "height": 174.703125,
+            "top": 492.265625,
+            "right": 377.328125,
+            "bottom": 666.96875,
+            "left": 34.671875
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fixture Aaron Event\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    }
+  },
+  {
+    "width": 1920,
+    "before": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 384,
+            "y": 22.515625,
+            "width": 1152,
+            "height": 80,
+            "top": 22.515625,
+            "right": 1536,
+            "bottom": 102.515625,
+            "left": 384
+          },
+          "text": "Identity Header\n          \n            RETRIEVING RECORD"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 384,
+            "y": 111.78125,
+            "width": 525.65625,
+            "height": 309.71875,
+            "top": 111.78125,
+            "right": 909.65625,
+            "bottom": 421.5,
+            "left": 384
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            Retrieving portrait record"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 918.921875,
+            "y": 111.78125,
+            "width": 617.078125,
+            "height": 309.71875,
+            "top": 111.78125,
+            "right": 1536,
+            "bottom": 421.5,
+            "left": 918.921875
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              RETRIEVING RECORD\n            \n            \n              Photos\n              RETRIEVING\n            \n            \n              Matches\n              RETRIEVING\n            \n            \n              Events\n              RETRIEVING\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              N/A\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 384,
+            "y": 430.765625,
+            "width": 1152,
+            "height": 293.25,
+            "top": 430.765625,
+            "right": 1536,
+            "bottom": 724.015625,
+            "left": 384
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of -- archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Event History\n                VMP\n              \n              \n                Event History Initializing\n                Date Pending\n                Venue Pending\n                Location Pending\n              \n              \n                Opponent Unlisted\n                VS\n                aaron rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    },
+    "after": {
+      "modules": [
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity",
+          "rect": {
+            "x": 384,
+            "y": 22.515625,
+            "width": 1152,
+            "height": 80,
+            "top": 22.515625,
+            "right": 1536,
+            "bottom": 102.515625,
+            "left": 384
+          },
+          "text": "Identity Header\n          \n            Aaron Rourke"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait",
+          "rect": {
+            "x": 384,
+            "y": 111.78125,
+            "width": 525.65625,
+            "height": 309.71875,
+            "top": 111.78125,
+            "right": 909.65625,
+            "bottom": 421.5,
+            "left": 384
+          },
+          "text": "Portrait - Updated N/A\n          \n            \n            No portrait available"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status",
+          "rect": {
+            "x": 918.921875,
+            "y": 111.78125,
+            "width": 617.078125,
+            "height": 309.71875,
+            "top": 111.78125,
+            "right": 1536,
+            "bottom": 421.5,
+            "left": 918.921875
+          },
+          "text": "Archive Status Module\n          \n            \n              Archive Status\n              NOT YET INDEXED\n            \n            \n              Photos\n              42\n            \n            \n              Matches\n              NOT YET INDEXED\n            \n            \n              Events\n              NOT YET INDEXED\n            \n            \n              WIN/PATRICIPANT\n              0 / 0\n            \n            \n              Category\n              Wrestler\n            \n            \n              Aliases\n              N/A\n            \n            \n              Teams / Stables\n              N/A"
+        },
+        {
+          "class": "wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--timeline",
+          "rect": {
+            "x": 384,
+            "y": 430.765625,
+            "width": 1152,
+            "height": 293.25,
+            "top": 430.765625,
+            "right": 1536,
+            "bottom": 724.015625,
+            "left": 384
+          },
+          "text": "TIMELINE / EVENT HISTORY\n            01 of 01 archived events\n          \n          \n            ‹\n            \n              Previous\n              \n              \n              \n            \n            \n              \n                \n                Fixture Aaron Event\n                VMP\n              \n              \n                Fixture Aaron Event\n                August 7th, 2026\n                Venue Unlisted\n                Location Unlisted\n              \n              \n                Opponent Unlisted\n                VS\n                Aaron Rourke\n                Match Data Unlisted\n                Result Unlisted\n                Open Event\n              \n            \n            \n              Next\n              \n              \n              \n            \n            ›"
+        }
+      ]
+    }
+  }
+]
