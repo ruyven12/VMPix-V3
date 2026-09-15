@@ -921,11 +921,126 @@ The Soundtrack / The Battleground / The Horizon / The Wild / The Cosmos
 
 # World: The Soundtrack
 
-Status: LOCKED  
-Compass Position: NW  
+Status: LOCKED existing Archive identity; Zhento consolidation below is **WORKING LORE / DESIGN DIRECTION** unless explicitly labeled otherwise.
+Compass Position: NW
 Current Module: Music Nexus
+World Name: ZHENTO
 
-## Core Identity
+## Zhento consolidation — authority and status
+
+Source: Chris's “ZHENTO LORE + STORYBOARD CONSOLIDATION PASS” and clarification that the Music/Zhento storyboard is newly being created, 2026-09-15. This authorizes recording the supplied concepts, not implementation or automatic promotion of provisional material into locked canon.
+
+[Zhento / Music Storyboard](ZHENTO_STORYBOARD.md) records the current story spine beneath this World Bible's authority. The labels below separate working canon (`WORKING LORE`), design direction, inspiration and unresolved questions.
+
+**DESIGN DIRECTION — Reconciliation.** The current Zhento direction is a prosperous past and a largely deserted present. Older descriptions below of a continually inhabited, physically growing city and its arrival sentence are retained as historical wording, superseded for the current Zhento story direction. They must not be used to fill the missing history. Community, memory, welcome, inclusion and the existing “Everyone belongs” law remain compatible anchors. The older Four Pillars landmark's place in this direction is **UNRESOLVED**; it is not the newly defined heart of the sound, and no replacement landmark is established.
+
+The wider blue/purple sonic palette does not change the protected purple Shell accent, NW bearing, Portfolio identity or runtime. Lore Master's older Soundtrack summary is a prior snapshot; this dated consolidation owns the current Zhento direction. No Daïion canon is revised.
+
+## Core identity — Planet of Culture
+
+**WORKING LORE.** ZHENTO is the Music world within the Voodoo Media Archive: the **PLANET OF CULTURE**.
+
+**MUSIC IS THE SOUNDTRACK OF LIFE.** Music intertwines with life, memory, identity, survival, connection, culture, movement and emotion. It is foundational to this world, beyond entertainment.
+
+## The Pulse
+
+**WORKING LORE.** Music is Zhento's heartbeat: **THE PULSE**. Rhythm acts like a heartbeat; drums represent pulse. Sound travels through the world as sonic and waveform language. Music is heard and physically felt: bass, drums, guitar tones and other frequencies can be experienced through the body.
+
+The Pulse is not currently a literal magical resource, fuel source or conventional energy system. It is not Zhento's equivalent of Daïion's Draegin. Do not infer a mechanism or equate it with Archive Energy.
+
+**DESIGN DIRECTION.** The world should feel as though sound moves through it. The Pulse should generally be felt before it is technically explained.
+
+## Sound and visual language
+
+**DESIGN DIRECTION.** Sound waves, sonic waves, waveforms, rhythm patterns, frequency-like motion, branching signals, convergence paths, resonance, pulses and nodes/nexuses form the primary language. Blue, purple and blue/purple transitions are the world palette.
+
+Zhento must communicate sound rather than generic energy. Do not recolor Daïion's effects blue or design effects in this documentation pass.
+
+## Past and present
+
+**WORKING LORE — At its height.** Zhento was extremely prosperous: an enormous industrial, highly developed mega-city world and a major center of culture. Civilization was deeply intertwined with music as a major cultural and industrial force. Culture and music were foundational to everyday life, not a secondary industry. Why it became that cultural center remains unknown.
+
+**WORKING LORE — Current encounter.** The Archive encounters a largely deserted, abandoned and decayed world. Formerly active structures remain.
+
+**DESIGN DIRECTION.** Echoes, dormant signals, residual sonic traces, old convergence points and decayed cultural infrastructure can remain. The Pulse initially welcomes and draws the Listener in, then lingers through otherwise deserted spaces:
+
+**WELCOME → RESONANCE → ECHO → EMPTINESS**
+
+Music can lend warmth while the absent civilization creates loneliness.
+
+**UNRESOLVED.** The decline, desertion and population's fate have no established cause. Do not invent wars, invasions, plague, disaster, corporate collapse, a villain, technological catastrophe, extinction or a resource crisis.
+
+## Genres
+
+**DESIGN DIRECTION.** Zhento represents the archive's wider soundtrack, not only rock or metal. Examples include rock, metal, rap, hip-hop, techno/electronic, folk, yacht rock and additional archived genres. Different areas may carry different rhythmic or sonic identities; the Pulse may change with the journey.
+
+**UNRESOLVED.** Genre geography may involve dedicated regions, overlap, blending or dynamic change. No fixed genre districts are established.
+
+## Archive destinations
+
+**WORKING LORE / DESIGN DIRECTION.** Bands, Shows, People and Venues should become distinct pieces of Zhento's world, beyond menu categories.
+
+| Archive area | Current conceptual identity | Boundary |
+| --- | --- | --- |
+| Bands | **Sources of the Pulse.** Without bands there is no music, without music no soundtrack, and without the soundtrack Zhento has no Pulse. Distinct band signals contribute to the larger soundtrack. | Formal area name unresolved; signals are conceptual, not a fuel-production mechanism. |
+| Shows | **Convergence nexuses.** Band signals travel, intersect and synchronize into a shared moment of collective physical experience: branching signals → convergence → nexus. A matrix of sonic pathways meeting at points is possible story/visual language. | Formal area name unresolved; future animation language only, with no effects specified here. |
+| Venues | **Vessels of the Pulse.** Physical performance structures of different sizes and architectural identities housed convergence events. Once filled with live sonic force, they are now aged or decayed and may retain echoes or waveform remnants. | Show = event; venue = physical vessel. A structural parallel to Fields of Conflict does not authorize copying it. Formal name unresolved. |
+| People | **The Chorus** carries the soundtrack forward: participants, carriers and keepers. | Working canon / provisional name. No Hall of Fame, awards, ranking, fame, elite status or induction implied by inclusion. |
+
+## The Listener and the journey
+
+**WORKING LORE.** The visitor is **THE LISTENER**, entering an Archive and experiencing what remains. Listening, following, exploring, navigating, interpreting and moving through the Pulse define this role; it is not a hero, conquest or mission role.
+
+**DESIGN DIRECTION.** The Listener moves through the Archive by following the Pulse. Distinct environments gradually draw the Listener deeper toward the heart/source/convergence of Zhento's soundtrack.
+
+**FOLLOW THE PULSE DEEPER TOWARD THE HEART OF THE SOUND.**
+
+**UNRESOLVED.** The destination's physical identity and Chapter One/arrival sequence are not defined. No final Citadel, tower, capital or central structure is created. The storyboard's broad arrival beat is not a completed arrival sequence.
+
+## Inspiration references
+
+**INSPIRATION — Fury³.** Supplied creative references only:
+
+- **New Kroy:** primary architectural/world influence — mega-city scale, industry, dense civilization, vertical structures and technological urban environments.
+- **Vestra:** secondary atmosphere — harsher environments, rough industry, underground/forgotten spaces and less polished areas.
+- **Fury:** secondary atmosphere — stark environments, emptiness, strange large-scale structures and a hollow/abandoned feeling.
+
+Do not copy Fury³ characters, factions, plot, terminology or locations. These reference notes are not imported history or independently researched game canon.
+
+**INSPIRATION — Hollow Knight: Silksong.** Journey structure only: distinct regions, progression felt through the world, upward/inward movement toward something significant, gradual attraction toward a major destination and changing yet coherent environments. Translate this into following the Pulse deeper toward the heart of the soundtrack. Do not copy its story, Pharloom, Citadel, characters or terminology, or invent direct equivalents.
+
+## Relationship to Daïion
+
+**DESIGN DIRECTION — Contrast, not new Daïion canon.** The supplied contrast is Daïion's conflict, survival, battle, red, Draegin and fractured energy versus Zhento's culture, expression, sound, rhythm, blue/purple, sonic waves and resonance. This does not replace Daïion's established honor/respect identity or settle Draegin's nature.
+
+Both belong to the larger Archive experience while retaining distinct identities. Direct story connections and their exact relationship remain **UNRESOLVED**.
+
+## Open story questions
+
+All entries are **UNRESOLVED**; this consolidation answers none of them.
+
+1. Why did Zhento become such an important cultural center?
+2. What caused Zhento's decline?
+3. Why is the world now deserted?
+4. What happened to its former population?
+5. What does the larger Archive represent within Zhento?
+6. What is Zhento's Chapter One / arrival sequence?
+7. What is located at the eventual “heart of the sound”?
+8. Are sonic waves physically present, Archive visualization or intentionally ambiguous?
+9. How are genres geographically/culturally distributed?
+10. What are the finalized names for the Bands, Shows and Venues areas?
+11. Is “The Chorus” the final People name?
+12. How directly does Zhento connect to Daïion?
+13. Are there additional regions, social structures or cultural groups?
+14. What historical event separates prosperous Zhento from deserted Zhento?
+
+Additional inherited reconciliation: the Four Pillars' place in this direction remains unresolved. Historical idea-bucket names are not finalized regions or People names.
+
+## Historical Soundtrack definition — retained source record
+
+The following preserves the earlier text, not a second current story direction. Read it under the reconciliation above: active-city/physical-growth/arrival wording is superseded for current Zhento planning; the Four Pillars relationship remains unresolved. Idea-bucket concepts remain deferred/provisional. Compatible inclusion and memory principles remain established anchors. No historical line authorizes overriding the current boundaries.
+
+### Core Identity
 
 The Soundtrack is a living megacity where music never truly ends.
 
@@ -933,14 +1048,14 @@ Every performance strengthens the city.
 Every photograph preserves a connection.  
 Every new memory becomes part of a world that continues to grow alongside the community that created it.
 
-## Purpose
+### Purpose
 
 The Soundtrack exists to preserve the emotional connections created through live music.
 
 It is not just a music portfolio.  
 It is a world about connection, relationships, memory, and community through music.
 
-## Core Emotion
+### Core Emotion
 
 - Connection
 - Community
@@ -948,13 +1063,13 @@ It is a world about connection, relationships, memory, and community through mus
 - Energy
 - Welcome
 
-## Time
+### Time
 
 The Soundtrack is primarily night.
 
 The city comes alive after dark, under stage lights, venue lights, festival lights, and urban glow.
 
-## Philosophy
+### Philosophy
 
 Music is a universal language.
 
@@ -965,7 +1080,7 @@ Every connection deserves to be remembered.
 
 The world reflects a personal journey through music, from 90s dance and pop, to country, to rock, to metal, while remaining open to every genre and future expansion.
 
-## Population
+### Population
 
 The Soundtrack is kept alive by:
 
@@ -978,7 +1093,7 @@ The Soundtrack is kept alive by:
 
 Future contributors should feel like they are adding memories to the world, not merely submitting content.
 
-## Geography
+### Geography
 
 The Soundtrack is a sprawling megacity.
 
@@ -987,7 +1102,7 @@ More venues, shows, artists, contributors, and memories create more city.
 
 This supports indefinite future expansion.
 
-## Architecture
+### Architecture
 
 The architecture is inspired by live concert production.
 
@@ -1008,7 +1123,7 @@ Flexible scale:
 
 Small shows should still feel meaningful. Local venue spaces are part of the world, not lesser versions of it.
 
-## Landmark
+### Landmark
 
 The defining landmark is The Four Pillars.
 
@@ -1024,7 +1139,7 @@ Everything else in The Soundtrack grows outward from those pillars.
 The Four Pillars are not about fame or virtuosity.  
 They represent the universal foundation of live music.
 
-## Environment
+### Environment
 
 The world is mostly urban.
 
@@ -1032,13 +1147,13 @@ Light functions almost like nature here.
 
 City lights, building lights, signs, streets, and venue glow may pulse with rhythm. Motion should feel musical, not mechanical.
 
-## Transportation
+### Transportation
 
 Movement through The Soundtrack is represented by sound waves.
 
 Transitions and travel language should feel like riding, crossing, or being carried by musical energy.
 
-## Personality
+### Personality
 
 The Soundtrack is:
 
@@ -1049,20 +1164,20 @@ The Soundtrack is:
 - Emotional
 - Inclusive
 
-## Immutable World Law
+### Immutable World Law
 
 Everyone belongs.
 
 Music unites.  
 Division, ego, drama, exclusion, and unnecessary conflict have no place in this world.
 
-## Expansion Rules
+### Expansion Rules
 
 Future additions should feel like natural city expansion.
 
 New districts, features, contributors, or archives should integrate into the living megacity rather than replacing or redesigning the world.
 
-## Protected Idea Bucket
+### Protected Idea Bucket
 
 These ideas are preserved but not required for current implementation:
 
@@ -1074,7 +1189,7 @@ These ideas are preserved but not required for current implementation:
 - Contributor Plaza / Living Memories concept.
 - Future districts such as Recording District, Festival Quarter, Local Venue Alley, Hall of Legends, Music Theory Conservatory, Contributor Plaza.
 
-## Arrival Sentence
+### Arrival Sentence
 
 Welcome to The Soundtrack, a city where music never fades, every performance strengthens the world, and every connection becomes part of a living archive.
 
