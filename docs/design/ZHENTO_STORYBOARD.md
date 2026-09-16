@@ -27,6 +27,19 @@ Blue/purple sonic waves, waveforms, rhythm patterns, frequency-like motion, bran
 
 Rock, metal, rap, hip-hop, techno/electronic, folk, yacht rock and other archived genres belong. Regional rhythms may vary; fixed genre districts, boundaries and distribution are unresolved.
 
+## Four Pillars — foundation for later story beats
+
+**CONFIRMED WORKING CANON / PROTECTED STORY CONCEPTS.** Source: Chris's “ZHENTO FOUR PILLARS DOCUMENTATION PASS,” 2026-09-16; see [World Bible — The Four Pillars of Zhento](world-bible.md#the-four-pillars-of-zhento).
+
+| Pillar | Archive relationship | Story foundation |
+| --- | --- | --- |
+| **RHYTHM** | **Bands → Source of the Pulse** | Originates the journey through timing, movement and drive. Bands contribute distinct rhythmic identities; without bands there is no Pulse, and without the Pulse no living soundtrack of Zhento. Rhythm is their originating musical force, not drums alone. |
+| **MELODY** | **People / The Chorus → Human identity of the soundtrack** | Gives the journey identity: the human line of distinct voices, memories and contributions moving through the Pulse. Together they form The Chorus and carry the soundtrack forward, without ranking, fame, awards or Hall of Fame status. |
+| **HARMONY** | **Venues → Vessels / spaces that shape the Pulse** | Gives the journey physical space. Sound and surroundings give each other depth; venues shape and contain live sound with distinct atmosphere, resonance and identity. Decayed structures may retain echoes of past convergence events. |
+| **SYNC** | **Shows → Convergence of the Pulse** | Produces convergence: bands, people, venue and audience experience align at a moment. Branching sonic paths meet and synchronize at a nexus into one shared physical experience. |
+
+Together these musical/cultural principles form **THE FOUR PILLARS OF ZHENTO**, a foundation beneath the archive rather than renamed menu buttons. Future work must preserve these conceptual mappings. Their visual implementation remains unresolved and is not protected yet. They do not prescribe new scenes, locations, effects or frontend mechanics, or finalize area names or The Chorus's provisional name. The existing ten-beat story spine is unchanged.
+
 ## Current story spine
 
 Each row is **DESIGN DIRECTION**, drawing on the working lore above. These are ten conceptual beats, not ten prescribed pages, routes, scenes or animations.
@@ -82,7 +95,19 @@ All remain **UNRESOLVED**:
 13. Are there additional regions, social structures or cultural groups?
 14. What historical event separates prosperous and deserted Zhento?
 
-The inherited Four Pillars landmark's relationship to this direction is also unresolved. Do not turn it into the journey's destination or invent a final tower, capital, Citadel or central structure. Do not invent wars, invasions, plague, disaster, corporate collapse, a villain, technological catastrophe, extinction or a resource crisis to explain the decline.
+### Unresolved Four Pillars questions
+
+Their conceptual purpose is established. The following remain **UNRESOLVED**:
+
+- How do the Pillars physically appear in-world?
+- Are they literal cultural principles, Archive terminology, or deliberately both?
+- How does the Listener first encounter them?
+- Does each Pillar receive a dedicated world location or sequence?
+- What is their exact frontend presentation?
+
+The Pillars are not established as the journey's destination. Historical idea-bucket names do not finalize regions or People names.
+
+The old Voice/Guitar/Bass/Drums landmark definition is superseded by the confirmed conceptual mappings above. Do not invent a final tower, capital, Citadel or central structure. Do not invent wars, invasions, plague, disaster, corporate collapse, a villain, technological catastrophe, extinction or a resource crisis to explain the decline.
 
 ## Continuity and review boundaries
 

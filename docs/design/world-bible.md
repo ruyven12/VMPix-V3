@@ -932,7 +932,7 @@ Source: Chris's “ZHENTO LORE + STORYBOARD CONSOLIDATION PASS” and clarificat
 
 [Zhento / Music Storyboard](ZHENTO_STORYBOARD.md) records the current story spine beneath this World Bible's authority. The labels below separate working canon (`WORKING LORE`), design direction, inspiration and unresolved questions.
 
-**DESIGN DIRECTION — Reconciliation.** The current Zhento direction is a prosperous past and a largely deserted present. Older descriptions below of a continually inhabited, physically growing city and its arrival sentence are retained as historical wording, superseded for the current Zhento story direction. They must not be used to fill the missing history. Community, memory, welcome, inclusion and the existing “Everyone belongs” law remain compatible anchors. The older Four Pillars landmark's place in this direction is **UNRESOLVED**; it is not the newly defined heart of the sound, and no replacement landmark is established.
+**DESIGN DIRECTION — Reconciliation.** The current Zhento direction is a prosperous past and a largely deserted present. Older descriptions below of a continually inhabited, physically growing city and its arrival sentence are retained as historical wording, superseded for the current Zhento story direction. They must not be used to fill the missing history. Community, memory, welcome, inclusion and the existing “Everyone belongs” law remain compatible anchors. The Four Pillars' conceptual purpose is now confirmed working canon in the 2026-09-16 update below. Rhythm, Melody, Harmony and Sync supersede the historical Voice/Guitar/Bass/Drums definition. Their physical appearance remains **UNRESOLVED**; they are not established as the heart of the sound or a physical landmark.
 
 The wider blue/purple sonic palette does not change the protected purple Shell accent, NW bearing, Portfolio identity or runtime. Lore Master's older Soundtrack summary is a prior snapshot; this dated consolidation owns the current Zhento direction. No Daïion canon is revised.
 
@@ -987,6 +987,23 @@ Music can lend warmth while the absent civilization creates loneliness.
 | Venues | **Vessels of the Pulse.** Physical performance structures of different sizes and architectural identities housed convergence events. Once filled with live sonic force, they are now aged or decayed and may retain echoes or waveform remnants. | Show = event; venue = physical vessel. A structural parallel to Fields of Conflict does not authorize copying it. Formal name unresolved. |
 | People | **The Chorus** carries the soundtrack forward: participants, carriers and keepers. | Working canon / provisional name. No Hall of Fame, awards, ranking, fame, elite status or induction implied by inclusion. |
 
+## The Four Pillars of Zhento
+
+**CONFIRMED WORKING CANON / PROTECTED STORY CONCEPTS.** Source: Chris's “ZHENTO FOUR PILLARS DOCUMENTATION PASS,” 2026-09-16. The Four Pillars are musical/cultural principles underlying Zhento and a story/design foundation beneath the Music Archive, not merely navigation categories or renamed menu buttons.
+
+| Pillar | Music Archive structure | Conceptual relationship |
+| --- | --- | --- |
+| **I — RHYTHM** | **Bands** | **Source of the Pulse.** Rhythm is the pulse: timing, movement and drive. Bands are its primary sources; distinct rhythmic identities contribute to Zhento's larger soundtrack. Without bands there is no Pulse; without the Pulse there is no living soundtrack of Zhento. Rhythm means the originating musical force of bands, not literal drum beats alone. |
+| **II — MELODY** | **People / The Chorus** | **Human identity of the soundtrack.** Melody is the human line moving through the Pulse. Distinct voices, identities, memories and contributions together form The Chorus, which carries the soundtrack forward. Inclusion implies no ranking, fame, awards or Hall of Fame status. |
+| **III — HARMONY** | **Venues** | **Vessels / spaces that shape the Pulse.** Harmony is the relationship between sound and space: different elements coexist and gain depth through their surroundings. Venues shape, contain and give physical character to live sound, with different atmosphere, resonance and identity. Abandoned or decayed performance structures may retain echoes of former convergence events. |
+| **IV — SYNC** | **Shows** | **Convergence of the Pulse.** Separate musical forces align at a specific moment: bands, people, venue and audience experience come together. Shows remain convergence nexuses where branching sonic paths meet, synchronize and become one shared physical experience. |
+
+Together, Rhythm, Melody, Harmony and Sync form **THE FOUR PILLARS OF ZHENTO**. Their conceptual role is established; this does not finalize area names, change The Chorus's provisional naming status or define how the principles manifest in-world.
+
+### Zhento design protection
+
+**PROTECTED — Conceptual relationships.** Future story/design and implementation must preserve Rhythm / Bands, Melody / People, Harmony / Venues and Sync / Shows. Protection applies to these story concepts and mappings. Visual implementation remains unresolved and is not protected yet. No visual or mechanical frontend treatment is determined or authorized here.
+
 ## The Listener and the journey
 
 **WORKING LORE.** The visitor is **THE LISTENER**, entering an Archive and experiencing what remains. Listening, following, exploring, navigating, interpreting and moving through the Pulse define this role; it is not a hero, conquest or mission role.
@@ -1034,11 +1051,21 @@ All entries are **UNRESOLVED**; this consolidation answers none of them.
 13. Are there additional regions, social structures or cultural groups?
 14. What historical event separates prosperous Zhento from deserted Zhento?
 
-Additional inherited reconciliation: the Four Pillars' place in this direction remains unresolved. Historical idea-bucket names are not finalized regions or People names.
+### Unresolved Four Pillars questions
+
+Their conceptual purpose is established. The following remain **UNRESOLVED**:
+
+- How do the Pillars physically appear in-world?
+- Are they literal cultural principles, Archive terminology, or deliberately both?
+- How does the Listener first encounter them?
+- Does each Pillar receive a dedicated world location or sequence?
+- What is their exact frontend presentation?
+
+The Pillars are not established as the journey's destination. Historical idea-bucket names do not finalize regions or People names.
 
 ## Historical Soundtrack definition — retained source record
 
-The following preserves the earlier text, not a second current story direction. Read it under the reconciliation above: active-city/physical-growth/arrival wording is superseded for current Zhento planning; the Four Pillars relationship remains unresolved. Idea-bucket concepts remain deferred/provisional. Compatible inclusion and memory principles remain established anchors. No historical line authorizes overriding the current boundaries.
+The following preserves the earlier text, not a second current story direction. Read it under the reconciliation above: active-city/physical-growth/arrival wording is superseded for current Zhento planning; the historical Four Pillars definition is superseded by Rhythm, Melody, Harmony and Sync, while their physical appearance remains unresolved. Idea-bucket concepts remain deferred/provisional. Compatible inclusion and memory principles remain established anchors. No historical line authorizes overriding the current boundaries.
 
 ### Core Identity
 
@@ -1123,7 +1150,9 @@ Flexible scale:
 
 Small shows should still feel meaningful. Local venue spaces are part of the world, not lesser versions of it.
 
-### Landmark
+### Landmark — superseded Four Pillars definition
+
+**HISTORICAL / SUPERSEDED, 2026-09-16.** The Voice/Guitar/Bass/Drums definition and fixed-landmark framing below are retained only as a source record. Current confirmed working canon is Rhythm / Bands, Melody / People, Harmony / Venues and Sync / Shows. No physical landmark or visual form is established by the current definition.
 
 The defining landmark is The Four Pillars.
 
