@@ -15140,6 +15140,16 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
   const context = getWrestlingPersonDossierPrototypeSelectedPersonContext(state.record);
   workspace.dataset.wrestlingPersonDossierPrototypeState = state.status;
   const pending = state.status === "idle" || state.status === "loading";
+  const recovery = workspace.querySelector("[data-wrestling-person-dossier-prototype-recovery]");
+  const retry = recovery?.querySelector("button");
+  if (recovery) {
+    const showRecovery = state.status === "error";
+    if (!showRecovery && recovery.contains(document.activeElement)) {
+      workspace.querySelector("[data-wrestling-person-dossier-prototype-name]")?.focus({ preventScroll: true });
+    }
+    recovery.hidden = !showRecovery;
+    retry.disabled = !showRecovery;
+  }
   const initialIdentity = pending ? state.initialIdentity : null;
   const identity = workspace.querySelector(".wrestling-person-dossier-prototype-module--identity");
   const statusPanel = workspace.querySelector(".wrestling-person-dossier-prototype-module--status");
@@ -15166,6 +15176,9 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
 
   renderWrestlingPersonDossierPrototypePortrait(workspace, initialIdentity
     ? { ...context, displayName: initialIdentity.name, record: initialIdentity } : context);
+  if (state.status === "error") {
+    workspace.querySelector("[data-wrestling-person-dossier-prototype-portrait-label]").hidden = true;
+  }
 
   if (state.status === "empty") {
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-name]", `${context.displayName.toUpperCase()} RECORD NOT FOUND`);
@@ -15189,22 +15202,48 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
   setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", pending ? "PENDING" : WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
   setWrestlingPersonDossierPrototypeMetadataItems(workspace, null);
 }
+function cancelWrestlingPersonDossierPrototypeRecordRequest(activation = wrestlingPersonDossierActivation) {
+  const request = activation?.recordRequest;
+  if (!request) return;
+  activation.recordRequest = null;
+  if (wrestlingPersonDossierPrototypeRecordRequests.get(request.key) === request.promise) {
+    wrestlingPersonDossierPrototypeRecordRequests.delete(request.key);
+  }
+  request.controller.abort();
+}
+
+function retryWrestlingPersonDossierPrototypeRecord() {
+  if (!isCurrentWrestlingPersonDossierRequest() || wrestlingPersonDossierPrototypeSelectedPersonState.status !== "error") return;
+  cancelWrestlingPersonDossierPrototypeRecordRequest();
+  // Retry only identity: successful history, its selection, and the mounted dossier stay intact.
+  loadWrestlingPersonDossierPrototypeSelectedPersonRecord();
+}
+
 function getWrestlingPersonDossierPrototypeRecordRequest(context, cacheKey) {
   let rawRequest = wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey);
   if (!rawRequest) {
-    rawRequest = new Promise((resolve) => resolve(withWrestlingRequestTimeout(fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
-       headers: { Accept: "application/json" },
-    }), null, WRESTLING_PEOPLE_TIMEOUT_MS, context.displayName)))
-      .then((response) => {
-        if (!response.ok) throw new Error("Person archive request failed: " + response.status + " " + response.statusText);
-        return response.json();
-      }).then((payload) => {
+    const activation = wrestlingPersonDossierActivation;
+    const controller = new AbortController();
+    // Dispatch synchronously before dossier construction; the deadline includes the body.
+    const responseBody = new Promise((resolve) => resolve(fetch(getWrestlingPersonDossierPrototypePersonLookupUrl(context), {
+      headers: { Accept: "application/json" }, signal: controller.signal,
+    }))).then((response) => {
+      if (!response.ok) throw new Error("Person archive request failed: " + response.status + " " + response.statusText);
+      return response.json();
+    });
+    rawRequest = withWrestlingRequestTimeout(responseBody, controller, WRESTLING_PEOPLE_TIMEOUT_MS, context.displayName)
+      .then((payload) => {
+        if (controller.signal.aborted) throw new DOMException("Person lookup abandoned", "AbortError");
         const result = findWrestlingPersonDossierPrototypeSelectedPersonRecord(payload, context);
         if (result) setWrestlingPersonDossierPrototypeCachedRecord(result, context, cacheKey);
         return result;
       }).finally(() => {
         if (wrestlingPersonDossierPrototypeRecordRequests.get(cacheKey) === rawRequest) wrestlingPersonDossierPrototypeRecordRequests.delete(cacheKey);
+        if (activation?.recordRequest?.promise === rawRequest) activation.recordRequest = null;
       });
+    if (activation) activation.recordRequest = { key: cacheKey, controller, promise: rawRequest };
+    // Early dispatch may be abandoned before the visible consumer attaches.
+    rawRequest.catch(() => {});
     wrestlingPersonDossierPrototypeRecordRequests.set(cacheKey, rawRequest);
   }
   return rawRequest;
@@ -15302,7 +15341,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
         <header class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--identity">
           <p class="wrestling-person-dossier-prototype-module__label">Identity Header</p>
           <div class="wrestling-person-dossier-prototype-identity-summary">
-            <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name" data-wrestling-person-dossier-prototype-name>ARCHIVE RECORD INITIALIZING</h2>
+            <h2 class="wrestling-person-dossier-prototype-identity__name" id="wrestling-person-dossier-prototype-name" tabindex="-1" data-wrestling-person-dossier-prototype-name>ARCHIVE RECORD INITIALIZING</h2>
           </div>
         </header>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--portrait" aria-label="Portrait module">
@@ -15310,6 +15349,10 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
           <div class="wrestling-person-dossier-prototype-portrait" data-wrestling-person-dossier-prototype-portrait aria-label="Selected person portrait module">
             <img class="wrestling-person-dossier-prototype-portrait__image" data-wrestling-person-dossier-prototype-portrait-image loading="lazy" decoding="async" hidden alt="">
             <span class="wrestling-person-dossier-prototype-portrait__label" data-wrestling-person-dossier-prototype-portrait-label>Portrait Signal Reserved</span>
+            <div class="wrestling-person-dossier-prototype-recovery" data-wrestling-person-dossier-prototype-recovery hidden>
+              <p id="wrestling-person-record-recovery-message" role="status">Person record unavailable. Event History loads independently.</p>
+              <button class="wrestling-person-dossier-prototype-event-history__action" type="button" aria-describedby="wrestling-person-record-recovery-message" data-wrestling-person-dossier-prototype-retry disabled>Retry Record</button>
+            </div>
           </div>
         </section>
         <section class="wrestling-person-dossier-prototype-module wrestling-person-dossier-prototype-module--status" aria-label="Archive status module">
@@ -15479,6 +15522,7 @@ function getWrestlingPersonDossierPrototypeShell() {
 
   const { pedestal, expandedHologram } = createWrestlingPersonDossierPrototypeHallPresentation();
   prototypeShell.append(pedestal, expandedHologram);
+  prototypeShell.querySelector("[data-wrestling-person-dossier-prototype-retry]")?.addEventListener("click", retryWrestlingPersonDossierPrototypeRecord);
 
   const shellElement = document.querySelector(".site-shell");
   (shellElement || document.body).appendChild(prototypeShell);
@@ -15487,6 +15531,7 @@ function getWrestlingPersonDossierPrototypeShell() {
 }
 
 function setWrestlingPersonDossierPrototypeActive(isActive, subject = null) {
+  cancelWrestlingPersonDossierPrototypeRecordRequest();
   if (isActive) {
     const token = window.history.state?.hallOfChampionsReturnToken;
     const snapshot = hallOfChampionsReturnSnapshots.get(token);
