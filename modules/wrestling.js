@@ -13865,7 +13865,8 @@ function normalizeWrestlingPersonDossierPrototypePersonAppearance(match, matchIn
   const personSideKey = getWrestlingPersonDossierPrototypeSelectedPersonSideKey(match, context);
   const opposingSideKey = personSideKey === "side_1" ? "side_2" : personSideKey === "side_2" ? "side_1" : "";
   const personSideValues = personSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, personSideKey) : [context.displayName];
-  const opposingSideValues = opposingSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, opposingSideKey) : [];
+  const opposingSideValues = (opposingSideKey ? getWrestlingPersonDossierPrototypeMatchSide(match, opposingSideKey) : [])
+    .filter((value) => !isWrestlingPersonDossierPrototypeSelectedPersonIdentity(value, context));
   const matchOrder = Number(match?.match_order ?? match?.matchOrder ?? match?.order ?? matchIndex + 1);
 
   return {
@@ -15028,9 +15029,8 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-date]", activeEvent?.date || (stateName === "loaded" ? "Date Unlisted" : "Date Pending"));
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-venue]", activeEvent?.venue || (stateName === "loaded" ? "Venue Unlisted" : "Venue Pending"));
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-location]", activeEvent?.location || (stateName === "loaded" ? "Location Unlisted" : "Location Pending"));
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-opponents]", selectedAppearance?.opposingSide || "Opponent Unlisted");
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-person-side]", selectedAppearance?.personSide || context.displayName);
-  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-match-type]", selectedAppearance?.matchType || "Match Data Unlisted");
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-opponents]", `vs ${selectedAppearance?.opposingSide || "Opponent Unlisted"}`);
+  setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-match-type]", `(${selectedAppearance?.matchType || "Match Data Unlisted"})`);
   setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-event-result]", selectedAppearance?.result || "Result Unlisted");
   setWrestlingPersonDossierPrototypeEventPoster(workspace, activeEvent);
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[boundedActiveIndex - 1] : null);
@@ -15421,16 +15421,17 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
                 <span class="wrestling-person-dossier-prototype-event-history__poster-mark" data-wrestling-person-dossier-prototype-event-poster-mark>VMP</span>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__show">
+                <p class="wrestling-person-dossier-prototype-event-history__section-label">EVENT</p>
                 <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title data-wrestling-person-dossier-prototype-event-fit>Event History Initializing</h3>
                 <p data-wrestling-person-dossier-prototype-event-date>Date Pending</p>
                 <p data-wrestling-person-dossier-prototype-event-venue>Venue Pending</p>
                 <p data-wrestling-person-dossier-prototype-event-location>Location Pending</p>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__match">
+                <p class="wrestling-person-dossier-prototype-event-history__section-label">INFORMATION</p>
                 <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-opponents data-wrestling-person-dossier-prototype-event-fit>Opponent Unlisted</p>
-                <p class="wrestling-person-dossier-prototype-event-history__vs">VS</p>
-                <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-person-side data-wrestling-person-dossier-prototype-event-fit>Selected Person</p>
                 <p class="wrestling-person-dossier-prototype-event-history__type" data-wrestling-person-dossier-prototype-event-match-type>Match Data Pending</p>
+                <p class="wrestling-person-dossier-prototype-event-history__section-label">OUTCOME</p>
                 <p class="wrestling-person-dossier-prototype-event-history__result" data-wrestling-person-dossier-prototype-event-result>Result Pending</p>
                 <button class="wrestling-person-dossier-prototype-event-history__action" type="button" aria-disabled="true" data-wrestling-person-dossier-prototype-event-open disabled>Open Event</button>
               </div>
