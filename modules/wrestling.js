@@ -13932,6 +13932,15 @@ function normalizeWrestlingPersonDossierPrototypeEventHistory(payload, context =
   return [...eventMap.values()].sort((left, right) => right.dateSort - left.dateSort || left.title.localeCompare(right.title));
 }
 
+function getWrestlingPersonDossierPrototypeTimelineEntries(events = wrestlingPersonDossierPrototypeEventHistoryState.events) {
+  return events.flatMap((event) => {
+    const appearances = Array.isArray(event.personAppearances) ? event.personAppearances : [];
+    return appearances.length > 0
+      ? appearances.map((appearance) => ({ ...event, selectedAppearance: appearance }))
+      : [{ ...event, selectedAppearance: null }];
+  });
+}
+
 function getWrestlingPersonDossierPrototypeEventHistoryCount(total) {
   const count = Number(total);
   return Number.isFinite(count) && count > 0 ? String(Math.trunc(count)).padStart(2, "0") : "00";
@@ -14078,8 +14087,9 @@ function setWrestlingPersonDossierPrototypeEventHistoryIndex(nextIndex, shell = 
     return false;
   }
 
-  const boundedIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(nextIndex, state.events.length);
-  const currentIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, state.events.length);
+  const entries = getWrestlingPersonDossierPrototypeTimelineEntries();
+  const boundedIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(nextIndex, entries.length);
+  const currentIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, entries.length);
   if (boundedIndex === currentIndex) {
     state.activeIndex = currentIndex;
     return false;
@@ -14109,8 +14119,9 @@ function getWrestlingPersonDossierPrototypeSelectedEventArchiveContext() {
     return null;
   }
 
-  const eventIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, state.events.length);
-  const event = state.events[eventIndex];
+  const entries = getWrestlingPersonDossierPrototypeTimelineEntries();
+  const eventIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, entries.length);
+  const event = entries[eventIndex];
   if (!event) {
     return null;
   }
@@ -14118,7 +14129,7 @@ function getWrestlingPersonDossierPrototypeSelectedEventArchiveContext() {
   return {
     event,
     eventIndex,
-    appearance: Array.isArray(event.personAppearances) ? event.personAppearances[0] || null : null,
+    appearance: event.selectedAppearance,
   };
 }
 
@@ -14161,7 +14172,7 @@ function createWrestlingPersonDossierPrototypeEventArchivePhotoEventRow(event, a
   const raw = event.raw && typeof event.raw === "object" ? event.raw : {};
   const match = appearance?.match && typeof appearance.match === "object" ? appearance.match : {};
   const matchOrder = Number.parseInt(appearance?.matchOrder || match.match_order || match.matchOrder || match.order || "1", 10) || 1;
-  const matchRef = getWrestlingMatchRouteRef(match, matchOrder - 1) || `match-${matchOrder}`;
+  const matchRef = getWrestlingText(match.match_url) || getWrestlingMatchRouteRef(match, matchOrder - 1) || `match-${matchOrder}`;
   const rawDate = raw.date || raw.show_date || raw.eventDate || raw.event_date || event.dateKey || event.date;
   const dateKey = getWrestlingText(event.dateKey || raw.dateKey || raw.date_key || getWrestlingShowDateKey(rawDate));
   const showId = getWrestlingText(raw.showId || raw.show_id || raw.eventId || raw.event_id || raw.id || event.id || dateKey);
@@ -15035,7 +15046,7 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   const eventTotal = stateName === "loaded" ? events.length : 0;
   const boundedActiveIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(activeIndex, eventTotal || total);
   const activeEvent = stateName === "loaded" ? events[boundedActiveIndex] || event : event;
-  const selectedAppearance = activeEvent?.personAppearances?.[0] || null;
+  const selectedAppearance = activeEvent?.selectedAppearance || null;
   if (timeline) {
     timeline.dataset.wrestlingPersonDossierPrototypeEventHistoryState = stateName;
   }
@@ -15058,7 +15069,7 @@ function renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, state
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "previous", stateName === "loaded" ? events[boundedActiveIndex - 1] : null);
   setWrestlingPersonDossierPrototypeEventPreview(workspace, "next", stateName === "loaded" ? events[boundedActiveIndex + 1] : null);
   if (stateName === "loaded" || stateName === "empty") {
-    setWrestlingPersonDossierPrototypeWinParticipantStatus(workspace, events, context);
+    setWrestlingPersonDossierPrototypeWinParticipantStatus(workspace, wrestlingPersonDossierPrototypeEventHistoryState.events, context);
   } else {
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "winParticipant", stateName === "error" ? "UNAVAILABLE" : "PENDING");
   }
@@ -15075,9 +15086,10 @@ function renderWrestlingPersonDossierPrototypeEventHistoryState(shell = wrestlin
 
   const state = wrestlingPersonDossierPrototypeEventHistoryState;
   if (state.status === "loaded" && state.events.length > 0) {
-    const activeIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, state.events.length);
+    const entries = getWrestlingPersonDossierPrototypeTimelineEntries();
+    const activeIndex = getWrestlingPersonDossierPrototypeBoundedEventHistoryIndex(state.activeIndex, entries.length);
     state.activeIndex = activeIndex;
-    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", state.events[activeIndex], state.events.length, state.events, activeIndex);
+    renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "loaded", entries[activeIndex], entries.length, entries, activeIndex);
   } else if (state.status === "empty") {
     state.activeIndex = 0;
     renderWrestlingPersonDossierPrototypeEventHistoryShell(workspace, "empty");
