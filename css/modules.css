@@ -13173,11 +13173,16 @@ button.wrestling-event-history-tagged-thumb {
 .wrestling-person-dossier-prototype-event-history__outcome,
 .wrestling-person-dossier-prototype-event-history__metadata { display: contents; }
 @media (max-width: 640px) {
+  /* Share the existing dossier height: a little less portrait, more Timeline. */
+  .wrestling-person-dossier-prototype-framework {
+    grid-template-rows: auto minmax(8.1rem, 1fr) auto minmax(12.5rem, 1.5fr);
+  }
+  .wrestling-person-dossier-prototype-portrait { max-block-size: min(100%, 14svh); }
   .wrestling-person-dossier-prototype-module--timeline { row-gap: 4px; padding-block-end: 4px; }
   .wrestling-person-dossier-prototype-event-history__card {
     grid-template-columns: minmax(0, 0.7fr) minmax(0, 2.15fr);
     grid-template-rows: minmax(0, 1fr);
-    gap: 0.4rem;
+    column-gap: 10px;
     padding: 0.2rem;
   }
   .wrestling-person-dossier-prototype-event-history__poster {
@@ -13192,9 +13197,9 @@ button.wrestling-event-history-tagged-thumb {
     display: grid;
     grid-column: 2;
     grid-row: 1;
-    grid-template-rows: auto auto auto;
-    align-content: center;
-    gap: 0.15rem;
+    grid-template-rows: max-content max-content minmax(max-content, 1fr);
+    align-content: stretch;
+    gap: 4px;
     min-inline-size: 0;
     text-align: left;
   }
@@ -13211,15 +13216,16 @@ button.wrestling-event-history-tagged-thumb {
     border: 0;
     padding: 0;
   }
-  .wrestling-person-dossier-prototype-event-history__show { grid-row: 1; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.35rem; }
+  .wrestling-person-dossier-prototype-event-history__show { grid-row: 1; grid-template-columns: minmax(0, 1fr); }
   .wrestling-person-dossier-prototype-event-history__metadata { grid-column: 1 / -1; }
-  .wrestling-person-dossier-prototype-event-history__information { grid-row: 2; }
-  .wrestling-person-dossier-prototype-event-history__outcome { grid-row: 3; grid-template-columns: auto 1fr; column-gap: 0.35rem; }
-  .wrestling-person-dossier-prototype-event-history__metadata { display: flex; flex-wrap: wrap; gap: 0.08rem 0.3rem; }
+  .wrestling-person-dossier-prototype-event-history__information { grid-row: 2; border-block: 1px solid rgba(255, 118, 64, 0.2); padding-block: 4px; inline-size: 100%; box-sizing: border-box; }
+  .wrestling-person-dossier-prototype-event-history__outcome { grid-row: 3; grid-template-columns: minmax(0, 1fr); grid-template-rows: max-content max-content 1fr; }
+  .wrestling-person-dossier-prototype-event-history__metadata { display: grid; gap: 0.08rem; }
   .wrestling-person-dossier-prototype-module--timeline [data-wrestling-person-dossier-prototype-event-open] {
     grid-column: 1 / -1;
     justify-self: center;
-    margin-block-start: 0.1rem;
+    align-self: end;
+    margin-block-start: 4px;
   }
 }
 
