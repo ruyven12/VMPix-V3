@@ -6840,79 +6840,146 @@ let lightboxInFrameStrip = null;
 let lightboxInFrameActions = null;
 let lightboxInFrameResizeObserver = null;
 let lightboxInFrameLayoutFrame = 0;
-let lightboxPhotoDownloadSession = null;
+let lightboxInFramePhotoActions = null;
 
 function cancelLightboxPhotoDownload() {
-  const session = lightboxPhotoDownloadSession;
-  lightboxPhotoDownloadSession = null;
-  if (!session) return;
-  session.controller?.abort();
-  clearTimeout(session.timeout);
-  clearTimeout(session.revokeTimer);
-  if (session.objectUrl) URL.revokeObjectURL(session.objectUrl);
-  lightboxInFrameActions?.querySelector("a")?.removeAttribute("aria-busy");
+  lightboxInFramePhotoActions?.cancel();
 }
 
-async function downloadLightboxPhoto(event) {
-  const session = lightboxPhotoDownloadSession;
-  if (!session || event.defaultPrevented) return;
-  const current = () => lightboxPhotoDownloadSession === session && location.pathname === session.path &&
-    lightboxScreen?.classList.contains("has-match-in-frame");
-  if (!current()) { event.preventDefault(); return; }
-  if (session.pending) { event.preventDefault(); return; }
-  if (session.fallback || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
-  event.preventDefault();
-  const link = lightboxInFrameActions.querySelector("a");
-  const note = lightboxInFrameActions.querySelector("p");
-  session.pending = true;
-  session.controller = new AbortController();
-  link.setAttribute("aria-busy", "true");
-  note.textContent = "Preparing photo download…";
-  session.timeout = setTimeout(() => session.controller.abort(), 20000);
-  try {
-    const response = await fetch(session.url, { signal: session.controller.signal });
-    if (!response.ok) throw new Error("Photo response unavailable");
-    const blob = await response.blob();
-    if (!current()) return;
-    if (!blob.size) throw new Error("Empty photo response");
-    let mime = blob.type.split(";")[0].toLowerCase();
-    if (mime === "application/octet-stream" || !mime) {
-      const bytes = new Uint8Array(await blob.slice(0, 16).arrayBuffer());
-      const text = String.fromCharCode(...bytes);
-      mime = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255 ? "image/jpeg" :
-        bytes[0] === 137 && text.slice(1, 4) === "PNG" ? "image/png" :
-        /^GIF8[79]a/.test(text) ? "image/gif" :
-        text.startsWith("RIFF") && text.slice(8, 12) === "WEBP" ? "image/webp" :
-        text.slice(4, 12) === "ftypavif" ? "image/avif" : "";
-    }
-    if (!mime.startsWith("image/")) throw new Error("Response is not a photo");
-    if (!current()) return;
-    const extension = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
-      "image/avif": "avif", "image/gif": "gif", "image/svg+xml": "svg", "image/tiff": "tif", "image/bmp": "bmp" }[mime];
-    let filename = session.filename;
-    if (extension) filename = filename.replace(/\.[a-z0-9]{1,5}$/i, "") + "." + extension;
-    if (session.objectUrl) { clearTimeout(session.revokeTimer); URL.revokeObjectURL(session.objectUrl); }
-    session.objectUrl = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = session.objectUrl;
-    anchor.download = filename;
-    anchor.hidden = true;
-    document.body.append(anchor);
-    try { anchor.click(); } finally { anchor.remove(); }
-    session.revokeTimer = setTimeout(() => {
-      if (session.objectUrl) URL.revokeObjectURL(session.objectUrl);
-      session.objectUrl = null;
-    }, 30000);
-    note.textContent = "Photo download started.";
-  } catch {
-    if (!current()) return;
-    session.fallback = true;
-    note.textContent = "Direct download unavailable. Select Download Photo again to open the image and save.";
-  } finally {
+function createLightboxPhotoActions({ isCurrent, noteId }) {
+  let lightboxPhotoDownloadSession = null;
+
+  function cancel() {
+    const session = lightboxPhotoDownloadSession;
+    lightboxPhotoDownloadSession = null;
+    if (!session) return;
+    session.controller?.abort();
     clearTimeout(session.timeout);
-    session.pending = false;
-    if (current()) link.removeAttribute("aria-busy");
+    clearTimeout(session.revokeTimer);
+    if (session.objectUrl) URL.revokeObjectURL(session.objectUrl);
+    element?.querySelector("a")?.removeAttribute("aria-busy");
   }
+
+  async function downloadLightboxPhoto(event) {
+    const session = lightboxPhotoDownloadSession;
+    if (!session || event.defaultPrevented) return;
+    const current = () => lightboxPhotoDownloadSession === session && location.pathname === session.path &&
+      isCurrent();
+    if (!current()) { event.preventDefault(); return; }
+    if (session.pending) { event.preventDefault(); return; }
+    if (session.fallback || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
+    event.preventDefault();
+    const link = element.querySelector("a");
+    const note = element.querySelector("p");
+    session.pending = true;
+    session.controller = new AbortController();
+    link.setAttribute("aria-busy", "true");
+    note.textContent = "Preparing photo download…";
+    session.timeout = setTimeout(() => session.controller.abort(), 20000);
+    try {
+      const response = await fetch(session.url, { signal: session.controller.signal });
+      if (!response.ok) throw new Error("Photo response unavailable");
+      const blob = await response.blob();
+      if (!current()) return;
+      if (!blob.size) throw new Error("Empty photo response");
+      let mime = blob.type.split(";")[0].toLowerCase();
+      if (mime === "application/octet-stream" || !mime) {
+        const bytes = new Uint8Array(await blob.slice(0, 16).arrayBuffer());
+        const text = String.fromCharCode(...bytes);
+        mime = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255 ? "image/jpeg" :
+          bytes[0] === 137 && text.slice(1, 4) === "PNG" ? "image/png" :
+          /^GIF8[79]a/.test(text) ? "image/gif" :
+          text.startsWith("RIFF") && text.slice(8, 12) === "WEBP" ? "image/webp" :
+          text.slice(4, 12) === "ftypavif" ? "image/avif" : "";
+      }
+      if (!mime.startsWith("image/")) throw new Error("Response is not a photo");
+      if (!current()) return;
+      const extension = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp",
+        "image/avif": "avif", "image/gif": "gif", "image/svg+xml": "svg", "image/tiff": "tif", "image/bmp": "bmp" }[mime];
+      let filename = session.filename;
+      if (extension) filename = filename.replace(/\.[a-z0-9]{1,5}$/i, "") + "." + extension;
+      if (session.objectUrl) { clearTimeout(session.revokeTimer); URL.revokeObjectURL(session.objectUrl); }
+      session.objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = session.objectUrl;
+      anchor.download = filename;
+      anchor.hidden = true;
+      document.body.append(anchor);
+      try { anchor.click(); } finally { anchor.remove(); }
+      session.revokeTimer = setTimeout(() => {
+        if (session.objectUrl) URL.revokeObjectURL(session.objectUrl);
+        session.objectUrl = null;
+      }, 30000);
+      note.textContent = "Photo download started.";
+    } catch {
+      if (!current()) return;
+      session.fallback = true;
+      note.textContent = "Direct download unavailable. Select Download Photo again to open the image and save.";
+    } finally {
+      clearTimeout(session.timeout);
+      session.pending = false;
+      if (current()) link.removeAttribute("aria-busy");
+    }
+  }
+
+  const element = document.createElement("div");
+  element.className = "v3-lightbox-photo-actions";
+  const download = document.createElement("a");
+  download.className = "v3-lightbox-photo-actions__download";
+  download.textContent = "DOWNLOAD PHOTO";
+  download.setAttribute("aria-describedby", noteId);
+  download.addEventListener("click", downloadLightboxPhoto);
+  const buy = document.createElement("button");
+  buy.type = "button";
+  buy.disabled = true;
+  buy.className = "v3-lightbox-photo-actions__buy";
+  buy.append(document.createTextNode("BUY PRINT"));
+  const soon = document.createElement("span");
+  soon.textContent = "COMING SOON";
+  buy.append(soon);
+  buy.setAttribute("aria-label", "Buy print. Coming soon; print purchasing is not available.");
+  const note = document.createElement("p");
+  note.id = noteId;
+  note.className = "v3-lightbox-photo-actions__note";
+  note.setAttribute("role", "status");
+  note.setAttribute("aria-live", "polite");
+  element.append(download, buy, note);
+
+  function sync(tileDataset) {
+    const download = element.querySelector("a");
+    const note = element.querySelector("p");
+    const downloadPath = new URL(tileDataset.wrestlingLightboxRoute || location.href, document.baseURI).pathname;
+    const downloadKey = [tileDataset.galleryLightboxId, tileDataset.galleryDownloadUrl, downloadPath].join("|");
+    const retainedDownload = lightboxPhotoDownloadSession?.key === downloadKey;
+    const retainedNote = retainedDownload ? note.textContent : "";
+    if (!retainedDownload) cancel();
+    ["href", "download", "target", "rel", "aria-disabled", "tabindex"].forEach((name) => download.removeAttribute(name));
+    let downloadUrl = null;
+    try {
+      const candidate = new URL(tileDataset.galleryDownloadUrl || "", document.baseURI);
+      if (tileDataset.galleryDownloadUrl && ["http:", "https:"].includes(candidate.protocol)) downloadUrl = candidate;
+    } catch { /* An unavailable source has no actionable link. */ }
+    if (downloadUrl) {
+      download.href = downloadUrl.href;
+      if (!retainedDownload) lightboxPhotoDownloadSession = { key: downloadKey, path: downloadPath,
+        url: downloadUrl.href, filename: tileDataset.galleryDownloadFilename || "vmpix-photo", pending: false, fallback: false };
+      if (downloadUrl.origin === location.origin) {
+        download.download = tileDataset.galleryDownloadFilename || "vmpix-photo";
+        note.textContent = "Save the available image file.";
+      } else {
+        download.target = "_blank";
+        download.rel = "noopener noreferrer";
+        note.textContent = "Opens the image in a new tab. Use your browser’s Save Image option.";
+      }
+    } else {
+      download.setAttribute("aria-disabled", "true");
+      download.tabIndex = -1;
+      note.textContent = "Download unavailable for this photo.";
+    }
+    if (downloadUrl) note.textContent = retainedNote || "Save the available image file.";
+    element.hidden = false;
+  }
+  return { element, sync, cancel };
 }
 
 function layoutLightboxInFrame() {
@@ -6965,28 +7032,11 @@ function syncLightboxInFrame(tileDataset = null) {
     const names = document.createElement("p");
     names.className = "v3-lightbox-in-frame__names";
     lightboxInFrameStrip.append(label, names);
-    lightboxInFrameActions = document.createElement("div");
-    lightboxInFrameActions.className = "v3-lightbox-photo-actions";
-    const download = document.createElement("a");
-    download.className = "v3-lightbox-photo-actions__download";
-    download.textContent = "DOWNLOAD PHOTO";
-    download.setAttribute("aria-describedby", "v3-photo-download-note");
-    download.addEventListener("click", downloadLightboxPhoto);
-    const buy = document.createElement("button");
-    buy.type = "button";
-    buy.disabled = true;
-    buy.className = "v3-lightbox-photo-actions__buy";
-    buy.append(document.createTextNode("BUY PRINT"));
-    const soon = document.createElement("span");
-    soon.textContent = "COMING SOON";
-    buy.append(soon);
-    buy.setAttribute("aria-label", "Buy print. Coming soon; print purchasing is not available.");
-    const note = document.createElement("p");
-    note.id = "v3-photo-download-note";
-    note.className = "v3-lightbox-photo-actions__note";
-    note.setAttribute("role", "status");
-    note.setAttribute("aria-live", "polite");
-    lightboxInFrameActions.append(download, buy, note);
+    lightboxInFramePhotoActions = createLightboxPhotoActions({
+      isCurrent: () => lightboxScreen?.classList.contains("has-match-in-frame"),
+      noteId: "v3-photo-download-note",
+    });
+    lightboxInFrameActions = lightboxInFramePhotoActions.element;
     lightboxPhoto.parentElement.append(lightboxInFrameStrip, lightboxInFrameActions);
     lightboxImage.addEventListener("load", scheduleLightboxInFrameLayout);
     lightboxInFrameResizeObserver = new ResizeObserver(scheduleLightboxInFrameLayout);
@@ -6996,38 +7046,7 @@ function syncLightboxInFrame(tileDataset = null) {
   if (!Array.isArray(tags)) tags = [];
   lightboxInFrameStrip.querySelector("p").textContent = tags.length ? tags.join(" · ") : "No tags recorded";
   lightboxInFrameStrip.hidden = false;
-  const download = lightboxInFrameActions.querySelector("a");
-  const note = lightboxInFrameActions.querySelector("p");
-  const downloadPath = new URL(tileDataset.wrestlingLightboxRoute || location.href, document.baseURI).pathname;
-  const downloadKey = [tileDataset.galleryLightboxId, tileDataset.galleryDownloadUrl, downloadPath].join("|");
-  const retainedDownload = lightboxPhotoDownloadSession?.key === downloadKey;
-  const retainedNote = retainedDownload ? note.textContent : "";
-  if (!retainedDownload) cancelLightboxPhotoDownload();
-  ["href", "download", "target", "rel", "aria-disabled", "tabindex"].forEach((name) => download.removeAttribute(name));
-  let downloadUrl = null;
-  try {
-    const candidate = new URL(tileDataset.galleryDownloadUrl || "", document.baseURI);
-    if (tileDataset.galleryDownloadUrl && ["http:", "https:"].includes(candidate.protocol)) downloadUrl = candidate;
-  } catch { /* An unavailable source has no actionable link. */ }
-  if (downloadUrl) {
-    download.href = downloadUrl.href;
-    if (!retainedDownload) lightboxPhotoDownloadSession = { key: downloadKey, path: downloadPath,
-      url: downloadUrl.href, filename: tileDataset.galleryDownloadFilename || "vmpix-photo", pending: false, fallback: false };
-    if (downloadUrl.origin === location.origin) {
-      download.download = tileDataset.galleryDownloadFilename || "vmpix-photo";
-      note.textContent = "Save the available image file.";
-    } else {
-      download.target = "_blank";
-      download.rel = "noopener noreferrer";
-      note.textContent = "Opens the image in a new tab. Use your browser’s Save Image option.";
-    }
-  } else {
-    download.setAttribute("aria-disabled", "true");
-    download.tabIndex = -1;
-    note.textContent = "Download unavailable for this photo.";
-  }
-  if (downloadUrl) note.textContent = retainedNote || "Save the available image file.";
-  lightboxInFrameActions.hidden = false;
+  lightboxInFramePhotoActions.sync(tileDataset);
   lightboxInFrameResizeObserver.observe(lightboxInFrameActions);
   lightboxInFrameResizeObserver.observe(lightboxPhoto.parentElement);
   lightboxInFrameResizeObserver.observe(lightboxInFrameStrip);

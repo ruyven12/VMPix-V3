@@ -14410,7 +14410,29 @@ function setWrestlingPersonDossierPrototypeEventArchiveMode(archive, mode) {
   }
 }
 
+let wrestlingPersonEventArchivePhotoActions = null;
+
+function syncWrestlingPersonEventArchivePhotoActions(viewer, photo, selectedIndex, viewerImageRequestKey, downloadPhoto = photo) {
+  const state = wrestlingPersonDossierPrototypeEventArchiveState;
+  const figure = viewer.querySelector(".wrestling-person-dossier-prototype-event-archive__viewer-figure");
+  if (!figure) return;
+  if (!wrestlingPersonEventArchivePhotoActions || wrestlingPersonEventArchivePhotoActions.element.parentElement !== figure) {
+    wrestlingPersonEventArchivePhotoActions?.cancel();
+    wrestlingPersonEventArchivePhotoActions = createLightboxPhotoActions({
+      isCurrent: () => state.isOpen && state.mode === "viewer" && !viewer.hidden,
+      noteId: "v3-person-photo-download-note",
+    });
+    figure.append(wrestlingPersonEventArchivePhotoActions.element);
+  }
+  wrestlingPersonEventArchivePhotoActions.sync({
+    ...getWrestlingPhotoDownloadData(downloadPhoto, selectedIndex, getWrestlingText(photo.matchRef || photo.match_ref || photo.match_id || photo.matchId, "person")),
+    galleryLightboxId: `${viewerImageRequestKey}:${selectedIndex}:${getWrestlingText(photo.image_key || photo.ImageKey || photo.photoId)}`,
+    wrestlingLightboxRoute: location.href,
+  });
+}
+
 function resetWrestlingPersonDossierPrototypeEventArchiveViewerState() {
+  wrestlingPersonEventArchivePhotoActions?.cancel();
   const state = wrestlingPersonDossierPrototypeEventArchiveState;
   state.selectedPhotoIndex = 0;
   state.photoGridScrollTop = 0;
@@ -14443,11 +14465,15 @@ function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   let detailImageReady = false;
 
   state.viewerImageRequestKey = viewerImageRequestKey;
+  syncWrestlingPersonEventArchivePhotoActions(viewer, photo, selectedIndex, viewerImageRequestKey);
   if (image) {
     image.src = immediateImageUrl;
     image.alt = captionText || `${getWrestlingPersonDossierPrototypeSelectedPersonContext().displayName} event archive photo ${selectedIndex + 1}`;
     if (!getWrestlingText(photo.large_url || photo.largeUrl || photo.medium_url || photo.mediumUrl)) {
       requestWrestlingPersonSelectedPhotoDetail(photo).then(async (detail) => {
+        if (detail && state.viewerImageRequestKey === viewerImageRequestKey && state.selectedPhotoIndex === selectedIndex && state.mode === "viewer" && state.isOpen && state.photoRenderItems[selectedIndex] === photo) {
+          syncWrestlingPersonEventArchivePhotoActions(viewer, photo, selectedIndex, viewerImageRequestKey, { ...photo, ...detail });
+        }
         const detailUrl = getWrestlingText(detail?.large_url || detail?.medium_url || detail?.small_url);
         if (!detailUrl || state.viewerImageRequestKey !== viewerImageRequestKey || state.mode !== "viewer" || !state.isOpen) return;
         const isReady = await loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(detailUrl);
@@ -18488,6 +18514,17 @@ function getWrestlingMatchPhotoDownloadUrl(photo) {
   return "";
 }
 
+function getWrestlingPhotoDownloadData(photo, index = 0, matchRef = "match-1") {
+  const galleryDownloadUrl = getWrestlingMatchPhotoDownloadUrl(photo);
+  const downloadExtension = galleryDownloadUrl.match(/\.(jpe?g|png|webp|avif|gif)(?:[?#]|$)/i)?.[1] || "";
+  const downloadName = getWrestlingText(photo.filename || photo.label || photo.photoId, `photo-${index + 1}`)
+    .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]/g, "-").replace(/\.[a-z0-9]{1,5}$/i, "")
+    .replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 100) || `photo-${index + 1}`;
+  const downloadMatch = String(matchRef).replace(/[^a-z0-9_-]/gi, "-").slice(0, 40);
+  const galleryDownloadFilename = `vmpix-${downloadMatch}-${downloadName}${downloadExtension ? `.${downloadExtension}` : ""}`;
+  return { galleryDownloadUrl, galleryDownloadFilename };
+}
+
 function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, match = {}, options = {}) {
   const imageSrc = photo.thumbnailSrc || photo.smallSrc || photo.lightboxSrc;
   const lightboxSrc = photo.lightboxSrc || imageSrc;
@@ -18506,13 +18543,7 @@ function createWrestlingMatchPhotoLightboxTile(photo, index = 0, show = {}, matc
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
   tile.dataset.galleryInFrameTags = JSON.stringify(getWrestlingPersonCaptionNameParts(photo));
-  tile.dataset.galleryDownloadUrl = getWrestlingMatchPhotoDownloadUrl(photo);
-  const downloadExtension = tile.dataset.galleryDownloadUrl.match(/\.(jpe?g|png|webp|avif|gif)(?:[?#]|$)/i)?.[1] || "";
-  const downloadName = getWrestlingText(photo.filename || photo.label || photo.photoId, `photo-${index + 1}`)
-    .replace(/[\u0000-\u001f\u007f<>:"/\\|?*]/g, "-").replace(/\.[a-z0-9]{1,5}$/i, "")
-    .replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 100) || `photo-${index + 1}`;
-  const downloadMatch = String(matchRef).replace(/[^a-z0-9_-]/gi, "-").slice(0, 40);
-  tile.dataset.galleryDownloadFilename = `vmpix-${downloadMatch}-${downloadName}${downloadExtension ? `.${downloadExtension}` : ""}`;
+  Object.assign(tile.dataset, getWrestlingPhotoDownloadData(photo, index, matchRef));
   tile.dataset.galleryKind = "image";
   tile.dataset.galleryMediaId = imageKey;
   tile.dataset.galleryLightboxId = `wrestling-match-photo-${normalizeWrestlingArchiveSlug(imageKey, String(index + 1))}`;

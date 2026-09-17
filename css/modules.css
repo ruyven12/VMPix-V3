@@ -12507,12 +12507,17 @@ button.wrestling-event-history-tagged-thumb {
   grid-column: 2;
   grid-row: 1;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
   gap: clamp(0.34rem, 0.9vw, 0.54rem);
   min-inline-size: 0;
   min-block-size: 0;
   block-size: 100%;
   margin: 0;
+}
+
+.wrestling-person-dossier-prototype-event-archive__viewer-figure > .v3-lightbox-photo-actions {
+  justify-self: center;
+  min-inline-size: 0;
 }
 
 .wrestling-person-dossier-prototype-event-archive__viewer-stage {
