@@ -14495,14 +14495,20 @@ function moveWrestlingPersonDossierPrototypeEventArchiveViewerPhoto(delta, archi
   return renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive);
 }
 
+function getWrestlingPersonDossierPrototypeEventArchivePhotoPageSize() {
+  return window.matchMedia("(max-width: 640px)").matches
+    ? 16
+    : WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE;
+}
+
 function getWrestlingPersonDossierPrototypeEventArchivePhotoPageCount(photos) {
   const photoCount = Array.isArray(photos) ? photos.length : 0;
-  return Math.max(1, Math.ceil(photoCount / WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE));
+  return Math.max(1, Math.ceil(photoCount / getWrestlingPersonDossierPrototypeEventArchivePhotoPageSize()));
 }
 
 function getWrestlingPersonDossierPrototypeEventArchivePhotoPageForIndex(index) {
   const value = Number.parseInt(index, 10);
-  return Math.floor(Math.max(0, Number.isFinite(value) ? value : 0) / WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE) + 1;
+  return Math.floor(Math.max(0, Number.isFinite(value) ? value : 0) / getWrestlingPersonDossierPrototypeEventArchivePhotoPageSize()) + 1;
 }
 
 function getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(page, photos) {
@@ -14561,8 +14567,8 @@ function renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, opt
 
   const pageCount = getWrestlingPersonDossierPrototypeEventArchivePhotoPageCount(photos);
   const page = getWrestlingPersonDossierPrototypeEventArchiveBoundedPhotoPage(options.page || state.photoGalleryPage, photos);
-  const startIndex = (page - 1) * WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE;
-  const pagePhotos = photos.slice(startIndex, startIndex + WRESTLING_PERSON_DOSSIER_PROTOTYPE_EVENT_ARCHIVE_PHOTO_PAGE_SIZE);
+  const startIndex = (page - 1) * getWrestlingPersonDossierPrototypeEventArchivePhotoPageSize();
+  const pagePhotos = photos.slice(startIndex, startIndex + getWrestlingPersonDossierPrototypeEventArchivePhotoPageSize());
   state.photoGalleryPage = page;
   region.replaceChildren();
 
@@ -15472,8 +15478,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
               <div class="wrestling-person-dossier-prototype-event-archive__identity">
                 <h3 data-wrestling-person-dossier-prototype-event-archive-event-title></h3>
                 <p data-wrestling-person-dossier-prototype-event-archive-event-date></p>
-                <p data-wrestling-person-dossier-prototype-event-archive-event-venue></p>
-                <p data-wrestling-person-dossier-prototype-event-archive-event-location></p>
+                <div class="wrestling-person-dossier-prototype-event-archive__location-line"><p data-wrestling-person-dossier-prototype-event-archive-event-venue></p><p data-wrestling-person-dossier-prototype-event-archive-event-location></p></div>
               </div>
               <dl class="wrestling-person-dossier-prototype-event-archive__facts">
                 <div>
