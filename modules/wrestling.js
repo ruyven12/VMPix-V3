@@ -1087,6 +1087,9 @@ function getWrestlingShowsApiUrl(page = 1, options = {}) {
   if (options.search) {
     apiUrl.searchParams.set("search", String(options.search));
   }
+  if (options.matchUrl) {
+    apiUrl.searchParams.set("match_url", String(options.matchUrl));
+  }
   return apiUrl;
 }
 
@@ -17030,6 +17033,7 @@ function requestWrestlingPersonEventTaggedPhotos(eventRow, person) {
     includePhotos: true,
     limit: 5,
     search: getWrestlingPersonEventRowPhotoSearch(eventRow, showId),
+    matchUrl: matchRef,
   })
     .then((payload) => {
       const rows = normalizeLiveWrestlingShows(payload);
