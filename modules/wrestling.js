@@ -15420,20 +15420,28 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
                 <span class="wrestling-person-dossier-prototype-event-history__poster-title" data-wrestling-person-dossier-prototype-event-poster-title>Event History</span>
                 <span class="wrestling-person-dossier-prototype-event-history__poster-mark" data-wrestling-person-dossier-prototype-event-poster-mark>VMP</span>
               </div>
+              <div class="wrestling-person-dossier-prototype-event-history__details">
               <div class="wrestling-person-dossier-prototype-event-history__show">
                 <p class="wrestling-person-dossier-prototype-event-history__section-label">EVENT</p>
                 <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title data-wrestling-person-dossier-prototype-event-fit>Event History Initializing</h3>
+                <div class="wrestling-person-dossier-prototype-event-history__metadata">
                 <p data-wrestling-person-dossier-prototype-event-date>Date Pending</p>
                 <p data-wrestling-person-dossier-prototype-event-venue>Venue Pending</p>
                 <p data-wrestling-person-dossier-prototype-event-location>Location Pending</p>
+                </div>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__match">
+                <div class="wrestling-person-dossier-prototype-event-history__information">
                 <p class="wrestling-person-dossier-prototype-event-history__section-label">INFORMATION</p>
                 <p class="wrestling-person-dossier-prototype-event-history__side" data-wrestling-person-dossier-prototype-event-opponents data-wrestling-person-dossier-prototype-event-fit>Opponent Unlisted</p>
                 <p class="wrestling-person-dossier-prototype-event-history__type" data-wrestling-person-dossier-prototype-event-match-type>Match Data Pending</p>
+                </div>
+                <div class="wrestling-person-dossier-prototype-event-history__outcome">
                 <p class="wrestling-person-dossier-prototype-event-history__section-label">OUTCOME</p>
                 <p class="wrestling-person-dossier-prototype-event-history__result" data-wrestling-person-dossier-prototype-event-result>Result Pending</p>
                 <button class="wrestling-person-dossier-prototype-event-history__action" type="button" aria-disabled="true" data-wrestling-person-dossier-prototype-event-open disabled>Open Event</button>
+                </div>
+              </div>
               </div>
             </article>
             <article class="wrestling-person-dossier-prototype-event-history__preview wrestling-person-dossier-prototype-event-history__preview--next is-empty" aria-label="Next event preview" aria-hidden="true" data-wrestling-person-dossier-prototype-event-preview="next">
