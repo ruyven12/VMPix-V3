@@ -12410,6 +12410,11 @@ button.wrestling-event-history-tagged-thumb {
   pointer-events: none;
 }
 
+.wrestling-person-dossier-prototype-event-archive__photo-loading {
+  position: relative;
+  max-inline-size: 100%;
+  padding: 0.5rem 1rem 0.9rem;
+}
 .wrestling-person-dossier-prototype-event-archive__photo-status {
   align-self: center;
   justify-self: center;
@@ -12947,7 +12952,12 @@ button.wrestling-event-history-tagged-thumb {
     text-align: center;
   }
 
-  .wrestling-person-dossier-prototype-event-archive__region--photos:not([data-wrestling-person-dossier-prototype-event-archive-photo-state="loaded"]) {
+  .wrestling-person-dossier-prototype-event-archive__region--photos[data-wrestling-person-dossier-prototype-event-archive-photo-state="loading"] {
+    grid-template-rows: auto minmax(0, 1fr);
+    align-self: stretch;
+  }
+
+  .wrestling-person-dossier-prototype-event-archive__region--photos:not([data-wrestling-person-dossier-prototype-event-archive-photo-state="loaded"]):not([data-wrestling-person-dossier-prototype-event-archive-photo-state="loading"]) {
     grid-template-rows: auto minmax(4rem, 1fr);
     align-self: start;
     inline-size: 100%;

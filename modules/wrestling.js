@@ -14639,6 +14639,7 @@ function setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, stat
 
   resetWrestlingPersonDossierPrototypeEventArchivePhotoGallery(region);
   region.dataset.wrestlingPersonDossierPrototypeEventArchivePhotoState = stateName;
+  region.setAttribute("aria-busy", String(stateName === "loading"));
   region.replaceChildren();
 
   if (stateName === "loaded" && photos.length > 0) {
@@ -14650,12 +14651,24 @@ function setWrestlingPersonDossierPrototypeEventArchivePhotoStatus(archive, stat
 
   const status = document.createElement("p");
   status.className = "wrestling-person-dossier-prototype-event-archive__photo-status";
-  status.textContent = stateName === "loading"
-    ? "PHOTO ARCHIVE INITIALIZING"
-    : stateName === "error"
+  if (stateName === "loading") {
+    const loading = document.createElement("div");
+    loading.className = "wrestling-person-dossier-prototype-event-archive__photo-loading";
+    status.classList.add("wrestling-match-dossier-photo-highlights__count");
+    loading.append(status);
+    updateWrestlingMatchDossierPhotoProgress(loading, {
+      label: "PREPARING ARCHIVE",
+      state: "loading",
+      progress: { loaded: 0, total: null },
+    });
+    loading.querySelector('[role="progressbar"]').setAttribute("aria-label", "Event Archive loading progress");
+    region.append(loading);
+  } else {
+    status.textContent = stateName === "error"
       ? "PHOTO ARCHIVE UNAVAILABLE"
       : "NO ARCHIVED PHOTOS FOUND";
-  region.append(status);
+    region.append(status);
+  }
   setWrestlingPersonDossierPrototypeEventArchivePhotoCount(archive, stateName === "empty" ? 0 : null);
 }
 
