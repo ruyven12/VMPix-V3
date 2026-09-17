@@ -13187,7 +13187,7 @@ button.wrestling-event-history-tagged-thumb {
   .wrestling-person-dossier-prototype-event-history__poster {
     grid-column: 1;
     grid-row: 1;
-    align-self: start;
+    place-self: center;
     inline-size: 100%;
     block-size: auto;
     aspect-ratio: 4 / 5;
