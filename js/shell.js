@@ -2550,14 +2550,14 @@ function updateShellBackState(route = getRouteFromUrl()) {
   shellBackButton.setAttribute("aria-label", isDisabled ? "Back unavailable" : `Back to ${getShellBackLabel(targetUrl)}`);
 }
 
-// One continuous 640 ms passage; restoration happens only under full coverage.
+// Two native 300 ms phases meet at full coverage; restore synchronously between them.
 let shellBackSweep = null;
 
 function cancelShellBackSweep(restorePending = false) {
   const sweep = shellBackSweep;
   if (!sweep || sweep.committing) return;
   shellBackSweep = null;
-  window.cancelAnimationFrame(sweep.frame);
+  sweep.animation?.cancel();
   sweep.element.remove();
   if (restorePending && !sweep.restored) sweep.restore();
 }
@@ -2567,7 +2567,7 @@ function runShellBackSweep(targetRoute, restore, isBack) {
   const sourceRoute = shellRenderedRoute;
   const host = shell;
   if (!isBack || !sourceRoute || sourceRoute.name === "home" || targetRoute.name === "home" ||
-      reducedMotion.matches || !host || typeof window.requestAnimationFrame !== "function") {
+      reducedMotion.matches || !host || typeof Element === "undefined" || typeof Element.prototype.animate !== "function") {
     restore();
     return;
   }
@@ -2583,40 +2583,49 @@ function runShellBackSweep(targetRoute, restore, isBack) {
   const bottom = top + (viewport?.height || window.innerHeight);
   const engineBounds = portfolioEngine?.getBoundingClientRect();
   const engineTop = engineBounds && engineBounds.height > 0 && engineBounds.top > top ? engineBounds.top : bottom;
+  const height = Math.max(0, Math.min(bottom, engineTop) - top);
+  const overscan = Math.ceil(height * Math.tan(1.25 * Math.PI / 180) / 2) + 2;
   element.style.top = `${top}px`;
-  element.style.height = `${Math.max(0, Math.min(bottom, engineTop) - top)}px`;
+  element.style.height = `${height}px`;
+  element.style.setProperty("--shell-back-sweep-overscan", `${overscan}px`);
   host.append(element);
-  const sweep = { element, restore, frame: 0, restored: false, committing: false, startedAt: null };
+  const sweep = { element, restore, animation: null, restored: false, committing: false };
   shellBackSweep = sweep;
-  const tick = (now) => {
+  const coveredTransform = "translate3d(0, 0, 0) skewX(-1.25deg)";
+  const play = async () => {
+    const entry = veil.animate([
+      { transform: "translate3d(-100%, 0, 0) skewX(-1.25deg)" },
+      { transform: coveredTransform },
+    ], { duration: 300, easing: "cubic-bezier(.42, 0, .75, .5)", fill: "forwards" });
+    sweep.animation = entry;
+    await entry.finished;
     if (shellBackSweep !== sweep) return;
-    if (sweep.startedAt === null) sweep.startedAt = now;
-    const elapsed = Math.min(640, now - sweep.startedAt);
-    // Clamp the crossing frame to full coverage before touching the route DOM.
-    const handoff = elapsed >= 320 && !sweep.restored;
-    veil.style.transform = `translate3d(${handoff ? 0 : -100 + elapsed / 640 * 200}%, 0, 0)`;
-    if (handoff) {
-      sweep.restored = true;
-      sweep.committing = true;
-      try {
-        restore();
-      } catch (error) {
-        sweep.committing = false;
-        cancelShellBackSweep();
-        throw error;
-      } finally {
-        sweep.committing = false;
-      }
-      sweep.frame = window.requestAnimationFrame(tick);
-      return;
+    sweep.restored = true;
+    sweep.committing = true;
+    try {
+      restore();
+    } finally {
+      sweep.committing = false;
     }
-    if (elapsed >= 640) {
-      cancelShellBackSweep();
-      return;
-    }
-    sweep.frame = window.requestAnimationFrame(tick);
+    if (shellBackSweep !== sweep) return;
+    // No timer or hold: the exit starts at the entry's exact covered transform.
+    const exit = veil.animate([
+      { transform: coveredTransform },
+      { transform: "translate3d(100%, 0, 0) skewX(-1.25deg)" },
+    ], { duration: 300, easing: "cubic-bezier(.25, .5, .58, 1)", fill: "forwards" });
+    sweep.animation = exit;
+    // Join the same document timeline instead of waiting for a new start frame.
+    if (Number.isFinite(entry.startTime)) exit.startTime = entry.startTime + 300;
+    entry.cancel();
+    await exit.finished;
+    if (shellBackSweep === sweep) cancelShellBackSweep();
   };
-  sweep.frame = window.requestAnimationFrame(tick);
+  play().catch((error) => {
+    // Cancellation belongs to the newer navigation; never revive its old callback.
+    if (shellBackSweep !== sweep) return;
+    cancelShellBackSweep(true);
+    if (sweep.restored) console.error("Shell Back sweep could not finish:", error);
+  });
 }
 
 function syncShellBackSweepMotion() {
