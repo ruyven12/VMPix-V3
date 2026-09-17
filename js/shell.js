@@ -424,6 +424,7 @@ function handoffPortfolioGatewayRoute(worldName) {
     updatePortfolioGatewayRouteHandoffUrl(targetUrl);
   }
 
+  shellRenderedRoute = getRouteFromUrl(targetUrl);
   shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
@@ -2311,7 +2312,7 @@ function handlePrototypeEngineReturnEmitter(event) {
 
   event.preventDefault();
   event.stopPropagation();
-  navigateToRoute(getPrototypeEngineReturnRoute(route));
+  navigateToRoute(getPrototypeEngineReturnRoute(route), { navigationDirection: "back" });
 }
 
 function initPrototypeEngineReturnEmitter() {
@@ -2549,6 +2550,79 @@ function updateShellBackState(route = getRouteFromUrl()) {
   shellBackButton.setAttribute("aria-label", isDisabled ? "Back unavailable" : `Back to ${getShellBackLabel(targetUrl)}`);
 }
 
+// One continuous 640 ms passage; restoration happens only under full coverage.
+let shellBackSweep = null;
+
+function cancelShellBackSweep(restorePending = false) {
+  const sweep = shellBackSweep;
+  if (!sweep || sweep.committing) return;
+  shellBackSweep = null;
+  window.cancelAnimationFrame(sweep.frame);
+  sweep.element.remove();
+  if (restorePending && !sweep.restored) sweep.restore();
+}
+
+function runShellBackSweep(targetRoute, restore, isBack) {
+  cancelShellBackSweep();
+  const sourceRoute = shellRenderedRoute;
+  const host = shell;
+  if (!isBack || !sourceRoute || sourceRoute.name === "home" || targetRoute.name === "home" ||
+      reducedMotion.matches || !host || typeof window.requestAnimationFrame !== "function") {
+    restore();
+    return;
+  }
+  const element = document.createElement("div");
+  element.className = "shell-back-sweep";
+  element.setAttribute("aria-hidden", "true");
+  element.dataset.world = sourceRoute.name.startsWith("wrestling") ? "wrestling" : "archive";
+  const veil = document.createElement("div");
+  veil.className = "shell-back-sweep__veil";
+  element.append(veil);
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || window.innerHeight);
+  const engineBounds = portfolioEngine?.getBoundingClientRect();
+  const engineTop = engineBounds && engineBounds.height > 0 && engineBounds.top > top ? engineBounds.top : bottom;
+  element.style.top = `${top}px`;
+  element.style.height = `${Math.max(0, Math.min(bottom, engineTop) - top)}px`;
+  host.append(element);
+  const sweep = { element, restore, frame: 0, restored: false, committing: false, startedAt: null };
+  shellBackSweep = sweep;
+  const tick = (now) => {
+    if (shellBackSweep !== sweep) return;
+    if (sweep.startedAt === null) sweep.startedAt = now;
+    const elapsed = Math.min(640, now - sweep.startedAt);
+    // Clamp the crossing frame to full coverage before touching the route DOM.
+    const handoff = elapsed >= 320 && !sweep.restored;
+    veil.style.transform = `translate3d(${handoff ? 0 : -100 + elapsed / 640 * 200}%, 0, 0)`;
+    if (handoff) {
+      sweep.restored = true;
+      sweep.committing = true;
+      try {
+        restore();
+      } catch (error) {
+        sweep.committing = false;
+        cancelShellBackSweep();
+        throw error;
+      } finally {
+        sweep.committing = false;
+      }
+      sweep.frame = window.requestAnimationFrame(tick);
+      return;
+    }
+    if (elapsed >= 640) {
+      cancelShellBackSweep();
+      return;
+    }
+    sweep.frame = window.requestAnimationFrame(tick);
+  };
+  sweep.frame = window.requestAnimationFrame(tick);
+}
+
+function syncShellBackSweepMotion() {
+  if (reducedMotion.matches) cancelShellBackSweep(true);
+}
+
 function performShellBack() {
   if (!shellBackButton || shellBackButton.disabled || shellBackButton.getAttribute("aria-disabled") === "true") {
     return;
@@ -2563,7 +2637,7 @@ function performShellBack() {
 
   const targetUrl = getShellBackTarget(route, historyState);
   if (targetUrl) {
-    navigateToRoute(targetUrl, { shouldFocusBandsView: route.name === "band-detail" });
+    navigateToRoute(targetUrl, { shouldFocusBandsView: route.name === "band-detail", navigationDirection: "back" });
   }
 }
 
@@ -4943,6 +5017,7 @@ function completeHomePortfolioRouteHandoff() {
   updateShellBreadcrumb(portfolioRoute);
   updateShellBackState(portfolioRoute);
   stabilizeShellViewport(portfolioRoute, { historyState: { fromHomeEngage: true } });
+  shellRenderedRoute = portfolioRoute;
 }
 
 function beginHomePortfolioTransition() {
@@ -5007,10 +5082,22 @@ if (shell && startButton) {
     });
   });
   if (moduleBack) {
-    moduleBack.addEventListener("click", revealHub);
+    moduleBack.addEventListener("click", () => {
+      const targetRoute = getRouteFromUrl(routePaths.portfolio);
+      runShellBackSweep(targetRoute, () => {
+        revealHub();
+        shellRenderedRoute = targetRoute;
+      }, true);
+    });
   }
   if (ringArchiveBack) {
-    ringArchiveBack.addEventListener("click", revealHub);
+    ringArchiveBack.addEventListener("click", () => {
+      const targetRoute = getRouteFromUrl(routePaths.portfolio);
+      runShellBackSweep(targetRoute, () => {
+        revealHub();
+        shellRenderedRoute = targetRoute;
+      }, true);
+    });
   }
   if (ringArchiveShows) {
     ringArchiveShows.addEventListener("click", () => {
@@ -5029,12 +5116,12 @@ if (shell && startButton) {
   }
   if (wrestlingPeopleBack) {
     wrestlingPeopleBack.addEventListener("click", () => {
-      navigateToRoute(routePaths.wrestling);
+      navigateToRoute(routePaths.wrestling, { navigationDirection: "back" });
     });
   }
   if (wrestlingVenuesBack) {
     wrestlingVenuesBack.addEventListener("click", () => {
-      navigateToRoute(routePaths.wrestling);
+      navigateToRoute(routePaths.wrestling, { navigationDirection: "back" });
     });
   }
   wrestlingShowEntries.forEach((entry) => {
@@ -5059,20 +5146,20 @@ if (shell && startButton) {
   });
   if (wrestlingShowDetailBack) {
     wrestlingShowDetailBack.addEventListener("click", () => {
-      navigateToRoute(routePaths.wrestlingShows);
+      navigateToRoute(routePaths.wrestlingShows, { navigationDirection: "back" });
     });
   }
   if (wrestlingMatchGalleryBack) {
     wrestlingMatchGalleryBack.addEventListener("click", () => {
       const showRoute = wrestlingMatchGalleryShell?.dataset.wrestlingShowRoute;
       if (showRoute) {
-        navigateToRoute(showRoute);
+        navigateToRoute(showRoute, { navigationDirection: "back" });
         return;
       }
       const showId = wrestlingMatchGalleryShell?.dataset.wrestlingShowId ||
         wrestlingMatchGalleryShell?.dataset.showId ||
         "warzone-26";
-      navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}`);
+      navigateToRoute(`${routePaths.wrestlingShows}/${encodeURIComponent(showId)}`, { navigationDirection: "back" });
     });
   }
   wrestlingPhotoTiles.forEach((tile) => {
@@ -5138,6 +5225,7 @@ if (shell && startButton) {
   if (typeof initWrestlingPeopleModule === "function") {
     initWrestlingPeopleModule();
   }
+  seedShellHistoryIndex();
   const initialRoute = getRouteFromUrl();
   syncRouteFromLocation({
     historyState: window.history.state,
@@ -5145,7 +5233,15 @@ if (shell && startButton) {
     shouldPlayDirectPortfolioEntrySequence: PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA && initialRoute.name === "portfolio",
   });
   window.addEventListener("popstate", (event) => {
-    syncRouteFromLocation({ historyState: event.state });
+    const targetRoute = getRouteFromUrlWithPrototypePrecedence();
+    const historyState = event.state;
+    const targetIndex = getShellHistoryIndex(historyState);
+    const isBack = targetIndex !== null && shellHistoryIndex !== null && targetIndex < shellHistoryIndex;
+    shellHistoryIndex = targetIndex;
+    runShellBackSweep(targetRoute, () => {
+      syncRoute(targetRoute, { historyState });
+      if (typeof stabilizeShellViewport === "function") stabilizeShellViewport(targetRoute, { historyState });
+    }, isBack);
   });
   if (hubCarousel) {
     hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
@@ -5153,9 +5249,11 @@ if (shell && startButton) {
   }
   syncAmbientMotion();
   if (typeof reducedMotion.addEventListener === "function") {
+    reducedMotion.addEventListener("change", syncShellBackSweepMotion);
     reducedMotion.addEventListener("change", syncAmbientMotion);
     reducedMotion.addEventListener("change", syncPortfolioEngineLightningMotion);
   } else if (typeof reducedMotion.addListener === "function") {
+    reducedMotion.addListener(syncShellBackSweepMotion);
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
   }
@@ -5169,7 +5267,11 @@ if (shell && startButton) {
       closeGlobalMenu();
     }
   });
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) syncRouteFromLocation({ historyState: window.history.state });
+  });
   window.addEventListener("pagehide", () => {
+    cancelShellBackSweep();
     setShellDrawerLock(false);
     window.clearTimeout(portfolioArrivalTimer);
     window.clearTimeout(portfolioOrientationStartTimer);

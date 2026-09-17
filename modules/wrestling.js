@@ -4614,7 +4614,7 @@ function renderWrestlingShowDetailState(showId, stateName) {
   backButton.className = "wrestling-detail-back";
   backButton.type = "button";
   backButton.textContent = "Back to Events";
-  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows));
+  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows, { navigationDirection: "back" }));
 
   const stateSection = document.createElement("section");
   stateSection.className = `wrestling-show-state wrestling-show-state--${stateName}`;
@@ -6986,7 +6986,7 @@ function renderWrestlingMatchDossierState(route, stateName) {
   backButton.className = "wrestling-detail-back";
   backButton.textContent = "Back to Show";
   backButton.addEventListener("click", () => navigateToRoute(
-    `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(showId))}`
+    `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(showId))}`, { navigationDirection: "back" }
   ));
   section.append(backButton, createWrestlingV3StateCard(stateName, "wrestlingShows", {
     title: stateName === "loading" ? "Loading Encounter Archive" : "Archive Record Unavailable",
@@ -7414,7 +7414,7 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   backButton.className = "wrestling-detail-back";
   backButton.type = "button";
   backButton.textContent = "Back to Events";
-  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows));
+  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows, { navigationDirection: "back" }));
 
   const hero = document.createElement("section");
   hero.className = "wrestling-detail-hero";
@@ -10597,7 +10597,7 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     backButton.type = "button";
     backButton.className = "wrestling-detail-back";
     backButton.textContent = "Back to Fields of Conflict";
-    backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingVenues));
+    backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingVenues, { navigationDirection: "back" }));
     dossier.replaceChildren(backButton, createWrestlingV3StateCard("unavailable", "wrestlingVenues", {
       title: "Archive Record Unavailable",
       text: "No matching venue record was found. Return to Fields of Conflict.",
@@ -16289,7 +16289,7 @@ function returnToWrestlingVenuesRoute() {
     return;
   }
 
-  navigateToRoute(routePaths.wrestlingVenues);
+  navigateToRoute(routePaths.wrestlingVenues, { navigationDirection: "back" });
 }
 
 function renderWrestlingVenueDetailRoute(venueId, options = {}) {
@@ -17819,7 +17819,7 @@ function returnToWrestlingPeopleRoute() {
     return;
   }
 
-  navigateToRoute(routePaths.wrestlingPeople);
+  navigateToRoute(routePaths.wrestlingPeople, { navigationDirection: "back" });
 }
 
 function createWrestlingPersonDetailBackButton() {

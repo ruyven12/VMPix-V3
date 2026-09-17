@@ -241,6 +241,23 @@ function getRouteFromUrl(url = window.location.href) {
   return unknownRoute("route-not-found");
 }
 
+const SHELL_HISTORY_INDEX_KEY = "__v3ShellHistoryIndex";
+let shellHistoryIndex = null;
+let shellRenderedRoute = null;
+
+function getShellHistoryIndex(state) {
+  const value = state?.[SHELL_HISTORY_INDEX_KEY];
+  return Number.isSafeInteger(value) ? value : null;
+}
+
+function seedShellHistoryIndex() {
+  shellHistoryIndex = getShellHistoryIndex(window.history?.state);
+  if (shellHistoryIndex === null && typeof window.history?.replaceState === "function") {
+    shellHistoryIndex = 0;
+    window.history.replaceState({ ...(window.history.state || {}), [SHELL_HISTORY_INDEX_KEY]: shellHistoryIndex }, "", window.location.href);
+  }
+}
+
 function pushRouteUrl(url, state = {}) {
   if (!window.history || typeof window.history.pushState !== "function") {
     return;
@@ -248,9 +265,13 @@ function pushRouteUrl(url, state = {}) {
 
   const targetUrl = new URL(url, window.location.href);
   const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
-  const routeState = { ...state, route: targetPath };
+  if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
+  const currentIndex = getShellHistoryIndex(window.history.state);
+  const nextIndex = (currentIndex ?? shellHistoryIndex ?? 0) + 1;
+  const routeState = { ...state, route: targetPath, [SHELL_HISTORY_INDEX_KEY]: targetPath !== getPathWithSearch() ? nextIndex : currentIndex ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
     window.history.pushState(routeState, "", targetPath);
+    shellHistoryIndex = nextIndex;
   } else if (Object.keys(state).length > 0) {
     window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
   }
@@ -263,7 +284,7 @@ function replaceRouteUrl(url, state = {}) {
 
   const targetUrl = new URL(url, window.location.href);
   const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
-  const routeState = { ...state, route: targetPath };
+  const routeState = { ...state, route: targetPath, [SHELL_HISTORY_INDEX_KEY]: getShellHistoryIndex(window.history.state) ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
     window.history.replaceState(routeState, "", targetPath);
   } else if (Object.keys(state).length > 0) {
@@ -272,6 +293,8 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
+  shellRenderedRoute = route;
   if (route.name === "wrestling-shows" && typeof primeWrestlingShowsRouteSurface === "function") {
     primeWrestlingShowsRouteSurface();
   }
@@ -622,9 +645,16 @@ function syncRouteFromLocation(options = {}) {
 function navigateToRoute(url, options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence(url);
   const targetUrl = route.isUnknown ? url : route.canonicalUrl;
-  pushRouteUrl(targetUrl, options.historyState || {});
-  syncRoute(route, { ...options, shouldCanonicalize: false });
-  if (typeof stabilizeShellViewport === "function") {
-    stabilizeShellViewport(route, options);
+  const restore = () => {
+    pushRouteUrl(targetUrl, options.historyState || {});
+    syncRoute(route, { ...options, shouldCanonicalize: false });
+    if (typeof stabilizeShellViewport === "function") {
+      stabilizeShellViewport(route, options);
+    }
+  };
+  if (typeof runShellBackSweep === "function") {
+    runShellBackSweep(route, restore, options.navigationDirection === "back");
+  } else {
+    restore();
   }
 }

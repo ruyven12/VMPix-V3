@@ -810,7 +810,7 @@ function returnToBandsIndexRoute() {
     window.history.back();
     return;
   }
-  navigateToRoute(returnUrl, { shouldFocusBandsView: true });
+  navigateToRoute(returnUrl, { navigationDirection: "back", shouldFocusBandsView: true });
 }
 
 function navigateToSetDetail(row) {
@@ -871,7 +871,7 @@ function returnToBandDetailRoute() {
     return;
   }
   if (route.name === "set-detail") {
-    navigateToRoute(setsArchiveUrl, {
+    navigateToRoute(setsArchiveUrl, { navigationDirection: "back",
       historyState: {
         bandUrl,
         returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
@@ -882,7 +882,7 @@ function returnToBandDetailRoute() {
     return;
   }
 
-  navigateToRoute(bandUrl, {
+  navigateToRoute(bandUrl, { navigationDirection: "back",
     historyState: {
       returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
       fromBandsIndex: Boolean(historyState.fromBandsIndex),
@@ -2985,7 +2985,7 @@ function syncMusicVenuesArchive() {
 }
 
 function returnToMusicVenuesRoute() {
-  navigateToRoute(routePaths.musicVenues);
+  navigateToRoute(routePaths.musicVenues, { navigationDirection: "back" });
 }
 
 function navigateToMusicVenueDetail(venue) {
@@ -7510,7 +7510,7 @@ function returnToSetsArchiveFromGallery() {
       return;
     }
 
-    navigateToRoute(setsArchiveUrl, {
+    navigateToRoute(setsArchiveUrl, { navigationDirection: "back",
       historyState: {
         bandUrl: historyState.bandUrl || getBandRouteUrl(bandId),
         returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
@@ -10779,7 +10779,7 @@ function showMusicPersonDetail(personId) {
 }
 
 function returnToMusicPeopleRoute() {
-  navigateToRoute(routePaths.musicPeople);
+  navigateToRoute(routePaths.musicPeople, { navigationDirection: "back" });
 }
 
 function createMusicPeopleRow(person) {
@@ -12079,7 +12079,7 @@ function returnToMusicShowsArchive() {
     return;
   }
 
-  navigateToRoute(routePaths.musicShows);
+  navigateToRoute(routePaths.musicShows, { navigationDirection: "back" });
 }
 
 function createShowDetailStat(label, value) {
@@ -13939,7 +13939,7 @@ function moveMusicNexusSelection(direction) {
 function initMusicModule() {
   if (musicNexusBack) {
     musicNexusBack.addEventListener("click", () => {
-      navigateToRoute(routePaths.portfolio);
+      navigateToRoute(routePaths.portfolio, { navigationDirection: "back" });
     });
   }
   if (bandDetailBack) {

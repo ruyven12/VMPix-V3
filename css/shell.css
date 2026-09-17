@@ -12525,3 +12525,27 @@ button {
 }
 
 
+
+/* Shell Back passage uses the persistent Shell; its measured clip ends above Engine. */
+.shell-back-sweep {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 2147483647;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+}
+.shell-back-sweep__veil {
+  position: absolute;
+  inset: 0;
+  background: #050507;
+  transform: translate3d(-100%, 0, 0);
+  will-change: transform;
+}
+.shell-back-sweep[data-world="wrestling"] .shell-back-sweep__veil {
+  border-right: 1px solid rgba(154, 37, 48, 0.72);
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell-back-sweep { display: none; }
+}
