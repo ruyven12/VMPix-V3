@@ -12903,6 +12903,15 @@ function getWrestlingPersonDossierPrototypeCount(record, fields) {
   return getWrestlingPersonDossierPrototypeDisplayValue(value, WRESTLING_PERSON_DOSSIER_PROTOTYPE_UNINDEXED);
 }
 
+function getWrestlingPersonDossierPrototypePhotoCount(record) {
+  const status = getWrestlingPersonDossierPrototypeText(record?.photo_count_status || record?.photoCountStatus).toLowerCase();
+  const source = getWrestlingPersonDossierPrototypeText(record?.photo_count_source || record?.photoCountSource).toLowerCase();
+  if (status === "unavailable" || source === "none") {
+    return "—";
+  }
+  return getWrestlingPersonDossierPrototypeCount(record, ["photo_count", "photoCount", "photos_count"]);
+}
+
 function getWrestlingPersonDossierPrototypeArchiveStatus(record) {
   return getWrestlingPersonDossierPrototypeDisplayValue(
     record?.archive_status || record?.archiveStatus || record?.status || record?.photo_count_status,
@@ -15162,7 +15171,7 @@ function renderWrestlingPersonDossierPrototypeSelectedPersonState(shell = wrestl
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-category]", context.category);
     setWrestlingPersonDossierPrototypeText(workspace, "[data-wrestling-person-dossier-prototype-team]", context.teamStable);
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "archive", getWrestlingPersonDossierPrototypeArchiveStatus(record));
-    setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", getWrestlingPersonDossierPrototypeCount(record, ["photo_count", "photoCount", "photos_count"]));
+    setWrestlingPersonDossierPrototypeStatusItem(workspace, "photos", getWrestlingPersonDossierPrototypePhotoCount(record));
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "matches", getWrestlingPersonDossierPrototypeCount(record, ["match_count", "matchCount", "matches_count"]));
     setWrestlingPersonDossierPrototypeStatusItem(workspace, "events", getWrestlingPersonDossierPrototypeCount(record, ["event_count", "eventCount", "show_count", "showCount"]));
     setWrestlingPersonDossierPrototypeMetadataItems(workspace, record);
