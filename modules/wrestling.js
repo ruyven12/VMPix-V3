@@ -414,6 +414,7 @@ let wrestlingMatchDetailPrototypePhotoRetryAttempts = new Map();
 let wrestlingMatchDetailPrototypePhotoRetryTimers = new Map();
 let wrestlingMatchDetailPrototypePhotoPageStates = new Map();
 let wrestlingPersonTaggedPhotoRequests = new Map();
+const wrestlingPersonSelectedPhotoDetailRequests = new Map();
 let wrestlingPersonTaggedPhotoRequestToken = 0;
 let wrestlingShowsDataState = "idle";
 let wrestlingShowsDataRequested = false;
@@ -14229,6 +14230,32 @@ function getWrestlingPersonDossierPrototypeEventArchiveHeroPhotoUrl(photo) {
   return getWrestlingPersonTaggedPhotoLightboxUrl(photo) || getWrestlingPersonMatchedPhotoUrl(photo);
 }
 
+function requestWrestlingPersonSelectedPhotoDetail(photo) {
+  const imageKey = getWrestlingText(photo?.image_key || photo?.ImageKey);
+  if (!/^(?:i-)?[A-Za-z0-9]{1,64}$/.test(imageKey) || typeof fetch !== "function") {
+    return Promise.resolve(null);
+  }
+  const requestKey = imageKey.replace(/^i-/, "");
+  if (wrestlingPersonSelectedPhotoDetailRequests.has(requestKey)) {
+    return wrestlingPersonSelectedPhotoDetailRequests.get(requestKey);
+  }
+  const apiUrl = new URL(`/api/wrestling/smugmug/images/${encodeURIComponent(imageKey)}`, WRESTLING_SHOWS_API_BASE_URL);
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), WRESTLING_SHOWS_TIMEOUT_MS) : 0;
+  const request = fetch(apiUrl.toString(), { signal: controller?.signal })
+    .then((response) => response.ok ? response.json() : null)
+    .then((payload) => {
+      const detail = payload?.ok && payload.photo;
+      const detailKey = getWrestlingText(detail?.image_key).replace(/^i-/, "");
+      return detail && detailKey === requestKey ? detail : null;
+    })
+    .catch(() => null)
+    .finally(() => { if (timeoutId) window.clearTimeout(timeoutId); });
+  // Retain in-flight, successful and failed selections for this session; no sibling prefetch.
+  wrestlingPersonSelectedPhotoDetailRequests.set(requestKey, request);
+  return request;
+}
+
 function loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(url) {
   const heroUrl = getWrestlingText(url);
   const state = wrestlingPersonDossierPrototypeEventArchiveState;
@@ -14413,15 +14440,27 @@ function renderWrestlingPersonDossierPrototypeEventArchiveViewer(archive) {
   const immediateImageUrl = thumbnailUrl || imageUrl;
   const viewerImageRequestKey = state.viewerImageRequestKey + 1;
   const captionText = getWrestlingPersonDossierPrototypeEventArchivePhotoCaption(photo);
+  let detailImageReady = false;
 
   state.viewerImageRequestKey = viewerImageRequestKey;
   if (image) {
     image.src = immediateImageUrl;
     image.alt = captionText || `${getWrestlingPersonDossierPrototypeSelectedPersonContext().displayName} event archive photo ${selectedIndex + 1}`;
+    if (!getWrestlingText(photo.large_url || photo.largeUrl || photo.medium_url || photo.mediumUrl)) {
+      requestWrestlingPersonSelectedPhotoDetail(photo).then(async (detail) => {
+        const detailUrl = getWrestlingText(detail?.large_url || detail?.medium_url || detail?.small_url);
+        if (!detailUrl || state.viewerImageRequestKey !== viewerImageRequestKey || state.mode !== "viewer" || !state.isOpen) return;
+        const isReady = await loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(detailUrl);
+        const currentPhotos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
+        if (!isReady || state.viewerImageRequestKey !== viewerImageRequestKey || state.selectedPhotoIndex !== selectedIndex || state.mode !== "viewer" || !state.isOpen || currentPhotos[selectedIndex] !== photo) return;
+        detailImageReady = true;
+        image.src = detailUrl;
+      });
+    }
     if (imageUrl && imageUrl !== immediateImageUrl) {
       loadWrestlingPersonDossierPrototypeEventArchiveHeroImage(imageUrl).then((isReady) => {
         const currentPhotos = Array.isArray(state.photoRenderItems) ? state.photoRenderItems : [];
-        if (!isReady || state.viewerImageRequestKey !== viewerImageRequestKey || state.selectedPhotoIndex !== selectedIndex || state.mode !== "viewer" || !state.isOpen || currentPhotos[selectedIndex] !== photo) {
+        if (!isReady || detailImageReady || state.viewerImageRequestKey !== viewerImageRequestKey || state.selectedPhotoIndex !== selectedIndex || state.mode !== "viewer" || !state.isOpen || currentPhotos[selectedIndex] !== photo) {
           return;
         }
         image.src = imageUrl;
