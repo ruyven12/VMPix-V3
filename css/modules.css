@@ -13143,6 +13143,26 @@ button.wrestling-event-history-tagged-thumb {
     font-size: calc(0.4rem + 4px);
   }
 }
+/* A single event has no navigation tracks or decorative pagination to reserve. */
+[data-wrestling-person-dossier-prototype-event-history-total="1"] .wrestling-person-dossier-prototype-event-history {
+  grid-template-columns: minmax(0, 38rem);
+}
+[data-wrestling-person-dossier-prototype-event-history-total="1"] .wrestling-person-dossier-prototype-event-history__card {
+  grid-column: 1;
+}
+[data-wrestling-person-dossier-prototype-event-history-total="1"] :is(.wrestling-person-dossier-prototype-event-history__nav, .wrestling-person-dossier-prototype-event-history__preview, .wrestling-person-dossier-prototype-event-history__dots) {
+  display: none;
+}
+@media (max-width: 640px) {
+  .wrestling-person-dossier-prototype-module--timeline [data-wrestling-person-dossier-prototype-event-open] {
+    min-block-size: 36px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    max-inline-size: 100%;
+  }
+}
+
 .wrestling-people-prototype-shell {
   display: none;
 }
