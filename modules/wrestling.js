@@ -15426,8 +15426,7 @@ function createWrestlingPersonDossierPrototypeHallPresentation() {
                 <h3 class="wrestling-person-dossier-prototype-event-history__title" data-wrestling-person-dossier-prototype-event-title data-wrestling-person-dossier-prototype-event-fit>Event History Initializing</h3>
                 <div class="wrestling-person-dossier-prototype-event-history__metadata">
                 <p data-wrestling-person-dossier-prototype-event-date>Date Pending</p>
-                <p data-wrestling-person-dossier-prototype-event-venue>Venue Pending</p>
-                <p data-wrestling-person-dossier-prototype-event-location>Location Pending</p>
+                <p><span data-wrestling-person-dossier-prototype-event-venue>Venue Pending</span> - <span data-wrestling-person-dossier-prototype-event-location>Location Pending</span></p>
                 </div>
               </div>
               <div class="wrestling-person-dossier-prototype-event-history__match">
