@@ -376,7 +376,7 @@
           <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
           <span class="zhento-side-hud-rail zhento-side-hud-rail--right" aria-hidden="true"></span>
           <section class="rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-rhythm-source-index>
-            <header class="rhythm-heading"><p>ZHENTO</p><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
+            <header class="rhythm-heading"><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
             <div class="rhythm-modes" role="tablist" aria-label="Pillar of Rhythm modes">
               <button class="rhythm-mode" id="rhythm-source-tab" type="button" role="tab" aria-selected="true" aria-controls="rhythm-source-panel">SOURCE INDEX</button>
               <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
@@ -389,7 +389,8 @@
                 <button type="button" data-bands-filter-reset>Reset filters</button>
               </div>
               <p class="rhythm-source-status" role="status" data-rhythm-source-status>Retrieving Source Index…</p>
-              <ul class="rhythm-source-list" data-rhythm-source-list aria-label="Bands Source Index"></ul>
+              <div class="rhythm-rolodex-controls" aria-label="Move through Bands"><button type="button" data-rhythm-previous aria-label="Previous Band">&#9650;</button><button type="button" data-rhythm-next aria-label="Next Band">&#9660;</button></div>
+              <div class="rhythm-rolodex" data-rhythm-rolodex tabindex="0" aria-label="Band rolodex, scroll to select a Band"><ul class="rhythm-source-list" data-rhythm-source-list aria-label="Bands Source Index"></ul></div>
               <button class="rhythm-source-more" type="button" data-rhythm-source-more hidden>Load more Bands</button>
             </section>
           </section>
