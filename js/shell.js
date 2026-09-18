@@ -2284,10 +2284,14 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
+  return route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
+    route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  if (route?.name === "wrestling-shows") return routePaths.wrestling;
+  if (route?.name === "wrestling-show-detail") return routePaths.wrestlingShows;
+
   const routeShowId = String(route?.dateKey || route?.showId || "").trim();
   const routeMatchId = String(route?.matchRef || route?.matchId || "").trim();
   const prototypeShowId = routeShowId || (
@@ -2348,10 +2352,15 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   initPrototypeEngineReturnEmitter();
 
   const isActive = isPrototypeEngineReturnRoute(route);
-  const isMatchDetailBack = route?.name === "wrestling-match-detail";
+  const backLabel = {
+    "wrestling-match-detail": "Back to Campaign Record",
+    "wrestling-show-detail": "Back to Shows",
+    "wrestling-shows": "Back to Wrestling",
+  }[route?.name];
+  const isArchiveBack = Boolean(backLabel);
   // Photo routes retain their existing control, without the new BACK treatment.
-  shell?.toggleAttribute("data-match-dossier-back", isMatchDetailBack);
-  if (isMatchDetailBack) prototypeEngineReturnEmitter.removeAttribute("aria-hidden");
+  shell?.toggleAttribute("data-match-dossier-back", isArchiveBack);
+  if (isArchiveBack) prototypeEngineReturnEmitter.removeAttribute("aria-hidden");
   else prototypeEngineReturnEmitter.setAttribute("aria-hidden", "true");
   prototypeEngineReturnEmitter.classList.toggle("is-prototype-return-control", isActive);
   prototypeEngineReturnEmitter.toggleAttribute("data-prototype-engine-return-active", isActive);
@@ -2362,8 +2371,8 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
     return;
   }
 
-  prototypeEngineReturnControl.setAttribute("aria-label", isMatchDetailBack ? "Back to Campaign Record" : "Return");
-  prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isMatchDetailBack ? "BACK" : "RETURN";
+  prototypeEngineReturnControl.setAttribute("aria-label", backLabel || "Return");
+  prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isArchiveBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
   prototypeEngineReturnControl.disabled = !isActive;
   prototypeEngineReturnControl.tabIndex = isActive ? 0 : -1;
