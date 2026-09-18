@@ -56,10 +56,9 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
   battleground: {
     id: "battleground",
     label: "The Battleground",
-    eyebrow: "ARCHIVE DESTINATION",
-    worldIdentifier: "PLANET // DAÏION",
+    eyebrow: "Planet Daiion",
     description: "Enter Daïion — a once-prosperous world transformed by conflict, where remnants of its past and the energy that shaped its fate surround the real matches, moments, champions, and photographs of the Wrestling Archive.",
-    status: "COORDINATES LOCKED // READY FOR TRAVEL",
+    status: "Coordinates Locked",
     statusType: "decoding",
   },
   wild: {
@@ -1428,6 +1427,7 @@ function setPortfolioEngineProjectionContent(worldName) {
   const config = getPortfolioWorldSelectionConfig(worldName);
   if (portfolioEngineProjection) {
     portfolioEngineProjection.dataset.archiveStatus = config.statusType;
+    portfolioEngineProjection.dataset.world = config.id;
     const eyebrow = portfolioEngineProjection.querySelector(".portfolio-engine-projection-kicker");
     const worldIdentifier = portfolioEngineProjection.querySelector(".portfolio-engine-projection-status-label");
     if (eyebrow) eyebrow.textContent = config.eyebrow || "Archive Analysis";
@@ -1441,6 +1441,20 @@ function setPortfolioEngineProjectionContent(worldName) {
   }
   if (portfolioEngineProjectionStatus) {
     portfolioEngineProjectionStatus.textContent = config.status;
+    if (config.id === "battleground") {
+      portfolioEngineProjectionStatus.setAttribute("aria-label", "Coordinates Locked. Ready for Traverse.");
+      portfolioEngineProjectionStatus.setAttribute("aria-live", "off");
+      portfolioEngineProjectionStatus.replaceChildren(...[config.status, "Ready for Traverse"].map((text) => {
+        const phrase = document.createElement("span");
+        phrase.className = "portfolio-engine-projection-status-phrase";
+        phrase.setAttribute("aria-hidden", "true");
+        phrase.textContent = text;
+        return phrase;
+      }));
+    } else {
+      portfolioEngineProjectionStatus.removeAttribute("aria-label");
+      portfolioEngineProjectionStatus.removeAttribute("aria-live");
+    }
   }
 }
 

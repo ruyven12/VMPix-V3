@@ -5124,6 +5124,71 @@ button {
   text-shadow: 0 0 0.24rem rgba(210, 210, 205, 0.12);
 }
 
+/* Battleground destination copy grows within the space above the persistent Engine. */
+.site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world="battleground"] {
+  max-height: calc(100svh - var(--portfolio-engine-bottom-offset, max(0.58rem, env(safe-area-inset-bottom))) - var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) - clamp(0.62rem, 1.45svh, 1rem) - max(0.75rem, env(safe-area-inset-top)));
+  align-content: start;
+  grid-auto-rows: max-content;
+  overflow-y: auto;
+}
+
+/* The old connector was outside the clipped card; keep it out of scrollable bounds. */
+.portfolio-engine-projection[data-world="battleground"]::after {
+  content: none;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-projection-active .portfolio-engine-projection[data-world="battleground"] {
+  pointer-events: auto;
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-kicker {
+  color: rgba(255, 174, 72, 0.9);
+  font-size: clamp(0.94rem, 3.35vw, 1.24rem);
+  font-weight: 700;
+  line-height: 1.04;
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-title {
+  font-size: calc(clamp(0.94rem, 3.35vw, 1.24rem) - 2px);
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status {
+  display: grid;
+  grid-template-columns: max-content;
+  white-space: nowrap;
+  animation: none;
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status::after {
+  animation: none;
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status-phrase {
+  grid-area: 1 / 1;
+  animation: battlegroundDestinationStatusMorph 2.4s ease-in-out infinite;
+}
+
+.portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status-phrase:nth-child(2) {
+  animation-delay: -1.2s;
+}
+
+@keyframes battlegroundDestinationStatusMorph {
+  0%, 41.6667%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0; transform: translateY(-2px); }
+  91.6667% { opacity: 0; transform: translateY(2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status-phrase {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .portfolio-engine-projection[data-world="battleground"] .portfolio-engine-projection-status-phrase:nth-child(2) {
+    opacity: 0;
+  }
+}
+
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field {
   display: block;
 }
