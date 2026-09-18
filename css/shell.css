@@ -12715,3 +12715,8 @@ button {
   }
   .site-shell[data-shell-route="portfolio"] .portfolio-beacon::before { opacity: 1; }
 }
+
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon--world::before,
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon--world::after {
+  transform: translate3d(-50%, -50%, 0) scale(1.22);
+}
