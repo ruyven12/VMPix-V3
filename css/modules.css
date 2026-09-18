@@ -31006,3 +31006,18 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-telemetry-value { color:#e6d8ff;font-size:.7rem;line-height:1.2;overflow-wrap:anywhere; }
 .rhythm-source-more { margin-block:.6rem .4rem; }
 @media(prefers-reduced-motion:reduce) { .rhythm-rolodex { scroll-behavior:auto; } .rhythm-rolodex .rhythm-source-row { transition:none; } }
+/* Desktop dossier density uses the space reserved above the shared Engine. */
+@media (min-width: 900px) {
+  .rhythm-viewport .rhythm-pillar { padding-block-end:4px; }
+  .rhythm-source-panel { display:flex;flex-direction:column;flex:1;min-height:0; }
+  .rhythm-source-panel > :not(.rhythm-rolodex) { flex-shrink:0; }
+  .rhythm-rolodex { --rhythm-card-height:clamp(9rem,15svh,11rem);flex:1;min-height:19rem;height:auto;container-type:size; }
+  .rhythm-rolodex .rhythm-source-list { padding-block:calc((100cqh - var(--rhythm-card-height))/2); }
+  .rhythm-rolodex .rhythm-source-art { height:100%;aspect-ratio:auto; }
+  .rhythm-rolodex .rhythm-source-art img { object-fit:cover; }
+  .rhythm-rolodex .rhythm-source-name { font-size:calc(clamp(.8rem,1.5vw,1.1rem) + 4px); }
+  .rhythm-source-telemetry { box-sizing:border-box;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:0;padding-block:10px; }
+  .rhythm-telemetry-label { font-size:calc(.58rem + 2px); }
+  .rhythm-telemetry-value { font-size:calc(.7rem + 2px); }
+  .rhythm-source-more { margin-block:.6rem 0; }
+}
