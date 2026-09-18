@@ -12760,3 +12760,7 @@ button {
 
 
 .site-shell:is([data-shell-route="music"], [data-shell-route="music-bands"]) .portfolio-engine { transform: translate3d(0,0,0) scale3d(1,1,1); }
+
+/* Bands uses the current shared module viewport, with no Music presentation ancestor. */
+.site-shell[data-shell-route="music-bands"] .portfolio-hub { position:fixed;inset:0;inline-size:100%;block-size:100%;min-height:0;max-height:none;padding:0;border:0;border-radius:0;background:none;transform:none;overflow:visible; }
+.site-shell[data-shell-route="music-bands"] .portfolio-hub::before { content:none; }

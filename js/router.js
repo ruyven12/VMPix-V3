@@ -294,6 +294,7 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  syncRhythmPresentationOwnership(route);
   if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
   shellRenderedRoute = route;
   if (route.name === "wrestling-shows" && typeof primeWrestlingShowsRouteSurface === "function") {
@@ -543,7 +544,7 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "music-bands") {
     bandsIndexReturnUrl = route.canonicalUrl;
-    showMusicNexus({ initialSection: "bands", currentView: "Bands" });
+    showRhythmPillar();
     setBandsView(route.view, Boolean(options.shouldFocusBandsView));
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);

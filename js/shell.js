@@ -2400,6 +2400,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   const isActive = isPrototypeEngineReturnRoute(route);
   const backLabel = {
     "music": "Back to Portfolio",
+    "music-bands": "Back to Zhento",
     "wrestling-people-prototype": "Back to Wrestling",
     "wrestling-people": "Back to Wrestling",
     "wrestling-person-detail": "Back to Hall of Champions",
@@ -2781,8 +2782,8 @@ function setShellLogoFallback(isFallback) {
 }
 
 function initShellRailLogo() {
-  const logoVideo = document.querySelector("[data-shell-logo-video]");
-  const logoFallback = document.querySelector("[data-shell-logo-fallback]");
+  const logoVideo = queryRetainedMusicElement("[data-shell-logo-video]");
+  const logoFallback = queryRetainedMusicElement("[data-shell-logo-fallback]");
   if (!logoVideo || !logoFallback) {
     return;
   }
@@ -3117,6 +3118,31 @@ function resetZhentoLandingSelection() {
       landing.querySelector(".zhento-destination-prompt").hidden = true;
     });
   });
+}
+
+function syncRhythmPresentationOwnership(route) {
+  const active = route.name === 'music-bands';
+  for (const [id, node] of [['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
+    const template = document.getElementById(id);
+    if (active && node?.isConnected) template.content.append(node);
+    else if (!active && template.content.childElementCount) template.before(template.content);
+  }
+  rhythmViewport.hidden = !active;
+  rhythmViewport.inert = !active;
+  if (!active) { cancelRhythmPulseBatches(); musicBandsIndex.setAttribute('aria-hidden','true'); }
+}
+function showRhythmPillar() {
+  clearPortfolioArrivalState(); clearPortfolioOrientationState(); clearPortfolioDirectArrivalState();
+  shell.classList.remove('is-placeholder-view','is-music-nexus-view','is-ring-archive-view','is-wrestling-people-view','is-wrestling-person-detail-view','is-wrestling-shows-view','is-wrestling-show-detail-view','is-wrestling-match-gallery-view','is-wrestling-lightbox-view','is-about-view','is-calendar-view','is-contact-view');
+  shell.classList.add('has-entered-hub','is-module-view');
+  homeFrame?.setAttribute('aria-hidden','true');
+  portfolioHub.setAttribute('aria-hidden','false'); portfolioHub.removeAttribute('inert');
+  for (const host of [modulePlaceholder,ringArchiveShell,aboutShell,calendarShell,contactShell]) { host?.setAttribute('aria-hidden','true'); host?.setAttribute('inert',''); }
+  setWrestlingShowsHidden(true); setWrestlingPeopleHidden(true); setWrestlingPersonDetailHidden(true); setWrestlingVenuesHidden(true); setWrestlingShowDetailHidden(true); setWrestlingMatchGalleryHidden(true); setWrestlingLightboxHidden(true);
+  musicBandsIndex.setAttribute('aria-hidden','false'); musicBandsIndex.removeAttribute('inert');
+  setHubChromeHidden(true); setActiveGlobalNav('music');
+  setPortfolioEngineHudCurrentView('Pillar of Rhythm');
+  syncBandsIndex(); requestMusicBandsIndexData();
 }
 
 function showMusicNexus(options = {}) {
@@ -4460,7 +4486,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "route-not-found": modulePlaceholder,
     music: musicNexusShell,
     "music-route-not-found": modulePlaceholder,
-    "music-bands": musicNexusShell,
+    "music-bands": rhythmViewport,
     "band-detail": musicNexusShell,
     "sets-archive": musicNexusShell,
     "set-detail": musicNexusShell,

@@ -24,6 +24,12 @@
     <script>
       (() => {
         const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (routePath === "/music/bands") {
+          const root = document.currentScript.parentElement;
+          root.classList.remove("is-home-route");
+          root.classList.add("is-module-view");
+          root.setAttribute("data-shell-route", "music-bands");
+        }
         if (routePath === "/music") {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
@@ -365,6 +371,27 @@
           </button>
         </section>
 
+        <section class="rhythm-viewport" data-rhythm-viewport hidden aria-label="Pillar of Rhythm content viewport">
+          <section class="rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-pulse-network>
+            <header class="rhythm-heading"><p>ZHENTO</p><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
+            <div class="rhythm-modes" role="tablist" aria-label="Pillar of Rhythm modes">
+              <button class="rhythm-mode" id="rhythm-network-tab" type="button" role="tab" aria-selected="true" aria-controls="rhythm-network-panel">PULSE NETWORK</button>
+              <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SOURCE INDEX</button>
+              <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
+            </div>
+            <section class="rhythm-network-panel" id="rhythm-network-panel" role="tabpanel" aria-labelledby="rhythm-network-tab">
+              <p class="rhythm-network-status" role="status" data-pulse-status>Retrieving the Pulse Network…</p>
+              <div class="rhythm-field" data-pulse-field aria-label="Selectable Band nodes">
+                <svg class="rhythm-resonance" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="23" ry="46"/><ellipse cx="50" cy="50" rx="46" ry="18"/><ellipse cx="50" cy="50" rx="40" ry="31" transform="rotate(-35 50 50)"/></svg>
+                <div class="rhythm-nodes" data-pulse-nodes></div>
+              </div>
+              <p class="rhythm-resonance-note">Decorative resonance · no documented relationships implied</p>
+              <article class="rhythm-readout" data-pulse-readout aria-live="polite"><p>Select a source to view its archive.</p></article>
+            </section>
+          </section>
+
+        </section>
+        <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
           <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Soundtrack" data-music-nexus-landing data-zhento-landing>
             <div class="zhento-landing__artwork" aria-hidden="true"></div>
@@ -395,24 +422,6 @@
               <button class="zhento-destinations__item" type="button" data-zhento-destination="people" aria-pressed="false"><span>PILLAR OF MELODY</span></button>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="venues" aria-pressed="false"><span>PILLAR OF HARMONY</span></button>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="shows" aria-pressed="false"><span>PILLAR OF SYNCHRONY</span></button>
-            </section>
-          </section>
-
-          <section class="music-bands-index is-active rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-music-bands-index data-pulse-network>
-            <header class="rhythm-heading"><p>ZHENTO</p><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
-            <div class="music-bands-mode-switch" role="tablist" aria-label="Pillar of Rhythm modes">
-              <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">PULSE NETWORK</button>
-              <button class="bands-index-mode-tab" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SOURCE INDEX</button>
-              <button class="bands-index-mode-tab" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
-            </div>
-            <section class="bands-index-panel is-active rhythm-network-panel" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
-              <p class="rhythm-network-status" role="status" data-pulse-status>Retrieving the Pulse Network…</p>
-              <div class="rhythm-field" data-pulse-field aria-label="Selectable Band nodes">
-                <svg class="rhythm-resonance" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="23" ry="46"/><ellipse cx="50" cy="50" rx="46" ry="18"/><ellipse cx="50" cy="50" rx="40" ry="31" transform="rotate(-35 50 50)"/></svg>
-                <div class="rhythm-nodes" data-pulse-nodes></div>
-              </div>
-              <p class="rhythm-resonance-note">Decorative resonance · no documented relationships implied</p>
-              <article class="rhythm-readout" data-pulse-readout aria-live="polite"><p>Select a source to view its archive.</p></article>
             </section>
           </section>
 
@@ -1045,6 +1054,8 @@
             </div>
           </article>
         </section>
+        </template>
+        <script>if (!/^\/music\/bands\/?$/.test(location.pathname)) { const t=document.getElementById('music-presentation-template'); t.before(t.content); }</script>
         <section class="ring-archive-shell" aria-label="Ring Archive" aria-hidden="true" inert data-ring-archive-shell>
 
           <section class="ring-archive-activity" aria-labelledby="ring-activity-title">
@@ -1740,6 +1751,7 @@
         <span class="portfolio-engine-value">3.0.01</span>
       </div>
     </aside>
+    <template id="shell-rail-template">
     <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal shell rail">
       <button
         class="rail-menu-trigger"
@@ -1770,6 +1782,8 @@
         </span>
       </span>
     </footer>
+    </template>
+    <script>if (!/^\/music\/bands\/?$/.test(location.pathname)) { const t=document.getElementById('shell-rail-template'); t.before(t.content); }</script>
 
     <button
       class="global-menu-backdrop"

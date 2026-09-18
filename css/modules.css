@@ -30938,21 +30938,21 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-destination-prompt__text { clip-path: none; }
   .zhento-destination-prompt__text::after { display: none; }
 }
+/* Pillar of Rhythm occupies the current shared viewport beside other V3 modules. */
+.rhythm-viewport { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
+.rhythm-viewport[hidden] { display:none; }
+.rhythm-viewport .rhythm-pillar { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);display:block;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) 1rem max(1rem,env(safe-area-inset-left));overflow-y:auto;overflow-x:hidden;color:#e4eaff; }
+.rhythm-pillar > * { box-sizing:border-box;max-width:62rem;margin-inline:auto; }
+.rhythm-modes { display:flex;justify-content:center;gap:.4rem; }
+.rhythm-mode { appearance:none;flex:0 1 auto;font:inherit;cursor:pointer;border-radius:3px; }
 /* Pillar of Rhythm: bounded Pulse Network, owned only by the Bands index route. */
-.site-shell[data-shell-route="music-bands"] .portfolio-hub { position:fixed; inset:0; width:100%;height:100%;min-height:0;max-height:none;padding:0;border:0;border-radius:0;background:none;transform:none;overflow:visible; }
-.site-shell[data-shell-route="music-bands"] .portfolio-hub::before,
-.site-shell[data-shell-route="music-bands"] .music-nexus-shell::before { content:none; }
-.site-shell[data-shell-route="music-bands"] .portfolio-hub > :not(.music-nexus-shell),
-.site-shell[data-shell-route="music-bands"] .music-nexus-shell > :not([data-pulse-network]) { display:none !important; }
-.site-shell[data-shell-route="music-bands"] .music-nexus-shell { position:fixed;inset:0 0 calc(var(--portfolio-engine-height,5rem) + var(--portfolio-engine-bottom-offset,.75rem) + env(safe-area-inset-bottom) + 1rem);width:100%;height:auto;max-height:none;min-height:0;padding:clamp(1rem,3vw,2.5rem);border:0;border-radius:0;transform:none;overflow-y:auto;overflow-x:hidden;background:radial-gradient(ellipse at 50% 35%,rgba(96,81,173,.2),transparent 65%),#070a15;scroll-padding-block:1rem; }
-.site-shell[data-shell-route="music-bands"] .rhythm-pillar { display:block;width:min(100%,62rem);margin-inline:auto;padding:0;border:0;background:none;box-shadow:none;color:#e4eaff; }
 .rhythm-heading { text-align:center;margin-block:0 1.2rem; }
 .rhythm-heading h1 { margin:.4rem 0;font-family:var(--font-display);font-size:clamp(1.15rem,3vw,1.8rem);line-height:1.3;letter-spacing:.06em;color:#c5c9ff; }
 .rhythm-heading p { margin:.35rem 0;font-size:clamp(.8rem,1.4vw,1rem);color:#a8b5d8; }
-.rhythm-pillar .music-bands-mode-switch { display:flex;justify-content:center;gap:.4rem;margin:0 0 .6rem;padding:0;border:0;background:none; }
-.rhythm-pillar .bands-index-mode-tab { flex:0 1 auto;min-height:44px;padding:.5rem .7rem;font-size:clamp(.65rem,1.2vw,.82rem);color:#aab4d0;border:1px solid #5b5a8a;background:rgba(73,66,118,.14); }
-.rhythm-pillar .bands-index-mode-tab[aria-selected="true"] { color:#e6eaff;border-color:#a092f2;background:rgba(117,97,201,.2);box-shadow:inset 0 0 1rem #8e7aff18; }
-.rhythm-pillar .bands-index-mode-tab:disabled { opacity:.48;cursor:not-allowed; }
+.rhythm-pillar .rhythm-modes { display:flex;justify-content:center;gap:.4rem;margin:0 0 .6rem;padding:0;border:0;background:none; }
+.rhythm-pillar .rhythm-mode { flex:0 1 auto;min-height:44px;padding:.5rem .7rem;font-size:clamp(.65rem,1.2vw,.82rem);color:#aab4d0;border:1px solid #5b5a8a;background:rgba(73,66,118,.14); }
+.rhythm-pillar .rhythm-mode[aria-selected="true"] { color:#e6eaff;border-color:#a092f2;background:rgba(117,97,201,.2);box-shadow:inset 0 0 1rem #8e7aff18; }
+.rhythm-pillar .rhythm-mode:disabled { opacity:.48;cursor:not-allowed; }
 .rhythm-pillar .rhythm-network-panel { display:grid;justify-items:center;gap:.6rem;padding:0;min-height:0;overflow:visible;background:none;border:0; }
 .rhythm-network-status { margin:0;min-height:1.4em;font-size:.8rem;color:#bfc8e8;text-align:center; }
 .rhythm-field { position:relative;isolation:isolate;inline-size:min(100%,34rem);aspect-ratio:1;flex:none;background:radial-gradient(circle,rgba(130,112,232,.11),rgba(35,56,99,.05) 65%,transparent 69%); }
@@ -30978,12 +30978,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 @keyframes rhythmResonance { from { opacity:.22;transform:rotate(-1deg); } to { opacity:.36;transform:rotate(1deg); } }
 @media(prefers-reduced-motion:reduce) { .rhythm-pillar *, .rhythm-pillar *::before,.rhythm-pillar *::after { animation:none !important;transition:none !important; } }
 
-.site-shell[data-shell-route="music-bands"] .portfolio-hub { background:#070a15; }
-.site-shell[data-shell-route="music-bands"] .music-nexus-shell { display:block;box-sizing:border-box; }
-.site-shell[data-shell-route="music-bands"] .rhythm-pillar { box-sizing:border-box;min-width:0;max-width:100%;overflow:visible; }
 .rhythm-pillar .rhythm-network-panel { display:flex;flex-direction:column;align-items:center;width:100%;height:auto;max-height:none;min-width:0;box-sizing:border-box;animation:none; }
 .rhythm-pillar .rhythm-field { width:min(100%,36svh,30rem);max-width:100%;min-width:0;box-sizing:border-box; }
 .rhythm-pillar .rhythm-readout { min-width:0;max-width:100%;flex:none; }
 .rhythm-pillar .rhythm-resonance-note { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
-.rhythm-pillar .music-bands-mode-switch { width:100%;box-sizing:border-box;overflow:visible; }
+.rhythm-pillar .rhythm-modes { width:100%;box-sizing:border-box;overflow:visible; }
 .rhythm-pillar .rhythm-field { min-width:min(100%,18rem); }
