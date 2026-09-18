@@ -12277,12 +12277,11 @@ function restoreHallOfChampionsReturnFocus(prototypeShell, viewport) {
   const snapshot = prototypeShell.hallOfChampionsReturnFocus;
   if (!snapshot || prototypeShell.dataset.hallOfChampionsActive !== "true" ||
     prototypeShell.dataset.hallOfChampionsModeSelectorReady !== "true") return;
-  const item = snapshot.focusTarget && viewport.contains(snapshot.focusTarget)
+  const item = snapshot.focusTarget && prototypeShell.contains(snapshot.focusTarget)
     ? snapshot.focusTarget
     : [...viewport.querySelectorAll("[data-wrestling-person-id]")]
       .find((node) => node.dataset.wrestlingPersonId === snapshot.personId);
-  if (!item) return;
-  item.focus({ preventScroll: true });
+  if (item) item.focus({ preventScroll: true });
   viewport.scrollTop = snapshot.scrollTop;
   delete prototypeShell.hallOfChampionsReturnFocus;
 }
@@ -12316,24 +12315,40 @@ function formatHallOfChampionsArchiveRecordPhotoCount(photoCount) {
   return Number.isFinite(photoCount) ? `${photoCount.toLocaleString()} Photos` : "";
 }
 
-function activateHallOfChampionsArchiveRecordRoute(routeUrl) {
-  const prototypeShell = wrestlingPeoplePrototypeShell;
+function captureHallOfChampionsReturn(prototypeShell, personRouteUrl = null) {
   const mode = getHallOfChampionsActiveWorkspaceMode(prototypeShell);
-  const token = "hall-return-" + (++hallOfChampionsReturnSequence);
+  const modeIndex = getHallOfChampionsCurrentModeIndex(prototypeShell);
+  const token = personRouteUrl || !prototypeShell.hallOfChampionsReturnToken
+    ? "hall-return-" + (++hallOfChampionsReturnSequence)
+    : prototypeShell.hallOfChampionsReturnToken;
+  const previous = hallOfChampionsReturnSnapshots.get(token);
   const viewport = prototypeShell.querySelector('[data-hall-of-champions-workspace-results="' + mode + '"]');
-  const personId = normalizeWrestlingPersonId(new URL(routeUrl, location.href).pathname.split("/").pop());
+  const personPath = personRouteUrl ? new URL(personRouteUrl, location.href).pathname : previous?.personPath;
+  const lastFocus = prototypeShell.hallOfChampionsLastFocus;
+  const focusTarget = prototypeShell.contains(document.activeElement)
+    ? document.activeElement
+    : lastFocus?.modeIndex === modeIndex && prototypeShell.contains(lastFocus.target)
+      ? lastFocus.target
+      : previous?.modeIndex === modeIndex && prototypeShell.contains(previous.focusTarget) ? previous.focusTarget : null;
   hallOfChampionsReturnSnapshots.set(token, {
-    sourcePath: location.pathname, personPath: new URL(routeUrl, location.href).pathname,
-    modeIndex: getHallOfChampionsCurrentModeIndex(prototypeShell),
+    sourcePath: routePaths.wrestlingPeople, personPath,
+    modeIndex,
     letter: getHallOfChampionsCurrentAzLetter(), category: getHallOfChampionsCurrentCategory(),
     team: getHallOfChampionsCurrentTeam(), query: hallOfChampionsSearchQuery,
-    expanded: prototypeShell.dataset.hallOfChampionsExpanded === "true", personId,
+    expanded: prototypeShell.dataset.hallOfChampionsExpanded === "true",
+    personId: personRouteUrl ? normalizeWrestlingPersonId(personPath.split("/").pop()) : previous?.personId,
     scrollTop: viewport?.scrollTop || 0,
     results: viewport?.firstElementChild, records: hallOfChampionsPeopleArchiveRecords,
-    focusTarget: viewport?.contains(document.activeElement) ? document.activeElement : null,
+    focusTarget,
   });
   prototypeShell.hallOfChampionsReturnToken = token;
   if (hallOfChampionsReturnSnapshots.size > 24) hallOfChampionsReturnSnapshots.delete(hallOfChampionsReturnSnapshots.keys().next().value);
+  return token;
+}
+
+function activateHallOfChampionsArchiveRecordRoute(routeUrl) {
+  const prototypeShell = wrestlingPeoplePrototypeShell;
+  const token = captureHallOfChampionsReturn(prototypeShell, routeUrl);
   replaceRouteUrl(location.pathname + location.search, { ...window.history.state, hallOfChampionsReturnToken: token });
   navigateToRoute(routeUrl, {
     historyState: { fromWrestlingPeopleHall: true, fromWrestlingPeopleIndex: true, hallOfChampionsReturnToken: token },
@@ -12742,6 +12757,19 @@ function setWrestlingPeoplePrototypeActive(isActive) {
     ? getWrestlingPeoplePrototypeShell()
     : wrestlingPeoplePrototypeShell || document.querySelector("[data-wrestling-people-prototype-shell]");
 
+  if (isActive && prototypeShell && !prototypeShell.hallOfChampionsFocusTrackingBound) {
+    prototypeShell.addEventListener("focusin", (event) => {
+      prototypeShell.hallOfChampionsLastFocus = {
+        target: event.target,
+        modeIndex: getHallOfChampionsCurrentModeIndex(prototypeShell),
+      };
+    });
+    prototypeShell.hallOfChampionsFocusTrackingBound = true;
+  }
+  if (!isActive && prototypeShell?.dataset.hallOfChampionsActive === "true") {
+    captureHallOfChampionsReturn(prototypeShell);
+  }
+
   if (isActive && typeof setWrestlingVenuesPrototypeActive === "function") {
     setWrestlingVenuesPrototypeActive(false);
   }
@@ -12839,6 +12867,12 @@ function setWrestlingPeoplePrototypeActive(isActive) {
 
   if (typeof setDocumentTitle === "function") {
     setDocumentTitle("Hall of Champions - Voodoo Media V3.0.01");
+  }
+  if (typeof updatePrototypeEngineReturnEmitter === "function") {
+    updatePrototypeEngineReturnEmitter(getRouteFromUrl());
+  }
+  if (typeof syncPortfolioEngineLightningMotion === "function") {
+    syncPortfolioEngineLightningMotion();
   }
 }
 

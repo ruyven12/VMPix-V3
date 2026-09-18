@@ -425,6 +425,7 @@ function handoffPortfolioGatewayRoute(worldName) {
   }
 
   shellRenderedRoute = getRouteFromUrl(targetUrl);
+  updatePrototypeEngineReturnEmitter(shellRenderedRoute);
   shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
@@ -2284,11 +2285,15 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
+  return route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+    route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
+  if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
+  if (route?.name === "wrestling") return getShellBackTarget(route);
   if (route?.name === "wrestling-shows") return routePaths.wrestling;
   if (route?.name === "wrestling-show-detail") return routePaths.wrestlingShows;
 
@@ -2316,6 +2321,10 @@ function handlePrototypeEngineReturnEmitter(event) {
 
   event.preventDefault();
   event.stopPropagation();
+  if (shouldShellBackUseHistory(route)) {
+    window.history.back();
+    return;
+  }
   navigateToRoute(getPrototypeEngineReturnRoute(route), { navigationDirection: "back" });
 }
 
@@ -2353,6 +2362,10 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
 
   const isActive = isPrototypeEngineReturnRoute(route);
   const backLabel = {
+    "wrestling-people-prototype": "Back to Wrestling",
+    "wrestling-people": "Back to Wrestling",
+    "wrestling-person-detail": "Back to Hall of Champions",
+    "wrestling": "Back to Portfolio",
     "wrestling-match-detail": "Back to Campaign Record",
     "wrestling-show-detail": "Back to Shows",
     "wrestling-shows": "Back to Wrestling",
@@ -2491,6 +2504,8 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return "";
   }
 
+  if (route.name === "wrestling-people-prototype") return routePaths.wrestling;
+
   if (route.name === "band-detail") {
     return normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl || routeNameToShellBackTarget[route.name]);
   }
@@ -2522,6 +2537,11 @@ function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = win
   if (!window.history || window.history.length <= 1 || !route) {
     return false;
   }
+
+  const parentTarget = isPrototypeEngineReturnRoute(route)
+    ? getPrototypeEngineReturnRoute(route)
+    : getShellBackTarget(route, historyState);
+  if (parentTarget && historyState.__v3ShellPreviousRoute === parentTarget) return true;
 
   return (
     (route.name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) ||
@@ -3108,6 +3128,7 @@ function showBattlegroundGatewayArrivalSurface() {
   applyPortfolioGatewayWorldBackground("battleground");
   applyPortfolioGatewaySettledFrame();
   applyPortfolioShellRouteContext();
+  updatePrototypeEngineReturnEmitter(getRouteFromUrl());
   shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
   shell.classList.add("has-entered-hub", "has-portfolio-entry-constellation", "is-portfolio-world-gateway-active", "is-portfolio-world-arrived");
   shell.dataset.portfolioGatewayWorld = "battleground";

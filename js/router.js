@@ -270,6 +270,7 @@ function pushRouteUrl(url, state = {}) {
   const nextIndex = (currentIndex ?? shellHistoryIndex ?? 0) + 1;
   const routeState = { ...state, route: targetPath, [SHELL_HISTORY_INDEX_KEY]: targetPath !== getPathWithSearch() ? nextIndex : currentIndex ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
+    routeState.__v3ShellPreviousRoute = getPathWithSearch();
     window.history.pushState(routeState, "", targetPath);
     shellHistoryIndex = nextIndex;
   } else if (Object.keys(state).length > 0) {
