@@ -360,74 +360,28 @@
         </section>
 
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
-          <section class="music-nexus-landing" aria-label="Music Nexus landing" data-music-nexus-landing>
-            <section class="music-landing-hero" aria-label="Music Nexus hero">
-              <div class="music-landing-stage" aria-hidden="true">
-                <span class="music-landing-light music-landing-light--left"></span>
-                <span class="music-landing-light music-landing-light--right"></span>
-                <span class="music-landing-truss"></span>
-                <span class="music-landing-performer music-landing-performer--guitar"></span>
-                <span class="music-landing-performer music-landing-performer--drums"></span>
-                <span class="music-landing-crowd"></span>
-              </div>
-              <header class="music-landing-header">
-                <p class="music-landing-kicker">WELCOME TO THE</p>
-                <h3 class="music-landing-title" id="music-nexus-title">MUSIC NEXUS</h3>
-              </header>
+          <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Music Archive" data-music-nexus-landing data-zhento-landing>
+            <div class="zhento-landing__artwork" aria-hidden="true"></div>
+            <header class="zhento-identity">
+              <h1 class="zhento-identity__heading" id="music-nexus-title"><span class="zhento-identity__planet">PLANET //</span><span class="zhento-identity__name">ZHENTO</span></h1>
+              <p class="zhento-identity__subtitle">(The Music Archive)</p>
+            </header>
+            <section class="zhento-stats zhento-panel" aria-label="Archive statistics — placeholder values">
+              <dl class="zhento-stats__list">
+                <div class="zhento-stats__primary"><dt>PHOTOS</dt><dd>0</dd></div>
+                <div><dt>BANDS</dt><dd>0</dd></div>
+                <div><dt>SHOWS</dt><dd>0</dd></div>
+                <div><dt>PEOPLE</dt><dd>0</dd></div>
+                <div><dt>VENUES</dt><dd>0</dd></div>
+              </dl>
             </section>
-
-            <section class="music-landing-stats" aria-label="Music Nexus statistics" aria-busy="false" data-music-landing-stats data-stats-state="fallback">
-              <article class="music-landing-stat music-landing-stat--photos" data-music-stat="photos" data-api-route="/api/music/bands" data-api-field="photosTotal" aria-label="Photos - Total Archive Collection">
-                <strong class="music-landing-stat-value" data-music-stat-value="photos" data-fallback-value="9800">9,800</strong>
-                <span class="music-landing-stat-label">Photos</span>
-                <span class="music-landing-stat-copy">Total Archive Collection</span>
-              </article>
-            </section>
-
-            <section class="music-landing-card-grid" aria-label="Music Nexus navigation">
-              <article class="music-landing-card" role="link" tabindex="0" data-music-landing-route="/music/bands" data-music-stat="bands" data-api-route="/api/music/bands" data-api-field="bandsTotal" aria-label="Bands - Browse Artists">
-                <strong class="music-landing-stat-value" data-music-stat-value="bands" data-fallback-value="144">144</strong>
-                <h4 class="music-landing-card-title">Bands</h4>
-                <p class="music-landing-card-copy">Browse Artists</p>
-              </article>
-              <article class="music-landing-card" role="link" tabindex="0" data-music-landing-route="/music/shows" data-music-stat="shows" data-api-route="/api/music/shows" data-api-field="showsTotal" aria-label="Shows - Browse Events">
-                <strong class="music-landing-stat-value" data-music-stat-value="shows" data-fallback-value="328">328</strong>
-                <h4 class="music-landing-card-title">Shows</h4>
-                <p class="music-landing-card-copy">Browse Events</p>
-              </article>
-              <article class="music-landing-card" role="link" tabindex="0" data-music-landing-route="/music/people" data-music-stat="people" data-api-route="/api/music/people" data-api-field="peopleTotal" aria-label="People - Musicians &amp; Staff">
-                <strong class="music-landing-stat-value" data-music-stat-value="people" data-fallback-value="214">214</strong>
-                <h4 class="music-landing-card-title">People</h4>
-                <p class="music-landing-card-copy">Musicians &amp; Staff</p>
-              </article>
-              <article class="music-landing-card" role="link" tabindex="0" data-music-landing-route="/music/venues" data-music-stat="venues" data-api-route="/api/music/venues" data-api-field="venuesTotal" aria-label="Venues - Music Locations">
-                <strong class="music-landing-stat-value" data-music-stat-value="venues" data-fallback-value="42">42</strong>
-                <h4 class="music-landing-card-title">Venues</h4>
-                <p class="music-landing-card-copy">Music Locations</p>
-              </article>
-            </section>
-
-            <section class="music-landing-activity" aria-labelledby="music-landing-activity-title">
-              <header class="music-landing-section-header">
-                <h4 class="music-landing-section-title" id="music-landing-activity-title">Latest Music Activity</h4>
-              </header>
-              <div class="music-landing-activity-list" aria-label="Latest Music Activity placeholder cards">
-                <article class="music-landing-activity-card">
-                  <span class="music-landing-activity-type">Show Queue</span>
-                  <h5 class="music-landing-activity-title">Club set placeholder staged</h5>
-                  <p class="music-landing-activity-copy">Static event row reserved for future music show records.</p>
-                </article>
-                <article class="music-landing-activity-card">
-                  <span class="music-landing-activity-type">Band Index</span>
-                  <h5 class="music-landing-activity-title">Artist card shell prepared</h5>
-                  <p class="music-landing-activity-copy">Mock artist lane with no live source attached.</p>
-                </article>
-                <article class="music-landing-activity-card">
-                  <span class="music-landing-activity-type">Venue Lane</span>
-                  <h5 class="music-landing-activity-title">Room archive placeholder ready</h5>
-                  <p class="music-landing-activity-copy">Future venue records will connect in a later pass.</p>
-                </article>
-              </div>
+            <button class="zhento-enter" type="button" disabled aria-label="Enter — not available yet">ENTER</button>
+            <section class="zhento-destinations zhento-panel" aria-label="Destinations — not available yet">
+              <h2>DESTINATION</h2>
+              <button type="button" disabled>SHOWS</button>
+              <button type="button" disabled>VENUES</button>
+              <button type="button" disabled>PEOPLE</button>
+              <button type="button" disabled>BANDS</button>
             </section>
           </section>
 

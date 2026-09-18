@@ -2422,7 +2422,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music";
   shell.dataset.shellRoute = shellRouteName;
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name === "wrestling-shows") {
@@ -2436,6 +2436,9 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   }
   if (route.name !== "portfolio" && route.name !== "wrestling") {
     clearPortfolioGatewayState();
+  }
+  if (route.name === "music") {
+    setPortfolioEngineHudCurrentView("Zhento");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -3119,14 +3122,14 @@ function showMusicNexus(options = {}) {
   const initialSection = options.initialSection || "landing";
   if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
     showMusicNexusLanding({ shouldScroll: false });
-    requestMusicLandingStats();
+    setPortfolioEngineHudCurrentView("Zhento");
   } else {
     setMusicNexusContext(initialSection, false, false);
     if (initialSection === "bands") {
       showBandsIndexView({ shouldScroll: false, shouldUpdateRail: false });
     }
   }
-  setCurrentView(options.currentView || "Music Nexus");
+  setCurrentView(options.currentView || (initialSection === "landing" ? "Zhento" : "Music Nexus"));
   setActiveGlobalNav(options.globalNavTarget || "music");
   if (startButton) {
     startButton.disabled = true;

@@ -12720,3 +12720,26 @@ button {
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon--world::after {
   transform: translate3d(-50%, -50%, 0) scale(1.22);
 }
+
+/* Zhento landing colors the persistent Shell Engine without changing its ownership. */
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-engine {
+  --engine-accent: 137 123 235;
+  --engine-accent-soft: 173 186 255;
+  --engine-accent-glow: 112 184 255;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .engine-lightning-main {
+  animation: zhentoEngineResonance 4.8s ease-in-out infinite;
+  filter: drop-shadow(0 0 .18rem rgb(var(--engine-accent-glow) / .35));
+}
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .engine-lightning-branch { opacity: .12; animation: none; }
+@keyframes zhentoEngineResonance { 0%,100% { opacity: .4; } 45% { opacity: .68; } 60% { opacity: .52; } }
+@media (prefers-reduced-motion: reduce) {
+  .site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-engine *,
+  .site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-engine *::before,
+  .site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-engine *::after { animation: none !important; }
+}
+
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .universal-bottom-rail { display: none; }

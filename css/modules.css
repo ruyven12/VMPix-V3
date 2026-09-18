@@ -30184,3 +30184,132 @@ button.hall-crusades-archive-crystal:focus-visible {
   min-inline-size: 0;
   overflow-wrap: anywhere;
 }
+
+/* Zhento uses the existing Music landing lifecycle and the Shell-owned Engine. */
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-hub {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  transform: none;
+  overflow: visible;
+}
+.site-shell.is-music-nexus-view:has(.music-nexus-shell.is-landing) .portfolio-hub::before,
+.site-shell.is-music-nexus-view .music-nexus-shell.is-landing::before { content: none; }
+
+.site-shell.is-music-nexus-view .music-nexus-shell.is-landing {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  transform: none;
+  overflow: hidden;
+}
+.music-nexus-shell.is-landing .zhento-landing {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  color: #e8edff;
+  font-family: var(--font-display);
+  isolation: isolate;
+}
+.zhento-landing__artwork {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, rgba(6,8,25,.32), transparent 45%), url("../assets/media/background/zhento-main.png") 58% center / cover no-repeat;
+}
+.zhento-identity {
+  --zhento-hud-x: calc(50vw - 16rem);
+  --zhento-hud-y: -30svh;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(34rem, calc(100% - 2rem));
+  text-align: center;
+  transform: translate(-50%, -50%);
+  animation: zhentoIdentityHold 3200ms ease-out both, zhentoIdentityProject 720ms cubic-bezier(.2,.74,.24,1) 3200ms forwards;
+}
+.zhento-identity__heading { display: grid; gap: .4rem; margin: 0; font-weight: 800; }
+.zhento-identity__planet {
+  font-size: clamp(.75rem, 1.8vw, .95rem);
+  letter-spacing: .16em;
+  color: #bbd6ff;
+  animation: zhentoIdentityResolve 700ms ease-out both;
+}
+.zhento-identity__name {
+  font-size: clamp(2.5rem, 13vw, 6.6rem);
+  line-height: .95;
+  letter-spacing: .025em;
+  color: #f1f2ff;
+  text-shadow: 0 0 .8rem rgba(130,155,255,.22);
+  animation: zhentoIdentityResolve 950ms ease-out 180ms both;
+}
+.zhento-identity__subtitle {
+  margin: .7rem 0 0;
+  color: #c9c7ed;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  animation: zhentoIdentityResolve 520ms ease-out 3500ms both;
+}
+.zhento-panel {
+  position: absolute;
+  box-sizing: border-box;
+  padding: .9rem 1rem;
+  border: 1px solid rgba(139,163,244,.42);
+  background: linear-gradient(135deg, rgba(124,143,230,.1), transparent 45%), rgba(7,10,27,.67);
+  clip-path: polygon(.5rem 0,100% 0,100% calc(100% - .5rem),calc(100% - .5rem) 100%,0 100%,0 .5rem);
+  animation: zhentoPanelProject 1040ms cubic-bezier(.2,.74,.24,1) 3450ms both;
+}
+.zhento-stats { top: max(8svh, env(safe-area-inset-top)); left: max(6vw, env(safe-area-inset-left)); width: clamp(10.5rem,19vw,19rem); }
+.zhento-stats__list { display: grid; gap: .55rem; margin: 0; }
+.zhento-stats__list > div { display: flex; align-items: center; justify-content: space-between; gap: .8rem; }
+.zhento-stats__list dt { font-size: .72rem; letter-spacing: .06em; color: #bfcbf1; }
+.zhento-stats__list dd { margin: 0; font-size: 1rem; }
+.zhento-stats__list .zhento-stats__primary { display: grid; justify-items: center; gap: .25rem; border-bottom: 1px solid rgba(139,163,244,.2); padding-bottom: .6rem; }
+.zhento-stats__primary dd { font-size: 2rem; line-height: 1; }
+.zhento-destinations { right: max(6vw, env(safe-area-inset-right)); bottom: calc(var(--portfolio-engine-height, 5rem) + var(--portfolio-engine-bottom-offset, 1rem) + 1.5rem); width: clamp(10.5rem,17vw,17rem); display: grid; gap: .3rem; }
+.zhento-destinations h2 { margin: 0 0 .25rem; font-size: .66rem; font-weight: 600; letter-spacing: .12em; color: #aaaedb; }
+.zhento-destinations button, .zhento-enter {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #e5eaff;
+  font: inherit;
+  letter-spacing: .08em;
+  opacity: 1;
+  cursor: default;
+}
+.zhento-destinations button { min-height: 44px; padding: .4rem 0; text-align: left; font-size: .82rem; border-bottom: 1px solid rgba(139,163,244,.15); }
+.zhento-enter { position: absolute; left: 50%; top: 60%; transform: translateX(-50%); min-height: 44px; padding: .7rem 2rem; border: 1px solid rgba(164,177,255,.52); background: rgba(12,16,40,.48); font-size: .9rem; animation: zhentoPanelProject 1040ms ease-out 3450ms both; }
+@keyframes zhentoIdentityResolve { from { opacity: 0; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
+@keyframes zhentoIdentityHold { 0%,66% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes zhentoIdentityProject { from { opacity: 0; transform: translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y) + .72rem)) scale(.7); } to { opacity: .94; transform: translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.625); } }
+@keyframes zhentoPanelProject { from { opacity: 0; translate: 0 .7rem; } to { opacity: 1; translate: 0 0; } }
+@media (max-width: 640px) {
+  .zhento-identity { --zhento-hud-x: 0px; --zhento-hud-y: -6svh; }
+  .zhento-stats { top: auto; left: max(1rem, env(safe-area-inset-left)); bottom: calc(var(--portfolio-engine-height, 5rem) + var(--portfolio-engine-bottom-offset, 1rem) + 1.5rem); width: calc(50% - 1.5rem); }
+  .zhento-destinations { right: max(1rem, env(safe-area-inset-right)); width: calc(50% - 1.5rem); }
+  .zhento-enter { top: 54%; }
+}
+@media (max-height: 650px) {
+  .music-nexus-shell.is-landing .zhento-landing { position: absolute; min-height: 650px; }
+  .site-shell.is-music-nexus-view .music-nexus-shell.is-landing { overflow-y: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zhento-landing *, .zhento-landing *::before, .zhento-landing *::after { animation: none !important; }
+  .zhento-identity { opacity: .94; transform: translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.625); }
+}
