@@ -12666,3 +12666,52 @@ button {
     opacity: 0.28;
   }
 }
+
+/* Compact Portfolio stellar cores and restrained optical diffraction. */
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon {
+  animation: none;
+  transform: translate3d(-50%, -50%, 0);
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon::before {
+  width: calc(var(--beacon-size) * 0.36);
+  height: calc(var(--beacon-size) * 0.36);
+  border-radius: 50%;
+  -webkit-mask-image: none;
+  mask-image: none;
+  background: radial-gradient(circle, #fff 0 22%, rgb(var(--beacon-color) / 0.96) 38%, rgb(var(--beacon-color) / 0.35) 65%, transparent 78%);
+  box-shadow: 0 0 0.2rem rgb(var(--beacon-color) / 0.4);
+  filter: none;
+  transform: translate3d(-50%, -50%, 0);
+  animation: portfolioStarShine 6.4s ease-in-out calc(var(--beacon-delay) * -1) infinite;
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon::after {
+  background:
+    linear-gradient(90deg, transparent, rgb(var(--beacon-color) / 0.35) 24%, rgba(255,255,255,0.95) 50%, rgb(var(--beacon-color) / 0.35) 76%, transparent),
+    linear-gradient(180deg, transparent, rgb(var(--beacon-color) / 0.25) 28%, rgba(255,255,255,0.72) 50%, rgb(var(--beacon-color) / 0.25) 72%, transparent);
+  background-size: 100% 1px, 0.7px 76%;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: none;
+  transform: translate3d(-50%, -50%, 0);
+  opacity: 0.78;
+  animation: none;
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon--system::after {
+  background-size: 78% 0.8px, 0.6px 56%;
+  opacity: 0.46;
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon[aria-pressed="true"]::after {
+  opacity: 1;
+}
+@keyframes portfolioStarShine {
+  0%, 100% { opacity: 0.88; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon,
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon::before,
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon::after {
+    animation: none !important;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon::before { opacity: 1; }
+}
