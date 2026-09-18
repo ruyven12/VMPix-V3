@@ -30746,4 +30746,41 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-identity__subtitle { margin-top: .65rem; font-size: .75rem; line-height: 1.35; }
 }
 
-.zhento-destinations__context { display: block; margin-top: .24rem; color: rgba(173,186,255,.78); font-size: .6rem; font-weight: 500; line-height: 1.2; letter-spacing: .06em; }
+
+.zhento-stats__row[data-zhento-stat]::before {
+  position: absolute;
+  inset-block-start: 22%;
+  inset-block-end: 22%;
+  inset-inline-start: 0;
+  inline-size: 1px;
+  content: "";
+  opacity: 0;
+  background: rgba(137, 167, 255, 0.72);
+  box-shadow: 0 0 0.34rem rgba(145, 112, 235, 0.24);
+}
+
+.zhento-stats__row.is-active,
+.zhento-stats__row[aria-current="true"] {
+  background:
+    linear-gradient(90deg, rgba(137, 167, 255, 0.1), rgba(145, 112, 235, 0.075) 46%, transparent 92%);
+  border-block-end-color: rgba(137, 167, 255, 0.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(137, 167, 255, 0.11),
+    inset 0 0 0.62rem rgba(145, 112, 235, 0.08),
+    0 0 0.42rem rgba(145, 112, 235, 0.1);
+}
+
+.zhento-stats__row.is-active::before,
+.zhento-stats__row[aria-current="true"]::before {
+  opacity: 1;
+}
+
+.zhento-stats__row.is-active .zhento-stats__term,
+.zhento-stats__row[aria-current="true"] .zhento-stats__term,
+.zhento-stats__row.is-active .zhento-stats__value,
+.zhento-stats__row[aria-current="true"] .zhento-stats__value {
+  color: rgba(220, 230, 255, 0.96);
+  text-shadow: 0 0 0.32rem rgba(145, 112, 235, 0.2);
+}
+
+.zhento-stats__value { min-inline-size: 7ch; font-variant-numeric: tabular-nums; text-align: right; }

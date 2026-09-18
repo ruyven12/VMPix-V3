@@ -1732,11 +1732,11 @@ function renderSiteModuleMockState(surface, scope, stateName, renderOptions = {}
 const MUSIC_NEXUS_STATS_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_NEXUS_STATS_TIMEOUT_MS = 8000;
 const MUSIC_NEXUS_LIVE_STAT_CONFIG = [
-  { key: "bands", route: "/api/music/bands", field: "bandsTotal" },
-  { key: "shows", route: "/api/music/shows", field: "showsTotal" },
-  { key: "people", route: "/api/music/people", field: "peopleTotal" },
-  { key: "venues", route: "/api/music/venues", field: "venuesTotal" },
-  { key: "photos", route: "/api/music/bands", field: "photosTotal" },
+  { key: "bands", route: "/api/music/bands/stats", field: "bandsTotal" },
+  { key: "shows", route: "/api/music/shows/stats", field: "showsTotal" },
+  { key: "people", route: "/api/music/people/stats", field: "peopleTotal" },
+  { key: "venues", route: "/api/music/venues/stats", field: "venuesTotal" },
+  { key: "photos", route: "/api/music/bands/stats", field: "photosTotal" },
 ];
 
 let musicLandingStatsRequest = null;
@@ -1830,79 +1830,95 @@ function readMusicLandingStatField(payload, fieldName) {
   return undefined;
 }
 
-async function fetchMusicLandingStat(statConfig) {
-  const apiUrl = new URL(statConfig.route, MUSIC_NEXUS_STATS_API_BASE_URL);
-  const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller
-    ? window.setTimeout(() => controller.abort(), MUSIC_NEXUS_STATS_TIMEOUT_MS)
-    : 0;
-
+async function fetchMusicLandingStat(statConfig, session) {
+  const controller = new AbortController();
+  session.controllers.add(controller);
+  const timeout = setTimeout(() => controller.abort(), MUSIC_NEXUS_STATS_TIMEOUT_MS);
   try {
-    const response = await fetch(apiUrl.href, {
-      cache: "no-store",
-      signal: controller?.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`Music stat request failed: ${statConfig.route} (${response.status})`);
-    }
-
+    const response = await fetch(new URL(statConfig.route, MUSIC_NEXUS_STATS_API_BASE_URL).href, { cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error("Music statistics unavailable");
     const payload = await response.json();
-    const value = readMusicLandingStatField(payload, statConfig.field);
-    if (value === undefined || value === null || value === "") {
-      throw new Error(`Music stat field missing: ${statConfig.field}`);
-    }
-
-    return value;
+    if (payload?.ok === false) throw new Error("Music statistics unavailable");
+    return payload;
   } finally {
-    if (timeoutId) {
-      window.clearTimeout(timeoutId);
-    }
+    clearTimeout(timeout);
+    session.controllers.delete(controller);
   }
 }
 
+let zhentoStatsSession = null;
+function cancelZhentoLandingStats() {
+  const session = zhentoStatsSession;
+  if (!session) return;
+  zhentoStatsSession = null;
+  cancelAnimationFrame(session.frame);
+  session.controllers.forEach((controller) => controller?.abort());
+}
 function requestMusicLandingStats() {
-  const statsSurface = document.querySelector("[data-music-landing-stats]");
-  if (!statsSurface || typeof fetch !== "function") {
-    return Promise.resolve(false);
-  }
-
-  if (musicLandingStatsLoaded) {
-    return Promise.resolve(true);
-  }
-  if (musicLandingStatsRequest) {
-    return musicLandingStatsRequest;
-  }
-
-  setMusicLandingStatsState("loading");
-  musicLandingStatsRequest = Promise.all(
-    MUSIC_NEXUS_LIVE_STAT_CONFIG.map((statConfig) => (
-      fetchMusicLandingStat(statConfig)
-        .then((value) => {
-          setMusicLandingStatValue(statConfig.key, value, "live");
-          return true;
-        })
-        .catch(() => {
-          restoreMusicLandingStatFallback(statConfig.key);
-          return false;
-        })
-    ))
-  ).then((results) => {
-    const liveCount = results.filter(Boolean).length;
-    const hasPartialFallback = liveCount > 0 && liveCount < MUSIC_NEXUS_LIVE_STAT_CONFIG.length;
-    musicLandingStatsLoaded = liveCount === MUSIC_NEXUS_LIVE_STAT_CONFIG.length;
-    setMusicLandingStatsState(
-      musicLandingStatsLoaded ? "live" : hasPartialFallback ? "partial" : "fallback"
-    );
-    musicLandingStatsRequest = null;
-    return liveCount > 0;
-  }).catch(() => {
-    MUSIC_NEXUS_LIVE_STAT_CONFIG.forEach((statConfig) => restoreMusicLandingStatFallback(statConfig.key));
-    setMusicLandingStatsState("fallback");
-    musicLandingStatsRequest = null;
-    return false;
+  if (zhentoStatsSession) return zhentoStatsSession.request;
+  const session = { controllers: new Set(), frame: 0, counts: new Map() };
+  zhentoStatsSession = session;
+  session.reveal = Promise.all(document.querySelector("[data-music-landing-stats]").getAnimations().map((animation) => animation.finished.catch(() => {})));
+  const current = () => zhentoStatsSession === session && getRouteFromUrl().name === "music";
+  const order = ["photos", "bands", "shows", "people", "venues"];
+  order.forEach((key) => {
+    const element = getMusicLandingStatValueElement(key);
+    element.textContent = "0";
+    element.dataset.statSource = "pending";
   });
-
-  return musicLandingStatsRequest;
+  setMusicLandingStatsState("loading");
+  const tick = (now) => {
+    session.frame = 0;
+    if (!current()) return;
+    for (const [key, count] of session.counts) {
+      if (now < count.start && !reducedMotion.matches) continue;
+      if (!count.begun) { count.start = now; count.begun = true; }
+      const progress = reducedMotion.matches ? 1 : Math.min(1, (now - count.start) / 900);
+      const value = count.total === 0 ? 0 : Math.round(1 + (count.total - 1) * (1 - Math.pow(1 - progress, 3)));
+      const element = getMusicLandingStatValueElement(key);
+      element.textContent = value.toLocaleString();
+      if (progress === 1) { element.dataset.statSource = "live"; session.counts.delete(key); }
+    }
+    if (session.counts.size) session.frame = requestAnimationFrame(tick);
+  };
+  const resolveCount = (key, raw) => {
+    if (!current()) return;
+    const total = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
+    const element = getMusicLandingStatValueElement(key);
+    if (!Number.isSafeInteger(total) || total < 0) {
+      element.textContent = "—";
+      element.dataset.statSource = "unavailable";
+      return;
+    }
+    if (reducedMotion.matches || total === 0) {
+      element.textContent = total.toLocaleString();
+      element.dataset.statSource = "live";
+      return;
+    }
+    element.dataset.statSource = "counting";
+    session.reveal.then(() => {
+      if (!current()) return;
+      session.counts.set(key, { total, start: performance.now() + order.indexOf(key) * 80 });
+      if (!session.frame) session.frame = requestAnimationFrame(tick);
+    });
+  };
+  const routes = [...new Set(MUSIC_NEXUS_LIVE_STAT_CONFIG.map((config) => config.route))];
+  session.request = Promise.all(routes.map((route) => {
+    const configs = MUSIC_NEXUS_LIVE_STAT_CONFIG.filter((config) => config.route === route);
+    return fetchMusicLandingStat(configs[0], session).then((payload) => {
+      configs.forEach((config) => {
+        const totals = config.key === "photos" ? payload?.photoTotals : config.key === "bands" ? payload?.bandTotals : payload?.totals;
+        const value = totals?.[config.field];
+        resolveCount(config.key, value);
+      });
+    }).catch(() => configs.forEach((config) => resolveCount(config.key, undefined)));
+  })).then(() => {
+    if (!current()) return false;
+    const failed = order.filter((key) => getMusicLandingStatValueElement(key).dataset.statSource === "unavailable").length;
+    setMusicLandingStatsState(failed ? "partial" : "live");
+    return failed < order.length;
+  });
+  return session.request;
 }
 
 const RING_ARCHIVE_STATS_API_BASE_URL = MUSIC_NEXUS_STATS_API_BASE_URL;
@@ -2418,6 +2434,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     return;
   }
 
+  if (route.name !== "music") cancelZhentoLandingStats();
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
   const isHomeRoute = route.name === "home";
@@ -2440,7 +2457,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     clearPortfolioGatewayState();
   }
   if (route.name === "music") {
-    setPortfolioEngineHudCurrentView("Zhento");
+    setPortfolioEngineHudCurrentView("OUTSKIRTS OF ZHENTO");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -3081,6 +3098,7 @@ function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
   delete landing.dataset.selectedDestination;
+  landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
   landing.querySelector(".zhento-enter").hidden = true;
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     button.setAttribute("aria-pressed", "false");
@@ -3089,6 +3107,7 @@ function resetZhentoLandingSelection() {
     button.addEventListener("click", () => {
       if (getRouteFromUrl().name !== "music") return;
       landing.dataset.selectedDestination = button.dataset.zhentoDestination;
+      landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === button.dataset.zhentoDestination)));
       landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
         item.setAttribute("aria-pressed", String(item === button));
       });
@@ -3145,7 +3164,8 @@ function showMusicNexus(options = {}) {
   if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
     resetZhentoLandingSelection();
     showMusicNexusLanding({ shouldScroll: false });
-    setPortfolioEngineHudCurrentView("Zhento");
+    requestMusicLandingStats();
+    setPortfolioEngineHudCurrentView("OUTSKIRTS OF ZHENTO");
   } else {
     setMusicNexusContext(initialSection, false, false);
     if (initialSection === "bands") {
