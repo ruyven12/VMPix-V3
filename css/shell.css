@@ -176,6 +176,7 @@ button {
   --engine-accent-glow: 77 163 255;
 }
 
+.site-shell[data-shell-route="wrestling-match-detail"][data-match-dossier-back],
 .site-shell[data-shell-route="portfolio"][data-active-world="battleground"],
 .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back])) {
   --engine-accent: 255 63 63;
