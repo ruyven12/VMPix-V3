@@ -24306,15 +24306,15 @@ button.hall-crusades-archive-crystal:focus-visible {
   100% {
     filter: none;
     text-shadow:
-      0 0 0.44rem rgba(255, 42, 26, 0.28),
+      0 0 0.44rem rgba(var(--destination-intro-glow, 255, 42, 26), 0.28),
       0 0 1.2rem rgba(0, 0, 0, 0.68);
   }
 
   50% {
-    filter: drop-shadow(0 0 0.34rem rgba(255, 58, 42, 0.32));
+    filter: drop-shadow(0 0 0.34rem rgba(var(--destination-intro-highlight, 255, 58, 42), 0.32));
     text-shadow:
-      0 0 0.58rem rgba(255, 70, 48, 0.5),
-      0 0 1.35rem rgba(255, 42, 26, 0.26),
+      0 0 0.58rem rgba(var(--destination-intro-highlight, 255, 70, 48), 0.5),
+      0 0 1.35rem rgba(var(--destination-intro-glow, 255, 42, 26), 0.26),
       0 0 1.35rem rgba(0, 0, 0, 0.72);
   }
 }
@@ -30920,4 +30920,21 @@ button.hall-crusades-archive-crystal:focus-visible {
     transform: none;
   }
   .zhento-detail__copy { padding-block: .25rem; }
+}
+
+/* Zhento follows the existing Daïion arrival prompt sequence. */
+.zhento-destination-prompt { --destination-intro-glow: 145,112,235; --destination-intro-highlight: 137,167,255; visibility: hidden; opacity: 0; }
+.zhento-destination-prompt__text { display: block; overflow: hidden; inline-size: max-content; max-inline-size: 100%; white-space: nowrap; clip-path: inset(0 100% 0 0); }
+.zhento-destination-prompt__text::after { display: inline-block; inline-size: 1px; block-size: 1em; margin-inline-start: .34rem; background: rgba(137,167,255,.78); box-shadow: 0 0 .4rem rgba(145,112,235,.32); content: ""; transform: translateY(.12em); }
+.site-shell[data-shell-route="music"][data-shell-module] .zhento-destination-prompt:not([hidden]) { visibility: visible; opacity: 1; animation: daiionDestinationIntroProject 360ms ease-out 5200ms both,daiionDestinationIntroPulse 620ms ease-in-out 7250ms 2 both,daiionDestinationIntroClear 260ms ease-out 8550ms forwards; }
+.site-shell[data-shell-route="music"][data-shell-module] .zhento-destination-prompt:not([hidden]) .zhento-destination-prompt__text { animation: daiionDestinationIntroType 1850ms steps(48,end) 5400ms both; }
+.site-shell[data-shell-route="music"][data-shell-module] .zhento-destination-prompt:not([hidden]) .zhento-destination-prompt__text::after { animation: daiionDestinationIntroCaret 620ms steps(1,end) 5400ms 5 both; }
+@media (max-width:540px) {
+  .zhento-destination-prompt { inset-block-start: 44.5%; max-inline-size: calc(100vw - 3.6rem); font-size: clamp(.68rem,3.2vw,.82rem); letter-spacing: .06em; }
+  .zhento-destination-prompt__text { white-space: normal; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .site-shell[data-shell-route="music"] .zhento-destination-prompt:not([hidden]) { visibility: visible; opacity: 1; transform: translate3d(-50%,-50%,0); }
+  .zhento-destination-prompt__text { clip-path: none; }
+  .zhento-destination-prompt__text::after { display: none; }
 }
