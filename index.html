@@ -368,26 +368,28 @@
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
           <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Music Archive" data-music-nexus-landing data-zhento-landing>
             <div class="zhento-landing__artwork" aria-hidden="true"></div>
+            <span class="zhento-top-hud-rail" aria-hidden="true"></span>
+            <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
+            <span class="zhento-side-hud-rail zhento-side-hud-rail--right" aria-hidden="true"></span>
             <header class="zhento-identity">
               <h1 class="zhento-identity__heading" id="music-nexus-title"><span class="zhento-identity__planet">PLANET //</span><span class="zhento-identity__name">ZHENTO</span></h1>
               <p class="zhento-identity__subtitle">(The Music Archive)</p>
             </header>
             <section class="zhento-stats zhento-panel" aria-label="Archive statistics — placeholder values">
-              <dl class="zhento-stats__list">
-                <div class="zhento-stats__primary"><dt>PHOTOS</dt><dd>0</dd></div>
-                <div><dt>BANDS</dt><dd>0</dd></div>
-                <div><dt>SHOWS</dt><dd>0</dd></div>
-                <div><dt>PEOPLE</dt><dd>0</dd></div>
-                <div><dt>VENUES</dt><dd>0</dd></div>
-              </dl>
+              <h2 class="zhento-stats__title">PLANET STATS</h2>
+              <div class="zhento-stats__row"><span class="zhento-stats__label"><span class="zhento-stats__term">PHOTOS</span></span><span class="zhento-stats__value">0</span></div>
+              <div class="zhento-stats__row"><span class="zhento-stats__label"><span class="zhento-stats__term">BANDS</span></span><span class="zhento-stats__value">0</span></div>
+              <div class="zhento-stats__row"><span class="zhento-stats__label"><span class="zhento-stats__term">SHOWS</span></span><span class="zhento-stats__value">0</span></div>
+              <div class="zhento-stats__row"><span class="zhento-stats__label"><span class="zhento-stats__term">PEOPLE</span></span><span class="zhento-stats__value">0</span></div>
+              <div class="zhento-stats__row"><span class="zhento-stats__label"><span class="zhento-stats__term">VENUES</span></span><span class="zhento-stats__value">0</span></div>
             </section>
             <button class="zhento-enter" type="button" hidden disabled aria-label="Enter — not available yet">ENTER</button>
             <section class="zhento-destinations zhento-panel" aria-label="Select a destination preview">
-              <h2>DESTINATION</h2>
-              <button type="button" data-zhento-destination="shows" aria-pressed="false">SHOWS</button>
-              <button type="button" data-zhento-destination="venues" aria-pressed="false">VENUES</button>
-              <button type="button" data-zhento-destination="people" aria-pressed="false">PEOPLE</button>
-              <button type="button" data-zhento-destination="bands" aria-pressed="false">BANDS</button>
+              <h2 class="zhento-destinations__title">DESTINATION</h2>
+              <button class="zhento-destinations__item" type="button" data-zhento-destination="shows" aria-pressed="false">SHOWS</button>
+              <button class="zhento-destinations__item" type="button" data-zhento-destination="venues" aria-pressed="false">VENUES</button>
+              <button class="zhento-destinations__item" type="button" data-zhento-destination="people" aria-pressed="false">PEOPLE</button>
+              <button class="zhento-destinations__item" type="button" data-zhento-destination="bands" aria-pressed="false">BANDS</button>
             </section>
           </section>
 
