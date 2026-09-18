@@ -8051,7 +8051,14 @@ function createRhythmSourceRow(band,select) {
   const item=document.createElement('li'),row=document.createElement('button');row.type='button';row.className='rhythm-source-row';row.dataset.bandId=getBandId(band);row.setAttribute('aria-label','Select '+band.name);
   const art=document.createElement('span');art.className='rhythm-source-art';art.setAttribute('aria-hidden','true');art.textContent=getBandInitials(band.name);
   const url=getBandDetailLogoUrl(band);if(url){const image=document.createElement('img');image.alt='';image.loading='lazy';image.decoding='async';image.addEventListener('error',()=>image.remove(),{once:true});image.src=url;art.append(image);}
-  const name=document.createElement('span');name.className='rhythm-source-name';name.textContent=band.name;
+  const name=document.createElement('span');name.className='rhythm-source-name';
+  const title=document.createElement('span');title.textContent=band.name;
+  const raw=band.backend_record||band,lifecycle=getBandDetailLifecycleStatus(getBandDetailGeneral(raw),raw);
+  const status=document.createElement('span');status.className='rhythm-source-lifecycle';
+  const statusLabel=document.createElement('span');statusLabel.textContent='Status';
+  const statusValue=document.createElement('span');statusValue.className='rhythm-source-lifecycle-value';statusValue.textContent=lifecycle.toUpperCase();
+  const statusKey=lifecycle.toLowerCase();if(statusKey==='active'||statusKey==='inactive')status.dataset.lifecycle=statusKey;
+  status.append(statusLabel,statusValue);name.append(title,status);
   row.append(art,name);row.addEventListener('click',()=>{if(row.classList.contains('is-active'))navigateToBandDetail(band);else select();});item.append(row);return item;
 }
 function renderRhythmSourceIndex() {
