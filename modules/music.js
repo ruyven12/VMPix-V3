@@ -1609,8 +1609,8 @@ function requestMusicBandsIndexData() {
     })
     .then((payload) => {
       const liveRows = normalizeLiveMusicBands(payload);
-      if (liveRows.length === 0) {
-        throw new Error("Music bands response contained no rows");
+      if (liveRows.length === 0 && ![payload?.data, payload?.rows, payload?.bands, payload?.source?.data, payload?.source?.rows].some(Array.isArray)) {
+        throw new Error("Music bands response contained no valid rows");
       }
 
       setMusicBandsIndexCollection(liveRows, "live");
@@ -8031,6 +8031,97 @@ function renderBandsLetterNavs(rows) {
   });
 }
 
+let rhythmPulseSession = null;
+function cancelRhythmPulseBatches() {
+  if (rhythmPulseSession) rhythmPulseSession.timers.forEach(clearTimeout);
+  rhythmPulseSession = null;
+}
+function rhythmBandHash(value) {
+  let hash = 2166136261;
+  for (const letter of String(value)) hash = Math.imul(hash ^ letter.charCodeAt(0), 16777619);
+  return hash >>> 0;
+}
+function renderRhythmBandReadout(band) {
+  const panel = musicBandsIndex.querySelector('[data-pulse-readout]');
+  panel.replaceChildren();
+  const artwork = document.createElement('div'); artwork.className = 'rhythm-artwork';
+  artwork.textContent = getBandInitials(band.name);
+  const url = getBandDetailLogoUrl(band);
+  if (url) {
+    const image = document.createElement('img'); image.alt = ''; image.decoding = 'async';
+    image.addEventListener('error', () => image.remove(), { once: true }); image.src = url; artwork.append(image);
+  }
+  const body = document.createElement('div'); body.className = 'rhythm-readout-body';
+  const title = document.createElement('h2'); title.textContent = band.name; body.append(title);
+  const raw = band.backend_record || band; const stats = raw.stats || {};
+  const facts = [];
+  const knownNumber = value => value == null || String(value).trim() === '' ? null : getBandIndexNumber(value);
+  const region = stats.region || raw.region || raw.general?.region;
+  if (region) facts.push(String(region));
+  const photos = knownNumber(stats.totalPhotos ?? stats.total_photos ?? raw.photo_count);
+  if (photos !== null) facts.push(formatBandIndexNumber(photos) + ' photos');
+  const archived = knownNumber(stats.archived_sets), total = knownNumber(stats.total_sets);
+  if (archived !== null && total !== null) facts.push(archived + ' / ' + total + ' sets archived');
+  const metadata = document.createElement('p'); metadata.textContent = facts.join(' · ') || 'Archive information unavailable'; body.append(metadata);
+  const open = document.createElement('button'); open.type = 'button'; open.textContent = 'Open Band';
+  open.addEventListener('click', () => navigateToBandDetail(band)); body.append(open); panel.append(artwork, body);
+}
+function renderRhythmPulseNetwork(rows) {
+  if (!musicBandsIndex || musicBandsIndex.getAttribute('aria-hidden') === 'true') return;
+  const status = musicBandsIndex.querySelector('[data-pulse-status]');
+  const field = musicBandsIndex.querySelector('[data-pulse-field]');
+  const nodes = musicBandsIndex.querySelector('[data-pulse-nodes]');
+  const readout = musicBandsIndex.querySelector('[data-pulse-readout]');
+  const state = musicBandsIndex.dataset.bandsDataState;
+  if (rhythmPulseSession?.rows === rows && rhythmPulseSession.state === state) return;
+  cancelRhythmPulseBatches(); nodes.replaceChildren(); readout.replaceChildren();
+  field.hidden = state !== 'live' || !rows.length;
+  status.replaceChildren();
+  if (state !== 'live') {
+    status.textContent = state === 'error' ? 'Pulse Network unavailable. ' : 'Retrieving the Pulse Network…';
+    if (state === 'error') { const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Retry Bands'; retry.addEventListener('click', retryMusicBandsIndexState); status.append(retry); }
+    return;
+  }
+  if (!rows.length) { status.textContent = 'No Bands archived yet.'; return; }
+  const unique = [...new Map(rows.map(band => [getBandId(band), band])).values()];
+  const selected = unique.sort((a,b) => rhythmBandHash(getBandId(a)) - rhythmBandHash(getBandId(b)) || getBandId(a).localeCompare(getBandId(b))).slice(0,16);
+  const session = { rows, state, timers: [] }; rhythmPulseSession = session;
+  readout.textContent = 'Select a source to view its archive.';
+  const positions = []; let count = 0;
+  const separation = 48 / Math.min(288, Math.max(200, field.clientWidth));
+  const projected = [];
+  for (const band of selected) {
+    const hash = rhythmBandHash(getBandId(band));
+    for (let attempt = 0; attempt < 512; attempt++) {
+      const seed = rhythmBandHash(hash + ':' + attempt);
+      const latitude = Math.acos(2 * ((seed & 65535) / 65535) - 1);
+      const longitude = ((seed >>> 16) / 65535) * Math.PI * 2;
+      const x = .42 * Math.sin(latitude) * Math.cos(longitude), y = .42 * Math.cos(latitude);
+      const z = Math.sin(latitude) * Math.sin(longitude);
+      if (positions.some(p => Math.abs(p.x-x) < separation && Math.abs(p.y-y) < separation)) continue;
+      positions.push({x,y,z}); projected.push(band); break;
+    }
+  }
+  function batch(limit) {
+    if (rhythmPulseSession !== session || musicBandsIndex.getAttribute('aria-hidden') === 'true') return;
+    while (count < Math.min(limit, projected.length)) {
+      const {x,y,z} = positions[count];
+      const band = projected[count++], hash = rhythmBandHash(getBandId(band));
+      const node = document.createElement('button'); node.type = 'button'; node.className = 'rhythm-node';
+      node.dataset.bandId = getBandId(band); node.setAttribute('aria-label', 'Select ' + band.name); node.setAttribute('aria-pressed','false');
+      node.style.setProperty('--node-x', ((.5+x)*100)+'%'); node.style.setProperty('--node-y', ((.5+y)*100)+'%');
+      node.style.setProperty('--node-depth', .78 + (z+1)*.22); node.style.setProperty('--node-opacity', .55+(z+1)*.225);
+      node.style.setProperty('--node-delay', -(hash%5000)+'ms'); node.style.zIndex = String(Math.round((z+1)*10));
+      const core = document.createElement('span'); core.className='rhythm-node-core'; core.setAttribute('aria-hidden','true'); node.append(core);
+      node.addEventListener('click', () => { nodes.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === node))); renderRhythmBandReadout(band); });
+      nodes.append(node);
+    }
+    status.textContent = count + ' active sources / ' + unique.length + ' Bands in archive';
+  }
+  batch(8); if (projected.length>8) session.timers.push(setTimeout(()=>batch(12),180));
+  if (projected.length>12) session.timers.push(setTimeout(()=>batch(16),360));
+}
+
 function renderBandsRadar(rows) {
   const forcedState = getForcedMockState("musicBands");
   const dataState = musicBandsIndex?.dataset.bandsDataState || "";
@@ -8377,6 +8468,7 @@ function scrollBandsIndexIntoView() {
 }
 
 function syncBandsIndex() {
+  if (musicBandsIndex?.hasAttribute("data-pulse-network")) { renderRhythmPulseNetwork(getMusicBandsIndexCollection()); return; }
   const allRows = getMusicBandsIndexCollection();
   syncActiveBandsFilterOptions();
   const rows = getVisibleBands();
@@ -8414,6 +8506,7 @@ function setBandsLetter(letter, options = {}) {
 }
 
 function setBandsView(viewName, shouldFocus = false, options = {}) {
+  if (musicBandsIndex?.hasAttribute("data-pulse-network")) { activeBandsView = "radar"; syncBandsIndex(); return; }
   if (!routedBandsViews.includes(viewName)) {
     return;
   }
@@ -8498,6 +8591,7 @@ function returnToBandsRadar() {
 }
 
 function setBandsIndexVisible(isVisible) {
+  if (!isVisible) cancelRhythmPulseBatches();
   if (!musicBandsIndex) {
     return;
   }

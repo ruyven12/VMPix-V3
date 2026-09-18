@@ -2321,13 +2321,13 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "music" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+  return route?.name === "music" || route?.name === "music-bands" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  if (route?.name === "music") return getShellBackTarget(route);
+  if (route?.name === "music" || route?.name === "music-bands") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
   if (route?.name === "wrestling") return getShellBackTarget(route);
@@ -2441,7 +2441,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands";
   shell.dataset.shellRoute = shellRouteName;
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name === "wrestling-shows") {
@@ -2456,8 +2456,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (route.name !== "portfolio" && route.name !== "wrestling") {
     clearPortfolioGatewayState();
   }
-  if (route.name === "music") {
-    setPortfolioEngineHudCurrentView("Outskirts of Zhento");
+  if (route.name === "music" || route.name === "music-bands") {
+    setPortfolioEngineHudCurrentView(route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);

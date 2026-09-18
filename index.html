@@ -398,114 +398,22 @@
             </section>
           </section>
 
-          <section class="music-bands-index is-active" aria-label="Music bands archive" aria-hidden="false" data-music-bands-index>
-            <div class="music-bands-mode-switch" role="tablist" aria-label="Bands Index view modes">
-              <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">Radar</button>
-              <button class="bands-index-mode-tab" id="bands-list-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-list-panel" data-bands-view-target="list">List</button>
-              <button class="bands-index-mode-tab" id="bands-search-tab" type="button" role="tab" aria-selected="false" aria-controls="bands-search-panel" data-bands-view-target="search">Search</button>
+          <section class="music-bands-index is-active rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-music-bands-index data-pulse-network>
+            <header class="rhythm-heading"><p>ZHENTO</p><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
+            <div class="music-bands-mode-switch" role="tablist" aria-label="Pillar of Rhythm modes">
+              <button class="bands-index-mode-tab" id="bands-radar-tab" type="button" role="tab" aria-selected="true" aria-controls="bands-radar-panel" data-bands-view-target="radar">PULSE NETWORK</button>
+              <button class="bands-index-mode-tab" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SOURCE INDEX</button>
+              <button class="bands-index-mode-tab" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
             </div>
-
-            <div class="music-bands-view-stack">
-              <section class="bands-index-panel bands-index-panel--radar is-active" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
-                <div class="bands-radar-layout">
-                  <div class="bands-radar-core" aria-label="Alphabet radar display">
-                    <span class="bands-radar-sweep" aria-hidden="true"></span>
-                    <span class="bands-radar-points" aria-hidden="true" data-bands-radar-points></span>
-                    <div class="bands-radar-center">
-                      <span class="bands-radar-letter" data-bands-radar-letter>A</span>
-                      <span class="bands-radar-count" data-bands-radar-count>1 signal</span>
-                    </div>
-                  </div>
-                  <ul class="bands-radar-signal-list" aria-label="Active letter band signals" data-bands-radar-signals>
-                    <li class="bands-radar-signal">Astra Vale</li>
-                  </ul>
-                  <div class="bands-letter-nav" aria-label="Band alphabet radar navigation" data-bands-letter-nav></div>
-                </div>
-              </section>
-
-              <section class="bands-index-panel bands-index-panel--list" id="bands-list-panel" role="tabpanel" aria-labelledby="bands-list-tab" aria-hidden="true" inert data-bands-view="list">
-                <div class="bands-list-panel">
-                  <div class="bands-filter-strip bands-list-filter-controls" aria-label="Band list filters">
-                    <span class="bands-filter-strip-label">Filters</span>
-                    <label class="bands-filter-field">
-                      <span class="bands-filter-label">Letter</span>
-                      <select class="bands-filter-select" data-bands-filter="letter" aria-label="Filter bands by letter">
-                        <option value="">All</option>
-                      </select>
-                    </label>
-                    <label class="bands-filter-field">
-                      <span class="bands-filter-label">Region</span>
-                      <select class="bands-filter-select" data-bands-filter="region" aria-label="Filter bands by region">
-                        <option value="">All Regions</option>
-                        <option value="local">Local</option>
-                        <option value="regional">Regional</option>
-                        <option value="national">National</option>
-                        <option value="international">International</option>
-                      </select>
-                    </label>
-                    <label class="bands-filter-field">
-                      <span class="bands-filter-label">Status</span>
-                      <select class="bands-filter-select" data-bands-filter="status" aria-label="Filter bands by archive status">
-                        <option value="">All Statuses</option>
-                        <option value="complete">Complete</option>
-                        <option value="partial">Partial</option>
-                        <option value="needs">Needs Work</option>
-                      </select>
-                    </label>
-                    <button class="bands-filter-reset" type="button" data-bands-filter-reset>Reset</button>
-                  </div>
-                  <div class="bands-list-viewport" aria-label="Alphabetized bands archive list" data-bands-list></div>
-                  <div class="bands-empty-state" data-bands-empty>No matching bands indexed</div>
-                </div>
-              </section>
-
-              <section class="bands-index-panel bands-index-panel--search" id="bands-search-panel" role="tabpanel" aria-labelledby="bands-search-tab" aria-hidden="true" inert data-bands-view="search">
-                <div class="bands-search-panel">
-                  <label class="bands-search-field">
-                    <span class="bands-search-label">Archive Search</span>
-                    <input class="bands-search-input" type="search" autocomplete="off" placeholder="Search bands, tiers, status" data-bands-search-input>
-                  </label>
-
-                  <div class="bands-search-groups">
-                    <div class="bands-filter-strip bands-filter-strip--search" aria-label="Band search filters">
-                      <span class="bands-filter-strip-label">Filters</span>
-                      <label class="bands-filter-field">
-                        <span class="bands-filter-label">Letter</span>
-                        <select class="bands-filter-select" data-bands-filter="letter" aria-label="Filter search results by letter">
-                          <option value="">All</option>
-                        </select>
-                      </label>
-                      <label class="bands-filter-field">
-                        <span class="bands-filter-label">Region</span>
-                        <select class="bands-filter-select" data-bands-filter="region" aria-label="Filter search results by region">
-                          <option value="">All Regions</option>
-                          <option value="local">Local</option>
-                          <option value="regional">Regional</option>
-                          <option value="national">National</option>
-                          <option value="international">International</option>
-                        </select>
-                      </label>
-                      <label class="bands-filter-field">
-                        <span class="bands-filter-label">Status</span>
-                        <select class="bands-filter-select" data-bands-filter="status" aria-label="Filter search results by archive status">
-                          <option value="">All Statuses</option>
-                          <option value="complete">Complete</option>
-                          <option value="partial">Partial</option>
-                          <option value="needs">Needs Work</option>
-                        </select>
-                      </label>
-                      <button class="bands-filter-reset" type="button" data-bands-filter-reset>Reset</button>
-                    </div>
-
-                    <section class="bands-search-group" aria-labelledby="bands-search-results-title">
-                      <h5 class="bands-search-group-title" id="bands-search-results-title">Signals</h5>
-                      <div class="bands-search-summary" data-bands-search-summary>12 rows</div>
-                      <ul class="bands-search-results" data-bands-search-results></ul>
-                    </section>
-                  </div>
-                </div>
-              </section>
-            </div>
+            <section class="bands-index-panel is-active rhythm-network-panel" id="bands-radar-panel" role="tabpanel" aria-labelledby="bands-radar-tab" data-bands-view="radar">
+              <p class="rhythm-network-status" role="status" data-pulse-status>Retrieving the Pulse Network…</p>
+              <div class="rhythm-field" data-pulse-field aria-label="Selectable Band nodes">
+                <svg class="rhythm-resonance" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="23" ry="46"/><ellipse cx="50" cy="50" rx="46" ry="18"/><ellipse cx="50" cy="50" rx="40" ry="31" transform="rotate(-35 50 50)"/></svg>
+                <div class="rhythm-nodes" data-pulse-nodes></div>
+              </div>
+              <p class="rhythm-resonance-note">Decorative resonance · no documented relationships implied</p>
+              <article class="rhythm-readout" data-pulse-readout aria-live="polite"><p>Select a source to view its archive.</p></article>
+            </section>
           </section>
 
           <section class="music-people-index" aria-label="Music people archive index" aria-hidden="true" inert data-music-people-index>
