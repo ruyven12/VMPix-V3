@@ -2457,7 +2457,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     clearPortfolioGatewayState();
   }
   if (route.name === "music") {
-    setPortfolioEngineHudCurrentView("OUTSKIRTS OF ZHENTO");
+    setPortfolioEngineHudCurrentView("Outskirts of Zhento");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -3099,7 +3099,8 @@ function resetZhentoLandingSelection() {
   if (!landing) return;
   delete landing.dataset.selectedDestination;
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
-  landing.querySelector(".zhento-enter").hidden = true;
+  landing.querySelector(".zhento-detail").hidden = true;
+  landing.querySelector(".zhento-destination-prompt").hidden = false;
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     button.setAttribute("aria-pressed", "false");
     if (button.dataset.zhentoBound) return;
@@ -3111,7 +3112,9 @@ function resetZhentoLandingSelection() {
       landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
         item.setAttribute("aria-pressed", String(item === button));
       });
-      landing.querySelector(".zhento-enter").hidden = false;
+      landing.querySelector(".zhento-detail__title").textContent = button.textContent.trim();
+      landing.querySelector(".zhento-detail").hidden = false;
+      landing.querySelector(".zhento-destination-prompt").hidden = true;
     });
   });
 }
@@ -3165,7 +3168,7 @@ function showMusicNexus(options = {}) {
     resetZhentoLandingSelection();
     showMusicNexusLanding({ shouldScroll: false });
     requestMusicLandingStats();
-    setPortfolioEngineHudCurrentView("OUTSKIRTS OF ZHENTO");
+    setPortfolioEngineHudCurrentView("Outskirts of Zhento");
   } else {
     setMusicNexusContext(initialSection, false, false);
     if (initialSection === "bands") {

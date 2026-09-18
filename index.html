@@ -366,24 +366,29 @@
         </section>
 
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
-          <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Music Archive" data-music-nexus-landing data-zhento-landing>
+          <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Soundtrack" data-music-nexus-landing data-zhento-landing>
             <div class="zhento-landing__artwork" aria-hidden="true"></div>
             <span class="zhento-top-hud-rail" aria-hidden="true"></span>
             <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
             <span class="zhento-side-hud-rail zhento-side-hud-rail--right" aria-hidden="true"></span>
             <header class="zhento-identity">
-              <h1 class="zhento-identity__heading" id="music-nexus-title"><span class="zhento-identity__planet">PLANET //</span><span class="zhento-identity__name">ZHENTO</span></h1>
-              <p class="zhento-identity__subtitle">(The Music Archive)</p>
+              <h1 class="zhento-identity__heading" id="music-nexus-title"><span class="zhento-identity__planet">PLANET</span><span class="zhento-identity__name">ZHENTO</span></h1>
+              <div class="zhento-identity__subtitle"><span class="zhento-identity__secondary">THE SOUNDTRACK</span><span class="zhento-identity__description">COMING SOON</span></div>
             </header>
             <section class="zhento-stats zhento-panel" aria-label="Music archive statistics" data-music-landing-stats>
               <h2 class="zhento-stats__title">PLANET STATS</h2>
               <div class="zhento-stats__row" data-zhento-stat="photos" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">PHOTOS</span></span><span class="zhento-stats__value" data-music-stat-value="photos">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="bands" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">BANDS</span></span><span class="zhento-stats__value" data-music-stat-value="bands">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="shows" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">SHOWS</span></span><span class="zhento-stats__value" data-music-stat-value="shows">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="people" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">PEOPLE</span></span><span class="zhento-stats__value" data-music-stat-value="people">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="venues" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">VENUES</span></span><span class="zhento-stats__value" data-music-stat-value="venues">0</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="bands" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">BANDS</span><span class="zhento-stats__context">(Rhythm)</span></span><span class="zhento-stats__value" data-music-stat-value="bands">0</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="shows" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">SHOWS</span><span class="zhento-stats__context">(Synchrony)</span></span><span class="zhento-stats__value" data-music-stat-value="shows">0</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="people" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">PEOPLE</span><span class="zhento-stats__context">(Melody)</span></span><span class="zhento-stats__value" data-music-stat-value="people">0</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="venues" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">VENUES</span><span class="zhento-stats__context">(Harmony)</span></span><span class="zhento-stats__value" data-music-stat-value="venues">0</span></div>
             </section>
-            <button class="zhento-enter" type="button" hidden disabled aria-label="Enter — not available yet">ENTER</button>
+            <p class="zhento-destination-prompt">PLEASE SELECT YOUR DESTINATION</p>
+            <section class="zhento-detail" aria-label="Selected Pillar" hidden>
+              <h2 class="zhento-detail__title"></h2>
+              <p class="zhento-detail__copy">COMING SOON</p>
+              <button class="zhento-enter" type="button" disabled aria-label="Enter — not available yet">ENTER</button>
+            </section>
             <section class="zhento-destinations zhento-panel" aria-label="Select a destination preview">
               <h2 class="zhento-destinations__title">DESTINATION</h2>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="bands" aria-pressed="false"><span>PILLAR OF RHYTHM</span></button>

@@ -30784,3 +30784,103 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .zhento-stats__value { min-inline-size: 7ch; font-variant-numeric: tabular-nums; text-align: right; }
+
+.zhento-detail {
+  position: absolute;
+  inset-block-start: auto;
+  inset-block-end: clamp(18.2rem, 32svh, 22rem);
+  inset-inline-start: auto;
+  inset-inline-end: clamp(8.2rem, 15vw, 18rem);
+  z-index: 4;
+  display: grid;
+  row-gap: clamp(0.46rem, 0.75vw, 0.64rem);
+  inline-size: clamp(14.6rem, 20vw, 22rem);
+  padding: clamp(0.72rem, 1.08vw, 0.96rem) clamp(0.82rem, 1.2vw, 1.1rem);
+  color: rgba(245, 246, 248, 0.92);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  background:
+    linear-gradient(135deg, rgba(137, 167, 255, 0.13), transparent 1.38rem) top left / 100% 100% no-repeat,
+    linear-gradient(315deg, rgba(145, 112, 235, 0.08), transparent 1.65rem) bottom right / 100% 100% no-repeat,
+    rgba(6, 7, 9, 0.64);
+  border: 1px solid rgba(137, 167, 255, 0.34);
+  box-shadow:
+    inset 0 0 0 1px rgba(220, 230, 255, 0.045),
+    inset 0 0 0.94rem rgba(145, 112, 235, 0.1),
+    0 0.42rem 1.24rem rgba(0, 0, 0, 0.34),
+    0 0 0.54rem rgba(145, 112, 235, 0.11);
+  clip-path: polygon(0.5rem 0, 100% 0, 100% calc(100% - 0.5rem), calc(100% - 0.5rem) 100%, 0 100%, 0 0.5rem);
+  transform: translate3d(0, 0.16rem, 0);
+  contain: layout paint style;
+}
+
+.zhento-detail__title,
+.zhento-detail__stat,
+.zhento-detail__copy,
+.zhento-detail__status {
+  display: block;
+}
+
+.zhento-detail__title {
+  padding-block-end: 0.38rem;
+  color: rgba(137, 167, 255, 0.94);
+  font-size: clamp(0.58rem, 0.72vw, 0.74rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+  border-block-end: 1px solid rgba(137, 167, 255, 0.24);
+  text-shadow: 0 0 0.34rem rgba(145, 112, 235, 0.22);
+}
+
+.zhento-detail__stat {
+  color: rgba(220, 230, 255, 0.92);
+  font-size: clamp(0.66rem, 0.82vw, 0.82rem);
+  font-weight: 650;
+  line-height: 1.06;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 0 0.32rem rgba(145, 112, 235, 0.18);
+}
+
+.zhento-detail__copy {
+  padding-block: 0.5rem 0.54rem;
+  color: rgba(198, 201, 208, 0.76);
+  font-family: var(--font-display);
+  font-size: clamp(0.68rem, 0.78vw, 0.82rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: 0.03em;
+  text-align: center;
+  border-block: 1px solid rgba(137, 167, 255, 0.15);
+}
+
+.zhento-destination-prompt {
+  position: absolute; inset-inline-start: 50%; inset-block-start: 51.5%; z-index: 4;
+  max-inline-size: min(42rem,calc(100vw - 3rem)); color: rgba(220,230,255,.88);
+  font-family: var(--font-display); font-size: clamp(.86rem,1.16vw,1.18rem); font-weight: 600;
+  line-height: 1.1; letter-spacing: .08em; text-align: center; text-transform: uppercase;
+  text-shadow: 0 0 .44rem rgba(145,112,235,.28),0 0 1.2rem rgba(0,0,0,.68);
+  pointer-events: none; transform: translate3d(-50%,-50%,0);
+}
+.zhento-detail[hidden], .zhento-destination-prompt[hidden] { display: none; }
+.zhento-destination-prompt { margin: 0; width: max-content; }
+.zhento-detail:not([hidden]) { animation: daiionArchiveFocusPanelResolve 220ms ease-out both; }
+.zhento-detail__title, .zhento-detail__copy { margin: 0; }
+.zhento-detail .zhento-enter { position: static; transform: none; min-height: 44px; padding: .45rem; width: 100%; border: 0; background: transparent; color: #dce6ff; font-size: .72rem; }
+.zhento-identity { box-sizing: border-box; padding: .7rem .6rem; background: linear-gradient(135deg,rgba(137,167,255,.16),transparent 1.2rem),linear-gradient(315deg,rgba(145,112,235,.1),transparent 1.45rem),rgba(6,7,9,.9); border: 1px solid rgba(137,167,255,.34); box-shadow: inset 0 0 0 1px rgba(220,230,255,.045),inset 0 0 .92rem rgba(145,112,235,.1),0 .42rem 1.2rem rgba(0,0,0,.34),0 0 .52rem rgba(145,112,235,.11); clip-path: polygon(.48rem 0,100% 0,100% calc(100% - .48rem),calc(100% - .48rem) 100%,0 100%,0 .48rem); }
+.zhento-identity__secondary, .zhento-identity__description { display: block; }
+.zhento-identity__secondary { font-weight: 700; line-height: 1.15; }
+.zhento-identity__description { margin-top: .55rem; font-size: .85em; line-height: 1.25; }
+@media (max-width:540px) {
+  .zhento-detail { inset-block-end: max(clamp(18rem,33svh,19.2rem),19.95rem); inset-inline-end: clamp(3.3rem,15vw,4.25rem); inline-size: min(15.35rem,calc(100vw - 3.2rem)); padding: .68rem .78rem; }
+  .zhento-identity { width: min(13.45rem,calc(100vw - 4.1rem)); top: calc(4.2rem + 12.4rem + 3.5rem); padding: .7rem .6rem; }
+  .zhento-identity__planet { font-size: .72rem; }
+  .zhento-identity__name { font-size: 1.92rem; }
+  .zhento-identity__subtitle { font-size: .92rem; margin-top: .55rem; }
+  .zhento-identity__description { font-size: .7rem; margin-top: .35rem; }
+}
