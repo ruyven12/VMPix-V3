@@ -30939,7 +30939,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-destination-prompt__text::after { display: none; }
 }
 /* Pillar of Rhythm occupies the current shared viewport beside other V3 modules. */
-.rhythm-viewport { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
+.rhythm-viewport { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
 .rhythm-viewport[hidden] { display:none; }
 .rhythm-viewport .rhythm-pillar { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);display:block;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) 1rem max(1rem,env(safe-area-inset-left));overflow-y:auto;overflow-x:hidden;color:#e4eaff; }
 .rhythm-pillar > * { box-sizing:border-box;max-width:62rem;margin-inline:auto; }
@@ -30958,13 +30958,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-field { position:relative;isolation:isolate;inline-size:min(100%,34rem);aspect-ratio:1;flex:none;background:radial-gradient(circle,rgba(130,112,232,.11),rgba(35,56,99,.05) 65%,transparent 69%); }
 .rhythm-field[hidden] { display:none; }
 .rhythm-resonance,.rhythm-nodes { position:absolute;inset:0;width:100%;height:100%; }
-.rhythm-resonance { fill:none;stroke:#99a3e7;stroke-width:.2;opacity:.3;pointer-events:none;animation:rhythmResonance 12s ease-in-out infinite alternate; }
+.rhythm-resonance { fill:none;stroke:#afbdff;stroke-width:.3;opacity:.42;pointer-events:none;animation:rhythmResonance 12s ease-in-out infinite alternate; }
 .rhythm-node { position:absolute;left:var(--node-x);top:var(--node-y);transform:translate(-50%,-50%);width:44px;height:44px;min-width:44px;min-height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer; }
-.rhythm-node-core { position:relative;display:block;width:12px;height:12px;border-radius:50%;background:#d8e4ff;box-shadow:0 0 10px #929cffaa;transform:scale(var(--node-depth));opacity:var(--node-opacity);animation:rhythmBreath 6s ease-in-out var(--node-delay) infinite alternate;pointer-events:none; }
-.rhythm-node-core::after { content:"";position:absolute;inset:-6px;border:1px solid #9d91dd88;border-radius:50%; }
+.rhythm-node-core { position:relative;display:block;width:13px;height:13px;border-radius:50%;background:#e5edff;box-shadow:0 0 10px #929cffaa;transform:scale(var(--node-depth));opacity:max(.72,var(--node-opacity));animation:rhythmBreath 6s ease-in-out var(--node-delay) infinite alternate;pointer-events:none; }
+.rhythm-node-core::after { content:"";position:absolute;inset:-6px;border:1.25px solid #ada7eed0;border-radius:50%; }
 .rhythm-node[aria-pressed="true"] { z-index:30 !important;background:radial-gradient(circle,#ac9aff28,transparent 70%); }
 .rhythm-node[aria-pressed="true"] .rhythm-node-core { opacity:1;box-shadow:0 0 14px #b7acff; }
-.rhythm-node[aria-pressed="true"] .rhythm-node-core::after { inset:-9px;border-color:#c2b8ff; }
+.rhythm-node[aria-pressed="true"] .rhythm-node-core::after { inset:-9px;border-width:1.5px;border-color:#e0d8ff; }
 .rhythm-node:focus-visible { outline:2px solid #e0dcff;outline-offset:1px; }
 .rhythm-resonance-note { margin:0;text-align:center;font-size:.72rem;line-height:1.4;color:#8e9abd; }
 .rhythm-readout { display:flex;align-items:center;gap:1rem;box-sizing:border-box;width:min(100%,34rem);min-height:8rem;margin:.3rem 0 .5rem;padding:1rem;border:1px solid #8176bb66;background:linear-gradient(120deg,#55518118,#1e274629);border-radius:4px; }
@@ -30975,7 +30975,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-artwork img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#080c19; }
 .rhythm-readout button,.rhythm-network-status button { min-height:44px;margin-top:.4rem;padding:.45rem .85rem;border:1px solid #8d82c8;border-radius:3px;background:#60578425;color:#e2dfff;font:inherit;cursor:pointer; }
 @keyframes rhythmBreath { from { filter:brightness(.88); } to { filter:brightness(1.15); } }
-@keyframes rhythmResonance { from { opacity:.22;transform:rotate(-1deg); } to { opacity:.36;transform:rotate(1deg); } }
+@keyframes rhythmResonance { from { opacity:.36;transform:rotate(-1deg); } to { opacity:.48;transform:rotate(1deg); } }
 @media(prefers-reduced-motion:reduce) { .rhythm-pillar *, .rhythm-pillar *::before,.rhythm-pillar *::after { animation:none !important;transition:none !important; } }
 
 .rhythm-pillar .rhythm-network-panel { display:flex;flex-direction:column;align-items:center;width:100%;height:auto;max-height:none;min-width:0;box-sizing:border-box;animation:none; }
@@ -30984,3 +30984,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-pillar .rhythm-resonance-note { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
 .rhythm-pillar .rhythm-modes { width:100%;box-sizing:border-box;overflow:visible; }
 .rhythm-pillar .rhythm-field { min-width:min(100%,18rem); }
+
+/* The existing scrollport distributes spare height below the instrument. */
+.rhythm-viewport .rhythm-pillar { display:flex;flex-direction:column;padding-block-end:.5rem; }
+.rhythm-pillar > .rhythm-heading,.rhythm-pillar > .rhythm-modes { flex:none; }
+.rhythm-pillar > .rhythm-network-panel { flex:1 0 auto; }
+.rhythm-pillar .rhythm-readout { margin-block-start:auto;margin-block-end:0; }
