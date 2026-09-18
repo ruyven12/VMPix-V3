@@ -31023,3 +31023,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-source-row.is-active .rhythm-telemetry-value { font-size:14px; }
   .rhythm-source-more { margin-block:.6rem 0; }
 }
+/* Mobile active dossier emphasis; neighboring cards retain their compact treatment. */
+@media (max-width: 899px) {
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art { height:100%;aspect-ratio:auto; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art img { object-fit:cover; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-name { font-size:calc(clamp(.8rem,1.5vw,1.1rem) + 4px); }
+  .rhythm-source-row.is-active .rhythm-telemetry-label { font-size:calc(.58rem + 2px); }
+  .rhythm-source-row.is-active .rhythm-telemetry-value { font-size:calc(.7rem + 2px); }
+}
