@@ -30884,3 +30884,40 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-identity__subtitle { font-size: .92rem; margin-top: .55rem; }
   .zhento-identity__description { font-size: .7rem; margin-top: .35rem; }
 }
+
+/* Exact Daïion identity anchors; Zhento intentionally has no identity plate. */
+.zhento-identity {
+  --zhento-hud-x: calc(50vw - clamp(2.2rem,6.2vw,7.5rem) - clamp(9.95rem,10.2vw,12.25rem));
+  --zhento-hud-y: clamp(-25rem,-36.5svh,-21rem);
+  --zhento-project-from: translate3d(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y) + .72rem),0) scale3d(.7,.7,1);
+  --zhento-project-to: translate3d(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y)),0) scale3d(.5625,.5625,1);
+  inset-inline-start: 50%; inset-inline-end: auto; inset-block-start: 50%;
+  width: min(34rem,calc(100vw - 2rem)); padding: 0; border: 0; background: transparent; box-shadow: none; clip-path: none;
+  transform: translate3d(-50%,-50%,0);
+}
+.zhento-identity__heading { gap: .08rem; }
+.zhento-identity__planet { font-size: clamp(.72rem,1.8vw,.86rem); letter-spacing: .16em; }
+.zhento-identity__name { font-size: clamp(2.4125rem,calc(14vw - 3px),6.6125rem); }
+.zhento-identity__subtitle { position: absolute; inset-block-start: calc(100% + clamp(.34rem,.52vw,.48rem)); inset-inline-start: 50%; width: min(20.5rem,calc(100vw - 2rem)); margin: 0; transform: translateX(-50%); }
+.zhento-identity__secondary { font-size: clamp(1.58rem,2.7vw,2.08rem); line-height: 1.04; letter-spacing: .08em; }
+.zhento-identity__description { margin-top: .4rem; font-size: clamp(1.08rem,1.42vw,1.22rem); line-height: 1.28; }
+@media (max-width:540px) {
+  .zhento-identity { --zhento-hud-x: calc(50vw - 8.9rem); --zhento-hud-y: clamp(-1.35rem,-2.2svh,-.55rem); width: clamp(21.75rem,calc(100vw - .75rem),23.75rem); }
+  .zhento-identity__subtitle { inset-block-start: calc(100% + .48rem); width: 100%; max-width: 100%; }
+  .zhento-identity__secondary { white-space: nowrap; }
+}
+@media (max-height:540px) and (orientation:landscape) {
+  .zhento-identity { --zhento-hud-y: clamp(-8.6rem,-24svh,-6.2rem); --zhento-project-to: translate3d(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y)),0) scale3d(.34,.34,1); }
+}
+@media (prefers-reduced-motion:reduce) { .zhento-identity { transform: var(--zhento-project-to); } }
+
+/* Four Pillar rows leave a smaller gap below the reference identity than Daïion's three rows. */
+@media (max-width:540px) {
+  .zhento-detail {
+    inset-block-end: calc(7.15rem + (4 * 2.33rem) + 1.36rem + .58rem + .38rem + 3px + .375rem);
+    padding-block: .5rem;
+    row-gap: .25rem;
+    transform: none;
+  }
+  .zhento-detail__copy { padding-block: .25rem; }
+}
