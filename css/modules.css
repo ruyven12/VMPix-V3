@@ -30745,3 +30745,5 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-identity__name { font-size: clamp(.96rem, 4.6vw, 1.25rem); }
   .zhento-identity__subtitle { margin-top: .65rem; font-size: .75rem; line-height: 1.35; }
 }
+
+.zhento-destinations__context { display: block; margin-top: .24rem; color: rgba(173,186,255,.78); font-size: .6rem; font-weight: 500; line-height: 1.2; letter-spacing: .06em; }
