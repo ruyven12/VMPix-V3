@@ -24,6 +24,12 @@
     <script>
       (() => {
         const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (routePath === "/music") {
+          const root = document.currentScript.parentElement;
+          root.classList.remove("is-home-route");
+          root.classList.add("is-music-nexus-view", "is-module-view");
+          root.setAttribute("data-shell-route", "music");
+        }
         if (/^\/wrestling\/shows\/[^/]+\/match-\d+(?:\/photo\/[^/]+)?$/.test(routePath)) {
           document.currentScript.parentElement.classList.remove("is-home-route");
           document.currentScript.parentElement.setAttribute("data-shell-route", "wrestling-match-detail");
@@ -375,13 +381,13 @@
                 <div><dt>VENUES</dt><dd>0</dd></div>
               </dl>
             </section>
-            <button class="zhento-enter" type="button" disabled aria-label="Enter — not available yet">ENTER</button>
-            <section class="zhento-destinations zhento-panel" aria-label="Destinations — not available yet">
+            <button class="zhento-enter" type="button" hidden disabled aria-label="Enter — not available yet">ENTER</button>
+            <section class="zhento-destinations zhento-panel" aria-label="Select a destination preview">
               <h2>DESTINATION</h2>
-              <button type="button" disabled>SHOWS</button>
-              <button type="button" disabled>VENUES</button>
-              <button type="button" disabled>PEOPLE</button>
-              <button type="button" disabled>BANDS</button>
+              <button type="button" data-zhento-destination="shows" aria-pressed="false">SHOWS</button>
+              <button type="button" data-zhento-destination="venues" aria-pressed="false">VENUES</button>
+              <button type="button" data-zhento-destination="people" aria-pressed="false">PEOPLE</button>
+              <button type="button" data-zhento-destination="bands" aria-pressed="false">BANDS</button>
             </section>
           </section>
 

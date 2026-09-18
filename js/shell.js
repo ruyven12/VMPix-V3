@@ -2305,12 +2305,13 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+  return route?.name === "music" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  if (route?.name === "music") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
   if (route?.name === "wrestling") return getShellBackTarget(route);
@@ -2382,6 +2383,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
 
   const isActive = isPrototypeEngineReturnRoute(route);
   const backLabel = {
+    "music": "Back to Portfolio",
     "wrestling-people-prototype": "Back to Wrestling",
     "wrestling-people": "Back to Wrestling",
     "wrestling-person-detail": "Back to Hall of Champions",
@@ -3075,6 +3077,26 @@ function showPortfolioHubView() {
   setActiveGlobalNav("portfolio");
 }
 
+function resetZhentoLandingSelection() {
+  const landing = document.querySelector("[data-zhento-landing]");
+  if (!landing) return;
+  delete landing.dataset.selectedDestination;
+  landing.querySelector(".zhento-enter").hidden = true;
+  landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
+    button.setAttribute("aria-pressed", "false");
+    if (button.dataset.zhentoBound) return;
+    button.dataset.zhentoBound = "true";
+    button.addEventListener("click", () => {
+      if (getRouteFromUrl().name !== "music") return;
+      landing.dataset.selectedDestination = button.dataset.zhentoDestination;
+      landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      landing.querySelector(".zhento-enter").hidden = false;
+    });
+  });
+}
+
 function showMusicNexus(options = {}) {
   if (!shell || !portfolioHub || !musicNexusShell) {
     return;
@@ -3121,6 +3143,7 @@ function showMusicNexus(options = {}) {
   setHubChromeHidden(true);
   const initialSection = options.initialSection || "landing";
   if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
+    resetZhentoLandingSelection();
     showMusicNexusLanding({ shouldScroll: false });
     setPortfolioEngineHudCurrentView("Zhento");
   } else {
