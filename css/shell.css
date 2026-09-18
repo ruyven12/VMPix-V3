@@ -2454,6 +2454,13 @@ button {
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
+/* Selection owns this readout while the existing star feed prepares the destination. */
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-gateway-active):is([data-portfolio-star-feed-state="feeding"], [data-portfolio-star-feed-state="charging"]) .portfolio-engine-panel--left {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-panel--left {
   opacity: 0;
   pointer-events: none;
