@@ -56,8 +56,10 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
   battleground: {
     id: "battleground",
     label: "The Battleground",
-    description: "Step inside the world of professional wrestling through the matches, moments, and personalities captured ringside.",
-    status: "DECODING",
+    eyebrow: "ARCHIVE DESTINATION",
+    worldIdentifier: "PLANET // DAÏION",
+    description: "Enter Daïion — a once-prosperous world transformed by conflict, where remnants of its past and the energy that shaped its fate surround the real matches, moments, champions, and photographs of the Wrestling Archive.",
+    status: "COORDINATES LOCKED // READY FOR TRAVEL",
     statusType: "decoding",
   },
   wild: {
@@ -1426,6 +1428,10 @@ function setPortfolioEngineProjectionContent(worldName) {
   const config = getPortfolioWorldSelectionConfig(worldName);
   if (portfolioEngineProjection) {
     portfolioEngineProjection.dataset.archiveStatus = config.statusType;
+    const eyebrow = portfolioEngineProjection.querySelector(".portfolio-engine-projection-kicker");
+    const worldIdentifier = portfolioEngineProjection.querySelector(".portfolio-engine-projection-status-label");
+    if (eyebrow) eyebrow.textContent = config.eyebrow || "Archive Analysis";
+    if (worldIdentifier) worldIdentifier.textContent = config.worldIdentifier || "Status";
   }
   if (portfolioEngineProjectionTitle) {
     portfolioEngineProjectionTitle.textContent = config.label;
