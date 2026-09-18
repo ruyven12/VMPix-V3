@@ -372,24 +372,27 @@
         </section>
 
         <section class="rhythm-viewport" data-rhythm-viewport hidden aria-label="Pillar of Rhythm content viewport">
-          <section class="rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-pulse-network>
+          <span class="zhento-top-hud-rail" aria-hidden="true"></span>
+          <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
+          <span class="zhento-side-hud-rail zhento-side-hud-rail--right" aria-hidden="true"></span>
+          <section class="rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-rhythm-source-index>
             <header class="rhythm-heading"><p>ZHENTO</p><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
             <div class="rhythm-modes" role="tablist" aria-label="Pillar of Rhythm modes">
-              <button class="rhythm-mode" id="rhythm-network-tab" type="button" role="tab" aria-selected="true" aria-controls="rhythm-network-panel">PULSE NETWORK</button>
-              <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SOURCE INDEX</button>
+              <button class="rhythm-mode" id="rhythm-source-tab" type="button" role="tab" aria-selected="true" aria-controls="rhythm-source-panel">SOURCE INDEX</button>
               <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
             </div>
-            <section class="rhythm-network-panel" id="rhythm-network-panel" role="tabpanel" aria-labelledby="rhythm-network-tab">
-              <p class="rhythm-network-status" role="status" data-pulse-status>Retrieving the Pulse Network…</p>
-              <div class="rhythm-field" data-pulse-field aria-label="Selectable Band nodes">
-                <svg class="rhythm-resonance" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46"/><ellipse cx="50" cy="50" rx="23" ry="46"/><ellipse cx="50" cy="50" rx="46" ry="18"/><ellipse cx="50" cy="50" rx="40" ry="31" transform="rotate(-35 50 50)"/></svg>
-                <div class="rhythm-nodes" data-pulse-nodes></div>
+            <section id="rhythm-source-panel" class="rhythm-source-panel" role="tabpanel" aria-labelledby="rhythm-source-tab">
+              <div class="rhythm-source-filters">
+                <label>Letter<select data-bands-filter="letter" aria-label="Filter Bands by letter"><option value="">All</option></select></label>
+                <label>Region<select data-bands-filter="region" aria-label="Filter Bands by region"><option value="">All regions</option><option value="local">Local</option><option value="regional">Regional</option><option value="national">National</option><option value="international">International</option></select></label>
+                <label>Completeness<select data-bands-filter="status" aria-label="Filter Bands by completeness"><option value="">All statuses</option><option value="complete">Complete</option><option value="partial">Partial</option><option value="needs">Needs Work</option></select></label>
+                <button type="button" data-bands-filter-reset>Reset filters</button>
               </div>
-              <p class="rhythm-resonance-note">Decorative resonance · no documented relationships implied</p>
-              <article class="rhythm-readout" data-pulse-readout aria-live="polite"><p>Select a source to view its archive.</p></article>
+              <p class="rhythm-source-status" role="status" data-rhythm-source-status>Retrieving Source Index…</p>
+              <ul class="rhythm-source-list" data-rhythm-source-list aria-label="Bands Source Index"></ul>
+              <button class="rhythm-source-more" type="button" data-rhythm-source-more hidden>Load more Bands</button>
             </section>
           </section>
-
         </section>
         <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>

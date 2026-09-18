@@ -75,7 +75,7 @@ const wrestlingLightboxCounter = document.querySelector("[data-wrestling-lightbo
 const wrestlingLightboxPhotoNumber = document.querySelector("[data-wrestling-lightbox-photo-number]");
 const musicActivityPanel = queryRetainedMusicElement("[data-music-activity-panel]");
 const musicActivityList = queryRetainedMusicElement("[data-music-activity-list]");
-const musicBandsIndex = document.querySelector("[data-pulse-network]");
+const musicBandsIndex = document.querySelector("[data-rhythm-source-index]");
 const musicPeopleIndex = queryRetainedMusicElement("[data-music-people-index]");
 const musicPeopleList = queryRetainedMusicElement("[data-music-people-list]");
 const personDetail = queryRetainedMusicElement("[data-person-detail]");
@@ -228,7 +228,7 @@ const reducedMotion = window.matchMedia
   : { matches: false };
 let spotlightFrame;
 let drawerCloseTimer;
-let activeBandsView = "radar";
+let activeBandsView = "list";
 let activeBandsLetter = "";
 let activeBandsFilterLetter = "";
 let activeBandsRegionFilter = "";

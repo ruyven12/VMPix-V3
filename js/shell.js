@@ -3129,7 +3129,7 @@ function syncRhythmPresentationOwnership(route) {
   }
   rhythmViewport.hidden = !active;
   rhythmViewport.inert = !active;
-  if (!active) { cancelRhythmPulseBatches(); musicBandsIndex.setAttribute('aria-hidden','true'); }
+  if (!active) { musicBandsIndex.setAttribute('aria-hidden','true'); }
 }
 function showRhythmPillar() {
   clearPortfolioArrivalState(); clearPortfolioOrientationState(); clearPortfolioDirectArrivalState();

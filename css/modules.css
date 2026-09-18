@@ -30953,40 +30953,33 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-pillar .rhythm-mode { flex:0 1 auto;min-height:44px;padding:.5rem .7rem;font-size:clamp(.65rem,1.2vw,.82rem);color:#aab4d0;border:1px solid #5b5a8a;background:rgba(73,66,118,.14); }
 .rhythm-pillar .rhythm-mode[aria-selected="true"] { color:#e6eaff;border-color:#a092f2;background:rgba(117,97,201,.2);box-shadow:inset 0 0 1rem #8e7aff18; }
 .rhythm-pillar .rhythm-mode:disabled { opacity:.48;cursor:not-allowed; }
-.rhythm-pillar .rhythm-network-panel { display:grid;justify-items:center;gap:.6rem;padding:0;min-height:0;overflow:visible;background:none;border:0; }
 .rhythm-network-status { margin:0;min-height:1.4em;font-size:.8rem;color:#bfc8e8;text-align:center; }
-.rhythm-field { position:relative;isolation:isolate;inline-size:min(100%,34rem);aspect-ratio:1;flex:none;background:radial-gradient(circle,rgba(130,112,232,.11),rgba(35,56,99,.05) 65%,transparent 69%); }
-.rhythm-field[hidden] { display:none; }
-.rhythm-resonance,.rhythm-nodes { position:absolute;inset:0;width:100%;height:100%; }
-.rhythm-resonance { fill:none;stroke:#afbdff;stroke-width:.3;opacity:.42;pointer-events:none;animation:rhythmResonance 12s ease-in-out infinite alternate; }
-.rhythm-node { position:absolute;left:var(--node-x);top:var(--node-y);transform:translate(-50%,-50%);width:44px;height:44px;min-width:44px;min-height:44px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer; }
-.rhythm-node-core { position:relative;display:block;width:13px;height:13px;border-radius:50%;background:#e5edff;box-shadow:0 0 10px #929cffaa;transform:scale(var(--node-depth));opacity:max(.72,var(--node-opacity));animation:rhythmBreath 6s ease-in-out var(--node-delay) infinite alternate;pointer-events:none; }
-.rhythm-node-core::after { content:"";position:absolute;inset:-6px;border:1.25px solid #ada7eed0;border-radius:50%; }
-.rhythm-node[aria-pressed="true"] { z-index:30 !important;background:radial-gradient(circle,#ac9aff28,transparent 70%); }
-.rhythm-node[aria-pressed="true"] .rhythm-node-core { opacity:1;box-shadow:0 0 14px #b7acff; }
-.rhythm-node[aria-pressed="true"] .rhythm-node-core::after { inset:-9px;border-width:1.5px;border-color:#e0d8ff; }
-.rhythm-node:focus-visible { outline:2px solid #e0dcff;outline-offset:1px; }
-.rhythm-resonance-note { margin:0;text-align:center;font-size:.72rem;line-height:1.4;color:#8e9abd; }
-.rhythm-readout { display:flex;align-items:center;gap:1rem;box-sizing:border-box;width:min(100%,34rem);min-height:8rem;margin:.3rem 0 .5rem;padding:1rem;border:1px solid #8176bb66;background:linear-gradient(120deg,#55518118,#1e274629);border-radius:4px; }
-.rhythm-readout h2 { margin:0 0 .35rem;font-family:var(--font-display);font-size:1rem;line-height:1.35;overflow-wrap:anywhere; }
-.rhythm-readout p { margin:.25rem 0;font-size:.82rem;line-height:1.5;color:#b7c4e2; }
-.rhythm-readout-body { min-width:0;flex:1; }
-.rhythm-artwork { position:relative;display:grid;place-items:center;flex:0 0 3.5rem;height:3.5rem;overflow:hidden;border:1px solid #8276b966;border-radius:4px;color:#cabdff; }
-.rhythm-artwork img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#080c19; }
-.rhythm-readout button,.rhythm-network-status button { min-height:44px;margin-top:.4rem;padding:.45rem .85rem;border:1px solid #8d82c8;border-radius:3px;background:#60578425;color:#e2dfff;font:inherit;cursor:pointer; }
-@keyframes rhythmBreath { from { filter:brightness(.88); } to { filter:brightness(1.15); } }
-@keyframes rhythmResonance { from { opacity:.36;transform:rotate(-1deg); } to { opacity:.48;transform:rotate(1deg); } }
 @media(prefers-reduced-motion:reduce) { .rhythm-pillar *, .rhythm-pillar *::before,.rhythm-pillar *::after { animation:none !important;transition:none !important; } }
 
-.rhythm-pillar .rhythm-network-panel { display:flex;flex-direction:column;align-items:center;width:100%;height:auto;max-height:none;min-width:0;box-sizing:border-box;animation:none; }
-.rhythm-pillar .rhythm-field { width:min(100%,36svh,30rem);max-width:100%;min-width:0;box-sizing:border-box; }
-.rhythm-pillar .rhythm-readout { min-width:0;max-width:100%;flex:none; }
-.rhythm-pillar .rhythm-resonance-note { max-width:100%;white-space:normal;overflow-wrap:anywhere; }
 .rhythm-pillar .rhythm-modes { width:100%;box-sizing:border-box;overflow:visible; }
-.rhythm-pillar .rhythm-field { min-width:min(100%,18rem); }
 
 /* The existing scrollport distributes spare height below the instrument. */
 .rhythm-viewport .rhythm-pillar { display:flex;flex-direction:column;padding-block-end:.5rem; }
 .rhythm-pillar > .rhythm-heading,.rhythm-pillar > .rhythm-modes { flex:none; }
-.rhythm-pillar > .rhythm-network-panel { flex:1 0 auto; }
-.rhythm-pillar .rhythm-readout { margin-block-start:auto;margin-block-end:0; }
+
+/* Source Index uses the existing Pillar scrollport and Zhento world rails. */
+.rhythm-viewport .rhythm-pillar { padding-block-start:max(3.6rem,env(safe-area-inset-top));padding-inline:max(2rem,env(safe-area-inset-left)) max(2rem,env(safe-area-inset-right)); }
+.rhythm-pillar .rhythm-modes { margin-inline:auto; }
+.rhythm-source-panel { width:100%;min-width:0;flex:none; }
+.rhythm-source-filters { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;align-items:end; }
+.rhythm-source-filters label { display:grid;gap:.3rem;min-width:0;font-size:.7rem;color:#ccd0ec; }
+.rhythm-source-filters select { width:100%;min-width:0;min-height:44px;padding:.4rem;color:#eceaff;background:#15122ce8;border:1px solid #8b7cbc88;border-radius:3px;font:inherit; }
+.rhythm-source-filters button,.rhythm-source-more,.rhythm-source-status button { min-height:44px;padding:.5rem .8rem;color:#e6deff;background:#342651ad;border:1px solid #9b82cba8;border-radius:3px;font:inherit;font-size:.8rem;cursor:pointer; }
+.rhythm-source-filters button { grid-column:1/-1;justify-self:end; }
+.rhythm-source-filters button:disabled { opacity:.45;cursor:default; }
+.rhythm-source-status { margin:.7rem 0;font-size:.8rem;line-height:1.4;color:#e0daf1; }
+.rhythm-source-list { display:grid;gap:.5rem;list-style:none;padding:0;margin:0; }
+.rhythm-source-row { display:flex;align-items:center;gap:.75rem;width:100%;min-height:76px;padding:.7rem;text-align:left;color:#f1edff;border:1px solid #a38cd66b;border-radius:4px;background:linear-gradient(110deg,#17172ad9,#242039c9);font:inherit;cursor:pointer; }
+.rhythm-source-row:hover,.rhythm-source-row:focus-visible { border-color:#c1a4f5;background:#302747e8; }
+.rhythm-source-art { position:relative;display:grid;place-items:center;flex:0 0 42px;height:42px;overflow:hidden;border:1px solid #a08ac180;border-radius:3px;font-size:.8rem;color:#d5c4ff; }
+.rhythm-source-art img { position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#11101b; }
+.rhythm-source-body { display:grid;gap:.28rem;min-width:0; }
+.rhythm-source-name { font-size:.92rem;line-height:1.35;overflow-wrap:anywhere; }
+.rhythm-source-meta { font-size:.72rem;line-height:1.5;color:#c6bfd7;overflow-wrap:anywhere; }
+.rhythm-source-more { display:block;margin:1rem auto .5rem; }
+.rhythm-source-more[hidden] { display:none; }
