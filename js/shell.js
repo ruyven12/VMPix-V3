@@ -5366,6 +5366,9 @@ if (shell && startButton) {
     shouldPlayDirectPortfolioArrival: false,
     shouldPlayDirectPortfolioEntrySequence: PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA && initialRoute.name === "portfolio",
   });
+  // Release only after the requested route and its initial viewport state are installed.
+  // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
+  document.documentElement.removeAttribute("data-v3-booting");
   window.addEventListener("popstate", (event) => {
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();
     const historyState = event.state;
