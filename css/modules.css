@@ -31025,6 +31025,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 /* Mobile active dossier emphasis; neighboring cards retain their compact treatment. */
 @media (max-width: 899px) {
+  .rhythm-viewport .rhythm-pillar { padding-block-end:4px; }
+  .rhythm-source-panel { display:flex;flex-direction:column;flex:1;min-height:0; }
+  .rhythm-source-panel > :not(.rhythm-rolodex) { flex-shrink:0; }
+  .rhythm-rolodex { flex:1;min-height:calc(var(--rhythm-card-height) + 5rem);height:auto;container-type:size; }
+  .rhythm-rolodex .rhythm-source-list { padding-block:calc((100cqh - var(--rhythm-card-height))/2); }
+  .rhythm-source-more { margin-block:.6rem 0; }
   .rhythm-rolodex .rhythm-source-row.is-active { grid-template-columns:calc(var(--rhythm-card-height) - 1.5rem - 2px) minmax(0,1fr) minmax(4.5rem,.65fr); }
   .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art { height:100%;aspect-ratio:auto; }
   .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art img { object-fit:contain; }
