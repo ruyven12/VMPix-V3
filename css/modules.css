@@ -31382,3 +31382,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media(min-width:700px) {
   .band-detail-content .band-archive-telemetry .band-coverage-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
 }
+
+/* One local roster inside the current Band dossier; no nested scroll region. */
+.band-detail-content .band-personnel { display:grid;grid-template-columns:minmax(0,1fr);align-content:start;box-sizing:border-box;min-width:0;gap:1rem;padding:1rem;border:1px solid rgba(172,149,235,.4);border-radius:0;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.85); }
+.band-personnel > .band-detail-panel-title { margin:0;font-size:.85rem;line-height:1.35;letter-spacing:.04em;text-align:center;color:#d4c6fa; }
+.band-personnel-controls { display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem; }
+.band-personnel-controls button { box-sizing:border-box;min-height:44px;min-width:7rem;max-width:100%;padding:.65rem .75rem;border:1px solid rgba(157,136,207,.35);border-radius:0;background:rgba(41,32,66,.55);color:#bbb3cf;font:inherit;font-size:.72rem;line-height:1.3;cursor:pointer; }
+.band-personnel-controls button[aria-pressed="true"] { border-color:#bca3ed;background:rgba(105,78,161,.23);color:#f1eaff; }
+.band-personnel-controls button:focus-visible { outline:2px solid #d6c4ff;outline-offset:3px; }
+.band-personnel .band-member-list { min-width:0;max-height:none;overflow:visible;gap:.6rem; }
+.band-personnel .band-member { border-color:rgba(165,143,213,.2);border-radius:0;background:rgba(99,78,148,.055);padding:.65rem;gap:.7rem; }
+.band-personnel .band-member-thumb { width:2.6rem;border-radius:0;border-color:rgba(171,150,220,.38);background:rgba(94,68,141,.15);box-shadow:none;color:#dbcef3; }
+.band-personnel .band-member-name { font-size:.85rem;line-height:1.4;white-space:normal;overflow:visible;overflow-wrap:anywhere;color:#ece5ff; }
+.band-personnel .band-member-role { font-size:.72rem;line-height:1.45;color:#bdb4d0; }
+.band-detail-content .band-personnel[hidden],.band-personnel-controls[hidden] { display:none; }

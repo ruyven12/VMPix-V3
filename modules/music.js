@@ -1395,55 +1395,82 @@ function normalizeBandDetailMembers(members) {
     .filter(Boolean);
 }
 
-function renderBandDetailMembers(container, members, emptyText) {
-  if (!container) {
-    return;
-  }
-
-  const normalizedMembers = normalizeBandDetailMembers(members);
+function renderBandDetailMembers(container, members) {
+  if (!container) return;
   const fragment = document.createDocumentFragment();
-
-  if (normalizedMembers.length === 0) {
-    const emptyItem = document.createElement("li");
-    emptyItem.className = "band-member band-member--empty";
+  normalizeBandDetailMembers(members).forEach(member => {
+    const item = document.createElement("li");
+    item.className = "band-member";
     const thumb = document.createElement("span");
     thumb.className = "band-member-thumb";
     thumb.setAttribute("aria-hidden", "true");
-    thumb.textContent = "ID";
+    thumb.textContent = member.thumb;
     const copy = document.createElement("div");
     copy.className = "band-member-copy";
     const name = document.createElement("p");
     name.className = "band-member-name";
-    name.textContent = emptyText;
-    const role = document.createElement("p");
-    role.className = "band-member-role";
-    role.textContent = "Ready for future personnel data";
-    copy.append(name, role);
-    emptyItem.append(thumb, copy);
-    fragment.append(emptyItem);
-  } else {
-    normalizedMembers.forEach((member) => {
-      const item = document.createElement("li");
-      item.className = "band-member";
-      const thumb = document.createElement("span");
-      thumb.className = "band-member-thumb";
-      thumb.setAttribute("aria-hidden", "true");
-      thumb.textContent = member.thumb;
-      const copy = document.createElement("div");
-      copy.className = "band-member-copy";
-      const name = document.createElement("p");
-      name.className = "band-member-name";
-      name.textContent = member.name;
+    name.textContent = member.name;
+    copy.append(name);
+    if (member.role && member.role !== "Role Pending") {
       const role = document.createElement("p");
       role.className = "band-member-role";
       role.textContent = member.role;
-      copy.append(name, role);
-      item.append(thumb, copy);
-      fragment.append(item);
-    });
-  }
-
+      copy.append(role);
+    }
+    item.append(thumb, copy);
+    fragment.append(item);
+  });
   container.replaceChildren(fragment);
+}
+
+function renderBandPersonnel(band) {
+  const section = bandDetailCoreMembers?.closest(".band-detail-members");
+  if (!section) return;
+  if (!section.classList.contains("band-personnel")) {
+    section.classList.add("band-personnel");
+    section.setAttribute("aria-label", "Personnel");
+    const title = document.createElement("h4");
+    title.className = "band-detail-panel-title";
+    title.textContent = "PERSONNEL";
+    const controls = document.createElement("div");
+    controls.className = "band-personnel-controls";
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Personnel roster");
+    ["current", "past"].forEach(key => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.dataset.personnelRoster = key;
+      button.setAttribute("aria-controls", "band-personnel-roster");
+      controls.append(button);
+    });
+    bandDetailCoreMembers.id = "band-personnel-roster";
+    section.replaceChildren(title, controls, bandDetailCoreMembers);
+  }
+  const personnel = getBandDetailPersonnel(band.backend_record || band);
+  // Membership in one authoritative roster does not negate membership in the other.
+  const rosters = { current: getUniqueBandDetailMembers(personnel.members), past: getUniqueBandDetailMembers(personnel.past_members) };
+  section.hidden = !rosters.current.length && !rosters.past.length;
+  const controls = section.querySelector(".band-personnel-controls");
+  controls.hidden = !rosters.current.length || !rosters.past.length;
+  const bandId = getBandId(band);
+  const previous = section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : "";
+  section.dataset.personnelBand = bandId;
+  const render = key => {
+    section.dataset.personnelSelection = key;
+    controls.querySelectorAll("button").forEach(button => {
+      const target = button.dataset.personnelRoster;
+      button.textContent = `${target.toUpperCase()} (${rosters[target].length})`;
+      button.setAttribute("aria-pressed", String(target === key));
+    });
+    bandDetailCoreMembers.setAttribute("aria-label", key === "past" ? "Past members" : "Current members");
+    renderBandDetailMembers(bandDetailCoreMembers, rosters[key]);
+  };
+  controls.querySelectorAll("button").forEach(button => {
+    button.onclick = () => {
+      render(button.dataset.personnelRoster);
+    };
+  });
+  render(previous && rosters[previous].length ? previous : rosters.current.length ? "current" : "past");
 }
 
 function setBandDetailLogo(logoUrl, name) {
@@ -5665,8 +5692,7 @@ function showBandDetail(band) {
   }
   renderBandIdentityDossier(band);
   renderBandArchiveTelemetry(band);
-  renderBandDetailMembers(bandDetailCoreMembers, members, "No core members indexed");
-  renderBandDetailMembers(bandDetailPastMembers, pastMembers, "No past members indexed");
+  renderBandPersonnel(band);
 
   setBandsIndexVisible(false);
   setBandDetailVisible(true);
