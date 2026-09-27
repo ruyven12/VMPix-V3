@@ -3129,6 +3129,7 @@ function cancelZhentoRhythmEntry() {
   if (!entry) return;
   zhentoRhythmEntry = null;
   entry.timers.forEach(window.clearTimeout);
+  entry.retirements.forEach((animation) => animation.cancel());
   entry.layer?.remove();
   shell.removeAttribute("data-zhento-rhythm-entry");
   shell.inert = entry.wasInert;
@@ -3144,10 +3145,18 @@ function startZhentoRhythmEntry() {
   const left = engine?.querySelector(".portfolio-engine-left-core");
   const right = engine?.querySelector(".portfolio-engine-reactor");
   if (!left || !right) return;
-  const entry = { timers: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false };
+  const entry = { timers: [], retirements: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false };
   zhentoRhythmEntry = entry;
   shell.dataset.zhentoRhythmEntry = "accepted";
   shell.inert = true;
+  // Retire only the source interface. Its artwork/atmosphere and entrance transforms stay intact.
+  for (const node of landing.children) {
+    if (node.classList.contains("zhento-landing__artwork") || node.hidden) continue;
+    const opacity = getComputedStyle(node).opacity;
+    entry.retirements.push(node.animate([{ opacity }, { opacity: 0 }], {
+      duration: reducedMotion.matches ? 0 : 150, easing: "ease-out", fill: "forwards",
+    }));
+  }
   prototypeEngineReturnControl.disabled = true;
   prototypeEngineReturnControl.tabIndex = -1;
   const promote = () => {

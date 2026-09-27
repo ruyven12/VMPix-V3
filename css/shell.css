@@ -12777,6 +12777,12 @@ button {
 @media(prefers-reduced-motion:reduce) { .site-shell[data-shell-route="music-bands"] .engine-emitter-energy * { animation:none !important; } }
 
 /* Rhythm entry: measured persistent emitters, opaque animated coverage, then current viewport. */
+/* Mount and measure the destination under coverage; disclose its complete interface only at cleanup. */
+.site-shell[data-zhento-rhythm-entry] .rhythm-viewport > :is(.rhythm-pillar, .zhento-top-hud-rail, .zhento-side-hud-rail) {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
 .site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control__text,
 .site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control::before,
 .site-shell[data-zhento-rhythm-entry] .engine-emitter-energy--left {
