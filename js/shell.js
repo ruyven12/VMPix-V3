@@ -2428,8 +2428,8 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   prototypeEngineReturnControl.setAttribute("aria-label", backLabel || "Return");
   prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isArchiveBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
-  prototypeEngineReturnControl.disabled = !isActive;
-  prototypeEngineReturnControl.tabIndex = isActive ? 0 : -1;
+  prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry);
+  prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry ? 0 : -1;
 }
 
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
@@ -3122,6 +3122,104 @@ function syncZhentoPillarStat() {
   if (stat.textContent !== text) stat.textContent = text;
 }
 
+// Rhythm owns one scoped entry transaction; the route still owns the destination DOM.
+let zhentoRhythmEntry = null;
+function cancelZhentoRhythmEntry() {
+  const entry = zhentoRhythmEntry;
+  if (!entry) return;
+  zhentoRhythmEntry = null;
+  entry.timers.forEach(window.clearTimeout);
+  entry.layer?.remove();
+  shell.removeAttribute("data-zhento-rhythm-entry");
+  shell.inert = entry.wasInert;
+  for (const key of ["impact-x", "impact-y", "left-x", "left-y", "right-x", "right-y"]) {
+    shell.style.removeProperty(`--zhento-entry-${key}`);
+  }
+  updatePrototypeEngineReturnEmitter(getRouteFromUrl());
+}
+function startZhentoRhythmEntry() {
+  const landing = document.querySelector("[data-zhento-landing]");
+  if (zhentoRhythmEntry || getRouteFromUrl().name !== "music" || landing?.dataset.selectedDestination !== "bands") return;
+  const engine = document.querySelector("[data-portfolio-engine]");
+  const left = engine?.querySelector(".portfolio-engine-left-core");
+  const right = engine?.querySelector(".portfolio-engine-reactor");
+  if (!left || !right) return;
+  const entry = { timers: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false };
+  zhentoRhythmEntry = entry;
+  shell.dataset.zhentoRhythmEntry = "accepted";
+  shell.inert = true;
+  prototypeEngineReturnControl.disabled = true;
+  prototypeEngineReturnControl.tabIndex = -1;
+  const promote = () => {
+    if (zhentoRhythmEntry !== entry) return;
+    entry.promoting = true;
+    try {
+      navigateToRoute(routePaths.musicBands);
+      entry.promoted = true;
+    } finally {
+      entry.promoting = false;
+    }
+  };
+  // Use the existing single request/cache. Hidden index rendering is intentionally skipped.
+  requestMusicBandsIndexData();
+  if (reducedMotion.matches) {
+    try { promote(); } finally { cancelZhentoRhythmEntry(); }
+    return;
+  }
+  const engineRect = engine.getBoundingClientRect();
+  const x = engineRect.left + engineRect.width / 2;
+  const y = engineRect.top + engineRect.height / 2;
+  shell.style.setProperty("--zhento-entry-impact-x", `${x}px`);
+  shell.style.setProperty("--zhento-entry-impact-y", `${y}px`);
+  for (const [side, node] of [["left", left], ["right", right]]) {
+    const rect = node.getBoundingClientRect();
+    shell.style.setProperty(`--zhento-entry-${side}-x`, `${x - rect.left - rect.width / 2}px`);
+    shell.style.setProperty(`--zhento-entry-${side}-y`, `${y - rect.top - rect.height / 2}px`);
+  }
+  const layer = document.createElement("div");
+  layer.className = "zhento-rhythm-entry";
+  layer.setAttribute("aria-hidden", "true");
+  layer.innerHTML = '<span class="zhento-rhythm-entry__impact"></span><span class="zhento-rhythm-entry__cover"></span><span class="zhento-rhythm-entry__portal"></span>';
+  // Reuse only the proven radial SVG paths, never the Hall surface or its route state.
+  const streaks = document.querySelector(".daiion-crusades-warp-layer__streak-field")?.cloneNode(true);
+  if (streaks) {
+    for (const node of [streaks, ...streaks.querySelectorAll("[class]")]) {
+      node.setAttribute("class", node.getAttribute("class").replaceAll("daiion-crusades-warp", "zhento-rhythm-warp"));
+    }
+    layer.append(streaks);
+  }
+  entry.layer = layer;
+  shell.append(layer);
+  const later = (ms, action) => entry.timers.push(window.setTimeout(() => {
+    if (zhentoRhythmEntry !== entry) return;
+    const expected = entry.promoted ? "music-bands" : "music";
+    if (getRouteFromUrl().name !== expected) { cancelZhentoRhythmEntry(); return; }
+    action();
+  }, ms));
+  later(180, () => { shell.dataset.zhentoRhythmEntry = "converging"; });
+  later(1150, () => { shell.dataset.zhentoRhythmEntry = "impact"; });
+  later(1570, () => { shell.dataset.zhentoRhythmEntry = "warp"; });
+  // Promotion is tied to the cover's actual completion, not network readiness or a timer race.
+  layer.addEventListener("animationend", (event) => {
+    if (event.animationName !== "zhentoRhythmCover" || zhentoRhythmEntry !== entry || entry.promoted) return;
+    try {
+      promote();
+      shell.dataset.zhentoRhythmEntry = "covered";
+      // Actual Bands viewport is active now. Two rendering frames resolve its measured layout.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (zhentoRhythmEntry !== entry) return;
+        later(360, () => { shell.dataset.zhentoRhythmEntry = "reveal"; });
+      }));
+    } catch (error) {
+      cancelZhentoRhythmEntry();
+      throw error;
+    }
+  });
+  layer.addEventListener("animationend", (event) => {
+    if (event.animationName === "zhentoRhythmReveal" && zhentoRhythmEntry === entry) cancelZhentoRhythmEntry();
+  });
+}
+
 let zhentoSelectionGeneration = 0;
 let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
@@ -3140,7 +3238,14 @@ function resetZhentoLandingSelection() {
   zhentoPromptExit?.cancel();
   zhentoPromptExit = null;
   delete landing.dataset.selectedDestination;
-  landing.querySelector(".zhento-detail .zhento-enter").textContent = "ENTER THE PILLAR";
+  const enter = landing.querySelector(".zhento-detail .zhento-enter");
+  enter.textContent = "ENTER THE PILLAR";
+  enter.disabled = true;
+  enter.setAttribute("aria-label", "Enter — not available yet");
+  if (!enter.dataset.zhentoEntryBound) {
+    enter.dataset.zhentoEntryBound = "true";
+    enter.addEventListener("click", startZhentoRhythmEntry);
+  }
   if (!landing.querySelector(".zhento-detail__stat")) {
     const stat = document.createElement("p");
     stat.className = "zhento-detail__stat";
@@ -3160,7 +3265,10 @@ function resetZhentoLandingSelection() {
     button.dataset.zhentoBound = "true";
     button.addEventListener("click", () => {
       if (getRouteFromUrl().name !== "music" || button.inert) return;
+      if (zhentoRhythmEntry) return;
       landing.dataset.selectedDestination = button.dataset.zhentoDestination;
+      enter.disabled = button.dataset.zhentoDestination !== "bands";
+      enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : "Enter the Pillar of Rhythm");
       landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === button.dataset.zhentoDestination)));
       landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
         item.setAttribute("aria-pressed", String(item === button));
@@ -5443,6 +5551,7 @@ if (shell && startButton) {
   // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
   document.documentElement.removeAttribute("data-v3-booting");
   window.addEventListener("popstate", (event) => {
+    cancelZhentoRhythmEntry();
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();
     const historyState = event.state;
     const targetIndex = getShellHistoryIndex(historyState);
@@ -5467,7 +5576,14 @@ if (shell && startButton) {
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
   }
-  window.addEventListener("resize", updateViewportMetrics);
+  window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); });
+  window.addEventListener("pagehide", cancelZhentoRhythmEntry);
+  reducedMotion.addEventListener("change", () => {
+    if (!zhentoRhythmEntry || !reducedMotion.matches) return;
+    const shouldEnter = !zhentoRhythmEntry.promoted && getRouteFromUrl().name === "music";
+    cancelZhentoRhythmEntry();
+    if (shouldEnter) navigateToRoute(routePaths.musicBands);
+  });
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", updateViewportMetrics);
     window.visualViewport.addEventListener("scroll", updateViewportMetrics);

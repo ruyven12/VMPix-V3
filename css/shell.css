@@ -12775,3 +12775,111 @@ button {
 .site-shell[data-shell-route="music-bands"] .engine-emitter-energy-discharge--left-feed { animation:daiionEmitterInwardDischargeSnap 4.9s steps(1,end) -1.1s infinite; }
 .site-shell[data-shell-route="music-bands"] .engine-emitter-energy-discharge--left-lower { opacity:.18; }
 @media(prefers-reduced-motion:reduce) { .site-shell[data-shell-route="music-bands"] .engine-emitter-energy * { animation:none !important; } }
+
+/* Rhythm entry: measured persistent emitters, opaque animated coverage, then current viewport. */
+.site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control__text,
+.site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control::before,
+.site-shell[data-zhento-rhythm-entry] .engine-emitter-energy--left {
+  animation: zhentoRhythmBackOut 150ms ease-out forwards !important;
+  pointer-events: none !important;
+}
+/* Route promotion may recreate SVG energy; only the acceptance phase may fade. */
+.site-shell[data-zhento-rhythm-entry]:not([data-zhento-rhythm-entry="accepted"]) .prototype-engine-return-control__text,
+.site-shell[data-zhento-rhythm-entry]:not([data-zhento-rhythm-entry="accepted"]) .prototype-engine-return-control::before,
+.site-shell[data-zhento-rhythm-entry]:not([data-zhento-rhythm-entry="accepted"]) .engine-emitter-energy--left {
+  animation: none !important;
+  opacity: 0 !important;
+}
+.site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control { pointer-events: none !important; }
+.site-shell[data-zhento-rhythm-entry]:not([data-zhento-rhythm-entry="accepted"]) .portfolio-engine-panel,
+.site-shell[data-zhento-rhythm-entry]:not([data-zhento-rhythm-entry="accepted"]) .engine-lightning-overlay {
+  opacity: 0 !important;
+  transition: opacity 170ms ease-out;
+}
+.site-shell[data-zhento-rhythm-entry]:is([data-zhento-rhythm-entry="converging"],[data-zhento-rhythm-entry="impact"],[data-zhento-rhythm-entry="warp"],[data-zhento-rhythm-entry="covered"]) .portfolio-engine-left-core {
+  animation: zhentoRhythmLeft 970ms cubic-bezier(.82,0,.96,.74) forwards !important;
+}
+.site-shell[data-zhento-rhythm-entry]:is([data-zhento-rhythm-entry="converging"],[data-zhento-rhythm-entry="impact"],[data-zhento-rhythm-entry="warp"],[data-zhento-rhythm-entry="covered"]) .portfolio-engine-reactor {
+  animation: zhentoRhythmRight 970ms cubic-bezier(.82,0,.96,.74) forwards !important;
+}
+.site-shell[data-zhento-rhythm-entry="reveal"] :is(.portfolio-engine-left-core,.portfolio-engine-reactor) {
+  animation: none !important;
+  transform: none !important;
+}
+.site-shell[data-zhento-rhythm-entry="reveal"] :is(.portfolio-engine-panel,.engine-lightning-overlay) { opacity: 1 !important; }
+.zhento-rhythm-entry {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  overflow: hidden;
+  contain: layout paint style;
+  isolation: isolate;
+}
+.zhento-rhythm-entry > span { position: absolute; display: block; pointer-events: none; }
+.zhento-rhythm-entry__cover {
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(ellipse at var(--zhento-entry-impact-x) var(--zhento-entry-impact-y), #30214d 0, #120c23 38%, #070610 85%);
+}
+.zhento-rhythm-entry__impact {
+  left: var(--zhento-entry-impact-x);
+  top: var(--zhento-entry-impact-y);
+  width: 9rem;
+  height: 9rem;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, #e4d1ff 0 3%, #b286ea 7%, #66499a88 22%, transparent 68%);
+  transform: translate(-50%,-50%) scale(.1);
+}
+.zhento-rhythm-entry__portal,
+.zhento-rhythm-warp-layer__streak-field {
+  position: absolute;
+  left: var(--zhento-entry-impact-x);
+  top: var(--zhento-entry-impact-y);
+  width: max(220vw,220vh);
+  height: max(220vw,220vh);
+  transform: translate3d(-50%,-50%,0) scale(.04);
+  transform-origin: center;
+  opacity: 0;
+  fill: none;
+}
+.zhento-rhythm-entry__portal {
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 35%, #7152ab18 36% 39%, #b6a0e855 40%, #9680cbb3 41%, #54408355 42%, transparent 44%);
+}
+.zhento-rhythm-warp-streak { stroke: #9775d6; stroke-width: .25; vector-effect: non-scaling-stroke; }
+.zhento-rhythm-warp-streak--hot { stroke: #d9c5fc; }
+.zhento-rhythm-warp-streak--primary { stroke-width: 1.3; }
+.zhento-rhythm-warp-streak--medium { stroke: #8797d8; stroke-width: .8; }
+.zhento-rhythm-warp-streak--faint { opacity: .45; }
+.zhento-rhythm-warp-streak-group { transform-origin: center; }
+.site-shell[data-zhento-rhythm-entry="impact"] .zhento-rhythm-entry__impact { animation: zhentoRhythmImpact 420ms ease-out forwards; }
+.site-shell:is([data-zhento-rhythm-entry="warp"],[data-zhento-rhythm-entry="covered"],[data-zhento-rhythm-entry="reveal"]) .zhento-rhythm-entry__cover { animation: zhentoRhythmCover 600ms ease-in forwards; }
+.site-shell:is([data-zhento-rhythm-entry="warp"],[data-zhento-rhythm-entry="covered"],[data-zhento-rhythm-entry="reveal"]) .zhento-rhythm-warp-layer__streak-field {
+  animation: daiionCrusadesWarpStreakField 2100ms linear forwards;
+}
+.site-shell:is([data-zhento-rhythm-entry="warp"],[data-zhento-rhythm-entry="covered"],[data-zhento-rhythm-entry="reveal"]) .zhento-rhythm-entry__portal {
+  animation: daiionCrusadesWarpShockwave 2100ms linear forwards;
+}
+/* The portal continues expanding while the mounted destination is unveiled. */
+.site-shell:is([data-zhento-rhythm-entry="covered"],[data-zhento-rhythm-entry="reveal"]) .zhento-rhythm-entry__portal {
+  animation: zhentoRhythmPortalOpen 1160ms cubic-bezier(.22,.64,.3,1) forwards;
+}
+.site-shell[data-zhento-rhythm-entry="reveal"] .zhento-rhythm-entry { animation: zhentoRhythmReveal 760ms ease-in-out forwards; }
+@keyframes zhentoRhythmBackOut { to { opacity: 0; } }
+@keyframes zhentoRhythmLeft { to { transform: translate3d(var(--zhento-entry-left-x),var(--zhento-entry-left-y),0); } }
+@keyframes zhentoRhythmRight { to { transform: translate3d(var(--zhento-entry-right-x),var(--zhento-entry-right-y),0); } }
+@keyframes zhentoRhythmImpact { 0% { opacity: .35; transform: translate(-50%,-50%) scale(.3); } 25% { opacity: .92; } 100% { opacity: .25; transform: translate(-50%,-50%) scale(1.3); } }
+@keyframes zhentoRhythmCover { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zhentoRhythmReveal { to { opacity: 0; } }
+@keyframes zhentoRhythmPortalOpen {
+  from { opacity: .8; transform: translate3d(-50%,-50%,0) scale(.08); }
+  60% { opacity: .64; }
+  to { opacity: 0; transform: translate3d(-50%,-50%,0) scale(1.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-zhento-rhythm-entry] :is(.prototype-engine-return-control__text,.engine-emitter-energy--left),
+  .site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control::before { animation: none !important; opacity: 0 !important; }
+  .zhento-rhythm-entry { display: none; }
+}
