@@ -30839,11 +30839,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .zhento-detail__stat {
   color: rgba(220, 230, 255, 0.92);
-  font-size: clamp(0.66rem, 0.82vw, 0.82rem);
+  margin: 0;
+  font-size: clamp(0.58rem, 0.72vw, 0.74rem);
   font-weight: 650;
   line-height: 1.06;
   text-align: center;
   text-transform: uppercase;
+  border-block-end: 1px solid rgba(137, 167, 255, 0.15);
   text-shadow: 0 0 0.32rem rgba(145, 112, 235, 0.18);
 }
 
@@ -30917,12 +30919,12 @@ button.hall-crusades-archive-crystal:focus-visible {
     inset-block-end: calc(7.15rem + (4 * 2.33rem) + 1.36rem + .58rem + .38rem + 3px + .375rem);
     inset-inline: 1rem;
     inline-size: auto;
-    padding: .125rem .5rem;
-    row-gap: .125rem;
+    padding: 1px .5rem;
+    row-gap: 1px;
     transform: none;
   }
-  .zhento-detail__title { padding-block-end: .2rem; }
-  .zhento-detail__copy { padding-block: .125rem; }
+  .zhento-detail__title { padding-block-end: 0; }
+  .zhento-detail__copy { padding-block: 0; }
 }
 
 /* Zhento follows the existing Daïion arrival prompt sequence. */

@@ -1878,6 +1878,7 @@ function requestMusicLandingStats() {
       element.textContent = value.toLocaleString();
       if (progress === 1) { element.dataset.statSource = "live"; session.counts.delete(key); }
     }
+    syncZhentoPillarStat();
     if (session.counts.size) session.frame = requestAnimationFrame(tick);
   };
   const resolveCount = (key, raw) => {
@@ -1887,11 +1888,13 @@ function requestMusicLandingStats() {
     if (!Number.isSafeInteger(total) || total < 0) {
       element.textContent = "—";
       element.dataset.statSource = "unavailable";
+      syncZhentoPillarStat();
       return;
     }
     if (reducedMotion.matches || total === 0) {
       element.textContent = total.toLocaleString();
       element.dataset.statSource = "live";
+      syncZhentoPillarStat();
       return;
     }
     element.dataset.statSource = "counting";
@@ -3101,6 +3104,24 @@ const ZHENTO_PILLAR_DESCRIPTIONS = {
   shows: "Where everything converges. Shows preserve the moments when bands, people, places, and the Pulse aligned in a single shared experience.",
 };
 
+const ZHENTO_PILLAR_STAT_LABELS = {
+  bands: "SOURCES OF THE PULSE",
+  people: "VOICES IN THE CHORUS",
+  venues: "PLACES OF RESONANCE",
+  shows: "RECORDED CONVERGENCES",
+};
+
+function syncZhentoPillarStat() {
+  const landing = document.querySelector("[data-zhento-landing]");
+  const key = landing?.dataset.selectedDestination;
+  const stat = landing?.querySelector(".zhento-detail__stat");
+  if (!stat || !ZHENTO_PILLAR_STAT_LABELS[key]) return;
+  const source = getMusicLandingStatValueElement(key);
+  const value = ["live", "counting"].includes(source?.dataset.statSource) ? source.textContent : "—";
+  const text = `${value} ${ZHENTO_PILLAR_STAT_LABELS[key]}`;
+  if (stat.textContent !== text) stat.textContent = text;
+}
+
 let zhentoSelectionGeneration = 0;
 let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
@@ -3110,6 +3131,11 @@ function resetZhentoLandingSelection() {
   zhentoPromptExit?.cancel();
   zhentoPromptExit = null;
   delete landing.dataset.selectedDestination;
+  if (!landing.querySelector(".zhento-detail__stat")) {
+    const stat = document.createElement("p");
+    stat.className = "zhento-detail__stat";
+    landing.querySelector(".zhento-detail__title").after(stat);
+  }
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
   landing.querySelector(".zhento-detail").hidden = true;
   landing.querySelector(".zhento-destination-prompt").hidden = false;
@@ -3131,6 +3157,7 @@ function resetZhentoLandingSelection() {
       });
       landing.querySelector(".zhento-detail__title").textContent = button.textContent.trim();
       landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[button.dataset.zhentoDestination];
+      syncZhentoPillarStat();
       const prompt = landing.querySelector(".zhento-destination-prompt");
       const selection = landing.dataset.selectedDestination;
       const revealDetail = () => {
