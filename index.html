@@ -389,10 +389,10 @@
           <section class="rhythm-pillar" aria-labelledby="rhythm-title" aria-hidden="false" data-rhythm-source-index>
             <header class="rhythm-heading"><h1 id="rhythm-title">PILLAR OF RHYTHM</h1><p>Bands // Sources of the Pulse</p></header>
             <div class="rhythm-modes" role="tablist" aria-label="Pillar of Rhythm modes">
-              <button class="rhythm-mode" id="rhythm-source-tab" type="button" role="tab" aria-selected="true" aria-controls="rhythm-source-panel">SOURCE INDEX</button>
-              <button class="rhythm-mode" type="button" role="tab" aria-selected="false" disabled title="Coming soon">SEARCH</button>
+              <button class="rhythm-mode" id="rhythm-source-tab" data-bands-view-target="list" type="button" role="tab" aria-selected="true" aria-controls="rhythm-source-panel">SOURCE INDEX</button>
+              <button class="rhythm-mode" id="rhythm-search-tab" data-bands-view-target="search" type="button" role="tab" aria-selected="false" aria-controls="rhythm-search-panel">SEARCH</button>
             </div>
-            <section id="rhythm-source-panel" class="rhythm-source-panel" role="tabpanel" aria-labelledby="rhythm-source-tab">
+            <section id="rhythm-source-panel" data-bands-view="list" class="rhythm-source-panel" role="tabpanel" aria-labelledby="rhythm-source-tab">
               <div class="rhythm-source-filters">
                 <label>Letter<select data-bands-filter="letter" aria-label="Filter Bands by letter"><option value="">All</option></select></label>
                 <label>Region<select data-bands-filter="region" aria-label="Filter Bands by region"><option value="">All regions</option><option value="local">Local</option><option value="regional">Regional</option><option value="national">National</option><option value="international">International</option></select></label>
@@ -403,6 +403,11 @@
               <div class="rhythm-rolodex-controls" aria-label="Move through Bands"><button type="button" data-rhythm-previous aria-label="Previous Band">&#9650;</button><button type="button" data-rhythm-next aria-label="Next Band">&#9660;</button></div>
               <div class="rhythm-rolodex" data-rhythm-rolodex tabindex="0" aria-label="Band rolodex, scroll to select a Band"><ul class="rhythm-source-list" data-rhythm-source-list aria-label="Bands Source Index"></ul></div>
               <button class="rhythm-source-more" type="button" data-rhythm-source-more hidden>Load more Bands</button>
+            </section>
+            <section id="rhythm-search-panel" class="rhythm-search-panel" data-bands-view="search" role="tabpanel" aria-labelledby="rhythm-search-tab" hidden inert aria-hidden="true">
+              <label class="rhythm-search-control" for="rhythm-search-input">SEARCH BANDS<input id="rhythm-search-input" data-bands-search-input type="search" placeholder="SEARCH BANDS" autocomplete="off" spellcheck="false"></label>
+              <p class="rhythm-source-status" role="status" data-bands-search-summary>SEARCH THE SOURCES</p>
+              <ul class="rhythm-search-results" data-bands-search-results aria-label="Band search results"></ul>
             </section>
           </section>
         </section>

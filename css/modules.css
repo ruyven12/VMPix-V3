@@ -31215,9 +31215,20 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 /* Lifecycle and rolodex selection are independent: solid/live vs dashed/archived. */
-.rhythm-rolodex .rhythm-source-row[data-band-status="active"] { border-style:solid;border-color:#aa8bc5;background:linear-gradient(110deg,#1d1930eb,#292039e3); }
-.rhythm-rolodex .rhythm-source-row[data-band-status="active"].is-active { border-color:#e4d8ff;box-shadow:inset 0 0 1rem #ac7bd724; }
-.rhythm-rolodex .rhythm-source-row[data-band-status="inactive"] { border-style:dashed;border-color:#77717f;background:linear-gradient(110deg,#18191feb,#22222be3); }
-.rhythm-rolodex .rhythm-source-row[data-band-status="inactive"].is-active { border-color:#bbb4c9;box-shadow:inset 0 0 .5rem #8c7ca50c; }
-.rhythm-rolodex .rhythm-source-row[data-band-status="inactive"] .rhythm-source-art { filter:saturate(.2);opacity:.82; }
-.rhythm-rolodex .rhythm-source-row[data-band-status="unknown"] .rhythm-source-lifecycle { display:none; }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="active"] { border-style:solid;border-color:#aa8bc5;background:linear-gradient(110deg,#1d1930eb,#292039e3); }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="active"].is-active { border-color:#e4d8ff;box-shadow:inset 0 0 1rem #ac7bd724; }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="inactive"] { border-style:dashed;border-color:#77717f;background:linear-gradient(110deg,#18191feb,#22222be3); }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="inactive"].is-active { border-color:#bbb4c9;box-shadow:inset 0 0 .5rem #8c7ca50c; }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="inactive"] .rhythm-source-art { filter:saturate(.2);opacity:.82; }
+:is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="unknown"] .rhythm-source-lifecycle { display:none; }
+
+/* Source retrieval shares the current Pillar viewport and existing Band state. */
+.rhythm-pillar [data-bands-view][hidden] { display:none; }
+.rhythm-search-panel { display:flex;flex-direction:column;flex:1;min-height:0;min-width:0; }
+.rhythm-search-control { display:grid;flex:none;gap:.35rem;font-size:.75rem;color:#d9c9f3; }
+.rhythm-search-control input { box-sizing:border-box;width:100%;min-width:0;min-height:48px;padding:.7rem .8rem;border:1px solid #ad8bdb88;border-radius:3px;background:#181428ed;color:#f1edff;font:inherit;font-size:1rem; }
+.rhythm-search-control input:focus-visible { outline:1px solid #e4d8ff;outline-offset:2px; }
+.rhythm-search-results { display:grid;align-content:start;gap:.5rem;min-height:0;margin:0;padding:0 0 .5rem;overflow-y:auto;overflow-x:hidden;list-style:none;scrollbar-width:thin;scrollbar-color:#9c77c677 transparent; }
+.rhythm-search-results .rhythm-source-row { box-sizing:border-box;min-height:76px; }
+.rhythm-search-results .rhythm-source-art { flex-basis:52px;height:52px; }
+.rhythm-search-results .rhythm-source-name { display:grid;gap:.3rem;min-width:0;font-size:1rem;line-height:1.35;overflow-wrap:anywhere; }
