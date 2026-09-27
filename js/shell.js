@@ -3127,6 +3127,15 @@ let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
+  const artwork = landing.querySelector(".zhento-landing__artwork");
+  if (artwork && !artwork.querySelector(".zhento-atmosphere")) {
+    const atmosphere = document.createElement("div");
+    atmosphere.className = "zhento-atmosphere";
+    atmosphere.setAttribute("aria-hidden", "true");
+    atmosphere.innerHTML = '<div class="zhento-atmosphere__heartbeat"></div><div class="zhento-atmosphere__wake"></div>'
+      + Array.from({ length: 10 }, () => '<i class="zhento-atmosphere__mote"></i>').join("");
+    artwork.append(atmosphere);
+  }
   const generation = ++zhentoSelectionGeneration;
   zhentoPromptExit?.cancel();
   zhentoPromptExit = null;

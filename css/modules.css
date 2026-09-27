@@ -30233,6 +30233,76 @@ button.hall-crusades-archive-crystal:focus-visible {
   z-index: -1;
   background: linear-gradient(0deg, rgba(6,8,25,.32), transparent 45%), url("../assets/media/background/zhento-main.png") 58% center / cover no-repeat;
 }
+/* Zhento atmosphere stays inside the artwork layer, below all landing UI. */
+.zhento-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: layout paint style;
+}
+.zhento-atmosphere__heartbeat {
+  position: absolute;
+  inset-inline: -12%;
+  inset-block-start: 43%;
+  block-size: 24%;
+  background: radial-gradient(ellipse at 65% 48%, rgba(188,183,255,.48), rgba(127,152,255,.26) 28%, rgba(119,99,227,.1) 52%, transparent 73%);
+  opacity: .22;
+}
+.zhento-atmosphere__wake {
+  position: absolute;
+  inset-inline: -12%;
+  inset-block-start: 49%;
+  block-size: clamp(4rem, 11vh, 8rem);
+  background: linear-gradient(180deg, transparent, rgba(145,176,255,.06) 30%, rgba(202,215,255,.3) 54%, rgba(162,144,255,.13) 66%, transparent);
+  opacity: 0;
+  transform: translate3d(0,24vh,0) skewY(-7deg);
+}
+.zhento-atmosphere__mote {
+  position: absolute;
+  left: var(--mote-x);
+  top: var(--mote-y);
+  width: var(--mote-size, 3px);
+  height: var(--mote-size, 3px);
+  border-radius: 50%;
+  background: #dce9ff;
+  box-shadow: 0 0 5px 1px rgba(159,153,255,.65);
+  opacity: .82;
+}
+.zhento-atmosphere__mote:nth-of-type(1) { --mote-x: 12%; --mote-y: 43%; --mote-size: 3px; --mote-time: 17s; --mote-delay: -3s; }
+.zhento-atmosphere__mote:nth-of-type(2) { --mote-x: 32%; --mote-y: 37%; --mote-size: 2px; --mote-time: 22s; --mote-delay: -11s; }
+.zhento-atmosphere__mote:nth-of-type(3) { --mote-x: 71%; --mote-y: 26%; --mote-size: 3px; --mote-time: 19s; --mote-delay: -8s; }
+.zhento-atmosphere__mote:nth-of-type(4) { --mote-x: 87%; --mote-y: 38%; --mote-size: 2px; --mote-time: 25s; --mote-delay: -15s; }
+.zhento-atmosphere__mote:nth-of-type(5) { --mote-x: 18%; --mote-y: 58%; --mote-size: 4px; --mote-time: 20s; --mote-delay: -6s; }
+.zhento-atmosphere__mote:nth-of-type(6) { --mote-x: 42%; --mote-y: 54%; --mote-size: 2px; --mote-time: 24s; --mote-delay: -17s; }
+.zhento-atmosphere__mote:nth-of-type(7) { --mote-x: 80%; --mote-y: 54%; --mote-size: 3px; --mote-time: 18s; --mote-delay: -12s; }
+.zhento-atmosphere__mote:nth-of-type(8) { --mote-x: 10%; --mote-y: 76%; --mote-size: 3px; --mote-time: 23s; --mote-delay: -9s; }
+.zhento-atmosphere__mote:nth-of-type(9) { --mote-x: 30%; --mote-y: 85%; --mote-size: 4px; --mote-time: 21s; --mote-delay: -14s; }
+.zhento-atmosphere__mote:nth-of-type(10) { --mote-x: 61%; --mote-y: 79%; --mote-size: 2px; --mote-time: 26s; --mote-delay: -5s; }
+.site-shell[data-shell-route="music"] .zhento-atmosphere__heartbeat { animation: zhentoCityHeartbeat 7600ms ease-in-out infinite; }
+.site-shell[data-shell-route="music"] .zhento-atmosphere__wake { animation: zhentoPulseWake 9s linear 3s infinite; }
+.site-shell[data-shell-route="music"] .zhento-atmosphere__mote { animation: zhentoResonanceDrift var(--mote-time) ease-in-out var(--mote-delay) infinite alternate; }
+@keyframes zhentoCityHeartbeat {
+  0%, 58%, 100% { opacity: .18; }
+  20% { opacity: .88; }
+  30% { opacity: .28; }
+  39% { opacity: .58; }
+}
+@keyframes zhentoPulseWake {
+  0% { opacity: 0; transform: translate3d(0,24vh,0) skewY(-7deg); }
+  9% { opacity: .82; }
+  28% { opacity: .62; }
+  42%, 100% { opacity: 0; transform: translate3d(0,-29vh,0) skewY(-7deg); }
+}
+@keyframes zhentoResonanceDrift {
+  from { transform: translate3d(-7px,13px,0); opacity: .62; }
+  to { transform: translate3d(10px,-19px,0); opacity: .96; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zhento-atmosphere__heartbeat { opacity: .42; }
+  .zhento-atmosphere__wake { display: none; }
+  .zhento-atmosphere__mote { opacity: .82; }
+}
 .zhento-identity {
   --zhento-hud-x: calc(50vw - clamp(2.2rem, 6.2vw, 7.5rem) - clamp(9.95rem, 10.2vw, 12.25rem));
   --zhento-hud-y: clamp(-25rem, -36.5svh, -21rem);
