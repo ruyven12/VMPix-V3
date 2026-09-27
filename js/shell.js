@@ -3095,6 +3095,13 @@ function showPortfolioHubView() {
   setActiveGlobalNav("portfolio");
 }
 
+const ZHENTO_PILLAR_DESCRIPTIONS = {
+  bands: "Where the Pulse begins. The bands whose sound, energy, and identity shaped Zhento are preserved within the Pillar of Rhythm.",
+  people: "The voices within the Pulse. The Chorus preserves the people who shaped the scene, carried its stories, and gave its music a human presence.",
+  venues: "The places where the Pulse found form. These spaces brought artists, audiences, and sound together, becoming the architecture of Zhento’s musical history.",
+  shows: "Where everything converges. Shows preserve the moments when bands, people, places, and the Pulse aligned in a single shared experience.",
+};
+
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
@@ -3114,6 +3121,7 @@ function resetZhentoLandingSelection() {
         item.setAttribute("aria-pressed", String(item === button));
       });
       landing.querySelector(".zhento-detail__title").textContent = button.textContent.trim();
+      landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[button.dataset.zhentoDestination];
       landing.querySelector(".zhento-detail").hidden = false;
       landing.querySelector(".zhento-destination-prompt").hidden = true;
     });
