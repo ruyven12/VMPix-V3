@@ -3131,6 +3131,7 @@ function resetZhentoLandingSelection() {
   zhentoPromptExit?.cancel();
   zhentoPromptExit = null;
   delete landing.dataset.selectedDestination;
+  landing.querySelector(".zhento-detail .zhento-enter").textContent = "ENTER THE PILLAR";
   if (!landing.querySelector(".zhento-detail__stat")) {
     const stat = document.createElement("p");
     stat.className = "zhento-detail__stat";

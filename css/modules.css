@@ -30840,12 +30840,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-detail__stat {
   color: rgba(220, 230, 255, 0.92);
   margin: 0;
-  font-size: clamp(0.58rem, 0.72vw, 0.74rem);
+  font-size: clamp(0.66rem, 0.82vw, 0.82rem);
   font-weight: 650;
   line-height: 1.06;
   text-align: center;
   text-transform: uppercase;
-  border-block-end: 1px solid rgba(137, 167, 255, 0.15);
   text-shadow: 0 0 0.32rem rgba(145, 112, 235, 0.18);
 }
 
