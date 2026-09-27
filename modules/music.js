@@ -8053,11 +8053,13 @@ function createRhythmSourceRow(band,select) {
   const url=getBandDetailLogoUrl(band);if(url){const image=document.createElement('img');image.alt='';image.loading='lazy';image.decoding='async';image.addEventListener('error',()=>image.remove(),{once:true});image.src=url;art.append(image);}
   const name=document.createElement('span');name.className='rhythm-source-name';
   const title=document.createElement('span');title.textContent=band.name;
-  const raw=band.backend_record||band,lifecycle=getBandDetailLifecycleStatus(getBandDetailGeneral(raw),raw);
+  const raw=band.backend_record||band,lifecycle=getBandDetailLifecycleStatus(getBandDetailGeneral(raw),raw).trim().toLowerCase();
+  const statusKey=lifecycle==='active'||lifecycle==='inactive'?lifecycle:'unknown';
+  row.dataset.bandStatus=statusKey;
   const status=document.createElement('span');status.className='rhythm-source-lifecycle';
   const statusLabel=document.createElement('span');statusLabel.textContent='Status';
-  const statusValue=document.createElement('span');statusValue.className='rhythm-source-lifecycle-value';statusValue.textContent=lifecycle.toUpperCase();
-  const statusKey=lifecycle.toLowerCase();if(statusKey==='active'||statusKey==='inactive')status.dataset.lifecycle=statusKey;
+  const statusValue=document.createElement('span');statusValue.className='rhythm-source-lifecycle-value';statusValue.textContent=statusKey.toUpperCase();
+  if(statusKey!=='unknown')status.dataset.lifecycle=statusKey;
   status.append(statusLabel,statusValue);name.append(title,status);
   row.append(art,name);row.addEventListener('click',()=>{if(row.classList.contains('is-active'))navigateToBandDetail(band);else select();});item.append(row);return item;
 }
@@ -8086,7 +8088,7 @@ function renderRhythmSourceIndex() {
     if(session.active!==nearest){
       const mobile=window.matchMedia('(max-width: 899px)').matches;
       const before=buttons[nearest].parentElement.getBoundingClientRect();
-      buttons.forEach((button,index)=>{const active=index===nearest;button.parentElement.classList.toggle('is-active',active);button.classList.toggle('is-active',active);button.setAttribute('aria-current',String(active));button.querySelector('.rhythm-source-telemetry')?.remove();button.setAttribute('aria-label',(active?'Open ':'Select ')+rows[index].name+(active?' band detail':''));if(active)button.append(createRhythmSourceTelemetry(rows[index]));});session.active=nearest;
+      buttons.forEach((button,index)=>{const active=index===nearest;button.parentElement.classList.toggle('is-active',active);button.classList.toggle('is-active',active);button.setAttribute('aria-current',String(active));button.querySelector('.rhythm-source-telemetry')?.remove();button.setAttribute('aria-label',(active?'Open ':'Select ')+rows[index].name+(active?' band detail':'')+(button.dataset.bandStatus==='unknown'?'':', '+button.dataset.bandStatus+' band'));if(active)button.append(createRhythmSourceTelemetry(rows[index]));});session.active=nearest;
       // A compact peek grows into the dossier. Keep its center fixed on screen
       // so the height swap cannot select a different row or jump the scroll.
       if(mobile&&preserveCenter){const after=buttons[nearest].parentElement.getBoundingClientRect();view.scrollTop+=after.top+after.height/2-before.top-before.height/2;}
