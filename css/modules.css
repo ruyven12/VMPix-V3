@@ -31182,3 +31182,29 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-source-row.is-active .rhythm-source-lifecycle { display:flex;flex-direction:column;align-items:center;gap:.15rem;margin-top:.45rem;padding:.2rem .3rem;border:1px solid #a38cd655;border-radius:3px;font:inherit;line-height:1.15;color:#c6bfd7; }
 .rhythm-source-lifecycle[data-lifecycle="active"] .rhythm-source-lifecycle-value { color:#80e6a0; }
 .rhythm-source-lifecycle[data-lifecycle="inactive"] .rhythm-source-lifecycle-value { color:#f0d66c; }
+/* Mobile scanner: compact peeks surround the full active dossier. */
+.rhythm-rolodex-stage { display:contents; }
+@media (max-width: 899px) {
+  .rhythm-source-filters { grid-template-columns:repeat(3,minmax(0,1fr)) auto;padding:.4rem;gap:.3rem; }
+  .rhythm-source-filters label { gap:.2rem; }
+  .rhythm-source-filters label+label { padding-inline-start:.3rem; }
+  .rhythm-source-filters select { padding-inline:.25rem; }
+  .rhythm-source-filters button { grid-column:auto;width:3.25rem;padding:.25rem;align-self:end;line-height:1.2; }
+  .rhythm-source-status { margin:.35rem 0;font-size:.72rem; }
+  .rhythm-source-panel > .rhythm-rolodex-stage { position:relative;display:flex;flex:1 1 auto;min-height:calc(clamp(8.5rem,15svh,11rem) + 10rem);margin-inline:-1rem; }
+  .rhythm-rolodex-stage .rhythm-rolodex { min-width:0;scroll-snap-type:none; }
+  .rhythm-rolodex .rhythm-source-list { padding-inline:36px; }
+  .rhythm-rolodex .rhythm-source-list>li { height:72px;scroll-snap-align:none; }
+  .rhythm-rolodex .rhythm-source-list>li.is-active { height:auto;min-height:var(--rhythm-card-height); }
+  .rhythm-rolodex .rhythm-source-row { padding:.625rem;gap:.5rem;transform:none; }
+  .rhythm-rolodex .rhythm-source-row:not(.is-active) { grid-template-columns:40px minmax(0,1fr); }
+  .rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-name { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .rhythm-rolodex .rhythm-source-row.is-active { height:auto;min-height:var(--rhythm-card-height);grid-template-columns:minmax(0,.95fr) minmax(0,1.2fr) minmax(4.25rem,.7fr); }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art { height:calc(var(--rhythm-card-height) - 1.375rem); }
+  .rhythm-rolodex .rhythm-source-name { min-width:0; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-lifecycle { display:none; }
+  .rhythm-rolodex-controls { position:absolute;inset:50% 0 auto;z-index:2;display:flex;justify-content:space-between;gap:0;margin:0;transform:translateY(-50%);pointer-events:none; }
+  .rhythm-rolodex-controls button { pointer-events:auto;background:linear-gradient(90deg,transparent 8px,#291b40dd 8px,#291b40dd 36px,transparent 36px);border:0; }
+  .rhythm-rolodex-controls button:focus-visible { outline:1px solid #c5a2ff;outline-offset:-5px; }
+  .rhythm-source-more { font-size:.72rem;padding-inline:.7rem; }
+}

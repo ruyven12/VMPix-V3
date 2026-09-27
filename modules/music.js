@@ -8068,6 +8068,8 @@ function renderRhythmSourceIndex() {
   if(rhythmSourceSession?.all===all&&rhythmSourceSession.key===key)return;
   if(rhythmSourceSession?.frame)cancelAnimationFrame(rhythmSourceSession.frame);
   const list=musicBandsIndex.querySelector('[data-rhythm-source-list]'),status=musicBandsIndex.querySelector('[data-rhythm-source-status]'),more=musicBandsIndex.querySelector('[data-rhythm-source-more]'),view=musicBandsIndex.querySelector('[data-rhythm-rolodex]'),previous=musicBandsIndex.querySelector('[data-rhythm-previous]'),next=musicBandsIndex.querySelector('[data-rhythm-next]');
+  // Keep the existing controls beside the scanner without changing desktop flow.
+  if(!view.parentElement.classList.contains('rhythm-rolodex-stage')){const stage=document.createElement('div');stage.className='rhythm-rolodex-stage';view.before(stage);stage.append(previous.parentElement,view);}
   list.replaceChildren();status.replaceChildren();more.hidden=true;more.onclick=null;view.onscroll=null;view.hidden=true;previous.disabled=true;next.disabled=true;
   const session={all,key,active:-1,frame:0};rhythmSourceSession=session;
   if(state!=='live'){status.textContent=state==='error'?'Source Index unavailable. ':'Retrieving Source Index…';if(state==='error'){const retry=document.createElement('button');retry.type='button';retry.textContent='Retry Bands';retry.addEventListener('click',retryMusicBandsIndexState);status.append(retry);}return;}
@@ -8077,11 +8079,23 @@ function renderRhythmSourceIndex() {
     session.frame=0;if(rhythmSourceSession!==session||!view.clientHeight)return;
     const center=view.getBoundingClientRect().top+view.clientHeight/2;let nearest=0,distance=Infinity;
     buttons.forEach((button,index)=>{const rect=button.getBoundingClientRect(),d=Math.abs(rect.top+rect.height/2-center);if(d<distance){distance=d;nearest=index;}});
-    if(session.active!==nearest){buttons.forEach((button,index)=>{const active=index===nearest;button.classList.toggle('is-active',active);button.setAttribute('aria-current',String(active));button.querySelector('.rhythm-source-telemetry')?.remove();button.setAttribute('aria-label',(active?'Open ':'Select ')+rows[index].name+(active?' band detail':''));if(active)button.append(createRhythmSourceTelemetry(rows[index]));});session.active=nearest;}
+    activate(nearest,true);
     previous.disabled=nearest===0;next.disabled=nearest>=rows.length-1;
   }
+  function activate(nearest,preserveCenter=false){
+    if(session.active!==nearest){
+      const mobile=window.matchMedia('(max-width: 899px)').matches;
+      const before=buttons[nearest].parentElement.getBoundingClientRect();
+      buttons.forEach((button,index)=>{const active=index===nearest;button.parentElement.classList.toggle('is-active',active);button.classList.toggle('is-active',active);button.setAttribute('aria-current',String(active));button.querySelector('.rhythm-source-telemetry')?.remove();button.setAttribute('aria-label',(active?'Open ':'Select ')+rows[index].name+(active?' band detail':''));if(active)button.append(createRhythmSourceTelemetry(rows[index]));});session.active=nearest;
+      // A compact peek grows into the dossier. Keep its center fixed on screen
+      // so the height swap cannot select a different row or jump the scroll.
+      if(mobile&&preserveCenter){const after=buttons[nearest].parentElement.getBoundingClientRect();view.scrollTop+=after.top+after.height/2-before.top-before.height/2;}
+    }
+  }
   function center(index,behavior=reducedMotion.matches?'auto':'smooth'){
-    const button=buttons[Math.max(0,Math.min(index,buttons.length-1))];if(!button)return;
+    index=Math.max(0,Math.min(index,buttons.length-1));const button=buttons[index];if(!button)return;
+    // Resolve the mobile card height before centering, not midway through a scroll.
+    if(window.matchMedia('(max-width: 899px)').matches){activate(index);behavior='auto';}
     const rect=button.getBoundingClientRect();view.scrollTo({top:view.scrollTop+rect.top+rect.height/2-view.getBoundingClientRect().top-view.clientHeight/2,behavior});if(behavior==='auto')sync();
   }
   const append=()=>{const fragment=document.createDocumentFragment(),end=Math.min(count+24,rows.length);while(count<end){const index=count++,item=createRhythmSourceRow(rows[index],()=>center(index));buttons.push(item.firstElementChild);fragment.append(item);}list.append(fragment);status.textContent=count+' / '+rows.length+' Bands'+(rows.length!==all.length?' · '+all.length+' in archive':'');more.hidden=count>=rows.length;sync();};
