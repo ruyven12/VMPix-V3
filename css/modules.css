@@ -30915,11 +30915,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (max-width:540px) {
   .zhento-detail {
     inset-block-end: calc(7.15rem + (4 * 2.33rem) + 1.36rem + .58rem + .38rem + 3px + .375rem);
-    padding-block: .5rem;
-    row-gap: .25rem;
+    inset-inline: 1rem;
+    inline-size: auto;
+    padding: .125rem .5rem;
+    row-gap: .125rem;
     transform: none;
   }
-  .zhento-detail__copy { padding-block: .25rem; }
+  .zhento-detail__title { padding-block-end: .2rem; }
+  .zhento-detail__copy { padding-block: .125rem; }
 }
 
 /* Zhento follows the existing Daïion arrival prompt sequence. */
