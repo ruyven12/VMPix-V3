@@ -8037,6 +8037,79 @@ function renderBandsLetterNavs(rows) {
   });
 }
 
+// One visual arrival per viewport entry; data and retained browse state remain independent.
+let rhythmArrival = null;
+let rhythmArrivalPresented = false;
+const rhythmArrivalGroups = {
+  world: '.rhythm-heading, .zhento-top-hud-rail, .zhento-side-hud-rail',
+  controls: '.rhythm-modes, .rhythm-source-filters, [data-rhythm-source-status], .rhythm-search-control',
+  dossier: '.rhythm-source-list > li.is-active, .rhythm-rolodex-controls, [data-bands-search-summary]',
+};
+function syncRhythmArrivalInput() {
+  if (!rhythmViewport || !musicBandsIndex) return;
+  const complete = rhythmViewport.dataset.rhythmArrival === 'complete';
+  const controls = complete || rhythmViewport.hasAttribute('data-rhythm-controls-ready');
+  const dossier = complete || rhythmViewport.hasAttribute('data-rhythm-dossier-ready');
+  musicBandsIndex.querySelectorAll(rhythmArrivalGroups.controls).forEach(node => { node.inert = !controls; });
+  musicBandsIndex.querySelectorAll('.rhythm-rolodex-controls, [data-bands-search-summary]').forEach(node => { node.inert = !dossier; });
+  musicBandsIndex.querySelectorAll('.rhythm-source-list > li').forEach(node => { node.inert = !(complete || (dossier && node.classList.contains('is-active'))); });
+  musicBandsIndex.querySelectorAll('.rhythm-search-results, .rhythm-source-more').forEach(node => { node.inert = !complete; });
+  const scanner = musicBandsIndex.querySelector('[data-rhythm-rolodex]');
+  if (scanner) scanner.tabIndex = complete ? 0 : -1;
+}
+function finishRhythmArrival() {
+  const arrival = rhythmArrival;
+  rhythmArrival = null;
+  arrival?.animations.forEach(animation => animation.cancel());
+  rhythmViewport.dataset.rhythmArrival = 'complete';
+  rhythmViewport.removeAttribute('data-rhythm-controls-ready');
+  rhythmViewport.removeAttribute('data-rhythm-dossier-ready');
+  rhythmViewport.querySelectorAll('[data-rhythm-peek-reveal]').forEach(node => node.removeAttribute('data-rhythm-peek-reveal'));
+  syncRhythmArrivalInput();
+}
+function prepareRhythmArrival(restore = false) {
+  finishRhythmArrival();
+  if (reducedMotion.matches || (restore && rhythmArrivalPresented)) return;
+  rhythmArrival = { animations: [], started: false };
+  rhythmViewport.dataset.rhythmArrival = 'waiting';
+  syncRhythmArrivalInput();
+}
+async function startRhythmArrival() {
+  const arrival = rhythmArrival;
+  if (!arrival || arrival.started || rhythmViewport.hidden || shell.hasAttribute('data-zhento-rhythm-entry')) return;
+  if (reducedMotion.matches) { finishRhythmArrival(); return; }
+  arrival.started = true;
+  rhythmArrivalPresented = true;
+  // Sequential animation completion keeps interaction tied to the painted tier, not API timers.
+  for (const [tier, duration] of [['world',250],['controls',300],['dossier',350],['peeks',350]]) {
+    if (rhythmArrival !== arrival) return;
+    rhythmViewport.dataset.rhythmArrival = tier;
+    let nodes;
+    if (tier === 'peeks') {
+      const scanner = musicBandsIndex.querySelector('[data-rhythm-rolodex]');
+      const bounds = scanner.getBoundingClientRect();
+      nodes = [...musicBandsIndex.querySelectorAll('.rhythm-source-list > li:not(.is-active)')].filter(node => {
+        const rect = node.getBoundingClientRect();
+        return rect.bottom > bounds.top && rect.top < bounds.bottom;
+      });
+      nodes.forEach(node => node.setAttribute('data-rhythm-peek-reveal',''));
+      nodes.push(...musicBandsIndex.querySelectorAll('.rhythm-search-results, .rhythm-source-more'));
+    } else nodes = [...rhythmViewport.querySelectorAll(rhythmArrivalGroups[tier])];
+    nodes = nodes.filter(node => node.getClientRects().length && !node.closest('[hidden]'));
+    // Empty tiers add no artificial wait; real loading/error feedback remains usable.
+    const animations = nodes.map(node => node.animate([{opacity:0},{opacity:getComputedStyle(node).opacity}], {duration,easing:'cubic-bezier(.2,.65,.3,1)',fill:'backwards'}));
+    arrival.animations.push(...animations);
+    await Promise.all(animations.map(animation => animation.finished.catch(() => {})));
+    if (rhythmArrival !== arrival) return;
+    animations.forEach(animation => animation.cancel());
+    if (tier === 'controls') rhythmViewport.setAttribute('data-rhythm-controls-ready','');
+    if (tier === 'dossier') rhythmViewport.setAttribute('data-rhythm-dossier-ready','');
+    syncRhythmArrivalInput();
+  }
+  if (rhythmArrival === arrival) finishRhythmArrival();
+}
+reducedMotion.addEventListener('change', () => { if (reducedMotion.matches && rhythmArrival) finishRhythmArrival(); });
+
 let rhythmSourceSession = null;
 function getRhythmSourceStatus(band) {
   const raw=band.backend_record||band, stats=raw.stats||{};
@@ -8508,6 +8581,7 @@ function scrollBandsIndexIntoView() {
 function syncBandsIndex() {
   if (musicBandsIndex?.hasAttribute("data-rhythm-source-index")) {
     if (activeBandsView === "search") renderRhythmSearch(); else renderRhythmSourceIndex();
+    syncRhythmArrivalInput();
     return;
   }
   const allRows = getMusicBandsIndexCollection();

@@ -3137,6 +3137,7 @@ function cancelZhentoRhythmEntry() {
     shell.style.removeProperty(`--zhento-entry-${key}`);
   }
   updatePrototypeEngineReturnEmitter(getRouteFromUrl());
+  if (getRouteFromUrl().name === "music-bands") startRhythmArrival();
 }
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
@@ -3310,8 +3311,11 @@ function resetZhentoLandingSelection() {
   });
 }
 
-function syncRhythmPresentationOwnership(route) {
+function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
+  const entering = active && (rhythmViewport.hidden || !rhythmViewport.hasAttribute('data-rhythm-arrival'));
+  if (!active) finishRhythmArrival();
+  else if (entering) prepareRhythmArrival(Boolean(options.historyState || options.navigationDirection === 'back'));
   for (const [id, node] of [['home-presentation-template', homeFrame], ['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
     const template = document.getElementById(id);
     if (active && node?.isConnected) template.content.append(node);
@@ -3333,6 +3337,8 @@ function showRhythmPillar() {
   setHubChromeHidden(true); setActiveGlobalNav('music');
   setPortfolioEngineHudCurrentView('Pillar of Rhythm');
   syncBandsIndex(); requestMusicBandsIndexData();
+  // The warp owns visibility until cleanup. Direct entries begin after this mount resolves.
+  requestAnimationFrame(() => startRhythmArrival());
 }
 
 function showMusicNexus(options = {}) {

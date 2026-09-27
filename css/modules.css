@@ -31303,3 +31303,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 .rhythm-search-results .rhythm-source-row { box-sizing:border-box;min-height:76px; }
 .rhythm-search-results .rhythm-source-art { flex-basis:52px;height:52px; }
 .rhythm-search-results .rhythm-source-name { display:grid;gap:.3rem;min-width:0;font-size:1rem;line-height:1.35;overflow-wrap:anywhere; }
+
+/* Rhythm arrival changes paint/input only; every tier retains its measured space. */
+.rhythm-viewport:not([data-rhythm-arrival="complete"]) :where(.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-source-list > li,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-search-results,.rhythm-source-more) { visibility:hidden; }
+.rhythm-viewport:is(:not([data-rhythm-arrival]),[data-rhythm-arrival="waiting"]) :is(.rhythm-heading,.zhento-top-hud-rail,.zhento-side-hud-rail) { visibility:hidden; }
+.rhythm-viewport:is([data-rhythm-arrival="controls"],[data-rhythm-arrival="dossier"],[data-rhythm-arrival="peeks"]) :is(.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control) { visibility:visible; }
+.rhythm-viewport:is([data-rhythm-arrival="dossier"],[data-rhythm-arrival="peeks"]) :is(.rhythm-source-list > li.is-active,.rhythm-rolodex-controls,[data-bands-search-summary]) { visibility:visible; }
+.rhythm-viewport[data-rhythm-arrival="peeks"] :is([data-rhythm-peek-reveal],.rhythm-search-results,.rhythm-source-more) { visibility:visible; }
+.rhythm-viewport:not([data-rhythm-arrival="complete"]) :is(.rhythm-pillar,.rhythm-rolodex,.rhythm-search-results) { overflow-y:hidden;touch-action:none; }
+@media(prefers-reduced-motion:reduce) {
+  .rhythm-viewport:not([hidden]) :is(.rhythm-heading,.zhento-top-hud-rail,.zhento-side-hud-rail,.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-source-list > li,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-search-results,.rhythm-source-more) { visibility:visible; }
+}

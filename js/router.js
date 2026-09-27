@@ -295,7 +295,7 @@ function replaceRouteUrl(url, state = {}) {
 
 function syncRoute(route, options = {}) {
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
-  syncRhythmPresentationOwnership(route);
+  syncRhythmPresentationOwnership(route, options);
   if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
   shellRenderedRoute = route;
   if (route.name === "wrestling-shows" && typeof primeWrestlingShowsRouteSurface === "function") {
