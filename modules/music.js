@@ -1736,6 +1736,7 @@ function renderBandDetailArchiveCoverage(band) {
     return;
   }
 
+  renderBandIdentityLastSeen(band);
   const stats = getBandDetailStats(band);
   if (bandDetailYearsCovered) {
     bandDetailYearsCovered.textContent = getBandDetailYearsCovered(stats, band);
@@ -5433,6 +5434,80 @@ function showBandsIndexView(options = {}) {
   }
 }
 
+function renderBandIdentityLastSeen(band) {
+  const row = bandDetail?.querySelector("[data-band-identity-last-seen]");
+  if (!row) return;
+  const stats = getBandDetailStats(band);
+  const fields = ["latest_seen", "latestSeen", "latest_seen_at", "latestSeenAt", "latest_show_date", "latestShowDate"];
+  const rawDate = getBandDetailTextCandidate(...[stats, band].flatMap(source => fields.map(field => source[field])));
+  const calendarDate = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  // A calendar day has no time zone; retain it rather than converting UTC midnight to local time.
+  const value = calendarDate
+    ? `${calendarDate[2]}/${calendarDate[3]}/${calendarDate[1]}`
+    : getBandDetailLatestSeen(stats, band);
+  row.hidden = value === "Pending";
+  row.lastElementChild.textContent = row.hidden ? "" : value;
+}
+
+function renderBandIdentityDossier(band) {
+  const hero = bandDetail?.querySelector(".band-detail-hero");
+  if (!hero) return;
+  const copy = hero.querySelector(".band-detail-copy");
+  if (!hero.classList.contains("band-identity-dossier")) {
+    hero.classList.add("band-identity-dossier");
+    // Retain the existing data-bound nodes and the View Sets listener.
+    bandDetailName.after(bandDetailLocation);
+    copy.querySelector(".band-detail-meta")?.remove();
+    bandDetailStatus.after(bandDetailTags);
+    const lifecycle = document.createElement("p");
+    lifecycle.className = "band-identity-lifecycle";
+    lifecycle.dataset.bandIdentityLifecycle = "";
+    const seen = document.createElement("p");
+    seen.className = "band-identity-last-seen";
+    seen.dataset.bandIdentityLastSeen = "";
+    const label = document.createElement("span");
+    label.textContent = "LAST SEEN";
+    seen.append(label, document.createElement("span"));
+    copy.querySelector(".band-detail-completion").before(lifecycle, seen);
+    hero.append(bandDetailViewSets);
+    bandDetailLogoName?.remove();
+  }
+  const raw = band.backend_record || band;
+  const stats = getBandDetailStats(raw);
+  const general = getBandDetailGeneral(raw);
+  const region = getBandDetailTextCandidate(stats.region, raw.region, general.region);
+  bandDetailRegion.textContent = region;
+  bandDetailRegion.hidden = !region;
+  const archiveStatus = getRhythmSourceStatus(band);
+  bandDetailStatus.textContent = archiveStatus.label;
+  bandDetailStatus.hidden = !archiveStatus.label;
+  const location = [getBandDetailTextCandidate(stats.location, raw.location), getBandDetailTextCandidate(stats.state, raw.state)].filter(Boolean).join(", ");
+  bandDetailLocation.textContent = location;
+  bandDetailLocation.hidden = !location;
+  const lifecycle = getBandDetailLifecycleStatus(general, raw).toLowerCase();
+  const key = ["active", "inactive"].includes(lifecycle) ? lifecycle : "unknown";
+  hero.dataset.bandStatus = key;
+  const statusNode = hero.querySelector("[data-band-identity-lifecycle]");
+  statusNode.textContent = key === "active" ? "● ACTIVE" : key === "inactive" ? "○ INACTIVE" : "STATUS UNKNOWN";
+  const known = value => value != null && String(value).trim() !== "" && getBandIndexNumber(value) !== null;
+  const archived = stats.archived_sets ?? raw.archived_sets;
+  const total = stats.total_sets ?? raw.total_sets;
+  const hasCompletion = known(archived) && known(total);
+  const completion = hasCompletion ? getBandDetailCompletion(Number(archived), Number(total)) : null;
+  bandDetailCompletionValue.textContent = hasCompletion ? `${completion}%` : "—";
+  bandDetailProgressFill.style.width = `${completion ?? 0}%`;
+  const progress = hero.querySelector(".band-detail-progress");
+  progress.hidden = !hasCompletion;
+  progress.removeAttribute("aria-hidden");
+  progress.setAttribute("role", "progressbar");
+  progress.setAttribute("aria-label", "Archive completion");
+  progress.setAttribute("aria-valuemin", "0");
+  progress.setAttribute("aria-valuemax", "100");
+  if (hasCompletion) progress.setAttribute("aria-valuenow", String(completion));
+  else progress.removeAttribute("aria-valuenow");
+  renderBandIdentityLastSeen(band);
+}
+
 function showBandDetail(band) {
   if (!band || !bandDetail) {
     return;
@@ -5539,6 +5614,7 @@ function showBandDetail(band) {
   if (bandDetailLastUpdated) {
     bandDetailLastUpdated.textContent = getBandDetailLastUpdated(stats, band);
   }
+  renderBandIdentityDossier(band);
   renderBandDetailMembers(bandDetailCoreMembers, members, "No core members indexed");
   renderBandDetailMembers(bandDetailPastMembers, pastMembers, "No past members indexed");
 
