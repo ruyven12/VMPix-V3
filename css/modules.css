@@ -31326,19 +31326,19 @@ button.hall-crusades-archive-crystal:focus-visible {
   position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr);gap:1rem;
   padding:1rem;border:1px solid rgba(184,164,255,.48);border-radius:0;
   clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
-  background:linear-gradient(125deg,rgba(116,89,187,.13),transparent 56%),rgba(9,10,25,.88);overflow:visible;
+  background:linear-gradient(125deg,rgba(116,89,187,.13),transparent 56%),rgba(9,10,25,.55);overflow:visible;
 }
 .band-identity-dossier::before { inset:0;background:linear-gradient(90deg,rgba(211,196,255,.8),transparent) top left/54px 1px no-repeat,linear-gradient(0deg,rgba(156,182,255,.65),transparent) bottom right/1px 54px no-repeat; }
-.band-identity-dossier .band-detail-poster { position:relative;box-sizing:border-box;width:min(100%,16rem);height:auto;min-height:0;aspect-ratio:1;align-self:start;border:1px solid rgba(174,153,247,.48);border-radius:0;background:rgba(5,6,18,.62);box-shadow:inset 0 0 1.3rem rgba(105,81,161,.1); }
+.band-identity-dossier .band-detail-poster { position:relative;box-sizing:border-box;width:min(100%,16rem);height:auto;min-height:0;aspect-ratio:1;align-self:start;border:1px solid rgba(174,153,247,.48);border-radius:0;background:rgba(5,6,18,.7);box-shadow:inset 0 0 1.3rem rgba(105,81,161,.1); }
 .band-identity-dossier .band-detail-poster::before,.band-identity-dossier .band-detail-poster::after { display:none; }
 .band-identity-dossier .band-detail-logo { width:100%;height:100%;min-width:0;gap:0;place-items:center;align-content:center; }
 .band-identity-dossier .band-detail-logo-image { width:100%;height:100%;max-height:none;object-fit:contain;filter:none; }
 .band-identity-dossier [hidden] { display:none; }
-.band-identity-dossier .band-detail-copy { min-width:0;align-content:start;gap:.8rem; }
+.band-identity-dossier .band-detail-copy { min-width:0;align-content:start;gap:.8rem;background:rgba(9,10,25,.68); }
 .band-identity-dossier .band-detail-name { font-size:clamp(1.6rem,5vw,2.8rem);line-height:1.18;text-wrap:balance; }
 .band-identity-dossier .band-detail-meta-value { font-size:.82rem;line-height:1.4;text-transform:none;color:#ccd2e9; }
 .band-identity-dossier .band-detail-tags { gap:.4rem; }
-.band-identity-dossier .band-detail-tag { border-color:rgba(169,153,224,.38);border-radius:0;background:rgba(100,81,152,.1);font-size:.69rem;line-height:1.3;padding:.35rem .45rem;color:#d4caef;overflow-wrap:anywhere; }
+.band-identity-dossier .band-detail-tag { border-color:rgba(169,153,224,.38);border-radius:0;background:rgba(23,19,40,.7);font-size:.69rem;line-height:1.3;padding:.35rem .45rem;color:#d4caef;overflow-wrap:anywhere; }
 .band-identity-dossier[data-band-status="inactive"] .band-detail-logo-image { filter:saturate(.28); }
 .band-identity-last-seen { display:flex;flex-wrap:wrap;gap:.4rem .65rem;margin:0;font-size:.75rem;line-height:1.4;color:#e1dded; }
 .band-identity-last-seen > :first-child { color:#aaa2c1; }
@@ -31348,7 +31348,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-identity-dossier .band-detail-completion-value { font-size:.85rem;line-height:1.3;color:#eee8ff; }
 .band-identity-dossier .band-detail-progress { height:7px;border-radius:0;border-color:rgba(176,151,230,.32);background:rgba(8,9,22,.7); }
 .band-identity-dossier .band-detail-progress-fill { border-radius:0;background:linear-gradient(90deg,#8263bf,#a595d4);box-shadow:none; }
-.band-identity-dossier .band-detail-action { grid-column:1/-1;justify-self:center;box-sizing:border-box;min-height:44px;min-width:10rem;max-width:100%;padding:.65rem 1.2rem;margin:0;border:1px solid rgba(187,160,255,.55);border-radius:0;background:rgba(69,48,112,.32);font-size:.85rem;line-height:1.3; }
+.band-identity-dossier .band-detail-action { grid-column:1/-1;justify-self:center;box-sizing:border-box;min-height:44px;min-width:10rem;max-width:100%;padding:.65rem 1.2rem;margin:0;border:1px solid rgba(187,160,255,.55);border-radius:0;background:rgba(38,27,65,.72);font-size:.85rem;line-height:1.3; }
 @media(min-width:700px) {
   .band-detail-content .band-identity-dossier { grid-template-columns:minmax(13rem,.85fr) minmax(0,1.15fr);gap:1.25rem;padding:1.5rem; }
   .band-identity-dossier .band-detail-poster { width:100%;max-width:23rem; }
@@ -31371,11 +31371,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   position:relative;box-sizing:border-box;min-width:0;padding:1rem;
   border:1px solid rgba(172,149,235,.4);border-radius:0;
   clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
-  background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.85);
+  background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.48);
 }
 .band-archive-telemetry .band-detail-panel-title { margin:0 0 1rem;font-size:.85rem;line-height:1.35;letter-spacing:.04em;text-align:center;color:#d4c6fa; }
 .band-detail-content .band-archive-telemetry .band-coverage-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem; }
-.band-archive-telemetry .band-coverage-item { min-width:0;padding:.8rem .6rem;gap:.5rem;border:1px solid rgba(165,143,213,.2);border-radius:0;background:rgba(99,78,148,.055);text-align:center; }
+.band-archive-telemetry .band-coverage-item { min-width:0;padding:.8rem .6rem;gap:.5rem;border:1px solid rgba(165,143,213,.2);border-radius:0;background:rgba(12,11,27,.7);text-align:center; }
 .band-archive-telemetry .band-coverage-label { color:#ada5c5;font-size:.68rem;line-height:1.4;overflow-wrap:anywhere; }
 .band-archive-telemetry .band-coverage-value { color:#ece5ff;font-size:1rem;line-height:1.4;overflow-wrap:anywhere; }
 .band-detail-content .band-archive-telemetry[hidden],.band-archive-telemetry .band-coverage-item[hidden] { display:none; }
@@ -31384,14 +31384,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 /* One local roster inside the current Band dossier; no nested scroll region. */
-.band-detail-content .band-personnel { display:grid;grid-template-columns:minmax(0,1fr);align-content:start;box-sizing:border-box;min-width:0;gap:1rem;padding:1rem;border:1px solid rgba(172,149,235,.4);border-radius:0;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.85); }
+.band-detail-content .band-personnel { display:grid;grid-template-columns:minmax(0,1fr);align-content:start;box-sizing:border-box;min-width:0;gap:1rem;padding:1rem;border:1px solid rgba(172,149,235,.4);border-radius:0;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.48); }
 .band-personnel > .band-detail-panel-title { margin:0;font-size:.85rem;line-height:1.35;letter-spacing:.04em;text-align:center;color:#d4c6fa; }
 .band-personnel-controls { display:flex;justify-content:center;flex-wrap:wrap;gap:.6rem; }
-.band-personnel-controls button { box-sizing:border-box;min-height:44px;min-width:7rem;max-width:100%;padding:.65rem .75rem;border:1px solid rgba(157,136,207,.35);border-radius:0;background:rgba(41,32,66,.55);color:#bbb3cf;font:inherit;font-size:.72rem;line-height:1.3;cursor:pointer; }
-.band-personnel-controls button[aria-pressed="true"] { border-color:#bca3ed;background:rgba(105,78,161,.23);color:#f1eaff; }
+.band-personnel-controls button { box-sizing:border-box;min-height:44px;min-width:7rem;max-width:100%;padding:.65rem .75rem;border:1px solid rgba(157,136,207,.35);border-radius:0;background:rgba(23,19,40,.7);color:#bbb3cf;font:inherit;font-size:.72rem;line-height:1.3;cursor:pointer; }
+.band-personnel-controls button[aria-pressed="true"] { border-color:#bca3ed;background:rgba(49,35,79,.72);color:#f1eaff; }
 .band-personnel-controls button:focus-visible { outline:2px solid #d6c4ff;outline-offset:3px; }
 .band-personnel .band-member-list { min-width:0;max-height:none;overflow:visible;gap:.6rem; }
-.band-personnel .band-member { border-color:rgba(165,143,213,.2);border-radius:0;background:rgba(99,78,148,.055);padding:.65rem;gap:.7rem; }
+.band-personnel .band-member { border-color:rgba(165,143,213,.2);border-radius:0;background:rgba(12,11,27,.7);padding:.65rem;gap:.7rem; }
 .band-personnel .band-member-thumb { width:2.6rem;border-radius:0;border-color:rgba(171,150,220,.38);background:rgba(94,68,141,.15);box-shadow:none;color:#dbcef3; }
 .band-personnel .band-member-name { font-size:.85rem;line-height:1.4;white-space:normal;overflow:visible;overflow-wrap:anywhere;color:#ece5ff; }
 .band-personnel .band-member-role { font-size:.72rem;line-height:1.45;color:#bdb4d0; }
