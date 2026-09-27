@@ -5109,8 +5109,15 @@ function getBandsRegionStatusRows(rows) {
   return filteredRows;
 }
 
+function getBandsBrowseCollection() {
+  const rows=getMusicBandsIndexCollection();
+  return musicBandsIndex?.hasAttribute("data-rhythm-source-index")
+    ? rows.filter(band=>getRhythmSourcePhotoCount(band)>0)
+    : rows;
+}
+
 function getBandsFilterOptionRows() {
-  return getBandsRegionStatusRows(getMusicBandsIndexCollection());
+  return getBandsRegionStatusRows(getBandsBrowseCollection());
 }
 
 function hasActiveBandsPanelFilters() {
@@ -5118,7 +5125,7 @@ function hasActiveBandsPanelFilters() {
 }
 
 function getVisibleBands() {
-  let rows = getMusicBandsIndexCollection();
+  let rows = getBandsBrowseCollection();
   if (!shouldUseBandsPanelFilters()) {
     return rows;
   }
@@ -8039,10 +8046,16 @@ function getRhythmSourceStatus(band) {
   const known=value=>value!=null&&String(value).trim()!==''&&getBandIndexNumber(value)!==null;
   return known(stats.archived_sets)&&known(stats.total_sets)?getBandArchiveStatus(stats.archived_sets,stats.total_sets):{key:'',label:''};
 }
+function getRhythmSourcePhotoCount(band) {
+  const raw=band.backend_record||band,stats=raw.stats||{};
+  const value=stats.totalPhotos??stats.total_photos??raw.photo_count;
+  return (typeof value==='number'||typeof value==='string')&&String(value).trim()!==''
+    ? getBandIndexNumber(value) : null;
+}
 function createRhythmSourceTelemetry(band) {
   const raw=band.backend_record||band,stats=raw.stats||{};
   const number=value=>value==null||String(value).trim()===''||getBandIndexNumber(value)===null?'—':formatBandIndexNumber(value,'—');
-  const values=[['Region',stats.region||raw.region||raw.general?.region||'—'],['Live Sets',number(stats.total_sets)],['Photos',number(stats.totalPhotos??stats.total_photos??raw.photo_count)]];
+  const values=[['Region',stats.region||raw.region||raw.general?.region||'—'],['Live Sets',number(stats.total_sets)],['Photos',number(getRhythmSourcePhotoCount(band))]];
   const telemetry=document.createElement('span');telemetry.className='rhythm-source-telemetry';
   values.forEach(([label,value])=>{const cell=document.createElement('span'),key=document.createElement('span'),data=document.createElement('span');key.className='rhythm-telemetry-label';data.className='rhythm-telemetry-value';key.textContent=label;data.textContent=value;cell.append(key,data);telemetry.append(cell);});
   return telemetry;
@@ -8075,7 +8088,7 @@ function renderRhythmSourceIndex() {
   list.replaceChildren();status.replaceChildren();more.hidden=true;more.onclick=null;view.onscroll=null;view.hidden=true;previous.disabled=true;next.disabled=true;
   const session={all,key,active:-1,frame:0};rhythmSourceSession=session;
   if(state!=='live'){status.textContent=state==='error'?'Source Index unavailable. ':'Retrieving Source Index…';if(state==='error'){const retry=document.createElement('button');retry.type='button';retry.textContent='Retry Bands';retry.addEventListener('click',retryMusicBandsIndexState);status.append(retry);}return;}
-  const rows=getListBands(getVisibleBands()).slice().sort((a,b)=>a.name.localeCompare(b.name));if(!rows.length){status.textContent=all.length?'No Bands match these filters.':'No Bands archived yet.';return;}
+  const archive=getBandsBrowseCollection(),rows=getListBands(getVisibleBands()).slice().sort((a,b)=>a.name.localeCompare(b.name));if(!rows.length){status.textContent=archive.length?'No Bands match these filters.':'No Bands archived yet.';return;}
   view.hidden=false;let count=0;const buttons=[];
   function sync(){
     session.frame=0;if(rhythmSourceSession!==session||!view.clientHeight)return;
@@ -8100,7 +8113,7 @@ function renderRhythmSourceIndex() {
     if(window.matchMedia('(max-width: 899px)').matches){activate(index);behavior='auto';}
     const rect=button.getBoundingClientRect();view.scrollTo({top:view.scrollTop+rect.top+rect.height/2-view.getBoundingClientRect().top-view.clientHeight/2,behavior});if(behavior==='auto')sync();
   }
-  const append=()=>{const fragment=document.createDocumentFragment(),end=Math.min(count+24,rows.length);while(count<end){const index=count++,item=createRhythmSourceRow(rows[index],()=>center(index));buttons.push(item.firstElementChild);fragment.append(item);}list.append(fragment);status.textContent=count+' / '+rows.length+' Bands'+(rows.length!==all.length?' · '+all.length+' in archive':'');more.hidden=count>=rows.length;sync();};
+  const append=()=>{const fragment=document.createDocumentFragment(),end=Math.min(count+24,rows.length);while(count<end){const index=count++,item=createRhythmSourceRow(rows[index],()=>center(index));buttons.push(item.firstElementChild);fragment.append(item);}list.append(fragment);status.textContent=count+' / '+rows.length+' Bands'+(rows.length!==archive.length?' · '+archive.length+' in archive':'');more.hidden=count>=rows.length;sync();};
   view.onscroll=()=>{if(!session.frame)session.frame=requestAnimationFrame(sync);};
   previous.onclick=()=>center(session.active-1);next.onclick=()=>{const index=session.active+1;if(index>=count&&count<rows.length)append();center(index);};more.onclick=append;
   append();center(rows.length>2?1:0,'auto');
