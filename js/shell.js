@@ -1858,7 +1858,6 @@ function requestMusicLandingStats() {
   if (zhentoStatsSession) return zhentoStatsSession.request;
   const session = { controllers: new Set(), frame: 0, counts: new Map() };
   zhentoStatsSession = session;
-  session.reveal = Promise.all(document.querySelector("[data-music-landing-stats]").getAnimations().map((animation) => animation.finished.catch(() => {})));
   const current = () => zhentoStatsSession === session && getRouteFromUrl().name === "music";
   const order = ["photos", "bands", "shows", "people", "venues"];
   order.forEach((key) => {
@@ -1896,9 +1895,9 @@ function requestMusicLandingStats() {
       return;
     }
     element.dataset.statSource = "counting";
-    session.reveal.then(() => {
+    Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {}))).then(() => {
       if (!current()) return;
-      session.counts.set(key, { total, start: performance.now() + order.indexOf(key) * 80 });
+      session.counts.set(key, { total, start: performance.now() });
       if (!session.frame) session.frame = requestAnimationFrame(tick);
     });
   };
@@ -3102,19 +3101,29 @@ const ZHENTO_PILLAR_DESCRIPTIONS = {
   shows: "Where everything converges. Shows preserve the moments when bands, people, places, and the Pulse aligned in a single shared experience.",
 };
 
+let zhentoSelectionGeneration = 0;
+let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
+  const generation = ++zhentoSelectionGeneration;
+  zhentoPromptExit?.cancel();
+  zhentoPromptExit = null;
   delete landing.dataset.selectedDestination;
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
   landing.querySelector(".zhento-detail").hidden = true;
   landing.querySelector(".zhento-destination-prompt").hidden = false;
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     button.setAttribute("aria-pressed", "false");
+    const reveal = button.getAnimations().filter((animation) => animation.animationName === "daiionArchiveStatsLabelResolve");
+    button.inert = !reducedMotion.matches && reveal.some((animation) => animation.playState !== "finished");
+    Promise.all(reveal.map((animation) => animation.finished.catch(() => {}))).then(() => {
+      if (generation === zhentoSelectionGeneration && getRouteFromUrl().name === "music") button.inert = false;
+    });
     if (button.dataset.zhentoBound) return;
     button.dataset.zhentoBound = "true";
     button.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music") return;
+      if (getRouteFromUrl().name !== "music" || button.inert) return;
       landing.dataset.selectedDestination = button.dataset.zhentoDestination;
       landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === button.dataset.zhentoDestination)));
       landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
@@ -3122,8 +3131,27 @@ function resetZhentoLandingSelection() {
       });
       landing.querySelector(".zhento-detail__title").textContent = button.textContent.trim();
       landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[button.dataset.zhentoDestination];
-      landing.querySelector(".zhento-detail").hidden = false;
-      landing.querySelector(".zhento-destination-prompt").hidden = true;
+      const prompt = landing.querySelector(".zhento-destination-prompt");
+      const selection = landing.dataset.selectedDestination;
+      const revealDetail = () => {
+        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection) return;
+        prompt.hidden = true;
+        landing.querySelector(".zhento-detail").hidden = false;
+      };
+      const opacity = Number(getComputedStyle(prompt).opacity);
+      if (!reducedMotion.matches && !prompt.hidden && opacity > 0) {
+        zhentoPromptExit?.cancel();
+        const exit = prompt.animate([{ opacity }, { opacity: 0 }], { duration: 150, easing: "ease-out", fill: "forwards" });
+        zhentoPromptExit = exit;
+        exit.finished.then(() => {
+          if (zhentoPromptExit !== exit) return;
+          revealDetail();
+          exit.cancel();
+          zhentoPromptExit = null;
+        }).catch(() => {});
+      } else {
+        revealDetail();
+      }
     });
   });
 }

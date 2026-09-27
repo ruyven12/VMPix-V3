@@ -30277,8 +30277,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 .zhento-enter { position: absolute; left: 50%; top: 60%; transform: translateX(-50%); min-height: 44px; padding: .7rem 2rem; border: 1px solid rgba(164,177,255,.52); background: rgba(12,16,40,.48); font-size: .9rem; animation: zhentoPanelProject 1040ms ease-out 3450ms both; }
 @keyframes zhentoIdentityResolve { from { opacity: 0; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
-@keyframes zhentoIdentityHold { 0%,66% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes zhentoIdentityProject { from { opacity: 0; transform: var(--zhento-project-from, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y) + .72rem)) scale(.7)); } to { opacity: .94; transform: var(--zhento-project-to, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.5625)); } }
+@keyframes zhentoIdentityHold { 0%,66% { opacity: 1; translate: 0 0; } 100% { opacity: 0; translate: 0 12px; } }
+@keyframes zhentoIdentityProject { from { opacity: 0; transform: var(--zhento-project-from, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y) + .72rem)) scale(.7)); } to { opacity: .88; translate: 0 0; transform: var(--zhento-project-to, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.5625)); } }
 @keyframes zhentoPanelProject { from { opacity: 0; translate: 0 .7rem; } to { opacity: 1; translate: 0 0; } }
 @media (max-width: 640px) {
 
@@ -30292,7 +30292,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .zhento-landing *, .zhento-landing *::before, .zhento-landing *::after { animation: none !important; }
-  .zhento-identity { opacity: .94; transform: var(--zhento-project-to, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.5625)); }
+  .zhento-identity { opacity: .88; transform: var(--zhento-project-to, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.5625)); }
 }
 
 .site-shell[data-shell-route="music"] :is(.home-frame, .shell-breadcrumb, .ambient-system, .universal-bottom-rail),
@@ -30941,6 +30941,141 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-destination-prompt__text { clip-path: none; }
   .zhento-destination-prompt__text::after { display: none; }
 }
+/* Zhento arrival uses the approved archive draw with its own palette. */
+.site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
+  animation: zhentoHudReveal 500ms ease-out 2800ms both;
+}
+.site-shell[data-shell-route="music"] .zhento-stats {
+  animation: zhentoStatsPanelProject 1040ms cubic-bezier(.2,.74,.24,1) 3450ms both;
+}
+.site-shell[data-shell-route="music"] .zhento-destinations {
+  animation: zhentoDestinationPanelProject 1040ms cubic-bezier(.2,.74,.24,1) 3450ms both;
+}
+.site-shell[data-shell-route="music"] :is(.zhento-stats, .zhento-destinations)::before {
+  animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(.2,.74,.24,1) 3450ms both;
+}
+.site-shell[data-shell-route="music"] :is(.zhento-stats__title, .zhento-destinations__title) {
+  animation: daiionArchiveStatsContentResolve 180ms ease-out 4550ms both;
+}
+.zhento-stats__row:nth-child(2), .zhento-destinations__item:nth-child(2) { --zhento-row-index: 0; }
+.zhento-stats__row:nth-child(3), .zhento-destinations__item:nth-child(3) { --zhento-row-index: 1; }
+.zhento-stats__row:nth-child(4), .zhento-destinations__item:nth-child(4) { --zhento-row-index: 2; }
+.zhento-stats__row:nth-child(5), .zhento-destinations__item:nth-child(5) { --zhento-row-index: 3; }
+.zhento-stats__row:nth-child(6) { --zhento-row-index: 4; }
+.site-shell[data-shell-route="music"] :is(.zhento-stats__label, .zhento-destinations__item) {
+  animation: daiionArchiveStatsLabelResolve 220ms ease-out calc(4620ms + var(--zhento-row-index) * 80ms) both;
+}
+.site-shell[data-shell-route="music"] .zhento-stats__value {
+  animation: zhentoStatValueReady 1ms step-start calc(4740ms + var(--zhento-row-index) * 80ms) both;
+}
+@keyframes zhentoHudReveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zhentoStatValueReady { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zhentoStatsPanelProject {
+  0% {
+    opacity: 0;
+    border-color: rgba(137, 167, 255, 0);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0),
+      inset 0 0 0 rgba(145, 112, 235, 0),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0),
+      0 0 0 rgba(145, 112, 235, 0);
+    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
+  }
+
+  12% {
+    opacity: 0.36;
+    border-color: rgba(137, 167, 255, 0.1);
+    clip-path: polygon(0.55rem 0, 0.95rem 0, 0.95rem 1px, 0.55rem 1px, 0.55rem 1px, 0.55rem 0);
+  }
+
+  36% {
+    opacity: 0.78;
+    border-color: rgba(137, 167, 255, 0.22);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% 1px, 0 1px, 0 1px, 0 0.55rem);
+  }
+
+  58% {
+    opacity: 0.92;
+    border-color: rgba(137, 167, 255, 0.34);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% 58%, calc(100% - 0.55rem) 64%, 0 64%, 0 0.55rem);
+  }
+
+  72% {
+    opacity: 1;
+    border-color: rgba(137, 167, 255, 0.38);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0.035),
+      inset 0 0 0.82rem rgba(145, 112, 235, 0.08),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0.32),
+      0 0 0.42rem rgba(145, 112, 235, 0.1);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
+  }
+
+  100% {
+    opacity: 1;
+    border-color: rgba(137, 167, 255, 0.38);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0.055),
+      inset 0 0 1.15rem rgba(145, 112, 235, 0.12),
+      0 0.45rem 1.4rem rgba(0, 0, 0, 0.38),
+      0 0 0.68rem rgba(145, 112, 235, 0.14);
+    clip-path: polygon(0.55rem 0, 100% 0, 100% calc(100% - 0.55rem), calc(100% - 0.55rem) 100%, 0 100%, 0 0.55rem);
+  }
+}
+
+@keyframes zhentoDestinationPanelProject {
+  0% {
+    opacity: 0;
+    border-color: rgba(137, 167, 255, 0);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0),
+      inset 0 0 0 rgba(145, 112, 235, 0),
+      0 0.42rem 1.2rem rgba(0, 0, 0, 0),
+      0 0 0 rgba(145, 112, 235, 0);
+    clip-path: polygon(0.48rem 0, 0.88rem 0, 0.88rem 1px, 0.48rem 1px, 0.48rem 1px, 0.48rem 0);
+  }
+
+  12% {
+    opacity: 0.36;
+    border-color: rgba(137, 167, 255, 0.1);
+    clip-path: polygon(0.48rem 0, 0.88rem 0, 0.88rem 1px, 0.48rem 1px, 0.48rem 1px, 0.48rem 0);
+  }
+
+  36% {
+    opacity: 0.78;
+    border-color: rgba(137, 167, 255, 0.2);
+    clip-path: polygon(0.48rem 0, 100% 0, 100% 1px, 0 1px, 0 1px, 0 0.48rem);
+  }
+
+  58% {
+    opacity: 0.9;
+    border-color: rgba(137, 167, 255, 0.3);
+    clip-path: polygon(0.48rem 0, 100% 0, 100% 58%, calc(100% - 0.48rem) 64%, 0 64%, 0 0.48rem);
+  }
+
+  72% {
+    opacity: 1;
+    border-color: rgba(137, 167, 255, 0.34);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0.03),
+      inset 0 0 0.66rem rgba(145, 112, 235, 0.075),
+      0 0.42rem 1.2rem rgba(0, 0, 0, 0.3),
+      0 0 0.36rem rgba(145, 112, 235, 0.09);
+    clip-path: polygon(0.48rem 0, 100% 0, 100% calc(100% - 0.48rem), calc(100% - 0.48rem) 100%, 0 100%, 0 0.48rem);
+  }
+
+  100% {
+    opacity: 1;
+    border-color: rgba(137, 167, 255, 0.34);
+    box-shadow:
+      inset 0 0 0 1px rgba(220, 230, 255, 0.045),
+      inset 0 0 0.92rem rgba(145, 112, 235, 0.1),
+      0 0.42rem 1.2rem rgba(0, 0, 0, 0.34),
+      0 0 0.52rem rgba(145, 112, 235, 0.11);
+    clip-path: polygon(0.48rem 0, 100% 0, 100% calc(100% - 0.48rem), calc(100% - 0.48rem) 100%, 0 100%, 0 0.48rem);
+  }
+}
+
 /* Pillar of Rhythm occupies the current shared viewport beside other V3 modules. */
 .rhythm-viewport { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
 .rhythm-viewport[hidden] { display:none; }
