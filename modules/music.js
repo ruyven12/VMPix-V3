@@ -670,8 +670,8 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
   setBandsIndexVisible(false);
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
-  if (musicNexusShell) {
-    musicNexusShell.scrollTo({
+  if (bandDetailContent) {
+    bandDetailContent.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
     });
@@ -5546,8 +5546,8 @@ function showBandDetail(band) {
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
   refreshBandDetailArchiveCoverage(activeMusicBand);
-  if (musicNexusShell) {
-    musicNexusShell.scrollTo({
+  if (bandDetailContent) {
+    bandDetailContent.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
     });

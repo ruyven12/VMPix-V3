@@ -2323,13 +2323,13 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  return route?.name === "music" || route?.name === "music-bands" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+  return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  if (route?.name === "music" || route?.name === "music-bands") return getShellBackTarget(route);
+  if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
   if (route?.name === "wrestling") return getShellBackTarget(route);
@@ -2403,6 +2403,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   const backLabel = {
     "music": "Back to Portfolio",
     "music-bands": "Back to Zhento",
+    "band-detail": "Back to Bands",
     "wrestling-people-prototype": "Back to Wrestling",
     "wrestling-people": "Back to Wrestling",
     "wrestling-person-detail": "Back to Hall of Champions",
@@ -2444,7 +2445,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
   shell.dataset.shellRoute = shellRouteName;
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name === "wrestling-shows") {
@@ -2459,8 +2460,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (route.name !== "portfolio" && route.name !== "wrestling") {
     clearPortfolioGatewayState();
   }
-  if (route.name === "music" || route.name === "music-bands") {
-    setPortfolioEngineHudCurrentView(route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
+  if (route.name === "music" || route.name === "music-bands" || route.name === "band-detail") {
+    setPortfolioEngineHudCurrentView(route.name === "band-detail" ? "Band Detail" : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -3313,19 +3314,23 @@ function resetZhentoLandingSelection() {
 
 function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
+  const detail = route.name === 'band-detail';
+  const currentFoundation = active || detail;
   const entering = active && (rhythmViewport.hidden || !rhythmViewport.hasAttribute('data-rhythm-arrival'));
   if (!active) finishRhythmArrival();
   else if (entering) prepareRhythmArrival(Boolean(options.historyState || options.navigationDirection === 'back'));
   for (const [id, node] of [['home-presentation-template', homeFrame], ['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
     const template = document.getElementById(id);
-    if (active && node?.isConnected) template.content.append(node);
-    else if (!active && template.content.childElementCount) template.before(template.content);
+    if (currentFoundation && node?.isConnected) template.content.append(node);
+    else if (!currentFoundation && template.content.childElementCount) template.before(template.content);
   }
   rhythmViewport.hidden = !active;
   rhythmViewport.inert = !active;
+  bandDetailViewport.hidden = !detail;
+  bandDetailViewport.inert = !detail;
   if (!active) { musicBandsIndex.setAttribute('aria-hidden','true'); }
 }
-function showRhythmPillar() {
+function showRhythmPillar({ detail = false } = {}) {
   clearPortfolioArrivalState(); clearPortfolioOrientationState(); clearPortfolioDirectArrivalState();
   shell.classList.remove('is-placeholder-view','is-music-nexus-view','is-ring-archive-view','is-wrestling-people-view','is-wrestling-person-detail-view','is-wrestling-shows-view','is-wrestling-show-detail-view','is-wrestling-match-gallery-view','is-wrestling-lightbox-view','is-about-view','is-calendar-view','is-contact-view');
   shell.classList.add('has-entered-hub','is-module-view');
@@ -3333,8 +3338,12 @@ function showRhythmPillar() {
   portfolioHub.setAttribute('aria-hidden','false'); portfolioHub.removeAttribute('inert');
   for (const host of [modulePlaceholder,ringArchiveShell,aboutShell,calendarShell,contactShell]) { host?.setAttribute('aria-hidden','true'); host?.setAttribute('inert',''); }
   setWrestlingShowsHidden(true); setWrestlingPeopleHidden(true); setWrestlingPersonDetailHidden(true); setWrestlingVenuesHidden(true); setWrestlingShowDetailHidden(true); setWrestlingMatchGalleryHidden(true); setWrestlingLightboxHidden(true);
-  musicBandsIndex.setAttribute('aria-hidden','false'); musicBandsIndex.removeAttribute('inert');
+  musicBandsIndex.setAttribute('aria-hidden', String(detail)); musicBandsIndex.inert = detail;
   setHubChromeHidden(true); setActiveGlobalNav('music');
+  if (detail) {
+    setPortfolioEngineHudCurrentView('Band Detail');
+    return;
+  }
   setPortfolioEngineHudCurrentView('Pillar of Rhythm');
   syncBandsIndex(); requestMusicBandsIndexData();
   // The warp owns visibility until cleanup. Direct entries begin after this mount resolves.
@@ -4683,7 +4692,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     music: musicNexusShell,
     "music-route-not-found": modulePlaceholder,
     "music-bands": rhythmViewport,
-    "band-detail": musicNexusShell,
+    "band-detail": bandDetailContent,
     "sets-archive": musicNexusShell,
     "set-detail": musicNexusShell,
     "music-people": musicNexusShell,

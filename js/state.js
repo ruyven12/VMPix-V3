@@ -13,6 +13,8 @@ function queryRetainedMusicElements(selector) {
   return [...document.querySelectorAll(selector), ...document.getElementById('music-presentation-template').content.querySelectorAll(selector), ...document.getElementById('shell-rail-template').content.querySelectorAll(selector)];
 }
 const rhythmViewport = document.querySelector('[data-rhythm-viewport]');
+const bandDetailViewport = document.querySelector('[data-band-detail-viewport]');
+const bandDetailContent = document.querySelector('[data-band-detail-content]');
 
 const shell = document.querySelector(".site-shell");
 const startButton = document.querySelector(".start-button") || document.getElementById("home-presentation-template").content.querySelector(".start-button");

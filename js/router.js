@@ -556,7 +556,7 @@ function syncRoute(route, options = {}) {
   if (route.name === "band-detail") {
     const historyState = options.historyState || window.history.state || {};
     bandsIndexReturnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
-    showMusicNexus({ initialSection: "bands" });
+    showRhythmPillar({ detail: true });
     if (typeof showBandDetailRoute === "function") {
       showBandDetailRoute(route.bandId);
     } else {

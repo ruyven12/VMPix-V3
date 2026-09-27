@@ -31148,12 +31148,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 /* Pillar of Rhythm occupies the current shared viewport beside other V3 modules. */
-.rhythm-viewport { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
-.rhythm-viewport[hidden] { display:none; }
+:is(.rhythm-viewport, .band-detail-viewport) { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
+:is(.rhythm-viewport, .band-detail-viewport)[hidden] { display:none; }
 /* The existing 835x470 backdrop has a pale three-pixel bottom border.
    Crop only that source border when mobile cover sizing is height-limited. */
 @media (max-width: 899px) and (max-aspect-ratio: 835/470) {
-  .rhythm-viewport { background-size:auto,auto,auto calc(100% * 470 / 467);background-position:0 0,0 0,center top; }
+  :is(.rhythm-viewport, .band-detail-viewport) { background-size:auto,auto,auto calc(100% * 470 / 467);background-position:0 0,0 0,center top; }
 }
 .rhythm-viewport .rhythm-pillar { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);display:block;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) 1rem max(1rem,env(safe-area-inset-left));overflow-y:auto;overflow-x:hidden;color:#e4eaff; }
 .rhythm-pillar > * { box-sizing:border-box;max-width:62rem;margin-inline:auto; }
@@ -31314,3 +31314,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media(prefers-reduced-motion:reduce) {
   .rhythm-viewport:not([hidden]) :is(.rhythm-heading,.zhento-top-hud-rail,.zhento-side-hud-rail,.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-source-list > li,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-search-results,.rhythm-source-more) { visibility:visible; }
 }
+
+/* Current Band Detail foundation: retained dossier data inside the Shell's safe content area. */
+.band-detail-content { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);box-sizing:border-box;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:max(3.6rem,env(safe-area-inset-top)) max(2rem,env(safe-area-inset-right)) 1rem max(2rem,env(safe-area-inset-left));color:#e4eaff; }
+.band-detail-content .band-detail-screen { box-sizing:border-box;width:min(100%,62rem);min-width:0;margin-inline:auto; }
+.band-detail-content .band-detail-screen[aria-hidden="false"] { display:grid; }
+.band-detail-content :is(.band-detail-name,.band-detail-meta-value,.band-coverage-value,.band-member-name,.band-member-role) { overflow-wrap:anywhere; }
