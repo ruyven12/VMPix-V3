@@ -1750,6 +1750,7 @@ function renderBandDetailArchiveCoverage(band) {
   if (bandDetailLastUpdated) {
     bandDetailLastUpdated.textContent = getBandDetailLastUpdated(stats, band);
   }
+  renderBandArchiveTelemetry(band);
 }
 
 function requestMusicBandArchiveCoverage(band) {
@@ -5511,6 +5512,51 @@ function renderBandIdentityDossier(band) {
   renderBandIdentityLastSeen(band);
 }
 
+function renderBandArchiveTelemetry(band) {
+  const section = bandDetailYearsCovered?.closest(".band-detail-coverage");
+  if (!section) return;
+  const nodes = [bandDetailYearsCovered, bandDetailMostActiveYear, bandDetailTotalPhotos, bandDetailSetsCaptured, bandDetailLastUpdated, bandDetailContributors];
+  if (!section.classList.contains("band-archive-telemetry")) {
+    section.classList.add("band-archive-telemetry");
+    section.querySelector(".band-detail-panel-title").textContent = "ARCHIVE TELEMETRY";
+    section.querySelector(".band-coverage-grid").replaceChildren(...nodes.map(node => node.closest(".band-coverage-item")));
+  }
+  const raw = band.backend_record || band;
+  const stats = getBandDetailStats(raw);
+  const number = (...values) => {
+    for (const value of values) {
+      if (value != null && String(value).trim() !== "" && getBandIndexNumber(value) !== null) return getBandIndexNumber(value);
+    }
+    return null;
+  };
+  const archived = number(stats.archived_sets, raw.archived_sets);
+  const total = number(stats.total_sets, raw.total_sets, raw.albums);
+  const photos = number(stats.totalPhotos, stats.total_photos, raw.photo_count, raw.photos);
+  const personnel = getBandDetailPersonnel(raw);
+  const pastKeys = new Set(getUniqueBandDetailMembers(personnel.past_members).map(getBandDetailMemberKey));
+  const members = getUniqueBandDetailMembers(personnel.members, pastKeys);
+  const contributors = members.length > 0 ? members.length : number(raw.member_count, raw.memberCount, stats.member_count, stats.memberCount);
+  const dateFields = ["last_updated", "lastUpdated", "updated_at", "updatedAt"];
+  const rawDate = getBandDetailTextCandidate(...[stats, raw].flatMap(source => dateFields.map(field => source[field])));
+  const calendarDate = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const updated = calendarDate ? `${calendarDate[2]}/${calendarDate[3]}/${calendarDate[1]}` : getBandDetailLastUpdated(stats, raw);
+  const values = [
+    getBandDetailYearsCovered(stats, raw),
+    getBandDetailMostActiveYear(stats, raw),
+    photos === null ? null : formatBandDetailNumber(photos),
+    archived === null || total === null ? null : `${formatBandDetailNumber(archived)}/${formatBandDetailNumber(total)}`,
+    updated,
+    contributors === null ? null : formatBandDetailNumber(contributors),
+  ];
+  nodes.forEach((node, index) => {
+    const value = values[index];
+    const present = value != null && value !== "Pending" && String(value).trim() !== "";
+    node.textContent = present ? String(value) : "";
+    node.closest(".band-coverage-item").hidden = !present;
+  });
+  section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden);
+}
+
 function showBandDetail(band) {
   if (!band || !bandDetail) {
     return;
@@ -5618,6 +5664,7 @@ function showBandDetail(band) {
     bandDetailLastUpdated.textContent = getBandDetailLastUpdated(stats, band);
   }
   renderBandIdentityDossier(band);
+  renderBandArchiveTelemetry(band);
   renderBandDetailMembers(bandDetailCoreMembers, members, "No core members indexed");
   renderBandDetailMembers(bandDetailPastMembers, pastMembers, "No past members indexed");
 
