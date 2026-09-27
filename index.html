@@ -10,7 +10,7 @@
     html { background-color: #050507; }
     html[data-v3-booting] body { opacity: 0 !important; pointer-events: none !important; }
   </style>
-  <script>document.documentElement.setAttribute("data-v3-booting", "");</script>
+  <script>if (!/^\/music\/bands\/*$/.test(location.pathname)) document.documentElement.setAttribute("data-v3-booting", "");</script>
   <title>Welcome to Voodoo Media V3.0.01</title>
   <link rel="icon" href="data:,">
 
@@ -34,7 +34,7 @@
         if (routePath === "/music/bands") {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
-          root.classList.add("is-module-view");
+          root.classList.add("has-entered-hub", "is-module-view");
           root.setAttribute("data-shell-route", "music-bands");
         }
         if (routePath === "/music") {
@@ -263,6 +263,7 @@
     </nav>
 
     <main class="public-home" aria-labelledby="home-title">
+      <template id="home-presentation-template">
       <section class="home-frame" aria-label="Voodoo Media public homepage">
         <div class="home-lockup">
           <div class="title-group">
@@ -283,6 +284,9 @@
           <span class="sr-only" id="start-description">Enter Archive control centered inside the VMPix V3 portal shell.</span>
         </div>
       </section>
+
+      </template>
+      <script>if (!/^\/music\/bands\/*$/.test(location.pathname)) { const t=document.getElementById("home-presentation-template"); t.before(t.content); }</script>
 
       <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true" inert>
         <h2 class="sr-only" id="portfolio-title">Portfolio Entry Stage</h2>
@@ -402,6 +406,15 @@
             </section>
           </section>
         </section>
+        <script>
+          if (/^\/music\/bands\/*$/.test(location.pathname)) {
+            const viewport = document.querySelector("[data-rhythm-viewport]");
+            viewport.hidden = false;
+            const hub = viewport.closest(".portfolio-hub");
+            hub.setAttribute("aria-hidden", "false");
+            hub.removeAttribute("inert");
+          }
+        </script>
         <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
           <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Soundtrack" data-music-nexus-landing data-zhento-landing>

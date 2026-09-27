@@ -3158,7 +3158,7 @@ function resetZhentoLandingSelection() {
 
 function syncRhythmPresentationOwnership(route) {
   const active = route.name === 'music-bands';
-  for (const [id, node] of [['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
+  for (const [id, node] of [['home-presentation-template', homeFrame], ['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
     const template = document.getElementById(id);
     if (active && node?.isConnected) template.content.append(node);
     else if (!active && template.content.childElementCount) template.before(template.content);

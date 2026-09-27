@@ -15,8 +15,8 @@ function queryRetainedMusicElements(selector) {
 const rhythmViewport = document.querySelector('[data-rhythm-viewport]');
 
 const shell = document.querySelector(".site-shell");
-const startButton = document.querySelector(".start-button");
-const homeFrame = document.querySelector(".home-frame");
+const startButton = document.querySelector(".start-button") || document.getElementById("home-presentation-template").content.querySelector(".start-button");
+const homeFrame = document.querySelector(".home-frame") || document.getElementById("home-presentation-template").content.querySelector(".home-frame");
 const portfolioHub = document.querySelector(".portfolio-hub");
 const portfolioEntryTarget = document.querySelector("[data-portfolio-entry-target]");
 const aboutShell = document.querySelector("[data-about-shell]");
