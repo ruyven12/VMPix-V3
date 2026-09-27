@@ -5459,16 +5459,13 @@ function renderBandIdentityDossier(band) {
     bandDetailName.after(bandDetailLocation);
     copy.querySelector(".band-detail-meta")?.remove();
     bandDetailStatus.after(bandDetailTags);
-    const lifecycle = document.createElement("p");
-    lifecycle.className = "band-identity-lifecycle";
-    lifecycle.dataset.bandIdentityLifecycle = "";
     const seen = document.createElement("p");
     seen.className = "band-identity-last-seen";
     seen.dataset.bandIdentityLastSeen = "";
     const label = document.createElement("span");
     label.textContent = "LAST SEEN";
     seen.append(label, document.createElement("span"));
-    copy.querySelector(".band-detail-completion").before(lifecycle, seen);
+    copy.querySelector(".band-detail-completion").before(seen);
     hero.append(bandDetailViewSets);
     bandDetailLogoName?.remove();
   }
@@ -5481,14 +5478,20 @@ function renderBandIdentityDossier(band) {
   const archiveStatus = getRhythmSourceStatus(band);
   bandDetailStatus.textContent = archiveStatus.label;
   bandDetailStatus.hidden = !archiveStatus.label;
+  // Generic tags may repeat region/completeness; only an explicit genre field belongs here.
+  const genreValue = general.genre ?? raw.genre;
+  const genres = (Array.isArray(genreValue) ? genreValue : [genreValue])
+    .filter(value => typeof value === "string")
+    .map(value => getBandDetailTextCandidate(value))
+    .filter(value => value && ![region, archiveStatus.label].some(label => label.toLowerCase() === value.toLowerCase()));
+  bandDetailTags.textContent = [...new Set(genres)].join(" / ");
+  bandDetailTags.hidden = genres.length === 0;
   const location = [getBandDetailTextCandidate(stats.location, raw.location), getBandDetailTextCandidate(stats.state, raw.state)].filter(Boolean).join(", ");
   bandDetailLocation.textContent = location;
   bandDetailLocation.hidden = !location;
   const lifecycle = getBandDetailLifecycleStatus(general, raw).toLowerCase();
   const key = ["active", "inactive"].includes(lifecycle) ? lifecycle : "unknown";
   hero.dataset.bandStatus = key;
-  const statusNode = hero.querySelector("[data-band-identity-lifecycle]");
-  statusNode.textContent = key === "active" ? "● ACTIVE" : key === "inactive" ? "○ INACTIVE" : "STATUS UNKNOWN";
   const known = value => value != null && String(value).trim() !== "" && getBandIndexNumber(value) !== null;
   const archived = stats.archived_sets ?? raw.archived_sets;
   const total = stats.total_sets ?? raw.total_sets;
