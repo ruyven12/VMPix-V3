@@ -31224,6 +31224,46 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   [data-zhento-context-managed] .zhento-detail:not([hidden]) { animation: none; }
 }
+/* Pulse shares the contextual frame; overview and detail occupy the same footprint. */
+.zhento-lower-third [hidden] { display: none !important; }
+.zhento-lower-third[data-lower-third-content="pulse"] { inline-size: min(62rem, calc(100vw - 2 * clamp(2.2rem, 6.2vw, 7.5rem))); }
+.zhento-pulse { text-align: center; pointer-events: auto; }
+.zhento-pulse__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; margin-block-start: .65rem; }
+.zhento-pillar-tile {
+  --pillar-edge: 137, 167, 255; --pillar-focus: 50% 42%;
+  position: relative; isolation: isolate; overflow: hidden; min-inline-size: 0; min-block-size: 44px; block-size: 10rem;
+  padding: 0; border: 1px solid rgba(var(--pillar-edge), .55); border-radius: 0; background: rgba(6, 7, 12, .35);
+  color: rgba(241, 244, 255, .98); font: inherit; cursor: pointer; text-align: left;
+}
+.zhento-pillar-tile[data-zhento-destination="people"] { --pillar-edge: 145, 112, 235; --pillar-focus: 51% 42%; }
+.zhento-pillar-tile[data-zhento-destination="venues"] { --pillar-focus: 50% 42%; }
+.zhento-pillar-tile[data-zhento-destination="shows"] { --pillar-focus: 51% 42%; }
+.zhento-pillar-tile__art { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: var(--pillar-focus); z-index: -1; }
+.zhento-pillar-tile__label { position: absolute; inset-inline: 0; inset-block-end: 0; display: grid; gap: .15rem; padding: .8rem .45rem .35rem; background: linear-gradient(transparent, rgba(5,7,15,.78) 35%, rgba(5,7,15,.88)); }
+.zhento-pillar-tile__title { font-size: .72rem; line-height: 1.2; }
+.zhento-pillar-tile__category, .zhento-pillar-tile__count { font-size: .62rem; line-height: 1.2; color: rgba(225,231,247,.92); }
+.zhento-pillar-tile__arrow { position: absolute; inset-inline-end: .4rem; inset-block-end: .3rem; font-size: .8rem; color: rgb(var(--pillar-edge)); }
+.zhento-pillar-tile[aria-pressed="true"] { border-color: rgb(var(--pillar-edge)); box-shadow: inset 0 0 0 1px rgba(var(--pillar-edge), .7); }
+.zhento-pillar-tile:focus-visible, .zhento-pulse__back:focus-visible, .zhento-pulse .zhento-enter:focus-visible { outline: 2px solid rgba(220,230,255,.85); outline-offset: -3px; }
+.zhento-pulse__detail { padding: .55rem .75rem .2rem; background: linear-gradient(90deg, rgba(6,7,12,.5), rgba(6,7,12,.3) 78%, transparent); }
+.zhento-pulse__detail .zhento-detail__title { border: 0; padding: 0; line-height: 1.3; text-shadow: none; }
+.zhento-pulse__detail .zhento-detail__stat { line-height: 1.35; text-shadow: none; }
+.zhento-pulse__detail .zhento-detail__copy { margin: .75rem 0; padding: 0; border: 0; font-family: inherit; font-size: calc(.76rem + 2px); line-height: 1.4; letter-spacing: 0; }
+.zhento-pulse .zhento-enter, .zhento-pulse__back { position: static; transform: none; display: block; inline-size: 100%; min-block-size: 44px; margin: 0; padding: .45rem; border: 0; background: transparent; color: #dce6ff; font: inherit; font-size: .72rem; cursor: pointer; }
+.zhento-pulse .zhento-enter:disabled { opacity: .5; cursor: default; }
+.zhento-pulse__back { border-block-start: 1px solid rgba(137,167,255,.2); font-size: .65rem; }
+@media (max-width: 900px) {
+  .zhento-pulse__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .zhento-pillar-tile { block-size: 7rem; }
+}
+@media (max-width: 540px) {
+  .zhento-lower-third[data-lower-third-content="pulse"] { inline-size: calc(100vw - 4.1rem); }
+  .zhento-pulse__grid { gap: .4rem; margin-block-start: .5rem; }
+  .zhento-pillar-tile { block-size: 6.25rem; }
+  .zhento-pillar-tile__title { font-size: .65rem; }
+  .zhento-pillar-tile__category, .zhento-pillar-tile__count { font-size: .58rem; }
+  .zhento-pillar-tile__label { gap: .1rem; padding: .65rem .35rem .3rem; }
+}
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
   animation: zhentoHudReveal 500ms ease-out 2800ms both;

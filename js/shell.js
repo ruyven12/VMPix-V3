@@ -3136,6 +3136,11 @@ const ZHENTO_PILLAR_STAT_LABELS = {
 
 function syncZhentoPillarStat() {
   const landing = document.querySelector("[data-zhento-landing]");
+  landing?.querySelectorAll("[data-zhento-pillar-count]").forEach((count) => {
+    const source = getMusicLandingStatValueElement(count.dataset.zhentoPillarCount);
+    const value = ["live", "counting"].includes(source?.dataset.statSource) ? source.textContent : "—";
+    if (count.textContent !== value) count.textContent = value;
+  });
   const key = landing?.dataset.selectedDestination;
   const stat = landing?.querySelector(".zhento-detail__stat");
   if (!stat || !ZHENTO_PILLAR_STAT_LABELS[key]) return;
@@ -3294,11 +3299,81 @@ function fitZhentoLowerThirdBody() {
   body.scrollTop = scrollTop;
 }
 
+function setZhentoPulseView(landing, detail) {
+  const pulse = landing.querySelector(".zhento-pulse");
+  pulse.dataset.pulseView = detail ? "detail" : "overview";
+  for (const [selector, visible] of [[".zhento-pulse__overview", !detail], [".zhento-pulse__detail", detail]]) {
+    const view = pulse.querySelector(selector);
+    view.hidden = !visible;
+    view.inert = !visible;
+  }
+  landing.querySelector(".zhento-lower-third").setAttribute("aria-labelledby", detail ? "zhento-pillar-title" : "zhento-pulse-title");
+}
+
+function clearZhentoPillarSelection(landing) {
+  delete landing.dataset.selectedDestination;
+  landing.querySelectorAll("[data-zhento-destination]").forEach((button) => button.setAttribute("aria-pressed", "false"));
+  landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
+  setZhentoPulseView(landing, false);
+}
+
+function cancelZhentoPulseMorph(context) {
+  const morph = context?.pulseMorph;
+  if (!morph) return;
+  context.pulseMorph = null;
+  morph.animations.forEach((animation) => animation.cancel());
+  morph.pulse.inert = false;
+  delete morph.pulse.dataset.pulseMoving;
+}
+
+async function morphZhentoPulse(landing, detail) {
+  const context = zhentoInformationContext;
+  if (context?.key !== "pulse" || context.pulseMorph) return;
+  const pulse = landing.querySelector(".zhento-pulse");
+  const surface = landing.querySelector(".zhento-lower-third");
+  const previousKey = landing.dataset.selectedDestination;
+  const settle = () => {
+    if (!detail) clearZhentoPillarSelection(landing);
+    else setZhentoPulseView(landing, true);
+  };
+  const focus = () => (detail ? pulse.querySelector(".zhento-pulse__back") : pulse.querySelector(`[data-zhento-destination="${previousKey}"]`))?.focus({ preventScroll: true });
+  if (reducedMotion.matches) { settle(); focus(); return; }
+  const morph = { pulse, animations: [], settle };
+  context.pulseMorph = morph;
+  pulse.dataset.pulseMoving = "true";
+  pulse.inert = true;
+  const current = () => zhentoInformationContext === context && context.pulseMorph === morph;
+  const animate = (element, frames, duration) => {
+    const animation = element.animate(frames, { duration, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both" });
+    morph.animations.push(animation);
+    return animation.finished.catch(() => {});
+  };
+  const startHeight = surface.getBoundingClientRect().height;
+  const outgoing = pulse.querySelector(detail ? ".zhento-pulse__overview" : ".zhento-pulse__detail");
+  const retirements = [animate(outgoing, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.985)" }], 80)];
+  if (detail) pulse.querySelectorAll('[data-zhento-destination][aria-pressed="false"]').forEach((tile) => {
+    retirements.push(animate(tile, [{ opacity: 1 }, { opacity: .15 }], 80));
+  });
+  await Promise.all(retirements);
+  if (!current()) return;
+  settle();
+  const endHeight = surface.getBoundingClientRect().height;
+  const incoming = pulse.querySelector(detail ? ".zhento-pulse__detail" : ".zhento-pulse__overview");
+  await Promise.all([
+    animate(surface, [{ height: `${startHeight}px` }, { height: `${endHeight}px` }], 180),
+    animate(incoming, [{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "none" }], 180),
+  ]);
+  if (!current()) return;
+  cancelZhentoPulseMorph(context);
+  focus();
+}
+
 function setZhentoLowerThirdContent(surface, key) {
   const copy = surface.querySelector(`[data-zhento-lower-third-copy="${key}"]`);
   if (!copy) return;
   clearZhentoBodyScroll(surface);
   surface.dataset.lowerThirdContent = key;
+  surface.setAttribute("aria-labelledby", "zhento-lore-title");
   surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren(copy.content.cloneNode(true));
 }
 let zhentoInformationContext = null;
@@ -3307,14 +3382,18 @@ function cancelZhentoInformationContext(hide = true) {
   const context = zhentoInformationContext;
   zhentoInformationContext = null;
   context?.animations.forEach((animation) => animation.cancel());
-  if (!hide) return;
+  if (!hide) context?.pulseMorph?.settle();
+  cancelZhentoPulseMorph(context);
+  if (!hide) {
+    if (context) context.animations = [];
+    zhentoInformationContext = context;
+    return;
+  }
   const landing = context?.landing || document.querySelector("[data-zhento-landing]");
   if (!landing) return;
-  zhentoPromptExit?.cancel();
-  zhentoPromptExit = null;
   delete landing.dataset.informationContext;
   clearZhentoBodyScroll(landing.querySelector(".zhento-lower-third"));
-  landing.querySelectorAll(".zhento-destinations, .zhento-lower-third, .zhento-detail, .zhento-destination-prompt").forEach((surface) => {
+  landing.querySelectorAll(".zhento-lower-third").forEach((surface) => {
     surface.hidden = true;
     surface.inert = true;
   });
@@ -3324,22 +3403,24 @@ function showZhentoInformationContext(landing, key) {
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
   if (key !== "pulse" && key !== "lore" && key !== "origins" && key !== "reimaging") return;
-  const surface = landing.querySelector(key === "pulse" ? ".zhento-destinations" : ".zhento-lower-third");
+  const surface = landing.querySelector(".zhento-lower-third");
   if (!surface) return;
+  const pulse = surface.querySelector(".zhento-pulse");
+  const reading = surface.querySelector(".zhento-lower-third__reading-zone");
+  pulse.hidden = key !== "pulse";
+  pulse.inert = key !== "pulse";
+  reading.hidden = key === "pulse";
+  reading.inert = key === "pulse";
   if (key !== "pulse") setZhentoLowerThirdContent(surface, key);
+  else surface.dataset.lowerThirdContent = "pulse";
   const context = { landing, key, animations: [] };
   zhentoInformationContext = context;
   landing.dataset.informationContext = key;
   surface.hidden = false;
   surface.inert = false;
   if (key === "pulse") {
-    const detail = landing.querySelector(".zhento-detail");
-    const prompt = landing.querySelector(".zhento-destination-prompt");
-    const selected = Boolean(landing.dataset.selectedDestination);
-    detail.hidden = !selected;
-    detail.inert = !selected;
-    prompt.hidden = selected;
-    prompt.inert = selected;
+    setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination));
+    syncZhentoPillarStat();
   }
   if (key === "origins" || key === "reimaging") {
     fitZhentoLowerThirdBody();
@@ -3366,8 +3447,11 @@ function showZhentoInformationContext(landing, key) {
     animate(surface.querySelector(".zhento-lower-third__header"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 110, duration: 170 });
     animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 210, duration: 190 });
   } else {
-    animate(surface, [{ opacity: 0, transform: "translateY(8px) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 320 });
-    animate(surface.querySelector(".zhento-context-signal"), [{ opacity: 0, transform: "scaleX(.05)" }, { opacity: .9, transform: "scaleX(1)", offset: .55 }, { opacity: 0, transform: "scaleX(1)" }], { duration: 300 });
+    animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 320 });
+    animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 230 });
+    surface.querySelectorAll(".zhento-lower-third__frame").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { duration: 260 }));
+    animate(surface.querySelector(".zhento-lower-third__signal"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .9, transform: "scaleX(1)", offset: .6 }, { opacity: .6, transform: "scaleX(1)" }], { duration: 320 });
+    animate(pulse, [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 110, duration: 210 });
   }
 }
 let zhentoSelectorMorph = null;
@@ -3417,6 +3501,7 @@ function resetZhentoInformationSelector(landing) {
   const changeMode = async (control, key) => {
     panel.dataset.selectorUsed = "true";
     cancelZhentoInformationContext();
+    if (!key) clearZhentoPillarSelection(landing);
     if (reducedMotion.matches) {
       setMode(key);
       showZhentoInformationContext(landing, key);
@@ -3471,8 +3556,6 @@ function resetZhentoInformationSelector(landing) {
   delete panel.dataset.selectorUsed;
   setMode("");
 }
-let zhentoSelectionGeneration = 0;
-let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
@@ -3486,70 +3569,37 @@ function resetZhentoLandingSelection() {
       + Array.from({ length: 10 }, () => '<i class="zhento-atmosphere__mote"></i>').join("");
     artwork.append(atmosphere);
   }
-  const generation = ++zhentoSelectionGeneration;
-  zhentoPromptExit?.cancel();
-  zhentoPromptExit = null;
-  delete landing.dataset.selectedDestination;
-  const enter = landing.querySelector(".zhento-detail .zhento-enter");
-  enter.textContent = "Enter the Pillar";
+  clearZhentoPillarSelection(landing);
+  const enter = landing.querySelector(".zhento-pulse .zhento-enter");
   enter.disabled = true;
   enter.setAttribute("aria-label", "Enter — not available yet");
   if (!enter.dataset.zhentoEntryBound) {
     enter.dataset.zhentoEntryBound = "true";
     enter.addEventListener("click", startZhentoRhythmEntry);
   }
-  if (!landing.querySelector(".zhento-detail__stat")) {
-    const stat = document.createElement("p");
-    stat.className = "zhento-detail__stat";
-    landing.querySelector(".zhento-detail__title").after(stat);
-  }
-  landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
-  landing.querySelector(".zhento-detail").hidden = true;
-  landing.querySelector(".zhento-destination-prompt").hidden = true;
-  landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
-    button.setAttribute("aria-pressed", "false");
-    const reveal = button.getAnimations().filter((animation) => animation.animationName === "daiionArchiveStatsLabelResolve");
-    button.inert = !reducedMotion.matches && !v3RouteContext.skipEntryAnimation && reveal.some((animation) => animation.playState !== "finished");
-    Promise.all(reveal.map((animation) => animation.finished.catch(() => {}))).then(() => {
-      if (generation === zhentoSelectionGeneration && getRouteFromUrl().name === "music") button.inert = false;
+  const back = landing.querySelector(".zhento-pulse__back");
+  if (!back.dataset.zhentoBound) {
+    back.dataset.zhentoBound = "true";
+    back.addEventListener("click", () => {
+      if (getRouteFromUrl().name === "music" && !zhentoRhythmEntry) void morphZhentoPulse(landing, false);
     });
+  }
+  landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     if (button.dataset.zhentoBound) return;
     button.dataset.zhentoBound = "true";
     button.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music" || button.inert) return;
-      if (zhentoRhythmEntry) return;
-      landing.dataset.selectedDestination = button.dataset.zhentoDestination;
-      enter.disabled = button.dataset.zhentoDestination !== "bands";
+      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry || zhentoInformationContext?.pulseMorph) return;
+      const key = button.dataset.zhentoDestination;
+      landing.dataset.selectedDestination = key;
+      enter.disabled = key !== "bands";
       enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : "Enter the Pillar of Rhythm");
-      landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === button.dataset.zhentoDestination)));
-      landing.querySelectorAll("[data-zhento-destination]").forEach((item) => {
-        item.setAttribute("aria-pressed", String(item === button));
-      });
-      landing.querySelector(".zhento-detail__title").textContent = button.textContent.trim();
-      landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[button.dataset.zhentoDestination];
+      landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === key)));
+      landing.querySelectorAll("[data-zhento-destination]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      landing.querySelector(".zhento-detail__title").textContent = button.querySelector(".zhento-pillar-tile__title").textContent;
+      landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[key];
       syncZhentoPillarStat();
-      const prompt = landing.querySelector(".zhento-destination-prompt");
-      const selection = landing.dataset.selectedDestination;
-      const revealDetail = () => {
-        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection || landing.dataset.informationContext !== "pulse") return;
-        prompt.hidden = true;
-        landing.querySelector(".zhento-detail").hidden = false;
-        landing.querySelector(".zhento-detail").inert = false;
-      };
-      const opacity = Number(getComputedStyle(prompt).opacity);
-      if (!reducedMotion.matches && !(v3RouteContext.skipEntryAnimation && v3RouteContext.pending) && !prompt.hidden && opacity > 0) {
-        zhentoPromptExit?.cancel();
-        const exit = prompt.animate([{ opacity }, { opacity: 0 }], { duration: 150, easing: "ease-out", fill: "forwards" });
-        zhentoPromptExit = exit;
-        exit.finished.then(() => {
-          if (zhentoPromptExit !== exit) return;
-          revealDetail();
-          exit.cancel();
-          zhentoPromptExit = null;
-        }).catch(() => {});
-      } else {
-        revealDetail();
-      }
+      // A hidden synthetic activation is the existing shared-resume adapter.
+      if (landing.dataset.informationContext === "pulse") void morphZhentoPulse(landing, true);
     });
   });
 }
