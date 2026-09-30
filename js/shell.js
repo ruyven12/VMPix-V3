@@ -3249,11 +3249,27 @@ function startZhentoRhythmEntry() {
   });
 }
 
+function resetZhentoInformationSelector(landing) {
+  const toggle = landing.querySelector("[data-zhento-stats-toggle]");
+  const body = landing.querySelector("#zhento-stats-body");
+  if (!toggle || !body) return;
+  const setExpanded = (expanded) => {
+    toggle.setAttribute("aria-expanded", String(expanded));
+    body.setAttribute("aria-hidden", String(!expanded));
+    body.inert = !expanded;
+  };
+  if (!toggle.dataset.bound) {
+    toggle.dataset.bound = "true";
+    toggle.addEventListener("click", () => setExpanded(toggle.getAttribute("aria-expanded") !== "true"));
+  }
+  setExpanded(true);
+}
 let zhentoSelectionGeneration = 0;
 let zhentoPromptExit = null;
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
+  resetZhentoInformationSelector(landing);
   const artwork = landing.querySelector(".zhento-landing__artwork");
   if (artwork && !artwork.querySelector(".zhento-atmosphere")) {
     const atmosphere = document.createElement("div");

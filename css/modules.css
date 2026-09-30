@@ -30646,6 +30646,56 @@ button.hall-crusades-archive-crystal:focus-visible {
   border-block-end: 1px solid rgba(137, 167, 255, 0.18);
 }
 
+/* Local information disclosure keeps live stat nodes and their timelines mounted. */
+.zhento-stats .zhento-stats__title { padding-block-end: 0; }
+.zhento-info-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .45rem;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: .35rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: start;
+  pointer-events: auto;
+}
+.zhento-stats__toggle { cursor: pointer; }
+.zhento-info-control:focus-visible {
+  outline: 1px solid rgba(137, 189, 255, .95);
+  outline-offset: -2px;
+}
+.zhento-stats__chevron {
+  flex: 0 0 .38rem;
+  block-size: .38rem;
+  margin-inline-end: .2rem;
+  border-inline-end: 1px solid currentColor;
+  border-block-end: 1px solid currentColor;
+  transform: rotate(225deg);
+}
+.zhento-stats__toggle[aria-expanded="false"] .zhento-stats__chevron { transform: rotate(45deg); }
+.zhento-stats__body[aria-hidden="true"] {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+.zhento-info-placeholder {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: .16rem;
+  border-block-start: 1px solid rgba(137, 167, 255, .18);
+  color: rgba(224, 230, 244, .82);
+  font-size: clamp(.62rem, .78vw, .78rem);
+  font-weight: 500;
+  cursor: default;
+}
+.zhento-info-context { color: rgba(184, 193, 214, .72); font-size: .85em; }
 /* Photo progress shares the live count tick; no separate animation timeline. */
 .zhento-stats__row[data-zhento-stat="photos"] {
   grid-template-columns:auto minmax(0,1fr);
@@ -30825,7 +30875,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-stats__value { margin: 0; }
 @media (max-width: 540px) {
   .zhento-stats { inset-block-start: 4.2rem; inset-inline-start: 2.05rem; inline-size: min(13.45rem, calc(100vw - 3.2rem)); padding: .71rem .77rem; }
-  .zhento-stats__row { min-block-size: 2.48rem; column-gap: .42rem; }
+  .zhento-stats__row { min-block-size: 2rem; column-gap: .42rem; }
   .zhento-destinations { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; inline-size: min(12.82rem, calc(100vw - 3.2rem)); padding: .68rem .79rem; }
   .zhento-destinations__item { min-block-size: 2.33rem; padding-block: .68rem .51rem; }
 }
@@ -31063,11 +31113,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-shell-route="music"] :is(.zhento-stats__title, .zhento-destinations__title) {
   animation: daiionArchiveStatsContentResolve 180ms ease-out 4550ms both;
 }
-.zhento-stats__row:nth-child(2), .zhento-destinations__item:nth-child(2) { --zhento-row-index: 0; }
-.zhento-stats__row:nth-child(3), .zhento-destinations__item:nth-child(3) { --zhento-row-index: 1; }
-.zhento-stats__row:nth-child(4), .zhento-destinations__item:nth-child(4) { --zhento-row-index: 2; }
-.zhento-stats__row:nth-child(5), .zhento-destinations__item:nth-child(5) { --zhento-row-index: 3; }
-.zhento-stats__row:nth-child(6) { --zhento-row-index: 4; }
+.zhento-stats__row[data-zhento-stat="photos"], .zhento-destinations__item:nth-child(2) { --zhento-row-index: 0; }
+.zhento-stats__row[data-zhento-stat="bands"], .zhento-destinations__item:nth-child(3) { --zhento-row-index: 1; }
+.zhento-stats__row[data-zhento-stat="shows"], .zhento-destinations__item:nth-child(4) { --zhento-row-index: 2; }
+.zhento-stats__row[data-zhento-stat="people"], .zhento-destinations__item:nth-child(5) { --zhento-row-index: 3; }
+.zhento-stats__row[data-zhento-stat="venues"] { --zhento-row-index: 4; }
 .site-shell[data-shell-route="music"] :is(.zhento-stats__label, .zhento-destinations__item) {
   animation: daiionArchiveStatsLabelResolve 220ms ease-out calc(4620ms + var(--zhento-row-index) * 80ms) both;
 }
