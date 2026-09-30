@@ -1419,82 +1419,219 @@ function normalizeBandDetailMembers(members) {
     .filter(Boolean);
 }
 
-function renderBandDetailMembers(container, members) {
-  if (!container) return;
+const BAND_PERSONNEL_ROLE_ICONS = {
+  vocals: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M6 10v2a6 6 0 0 0 12 0v-2M12 18v4M8 22h8"/>',
+  guitar: '<path d="m14 9 5-6 2 2-6 6c2 4 0 5-2 5-1 0-1 2-2 3-2 2-5 2-7 0s-2-5 0-7c1-1 3-1 3-2 0-2 3-3 7-1Z"/><circle cx="9" cy="14" r="2"/><path d="m9 14 11-10M5 17l2 2"/>',
+  bass: '<path d="m12 12 7-10 2 2-7 10c2 3 0 5-2 5-1 0-1 2-3 2-3 0-6-2-6-5 0-2 2-4 4-3l2-2 3 1Z"/><path d="m8 17 12-14M6 17l3 2M17 3l2 1M18 7l2 1"/>',
+  drums: '<ellipse cx="12" cy="12" rx="9" ry="3"/><path d="M3 12v7c0 4 18 4 18 0v-7M7 15v5M12 16v6M17 15v5M4 2l12 6M20 2 8 8"/>',
+  keys: '<rect x="2" y="5" width="20" height="14" rx="1"/><path d="M6 12v7M10 12v7M14 12v7M18 12v7M5 5v7h2V5M9 5v7h2V5M15 5v7h2V5M19 5v7h2V5"/>',
+  electronics: '<path d="M2 12h3l2-7 3 14 3-17 3 20 2-10h4"/>',
+  neutral: '<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3M8 22v-4M16 22v-4"/>',
+};
+
+function getBandPersonnelRoleIcons(role) {
+  // Bass guitar is one instrument, not a second guitar role.
+  const text = String(role || '').toLowerCase().replace(/\bbass\s+guitar(?:ist)?\b/g, 'bass');
+  const mappings = [
+    ['vocals', /\b(?:vocals?|vocalist|singer)\b/],
+    ['guitar', /\b(?:guitars?|guitarist)\b/],
+    ['bass', /\b(?:bass|bassist)\b/],
+    ['drums', /\b(?:drums?|drummer|percussion|percussionist)\b/],
+    ['keys', /\b(?:keyboards?|keyboardist|keys|piano|pianist)\b/],
+    ['electronics', /\b(?:dj|electronics?|turntables?)\b/],
+  ];
+  const matches = mappings.map(([key, pattern]) => ({ key, index: text.search(pattern) }))
+    .filter(match => match.index >= 0).sort((a, b) => a.index - b.index);
+  return matches.length ? matches.slice(0, 2).map(match => match.key) : ['neutral'];
+}
+
+function createBandPersonnelCard(member) {
+  const item = document.createElement('li');
+  item.className = 'band-member';
+  const icons = document.createElement('span');
+  icons.className = 'band-personnel-icons';
+  icons.setAttribute('aria-hidden', 'true');
+  getBandPersonnelRoleIcons(member.role).forEach(key => {
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('focusable', 'false');
+    icon.dataset.personnelIcon = key;
+    icon.innerHTML = BAND_PERSONNEL_ROLE_ICONS[key];
+    icons.append(icon);
+  });
+  const copy = document.createElement('div');
+  copy.className = 'band-member-copy';
+  const name = document.createElement('p');
+  name.className = 'band-member-name';
+  name.textContent = member.name;
+  copy.append(name);
+  if (member.role && member.role !== 'Role Pending') {
+    const role = document.createElement('p');
+    role.className = 'band-member-role';
+    role.textContent = member.role;
+    copy.append(role);
+  }
+  item.append(icons, copy);
+  return item;
+}
+
+function createBandPersonnelPages(container, rosters) {
+  const pages = { current: [], past: [] };
   const fragment = document.createDocumentFragment();
-  normalizeBandDetailMembers(members).forEach(member => {
-    const item = document.createElement("li");
-    item.className = "band-member";
-    const thumb = document.createElement("span");
-    thumb.className = "band-member-thumb";
-    thumb.setAttribute("aria-hidden", "true");
-    thumb.textContent = member.thumb;
-    const copy = document.createElement("div");
-    copy.className = "band-member-copy";
-    const name = document.createElement("p");
-    name.className = "band-member-name";
-    name.textContent = member.name;
-    copy.append(name);
-    if (member.role && member.role !== "Role Pending") {
-      const role = document.createElement("p");
-      role.className = "band-member-role";
-      role.textContent = member.role;
-      copy.append(role);
+  Object.entries(rosters).forEach(([key, members]) => {
+    const records = normalizeBandDetailMembers(members);
+    for (let index = 0; index < records.length; index += 2) {
+      const page = document.createElement('li');
+      page.className = 'band-personnel-page';
+      page.setAttribute('aria-roledescription', 'slide');
+      page.setAttribute('aria-label', (key === 'past' ? 'Past' : 'Current') + ' members, page ' + (index / 2 + 1) + ' of ' + Math.ceil(records.length / 2));
+      page.setAttribute('aria-hidden', 'true');
+      page.inert = true;
+      const list = document.createElement('ul');
+      list.className = 'band-personnel-page-members';
+      records.slice(index, index + 2).forEach(member => list.append(createBandPersonnelCard(member)));
+      page.append(list);
+      pages[key].push(page);
+      fragment.append(page);
     }
-    item.append(thumb, copy);
-    fragment.append(item);
   });
   container.replaceChildren(fragment);
+  return pages;
 }
 
 function renderBandPersonnel(band) {
-  const section = bandDetailCoreMembers?.closest(".band-detail-members");
+  const section = bandDetailCoreMembers?.closest('.band-detail-members');
   if (!section) return;
-  if (!section.classList.contains("band-personnel")) {
-    section.classList.add("band-personnel");
-    section.setAttribute("aria-label", "Personnel");
-    const title = document.createElement("h4");
-    title.className = "band-detail-panel-title";
-    title.textContent = "PERSONNEL";
-    const controls = document.createElement("div");
-    controls.className = "band-personnel-controls";
-    controls.setAttribute("role", "group");
-    controls.setAttribute("aria-label", "Personnel roster");
-    ["current", "past"].forEach(key => {
-      const button = document.createElement("button");
-      button.type = "button";
+  if (!section.classList.contains('band-personnel')) {
+    section.classList.add('band-personnel');
+    section.setAttribute('aria-label', 'Personnel');
+    const title = document.createElement('h4');
+    title.className = 'band-detail-panel-title';
+    title.textContent = 'PERSONNEL';
+    const controls = document.createElement('div');
+    controls.className = 'band-personnel-controls';
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', 'Personnel roster');
+    ['current', 'past'].forEach(key => {
+      const button = document.createElement('button');
+      button.type = 'button';
       button.dataset.personnelRoster = key;
-      button.setAttribute("aria-controls", "band-personnel-roster");
+      button.setAttribute('aria-controls', 'band-personnel-roster');
       controls.append(button);
     });
-    bandDetailCoreMembers.id = "band-personnel-roster";
-    section.replaceChildren(title, controls, bandDetailCoreMembers);
+    bandDetailCoreMembers.id = 'band-personnel-roster';
+    bandDetailCoreMembers.tabIndex = 0;
+    bandDetailCoreMembers.setAttribute('aria-roledescription', 'carousel');
+    const pagination = document.createElement('div');
+    pagination.className = 'band-personnel-pagination';
+    pagination.setAttribute('role', 'group');
+    pagination.setAttribute('aria-label', 'Personnel pages');
+    const previous = document.createElement('button');
+    previous.type = 'button';
+    previous.dataset.personnelPrevious = '';
+    previous.textContent = '‹';
+    previous.setAttribute('aria-label', 'Previous personnel page');
+    previous.setAttribute('aria-controls', 'band-personnel-roster');
+    const indicator = document.createElement('div');
+    indicator.className = 'band-personnel-indicator';
+    const dots = document.createElement('span');
+    dots.className = 'band-personnel-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    const status = document.createElement('span');
+    status.className = 'band-personnel-page-status';
+    status.setAttribute('aria-live', 'polite');
+    status.setAttribute('aria-atomic', 'true');
+    indicator.append(dots, status);
+    const next = document.createElement('button');
+    next.type = 'button';
+    next.dataset.personnelNext = '';
+    next.textContent = '›';
+    next.setAttribute('aria-label', 'Next personnel page');
+    next.setAttribute('aria-controls', 'band-personnel-roster');
+    pagination.append(previous, indicator, next);
+    section.replaceChildren(title, controls, bandDetailCoreMembers, pagination);
   }
   const personnel = getBandDetailPersonnel(band.backend_record || band);
-  // Membership in one authoritative roster does not negate membership in the other.
-  const rosters = { current: getUniqueBandDetailMembers(personnel.members), past: getUniqueBandDetailMembers(personnel.past_members) };
+  // Keep authoritative roster membership and the shared resume selection hook.
+  const rosters = {
+    current: getUniqueBandDetailMembers(personnel.members),
+    past: getUniqueBandDetailMembers(personnel.past_members),
+  };
   section.hidden = !rosters.current.length && !rosters.past.length;
-  const controls = section.querySelector(".band-personnel-controls");
+  const controls = section.querySelector('.band-personnel-controls');
   controls.hidden = !rosters.current.length || !rosters.past.length;
   const bandId = getBandId(band);
-  const previous = v3ResumeUI().personnel === "past" ? "past" : section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : "";
+  const retained = v3ResumeUI().personnel === 'past' ? 'past'
+    : section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : '';
   section.dataset.personnelBand = bandId;
-  const render = key => {
+  const pages = createBandPersonnelPages(bandDetailCoreMembers, rosters);
+  const pagination = section.querySelector('.band-personnel-pagination');
+  const previous = pagination.querySelector('[data-personnel-previous]');
+  const next = pagination.querySelector('[data-personnel-next]');
+  const dots = pagination.querySelector('.band-personnel-dots');
+  const status = pagination.querySelector('.band-personnel-page-status');
+  pagination.hidden = Math.max(pages.current.length, pages.past.length) <= 1;
+  let selected = retained && rosters[retained].length ? retained : rosters.current.length ? 'current' : 'past';
+  let pageIndex = 0;
+
+  function renderPage(index) {
+    const count = pages[selected].length;
+    pageIndex = Math.max(0, Math.min(index, count - 1));
+    Object.entries(pages).forEach(([key, rosterPages]) => rosterPages.forEach((page, index) => {
+      const active = key === selected && index === pageIndex;
+      page.classList.toggle('is-active', active);
+      page.setAttribute('aria-hidden', String(!active));
+      page.inert = !active;
+    }));
+    previous.disabled = pageIndex === 0;
+    next.disabled = pageIndex >= count - 1;
+    dots.replaceChildren(...pages[selected].map((_, index) => {
+      const dot = document.createElement('span');
+      dot.className = index === pageIndex ? 'is-active' : '';
+      return dot;
+    }));
+    status.textContent = count ? (pageIndex + 1) + ' / ' + count : '';
+    status.setAttribute('aria-label', count ? 'Personnel page ' + (pageIndex + 1) + ' of ' + count : '');
+  }
+
+  function selectRoster(key) {
+    selected = key;
     section.dataset.personnelSelection = key;
-    controls.querySelectorAll("button").forEach(button => {
+    controls.querySelectorAll('button').forEach(button => {
       const target = button.dataset.personnelRoster;
-      button.textContent = `${target.toUpperCase()} (${rosters[target].length})`;
-      button.setAttribute("aria-pressed", String(target === key));
+      button.textContent = target.toUpperCase() + ' (' + rosters[target].length + ')';
+      button.setAttribute('aria-pressed', String(target === key));
     });
-    bandDetailCoreMembers.setAttribute("aria-label", key === "past" ? "Past members" : "Current members");
-    renderBandDetailMembers(bandDetailCoreMembers, rosters[key]);
-  };
-  controls.querySelectorAll("button").forEach(button => {
-    button.onclick = () => {
-      render(button.dataset.personnelRoster);
-    };
+    bandDetailCoreMembers.setAttribute('aria-label', key === 'past' ? 'Past members' : 'Current members');
+    renderPage(0);
+  }
+
+  controls.querySelectorAll('button').forEach(button => {
+    button.onclick = () => selectRoster(button.dataset.personnelRoster);
   });
-  render(previous && rosters[previous].length ? previous : rosters.current.length ? "current" : "past");
+  previous.onclick = () => renderPage(pageIndex - 1);
+  next.onclick = () => renderPage(pageIndex + 1);
+  bandDetailCoreMembers.onkeydown = event => {
+    const targets = { ArrowLeft: pageIndex - 1, ArrowRight: pageIndex + 1, Home: 0, End: pages[selected].length - 1 };
+    if (!(event.key in targets)) return;
+    event.preventDefault();
+    renderPage(targets[event.key]);
+  };
+  let swipe = null;
+  bandDetailCoreMembers.onpointerdown = event => {
+    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    swipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    bandDetailCoreMembers.setPointerCapture(event.pointerId);
+  };
+  bandDetailCoreMembers.onpointerup = event => {
+    if (!swipe || swipe.id !== event.pointerId) return;
+    const dx = event.clientX - swipe.x, dy = event.clientY - swipe.y;
+    swipe = null;
+    if (bandDetailCoreMembers.hasPointerCapture(event.pointerId)) bandDetailCoreMembers.releasePointerCapture(event.pointerId);
+    if (Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy) * 1.3) renderPage(pageIndex + (dx < 0 ? 1 : -1));
+  };
+  bandDetailCoreMembers.onpointercancel = () => { swipe = null; };
+  selectRoster(selected);
 }
 
 function setBandDetailLogo(logoUrl, name) {

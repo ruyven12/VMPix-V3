@@ -31395,7 +31395,92 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel .band-member-thumb { width:2.6rem;border-radius:0;border-color:rgba(171,150,220,.38);background:rgba(94,68,141,.15);box-shadow:none;color:#dbcef3; }
 .band-personnel .band-member-name { font-size:.85rem;line-height:1.4;white-space:normal;overflow:visible;overflow-wrap:anywhere;color:#ece5ff; }
 .band-personnel .band-member-role { font-size:.72rem;line-height:1.45;color:#bdb4d0; }
-.band-detail-content .band-personnel[hidden],.band-personnel-controls[hidden] { display:none; }
+.band-detail-content .band-personnel[hidden],.band-personnel-controls[hidden],.band-personnel-pagination[hidden] { display:none; }
+
+/* Two records per page. Hidden pages share the same natural grid track so
+   paging and roster switches never resize the section or shift the page. */
+.band-personnel .band-member-list {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  touch-action:pan-y;
+  overflow:visible;
+}
+.band-personnel-page {
+  grid-area:1 / 1;
+  min-width:0;
+  list-style:none;
+  visibility:hidden;
+  pointer-events:none;
+}
+.band-personnel-page.is-active { visibility:inherit;pointer-events:auto; }
+.band-personnel-page-members {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.6rem;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.band-personnel-page-members > .band-member {
+  box-sizing:border-box;
+  grid-template-columns:minmax(0,1fr);
+  align-content:start;
+  justify-items:center;
+  min-height:9.5rem;
+  text-align:center;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.band-personnel-page-members > .band-member:only-child {
+  grid-column:1 / -1;
+  width:calc((100% - .6rem) / 2);
+  justify-self:center;
+}
+.band-personnel-icons {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  min-height:2.6rem;
+  color:#d8c5fa;
+}
+.band-personnel-icons svg {
+  width:1.8rem;
+  height:1.8rem;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.band-personnel .band-member-copy { width:100%; }
+.band-personnel .band-member-role { font-size:.75rem; }
+.band-personnel-pagination {
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 44px;
+  align-items:center;
+  gap:.5rem;
+}
+.band-personnel-pagination button {
+  box-sizing:border-box;
+  min-width:44px;
+  min-height:44px;
+  padding:0;
+  border:1px solid rgba(157,136,207,.3);
+  border-radius:0;
+  background:rgba(23,19,40,.7);
+  color:#d4c6ef;
+  font:inherit;
+  font-size:1.5rem;
+  cursor:pointer;
+}
+.band-personnel-pagination button:disabled { opacity:.35;cursor:default; }
+.band-personnel-indicator { display:grid;justify-items:center;gap:.4rem;min-width:0; }
+.band-personnel-dots { display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem; }
+.band-personnel-dots > span { width:6px;height:6px;border:1px solid #9d88c7;border-radius:50%; }
+.band-personnel-dots > .is-active { background:#d1b7f5;border-color:#d1b7f5; }
+.band-personnel-page-status { color:#bdb4d0;font-size:.65rem;line-height:1.3; }
+.band-personnel :is(.band-member-list,.band-personnel-pagination button):focus-visible { outline:2px solid #d6c4ff;outline-offset:3px; }
+
 
 /* Same-Pillar record opening: retire only local archive UI; preserve the world and its HUD. */
 .site-shell[data-band-record-opening] .rhythm-pillar :is(.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-source-more),
