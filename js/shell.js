@@ -2455,7 +2455,10 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     return;
   }
 
-  if (route.name !== "music") cancelZhentoLandingStats();
+  if (route.name !== "music") {
+    cancelZhentoLandingStats();
+    cancelZhentoInformationContext();
+  }
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
   const moduleContext = getShellNavModuleContext(activeTarget);
   const isHomeRoute = route.name === "home";
@@ -3249,6 +3252,61 @@ function startZhentoRhythmEntry() {
   });
 }
 
+let zhentoInformationContext = null;
+
+function cancelZhentoInformationContext(hide = true) {
+  const context = zhentoInformationContext;
+  zhentoInformationContext = null;
+  context?.animations.forEach((animation) => animation.cancel());
+  if (!hide) return;
+  const landing = context?.landing || document.querySelector("[data-zhento-landing]");
+  if (!landing) return;
+  zhentoPromptExit?.cancel();
+  zhentoPromptExit = null;
+  delete landing.dataset.informationContext;
+  landing.querySelectorAll(".zhento-destinations, .zhento-lower-third, .zhento-detail, .zhento-destination-prompt").forEach((surface) => {
+    surface.hidden = true;
+    surface.inert = true;
+  });
+}
+
+function showZhentoInformationContext(landing, key) {
+  if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
+  cancelZhentoInformationContext();
+  if (key !== "destination" && key !== "lore") return;
+  const surface = landing.querySelector(key === "destination" ? ".zhento-destinations" : ".zhento-lower-third");
+  if (!surface) return;
+  const context = { landing, key, animations: [] };
+  zhentoInformationContext = context;
+  landing.dataset.informationContext = key;
+  surface.hidden = false;
+  surface.inert = false;
+  if (key === "destination") {
+    const detail = landing.querySelector(".zhento-detail");
+    const prompt = landing.querySelector(".zhento-destination-prompt");
+    const selected = Boolean(landing.dataset.selectedDestination);
+    detail.hidden = !selected;
+    detail.inert = !selected;
+    prompt.hidden = selected;
+    prompt.inert = selected;
+  }
+  if (reducedMotion.matches) return;
+  const animate = (element, frames, timing) => {
+    if (!element) return;
+    const animation = element.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...timing });
+    context.animations.push(animation);
+    animation.finished.then(() => {
+      animation.cancel();
+      if (zhentoInformationContext === context) context.animations = context.animations.filter((item) => item !== animation);
+    }).catch(() => {});
+  };
+  animate(surface, [{ opacity: 0, transform: "translateY(8px) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: key === "lore" ? 400 : 320 });
+  animate(surface.querySelector(".zhento-context-signal"), [{ opacity: 0, transform: "scaleX(.05)" }, { opacity: .9, transform: "scaleX(1)", offset: .55 }, { opacity: 0, transform: "scaleX(1)" }], { duration: 300 });
+  if (key === "lore") {
+    animate(surface.querySelector(".zhento-lower-third__header"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 90, duration: 180 });
+    animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 190, duration: 210 });
+  }
+}
 function resetZhentoInformationSelector(landing) {
   const panel = landing.querySelector("[data-music-landing-stats]");
   const toggle = landing.querySelector("[data-zhento-stats-toggle]");
@@ -3270,13 +3328,16 @@ function resetZhentoInformationSelector(landing) {
     if (control.dataset.bound) return;
     control.dataset.bound = "true";
     control.addEventListener("click", () => {
+      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
       const key = control.dataset.zhentoInformation;
       if (key === "planet-stats" && panel.dataset.selectedInformation === key) {
         setExpanded(toggle.getAttribute("aria-expanded") !== "true");
       }
       setSelected(key);
+      showZhentoInformationContext(landing, key);
     });
   });
+  cancelZhentoInformationContext();
   setSelected("planet-stats");
   setExpanded(true);
 }
@@ -3314,7 +3375,7 @@ function resetZhentoLandingSelection() {
   }
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
   landing.querySelector(".zhento-detail").hidden = true;
-  landing.querySelector(".zhento-destination-prompt").hidden = false;
+  landing.querySelector(".zhento-destination-prompt").hidden = true;
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     button.setAttribute("aria-pressed", "false");
     const reveal = button.getAnimations().filter((animation) => animation.animationName === "daiionArchiveStatsLabelResolve");
@@ -3340,9 +3401,10 @@ function resetZhentoLandingSelection() {
       const prompt = landing.querySelector(".zhento-destination-prompt");
       const selection = landing.dataset.selectedDestination;
       const revealDetail = () => {
-        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection) return;
+        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection || landing.dataset.informationContext !== "destination") return;
         prompt.hidden = true;
         landing.querySelector(".zhento-detail").hidden = false;
+        landing.querySelector(".zhento-detail").inert = false;
       };
       const opacity = Number(getComputedStyle(prompt).opacity);
       if (!reducedMotion.matches && !(v3RouteContext.skipEntryAnimation && v3RouteContext.pending) && !prompt.hidden && opacity > 0) {
@@ -5834,6 +5896,10 @@ if (shell && startButton) {
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
+  window.addEventListener("pagehide", () => cancelZhentoInformationContext(false));
+  reducedMotion.addEventListener("change", () => {
+    if (reducedMotion.matches) cancelZhentoInformationContext(false);
+  });
   reducedMotion.addEventListener("change", () => {
     if (!zhentoRhythmEntry || !reducedMotion.matches) return;
     const shouldEnter = !zhentoRhythmEntry.promoted && getRouteFromUrl().name === "music";

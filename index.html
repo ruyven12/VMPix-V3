@@ -577,7 +577,7 @@
         </script>
         <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
-          <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Soundtrack" data-music-nexus-landing data-zhento-landing>
+          <section class="music-nexus-landing zhento-landing" aria-label="Zhento — The Soundtrack" data-music-nexus-landing data-zhento-landing data-zhento-context-managed>
             <div class="zhento-landing__artwork" aria-hidden="true"></div>
             <span class="zhento-top-hud-rail" aria-hidden="true"></span>
             <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
@@ -595,23 +595,29 @@
               <div class="zhento-stats__row" data-zhento-stat="people" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">People</span><span class="zhento-stats__context">(Melody)</span></span><span class="zhento-stats__value" data-music-stat-value="people">0</span></div>
               <div class="zhento-stats__row" data-zhento-stat="venues" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Venues</span><span class="zhento-stats__context">(Harmony)</span></span><span class="zhento-stats__value" data-music-stat-value="venues">0</span></div>
               </div>
-              <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="the-pulse" aria-pressed="false"><span class="zhento-info-label"><span>The Pulse</span><span class="zhento-info-context">(Destinations)</span></span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="lore" aria-pressed="false"><span class="zhento-info-label"><span>Lore</span><span class="zhento-info-context">(Story)</span></span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="origins" aria-pressed="false"><span class="zhento-info-label"><span>Origins</span><span class="zhento-info-context">(Non-Story)</span></span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="reimaging" aria-pressed="false"><span class="zhento-info-label">Reimaging Project</span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
+              <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="destination" aria-pressed="false"><span class="zhento-info-label">Destination</span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
             </section>
-            <p class="zhento-destination-prompt"><span class="zhento-destination-prompt__text">Please select your destination</span></p>
-            <section class="zhento-detail" aria-label="Selected Pillar" hidden>
+            <p class="zhento-destination-prompt" hidden><span class="zhento-destination-prompt__text">Please select your destination</span></p>
+            <section class="zhento-detail" aria-label="Selected Pillar" hidden inert>
               <h2 class="zhento-detail__title"></h2>
               <p class="zhento-detail__copy">Coming Soon</p>
               <button class="zhento-enter" type="button" disabled aria-label="Enter — not available yet">Enter</button>
             </section>
-            <section class="zhento-destinations zhento-panel" aria-label="Select a destination preview">
+            <section class="zhento-destinations zhento-panel" aria-label="Select a destination preview" hidden inert>
+              <span class="zhento-context-signal" aria-hidden="true"></span>
               <h2 class="zhento-destinations__title">Destination</h2>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="bands" aria-pressed="false"><span>Pillar of Rhythm</span></button>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="shows" aria-pressed="false"><span>Pillar of Synchrony</span></button>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="people" aria-pressed="false"><span>Pillar of Melody</span></button>
               <button class="zhento-destinations__item" type="button" data-zhento-destination="venues" aria-pressed="false"><span>Pillar of Harmony</span></button>
+            </section>
+            <section class="zhento-lower-third" aria-labelledby="zhento-lore-title" hidden inert>
+              <span class="zhento-context-signal" aria-hidden="true"></span>
+              <header class="zhento-lower-third__header"><h2 id="zhento-lore-title">Lore</h2><p>Story</p></header>
+              <p class="zhento-lower-third__body">Coming Soon</p>
             </section>
           </section>
 

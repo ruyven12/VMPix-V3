@@ -31101,6 +31101,49 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-destination-prompt__text { clip-path: none; }
   .zhento-destination-prompt__text::after { display: none; }
 }
+/* Context surfaces are user-triggered and never inherit the landing arrival delay. */
+.zhento-destinations[hidden], .zhento-lower-third[hidden] { display: none !important; }
+.site-shell[data-shell-route="music"] [data-zhento-context-managed] :is(.zhento-destinations, .zhento-destinations__title, .zhento-destinations__item, .zhento-destination-prompt, .zhento-destination-prompt__text),
+.site-shell[data-shell-route="music"] [data-zhento-context-managed] .zhento-destinations::before,
+.site-shell[data-shell-route="music"] [data-zhento-context-managed] .zhento-destination-prompt__text::after { animation: none !important; }
+.site-shell[data-shell-route="music"] [data-zhento-context-managed] .zhento-destination-prompt__text { clip-path: none; }
+.site-shell[data-shell-route="music"] [data-zhento-context-managed] .zhento-destination-prompt__text::after { display: none; }
+.zhento-context-signal {
+  position: absolute;
+  inset-inline: .6rem;
+  inset-block-start: 0;
+  block-size: 2px;
+  background: linear-gradient(90deg, rgba(145,112,235,.2), rgba(176,147,255,.95), rgba(137,189,255,.6));
+  opacity: 0;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.zhento-lower-third {
+  position: absolute;
+  z-index: 4;
+  inset-block-end: clamp(7.1rem, 12svh, 8.8rem);
+  inset-inline-end: clamp(2.2rem, 6.2vw, 7.5rem);
+  box-sizing: border-box;
+  inline-size: min(30rem, calc(100vw - 4.1rem));
+  min-block-size: 8.5rem;
+  padding: 1rem 1.2rem;
+  color: rgba(235,239,249,.94);
+  font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(120deg, rgba(145,112,235,.1), transparent 60%), rgba(6,7,12,.64);
+  border: 1px solid rgba(153,137,235,.52);
+  box-shadow: inset 0 0 0 1px rgba(220,230,255,.04), 0 0 .65rem rgba(145,112,235,.12);
+  clip-path: polygon(.75rem 0,100% 0,100% calc(100% - .75rem),calc(100% - .75rem) 100%,0 100%,0 .75rem);
+}
+.zhento-lower-third__header { border-block-end: 1px solid rgba(137,167,255,.23); padding-block-end: .55rem; }
+.zhento-lower-third__header h2 { margin: 0; color: rgba(170,199,255,.96); font: inherit; font-size: .85rem; letter-spacing: .08em; }
+.zhento-lower-third__header p { margin: .3rem 0 0; color: rgba(184,193,214,.78); font-size: .65rem; }
+.zhento-lower-third__body { margin: .85rem 0 0; font-size: .76rem; line-height: 1.4; }
+@media (max-width: 540px) {
+  .zhento-lower-third { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; padding: .9rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-zhento-context-managed] .zhento-detail:not([hidden]) { animation: none; }
+}
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
   animation: zhentoHudReveal 500ms ease-out 2800ms both;
