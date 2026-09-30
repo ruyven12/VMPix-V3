@@ -30878,8 +30878,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-stats__title, .zhento-destinations__title { margin: 0; }
 .zhento-stats__value { margin: 0; }
 @media (max-width: 540px) {
-  .zhento-stats { inset-block-start: 2.7rem; inset-inline-start: 2.05rem; inline-size: min(13.45rem, calc(100vw - 3.2rem)); padding: .25rem .77rem; }
-  .zhento-stats__row { min-block-size: 2rem; column-gap: .42rem; }
+  .zhento-stats { inset-block-start: 2.45rem; inset-inline-start: 2.05rem; inline-size: min(13.45rem, calc(100vw - 3.2rem)); padding: .125rem .77rem; }
+  .zhento-stats__row { min-block-size: 1.6rem; column-gap: .42rem; }
   .zhento-destinations { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; inline-size: min(12.82rem, calc(100vw - 3.2rem)); padding: .68rem .79rem; }
   .zhento-destinations__item { min-block-size: 2.33rem; padding-block: .68rem .51rem; }
 }
