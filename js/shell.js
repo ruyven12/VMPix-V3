@@ -3273,15 +3273,15 @@ function cancelZhentoInformationContext(hide = true) {
 function showZhentoInformationContext(landing, key) {
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
-  if (key !== "destination" && key !== "lore") return;
-  const surface = landing.querySelector(key === "destination" ? ".zhento-destinations" : ".zhento-lower-third");
+  if (key !== "pulse" && key !== "lore") return;
+  const surface = landing.querySelector(key === "pulse" ? ".zhento-destinations" : ".zhento-lower-third");
   if (!surface) return;
   const context = { landing, key, animations: [] };
   zhentoInformationContext = context;
   landing.dataset.informationContext = key;
   surface.hidden = false;
   surface.inert = false;
-  if (key === "destination") {
+  if (key === "pulse") {
     const detail = landing.querySelector(".zhento-detail");
     const prompt = landing.querySelector(".zhento-destination-prompt");
     const selected = Boolean(landing.dataset.selectedDestination);
@@ -3330,7 +3330,7 @@ function resetZhentoInformationSelector(landing) {
     control.addEventListener("click", () => {
       if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
       const key = control.dataset.zhentoInformation;
-      if (key === "planet-stats" && panel.dataset.selectedInformation === key) {
+      if (key === "planet-stats") {
         setExpanded(toggle.getAttribute("aria-expanded") !== "true");
       }
       setSelected(key);
@@ -3339,7 +3339,7 @@ function resetZhentoInformationSelector(landing) {
   });
   cancelZhentoInformationContext();
   setSelected("planet-stats");
-  setExpanded(true);
+  setExpanded(false);
 }
 let zhentoSelectionGeneration = 0;
 let zhentoPromptExit = null;
@@ -3401,7 +3401,7 @@ function resetZhentoLandingSelection() {
       const prompt = landing.querySelector(".zhento-destination-prompt");
       const selection = landing.dataset.selectedDestination;
       const revealDetail = () => {
-        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection || landing.dataset.informationContext !== "destination") return;
+        if (getRouteFromUrl().name !== "music" || landing.dataset.selectedDestination !== selection || landing.dataset.informationContext !== "pulse") return;
         prompt.hidden = true;
         landing.querySelector(".zhento-detail").hidden = false;
         landing.querySelector(".zhento-detail").inert = false;
