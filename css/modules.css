@@ -31265,11 +31265,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 @media (max-width: 540px) {
   .zhento-lower-third[data-lower-third-content="pulse"] { inline-size: calc(100vw - 4.1rem); }
-  .zhento-lower-third[data-lower-third-content="pulse"]:has(.zhento-pulse[data-pulse-view="overview"]) { padding-block: .1rem .55rem; }
-  .zhento-pulse__overview > .zhento-lower-third__header { display: flex; align-items: baseline; justify-content: center; gap: .5rem; padding-block-end: 0; background: rgba(6,7,12,.94); }
+  .zhento-lower-third[data-lower-third-content="pulse"]:has(.zhento-pulse[data-pulse-view="overview"]) {
+    --pulse-available-height: calc(100svh - 7.15rem - clamp(7rem, 14svh, 10rem) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    block-size: min(clamp(26.5rem, 50svh, 30rem), var(--pulse-available-height));
+    padding-block: .1rem .55rem;
+  }
+  .zhento-pulse[data-pulse-view="overview"], .zhento-pulse__overview { block-size: 100%; min-block-size: 0; }
+  .zhento-pulse__overview { display: flex; flex-direction: column; }
+  .zhento-pulse__overview > .zhento-lower-third__header { display: flex; flex: 0 0 auto; align-items: baseline; justify-content: center; gap: .5rem; padding-block-end: 0; background: rgba(6,7,12,.94); }
   .zhento-pulse__overview > .zhento-lower-third__header p { margin: 0; }
-  .zhento-pulse__grid { gap: .3rem; margin-block-start: .25rem; }
-  .zhento-pillar-tile { --pillar-art-share: 68%; block-size: clamp(10.3125rem, 19svh, 11.25rem); }
+  .zhento-pulse__grid { flex: 1; min-block-size: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(.15rem, .5svh, .3rem); margin-block-start: clamp(.125rem, .4svh, .25rem); }
+  .zhento-pillar-tile { --pillar-art-share: 68%; block-size: 100%; }
   .zhento-pillar-tile__title { font-size: .65rem; }
   .zhento-pillar-tile__category, .zhento-pillar-tile__count { font-size: .58rem; }
   .zhento-pillar-tile__label { box-sizing: border-box; block-size: 32%; align-content: center; gap: .1rem; padding: .25rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
