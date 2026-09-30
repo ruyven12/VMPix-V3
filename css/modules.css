@@ -31265,9 +31265,16 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 @media (max-width: 540px) {
   .zhento-lower-third[data-lower-third-content="pulse"] { inline-size: calc(100vw - 4.1rem); }
+  [data-zhento-landing][data-information-context="pulse"]:has(.zhento-pulse:is([data-pulse-view="overview"], [data-pulse-moving="true"])) {
+    --pulse-context-top: calc(clamp(12rem, 24svh, 14rem) + env(safe-area-inset-top, 0px));
+  }
+  [data-zhento-landing][data-information-context="pulse"]:has(.zhento-pulse:is([data-pulse-view="overview"], [data-pulse-moving="true"])) .zhento-identity {
+    --zhento-hud-y: 0px;
+    inset-block-start: calc(var(--pulse-context-top) - 4.375rem);
+  }
   .zhento-lower-third[data-lower-third-content="pulse"]:has(.zhento-pulse[data-pulse-view="overview"]) {
-    --pulse-available-height: calc(100svh - 7.15rem - clamp(7rem, 14svh, 10rem) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    block-size: min(clamp(26.5rem, 50svh, 30rem), var(--pulse-available-height));
+    --pulse-available-height: calc(100svh - 7.15rem - var(--pulse-context-top, 12rem) - env(safe-area-inset-bottom, 0px));
+    block-size: var(--pulse-available-height);
     padding-block: .1rem .55rem;
   }
   .zhento-pulse[data-pulse-view="overview"], .zhento-pulse__overview { block-size: 100%; min-block-size: 0; }
