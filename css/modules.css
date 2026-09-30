@@ -31258,11 +31258,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 @media (max-width: 540px) {
   .zhento-lower-third[data-lower-third-content="pulse"] { inline-size: calc(100vw - 4.1rem); }
-  .zhento-pulse__grid { gap: .4rem; margin-block-start: .5rem; }
-  .zhento-pillar-tile { block-size: 6.25rem; }
+  .zhento-lower-third[data-lower-third-content="pulse"]:has(.zhento-pulse[data-pulse-view="overview"]) { padding-block: .1rem .55rem; }
+  .zhento-pulse__overview > .zhento-lower-third__header { display: flex; align-items: baseline; justify-content: center; gap: .5rem; padding-block-end: 0; }
+  .zhento-pulse__overview > .zhento-lower-third__header p { margin: 0; }
+  .zhento-pulse__grid { gap: .3rem; margin-block-start: .25rem; }
+  .zhento-pillar-tile { block-size: 8.125rem; }
+  .zhento-pillar-tile__art { block-size: 62%; }
   .zhento-pillar-tile__title { font-size: .65rem; }
   .zhento-pillar-tile__category, .zhento-pillar-tile__count { font-size: .58rem; }
-  .zhento-pillar-tile__label { gap: .1rem; padding: .65rem .35rem .3rem; }
+  .zhento-pillar-tile__label { box-sizing: border-box; block-size: 38%; align-content: center; gap: .1rem; padding: .25rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
 }
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
