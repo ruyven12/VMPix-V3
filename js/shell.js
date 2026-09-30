@@ -2457,6 +2457,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
 
   if (route.name !== "music") {
     cancelZhentoLandingStats();
+    cancelZhentoSelectorMorph();
     cancelZhentoInformationContext();
   }
   const activeTarget = targetName || routeNameToGlobalNavTarget[route.name] || "home";
@@ -3313,39 +3314,106 @@ function showZhentoInformationContext(landing, key) {
     animate(surface.querySelector(".zhento-context-signal"), [{ opacity: 0, transform: "scaleX(.05)" }, { opacity: .9, transform: "scaleX(1)", offset: .55 }, { opacity: 0, transform: "scaleX(1)" }], { duration: 300 });
   }
 }
+let zhentoSelectorMorph = null;
+
+function cancelZhentoSelectorMorph(complete = false) {
+  const morph = zhentoSelectorMorph;
+  if (!morph) return;
+  zhentoSelectorMorph = null;
+  morph.animations.forEach((animation) => animation.cancel());
+  morph.setMode(complete ? morph.key : "");
+  morph.panel.inert = false;
+  delete morph.panel.dataset.selectorMoving;
+  if (complete && getRouteFromUrl().name === "music") {
+    morph.control.focus({ preventScroll: true });
+    showZhentoInformationContext(morph.landing, morph.key);
+  }
+}
+
 function resetZhentoInformationSelector(landing) {
   const panel = landing.querySelector("[data-music-landing-stats]");
   const toggle = landing.querySelector("[data-zhento-stats-toggle]");
   const body = landing.querySelector("#zhento-stats-body");
   if (!panel || !toggle || !body) return;
   const controls = [...panel.querySelectorAll("[data-zhento-information]")];
-  const setSelected = (key) => {
+  const rowFor = (control) => control.closest(".zhento-stats__title") || control;
+  const setMode = (key) => {
     panel.dataset.selectedInformation = key;
+    panel.dataset.selectorMode = key ? "selected" : "fresh";
     controls.forEach((control) => {
-      control.setAttribute("aria-pressed", String(control.dataset.zhentoInformation === key));
+      const selected = control.dataset.zhentoInformation === key;
+      const hidden = Boolean(key) && !selected;
+      rowFor(control).hidden = hidden;
+      control.inert = hidden;
+      control.setAttribute("aria-pressed", String(selected));
+      if (selected) {
+        const label = (control.querySelector(".zhento-info-label")?.textContent || "Planet Stats").trim();
+        control.setAttribute("aria-label", `${label} — return to information menu`);
+      } else {
+        control.removeAttribute("aria-label");
+      }
     });
-  };
-  const setExpanded = (expanded) => {
+    const expanded = key === "planet-stats";
     toggle.setAttribute("aria-expanded", String(expanded));
     body.setAttribute("aria-hidden", String(!expanded));
     body.inert = !expanded;
+  };
+  const changeMode = async (control, key) => {
+    panel.dataset.selectorUsed = "true";
+    cancelZhentoInformationContext();
+    if (reducedMotion.matches) {
+      setMode(key);
+      showZhentoInformationContext(landing, key);
+      return;
+    }
+    const startHeight = panel.getBoundingClientRect().height;
+    const startRow = control.getBoundingClientRect();
+    const morph = { landing, panel, control, key, setMode, animations: [] };
+    zhentoSelectorMorph = morph;
+    panel.dataset.selectorMoving = "true";
+    panel.inert = true;
+    const animate = (element, frames, timing) => {
+      const animation = element.animate(frames, { duration: 220, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...timing });
+      morph.animations.push(animation);
+      return animation.finished.catch(() => {});
+    };
+    if (key) {
+      control.setAttribute("aria-pressed", "true");
+      await Promise.all(controls.filter((item) => item !== control).map((item) => animate(item, [{ opacity: 1, transform: "scaleY(1)" }, { opacity: 0, transform: "scaleY(.92)" }], { duration: 60 })));
+      if (zhentoSelectorMorph !== morph) return;
+    }
+    setMode(key);
+    const endHeight = panel.getBoundingClientRect().height;
+    const endRow = control.getBoundingClientRect();
+    const duration = key ? 140 : 220;
+    const settles = [
+      animate(panel, [{ height: `${startHeight}px` }, { height: `${endHeight}px` }], { duration }),
+      animate(control, [{ transform: `translateY(${startRow.top - endRow.top}px)` }, { transform: "translateY(0)" }], { duration }),
+    ];
+    if (key === "planet-stats") {
+      settles.push(animate(body, [{ opacity: 0 }, { opacity: 1 }], { duration }));
+    } else if (!key) {
+      controls.filter((item) => item !== control).forEach((item) => {
+        settles.push(animate(item, [{ opacity: 0 }, { opacity: 1 }], { delay: 60, duration: 160 }));
+      });
+    }
+    await Promise.all(settles);
+    if (zhentoSelectorMorph === morph) cancelZhentoSelectorMorph(true);
   };
   controls.forEach((control) => {
     if (control.dataset.bound) return;
     control.dataset.bound = "true";
     control.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
-      const key = control.dataset.zhentoInformation;
-      if (key === "planet-stats") {
-        setExpanded(toggle.getAttribute("aria-expanded") !== "true");
-      }
-      setSelected(key);
-      showZhentoInformationContext(landing, key);
+      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry || zhentoSelectorMorph) return;
+      const selected = panel.dataset.selectedInformation;
+      if (selected && selected !== control.dataset.zhentoInformation) return;
+      void changeMode(control, selected ? "" : control.dataset.zhentoInformation);
     });
   });
+  cancelZhentoSelectorMorph();
   cancelZhentoInformationContext();
-  setSelected("planet-stats");
-  setExpanded(false);
+  delete panel.dataset.selectorUsed;
+  setMode("");
 }
 let zhentoSelectionGeneration = 0;
 let zhentoPromptExit = null;
@@ -5902,9 +5970,15 @@ if (shell && startButton) {
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
-  window.addEventListener("pagehide", () => cancelZhentoInformationContext(false));
+  window.addEventListener("pagehide", () => {
+    cancelZhentoSelectorMorph();
+    cancelZhentoInformationContext(false);
+  });
   reducedMotion.addEventListener("change", () => {
-    if (reducedMotion.matches) cancelZhentoInformationContext(false);
+    if (reducedMotion.matches) {
+      cancelZhentoInformationContext(false);
+      cancelZhentoSelectorMorph(true);
+    }
   });
   reducedMotion.addEventListener("change", () => {
     if (!zhentoRhythmEntry || !reducedMotion.matches) return;

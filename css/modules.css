@@ -30700,6 +30700,21 @@ button.hall-crusades-archive-crystal:focus-visible {
   box-shadow: inset 0 -1px rgba(137, 167, 255, .72);
   text-shadow: 0 0 .42rem rgba(145, 112, 235, .35);
 }
+/* The same controls become the selected return header; live stats stay mounted. */
+.zhento-stats[data-selector-mode] { align-content: start; }
+.site-shell[data-shell-route="music"] .zhento-stats[data-selector-used] .zhento-stats__title { animation: none !important; opacity: 1; }
+.zhento-stats :is(.zhento-info-control, .zhento-stats__title)[hidden] { display: none !important; }
+.zhento-stats[data-selector-mode="selected"] .zhento-info-option { border-block-start-color: transparent; }
+.zhento-stats[data-selector-mode="selected"] .zhento-info-arrow {
+  flex: 0 0 .38rem;
+  block-size: .38rem;
+  margin-inline-end: .2rem;
+  font-size: 0;
+  border-inline-end: 1px solid currentColor;
+  border-block-end: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+.zhento-stats[data-selector-mode="selected"] .zhento-stats__chevron { transform: rotate(45deg); }
 /* Photo progress shares the live count tick; no separate animation timeline. */
 .zhento-stats__row[data-zhento-stat="photos"] {
   grid-template-columns:auto minmax(0,1fr);
