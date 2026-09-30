@@ -31396,3 +31396,18 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel .band-member-name { font-size:.85rem;line-height:1.4;white-space:normal;overflow:visible;overflow-wrap:anywhere;color:#ece5ff; }
 .band-personnel .band-member-role { font-size:.72rem;line-height:1.45;color:#bdb4d0; }
 .band-detail-content .band-personnel[hidden],.band-personnel-controls[hidden] { display:none; }
+
+/* Same-Pillar record opening: retire only local archive UI; preserve the world and its HUD. */
+.site-shell[data-band-record-opening] .rhythm-pillar :is(.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-source-more),
+.site-shell[data-band-record-opening] .rhythm-pillar :is(.rhythm-source-list,.rhythm-search-results) > li:not(:has([data-record-anchor])) {
+  opacity:0;transition:opacity 240ms ease-out;pointer-events:none;
+}
+.rhythm-source-row[data-record-anchor] { outline:1px solid rgba(190,150,255,.25);outline-offset:1px;border-color:#d8b9ff!important; }
+.site-shell[data-band-record-opening="morph"] .rhythm-pillar { visibility:hidden; }
+.band-detail-viewport[data-band-record-stage="prepared"] { visibility:hidden; }
+.band-detail-viewport[data-band-record-stage="prepared"],.site-shell[data-shell-route="music-bands"] .band-detail-viewport[data-band-record-stage="morph"] { background:none; }
+.band-detail-viewport[data-band-record-stage] .band-identity-dossier { transform-origin:0 0; }
+.band-detail-viewport[data-band-record-shared] :is(.band-detail-poster,.band-detail-name) { opacity:0; }
+.band-detail-viewport[data-band-record-stage]:is([data-band-record-stage="prepared"],[data-band-record-stage="morph"]) :is(.band-archive-telemetry,.band-personnel),
+.band-detail-viewport[data-band-record-stage="telemetry"] .band-personnel { visibility:hidden; }
+.band-detail-viewport[data-band-record-stage] .band-detail-content { overflow-y:hidden;touch-action:none; }

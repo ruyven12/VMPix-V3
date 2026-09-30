@@ -12889,3 +12889,11 @@ button {
   .site-shell[data-zhento-rhythm-entry] .prototype-engine-return-control::before { animation: none !important; opacity: 0 !important; }
   .zhento-rhythm-entry { display: none; }
 }
+
+/* BACK withdraws without changing its emitter footprint or duplicating the Engine. */
+.site-shell[data-band-record-opening]:not([data-band-record-opening="settled"]) :is(.prototype-engine-return-control__text,.engine-emitter-energy--left),
+.site-shell[data-band-record-opening]:not([data-band-record-opening="settled"]) .prototype-engine-return-control::before {
+  opacity:0!important;transition:opacity 160ms ease-out;animation:none!important;
+}
+.site-shell[data-band-record-opening] .prototype-engine-return-control { pointer-events:none!important; }
+.shell-band-record-shared { contain:layout style;will-change:transform; }

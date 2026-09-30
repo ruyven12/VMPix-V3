@@ -682,7 +682,14 @@ function showBandDetailRoute(bandId, options = {}) {
   const normalizedBandId = String(bandId || "").trim();
   const band = findBandById(normalizedBandId);
   if (band) {
-    showBandDetail(band);
+    // The Shell has already prepared this exact record for the measured handoff.
+    if (bandRecordOpening?.prepared && bandRecordOpening.bandId === normalizedBandId) {
+      setBandsIndexVisible(false);
+      setBandDetailVisible(true);
+      setCurrentView("Band Detail");
+    } else {
+      showBandDetail(band);
+    }
     return;
   }
 
@@ -790,15 +797,17 @@ function getActiveBandsReturnUrl() {
   return normalizeBandsReturnUrl(bandsIndexReturnUrl || getBandsRouteUrl(activeBandsView));
 }
 
-function navigateToBandDetail(band) {
+function navigateToBandDetail(band, source = null) {
   const bandId = getBandId(band);
-  if (!bandId) {
+  if (!bandId || bandRecordOpening) {
     return;
   }
 
   const returnUrl = getActiveBandsReturnUrl();
   bandsIndexReturnUrl = returnUrl;
-  navigateToRoute(getBandRouteUrl(bandId), { historyState: { returnUrl, fromBandsIndex: true } });
+  const options = { historyState: { returnUrl, fromBandsIndex: true } };
+  if (beginBandRecordOpening(band, source, options)) return;
+  navigateToRoute(getBandRouteUrl(bandId), options);
 }
 
 function returnToBandsIndexRoute() {
@@ -5584,7 +5593,7 @@ function renderBandArchiveTelemetry(band) {
   section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden);
 }
 
-function showBandDetail(band) {
+function showBandDetail(band, options = {}) {
   if (!band || !bandDetail) {
     return;
   }
@@ -5693,11 +5702,12 @@ function showBandDetail(band) {
   renderBandIdentityDossier(band);
   renderBandArchiveTelemetry(band);
   renderBandPersonnel(band);
+  refreshBandDetailArchiveCoverage(activeMusicBand);
+  if (options.prepareRecordOpening) return;
 
   setBandsIndexVisible(false);
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
-  refreshBandDetailArchiveCoverage(activeMusicBand);
   if (bandDetailContent) {
     bandDetailContent.scrollTo({
       top: 0,
@@ -8299,7 +8309,7 @@ function createRhythmSourceRow(band,select,{direct=false}={}) {
   const statusValue=document.createElement('span');statusValue.className='rhythm-source-lifecycle-value';statusValue.textContent=statusKey.toUpperCase();
   if(statusKey!=='unknown')status.dataset.lifecycle=statusKey;
   status.append(statusLabel,statusValue);name.append(title,status);
-  row.append(art,name);row.addEventListener('click',()=>{if(direct||row.classList.contains('is-active'))navigateToBandDetail(band);else select();});item.append(row);return item;
+  row.append(art,name);row.addEventListener('click',()=>{if(direct||row.classList.contains('is-active'))navigateToBandDetail(band,row);else select();});item.append(row);return item;
 }
 function renderRhythmSourceIndex() {
   if(!musicBandsIndex||musicBandsIndex.getAttribute('aria-hidden')==='true')return;

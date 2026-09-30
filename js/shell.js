@@ -2354,6 +2354,7 @@ function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 
 function handlePrototypeEngineReturnEmitter(event) {
   const route = getRouteFromUrl();
+  if (bandRecordOpening) { event.preventDefault(); return; }
   if (!isPrototypeEngineReturnRoute(route)) {
     return;
   }
@@ -2429,8 +2430,8 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   prototypeEngineReturnControl.setAttribute("aria-label", backLabel || "Return");
   prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isArchiveBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
-  prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry);
-  prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry ? 0 : -1;
+  prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry) || Boolean(bandRecordOpening);
+  prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry && !bandRecordOpening ? 0 : -1;
 }
 
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
@@ -3312,6 +3313,185 @@ function resetZhentoLandingSelection() {
   });
 }
 
+// A same-world record opening. Shell owns the lifecycle; Music only supplies the selected row.
+let bandRecordOpening = null;
+
+function cancelBandRecordOpening() {
+  const opening = bandRecordOpening;
+  if (!opening) return;
+  bandRecordOpening = null;
+  opening.timers.forEach(clearTimeout);
+  opening.animations.forEach(animation => animation.cancel());
+  opening.shared.forEach(node => node.remove());
+  opening.source.removeAttribute('data-record-anchor');
+  shell.removeAttribute('data-band-record-opening');
+  bandDetailViewport.removeAttribute('data-band-record-stage');
+  bandDetailViewport.removeAttribute('data-band-record-shared');
+  const route = getRouteFromUrl();
+  const detail = route.name === 'band-detail';
+  bandDetailViewport.hidden = !detail;
+  bandDetailViewport.inert = !detail;
+  rhythmViewport.inert = route.name !== 'music-bands';
+  musicBandsIndex.inert = route.name !== 'music-bands';
+  bandDetail.inert = !detail;
+  bandDetail.setAttribute('aria-hidden', String(!detail));
+  updatePrototypeEngineReturnEmitter(route);
+}
+
+function finishBandRecordOpeningImmediately() {
+  const opening = bandRecordOpening;
+  if (!opening) return;
+  try {
+    if (!opening.promoted) promoteBandRecordOpening(opening);
+  } finally {
+    cancelBandRecordOpening();
+  }
+}
+
+function promoteBandRecordOpening(opening) {
+  if (bandRecordOpening !== opening || opening.promoted) return;
+  opening.promoting = true;
+  try {
+    navigateToRoute(getBandRouteUrl(opening.bandId), { ...opening.options, shouldResetScroll: false });
+    opening.promoted = true;
+  } finally {
+    opening.promoting = false;
+  }
+}
+
+function createBandRecordSharedNode(source, rect) {
+  const clone = source.cloneNode(true);
+  const originals = [source, ...source.querySelectorAll('*')];
+  const copies = [clone, ...clone.querySelectorAll('*')];
+  originals.forEach((node, index) => {
+    const style = getComputedStyle(node);
+    // Freeze the painted appearance, including inherited type, without copying listeners or ids.
+    for (const property of style) copies[index].style.setProperty(property, style.getPropertyValue(property));
+    copies[index].removeAttribute('id');
+    copies[index].style.animation = 'none';
+    copies[index].style.transition = 'none';
+  });
+  Object.assign(clone.style, {
+    position: 'fixed', left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`,
+    height: `${rect.height}px`, margin: '0', minWidth: '0', minHeight: '0', maxWidth: 'none',
+    maxHeight: 'none', transform: 'none', transformOrigin: '0 0', pointerEvents: 'none', zIndex: '40',
+  });
+  clone.classList.add('shell-band-record-shared');
+  clone.setAttribute('aria-hidden', 'true');
+  clone.inert = true;
+  shell.append(clone);
+  return clone;
+}
+
+function beginBandRecordOpening(band, source, options) {
+  if (bandRecordOpening) return true;
+  if (reducedMotion.matches || getRouteFromUrl().name !== 'music-bands' || !source?.isConnected ||
+      typeof source.animate !== 'function') return false;
+  const sourceRect = source.getBoundingClientRect();
+  if (!sourceRect.width || !sourceRect.height) return false;
+  finishRhythmArrival();
+  const opening = { bandId: getBandId(band), source, options, animations: [], shared: [], timers: [], prepared: false, promoted: false, promoting: false };
+  bandRecordOpening = opening;
+  const play = (node, frames, timing) => {
+    const animation = node.animate(frames, { easing: 'cubic-bezier(.2,.65,.3,1)', fill: 'both', ...timing });
+    opening.animations.push(animation);
+    return animation;
+  };
+  const run = async () => {
+    source.setAttribute('data-record-anchor', '');
+    shell.dataset.bandRecordOpening = 'lock';
+    rhythmViewport.inert = true;
+    musicBandsIndex.inert = true;
+    updatePrototypeEngineReturnEmitter();
+    // Prepare once from the already loaded Band, without changing route or index ownership.
+    bandDetailViewport.dataset.bandRecordStage = 'prepared';
+    showBandDetail(band, { prepareRecordOpening: true });
+    bandDetail.setAttribute('aria-hidden', 'false');
+    bandDetailViewport.hidden = false;
+    bandDetailViewport.inert = true;
+    bandDetailContent.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const hero = bandDetail.querySelector('.band-identity-dossier');
+    const targetRect = hero.getBoundingClientRect();
+    const pairs = [
+      [source.querySelector('.rhythm-source-art img') || source.querySelector('.rhythm-source-art'), hero.querySelector('.band-detail-poster')],
+      [source.querySelector('.rhythm-source-name > span'), bandDetailName],
+    ].filter(([from, to]) => from && to);
+    const paintedRect = (node, image = node) => {
+      const rect = node.getBoundingClientRect();
+      if (image.tagName !== 'IMG') {
+        if (node === bandDetailName || node.matches('.rhythm-source-name > span')) {
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          return range.getBoundingClientRect();
+        }
+        return rect;
+      }
+      if (!image.naturalWidth) return rect;
+      // The prepared logo can still be display:none until its cached load event. Measure its
+      // stable poster content box and fit the already-painted source image into that box.
+      const style = getComputedStyle(node);
+      const left = parseFloat(style.borderLeftWidth) || 0, right = parseFloat(style.borderRightWidth) || 0;
+      const top = parseFloat(style.borderTopWidth) || 0, bottom = parseFloat(style.borderBottomWidth) || 0;
+      const boxWidth = rect.width - left - right, boxHeight = rect.height - top - bottom;
+      const scale = Math.min(boxWidth / image.naturalWidth, boxHeight / image.naturalHeight);
+      const width = image.naturalWidth * scale, height = image.naturalHeight * scale;
+      return { left: rect.left + left + (boxWidth - width) / 2, top: rect.top + top + (boxHeight - height) / 2, width, height };
+    };
+    const geometry = pairs.map(([from, to]) => ({ from, to, start: paintedRect(from), end: paintedRect(to, from) }));
+    opening.prepared = true;
+    const lock = play(source, [{ outlineColor: 'rgba(190,150,255,0)' }, { outlineColor: 'rgba(211,185,255,.9)', offset: .5 }, { outlineColor: 'rgba(190,150,255,.25)' }], { duration: 260 });
+    await lock.finished;
+    if (bandRecordOpening !== opening) return;
+    geometry.forEach(({ from, start }) => opening.shared.push(createBandRecordSharedNode(from, start)));
+    bandDetailViewport.setAttribute('data-band-record-shared', '');
+    bandDetailViewport.dataset.bandRecordStage = 'morph';
+    shell.dataset.bandRecordOpening = 'morph';
+    const inverse = `translate(${sourceRect.left - targetRect.left}px, ${sourceRect.top - targetRect.top}px) scale(${sourceRect.width / targetRect.width}, ${sourceRect.height / targetRect.height})`;
+    const morph = play(hero, [{ transform: inverse }, { transform: 'none' }], { duration: 560 });
+    [...hero.children].forEach(node => play(node, [{ opacity: 0 }, { opacity: 1 }], { delay: 340, duration: 220 }));
+    const handoffs = [];
+    geometry.forEach(({ from, to, start, end }, index) => {
+      const scale = Math.min(end.width / start.width, end.height / start.height);
+      const left = end.left + (end.width - start.width * scale) / 2;
+      const top = end.top + (end.height - start.height * scale) / 2;
+      play(opening.shared[index], [{ transform: 'none' }, { transform: `translate(${left - start.left}px, ${top - start.top}px) scale(${scale})` }], { duration: 560 });
+      handoffs.push(play(opening.shared[index], [{ opacity: 1 }, { opacity: 0 }], { delay: 560, duration: 80 }));
+      // Resolve target typography and image fit while the shared identity reaches its footprint.
+      const target = from.tagName === 'IMG' ? hero.querySelector('.band-detail-poster') : to;
+      handoffs.push(play(target, [{ opacity: 0 }, { opacity: 1 }], { delay: 560, duration: 80 }));
+    });
+    opening.timers.push(setTimeout(() => promoteBandRecordOpening(opening), 490));
+    await morph.finished;
+    if (bandRecordOpening !== opening) return;
+    promoteBandRecordOpening(opening);
+    await Promise.all(handoffs.map(animation => animation.finished));
+    if (bandRecordOpening !== opening) return;
+    // The real dossier has animated all along; at matching rectangles only the shared ink retires.
+    opening.shared.forEach(node => node.remove());
+    bandDetailViewport.removeAttribute('data-band-record-shared');
+    shell.dataset.bandRecordOpening = 'settled';
+    for (const [tier, selector] of [['telemetry', '.band-archive-telemetry'], ['personnel', '.band-personnel']]) {
+      if (bandRecordOpening !== opening) return;
+      bandDetailViewport.dataset.bandRecordStage = tier;
+      const panel = bandDetail.querySelector(selector);
+      if (!panel || panel.hidden) continue;
+      await play(panel, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 320 }).finished;
+    }
+    if (bandRecordOpening !== opening) return;
+    cancelBandRecordOpening();
+    bandDetailName.setAttribute('tabindex', '-1');
+    bandDetailName.focus({ preventScroll: true });
+    bandDetailName.removeAttribute('tabindex');
+  };
+  run().catch(() => {
+    if (bandRecordOpening === opening) finishBandRecordOpeningImmediately();
+  });
+  return true;
+}
+window.addEventListener('resize', finishBandRecordOpeningImmediately);
+window.addEventListener('pagehide', cancelBandRecordOpening);
+reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) finishBandRecordOpeningImmediately(); });
+
 function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
   const detail = route.name === 'band-detail';
@@ -3327,7 +3507,7 @@ function syncRhythmPresentationOwnership(route, options = {}) {
   rhythmViewport.hidden = !active;
   rhythmViewport.inert = !active;
   bandDetailViewport.hidden = !detail;
-  bandDetailViewport.inert = !detail;
+  bandDetailViewport.inert = !detail || Boolean(bandRecordOpening);
   if (!active) { musicBandsIndex.setAttribute('aria-hidden','true'); }
 }
 function showRhythmPillar({ detail = false } = {}) {
@@ -5575,6 +5755,7 @@ if (shell && startButton) {
   // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
   document.documentElement.removeAttribute("data-v3-booting");
   window.addEventListener("popstate", (event) => {
+    cancelBandRecordOpening();
     cancelZhentoRhythmEntry();
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();
     const historyState = event.state;

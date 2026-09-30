@@ -294,6 +294,7 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 function syncRoute(route, options = {}) {
+  if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
   syncRhythmPresentationOwnership(route, options);
   if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
@@ -646,6 +647,7 @@ function syncRouteFromLocation(options = {}) {
 }
 
 function navigateToRoute(url, options = {}) {
+  if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
   const route = getRouteFromUrlWithPrototypePrecedence(url);
   const targetUrl = route.isUnknown ? url : route.canonicalUrl;
