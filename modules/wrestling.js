@@ -5709,7 +5709,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       if (cancelled) return;
       root.dataset.recordPreloadStarted = String(startedAt);
       root.dataset.recordHeaderSettled = String(performance.now());
-      await Promise.race([firstReady, wait(700)]);
+      if (!v3RouteContext.skipEntryAnimation) await Promise.race([firstReady, wait(700)]);
       if (cancelled) return;
       let content = options.canonical ? targetShell : document.createElement("div");
       if (!options.canonical) content.className = "wrestling-encounter-record-content";
@@ -5826,7 +5826,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
       root.dataset.recordPhotoReveal = String(performance.now());
       root.dataset.recordFirstRevealReady = String(prepared.size);
       const revealNodes = options.canonical ? [...targetShell.children].filter((node) => node !== hero) : [content];
-      const reveals = revealNodes.map((node) => animate(node, [{ opacity: 0 }, { opacity: 1 }], 200));
+      const reveals = v3RouteContext.skipEntryAnimation ? [] : revealNodes.map((node) => animate(node, [{ opacity: 0 }, { opacity: 1 }], 200));
       Promise.all(reveals.map((animation) => animation.finished)).then(() => {
         if (cancelled) return;
         root.dataset.recordInfoState = "visible";
@@ -9715,7 +9715,9 @@ function isFieldsOfConflictDetailHydrationRouteActive(routeKey) {
   return isWrestlingVenueDetailPrototypeRoute(route) && getFieldsOfConflictDetailHydrationRouteKey(route) === routeKey;
 }
 
+let fieldsOfConflictVenuesLoadPromise = null;
 function loadFieldsOfConflictDetailVenuesData(signal) {
+  if (fieldsOfConflictVenuesLoadPromise) return fieldsOfConflictVenuesLoadPromise;
   if (wrestlingVenuesDataState === "live") {
     return Promise.resolve(true);
   }
@@ -9725,7 +9727,7 @@ function loadFieldsOfConflictDetailVenuesData(signal) {
   }
 
   setWrestlingVenuesCollection(wrestlingVenuesCollection, "loading");
-  return fetchWrestlingVenuesPayload(1, signal)
+  fieldsOfConflictVenuesLoadPromise = fetchWrestlingVenuesPayload(1, signal)
     .then((firstPayload) => {
       const totalPages = getWrestlingVenuesPayloadTotalPages(firstPayload);
       const remainingPages = Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => index + 2);
@@ -9748,7 +9750,8 @@ function loadFieldsOfConflictDetailVenuesData(signal) {
     .catch(() => {
       setWrestlingVenuesCollection(wrestlingVenuesCollection, "error");
       return false;
-    });
+    }).finally(() => { fieldsOfConflictVenuesLoadPromise = null; });
+  return fieldsOfConflictVenuesLoadPromise;
 }
 
 function loadFieldsOfConflictDetailShowsData(signal) {
@@ -9870,7 +9873,7 @@ function getFieldsOfConflictVenueLookupCandidates(venueId, config = findFieldsOf
 function getFieldsOfConflictDossierVenueSource(venueId = getFieldsOfConflictActiveVenueId()) {
   let config = findFieldsOfConflictVenueConfig(venueId);
   const resolvedVenue = getFieldsOfConflictVenueLookupCandidates(venueId, config)
-    .map((candidate) => findWrestlingVenueById(candidate, { allowFallback: false }))
+    .map((candidate) => findWrestlingVenueById(candidate, { allowFallback: false, includeStatic: false }))
     .find(Boolean) || null;
   if (!config && resolvedVenue) {
     config = findFieldsOfConflictVenueConfig(getWrestlingVenueRowId(resolvedVenue)) ||
@@ -9878,8 +9881,8 @@ function getFieldsOfConflictDossierVenueSource(venueId = getFieldsOfConflictActi
   }
   return {
     config,
-    venue: resolvedVenue || config,
-    fallbackConfig: resolvedVenue ? null : config,
+    venue: resolvedVenue,
+    fallbackConfig: null,
   };
 }
 
@@ -10598,9 +10601,10 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     backButton.className = "wrestling-detail-back";
     backButton.textContent = "Back to Fields of Conflict";
     backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingVenues, { navigationDirection: "back" }));
-    dossier.replaceChildren(backButton, createWrestlingV3StateCard("unavailable", "wrestlingVenues", {
-      title: "Archive Record Unavailable",
-      text: "No matching venue record was found. Return to Fields of Conflict.",
+    const loading = ['idle','loading'].includes(wrestlingVenuesDataState);
+    dossier.replaceChildren(backButton, createWrestlingV3StateCard(loading ? 'loading' : wrestlingVenuesDataState === 'error' ? 'error' : 'empty', "wrestlingVenues", {
+      title: loading ? 'Retrieving Venue Record' : 'Archive Record Unavailable',
+      text: loading ? 'Resolving the venue archive…' : 'No matching venue record is available. Return to Fields of Conflict.',
       retry: false,
     }));
     delete dossier.dataset.fieldsOfConflictVenueId;
@@ -11573,7 +11577,7 @@ function scheduleHallOfChampionsModeSelectorAvailability(prototypeShell) {
     return;
   }
 
-  if (prototypeShell.dataset.hallOfChampionsRestoring === "true" ||
+  if ((v3RouteContext.skipEntryAnimation && v3RouteContext.pending) || prototypeShell.dataset.hallOfChampionsRestoring === "true" ||
     prototypeShell.dataset.hallOfChampionsModeSelectorReady === "true") {
     delete prototypeShell.dataset.hallOfChampionsRestoring;
     if (hallOfChampionsModeSelectorRevealTimer) {
@@ -12228,6 +12232,7 @@ function requestHallOfChampionsPeopleSelectorData(prototypeShell) {
     return hallOfChampionsPeopleArchiveRecords;
   }).finally(() => {
     hallOfChampionsPeopleArchiveRequest = null;
+    notifyV3ResumeReady();
   });
   return hallOfChampionsPeopleArchiveRequest;
 }
@@ -12700,7 +12705,7 @@ function startHallOfChampionsPedestalActivation(prototypeShell) {
   clearHallOfChampionsActivationTimers();
   setHallOfChampionsCrystalTransform(prototypeShell, HALL_OF_CHAMPIONS_CRYSTAL_REST_Y);
 
-  if (prefersHallOfChampionsReducedMotion()) {
+  if (prefersHallOfChampionsReducedMotion() || v3RouteContext.skipEntryAnimation) {
     prototypeShell.dataset.hallOfChampionsAwakening = "settled";
     prototypeShell.dataset.hallOfChampionsActivationComplete = "true";
     scheduleHallOfChampionsProjectionGeometrySync(prototypeShell);
@@ -14708,7 +14713,7 @@ function renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive, opt
 
   const grid = document.createElement("div");
   grid.className = "wrestling-person-dossier-prototype-event-archive__photo-grid";
-  if (options.animate !== false) {
+  if (options.animate !== false && !v3RouteContext.pending) {
     grid.classList.add("is-page-transitioning");
   }
   pagePhotos.forEach((photo, pageIndex) => {
@@ -14995,7 +15000,7 @@ function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPerson
   framework?.setAttribute("inert", "");
   archive.hidden = false;
   archive.setAttribute("aria-hidden", "false");
-  archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "opening";
+  archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = v3RouteContext.pending ? "open" : "opening";
   setWrestlingPersonDossierPrototypeEventArchiveScrollLock(true);
 
   if (!state.keydownHandler) {
@@ -15937,6 +15942,9 @@ function setWrestlingVenuesPrototypeActive(isActive) {
 }
 
 function renderWrestlingVenuesPrototypeShell() {
+  if (wrestlingVenuesDataState === 'idle') loadFieldsOfConflictDetailVenuesData().then(()=>{
+    if(getRouteFromUrl().name==='wrestling-venues')renderFieldsOfConflictVenueDossier(getFieldsOfConflictActiveVenueId());
+  });
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
   clearWrestlingVenuesPrototypeSourceShell();
   setWrestlingVenuesPrototypeActive(true);
@@ -15948,7 +15956,7 @@ function renderWrestlingVenuesPrototypeShell() {
 function renderWrestlingVenueDetailPrototypeRoute(route = {}) {
   cancelWrestlingPeopleBackgroundHydrationIfRouteUnneeded();
   clearWrestlingVenuesPrototypeSourceShell();
-  const routeVenueId = normalizeWrestlingVenueId(getFieldsOfConflictRouteVenueId(route)) || FIELDS_OF_CONFLICT_DETAIL_PROTOTYPE_VENUE_ID;
+  const routeVenueId = normalizeWrestlingVenueId(getFieldsOfConflictRouteVenueId(route));
   setWrestlingVenuesPrototypeActive(true);
   updateFieldsOfConflictVenueLock(routeVenueId);
   renderFieldsOfConflictVenueDossier(routeVenueId);
@@ -17437,7 +17445,9 @@ function openWrestlingPersonTaggedPhotoLightbox(photos, photoIndex, trigger, eve
     wrestlingLightboxShell.setAttribute("aria-hidden", "true");
     wrestlingLightboxShell.setAttribute("inert", "");
   }
-  showLightbox(targetTile, { returnContext });
+  const skipEntryAnimation = v3RouteContext.skipEntryAnimation && !v3RouteContext.photoRevealed;
+  showLightbox(targetTile, { returnContext, skipEntryAnimation });
+  v3RouteContext.photoRevealed = true;
   const sharedLightboxOpen = typeof lightboxScreen !== "undefined" && lightboxScreen?.getAttribute("aria-hidden") === "false";
   if (!sharedLightboxOpen) {
     activeWrestlingPersonLightboxContext = null;
@@ -18946,7 +18956,9 @@ function openWrestlingMatchPhotoLightbox(photos, photoIndex, trigger, show, matc
     wrestlingLightboxShell.setAttribute("aria-hidden", "true");
     wrestlingLightboxShell.setAttribute("inert", "");
   }
-  showLightbox(targetTile, { returnContext });
+  const skipEntryAnimation = v3RouteContext.skipEntryAnimation && !v3RouteContext.photoRevealed;
+  showLightbox(targetTile, { returnContext, skipEntryAnimation });
+  v3RouteContext.photoRevealed = true;
   setWrestlingMatchLightboxRouteSyncActive(true);
 }
 
@@ -19866,4 +19878,54 @@ function initWrestlingPeopleModule() {
   syncDaiionLoreDestinationOption();
   bindWrestlingLandingHallOfChampionsCta();
   bindDaiionLoreFocusPanelContent();
+}
+
+function captureWrestlingResumeState(route) {
+  if(route.name==='wrestling-shows')return {search:activeWrestlingShowsSearch,year:activeWrestlingShowsYearFilter,promotion:activeWrestlingShowsPromotionFilter,venue:activeWrestlingShowsVenueFilter,sort:activeWrestlingShowsSort,hallYear:activeHallCrusadesYearFilter,banner:activeHallCrusadesBannerFilter,field:activeHallCrusadesFieldFilter,query:activeHallCrusadesSearchQuery,index:hallCrusadesPosterActiveIndex,drawers:[isHallCrusadesYearDrawerOpen,isHallCrusadesBannerDrawerOpen,isHallCrusadesFieldDrawerOpen,isHallCrusadesSearchPanelOpen]};
+  if(route.name==='wrestling-people-prototype' && wrestlingPeoplePrototypeShell)return {mode:getHallOfChampionsCurrentModeIndex(wrestlingPeoplePrototypeShell),query:hallOfChampionsSearchQuery,letter:getHallOfChampionsCurrentAzLetter(),category:getHallOfChampionsCurrentCategory(),team:getHallOfChampionsCurrentTeam(),expanded:wrestlingPeoplePrototypeShell.dataset.hallOfChampionsExpanded==='true'};
+  if(route.name==='wrestling-person-detail'){const state=wrestlingPersonDossierPrototypeEventArchiveState;return {event:wrestlingPersonDossierPrototypeEventHistoryState.activeIndex,open:state.isOpen,page:state.photoGalleryPage,photo:state.selectedPhotoIndex,mode:state.mode,gridScroll:state.photoGridScrollTop};}
+  if(route.name.startsWith('wrestling-match-detail')){const show=getWrestlingMatchDossierPrototypeSourceShow(route),match=getWrestlingMatchDossierPrototypeSourceMatch(route,show),key=getWrestlingMatchDossierPhotoPageKey(show,match,route);return {pages:key?[[key,wrestlingMatchDetailPrototypePhotoPageStates.get(key)||0]]:[]};}
+  return {};
+}
+function seedWrestlingResumeState(route,ui) {
+  if(route.name==='wrestling-shows'){
+    activeWrestlingShowsSearch=v3Text(ui.search);activeWrestlingShowsYearFilter=v3Text(ui.year);activeWrestlingShowsPromotionFilter=v3Text(ui.promotion);activeWrestlingShowsVenueFilter=v3Text(ui.venue);activeWrestlingShowsSort=['newest','oldest','name'].includes(ui.sort)?ui.sort:'newest';
+    activeHallCrusadesYearFilter=v3Text(ui.hallYear);activeHallCrusadesBannerFilter=v3Text(ui.banner,'all');activeHallCrusadesFieldFilter=v3Text(ui.field,'all');activeHallCrusadesSearchQuery=v3Text(ui.query);hallCrusadesPosterActiveIndex=Math.floor(v3Number(ui.index,0,10000));isHallCrusadesPosterDefaultIndexApplied=true;
+  }
+  if(route.name.startsWith('wrestling-match-detail') && Array.isArray(ui.pages))ui.pages.slice(0,12).forEach(pair=>{if(Array.isArray(pair) && v3Text(pair[0]))wrestlingMatchDetailPrototypePhotoPageStates.set(pair[0],Math.floor(v3Number(pair[1],0,10000)));});
+}
+function restoreWrestlingResumeState(route,ui) {
+  if(route.name==='wrestling-shows'){
+    if(['idle','loading'].includes(wrestlingShowsDataState))return false;
+    seedWrestlingResumeState(route,ui);renderWrestlingShowsArchive({skipDataRequest:true});
+    [setHallCrusadesYearDrawerOpen,setHallCrusadesBannerDrawerOpen,setHallCrusadesFieldDrawerOpen,setHallCrusadesSearchPanelOpen].forEach((set,index)=>set(Array.isArray(ui.drawers)&&ui.drawers[index]===true));return true;
+  }
+  if(route.name==='wrestling-people-prototype'){
+    if(['idle','loading'].includes(hallOfChampionsPeopleArchiveState) || (hallOfChampionsPeopleArchiveRequest && !hallOfChampionsPeopleArchiveNetworkComplete))return false;
+    const root=wrestlingPeoplePrototypeShell;if(!root)return false;
+    hallOfChampionsSearchQuery=v3Text(ui.query);root.querySelector('[data-hall-of-champions-search]').value=hallOfChampionsSearchQuery;
+    hallOfChampionsAzLetterIndex=Math.max(0,HALL_OF_CHAMPIONS_AZ_LETTERS.indexOf(v3Text(ui.letter)));
+    hallOfChampionsCategoryIndex=Math.max(0,hallOfChampionsPeopleArchiveCategories.indexOf(v3Text(ui.category)));
+    hallOfChampionsTeamIndex=Math.max(0,hallOfChampionsPeopleArchiveTeams.indexOf(v3Text(ui.team)));
+    root.dataset.hallOfChampionsExpanded=String(ui.expanded===true);
+    setHallOfChampionsModeSelectorAvailable(root,true);
+    completeHallOfChampionsModeTransition(getHallOfChampionsModeSelector(root),Math.floor(v3Number(ui.mode,0,3)));
+    syncHallOfChampionsWorkspaces(root);return true;
+  }
+  if(route.name==='wrestling-person-detail'){
+    const history=wrestlingPersonDossierPrototypeEventHistoryState,state=wrestlingPersonDossierPrototypeEventArchiveState;
+    if(['idle','loading'].includes(history.status))return false;
+    if(!v3RouteContext.applied){history.activeIndex=Math.min(Math.floor(v3Number(ui.event,0,10000)),Math.max(0,history.events.length-1));renderWrestlingPersonDossierPrototypeEventHistoryState();v3RouteContext.applied=true;if(ui.open===true)openWrestlingPersonDossierPrototypeEventArchive();}
+    if(ui.open===true && state.isOpen){
+      const archive=getWrestlingPersonDossierPrototypeEventArchive();
+      if(state.photoRequests.size)return false;
+      state.photoGalleryPage=Math.max(1,Math.floor(v3Number(ui.page,1,10000)));state.photoGridScrollTop=v3Number(ui.gridScroll);renderWrestlingPersonDossierPrototypeEventArchivePhotoPage(archive);
+      if(ui.mode==='viewer' && state.photoRenderItems.length)openWrestlingPersonDossierPrototypeEventArchiveViewer(archive,Math.min(Math.floor(v3Number(ui.photo)),state.photoRenderItems.length-1));
+    }return true;
+  }
+  if(route.name==='wrestling-show-detail' || route.name.startsWith('wrestling-match-detail')){
+    if(['idle','loading'].includes(wrestlingShowsDataState))return false;
+    if(route.name.startsWith('wrestling-match-detail'))return Boolean(document.querySelector('[data-record-info-state="visible"]')) || wrestlingShowsDataState==='error';
+  }
+  return true;
 }

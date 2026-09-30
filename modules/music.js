@@ -444,6 +444,8 @@ function getMusicPersonDetailData(personId) {
 }
 
 function findBandById(bandId) {
+  const currentV3 = ['music','music-bands','band-detail'].includes(getRouteFromUrl().name);
+  if (currentV3 && (!musicBandsIndexLoaded || musicBandsIndex?.dataset.bandsDataState !== 'live')) return null;
   const normalizedBandId = String(bandId || "").trim().toLowerCase();
   if (!normalizedBandId) {
     return null;
@@ -459,7 +461,7 @@ function findBandById(bandId) {
     return bandKeys.some((key) => String(key || "").trim().toLowerCase() === normalizedBandId);
   });
 
-  return liveBand || getMockRecordById("musicBands", bandId, ["bandId", "id", "slug", "band_id"]) || null;
+  return liveBand || (currentV3 ? null : getMockRecordById("musicBands", bandId, ["bandId", "id", "slug", "band_id"])) || null;
 }
 
 function createUnknownBand(bandId) {
@@ -671,9 +673,10 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
   }
 
   setBandsIndexVisible(false);
+  bandDetail.removeAttribute("data-band-detail-placeholder");
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
-  if (bandDetailContent) {
+  if (bandDetailContent && !v3RouteContext.pending) {
     bandDetailContent.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -1474,7 +1477,7 @@ function renderBandPersonnel(band) {
   const controls = section.querySelector(".band-personnel-controls");
   controls.hidden = !rosters.current.length || !rosters.past.length;
   const bandId = getBandId(band);
-  const previous = section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : "";
+  const previous = v3ResumeUI().personnel === "past" ? "past" : section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : "";
   section.dataset.personnelBand = bandId;
   const render = key => {
     section.dataset.personnelSelection = key;
@@ -1621,7 +1624,8 @@ function normalizeLiveMusicBands(payload) {
 }
 
 function restoreMusicBandsFallback() {
-  setMusicBandsIndexCollection(musicBandIndexRows, "fallback");
+  const currentV3 = ["music", "music-bands", "band-detail"].includes(getRouteFromUrl().name);
+  setMusicBandsIndexCollection(currentV3 ? [] : musicBandIndexRows, currentV3 ? "error" : "fallback");
 }
 
 function requestMusicBandsIndexData() {
@@ -1666,7 +1670,7 @@ function requestMusicBandsIndexData() {
       return true;
     })
     .catch(() => {
-      setMusicBandsIndexCollection(musicBandIndexRows, "error");
+      setMusicBandsIndexCollection(['music','music-bands','band-detail'].includes(getRouteFromUrl().name) ? [] : musicBandIndexRows, "error");
       syncBandsIndex();
       return false;
     })
@@ -5716,12 +5720,13 @@ function showBandDetail(band, options = {}) {
   renderBandPersonnel(band);
   showBandCapturedSets(band);
   refreshBandDetailArchiveCoverage(activeMusicBand);
+  bandDetail.removeAttribute("data-band-detail-placeholder");
   if (options.prepareRecordOpening) return;
 
   setBandsIndexVisible(false);
   setBandDetailVisible(true);
   setCurrentView("Band Detail");
-  if (bandDetailContent) {
+  if (bandDetailContent && !v3RouteContext.pending) {
     bandDetailContent.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -7297,7 +7302,7 @@ function setLightboxActivePhoto(index, options = {}) {
       ? activeSetRow.dataset.setCamera
       : "Canon EOS 80D");
   }
-  if (didChangePhoto || options.forceTransition) {
+  if (!options.skipTransition && (didChangePhoto || options.forceTransition)) {
     runLightboxImageTransition();
   }
   syncLightboxThumbButtons();
@@ -7377,14 +7382,14 @@ function showLightbox(photoTile = activeGalleryPhoto, options = {}) {
     return;
   }
   selectGalleryPhoto(targetTile);
-  markLightboxTransitionSource(targetTile);
+  if (!options.skipEntryAnimation) markLightboxTransitionSource(targetTile);
   setGalleryModeVisible(false);
-  setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false });
+  setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false, skipTransition: options.skipEntryAnimation });
   setLightboxInfoVisible(false);
   setLightboxThumbnailStripVisible(false);
   setSetGalleryVisible(false);
   setLightboxVisible(true);
-  runLightboxEntryTransition();
+  if (!options.skipEntryAnimation) runLightboxEntryTransition();
   setCurrentView("Lightbox");
   if (musicNexusShell) {
     musicNexusShell.scrollTo({
@@ -7835,7 +7840,7 @@ function renderBandCapturedSets(band) {
     more.setAttribute('aria-label', `Show more captured sets, ${rows.length - next} remaining`);
   };
   const saved = window.history.state?.bandCapturedSets;
-  append(saved?.bandId === bandId && Number.isInteger(saved.count) ? Math.max(12, saved.count) : 12);
+  append(v3RouteContext.pending ? Math.max(12, Math.floor(v3Number(v3ResumeUI().capturedCount, 12, 10000))) : saved?.bandId === bandId && Number.isInteger(saved.count) ? Math.max(12, saved.count) : 12);
   more.addEventListener('click', () => {
     const firstNewIndex = session.visible;
     append(12);
@@ -8359,7 +8364,7 @@ function finishRhythmArrival() {
 }
 function prepareRhythmArrival(restore = false) {
   finishRhythmArrival();
-  if (reducedMotion.matches || (restore && rhythmArrivalPresented)) return;
+  if (reducedMotion.matches || v3RouteContext.skipEntryAnimation || (restore && rhythmArrivalPresented)) return;
   rhythmArrival = { animations: [], started: false };
   rhythmViewport.dataset.rhythmArrival = 'waiting';
   syncRhythmArrivalInput();
@@ -8443,7 +8448,7 @@ function renderRhythmSourceIndex() {
   if(!musicBandsIndex||musicBandsIndex.getAttribute('aria-hidden')==='true')return;
   syncActiveBandsFilterOptions();renderBandsFilterSelects();updateBandsFilterResetButtons();
   const all=getMusicBandsIndexCollection(),state=musicBandsIndex.dataset.bandsDataState,key=[state,activeBandsFilterLetter,activeBandsRegionFilter,activeBandsStatusFilter].join('|');
-  if(rhythmSourceSession?.all===all&&rhythmSourceSession.key===key)return;
+  if(rhythmSourceSession?.all===all&&rhythmSourceSession.key===key&&!musicSourceResume)return;
   if(rhythmSourceSession?.frame)cancelAnimationFrame(rhythmSourceSession.frame);
   const list=musicBandsIndex.querySelector('[data-rhythm-source-list]'),status=musicBandsIndex.querySelector('[data-rhythm-source-status]'),more=musicBandsIndex.querySelector('[data-rhythm-source-more]'),view=musicBandsIndex.querySelector('[data-rhythm-rolodex]'),previous=musicBandsIndex.querySelector('[data-rhythm-previous]'),next=musicBandsIndex.querySelector('[data-rhythm-next]');
   // Keep the existing controls beside the scanner without changing desktop flow.
@@ -8479,7 +8484,13 @@ function renderRhythmSourceIndex() {
   const append=()=>{const fragment=document.createDocumentFragment(),end=Math.min(count+24,rows.length);while(count<end){const index=count++,item=createRhythmSourceRow(rows[index],()=>center(index));buttons.push(item.firstElementChild);fragment.append(item);}list.append(fragment);status.textContent=count+' / '+rows.length+' Bands'+(rows.length!==archive.length?' · '+archive.length+' in archive':'');more.hidden=count>=rows.length;sync();};
   view.onscroll=()=>{if(!session.frame)session.frame=requestAnimationFrame(sync);};
   previous.onclick=()=>center(session.active-1);next.onclick=()=>{const index=session.active+1;if(index>=count&&count<rows.length)append();center(index);};more.onclick=append;
-  append();center(rows.length>2?1:0,'auto');
+  append();
+  const resumed=musicSourceResume || v3ResumeUI();
+  while(count<Math.min(rows.length,v3Number(resumed.count,24,10000)))append();
+  const selected=rows.findIndex(row=>getBandId(row)===resumed.selected);
+  center(selected>=0?selected:rows.length>2?1:0,'auto');
+  if (resumed.sourceScroll!=null) view.scrollTop=v3Number(resumed.sourceScroll);
+  if(view.clientHeight)musicSourceResume=null;
 }
 
 function renderRhythmSearch() {
@@ -14668,4 +14679,34 @@ function initMusicModule() {
   }
   hydrateSetRouteMetadata();
   setBandsView("radar");
+}
+
+let musicSourceResume=null;
+function captureMusicResumeState(route) {
+  if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
+  if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,capturedCount:bandCapturedSetsSession?.visible || 12};
+  return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
+}
+function seedMusicResumeState(route,ui) {
+  if(route.name!=='music-bands')return;
+  musicSourceResume={entry:v3RouteContext.entry,selected:v3Text(ui.selected),count:v3Number(ui.count,24,10000),sourceScroll:v3Number(ui.sourceScroll)};
+  activeBandsFilterLetter=/^(?:[A-Z#]|0-9)$/.test(v3Text(ui.letter))?ui.letter:"";activeBandsRegionFilter=["local","regional","national","international"].includes(ui.region)?ui.region:"";activeBandsStatusFilter=["complete","partial","needs"].includes(ui.status)?ui.status:"";bandsSearchTerm=v3Text(ui.query);
+}
+function settleMusicResumeLanding() {
+  const landing=document.querySelector('[data-zhento-landing]') || musicNexusShell;
+  landing?.getAnimations({subtree:true}).forEach(animation=>{if(animation instanceof CSSAnimation && animation.effect?.getTiming().iterations!==Infinity)try{animation.finish();}catch{}});
+}
+function restoreMusicResumeState(route,ui) {
+  if(route.name==='music'){
+    settleMusicResumeLanding();
+    const button=[...document.querySelectorAll('[data-zhento-destination]')].find(node=>node.dataset.zhentoDestination===v3Text(ui.pillar));
+    if(button){button.inert=false;button.click();}return true;
+  }
+  if(route.name==='music-bands')return !['loading','idle'].includes(musicBandsIndex.dataset.bandsDataState);
+  if(route.name==='band-detail'){
+    if(!musicBandsIndexLoaded)return musicBandsIndex.dataset.bandsDataState==='error';
+    if(!findBandById(route.bandId))return true;
+    return musicShowsSetsLoaded || musicShowsSetsDataState==='error';
+  }
+  return true;
 }

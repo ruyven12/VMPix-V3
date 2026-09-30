@@ -1078,6 +1078,7 @@ const siteModuleIntegrationPlaceholders = Object.freeze({
 });
 
 function getForcedMockState(scope = "") {
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)) return "";
   const params = new URLSearchParams(window.location.search || "");
   const forcedState = params.get("mockState");
   const forcedScope = params.get("mockScope") || "all";
@@ -2997,6 +2998,10 @@ function resolveDaiionArchiveStatsValues(valueNodes, mappedStats, animationStart
     return Number.isFinite(value) ? formatDaiionArchiveStat(value) : "N/A";
   });
 
+  if (v3RouteContext.skipEntryAnimation) {
+    valueNodes.forEach((node,index)=>{node.textContent=finalValues[index];node.classList.add('is-locked');node.classList.remove('is-locking');});
+    return;
+  }
   if (reduceMotion) {
     valueNodes.forEach((node, index) => setDaiionArchiveValueLocked(node, finalValues[index]));
     return;

@@ -9,6 +9,7 @@
   <style>
     html { background-color: #050507; }
     html[data-v3-booting] body { opacity: 0 !important; pointer-events: none !important; }
+    [data-band-detail-placeholder] { visibility: hidden !important; pointer-events: none !important; }
   </style>
   <script>if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) document.documentElement.setAttribute("data-v3-booting", "");</script>
   <title>Welcome to Voodoo Media V3.0.01</title>
@@ -31,6 +32,15 @@
     <script>
       (() => {
         const routePath = window.location.pathname.replace(/\/+$/, "") || "/";
+        if (/^\/wrestling(?:\/(?:shows(?:\/[^/]+(?:\/match-[^/]+(?:\/photo\/[^/]+)?)?)?|people(?:\/[^/]+)?|venues(?:\/[^/]+)?))?$/.test(routePath)) {
+          const root=document.currentScript.parentElement;
+          root.classList.remove('is-home-route'); root.classList.add('has-entered-hub','is-module-view');
+          const parts=routePath.split('/').filter(Boolean);
+          root.dataset.shellRoute=parts[1]==='shows' ? parts.length>4 ? 'wrestling-match-detail-photo' : parts.length>3 ? 'wrestling-match-detail' : parts.length>2 ? 'wrestling-show-detail' : 'wrestling-shows'
+            : parts[1]==='people' ? parts.length>2 ? 'wrestling-person-detail' : 'wrestling-people-prototype'
+            : parts[1]==='venues' ? parts.length>2 ? 'wrestling-venue-detail' : 'wrestling-venues' : 'wrestling';
+          root.dataset.activeWorld='battleground';
+        }
         if (/^\/music\/bands(?:\/[^/]+)?$/.test(routePath)) {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
@@ -45,7 +55,7 @@
         }
         if (/^\/wrestling\/shows\/[^/]+\/match-\d+(?:\/photo\/[^/]+)?$/.test(routePath)) {
           document.currentScript.parentElement.classList.remove("is-home-route");
-          document.currentScript.parentElement.setAttribute("data-shell-route", "wrestling-match-detail");
+          document.currentScript.parentElement.setAttribute("data-shell-route", routePath.includes("/photo/") ? "wrestling-match-detail-photo" : "wrestling-match-detail");
         }
       })();
     </script>
@@ -286,7 +296,7 @@
       </section>
 
       </template>
-      <script>if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) { const t=document.getElementById("home-presentation-template"); t.before(t.content); }</script>
+      <script>if (!(/^\/music(?:\/bands(?:\/[^/]+)?)?\/*$/.test(location.pathname) || /^\/wrestling(?:\/|$)/.test(location.pathname))) { const t=document.getElementById("home-presentation-template"); t.before(t.content); }</script>
 
       <section class="portfolio-hub" aria-labelledby="portfolio-title" aria-hidden="true" inert>
         <h2 class="sr-only" id="portfolio-title">Portfolio Entry Stage</h2>
@@ -1093,7 +1103,7 @@
           </article>
         </section>
         </template>
-        <script>if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) { const t=document.getElementById('music-presentation-template'); t.before(t.content); }</script>
+        <script>if (!(/^\/music(?:\/bands(?:\/[^/]+)?)?\/*$/.test(location.pathname) || /^\/wrestling(?:\/|$)/.test(location.pathname)) || /^\/music\/*$/.test(location.pathname) || /^\/wrestling\/shows\/[^/]+\/match-[^/]+\/photo\/[^/]+\/*$/.test(location.pathname)) { const t=document.getElementById('music-presentation-template'); t.before(t.content); }</script>
         <section class="ring-archive-shell" aria-label="Ring Archive" aria-hidden="true" inert data-ring-archive-shell>
 
           <section class="ring-archive-activity" aria-labelledby="ring-activity-title">
@@ -1821,7 +1831,7 @@
       </span>
     </footer>
     </template>
-    <script>if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) { const t=document.getElementById('shell-rail-template'); t.before(t.content); }</script>
+    <script>if (!(/^\/music(?:\/bands(?:\/[^/]+)?)?\/*$/.test(location.pathname) || /^\/wrestling(?:\/|$)/.test(location.pathname))) { const t=document.getElementById('shell-rail-template'); t.before(t.content); }</script>
 
     <button
       class="global-menu-backdrop"
@@ -1933,9 +1943,7 @@
         }
       };
       window.addEventListener("load", () => {
-        if (window.isWrestlingVenuesPrototypePath?.() && typeof syncRoute === "function") {
-          syncRoute({ shouldCanonicalize: false });
-        }
+        // Bootstrap already owns the canonical Venue route; keep its resume context.
         requestAnimationFrame(syncPrototypeShellState);
         window.setTimeout(syncPrototypeShellState, 100);
         window.setTimeout(syncPrototypeShellState, 500);

@@ -1769,6 +1769,7 @@ function setMusicLandingStatsState(stateName) {
 }
 
 function getFallbackMusicLandingStatValue(key) {
+  if (getRouteFromUrl().name === "music") return "—";
   const valueElement = getMusicLandingStatValueElement(key);
   if (!valueElement) {
     return "";
@@ -1862,7 +1863,7 @@ function requestMusicLandingStats() {
   const order = ["photos", "bands", "shows", "people", "venues"];
   order.forEach((key) => {
     const element = getMusicLandingStatValueElement(key);
-    element.textContent = "0";
+    element.textContent = "—";
     element.dataset.statSource = "pending";
   });
   setMusicLandingStatsState("loading");
@@ -1891,7 +1892,7 @@ function requestMusicLandingStats() {
       syncZhentoPillarStat();
       return;
     }
-    if (reducedMotion.matches || total === 0) {
+    if (reducedMotion.matches || v3RouteContext.skipEntryAnimation || total === 0) {
       element.textContent = total.toLocaleString();
       element.dataset.statSource = "live";
       syncZhentoPillarStat();
@@ -3270,7 +3271,7 @@ function resetZhentoLandingSelection() {
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     button.setAttribute("aria-pressed", "false");
     const reveal = button.getAnimations().filter((animation) => animation.animationName === "daiionArchiveStatsLabelResolve");
-    button.inert = !reducedMotion.matches && reveal.some((animation) => animation.playState !== "finished");
+    button.inert = !reducedMotion.matches && !v3RouteContext.skipEntryAnimation && reveal.some((animation) => animation.playState !== "finished");
     Promise.all(reveal.map((animation) => animation.finished.catch(() => {}))).then(() => {
       if (generation === zhentoSelectionGeneration && getRouteFromUrl().name === "music") button.inert = false;
     });
@@ -3297,7 +3298,7 @@ function resetZhentoLandingSelection() {
         landing.querySelector(".zhento-detail").hidden = false;
       };
       const opacity = Number(getComputedStyle(prompt).opacity);
-      if (!reducedMotion.matches && !prompt.hidden && opacity > 0) {
+      if (!reducedMotion.matches && !(v3RouteContext.skipEntryAnimation && v3RouteContext.pending) && !prompt.hidden && opacity > 0) {
         zhentoPromptExit?.cancel();
         const exit = prompt.animate([{ opacity }, { opacity: 0 }], { duration: 150, easing: "ease-out", fill: "forwards" });
         zhentoPromptExit = exit;
@@ -3496,14 +3497,15 @@ reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) fini
 function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
   const detail = route.name === 'band-detail';
-  const currentFoundation = active || detail;
+  const currentFoundation = isCurrentV3Route(route);
   const entering = active && (rhythmViewport.hidden || !rhythmViewport.hasAttribute('data-rhythm-arrival'));
   if (!active) finishRhythmArrival();
   else if (entering) prepareRhythmArrival(Boolean(options.historyState || options.navigationDirection === 'back'));
   for (const [id, node] of [['home-presentation-template', homeFrame], ['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
     const template = document.getElementById(id);
-    if (currentFoundation && node?.isConnected) template.content.append(node);
-    else if (!currentFoundation && template.content.childElementCount) template.before(template.content);
+    const parked = currentFoundation && !(id === 'music-presentation-template' && ['music','wrestling-match-detail-photo'].includes(route.name));
+    if (parked && node?.isConnected) template.content.append(node);
+    else if (!parked && template.content.childElementCount) template.before(template.content);
   }
   rhythmViewport.hidden = !active;
   rhythmViewport.inert = !active;
@@ -4912,12 +4914,12 @@ function resetShellScroller(scroller) {
 
 function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
   updateViewportMetrics();
-  if (options.shouldResetScroll === false) {
+  if (options.shouldResetScroll === false || v3RouteContext.pending) {
     return;
   }
 
   window.requestAnimationFrame(() => {
-    resetShellScroller(getActiveShellScroller(route));
+    if (!v3RouteContext.pending && v3RouteContext.route === route) resetShellScroller(getActiveShellScroller(route));
   });
 }
 
@@ -5756,6 +5758,7 @@ if (shell && startButton) {
   // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
   document.documentElement.removeAttribute("data-v3-booting");
   window.addEventListener("popstate", (event) => {
+    checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
     cancelBandRecordOpening();
     cancelZhentoRhythmEntry();
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();
@@ -5764,7 +5767,7 @@ if (shell && startButton) {
     const isBack = targetIndex !== null && shellHistoryIndex !== null && targetIndex < shellHistoryIndex;
     shellHistoryIndex = targetIndex;
     runShellBackSweep(targetRoute, () => {
-      syncRoute(targetRoute, { historyState });
+      syncRoute(targetRoute, { historyState, navigationCause: 'back-forward' });
       if (typeof stabilizeShellViewport === "function") stabilizeShellViewport(targetRoute, { historyState });
     }, isBack);
   });
@@ -5800,7 +5803,11 @@ if (shell && startButton) {
     }
   });
   window.addEventListener("pageshow", (event) => {
-    if (event.persisted) syncRouteFromLocation({ historyState: window.history.state });
+    if (event.persisted) {
+      cancelV3ResumeRestore();
+      v3RouteContext = { ...v3RouteContext, navigationCause: 'bfcache', skipEntryAnimation: true, isResume: true, pending: false };
+      updateViewportMetrics(); updateShellBackState(getRouteFromUrl()); syncAmbientMotion(); syncPortfolioEngineLightningMotion();
+    }
   });
   window.addEventListener("pagehide", () => {
     cancelShellBackSweep();

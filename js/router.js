@@ -241,6 +241,94 @@ function getRouteFromUrl(url = window.location.href) {
   return unknownRoute("route-not-found");
 }
 
+
+// Refresh supplements one history entry; ordinary SPA history remains authoritative.
+const V3_RESUME_VERSION = 1;
+const v3InitialNavigationCause = performance.getEntriesByType('navigation')[0]?.type === 'reload' ? 'reload' : performance.getEntriesByType('navigation')[0]?.type === 'back_forward' ? 'back-forward' : 'deep-link';
+let v3RouteContext = { navigationCause: v3InitialNavigationCause, skipEntryAnimation: false, isResume: false };
+const v3EntriesRenderedInDocument = new Set();
+let v3RouteStarted = false, v3ResumeWake = null, v3ResumeObserver = null, v3ResumeDeadline = 0, v3CheckpointTimer = 0;
+const v3Text = (value, fallback = '') => typeof value === 'string' && value.length <= 300 ? value : fallback;
+const v3Number = (value, fallback = 0, max = 1000000) => Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : fallback;
+function isCurrentV3Route(route) {
+  return ['music','music-bands','band-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
+}
+function createV3EntryId() { return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function ensureV3EntryId() {
+  const state = window.history.state || {};
+  if (!/^[a-zA-Z0-9-]{8,80}$/.test(state.v3EntryId || '')) window.history.replaceState({ ...state, v3EntryId: createV3EntryId() }, '', location.href);
+  return window.history.state.v3EntryId;
+}
+function v3ResumeKey(entry, url) { return 'v3:resume:' + V3_RESUME_VERSION + ':' + entry + ':' + url; }
+function v3ResumeUI() { return v3RouteContext.pending ? v3RouteContext.snapshot?.ui || {} : {}; }
+function getV3ResumeScrollers(route = v3RouteContext.route) {
+  const selectors = route.name === 'music-bands' ? ['.rhythm-pillar','[data-rhythm-rolodex]','#rhythm-search-panel','[data-bands-search-results]']
+    : route.name === 'band-detail' ? ['[data-band-detail-content]']
+    : route.name === 'wrestling-people-prototype' ? ['[data-wrestling-people-prototype-shell]',...['search','az','category','team'].map(mode=>'[data-hall-of-champions-workspace-results="'+mode+'"]')]
+    : route.name === 'wrestling-person-detail' ? ['[data-wrestling-person-dossier-prototype-shell]','.wrestling-person-dossier-prototype-framework','[data-wrestling-person-dossier-prototype-event-archive-photo-grid]']
+    : route.name.startsWith('wrestling-') ? ['.wrestling-show-prototype-surface','.wrestling-show-prototype-encounters','.wrestling-show-prototype-encounter-list'] : [];
+  return new Map([['shell',getActiveShellScroller(route)],...selectors.map(selector=>[selector,document.querySelector(selector)])]);
+}
+function captureV3Scroll() {
+  return [...getV3ResumeScrollers()].filter(([,node])=>node?.isConnected).map(([key,node])=>({key,top:node.scrollTop,left:node.scrollLeft}));
+}
+function restoreV3Scroll(rows) {
+  if(!Array.isArray(rows))return;
+  const scrollers=getV3ResumeScrollers();
+  rows.slice(0,12).forEach(row=>{const node=scrollers.get(row?.key);if(node?.isConnected)node.scrollTo({top:v3Number(row.top),left:v3Number(row.left),behavior:'instant'});});
+}
+function checkpointV3Resume(allowDeparted = false) {
+  clearTimeout(v3CheckpointTimer);
+  const context=v3RouteContext;
+  if(!context.entry || context.pending || !isCurrentV3Route(context.route) || (allowDeparted !== true && context.url!==(getRouteFromUrl().canonicalUrl || getPathWithSearch())))return;
+  try {
+    const ui=context.route.name.startsWith('music')||context.route.name==='band-detail' ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
+    const snapshot={version:V3_RESUME_VERSION,entry:context.entry,url:context.url,ui,scroll:captureV3Scroll()};
+    const value=JSON.stringify(snapshot);
+    if(value.length<=16000)sessionStorage.setItem(v3ResumeKey(context.entry,context.url),value);
+  } catch { /* Storage is optional; navigation and real data rendering must continue. */ }
+}
+function notifyV3ResumeReady(){v3ResumeWake?.();}
+function cancelV3ResumeRestore(){v3ResumeWake=null;v3ResumeObserver?.disconnect();v3ResumeObserver=null;clearTimeout(v3ResumeDeadline);}
+function beginV3RouteContext(route,options){
+  cancelV3ResumeRestore();
+  const cause=options.navigationCause || (v3RouteStarted ? 'spa' : v3InitialNavigationCause);
+  v3RouteStarted=true;
+  const entry=ensureV3EntryId(),url=route.canonicalUrl || getPathWithSearch();
+  if(route.name==='music-bands' && musicSourceResume?.entry && musicSourceResume.entry!==entry)musicSourceResume=null;
+  // A reload also discards ancestors' in-memory return state. Recover only the first
+  // visit to such an entry; entries already alive here retain normal SPA restoration.
+  const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
+  v3EntriesRenderedInDocument.add(entry);
+  let snapshot=null;
+  if((cause==='reload' || reloadGap) && isCurrentV3Route(route))try{
+    const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
+    const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
+    if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
+  }catch{}
+  v3RouteContext={navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
+  if(snapshot)try{if(route.name.startsWith('music')||route.name==='band-detail')seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
+  queueMicrotask(()=>{
+    const context=v3RouteContext;
+    if(context.route!==route)return;
+    const restore=()=>{
+      if(v3RouteContext!==context)return;
+      v3ResumeObserver?.disconnect();
+      let ready=true;
+      try{if(context.pending && !context.uiReady)ready=route.name.startsWith('music')||route.name==='band-detail' ? restoreMusicResumeState(route,context.snapshot.ui) : restoreWrestlingResumeState(route,context.snapshot.ui);}catch{ready=true;}
+      if(ready)context.uiReady=true;
+      if(context.pending && document.fonts?.status==='loading'){ready=false;if(!context.fontWait){context.fontWait=true;document.fonts.ready.then(()=>{context.fontWait=false;if(v3RouteContext===context && context.pending)restore();});}}
+      if(ready){if(context.pending)restoreV3Scroll(context.snapshot.scroll);context.pending=false;cancelV3ResumeRestore();}
+      else v3ResumeObserver?.observe(document.querySelector('.site-shell'),{childList:true,subtree:true,attributes:true,attributeFilter:['data-record-info-state','data-wrestling-person-dossier-prototype-event-archive-photo-state','data-bands-data-state']});
+    };
+    if(context.pending){v3ResumeWake=restore;v3ResumeObserver=new MutationObserver(restore);v3ResumeDeadline=setTimeout(()=>{context.pending=false;cancelV3ResumeRestore();},20000);}
+    restore();
+    if(context.skipEntryAnimation && route.name==='music')settleMusicResumeLanding();
+  });
+}
+for(const type of ['click','input','change','scroll'])document.addEventListener(type,()=>{clearTimeout(v3CheckpointTimer);v3CheckpointTimer=setTimeout(checkpointV3Resume,180);},{capture:true,passive:true});
+window.addEventListener('pagehide',checkpointV3Resume,{capture:true});
+
 const SHELL_HISTORY_INDEX_KEY = "__v3ShellHistoryIndex";
 let shellHistoryIndex = null;
 let shellRenderedRoute = null;
@@ -251,6 +339,7 @@ function getShellHistoryIndex(state) {
 }
 
 function seedShellHistoryIndex() {
+  ensureV3EntryId();
   shellHistoryIndex = getShellHistoryIndex(window.history?.state);
   if (shellHistoryIndex === null && typeof window.history?.replaceState === "function") {
     shellHistoryIndex = 0;
@@ -259,6 +348,7 @@ function seedShellHistoryIndex() {
 }
 
 function pushRouteUrl(url, state = {}) {
+  checkpointV3Resume();
   if (!window.history || typeof window.history.pushState !== "function") {
     return;
   }
@@ -268,7 +358,7 @@ function pushRouteUrl(url, state = {}) {
   if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
   const currentIndex = getShellHistoryIndex(window.history.state);
   const nextIndex = (currentIndex ?? shellHistoryIndex ?? 0) + 1;
-  const routeState = { ...state, route: targetPath, [SHELL_HISTORY_INDEX_KEY]: targetPath !== getPathWithSearch() ? nextIndex : currentIndex ?? shellHistoryIndex ?? 0 };
+  const routeState = { ...state, v3EntryId: targetPath !== getPathWithSearch() ? createV3EntryId() : ensureV3EntryId(), route: targetPath, [SHELL_HISTORY_INDEX_KEY]: targetPath !== getPathWithSearch() ? nextIndex : currentIndex ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
     routeState.__v3ShellPreviousRoute = getPathWithSearch();
     window.history.pushState(routeState, "", targetPath);
@@ -279,21 +369,24 @@ function pushRouteUrl(url, state = {}) {
 }
 
 function replaceRouteUrl(url, state = {}) {
+  checkpointV3Resume();
   if (!window.history || typeof window.history.replaceState !== "function") {
     return;
   }
 
   const targetUrl = new URL(url, window.location.href);
   const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
-  const routeState = { ...state, route: targetPath, [SHELL_HISTORY_INDEX_KEY]: getShellHistoryIndex(window.history.state) ?? shellHistoryIndex ?? 0 };
+  const routeState = { ...(window.history.state || {}), ...state, v3EntryId: ensureV3EntryId(), route: targetPath, [SHELL_HISTORY_INDEX_KEY]: getShellHistoryIndex(window.history.state) ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
     window.history.replaceState(routeState, "", targetPath);
   } else if (Object.keys(state).length > 0) {
     window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
   }
+  if (v3RouteContext.entry === window.history.state?.v3EntryId) v3RouteContext.url = getRouteFromUrl().canonicalUrl || getPathWithSearch();
 }
 
 function syncRoute(route, options = {}) {
+  beginV3RouteContext(route, options);
   if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
   syncRhythmPresentationOwnership(route, options);
