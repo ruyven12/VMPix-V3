@@ -593,6 +593,9 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
     return;
   }
 
+  bandDetailViewSets?.remove();
+  bandDetail.querySelector(".band-captured-sets")?.remove();
+  bandCapturedSetsSession = null;
   const normalizedBandId = String(bandId || "").trim();
   const isLoading = stateName === "loading";
   const isError = stateName === "error";
@@ -831,13 +834,20 @@ function navigateToSetDetail(row) {
   const historyState = window.history.state || {};
   const returnUrl = normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl);
   const setsArchiveUrl = getBandSetsRouteUrl(bandId);
+  const fromBandCapturedSets = getRouteFromUrl().name === 'band-detail' && row.classList?.contains('band-captured-set-row') === true;
+  if (fromBandCapturedSets) {
+    window.history.replaceState({ ...historyState, bandCapturedSets: {
+      bandId, count: bandCapturedSetsSession?.visible || 12, scrollTop: bandDetailContent.scrollTop,
+    } }, '', window.location.href);
+  }
   bandsIndexReturnUrl = returnUrl;
   navigateToRoute(getSetRouteUrl(bandId, setCode), {
     historyState: {
       bandUrl: getBandRouteUrl(bandId),
       setsArchiveUrl,
       returnUrl,
-      fromSetsArchive: true,
+      fromSetsArchive: !fromBandCapturedSets,
+      fromBandCapturedSets,
       fromBandsIndex: Boolean(historyState.fromBandsIndex),
     },
   });
@@ -873,6 +883,7 @@ function returnToBandDetailRoute() {
   }
 
   const bandUrl = historyState.bandUrl || getBandRouteUrl(bandId);
+  if (returnToCapturedBandDetail(route, historyState)) return;
   const setsArchiveUrl = historyState.setsArchiveUrl || getBandSetsRouteUrl(bandId);
   if (route.name === "set-detail" && historyState.setsArchiveUrl && historyState.fromSetsArchive) {
     window.history.back();
@@ -903,6 +914,7 @@ function showSetGalleryRoute(row, options = {}) {
     return;
   }
 
+  setGalleryBack?.setAttribute('aria-label', window.history.state?.fromBandCapturedSets ? 'Back to Band Detail' : 'Back to Sets Archive');
   updateSetsFeaturedFromRow(row);
   updateSetGalleryFromRow(row);
   setGalleryViewMode("grid");
@@ -5492,7 +5504,7 @@ function renderBandIdentityDossier(band) {
   const copy = hero.querySelector(".band-detail-copy");
   if (!hero.classList.contains("band-identity-dossier")) {
     hero.classList.add("band-identity-dossier");
-    // Retain the existing data-bound nodes and the View Sets listener.
+    // Retain the existing data-bound identity nodes; Sets now lives below Personnel.
     bandDetailName.after(bandDetailLocation);
     copy.querySelector(".band-detail-meta")?.remove();
     bandDetailStatus.after(bandDetailTags);
@@ -5503,7 +5515,7 @@ function renderBandIdentityDossier(band) {
     label.textContent = "LAST SEEN";
     seen.append(label, document.createElement("span"));
     copy.querySelector(".band-detail-completion").before(seen);
-    hero.append(bandDetailViewSets);
+    bandDetailViewSets?.remove();
     bandDetailLogoName?.remove();
   }
   const raw = band.backend_record || band;
@@ -5702,6 +5714,7 @@ function showBandDetail(band, options = {}) {
   renderBandIdentityDossier(band);
   renderBandArchiveTelemetry(band);
   renderBandPersonnel(band);
+  showBandCapturedSets(band);
   refreshBandDetailArchiveCoverage(activeMusicBand);
   if (options.prepareRecordOpening) return;
 
@@ -7664,6 +7677,7 @@ function showSetGallery() {
 
 function returnToSetsArchiveFromGallery() {
   const route = getRouteFromUrl();
+  if (returnToCapturedBandDetail(route, window.history.state || {})) return;
   if (route.name === "set-detail") {
     const historyState = window.history.state || {};
     const bandId = route.bandId || getBandId(activeMusicBand);
@@ -7736,6 +7750,114 @@ function getSetsArchiveRowsForBand(band) {
   });
 }
 
+let bandCapturedSetsSession = null;
+
+function returnToCapturedBandDetail(route, historyState) {
+  if (route.name !== 'set-detail' || !historyState.fromBandCapturedSets) return false;
+  const bandUrl = historyState.bandUrl || getBandRouteUrl(route.bandId);
+  if (historyState.__v3ShellPreviousRoute === bandUrl) window.history.back();
+  else navigateToRoute(bandUrl, { navigationDirection: 'back', historyState: {
+    returnUrl: normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl),
+    fromBandsIndex: Boolean(historyState.fromBandsIndex),
+  } });
+  return true;
+}
+
+function restoreBandCapturedSetsScroll(session) {
+  const saved = window.history.state?.bandCapturedSets;
+  if (!saved || saved.bandId !== session.bandId || !Number.isFinite(saved.scrollTop)) return;
+  // Run after the existing route's viewport reset; restore only this retained history entry.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const route = getRouteFromUrl();
+    if (bandCapturedSetsSession === session && route.name === 'band-detail' && route.bandId === session.bandId && window.history.state?.bandCapturedSets?.scrollTop === saved.scrollTop) {
+      bandDetailContent.scrollTo({ top: saved.scrollTop, behavior: 'instant' });
+    }
+  }));
+}
+
+function getCapturedSetYear(show) {
+  const raw = String(show.rawDate || '').trim();
+  // Require an explicit full year and a complete valid calendar date; never guess a range.
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|[T\s])/);
+  const slash = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  const date = parseMusicShowDate(raw);
+  if (!date || !/\b\d{4}\b/.test(raw)) return null;
+  if (iso || slash) {
+    const year = Number(iso ? iso[1] : slash[3]), month = Number(iso ? iso[2] : slash[1]), day = Number(iso ? iso[3] : slash[2]);
+    if (date.getFullYear() !== year || date.getMonth() + 1 !== month || date.getDate() !== day) return null;
+  } else if (!/\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\b/i.test(raw) || !/\b\d{1,2}(?:st|nd|rd|th)?\b/i.test(raw)) return null;
+  return date.getFullYear();
+}
+
+function renderBandCapturedSets(band) {
+  const bandId = getBandId(band);
+  const existing = bandCapturedSetsSession;
+  if (existing?.bandId === bandId && existing.source === musicShowsSetsCollection && musicShowsSetsDataState === 'live') {
+    restoreBandCapturedSetsScroll(existing);
+    return;
+  }
+  bandDetail.querySelector('.band-captured-sets')?.remove();
+  bandCapturedSetsSession = null;
+  // Legacy fallback rows are not evidence of this Band's captured sets.
+  if (musicShowsSetsDataState !== 'live') return;
+  const rows = getSortedSetsArchiveRows(getSetsArchiveRowsForBand(band));
+  if (!rows.length) return;
+  const section = document.createElement('section');
+  section.className = 'band-captured-sets';
+  section.setAttribute('aria-labelledby', 'band-captured-sets-title');
+  const header = document.createElement('header');
+  const title = document.createElement('h2');
+  title.id = 'band-captured-sets-title';
+  title.className = 'band-detail-panel-title';
+  title.textContent = 'CAPTURED SETS';
+  const summary = document.createElement('p');
+  summary.className = 'band-captured-sets-summary';
+  const years = rows.map(getCapturedSetYear);
+  const min = Math.min(...years), max = Math.max(...years);
+  const range = years.every(Number.isFinite) ? ` // ${min === max ? min : `${min}\u2013${max}`}` : '';
+  summary.textContent = `${rows.length} SET${rows.length === 1 ? '' : 'S'}${range}`;
+  header.append(title, summary);
+  const list = document.createElement('ul');
+  list.className = 'band-captured-sets-list';
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.className = 'band-captured-sets-more';
+  more.textContent = 'SHOW MORE SETS';
+  const session = { bandId, source: musicShowsSetsCollection, rows, visible: 0 };
+  bandCapturedSetsSession = session;
+  const append = count => {
+    const next = Math.min(rows.length, session.visible + count);
+    const fragment = document.createDocumentFragment();
+    for (let index = session.visible; index < next; index++) fragment.append(createSetsListRow(rows[index], false, { captured: true }));
+    list.append(fragment);
+    session.visible = next;
+    more.hidden = next >= rows.length;
+    more.setAttribute('aria-label', `Show more captured sets, ${rows.length - next} remaining`);
+  };
+  const saved = window.history.state?.bandCapturedSets;
+  append(saved?.bandId === bandId && Number.isInteger(saved.count) ? Math.max(12, saved.count) : 12);
+  more.addEventListener('click', () => {
+    const firstNewIndex = session.visible;
+    append(12);
+    list.children[firstNewIndex]?.firstElementChild?.focus({ preventScroll: true });
+  });
+  section.append(header, list, more);
+  const personnel = bandDetail.querySelector('.band-personnel');
+  if (personnel) personnel.after(section);
+  else bandDetail.append(section);
+  restoreBandCapturedSetsScroll(session);
+}
+
+function showBandCapturedSets(band) {
+  renderBandCapturedSets(band);
+  if (musicShowsSetsLoaded) return;
+  requestMusicShowsSetsData().then(() => {
+    const route = getRouteFromUrl();
+    const bandId = getBandId(band);
+    if ((route.name === 'band-detail' && route.bandId === bandId) || bandRecordOpening?.bandId === bandId) renderBandCapturedSets(band);
+  });
+}
+
 function getSetsArchiveDateSort(row) {
   const existingSort = Number(row?.dateSort);
   if (Number.isFinite(existingSort) && existingSort > 0) {
@@ -7799,7 +7921,7 @@ function setArchivePosterImage(image, imageSrc, fallbackElement, loadedClassName
   image.src = imageSrc;
 }
 
-function createSetsListRow(show, isActive = false) {
+function createSetsListRow(show, isActive = false, { captured = false } = {}) {
   const item = document.createElement("li");
   const row = document.createElement("button");
   const setAlbum = getMusicShowAlbumForBand(show, activeMusicBand, show.setCode);
@@ -7870,6 +7992,12 @@ function createSetsListRow(show, isActive = false) {
   location.textContent = show.location;
   copy.append(date, title, location);
   row.append(thumb, copy);
+  if (captured) {
+    // Reuse the normalized fields, safe poster fallback, and destination; replace only framing.
+    for (const [node, className] of [[row,'band-captured-set-row'],[thumb,'band-captured-set-art'],[poster,'band-captured-set-image'],[fallback,'band-captured-set-fallback'],[copy,'band-captured-set-copy'],[date,'band-captured-set-date'],[title,'band-captured-set-title'],[location,'band-captured-set-location']]) node.className = className;
+    row.removeAttribute('data-set-row');
+    row.removeAttribute('aria-pressed');
+  }
   row.addEventListener("click", () => {
     navigateToSetDetail(row);
   });

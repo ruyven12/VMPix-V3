@@ -2560,6 +2560,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return historyState.bandUrl || getBandRouteUrl(route.bandId);
   }
   if (route.name === "set-detail") {
+    if (historyState.fromBandCapturedSets) return historyState.bandUrl || getBandRouteUrl(route.bandId);
     return historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId);
   }
   if (route.name === "wrestling-match-gallery") {

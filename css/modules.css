@@ -31411,3 +31411,24 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-detail-viewport[data-band-record-stage]:is([data-band-record-stage="prepared"],[data-band-record-stage="morph"]) :is(.band-archive-telemetry,.band-personnel),
 .band-detail-viewport[data-band-record-stage="telemetry"] .band-personnel { visibility:hidden; }
 .band-detail-viewport[data-band-record-stage] .band-detail-content { overflow-y:hidden;touch-action:none; }
+
+/* Captured Sets uses the existing archive rows inside one local, content-sized HUD panel. */
+.band-detail-content .band-captured-sets { box-sizing:border-box;min-width:0;display:grid;gap:1rem;padding:1rem;border:1px solid rgba(172,149,235,.4);border-radius:0;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);background:linear-gradient(120deg,rgba(112,85,180,.1),transparent 65%),rgba(9,10,25,.48); }
+.band-captured-sets .band-detail-panel-title { margin:0;font-size:.85rem;line-height:1.35;letter-spacing:.04em;text-align:center;color:#d4c6fa; }
+.band-captured-sets-summary { margin:.5rem 0 0;font-size:.68rem;line-height:1.4;text-align:center;color:#bdb1d8; }
+.band-captured-sets-list { display:grid;gap:.65rem;min-width:0;margin:0;padding:0;list-style:none; }
+.band-captured-sets-list > li { min-width:0; }
+.band-captured-set-row { display:grid;grid-template-columns:3.4rem minmax(0,1fr);align-items:center;gap:.7rem;box-sizing:border-box;width:100%;min-height:76px;padding:.65rem;border:1px solid rgba(165,143,213,.3);border-radius:0;background:rgba(12,11,27,.7);color:#ece5ff;font:inherit;text-align:left;cursor:pointer; }
+.band-captured-set-art { display:grid;place-items:center;position:relative;box-sizing:border-box;width:100%;aspect-ratio:1;overflow:hidden;border:1px solid rgba(171,150,220,.3);background:rgba(7,8,20,.72); }
+.band-captured-set-image { display:block;width:100%;height:100%;object-fit:contain; }
+.band-captured-set-fallback { padding:.2rem;font-size:.58rem;line-height:1.3;text-align:center;color:#bdb1d8;overflow-wrap:anywhere; }
+.band-captured-set-copy { display:grid;gap:.3rem;min-width:0; }
+.band-captured-set-date { color:#ad9fc7;font-size:.64rem;line-height:1.4;overflow-wrap:anywhere; }
+.band-captured-set-title { color:#ece5ff;font-size:.82rem;line-height:1.45;overflow-wrap:anywhere; }
+.band-captured-set-location { color:#bdb4d0;font-size:.65rem;line-height:1.4;overflow-wrap:anywhere; }
+.band-captured-sets-more { justify-self:center;box-sizing:border-box;min-height:44px;max-width:100%;padding:.65rem .85rem;border:1px solid rgba(157,136,207,.35);border-radius:0;background:rgba(23,19,40,.7);color:#d4c6fa;font:inherit;font-size:.7rem;cursor:pointer; }
+.band-captured-set-row:focus-visible,.band-captured-sets-more:focus-visible { outline:2px solid #d6c4ff;outline-offset:2px; }
+.band-captured-set-row:hover { border-color:#bca3ed; }
+.band-captured-sets [hidden] { display:none; }
+.band-detail-viewport[data-band-record-stage] .band-captured-sets { visibility:hidden; }
+@media(min-width:700px) { .band-captured-set-row { grid-template-columns:4rem minmax(0,1fr);gap:1rem; } .band-captured-set-title { font-size:.92rem; } }
