@@ -30617,7 +30617,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   line-height: 1;
   letter-spacing: 0.16em;
   text-align: center;
-  text-transform: uppercase;
+  text-transform: none;
   border-block-end: 1px solid rgba(137, 167, 255, 0.28);
   text-shadow: 0 0 0.42rem rgba(145, 112, 235, 0.26);
 }
@@ -30630,6 +30630,27 @@ button.hall-crusades-archive-crystal:focus-visible {
   align-items: center;
   min-block-size: clamp(2.64rem, 5.28svh, 3.12rem);
   border-block-end: 1px solid rgba(137, 167, 255, 0.18);
+}
+
+/* Photo progress shares the live count tick; no separate animation timeline. */
+.zhento-stats__row[data-zhento-stat="photos"] {
+  grid-template-columns:auto minmax(0,1fr);
+}
+.zhento-stats__row[data-zhento-stat="photos"]::after {
+  position:absolute;
+  inset-inline:0;
+  inset-block-end:0;
+  block-size:2px;
+  content:"";
+  pointer-events:none;
+  background:linear-gradient(90deg,rgba(166,126,241,.85),rgba(137,189,255,.95));
+  transform:scaleX(var(--zhento-photo-progress,0));
+  transform-origin:left center;
+}
+.zhento-stats__value [data-zhento-photo-count],
+.zhento-stats__value [data-zhento-photo-percent] {
+  display:inline-block;
+  white-space:nowrap;
 }
 
 .zhento-stats__row:last-child {
@@ -30657,7 +30678,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-size: calc(clamp(0.63rem, 0.82vw, 0.78rem) + 2px);
   font-weight: 650;
   line-height: 1.02;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .zhento-stats__context {

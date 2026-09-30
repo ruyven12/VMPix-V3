@@ -1855,6 +1855,17 @@ function cancelZhentoLandingStats() {
   cancelAnimationFrame(session.frame);
   session.controllers.forEach((controller) => controller?.abort());
 }
+const ZHENTO_TOTAL_SHOTS = 64731;
+function renderZhentoPhotoProgress(element, value) {
+  const available = Number.isSafeInteger(value) && value >= 0;
+  const percentage = available ? value / ZHENTO_TOTAL_SHOTS * 100 : 0;
+  element.querySelector('[data-zhento-photo-count]').textContent =
+    (available ? value.toLocaleString('en-US') : '—') + ' / ' + ZHENTO_TOTAL_SHOTS.toLocaleString('en-US');
+  element.querySelector('[data-zhento-photo-percent]').textContent =
+    '· ' + (available ? percentage.toFixed(2) : '—') + '%';
+  element.closest('[data-zhento-stat="photos"]').style.setProperty('--zhento-photo-progress', String(Math.min(100, Math.max(0, percentage)) / 100));
+}
+
 function requestMusicLandingStats() {
   if (zhentoStatsSession) return zhentoStatsSession.request;
   const session = { controllers: new Set(), frame: 0, counts: new Map() };
@@ -1863,7 +1874,8 @@ function requestMusicLandingStats() {
   const order = ["photos", "bands", "shows", "people", "venues"];
   order.forEach((key) => {
     const element = getMusicLandingStatValueElement(key);
-    element.textContent = "—";
+    if (key === "photos") renderZhentoPhotoProgress(element, null);
+    else element.textContent = "—";
     element.dataset.statSource = "pending";
   });
   setMusicLandingStatsState("loading");
@@ -1876,7 +1888,8 @@ function requestMusicLandingStats() {
       const progress = reducedMotion.matches ? 1 : Math.min(1, (now - count.start) / 900);
       const value = count.total === 0 ? 0 : Math.round(1 + (count.total - 1) * (1 - Math.pow(1 - progress, 3)));
       const element = getMusicLandingStatValueElement(key);
-      element.textContent = value.toLocaleString();
+      if (key === "photos") renderZhentoPhotoProgress(element, value);
+      else element.textContent = value.toLocaleString();
       if (progress === 1) { element.dataset.statSource = "live"; session.counts.delete(key); }
     }
     syncZhentoPillarStat();
@@ -1887,13 +1900,15 @@ function requestMusicLandingStats() {
     const total = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
     const element = getMusicLandingStatValueElement(key);
     if (!Number.isSafeInteger(total) || total < 0) {
-      element.textContent = "—";
+      if (key === "photos") renderZhentoPhotoProgress(element, null);
+      else element.textContent = "—";
       element.dataset.statSource = "unavailable";
       syncZhentoPillarStat();
       return;
     }
     if (reducedMotion.matches || v3RouteContext.skipEntryAnimation || total === 0) {
-      element.textContent = total.toLocaleString();
+      if (key === "photos") renderZhentoPhotoProgress(element, total);
+      else element.textContent = total.toLocaleString();
       element.dataset.statSource = "live";
       syncZhentoPillarStat();
       return;
