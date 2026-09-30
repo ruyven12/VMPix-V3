@@ -3250,18 +3250,34 @@ function startZhentoRhythmEntry() {
 }
 
 function resetZhentoInformationSelector(landing) {
+  const panel = landing.querySelector("[data-music-landing-stats]");
   const toggle = landing.querySelector("[data-zhento-stats-toggle]");
   const body = landing.querySelector("#zhento-stats-body");
-  if (!toggle || !body) return;
+  if (!panel || !toggle || !body) return;
+  const controls = [...panel.querySelectorAll("[data-zhento-information]")];
+  const setSelected = (key) => {
+    panel.dataset.selectedInformation = key;
+    controls.forEach((control) => {
+      control.setAttribute("aria-pressed", String(control.dataset.zhentoInformation === key));
+    });
+  };
   const setExpanded = (expanded) => {
     toggle.setAttribute("aria-expanded", String(expanded));
     body.setAttribute("aria-hidden", String(!expanded));
     body.inert = !expanded;
   };
-  if (!toggle.dataset.bound) {
-    toggle.dataset.bound = "true";
-    toggle.addEventListener("click", () => setExpanded(toggle.getAttribute("aria-expanded") !== "true"));
-  }
+  controls.forEach((control) => {
+    if (control.dataset.bound) return;
+    control.dataset.bound = "true";
+    control.addEventListener("click", () => {
+      const key = control.dataset.zhentoInformation;
+      if (key === "planet-stats" && panel.dataset.selectedInformation === key) {
+        setExpanded(toggle.getAttribute("aria-expanded") !== "true");
+      }
+      setSelected(key);
+    });
+  });
+  setSelected("planet-stats");
   setExpanded(true);
 }
 let zhentoSelectionGeneration = 0;
