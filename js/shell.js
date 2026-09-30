@@ -3136,11 +3136,6 @@ const ZHENTO_PILLAR_STAT_LABELS = {
 
 function syncZhentoPillarStat() {
   const landing = document.querySelector("[data-zhento-landing]");
-  landing?.querySelectorAll("[data-zhento-pillar-count]").forEach((count) => {
-    const source = getMusicLandingStatValueElement(count.dataset.zhentoPillarCount);
-    const value = ["live", "counting"].includes(source?.dataset.statSource) ? source.textContent : "—";
-    if (count.textContent !== value) count.textContent = value;
-  });
   const key = landing?.dataset.selectedDestination;
   const stat = landing?.querySelector(".zhento-detail__stat");
   if (!stat || !ZHENTO_PILLAR_STAT_LABELS[key]) return;
@@ -3272,6 +3267,7 @@ function clearZhentoBodyScroll(surface) {
 function fitZhentoLowerThirdBody() {
   const landing = document.querySelector("[data-zhento-landing]");
   const surface = landing?.querySelector(".zhento-lower-third");
+  if (landing?.dataset.informationContext === "pulse") { fitZhentoPulseCopy(landing); return; }
   if (!surface || surface.hidden || !["origins", "reimaging"].includes(landing.dataset.informationContext)) return;
   const body = surface.querySelector(".zhento-lower-third__body");
   if (!body) return;
@@ -3299,22 +3295,53 @@ function fitZhentoLowerThirdBody() {
   body.scrollTop = scrollTop;
 }
 
-function setZhentoPulseView(landing, detail) {
-  const pulse = landing.querySelector(".zhento-pulse");
-  pulse.dataset.pulseView = detail ? "detail" : "overview";
-  for (const [selector, visible] of [[".zhento-pulse__overview", !detail], [".zhento-pulse__detail", detail]]) {
-    const view = pulse.querySelector(selector);
-    view.hidden = !visible;
-    view.inert = !visible;
+function fitZhentoPulseCopy(landing) {
+  const copy = landing?.querySelector(".zhento-pulse__detail .zhento-detail__copy");
+  if (!copy) return;
+  const scrollable = !copy.closest(".zhento-pulse__detail").hidden && copy.scrollHeight > copy.clientHeight + 1;
+  if (scrollable) {
+    copy.tabIndex = 0;
+    copy.setAttribute("role", "region");
+    copy.setAttribute("aria-label", "Pillar description");
+  } else {
+    copy.removeAttribute("tabindex");
+    copy.removeAttribute("role");
+    copy.removeAttribute("aria-label");
   }
-  landing.querySelector(".zhento-lower-third").setAttribute("aria-labelledby", detail ? "zhento-pillar-title" : "zhento-pulse-title");
+}
+
+function setZhentoPulseView(landing, selected) {
+  const pulse = landing.querySelector(".zhento-pulse");
+  pulse.dataset.pulseView = selected ? "selected" : "overview";
+  const info = pulse.querySelector(".zhento-pulse__detail");
+  info.hidden = !selected;
+  info.inert = !selected;
+  info.setAttribute("aria-hidden", String(!selected));
+  landing.querySelector(".zhento-lower-third").setAttribute("aria-labelledby", "zhento-pulse-title");
+  fitZhentoPulseCopy(landing);
+}
+
+function selectZhentoPillar(landing, key) {
+  const selected = Boolean(ZHENTO_PILLAR_DESCRIPTIONS[key]);
+  if (selected) landing.dataset.selectedDestination = key;
+  else delete landing.dataset.selectedDestination;
+  const pulse = landing.querySelector(".zhento-pulse");
+  pulse.querySelectorAll("[data-zhento-destination]").forEach((tile) => tile.setAttribute("aria-pressed", String(selected && tile.dataset.zhentoDestination === key)));
+  landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(selected && row.dataset.zhentoStat === key)));
+  const enter = pulse.querySelector(".zhento-enter");
+  enter.disabled = !selected || key !== "bands";
+  enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : "Enter the Pillar of Rhythm");
+  if (selected) {
+    pulse.querySelector(".zhento-detail__title").textContent = pulse.querySelector(`[data-zhento-destination="${key}"] .zhento-pillar-tile__title`).textContent;
+    pulse.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[key];
+    syncZhentoPillarStat();
+  }
+  pulse.querySelector(".zhento-detail__copy").scrollTop = 0;
+  setZhentoPulseView(landing, selected);
 }
 
 function clearZhentoPillarSelection(landing) {
-  delete landing.dataset.selectedDestination;
-  landing.querySelectorAll("[data-zhento-destination]").forEach((button) => button.setAttribute("aria-pressed", "false"));
-  landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", "false"));
-  setZhentoPulseView(landing, false);
+  selectZhentoPillar(landing, "");
 }
 
 function cancelZhentoPulseMorph(context) {
@@ -3322,50 +3349,33 @@ function cancelZhentoPulseMorph(context) {
   if (!morph) return;
   context.pulseMorph = null;
   morph.animations.forEach((animation) => animation.cancel());
-  morph.pulse.inert = false;
   delete morph.pulse.dataset.pulseMoving;
+  morph.settle();
 }
 
-async function morphZhentoPulse(landing, detail) {
+async function morphZhentoPulse(landing, key) {
   const context = zhentoInformationContext;
-  if (context?.key !== "pulse" || context.pulseMorph) return;
   const pulse = landing.querySelector(".zhento-pulse");
-  const surface = landing.querySelector(".zhento-lower-third");
-  const previousKey = landing.dataset.selectedDestination;
-  const settle = () => {
-    if (!detail) clearZhentoPillarSelection(landing);
-    else setZhentoPulseView(landing, true);
-  };
-  const focus = () => (detail ? pulse.querySelector(".zhento-pulse__back") : pulse.querySelector(`[data-zhento-destination="${previousKey}"]`))?.focus({ preventScroll: true });
-  if (reducedMotion.matches) { settle(); focus(); return; }
-  const morph = { pulse, animations: [], settle };
+  const info = pulse.querySelector(".zhento-pulse__detail");
+  const startHeight = info.hidden ? 0 : info.getBoundingClientRect().height;
+  const startOpacity = info.hidden ? 0 : Number(getComputedStyle(info).opacity);
+  cancelZhentoPulseMorph(context);
+  selectZhentoPillar(landing, key);
+  if (context?.key !== "pulse" || reducedMotion.matches) return;
+  const selected = Boolean(landing.dataset.selectedDestination);
+  const endHeight = selected ? info.getBoundingClientRect().height : 0;
+  const morph = { pulse, animations: [], settle: () => setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination)) };
   context.pulseMorph = morph;
   pulse.dataset.pulseMoving = "true";
-  pulse.inert = true;
-  const current = () => zhentoInformationContext === context && context.pulseMorph === morph;
-  const animate = (element, frames, duration) => {
-    const animation = element.animate(frames, { duration, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both" });
-    morph.animations.push(animation);
-    return animation.finished.catch(() => {});
-  };
-  const startHeight = surface.getBoundingClientRect().height;
-  const outgoing = pulse.querySelector(detail ? ".zhento-pulse__overview" : ".zhento-pulse__detail");
-  const retirements = [animate(outgoing, [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.985)" }], 80)];
-  if (detail) pulse.querySelectorAll('[data-zhento-destination][aria-pressed="false"]').forEach((tile) => {
-    retirements.push(animate(tile, [{ opacity: 1 }, { opacity: .15 }], 80));
-  });
-  await Promise.all(retirements);
-  if (!current()) return;
-  settle();
-  const endHeight = surface.getBoundingClientRect().height;
-  const incoming = pulse.querySelector(detail ? ".zhento-pulse__detail" : ".zhento-pulse__overview");
-  await Promise.all([
-    animate(surface, [{ height: `${startHeight}px` }, { height: `${endHeight}px` }], 180),
-    animate(incoming, [{ opacity: 0, transform: "translateY(5px)" }, { opacity: 1, transform: "none" }], 180),
-  ]);
-  if (!current()) return;
-  cancelZhentoPulseMorph(context);
-  focus();
+  // The grid remains interactive throughout; only the info region changes height.
+  info.hidden = false;
+  const animation = info.animate([
+    { height: `${startHeight}px`, opacity: selected && startHeight ? .35 : startOpacity },
+    { height: `${endHeight}px`, opacity: selected ? 1 : 0 },
+  ], { duration: 240, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both" });
+  morph.animations.push(animation);
+  await animation.finished.catch(() => {});
+  if (zhentoInformationContext === context && context.pulseMorph === morph) cancelZhentoPulseMorph(context);
 }
 
 function setZhentoLowerThirdContent(surface, key) {
@@ -3422,7 +3432,7 @@ function showZhentoInformationContext(landing, key) {
     setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination));
     syncZhentoPillarStat();
   }
-  if (key === "origins" || key === "reimaging") {
+  if (key === "pulse" || key === "origins" || key === "reimaging") {
     fitZhentoLowerThirdBody();
     document.fonts?.ready.then(() => {
       if (zhentoInformationContext === context) fitZhentoLowerThirdBody();
@@ -3597,29 +3607,18 @@ function resetZhentoLandingSelection() {
     enter.dataset.zhentoEntryBound = "true";
     enter.addEventListener("click", startZhentoRhythmEntry);
   }
-  const back = landing.querySelector(".zhento-pulse__back");
-  if (!back.dataset.zhentoBound) {
-    back.dataset.zhentoBound = "true";
-    back.addEventListener("click", () => {
-      if (getRouteFromUrl().name === "music" && !zhentoRhythmEntry) void morphZhentoPulse(landing, false);
-    });
-  }
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     if (button.dataset.zhentoBound) return;
     button.dataset.zhentoBound = "true";
     button.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry || zhentoInformationContext?.pulseMorph) return;
+      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
       const key = button.dataset.zhentoDestination;
-      landing.dataset.selectedDestination = key;
-      enter.disabled = key !== "bands";
-      enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : "Enter the Pillar of Rhythm");
-      landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(row.dataset.zhentoStat === key)));
-      landing.querySelectorAll("[data-zhento-destination]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-      landing.querySelector(".zhento-detail__title").textContent = button.querySelector(".zhento-pillar-tile__title").textContent;
-      landing.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[key];
-      syncZhentoPillarStat();
-      // A hidden synthetic activation is the existing shared-resume adapter.
-      if (landing.dataset.informationContext === "pulse") void morphZhentoPulse(landing, true);
+      // Hidden activation remains the shared-resume adapter; visible activation toggles.
+      if (landing.dataset.informationContext === "pulse") {
+        void morphZhentoPulse(landing, landing.dataset.selectedDestination === key ? "" : key);
+      } else {
+        selectZhentoPillar(landing, key);
+      }
     });
   });
 }
