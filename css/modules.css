@@ -30573,6 +30573,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-shell-route="music"] *::after {
   text-transform:none !important;
 }
+.site-shell[data-shell-route="music"] .zhento-identity,
+.site-shell[data-shell-route="music"] .zhento-identity * {
+  text-transform:uppercase !important;
+}
 
 .zhento-stats {
   position: absolute;
