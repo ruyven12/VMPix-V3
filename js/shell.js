@@ -3300,11 +3300,17 @@ function showZhentoInformationContext(landing, key) {
       if (zhentoInformationContext === context) context.animations = context.animations.filter((item) => item !== animation);
     }).catch(() => {});
   };
-  animate(surface, [{ opacity: 0, transform: "translateY(8px) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: key === "lore" ? 400 : 320 });
-  animate(surface.querySelector(".zhento-context-signal"), [{ opacity: 0, transform: "scaleX(.05)" }, { opacity: .9, transform: "scaleX(1)", offset: .55 }, { opacity: 0, transform: "scaleX(1)" }], { duration: 300 });
   if (key === "lore") {
-    animate(surface.querySelector(".zhento-lower-third__header"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 90, duration: 180 });
-    animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 190, duration: 210 });
+    animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
+    animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
+    animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
+    animate(surface.querySelector(".zhento-lower-third__frame--lower"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 55, duration: 290 });
+    animate(surface.querySelector(".zhento-lower-third__signal"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .9, transform: "scaleX(1)", offset: .6 }, { opacity: .6, transform: "scaleX(1)" }], { duration: 400 });
+    animate(surface.querySelector(".zhento-lower-third__header"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 110, duration: 170 });
+    animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 210, duration: 190 });
+  } else {
+    animate(surface, [{ opacity: 0, transform: "translateY(8px) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 320 });
+    animate(surface.querySelector(".zhento-context-signal"), [{ opacity: 0, transform: "scaleX(.05)" }, { opacity: .9, transform: "scaleX(1)", offset: .55 }, { opacity: 0, transform: "scaleX(1)" }], { duration: 300 });
   }
 }
 function resetZhentoInformationSelector(landing) {

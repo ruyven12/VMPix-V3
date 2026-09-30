@@ -31124,22 +31124,66 @@ button.hall-crusades-archive-crystal:focus-visible {
   inset-block-end: clamp(7.1rem, 12svh, 8.8rem);
   inset-inline-end: clamp(2.2rem, 6.2vw, 7.5rem);
   box-sizing: border-box;
-  inline-size: min(30rem, calc(100vw - 4.1rem));
-  min-block-size: 8.5rem;
-  padding: 1rem 1.2rem;
+  inline-size: min(40rem, calc(100vw - 4.1rem));
+  padding: .8rem 1.1rem 1.25rem 2.25rem;
   color: rgba(235,239,249,.94);
   font-family: "Audiowide", "Orbitron", "Rajdhani", "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(120deg, rgba(145,112,235,.1), transparent 60%), rgba(6,7,12,.64);
-  border: 1px solid rgba(153,137,235,.52);
-  box-shadow: inset 0 0 0 1px rgba(220,230,255,.04), 0 0 .65rem rgba(145,112,235,.12);
-  clip-path: polygon(.75rem 0,100% 0,100% calc(100% - .75rem),calc(100% - .75rem) 100%,0 100%,0 .75rem);
+  background: linear-gradient(110deg, rgba(145,112,235,.1), transparent 45%), rgba(6,7,12,.38);
+  clip-path: polygon(6% 0,99% 0,100% 8%,100% 88%,98% 100%,3% 100%,0 75%,0 28%);
+  transform-origin: right center;
 }
-.zhento-lower-third__header { border-block-end: 1px solid rgba(137,167,255,.23); padding-block-end: .55rem; }
+.zhento-lower-third::after {
+  position: absolute;
+  inset-inline-end: .25rem;
+  inset-block: 18% 20%;
+  inline-size: .3rem;
+  border-inline: 1px solid rgba(137,167,255,.48);
+  background: rgba(145,112,235,.12);
+  content: "";
+  pointer-events: none;
+}
+.zhento-lower-third__leading {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  stroke: rgba(170,147,244,.88);
+  stroke-width: 1;
+  opacity: .8;
+  transform-origin: right center;
+  pointer-events: none;
+}
+.zhento-lower-third__frame {
+  position: absolute;
+  block-size: 1px;
+  background: linear-gradient(90deg, rgba(166,126,241,.75), rgba(137,189,255,.8));
+  opacity: .75;
+  transform-origin: right center;
+  pointer-events: none;
+}
+.zhento-lower-third__frame--upper { inset-block-start: 0; inset-inline: 6% 1%; }
+.zhento-lower-third__frame--lower { inset-block-end: 0; inset-inline: 3% 2%; }
+.zhento-lower-third .zhento-lower-third__signal {
+  inset-block-start: auto;
+  inset-block-end: .45rem;
+  inset-inline: 12% 1.05rem;
+  block-size: 1px;
+  background: linear-gradient(90deg, transparent 0 4%, rgba(145,112,235,.7) 4% 14%, transparent 14% 16%, rgba(137,167,255,.7) 16% 89%, transparent 89% 91%, rgba(170,147,244,.8) 91%);
+  opacity: .6;
+  transform-origin: right center;
+}
+.zhento-lower-third__reading-zone {
+  box-sizing: border-box;
+  inline-size: min(100%, 23rem);
+  padding: .55rem .75rem .65rem;
+  background: linear-gradient(90deg, rgba(6,7,12,.5), rgba(6,7,12,.3) 78%, transparent);
+}
+.zhento-lower-third__header { border-block-end: 1px solid rgba(137,167,255,.23); padding-block-end: .45rem; }
 .zhento-lower-third__header h2 { margin: 0; color: rgba(170,199,255,.96); font: inherit; font-size: .85rem; letter-spacing: .08em; }
 .zhento-lower-third__header p { margin: .3rem 0 0; color: rgba(184,193,214,.78); font-size: .65rem; }
-.zhento-lower-third__body { margin: .85rem 0 0; font-size: .76rem; line-height: 1.4; }
+.zhento-lower-third__body { margin: .65rem 0 0; font-size: .76rem; line-height: 1.4; }
 @media (max-width: 540px) {
-  .zhento-lower-third { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; padding: .9rem 1rem; }
+  .zhento-lower-third { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; inline-size: calc((100vw - 4.1rem) * .88); padding: .65rem .85rem 1.15rem 1.5rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-zhento-context-managed] .zhento-detail:not([hidden]) { animation: none; }
