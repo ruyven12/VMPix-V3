@@ -31203,6 +31203,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-lower-third__header h2 { margin: 0; color: rgba(170,199,255,.96); font: inherit; font-size: calc(.85rem + 2px); letter-spacing: .08em; }
 .zhento-lower-third__header p { margin: .3rem 0 0; color: rgba(184,193,214,.78); font-size: .65rem; }
 .zhento-lower-third__body { margin: .65rem 0 0; font-size: .76rem; line-height: 1.4; }
+.zhento-lower-third[data-lower-third-content="origins"] .zhento-lower-third__body p { margin: 0; }
+.zhento-lower-third[data-lower-third-content="origins"] .zhento-lower-third__body p + p { margin-block-start: 1em; }
+.zhento-lower-third__body[data-description-scroll] {
+  pointer-events: auto;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.zhento-lower-third__body[data-description-scroll]:focus-visible { outline: 1px solid rgba(137,167,255,.6); outline-offset: 2px; }
 @media (max-width: 540px) {
   .zhento-lower-third { inset-block-end: 7.15rem; inset-inline-end: 2.05rem; inline-size: calc((100vw - 4.1rem) * .88); padding: .65rem .85rem 1.15rem 1.5rem; }
 }

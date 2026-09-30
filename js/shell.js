@@ -3253,6 +3253,54 @@ function startZhentoRhythmEntry() {
   });
 }
 
+function clearZhentoBodyScroll(surface) {
+  const body = surface?.querySelector(".zhento-lower-third__body");
+  if (!body) return;
+  body.scrollTop = 0;
+  body.style.removeProperty("max-block-size");
+  body.removeAttribute("data-description-scroll");
+  body.removeAttribute("tabindex");
+  body.removeAttribute("role");
+  body.removeAttribute("aria-label");
+}
+
+function fitZhentoOriginsBody() {
+  const landing = document.querySelector("[data-zhento-landing]");
+  const surface = landing?.querySelector(".zhento-lower-third");
+  if (!surface || surface.hidden || landing.dataset.informationContext !== "origins") return;
+  const body = surface.querySelector(".zhento-lower-third__body");
+  if (!body) return;
+  const scrollTop = body.scrollTop;
+  clearZhentoBodyScroll(surface);
+  // One natural-layout measurement; the frame/header remain outside the scroll region.
+  const panelRect = surface.getBoundingClientRect();
+  const bodyRect = body.getBoundingClientRect();
+  const blockers = [...landing.querySelectorAll("[data-music-landing-stats], .zhento-identity, .zhento-identity__subtitle")]
+    .map((element) => element.getBoundingClientRect());
+  let safeTop = (window.visualViewport?.offsetTop || 0) + 12;
+  blockers.forEach((rect) => {
+    if (rect.width && rect.height && rect.left < panelRect.right && rect.right > panelRect.left) {
+      safeTop = Math.max(safeTop, rect.bottom + 12);
+    }
+  });
+  const chromeHeight = panelRect.height - bodyRect.height;
+  const availableBody = Math.max(1, Math.floor(panelRect.bottom - safeTop - chromeHeight));
+  if (bodyRect.height <= availableBody + 1) return;
+  body.style.maxBlockSize = `${availableBody}px`;
+  body.dataset.descriptionScroll = "true";
+  body.tabIndex = 0;
+  body.setAttribute("role", "region");
+  body.setAttribute("aria-label", "Origins story");
+  body.scrollTop = scrollTop;
+}
+
+function setZhentoLowerThirdContent(surface, key) {
+  const copy = surface.querySelector(`[data-zhento-lower-third-copy="${key}"]`);
+  if (!copy) return;
+  clearZhentoBodyScroll(surface);
+  surface.dataset.lowerThirdContent = key;
+  surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren(copy.content.cloneNode(true));
+}
 let zhentoInformationContext = null;
 
 function cancelZhentoInformationContext(hide = true) {
@@ -3265,6 +3313,7 @@ function cancelZhentoInformationContext(hide = true) {
   zhentoPromptExit?.cancel();
   zhentoPromptExit = null;
   delete landing.dataset.informationContext;
+  clearZhentoBodyScroll(landing.querySelector(".zhento-lower-third"));
   landing.querySelectorAll(".zhento-destinations, .zhento-lower-third, .zhento-detail, .zhento-destination-prompt").forEach((surface) => {
     surface.hidden = true;
     surface.inert = true;
@@ -3274,9 +3323,10 @@ function cancelZhentoInformationContext(hide = true) {
 function showZhentoInformationContext(landing, key) {
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
-  if (key !== "pulse" && key !== "lore") return;
+  if (key !== "pulse" && key !== "lore" && key !== "origins") return;
   const surface = landing.querySelector(key === "pulse" ? ".zhento-destinations" : ".zhento-lower-third");
   if (!surface) return;
+  if (key !== "pulse") setZhentoLowerThirdContent(surface, key);
   const context = { landing, key, animations: [] };
   zhentoInformationContext = context;
   landing.dataset.informationContext = key;
@@ -3291,6 +3341,12 @@ function showZhentoInformationContext(landing, key) {
     prompt.hidden = selected;
     prompt.inert = selected;
   }
+  if (key === "origins") {
+    fitZhentoOriginsBody();
+    document.fonts?.ready.then(() => {
+      if (zhentoInformationContext === context) fitZhentoOriginsBody();
+    });
+  }
   if (reducedMotion.matches) return;
   const animate = (element, frames, timing) => {
     if (!element) return;
@@ -3301,7 +3357,7 @@ function showZhentoInformationContext(landing, key) {
       if (zhentoInformationContext === context) context.animations = context.animations.filter((item) => item !== animation);
     }).catch(() => {});
   };
-  if (key === "lore") {
+  if (key === "lore" || key === "origins") {
     animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
     animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
     animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
@@ -5968,7 +6024,7 @@ if (shell && startButton) {
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
   }
-  window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); });
+  window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoOriginsBody(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
   window.addEventListener("pagehide", () => {
     cancelZhentoSelectorMorph();
@@ -5987,7 +6043,7 @@ if (shell && startButton) {
     if (shouldEnter) navigateToRoute(routePaths.musicBands);
   });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", updateViewportMetrics);
+    window.visualViewport.addEventListener("resize", () => { updateViewportMetrics(); fitZhentoOriginsBody(); });
     window.visualViewport.addEventListener("scroll", updateViewportMetrics);
   }
   window.addEventListener("keydown", (event) => {
