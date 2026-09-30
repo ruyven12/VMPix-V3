@@ -3556,9 +3556,29 @@ function resetZhentoInformationSelector(landing) {
   delete panel.dataset.selectorUsed;
   setMode("");
 }
+// Prepare each existing image once, independently of whether the Pulse view is open.
+function prepareZhentoPillarArtwork(landing) {
+  landing.querySelectorAll(".zhento-pillar-tile__art").forEach((image) => {
+    if (image.dataset.pillarPrepared) return;
+    image.dataset.pillarPrepared = "true";
+    const tile = image.closest(".zhento-pillar-tile");
+    tile.dataset.artworkState = "pending";
+    const settle = (ready) => { tile.dataset.artworkState = ready ? "ready" : "unavailable"; };
+    if (typeof image.decode === "function") {
+      image.decode().then(() => settle(image.naturalWidth > 0)).catch(() => settle(false));
+    } else if (image.complete) {
+      settle(image.naturalWidth > 0);
+    } else {
+      image.addEventListener("load", () => settle(true), { once: true });
+      image.addEventListener("error", () => settle(false), { once: true });
+    }
+  });
+}
+
 function resetZhentoLandingSelection() {
   const landing = document.querySelector("[data-zhento-landing]");
   if (!landing) return;
+  prepareZhentoPillarArtwork(landing);
   resetZhentoInformationSelector(landing);
   const artwork = landing.querySelector(".zhento-landing__artwork");
   if (artwork && !artwork.querySelector(".zhento-atmosphere")) {
