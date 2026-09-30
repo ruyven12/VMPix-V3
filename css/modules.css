@@ -31142,6 +31142,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   content: "";
   pointer-events: none;
 }
+.zhento-lower-third__right-frame { display: none; }
+@media (min-width: 541px) {
+  .zhento-lower-third__right-frame { display: inline; }
+  .zhento-lower-third::after { inset-inline-end: 1.05rem; inset-block: 18% .45rem; }
+}
 .zhento-lower-third__leading {
   position: absolute;
   inset: 0;
@@ -31174,12 +31179,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .zhento-lower-third__reading-zone {
   box-sizing: border-box;
-  inline-size: min(100%, 23rem);
+  inline-size: 100%;
+  text-align: center;
   padding: .55rem .75rem .65rem;
   background: linear-gradient(90deg, rgba(6,7,12,.5), rgba(6,7,12,.3) 78%, transparent);
 }
 .zhento-lower-third__header { border-block-end: 1px solid rgba(137,167,255,.23); padding-block-end: .45rem; }
-.zhento-lower-third__header h2 { margin: 0; color: rgba(170,199,255,.96); font: inherit; font-size: .85rem; letter-spacing: .08em; }
+.zhento-lower-third__header h2 { margin: 0; color: rgba(170,199,255,.96); font: inherit; font-size: calc(.85rem + 2px); letter-spacing: .08em; }
 .zhento-lower-third__header p { margin: .3rem 0 0; color: rgba(184,193,214,.78); font-size: .65rem; }
 .zhento-lower-third__body { margin: .65rem 0 0; font-size: .76rem; line-height: 1.4; }
 @media (max-width: 540px) {
