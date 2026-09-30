@@ -30564,6 +30564,16 @@ button.hall-crusades-archive-crystal:focus-visible {
     filter: drop-shadow(0 0 0.22rem rgba(145, 112, 235, 0.28));
   }
 }
+/* The Music landing preserves authored casing, including shared Shell labels. */
+.site-shell[data-shell-route="music"],
+.site-shell[data-shell-route="music"] *,
+.site-shell[data-shell-route="music"]::before,
+.site-shell[data-shell-route="music"]::after,
+.site-shell[data-shell-route="music"] *::before,
+.site-shell[data-shell-route="music"] *::after {
+  text-transform:none !important;
+}
+
 .zhento-stats {
   position: absolute;
   inset-block-start: clamp(4.55rem, 8.6svh, 6.1rem);

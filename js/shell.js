@@ -2444,7 +2444,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   }
 
   prototypeEngineReturnControl.setAttribute("aria-label", backLabel || "Return");
-  prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = isArchiveBack ? "BACK" : "RETURN";
+  prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = route.name === "music" ? "Back" : isArchiveBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
   prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry) || Boolean(bandRecordOpening);
   prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry && !bandRecordOpening ? 0 : -1;
@@ -3124,10 +3124,10 @@ const ZHENTO_PILLAR_DESCRIPTIONS = {
 };
 
 const ZHENTO_PILLAR_STAT_LABELS = {
-  bands: "SOURCES OF THE PULSE",
-  people: "VOICES IN THE CHORUS",
-  venues: "PLACES OF RESONANCE",
-  shows: "RECORDED CONVERGENCES",
+  bands: "Sources of the Pulse",
+  people: "Voices in the Chorus",
+  venues: "Places of Resonance",
+  shows: "Recorded Convergences",
 };
 
 function syncZhentoPillarStat() {
@@ -3268,7 +3268,7 @@ function resetZhentoLandingSelection() {
   zhentoPromptExit = null;
   delete landing.dataset.selectedDestination;
   const enter = landing.querySelector(".zhento-detail .zhento-enter");
-  enter.textContent = "ENTER THE PILLAR";
+  enter.textContent = "Enter the Pillar";
   enter.disabled = true;
   enter.setAttribute("aria-label", "Enter — not available yet");
   if (!enter.dataset.zhentoEntryBound) {
