@@ -3264,10 +3264,10 @@ function clearZhentoBodyScroll(surface) {
   body.removeAttribute("aria-label");
 }
 
-function fitZhentoOriginsBody() {
+function fitZhentoLowerThirdBody() {
   const landing = document.querySelector("[data-zhento-landing]");
   const surface = landing?.querySelector(".zhento-lower-third");
-  if (!surface || surface.hidden || landing.dataset.informationContext !== "origins") return;
+  if (!surface || surface.hidden || !["origins", "reimaging"].includes(landing.dataset.informationContext)) return;
   const body = surface.querySelector(".zhento-lower-third__body");
   if (!body) return;
   const scrollTop = body.scrollTop;
@@ -3290,7 +3290,7 @@ function fitZhentoOriginsBody() {
   body.dataset.descriptionScroll = "true";
   body.tabIndex = 0;
   body.setAttribute("role", "region");
-  body.setAttribute("aria-label", "Origins story");
+  body.setAttribute("aria-label", landing.dataset.informationContext === "origins" ? "Origins story" : "Reimaging Project description");
   body.scrollTop = scrollTop;
 }
 
@@ -3323,7 +3323,7 @@ function cancelZhentoInformationContext(hide = true) {
 function showZhentoInformationContext(landing, key) {
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
-  if (key !== "pulse" && key !== "lore" && key !== "origins") return;
+  if (key !== "pulse" && key !== "lore" && key !== "origins" && key !== "reimaging") return;
   const surface = landing.querySelector(key === "pulse" ? ".zhento-destinations" : ".zhento-lower-third");
   if (!surface) return;
   if (key !== "pulse") setZhentoLowerThirdContent(surface, key);
@@ -3341,10 +3341,10 @@ function showZhentoInformationContext(landing, key) {
     prompt.hidden = selected;
     prompt.inert = selected;
   }
-  if (key === "origins") {
-    fitZhentoOriginsBody();
+  if (key === "origins" || key === "reimaging") {
+    fitZhentoLowerThirdBody();
     document.fonts?.ready.then(() => {
-      if (zhentoInformationContext === context) fitZhentoOriginsBody();
+      if (zhentoInformationContext === context) fitZhentoLowerThirdBody();
     });
   }
   if (reducedMotion.matches) return;
@@ -3357,7 +3357,7 @@ function showZhentoInformationContext(landing, key) {
       if (zhentoInformationContext === context) context.animations = context.animations.filter((item) => item !== animation);
     }).catch(() => {});
   };
-  if (key === "lore" || key === "origins") {
+  if (key === "lore" || key === "origins" || key === "reimaging") {
     animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
     animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
     animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
@@ -6024,7 +6024,7 @@ if (shell && startButton) {
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
   }
-  window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoOriginsBody(); });
+  window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoLowerThirdBody(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
   window.addEventListener("pagehide", () => {
     cancelZhentoSelectorMorph();
@@ -6043,7 +6043,7 @@ if (shell && startButton) {
     if (shouldEnter) navigateToRoute(routePaths.musicBands);
   });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", () => { updateViewportMetrics(); fitZhentoOriginsBody(); });
+    window.visualViewport.addEventListener("resize", () => { updateViewportMetrics(); fitZhentoLowerThirdBody(); });
     window.visualViewport.addEventListener("scroll", updateViewportMetrics);
   }
   window.addEventListener("keydown", (event) => {

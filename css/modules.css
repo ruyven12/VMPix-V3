@@ -31205,6 +31205,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-lower-third__body { margin: .65rem 0 0; font-size: .76rem; line-height: 1.4; }
 .zhento-lower-third[data-lower-third-content="origins"] .zhento-lower-third__body p { margin: 0; }
 .zhento-lower-third[data-lower-third-content="origins"] .zhento-lower-third__body p + p { margin-block-start: 1em; }
+.zhento-lower-third[data-lower-third-content="reimaging"] .zhento-lower-third__body p { margin: 0; }
+.zhento-lower-third[data-lower-third-content="reimaging"] .zhento-lower-third__body p + p { margin-block-start: 1em; }
+.zhento-lower-third[data-lower-third-content="reimaging"] .zhento-lower-third__body ul { margin: 1em 0; padding: 0; list-style: disc inside; text-align: center; }
+.zhento-lower-third[data-lower-third-content="reimaging"] .zhento-lower-third__body li + li { margin-block-start: .5em; }
 .zhento-lower-third__body[data-description-scroll] {
   pointer-events: auto;
   overflow-y: auto;
