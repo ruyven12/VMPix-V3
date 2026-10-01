@@ -1013,7 +1013,7 @@ button {
   will-change: opacity, transform, clip-path;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .portfolio-world-gateway-background {
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .portfolio-world-gateway-background {
   visibility: hidden !important;
   opacity: 0 !important;
   filter: none;
@@ -1036,11 +1036,11 @@ button {
   will-change: opacity;
 }
 
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4),
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-system::before,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-system::after,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-void-stars::before,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-void-stars::after {
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4),
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-system::before,
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-system::after,
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-void-stars::before,
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange])[data-portfolio-gateway-state][data-portfolio-gateway-world].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) .ambient-void-stars::after {
   visibility: visible;
   opacity: var(--portfolio-gateway-portfolio-opacity) !important;
   animation: none !important;
@@ -5611,9 +5611,9 @@ button {
   will-change: opacity, transform, clip-path;
 }
 
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-world-gateway-background,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-background,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-world-gateway-ring {
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange]).is-portfolio-world-gateway-active .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange]).is-portfolio-world-arrived .portfolio-world-gateway-background,
+.site-shell[data-shell-route="portfolio"]:not([data-daiion-world-exchange]).is-portfolio-world-arrived .portfolio-world-gateway-ring {
   z-index: 2;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -12920,11 +12920,10 @@ button {
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::before,
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::after,
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway-ring { visibility: hidden !important; opacity: 0 !important; }
-@property --daiion-world-opacity { syntax: "<number>"; inherits: false; initial-value: 0; }
 /* The existing artwork plane blends over retained Portfolio atmosphere across route ownership. */
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway { background-image: none !important; background-color: transparent !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background { visibility: visible !important; opacity: var(--daiion-world-opacity) !important; background: var(--portfolio-gateway-world-image) center / cover no-repeat !important; transform: none !important; clip-path: none !important; mask: none !important; filter: none !important; transition: none !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4),
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background { visibility: visible !important; opacity: 0; background: var(--portfolio-gateway-world-image) center / cover no-repeat !important; transform: none !important; clip-path: none !important; mask: none !important; filter: none !important; transition: none !important; }
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4) { visibility: visible !important; opacity: 1; animation: none !important; transition: none !important; }
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::before,
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::after,
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-void-stars::before,

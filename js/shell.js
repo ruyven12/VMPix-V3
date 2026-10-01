@@ -259,12 +259,13 @@ function getPortfolioGatewaySettledFrameElements() {
   ];
 }
 
-function applyPortfolioGatewaySettledFrame({ commitLayout = true } = {}) {
+function applyPortfolioGatewaySettledFrame({ commitLayout = true, settleLegacyProperties = true } = {}) {
   if (!shell || !portfolioWorldGateway) {
     return;
   }
 
-  PORTFOLIO_GATEWAY_SETTLED_SHELL_PROPERTIES.forEach(([propertyName, propertyValue]) => {
+  // The modern animated exchange owns local planes; avoid invalidating every descendant with legacy inherited values.
+  if (settleLegacyProperties) PORTFOLIO_GATEWAY_SETTLED_SHELL_PROPERTIES.forEach(([propertyName, propertyValue]) => {
     shell.style.setProperty(propertyName, propertyValue);
   });
   portfolioWorldGateway.style.setProperty("--portfolio-gateway-reveal-radius", "var(--portfolio-gateway-reveal-full-radius)");
@@ -635,6 +636,10 @@ function cancelDaiionGatewayTransition() {
   clearTimeout(entry?.readyTimer);
   entry?.cancelReady?.();
   entry?.layer?.remove();
+  entry?.blendStyles?.forEach(({ element, opacity, opacityPriority, willChange, willChangePriority }) => {
+    element.style.setProperty("opacity", opacity, opacityPriority);
+    element.style.setProperty("will-change", willChange, willChangePriority);
+  });
   if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
   if (shell) { delete shell.dataset.daiionEntryStage; delete shell.dataset.daiionWorldExchange; }
 }
@@ -645,7 +650,7 @@ function startDaiionGatewayTransition() {
   daiionGatewayTransition = entry;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
-  const promote = () => {
+  const promote = ({ settleLegacyProperties = true } = {}) => {
     if (!current() || entry.promoted || window.location.pathname !== routePaths.portfolio) return;
     // Read visualViewport before presentation writes: its width getter otherwise forces their layout.
     const measured = entry.viewportMetrics;
@@ -657,7 +662,7 @@ function startDaiionGatewayTransition() {
     shell.dataset.daiionEntryStage = "covered";
     shell.dataset.portfolioGatewayState = "filling-screen";
     // Decoded destination art replaces the world beneath the continuing transparent wave.
-    applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics });
+    applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics, settleLegacyProperties });
     shell.classList.add("is-portfolio-world-arrived");
     handoffPortfolioGatewayRoute("battleground");
     syncPortfolioGatewayTriggerState();
@@ -677,6 +682,8 @@ function startDaiionGatewayTransition() {
     return;
   }
   const artworkReady = prepareDaiionGatewayArtwork();
+  entry.scroller = getActiveShellScroller({ name: "portfolio" });
+  entry.scrollerWasAtOrigin = Boolean(entry.scroller && entry.scroller.scrollTop === 0 && entry.scroller.scrollLeft === 0);
   // Measure the persistent Shell before motion, not twice during the 140ms world exchange.
   updateViewportMetrics();
   entry.viewportMetrics = {
@@ -770,6 +777,22 @@ function startDaiionGatewayTransition() {
     entry.cancelReady = null;
     if (!current()) return;
     if (!ready) { clearPortfolioGatewayState(); syncPortfolioGatewayTriggerState(); return; }
+    const worldArtwork = portfolioWorldGateway.querySelector(".portfolio-world-gateway-background");
+    const backdropCandidates = [...shell.querySelectorAll(".portfolio-observatory-layer, .cinema-fire-bg, .ambient-void-stars, .nebula-stage")];
+    const sourceBackdrops = backdropCandidates.filter((element) => !backdropCandidates.some((parent) => parent !== element && parent.contains(element)));
+    entry.blendStyles = [];
+    if (worldArtwork) {
+      // Both native-opacity planes paint their initial states during the existing portal formation.
+      shell.dataset.daiionWorldExchange = "active";
+      [worldArtwork, ...sourceBackdrops].forEach((element) => {
+        entry.blendStyles.push({
+          element, opacity: element.style.opacity, opacityPriority: element.style.getPropertyPriority("opacity"),
+          willChange: element.style.willChange, willChangePriority: element.style.getPropertyPriority("will-change"),
+        });
+        element.style.opacity = element === worldArtwork ? "0" : "1";
+        element.style.willChange = "opacity";
+      });
+    }
     shell.dataset.daiionEntryStage = "portal";
     await Promise.all([
       // Explicit WAAPI from-state is paint-safe; the audited jump came from .72 scale and front-loaded easing.
@@ -784,29 +807,45 @@ function startDaiionGatewayTransition() {
     const reach = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 24;
     const peak = reach / radius;
     const waveTransform = (scale, angle = 0) => `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
-    const worldArtwork = portfolioWorldGateway.querySelector(".portfolio-world-gateway-background");
     let exchange = Promise.resolve();
     if (worldArtwork) {
-      shell.dataset.daiionWorldExchange = "active";
-      // Reuse the existing artwork plane: 60ms before promotion, 80ms after it.
-      exchange = animate(worldArtwork, [{ "--daiion-world-opacity": 0 }, { "--daiion-world-opacity": 1 }], { delay: 500, duration: 140, easing: "linear" }).then(() => {
+      // Native compositor opacity overlaps for 140ms: 60ms before promotion and 80ms after.
+      exchange = Promise.all([
+        animate(worldArtwork, [{ opacity: 0 }, { opacity: 1 }], { delay: 500, duration: 140, easing: "linear" }),
+        ...sourceBackdrops.map((element) => animate(element, [{ opacity: 1 }, { opacity: 0 }], { delay: 500, duration: 140, easing: "linear" })),
+      ]).then(() => {
         if (current() && entry.promoted) delete shell.dataset.daiionWorldExchange;
       });
     }
+    // Start the entire transform trajectory now; canonical promotion cannot leave the wave between jobs.
+    const boundary = 560 / 940;
+    const waveMotion = Promise.all([
+      ...rings.map((ring, index) => animate(ring, [
+        { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: "cubic-bezier(.16,.45,.55,.85)" },
+        { transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6), offset: boundary, easing: "linear" },
+        { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
+      ], { duration: 940, easing: "linear" })),
+      animate(streaks, [
+        { transform: waveTransform(.92) },
+        { transform: waveTransform(peak * .83, 4), offset: boundary },
+        { transform: waveTransform(peak * 1.36, 7) },
+      ], { duration: 940, easing: "linear" }),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78 }, { opacity: 0 }], { delay: 560, duration: 380, easing: "linear", fill: "forwards" })),
+      animate(streaks, [{ opacity: .56 }, { opacity: 0 }], { delay: 560, duration: 380, easing: "linear", fill: "forwards" }),
+    ]);
     await Promise.all([
-      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62, transform: waveTransform(index ? 1 : 1.035, index * -9) }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)" })),
-      animate(streaks, [{ opacity: 0, transform: waveTransform(.92) }, { opacity: .8, offset: .2 }, { opacity: .56, transform: waveTransform(peak * .83, 4) }], { duration: 560, easing: "linear" }),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62 }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78 }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)", fill: "none" })),
+      animate(streaks, [{ opacity: 0 }, { opacity: .8, offset: .2 }, { opacity: .56 }], { duration: 560, easing: "linear", fill: "none" }),
       animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1)" }], { duration: 560 }),
       animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(.99)", offset: .28 }, { transform: "translate(-50%, -50%) scale(1)" }], { duration: 260 }),
     ]);
     if (!current()) return;
-    promote();
+    promote({ settleLegacyProperties: false });
     if (!current()) return;
     transport.dataset.revealing = "true";
     await Promise.all([
       exchange,
-      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }, { opacity: 0, transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) }], { duration: 380, easing: "linear" })),
-      animate(streaks, [{ opacity: .56, transform: waveTransform(peak * .83, 4) }, { opacity: 0, transform: waveTransform(peak * 1.36, 7) }], { duration: 380, easing: "linear" }),
+      waveMotion,
       animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }),
     ]);
     if (current()) cancelDaiionGatewayTransition();
@@ -5533,6 +5572,8 @@ function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
   if (options.shouldResetScroll === false || v3RouteContext.pending) {
     return;
   }
+  // Portfolio and the persistent destination share this already-zero scroller; scrollTo would force layout.
+  if (persistentViewportUnchanged && entry.scrollerWasAtOrigin && entry.scroller === getActiveShellScroller(route)) return;
 
   window.requestAnimationFrame(() => {
     if (!v3RouteContext.pending && v3RouteContext.route === route) resetShellScroller(getActiveShellScroller(route));
