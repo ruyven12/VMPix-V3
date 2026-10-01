@@ -31858,3 +31858,23 @@ button.hall-crusades-archive-crystal:focus-visible {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway *::after { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important; }
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro { visibility: hidden !important; opacity: 0 !important; }
 }
+
+/* Explicit Portfolio transport prepares the retained landing; direct/resumed Music keeps its own intro. */
+.site-shell[data-music-transport-entry="prepared"] .music-nexus-shell {
+  display: block !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.site-shell[data-music-transport-entry] .zhento-identity {
+  animation: none !important;
+  opacity: .88;
+  transform: var(--zhento-project-to, translate(calc(-50% + var(--zhento-hud-x)),calc(-50% + var(--zhento-hud-y))) scale(.5625));
+}
+.site-shell[data-music-transport-entry] :is(.zhento-identity__planet,.zhento-identity__name,.zhento-identity__subtitle,.zhento-top-hud-rail,.zhento-side-hud-rail,.zhento-stats,.zhento-stats__title,.zhento-stats__label,.zhento-stats__value) {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+}
+.site-shell[data-music-transport-entry] .zhento-stats::before {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+}

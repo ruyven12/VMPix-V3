@@ -387,10 +387,16 @@ function replaceRouteUrl(url, state = {}) {
 }
 
 // Adopt an already-painted persistent destination without running its mount path again.
-function adoptPersistentWrestlingRoute(route) {
+function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {}) {
   beginV3RouteContext(route, { navigationCause: "spa" });
   if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
   shellRenderedRoute = route;
+  if (worldName === "soundtrack") {
+    showMusicNexus({ fromPortfolioTransport: true });
+    shell.dataset.musicTransportEntry = "arriving";
+    updateShellRouteContext(route, "music");
+    musicNexusShell.inert = true;
+  }
   setActiveGlobalNavForRoute(route.name, { preservePresentation: true });
   updateShellBreadcrumb(route);
   updateShellBackState(route);

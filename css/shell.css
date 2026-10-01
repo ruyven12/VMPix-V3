@@ -6781,9 +6781,9 @@ button {
   transform: translateZ(0) scale3d(0.98, 0.98, 1);
 }
 
-.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-world-gateway-active .portfolio-engine,
-.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-world-arrived .portfolio-engine,
-.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]):not([data-music-transport-entry]).is-portfolio-world-gateway-active .portfolio-engine,
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]):not([data-music-transport-entry]).is-portfolio-world-arrived .portfolio-engine,
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]):not([data-music-transport-entry]).is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
   visibility: hidden !important;
   opacity: 0 !important;
   filter: none;
@@ -12899,35 +12899,35 @@ button {
 .shell-band-record-shared { contain:layout style;will-change:transform; }
 
 /* Wrestling's persistent gateway retains the painted source until full coverage. */
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) {
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"]).is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) {
   --portfolio-gateway-portfolio-opacity: 1 !important;
 }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active .portfolio-engine {
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"]).is-portfolio-world-gateway-active .portfolio-engine {
   visibility: visible !important;
   opacity: .42 !important;
   pointer-events: none !important;
   transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
   transition: opacity 120ms var(--ease-standard), visibility 0ms linear !important;
 }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active.is-portfolio-world-arrived .portfolio-engine {
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"]).is-portfolio-world-gateway-active.is-portfolio-world-arrived .portfolio-engine {
   opacity: 1 !important;
   transition: opacity 520ms ease-out, visibility 0ms linear !important;
 }
 
 /* Daïion travel: the contained portal releases transparent transport energy. */
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-daiion-entry-stage].is-portfolio-world-gateway-active { animation: none !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway { visibility: visible; opacity: 1; transform: none !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::before,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::after,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway-ring { visibility: hidden !important; opacity: 0 !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-daiion-entry-stage].is-portfolio-world-gateway-active { animation: none !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway { visibility: visible; opacity: 1; transform: none !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::before,
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway::after,
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage].is-portfolio-world-gateway-active .portfolio-world-gateway-ring { visibility: hidden !important; opacity: 0 !important; }
 /* The existing artwork plane blends over retained Portfolio atmosphere across route ownership. */
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway { background-image: none !important; background-color: transparent !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background { visibility: visible !important; opacity: 0; background: var(--portfolio-gateway-world-image) center / cover no-repeat !important; transform: none !important; clip-path: none !important; mask: none !important; filter: none !important; transition: none !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4) { visibility: visible !important; opacity: 1; animation: none !important; transition: none !important; }
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::before,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::after,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-void-stars::before,
-.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-void-stars::after { visibility: visible !important; opacity: 1 !important; animation: none !important; transition: none !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway { background-image: none !important; background-color: transparent !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background { visibility: visible !important; opacity: 0; background: var(--portfolio-gateway-world-image) center / cover no-repeat !important; transform: none !important; clip-path: none !important; mask: none !important; filter: none !important; transition: none !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active :is(.cinema-fire-bg, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .nebula-stage--1, .nebula-stage--4) { visibility: visible !important; opacity: 1; animation: none !important; transition: none !important; }
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::before,
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-system::after,
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-void-stars::before,
+.site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .ambient-void-stars::after { visibility: visible !important; opacity: 1 !important; animation: none !important; transition: none !important; }
 .daiion-gateway-passage { position: absolute; inset: 0; z-index: 20; pointer-events: none; isolation: isolate; }
 .daiion-gateway-feeds { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
 .daiion-gateway-feeds path { fill: none; stroke: rgb(var(--portfolio-gateway-reveal-rgb)); stroke-width: 2; stroke-linecap: round; filter: drop-shadow(0 0 3px rgb(var(--portfolio-gateway-reveal-rgb) / .75)); stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; }
@@ -12955,5 +12955,40 @@ button {
 .site-shell[data-portfolio-gateway-world="battleground"]:not(.is-portfolio-world-arrived) .portfolio-world-gateway { background-color: transparent; }
 
 @media (prefers-reduced-motion: reduce) {
-  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active.is-portfolio-world-arrived .portfolio-engine { transition: none !important; }
+  .site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"]).is-portfolio-world-gateway-active.is-portfolio-world-arrived .portfolio-engine { transition: none !important; }
+}
+
+/* Soundtrack is the same transport material and geometry, translated only into Zhento's palette. */
+.site-shell[data-portfolio-gateway-world="soundtrack"][data-daiion-entry-stage] .portfolio-world-gateway {
+  --portfolio-gateway-reveal-rgb: 183 112 255;
+  --portfolio-gateway-reveal-secondary-rgb: 77 163 255;
+  --portfolio-gateway-signal-rgb: 126 215 255;
+  background-position: 58% center !important;
+}
+.site-shell[data-shell-route][data-portfolio-gateway-world="soundtrack"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background {
+  background: linear-gradient(0deg,rgba(6,8,25,.32),transparent 45%),var(--portfolio-gateway-world-image) 58% center / cover no-repeat !important;
+}
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__depth { background: rgb(6 9 24); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__depth::before {
+  background: linear-gradient(0deg,rgba(6,8,25,.32),transparent 45%),var(--portfolio-gateway-world-image) 58% center / cover no-repeat;
+}
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__rim { position: absolute; inset: -4%; border-radius: inherit; background: conic-gradient(from 16deg, transparent 0 12deg, rgb(173 186 255 / .85) 20deg, rgb(113 99 227 / .9) 58deg, transparent 82deg 122deg, rgb(113 99 227) 158deg, transparent 179deg 209deg, rgb(173 186 255 / .7) 242deg, rgb(113 99 227 / .8) 291deg, transparent 318deg); mask-image: radial-gradient(ellipse, transparent 60%, #000 64% 66%, transparent 71%); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal::after { content: ""; position: absolute; inset: 5%; border-radius: inherit; background: conic-gradient(from 42deg, transparent 0 47deg, rgb(126 215 255 / .38) 58deg, transparent 73deg 182deg, rgb(137 123 235 / .55) 206deg, transparent 228deg); mask-image: radial-gradient(ellipse at 44% 47%, transparent 45%, #000 59%, transparent 68%); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__rim::before { content: ""; position: absolute; inset: -3%; background: conic-gradient(from 25deg, transparent 0 24%, rgb(126 215 255 / .8) 25%, transparent 27% 56%, rgb(137 123 235 / .9) 57%, transparent 60% 86%, rgb(173 186 255 / .7) 87%, transparent 90%); animation: daiionRimCirculation 900ms linear infinite; }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave { border-radius: 48% 52% 49% 51% / 51% 48% 52% 49%; mask-image: conic-gradient(from 12deg, #000, rgb(0 0 0 / .6) 52deg, #000 96deg, rgb(0 0 0 / .4) 171deg, #000 214deg, rgb(0 0 0 / .7) 293deg, #000); background: radial-gradient(ellipse closest-side at 49% 50%, transparent 0 86%, rgb(27 9 83 / .12) 89%, rgb(112 66 210 / .38) 92%, rgb(112 184 255 / .72) 94%, rgb(60 25 127 / .2) 96%, transparent 100%); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave::before { content: ""; position: absolute; inset: -2%; border-radius: inherit; background: conic-gradient(from 17deg, transparent 0 18deg, rgb(143 110 242 / .65) 30deg, transparent 47deg 102deg, rgb(126 215 255 / .55) 111deg, transparent 119deg 188deg, rgb(112 91 219 / .7) 204deg, transparent 227deg 285deg, rgb(173 186 255 / .5) 296deg, transparent 306deg); mask-image: radial-gradient(circle closest-side, transparent 0 94%, #000 96% 97%, transparent 100%); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave--2 { inline-size: calc(var(--daiion-portal-size) * 1.018); block-size: calc(var(--daiion-portal-size) * .987); background: radial-gradient(circle closest-side, transparent 0 92%, rgb(47 16 115 / .2) 95%, rgb(135 87 224 / .48) 97%, transparent 100%); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks { overflow: visible; fill: none; stroke: rgb(132 99 224 / .7); stroke-width: 1.15; stroke-linecap: round; }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks path:nth-child(4n) { stroke: rgb(173 186 255 / .8); stroke-width: 1.5; }
+
+/* Route ownership changes under the active wave; retain its existing ancestor until cleanup. */
+.site-shell[data-shell-route="music"][data-daiion-entry-stage][data-portfolio-gateway-world="soundtrack"] .ambient-system {
+  display: block !important;
+  visibility: visible !important;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.site-shell[data-portfolio-gateway-world="soundtrack"][data-daiion-entry-stage]:not([data-daiion-world-exchange]) .portfolio-world-gateway {
+  background-image: linear-gradient(0deg,rgba(6,8,25,.32),transparent 45%),var(--portfolio-gateway-world-image) !important;
 }

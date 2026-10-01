@@ -99,6 +99,7 @@ const PORTFOLIO_GATEWAY_WORLD_CONFIG = {
   soundtrack: {
     route: routePaths.music,
     background: "soundtrack",
+    backgroundSrc: "/assets/media/background/zhento-main.png",
     isRouteable: true,
   },
   cosmos: {
@@ -347,15 +348,15 @@ function clearPortfolioGatewayRouteHandoffTimer() {
   portfolioGatewayRouteHandoffTimer = 0;
 }
 
-function getPortfolioGatewayRouteHandoffTarget() {
-  return routePaths.wrestling || "/wrestling";
+function getPortfolioGatewayRouteHandoffTarget(worldName = shell?.dataset.portfolioGatewayWorld) {
+  return worldName === "soundtrack" ? routePaths.music : routePaths.wrestling || "/wrestling";
 }
 
 function isPortfolioGatewayRouteHandoffReady(worldName) {
   const gatewayWorld = shell?.dataset.portfolioGatewayWorld || worldName || getPortfolioGatewayActiveWorld();
   return Boolean(
     shell &&
-    gatewayWorld === "battleground" &&
+    (gatewayWorld === "battleground" || gatewayWorld === "soundtrack") &&
     shell.dataset.portfolioGatewayState === "filling-screen" &&
     shell.classList.contains("is-portfolio-world-gateway-active") &&
     shell.classList.contains("is-portfolio-world-arrived")
@@ -365,7 +366,7 @@ function isPortfolioGatewayRouteHandoffReady(worldName) {
 function updatePortfolioGatewayRouteHandoffUrl(targetUrl, method = "push") {
   const handoffState = {
     fromPortfolioGateway: true,
-    portfolioGatewayWorld: "battleground",
+    portfolioGatewayWorld: shell?.dataset.portfolioGatewayWorld || "battleground",
   };
 
   if (method === "replace" && typeof replaceRouteUrl === "function") {
@@ -404,7 +405,7 @@ function confirmPortfolioGatewayRouteHandoff(worldName, generation) {
 
   shell.dataset.portfolioGatewayHandoff = "complete";
 
-  initDaiionArchiveStatsAfterGatewayHandoff();
+  if (worldName === "battleground") initDaiionArchiveStatsAfterGatewayHandoff();
 }
 
 function handoffPortfolioGatewayRoute(worldName, { confirmationDelay = 320 } = {}) {
@@ -422,7 +423,7 @@ function handoffPortfolioGatewayRoute(worldName, { confirmationDelay = 320 } = {
     updatePortfolioGatewayRouteHandoffUrl(targetUrl);
   }
 
-  adoptPersistentWrestlingRoute(getRouteFromUrl(targetUrl));
+  adoptPersistentWrestlingRoute(getRouteFromUrl(targetUrl), { worldName });
   shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
   const generation = portfolioGatewayGeneration;
@@ -540,12 +541,12 @@ function queuePortfolioGatewayPullingUniverse(worldName, route) {
   }, delay);
 }
 
-function clearPortfolioGatewayState() {
+function clearPortfolioGatewayState({ transitionAlreadyCancelled = false } = {}) {
   if (!shell) {
     return false;
   }
 
-  cancelDaiionGatewayTransition();
+  if (!transitionAlreadyCancelled) cancelDaiionGatewayTransition();
   const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
   portfolioGatewayGeneration += 1;
   shell.style.removeProperty("--portfolio-gateway-cover-radius-vmax");
@@ -620,14 +621,14 @@ function syncPortfolioGatewayTriggerState() {
 }
 
 let daiionGatewayTransition = null;
-let daiionGatewayArtworkReady = null;
-function prepareDaiionGatewayArtwork() {
-  if (!daiionGatewayArtworkReady) {
+const daiionGatewayArtworkReady = new Map();
+function prepareDaiionGatewayArtwork(worldName = "battleground") {
+  if (!daiionGatewayArtworkReady.has(worldName)) {
     const image = new Image();
-    image.src = new URL(getPortfolioGatewayBackgroundSrc("battleground"), location.origin + "/").href;
-    daiionGatewayArtworkReady = image.decode().then(() => true, () => { daiionGatewayArtworkReady = null; return false; });
+    image.src = new URL(getPortfolioGatewayBackgroundSrc(worldName), location.origin + "/").href;
+    daiionGatewayArtworkReady.set(worldName, image.decode().then(() => true, () => { daiionGatewayArtworkReady.delete(worldName); return false; }));
   }
-  return daiionGatewayArtworkReady;
+  return daiionGatewayArtworkReady.get(worldName);
 }
 function cancelDaiionGatewayTransition() {
   const entry = daiionGatewayTransition;
@@ -642,11 +643,22 @@ function cancelDaiionGatewayTransition() {
   });
   if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
   if (shell) { delete shell.dataset.daiionEntryStage; delete shell.dataset.daiionWorldExchange; }
+  if (entry?.worldName === "soundtrack") {
+    if (entry.promoted && getRouteFromUrl().name === "music") {
+      shell.dataset.musicTransportEntry = "settled";
+      musicNexusShell.inert = false;
+      clearPortfolioGatewayState({ transitionAlreadyCancelled: true });
+    } else {
+      delete shell.dataset.musicTransportEntry;
+      musicNexusShell.setAttribute("aria-hidden", "true");
+      musicNexusShell.inert = true;
+    }
+  }
 }
 
-function startDaiionGatewayTransition() {
+function startDaiionGatewayTransition(worldName = "battleground") {
   cancelDaiionGatewayTransition();
-  const entry = { generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
+  const entry = { worldName, generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
   daiionGatewayTransition = entry;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
@@ -664,7 +676,7 @@ function startDaiionGatewayTransition() {
     // Decoded destination art replaces the world beneath the continuing transparent wave.
     applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics, settleLegacyProperties });
     shell.classList.add("is-portfolio-world-arrived");
-    handoffPortfolioGatewayRoute("battleground", { confirmationDelay });
+    handoffPortfolioGatewayRoute(worldName, { confirmationDelay });
     syncPortfolioGatewayTriggerState();
   };
   entry.finishImmediately = () => {
@@ -673,15 +685,22 @@ function startDaiionGatewayTransition() {
     promote();
     if (entry.promoted && shell.dataset.portfolioGatewayHandoff !== "complete") {
       clearPortfolioGatewayRouteHandoffTimer();
-      confirmPortfolioGatewayRouteHandoff("battleground", entry.generation);
+      confirmPortfolioGatewayRouteHandoff(worldName, entry.generation);
     }
     cancelDaiionGatewayTransition();
   };
+  if (worldName === "soundtrack") {
+    shell.dataset.musicTransportEntry = "prepared";
+    resetZhentoLandingSelection();
+    showMusicNexusLanding({ shouldScroll: false });
+    musicNexusShell.setAttribute("aria-hidden", "true");
+    musicNexusShell.inert = true;
+  }
   if (isPortfolioEngineReducedMotion()) {
     entry.finishImmediately();
     return;
   }
-  const artworkReady = prepareDaiionGatewayArtwork();
+  const artworkReady = prepareDaiionGatewayArtwork(worldName);
   entry.scroller = getActiveShellScroller({ name: "portfolio" });
   entry.scrollerWasAtOrigin = Boolean(entry.scroller && entry.scroller.scrollTop === 0 && entry.scroller.scrollLeft === 0);
   // Measure the persistent Shell before motion, not twice during the 140ms world exchange.
@@ -887,7 +906,7 @@ function startPortfolioWorldGateway() {
   }
 
   portfolioGatewayGeneration += 1;
-  resetDaiionArchivePresentation();
+  if (activeWorld === "battleground") resetDaiionArchivePresentation();
   clearPortfolioGatewayPhaseTimer();
   clearPortfolioGatewayRouteHandoffTimer();
   clearPortfolioGatewaySettledFrame();
@@ -902,7 +921,7 @@ function startPortfolioWorldGateway() {
   clearPortfolioStarEmitterChargeState();
   stopPortfolioEngineLightning();
   fadePortfolioEngineProjectionForGateway();
-  if (activeWorld === "battleground") startDaiionGatewayTransition();
+  if (activeWorld === "battleground" || activeWorld === "soundtrack") startDaiionGatewayTransition(activeWorld);
   else queuePortfolioGatewayPullingUniverse(activeWorld, route);
   syncPortfolioGatewayTriggerState();
   return true;
@@ -2811,7 +2830,10 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     return;
   }
 
+  const activeMusicTransport = route.name === "music" && daiionGatewayTransition?.worldName === "soundtrack"
+    && daiionGatewayTransition.promoted && daiionGatewayTransition.generation === portfolioGatewayGeneration;
   if (route.name !== "music") {
+    delete shell.dataset.musicTransportEntry;
     cancelZhentoLandingStats();
     cancelZhentoSelectorMorph();
     cancelZhentoInformationContext();
@@ -2830,11 +2852,11 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   } else {
     delete shell.dataset.wrestlingShowsRouteHandoff;
   }
-  if (route.name !== "portfolio") {
+  if (route.name !== "portfolio" && !activeMusicTransport) {
     shell.classList.remove("has-portfolio-entry-constellation");
     clearPortfolioEngineReadyState({ preserveWorld: route.name === "wrestling-show-detail" || shellRouteName === "wrestling-match-detail" });
   }
-  if (route.name !== "portfolio" && route.name !== "wrestling") {
+  if (route.name !== "portfolio" && route.name !== "wrestling" && !activeMusicTransport) {
     clearPortfolioGatewayState();
   }
   if (route.name === "music" || route.name === "music-bands" || route.name === "band-detail") {
@@ -4195,10 +4217,15 @@ function showRhythmPillar({ detail = false } = {}) {
 }
 
 function showMusicNexus(options = {}) {
+  if (!options.fromPortfolioTransport) {
+    if (daiionGatewayTransition?.worldName === "soundtrack") clearPortfolioGatewayState();
+    // Clear after owned cleanup so a normal mount cannot inherit this entry's settled-intro marker.
+    delete shell?.dataset.musicTransportEntry;
+  }
   if (!shell || !portfolioHub || !musicNexusShell) {
     return;
   }
-  clearPortfolioArrivalState();
+  if (!options.fromPortfolioTransport) clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
   shell.classList.remove("is-placeholder-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
@@ -4251,7 +4278,7 @@ function showMusicNexus(options = {}) {
     }
   }
   setCurrentView(options.currentView || (initialSection === "landing" ? "Zhento" : "Music Nexus"));
-  setActiveGlobalNav(options.globalNavTarget || "music");
+  setActiveGlobalNav(options.globalNavTarget || "music", { preservePresentation: Boolean(options.fromPortfolioTransport) });
   if (startButton) {
     startButton.disabled = true;
     startButton.setAttribute("aria-busy", "false");
@@ -5578,7 +5605,7 @@ function resetShellScroller(scroller) {
 
 function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
   const entry = daiionGatewayTransition;
-  const persistentViewportUnchanged = route.name === "wrestling" && entry?.promoted
+  const persistentViewportUnchanged = (route.name === "wrestling" || (route.name === "music" && entry?.worldName === "soundtrack")) && entry?.promoted
     && entry.generation === portfolioGatewayGeneration && entry.viewportUnchanged;
   // Keep normal route/scroll ownership; only the already-measured persistent entry avoids a second flush.
   if (!persistentViewportUnchanged) updateViewportMetrics();
