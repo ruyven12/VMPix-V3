@@ -407,7 +407,7 @@ function confirmPortfolioGatewayRouteHandoff(worldName, generation) {
   initDaiionArchiveStatsAfterGatewayHandoff();
 }
 
-function handoffPortfolioGatewayRoute(worldName) {
+function handoffPortfolioGatewayRoute(worldName, { confirmationDelay = 320 } = {}) {
   if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
     return;
   }
@@ -432,7 +432,7 @@ function handoffPortfolioGatewayRoute(worldName) {
   }
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
     confirmPortfolioGatewayRouteHandoff(worldName, generation);
-  }, 320);
+  }, confirmationDelay);
 }
 
 function completePortfolioGatewayWorldArrival(worldName, route) {
@@ -650,7 +650,7 @@ function startDaiionGatewayTransition() {
   daiionGatewayTransition = entry;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
-  const promote = ({ settleLegacyProperties = true } = {}) => {
+  const promote = ({ settleLegacyProperties = true, confirmationDelay = 320 } = {}) => {
     if (!current() || entry.promoted || window.location.pathname !== routePaths.portfolio) return;
     // Read visualViewport before presentation writes: its width getter otherwise forces their layout.
     const measured = entry.viewportMetrics;
@@ -664,7 +664,7 @@ function startDaiionGatewayTransition() {
     // Decoded destination art replaces the world beneath the continuing transparent wave.
     applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics, settleLegacyProperties });
     shell.classList.add("is-portfolio-world-arrived");
-    handoffPortfolioGatewayRoute("battleground");
+    handoffPortfolioGatewayRoute("battleground", { confirmationDelay });
     syncPortfolioGatewayTriggerState();
   };
   entry.finishImmediately = () => {
@@ -694,6 +694,14 @@ function startDaiionGatewayTransition() {
   const width = viewport.width, height = viewport.height;
   const center = { x: width / 2, y: height * .42 };
   const radius = Math.min(width * .29, height * .26, 320);
+  const farthestCorner = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y));
+  // Primary CSS ellipse: transparent to 86%, shortest radius 98%, center shifted 2%.
+  // Its conservative clear interior must exceed every corner plus the feather safety margin.
+  const clearInteriorRatio = .86 * .98 - .02;
+  const exitMargin = 24;
+  const exitTime = 560;
+  const clearScale = (farthestCorner + exitMargin + 1) / (clearInteriorRatio * radius);
+  entry.ringExitGate = { farthestCorner, radius, clearInteriorRatio, exitMargin, exitTime, clearScale };
   const layer = document.createElement("div");
   layer.className = "daiion-gateway-passage";
   layer.setAttribute("aria-hidden", "true");
@@ -765,11 +773,12 @@ function startDaiionGatewayTransition() {
   portfolioWorldGateway.append(layer);
   entry.layer = layer;
   shell.dataset.daiionEntryStage = "preparing";
-  const animate = (node, frames, options) => {
+  const createAnimation = (node, frames, options) => {
     const animation = node.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...options });
     entry.animations.push(animation);
-    return animation.finished.catch(() => {});
+    return animation;
   };
+  const animate = (node, frames, options) => createAnimation(node, frames, options).finished.catch(() => {});
   void (async () => {
     // Start the visible 580ms clock only after decode: geometry must not advance behind late artwork.
     const ready = await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(() => resolve(false), 5000); })]);
@@ -804,50 +813,54 @@ function startDaiionGatewayTransition() {
     ]);
     if (!current()) return;
     shell.dataset.daiionEntryStage = "transport";
-    const reach = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 24;
-    const peak = reach / radius;
+    const peak = clearScale / .8;
     const waveTransform = (scale, angle = 0) => `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
+    const transportAnimationIndex = entry.animations.length;
+    const boundary = exitTime / 940;
+    const waveAnimations = rings.map((ring, index) => createAnimation(ring, [
+      { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: "cubic-bezier(.16,.45,.55,.85)" },
+      { transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6), offset: boundary, easing: "linear" },
+      { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
+    ], { duration: 940, easing: "linear" }));
+    entry.primaryWave = waveAnimations[0];
     let exchange = Promise.resolve();
     if (worldArtwork) {
-      // Native compositor opacity overlaps for 140ms: 60ms before promotion and 80ms after.
+      // Shared native clock: opacity stays zero until the primary's clear interior exceeds its gate.
       exchange = Promise.all([
-        animate(worldArtwork, [{ opacity: 0 }, { opacity: 1 }], { delay: 500, duration: 140, easing: "linear" }),
-        ...sourceBackdrops.map((element) => animate(element, [{ opacity: 1 }, { opacity: 0 }], { delay: 500, duration: 140, easing: "linear" })),
-      ]).then(() => {
-        if (current() && entry.promoted) delete shell.dataset.daiionWorldExchange;
-      });
+        animate(worldArtwork, [{ opacity: 0 }, { opacity: 1 }], { delay: exitTime, duration: 140, easing: "linear" }),
+        ...sourceBackdrops.map((element) => animate(element, [{ opacity: 1 }, { opacity: 0 }], { delay: exitTime, duration: 140, easing: "linear" })),
+      ]);
     }
-    // Start the entire transform trajectory now; canonical promotion cannot leave the wave between jobs.
-    const boundary = 560 / 940;
     const waveMotion = Promise.all([
-      ...rings.map((ring, index) => animate(ring, [
-        { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: "cubic-bezier(.16,.45,.55,.85)" },
-        { transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6), offset: boundary, easing: "linear" },
-        { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
-      ], { duration: 940, easing: "linear" })),
+      ...waveAnimations.map((animation) => animation.finished.catch(() => {})),
       animate(streaks, [
         { transform: waveTransform(.92) },
         { transform: waveTransform(peak * .83, 4), offset: boundary },
         { transform: waveTransform(peak * 1.36, 7) },
       ], { duration: 940, easing: "linear" }),
-      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78 }, { opacity: 0 }], { delay: 560, duration: 380, easing: "linear", fill: "forwards" })),
-      animate(streaks, [{ opacity: .56 }, { opacity: 0 }], { delay: 560, duration: 380, easing: "linear", fill: "forwards" }),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" })),
+      animate(streaks, [{ opacity: .56 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" }),
+      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { delay: exitTime, duration: 180, fill: "forwards" }),
     ]);
-    await Promise.all([
+    const expansion = Promise.all([
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62 }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78 }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)", fill: "none" })),
       animate(streaks, [{ opacity: 0 }, { opacity: .8, offset: .2 }, { opacity: .56 }], { duration: 560, easing: "linear", fill: "none" }),
       animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1)" }], { duration: 560 }),
       animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(.99)", offset: .28 }, { transform: "translate(-50%, -50%) scale(1)" }], { duration: 260 }),
     ]);
-    if (!current()) return;
-    promote({ settleLegacyProperties: false });
+    // Assign every transport effect the primary's exact timeline origin; no independent fade timer can lead it.
+    const transportStart = document.timeline.currentTime;
+    entry.animations.slice(transportAnimationIndex).forEach((animation) => { animation.startTime = transportStart; });
+    await expansion;
     if (!current()) return;
     transport.dataset.revealing = "true";
-    await Promise.all([
-      exchange,
-      waveMotion,
-      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }),
-    ]);
+    await exchange;
+    if (!current()) return;
+    // Broad arrival selectors settle only after the world blend; preserve the existing 880ms HUD budget.
+    promote({ settleLegacyProperties: false, confirmationDelay: Math.max(0, 880 - entry.primaryWave.currentTime) });
+    if (!current()) return;
+    delete shell.dataset.daiionWorldExchange;
+    await waveMotion;
     if (current()) cancelDaiionGatewayTransition();
   })();
 }
