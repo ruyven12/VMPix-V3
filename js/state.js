@@ -2968,25 +2968,46 @@ function getDaiionArchiveDecodeFrames(finalValue) {
   return ["░░", "7F", hexValue];
 }
 
+let daiionArchivePresentationGeneration = 0;
+const daiionArchivePresentationTimers = new Set();
+function resetDaiionArchivePresentation() {
+  daiionArchivePresentationGeneration += 1;
+  daiionArchiveStatsRequestId += 1;
+  daiionArchivePresentationTimers.forEach((timer) => window.clearTimeout(timer));
+  daiionArchivePresentationTimers.clear();
+  document.querySelectorAll("[data-daiion-stat-value]").forEach((node) => {
+    node.textContent = "";
+    node.classList.remove("is-decoding", "is-locked", "is-locking");
+  });
+}
+function scheduleDaiionArchivePresentation(callback, delay, generation = daiionArchivePresentationGeneration) {
+  const timer = window.setTimeout(() => {
+    daiionArchivePresentationTimers.delete(timer);
+    if (generation !== daiionArchivePresentationGeneration || !isDaiionArchiveLandingPath()) return;
+    callback();
+  }, delay);
+  daiionArchivePresentationTimers.add(timer);
+}
+
 function setDaiionArchiveValueLocked(node, value) {
   node.textContent = value;
   node.classList.remove("is-decoding");
   node.classList.add("is-locked", "is-locking");
-  window.setTimeout(() => node.classList.remove("is-locking"), 320);
+  scheduleDaiionArchivePresentation(() => node.classList.remove("is-locking"), 320);
 }
 
 function decodeDaiionArchiveValue(node, finalValue, rowIndex) {
   const decodeFrames = getDaiionArchiveDecodeFrames(finalValue);
   const rowDelay = 160 + rowIndex * daiionArchiveStatsRowStagger;
-  window.setTimeout(() => {
+  scheduleDaiionArchivePresentation(() => {
     node.classList.remove("is-locked", "is-locking");
     node.classList.add("is-decoding");
     decodeFrames.forEach((frame, frameIndex) => {
-      window.setTimeout(() => {
+      scheduleDaiionArchivePresentation(() => {
         node.textContent = frame;
       }, frameIndex * 76);
     });
-    window.setTimeout(() => setDaiionArchiveValueLocked(node, finalValue), decodeFrames.length * 76 + 58);
+    scheduleDaiionArchivePresentation(() => setDaiionArchiveValueLocked(node, finalValue), decodeFrames.length * 76 + 58);
   }, rowDelay);
 }
 
@@ -3010,7 +3031,7 @@ function resolveDaiionArchiveStatsValues(valueNodes, mappedStats, animationStart
   const now = typeof performance !== "undefined" ? performance.now() : Date.now();
   const startedAt = Number.isFinite(animationStartedAt) ? animationStartedAt : now;
   const remainingDelay = Math.max(0, daiionArchiveStatsDecodeDelay - (now - startedAt));
-  window.setTimeout(() => {
+  scheduleDaiionArchivePresentation(() => {
     valueNodes.forEach((node, index) => decodeDaiionArchiveValue(node, finalValues[index], index));
   }, remainingDelay);
 }
@@ -3033,6 +3054,7 @@ async function initDaiionArchiveStatsPanel(options = {}) {
     return;
   }
 
+  resetDaiionArchivePresentation();
   const requestId = ++daiionArchiveStatsRequestId;
   const animationStartedAt = Number.isFinite(options.animationStartedAt)
     ? options.animationStartedAt

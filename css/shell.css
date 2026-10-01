@@ -1118,7 +1118,7 @@ button {
   }
 
   100% {
-    --portfolio-gateway-reveal-radius-vmax: 96;
+    --portfolio-gateway-reveal-radius-vmax: var(--portfolio-gateway-cover-radius-vmax, 96);
     --portfolio-gateway-destination-opacity: 1;
     --portfolio-gateway-destination-scale: 1;
     --portfolio-gateway-portfolio-opacity: 0;
@@ -6781,9 +6781,9 @@ button {
   transform: translateZ(0) scale3d(0.98, 0.98, 1);
 }
 
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-engine,
-.site-shell[data-shell-route="portfolio"].is-portfolio-world-arrived .portfolio-engine,
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-world-gateway-active .portfolio-engine,
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-world-arrived .portfolio-engine,
+.site-shell[data-shell-route="portfolio"]:not([data-portfolio-gateway-world="battleground"]).is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived):not([data-portfolio-gateway-state="filling-screen"]) .portfolio-engine {
   visibility: hidden !important;
   opacity: 0 !important;
   filter: none;
@@ -12897,3 +12897,19 @@ button {
 }
 .site-shell[data-band-record-opening] .prototype-engine-return-control { pointer-events:none!important; }
 .shell-band-record-shared { contain:layout style;will-change:transform; }
+
+/* Wrestling's persistent gateway retains the painted source until full coverage. */
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active:not(.is-portfolio-world-arrived) {
+  --portfolio-gateway-portfolio-opacity: 1 !important;
+}
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active .portfolio-engine {
+  visibility: visible !important;
+  opacity: .42 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1) !important;
+  transition: opacity 120ms var(--ease-standard), visibility 0ms linear !important;
+}
+.site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-gateway-active.is-portfolio-world-arrived .portfolio-engine {
+  opacity: 1 !important;
+  transition: opacity 520ms ease-out, visibility 0ms linear !important;
+}

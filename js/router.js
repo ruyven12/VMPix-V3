@@ -291,6 +291,7 @@ function checkpointV3Resume(allowDeparted = false) {
 function notifyV3ResumeReady(){v3ResumeWake?.();}
 function cancelV3ResumeRestore(){v3ResumeWake=null;v3ResumeObserver?.disconnect();v3ResumeObserver=null;clearTimeout(v3ResumeDeadline);}
 function beginV3RouteContext(route,options){
+  if ((route.name === "wrestling" || v3RouteContext.route?.name === "wrestling") && typeof resetDaiionArchivePresentation === "function") resetDaiionArchivePresentation();
   cancelV3ResumeRestore();
   const cause=options.navigationCause || (v3RouteStarted ? 'spa' : v3InitialNavigationCause);
   v3RouteStarted=true;
@@ -383,6 +384,18 @@ function replaceRouteUrl(url, state = {}) {
     window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
   }
   if (v3RouteContext.entry === window.history.state?.v3EntryId) v3RouteContext.url = getRouteFromUrl().canonicalUrl || getPathWithSearch();
+}
+
+// Adopt an already-painted persistent destination without running its mount path again.
+function adoptPersistentWrestlingRoute(route) {
+  beginV3RouteContext(route, { navigationCause: "spa" });
+  if (typeof cancelShellBackSweep === "function") cancelShellBackSweep();
+  shellRenderedRoute = route;
+  setActiveGlobalNavForRoute(route.name, { preservePresentation: true });
+  updateShellBreadcrumb(route);
+  updateShellBackState(route);
+  updatePrototypeEngineReturnEmitter(route);
+  stabilizeShellViewport(route);
 }
 
 function syncRoute(route, options = {}) {

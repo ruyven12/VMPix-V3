@@ -188,6 +188,7 @@ let portfolioRightEmitterChargingTimer = 0;
 let portfolioRightEmitterReadyTimer = 0;
 let portfolioGatewayPhaseTimer = 0;
 let portfolioGatewayRouteHandoffTimer = 0;
+let portfolioGatewayGeneration = 0;
 let portfolioStarFeedAnimationCycle = 0;
 let portfolioEngineLightningTimer = 0;
 let portfolioEngineLightningFrame = 0;
@@ -394,15 +395,10 @@ function initDaiionArchiveStatsAfterGatewayHandoff() {
   initDaiionArchiveStatsPanel({ animationStartedAt });
 }
 
-function confirmPortfolioGatewayRouteHandoff(worldName) {
+function confirmPortfolioGatewayRouteHandoff(worldName, generation) {
   portfolioGatewayRouteHandoffTimer = 0;
-  if (!isPortfolioGatewayRouteHandoffReady(worldName)) {
+  if (generation !== portfolioGatewayGeneration || window.location.pathname !== getPortfolioGatewayRouteHandoffTarget() || !isPortfolioGatewayRouteHandoffReady(worldName)) {
     return;
-  }
-
-  const targetUrl = getPortfolioGatewayRouteHandoffTarget();
-  if (window.location.pathname !== targetUrl) {
-    updatePortfolioGatewayRouteHandoffUrl(targetUrl, "replace");
   }
 
   shell.dataset.portfolioGatewayHandoff = "complete";
@@ -425,12 +421,12 @@ function handoffPortfolioGatewayRoute(worldName) {
     updatePortfolioGatewayRouteHandoffUrl(targetUrl);
   }
 
-  shellRenderedRoute = getRouteFromUrl(targetUrl);
-  updatePrototypeEngineReturnEmitter(shellRenderedRoute);
+  adoptPersistentWrestlingRoute(getRouteFromUrl(targetUrl));
   shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
+  const generation = portfolioGatewayGeneration;
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
-    confirmPortfolioGatewayRouteHandoff(worldName);
+    confirmPortfolioGatewayRouteHandoff(worldName, generation);
   }, 320);
 }
 
@@ -545,6 +541,8 @@ function clearPortfolioGatewayState() {
   }
 
   const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
+  portfolioGatewayGeneration += 1;
+  shell.style.removeProperty("--portfolio-gateway-cover-radius-vmax");
   clearPortfolioGatewayPhaseTimer();
   clearPortfolioGatewayRouteHandoffTimer();
   clearPortfolioGatewaySettledFrame();
@@ -615,6 +613,17 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
 }
 
+function measurePortfolioGatewayCoverage() {
+  if (!shell || !portfolioWorldGateway || shell.dataset.portfolioGatewayWorld !== "battleground") return;
+  const rect = portfolioWorldGateway.getBoundingClientRect();
+  const origin = getComputedStyle(portfolioWorldGateway, "::after").transformOrigin.split(" ").map(Number.parseFloat);
+  if (!rect.width || !rect.height || !origin.slice(0, 2).every(Number.isFinite)) return;
+  // The destination scales about this same origin. Its minimum scale is one;
+  // retaining the unscaled farthest-corner radius is conservative throughout travel.
+  const radius = Math.hypot(Math.max(Math.abs(origin[0]), Math.abs(rect.width - origin[0])), Math.max(Math.abs(origin[1]), Math.abs(rect.height - origin[1]))) + 2;
+  shell.style.setProperty("--portfolio-gateway-cover-radius-vmax", String(Math.max(96, radius / Math.max(innerWidth, innerHeight) * 100)));
+}
+
 function startPortfolioWorldGateway() {
   if (!shell || window.location.pathname !== routePaths.portfolio || isPortfolioGatewayActive()) {
     return false;
@@ -632,6 +641,8 @@ function startPortfolioWorldGateway() {
     return false;
   }
 
+  portfolioGatewayGeneration += 1;
+  resetDaiionArchivePresentation();
   clearPortfolioGatewayPhaseTimer();
   clearPortfolioGatewayRouteHandoffTimer();
   clearPortfolioGatewaySettledFrame();
@@ -642,6 +653,7 @@ function startPortfolioWorldGateway() {
   shell.dataset.portfolioGatewayRoute = route;
   shell.dataset.portfolioGatewayState = "focusing-star";
   shell.classList.add("is-portfolio-world-gateway-active");
+  measurePortfolioGatewayCoverage();
   clearPortfolioEngineScan();
   clearPortfolioStarEmitterChargeState();
   stopPortfolioEngineLightning();
@@ -2934,8 +2946,8 @@ function initShellRailLogo() {
   updateLogoMode();
 }
 
-function setActiveGlobalNav(targetName) {
-  updateShellRouteContext(getRouteFromUrl(), targetName);
+function setActiveGlobalNav(targetName, options = {}) {
+  if (!options.preservePresentation) updateShellRouteContext(getRouteFromUrl(), targetName);
   globalNavButtons.forEach((button) => {
     const isCurrent = button.dataset.globalNavTarget === targetName;
     if (isCurrent) {
@@ -2946,8 +2958,8 @@ function setActiveGlobalNav(targetName) {
   });
 }
 
-function setActiveGlobalNavForRoute(routeName) {
-  setActiveGlobalNav(routeNameToGlobalNavTarget[routeName] || "home");
+function setActiveGlobalNavForRoute(routeName, options = {}) {
+  setActiveGlobalNav(routeNameToGlobalNavTarget[routeName] || "home", options);
 }
 
 function setSpotlight(moduleName) {
@@ -4007,6 +4019,8 @@ function showBattlegroundGatewayArrivalSurface() {
     return;
   }
 
+  resetDaiionArchivePresentation();
+  shell.classList.remove("is-portfolio-world-arrived");
   clearPortfolioArrivalState();
   clearPortfolioOrientationState();
   clearPortfolioDirectArrivalState();
