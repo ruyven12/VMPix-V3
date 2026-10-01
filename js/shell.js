@@ -1851,6 +1851,8 @@ let zhentoStatsSession = null;
 function cancelZhentoLandingStats() {
   const session = zhentoStatsSession;
   if (!session) return;
+  cancelZhentoTelemetry();
+  zhentoTelemetryPayload = null;
   zhentoStatsSession = null;
   cancelAnimationFrame(session.frame);
   session.controllers.forEach((controller) => controller?.abort());
@@ -1868,7 +1870,7 @@ function renderZhentoPhotoProgress(element, value) {
 
 function requestMusicLandingStats() {
   if (zhentoStatsSession) return zhentoStatsSession.request;
-  const session = { controllers: new Set(), frame: 0, counts: new Map() };
+  const session = { controllers: new Set(), frame: 0, counts: new Map(), versions: new Map(), values: new Map(), liveValues: new Map(), aggregateValidKeys: new Set(), owners: new Map(), targets: new Map(), telemetryAuthoritative: false };
   zhentoStatsSession = session;
   const current = () => zhentoStatsSession === session && getRouteFromUrl().name === "music";
   const order = ["photos", "bands", "shows", "people", "venues"];
@@ -1886,7 +1888,8 @@ function requestMusicLandingStats() {
       if (now < count.start && !reducedMotion.matches) continue;
       if (!count.begun) { count.start = now; count.begun = true; }
       const progress = reducedMotion.matches ? 1 : Math.min(1, (now - count.start) / 900);
-      const value = count.total === 0 ? 0 : Math.round(1 + (count.total - 1) * (1 - Math.pow(1 - progress, 3)));
+      const value = count.total === 0 ? 0 : Math.round(count.from + (count.total - count.from) * (1 - Math.pow(1 - progress, 3)));
+      session.values.set(key, value);
       const element = getMusicLandingStatValueElement(key);
       if (key === "photos") renderZhentoPhotoProgress(element, value);
       else element.textContent = value.toLocaleString();
@@ -1895,18 +1898,31 @@ function requestMusicLandingStats() {
     syncZhentoPillarStat();
     if (session.counts.size) session.frame = requestAnimationFrame(tick);
   };
-  const resolveCount = (key, raw) => {
+  const resolveCount = (key, raw, owner = "boot", immediate = false) => {
     if (!current()) return;
+    const numeric = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
+    if (Number.isSafeInteger(numeric) && numeric >= 0 && (owner !== "boot" || !session.aggregateValidKeys.has(key))) {
+      session.liveValues.set(key, numeric);
+      if (owner === "telemetry") session.aggregateValidKeys.add(key);
+    }
+    if (owner === "boot" && session.telemetryAuthoritative && (zhentoInformationContext?.key === "planet-stats" || session.aggregateValidKeys.has(key))) return;
+    const version = (session.versions.get(key) || 0) + 1;
+    session.versions.set(key, version);
+    session.owners.set(key, owner);
+    session.targets.set(key, raw);
+    session.counts.delete(key);
     const total = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
     const element = getMusicLandingStatValueElement(key);
     if (!Number.isSafeInteger(total) || total < 0) {
       if (key === "photos") renderZhentoPhotoProgress(element, null);
       else element.textContent = "—";
       element.dataset.statSource = "unavailable";
+      session.values.delete(key);
       syncZhentoPillarStat();
       return;
     }
-    if (reducedMotion.matches || v3RouteContext.skipEntryAnimation || total === 0) {
+    if (immediate || reducedMotion.matches || v3RouteContext.skipEntryAnimation || total === 0 || session.values.get(key) === total) {
+      session.values.set(key, total);
       if (key === "photos") renderZhentoPhotoProgress(element, total);
       else element.textContent = total.toLocaleString();
       element.dataset.statSource = "live";
@@ -1915,11 +1931,12 @@ function requestMusicLandingStats() {
     }
     element.dataset.statSource = "counting";
     Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => {}))).then(() => {
-      if (!current()) return;
-      session.counts.set(key, { total, start: performance.now() });
+      if (!current() || session.versions.get(key) !== version) return;
+      session.counts.set(key, { total, from: session.values.get(key) ?? 1, start: performance.now() });
       if (!session.frame) session.frame = requestAnimationFrame(tick);
     });
   };
+  session.resolveCount = resolveCount;
   const routes = [...new Set(MUSIC_NEXUS_LIVE_STAT_CONFIG.map((config) => config.route))];
   session.request = Promise.all(routes.map((route) => {
     const configs = MUSIC_NEXUS_LIVE_STAT_CONFIG.filter((config) => config.route === route);
@@ -1937,6 +1954,88 @@ function requestMusicLandingStats() {
     return failed < order.length;
   });
   return session.request;
+}
+
+let zhentoTelemetryRequest = null;
+let zhentoTelemetryPayload = null;
+
+function cancelZhentoTelemetry(abortRequest = true) {
+  if (abortRequest) {
+    const request = zhentoTelemetryRequest;
+    zhentoTelemetryRequest = null;
+    request?.controller.abort();
+    clearTimeout(request?.timeout);
+  }
+  const session = zhentoStatsSession;
+  // Finish only aggregate-owned counts; ordinary landing/Pulse work keeps its lifecycle.
+  session?.owners.forEach((owner, key) => {
+    if (owner === "telemetry") session.resolveCount(key, session.targets.get(key), "telemetry", true);
+  });
+  if (abortRequest) session?.liveValues.forEach((value, key) => session.resolveCount(key, value, "retained", true));
+  if (session && !session.counts.size) { cancelAnimationFrame(session.frame); session.frame = 0; }
+}
+
+function applyZhentoTelemetryCounts(payload, immediate = false) {
+  const session = zhentoStatsSession;
+  if (!session) return;
+  session.telemetryAuthoritative = true;
+  ["photos", "bands", "shows", "people", "venues"].forEach((key) => {
+    session.resolveCount(key, key === "photos" ? payload?.photoTotals?.photosTotal : payload?.totals?.[key], "telemetry", immediate);
+  });
+}
+
+function renderZhentoTelemetry(payload) {
+  const surface = document.querySelector(".zhento-telemetry");
+  if (!surface) return;
+  const number = (raw) => typeof raw === "number" && Number.isSafeInteger(raw) && raw >= 0 ? raw : null;
+  const format = (raw) => number(raw) === null ? "—" : raw.toLocaleString("en-US");
+  surface.querySelectorAll("[data-zhento-archive]").forEach((element) => {
+    element.textContent = format(payload?.archive?.[element.dataset.zhentoArchive]);
+  });
+  const archived = number(payload?.archive?.archivedSets);
+  const total = number(payload?.archive?.totalSets);
+  const percentage = archived !== null && total > 0 ? archived / total * 100 : null;
+  surface.querySelector("[data-zhento-sets-progress]").textContent = `${format(archived)} / ${format(total)} · ${percentage === null ? "—" : percentage.toFixed(2)}%`;
+  surface.querySelector("[data-zhento-bands-progress]").textContent = `${format(payload?.archive?.fullyArchived)} / ${format(payload?.totals?.bands)}`;
+  surface.style.setProperty("--zhento-sets-progress", String(percentage === null ? 0 : Math.min(1, Math.max(0, percentage / 100))));
+  const first = number(payload?.span?.firstYear);
+  const last = number(payload?.span?.lastYear);
+  surface.querySelector("[data-zhento-archive-span]").textContent = `ARCHIVE SPAN // ${first || "—"} — ${last || "—"}`;
+  const status = ["live", "partial"].includes(payload?.status) ? payload.status : "unavailable";
+  surface.dataset.telemetryState = status;
+  surface.setAttribute("aria-busy", "false");
+  surface.querySelector("[data-zhento-telemetry-status]").textContent = status === "live" ? "Live archive data" : status === "partial" ? "Some archive data is unavailable" : "Archive data unavailable";
+}
+
+function requestZhentoTelemetry(context) {
+  if (zhentoTelemetryRequest) return zhentoTelemetryRequest.promise;
+  const controller = new AbortController();
+  const request = { controller, timeout: 0, promise: null };
+  zhentoTelemetryRequest = request;
+  const current = () => zhentoTelemetryRequest === request && zhentoInformationContext === context && getRouteFromUrl().name === "music";
+  const surface = context.landing.querySelector(".zhento-telemetry");
+  surface.dataset.telemetryState = "loading";
+  surface.setAttribute("aria-busy", "true");
+  surface.querySelector("[data-zhento-telemetry-status]").textContent = "Synchronizing Archive...";
+  request.timeout = setTimeout(() => controller.abort(), MUSIC_NEXUS_STATS_TIMEOUT_MS);
+  const apply = (payload) => {
+    if (!current()) return;
+    zhentoTelemetryPayload = payload;
+    renderZhentoTelemetry(payload);
+    applyZhentoTelemetryCounts(payload);
+  };
+  request.promise = fetch(new URL("/api/music/telemetry", MUSIC_NEXUS_STATS_API_BASE_URL).href, { cache: "no-store", signal: controller.signal })
+    .then(async (response) => {
+      if (!response.ok) throw new Error("Archive telemetry unavailable");
+      const payload = await response.json();
+      if (payload?.ok !== true) throw new Error("Archive telemetry unavailable");
+      apply(payload);
+    }).catch(() => { if (current()) apply({ status: "unavailable" }); })
+    .finally(() => {
+      clearTimeout(request.timeout);
+      if (zhentoTelemetryRequest === request) zhentoTelemetryRequest = null;
+    });
+  return request.promise;
 }
 
 const RING_ARCHIVE_STATS_API_BASE_URL = MUSIC_NEXUS_STATS_API_BASE_URL;
@@ -3374,6 +3473,7 @@ function cancelZhentoInformationContext(hide = true) {
   const context = zhentoInformationContext;
   zhentoInformationContext = null;
   context?.animations.forEach((animation) => animation.cancel());
+  if (context?.key === "planet-stats") cancelZhentoTelemetry(hide);
   if (!hide) context?.pulseMorph?.settle();
   cancelZhentoPulseMorph(context);
   if (!hide) {
@@ -3394,17 +3494,20 @@ function cancelZhentoInformationContext(hide = true) {
 function showZhentoInformationContext(landing, key) {
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
-  if (key !== "pulse" && key !== "lore" && key !== "origins" && key !== "reimaging") return;
+  if (key !== "planet-stats" && key !== "pulse" && key !== "lore" && key !== "origins" && key !== "reimaging") return;
   const surface = landing.querySelector(".zhento-lower-third");
   if (!surface) return;
   const pulse = surface.querySelector(".zhento-pulse");
   const reading = surface.querySelector(".zhento-lower-third__reading-zone");
   pulse.hidden = key !== "pulse";
   pulse.inert = key !== "pulse";
-  reading.hidden = key === "pulse";
-  reading.inert = key === "pulse";
-  if (key !== "pulse") setZhentoLowerThirdContent(surface, key);
-  else surface.dataset.lowerThirdContent = "pulse";
+  const telemetry = surface.querySelector(".zhento-telemetry");
+  telemetry.hidden = key !== "planet-stats";
+  telemetry.inert = key !== "planet-stats";
+  reading.hidden = key === "pulse" || key === "planet-stats";
+  reading.inert = reading.hidden;
+  if (key !== "pulse" && key !== "planet-stats") setZhentoLowerThirdContent(surface, key);
+  else surface.dataset.lowerThirdContent = key;
   const context = { landing, key, animations: [] };
   zhentoInformationContext = context;
   landing.dataset.informationContext = key;
@@ -3413,6 +3516,15 @@ function showZhentoInformationContext(landing, key) {
   if (key === "pulse") {
     setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination));
     syncZhentoPillarStat();
+  }
+  if (key === "planet-stats") {
+    surface.setAttribute("aria-labelledby", "zhento-telemetry-title");
+    telemetry.querySelector(".zhento-telemetry__body").scrollTop = 0;
+    if (zhentoTelemetryPayload) {
+      renderZhentoTelemetry(zhentoTelemetryPayload);
+      applyZhentoTelemetryCounts(zhentoTelemetryPayload, true);
+    }
+    void requestZhentoTelemetry(context);
   }
   if (key === "origins" || key === "reimaging") {
     fitZhentoLowerThirdBody();
@@ -3430,7 +3542,11 @@ function showZhentoInformationContext(landing, key) {
       if (zhentoInformationContext === context) context.animations = context.animations.filter((item) => item !== animation);
     }).catch(() => {});
   };
-  if (key === "lore" || key === "origins" || key === "reimaging") {
+  if (key === "planet-stats") {
+    animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 480 });
+    surface.querySelectorAll(":scope > .zhento-lower-third__leading, :scope > .zhento-lower-third__frame, :scope > .zhento-lower-third__signal").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 320 }));
+    ["header", "photos", "world", "archive", "footer"].forEach((part, index) => animate(telemetry.querySelector(`.zhento-telemetry__${part}`), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 80 + index * 50, duration: 200 }));
+  } else if (key === "lore" || key === "origins" || key === "reimaging") {
     animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
     animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
     animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
@@ -3488,8 +3604,7 @@ function resetZhentoInformationSelector(landing) {
     });
     const expanded = key === "planet-stats";
     toggle.setAttribute("aria-expanded", String(expanded));
-    body.setAttribute("aria-hidden", String(!expanded));
-    body.inert = !expanded;
+
   };
   const changeMode = async (control, key) => {
     panel.dataset.selectorUsed = "true";
@@ -3524,9 +3639,7 @@ function resetZhentoInformationSelector(landing) {
       animate(panel, [{ height: `${startHeight}px` }, { height: `${endHeight}px` }], { duration }),
       animate(control, [{ transform: `translateY(${startRow.top - endRow.top}px)` }, { transform: "translateY(0)" }], { duration }),
     ];
-    if (key === "planet-stats") {
-      settles.push(animate(body, [{ opacity: 0 }, { opacity: 1 }], { duration }));
-    } else if (!key) {
+    if (!key) {
       controls.filter((item) => item !== control).forEach((item) => {
         settles.push(animate(item, [{ opacity: 0 }, { opacity: 1 }], { delay: 60, duration: 160 }));
       });

@@ -588,13 +588,6 @@
             </header>
             <section class="zhento-stats zhento-panel" aria-label="Zhento information" data-music-landing-stats data-selected-information="" data-selector-mode="fresh">
               <h2 class="zhento-stats__title"><button class="zhento-info-control zhento-stats__toggle" type="button" aria-expanded="false" aria-controls="zhento-stats-body" data-zhento-stats-toggle data-zhento-information="planet-stats" aria-pressed="false"><span>Planet Stats</span><span class="zhento-stats__chevron" aria-hidden="true"></span></button></h2>
-              <div class="zhento-stats__body" id="zhento-stats-body" aria-hidden="true" inert>
-              <div class="zhento-stats__row" data-zhento-stat="photos" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Photos</span></span><span class="zhento-stats__value" data-music-stat-value="photos"><span data-zhento-photo-count>— / 64,731</span> <span data-zhento-photo-percent>· —%</span></span></div>
-              <div class="zhento-stats__row" data-zhento-stat="bands" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Bands</span><span class="zhento-stats__context">(Rhythm)</span></span><span class="zhento-stats__value" data-music-stat-value="bands">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="shows" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Shows</span><span class="zhento-stats__context">(Synchrony)</span></span><span class="zhento-stats__value" data-music-stat-value="shows">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="people" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">People</span><span class="zhento-stats__context">(Melody)</span></span><span class="zhento-stats__value" data-music-stat-value="people">0</span></div>
-              <div class="zhento-stats__row" data-zhento-stat="venues" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Venues</span><span class="zhento-stats__context">(Harmony)</span></span><span class="zhento-stats__value" data-music-stat-value="venues">0</span></div>
-              </div>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="pulse" aria-pressed="false"><span class="zhento-info-label">Pulse</span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="lore" aria-pressed="false"><span class="zhento-info-label"><span>Lore</span><span class="zhento-info-context">(Story)</span></span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
               <button class="zhento-info-control zhento-info-option" type="button" data-zhento-information="origins" aria-pressed="false"><span class="zhento-info-label"><span>Origins</span><span class="zhento-info-context">(Non-Story)</span></span><span class="zhento-info-arrow" aria-hidden="true">&gt;</span></button>
@@ -606,6 +599,30 @@
               <span class="zhento-lower-third__frame zhento-lower-third__frame--lower" aria-hidden="true"></span>
               <span class="zhento-context-signal zhento-lower-third__signal" aria-hidden="true"></span>
               <div class="zhento-lower-third__reading-zone"></div>
+              <section class="zhento-telemetry" hidden inert aria-labelledby="zhento-telemetry-title">
+                <header class="zhento-lower-third__header zhento-telemetry__header"><h2 id="zhento-telemetry-title">Archive Telemetry</h2><p>Planet Stats</p><p>Live state of the Zhento Music Archive</p><p data-zhento-telemetry-status role="status">Synchronizing Archive...</p></header>
+                <div class="zhento-telemetry__body" id="zhento-stats-body" tabindex="0" role="region" aria-label="Planet archive statistics">
+                  <section class="zhento-telemetry__photos" aria-label="Photo archive">
+              <div class="zhento-stats__row" data-zhento-stat="photos" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">PHOTOS</span></span><span class="zhento-stats__value" data-music-stat-value="photos"><span data-zhento-photo-count>— / 64,731</span> <span data-zhento-photo-percent>· —%</span></span></div>
+                  </section>
+                  <section class="zhento-telemetry__world" aria-label="World totals">
+              <div class="zhento-stats__row" data-zhento-stat="bands" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Bands</span></span><span class="zhento-stats__value" data-music-stat-value="bands">—</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="shows" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Shows</span></span><span class="zhento-stats__value" data-music-stat-value="shows">—</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="people" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">People</span></span><span class="zhento-stats__value" data-music-stat-value="people">—</span></div>
+              <div class="zhento-stats__row" data-zhento-stat="venues" aria-current="false"><span class="zhento-stats__label"><span class="zhento-stats__term">Venues</span></span><span class="zhento-stats__value" data-music-stat-value="venues">—</span></div>
+                  </section>
+                  <section class="zhento-telemetry__archive" aria-labelledby="zhento-archive-progress-title">
+                    <h3 id="zhento-archive-progress-title">ARCHIVE PROGRESS</h3>
+                    <dl>
+                      <div class="zhento-telemetry__sets-row"><dt>Sets Archived</dt><dd><span data-zhento-sets-progress>— / — · —%</span><span class="zhento-telemetry__rail" aria-hidden="true"></span></dd></div>
+                      <div><dt>Bands Reimagined</dt><dd data-zhento-bands-progress>— / —</dd></div>
+                      <div><dt>In Progress</dt><dd data-zhento-archive="inProgress">—</dd></div>
+                      <div><dt>Awaiting Work</dt><dd data-zhento-archive="awaitingArchive">—</dd></div>
+                    </dl>
+                  </section>
+                  <footer class="zhento-telemetry__footer"><span data-zhento-archive-span>ARCHIVE SPAN // — — —</span></footer>
+                </div>
+              </section>
               <section class="zhento-pulse" aria-label="Pillar destinations" hidden inert>
                 <div class="zhento-pulse__overview">
                   <section class="zhento-pulse__box zhento-pulse__info-box" aria-label="Pillar information">

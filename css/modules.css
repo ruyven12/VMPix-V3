@@ -31305,6 +31305,38 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-pillar-tile__category { font-size: .58rem; line-height: 1.1; }
   .zhento-pillar-tile__label { box-sizing: border-box; block-size: 32%; align-content: center; gap: .05rem; padding: .1rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
 }
+/* Planet Stats shares the contextual frame; only its body scrolls within the safe region. */
+.zhento-lower-third[data-lower-third-content="planet-stats"] { block-size: min(36rem, calc(100svh - 15rem)); }
+.zhento-telemetry { display: flex; flex-direction: column; block-size: 100%; min-block-size: 0; pointer-events: auto; text-align: center; }
+.zhento-telemetry__header { flex: 0 0 auto; background: rgba(6,7,12,.86); }
+.zhento-telemetry__header [data-zhento-telemetry-status] { font-size: .6rem; min-block-size: 1.4em; }
+.zhento-telemetry__body { min-block-size: 0; overflow-y: auto; overscroll-behavior-y: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: thin; padding: .6rem .15rem .2rem; }
+.zhento-telemetry__body:focus-visible { outline: 1px solid rgba(137,167,255,.6); outline-offset: -1px; }
+.site-shell[data-shell-route="music"] .zhento-telemetry :is(.zhento-stats__label, .zhento-stats__value) { animation: none; }
+.zhento-telemetry .zhento-stats__row { display: flex; flex-direction: column; justify-content: center; gap: .25rem; min-block-size: 0; padding: .65rem .35rem; border: 1px solid rgba(137,167,255,.19); background: rgba(6,7,12,.54); }
+.zhento-telemetry .zhento-stats__label { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: .25rem; }
+.zhento-telemetry .zhento-stats__value { white-space: normal; text-align: center; font-variant-numeric: tabular-nums; }
+.zhento-telemetry__photos .zhento-stats__row { position: relative; padding-block: .7rem 1rem; }
+.zhento-telemetry__photos .zhento-stats__value { display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem .5rem; font-size: 1rem; }
+.zhento-telemetry__photos .zhento-stats__row::after { content: ""; position: absolute; inset: auto .5rem .35rem; block-size: 2px; background: linear-gradient(90deg, rgba(145,112,235,.9), rgba(137,167,255,.95)); transform: scaleX(var(--zhento-photo-progress, 0)); transform-origin: left; }
+.zhento-telemetry__world { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem; margin-block: .6rem; }
+.zhento-telemetry__world .zhento-stats__value { font-size: 1rem; }
+.zhento-telemetry__archive { padding: .6rem .5rem; border-block: 1px solid rgba(137,167,255,.23); background: rgba(6,7,12,.5); }
+.zhento-telemetry__archive h3 { margin: 0 0 .5rem; font-size: .72rem; font-weight: inherit; color: rgba(170,199,255,.96); }
+.zhento-telemetry__archive dl { display: grid; gap: .45rem; margin: 0; font-size: .65rem; line-height: 1.35; }
+.zhento-telemetry__archive dl > div { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; text-align: left; }
+.zhento-telemetry__archive dd { margin: 0; flex: 0 0 auto; color: #dce6ff; font-variant-numeric: tabular-nums; }
+.zhento-telemetry__sets-row { position: relative; flex-wrap: wrap; padding-block-end: .55rem; }
+.zhento-telemetry__sets-row dd { max-inline-size: 100%; margin-inline-start: auto; text-align: right; }
+.zhento-telemetry__sets-row .zhento-telemetry__rail { position: absolute; inset: auto 0 0; }
+.zhento-telemetry__rail { display: block; margin-block-start: .4rem; block-size: 2px; background: rgba(137,167,255,.15); }
+.zhento-telemetry__rail::after { content: ""; display: block; block-size: 100%; background: linear-gradient(90deg, rgba(145,112,235,.9), rgba(137,167,255,.95)); transform: scaleX(var(--zhento-sets-progress, 0)); transform-origin: left; }
+.zhento-telemetry__footer { display: grid; gap: .3rem; padding-block: .65rem .3rem; font-size: .6rem; color: rgba(184,193,214,.85); }
+@media (max-width: 540px) {
+  [data-zhento-landing][data-information-context="planet-stats"] { --telemetry-context-top: calc(clamp(12rem, 24svh, 14rem) + env(safe-area-inset-top, 0px)); }
+  [data-zhento-landing][data-information-context="planet-stats"] .zhento-identity { --zhento-hud-y: 0px; inset-block-start: calc(var(--telemetry-context-top) - 4.375rem); }
+  .zhento-lower-third[data-lower-third-content="planet-stats"] { inline-size: calc(100vw - 4.1rem); block-size: calc(100svh - 7.15rem - var(--telemetry-context-top, 12rem) - env(safe-area-inset-bottom, 0px)); }
+}
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
   animation: zhentoHudReveal 500ms ease-out 2800ms both;
