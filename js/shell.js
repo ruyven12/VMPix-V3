@@ -3267,7 +3267,6 @@ function clearZhentoBodyScroll(surface) {
 function fitZhentoLowerThirdBody() {
   const landing = document.querySelector("[data-zhento-landing]");
   const surface = landing?.querySelector(".zhento-lower-third");
-  if (landing?.dataset.informationContext === "pulse") { fitZhentoPulseCopy(landing); return; }
   if (!surface || surface.hidden || !["origins", "reimaging"].includes(landing.dataset.informationContext)) return;
   const body = surface.querySelector(".zhento-lower-third__body");
   if (!body) return;
@@ -3295,21 +3294,6 @@ function fitZhentoLowerThirdBody() {
   body.scrollTop = scrollTop;
 }
 
-function fitZhentoPulseCopy(landing) {
-  const copy = landing?.querySelector(".zhento-pulse__detail .zhento-detail__copy");
-  if (!copy) return;
-  const scrollable = !copy.closest(".zhento-pulse__detail").hidden && copy.scrollHeight > copy.clientHeight + 1;
-  if (scrollable) {
-    copy.tabIndex = 0;
-    copy.setAttribute("role", "region");
-    copy.setAttribute("aria-label", "Pillar description");
-  } else {
-    copy.removeAttribute("tabindex");
-    copy.removeAttribute("role");
-    copy.removeAttribute("aria-label");
-  }
-}
-
 function setZhentoPulseView(landing, selected) {
   const pulse = landing.querySelector(".zhento-pulse");
   pulse.dataset.pulseView = selected ? "selected" : "overview";
@@ -3318,7 +3302,6 @@ function setZhentoPulseView(landing, selected) {
   info.inert = !selected;
   info.setAttribute("aria-hidden", String(!selected));
   landing.querySelector(".zhento-lower-third").setAttribute("aria-labelledby", "zhento-pulse-title");
-  fitZhentoPulseCopy(landing);
 }
 
 function selectZhentoPillar(landing, key) {
@@ -3356,25 +3339,24 @@ function cancelZhentoPulseMorph(context) {
 async function morphZhentoPulse(landing, key) {
   const context = zhentoInformationContext;
   const pulse = landing.querySelector(".zhento-pulse");
-  const info = pulse.querySelector(".zhento-pulse__detail");
-  const startHeight = info.hidden ? 0 : info.getBoundingClientRect().height;
-  const startOpacity = info.hidden ? 0 : Number(getComputedStyle(info).opacity);
+  const box = pulse.querySelector(".zhento-pulse__info-box");
+  const startHeight = box.getBoundingClientRect().height;
   cancelZhentoPulseMorph(context);
   selectZhentoPillar(landing, key);
   if (context?.key !== "pulse" || reducedMotion.matches) return;
-  const selected = Boolean(landing.dataset.selectedDestination);
-  const endHeight = selected ? info.getBoundingClientRect().height : 0;
+  const endHeight = box.getBoundingClientRect().height;
+  const content = pulse.querySelector(landing.dataset.selectedDestination ? ".zhento-pulse__detail" : ".zhento-pulse__placeholder");
   const morph = { pulse, animations: [], settle: () => setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination)) };
   context.pulseMorph = morph;
   pulse.dataset.pulseMoving = "true";
-  // The grid remains interactive throughout; only the info region changes height.
-  info.hidden = false;
-  const animation = info.animate([
-    { height: `${startHeight}px`, opacity: selected && startHeight ? .35 : startOpacity },
-    { height: `${endHeight}px`, opacity: selected ? 1 : 0 },
-  ], { duration: 240, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both" });
-  morph.animations.push(animation);
-  await animation.finished.catch(() => {});
+  // Only the upper box resizes; the lower selector always remains interactive.
+  morph.animations.push(box.animate([{ height: `${startHeight}px` }, { height: `${endHeight}px` }], {
+    duration: 240, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both",
+  }));
+  morph.animations.push(content.animate([{ opacity: .2 }, { opacity: 1 }], {
+    duration: 240, easing: "ease-out", fill: "both",
+  }));
+  await Promise.all(morph.animations.map((animation) => animation.finished.catch(() => {})));
   if (zhentoInformationContext === context && context.pulseMorph === morph) cancelZhentoPulseMorph(context);
 }
 
@@ -3432,7 +3414,7 @@ function showZhentoInformationContext(landing, key) {
     setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination));
     syncZhentoPillarStat();
   }
-  if (key === "pulse" || key === "origins" || key === "reimaging") {
+  if (key === "origins" || key === "reimaging") {
     fitZhentoLowerThirdBody();
     document.fonts?.ready.then(() => {
       if (zhentoInformationContext === context) fitZhentoLowerThirdBody();
@@ -3458,10 +3440,11 @@ function showZhentoInformationContext(landing, key) {
     animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 210, duration: 190 });
   } else {
     animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 320 });
-    animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 230 });
-    surface.querySelectorAll(".zhento-lower-third__frame").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { duration: 260 }));
-    animate(surface.querySelector(".zhento-lower-third__signal"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .9, transform: "scaleX(1)", offset: .6 }, { opacity: .6, transform: "scaleX(1)" }], { duration: 320 });
-    animate(pulse, [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 110, duration: 210 });
+    pulse.querySelectorAll(".zhento-lower-third__leading").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 230 }));
+    pulse.querySelectorAll(".zhento-lower-third__frame").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { duration: 260 }));
+    pulse.querySelectorAll(".zhento-lower-third__signal").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .9, transform: "scaleX(1)", offset: .6 }, { opacity: .6, transform: "scaleX(1)" }], { duration: 320 }));
+    animate(pulse.querySelector(".zhento-pulse__info-box"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 80, duration: 200 });
+    animate(pulse.querySelector(".zhento-pulse__grid"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 130, duration: 190 });
   }
 }
 let zhentoSelectorMorph = null;

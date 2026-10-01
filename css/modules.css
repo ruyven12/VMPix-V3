@@ -31224,11 +31224,18 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   [data-zhento-context-managed] .zhento-detail:not([hidden]) { animation: none; }
 }
-/* Pulse shares the contextual frame; overview and detail occupy the same footprint. */
+/* Pulse uses separate information and selector boxes in the same contextual HUD family. */
 .zhento-lower-third [hidden] { display: none !important; }
-.zhento-lower-third[data-lower-third-content="pulse"] { inline-size: min(62rem, calc(100vw - 2 * clamp(2.2rem, 6.2vw, 7.5rem))); }
+.zhento-lower-third[data-lower-third-content="pulse"] { inline-size: min(62rem, calc(100vw - 2 * clamp(2.2rem, 6.2vw, 7.5rem))); padding: 0; background: none; clip-path: none; }
+.zhento-lower-third[data-lower-third-content="pulse"] > :is(.zhento-lower-third__leading, .zhento-lower-third__frame, .zhento-lower-third__signal), .zhento-lower-third[data-lower-third-content="pulse"]::after { display: none; }
+.zhento-pulse__overview { display: flex; flex-direction: column; gap: .65rem; }
+.zhento-pulse__box { position: relative; box-sizing: border-box; min-inline-size: 0; padding: .65rem 1.1rem .85rem 2.25rem; background: linear-gradient(110deg, rgba(145,112,235,.1), transparent 45%), rgba(6,7,12,.6); clip-path: polygon(6% 0,99% 0,100% 8%,100% 88%,98% 100%,3% 100%,0 75%,0 28%); }
+.zhento-pulse__info-box { flex: 0 0 auto; }
+.zhento-pulse__selector-box { display: flex; flex-direction: column; }
+.zhento-pulse__placeholder { display: flex; align-items: baseline; justify-content: center; gap: .5rem; }
+.zhento-pulse__placeholder p { margin: 0; }
 .zhento-pulse { text-align: center; pointer-events: auto; }
-.zhento-pulse__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; margin-block-start: .65rem; }
+.zhento-pulse__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; margin-block-start: 0; }
 .zhento-pillar-tile {
   --pillar-edge: 137, 167, 255; --pillar-focus: 50% 42%;
   position: relative; isolation: isolate; overflow: hidden; min-inline-size: 0; min-block-size: 44px; block-size: 10rem;
@@ -31252,19 +31259,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-pillar-tile__arrow { position: absolute; inset-inline-end: .4rem; inset-block-end: .3rem; font-size: .8rem; color: rgb(var(--pillar-edge)); }
 .zhento-pillar-tile[aria-pressed="true"] { border-color: rgb(var(--pillar-edge)); box-shadow: inset 0 0 0 2px rgba(var(--pillar-edge), .8), 0 0 .45rem rgba(var(--pillar-edge), .25); }
 .zhento-pillar-tile:focus-visible, .zhento-pulse .zhento-enter:focus-visible { outline: 2px solid rgba(220,230,255,.85); outline-offset: -3px; }
-.zhento-pulse__detail { box-sizing: border-box; display: flex; flex-direction: column; flex: 0 0 auto; min-block-size: 0; padding-inline: .75rem; background: linear-gradient(90deg, rgba(6,7,12,.5), rgba(6,7,12,.3) 78%, transparent); }
+.zhento-pulse__detail { box-sizing: border-box; display: flex; flex-direction: column; flex: 0 0 auto; min-block-size: 0; padding: .25rem 0 0; background: linear-gradient(90deg, rgba(6,7,12,.5), rgba(6,7,12,.3) 78%, transparent); }
 .zhento-pulse__detail > .zhento-lower-third__header, .zhento-pulse__detail > .zhento-enter { flex: 0 0 auto; }
-.zhento-pulse[data-pulse-moving="true"] .zhento-pulse__detail { overflow: clip; }
-.zhento-pillar-tile::after { position: absolute; inset: 0 0 auto; block-size: var(--pillar-art-share, 60%); background: rgba(6,7,12,.35); opacity: 0; content: ""; pointer-events: none; }
+.zhento-pulse[data-pulse-moving="true"] .zhento-pulse__info-box { overflow: clip; }
+.zhento-pillar-tile::after { position: absolute; inset: 0 0 auto; z-index: -1; block-size: var(--pillar-art-share, 100%); background: rgba(6,7,12,.7); opacity: 0; content: ""; pointer-events: none; }
 .zhento-pulse[data-pulse-view="selected"] .zhento-pillar-tile[data-artwork-state="ready"][aria-pressed="false"]::after { opacity: 1; }
 @media (prefers-reduced-motion: no-preference) {
   .zhento-pillar-tile::after { transition: opacity 200ms ease-out; }
 }
 .zhento-pulse__detail .zhento-detail__title { border: 0; padding: 0; line-height: 1.3; text-shadow: none; }
 .zhento-pulse__detail .zhento-detail__stat { line-height: 1.35; text-shadow: none; }
-.zhento-pulse__detail .zhento-detail__copy { margin: .5rem 0; padding: 0; border: 0; font-family: inherit; font-size: calc(.76rem + 2px); line-height: 1.4; letter-spacing: 0; }
+.zhento-pulse__detail .zhento-detail__copy { margin: .3rem 0; padding: 0; border: 0; font-family: inherit; font-size: calc(.76rem + 2px); line-height: 1.4; letter-spacing: 0; }
 .zhento-pulse .zhento-enter { position: static; transform: none; display: block; inline-size: 100%; min-block-size: 44px; margin: 0; padding: .45rem; border: 0; background: transparent; color: #dce6ff; font: inherit; font-size: .72rem; cursor: pointer; }
 .zhento-pulse .zhento-enter:disabled { opacity: .5; cursor: default; }
+@media (min-width: 541px) {
+  .zhento-pulse__selector-box { padding-inline-start: max(2.25rem, 6%); }
+}
 @media (max-width: 900px) {
   .zhento-pulse__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .zhento-pillar-tile { block-size: 7rem; }
@@ -31281,20 +31291,19 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-lower-third[data-lower-third-content="pulse"] {
     --pulse-available-height: calc(100svh - 7.15rem - var(--pulse-context-top, 12rem) - env(safe-area-inset-bottom, 0px));
     block-size: var(--pulse-available-height);
-    padding-block: .1rem .55rem;
+    padding: 0;
   }
   .zhento-pulse, .zhento-pulse__overview { block-size: 100%; min-block-size: 0; }
-  .zhento-pulse__overview { display: flex; flex-direction: column; }
-  .zhento-pulse__detail { max-block-size: max(9rem, calc(100% - clamp(13rem, 34svh, 21rem) - 2rem)); }
-  .zhento-pulse__detail .zhento-detail__copy { flex: 0 1 auto; min-block-size: 1.4em; overflow-y: auto; overscroll-behavior-y: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-  .zhento-pulse__detail .zhento-detail__copy:focus-visible { outline: 1px solid rgba(137,167,255,.6); outline-offset: 1px; }
-  .zhento-pulse__overview > .zhento-lower-third__header { display: flex; flex: 0 0 auto; align-items: baseline; justify-content: center; gap: .5rem; padding-block-end: 0; background: rgba(6,7,12,.94); }
-  .zhento-pulse__overview > .zhento-lower-third__header p { margin: 0; }
-  .zhento-pulse__grid { flex: 1; min-block-size: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(.15rem, .5svh, .3rem); margin-block-start: clamp(.125rem, .4svh, .25rem); }
+  .zhento-pulse__overview { gap: clamp(.4rem, 1svh, .65rem); }
+  .zhento-pulse__box { padding: .45rem .85rem .7rem 1.25rem; }
+  .zhento-pulse__selector-box { flex: 1; min-block-size: 0; }
+  .zhento-pulse__info-box .zhento-lower-third__header { padding-block-end: .25rem; }
+  .zhento-pulse__grid { flex: 1; min-block-size: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(.15rem, .5svh, .3rem); margin-block-start: 0; }
   .zhento-pillar-tile { --pillar-art-share: 68%; block-size: 100%; }
-  .zhento-pillar-tile__title { font-size: .65rem; }
-  .zhento-pillar-tile__category { font-size: .58rem; }
-  .zhento-pillar-tile__label { box-sizing: border-box; block-size: 32%; align-content: center; gap: .1rem; padding: .25rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
+  .zhento-pillar-tile__arrow { inset-block-start: .3rem; inset-block-end: auto; }
+  .zhento-pillar-tile__title { font-size: .65rem; line-height: 1.1; }
+  .zhento-pillar-tile__category { font-size: .58rem; line-height: 1.1; }
+  .zhento-pillar-tile__label { box-sizing: border-box; block-size: 32%; align-content: center; gap: .05rem; padding: .1rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
 }
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {
