@@ -764,7 +764,7 @@ function startDaiionGatewayTransition() {
     entry.cancelReady = null;
     if (!current()) return;
     veil.dataset.revealing = "true";
-    const dissolveEnds = ["rotate(-11deg) scale(1.92, 1.6)", "rotate(9deg) scale(1.75, 1.92)", "rotate(3deg) scale(1.86, 1.82)"];
+    const dissolveEnds = ["rotate(-9deg) scale(2.08, 1.38) skewX(5deg)", "rotate(7deg) scale(1.94, 1.64) skewX(-4deg)", "rotate(5deg) scale(2.04, 1.56) skewX(3deg)"];
     await Promise.all([
       ...fronts.map((front, index) => animate(front, [{ opacity: 1, transform: spillEnds[index] }, { opacity: [.12, .38, .66][index], offset: .38 }, { opacity: 0, transform: dissolveEnds[index] }], { duration: 380, easing: "linear" })),
       animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 }),
