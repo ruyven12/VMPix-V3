@@ -624,7 +624,7 @@ function prepareDaiionGatewayArtwork() {
   if (!daiionGatewayArtworkReady) {
     const image = new Image();
     image.src = new URL(getPortfolioGatewayBackgroundSrc("battleground"), location.origin + "/").href;
-    daiionGatewayArtworkReady = image.decode().catch(() => {});
+    daiionGatewayArtworkReady = image.decode().then(() => true, () => { daiionGatewayArtworkReady = null; return false; });
   }
   return daiionGatewayArtworkReady;
 }
@@ -650,7 +650,7 @@ function startDaiionGatewayTransition() {
     entry.promoted = true;
     shell.dataset.daiionEntryStage = "covered";
     shell.dataset.portfolioGatewayState = "filling-screen";
-    // The opaque veil already covers every corner; prepare the final world underneath it.
+    // Decoded destination art replaces the world beneath the continuing transparent wave.
     applyPortfolioGatewaySettledFrame();
     shell.classList.add("is-portfolio-world-arrived");
     handoffPortfolioGatewayRoute("battleground");
@@ -720,17 +720,29 @@ function startDaiionGatewayTransition() {
   const rim = document.createElement("div");
   rim.className = "daiion-gateway-portal__rim";
   portal.append(depth, rim);
-  const veil = document.createElement("div");
-  veil.className = "daiion-gateway-veil";
-  // Reference world-entry contract: 580ms portal, 560ms safe flood, 380ms patch reveal.
-  // Future world identities reuse the ownership/coverage contract and replace only these visuals.
-  const fronts = Array.from({ length: 3 }, (_, index) => {
-    const front = document.createElement("div");
-    front.className = `daiion-gateway-front daiion-gateway-front--${index + 1}`;
-    veil.append(front);
-    return front;
+  // Reference world entry: 580ms portal, 560ms outward transport, 380ms dissipation.
+  // Future world identities may reuse this ownership contract with their own ring material.
+  const transport = document.createElement("div");
+  transport.className = "daiion-gateway-transport";
+  const rings = Array.from({ length: 2 }, (_, index) => {
+    const ring = document.createElement("div");
+    ring.className = `daiion-gateway-wave daiion-gateway-wave--${index + 1}`;
+    transport.append(ring);
+    return ring;
   });
-  layer.append(feeds, portal, veil);
+  const streaks = document.createElementNS(feeds.namespaceURI, "svg");
+  streaks.classList.add("daiion-gateway-transport-streaks");
+  streaks.setAttribute("viewBox", "-140 -140 280 280");
+  for (let index = 0; index < 18; index += 1) {
+    const angle = index * 2.39996;
+    const inner = 83 + (index % 4) * 4;
+    const outer = inner + 9 + (index % 3) * 8;
+    const path = document.createElementNS(feeds.namespaceURI, "path");
+    path.setAttribute("d", `M ${Math.cos(angle) * inner} ${Math.sin(angle) * inner} Q ${Math.cos(angle + .018) * (inner + 9)} ${Math.sin(angle + .018) * (inner + 9)} ${Math.cos(angle + .026) * outer} ${Math.sin(angle + .026) * outer}`);
+    streaks.append(path);
+  }
+  transport.append(streaks);
+  layer.append(feeds, portal, transport);
   portfolioWorldGateway.append(layer);
   entry.layer = layer;
   shell.dataset.daiionEntryStage = "portal";
@@ -747,27 +759,30 @@ function startDaiionGatewayTransition() {
       ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9 }], { duration: 480 })),
     ]);
     if (!current()) return;
-    shell.dataset.daiionEntryStage = "veil";
-    const originScale = { x: radius * 1.6 / width, y: radius * 1.6 / height };
-    const spillStarts = [-13, 11, 2].map((angle) => `rotate(${angle}deg) scale(${originScale.x}, ${originScale.y})`);
-    const spillEnds = ["rotate(-13deg) scale(1.85, 1.55)", "rotate(11deg) scale(1.7, 1.85)", "rotate(2deg) scale(1.8, 1.75)"];
+    // The transparent swap needs decoded artwork; keep the contained portal while it prepares.
+    const ready = await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(() => resolve(false), 5000); })]);
+    clearTimeout(entry.readyTimer);
+    entry.cancelReady = null;
+    if (!current()) return;
+    if (!ready) { clearPortfolioGatewayState(); syncPortfolioGatewayTriggerState(); return; }
+    shell.dataset.daiionEntryStage = "transport";
+    const reach = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 24;
+    const peak = reach / radius;
+    const waveTransform = (scale, angle = 0) => `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
     await Promise.all([
-      ...fronts.map((front, index) => animate(front, [{ opacity: 0, transform: spillStarts[index] }, { opacity: 1, offset: .18 }, { opacity: 1, transform: spillEnds[index] }], { duration: 560, easing: "cubic-bezier(.32,.18,.68,.78)" })),
-      animate(rim, [{ opacity: 1 }, { opacity: .3 }], { duration: 260 }),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: .9, transform: waveTransform(1, index * -9) }, { opacity: index ? .52 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }], { duration: 560, easing: "cubic-bezier(.24,.2,.66,.92)" })),
+      animate(streaks, [{ opacity: 0, transform: waveTransform(.92) }, { opacity: .8, offset: .2 }, { opacity: .56, transform: waveTransform(peak * .83, 4) }], { duration: 560, easing: "linear" }),
+      animate(rim, [{ opacity: 1, transform: "rotate(8deg)" }, { opacity: .35, transform: "rotate(74deg)" }], { duration: 560 }),
       animate(feeds, [{ opacity: 1 }, { opacity: 0 }], { duration: 280 }),
     ]);
     if (!current()) return;
     promote();
     if (!current()) return;
-    await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(resolve, 5000); })]);
-    clearTimeout(entry.readyTimer);
-    entry.cancelReady = null;
-    if (!current()) return;
-    veil.dataset.revealing = "true";
-    const dissolveEnds = ["rotate(-9deg) scale(2.08, 1.38) skewX(5deg)", "rotate(7deg) scale(1.94, 1.64) skewX(-4deg)", "rotate(5deg) scale(2.04, 1.56) skewX(3deg)"];
+    transport.dataset.revealing = "true";
     await Promise.all([
-      ...fronts.map((front, index) => animate(front, [{ opacity: 1, transform: spillEnds[index] }, { opacity: [.12, .38, .66][index], offset: .38 }, { opacity: 0, transform: dissolveEnds[index] }], { duration: 380, easing: "linear" })),
-      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 }),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .52 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }, { opacity: 0, transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) }], { duration: 380, easing: "linear" })),
+      animate(streaks, [{ opacity: .56, transform: waveTransform(peak * .83, 4) }, { opacity: 0, transform: waveTransform(peak * 1.36, 7) }], { duration: 380, easing: "linear" }),
+      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }),
     ]);
     if (current()) cancelDaiionGatewayTransition();
   })();
