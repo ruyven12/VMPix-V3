@@ -728,9 +728,6 @@ function startDaiionGatewayTransition() {
     veil.append(front);
     return front;
   });
-  const pockets = document.createElement("div");
-  pockets.className = "daiion-gateway-veil__pockets";
-  veil.append(pockets);
   layer.append(feeds, portal, veil);
   portfolioWorldGateway.append(layer);
   entry.layer = layer;
@@ -751,9 +748,8 @@ function startDaiionGatewayTransition() {
     shell.dataset.daiionEntryStage = "veil";
     const spillStarts = ["translate(-8%, -5%) rotate(-18deg) scale(.12, .18)", "translate(9%, -2%) rotate(14deg) scale(.16, .1)", "translate(-2%, 8%) rotate(-7deg) scale(.1, .2)"];
     const spillEnds = ["translate(-5%, -3%) rotate(-8deg) scale(1.65)", "translate(6%, -2%) rotate(7deg) scale(1.7)", "translate(0, 6%) rotate(-3deg) scale(1.65)"];
-    void animate(pockets, [{ transform: "translate(-3%, 2%) scale(1.05)" }, { transform: "translate(4%, -3%) scale(1.12)" }], { duration: 880, iterations: Infinity, direction: "alternate" });
     await Promise.all([
-      ...fronts.map((front, index) => animate(front, [{ opacity: 0, transform: spillStarts[index] }, { opacity: 1, offset: .18 }, { opacity: 1, transform: spillEnds[index] }], { duration: 560, easing: "cubic-bezier(.42,0,.68,1)" })),
+      ...fronts.map((front, index) => animate(front, [{ opacity: 0, transform: spillStarts[index] }, { opacity: 1, offset: .18 }, { opacity: 1, transform: spillEnds[index] }], { duration: 560, easing: "cubic-bezier(.32,.18,.68,.78)" })),
       animate(rim, [{ opacity: 1 }, { opacity: .3 }], { duration: 260 }),
       animate(feeds, [{ opacity: 1 }, { opacity: 0 }], { duration: 280 }),
     ]);
@@ -768,9 +764,8 @@ function startDaiionGatewayTransition() {
     const recedeMid = ["translate(-42%, -17%) rotate(-15deg) scale(.94, .85)", "translate(47%, -13%) rotate(13deg) scale(.92, .8)", "translate(5%, 53%) rotate(-9deg) scale(1, .85)"];
     const recede = ["translate(-130%, -45%) rotate(-18deg) scale(1, .65)", "translate(125%, -30%) rotate(16deg) scale(.85, .7)", "translate(15%, 140%) rotate(-12deg) scale(.8, .7)"];
     await Promise.all([
-      ...fronts.map((front, index) => animate(front, [{ opacity: 1, transform: spillEnds[index] }, { opacity: 1, transform: recedeMid[index], offset: .38 }, { opacity: 0, transform: recede[index] }], { duration: 380, easing: "linear" })),
+      ...fronts.map((front, index) => animate(front, [{ opacity: 1, transform: spillEnds[index] }, { opacity: 1, transform: recedeMid[index], offset: .30 + index * .09 }, { opacity: 0, transform: recede[index] }], { duration: 380, easing: "linear" })),
       animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 }),
-      animate(pockets, [{ opacity: .8 }, { opacity: 0 }], { duration: 260 }),
     ]);
     if (current()) cancelDaiionGatewayTransition();
   })();
