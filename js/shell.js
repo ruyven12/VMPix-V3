@@ -259,7 +259,7 @@ function getPortfolioGatewaySettledFrameElements() {
   ];
 }
 
-function applyPortfolioGatewaySettledFrame() {
+function applyPortfolioGatewaySettledFrame({ commitLayout = true } = {}) {
   if (!shell || !portfolioWorldGateway) {
     return;
   }
@@ -283,8 +283,8 @@ function applyPortfolioGatewaySettledFrame() {
     element.style.transform = "translateZ(0) scale3d(1, 1, 1)";
     element.style.transition = "none";
   });
-  // Commit the direct-route final frame before arrived classes are applied.
-  portfolioWorldGateway.getBoundingClientRect();
+  // Direct arrivals commit immediately; animated promotion batches these writes under the wave.
+  if (commitLayout) portfolioWorldGateway.getBoundingClientRect();
 }
 
 function clearPortfolioGatewaySettledFrame() {
@@ -647,11 +647,17 @@ function startDaiionGatewayTransition() {
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
   const promote = () => {
     if (!current() || entry.promoted || window.location.pathname !== routePaths.portfolio) return;
+    // Read visualViewport before presentation writes: its width getter otherwise forces their layout.
+    const measured = entry.viewportMetrics;
+    entry.viewportUnchanged = Boolean(measured
+      && measured.width === window.innerWidth && measured.height === window.innerHeight
+      && measured.visualWidth === window.visualViewport?.width
+      && measured.visualHeight === window.visualViewport?.height);
     entry.promoted = true;
     shell.dataset.daiionEntryStage = "covered";
     shell.dataset.portfolioGatewayState = "filling-screen";
     // Decoded destination art replaces the world beneath the continuing transparent wave.
-    applyPortfolioGatewaySettledFrame();
+    applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics });
     shell.classList.add("is-portfolio-world-arrived");
     handoffPortfolioGatewayRoute("battleground");
     syncPortfolioGatewayTriggerState();
@@ -671,6 +677,12 @@ function startDaiionGatewayTransition() {
     return;
   }
   const artworkReady = prepareDaiionGatewayArtwork();
+  // Measure the persistent Shell before motion, not twice during the 140ms world exchange.
+  updateViewportMetrics();
+  entry.viewportMetrics = {
+    width: window.innerWidth, height: window.innerHeight,
+    visualWidth: window.visualViewport?.width, visualHeight: window.visualViewport?.height,
+  };
   const viewport = portfolioWorldGateway.getBoundingClientRect();
   const width = viewport.width, height = viewport.height;
   const center = { x: width / 2, y: height * .42 };
@@ -745,27 +757,29 @@ function startDaiionGatewayTransition() {
   layer.append(feeds, portal, transport);
   portfolioWorldGateway.append(layer);
   entry.layer = layer;
-  shell.dataset.daiionEntryStage = "portal";
+  shell.dataset.daiionEntryStage = "preparing";
   const animate = (node, frames, options) => {
     const animation = node.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...options });
     entry.animations.push(animation);
     return animation.finished.catch(() => {});
   };
   void (async () => {
-    await Promise.all([
-      animate(portal, [{ opacity: 0, transform: "translate(-50%, -50%) scale(.72)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1)", offset: .72 }, { opacity: 1, transform: "translate(-50%, -50%) scale(.985)", offset: .84 }, { opacity: 1, transform: "translate(-50%, -50%) scale(1.035)" }], { duration: 580 }),
-      animate(rim, [{ transform: "rotate(-24deg) scale(.98)", opacity: .2 }, { transform: "rotate(4deg) scale(.99)", opacity: .72, offset: .74 }, { transform: "rotate(8deg) scale(1.06)", opacity: 1 }], { duration: 580 }),
-      animate(depth, [{ transform: "scale(1.08) skewY(-2deg)" }, { transform: "scale(.99) skewY(1.5deg)", offset: .82 }, { transform: "scale(1.04) skewY(-.8deg)" }], { duration: 580 }),
-      animate(rings[0], [{ opacity: 0, transform: "translate(-50%, -50%) scale(1)" }, { opacity: .62, transform: "translate(-50%, -50%) scale(1.035)" }], { delay: 460, duration: 120 }),
-      ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9, offset: .66 }, { strokeDashoffset: -.25, opacity: 0 }], { duration: 580 })),
-    ]);
-    if (!current()) return;
-    // The transparent swap needs decoded artwork; keep the contained portal while it prepares.
+    // Start the visible 580ms clock only after decode: geometry must not advance behind late artwork.
     const ready = await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(() => resolve(false), 5000); })]);
     clearTimeout(entry.readyTimer);
     entry.cancelReady = null;
     if (!current()) return;
     if (!ready) { clearPortfolioGatewayState(); syncPortfolioGatewayTriggerState(); return; }
+    shell.dataset.daiionEntryStage = "portal";
+    await Promise.all([
+      // Explicit WAAPI from-state is paint-safe; the audited jump came from .72 scale and front-loaded easing.
+      animate(portal, [{ opacity: .55, transform: "translate(-50%, -50%) scale(.06)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1.035)" }], { duration: 580, easing: "linear" }),
+      animate(rim, [{ transform: "rotate(-24deg) scale(.98)", opacity: .2 }, { transform: "rotate(4deg) scale(.99)", opacity: .72, offset: .74 }, { transform: "rotate(8deg) scale(1.06)", opacity: 1 }], { duration: 580 }),
+      animate(depth, [{ transform: "scale(1.08) skewY(-2deg)" }, { transform: "scale(.99) skewY(1.5deg)", offset: .82 }, { transform: "scale(1.04) skewY(-.8deg)" }], { duration: 580 }),
+      animate(rings[0], [{ opacity: 0, transform: "translate(-50%, -50%) scale(.8333)" }, { opacity: .62, transform: "translate(-50%, -50%) scale(1.035)" }], { delay: 460, duration: 120, easing: "linear" }),
+      ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9, offset: .66 }, { strokeDashoffset: -.25, opacity: 0 }], { duration: 580 })),
+    ]);
+    if (!current()) return;
     shell.dataset.daiionEntryStage = "transport";
     const reach = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 24;
     const peak = reach / radius;
@@ -5511,7 +5525,11 @@ function resetShellScroller(scroller) {
 }
 
 function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
-  updateViewportMetrics();
+  const entry = daiionGatewayTransition;
+  const persistentViewportUnchanged = route.name === "wrestling" && entry?.promoted
+    && entry.generation === portfolioGatewayGeneration && entry.viewportUnchanged;
+  // Keep normal route/scroll ownership; only the already-measured persistent entry avoids a second flush.
+  if (!persistentViewportUnchanged) updateViewportMetrics();
   if (options.shouldResetScroll === false || v3RouteContext.pending) {
     return;
   }
