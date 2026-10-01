@@ -630,19 +630,44 @@ function prepareDaiionGatewayArtwork(worldName = "battleground") {
   }
   return daiionGatewayArtworkReady.get(worldName);
 }
-function cancelDaiionGatewayTransition() {
-  const entry = daiionGatewayTransition;
-  daiionGatewayTransition = null;
+function releaseDaiionGatewayPassage(entry) {
   entry?.animations.forEach((animation) => animation.cancel());
-  clearTimeout(entry?.readyTimer);
-  entry?.cancelReady?.();
+  if (entry) entry.animations.length = 0;
   entry?.layer?.remove();
   entry?.blendStyles?.forEach(({ element, opacity, opacityPriority, willChange, willChangePriority }) => {
     element.style.setProperty("opacity", opacity, opacityPriority);
     element.style.setProperty("will-change", willChange, willChangePriority);
   });
-  if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
+  if (entry) { entry.layer = null; entry.blendStyles = null; }
   if (shell) { delete shell.dataset.daiionEntryStage; delete shell.dataset.daiionWorldExchange; }
+}
+
+function resolveMusicTransportArrival(entry) {
+  // The wave retires at 940ms; this same generation owns the retained landing until its frame resolves.
+  releaseDaiionGatewayPassage(entry);
+  const panel = musicNexusShell.querySelector("[data-music-landing-stats]");
+  if (!panel) return Promise.resolve();
+  return new Promise((resolve) => {
+    const dispose = () => { panel.removeEventListener("animationend", finish); entry.cancelArrival = null; resolve(); };
+    const finish = (event) => {
+      if (event.target !== panel || event.animationName !== "zhentoStatsPanelProject"
+        || daiionGatewayTransition !== entry || entry.generation !== portfolioGatewayGeneration) return;
+      dispose();
+    };
+    entry.cancelArrival = dispose;
+    panel.addEventListener("animationend", finish);
+    shell.dataset.musicTransportEntry = "resolving";
+  });
+}
+
+function cancelDaiionGatewayTransition() {
+  const entry = daiionGatewayTransition;
+  daiionGatewayTransition = null;
+  entry?.cancelArrival?.();
+  clearTimeout(entry?.readyTimer);
+  entry?.cancelReady?.();
+  releaseDaiionGatewayPassage(entry);
+  if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
   if (entry?.worldName === "soundtrack") {
     if (entry.promoted && getRouteFromUrl().name === "music") {
       shell.dataset.musicTransportEntry = "settled";
@@ -693,6 +718,10 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     shell.dataset.musicTransportEntry = "prepared";
     resetZhentoLandingSelection();
     showMusicNexusLanding({ shouldScroll: false });
+    // Prepare the destination's own scroller before motion; adoption need not reset it again.
+    resetShellScroller(musicNexusShell);
+    entry.destinationScroller = musicNexusShell;
+    entry.destinationScrollerWasAtOrigin = musicNexusShell.scrollTop === 0 && musicNexusShell.scrollLeft === 0;
     musicNexusShell.setAttribute("aria-hidden", "true");
     musicNexusShell.inert = true;
   }
@@ -880,6 +909,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     if (!current()) return;
     delete shell.dataset.daiionWorldExchange;
     await waveMotion;
+    if (current() && worldName === "soundtrack") await resolveMusicTransportArrival(entry);
     if (current()) cancelDaiionGatewayTransition();
   })();
 }
@@ -4267,8 +4297,10 @@ function showMusicNexus(options = {}) {
   setHubChromeHidden(true);
   const initialSection = options.initialSection || "landing";
   if (initialSection === "landing" && typeof showMusicNexusLanding === "function") {
-    resetZhentoLandingSelection();
-    showMusicNexusLanding({ shouldScroll: false });
+    if (!options.fromPortfolioTransport) {
+      resetZhentoLandingSelection();
+      showMusicNexusLanding({ shouldScroll: false });
+    }
     requestMusicLandingStats();
     setPortfolioEngineHudCurrentView("Outskirts of Zhento");
   } else {
@@ -5614,6 +5646,8 @@ function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
   }
   // Portfolio and the persistent destination share this already-zero scroller; scrollTo would force layout.
   if (persistentViewportUnchanged && entry.scrollerWasAtOrigin && entry.scroller === getActiveShellScroller(route)) return;
+  if (persistentViewportUnchanged && route.name === "music" && entry.destinationScrollerWasAtOrigin
+    && entry.destinationScroller === getActiveShellScroller(route)) return;
 
   window.requestAnimationFrame(() => {
     if (!v3RouteContext.pending && v3RouteContext.route === route) resetShellScroller(getActiveShellScroller(route));

@@ -31878,3 +31878,43 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation-duration: 1ms !important;
   animation-delay: 0ms !important;
 }
+
+/* Prepared effects have no running CSS clock; resolving starts each finite effect exactly once. */
+.site-shell:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) :is(.zhento-identity__planet,.zhento-identity__name,.zhento-identity__subtitle,.zhento-top-hud-rail,.zhento-side-hud-rail,.zhento-stats,.zhento-stats__title,.zhento-stats__label,.zhento-stats__value),
+.site-shell:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .zhento-stats::before {
+  animation-name: none !important;
+}
+
+/* A transport entry resolves the existing identity and selector without the direct-load holds. */
+.site-shell[data-music-transport-entry="resolving"] .zhento-identity {
+  opacity: 1;
+  animation: zhentoTransportIdentityProject 720ms cubic-bezier(.2,.74,.24,1) 900ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-identity__planet {
+  animation: zhentoIdentityResolve 700ms ease-out both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-identity__name {
+  animation: zhentoIdentityResolve 950ms ease-out 180ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-identity__subtitle {
+  animation: zhentoIdentityResolve 520ms ease-out 720ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] :is(.zhento-top-hud-rail,.zhento-side-hud-rail) {
+  animation: zhentoHudReveal 500ms ease-out 250ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-stats {
+  animation: zhentoStatsPanelProject 1040ms cubic-bezier(.2,.74,.24,1) 660ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-stats::before {
+  animation: daiionArchiveStatsProjectionLine 470ms cubic-bezier(.2,.74,.24,1) 660ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-stats__title {
+  animation: daiionArchiveStatsContentResolve 180ms ease-out 1400ms both !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .zhento-info-option {
+  animation: daiionArchiveStatsLabelResolve 220ms ease-out 1400ms both !important;
+}
+@keyframes zhentoTransportIdentityProject {
+  from { opacity: 1; transform: translate3d(-50%,-50%,0) scale3d(1,1,1); }
+  to { opacity: .88; transform: var(--zhento-project-to); }
+}
