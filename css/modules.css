@@ -31228,7 +31228,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-lower-third [hidden] { display: none !important; }
 .zhento-lower-third[data-lower-third-content="pulse"] { inline-size: min(62rem, calc(100vw - 2 * clamp(2.2rem, 6.2vw, 7.5rem))); padding: 0; background: none; clip-path: none; }
 .zhento-lower-third[data-lower-third-content="pulse"] > :is(.zhento-lower-third__leading, .zhento-lower-third__frame, .zhento-lower-third__signal), .zhento-lower-third[data-lower-third-content="pulse"]::after { display: none; }
-.zhento-pulse__overview { display: flex; flex-direction: column; gap: .65rem; }
+.zhento-pulse__overview { display: flex; flex-direction: column; gap: 15px; }
 .zhento-pulse__box { position: relative; box-sizing: border-box; min-inline-size: 0; padding: .65rem 1.1rem .85rem 2.25rem; background: linear-gradient(110deg, rgba(145,112,235,.1), transparent 45%), rgba(6,7,12,.6); clip-path: polygon(6% 0,99% 0,100% 8%,100% 88%,98% 100%,3% 100%,0 75%,0 28%); }
 .zhento-pulse__info-box { flex: 0 0 auto; }
 .zhento-pulse__selector-box { display: flex; flex-direction: column; }
@@ -31294,7 +31294,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     padding: 0;
   }
   .zhento-pulse, .zhento-pulse__overview { block-size: 100%; min-block-size: 0; }
-  .zhento-pulse__overview { gap: clamp(.4rem, 1svh, .65rem); }
+  .zhento-pulse__overview { gap: 15px; }
   .zhento-pulse__box { padding: .45rem .85rem .7rem 1.25rem; }
   .zhento-pulse__selector-box { flex: 1; min-block-size: 0; }
   .zhento-pulse__info-box .zhento-lower-third__header { padding-block-end: .25rem; }
