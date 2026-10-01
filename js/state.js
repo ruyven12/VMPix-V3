@@ -2992,7 +2992,12 @@ function scheduleDaiionArchivePresentation(callback, delay, generation = daiionA
 function setDaiionArchiveValueLocked(node, value) {
   node.textContent = value;
   node.classList.remove("is-decoding");
-  node.classList.add("is-locked", "is-locking");
+  node.classList.add("is-locked");
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches) {
+    node.classList.remove("is-locking");
+    return;
+  }
+  node.classList.add("is-locking");
   scheduleDaiionArchivePresentation(() => node.classList.remove("is-locking"), 320);
 }
 

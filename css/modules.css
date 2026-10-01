@@ -31844,3 +31844,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-captured-sets .band-captured-set-image[hidden] { display:block;visibility:hidden; }
 .band-detail-viewport[data-band-record-stage] .band-captured-sets { visibility:hidden; }
 @media(min-width:700px) { .band-captured-set-row { grid-template-columns:4rem minmax(0,1fr);gap:1rem; } .band-captured-set-title { font-size:.92rem; } }
+
+/* Daïion welcome retires before its HUD identity and data resolve on mobile. */
+@media (max-width: 540px) and (prefers-reduced-motion: no-preference) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro { inset-block-start: 37%; animation: daiionDestinationIntroProject 240ms ease-out 380ms both, daiionDestinationIntroClear 240ms ease-out 1900ms forwards; }
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text { animation: daiionDestinationIntroType 1000ms steps(48, end) 540ms both; }
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro__text::after { animation: daiionDestinationIntroCaret 500ms steps(1, end) 540ms 2 both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway *,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway *::before,
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .portfolio-world-gateway *::after { animation-duration: 0s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition: none !important; }
+  .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-destination-intro { visibility: hidden !important; opacity: 0 !important; }
+}

@@ -425,6 +425,10 @@ function handoffPortfolioGatewayRoute(worldName) {
   shell.dataset.portfolioGatewayHandoff = "pushed";
   clearPortfolioGatewayRouteHandoffTimer();
   const generation = portfolioGatewayGeneration;
+  if (isPortfolioEngineReducedMotion()) {
+    confirmPortfolioGatewayRouteHandoff(worldName, generation);
+    return;
+  }
   portfolioGatewayRouteHandoffTimer = window.setTimeout(() => {
     confirmPortfolioGatewayRouteHandoff(worldName, generation);
   }, 320);
@@ -540,6 +544,7 @@ function clearPortfolioGatewayState() {
     return false;
   }
 
+  cancelDaiionGatewayTransition();
   const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
   portfolioGatewayGeneration += 1;
   shell.style.removeProperty("--portfolio-gateway-cover-radius-vmax");
@@ -613,15 +618,125 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
 }
 
-function measurePortfolioGatewayCoverage() {
-  if (!shell || !portfolioWorldGateway || shell.dataset.portfolioGatewayWorld !== "battleground") return;
-  const rect = portfolioWorldGateway.getBoundingClientRect();
-  const origin = getComputedStyle(portfolioWorldGateway, "::after").transformOrigin.split(" ").map(Number.parseFloat);
-  if (!rect.width || !rect.height || !origin.slice(0, 2).every(Number.isFinite)) return;
-  // The destination scales about this same origin. Its minimum scale is one;
-  // retaining the unscaled farthest-corner radius is conservative throughout travel.
-  const radius = Math.hypot(Math.max(Math.abs(origin[0]), Math.abs(rect.width - origin[0])), Math.max(Math.abs(origin[1]), Math.abs(rect.height - origin[1]))) + 2;
-  shell.style.setProperty("--portfolio-gateway-cover-radius-vmax", String(Math.max(96, radius / Math.max(innerWidth, innerHeight) * 100)));
+let daiionGatewayTransition = null;
+let daiionGatewayArtworkReady = null;
+function prepareDaiionGatewayArtwork() {
+  if (!daiionGatewayArtworkReady) {
+    const image = new Image();
+    image.src = new URL(getPortfolioGatewayBackgroundSrc("battleground"), location.origin + "/").href;
+    daiionGatewayArtworkReady = image.decode().catch(() => {});
+  }
+  return daiionGatewayArtworkReady;
+}
+function cancelDaiionGatewayTransition() {
+  const entry = daiionGatewayTransition;
+  daiionGatewayTransition = null;
+  entry?.animations.forEach((animation) => animation.cancel());
+  clearTimeout(entry?.readyTimer);
+  entry?.cancelReady?.();
+  entry?.layer?.remove();
+  if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
+  if (shell) delete shell.dataset.daiionEntryStage;
+}
+
+function startDaiionGatewayTransition() {
+  cancelDaiionGatewayTransition();
+  const entry = { generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
+  daiionGatewayTransition = entry;
+  portfolioWorldGateway.inert = true;
+  const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
+  const promote = () => {
+    if (!current() || entry.promoted || window.location.pathname !== routePaths.portfolio) return;
+    entry.promoted = true;
+    shell.dataset.daiionEntryStage = "covered";
+    shell.dataset.portfolioGatewayState = "filling-screen";
+    // The opaque veil already covers every corner; prepare the final world underneath it.
+    applyPortfolioGatewaySettledFrame();
+    shell.classList.add("is-portfolio-world-arrived");
+    handoffPortfolioGatewayRoute("battleground");
+    syncPortfolioGatewayTriggerState();
+  };
+  entry.finishImmediately = () => {
+    if (!current()) return;
+    entry.animations.forEach((animation) => animation.cancel());
+    promote();
+    if (entry.promoted && shell.dataset.portfolioGatewayHandoff !== "complete") {
+      clearPortfolioGatewayRouteHandoffTimer();
+      confirmPortfolioGatewayRouteHandoff("battleground", entry.generation);
+    }
+    cancelDaiionGatewayTransition();
+  };
+  if (isPortfolioEngineReducedMotion()) {
+    entry.finishImmediately();
+    return;
+  }
+  const artworkReady = prepareDaiionGatewayArtwork();
+  const viewport = portfolioWorldGateway.getBoundingClientRect();
+  const width = viewport.width, height = viewport.height;
+  const center = { x: width / 2, y: height * .42 };
+  const radius = Math.min(width * .29, height * .2, 176);
+  const fullRadius = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 4;
+  const layer = document.createElement("div");
+  layer.className = "daiion-gateway-passage";
+  layer.setAttribute("aria-hidden", "true");
+  layer.style.setProperty("--daiion-portal-x", `${center.x}px`);
+  layer.style.setProperty("--daiion-portal-y", `${center.y}px`);
+  layer.style.setProperty("--daiion-portal-size", `${radius * 2}px`);
+  const feeds = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  feeds.classList.add("daiion-gateway-feeds");
+  feeds.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  for (const [index, emitter] of [portfolioEngineScanAnchor, portfolioRightEmitter].entries()) {
+    const rect = emitter?.getBoundingClientRect();
+    if (!rect) continue;
+    const x = rect.left + rect.width / 2 - viewport.left;
+    const y = rect.top + rect.height / 2 - viewport.top;
+    const endX = center.x + (index ? radius : -radius) * .72;
+    const endY = center.y + radius * .7;
+    const path = document.createElementNS(feeds.namespaceURI, "path");
+    path.setAttribute("d", `M ${x} ${y} Q ${x} ${center.y + radius * 1.6} ${endX} ${endY}`);
+    path.setAttribute("pathLength", "1");
+    feeds.append(path);
+  }
+  const portal = document.createElement("div");
+  portal.className = "daiion-gateway-portal";
+  const veil = document.createElement("div");
+  veil.className = "daiion-gateway-veil";
+  const circle = (size) => `circle(${size}px at ${center.x}px ${center.y}px)`;
+  veil.style.clipPath = circle(radius * .8);
+  layer.append(feeds, portal, veil);
+  portfolioWorldGateway.append(layer);
+  entry.layer = layer;
+  shell.dataset.daiionEntryStage = "portal";
+  const animate = (node, frames, options) => {
+    const animation = node.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...options });
+    entry.animations.push(animation);
+    return animation.finished.catch(() => {});
+  };
+  void (async () => {
+    await Promise.all([
+      animate(portal, [{ opacity: 0, transform: "translate(-50%, -50%) scale(.72)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1)" }], { duration: 580 }),
+      ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9 }], { duration: 480 })),
+    ]);
+    if (!current()) return;
+    shell.dataset.daiionEntryStage = "veil";
+    await Promise.all([
+      animate(veil, [{ opacity: 1, clipPath: circle(radius * .8) }, { opacity: 1, clipPath: circle(fullRadius) }], { duration: 560 }),
+      animate(feeds, [{ opacity: 1 }, { opacity: 0 }], { duration: 280 }),
+    ]);
+    if (!current()) return;
+    promote();
+    if (!current()) return;
+    await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(resolve, 5000); })]);
+    clearTimeout(entry.readyTimer);
+    entry.cancelReady = null;
+    if (!current()) return;
+    await animate(layer, [{ opacity: 1 }, { opacity: 0 }], { duration: 380 });
+    if (current()) cancelDaiionGatewayTransition();
+  })();
+}
+
+function syncDaiionGatewayMotion() {
+  if (isPortfolioEngineReducedMotion()) daiionGatewayTransition?.finishImmediately();
 }
 
 function startPortfolioWorldGateway() {
@@ -653,12 +768,12 @@ function startPortfolioWorldGateway() {
   shell.dataset.portfolioGatewayRoute = route;
   shell.dataset.portfolioGatewayState = "focusing-star";
   shell.classList.add("is-portfolio-world-gateway-active");
-  measurePortfolioGatewayCoverage();
   clearPortfolioEngineScan();
   clearPortfolioStarEmitterChargeState();
   stopPortfolioEngineLightning();
   fadePortfolioEngineProjectionForGateway();
-  queuePortfolioGatewayPullingUniverse(activeWorld, route);
+  if (activeWorld === "battleground") startDaiionGatewayTransition();
+  else queuePortfolioGatewayPullingUniverse(activeWorld, route);
   syncPortfolioGatewayTriggerState();
   return true;
 }
@@ -4019,6 +4134,7 @@ function showBattlegroundGatewayArrivalSurface() {
     return;
   }
 
+  cancelDaiionGatewayTransition();
   resetDaiionArchivePresentation();
   shell.classList.remove("is-portfolio-world-arrived");
   clearPortfolioArrivalState();
@@ -6198,10 +6314,12 @@ if (shell && startButton) {
     reducedMotion.addEventListener("change", syncShellBackSweepMotion);
     reducedMotion.addEventListener("change", syncAmbientMotion);
     reducedMotion.addEventListener("change", syncPortfolioEngineLightningMotion);
+    reducedMotion.addEventListener("change", syncDaiionGatewayMotion);
   } else if (typeof reducedMotion.addListener === "function") {
     reducedMotion.addListener(syncShellBackSweepMotion);
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
+    reducedMotion.addListener(syncDaiionGatewayMotion);
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoLowerThirdBody(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
@@ -6238,6 +6356,10 @@ if (shell && startButton) {
     }
   });
   window.addEventListener("pagehide", () => {
+    if (daiionGatewayTransition) {
+      if (daiionGatewayTransition.promoted) daiionGatewayTransition.finishImmediately();
+      else clearPortfolioGatewayState();
+    }
     cancelShellBackSweep();
     setShellDrawerLock(false);
     window.clearTimeout(portfolioArrivalTimer);
