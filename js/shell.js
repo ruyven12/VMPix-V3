@@ -636,7 +636,7 @@ function cancelDaiionGatewayTransition() {
   entry?.cancelReady?.();
   entry?.layer?.remove();
   if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
-  if (shell) delete shell.dataset.daiionEntryStage;
+  if (shell) { delete shell.dataset.daiionEntryStage; delete shell.dataset.daiionWorldExchange; }
 }
 
 function startDaiionGatewayTransition() {
@@ -753,10 +753,11 @@ function startDaiionGatewayTransition() {
   };
   void (async () => {
     await Promise.all([
-      animate(portal, [{ opacity: 0, transform: "translate(-50%, -50%) scale(.72)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1.018)", offset: .82 }, { opacity: 1, transform: "translate(-50%, -50%) scale(1)" }], { duration: 580 }),
-      animate(rim, [{ transform: "rotate(-24deg)", opacity: .2 }, { transform: "rotate(8deg)", opacity: 1 }], { duration: 580 }),
-      animate(depth, [{ transform: "scale(1.08) skewY(-2deg)" }, { transform: "scale(1.02) skewY(1deg)" }], { duration: 580 }),
-      ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9 }], { duration: 480 })),
+      animate(portal, [{ opacity: 0, transform: "translate(-50%, -50%) scale(.72)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1)", offset: .72 }, { opacity: 1, transform: "translate(-50%, -50%) scale(.985)", offset: .84 }, { opacity: 1, transform: "translate(-50%, -50%) scale(1.035)" }], { duration: 580 }),
+      animate(rim, [{ transform: "rotate(-24deg) scale(.98)", opacity: .2 }, { transform: "rotate(4deg) scale(.99)", opacity: .72, offset: .74 }, { transform: "rotate(8deg) scale(1.06)", opacity: 1 }], { duration: 580 }),
+      animate(depth, [{ transform: "scale(1.08) skewY(-2deg)" }, { transform: "scale(.99) skewY(1.5deg)", offset: .82 }, { transform: "scale(1.04) skewY(-.8deg)" }], { duration: 580 }),
+      animate(rings[0], [{ opacity: 0, transform: "translate(-50%, -50%) scale(1)" }, { opacity: .62, transform: "translate(-50%, -50%) scale(1.035)" }], { delay: 460, duration: 120 }),
+      ...[...feeds.children].map((path) => animate(path, [{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: 0, opacity: .9, offset: .66 }, { strokeDashoffset: -.25, opacity: 0 }], { duration: 580 })),
     ]);
     if (!current()) return;
     // The transparent swap needs decoded artwork; keep the contained portal while it prepares.
@@ -769,18 +770,28 @@ function startDaiionGatewayTransition() {
     const reach = Math.hypot(Math.max(center.x, width - center.x), Math.max(center.y, height - center.y)) + 24;
     const peak = reach / radius;
     const waveTransform = (scale, angle = 0) => `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
+    const worldArtwork = portfolioWorldGateway.querySelector(".portfolio-world-gateway-background");
+    let exchange = Promise.resolve();
+    if (worldArtwork) {
+      shell.dataset.daiionWorldExchange = "active";
+      // Reuse the existing artwork plane: 60ms before promotion, 80ms after it.
+      exchange = animate(worldArtwork, [{ "--daiion-world-opacity": 0 }, { "--daiion-world-opacity": 1 }], { delay: 500, duration: 140, easing: "linear" }).then(() => {
+        if (current() && entry.promoted) delete shell.dataset.daiionWorldExchange;
+      });
+    }
     await Promise.all([
-      ...rings.map((ring, index) => animate(ring, [{ opacity: .9, transform: waveTransform(1, index * -9) }, { opacity: index ? .52 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }], { duration: 560, easing: "cubic-bezier(.24,.2,.66,.92)" })),
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62, transform: waveTransform(index ? 1 : 1.035, index * -9) }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)" })),
       animate(streaks, [{ opacity: 0, transform: waveTransform(.92) }, { opacity: .8, offset: .2 }, { opacity: .56, transform: waveTransform(peak * .83, 4) }], { duration: 560, easing: "linear" }),
-      animate(rim, [{ opacity: 1, transform: "rotate(8deg)" }, { opacity: .35, transform: "rotate(74deg)" }], { duration: 560 }),
-      animate(feeds, [{ opacity: 1 }, { opacity: 0 }], { duration: 280 }),
+      animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1)" }], { duration: 560 }),
+      animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(.99)", offset: .28 }, { transform: "translate(-50%, -50%) scale(1)" }], { duration: 260 }),
     ]);
     if (!current()) return;
     promote();
     if (!current()) return;
     transport.dataset.revealing = "true";
     await Promise.all([
-      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .52 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }, { opacity: 0, transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) }], { duration: 380, easing: "linear" })),
+      exchange,
+      ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78, transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6) }, { opacity: 0, transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) }], { duration: 380, easing: "linear" })),
       animate(streaks, [{ opacity: .56, transform: waveTransform(peak * .83, 4) }, { opacity: 0, transform: waveTransform(peak * 1.36, 7) }], { duration: 380, easing: "linear" }),
       animate(portal, [{ opacity: 1 }, { opacity: 0 }], { duration: 180 }),
     ]);
