@@ -31926,3 +31926,30 @@ button.hall-crusades-archive-crystal:focus-visible {
   from { opacity: 1; transform: translate3d(-50%,-50%,0) scale3d(1,1,1); }
   to { opacity: .88; transform: var(--zhento-project-to); }
 }
+
+/* Daïion information framework retains the established HUD frame and its arrival timing. */
+.daiion-archive-stats-panel[data-daiion-information-selector] { align-content: start; }
+.daiion-information-retained-stats,
+[data-daiion-context-host][hidden],
+.daiion-info-control[hidden] { display: none !important; }
+.daiion-info-control {
+  display: flex; align-items: center; justify-content: space-between; gap: .45rem;
+  inline-size: 100%; min-block-size: 44px; padding: .35rem 0;
+  border: 0; border-radius: 0; border-block-end: 1px solid rgba(255, 90, 60, .18);
+  background: transparent; color: rgba(245, 246, 248, .86);
+  font: inherit; font-size: clamp(.62rem, .78vw, .78rem); font-weight: 500;
+  letter-spacing: inherit; text-align: start; text-transform: none;
+  cursor: pointer; pointer-events: auto;
+}
+.daiion-info-control:last-of-type { border-block-end: 0; }
+.daiion-info-control:focus-visible { outline: 1px solid rgba(255, 138, 113, .95); outline-offset: -2px; }
+.daiion-info-arrow { margin-inline-end: .2rem; color: rgba(255, 110, 84, .9); }
+.daiion-info-control[aria-pressed="true"] {
+  color: rgba(255, 190, 170, 1); border-block-end-color: transparent;
+  background: linear-gradient(90deg, rgba(181, 36, 43, .2), rgba(255, 90, 60, .05));
+  box-shadow: inset 0 -1px rgba(255, 90, 60, .55);
+}
+.daiion-info-control[aria-pressed="true"] .daiion-info-arrow {
+  flex: 0 0 .38rem; block-size: .38rem; font-size: 0;
+  border-inline-end: 1px solid currentColor; border-block-end: 1px solid currentColor; transform: rotate(45deg);
+}

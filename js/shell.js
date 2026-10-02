@@ -395,6 +395,7 @@ function initDaiionArchiveStatsAfterGatewayHandoff() {
 
   const animationStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
   initDaiionArchiveStatsPanel({ animationStartedAt });
+  resetDaiionInformationSelector();
 }
 
 function confirmPortfolioGatewayRouteHandoff(worldName, generation) {
@@ -547,6 +548,9 @@ function clearPortfolioGatewayState({ transitionAlreadyCancelled = false } = {})
   }
 
   if (!transitionAlreadyCancelled) cancelDaiionGatewayTransition();
+  cancelDaiionSelectorMorph();
+  setDaiionInformationContext();
+  portfolioWorldGateway?.setAttribute("aria-hidden", "true");
   const wasActive = isPortfolioGatewayActive() || shell.classList.contains("is-portfolio-world-arrived");
   portfolioGatewayGeneration += 1;
   shell.style.removeProperty("--portfolio-gateway-cover-radius-vmax");
@@ -3947,6 +3951,80 @@ function showZhentoInformationContext(landing, key) {
     animate(pulse.querySelector(".zhento-pulse__grid"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 130, duration: 190 });
   }
 }
+let daiionSelectorMorph = null;
+
+function setDaiionInformationContext(key = "") {
+  const panel = portfolioWorldGateway?.querySelector("[data-daiion-information-selector]");
+  if (!panel) return;
+  const controls = [...panel.querySelectorAll("[data-daiion-information]")];
+  const active = controls.some((control) => control.dataset.daiionInformation === key) ? key : "";
+  panel.dataset.selectedInformation = active;
+  panel.dataset.selectorMode = active ? "selected" : "fresh";
+  controls.forEach((control) => {
+    const selected = control.dataset.daiionInformation === active;
+    control.hidden = Boolean(active) && !selected;
+    control.inert = control.hidden;
+    control.setAttribute("aria-pressed", String(selected));
+    if (selected) control.setAttribute("aria-label", `${control.firstElementChild.textContent} — return to information menu`);
+    else control.removeAttribute("aria-label");
+  });
+  const host = portfolioWorldGateway.querySelector("[data-daiion-context-host]");
+  if (host) {
+    host.dataset.contextOwner = active;
+    host.hidden = true;
+    host.inert = true;
+  }
+}
+
+function cancelDaiionSelectorMorph() {
+  const morph = daiionSelectorMorph;
+  if (!morph) return;
+  daiionSelectorMorph = null;
+  morph.animations.forEach((animation) => animation.cancel());
+  morph.panel.inert = false;
+  delete morph.panel.dataset.selectorMoving;
+}
+
+async function changeDaiionInformationContext(control) {
+  if (getRouteFromUrl().name !== "wrestling" || daiionSelectorMorph) return;
+  const panel = control.closest("[data-daiion-information-selector]");
+  const selected = panel.dataset.selectedInformation;
+  if (selected && selected !== control.dataset.daiionInformation) return;
+  const key = selected ? "" : control.dataset.daiionInformation;
+  const startHeight = panel.getBoundingClientRect().height;
+  const startTop = control.getBoundingClientRect().top;
+  setDaiionInformationContext(key);
+  if (reducedMotion.matches) return;
+  const endHeight = panel.getBoundingClientRect().height;
+  const endTop = control.getBoundingClientRect().top;
+  const timing = { duration: 220, easing: "cubic-bezier(.2,.74,.24,1)", fill: "both" };
+  const morph = { panel, animations: [
+    panel.animate([{ height: `${startHeight}px` }, { height: `${endHeight}px` }], timing),
+    control.animate([{ transform: `translateY(${startTop - endTop}px)` }, { transform: "translateY(0)" }], timing),
+  ] };
+  daiionSelectorMorph = morph;
+  panel.inert = true;
+  panel.dataset.selectorMoving = "true";
+  await Promise.all(morph.animations.map((animation) => animation.finished.catch(() => {})));
+  if (daiionSelectorMorph !== morph) return;
+  cancelDaiionSelectorMorph();
+  if (getRouteFromUrl().name === "wrestling") control.focus({ preventScroll: true });
+}
+
+function resetDaiionInformationSelector() {
+  cancelDaiionSelectorMorph();
+  if (getRouteFromUrl().name === "wrestling") portfolioWorldGateway?.setAttribute("aria-hidden", "false");
+  const panel = portfolioWorldGateway?.querySelector("[data-daiion-information-selector]");
+  if (!panel) return;
+  if (!panel.dataset.informationBound) {
+    panel.dataset.informationBound = "true";
+    panel.querySelectorAll("[data-daiion-information]").forEach((control) => {
+      control.addEventListener("click", () => { void changeDaiionInformationContext(control); });
+    });
+  }
+  setDaiionInformationContext();
+}
+
 let zhentoSelectorMorph = null;
 
 function cancelZhentoSelectorMorph(complete = false) {
@@ -4462,6 +4540,7 @@ function showBattlegroundGatewayArrivalSurface() {
   setCurrentView("Outskirts of Daiion");
   setPortfolioEngineHudCurrentView("Outskirts of Daiion");
   setDocumentTitle("The Battleground - Voodoo Media V3.0.01");
+  resetDaiionInformationSelector();
   syncPortfolioGatewayTriggerState();
   if (startButton) {
     startButton.disabled = true;
@@ -6595,6 +6674,8 @@ if (shell && startButton) {
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoLowerThirdBody(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
+  window.addEventListener("pagehide", cancelDaiionSelectorMorph);
+  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) cancelDaiionSelectorMorph(); });
   window.addEventListener("pagehide", () => {
     cancelZhentoSelectorMorph();
     cancelZhentoInformationContext(false);

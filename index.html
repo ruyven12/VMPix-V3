@@ -106,7 +106,12 @@
         <span class="daiion-planet-node daiion-planet-node--campaigns" data-daiion-planet-node="campaigns" aria-hidden="true"><span class="daiion-planet-node__point"></span></span>
         <span class="daiion-planet-node daiion-planet-node--combatants" data-daiion-planet-node="combatants" aria-hidden="true"><span class="daiion-planet-node__point"></span></span>
         <span class="daiion-planet-node daiion-planet-node--arenas" data-daiion-planet-node="arenas" aria-hidden="true"><span class="daiion-planet-node__point"></span></span>
-        <aside class="daiion-archive-stats-panel" aria-hidden="true">
+        <aside class="daiion-archive-stats-panel" aria-label="Daïion information" data-daiion-information-selector data-selected-information="" data-selector-mode="fresh">
+          <button class="daiion-info-control" type="button" data-daiion-information="planet-stats" aria-pressed="false"><span>Planet Stats</span><span class="daiion-info-arrow" aria-hidden="true"></span></button>
+          <button class="daiion-info-control" type="button" data-daiion-information="draegin" aria-pressed="false"><span>Draegin</span><span class="daiion-info-arrow" aria-hidden="true">&gt;</span></button>
+          <button class="daiion-info-control" type="button" data-daiion-information="lore" aria-pressed="false"><span>Lore</span><span class="daiion-info-arrow" aria-hidden="true">&gt;</span></button>
+          <button class="daiion-info-control" type="button" data-daiion-information="origins" aria-pressed="false"><span>Origins</span><span class="daiion-info-arrow" aria-hidden="true">&gt;</span></button>
+          <div class="daiion-information-retained-stats" hidden inert aria-hidden="true">
           <span class="daiion-archive-stats-panel__title">PLANET STATS</span>
           <span class="daiion-archive-stats-panel__row">
             <span class="daiion-archive-stats-panel__label"><span class="daiion-archive-stats-panel__term">Promotions</span><span class="daiion-archive-stats-panel__context">(Banners)</span></span>
@@ -128,7 +133,9 @@
             <span class="daiion-archive-stats-panel__label"><span class="daiion-archive-stats-panel__term">People</span><span class="daiion-archive-stats-panel__context">(Combatants)</span></span>
             <span class="daiion-archive-stats-panel__value" data-daiion-stat-value="people">N/A</span>
           </span>
+          </div>
         </aside>
+        <section data-daiion-context-host data-context-owner="" hidden inert aria-hidden="true"></section>
         <aside class="daiion-archive-focus-panel" aria-label="Archive Focus" aria-hidden="true" aria-live="polite" data-daiion-archive-focus>
           <span class="daiion-archive-focus-panel__title">ARCHIVE FOCUS</span>
           <span class="daiion-archive-focus-panel__stat" data-daiion-archive-focus-stat></span>
