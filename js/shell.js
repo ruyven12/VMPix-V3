@@ -814,6 +814,19 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const outer = inner + 9 + (index % 3) * 8;
     const path = document.createElementNS(feeds.namespaceURI, "path");
     path.setAttribute("d", `M ${Math.cos(angle) * inner} ${Math.sin(angle) * inner} Q ${Math.cos(angle + .018) * (inner + 9)} ${Math.sin(angle + .018) * (inner + 9)} ${Math.cos(angle + .026) * outer} ${Math.sin(angle + .026) * outer}`);
+    if (worldName === "soundtrack") {
+      // Two tapered currents per existing path, with sparse off-axis wisps: deterministic, never a filled sheet.
+      const theta = angle + Math.sin(index * 1.73) * .24;
+      const start = 79 + (index * 7) % 19;
+      const length = 19 + (index * 13) % 43;
+      const bend = Math.sin(index * 2.11) * .18;
+      const point = (turn, distance) => `${Math.cos(turn) * distance} ${Math.sin(turn) * distance}`;
+      const current = (turn, distance, span, curl, breadth) =>
+        `M ${point(turn, distance)} Q ${point(turn + curl - breadth / distance, distance + span * .48)} ${point(turn + curl * .72, distance + span)} Q ${point(turn + curl + breadth / distance, distance + span * .56)} ${point(turn, distance)} Z`;
+      path.setAttribute("d", current(theta, start, length, bend, index % 6 === 0 ? 1.65 : .6 + (index % 4) * .18)
+        + current(theta + .07 + (index % 3) * .045, start + 6, length * .62, -bend * .75, .34)
+        + (index % 5 === 1 ? current(theta - .15, start + 3, length * .38, bend * 1.3, .24) : ""));
+    }
     streaks.append(path);
   }
   transport.append(streaks);
@@ -866,11 +879,23 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const transportAnimationIndex = entry.animations.length;
     const boundary = exitTime / 940;
     const waveAnimations = rings.map((ring, index) => createAnimation(ring, [
-      { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: "cubic-bezier(.16,.45,.55,.85)" },
+      { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: worldName === "soundtrack" ? "cubic-bezier(.24,.30,.58,.82)" : "cubic-bezier(.16,.45,.55,.85)" },
       { transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6), offset: boundary, easing: "linear" },
       { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
     ], { duration: 940, easing: "linear" }));
     entry.primaryWave = waveAnimations[0];
+    if (worldName === "soundtrack") {
+      [...streaks.children].forEach((path, index) => {
+        const delay = (index * 31) % 87;
+        const turn = (index % 7 - 3) * 1.25;
+        createAnimation(path, [
+          { opacity: 0, transform: `rotate(${-turn}deg) scale(${.86 + (index % 3) * .035})` },
+          { opacity: index % 6 === 0 ? .95 : .38 + (index % 5) * .105, offset: .12 + (index % 4) * .035 },
+          { opacity: .24 + (index % 3) * .08, offset: .64 },
+          { opacity: 0, transform: `rotate(${turn}deg) scale(${1.08 + (index % 4) * .025})` },
+        ], { delay, duration: 940 - delay, easing: "ease-out" });
+      });
+    }
     let exchange = Promise.resolve();
     if (worldArtwork) {
       // Shared native clock: opacity stays zero until the primary's clear interior exceeds its gate.
