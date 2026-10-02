@@ -3968,6 +3968,20 @@ function setDaiionInformationContext(key = "") {
     if (selected) control.setAttribute("aria-label", `${control.firstElementChild.textContent} — return to information menu`);
     else control.removeAttribute("aria-label");
   });
+  const showDestinations = active === "draegin";
+  const destination = portfolioWorldGateway.querySelector("[data-daiion-context-panel]");
+  if (destination) {
+    destination.hidden = !showDestinations;
+    destination.inert = !showDestinations;
+    destination.setAttribute("aria-hidden", String(!showDestinations));
+  }
+  const detail = portfolioWorldGateway.querySelector("[data-daiion-context-detail]");
+  if (detail) {
+    detail.hidden = !showDestinations;
+    detail.inert = !showDestinations;
+  }
+  const cue = portfolioWorldGateway.querySelector("[data-daiion-context-cue]");
+  if (cue) cue.dataset.contextActive = String(showDestinations);
   const host = portfolioWorldGateway.querySelector("[data-daiion-context-host]");
   if (host) {
     host.dataset.contextOwner = active;
