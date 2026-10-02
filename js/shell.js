@@ -967,8 +967,9 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const expansion = Promise.all([
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62 }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78 }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)", fill: "none" })),
       animate(streaks, [{ opacity: 0 }, { opacity: .8, offset: .2 }, { opacity: .56 }], { duration: 560, easing: "linear", fill: "none" }),
-      animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1)" }], { duration: 560 }),
-      animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(.99)", offset: .28 }, { transform: "translate(-50%, -50%) scale(1)" }], { duration: 260 }),
+      animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1.06)" }], { duration: 560 }),
+      // Absorb the formed breach at its terminal footprint; only the released ring expands.
+      animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(1.035)" }], { duration: 260 }),
     ]);
     // Ring, reveal mask, and adoption checkpoint share one native clock; no independent reveal timer.
     const transportStart = document.timeline.currentTime;
