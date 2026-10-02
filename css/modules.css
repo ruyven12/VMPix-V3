@@ -31971,3 +31971,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived [data-daiion-context-panel]:not([hidden]) { animation: none; }
 }
+
+/* Daïion Lore uses the existing lower-third geometry with a local crimson palette. */
+.daiion-lore { color: rgba(249, 235, 234, .94); background: linear-gradient(110deg, rgba(181, 36, 56, .1), transparent 45%), rgba(12, 5, 8, .38); }
+.daiion-lore::after { border-inline-color: rgba(218, 85, 91, .48); background: rgba(181, 36, 56, .12); }
+.daiion-lore .zhento-lower-third__leading { stroke: rgba(236, 115, 119, .88); }
+.daiion-lore .zhento-lower-third__frame { background: linear-gradient(90deg, rgba(189, 57, 78, .75), rgba(239, 127, 113, .8)); }
+.daiion-lore .zhento-lower-third__signal { background: linear-gradient(90deg, transparent 0 4%, rgba(181, 36, 56, .7) 4% 14%, transparent 14% 16%, rgba(218, 85, 91, .7) 16% 89%, transparent 89% 91%, rgba(236, 115, 119, .8) 91%); }
+.daiion-lore .zhento-lower-third__reading-zone { background: linear-gradient(90deg, rgba(12, 5, 8, .5), rgba(12, 5, 8, .3) 78%, transparent); }
+.daiion-lore .zhento-lower-third__header { border-block-end-color: rgba(218, 85, 91, .23); }
+.daiion-lore .zhento-lower-third__header h2 { color: rgba(255, 192, 181, .96); }
+.daiion-lore .zhento-lower-third__header p { color: rgba(225, 183, 181, .78); }
+.daiion-lore .zhento-lower-third__body[data-description-scroll]:focus-visible { outline-color: rgba(218, 85, 91, .6); }

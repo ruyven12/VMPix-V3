@@ -3951,6 +3951,75 @@ function showZhentoInformationContext(landing, key) {
     animate(pulse.querySelector(".zhento-pulse__grid"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 130, duration: 190 });
   }
 }
+let daiionLoreContext = null;
+
+function fitDaiionLoreBody() {
+  const surface = portfolioWorldGateway?.querySelector(".daiion-lore");
+  if (!surface || surface.hidden || surface.dataset.contextOwner !== "lore") return;
+  const body = surface.querySelector(".zhento-lower-third__body");
+  const scrollTop = body.scrollTop;
+  clearZhentoBodyScroll(surface);
+  // Measure natural content once; all identity descendants count toward the reserved region.
+  const panelRect = surface.getBoundingClientRect();
+  const bodyRect = body.getBoundingClientRect();
+  const blockers = [...portfolioWorldGateway.querySelectorAll("[data-daiion-information-selector], .daiion-title-reveal, .daiion-title-reveal__subtitle, .daiion-title-reveal__secondary, .daiion-title-reveal__lore")]
+    .map((element) => element.getBoundingClientRect());
+  let safeTop = (window.visualViewport?.offsetTop || 0) + 12;
+  blockers.forEach((rect) => {
+    if (rect.width && rect.height && rect.left < panelRect.right && rect.right > panelRect.left) safeTop = Math.max(safeTop, rect.bottom + 12);
+  });
+  const availableBody = Math.max(1, Math.floor(panelRect.bottom - safeTop - (panelRect.height - bodyRect.height)));
+  if (bodyRect.height <= availableBody + 1) return;
+  body.style.maxBlockSize = `${availableBody}px`;
+  body.dataset.descriptionScroll = "true";
+  body.tabIndex = 0;
+  body.setAttribute("role", "region");
+  body.setAttribute("aria-label", "Lore of Daiion story");
+  body.scrollTop = scrollTop;
+}
+
+function cancelDaiionLoreContext(hide = true) {
+  const context = daiionLoreContext;
+  context?.animations.forEach((animation) => animation.cancel());
+  if (context) context.animations = [];
+  if (!hide) return;
+  daiionLoreContext = null;
+  const surface = context?.surface || portfolioWorldGateway?.querySelector(".daiion-lore");
+  if (!surface) return;
+  surface.hidden = true;
+  surface.inert = true;
+  surface.setAttribute("aria-hidden", "true");
+  clearZhentoBodyScroll(surface);
+}
+
+function showDaiionLoreContext(surface) {
+  if (daiionLoreContext?.surface === surface) return;
+  cancelDaiionLoreContext();
+  const context = { surface, animations: [] };
+  daiionLoreContext = context;
+  surface.hidden = false;
+  surface.inert = false;
+  surface.setAttribute("aria-hidden", "false");
+  fitDaiionLoreBody();
+  document.fonts?.ready.then(() => { if (daiionLoreContext === context) fitDaiionLoreBody(); });
+  if (reducedMotion.matches) return;
+  const animate = (element, frames, timing) => {
+    const animation = element.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...timing });
+    context.animations.push(animation);
+    animation.finished.then(() => {
+      animation.cancel();
+      if (daiionLoreContext === context) context.animations = context.animations.filter((item) => item !== animation);
+    }).catch(() => {});
+  };
+    animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
+    animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
+    animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
+    animate(surface.querySelector(".zhento-lower-third__frame--lower"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 55, duration: 290 });
+    animate(surface.querySelector(".zhento-lower-third__signal"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .9, transform: "scaleX(1)", offset: .6 }, { opacity: .6, transform: "scaleX(1)" }], { duration: 400 });
+    animate(surface.querySelector(".zhento-lower-third__header"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 110, duration: 170 });
+    animate(surface.querySelector(".zhento-lower-third__body"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 210, duration: 190 });
+}
+
 let daiionSelectorMorph = null;
 
 function setDaiionInformationContext(key = "") {
@@ -3985,8 +4054,8 @@ function setDaiionInformationContext(key = "") {
   const host = portfolioWorldGateway.querySelector("[data-daiion-context-host]");
   if (host) {
     host.dataset.contextOwner = active;
-    host.hidden = true;
-    host.inert = true;
+    if (active === "lore") showDaiionLoreContext(host);
+    else cancelDaiionLoreContext();
   }
 }
 
@@ -6688,8 +6757,12 @@ if (shell && startButton) {
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoLowerThirdBody(); });
   window.addEventListener("pagehide", cancelZhentoRhythmEntry);
-  window.addEventListener("pagehide", cancelDaiionSelectorMorph);
-  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) cancelDaiionSelectorMorph(); });
+  window.addEventListener("pagehide", () => { cancelDaiionSelectorMorph(); setDaiionInformationContext(); });
+  reducedMotion.addEventListener("change", () => {
+    if (reducedMotion.matches) { cancelDaiionSelectorMorph(); cancelDaiionLoreContext(false); }
+  });
+  window.addEventListener("resize", fitDaiionLoreBody);
+  window.visualViewport?.addEventListener("resize", fitDaiionLoreBody);
   window.addEventListener("pagehide", () => {
     cancelZhentoSelectorMorph();
     cancelZhentoInformationContext(false);
