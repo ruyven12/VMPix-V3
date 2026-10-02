@@ -805,7 +805,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   rim.className = "daiion-gateway-portal__rim";
   portal.append(depth, rim);
   // Reference world entry: 580ms portal, 560ms outward transport, 380ms dissipation.
-  // Future world identities may reuse this ownership contract with their own ring material.
+  // Worlds share geometry, material and timing; only artwork, palette and arrival adapter differ.
   const transport = document.createElement("div");
   transport.className = "daiion-gateway-transport";
   const rings = Array.from({ length: 2 }, (_, index) => {
@@ -823,19 +823,6 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const outer = inner + 9 + (index % 3) * 8;
     const path = document.createElementNS(feeds.namespaceURI, "path");
     path.setAttribute("d", `M ${Math.cos(angle) * inner} ${Math.sin(angle) * inner} Q ${Math.cos(angle + .018) * (inner + 9)} ${Math.sin(angle + .018) * (inner + 9)} ${Math.cos(angle + .026) * outer} ${Math.sin(angle + .026) * outer}`);
-    if (worldName === "soundtrack") {
-      // Two tapered currents per existing path, with sparse off-axis wisps: deterministic, never a filled sheet.
-      const theta = angle + Math.sin(index * 1.73) * .24;
-      const start = 79 + (index * 7) % 19;
-      const length = 19 + (index * 13) % 43;
-      const bend = Math.sin(index * 2.11) * .18;
-      const point = (turn, distance) => `${Math.cos(turn) * distance} ${Math.sin(turn) * distance}`;
-      const current = (turn, distance, span, curl, breadth) =>
-        `M ${point(turn, distance)} Q ${point(turn + curl - breadth / distance, distance + span * .48)} ${point(turn + curl * .72, distance + span)} Q ${point(turn + curl + breadth / distance, distance + span * .56)} ${point(turn, distance)} Z`;
-      path.setAttribute("d", current(theta, start, length, bend, index % 6 === 0 ? 1.65 : .6 + (index % 4) * .18)
-        + current(theta + .07 + (index % 3) * .045, start + 6, length * .62, -bend * .75, .34)
-        + (index % 5 === 1 ? current(theta - .15, start + 3, length * .38, bend * 1.3, .24) : ""));
-    }
     streaks.append(path);
   }
   transport.append(streaks);
@@ -872,7 +859,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
         element.style.willChange = "opacity";
       });
     }
-    const ringCurve = worldName === "soundtrack" ? [.24, .30, .58, .82] : [.16, .45, .55, .85];
+    const ringCurve = [.16, .45, .55, .85];
     const ringEasing = `cubic-bezier(${ringCurve.join(",")})`;
     const apertureRadius = radius * .98 * .94;
     const apertureShift = -.02 * radius;
@@ -953,18 +940,6 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
     ], { duration: 940, easing: "linear" }));
     entry.primaryWave = waveAnimations[0];
-    if (worldName === "soundtrack") {
-      [...streaks.children].forEach((path, index) => {
-        const delay = (index * 31) % 87;
-        const turn = (index % 7 - 3) * 1.25;
-        createAnimation(path, [
-          { opacity: 0, transform: `rotate(${-turn}deg) scale(${.86 + (index % 3) * .035})` },
-          { opacity: index % 6 === 0 ? .95 : .38 + (index % 5) * .105, offset: .12 + (index % 4) * .035 },
-          { opacity: .24 + (index % 3) * .08, offset: .64 },
-          { opacity: 0, transform: `rotate(${turn}deg) scale(${1.08 + (index % 4) * .025})` },
-        ], { delay, duration: 940 - delay, easing: "ease-out" });
-      });
-    }
     let exchange = Promise.resolve();
     if (worldArtwork) {
       entry.worldReveal = createAnimation(entry.revealWrapper.node, [
@@ -987,7 +962,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       ], { duration: 940, easing: "linear" }),
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" })),
       animate(streaks, [{ opacity: .56 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" }),
-      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { delay: worldName === "battleground" ? 0 : exitTime, duration: worldName === "battleground" ? 100 : 180, fill: "forwards" }),
+      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { delay: 0, duration: 100, fill: "forwards" }),
     ]);
     const expansion = Promise.all([
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62 }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78 }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)", fill: "none" })),

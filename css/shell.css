@@ -12935,21 +12935,21 @@ button {
 .daiion-gateway-feed-wisp { stroke-width: .8 !important; stroke: rgb(var(--portfolio-gateway-reveal-secondary-rgb)) !important; }
 .daiion-gateway-feed-charge { stroke-width: 2.6 !important; filter: drop-shadow(0 0 5px rgb(var(--portfolio-gateway-reveal-rgb) / .8)) !important; }
 .daiion-gateway-portal { position: absolute; left: var(--daiion-portal-x); top: var(--daiion-portal-y); inline-size: var(--daiion-portal-size); block-size: var(--daiion-portal-size); border-radius: 39% 61% 42% 58% / 54% 36% 64% 46%; box-sizing: border-box; background: transparent; filter: drop-shadow(0 0 .45rem rgb(var(--portfolio-gateway-reveal-rgb) / .35)); opacity: 0; transform: translate(-50%, -50%); }
-.daiion-gateway-portal__depth { position: absolute; inset: 3%; border-radius: inherit; overflow: hidden; background: rgb(22 7 5); mask-image: radial-gradient(ellipse at 44% 42%, #000 31%, rgba(0,0,0,.85) 53%, transparent 69%), radial-gradient(ellipse at 70% 66%, #000 8%, transparent 33%); }
+.daiion-gateway-portal__depth { position: absolute; inset: 3%; border-radius: inherit; overflow: hidden; background: rgb(var(--daiion-energy-depth, 22 7 5)); mask-image: radial-gradient(ellipse at 44% 42%, #000 31%, rgba(0,0,0,.85) 53%, transparent 69%), radial-gradient(ellipse at 70% 66%, #000 8%, transparent 33%); }
 .daiion-gateway-portal__depth::before { content: ""; position: absolute; left: var(--daiion-world-x); top: var(--daiion-world-y); inline-size: var(--daiion-world-width); block-size: var(--daiion-world-height); background: var(--portfolio-gateway-world-image) center / cover no-repeat; }
-.daiion-gateway-portal__rim { position: absolute; inset: -4%; border-radius: inherit; background: conic-gradient(from 16deg, transparent 0 12deg, rgb(255 159 46 / .85) 20deg, rgb(255 63 63 / .9) 58deg, transparent 82deg 122deg, rgb(255 63 63) 158deg, transparent 179deg 209deg, rgb(255 159 46 / .7) 242deg, rgb(255 63 63 / .8) 291deg, transparent 318deg); mask-image: radial-gradient(ellipse, transparent 60%, #000 64% 66%, transparent 71%); }
-.daiion-gateway-portal::after { content: ""; position: absolute; inset: 5%; border-radius: inherit; background: conic-gradient(from 42deg, transparent 0 47deg, rgb(255 130 44 / .38) 58deg, transparent 73deg 182deg, rgb(255 54 38 / .55) 206deg, transparent 228deg); mask-image: radial-gradient(ellipse at 44% 47%, transparent 45%, #000 59%, transparent 68%); }
+.daiion-gateway-portal__rim { position: absolute; inset: -4%; border-radius: inherit; background: conic-gradient(from 16deg, transparent 0 12deg, rgb(var(--daiion-energy-rim-hot, 255 159 46) / .85) 20deg, rgb(var(--daiion-energy-rim-core, 255 63 63) / .9) 58deg, transparent 82deg 122deg, rgb(var(--daiion-energy-rim-core, 255 63 63)) 158deg, transparent 179deg 209deg, rgb(var(--daiion-energy-rim-hot, 255 159 46) / .7) 242deg, rgb(var(--daiion-energy-rim-core, 255 63 63) / .8) 291deg, transparent 318deg); mask-image: radial-gradient(ellipse, transparent 60%, #000 64% 66%, transparent 71%); }
+.daiion-gateway-portal::after { content: ""; position: absolute; inset: 5%; border-radius: inherit; background: conic-gradient(from 42deg, transparent 0 47deg, rgb(var(--daiion-energy-inner-hot, 255 130 44) / .38) 58deg, transparent 73deg 182deg, rgb(var(--daiion-energy-inner-core, 255 54 38) / .55) 206deg, transparent 228deg); mask-image: radial-gradient(ellipse at 44% 47%, transparent 45%, #000 59%, transparent 68%); }
 /* Transparent annuli carry transport energy; no viewport fill sits above either world. */
-.daiion-gateway-portal__rim::before { content: ""; position: absolute; inset: -3%; background: conic-gradient(from 25deg, transparent 0 24%, rgb(255 134 65 / .8) 25%, transparent 27% 56%, rgb(223 55 75 / .9) 57%, transparent 60% 86%, rgb(255 112 59 / .7) 87%, transparent 90%); animation: daiionRimCirculation 900ms linear infinite; }
+.daiion-gateway-portal__rim::before { content: ""; position: absolute; inset: -3%; background: conic-gradient(from 25deg, transparent 0 24%, rgb(var(--daiion-energy-highlight, 255 134 65) / .8) 25%, transparent 27% 56%, rgb(var(--daiion-energy-rim-secondary, 223 55 75) / .9) 57%, transparent 60% 86%, rgb(var(--daiion-energy-accent, 255 112 59) / .7) 87%, transparent 90%); animation: daiionRimCirculation 900ms linear infinite; }
 .daiion-gateway-transport { position: absolute; inset: 0; pointer-events: none; }
 .daiion-gateway-wave,
 .daiion-gateway-transport-streaks { position: absolute; left: var(--daiion-portal-x); top: var(--daiion-portal-y); inline-size: var(--daiion-portal-size); block-size: var(--daiion-portal-size); opacity: 0; transform: translate(-50%, -50%); transform-origin: center; }
-.daiion-gateway-wave { border-radius: 48% 52% 49% 51% / 51% 48% 52% 49%; mask-image: conic-gradient(from 12deg, #000, rgb(0 0 0 / .6) 52deg, #000 96deg, rgb(0 0 0 / .4) 171deg, #000 214deg, rgb(0 0 0 / .7) 293deg, #000); background: radial-gradient(ellipse closest-side at 49% 50%, transparent 0 86%, rgb(83 5 28 / .12) 89%, rgb(188 28 60 / .38) 92%, rgb(246 69 86 / .72) 94%, rgb(127 12 40 / .2) 96%, transparent 100%); }
-.daiion-gateway-wave::before { content: ""; position: absolute; inset: -2%; border-radius: inherit; background: conic-gradient(from 17deg, transparent 0 18deg, rgb(238 69 83 / .65) 30deg, transparent 47deg 102deg, rgb(255 134 65 / .55) 111deg, transparent 119deg 188deg, rgb(208 42 76 / .7) 204deg, transparent 227deg 285deg, rgb(255 112 59 / .5) 296deg, transparent 306deg); mask-image: radial-gradient(circle closest-side, transparent 0 94%, #000 96% 97%, transparent 100%); }
-.daiion-gateway-wave--2 { inline-size: calc(var(--daiion-portal-size) * 1.018); block-size: calc(var(--daiion-portal-size) * .987); background: radial-gradient(circle closest-side, transparent 0 92%, rgb(115 16 43 / .2) 95%, rgb(199 41 73 / .48) 97%, transparent 100%); }
-.daiion-gateway-transport-streaks { overflow: visible; fill: none; stroke: rgb(218 50 77 / .7); stroke-width: 1.15; stroke-linecap: round; }
+.daiion-gateway-wave { border-radius: 48% 52% 49% 51% / 51% 48% 52% 49%; mask-image: conic-gradient(from 12deg, #000, rgb(0 0 0 / .6) 52deg, #000 96deg, rgb(0 0 0 / .4) 171deg, #000 214deg, rgb(0 0 0 / .7) 293deg, #000); background: radial-gradient(ellipse closest-side at 49% 50%, transparent 0 86%, rgb(var(--daiion-energy-shadow, 83 5 28) / .12) 89%, rgb(var(--daiion-energy-body, 188 28 60) / .38) 92%, rgb(var(--daiion-energy-edge, 246 69 86) / .72) 94%, rgb(var(--daiion-energy-outer, 127 12 40) / .2) 96%, transparent 100%); }
+.daiion-gateway-wave::before { content: ""; position: absolute; inset: -2%; border-radius: inherit; background: conic-gradient(from 17deg, transparent 0 18deg, rgb(var(--daiion-energy-crest, 238 69 83) / .65) 30deg, transparent 47deg 102deg, rgb(var(--daiion-energy-highlight, 255 134 65) / .55) 111deg, transparent 119deg 188deg, rgb(var(--daiion-energy-strand, 208 42 76) / .7) 204deg, transparent 227deg 285deg, rgb(var(--daiion-energy-accent, 255 112 59) / .5) 296deg, transparent 306deg); mask-image: radial-gradient(circle closest-side, transparent 0 94%, #000 96% 97%, transparent 100%); }
+.daiion-gateway-wave--2 { inline-size: calc(var(--daiion-portal-size) * 1.018); block-size: calc(var(--daiion-portal-size) * .987); background: radial-gradient(circle closest-side, transparent 0 92%, rgb(var(--daiion-energy-echo-shadow, 115 16 43) / .2) 95%, rgb(var(--daiion-energy-echo, 199 41 73) / .48) 97%, transparent 100%); }
+.daiion-gateway-transport-streaks { overflow: visible; fill: none; stroke: rgb(var(--daiion-energy-streak, 218 50 77) / .7); stroke-width: 1.15; stroke-linecap: round; }
 .daiion-gateway-transport-streaks path { vector-effect: non-scaling-stroke; }
-.daiion-gateway-transport-streaks path:nth-child(4n) { stroke: rgb(247 132 75 / .8); stroke-width: 1.5; }
+.daiion-gateway-transport-streaks path:nth-child(4n) { stroke: rgb(var(--daiion-energy-streak-hot, 247 132 75) / .8); stroke-width: 1.5; }
 @keyframes daiionRimCirculation { to { transform: rotate(360deg); } }
 .site-shell[data-portfolio-gateway-world="battleground"] .portfolio-world-gateway { background-color: rgb(34 8 6); }
 .site-shell[data-portfolio-gateway-world="battleground"]:not(.is-portfolio-world-arrived) .portfolio-world-gateway { background-color: transparent; }
@@ -12968,21 +12968,29 @@ button {
 .site-shell[data-shell-route][data-portfolio-gateway-world="soundtrack"][data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active .portfolio-world-gateway-background {
   background: linear-gradient(0deg,rgba(6,8,25,.32),transparent 45%),var(--portfolio-gateway-world-image) 58% center / cover no-repeat !important;
 }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__depth { background: rgb(6 9 24); }
+.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-passage {
+  --daiion-energy-depth: 6 9 24;
+  --daiion-energy-rim-hot: 173 186 255;
+  --daiion-energy-rim-core: 113 99 227;
+  --daiion-energy-inner-hot: 126 215 255;
+  --daiion-energy-inner-core: 137 123 235;
+  --daiion-energy-highlight: 126 215 255;
+  --daiion-energy-rim-secondary: 137 123 235;
+  --daiion-energy-accent: 173 186 255;
+  --daiion-energy-shadow: 47 25 112;
+  --daiion-energy-body: 112 91 219;
+  --daiion-energy-edge: 137 123 235;
+  --daiion-energy-outer: 60 25 127;
+  --daiion-energy-crest: 143 110 242;
+  --daiion-energy-strand: 112 91 219;
+  --daiion-energy-echo-shadow: 47 16 115;
+  --daiion-energy-echo: 135 87 224;
+  --daiion-energy-streak: 132 99 224;
+  --daiion-energy-streak-hot: 173 186 255;
+}
 .site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__depth::before {
   background: linear-gradient(0deg,rgba(6,8,25,.32),transparent 45%),var(--portfolio-gateway-world-image) 58% center / cover no-repeat;
 }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__rim { position: absolute; inset: -4%; border-radius: inherit; background: conic-gradient(from 16deg, transparent 0 12deg, rgb(173 186 255 / .85) 20deg, rgb(113 99 227 / .9) 58deg, transparent 82deg 122deg, rgb(113 99 227) 158deg, transparent 179deg 209deg, rgb(173 186 255 / .7) 242deg, rgb(113 99 227 / .8) 291deg, transparent 318deg); mask-image: radial-gradient(ellipse, transparent 60%, #000 64% 66%, transparent 71%); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal::after { content: ""; position: absolute; inset: 5%; border-radius: inherit; background: conic-gradient(from 42deg, transparent 0 47deg, rgb(126 215 255 / .38) 58deg, transparent 73deg 182deg, rgb(137 123 235 / .55) 206deg, transparent 228deg); mask-image: radial-gradient(ellipse at 44% 47%, transparent 45%, #000 59%, transparent 68%); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-portal__rim::before { content: ""; position: absolute; inset: -3%; background: conic-gradient(from 25deg, transparent 0 24%, rgb(126 215 255 / .8) 25%, transparent 27% 56%, rgb(137 123 235 / .9) 57%, transparent 60% 86%, rgb(173 186 255 / .7) 87%, transparent 90%); animation: daiionRimCirculation 900ms linear infinite; }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave { border-radius: 48% 52% 49% 51% / 51% 48% 52% 49%; mask-image: conic-gradient(from 12deg, #000, rgb(0 0 0 / .6) 52deg, #000 96deg, rgb(0 0 0 / .4) 171deg, #000 214deg, rgb(0 0 0 / .7) 293deg, #000); background: radial-gradient(ellipse closest-side at 49% 50%, transparent 0 86%, rgb(47 25 112 / .04) 88%, rgb(112 91 219 / .2) 91%, rgb(137 123 235 / .52) 94%, rgb(154 182 255 / .4) 95.5%, rgb(91 67 182 / .15) 97%, rgb(47 25 112 / .035) 99%, transparent 100%); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave::before { content: ""; position: absolute; inset: -2%; border-radius: inherit; background: conic-gradient(from 17deg, transparent 0 18deg, rgb(143 110 242 / .65) 30deg, transparent 47deg 102deg, rgb(126 215 255 / .55) 111deg, transparent 119deg 188deg, rgb(112 91 219 / .7) 204deg, transparent 227deg 285deg, rgb(173 186 255 / .5) 296deg, transparent 306deg); mask-image: radial-gradient(circle closest-side, transparent 0 92%, rgb(0 0 0 / .2) 94%, rgb(0 0 0 / .8) 96%, rgb(0 0 0 / .24) 98%, transparent 100%); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-wave--2 { inline-size: calc(var(--daiion-portal-size) * 1.018); block-size: calc(var(--daiion-portal-size) * .987); background: radial-gradient(circle closest-side, transparent 0 92%, rgb(47 16 115 / .2) 95%, rgb(135 87 224 / .48) 97%, transparent 100%); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks { overflow: visible; color: rgb(137 123 235 / .8); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks path { fill: currentColor; stroke: none; transform-box: view-box; transform-origin: center; }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks path:nth-child(3n) { color: rgb(104 120 219 / .65); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks path:nth-child(6n + 1) { color: rgb(173 186 255 / .9); }
-.site-shell[data-portfolio-gateway-world="soundtrack"] .daiion-gateway-transport-streaks path:nth-child(11n) { color: rgb(126 215 255 / .7); }
 
 /* Route ownership changes under the active wave; retain its existing ancestor until cleanup. */
 .site-shell[data-shell-route="music"][data-daiion-entry-stage][data-portfolio-gateway-world="soundtrack"] .ambient-system {
