@@ -987,7 +987,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       ], { duration: 940, easing: "linear" }),
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? .32 : .78 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" })),
       animate(streaks, [{ opacity: .56 }, { opacity: 0 }], { delay: exitTime, duration: 380, easing: "linear", fill: "forwards" }),
-      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { delay: exitTime, duration: 180, fill: "forwards" }),
+      animate(portal, [{ opacity: 1 }, { opacity: 0 }], { delay: worldName === "battleground" ? 0 : exitTime, duration: worldName === "battleground" ? 100 : 180, fill: "forwards" }),
     ]);
     const expansion = Promise.all([
       ...rings.map((ring, index) => animate(ring, [{ opacity: index ? 0 : .62 }, { opacity: index ? .3 : .8, offset: .18 }, { opacity: index ? .32 : .78 }], { duration: 560, easing: "cubic-bezier(.16,.45,.55,.85)", fill: "none" })),

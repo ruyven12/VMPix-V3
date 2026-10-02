@@ -31860,10 +31860,18 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 /* Explicit Portfolio transport prepares the retained landing; direct/resumed Music keeps its own intro. */
-.site-shell[data-music-transport-entry="prepared"] .music-nexus-shell {
+.site-shell:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .music-nexus-shell {
   display: block !important;
   visibility: hidden !important;
   pointer-events: none !important;
+}
+.site-shell[data-music-transport-entry]:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .music-nexus-shell :is([data-zhento-landing],[data-zhento-landing] *),
+.site-shell[data-music-transport-entry]:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .music-nexus-shell :is([data-zhento-landing],[data-zhento-landing] *)::before,
+.site-shell[data-music-transport-entry]:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .music-nexus-shell :is([data-zhento-landing],[data-zhento-landing] *)::after {
+  visibility: hidden !important;
+}
+.site-shell[data-music-transport-entry="resolving"] .music-nexus-shell {
+  transition-property: opacity, transform !important;
 }
 .site-shell[data-music-transport-entry] .zhento-identity {
   animation: none !important;
