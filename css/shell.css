@@ -13012,3 +13012,34 @@ button {
 /* The existing world pixels counter-transform inside a compositor-owned, static feathered aperture. */
 .daiion-gateway-aperture { position: absolute; z-index: 1; pointer-events: none; transform-origin: center; will-change: transform; mask-image: radial-gradient(circle closest-side, #000 calc(100% - var(--daiion-aperture-feather)), transparent 100%); mask-repeat: no-repeat; }
 .site-shell:is([data-shell-route="portfolio"], [data-shell-route="music"]):is([data-portfolio-gateway-world="battleground"], [data-portfolio-gateway-world="soundtrack"])[data-portfolio-gateway-state][data-daiion-entry-stage][data-daiion-world-exchange].is-portfolio-world-gateway-active :not(.daiion-gateway-aperture) > .portfolio-world-gateway-background { transform: none !important; }
+
+/* Daïion releases the formed rim's painted boundary before normalizing its expanding material. */
+@property --daiion-release-progress { syntax: "<number>"; inherits: true; initial-value: 0; }
+.site-shell[data-portfolio-gateway-world="battleground"][data-daiion-entry-stage] :is(.daiion-gateway-passage, .daiion-gateway-aperture) {
+  --daiion-boundary-x: calc(var(--daiion-portal-size) * -.01 * var(--daiion-release-progress));
+  --daiion-boundary-rx: calc(var(--daiion-formed-crest) * (1 - var(--daiion-release-progress)) + var(--daiion-portal-size) * .4606 * var(--daiion-release-progress));
+  --daiion-boundary-ry: calc(var(--daiion-formed-crest) * (1 - var(--daiion-release-progress)) + var(--daiion-portal-size) * .47 * var(--daiion-release-progress));
+}
+.site-shell[data-portfolio-gateway-world="battleground"][data-daiion-entry-stage] .daiion-gateway-portal__depth { overflow: visible; border-radius: 0; background: transparent; mask-image: none; }
+.site-shell[data-portfolio-gateway-world="battleground"][data-daiion-entry-stage] .daiion-gateway-portal__depth::before {
+  mask-image: radial-gradient(circle calc(var(--daiion-formed-crest) * 1.035) at var(--daiion-portal-x) var(--daiion-portal-y), #000 calc(100% - var(--daiion-aperture-feather) * 1.035), transparent 100%);
+}
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-wave--1 { background: none; mask-image: none; border-radius: 0; }
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-wave--1::before { content: none; }
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-wave--1::after {
+  content: ""; position: absolute; inset: -7.24%; transform: rotate(8deg); border-radius: 39% 61% 42% 58% / 54% 36% 64% 46%;
+  opacity: calc(1 - var(--daiion-release-progress));
+  background: conic-gradient(from 16deg, transparent 0 12deg, rgb(var(--daiion-energy-rim-hot, 255 159 46) / .85) 20deg, rgb(var(--daiion-energy-rim-core, 255 63 63) / .9) 58deg, transparent 82deg 122deg, rgb(var(--daiion-energy-rim-core, 255 63 63)) 158deg, transparent 179deg 209deg, rgb(var(--daiion-energy-rim-hot, 255 159 46) / .7) 242deg, rgb(var(--daiion-energy-rim-core, 255 63 63) / .8) 291deg, transparent 318deg);
+  mask-image: radial-gradient(ellipse calc(var(--daiion-boundary-rx) / .65) calc(var(--daiion-boundary-ry) / .65) at calc(50% + var(--daiion-boundary-x)) 50%, transparent 60%, #000 64% 66%, transparent 71%);
+}
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-release-paint {
+  left: 50%; top: 50%; inline-size: 114.48%; block-size: 114.48%; transform: translate(-50%, -50%); opacity: var(--daiion-release-progress);
+  background: radial-gradient(ellipse calc(var(--daiion-boundary-rx) / .94) calc(var(--daiion-boundary-ry) / .94) at calc(50% + var(--daiion-boundary-x)) 50%, transparent 0 86%, rgb(var(--daiion-energy-shadow, 83 5 28) / .12) 89%, rgb(var(--daiion-energy-body, 188 28 60) / .38) 92%, rgb(var(--daiion-energy-edge, 246 69 86) / .72) 94%, rgb(var(--daiion-energy-outer, 127 12 40) / .2) 96%, transparent 100%);
+}
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-release-paint::before {
+  inset: 0;
+  mask-image: radial-gradient(ellipse calc(var(--daiion-boundary-rx) / .94 * 1.06122449) calc(var(--daiion-boundary-ry) / .94 * 1.04) at 50% 50%, transparent 0 94%, #000 96% 97%, transparent 100%);
+}
+.site-shell[data-portfolio-gateway-world="battleground"] .daiion-gateway-aperture {
+  mask-image: radial-gradient(ellipse var(--daiion-boundary-rx) var(--daiion-boundary-ry) at calc(50% + var(--daiion-boundary-x)) 50%, #000 calc(100% - var(--daiion-aperture-feather)), transparent 100%);
+}

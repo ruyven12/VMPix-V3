@@ -769,6 +769,11 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   layer.style.setProperty("--daiion-world-height", `${height}px`);
   layer.style.setProperty("--daiion-world-x", `${radius - center.x}px`);
   layer.style.setProperty("--daiion-world-y", `${radius - center.y}px`);
+  if (worldName === "battleground") {
+    // Inherit the formed rim: 4% inset expansion, terminal 1.06 rim scale, farthest-corner 65% crest.
+    layer.style.setProperty("--daiion-formed-crest", `${radius * 1.08 * 1.06 * Math.SQRT2 * .65}px`);
+    layer.style.setProperty("--daiion-aperture-feather", `${8 / clearScale}px`);
+  }
   const emitterPoints = [];
   const feeds = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   feeds.classList.add("daiion-gateway-feeds");
@@ -811,6 +816,11 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   const rings = Array.from({ length: 2 }, (_, index) => {
     const ring = document.createElement("div");
     ring.className = `daiion-gateway-wave daiion-gateway-wave--${index + 1}`;
+    if (worldName === "battleground" && index === 0) {
+      const paint = document.createElement("span");
+      paint.className = "daiion-gateway-wave daiion-gateway-release-paint";
+      ring.append(paint);
+    }
     transport.append(ring);
     return ring;
   });
@@ -861,8 +871,8 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     }
     const ringCurve = [.16, .45, .55, .85];
     const ringEasing = `cubic-bezier(${ringCurve.join(",")})`;
-    const apertureRadius = radius * .98 * .94;
-    const apertureShift = -.02 * radius;
+    const apertureRadius = radius * (worldName === "battleground" ? 1.08 * 1.06 : .98 * .94);
+    const apertureShift = worldName === "battleground" ? 0 : -.02 * radius;
     const apertureTransform = (scale, angle = 0) =>
       `translate(-50%, -50%) rotate(${angle}deg) scale(${scale}) translateX(${apertureShift}px)`;
     if (worldArtwork) {
@@ -872,6 +882,10 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       aperture.className = "daiion-gateway-aperture";
       aperture.style.cssText = `left:${center.x}px;top:${center.y}px;width:${apertureRadius * 2}px;height:${apertureRadius * 2}px;--daiion-aperture-feather:${8 / clearScale}px`;
       aperture.style.transform = apertureTransform(1.035);
+      if (worldName === "battleground") {
+        aperture.style.setProperty("--daiion-portal-size", `${radius * 2}px`);
+        aperture.style.setProperty("--daiion-formed-crest", layer.style.getPropertyValue("--daiion-formed-crest"));
+      }
       entry.revealWrapper = { node: aperture, artwork: worldArtwork, parent: worldArtwork.parentNode, next: worldArtwork.nextSibling };
       const properties = ["width", "height", "top", "right", "bottom", "left", "transform", "transform-origin"];
       entry.revealStyles = [{ element: worldArtwork, properties: properties.map((name) =>
@@ -933,6 +947,12 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const peak = clearScale / .8;
     const waveTransform = (scale, angle = 0) => `translate(-50%, -50%) rotate(${angle}deg) scale(${scale})`;
     const transportAnimationIndex = entry.animations.length;
+    if (worldName === "battleground") {
+      [layer, entry.revealWrapper?.node].filter(Boolean).forEach((paintOwner) => {
+        createAnimation(paintOwner, [{ "--daiion-release-progress": "0" }, { "--daiion-release-progress": "1" }],
+          { duration: 120, easing: "linear" });
+      });
+    }
     const boundary = exitTime / 940;
     const waveAnimations = rings.map((ring, index) => createAnimation(ring, [
       { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: ringEasing },
