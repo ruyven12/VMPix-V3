@@ -3955,7 +3955,7 @@ let daiionLoreContext = null;
 
 function fitDaiionLoreBody() {
   const surface = portfolioWorldGateway?.querySelector(".daiion-lore");
-  if (!surface || surface.hidden || surface.dataset.contextOwner !== "lore") return;
+  if (!surface || surface.hidden || !["lore", "origins"].includes(surface.dataset.contextOwner)) return;
   const body = surface.querySelector(".zhento-lower-third__body");
   const scrollTop = body.scrollTop;
   clearZhentoBodyScroll(surface);
@@ -3974,7 +3974,7 @@ function fitDaiionLoreBody() {
   body.dataset.descriptionScroll = "true";
   body.tabIndex = 0;
   body.setAttribute("role", "region");
-  body.setAttribute("aria-label", "Lore of Daiion story");
+  body.setAttribute("aria-label", surface.dataset.contextOwner === "origins" ? "Origins of Wrestling description" : "Lore of Daiion story");
   body.scrollTop = scrollTop;
 }
 
@@ -3990,12 +3990,19 @@ function cancelDaiionLoreContext(hide = true) {
   surface.inert = true;
   surface.setAttribute("aria-hidden", "true");
   clearZhentoBodyScroll(surface);
+  surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren();
+  delete surface.dataset.lowerThirdContent;
 }
 
 function showDaiionLoreContext(surface) {
-  if (daiionLoreContext?.surface === surface) return;
+  const key = surface.dataset.contextOwner;
+  if (daiionLoreContext?.surface === surface && daiionLoreContext.key === key) return;
   cancelDaiionLoreContext();
-  const context = { surface, animations: [] };
+  const template = surface.querySelector(`[data-daiion-context-copy="${key}"]`);
+  if (!template) return;
+  surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren(template.content.cloneNode(true));
+  surface.dataset.lowerThirdContent = key;
+  const context = { surface, key, animations: [] };
   daiionLoreContext = context;
   surface.hidden = false;
   surface.inert = false;
@@ -4054,7 +4061,7 @@ function setDaiionInformationContext(key = "") {
   const host = portfolioWorldGateway.querySelector("[data-daiion-context-host]");
   if (host) {
     host.dataset.contextOwner = active;
-    if (active === "lore") showDaiionLoreContext(host);
+    if (active === "lore" || active === "origins") showDaiionLoreContext(host);
     else cancelDaiionLoreContext();
   }
 }
