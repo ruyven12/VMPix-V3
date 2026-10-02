@@ -638,7 +638,16 @@ function releaseDaiionGatewayPassage(entry) {
     element.style.setProperty("opacity", opacity, opacityPriority);
     element.style.setProperty("will-change", willChange, willChangePriority);
   });
-  if (entry) { entry.layer = null; entry.blendStyles = null; }
+  entry?.revealStyles?.forEach(({ element, properties }) => {
+    properties.forEach(([name, value, priority]) => element.style.setProperty(name, value, priority));
+  });
+  const aperture = entry?.revealWrapper;
+  if (aperture) {
+    if (aperture.artwork.parentNode === aperture.node) aperture.parent.insertBefore(aperture.artwork,
+      aperture.next?.parentNode === aperture.parent ? aperture.next : null);
+    aperture.node.remove();
+  }
+  if (entry) { entry.layer = null; entry.blendStyles = null; entry.revealStyles = null; entry.revealWrapper = null; }
   if (shell) { delete shell.dataset.daiionEntryStage; delete shell.dataset.daiionWorldExchange; }
 }
 
@@ -852,7 +861,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const sourceBackdrops = backdropCandidates.filter((element) => !backdropCandidates.some((parent) => parent !== element && parent.contains(element)));
     entry.blendStyles = [];
     if (worldArtwork) {
-      // Both native-opacity planes paint their initial states during the existing portal formation.
+      // Prepare the decoded destination without exposing it before the rim releases.
       shell.dataset.daiionWorldExchange = "active";
       [worldArtwork, ...sourceBackdrops].forEach((element) => {
         entry.blendStyles.push({
@@ -862,6 +871,66 @@ function startDaiionGatewayTransition(worldName = "battleground") {
         element.style.opacity = element === worldArtwork ? "0" : "1";
         element.style.willChange = "opacity";
       });
+    }
+    const ringCurve = worldName === "soundtrack" ? [.24, .30, .58, .82] : [.16, .45, .55, .85];
+    const ringEasing = `cubic-bezier(${ringCurve.join(",")})`;
+    const apertureRadius = radius * .98 * .94;
+    const apertureShift = -.02 * radius;
+    const apertureTransform = (scale, angle = 0) =>
+      `translate(-50%, -50%) rotate(${angle}deg) scale(${scale}) translateX(${apertureShift}px)`;
+    if (worldArtwork) {
+      // A cached feathered aperture transforms with the primary. Its existing artwork is inverse-transformed.
+      // Precompute compensation before visible motion, never from an animation-frame callback.
+      const aperture = document.createElement("div");
+      aperture.className = "daiion-gateway-aperture";
+      aperture.style.cssText = `left:${center.x}px;top:${center.y}px;width:${apertureRadius * 2}px;height:${apertureRadius * 2}px;--daiion-aperture-feather:${8 / clearScale}px`;
+      aperture.style.transform = apertureTransform(1.035);
+      entry.revealWrapper = { node: aperture, artwork: worldArtwork, parent: worldArtwork.parentNode, next: worldArtwork.nextSibling };
+      const properties = ["width", "height", "top", "right", "bottom", "left", "transform", "transform-origin"];
+      entry.revealStyles = [{ element: worldArtwork, properties: properties.map((name) =>
+        [name, worldArtwork.style.getPropertyValue(name), worldArtwork.style.getPropertyPriority(name)]) }];
+      worldArtwork.parentNode.insertBefore(aperture, worldArtwork);
+      aperture.append(worldArtwork);
+      worldArtwork.style.width = `${width}px`;
+      worldArtwork.style.height = `${height}px`;
+      worldArtwork.style.inset = "0 auto auto 0";
+      worldArtwork.style.transformOrigin = "0 0";
+      worldArtwork.style.willChange = "transform";
+      const bezier = (t, a, b) => 3 * (1 - t) ** 2 * t * a + 3 * (1 - t) * t ** 2 * b + t ** 3;
+      const progress = (time) => {
+        let low = 0, high = 1;
+        for (let n = 0; n < 22; n += 1) {
+          const mid = (low + high) / 2;
+          if (bezier(mid, ringCurve[0], ringCurve[2]) < time) low = mid; else high = mid;
+        }
+        return bezier((low + high) / 2, ringCurve[1], ringCurve[3]);
+      };
+      const pose = (time) => {
+        const p = time <= exitTime ? progress(time / exitTime) : (time - exitTime) / (940 - exitTime);
+        return time <= exitTime
+          ? { scale: 1.035 + (clearScale - 1.035) * p, angle: -6 * p }
+          : { scale: clearScale + (clearScale / .8 * 1.27 - clearScale) * p, angle: -6 - 4 * p };
+      };
+      const compensate = ({ scale, angle }) =>
+        `translate3d(${apertureRadius - apertureShift}px,${apertureRadius}px,0) scale3d(${1 / scale},${1 / scale},1) rotate(${-angle}deg) translate3d(${-center.x}px,${-center.y}px,0)`;
+      const samples = [{ time: 0, ...pose(0) }];
+      let maxError = 0;
+      const subdivide = (start, end) => {
+        const a = pose(start), b = pose(end);
+        let error = 0;
+        for (const fraction of [.25, .5, .75]) {
+          const exact = pose(start + (end - start) * fraction);
+          const inverse = (1 - fraction) / a.scale + fraction / b.scale;
+          const angleError = Math.abs(exact.angle - (a.angle + (b.angle - a.angle) * fraction)) * Math.PI / 180;
+          error = Math.max(error, farthestCorner * (Math.abs(exact.scale * inverse - 1) + angleError));
+        }
+        if (error > .12 && end - start > .25) { const mid = (start + end) / 2; subdivide(start, mid); subdivide(mid, end); }
+        else { maxError = Math.max(maxError, error); samples.push({ time: end, ...b }); }
+      };
+      for (let time = 0; time < 940; time += 4) subdivide(time, Math.min(time + 4, 940));
+      entry.revealCompensation = { maxError, keyframes: samples.map((sample) =>
+        ({ offset: sample.time / 940, transform: compensate(sample), easing: "linear" })) };
+      worldArtwork.style.transform = compensate(pose(0));
     }
     shell.dataset.daiionEntryStage = "portal";
     await Promise.all([
@@ -879,7 +948,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     const transportAnimationIndex = entry.animations.length;
     const boundary = exitTime / 940;
     const waveAnimations = rings.map((ring, index) => createAnimation(ring, [
-      { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: worldName === "soundtrack" ? "cubic-bezier(.24,.30,.58,.82)" : "cubic-bezier(.16,.45,.55,.85)" },
+      { transform: waveTransform(index ? 1 : 1.035, index * -9), easing: ringEasing },
       { transform: waveTransform(peak * (index ? .61 : .8), index ? 8 : -6), offset: boundary, easing: "linear" },
       { transform: waveTransform(peak * (index ? 1.12 : 1.27), index ? 16 : -10) },
     ], { duration: 940, easing: "linear" }));
@@ -898,11 +967,16 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     }
     let exchange = Promise.resolve();
     if (worldArtwork) {
-      // Shared native clock: opacity stays zero until the primary's clear interior exceeds its gate.
-      exchange = Promise.all([
-        animate(worldArtwork, [{ opacity: 0 }, { opacity: 1 }], { delay: exitTime, duration: 140, easing: "linear" }),
-        ...sourceBackdrops.map((element) => animate(element, [{ opacity: 1 }, { opacity: 0 }], { delay: exitTime, duration: 140, easing: "linear" })),
-      ]);
+      entry.worldReveal = createAnimation(entry.revealWrapper.node, [
+        { transform: apertureTransform(1.035), easing: ringEasing },
+        { transform: apertureTransform(peak * .8, -6), offset: boundary, easing: "linear" },
+        { transform: apertureTransform(peak * 1.27, -10) },
+      ], { duration: 940, easing: "linear" });
+      entry.worldCompensation = createAnimation(worldArtwork, entry.revealCompensation.keyframes,
+        { duration: 940, easing: "linear" });
+      // Preserve the safe adoption clock, but remove the old late whole-world cross-fade.
+      // Backwards fill exposes only the already-installed aperture from the first transport frame.
+      exchange = animate(worldArtwork, [{ opacity: 1 }, { opacity: 1 }], { delay: exitTime, duration: 140, easing: "linear" });
     }
     const waveMotion = Promise.all([
       ...waveAnimations.map((animation) => animation.finished.catch(() => {})),
@@ -921,7 +995,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       animate(rim, [{ opacity: 1, transform: "rotate(8deg) scale(1.06)" }, { opacity: .35, transform: "rotate(74deg) scale(1)" }], { duration: 560 }),
       animate(portal, [{ transform: "translate(-50%, -50%) scale(1.035)" }, { transform: "translate(-50%, -50%) scale(.99)", offset: .28 }, { transform: "translate(-50%, -50%) scale(1)" }], { duration: 260 }),
     ]);
-    // Assign every transport effect the primary's exact timeline origin; no independent fade timer can lead it.
+    // Ring, reveal mask, and adoption checkpoint share one native clock; no independent reveal timer.
     const transportStart = document.timeline.currentTime;
     entry.animations.slice(transportAnimationIndex).forEach((animation) => { animation.startTime = transportStart; });
     await expansion;
@@ -929,7 +1003,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     transport.dataset.revealing = "true";
     await exchange;
     if (!current()) return;
-    // Broad arrival selectors settle only after the world blend; preserve the existing 880ms HUD budget.
+    // The rim has fully revealed the world before adoption; preserve the existing 880ms HUD budget.
     promote({ settleLegacyProperties: false, confirmationDelay: Math.max(0, 880 - entry.primaryWave.currentTime) });
     if (!current()) return;
     delete shell.dataset.daiionWorldExchange;
