@@ -13038,3 +13038,22 @@ button {
   /* Reserve a usable telemetry region; other Daïion contexts keep their identity pose. */
   .portfolio-world-gateway:has([data-daiion-context-host][data-context-owner="planet-stats"]) .daiion-title-reveal { inset-block-start: clamp(16rem, 33svh, 19rem); }
 }
+
+/* Daïion destination departure reuses Rhythm's BACK fade, never its transport. */
+.site-shell[data-daiion-destination-departure] .prototype-engine-return-control__text,
+.site-shell[data-daiion-destination-departure] .prototype-engine-return-control::before,
+.site-shell[data-daiion-destination-departure] .engine-emitter-energy--left {
+  animation: zhentoRhythmBackOut 150ms ease-out forwards !important;
+  pointer-events: none !important;
+}
+.site-shell[data-daiion-destination-departure]:not([data-daiion-destination-departure="accepted"]) .prototype-engine-return-control__text,
+.site-shell[data-daiion-destination-departure]:not([data-daiion-destination-departure="accepted"]) .prototype-engine-return-control::before,
+.site-shell[data-daiion-destination-departure]:not([data-daiion-destination-departure="accepted"]) .engine-emitter-energy--left {
+  animation: none !important; opacity: 0 !important;
+}
+.site-shell[data-daiion-destination-departure] .prototype-engine-return-control { pointer-events: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-daiion-destination-departure] .prototype-engine-return-control__text,
+  .site-shell[data-daiion-destination-departure] .prototype-engine-return-control::before,
+  .site-shell[data-daiion-destination-departure] .engine-emitter-energy--left { animation: none !important; opacity: 0 !important; }
+}

@@ -2588,6 +2588,7 @@ function promoteDaiionCrusadesToHallOfCrusadesRoute() {
 }
 
 function resetDaiionCrusadesConvergencePrototype() {
+  if (typeof cancelDaiionDestinationDeparture === "function") cancelDaiionDestinationDeparture();
   const shell = document.querySelector(".site-shell");
   window.clearTimeout(daiionCrusadesImpactTimer);
   daiionCrusadesImpactTimer = 0;
@@ -2879,12 +2880,15 @@ function routeDaiionArchiveFocusPanel() {
     return;
   }
 
-  if (routeTarget === routePaths.wrestlingShows && daiionDestinationSelectedTarget === "campaigns") {
-    startDaiionCrusadesConvergencePrototype();
-    return;
-  }
-
-  navigateToRoute(routeTarget);
+  const enter = () => {
+    if (routeTarget === routePaths.wrestlingShows && daiionDestinationSelectedTarget === "campaigns") {
+      startDaiionCrusadesConvergencePrototype();
+      return;
+    }
+    navigateToRoute(routeTarget);
+  };
+  if (typeof runDaiionDestinationDeparture === "function") runDaiionDestinationDeparture(enter);
+  else enter();
 }
 
 function initDaiionDestinationPanel() {

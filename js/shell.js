@@ -2930,8 +2930,8 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   prototypeEngineReturnControl.setAttribute("aria-label", backLabel || "Return");
   prototypeEngineReturnControl.querySelector(".prototype-engine-return-control__text").textContent = route.name === "music" ? "Back" : isArchiveBack ? "BACK" : "RETURN";
   prototypeEngineReturnControl.hidden = !isActive;
-  prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry) || Boolean(bandRecordOpening);
-  prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry && !bandRecordOpening ? 0 : -1;
+  prototypeEngineReturnControl.disabled = !isActive || Boolean(zhentoRhythmEntry) || Boolean(bandRecordOpening) || isDaiionDestinationDepartureActive();
+  prototypeEngineReturnControl.tabIndex = isActive && !zhentoRhythmEntry && !bandRecordOpening && !isDaiionDestinationDepartureActive() ? 0 : -1;
 }
 
 function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
@@ -4140,6 +4140,56 @@ function showDaiionLoreContext(surface) {
 let daiionSelectorMorph = null;
 
 // Draegin owns presentation only; existing destination handlers still select and enter.
+// Match Rhythm's 150ms BACK retirement / 180ms release without owning the clash.
+let daiionDestinationDeparture = null;
+function isDaiionDestinationDepartureActive() { return Boolean(daiionDestinationDeparture); }
+function cancelDaiionDestinationDeparture(immediate = false) {
+  const entry = daiionDestinationDeparture;
+  if (!entry) return;
+  entry.cancelled = true;
+  window.clearTimeout(entry.timer);
+  entry.frames.forEach(window.cancelAnimationFrame);
+  shell.dataset.daiionDestinationDeparture = "settling";
+  const finish = () => {
+    if (daiionDestinationDeparture !== entry) return;
+    daiionDestinationDeparture = null;
+    shell.removeAttribute("data-daiion-destination-departure");
+    if (!entry.gallery.hidden) entry.gallery.inert = entry.wasInert;
+    updatePrototypeEngineReturnEmitter(getRouteFromUrl());
+  };
+  // Hold the cleared BACK through route/reset writes, then restore the correct route state.
+  if (immediate) finish();
+  else entry.frames.push(requestAnimationFrame(() => {
+    entry.frames.push(requestAnimationFrame(finish));
+  }));
+}
+function runDaiionDestinationDeparture(enter) {
+  if (daiionDestinationDeparture || getRouteFromUrl().name !== "wrestling") return;
+  const gallery = portfolioWorldGateway?.querySelector(".daiion-gallery");
+  if (!gallery || gallery.hidden) return;
+  const entry = { gallery, wasInert: gallery.inert, frames: [], timer: 0, cancelled: false };
+  daiionDestinationDeparture = entry;
+  gallery.inert = true;
+  shell.dataset.daiionDestinationDeparture = "accepted";
+  updatePrototypeEngineReturnEmitter(getRouteFromUrl());
+  const fades = prototypeEngineReturnControl?.querySelector(".prototype-engine-return-control__text")?.getAnimations()
+    .filter((animation) => animation.animationName === "zhentoRhythmBackOut") || [];
+  const release = async () => {
+    await Promise.all(fades.map((animation) => animation.finished.catch(() => {})));
+    if (daiionDestinationDeparture !== entry || entry.cancelled) return;
+    if (getRouteFromUrl().name !== "wrestling") { cancelDaiionDestinationDeparture(); return; }
+    try {
+      // Let the protected convergence read its geometry before changing Shell styles.
+      enter();
+      if (daiionDestinationDeparture === entry && !entry.cancelled) shell.dataset.daiionDestinationDeparture = "released";
+    } catch (error) { cancelDaiionDestinationDeparture(); throw error; }
+  };
+  if (reducedMotion.matches) {
+    shell.dataset.daiionDestinationDeparture = "released";
+    try { enter(); } catch (error) { cancelDaiionDestinationDeparture(true); throw error; }
+  } else entry.timer = window.setTimeout(() => { void release(); }, 180);
+}
+
 let daiionGalleryAnimations = [];
 function cancelDaiionGalleryReveal() {
   daiionGalleryAnimations.forEach((animation) => animation.cancel());
@@ -4210,7 +4260,15 @@ function setDaiionInformationContext(key = "") {
     destination.hidden = !showDestinations;
     destination.inert = !showDestinations;
     destination.setAttribute("aria-hidden", String(!showDestinations));
-    if (!showDestinations) cancelDaiionGalleryReveal();
+    if (!showDestinations) {
+      cancelDaiionGalleryReveal();
+      const promotingCrusades = getRouteFromUrl().name === "wrestling-shows" &&
+        typeof isDaiionCrusadesRoutePromotionReady === "function" && isDaiionCrusadesRoutePromotionReady(shell);
+      if (isDaiionDestinationDepartureActive() && shell.classList.contains("is-daiion-crusades-converging") &&
+          !promotingCrusades && typeof resetDaiionCrusadesConvergencePrototype === "function") {
+        resetDaiionCrusadesConvergencePrototype();
+      } else cancelDaiionDestinationDeparture();
+    }
     else if (wasHidden) revealDaiionGallery(destination);
   }
   const detail = portfolioWorldGateway.querySelector("[data-daiion-context-detail]");
@@ -6969,6 +7027,7 @@ if (shell && startButton) {
       if (daiionGatewayTransition.promoted) daiionGatewayTransition.finishImmediately();
       else clearPortfolioGatewayState();
     }
+    cancelDaiionDestinationDeparture(true);
     cancelShellBackSweep();
     setShellDrawerLock(false);
     window.clearTimeout(portfolioArrivalTimer);

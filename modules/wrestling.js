@@ -19444,7 +19444,12 @@ function bindWrestlingLandingHallOfChampionsCta() {
     status.tabIndex = 0;
     status.setAttribute("aria-label", "Enter the Hall of Champions");
   };
-  const open = () => isActive() && navigateToRoute(routePaths.wrestlingPeople);
+  const open = () => {
+    if (!isActive()) return;
+    const enter = () => navigateToRoute(routePaths.wrestlingPeople);
+    if (typeof runDaiionDestinationDeparture === "function") runDaiionDestinationDeparture(enter);
+    else enter();
+  };
   panel.dataset.wrestlingHallChampionsCtaBound = "true";
   panel.addEventListener("keydown", (event) => {
     if (event.target.closest(statusSelector) && (event.key === "Enter" || event.key === " ")) {
@@ -19453,8 +19458,12 @@ function bindWrestlingLandingHallOfChampionsCta() {
     }
   });
   document.addEventListener("click", (event) => {
+    // A selection can move the CTA under the original pointer; it must never enter.
+    if (event.target.closest("[data-daiion-destination-target]")) {
+      window.setTimeout(sync, 0);
+      return;
+    }
     if (isActive() && hitsStatus(event)) open();
-    else if (event.target.closest("[data-daiion-destination-target]")) window.setTimeout(sync, 0);
   });
   sync();
 }
