@@ -4054,7 +4054,7 @@ function fitDaiionLoreBody() {
     if (rect.width && rect.height && rect.left < panelRect.right && rect.right > panelRect.left) safeTop = Math.max(safeTop, rect.bottom + 12);
   });
   if (telemetry) {
-    surface.style.setProperty("--daiion-telemetry-height", `${Math.max(1, Math.floor(Math.min(576, panelRect.bottom - safeTop)))}px`);
+    surface.style.setProperty("--daiion-telemetry-max-height", `${Math.max(1, Math.floor(Math.min(576, panelRect.bottom - safeTop)))}px`);
     body.scrollTop = scrollTop;
     return;
   }
@@ -4089,7 +4089,7 @@ function cancelDaiionLoreContext(hide = true) {
   clearZhentoBodyScroll(surface);
   surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren();
   delete surface.dataset.lowerThirdContent;
-  surface.style.removeProperty("--daiion-telemetry-height");
+  surface.style.removeProperty("--daiion-telemetry-max-height");
 }
 
 function showDaiionLoreContext(surface) {

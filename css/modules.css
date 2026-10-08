@@ -31306,10 +31306,12 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-pillar-tile__label { box-sizing: border-box; block-size: 32%; align-content: center; gap: .05rem; padding: .1rem .35rem; background: linear-gradient(90deg, rgba(5,7,15,.78), rgba(5,7,15,.88)); }
 }
 /* Planet Stats shares the contextual frame; only its body scrolls within the safe region. */
-.zhento-lower-third[data-lower-third-content="planet-stats"] { block-size: min(36rem, calc(100svh - 15rem)); }
-.zhento-telemetry { display: flex; flex-direction: column; block-size: 100%; min-block-size: 0; pointer-events: auto; text-align: center; }
+.zhento-lower-third[data-lower-third-content="planet-stats"] { display: flex; flex-direction: column; block-size: auto; max-block-size: min(36rem, calc(100svh - 15rem)); }
+.zhento-telemetry { display: flex; flex-direction: column; flex: 1 1 auto; block-size: auto; min-block-size: 0; pointer-events: auto; text-align: center; }
 .zhento-telemetry__header { flex: 0 0 auto; background: rgba(6,7,12,.86); }
-.zhento-telemetry__header [data-zhento-telemetry-status] { font-size: .6rem; min-block-size: 1.4em; }
+.zhento-telemetry, .zhento-telemetry *, .zhento-telemetry::before, .zhento-telemetry::after, .zhento-telemetry *::before, .zhento-telemetry *::after { text-transform: none !important; }
+/* Keep live loading/error announcements without adding a third visible header line. */
+.zhento-telemetry .zhento-telemetry__status { position: absolute; inline-size: 1px; block-size: 1px; min-block-size: 0; padding: 0; margin: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .zhento-telemetry__body { min-block-size: 0; overflow-y: auto; overscroll-behavior-y: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; scrollbar-width: thin; padding: .6rem .15rem .2rem; }
 .zhento-telemetry__body:focus-visible { outline: 1px solid rgba(137,167,255,.6); outline-offset: -1px; }
 .site-shell[data-shell-route="music"] .zhento-telemetry :is(.zhento-stats__label, .zhento-stats__value) { animation: none; }
@@ -31335,7 +31337,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (max-width: 540px) {
   [data-zhento-landing][data-information-context="planet-stats"] { --telemetry-context-top: calc(clamp(12rem, 24svh, 14rem) + env(safe-area-inset-top, 0px)); }
   [data-zhento-landing][data-information-context="planet-stats"] .zhento-identity { --zhento-hud-y: 0px; inset-block-start: calc(var(--telemetry-context-top) - 4.375rem); }
-  .zhento-lower-third[data-lower-third-content="planet-stats"] { inline-size: calc(100vw - 4.1rem); block-size: calc(100svh - 7.15rem - var(--telemetry-context-top, 12rem) - env(safe-area-inset-bottom, 0px)); }
+  .zhento-lower-third[data-lower-third-content="planet-stats"] { inline-size: calc(100vw - 4.1rem); max-block-size: calc(100svh - 7.15rem - var(--telemetry-context-top, 12rem) - env(safe-area-inset-bottom, 0px)); }
+  .zhento-telemetry__header h2 { font-size: clamp(.675rem, calc(4vw - .225rem), .975rem); }
+  .zhento-telemetry__header > p:not(.zhento-telemetry__status) { font-size: clamp(.55rem, 2.4vw, .65rem); }
 }
 /* Zhento arrival uses the approved archive draw with its own palette. */
 .site-shell[data-shell-route="music"] [data-zhento-landing] :is(.zhento-top-hud-rail, .zhento-side-hud-rail) {

@@ -13015,18 +13015,18 @@ button {
 
 /* Daïion telemetry uses the existing contextual frame and Zhento telemetry components. */
 .daiion-lore[data-context-owner="planet-stats"][data-lower-third-content="planet-stats"] {
-  block-size: var(--daiion-telemetry-height, min(36rem, calc(100svh - 15rem)));
+  block-size: auto; max-block-size: var(--daiion-telemetry-max-height, min(36rem, calc(100svh - 15rem)));
 }
 .daiion-lore[data-context-owner="planet-stats"][data-lower-third-content="planet-stats"] .zhento-lower-third__reading-zone {
-  box-sizing: border-box; block-size: 100%; min-block-size: 0;
+  box-sizing: border-box; display: flex; flex-direction: column; flex: 1 1 auto; block-size: auto; min-block-size: 0;
 }
 .daiion-telemetry .zhento-telemetry__header { background: rgba(12,5,8,.86); }
-.daiion-telemetry [data-daiion-telemetry-status] { font-size: .6rem; min-block-size: 2.8em; }
 .daiion-telemetry .zhento-stats__row { border-color: rgba(218,85,91,.19); background: rgba(12,5,8,.54); }
 .daiion-telemetry .zhento-stats__label { color: rgba(249,235,234,.94); }
 .daiion-telemetry .zhento-stats__value { color: #f5d9d7; }
 .daiion-telemetry .zhento-telemetry__photos .zhento-stats__row::after { content: none; }
-.daiion-telemetry__photo-status { margin: .3rem 0; font-size: .6rem; line-height: 1.4; min-block-size: 2.8em; color: rgba(225,183,181,.85); }
+.daiion-telemetry__photo-status { margin: .3rem 0; font-size: .6rem; line-height: 1.4; min-block-size: 0; color: rgba(225,183,181,.85); }
+.daiion-telemetry__photo-status:not([data-photo-state]), .daiion-telemetry__photo-status[data-photo-state="complete"] { position: absolute; inline-size: 1px; block-size: 1px; margin: 0; overflow: hidden; clip-path: inset(50%); }
 .daiion-telemetry .zhento-telemetry__archive { border-color: rgba(218,85,91,.23); background: rgba(12,5,8,.5); }
 .daiion-telemetry .zhento-telemetry__archive h3 { color: rgba(255,192,181,.96); }
 .daiion-telemetry .zhento-telemetry__archive p { margin: .5rem 0; font-size: .76rem; }
@@ -13034,5 +13034,7 @@ button {
 .daiion-telemetry .zhento-telemetry__body { scrollbar-color: rgba(218,85,91,.6) rgba(12,5,8,.3); }
 .daiion-telemetry .zhento-telemetry__body:focus-visible { outline-color: rgba(218,85,91,.6); }
 @media (max-width: 540px) {
-  .daiion-lore[data-context-owner="planet-stats"][data-lower-third-content="planet-stats"] { inline-size: calc(100vw - 4.1rem); block-size: var(--daiion-telemetry-height, calc(100svh - 19.15rem)); }
+  .daiion-lore[data-context-owner="planet-stats"][data-lower-third-content="planet-stats"] { inline-size: calc(100vw - 4.1rem); max-block-size: var(--daiion-telemetry-max-height, calc(100svh - 19.15rem)); }
+  /* Reserve a usable telemetry region; other Daïion contexts keep their identity pose. */
+  .portfolio-world-gateway:has([data-daiion-context-host][data-context-owner="planet-stats"]) .daiion-title-reveal { inset-block-start: clamp(16rem, 33svh, 19rem); }
 }
