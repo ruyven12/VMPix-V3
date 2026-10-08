@@ -4139,6 +4139,54 @@ function showDaiionLoreContext(surface) {
 
 let daiionSelectorMorph = null;
 
+// Draegin owns presentation only; existing destination handlers still select and enter.
+let daiionGalleryAnimations = [];
+function cancelDaiionGalleryReveal() {
+  daiionGalleryAnimations.forEach((animation) => animation.cancel());
+  daiionGalleryAnimations = [];
+}
+function animateDaiionGallery(element, frames, timing) {
+  if (!element || reducedMotion.matches) return;
+  const animation = element.animate(frames, { easing: "cubic-bezier(.2,.74,.24,1)", fill: "both", ...timing });
+  daiionGalleryAnimations.push(animation);
+  animation.finished.then(() => {
+    animation.cancel();
+    daiionGalleryAnimations = daiionGalleryAnimations.filter((item) => item !== animation);
+  }).catch(() => {});
+}
+function prepareDaiionGallery(gallery) {
+  gallery.querySelectorAll(".daiion-gallery__art").forEach((image) => {
+    if (image.dataset.galleryPrepared) return;
+    image.dataset.galleryPrepared = "true";
+    const tile = image.closest(".daiion-gallery__tile");
+    tile.dataset.artworkState = "pending";
+    const settle = () => { tile.dataset.artworkState = image.naturalWidth > 0 ? "ready" : "unavailable"; };
+    if (typeof image.decode === "function") image.decode().then(settle).catch(() => { tile.dataset.artworkState = "unavailable"; });
+    else if (image.complete) settle();
+    else {
+      image.addEventListener("load", settle, { once: true });
+      image.addEventListener("error", settle, { once: true });
+    }
+  });
+  if (gallery.dataset.galleryBound) return;
+  gallery.dataset.galleryBound = "true";
+  gallery.addEventListener("click", (event) => {
+    if (!event.target.closest(".daiion-gallery__tile") || gallery.hidden) return;
+    // Selection has already been handled on the native button by state.js.
+    cancelDaiionGalleryReveal();
+    animateDaiionGallery(gallery.querySelector("[data-daiion-archive-focus]"), [{ opacity: .2 }, { opacity: 1 }], { duration: 240 });
+  });
+}
+function revealDaiionGallery(gallery) {
+  cancelDaiionGalleryReveal();
+  animateDaiionGallery(gallery, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 320 });
+  gallery.querySelectorAll(".zhento-lower-third__leading, .zhento-lower-third__frame, .zhento-lower-third__signal").forEach((line) => {
+    animateDaiionGallery(line, [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 260 });
+  });
+  animateDaiionGallery(gallery.querySelector(".daiion-gallery__info"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 80, duration: 200 });
+  animateDaiionGallery(gallery.querySelector(".daiion-gallery__grid"), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 130, duration: 190 });
+}
+
 function setDaiionInformationContext(key = "") {
   const panel = portfolioWorldGateway?.querySelector("[data-daiion-information-selector]");
   if (!panel) return;
@@ -4157,9 +4205,13 @@ function setDaiionInformationContext(key = "") {
   const showDestinations = active === "draegin";
   const destination = portfolioWorldGateway.querySelector("[data-daiion-context-panel]");
   if (destination) {
+    const wasHidden = destination.hidden;
+    prepareDaiionGallery(destination);
     destination.hidden = !showDestinations;
     destination.inert = !showDestinations;
     destination.setAttribute("aria-hidden", String(!showDestinations));
+    if (!showDestinations) cancelDaiionGalleryReveal();
+    else if (wasHidden) revealDaiionGallery(destination);
   }
   const detail = portfolioWorldGateway.querySelector("[data-daiion-context-detail]");
   if (detail) {

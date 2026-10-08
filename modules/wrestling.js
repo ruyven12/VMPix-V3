@@ -19459,20 +19459,6 @@ function bindWrestlingLandingHallOfChampionsCta() {
   sync();
 }
 
-function syncDaiionLoreDestinationOption() {
-  const panel = document.querySelector(".daiion-destination-panel");
-  if (!panel || panel.querySelector("[data-daiion-destination-lore-option]")) return;
-  const loreOption = document.createElement("button");
-  loreOption.className = "daiion-destination-panel__item";
-  loreOption.type = "button";
-  loreOption.dataset.daiionDestinationLoreOption = "true";
-  loreOption.dataset.daiionDestinationTarget = "lore";
-  loreOption.setAttribute("aria-pressed", "false");
-  loreOption.textContent = "LORE OF DAÏION";
-  panel.append(loreOption);
-  if (typeof initDaiionDestinationPanel === "function") initDaiionDestinationPanel();
-}
-
 function syncDaiionLoreFocusPanel() {
   const panel = document.querySelector("[data-daiion-archive-focus]");
   if (!panel || panel.dataset.daiionSelectedTarget !== "lore") return;
@@ -19875,7 +19861,6 @@ function initWrestlingPeopleModule() {
   applyStaticWrestlingRelationshipHooks();
   syncDaiionEnvironmentalCoverage();
   syncDaiionRestingIdentityBlock();
-  syncDaiionLoreDestinationOption();
   bindWrestlingLandingHallOfChampionsCta();
   bindDaiionLoreFocusPanelContent();
 }
