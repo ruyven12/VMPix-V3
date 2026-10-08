@@ -3952,11 +3952,96 @@ function showZhentoInformationContext(landing, key) {
   }
 }
 let daiionLoreContext = null;
+let daiionVerifiedPhotoSnapshot = null;
+
+function getDaiionTelemetryNumber(raw) {
+  const value = typeof raw === "number" || (typeof raw === "string" && raw.trim()) ? Number(raw) : NaN;
+  return Number.isSafeInteger(value) && value >= 0 ? value : null;
+}
+
+function isDaiionTelemetryCurrent(context) {
+  return daiionLoreContext === context && context.key === "planet-stats" && getRouteFromUrl().name === "wrestling";
+}
+
+function paintDaiionTelemetryCounts(context, progress = 1) {
+  context.surface.querySelectorAll("[data-daiion-telemetry-value]").forEach((element) => {
+    const total = context.telemetryValues[element.dataset.daiionTelemetryValue];
+    element.textContent = total === null ? "—" : Math.round(total * progress).toLocaleString("en-US");
+  });
+}
+
+function resolveDaiionTelemetryCounts(context) {
+  cancelAnimationFrame(context.countFrame);
+  const start = () => {
+    if (!isDaiionTelemetryCurrent(context)) return;
+    if (reducedMotion.matches) { paintDaiionTelemetryCounts(context); return; }
+    const started = performance.now();
+    const tick = (now) => {
+      if (!isDaiionTelemetryCurrent(context)) return;
+      const progress = Math.min(1, (now - started) / 900);
+      paintDaiionTelemetryCounts(context, 1 - Math.pow(1 - progress, 3));
+      context.countFrame = progress < 1 ? requestAnimationFrame(tick) : 0;
+    };
+    context.countFrame = requestAnimationFrame(tick);
+  };
+  // Numerical arrival follows the same visible Photos/world tiers as the donor.
+  const tiers = context.surface.querySelectorAll(".zhento-telemetry__photos, .zhento-telemetry__world");
+  Promise.all([...tiers].flatMap((element) => element.getAnimations().map((animation) => animation.finished.catch(() => {})))).then(start);
+}
+
+function renderDaiionTelemetry(context, payloads) {
+  if (!isDaiionTelemetryCurrent(context)) return;
+  const [shows, people, venues] = payloads;
+  const photo = shows?.photoTotals;
+  const reportedPhotos = getDaiionTelemetryNumber(photo?.photosTotal);
+  const verified = reportedPhotos !== null && photo?.status === "complete" && photo?.complete === true;
+  const stale = reportedPhotos !== null && photo?.status === "stale";
+  if (verified || stale) daiionVerifiedPhotoSnapshot = { total: reportedPhotos, calculatedAt: photo.calculatedAt };
+  const photos = verified || stale ? reportedPhotos : daiionVerifiedPhotoSnapshot?.total ?? null;
+  const photoStale = photos !== null && !verified;
+  context.telemetryValues = {
+    photos,
+    shows: getDaiionTelemetryNumber(shows?.totals?.showsTotal),
+    matches: getDaiionTelemetryNumber(shows?.totals?.matchesTotal),
+    people: getDaiionTelemetryNumber(people?.totalPeople),
+    venues: getDaiionTelemetryNumber(venues?.total_venues),
+  };
+  const years = Array.isArray(shows?.byYear) ? shows.byYear.map((entry) => getDaiionTelemetryNumber(entry?.year)).filter((year) => year >= 1000 && year <= 9999) : [];
+  context.surface.querySelector("[data-daiion-archive-span]").textContent = years.length ? `ARCHIVE SPAN // ${Math.min(...years)} — ${Math.max(...years)}` : "ARCHIVE SPAN // — — —";
+  const available = Object.values(context.telemetryValues).filter((value) => value !== null).length;
+  const state = !available ? "unavailable" : available < 5 || !years.length ? "partial" : photoStale ? "stale" : "live";
+  const telemetry = context.surface.querySelector(".daiion-telemetry");
+  telemetry.dataset.telemetryState = state;
+  telemetry.setAttribute("aria-busy", "false");
+  context.surface.querySelector("[data-daiion-telemetry-status]").textContent = state === "live" ? "Live archive data" : state === "stale" ? "Live archive data · photo snapshot stale" : state === "partial" ? "Some archive data is unavailable" : "Archive data unavailable";
+  const photoStatus = context.surface.querySelector("[data-daiion-photo-status]");
+  photoStatus.textContent = verified ? "Verified photo snapshot" : photoStale ? "Verified photo snapshot · stale" : photo?.complete === false ? "Photo total unavailable · incomplete snapshot" : "Photo total unavailable";
+  photoStatus.dataset.photoState = verified ? "complete" : photoStale ? "stale" : "unavailable";
+  resolveDaiionTelemetryCounts(context);
+}
+
+function requestDaiionTelemetry(context) {
+  // One request group per active context; retap/departure aborts the group.
+  if (context.telemetryRequest) return context.telemetryRequest.promise;
+  const controller = new AbortController();
+  const request = { controller, timeout: setTimeout(() => controller.abort(), RING_ARCHIVE_STATS_TIMEOUT_MS), promise: null };
+  context.telemetryRequest = request;
+  request.promise = Promise.allSettled(["shows", "people", "venues"].map(async (kind) => {
+    const response = await fetch(new URL(`/api/wrestling/${kind}/stats`, RING_ARCHIVE_STATS_API_BASE_URL).href, { cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error("Archive telemetry unavailable");
+    const payload = await response.json();
+    if (payload?.ok !== true) throw new Error("Archive telemetry unavailable");
+    return payload;
+  })).then((results) => renderDaiionTelemetry(context, results.map((result) => result.status === "fulfilled" ? result.value : null)))
+    .finally(() => { clearTimeout(request.timeout); if (context.telemetryRequest === request) context.telemetryRequest = null; });
+  return request.promise;
+}
 
 function fitDaiionLoreBody() {
   const surface = portfolioWorldGateway?.querySelector(".daiion-lore");
-  if (!surface || surface.hidden || !["lore", "origins"].includes(surface.dataset.contextOwner)) return;
-  const body = surface.querySelector(".zhento-lower-third__body");
+  if (!surface || surface.hidden || !["lore", "origins", "planet-stats"].includes(surface.dataset.contextOwner)) return;
+  const telemetry = surface.dataset.contextOwner === "planet-stats";
+  const body = surface.querySelector(telemetry ? ".zhento-telemetry__body" : ".zhento-lower-third__body");
   const scrollTop = body.scrollTop;
   clearZhentoBodyScroll(surface);
   // Measure natural content once; all identity descendants count toward the reserved region.
@@ -3968,6 +4053,11 @@ function fitDaiionLoreBody() {
   blockers.forEach((rect) => {
     if (rect.width && rect.height && rect.left < panelRect.right && rect.right > panelRect.left) safeTop = Math.max(safeTop, rect.bottom + 12);
   });
+  if (telemetry) {
+    surface.style.setProperty("--daiion-telemetry-height", `${Math.max(1, Math.floor(Math.min(576, panelRect.bottom - safeTop)))}px`);
+    body.scrollTop = scrollTop;
+    return;
+  }
   const availableBody = Math.max(1, Math.floor(panelRect.bottom - safeTop - (panelRect.height - bodyRect.height)));
   if (bodyRect.height <= availableBody + 1) return;
   body.style.maxBlockSize = `${availableBody}px`;
@@ -3981,8 +4071,15 @@ function fitDaiionLoreBody() {
 function cancelDaiionLoreContext(hide = true) {
   const context = daiionLoreContext;
   context?.animations.forEach((animation) => animation.cancel());
-  if (context) context.animations = [];
+  if (context) {
+    context.animations = [];
+    cancelAnimationFrame(context.countFrame);
+    context.countFrame = 0;
+    if (!hide && context.telemetryValues) paintDaiionTelemetryCounts(context);
+  }
   if (!hide) return;
+  context?.telemetryRequest?.controller.abort();
+  clearTimeout(context?.telemetryRequest?.timeout);
   daiionLoreContext = null;
   const surface = context?.surface || portfolioWorldGateway?.querySelector(".daiion-lore");
   if (!surface) return;
@@ -3992,6 +4089,7 @@ function cancelDaiionLoreContext(hide = true) {
   clearZhentoBodyScroll(surface);
   surface.querySelector(".zhento-lower-third__reading-zone").replaceChildren();
   delete surface.dataset.lowerThirdContent;
+  surface.style.removeProperty("--daiion-telemetry-height");
 }
 
 function showDaiionLoreContext(surface) {
@@ -4007,6 +4105,12 @@ function showDaiionLoreContext(surface) {
   surface.hidden = false;
   surface.inert = false;
   surface.setAttribute("aria-hidden", "false");
+  surface.setAttribute("aria-labelledby", key === "planet-stats" ? "daiion-telemetry-title" : "daiion-lore-title");
+  if (key === "planet-stats") {
+    const body = surface.querySelector(".zhento-telemetry__body");
+    body.scrollTop = 0;
+    void requestDaiionTelemetry(context);
+  }
   fitDaiionLoreBody();
   document.fonts?.ready.then(() => { if (daiionLoreContext === context) fitDaiionLoreBody(); });
   if (reducedMotion.matches) return;
@@ -4018,6 +4122,12 @@ function showDaiionLoreContext(surface) {
       if (daiionLoreContext === context) context.animations = context.animations.filter((item) => item !== animation);
     }).catch(() => {});
   };
+  if (key === "planet-stats") {
+    animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 480 });
+    surface.querySelectorAll(":scope > .zhento-lower-third__leading, :scope > .zhento-lower-third__frame, :scope > .zhento-lower-third__signal").forEach((line) => animate(line, [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 320 }));
+    ["header", "photos", "world", "archive", "footer"].forEach((part, index) => animate(surface.querySelector(`.zhento-telemetry__${part}`), [{ opacity: 0, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { delay: 80 + index * 50, duration: 200 }));
+    return;
+  }
     animate(surface, [{ opacity: 0, transform: "translateX(6px)" }, { opacity: 1, transform: "none" }], { duration: 400 });
     animate(surface.querySelector(".zhento-lower-third__leading"), [{ opacity: 0, transform: "scaleX(.04)" }, { opacity: .8, transform: "scaleX(1)" }], { duration: 270 });
     animate(surface.querySelector(".zhento-lower-third__frame--upper"), [{ opacity: 0, transform: "scaleX(0)" }, { opacity: .75, transform: "scaleX(1)" }], { delay: 20, duration: 260 });
@@ -4061,7 +4171,7 @@ function setDaiionInformationContext(key = "") {
   const host = portfolioWorldGateway.querySelector("[data-daiion-context-host]");
   if (host) {
     host.dataset.contextOwner = active;
-    if (active === "lore" || active === "origins") showDaiionLoreContext(host);
+    if (active === "lore" || active === "origins" || active === "planet-stats") showDaiionLoreContext(host);
     else cancelDaiionLoreContext();
   }
 }
