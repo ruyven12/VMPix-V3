@@ -12734,8 +12734,8 @@ button {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: calc((var(--beacon-hit-size) / 2 - 2px) * 5);
-  height: calc((var(--beacon-hit-size) / 2 - 2px) * 5);
+  width: calc((var(--beacon-hit-size) / 2 - 2px) * 10);
+  height: calc((var(--beacon-hit-size) / 2 - 2px) * 10);
   transform: translate(-50%, -50%);
   pointer-events: none;
   display: none;
@@ -12753,7 +12753,7 @@ button {
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
-  transform: scale(0.057);
+  transform: scale(0.0285);
   transform-origin: center;
 }
 .portfolio-star-energy::before {
@@ -12775,15 +12775,15 @@ button {
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(7) { --portfolio-star-wave-delay: -4.8s; }
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(8) { --portfolio-star-wave-delay: -5.6s; }
 @keyframes portfolioStarIdleWave {
-  0% { transform: scale(0.057); opacity: 0; }
-  14% { opacity: 0.56; }
-  45% { opacity: 0.22; }
+  0% { transform: scale(0.0285); opacity: 0; }
+  14% { opacity: 0.7; }
+  45% { opacity: 0.275; }
   68%, 100% { transform: scale(1); opacity: 0; }
 }
 @keyframes portfolioStarSelectionWave {
-  0% { transform: scale(0.057); opacity: 0; }
-  12% { opacity: 0.86; }
-  55% { opacity: 0.48; }
+  0% { transform: scale(0.0285); opacity: 0; }
+  12% { opacity: 1; }
+  55% { opacity: 0.6; }
   100% { transform: scale(1); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
