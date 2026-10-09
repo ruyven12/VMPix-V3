@@ -12792,6 +12792,113 @@ button {
   .portfolio-star-energy::after { animation: none !important; }
 }
 
+/* Zhento-only Portfolio identification prototype: independent of the Archive Analysis surface. */
+.portfolio-zhento-identification {
+  position: fixed;
+  z-index: 34;
+  top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(18px, 3svh, 40px));
+  left: 50%;
+  width: min(288px, calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  transform: translateX(-50%);
+  color: rgba(240, 236, 255, 0.96);
+  font-family: var(--font-display);
+  pointer-events: none;
+  isolation: isolate;
+  display: none;
+}
+.site-shell[data-shell-route="portfolio"][data-active-world="soundtrack"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-zhento-identification:not([hidden]) {
+  display: block;
+}
+.portfolio-zhento-identification,
+.portfolio-zhento-identification * { text-transform: none; }
+.portfolio-zhento-identification::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  background: linear-gradient(115deg, rgba(151, 107, 255, 0.66), rgba(94, 134, 239, 0.32) 60%, rgba(151, 107, 255, 0.5));
+  transform-origin: center;
+  animation: portfolioZhentoIdentificationFrame 240ms ease-out 60ms both;
+}
+.portfolio-zhento-identification::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(197, 177, 255, 0.85), transparent);
+  animation: portfolioZhentoIdentificationSignal 160ms ease-out both;
+}
+.portfolio-zhento-identification__screen {
+  margin: 1px;
+  padding: 13px 18px 14px;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  background:
+    linear-gradient(110deg, rgba(77, 38, 130, 0.24), rgba(19, 28, 59, 0.08)),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(168, 150, 226, 0.035) 7px 8px),
+    rgba(8, 7, 18, 0.72);
+  animation: portfolioZhentoIdentificationMaterialize 240ms ease-out 160ms both;
+}
+.portfolio-zhento-identification__label {
+  display: block;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.13em;
+  color: rgba(193, 174, 239, 0.85);
+  animation: portfolioZhentoIdentificationText 120ms ease-out 180ms both;
+}
+.portfolio-zhento-identification__title {
+  margin: 4px 0 10px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 10px rgba(138, 94, 238, 0.18);
+  animation: portfolioZhentoIdentificationText 180ms ease-out 240ms both;
+}
+.portfolio-zhento-identification__metadata {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 9px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 18px;
+  animation: portfolioZhentoIdentificationText 200ms ease-out 400ms both;
+}
+.portfolio-zhento-identification__metadata dt { color: rgba(191, 182, 217, 0.72); }
+.portfolio-zhento-identification__metadata dd { margin: 0; }
+@keyframes portfolioZhentoIdentificationSignal {
+  from { transform: scaleX(0.08); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes portfolioZhentoIdentificationFrame {
+  from { transform: scaleX(0.04); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@keyframes portfolioZhentoIdentificationMaterialize {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes portfolioZhentoIdentificationText {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (min-width: 900px) {
+  .portfolio-zhento-identification {
+    top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(32px, 6svh, 72px));
+    width: 336px;
+  }
+  .portfolio-zhento-identification__title { font-size: 36px; }
+  .portfolio-zhento-identification__metadata { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-zhento-identification::before,
+  .portfolio-zhento-identification::after,
+  .portfolio-zhento-identification * { animation: none !important; }
+}
+
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine {
   --engine-accent: 137 123 235;

@@ -141,6 +141,7 @@ const portfolioStarFeedStrands = portfolioStarFeedOverlay
   ? Array.from(portfolioStarFeedOverlay.querySelectorAll("[data-portfolio-star-feed-strand]"))
   : [];
 const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
+const portfolioZhentoIdentification = document.querySelector("[data-portfolio-zhento-identification]");
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
@@ -1198,6 +1199,7 @@ function startPortfolioWorldGateway() {
     return false;
   }
 
+  setPortfolioZhentoIdentification(false);
   portfolioGatewayGeneration += 1;
   if (activeWorld === "battleground") resetDaiionArchivePresentation();
   clearPortfolioGatewayPhaseTimer();
@@ -2131,6 +2133,12 @@ function refreshPortfolioEngineScan() {
   updatePortfolioEngineScanCoordinates(portfolioEngineScanTarget);
 }
 
+function setPortfolioZhentoIdentification(isVisible = false) {
+  if (!portfolioZhentoIdentification) return;
+  portfolioZhentoIdentification.hidden = !isVisible;
+  portfolioZhentoIdentification.setAttribute("aria-hidden", String(!isVisible));
+}
+
 function setPortfolioActiveWorld(worldName = "portfolio") {
   const config = getPortfolioWorldSelectionConfig(worldName);
   const previousWorld = shell?.dataset.activeWorld || "portfolio";
@@ -2145,6 +2153,7 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
     clearPortfolioGatewayFocusState();
   }
   const isPortfolioSelection = window.location.pathname === routePaths.portfolio && !isPortfolioGatewayActive();
+  setPortfolioZhentoIdentification(isPortfolioSelection && config.id === "soundtrack");
   setPortfolioEngineHudCurrentView(isPortfolioSelection
     ? PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio.label
     : (config.id === "battleground" ? "Outskirts of Daiion" : config.label));
@@ -6571,6 +6580,7 @@ function cancelPortfolioEngineReadyGate() {
 }
 
 function clearPortfolioEngineReadyState(options = {}) {
+  setPortfolioZhentoIdentification(false);
   cancelPortfolioEngineReadyGate();
   clearPortfolioEngineScan();
   stopPortfolioEngineLightning();
