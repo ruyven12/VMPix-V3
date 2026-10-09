@@ -142,6 +142,7 @@ const portfolioStarFeedStrands = portfolioStarFeedOverlay
   : [];
 const portfolioEngineProjection = document.querySelector("[data-portfolio-engine-projection]");
 const portfolioZhentoIdentification = document.querySelector("[data-portfolio-zhento-identification]");
+let portfolioZhentoIdentificationGeneration = 0;
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
@@ -1210,6 +1211,7 @@ function startPortfolioWorldGateway() {
   }
 
   if (activeWorld === "soundtrack" && !isPortfolioEngineReducedMotion() && !portfolioZhentoIdentification?.hidden) {
+    stopPortfolioZhentoIdentificationIdle(true);
     portfolioZhentoIdentification.classList.add("is-departing");
   } else setPortfolioZhentoIdentification(false);
   portfolioGatewayGeneration += 1;
@@ -2145,11 +2147,43 @@ function refreshPortfolioEngineScan() {
   updatePortfolioEngineScanCoordinates(portfolioEngineScanTarget);
 }
 
+function stopPortfolioZhentoIdentificationIdle(preserveOrientation = false) {
+  const panel = portfolioZhentoIdentification;
+  portfolioZhentoIdentificationGeneration += 1;
+  if (!panel) return;
+  const rings = panel.querySelectorAll(".portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2))");
+  // Read the four current orientations once, before removing the idle tracks.
+  const angles = preserveOrientation && panel.classList.contains("is-living")
+    ? Array.from(rings, (ring) => {
+      const matrix = new DOMMatrixReadOnly(getComputedStyle(ring).transform);
+      return Math.atan2(matrix.b, matrix.a) * 180 / Math.PI;
+    }) : null;
+  rings.forEach((ring, index) => {
+    if (angles) ring.style.setProperty("--orbital-rest-angle", `${angles[index]}deg`);
+    else if (!preserveOrientation) ring.style.removeProperty("--orbital-rest-angle");
+  });
+  panel.classList.remove("is-living");
+}
+
 function setPortfolioZhentoIdentification(isVisible = false) {
-  if (!portfolioZhentoIdentification) return;
-  if (!isVisible) portfolioZhentoIdentification.classList.remove("is-departing");
-  portfolioZhentoIdentification.hidden = !isVisible;
-  portfolioZhentoIdentification.setAttribute("aria-hidden", String(!isVisible));
+  const panel = portfolioZhentoIdentification;
+  if (!panel || (isVisible && !panel.hidden)) return;
+  stopPortfolioZhentoIdentificationIdle();
+  panel.classList.remove("is-departing");
+  panel.hidden = !isVisible;
+  panel.setAttribute("aria-hidden", String(!isVisible));
+  if (!isVisible || isPortfolioEngineReducedMotion()) return;
+  const generation = portfolioZhentoIdentificationGeneration;
+  // Completion of the existing CRT tracks owns idle activation; no new timer.
+  const ignition = panel.getAnimations({ subtree: true });
+  if (!ignition.length) return;
+  Promise.all(ignition.map((animation) => animation.finished)).then(() => {
+    if (generation !== portfolioZhentoIdentificationGeneration || panel.hidden ||
+        panel.classList.contains("is-departing") || isPortfolioGatewayActive() ||
+        window.location.pathname !== routePaths.portfolio || shell?.dataset.activeWorld !== "soundtrack" ||
+        isPortfolioEngineReducedMotion()) return;
+    panel.classList.add("is-living");
+  }).catch(() => {});
 }
 
 function reversePortfolioZhentoIdentification(entry) {

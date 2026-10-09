@@ -13048,6 +13048,52 @@ button {
   57.5% { transform: translateX(22%) scaleX(.65); opacity: .65; }
   77.5%, 100% { transform: translateX(42%) scaleX(.05); opacity: 0; }
 }
+/* Living telemetry starts only after the existing CRT ignition has settled.
+   These tracks are removed before the finite Traverse reverse is collected. */
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) {
+  --orbital-idle-turn: 360deg;
+  animation: portfolioZhentoOrbitalTelemetry 24s linear infinite;
+}
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(2), ellipse:nth-of-type(2)) { --orbital-idle-turn: -360deg; }
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__screen::after {
+  top: 7px;
+  left: 7px;
+  width: 12%;
+  height: calc(100% - 14px);
+  background: linear-gradient(90deg, transparent, rgba(130, 160, 245, .15), rgba(170, 140, 246, .28), transparent);
+  animation: portfolioZhentoGridTelemetry 9s linear infinite;
+}
+.portfolio-zhento-identification__title { position: relative; }
+.portfolio-zhento-identification__pulse {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  width: 84%;
+  max-width: 96px;
+  height: 8px;
+  transform: translateX(-50%);
+  color: rgba(155, 167, 244, .75);
+  opacity: 0;
+  pointer-events: none;
+}
+.portfolio-zhento-identification:is(.is-living, .is-departing) .portfolio-zhento-identification__pulse { opacity: .55; }
+.portfolio-zhento-identification__pulse path { transform-origin: center; }
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__pulse path { animation: portfolioZhentoPulseTelemetry 3.6s ease-in-out infinite; }
+@keyframes portfolioZhentoOrbitalTelemetry {
+  from { transform: rotate(var(--orbital-rest-angle)); }
+  to { transform: rotate(calc(var(--orbital-rest-angle) + var(--orbital-idle-turn))); }
+}
+@keyframes portfolioZhentoGridTelemetry {
+  0%, 10% { transform: translateX(0); opacity: 0; }
+  12% { opacity: .2; }
+  24% { transform: translateX(750%); opacity: .2; }
+  27%, 100% { transform: translateX(750%); opacity: 0; }
+}
+@keyframes portfolioZhentoPulseTelemetry {
+  0%, 100% { transform: scaleY(.45); opacity: .65; }
+  30%, 70% { transform: scaleY(.7); opacity: .8; }
+  45%, 55% { transform: scaleY(1); opacity: 1; }
+}
 @media (min-width: 900px) {
   .portfolio-zhento-identification {
     --identification-crt-trace-offset: 67px;
@@ -13060,6 +13106,9 @@ button {
   .portfolio-zhento-identification__metadata { font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .portfolio-zhento-identification__pulse { opacity: .55; }
+  .portfolio-zhento-identification.is-living .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) { transform: rotate(var(--orbital-rest-angle)); }
+  .portfolio-zhento-identification.is-living .portfolio-zhento-identification__screen::after { opacity: 0; }
   .portfolio-zhento-identification::before,
   .portfolio-zhento-identification::after,
   .portfolio-zhento-identification *,
