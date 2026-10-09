@@ -12749,7 +12749,7 @@ button {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px solid rgb(var(--beacon-color) / 0.9);
+  border: 1px solid rgb(var(--beacon-color) / 1);
   box-sizing: border-box;
   pointer-events: none;
   opacity: 0;
@@ -12760,7 +12760,7 @@ button {
   animation: portfolioStarIdleWave 6.4s linear var(--portfolio-star-wave-delay, 0s) infinite;
 }
 .portfolio-star-energy::after {
-  /* The one-shot wave travels 18% farther, with a brighter crest. */
+  /* The one-shot wave travels 18% farther. */
   inset: -9%;
   border-color: rgb(var(--beacon-color) / 1);
 }
@@ -12776,14 +12776,12 @@ button {
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(8) { --portfolio-star-wave-delay: -5.6s; }
 @keyframes portfolioStarIdleWave {
   0% { transform: scale(0.0285); opacity: 0; }
-  14% { opacity: 0.7; }
-  45% { opacity: 0.275; }
+  14%, 45% { opacity: 0.95; }
   68%, 100% { transform: scale(1); opacity: 0; }
 }
 @keyframes portfolioStarSelectionWave {
   0% { transform: scale(0.0285); opacity: 0; }
-  12% { opacity: 1; }
-  55% { opacity: 0.6; }
+  12%, 55% { opacity: 0.95; }
   100% { transform: scale(1); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
