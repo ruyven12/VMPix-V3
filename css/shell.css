@@ -12726,6 +12726,42 @@ button {
   transform: translate3d(-50%, -50%, 0) scale(1.22);
 }
 
+/* Idle waves repaint only the small button background; cores and diffraction remain independent. */
+@property --portfolio-star-wave-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --portfolio-star-wave-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon:not(:disabled) {
+  /* A 2px inset keeps the feather inside paint containment and the mobile edge targets. */
+  --portfolio-star-wave-radius: calc(3px + (var(--beacon-hit-size) / 2 - 5px) * var(--portfolio-star-wave-progress));
+  background-image: radial-gradient(circle at center,
+    transparent calc(var(--portfolio-star-wave-radius) - 0.85px),
+    rgb(var(--beacon-color) / var(--portfolio-star-wave-alpha)) calc(var(--portfolio-star-wave-radius) - 0.45px),
+    rgb(var(--beacon-color) / var(--portfolio-star-wave-alpha)) var(--portfolio-star-wave-radius),
+    transparent calc(var(--portfolio-star-wave-radius) + 0.6px));
+  background-size: 100% 100%;
+  animation: portfolioStarIdleWave 6.4s linear var(--portfolio-star-wave-delay, 0s) infinite;
+}
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(2) { --portfolio-star-wave-delay: -0.8s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(3) { --portfolio-star-wave-delay: -1.6s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(4) { --portfolio-star-wave-delay: -2.4s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(5) { --portfolio-star-wave-delay: -3.2s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(6) { --portfolio-star-wave-delay: -4s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(7) { --portfolio-star-wave-delay: -4.8s; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(8) { --portfolio-star-wave-delay: -5.6s; }
+@keyframes portfolioStarIdleWave {
+  0% { --portfolio-star-wave-progress: 0; --portfolio-star-wave-alpha: 0; }
+  14% { --portfolio-star-wave-alpha: 0.32; }
+  45% { --portfolio-star-wave-alpha: 0.12; }
+  68%, 100% { --portfolio-star-wave-progress: 1; --portfolio-star-wave-alpha: 0; }
+}
+
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine {
   --engine-accent: 137 123 235;

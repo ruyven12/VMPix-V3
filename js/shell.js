@@ -883,6 +883,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     // Decoded destination art replaces the world beneath the continuing transparent wave.
     applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics, settleLegacyProperties });
     shell.classList.add("is-portfolio-world-arrived");
+    if (worldName === "battleground") setPortfolioEngineHudCurrentView("Outskirts of Daiion");
     handoffPortfolioGatewayRoute(worldName, { confirmationDelay });
     trackWorldLandingMilestone(entry.landing, "route-adopted");
     syncPortfolioGatewayTriggerState();
