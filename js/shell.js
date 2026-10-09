@@ -624,13 +624,13 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
 }
 
-// Tracking only: transport, Router and the existing presentation callbacks retain their authority.
+// Shell tracks arrival and coordinates its native landing clock; transport and Router retain ownership.
 const worldLandingProfiles = Object.freeze({
   battleground: Object.freeze({ world: "daiion", route: routePaths.wrestling,
     landing: "route-adopted", selector: "[data-daiion-information-selector]",
     completionAnimation: "daiionArchiveStatsPanelProject" }),
   soundtrack: Object.freeze({ world: "zhento", route: routePaths.music,
-    landing: "landing-frame-start", selector: "[data-music-landing-stats]",
+    landing: "route-adopted", selector: "[data-music-landing-stats]",
     completionAnimation: "zhentoStatsPanelProject" }),
 });
 const worldLandingNextPhase = Object.freeze({
@@ -691,7 +691,7 @@ function beginWorldLanding(worldName) {
   const profile = worldLandingProfiles[worldName];
   if (!profile) return null;
   const instance = { token: ++worldLandingGeneration, gatewayGeneration: portfolioGatewayGeneration, profile, phase: "departure",
-    history: [{ phase: "departure", at: performance.now() }] };
+    history: [{ phase: "departure", at: performance.now() }], landingEpoch: null };
   activeWorldLanding = instance;
   getWorldLandingInteractionRoot(instance).inert = true;
   syncWorldLandingPresentation();
@@ -703,7 +703,11 @@ function trackWorldLandingMilestone(instance, milestone) {
   const phase = milestone === "preparation-start" ? "preparing"
     : milestone === "transport-start" ? "transport"
     : milestone === instance.profile.landing ? "landing" : null;
-  if (phase) advanceWorldLanding(instance, phase);
+  if (phase && advanceWorldLanding(instance, phase) && phase === "landing" && instance.profile.world === "zhento"
+    && !isPortfolioEngineReducedMotion()) {
+    // Start the arrival clock at adoption, while transport still keeps the retained interface hidden.
+    shell.dataset.musicTransportEntry = "arriving";
+  }
 }
 
 function completeWorldLanding(instance, source) {
@@ -713,6 +717,23 @@ function completeWorldLanding(instance, source) {
   instance.completionAccepted = true;
   instance.completionSource = source;
   return advanceWorldLanding(instance, "ready");
+}
+
+function synchronizeWorldLandingClock(instance, interfaceAnimation) {
+  if (activeWorldLanding !== instance || instance.token !== worldLandingGeneration
+    || instance.gatewayGeneration !== portfolioGatewayGeneration || instance.phase !== "landing"
+    || isPortfolioEngineReducedMotion()) return;
+  // The reference interface's native start is the epoch, including work already elapsed under transport.
+  instance.landingEpoch ??= interfaceAnimation?.startTime ?? document.timeline.currentTime;
+  if (instance.profile.world !== "zhento") return; // Daïion's established native schedule remains untouched.
+  const names = new Set(["zhentoTransportIdentityProject", "zhentoIdentityResolve", "zhentoHudReveal",
+    "zhentoStatsPanelProject", "daiionArchiveStatsProjectionLine", "daiionArchiveStatsContentResolve",
+    "daiionArchiveStatsLabelResolve"]);
+  getWorldLandingInteractionRoot(instance).getAnimations({ subtree: true }).forEach((animation) => {
+    if (names.has(animation.animationName) && animation.startTime !== instance.landingEpoch) {
+      animation.startTime = instance.landingEpoch;
+    }
+  });
 }
 
 function waitForWorldLandingCompletion(instance) {
@@ -759,6 +780,7 @@ function waitForWorldLandingCompletion(instance) {
     frame = requestAnimationFrame(() => {
       if (settled) return;
       animation = panel.getAnimations().find((item) => item.animationName === instance.profile.completionAnimation);
+      synchronizeWorldLandingClock(instance, animation);
       let remaining;
       if (animation) {
         remaining = Math.max(0, animation.effect.getComputedTiming().endTime - (animation.currentTime || 0));
