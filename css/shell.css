@@ -13663,3 +13663,59 @@ button {
   .portfolio-zhento-briefing__screen::before,
   .portfolio-zhento-briefing__screen::after { animation: none !important; }
 }
+
+/* Portfolio right emitter only: idle illumination yields to charging and transport. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor {
+  will-change: auto;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-ring {
+  animation: portfolioRightEmitterIdleRing 2.8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-core {
+  animation: none;
+  transform: none;
+  will-change: auto;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-core {
+  filter: grayscale(1) contrast(1.1) brightness(1.14) drop-shadow(0 0 .32rem rgb(var(--engine-accent-glow) / .26));
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before {
+  background: radial-gradient(circle, rgb(var(--engine-accent-glow) / .42) 0 12%, rgb(var(--engine-accent-soft) / .18) 28%, transparent 66%);
+  opacity: .55;
+  animation: portfolioRightEmitterIdleGlow 2.8s ease-in-out infinite;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
+  animation: none;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before {
+  /* One wave retains the existing primary-ring footprint and expansion. */
+  animation: portfolioRightEmitterReadyPulsePrimary 2800ms linear infinite;
+}
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
+  /* Reuse the second wave's layer as concentrated light, rather than another ring. */
+  inset: -5%;
+  border: 0;
+  background: radial-gradient(circle, rgb(var(--engine-accent-glow) / .42) 0 12%, rgb(var(--engine-accent-soft) / .18) 28%, transparent 66%);
+  opacity: .55;
+  animation: portfolioRightEmitterIdleGlow 2.8s ease-in-out infinite;
+}
+@keyframes portfolioRightEmitterIdleGlow {
+  0%, 100% { opacity: .38; transform: scale3d(.96, .96, 1); }
+  50% { opacity: .95; transform: scale3d(1.06, 1.06, 1); }
+}
+@keyframes portfolioRightEmitterIdleRing {
+  0%, 100% { opacity: .72; transform: scale3d(.99, .99, 1); }
+  50% { opacity: 1; transform: scale3d(1.04, 1.04, 1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-ring {
+    opacity: .88;
+    transform: none;
+  }
+  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before,
+  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
+    opacity: .55;
+    transform: none;
+  }
+}
