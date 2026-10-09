@@ -12798,7 +12798,9 @@ button {
   z-index: 34;
   top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(18px, 3svh, 40px));
   left: 50%;
-  width: min(288px, calc(100vw - 32px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  width: calc(100% - 20px);
+  max-width: 500px;
+  height: 128px;
   transform: translateX(-50%);
   color: rgba(240, 236, 255, 0.96);
   font-family: var(--font-display);
@@ -12832,8 +12834,14 @@ button {
   animation: portfolioZhentoIdentificationSignal 160ms ease-out both;
 }
 .portfolio-zhento-identification__screen {
+  display: grid;
+  grid-template-columns: clamp(76px, 24vw, 102px) minmax(0, 1fr);
+  gap: clamp(10px, 2.6vw, 16px);
+  align-items: center;
+  height: calc(100% - 2px);
+  box-sizing: border-box;
   margin: 1px;
-  padding: 13px 18px 14px;
+  padding: 12px;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   background:
     linear-gradient(110deg, rgba(77, 38, 130, 0.24), rgba(19, 28, 59, 0.08)),
@@ -12841,6 +12849,13 @@ button {
     rgba(8, 7, 18, 0.72);
   animation: portfolioZhentoIdentificationMaterialize 240ms ease-out 160ms both;
 }
+.portfolio-zhento-identification__orbital {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+}
+.portfolio-zhento-identification__readout { min-width: 0; }
 .portfolio-zhento-identification__label {
   display: block;
   font-size: 10px;
@@ -12888,8 +12903,10 @@ button {
 @media (min-width: 900px) {
   .portfolio-zhento-identification {
     top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(32px, 6svh, 72px));
-    width: 336px;
+    width: 472px;
+    height: 135px;
   }
+  .portfolio-zhento-identification__screen { grid-template-columns: 104px minmax(0, 1fr); gap: 18px; padding-inline: 16px; }
   .portfolio-zhento-identification__title { font-size: 36px; }
   .portfolio-zhento-identification__metadata { font-size: 12px; }
 }
