@@ -12726,27 +12726,46 @@ button {
   transform: translate3d(-50%, -50%, 0) scale(1.22);
 }
 
-/* Idle waves repaint only the small button background; cores and diffraction remain independent. */
-@property --portfolio-star-wave-progress {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
-@property --portfolio-star-wave-alpha {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 0;
-}
+/* Visual-only waves escape the hit area; the existing star field clips at viewport edges. */
 .site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon:not(:disabled) {
-  /* A 2px inset keeps the feather inside paint containment and the mobile edge targets. */
-  --portfolio-star-wave-radius: calc(3px + (var(--beacon-hit-size) / 2 - 5px) * var(--portfolio-star-wave-progress));
-  background-image: radial-gradient(circle at center,
-    transparent calc(var(--portfolio-star-wave-radius) - 0.85px),
-    rgb(var(--beacon-color) / var(--portfolio-star-wave-alpha)) calc(var(--portfolio-star-wave-radius) - 0.45px),
-    rgb(var(--beacon-color) / var(--portfolio-star-wave-alpha)) var(--portfolio-star-wave-radius),
-    transparent calc(var(--portfolio-star-wave-radius) + 0.6px));
-  background-size: 100% 100%;
+  contain: layout style;
+}
+.portfolio-star-energy {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc((var(--beacon-hit-size) / 2 - 2px) * 5);
+  height: calc((var(--beacon-hit-size) / 2 - 2px) * 5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: none;
+}
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-beacon:not(:disabled) .portfolio-star-energy {
+  display: block;
+}
+.portfolio-star-energy::before,
+.portfolio-star-energy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--beacon-color) / 0.9);
+  box-sizing: border-box;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.057);
+  transform-origin: center;
+}
+.portfolio-star-energy::before {
   animation: portfolioStarIdleWave 6.4s linear var(--portfolio-star-wave-delay, 0s) infinite;
+}
+.portfolio-star-energy::after {
+  /* The one-shot wave travels 18% farther, with a brighter crest. */
+  inset: -9%;
+  border-color: rgb(var(--beacon-color) / 1);
+}
+.portfolio-beacon[aria-pressed="true"] .portfolio-star-energy::after {
+  animation: portfolioStarSelectionWave 950ms cubic-bezier(0.16, 0.55, 0.28, 1) both;
 }
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(2) { --portfolio-star-wave-delay: -0.8s; }
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(3) { --portfolio-star-wave-delay: -1.6s; }
@@ -12756,10 +12775,21 @@ button {
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(7) { --portfolio-star-wave-delay: -4.8s; }
 .site-shell[data-shell-route="portfolio"] .portfolio-beacon:nth-child(8) { --portfolio-star-wave-delay: -5.6s; }
 @keyframes portfolioStarIdleWave {
-  0% { --portfolio-star-wave-progress: 0; --portfolio-star-wave-alpha: 0; }
-  14% { --portfolio-star-wave-alpha: 0.32; }
-  45% { --portfolio-star-wave-alpha: 0.12; }
-  68%, 100% { --portfolio-star-wave-progress: 1; --portfolio-star-wave-alpha: 0; }
+  0% { transform: scale(0.057); opacity: 0; }
+  14% { opacity: 0.56; }
+  45% { opacity: 0.22; }
+  68%, 100% { transform: scale(1); opacity: 0; }
+}
+@keyframes portfolioStarSelectionWave {
+  0% { transform: scale(0.057); opacity: 0; }
+  12% { opacity: 0.86; }
+  55% { opacity: 0.48; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-star-energy { display: none !important; }
+  .portfolio-star-energy::before,
+  .portfolio-star-energy::after { animation: none !important; }
 }
 
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */

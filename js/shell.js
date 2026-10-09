@@ -2192,6 +2192,12 @@ function initPortfolioBeaconHotspots() {
   portfolioGatewayTrigger?.addEventListener("click", handlePortfolioGatewayTriggerClick);
   syncPortfolioGatewayTriggerState();
   portfolioBeaconHotspots.forEach((button) => {
+    if (!button.querySelector(".portfolio-star-energy")) {
+      const energy = document.createElement("span");
+      energy.className = "portfolio-star-energy";
+      energy.setAttribute("aria-hidden", "true");
+      button.append(energy);
+    }
     button.addEventListener("click", handlePortfolioBeaconHotspotClick);
     button.addEventListener("keydown", handlePortfolioBeaconHotspotKeydown);
   });
