@@ -12840,7 +12840,8 @@ button {
 .portfolio-zhento-identification__screen {
   display: grid;
   grid-template-columns: clamp(76px, 24vw, 102px) minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: clamp(7px, 2vw, 12px);
+  --identification-column-gap: clamp(7px, 2vw, 12px);
+  gap: var(--identification-column-gap);
   align-items: center;
   height: calc(100% - 2px);
   box-sizing: border-box;
@@ -12903,10 +12904,12 @@ button {
   transform-box: view-box;
   transform-origin: 60px 60px;
   --orbital-rest-angle: 0deg;
+  --orbital-sweep-angle: -36deg;
+  transform: rotate(var(--orbital-rest-angle));
   animation: portfolioZhentoOrbitalSweep 800ms linear both;
 }
-.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(1) { --orbital-rest-angle: -28deg; }
-.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(2) { --orbital-rest-angle: 34deg; }
+.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(1) { --orbital-rest-angle: -28deg; --orbital-sweep-angle: -48deg; }
+.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(2) { --orbital-rest-angle: 34deg; --orbital-sweep-angle: 42deg; }
 .portfolio-zhento-identification__orbital > g:first-of-type > circle:nth-of-type(4) {
   animation: portfolioZhentoOrbitalAcquire 800ms linear both;
 }
@@ -12926,7 +12929,57 @@ button {
   opacity: 0;
   animation: portfolioZhentoIdentityTransfer 800ms linear both;
 }
+/* Static HUD geometry sits behind the three existing content columns. */
 .portfolio-zhento-identification__screen { position: relative; }
+.portfolio-zhento-identification__screen::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(178, 155, 249, .7), rgba(178, 155, 249, .7)) left top / 24px 1px no-repeat,
+    linear-gradient(rgba(129, 176, 244, .65), rgba(129, 176, 244, .65)) left top / 1px 5px no-repeat,
+    linear-gradient(rgba(178, 155, 249, .7), rgba(178, 155, 249, .7)) right bottom / 24px 1px no-repeat,
+    linear-gradient(rgba(129, 176, 244, .65), rgba(129, 176, 244, .65)) right bottom / 1px 5px no-repeat,
+    linear-gradient(rgba(151, 149, 244, .14) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, rgba(126, 164, 239, .14) 1px, transparent 1px) 0 0 / 14px 14px;
+  opacity: .3;
+  animation: portfolioZhentoHudGrid 800ms linear both;
+}
+.portfolio-zhento-identification__orbital,
+.portfolio-zhento-identification__readout,
+.portfolio-zhento-identification__metadata { position: relative; z-index: 1; }
+.portfolio-zhento-identification__screen::after { z-index: 0; }
+.portfolio-zhento-identification__readout::before,
+.portfolio-zhento-identification__readout::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(151, 169, 249, .85), rgba(151, 169, 249, .85)) center top / 3px 1px no-repeat,
+    linear-gradient(rgba(178, 144, 241, .85), rgba(178, 144, 241, .85)) center bottom / 3px 1px no-repeat,
+    linear-gradient(transparent, rgba(146, 131, 234, .65) 18% 82%, transparent) center / 1px 100% no-repeat;
+  transform-origin: center;
+  opacity: .5;
+  animation: portfolioZhentoHudDividers 800ms linear both;
+}
+.portfolio-zhento-identification__readout::before { left: calc(var(--identification-column-gap) / -2 - 1.5px); }
+.portfolio-zhento-identification__readout::after { right: calc(var(--identification-column-gap) / -2 - 1.5px); }
+@keyframes portfolioZhentoHudGrid {
+  0% { opacity: 0; }
+  18.75% { opacity: .7; }
+  50% { opacity: .5; }
+  81.25%, 100% { opacity: .3; }
+}
+@keyframes portfolioZhentoHudDividers {
+  0%, 18.75% { transform: scaleY(.05); opacity: 0; }
+  50% { transform: scaleY(1); opacity: .85; }
+  81.25%, 100% { transform: scaleY(1); opacity: .5; }
+}
 @keyframes portfolioZhentoIdentificationSignal {
   0% { transform: scaleX(.08); opacity: 0; }
   20%, 100% { transform: scaleX(1); opacity: 1; }
@@ -12957,8 +13010,8 @@ button {
   75%, 100% { fill-opacity: 1; stroke-opacity: 1; }
 }
 @keyframes portfolioZhentoOrbitalSweep {
-  0%, 15% { transform: rotate(calc(var(--orbital-rest-angle) - 18deg)); stroke-opacity: .15; }
-  42.5% { stroke-opacity: .8; }
+  0%, 18.75% { transform: rotate(calc(var(--orbital-rest-angle) + var(--orbital-sweep-angle))); stroke-opacity: .12; }
+  50% { stroke-opacity: 1; }
   81.25%, 100% { transform: rotate(var(--orbital-rest-angle)); stroke-opacity: 1; }
 }
 @keyframes portfolioZhentoOrbitalScan {
@@ -12985,7 +13038,10 @@ button {
   .portfolio-zhento-identification::before,
   .portfolio-zhento-identification::after,
   .portfolio-zhento-identification *,
-  .portfolio-zhento-identification__screen::after { animation: none !important; }
+  .portfolio-zhento-identification__screen::after,
+  .portfolio-zhento-identification__screen::before,
+  .portfolio-zhento-identification__readout::before,
+  .portfolio-zhento-identification__readout::after { animation: none !important; }
 }
 
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
