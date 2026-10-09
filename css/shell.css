@@ -5663,13 +5663,18 @@ button {
 
 
 .site-shell:is(:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])), [data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived, :is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back]))) .engine-lightning-overlay {
-  --engine-title-exclusion-start: 24%;
-  --engine-title-exclusion-end: 76%;
-  --engine-title-exclusion-feather: 1.4%;
   visibility: visible !important;
   opacity: 0.72 !important;
   animation: wrestling2TeslaArcIdleOverlay 9.8s cubic-bezier(0.42, 0, 0.24, 1) infinite !important;
   transition: none;
+}
+
+/* The persistent rail uses one center cutout on Portfolio and world pages. */
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .engine-lightning-overlay,
+.site-shell:is(:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])), [data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived, :is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back]))) .engine-lightning-overlay {
+  --engine-title-exclusion-start: 24%;
+  --engine-title-exclusion-end: 76%;
+  --engine-title-exclusion-feather: 1.4%;
   -webkit-mask-image:
     linear-gradient(90deg, transparent 0%, #000 7%, #000 93%, transparent 100%),
     linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%),
@@ -6495,6 +6500,7 @@ button {
 }
 
 @media (min-width: 64rem) {
+  .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .engine-lightning-overlay,
   .site-shell:is(:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])), [data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived, :is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back]))) .engine-lightning-overlay {
     --engine-title-exclusion-start: 36%;
     --engine-title-exclusion-end: 64%;
@@ -12748,6 +12754,7 @@ button {
   /* Music uses the base 3.35rem readout reserve after Portfolio route variables retire. */
   min-height: calc(3.35rem - clamp(0.68rem, 2.1svh, 1.08rem));
 }
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left {
   position: absolute;
@@ -12764,8 +12771,10 @@ button {
   transform: translate3d(-50%,-50%,0);
   background: transparent;
 }
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-label { display: block; text-transform: none; }
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
 
