@@ -12743,6 +12743,12 @@ button {
 
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .universal-bottom-rail { display: none; }
 
+/* Prepare Zhento's settled readout while the shared arrival still owns its hidden presentation. */
+.site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left {
+  /* Music uses the base 3.35rem readout reserve after Portfolio route variables retire. */
+  min-height: calc(3.35rem - clamp(0.68rem, 2.1svh, 1.08rem));
+}
+.site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
@@ -12758,7 +12764,9 @@ button {
   transform: translate3d(-50%,-50%,0);
   background: transparent;
 }
+.site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-label { display: block; text-transform: none; }
+.site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
 
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])):not([data-shell-module]) .portfolio-engine { visibility: hidden; }
