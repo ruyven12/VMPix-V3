@@ -2459,14 +2459,8 @@ button {
   visibility: hidden !important;
 }
 
-/* Selection owns this readout while the existing star feed prepares the destination. */
-.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-gateway-active):is([data-portfolio-star-feed-state="feeding"], [data-portfolio-star-feed-state="charging"]) .portfolio-engine-panel--left {
-  opacity: 0;
-  pointer-events: none;
-  transition: none;
-}
-
-.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .portfolio-engine-panel--left {
+/* Keep selection visible; retain the existing readout retirement during actual world entry. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"][data-world-landing-world] .portfolio-engine-panel--left {
   opacity: 0;
   pointer-events: none;
 }
