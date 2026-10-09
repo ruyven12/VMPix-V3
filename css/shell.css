@@ -12794,6 +12794,8 @@ button {
 
 /* Zhento-only Portfolio identification prototype: independent of the Archive Analysis surface. */
 .portfolio-zhento-identification {
+  --identification-duration: 600ms;
+  --identification-crt-trace-offset: 63.5px;
   position: fixed;
   z-index: 34;
   top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(18px, 3svh, 40px));
@@ -12814,6 +12816,10 @@ button {
 .site-shell[data-shell-route="portfolio"][data-active-world="soundtrack"] .portfolio-zhento-identification.is-departing:not([hidden]) {
   display: block;
 }
+.portfolio-zhento-identification.is-departing { --identification-duration: 800ms; }
+.portfolio-zhento-identification.is-departing::before { animation-name: portfolioZhentoIdentificationFrame; }
+.portfolio-zhento-identification.is-departing::after { animation-name: portfolioZhentoIdentificationSignal; }
+.portfolio-zhento-identification.is-departing .portfolio-zhento-identification__screen { animation-name: portfolioZhentoIdentificationMaterialize; }
 .portfolio-zhento-identification,
 .portfolio-zhento-identification * { text-transform: none; }
 .portfolio-zhento-identification::before {
@@ -12821,11 +12827,11 @@ button {
   position: absolute;
   inset: 0;
   z-index: -1;
-  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  clip-path: polygon(evenodd, 0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px), 0 0, 1px 1px, 1px calc(100% - 11px), 11px calc(100% - 1px), calc(100% - 1px) calc(100% - 1px), calc(100% - 1px) 15px, calc(100% - 15px) 1px, 1px 1px);
   background: linear-gradient(115deg, rgba(151, 107, 255, 0.72), rgba(94, 134, 239, 0.38) 60%, rgba(151, 107, 255, 0.56));
   box-shadow: inset 0 0 8px rgba(147, 115, 232, 0.12);
   transform-origin: center;
-  animation: portfolioZhentoIdentificationFrame 800ms linear both;
+  animation: portfolioZhentoCrtFrame var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification::after {
   content: "";
@@ -12835,7 +12841,7 @@ button {
   right: 24px;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(197, 177, 255, 0.85), transparent);
-  animation: portfolioZhentoIdentificationSignal 800ms linear both;
+  animation: portfolioZhentoCrtSignal var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__screen {
   display: grid;
@@ -12849,10 +12855,10 @@ button {
   padding: 12px;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   background:
-    linear-gradient(110deg, rgba(77, 38, 130, 0.24), rgba(19, 28, 59, 0.08)),
+    linear-gradient(110deg, rgba(77, 38, 130, 0.168), rgba(19, 28, 59, 0.056)),
     repeating-linear-gradient(0deg, transparent 0 7px, rgba(168, 150, 226, 0.035) 7px 8px),
-    rgba(8, 7, 18, 0.72);
-  animation: portfolioZhentoIdentificationMaterialize 800ms linear both;
+    rgba(8, 7, 18, 0.504);
+  animation: portfolioZhentoCrtScreen var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__orbital {
   display: block;
@@ -12875,7 +12881,7 @@ button {
   line-height: 12px;
   letter-spacing: 0.13em;
   color: rgba(193, 174, 239, 0.85);
-  animation: portfolioZhentoIdentificationLabel 800ms linear both;
+  animation: portfolioZhentoIdentificationLabel var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__title {
   margin: 6px 0 0;
@@ -12884,7 +12890,7 @@ button {
   line-height: 1.1;
   letter-spacing: 0.04em;
   text-shadow: 0 0 6px rgba(153, 118, 246, 0.3), 0 0 14px rgba(112, 155, 239, 0.12);
-  animation: portfolioZhentoIdentificationTitle 800ms linear both;
+  animation: portfolioZhentoIdentificationTitle var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__metadata {
   display: grid;
@@ -12894,11 +12900,12 @@ button {
   font-size: 11px;
   line-height: 15px;
   white-space: nowrap;
-  animation: portfolioZhentoIdentificationMetadata 800ms linear both;
+  text-align: center;
+  animation: portfolioZhentoIdentificationMetadata var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__metadata dt { color: rgba(191, 182, 217, 0.72); }
 .portfolio-zhento-identification__metadata dd { margin: 0; }
-/* All identification tracks share one 800ms clock, including their holds.
+/* Arrival tracks share 600ms; accepted Traverse retains the original 800ms reverse tracks.
    Traverse reverses these same native animations; no second exit choreography. */
 .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) {
   transform-box: view-box;
@@ -12906,15 +12913,15 @@ button {
   --orbital-rest-angle: 0deg;
   --orbital-sweep-angle: -36deg;
   transform: rotate(var(--orbital-rest-angle));
-  animation: portfolioZhentoOrbitalSweep 800ms linear both;
+  animation: portfolioZhentoOrbitalSweep var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(1) { --orbital-rest-angle: -28deg; --orbital-sweep-angle: -48deg; }
 .portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(2) { --orbital-rest-angle: 34deg; --orbital-sweep-angle: 42deg; }
 .portfolio-zhento-identification__orbital > g:first-of-type > circle:nth-of-type(4) {
-  animation: portfolioZhentoOrbitalAcquire 800ms linear both;
+  animation: portfolioZhentoOrbitalAcquire var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__orbital > g:first-of-type > path:first-of-type {
-  animation: portfolioZhentoOrbitalScan 800ms linear both;
+  animation: portfolioZhentoOrbitalScan var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__screen::after {
   content: "";
@@ -12927,7 +12934,7 @@ button {
   transform-origin: left;
   background: linear-gradient(90deg, transparent, rgba(168, 166, 255, .48), transparent);
   opacity: 0;
-  animation: portfolioZhentoIdentityTransfer 800ms linear both;
+  animation: portfolioZhentoIdentityTransfer var(--identification-duration) linear both;
 }
 /* Static HUD geometry sits behind the three existing content columns. */
 .portfolio-zhento-identification__screen { position: relative; }
@@ -12945,7 +12952,7 @@ button {
     linear-gradient(rgba(151, 149, 244, .14) 1px, transparent 1px) 0 0 / 14px 14px,
     linear-gradient(90deg, rgba(126, 164, 239, .14) 1px, transparent 1px) 0 0 / 14px 14px;
   opacity: .3;
-  animation: portfolioZhentoHudGrid 800ms linear both;
+  animation: portfolioZhentoHudGrid var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__orbital,
 .portfolio-zhento-identification__readout,
@@ -12965,7 +12972,7 @@ button {
     linear-gradient(transparent, rgba(146, 131, 234, .65) 18% 82%, transparent) center / 1px 100% no-repeat;
   transform-origin: center;
   opacity: .5;
-  animation: portfolioZhentoHudDividers 800ms linear both;
+  animation: portfolioZhentoHudDividers var(--identification-duration) linear both;
 }
 .portfolio-zhento-identification__readout::before { left: calc(var(--identification-column-gap) / -2 - 1.5px); }
 .portfolio-zhento-identification__readout::after { right: calc(var(--identification-column-gap) / -2 - 1.5px); }
@@ -12979,6 +12986,23 @@ button {
   0%, 18.75% { transform: scaleY(.05); opacity: 0; }
   50% { transform: scaleY(1); opacity: .85; }
   81.25%, 100% { transform: scaleY(1); opacity: .5; }
+}
+/* CRT powers on from a central horizontal trace; transforms never change layout.
+   The original frame/screen tracks below remain the Traverse departure donor. */
+@keyframes portfolioZhentoCrtSignal {
+  0% { transform: translateY(var(--identification-crt-trace-offset)) scaleX(.08); opacity: 0; }
+  10% { transform: translateY(var(--identification-crt-trace-offset)) scaleX(1); opacity: .85; }
+  35%, 100% { transform: translateY(0) scaleX(1); opacity: 1; }
+}
+@keyframes portfolioZhentoCrtFrame {
+  0% { transform: scale(.08, .008); opacity: 0; }
+  10% { transform: scale(1, .008); opacity: .8; }
+  35%, 100% { transform: scale(1, 1); opacity: 1; }
+}
+@keyframes portfolioZhentoCrtScreen {
+  0%, 10% { transform: scaleY(.008); opacity: 0; }
+  16.6667% { transform: scaleY(.008); opacity: 1; }
+  40%, 100% { transform: scaleY(1); opacity: 1; }
 }
 @keyframes portfolioZhentoIdentificationSignal {
   0% { transform: scaleX(.08); opacity: 0; }
@@ -13026,6 +13050,7 @@ button {
 }
 @media (min-width: 900px) {
   .portfolio-zhento-identification {
+    --identification-crt-trace-offset: 67px;
     top: max(calc(env(safe-area-inset-top, 0px) + 16px), clamp(32px, 6svh, 72px));
     width: 472px;
     height: 135px;
