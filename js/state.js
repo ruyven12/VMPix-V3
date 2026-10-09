@@ -2628,6 +2628,7 @@ function resetDaiionCrusadesConvergencePrototype() {
 }
 
 function startDaiionCrusadesConvergencePrototype() {
+  if (typeof isWorldLandingInteractionBlocked === "function" && isWorldLandingInteractionBlocked("daiion")) return;
   if (daiionCrusadesConvergenceInProgress || !isDaiionArchiveLandingPath() || daiionDestinationSelectedTarget !== "campaigns") {
     return;
   }
@@ -2859,6 +2860,7 @@ function syncDaiionDestinationSelection() {
 }
 
 function setDaiionDestinationTarget(target) {
+  if (typeof isWorldLandingInteractionBlocked === "function" && isWorldLandingInteractionBlocked("daiion")) return;
   if (daiionCrusadesConvergenceInProgress || !isDaiionArchiveLandingPath() || !daiionDestinationTargets.has(target)) {
     return;
   }
@@ -2874,6 +2876,7 @@ function resetDaiionDestinationSelection() {
 }
 
 function routeDaiionArchiveFocusPanel() {
+  if (typeof isWorldLandingInteractionBlocked === "function" && isWorldLandingInteractionBlocked("daiion")) return;
   const focusPanel = document.querySelector("[data-daiion-archive-focus]");
   const routeTarget = focusPanel?.getAttribute("data-daiion-route-target");
   if (!routeTarget || !isDaiionArchiveLandingPath() || !focusPanel.classList.contains("is-active")) {

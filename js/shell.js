@@ -627,9 +627,11 @@ function syncPortfolioGatewayTriggerState() {
 // Tracking only: transport, Router and the existing presentation callbacks retain their authority.
 const worldLandingProfiles = Object.freeze({
   battleground: Object.freeze({ world: "daiion", route: routePaths.wrestling,
-    landing: "route-adopted", ready: "transport-finished" }),
+    landing: "route-adopted", selector: "[data-daiion-information-selector]",
+    completionAnimation: "daiionArchiveStatsPanelProject" }),
   soundtrack: Object.freeze({ world: "zhento", route: routePaths.music,
-    landing: "landing-frame-start", ready: "landing-frame-finished" }),
+    landing: "landing-frame-start", selector: "[data-music-landing-stats]",
+    completionAnimation: "zhentoStatsPanelProject" }),
 });
 const worldLandingNextPhase = Object.freeze({
   departure: "preparing", preparing: "transport", transport: "landing", landing: "ready",
@@ -650,12 +652,33 @@ function syncWorldLandingPresentation() {
   }
 }
 
+function getWorldLandingInteractionRoot(instance = activeWorldLanding) {
+  return instance?.profile.world === "daiion" ? portfolioWorldGateway
+    : instance?.profile.world === "zhento" ? musicNexusShell : null;
+}
+
+function isWorldLandingInteractionBlocked(world) {
+  return Boolean(activeWorldLanding && activeWorldLanding.profile.world === world);
+}
+
+function blockWorldLandingActivation(event) {
+  if (!activeWorldLanding || !getWorldLandingInteractionRoot()?.contains(event.target)
+    || (event.type === "keydown" && event.key !== "Enter" && event.key !== " ")) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}
+shell?.addEventListener("click", blockWorldLandingActivation, true);
+shell?.addEventListener("keydown", blockWorldLandingActivation, true);
+
 function advanceWorldLanding(instance, phase) {
   if (!instance || activeWorldLanding !== instance || instance.token !== worldLandingGeneration
+    || (phase === "ready" && !instance.completionAccepted)
     || (phase !== "cancelled" && worldLandingNextPhase[instance.phase] !== phase)) return false;
   instance.phase = phase;
   instance.history.push({ phase, at: performance.now() });
   if (phase === "ready" || phase === "cancelled") {
+    instance.cancelCompletion?.();
+    if (phase === "ready") getWorldLandingInteractionRoot(instance).inert = false;
     activeWorldLanding = null;
     lastWorldLanding = instance;
   }
@@ -667,9 +690,10 @@ function beginWorldLanding(worldName) {
   advanceWorldLanding(activeWorldLanding, "cancelled");
   const profile = worldLandingProfiles[worldName];
   if (!profile) return null;
-  const instance = { token: ++worldLandingGeneration, profile, phase: "departure",
+  const instance = { token: ++worldLandingGeneration, gatewayGeneration: portfolioGatewayGeneration, profile, phase: "departure",
     history: [{ phase: "departure", at: performance.now() }] };
   activeWorldLanding = instance;
+  getWorldLandingInteractionRoot(instance).inert = true;
   syncWorldLandingPresentation();
   return instance;
 }
@@ -678,9 +702,80 @@ function trackWorldLandingMilestone(instance, milestone) {
   if (!instance) return;
   const phase = milestone === "preparation-start" ? "preparing"
     : milestone === "transport-start" ? "transport"
-    : milestone === instance.profile.landing ? "landing"
-    : milestone === instance.profile.ready ? "ready" : null;
+    : milestone === instance.profile.landing ? "landing" : null;
   if (phase) advanceWorldLanding(instance, phase);
+}
+
+function completeWorldLanding(instance, source) {
+  if (!instance || activeWorldLanding !== instance || instance.token !== worldLandingGeneration
+    || instance.gatewayGeneration !== portfolioGatewayGeneration || instance.phase !== "landing" || location.pathname !== instance.profile.route
+    || (!instance.completionVerified && !(source === "reduced-motion" && isPortfolioEngineReducedMotion()))) return false;
+  instance.completionAccepted = true;
+  instance.completionSource = source;
+  return advanceWorldLanding(instance, "ready");
+}
+
+function waitForWorldLandingCompletion(instance) {
+  if (instance.completionPromise) return instance.completionPromise;
+  const panel = getWorldLandingInteractionRoot(instance)?.querySelector(instance.profile.selector);
+  if (!panel) {
+    instance.completionVerified = true;
+    return Promise.resolve(completeWorldLanding(instance, "no-interface"));
+  }
+  instance.completionPromise = new Promise((resolve) => {
+    let settled = false, animation = null, timer = 0, frame = 0, fallbackDuration = 0;
+    const dispose = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      cancelAnimationFrame(frame);
+      panel.removeEventListener("animationend", onEnd);
+      instance.cancelCompletion = null;
+      resolve(instance.phase === "ready");
+    };
+    const finish = (source) => {
+      if (settled || activeWorldLanding !== instance || instance.token !== worldLandingGeneration
+        || instance.gatewayGeneration !== portfolioGatewayGeneration || instance.phase !== "landing" || location.pathname !== instance.profile.route) return;
+      if (!isPortfolioEngineReducedMotion()) {
+        animation ||= panel.getAnimations().find((item) => item.animationName === instance.profile.completionAnimation);
+        if (animation) {
+          const end = animation.effect.getComputedTiming().endTime;
+          if (animation.playState !== "finished" && !(animation.playState === "running" && animation.currentTime >= end)) return;
+        } else {
+          const started = instance.history.find((item) => item.phase === "landing").at;
+          const style = getComputedStyle(panel);
+          if (performance.now() - started < fallbackDuration || style.visibility !== "visible" || Number(style.opacity) < .99) return;
+        }
+      }
+      instance.completionVerified = true;
+      completeWorldLanding(instance, source);
+    };
+    const onEnd = (event) => {
+      if (event.target === panel && event.animationName === instance.profile.completionAnimation) finish("animationend");
+    };
+    instance.cancelCompletion = dispose;
+    panel.addEventListener("animationend", onEnd);
+    // Derive the watchdog from the existing CSS clock; it never shortens the authored reveal.
+    frame = requestAnimationFrame(() => {
+      if (settled) return;
+      animation = panel.getAnimations().find((item) => item.animationName === instance.profile.completionAnimation);
+      let remaining;
+      if (animation) {
+        remaining = Math.max(0, animation.effect.getComputedTiming().endTime - (animation.currentTime || 0));
+        animation.finished.then(() => finish("animation-finished")).catch(() => {});
+      } else {
+        const style = getComputedStyle(panel), index = style.animationName.split(",").map((name) => name.trim()).indexOf(instance.profile.completionAnimation);
+        const milliseconds = (value) => parseFloat(value) * (value.trim().endsWith("ms") ? 1 : 1000) || 0;
+        const times = (value) => value.split(",").map(milliseconds);
+        const durations = times(style.animationDuration), delays = times(style.animationDelay);
+        fallbackDuration = index < 0 ? 0 : durations[index % durations.length] + delays[index % delays.length];
+        const started = instance.history.find((item) => item.phase === "landing").at;
+        remaining = Math.max(0, fallbackDuration - (performance.now() - started));
+      }
+      timer = window.setTimeout(() => finish("fallback"), remaining + 50);
+    });
+  });
+  return instance.completionPromise;
 }
 
 let daiionGatewayTransition = null;
@@ -718,19 +813,9 @@ function resolveMusicTransportArrival(entry) {
   trackWorldLandingMilestone(entry.landing, "landing-frame-start");
   // The wave retires at 940ms; this same generation owns the retained landing until its frame resolves.
   releaseDaiionGatewayPassage(entry);
-  const panel = musicNexusShell.querySelector("[data-music-landing-stats]");
-  if (!panel) return Promise.resolve();
-  return new Promise((resolve) => {
-    const dispose = () => { panel.removeEventListener("animationend", finish); entry.cancelArrival = null; resolve(); };
-    const finish = (event) => {
-      if (event.target !== panel || event.animationName !== "zhentoStatsPanelProject"
-        || daiionGatewayTransition !== entry || entry.generation !== portfolioGatewayGeneration) return;
-      dispose();
-    };
-    entry.cancelArrival = dispose;
-    panel.addEventListener("animationend", finish);
-    shell.dataset.musicTransportEntry = "resolving";
-  });
+  const completion = waitForWorldLandingCompletion(entry.landing);
+  shell.dataset.musicTransportEntry = "resolving";
+  return completion;
 }
 
 function cancelDaiionGatewayTransition() {
@@ -791,7 +876,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     }
     if (entry.promoted) {
       trackWorldLandingMilestone(entry.landing, entry.landing.profile.landing);
-      trackWorldLandingMilestone(entry.landing, entry.landing.profile.ready);
+      completeWorldLanding(entry.landing, "reduced-motion");
     }
     cancelDaiionGatewayTransition();
   };
@@ -1058,12 +1143,14 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     if (!current()) return;
     delete shell.dataset.daiionWorldExchange;
     await waveMotion;
-    if (current()) trackWorldLandingMilestone(entry.landing, "transport-finished");
-    if (current() && worldName === "soundtrack") await resolveMusicTransportArrival(entry);
-    if (current()) {
-      trackWorldLandingMilestone(entry.landing, "landing-frame-finished");
-      cancelDaiionGatewayTransition();
+    if (!current()) return;
+    if (worldName === "soundtrack") await resolveMusicTransportArrival(entry);
+    else {
+      // Retire transport at its unchanged beat, retaining only the interaction lock.
+      releaseDaiionGatewayPassage(entry);
+      await waitForWorldLandingCompletion(entry.landing);
     }
+    if (current() && entry.landing.phase === "ready") cancelDaiionGatewayTransition();
   })();
 }
 
@@ -3725,7 +3812,7 @@ function cancelZhentoRhythmEntry() {
 }
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
-  if (zhentoRhythmEntry || getRouteFromUrl().name !== "music" || landing?.dataset.selectedDestination !== "bands") return;
+  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || landing?.dataset.selectedDestination !== "bands") return;
   const engine = document.querySelector("[data-portfolio-engine]");
   const left = engine?.querySelector(".portfolio-engine-left-core");
   const right = engine?.querySelector(".portfolio-engine-reactor");
@@ -3866,6 +3953,7 @@ function setZhentoPulseView(landing, selected) {
 }
 
 function selectZhentoPillar(landing, key) {
+  if (key && isWorldLandingInteractionBlocked("zhento")) return;
   const selected = Boolean(ZHENTO_PILLAR_DESCRIPTIONS[key]);
   if (selected) landing.dataset.selectedDestination = key;
   else delete landing.dataset.selectedDestination;
@@ -3898,6 +3986,7 @@ function cancelZhentoPulseMorph(context) {
 }
 
 async function morphZhentoPulse(landing, key) {
+  if (isWorldLandingInteractionBlocked("zhento")) return;
   const context = zhentoInformationContext;
   const pulse = landing.querySelector(".zhento-pulse");
   const box = pulse.querySelector(".zhento-pulse__info-box");
@@ -3954,6 +4043,7 @@ function cancelZhentoInformationContext(hide = true) {
 }
 
 function showZhentoInformationContext(landing, key) {
+  if (key && isWorldLandingInteractionBlocked("zhento")) return;
   if (zhentoInformationContext?.landing === landing && zhentoInformationContext.key === key) return;
   cancelZhentoInformationContext();
   if (key !== "planet-stats" && key !== "pulse" && key !== "lore" && key !== "origins" && key !== "reimaging") return;
@@ -4238,7 +4328,7 @@ function cancelDaiionDestinationDeparture(immediate = false) {
   }));
 }
 function runDaiionDestinationDeparture(enter) {
-  if (daiionDestinationDeparture || getRouteFromUrl().name !== "wrestling") return;
+  if (isWorldLandingInteractionBlocked("daiion") || daiionDestinationDeparture || getRouteFromUrl().name !== "wrestling") return;
   const gallery = portfolioWorldGateway?.querySelector(".daiion-gallery");
   if (!gallery || gallery.hidden) return;
   const entry = { gallery, wasInert: gallery.inert, frames: [], timer: 0, cancelled: false };
@@ -4312,6 +4402,7 @@ function revealDaiionGallery(gallery) {
 }
 
 function setDaiionInformationContext(key = "") {
+  if (key && isWorldLandingInteractionBlocked("daiion")) return;
   const panel = portfolioWorldGateway?.querySelector("[data-daiion-information-selector]");
   if (!panel) return;
   const controls = [...panel.querySelectorAll("[data-daiion-information]")];
@@ -4370,7 +4461,7 @@ function cancelDaiionSelectorMorph() {
 }
 
 async function changeDaiionInformationContext(control) {
-  if (getRouteFromUrl().name !== "wrestling" || daiionSelectorMorph) return;
+  if (isWorldLandingInteractionBlocked("daiion") || getRouteFromUrl().name !== "wrestling" || daiionSelectorMorph) return;
   const panel = control.closest("[data-daiion-information-selector]");
   const selected = panel.dataset.selectedInformation;
   if (selected && selected !== control.dataset.daiionInformation) return;
@@ -4497,7 +4588,7 @@ function resetZhentoInformationSelector(landing) {
     if (control.dataset.bound) return;
     control.dataset.bound = "true";
     control.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry || zhentoSelectorMorph) return;
+      if (isWorldLandingInteractionBlocked("zhento") || getRouteFromUrl().name !== "music" || zhentoRhythmEntry || zhentoSelectorMorph) return;
       const selected = panel.dataset.selectedInformation;
       if (selected && selected !== control.dataset.zhentoInformation) return;
       void changeMode(control, selected ? "" : control.dataset.zhentoInformation);
@@ -4553,7 +4644,7 @@ function resetZhentoLandingSelection() {
     if (button.dataset.zhentoBound) return;
     button.dataset.zhentoBound = "true";
     button.addEventListener("click", () => {
-      if (getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
+      if (isWorldLandingInteractionBlocked("zhento") || getRouteFromUrl().name !== "music" || zhentoRhythmEntry) return;
       const key = button.dataset.zhentoDestination;
       // Hidden activation remains the shared-resume adapter; visible activation toggles.
       if (landing.dataset.informationContext === "pulse") {
