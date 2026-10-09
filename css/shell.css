@@ -12743,6 +12743,12 @@ button {
 
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .universal-bottom-rail { display: none; }
 
+/* Portfolio's current-view readout stays neutral while the selected world colors the energy. */
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left {
+  --engine-accent: 242 242 242;
+  --engine-accent-glow: 242 242 242;
+}
+
 /* Prepare Zhento's settled readout while the shared arrival still owns its hidden presentation. */
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left {
   /* Music uses the base 3.35rem readout reserve after Portfolio route variables retire. */

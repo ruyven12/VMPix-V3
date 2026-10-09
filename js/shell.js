@@ -2143,7 +2143,10 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
   if (didChangeActiveWorld) {
     clearPortfolioGatewayFocusState();
   }
-  setPortfolioEngineHudCurrentView(config.id === "battleground" ? "Outskirts of Daiion" : config.label);
+  const isPortfolioSelection = window.location.pathname === routePaths.portfolio && !isPortfolioGatewayActive();
+  setPortfolioEngineHudCurrentView(isPortfolioSelection
+    ? PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio.label
+    : (config.id === "battleground" ? "Outskirts of Daiion" : config.label));
   portfolioBeaconHotspots.forEach((button) => {
     const isSelected = config.id !== "portfolio" && button.dataset.portfolioStar === config.id;
     button.classList.toggle("is-selected", isSelected);
