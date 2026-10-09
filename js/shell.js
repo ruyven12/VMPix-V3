@@ -624,6 +624,51 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
 }
 
+// Tracking only: transport, Router and the existing presentation callbacks retain their authority.
+const worldLandingProfiles = Object.freeze({
+  battleground: Object.freeze({ world: "daiion", route: routePaths.wrestling,
+    landing: "route-adopted", ready: "transport-finished" }),
+  soundtrack: Object.freeze({ world: "zhento", route: routePaths.music,
+    landing: "landing-frame-start", ready: "landing-frame-finished" }),
+});
+const worldLandingNextPhase = Object.freeze({
+  departure: "preparing", preparing: "transport", transport: "landing", landing: "ready",
+});
+let worldLandingGeneration = 0;
+let activeWorldLanding = null;
+let lastWorldLanding = null;
+
+function advanceWorldLanding(instance, phase) {
+  if (!instance || activeWorldLanding !== instance || instance.token !== worldLandingGeneration
+    || (phase !== "cancelled" && worldLandingNextPhase[instance.phase] !== phase)) return false;
+  instance.phase = phase;
+  instance.history.push({ phase, at: performance.now() });
+  if (phase === "ready" || phase === "cancelled") {
+    activeWorldLanding = null;
+    lastWorldLanding = instance;
+  }
+  return true;
+}
+
+function beginWorldLanding(worldName) {
+  advanceWorldLanding(activeWorldLanding, "cancelled");
+  const profile = worldLandingProfiles[worldName];
+  if (!profile) return null;
+  const instance = { token: ++worldLandingGeneration, profile, phase: "departure",
+    history: [{ phase: "departure", at: performance.now() }] };
+  activeWorldLanding = instance;
+  return instance;
+}
+
+function trackWorldLandingMilestone(instance, milestone) {
+  if (!instance) return;
+  const phase = milestone === "preparation-start" ? "preparing"
+    : milestone === "transport-start" ? "transport"
+    : milestone === instance.profile.landing ? "landing"
+    : milestone === instance.profile.ready ? "ready" : null;
+  if (phase) advanceWorldLanding(instance, phase);
+}
+
 let daiionGatewayTransition = null;
 const daiionGatewayArtworkReady = new Map();
 function prepareDaiionGatewayArtwork(worldName = "battleground") {
@@ -656,6 +701,7 @@ function releaseDaiionGatewayPassage(entry) {
 }
 
 function resolveMusicTransportArrival(entry) {
+  trackWorldLandingMilestone(entry.landing, "landing-frame-start");
   // The wave retires at 940ms; this same generation owns the retained landing until its frame resolves.
   releaseDaiionGatewayPassage(entry);
   const panel = musicNexusShell.querySelector("[data-music-landing-stats]");
@@ -675,6 +721,7 @@ function resolveMusicTransportArrival(entry) {
 
 function cancelDaiionGatewayTransition() {
   const entry = daiionGatewayTransition;
+  advanceWorldLanding(entry?.landing, "cancelled");
   daiionGatewayTransition = null;
   entry?.cancelArrival?.();
   clearTimeout(entry?.readyTimer);
@@ -697,6 +744,7 @@ function cancelDaiionGatewayTransition() {
 function startDaiionGatewayTransition(worldName = "battleground") {
   cancelDaiionGatewayTransition();
   const entry = { worldName, generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
+  entry.landing = beginWorldLanding(worldName);
   daiionGatewayTransition = entry;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
@@ -715,18 +763,25 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     applyPortfolioGatewaySettledFrame({ commitLayout: !entry.viewportMetrics, settleLegacyProperties });
     shell.classList.add("is-portfolio-world-arrived");
     handoffPortfolioGatewayRoute(worldName, { confirmationDelay });
+    trackWorldLandingMilestone(entry.landing, "route-adopted");
     syncPortfolioGatewayTriggerState();
   };
   entry.finishImmediately = () => {
     if (!current()) return;
+    trackWorldLandingMilestone(entry.landing, "transport-start");
     entry.animations.forEach((animation) => animation.cancel());
     promote();
     if (entry.promoted && shell.dataset.portfolioGatewayHandoff !== "complete") {
       clearPortfolioGatewayRouteHandoffTimer();
       confirmPortfolioGatewayRouteHandoff(worldName, entry.generation);
     }
+    if (entry.promoted) {
+      trackWorldLandingMilestone(entry.landing, entry.landing.profile.landing);
+      trackWorldLandingMilestone(entry.landing, entry.landing.profile.ready);
+    }
     cancelDaiionGatewayTransition();
   };
+  trackWorldLandingMilestone(entry.landing, "preparation-start");
   if (worldName === "soundtrack") {
     shell.dataset.musicTransportEntry = "prepared";
     resetZhentoLandingSelection();
@@ -924,6 +979,7 @@ function startDaiionGatewayTransition(worldName = "battleground") {
       worldArtwork.style.transform = compensate(pose(0));
     }
     shell.dataset.daiionEntryStage = "portal";
+    trackWorldLandingMilestone(entry.landing, "transport-start");
     await Promise.all([
       // Explicit WAAPI from-state is paint-safe; the audited jump came from .72 scale and front-loaded easing.
       animate(portal, [{ opacity: .55, transform: "translate(-50%, -50%) scale(.06)" }, { opacity: 1, transform: "translate(-50%, -50%) scale(1.035)" }], { duration: 580, easing: "linear" }),
@@ -988,8 +1044,12 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     if (!current()) return;
     delete shell.dataset.daiionWorldExchange;
     await waveMotion;
+    if (current()) trackWorldLandingMilestone(entry.landing, "transport-finished");
     if (current() && worldName === "soundtrack") await resolveMusicTransportArrival(entry);
-    if (current()) cancelDaiionGatewayTransition();
+    if (current()) {
+      trackWorldLandingMilestone(entry.landing, "landing-frame-finished");
+      cancelDaiionGatewayTransition();
+    }
   })();
 }
 
