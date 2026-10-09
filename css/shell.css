@@ -2454,6 +2454,11 @@ button {
   text-shadow: 0 0 0.28rem rgb(var(--engine-accent-glow) / 0.1);
 }
 
+/* Selection hands readout visibility to the shared arrival phase until the existing landing beat. */
+.site-shell[data-world-landing-world="daiion"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"]) .portfolio-engine-panel--left {
+  visibility: hidden !important;
+}
+
 /* Selection owns this readout while the existing star feed prepares the destination. */
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-gateway-active):is([data-portfolio-star-feed-state="feeding"], [data-portfolio-star-feed-state="charging"]) .portfolio-engine-panel--left {
   opacity: 0;

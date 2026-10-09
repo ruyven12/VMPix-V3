@@ -30204,7 +30204,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-shell-route="music"] .portfolio-hub::before,
 .site-shell[data-shell-route="music"] .music-nexus-shell::before { content: none; }
 
-.site-shell[data-shell-route="music"] .music-nexus-shell {
+.site-shell[data-shell-route="music"] .music-nexus-shell,
+.site-shell[data-world-landing-world="zhento"][data-world-landing-phase] .music-nexus-shell {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -30217,7 +30218,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   transform: none;
   overflow: hidden;
 }
-.site-shell[data-shell-route="music"] .zhento-landing {
+.site-shell[data-shell-route="music"] .zhento-landing,
+.site-shell[data-world-landing-world="zhento"][data-world-landing-phase] .zhento-landing {
   position: fixed;
   inset: 0;
   display: block;
@@ -31875,8 +31877,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 .site-shell[data-music-transport-entry]:is([data-music-transport-entry="prepared"],[data-music-transport-entry="arriving"]) .music-nexus-shell :is([data-zhento-landing],[data-zhento-landing] *)::after {
   visibility: hidden !important;
 }
-.site-shell[data-music-transport-entry="resolving"] .music-nexus-shell {
-  transition-property: opacity, transform !important;
+/* The retained transport plane never participates in the generic Music entrance translation. */
+.site-shell[data-world-landing-world="zhento"][data-world-landing-phase] .music-nexus-shell {
+  transform: none !important;
+  transition-property: opacity !important;
 }
 .site-shell[data-music-transport-entry] .zhento-identity {
   animation: none !important;

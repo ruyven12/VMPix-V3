@@ -638,6 +638,18 @@ let worldLandingGeneration = 0;
 let activeWorldLanding = null;
 let lastWorldLanding = null;
 
+// Presentation is a projection of the coordinator, never an independent arrival state.
+function syncWorldLandingPresentation() {
+  if (!shell) return;
+  if (activeWorldLanding) {
+    shell.dataset.worldLandingWorld = activeWorldLanding.profile.world;
+    shell.dataset.worldLandingPhase = activeWorldLanding.phase;
+  } else {
+    delete shell.dataset.worldLandingWorld;
+    delete shell.dataset.worldLandingPhase;
+  }
+}
+
 function advanceWorldLanding(instance, phase) {
   if (!instance || activeWorldLanding !== instance || instance.token !== worldLandingGeneration
     || (phase !== "cancelled" && worldLandingNextPhase[instance.phase] !== phase)) return false;
@@ -647,6 +659,7 @@ function advanceWorldLanding(instance, phase) {
     activeWorldLanding = null;
     lastWorldLanding = instance;
   }
+  syncWorldLandingPresentation();
   return true;
 }
 
@@ -657,6 +670,7 @@ function beginWorldLanding(worldName) {
   const instance = { token: ++worldLandingGeneration, profile, phase: "departure",
     history: [{ phase: "departure", at: performance.now() }] };
   activeWorldLanding = instance;
+  syncWorldLandingPresentation();
   return instance;
 }
 
