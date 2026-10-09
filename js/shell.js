@@ -848,6 +848,7 @@ function cancelDaiionGatewayTransition() {
   entry?.cancelArrival?.();
   clearTimeout(entry?.readyTimer);
   entry?.cancelReady?.();
+  if (entry?.worldName === "soundtrack") setPortfolioZhentoIdentification(false);
   releaseDaiionGatewayPassage(entry);
   if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
   if (entry?.worldName === "soundtrack") {
@@ -868,6 +869,8 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   const entry = { worldName, generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
   entry.landing = beginWorldLanding(worldName);
   daiionGatewayTransition = entry;
+  const identificationDeparture = worldName === "soundtrack"
+    ? reversePortfolioZhentoIdentification(entry) : null;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
   const promote = ({ settleLegacyProperties = true, confirmationDelay = 320 } = {}) => {
@@ -1019,28 +1022,35 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   };
   const animate = (node, frames, options) => createAnimation(node, frames, options).finished.catch(() => {});
   void (async () => {
+    const worldArtwork = portfolioWorldGateway.querySelector(".portfolio-world-gateway-background");
+    const prepareWorldExchange = () => {
+      const backdropCandidates = [...shell.querySelectorAll(".portfolio-observatory-layer, .cinema-fire-bg, .ambient-void-stars, .nebula-stage")];
+      const sourceBackdrops = backdropCandidates.filter((element) => !backdropCandidates.some((parent) => parent !== element && parent.contains(element)));
+      entry.blendStyles = [];
+      if (worldArtwork) {
+        // Prepare the decoded destination without exposing it before the rim releases.
+        shell.dataset.daiionWorldExchange = "active";
+        [worldArtwork, ...sourceBackdrops].forEach((element) => {
+          entry.blendStyles.push({
+            element, opacity: element.style.opacity, opacityPriority: element.style.getPropertyPriority("opacity"),
+            willChange: element.style.willChange, willChangePriority: element.style.getPropertyPriority("will-change"),
+          });
+          element.style.opacity = element === worldArtwork ? "0" : "1";
+          element.style.willChange = "opacity";
+        });
+      }
+    };
+    if (identificationDeparture) prepareWorldExchange();
     // Start the visible 580ms clock only after decode: geometry must not advance behind late artwork.
     const ready = await Promise.race([artworkReady, new Promise((resolve) => { entry.cancelReady = resolve; entry.readyTimer = setTimeout(() => resolve(false), 5000); })]);
     clearTimeout(entry.readyTimer);
     entry.cancelReady = null;
+    // Decode and reverse identification run concurrently in the existing preparation phase.
+    // Native animation completion, not an added transport timer, releases the portal.
+    if (identificationDeparture) await identificationDeparture;
     if (!current()) return;
     if (!ready) { clearPortfolioGatewayState(); syncPortfolioGatewayTriggerState(); return; }
-    const worldArtwork = portfolioWorldGateway.querySelector(".portfolio-world-gateway-background");
-    const backdropCandidates = [...shell.querySelectorAll(".portfolio-observatory-layer, .cinema-fire-bg, .ambient-void-stars, .nebula-stage")];
-    const sourceBackdrops = backdropCandidates.filter((element) => !backdropCandidates.some((parent) => parent !== element && parent.contains(element)));
-    entry.blendStyles = [];
-    if (worldArtwork) {
-      // Prepare the decoded destination without exposing it before the rim releases.
-      shell.dataset.daiionWorldExchange = "active";
-      [worldArtwork, ...sourceBackdrops].forEach((element) => {
-        entry.blendStyles.push({
-          element, opacity: element.style.opacity, opacityPriority: element.style.getPropertyPriority("opacity"),
-          willChange: element.style.willChange, willChangePriority: element.style.getPropertyPriority("will-change"),
-        });
-        element.style.opacity = element === worldArtwork ? "0" : "1";
-        element.style.willChange = "opacity";
-      });
-    }
+    if (!entry.blendStyles) prepareWorldExchange();
     const ringCurve = [.16, .45, .55, .85];
     const ringEasing = `cubic-bezier(${ringCurve.join(",")})`;
     const apertureRadius = radius * .98 * .94;
@@ -1199,7 +1209,9 @@ function startPortfolioWorldGateway() {
     return false;
   }
 
-  setPortfolioZhentoIdentification(false);
+  if (activeWorld === "soundtrack" && !isPortfolioEngineReducedMotion() && !portfolioZhentoIdentification?.hidden) {
+    portfolioZhentoIdentification.classList.add("is-departing");
+  } else setPortfolioZhentoIdentification(false);
   portfolioGatewayGeneration += 1;
   if (activeWorld === "battleground") resetDaiionArchivePresentation();
   clearPortfolioGatewayPhaseTimer();
@@ -2135,8 +2147,33 @@ function refreshPortfolioEngineScan() {
 
 function setPortfolioZhentoIdentification(isVisible = false) {
   if (!portfolioZhentoIdentification) return;
+  if (!isVisible) portfolioZhentoIdentification.classList.remove("is-departing");
   portfolioZhentoIdentification.hidden = !isVisible;
   portfolioZhentoIdentification.setAttribute("aria-hidden", String(!isVisible));
+}
+
+function reversePortfolioZhentoIdentification(entry) {
+  const panel = portfolioZhentoIdentification;
+  if (!panel || panel.hidden || isPortfolioEngineReducedMotion()) {
+    setPortfolioZhentoIdentification(false);
+    return Promise.resolve();
+  }
+  const animations = panel.getAnimations({ subtree: true });
+  const epoch = document.timeline.currentTime;
+  const duration = Math.max(0, ...animations.map((animation) => animation.effect.getComputedTiming().endTime));
+  // Every CSS track includes its holds in the same 800ms timeline.
+  // Reverse from the resolved record, including unusually fast accepted entries.
+  animations.forEach((animation) => {
+    animation.pause();
+    animation.currentTime = duration;
+    animation.playbackRate = -1;
+    animation.play();
+    animation.startTime = epoch + duration;
+  });
+  return Promise.all(animations.map((animation) => animation.finished.catch(() => {}))).then(() => {
+    if (daiionGatewayTransition !== entry || entry.generation !== portfolioGatewayGeneration) return;
+    setPortfolioZhentoIdentification(false);
+  });
 }
 
 function setPortfolioActiveWorld(worldName = "portfolio") {

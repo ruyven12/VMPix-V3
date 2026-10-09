@@ -12811,6 +12811,9 @@ button {
 .site-shell[data-shell-route="portfolio"][data-active-world="soundtrack"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-zhento-identification:not([hidden]) {
   display: block;
 }
+.site-shell[data-shell-route="portfolio"][data-active-world="soundtrack"] .portfolio-zhento-identification.is-departing:not([hidden]) {
+  display: block;
+}
 .portfolio-zhento-identification,
 .portfolio-zhento-identification * { text-transform: none; }
 .portfolio-zhento-identification::before {
@@ -12822,7 +12825,7 @@ button {
   background: linear-gradient(115deg, rgba(151, 107, 255, 0.72), rgba(94, 134, 239, 0.38) 60%, rgba(151, 107, 255, 0.56));
   box-shadow: inset 0 0 8px rgba(147, 115, 232, 0.12);
   transform-origin: center;
-  animation: portfolioZhentoIdentificationFrame 240ms ease-out 60ms both;
+  animation: portfolioZhentoIdentificationFrame 800ms linear both;
 }
 .portfolio-zhento-identification::after {
   content: "";
@@ -12832,7 +12835,7 @@ button {
   right: 24px;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(197, 177, 255, 0.85), transparent);
-  animation: portfolioZhentoIdentificationSignal 160ms ease-out both;
+  animation: portfolioZhentoIdentificationSignal 800ms linear both;
 }
 .portfolio-zhento-identification__screen {
   display: grid;
@@ -12848,7 +12851,7 @@ button {
     linear-gradient(110deg, rgba(77, 38, 130, 0.24), rgba(19, 28, 59, 0.08)),
     repeating-linear-gradient(0deg, transparent 0 7px, rgba(168, 150, 226, 0.035) 7px 8px),
     rgba(8, 7, 18, 0.72);
-  animation: portfolioZhentoIdentificationMaterialize 240ms ease-out 160ms both;
+  animation: portfolioZhentoIdentificationMaterialize 800ms linear both;
 }
 .portfolio-zhento-identification__orbital {
   display: block;
@@ -12871,7 +12874,7 @@ button {
   line-height: 12px;
   letter-spacing: 0.13em;
   color: rgba(193, 174, 239, 0.85);
-  animation: portfolioZhentoIdentificationText 120ms ease-out 180ms both;
+  animation: portfolioZhentoIdentificationLabel 800ms linear both;
 }
 .portfolio-zhento-identification__title {
   margin: 6px 0 0;
@@ -12880,7 +12883,7 @@ button {
   line-height: 1.1;
   letter-spacing: 0.04em;
   text-shadow: 0 0 6px rgba(153, 118, 246, 0.3), 0 0 14px rgba(112, 155, 239, 0.12);
-  animation: portfolioZhentoIdentificationText 180ms ease-out 240ms both;
+  animation: portfolioZhentoIdentificationTitle 800ms linear both;
 }
 .portfolio-zhento-identification__metadata {
   display: grid;
@@ -12890,25 +12893,83 @@ button {
   font-size: 11px;
   line-height: 15px;
   white-space: nowrap;
-  animation: portfolioZhentoIdentificationText 200ms ease-out 400ms both;
+  animation: portfolioZhentoIdentificationMetadata 800ms linear both;
 }
 .portfolio-zhento-identification__metadata dt { color: rgba(191, 182, 217, 0.72); }
 .portfolio-zhento-identification__metadata dd { margin: 0; }
+/* All identification tracks share one 800ms clock, including their holds.
+   Traverse reverses these same native animations; no second exit choreography. */
+.portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  --orbital-rest-angle: 0deg;
+  animation: portfolioZhentoOrbitalSweep 800ms linear both;
+}
+.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(1) { --orbital-rest-angle: -28deg; }
+.portfolio-zhento-identification__orbital > g:first-of-type > ellipse:nth-of-type(2) { --orbital-rest-angle: 34deg; }
+.portfolio-zhento-identification__orbital > g:first-of-type > circle:nth-of-type(4) {
+  animation: portfolioZhentoOrbitalAcquire 800ms linear both;
+}
+.portfolio-zhento-identification__orbital > g:first-of-type > path:first-of-type {
+  animation: portfolioZhentoOrbitalScan 800ms linear both;
+}
+.portfolio-zhento-identification__screen::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  width: 55%;
+  height: 1px;
+  pointer-events: none;
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, rgba(168, 166, 255, .48), transparent);
+  opacity: 0;
+  animation: portfolioZhentoIdentityTransfer 800ms linear both;
+}
+.portfolio-zhento-identification__screen { position: relative; }
 @keyframes portfolioZhentoIdentificationSignal {
-  from { transform: scaleX(0.08); opacity: 0; }
-  to { transform: scaleX(1); opacity: 1; }
+  0% { transform: scaleX(.08); opacity: 0; }
+  20%, 100% { transform: scaleX(1); opacity: 1; }
 }
 @keyframes portfolioZhentoIdentificationFrame {
-  from { transform: scaleX(0.04); opacity: 0; }
-  to { transform: scaleX(1); opacity: 1; }
+  0%, 7.5% { transform: scaleX(.04); opacity: 0; }
+  37.5%, 100% { transform: scaleX(1); opacity: 1; }
 }
 @keyframes portfolioZhentoIdentificationMaterialize {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0%, 20% { opacity: 0; }
+  50%, 100% { opacity: 1; }
 }
-@keyframes portfolioZhentoIdentificationText {
-  from { opacity: 0; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes portfolioZhentoIdentificationLabel {
+  0%, 37.5% { opacity: 0; transform: translateY(3px); }
+  52.5%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes portfolioZhentoIdentificationTitle {
+  0%, 50% { opacity: 0; transform: translateY(3px); }
+  77.5%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes portfolioZhentoIdentificationMetadata {
+  0%, 75% { opacity: 0; transform: translateY(3px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes portfolioZhentoOrbitalAcquire {
+  0% { fill-opacity: .15; stroke-opacity: .2; }
+  22.5% { fill-opacity: .6; stroke-opacity: .7; }
+  75%, 100% { fill-opacity: 1; stroke-opacity: 1; }
+}
+@keyframes portfolioZhentoOrbitalSweep {
+  0%, 15% { transform: rotate(calc(var(--orbital-rest-angle) - 18deg)); stroke-opacity: .15; }
+  42.5% { stroke-opacity: .8; }
+  81.25%, 100% { transform: rotate(var(--orbital-rest-angle)); stroke-opacity: 1; }
+}
+@keyframes portfolioZhentoOrbitalScan {
+  0%, 22.5% { transform: translateY(-18px); stroke-opacity: .15; }
+  50% { transform: translateY(12px); stroke-opacity: 1; }
+  75%, 100% { transform: translateY(0); stroke-opacity: 1; }
+}
+@keyframes portfolioZhentoIdentityTransfer {
+  0%, 42.5% { transform: translateX(12%) scaleX(.05); opacity: 0; }
+  57.5% { transform: translateX(22%) scaleX(.65); opacity: .65; }
+  77.5%, 100% { transform: translateX(42%) scaleX(.05); opacity: 0; }
 }
 @media (min-width: 900px) {
   .portfolio-zhento-identification {
@@ -12923,7 +12984,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .portfolio-zhento-identification::before,
   .portfolio-zhento-identification::after,
-  .portfolio-zhento-identification * { animation: none !important; }
+  .portfolio-zhento-identification *,
+  .portfolio-zhento-identification__screen::after { animation: none !important; }
 }
 
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
