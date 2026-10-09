@@ -13050,11 +13050,28 @@ button {
 }
 /* Living telemetry starts only after the existing CRT ignition has settled.
    These tracks are removed before the finite Traverse reverse is collected. */
-.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) {
+/* Rasterize the existing ring fragments once; HTML planes rotate on the compositor.
+   The untouched donor SVG still owns ignition, static/reduced motion and departure. */
+.portfolio-zhento-identification__orbital-slot { position: relative; z-index: 1; width: 100%; aspect-ratio: 1; }
+.portfolio-zhento-identification__orbital-slot .portfolio-zhento-identification__orbital { z-index: 4; }
+.portfolio-zhento-identification__orbital-telemetry {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+  transform-origin: center;
   --orbital-idle-turn: 360deg;
+}
+.portfolio-zhento-identification__orbital-telemetry svg,
+.portfolio-zhento-identification__pulse-art { display: block; width: 100%; height: 100%; }
+.portfolio-zhento-identification__orbital-telemetry[data-portfolio-orbital-ring="2"] { z-index: 2; }
+.portfolio-zhento-identification__orbital-telemetry[data-portfolio-orbital-ring="3"] { z-index: 3; --orbital-idle-turn: -360deg; }
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital-telemetry {
+  display: block;
   animation: portfolioZhentoOrbitalTelemetry 24s linear infinite;
 }
-.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(2), ellipse:nth-of-type(2)) { --orbital-idle-turn: -360deg; }
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) { visibility: hidden; }
 .portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__screen::after {
   top: 7px;
   left: 7px;
@@ -13077,11 +13094,10 @@ button {
   pointer-events: none;
 }
 .portfolio-zhento-identification:is(.is-living, .is-departing) .portfolio-zhento-identification__pulse { opacity: .55; }
-.portfolio-zhento-identification__pulse path { transform-origin: center; }
-.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__pulse path { animation: portfolioZhentoPulseTelemetry 3.6s ease-in-out infinite; }
+.portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__pulse { animation: portfolioZhentoPulseTelemetry 3.6s ease-in-out infinite; }
 @keyframes portfolioZhentoOrbitalTelemetry {
-  from { transform: rotate(var(--orbital-rest-angle)); }
-  to { transform: rotate(calc(var(--orbital-rest-angle) + var(--orbital-idle-turn))); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(var(--orbital-idle-turn)); }
 }
 @keyframes portfolioZhentoGridTelemetry {
   0%, 10% { transform: translateX(0); opacity: 0; }
@@ -13090,9 +13106,9 @@ button {
   27%, 100% { transform: translateX(750%); opacity: 0; }
 }
 @keyframes portfolioZhentoPulseTelemetry {
-  0%, 100% { transform: scaleY(.45); opacity: .65; }
-  30%, 70% { transform: scaleY(.7); opacity: .8; }
-  45%, 55% { transform: scaleY(1); opacity: 1; }
+  0%, 100% { transform: translateX(-50%) scaleY(.45); opacity: .3575; }
+  30%, 70% { transform: translateX(-50%) scaleY(.7); opacity: .44; }
+  45%, 55% { transform: translateX(-50%) scaleY(1); opacity: .55; }
 }
 @media (min-width: 900px) {
   .portfolio-zhento-identification {
@@ -13107,7 +13123,8 @@ button {
 }
 @media (prefers-reduced-motion: reduce) {
   .portfolio-zhento-identification__pulse { opacity: .55; }
-  .portfolio-zhento-identification.is-living .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) { transform: rotate(var(--orbital-rest-angle)); }
+  .portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital-telemetry { display: none; }
+  .portfolio-zhento-identification.is-living:not(.is-departing) .portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2)) { visibility: visible; }
   .portfolio-zhento-identification.is-living .portfolio-zhento-identification__screen::after { opacity: 0; }
   .portfolio-zhento-identification::before,
   .portfolio-zhento-identification::after,

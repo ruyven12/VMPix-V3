@@ -2152,12 +2152,14 @@ function stopPortfolioZhentoIdentificationIdle(preserveOrientation = false) {
   portfolioZhentoIdentificationGeneration += 1;
   if (!panel) return;
   const rings = panel.querySelectorAll(".portfolio-zhento-identification__orbital > g:first-of-type > :is(circle:nth-of-type(1), circle:nth-of-type(2), ellipse:nth-of-type(1), ellipse:nth-of-type(2))");
-  // Read the four current orientations once, before removing the idle tracks.
+  // Capture the compositor planes once; return their current pose to the donor SVG.
   const angles = preserveOrientation && panel.classList.contains("is-living")
-    ? Array.from(rings, (ring) => {
-      const matrix = new DOMMatrixReadOnly(getComputedStyle(ring).transform);
-      return Math.atan2(matrix.b, matrix.a) * 180 / Math.PI;
-    }) : null;
+    ? Array.from(rings, (ring) => parseFloat(getComputedStyle(ring).getPropertyValue("--orbital-rest-angle")) || 0)
+    : null;
+  if (angles) panel.querySelectorAll("[data-portfolio-orbital-ring]").forEach((plane) => {
+    const matrix = new DOMMatrixReadOnly(getComputedStyle(plane).transform);
+    angles[Number(plane.dataset.portfolioOrbitalRing)] += Math.atan2(matrix.b, matrix.a) * 180 / Math.PI;
+  });
   rings.forEach((ring, index) => {
     if (angles) ring.style.setProperty("--orbital-rest-angle", `${angles[index]}deg`);
     else if (!preserveOrientation) ring.style.removeProperty("--orbital-rest-angle");
