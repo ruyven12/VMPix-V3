@@ -739,7 +739,7 @@ function synchronizeWorldLandingClock(instance, interfaceAnimation) {
     || isPortfolioEngineReducedMotion()) return;
   // The reference interface's native start is the epoch, including work already elapsed under transport.
   instance.landingEpoch ??= interfaceAnimation?.startTime ?? document.timeline.currentTime;
-  if (instance.profile.world !== "zhento") return; // Daïion's established native schedule remains untouched.
+  if (instance.profile.world !== "zhento") return; // Daï¿½ion's established native schedule remains untouched.
   const names = new Set(["zhentoTransportIdentityProject", "zhentoIdentityResolve", "zhentoHudReveal",
     "zhentoStatsPanelProject", "daiionArchiveStatsProjectionLine", "daiionArchiveStatsContentResolve",
     "daiionArchiveStatsLabelResolve"]);
@@ -2017,6 +2017,8 @@ function revealPortfolioZhentoBriefing() {
   if (!panel || !panel.hidden) return;
   const generation = portfolioZhentoIdentificationGeneration;
   panel.hidden = false;
+  const description = panel.querySelector(".portfolio-zhento-briefing__description");
+  if (description) description.scrollTop = 0;
   panel.setAttribute("aria-hidden", "false");
   if (isPortfolioEngineReducedMotion()) return;
   panel.classList.add("is-revealing");

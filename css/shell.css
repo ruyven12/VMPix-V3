@@ -14195,3 +14195,95 @@ button {
   .portfolio-beacon--system .portfolio-star-label { top: calc(50% + 20px); }
   .portfolio-beacon--trajectory .portfolio-star-label { top: calc(50% + 24px); }
 }
+
+/* Short landscape viewports reserve one HUD column beside the existing compass. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .site-shell[data-shell-route="portfolio"] {
+    --portfolio-landscape-left: max(10px, calc(env(safe-area-inset-left, 0px) + 10px));
+    --portfolio-landscape-top: max(8px, calc(env(safe-area-inset-top, 0px) + 8px));
+    --portfolio-landscape-panel-width: min(472px, calc(45vw - var(--portfolio-landscape-left) - 10px));
+    --portfolio-landscape-bottom: calc(100svh - var(--portfolio-engine-bottom-offset, max(0.58rem, env(safe-area-inset-bottom))) - var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) - 10px);
+    --portfolio-landscape-center-x: calc(72.5vw - env(safe-area-inset-right, 0px) / 2);
+    --portfolio-landscape-north: max(14svh, calc(env(safe-area-inset-top, 0px) + 40px));
+    --portfolio-landscape-south: calc(var(--portfolio-landscape-bottom) - 47px);
+    --portfolio-landscape-center-y: calc((var(--portfolio-landscape-north) + var(--portfolio-landscape-south)) / 2);
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field {
+    --home-portfolio-transition-center-x: var(--portfolio-landscape-center-x);
+    --home-portfolio-transition-center-y: var(--portfolio-landscape-center-y);
+    --entry-beacon-midline-y: 0px;
+    --entry-beacon-01-x: -21vw;
+    --entry-beacon-01-y: 0px;
+    --entry-beacon-02-x: -14vw;
+    --entry-beacon-02-y: calc(-1 * max(64px, 13svh));
+    --entry-beacon-03-x: 0px;
+    --entry-beacon-03-y: calc(var(--portfolio-landscape-north) - var(--portfolio-landscape-center-y));
+    --entry-beacon-04-x: 14vw;
+    --entry-beacon-04-y: calc(-1 * max(64px, 13svh));
+    --entry-beacon-05-x: 21vw;
+    --entry-beacon-05-y: 0px;
+    --entry-system-01-x: -10vw;
+    --entry-system-01-y: calc((var(--portfolio-landscape-south) - var(--portfolio-landscape-center-y)) * .73);
+    --entry-system-02-x: 0px;
+    --entry-system-02-y: calc(var(--portfolio-landscape-south) - var(--portfolio-landscape-center-y));
+    --entry-system-03-x: 10vw;
+    --entry-system-03-y: var(--entry-system-01-y);
+  }
+  .site-shell[data-shell-route="portfolio"] :is(.portfolio-zhento-identification, .portfolio-branding) {
+    top: var(--portfolio-landscape-top);
+    left: var(--portfolio-landscape-left);
+    width: var(--portfolio-landscape-panel-width);
+    transform: none;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-branding__logo { width: 90%; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-identification__screen {
+    grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-identification__title { font-size: 24px; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-identification__metadata { font-size: 11px; white-space: normal; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-destination-intro {
+    left: calc(var(--portfolio-landscape-left) + var(--portfolio-landscape-panel-width) / 2);
+    top: calc(var(--portfolio-landscape-bottom) - 36px);
+    width: min(360px, var(--portfolio-landscape-panel-width));
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world] {
+    left: var(--portfolio-landscape-left);
+    right: auto;
+    width: var(--portfolio-landscape-panel-width);
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection:not([data-world="soundtrack"]):not([data-world="battleground"]) {
+    max-height: calc(var(--portfolio-landscape-bottom) - var(--portfolio-landscape-top) - 140px);
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection:is([data-world="soundtrack"], [data-world="battleground"]) {
+    top: calc(var(--portfolio-landscape-top) + 140px);
+    bottom: calc(100svh - var(--portfolio-landscape-bottom));
+    left: var(--portfolio-landscape-left);
+    right: auto;
+    width: var(--portfolio-landscape-panel-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-briefing:not([hidden]) { flex: 1; height: auto; min-height: 0; display: flex; flex-direction: column; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-briefing__screen {
+    flex: 1;
+    min-height: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+  }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-briefing__header { flex: none; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-zhento-briefing__description {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--engine-accent) / .45) transparent;
+    pointer-events: auto;
+    overscroll-behavior-y: contain;
+  }
+}
