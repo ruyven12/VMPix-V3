@@ -2362,7 +2362,16 @@ function initPortfolioBeaconHotspots() {
   const brandingVersion = document.querySelector("[data-portfolio-branding-version]");
   const archiveBuild = document.querySelector("[data-archive-build]") ||
     document.querySelector('[data-portfolio-engine-panel="archive-build"] .portfolio-engine-value');
-  if (brandingVersion && archiveBuild) brandingVersion.textContent = archiveBuild.textContent.trim();
+  if (brandingVersion && archiveBuild) {
+    const build = archiveBuild.textContent.trim();
+    const separator = build.indexOf(".");
+    const major = brandingVersion.querySelector("[data-portfolio-branding-major]");
+    const suffix = brandingVersion.querySelector("[data-portfolio-branding-suffix]");
+    if (major && suffix) {
+      major.textContent = separator < 0 ? build : build.slice(0, separator);
+      suffix.textContent = separator < 0 ? "" : build.slice(separator);
+    }
+  }
   setPortfolioActiveWorld("portfolio");
   setPortfolioBeaconHotspotsEnabled(Boolean(shell?.dataset.portfolioEngineReady === "true"));
   portfolioGatewayTrigger?.addEventListener("click", handlePortfolioGatewayTriggerClick);

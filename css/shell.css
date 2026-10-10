@@ -14058,13 +14058,8 @@ button {
   height: auto;
   object-fit: contain;
 }
-.portfolio-branding__edition {
-  font-size: 18px;
-  line-height: 22px;
-  letter-spacing: .1em;
-  text-shadow: 0 0 4px rgb(223 229 241 / .12);
-}
 .portfolio-branding__build {
+  height: 38px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
@@ -14072,15 +14067,25 @@ button {
   width: 100%;
 }
 .portfolio-branding__version {
-  font-size: 10px;
-  line-height: 12px;
-  letter-spacing: .08em;
-  color: rgb(217 223 234 / .78);
+  display: inline-flex;
+  align-items: baseline;
+  white-space: pre;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: .04em;
+  color: rgb(217 223 234 / .84);
+}
+.portfolio-branding__major {
+  font-size: 18px;
+  color: rgb(239 242 249 / .96);
+  text-shadow: 0 0 4px rgb(223 229 241 / .12);
 }
 .portfolio-branding__rail { display: block; width: 100%; height: 12px; overflow: visible; }
 .portfolio-branding__rail polyline { fill: none; stroke: rgb(217 225 239 / .62); stroke-width: 1; vector-effect: non-scaling-stroke; }
 @media (min-width: 700px) {
   .portfolio-branding { top: max(calc(env(safe-area-inset-top, 0px) + 10px), 32px); }
   .portfolio-branding__logo { width: 400px; max-width: 100%; }
-  .portfolio-branding__edition { font-size: 20px; line-height: 24px; }
+  .portfolio-branding__build { height: 40px; }
+  .portfolio-branding__version { font-size: 16px; line-height: 24px; }
+  .portfolio-branding__major { font-size: 20px; }
 }
