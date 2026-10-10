@@ -13866,3 +13866,62 @@ button {
 .portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(1) { stop-color: #f5879b; }
 .portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(2) { stop-color: #bc5168; }
 .portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(3) { stop-color: #2e151c; }
+
+/* PASS 109N: the existing Archive Briefing surface resolves Da?ion's authored record. */
+.site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world="battleground"] {
+  width: min(472px, calc(100% - 20px));
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+  animation: none;
+  transition: none;
+  gap: 0;
+  overflow: visible;
+  contain: layout style;
+}
+.portfolio-engine-projection[data-world="battleground"] > :not(.portfolio-zhento-briefing),
+.portfolio-engine-projection[data-world="battleground"]::before,
+.portfolio-engine-projection[data-world="battleground"]::after { display: none; }
+.site-shell[data-shell-route="portfolio"][data-active-world="battleground"].is-portfolio-world-gateway-active .portfolio-engine-projection[data-world="battleground"]:has(.portfolio-zhento-briefing.is-departing:not([hidden])) {
+  visibility: visible !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing { color: rgba(255, 238, 238, .96); }
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing::before {
+  background: linear-gradient(115deg, rgba(224, 65, 80, .72), rgba(162, 47, 65, .38) 60%, rgba(224, 65, 80, .56));
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__screen {
+  background: linear-gradient(110deg, rgba(130, 38, 54, .168), rgba(59, 19, 27, .056)), rgba(18, 7, 10, .504);
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__screen::before {
+  background:
+    linear-gradient(rgba(249, 155, 169, .7), rgba(249, 155, 169, .7)) left top / 24px 1px no-repeat,
+    linear-gradient(rgba(244, 129, 146, .65), rgba(244, 129, 146, .65)) left top / 1px 5px no-repeat,
+    linear-gradient(rgba(249, 155, 169, .7), rgba(249, 155, 169, .7)) right bottom / 24px 1px no-repeat,
+    linear-gradient(rgba(244, 129, 146, .65), rgba(244, 129, 146, .65)) right bottom / 1px 5px no-repeat,
+    linear-gradient(rgba(244, 149, 163, .14) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, rgba(239, 126, 144, .14) 1px, transparent 1px) 0 0 / 14px 14px;
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__screen::after {
+  background: linear-gradient(90deg, transparent, rgba(244, 142, 159, .12) 65%, rgba(255, 179, 190, .38) 96%, transparent);
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__header { border-bottom-color: rgba(220, 129, 144, .2); }
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__header h2 {
+  color: rgba(250, 206, 217, .92);
+  text-shadow: 0 0 5px rgba(230, 112, 133, .16);
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__status { color: rgba(246, 174, 188, .86); }
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__status::before {
+  background: rgba(255, 169, 183, .8);
+  box-shadow: 0 0 4px rgba(239, 132, 151, .25);
+}
+.portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__description { color: rgba(250, 230, 235, .93); }

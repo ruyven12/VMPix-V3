@@ -145,6 +145,7 @@ const portfolioZhentoIdentification = document.querySelector("[data-portfolio-zh
 let portfolioZhentoIdentificationGeneration = 0;
 let portfolioZhentoIdentificationIgnition = Promise.resolve(false);
 const portfolioZhentoBriefing = document.querySelector("[data-portfolio-zhento-briefing]");
+const portfolioZhentoBriefingDescription = portfolioZhentoBriefing?.querySelector(".portfolio-zhento-briefing__description")?.textContent || "";
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
@@ -1946,7 +1947,7 @@ function fadePortfolioEngineProjectionForGateway() {
     return;
   }
 
-  if (shell.dataset.activeWorld === "soundtrack") {
+  if (shell.dataset.activeWorld === "soundtrack" || shell.dataset.activeWorld === "battleground") {
     if (!portfolioZhentoBriefing?.hidden) {
       portfolioZhentoBriefing.classList.remove("is-revealing");
       portfolioZhentoBriefing.classList.add("is-departing");
@@ -2055,7 +2056,12 @@ function hidePortfolioEngineProjection({ immediate = false } = {}) {
 
 function setPortfolioEngineProjectionContent(worldName) {
   const config = getPortfolioWorldSelectionConfig(worldName);
-  if (config.id !== "soundtrack") resetPortfolioZhentoBriefing();
+  if (config.id !== "soundtrack" && config.id !== "battleground") resetPortfolioZhentoBriefing();
+  if (config.id === "soundtrack" || config.id === "battleground") {
+    const description = portfolioZhentoBriefing?.querySelector(".portfolio-zhento-briefing__description");
+    if (description) description.textContent = config.id === "battleground"
+      ? config.description : portfolioZhentoBriefingDescription;
+  }
   if (portfolioEngineProjection) {
     portfolioEngineProjection.dataset.archiveStatus = config.statusType;
     portfolioEngineProjection.dataset.world = config.id;
@@ -2105,16 +2111,16 @@ function showPortfolioEngineProjection(worldName) {
   shell.classList.remove("is-portfolio-projection-retracting");
   portfolioEngineProjection.setAttribute("aria-hidden", "false");
   shell.classList.add("is-portfolio-projection-active");
-  if (worldName === "soundtrack") revealPortfolioZhentoBriefing();
+  if (worldName === "soundtrack" || worldName === "battleground") revealPortfolioZhentoBriefing();
 }
 
 function queuePortfolioEngineProjection(worldName) {
-  hidePortfolioEngineProjection({ immediate: worldName === "soundtrack" });
-  if (worldName === "soundtrack") {
+  hidePortfolioEngineProjection({ immediate: worldName === "soundtrack" || worldName === "battleground" });
+  if (worldName === "soundtrack" || worldName === "battleground") {
     setPortfolioEngineProjectionContent(worldName);
     const generation = portfolioZhentoIdentificationGeneration;
     portfolioZhentoIdentificationIgnition.then((ready) => {
-      if (!ready || generation !== portfolioZhentoIdentificationGeneration || shell?.dataset.activeWorld !== "soundtrack") return;
+      if (!ready || generation !== portfolioZhentoIdentificationGeneration || shell?.dataset.activeWorld !== worldName) return;
       showPortfolioEngineProjection(worldName);
     });
     return;
@@ -2249,7 +2255,7 @@ function setPortfolioZhentoIdentification(isVisible = false, worldName = "soundt
   portfolioZhentoIdentificationIgnition = Promise.resolve(isVisible);
   if (!isVisible) {
     resetPortfolioZhentoBriefing();
-    if (portfolioEngineProjection?.dataset.world === "soundtrack") hidePortfolioEngineProjection({ immediate: true });
+    if (portfolioEngineProjection?.dataset.world === "soundtrack" || portfolioEngineProjection?.dataset.world === "battleground") hidePortfolioEngineProjection({ immediate: true });
   }
   if (!isVisible || isPortfolioEngineReducedMotion()) return;
   const generation = portfolioZhentoIdentificationGeneration;
@@ -2274,7 +2280,7 @@ function reversePortfolioZhentoIdentification(entry) {
     return Promise.resolve();
   }
   const animations = [...panel.getAnimations({ subtree: true }),
-    ...(entry.worldName === "soundtrack" ? (portfolioZhentoBriefing?.getAnimations({ subtree: true }) || []) : [])];
+    ...(portfolioZhentoBriefing?.getAnimations({ subtree: true }) || [])];
   const epoch = document.timeline.currentTime;
   const duration = Math.max(0, ...animations.map((animation) => animation.effect.getComputedTiming().endTime));
   // Every CSS track includes its holds in the same 800ms timeline.
