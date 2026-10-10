@@ -148,6 +148,7 @@ const portfolioZhentoBriefing = document.querySelector("[data-portfolio-zhento-b
 const portfolioZhentoBriefingDescription = portfolioZhentoBriefing?.querySelector(".portfolio-zhento-briefing__description")?.textContent || "";
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
+const portfolioDestinationIntro = document.querySelector("[data-portfolio-destination-intro]");
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
 const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
@@ -1225,6 +1226,7 @@ function startPortfolioWorldGateway() {
     stopPortfolioZhentoIdentificationIdle(true);
     portfolioZhentoIdentification.classList.add("is-departing");
   } else setPortfolioZhentoIdentification(false);
+  cancelPortfolioDestinationIntro({ immediate: true });
   portfolioGatewayGeneration += 1;
   if (activeWorld === "battleground") resetDaiionArchivePresentation();
   clearPortfolioGatewayPhaseTimer();
@@ -2300,6 +2302,7 @@ function reversePortfolioZhentoIdentification(entry) {
 
 function setPortfolioActiveWorld(worldName = "portfolio") {
   const config = getPortfolioWorldSelectionConfig(worldName);
+  if (config.id !== "portfolio") cancelPortfolioDestinationIntro();
   const previousWorld = shell?.dataset.activeWorld || "portfolio";
   const didChangeActiveWorld = previousWorld !== config.id;
   if (config.id === "portfolio") {
@@ -6712,6 +6715,8 @@ let portfolioDirectArrivalTimer = 0;
 let portfolioEngineReadyTimer = 0;
 let portfolioEngineReadyFrame = 0;
 let portfolioEngineReadyGateStartedAt = 0;
+let portfolioDestinationIntroGeneration = 0;
+let portfolioDestinationIntroPlayed = false;
 let isHomePortfolioRouteHandoffPending = false;
 
 function getPortfolioRouteContext() {
@@ -6739,7 +6744,57 @@ function cancelPortfolioEngineReadyGate() {
   portfolioEngineReadyGateStartedAt = 0;
 }
 
+function clearPortfolioDestinationIntro() {
+  portfolioDestinationIntroGeneration += 1;
+  if (!portfolioDestinationIntro) return;
+  portfolioDestinationIntro.hidden = true;
+  portfolioDestinationIntro.setAttribute("aria-hidden", "true");
+  portfolioDestinationIntro.classList.remove("is-playing", "is-cancelling");
+  portfolioDestinationIntro.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
+}
+
+function cancelPortfolioDestinationIntro({ immediate = false } = {}) {
+  const prompt = portfolioDestinationIntro;
+  if (!prompt || prompt.hidden) return;
+  if (immediate || isPortfolioEngineReducedMotion()) {
+    clearPortfolioDestinationIntro();
+    return;
+  }
+  if (prompt.classList.contains("is-cancelling")) return;
+  const generation = ++portfolioDestinationIntroGeneration;
+  // Freeze the current reveal, suppress fragments, and fade without delaying selection.
+  prompt.classList.add("is-cancelling");
+  const fade = prompt.getAnimations().find((animation) => animation.animationName === "portfolioDestinationIntroCancel");
+  if (!fade) { clearPortfolioDestinationIntro(); return; }
+  fade.finished.then(() => {
+    if (generation === portfolioDestinationIntroGeneration) clearPortfolioDestinationIntro();
+  }).catch(() => {});
+}
+
+function showPortfolioDestinationIntro() {
+  if (!portfolioDestinationIntro || portfolioDestinationIntroPlayed ||
+    window.location.pathname !== routePaths.portfolio || shell?.dataset.portfolioEngineReady !== "true" ||
+    shell.dataset.activeWorld !== "portfolio" || isPortfolioGatewayActive()) return;
+  portfolioDestinationIntroPlayed = true;
+  clearPortfolioDestinationIntro();
+  const generation = portfolioDestinationIntroGeneration;
+  portfolioDestinationIntro.hidden = false;
+  portfolioDestinationIntro.setAttribute("aria-hidden", "false");
+  portfolioDestinationIntro.classList.add("is-playing");
+  // The shared reduced-motion CSS suppresses all CSS animations; a static native hold still owns cleanup.
+  if (isPortfolioEngineReducedMotion()) {
+    const hold = portfolioDestinationIntro.animate([{ opacity: 1 }, { opacity: 1 }], { duration: 1000 });
+    hold.id = "portfolio-destination-intro-hold";
+  }
+  const animations = portfolioDestinationIntro.getAnimations({ subtree: true });
+  Promise.all(animations.map((animation) => animation.finished)).then(() => {
+    if (generation === portfolioDestinationIntroGeneration) clearPortfolioDestinationIntro();
+  }).catch(() => {});
+}
+
 function clearPortfolioEngineReadyState(options = {}) {
+  clearPortfolioDestinationIntro();
+  portfolioDestinationIntroPlayed = false;
   setPortfolioZhentoIdentification(false);
   cancelPortfolioEngineReadyGate();
   clearPortfolioEngineScan();
@@ -6805,6 +6860,7 @@ function markPortfolioEngineReady() {
   syncPortfolioGatewayTriggerState();
   startPortfolioEngineLightning();
   completeHomePortfolioRouteHandoff();
+  showPortfolioDestinationIntro();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
   }));
@@ -7402,6 +7458,7 @@ if (shell && startButton) {
     window.clearTimeout(portfolioDirectArrivalTimer);
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(portfolioFirstTransferTimer);
+    clearPortfolioDestinationIntro();
     cancelPortfolioEngineReadyGate();
     stopPortfolioEngineLightning();
     window.clearTimeout(drawerCloseTimer);
