@@ -13813,3 +13813,56 @@ button {
   }
   .portfolio-engage__rail { transition: none; }
 }
+
+/* PASS 109M: Da?ion record reuses the existing identification frame and animation tracks. */
+.site-shell[data-shell-route="portfolio"][data-active-world="battleground"].has-entered-hub.has-portfolio-entry-constellation:not(.is-portfolio-world-gateway-active) .portfolio-zhento-identification[data-identification-world="battleground"]:not([hidden]),
+.site-shell[data-shell-route="portfolio"][data-active-world="battleground"] .portfolio-zhento-identification[data-identification-world="battleground"].is-departing:not([hidden]) { display: block; }
+.portfolio-zhento-identification[data-identification-world="battleground"] { color: rgba(255, 238, 238, .96); }
+.portfolio-zhento-identification[data-identification-world="battleground"]::before {
+  background: linear-gradient(115deg, rgba(224, 65, 80, .72), rgba(162, 47, 65, .38) 60%, rgba(224, 65, 80, .56));
+  box-shadow: inset 0 0 8px rgba(205, 77, 97, .12);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"]::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 183, 191, .85), transparent);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__screen {
+  background: linear-gradient(110deg, rgba(130, 38, 54, .168), rgba(59, 19, 27, .056)),
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(226, 150, 163, .035) 7px 8px), rgba(18, 7, 10, .504);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__label { color: rgba(239, 174, 184, .85); }
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__title {
+  text-shadow: 0 0 6px rgba(246, 118, 138, .3), 0 0 14px rgba(239, 112, 127, .12);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__metadata dt { color: rgba(217, 182, 188, .72); }
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__screen::before {
+  background:
+    linear-gradient(rgba(249, 155, 169, .7), rgba(249, 155, 169, .7)) left top / 24px 1px no-repeat,
+    linear-gradient(rgba(244, 129, 146, .65), rgba(244, 129, 146, .65)) left top / 1px 5px no-repeat,
+    linear-gradient(rgba(249, 155, 169, .7), rgba(249, 155, 169, .7)) right bottom / 24px 1px no-repeat,
+    linear-gradient(rgba(244, 129, 146, .65), rgba(244, 129, 146, .65)) right bottom / 1px 5px no-repeat,
+    linear-gradient(rgba(244, 149, 163, .14) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(90deg, rgba(239, 126, 144, .14) 1px, transparent 1px) 0 0 / 14px 14px;
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__readout::before,
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__readout::after {
+  background: linear-gradient(rgba(249, 151, 163, .85), rgba(249, 151, 163, .85)) center top / 3px 1px no-repeat,
+    linear-gradient(rgba(241, 144, 160, .85), rgba(241, 144, 160, .85)) center bottom / 3px 1px no-repeat,
+    linear-gradient(transparent, rgba(234, 131, 148, .65) 18% 82%, transparent) center / 1px 100% no-repeat;
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__screen::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 166, 178, .48), transparent);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"].is-living:not(.is-departing) .portfolio-zhento-identification__screen::after {
+  background: linear-gradient(90deg, transparent, rgba(245, 130, 147, .15), rgba(246, 140, 158, .28), transparent);
+}
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__pulse { color: rgba(244, 155, 172, .75); }
+/* Palette overrides apply to the original SVG and its existing compositor planes alike. */
+.portfolio-zhento-identification[data-identification-world="battleground"] [stroke] { stroke: #e58b9a; }
+.portfolio-zhento-identification[data-identification-world="battleground"] [stroke="#779feb"],
+.portfolio-zhento-identification[data-identification-world="battleground"] [stroke="#80afe8"] { stroke: #eb778b; }
+.portfolio-zhento-identification[data-identification-world="battleground"] [stroke="#b191ed"],
+.portfolio-zhento-identification[data-identification-world="battleground"] [stroke="#a3a2f0"] { stroke: #edabb7; }
+.portfolio-zhento-identification[data-identification-world="battleground"] [fill="#afbcf6"] { fill: #f6afb9; }
+.portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(1) { stop-color: #f5879b; }
+.portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(2) { stop-color: #bc5168; }
+.portfolio-zhento-identification[data-identification-world="battleground"] stop:nth-child(3) { stop-color: #2e151c; }

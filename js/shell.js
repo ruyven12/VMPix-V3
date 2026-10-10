@@ -857,7 +857,7 @@ function cancelDaiionGatewayTransition() {
   entry?.cancelArrival?.();
   clearTimeout(entry?.readyTimer);
   entry?.cancelReady?.();
-  if (entry?.worldName === "soundtrack") setPortfolioZhentoIdentification(false);
+  if (entry && portfolioZhentoIdentification?.dataset.identificationWorld === entry.worldName) setPortfolioZhentoIdentification(false);
   releaseDaiionGatewayPassage(entry);
   if (entry && portfolioWorldGateway) portfolioWorldGateway.inert = entry.wasInert;
   if (entry?.worldName === "soundtrack") {
@@ -878,7 +878,8 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   const entry = { worldName, generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
   entry.landing = beginWorldLanding(worldName);
   daiionGatewayTransition = entry;
-  const identificationDeparture = worldName === "soundtrack"
+  const identificationDeparture = !portfolioZhentoIdentification?.hidden &&
+    portfolioZhentoIdentification?.dataset.identificationWorld === worldName
     ? reversePortfolioZhentoIdentification(entry) : null;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
@@ -1218,7 +1219,8 @@ function startPortfolioWorldGateway() {
     return false;
   }
 
-  if (activeWorld === "soundtrack" && !isPortfolioEngineReducedMotion() && !portfolioZhentoIdentification?.hidden) {
+  if ((activeWorld === "soundtrack" || activeWorld === "battleground") &&
+    !isPortfolioEngineReducedMotion() && !portfolioZhentoIdentification?.hidden) {
     stopPortfolioZhentoIdentificationIdle(true);
     portfolioZhentoIdentification.classList.add("is-departing");
   } else setPortfolioZhentoIdentification(false);
@@ -2221,9 +2223,25 @@ function stopPortfolioZhentoIdentificationIdle(preserveOrientation = false) {
   panel.classList.remove("is-living");
 }
 
-function setPortfolioZhentoIdentification(isVisible = false) {
+// The existing identification surface has two approved records; animation ownership is unchanged.
+function setPortfolioZhentoIdentification(isVisible = false, worldName = "soundtrack") {
   const panel = portfolioZhentoIdentification;
-  if (!panel || (isVisible && !panel.hidden)) return;
+  if (!panel) return;
+  const record = worldName === "battleground"
+    ? { title: "DA\u00cfION", designation: "The Battleground", classification: "The Wrestling Archive" }
+    : { title: "ZHENTO", designation: "The Soundtrack", classification: "The Music Archive" };
+  const switchingWorld = isVisible && panel.dataset.identificationWorld !== worldName;
+  if (switchingWorld) {
+    setPortfolioZhentoIdentification(false);
+    // Resolve the hidden style once so the previous record's native tracks retire before reuse.
+    panel.getAnimations({ subtree: true });
+    panel.dataset.identificationWorld = worldName;
+    panel.querySelector(".portfolio-zhento-identification__title").firstChild.nodeValue = `${record.title}\n            `;
+    const values = panel.querySelectorAll(".portfolio-zhento-identification__metadata dd");
+    values[0].textContent = record.designation;
+    values[1].textContent = record.classification;
+  }
+  if (isVisible && !panel.hidden) return;
   stopPortfolioZhentoIdentificationIdle();
   panel.classList.remove("is-departing");
   panel.hidden = !isVisible;
@@ -2240,7 +2258,8 @@ function setPortfolioZhentoIdentification(isVisible = false) {
   if (!ignition.length) return;
   const current = () => generation === portfolioZhentoIdentificationGeneration && !panel.hidden &&
     !panel.classList.contains("is-departing") && !isPortfolioGatewayActive() &&
-    window.location.pathname === routePaths.portfolio && shell?.dataset.activeWorld === "soundtrack";
+    window.location.pathname === routePaths.portfolio && shell?.dataset.activeWorld === worldName &&
+    panel.dataset.identificationWorld === worldName;
   portfolioZhentoIdentificationIgnition = Promise.all(ignition.map((animation) => animation.finished)).then(() => {
     if (!current()) return false;
     if (!isPortfolioEngineReducedMotion()) panel.classList.add("is-living");
@@ -2255,7 +2274,7 @@ function reversePortfolioZhentoIdentification(entry) {
     return Promise.resolve();
   }
   const animations = [...panel.getAnimations({ subtree: true }),
-    ...(portfolioZhentoBriefing?.getAnimations({ subtree: true }) || [])];
+    ...(entry.worldName === "soundtrack" ? (portfolioZhentoBriefing?.getAnimations({ subtree: true }) || []) : [])];
   const epoch = document.timeline.currentTime;
   const duration = Math.max(0, ...animations.map((animation) => animation.effect.getComputedTiming().endTime));
   // Every CSS track includes its holds in the same 800ms timeline.
@@ -2287,7 +2306,8 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
     clearPortfolioGatewayFocusState();
   }
   const isPortfolioSelection = window.location.pathname === routePaths.portfolio && !isPortfolioGatewayActive();
-  setPortfolioZhentoIdentification(isPortfolioSelection && config.id === "soundtrack");
+  setPortfolioZhentoIdentification(isPortfolioSelection &&
+    (config.id === "soundtrack" || config.id === "battleground"), config.id);
   setPortfolioEngineHudCurrentView(isPortfolioSelection
     ? PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio.label
     : (config.id === "battleground" ? "Outskirts of Daiion" : config.label));
