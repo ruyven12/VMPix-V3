@@ -13719,3 +13719,97 @@ button {
     transform: none;
   }
 }
+
+/* PASS 109L: one existing entry control, positioned in the Portfolio star field. */
+.portfolio-engage[hidden] { display: none !important; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage {
+  position: fixed;
+  z-index: 8;
+  inset: auto;
+  top: calc(var(--home-portfolio-transition-center-y) + var(--entry-beacon-midline-y));
+  left: var(--home-portfolio-transition-center-x);
+  width: clamp(112px, calc(30.769vw + 1.23px), 144px);
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  appearance: none;
+  background: transparent;
+  color: rgb(247 247 242 / 0.66);
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  cursor: default;
+  isolation: isolate;
+  text-transform: none;
+  font-family: Audiowide, Orbitron, Rajdhani, "Segoe UI", Arial, sans-serif;
+  font-size: clamp(12px, 3.15vw, 14px);
+  line-height: 1;
+  letter-spacing: 0.1em;
+  animation: portfolioEngageEstablish 240ms ease-out;
+  transition: color 180ms ease-out;
+}
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage::before,
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage::after {
+  content: none !important;
+}
+.portfolio-engage__frame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px);
+  background: rgb(var(--engine-accent-glow) / 0.3);
+}
+.portfolio-engage__frame::before {
+  position: absolute;
+  inset: 1px;
+  content: "";
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  background: linear-gradient(180deg, rgb(var(--engine-accent-glow) / 0.07), transparent 60%), rgb(5 5 12 / 0.76);
+}
+.portfolio-engage__rail {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  height: 1px;
+  pointer-events: none;
+  opacity: 0.38;
+  background: linear-gradient(90deg, transparent, rgb(var(--engine-accent-glow)) 12% 40%, transparent 40% 60%, rgb(var(--engine-accent-glow)) 60% 88%, transparent);
+  transition: opacity 180ms ease-out;
+}
+.portfolio-engage__rail--upper { top: 4px; }
+.portfolio-engage__rail--lower { bottom: 4px; }
+.portfolio-engage__label { pointer-events: none; text-transform: none; }
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage:not(:disabled) {
+  color: rgb(247 247 242);
+  text-shadow: 0 0 8px rgb(var(--engine-accent-glow) / 0.28);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.portfolio-engage:not(:disabled) .portfolio-engage__rail { opacity: 0.86; }
+.portfolio-engage:not(:disabled) .portfolio-engage__frame { background: rgb(var(--engine-accent-glow) / 0.72); }
+.portfolio-engage:not(:disabled):hover .portfolio-engage__rail { opacity: 1; }
+.portfolio-engage:focus-visible { outline: 2px solid rgb(247 247 242); outline-offset: 6px; }
+.site-shell[data-shell-route="portfolio"].is-portfolio-world-gateway-active .portfolio-beacon-field > .portfolio-engage {
+  display: none;
+  pointer-events: none;
+  animation: none;
+}
+@keyframes portfolioEngageEstablish {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (min-width: 700px) {
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage { height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage {
+    animation: none;
+    transition: none;
+  }
+  .portfolio-engage__rail { transition: none; }
+}

@@ -622,6 +622,12 @@ function syncPortfolioGatewayTriggerState() {
   const activeWorld = getPortfolioGatewayActiveWorld();
   const route = getPortfolioGatewayRoute(activeWorld);
   const isEnabled = shouldEnablePortfolioGatewayTrigger();
+  const isVisible = window.location.pathname === routePaths.portfolio &&
+    shell?.dataset.portfolioEngineReady === "true" &&
+    activeWorld !== "portfolio" && !isPortfolioGatewayActive();
+  if (!isVisible && document.activeElement === portfolioGatewayTrigger) portfolioGatewayTrigger.blur();
+  portfolioGatewayTrigger.hidden = !isVisible;
+  portfolioGatewayTrigger.setAttribute("aria-hidden", String(!isVisible));
   portfolioGatewayTrigger.disabled = !isEnabled;
   portfolioGatewayTrigger.setAttribute("aria-disabled", String(!isEnabled));
   portfolioGatewayTrigger.dataset.portfolioGatewayWorld = isEnabled ? activeWorld : "";
