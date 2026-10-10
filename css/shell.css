@@ -13664,60 +13664,39 @@ button {
   .portfolio-zhento-briefing__screen::after { animation: none !important; }
 }
 
-/* Portfolio right emitter only: idle illumination yields to charging and transport. */
+/* Portfolio idle anchor: static illumination yields to charging and transport. */
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived) .portfolio-engine-reactor,
+.site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived) .portfolio-engine-reactor * { pointer-events: none; }
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor {
   will-change: auto;
+  box-shadow: 0 0 .62rem rgb(var(--engine-accent-glow) / .13), inset 0 0 0 1px rgb(0 0 0 / .62), inset 0 0 .86rem rgb(var(--engine-accent-glow) / .06);
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-ring {
-  animation: portfolioRightEmitterIdleRing 2.8s ease-in-out infinite;
-  will-change: opacity, transform;
+  animation: none;
+  transform: none;
+  opacity: .88;
+  will-change: auto;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-core {
   animation: none;
   transform: none;
   will-change: auto;
-}
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-core {
   filter: grayscale(1) contrast(1.1) brightness(1.14) drop-shadow(0 0 .32rem rgb(var(--engine-accent-glow) / .26));
 }
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before {
-  background: radial-gradient(circle, rgb(var(--engine-accent-glow) / .42) 0 12%, rgb(var(--engine-accent-soft) / .18) 28%, transparent 66%);
-  opacity: .55;
-  animation: portfolioRightEmitterIdleGlow 2.8s ease-in-out infinite;
-}
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
-  animation: none;
-}
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before {
-  /* One wave retains the existing primary-ring footprint and expansion. */
-  animation: portfolioRightEmitterReadyPulsePrimary 2800ms linear infinite;
-}
-.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
-  /* Reuse the second wave's layer as concentrated light, rather than another ring. */
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before {
   inset: -5%;
   border: 0;
   background: radial-gradient(circle, rgb(var(--engine-accent-glow) / .42) 0 12%, rgb(var(--engine-accent-soft) / .18) 28%, transparent 66%);
   opacity: .55;
-  animation: portfolioRightEmitterIdleGlow 2.8s ease-in-out infinite;
+  animation: none;
+  transform: none;
+  will-change: auto;
 }
-@keyframes portfolioRightEmitterIdleGlow {
-  0%, 100% { opacity: .38; transform: scale3d(.96, .96, 1); }
-  50% { opacity: .95; transform: scale3d(1.06, 1.06, 1); }
-}
-@keyframes portfolioRightEmitterIdleRing {
-  0%, 100% { opacity: .72; transform: scale3d(.99, .99, 1); }
-  50% { opacity: 1; transform: scale3d(1.04, 1.04, 1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor-ring {
-    opacity: .88;
-    transform: none;
-  }
-  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-right-emitter-ready):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::before,
-  .site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
-    opacity: .55;
-    transform: none;
-  }
+.site-shell[data-shell-route="portfolio"].is-portfolio-engine-ready[data-portfolio-engine-ready="true"]:not(.is-portfolio-right-emitter-charging):not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-engine-reactor::after {
+  animation: none;
+  opacity: 0;
+  transform: none;
+  will-change: auto;
 }
 
 /* PASS 109L: one existing entry control, positioned in the Portfolio star field. */
@@ -13925,3 +13904,54 @@ button {
   box-shadow: 0 0 4px rgba(239, 132, 151, .25);
 }
 .portfolio-engine-projection[data-world="battleground"] .portfolio-zhento-briefing__description { color: rgba(250, 230, 235, .93); }
+
+/* Ready ENGAGE owns the Portfolio idle energy; native disabled/hidden state gates it. */
+.portfolio-engage__energy {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: visible;
+}
+.portfolio-engage__frame::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px);
+  background: radial-gradient(ellipse at center, transparent 35%, rgb(var(--engine-accent-glow) / .58) 90%);
+  opacity: 0;
+}
+.portfolio-engage__wave {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+  stroke: rgb(var(--engine-accent-glow));
+  stroke-width: 1;
+  opacity: 0;
+  transform-origin: center;
+}
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage:not([hidden]):not(:disabled):is([data-portfolio-gateway-world="soundtrack"], [data-portfolio-gateway-world="battleground"]) .portfolio-engage__frame::after {
+  animation: portfolioEngageReadyBreath 3s ease-in-out infinite;
+}
+.site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage:not([hidden]):not(:disabled):is([data-portfolio-gateway-world="soundtrack"], [data-portfolio-gateway-world="battleground"]) .portfolio-engage__wave {
+  animation: portfolioEngageReadyWave 3s ease-out infinite;
+}
+@keyframes portfolioEngageReadyBreath {
+  0%, 100% { opacity: .2; }
+  50% { opacity: .72; }
+}
+@keyframes portfolioEngageReadyWave {
+  0% { opacity: 0; transform: scale(1); }
+  15% { opacity: .72; }
+  75%, 100% { opacity: 0; transform: scale(1.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage .portfolio-engage__wave { animation: none !important; opacity: 0; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage .portfolio-engage__frame::after { animation: none !important; }
+  .site-shell[data-shell-route="portfolio"] .portfolio-beacon-field > .portfolio-engage:not([hidden]):not(:disabled) .portfolio-engage__frame::after { opacity: .46; }
+}
