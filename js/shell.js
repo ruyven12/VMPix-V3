@@ -2359,6 +2359,10 @@ function handlePortfolioBeaconHotspotKeydown(event) {
 }
 
 function initPortfolioBeaconHotspots() {
+  const brandingVersion = document.querySelector("[data-portfolio-branding-version]");
+  const archiveBuild = document.querySelector("[data-archive-build]") ||
+    document.querySelector('[data-portfolio-engine-panel="archive-build"] .portfolio-engine-value');
+  if (brandingVersion && archiveBuild) brandingVersion.textContent = archiveBuild.textContent.trim();
   setPortfolioActiveWorld("portfolio");
   setPortfolioBeaconHotspotsEnabled(Boolean(shell?.dataset.portfolioEngineReady === "true"));
   portfolioGatewayTrigger?.addEventListener("click", handlePortfolioGatewayTriggerClick);

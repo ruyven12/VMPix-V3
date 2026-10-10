@@ -14029,3 +14029,58 @@ button {
   .portfolio-destination-intro.is-playing .portfolio-destination-intro__fragments { display: none; }
   .portfolio-destination-intro.is-playing .portfolio-destination-intro__fragments > span { animation: none; }
 }
+
+/* PASS 109R: static Portfolio branding, using the existing settled/selection lifecycle. */
+.portfolio-branding {
+  position: fixed;
+  z-index: 8;
+  top: max(calc(env(safe-area-inset-top, 0px) + 10px), clamp(12px, 2svh, 24px));
+  left: 50%;
+  width: min(440px, calc(100% - 20px));
+  transform: translateX(-50%);
+  display: none;
+  justify-items: center;
+  gap: 4px;
+  background: transparent;
+  color: rgb(233 235 241 / .92);
+  font-family: var(--font-display);
+  text-align: center;
+  pointer-events: none;
+}
+.site-shell[data-shell-route="portfolio"][data-active-world="portfolio"][data-portfolio-engine-ready="true"].is-portfolio-engine-ready:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-branding {
+  display: grid;
+}
+.portfolio-branding,
+.portfolio-branding * { text-transform: none; pointer-events: none; }
+.portfolio-branding__logo {
+  display: block;
+  width: min(90%, 352px);
+  height: auto;
+  object-fit: contain;
+}
+.portfolio-branding__edition {
+  font-size: 18px;
+  line-height: 22px;
+  letter-spacing: .1em;
+  text-shadow: 0 0 4px rgb(223 229 241 / .12);
+}
+.portfolio-branding__build {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.portfolio-branding__version {
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: .08em;
+  color: rgb(217 223 234 / .78);
+}
+.portfolio-branding__rail { display: block; width: 100%; height: 12px; overflow: visible; }
+.portfolio-branding__rail polyline { fill: none; stroke: rgb(217 225 239 / .62); stroke-width: 1; vector-effect: non-scaling-stroke; }
+@media (min-width: 700px) {
+  .portfolio-branding { top: max(calc(env(safe-area-inset-top, 0px) + 10px), 32px); }
+  .portfolio-branding__logo { width: 400px; max-width: 100%; }
+  .portfolio-branding__edition { font-size: 20px; line-height: 24px; }
+}
