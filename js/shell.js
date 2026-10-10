@@ -6778,11 +6778,13 @@ function showPortfolioBranding() {
   header.dataset.established = "true";
   header.hidden = false;
   header.setAttribute("aria-hidden", "false");
-  if (isPortfolioEngineReducedMotion()) return;
+  if (isPortfolioEngineReducedMotion()) { showPortfolioDestinationIntro(); return; }
   const generation = ++portfolioBrandingGeneration;
   header.classList.add("is-revealing");
   Promise.all(header.getAnimations({ subtree: true }).map((animation) => animation.finished)).then(() => {
-    if (generation === portfolioBrandingGeneration && !header.hidden) header.classList.remove("is-revealing");
+    if (generation !== portfolioBrandingGeneration || header.hidden) return;
+    header.classList.remove("is-revealing");
+    showPortfolioDestinationIntro();
   }).catch(() => {});
 }
 
@@ -6829,6 +6831,12 @@ function syncPortfolioBrandingSelection(worldName = shell?.dataset.activeWorld) 
 function syncPortfolioBrandingMotion() {
   if (!isPortfolioEngineReducedMotion()) return;
   syncPortfolioBrandingSelection();
+  if (portfolioDestinationIntro && !portfolioDestinationIntro.hidden) {
+    const generation = ++portfolioDestinationIntroGeneration;
+    portfolioDestinationIntro.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
+    if (portfolioDestinationIntro.classList.contains("is-cancelling")) clearPortfolioDestinationIntro();
+    else completePortfolioDestinationIntro(generation);
+  } else showPortfolioDestinationIntro();
 }
 
 function clearPortfolioDestinationIntro() {
@@ -6842,7 +6850,9 @@ function clearPortfolioDestinationIntro() {
 
 function cancelPortfolioDestinationIntro({ immediate = false } = {}) {
   const prompt = portfolioDestinationIntro;
-  if (!prompt || prompt.hidden) return;
+  // Consume this arrival even when selection cancels the invitation before branding settles.
+  portfolioDestinationIntroPlayed = true;
+  if (!prompt || prompt.hidden) { clearPortfolioDestinationIntro(); return; }
   if (immediate || isPortfolioEngineReducedMotion()) {
     clearPortfolioDestinationIntro();
     return;
@@ -6858,6 +6868,18 @@ function cancelPortfolioDestinationIntro({ immediate = false } = {}) {
   }).catch(() => {});
 }
 
+function completePortfolioDestinationIntro(generation) {
+  // The shared reduced-motion CSS suppresses all CSS animations; a static native hold still owns cleanup.
+  if (isPortfolioEngineReducedMotion()) {
+    const hold = portfolioDestinationIntro.animate([{ opacity: 1 }, { opacity: 1 }], { duration: 1000 });
+    hold.id = "portfolio-destination-intro-hold";
+  }
+  const animations = portfolioDestinationIntro.getAnimations({ subtree: true });
+  Promise.all(animations.map((animation) => animation.finished)).then(() => {
+    if (generation === portfolioDestinationIntroGeneration) clearPortfolioDestinationIntro();
+  }).catch(() => {});
+}
+
 function showPortfolioDestinationIntro() {
   if (!portfolioDestinationIntro || portfolioDestinationIntroPlayed ||
     window.location.pathname !== routePaths.portfolio || shell?.dataset.portfolioEngineReady !== "true" ||
@@ -6868,15 +6890,7 @@ function showPortfolioDestinationIntro() {
   portfolioDestinationIntro.hidden = false;
   portfolioDestinationIntro.setAttribute("aria-hidden", "false");
   portfolioDestinationIntro.classList.add("is-playing");
-  // The shared reduced-motion CSS suppresses all CSS animations; a static native hold still owns cleanup.
-  if (isPortfolioEngineReducedMotion()) {
-    const hold = portfolioDestinationIntro.animate([{ opacity: 1 }, { opacity: 1 }], { duration: 1000 });
-    hold.id = "portfolio-destination-intro-hold";
-  }
-  const animations = portfolioDestinationIntro.getAnimations({ subtree: true });
-  Promise.all(animations.map((animation) => animation.finished)).then(() => {
-    if (generation === portfolioDestinationIntroGeneration) clearPortfolioDestinationIntro();
-  }).catch(() => {});
+  completePortfolioDestinationIntro(generation);
 }
 
 function clearPortfolioEngineReadyState(options = {}) {
@@ -6949,7 +6963,6 @@ function markPortfolioEngineReady() {
   startPortfolioEngineLightning();
   completeHomePortfolioRouteHandoff();
   showPortfolioBranding();
-  showPortfolioDestinationIntro();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
   }));
