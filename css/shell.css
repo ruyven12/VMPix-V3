@@ -13799,6 +13799,10 @@ button {
   text-shadow: 0 0 6px rgba(246, 118, 138, .3), 0 0 14px rgba(239, 112, 127, .12);
 }
 .portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__metadata dt { color: rgba(217, 182, 188, .72); }
+/* Allow the longer Daïion classification to fit its existing metadata column. */
+.portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__metadata > div:last-child dd {
+  white-space: normal;
+}
 .portfolio-zhento-identification[data-identification-world="battleground"] .portfolio-zhento-identification__screen::before {
   background:
     linear-gradient(rgba(249, 155, 169, .7), rgba(249, 155, 169, .7)) left top / 24px 1px no-repeat,
