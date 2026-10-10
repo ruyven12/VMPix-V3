@@ -14167,28 +14167,27 @@ button {
 .portfolio-beacon:is(.is-selected, [aria-pressed="true"]) .portfolio-star-label__classification {
   color: rgb(var(--beacon-color) / .9);
 }
-.portfolio-beacon--horizon .portfolio-star-label {
-  left: calc(50% + 12px);
-  top: calc(50% + 30px);
-  transform: none;
-  justify-items: start;
-  text-align: left;
-}
+/* Center edge labels on their existing star; clamp only enough to protect text/shadow. */
+.portfolio-beacon--horizon .portfolio-star-label,
 .portfolio-beacon--wild .portfolio-star-label {
-  left: auto;
-  right: calc(50% + 12px);
+  left: 50%;
+  right: auto;
   top: calc(50% + 30px);
-  transform: none;
-  justify-items: end;
-  text-align: right;
+  transform: translateX(clamp(
+    calc(env(safe-area-inset-left, 0px) + 2px - 50vw - var(--beacon-x)),
+    -50%,
+    calc(50vw - env(safe-area-inset-right, 0px) - 2px - var(--beacon-x) - 100%)
+  ));
+  justify-items: center;
+  text-align: center;
 }
 .portfolio-beacon--system .portfolio-star-label { top: calc(50% + 17px); }
 .portfolio-beacon--trajectory .portfolio-star-label { top: calc(50% + 20px); }
 @media (min-width: 700px) {
   .portfolio-star-label { font-size: 16px; top: calc(50% + 20px); }
   .portfolio-star-label__classification { font-size: 11.5px; }
-  .portfolio-beacon--horizon .portfolio-star-label { left: calc(50% + 16px); top: calc(50% + 26px); }
-  .portfolio-beacon--wild .portfolio-star-label { right: calc(50% + 16px); top: calc(50% + 26px); }
+  .portfolio-beacon--horizon .portfolio-star-label,
+  .portfolio-beacon--wild .portfolio-star-label { top: calc(50% + 26px); }
   .portfolio-beacon--system .portfolio-star-label { top: calc(50% + 20px); }
   .portfolio-beacon--trajectory .portfolio-star-label { top: calc(50% + 24px); }
 }
