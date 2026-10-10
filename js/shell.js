@@ -149,6 +149,8 @@ const portfolioZhentoBriefingDescription = portfolioZhentoBriefing?.querySelecto
 const portfolioWorldGateway = document.querySelector("[data-portfolio-world-gateway]");
 const portfolioGatewayTrigger = document.querySelector("[data-portfolio-world-gateway-trigger]");
 const portfolioDestinationIntro = document.querySelector("[data-portfolio-destination-intro]");
+const portfolioBranding = document.querySelector("[data-portfolio-branding]");
+let portfolioBrandingGeneration = 0;
 const portfolioEngineProjectionTitle = document.querySelector("[data-portfolio-projection-title]");
 const portfolioEngineProjectionDescription = document.querySelector("[data-portfolio-projection-description]");
 const portfolioEngineProjectionStatus = document.querySelector("[data-portfolio-projection-status]");
@@ -1226,6 +1228,7 @@ function startPortfolioWorldGateway() {
     stopPortfolioZhentoIdentificationIdle(true);
     portfolioZhentoIdentification.classList.add("is-departing");
   } else setPortfolioZhentoIdentification(false);
+  clearPortfolioBranding({ reset: true });
   cancelPortfolioDestinationIntro({ immediate: true });
   portfolioGatewayGeneration += 1;
   if (activeWorld === "battleground") resetDaiionArchivePresentation();
@@ -2315,6 +2318,7 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
     clearPortfolioGatewayFocusState();
   }
   const isPortfolioSelection = window.location.pathname === routePaths.portfolio && !isPortfolioGatewayActive();
+  syncPortfolioBrandingSelection(config.id);
   setPortfolioZhentoIdentification(isPortfolioSelection &&
     (config.id === "soundtrack" || config.id === "battleground"), config.id);
   setPortfolioEngineHudCurrentView(isPortfolioSelection
@@ -6757,6 +6761,76 @@ function cancelPortfolioEngineReadyGate() {
   portfolioEngineReadyGateStartedAt = 0;
 }
 
+function clearPortfolioBranding({ reset = false } = {}) {
+  portfolioBrandingGeneration += 1;
+  if (!portfolioBranding) return;
+  portfolioBranding.hidden = true;
+  portfolioBranding.setAttribute("aria-hidden", "true");
+  portfolioBranding.classList.remove("is-revealing", "is-concealed");
+  portfolioBranding.getAnimations({ subtree: true }).forEach((animation) => animation.cancel());
+  if (reset) delete portfolioBranding.dataset.established;
+}
+
+function showPortfolioBranding() {
+  const header = portfolioBranding;
+  if (!header || header.dataset.established || window.location.pathname !== routePaths.portfolio ||
+    shell?.dataset.portfolioEngineReady !== "true" || shell.dataset.activeWorld !== "portfolio" || isPortfolioGatewayActive()) return;
+  header.dataset.established = "true";
+  header.hidden = false;
+  header.setAttribute("aria-hidden", "false");
+  if (isPortfolioEngineReducedMotion()) return;
+  const generation = ++portfolioBrandingGeneration;
+  header.classList.add("is-revealing");
+  Promise.all(header.getAnimations({ subtree: true }).map((animation) => animation.finished)).then(() => {
+    if (generation === portfolioBrandingGeneration && !header.hidden) header.classList.remove("is-revealing");
+  }).catch(() => {});
+}
+
+function syncPortfolioBrandingSelection(worldName = shell?.dataset.activeWorld) {
+  const header = portfolioBranding;
+  if (!header) return;
+  if (window.location.pathname !== routePaths.portfolio || shell?.dataset.portfolioEngineReady !== "true" || isPortfolioGatewayActive()) {
+    clearPortfolioBranding({ reset: true });
+    return;
+  }
+  if (!header.dataset.established) return;
+  const restoring = worldName === "portfolio";
+  if (isPortfolioEngineReducedMotion()) {
+    clearPortfolioBranding();
+    header.hidden = !restoring;
+    header.setAttribute("aria-hidden", String(!restoring));
+    return;
+  }
+  if (restoring && !header.hidden && !header.classList.contains("is-concealed")) return;
+  if (!restoring && (header.hidden || header.classList.contains("is-concealed"))) return;
+  // Read the current fade once. Interrupted ignition restores from dark, never a full-logo flash.
+  const fromOpacity = header.hidden || (restoring && header.classList.contains("is-revealing"))
+    ? 0 : Number(getComputedStyle(header).opacity);
+  const generation = ++portfolioBrandingGeneration;
+  header.getAnimations().forEach((animation) => animation.cancel());
+  if (restoring) header.classList.remove("is-revealing", "is-concealed");
+  else {
+    header.classList.add("is-concealed");
+    header.getAnimations({ subtree: true }).forEach((animation) => animation.pause());
+  }
+  header.hidden = false;
+  header.setAttribute("aria-hidden", String(!restoring));
+  const fade = header.animate([{ opacity: fromOpacity }, { opacity: restoring ? 1 : 0 }], {
+    duration: 180, easing: "ease-out", fill: "forwards",
+  });
+  fade.id = restoring ? "portfolio-branding-restore" : "portfolio-branding-selection-fade";
+  fade.finished.then(() => {
+    if (generation !== portfolioBrandingGeneration) return;
+    if (restoring) fade.cancel();
+    else clearPortfolioBranding();
+  }).catch(() => {});
+}
+
+function syncPortfolioBrandingMotion() {
+  if (!isPortfolioEngineReducedMotion()) return;
+  syncPortfolioBrandingSelection();
+}
+
 function clearPortfolioDestinationIntro() {
   portfolioDestinationIntroGeneration += 1;
   if (!portfolioDestinationIntro) return;
@@ -6806,6 +6880,7 @@ function showPortfolioDestinationIntro() {
 }
 
 function clearPortfolioEngineReadyState(options = {}) {
+  clearPortfolioBranding({ reset: true });
   clearPortfolioDestinationIntro();
   portfolioDestinationIntroPlayed = false;
   setPortfolioZhentoIdentification(false);
@@ -6873,6 +6948,7 @@ function markPortfolioEngineReady() {
   syncPortfolioGatewayTriggerState();
   startPortfolioEngineLightning();
   completeHomePortfolioRouteHandoff();
+  showPortfolioBranding();
   showPortfolioDestinationIntro();
   shell.dispatchEvent(new CustomEvent("portfolio:engine-ready", {
     detail: { coordinateCount: PORTFOLIO_COORDINATE_ONLINE_TOTAL },
@@ -7411,11 +7487,13 @@ if (shell && startButton) {
     reducedMotion.addEventListener("change", syncShellBackSweepMotion);
     reducedMotion.addEventListener("change", syncAmbientMotion);
     reducedMotion.addEventListener("change", syncPortfolioEngineLightningMotion);
+    reducedMotion.addEventListener("change", syncPortfolioBrandingMotion);
     reducedMotion.addEventListener("change", syncDaiionGatewayMotion);
   } else if (typeof reducedMotion.addListener === "function") {
     reducedMotion.addListener(syncShellBackSweepMotion);
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
+    reducedMotion.addListener(syncPortfolioBrandingMotion);
     reducedMotion.addListener(syncDaiionGatewayMotion);
   }
   window.addEventListener("resize", () => { cancelZhentoRhythmEntry(); updateViewportMetrics(); fitZhentoLowerThirdBody(); });
@@ -7471,6 +7549,7 @@ if (shell && startButton) {
     window.clearTimeout(portfolioDirectArrivalTimer);
     window.clearTimeout(portfolioOrientationTimer);
     window.clearTimeout(portfolioFirstTransferTimer);
+    clearPortfolioBranding({ reset: true });
     clearPortfolioDestinationIntro();
     cancelPortfolioEngineReadyGate();
     stopPortfolioEngineLightning();

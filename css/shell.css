@@ -14030,7 +14030,7 @@ button {
   .portfolio-destination-intro.is-playing .portfolio-destination-intro__fragments > span { animation: none; }
 }
 
-/* PASS 109R: static Portfolio branding, using the existing settled/selection lifecycle. */
+/* Portfolio branding uses the existing settled/selection lifecycle. */
 .portfolio-branding {
   position: fixed;
   z-index: 8;
@@ -14047,12 +14047,14 @@ button {
   text-align: center;
   pointer-events: none;
 }
-.site-shell[data-shell-route="portfolio"][data-active-world="portfolio"][data-portfolio-engine-ready="true"].is-portfolio-engine-ready:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-branding {
+.site-shell[data-shell-route="portfolio"][data-portfolio-engine-ready="true"].is-portfolio-engine-ready:not(.is-portfolio-world-gateway-active):not(.is-portfolio-world-arrived) .portfolio-branding:not([hidden]) {
   display: grid;
 }
 .portfolio-branding,
 .portfolio-branding * { text-transform: none; pointer-events: none; }
 .portfolio-branding__logo {
+  transform: scale(.9);
+  transform-origin: center;
   display: block;
   width: min(90%, 352px);
   height: auto;
@@ -14088,4 +14090,34 @@ button {
   .portfolio-branding__build { height: 40px; }
   .portfolio-branding__version { font-size: 16px; line-height: 24px; }
   .portfolio-branding__major { font-size: 20px; }
+}
+
+/* One finite 650ms reveal; the Shell owns native completion and selection cancellation. */
+.portfolio-branding.is-revealing .portfolio-branding__rail {
+  animation: portfolioBrandingRailsReveal 650ms linear both;
+}
+.portfolio-branding__rail:first-child { --branding-rail-start: inset(0 0 0 100%); }
+.portfolio-branding__rail:last-child { --branding-rail-start: inset(0 100% 0 0); }
+.portfolio-branding.is-revealing .portfolio-branding__logo {
+  animation: portfolioBrandingLogoReveal 650ms linear both;
+}
+.portfolio-branding.is-revealing .portfolio-branding__version {
+  animation: portfolioBrandingVersionReveal 650ms linear both;
+}
+@keyframes portfolioBrandingRailsReveal {
+  0% { opacity: 0; clip-path: var(--branding-rail-start); }
+  23.077%, 100% { opacity: 1; clip-path: inset(0); }
+}
+@keyframes portfolioBrandingLogoReveal {
+  0%, 23.077% { opacity: 0; }
+  61.538%, 100% { opacity: 1; }
+}
+@keyframes portfolioBrandingVersionReveal {
+  0%, 61.538% { opacity: 0; }
+  84.615%, 100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-branding.is-revealing :is(.portfolio-branding__rail, .portfolio-branding__logo, .portfolio-branding__version) {
+    animation: none; opacity: 1; clip-path: none;
+  }
 }
