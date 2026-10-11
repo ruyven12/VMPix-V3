@@ -4,7 +4,7 @@
 
 Classification: **CURRENT / SPECIALIZED** route reference under [PROJECT_RULES.md](PROJECT_RULES.md). Future public/admin/API targets are **FUTURE / PLANNING**, not implementation permission.
 
-Wrestling routes and API bindings were source-verified in PASS 6 and synchronized in PASS 7 (2026-09-10). "active" does not mean module completeness or runtime success. Runtime/browser verification, physical-device QA, and human creative signoff are separate; one does not imply the next. Non-Wrestling and deployment statements remain retained records needing current verification; Render configuration was not reverified. The future /admin/locks example in the Admin Shell Blueprint is not listed here; reconcile the planned route inventory in a later approved pass, without adding routes now.
+Wrestling routes and API bindings were source-verified in PASS 6 and synchronized in PASS 7 (2026-09-10). "active" does not mean module completeness or runtime success. Runtime/browser verification, physical-device QA, and human creative signoff are separate; one does not imply the next. Portfolio page-level approval and its existing destination mappings are recorded in PASS 109AF (2026-10-11); other non-Wrestling and deployment statements remain retained records needing current verification; Render configuration was not reverified. The future /admin/locks example in the Admin Shell Blueprint is not listed here; reconcile the planned route inventory in a later approved pass, without adding routes now.
 
 This document tracks the intended V3 route map and the current route behavior in the VMPix-V3 frontend repo. It is documentation only and does not create routes, change routing, wire APIs, or alter deployment behavior.
 
@@ -37,7 +37,7 @@ Current `render.yaml` already declares this rewrite behavior.
 | Route | Target | Status | Current behavior | Notes |
 | --- | --- | --- | --- | --- |
 | `/` | Homepage | active | Normalized as the home route. `/index.html` is also normalized to `/`. | Shell entry point. |
-| `/portfolio` | Portfolio Hub | active | History API route handled by the shell router. | Hub route after portal entry. |
+| `/portfolio` | Interactive Portfolio | active | History API route handled by the Shared V3 Shell. | **COMPLETE — PAGE-LEVEL SIGNOFF**, PASS 109AF; first completed Experience Build page. Shared transition limitations remain open in [Current State](CURRENT_STATE.md#shared-shell-transition-qa-backlog). |
 | `/music` | Music Nexus | active | History API route handled by the shell router. | Opens the static Music Nexus landing entry point. |
 | `/music/bands` | Music Bands Archive | active | History API route handled by the shell router. | Existing bands route remains separate from the `/music` landing; future radar work belongs here. |
 | `/music/shows` | Music Shows Archive | active | History API route handled by the shell router. | Opens Music Nexus with the Shows section selected. |
@@ -49,6 +49,25 @@ Current `render.yaml` already declares this rewrite behavior.
 | `/about` | About | active | History API route handled by the shell router. | Opens the current About shell view. |
 | `/contact` | Contact | active | History API route handled by the shell router. | Opens the current Contact shell view. |
 | `/admin` | Admin Shell | future | Main shell navigation currently sends admin traffic to `./admin/index.html`; `/admin` is not currently an SPA route. | Future protected admin route should live inside the V3 route contract. |
+
+## Portfolio Destination Mapping
+
+Approved Portfolio compass/label inventory, recorded in PASS 109AF. Preserve destination IDs, current selection behavior and existing route mappings; this table creates no routes or classifications.
+
+| Position | Destination | Classification | Existing Portfolio traversal |
+| --- | --- | --- | --- |
+| North | Cosmos | Astrophotography | Unavailable; ENGAGE disabled. |
+| Northwest | Zhento | Music | `/music`, after charging readiness. |
+| Northeast | Daïion | Wrestling | `/wrestling`, after charging readiness. |
+| West | Horizon | Sunsets | Unavailable; ENGAGE disabled. |
+| East | Wild | Wildlife | Unavailable; ENGAGE disabled. |
+| Southwest | Story | None | Unavailable; ENGAGE disabled. |
+| Southeast | Comms | None | Unavailable; ENGAGE disabled. |
+| South | Trajectory | None | Unavailable; ENGAGE disabled. |
+
+Only Zhento and Daïion currently support traversal from Portfolio. The other six stars remain selectable for their existing information/Coming Soon behavior; `None` means no secondary label, not visible placeholder text. Their unavailable entry state does not introduce or remap public routes elsewhere in this manifest.
+
+See [Protected Decisions](V3_PROTECTED_DECISIONS.md#portfolio-experience-build) for the approved presentation and animation contract, and [Current State](CURRENT_STATE.md#portfolio-page-level-signoff) for page QA/signoff. Successful Portfolio entry to a world does not sign off that module's own destination experiences or the complete transition's performance.
 
 ## Canonical Wrestling Routes — PASS 6 Source-Verified
 

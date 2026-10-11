@@ -2,15 +2,16 @@
 
 ## Authority and status dimensions
 
-Classification: **CURRENT / SPECIALIZED** readiness reference under [PROJECT_RULES.md](PROJECT_RULES.md). Wrestling entries reflect PASS 6 source inspection, synchronized in PASS 7 (2026-09-10). Other module entries remain retained snapshots needing current verification. Source presence does not establish runtime/browser success, physical-device QA, or human creative signoff; those are separate evidence stages.
+Classification: **CURRENT / SPECIALIZED** readiness reference under [PROJECT_RULES.md](PROJECT_RULES.md). Wrestling entries reflect PASS 6 source inspection, synchronized in PASS 7 (2026-09-10). Portfolio is updated by explicit PASS 109AF page-level approval (2026-10-11); other module entries remain retained snapshots needing current verification. Source presence does not establish runtime/browser success, physical-device QA, or human creative signoff; those are separate evidence stages.
 
-Keep implementation readiness, route handling, creative canon/protection, and QA/signoff separate. "active" here is not World Bible's in-world ACTIVE label or a signed-off experience. World Bible records Home and Interactive Portfolio as protected and focuses current creative work on The Story, The Trajectory, and The Comms. The older Portfolio card-launcher wording remains an unverified snapshot, not an instruction to rebuild protected work. Current scheduling is recorded in [Current State](CURRENT_STATE.md); Wrestling source status is detailed below.
+Keep implementation readiness, route handling, creative canon/protection, and QA/signoff separate. "active" here is not World Bible's in-world ACTIVE label or a signed-off experience. World Bible records Home and Interactive Portfolio as protected and focuses current creative work on The Story, The Trajectory, and The Comms. Portfolio is the first completed Experience Build page: **COMPLETE — PAGE-LEVEL SIGNOFF**, Shared V3 Shell-owned. Its current approved design is recorded in [Protected Decisions](V3_PROTECTED_DECISIONS.md#portfolio-experience-build); this approval does not complete other modules, the V3 release or end-to-end transition performance. Current scheduling is recorded in [Current State](CURRENT_STATE.md); Wrestling source status is detailed below.
 
 This document tracks current V3 module readiness. It is documentation only and does not create modules, edit app code, change routes, wire APIs, or add dependencies.
 
 ## Status Labels
 
 - `active`: Present in the current V3 frontend experience.
+- `COMPLETE — PAGE-LEVEL SIGNOFF`: Explicitly approved page experience; separate from full release readiness, physical-device verification and shared transition-performance approval.
 - `placeholder`: Present as a partial shell view, prototype, or planned surface, but incomplete.
 - `future`: Planned but not currently implemented as a ready V3 module.
 - `none`: Retained per-row API snapshot for modules outside this Wrestling verification; not a global claim that V3 has no API integration.
@@ -22,7 +23,7 @@ This document tracks current V3 module readiness. It is documentation only and d
 | Module | Status | UI status | API status | Mobile status | Notes | Next planned work |
 | --- | --- | --- | --- | --- | --- | --- |
 | Homepage | active | Active shell entry screen. | none | Needs continued Samsung S25 Ultra and webview QA. | Normalized to `/`; starts the V3 shell experience. | Keep homepage stable while route and module expansion continues. |
-| Portfolio Hub | active | Active hub screen. | none | Needs continued mobile/webview QA. | Routed at `/portfolio`; module cards launch current module views. | Preserve hub as the shell-owned module launcher and avoid route-specific layout forks. |
+| Portfolio Hub | active | **COMPLETE — PAGE-LEVEL SIGNOFF** (PASS 109AF). | none | Portrait/landscape browser QA passed; physical S25 Ultra performance/safe-area verification remains open. | `/portfolio`, Shared V3 Shell-owned; first completed Experience Build page. Stars select destinations; central ENGAGE alone traverses to ready Zhento/Daïion. | Preserve approved presentation; track remaining [shared Shell limitations](CURRENT_STATE.md#shared-shell-transition-qa-backlog) separately. |
 | Music Nexus | active | Active static landing entry point. | none | Landing shell has focused mobile, tablet, desktop, and webview QA coverage. | Routed at `/music`; band/radar/list/search views live under `/music/bands`. Static stats and latest activity remain placeholder-only in v1. | Continue separating module behavior from shell routing while preparing for backend data adapters. |
 | Music Bands | active | Existing bands route surface. | none | Needs future Bands Archive/Radar QA when that pass begins. | Routed at `/music/bands`; future radar implementation belongs here, not on `/music`. | Build the approved Bands Archive work without changing the landing route contract. |
 | Music Shows | active | Active section inside Music Nexus. | none | Needs future archive-specific hardening. | Routed at `/music/shows`. | Harden empty/loading/error states before live API integration. |

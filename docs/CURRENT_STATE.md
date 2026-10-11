@@ -5,8 +5,8 @@
 - Project: Website-V3 / VMPix-V3
 - Purpose: Current project-state snapshot
 - Status: Active / frequently updated
-- Last reviewed: 2026-09-10 — PASS 26 workflow refresh
-- Basis: PASS 5 direction and PASS 6–7 implementation snapshots; PASS 26 verifies current workflow files and records completed PASS 10–25/follow-up reports from this task history. No application re-audit, browser/E2E rerun, or physical-device validation was performed in PASS 26.
+- Last reviewed: 2026-10-11 — PASS 109AF Portfolio documentation/signoff only; other area snapshots retain their original evidence dates.
+- Basis: PASS 5 direction and PASS 6–7 implementation snapshots; PASS 26 workflow verification and PASS 10–25/follow-up reports remain the basis for unchanged areas. Portfolio uses the supplied PASS 109V–109AE QA/correction reports and explicit PASS 109AF page-level approval. No application re-audit, browser/E2E rerun or physical-device validation was performed in PASS 109AF.
 
 Read [AGENTS.md](../AGENTS.md) first. This file records **state, not permanent law**; engineering, workflow, and creative authority remain in the governing documents.
 
@@ -34,10 +34,12 @@ This sequence comes from Chris's PASS 5 direction and supersedes older developme
 | Experience | Design status | Implementation status | QA/device-validation status |
 | --- | --- | --- | --- |
 | Home Story v1.0 | APPROVED/protected; World Bible also records LOCKED. | Documented complete; runtime verification pending. | Final mobile validation remains pending in the source; no newer device acceptance established here. |
-| Interactive Portfolio v1.0 | LOCKED/protected. | Completed observatory, selection, scan, projection, and status experience documented; runtime verification pending. Archive Seal transport remains future/outside the lock. | Current device/browser evidence and final subjective signoff coverage require confirmation; protection remains in force. |
+| Interactive Portfolio | LOCKED/protected; [approved Portfolio record](V3_PROTECTED_DECISIONS.md#portfolio-experience-build). | **COMPLETE — PAGE-LEVEL SIGNOFF**, PASS 109AF; first completed V3 Experience Build page, `/portfolio`, Shared V3 Shell-owned. | Page QA passed on the recorded portrait/landscape/desktop matrix; explicit page-level approval received. [Shared transition and physical-device verification](#shared-shell-transition-qa-backlog) remain open; no full end-to-end performance signoff. |
 | Approved Shell/Engine Bar behavior | Protected Shell ownership and established persistence. | Shell-owned Engine/Console behavior documented; runtime verification pending. | Regression/device evidence pending confirmation; cold-entry/return-Home contract remains unresolved. |
 
 Canonical protection details: [Project Rules](PROJECT_RULES.md), [Home Story / Experience Build](V3_EXPERIENCE_BUILD_RULES.md), and [World Bible](design/world-bible.md). LOCKED is not proof that all device checks passed; do not reopen approved design merely because QA evidence needs recording.
+
+Portfolio page-level completion does not mark the full V3 release complete or change any other module's status. The [Portfolio QA record](#portfolio-page-level-signoff) and [open Shell backlog](#shared-shell-transition-qa-backlog) define the acceptance boundary.
 
 ## 5. Wrestling Implementation Snapshot and Later Milestones
 
@@ -104,6 +106,44 @@ Generic health covers rendering, application runtime errors, horizontal overflow
 **Remaining test drift:** Wrestling mode explicitly excludes the legacy people-responsive, venues-responsive, and relationship-hooks specs; they remain available unchanged in `all`/`test:e2e`. Retired selectors/routes and old viewport/placeholder assumptions still require incremental modernization when relevant work touches them. Home/Calendar assertions also need triage. The PASS 6 absence of verified 1920px/reduced-motion coverage is historical; the generic layer now supplies both, without modernizing every specialized test.
 
 Physical Samsung S25 Ultra, iPhone Safari, and embedded-webview verification remain separate from viewport emulation. Chris's supplied recordings/screenshots prompted follow-up fixes; they do not automatically approve the resulting builds. Final cinematic/device acceptance for recent Hall refinements remains pending. Use the [animation checklist](CODEX_UI_ANIMATION_CHECKLIST.md) and keep source, browser, automated-test, physical-device, and human-visual evidence distinct.
+
+### Portfolio page-level signoff
+
+**`/portfolio` — COMPLETE — PAGE-LEVEL SIGNOFF.** Module ownership: **Shared V3 Shell**. First completed V3 Experience Build page; explicit approval supplied in **PASS 109AF (2026-10-11)**. This is page-level Experience Build acceptance, not full V3 release completion or complete end-to-end transition-performance approval.
+
+**QA basis:** PASS 109V, PASS 109W, PASS 109X, PASS 109Y, PASS 109Z, PASS 109Z.1, PASS 109AA, PASS 109AB, PASS 109AC, PASS 109AD and PASS 109AE. These are the supplied prior QA/correction/diagnostic records; PASS 109AF records their results and the owner's approval without rerunning tests. Diagnostic passes that found no visually equivalent correction do not imply that their outstanding transition issues passed.
+
+Recorded page checks passed:
+
+- Portrait and landscape responsive layouts; star selection, all eight labels/classifications and touch-target preservation.
+- Accessible destination names matching visible identities; native buttons, visible keyboard focus, Enter/Space and touch interaction.
+- Central ENGAGE readiness and sole traversal ownership; only Zhento/Daïion enter, unavailable destinations remain unavailable and the old right-emitter location cannot traverse.
+- Zhento/Daïion upper identification and lower briefing presentation, reveal/departure coordination, selection switching and clean reset.
+- Cancellation, rapid switching, repeated-activation protection, Back/re-entry and reduced-motion behavior; navigation/landing readiness passed without changing route/history contracts.
+- Settled unselected and selected idle performance. PASS 109Z.1 removed the selected-state lightning filter bottleneck; recurring 200–400ms selected-idle stalls did not return. This result does not cover the unresolved formation/handoff stalls below.
+
+| Completed correction | Recorded result |
+| --- | --- |
+| PASS 109W | Daïion's upper classification fits/wraps inside the metadata column at 360×800 without altering panel geometry or Zhento. |
+| PASS 109X | Landscape HUD/ENGAGE clearance and Cosmos visibility corrected; controlled briefing scrolling preserves accessible content. Protected portrait layouts retained. |
+| PASS 109Y | All eight accessible destination names align with visible identities/classifications; existing unavailable semantics and interaction preserved. |
+
+Recorded viewport coverage: portrait **360×800 / 412×915**; landscape **800×360 / 915×412 / 844×390 / 932×430**; desktop **1280×720 / 1440×900 / 1920×1080**. Browser-emulated mobile coverage is not Samsung S25 Ultra hardware acceptance. Desktop headed Chrome and headless comparison evidence likewise does not establish all GPU/browser combinations.
+
+The approved design/timing record lives only in [Protected Decisions](V3_PROTECTED_DECISIONS.md#portfolio-experience-build); destination/classification/traversal mappings live only in the [Route Manifest](V3_ROUTE_MANIFEST.md#portfolio-destination-mapping). Other modules' retained QA/status entries above are unchanged.
+
+### Shared Shell transition QA backlog
+
+**OPEN — outside Portfolio page-level signoff.** Preserve approved effects while tracking these separate Shell/arrival limitations. No issue below is resolved or waived by PASS 109AF; no follow-up implementation, visual redesign or deployment is authorized here.
+
+| Open limitation | Evidence / current boundary | Remaining verification / acceptance |
+| --- | --- | --- |
+| Cold portal formation | First-use GPU/compositor stalls remain; PASS 109AE cold desktop formation reached approximately 250ms while warm formation was approximately 16.8ms. Artwork predecoding did not eliminate the stall. No visually equivalent surgical correction validated; exact lower-level material/driver cause remains unresolved. | Track under shared Shell transitions. Preserve approved portal material, contours, crop and 580/560/380ms transport; profile physical hardware and additional GPU/browser combinations before a separately approved correction. |
+| Daïion covered handoff | Ember-field compositor/raster activation burst: approximately 83–134ms frame gaps. PASS 109AD found no visually equivalent correction; approved ember density, distribution, movement, timing and atmospheric depth remain preserved. Separate from cold portal formation. | Remains open under shared Shell/world arrival. Any future optimization must demonstrate rendered visual equivalence as well as lower layer/raster workload. |
+| Traverse preparation | Improved in PASS 109AC; some synchronous settlement cost remains after ENGAGE acceptance, before visible portal formation. Preparation improvement does not resolve GPU formation or ember activation. | Keep the remaining cost visible; measure separately from visible-transition stalls before any future hotfix. Preserve focus accessibility, readiness and existing departure/transport timing. |
+| Physical-device and broader environment verification | Samsung S25 Ultra performance and safe-area behavior remain pending, including the previously observed physical-device landing nudge. Additional desktop GPU/browser verification is still required; viewport emulation and the tested desktop environment cannot establish device-wide acceptance. | Physical-device profiling and visual review remain necessary. Do not mark the landing nudge resolved from browser-only results or claim full end-to-end transition-performance approval. |
+
+**Signoff boundary:** Portfolio page-level Experience Build is complete. Shared transition performance, pending physical-device verification, other destination experiences and full V3 release readiness remain incomplete/separately tracked.
 
 ## 9. Current Known Unresolved Decisions
 
