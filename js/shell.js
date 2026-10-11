@@ -882,9 +882,6 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   const entry = { worldName, generation: portfolioGatewayGeneration, animations: [], layer: null, promoted: false, wasInert: portfolioWorldGateway.inert };
   entry.landing = beginWorldLanding(worldName);
   daiionGatewayTransition = entry;
-  const identificationDeparture = !portfolioZhentoIdentification?.hidden &&
-    portfolioZhentoIdentification?.dataset.identificationWorld === worldName
-    ? reversePortfolioZhentoIdentification(entry) : null;
   portfolioWorldGateway.inert = true;
   const current = () => daiionGatewayTransition === entry && entry.generation === portfolioGatewayGeneration;
   const promote = ({ settleLegacyProperties = true, confirmationDelay = 320 } = {}) => {
@@ -924,7 +921,6 @@ function startDaiionGatewayTransition(worldName = "battleground") {
   trackWorldLandingMilestone(entry.landing, "preparation-start");
   if (worldName === "soundtrack") {
     shell.dataset.musicTransportEntry = "prepared";
-    resetZhentoLandingSelection();
     showMusicNexusLanding({ shouldScroll: false });
     // Prepare the destination's own scroller before motion; adoption need not reset it again.
     resetShellScroller(musicNexusShell);
@@ -947,6 +943,11 @@ function startDaiionGatewayTransition(worldName = "battleground") {
     visualWidth: window.visualViewport?.width, visualHeight: window.visualViewport?.height,
   };
   const viewport = portfolioWorldGateway.getBoundingClientRect();
+  // Inspect the departure tracks after hidden destination preparation and geometry reads.
+  // This batches their style flush; the native timeline epoch and 800ms gate are unchanged.
+  const identificationDeparture = !portfolioZhentoIdentification?.hidden &&
+    portfolioZhentoIdentification?.dataset.identificationWorld === worldName
+    ? reversePortfolioZhentoIdentification(entry) : null;
   const width = viewport.width, height = viewport.height;
   const center = { x: width / 2, y: height * .42 };
   const radius = Math.min(width * .29, height * .26, 320);
@@ -1222,6 +1223,12 @@ function startPortfolioWorldGateway() {
   ) {
     return false;
   }
+
+  // Clear focus while the selected scene is still clean, before presentation writes.
+  if (document.activeElement === portfolioGatewayTrigger) portfolioGatewayTrigger.blur();
+
+  // Reset the hidden Music selection before transport attributes invalidate its layout.
+  if (activeWorld === "soundtrack") resetZhentoLandingSelection();
 
   if ((activeWorld === "soundtrack" || activeWorld === "battleground") &&
     !isPortfolioEngineReducedMotion() && !portfolioZhentoIdentification?.hidden) {
