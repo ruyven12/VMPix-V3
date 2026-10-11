@@ -3678,8 +3678,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 
 .site-shell.is-home-route .home-archive-message--signal {
   animation:
-    archiveNodeType 0.4s steps(15, end) 1.5s both,
-    archiveSignalPresence 3.2s linear 1.5s both;
+    archiveNodeType 0.4s steps(15, end) 0s both,
+    archiveSignalPresence 3s linear 0s both;
 }
 
 .home-archive-message--node {
@@ -3688,8 +3688,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     0 0 0.46rem rgba(213, 22, 34, 0.32),
     0 0 1.1rem rgba(213, 22, 34, 0.16);
   animation:
-    archiveNodeType 0.9s steps(18, end) 5.5s both,
-    archiveNodePresence 3.35s linear 5.5s both;
+    archiveNodeType 0.9s steps(18, end) 3s both,
+    archiveNodePresence 3s linear 3s both;
 }
 
 .home-archive-message--decode {
@@ -3698,8 +3698,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     0 0 0.42rem rgba(247, 247, 242, 0.22),
     0 0 1rem rgba(247, 247, 242, 0.1);
   animation:
-    archiveDecodeType 1.05s steps(19, end) 9.25s both,
-    archiveDecodePresence 3.05s var(--ease-breath) 9.25s both;
+    archiveDecodeType 1.05s steps(19, end) 6s both,
+    archiveDecodePresence 3s var(--ease-breath) 6s both;
 }
 .home-archive-message--identity {
   --home-identity-center-correction: calc(2dvh - clamp(2.35rem, 7svh, 4.2rem));
@@ -3753,9 +3753,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.18, 0.18, 1);
   animation:
-    archiveAccessRingForm 0.96s var(--ease-breath) 20.46s both,
-    archiveCoreOuterIgnition 0.92s var(--ease-breath) 21.16s forwards,
-    archiveCoreOuterCirculation 12s linear 22.1s infinite;
+    archiveAccessRingForm 0.96s var(--ease-breath) 16s both,
+    archiveCoreOuterIgnition 0.92s var(--ease-breath) 16.7s forwards,
+    archiveCoreOuterCirculation 12s linear 17.64s infinite;
 }
 
 .home-archive-message--identity::after {
@@ -3773,9 +3773,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   filter: brightness(1);
   transform: translate3d(-50%, -50%, 0) scale3d(0.1, 0.1, 1);
   animation:
-    archiveAccessCoreRingForm 0.96s var(--ease-breath) 20.52s both,
-    archiveCoreInnerIgnition 0.86s var(--ease-breath) 21.22s forwards,
-    archiveCoreInnerCirculation 8.5s linear 22.08s infinite;
+    archiveAccessCoreRingForm 0.96s var(--ease-breath) 16.06s both,
+    archiveCoreInnerIgnition 0.86s var(--ease-breath) 16.76s forwards,
+    archiveCoreInnerCirculation 8.5s linear 17.62s infinite;
 }
 
 .home-identity-text {
@@ -3797,7 +3797,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 .home-identity-text--full {
-  animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 12.58s both;
+  animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 9s both;
 }
 
 .home-identity-text--mark {
@@ -3807,9 +3807,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
-    archiveIdentityMarkMorph 5.6s var(--ease-breath) 12.58s both,
-    archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 18.72s forwards,
-    archiveIdentityMarkEngageDissolve 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 19.28s forwards;
+    archiveIdentityMarkMorph 5.6s var(--ease-breath) 9s both,
+    archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 14.5s forwards,
+    archiveIdentityMarkEngageDissolve 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 15.06s forwards;
 }
 
 .home-identity-text--engage {
@@ -3823,7 +3823,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveEngageCommandForm 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 21.5s both;
+  animation: archiveEngageCommandForm 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 17.32s both;
 }
 
 .home-identity-text--engage::before,
@@ -3847,7 +3847,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     drop-shadow(0 0 0.54rem rgba(255, 57, 18, 0.44))
     drop-shadow(0 0 0.22rem rgba(255, 151, 38, 0.34));
   will-change: opacity, filter;
-  animation: archiveCoreLightningField 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
+  animation: archiveCoreLightningField 6.8s cubic-bezier(0.38, 0, 0.22, 1) 18.28s infinite;
 }
 
 .home-core-lightning__segment {
@@ -3864,42 +3864,42 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   filter:
     drop-shadow(0 0 0.24rem rgba(255, 57, 18, 0.82))
     drop-shadow(0 0 0.12rem rgba(255, 151, 38, 0.66));
-  animation: archiveCoreLightningSegment 6.8s cubic-bezier(0.38, 0, 0.22, 1) 22.46s infinite;
+  animation: archiveCoreLightningSegment 6.8s cubic-bezier(0.38, 0, 0.22, 1) 18.28s infinite;
 }
 
 .home-core-lightning__segment:nth-of-type(2) {
   stroke-width: 2.15;
-  animation-delay: 22.58s;
+  animation-delay: 18.4s;
 }
 
 .home-core-lightning__segment:nth-of-type(3) {
   stroke-width: 2.4;
-  animation-delay: 22.7s;
+  animation-delay: 18.52s;
 }
 
 .home-core-lightning__segment:nth-of-type(4) {
   stroke-width: 2.2;
-  animation-delay: 22.82s;
+  animation-delay: 18.64s;
 }
 
 .home-core-lightning__segment:nth-of-type(5) {
   stroke-width: 2.3;
-  animation-delay: 22.94s;
+  animation-delay: 18.76s;
 }
 
 .home-core-lightning__segment:nth-of-type(6) {
   stroke-width: 2.1;
-  animation-delay: 23.06s;
+  animation-delay: 18.88s;
 }
 
 .home-core-lightning__segment:nth-of-type(7) {
   stroke-width: 2.35;
-  animation-delay: 23.18s;
+  animation-delay: 19s;
 }
 
 .home-core-lightning__segment:nth-of-type(8) {
   stroke-width: 2.15;
-  animation-delay: 23.3s;
+  animation-delay: 19.12s;
 }
 
 .home-identity-text--core,
@@ -3917,7 +3917,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 .home-identity-text--core {
-  animation: archiveCoreStatusForm 0.6s var(--ease-breath) 18.88s both;
+  animation: archiveCoreStatusForm 0.6s var(--ease-breath) 14.5s both;
 }
 
 .home-identity-text--ready {
@@ -3925,7 +3925,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   text-shadow:
     0 0 0.46rem rgba(238, 217, 153, 0.28),
     0 0 1.12rem rgba(220, 188, 108, 0.16);
-  animation: archiveAccessReadyForm 0.56s var(--ease-breath) 19.14s both;
+  animation: archiveAccessReadyForm 0.56s var(--ease-breath) 14.76s both;
 }
 /* PASS 110H: Home acknowledges preserved world connections before Core Online. */
 .home-worlds-acknowledgement {
@@ -3963,11 +3963,11 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 
 .site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement {
   display: block;
-  animation: homeWorldsAcknowledgementPresence 2.4s linear 15.9s both;
+  animation: homeWorldsAcknowledgementPresence 2.4s linear 12s both;
 }
 
 .site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement__traces {
-  animation: homeWorldsAcknowledgementConnections 0.3s ease-out 16.3s both;
+  animation: homeWorldsAcknowledgementConnections 0.3s ease-out 12.4s both;
 }
 
 @keyframes homeWorldsAcknowledgementPresence {
