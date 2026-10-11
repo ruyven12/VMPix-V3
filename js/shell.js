@@ -7532,10 +7532,11 @@ if (shell && startButton) {
     shouldPlayDirectPortfolioArrival: false,
     shouldPlayDirectPortfolioEntrySequence: PORTFOLIO_DIRECT_ENTRY_SEQUENCE_FOR_QA && initialRoute.name === "portfolio",
   });
-  // Release only after the requested route and its initial viewport state are installed.
-  // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
-  document.documentElement.removeAttribute("data-v3-booting");
-  syncHomeEngageReadiness();
+  // Preserve other routes' boot milestone; Home releases after all initialization below.
+  if (!document.documentElement.hasAttribute("data-v3-home-boot")) {
+    document.documentElement.removeAttribute("data-v3-booting");
+    syncHomeEngageReadiness();
+  }
   window.addEventListener("pagehide", clearHomeEngageReadiness);
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) syncHomeEngageReadiness();
@@ -7636,4 +7637,11 @@ if (shell && startButton) {
       window.cancelAnimationFrame(spotlightFrame);
     }
   });
+  // One Home presentation milestone releases visibility and the paused CSS story together.
+  // Asset/API loading continues independently; route returns never re-arm the boot mask.
+  if (document.documentElement.hasAttribute("data-v3-home-boot")) {
+    document.documentElement.removeAttribute("data-v3-booting");
+    document.documentElement.removeAttribute("data-v3-home-boot");
+    syncHomeEngageReadiness();
+  }
 }

@@ -10,8 +10,47 @@
     html { background-color: #050507; }
     html[data-v3-booting] body { opacity: 0 !important; pointer-events: none !important; }
     [data-band-detail-placeholder] { visibility: hidden !important; pointer-events: none !important; }
+    [data-home-boot-recovery] { display: none; }
+    html[data-v3-home-boot-failed] body { opacity: 1 !important; pointer-events: auto !important; margin: 0; background: #050507; color: #f7f7f2; }
+    html[data-v3-home-boot-failed] .site-shell { display: none !important; }
+    html[data-v3-home-boot-failed] [data-home-boot-recovery] {
+      position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 16px; box-sizing: border-box; padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+      background: #050507; text-align: center; font: 16px/1.5 system-ui, sans-serif;
+    }
+    [data-home-boot-recovery] h1 { margin: 0; font-size: 1.25rem; }
+    [data-home-boot-recovery] p { margin: 0; }
+    [data-home-boot-retry] { min-height: 44px; padding: 10px 24px; border: 1px solid #bfc0c6; border-radius: 4px; background: #15151b; color: inherit; font: inherit; cursor: pointer; }
+    [data-home-boot-retry]:focus-visible { outline: 2px solid #f7f7f2; outline-offset: 4px; }
   </style>
-  <script>if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) document.documentElement.setAttribute("data-v3-booting", "");</script>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) root.setAttribute("data-v3-booting", "");
+      if ((location.pathname.replace(/\/+$/, "") || "/") !== "/") return;
+      root.setAttribute("data-v3-home-boot", "");
+      const checkShellBoot = (event) => {
+        if (!(event.target instanceof HTMLScriptElement) || new URL(event.target.src, location.href).pathname !== "/js/shell.js") return;
+        document.removeEventListener("load", checkShellBoot, true);
+        document.removeEventListener("error", checkShellBoot, true);
+        // A slow request is still pending. Check only when Shell loading/execution has ended.
+        if (!root.hasAttribute("data-v3-booting")) return;
+        const recovery = document.querySelector("[data-home-boot-recovery]");
+        if (!recovery) return;
+        root.setAttribute("data-v3-home-boot-failed", "");
+        document.querySelector(".site-shell")?.setAttribute("inert", "");
+        recovery.hidden = false;
+        const retry = recovery.querySelector("[data-home-boot-retry]");
+        retry.addEventListener("click", () => {
+          retry.disabled = true;
+          location.reload();
+        }, { once: true });
+        retry.focus();
+      };
+      document.addEventListener("load", checkShellBoot, true);
+      document.addEventListener("error", checkShellBoot, true);
+    })();
+  </script>
   <title>Welcome to Voodoo Media V3.0.01</title>
   <link rel="icon" href="data:,">
 
@@ -2175,6 +2214,12 @@
       </div>
     </aside>
   </div>
+
+  <section data-home-boot-recovery hidden role="alert" aria-labelledby="home-boot-recovery-title">
+    <h1 id="home-boot-recovery-title">The archive could not start.</h1>
+    <p>Please retry to reload Home.</p>
+    <button type="button" data-home-boot-retry>Retry</button>
+  </section>
 
   <script src="/js/state.js"></script>
   <script src="/modules/music.js"></script>

@@ -3583,6 +3583,16 @@ button {
   animation: none;
 }
 
+/* Home boot holds the existing presentation at time zero until Shell can show it. */
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.ambient-system, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .home-archive-communication, .home-archive-awakening, .home-frame),
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.ambient-system, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .home-archive-communication, .home-archive-awakening, .home-frame)::before,
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.ambient-system, .portfolio-observatory-layer, .ambient-void-stars, .nebula-stage, .home-archive-communication, .home-archive-awakening, .home-frame)::after,
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-archive-communication, .home-archive-awakening, .home-frame) *,
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-archive-communication, .home-archive-awakening, .home-frame) *::before,
+html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-archive-communication, .home-archive-awakening, .home-frame) *::after {
+  animation-play-state: paused !important;
+}
+
 /* Home Story Prototype Pass - Void Isolation. Temporary Home-only suppression for story review. */
 .site-shell.is-home-route .ambient-system {
   background: #010103;
