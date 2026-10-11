@@ -3796,6 +3796,186 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   will-change: opacity, transform, filter;
 }
 
+/* PASS 110K: one authentic bitmap, a finite scan, and restrained signal fragments. */
+.home-signal-assembly {
+  --home-signal-logo-width: min(84vw, 24rem,
+    calc((50dvh - 0.5875em - 16px - env(safe-area-inset-top, 0px)) * 3.09843),
+    calc(100vw - 2 * max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px)) - 32px));
+  --home-signal-logo-height: calc(var(--home-signal-logo-width) / 3);
+  --home-signal-transparent-bottom: calc(var(--home-signal-logo-height) * 0.031768);
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: calc(50% + 0.5875em + 8px - var(--home-signal-transparent-bottom));
+  width: var(--home-signal-logo-width);
+  height: var(--home-signal-logo-height);
+  aspect-ratio: 3 / 1;
+  display: none;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  visibility: hidden;
+  font-size: clamp(1.19rem, calc(4.8vw + 0.1875rem), 1.67rem);
+  line-height: 1.25;
+  translate: -50% 0;
+  animation: none;
+}
+
+.home-signal-assembly__reveal,
+.home-signal-assembly__window,
+.home-signal-assembly__pane {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.home-signal-assembly__reveal,
+.home-signal-assembly__window {
+  overflow: hidden;
+}
+
+.home-signal-assembly__window {
+  transform: translateY(-100%);
+  animation: none;
+}
+
+.home-signal-assembly__pane {
+  transform: translateY(100%);
+  animation: none;
+}
+
+.home-signal-assembly__logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-signal-assembly__fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  color: rgb(247, 247, 242);
+  font-size: clamp(0.95rem, calc(3.2vw + 0.1875rem), 1.23rem);
+  white-space: nowrap;
+  text-shadow: none;
+}
+
+.home-signal-assembly.is-logo-unavailable .home-signal-assembly__logo {
+  visibility: hidden;
+}
+
+.home-signal-assembly.is-logo-unavailable .home-signal-assembly__fallback {
+  display: grid;
+}
+
+.home-signal-assembly__scan {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(225, 231, 239, 0.68);
+  transform: translateY(0);
+  opacity: 0;
+  animation: none;
+}
+
+.home-signal-assembly__fragment {
+  position: absolute;
+  left: var(--signal-x);
+  top: var(--signal-y);
+  width: var(--signal-size);
+  height: var(--signal-size);
+  background: rgb(225, 231, 239);
+  opacity: 0;
+  visibility: hidden;
+  translate: -50% -50%;
+  transform: translate(var(--signal-dx), var(--signal-dy));
+  animation: none;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly {
+  display: block;
+  animation: homeSignalAssemblyPresence 3s linear 9s both;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__window {
+  animation: homeSignalAssemblyWindow 1.3s linear 9.4s both;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__pane {
+  animation: homeSignalAssemblyCountermove 1.3s linear 9.4s both;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__scan {
+  animation: homeSignalAssemblyScan 1.3s linear 9.4s both;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__fragment {
+  animation: homeSignalAssemblyFragment 0.3s linear var(--signal-delay) both;
+}
+
+@keyframes homeSignalAssemblyPresence {
+  0%, 100% { opacity: 0; visibility: hidden; }
+  13.333333%, 83.333333% { opacity: 1; visibility: visible; }
+}
+
+@keyframes homeSignalAssemblyWindow {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes homeSignalAssemblyCountermove {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes homeSignalAssemblyScan {
+  0% { opacity: 1; transform: translateY(0); }
+  99.999% { opacity: 1; transform: translateY(calc(var(--home-signal-logo-height) - 1px)); }
+  100% { opacity: 0; transform: translateY(calc(var(--home-signal-logo-height) - 1px)); }
+}
+
+@keyframes homeSignalAssemblyFragment {
+  0% { opacity: 0; visibility: hidden; transform: translate(var(--signal-dx), var(--signal-dy)); }
+  46.666667%, 60% { opacity: 0.72; visibility: visible; transform: translate(0, 0); }
+  100% { opacity: 0; visibility: hidden; transform: translate(0, 0); }
+}
+
+@keyframes homeIdentityDesignationResolve {
+  from { opacity: 0; }
+  to { opacity: 0.96; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly {
+    bottom: calc(100% + 0.5rem);
+    width: min(84vw, 24rem);
+    height: 1.25em;
+    aspect-ratio: auto;
+    font-size: inherit;
+    opacity: 1;
+    visibility: visible;
+    animation: none !important;
+  }
+  .site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__window,
+  .site-shell.is-home-route:not(.is-home-transitioning) .home-signal-assembly__pane {
+    transform: none;
+    animation: none !important;
+  }
+  .home-signal-assembly__logo,
+  .home-signal-assembly__scan,
+  .home-signal-assembly__fragment {
+    display: none;
+    animation: none !important;
+  }
+  .home-signal-assembly__fallback {
+    display: grid;
+  }
+}
+
 .home-identity-text--full {
   animation: archiveIdentityFullMorph 3.45s var(--ease-breath) 9s both;
 }
@@ -3803,11 +3983,13 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 .home-identity-text--mark {
   color: rgb(247, 247, 242);
   font-size: clamp(1.19rem, calc(4.8vw + 0.1875rem), 1.67rem);
+  transform: scale3d(0.94, 0.94, 1);
+  filter: brightness(1.02);
   text-shadow:
     0 0 0.48rem rgba(238, 217, 153, 0.24),
     0 0 1.15rem rgba(220, 188, 108, 0.14);
   animation:
-    archiveIdentityMarkMorph 5.6s var(--ease-breath) 9s both,
+    homeIdentityDesignationResolve 0.5s ease-out 11.5s both,
     archiveIdentityMarkReadySettle 0.72s var(--ease-breath) 14.5s forwards,
     archiveIdentityMarkEngageDissolve 0.68s cubic-bezier(0.28, 0.72, 0.18, 1) 15.06s forwards;
 }
