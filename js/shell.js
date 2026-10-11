@@ -3364,6 +3364,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
+  if (!isHomeRoute) clearHomeEngageReadiness();
   if (bottomRail) {
     bottomRail.dataset.shellRoute = shellRouteName;
     bottomRail.dataset.shellActiveTarget = activeTarget;
@@ -6591,7 +6592,7 @@ function showHomepage() {
   clearPortfolioEngineReadyState();
   closeGlobalMenu({ shouldRestoreFocus: false });
   shell.classList.remove("is-home-transitioning", "is-engage-activated", "has-entered-hub", "is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view");
-  startButton.disabled = false;
+  clearHomeEngageReadiness();
   startButton.setAttribute("aria-busy", "false");
   if (homeFrame) {
     homeFrame.setAttribute("aria-hidden", "false");
@@ -6635,6 +6636,7 @@ function showHomepage() {
   setCurrentView(ROUTE_TITLE_LABELS.home);
   setDocumentTitle(ROUTE_TITLE_LABELS.home);
   setActiveGlobalNav("home");
+  syncHomeEngageReadiness();
 }
 
 function handleGlobalMenuAction(event) {
@@ -7182,6 +7184,50 @@ function startPortfolioArrival() {
 const HOME_PORTFOLIO_TRANSITION_CLEANUP_MS = 2360;
 const HOME_PORTFOLIO_REDUCED_MOTION_CLEANUP_MS = 40;
 let homePortfolioTransitionTimer = 0;
+let homeEngageReadinessGeneration = 0;
+let isHomeEngageReady = false;
+
+function clearHomeEngageReadiness() {
+  homeEngageReadinessGeneration += 1;
+  isHomeEngageReady = false;
+  if (startButton) startButton.disabled = true;
+}
+
+function isHomeEngagePresentationActive() {
+  return Boolean(shell && startButton &&
+    !document.documentElement.hasAttribute("data-v3-booting") &&
+    getRouteFromUrl().name === "home" &&
+    shell.classList.contains("is-home-route") &&
+    !shell.classList.contains("has-entered-hub") &&
+    !shell.classList.contains("is-home-transitioning") &&
+    homeFrame?.getAttribute("aria-hidden") === "false");
+}
+
+function syncHomeEngageReadiness() {
+  clearHomeEngageReadiness();
+  if (!isHomeEngagePresentationActive()) return;
+
+  const generation = homeEngageReadinessGeneration;
+  const releaseInteraction = () => {
+    if (generation !== homeEngageReadinessGeneration || !isHomeEngagePresentationActive()) return;
+    isHomeEngageReady = true;
+    startButton.disabled = false;
+  };
+  if (reducedMotion.matches) {
+    releaseInteraction();
+    return;
+  }
+
+  // Follow the existing CSS reveal, including a reveal completed before Shell boot.
+  // Cancellation rejects finished; a new Home arrival/motion setting invalidates this generation.
+  const reveal = document.querySelector(".home-identity-text--engage")?.getAnimations()
+    .find((animation) => animation.animationName === "archiveEngageCommandForm");
+  if (reveal?.playState === "finished") releaseInteraction();
+  else if (reveal) reveal.finished.then(releaseInteraction, () => {
+    // CSS can settle reduced motion before the media-query change event is delivered.
+    if (reducedMotion.matches) releaseInteraction();
+  });
+}
 
 function clearHomePortfolioTransitionState() {
   window.clearTimeout(homePortfolioTransitionTimer);
@@ -7275,6 +7321,8 @@ function beginHomePortfolioTransition() {
   if (
     !shell ||
     !startButton ||
+    !isHomeEngageReady ||
+    !isHomeEngagePresentationActive() ||
     startButton.disabled ||
     shell.classList.contains("is-portfolio-entry-sequence") ||
     shell.classList.contains("is-home-transitioning") ||
@@ -7284,6 +7332,7 @@ function beginHomePortfolioTransition() {
     return;
   }
 
+  clearHomeEngageReadiness();
   isHomePortfolioRouteHandoffPending = true;
   activatePortfolioEntrySequenceState();
   revealHub({
@@ -7486,6 +7535,11 @@ if (shell && startButton) {
   // Release only after the requested route and its initial viewport state are installed.
   // API/media readiness continues independently; SPA and BFCache restores never re-arm this gate.
   document.documentElement.removeAttribute("data-v3-booting");
+  syncHomeEngageReadiness();
+  window.addEventListener("pagehide", clearHomeEngageReadiness);
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) syncHomeEngageReadiness();
+  });
   window.addEventListener("popstate", (event) => {
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
     cancelBandRecordOpening();
@@ -7506,12 +7560,14 @@ if (shell && startButton) {
   }
   syncAmbientMotion();
   if (typeof reducedMotion.addEventListener === "function") {
+    reducedMotion.addEventListener("change", syncHomeEngageReadiness);
     reducedMotion.addEventListener("change", syncShellBackSweepMotion);
     reducedMotion.addEventListener("change", syncAmbientMotion);
     reducedMotion.addEventListener("change", syncPortfolioEngineLightningMotion);
     reducedMotion.addEventListener("change", syncPortfolioBrandingMotion);
     reducedMotion.addEventListener("change", syncDaiionGatewayMotion);
   } else if (typeof reducedMotion.addListener === "function") {
+    reducedMotion.addListener(syncHomeEngageReadiness);
     reducedMotion.addListener(syncShellBackSweepMotion);
     reducedMotion.addListener(syncAmbientMotion);
     reducedMotion.addListener(syncPortfolioEngineLightningMotion);
