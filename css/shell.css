@@ -1606,19 +1606,13 @@ button {
 
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main {
   stroke: rgb(var(--engine-accent-glow) / 0.78);
-  filter:
-    drop-shadow(0 0 0.2rem rgb(var(--engine-accent-glow) / 0.68))
-    drop-shadow(0 0 0.55rem rgb(var(--engine-accent-glow) / 0.38))
-    drop-shadow(0 0 0.9rem rgb(var(--engine-accent) / 0.16));
+  filter: none;
   animation-name: engineLightningSuperchargedFieldPulse;
 }
 
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--center {
   stroke: rgb(var(--engine-accent-glow) / 0.98);
-  filter:
-    drop-shadow(0 0 0.24rem rgb(var(--engine-accent-glow) / 0.86))
-    drop-shadow(0 0 0.68rem rgb(var(--engine-accent-glow) / 0.46))
-    drop-shadow(0 0 1.05rem rgb(var(--engine-accent) / 0.2));
+  filter: none;
   animation-name: engineLightningSuperchargedMainPulse;
 }
 
@@ -1632,43 +1626,33 @@ button {
 
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch {
   stroke: rgb(var(--engine-accent-soft) / 0.62);
-  filter:
-    drop-shadow(0 0 0.16rem rgb(var(--engine-accent-soft) / 0.46))
-    drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.22));
+  filter: none;
   animation-name: engineLightningSuperchargedBranchPulse;
 }
 
 .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch--alt {
   stroke: rgb(var(--engine-accent-glow) / 0.58);
-  filter:
-    drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.44))
-    drop-shadow(0 0 0.36rem rgb(var(--engine-accent-glow) / 0.18));
+  filter: none;
   animation-name: engineLightningSuperchargedBranchPulseAlt;
 }
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main {
-  filter:
-    drop-shadow(0 0 0.34rem rgb(var(--engine-accent-glow) / 0.88))
-    drop-shadow(0 0 1.05rem rgb(var(--engine-accent-glow) / 0.58))
-    drop-shadow(0 0 1.55rem rgb(var(--engine-accent) / 0.28));
+  filter: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main--center {
-  filter:
-    drop-shadow(0 0 0.42rem rgb(var(--engine-accent-glow) / 0.98))
-    drop-shadow(0 0 1.32rem rgb(var(--engine-accent-glow) / 0.74))
-    drop-shadow(0 0 1.95rem rgb(var(--engine-accent) / 0.34));
+  filter: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch {
-  filter:
-    drop-shadow(0 0 0.24rem rgb(var(--engine-accent-soft) / 0.7))
-    drop-shadow(0 0 0.78rem rgb(var(--engine-accent-glow) / 0.34));
+  filter: none;
 }
 
 .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch--alt {
-  filter:
-    drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.66))
-    drop-shadow(0 0 0.68rem rgb(var(--engine-accent-glow) / 0.28));
+  filter: none;
+}
+
+.site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="feeding"] :is(.engine-lightning-main, .engine-lightning-branch) {
+  filter: none;
 }
 
 @keyframes engineLightningFieldPulse {
@@ -2741,42 +2725,34 @@ button {
     filter: drop-shadow(0 0 0.06rem rgb(var(--engine-accent-glow) / 0.2));
   }
   .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main {
-    filter:
-      drop-shadow(0 0 0.14rem rgb(var(--engine-accent-glow) / 0.56))
-      drop-shadow(0 0 0.38rem rgb(var(--engine-accent-glow) / 0.3));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-main--center {
-    filter:
-      drop-shadow(0 0 0.18rem rgb(var(--engine-accent-glow) / 0.72))
-      drop-shadow(0 0 0.46rem rgb(var(--engine-accent-glow) / 0.36));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch {
-    filter: drop-shadow(0 0 0.1rem rgb(var(--engine-accent-soft) / 0.36));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"]:is(.is-portfolio-right-emitter-charging[data-portfolio-star-feed-state="charging"], .is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"]) .engine-lightning-branch--alt {
-    filter: drop-shadow(0 0 0.09rem rgb(var(--engine-accent-glow) / 0.34));
+    filter: none;
   }
   .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main {
-    filter:
-      drop-shadow(0 0 0.22rem rgb(var(--engine-accent-glow) / 0.72))
-      drop-shadow(0 0 0.64rem rgb(var(--engine-accent-glow) / 0.42));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-main--center {
-    filter:
-      drop-shadow(0 0 0.28rem rgb(var(--engine-accent-glow) / 0.92))
-      drop-shadow(0 0 0.88rem rgb(var(--engine-accent-glow) / 0.56));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch {
-    filter: drop-shadow(0 0 0.16rem rgb(var(--engine-accent-soft) / 0.5));
+    filter: none;
   }
 
   .site-shell[data-shell-route="portfolio"].is-portfolio-right-emitter-ready[data-portfolio-star-feed-state="ready"] .engine-lightning-branch--alt {
-    filter: drop-shadow(0 0 0.15rem rgb(var(--engine-accent-glow) / 0.48));
+    filter: none;
   }
 
   .portfolio-engine-panel {
