@@ -4327,6 +4327,20 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   animation: none;
 }
 
+/* Keep the Home hit area on the established visual-core center. */
+@media (min-width: 27rem) {
+  .site-shell.is-home-route .start-portal {
+    position: fixed;
+    top: var(--home-portfolio-transition-center-y);
+    left: var(--home-portfolio-transition-center-x);
+    translate: -50% -50%;
+  }
+
+  .site-shell.is-home-route .start-button:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
 .site-shell.is-home-route .start-button::before,
 .site-shell.is-home-route .start-button::after {
   visibility: hidden;
