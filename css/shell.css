@@ -3927,6 +3927,75 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     0 0 1.12rem rgba(220, 188, 108, 0.16);
   animation: archiveAccessReadyForm 0.56s var(--ease-breath) 19.14s both;
 }
+/* PASS 110H: Home acknowledges preserved world connections before Core Online. */
+.home-worlds-acknowledgement {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: clamp(10rem, 32vw, 14rem);
+  height: auto;
+  aspect-ratio: 3 / 2;
+  display: none;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -50%);
+  animation: none;
+}
+
+.home-worlds-acknowledgement__points {
+  fill: rgb(225, 231, 239);
+}
+
+.home-worlds-acknowledgement__traces {
+  fill: none;
+  stroke: rgba(225, 231, 239, 0.34);
+  stroke-width: 0.65;
+  opacity: 0;
+  animation: none;
+}
+
+.home-worlds-acknowledgement__traces path {
+  vector-effect: non-scaling-stroke;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement {
+  display: block;
+  animation: homeWorldsAcknowledgementPresence 2.4s linear 15.9s both;
+}
+
+.site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement__traces {
+  animation: homeWorldsAcknowledgementConnections 0.3s ease-out 16.3s both;
+}
+
+@keyframes homeWorldsAcknowledgementPresence {
+  0%, 100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  16.666667%, 83.333333% {
+    opacity: 0.72;
+    visibility: visible;
+  }
+}
+
+@keyframes homeWorldsAcknowledgementConnections {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement,
+  .site-shell.is-home-route:not(.is-home-transitioning) .home-worlds-acknowledgement__traces {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    animation: none !important;
+  }
+}
+
 .home-archive-awakening {
   position: fixed;
   inset: 0;
