@@ -27,28 +27,104 @@
     (() => {
       const root = document.documentElement;
       if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) root.setAttribute("data-v3-booting", "");
+      let appliedShellSheet;
+      const isStylesheetReady = () => {
+        const link = document.querySelector("link[data-v3-shell-css]");
+        const sheet = link?.sheet;
+        if (!link?.isConnected || link.disabled || !sheet || sheet.disabled) return false;
+        if (sheet === appliedShellSheet) return true;
+        try {
+          const rules = Array.from(sheet.cssRules);
+          if (!rules.some((rule) => rule.type === CSSRule.KEYFRAMES_RULE && rule.name === "archiveEngageCommandForm") ||
+              !rules.some((rule) => rule.selectorText === ".home-identity-text--engage" && rule.style.animationName.includes("archiveEngageCommandForm"))) return false;
+          appliedShellSheet = sheet;
+          return true;
+        } catch { return false; }
+      };
+      // Also protect Home re-entry in a document initially opened on another Shell route.
+      window.isV3HomeStylesheetReady = isStylesheetReady;
       if ((location.pathname.replace(/\/+$/, "") || "/") !== "/") return;
       root.setAttribute("data-v3-home-boot", "");
-      const checkShellBoot = (event) => {
-        if (!(event.target instanceof HTMLScriptElement) || new URL(event.target.src, location.href).pathname !== "/js/shell.js") return;
-        document.removeEventListener("load", checkShellBoot, true);
-        document.removeEventListener("error", checkShellBoot, true);
-        // A slow request is still pending. Check only when Shell loading/execution has ended.
-        if (!root.hasAttribute("data-v3-booting")) return;
+      root.setAttribute("data-v3-home-css", "loading");
+      let cssState = "loading";
+      let failed = false;
+      let initialized = false;
+      let presentationReady;
+      let cssFailureTimer = 0;
+      const stopWatching = () => {
+        window.clearTimeout(cssFailureTimer);
+        document.removeEventListener("load", checkPrerequisite, true);
+        document.removeEventListener("error", checkPrerequisite, true);
+      };
+      const showRecovery = () => {
         const recovery = document.querySelector("[data-home-boot-recovery]");
         if (!recovery) return;
-        root.setAttribute("data-v3-home-boot-failed", "");
         document.querySelector(".site-shell")?.setAttribute("inert", "");
+        const engage = document.querySelector(".start-button");
+        if (engage) engage.disabled = true;
         recovery.hidden = false;
         const retry = recovery.querySelector("[data-home-boot-retry]");
+        if (retry.dataset.v3HomeRetryBound) return;
+        retry.dataset.v3HomeRetryBound = "true";
         retry.addEventListener("click", () => {
+          if (retry.disabled) return;
           retry.disabled = true;
+          // A new document re-requests CSS and runs the established initialization once.
           location.reload();
         }, { once: true });
         retry.focus();
       };
-      document.addEventListener("load", checkShellBoot, true);
-      document.addEventListener("error", checkShellBoot, true);
+      const failBoot = (stylesheetFailed = false) => {
+        if (failed) return;
+        failed = true;
+        stopWatching();
+        if (stylesheetFailed) {
+          cssState = "failed";
+          root.setAttribute("data-v3-home-css", cssState);
+          // Release the parser/render blocker; a late response cannot apply or grant readiness.
+          document.querySelector("link[data-v3-shell-css]")?.remove();
+        }
+        root.setAttribute("data-v3-home-boot-failed", "");
+        showRecovery();
+      };
+      const releasePresentation = () => {
+        if (failed || !initialized || cssState !== "ready") return;
+        if (!isStylesheetReady()) { failBoot(true); return; }
+        stopWatching();
+        root.removeAttribute("data-v3-booting");
+        root.removeAttribute("data-v3-home-boot");
+        presentationReady();
+      };
+      const markStylesheetReady = () => {
+        if (failed) return;
+        if (!isStylesheetReady()) { failBoot(true); return; }
+        cssState = "ready";
+        root.setAttribute("data-v3-home-css", cssState);
+        window.clearTimeout(cssFailureTimer);
+        releasePresentation();
+      };
+      const checkPrerequisite = (event) => {
+        if (event.target instanceof HTMLLinkElement && event.target.hasAttribute("data-v3-shell-css")) {
+          if (event.type === "error") failBoot(true);
+          else markStylesheetReady();
+        } else if (event.target instanceof HTMLScriptElement && new URL(event.target.src, location.href).pathname === "/js/shell.js") {
+          if (event.type === "error" || !initialized) failBoot();
+        }
+      };
+      window.v3HomeBoot = {
+        complete(onPresentationReady) {
+          if (failed || initialized) return;
+          initialized = true;
+          presentationReady = onPresentationReady;
+          if (cssState === "loading" && isStylesheetReady()) markStylesheetReady();
+          else releasePresentation();
+        },
+      };
+      document.addEventListener("load", checkPrerequisite, true);
+      document.addEventListener("error", checkPrerequisite, true);
+      document.addEventListener("DOMContentLoaded", () => { if (failed) showRecovery(); }, { once: true });
+      // Failure only: elapsed time never makes a stylesheet or ENGAGE ready.
+      cssFailureTimer = window.setTimeout(() => failBoot(true), 15000);
     })();
   </script>
   <title>Welcome to Voodoo Media V3.0.01</title>
@@ -62,11 +138,17 @@
   <link rel="preload" as="image" href="/assets/media/background/nebula-stage-1.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <link rel="stylesheet" href="/css/tokens.css">
-  <link rel="stylesheet" href="/css/shell.css">
+  <link rel="stylesheet" href="/css/shell.css" data-v3-shell-css>
   <link rel="stylesheet" href="/css/modules.css">
   <link rel="stylesheet" href="/css/connect.css">
 </head>
 <body>
+  <section data-home-boot-recovery hidden role="alert" aria-labelledby="home-boot-recovery-title">
+    <h1 id="home-boot-recovery-title">The archive could not start.</h1>
+    <p>Please retry to reload Home.</p>
+    <button type="button" data-home-boot-retry>Retry</button>
+  </section>
+
   <div class="site-shell is-home-route" data-portfolio-gateway-world="" data-portfolio-gateway-route="" data-portfolio-gateway-state="idle">
     <script>
       (() => {
@@ -369,11 +451,11 @@
         <span class="home-archive-message home-archive-message--node">VISITOR RECOGNIZED</span>
         <span class="home-archive-message home-archive-message--decode">INITIATING ARCHIVE…</span>
         <span class="home-archive-message home-archive-message--identity">
-          <span class="home-signal-assembly" aria-hidden="true">
+          <span class="home-signal-assembly is-logo-unavailable" data-logo-state="pending" aria-hidden="true">
             <span class="home-signal-assembly__reveal">
               <span class="home-signal-assembly__window">
                 <span class="home-signal-assembly__pane">
-                  <img class="home-signal-assembly__logo" src="/assets/branding/voodoo-media-logo-transparent.png" alt="" width="2172" height="724" loading="eager" decoding="async" onerror="this.closest('.home-signal-assembly').classList.add('is-logo-unavailable')">
+                  <img class="home-signal-assembly__logo" src="/assets/branding/voodoo-media-logo-transparent.png" alt="" width="2172" height="724" loading="eager" decoding="async" onload="this.decode().then(() => { if (this.complete &amp;&amp; this.naturalWidth > 0 &amp;&amp; this.naturalHeight > 0) { const assembly = this.closest('.home-signal-assembly'); assembly.dataset.logoState = 'ready'; assembly.classList.remove('is-logo-unavailable'); } }, () => { this.closest('.home-signal-assembly').dataset.logoState = 'failed'; })" onerror="const assembly = this.closest('.home-signal-assembly'); assembly.dataset.logoState = 'failed'; assembly.classList.add('is-logo-unavailable')">
                   <span class="home-signal-assembly__fallback">VOODOO MEDIA</span>
                 </span>
               </span>
@@ -2256,12 +2338,6 @@
       </div>
     </aside>
   </div>
-
-  <section data-home-boot-recovery hidden role="alert" aria-labelledby="home-boot-recovery-title">
-    <h1 id="home-boot-recovery-title">The archive could not start.</h1>
-    <p>Please retry to reload Home.</p>
-    <button type="button" data-home-boot-retry>Retry</button>
-  </section>
 
   <script src="/js/state.js"></script>
   <script src="/modules/music.js"></script>

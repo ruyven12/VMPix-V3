@@ -7196,6 +7196,8 @@ function clearHomeEngageReadiness() {
 function isHomeEngagePresentationActive() {
   return Boolean(shell && startButton &&
     !document.documentElement.hasAttribute("data-v3-booting") &&
+    !document.documentElement.hasAttribute("data-v3-home-boot-failed") &&
+    window.isV3HomeStylesheetReady?.() &&
     getRouteFromUrl().name === "home" &&
     shell.classList.contains("is-home-route") &&
     !shell.classList.contains("has-entered-hub") &&
@@ -7640,8 +7642,6 @@ if (shell && startButton) {
   // One Home presentation milestone releases visibility and the paused CSS story together.
   // Asset/API loading continues independently; route returns never re-arm the boot mask.
   if (document.documentElement.hasAttribute("data-v3-home-boot")) {
-    document.documentElement.removeAttribute("data-v3-booting");
-    document.documentElement.removeAttribute("data-v3-home-boot");
-    syncHomeEngageReadiness();
+    window.v3HomeBoot?.complete(syncHomeEngageReadiness);
   }
 }
