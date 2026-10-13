@@ -3346,6 +3346,12 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     : route.name;
   const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
   shell.dataset.shellRoute = shellRouteName;
+  const menuPreview = document.querySelector("[data-shell-menu-panel]");
+  if (menuPreview) {
+    const isMenuPreview = route.name === "portfolio" && new URLSearchParams(window.location.search).get("menuPreview") === "1";
+    shell.toggleAttribute("data-shell-menu-preview", isMenuPreview);
+    menuPreview.hidden = !isMenuPreview;
+  }
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name === "wrestling-shows") {
     shell.dataset.wrestlingShowsRouteHandoff = "active";
