@@ -14779,3 +14779,17 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   pointer-events: auto;
 }
 .shell-menu-preview__admin-link:focus-visible { outline: 1px solid #e5ecf6; outline-offset: 3px; }
+
+/* Admin 1G: center panel contents and exclude the identified legacy footer. */
+.site-shell[data-shell-route="admin"] {
+  grid-template-rows: minmax(0, 1fr);
+}
+.site-shell[data-shell-route="admin"] .universal-bottom-rail {
+  display: none;
+}
+.site-shell[data-shell-route="admin"] .admin-login__surface {
+  text-align: center;
+}
+.site-shell[data-shell-route="admin"] .admin-login__password {
+  text-align: start;
+}
