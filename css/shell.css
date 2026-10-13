@@ -14496,6 +14496,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     overflow-y: auto;
     pointer-events: auto;
   }
+  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world="story"] {
+    align-content: safe center;
+  }
   .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection:is([data-world="soundtrack"], [data-world="battleground"]) {
     top: calc(var(--portfolio-landscape-top) + 140px);
     bottom: calc(100svh - var(--portfolio-landscape-bottom));

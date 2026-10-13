@@ -70,10 +70,10 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
   },
   story: {
     id: "story",
-    label: "The Story",
-    description: "Discover the journey, passion, and moments that brought this archive to life.",
-    status: "INFORMATION",
-    statusType: "information",
+    label: "Gaming",
+    description: "Journey through the generations of gaming content from retro to new-age. This will be a work in progress soon.",
+    status: "COMING SOON",
+    statusType: "coming-soon",
   },
   trajectory: {
     id: "trajectory",
@@ -628,7 +628,7 @@ function syncPortfolioGatewayTriggerState() {
   const isEnabled = shouldEnablePortfolioGatewayTrigger();
   const isVisible = window.location.pathname === routePaths.portfolio &&
     shell?.dataset.portfolioEngineReady === "true" &&
-    activeWorld !== "portfolio" && !isPortfolioGatewayActive();
+    isPortfolioGatewayWorldRouteable(activeWorld) && !isPortfolioGatewayActive();
   if (!isVisible && document.activeElement === portfolioGatewayTrigger) portfolioGatewayTrigger.blur();
   portfolioGatewayTrigger.hidden = !isVisible;
   portfolioGatewayTrigger.setAttribute("aria-hidden", String(!isVisible));
