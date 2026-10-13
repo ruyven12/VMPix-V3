@@ -25,6 +25,7 @@ const aboutShell = document.querySelector("[data-about-shell]");
 const calendarShell = document.querySelector("[data-calendar-shell]");
 const contactShell = document.querySelector("[data-contact-shell]");
 const connectShell = document.querySelector("[data-connect-shell]");
+const adminShell = document.querySelector("[data-admin-shell]");
 const shellBreadcrumb = document.querySelector("[data-shell-breadcrumb]");
 const shellBreadcrumbList = document.querySelector("[data-shell-breadcrumb-list]");
 const bottomRail = queryRetainedMusicElement("[data-shell-bottom-rail]");
@@ -1989,6 +1990,7 @@ const routePaths = {
   about: "/about",
   contact: "/contact",
   connect: "/connect",
+  admin: "/admin",
 };
 
 const WRESTLING_MATCH_DETAIL_SHOW_ID = "062026";
@@ -2201,6 +2203,16 @@ const shellRouteRegistry = [
     bottomRailEligible: false,
   },
   {
+    id: "admin",
+    route: routePaths.admin,
+    label: "Admin Access",
+    parentSection: "Site",
+    moduleType: "module",
+    drawerGroup: "site",
+    breadcrumbLabel: "Admin",
+    bottomRailEligible: false,
+  },
+  {
     id: "wildlife",
     route: "",
     label: "Wildlife",
@@ -2269,6 +2281,7 @@ const routeNameToGlobalNavTarget = {
   about: "about",
   contact: "contact",
   connect: "connect",
+  admin: "admin",
 };
 
 const routeNameToBreadcrumbTrail = {
@@ -2303,6 +2316,7 @@ const routeNameToBreadcrumbTrail = {
   about: ["portfolio", "about"],
   contact: ["portfolio", "contact"],
   connect: ["connect"],
+  admin: ["portfolio", "admin"],
 };
 
 const routeNameToDrilldownBreadcrumb = {
@@ -2355,6 +2369,7 @@ const routeNameToShellBackTarget = {
   about: routePaths.portfolio,
   contact: routePaths.portfolio,
   connect: routePaths.home,
+  admin: routePaths.portfolio,
 };
 const routedBandsViews = ["radar", "list", "search"];
 const mockSetCodes = [

@@ -786,10 +786,21 @@ function syncShellMenuMotion() {
   scheduleShellMenuPosition();
 }
 
+function handleShellMenuAdmin(event) {
+  if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.hidden || shellMenuPanel.inert) {
+    event.preventDefault();
+    return;
+  }
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  navigateToRoute(routePaths.admin);
+}
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
+  shellMenuPanel.querySelector("[data-shell-menu-admin]")?.addEventListener("click", handleShellMenuAdmin);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
   window.addEventListener("keydown", handleShellMenuEscape);
@@ -3515,7 +3526,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
   shell.dataset.shellRoute = shellRouteName;
   syncShellMenuRoute(route);
   shell.dataset.shellActiveTarget = activeTarget;
@@ -6179,6 +6190,55 @@ function showWrestlingLightbox(showId, matchId, photoId) {
   }
 }
 
+
+function hideAdminShell() {
+  window.V3AdminModule?.deactivate();
+  if (adminShell) {
+    adminShell.hidden = true;
+    adminShell.setAttribute("aria-hidden", "true");
+    adminShell.setAttribute("inert", "");
+  }
+  shell?.classList.remove("is-admin-view");
+}
+
+function showAdminShell() {
+  if (!shell || !adminShell) return;
+  shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-venue-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view", "is-connect-view");
+  shell.classList.add("has-entered-hub", "is-module-view", "is-admin-view");
+  homeFrame?.setAttribute("aria-hidden", "true");
+  [portfolioHub, modulePlaceholder, musicNexusShell, ringArchiveShell, aboutShell, calendarShell, contactShell, connectShell].forEach((surface) => {
+    surface?.setAttribute("aria-hidden", "true");
+    surface?.setAttribute("inert", "");
+  });
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  setHubChromeHidden(true);
+  adminShell.hidden = false;
+  adminShell.setAttribute("aria-hidden", "false");
+  adminShell.removeAttribute("inert");
+  window.V3AdminModule?.activate();
+  setCurrentView("Admin Access");
+  setDocumentTitle("Admin Access - Voodoo Media V3.0.01");
+  setActiveGlobalNav("admin");
+  setPortfolioEngineHudCurrentView("Admin Access");
+  adminShell.querySelector("h1")?.focus({ preventScroll: true });
+}
+
+function handleAdminReturn(event) {
+  if (getRouteFromUrl().name !== "admin" || !adminShell || adminShell.hidden || adminShell.hasAttribute("inert")) {
+    event.preventDefault();
+    return;
+  }
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  navigateToRoute(routePaths.portfolio);
+}
+
 function showAboutShell() {
   if (!shell || !aboutShell) {
     return;
@@ -6654,6 +6714,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     calendar: calendarShell,
     about: aboutShell,
     contact: contactShell,
+    admin: adminShell,
   };
 
   return routeScrollerMap[route.name] || document.querySelector(".public-home");
@@ -7520,6 +7581,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   renderGlobalMenu();
   initShellRailLogo();
   initShellMenu();
+  adminShell?.querySelector("[data-admin-return]")?.addEventListener("click", handleAdminReturn);
   initPortfolioBeaconHotspots();
   initPortfolioEngineLightning();
   initPrototypeEngineReturnEmitter();

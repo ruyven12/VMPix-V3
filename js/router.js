@@ -180,6 +180,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.contact) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
+  if (routePath === routePaths.admin) {
+    return { name: "admin", canonicalUrl: routePaths.admin };
+  }
   if (routePath === routePaths.connect) {
     return { name: "connect", canonicalUrl: routePaths.connect };
   }
@@ -405,6 +408,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (route.name !== "admin" && typeof hideAdminShell === "function") hideAdminShell();
   beginV3RouteContext(route, options);
   if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
@@ -630,6 +634,11 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "contact") {
     showContactShell();
+    return;
+  }
+
+  if (route.name === "admin") {
+    showAdminShell();
     return;
   }
 

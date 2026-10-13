@@ -192,6 +192,12 @@
           root.classList.add("has-entered-hub", "is-module-view");
           root.setAttribute("data-shell-route", routePath === "/music/bands" ? "music-bands" : "band-detail");
         }
+        if (routePath === "/admin") {
+          const root = document.currentScript.parentElement;
+          root.classList.remove("is-home-route");
+          root.classList.add("has-entered-hub", "is-module-view");
+          root.setAttribute("data-shell-route", "admin");
+        }
         if (routePath === "/music") {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
@@ -2228,6 +2234,25 @@
           </article>
         </div>
       </section>
+      <section class="admin-shell" data-admin-shell hidden inert aria-hidden="true" aria-labelledby="admin-access-title">
+        <div class="admin-access">
+          <article class="admin-login">
+            <div class="admin-login__surface">
+              <h1 class="admin-login__title" id="admin-access-title" tabindex="-1">ADMIN ACCESS</h1>
+              <div role="group" aria-labelledby="admin-access-title">
+                <label class="admin-login__label" for="v3-admin-password">PASSWORD</label>
+                <div class="admin-login__password-row">
+                  <input class="admin-login__password" id="v3-admin-password" name="password" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="1024" aria-describedby="admin-access-feedback" data-admin-password>
+                  <button class="admin-login__toggle" type="button" aria-label="Show password" aria-pressed="false" aria-controls="v3-admin-password" data-admin-password-toggle>SHOW</button>
+                </div>
+                <button class="admin-login__connect" type="button" data-admin-connect>CONNECT</button>
+                <p class="admin-login__feedback" id="admin-access-feedback" role="status" aria-live="polite" aria-atomic="true" data-admin-feedback>Authentication is not connected yet.</p>
+              </div>
+              <a class="admin-login__return" href="/portfolio" data-admin-return>Return to Portfolio</a>
+            </div>
+          </article>
+        </div>
+      </section>
     </main>
 
     <aside class="portfolio-engine" data-portfolio-engine aria-label="Portfolio Engine HUD">
@@ -2302,7 +2327,7 @@
         <li class="shell-menu-preview__row">The Story (About)</li>
         <li class="shell-menu-preview__row">The Trajectory (Upcoming)</li>
         <li class="shell-menu-preview__row">Contact</li>
-        <li class="shell-menu-preview__row shell-menu-preview__row--admin">Admin Menu</li>
+        <li class="shell-menu-preview__row shell-menu-preview__row--admin"><a class="shell-menu-preview__admin-link" href="/admin" data-shell-menu-admin>Admin Menu</a></li>
       </ul>
     </aside>
 
@@ -2379,6 +2404,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="/modules/wrestling.js"></script>
   <script src="/modules/connect.js"></script>
+  <script src="/modules/admin.js"></script>
   <script src="/js/router.js"></script>
   <script>
     (() => {
