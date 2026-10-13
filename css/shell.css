@@ -5551,11 +5551,12 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   transform: translate3d(-50%, -50%, 0) scale3d(0.9, 0.9, 1) rotate(0deg);
 }
 
-.portfolio-beacon:disabled {
+.portfolio-beacon:disabled,
+.portfolio-beacon--undiscovered {
   cursor: default;
 }
 
-.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon:not(:disabled) {
+.site-shell[data-shell-route="portfolio"].has-entered-hub.has-portfolio-entry-constellation .portfolio-beacon[data-portfolio-star]:not(:disabled) {
   pointer-events: auto;
 }
 
@@ -14393,6 +14394,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .portfolio-star-label,
 .portfolio-star-label * { pointer-events: none; text-transform: none; }
+.portfolio-beacon--undiscovered .portfolio-star-label {
+  color: rgb(150 155 165 / .72);
+}
 .portfolio-star-label__classification {
   font-size: clamp(10px, 2.6vw, 11px);
   line-height: 1.2;
@@ -14496,7 +14500,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     overflow-y: auto;
     pointer-events: auto;
   }
-  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world="story"] {
+  .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection[data-world="trajectory"] {
     align-content: safe center;
   }
   .site-shell[data-shell-route="portfolio"] .portfolio-engine-projection:is([data-world="soundtrack"], [data-world="battleground"]) {

@@ -70,22 +70,22 @@ const PORTFOLIO_WORLD_SELECTION_CONFIG = {
   },
   story: {
     id: "story",
-    label: "Gaming",
-    description: "Journey through the generations of gaming content from retro to new-age. This will be a work in progress soon.",
+    label: "Undiscovered",
+    description: "",
     status: "COMING SOON",
     statusType: "coming-soon",
   },
   trajectory: {
     id: "trajectory",
-    label: "The Trajectory",
-    description: "Follow the evolution of the archive through milestones, goals, and what's still to come.",
-    status: "INFORMATION",
-    statusType: "information",
+    label: "Gaming",
+    description: "Journey through the generations of gaming content from retro to new-age. This will be a work in progress soon.",
+    status: "COMING SOON",
+    statusType: "coming-soon",
   },
   comms: {
     id: "comms",
-    label: "The Comms",
-    description: "Connect for booking, availability, collaboration, and upcoming events.",
+    label: "Undiscovered",
+    description: "",
     status: "INFORMATION",
     statusType: "information",
   },
@@ -2514,7 +2514,7 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
 
 function handlePortfolioBeaconHotspotClick(event) {
   const button = event.currentTarget;
-  if (!button || button.disabled || window.location.pathname !== routePaths.portfolio) {
+  if (!button || !button.hasAttribute("data-portfolio-star") || button.disabled || window.location.pathname !== routePaths.portfolio) {
     return;
   }
 
@@ -2531,7 +2531,7 @@ function handlePortfolioBeaconHotspotKeydown(event) {
   }
 
   const button = event.currentTarget;
-  if (!button || button.disabled || window.location.pathname !== routePaths.portfolio) {
+  if (!button || !button.hasAttribute("data-portfolio-star") || button.disabled || window.location.pathname !== routePaths.portfolio) {
     return;
   }
 
