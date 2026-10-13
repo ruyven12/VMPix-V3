@@ -7344,7 +7344,7 @@ function beginHomePortfolioTransition() {
   schedulePortfolioEntrySequenceCleanup();
 }
 
-if (shell && startButton) {
+if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) {
   renderGlobalMenu();
   initShellRailLogo();
   initPortfolioBeaconHotspots();

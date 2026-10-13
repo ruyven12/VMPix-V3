@@ -46,13 +46,18 @@
       if ((location.pathname.replace(/\/+$/, "") || "/") !== "/") return;
       root.setAttribute("data-v3-home-boot", "");
       root.setAttribute("data-v3-home-css", "loading");
+      root.setAttribute("data-v3-home-shell", "pending");
       let cssState = "loading";
+      let shellState = "pending";
+      let initializing = false;
       let failed = false;
       let initialized = false;
       let presentationReady;
       let cssFailureTimer = 0;
+      let shellFailureTimer = 0;
       const stopWatching = () => {
         window.clearTimeout(cssFailureTimer);
+        window.clearTimeout(shellFailureTimer);
         document.removeEventListener("load", checkPrerequisite, true);
         document.removeEventListener("error", checkPrerequisite, true);
       };
@@ -69,7 +74,7 @@
         retry.addEventListener("click", () => {
           if (retry.disabled) return;
           retry.disabled = true;
-          // A new document re-requests CSS and runs the established initialization once.
+          // A new document re-requests prerequisites and initializes once.
           location.reload();
         }, { once: true });
         retry.focus();
@@ -87,8 +92,14 @@
         root.setAttribute("data-v3-home-boot-failed", "");
         showRecovery();
       };
+      const failShellLoad = () => {
+        if (failed || shellState !== "pending") return;
+        shellState = "failed";
+        root.setAttribute("data-v3-home-shell", shellState);
+        failBoot();
+      };
       const releasePresentation = () => {
-        if (failed || !initialized || cssState !== "ready") return;
+        if (failed || !initialized || cssState !== "ready" || shellState !== "loaded") return;
         if (!isStylesheetReady()) { failBoot(true); return; }
         stopWatching();
         root.removeAttribute("data-v3-booting");
@@ -108,12 +119,23 @@
           if (event.type === "error") failBoot(true);
           else markStylesheetReady();
         } else if (event.target instanceof HTMLScriptElement && new URL(event.target.src, location.href).pathname === "/js/shell.js") {
-          if (event.type === "error" || !initialized) failBoot();
+          if (failed) return;
+          if (event.type === "error") { failShellLoad(); return; }
+          shellState = "loaded";
+          root.setAttribute("data-v3-home-shell", shellState);
+          window.clearTimeout(shellFailureTimer);
+          if (!initialized) failBoot();
+          else releasePresentation();
         }
       };
       window.v3HomeBoot = {
+        beginInitialization() {
+          if (failed || initializing || initialized) return false;
+          initializing = true;
+          return true;
+        },
         complete(onPresentationReady) {
-          if (failed || initialized) return;
+          if (failed || initialized || !initializing) return;
           initialized = true;
           presentationReady = onPresentationReady;
           if (cssState === "loading" && isStylesheetReady()) markStylesheetReady();
@@ -125,6 +147,8 @@
       document.addEventListener("DOMContentLoaded", () => { if (failed) showRecovery(); }, { once: true });
       // Failure only: elapsed time never makes a stylesheet or ENGAGE ready.
       cssFailureTimer = window.setTimeout(() => failBoot(true), 15000);
+      // Armed before parser-blocking Shell loading; timeout can only offer recovery.
+      shellFailureTimer = window.setTimeout(failShellLoad, 15000);
     })();
   </script>
   <title>Welcome to Voodoo Media V3.0.01</title>
