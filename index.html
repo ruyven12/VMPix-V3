@@ -2277,7 +2277,7 @@
         <span class="portfolio-engine-value" data-portfolio-engine-current-view>Interactive Portfolio</span>
       </div>
 
-      <div class="portfolio-engine-reactor" aria-hidden="true">
+      <button class="portfolio-engine-reactor" type="button" data-shell-menu-toggle aria-label="Open Shell menu" aria-controls="shell-menu-panel" aria-expanded="false" aria-hidden="true" tabindex="-1" disabled>
         <svg class="engine-emitter-energy engine-emitter-energy--right" viewBox="-8 -8 116 116" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
           <circle class="engine-emitter-energy-ring engine-emitter-energy-ring--outer" cx="50" cy="50" r="43" pathLength="100" />
           <circle class="engine-emitter-energy-ring engine-emitter-energy-ring--middle" cx="50" cy="50" r="37" pathLength="100" />
@@ -2288,7 +2288,7 @@
         </svg>
         <span class="portfolio-engine-reactor-ring"></span>
         <img class="portfolio-engine-reactor-core" src="/assets/media/voodoo-doll-center.png" width="1536" height="1024" alt="" decoding="async" />
-      </div>
+      </button>
 
 
       <div class="portfolio-engine-panel portfolio-engine-panel--right" data-portfolio-engine-panel="archive-build">
@@ -2296,7 +2296,7 @@
         <span class="portfolio-engine-value">3.0.01</span>
       </div>
     </aside>
-    <aside class="shell-menu-preview" aria-label="Shell menu preview" data-shell-menu-panel hidden>
+    <aside class="shell-menu-preview" id="shell-menu-panel" aria-label="Shell menu" aria-hidden="true" data-shell-menu-panel inert hidden>
       <div class="shell-menu-preview__surface" aria-hidden="true"></div>
       <ul class="shell-menu-preview__rows">
         <li class="shell-menu-preview__row">The Story</li>

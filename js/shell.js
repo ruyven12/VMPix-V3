@@ -136,6 +136,14 @@ const portfolioEngineScanAnchor = document.querySelector(".portfolio-engine-left
 const prototypeEngineReturnEmitter = portfolioEngineScanAnchor;
 let prototypeEngineReturnControl = null;
 const portfolioRightEmitter = document.querySelector(".portfolio-engine-reactor");
+const shellMenuPanel = document.querySelector("[data-shell-menu-panel]");
+const shellMenuUsesAnchor = typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("position-anchor", "--shell-menu-emitter") && CSS.supports("top", "anchor(center)");
+let shellMenuOpen = false;
+let shellMenuPositionActive = false;
+let shellMenuPositionFrame = 0;
+let shellMenuEngineWait = null;
+let shellMenuRouteKey = null;
+let shellMenuPreviewPending = false;
 const portfolioStarFeedOverlay = document.querySelector("[data-portfolio-star-feed-overlay]");
 const portfolioStarFeedStrands = portfolioStarFeedOverlay
   ? Array.from(portfolioStarFeedOverlay.querySelectorAll("[data-portfolio-star-feed-strand]"))
@@ -636,6 +644,169 @@ function syncPortfolioGatewayTriggerState() {
   portfolioGatewayTrigger.setAttribute("aria-disabled", String(!isEnabled));
   portfolioGatewayTrigger.dataset.portfolioGatewayWorld = isEnabled ? activeWorld : "";
   portfolioGatewayTrigger.dataset.portfolioGatewayRoute = isEnabled ? route : "";
+  syncShellMenuAvailability();
+}
+
+// Shell menu uses the existing Engine lifecycle; rows remain informational.
+function isShellMenuAvailable() {
+  return Boolean(shell && portfolioRightEmitter && shellMenuPanel &&
+    window.location.pathname === routePaths.portfolio && shell.dataset.shellRoute === "portfolio" &&
+    shell.dataset.portfolioEngineReady === "true" && !isPortfolioGatewayActive() &&
+    !shell.classList.contains("is-portfolio-world-arrived"));
+}
+
+function stopShellMenuPositioning() {
+  shellMenuPositionActive = false;
+  if (shellMenuPositionFrame) window.cancelAnimationFrame(shellMenuPositionFrame);
+  shellMenuPositionFrame = 0;
+}
+
+function resetShellMenu() {
+  shellMenuOpen = false;
+  shellMenuEngineWait = null;
+  stopShellMenuPositioning();
+  shell?.classList.remove("is-shell-menu-open");
+  portfolioRightEmitter?.setAttribute("aria-expanded", "false");
+  portfolioRightEmitter?.setAttribute("aria-label", "Open Shell menu");
+  if (shellMenuPanel) {
+    shellMenuPanel.hidden = true;
+    shellMenuPanel.inert = true;
+    shellMenuPanel.setAttribute("aria-hidden", "true");
+    shellMenuPanel.style.removeProperty("--shell-menu-emitter-x");
+    shellMenuPanel.style.removeProperty("--shell-menu-emitter-y");
+  }
+}
+
+function positionShellMenu() {
+  if (!isShellMenuAvailable()) return false;
+  if (shellMenuUsesAnchor) return true;
+  const rect = portfolioRightEmitter.getBoundingClientRect();
+  if (!rect.width || !rect.height) return false;
+  shellMenuPanel.style.setProperty("--shell-menu-emitter-x", (rect.left + rect.width / 2) + "px");
+  shellMenuPanel.style.setProperty("--shell-menu-emitter-y", (rect.top + rect.height / 2) + "px");
+  return true;
+}
+
+function scheduleShellMenuPosition() {
+  if (shellMenuUsesAnchor || !shellMenuPositionActive || shellMenuPositionFrame) return;
+  // One coalesced measurement after viewport handlers, never a positioning loop.
+  shellMenuPositionFrame = window.requestAnimationFrame(() => {
+    shellMenuPositionFrame = 0;
+    if (shellMenuPositionActive) positionShellMenu();
+  });
+}
+
+function setShellMenuOpen(isOpen) {
+  if (!shellMenuPanel || !portfolioRightEmitter) return false;
+  if (isOpen && (!isShellMenuAvailable() || portfolioRightEmitter.disabled || !positionShellMenu())) return false;
+  shellMenuOpen = isOpen;
+  if (isOpen) shellMenuPositionActive = true;
+  shell.classList.toggle("is-shell-menu-open", isOpen);
+  portfolioRightEmitter.setAttribute("aria-expanded", String(isOpen));
+  portfolioRightEmitter.setAttribute("aria-label", isOpen ? "Close Shell menu" : "Open Shell menu");
+  shellMenuPanel.setAttribute("aria-hidden", String(!isOpen));
+  shellMenuPanel.inert = !isOpen;
+  if (!isOpen && reducedMotion.matches) stopShellMenuPositioning();
+  return true;
+}
+
+function syncShellMenuAvailability() {
+  if (!portfolioRightEmitter || !shellMenuPanel) return;
+  const available = isShellMenuAvailable();
+  if (!available) {
+    if (document.activeElement === portfolioRightEmitter) portfolioRightEmitter.blur();
+    portfolioRightEmitter.disabled = true;
+    portfolioRightEmitter.tabIndex = -1;
+    portfolioRightEmitter.setAttribute("aria-hidden", "true");
+    resetShellMenu();
+    return;
+  }
+  // Do not measure an unsettled Engine transform for the compatibility path.
+  // Native completion gates only the new toggle, preserving all existing clocks.
+  if (portfolioRightEmitter.disabled && !reducedMotion.matches) {
+    if (shellMenuEngineWait) return;
+    const tracks = (portfolioEngine?.getAnimations?.() || []).filter((animation) =>
+      animation.transitionProperty === "transform" && (animation.playState === "running" || animation.pending));
+    if (tracks.length) {
+      const wait = {};
+      shellMenuEngineWait = wait;
+      const settled = () => {
+        if (shellMenuEngineWait !== wait) return;
+        shellMenuEngineWait = null;
+        syncShellMenuAvailability();
+      };
+      Promise.all(tracks.map((animation) => animation.finished)).then(settled, settled);
+      return;
+    }
+  }
+  portfolioRightEmitter.disabled = false;
+  portfolioRightEmitter.tabIndex = 0;
+  portfolioRightEmitter.setAttribute("aria-hidden", "false");
+  shellMenuPanel.hidden = false;
+  if (shellMenuPreviewPending) {
+    shellMenuPreviewPending = false;
+    setShellMenuOpen(true);
+  }
+}
+
+function syncShellMenuRoute(route) {
+  const key = route.name === "portfolio" ? window.location.pathname + window.location.search : "";
+  if (key !== shellMenuRouteKey) {
+    resetShellMenu();
+    shellMenuRouteKey = key;
+    shellMenuPreviewPending = route.name === "portfolio" && new URLSearchParams(window.location.search).get("menuPreview") === "1";
+  }
+  shell?.toggleAttribute("data-shell-menu-preview", route.name === "portfolio" && new URLSearchParams(window.location.search).get("menuPreview") === "1");
+  syncShellMenuAvailability();
+}
+
+function handleShellMenuToggle() {
+  if (!isShellMenuAvailable() || portfolioRightEmitter.disabled) return;
+  setShellMenuOpen(!shellMenuOpen);
+}
+
+function handleShellMenuEscape(event) {
+  if (event.key !== "Escape" || !shellMenuOpen) return;
+  event.preventDefault();
+  setShellMenuOpen(false);
+  if (isShellMenuAvailable() && !portfolioRightEmitter.disabled) portfolioRightEmitter.focus({ preventScroll: true });
+}
+
+function settleShellMenuRetraction(event) {
+  if (event.target === shellMenuPanel && event.propertyName === "transform" && !shellMenuOpen &&
+    (event.type === "transitionend" || reducedMotion.matches)) stopShellMenuPositioning();
+}
+
+function syncShellMenuMotion() {
+  if (reducedMotion.matches) {
+    shellMenuEngineWait = null;
+    if (!shellMenuOpen) stopShellMenuPositioning();
+  }
+  syncShellMenuAvailability();
+  scheduleShellMenuPosition();
+}
+
+function initShellMenu() {
+  if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
+  portfolioRightEmitter.dataset.shellMenuBound = "true";
+  portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
+  shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
+  shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
+  window.addEventListener("keydown", handleShellMenuEscape);
+  window.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
+  window.addEventListener("orientationchange", scheduleShellMenuPosition, { passive: true });
+  window.visualViewport?.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
+  window.visualViewport?.addEventListener("scroll", scheduleShellMenuPosition, { passive: true });
+  window.addEventListener("pagehide", () => {
+    resetShellMenu();
+    shellMenuPreviewPending = false;
+    portfolioRightEmitter.disabled = true;
+    portfolioRightEmitter.tabIndex = -1;
+    portfolioRightEmitter.setAttribute("aria-hidden", "true");
+  });
+  window.addEventListener("pageshow", (event) => { if (event.persisted) syncShellMenuAvailability(); });
+  if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEventListener("change", syncShellMenuMotion);
+  else reducedMotion.addListener(syncShellMenuMotion);
 }
 
 // Shell tracks arrival and coordinates its native landing clock; transport and Router retain ownership.
@@ -3346,12 +3517,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     : route.name;
   const shouldHideBottomRail = isHomeRoute || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
   shell.dataset.shellRoute = shellRouteName;
-  const menuPreview = document.querySelector("[data-shell-menu-panel]");
-  if (menuPreview) {
-    const isMenuPreview = route.name === "portfolio" && new URLSearchParams(window.location.search).get("menuPreview") === "1";
-    shell.toggleAttribute("data-shell-menu-preview", isMenuPreview);
-    menuPreview.hidden = !isMenuPreview;
-  }
+  syncShellMenuRoute(route);
   shell.dataset.shellActiveTarget = activeTarget;
   if (route.name === "wrestling-shows") {
     shell.dataset.wrestlingShowsRouteHandoff = "active";
@@ -7353,6 +7519,7 @@ function beginHomePortfolioTransition() {
 if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) {
   renderGlobalMenu();
   initShellRailLogo();
+  initShellMenu();
   initPortfolioBeaconHotspots();
   initPortfolioEngineLightning();
   initPrototypeEngineReturnEmitter();
