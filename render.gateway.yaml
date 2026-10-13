@@ -1,0 +1,20 @@
+# Candidate only: select this Blueprint explicitly in a separately approved hosting pass.
+# The active Static Site Blueprint remains render.yaml.
+services:
+  - type: web
+    name: vmpix-v3-gateway
+    runtime: node
+    # Candidate paid baseline; creation and billing still require separate deployment approval.
+    plan: 0.5c-512mb
+    buildCommand: node --check gateway.cjs
+    startCommand: npm run start:gateway
+    healthCheckPath: /
+    autoDeployTrigger: off
+    envVars:
+      - key: V3_ADMIN_AUTH_ENABLED
+        value: "false"
+      - key: V3_ADMIN_AUTH_ORIGIN
+        sync: false
+      - key: V3_ADMIN_AUTH_UPSTREAM_ORIGIN
+        sync: false
+# Auth remains blocked behind TLS termination until ingress trust is separately verified.
