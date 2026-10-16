@@ -3396,14 +3396,14 @@ function requestRingArchiveStats() {
 }
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  if (route?.name === "admin" && route.adminStation === "api") return true;
+  if (route?.name === "admin" && ["api", "database"].includes(route.adminStation)) return true;
   return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
-  if (route?.name === "admin" && route.adminStation === "api") return routePaths.admin;
+  if (route?.name === "admin" && ["api", "database"].includes(route.adminStation)) return routePaths.admin;
   if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
@@ -3476,7 +3476,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   initPrototypeEngineReturnEmitter();
 
   const isActive = isPrototypeEngineReturnRoute(route);
-  const backLabel = route?.name === "admin" && route.adminStation === "api" ? "Back to Core Control Deck" : {
+  const backLabel = route?.name === "admin" && ["api", "database"].includes(route.adminStation) ? "Back to Core Control Deck" : {
     "music": "Back to Portfolio",
     "music-bands": "Back to Zhento",
     "band-detail": "Back to Bands",
@@ -3635,7 +3635,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return "";
   }
 
-  if (route.name === "admin" && route.adminStation === "api") return routePaths.admin;
+  if (route.name === "admin" && ["api", "database"].includes(route.adminStation)) return routePaths.admin;
   if (route.name === "wrestling-people-prototype") return routePaths.wrestling;
 
   if (route.name === "band-detail") {
@@ -6230,29 +6230,31 @@ function trackAdminStation(element, name, complete, classOwner = element, holdFo
   else animation.finished.then(() => finish(), () => finish());
 }
 function handleAdminStationNavigation(event, station) {
+  if (!["api", "database", "deck"].includes(station)) return;
+  const entering = station !== "deck";
   const route = getRouteFromUrl();
   if (route.name !== "admin" || !adminShell || adminShell.hidden || adminShell.hasAttribute("inert")) return;
-  const source = adminShell.querySelector(station === "api" ? "[data-admin-console]" : "[data-admin-api-station]");
+  const source = adminShell.querySelector(entering ? "[data-admin-console]" : route.adminStation === "database" ? "[data-admin-database-station]" : "[data-admin-api-station]");
   if (!source || source.hidden || source.hasAttribute("inert") || adminStationTravel) return;
-  if (station === "api" && !window.V3AdminModule?.prepareStationEntry()) return;
+  if (entering && !window.V3AdminModule?.prepareStationEntry()) return;
   event.preventDefault();
-  const destination = station === "api" ? `${routePaths.admin}?station=api` : routePaths.admin;
+  const destination = entering ? `${routePaths.admin}?station=${station}` : routePaths.admin;
   const handoff = () => {
     if (getRouteFromUrl().canonicalUrl !== route.canonicalUrl || adminShell.hidden || adminShell.hasAttribute("inert")) return false;
     if (source.hidden || source.hasAttribute("inert")) return false;
-    if (station === "api" && !window.V3AdminModule?.prepareStationEntry()) return false;
+    if (entering && !window.V3AdminModule?.prepareStationEntry()) return false;
     if (station === "deck" && shouldShellBackUseHistory(route)) window.history.back();
-    else navigateToRoute(destination, { navigationDirection: station === "api" ? "forward" : "back" });
+    else navigateToRoute(destination, { navigationDirection: entering ? "forward" : "back" });
     return true;
   };
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { handoff(); return; }
   const depart = () => {
     if (getRouteFromUrl().canonicalUrl !== route.canonicalUrl || adminShell.hidden || adminShell.hasAttribute("inert")) return;
-    if (source.hidden || source.hasAttribute("inert") || station === "api" && !window.V3AdminModule?.prepareStationEntry()) return;
+    if (source.hidden || source.hasAttribute("inert") || entering && !window.V3AdminModule?.prepareStationEntry()) return;
     source.classList.add("is-admin-station-departing");
     trackAdminStation(source, "adminStationDepart", handoff, source, true);
   };
-  if (station === "api") {
+  if (entering) {
     source.classList.add("is-admin-conduit-active");
     trackAdminStation(source.querySelector(".admin-console__stations"), "adminApiConduit", depart, source);
   } else depart();
@@ -6272,7 +6274,7 @@ function showAdminShell(route = getRouteFromUrl()) {
   if (!shell || !adminShell) return;
   const wasActive = !adminShell.hidden && !adminShell.hasAttribute("inert");
   const previousStation = adminShell.querySelector("[data-admin-stage]")?.dataset.adminView;
-  const station = route.adminStation === "api" ? "api" : "deck";
+  const station = ["api", "database"].includes(route.adminStation) ? route.adminStation : "deck";
   shell.classList.remove("is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-venue-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view", "is-connect-view");
   shell.classList.add("has-entered-hub", "is-module-view", "is-admin-view");
   homeFrame?.setAttribute("aria-hidden", "true");
@@ -6293,14 +6295,14 @@ function showAdminShell(route = getRouteFromUrl()) {
   adminShell.removeAttribute("inert");
   if (wasActive) window.V3AdminModule?.setStation(station);
   else window.V3AdminModule?.activate({ station });
-  const currentView = station === "api" ? "API" : "Admin Access";
+  const currentView = station === "api" ? "API" : station === "database" ? "Database" : "Admin Access";
   setCurrentView(currentView);
-  setDocumentTitle(`${station === "api" ? "API Station" : "Admin Access"} - Voodoo Media V3.0.01`);
+  setDocumentTitle(`${station === "api" ? "API Station" : station === "database" ? "Database Station" : "Admin Access"} - Voodoo Media V3.0.01`);
   setActiveGlobalNav("admin");
   setPortfolioEngineHudCurrentView(currentView);
   if (!wasActive) adminShell.querySelector(".admin-login:not([hidden]) h1")?.focus({ preventScroll: true });
   if (wasActive && previousStation !== station && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    const arrival = adminShell.querySelector(station === "api" ? "[data-admin-api-station]" : "[data-admin-console]");
+    const arrival = adminShell.querySelector(station === "api" ? "[data-admin-api-station]" : station === "database" ? "[data-admin-database-station]" : "[data-admin-console]");
     if (arrival && !arrival.hidden && !arrival.hasAttribute("inert")) {
       arrival.classList.add("is-admin-station-arriving");
       trackAdminStation(arrival, "adminStationArrive", () => {});
@@ -7664,6 +7666,8 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   window.addEventListener("pagehide", cancelAdminStationTravel);
   adminShell?.querySelector("[data-admin-open-api]")?.addEventListener("click", event => handleAdminStationNavigation(event, "api"));
   adminShell?.querySelector("[data-admin-api-back]")?.addEventListener("click", event => handleAdminStationNavigation(event, "deck"));
+  adminShell?.querySelector("[data-admin-open-database]")?.addEventListener("click", event => handleAdminStationNavigation(event, "database"));
+  adminShell?.querySelector("[data-admin-database-back]")?.addEventListener("click", event => handleAdminStationNavigation(event, "deck"));
   initPortfolioBeaconHotspots();
   initPortfolioEngineLightning();
   initPrototypeEngineReturnEmitter();

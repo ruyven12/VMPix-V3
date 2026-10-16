@@ -2296,7 +2296,7 @@
                     </span>
                     <div class="admin-console__station-body">
                       <h2 id="admin-station-database">DATABASE</h2>
-                      <button class="admin-console__standby" type="button" disabled aria-disabled="true" tabindex="-1">STANDBY</button>
+                      <button class="admin-console__standby" type="button" data-admin-open-database aria-label="Open Database station" disabled aria-disabled="true"><span>ENTER</span></button>
                     </div>
                   </section>
                   <section class="admin-console__station" style="--station-order: 2" aria-labelledby="admin-station-imports">
@@ -2625,6 +2625,47 @@
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-api-feedback></p><button class="admin-console__logout" type="button" data-admin-api-logout>LOGOUT</button></footer>
             </div>
           </article>
+          <article class="admin-database admin-api" data-admin-database-station hidden inert aria-hidden="true" aria-labelledby="admin-database-title">
+            <div class="admin-api__surface">
+              <div class="admin-api__heading">
+                <div><h1 id="admin-database-title" tabindex="-1">Station 02 <em>//</em> Database</h1><p>Archive Core</p></div>
+                <button class="admin-api__back" type="button" data-admin-database-back><span aria-hidden="true">←</span> BACK</button>
+              </div>
+              <details class="admin-database__overview admin-api-section" data-admin-database-overview aria-labelledby="admin-database-overview-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-database-overview-title">Database Overview</h2></summary>
+                <div class="admin-api-section__body">
+                  <button class="admin-database__refresh" type="button" data-database-refresh disabled>Refresh Overview</button>
+                  <div class="admin-database__summary">
+                    <p class="admin-database__message" role="status" aria-live="polite" aria-atomic="true" data-database-message>Expand the overview to check its data.</p>
+                    <p class="admin-database__checked">Last Checked: <time data-database-checked>—</time></p>
+                  </div>
+                  <section class="admin-database__postgres" aria-labelledby="admin-database-postgres-title">
+                    <h3 id="admin-database-postgres-title">PostgreSQL Connection</h3>
+                    <dl class="admin-database__connection"><div><dt>Connection</dt><dd data-database-connection>Not Checked</dd></div><div><dt>Last Verified</dt><dd><time data-database-verified>—</time></dd></div></dl>
+                    <p class="admin-database__connection-note" data-database-connection-note>No connection check has run.</p>
+                  </section>
+                  <details class="admin-database__group" data-database-group="music"><summary>Music Archive</summary>
+                    <div class="admin-database__metrics">
+                      <article class="admin-database__metric" data-database-metric="music-bands" data-database-state="Not Checked"><h4>Bands</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                      <article class="admin-database__metric" data-database-metric="music-shows" data-database-state="Not Checked"><h4>Shows</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                      <article class="admin-database__metric" data-database-metric="music-people" data-database-state="Not Checked"><h4>People</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                      <article class="admin-database__metric" data-database-metric="music-venues" data-database-state="Not Checked"><h4>Venues</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                    </div>
+                  </details>
+                  <details class="admin-database__group" data-database-group="wrestling"><summary>Wrestling Archive</summary>
+                    <p class="admin-database__group-note">Matches: Not available. Matches are stored within shows; the Shows count is shows only.</p>
+                    <div class="admin-database__metrics">
+                      <article class="admin-database__metric" data-database-metric="wrestling-shows" data-database-state="Not Checked"><h4>Shows</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                      <article class="admin-database__metric" data-database-metric="wrestling-people" data-database-state="Not Checked"><h4>People</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                      <article class="admin-database__metric" data-database-metric="wrestling-venues" data-database-state="Not Checked"><h4>Venues</h4><p class="admin-database__count" data-database-count>—</p><p class="admin-database__metric-state" data-database-metric-state>Not Checked</p><p class="admin-database__updated">Last Updated: Not available</p><p class="admin-database__metric-note" data-database-metric-note>No count check has run.</p></article>
+                    </div>
+                  </details>
+                </div>
+              </details>
+              <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-database-feedback></p><button class="admin-console__logout" type="button" data-admin-database-logout>LOGOUT</button></footer>
+            </div>
+          </article>
+
           </div>
         </div>
       </section>

@@ -51,6 +51,11 @@
   const apiConnection = host?.querySelector("[data-admin-api-connection]");
   const apiResponse = host?.querySelector("[data-admin-api-response]");
   const apiVerified = host?.querySelector("[data-admin-api-verified]");
+  const databaseOpen = host?.querySelector("[data-admin-open-database]");
+  const databasePanel = host?.querySelector("[data-admin-database-station]");
+  const databaseTitle = host?.querySelector("#admin-database-title");
+  const databaseLogout = host?.querySelector("[data-admin-database-logout]");
+  const databaseFeedback = host?.querySelector("[data-admin-database-feedback]");
   if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
       !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink ||
       !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiCheck ||
@@ -89,6 +94,7 @@
     const changed = visualPhase !== "login";
     resetSignal();
     surface(apiPanel, false);
+    if (databasePanel) surface(databasePanel, false);
     stage.dataset.adminView = "deck";
     cancelVisuals();
     surface(deck, false);
@@ -129,7 +135,7 @@
     deckReturn.appendChild(returnLink);
     surface(deck, true);
     host.setAttribute("aria-labelledby", "admin-console-title");
-    if (shouldFocus && !(requestedStation === "api" && visualPhase === "ready")) focusTitle(deckTitle);
+    if (shouldFocus && !(["api", "database"].includes(requestedStation) && visualPhase === "ready")) focusTitle(deckTitle);
   }
   function showDeck(shouldFocus = true) {
     cancelVisuals();
@@ -206,10 +212,12 @@
     apiLogout.disabled = busy();
     apiLogout.textContent = deckLogout.textContent;
     apiFeedback.textContent = message;
+    if (databaseLogout) { databaseLogout.disabled = busy(); databaseLogout.textContent = deckLogout.textContent; }
+    if (databaseFeedback) databaseFeedback.textContent = message;
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -326,6 +334,8 @@
   function updateStationControl() {
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
+    if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
+    updateDatabaseControl();
     if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     updateMonitorControls();
   }
@@ -334,6 +344,19 @@
       clearSession(); present("idle", "Your session has expired. Connect again."); return;
     }
     const wasApi = stage.dataset.adminView === "api";
+    const wasDatabase = stage.dataset.adminView === "database";
+    const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
+      (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
+    if (databaseSelected) {
+      if (wasApi) resetSignal();
+      surface(loginPanel, false); surface(deck, false); surface(apiPanel, false); surface(databasePanel, true);
+      stage.dataset.adminView = "database";
+      host.setAttribute("aria-labelledby", "admin-database-title");
+      if (!wasDatabase && shouldFocus) focusTitle(databaseTitle);
+      updateStationControl(); return;
+    }
+    if (wasDatabase) cancelDatabaseOverview();
+    if (databasePanel) surface(databasePanel, false);
     const allowed = requestedStation === "api" && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasApi && ["logging-out", "logout-uncertain"].includes(state));
     if (allowed) {
@@ -348,7 +371,7 @@
       if (visualPhase === "ready") {
         surface(deck, true);
         host.setAttribute("aria-labelledby", "admin-console-title");
-        if (wasApi && shouldFocus) focusTitle(deckTitle);
+        if ((wasApi || wasDatabase) && shouldFocus) focusTitle(deckTitle);
       }
     }
     updateStationControl();
@@ -369,6 +392,7 @@
     cancelDiagnostics();
     cancelMusicStatus();
     cancelQuery();
+    cancelDatabaseOverview();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -1655,6 +1679,173 @@
   configureQuery(true); renderQuery();
 
 
+  // Database Overview uses five fixed public read-only sources; response timestamps are not data updates.
+  const databaseMetricCatalog = Object.freeze([
+    { id: "music-bands", name: "Bands" }, { id: "music-shows", name: "Shows" },
+    { id: "music-people", name: "People" }, { id: "music-venues", name: "Venues" },
+    { id: "wrestling-shows", name: "Shows" }, { id: "wrestling-people", name: "People" }, { id: "wrestling-venues", name: "Venues" }
+  ].map(item => Object.freeze(item)));
+  const databaseSources = Object.freeze([
+    { id: "connection", path: "/health/db", metrics: [] },
+    { id: "music", path: "/api/music/telemetry", metrics: ["music-bands", "music-shows", "music-people", "music-venues"] },
+    { id: "wrestling-shows", path: "/api/wrestling/shows/db?limit=1&page=1", metrics: ["wrestling-shows"] },
+    { id: "wrestling-people", path: "/api/wrestling/people/db?limit=1&page=1", metrics: ["wrestling-people"] },
+    { id: "wrestling-venues", path: "/api/wrestling/venues/db?limit=1&page=1", metrics: ["wrestling-venues"] }
+  ].map(item => Object.freeze({ ...item, metrics: Object.freeze(item.metrics) })));
+  const databaseOverview = databasePanel?.querySelector("[data-admin-database-overview]");
+  const databaseRefresh = databasePanel?.querySelector("[data-database-refresh]");
+  const databaseMessage = databasePanel?.querySelector("[data-database-message]");
+  const databaseChecked = databasePanel?.querySelector("[data-database-checked]");
+  const databaseConnectionNode = databasePanel?.querySelector("[data-database-connection]");
+  const databaseVerified = databasePanel?.querySelector("[data-database-verified]");
+  const databaseConnectionNote = databasePanel?.querySelector("[data-database-connection-note]");
+  const databaseRows = new Map(databaseMetricCatalog.map(item => [item.id, databasePanel?.querySelector(`[data-database-metric="${item.id}"]`)]));
+  const databaseMetrics = new Map(databaseMetricCatalog.map(item => [item.id, emptyDatabaseMetric()]));
+  let databaseGeneration = 0, databaseRun = null, databaseAutoAttempted = false;
+  let databaseLastChecked = null, databaseLastVerified = null, databaseConnection = "Not Checked";
+  let databaseConnectionReason = "No connection check has run.";
+  function emptyDatabaseMetric() { return { count: null, state: "Not Checked", reason: "No count check has run.", checkedAt: null }; }
+  function databaseAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
+      databaseOverview && databaseRefresh && databaseMessage && databaseChecked && databaseConnectionNode && databaseVerified && databaseConnectionNote &&
+      [...databaseRows.values()].every(Boolean);
+  }
+  function updateDatabaseControl() {
+    if (databaseRefresh) { databaseRefresh.disabled = !databaseAllowed() || databaseRun !== null; databaseRefresh.setAttribute("aria-busy", String(databaseRun !== null)); }
+  }
+  function databaseTime(node, value) {
+    if (!node) return;
+    node.textContent = value ? formatAdminDateTime(value) : "—";
+    if (value) { node.dateTime = value; node.title = formatAdminDateTime(value); }
+    else { node.removeAttribute("datetime"); node.removeAttribute("title"); }
+  }
+  function renderDatabaseMetric(id) {
+    const row = databaseRows.get(id), result = databaseMetrics.get(id);
+    if (!row || !result) return;
+    row.dataset.databaseState = result.state;
+    row.querySelector("[data-database-count]").textContent = result.count === null ? "—" : String(result.count);
+    row.querySelector("[data-database-metric-state]").textContent = result.state;
+    row.querySelector("[data-database-metric-note]").textContent = result.reason;
+    if (result.checkedAt) row.setAttribute("aria-description", `Last count check: ${formatAdminDateTime(result.checkedAt)}. ${result.reason}`);
+    else row.removeAttribute("aria-description");
+  }
+  function renderDatabaseConnection() {
+    if (databaseConnectionNode) databaseConnectionNode.textContent = databaseConnection;
+    if (databaseConnectionNote) databaseConnectionNote.textContent = databaseConnectionReason;
+    databaseTime(databaseVerified, databaseLastVerified);
+  }
+  function cancelDatabaseOverview() {
+    databaseGeneration += 1;
+    const run = databaseRun; databaseRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      databaseMetrics.forEach((result, id) => {
+        if (["Checking", "Refreshing"].includes(result.state)) {
+          databaseMetrics.set(id, { ...result, state: result.count === null ? "Canceled" : "Stale", reason: result.count === null ? "Count check canceled." : "Previous count; refresh canceled." });
+          renderDatabaseMetric(id);
+        }
+      });
+      if (databaseConnection === "Checking") { databaseConnection = "Unavailable"; databaseConnectionReason = "Connection check canceled."; renderDatabaseConnection(); }
+      if (databaseMessage) databaseMessage.textContent = "Overview refresh canceled. Refresh to try again.";
+    }
+    updateDatabaseControl();
+  }
+  function resetDatabaseOverview() {
+    cancelDatabaseOverview(); databaseAutoAttempted = false;
+    databaseLastChecked = null; databaseLastVerified = null; databaseConnection = "Not Checked"; databaseConnectionReason = "No connection check has run.";
+    databaseMetricCatalog.forEach(item => { databaseMetrics.set(item.id, emptyDatabaseMetric()); renderDatabaseMetric(item.id); });
+    if (databaseOverview) databaseOverview.open = false;
+    if (databaseMessage) databaseMessage.textContent = "Expand the overview to check its data.";
+    databaseTime(databaseChecked, null); renderDatabaseConnection();
+  }
+  function databaseCurrent(run) {
+    if (databaseRun !== run || run.generation !== databaseGeneration) return false;
+    if (!databaseAllowed()) { cancelDatabaseOverview(); prepareStationEntry(); return false; }
+    return true;
+  }
+  function interpretDatabaseSource(source, data) {
+    if (!diagnosticObject(data) || data.ok !== true) return null;
+    if (source.id === "connection") return data.database === "connected" && parseAdminTimestamp(data.time) ? { connected: true, counts: {} } : null;
+    if (source.id === "music") {
+      if (data.route !== "/api/music/telemetry" || !["live", "partial", "unavailable"].includes(data.status) || !diagnosticObject(data.totals)) return null;
+      const counts = Object.create(null);
+      source.metrics.forEach(id => { const value = data.totals[id.slice(6)]; counts[id] = diagnosticCount(value) ? value : null; });
+      return { counts };
+    }
+    const spec = queryCatalog.find(item => item.id === source.id);
+    const paging = spec && validateQueryPayload(data, { page: 1, limit: 1 }, spec);
+    return paging ? { counts: { [source.id]: paging.total } } : null;
+  }
+  async function checkDatabaseSource(source, run) {
+    const ownController = new AbortController(); run.controllers.add(ownController);
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000); run.timers.add(timer);
+    let result = null, reason = "The source could not be verified.", failureState = "Unavailable", http = null;
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${source.path}`, {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      http = response.status;
+      if (!response.ok) { failureState = "Error"; reason = `HTTP ${response.status}: source unavailable.`; try { await response.body?.cancel(); } catch {} }
+      else {
+        const parsed = await boundedEndpointJson(response, run, ownController);
+        if (parsed.unavailable) reason = "Response exceeds the 128 KiB limit.";
+        else if (parsed.unsupported) { reason = "Bounded responses are unavailable in this browser."; ownController.abort(); }
+        else if (parsed.invalid) { failureState = "Error"; reason = "The source response was not valid JSON."; ownController.abort(); }
+        else { result = interpretDatabaseSource(source, parsed.data); if (!result) { failureState = "Error"; reason = "The source contract was not verified."; } }
+      }
+    } catch {
+      if (timedOut) reason = "The source request exceeded 15 seconds.";
+      else if (http !== null && !ownController.signal.aborted) { failureState = "Error"; reason = "The source contract was not verified."; }
+    }
+    finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController); }
+    return { result, reason, failureState, checkedAt: new Date().toISOString() };
+  }
+  function applyDatabaseSource(source, outcome) {
+    if (source.id === "connection") {
+      databaseConnection = outcome.result?.connected ? "Connected" : outcome.failureState || "Unavailable";
+      if (outcome.result?.connected) databaseLastVerified = outcome.checkedAt;
+      databaseConnectionReason = outcome.result?.connected ? "Database connection verified." : outcome.reason;
+      renderDatabaseConnection();
+    }
+    source.metrics.forEach(id => {
+      const previous = databaseMetrics.get(id), count = outcome.result?.counts[id];
+      const verified = diagnosticCount(count);
+      databaseMetrics.set(id, { count: verified ? count : previous.count, checkedAt: outcome.checkedAt,
+        state: verified ? "Verified" : previous.count === null ? outcome.failureState || "Unavailable" : "Stale",
+        reason: verified ? "Stored collection count." : previous.count !== null ? "Previous count; latest check failed." : outcome.result ? "This count is unavailable." : outcome.reason });
+      renderDatabaseMetric(id);
+    });
+  }
+  async function refreshDatabaseOverview() {
+    if (databaseRun) return;
+    if (!prepareStationEntry() || !databaseAllowed()) return;
+    databaseAutoAttempted = true;
+    const run = { generation: ++databaseGeneration, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
+    databaseRun = run;
+    databaseMetrics.forEach((result, id) => { databaseMetrics.set(id, { ...result, state: result.count === null ? "Checking" : "Refreshing", reason: result.count === null ? "Checking stored count…" : "Previous count; refreshing…" }); renderDatabaseMetric(id); });
+    databaseConnection = "Checking"; databaseConnectionReason = "Checking database connection…"; renderDatabaseConnection();
+    databaseMessage.textContent = "Checking 0 of 5 sources…"; updateDatabaseControl();
+    async function worker() {
+      while (run.cursor < databaseSources.length && databaseCurrent(run)) {
+        const source = databaseSources[run.cursor++], outcome = await checkDatabaseSource(source, run);
+        if (!databaseCurrent(run)) return;
+        applyDatabaseSource(source, outcome); run.completed += 1;
+        databaseMessage.textContent = `Checking ${run.completed} of 5 sources…`;
+      }
+    }
+    await Promise.all(Array.from({ length: 2 }, worker));
+    if (!databaseCurrent(run)) return;
+    databaseRun = null; databaseLastChecked = new Date().toISOString(); databaseTime(databaseChecked, databaseLastChecked);
+    const incomplete = databaseConnection !== "Connected" || [...databaseMetrics.values()].some(result => result.state !== "Verified");
+    databaseMessage.textContent = incomplete ? "Overview checked. Some data is unavailable or stale." : "Database overview checked.";
+    updateDatabaseControl();
+  }
+  databaseOverview?.addEventListener("toggle", () => { if (databaseOverview.open && !databaseAutoAttempted) refreshDatabaseOverview(); });
+  databaseRefresh?.addEventListener("click", refreshDatabaseOverview);
+
+
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();
@@ -1676,6 +1867,9 @@
   apiLogout.addEventListener("click", () => {
     if (!apiPanel.hidden && !apiPanel.hasAttribute("inert")) logout();
   });
+  databaseLogout?.addEventListener("click", () => {
+    if (!databasePanel.hidden && !databasePanel.hasAttribute("inert")) logout();
+  });
   password.addEventListener("keydown", (event) => {
     if (!available() || event.key !== "Enter" || event.isComposing || password.disabled) return;
     event.preventDefault(); connectAction();
@@ -1691,11 +1885,11 @@
     canEnterStation,
     prepareStationEntry,
     setStation(station) {
-      requestedStation = station === "api" ? "api" : "deck";
+      requestedStation = ["api", "database"].includes(station) ? station : "deck";
       updateStationPresentation();
     },
     activate({ station = "deck" } = {}) {
-      requestedStation = station === "api" ? "api" : "deck";
+      requestedStation = ["api", "database"].includes(station) ? station : "deck";
       cancelRequest(); active = true; clearPassword();
       present(bearer ? "unverified" : "idle", bearer ? "Checking your session…" : "Enter your password to connect securely.");
       if (bearer) checkSession();

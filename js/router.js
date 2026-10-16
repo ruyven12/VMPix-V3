@@ -181,8 +181,9 @@ function getRouteFromUrl(url = window.location.href) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
   if (routePath === routePaths.admin) {
-    const adminStation = routeUrl.searchParams.get("station") === "api" ? "api" : "deck";
-    return { name: "admin", adminStation, canonicalUrl: adminStation === "api" ? `${routePaths.admin}?station=api` : routePaths.admin };
+    const station = routeUrl.searchParams.get("station");
+    const adminStation = ["api", "database"].includes(station) ? station : "deck";
+    return { name: "admin", adminStation, canonicalUrl: adminStation === "deck" ? routePaths.admin : `${routePaths.admin}?station=${adminStation}` };
   }
   if (routePath === routePaths.connect) {
     return { name: "connect", canonicalUrl: routePaths.connect };
