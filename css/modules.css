@@ -32572,3 +32572,20 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 /* Admin 3G: status timestamps must not squeeze their mobile labels. */
 .admin-shell [data-admin-music-status-report] .admin-diagnostic__facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+
+/* Admin 3H: reserve measured Eastern date lines on existing timestamp surfaces. */
+.admin-shell [data-admin-api-verified] { min-block-size: 3em; }
+.admin-shell .admin-endpoints .admin-endpoints__summary > .admin-endpoints__completed,
+.admin-shell .admin-diagnostics .admin-diagnostics__completed,
+.admin-shell .admin-diagnostic__checked > .admin-diagnostic__timestamp { min-block-size: 2.9em; }
+@media (max-width: 839px) {
+  .admin-shell .admin-endpoints .admin-endpoints__completed > time,
+  .admin-shell .admin-diagnostics__completed > time,
+  .admin-shell .admin-diagnostic__timestamp > time { display: block; }
+}
+@media (min-width: 840px) {
+  .admin-shell .admin-endpoints .admin-endpoints__summary > .admin-endpoints__completed,
+  .admin-shell .admin-diagnostics .admin-diagnostics__completed,
+  .admin-shell .admin-diagnostic__checked > .admin-diagnostic__timestamp { min-block-size: 1.45em; }
+}

@@ -2454,7 +2454,7 @@
                   <div class="admin-diagnostics__summary" role="group" aria-label="Latest results per diagnostic">
                     <p role="status" aria-live="polite" aria-atomic="true" data-admin-diagnostic-progress>0 / 7 supported diagnostics checked</p>
                     <p data-admin-diagnostic-totals>0 healthy · 0 warnings · 0 errors · 0 unavailable. 3 diagnostics are not implemented.</p>
-                    <p>Last completed: <time data-admin-diagnostic-completed>—</time></p>
+                    <p class="admin-diagnostics__completed">Last completed: <time data-admin-diagnostic-completed>—</time></p>
                     <p>Manual, read-only checks. Timeout: 15s. Response limit: 128 KiB.</p>
                     <p>Technical views are available after checks finish.</p>
                   </div>
@@ -2466,7 +2466,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   </ul>
@@ -2479,7 +2479,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/music</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="music-bands" data-diagnostic-state="Not Checked">
@@ -2487,7 +2487,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/music/bands</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="music-shows" data-diagnostic-state="Not Checked">
@@ -2495,7 +2495,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/music/shows</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="music-people" data-diagnostic-state="Not Checked">
@@ -2503,7 +2503,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/music/people</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="music-venues" data-diagnostic-state="Not Checked">
@@ -2511,10 +2511,18 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/music/venues</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   </ul>
+                  <details class="admin-diagnostics__group" data-admin-smug-diagnostics><summary>SmugMug Diagnostics</summary>
+                    <button class="admin-diagnostics__category" type="button" disabled aria-disabled="true" aria-describedby="admin-smug-unavailable">Run Diagnostics</button>
+                    <div class="admin-diagnostics__rows"><article class="admin-diagnostic" aria-label="SmugMug diagnostics unavailable">
+                      <code class="admin-diagnostic__path">/api/admin/smug/music/diagnostics</code>
+                      <p class="admin-diagnostic__reason" id="admin-smug-unavailable">Unavailable: this backend diagnostic performs schema maintenance and cannot be run from this read-only console.</p>
+                    </article></div>
+                  </details>
+
                 </details>
                 <details class="admin-diagnostics__group" data-admin-diagnostic-group="wrestling"><summary>Wrestling Diagnostics</summary>
                   <button class="admin-diagnostics__category" type="button" data-admin-diagnostic-category="wrestling" aria-label="Run Wrestling Diagnostics" disabled>Run Diagnostics</button>
@@ -2524,7 +2532,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/wrestling</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="wrestling-shows" data-diagnostic-state="Unavailable">
@@ -2532,7 +2540,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/wrestling/shows</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Unavailable</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Not implemented by the current API.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="wrestling-people" data-diagnostic-state="Unavailable">
@@ -2540,7 +2548,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/wrestling/people</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Unavailable</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Not implemented by the current API.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   <li class="admin-diagnostic" data-admin-diagnostic="wrestling-venues" data-diagnostic-state="Unavailable">
@@ -2548,7 +2556,7 @@
                     <code class="admin-diagnostic__path">/api/admin/diagnostics/wrestling/venues</code>
                     <p class="admin-diagnostic__response"><span data-diagnostic-state>Unavailable</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Not implemented by the current API.</p>
-                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span>Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   </ul>
@@ -2560,7 +2568,7 @@
                       <code class="admin-diagnostic__path">/api/status/music</code>
                       <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
                       <p class="admin-diagnostic__reason" role="status" aria-live="polite" aria-atomic="true" data-music-status-reason>No status check has run.</p>
-                      <p class="admin-diagnostic__checked"><span data-music-status-warnings>Reported warnings: —</span><span>Last checked: <time data-music-status-checked>—</time></span></p>
+                      <p class="admin-diagnostic__checked"><span data-music-status-warnings>Reported warnings: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-music-status-checked>—</time></span></p>
                       <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-music-status-facts hidden></dl><ul class="admin-diagnostic__details" data-music-status-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-music-status-json>No report available.</pre></details></details>
                     </article>
                   </div>

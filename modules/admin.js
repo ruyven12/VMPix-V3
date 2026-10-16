@@ -1,6 +1,30 @@
 /* Admin owns its local login state; the bearer exists only in this document's memory. */
 (function () {
   "use strict";
+  // Display only: transport timestamps and authentication deadlines keep their original values.
+  let adminEasternFormatter = null;
+  function parseAdminTimestamp(value) {
+    if (value instanceof Date) return Number.isFinite(value.getTime()) ? value : null;
+    if (typeof value !== "string") return null;
+    const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+    if (!match) return null;
+    const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+    const days = [31, year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (month < 1 || month > 12 || day < 1 || day > days[month - 1] || Number(match[4]) > 23 || Number(match[5]) > 59 || Number(match[6]) > 59 ||
+        match[7] !== "Z" && (Number(match[7].slice(1, 3)) > 23 || Number(match[7].slice(4, 6)) > 59)) return null;
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date : null;
+  }
+  function formatAdminDateTime(value, fallback = "—") {
+    const date = parseAdminTimestamp(value);
+    if (!date) return fallback;
+    try {
+      adminEasternFormatter ||= new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true, timeZoneName: "short" });
+      const parts = Object.fromEntries(adminEasternFormatter.formatToParts(date).map(part => [part.type, part.value]));
+      return `${parts.month} ${parts.day}, ${parts.year} · ${parts.hour}:${parts.minute} ${parts.dayPeriod} ${parts.timeZoneName}`;
+    } catch { return fallback; }
+  }
+
   const API = "https://vmpix-data.onrender.com/api/v3/admin/auth";
   const host = document.querySelector("[data-admin-shell]");
   const password = host?.querySelector("[data-admin-password]");
@@ -409,8 +433,8 @@
     updateMonitorControls();
     const completed = new Date();
     apiVerified.dateTime = completed.toISOString();
-    apiVerified.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    apiVerified.title = `Most recent completed check: ${completed.toLocaleString()}`;
+    apiVerified.textContent = formatAdminDateTime(completed);
+    apiVerified.title = `Most recent completed check: ${formatAdminDateTime(completed)}`;
     apiResponse.textContent = elapsed === null ? "—" : `${Math.round(elapsed)} ms`;
     apiConnection.textContent = outcome === "connected" ? "CONNECTED" : outcome === "unavailable" ? "UNAVAILABLE" : "ERROR";
     apiStatus.textContent = outcome === "connected" ? "Signal Verified" : outcome === "unavailable" ? "Signal Unavailable" : "Check Failed";
@@ -593,8 +617,8 @@
     monitorRun = null;
     const completed = new Date();
     monitorCompleted.dateTime = completed.toISOString();
-    monitorCompleted.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    monitorCompleted.title = completed.toLocaleString();
+    monitorCompleted.textContent = formatAdminDateTime(completed);
+    monitorCompleted.title = formatAdminDateTime(completed);
     monitorProgress.textContent = `Complete: ${run.completed} / ${ids.length} checked`;
     updateStationControl(); updateMonitorControls();
   }
@@ -666,9 +690,9 @@
     row.querySelector("[data-diagnostic-reason]").textContent = result.reason;
     row.querySelector("[data-diagnostic-issues]").textContent = result.issues === null ? "Reported issues: —" : result.issues;
     const checked = row.querySelector("[data-diagnostic-checked]");
-    checked.textContent = result.checkedAt === null ? "—" : new Date(result.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    checked.textContent = result.checkedAt === null ? "—" : formatAdminDateTime(result.checkedAt);
     if (result.checkedAt === null) { checked.removeAttribute("datetime"); checked.removeAttribute("title"); }
-    else { checked.dateTime = result.checkedAt; checked.title = new Date(result.checkedAt).toLocaleString(); }
+    else { checked.dateTime = result.checkedAt; checked.title = formatAdminDateTime(result.checkedAt); }
     const facts = row.querySelector("[data-diagnostic-facts]");
     facts.replaceChildren();
     result.facts.forEach(([label, value]) => {
@@ -783,6 +807,9 @@
       [value.warnings, value.summary?.warnings, value.importHealth?.staleWarnings].forEach(warnings => {
         if (Array.isArray(warnings)) { if (warnings.length > 10) bounded = true; warnings.slice(0, 10).forEach(item => append(`${label} · Warning`, item)); }
       });
+      const dates = [["Generated", value.generatedAt], ["Latest successful import", value.importHealth?.lastSuccessfulImportAt],
+        ["Latest failed import", value.importHealth?.lastFailedImportAt], ["Statistics last rebuilt", value.statsHealth?.lastRebuiltAt]];
+      dates.forEach(([name, timestamp]) => { if (timestamp !== undefined) append(`${label} · ${name}`, formatAdminDateTime(timestamp, "Not recorded")); });
       if (typeof value.importHealth?.latestFailureReason === "string") append(`${label} · Import failure`, value.importHealth.latestFailureReason);
       if (Array.isArray(value.importHealth?.latestImports)) {
         if (value.importHealth.latestImports.length > 10) bounded = true;
@@ -805,7 +832,7 @@
           if (records.length > 5) bounded = true;
           records.slice(0, 5).forEach(record => {
             if (!diagnosticObject(record)) return;
-            const fields = sampleFields.filter(key => ["string", "number", "boolean"].includes(typeof record[key])).map(key => `${diagnosticLabel(key)}: ${String(record[key])}`);
+            const fields = sampleFields.filter(key => ["string", "number", "boolean"].includes(typeof record[key])).map(key => `${diagnosticLabel(key)}: ${key === "date" && parseAdminTimestamp(record[key]) ? formatAdminDateTime(record[key]) : String(record[key])}`);
             if (fields.length && details.length < 60) details.push(`${label} · ${diagnosticLabel(name)} · ${diagnosticLabel(issue)}: ${fields.join(" · ")}`);
           });
         });
@@ -995,8 +1022,8 @@
     if (!diagnosticCurrent(run)) return;
     diagnosticsRun = null;
     const completed = new Date(); diagnosticsCompleted.dateTime = completed.toISOString();
-    diagnosticsCompleted.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    diagnosticsCompleted.title = completed.toLocaleString();
+    diagnosticsCompleted.textContent = formatAdminDateTime(completed);
+    diagnosticsCompleted.title = formatAdminDateTime(completed);
     diagnosticsProgress.textContent = `Complete: ${run.completed} / ${supported.length} checked`;
     updateStationControl();
   }
@@ -1037,9 +1064,9 @@
     musicStatusRow.querySelector("[data-music-status-reason]").textContent = result.reason;
     musicStatusRow.querySelector("[data-music-status-warnings]").textContent = result.warnings === null ? "Reported warnings: —" : `Reported warnings: ${result.warnings}`;
     const checked = musicStatusRow.querySelector("[data-music-status-checked]");
-    checked.textContent = result.checkedAt === null ? "—" : new Date(result.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    checked.textContent = result.checkedAt === null ? "—" : formatAdminDateTime(result.checkedAt);
     if (result.checkedAt === null) { checked.removeAttribute("datetime"); checked.removeAttribute("title"); }
-    else { checked.dateTime = result.checkedAt; checked.title = new Date(result.checkedAt).toLocaleString(); }
+    else { checked.dateTime = result.checkedAt; checked.title = formatAdminDateTime(result.checkedAt); }
     const facts = musicStatusRow.querySelector("[data-music-status-facts]"); facts.replaceChildren();
     result.facts.forEach(([label, value]) => { const term = document.createElement("dt"), detail = document.createElement("dd"); term.textContent = label; detail.textContent = String(value); facts.append(term, detail); });
     facts.hidden = result.facts.length === 0;
@@ -1077,11 +1104,11 @@
     const facts = [["Database connected", data.database.connected ? "Yes" : "No"]];
     categories.forEach(category => {
       facts.push([`${diagnosticLabel(category)} table`, data.tables[`music_${category}`] ? "Available" : "Unavailable"],
-        [`${diagnosticLabel(category)} records`, data.counts[category]], [`${diagnosticLabel(category)} · Latest logged import`, data.imports[`${category}LastImport`] || "Not recorded"]);
+        [`${diagnosticLabel(category)} records`, data.counts[category]], [`${diagnosticLabel(category)} · Latest logged import`, formatAdminDateTime(data.imports[`${category}LastImport`], "Not recorded")]);
     });
     const qualityLabels = { venuesMissingGps: "Venues missing GPS", venuesMissingLogo: "Venues missing logo", showsMissingPoster: "Shows missing poster", peopleMissingBands: "People missing bands", bandsMissingStatus: "Bands missing status" };
     quality.forEach(key => facts.push([qualityLabels[key], data.dataQuality[key]]));
-    facts.push(["Backend generated at", data.generatedAt]);
+    facts.push(["Backend generated at", formatAdminDateTime(data.generatedAt)]);
     return { state: unavailable ? "Unavailable" : findings ? "Warning" : "Healthy",
       reason: unavailable ? "Required music context is unavailable." : findings ? "Music status has warnings." : "Music status is operational.",
       warnings: data.warnings.length, facts, details: data.warnings.slice(0, 20).map(warning => `Backend warning: ${warning}`) };
