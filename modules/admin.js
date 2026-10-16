@@ -185,7 +185,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -302,7 +302,7 @@
   function updateStationControl() {
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
-    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null;
+    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null;
     updateMonitorControls();
   }
   function updateStationPresentation(shouldFocus = true) {
@@ -342,6 +342,7 @@
     signalController = null;
     signalBusy = false;
     cancelMonitor();
+    cancelDiagnostics();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -356,7 +357,7 @@
     if (available() && bearer && expiresAt <= Date.now()) {
       clearSession(); present("idle", "Your session has expired. Connect again."); return;
     }
-    if (!signalAllowed() || signalBusy || monitorRun !== null) return;
+    if (!signalAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null) return;
     const at = ++signalGeneration;
     const ownController = new AbortController();
     signalController = ownController;
@@ -438,9 +439,10 @@
       endpointRows.size === 10 && [...endpointRows.values()].every(Boolean);
   }
   function updateMonitorControls() {
-    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null;
+    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null;
     if (monitorAll) { monitorAll.disabled = disabled; monitorAll.setAttribute("aria-busy", String(monitorRun !== null)); }
     endpointRows.forEach(row => { const button = row?.querySelector("[data-admin-endpoint-check]"); if (button) button.disabled = disabled; });
+    updateDiagnosticControls();
   }
   function renderEndpoint(id) {
     const row = endpointRows.get(id), result = endpointResults.get(id);
@@ -565,7 +567,7 @@
     return { state, http, elapsed: performance.now() - started, reason };
   }
   async function runEndpointChecks(ids) {
-    if (signalBusy || monitorRun) return;
+    if (signalBusy || monitorRun || diagnosticsRun) return;
     if (!prepareStationEntry() || !monitorAllowed()) return;
     if (ids.length === endpointCatalog.length) endpointCatalog.forEach(spec => { endpointResults.set(spec.id, uncheckedEndpoint()); renderEndpoint(spec.id); });
     const run = { generation: ++monitorGeneration, ids, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
@@ -597,6 +599,409 @@
   }
   monitorAll?.addEventListener("click", () => runEndpointChecks(endpointCatalog.map(spec => spec.id)));
   endpointCatalog.forEach(spec => endpointRows.get(spec.id)?.querySelector("[data-admin-endpoint-check]")?.addEventListener("click", () => runEndpointChecks([spec.id])));
+
+  // Fixed read-only diagnostics share the authenticated session, never legacy credentials.
+  const diagnosticCatalog = Object.freeze([{"id":"global-overview","group":"global","name":"Overall Backend","path":"/api/admin/diagnostics","section":"global","category":null,"supported":true},{"id":"music-overview","group":"music","name":"Overall Music","path":"/api/admin/diagnostics/music","section":"music","category":null,"supported":true},{"id":"music-bands","group":"music","name":"Bands","path":"/api/admin/diagnostics/music/bands","section":"music","category":"bands","supported":true},{"id":"music-shows","group":"music","name":"Shows","path":"/api/admin/diagnostics/music/shows","section":"music","category":"shows","supported":true},{"id":"music-people","group":"music","name":"People","path":"/api/admin/diagnostics/music/people","section":"music","category":"people","supported":true},{"id":"music-venues","group":"music","name":"Venues","path":"/api/admin/diagnostics/music/venues","section":"music","category":"venues","supported":true},{"id":"wrestling-overview","group":"wrestling","name":"Overall Wrestling","path":"/api/admin/diagnostics/wrestling","section":"wrestling","category":null,"supported":true},{"id":"wrestling-shows","group":"wrestling","name":"Shows","path":"/api/admin/diagnostics/wrestling/shows","section":"wrestling","category":"shows","supported":false},{"id":"wrestling-people","group":"wrestling","name":"People","path":"/api/admin/diagnostics/wrestling/people","section":"wrestling","category":"people","supported":false},{"id":"wrestling-venues","group":"wrestling","name":"Venues","path":"/api/admin/diagnostics/wrestling/venues","section":"wrestling","category":"venues","supported":false}].map(spec => Object.freeze(spec)));
+  const diagnosticsPanel = host.querySelector("[data-admin-diagnostics]");
+  const diagnosticsAll = diagnosticsPanel?.querySelector("[data-admin-diagnostic-all]");
+  const diagnosticsProgress = diagnosticsPanel?.querySelector("[data-admin-diagnostic-progress]");
+  const diagnosticsTotals = diagnosticsPanel?.querySelector("[data-admin-diagnostic-totals]");
+  const diagnosticsCompleted = diagnosticsPanel?.querySelector("[data-admin-diagnostic-completed]");
+  const diagnosticRows = new Map(diagnosticCatalog.map(spec => [spec.id, diagnosticsPanel?.querySelector(`[data-admin-diagnostic="${spec.id}"]`)]));
+  const diagnosticResults = new Map(diagnosticCatalog.map(spec => [spec.id, uncheckedDiagnostic(spec)]));
+  let diagnosticsGeneration = 0;
+  let diagnosticsRun = null;
+  const diagnosticMetrics = Object.freeze({
+    music: {
+      bands: { total: "total_bands", issues: ["bands_missing_id", "duplicate_band_ids", "bands_missing_name", "duplicate_band_names", "bands_missing_status", "bands_missing_region"] },
+      shows: { total: "total_shows", issues: ["shows_missing_show_name", "shows_missing_date", "shows_missing_venue", "duplicate_show_keys"] },
+      people: { total: "total_people", issues: ["people_missing_id", "duplicate_person_ids", "people_missing_name", "duplicate_person_names", "people_missing_category"] },
+      venues: { total: "total_venues", issues: ["venues_missing_id", "duplicate_venue_ids", "venues_missing_name", "duplicate_venue_names", "venues_missing_city", "venues_missing_state", "venues_missing_gps", "venues_pending_geocode_enrichment", "bad_column_mapping_detected"], information: ["music_shows_total", "music_shows_with_venue_id", "matching_show_venue_relationships", "venues_with_show_count", "venues_with_gps", "venues_with_formatted_address"] }
+    },
+    wrestling: {
+      shows: { total: "total_records", issues: ["records_missing_show_name", "records_missing_date", "records_missing_venue_id", "duplicate_show_keys", "records_with_invalid_venue_id"] },
+      people: { total: "total_people", issues: ["people_missing_name", "people_missing_category", "duplicate_person_ids"] },
+      venues: { total: "total_venues", issues: ["venues_missing_gps", "venues_missing_name", "duplicate_venue_ids"], information: ["venues_with_gps"] },
+      matches: { total: "total_matches", issues: ["matches_missing_participants", "matches_missing_winner", "matches_missing_match_type", "matches_missing_match_order"], information: ["total_records"] }
+    }
+  });
+  function diagnosticObject(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+  function diagnosticCount(value) { return Number.isSafeInteger(value) && value >= 0; }
+  function diagnosticLabel(key) { const words = key.replace(/_/g, " "); return words.charAt(0).toUpperCase() + words.slice(1); }
+  function uncheckedDiagnostic(spec, reason = "Run this diagnostic to inspect its report.") {
+    return { state: spec.supported ? "Not Checked" : "Unavailable", http: null, elapsed: null,
+      reason: spec.supported ? reason : "Not implemented by the current API.", facts: [], details: [], technical: null, issues: null, checkedAt: null };
+  }
+  function diagnosticsAllowed() {
+    return signalAllowed() && diagnosticsPanel && diagnosticsAll && diagnosticsProgress && diagnosticsTotals && diagnosticsCompleted &&
+      diagnosticRows.size === 10 && [...diagnosticRows.values()].every(Boolean);
+  }
+  function updateDiagnosticControls() {
+    const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null;
+    diagnosticsPanel?.querySelectorAll("[data-admin-diagnostic-run], [data-admin-diagnostic-category], [data-admin-diagnostic-all]").forEach(button => {
+      const spec = diagnosticCatalog.find(item => item.id === button.dataset.adminDiagnosticRun);
+      button.disabled = disabled || Boolean(spec && !spec.supported);
+      button.setAttribute("aria-busy", String(diagnosticsRun !== null));
+    });
+  }
+  function renderDiagnostic(id) {
+    const row = diagnosticRows.get(id), result = diagnosticResults.get(id);
+    if (!row || !result) return;
+    const technical = row.querySelector(".admin-diagnostic__technical"), checking = result.state === "Checking";
+    if (checking && technical.contains(document.activeElement)) document.activeElement.blur();
+    technical.toggleAttribute("inert", checking);
+    ["aria-disabled", "aria-busy"].forEach(attribute => {
+      if (checking) technical.setAttribute(attribute, "true"); else technical.removeAttribute(attribute);
+    });
+    technical.querySelectorAll("summary").forEach(summary => {
+      if (checking) { summary.setAttribute("aria-disabled", "true"); summary.setAttribute("tabindex", "-1"); }
+      else { summary.removeAttribute("aria-disabled"); summary.removeAttribute("tabindex"); }
+    });
+    row.dataset.diagnosticState = result.state;
+    row.querySelector("[data-diagnostic-state]").textContent = result.state;
+    row.querySelector("[data-diagnostic-http]").textContent = result.http === null ? "HTTP —" : `HTTP ${result.http}`;
+    row.querySelector("[data-diagnostic-time]").textContent = result.elapsed === null ? "Time —" : `Time ${Math.round(result.elapsed)} ms`;
+    row.querySelector("[data-diagnostic-reason]").textContent = result.reason;
+    row.querySelector("[data-diagnostic-issues]").textContent = result.issues === null ? "Reported issues: —" : result.issues;
+    const checked = row.querySelector("[data-diagnostic-checked]");
+    checked.textContent = result.checkedAt === null ? "—" : new Date(result.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    if (result.checkedAt === null) { checked.removeAttribute("datetime"); checked.removeAttribute("title"); }
+    else { checked.dateTime = result.checkedAt; checked.title = new Date(result.checkedAt).toLocaleString(); }
+    const facts = row.querySelector("[data-diagnostic-facts]");
+    facts.replaceChildren();
+    result.facts.forEach(([label, value]) => {
+      const term = document.createElement("dt"), detail = document.createElement("dd");
+      term.textContent = label; detail.textContent = String(value); facts.append(term, detail);
+    });
+    facts.hidden = result.facts.length === 0;
+    const details = row.querySelector("[data-diagnostic-details]"); details.replaceChildren();
+    result.details.forEach(text => { const item = document.createElement("li"); item.textContent = text; details.appendChild(item); });
+    row.querySelector("[data-diagnostic-json]").textContent = result.technical === null ? "No report available." : result.technical;
+  }
+  function renderDiagnosticTotals() {
+    let healthy = 0, findings = 0, failed = 0, unavailable = 0;
+    diagnosticCatalog.filter(spec => spec.supported).forEach(spec => {
+      const state = diagnosticResults.get(spec.id).state;
+      if (state === "Healthy") healthy += 1;
+      else if (state === "Warning") findings += 1;
+      else if (state === "Error") failed += 1;
+      else if (state === "Unavailable") unavailable += 1;
+    });
+    if (diagnosticsTotals) diagnosticsTotals.textContent = `${healthy} healthy · ${findings} warnings · ${failed} errors · ${unavailable} unavailable. 3 diagnostics are not implemented.`;
+  }
+  function cancelDiagnostics() {
+    diagnosticsGeneration += 1;
+    const run = diagnosticsRun; diagnosticsRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout);
+      run.controllers.forEach(item => item.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      diagnosticCatalog.forEach(spec => {
+        if (diagnosticResults.get(spec.id).state === "Checking") {
+          diagnosticResults.set(spec.id, uncheckedDiagnostic(spec, "Check canceled before verification.")); renderDiagnostic(spec.id);
+        }
+      });
+      if (diagnosticsProgress) diagnosticsProgress.textContent = `Canceled: ${run.completed} / ${run.ids.length} checked`;
+      renderDiagnosticTotals();
+    }
+    updateStationControl();
+  }
+  function resetDiagnosticReports() {
+    cancelDiagnostics();
+    diagnosticCatalog.forEach(spec => { diagnosticResults.set(spec.id, uncheckedDiagnostic(spec)); renderDiagnostic(spec.id); });
+    if (diagnosticsProgress) diagnosticsProgress.textContent = "0 / 7 supported diagnostics checked";
+    if (diagnosticsCompleted) { diagnosticsCompleted.textContent = "—"; diagnosticsCompleted.removeAttribute("datetime"); diagnosticsCompleted.removeAttribute("title"); }
+    renderDiagnosticTotals();
+  }
+  function diagnosticCurrent(run) {
+    if (diagnosticsRun !== run || run.generation !== diagnosticsGeneration) return false;
+    if (!signalAllowed()) { cancelDiagnostics(); prepareStationEntry(); return false; }
+    return true;
+  }
+  function sanitizeDiagnosticResponse(input, privateToken) {
+    let nodes = 0, characters = 0, omitted = false, unverified = false;
+    const sensitiveKey = key => /auth|cookie|token|session|password|passwd|pwd|passphrase|secret|hash|apikey|credential|privatekey|bearer|signingkey|connectionstring|connectionurl|databaseurl|dburl|dsn|stack|trace/.test(key.toLowerCase().replace(/[^a-z0-9]/g, ""));
+    const redactString = (input, keyName = false) => {
+      let value = input.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
+      const context = value.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!keyName && /password|passwd|passphrase|apikey|secret|accesstoken|accesskey|sessiontoken|refreshtoken|authorization|bearer|cookie|credential|privatekey/.test(context)) return "[REDACTED: credential context]";
+      if (privateToken) value = value.split(privateToken).join("[REDACTED]");
+      value = value.replace(/-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?(?:-----END [A-Z ]*PRIVATE KEY-----|$)/g, "[REDACTED PRIVATE KEY]")
+        .replace(/scrypt\$v1\$[0-9a-f]{32}\$[0-9a-f]{64}/gi, "[REDACTED PASSWORD HASH]")
+        .replace(/\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}/g, "[REDACTED PASSWORD HASH]")
+        .replace(/\$argon2(?:id|i|d)\$(?:v=\d+\$)?[^\s$]+\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+/g, "[REDACTED PASSWORD HASH]")
+        .replace(/\b(?:Bearer|Basic)\s+[^\s<>"']+/gi, "[REDACTED AUTHORIZATION]")
+        .replace(/\b[0-9a-f]{64}\b/gi, "[REDACTED TOKEN]")
+        .replace(/\b[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/g, "[REDACTED JWT]")
+        .replace(/\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|rediss?|amqps?):\/\/[^\s<>"']+/gi, "[REDACTED CONNECTION URL]")
+        .replace(/\b[a-z0-9_-]*(?:password|passwd|pwd|passphrase|api[_-]?key|token|session|secret|credential|hash|connection[_-]?(?:string|url)|database[_-]?url|db[_-]?url)[a-z0-9_-]*\s*[:=]\s*(?:"[^"]*"|'[^']*'|[^\s,;]+)/gi, "[REDACTED CREDENTIAL]")
+        .replace(/https?:\/\/[^\s<>"']+/gi, text => {
+          try { const url = new URL(text); return url.username || url.password || [...url.searchParams.keys()].some(sensitiveKey) ? "[REDACTED URL]" : text; }
+          catch { return "[OMITTED URL]"; }
+        });
+      if (value.length > 1024) { omitted = true; value = value.slice(0, 1024) + " [OMITTED: string limit]"; }
+      characters += value.length;
+      return value;
+    };
+    const visit = (value, depth) => {
+      if (++nodes > 2500 || characters > 36000 || depth > 8) { omitted = true; return "[OMITTED: safety limit]"; }
+      if (value === null || typeof value === "boolean") return value;
+      if (typeof value === "number") { if (Number.isFinite(value)) return value; omitted = true; return "[OMITTED: invalid number]"; }
+      if (typeof value === "string") return redactString(value);
+      if (Array.isArray(value)) {
+        const result = value.slice(0, 100).map(item => visit(item, depth + 1));
+        if (value.length > 100) { omitted = true; result.push("[OMITTED: item limit]"); }
+        return result;
+      }
+      if (!diagnosticObject(value)) { omitted = true; return "[OMITTED: unsupported value]"; }
+      const result = Object.create(null), keys = Object.keys(value);
+      keys.slice(0, 100).forEach(key => {
+        const normalized = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (["proto", "prototype", "constructor"].includes(normalized)) { omitted = true; unverified = true; return; }
+        const cleanedKey = redactString(key, true), safeKey = cleanedKey.slice(0, 128);
+        // Rewriting an incoming key must never manufacture a valid contract field.
+        if (safeKey !== key || Object.prototype.hasOwnProperty.call(result, safeKey)) { omitted = true; unverified = true; return; }
+        result[safeKey] = sensitiveKey(key) ? "[REDACTED]" : visit(value[key], depth + 1);
+      });
+      if (keys.length > 100) { omitted = true; result.omitted_fields = "[OMITTED: field limit]"; }
+      return result;
+    };
+    const data = visit(input, 0), text = JSON.stringify(data, null, 2);
+    if (new TextEncoder().encode(text).length > 65536) return { data: null, omitted: true, unverified: true, text: '{"omitted":"Sanitized response exceeded the 64 KiB display limit."}' };
+    return { data, text, omitted, unverified };
+  }
+  function diagnosticDetails(data, spec) {
+    const details = [], sampleFields = ["id", "band_id", "band", "show_id", "show_name", "date", "person_id", "name", "category", "venue_id", "venue_name", "venue", "city", "state", "count"];
+    let bounded = false;
+    const describe = value => ["string", "number"].includes(typeof value) ? String(value) : diagnosticObject(value) ? ["code", "type", "message", "description", "reason", "error"].filter(key => ["string", "number"].includes(typeof value[key])).map(key => `${key}: ${value[key]}`).join(" · ") : "";
+    const append = (label, value) => { const text = describe(value); if (text && details.length < 60) details.push(`${label}: ${text}`); };
+    const inspect = (value, label, category) => {
+      if (!diagnosticObject(value)) return;
+      ["code", "error", "message", "description", "reason"].forEach(key => append(`${label} · ${diagnosticLabel(key)}`, value[key]));
+      [value.warnings, value.summary?.warnings, value.importHealth?.staleWarnings].forEach(warnings => {
+        if (Array.isArray(warnings)) { if (warnings.length > 10) bounded = true; warnings.slice(0, 10).forEach(item => append(`${label} · Warning`, item)); }
+      });
+      if (typeof value.importHealth?.latestFailureReason === "string") append(`${label} · Import failure`, value.importHealth.latestFailureReason);
+      if (Array.isArray(value.importHealth?.latestImports)) {
+        if (value.importHealth.latestImports.length > 10) bounded = true;
+        value.importHealth.latestImports.slice(0, 10).forEach(item => {
+          if (!diagnosticObject(item)) return;
+          if (typeof item.status === "string") append(`${label} · Import status`, item.status);
+          if (typeof item.sync_health === "string") append(`${label} · Import health`, item.sync_health);
+          if (typeof item.error_message === "string") append(`${label} · Import message`, item.error_message);
+        });
+      }
+      if (typeof value.shows?.refresh_hint === "string") append(`${label} · Backend hint`, value.shows.refresh_hint);
+      if (typeof value.relationships?.refresh_hint === "string") append(`${label} · Backend hint`, value.relationships.refresh_hint);
+      const groups = category ? [category] : Object.keys(diagnosticMetrics[label === "Wrestling" ? "wrestling" : "music"] || {});
+      groups.forEach(name => {
+        const samples = value[name]?.samples;
+        if (!diagnosticObject(samples)) return;
+        if (Object.keys(samples).length > 20) bounded = true;
+        Object.entries(samples).slice(0, 20).forEach(([issue, records]) => {
+          if (!Array.isArray(records)) return;
+          if (records.length > 5) bounded = true;
+          records.slice(0, 5).forEach(record => {
+            if (!diagnosticObject(record)) return;
+            const fields = sampleFields.filter(key => ["string", "number", "boolean"].includes(typeof record[key])).map(key => `${diagnosticLabel(key)}: ${String(record[key])}`);
+            if (fields.length && details.length < 60) details.push(`${label} · ${diagnosticLabel(name)} · ${diagnosticLabel(issue)}: ${fields.join(" · ")}`);
+          });
+        });
+      });
+      if (diagnosticObject(value.relationships)) {
+        if (Object.keys(value.relationships).length > 20) bounded = true;
+        Object.entries(value.relationships).slice(0, 20).forEach(([key, field]) => {
+        if (diagnosticCount(field)) append(`${label} · Relationship`, `${diagnosticLabel(key)}: ${field}`);
+        else if (Array.isArray(field)) {
+          if (field.length > 10) bounded = true;
+          field.slice(0, 10).forEach(item => { if (["string", "number"].includes(typeof item)) append(`${label} · ${diagnosticLabel(key)}`, String(item)); });
+        }
+        });
+      }
+    };
+    if (spec.section === "global") { inspect(data, "Global", null); inspect(data?.music, "Music", null); inspect(data?.wrestling, "Wrestling", null); }
+    else inspect(data, spec.section === "music" ? "Music" : "Wrestling", spec.category);
+    if (bounded || details.length === 60) details.push("Some structured details are omitted by display limits. Technical Response may also be bounded.");
+    return details;
+  }
+  function diagnosticDomain(data, domain, category = null) {
+    if (diagnosticObject(data) && data.ok === false) return { unavailable: false, error: true, findings: false, findingCounters: null, facts: [["Report verified", "No"]] };
+    if (!diagnosticObject(data) || data.ok !== true || !diagnosticObject(data.summary)) throw new Error("Invalid report");
+    const summary = data.summary, names = domain === "music" ? ["bands", "shows", "people", "venues"] : ["shows", "people", "venues"];
+    if (typeof summary.database_connected !== "boolean" || !diagnosticObject(summary.tables) || !diagnosticCount(summary.warning_count) ||
+        names.some(name => typeof summary.tables[`${domain}_${name}`] !== "boolean")) throw new Error("Invalid context");
+    const facts = [["Database connected", summary.database_connected ? "Yes" : "No"], ["Reported warnings", summary.warning_count]];
+    const clean = { ok: true, summary: { database_connected: summary.database_connected, tables: {}, warning_count: summary.warning_count } };
+    names.forEach(name => { clean.summary.tables[`${domain}_${name}`] = summary.tables[`${domain}_${name}`]; });
+    let unavailable = !summary.database_connected || (category ? !summary.tables[`${domain}_${category}`] : names.some(name => !summary.tables[`${domain}_${name}`]));
+    if (unavailable) return { unavailable: true, error: false, findings: false, findingCounters: null, facts };
+    let findingCounters = 0, unknownHealth = false, error = false, importUnverified = false;
+    const selected = category ? [category] : Object.keys(diagnosticMetrics[domain]);
+    selected.forEach(name => {
+      const definition = diagnosticMetrics[domain][name], values = data[name];
+      if (!diagnosticObject(values) || !diagnosticCount(values[definition.total])) {
+        if (!unavailable) throw new Error("Missing metrics");
+        return;
+      }
+      const output = {}; clean[name] = output;
+      output[definition.total] = values[definition.total]; facts.push([`${diagnosticLabel(name)} · Total`, values[definition.total]]);
+      definition.issues.forEach(key => {
+        if (!diagnosticCount(values[key])) throw new Error("Invalid metric");
+        output[key] = values[key];
+        facts.push([diagnosticLabel(key), values[key]]);
+        if (values[key] > 0) findingCounters += 1;
+      });
+      (definition.information || []).forEach(key => { if (diagnosticCount(values[key])) output[key] = values[key]; });
+    });
+    if (category) {
+      const imports = data.importHealth;
+      if (!diagnosticObject(imports) || typeof imports.ok !== "boolean" || !Array.isArray(imports.latestImports)) throw new Error("Invalid category import context");
+      importUnverified = imports.ok !== true || imports.latestImports.length === 0;
+      facts.push(["Recent import records", imports.latestImports.length]);
+      imports.latestImports.forEach((item, index) => {
+        if (!diagnosticObject(item) || !diagnosticCount(item.errors_count) || !diagnosticCount(item.warnings_count)) throw new Error("Invalid import metrics");
+        const failed = item.status === "failed" || item.status === "error" || item.sync_health === "failed" || item.errors_count > 0;
+        const warning = item.status === "warning" || item.sync_health === "warning" || item.warnings_count > 0;
+        const known = ["success", "warning", "failed", "error"].includes(item.status) && ["healthy", "warning", "failed"].includes(item.sync_health);
+        if (failed) error = true;
+        if (failed || warning) findingCounters += 1;
+        if (!known) importUnverified = true;
+        if (index < 10) facts.push([`Import ${index + 1} · Errors`, item.errors_count], [`Import ${index + 1} · Warnings`, item.warnings_count]);
+      });
+      facts.push(["Import history context", importUnverified ? "Unverified" : "Observed history"]);
+    } else {
+      const relationship = data.relationshipHealth, stats = data.statsHealth, imports = data.importHealth, locks = data.lockHealth;
+      if (!diagnosticObject(relationship) || !["unknown", "failed", "warning", "healthy"].includes(relationship.overallHealth) ||
+          ![relationship.errors, relationship.warnings, relationship.info].every(diagnosticCount) ||
+          !diagnosticObject(stats) || !["unknown", "healthy"].includes(stats.overallHealth) || !diagnosticCount(stats.snapshots) ||
+          !diagnosticObject(imports) || !diagnosticCount(imports.failingImportsLast24h) || !diagnosticCount(imports.warningImportsLast24h) || !Array.isArray(imports.staleWarnings) ||
+          !diagnosticObject(locks) || !diagnosticCount(locks.activeLocks) || !diagnosticCount(locks.staleLocks)) throw new Error("Invalid health context");
+      clean.relationshipHealth = { overallHealth: relationship.overallHealth, errors: relationship.errors, warnings: relationship.warnings, info: relationship.info };
+      clean.statsHealth = { overallHealth: stats.overallHealth, snapshots: stats.snapshots };
+      clean.importHealth = { failingImportsLast24h: imports.failingImportsLast24h, warningImportsLast24h: imports.warningImportsLast24h, stale_warning_count: imports.staleWarnings.length };
+      clean.lockHealth = { activeLocks: locks.activeLocks, staleLocks: locks.staleLocks };
+      facts.push(["Relationship errors", relationship.errors], ["Relationship warnings", relationship.warnings], ["Statistics snapshots", stats.snapshots],
+        ["Failed imports · 24h", imports.failingImportsLast24h], ["Import warnings · 24h", imports.warningImportsLast24h], ["Stale locks", locks.staleLocks]);
+      findingCounters += [relationship.errors, relationship.warnings, imports.failingImportsLast24h, imports.warningImportsLast24h, imports.staleWarnings.length, locks.staleLocks].filter(value => value > 0).length;
+      unknownHealth = relationship.overallHealth === "unknown" || stats.overallHealth === "unknown" || stats.snapshots === 0 ||
+        relationship.ok !== true || stats.ok !== true || imports.ok !== true || locks.ok !== true;
+      if (relationship.overallHealth === "failed" || relationship.overallHealth === "warning") findingCounters += 1;
+      error = relationship.overallHealth === "failed" || relationship.errors > 0 || imports.failingImportsLast24h > 0;
+    }
+    facts.push(["Counters with findings", findingCounters]);
+    const returnedWarnings = [data.warnings, summary.warnings].some(value => Array.isArray(value) && value.length > 0);
+    return { unavailable, error, findings: findingCounters > 0 || summary.warning_count > 0 || unknownHealth || returnedWarnings || importUnverified, importUnverified, findingCounters, facts };
+  }
+  function interpretDiagnostic(spec, data) {
+    let report;
+    if (spec.section === "global") {
+      if (!diagnosticObject(data) || data.ok !== true || !diagnosticObject(data.summary) || !diagnosticObject(data.database)) throw new Error("Invalid overview");
+      const summary = data.summary;
+      if (![summary.total_music_issues, summary.total_wrestling_issues, summary.total_warnings].every(diagnosticCount) ||
+          ![summary.overall_status, summary.music_status, summary.wrestling_status].every(status => ["ok", "warnings", "issues"].includes(status)) ||
+          typeof data.database.database_connected !== "boolean" || !Array.isArray(data.database.missing_tables) ||
+          !data.database.missing_tables.every(table => typeof table === "string")) throw new Error("Invalid overview context");
+      const music = diagnosticDomain(data.music, "music"), wrestling = diagnosticDomain(data.wrestling, "wrestling");
+      report = { unavailable: !data.database.database_connected || data.database.missing_tables.length > 0 || music.unavailable || wrestling.unavailable,
+        error: [summary.overall_status, summary.music_status, summary.wrestling_status].includes("issues") || summary.total_music_issues > 0 || summary.total_wrestling_issues > 0 || music.error || wrestling.error,
+        findings: [summary.overall_status, summary.music_status, summary.wrestling_status].includes("warnings") || summary.total_music_issues > 0 || summary.total_wrestling_issues > 0 || summary.total_warnings > 0 || music.findings || wrestling.findings || Array.isArray(data.warnings) && data.warnings.length > 0,
+        findingCounters: null, issueCount: summary.total_music_issues + summary.total_wrestling_issues,
+        facts: [["Music issues", summary.total_music_issues], ["Wrestling issues", summary.total_wrestling_issues], ["Reported warnings", summary.total_warnings],
+          ["Music status", summary.music_status], ["Wrestling status", summary.wrestling_status], ["Missing tables", data.database.missing_tables.length],
+          ...music.facts.map(([label, value]) => [`Music · ${label}`, value]), ...wrestling.facts.map(([label, value]) => [`Wrestling · ${label}`, value])] };
+    } else report = diagnosticDomain(data, spec.section, spec.category);
+    return { state: report.error ? "Error" : report.unavailable ? "Unavailable" : report.findings ? "Warning" : "Healthy",
+      reason: report.error ? "Errors require review." : report.unavailable ? "Required context is unavailable." : report.importUnverified ? "Import history is unverified." : report.findings ? "Warnings require review." : "No findings reported in verified checks.",
+      issues: diagnosticCount(report.issueCount) ? `Reported issues: ${report.issueCount}` : diagnosticCount(report.findingCounters) ? `Checks with findings: ${report.findingCounters}` : null,
+      facts: report.facts };
+  }
+  async function checkDiagnostic(spec, run) {
+    const ownController = new AbortController(); run.controllers.add(ownController);
+    const started = performance.now(), privateToken = bearer; let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000); run.timers.add(timer);
+    let result = { state: "Unavailable", reason: "The diagnostic request could not be verified.", facts: [], details: [], technical: null, issues: null };
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${spec.path}`, {
+        method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${privateToken}` },
+        credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      http = response.status;
+      if (http === 401 || http === 403) {
+        if (diagnosticCurrent(run)) {
+          cancelDiagnostics(); clearSession(); clearPassword();
+          present("idle", http === 401 ? "Your session has expired or ended. Connect again." : "Access denied. Connect again to continue.");
+        }
+        try { await response.body?.cancel(); } catch { /* No raw error body is displayed. */ }
+      } else {
+        const parsed = await boundedEndpointJson(response, run, ownController);
+        if (!response.ok) result = { ...result, state: "Error", reason: `HTTP ${http}: report unavailable.` };
+        if (parsed.unavailable) result.reason = "Response exceeds the 128 KiB safety limit.";
+        else if (parsed.unsupported) { result.reason = "This browser cannot safely read a bounded response."; ownController.abort(); }
+        else if (parsed.invalid) { result = { ...result, state: "Error", reason: "The diagnostic response was not valid JSON." }; ownController.abort(); }
+        else {
+          const safe = sanitizeDiagnosticResponse(parsed.data, privateToken);
+          result.technical = safe.text;
+          if (safe.data === null) result.reason = "Report exceeds the safe display limit.";
+          else {
+            result.details = diagnosticDetails(safe.data, spec);
+            if (safe.omitted || safe.unverified) result.details.push("Response content was omitted by safety limits; the displayed report is incomplete.");
+            if (response.ok) result = { ...result, ...interpretDiagnostic(spec, safe.data) };
+            if (safe.omitted || safe.unverified) {
+              if (result.state === "Healthy") { result.state = "Warning"; result.reason = "The displayed report is incomplete."; }
+            }
+          }
+        }
+      }
+    } catch {
+      if (timedOut) result.reason = "The request exceeded 15 seconds.";
+      else if (!ownController.signal.aborted && http !== null) result = { ...result, state: "Error", reason: "The response did not match this diagnostic contract." };
+    } finally {
+      clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController);
+    }
+    return { ...result, http, elapsed: performance.now() - started, checkedAt: new Date().toISOString() };
+  }
+  async function runDiagnostics(ids) {
+    if (diagnosticsRun || signalBusy || monitorRun) return;
+    if (!prepareStationEntry() || !diagnosticsAllowed()) return;
+    const supported = ids.filter(id => diagnosticCatalog.some(spec => spec.id === id && spec.supported));
+    if (supported.length === 0 || supported.length !== new Set(supported).size) return;
+    // Collapse only refreshed technical views within this explicit user action, before async content changes.
+    supported.forEach(id => diagnosticRows.get(id)?.querySelectorAll(".admin-diagnostic__technical, .admin-diagnostic__technical details").forEach(view => { view.open = false; }));
+    const run = { generation: ++diagnosticsGeneration, ids: supported, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
+    diagnosticsRun = run;
+    supported.forEach(id => {
+      const spec = diagnosticCatalog.find(item => item.id === id);
+      diagnosticResults.set(id, { ...uncheckedDiagnostic(spec), state: "Checking", reason: "Queued for this diagnostic…" });
+      renderDiagnostic(id);
+    });
+    renderDiagnosticTotals();
+    updateStationControl();
+    diagnosticsProgress.textContent = `0 / ${supported.length} supported diagnostics checked`;
+    async function worker() {
+      while (run.cursor < supported.length && diagnosticCurrent(run)) {
+        const id = supported[run.cursor++], spec = diagnosticCatalog.find(item => item.id === id);
+        diagnosticResults.set(id, { ...uncheckedDiagnostic(spec), state: "Checking", reason: "Checking this diagnostic…" });
+        renderDiagnostic(id); renderDiagnosticTotals();
+        const result = await checkDiagnostic(spec, run);
+        if (!diagnosticCurrent(run)) return;
+        diagnosticResults.set(id, result); renderDiagnostic(id); run.completed += 1;
+        diagnosticsProgress.textContent = `${run.completed} / ${supported.length} supported diagnostics checked`;
+        renderDiagnosticTotals();
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(2, supported.length) }, worker));
+    if (!diagnosticCurrent(run)) return;
+    diagnosticsRun = null;
+    const completed = new Date(); diagnosticsCompleted.dateTime = completed.toISOString();
+    diagnosticsCompleted.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    diagnosticsCompleted.title = completed.toLocaleString();
+    diagnosticsProgress.textContent = `Complete: ${run.completed} / ${supported.length} checked`;
+    updateStationControl();
+  }
+  diagnosticsAll?.addEventListener("click", () => runDiagnostics(diagnosticCatalog.filter(spec => spec.supported).map(spec => spec.id)));
+  diagnosticsPanel?.querySelectorAll("[data-admin-diagnostic-category]").forEach(button => button.addEventListener("click", () =>
+    runDiagnostics(diagnosticCatalog.filter(spec => spec.supported && spec.group === button.dataset.adminDiagnosticCategory).map(spec => spec.id))));
+  diagnosticCatalog.filter(spec => spec.supported).forEach(spec => diagnosticRows.get(spec.id)?.querySelector("[data-admin-diagnostic-run]")?.addEventListener("click", () => runDiagnostics([spec.id])));
 
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;

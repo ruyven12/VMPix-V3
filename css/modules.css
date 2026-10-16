@@ -32519,3 +32519,52 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-endpoints .admin-endpoint__reason { min-block-size: 1.45em; }
   .admin-shell .admin-endpoints .admin-endpoints__summary > .admin-endpoints__issue { min-block-size: 1.45em; }
 }
+
+
+/* Admin 3F: manual read-only diagnostics, within the established API scrollport. */
+.admin-shell .admin-diagnostics { margin-block-start: 22px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-diagnostics p { margin: 0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-diagnostics button { appearance: none; min-block-size: 44px; padding: 10px 12px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-diagnostics button:disabled { color: #ab99a8; cursor: default; }
+.admin-shell .admin-diagnostics button:focus-visible, .admin-shell .admin-diagnostics summary:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-diagnostics__all { inline-size: 100%; }
+.admin-shell .admin-diagnostics__summary { display: grid; gap: 4px; margin-block: 10px; padding-block: 8px; border-block: 1px solid #4c3546; color: #c6b7c5; }
+.admin-shell .admin-diagnostics__summary [data-admin-diagnostic-progress] { min-block-size: 2.9em; color: #e3d5e1; font-size: 14px; }
+.admin-shell .admin-diagnostics__group { margin-block-start: 8px; border: 1px solid #4c3546; background: rgb(23 15 24 / .4); }
+.admin-shell .admin-diagnostics__group > summary { min-block-size: 44px; padding: 11px 12px; color: #d9cbd7; font: 14px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-diagnostics__group > summary::marker, .admin-shell .admin-diagnostic__technical > summary::marker { color: #bd526d; }
+.admin-shell .admin-diagnostics__category { inline-size: calc(100% - 20px); margin: 8px 10px; }
+.admin-shell .admin-diagnostics__rows { margin: 0; padding: 0 10px; list-style: none; }
+.admin-shell .admin-diagnostic { min-inline-size: 0; padding-block: 10px; border-block-start: 1px solid #473340; }
+.admin-shell .admin-diagnostic__heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.admin-shell .admin-diagnostic h3 { min-inline-size: 0; margin: 0; color: #ded1dc; font: 400 14px/1.4 var(--font-display); }
+.admin-shell .admin-diagnostic__heading button { flex-shrink: 0; min-inline-size: 64px; }
+.admin-shell .admin-diagnostic__path { display: block; margin-block: 4px 6px; color: #ad9cac; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-diagnostic__response { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; color: #ccbdc9; }
+.admin-shell .admin-diagnostic__response > span { flex-shrink: 0; }
+.admin-shell .admin-diagnostic__response [data-diagnostic-state] { inline-size: 101px; color: #ded1dc; font-size: 14px; }
+.admin-shell .admin-diagnostic__response [data-diagnostic-http] { inline-size: 73px; }
+.admin-shell .admin-diagnostic__response [data-diagnostic-time] { inline-size: 103px; }
+.admin-shell .admin-diagnostics .admin-diagnostic__reason { min-block-size: 2.9em; margin-block-start: 4px; color: #bfaabb; overflow-wrap: anywhere; }
+.admin-shell .admin-diagnostic__checked { display: grid; gap: 2px; margin-block-start: 4px; color: #ad9aac; }
+.admin-shell .admin-diagnostic__checked > span { min-block-size: 1.45em; }
+.admin-shell .admin-diagnostic__checked [data-diagnostic-issues] { min-block-size: 2.9em; }
+.admin-shell .admin-diagnostic__checked time { display: inline-block; min-inline-size: 6.9em; }
+.admin-shell .admin-diagnostic[data-diagnostic-state="Healthy"] [data-diagnostic-state] { color: #dce6dd; }
+.admin-shell .admin-diagnostic[data-diagnostic-state="Warning"] [data-diagnostic-state] { color: #d9b16f; }
+.admin-shell .admin-diagnostic[data-diagnostic-state="Error"] [data-diagnostic-state] { color: #df8c9e; }
+.admin-shell .admin-diagnostic[data-diagnostic-state="Unavailable"] [data-diagnostic-state] { color: #ab9aaa; }
+.admin-shell .admin-diagnostic__facts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; margin: 8px 0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-diagnostic__facts[hidden] { display: none; }
+.admin-shell .admin-diagnostic__facts dt { min-inline-size: 0; color: #ad9cac; overflow-wrap: anywhere; }
+.admin-shell .admin-diagnostic__facts dd { margin: 0; color: #e0d0dd; text-align: end; overflow-wrap: anywhere; }
+.admin-shell .admin-diagnostic__details { display: grid; gap: 6px; margin: 8px 0; padding-inline-start: 18px; font: 12px/1.5 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-diagnostic__technical { margin-block-start: 4px; color: #baa7b8; }
+.admin-shell .admin-diagnostic__technical summary { min-block-size: 44px; padding-block: 11px; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-diagnostic__technical pre { margin: 8px 0 0; color: #cbbac8; font: 12px/1.5 var(--font-display); white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (min-width: 840px) {
+  .admin-shell .admin-diagnostics__all { inline-size: auto; }
+  .admin-shell .admin-diagnostics__summary [data-admin-diagnostic-progress] { min-block-size: 1.45em; }
+  .admin-shell .admin-diagnostics .admin-diagnostic__reason { min-block-size: 1.45em; }
+  .admin-shell .admin-diagnostic__checked [data-diagnostic-issues] { min-block-size: 1.45em; }
+}
