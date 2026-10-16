@@ -32568,3 +32568,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-diagnostics .admin-diagnostic__reason { min-block-size: 1.45em; }
   .admin-shell .admin-diagnostic__checked [data-diagnostic-issues] { min-block-size: 1.45em; }
 }
+
+
+/* Admin 3G: status timestamps must not squeeze their mobile labels. */
+.admin-shell [data-admin-music-status-report] .admin-diagnostic__facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }

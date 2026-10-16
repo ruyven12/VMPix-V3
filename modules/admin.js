@@ -185,7 +185,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -302,7 +302,7 @@
   function updateStationControl() {
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
-    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null;
+    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
     updateMonitorControls();
   }
   function updateStationPresentation(shouldFocus = true) {
@@ -343,6 +343,7 @@
     signalBusy = false;
     cancelMonitor();
     cancelDiagnostics();
+    cancelMusicStatus();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -357,7 +358,7 @@
     if (available() && bearer && expiresAt <= Date.now()) {
       clearSession(); present("idle", "Your session has expired. Connect again."); return;
     }
-    if (!signalAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null) return;
+    if (!signalAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null) return;
     const at = ++signalGeneration;
     const ownController = new AbortController();
     signalController = ownController;
@@ -439,7 +440,7 @@
       endpointRows.size === 10 && [...endpointRows.values()].every(Boolean);
   }
   function updateMonitorControls() {
-    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null;
+    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
     if (monitorAll) { monitorAll.disabled = disabled; monitorAll.setAttribute("aria-busy", String(monitorRun !== null)); }
     endpointRows.forEach(row => { const button = row?.querySelector("[data-admin-endpoint-check]"); if (button) button.disabled = disabled; });
     updateDiagnosticControls();
@@ -567,7 +568,7 @@
     return { state, http, elapsed: performance.now() - started, reason };
   }
   async function runEndpointChecks(ids) {
-    if (signalBusy || monitorRun || diagnosticsRun) return;
+    if (signalBusy || monitorRun || diagnosticsRun || musicStatusRun) return;
     if (!prepareStationEntry() || !monitorAllowed()) return;
     if (ids.length === endpointCatalog.length) endpointCatalog.forEach(spec => { endpointResults.set(spec.id, uncheckedEndpoint()); renderEndpoint(spec.id); });
     const run = { generation: ++monitorGeneration, ids, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
@@ -637,12 +638,13 @@
       diagnosticRows.size === 10 && [...diagnosticRows.values()].every(Boolean);
   }
   function updateDiagnosticControls() {
-    const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null;
+    const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
     diagnosticsPanel?.querySelectorAll("[data-admin-diagnostic-run], [data-admin-diagnostic-category], [data-admin-diagnostic-all]").forEach(button => {
       const spec = diagnosticCatalog.find(item => item.id === button.dataset.adminDiagnosticRun);
       button.disabled = disabled || Boolean(spec && !spec.supported);
       button.setAttribute("aria-busy", String(diagnosticsRun !== null));
     });
+    updateMusicStatusControl();
   }
   function renderDiagnostic(id) {
     const row = diagnosticRows.get(id), result = diagnosticResults.get(id);
@@ -961,7 +963,7 @@
     return { ...result, http, elapsed: performance.now() - started, checkedAt: new Date().toISOString() };
   }
   async function runDiagnostics(ids) {
-    if (diagnosticsRun || signalBusy || monitorRun) return;
+    if (diagnosticsRun || signalBusy || monitorRun || musicStatusRun) return;
     if (!prepareStationEntry() || !diagnosticsAllowed()) return;
     const supported = ids.filter(id => diagnosticCatalog.some(spec => spec.id === id && spec.supported));
     if (supported.length === 0 || supported.length !== new Set(supported).size) return;
@@ -1002,6 +1004,134 @@
   diagnosticsPanel?.querySelectorAll("[data-admin-diagnostic-category]").forEach(button => button.addEventListener("click", () =>
     runDiagnostics(diagnosticCatalog.filter(spec => spec.supported && spec.group === button.dataset.adminDiagnosticCategory).map(spec => spec.id))));
   diagnosticCatalog.filter(spec => spec.supported).forEach(spec => diagnosticRows.get(spec.id)?.querySelector("[data-admin-diagnostic-run]")?.addEventListener("click", () => runDiagnostics([spec.id])));
+
+  // Public status is a separate manual check; it is never part of diagnostic Run All.
+  const musicStatusPanel = host.querySelector("[data-admin-music-status]");
+  const musicStatusCheck = musicStatusPanel?.querySelector("[data-admin-music-status-check]");
+  const musicStatusRow = musicStatusPanel?.querySelector("[data-admin-music-status-report]");
+  let musicStatusGeneration = 0, musicStatusRun = null;
+  let musicStatusResult = uncheckedMusicStatus();
+  function uncheckedMusicStatus(reason = "No status check has run.") {
+    return { state: "Not Checked", http: null, elapsed: null, checkedAt: null, warnings: null, reason, facts: [], details: [], technical: null };
+  }
+  function musicStatusAllowed() { return signalAllowed() && musicStatusPanel && musicStatusCheck && musicStatusRow; }
+  function updateMusicStatusControl() {
+    if (!musicStatusCheck) return;
+    musicStatusCheck.disabled = !musicStatusAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
+    musicStatusCheck.setAttribute("aria-busy", String(musicStatusRun !== null));
+  }
+  function renderMusicStatus() {
+    if (!musicStatusRow) return;
+    const result = musicStatusResult, technical = musicStatusRow.querySelector(".admin-diagnostic__technical"), checking = result.state === "Checking";
+    if (checking && technical.contains(document.activeElement)) document.activeElement.blur();
+    technical.toggleAttribute("inert", checking);
+    ["aria-disabled", "aria-busy"].forEach(attribute => { if (checking) technical.setAttribute(attribute, "true"); else technical.removeAttribute(attribute); });
+    technical.querySelectorAll("summary").forEach(summary => {
+      if (checking) { summary.setAttribute("aria-disabled", "true"); summary.setAttribute("tabindex", "-1"); }
+      else { summary.removeAttribute("aria-disabled"); summary.removeAttribute("tabindex"); }
+    });
+    musicStatusRow.dataset.diagnosticState = result.state;
+    musicStatusRow.querySelector("[data-diagnostic-state]").textContent = result.state;
+    musicStatusRow.querySelector("[data-diagnostic-http]").textContent = result.http === null ? "HTTP —" : `HTTP ${result.http}`;
+    musicStatusRow.querySelector("[data-diagnostic-time]").textContent = result.elapsed === null ? "Time —" : `Time ${Math.round(result.elapsed)} ms`;
+    musicStatusRow.querySelector("[data-music-status-reason]").textContent = result.reason;
+    musicStatusRow.querySelector("[data-music-status-warnings]").textContent = result.warnings === null ? "Reported warnings: —" : `Reported warnings: ${result.warnings}`;
+    const checked = musicStatusRow.querySelector("[data-music-status-checked]");
+    checked.textContent = result.checkedAt === null ? "—" : new Date(result.checkedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    if (result.checkedAt === null) { checked.removeAttribute("datetime"); checked.removeAttribute("title"); }
+    else { checked.dateTime = result.checkedAt; checked.title = new Date(result.checkedAt).toLocaleString(); }
+    const facts = musicStatusRow.querySelector("[data-music-status-facts]"); facts.replaceChildren();
+    result.facts.forEach(([label, value]) => { const term = document.createElement("dt"), detail = document.createElement("dd"); term.textContent = label; detail.textContent = String(value); facts.append(term, detail); });
+    facts.hidden = result.facts.length === 0;
+    const details = musicStatusRow.querySelector("[data-music-status-details]"); details.replaceChildren();
+    result.details.forEach(text => { const item = document.createElement("li"); item.textContent = text; details.appendChild(item); });
+    musicStatusRow.querySelector("[data-music-status-json]").textContent = result.technical === null ? "No report available." : result.technical;
+  }
+  function cancelMusicStatus() {
+    musicStatusGeneration += 1;
+    const run = musicStatusRun; musicStatusRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      if (musicStatusResult.state === "Checking") { musicStatusResult = uncheckedMusicStatus("Check canceled before verification."); renderMusicStatus(); }
+    }
+    updateStationControl();
+  }
+  function resetMusicStatus() { cancelMusicStatus(); musicStatusResult = uncheckedMusicStatus(); renderMusicStatus(); }
+  function musicStatusCurrent(run) {
+    if (musicStatusRun !== run || run.generation !== musicStatusGeneration) return false;
+    if (!signalAllowed()) { cancelMusicStatus(); prepareStationEntry(); return false; }
+    return true;
+  }
+  function interpretMusicStatus(data) {
+    const categories = ["bands", "shows", "people", "venues"], quality = ["venuesMissingGps", "venuesMissingLogo", "showsMissingPoster", "peopleMissingBands", "bandsMissingStatus"];
+    const timestamp = value => typeof value === "string" && (value === "" || expiry(value) !== 0);
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== "/api/status/music" || !timestamp(data.generatedAt) || data.generatedAt === "" ||
+        !diagnosticObject(data.database) || typeof data.database.connected !== "boolean" || !diagnosticObject(data.tables) ||
+        !diagnosticObject(data.counts) || !diagnosticObject(data.imports) || !diagnosticObject(data.dataQuality) ||
+        !Array.isArray(data.warnings) || !data.warnings.every(warning => typeof warning === "string") ||
+        categories.some(category => typeof data.tables[`music_${category}`] !== "boolean" || !diagnosticCount(data.counts[category]) || !timestamp(data.imports[`${category}LastImport`])) ||
+        quality.some(key => !diagnosticCount(data.dataQuality[key]))) throw new Error("Invalid music status");
+    const unavailable = !data.database.connected || categories.some(category => !data.tables[`music_${category}`]);
+    const findings = data.warnings.length > 0 || quality.some(key => data.dataQuality[key] > 0);
+    const facts = [["Database connected", data.database.connected ? "Yes" : "No"]];
+    categories.forEach(category => {
+      facts.push([`${diagnosticLabel(category)} table`, data.tables[`music_${category}`] ? "Available" : "Unavailable"],
+        [`${diagnosticLabel(category)} records`, data.counts[category]], [`${diagnosticLabel(category)} · Latest logged import`, data.imports[`${category}LastImport`] || "Not recorded"]);
+    });
+    const qualityLabels = { venuesMissingGps: "Venues missing GPS", venuesMissingLogo: "Venues missing logo", showsMissingPoster: "Shows missing poster", peopleMissingBands: "People missing bands", bandsMissingStatus: "Bands missing status" };
+    quality.forEach(key => facts.push([qualityLabels[key], data.dataQuality[key]]));
+    facts.push(["Backend generated at", data.generatedAt]);
+    return { state: unavailable ? "Unavailable" : findings ? "Warning" : "Healthy",
+      reason: unavailable ? "Required music context is unavailable." : findings ? "Music status has warnings." : "Music status is operational.",
+      warnings: data.warnings.length, facts, details: data.warnings.slice(0, 20).map(warning => `Backend warning: ${warning}`) };
+  }
+  async function checkMusicStatus() {
+    if (musicStatusRun || signalBusy || monitorRun || diagnosticsRun) return;
+    if (!prepareStationEntry() || !musicStatusAllowed()) return;
+    musicStatusRow.querySelectorAll(".admin-diagnostic__technical, .admin-diagnostic__technical details").forEach(view => { view.open = false; });
+    const run = { generation: ++musicStatusGeneration, controllers: new Set(), readers: new Set(), timers: new Set() };
+    const ownController = new AbortController(); run.controllers.add(ownController); musicStatusRun = run;
+    musicStatusResult = { ...uncheckedMusicStatus("Checking the public music status…"), state: "Checking" }; renderMusicStatus(); updateStationControl();
+    const started = performance.now(); let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000); run.timers.add(timer);
+    let result = { ...uncheckedMusicStatus("The status request could not be verified."), state: "Unavailable" };
+    try {
+      const response = await fetch("https://vmpix-data.onrender.com/api/status/music", {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      http = response.status;
+      if (!response.ok) result = { ...result, state: "Error", reason: `HTTP ${http}: music status unavailable.` };
+      const parsed = await boundedEndpointJson(response, run, ownController);
+      if (parsed.unavailable) result.reason = "Response exceeds the 128 KiB safety limit.";
+      else if (parsed.unsupported) { result.reason = "This browser cannot safely read a bounded response."; ownController.abort(); }
+      else if (parsed.invalid) { result = { ...result, state: "Error", reason: "The status response was not valid JSON." }; ownController.abort(); }
+      else {
+        const safe = sanitizeDiagnosticResponse(parsed.data, bearer); result.technical = safe.text;
+        if (safe.data === null) result.reason = "Report exceeds the safe display limit.";
+        else {
+          if (response.ok) result = { ...result, ...interpretMusicStatus(safe.data) };
+          else ["code", "error", "message"].forEach(key => { if (typeof safe.data[key] === "string") result.details.push(`Backend ${key}: ${safe.data[key]}`); });
+          if (safe.omitted || safe.unverified) {
+            result.warnings = null;
+            result.details.push("Response content was omitted by safety limits; this report is incomplete.");
+            if (result.state === "Healthy") { result.state = "Warning"; result.reason = "The displayed status is incomplete."; }
+          }
+          if (Array.isArray(safe.data.warnings) && safe.data.warnings.length > 20) result.details.push("Further backend warnings are omitted from these details. See the bounded Technical Response.");
+        }
+      }
+    } catch {
+      if (timedOut) result.reason = "The request exceeded 15 seconds.";
+      else if (!ownController.signal.aborted && http !== null) result = { ...result, state: "Error", reason: "The music status contract was not verified." };
+    } finally {
+      clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController);
+    }
+    if (!musicStatusCurrent(run)) return;
+    musicStatusRun = null;
+    musicStatusResult = { ...result, http, elapsed: performance.now() - started, checkedAt: new Date().toISOString() };
+    renderMusicStatus(); updateStationControl();
+  }
+  musicStatusCheck?.addEventListener("click", checkMusicStatus);
 
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;

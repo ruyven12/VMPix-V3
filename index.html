@@ -2553,6 +2553,22 @@
                   </li>
                   </ul>
                 </details>
+                <details class="admin-diagnostics__group" data-admin-music-status><summary>Music Status</summary>
+                  <button class="admin-diagnostics__category" type="button" data-admin-music-status-check disabled>Check Status</button>
+                  <div class="admin-diagnostics__rows">
+                    <article class="admin-diagnostic" data-admin-music-status-report data-diagnostic-state="Not Checked" aria-label="Music status report">
+                      <code class="admin-diagnostic__path">/api/status/music</code>
+                      <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
+                      <p class="admin-diagnostic__reason" role="status" aria-live="polite" aria-atomic="true" data-music-status-reason>No status check has run.</p>
+                      <p class="admin-diagnostic__checked"><span data-music-status-warnings>Reported warnings: —</span><span>Last checked: <time data-music-status-checked>—</time></span></p>
+                      <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-music-status-facts hidden></dl><ul class="admin-diagnostic__details" data-music-status-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-music-status-json>No report available.</pre></details></details>
+                    </article>
+                  </div>
+                </details>
+                <details class="admin-diagnostics__group" data-admin-wrestling-status><summary>Wrestling Status</summary>
+                  <div class="admin-diagnostics__rows"><p class="admin-diagnostic">Need implementation</p></div>
+                </details>
+
                 </div>
               </details>
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-api-feedback></p><button class="admin-console__logout" type="button" data-admin-api-logout>LOGOUT</button></footer>
