@@ -2356,18 +2356,22 @@
                 <div><h1 id="admin-api-title" tabindex="-1">STATION 01 <em>//</em> API</h1><p>PRIMARY SIGNAL INTEGRITY</p></div>
                 <button class="admin-api__back" type="button" data-admin-api-back><span aria-hidden="true">←</span> BACK</button>
               </div>
-              <section class="admin-api__uplink" aria-labelledby="admin-api-uplink-title">
-                <header class="admin-api__uplink-header"><h2 id="admin-api-uplink-title">V3 DATA // PRIMARY UPLINK</h2></header>
-                <div class="admin-api__signal" role="status" aria-live="polite" aria-atomic="true"><h2 data-admin-api-status>AWAITING SIGNAL</h2><p data-admin-api-detail>Backend connection not yet checked.</p></div>
+              <details class="admin-api__uplink admin-api-section" data-admin-api-section="primary" aria-labelledby="admin-api-uplink-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-api-uplink-title">Primary Signal Integrity</h2></summary>
+                <div class="admin-api-section__body">
+                <div class="admin-api__signal" role="status" aria-live="polite" aria-atomic="true"><p class="admin-api__signal-label" data-admin-api-status>Awaiting Signal</p><p class="admin-api__signal-detail" data-admin-api-detail>Backend connection not yet checked.</p></div>
                 <dl class="admin-api__telemetry">
                   <div><dt>CONNECTION</dt><dd data-admin-api-connection>—</dd></div>
                   <div><dt>RESPONSE TIME</dt><dd data-admin-api-response>—</dd></div>
                   <div><dt>LAST VERIFIED<span class="sr-only"> — Most recent completed check</span></dt><dd><time data-admin-api-verified>—</time></dd></div>
                 </dl>
                 <button class="admin-api__check" type="button" data-admin-api-check>MANUAL SIGNAL CHECK</button>
-              </section>
-              <section class="admin-endpoints" data-admin-endpoint-monitor aria-labelledby="admin-endpoints-title">
-                <header class="admin-endpoints__heading"><div><h2 id="admin-endpoints-title">Endpoint Monitor</h2><p>Manual, read-only public checks.</p></div><button class="admin-endpoints__all" type="button" data-admin-monitor-all disabled>Check All Endpoints</button></header>
+                </div>
+              </details>
+              <details class="admin-endpoints admin-api-section" data-admin-api-section="endpoints" data-admin-endpoint-monitor aria-labelledby="admin-endpoints-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-endpoints-title">Endpoint Monitor</h2></summary>
+                <div class="admin-api-section__body">
+                <div class="admin-endpoints__actions"><p>Manual, read-only public checks.</p><button class="admin-endpoints__all" type="button" data-admin-monitor-all disabled>Check All Endpoints</button></div>
                 <p class="admin-endpoints__policy">Slow: verified responses over 2 seconds. Request timeout: 15 seconds. Unavailable: no verified result.</p>
                 <p class="admin-endpoints__progress" role="status" aria-live="polite" aria-atomic="true" data-admin-monitor-progress>0/10 checked. Ready for a manual check.</p>
                 <p class="admin-endpoints__totals" data-admin-monitor-totals>Latest per endpoint: 0 successful · 0 failed · 0 unavailable</p>
@@ -2438,7 +2442,8 @@
                     <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
                   </li>
                 </ul></details>
-              </section>
+                </div>
+              </details>
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-api-feedback></p><button class="admin-console__logout" type="button" data-admin-api-logout>LOGOUT</button></footer>
             </div>
           </article>

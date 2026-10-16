@@ -32393,11 +32393,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-api__back { appearance: none; min-block-size: 44px; padding: 10px 14px; border: 1px solid #674052; border-radius: 0; background: #181016; color: #d4c8d2; font: 10px/1.3 var(--font-display), sans-serif; cursor: pointer; }
 .admin-shell .admin-api__back span { margin-inline-end: 7px; }
 .admin-shell .admin-api__uplink { padding: 16px 12px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
-.admin-shell .admin-api__uplink-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid #3f303c; }
-.admin-shell .admin-api__uplink-header h2, .admin-shell .admin-api__uplink-header p { margin: 0; color: #c4b4c1; font: 10px/1.5 var(--font-display), sans-serif; letter-spacing: .06em; }
 .admin-shell .admin-api__signal { min-block-size: 116px; padding-bottom: 17px; text-align: center; }
-.admin-shell .admin-api__signal h2 { display: grid; align-content: center; min-block-size: 2.6em; margin: 0 0 8px; font: 400 clamp(17px, 4.8vw, 26px)/1.3 var(--font-display), sans-serif; }
-.admin-shell .admin-api__signal p { min-block-size: 4.5em; color: #c1b5c2; font: 14px/1.5 var(--font-display), sans-serif; }
+.admin-shell .admin-api__signal .admin-api__signal-label { display: grid; align-content: center; min-block-size: 2.6em; margin: 0 0 8px; font: 400 clamp(17px, 4.8vw, 26px)/1.3 var(--font-display), sans-serif; }
+.admin-shell .admin-api__signal-detail { min-block-size: 4.5em; color: #c1b5c2; font: 14px/1.5 var(--font-display), sans-serif; }
 .admin-shell .admin-api__telemetry { display: grid; gap: 7px; margin: 0; padding-top: 16px; border-top: 1px solid #7e3047; }
 .admin-shell .admin-api__telemetry > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-block-size: 44px; padding: 9px 10px; border: 1px solid #3e333f; background: rgb(18 15 22 / .4); }
 .admin-shell .admin-api__telemetry dt { color: #c4b6c3; font: 10px/1.5 var(--font-display), sans-serif; letter-spacing: .1em; }
@@ -32420,9 +32418,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-api__heading { flex-wrap: nowrap; }
   .admin-shell .admin-api__heading p { font-size: 11px; letter-spacing: .2em; }
   .admin-shell .admin-api__uplink { padding: 20px 26px; }
-  .admin-shell .admin-api__uplink-header h2, .admin-shell .admin-api__uplink-header p { font-size: 11px; }
-  .admin-shell .admin-api__signal h2 { min-block-size: 1.3em; }
-  .admin-shell .admin-api__signal p { min-block-size: 3em; }
+  .admin-shell .admin-api__signal .admin-api__signal-label { min-block-size: 1.3em; }
+  .admin-shell .admin-api__signal-detail { min-block-size: 3em; }
   .admin-shell .admin-api__telemetry { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .admin-shell .admin-api__telemetry > div { flex-direction: column; justify-content: center; min-block-size: 64px; gap: 5px; }
   .admin-shell .admin-api__telemetry dd { text-align: center; }
@@ -32436,12 +32433,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 
 /* Admin 3C: bounded, manual endpoint checks use the existing station scrollport. */
-.admin-shell .admin-api__uplink-header { margin-bottom: 18px; }
 .admin-shell .admin-api__check { justify-content: center; }
 .admin-shell .admin-endpoints { margin-block-start: 22px; padding: 16px 12px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
-.admin-shell .admin-endpoints__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-block-end: 15px; border-bottom: 1px solid #603044; }
-.admin-shell .admin-endpoints h2 { margin: 0; font: 400 17px/1.4 var(--font-display); }
-.admin-shell .admin-endpoints__heading p { margin-block-start: 6px; color: #b9aab9; font: 10px/1.6 var(--font-display); }
 .admin-shell .admin-endpoints__all, .admin-shell .admin-endpoint__check { appearance: none; min-block-size: 44px; padding: 10px 12px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 10px/1.5 var(--font-display); cursor: pointer; }
 .admin-shell .admin-endpoints__all:disabled, .admin-shell .admin-endpoint__check:disabled { color: #ab99a8; cursor: wait; }
 .admin-shell .admin-endpoints__policy { margin-block: 14px; color: #b9aab9; font: 10px/1.7 var(--font-display); }
@@ -32474,4 +32467,24 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-endpoint__result { grid-template-columns: minmax(0, 1fr) 8em 10em; }
   .admin-shell .admin-endpoint__time { grid-column: auto; text-align: end; }
   .admin-shell .admin-endpoint__reason { min-block-size: 3em; }
+}
+
+
+/* Admin 3D: independent native disclosures share one API section heading convention. */
+.admin-shell .admin-api-section { padding: 0; }
+.admin-shell .admin-api-section__summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-block-size: 44px; padding: 14px 12px; border-block-end: 1px solid transparent; color: #e8e5eb; list-style: none; cursor: pointer; }
+.admin-shell .admin-api-section__summary::-webkit-details-marker { display: none; }
+.admin-shell .admin-api-section__summary::marker { content: ""; }
+.admin-shell .admin-api-section__summary::after { flex: 0 0 7px; inline-size: 7px; block-size: 7px; margin-inline-end: 3px; border-inline-end: 1px solid #bd526d; border-block-end: 1px solid #bd526d; transform: rotate(-45deg); pointer-events: none; content: ""; }
+.admin-shell .admin-api-section[open] > .admin-api-section__summary { border-block-end-color: #603044; }
+.admin-shell .admin-api-section[open] > .admin-api-section__summary::after { transform: rotate(45deg); }
+.admin-shell .admin-api-section__title { min-inline-size: 0; margin: 0; color: #e8e5eb; font: 400 17px/1.4 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-api-section__body { padding: 16px 12px; }
+.admin-shell .admin-api-section__summary:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-endpoints__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+.admin-shell .admin-endpoints__actions p { color: #b9aab9; font: 10px/1.6 var(--font-display); }
+@media (min-width: 840px) {
+  .admin-shell .admin-api-section { padding: 0; }
+  .admin-shell .admin-api-section__summary { padding-inline: 26px; }
+  .admin-shell .admin-api-section__body { padding: 20px 26px; }
 }

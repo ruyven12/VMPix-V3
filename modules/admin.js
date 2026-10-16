@@ -342,7 +342,7 @@
     signalController = null;
     signalBusy = false;
     cancelMonitor();
-    apiStatus.textContent = "AWAITING SIGNAL";
+    apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
     apiResponse.textContent = "—";
@@ -364,7 +364,7 @@
     updateMonitorControls();
     apiCheck.disabled = true;
     apiCheck.setAttribute("aria-busy", "true");
-    apiStatus.textContent = "ACQUIRING SIGNAL";
+    apiStatus.textContent = "Acquiring Signal";
     apiDetail.textContent = "Checking the public API health endpoint…";
     apiConnection.textContent = "CHECKING";
     apiResponse.textContent = "—";
@@ -411,7 +411,7 @@
     apiVerified.title = `Most recent completed check: ${completed.toLocaleString()}`;
     apiResponse.textContent = elapsed === null ? "—" : `${Math.round(elapsed)} ms`;
     apiConnection.textContent = outcome === "connected" ? "CONNECTED" : outcome === "unavailable" ? "UNAVAILABLE" : "ERROR";
-    apiStatus.textContent = outcome === "connected" ? "SIGNAL VERIFIED" : outcome === "unavailable" ? "SIGNAL UNAVAILABLE" : "CHECK FAILED";
+    apiStatus.textContent = outcome === "connected" ? "Signal Verified" : outcome === "unavailable" ? "Signal Unavailable" : "Check Failed";
     apiDetail.textContent = outcome === "connected" ? "Primary API connection verified." :
       outcome === "unavailable" ? "The endpoint responded without confirming API liveness." :
       timedOut ? "The health request timed out. API liveness was not confirmed." : "The health check could not be completed. Please retry.";
