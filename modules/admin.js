@@ -7,13 +7,132 @@
   const toggle = host?.querySelector("[data-admin-password-toggle]");
   const connect = host?.querySelector("[data-admin-connect]");
   const feedback = host?.querySelector("[data-admin-feedback]");
-  if (!host || !password || !toggle || !connect || !feedback) return;
+  const stage = host?.querySelector("[data-admin-stage]");
+  const loginPanel = host?.querySelector(".admin-login");
+  const loginTitle = host?.querySelector("#admin-access-title");
+  const deck = host?.querySelector("[data-admin-console]");
+  const deckTitle = host?.querySelector("#admin-console-title");
+  const deckFeedback = host?.querySelector("[data-admin-console-feedback]");
+  const deckLogout = host?.querySelector("[data-admin-console-logout]");
+  const deckReturn = host?.querySelector("[data-admin-console-return]");
+  const returnLink = host?.querySelector("[data-admin-return]");
+  if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
+      !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink) return;
   let active = false;
   let bearer = null;
   let expiresAt = 0;
   let state = "idle";
   let generation = 0;
   let controller = null;
+
+  let visualGeneration = 0;
+  let visualCleanup = null;
+  let visualPhase = "login";
+  const returnHome = returnLink.parentElement;
+  const lastStationBody = deck.querySelector(".admin-console__station:last-of-type .admin-console__station-body");
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function surface(element, visible) {
+    if (!visible && element.contains(document.activeElement)) document.activeElement.blur();
+    element.hidden = !visible;
+    element.toggleAttribute("inert", !visible);
+    element.setAttribute("aria-hidden", String(!visible));
+  }
+  function cancelVisuals() {
+    visualGeneration += 1;
+    visualCleanup?.();
+    visualCleanup = null;
+    loginPanel.classList.remove("is-admin-collapsing");
+    deck.classList.remove("is-admin-assembling", "is-admin-arriving");
+  }
+  function phase(value) { visualPhase = value; stage.dataset.adminPhase = value; }
+  function focusTitle(title) { if (available()) title.focus({ preventScroll: true }); }
+  function resetPresentation(shouldFocus = false) {
+    const changed = visualPhase !== "login";
+    cancelVisuals();
+    surface(deck, false);
+    if (returnLink.parentElement !== returnHome) returnHome.appendChild(returnLink);
+    surface(loginPanel, true);
+    host.setAttribute("aria-labelledby", "admin-access-title");
+    phase("login");
+    if (changed && shouldFocus) focusTitle(loginTitle);
+  }
+  function visualTrack(element, animationName, onComplete) {
+    const routeGeneration = generation;
+    const ownVisual = visualGeneration;
+    let completed = false;
+    const complete = (event) => {
+      if (event && (event.target !== element || event.animationName !== animationName)) return;
+      if (completed) return;
+      completed = true;
+      cleanup();
+      if (visualCleanup === cleanup) visualCleanup = null;
+      if (ownVisual !== visualGeneration || routeGeneration !== generation || !available() || !bearer) return;
+      onComplete();
+    };
+    const cleanup = () => {
+      element.removeEventListener("animationend", complete);
+      element.removeEventListener("animationcancel", complete);
+    };
+    visualCleanup = cleanup;
+    element.addEventListener("animationend", complete);
+    element.addEventListener("animationcancel", complete);
+    // Missing/disabled presentation CSS must never leave a confirmed session behind an inert panel.
+    const animations = typeof stage.getAnimations === "function" ? stage.getAnimations({ subtree: true }) : [];
+    const animation = animations.find((item) => item.animationName === animationName && item.effect?.target === element);
+    if (!animation) complete();
+    else if (animation.finished) animation.finished.then(() => complete(), () => complete());
+  }
+  function revealDeck(shouldFocus = true) {
+    surface(loginPanel, false);
+    deckReturn.appendChild(returnLink);
+    surface(deck, true);
+    host.setAttribute("aria-labelledby", "admin-console-title");
+    if (shouldFocus) focusTitle(deckTitle);
+  }
+  function showDeck(shouldFocus = true) {
+    cancelVisuals();
+    phase("ready");
+    revealDeck(shouldFocus);
+  }
+  function renderPresentation(animateArrival) {
+    const deckState = state === "authenticated" || state === "logout-uncertain" ||
+      state === "logging-out" && visualPhase !== "login";
+    if (!deckState) { resetPresentation(available()); return; }
+    if (visualPhase === "ready") return;
+    if (visualPhase === "collapsing" || visualPhase === "assembling") {
+      if (state !== "authenticated") showDeck(false);
+      return;
+    }
+    if (!animateArrival || motionPreference.matches) {
+      showDeck(); return;
+    }
+    cancelVisuals();
+    if (loginPanel.contains(document.activeElement)) document.activeElement.blur();
+    loginPanel.setAttribute("inert", "");
+    loginPanel.setAttribute("aria-hidden", "true");
+    // Both visual tracks start together; CSS owns the visible 200ms handoff.
+    deck.hidden = false;
+    deck.setAttribute("inert", "");
+    deck.setAttribute("aria-hidden", "true");
+    phase("collapsing");
+    deck.classList.add("is-admin-arriving", "is-admin-assembling");
+    loginPanel.classList.add("is-admin-collapsing");
+    visualTrack(loginPanel, "adminLoginCollapse", () => {
+      phase("assembling");
+      revealDeck();
+      visualTrack(lastStationBody, "adminConsoleBuild", () => {
+        cancelVisuals();
+        phase("ready");
+      });
+    });
+  }
+  const settleReducedMotion = (event) => {
+    if (event.matches && available() && bearer && ["collapsing", "assembling"].includes(visualPhase) &&
+        ["authenticated", "logging-out", "logout-uncertain"].includes(state)) showDeck();
+  };
+  if (typeof motionPreference.addEventListener === "function") motionPreference.addEventListener("change", settleReducedMotion);
+  else motionPreference.addListener?.(settleReducedMotion);
 
   function clearPassword() {
     password.value = "";
@@ -27,7 +146,7 @@
     return active && !host.hidden && !host.hasAttribute("inert") && host.getAttribute("aria-hidden") === "false";
   }
   function busy() { return ["connecting", "checking", "logging-out"].includes(state); }
-  function present(next, message) {
+  function present(next, message, animateArrival = false) {
     state = next;
     password.disabled = busy() || bearer !== null;
     toggle.disabled = password.disabled;
@@ -37,6 +156,11 @@
       state === "logging-out" ? "LOGGING OUT…" : state === "authenticated" || state === "logout-uncertain" ?
         "LOGOUT" : bearer ? "RETRY" : "CONNECT";
     feedback.textContent = message;
+    deckFeedback.textContent = message;
+    deckLogout.disabled = busy();
+    deckLogout.setAttribute("aria-busy", String(busy()));
+    deckLogout.textContent = state === "logging-out" ? "LOGGING OUT…" : "LOGOUT";
+    renderPresentation(animateArrival);
   }
   function clearSession() { bearer = null; expiresAt = 0; }
   function cancelRequest() {
@@ -96,7 +220,7 @@
       if (result.status === 200 && result.data.ok === true && result.data.authenticated === true &&
           typeof result.data.token === "string" && /^[0-9a-f]{64}$/.test(result.data.token) && deadline > Date.now()) {
         bearer = result.data.token; expiresAt = deadline;
-        present("authenticated", "Authenticated. Your session is active.");
+        present("authenticated", "Authenticated. Your session is active.", true);
       } else if (result.status === 401 && result.data.error === "invalid_credentials") {
         present("idle", "Incorrect password. Please try again.");
         password.setAttribute("aria-invalid", "true");
@@ -143,7 +267,7 @@
     }
   }
   function connectAction() {
-    if (!available() || busy()) return;
+    if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();
     if (state === "authenticated" || state === "logout-uncertain") return logout();
     return checkSession();
@@ -157,12 +281,16 @@
     toggle.textContent = show ? "HIDE" : "SHOW";
   });
   connect.addEventListener("click", connectAction);
+  deckLogout.addEventListener("click", () => {
+    if (!deck.hidden && !deck.hasAttribute("inert")) logout();
+  });
   password.addEventListener("keydown", (event) => {
     if (!available() || event.key !== "Enter" || event.isComposing || password.disabled) return;
     event.preventDefault(); connectAction();
   });
   window.addEventListener("pagehide", () => {
     cancelRequest(); clearSession(); clearPassword();
+    resetPresentation(false);
     present("idle", "Enter your password to connect securely.");
   });
   clearPassword();

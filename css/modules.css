@@ -32084,3 +32084,229 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-planet-node.is-active::before { opacity: .5; transform: none; }
 }
+
+
+/* Admin 2A: local, authenticated command deck; Shell and login artwork remain unchanged. */
+.admin-shell .admin-access__stage {
+  --admin-stage-budget: max(0px, calc(100svh - max(24px, env(safe-area-inset-top)) - var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) - var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))) - 32px));
+  position: relative;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  inline-size: min(100%, 68rem);
+  min-inline-size: 0;
+  min-block-size: min(40rem, var(--admin-stage-budget));
+}
+.admin-shell .admin-access__stage > .admin-login,
+.admin-shell .admin-access__stage > .admin-console { grid-area: 1 / 1; }
+.admin-shell .admin-access__stage > [hidden] { display: none; }
+.admin-shell .admin-access__stage[data-admin-phase="collapsing"] > .admin-console {
+  position: absolute;
+  align-self: safe center;
+  justify-self: center;
+}
+.admin-shell .admin-login.is-admin-collapsing {
+  transform-origin: 50% 50%;
+  pointer-events: none;
+  animation: adminLoginCollapse 200ms cubic-bezier(.55, 0, .75, .45) both;
+}
+.admin-shell .admin-console {
+  --admin-console-shape: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+  inline-size: 100%;
+  min-inline-size: 0;
+  padding: 1px;
+  clip-path: var(--admin-console-shape);
+  background: linear-gradient(125deg, #75747b, #742638 38%, #363039 65%, #8c3447);
+  color: #e8e7eb;
+}
+.admin-shell .admin-console__surface {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-block-size: 38rem;
+  padding: 20px 16px 16px;
+  clip-path: var(--admin-console-shape);
+  background:
+    linear-gradient(90deg, rgb(189 180 191 / .025) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(rgb(189 180 191 / .025) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(135deg, #1b181e, #0a090c 42%, #151117 80%, #0b090d);
+}
+.admin-shell .admin-console__header {
+  padding: 0 4px 17px;
+  border-bottom: 1px solid #743044;
+  text-align: center;
+}
+.admin-shell .admin-console__eyebrow {
+  margin: 0 0 9px;
+  color: #b8a4ad;
+  font: 10px/1.3 var(--font-display), sans-serif;
+  letter-spacing: .14em;
+}
+.admin-shell .admin-console__title {
+  margin: 0;
+  color: #e8e5eb;
+  font: 400 clamp(18px, 4.8vw, 25px)/1.35 var(--font-display), sans-serif;
+  letter-spacing: .025em;
+}
+.admin-shell .admin-console__stations {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  isolation: isolate;
+  margin-block: 0 12px;
+}
+.admin-shell .admin-console__stations::before {
+  position: absolute;
+  z-index: -1;
+  inset-block: 0;
+  inset-inline-start: calc(50% - .5px);
+  inline-size: 1px;
+  background: #673040;
+  content: "";
+}
+.admin-shell .admin-console__station {
+  position: relative;
+  min-inline-size: 0;
+  min-block-size: 104px;
+  border-bottom: 1px solid rgb(143 127 139 / .2);
+}
+.admin-shell .admin-console__station::before {
+  position: absolute;
+  inset-inline-start: calc(50% - 3px);
+  inset-block-start: calc(50% - 3px);
+  inline-size: 6px;
+  block-size: 6px;
+  background: #743246;
+  transform: rotate(45deg);
+  content: "";
+}
+.admin-shell .admin-console__station-body {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  min-block-size: 104px;
+  block-size: 100%;
+  padding: 20px 8px;
+}
+.admin-shell .admin-console__station h2 {
+  margin: 0;
+  color: #d8d3dc;
+  font: 400 clamp(12px, 3.5vw, 17px)/1.4 var(--font-display), sans-serif;
+  letter-spacing: .035em;
+}
+.admin-shell .admin-console__standby {
+  appearance: none;
+  min-block-size: 36px;
+  padding: 9px 10px;
+  border: 1px solid #54434f;
+  border-radius: 0;
+  background: #141016;
+  color: #ab98a4;
+  font: 10px/1.3 var(--font-display), sans-serif;
+  letter-spacing: .05em;
+  opacity: 1;
+  cursor: not-allowed;
+}
+.admin-shell .admin-console__junction { display: none; }
+.admin-shell .admin-console__footer { padding: 0 4px; }
+.admin-shell .admin-console__feedback {
+  min-block-size: 2.8em;
+  margin: 0 0 8px;
+  color: #c4b6c1;
+  font: 13px/1.4 sans-serif;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.admin-shell .admin-console__actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.admin-shell .admin-console__return-slot { min-inline-size: 0; }
+.admin-shell .admin-console__logout {
+  appearance: none;
+  min-block-size: 44px;
+  padding: 10px 14px;
+  border: 1px solid #8b354b;
+  border-radius: 0;
+  background: #270e18;
+  color: #e4d8e0;
+  font: 11px/1.3 var(--font-display), sans-serif;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.admin-shell .admin-console__logout:disabled { cursor: wait; color: #bcaab7; }
+.admin-shell .admin-console__logout:focus-visible,
+.admin-shell .admin-console__title:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-console__pixels { position: absolute; inset: 0; pointer-events: none; }
+.admin-shell .admin-console__pixel {
+  position: absolute;
+  inline-size: 10px;
+  block-size: 10px;
+  opacity: 0;
+  background: #b5a5b3;
+  pointer-events: none;
+}
+.admin-shell .admin-console__pixel:nth-child(3n) { background: #8d3b51; }
+.admin-shell .admin-console__pixel:nth-child(1) { left: 7%; top: 18%; --pixel-x: -10px; --pixel-y: -8px; }
+.admin-shell .admin-console__pixel:nth-child(2) { left: 24%; top: 36%; --pixel-x: -6px; --pixel-y: 8px; }
+.admin-shell .admin-console__pixel:nth-child(3) { left: 41%; top: 12%; --pixel-x: 6px; --pixel-y: -10px; }
+.admin-shell .admin-console__pixel:nth-child(4) { left: 58%; top: 28%; --pixel-x: 10px; --pixel-y: -5px; }
+.admin-shell .admin-console__pixel:nth-child(5) { left: 76%; top: 16%; --pixel-x: 8px; --pixel-y: -8px; }
+.admin-shell .admin-console__pixel:nth-child(6) { left: 89%; top: 42%; --pixel-x: 10px; --pixel-y: 4px; }
+.admin-shell .admin-console__pixel:nth-child(7) { left: 12%; top: 69%; --pixel-x: -8px; --pixel-y: 10px; }
+.admin-shell .admin-console__pixel:nth-child(8) { left: 29%; top: 81%; --pixel-x: -5px; --pixel-y: 8px; }
+.admin-shell .admin-console__pixel:nth-child(9) { left: 45%; top: 61%; --pixel-x: 5px; --pixel-y: 8px; }
+.admin-shell .admin-console__pixel:nth-child(10) { left: 61%; top: 77%; --pixel-x: 8px; --pixel-y: 10px; }
+.admin-shell .admin-console__pixel:nth-child(11) { left: 79%; top: 64%; --pixel-x: 8px; --pixel-y: 6px; }
+.admin-shell .admin-console__pixel:nth-child(12) { left: 91%; top: 82%; --pixel-x: 10px; --pixel-y: 10px; }
+.admin-shell .admin-console.is-admin-assembling .admin-console__station-body {
+  animation: adminConsoleBuild 620ms steps(1, end) calc(var(--admin-arrival-offset, 0ms) + var(--station-order) * 70ms) both;
+}
+.admin-shell .admin-console.is-admin-assembling .admin-console__pixel {
+  animation: adminConsolePixel 520ms steps(4, end) calc(var(--admin-arrival-offset, 0ms) + var(--station-order) * 70ms + var(--pixel-order) * 7ms) both;
+}
+.admin-shell .admin-console.is-admin-arriving {
+  --admin-arrival-offset: 200ms;
+  will-change: opacity;
+  animation: adminConsoleArrival 200ms steps(1, end) both;
+}
+@keyframes adminConsoleArrival {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes adminLoginCollapse {
+  0% { transform: scale(1); opacity: 1; }
+  55% { transform: scale(.62); opacity: .72; }
+  100% { transform: scale(.06); opacity: 0; }
+}
+@keyframes adminConsoleBuild {
+  0% { clip-path: polygon(0 0, 0 0, 0 25%, 0 25%, 0 50%, 0 50%, 0 75%, 0 75%, 0 100%, 0 100%); }
+  16% { clip-path: polygon(0 0, 25% 0, 25% 25%, 50% 25%, 50% 50%, 25% 50%, 25% 75%, 0 75%, 0 100%, 0 100%); }
+  34% { clip-path: polygon(0 0, 75% 0, 75% 25%, 50% 25%, 50% 50%, 75% 50%, 75% 75%, 25% 75%, 25% 100%, 0 100%); }
+  54% { clip-path: polygon(0 0, 100% 0, 100% 25%, 75% 25%, 75% 50%, 100% 50%, 100% 75%, 50% 75%, 50% 100%, 0 100%); }
+  74% { clip-path: polygon(0 0, 100% 0, 100% 25%, 100% 25%, 100% 50%, 100% 50%, 100% 75%, 75% 75%, 75% 100%, 0 100%); }
+  88%, 100% { clip-path: polygon(0 0, 100% 0, 100% 25%, 100% 25%, 100% 50%, 100% 50%, 100% 75%, 100% 75%, 100% 100%, 0 100%); }
+}
+@keyframes adminConsolePixel {
+  0% { transform: translate(var(--pixel-x), var(--pixel-y)) scale(.4); opacity: 0; }
+  20% { transform: translate(var(--pixel-x), var(--pixel-y)) scale(.8); opacity: .85; }
+  65% { transform: translate(0, 0) scale(1); opacity: .65; }
+  100% { transform: translate(0, 0) scale(.6); opacity: 0; }
+}
+@media (min-width: 840px) {
+  .admin-shell .admin-access__stage { min-block-size: min(32rem, var(--admin-stage-budget)); }
+  .admin-shell .admin-console__surface { min-block-size: 30rem; padding: 26px; }
+  .admin-shell .admin-console__stations { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .admin-shell .admin-console__stations::after { position: absolute; z-index: -1; inset-inline: 0; inset-block-start: calc(50% - .5px); block-size: 1px; background: #673040; content: ""; }
+  .admin-shell .admin-console__station { border: 0; min-block-size: 126px; }
+  .admin-shell .admin-console__station::before { display: none; }
+  .admin-shell .admin-console__station-body { min-block-size: 126px; flex-direction: column; justify-content: center; gap: 15px; }
+  .admin-shell .admin-console__junction { display: block; position: absolute; inset-inline-start: calc(50% - 4px); inset-block-start: calc(50% - 4px); inline-size: 8px; block-size: 8px; background: #914154; transform: rotate(45deg); }
+  .admin-shell .admin-console__footer { display: flex; align-items: center; gap: 24px; }
+  .admin-shell .admin-console__feedback { flex: 1; margin: 0; text-align: start; }
+  .admin-shell .admin-console__actions { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell .admin-login.is-admin-collapsing,
+  .admin-shell .admin-console.is-admin-arriving,
+  .admin-shell .admin-console.is-admin-assembling .admin-console__station-body,
+  .admin-shell .admin-console.is-admin-assembling .admin-console__pixel { animation: none; }
+}
