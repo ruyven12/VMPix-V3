@@ -626,7 +626,7 @@
   endpointCatalog.forEach(spec => endpointRows.get(spec.id)?.querySelector("[data-admin-endpoint-check]")?.addEventListener("click", () => runEndpointChecks([spec.id])));
 
   // Fixed read-only diagnostics share the authenticated session, never legacy credentials.
-  const diagnosticCatalog = Object.freeze([{"id":"global-overview","group":"global","name":"Overall Backend","path":"/api/admin/diagnostics","section":"global","category":null,"supported":true},{"id":"music-overview","group":"music","name":"Overall Music","path":"/api/admin/diagnostics/music","section":"music","category":null,"supported":true},{"id":"music-bands","group":"music","name":"Bands","path":"/api/admin/diagnostics/music/bands","section":"music","category":"bands","supported":true},{"id":"music-shows","group":"music","name":"Shows","path":"/api/admin/diagnostics/music/shows","section":"music","category":"shows","supported":true},{"id":"music-people","group":"music","name":"People","path":"/api/admin/diagnostics/music/people","section":"music","category":"people","supported":true},{"id":"music-venues","group":"music","name":"Venues","path":"/api/admin/diagnostics/music/venues","section":"music","category":"venues","supported":true},{"id":"wrestling-overview","group":"wrestling","name":"Overall Wrestling","path":"/api/admin/diagnostics/wrestling","section":"wrestling","category":null,"supported":true},{"id":"wrestling-shows","group":"wrestling","name":"Shows","path":"/api/admin/diagnostics/wrestling/shows","section":"wrestling","category":"shows","supported":false},{"id":"wrestling-people","group":"wrestling","name":"People","path":"/api/admin/diagnostics/wrestling/people","section":"wrestling","category":"people","supported":false},{"id":"wrestling-venues","group":"wrestling","name":"Venues","path":"/api/admin/diagnostics/wrestling/venues","section":"wrestling","category":"venues","supported":false}].map(spec => Object.freeze(spec)));
+  const diagnosticCatalog = Object.freeze([{"id":"global-overview","group":"global","name":"Overall Backend","path":"/api/admin/diagnostics","section":"global","category":null,"supported":true},{"id":"music-overview","group":"music","name":"Overall Music","path":"/api/admin/diagnostics/music","section":"music","category":null,"supported":true},{"id":"music-bands","group":"music","name":"Bands","path":"/api/admin/diagnostics/music/bands","section":"music","category":"bands","supported":true},{"id":"music-shows","group":"music","name":"Shows","path":"/api/admin/diagnostics/music/shows","section":"music","category":"shows","supported":true},{"id":"music-people","group":"music","name":"People","path":"/api/admin/diagnostics/music/people","section":"music","category":"people","supported":true},{"id":"music-venues","group":"music","name":"Venues","path":"/api/admin/diagnostics/music/venues","section":"music","category":"venues","supported":true},{"id":"wrestling-overview","group":"wrestling","name":"Overall Wrestling","path":"/api/admin/diagnostics/wrestling","section":"wrestling","category":null,"supported":true},{"id":"wrestling-shows","group":"wrestling","name":"Shows","path":"/api/admin/diagnostics/wrestling/shows","section":"wrestling","category":"shows","supported":false},{"id":"wrestling-people","group":"wrestling","name":"People","path":"/api/admin/diagnostics/wrestling/people","section":"wrestling","category":"people","supported":false},{"id":"wrestling-venues","group":"wrestling","name":"Venues","path":"/api/admin/diagnostics/wrestling/venues","section":"wrestling","category":"venues","supported":false},{"id":"smug-config","group":"smug","name":"Configuration","path":"/api/admin/smug/music/config","section":"smug","category":"config","supported":true},{"id":"smug-snapshots","group":"smug","name":"Music snapshots","path":"/api/admin/smug/music/diagnostics","section":"smug","category":"snapshots","supported":true}].map(spec => Object.freeze(spec)));
   const diagnosticsPanel = host.querySelector("[data-admin-diagnostics]");
   const diagnosticsAll = diagnosticsPanel?.querySelector("[data-admin-diagnostic-all]");
   const diagnosticsProgress = diagnosticsPanel?.querySelector("[data-admin-diagnostic-progress]");
@@ -659,7 +659,7 @@
   }
   function diagnosticsAllowed() {
     return signalAllowed() && diagnosticsPanel && diagnosticsAll && diagnosticsProgress && diagnosticsTotals && diagnosticsCompleted &&
-      diagnosticRows.size === 10 && [...diagnosticRows.values()].every(Boolean);
+      diagnosticRows.size === 12 && [...diagnosticRows.values()].every(Boolean);
   }
   function updateDiagnosticControls() {
     const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
@@ -735,7 +735,7 @@
   function resetDiagnosticReports() {
     cancelDiagnostics();
     diagnosticCatalog.forEach(spec => { diagnosticResults.set(spec.id, uncheckedDiagnostic(spec)); renderDiagnostic(spec.id); });
-    if (diagnosticsProgress) diagnosticsProgress.textContent = "0 / 7 supported diagnostics checked";
+    if (diagnosticsProgress) diagnosticsProgress.textContent = "0 / 9 supported diagnostics checked";
     if (diagnosticsCompleted) { diagnosticsCompleted.textContent = "—"; diagnosticsCompleted.removeAttribute("datetime"); diagnosticsCompleted.removeAttribute("title"); }
     renderDiagnosticTotals();
   }
@@ -797,6 +797,7 @@
     return { data, text, omitted, unverified };
   }
   function diagnosticDetails(data, spec) {
+    if (spec.section === "smug") return smugReportDetails(data);
     const details = [], sampleFields = ["id", "band_id", "band", "show_id", "show_name", "date", "person_id", "name", "category", "venue_id", "venue_name", "venue", "city", "state", "count"];
     let bounded = false;
     const describe = value => ["string", "number"].includes(typeof value) ? String(value) : diagnosticObject(value) ? ["code", "type", "message", "description", "reason", "error"].filter(key => ["string", "number"].includes(typeof value[key])).map(key => `${key}: ${value[key]}`).join(" · ") : "";
@@ -921,7 +922,155 @@
     const returnedWarnings = [data.warnings, summary.warnings].some(value => Array.isArray(value) && value.length > 0);
     return { unavailable, error, findings: findingCounters > 0 || summary.warning_count > 0 || unknownHealth || returnedWarnings || importUnverified, importUnverified, findingCounters, facts };
   }
+  // SmugMug reports use a strict limited projection before the unchanged general redactor.
+  function projectSmugReport(spec, input) {
+    if (!diagnosticObject(input) || typeof input.ok !== "boolean") throw new Error("Invalid SmugMug envelope");
+    let omitted = false;
+    const text = value => {
+      if (typeof value !== "string") throw new Error("Invalid text");
+      if (/oauth|consumerkey|consumersecret|signature|accesskey/.test(value.toLowerCase().replace(/[^a-z0-9]/g, ""))) return "[REDACTED: SmugMug credential context]";
+      value = value.replace(/https?:\/\/[^\s<>"']+/gi, "[OMITTED URL]");
+      if (value.length > 1024) { omitted = true; return value.slice(0, 1024); } return value;
+    };
+    const bool = value => { if (typeof value !== "boolean") throw new Error("Invalid readiness"); return value; };
+    const count = value => { if (!diagnosticCount(value)) throw new Error("Invalid count"); return value; };
+    const timestamp = value => { if (value === null) return null; if (!parseAdminTimestamp(value)) throw new Error("Invalid timestamp"); return value; };
+    const warnings = value => { if (!Array.isArray(value) || value.some(item => typeof item !== "string")) throw new Error("Invalid warnings"); if (value.length > 50) omitted = true; return value.slice(0, 50).map(text); };
+    const output = { projection: "Limited redacted SmugMug projection; private/provider fields and URLs are omitted.", kind: spec.category, ok: input.ok };
+    if (input.generatedAt !== undefined) output.generatedAt = timestamp(input.generatedAt);
+    if (input.ok === false) {
+      ["error", "code", "message"].forEach(key => { if (typeof input[key] === "string") output[key] = text(input[key]); });
+      return { data: output, omitted };
+    }
+    const expected = spec.category === "config" ? "smug_config" : "smug_diagnostics";
+    if (input.type !== expected || input.section !== "music" || input.route !== `/admin/smug/music/${spec.category === "config" ? "config" : "diagnostics"}` || !output.generatedAt) throw new Error("Unexpected SmugMug report");
+    output.warnings = warnings(input.warnings);
+    output.warningCount = count(input.warnings.length);
+    const sourceSnapshot = input.snapshotFields;
+    if (!diagnosticObject(sourceSnapshot) || !Array.isArray(sourceSnapshot.missing) || sourceSnapshot.missing.some(item => typeof item !== "string") || !diagnosticObject(sourceSnapshot.tables)) throw new Error("Invalid snapshot context");
+    const fields = ["gallery_id", "album_id", "cover_image_url", "photo_count", "smug_last_synced_at", "smug_sync_status", "smug_sync_error"];
+    output.snapshot = { present: bool(sourceSnapshot.present), missingCount: sourceSnapshot.missing.length, tables: {} };
+    ["music_bands", "music_shows"].forEach(name => {
+      const table = sourceSnapshot.tables[name];
+      if (table === undefined && !sourceSnapshot.present) return;
+      if (!diagnosticObject(table) || !diagnosticObject(table.fields)) throw new Error("Invalid snapshot table");
+      const target = { tablePresent: bool(table.tablePresent), fields: {} };
+      fields.forEach(field => { target.fields[field] = bool(table.fields[field]); }); output.snapshot.tables[name] = target;
+    });
+    if (!diagnosticObject(input.summary)) throw new Error("Missing summary");
+    if (spec.category === "config") {
+      const config = input.config, helper = input.helper;
+      if (!diagnosticObject(config) || !diagnosticObject(helper) || !Array.isArray(config.missing) || !Array.isArray(input.summary.missingRequirements)) throw new Error("Invalid configuration");
+      output.configuration = { apiReady: bool(config.smugApiKeyConfigured), nicknameReady: bool(config.smugNicknameConfigured), configured: bool(config.configured), userAgentReady: bool(config.userAgentConfigured), missingCount: config.missing.length };
+      output.helper = { available: bool(helper.available), requestReady: bool(helper.requestHelperAvailable), urlReady: bool(helper.urlHelperAvailable), retrySupported: bool(helper.rateLimitRetrySupported), concurrency: count(helper.lowConcurrencyDefault) };
+      output.readiness = { diagnosticsCapable: bool(input.summary.readyForDiagnostics), syncReady: bool(input.summary.readyForSync), missingCount: input.summary.missingRequirements.length };
+      return { data: output, omitted };
+    }
+    const summary = input.summary;
+    output.summary = { databaseReady: bool(summary.databaseConnected), snapshotReady: bool(summary.snapshotFieldsPresent), heavyScan: bool(summary.heavyScan), providerCalls: count(summary.smugApiCalls) };
+    if (summary.heavyScan !== false || summary.smugApiCalls !== 0) throw new Error("Unexpected diagnostic work");
+    if (!summary.databaseConnected) return { data: output, omitted };
+    const samples = source => {
+      if (!Array.isArray(source)) throw new Error("Invalid samples");
+      if (source.length > 10) omitted = true;
+      return source.slice(0, 10).map(item => {
+        if (!diagnosticObject(item)) throw new Error("Invalid sample");
+        const target = {};
+        ["band_id", "band", "show_id", "name", "smug_sync_status", "smug_sync_error"].forEach(key => { if (["string", "number"].includes(typeof item[key])) target[key] = typeof item[key] === "string" ? text(item[key]) : item[key]; });
+        ["date", "smug_last_synced_at"].forEach(key => {
+          if (item[key] === undefined) return;
+          if (item[key] === null) target[key] = null;
+          else if (parseAdminTimestamp(item[key]) || typeof item[key] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item[key]) && parseAdminTimestamp(item[key] + "T00:00:00Z")) target[key] = item[key];
+          else omitted = true;
+        });
+        return target;
+      });
+    };
+    const finding = source => { if (!diagnosticObject(source)) throw new Error("Invalid finding"); const target = { count: count(source.count), samples: source.samples === undefined ? [] : samples(source.samples) }; if (typeof source.meaning === "string") target.meaning = text(source.meaning); return target; };
+    const age = source => {
+      if (source === null) return null;
+      if (!diagnosticObject(source)) throw new Error("Invalid age");
+      const target = { latest_synced_at: timestamp(source.latest_synced_at), oldest_synced_at: timestamp(source.oldest_synced_at) };
+      ["synced_rows", "never_synced_rows", "stale_7d_rows", "stale_30d_rows"].forEach(key => { target[key] = count(source[key]); }); return target;
+    };
+    ["bands", "shows"].forEach(name => {
+      const source = input[name];
+      if (!diagnosticObject(source)) throw new Error("Invalid archive context");
+      const target = { tablePresent: bool(source.tablePresent) }; output[name] = target;
+      if (!source.tablePresent) return;
+      const findingKeys = name === "bands" ? ["missingSmugFolder", "missingSyncData"] : ["missingPosterOrShowUrl", "missingSyncData"];
+      findingKeys.forEach(key => { target[key] = finding(source[key]); });
+      if (!Array.isArray(source.syncStatus)) throw new Error("Invalid sync distribution");
+      if (source.syncStatus.length > 50) omitted = true;
+      target.syncStatus = source.syncStatus.slice(0, 50).map(item => { if (!diagnosticObject(item)) throw new Error("Invalid sync state"); return { status: text(item.status), count: count(item.count) }; });
+      target.snapshotAge = age(source.snapshotAge);
+      if (name === "shows") {
+        target.showUrlColumnPresent = bool(source.showUrlColumnPresent);
+        if (source.rawSheetColumnPresent !== undefined) target.rawSheetColumnPresent = bool(source.rawSheetColumnPresent);
+        if (source.coverage !== undefined) {
+          target.coverage = source.coverage === null ? null : {};
+          if (target.coverage !== null) { if (!diagnosticObject(source.coverage)) throw new Error("Invalid coverage"); ["total_shows", "resolved_shows", "unresolved_shows", "skipped_logo_sources", "skipped_venue_logo_sources", "missing_image_key", "missing_album_key", "missing_cover_image", "never_synced", "stale_syncs_30d"].forEach(key => { target.coverage[key] = count(source.coverage[key]); }); }
+        }
+        ["unresolved", "missingCoverImage", "posterFallbackUsage"].forEach(key => { if (source[key] !== undefined) target[key] = finding(source[key]); });
+      }
+    });
+    return { data: output, omitted };
+  }
+  function interpretSmugReport(spec, data) {
+    if (data.ok !== true) return { state: "Error", reason: "SmugMug returned an error.", issues: null, facts: [] };
+    const tablesReady = ["music_bands", "music_shows"].every(name => data.snapshot.tables[name]?.tablePresent === true && Object.values(data.snapshot.tables[name].fields).every(value => value === true));
+    let unavailable = !data.snapshot.present || data.snapshot.missingCount > 0 || !tablesReady, warning = data.warningCount > 0, error = false, checks = 0;
+    const facts = [["Snapshot fields ready", data.snapshot.present ? "Yes" : "No"], ["Missing snapshot fields", data.snapshot.missingCount], ["Reported warnings", data.warningCount]];
+    if (spec.category === "config") {
+      const config = data.configuration, helper = data.helper;
+      unavailable ||= !config.apiReady || !config.nicknameReady || !config.configured || !helper.available || !helper.requestReady || !helper.urlReady || !data.readiness.diagnosticsCapable;
+      warning ||= !config.userAgentReady || !data.readiness.syncReady || config.missingCount > 0 || data.readiness.missingCount > 0;
+      facts.push(["API configuration present", config.apiReady ? "Yes" : "No"], ["Nickname configuration present", config.nicknameReady ? "Yes" : "No"], ["Configured", config.configured ? "Yes" : "No"], ["User agent present", config.userAgentReady ? "Yes" : "No"], ["Helper available", helper.available ? "Yes" : "No"], ["Ready for sync", data.readiness.syncReady ? "Yes" : "No"], ["Missing requirements", data.readiness.missingCount]);
+    } else {
+      unavailable ||= !data.summary.databaseReady;
+      warning ||= data.summary.snapshotReady !== data.snapshot.present;
+      facts.push(["Database connected", data.summary.databaseReady ? "Yes" : "No"], ["SmugMug API calls", data.summary.providerCalls]);
+      ["bands", "shows"].forEach(name => {
+        const source = data[name];
+        if (!source) return;
+        unavailable ||= !source.tablePresent;
+        Object.entries(source).forEach(([key, finding]) => {
+          if (diagnosticObject(finding) && diagnosticCount(finding.count)) {
+            const label = key === "missingPosterOrShowUrl" ? "Source findings" : key.replace(/([A-Z])/g, " $1");
+            facts.push([`${diagnosticLabel(name)} · ${label}`, finding.count]); if (finding.count > 0) checks += 1;
+          }
+        });
+        source.syncStatus?.forEach(item => { facts.push([`${diagnosticLabel(name)} · Sync ${item.status}`, item.count]); if (item.count > 0 && !["resolved", "synced"].includes(item.status)) checks += 1; if (item.count > 0 && ["error", "failed"].includes(item.status)) error = true; });
+        if (source.snapshotAge) Object.entries(source.snapshotAge).forEach(([key, value]) => {
+          facts.push([`${diagnosticLabel(name)} · ${diagnosticLabel(key)}`, key.endsWith("_at") ? formatAdminDateTime(value, "Not recorded") : value]);
+          if (["never_synced_rows", "stale_7d_rows", "stale_30d_rows"].includes(key) && value > 0) checks += 1;
+        });
+        else if (source.tablePresent) warning = true;
+        if (source.coverage) Object.entries(source.coverage).forEach(([key, value]) => { facts.push([`Shows · ${diagnosticLabel(key)}`, value]); if (!["total_shows", "resolved_shows"].includes(key) && value > 0) checks += 1; });
+      });
+      warning ||= checks > 0;
+    }
+    facts.push(["Report generated", formatAdminDateTime(data.generatedAt)]);
+    return { state: error ? "Error" : unavailable ? "Unavailable" : warning ? "Warning" : "Healthy", reason: error ? "Snapshot errors require review." : unavailable ? "SmugMug prerequisites are unavailable." : warning ? "SmugMug findings require review." : spec.category === "config" ? "Configuration prerequisites are present." : "Snapshot checks report no findings.", issues: `Checks with findings: ${checks}`, facts };
+  }
+  function smugReportDetails(data) {
+    const details = ["Limited redacted projection: private/provider fields and URLs are omitted."];
+    ["error", "code", "message"].forEach(key => { if (typeof data[key] === "string") details.push(`Backend ${key}: ${data[key]}`); });
+    data.warnings?.slice(0, 20).forEach(warning => details.push(`Backend warning: ${warning}`));
+    ["bands", "shows"].forEach(name => {
+      const source = data[name]; if (!source) return;
+      Object.entries(source).forEach(([key, finding]) => {
+        if (!diagnosticObject(finding) || !Array.isArray(finding.samples)) return;
+        if (finding.meaning) details.push(`${diagnosticLabel(name)} · Source meaning: ${finding.meaning}`);
+        finding.samples.slice(0, 5).forEach(sample => details.push(`${diagnosticLabel(name)} · ${key}: ${Object.entries(sample).map(([field, value]) => `${diagnosticLabel(field)}: ${field.endsWith("_at") || field === "date" && parseAdminTimestamp(value) ? formatAdminDateTime(value, "Not recorded") : String(value)}`).join(" · ")}`));
+        if (finding.samples.length > 5) details.push("Further projected samples are omitted from these details. See Technical Response.");
+      });
+    });
+    return details;
+  }
+
   function interpretDiagnostic(spec, data) {
+    if (spec.section === "smug") return interpretSmugReport(spec, data);
     let report;
     if (spec.section === "global") {
       if (!diagnosticObject(data) || data.ok !== true || !diagnosticObject(data.summary) || !diagnosticObject(data.database)) throw new Error("Invalid overview");
@@ -968,7 +1117,9 @@
         else if (parsed.unsupported) { result.reason = "This browser cannot safely read a bounded response."; ownController.abort(); }
         else if (parsed.invalid) { result = { ...result, state: "Error", reason: "The diagnostic response was not valid JSON." }; ownController.abort(); }
         else {
-          const safe = sanitizeDiagnosticResponse(parsed.data, privateToken);
+          const projection = spec.section === "smug" ? projectSmugReport(spec, parsed.data) : { data: parsed.data, omitted: false };
+          const safe = sanitizeDiagnosticResponse(projection.data, privateToken);
+          safe.omitted ||= projection.omitted;
           result.technical = safe.text;
           if (safe.data === null) result.reason = "Report exceeds the safe display limit.";
           else {

@@ -32589,3 +32589,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-diagnostics .admin-diagnostics__completed,
   .admin-shell .admin-diagnostic__checked > .admin-diagnostic__timestamp { min-block-size: 1.45em; }
 }
+
+
+/* Admin 3I: balance SmugMug report labels and timestamp values. */
+.admin-shell [data-admin-diagnostic-group="smug"] .admin-diagnostic__facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }

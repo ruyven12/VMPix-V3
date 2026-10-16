@@ -2452,7 +2452,7 @@
                 <div class="admin-api-section__body">
                   <button class="admin-diagnostics__all" type="button" data-admin-diagnostic-all disabled>Run All Diagnostics</button>
                   <div class="admin-diagnostics__summary" role="group" aria-label="Latest results per diagnostic">
-                    <p role="status" aria-live="polite" aria-atomic="true" data-admin-diagnostic-progress>0 / 7 supported diagnostics checked</p>
+                    <p role="status" aria-live="polite" aria-atomic="true" data-admin-diagnostic-progress>0 / 9 supported diagnostics checked</p>
                     <p data-admin-diagnostic-totals>0 healthy · 0 warnings · 0 errors · 0 unavailable. 3 diagnostics are not implemented.</p>
                     <p class="admin-diagnostics__completed">Last completed: <time data-admin-diagnostic-completed>—</time></p>
                     <p>Manual, read-only checks. Timeout: 15s. Response limit: 128 KiB.</p>
@@ -2515,13 +2515,6 @@
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   </ul>
-                  <details class="admin-diagnostics__group" data-admin-smug-diagnostics><summary>SmugMug Diagnostics</summary>
-                    <button class="admin-diagnostics__category" type="button" disabled aria-disabled="true" aria-describedby="admin-smug-unavailable">Run Diagnostics</button>
-                    <div class="admin-diagnostics__rows"><article class="admin-diagnostic" aria-label="SmugMug diagnostics unavailable">
-                      <code class="admin-diagnostic__path">/api/admin/smug/music/diagnostics</code>
-                      <p class="admin-diagnostic__reason" id="admin-smug-unavailable">Unavailable: this backend diagnostic performs schema maintenance and cannot be run from this read-only console.</p>
-                    </article></div>
-                  </details>
 
                 </details>
                 <details class="admin-diagnostics__group" data-admin-diagnostic-group="wrestling"><summary>Wrestling Diagnostics</summary>
@@ -2558,6 +2551,27 @@
                     <p class="admin-diagnostic__reason" data-diagnostic-reason>Not implemented by the current API.</p>
                     <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
                     <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Sensitive values are redacted. Safety limits may omit part of the response.</p><pre data-diagnostic-json>No report available.</pre></details></details>
+                  </li>
+                  </ul>
+                </details>
+                <details class="admin-diagnostics__group" data-admin-diagnostic-group="smug" data-admin-smug-diagnostics><summary>SmugMug Diagnostics</summary>
+                  <button class="admin-diagnostics__category" type="button" data-admin-diagnostic-category="smug" aria-label="Run SmugMug Diagnostics" disabled>Run Diagnostics</button>
+                  <ul class="admin-diagnostics__rows">
+                  <li class="admin-diagnostic" data-admin-diagnostic="smug-config" data-diagnostic-state="Not Checked">
+                    <div class="admin-diagnostic__heading"><h3>Configuration</h3><button type="button" data-admin-diagnostic-run="smug-config" aria-label="Run SmugMug Configuration diagnostic" disabled>Run</button></div>
+                    <code class="admin-diagnostic__path">/api/admin/smug/music/config</code>
+                    <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
+                    <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Limited redacted projection: private/provider fields and URLs are omitted.</p><pre data-diagnostic-json>No report available.</pre></details></details>
+                  </li>
+                  <li class="admin-diagnostic" data-admin-diagnostic="smug-snapshots" data-diagnostic-state="Not Checked">
+                    <div class="admin-diagnostic__heading"><h3>Music snapshots</h3><button type="button" data-admin-diagnostic-run="smug-snapshots" aria-label="Run SmugMug Music snapshots diagnostic" disabled>Run</button></div>
+                    <code class="admin-diagnostic__path">/api/admin/smug/music/diagnostics</code>
+                    <p class="admin-diagnostic__response"><span data-diagnostic-state>Not Checked</span><span data-diagnostic-http>HTTP —</span><span data-diagnostic-time>Time —</span></p>
+                    <p class="admin-diagnostic__reason" data-diagnostic-reason>Run this diagnostic to inspect its report.</p>
+                    <p class="admin-diagnostic__checked"><span data-diagnostic-issues>Reported issues: —</span><span class="admin-diagnostic__timestamp">Last checked: <time data-diagnostic-checked>—</time></span></p>
+                    <details class="admin-diagnostic__technical"><summary>Technical details</summary><dl class="admin-diagnostic__facts" data-diagnostic-facts hidden></dl><ul class="admin-diagnostic__details" data-diagnostic-details></ul><details><summary>Technical Response</summary><p>Limited redacted projection: private/provider fields and URLs are omitted.</p><pre data-diagnostic-json>No report available.</pre></details></details>
                   </li>
                   </ul>
                 </details>
