@@ -32593,3 +32593,49 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 /* Admin 3I: balance SmugMug report labels and timestamp values. */
 .admin-shell [data-admin-diagnostic-group="smug"] .admin-diagnostic__facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+
+
+/* Admin 3J: manual Query Explorer, within the existing API scrollport. */
+.admin-shell .admin-query { margin-block-start: 22px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-query p { margin: 0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-query__title { margin: 0 0 8px; color: #e0d1dd; font: 400 14px/1.45 var(--font-display); }
+.admin-shell .admin-query__policy { color: #b9aab9; }
+.admin-shell .admin-query__controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-block: 14px; }
+.admin-shell .admin-query__controls > label { display: grid; min-inline-size: 0; gap: 4px; color: #d2bfce; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-query__controls > label[hidden] { display: none; }
+.admin-shell .admin-query input, .admin-shell .admin-query select { box-sizing: border-box; inline-size: 100%; min-inline-size: 0; min-block-size: 44px; padding: 10px 8px; border: 1px solid #6c3a4d; border-radius: 0; background: #130d15; color: #e4d5e0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-query option { background: #130d15; color: #e4d5e0; }
+.admin-shell .admin-query button { appearance: none; min-block-size: 44px; padding: 10px 12px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-query button:disabled, .admin-shell .admin-query input:disabled, .admin-shell .admin-query select:disabled { color: #ab99a8; cursor: default; }
+.admin-shell .admin-query :is(button, input, select, summary):focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-query__run { inline-size: 100%; }
+.admin-shell .admin-query__summary { display: grid; gap: 4px; margin-block: 10px; padding-block: 8px; border-block: 1px solid #4c3546; color: #c6b7c5; }
+.admin-shell .admin-query__response { display: flex; flex-wrap: wrap; gap: 2px 8px; }
+.admin-shell .admin-query__response > span { min-inline-size: 73px; }
+.admin-shell .admin-query__response [data-query-state] { min-inline-size: 101px; color: #e3d5e1; font-size: 14px; }
+.admin-shell .admin-query__message { min-block-size: 4.35em; overflow-wrap: anywhere; }
+.admin-shell .admin-query__path { display: block; min-block-size: 4.35em; color: #b4a1b0; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-query__metadata { min-block-size: 4.35em; overflow-wrap: anywhere; }
+.admin-shell .admin-query__checked { min-block-size: 2.9em; }
+.admin-shell .admin-query__checked time { display: block; }
+.admin-shell .admin-query__paging { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-shell .admin-query__paging > button { flex: 1 1 0; }
+.admin-shell .admin-query__records { display: grid; gap: 10px; margin-block-start: 12px; }
+.admin-shell .admin-query__record { min-inline-size: 0; padding: 12px; border: 1px solid #4c3546; background: rgb(23 15 24 / .4); }
+.admin-shell .admin-query__record h4 { margin: 0 0 8px; color: #e0d1dd; font: 400 14px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-query__record dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 5px 10px; margin: 0; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-query__record dt { min-inline-size: 0; color: #ad9cac; }
+.admin-shell .admin-query__record dd { min-inline-size: 0; margin: 0; color: #e0d0dd; text-align: end; }
+.admin-shell .admin-query__technical { margin-block-start: 8px; color: #baa7b8; }
+.admin-shell .admin-query__technical > summary { min-block-size: 44px; padding-block: 11px; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-query__technical > summary::marker { color: #bd526d; }
+.admin-shell .admin-query__technical pre { margin: 8px 0 0; color: #cbbac8; font: 12px/1.5 var(--font-display); white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (min-width: 840px) {
+  .admin-shell .admin-query__controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-shell .admin-query__run { inline-size: auto; }
+  .admin-shell .admin-query__message, .admin-shell .admin-query__metadata, .admin-shell .admin-query__path, .admin-shell .admin-query__checked { min-block-size: 1.45em; }
+  .admin-shell .admin-query__checked time { display: inline; }
+  .admin-shell .admin-query__paging { justify-content: flex-start; }
+  .admin-shell .admin-query__paging > button { flex: 0 1 auto; }
+  .admin-shell .admin-query__records { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

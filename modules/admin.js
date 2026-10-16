@@ -209,7 +209,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -326,7 +326,7 @@
   function updateStationControl() {
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
-    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
+    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     updateMonitorControls();
   }
   function updateStationPresentation(shouldFocus = true) {
@@ -368,6 +368,7 @@
     cancelMonitor();
     cancelDiagnostics();
     cancelMusicStatus();
+    cancelQuery();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -382,7 +383,7 @@
     if (available() && bearer && expiresAt <= Date.now()) {
       clearSession(); present("idle", "Your session has expired. Connect again."); return;
     }
-    if (!signalAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null) return;
+    if (!signalAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null) return;
     const at = ++signalGeneration;
     const ownController = new AbortController();
     signalController = ownController;
@@ -464,7 +465,7 @@
       endpointRows.size === 10 && [...endpointRows.values()].every(Boolean);
   }
   function updateMonitorControls() {
-    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
+    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     if (monitorAll) { monitorAll.disabled = disabled; monitorAll.setAttribute("aria-busy", String(monitorRun !== null)); }
     endpointRows.forEach(row => { const button = row?.querySelector("[data-admin-endpoint-check]"); if (button) button.disabled = disabled; });
     updateDiagnosticControls();
@@ -592,7 +593,7 @@
     return { state, http, elapsed: performance.now() - started, reason };
   }
   async function runEndpointChecks(ids) {
-    if (signalBusy || monitorRun || diagnosticsRun || musicStatusRun) return;
+    if (signalBusy || monitorRun || diagnosticsRun || musicStatusRun || queryRun) return;
     if (!prepareStationEntry() || !monitorAllowed()) return;
     if (ids.length === endpointCatalog.length) endpointCatalog.forEach(spec => { endpointResults.set(spec.id, uncheckedEndpoint()); renderEndpoint(spec.id); });
     const run = { generation: ++monitorGeneration, ids, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
@@ -662,7 +663,7 @@
       diagnosticRows.size === 12 && [...diagnosticRows.values()].every(Boolean);
   }
   function updateDiagnosticControls() {
-    const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
+    const disabled = !diagnosticsAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     diagnosticsPanel?.querySelectorAll("[data-admin-diagnostic-run], [data-admin-diagnostic-category], [data-admin-diagnostic-all]").forEach(button => {
       const spec = diagnosticCatalog.find(item => item.id === button.dataset.adminDiagnosticRun);
       button.disabled = disabled || Boolean(spec && !spec.supported);
@@ -1141,7 +1142,7 @@
     return { ...result, http, elapsed: performance.now() - started, checkedAt: new Date().toISOString() };
   }
   async function runDiagnostics(ids) {
-    if (diagnosticsRun || signalBusy || monitorRun || musicStatusRun) return;
+    if (diagnosticsRun || signalBusy || monitorRun || musicStatusRun || queryRun) return;
     if (!prepareStationEntry() || !diagnosticsAllowed()) return;
     const supported = ids.filter(id => diagnosticCatalog.some(spec => spec.id === id && spec.supported));
     if (supported.length === 0 || supported.length !== new Set(supported).size) return;
@@ -1195,8 +1196,9 @@
   function musicStatusAllowed() { return signalAllowed() && musicStatusPanel && musicStatusCheck && musicStatusRow; }
   function updateMusicStatusControl() {
     if (!musicStatusCheck) return;
-    musicStatusCheck.disabled = !musicStatusAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null;
+    musicStatusCheck.disabled = !musicStatusAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     musicStatusCheck.setAttribute("aria-busy", String(musicStatusRun !== null));
+    updateQueryControls();
   }
   function renderMusicStatus() {
     if (!musicStatusRow) return;
@@ -1265,7 +1267,7 @@
       warnings: data.warnings.length, facts, details: data.warnings.slice(0, 20).map(warning => `Backend warning: ${warning}`) };
   }
   async function checkMusicStatus() {
-    if (musicStatusRun || signalBusy || monitorRun || diagnosticsRun) return;
+    if (musicStatusRun || signalBusy || monitorRun || diagnosticsRun || queryRun) return;
     if (!prepareStationEntry() || !musicStatusAllowed()) return;
     musicStatusRow.querySelectorAll(".admin-diagnostic__technical, .admin-diagnostic__technical details").forEach(view => { view.open = false; });
     const run = { generation: ++musicStatusGeneration, controllers: new Set(), readers: new Set(), timers: new Set() };
@@ -1310,6 +1312,348 @@
     renderMusicStatus(); updateStationControl();
   }
   musicStatusCheck?.addEventListener("click", checkMusicStatus);
+
+  // The explorer builds only allowlisted public archive GETs; it never sends the Admin bearer.
+  const queryCatalog = Object.freeze([{"id":"music-bands","archive":"music","label":"Bands","path":"/api/music/bands/db","rows":"data","title":"band","filters":["region","status"],"sorts":["band","band_id","region","status","created_at","updated_at"],"tokens":[],"defaultSort":"band","defaultDir":"asc","fields":[["band_id","Band ID"],["region","Region"],["location","Location"],["state","State"],["status","Status"]]},{"id":"music-shows","archive":"music","label":"Shows","path":"/api/music/shows/db","rows":"data","title":"name","filters":["state","city","venue_id","venue","band"],"sorts":["show_id","name","date","venue_id","venue","city","state","created_at","updated_at"],"tokens":[],"defaultSort":"date","defaultDir":"desc","fields":[["show_id","Show ID"],["date","Event date"],["venue_id","Venue ID"],["venue","Venue"],["city","City"],["state","State"],["smug_sync_status","Snapshot status"],["smug_last_synced_at","Snapshot updated","timestamp"]]},{"id":"music-people","archive":"music","label":"People","path":"/api/music/people/db","rows":"data","title":"name","filters":["category","band","instrument","association"],"sorts":["person_id","name","category","created_at","updated_at"],"tokens":[],"defaultSort":"name","defaultDir":"asc","fields":[["person_id","Person ID"],["category","Category"]]},{"id":"music-venues","archive":"music","label":"Venues","path":"/api/music/venues/db","rows":"data","title":"venue","filters":["city","state","country","region","status"],"sorts":["venue_id","venue_key","venue","city","state","country","region","status","created_at","updated_at"],"tokens":[],"defaultSort":"venue","defaultDir":"asc","fields":[["venue_id","Venue ID"],["city","City"],["state","State"],["country","Country"],["region","Region"],["status","Status"],["latitude","Latitude"],["longitude","Longitude"]]},{"id":"wrestling-shows","archive":"wrestling","label":"Shows","path":"/api/wrestling/shows/db","rows":"data","title":"show_name","filters":["promotion","state","city","venue","venue_id","participant","winner","referee","person","tagged_person"],"sorts":["show_id","show_key","promotion","show_name","date","venue_id","venue","city","state","created_at","updated_at"],"tokens":[],"defaultSort":"date","defaultDir":"desc","fields":[["show_id","Show ID"],["show_key","Show key"],["promotion","Promotion"],["date","Event date"],["venue_id","Venue ID"],["venue","Venue"],["city","City"],["state","State"]]},{"id":"wrestling-people","archive":"wrestling","label":"People","path":"/api/wrestling/people/db","rows":"data","title":"name","filters":["category","team"],"sorts":["name_asc","name_desc","newest","oldest"],"tokens":["name_asc","name_desc","newest","oldest"],"defaultSort":"name_asc","defaultDir":"asc","fields":[["id","Person ID"],["slug","Slug"],["category","Category"],["event_count","Events"],["match_count","Matches"],["photo_count","Stored photos"],["photo_count_status","Photo count status"],["photo_count_source","Photo count source"]]},{"id":"wrestling-venues","archive":"wrestling","label":"Venues","path":"/api/wrestling/venues/db","rows":"items","title":"venue_name","filters":["city","state","country","region","venue_type","status"],"sorts":["name_asc","name_desc","city_asc","state_asc","name","venue_name","city","state"],"tokens":["name_asc","name_desc","city_asc","state_asc"],"defaultSort":"name_asc","defaultDir":"asc","fields":[["venue_id","Venue ID"],["city","City"],["state","State"],["country","Country"],["region","Region"],["venue_type","Venue type"],["status","Status"],["latitude","Latitude"],["longitude","Longitude"]]}].map(spec => Object.freeze({ ...spec,
+    filters: Object.freeze(spec.filters), sorts: Object.freeze(spec.sorts), tokens: Object.freeze(spec.tokens),
+    fields: Object.freeze(spec.fields.map(field => Object.freeze(field))) })));
+  const queryPanel = host.querySelector("[data-admin-query-explorer]");
+  const queryNodes = Object.fromEntries(["archive", "dataset", "type", "field", "value", "direction", "limit", "page", "run", "previous", "next", "state", "http", "time", "message", "path", "metadata", "checked", "records", "technical", "json"].map(key => [key, queryPanel?.querySelector(`[data-query-${key}]`)]));
+  let queryGeneration = 0, queryRun = null;
+  let queryResult = uncheckedQuery();
+  function uncheckedQuery(message = "Choose a dataset and run a query.") {
+    return { state: "Not Run", http: null, elapsed: null, checkedAt: null, message, snapshot: null, pagination: null, records: [], technical: null };
+  }
+  function queryAllowed() { return signalAllowed() && queryPanel && Object.values(queryNodes).every(Boolean); }
+  function querySpec() { return queryCatalog.find(spec => spec.id === queryNodes.dataset?.value && spec.archive === queryNodes.archive?.value); }
+  function queryLabel(value) { return ({ name_asc: "Name: ascending", name_desc: "Name: descending", city_asc: "City: ascending", state_asc: "State: ascending", newest: "Newest", oldest: "Oldest" })[value] || diagnosticLabel(value); }
+  function queryOptions(select, values, selected) {
+    select.replaceChildren();
+    values.forEach(value => { const option = document.createElement("option"); option.value = value.value; option.textContent = value.label; select.appendChild(option); });
+    select.value = selected;
+  }
+  function configureQuery(resetDataset = false) {
+    if (!queryPanel || !Object.values(queryNodes).every(Boolean)) return;
+    if (resetDataset) {
+      const specs = queryCatalog.filter(spec => spec.archive === queryNodes.archive.value);
+      queryOptions(queryNodes.dataset, specs.map(spec => ({ value: spec.id, label: spec.label })), specs[0]?.id || "");
+    }
+    const spec = querySpec();
+    if (!spec) return;
+    const type = queryNodes.type.value, fields = type === "filter" ? spec.filters : type === "sort" ? spec.sorts : [];
+    queryOptions(queryNodes.field, fields.map(value => ({ value, label: queryLabel(value) })), type === "sort" ? spec.defaultSort : fields[0] || "");
+    queryPanel.querySelector("[data-query-field-wrap]").hidden = !["filter", "sort"].includes(type);
+    queryPanel.querySelector("[data-query-value-wrap]").hidden = !["search", "filter"].includes(type);
+    queryPanel.querySelector("[data-query-value-wrap]").firstChild.textContent = type === "filter" ? "Filter value" : "Search text";
+    queryNodes.direction.value = spec.defaultDir;
+    queryNodes.value.value = "";
+    queryNodes.page.value = "1";
+    queryNodes.value.removeAttribute("aria-invalid");
+    updateQueryDirection(); updateQueryControls();
+  }
+  function updateQueryDirection() {
+    const spec = querySpec();
+    if (!spec || !queryPanel) return;
+    queryPanel.querySelector("[data-query-direction-wrap]").hidden = queryNodes.type.value !== "sort" || spec.tokens.includes(queryNodes.field.value);
+  }
+  function captureQuery() {
+    const spec = querySpec(), type = queryNodes.type.value;
+    if (!spec || !["search", "filter", "sort", "pagination"].includes(type)) throw new Error("Choose a supported dataset and test type.");
+    const limitText = queryNodes.limit.value, pageText = queryNodes.page.value;
+    if (!/^(1|5|10)$/.test(limitText) || !/^[1-9]\d{0,4}$/.test(pageText) || Number(pageText) > 10000) throw new Error("Choose a page size of 1, 5 or 10 and a page from 1 to 10000.");
+    const limit = Number(limitText), page = Number(pageText), params = new URLSearchParams({ limit: String(limit), page: String(page) });
+    if (type === "search" || type === "filter") {
+      const value = queryNodes.value.value.trim();
+      if (!value || value.length > 120 || /[\u0000-\u001f\u007f]/.test(value)) throw new Error("Enter 1–120 characters without control characters.");
+      if (bearer && value.toLowerCase().includes(bearer.toLowerCase())) throw new Error("Enter valid public query text.");
+      try { encodeURIComponent(value); } catch { throw new Error("Enter valid text for this query."); }
+      if (type === "filter" && !spec.filters.includes(queryNodes.field.value)) throw new Error("Choose a supported filter field.");
+      params.set(type === "search" ? "search" : queryNodes.field.value, value);
+    } else if (type === "sort") {
+      const field = queryNodes.field.value;
+      if (!spec.sorts.includes(field)) throw new Error("Choose a supported sort field.");
+      params.set("sort", field);
+      if (!spec.tokens.includes(field)) {
+        if (!["asc", "desc"].includes(queryNodes.direction.value)) throw new Error("Choose a supported sort direction.");
+        params.set("dir", queryNodes.direction.value);
+      }
+    }
+    return Object.freeze({ id: spec.id, archive: spec.archive, label: spec.label, type, page, limit, path: `${spec.path}?${params.toString()}` });
+  }
+  function queryMatchesSnapshot() {
+    try { return queryResult.snapshot?.path === captureQuery().path; } catch { return false; }
+  }
+  function updateQueryControls() {
+    if (!queryPanel || !Object.values(queryNodes).every(Boolean)) return;
+    const blocked = !queryAllowed() || signalBusy || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
+    ["archive", "dataset", "type", "field", "value", "direction", "limit", "page", "run"].forEach(key => { queryNodes[key].disabled = blocked; });
+    queryNodes.run.setAttribute("aria-busy", String(queryRun !== null));
+    const paging = queryResult.pagination, matches = queryMatchesSnapshot();
+    queryNodes.previous.disabled = blocked || !matches || !paging?.hasPrevPage || paging.page <= 1;
+    queryNodes.next.disabled = blocked || !matches || !paging?.hasNextPage || paging.page >= 10000;
+  }
+  function renderQuery() {
+    if (!queryPanel || !Object.values(queryNodes).every(Boolean)) return;
+    const result = queryResult, checking = result.state === "Loading";
+    queryPanel.dataset.queryState = result.state;
+    queryNodes.state.textContent = result.state;
+    queryNodes.http.textContent = result.http === null ? "HTTP —" : `HTTP ${result.http}`;
+    queryNodes.time.textContent = result.elapsed === null ? "Time —" : `Time ${Math.round(result.elapsed)} ms`;
+    queryNodes.message.textContent = result.message;
+    queryNodes.path.textContent = result.snapshot?.path || "No query has run.";
+    queryNodes.metadata.textContent = result.pagination ? `Returned records: ${result.pagination.count} · Total: ${result.pagination.total} · Page: ${result.pagination.page} / ${result.pagination.totalPages}` : "Returned records: — · Total: — · Page: —";
+    queryNodes.checked.textContent = result.checkedAt ? formatAdminDateTime(result.checkedAt) : "—";
+    if (result.checkedAt) { queryNodes.checked.dateTime = result.checkedAt; queryNodes.checked.title = formatAdminDateTime(result.checkedAt); }
+    else { queryNodes.checked.removeAttribute("datetime"); queryNodes.checked.removeAttribute("title"); }
+    if (checking && queryNodes.technical.contains(document.activeElement)) document.activeElement.blur();
+    queryNodes.technical.toggleAttribute("inert", checking);
+    ["aria-busy", "aria-disabled"].forEach(attribute => { if (checking) queryNodes.technical.setAttribute(attribute, "true"); else queryNodes.technical.removeAttribute(attribute); });
+    const summary = queryNodes.technical.querySelector("summary");
+    if (checking) { summary.setAttribute("tabindex", "-1"); summary.setAttribute("aria-disabled", "true"); }
+    else { summary.removeAttribute("tabindex"); summary.removeAttribute("aria-disabled"); }
+    queryNodes.json.textContent = result.technical || "No response available.";
+    queryNodes.records.replaceChildren();
+    result.records.forEach(record => {
+      const article = document.createElement("article"), title = document.createElement("h4"), facts = document.createElement("dl");
+      article.className = "admin-query__record"; title.textContent = record.title;
+      record.facts.forEach(([label, value]) => { const term = document.createElement("dt"), detail = document.createElement("dd"); term.textContent = label; detail.textContent = value; facts.append(term, detail); });
+      article.append(title, facts); queryNodes.records.appendChild(article);
+    });
+    updateQueryControls();
+  }
+  function cancelQuery() {
+    queryGeneration += 1;
+    const run = queryRun; queryRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      queryResult = { ...uncheckedQuery("Query canceled before verification."), state: "Canceled", snapshot: run.snapshot }; renderQuery();
+    }
+    updateStationControl();
+  }
+  function resetQueryExplorer() { cancelQuery(); queryResult = uncheckedQuery(); renderQuery(); }
+  function queryCurrent(run) {
+    if (queryRun !== run || run.generation !== queryGeneration) return false;
+    if (!queryAllowed()) { cancelQuery(); prepareStationEntry(); return false; }
+    try { if (captureQuery().path !== run.snapshot.path) { cancelQuery(); return false; } }
+    catch { cancelQuery(); return false; }
+    return true;
+  }
+  function validateQueryPayload(data, snapshot, spec) {
+    const routes = spec.id === "wrestling-people" ? [spec.path, "/api/wrestling/people"] : [spec.path];
+    if (!diagnosticObject(data) || data.ok !== true || !routes.includes(data.route) || !Array.isArray(data[spec.rows]) || data[spec.rows].length > snapshot.limit ||
+        !data[spec.rows].every(diagnosticObject) || !diagnosticCount(data.count) || data.count !== data[spec.rows].length ||
+        !diagnosticCount(data.total) || data.total < data.count || data.page !== snapshot.page || data.limit !== snapshot.limit ||
+        !diagnosticCount(data.totalPages) || data.totalPages !== Math.ceil(data.total / data.limit)) return null;
+    const paging = data.meta?.pagination;
+    if (!diagnosticObject(paging) || ["page", "limit", "count", "total", "totalPages"].some(key => paging[key] !== data[key]) ||
+        typeof paging.hasNextPage !== "boolean" || typeof paging.hasPrevPage !== "boolean" ||
+        paging.hasNextPage !== (data.page < data.totalPages) || paging.hasPrevPage !== (data.page > 1) ||
+        data.hasNextPage !== undefined && data.hasNextPage !== paging.hasNextPage || data.hasPrevPage !== undefined && data.hasPrevPage !== paging.hasPrevPage) return null;
+    return { page: data.page, limit: data.limit, count: data.count, total: data.total, totalPages: data.totalPages, hasNextPage: paging.hasNextPage, hasPrevPage: paging.hasPrevPage };
+  }
+  function queryRecords(spec, rows) {
+    return rows.map((record, index) => {
+      const titleValue = record[spec.title];
+      let unsupported = titleValue !== undefined && titleValue !== null && !["string", "number"].includes(typeof titleValue);
+      const title = typeof titleValue === "string" && titleValue.trim() || typeof titleValue === "number" && Number.isFinite(titleValue) ? String(titleValue) : `${spec.label} record ${index + 1}`;
+      const facts = [];
+      spec.fields.forEach(([field, label, type]) => {
+        const value = record[field];
+        if (value === undefined) return;
+        if (value === null || value === "") facts.push([label, "Not recorded"]);
+        else if (type === "timestamp") { const formatted = formatAdminDateTime(value, "Unavailable"); if (formatted === "Unavailable") unsupported = true; facts.push([label, formatted]); }
+        else if (typeof value === "string" || typeof value === "number" && Number.isFinite(value)) facts.push([label, String(value)]);
+        else { unsupported = true; facts.push([label, "Unsupported value omitted"]); }
+      });
+      const relationshipText = (items, render) => {
+        if (!Array.isArray(items)) { if (items !== undefined && items !== null) unsupported = true; return null; }
+        if (items.length === 0) return null;
+        const rendered = items.slice(0, 4).map(render); if (rendered.some(value => value === null)) unsupported = true;
+        const values = rendered.filter(Boolean);
+        return values.length ? values.join(" · ") + (items.length > 4 ? " · Additional relationships not shown" : "") : null;
+      };
+      if (spec.id === "music-people" || spec.id === "music-shows") {
+        const bands = relationshipText(record.bands, item => diagnosticObject(item) && typeof item.band === "string" ?
+          item.band + (spec.id === "music-people" && typeof item.instrument === "string" && item.instrument ? ` (${item.instrument})` : "") : null);
+        if (bands) facts.push(["Bands", bands]);
+      }
+      if (spec.id === "music-people") {
+        const associations = relationshipText(record.associations, item => typeof item === "string" ? item : null);
+        if (associations) facts.push(["Associations", associations]);
+      }
+      if (spec.id === "wrestling-people") {
+        const teams = relationshipText(record.teams, item => typeof item === "string" ? item : null);
+        if (teams) facts.push(["Teams", teams]);
+      }
+      return { title, facts, unsupported };
+    });
+  }
+  function scrubQueryResponse(input) {
+    let nodes = 0, characters = 0, omitted = false, redacted = false;
+    const credentialKey = key => {
+      const normalized = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+      return normalized === "sig" || /oauth|consumerkey|consumersecret|accesskey|signature|auth|cookie|token|session|password|secret|apikey|credential|privatekey/.test(normalized);
+    };
+    const text = value => {
+      const context = value.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (/oauth|consumerkey|consumersecret|accesskey|signature/.test(context)) { redacted = true; return "[REDACTED: provider credential context]"; }
+      value = value.replace(/(?:https?:\/\/|\/\/)[^\s<>"']+|[^\s<>"']*\?[^\s<>"']+/gi, candidate => {
+        try {
+          const url = new URL(candidate, "https://query.invalid/");
+          if (url.username || url.password || [...url.searchParams.keys()].some(credentialKey)) { redacted = true; return "[REDACTED URL]"; }
+          return candidate;
+        } catch { omitted = true; return "[OMITTED URL]"; }
+      });
+      // Whole-string omission never leaves a truncated credential fragment for the shared redactor.
+      if (value.length > 1024 || characters + value.length > 36000) { omitted = true; return "[OMITTED: string safety limit]"; }
+      characters += value.length;
+      return value;
+    };
+    const visit = (value, depth) => {
+      if (++nodes > 2500 || depth > 8) { omitted = true; return "[OMITTED: safety limit]"; }
+      if (typeof value === "string") return text(value);
+      if (value === null || typeof value === "boolean" || typeof value === "number") return value;
+      if (Array.isArray(value)) {
+        const result = value.slice(0, 100).map(item => visit(item, depth + 1));
+        if (value.length > 100) { omitted = true; result.push("[OMITTED: item limit]"); }
+        return result;
+      }
+      if (!diagnosticObject(value)) { omitted = true; return "[OMITTED: unsupported value]"; }
+      const result = Object.create(null), keys = Object.keys(value);
+      keys.slice(0, 100).forEach(key => {
+        if (key.length > 128 || /[\u0000-\u001f\u007f]/.test(key) || ["__proto__", "constructor", "prototype"].includes(key)) { omitted = true; return; }
+        if (credentialKey(key)) { result[key] = "[REDACTED]"; redacted = true; }
+        else result[key] = visit(value[key], depth + 1);
+      });
+      if (keys.length > 100) { omitted = true; result["[OMITTED]"] = "Object safety limit"; }
+      return result;
+    };
+    return { data: visit(input, 0), omitted, redacted };
+  }
+  function safeQueryCards(spec, rows) {
+    let partial = false;
+    const projections = rows.map(record => {
+      const projection = Object.create(null), relationshipKeys = [], more = [];
+      const scalar = value => {
+        if (value === null || typeof value === "string" || typeof value === "number" && Number.isFinite(value)) return value;
+        partial = true; return "[Unsupported value omitted]";
+      };
+      [spec.title, ...spec.fields.map(field => field[0])].forEach(key => { if (record[key] !== undefined) projection[key] = scalar(record[key]); });
+      if (spec.id === "music-people" || spec.id === "music-shows") relationshipKeys.push("bands");
+      if (spec.id === "music-people") relationshipKeys.push("associations");
+      if (spec.id === "wrestling-people") relationshipKeys.push("teams");
+      relationshipKeys.forEach(key => {
+        if (record[key] === undefined || record[key] === null) return;
+        if (!Array.isArray(record[key])) { partial = true; return; }
+        if (record[key].length > 4) more.push(key);
+        projection[key] = record[key].slice(0, 4).map(item => {
+          if (key !== "bands") return scalar(item);
+          if (!diagnosticObject(item)) { partial = true; return null; }
+          const band = Object.create(null);
+          if (item.band !== undefined) band.band = scalar(item.band);
+          if (spec.id === "music-people" && item.instrument !== undefined) band.instrument = scalar(item.instrument);
+          return band;
+        });
+      });
+      const scrubbed = scrubQueryResponse(projection), safe = sanitizeDiagnosticResponse(scrubbed.data, bearer);
+      partial ||= scrubbed.omitted || scrubbed.redacted || safe.omitted || safe.unverified;
+      const data = diagnosticObject(safe.data) ? safe.data : Object.create(null);
+      if (!diagnosticObject(safe.data)) partial = true;
+      // Only already-scrubbed text can be shortened for a compact card.
+      const shorten = value => {
+        if (typeof value === "string") {
+          if (value.length > 240) { partial = true; return value.slice(0, 240) + " [Preview shortened]"; }
+          return value;
+        }
+        if (Array.isArray(value)) return value.map(shorten);
+        if (diagnosticObject(value)) { const result = Object.create(null); Object.keys(value).forEach(key => { result[key] = shorten(value[key]); }); return result; }
+        return value;
+      };
+      return { data: shorten(data), more };
+    });
+    const records = queryRecords(spec, projections.map(item => item.data));
+    records.forEach((record, index) => {
+      if (projections[index].more.length) record.facts.push(["Relationships", "Additional supplied relationships not shown."]);
+      partial ||= record.unsupported;
+    });
+    return { records, partial };
+  }
+  async function runQuery(page = null) {
+    if (queryRun || signalBusy || monitorRun || diagnosticsRun || musicStatusRun) return;
+    if (!prepareStationEntry() || !queryAllowed()) return;
+    if (page !== null) {
+      if (!queryMatchesSnapshot() || !queryResult.pagination || !Number.isSafeInteger(page) || page < 1 || page > 10000 ||
+          page === queryResult.pagination.page - 1 && !queryResult.pagination.hasPrevPage || page === queryResult.pagination.page + 1 && !queryResult.pagination.hasNextPage || Math.abs(page - queryResult.pagination.page) !== 1) return;
+      queryNodes.page.value = String(page);
+    }
+    let snapshot;
+    try { snapshot = captureQuery(); }
+    catch (error) { queryResult = { ...uncheckedQuery(error.message), state: "Invalid" }; renderQuery(); return; }
+    const spec = queryCatalog.find(item => item.id === snapshot.id);
+    queryNodes.technical.open = false;
+    const run = { generation: ++queryGeneration, snapshot, controllers: new Set(), readers: new Set(), timers: new Set() };
+    const ownController = new AbortController(); run.controllers.add(ownController); queryRun = run;
+    queryResult = { ...uncheckedQuery("Loading this public archive query…"), state: "Loading", snapshot }; renderQuery(); updateStationControl();
+    const started = performance.now(); let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000); run.timers.add(timer);
+    let result = { ...uncheckedQuery("The query could not be verified."), state: "Unavailable", snapshot };
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${snapshot.path}`, {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      http = response.status;
+      const parsed = await boundedEndpointJson(response, run, ownController);
+      if (parsed.unavailable) result.message = "Response exceeds the 128 KiB safety limit.";
+      else if (parsed.unsupported) { result.message = "This browser cannot safely read a bounded response."; ownController.abort(); }
+      else if (parsed.invalid) { result.state = "Error"; result.message = response.ok ? "The response was not valid JSON." : `HTTP ${http}: the archive query failed.`; ownController.abort(); }
+      else {
+        const paging = response.ok ? validateQueryPayload(parsed.data, snapshot, spec) : null;
+        const previews = paging ? safeQueryCards(spec, parsed.data[spec.rows]) : null;
+        const scrubbed = scrubQueryResponse(parsed.data);
+        const safe = sanitizeDiagnosticResponse(scrubbed.data, bearer); result.technical = safe.text;
+        safe.omitted ||= scrubbed.omitted;
+        if (!response.ok) { result.state = "Error"; result.message = `HTTP ${http}: the archive query failed.`; }
+        else if (!paging) { result.state = "Error"; result.message = "The archive response contract was not verified."; }
+        else {
+          const warnings = Array.isArray(parsed.data.meta?.warnings) && parsed.data.meta.warnings.length > 0 || Array.isArray(parsed.data.warnings) && parsed.data.warnings.length > 0;
+          const records = previews.records;
+          const limited = safe.omitted || safe.unverified || scrubbed.redacted || previews.partial || warnings;
+          result = { ...result, state: limited ? "Partial" : paging.count === 0 ? "Empty" : "Results", pagination: paging,
+            records, message: limited ? "Results are limited or include backend warnings. Review the redacted response." : paging.count === 0 ? "No records matched this query." : "Public archive results verified." };
+        }
+      }
+    } catch {
+      if (timedOut) result.message = "The query exceeded 15 seconds.";
+      else if (!ownController.signal.aborted && http !== null) { result.state = "Error"; result.message = "The response did not match the archive format."; }
+    } finally {
+      clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController);
+    }
+    if (!queryCurrent(run)) return;
+    queryRun = null;
+    queryResult = { ...result, http, elapsed: performance.now() - started, checkedAt: new Date().toISOString() }; renderQuery(); updateStationControl();
+  }
+  const cancelEditedQuery = () => { if (queryRun) cancelQuery(); };
+  queryNodes.archive?.addEventListener("change", () => { cancelEditedQuery(); configureQuery(true); queryResult = uncheckedQuery(); renderQuery(); });
+  queryNodes.dataset?.addEventListener("change", () => { cancelEditedQuery(); configureQuery(); queryResult = uncheckedQuery(); renderQuery(); });
+  queryNodes.type?.addEventListener("change", () => { cancelEditedQuery(); configureQuery(); });
+  queryNodes.field?.addEventListener("change", () => {
+    cancelEditedQuery();
+    queryNodes.page.value = "1";
+    if (queryNodes.type.value === "filter") queryNodes.value.value = "";
+    updateQueryDirection(); updateQueryControls();
+  });
+  ["value", "direction", "limit"].forEach(key => queryNodes[key]?.addEventListener("input", () => { cancelEditedQuery(); queryNodes.page.value = "1"; updateQueryControls(); }));
+  queryNodes.page?.addEventListener("input", () => { cancelEditedQuery(); updateQueryControls(); });
+  ["value", "page"].forEach(key => queryNodes[key]?.addEventListener("keydown", event => {
+    if (event.key !== "Enter" || event.isComposing || queryNodes[key].disabled || !queryAllowed()) return;
+    event.preventDefault(); runQuery();
+  }));
+  queryNodes.run?.addEventListener("click", () => runQuery());
+  queryNodes.previous?.addEventListener("click", () => runQuery(queryResult.pagination?.page - 1));
+  queryNodes.next?.addEventListener("click", () => runQuery(queryResult.pagination?.page + 1));
+  configureQuery(true); renderQuery();
+
 
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;

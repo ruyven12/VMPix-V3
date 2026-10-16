@@ -2593,6 +2593,35 @@
 
                 </div>
               </details>
+              <details class="admin-query admin-api-section" data-admin-api-section="tools" data-admin-query-explorer aria-labelledby="admin-query-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-query-title">API Testing Tools</h2></summary>
+                <div class="admin-api-section__body">
+                  <h3 class="admin-query__title">Query Explorer</h3>
+                  <p class="admin-query__policy">Manual public archive queries. Page sizes: 1, 5 or 10. A 15-second timeout and 128 KiB response limit apply. No background checks.</p>
+                  <div class="admin-query__controls" role="group" aria-label="Query options">
+                    <label>Archive<select data-query-archive><option value="music">Music</option><option value="wrestling">Wrestling</option></select></label>
+                    <label>Dataset<select data-query-dataset></select></label>
+                    <label>Test type<select data-query-type><option value="search">Search</option><option value="filter">Filter</option><option value="sort">Sort</option><option value="pagination">Pagination</option></select></label>
+                    <label data-query-field-wrap hidden>Field<select data-query-field></select></label>
+                    <label data-query-value-wrap>Search text<input type="text" maxlength="120" autocomplete="off" data-query-value></label>
+                    <label data-query-direction-wrap hidden>Direction<select data-query-direction><option value="asc">Ascending</option><option value="desc">Descending</option></select></label>
+                    <label>Page size<select data-query-limit><option value="1">1</option><option value="5">5</option><option value="10" selected>10</option></select></label>
+                    <label>Page<input type="number" min="1" max="10000" step="1" value="1" inputmode="numeric" data-query-page></label>
+                  </div>
+                  <button class="admin-query__run" type="button" data-query-run disabled>Run Query</button>
+                  <div class="admin-query__summary" role="group" aria-label="Query result">
+                    <p class="admin-query__response"><span data-query-state>Not Run</span><span data-query-http>HTTP —</span><span data-query-time>Time —</span></p>
+                    <p class="admin-query__message" role="status" aria-live="polite" aria-atomic="true" data-query-message>Choose a dataset and run a query.</p>
+                    <code class="admin-query__path" data-query-path>No query has run.</code>
+                    <p class="admin-query__metadata" data-query-metadata>Returned records: — · Total: — · Page: —</p>
+                    <p class="admin-query__checked">Last completed: <time data-query-checked>—</time></p>
+                  </div>
+                  <div class="admin-query__paging" role="group" aria-label="Result pages"><button type="button" data-query-previous disabled>Previous</button><button type="button" data-query-next disabled>Next</button></div>
+                  <div class="admin-query__records" data-query-records></div>
+                  <details class="admin-query__technical" data-query-technical><summary>Technical Response</summary><p>Returned JSON is redacted and bounded. Technical views close while a query runs.</p><pre data-query-json>No response available.</pre></details>
+                </div>
+              </details>
+
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-api-feedback></p><button class="admin-console__logout" type="button" data-admin-api-logout>LOGOUT</button></footer>
             </div>
           </article>
