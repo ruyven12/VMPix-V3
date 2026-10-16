@@ -32310,3 +32310,45 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-console.is-admin-assembling .admin-console__station-body,
   .admin-shell .admin-console.is-admin-assembling .admin-console__pixel { animation: none; }
 }
+
+
+/* Admin 2B: mobile deck fills the usable Shell-to-Engine span; login and desktop stay unchanged. */
+@media (max-width: 839px) {
+  .admin-shell {
+    --admin-deck-top: calc(env(safe-area-inset-top, 0px) + 10px);
+    --admin-deck-bottom: calc(var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) + var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))) + 20px);
+    --admin-deck-budget: max(0px, calc(var(--app-viewport-height, 100svh) - var(--admin-deck-top) - var(--admin-deck-bottom)));
+  }
+  .admin-shell .admin-access:has(> .admin-access__stage:is([data-admin-phase="assembling"], [data-admin-phase="ready"])) {
+    align-content: start;
+    padding-block-start: var(--admin-deck-top);
+    padding-block-end: var(--admin-deck-bottom);
+  }
+  .admin-shell .admin-access__stage:is([data-admin-phase="assembling"], [data-admin-phase="ready"]) {
+    align-items: stretch;
+    block-size: var(--admin-deck-budget);
+    min-block-size: min-content;
+  }
+  .admin-shell .admin-access__stage:is([data-admin-phase="collapsing"], [data-admin-phase="assembling"], [data-admin-phase="ready"]) > .admin-console {
+    block-size: var(--admin-deck-budget);
+    min-block-size: min-content;
+  }
+  .admin-shell .admin-access__stage:is([data-admin-phase="collapsing"], [data-admin-phase="assembling"], [data-admin-phase="ready"]) > .admin-console > .admin-console__surface {
+    block-size: 100%;
+    min-block-size: min-content;
+    grid-template-rows: auto minmax(min-content, 1fr) auto;
+  }
+  .admin-shell .admin-access__stage:is([data-admin-phase="collapsing"], [data-admin-phase="assembling"], [data-admin-phase="ready"]) .admin-console__stations {
+    grid-template-rows: repeat(4, minmax(104px, 1fr));
+  }
+  /* Anchor only the pre-rendered deck to Admin's existing scroll host, outside login sizing. */
+  .admin-shell .admin-access__stage[data-admin-phase="collapsing"] { position: static; }
+  .admin-shell .admin-access__stage[data-admin-phase="collapsing"] > .admin-console {
+    inset-block-start: var(--admin-deck-top);
+    inset-inline-start: max(18px, env(safe-area-inset-left));
+    inset-inline-end: max(18px, env(safe-area-inset-right));
+    inline-size: auto;
+    align-self: start;
+    justify-self: stretch;
+  }
+}
