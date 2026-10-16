@@ -2372,10 +2372,13 @@
                 <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-endpoints-title">Endpoint Monitor</h2></summary>
                 <div class="admin-api-section__body">
                 <div class="admin-endpoints__actions"><p>Manual, read-only public checks.</p><button class="admin-endpoints__all" type="button" data-admin-monitor-all disabled>Check All Endpoints</button></div>
-                <p class="admin-endpoints__policy">Slow: verified responses over 2 seconds. Request timeout: 15 seconds. Unavailable: no verified result.</p>
-                <p class="admin-endpoints__progress" role="status" aria-live="polite" aria-atomic="true" data-admin-monitor-progress>0/10 checked. Ready for a manual check.</p>
-                <p class="admin-endpoints__totals" data-admin-monitor-totals>Latest per endpoint: 0 successful · 0 failed · 0 unavailable</p>
+                <div class="admin-endpoints__summary" role="group" aria-label="Latest results per endpoint">
+                <p class="admin-endpoints__progress" role="status" aria-live="polite" aria-atomic="true" data-admin-monitor-progress>0 / 10 checked</p>
+                <p class="admin-endpoints__totals" data-admin-monitor-totals>0 successful · 0 failed · 0 unavailable</p>
                 <p class="admin-endpoints__completed">Last completed: <time data-admin-monitor-completed>—</time></p>
+                <p class="admin-endpoints__policy">Slow: verified &gt; 2s. Timeout: 15s.</p>
+                <p class="admin-endpoints__issue" data-admin-monitor-issue>No failed or unavailable checks.</p>
+                </div>
                 <details class="admin-endpoints__group" data-admin-endpoint-group="core"><summary>Core API</summary><ul class="admin-endpoints__rows">
                   <li class="admin-endpoint" data-admin-endpoint="core-health" data-endpoint-state="Not Checked">
                     <div class="admin-endpoint__heading"><h3>API Health</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check API Health in Core API" disabled>Check</button></div>

@@ -423,6 +423,7 @@
   const monitorAll = monitorPanel?.querySelector("[data-admin-monitor-all]");
   const monitorProgress = monitorPanel?.querySelector("[data-admin-monitor-progress]");
   const monitorTotals = monitorPanel?.querySelector("[data-admin-monitor-totals]");
+  const monitorIssue = monitorPanel?.querySelector("[data-admin-monitor-issue]");
   const monitorCompleted = monitorPanel?.querySelector("[data-admin-monitor-completed]");
   const endpointRows = new Map(endpointCatalog.map(item => [item.id, monitorPanel?.querySelector(`[data-admin-endpoint="${item.id}"]`)]));
   const endpointResults = new Map(endpointCatalog.map(item => [item.id, uncheckedEndpoint()]));
@@ -457,7 +458,13 @@
       else if (result.state === "Failed") failed += 1;
       else if (result.state === "Unavailable") unavailable += 1;
     });
-    if (monitorTotals) monitorTotals.textContent = `Latest per endpoint: ${successful} successful · ${failed} failed · ${unavailable} unavailable`;
+    if (monitorTotals) monitorTotals.textContent = `${successful} successful · ${failed} failed · ${unavailable} unavailable`;
+    if (monitorIssue) {
+      const issue = endpointCatalog.find(spec => ["Failed", "Unavailable"].includes(endpointResults.get(spec.id)?.state));
+      const group = issue && ({ core: "", music: "Music ", wrestling: "Wrestling " })[issue.group];
+      monitorIssue.textContent = issue ? `First issue: ${group}${issue.name}. ${endpointResults.get(issue.id).reason}` :
+        "No failed or unavailable checks.";
+    }
   }
   function cancelMonitor() {
     monitorGeneration += 1;
@@ -470,7 +477,7 @@
       endpointResults.forEach((result, id) => {
         if (result.state === "Checking") { endpointResults.set(id, uncheckedEndpoint("Check canceled before verification.")); renderEndpoint(id); }
       });
-      if (monitorProgress) monitorProgress.textContent = `Canceled. ${run.completed}/${run.ids.length} checked.`;
+      if (monitorProgress) monitorProgress.textContent = `Canceled: ${run.completed} / ${run.ids.length} checked`;
       renderMonitorTotals();
     }
     updateMonitorControls();
@@ -564,7 +571,7 @@
     const run = { generation: ++monitorGeneration, ids, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
     monitorRun = run;
     updateStationControl(); updateMonitorControls(); renderMonitorTotals();
-    if (monitorProgress) monitorProgress.textContent = `0/${ids.length} checked. Checking endpoints…`;
+    if (monitorProgress) monitorProgress.textContent = `0 / ${ids.length} checked`;
     async function worker() {
       while (run.cursor < ids.length && monitorCurrent(run)) {
         const id = ids[run.cursor++], spec = endpointCatalog.find(item => item.id === id);
@@ -574,7 +581,7 @@
         if (!monitorCurrent(run)) return;
         endpointResults.set(id, result); renderEndpoint(id);
         run.completed += 1;
-        if (monitorProgress) monitorProgress.textContent = `${run.completed}/${ids.length} checked.`;
+        if (monitorProgress) monitorProgress.textContent = `${run.completed} / ${ids.length} checked`;
         renderMonitorTotals();
       }
     }
@@ -585,7 +592,7 @@
     monitorCompleted.dateTime = completed.toISOString();
     monitorCompleted.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     monitorCompleted.title = completed.toLocaleString();
-    monitorProgress.textContent = `Complete. ${run.completed}/${ids.length} checked.`;
+    monitorProgress.textContent = `Complete: ${run.completed} / ${ids.length} checked`;
     updateStationControl(); updateMonitorControls();
   }
   monitorAll?.addEventListener("click", () => runEndpointChecks(endpointCatalog.map(spec => spec.id)));
