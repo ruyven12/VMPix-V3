@@ -181,7 +181,8 @@ function getRouteFromUrl(url = window.location.href) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
   if (routePath === routePaths.admin) {
-    return { name: "admin", canonicalUrl: routePaths.admin };
+    const adminStation = routeUrl.searchParams.get("station") === "api" ? "api" : "deck";
+    return { name: "admin", adminStation, canonicalUrl: adminStation === "api" ? `${routePaths.admin}?station=api` : routePaths.admin };
   }
   if (routePath === routePaths.connect) {
     return { name: "connect", canonicalUrl: routePaths.connect };
@@ -408,6 +409,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof cancelAdminStationTravel === "function") cancelAdminStationTravel();
   if (route.name !== "admin" && typeof hideAdminShell === "function") hideAdminShell();
   beginV3RouteContext(route, options);
   if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
@@ -638,7 +640,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "admin") {
-    showAdminShell();
+    showAdminShell(route);
     return;
   }
 

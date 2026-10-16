@@ -16,14 +16,30 @@
   const deckLogout = host?.querySelector("[data-admin-console-logout]");
   const deckReturn = host?.querySelector("[data-admin-console-return]");
   const returnLink = host?.querySelector("[data-admin-return]");
+  const apiOpen = host?.querySelector("[data-admin-open-api]");
+  const apiPanel = host?.querySelector("[data-admin-api-station]");
+  const apiTitle = host?.querySelector("#admin-api-title");
+  const apiLogout = host?.querySelector("[data-admin-api-logout]");
+  const apiFeedback = host?.querySelector("[data-admin-api-feedback]");
+  const apiSession = host?.querySelector("[data-admin-api-session]");
+  const apiCheck = host?.querySelector("[data-admin-api-check]");
+  const apiInstrument = host?.querySelector("[data-admin-api-instrument]");
+  const apiStatus = host?.querySelector("[data-admin-api-status]");
+  const apiDetail = host?.querySelector("[data-admin-api-detail]");
+  const apiConnection = host?.querySelector("[data-admin-api-connection]");
+  const apiResponse = host?.querySelector("[data-admin-api-response]");
+  const apiVerified = host?.querySelector("[data-admin-api-verified]");
   if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
-      !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink) return;
+      !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink ||
+      !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiSession || !apiCheck ||
+      !apiInstrument || !apiStatus || !apiDetail || !apiConnection || !apiResponse || !apiVerified) return;
   let active = false;
   let bearer = null;
   let expiresAt = 0;
   let state = "idle";
   let generation = 0;
   let controller = null;
+  let requestedStation = "deck";
 
   let visualGeneration = 0;
   let visualCleanup = null;
@@ -49,6 +65,9 @@
   function focusTitle(title) { if (available()) title.focus({ preventScroll: true }); }
   function resetPresentation(shouldFocus = false) {
     const changed = visualPhase !== "login";
+    resetSignal();
+    surface(apiPanel, false);
+    stage.dataset.adminView = "deck";
     cancelVisuals();
     surface(deck, false);
     if (returnLink.parentElement !== returnHome) returnHome.appendChild(returnLink);
@@ -88,18 +107,19 @@
     deckReturn.appendChild(returnLink);
     surface(deck, true);
     host.setAttribute("aria-labelledby", "admin-console-title");
-    if (shouldFocus) focusTitle(deckTitle);
+    if (shouldFocus && !(requestedStation === "api" && visualPhase === "ready")) focusTitle(deckTitle);
   }
   function showDeck(shouldFocus = true) {
     cancelVisuals();
     phase("ready");
     revealDeck(shouldFocus);
+    updateStationPresentation(shouldFocus);
   }
   function renderPresentation(animateArrival) {
     const deckState = state === "authenticated" || state === "logout-uncertain" ||
       state === "logging-out" && visualPhase !== "login";
     if (!deckState) { resetPresentation(available()); return; }
-    if (visualPhase === "ready") return;
+    if (visualPhase === "ready") { updateStationPresentation(); return; }
     if (visualPhase === "collapsing" || visualPhase === "assembling") {
       if (state !== "authenticated") showDeck(false);
       return;
@@ -124,6 +144,7 @@
       visualTrack(lastStationBody, "adminConsoleBuild", () => {
         cancelVisuals();
         phase("ready");
+        updateStationPresentation();
       });
     });
   }
@@ -160,7 +181,12 @@
     deckLogout.disabled = busy();
     deckLogout.setAttribute("aria-busy", String(busy()));
     deckLogout.textContent = state === "logging-out" ? "LOGGING OUT…" : "LOGOUT";
+    apiLogout.disabled = busy();
+    apiLogout.textContent = deckLogout.textContent;
+    apiFeedback.textContent = message;
+    apiSession.textContent = state === "authenticated" ? "SECURE SESSION" : state === "logging-out" ? "ENDING SESSION" : "SESSION UNVERIFIED";
     renderPresentation(animateArrival);
+    updateStationControl();
   }
   function clearSession() { bearer = null; expiresAt = 0; }
   function cancelRequest() {
@@ -254,6 +280,7 @@
   }
   async function logout() {
     if (!available() || busy() || !bearer) return;
+    resetSignal();
     const at = ++generation;
     present("logging-out", "Ending your session…");
     try {
@@ -266,6 +293,140 @@
       if (current(at)) present("logout-uncertain", "Logout could not be confirmed. Please retry LOGOUT.");
     }
   }
+  function prepareStationEntry() {
+    if (available() && bearer && expiresAt <= Date.now()) {
+      clearSession(); present("idle", "Your session has expired. Connect again."); return false;
+    }
+    return canEnterStation();
+  }
+  function canEnterStation() {
+    return available() && state === "authenticated" && bearer !== null && expiresAt > Date.now() && visualPhase === "ready";
+  }
+  function updateStationControl() {
+    apiOpen.disabled = !canEnterStation();
+    apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
+    if (!signalBusy) apiCheck.disabled = !signalAllowed();
+  }
+  function updateStationPresentation(shouldFocus = true) {
+    if (available() && state === "authenticated" && bearer && expiresAt <= Date.now()) {
+      clearSession(); present("idle", "Your session has expired. Connect again."); return;
+    }
+    const wasApi = stage.dataset.adminView === "api";
+    const allowed = requestedStation === "api" && visualPhase === "ready" && bearer &&
+      (state === "authenticated" && expiresAt > Date.now() || wasApi && ["logging-out", "logout-uncertain"].includes(state));
+    if (allowed) {
+      surface(loginPanel, false); surface(deck, false); surface(apiPanel, true);
+      stage.dataset.adminView = "api";
+      host.setAttribute("aria-labelledby", "admin-api-title");
+      if (!wasApi && shouldFocus) focusTitle(apiTitle);
+    } else {
+      if (wasApi) resetSignal();
+      surface(apiPanel, false);
+      stage.dataset.adminView = "deck";
+      if (visualPhase === "ready") {
+        surface(deck, true);
+        host.setAttribute("aria-labelledby", "admin-console-title");
+        if (wasApi && shouldFocus) focusTitle(deckTitle);
+      }
+    }
+    updateStationControl();
+  }
+  // Public liveness only: this controller never receives the private Admin bearer.
+  let signalGeneration = 0;
+  let signalController = null;
+  let signalBusy = false;
+  function signalAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "api" && !apiPanel.hidden && !apiPanel.hasAttribute("inert");
+  }
+  function signalMotionEnd(event) {
+    if (event.animationName === "adminApiAcquire") apiInstrument.classList.remove("is-checking");
+    if (event.animationName === "adminApiLock") apiInstrument.classList.remove("is-locked");
+  }
+  function resetSignal() {
+    signalGeneration += 1;
+    signalController?.abort();
+    signalController = null;
+    signalBusy = false;
+    apiInstrument.classList.remove("is-checking", "is-locked");
+    apiStatus.textContent = "AWAITING SIGNAL";
+    apiDetail.textContent = "Backend connection not yet checked.";
+    apiConnection.textContent = "—";
+    apiResponse.textContent = "—";
+    apiVerified.textContent = "—";
+    apiVerified.removeAttribute("datetime");
+    apiVerified.removeAttribute("title");
+    apiCheck.disabled = !signalAllowed();
+    apiCheck.setAttribute("aria-busy", "false");
+  }
+  async function checkSignal() {
+    if (available() && bearer && expiresAt <= Date.now()) {
+      clearSession(); present("idle", "Your session has expired. Connect again."); return;
+    }
+    if (!signalAllowed() || signalBusy) return;
+    const at = ++signalGeneration;
+    const ownController = new AbortController();
+    signalController = ownController;
+    signalBusy = true;
+    apiCheck.disabled = true;
+    apiCheck.setAttribute("aria-busy", "true");
+    apiStatus.textContent = "ACQUIRING SIGNAL";
+    apiDetail.textContent = "Checking the public API health endpoint…";
+    apiConnection.textContent = "CHECKING";
+    apiResponse.textContent = "—";
+    apiInstrument.classList.remove("is-locked");
+    if (!motionPreference.matches) apiInstrument.classList.add("is-checking");
+    const started = performance.now();
+    let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000);
+    let outcome = "error";
+    let elapsed = null;
+    try {
+      const response = await fetch("https://vmpix-data.onrender.com/health", {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors",
+        cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      if (!response.ok) {
+        elapsed = performance.now() - started;
+        outcome = "unavailable";
+        await response.body?.cancel();
+      } else {
+        const data = await response.json();
+        const valid = data && typeof data === "object" && !Array.isArray(data) &&
+          typeof data.ok === "boolean" && (data.service === undefined || data.service === "vmpix-v3-data");
+        if (valid) {
+          elapsed = performance.now() - started;
+          outcome = data.ok === true ? "connected" : "unavailable";
+        }
+      }
+    } catch { /* Failure is rendered locally without exposing response or credential data. */ }
+    finally {
+      clearTimeout(timer);
+      if (signalController === ownController) signalController = null;
+    }
+    if (at !== signalGeneration) return;
+    if (available() && bearer && expiresAt <= Date.now()) {
+      clearSession(); present("idle", "Your session has expired. Connect again."); return;
+    }
+    if (!signalAllowed()) return;
+    signalBusy = false;
+    apiCheck.disabled = false;
+    apiCheck.setAttribute("aria-busy", "false");
+    apiInstrument.classList.remove("is-checking");
+    const completed = new Date();
+    apiVerified.dateTime = completed.toISOString();
+    apiVerified.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    apiVerified.title = `Most recent completed check: ${completed.toLocaleString()}`;
+    apiResponse.textContent = elapsed === null ? "—" : `${Math.round(elapsed)} ms`;
+    apiConnection.textContent = outcome === "connected" ? "CONNECTED" : outcome === "unavailable" ? "UNAVAILABLE" : "ERROR";
+    apiStatus.textContent = outcome === "connected" ? "SIGNAL VERIFIED" : outcome === "unavailable" ? "SIGNAL UNAVAILABLE" : "CHECK FAILED";
+    apiDetail.textContent = outcome === "connected" ? "Primary API connection verified." :
+      outcome === "unavailable" ? "The endpoint responded without confirming API liveness." :
+      timedOut ? "The health request timed out. API liveness was not confirmed." : "The health check could not be completed. Please retry.";
+    if (outcome === "connected" && !motionPreference.matches) apiInstrument.classList.add("is-locked");
+  }
+  apiCheck.addEventListener("click", checkSignal);
+  apiInstrument.addEventListener("animationend", signalMotionEnd);
+  apiInstrument.addEventListener("animationcancel", signalMotionEnd);
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();
@@ -284,6 +445,9 @@
   deckLogout.addEventListener("click", () => {
     if (!deck.hidden && !deck.hasAttribute("inert")) logout();
   });
+  apiLogout.addEventListener("click", () => {
+    if (!apiPanel.hidden && !apiPanel.hasAttribute("inert")) logout();
+  });
   password.addEventListener("keydown", (event) => {
     if (!available() || event.key !== "Enter" || event.isComposing || password.disabled) return;
     event.preventDefault(); connectAction();
@@ -296,7 +460,14 @@
   clearPassword();
   present("idle", "Enter your password to connect securely.");
   window.V3AdminModule = Object.freeze({
-    activate() {
+    canEnterStation,
+    prepareStationEntry,
+    setStation(station) {
+      requestedStation = station === "api" ? "api" : "deck";
+      updateStationPresentation();
+    },
+    activate({ station = "deck" } = {}) {
+      requestedStation = station === "api" ? "api" : "deck";
       cancelRequest(); active = true; clearPassword();
       present(bearer ? "unverified" : "idle", bearer ? "Checking your session…" : "Enter your password to connect securely.");
       if (bearer) checkSession();
