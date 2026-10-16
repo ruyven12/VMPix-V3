@@ -14709,7 +14709,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   padding: 12px;
   color: #f5eef0;
   background: #070405;
-  font-family: sans-serif;
+  font-family: var(--font-display);
   font-size: 16px;
   line-height: 1.4;
   caret-color: #f4d4dc;
@@ -14745,7 +14745,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   min-height: 2.8em;
   margin: 20px 0 12px;
   color: #d8c8cd;
-  font-family: sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   line-height: 1.4;
   overflow-wrap: anywhere;
@@ -14756,7 +14756,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   min-height: 44px;
   padding: 8px 0;
   color: #e1d6da;
-  font-family: sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   text-underline-offset: 4px;
   touch-action: manipulation;

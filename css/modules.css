@@ -32086,6 +32086,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 
+/* Admin 3B: preserve authored casing and use the established V3 typeface. */
+.admin-shell, .admin-shell * { font-family: var(--font-display); text-transform: none; }
 /* Admin 2A: local, authenticated command deck; Shell and login artwork remain unchanged. */
 .admin-shell .admin-access__stage {
   --admin-stage-budget: max(0px, calc(100svh - max(24px, env(safe-area-inset-top)) - var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) - var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))) - 32px));
@@ -32214,7 +32216,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   min-block-size: 2.8em;
   margin: 0 0 8px;
   color: #c4b6c1;
-  font: 13px/1.4 sans-serif;
+  font: 13px/1.4 var(--font-display), sans-serif;
   overflow-wrap: anywhere;
   text-align: center;
 }
@@ -32360,10 +32362,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-console__standby[data-admin-open-api]::after { content: "STANDBY"; visibility: hidden; }
 .admin-shell .admin-console__standby[data-admin-open-api]:disabled { cursor: wait; }
 .admin-shell .admin-console__standby[data-admin-open-api]:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
-.admin-shell .admin-access:has(> [data-admin-view="api"]) {
+.admin-shell:has(.admin-access__stage[data-admin-view="api"]) {
+  inset-block-end: calc(var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) + var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))));
+  scroll-padding-block-end: 20px;
+}
+.admin-shell .admin-access:has(> .admin-access__stage[data-admin-view="api"]) {
   align-content: start;
   padding-block-start: calc(env(safe-area-inset-top, 0px) + 10px);
-  padding-block-end: calc(var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) + var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))) + 20px);
+  padding-block-end: 20px;
 }
 .admin-shell .admin-access__stage[data-admin-view="api"] { block-size: auto; min-block-size: 0; align-items: start; }
 .admin-shell .admin-api[hidden] { display: none; }
@@ -32380,11 +32386,6 @@ button.hall-crusades-archive-crystal:focus-visible {
     linear-gradient(135deg, #1a171d, #0a090c 45%, #151117 80%, #0b090d);
 }
 .admin-shell .admin-api p { margin: 0; }
-.admin-shell .admin-api__identity { display: flex; align-items: start; justify-content: space-between; gap: 14px; padding: 0 1px 16px; border-bottom: 1px solid #723044; }
-.admin-shell .admin-api__identity p { font: 11px/1.5 var(--font-display), sans-serif; letter-spacing: .1em; }
-.admin-shell .admin-api__identity span { display: block; margin-top: 5px; color: #ab9ba8; font: 8px/1.5 var(--font-display), sans-serif; letter-spacing: .25em; }
-.admin-shell .admin-api__identity .admin-api__session { color: #c4b6c0; font-size: 8px; text-align: end; }
-.admin-shell .admin-api__session::before { display: inline-block; inline-size: 6px; block-size: 6px; margin-inline-end: 7px; border-radius: 50%; background: #a73550; content: ""; }
 .admin-shell .admin-api__heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-block: 22px; }
 .admin-shell .admin-api__heading h1 { margin: 0; font: 400 clamp(21px, 5.8vw, 36px)/1.3 var(--font-display), sans-serif; letter-spacing: .015em; }
 .admin-shell .admin-api__heading em { color: #ad3853; font-style: normal; }
@@ -32394,7 +32395,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-api__uplink { padding: 16px 12px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
 .admin-shell .admin-api__uplink-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 15px; border-bottom: 1px solid #3f303c; }
 .admin-shell .admin-api__uplink-header h2, .admin-shell .admin-api__uplink-header p { margin: 0; color: #c4b4c1; font: 10px/1.5 var(--font-display), sans-serif; letter-spacing: .06em; }
-.admin-shell .admin-api__uplink-header span { color: #e2dce4; font-family: monospace; font-size: 12px; }
+.admin-shell .admin-api__uplink-header span { color: #e2dce4; font-family: var(--font-display); font-size: 12px; }
 .admin-shell .admin-api__instrument { position: relative; inline-size: min(100%, 360px); aspect-ratio: 1; margin: 25px auto 14px; isolation: isolate; }
 .admin-shell .admin-api__instrument > span { position: absolute; pointer-events: none; }
 .admin-shell .admin-api__axis { inset: 0; background: linear-gradient(90deg, transparent calc(50% - .5px), #713045 50%, transparent calc(50% + .5px)), linear-gradient(transparent calc(50% - .5px), #713045 50%, transparent calc(50% + .5px)); opacity: .65; }
@@ -32415,11 +32416,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-api__corner--d { inset: auto 3% 3% auto; border-width: 0 1px 1px 0; }
 .admin-shell .admin-api__signal { min-block-size: 116px; padding-bottom: 17px; text-align: center; }
 .admin-shell .admin-api__signal h2 { display: grid; align-content: center; min-block-size: 2.6em; margin: 0 0 8px; font: 400 clamp(17px, 4.8vw, 26px)/1.3 var(--font-display), sans-serif; }
-.admin-shell .admin-api__signal p { min-block-size: 3em; color: #c1b5c2; font: 14px/1.5 sans-serif; }
+.admin-shell .admin-api__signal p { min-block-size: 4.5em; color: #c1b5c2; font: 14px/1.5 var(--font-display), sans-serif; }
 .admin-shell .admin-api__telemetry { display: grid; gap: 7px; margin: 0; padding-top: 16px; border-top: 1px solid #7e3047; }
 .admin-shell .admin-api__telemetry > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-block-size: 44px; padding: 9px 10px; border: 1px solid #3e333f; background: rgb(18 15 22 / .4); }
 .admin-shell .admin-api__telemetry dt { color: #c4b6c3; font: 10px/1.5 var(--font-display), sans-serif; letter-spacing: .1em; }
-.admin-shell .admin-api__telemetry dd { inline-size: 11ch; flex-shrink: 0; margin: 0; color: #e3dce5; font: 12px/1.5 monospace; text-align: end; }
+.admin-shell .admin-api__telemetry dd { inline-size: 8.5em; flex-shrink: 0; margin: 0; color: #e3dce5; font: 12px/1.5 var(--font-display), sans-serif; text-align: end; }
 .admin-shell .admin-api__telemetry time { display: block; inline-size: 100%; }
 .admin-shell .admin-api__check { display: flex; align-items: center; justify-content: space-between; gap: 10px; inline-size: 100%; min-block-size: 54px; margin-top: 20px; padding: 12px; border: 1px solid #a33b55; border-radius: 0; background: linear-gradient(90deg, #32101e, #1a1018); color: #e2d6e0; font: 10px/1.5 var(--font-display), sans-serif; cursor: pointer; }
 .admin-shell .admin-api__check:disabled { cursor: wait; color: #b6a4b1; }
@@ -32427,9 +32428,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-api__explanation { display: flex; align-items: start; justify-content: space-between; gap: 15px; margin-top: 19px; color: #a797a8; font: 10px/1.7 var(--font-display), sans-serif; letter-spacing: .07em; }
 .admin-shell .admin-api__explanation p:first-child { max-inline-size: 28em; }
 .admin-shell .admin-api__explanation p:last-child { border-inline-start: 1px solid #733046; padding-inline-start: 12px; }
-.admin-shell .admin-api__explanation span { display: block; color: #d5c9d4; font: 12px/1.5 monospace; }
+.admin-shell .admin-api__explanation span { display: block; color: #d5c9d4; font: 12px/1.5 var(--font-display), sans-serif; }
 .admin-shell .admin-api__footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 2px 0; }
-.admin-shell .admin-api__footer p { max-inline-size: 40em; color: #b9aab8; font: 12px/1.5 sans-serif; }
+.admin-shell .admin-api__footer p { max-inline-size: 40em; color: #b9aab8; font: 12px/1.5 var(--font-display), sans-serif; }
 .admin-shell .admin-api__back:focus-visible, .admin-shell .admin-api__check:focus-visible, .admin-shell #admin-api-title:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
 .admin-shell .is-admin-station-departing { pointer-events: none; animation: adminStationDepart 160ms ease-in both; }
 .admin-shell .is-admin-station-arriving { animation: adminStationArrive 240ms ease-out both; }
@@ -32444,14 +32445,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 @keyframes adminApiLock { 0% { transform: scale(.97); opacity: .65; } 100% { transform: scale(1); opacity: 1; } }
 @media (min-width: 840px) {
   .admin-shell .admin-api__surface { padding: 26px; }
-  .admin-shell .admin-api__identity p { font-size: 12px; }
-  .admin-shell .admin-api__identity .admin-api__session { font-size: 10px; }
   .admin-shell .admin-api__heading { flex-wrap: nowrap; }
   .admin-shell .admin-api__heading p { font-size: 11px; letter-spacing: .2em; }
   .admin-shell .admin-api__uplink { padding: 20px 26px; }
   .admin-shell .admin-api__uplink-header h2, .admin-shell .admin-api__uplink-header p { font-size: 11px; }
   .admin-shell .admin-api__instrument { inline-size: 350px; margin-block: 20px 12px; }
   .admin-shell .admin-api__signal h2 { min-block-size: 1.3em; }
+  .admin-shell .admin-api__signal p { min-block-size: 3em; }
   .admin-shell .admin-api__telemetry { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .admin-shell .admin-api__telemetry > div { flex-direction: column; justify-content: center; min-block-size: 64px; gap: 5px; }
   .admin-shell .admin-api__telemetry dd { text-align: center; }

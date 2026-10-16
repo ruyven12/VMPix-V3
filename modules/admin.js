@@ -21,7 +21,6 @@
   const apiTitle = host?.querySelector("#admin-api-title");
   const apiLogout = host?.querySelector("[data-admin-api-logout]");
   const apiFeedback = host?.querySelector("[data-admin-api-feedback]");
-  const apiSession = host?.querySelector("[data-admin-api-session]");
   const apiCheck = host?.querySelector("[data-admin-api-check]");
   const apiInstrument = host?.querySelector("[data-admin-api-instrument]");
   const apiStatus = host?.querySelector("[data-admin-api-status]");
@@ -31,7 +30,7 @@
   const apiVerified = host?.querySelector("[data-admin-api-verified]");
   if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
       !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink ||
-      !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiSession || !apiCheck ||
+      !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiCheck ||
       !apiInstrument || !apiStatus || !apiDetail || !apiConnection || !apiResponse || !apiVerified) return;
   let active = false;
   let bearer = null;
@@ -184,7 +183,6 @@
     apiLogout.disabled = busy();
     apiLogout.textContent = deckLogout.textContent;
     apiFeedback.textContent = message;
-    apiSession.textContent = state === "authenticated" ? "SECURE SESSION" : state === "logging-out" ? "ENDING SESSION" : "SESSION UNVERIFIED";
     renderPresentation(animateArrival);
     updateStationControl();
   }
