@@ -22,7 +22,6 @@
   const apiLogout = host?.querySelector("[data-admin-api-logout]");
   const apiFeedback = host?.querySelector("[data-admin-api-feedback]");
   const apiCheck = host?.querySelector("[data-admin-api-check]");
-  const apiInstrument = host?.querySelector("[data-admin-api-instrument]");
   const apiStatus = host?.querySelector("[data-admin-api-status]");
   const apiDetail = host?.querySelector("[data-admin-api-detail]");
   const apiConnection = host?.querySelector("[data-admin-api-connection]");
@@ -31,7 +30,7 @@
   if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
       !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink ||
       !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiCheck ||
-      !apiInstrument || !apiStatus || !apiDetail || !apiConnection || !apiResponse || !apiVerified) return;
+      !apiStatus || !apiDetail || !apiConnection || !apiResponse || !apiVerified) return;
   let active = false;
   let bearer = null;
   let expiresAt = 0;
@@ -303,7 +302,8 @@
   function updateStationControl() {
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
-    if (!signalBusy) apiCheck.disabled = !signalAllowed();
+    if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null;
+    updateMonitorControls();
   }
   function updateStationPresentation(shouldFocus = true) {
     if (available() && state === "authenticated" && bearer && expiresAt <= Date.now()) {
@@ -336,16 +336,12 @@
   function signalAllowed() {
     return canEnterStation() && stage.dataset.adminView === "api" && !apiPanel.hidden && !apiPanel.hasAttribute("inert");
   }
-  function signalMotionEnd(event) {
-    if (event.animationName === "adminApiAcquire") apiInstrument.classList.remove("is-checking");
-    if (event.animationName === "adminApiLock") apiInstrument.classList.remove("is-locked");
-  }
   function resetSignal() {
     signalGeneration += 1;
     signalController?.abort();
     signalController = null;
     signalBusy = false;
-    apiInstrument.classList.remove("is-checking", "is-locked");
+    cancelMonitor();
     apiStatus.textContent = "AWAITING SIGNAL";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -360,19 +356,18 @@
     if (available() && bearer && expiresAt <= Date.now()) {
       clearSession(); present("idle", "Your session has expired. Connect again."); return;
     }
-    if (!signalAllowed() || signalBusy) return;
+    if (!signalAllowed() || signalBusy || monitorRun !== null) return;
     const at = ++signalGeneration;
     const ownController = new AbortController();
     signalController = ownController;
     signalBusy = true;
+    updateMonitorControls();
     apiCheck.disabled = true;
     apiCheck.setAttribute("aria-busy", "true");
     apiStatus.textContent = "ACQUIRING SIGNAL";
     apiDetail.textContent = "Checking the public API health endpoint…";
     apiConnection.textContent = "CHECKING";
     apiResponse.textContent = "—";
-    apiInstrument.classList.remove("is-locked");
-    if (!motionPreference.matches) apiInstrument.classList.add("is-checking");
     const started = performance.now();
     let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000);
@@ -409,7 +404,7 @@
     signalBusy = false;
     apiCheck.disabled = false;
     apiCheck.setAttribute("aria-busy", "false");
-    apiInstrument.classList.remove("is-checking");
+    updateMonitorControls();
     const completed = new Date();
     apiVerified.dateTime = completed.toISOString();
     apiVerified.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -420,11 +415,182 @@
     apiDetail.textContent = outcome === "connected" ? "Primary API connection verified." :
       outcome === "unavailable" ? "The endpoint responded without confirming API liveness." :
       timedOut ? "The health request timed out. API liveness was not confirmed." : "The health check could not be completed. Please retry.";
-    if (outcome === "connected" && !motionPreference.matches) apiInstrument.classList.add("is-locked");
   }
   apiCheck.addEventListener("click", checkSignal);
-  apiInstrument.addEventListener("animationend", signalMotionEnd);
-  apiInstrument.addEventListener("animationcancel", signalMotionEnd);
+  // Fixed public GET catalog only. No Admin credential is passed to this controller.
+  const endpointCatalog = Object.freeze([{"id":"core-health","group":"core","name":"API Health","path":"/health","contract":"health"},{"id":"core-database","group":"core","name":"Database Health","path":"/health/db","contract":"database"},{"id":"core-tables","group":"core","name":"Table Endpoint","path":"/health/tables","contract":"tables"},{"id":"music-bands","group":"music","name":"Bands","path":"/api/music/bands/db?limit=1&page=1","contract":"data"},{"id":"music-shows","group":"music","name":"Shows","path":"/api/music/shows/db?limit=1&page=1","contract":"data"},{"id":"music-people","group":"music","name":"People","path":"/api/music/people/db?limit=1&page=1","contract":"data"},{"id":"music-venues","group":"music","name":"Venues","path":"/api/music/venues/db?limit=1&page=1","contract":"data"},{"id":"wrestling-shows","group":"wrestling","name":"Shows","path":"/api/wrestling/shows/db?limit=1&page=1","contract":"data"},{"id":"wrestling-people","group":"wrestling","name":"People","path":"/api/wrestling/people/db?limit=1&page=1","contract":"data"},{"id":"wrestling-venues","group":"wrestling","name":"Venues","path":"/api/wrestling/venues/db?limit=1&page=1","contract":"items"}].map(item => Object.freeze(item)));
+  const monitorPanel = host.querySelector("[data-admin-endpoint-monitor]");
+  const monitorAll = monitorPanel?.querySelector("[data-admin-monitor-all]");
+  const monitorProgress = monitorPanel?.querySelector("[data-admin-monitor-progress]");
+  const monitorTotals = monitorPanel?.querySelector("[data-admin-monitor-totals]");
+  const monitorCompleted = monitorPanel?.querySelector("[data-admin-monitor-completed]");
+  const endpointRows = new Map(endpointCatalog.map(item => [item.id, monitorPanel?.querySelector(`[data-admin-endpoint="${item.id}"]`)]));
+  const endpointResults = new Map(endpointCatalog.map(item => [item.id, uncheckedEndpoint()]));
+  let monitorGeneration = 0;
+  let monitorRun = null;
+  const RESPONSE_LIMIT = 128 * 1024;
+  function uncheckedEndpoint(reason = "No check has run.") {
+    return { state: "Not Checked", http: null, elapsed: null, reason };
+  }
+  function monitorAllowed() {
+    return signalAllowed() && monitorPanel && monitorAll && monitorProgress && monitorTotals && monitorCompleted &&
+      endpointRows.size === 10 && [...endpointRows.values()].every(Boolean);
+  }
+  function updateMonitorControls() {
+    const disabled = !monitorAllowed() || signalBusy || monitorRun !== null;
+    if (monitorAll) { monitorAll.disabled = disabled; monitorAll.setAttribute("aria-busy", String(monitorRun !== null)); }
+    endpointRows.forEach(row => { const button = row?.querySelector("[data-admin-endpoint-check]"); if (button) button.disabled = disabled; });
+  }
+  function renderEndpoint(id) {
+    const row = endpointRows.get(id), result = endpointResults.get(id);
+    if (!row || !result) return;
+    row.dataset.endpointState = result.state;
+    row.querySelector("[data-endpoint-state]").textContent = result.state;
+    row.querySelector("[data-endpoint-http]").textContent = result.http === null ? "HTTP —" : `HTTP ${result.http}`;
+    row.querySelector("[data-endpoint-time]").textContent = result.elapsed === null ? "Time —" : `Time ${Math.round(result.elapsed)} ms`;
+    row.querySelector("[data-endpoint-reason]").textContent = result.reason;
+  }
+  function renderMonitorTotals() {
+    let successful = 0, failed = 0, unavailable = 0;
+    endpointResults.forEach(result => {
+      if (result.state === "Connected" || result.state === "Slow") successful += 1;
+      else if (result.state === "Failed") failed += 1;
+      else if (result.state === "Unavailable") unavailable += 1;
+    });
+    if (monitorTotals) monitorTotals.textContent = `Latest per endpoint: ${successful} successful · ${failed} failed · ${unavailable} unavailable`;
+  }
+  function cancelMonitor() {
+    monitorGeneration += 1;
+    const run = monitorRun;
+    monitorRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout);
+      run.controllers.forEach(controller => controller.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      endpointResults.forEach((result, id) => {
+        if (result.state === "Checking") { endpointResults.set(id, uncheckedEndpoint("Check canceled before verification.")); renderEndpoint(id); }
+      });
+      if (monitorProgress) monitorProgress.textContent = `Canceled. ${run.completed}/${run.ids.length} checked.`;
+      renderMonitorTotals();
+    }
+    updateMonitorControls();
+  }
+  function monitorCurrent(run) {
+    if (monitorRun !== run || run.generation !== monitorGeneration) return false;
+    if (!signalAllowed()) { cancelMonitor(); prepareStationEntry(); return false; }
+    return true;
+  }
+  function validEndpointPayload(spec, data) {
+    if (!data || typeof data !== "object" || Array.isArray(data) || data.ok !== true) return false;
+    if (spec.contract === "health") return data.service === "vmpix-v3-data" && typeof data.time === "string" && Number.isFinite(Date.parse(data.time));
+    if (spec.contract === "database") return data.database === "connected" && typeof data.time === "string" && Number.isFinite(Date.parse(data.time));
+    if (spec.contract === "tables") return Array.isArray(data.tables) && data.tables.every(name => typeof name === "string");
+    const items = data[spec.contract];
+    return Array.isArray(items) && items.length <= 1 && items.every(item => item && typeof item === "object" && !Array.isArray(item)) &&
+      Number.isSafeInteger(data.total) && data.total >= items.length && data.count === items.length &&
+      data.page === 1 && data.limit === 1 && Number.isSafeInteger(data.totalPages) && data.totalPages >= 0;
+  }
+  async function boundedEndpointJson(response, run, controller) {
+    const length = response.headers.get("content-length");
+    if (length && /^\d+$/.test(length) && Number(length) > RESPONSE_LIMIT) {
+      try { await response.body?.cancel(); } catch { /* Cancellation is best effort; the limit outcome stays explicit. */ }
+      controller.abort(); return { unavailable: true };
+    }
+    if (!/^(application\/json|application\/[a-z0-9.+-]+\+json)(?:\s*;|$)/i.test(response.headers.get("content-type") || "")) return { invalid: true };
+    if (!response.body || typeof response.body.getReader !== "function") return { unsupported: true };
+    const reader = response.body.getReader();
+    run.readers.add(reader);
+    const chunks = []; let size = 0;
+    try {
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        size += chunk.value.byteLength;
+        if (size > RESPONSE_LIMIT) {
+          try { await reader.cancel(); } catch { /* Preserve the known byte-limit outcome. */ }
+          controller.abort(); return { unavailable: true };
+        }
+        chunks.push(chunk.value);
+      }
+      const bytes = new Uint8Array(size); let offset = 0;
+      chunks.forEach(chunk => { bytes.set(chunk, offset); offset += chunk.byteLength; });
+      return { data: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) };
+    } finally {
+      run.readers.delete(reader);
+      reader.releaseLock();
+    }
+  }
+  async function checkEndpoint(spec, run) {
+    const controller = new AbortController();
+    run.controllers.add(controller);
+    let timedOut = false;
+    const started = performance.now();
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000);
+    run.timers.add(timer);
+    let http = null;
+    let state = "Unavailable", reason = "The request could not be verified.";
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${spec.path}`, {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors",
+        cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal
+      });
+      http = response.status;
+      if (!response.ok) {
+        state = "Failed"; reason = `HTTP ${http} did not confirm this endpoint.`;
+        await response.body?.cancel();
+      } else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) reason = "Response exceeds the 128 KiB safety limit.";
+        else if (parsed.unsupported) { reason = "This browser cannot safely read a bounded response."; controller.abort(); }
+        else if (parsed.invalid || !validEndpointPayload(spec, parsed.data)) {
+          state = "Failed"; reason = "The expected public response was not verified."; controller.abort();
+        } else {
+          state = performance.now() - started > 2000 ? "Slow" : "Connected";
+          reason = state === "Slow" ? "Verified response exceeded 2 seconds." : "Expected public response verified.";
+        }
+      }
+    } catch {
+      if (timedOut) reason = "The request exceeded 15 seconds.";
+      else if (!controller.signal.aborted && http !== null) { state = "Failed"; reason = "The response did not match the expected format."; }
+    } finally {
+      clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller);
+    }
+    return { state, http, elapsed: performance.now() - started, reason };
+  }
+  async function runEndpointChecks(ids) {
+    if (signalBusy || monitorRun) return;
+    if (!prepareStationEntry() || !monitorAllowed()) return;
+    if (ids.length === endpointCatalog.length) endpointCatalog.forEach(spec => { endpointResults.set(spec.id, uncheckedEndpoint()); renderEndpoint(spec.id); });
+    const run = { generation: ++monitorGeneration, ids, cursor: 0, completed: 0, controllers: new Set(), readers: new Set(), timers: new Set() };
+    monitorRun = run;
+    updateStationControl(); updateMonitorControls(); renderMonitorTotals();
+    if (monitorProgress) monitorProgress.textContent = `0/${ids.length} checked. Checking endpoints…`;
+    async function worker() {
+      while (run.cursor < ids.length && monitorCurrent(run)) {
+        const id = ids[run.cursor++], spec = endpointCatalog.find(item => item.id === id);
+        endpointResults.set(id, { state: "Checking", http: null, elapsed: null, reason: "Waiting for a verified response." });
+        renderEndpoint(id); renderMonitorTotals();
+        const result = await checkEndpoint(spec, run);
+        if (!monitorCurrent(run)) return;
+        endpointResults.set(id, result); renderEndpoint(id);
+        run.completed += 1;
+        if (monitorProgress) monitorProgress.textContent = `${run.completed}/${ids.length} checked.`;
+        renderMonitorTotals();
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(2, ids.length) }, worker));
+    if (!monitorCurrent(run)) return;
+    monitorRun = null;
+    const completed = new Date();
+    monitorCompleted.dateTime = completed.toISOString();
+    monitorCompleted.textContent = completed.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    monitorCompleted.title = completed.toLocaleString();
+    monitorProgress.textContent = `Complete. ${run.completed}/${ids.length} checked.`;
+    updateStationControl(); updateMonitorControls();
+  }
+  monitorAll?.addEventListener("click", () => runEndpointChecks(endpointCatalog.map(spec => spec.id)));
+  endpointCatalog.forEach(spec => endpointRows.get(spec.id)?.querySelector("[data-admin-endpoint-check]")?.addEventListener("click", () => runEndpointChecks([spec.id])));
+
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();

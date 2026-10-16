@@ -2357,22 +2357,87 @@
                 <button class="admin-api__back" type="button" data-admin-api-back><span aria-hidden="true">←</span> BACK</button>
               </div>
               <section class="admin-api__uplink" aria-labelledby="admin-api-uplink-title">
-                <header class="admin-api__uplink-header"><h2 id="admin-api-uplink-title">V3 DATA // PRIMARY UPLINK</h2><p>TARGET // <span>/health</span></p></header>
-                <div class="admin-api__instrument" data-admin-api-instrument aria-hidden="true">
-                  <span class="admin-api__axis"></span><span class="admin-api__calibration"></span>
-                  <span class="admin-api__ring admin-api__ring--outer"></span><span class="admin-api__ring admin-api__ring--inner"></span>
-                  <span class="admin-api__scan"></span><span class="admin-api__lock"><i></i></span>
-                  <span class="admin-api__corner admin-api__corner--a"></span><span class="admin-api__corner admin-api__corner--b"></span>
-                  <span class="admin-api__corner admin-api__corner--c"></span><span class="admin-api__corner admin-api__corner--d"></span>
-                </div>
+                <header class="admin-api__uplink-header"><h2 id="admin-api-uplink-title">V3 DATA // PRIMARY UPLINK</h2></header>
                 <div class="admin-api__signal" role="status" aria-live="polite" aria-atomic="true"><h2 data-admin-api-status>AWAITING SIGNAL</h2><p data-admin-api-detail>Backend connection not yet checked.</p></div>
                 <dl class="admin-api__telemetry">
                   <div><dt>CONNECTION</dt><dd data-admin-api-connection>—</dd></div>
                   <div><dt>RESPONSE TIME</dt><dd data-admin-api-response>—</dd></div>
                   <div><dt>LAST VERIFIED<span class="sr-only"> — Most recent completed check</span></dt><dd><time data-admin-api-verified>—</time></dd></div>
                 </dl>
-                <button class="admin-api__check" type="button" data-admin-api-check><span class="admin-api__check-dot" aria-hidden="true"></span>MANUAL SIGNAL CHECK<span aria-hidden="true">→</span></button>
-                <div class="admin-api__explanation"><p>Initiates a connection check against the API health endpoint.</p><p>ENDPOINT <span>/health</span></p></div>
+                <button class="admin-api__check" type="button" data-admin-api-check>MANUAL SIGNAL CHECK</button>
+              </section>
+              <section class="admin-endpoints" data-admin-endpoint-monitor aria-labelledby="admin-endpoints-title">
+                <header class="admin-endpoints__heading"><div><h2 id="admin-endpoints-title">Endpoint Monitor</h2><p>Manual, read-only public checks.</p></div><button class="admin-endpoints__all" type="button" data-admin-monitor-all disabled>Check All Endpoints</button></header>
+                <p class="admin-endpoints__policy">Slow: verified responses over 2 seconds. Request timeout: 15 seconds. Unavailable: no verified result.</p>
+                <p class="admin-endpoints__progress" role="status" aria-live="polite" aria-atomic="true" data-admin-monitor-progress>0/10 checked. Ready for a manual check.</p>
+                <p class="admin-endpoints__totals" data-admin-monitor-totals>Latest per endpoint: 0 successful · 0 failed · 0 unavailable</p>
+                <p class="admin-endpoints__completed">Last completed: <time data-admin-monitor-completed>—</time></p>
+                <details class="admin-endpoints__group" data-admin-endpoint-group="core"><summary>Core API</summary><ul class="admin-endpoints__rows">
+                  <li class="admin-endpoint" data-admin-endpoint="core-health" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>API Health</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check API Health in Core API" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/health</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="core-database" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Database Health</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Database Health in Core API" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/health/db</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="core-tables" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Table Endpoint</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Table Endpoint in Core API" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/health/tables</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                </ul></details>
+                <details class="admin-endpoints__group" data-admin-endpoint-group="music"><summary>Music Archive</summary><ul class="admin-endpoints__rows">
+                  <li class="admin-endpoint" data-admin-endpoint="music-bands" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Bands</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Bands in Music Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/music/bands/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="music-shows" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Shows</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Shows in Music Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/music/shows/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="music-people" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>People</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check People in Music Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/music/people/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="music-venues" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Venues</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Venues in Music Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/music/venues/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                </ul></details>
+                <details class="admin-endpoints__group" data-admin-endpoint-group="wrestling"><summary>Wrestling Archive</summary><ul class="admin-endpoints__rows">
+                  <li class="admin-endpoint" data-admin-endpoint="wrestling-shows" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Shows</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Shows in Wrestling Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/wrestling/shows/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="wrestling-people" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>People</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check People in Wrestling Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/wrestling/people/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                  <li class="admin-endpoint" data-admin-endpoint="wrestling-venues" data-endpoint-state="Not Checked">
+                    <div class="admin-endpoint__heading"><h3>Venues</h3><button class="admin-endpoint__check" type="button" data-admin-endpoint-check aria-label="Check Venues in Wrestling Archive" disabled>Check</button></div>
+                    <code class="admin-endpoint__path">/api/wrestling/venues/db?limit=1&amp;page=1</code>
+                    <p class="admin-endpoint__result"><span class="admin-endpoint__state" data-endpoint-state>Not Checked</span><span class="admin-endpoint__http" data-endpoint-http>HTTP —</span><span class="admin-endpoint__time" data-endpoint-time>Time —</span></p>
+                    <p class="admin-endpoint__reason" data-endpoint-reason>No check has run.</p>
+                  </li>
+                </ul></details>
               </section>
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-api-feedback></p><button class="admin-console__logout" type="button" data-admin-api-logout>LOGOUT</button></footer>
             </div>
