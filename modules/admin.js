@@ -217,7 +217,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -337,6 +337,7 @@
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
     updateDatabaseControl();
     updateRecordsControl();
+    updateRelationshipsControl();
     if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     updateMonitorControls();
   }
@@ -356,7 +357,7 @@
       if (!wasDatabase && shouldFocus) focusTitle(databaseTitle);
       updateStationControl(); return;
     }
-    if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); }
+    if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); cancelRelationships(); }
     if (databasePanel) surface(databasePanel, false);
     const allowed = requestedStation === "api" && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasApi && ["logging-out", "logout-uncertain"].includes(state));
@@ -395,6 +396,7 @@
     cancelQuery();
     cancelDatabaseOverview();
     cancelRecordsExplorer();
+    cancelRelationships();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -2113,6 +2115,242 @@
   recordsNodes.previous?.addEventListener("click", () => { if (recordsMatchSnapshot() && recordsResult.pagination?.hasPrevPage) loadRecords(recordsResult.snapshot.search, recordsResult.pagination.page - 1); });
   recordsNodes.next?.addEventListener("click", () => { if (recordsMatchSnapshot() && recordsResult.pagination?.hasNextPage) loadRecords(recordsResult.snapshot.search, recordsResult.pagination.page + 1); });
   configureRecordsCollection(); renderRecords(true);
+
+
+  // Relationship audits are manual: these read-only endpoints still perform full server-side scans.
+  const relationshipSpecs = Object.freeze([
+    Object.freeze({ section: "music", path: "/api/admin/relationships/music", entities: Object.freeze(["bands", "shows", "people", "venues"]) }),
+    Object.freeze({ section: "wrestling", path: "/api/admin/relationships/wrestling", entities: Object.freeze(["shows", "matches", "people", "venues"]) })
+  ]);
+  const relationshipKnownCodes = new Set(["music/shows/MISSING_VENUE_ID","music/shows/INVALID_VENUE_ID","music/venues/MISSING_VENUE_ID","music/venues/DUPLICATE_VENUE_ID","music/venues/ORPHANED_VENUE_NO_SHOWS","music/venues/DUPLICATE_NAME","music/venues/MISSING_CITY_STATE","music/venues/INCOMPLETE_GEO","music/people/DUPLICATE_NAME","music/people/MISSING_PERSON_ID","music/people/MALFORMED_PEOPLE_BANDS_FIELD","music/shows/MALFORMED_SHOW_BANDS_FIELD","music/shows/DUPLICATE_SHOW_BAND_RELATIONSHIP","music/shows/MISSING_BAND_REFERENCE","music/people/MALFORMED_PEOPLE_BAND_ITEM","music/people/MISSING_PERSON_BAND_REFERENCE","music/people/DUPLICATE_PERSON_BAND_RELATIONSHIP","music/bands/ORPHANED_BAND_NO_PEOPLE","music/people/ORPHANED_PERSON_NO_BANDS","wrestling/shows/MISSING_VENUE_ID","wrestling/shows/INVALID_VENUE_ID","wrestling/venues/DUPLICATE_NAME","wrestling/venues/ORPHANED_VENUE_NO_SHOWS","wrestling/venues/MISSING_CITY_STATE","wrestling/venues/INCOMPLETE_GEO","wrestling/people/DUPLICATE_NAME","wrestling/people/MISSING_WRESTLER_ID","wrestling/shows/MALFORMED_MATCHES_FIELD","wrestling/shows/ORPHANED_SHOW_NO_MATCHES","wrestling/shows/MISSING_PROMOTION","wrestling/matches/MISSING_PARTICIPANT_REFERENCE","wrestling/matches/MISSING_WINNER_REFERENCE","wrestling/matches/MISSING_REFEREE_REFERENCE","wrestling/matches/MALFORMED_RELATIONSHIP_FIELD","wrestling/matches/MISSING_WINNER","wrestling/matches/EMPTY_RELATIONSHIP_FIELD","wrestling/matches/MISSING_EXTRA_PEOPLE_REFERENCE","wrestling/matches/MISSING_TAGGED_PEOPLE_REFERENCE","wrestling/matches/MISSING_SIDE_REFERENCE","wrestling/matches/DUPLICATE_MATCH_PEOPLE_RELATIONSHIP"]);
+  const relationshipReferenceCodes = new Set(["music/shows/MISSING_VENUE_ID","music/shows/INVALID_VENUE_ID","wrestling/shows/MISSING_VENUE_ID","wrestling/shows/INVALID_VENUE_ID","music/shows/MISSING_BAND_REFERENCE","music/people/MISSING_PERSON_BAND_REFERENCE","wrestling/matches/MISSING_PARTICIPANT_REFERENCE","wrestling/matches/MISSING_WINNER_REFERENCE","wrestling/matches/MISSING_REFEREE_REFERENCE","wrestling/matches/MISSING_EXTRA_PEOPLE_REFERENCE","wrestling/matches/MISSING_TAGGED_PEOPLE_REFERENCE","wrestling/matches/MISSING_SIDE_REFERENCE"]);
+  const relationshipTargetKeys = Object.freeze({"MISSING_VENUE_ID":["venue"],"INVALID_VENUE_ID":["venue_id","venue"],"MISSING_BAND_REFERENCE":["band"],"MISSING_PERSON_BAND_REFERENCE":["band"],"MISSING_PARTICIPANT_REFERENCE":["participant"],"MISSING_WINNER_REFERENCE":["winner"],"MISSING_REFEREE_REFERENCE":["referee"],"MISSING_EXTRA_PEOPLE_REFERENCE":["person"],"MISSING_TAGGED_PEOPLE_REFERENCE":["person"],"MISSING_SIDE_REFERENCE":["side"]});
+  const relationshipIssueSnapshots = new WeakMap();
+  const relationshipsPanel = databasePanel?.querySelector("[data-admin-relationships]");
+  const relationshipsRefresh = relationshipsPanel?.querySelector("[data-relationships-refresh]");
+  const relationshipsMessage = relationshipsPanel?.querySelector("[data-relationships-message]");
+  const relationshipsChecked = relationshipsPanel?.querySelector("[data-relationships-checked]");
+  const relationshipArchives = new Map(relationshipSpecs.map(spec => [spec.section, relationshipsPanel?.querySelector(`[data-relationships-archive="${spec.section}"]`)]));
+  let relationshipsGeneration = 0, relationshipsRun = null, relationshipsLastChecked = null;
+  const relationshipResults = new Map(relationshipSpecs.map(spec => [spec.section, emptyRelationshipResult()]));
+  function emptyRelationshipResult() {
+    return { state: "Unavailable", reason: "No relationship report has loaded.", report: null, stale: false, checkedAt: null, http: null };
+  }
+  function relationshipsAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
+      relationshipsPanel && relationshipsRefresh && relationshipsMessage && relationshipsChecked && [...relationshipArchives.values()].every(Boolean);
+  }
+  function updateRelationshipsControl() {
+    if (!relationshipsRefresh) return;
+    relationshipsRefresh.disabled = !relationshipsAllowed() || relationshipsRun !== null;
+    relationshipsRefresh.setAttribute("aria-busy", String(relationshipsRun !== null));
+  }
+  function relationshipText(value, fallback = "Not provided") {
+    return typeof value === "string" && value.trim() ? value : typeof value === "number" && Number.isFinite(value) ? String(value) : fallback;
+  }
+  function relationshipSafe(input) {
+    const scrubbed = scrubQueryResponse(input), safe = sanitizeDiagnosticResponse(scrubbed.data, bearer);
+    return { data: safe.data, text: safe.text, limited: scrubbed.omitted || safe.omitted || safe.unverified };
+  }
+  function validateRelationshipPayload(data, spec) {
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== spec.path || !parseAdminTimestamp(data.generatedAt) ||
+        data.page !== 1 || data.limit !== 50 || !Array.isArray(data.items) || data.items.length > 50 || data.count !== data.items.length ||
+        !diagnosticCount(data.total) || data.count !== Math.min(data.total, 50) || data.totalPages !== Math.ceil(data.total / 50) ||
+        data.hasNextPage !== (data.page < data.totalPages) || data.hasPrevPage !== false || !diagnosticObject(data.summary) ||
+        !["errors", "warnings", "info"].every(key => diagnosticCount(data.summary[key])) ||
+        data.summary.errors + data.summary.warnings + data.summary.info !== data.total ||
+        !Array.isArray(data.warnings) || !data.warnings.every(value => typeof value === "string")) return false;
+    const paging = data.meta?.pagination;
+    if (data.meta?.route !== spec.path || data.meta?.source !== "postgres" || !diagnosticObject(paging) ||
+        ["page", "limit", "count", "total", "totalPages", "hasNextPage", "hasPrevPage"].some(key => paging[key] !== data[key])) return false;
+    if (!data.items.every(item => diagnosticObject(item) && item.section === spec.section && spec.entities.includes(item.type) &&
+        ["error", "warning", "info"].includes(item.severity) && typeof item.code === "string" && item.code.length > 0 &&
+        typeof item.message === "string" && typeof item.entity_id === "string" && typeof item.entity_name === "string" && diagnosticObject(item.details))) return false;
+    return ["error", "warning", "info"].every((severity, index) => data.items.filter(item => item.severity === severity).length <= data.summary[["errors", "warnings", "info"][index]]);
+  }
+  function projectRelationshipIssue(item) {
+    const key = `${item.section}/${item.type}/${item.code}`, missing = relationshipReferenceCodes.has(key);
+    const targets = Object.create(null);
+    let targetLimited = false;
+    if (missing) (relationshipTargetKeys[item.code] || []).forEach(field => {
+      const value = item.details[field];
+      if (value === undefined || value === null || value === "") return;
+      if (typeof value === "string" || typeof value === "number" && Number.isFinite(value)) targets[field] = value;
+      else targetLimited = true;
+    });
+    // Default summaries and each technical body have separate bounds; one large issue cannot erase other issues.
+    const summary = relationshipSafe({ name: item.entity_name, sourceId: item.entity_id, message: item.message, code: item.code, targets });
+    const technical = relationshipSafe(item), safe = diagnosticObject(summary.data) ? summary.data : Object.create(null);
+    const safeTargets = diagnosticObject(safe.targets) ? Object.entries(safe.targets).map(([field, value]) => `${field}: ${relationshipText(value)}`).join(" · ") : "";
+    return { type: item.type, severity: item.severity, category: missing ? "missing" : "warnings",
+      name: relationshipText(safe.name, "Source name not provided"), sourceId: relationshipText(safe.sourceId),
+      code: relationshipText(safe.code, "Code not available"), message: relationshipText(safe.message, "Explanation not supplied."),
+      target: safeTargets || (missing ? "Not provided" : "Not classified as a missing reference"), technical: technical.text,
+      limited: summary.limited || technical.limited || targetLimited || !relationshipKnownCodes.has(key) };
+  }
+  function projectRelationshipReport(data) {
+    const warnings = relationshipSafe(data.warnings.slice(0, 20)), safeWarnings = Array.isArray(warnings.data) ? warnings.data.filter(item => typeof item === "string") : [];
+    const items = data.items.map(projectRelationshipIssue);
+    return { items, summary: { errors: data.summary.errors, warnings: data.summary.warnings, info: data.summary.info },
+      count: data.count, total: data.total, more: data.hasNextPage, warnings: safeWarnings, warningCount: data.warnings.length,
+      limited: warnings.limited || data.warnings.length > 20 || items.some(item => item.limited) };
+  }
+  function appendRelationshipText(parent, tag, text, className) {
+    const node = document.createElement(tag); if (className) node.className = className; node.textContent = text; parent.append(node); return node;
+  }
+  function renderRelationshipIssue(item) {
+    const article = document.createElement("article"); article.className = "admin-relationships__issue"; article.dataset.relationshipSeverity = item.severity;
+    relationshipIssueSnapshots.set(article, JSON.stringify(item));
+    appendRelationshipText(article, "h4", item.name);
+    const list = document.createElement("dl");
+    [["Source entity ID", item.sourceId], ["Relationship type", item.type], ["Source severity", item.severity], ["Finding code", item.code], ["Target", item.target]].forEach(([name, value]) => {
+      appendRelationshipText(list, "dt", name); appendRelationshipText(list, "dd", value);
+    });
+    article.append(list); appendRelationshipText(article, "p", item.message);
+    if (item.limited) appendRelationshipText(article, "p", "Some source content is omitted or its classification is unverified.");
+    const technical = document.createElement("details"); technical.className = "admin-relationships__technical";
+    appendRelationshipText(technical, "summary", "Technical details");
+    appendRelationshipText(technical, "pre", item.technical || "Technical content is unavailable."); article.append(technical); return article;
+  }
+  function replaceRelationshipIssues(list, items) {
+    const openBySnapshot = new Map();
+    for (const article of list.children) {
+      const snapshot = relationshipIssueSnapshots.get(article); if (snapshot === undefined) continue;
+      const states = openBySnapshot.get(snapshot) || [];
+      states.push(article.querySelector(".admin-relationships__technical")?.open === true); openBySnapshot.set(snapshot, states);
+    }
+    const articles = items.map(item => {
+      const article = renderRelationshipIssue(item), states = openBySnapshot.get(relationshipIssueSnapshots.get(article));
+      if (states?.shift() === true) article.querySelector(".admin-relationships__technical").open = true;
+      return article;
+    });
+    list.replaceChildren(...articles);
+  }
+  function renderRelationshipArchive(spec, renderIssues) {
+    const archive = relationshipArchives.get(spec.section); if (!archive) return;
+    const result = relationshipResults.get(spec.section), report = result.report;
+    archive.dataset.relationshipState = result.state;
+    const stateNode = archive.querySelector("[data-relationships-archive-status]");
+    if (stateNode) stateNode.textContent = `${result.state}${result.stale ? " · Previous report" : ""}: ${result.reason}`;
+    const checked = archive.querySelector("[data-relationships-archive-checked]");
+    if (checked) { checked.textContent = formatAdminDateTime(result.checkedAt, "Not available"); if (result.checkedAt) checked.dateTime = result.checkedAt; else checked.removeAttribute("datetime"); }
+    const scope = archive.querySelector("[data-relationships-scope]");
+    if (scope) scope.textContent = report ? `${report.count} displayed / ${report.total} sampled findings. Reported severities: ${report.summary.errors} error, ${report.summary.warnings} warning, ${report.summary.info} info. Coverage is not verified.${report.more ? " Additional sampled findings are not displayed." : ""}` : "Sample totals and check coverage are not available.";
+    spec.entities.forEach(entity => {
+      const node = archive.querySelector(`[data-relationships-entity="${entity}"]`);
+      if (node) node.textContent = report ? `${report.items.filter(item => item.type === entity).length} in displayed sample` : "Not available";
+    });
+    for (const category of ["missing", "warnings", "unresolved"]) {
+      const panel = archive.querySelector(`[data-relationships-category="${category}"]`); if (!panel) continue;
+      const selected = report?.items.filter(item => item.category === category) || [];
+      panel.querySelector("[data-relationships-category-total]").textContent = category === "unresolved" || !report ? "Not available" : `${selected.length} in displayed sample · Total not available`;
+      if (category === "warnings" && report?.warningCount) panel.querySelector("[data-relationships-category-total]").textContent += ` · ${report.warningCount} operational messages`;
+      panel.querySelector("[data-relationships-category-message]").textContent = category === "unresolved" ? "The backend does not return a distinct unresolved-relationship classification or count." :
+        !report ? "No verified report is available." : selected.length ? "Source findings below retain their original severity. Counts describe this displayed sample only." : "No findings in this displayed sample; overall check coverage is not verified.";
+      if (category === "warnings" && report?.warningCount) panel.querySelector("[data-relationships-category-message]").textContent += " Operational messages are counted separately from sampled findings.";
+      if (renderIssues) replaceRelationshipIssues(panel.querySelector("[data-relationships-issues]"), selected);
+    }
+    if (renderIssues) {
+      const warningList = archive.querySelector("[data-relationships-operational-warnings]"); warningList.replaceChildren();
+      if (report?.warningCount) {
+        appendRelationshipText(warningList, "p", `Operational warnings: ${report.warningCount}. This report is incomplete.`);
+        const list = document.createElement("ul"); report.warnings.forEach(warning => appendRelationshipText(list, "li", warning)); warningList.append(list);
+        if (report.warningCount > report.warnings.length) appendRelationshipText(warningList, "p", "Additional operational warnings are omitted by the display limit.");
+      }
+      if (report?.limited) appendRelationshipText(warningList, "p", "Safety limits or unrecognized source codes make the displayed report incomplete.");
+    }
+  }
+  function renderRelationships(renderIssues = false) {
+    if (!relationshipsPanel || !relationshipsMessage || !relationshipsChecked) return;
+    const results = [...relationshipResults.values()], complete = results.filter(result => result.report).length;
+    relationshipsPanel.dataset.relationshipsState = relationshipsRun ? "Checking" : results.some(result => result.stale) ? "Stale" : complete ? "Checked" : "Unavailable";
+    relationshipsMessage.textContent = relationshipsRun ? "Checking both archives. Previous reports stay visible." :
+      complete ? "Review each archive status; coverage is unverified." : "No report loaded. Refresh to check both archives.";
+    relationshipsChecked.textContent = formatAdminDateTime(relationshipsLastChecked, "Not available");
+    if (relationshipsLastChecked) relationshipsChecked.dateTime = relationshipsLastChecked; else relationshipsChecked.removeAttribute("datetime");
+    relationshipSpecs.forEach(spec => renderRelationshipArchive(spec, renderIssues)); updateRelationshipsControl();
+  }
+  function cancelRelationships() {
+    relationshipsGeneration += 1; const run = relationshipsRun; relationshipsRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      for (const section of run.pending) {
+        const previous = relationshipResults.get(section);
+        relationshipResults.set(section, { ...previous, state: "Unavailable", stale: Boolean(previous.report), reason: "Request canceled. A canceled scan may still finish on the server." });
+      }
+    }
+    renderRelationships();
+  }
+  function resetRelationships() {
+    cancelRelationships(); relationshipsLastChecked = null;
+    relationshipSpecs.forEach(spec => relationshipResults.set(spec.section, emptyRelationshipResult()));
+    relationshipsPanel?.querySelectorAll("details").forEach(node => { node.open = false; });
+    if (relationshipsPanel) relationshipsPanel.open = false;
+    renderRelationships(true);
+  }
+  function relationshipsCurrent(run) {
+    if (relationshipsRun !== run || run.generation !== relationshipsGeneration) return false;
+    if (!relationshipsAllowed()) { cancelRelationships(); prepareStationEntry(); return false; }
+    return true;
+  }
+  async function checkRelationshipArchive(spec, run) {
+    const controller = new AbortController(); run.controllers.add(controller);
+    const privateToken = bearer; let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    let outcome = { state: "Unavailable", reason: "The relationship request could not be verified.", report: null };
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${spec.path}?limit=50&page=1`, {
+        method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${privateToken}` },
+        credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal
+      });
+      http = response.status;
+      if (http === 401 || http === 403) {
+        if (relationshipsCurrent(run)) { cancelRelationships(); clearSession(); clearPassword(); present("idle", http === 401 ? "Your session has expired or ended. Connect again." : "Access denied. Connect again to continue."); }
+        try { await response.body?.cancel(); } catch { /* Error bodies cannot authorize or become report content. */ }
+      } else if (!response.ok) {
+        outcome = { ...outcome, state: "Error", reason: `HTTP ${http}: relationship report unavailable.` };
+        try { await response.body?.cancel(); } catch { /* Keep the known HTTP outcome. */ }
+      } else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) outcome.reason = "Response exceeds the 128 KiB safety limit.";
+        else if (parsed.unsupported) { outcome.reason = "This browser cannot safely read a bounded response."; controller.abort(); }
+        else if (parsed.invalid || !validateRelationshipPayload(parsed.data, spec)) { outcome.state = "Error"; outcome.reason = "The relationship response contract was not verified."; controller.abort(); }
+        else {
+          const report = projectRelationshipReport(parsed.data);
+          outcome = { report, state: report.summary.errors ? "Error" : report.summary.warnings ? "Warning" : "Unavailable",
+            reason: report.summary.errors ? "The backend reports errors in its sampled findings." : report.summary.warnings ? "The backend reports warnings in its sampled findings." :
+              report.warningCount || report.limited ? "The report is incomplete; check coverage is unverified." : report.summary.info ? "Informational findings returned; complete coverage is unverified." : "No findings returned; complete check coverage is unverified." };
+        }
+      }
+    } catch {
+      if (timedOut) outcome.reason = "The request exceeded 15 seconds. The server scan may still finish.";
+      else if (!controller.signal.aborted && http !== null) { outcome.state = "Error"; outcome.reason = "The relationship response could not be read."; }
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    return { ...outcome, http, checkedAt: new Date().toISOString() };
+  }
+  async function refreshRelationships() {
+    if (relationshipsRun || !relationshipsPanel?.open) return;
+    if (!prepareStationEntry() || !relationshipsAllowed()) return;
+    const run = { generation: ++relationshipsGeneration, pending: new Set(relationshipSpecs.map(spec => spec.section)), controllers: new Set(), readers: new Set(), timers: new Set() };
+    relationshipsRun = run;
+    relationshipSpecs.forEach(spec => { const previous = relationshipResults.get(spec.section); relationshipResults.set(spec.section, { ...previous, state: "Checking", reason: "Checking the current sampled report…" }); });
+    renderRelationships();
+    await Promise.all(relationshipSpecs.map(async spec => {
+      const result = await checkRelationshipArchive(spec, run);
+      if (!relationshipsCurrent(run)) return;
+      const previous = relationshipResults.get(spec.section);
+      relationshipResults.set(spec.section, { ...result, report: result.report || previous.report, stale: !result.report && Boolean(previous.report), checkedAt: result.report ? result.checkedAt : previous.checkedAt });
+      relationshipsLastChecked = result.checkedAt;
+      run.pending.delete(spec.section); renderRelationshipArchive(spec, true);
+    }));
+    if (!relationshipsCurrent(run)) return;
+    relationshipsRun = null; renderRelationships();
+  }
+  relationshipsRefresh?.addEventListener("click", refreshRelationships);
+  relationshipsPanel?.addEventListener("toggle", () => {
+    if (relationshipsPanel.open && available() && stage.dataset.adminView === "database") { prepareStationEntry(); updateRelationshipsControl(); }
+  });
+  renderRelationships(true);
 
 
   function connectAction() {
