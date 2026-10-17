@@ -2662,6 +2662,27 @@
                   </details>
                 </div>
               </details>
+              <details class="admin-records admin-api-section" data-admin-records-explorer aria-labelledby="admin-records-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-records-title">Records Explorer</h2></summary>
+                <div class="admin-api-section__body">
+                  <p class="admin-records__policy">Read-only records, 10 per page. Search runs only when submitted. Summaries are previews; full safe values remain in Record Information. IDs are supplied by the current response and can change after imports. URLs are text only.</p>
+                  <div class="admin-records__controls" role="group" aria-label="Record collection">
+                    <label>Archive<select data-records-archive><option value="music">Music</option><option value="wrestling">Wrestling</option></select></label>
+                    <label>Collection<select data-records-collection></select></label>
+                    <label class="admin-records__search">Search<input type="text" autocomplete="off" maxlength="120" data-records-search></label>
+                    <div class="admin-records__actions"><button type="button" data-records-search-run disabled>Search</button><button type="button" data-records-clear disabled>Clear</button></div>
+                  </div>
+                  <div class="admin-records__summary" role="group" aria-label="Records result">
+                    <p class="admin-records__response"><span data-records-state>Not Loaded</span><span data-records-http>HTTP —</span><span data-records-time>Time —</span></p>
+                    <p class="admin-records__message" role="status" aria-live="polite" aria-atomic="true" data-records-message>Expand Records Explorer to load the first page.</p>
+                    <p class="admin-records__metadata" data-records-metadata>Records: — · Total: — · Page: —</p>
+                    <code class="admin-records__path" data-records-path>No collection has loaded.</code>
+                  </div>
+                  <div class="admin-records__paging" role="group" aria-label="Record pages"><button type="button" data-records-previous disabled>Previous</button><button type="button" data-records-next disabled>Next</button></div>
+                  <div class="admin-records__list" data-records-list></div>
+                </div>
+              </details>
+
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-database-feedback></p><button class="admin-console__logout" type="button" data-admin-database-logout>LOGOUT</button></footer>
             </div>
           </article>

@@ -217,7 +217,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -336,6 +336,7 @@
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
     updateDatabaseControl();
+    updateRecordsControl();
     if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     updateMonitorControls();
   }
@@ -355,7 +356,7 @@
       if (!wasDatabase && shouldFocus) focusTitle(databaseTitle);
       updateStationControl(); return;
     }
-    if (wasDatabase) cancelDatabaseOverview();
+    if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); }
     if (databasePanel) surface(databasePanel, false);
     const allowed = requestedStation === "api" && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasApi && ["logging-out", "logout-uncertain"].includes(state));
@@ -393,6 +394,7 @@
     cancelMusicStatus();
     cancelQuery();
     cancelDatabaseOverview();
+    cancelRecordsExplorer();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -1844,6 +1846,273 @@
   }
   databaseOverview?.addEventListener("toggle", () => { if (databaseOverview.open && !databaseAutoAttempted) refreshDatabaseOverview(); });
   databaseRefresh?.addEventListener("click", refreshDatabaseOverview);
+
+
+  // Records use fixed public collections and independent safe per-record detail budgets.
+  const recordsCatalog = Object.freeze([{"id":"music-bands","archive":"music","label":"Bands","path":"/api/music/bands/db","rows":"data","route":"/api/music/bands/db","source":"PostgreSQL:music_bands","name":"band","ids":["band_id"],"secondary":["region","location","status"],"relationships":[["personnel.members","People · current members","People"],["personnel.past_members","People · past members","People"]],"timestamps":[]},{"id":"music-shows","archive":"music","label":"Shows","path":"/api/music/shows/db","rows":"data","route":"/api/music/shows/db","source":"PostgreSQL:music_shows","name":"name","ids":["show_id"],"secondary":["date","venue"],"relationships":[["bands","Bands · supplied lineup","Bands"],["venue_id","Venue identifier","Venues"],["venue","Venue name","Venues"],["venue_details","Venue details","Venues"],["smug_albums","Stored album associations","Albums"]],"timestamps":["smug_last_synced_at"]},{"id":"music-people","archive":"music","label":"People","path":"/api/music/people/db","rows":"data","route":"/api/music/people/db","source":{"type":"postgres","table":"music_people"},"name":"name","ids":["person_id"],"secondary":["category"],"relationships":[["bands","Bands · supplied names and instruments","Bands"],["associations","Associations · supplied names","Associations"]],"timestamps":["first_seen","latest_seen","stats.first_seen","stats.latest_seen"]},{"id":"music-venues","archive":"music","label":"Venues","path":"/api/music/venues/db","rows":"data","route":"/api/music/venues/db","source":{"type":"postgres","table":"music_venues"},"name":"venue","ids":["venue_id"],"secondary":["city","state","country"],"relationships":[],"timestamps":[]},{"id":"wrestling-shows","archive":"wrestling","label":"Shows","path":"/api/wrestling/shows/db","rows":"data","route":"/api/wrestling/shows/db","source":"PostgreSQL:wrestling_shows","name":"show_name","ids":["show_key","show_id"],"secondary":["promotion","date","venue"],"relationships":[["matches","Matches · supplied roles and names","Matches"],["venue_id","Venue identifier","Venues"],["venue","Venue name","Venues"],["venue_details","Venue details","Venues"]],"timestamps":[]},{"id":"wrestling-people","archive":"wrestling","label":"People","path":"/api/wrestling/people/db","rows":"data","route":"/api/wrestling/people","source":"db","type":"wrestling_people","name":"name","ids":["id","slug"],"secondary":["category"],"relationships":[["teams","Teams · supplied names","Teams"]],"timestamps":[]},{"id":"wrestling-venues","archive":"wrestling","label":"Venues","path":"/api/wrestling/venues/db","rows":"items","route":"/api/wrestling/venues/db","source":"db","type":"venues","section":"wrestling","name":"venue_name","ids":["venue_id"],"secondary":["city","state","venue_type"],"relationships":[],"timestamps":[]}].map(spec => Object.freeze({ ...spec,
+    source: diagnosticObject(spec.source) ? Object.freeze(spec.source) : spec.source,
+    ids: Object.freeze(spec.ids), secondary: Object.freeze(spec.secondary),
+    relationships: Object.freeze(spec.relationships.map(item => Object.freeze(item))), timestamps: Object.freeze(spec.timestamps) })));
+  const recordsExplorer = databasePanel?.querySelector("[data-admin-records-explorer]");
+  const recordsNodes = Object.fromEntries(["archive", "collection", "search", "search-run", "clear", "previous", "next", "state", "http", "time", "message", "path", "metadata", "list"].map(key => [key, recordsExplorer?.querySelector(`[data-records-${key}]`)]));
+  let recordsGeneration = 0, recordsRun = null, recordsAutoAttempted = false, recordsNeedsLoad = false;
+  let recordsResult = emptyRecords();
+  function emptyRecords(message = "Expand Records Explorer to load the first page.") {
+    return { state: "Not Loaded", message, snapshot: null, pagination: null, http: null, elapsed: null, entries: [] };
+  }
+  function recordsAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
+      recordsExplorer && Object.values(recordsNodes).every(Boolean);
+  }
+  function selectedRecordsSpec() { return recordsCatalog.find(spec => spec.id === recordsNodes.collection?.value && spec.archive === recordsNodes.archive?.value); }
+  function recordsSnapshot(spec, search, page) {
+    if (!spec || !recordsCatalog.includes(spec) || typeof search !== "string" || search.length > 120 || /[\u0000-\u001f\u007f]/.test(search) || !Number.isSafeInteger(page) || page < 1 || page > 10000) return null;
+    try { encodeURIComponent(search); } catch { return null; }
+    if (bearer && search.toLowerCase().includes(bearer.toLowerCase())) return null;
+    const params = new URLSearchParams({ limit: "10", page: String(page) });
+    if (search) params.set("search", search);
+    return Object.freeze({ id: spec.id, search, page, path: `${spec.path}?${params.toString()}` });
+  }
+  function recordsMatchSnapshot() { return recordsResult.snapshot?.id === selectedRecordsSpec()?.id && recordsResult.snapshot.search === recordsNodes.search?.value.trim(); }
+  function updateRecordsControl() {
+    if (!recordsExplorer || !Object.values(recordsNodes).every(Boolean)) return;
+    const unavailable = !recordsAllowed(), loading = recordsRun !== null;
+    recordsNodes.archive.disabled = unavailable;
+    recordsNodes.collection.disabled = unavailable;
+    ["search", "search-run", "clear"].forEach(key => { recordsNodes[key].disabled = unavailable || loading; });
+    recordsNodes["search-run"].setAttribute("aria-busy", String(loading));
+    const paging = recordsResult.pagination, matches = recordsMatchSnapshot();
+    recordsNodes.previous.disabled = unavailable || loading || !matches || !paging?.hasPrevPage;
+    recordsNodes.next.disabled = unavailable || loading || !matches || !paging?.hasNextPage || paging.page >= 10000;
+  }
+  function configureRecordsCollection() {
+    if (!recordsNodes.collection || !recordsNodes.archive) return;
+    recordsNodes.collection.replaceChildren();
+    recordsCatalog.filter(spec => spec.archive === recordsNodes.archive.value).forEach(spec => { const option = document.createElement("option"); option.value = spec.id; option.textContent = spec.label; recordsNodes.collection.appendChild(option); });
+  }
+  function recordsScalar(value) {
+    if (value === undefined) return "Not present";
+    if (value === null) return "NULL";
+    if (value === "") return "Empty text";
+    if (["string", "number", "boolean"].includes(typeof value)) return String(value);
+    return "Structured value";
+  }
+  function recordsValueNode(value, spec, path) {
+    if (value === null || typeof value !== "object") {
+      if (typeof value === "string" && spec.timestamps.includes(path) && parseAdminTimestamp(value)) {
+        const time = document.createElement("time"); time.dateTime = value; time.textContent = formatAdminDateTime(value); return time;
+      }
+      const text = document.createElement("span"); text.textContent = recordsScalar(value); return text;
+    }
+    const array = Array.isArray(value), keys = array ? value : Object.keys(value);
+    if (keys.length === 0) { const text = document.createElement("span"); text.textContent = array ? "Empty array" : "Empty object"; return text; }
+    const details = document.createElement("details"), summary = document.createElement("summary"), body = document.createElement("div");
+    details.className = "admin-records__nested"; body.className = "admin-records__nested-body";
+    summary.textContent = array ? "Array values" : "Object fields"; details.append(summary, body);
+    let built = false;
+    details.addEventListener("toggle", () => {
+      if (!details.open || built) return; built = true;
+      if (array) {
+        const list = document.createElement("ol"); list.className = "admin-records__array";
+        value.forEach((item, index) => { const row = document.createElement("li"); row.appendChild(recordsValueNode(item, spec, `${path}.${index}`)); list.appendChild(row); }); body.appendChild(list);
+      } else body.appendChild(recordsFieldList(value, spec, path));
+    });
+    return details;
+  }
+  function recordsFieldList(data, spec, prefix = "") {
+    const list = document.createElement("dl"); list.className = "admin-records__fields";
+    Object.keys(data).forEach(key => {
+      const field = document.createElement("div"), term = document.createElement("dt"), detail = document.createElement("dd"); field.className = "admin-records__field";
+      term.textContent = key; detail.appendChild(recordsValueNode(data[key], spec, prefix ? `${prefix}.${key}` : key)); field.append(term, detail); list.appendChild(field);
+    });
+    return list;
+  }
+  function recordsPath(data, path) {
+    let value = data;
+    for (const key of path.split(".")) { if (!diagnosticObject(value) || !Object.prototype.hasOwnProperty.call(value, key)) return undefined; value = value[key]; }
+    return value;
+  }
+  function recordsDisclosure(label, hook, fill) {
+    const view = document.createElement("details"), summary = document.createElement("summary"), body = document.createElement("div");
+    view.className = "admin-records__disclosure"; view.setAttribute(hook, ""); summary.textContent = label; view.append(summary, body);
+    let built = false;
+    view.addEventListener("toggle", () => { if (view.open && !built) { built = true; fill(body); } });
+    return view;
+  }
+  function buildRecordBody(container, entry, spec) {
+    if (entry.incomplete) { const notice = document.createElement("p"); notice.className = "admin-records__notice"; notice.textContent = entry.incompleteReason; container.appendChild(notice); }
+    if (entry.omitted || entry.redacted) { const notice = document.createElement("p"); notice.className = "admin-records__notice"; notice.textContent = entry.omitted ? "Some fields were omitted by safety limits. Omission markers identify incomplete content; sensitive values are redacted." : "Sensitive values are redacted."; container.appendChild(notice); }
+    container.appendChild(recordsDisclosure("Record Information", "data-records-information", body => {
+      if (entry.data && Object.keys(entry.data).length) body.appendChild(recordsFieldList(entry.data, spec));
+      else if (entry.data) { const message = document.createElement("p"); message.textContent = "No record fields were supplied."; body.appendChild(message); }
+      else { const message = document.createElement("p"); message.textContent = "Record fields exceeded the safe display limit. The safe summary remains available."; body.appendChild(message); }
+      if (spec.id === "wrestling-people" && entry.data?.photo_count_status === "unavailable") { const message = document.createElement("p"); message.className = "admin-records__notice"; message.textContent = "photo_count is not verified while photo_count_status is unavailable."; body.prepend(message); }
+    }));
+    container.appendChild(recordsDisclosure("Relationships", "data-records-relationships", body => {
+      if (spec.relationships.length === 0) { const message = document.createElement("p"); message.textContent = "Related records are not provided by this response."; body.appendChild(message); return; }
+      const groups = new Map();
+      spec.relationships.forEach(relationship => { const group = relationship[2]; if (!groups.has(group)) groups.set(group, []); groups.get(group).push(relationship); });
+      groups.forEach((relationships, group) => {
+        const view = recordsDisclosure(group, "data-records-relationship-group", groupBody => {
+          const list = document.createElement("dl"); list.className = "admin-records__fields";
+          relationships.forEach(([path, label]) => {
+            const field = document.createElement("div"), term = document.createElement("dt"), detail = document.createElement("dd"); field.className = "admin-records__field";
+            term.textContent = `${label} · ${path}`;
+            const value = entry.data ? recordsPath(entry.data, path) : undefined;
+            if (value === undefined) detail.textContent = entry.omitted ? "Not available in the bounded record." : "Not present in this response.";
+            else detail.appendChild(recordsValueNode(value, spec, path));
+            field.append(term, detail); list.appendChild(field);
+          }); groupBody.appendChild(list);
+        });
+        view.dataset.recordsRelationshipGroup = group; body.appendChild(view);
+      });
+    }));
+  }
+  function renderRecordsList() {
+    if (!recordsNodes.list) return;
+    recordsNodes.list.replaceChildren();
+    const spec = recordsCatalog.find(item => item.id === recordsResult.snapshot?.id);
+    if (!spec) return;
+    recordsResult.entries.forEach(entry => {
+      const record = document.createElement("details"), summary = document.createElement("summary"), name = document.createElement("span"), id = document.createElement("span"), secondary = document.createElement("span"), body = document.createElement("div");
+      record.className = "admin-records__record"; record.setAttribute("data-records-record", ""); record.name = "admin-database-records";
+      name.className = "admin-records__record-name"; name.textContent = entry.name;
+      id.className = "admin-records__record-id"; id.textContent = entry.ids;
+      secondary.className = "admin-records__record-secondary"; secondary.textContent = entry.secondary;
+      body.className = "admin-records__record-body"; summary.append(name, id, secondary); record.append(summary, body);
+      let built = false;
+      record.addEventListener("toggle", () => {
+        if (!record.open || !record.isConnected || record.parentElement !== recordsNodes.list) return;
+        recordsNodes.list.querySelectorAll("[data-records-record]").forEach(other => { if (other !== record) other.open = false; });
+        if (!built) { built = true; buildRecordBody(body, entry, spec); }
+      });
+      recordsNodes.list.appendChild(record);
+    });
+  }
+  function renderRecords(renderList = false) {
+    if (!recordsExplorer || !Object.values(recordsNodes).every(Boolean)) return;
+    recordsExplorer.dataset.recordsState = recordsResult.state;
+    recordsNodes.state.textContent = recordsResult.state;
+    recordsNodes.http.textContent = recordsResult.http === null ? "HTTP —" : `HTTP ${recordsResult.http}`;
+    recordsNodes.time.textContent = recordsResult.elapsed === null ? "Time —" : `Time ${Math.round(recordsResult.elapsed)} ms`;
+    recordsNodes.message.textContent = recordsResult.message;
+    recordsNodes.path.textContent = recordsResult.snapshot?.path || "No collection has loaded.";
+    const paging = recordsResult.pagination;
+    recordsNodes.metadata.textContent = paging ? `Records: ${paging.count} · Total: ${paging.total} · Page: ${paging.page} / ${paging.totalPages}` : "Records: — · Total: — · Page: —";
+    if (renderList) renderRecordsList();
+    updateRecordsControl();
+  }
+  function cancelRecordsExplorer() {
+    recordsGeneration += 1;
+    const run = recordsRun; recordsRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      recordsResult = { ...run.previous, state: "Canceled", message: run.previous.entries.length ? "Request canceled. Previous records are retained." : "Record request canceled before verification." }; renderRecords(true);
+    }
+    updateRecordsControl();
+  }
+  function resetRecordsExplorer() {
+    cancelRecordsExplorer(); recordsAutoAttempted = false; recordsNeedsLoad = false; recordsResult = emptyRecords();
+    if (recordsExplorer) recordsExplorer.open = false;
+    if (recordsNodes.search) recordsNodes.search.value = "";
+    renderRecords(true);
+  }
+  function recordsCurrent(run) {
+    if (recordsRun !== run || run.generation !== recordsGeneration) return false;
+    if (!recordsAllowed()) { cancelRecordsExplorer(); prepareStationEntry(); return false; }
+    if (selectedRecordsSpec()?.id !== run.snapshot.id || recordsNodes.search.value.trim() !== run.snapshot.search) { cancelRecordsExplorer(); return false; }
+    return true;
+  }
+  function validateRecordsPayload(data, spec, snapshot) {
+    const validSource = typeof spec.source === "string" ? data?.source === spec.source : diagnosticObject(data?.source) && Object.keys(spec.source).every(key => data.source[key] === spec.source[key]);
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== spec.route || !validSource || spec.type && data.type !== spec.type || spec.section && data.section !== spec.section ||
+        !Array.isArray(data[spec.rows]) || data[spec.rows].length > 10 || !data[spec.rows].every(diagnosticObject) || data.count !== data[spec.rows].length ||
+        !diagnosticCount(data.total) || data.total < data.count || data.page !== snapshot.page || data.limit !== 10 || !diagnosticCount(data.totalPages) || data.totalPages !== Math.ceil(data.total / 10)) return null;
+    const paging = data.meta?.pagination, hasNextPage = data.page < data.totalPages, hasPrevPage = data.page > 1 && data.totalPages > 0;
+    if (!diagnosticObject(paging) || ["page", "limit", "count", "total", "totalPages"].some(key => paging[key] !== data[key]) || paging.hasNextPage !== hasNextPage || paging.hasPrevPage !== hasPrevPage ||
+        data.hasNextPage !== undefined && data.hasNextPage !== hasNextPage || data.hasPrevPage !== undefined && data.hasPrevPage !== hasPrevPage) return null;
+    return { count: data.count, total: data.total, page: data.page, totalPages: data.totalPages, hasNextPage, hasPrevPage };
+  }
+  function safeRecordsEntry(record, spec) {
+    const usableIdentity = value => typeof value === "string" && value.trim().length > 0 || typeof value === "number" && Number.isFinite(value);
+    const preview = Object.create(null);
+    [spec.name, ...spec.ids, ...spec.secondary].forEach(key => { if (record[key] !== undefined) preview[key] = ["string", "number", "boolean"].includes(typeof record[key]) || record[key] === null ? record[key] : "[Unsupported summary value]"; });
+    const previewScrub = scrubQueryResponse(preview), safePreview = sanitizeDiagnosticResponse(previewScrub.data, bearer);
+    const scrubbed = scrubQueryResponse(record), safe = sanitizeDiagnosticResponse(scrubbed.data, bearer);
+    const summary = diagnosticObject(safePreview.data) ? safePreview.data : Object.create(null);
+    const usableSafeIdentity = value => usableIdentity(value) && (typeof value !== "string" || !/\[(?:REDACTED|OMITTED|Unsupported)/i.test(value));
+    const hasName = usableIdentity(record[spec.name]) && usableSafeIdentity(summary[spec.name]);
+    const hasIdentifier = spec.ids.some(key => usableIdentity(record[key]) && usableSafeIdentity(summary[key]));
+    const incomplete = !hasName || !hasIdentifier;
+    const data = diagnosticObject(safe.data) ? safe.data : null;
+    const secondary = spec.secondary.filter(key => summary[key] !== undefined && summary[key] !== null && summary[key] !== "").map(key => `${key}: ${recordsScalar(summary[key])}`).join(" · ");
+    return { name: !hasName || summary[spec.name] === undefined || summary[spec.name] === null || summary[spec.name] === "" ? "Name not supplied" : recordsScalar(summary[spec.name]),
+      ids: spec.ids.map(key => `${key}: ${recordsScalar(summary[key])}`).join(" · "), secondary, data,
+      incomplete, incompleteReason: !hasName && !hasIdentifier ? "No usable primary name or source identifier was supplied." : !hasName ? "The primary name is missing or invalid." : !hasIdentifier ? "No usable source identifier was supplied." : "",
+      omitted: scrubbed.omitted || safe.omitted || safe.unverified || !data || previewScrub.omitted || safePreview.omitted,
+      redacted: scrubbed.redacted || previewScrub.redacted };
+  }
+  async function loadRecords(search = "", page = 1) {
+    if (recordsRun || !recordsExplorer?.open) return;
+    if (!prepareStationEntry() || !recordsAllowed()) return;
+    const spec = selectedRecordsSpec(), snapshot = recordsSnapshot(spec, search, page);
+    if (!snapshot) { recordsResult = { ...recordsResult, state: "Invalid", message: "Enter valid search text of at most 120 characters without control characters." }; renderRecords(); return; }
+    const run = { generation: ++recordsGeneration, snapshot, previous: recordsResult, controllers: new Set(), readers: new Set(), timers: new Set() };
+    const ownController = new AbortController(); run.controllers.add(ownController); recordsRun = run; recordsAutoAttempted = true; recordsNeedsLoad = false;
+    recordsResult = { ...emptyRecords("Loading records…"), state: "Loading", snapshot }; renderRecords(true);
+    const started = performance.now(); let http = null, timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; ownController.abort(); }, 15000); run.timers.add(timer);
+    let result = { ...emptyRecords("The records could not be verified."), state: "Unavailable", snapshot };
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${snapshot.path}`, {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      http = response.status;
+      if (!response.ok) { result.state = "Error"; result.message = `HTTP ${http}: records unavailable.`; try { await response.body?.cancel(); } catch {} }
+      else {
+        const parsed = await boundedEndpointJson(response, run, ownController);
+        if (parsed.unavailable) result.message = "Response exceeds the 128 KiB safety limit.";
+        else if (parsed.unsupported) { result.message = "This browser cannot safely read a bounded response."; ownController.abort(); }
+        else if (parsed.invalid) { result.state = "Error"; result.message = "The records response was not valid JSON."; ownController.abort(); }
+        else {
+          const pagination = validateRecordsPayload(parsed.data, spec, snapshot);
+          if (!pagination) { result.state = "Error"; result.message = "The collection response contract was not verified."; }
+          else {
+            const entries = parsed.data[spec.rows].map(record => safeRecordsEntry(record, spec));
+            const limited = entries.some(entry => entry.omitted || entry.incomplete) || Array.isArray(parsed.data.meta?.warnings) && parsed.data.meta.warnings.length > 0 || Array.isArray(parsed.data.warnings) && parsed.data.warnings.length > 0;
+            result = { ...result, pagination, entries, state: limited ? "Partial" : entries.length ? "Loaded" : "Empty",
+              message: limited ? "Some records or source data are incomplete. Review record notices." : entries.length ? "Read-only records loaded. Select one to inspect its fields." : "No records matched this search." };
+          }
+        }
+      }
+    } catch {
+      if (timedOut) result.message = "The records request exceeded 15 seconds.";
+      else if (!ownController.signal.aborted && http !== null) { result.state = "Error"; result.message = "The records response could not be read."; }
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController); }
+    if (!recordsCurrent(run)) return;
+    recordsRun = null; recordsResult = { ...result, http, elapsed: performance.now() - started }; renderRecords(true);
+  }
+  function changeRecordsCollection(archiveChanged = false) {
+    cancelRecordsExplorer(); if (archiveChanged) configureRecordsCollection();
+    recordsNodes.search.value = ""; recordsNeedsLoad = true; recordsResult = emptyRecords("Expand Records Explorer to load this collection."); renderRecords(true);
+    if (recordsExplorer.open) loadRecords();
+  }
+  function searchRecords() {
+    if (recordsRun) return;
+    const search = recordsNodes.search.value.trim();
+    if (!search) { recordsResult = { ...recordsResult, state: "Invalid", message: "Enter search text, or use Clear to browse the collection." }; renderRecords(); return; }
+    loadRecords(search, 1);
+  }
+  recordsExplorer?.addEventListener("toggle", () => { if (recordsExplorer.open && (!recordsAutoAttempted || recordsNeedsLoad)) loadRecords(); });
+  recordsNodes.archive?.addEventListener("change", () => changeRecordsCollection(true));
+  recordsNodes.collection?.addEventListener("change", () => changeRecordsCollection());
+  recordsNodes.search?.addEventListener("input", () => { if (recordsRun) cancelRecordsExplorer(); updateRecordsControl(); });
+  recordsNodes.search?.addEventListener("keydown", event => { if (event.key === "Enter" && !event.isComposing && !recordsNodes.search.disabled) { event.preventDefault(); searchRecords(); } });
+  recordsNodes["search-run"]?.addEventListener("click", searchRecords);
+  recordsNodes.clear?.addEventListener("click", () => { if (!recordsRun) { recordsNodes.search.value = ""; loadRecords(); } });
+  recordsNodes.previous?.addEventListener("click", () => { if (recordsMatchSnapshot() && recordsResult.pagination?.hasPrevPage) loadRecords(recordsResult.snapshot.search, recordsResult.pagination.page - 1); });
+  recordsNodes.next?.addEventListener("click", () => { if (recordsMatchSnapshot() && recordsResult.pagination?.hasNextPage) loadRecords(recordsResult.snapshot.search, recordsResult.pagination.page + 1); });
+  configureRecordsCollection(); renderRecords(true);
 
 
   function connectAction() {

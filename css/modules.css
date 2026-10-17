@@ -32700,3 +32700,54 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell [data-database-group="music"] .admin-database__metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .admin-shell [data-database-group="wrestling"] .admin-database__metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+
+/* Admin 4B: complete read-only record fields stay in the existing Database scrollport. */
+.admin-shell .admin-records { margin-block-start: 18px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-records p { margin: 0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-records__policy { color: #b9aab9; }
+.admin-shell .admin-records__controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin-block: 14px; }
+.admin-shell .admin-records__controls > label { display: grid; min-inline-size: 0; gap: 4px; color: #d2bfce; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-records input, .admin-shell .admin-records select { box-sizing: border-box; inline-size: 100%; min-inline-size: 0; min-block-size: 44px; padding: 10px 8px; border: 1px solid #6c3a4d; border-radius: 0; background: #130d15; color: #e4d5e0; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-records option { background: #130d15; color: #e4d5e0; }
+.admin-shell .admin-records button { appearance: none; min-block-size: 44px; padding: 10px 12px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-records :is(button, input, select):disabled { color: #ab99a8; cursor: default; }
+.admin-shell .admin-records :is(button, input, select, summary):focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-records__actions, .admin-shell .admin-records__paging { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-shell .admin-records__actions > button, .admin-shell .admin-records__paging > button { flex: 1 1 0; }
+.admin-shell .admin-records__summary { display: grid; gap: 4px; margin-block: 10px; padding-block: 8px; border-block: 1px solid #4c3546; color: #c6b7c5; }
+.admin-shell .admin-records__response { display: flex; flex-wrap: wrap; gap: 2px 8px; }
+.admin-shell .admin-records__response > span { min-inline-size: 73px; }
+.admin-shell .admin-records__response [data-records-state] { min-inline-size: 101px; color: #e3d5e1; font-size: 14px; }
+.admin-shell .admin-records__message, .admin-shell .admin-records__metadata { min-block-size: 4.35em; overflow-wrap: anywhere; }
+.admin-shell .admin-records__path { display: block; min-block-size: 4.35em; color: #b4a1b0; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-records__list { display: grid; gap: 10px; margin-block-start: 12px; }
+.admin-shell .admin-records__record { min-inline-size: 0; border: 1px solid #4c3546; background: rgb(23 15 24 / .4); }
+.admin-shell .admin-records__record > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-block-size: 44px; gap: 4px 12px; padding: 12px; color: #ded1dc; cursor: pointer; list-style: none; overflow-wrap: anywhere; }
+.admin-shell .admin-records__record > summary::-webkit-details-marker { display: none; }
+.admin-shell .admin-records__record > summary::marker { content: ""; }
+.admin-shell .admin-records__record-name { color: #e2d4df; font: 14px/1.45 var(--font-display); }
+.admin-shell .admin-records__record-id, .admin-shell .admin-records__record-secondary { color: #b9a6b5; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-records__record > summary > span { grid-column: 1; min-inline-size: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.admin-shell .admin-records__record > summary::after { grid-column: 2; grid-row: 1 / 4; align-self: center; inline-size: 7px; block-size: 7px; margin-inline-end: 3px; border-inline-end: 1px solid #bd526d; border-block-end: 1px solid #bd526d; transform: rotate(-45deg); content: ""; }
+.admin-shell .admin-records__record[open] > summary::after { transform: rotate(45deg); }
+.admin-shell .admin-records__record-body { min-inline-size: 0; padding: 0 12px 12px; border-block-start: 1px solid #473340; }
+.admin-shell .admin-records__disclosure > summary { min-block-size: 44px; padding-block: 11px; color: #d3bfce; font: 14px/1.45 var(--font-display); cursor: pointer; overflow-wrap: anywhere; }
+.admin-shell .admin-records__disclosure > summary::marker, .admin-shell .admin-records__nested > summary::marker { color: #bd526d; }
+.admin-shell .admin-records__notice { margin-block: 8px; color: #d2b994; overflow-wrap: anywhere; }
+.admin-shell .admin-records__fields { min-inline-size: 0; margin: 0; font: 12px/1.5 var(--font-display); }
+.admin-shell .admin-records__field { min-inline-size: 0; padding-block: 8px; border-block-start: 1px solid #3c2f3b; }
+.admin-shell .admin-records__field > dt { min-inline-size: 0; margin: 0 0 3px; color: #ad9cac; overflow-wrap: anywhere; }
+.admin-shell .admin-records__field > dd { min-inline-size: 0; margin: 0; color: #e0d0dd; white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-shell .admin-records__nested { min-inline-size: 0; }
+.admin-shell .admin-records__nested > summary { min-block-size: 44px; padding-block: 11px; color: #cfbdc9; cursor: pointer; overflow-wrap: anywhere; }
+.admin-shell .admin-records__nested-body { min-inline-size: 0; padding-inline-start: 8px; border-inline-start: 1px solid #633448; }
+.admin-shell .admin-records__array { min-inline-size: 0; margin: 0; padding-inline-start: 20px; }
+.admin-shell .admin-records__array > li { min-inline-size: 0; padding-block: 7px; overflow-wrap: anywhere; }
+@media (min-width: 840px) {
+  .admin-shell .admin-records__controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-shell .admin-records__message, .admin-shell .admin-records__metadata, .admin-shell .admin-records__path { min-block-size: 1.45em; }
+  .admin-shell .admin-records__paging > button { flex: 0 1 auto; }
+  .admin-shell .admin-records__field { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 12px; }
+  .admin-shell .admin-records__field > dt { margin: 0; }
+}
