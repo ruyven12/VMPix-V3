@@ -217,7 +217,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -338,6 +338,7 @@
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
+    updateIntegrityControl();
     if (!signalBusy) apiCheck.disabled = !signalAllowed() || monitorRun !== null || diagnosticsRun !== null || musicStatusRun !== null || queryRun !== null;
     updateMonitorControls();
   }
@@ -357,7 +358,7 @@
       if (!wasDatabase && shouldFocus) focusTitle(databaseTitle);
       updateStationControl(); return;
     }
-    if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); cancelRelationships(); }
+    if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); cancelRelationships(); cancelIntegrity(); }
     if (databasePanel) surface(databasePanel, false);
     const allowed = requestedStation === "api" && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasApi && ["logging-out", "logout-uncertain"].includes(state));
@@ -397,6 +398,7 @@
     cancelDatabaseOverview();
     cancelRecordsExplorer();
     cancelRelationships();
+    cancelIntegrity();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -2351,6 +2353,195 @@
     if (relationshipsPanel.open && available() && stage.dataset.adminView === "database") { prepareStationEntry(); updateRelationshipsControl(); }
   });
   renderRelationships(true);
+
+
+  // Only this lightweight aggregate endpoint is approved here; full archive audits are not dispatched.
+  const integrityChecks = Object.freeze([
+    Object.freeze({ key: "bandsMissingStatus", entity: "bands", table: "music_bands", label: "Bands with blank status", meaning: "Blank source status only; this does not validate a status enum." }),
+    Object.freeze({ key: "showsMissingPoster", entity: "shows", table: "music_shows", label: "Shows with blank poster", meaning: "Blank source poster only; this does not test image URLs or availability." }),
+    Object.freeze({ key: "venuesMissingLogo", entity: "venues", table: "music_venues", label: "Venues with blank logo", meaning: "Blank source logo only; this does not test image URLs or availability." }),
+    Object.freeze({ key: "venuesMissingGps", entity: "venues", table: "music_venues", label: "Venues with blank GPS text", meaning: "Blank gps_lat or gps_lng text; this is not latitude/longitude numeric or range validation." })
+  ]);
+  const integrityWarningTemplates = Object.freeze({"venuesMissingGps":"{count} venues missing GPS.","venuesMissingLogo":"{count} venues missing logo.","showsMissingPoster":"{count} shows missing poster.","peopleMissingBands":"{count} people missing bands.","bandsMissingStatus":"{count} bands missing status."});
+  const integrityPanel = databasePanel?.querySelector("[data-admin-integrity]");
+  const integrityButton = integrityPanel?.querySelector("[data-integrity-run]");
+  const integrityProgress = integrityPanel?.querySelector("[data-integrity-progress]");
+  const integrityChecked = integrityPanel?.querySelector("[data-integrity-checked]");
+  const integrityArchives = new Map(["music", "wrestling"].map(section => [section, integrityPanel?.querySelector(`[data-integrity-archive="${section}"]`)]));
+  let integrityGeneration = 0, integrityRun = null, integrityResult = emptyIntegrityResult(), integrityLastChecked = null;
+  function emptyIntegrityResult() { return { state: "Unavailable", reason: "No integrity report has loaded.", report: null, stale: false, http: null }; }
+  function integrityAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
+      integrityPanel && integrityButton && integrityProgress && integrityChecked && [...integrityArchives.values()].every(Boolean);
+  }
+  function updateIntegrityControl() {
+    if (!integrityButton) return;
+    integrityButton.disabled = !integrityAllowed() || integrityRun !== null;
+    integrityButton.setAttribute("aria-busy", String(integrityRun !== null));
+  }
+  function safeIntegrityValue(value) {
+    const scrub = scrubQueryResponse(value), safe = sanitizeDiagnosticResponse(scrub.data, bearer);
+    return { data: safe.data, text: safe.text, limited: scrub.omitted || safe.omitted || safe.unverified };
+  }
+  function validateIntegrityEnvelope(data) {
+    return diagnosticObject(data) && data.ok === true && data.route === "/api/status/music" && parseAdminTimestamp(data.generatedAt) &&
+      diagnosticObject(data.database) && typeof data.database.connected === "boolean" && diagnosticObject(data.tables) &&
+      ["music_bands", "music_shows", "music_people", "music_venues"].every(table => typeof data.tables[table] === "boolean") &&
+      diagnosticObject(data.dataQuality) && Array.isArray(data.warnings) && data.warnings.every(warning => typeof warning === "string");
+  }
+  function expectedIntegrityWarning(warning, data) {
+    if (!["venuesMissingGps", "venuesMissingLogo", "showsMissingPoster", "peopleMissingBands", "bandsMissingStatus"].every(key => diagnosticCount(data.dataQuality[key]))) return false;
+    return Object.entries(integrityWarningTemplates).some(([key, template]) => diagnosticCount(data.dataQuality[key]) && data.dataQuality[key] > 0 && warning === template.replace("{count}", String(data.dataQuality[key])));
+  }
+  function projectIntegrityReport(data) {
+    const readableWarnings = data.warnings.filter(warning => !(expectedIntegrityWarning(warning, data) && warning === integrityWarningTemplates.peopleMissingBands.replace("{count}", String(data.dataQuality.peopleMissingBands))));
+    const safe = safeIntegrityValue(data), warningSafe = safeIntegrityValue(readableWarnings.slice(0, 20));
+    const operationalCount = data.warnings.filter(warning => !expectedIntegrityWarning(warning, data)).length;
+    const qualityContextValid = ["venuesMissingGps", "venuesMissingLogo", "showsMissingPoster", "peopleMissingBands", "bandsMissingStatus"].every(key => diagnosticCount(data.dataQuality[key]));
+    const checks = integrityChecks.map(spec => {
+      const count = data.dataQuality[spec.key], collectionCount = data.counts?.[spec.entity];
+      const coherent = diagnosticCount(count) && diagnosticCount(collectionCount) && count <= collectionCount;
+      const available = data.database.connected && data.tables[spec.table] && coherent;
+      const verified = Boolean(available && qualityContextValid && !operationalCount && !safe.limited);
+      return { key: spec.key, entity: spec.entity, label: spec.label, meaning: spec.meaning, count: available ? count : null,
+        verified, state: available && count > 0 ? "Warning" : verified ? "Healthy" : "Unavailable",
+        reason: !data.database.connected ? "Database connection is unverified." : !data.tables[spec.table] ? "The required source table is unavailable." : !coherent ? "The count or collection total is missing, invalid or inconsistent." :
+          !qualityContextValid || operationalCount ? "Source warnings or metric context limit verification." : "Aggregate count only; affected records are not supplied." };
+    });
+    const limited = safe.limited || warningSafe.limited || readableWarnings.length > 20;
+    const positive = checks.some(check => check.count > 0), unknown = checks.some(check => !check.verified) || limited;
+    return { checks, warnings: Array.isArray(warningSafe.data) ? warningSafe.data.filter(value => typeof value === "string") : [],
+      warningCount: data.warnings.length, readableWarningCount: readableWarnings.length, omittedRelationshipNotices: data.warnings.length - readableWarnings.length,
+      operationalCount, limited, technical: safe.text, generatedAt: data.generatedAt, checkedAt: null,
+      state: positive ? "Warning" : unknown ? "Unavailable" : "Healthy",
+      reason: positive ? "Blank-field findings returned." : unknown ? "Some selected checks are unverified." : "Selected blank-field checks returned zero." };
+  }
+  function integrityHistoricalLabel(label, stale) { return stale ? `${label} · Stale (previous result)` : label; }
+  function integrityText(parent, tag, text, className) {
+    const node = document.createElement(tag); if (className) node.className = className; node.textContent = text; parent.append(node); return node;
+  }
+  function renderIntegrityChecks(archive, report, stale = false) {
+    const list = archive.querySelector('[data-integrity-category="missing"] [data-integrity-findings]');
+    list.replaceChildren(...(report?.checks || []).map(check => {
+      const article = document.createElement("article"); article.className = "admin-integrity__finding"; article.dataset.integrityCheck = check.key;
+      article.dataset.integrityState = stale ? "Stale" : check.state;
+      integrityText(article, "h4", check.label);
+      const facts = document.createElement("dl");
+      [["Status", integrityHistoricalLabel(check.state, stale), "data-integrity-check-status"], ["Reported count", check.count === null ? "Not available" : String(check.count)], ["Verification", integrityHistoricalLabel(check.verified ? "Verified source count" : "Unavailable or limited", stale), "data-integrity-check-verification"]].forEach(([label, value, hook]) => { integrityText(facts, "dt", label); const detail = integrityText(facts, "dd", value); if (hook) detail.setAttribute(hook, ""); });
+      article.append(facts); integrityText(article, "p", check.meaning); integrityText(article, "p", check.reason);
+      integrityText(article, "p", "Affected records and comparison pairs are not provided by this aggregate endpoint."); return article;
+    }));
+    const facts = archive.querySelector("[data-integrity-facts]"); facts.replaceChildren();
+    if (!report) integrityText(facts, "p", "No source report is available.");
+    else {
+      integrityText(facts, "p", `Report timestamp: ${formatAdminDateTime(report.generatedAt, "Not available")}`);
+      integrityText(facts, "p", `Backend warnings: ${report.warningCount}. Operational or unknown messages: ${report.operationalCount}.`);
+      integrityText(facts, "p", "The relationship-owned peopleMissingBands metric is excluded from these checks. This source does not supply duplicate, field-consistency or affected-record diagnostics.");
+      if (report.warnings.length) { const list = document.createElement("ul"); report.warnings.forEach(warning => integrityText(list, "li", warning)); facts.append(list); }
+      if (report.omittedRelationshipNotices) integrityText(facts, "p", `${report.omittedRelationshipNotices} relationship-only notices are omitted from this view; they are not Data Integrity findings.`);
+      if (report.readableWarningCount > report.warnings.length || report.limited) integrityText(facts, "p", "Some response content is omitted by safety limits; this display is incomplete.");
+    }
+    archive.querySelector("[data-integrity-json]").textContent = report?.technical || "No report loaded.";
+  }
+  function updateIntegrityCheckLabels(archive, report, stale) {
+    (report?.checks || []).forEach(check => {
+      const article = archive.querySelector(`[data-integrity-check="${check.key}"]`); if (!article) return;
+      article.dataset.integrityState = stale ? "Stale" : check.state;
+      article.querySelector("[data-integrity-check-status]").textContent = integrityHistoricalLabel(check.state, stale);
+      article.querySelector("[data-integrity-check-verification]").textContent = integrityHistoricalLabel(check.verified ? "Verified source count" : "Unavailable or limited", stale);
+    });
+  }
+  function renderIntegrity(renderReport = false, progress) {
+    if (!integrityPanel || !integrityProgress || !integrityChecked) return;
+    const report = integrityResult.report, music = integrityArchives.get("music"), wrestling = integrityArchives.get("wrestling");
+    integrityPanel.dataset.integrityState = integrityRun ? "Checking" : integrityResult.state;
+    integrityProgress.textContent = progress || (integrityRun ? "Checking 0 / 1 source." : integrityLastChecked ? "Complete: 1 / 1 source checked." : "No integrity checks have run.");
+    integrityChecked.textContent = formatAdminDateTime(integrityLastChecked, "Not available");
+    if (integrityLastChecked) integrityChecked.dateTime = integrityLastChecked; else integrityChecked.removeAttribute("datetime");
+    for (const section of ["music", "wrestling"]) {
+      const archive = integrityArchives.get(section); if (!archive) continue;
+      archive.dataset.integrityState = section === "music" ? integrityResult.state : "Unavailable";
+      archive.querySelector("[data-integrity-status]").textContent = section === "music" ? `${integrityResult.state}${integrityResult.stale ? " · Stale" : ""}: ${integrityResult.reason}` : "Unavailable: no lightweight Wrestling source.";
+      archive.querySelector("[data-integrity-scope]").textContent = section === "music" ? "Only four blank-field aggregates are available. Counts can overlap; they are not unique affected-record totals." : "No Wrestling integrity requests are made. Missing data, duplicates and consistency checks are unavailable here.";
+      archive.querySelectorAll("[data-integrity-entity]").forEach(node => {
+        const checks = section === "music" ? report?.checks.filter(check => check.entity === node.dataset.integrityEntity) || [] : [];
+        node.textContent = checks.length ? `${checks.filter(check => check.count !== null).length} / ${checks.length} source counts available` : "Not available";
+      });
+      archive.querySelectorAll("[data-integrity-category]").forEach(category => {
+        const missing = section === "music" && category.dataset.integrityCategory === "missing", checks = missing ? report?.checks || [] : [];
+        category.dataset.integrityState = checks.length ? integrityResult.stale ? "Stale" : report.state : "Unavailable";
+        category.querySelector("[data-integrity-total]").textContent = checks.length ? `${integrityHistoricalLabel(report.state, integrityResult.stale)} · ${checks.filter(check => check.count > 0).length} checks with findings · ${checks.filter(check => !check.verified).length} unverified` : "Unavailable";
+        const checked = category.querySelector("[data-integrity-category-checked]"), checkedAt = checks.length ? report.checkedAt : null;
+        checked.textContent = formatAdminDateTime(checkedAt, "Not available"); if (checkedAt) checked.dateTime = checkedAt; else checked.removeAttribute("datetime");
+        const empty = category.querySelector("[data-integrity-empty]");
+        if (category.dataset.integrityCategory !== "duplicates") empty.textContent = missing ? report ? "Each count describes its own source predicate; no record samples are returned." : "Run Check All Integrity to request the supported Music aggregates." : "No approved lightweight source provides these checks.";
+      });
+      archive.querySelectorAll("[data-integrity-duplicate-kind]").forEach(category => {
+        category.querySelector("[data-integrity-total]").textContent = "Not available";
+        category.querySelector("[data-integrity-empty]").textContent = "This endpoint supplies no duplicate groups, comparison records or matching evidence.";
+      });
+    }
+    if (renderReport && music) renderIntegrityChecks(music, report, integrityResult.stale);
+    if (music) updateIntegrityCheckLabels(music, report, integrityResult.stale);
+    if (renderReport && wrestling) {
+      wrestling.querySelector("[data-integrity-facts]").textContent = "No supported lightweight Wrestling response is available.";
+      wrestling.querySelector("[data-integrity-json]").textContent = "No request is made for this unsupported source.";
+    }
+    updateIntegrityControl();
+  }
+  function cancelIntegrity() {
+    integrityGeneration += 1; const run = integrityRun; integrityRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      integrityResult = { ...integrityResult, state: "Unavailable", stale: Boolean(integrityResult.report), reason: "Request canceled; previous data may be stale." };
+    }
+    renderIntegrity(false, run ? "Canceled: 0 / 1 source checked." : undefined);
+  }
+  function resetIntegrity() {
+    cancelIntegrity(); integrityResult = emptyIntegrityResult(); integrityLastChecked = null;
+    if (integrityPanel) { integrityPanel.open = false; integrityPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
+    renderIntegrity(true);
+  }
+  function integrityCurrent(run) {
+    if (integrityRun !== run || run.generation !== integrityGeneration) return false;
+    if (!integrityAllowed()) { cancelIntegrity(); prepareStationEntry(); return false; }
+    return true;
+  }
+  async function checkAllIntegrity() {
+    if (integrityRun || !integrityPanel?.open) return;
+    if (!prepareStationEntry() || !integrityAllowed()) return;
+    const run = { generation: ++integrityGeneration, controllers: new Set(), readers: new Set(), timers: new Set() };
+    const controller = new AbortController(); run.controllers.add(controller); integrityRun = run;
+    const previous = integrityResult; integrityResult = { ...previous, state: "Checking", reason: "Checking selected Music aggregates…" }; renderIntegrity();
+    let http = null, timedOut = false, next = { state: "Unavailable", reason: "Source request could not be verified.", report: null };
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    try {
+      const response = await fetch("https://vmpix-data.onrender.com/api/status/music", {
+        method: "GET", headers: { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal
+      });
+      http = response.status;
+      const parsed = await boundedEndpointJson(response, run, controller);
+      if (!response.ok) next = { ...next, state: "Error", reason: `HTTP ${http}: source unavailable.` };
+      if (parsed.unavailable) next.reason = "Response exceeds the 128 KiB limit.";
+      else if (parsed.unsupported) { next.reason = "Bounded reading is unavailable."; controller.abort(); }
+      else if (parsed.invalid) { next.state = "Error"; next.reason = "Invalid JSON response."; controller.abort(); }
+      else if (response.ok) {
+        if (!validateIntegrityEnvelope(parsed.data)) { next.state = "Error"; next.reason = "Response contract is unverified."; }
+        else { const report = projectIntegrityReport(parsed.data); next = { state: report.state, reason: report.reason, report }; }
+      }
+    } catch {
+      if (timedOut) next.reason = "Request exceeded 15 seconds.";
+      else if (!controller.signal.aborted && http !== null) { next.state = "Error"; next.reason = "Response could not be read."; }
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    if (!integrityCurrent(run)) return;
+    integrityRun = null; integrityLastChecked = new Date().toISOString();
+    if (next.report) next.report.checkedAt = integrityLastChecked;
+    integrityResult = { ...next, report: next.report || previous.report, stale: !next.report && Boolean(previous.report), http };
+    renderIntegrity(true);
+  }
+  integrityButton?.addEventListener("click", checkAllIntegrity);
+  integrityPanel?.addEventListener("toggle", () => { if (integrityPanel.open && available() && stage.dataset.adminView === "database") { prepareStationEntry(); updateIntegrityControl(); } });
+  renderIntegrity(true);
 
 
   function connectAction() {

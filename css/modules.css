@@ -32795,3 +32795,43 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-relationships__message { min-block-size: 1.45em; }
   .admin-shell .admin-relationships__overview { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+
+/* Admin 4D: manual, bounded integrity findings within the existing Database scrollport. */
+.admin-shell .admin-integrity { margin-block-start: 18px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-integrity p { margin: 0; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__run { appearance: none; min-block-size: 44px; padding: 10px 12px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-integrity__run { inline-size: 100%; margin-block-end: 10px; }
+.admin-shell .admin-integrity__run:disabled { color: #ab99a8; cursor: default; }
+.admin-shell .admin-integrity :is(button, summary):focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-integrity__progress { min-block-size: 1.45em; color: #d5c6d2; }
+.admin-shell .admin-integrity__checked { min-block-size: 2.9em; }
+.admin-shell .admin-integrity__checked time { display: block; }
+.admin-shell .admin-integrity__policy { margin-block-start: 8px; color: #b9aab9; }
+.admin-shell .admin-integrity__archive { margin-block-start: 10px; border: 1px solid #4c3546; background: rgb(23 15 24 / .4); }
+.admin-shell .admin-integrity__archive > summary { min-block-size: 44px; padding: 11px 12px; color: #d9cbd7; font: 14px/1.45 var(--font-display); cursor: pointer; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__archive-body { min-inline-size: 0; padding: 0 10px 10px; }
+.admin-shell .admin-integrity .admin-integrity__status { min-block-size: 4.35em; color: #c8b6c4; font: 14px/1.45 var(--font-display); }
+.admin-shell .admin-integrity__archive[data-integrity-state="Error"] .admin-integrity__status { color: #efabb4; }
+.admin-shell .admin-integrity__archive[data-integrity-state="Warning"] .admin-integrity__status { color: #dfbd84; }
+.admin-shell .admin-integrity__entities { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 10px; margin-block: 8px; padding-block: 8px; border-block: 1px solid #473340; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-integrity__entities dt { min-inline-size: 0; color: #ad9cac; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__entities dd { min-inline-size: 0; margin: 0; color: #e0d0dd; text-align: end; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__category, .admin-shell .admin-integrity__duplicates { margin-block-start: 8px; border-block-start: 1px solid #473340; }
+.admin-shell .admin-integrity__category > summary, .admin-shell .admin-integrity__duplicates > summary, .admin-shell .admin-integrity__technical > summary { min-block-size: 44px; padding-block: 11px; color: #cfbdca; font: 12px/1.45 var(--font-display); cursor: pointer; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity :is(.admin-integrity__archive, .admin-integrity__category, .admin-integrity__duplicates, .admin-integrity__technical) > summary::marker { color: #bd526d; }
+.admin-shell .admin-integrity__category-total { display: block; margin-block-start: 4px; color: #ad9cac; }
+.admin-shell .admin-integrity__findings { display: grid; gap: 8px; }
+.admin-shell .admin-integrity__finding { min-inline-size: 0; padding-block: 10px; border-block-start: 1px solid #3e303b; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__finding h4 { margin: 0 0 6px; color: #e0d1dd; font: 400 14px/1.45 var(--font-display); }
+.admin-shell .admin-integrity__finding dl { display: grid; gap: 3px; margin-block: 6px; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-integrity__finding dt { color: #ad9cac; }
+.admin-shell .admin-integrity__finding dd { min-inline-size: 0; margin: 0; color: #dfccda; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__technical pre { margin: 0; color: #cbbac8; font: 12px/1.5 var(--font-display); white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__technical[inert] > summary { color: #8f7b8a; }
+@media (min-width: 840px) {
+  .admin-shell .admin-integrity__run { inline-size: auto; }
+  .admin-shell .admin-integrity__progress { min-block-size: 1.45em; }
+  .admin-shell .admin-integrity__checked { min-block-size: 1.45em; }
+  .admin-shell .admin-integrity__checked time { display: inline; }
+}
