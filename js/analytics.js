@@ -14,12 +14,12 @@
   const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-1" : "draft-1";
   const STORAGE_KEY = "v3.analytics.preference.v1", PREFERENCE_AGE = 180 * 24 * 60 * 60 * 1000;
   const DENIED = Object.freeze({ analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
-  const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", contact: "Contact", connect: "Connect" });
-  const PATHS = Object.freeze({ home: /^\/$/, portfolio: /^\/portfolio$/, music: /^\/music$/, "music-bands": /^\/music\/bands$/, "band-detail": /^\/music\/bands\/[^/]+$/, "sets-archive": /^\/music\/bands\/[^/]+\/sets$/, "set-detail": /^\/music\/bands\/[^/]+\/[^/]+$/, "music-shows": /^\/music\/shows$/, "show-detail": /^\/music\/shows\/[^/]+$/, "music-people": /^\/music\/people$/, "person-detail": /^\/music\/people\/[^/]+$/, "music-venues": /^\/music\/venues$/, "music-venue-detail": /^\/music\/venues\/[^/]+$/, wrestling: /^\/wrestling$/, "wrestling-shows": /^\/wrestling\/shows$/, "wrestling-show-detail": /^\/wrestling\/shows\/[^/]+$/, "wrestling-match-detail": /^\/wrestling\/shows\/[^/]+\/[^/]+$/, "wrestling-match-detail-photo": /^\/wrestling\/shows\/[^/]+\/[^/]+\/photo\/[^/]+$/, "wrestling-people-prototype": /^\/wrestling\/people$/, "wrestling-person-detail": /^\/wrestling\/people\/[^/]+$/, "wrestling-venues": /^\/wrestling\/venues$/, "wrestling-venue-detail": /^\/wrestling\/venues\/[^/]+$/, "wrestling-venue-detail-prototype": /^\/wrestling\/venues\/[^/]+$/, calendar: /^\/calendar$/, about: /^\/about$/, contact: /^\/contact$/, connect: /^\/connect$/ });
+  const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", privacy: "Privacy", contact: "Contact", connect: "Connect" });
+  const PATHS = Object.freeze({ home: /^\/$/, portfolio: /^\/portfolio$/, music: /^\/music$/, "music-bands": /^\/music\/bands$/, "band-detail": /^\/music\/bands\/[^/]+$/, "sets-archive": /^\/music\/bands\/[^/]+\/sets$/, "set-detail": /^\/music\/bands\/[^/]+\/[^/]+$/, "music-shows": /^\/music\/shows$/, "show-detail": /^\/music\/shows\/[^/]+$/, "music-people": /^\/music\/people$/, "person-detail": /^\/music\/people\/[^/]+$/, "music-venues": /^\/music\/venues$/, "music-venue-detail": /^\/music\/venues\/[^/]+$/, wrestling: /^\/wrestling$/, "wrestling-shows": /^\/wrestling\/shows$/, "wrestling-show-detail": /^\/wrestling\/shows\/[^/]+$/, "wrestling-match-detail": /^\/wrestling\/shows\/[^/]+\/[^/]+$/, "wrestling-match-detail-photo": /^\/wrestling\/shows\/[^/]+\/[^/]+\/photo\/[^/]+$/, "wrestling-people-prototype": /^\/wrestling\/people$/, "wrestling-person-detail": /^\/wrestling\/people\/[^/]+$/, "wrestling-venues": /^\/wrestling\/venues$/, "wrestling-venue-detail": /^\/wrestling\/venues\/[^/]+$/, "wrestling-venue-detail-prototype": /^\/wrestling\/venues\/[^/]+$/, calendar: /^\/calendar$/, about: /^\/about$/, privacy: /^\/privacy$/, contact: /^\/contact$/, connect: /^\/connect$/ });
   let preference = null, storageAvailable = true, current = null, previousPublic = "", lastIdentity = null;
   let shellRequested = false, shellReady = false, uiReady = false, observer = null, observerTimer = 0, tagState = "idle", configured = false;
   let restoredRoutePending = false;
-  let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, ui = null;
+  let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null;
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
@@ -100,7 +100,7 @@
     if (current?.name === "admin") previousPublic = "";
     current = next;
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
-    publishConsent(); sendCurrent();
+    publishConsent(); renderChoice(); sendCurrent();
   }
   function stopObserver() { observer?.disconnect(); observer = null; window.clearTimeout(observerTimer); observerTimer = 0; }
   function readyCheck() {
@@ -127,11 +127,13 @@
     }
     publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) ui.revise.focus({ preventScroll: true });
   }
-  function closePreferences() { if (!ui) return; ui.preferences.hidden = true; renderChoice(); (preference ? ui.revise : ui.open).focus({ preventScroll: true }); }
-  function preferences(shouldFocus = false) { wantPreferences = true; if (!uiReady) return; ui.preferences.hidden = false; ui.prompt.hidden = true; ui.revise.setAttribute("aria-expanded", "true"); ui.checkbox.checked = preference?.analyticsStorage === "granted"; if (shouldFocus) ui.checkbox.focus({ preventScroll: true }); }
+  function privacyPageNow() { return /^\/privacy\/?$/.test(window.location.pathname); }
+  function closePreferences(shouldFocus = true) { wantPreferences = false; wantPreferencesFocus = false; if (!ui) return; ui.preferences.hidden = true; renderChoice(); if (shouldFocus !== false) (privacyPageNow() ? document.querySelector("[data-privacy-open-preferences]") : preference ? ui.revise : ui.open)?.focus({ preventScroll: true }); }
+  function preferences(shouldFocus = false) { wantPreferences = true; wantPreferencesFocus ||= shouldFocus; if (!uiReady) return; ui.root.hidden = false; ui.preferences.hidden = false; ui.prompt.hidden = true; ui.revise.setAttribute("aria-expanded", "true"); ui.checkbox.checked = preference?.analyticsStorage === "granted"; if (wantPreferencesFocus) ui.checkbox.focus({ preventScroll: true }); wantPreferencesFocus = false; }
   function renderChoice() {
     if (!ui) return;
     const editing = !ui.preferences.hidden;
+    ui.root.hidden = privacyPageNow() && !editing;
     ui.prompt.hidden = Boolean(preference) || editing;
     ui.revise.hidden = !preference && !editing;
     ui.revise.setAttribute("aria-expanded", String(editing));
@@ -148,6 +150,7 @@
     button("Accept", actions, "accept", () => saveChoice("granted")); button("Reject", actions, "reject", () => saveChoice("denied")); const open = button("Preferences", actions, "preferences", () => preferences(true));
     const prefs = element("section", "", root); prefs.id = "v3-privacy-preferences"; prefs.hidden = true; element("h2", "Analytics preference", prefs);
     const notice = element("p", "", prefs, "notice");
+    const policy = element("a", "Read our privacy policy", prefs, "policy"); policy.href = "/privacy";
     const label = element("label", "", prefs), checkbox = element("input", "", label, "storage"); checkbox.type = "checkbox"; element("span", "Allow analytics storage", label);
     element("p", "Accept allows analytics storage; Reject denies it. Advertising storage, Google signals and ad personalization stay off. Denial does not delete earlier data. After reviewed activation, cookieless measurements may still be sent.", prefs);
     const saved = element("p", "", prefs, "saved"); saved.setAttribute("role", "status"); saved.setAttribute("aria-live", "polite");
@@ -177,6 +180,6 @@
   });
   boot.install({
     start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.ready) activate(); },
-    commit, activate, preferences
+    commit, activate, preferences, closePreferences
   });
 })();

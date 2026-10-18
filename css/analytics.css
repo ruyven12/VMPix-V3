@@ -13,6 +13,8 @@
 .v3-privacy label { display: flex; align-items: center; gap: 10px; min-block-size: 44px; margin-block-end: 8px; cursor: pointer; }
 .v3-privacy input { inline-size: 20px; block-size: 20px; flex: 0 0 20px; accent-color: #dad3e1; }
 .v3-privacy [data-v3-privacy-revise] { max-inline-size: 100%; }
+.v3-privacy [data-v3-privacy-policy] { display: flex; align-items: center; min-block-size: 44px; margin-block-end: 10px; color: #f1bbc8; font: inherit; text-decoration: underline; text-underline-offset: 0.18em; }
+.v3-privacy [data-v3-privacy-policy]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 @media (orientation: landscape) and (max-height: 500px) and (min-width: 600px) {
   .v3-privacy { inline-size: min(18rem, 32vw); }
   .v3-privacy__actions { flex-wrap: nowrap; }

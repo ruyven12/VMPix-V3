@@ -39,12 +39,13 @@
       window.__v3AnalyticsBoot = Object.freeze({
         commit,
         activate() { ready = true; call("activate"); },
-        install(controller) { if (adapter) return false; adapter = controller; call("start", { campaign: Object.freeze(campaign), referrer, latest, ready }); if (wantPreferences) call("preferences"); return true; }
+        closePreferences(shouldFocus = true) { wantPreferences = false; call("closePreferences", shouldFocus); },
+        install(controller) { if (adapter) return false; adapter = controller; call("start", { campaign: Object.freeze(campaign), referrer, latest, ready }); if (wantPreferences) call("preferences", true); return true; }
       });
       window.V3Analytics = Object.freeze({
         // Event extensions require an explicit name/parameter catalog; reserved GA commands are never accepted.
         track() { return false; },
-        preferences() { wantPreferences = true; call("preferences"); }
+        preferences() { wantPreferences = true; call("preferences", true); }
       });
     })();
   </script>
@@ -210,6 +211,7 @@
   <link rel="stylesheet" href="/css/shell.css" data-v3-shell-css>
   <link rel="stylesheet" href="/css/modules.css">
   <link rel="stylesheet" href="/css/connect.css">
+  <link rel="stylesheet" href="/css/privacy.css">
 </head>
 <body>
   <section data-home-boot-recovery hidden role="alert" aria-labelledby="home-boot-recovery-title">
@@ -2086,6 +2088,56 @@
           </p>
           <div class="about-state-surface" aria-live="polite" hidden data-about-state-surface></div>
         </section>
+      </section>
+      <section class="privacy-shell" aria-labelledby="privacy-title" aria-hidden="true" hidden inert data-privacy-shell>
+        <article class="privacy-shell__article" data-privacy-article>
+          <a href="/portfolio" data-privacy-back>Back</a>
+          <section aria-labelledby="privacy-title">
+            <h1 id="privacy-title" tabindex="-1">Your Privacy Matters</h1>
+            <button type="button" data-privacy-open-preferences>Analytics preferences</button>
+            <p>Welcome to VMPix!</p>
+            <p>We use Google Analytics to better understand how visitors explore our website, from music and wrestling photography to galleries and individual photos.</p>
+            <p>This helps us learn what people enjoy, which parts of the archive receive attention, and how we can make the experience better.</p>
+            <p>Depending on your privacy preferences, we may collect information such as page views, clicks, general location, device type, and how visitors interact with the website.</p>
+            <p>Google Analytics may also receive limited information without analytics cookies, even if you decline them.</p>
+            <p>We don't use Google Analytics for personalized advertising, and we don't use it to intentionally identify individual visitors.</p>
+            <p>You're always in control of your analytics preferences, and you can change them whenever you like.</p>
+          </section>
+          <section aria-labelledby="privacy-section-1">
+            <h2 id="privacy-section-1">What We Collect</h2>
+            <p>We may collect information about which pages, galleries, photographs, and sections visitors explore, along with searches, downloads, and interactions with website features.</p>
+            <p>Google Analytics may also provide general geographic information, browser and device details, referral sources, and engagement measurements.</p>
+            <p>We do not intentionally collect names, email addresses, or other directly identifying information through our analytics events.</p>
+          </section>
+          <section aria-labelledby="privacy-section-2">
+            <h2 id="privacy-section-2">Cookies &amp; Your Choices</h2>
+            <p>We use Google Analytics with Advanced Consent Mode.</p>
+            <p>You can accept or reject optional analytics cookies. Advertising storage and personalized advertising remain disabled.</p>
+            <p>Even when analytics cookies are rejected, Google's technology may receive limited cookieless signals.</p>
+            <p>You can revisit your privacy preferences through the website's consent controls.</p>
+          </section>
+          <section aria-labelledby="privacy-section-3">
+            <h2 id="privacy-section-3">How Information Is Used</h2>
+            <p>Analytics helps us understand which parts of VMPix are useful, improve navigation, identify popular photography, and make the archive easier to explore.</p>
+            <p>We do not use Google Analytics for personalized advertising.</p>
+            <p>Google processes analytics information according to its own privacy and data-handling practices.</p>
+            <p>You can learn more in &quot;Google's Privacy Policy&quot; (<a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a>).</p>
+          </section>
+          <section aria-labelledby="privacy-section-4">
+            <h2 id="privacy-section-4">Data Retention</h2>
+            <p>Analytics information is retained according to our Google Analytics settings and Google's applicable retention policies.</p>
+            <p>Some aggregated reporting information may remain available longer than event-level information.</p>
+            <p>Your consent preference may be saved on your device for up to 180 days, when local storage is available.</p>
+          </section>
+          <section aria-labelledby="privacy-section-5">
+            <h2 id="privacy-section-5">Your Privacy Rights</h2>
+            <p>You can change your analytics preferences through the website's privacy controls.</p>
+            <p>Depending on where you live, you may also have rights to request information about, restrict, or request deletion of certain personal information.</p>
+            <p>For privacy questions or requests, contact:</p>
+            <p><a href="mailto:ruyven12@gmail.com">ruyven12@gmail.com</a></p>
+            <p>We may update this policy as the website evolves or its analytics features change.</p>
+          </section>
+        </article>
       </section>
       <section class="calendar-shell" aria-labelledby="calendar-title" aria-hidden="true" inert data-calendar-shell data-site-module-scope="calendar">
         <header class="calendar-header">

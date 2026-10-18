@@ -1,0 +1,17 @@
+/* Privacy is a static Shell utility surface with one native scroll owner. */
+.site-shell[data-shell-route="privacy"] { grid-template-rows: minmax(0, 1fr); }
+.site-shell[data-shell-route="privacy"] .universal-bottom-rail { display: none; }
+.site-shell[data-shell-route="privacy"] .home-frame { display: none; }
+.site-shell[data-shell-route="privacy"] .portfolio-engine { visibility: visible; opacity: 1; pointer-events: auto; transform: translate3d(0, 0, 0) scale3d(1, 1, 1); }
+.privacy-shell[hidden] { display: none; }
+.privacy-shell { position: absolute; inset: 0; inset-block-end: calc(var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) + var(--portfolio-engine-bottom-offset, max(0.58rem, env(safe-area-inset-bottom)))); z-index: 2; box-sizing: border-box; min-inline-size: 0; min-block-size: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior-y: contain; padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 20px max(20px, env(safe-area-inset-left)); scroll-padding-block: 24px 20px; background: #08080b; color: #efedf0; -webkit-overflow-scrolling: touch; }
+.privacy-shell__article { box-sizing: border-box; inline-size: min(100%, 70ch); margin-inline: auto; padding: clamp(18px, 3vw, 36px); border: 1px solid #51424a; background: #101014; font: 400 16px/1.7 system-ui, sans-serif; letter-spacing: normal; text-align: start; text-transform: none; overflow-wrap: anywhere; }
+.privacy-shell__article h1, .privacy-shell__article h2 { color: #f8f3f5; font-family: var(--font-display); font-weight: 400; letter-spacing: normal; line-height: 1.4; text-transform: none; }
+.privacy-shell__article h1 { margin: 0 0 20px; font-size: clamp(24px, 4vw, 34px); }
+.privacy-shell__article h2 { margin: 0 0 14px; font-size: clamp(19px, 3vw, 23px); }
+.privacy-shell__article section + section { margin-block-start: 32px; padding-block-start: 28px; border-block-start: 1px solid #51424a; }
+.privacy-shell__article p { margin: 0 0 18px; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; }
+.privacy-shell__article a { color: #f1bbc8; text-decoration: underline; text-underline-offset: 0.18em; }
+.privacy-shell__article [data-privacy-back] { display: inline-flex; align-items: center; min-block-size: 44px; margin-block-end: 14px; }
+.privacy-shell__article button { min-block-size: 44px; max-inline-size: 100%; margin-block-end: 22px; padding: 10px 16px; border: 1px solid #b57c8d; border-radius: 3px; background: #23151b; color: #fff; font: 600 16px/1.4 system-ui, sans-serif; letter-spacing: normal; text-transform: none; cursor: pointer; }
+.privacy-shell__article :is(a, button):focus-visible { outline: 2px solid #fff; outline-offset: 4px; }

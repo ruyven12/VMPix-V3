@@ -3635,6 +3635,17 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return "";
   }
 
+  if (route.name === "privacy") {
+    try {
+      const previous = historyState.__v3ShellPreviousRoute;
+      if (typeof previous === "string" && previous.length <= 2048) {
+        const url = new URL(previous, window.location.origin);
+        const target = getRouteFromUrl(url.href);
+        if (url.origin === window.location.origin && !url.username && !url.password && !target.isUnknown && !["privacy", "route-not-found", "music-route-not-found", "wrestling-route-not-found"].includes(target.name)) return url.pathname + url.search + url.hash;
+      }
+    } catch { /* A direct Privacy entry returns to Portfolio. */ }
+    return routePaths.portfolio;
+  }
   if (route.name === "admin" && ["api", "database"].includes(route.adminStation)) return routePaths.admin;
   if (route.name === "wrestling-people-prototype") return routePaths.wrestling;
 
@@ -6320,6 +6331,81 @@ function handleAdminReturn(event) {
   navigateToRoute(routePaths.portfolio);
 }
 
+let privacyPreviousTitle = "";
+const PRIVACY_DOCUMENT_TITLE = "Your Privacy Matters - Voodoo Media V3.0.01";
+
+function hidePrivacyShell() {
+  if (privacyShell) {
+    if (privacyShell.contains(document.activeElement)) document.activeElement.blur();
+    privacyShell.hidden = true;
+    privacyShell.setAttribute("aria-hidden", "true");
+    privacyShell.setAttribute("inert", "");
+  }
+  shell?.classList.remove("is-privacy-view");
+  if (document.title === PRIVACY_DOCUMENT_TITLE) setDocumentTitle(privacyPreviousTitle);
+  privacyPreviousTitle = "";
+}
+
+function showPrivacyShell() {
+  if (!shell || !privacyShell) return;
+  const wasActive = !privacyShell.hidden;
+  if (!wasActive) privacyPreviousTitle = document.title;
+  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-venues-view", "is-wrestling-venue-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view", "is-contact-view", "is-connect-view");
+  shell.classList.add("has-entered-hub", "is-privacy-view");
+  homeFrame?.setAttribute("aria-hidden", "true");
+  [portfolioHub, modulePlaceholder, musicNexusShell, ringArchiveShell, aboutShell, calendarShell, contactShell, connectShell].forEach(surface => {
+    surface?.setAttribute("aria-hidden", "true");
+    surface?.setAttribute("inert", "");
+  });
+  setWrestlingShowsHidden(true);
+  setWrestlingPeopleHidden(true);
+  setWrestlingPersonDetailHidden(true);
+  setWrestlingVenuesHidden(true);
+  setWrestlingShowDetailHidden(true);
+  setWrestlingMatchGalleryHidden(true);
+  setWrestlingLightboxHidden(true);
+  setHubChromeHidden(true);
+  privacyShell.hidden = false;
+  privacyShell.setAttribute("aria-hidden", "false");
+  privacyShell.removeAttribute("inert");
+  setCurrentView("Privacy");
+  setActiveGlobalNav("privacy");
+  setPortfolioEngineHudCurrentView("Privacy");
+  const back = privacyShell.querySelector("[data-privacy-back]");
+  if (back) back.href = getShellBackTarget(getRouteFromUrl());
+  setDocumentTitle(PRIVACY_DOCUMENT_TITLE);
+  if (startButton) { startButton.disabled = true; startButton.setAttribute("aria-busy", "false"); }
+  if (!wasActive) privacyShell.querySelector("h1")?.focus({ preventScroll: true });
+}
+
+// Only the authored policy anchor is adopted by the Shell; modified clicks stay native.
+function handlePrivacyPolicyNavigation(event) {
+  const link = event.target instanceof Element ? event.target.closest("a[data-v3-privacy-policy]") : null;
+  if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (link.getAttribute("href") !== routePaths.privacy) return;
+  event.preventDefault();
+  try { window.__v3AnalyticsBoot?.closePreferences(false); } catch { /* Consent UI is optional. */ }
+  if (getRouteFromUrl().name === "privacy" && !privacyShell?.hidden) {
+    privacyShell?.querySelector("h1")?.focus({ preventScroll: true });
+    return;
+  }
+  navigateToRoute(routePaths.privacy);
+}
+
+function handlePrivacyPreferences() {
+  if (getRouteFromUrl().name !== "privacy" || privacyShell?.hidden || privacyShell?.hasAttribute("inert")) return;
+  try { window.V3Analytics?.preferences(); } catch { /* A delayed adapter keeps this request queued. */ }
+}
+
+function handlePrivacyBack(event) {
+  if (getRouteFromUrl().name !== "privacy" || privacyShell?.hidden || privacyShell?.hasAttribute("inert")) { event.preventDefault(); return; }
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  const route = getRouteFromUrl();
+  if (shouldShellBackUseHistory(route)) window.history.back();
+  else navigateToRoute(getShellBackTarget(route), { navigationDirection: "back" });
+}
+
 function showAboutShell() {
   if (!shell || !aboutShell) {
     return;
@@ -6794,6 +6880,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "wrestling-lightbox": wrestlingLightboxShell,
     calendar: calendarShell,
     about: aboutShell,
+    privacy: privacyShell,
     contact: contactShell,
     admin: adminShell,
   };
@@ -7663,6 +7750,9 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   renderGlobalMenu();
   initShellRailLogo();
   initShellMenu();
+  document.addEventListener("click", handlePrivacyPolicyNavigation);
+  privacyShell?.querySelector("[data-privacy-open-preferences]")?.addEventListener("click", handlePrivacyPreferences);
+  privacyShell?.querySelector("[data-privacy-back]")?.addEventListener("click", handlePrivacyBack);
   adminShell?.querySelector("[data-admin-return]")?.addEventListener("click", handleAdminReturn);
   window.addEventListener("pagehide", cancelAdminStationTravel);
   adminShell?.querySelector("[data-admin-open-api]")?.addEventListener("click", event => handleAdminStationNavigation(event, "api"));

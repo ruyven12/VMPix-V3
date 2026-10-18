@@ -22,6 +22,7 @@ const homeFrame = document.querySelector(".home-frame") || document.getElementBy
 const portfolioHub = document.querySelector(".portfolio-hub");
 const portfolioEntryTarget = document.querySelector("[data-portfolio-entry-target]");
 const aboutShell = document.querySelector("[data-about-shell]");
+const privacyShell = document.querySelector("[data-privacy-shell]");
 const calendarShell = document.querySelector("[data-calendar-shell]");
 const contactShell = document.querySelector("[data-contact-shell]");
 const connectShell = document.querySelector("[data-connect-shell]");
@@ -1988,6 +1989,7 @@ const routePaths = {
   wrestlingShows: "/wrestling/shows",
   calendar: "/calendar",
   about: "/about",
+  privacy: "/privacy",
   contact: "/contact",
   connect: "/connect",
   admin: "/admin",
@@ -2183,6 +2185,16 @@ const shellRouteRegistry = [
     bottomRailEligible: true,
   },
   {
+    id: "privacy",
+    route: routePaths.privacy,
+    label: "Privacy",
+    parentSection: "Site",
+    moduleType: "shell",
+    drawerGroup: "site",
+    breadcrumbLabel: "Privacy",
+    bottomRailEligible: true,
+  },
+  {
     id: "contact",
     route: routePaths.contact,
     label: "Contact",
@@ -2279,6 +2291,7 @@ const routeNameToGlobalNavTarget = {
   "wrestling-venue-detail": "wrestling",
   calendar: "calendar",
   about: "about",
+  privacy: "privacy",
   contact: "contact",
   connect: "connect",
   admin: "admin",
@@ -2314,6 +2327,7 @@ const routeNameToBreadcrumbTrail = {
   "wrestling-venue-detail": ["portfolio", "wrestling"],
   calendar: ["portfolio", "calendar"],
   about: ["portfolio", "about"],
+  privacy: ["portfolio", "privacy"],
   contact: ["portfolio", "contact"],
   connect: ["connect"],
   admin: ["portfolio", "admin"],
@@ -2367,6 +2381,7 @@ const routeNameToShellBackTarget = {
   "wrestling-venue-detail": routePaths.wrestlingVenues,
   calendar: routePaths.portfolio,
   about: routePaths.portfolio,
+  privacy: routePaths.portfolio,
   contact: routePaths.portfolio,
   connect: routePaths.home,
   admin: routePaths.portfolio,

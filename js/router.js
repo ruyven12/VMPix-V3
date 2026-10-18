@@ -177,6 +177,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.about) {
     return { name: "about", canonicalUrl: routePaths.about };
   }
+  if (routePath === routePaths.privacy) {
+    return { name: "privacy", canonicalUrl: routePaths.privacy };
+  }
   if (routePath === routePaths.contact) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
@@ -415,6 +418,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (route.name !== "privacy" && typeof hidePrivacyShell === "function") hidePrivacyShell();
   if (typeof cancelAdminStationTravel === "function") cancelAdminStationTravel();
   if (route.name !== "admin" && typeof hideAdminShell === "function") hideAdminShell();
   beginV3RouteContext(route, options);
@@ -637,6 +641,11 @@ function syncRoute(route, options = {}) {
 
   if (route.name === "about") {
     showAboutShell();
+    return;
+  }
+
+  if (route.name === "privacy") {
+    showPrivacyShell();
     return;
   }
 
