@@ -391,6 +391,10 @@ function replaceRouteUrl(url, state = {}) {
   if (v3RouteContext.entry === window.history.state?.v3EntryId) v3RouteContext.url = getRouteFromUrl().canonicalUrl || getPathWithSearch();
 }
 
+function notifyV3AnalyticsView(route) {
+  try { window.__v3AnalyticsBoot?.commit(route); } catch { /* Optional analytics never changes routing. */ }
+}
+
 // Adopt an already-painted persistent destination without running its mount path again.
 function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {}) {
   beginV3RouteContext(route, { navigationCause: "spa" });
@@ -407,6 +411,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
   updateShellBackState(route);
   updatePrototypeEngineReturnEmitter(route);
   stabilizeShellViewport(route);
+  notifyV3AnalyticsView(route);
 }
 
 function syncRoute(route, options = {}) {
@@ -768,6 +773,7 @@ function syncRouteFromLocation(options = {}) {
   if (typeof stabilizeShellViewport === "function") {
     stabilizeShellViewport(route, options);
   }
+  notifyV3AnalyticsView(route);
 }
 
 function navigateToRoute(url, options = {}) {
@@ -781,6 +787,7 @@ function navigateToRoute(url, options = {}) {
     if (typeof stabilizeShellViewport === "function") {
       stabilizeShellViewport(route, options);
     }
+    notifyV3AnalyticsView(route);
   };
   if (typeof runShellBackSweep === "function") {
     runShellBackSweep(route, restore, options.navigationDirection === "back");

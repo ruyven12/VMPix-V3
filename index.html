@@ -4,6 +4,51 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#050507">
+  <script>
+    (() => {
+      if (window.__v3AnalyticsBoot) return;
+      // Capture only bounded campaign tokens before route canonicalization; never retain the entry URL.
+      const campaign = Object.create(null);
+      const initialAdmin = /^\/admin(?:\/|$)/i.test(window.location.pathname);
+      const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_id", "utm_content", "utm_term"];
+      const safeToken = value => typeof value === "string" && /^[a-z0-9][a-z0-9_.-]{0,63}$/i.test(value) &&
+        !/password|passwd|secret|token|session|credential|apikey|privatekey|authorization/i.test(value) &&
+        !/^\d{7,}$/.test(value) && !/^[a-f0-9]{32,}$/i.test(value) && !/^[a-z0-9_-]{32,}$/i.test(value);
+      try {
+        const entry = new URL(window.location.href);
+        if (!initialAdmin) for (const key of keys) { const values = entry.searchParams.getAll(key); if (values.length === 1 && safeToken(values[0])) campaign[key] = values[0]; }
+      } catch { /* Missing attribution never affects routing. */ }
+      let referrer = "";
+      try { const source = new URL(document.referrer); if (!initialAdmin && ["https:", "http:"].includes(source.protocol) && !source.username && !source.password) referrer = source.origin + "/"; } catch {}
+      let latest = null, ready = false, adapter = null, sequence = 0, wantPreferences = false;
+      const call = (method, value) => { try { adapter?.[method]?.(value); } catch { /* Analytics cannot interrupt the Shell. */ } };
+      const commit = route => {
+        try {
+          if (!route || typeof route.name !== "string") return;
+          const isAdmin = route.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname);
+          const url = new URL(route.canonicalUrl || "/", window.location.origin);
+          const path = !route.isUnknown && !isAdmin && url.origin === window.location.origin && url.pathname.length <= 512 && url.pathname.split("/").every(part => {
+            if (!part) return true; const value = decodeURIComponent(part);
+            return /^[a-z0-9][a-z0-9_.-]{0,119}$/i.test(value) && !/password|passwd|secret|token|session|credential|apikey|privatekey|authorization/i.test(value) && !/^[a-f0-9]{32,}$/i.test(value) && !/^[a-z0-9_-]{32,}$/i.test(value);
+          }) ? url.pathname : null;
+          latest = Object.freeze({ name: isAdmin ? "admin" : route.name.slice(0, 64), path: isAdmin ? null : path,
+            view: route.name === "music-bands" && ["list", "search"].includes(route.view) ? route.view : "", unknown: route.isUnknown === true, generation: ++sequence });
+          call("commit", latest);
+        } catch { latest = Object.freeze({ name: "not_found", path: null, view: "", unknown: true, generation: ++sequence }); call("commit", latest); }
+      };
+      window.__v3AnalyticsBoot = Object.freeze({
+        commit,
+        activate() { ready = true; call("activate"); },
+        install(controller) { if (adapter) return false; adapter = controller; call("start", { campaign: Object.freeze(campaign), referrer, latest, ready }); if (wantPreferences) call("preferences"); return true; }
+      });
+      window.V3Analytics = Object.freeze({
+        // Event extensions require an explicit name/parameter catalog; reserved GA commands are never accepted.
+        track() { return false; },
+        preferences() { wantPreferences = true; call("preferences"); }
+      });
+    })();
+  </script>
+  <script async src="/js/analytics.js"></script>
   <!-- Keep parsed fallback markup unpainted until the initial V3 route owns the Shell.
        Opacity preserves the geometry used by synchronous startup measurements. -->
   <style>

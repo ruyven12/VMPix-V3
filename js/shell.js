@@ -7631,6 +7631,7 @@ function completeHomePortfolioRouteHandoff() {
   updateShellBackState(portfolioRoute);
   stabilizeShellViewport(portfolioRoute, { historyState: { fromHomeEngage: true } });
   shellRenderedRoute = portfolioRoute;
+  try { window.__v3AnalyticsBoot?.commit(portfolioRoute); } catch { /* Analytics is optional. */ }
 }
 
 function beginHomePortfolioTransition() {
@@ -7876,6 +7877,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     runShellBackSweep(targetRoute, () => {
       syncRoute(targetRoute, { historyState, navigationCause: 'back-forward' });
       if (typeof stabilizeShellViewport === "function") stabilizeShellViewport(targetRoute, { historyState });
+      try { window.__v3AnalyticsBoot?.commit(targetRoute); } catch { /* Analytics is optional. */ }
     }, isBack);
   });
   if (hubCarousel) {
@@ -7965,4 +7967,5 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   if (document.documentElement.hasAttribute("data-v3-home-boot")) {
     window.v3HomeBoot?.complete(syncHomeEngageReadiness);
   }
+  try { window.__v3AnalyticsBoot?.activate(); } catch { /* Readiness/consent remain independent of the Shell. */ }
 }

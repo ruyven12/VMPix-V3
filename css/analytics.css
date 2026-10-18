@@ -1,0 +1,25 @@
+/* Isolated, nonmodal Shell privacy controls; no application layout or motion changes. */
+.v3-privacy { position: fixed; z-index: 120; inset-block-start: max(12px, env(safe-area-inset-top)); inset-inline-start: max(12px, env(safe-area-inset-left)); inline-size: min(22rem, calc(100vw - max(12px, env(safe-area-inset-left)) - max(12px, env(safe-area-inset-right)))); max-block-size: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(12px, env(safe-area-inset-bottom)) - 6rem); overflow: auto; overscroll-behavior: contain; box-sizing: border-box; color: #efedf0; font: 13px/1.45 system-ui, sans-serif; letter-spacing: normal; text-transform: none; pointer-events: none; }
+.v3-privacy > section, .v3-privacy > button { pointer-events: auto; }
+.v3-privacy [hidden] { display: none !important; }
+.v3-privacy section { box-sizing: border-box; padding: 12px; border: 1px solid #77717c; border-radius: 4px; background: #131217; }
+.v3-privacy h2 { margin: 0 0 8px; color: inherit; font: 600 15px/1.4 system-ui, sans-serif; text-transform: none; }
+.v3-privacy p { margin: 0 0 10px; color: inherit; font: inherit; overflow-wrap: anywhere; }
+.v3-privacy button { min-block-size: 44px; padding: 8px 12px; border: 1px solid #aaa4b1; border-radius: 4px; background: #24212a; color: #fff; font: 600 13px/1.35 system-ui, sans-serif; text-transform: none; cursor: pointer; }
+.v3-privacy button:focus-visible, .v3-privacy input:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.v3-privacy [data-v3-privacy-revise]:focus-visible { outline-offset: -3px; }
+.v3-privacy__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.v3-privacy__actions button { flex: 1 1 5rem; }
+.v3-privacy label { display: flex; align-items: center; gap: 10px; min-block-size: 44px; margin-block-end: 8px; cursor: pointer; }
+.v3-privacy input { inline-size: 20px; block-size: 20px; flex: 0 0 20px; accent-color: #dad3e1; }
+.v3-privacy [data-v3-privacy-revise] { max-inline-size: 100%; }
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 600px) {
+  .v3-privacy { inline-size: min(18rem, 32vw); }
+  .v3-privacy__actions { flex-wrap: nowrap; }
+  .v3-privacy__actions button { min-inline-size: 0; flex: 1 1 0; padding-inline: 4px; overflow-wrap: anywhere; }
+  .v3-privacy__actions [data-v3-privacy-preferences] { flex-grow: 1.5; }
+}
+@media (orientation: portrait) {
+  /* Clear the existing Home hit area using its half-diameter; only this overlay is constrained. */
+  body:has(.site-shell.is-home-route) .v3-privacy { max-block-size: min(calc(100dvh - max(12px, env(safe-area-inset-top)) - max(12px, env(safe-area-inset-bottom)) - 6rem), calc(50dvh - clamp(5.65rem, calc(17vw + 1.86rem), 6.775rem) - max(12px, env(safe-area-inset-top)) - 12px)); }
+}
