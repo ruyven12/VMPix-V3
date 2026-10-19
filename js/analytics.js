@@ -25,7 +25,11 @@
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
   const gtag = function () {
-    if (["event", "config", "js", "consent"].includes(arguments[0]) && arguments[1] !== "default" && (!canCollect() || tagState !== "ready")) {
+    // Only a fully denied control update may reach an initialized SDK while collection is blocked.
+    const deniedUpdate = arguments.length === 3 && arguments[0] === "consent" && arguments[1] === "update" &&
+      tagState === "ready" && configured && lastConsent === "granted" && window[`ga-disable-${MEASUREMENT_ID}`] === true &&
+      arguments[2] && Object.keys(arguments[2]).length === 4 && Object.keys(DENIED).every(key => arguments[2][key] === "denied");
+    if (["event", "config", "js", "consent"].includes(arguments[0]) && arguments[1] !== "default" && (!canCollect() || tagState !== "ready") && !deniedUpdate) {
       window[`ga-disable-${MEASUREMENT_ID}`] = true; return false;
     }
     window.dataLayer.push(arguments); return arguments;
@@ -45,15 +49,16 @@
     preference = readPreference(); schedulePreferenceExpiry(); renderChoice();
     const values = consentValues();
     if (!canCollect()) {
-      // Basic mode sends nothing while blocked, including denied-consent control pings.
       window[`ga-disable-${MEASUREMENT_ID}`] = true;
-      lastConsent = null; lastIdentity = null; previousPublic = "";
+      // Revoke SDK permission once after an actual loss of consent; route-only locks keep their own gate.
+      const permissionDenied = !storageAvailable || !validPreference(preference) || preference.analyticsStorage !== "granted";
+      if (permissionDenied && lastConsent === "granted" && gtag("consent", "update", { ...DENIED }) !== false) lastConsent = "denied";
+      lastIdentity = null; previousPublic = "";
       return;
     }
     window[`ga-disable-${MEASUREMENT_ID}`] = tagState !== "ready";
     if (tagState !== "ready" || lastConsent === values.analytics_storage) return;
-    lastConsent = values.analytics_storage;
-    gtag("consent", "update", values);
+    if (gtag("consent", "update", values) !== false) lastConsent = values.analytics_storage;
   }
   function validPreference(value, now = Date.now()) {
     return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === "analyticsStorage,expiresAt,noticeVersion,savedAt,version" &&
