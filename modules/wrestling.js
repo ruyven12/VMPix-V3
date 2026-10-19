@@ -5544,14 +5544,14 @@ function createHallPrototypeEncounterCard(match = {}, matchIndex = 0, show = nul
   card.tabIndex = 0;
   card.setAttribute("aria-label", `Preview match ${matchIndex + 1}: ${encounter.heading}`);
 
-  const previewMatch = () => {
-    startHallEncounterSelectionPrototype(card, match, show);
+  const previewMatch = (event) => {
+    startHallEncounterSelectionPrototype(card, match, show, event);
   };
   card.addEventListener("click", previewMatch);
   card.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      previewMatch();
+      previewMatch(event);
     }
   });
   if (encounter.segmentInfo) {
@@ -5952,7 +5952,7 @@ function createHallEncounterRecordPreview(initialShow, initialMatch, matchRef, o
 let hallEncounterSelectionPrototype = null;
 let wrestlingMatchDossierPendingAdoption = null;
 
-function startHallEncounterSelectionPrototype(card, match, show = null) {
+function startHallEncounterSelectionPrototype(card, match, show = null, event = null) {
   if (hallEncounterSelectionPrototype || !card.isConnected) return;
   const surface = card.closest(".wrestling-show-prototype-surface");
   const site = card.closest(".site-shell");
@@ -5962,6 +5962,11 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
 
   const destination = getRouteFromUrlWithPrototypePrecedence(card.dataset.wrestlingMatchRoute);
   if (!isWrestlingMatchDetailRoute(destination)) return;
+  const relationshipAnalytics = typeof beginArchiveRelationshipAnalytics === "function"
+    ? beginArchiveRelationshipAnalytics(event, "wrestling", "show", "match", () => ({
+      source_content_id: show?.backend_record?.show_id,
+      target_content_id: match?.backend_record?.match_id,
+    })) : null;
   const pageKey = getWrestlingMatchDossierPhotoPageKey(show, match, destination);
   const recordPreview = createHallEncounterRecordPreview(show, match, card.dataset.wrestlingMatchRef, {
     canonical: true, pageKey, route: destination, onInitialReveal: () => handoff(),
@@ -6087,6 +6092,9 @@ function startHallEncounterSelectionPrototype(card, match, show = null) {
     ["tabindex", "role", "aria-label"].forEach((name) => hero.removeAttribute(name));
     hero.querySelector("h2").id = "wrestling-match-detail-prototype-title";
     try {
+      if (typeof stageArchiveRelationshipAnalytics === "function") {
+        stageArchiveRelationshipAnalytics(relationshipAnalytics, card.dataset.wrestlingMatchRoute);
+      }
       navigateToRoute(card.dataset.wrestlingMatchRoute, { shouldResetScroll: false });
     } finally {
       if (wrestlingMatchDossierPendingAdoption === transfer) wrestlingMatchDossierPendingAdoption = null;
@@ -10276,7 +10284,13 @@ function createFieldsOfConflictDossierEventHistoryRow(eventRow, venue) {
   action.dataset.wrestlingShowRoute = showRoute;
   setWrestlingRelationshipDataset(action, eventRow);
   if (showRoute) {
-    action.addEventListener("click", () => {
+    action.addEventListener("click", (event) => {
+      const analytics = typeof beginArchiveRelationshipAnalytics === "function"
+        ? beginArchiveRelationshipAnalytics(event, "wrestling", "venue", "show", () => ({
+          source_content_id: venue?.backend_record?.venue_id,
+          target_content_id: eventRow?.backend_record?.show_id,
+        })) : null;
+      if (typeof stageArchiveRelationshipAnalytics === "function") stageArchiveRelationshipAnalytics(analytics, showRoute);
       navigateToRoute(showRoute, {
         historyState: {
           fromWrestlingVenueDetail: true,
@@ -10474,7 +10488,7 @@ function createFieldsOfConflictDossierCarouselArrow(direction) {
   return button;
 }
 
-function updateFieldsOfConflictDossierCarousel(carousel, nextIndex) {
+function updateFieldsOfConflictDossierCarousel(carousel, nextIndex, event = null) {
   const track = getFieldsOfConflictDossierCarouselTrack(carousel);
   const dots = Array.from(getFieldsOfConflictDossierCarouselDots(carousel)?.querySelectorAll?.("[data-fields-of-conflict-dossier-carousel-dot]") || []);
   const slides = getFieldsOfConflictDossierCarouselSlides(carousel);
@@ -10483,6 +10497,8 @@ function updateFieldsOfConflictDossierCarousel(carousel, nextIndex) {
     return;
   }
 
+  const previousIndex = normalizeFieldsOfConflictDossierCarouselIndex(Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0, slides.length);
+  const wasHistoryOpen = slides[previousIndex]?.dataset.fieldsOfConflictDossierCarouselSlide === "events";
   carousel.dataset.fieldsOfConflictDossierCarouselIndex = String(activeIndex);
   track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
   slides.forEach((slide, index) => {
@@ -10496,6 +10512,10 @@ function updateFieldsOfConflictDossierCarousel(carousel, nextIndex) {
     dot.setAttribute("aria-current", isActive ? "true" : "false");
   });
   scheduleFieldsOfConflictVenueLocationMapResize();
+  if (previousIndex !== activeIndex && typeof reportArchiveContentExpansion === "function") {
+    reportArchiveContentExpansion(event, carousel, "wrestling", "venue", "show_history", wasHistoryOpen,
+      slides[activeIndex]?.dataset.fieldsOfConflictDossierCarouselSlide === "events");
+  }
 }
 
 function bindFieldsOfConflictDossierCarouselControls(carousel) {
@@ -10510,14 +10530,14 @@ function bindFieldsOfConflictDossierCarouselControls(carousel) {
       return;
     }
     const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
-    updateFieldsOfConflictDossierCarousel(carousel, action === "prev" ? currentIndex - 1 : currentIndex + 1);
+    updateFieldsOfConflictDossierCarousel(carousel, action === "prev" ? currentIndex - 1 : currentIndex + 1, event);
   });
   carousel.addEventListener("click", (event) => {
     const dot = event.target?.closest?.("[data-fields-of-conflict-dossier-carousel-dot]");
     if (!dot) {
       return;
     }
-    updateFieldsOfConflictDossierCarousel(carousel, Number.parseInt(dot.dataset.fieldsOfConflictDossierCarouselDot || "0", 10) || 0);
+    updateFieldsOfConflictDossierCarousel(carousel, Number.parseInt(dot.dataset.fieldsOfConflictDossierCarouselDot || "0", 10) || 0, event);
   });
 
   if (viewport) {
@@ -10527,7 +10547,7 @@ function bindFieldsOfConflictDossierCarouselControls(carousel) {
       }
       event.preventDefault();
       const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
-      updateFieldsOfConflictDossierCarousel(carousel, event.key === "ArrowLeft" ? currentIndex - 1 : currentIndex + 1);
+      updateFieldsOfConflictDossierCarousel(carousel, event.key === "ArrowLeft" ? currentIndex - 1 : currentIndex + 1, event);
     });
 
     let pointerStartX = 0;
@@ -10554,7 +10574,7 @@ function bindFieldsOfConflictDossierCarouselControls(carousel) {
       const deltaY = event.clientY - pointerStartY;
       if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
         const currentIndex = Number.parseInt(carousel.dataset.fieldsOfConflictDossierCarouselIndex || "0", 10) || 0;
-        updateFieldsOfConflictDossierCarousel(carousel, currentIndex + (deltaX < 0 ? 1 : -1));
+        updateFieldsOfConflictDossierCarousel(carousel, currentIndex + (deltaX < 0 ? 1 : -1), event);
       }
       clearPointerState();
     });

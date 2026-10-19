@@ -64,6 +64,78 @@ function reportMusicArchiveControl(event, dataset, before, kind) {
   } catch { /* Optional measurements cannot interrupt the archive. */ }
 }
 
+// Relationship intent is private and short-lived; route strings match destinations, never IDs.
+const archiveRelationshipIntents = new WeakMap();
+let archiveRelationshipPending = null, archiveRelationshipDispatch = null;
+let archiveGalleryRangePending = null;
+function archiveRelationshipType(route) {
+  return ({"band-detail":"band", "show-detail":"show", "person-detail":"person", "music-venue-detail":"venue", "set-detail":"set",
+    "wrestling-show-detail":"show", "wrestling-match-detail":"match", "wrestling-person-detail":"person", "wrestling-venue-detail":"venue", "wrestling-venue-detail-prototype":"venue"})[route?.name] || "";
+}
+function beginArchiveRelationshipAnalytics(event, archive, sourceType, targetType, readIdentity = null) {
+  try {
+    const intent = beginArchiveAnalytics(event);
+    if (!intent || !window.V3Analytics?.routeCurrent?.(archive) || archiveRelationshipType(getRouteFromUrl()) !== sourceType || v3RouteContext.pending) return null;
+    // Only audited closures read original public API ID fields. Missing/fallback IDs stay absent.
+    let identity = {};
+    try { const ids = readIdentity?.(); identity = {source_content_id: ids?.source_content_id, target_content_id: ids?.target_content_id}; } catch { /* IDs are optional. */ }
+    const token = Object.freeze({});
+    archiveRelationshipIntents.set(token, {intent, archive, sourceType, targetType, identity,
+      context: v3RouteContext, entry: history.state?.v3EntryId, sourcePath: archiveAnalyticsPath()});
+    return token;
+  } catch { return null; }
+}
+function stageArchiveRelationshipAnalytics(token, targetPath) {
+  try {
+    archiveRelationshipPending = null;
+    const source = archiveRelationshipIntents.get(token);
+    archiveRelationshipIntents.delete(token); // One accepted navigation may consume an intent.
+    if (!source || source.context !== v3RouteContext || source.entry !== history.state?.v3EntryId || source.sourcePath !== archiveAnalyticsPath() || !currentArchiveAnalyticsIntent(source.intent)) return false;
+    const route = getRouteFromUrlWithPrototypePrecedence(targetPath);
+    const path = archiveAnalyticsPath(route.canonicalUrl || targetPath);
+    if (route.isUnknown || archiveRelationshipType(route) !== source.targetType || path === source.sourcePath || !path.startsWith("/" + source.archive + "/")) return false;
+    const pending = {...source, path, name: route.name};
+    archiveRelationshipPending = pending;
+    // Existing forward record links commit in this task. Failed/canceled mounts cannot replay later.
+    queueMicrotask(() => { if (archiveRelationshipPending === pending) archiveRelationshipPending = null; });
+    return true;
+  } catch { return false; }
+}
+function getArchiveRelationshipAnalyticsIdentity(archive) {
+  const pending = archiveRelationshipDispatch;
+  return pending?.archive === archive ? {archive, source_content_type: pending.sourceType, target_content_type: pending.targetType, ...pending.identity} : null;
+}
+function flushArchiveRelationshipAnalytics(committed) {
+  if (!committed) return;
+  const pending = archiveRelationshipPending;
+  archiveRelationshipPending = null;
+  try {
+    if (!pending || pending.context === v3RouteContext || pending.entry === history.state?.v3EntryId || pending.path !== archiveAnalyticsPath() || getRouteFromUrl().name !== pending.name || !currentArchiveAnalyticsIntent(pending.intent) || !window.V3Analytics?.routeCurrent?.(pending.archive) || document.visibilityState !== "visible") return;
+    archiveRelationshipDispatch = pending;
+    window.V3Analytics.track("relationship_follow", {archive: pending.archive, content_type: pending.targetType,
+      source_content_type: pending.sourceType, target_content_type: pending.targetType}, pending.intent.ticket);
+  } catch { /* Optional measurement never changes a route's activation. */ }
+  finally { archiveRelationshipDispatch = null; }
+}
+function flushArchiveGalleryRangeAnalytics(stateName) {
+  const pending = archiveGalleryRangePending;
+  if (!pending) return;
+  try {
+    if (pending.context !== v3RouteContext || pending.album !== setGallery?.dataset.albumId || activeSetGalleryPhotoMode !== "all" || ["empty", "error"].includes(stateName) || !currentArchiveAnalyticsIntent(pending.intent)) { archiveGalleryRangePending = null; return; }
+    if (stateName !== "ready" || !setGallery?.isConnected || setGallery.getAttribute("aria-hidden") !== "false" || galleryGrid?.classList.contains("is-gallery-hidden") || !getCurrentGalleryPhotoTiles().length || !window.V3Analytics?.routeCurrent?.("music")) return;
+    archiveGalleryRangePending = null;
+    window.V3Analytics.track("content_expand", {archive: "music", content_type: "gallery", panel_type: "gallery_range"}, pending.intent.ticket);
+  } catch { archiveGalleryRangePending = null; }
+}
+function reportArchiveContentExpansion(event, owner, archive, contentType, panelType, wasOpen, isOpen) {
+  try {
+    if (wasOpen !== false || isOpen !== true || !owner?.isConnected || owner.hidden || owner.closest('[hidden], [inert], [aria-hidden="true"]') || v3RouteContext.pending) return false;
+    const intent = beginArchiveAnalytics(event);
+    if (!intent || !window.V3Analytics?.routeCurrent?.(archive)) return false;
+    return window.V3Analytics.track("content_expand", {archive, content_type: contentType, panel_type: panelType}, intent.ticket);
+  } catch { return false; }
+}
+
 // Optional measurements only: explicit user intent is separate from rendering/restoration.
 // Raw backend image keys are retained privately, never recovered from DOM IDs or image URLs.
 const archiveAnalyticsTileIds = new WeakMap();
@@ -150,6 +222,8 @@ function armArchivePhotoAnalytics(tile, intent, options = {}) {
 function flushArchiveAnalytics(committed = false) {
   try {
     const api = window.V3Analytics;
+    flushArchiveRelationshipAnalytics(committed);
+    if (committed && archiveGalleryRangePending?.context !== v3RouteContext) archiveGalleryRangePending = null;
     if (committed) {
       const binding = archiveAnalyticsRouteBinding;
       if (binding?.valid) {
@@ -1056,6 +1130,10 @@ function navigateToSetDetail(row, event) {
     } }, '', window.location.href);
   }
   bandsIndexReturnUrl = returnUrl;
+  const relationship = fromBandCapturedSets ? beginArchiveRelationshipAnalytics(event, "music", "band", "set", () => ({
+    source_content_id: musicBandsIndex?.dataset.bandsDataState === "live" ? activeMusicBand?.backend_record?.band_id : undefined,
+  })) : null;
+  stageArchiveRelationshipAnalytics(relationship, getSetRouteUrl(bandId, setCode));
   stageArchiveGalleryAnalytics(event, "music", getSetRouteUrl(bandId, setCode));
   navigateToRoute(getSetRouteUrl(bandId, setCode), {
     historyState: {
@@ -4309,6 +4387,11 @@ function createVenueShowRow(show) {
 
   row.addEventListener("click", (event) => {
     event.stopPropagation();
+    const relationship = beginArchiveRelationshipAnalytics(event, "music", "venue", "show", () => ({
+      source_content_id: musicVenuesDataState === "live" ? venueSlugToVenue(activeMusicVenueDetailSlug)?.venue_id : undefined,
+      target_content_id: musicShowsSetsDataState === "live" ? show.show_id : undefined,
+    }));
+    stageArchiveRelationshipAnalytics(relationship, getMusicShowRouteUrl(show));
     navigateToRoute(getMusicShowRouteUrl(show), {
       historyState: {
         fromVenueDetail: true,
@@ -4665,7 +4748,8 @@ function updateVenueRelationshipFocusWithMotion(card, updateFocus) {
   window.setTimeout(cleanup, 420);
 }
 
-function setVenueShowsPanelOpen(card, isOpen) {
+function setVenueShowsPanelOpen(card, isOpen, event = null) {
+  const wasOpen = card.getAttribute("aria-expanded") === "true";
   const panel = getVenueShowsRelationshipPanel();
   if (!panel) {
     return;
@@ -4687,10 +4771,12 @@ function setVenueShowsPanelOpen(card, isOpen) {
     } else {
       panel.setAttribute("inert", "");
     }
+    reportArchiveContentExpansion(event, card, "music", "venue", "show_history", wasOpen, isOpen);
   });
 }
 
-function setVenueArtistsPanelOpen(card, isOpen) {
+function setVenueArtistsPanelOpen(card, isOpen, event = null) {
+  const wasOpen = card.getAttribute("aria-expanded") === "true";
   const panel = getVenueArtistsRelationshipPanel();
   if (!panel) {
     return;
@@ -4712,6 +4798,7 @@ function setVenueArtistsPanelOpen(card, isOpen) {
     } else {
       panel.setAttribute("inert", "");
     }
+    reportArchiveContentExpansion(event, card, "music", "venue", "venue_artists", wasOpen, isOpen);
   });
 }
 
@@ -4758,7 +4845,7 @@ function setupVenueArtistsRelationshipCard(venue, artists) {
     if (event.target.closest(".venue-artist-pill")) {
       return;
     }
-    setVenueArtistsPanelOpen(card, card.getAttribute("aria-expanded") !== "true");
+    setVenueArtistsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
   };
   card.onkeydown = (event) => {
     if (event.target.closest(".venue-artist-pill")) {
@@ -4766,7 +4853,7 @@ function setupVenueArtistsRelationshipCard(venue, artists) {
     }
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      setVenueArtistsPanelOpen(card, card.getAttribute("aria-expanded") !== "true");
+      setVenueArtistsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
     }
   };
 }
@@ -4813,7 +4900,7 @@ function setupVenueShowsRelationshipCard(venue, shows) {
     if (event.target.closest("[data-venue-show-row]")) {
       return;
     }
-    setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true");
+    setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
   };
   card.onkeydown = (event) => {
     if (event.target.closest("[data-venue-show-row]")) {
@@ -4821,7 +4908,7 @@ function setupVenueShowsRelationshipCard(venue, shows) {
     }
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true");
+      setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
     }
   };
 }
@@ -6568,6 +6655,7 @@ function setGalleryState(stateName = "ready") {
   });
   syncSetGalleryPhotoToggleButton(activeState);
   syncSetGalleryLoadMoreButton(activeState);
+  flushArchiveGalleryRangeAnalytics(activeState);
   if (activeState === "ready") flushArchiveAnalytics();
 }
 
@@ -7343,13 +7431,15 @@ function loadMoreSetGalleryAllPhotos() {
   loadNextSetGalleryAllModePage(row);
 }
 
-function toggleSetGalleryPhotoRange() {
+function toggleSetGalleryPhotoRange(event = null) {
   const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0] || null;
   if (!row || !galleryViewAll || galleryViewAll.disabled || galleryViewAll.getAttribute("aria-disabled") === "true") {
     return;
   }
 
   const nextMode = activeSetGalleryPhotoMode === "all" ? "preview" : "all";
+  const intent = nextMode === "all" ? beginArchiveAnalytics(event) : null;
+  archiveGalleryRangePending = intent ? {intent, context: v3RouteContext, album: getSetAlbumId(row)} : null;
   loadSetGalleryPhotoHighlights(row, { mode: nextMode });
   if (galleryGrid && nextMode === "preview") {
     galleryGrid.scrollIntoView({
@@ -10801,7 +10891,7 @@ function createMusicPersonTaggedPhotoState(stateName = "empty", text = "") {
   return stateCard;
 }
 
-function toggleMusicPersonShowCard(card) {
+function toggleMusicPersonShowCard(card, event = null) {
   const isExpanded = !card.classList.contains("is-expanded");
   const summary = card.querySelector(".person-show-summary");
   const panel = card.querySelector(".person-show-expanded");
@@ -10820,6 +10910,7 @@ function toggleMusicPersonShowCard(card) {
   if (isExpanded) {
     triggerMusicPersonShowCardHydration(card, { priority: true });
   }
+  reportArchiveContentExpansion(event, card, "music", "person", "show_photos", !isExpanded, isExpanded);
 }
 
 function getMusicPersonTaggedLightboxPhotos(items) {
@@ -11469,8 +11560,8 @@ function createMusicPersonShowCard(show, personName) {
   actionGroup.append(count, toggle);
 
   summary.append(date, copy, actionGroup);
-  summary.addEventListener("click", () => {
-    toggleMusicPersonShowCard(card);
+  summary.addEventListener("click", (event) => {
+    toggleMusicPersonShowCard(card, event);
   });
 
   const action = document.createElement("button");
@@ -11483,6 +11574,10 @@ function createMusicPersonShowCard(show, personName) {
     action.addEventListener("click", (event) => {
       event.stopPropagation();
       const currentRoute = getRouteFromUrl();
+      const relationship = beginArchiveRelationshipAnalytics(event, "music", "person", "set", () => ({
+        source_content_id: musicPeopleIndexDataState === "live" ? findMusicPersonById(activeMusicPersonDetailId || activeMusicPeopleId)?.backend_record?.person_id : undefined,
+      }));
+      stageArchiveRelationshipAnalytics(relationship, showRoute);
       navigateToRoute(showRoute, {
         historyState: {
           fromPersonDetail: true,
@@ -13899,6 +13994,10 @@ function createShowDetailAlbumCard(show, album, index) {
       return;
     }
 
+    const relationship = beginArchiveRelationshipAnalytics(event, "music", "show", "set", () => ({
+      source_content_id: musicShowsSetsDataState === "live" ? show.show_id : undefined,
+    }));
+    stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
       historyState: {
@@ -13941,6 +14040,10 @@ function createShowDetailBandsOnBill(show) {
       return;
     }
 
+    const relationship = beginArchiveRelationshipAnalytics(event, "music", "show", "set", () => ({
+      source_content_id: musicShowsSetsDataState === "live" ? show.show_id : undefined,
+    }));
+    stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
       historyState: {

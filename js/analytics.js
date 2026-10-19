@@ -11,7 +11,7 @@
   const GA_ADMIN_SETTINGS_REVIEWED = true;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
-  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-search-1" : "draft-search-1";
+  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-engagement-1" : "draft-engagement-1";
   const STORAGE_KEY = "v3.analytics.preference.v1", PREFERENCE_AGE = 180 * 24 * 60 * 60 * 1000;
   const DENIED = Object.freeze({ analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
   const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", privacy: "Privacy", contact: "Contact", connect: "Connect" });
@@ -69,7 +69,7 @@
   }
   function validPreference(value, now = Date.now()) {
     return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === "analyticsStorage,expiresAt,noticeVersion,savedAt,version" &&
-      value.version === 1 && (value.noticeVersion === NOTICE_VERSION || REVIEWED_ACTIVATION && ["reviewed-basic-1", "reviewed-gallery-1"].includes(value.noticeVersion) && value.analyticsStorage === "denied") && ["granted", "denied"].includes(value.analyticsStorage) &&
+      value.version === 1 && (value.noticeVersion === NOTICE_VERSION || REVIEWED_ACTIVATION && ["reviewed-basic-1", "reviewed-gallery-1", "reviewed-search-1"].includes(value.noticeVersion) && value.analyticsStorage === "denied") && ["granted", "denied"].includes(value.analyticsStorage) &&
       Number.isSafeInteger(value.savedAt) && value.savedAt >= 0 && value.savedAt <= now && Number.isSafeInteger(value.expiresAt) &&
       value.expiresAt - value.savedAt === PREFERENCE_AGE && value.expiresAt > now;
   }
@@ -90,7 +90,7 @@
       }
       // Preserve an unfamiliar, unexpired notice record for a newer tab; it never grants here.
       let unfamiliar = false;
-      try { const raw = JSON.parse(stored); unfamiliar = typeof raw?.noticeVersion === "string" && raw.noticeVersion !== NOTICE_VERSION && !["reviewed-basic-1", "reviewed-gallery-1"].includes(raw.noticeVersion) && Number.isSafeInteger(raw.expiresAt) && raw.expiresAt > Date.now(); } catch { /* Malformed records are removed below. */ }
+      try { const raw = JSON.parse(stored); unfamiliar = typeof raw?.noticeVersion === "string" && raw.noticeVersion !== NOTICE_VERSION && !["reviewed-basic-1", "reviewed-gallery-1", "reviewed-search-1"].includes(raw.noticeVersion) && Number.isSafeInteger(raw.expiresAt) && raw.expiresAt > Date.now(); } catch { /* Malformed records are removed below. */ }
       if (stored !== null && !value && !unfamiliar && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
       storageAvailable = !unpersistedDenial;
       return unpersistedDenial ? (validPreference(preference) && preference.analyticsStorage === "denied" ? preference : null) : value;
@@ -144,8 +144,8 @@
   }
   // Public content IDs need an adapter-owned resolver reading audited backend identifiers.
   // Caller strings, DOM/route values, filenames, array positions, and "verified" flags are not proof.
-  // Caller ID slots are always ignored. Only the audited gallery/photo provider may enrich
-  // an event from original album IDs/image keys; normalized fallback IDs stay excluded.
+  // Caller ID slots are always ignored. Only the audited private providers may enrich
+  // events from original public API IDs; normalized fallback IDs stay excluded.
   const CUSTOM_ID_FIELDS = new Set(["gallery_id", "photo_id", "source_content_id", "target_content_id"]);
   const CUSTOM_TYPES = Object.freeze({ music: ["band", "show", "person", "venue", "set", "gallery", "photo"], wrestling: ["show", "person", "venue", "match", "gallery", "photo"] });
   const CUSTOM_DATASETS = Object.freeze({ music: ["bands", "shows", "people", "venues"], wrestling: ["shows", "people", "venues"] });
@@ -173,7 +173,7 @@
     for (const key of keys) {
       const descriptor = descriptors[key];
       if (!descriptor || !descriptor.enumerable || !("value" in descriptor) || (key !== "archive" && key !== "content_type" && !Object.prototype.hasOwnProperty.call(schema.fields, key))) return null;
-      // Do not read or serialize an untrusted ID value; no trusted ID producer exists in this pass.
+      // Do not read or serialize caller ID values; private providers establish provenance.
       if (!CUSTOM_ID_FIELDS.has(key)) values[key] = descriptor.value;
     }
     if (!["music", "wrestling"].includes(values.archive)) return null;
@@ -226,6 +226,16 @@
     }
     return ids;
   }
+  function trustedRelationshipIds(clean) {
+    if (typeof getArchiveRelationshipAnalyticsIdentity !== "function") return {};
+    const source = getArchiveRelationshipAnalyticsIdentity(clean.archive), ids = {};
+    if (source?.archive !== clean.archive || source.source_content_type !== clean.source_content_type || source.target_content_type !== clean.target_content_type) return ids;
+    for (const key of ["source_content_id", "target_content_id"]) {
+      const raw = source[key], value = Number.isSafeInteger(raw) && raw > 0 ? String(raw) : raw;
+      if (typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/.test(value) && !/password|secret|token|session|credential|authorization/i.test(value)) ids[key] = value;
+    }
+    return ids;
+  }
   function routeCurrent(archive) {
     try {
       if (customEventContextMatches(archive)) return true;
@@ -248,7 +258,7 @@
         const selected = path && canonicalView({ name: current.name, path });
         if (selected?.name === current.name && selected.url.split("/photo/")[0] === current.url.split("/photo/")[0]) location = selected.url;
       }
-      return gtag("event", name, { ...clean, ...trustedPhotoIds(name, clean.archive), send_to: MEASUREMENT_ID, page_location: location, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
+      return gtag("event", name, { ...clean, ...trustedPhotoIds(name, clean.archive), ...(name === "relationship_follow" ? trustedRelationshipIds(clean) : {}), send_to: MEASUREMENT_ID, page_location: location, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
     } catch { return false; } // Bad callers or blocked Analytics cannot interrupt an interaction.
   }
   function cancelArchiveSearch() {
@@ -415,8 +425,8 @@
     ui.menuChoice?.setAttribute("aria-expanded", String(editing));
     ui.pageChoice?.setAttribute("aria-expanded", String(editing));
     ui.open.setAttribute("aria-expanded", String(editing));
-    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views, download-button clicks, search usage and filter interactions only if you accept. Search terms are never sent. Reject keeps it off. Advertising stays off.";
-    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views, download-button clicks, search usage and filter interactions without search terms or filter values. Reject and withdrawal stop new website analytics events.";
+    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views, download-button clicks, search usage, filters, related-record navigation and content expansion only if you accept. Search terms are never sent. Reject keeps it off. Advertising stays off.";
+    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views, download-button clicks, search usage, filters, related-record navigation and content expansion without search terms or filter values. Reject and withdrawal stop new website analytics events.";
     ui.withdraw.hidden = preference?.analyticsStorage !== "granted";
     ui.saved.textContent = !storageAvailable ? "Browser storage is unavailable. Analytics stays off when permission cannot be verified." :
       preference ? `${REVIEWED_ACTIVATION ? "" : "Draft choice: "}${preference.analyticsStorage === "granted" ? "Optional Analytics allowed" : "Optional Analytics declined"} on this browser.` : "No Analytics choice saved.";
