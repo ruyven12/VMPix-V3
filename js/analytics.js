@@ -11,7 +11,7 @@
   const GA_ADMIN_SETTINGS_REVIEWED = false;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
-  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-1" : "draft-1";
+  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-basic-1" : "draft-basic-1";
   const STORAGE_KEY = "v3.analytics.preference.v1", PREFERENCE_AGE = 180 * 24 * 60 * 60 * 1000;
   const DENIED = Object.freeze({ analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
   const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", privacy: "Privacy", contact: "Contact", connect: "Connect" });
@@ -19,16 +19,20 @@
   let preference = null, storageAvailable = true, current = null, previousPublic = "", lastIdentity = null;
   let shellRequested = false, shellReady = false, uiReady = false, observer = null, observerTimer = 0, tagState = "idle", configured = false;
   let restoredRoutePending = false, adminRestricted = /^\/admin(?:\/|$)/i.test(window.location.pathname);
-  let expiryTimer = 0, unpersistedDenial = false;
+  let expiryTimer = 0, unpersistedDenial = false, storageWritable = false;
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null;
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
   const gtag = function () {
-    if (["event", "config", "js"].includes(arguments[0]) && adminNow()) return false;
+    if (["event", "config", "js", "consent"].includes(arguments[0]) && arguments[1] !== "default" && (!canCollect() || tagState !== "ready")) {
+      window[`ga-disable-${MEASUREMENT_ID}`] = true; return false;
+    }
     window.dataLayer.push(arguments); return arguments;
   };
-  window.gtag = gtag;
+  // Google consumes dataLayer; public module events must use the reviewed Shell interface.
+  // Direct SDK commands are not an approved bypass around consent, Admin or the event catalog.
+  window.gtag = () => false;
   gtag("consent", "default", { ...DENIED });
   gtag("set", "ads_data_redaction", true);
   function consentValues() {
@@ -36,13 +40,20 @@
     return { ...DENIED, analytics_storage: preference?.analyticsStorage === "granted" && !adminNow() ? "granted" : "denied" };
   }
   function publishConsent() {
+    // Do not let a queued storage event or unreadable/no-op storage revive cached permission.
+    window[`ga-disable-${MEASUREMENT_ID}`] = true;
+    preference = readPreference(); schedulePreferenceExpiry(); renderChoice();
     const values = consentValues();
-    window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
+    if (!canCollect()) {
+      // Basic mode sends nothing while blocked, including denied-consent control pings.
+      window[`ga-disable-${MEASUREMENT_ID}`] = true;
+      lastConsent = null; lastIdentity = null; previousPublic = "";
+      return;
+    }
+    window[`ga-disable-${MEASUREMENT_ID}`] = tagState !== "ready";
     if (tagState !== "ready" || lastConsent === values.analytics_storage) return;
     lastConsent = values.analytics_storage;
     gtag("consent", "update", values);
-    // Before readiness, preference/current retain only the latest private choice. The queue contains
-    // denied defaults/redaction only; no stale grant can execute while the Google script loads.
   }
   function validPreference(value, now = Date.now()) {
     return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === "analyticsStorage,expiresAt,noticeVersion,savedAt,version" &&
@@ -52,16 +63,31 @@
   }
   function decodePreference(text) { try { if (typeof text !== "string" || text.length > 512) return null; const value = JSON.parse(text); return validPreference(value) ? { ...value } : null; } catch { return null; } }
   function readPreference() {
+    const probeKey = STORAGE_KEY + ".check";
     try {
-      const stored = window.localStorage.getItem(STORAGE_KEY), value = decodePreference(stored);
-      // localStorage has no native expiry: remove invalid/expired choices whenever detected.
+      let stored = window.localStorage.getItem(STORAGE_KEY), value = decodePreference(stored);
+      if (value?.analyticsStorage === "granted" && !unpersistedDenial && !storageWritable) {
+        // A fixed, immediately removed capability marker is not a tracking identifier.
+        // Never rewrite the consent record: that could overwrite another tab's newer rejection.
+        window.localStorage.setItem(probeKey, "1");
+        if (window.localStorage.getItem(probeKey) !== "1") throw new Error("Preference storage is read-only");
+        window.localStorage.removeItem(probeKey);
+        if (window.localStorage.getItem(probeKey) !== null) throw new Error("Preference cleanup was not verified");
+        storageWritable = true;
+        stored = window.localStorage.getItem(STORAGE_KEY); value = decodePreference(stored);
+      }
       if (stored !== null && !value && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
       storageAvailable = !unpersistedDenial;
       return unpersistedDenial ? (validPreference(preference) && preference.analyticsStorage === "denied" ? preference : null) : value;
-    } catch { storageAvailable = false; return null; }
+    } catch {
+      storageAvailable = false; storageWritable = false;
+      try { window.localStorage.removeItem(probeKey); } catch { /* Best-effort removal of a fixed, non-personal marker. */ }
+      return null;
+    }
   }
   function checkPreferenceExpiry() {
     if (!preference || validPreference(preference)) return false;
+    window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = null;
     window.clearTimeout(expiryTimer); expiryTimer = 0;
     // Cleanup must never revive a stored grant or publish one while the current choice expires.
@@ -77,6 +103,7 @@
     expiryTimer = window.setTimeout(() => { expiryTimer = 0; checkPreferenceExpiry(); schedulePreferenceExpiry(); publishConsent(); renderChoice(); }, delay);
   }
   function reconcilePreference() {
+    window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = readPreference(); schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent();
   }
   function canonicalView(packet) {
@@ -96,7 +123,10 @@
     window[`ga-disable-${MEASUREMENT_ID}`] = true;
     publishConsent();
   }
-  function canCollect() { return REVIEWED_ACTIVATION && shellReady && uiReady && current && !adminNow() && !restoredRoutePending; }
+  function canCollect() {
+    return REVIEWED_ACTIVATION && shellReady && uiReady && current && !adminNow() && !restoredRoutePending &&
+      storageAvailable && validPreference(preference) && preference.analyticsStorage === "granted";
+  }
   function campaignConfig() {
     const source = campaigns.utm_source;
     return ["nfc", "instagram", "facebook", "youtube", "tiktok", "x"].includes(source) ? { campaign_source: source } : {};
@@ -106,9 +136,17 @@
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
     if (!canCollect() || tagState === "failed") return;
     if (tagState === "idle") {
+      // Revalidate actual stored permission before the first external Analytics request.
+      window[`ga-disable-${MEASUREMENT_ID}`] = true;
+      preference = readPreference(); schedulePreferenceExpiry(); renderChoice();
+      if (!canCollect()) { publishConsent(); return; }
       tagState = "loading";
       const script = document.createElement("script"); script.async = true; script.referrerPolicy = "no-referrer"; script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-      script.onload = () => { tagState = "ready"; lastConsent = null; publishConsent(); sendCurrent(); };
+      script.onload = () => {
+        // Execution may precede onload: keep the tag disabled until the latest grant is checked.
+        window[`ga-disable-${MEASUREMENT_ID}`] = true;
+        tagState = "ready"; lastConsent = null; reconcilePreference();
+      };
       script.onerror = () => { tagState = "failed"; window[`ga-disable-${MEASUREMENT_ID}`] = true; };
       document.head.append(script); return;
     }
@@ -116,14 +154,15 @@
     if (!configured) {
       publishConsent();
       gtag("js", new Date());
-      gtag("config", MEASUREMENT_ID, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false,
+      const result = gtag("config", MEASUREMENT_ID, { send_page_view: false, allow_google_signals: false, allow_ad_personalization_signals: false,
         page_location: current.url, page_title: current.title, page_referrer: previousPublic || entryReferrer, ...campaignConfig() });
+      if (result === false) return;
       configured = true;
     }
     if (lastIdentity === current.identity) return;
-    gtag("event", "page_view", { send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: previousPublic || entryReferrer });
+    if (gtag("event", "page_view", { send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: previousPublic || entryReferrer }) === false) return;
     lastIdentity = current.identity;
-    previousPublic = current.url;
+    previousPublic = current.url; entryReferrer = "";
   }
   function commit(packet) {
     const next = canonicalView(packet); if (!next) return;
@@ -151,11 +190,17 @@
   function element(tag, text, parent, hook) { const node = document.createElement(tag); if (text) node.textContent = text; if (hook) node.setAttribute(`data-v3-privacy-${hook}`, ""); parent?.append(node); return node; }
   function button(text, parent, hook, action) { const node = element("button", text, parent, hook); node.type = "button"; node.addEventListener("click", action); return node; }
   function saveChoice(analyticsStorage) {
+    if (analyticsStorage !== "granted") window[`ga-disable-${MEASUREMENT_ID}`] = true;
     const fromPrompt = ui?.prompt.contains(document.activeElement);
     const now = Date.now(); preference = { version: 1, noticeVersion: NOTICE_VERSION, analyticsStorage, savedAt: now, expiresAt: now + PREFERENCE_AGE };
-    unpersistedDenial = false;
-    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preference)); storageAvailable = true; } catch {
-      storageAvailable = false; unpersistedDenial = analyticsStorage === "denied";
+    unpersistedDenial = analyticsStorage === "denied";
+    const storedChoice = JSON.stringify(preference);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, storedChoice);
+      if (window.localStorage.getItem(STORAGE_KEY) !== storedChoice) throw new Error("Preference storage was not verified");
+      storageAvailable = true; storageWritable = true; unpersistedDenial = false;
+    } catch {
+      storageAvailable = false; storageWritable = false; unpersistedDenial = analyticsStorage === "denied";
       if (analyticsStorage === "denied") { try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* The visit-only message remains truthful. */ } }
     }
     schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) ui.revise.focus({ preventScroll: true });
@@ -171,9 +216,11 @@
     ui.prompt.hidden = Boolean(preference) || editing;
     ui.revise.hidden = !preference && !editing;
     ui.revise.setAttribute("aria-expanded", String(editing));
-    ui.status.textContent = !REVIEWED_ACTIVATION ? "Google analytics is inactive pending review. Save a draft storage choice." : "Accept allows analytics storage; Reject denies it. Cookieless measurement may continue; ads stay off.";
-    ui.notice.textContent = !REVIEWED_ACTIVATION ? "Privacy review and Google settings are pending. This choice applies to the draft notice; a new choice will be needed after reviewed activation." : "Analytics storage is optional. Advertising storage and ad personalization remain off.";
-    ui.saved.textContent = preference ? `${preference.analyticsStorage === "granted" ? "Analytics storage allowed" : "Analytics storage denied"}${storageAvailable ? " on this browser." : " for this visit; browser storage is unavailable."}` : "No storage choice saved.";
+    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics runs only if you accept. Reject keeps it off. Advertising stays off.";
+    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits. Reject and withdrawal stop optional Analytics.";
+    ui.withdraw.hidden = preference?.analyticsStorage !== "granted";
+    ui.saved.textContent = !storageAvailable ? "Browser storage is unavailable. Analytics stays off when permission cannot be verified." :
+      preference ? `${REVIEWED_ACTIVATION ? "" : "Draft choice: "}${preference.analyticsStorage === "granted" ? "Optional Analytics allowed" : "Optional Analytics declined"} on this browser.` : "No Analytics choice saved.";
   }
   function buildPrivacyUI() {
     const root = element("aside", "", document.body); root.className = "v3-privacy"; root.setAttribute("data-v3-privacy", ""); root.setAttribute("aria-label", "Analytics choices");
@@ -185,13 +232,15 @@
     const prefs = element("section", "", root); prefs.id = "v3-privacy-preferences"; prefs.hidden = true; element("h2", "Analytics preference", prefs);
     const notice = element("p", "", prefs, "notice");
     const policy = element("a", "Read our privacy policy", prefs, "policy"); policy.href = "/privacy";
-    const label = element("label", "", prefs), checkbox = element("input", "", label, "storage"); checkbox.type = "checkbox"; element("span", "Allow analytics storage", label);
-    element("p", "Accept allows analytics storage; Reject denies it. Advertising storage, Google signals and ad personalization stay off. Denial does not delete earlier data. After reviewed activation, cookieless measurements may still be sent.", prefs);
+    const label = element("label", "", prefs), checkbox = element("input", "", label, "storage"); checkbox.type = "checkbox"; element("span", "Allow optional Analytics", label);
+    element("p", "Optional Analytics starts only after you accept. You can turn it off here at any time. This stops future collection; it does not automatically delete earlier data. Advertising, Google Signals and ad personalization stay off.", prefs);
     const saved = element("p", "", prefs, "saved"); saved.setAttribute("role", "status"); saved.setAttribute("aria-live", "polite");
     const prefActions = element("div", "", prefs); prefActions.className = "v3-privacy__actions";
-    button("Save", prefActions, "save", () => { saveChoice(checkbox.checked ? "granted" : "denied"); closePreferences(); }); button("Close", prefActions, "close", closePreferences);
+    button("Save", prefActions, "save", () => { saveChoice(checkbox.checked ? "granted" : "denied"); closePreferences(); });
+    const withdraw = button("Withdraw consent", prefActions, "withdraw", () => { saveChoice("denied"); closePreferences(); });
+    button("Close", prefActions, "close", closePreferences);
     root.addEventListener("keydown", event => { if (event.key === "Escape" && !prefs.hidden) { event.preventDefault(); closePreferences(); } });
-    ui = { root, prompt, status, notice, preferences: prefs, checkbox, saved, revise, open }; uiReady = true; renderChoice(); if (wantPreferences) preferences(); sendCurrent();
+    ui = { root, prompt, status, notice, preferences: prefs, checkbox, saved, revise, open, withdraw }; uiReady = true; renderChoice(); if (wantPreferences) preferences(); sendCurrent();
   }
   function loadPrivacyStyles() {
     const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/css/analytics.css";
@@ -212,6 +261,7 @@
   window.addEventListener("focus", reconcilePreference);
   window.addEventListener("pageshow", event => {
     if (!event.persisted) return;
+    window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = readPreference(); schedulePreferenceExpiry(); lastIdentity = null;
     let matches = false;
     try {
