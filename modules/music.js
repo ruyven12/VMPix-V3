@@ -4,6 +4,158 @@
    Extracted mechanically from router.js and shell.js; shell/router still own layout and route mounting.
    ========================================================= */
 
+// Optional measurements only: explicit user intent is separate from rendering/restoration.
+// Raw backend image keys are retained privately, never recovered from DOM IDs or image URLs.
+const archiveAnalyticsTileIds = new WeakMap();
+const archiveAnalyticsIntents = new WeakSet();
+const archiveAnalyticsInlineImages = new WeakMap();
+const archiveAnalyticsRouteIntents = new WeakMap();
+let archiveAnalyticsRouteBinding = null;
+let archiveAnalyticsDispatchTile = null, archiveAnalyticsPendingGallery = null;
+let archiveAnalyticsPendingRoutePhoto = null, archiveAnalyticsPendingPhoto = null;
+let archiveAnalyticsActiveTile = null;
+function beginArchiveAnalytics(event, navigationMethod = "open") {
+  try {
+    if (!(event instanceof Event) || !event.isTrusted) return null;
+    const ticket = window.V3Analytics?.captureInteraction?.();
+    if (!ticket) return null;
+    const intent = Object.freeze({ ticket, method: navigationMethod });
+    archiveAnalyticsIntents.add(intent); return intent;
+  } catch { return null; }
+}
+function archiveAnalyticsIntent(value) {
+  return value && archiveAnalyticsIntents.has(value) ? value : beginArchiveAnalytics(value);
+}
+function getArchiveAnalyticsIdentity(archive) {
+  if (archive === "wrestling" && typeof getWrestlingInlineAnalyticsContext === "function") {
+    const context = getWrestlingInlineAnalyticsContext(archiveAnalyticsDispatchTile);
+    if (context) return context.ids;
+  }
+  const ids = archiveAnalyticsTileIds.get(archiveAnalyticsDispatchTile);
+  return ids?.archive === archive ? { ...ids, photoPath: archive === "wrestling" ? archiveAnalyticsDispatchTile?.dataset?.wrestlingLightboxRoute : undefined } : null;
+}
+function dispatchArchiveAnalytics(name, parameters, ticket, tile = null) {
+  try {
+    archiveAnalyticsDispatchTile = tile;
+    return window.V3Analytics?.track(name, parameters, ticket) === true;
+  } catch { return false; }
+  finally { archiveAnalyticsDispatchTile = null; }
+}
+function archiveAnalyticsPath(value = location.pathname) {
+  try { return new URL(value, location.origin).pathname.replace(/\/+$/, "") || "/"; } catch { return ""; }
+}
+function bindArchiveAnalyticsRoute(intent, path) {
+  if (archiveAnalyticsRouteBinding) archiveAnalyticsRouteBinding.valid = false;
+  const binding = { path, committed: false, valid: true, entry: null };
+  archiveAnalyticsRouteBinding = binding; archiveAnalyticsRouteIntents.set(intent, binding);
+  // Current forward navigation commits in this user task. A canceled/failed mount must
+  // never donate its intent to a future restoration. This cleanup cannot grant readiness.
+  queueMicrotask(() => { if (!binding.committed) binding.valid = false; });
+}
+function currentArchiveAnalyticsIntent(intent) {
+  if (!intent || !window.V3Analytics?.interactionCurrent?.(intent.ticket)) return false;
+  const binding = archiveAnalyticsRouteIntents.get(intent);
+  return !binding || binding.valid && binding.committed && binding.entry === history.state?.v3EntryId;
+}
+function stageArchiveGalleryAnalytics(event, archive, targetPath, entry = "button") {
+  const intent = archiveAnalyticsIntent(event);
+  archiveAnalyticsPendingGallery = intent ? { intent, archive, path: archiveAnalyticsPath(targetPath), entry } : null;
+  if (intent) bindArchiveAnalyticsRoute(intent, archiveAnalyticsPendingGallery.path);
+}
+function stageArchivePhotoRouteAnalytics(event, targetPath) {
+  const intent = archiveAnalyticsIntent(event);
+  archiveAnalyticsPendingRoutePhoto = intent ? { intent, path: archiveAnalyticsPath(targetPath) } : null;
+  if (intent) bindArchiveAnalyticsRoute(intent, archiveAnalyticsPendingRoutePhoto.path);
+}
+function takeArchivePhotoRouteAnalytics() {
+  const pending = archiveAnalyticsPendingRoutePhoto;
+  if (!pending || pending.path !== archiveAnalyticsPath()) return null;
+  archiveAnalyticsPendingRoutePhoto = null; return pending.intent;
+}
+function confirmArchiveLocalGalleryAnalytics(event, owner, archive) {
+  const intent = archiveAnalyticsIntent(event);
+  if (!intent || !owner?.isConnected || owner.hidden || owner.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
+  return dispatchArchiveAnalytics("gallery_open", { archive, content_type: "gallery", entry_method: "button" }, intent.ticket);
+}
+function armArchivePhotoAnalytics(tile, intent, options = {}) {
+  const previous = archiveAnalyticsActiveTile;
+  archiveAnalyticsActiveTile = tile;
+  // A same-photo user no-op keeps its original pending view; restoration cancels it.
+  if (tile && previous === tile && !options.opening && archiveAnalyticsIntents.has(intent)) return;
+  archiveAnalyticsPendingPhoto = null;
+  if (!tile || !archiveAnalyticsIntents.has(intent)) return;
+  const archive = archiveAnalyticsTileIds.get(tile)?.archive || (location.pathname.startsWith("/wrestling/") ? "wrestling" : "music");
+  archiveAnalyticsPendingPhoto = { intent, tile, archive, position: options.index + 1, source: options.source, galleryOpen: options.galleryOpen };
+}
+function flushArchiveAnalytics(committed = false) {
+  try {
+    const api = window.V3Analytics;
+    if (committed) {
+      const binding = archiveAnalyticsRouteBinding;
+      if (binding?.valid) {
+        if (!binding.committed && binding.path === archiveAnalyticsPath()) { binding.committed = true; binding.entry = history.state?.v3EntryId; }
+        else if (binding.path !== archiveAnalyticsPath() || binding.entry !== history.state?.v3EntryId) binding.valid = false;
+      }
+      if (archiveAnalyticsPendingGallery?.path !== archiveAnalyticsPath()) archiveAnalyticsPendingGallery = null;
+      if (archiveAnalyticsPendingRoutePhoto?.path !== archiveAnalyticsPath()) archiveAnalyticsPendingRoutePhoto = null;
+    }
+    const gallery = archiveAnalyticsPendingGallery;
+    if (gallery && (!api?.interactionCurrent?.(gallery.intent.ticket) || archiveAnalyticsRouteIntents.get(gallery.intent)?.valid === false)) archiveAnalyticsPendingGallery = null;
+    else if (gallery && currentArchiveAnalyticsIntent(gallery.intent) && gallery.path === archiveAnalyticsPath() && api?.routeCurrent?.(gallery.archive)) {
+      const visible = gallery.archive === "music"
+        ? setGallery?.getAttribute("aria-hidden") === "false" && galleryGrid && !galleryGrid.classList.contains("is-gallery-hidden") && galleryGrid.querySelector('[data-gallery-photo]')
+        : typeof confirmWrestlingGalleryAnalytics === "function" && confirmWrestlingGalleryAnalytics();
+      if (visible) {
+        archiveAnalyticsPendingGallery = null;
+        dispatchArchiveAnalytics("gallery_open", {archive: gallery.archive, content_type: "gallery", entry_method: gallery.entry}, gallery.intent.ticket);
+      }
+    }
+    const pending = archiveAnalyticsPendingPhoto;
+    if (!pending) return;
+    if (!api?.interactionCurrent?.(pending.intent.ticket) || archiveAnalyticsRouteIntents.get(pending.intent)?.valid === false) { archiveAnalyticsPendingPhoto = null; return; }
+    if (!currentArchiveAnalyticsIntent(pending.intent)) return;
+    if (!api.routeCurrent(pending.archive) || !isLightboxOpen() || document.visibilityState !== "visible" || pending.tile !== archiveAnalyticsActiveTile || !lightboxImage?.complete || !lightboxImage.naturalWidth) return;
+    if (new URL(pending.source, location.href).href !== lightboxImage.src || lightboxImage.src === new URL(galleryImageFallbackSrc, location.href).href) return;
+    archiveAnalyticsPendingPhoto = null;
+    if (pending.galleryOpen) dispatchArchiveAnalytics("gallery_open", {archive: pending.archive, content_type: "gallery", entry_method: "tile"}, pending.intent.ticket, pending.tile);
+    dispatchArchiveAnalytics("photo_view", { archive: pending.archive, content_type: "photo", photo_position: pending.position, navigation_method: pending.intent.method }, pending.intent.ticket, pending.tile);
+  } catch { /* Analytics cannot change a gallery's behavior. */ }
+}
+function stageArchiveInlinePhotoAnalytics(event, options) {
+  try {
+    const intent = archiveAnalyticsIntent(event), image = options.image;
+    if (!image) return;
+    let state = archiveAnalyticsInlineImages.get(image);
+    if (!state) {
+      state = { pending: null, photo: null };
+      archiveAnalyticsInlineImages.set(image, state);
+      image.addEventListener("load", () => flushArchiveInlinePhotoAnalytics(image));
+      image.addEventListener("error", () => { state.pending = null; });
+    }
+    const context = typeof getWrestlingInlineAnalyticsContext === "function" ? getWrestlingInlineAnalyticsContext(image) : null;
+    const previous = state.photo; state.photo = context?.photo || null;
+    if (intent && context?.photo === previous && !options.opening) return;
+    state.pending = null;
+    if (!intent || !context) return;
+    // No caller-provided IDs, owner or position enters the trusted provider.
+    state.pending = { context, intent };
+    flushArchiveInlinePhotoAnalytics(image);
+  } catch { /* Optional measurement only. */ }
+}
+function flushArchiveInlinePhotoAnalytics(image) {
+  try {
+    const state = archiveAnalyticsInlineImages.get(image), p = state?.pending;
+    if (!p) return;
+    if (!currentArchiveAnalyticsIntent(p.intent)) { state.pending = null; return; }
+    const context = getWrestlingInlineAnalyticsContext(image), old = p.context;
+    if (!context || context.photo !== old.photo || context.owner !== old.owner || context.requestKey !== old.requestKey) { state.pending = null; return; }
+    if (document.visibilityState !== "visible" || !image.complete || !image.naturalWidth || image.currentSrc && image.currentSrc !== image.src || /placeholder|no-photo|no-image/i.test(image.src)) return;
+    state.pending = null;
+    dispatchArchiveAnalytics("photo_view", {archive: "wrestling", content_type: "photo", photo_position: context.position, navigation_method: p.intent.method}, p.intent.ticket, image);
+  } catch { /* Optional measurement only. */ }
+}
+
+
 const MUSIC_BANDS_INDEX_API_BASE_URL = "https://vmpix-data.onrender.com";
 const MUSIC_BANDS_INDEX_API_ROUTE = "/api/music/bands";
 const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
@@ -827,7 +979,7 @@ function returnToBandsIndexRoute() {
   navigateToRoute(returnUrl, { navigationDirection: "back", shouldFocusBandsView: true });
 }
 
-function navigateToSetDetail(row) {
+function navigateToSetDetail(row, event) {
   const setCode = getSetCode(row, getSetsRows().indexOf(row));
   const bandId = getBandId(activeMusicBand) || getRouteFromUrl().bandId;
   if (!bandId || !setCode) {
@@ -844,6 +996,7 @@ function navigateToSetDetail(row) {
     } }, '', window.location.href);
   }
   bandsIndexReturnUrl = returnUrl;
+  stageArchiveGalleryAnalytics(event, "music", getSetRouteUrl(bandId, setCode));
   navigateToRoute(getSetRouteUrl(bandId, setCode), {
     historyState: {
       bandUrl: getBandRouteUrl(bandId),
@@ -926,6 +1079,7 @@ function showSetGalleryRoute(row, options = {}) {
   setSetDetailVisible(false);
   setSetsArchiveVisible(false);
   setSetGalleryVisible(true);
+  flushArchiveAnalytics();
   setGalleryModeVisible(false);
   const tiles = getCurrentGalleryPhotoTiles();
   if (tiles[0]) {
@@ -3654,6 +3808,7 @@ function normalizeMusicVenuePhotoHighlight(photo, index = 0) {
   return {
     ...photo,
     imageKey,
+    analyticsImageKey: photo.image_key || photo.imageKey || "",
     dedupeKeys: getMusicVenuePhotoHighlightDedupeKeys(photo),
     imageSrc: imageSrc || lightboxSrc,
     lightboxSrc: lightboxSrc || imageSrc,
@@ -3792,6 +3947,7 @@ function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}
   const tile = document.createElement("button");
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === state.activeIndex ? " is-active" : ""}`;
   tile.type = "button";
+  archiveAnalyticsTileIds.set(tile, { archive: "music", photo_id: photo.analyticsImageKey || photo.image_key || "", gallery_id: photo.analyticsAlbumId || photo.album_id });
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
   tile.dataset.galleryKind = "image";
@@ -3816,7 +3972,7 @@ function createMusicVenuePhotoHighlightLightboxTile(photo, index = 0, state = {}
   return tile;
 }
 
-function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null) {
+function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null, analytics = null) {
   const state = musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey);
   if (!state || state.photos.length === 0) {
     return;
@@ -3836,7 +3992,7 @@ function openMusicVenuePhotoHighlightsLightbox(photoIndex = 0, trigger = null) {
   };
   activeLightboxCustomTiles = state.photos.map((photo, index) => createMusicVenuePhotoHighlightLightboxTile(photo, index, state));
   const targetTile = activeLightboxCustomTiles[safeIndex] || activeLightboxCustomTiles[0] || null;
-  showLightbox(targetTile, { returnContext });
+  showLightbox(targetTile, { returnContext, analytics });
 }
 
 function renderMusicVenuePhotoHighlightsState(state, options = {}) {
@@ -3970,7 +4126,7 @@ function handleMusicVenuePhotoHighlightsOpenPhoto(event) {
   if (!state || state.photos.length === 0) {
     return;
   }
-  openMusicVenuePhotoHighlightsLightbox(state.activeIndex, event?.currentTarget || null);
+  openMusicVenuePhotoHighlightsLightbox(state.activeIndex, event?.currentTarget || null, beginArchiveAnalytics(event));
 }
 
 function syncMusicVenuePhotoHighlights(venue, requestedSlug = "") {
@@ -5565,6 +5721,7 @@ function setLightboxVisible(isVisible) {
     shell.classList.toggle("is-lightbox-view", isVisible);
   }
   if (!isVisible) {
+    archiveAnalyticsPendingPhoto = null; archiveAnalyticsActiveTile = null;
     syncLightboxInFrame();
     setLightboxInfoVisible(false);
     setLightboxThumbnailStripVisible(false);
@@ -6333,6 +6490,7 @@ function setGalleryState(stateName = "ready") {
   });
   syncSetGalleryPhotoToggleButton(activeState);
   syncSetGalleryLoadMoreButton(activeState);
+  if (activeState === "ready") flushArchiveAnalytics();
 }
 
 function getGalleryPhotoLabel(photoTile) {
@@ -6474,6 +6632,7 @@ function setLightboxImageStatus(status) {
   lightboxPhoto.classList.toggle("is-image-loading", nextStatus === "loading");
   lightboxPhoto.classList.toggle("is-image-loaded", nextStatus === "loaded");
   lightboxPhoto.classList.toggle("is-image-error", nextStatus === "error");
+  if (nextStatus === "loaded") flushArchiveAnalytics();
 }
 
 function setLightboxImageSource(imageSrc) {
@@ -6504,6 +6663,7 @@ function handleLightboxImageLoad() {
 }
 
 function handleLightboxImageError() {
+  archiveAnalyticsPendingPhoto = null;
   if (!lightboxImage) {
     return;
   }
@@ -6610,6 +6770,8 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
   return {
     dedupeKey: rawImageKey || imageSrc,
     imageKey: rawImageKey || `album-photo-${index + 1}`,
+    analyticsImageKey: rawImageKey,
+    analyticsAlbumId: photo.album_id,
     imageSrc,
     thumbnail_url: String(photo?.thumbnail_url || photo?.thumbnailUrl || "").trim(),
     small_url: String(photo?.small_url || photo?.smallUrl || "").trim(),
@@ -6786,6 +6948,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   const tile = document.createElement("button");
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
   tile.type = "button";
+  archiveAnalyticsTileIds.set(tile, { archive: "music", photo_id: photo.analyticsImageKey || photo.image_key || "", gallery_id: photo.analyticsAlbumId || photo.album_id });
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
   tile.dataset.galleryKind = "image";
@@ -6806,8 +6969,8 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   };
   protectArchiveImage(image);
   tile.append(image);
-  tile.addEventListener("click", () => {
-    showLightbox(tile);
+  tile.addEventListener("click", (event) => {
+    showLightbox(tile, { analytics: beginArchiveAnalytics(event) });
   });
   return tile;
 }
@@ -7169,7 +7332,7 @@ function cancelLightboxPhotoDownload() {
   lightboxInFramePhotoActions?.cancel();
 }
 
-function createLightboxPhotoActions({ isCurrent, noteId }) {
+function createLightboxPhotoActions({ isCurrent, noteId, analyticsPhoto = () => archiveAnalyticsActiveTile }) {
   let lightboxPhotoDownloadSession = null;
 
   function cancel() {
@@ -7190,6 +7353,8 @@ function createLightboxPhotoActions({ isCurrent, noteId }) {
       isCurrent();
     if (!current()) { event.preventDefault(); return; }
     if (session.pending) { event.preventDefault(); return; }
+    const analyticsIntent = beginArchiveAnalytics(event);
+    if (analyticsIntent && event.button <= 0) dispatchArchiveAnalytics("photo_download_click", { archive: "wrestling", content_type: "photo" }, analyticsIntent.ticket, analyticsPhoto());
     if (session.fallback || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
     event.preventDefault();
     const link = element.querySelector("a");
@@ -7377,6 +7542,9 @@ function syncLightboxInFrame(tileDataset = null) {
 }
 function setLightboxActivePhoto(index, options = {}) {
   const data = getLightboxPhotoData(index);
+  const analyticsOpening = !isLightboxOpen();
+  const analyticsIntent = options.analytics || takeArchivePhotoRouteAnalytics();
+  armArchivePhotoAnalytics(data.tile, analyticsIntent, { opening: analyticsOpening, index: data.normalizedIndex, source: data.imageSrc, galleryOpen: options.analyticsGalleryOpen });
   const didChangePhoto = activeLightboxIndex !== data.normalizedIndex;
   const tileDataset = data.tile?.dataset || {};
   syncLightboxInFrame(tileDataset);
@@ -7454,6 +7622,7 @@ function setLightboxActivePhoto(index, options = {}) {
       });
     }
   }
+  flushArchiveAnalytics();
 }
 
 function setLightboxThumbnailStripVisible(isVisible) {
@@ -7521,11 +7690,12 @@ function showLightbox(photoTile = activeGalleryPhoto, options = {}) {
   selectGalleryPhoto(targetTile);
   if (!options.skipEntryAnimation) markLightboxTransitionSource(targetTile);
   setGalleryModeVisible(false);
-  setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false, skipTransition: options.skipEntryAnimation });
+  setLightboxActivePhoto(getGalleryPhotoIndex(targetTile), { forceTransition: true, shouldSyncGallery: false, skipTransition: options.skipEntryAnimation, analytics: options.analytics, analyticsGalleryOpen: ["person-detail", "music-venue-photo-highlights"].includes(activeLightboxReturnContext?.source) });
   setLightboxInfoVisible(false);
   setLightboxThumbnailStripVisible(false);
   setSetGalleryVisible(false);
   setLightboxVisible(true);
+  flushArchiveAnalytics();
   if (!options.skipEntryAnimation) runLightboxEntryTransition();
   setCurrentView("Lightbox");
   if (musicNexusShell) {
@@ -7739,7 +7909,7 @@ function handleLightboxSwipeEnd(event) {
     lightboxGestureSuppressClick = true;
     setLightboxControlsHidden(false);
     commitLightboxSwipe(direction);
-    setLightboxActivePhoto(activeLightboxIndex + direction);
+    setLightboxActivePhoto(activeLightboxIndex + direction, { analytics: beginArchiveAnalytics(event, "swipe") });
   }
 }
 
@@ -7776,24 +7946,24 @@ function handleLightboxKeydown(event) {
   if (event.key === "ArrowLeft") {
     event.preventDefault();
     setLightboxControlsHidden(false);
-    setLightboxActivePhoto(activeLightboxIndex - 1);
+    setLightboxActivePhoto(activeLightboxIndex - 1, { analytics: beginArchiveAnalytics(event, "keyboard") });
     return;
   }
 
   if (event.key === "ArrowRight") {
     event.preventDefault();
     setLightboxControlsHidden(false);
-    setLightboxActivePhoto(activeLightboxIndex + 1);
+    setLightboxActivePhoto(activeLightboxIndex + 1, { analytics: beginArchiveAnalytics(event, "keyboard") });
   }
 }
 
-function openSelectedSetDetail() {
+function openSelectedSetDetail(event) {
   const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0];
   if (!row) {
     return;
   }
 
-  navigateToSetDetail(row);
+  navigateToSetDetail(row, event);
 }
 
 function closeSelectedSetDetail() {
@@ -8140,8 +8310,8 @@ function createSetsListRow(show, isActive = false, { captured = false } = {}) {
     row.removeAttribute('data-set-row');
     row.removeAttribute('aria-pressed');
   }
-  row.addEventListener("click", () => {
-    navigateToSetDetail(row);
+  row.addEventListener("click", (event) => {
+    navigateToSetDetail(row, event);
   });
   item.append(row);
   return item;
@@ -10599,6 +10769,7 @@ function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
   const tile = document.createElement("button");
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
   tile.type = "button";
+  archiveAnalyticsTileIds.set(tile, { archive: "music", photo_id: photo.analyticsImageKey || photo.image_key || "", gallery_id: photo.analyticsAlbumId || photo.album_id });
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = label;
   tile.dataset.galleryKind = "image";
@@ -10634,14 +10805,14 @@ function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photo
   });
   const currentPhotos = getMusicPersonTaggedLightboxPhotos(lightboxPhotos);
   if (!context.albumId || !context.personName || !context.personId || currentPhotos.length === 0) {
-    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show);
+    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show, options.analytics);
     return;
   }
 
   const cachedPhotos = getMusicPersonTaggedShowCachedLightboxPhotos(context);
   const immediatePhotos = cachedPhotos.length > 0 ? cachedPhotos : currentPhotos;
   const immediateIndex = getMusicPersonTaggedLightboxIndexForPhoto(immediatePhotos, item, photoIndex);
-  openMusicPersonTaggedPhotoLightbox(immediatePhotos, immediateIndex, trigger, show);
+  openMusicPersonTaggedPhotoLightbox(immediatePhotos, immediateIndex, trigger, show, options.analytics);
 
   const cached = getMusicPersonTaggedShowHydrationCacheEntry(context);
   if (Array.isArray(cached?.allPhotos) && cached.allPhotos.length > 0) {
@@ -10674,7 +10845,7 @@ function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photo
     });
 }
 
-function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show) {
+function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show, analytics = null) {
   const lightboxPhotos = getMusicPersonTaggedLightboxPhotos(photos);
   if (lightboxPhotos.length === 0) {
     return;
@@ -10690,7 +10861,7 @@ function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show) {
   };
   activeLightboxCustomTiles = lightboxPhotos.map((photo, index) => createMusicPersonTaggedLightboxTile(photo, index, show));
   const targetTile = activeLightboxCustomTiles[safeIndex] || activeLightboxCustomTiles[0] || null;
-  showLightbox(targetTile, { returnContext });
+  showLightbox(targetTile, { returnContext, analytics });
 }
 
 function createMusicPersonTaggedThumb(item, options = {}) {
@@ -10707,7 +10878,7 @@ function createMusicPersonTaggedThumb(item, options = {}) {
     );
     thumb.addEventListener("click", (event) => {
       event.stopPropagation();
-      openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, lightboxIndex, thumb, options);
+      openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, lightboxIndex, thumb, { ...options, analytics: beginArchiveAnalytics(event) });
     });
   }
 
@@ -13625,11 +13796,12 @@ function createShowDetailAlbumCard(show, album, index) {
     visibilityObserver: null,
   };
   registerShowSetCardPreview(card);
-  card.addEventListener("click", () => {
+  card.addEventListener("click", (event) => {
     if (!targetUrl) {
       return;
     }
 
+    stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
       historyState: {
         fromShowDetail: true,
@@ -13665,12 +13837,13 @@ function createShowDetailBandsOnBill(show) {
   const activeBandName = document.createElement("button");
   activeBandName.type = "button";
   activeBandName.className = "show-detail-bill-active-name";
-  activeBandName.addEventListener("click", () => {
+  activeBandName.addEventListener("click", (event) => {
     const targetUrl = getMusicShowAlbumSetRoute(show, albums[activeIndex]);
     if (!targetUrl) {
       return;
     }
 
+    stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
       historyState: {
         fromShowDetail: true,
@@ -14630,8 +14803,8 @@ function initMusicModule() {
   }
   galleryPhotoTiles.forEach((tile) => {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
-    tile.addEventListener("click", () => {
-      showLightbox(tile);
+    tile.addEventListener("click", (event) => {
+      showLightbox(tile, { analytics: beginArchiveAnalytics(event) });
     });
   });
   galleryViewOptions.forEach((option) => {
@@ -14646,15 +14819,15 @@ function initMusicModule() {
     lightboxBack.addEventListener("click", returnToSetGalleryFromLightbox);
   }
   if (lightboxPrev) {
-    lightboxPrev.addEventListener("click", () => {
+    lightboxPrev.addEventListener("click", (event) => {
       setLightboxControlsHidden(false);
-      setLightboxActivePhoto(activeLightboxIndex - 1);
+      setLightboxActivePhoto(activeLightboxIndex - 1, { analytics: beginArchiveAnalytics(event, "previous") });
     });
   }
   if (lightboxNext) {
-    lightboxNext.addEventListener("click", () => {
+    lightboxNext.addEventListener("click", (event) => {
       setLightboxControlsHidden(false);
-      setLightboxActivePhoto(activeLightboxIndex + 1);
+      setLightboxActivePhoto(activeLightboxIndex + 1, { analytics: beginArchiveAnalytics(event, "next") });
     });
   }
   if (lightboxImage) {
@@ -14707,9 +14880,9 @@ function initMusicModule() {
     });
   });
   lightboxThumbButtons.forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
       setLightboxControlsHidden(false);
-      setLightboxActivePhoto(Number.parseInt(button.dataset.lightboxThumbIndex || "0", 10));
+      setLightboxActivePhoto(Number.parseInt(button.dataset.lightboxThumbIndex || "0", 10), { analytics: beginArchiveAnalytics(event, "thumbnail") });
     });
   });
   if (lightboxFullscreenToggle) {
@@ -14724,8 +14897,8 @@ function initMusicModule() {
     setDetailClose.addEventListener("click", closeSelectedSetDetail);
   }
   setsRows.forEach((row) => {
-    row.addEventListener("click", () => {
-      navigateToSetDetail(row);
+    row.addEventListener("click", (event) => {
+      navigateToSetDetail(row, event);
     });
   });
   musicLandingRouteCards.forEach((card) => {

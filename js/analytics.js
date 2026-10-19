@@ -11,7 +11,7 @@
   const GA_ADMIN_SETTINGS_REVIEWED = true;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
-  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-basic-1" : "draft-basic-1";
+  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-gallery-1" : "draft-gallery-1";
   const STORAGE_KEY = "v3.analytics.preference.v1", PREFERENCE_AGE = 180 * 24 * 60 * 60 * 1000;
   const DENIED = Object.freeze({ analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
   const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", privacy: "Privacy", contact: "Contact", connect: "Connect" });
@@ -22,6 +22,8 @@
   let expiryTimer = 0, unpersistedDenial = false, storageWritable = false;
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null, currentPageReferrer = "";
+  let permissionStamp = "", permissionRevision = 0;
+  const interactionTickets = new WeakMap();
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
   const gtag = function () {
@@ -48,6 +50,8 @@
     window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = readPreference(); schedulePreferenceExpiry(); renderChoice();
     const values = consentValues();
+    const stamp = [storageAvailable, preference?.noticeVersion, preference?.analyticsStorage, preference?.savedAt, preference?.expiresAt, adminNow()].join(":");
+    if (stamp !== permissionStamp) { permissionStamp = stamp; permissionRevision++; }
     if (!canCollect()) {
       window[`ga-disable-${MEASUREMENT_ID}`] = true;
       // Revoke SDK permission once after an actual loss of consent; route-only locks keep their own gate.
@@ -62,7 +66,7 @@
   }
   function validPreference(value, now = Date.now()) {
     return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === "analyticsStorage,expiresAt,noticeVersion,savedAt,version" &&
-      value.version === 1 && value.noticeVersion === NOTICE_VERSION && ["granted", "denied"].includes(value.analyticsStorage) &&
+      value.version === 1 && (value.noticeVersion === NOTICE_VERSION || REVIEWED_ACTIVATION && value.noticeVersion === "reviewed-basic-1" && value.analyticsStorage === "denied") && ["granted", "denied"].includes(value.analyticsStorage) &&
       Number.isSafeInteger(value.savedAt) && value.savedAt >= 0 && value.savedAt <= now && Number.isSafeInteger(value.expiresAt) &&
       value.expiresAt - value.savedAt === PREFERENCE_AGE && value.expiresAt > now;
   }
@@ -81,7 +85,10 @@
         storageWritable = true;
         stored = window.localStorage.getItem(STORAGE_KEY); value = decodePreference(stored);
       }
-      if (stored !== null && !value && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
+      // Preserve an unfamiliar, unexpired notice record for a newer tab; it never grants here.
+      let unfamiliar = false;
+      try { const raw = JSON.parse(stored); unfamiliar = typeof raw?.noticeVersion === "string" && raw.noticeVersion !== NOTICE_VERSION && raw.noticeVersion !== "reviewed-basic-1" && Number.isSafeInteger(raw.expiresAt) && raw.expiresAt > Date.now(); } catch { /* Malformed records are removed below. */ }
+      if (stored !== null && !value && !unfamiliar && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
       storageAvailable = !unpersistedDenial;
       return unpersistedDenial ? (validPreference(preference) && preference.analyticsStorage === "denied" ? preference : null) : value;
     } catch {
@@ -134,8 +141,8 @@
   }
   // Public content IDs need an adapter-owned resolver reading audited backend identifiers.
   // Caller strings, DOM/route values, filenames, array positions, and "verified" flags are not proof.
-  // These ID slots are recognized but intentionally omitted until that resolver is connected:
-  // explicit band/album/record IDs or original image keys only; never normalized fallback IDs.
+  // Caller ID slots are always ignored. Only the audited gallery/photo provider may enrich
+  // an event from original album IDs/image keys; normalized fallback IDs stay excluded.
   const CUSTOM_ID_FIELDS = new Set(["gallery_id", "photo_id", "source_content_id", "target_content_id"]);
   const CUSTOM_TYPES = Object.freeze({ music: ["band", "show", "person", "venue", "set", "gallery", "photo"], wrestling: ["show", "person", "venue", "match", "gallery", "photo"] });
   const CUSTOM_DATASETS = Object.freeze({ music: ["bands", "shows", "people", "venues"], wrestling: ["shows", "people", "venues"] });
@@ -143,7 +150,7 @@
   const CUSTOM_FILTER_KEYS = ["letter", "region", "status", "state", "venue", "sort", "category", "instrument", "year", "promotion", "team", "mode", "banner", "field"];
   const CUSTOM_PANELS = ["relationships", "show_photos", "venue_artists", "show_history", "gallery_range"];
   // Fixed catalog only. Filter values stay unsupported until separately allowlisted; counts are safe.
-  // IDs are optional and omitted, rather than inferred or accepted on the caller's assertion.
+  // IDs remain optional; caller assertions never establish their provenance.
   const CUSTOM_EVENTS = Object.freeze({
     gallery_open: { required: ["entry_method"], fields: { gallery_id: null, entry_method: ["route", "direct", "history", "tile", "button", "relationship"] } },
     photo_view: { required: ["navigation_method"], fields: { gallery_id: null, photo_id: null, photo_position: [1, 1000000], navigation_method: ["open", "direct", "history", "next", "previous", "swipe", "keyboard", "thumbnail"] } },
@@ -194,13 +201,51 @@
     const root = "/" + archive, path = normalize(committed.pathname);
     return committed.origin === window.location.origin && normalize(actual.pathname) === path && (path === root || path.startsWith(root + "/"));
   }
-  function track(name, parameters) {
+  function captureInteraction() {
+    try {
+      publishConsent();
+      if (!canCollect() || tagState !== "ready" || !configured) return null;
+      const ticket = Object.freeze({}); interactionTickets.set(ticket, permissionRevision); return ticket;
+    } catch { return null; }
+  }
+  function interactionCurrent(ticket) {
+    try { publishConsent(); return !!ticket && interactionTickets.get(ticket) === permissionRevision && canCollect() && tagState === "ready" && configured; } catch { return false; }
+  }
+  function trustedPhotoIds(name, archive) {
+    // The audited provider reads only the synchronous internal dispatch context and private
+    // raw-record WeakMaps. There is no caller registration, DOM lookup or verified flag.
+    if (!["gallery_open", "photo_view", "photo_download_click"].includes(name) || typeof getArchiveAnalyticsIdentity !== "function") return {};
+    const source = getArchiveAnalyticsIdentity(archive), ids = {};
+    for (const key of ["gallery_id", "photo_id"]) {
+      const value = source?.[key];
+      if (key === "photo_id" && name === "gallery_open") continue;
+      if (typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/.test(value) && !/password|secret|token|session|credential|authorization/i.test(value)) ids[key] = value;
+    }
+    return ids;
+  }
+  function routeCurrent(archive) {
+    try {
+      if (customEventContextMatches(archive)) return true;
+      // Match-photo selection replaces only its URL, without a new semantic Shell mount.
+      // Accept only the same already-committed match; never adopt a route or add a page view.
+      if (archive !== "wrestling" || current?.name !== "wrestling-match-detail-photo") return false;
+      const actual = canonicalView({name: current.name, path: window.location.pathname});
+      return actual?.name === current.name && actual.url.split("/photo/")[0] === current.url.split("/photo/")[0];
+    } catch { return false; }
+  }
+  function track(name, parameters, ticket) {
     try {
       const clean = validateCustomEvent(name, parameters); if (!clean) return false;
       // No tag initialization, timers, queues, or retries here. Missing permission/readiness drops it.
       publishConsent();
-      if (!canCollect() || tagState !== "ready" || !configured || lastIdentity !== current.identity || !customEventContextMatches(clean.archive)) return false;
-      return gtag("event", name, { ...clean, send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
+      if (!canCollect() || tagState !== "ready" || !configured || lastIdentity !== current.identity || !routeCurrent(clean.archive) || ticket !== undefined && !interactionCurrent(ticket)) return false;
+      let location = customEventContextMatches(clean.archive) ? current.url : canonicalView({ name: current.name, path: window.location.pathname }).url;
+      if (clean.archive === "wrestling" && current.name === "wrestling-match-detail-photo" && typeof getArchiveAnalyticsIdentity === "function") {
+        const path = getArchiveAnalyticsIdentity(clean.archive)?.photoPath;
+        const selected = path && canonicalView({ name: current.name, path });
+        if (selected?.name === current.name && selected.url.split("/photo/")[0] === current.url.split("/photo/")[0]) location = selected.url;
+      }
+      return gtag("event", name, { ...clean, ...trustedPhotoIds(name, clean.archive), send_to: MEASUREMENT_ID, page_location: location, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
     } catch { return false; } // Bad callers or blocked Analytics cannot interrupt an interaction.
   }
   function campaignConfig() {
@@ -249,6 +294,7 @@
     adminRestricted = next.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname);
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
     publishConsent(); renderChoice(); sendCurrent();
+    try { if (typeof flushArchiveAnalytics === "function") flushArchiveAnalytics(true); } catch { /* Optional measurements never affect navigation. */ }
   }
   function stopObserver() { observer?.disconnect(); observer = null; window.clearTimeout(observerTimer); observerTimer = 0; }
   function readyCheck() {
@@ -293,8 +339,8 @@
     ui.prompt.hidden = Boolean(preference) || editing;
     ui.revise.hidden = !preference && !editing;
     ui.revise.setAttribute("aria-expanded", String(editing));
-    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics runs only if you accept. Reject keeps it off. Advertising stays off.";
-    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits. Reject and withdrawal stop optional Analytics.";
+    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views and download-button clicks only if you accept. Reject keeps it off. Advertising stays off.";
+    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views and download-button clicks. Reject and withdrawal stop new website analytics events.";
     ui.withdraw.hidden = preference?.analyticsStorage !== "granted";
     ui.saved.textContent = !storageAvailable ? "Browser storage is unavailable. Analytics stays off when permission cannot be verified." :
       preference ? `${REVIEWED_ACTIVATION ? "" : "Draft choice: "}${preference.analyticsStorage === "granted" ? "Optional Analytics allowed" : "Optional Analytics declined"} on this browser.` : "No Analytics choice saved.";
@@ -338,6 +384,7 @@
   window.addEventListener("focus", reconcilePreference);
   window.addEventListener("pageshow", event => {
     if (!event.persisted) return;
+    permissionRevision++; // A restored document must not replay an earlier pending user action.
     window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = readPreference(); schedulePreferenceExpiry(); lastIdentity = null;
     let matches = false;
@@ -352,7 +399,7 @@
     if (matches) sendCurrent();
   });
   // Preserve the bootstrap preference queue; pre-install references safely remain no-op stubs.
-  window.V3Analytics = Object.freeze({ track, preferences: window.V3Analytics.preferences });
+  window.V3Analytics = Object.freeze({ track, captureInteraction, interactionCurrent, routeCurrent, preferences: window.V3Analytics.preferences });
   boot.install({
     start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.adminRestricted) protectAdmin(); if (state.ready) activate(); },
     commit, protectAdmin, activate, preferences, closePreferences
