@@ -5,10 +5,10 @@
   if (!boot || window.__v3AnalyticsAdapterInstalled) return;
   window.__v3AnalyticsAdapterInstalled = true;
   const MEASUREMENT_ID = "G-1446TW7YQJ";
-  const COLLECTION_REVIEW_CONFIRMED = false;
+  const COLLECTION_REVIEW_CONFIRMED = true;
   // Google-side history tracking and all other Enhanced Measurement events are owner-confirmed off.
-  // The separate privacy/activation review is still pending; neither source gate is enabled here.
-  const GA_ADMIN_SETTINGS_REVIEWED = false;
+  // Live activation is approved; Basic Consent Mode still requires valid visitor acceptance.
+  const GA_ADMIN_SETTINGS_REVIEWED = true;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
   const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-basic-1" : "draft-basic-1";
