@@ -21,7 +21,7 @@
   let restoredRoutePending = false, adminRestricted = /^\/admin(?:\/|$)/i.test(window.location.pathname);
   let expiryTimer = 0, unpersistedDenial = false, storageWritable = false;
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
-  let lastConsent = null;
+  let lastConsent = null, currentPageReferrer = "";
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
   const gtag = function () {
@@ -132,6 +132,77 @@
     return REVIEWED_ACTIVATION && shellReady && uiReady && current && !adminNow() && !restoredRoutePending &&
       storageAvailable && validPreference(preference) && preference.analyticsStorage === "granted";
   }
+  // Public content IDs need an adapter-owned resolver reading audited backend identifiers.
+  // Caller strings, DOM/route values, filenames, array positions, and "verified" flags are not proof.
+  // These ID slots are recognized but intentionally omitted until that resolver is connected:
+  // explicit band/album/record IDs or original image keys only; never normalized fallback IDs.
+  const CUSTOM_ID_FIELDS = new Set(["gallery_id", "photo_id", "source_content_id", "target_content_id"]);
+  const CUSTOM_TYPES = Object.freeze({ music: ["band", "show", "person", "venue", "set", "gallery", "photo"], wrestling: ["show", "person", "venue", "match", "gallery", "photo"] });
+  const CUSTOM_DATASETS = Object.freeze({ music: ["bands", "shows", "people", "venues"], wrestling: ["shows", "people", "venues"] });
+  const CUSTOM_DATASET_TYPES = Object.freeze({ bands: "band", shows: "show", people: "person", venues: "venue" });
+  const CUSTOM_FILTER_KEYS = ["letter", "region", "status", "state", "venue", "sort", "category", "instrument", "year", "promotion", "team", "mode", "banner", "field"];
+  const CUSTOM_PANELS = ["relationships", "show_photos", "venue_artists", "show_history", "gallery_range"];
+  // Fixed catalog only. Filter values stay unsupported until separately allowlisted; counts are safe.
+  // IDs are optional and omitted, rather than inferred or accepted on the caller's assertion.
+  const CUSTOM_EVENTS = Object.freeze({
+    gallery_open: { required: ["entry_method"], fields: { gallery_id: null, entry_method: ["route", "direct", "history", "tile", "button", "relationship"] } },
+    photo_view: { required: ["navigation_method"], fields: { gallery_id: null, photo_id: null, photo_position: [1, 1000000], navigation_method: ["open", "direct", "history", "next", "previous", "swipe", "keyboard", "thumbnail"] } },
+    photo_download_click: { required: [], fields: { gallery_id: null, photo_id: null } },
+    archive_search: { required: ["dataset", "outcome"], fields: { dataset: "dataset", result_count: [0, 1000000], result_count_scope: ["total", "page", "loaded"], outcome: ["results", "empty", "error", "unavailable"] } },
+    archive_filter: { required: ["dataset", "filter_key", "selection_count"], fields: { dataset: "dataset", filter_key: CUSTOM_FILTER_KEYS, selection_count: [0, 100] } },
+    relationship_follow: { required: ["source_content_type", "target_content_type"], fields: { source_content_type: "type", target_content_type: "type", source_content_id: null, target_content_id: null } },
+    content_expand: { required: ["panel_type"], fields: { panel_type: CUSTOM_PANELS } }
+  });
+  function validateCustomEvent(name, parameters) {
+    if (typeof name !== "string" || !Object.prototype.hasOwnProperty.call(CUSTOM_EVENTS, name) || !parameters || typeof parameters !== "object") return null;
+    const prototype = Object.getPrototypeOf(parameters);
+    if (prototype !== Object.prototype && prototype !== null) return null;
+    const keys = Reflect.ownKeys(parameters);
+    if (keys.length > 12 || keys.some(key => typeof key !== "string")) return null;
+    const schema = CUSTOM_EVENTS[name], descriptors = Object.getOwnPropertyDescriptors(parameters), values = Object.create(null);
+    for (const key of keys) {
+      const descriptor = descriptors[key];
+      if (!descriptor || !descriptor.enumerable || !("value" in descriptor) || (key !== "archive" && key !== "content_type" && !Object.prototype.hasOwnProperty.call(schema.fields, key))) return null;
+      // Do not read or serialize an untrusted ID value; no trusted ID producer exists in this pass.
+      if (!CUSTOM_ID_FIELDS.has(key)) values[key] = descriptor.value;
+    }
+    if (!["music", "wrestling"].includes(values.archive)) return null;
+    const types = CUSTOM_TYPES[values.archive];
+    if (typeof values.content_type !== "string" || !types.includes(values.content_type)) return null;
+    for (const key of schema.required) if (values[key] === undefined) return null;
+    const clean = { archive: values.archive, content_type: values.content_type };
+    for (const [key, rule] of Object.entries(schema.fields)) {
+      if (CUSTOM_ID_FIELDS.has(key) || values[key] === undefined) continue;
+      const value = values[key];
+      if (rule === "dataset") { if (!CUSTOM_DATASETS[values.archive].includes(value) || CUSTOM_DATASET_TYPES[value] !== values.content_type) return null; }
+      else if (rule === "type") { if (!types.includes(value)) return null; }
+      else if (typeof rule[0] === "number") { if (!Number.isSafeInteger(value) || value < rule[0] || value > rule[1]) return null; }
+      else if (!rule.includes(value)) return null;
+      clean[key] = value;
+    }
+    if (name === "archive_search") {
+      const counted = clean.outcome === "results" || clean.outcome === "empty";
+      if (counted ? clean.result_count === undefined || !clean.result_count_scope || (clean.outcome === "empty" ? clean.result_count !== 0 : clean.result_count === 0) : clean.result_count !== undefined || clean.result_count_scope !== undefined) return null;
+    }
+    if (name === "relationship_follow" && clean.content_type !== clean.target_content_type) return null;
+    return clean;
+  }
+  function customEventContextMatches(archive) {
+    if (!current?.url || current.name === "not_found") return false;
+    const committed = new URL(current.url), actual = new URL(window.location.href);
+    const normalize = value => value.replace(/\/+$/, "") || "/";
+    const root = "/" + archive, path = normalize(committed.pathname);
+    return committed.origin === window.location.origin && normalize(actual.pathname) === path && (path === root || path.startsWith(root + "/"));
+  }
+  function track(name, parameters) {
+    try {
+      const clean = validateCustomEvent(name, parameters); if (!clean) return false;
+      // No tag initialization, timers, queues, or retries here. Missing permission/readiness drops it.
+      publishConsent();
+      if (!canCollect() || tagState !== "ready" || !configured || lastIdentity !== current.identity || !customEventContextMatches(clean.archive)) return false;
+      return gtag("event", name, { ...clean, send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
+    } catch { return false; } // Bad callers or blocked Analytics cannot interrupt an interaction.
+  }
   function campaignConfig() {
     const source = campaigns.utm_source;
     return ["nfc", "instagram", "facebook", "youtube", "tiktok", "x"].includes(source) ? { campaign_source: source } : {};
@@ -166,6 +237,7 @@
     }
     if (lastIdentity === current.identity) return;
     if (gtag("event", "page_view", { send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: previousPublic || entryReferrer }) === false) return;
+    currentPageReferrer = previousPublic || entryReferrer;
     lastIdentity = current.identity;
     previousPublic = current.url; entryReferrer = "";
   }
@@ -279,6 +351,8 @@
     restoredRoutePending = !matches; publishConsent(); renderChoice();
     if (matches) sendCurrent();
   });
+  // Preserve the bootstrap preference queue; pre-install references safely remain no-op stubs.
+  window.V3Analytics = Object.freeze({ track, preferences: window.V3Analytics.preferences });
   boot.install({
     start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.adminRestricted) protectAdmin(); if (state.ready) activate(); },
     commit, protectAdmin, activate, preferences, closePreferences
