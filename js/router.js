@@ -418,6 +418,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  try { window.__v3AnalyticsBoot?.protectAdmin(route); } catch { /* Optional analytics never changes mounting. */ }
   if (route.name !== "privacy" && typeof hidePrivacyShell === "function") hidePrivacyShell();
   if (typeof cancelAdminStationTravel === "function") cancelAdminStationTravel();
   if (route.name !== "admin" && typeof hideAdminShell === "function") hideAdminShell();
@@ -786,6 +787,10 @@ function syncRouteFromLocation(options = {}) {
 }
 
 function navigateToRoute(url, options = {}) {
+  try {
+    const target = new URL(url, window.location.href);
+    if (/^\/admin(?:\/|$)/i.test(target.pathname)) window.__v3AnalyticsBoot?.protectAdmin({ name: "admin" });
+  } catch { /* An optional exclusion never changes the navigation outcome. */ }
   if (bandRecordOpening && !bandRecordOpening.promoting) cancelBandRecordOpening();
   if (typeof zhentoRhythmEntry !== "undefined" && zhentoRhythmEntry && !zhentoRhythmEntry.promoting) cancelZhentoRhythmEntry();
   const route = getRouteFromUrlWithPrototypePrecedence(url);

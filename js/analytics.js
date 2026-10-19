@@ -6,8 +6,8 @@
   window.__v3AnalyticsAdapterInstalled = true;
   const MEASUREMENT_ID = "G-1446TW7YQJ";
   const COLLECTION_REVIEW_CONFIRMED = false;
-  // Prerequisite: GA Admin/history pageviews and automatic form/outbound/search/download/video/scroll
-  // detections must be reviewed/off for this manual-only event map. Code cannot change those settings.
+  // Google-side history tracking and all other Enhanced Measurement events are owner-confirmed off.
+  // The separate privacy/activation review is still pending; neither source gate is enabled here.
   const GA_ADMIN_SETTINGS_REVIEWED = false;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
@@ -18,20 +18,27 @@
   const PATHS = Object.freeze({ home: /^\/$/, portfolio: /^\/portfolio$/, music: /^\/music$/, "music-bands": /^\/music\/bands$/, "band-detail": /^\/music\/bands\/[^/]+$/, "sets-archive": /^\/music\/bands\/[^/]+\/sets$/, "set-detail": /^\/music\/bands\/[^/]+\/[^/]+$/, "music-shows": /^\/music\/shows$/, "show-detail": /^\/music\/shows\/[^/]+$/, "music-people": /^\/music\/people$/, "person-detail": /^\/music\/people\/[^/]+$/, "music-venues": /^\/music\/venues$/, "music-venue-detail": /^\/music\/venues\/[^/]+$/, wrestling: /^\/wrestling$/, "wrestling-shows": /^\/wrestling\/shows$/, "wrestling-show-detail": /^\/wrestling\/shows\/[^/]+$/, "wrestling-match-detail": /^\/wrestling\/shows\/[^/]+\/[^/]+$/, "wrestling-match-detail-photo": /^\/wrestling\/shows\/[^/]+\/[^/]+\/photo\/[^/]+$/, "wrestling-people-prototype": /^\/wrestling\/people$/, "wrestling-person-detail": /^\/wrestling\/people\/[^/]+$/, "wrestling-venues": /^\/wrestling\/venues$/, "wrestling-venue-detail": /^\/wrestling\/venues\/[^/]+$/, "wrestling-venue-detail-prototype": /^\/wrestling\/venues\/[^/]+$/, calendar: /^\/calendar$/, about: /^\/about$/, privacy: /^\/privacy$/, contact: /^\/contact$/, connect: /^\/connect$/ });
   let preference = null, storageAvailable = true, current = null, previousPublic = "", lastIdentity = null;
   let shellRequested = false, shellReady = false, uiReady = false, observer = null, observerTimer = 0, tagState = "idle", configured = false;
-  let restoredRoutePending = false;
+  let restoredRoutePending = false, adminRestricted = /^\/admin(?:\/|$)/i.test(window.location.pathname);
+  let expiryTimer = 0, unpersistedDenial = false;
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null;
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
   window.dataLayer = Array.isArray(window.dataLayer) ? window.dataLayer : [];
-  const gtag = function () { window.dataLayer.push(arguments); return arguments; };
+  const gtag = function () {
+    if (["event", "config", "js"].includes(arguments[0]) && adminNow()) return false;
+    window.dataLayer.push(arguments); return arguments;
+  };
   window.gtag = gtag;
   gtag("consent", "default", { ...DENIED });
   gtag("set", "ads_data_redaction", true);
-  function consentValues() { return { ...DENIED, analytics_storage: preference?.analyticsStorage === "granted" && !adminNow() ? "granted" : "denied" }; }
+  function consentValues() {
+    checkPreferenceExpiry();
+    return { ...DENIED, analytics_storage: preference?.analyticsStorage === "granted" && !adminNow() ? "granted" : "denied" };
+  }
   function publishConsent() {
+    const values = consentValues();
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
-    if (tagState !== "ready") return;
-    const values = consentValues(); if (lastConsent === values.analytics_storage) return;
+    if (tagState !== "ready" || lastConsent === values.analytics_storage) return;
     lastConsent = values.analytics_storage;
     gtag("consent", "update", values);
     // Before readiness, preference/current retain only the latest private choice. The queue contains
@@ -47,11 +54,31 @@
   function readPreference() {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY), value = decodePreference(stored);
-      if (value?.analyticsStorage === "granted") window.localStorage.setItem(STORAGE_KEY, stored);
-      return value;
+      // localStorage has no native expiry: remove invalid/expired choices whenever detected.
+      if (stored !== null && !value && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
+      storageAvailable = !unpersistedDenial;
+      return unpersistedDenial ? (validPreference(preference) && preference.analyticsStorage === "denied" ? preference : null) : value;
     } catch { storageAvailable = false; return null; }
   }
-  function checkPreferenceExpiry() { if (preference && !validPreference(preference)) { preference = null; publishConsent(); renderChoice(); } }
+  function checkPreferenceExpiry() {
+    if (!preference || validPreference(preference)) return false;
+    preference = null;
+    window.clearTimeout(expiryTimer); expiryTimer = 0;
+    // Cleanup must never revive a stored grant or publish one while the current choice expires.
+    readPreference();
+    renderChoice();
+    return true;
+  }
+  function schedulePreferenceExpiry() {
+    window.clearTimeout(expiryTimer); expiryTimer = 0;
+    if (!preference) return;
+    // 180 days exceeds the browser timer range. Each bounded wakeup revalidates, never grants.
+    const delay = Math.min(2147483647, Math.max(0, preference.expiresAt - Date.now()));
+    expiryTimer = window.setTimeout(() => { expiryTimer = 0; checkPreferenceExpiry(); schedulePreferenceExpiry(); publishConsent(); renderChoice(); }, delay);
+  }
+  function reconcilePreference() {
+    preference = readPreference(); schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent();
+  }
   function canonicalView(packet) {
     if (!packet || packet.name === "admin") return packet?.name === "admin" ? { name: "admin", generation: packet.generation } : null;
     let name = packet.name, path = packet.path;
@@ -63,14 +90,19 @@
     if (name === "music-bands") url.searchParams.set("view", packet.view === "search" ? "search" : "list");
     return Object.freeze({ name, url: url.href, title: `${TITLES[name] || "Page not found"} | Voodoo Media`, identity: `${name}:${url.pathname}${url.search}`, generation: packet.generation });
   }
-  function adminNow() { return current?.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname); }
+  function adminNow() { return adminRestricted || current?.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname); }
+  function protectAdmin() {
+    adminRestricted = true;
+    window[`ga-disable-${MEASUREMENT_ID}`] = true;
+    publishConsent();
+  }
   function canCollect() { return REVIEWED_ACTIVATION && shellReady && uiReady && current && !adminNow() && !restoredRoutePending; }
   function campaignConfig() {
-    const config = {}, map = { utm_source: "campaign_source", utm_medium: "campaign_medium", utm_campaign: "campaign_name", utm_id: "campaign_id", utm_content: "campaign_content", utm_term: "campaign_term" };
-    Object.keys(map).forEach(key => { if (campaigns[key]) config[map[key]] = campaigns[key]; }); return config;
+    const source = campaigns.utm_source;
+    return ["nfc", "instagram", "facebook", "youtube", "tiktok", "x"].includes(source) ? { campaign_source: source } : {};
   }
   function sendCurrent() {
-    checkPreferenceExpiry();
+    publishConsent();
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
     if (!canCollect() || tagState === "failed") return;
     if (tagState === "idle") {
@@ -91,14 +123,14 @@
     if (lastIdentity === current.identity) return;
     gtag("event", "page_view", { send_to: MEASUREMENT_ID, page_location: current.url, page_title: current.title, page_referrer: previousPublic || entryReferrer });
     lastIdentity = current.identity;
+    previousPublic = current.url;
   }
   function commit(packet) {
     const next = canonicalView(packet); if (!next) return;
     restoredRoutePending = false;
-    if (current?.identity && current.identity !== next.identity) previousPublic = next.name === "admin" ? "" : current.url;
-    if (next.name === "admin") { previousPublic = ""; lastIdentity = null; }
-    if (current?.name === "admin") previousPublic = "";
+    if (next.name === "admin") lastIdentity = null;
     current = next;
+    adminRestricted = next.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname);
     window[`ga-disable-${MEASUREMENT_ID}`] = !canCollect() || tagState !== "ready";
     publishConsent(); renderChoice(); sendCurrent();
   }
@@ -121,18 +153,20 @@
   function saveChoice(analyticsStorage) {
     const fromPrompt = ui?.prompt.contains(document.activeElement);
     const now = Date.now(); preference = { version: 1, noticeVersion: NOTICE_VERSION, analyticsStorage, savedAt: now, expiresAt: now + PREFERENCE_AGE };
+    unpersistedDenial = false;
     try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preference)); storageAvailable = true; } catch {
-      storageAvailable = false;
+      storageAvailable = false; unpersistedDenial = analyticsStorage === "denied";
       if (analyticsStorage === "denied") { try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* The visit-only message remains truthful. */ } }
     }
-    publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) ui.revise.focus({ preventScroll: true });
+    schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) ui.revise.focus({ preventScroll: true });
   }
   function privacyPageNow() { return /^\/privacy\/?$/.test(window.location.pathname); }
   function closePreferences(shouldFocus = true) { wantPreferences = false; wantPreferencesFocus = false; if (!ui) return; ui.preferences.hidden = true; renderChoice(); if (shouldFocus !== false) (privacyPageNow() ? document.querySelector("[data-privacy-open-preferences]") : preference ? ui.revise : ui.open)?.focus({ preventScroll: true }); }
-  function preferences(shouldFocus = false) { wantPreferences = true; wantPreferencesFocus ||= shouldFocus; if (!uiReady) return; ui.root.hidden = false; ui.preferences.hidden = false; ui.prompt.hidden = true; ui.revise.setAttribute("aria-expanded", "true"); ui.checkbox.checked = preference?.analyticsStorage === "granted"; if (wantPreferencesFocus) ui.checkbox.focus({ preventScroll: true }); wantPreferencesFocus = false; }
+  function preferences(shouldFocus = false) { publishConsent(); wantPreferences = true; wantPreferencesFocus ||= shouldFocus; if (!uiReady) return; ui.root.hidden = false; ui.preferences.hidden = false; ui.prompt.hidden = true; ui.revise.setAttribute("aria-expanded", "true"); ui.checkbox.checked = preference?.analyticsStorage === "granted"; if (wantPreferencesFocus) ui.checkbox.focus({ preventScroll: true }); wantPreferencesFocus = false; }
   function renderChoice() {
     if (!ui) return;
     const editing = !ui.preferences.hidden;
+    ui.checkbox.checked = preference?.analyticsStorage === "granted";
     ui.root.hidden = privacyPageNow() && !editing;
     ui.prompt.hidden = Boolean(preference) || editing;
     ui.revise.hidden = !preference && !editing;
@@ -165,21 +199,33 @@
     link.onerror = () => { window[`ga-disable-${MEASUREMENT_ID}`] = true; };
     document.head.append(link);
   }
-  preference = readPreference(); publishConsent();
+  preference = readPreference(); schedulePreferenceExpiry(); publishConsent();
   window.addEventListener("storage", event => {
     if (event.key !== STORAGE_KEY && event.key !== null) return;
-    preference = event.key === null ? null : decodePreference(event.newValue); publishConsent(); renderChoice(); sendCurrent();
+    try { if (event.storageArea && event.storageArea !== window.localStorage) return; } catch { /* Reconcile failure is denied below. */ }
+    // Event payloads can be queued out of order. Read the current authoritative record instead.
+    reconcilePreference();
   });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") reconcilePreference();
+  });
+  window.addEventListener("focus", reconcilePreference);
   window.addEventListener("pageshow", event => {
     if (!event.persisted) return;
-    preference = readPreference(); lastIdentity = null;
-    const actual = new URL(window.location.href), restored = current?.url ? new URL(current.url) : null;
-    const matches = Boolean(restored && restored.pathname === actual.pathname && (current.name !== "music-bands" || restored.searchParams.get("view") === (actual.searchParams.get("view") === "search" ? "search" : "list")));
+    preference = readPreference(); schedulePreferenceExpiry(); lastIdentity = null;
+    let matches = false;
+    try {
+      // Use the Shell's canonical parser without adopting a possibly unpainted restored route.
+      const route = getRouteFromUrlWithPrototypePrecedence();
+      const url = new URL(route.canonicalUrl, window.location.origin);
+      const restored = canonicalView({ name: route.name, path: url.pathname, view: route.view, unknown: route.isUnknown });
+      matches = Boolean(current?.identity && restored?.identity === current.identity);
+    } catch { /* Missing/mismatched route ownership stays excluded until a successful commit. */ }
     restoredRoutePending = !matches; publishConsent(); renderChoice();
     if (matches) sendCurrent();
   });
   boot.install({
-    start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.ready) activate(); },
-    commit, activate, preferences, closePreferences
+    start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.adminRestricted) protectAdmin(); if (state.ready) activate(); },
+    commit, protectAdmin, activate, preferences, closePreferences
   });
 })();

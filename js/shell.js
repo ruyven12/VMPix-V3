@@ -7956,6 +7956,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) syncHomeEngageReadiness();
   });
   window.addEventListener("popstate", (event) => {
+    try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
     cancelBandRecordOpening();
     cancelZhentoRhythmEntry();

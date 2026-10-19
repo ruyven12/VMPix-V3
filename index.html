@@ -7,25 +7,31 @@
   <script>
     (() => {
       if (window.__v3AnalyticsBoot) return;
-      // Capture only bounded campaign tokens before route canonicalization; never retain the entry URL.
+      // Owner-approved source labels only; free-form campaign text/identifiers are never retained.
       const campaign = Object.create(null);
       const initialAdmin = /^\/admin(?:\/|$)/i.test(window.location.pathname);
-      const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_id", "utm_content", "utm_term"];
-      const safeToken = value => typeof value === "string" && /^[a-z0-9][a-z0-9_.-]{0,63}$/i.test(value) &&
-        !/password|passwd|secret|token|session|credential|apikey|privatekey|authorization/i.test(value) &&
-        !/^\d{7,}$/.test(value) && !/^[a-f0-9]{32,}$/i.test(value) && !/^[a-z0-9_-]{32,}$/i.test(value);
+      const approvedSources = ["nfc", "instagram", "facebook", "youtube", "tiktok", "x"];
       try {
-        const entry = new URL(window.location.href);
-        if (!initialAdmin) for (const key of keys) { const values = entry.searchParams.getAll(key); if (values.length === 1 && safeToken(values[0])) campaign[key] = values[0]; }
+        const values = new URL(window.location.href).searchParams.getAll("utm_source");
+        if (!initialAdmin && values.length === 1 && approvedSources.includes(values[0])) campaign.utm_source = values[0];
       } catch { /* Missing attribution never affects routing. */ }
       let referrer = "";
-      try { const source = new URL(document.referrer); if (!initialAdmin && ["https:", "http:"].includes(source.protocol) && !source.username && !source.password) referrer = source.origin + "/"; } catch {}
-      let latest = null, ready = false, adapter = null, sequence = 0, wantPreferences = false;
+      try { const source = new URL(document.referrer); if (!initialAdmin && source.origin !== window.location.origin && ["https:", "http:"].includes(source.protocol) && !source.username && !source.password) referrer = source.origin + "/"; } catch {}
+      let latest = null, ready = false, adapter = null, sequence = 0, wantPreferences = false, adminRestricted = initialAdmin;
+      window["ga-disable-G-1446TW7YQJ"] = true;
       const call = (method, value) => { try { adapter?.[method]?.(value); } catch { /* Analytics cannot interrupt the Shell. */ } };
+      const protectAdmin = route => {
+        if (route?.name !== "admin" && !/^\/admin(?:\/|$)/i.test(window.location.pathname)) return;
+        adminRestricted = true;
+        window["ga-disable-G-1446TW7YQJ"] = true;
+        call("protectAdmin");
+      };
       const commit = route => {
         try {
           if (!route || typeof route.name !== "string") return;
           const isAdmin = route.name === "admin" || /^\/admin(?:\/|$)/i.test(window.location.pathname);
+          if (isAdmin) protectAdmin(route);
+          else adminRestricted = false;
           const url = new URL(route.canonicalUrl || "/", window.location.origin);
           const path = !route.isUnknown && !isAdmin && url.origin === window.location.origin && url.pathname.length <= 512 && url.pathname.split("/").every(part => {
             if (!part) return true; const value = decodeURIComponent(part);
@@ -37,10 +43,10 @@
         } catch { latest = Object.freeze({ name: "not_found", path: null, view: "", unknown: true, generation: ++sequence }); call("commit", latest); }
       };
       window.__v3AnalyticsBoot = Object.freeze({
-        commit,
+        commit, protectAdmin,
         activate() { ready = true; call("activate"); },
         closePreferences(shouldFocus = true) { wantPreferences = false; call("closePreferences", shouldFocus); },
-        install(controller) { if (adapter) return false; adapter = controller; call("start", { campaign: Object.freeze(campaign), referrer, latest, ready }); if (wantPreferences) call("preferences", true); return true; }
+        install(controller) { if (adapter) return false; adapter = controller; call("start", { campaign: Object.freeze(campaign), referrer, latest, ready, adminRestricted }); if (wantPreferences) call("preferences", true); return true; }
       });
       window.V3Analytics = Object.freeze({
         // Event extensions require an explicit name/parameter catalog; reserved GA commands are never accepted.
