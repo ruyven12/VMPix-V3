@@ -11,7 +11,7 @@
   const GA_ADMIN_SETTINGS_REVIEWED = true;
   const REVIEWED_ACTIVATION = COLLECTION_REVIEW_CONFIRMED && GA_ADMIN_SETTINGS_REVIEWED;
   // A draft choice is never restored as informed consent after the reviewed source gates change.
-  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-gallery-1" : "draft-gallery-1";
+  const NOTICE_VERSION = REVIEWED_ACTIVATION ? "reviewed-search-1" : "draft-search-1";
   const STORAGE_KEY = "v3.analytics.preference.v1", PREFERENCE_AGE = 180 * 24 * 60 * 60 * 1000;
   const DENIED = Object.freeze({ analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" });
   const TITLES = Object.freeze({ home: "Home", portfolio: "Portfolio", music: "Music", "music-bands": "Music Bands", "band-detail": "Music Band", "sets-archive": "Music Band Sets", "set-detail": "Music Set", "music-shows": "Music Shows", "show-detail": "Music Show", "music-people": "Music People", "person-detail": "Music Person", "music-venues": "Music Venues", "music-venue-detail": "Music Venue", wrestling: "Wrestling", "wrestling-shows": "Wrestling Shows", "wrestling-show-detail": "Wrestling Show", "wrestling-match-detail": "Wrestling Match", "wrestling-match-detail-photo": "Wrestling Photo", "wrestling-people-prototype": "Wrestling People", "wrestling-person-detail": "Wrestling Person", "wrestling-venues": "Wrestling Venues", "wrestling-venue-detail": "Wrestling Venue", "wrestling-venue-detail-prototype": "Wrestling Venue", calendar: "Calendar", about: "About", privacy: "Privacy", contact: "Contact", connect: "Connect" });
@@ -23,6 +23,7 @@
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null, currentPageReferrer = "";
   let preferencesReturnTarget = null;
+  let archiveSearchTimer = 0, archiveSearchRevision = 0;
   let permissionStamp = "", permissionRevision = 0;
   const interactionTickets = new WeakMap();
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
@@ -54,6 +55,7 @@
     const stamp = [storageAvailable, preference?.noticeVersion, preference?.analyticsStorage, preference?.savedAt, preference?.expiresAt, adminNow()].join(":");
     if (stamp !== permissionStamp) { permissionStamp = stamp; permissionRevision++; }
     if (!canCollect()) {
+      cancelArchiveSearch();
       window[`ga-disable-${MEASUREMENT_ID}`] = true;
       // Revoke SDK permission once after an actual loss of consent; route-only locks keep their own gate.
       const permissionDenied = !storageAvailable || !validPreference(preference) || preference.analyticsStorage !== "granted";
@@ -67,7 +69,7 @@
   }
   function validPreference(value, now = Date.now()) {
     return value && typeof value === "object" && !Array.isArray(value) && Object.keys(value).sort().join(",") === "analyticsStorage,expiresAt,noticeVersion,savedAt,version" &&
-      value.version === 1 && (value.noticeVersion === NOTICE_VERSION || REVIEWED_ACTIVATION && value.noticeVersion === "reviewed-basic-1" && value.analyticsStorage === "denied") && ["granted", "denied"].includes(value.analyticsStorage) &&
+      value.version === 1 && (value.noticeVersion === NOTICE_VERSION || REVIEWED_ACTIVATION && ["reviewed-basic-1", "reviewed-gallery-1"].includes(value.noticeVersion) && value.analyticsStorage === "denied") && ["granted", "denied"].includes(value.analyticsStorage) &&
       Number.isSafeInteger(value.savedAt) && value.savedAt >= 0 && value.savedAt <= now && Number.isSafeInteger(value.expiresAt) &&
       value.expiresAt - value.savedAt === PREFERENCE_AGE && value.expiresAt > now;
   }
@@ -88,7 +90,7 @@
       }
       // Preserve an unfamiliar, unexpired notice record for a newer tab; it never grants here.
       let unfamiliar = false;
-      try { const raw = JSON.parse(stored); unfamiliar = typeof raw?.noticeVersion === "string" && raw.noticeVersion !== NOTICE_VERSION && raw.noticeVersion !== "reviewed-basic-1" && Number.isSafeInteger(raw.expiresAt) && raw.expiresAt > Date.now(); } catch { /* Malformed records are removed below. */ }
+      try { const raw = JSON.parse(stored); unfamiliar = typeof raw?.noticeVersion === "string" && raw.noticeVersion !== NOTICE_VERSION && !["reviewed-basic-1", "reviewed-gallery-1"].includes(raw.noticeVersion) && Number.isSafeInteger(raw.expiresAt) && raw.expiresAt > Date.now(); } catch { /* Malformed records are removed below. */ }
       if (stored !== null && !value && !unfamiliar && window.localStorage.getItem(STORAGE_KEY) === stored) window.localStorage.removeItem(STORAGE_KEY);
       storageAvailable = !unpersistedDenial;
       return unpersistedDenial ? (validPreference(preference) && preference.analyticsStorage === "denied" ? preference : null) : value;
@@ -249,6 +251,55 @@
       return gtag("event", name, { ...clean, ...trustedPhotoIds(name, clean.archive), send_to: MEASUREMENT_ID, page_location: location, page_title: current.title, page_referrer: currentPageReferrer }) !== false;
     } catch { return false; } // Bad callers or blocked Analytics cannot interrupt an interaction.
   }
+  function cancelArchiveSearch() {
+    window.clearTimeout(archiveSearchTimer); archiveSearchTimer = 0; archiveSearchRevision++;
+  }
+  function archiveControlParameters(parameters, fields) {
+    if (!parameters || typeof parameters !== "object" || ![Object.prototype, null].includes(Object.getPrototypeOf(parameters))) return null;
+    const descriptors = Object.getOwnPropertyDescriptors(parameters), keys = Reflect.ownKeys(parameters);
+    if (keys.some(key => !fields.includes(key) || !descriptors[key].enumerable || !("value" in descriptors[key]))) return null;
+    const clean = Object.fromEntries(keys.map(key => [key, descriptors[key].value]));
+    clean.content_type = CUSTOM_DATASET_TYPES[clean.dataset]; return clean;
+  }
+  function genuineArchiveControl(event) {
+    return typeof Event === "function" && event instanceof Event && event.isTrusted;
+  }
+  function archiveSearch(event, parameters, readCount, suppliedTicket) {
+    try {
+      if (!genuineArchiveControl(event)) return false;
+      cancelArchiveSearch();
+      if (event.isComposing || typeof readCount !== "function") return false;
+      const base = archiveControlParameters(parameters, ["archive", "dataset"]);
+      if (!base || !validateCustomEvent("archive_search", { ...base, result_count: 0, result_count_scope: "loaded", outcome: "empty" })) return false;
+      const ticket = suppliedTicket === undefined ? captureInteraction() : suppliedTicket;
+      if (!interactionCurrent(ticket) || !routeCurrent(base.archive)) return false;
+      // A callback retains private module equality/source guards, never query text or IDs here.
+      const initial = readCount();
+      if (!Number.isSafeInteger(initial) || initial < 0 || initial > 1000000) return false;
+      const revision = archiveSearchRevision;
+      archiveSearchTimer = window.setTimeout(() => {
+        archiveSearchTimer = 0;
+        try {
+          if (revision !== archiveSearchRevision || !interactionCurrent(ticket) || !routeCurrent(base.archive) || document.visibilityState !== "visible") return;
+          const count = readCount();
+          if (revision !== archiveSearchRevision || !Number.isSafeInteger(count) || count < 0 || count > 1000000) return;
+          window.V3Analytics.track("archive_search", { ...base, result_count: count, result_count_scope: "loaded", outcome: count ? "results" : "empty" }, ticket);
+        } catch { /* A stale/unavailable result is dropped, never retried or replayed. */ }
+      }, 600);
+      return true;
+    } catch { return false; }
+  }
+  function archiveFilter(event, parameters, suppliedTicket) {
+    try {
+      if (!genuineArchiveControl(event)) return false;
+      cancelArchiveSearch();
+      const clean = archiveControlParameters(parameters, ["archive", "dataset", "filter_key", "selection_count"]);
+      if (!clean || !validateCustomEvent("archive_filter", clean)) return false;
+      const ticket = suppliedTicket === undefined ? captureInteraction() : suppliedTicket;
+      if (!interactionCurrent(ticket)) return false;
+      return window.V3Analytics.track("archive_filter", clean, ticket);
+    } catch { return false; }
+  }
   function campaignConfig() {
     const source = campaigns.utm_source;
     return ["nfc", "instagram", "facebook", "youtube", "tiktok", "x"].includes(source) ? { campaign_source: source } : {};
@@ -289,6 +340,7 @@
   }
   function commit(packet) {
     const next = canonicalView(packet); if (!next) return;
+    cancelArchiveSearch();
     restoredRoutePending = false;
     if (next.name === "admin") lastIdentity = null;
     current = next;
@@ -363,8 +415,8 @@
     ui.menuChoice?.setAttribute("aria-expanded", String(editing));
     ui.pageChoice?.setAttribute("aria-expanded", String(editing));
     ui.open.setAttribute("aria-expanded", String(editing));
-    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views and download-button clicks only if you accept. Reject keeps it off. Advertising stays off.";
-    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views and download-button clicks. Reject and withdrawal stop new website analytics events.";
+    ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views, download-button clicks, search usage and filter interactions only if you accept. Search terms are never sent. Reject keeps it off. Advertising stays off.";
+    ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views, download-button clicks, search usage and filter interactions without search terms or filter values. Reject and withdrawal stop new website analytics events.";
     ui.withdraw.hidden = preference?.analyticsStorage !== "granted";
     ui.saved.textContent = !storageAvailable ? "Browser storage is unavailable. Analytics stays off when permission cannot be verified." :
       preference ? `${REVIEWED_ACTIVATION ? "" : "Draft choice: "}${preference.analyticsStorage === "granted" ? "Optional Analytics allowed" : "Optional Analytics declined"} on this browser.` : "No Analytics choice saved.";
@@ -403,12 +455,16 @@
     // Event payloads can be queued out of order. Read the current authoritative record instead.
     reconcilePreference();
   });
+  window.addEventListener("popstate", cancelArchiveSearch);
+  window.addEventListener("pagehide", cancelArchiveSearch);
   document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") cancelArchiveSearch();
     if (document.visibilityState === "visible") reconcilePreference();
   });
   window.addEventListener("focus", reconcilePreference);
   window.addEventListener("pageshow", event => {
     if (!event.persisted) return;
+    cancelArchiveSearch();
     permissionRevision++; // A restored document must not replay an earlier pending user action.
     window[`ga-disable-${MEASUREMENT_ID}`] = true;
     preference = readPreference(); schedulePreferenceExpiry(); lastIdentity = null;
@@ -424,7 +480,7 @@
     if (matches) sendCurrent();
   });
   // Preserve the bootstrap preference queue; pre-install references safely remain no-op stubs.
-  window.V3Analytics = Object.freeze({ track, captureInteraction, interactionCurrent, routeCurrent, preferences: window.V3Analytics.preferences });
+  window.V3Analytics = Object.freeze({ track, captureInteraction, interactionCurrent, routeCurrent, archiveSearch, archiveFilter, cancelArchiveSearch, preferences: window.V3Analytics.preferences });
   boot.install({
     start(state) { campaigns = state.campaign || Object.freeze({}); entryReferrer = state.referrer || ""; if (state.latest) commit(state.latest); if (state.adminRestricted) protectAdmin(); if (state.ready) activate(); },
     commit, protectAdmin, activate, preferences, closePreferences

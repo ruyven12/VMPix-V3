@@ -3,6 +3,66 @@
    Static placeholder wrestling archive surfaces only.
    ========================================================= */
 
+// User intent stays local; only approved categories/counts reach the Shell adapter.
+const wrestlingSearchCompositionSurfaces = new Set();
+let wrestlingSearchCompositionContext;
+
+function cancelWrestlingSearchAnalytics() {
+  wrestlingSearchCompositionSurfaces.clear();
+  try { window.V3Analytics?.cancelArchiveSearch?.(); } catch (_) { /* Optional analytics. */ }
+}
+function normalizeWrestlingAnalyticsQuery(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function queueWrestlingSearchAnalytics(event, dataset, previousQuery, query, readCount, surface = dataset) {
+  if (!(event instanceof Event) || !event.isTrusted) {
+    cancelWrestlingSearchAnalytics();
+    return;
+  }
+  if (wrestlingSearchCompositionContext !== v3RouteContext) {
+    wrestlingSearchCompositionSurfaces.clear();
+    wrestlingSearchCompositionContext = v3RouteContext;
+  }
+  if (event.isComposing) {
+    cancelWrestlingSearchAnalytics();
+    wrestlingSearchCompositionSurfaces.add(surface);
+    return;
+  }
+  const completedComposition = wrestlingSearchCompositionSurfaces.delete(surface);
+  if (!completedComposition && normalizeWrestlingAnalyticsQuery(previousQuery) === normalizeWrestlingAnalyticsQuery(query)) return;
+  try {
+    if (!normalizeWrestlingAnalyticsQuery(query)) {
+      cancelWrestlingSearchAnalytics();
+      return;
+    }
+    const context = v3RouteContext;
+    window.V3Analytics?.archiveSearch?.(event, { archive: "wrestling", dataset }, () => (
+      context === v3RouteContext && !context?.pending ? readCount() : null
+    ));
+  } catch (_) { /* Analytics never changes archive interaction. */ }
+}
+
+function trackWrestlingFilterAnalytics(event, dataset, filterKey, previous, value, defaultValue = "", ticket) {
+  if (previous === value) return;
+  cancelWrestlingSearchAnalytics();
+  if (!(event instanceof Event) || !event.isTrusted) return;
+  try {
+    window.V3Analytics?.archiveFilter?.(event, {
+      archive: "wrestling", dataset, filter_key: filterKey,
+      selection_count: value === defaultValue ? 0 : 1,
+    }, ticket);
+  } catch (_) { /* Analytics never changes archive interaction. */ }
+}
+
+function captureWrestlingFilterAnalytics(event) {
+  cancelWrestlingSearchAnalytics();
+  if (!(event instanceof Event) || !event.isTrusted) return null;
+  try {
+    return window.V3Analytics?.captureInteraction?.() || null;
+  } catch (_) { return null; }
+}
+
 function normalizeWrestlingPersonId(personId) {
   return String(personId || "")
     .trim()
@@ -1563,18 +1623,34 @@ function getFilteredWrestlingShows() {
   });
 }
 
-function updateWrestlingShowsFilter(filterName, value) {
+function queueWrestlingShowsSearchAnalytics(event, previousQuery, nextValue) {
+  const query = normalizeWrestlingAnalyticsQuery(nextValue);
+  const rows = wrestlingShowsCollection;
+  const filters = JSON.stringify([activeWrestlingShowsYearFilter, activeWrestlingShowsPromotionFilter, activeWrestlingShowsVenueFilter, activeWrestlingShowsSort]);
+  queueWrestlingSearchAnalytics(event, "shows", previousQuery, nextValue, () => {
+    if (isHallCrusadesShowsVariantActive() || !["live", "empty"].includes(wrestlingShowsDataState)
+      || rows !== wrestlingShowsCollection || query !== normalizeWrestlingAnalyticsQuery(activeWrestlingShowsSearch)
+      || filters !== JSON.stringify([activeWrestlingShowsYearFilter, activeWrestlingShowsPromotionFilter, activeWrestlingShowsVenueFilter, activeWrestlingShowsSort])) return null;
+    return getFilteredWrestlingShows().length;
+  }, "legacy-shows");
+}
+
+function updateWrestlingShowsFilter(filterName, value, event) {
   if (filterName === "search") {
     const nextValue = String(value ?? "");
     if (nextValue === activeWrestlingShowsSearch) {
+      queueWrestlingShowsSearchAnalytics(event, activeWrestlingShowsSearch, nextValue);
       return;
     }
+    const previousQuery = activeWrestlingShowsSearch;
     activeWrestlingShowsSearch = nextValue;
     scheduleWrestlingShowsArchiveRender();
+    queueWrestlingShowsSearchAnalytics(event, previousQuery, nextValue);
     return;
   }
 
   const nextValue = String(value || "").trim();
+  const previous = { year: activeWrestlingShowsYearFilter, promotion: activeWrestlingShowsPromotionFilter, venue: activeWrestlingShowsVenueFilter }[filterName];
   if (filterName === "year") {
     if (nextValue === activeWrestlingShowsYearFilter) {
       return;
@@ -1594,14 +1670,19 @@ function updateWrestlingShowsFilter(filterName, value) {
     return;
   }
   renderWrestlingShowsArchiveImmediately();
+  const current = { year: activeWrestlingShowsYearFilter, promotion: activeWrestlingShowsPromotionFilter, venue: activeWrestlingShowsVenueFilter }[filterName];
+  trackWrestlingFilterAnalytics(event, "shows", filterName, previous, current);
 }
 
-function resetWrestlingShowsFilters() {
+function resetWrestlingShowsFilters(event) {
+  const previous = { year: activeWrestlingShowsYearFilter, promotion: activeWrestlingShowsPromotionFilter, venue: activeWrestlingShowsVenueFilter };
+  cancelWrestlingSearchAnalytics();
   activeWrestlingShowsSearch = "";
   activeWrestlingShowsYearFilter = "";
   activeWrestlingShowsPromotionFilter = "";
   activeWrestlingShowsVenueFilter = "";
   renderWrestlingShowsArchiveImmediately();
+  Object.entries(previous).forEach(([key, value]) => trackWrestlingFilterAnalytics(event, "shows", key, value, ""));
 }
 
 function createWrestlingShowState(stateName, options = {}) {
@@ -3211,12 +3292,13 @@ function setHallCrusadesYearDrawerOpen(isOpen) {
   syncHallCrusadesYearControls();
 }
 
-function updateHallCrusadesYearFilter(value) {
+function updateHallCrusadesYearFilter(value, event) {
   if (isHallCrusadesCampaignLockActive()) {
     return;
   }
 
   const nextValue = String(value || "").trim();
+  const previous = activeHallCrusadesYearFilter;
   if (nextValue !== activeHallCrusadesYearFilter) {
     activeHallCrusadesYearFilter = nextValue;
     hallCrusadesPosterActiveIndex = 0;
@@ -3227,6 +3309,7 @@ function updateHallCrusadesYearFilter(value) {
 
   setHallCrusadesYearDrawerOpen(false);
   renderHallCrusadesPosterStrip();
+  trackWrestlingFilterAnalytics(event, "shows", "year", previous, activeHallCrusadesYearFilter, "");
 }
 
 function handleHallCrusadesYearCrystalClick(event) {
@@ -3243,7 +3326,7 @@ function handleHallCrusadesYearCrystalClick(event) {
 }
 
 function handleHallCrusadesYearOptionClick(event) {
-  updateHallCrusadesYearFilter(event.currentTarget?.dataset?.hallCrusadesYearOption || "");
+  updateHallCrusadesYearFilter(event.currentTarget?.dataset?.hallCrusadesYearOption || "", event);
 }
 
 function handleHallCrusadesYearDocumentClick(event) {
@@ -3353,12 +3436,13 @@ function setHallCrusadesBannerDrawerOpen(isOpen) {
   syncHallCrusadesBannerControls();
 }
 
-function updateHallCrusadesBannerFilter(value) {
+function updateHallCrusadesBannerFilter(value, event) {
   if (isHallCrusadesCampaignLockActive()) {
     return;
   }
 
   const nextValue = normalizeHallCrusadesBannerFilterValue(value);
+  const previous = activeHallCrusadesBannerFilter;
   if (nextValue !== activeHallCrusadesBannerFilter) {
     activeHallCrusadesBannerFilter = nextValue;
     hallCrusadesPosterActiveIndex = 0;
@@ -3369,6 +3453,7 @@ function updateHallCrusadesBannerFilter(value) {
 
   setHallCrusadesBannerDrawerOpen(false);
   renderHallCrusadesPosterStrip();
+  trackWrestlingFilterAnalytics(event, "shows", "banner", previous, activeHallCrusadesBannerFilter, "all");
 }
 
 function handleHallCrusadesBannerCrystalClick(event) {
@@ -3390,7 +3475,7 @@ function handleHallCrusadesBannerDrawerClick(event) {
     return;
   }
 
-  updateHallCrusadesBannerFilter(option.dataset.hallCrusadesBannerOption);
+  updateHallCrusadesBannerFilter(option.dataset.hallCrusadesBannerOption, event);
 }
 
 function handleHallCrusadesBannerDocumentClick(event) {
@@ -3498,12 +3583,13 @@ function setHallCrusadesFieldDrawerOpen(isOpen) {
   syncHallCrusadesFieldControls();
 }
 
-function updateHallCrusadesFieldFilter(value) {
+function updateHallCrusadesFieldFilter(value, event) {
   if (isHallCrusadesCampaignLockActive()) {
     return;
   }
 
   const nextValue = normalizeHallCrusadesFieldFilterValue(value);
+  const previous = activeHallCrusadesFieldFilter;
   if (nextValue !== activeHallCrusadesFieldFilter) {
     activeHallCrusadesFieldFilter = nextValue;
     hallCrusadesPosterActiveIndex = 0;
@@ -3514,6 +3600,7 @@ function updateHallCrusadesFieldFilter(value) {
 
   setHallCrusadesFieldDrawerOpen(false);
   renderHallCrusadesPosterStrip();
+  trackWrestlingFilterAnalytics(event, "shows", "field", previous, activeHallCrusadesFieldFilter, "all");
 }
 
 function handleHallCrusadesFieldCrystalClick(event) {
@@ -3535,7 +3622,7 @@ function handleHallCrusadesFieldDrawerClick(event) {
     return;
   }
 
-  updateHallCrusadesFieldFilter(option.dataset.hallCrusadesFieldOption);
+  updateHallCrusadesFieldFilter(option.dataset.hallCrusadesFieldOption, event);
 }
 
 function handleHallCrusadesFieldDocumentClick(event) {
@@ -3634,23 +3721,38 @@ function setHallCrusadesSearchPanelOpen(isOpen) {
   }
 }
 
-function updateHallCrusadesSearchQuery(value) {
+function queueHallCrusadesSearchAnalytics(event, previousQuery, nextValue) {
+  const query = normalizeWrestlingAnalyticsQuery(nextValue);
+  const rows = wrestlingShowsCollection;
+  const filters = JSON.stringify([activeHallCrusadesYearFilter, activeHallCrusadesBannerFilter, activeHallCrusadesFieldFilter]);
+  queueWrestlingSearchAnalytics(event, "shows", previousQuery, nextValue, () => {
+    if (!isHallCrusadesShowsVariantActive() || !["live", "empty"].includes(wrestlingShowsDataState)
+      || rows !== wrestlingShowsCollection || query !== normalizeWrestlingAnalyticsQuery(activeHallCrusadesSearchQuery)
+      || filters !== JSON.stringify([activeHallCrusadesYearFilter, activeHallCrusadesBannerFilter, activeHallCrusadesFieldFilter])) return null;
+    return getHallCrusadesPosterSourceRows().length;
+  }, "hall-shows");
+}
+
+function updateHallCrusadesSearchQuery(value, event) {
   if (isHallCrusadesCampaignLockActive()) {
     return;
   }
 
   const nextValue = String(value ?? "");
   if (nextValue === activeHallCrusadesSearchQuery) {
+    queueHallCrusadesSearchAnalytics(event, activeHallCrusadesSearchQuery, nextValue);
     syncHallCrusadesSearchControls();
     return;
   }
 
+  const previousQuery = activeHallCrusadesSearchQuery;
   activeHallCrusadesSearchQuery = nextValue;
   hallCrusadesPosterActiveIndex = 0;
   if (hallCrusadesPosterStrip) {
     delete hallCrusadesPosterStrip.dataset.hallCrusadesFlowDirection;
   }
   renderHallCrusadesPosterStrip();
+  queueHallCrusadesSearchAnalytics(event, previousQuery, nextValue);
 }
 
 function handleHallCrusadesSearchCrystalClick(event) {
@@ -3667,12 +3769,12 @@ function handleHallCrusadesSearchCrystalClick(event) {
 }
 
 function handleHallCrusadesSearchInput(event) {
-  updateHallCrusadesSearchQuery(event.currentTarget?.value || "");
+  updateHallCrusadesSearchQuery(event.currentTarget?.value || "", event);
 }
 
 function handleHallCrusadesSearchClearClick(event) {
   event.preventDefault();
-  updateHallCrusadesSearchQuery("");
+  updateHallCrusadesSearchQuery("", event);
   setHallCrusadesSearchPanelOpen(true);
 }
 
@@ -8531,7 +8633,8 @@ function syncWrestlingPeopleFilters(rows) {
   }
 }
 
-function updateWrestlingPeopleFilter(filterName, value) {
+function updateWrestlingPeopleFilter(filterName, value, event) {
+  const previous = { search: activeWrestlingPeopleSearch, letter: activeWrestlingPeopleLetterFilter, category: activeWrestlingPeopleCategoryFilter }[filterName];
   const nextValue = getWrestlingText(value);
   if (filterName === "search") {
     activeWrestlingPeopleSearch = nextValue;
@@ -8543,13 +8646,30 @@ function updateWrestlingPeopleFilter(filterName, value) {
     return;
   }
   renderWrestlingPeopleIndex({ skipDataRequest: true });
+  if (filterName === "search") {
+    const query = normalizeWrestlingAnalyticsQuery(activeWrestlingPeopleSearch);
+    const rows = wrestlingPeopleCollection;
+    const filters = JSON.stringify([activeWrestlingPeopleLetterFilter, activeWrestlingPeopleCategoryFilter]);
+    queueWrestlingSearchAnalytics(event, "people", previous, activeWrestlingPeopleSearch, () => {
+      if (!isWrestlingPeopleIndexRouteActive() || !["live", "empty"].includes(wrestlingPeopleDataState)
+        || rows !== wrestlingPeopleCollection || query !== normalizeWrestlingAnalyticsQuery(activeWrestlingPeopleSearch)
+        || filters !== JSON.stringify([activeWrestlingPeopleLetterFilter, activeWrestlingPeopleCategoryFilter])) return null;
+      return getFilteredWrestlingPeopleRows().length;
+    });
+  } else {
+    const current = filterName === "letter" ? activeWrestlingPeopleLetterFilter : activeWrestlingPeopleCategoryFilter;
+    trackWrestlingFilterAnalytics(event, "people", filterName, previous, current);
+  }
 }
 
-function resetWrestlingPeopleFilters() {
+function resetWrestlingPeopleFilters(event) {
+  const previous = { letter: activeWrestlingPeopleLetterFilter, category: activeWrestlingPeopleCategoryFilter };
+  cancelWrestlingSearchAnalytics();
   activeWrestlingPeopleSearch = "";
   activeWrestlingPeopleLetterFilter = "";
   activeWrestlingPeopleCategoryFilter = "";
   renderWrestlingPeopleIndex({ skipDataRequest: true });
+  Object.entries(previous).forEach(([key, value]) => trackWrestlingFilterAnalytics(event, "people", key, value, ""));
 }
 
 function initWrestlingPeopleFilters() {
@@ -8559,18 +8679,18 @@ function initWrestlingPeopleFilters() {
   wrestlingPeopleFiltersInitialized = true;
 
   if (wrestlingPeopleSearchInput) {
-    wrestlingPeopleSearchInput.addEventListener("input", () => {
-      updateWrestlingPeopleFilter("search", wrestlingPeopleSearchInput.value);
+    wrestlingPeopleSearchInput.addEventListener("input", (event) => {
+      updateWrestlingPeopleFilter("search", wrestlingPeopleSearchInput.value, event);
     });
   }
   if (wrestlingPeopleLetterSelect) {
-    wrestlingPeopleLetterSelect.addEventListener("change", () => {
-      updateWrestlingPeopleFilter("letter", wrestlingPeopleLetterSelect.value);
+    wrestlingPeopleLetterSelect.addEventListener("change", (event) => {
+      updateWrestlingPeopleFilter("letter", wrestlingPeopleLetterSelect.value, event);
     });
   }
   if (wrestlingPeopleCategorySelect) {
-    wrestlingPeopleCategorySelect.addEventListener("change", () => {
-      updateWrestlingPeopleFilter("category", wrestlingPeopleCategorySelect.value);
+    wrestlingPeopleCategorySelect.addEventListener("change", (event) => {
+      updateWrestlingPeopleFilter("category", wrestlingPeopleCategorySelect.value, event);
     });
   }
   if (wrestlingPeopleFilterReset) {
@@ -9001,24 +9121,38 @@ function setWrestlingVenuesCount(count) {
   wrestlingVenuesCount.textContent = `${numericCount.toLocaleString()} venue${numericCount === 1 ? "" : "s"}`;
 }
 
-function updateWrestlingVenueFilter(filterName, value) {
+function updateWrestlingVenueFilter(filterName, value, event) {
   if (filterName === "search") {
+    const previousQuery = activeWrestlingVenueSearch;
     activeWrestlingVenueSearch = String(value || "");
     renderWrestlingVenuesResults();
+    const query = normalizeWrestlingAnalyticsQuery(activeWrestlingVenueSearch);
+    const rows = wrestlingVenuesCollection;
+    const state = activeWrestlingVenueStateFilter;
+    queueWrestlingSearchAnalytics(event, "venues", previousQuery, activeWrestlingVenueSearch, () => {
+      if (!["live", "empty"].includes(wrestlingVenuesDataState) || rows !== wrestlingVenuesCollection
+        || query !== normalizeWrestlingAnalyticsQuery(activeWrestlingVenueSearch) || state !== activeWrestlingVenueStateFilter) return null;
+      return getFilteredWrestlingVenues().length;
+    });
     return;
   }
   if (filterName === "state") {
+    const previous = activeWrestlingVenueStateFilter;
     activeWrestlingVenueStateFilter = normalizeWrestlingVenueState(value);
     normalizeActiveWrestlingVenueFilters(getWrestlingVenueArchiveRows());
     renderWrestlingVenuesFilters();
     renderWrestlingVenuesResults();
+    trackWrestlingFilterAnalytics(event, "venues", "state", previous, activeWrestlingVenueStateFilter);
   }
 }
 
-function resetWrestlingVenueFilters() {
+function resetWrestlingVenueFilters(event) {
+  const previous = activeWrestlingVenueStateFilter;
+  cancelWrestlingSearchAnalytics();
   activeWrestlingVenueSearch = "";
   activeWrestlingVenueStateFilter = "";
   renderWrestlingVenuesIndex();
+  trackWrestlingFilterAnalytics(event, "venues", "state", previous, activeWrestlingVenueStateFilter);
 }
 
 function createWrestlingVenueFilterField(labelText, fieldName, options, activeValue, allLabel = "") {
@@ -9049,8 +9183,8 @@ function createWrestlingVenueFilterField(labelText, fieldName, options, activeVa
   });
 
   select.value = activeValue;
-  select.addEventListener("change", () => {
-    updateWrestlingVenueFilter(fieldName, select.value);
+  select.addEventListener("change", (event) => {
+    updateWrestlingVenueFilter(fieldName, select.value, event);
   });
 
   label.append(labelSpan, select);
@@ -9076,8 +9210,8 @@ function createWrestlingVenueFilters(rows) {
   searchInput.placeholder = "Search name or city";
   searchInput.value = activeWrestlingVenueSearch;
   searchInput.dataset.wrestlingVenuesFilter = "search";
-  searchInput.addEventListener("input", () => {
-    updateWrestlingVenueFilter("search", searchInput.value);
+  searchInput.addEventListener("input", (event) => {
+    updateWrestlingVenueFilter("search", searchInput.value, event);
   });
 
   searchLabel.append(searchText, searchInput);
@@ -11235,8 +11369,18 @@ function getWrestlingPeoplePrototypeShell(options = {}) {
   `;
 
   expandedHologram.querySelector("[data-hall-of-champions-search]").addEventListener("input", (event) => {
+    const previousQuery = hallOfChampionsSearchQuery;
     hallOfChampionsSearchQuery = event.currentTarget.value;
     renderHallOfChampionsArchiveRows(prototypeShell, "search");
+    const query = normalizeWrestlingAnalyticsQuery(hallOfChampionsSearchQuery);
+    const rows = hallOfChampionsPeopleArchiveRecords;
+    queueWrestlingSearchAnalytics(event, "people", previousQuery, hallOfChampionsSearchQuery, () => {
+      if (prototypeShell.dataset.hallOfChampionsActive !== "true" || prototypeShell.dataset.hallOfChampionsExpanded !== "true"
+        || prototypeShell.querySelector("[data-hall-of-champions-mode-selector]")?.dataset.hallOfChampionsModeStatus === "changing"
+        || getHallOfChampionsActiveWorkspaceMode(prototypeShell) !== "search" || !["live", "empty"].includes(hallOfChampionsPeopleArchiveState)
+        || rows !== hallOfChampionsPeopleArchiveRecords || query !== normalizeWrestlingAnalyticsQuery(hallOfChampionsSearchQuery)) return null;
+      return getHallOfChampionsActiveWorkspaceMatches("search").length;
+    }, "hall-people");
   });
   const crystalTrigger = document.createElement("button");
   crystalTrigger.type = "button";
@@ -11502,7 +11646,7 @@ function setHallOfChampionsModeSelectorAvailable(prototypeShell, isAvailable) {
   }
 }
 
-function completeHallOfChampionsModeTransition(modeSelector, nextIndex) {
+function completeHallOfChampionsModeTransition(modeSelector, nextIndex, analytics = null) {
   const currentLabel = modeSelector?.querySelector("[data-hall-of-champions-mode-label='current']");
   const incomingLabel = modeSelector?.querySelector("[data-hall-of-champions-mode-label='incoming']");
   const nextMode = HALL_OF_CHAMPIONS_ARCHIVE_MODES[nextIndex] || HALL_OF_CHAMPIONS_ARCHIVE_MODES[0];
@@ -11520,9 +11664,14 @@ function completeHallOfChampionsModeTransition(modeSelector, nextIndex) {
   modeSelector.dataset.hallOfChampionsModeDirection = "none";
   modeSelector.setAttribute("aria-label", `Hall of Champions archive mode selector. Active mode: ${nextMode}`);
   syncHallOfChampionsLowerSelectorForMode(getHallOfChampionsPrototypeShellFromNode(modeSelector));
+  const prototypeShell = getHallOfChampionsPrototypeShellFromNode(modeSelector);
+  if (analytics && analytics.routeContext === v3RouteContext && prototypeShell?.dataset.hallOfChampionsActive === "true"
+    && prototypeShell.dataset.hallOfChampionsExpanded === "true" && getHallOfChampionsCurrentModeIndex(prototypeShell) === nextIndex) {
+    trackWrestlingFilterAnalytics(analytics.event, "people", "mode", analytics.previous, nextIndex, 0, analytics.ticket);
+  }
 }
 
-function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
+function cycleHallOfChampionsArchiveMode(prototypeShell, direction, event) {
   const modeSelector = getHallOfChampionsModeSelector(prototypeShell);
   if (!modeSelector || prototypeShell?.dataset.hallOfChampionsModeSelectorReady !== "true") {
     return;
@@ -11534,6 +11683,7 @@ function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
   const currentIndex = Number.parseInt(modeSelector.dataset.hallOfChampionsModeIndex || "0", 10);
   const step = direction === "previous" ? -1 : 1;
   const nextIndex = (currentIndex + step + HALL_OF_CHAMPIONS_ARCHIVE_MODES.length) % HALL_OF_CHAMPIONS_ARCHIVE_MODES.length;
+  const analytics = { event, previous: currentIndex, routeContext: v3RouteContext, ticket: captureWrestlingFilterAnalytics(event) };
   const incomingLabel = modeSelector.querySelector("[data-hall-of-champions-mode-label='incoming']");
   setHallOfChampionsLowerSelectorAvailable(prototypeShell, "az", false);
 
@@ -11543,7 +11693,7 @@ function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
   }
 
   if (prefersHallOfChampionsReducedMotion()) {
-    completeHallOfChampionsModeTransition(modeSelector, nextIndex);
+    completeHallOfChampionsModeTransition(modeSelector, nextIndex, analytics);
     return;
   }
 
@@ -11554,7 +11704,7 @@ function cycleHallOfChampionsArchiveMode(prototypeShell, direction) {
   }
   hallOfChampionsModeTransitionTimer = window.setTimeout(() => {
     hallOfChampionsModeTransitionTimer = 0;
-    completeHallOfChampionsModeTransition(modeSelector, nextIndex);
+    completeHallOfChampionsModeTransition(modeSelector, nextIndex, analytics);
   }, HALL_OF_CHAMPIONS_MODE_TRANSITION_MS);
 }
 
@@ -11562,19 +11712,19 @@ function handleHallOfChampionsModeNavigation(event) {
   event.preventDefault();
   const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
   const direction = event.currentTarget?.dataset.hallOfChampionsModeNav === "previous" ? "previous" : "next";
-  cycleHallOfChampionsArchiveMode(prototypeShell, direction);
+  cycleHallOfChampionsArchiveMode(prototypeShell, direction, event);
 }
 
 function handleHallOfChampionsModeSelectorKeydown(event) {
   const prototypeShell = getHallOfChampionsPrototypeShellFromNode(event.currentTarget);
   if (event.key === "ArrowLeft") {
     event.preventDefault();
-    cycleHallOfChampionsArchiveMode(prototypeShell, "previous");
+    cycleHallOfChampionsArchiveMode(prototypeShell, "previous", event);
     return;
   }
   if (event.key === "ArrowRight") {
     event.preventDefault();
-    cycleHallOfChampionsArchiveMode(prototypeShell, "next");
+    cycleHallOfChampionsArchiveMode(prototypeShell, "next", event);
   }
 }
 
@@ -11744,7 +11894,7 @@ function getHallOfChampionsLowerSelectorValueCount(modeName) {
   return HALL_OF_CHAMPIONS_AZ_LETTERS.length;
 }
 
-function completeHallOfChampionsLowerSelectorTransition(selector, modeName) {
+function completeHallOfChampionsLowerSelectorTransition(selector, modeName, analytics = null) {
   const prototypeShell = getHallOfChampionsPrototypeShellFromNode(selector);
   if (!selector || !prototypeShell) {
     hallOfChampionsLowerSelectorTransitionTimer = 0;
@@ -11755,9 +11905,13 @@ function completeHallOfChampionsLowerSelectorTransition(selector, modeName) {
   updateHallOfChampionsLowerSelectorReadout(prototypeShell, modeName, getHallOfChampionsLowerSelectorCurrentValue(modeName));
   syncHallOfChampionsWorkspaces(prototypeShell);
   hallOfChampionsLowerSelectorTransitionTimer = 0;
+  if (analytics && analytics.routeContext === v3RouteContext && prototypeShell.dataset.hallOfChampionsActive === "true"
+    && prototypeShell.dataset.hallOfChampionsExpanded === "true" && getHallOfChampionsActiveWorkspaceMode(prototypeShell) === modeName) {
+    trackWrestlingFilterAnalytics(analytics.event, "people", modeName === "az" ? "letter" : modeName, analytics.previous, getHallOfChampionsLowerSelectorCurrentValue(modeName), "", analytics.ticket);
+  }
 }
 
-function cycleHallOfChampionsLowerSelector(prototypeShell, direction) {
+function cycleHallOfChampionsLowerSelector(prototypeShell, direction, event) {
   const selector = getHallOfChampionsLowerSelector(prototypeShell);
   if (!selector || selector.dataset.hallOfChampionsLetterStatus === "changing") {
     return;
@@ -11780,11 +11934,13 @@ function cycleHallOfChampionsLowerSelector(prototypeShell, direction) {
     hallOfChampionsAzLetterIndex = (hallOfChampionsAzLetterIndex + step + totalValues) % totalValues;
   }
   const nextValue = getHallOfChampionsLowerSelectorCurrentValue(modeName);
+  const analytics = { event, previous: previousValue, routeContext: v3RouteContext, ticket: captureWrestlingFilterAnalytics(event) };
   const currentLabel = selector.querySelector("[data-hall-of-champions-letter-label='current']");
   const incomingLabel = selector.querySelector("[data-hall-of-champions-letter-label='incoming']");
   if (prefersHallOfChampionsReducedMotion() || !currentLabel || !incomingLabel) {
     updateHallOfChampionsLowerSelectorReadout(prototypeShell, modeName, nextValue);
     syncHallOfChampionsWorkspaces(prototypeShell);
+    trackWrestlingFilterAnalytics(event, "people", modeName === "az" ? "letter" : modeName, previousValue, nextValue, "", analytics.ticket);
     return;
   }
 
@@ -11796,7 +11952,7 @@ function cycleHallOfChampionsLowerSelector(prototypeShell, direction) {
   if (hallOfChampionsLowerSelectorTransitionTimer) {
     window.clearTimeout(hallOfChampionsLowerSelectorTransitionTimer);
   }
-  hallOfChampionsLowerSelectorTransitionTimer = window.setTimeout(() => completeHallOfChampionsLowerSelectorTransition(selector, modeName), HALL_OF_CHAMPIONS_LOWER_SELECTOR_TRANSITION_MS);
+  hallOfChampionsLowerSelectorTransitionTimer = window.setTimeout(() => completeHallOfChampionsLowerSelectorTransition(selector, modeName, analytics), HALL_OF_CHAMPIONS_LOWER_SELECTOR_TRANSITION_MS);
 }
 
 function handleHallOfChampionsLowerSelectorNavigation(event) {
@@ -11806,7 +11962,7 @@ function handleHallOfChampionsLowerSelectorNavigation(event) {
     return;
   }
   const direction = button.dataset.hallOfChampionsLetterNav === "previous" ? "previous" : "next";
-  cycleHallOfChampionsLowerSelector(getHallOfChampionsPrototypeShellFromNode(button), direction);
+  cycleHallOfChampionsLowerSelector(getHallOfChampionsPrototypeShellFromNode(button), direction, event);
 }
 
 function handleHallOfChampionsLowerSelectorKeydown(event) {
@@ -11818,7 +11974,7 @@ function handleHallOfChampionsLowerSelectorKeydown(event) {
     return;
   }
   event.preventDefault();
-  cycleHallOfChampionsLowerSelector(prototypeShell, event.key === "ArrowLeft" ? "previous" : "next");
+  cycleHallOfChampionsLowerSelector(prototypeShell, event.key === "ArrowLeft" ? "previous" : "next", event);
 }
 function getHallOfChampionsPeopleArchiveApiUrl(page = 1) {
   const apiUrl = new URL(WRESTLING_PEOPLE_API_ROUTE, WRESTLING_SHOWS_API_BASE_URL);
@@ -19464,31 +19620,33 @@ function applyStaticWrestlingRelationshipHooks() {
 
 function initWrestlingShowsArchive() {
   wrestlingShowYearChips.forEach((chip) => {
-    chip.addEventListener("click", () => {
+    chip.addEventListener("click", (event) => {
+      const previous = activeWrestlingShowsYearFilter;
       activeWrestlingShowsYearFilter = chip.textContent.trim() || "Upcoming";
       renderWrestlingShowsArchive();
+      trackWrestlingFilterAnalytics(event, "shows", "year", previous, activeWrestlingShowsYearFilter);
     });
   });
 
   if (wrestlingShowSearchInput) {
     wrestlingShowSearchInput.value = activeWrestlingShowsSearch;
-    wrestlingShowSearchInput.addEventListener("input", () => {
-      updateWrestlingShowsFilter("search", wrestlingShowSearchInput.value);
+    wrestlingShowSearchInput.addEventListener("input", (event) => {
+      updateWrestlingShowsFilter("search", wrestlingShowSearchInput.value, event);
     });
   }
   if (wrestlingShowYearSelect) {
-    wrestlingShowYearSelect.addEventListener("change", () => {
-      updateWrestlingShowsFilter("year", wrestlingShowYearSelect.value);
+    wrestlingShowYearSelect.addEventListener("change", (event) => {
+      updateWrestlingShowsFilter("year", wrestlingShowYearSelect.value, event);
     });
   }
   if (wrestlingShowPromotionSelect) {
-    wrestlingShowPromotionSelect.addEventListener("change", () => {
-      updateWrestlingShowsFilter("promotion", wrestlingShowPromotionSelect.value);
+    wrestlingShowPromotionSelect.addEventListener("change", (event) => {
+      updateWrestlingShowsFilter("promotion", wrestlingShowPromotionSelect.value, event);
     });
   }
   if (wrestlingShowVenueSelect) {
-    wrestlingShowVenueSelect.addEventListener("change", () => {
-      updateWrestlingShowsFilter("venue", wrestlingShowVenueSelect.value);
+    wrestlingShowVenueSelect.addEventListener("change", (event) => {
+      updateWrestlingShowsFilter("venue", wrestlingShowVenueSelect.value, event);
     });
   }
   if (wrestlingShowFilterReset) {
@@ -19504,9 +19662,11 @@ function initWrestlingShowsArchive() {
       wrestlingShowSortSelect.append(option);
     }
     wrestlingShowSortSelect.value = activeWrestlingShowsSort;
-    wrestlingShowSortSelect.addEventListener("change", () => {
+    wrestlingShowSortSelect.addEventListener("change", (event) => {
+      const previous = activeWrestlingShowsSort;
       activeWrestlingShowsSort = wrestlingShowSortSelect.value === "oldest" ? "oldest" : "newest";
       renderWrestlingShowsArchive();
+      trackWrestlingFilterAnalytics(event, "shows", "sort", previous, activeWrestlingShowsSort, "newest");
     });
   }
 

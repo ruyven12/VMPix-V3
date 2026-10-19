@@ -4,6 +4,66 @@
    Extracted mechanically from router.js and shell.js; shell/router still own layout and route mounting.
    ========================================================= */
 
+// Search text and selections stay inside the module; only category/count summaries leave it.
+const musicArchiveComposing = new Set();
+let musicArchiveCompositionContext;
+function musicArchiveControlSnapshot(dataset) {
+  const normalize = value => String(value || "").trim().toLowerCase();
+  if (dataset === "bands") return { query: normalize(bandsSearchTerm), source: musicBandsIndexCollection, filters: {letter: activeBandsFilterLetter, region: activeBandsRegionFilter, status: activeBandsStatusFilter}, view: activeBandsView };
+  if (dataset === "shows") return { query: getMusicShowsSearchNeedle(activeMusicShowsSearch)?.phrase || "", source: musicShowsSetsCollection, filters: {year: activeMusicShowsYearFilter, state: activeMusicShowsStateFilter, venue: activeMusicShowsVenueFilter} };
+  if (dataset === "people") return { query: normalize(activeMusicPeopleSearch), source: musicPeopleIndexCollection, filters: {letter: activeMusicPeopleLetterFilter, category: activeMusicPeopleCategoryFilter, instrument: activeMusicPeopleInstrumentFilter} };
+  if (dataset === "venues") return { query: normalize(activeMusicVenueSearch), source: musicVenuesCollection, filters: {state: activeMusicVenueStateFilter, venue: activeMusicVenueSlugFilter, sort: activeMusicVenueSort} };
+  return null;
+}
+function beginMusicArchiveControl(event, dataset) {
+  try { return event instanceof Event && event.isTrusted ? musicArchiveControlSnapshot(dataset) : null; }
+  catch { return null; }
+}
+function musicArchiveSearchCount(dataset) {
+  if (getRouteFromUrl().name !== "music-" + dataset || v3RouteContext.pending) return null;
+  const forced = getForcedMockState({bands:"musicBands",shows:"musicShows",people:"musicPeople",venues:"musicVenues"}[dataset]);
+  if (forced && forced !== "partial") return null;
+  if (dataset === "bands") {
+    if (activeBandsView !== "search" || musicBandsIndex?.getAttribute("aria-hidden") === "true" || musicBandsIndex?.dataset.bandsDataState !== "live") return null;
+    return musicBandsIndex.hasAttribute("data-rhythm-source-index") ? bandsSearchResults.querySelectorAll(".rhythm-search-result").length : getVisibleBands().length;
+  }
+  if (dataset === "shows" && musicShowsSetsLoaded && ["live", "empty"].includes(musicShowsSetsDataState)) return getFilteredMusicShows().length;
+  if (dataset === "people" && musicPeopleIndexLoaded && ["live", "empty"].includes(musicPeopleIndexDataState)) return getFilteredMusicPeopleRows().length;
+  if (dataset === "venues" && musicVenuesLoaded && ["live", "empty"].includes(musicVenuesDataState)) return getFilteredMusicVenues().length;
+  return null;
+}
+function reportMusicArchiveControl(event, dataset, before, kind) {
+  try {
+    const api = window.V3Analytics;
+    if (!before) { musicArchiveComposing.delete(dataset); api?.cancelArchiveSearch?.(); return; }
+    if (musicArchiveCompositionContext !== v3RouteContext) {
+      musicArchiveComposing.clear(); musicArchiveCompositionContext = v3RouteContext;
+    }
+    const after = musicArchiveControlSnapshot(dataset);
+    if (!after) return;
+    if (kind === "search") {
+      if (event.isComposing) { musicArchiveComposing.add(dataset); api?.cancelArchiveSearch?.(); return; }
+      const completedComposition = musicArchiveComposing.delete(dataset);
+      if (!after.query) { api?.cancelArchiveSearch?.(); return; }
+      if (before.query === after.query && !completedComposition) return;
+      const context = v3RouteContext, filters = JSON.stringify(after.filters);
+      api?.archiveSearch?.(event, {archive: "music", dataset}, () => {
+        const current = musicArchiveControlSnapshot(dataset);
+        if (context !== v3RouteContext || current.source !== after.source || current.query !== after.query || current.view !== after.view || JSON.stringify(current.filters) !== filters) return null;
+        return musicArchiveSearchCount(dataset);
+      });
+      return;
+    }
+    musicArchiveComposing.delete(dataset);
+    api?.cancelArchiveSearch?.();
+    Object.keys(after.filters).forEach(key => {
+      if (before.filters[key] === after.filters[key]) return;
+      const selected = Boolean(after.filters[key]) && !(key === "sort" && after.filters[key] === "az");
+      api?.archiveFilter?.(event, {archive: "music", dataset, filter_key: key, selection_count: selected ? 1 : 0});
+    });
+  } catch { /* Optional measurements cannot interrupt the archive. */ }
+}
+
 // Optional measurements only: explicit user intent is separate from rendering/restoration.
 // Raw backend image keys are retained privately, never recovered from DOM IDs or image URLs.
 const archiveAnalyticsTileIds = new WeakMap();
@@ -3067,10 +3127,12 @@ function sortMusicVenueRows(rows) {
   return sortedRows.sort(sortByName);
 }
 
-function updateMusicVenuesFilter(filterName, value) {
+function updateMusicVenuesFilter(filterName, value, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "venues");
   if (filterName === "search") {
     activeMusicVenueSearch = String(value || "");
     renderMusicVenuesResults();
+    reportMusicArchiveControl(event, "venues", analyticsBefore, "search");
     return;
   } else if (filterName === "state") {
     activeMusicVenueStateFilter = normalizeMusicVenueState(value);
@@ -3083,14 +3145,17 @@ function updateMusicVenuesFilter(filterName, value) {
     activeMusicVenueSort = musicVenueSortOptions.some((option) => option.value === value) ? value : "az";
   }
   renderMusicVenuesResults();
+  reportMusicArchiveControl(event, "venues", analyticsBefore, "filter");
 }
 
-function resetMusicVenuesFilters() {
+function resetMusicVenuesFilters(event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "venues");
   activeMusicVenueSearch = "";
   activeMusicVenueStateFilter = "";
   activeMusicVenueSlugFilter = "";
   activeMusicVenueSort = "az";
   renderMusicVenuesArchive();
+  reportMusicArchiveControl(event, "venues", analyticsBefore, "filter");
 }
 
 function createMusicVenuesFilterField(labelText, fieldName, options, activeValue, allLabel = "") {
@@ -3119,8 +3184,8 @@ function createMusicVenuesFilterField(labelText, fieldName, options, activeValue
     select.append(optionElement);
   });
   select.value = activeValue;
-  select.addEventListener("change", () => {
-    updateMusicVenuesFilter(fieldName, select.value);
+  select.addEventListener("change", (event) => {
+    updateMusicVenuesFilter(fieldName, select.value, event);
   });
 
   label.append(labelSpan, select);
@@ -3144,8 +3209,8 @@ function createMusicVenuesFilters(rows) {
   searchInput.placeholder = "Search name or city";
   searchInput.value = activeMusicVenueSearch;
   searchInput.dataset.musicVenuesFilter = "search";
-  searchInput.addEventListener("input", () => {
-    updateMusicVenuesFilter("search", searchInput.value);
+  searchInput.addEventListener("input", (event) => {
+    updateMusicVenuesFilter("search", searchInput.value, event);
   });
   searchLabel.append(searchText, searchInput);
 
@@ -4436,11 +4501,24 @@ function renderVenueArtistsPanel(panel, artists, card) {
   grid.className = "venue-artists-grid";
   grid.setAttribute("role", "list");
 
-  searchInput.addEventListener("input", () => {
+  let analyticsQuery = searchInput.value.trim().toLowerCase(), analyticsComposing = false;
+  searchInput.addEventListener("input", (event) => {
     if (card) {
       card._venueArtistSearch = searchInput.value;
     }
     updateVenueArtistsGrid(grid, venueArtists, searchInput.value);
+    try {
+      const query = searchInput.value.trim().toLowerCase();
+      const previous = analyticsQuery, completedComposition = analyticsComposing && !event.isComposing;
+      analyticsQuery = query; analyticsComposing = event.isComposing;
+      if (!event.isTrusted || event.isComposing || !query) { window.V3Analytics?.cancelArchiveSearch?.(); return; }
+      if (query === previous && !completedComposition) return;
+      const context = v3RouteContext, source = musicShowsSetsCollection;
+      window.V3Analytics?.archiveSearch?.(event, {archive: "music", dataset: "bands"}, () => {
+        if (context !== v3RouteContext || source !== musicShowsSetsCollection || !grid.isConnected || grid.closest('[hidden], [inert], [aria-hidden="true"]') || searchInput.value.trim().toLowerCase() !== query || musicShowsSetsDataState !== "live") return null;
+        return venueArtists.filter(artist => artist.name.toLowerCase().includes(query)).length;
+      });
+    } catch { /* Optional measurements cannot interrupt search. */ }
   });
 
   inner.append(summary, searchLabel, grid);
@@ -8597,13 +8675,15 @@ function renderBandsLetterNavs(rows) {
       allButton.disabled = rows.length === 0;
       allButton.setAttribute("aria-pressed", String(isRadarNav ? !activeBandsLetter : !activeBandsFilterLetter));
       allButton.setAttribute("aria-label", `${rows.length} total band signals`);
-      allButton.addEventListener("click", () => {
+      allButton.addEventListener("click", (event) => {
+        const analyticsBefore = beginMusicArchiveControl(event, "bands");
         if (isRadarNav) {
           activeBandsLetter = "";
         } else {
           activeBandsFilterLetter = "";
         }
         syncBandsIndex();
+        reportMusicArchiveControl(event, "bands", analyticsBefore, "filter");
         const listScroller = getBandsListScroller();
         if (!isRadarNav && listScroller) {
           listScroller.scrollTo({
@@ -8627,11 +8707,11 @@ function renderBandsLetterNavs(rows) {
       button.disabled = count === 0;
       button.setAttribute("aria-pressed", String(isListNav ? activeBandsFilterLetter === letter : letter === activeBandsLetter));
       button.setAttribute("aria-label", count > 0 ? `${letter}, ${count} band signals` : `${letter}, no band signals`);
-      button.addEventListener("click", () => {
+      button.addEventListener("click", (event) => {
         setBandsLetter(letter, {
           shouldFilterList: isListNav,
           shouldOpenList: false,
-        });
+        }, event);
       });
       fragment.append(button);
     });
@@ -9210,7 +9290,8 @@ function syncBandsIndex() {
   updateBandsStatus(rows);
 }
 
-function setBandsLetter(letter, options = {}) {
+function setBandsLetter(letter, options = {}, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "bands");
   if (!bandsAlphabet.includes(letter)) {
     return;
   }
@@ -9226,6 +9307,7 @@ function setBandsLetter(letter, options = {}) {
   }
 
   syncBandsIndex();
+  reportMusicArchiveControl(event, "bands", analyticsBefore, "filter");
 }
 
 function setBandsView(viewName, shouldFocus = false, options = {}) {
@@ -9286,9 +9368,11 @@ function setBandsView(viewName, shouldFocus = false, options = {}) {
   }
 }
 
-function setBandsSearchTerm(value) {
+function setBandsSearchTerm(value, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "bands");
   bandsSearchTerm = musicBandsIndex?.hasAttribute("data-rhythm-source-index") ? value : value.trim();
   syncBandsIndex();
+  reportMusicArchiveControl(event, "bands", analyticsBefore, "search");
 }
 
 function scrollActiveBandsResultsToTop() {
@@ -9302,7 +9386,8 @@ function scrollActiveBandsResultsToTop() {
   });
 }
 
-function setBandsFilterValue(filterType, value) {
+function setBandsFilterValue(filterType, value, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "bands");
   if (filterType === "letter") {
     activeBandsFilterLetter = normalizeBandsLetterFilter(value);
     if (activeBandsFilterLetter) {
@@ -9316,14 +9401,17 @@ function setBandsFilterValue(filterType, value) {
 
   syncBandsIndex();
   scrollActiveBandsResultsToTop();
+  reportMusicArchiveControl(event, "bands", analyticsBefore, "filter");
 }
 
-function clearBandsPanelFilters() {
+function clearBandsPanelFilters(event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "bands");
   activeBandsFilterLetter = "";
   activeBandsRegionFilter = "";
   activeBandsStatusFilter = "";
   syncBandsIndex();
   scrollActiveBandsResultsToTop();
+  reportMusicArchiveControl(event, "bands", analyticsBefore, "filter");
 }
 
 function returnToBandsRadar() {
@@ -11758,8 +11846,8 @@ function createMusicPeopleFilterField(labelText, fieldName, options, activeValue
     select.append(option);
   });
   select.value = activeValue;
-  select.addEventListener("change", () => {
-    updateMusicPeopleFilter(fieldName, select.value);
+  select.addEventListener("change", (event) => {
+    updateMusicPeopleFilter(fieldName, select.value, event);
   });
 
   label.append(labelSpan, select);
@@ -11791,8 +11879,8 @@ function createMusicPeopleFilters(rows) {
   searchInput.placeholder = "Search name, category, alias, band, instrument";
   searchInput.value = activeMusicPeopleSearch;
   searchInput.dataset.musicPeopleFilter = "search";
-  searchInput.addEventListener("input", () => {
-    updateMusicPeopleFilter("search", searchInput.value);
+  searchInput.addEventListener("input", (event) => {
+    updateMusicPeopleFilter("search", searchInput.value, event);
   });
   searchLabel.append(searchText, searchInput);
 
@@ -11853,7 +11941,8 @@ function restoreMusicPeopleFilterFocus(focusMeta) {
   });
 }
 
-function updateMusicPeopleFilter(filterName, value) {
+function updateMusicPeopleFilter(filterName, value, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "people");
   const nextValue = getMusicPeopleText(value);
   if (filterName === "search") {
     activeMusicPeopleSearch = nextValue;
@@ -11865,14 +11954,17 @@ function updateMusicPeopleFilter(filterName, value) {
     activeMusicPeopleInstrumentFilter = nextValue;
   }
   renderMusicPeopleIndex();
+  reportMusicArchiveControl(event, "people", analyticsBefore, filterName === "search" ? "search" : "filter");
 }
 
-function resetMusicPeopleFilters() {
+function resetMusicPeopleFilters(event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "people");
   activeMusicPeopleSearch = "";
   activeMusicPeopleLetterFilter = "";
   activeMusicPeopleCategoryFilter = "";
   activeMusicPeopleInstrumentFilter = "";
   renderMusicPeopleIndex();
+  reportMusicArchiveControl(event, "people", analyticsBefore, "filter");
 }
 
 function createMusicPeopleEmptyState(hasPublicRows = true) {
@@ -12516,14 +12608,17 @@ function getFilteredMusicShows() {
   });
 }
 
-function updateMusicShowsFilter(filterName, value) {
+function updateMusicShowsFilter(filterName, value, event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "shows");
   if (filterName === "search") {
     const nextValue = String(value ?? "");
     if (nextValue === activeMusicShowsSearch) {
+      reportMusicArchiveControl(event, "shows", analyticsBefore, "search");
       return;
     }
     activeMusicShowsSearch = nextValue;
     scheduleMusicShowsArchiveRender();
+    reportMusicArchiveControl(event, "shows", analyticsBefore, "search");
     return;
   }
 
@@ -12547,14 +12642,17 @@ function updateMusicShowsFilter(filterName, value) {
     return;
   }
   renderMusicShowsArchiveImmediately();
+  reportMusicArchiveControl(event, "shows", analyticsBefore, "filter");
 }
 
-function resetMusicShowsFilters() {
+function resetMusicShowsFilters(event = null) {
+  const analyticsBefore = beginMusicArchiveControl(event, "shows");
   activeMusicShowsSearch = "";
   activeMusicShowsYearFilter = "";
   activeMusicShowsStateFilter = "";
   activeMusicShowsVenueFilter = "";
   renderMusicShowsArchiveImmediately();
+  reportMusicArchiveControl(event, "shows", analyticsBefore, "filter");
 }
 
 function createMusicShowsState(stateName, stateCopy = musicShowsStateCopy[stateName] || musicShowsStateCopy.empty) {
@@ -12619,8 +12717,8 @@ function createMusicShowsFilterField(labelText, fieldName, options, activeValue)
     select.append(option);
   });
   select.value = activeValue;
-  select.addEventListener("change", () => {
-    updateMusicShowsFilter(fieldName, select.value);
+  select.addEventListener("change", (event) => {
+    updateMusicShowsFilter(fieldName, select.value, event);
   });
 
   label.append(labelSpan, select);
@@ -12645,8 +12743,8 @@ function createMusicShowsFilters(rows) {
   searchInput.placeholder = "Search name, venue, city, state";
   searchInput.value = activeMusicShowsSearch;
   searchInput.dataset.musicShowsFilter = "search";
-  searchInput.addEventListener("input", () => {
-    updateMusicShowsFilter("search", searchInput.value);
+  searchInput.addEventListener("input", (event) => {
+    updateMusicShowsFilter("search", searchInput.value, event);
   });
   searchLabel.append(searchText, searchInput);
 
@@ -14967,18 +15065,20 @@ function initMusicModule() {
   });
   if (bandsSearchInput) {
     bandsSearchInput.addEventListener("input", (event) => {
-      setBandsSearchTerm(event.currentTarget.value);
+      setBandsSearchTerm(event.currentTarget.value, event);
     });
   }
   bandsSearchChips.forEach((chip) => {
-    chip.addEventListener("click", () => {
+    chip.addEventListener("click", (event) => {
+      const analyticsBefore = beginMusicArchiveControl(event, "bands");
       setBandsSearchTerm(chip.dataset.bandsSearchTerm || "");
       setBandsView("search", true, { shouldRoute: true });
+      reportMusicArchiveControl(event, "bands", analyticsBefore, "search");
     });
   });
   bandsFilterSelects.forEach((select) => {
     select.addEventListener("change", (event) => {
-      setBandsFilterValue(event.currentTarget.dataset.bandsFilter, event.currentTarget.value);
+      setBandsFilterValue(event.currentTarget.dataset.bandsFilter, event.currentTarget.value, event);
     });
   });
   bandsFilterResetButtons.forEach((button) => {
