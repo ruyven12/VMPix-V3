@@ -14561,7 +14561,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   z-index: 9;
   display: block;
   width: min(18rem, calc(100vw - max(12px, env(safe-area-inset-left)) - max(12px, env(safe-area-inset-right))));
-  height: var(--shell-menu-height, 268px);
+  height: var(--shell-menu-height, 312px);
   max-height: calc(100vh - max(12px, env(safe-area-inset-top)) - max(12px, env(safe-area-inset-bottom)) - 44px);
   max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - max(12px, env(safe-area-inset-bottom)) - 44px);
   transform-origin: calc(100% - var(--shell-menu-point)) 100%;
@@ -14594,12 +14594,14 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 .shell-menu-preview__rows {
   position: relative;
   display: grid;
-  grid-template-rows: repeat(3, minmax(36px, 1fr)) minmax(36px, 1fr);
+  grid-template-rows: repeat(3, minmax(36px, 1fr)) repeat(2, minmax(44px, 1fr));
   height: calc(100% - 42px);
   margin: 0;
   padding: 18px 24px 16px;
   list-style: none;
-  pointer-events: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
 }
 .shell-menu-preview__row {
   display: flex;
@@ -14623,7 +14625,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   }
 }
 @media (min-width: 64rem) {
-  .site-shell .shell-menu-preview { --shell-menu-height: calc(240px - env(safe-area-inset-bottom, 0px)); }
+  .site-shell .shell-menu-preview { --shell-menu-height: calc(296px - env(safe-area-inset-bottom, 0px)); }
   .shell-menu-preview__rows { padding-block: 12px 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -14768,17 +14770,20 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   outline: 2px solid #f1d9e1;
   outline-offset: 3px;
 }
-.shell-menu-preview__admin-link {
+.shell-menu-preview__admin-link,
+.shell-menu-preview__action {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 44px;
   width: 100%;
   color: inherit;
   font: inherit;
   text-decoration: none;
   pointer-events: auto;
 }
-.shell-menu-preview__admin-link:focus-visible { outline: 1px solid #e5ecf6; outline-offset: 3px; }
+.shell-menu-preview__action { padding: 0; border: 0; background: none; text-align: start; cursor: pointer; }
+.shell-menu-preview__action:focus-visible,
+.shell-menu-preview__admin-link:focus-visible { outline: 1px solid #e5ecf6; outline-offset: -3px; }
 
 /* Admin 1G: center panel contents and exclude the identified legacy footer. */
 .site-shell[data-shell-route="admin"] {

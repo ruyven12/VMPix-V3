@@ -22,6 +22,7 @@
   let expiryTimer = 0, unpersistedDenial = false, storageWritable = false;
   let campaigns = Object.freeze({}), entryReferrer = "", wantPreferences = false, wantPreferencesFocus = false, ui = null;
   let lastConsent = null, currentPageReferrer = "";
+  let preferencesReturnTarget = null;
   let permissionStamp = "", permissionRevision = 0;
   const interactionTickets = new WeakMap();
   window[`ga-disable-${MEASUREMENT_ID}`] = true;
@@ -326,19 +327,42 @@
       storageAvailable = false; storageWritable = false; unpersistedDenial = analyticsStorage === "denied";
       if (analyticsStorage === "denied") { try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* The visit-only message remains truthful. */ } }
     }
-    schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) ui.revise.focus({ preventScroll: true });
+    schedulePreferenceExpiry(); publishConsent(); renderChoice(); sendCurrent(); if (fromPrompt) focusChoiceControl();
   }
   function privacyPageNow() { return /^\/privacy\/?$/.test(window.location.pathname); }
-  function closePreferences(shouldFocus = true) { wantPreferences = false; wantPreferencesFocus = false; if (!ui) return; ui.preferences.hidden = true; renderChoice(); if (shouldFocus !== false) (privacyPageNow() ? document.querySelector("[data-privacy-open-preferences]") : preference ? ui.revise : ui.open)?.focus({ preventScroll: true }); }
-  function preferences(shouldFocus = false) { publishConsent(); wantPreferences = true; wantPreferencesFocus ||= shouldFocus; if (!uiReady) return; ui.root.hidden = false; ui.preferences.hidden = false; ui.prompt.hidden = true; ui.revise.setAttribute("aria-expanded", "true"); ui.checkbox.checked = preference?.analyticsStorage === "granted"; if (wantPreferencesFocus) ui.checkbox.focus({ preventScroll: true }); wantPreferencesFocus = false; }
+  function focusChoiceControl() {
+    const candidates = [preferencesReturnTarget, privacyPageNow() ? document.querySelector("[data-privacy-open-preferences]") : null,
+      document.querySelector("[data-shell-menu-toggle]"), !preference ? ui?.open : null];
+    const target = candidates.find(node => node?.isConnected && !node.hidden && !node.disabled && !node.closest('[hidden], [inert], [aria-hidden="true"]'));
+    if (target) target.focus({ preventScroll: true });
+    else if (ui?.root.contains(document.activeElement)) document.activeElement?.blur();
+  }
+  function closePreferences(shouldFocus = true) {
+    wantPreferences = false; wantPreferencesFocus = false;
+    if (!ui) return;
+    ui.preferences.hidden = true; renderChoice();
+    if (shouldFocus !== false) focusChoiceControl();
+    preferencesReturnTarget = null;
+  }
+  function preferences(shouldFocus = false) {
+    publishConsent();
+    if (!wantPreferences && shouldFocus) preferencesReturnTarget = document.activeElement;
+    wantPreferences = true; wantPreferencesFocus ||= shouldFocus;
+    if (!uiReady) return;
+    ui.root.hidden = false; ui.preferences.hidden = false; ui.prompt.hidden = true;
+    renderChoice();
+    if (wantPreferencesFocus) ui.checkbox.focus({ preventScroll: true });
+    wantPreferencesFocus = false;
+  }
   function renderChoice() {
     if (!ui) return;
     const editing = !ui.preferences.hidden;
     ui.checkbox.checked = preference?.analyticsStorage === "granted";
-    ui.root.hidden = privacyPageNow() && !editing;
+    ui.root.hidden = (privacyPageNow() || Boolean(preference)) && !editing;
     ui.prompt.hidden = Boolean(preference) || editing;
-    ui.revise.hidden = !preference && !editing;
-    ui.revise.setAttribute("aria-expanded", String(editing));
+    ui.menuChoice?.setAttribute("aria-expanded", String(editing));
+    ui.pageChoice?.setAttribute("aria-expanded", String(editing));
+    ui.open.setAttribute("aria-expanded", String(editing));
     ui.status.textContent = !REVIEWED_ACTIVATION ? "Analytics is off pending review. You can save a draft choice." : "Optional Analytics measures visits, gallery opens, photo views and download-button clicks only if you accept. Reject keeps it off. Advertising stays off.";
     ui.notice.textContent = !REVIEWED_ACTIVATION ? "This choice applies to the draft notice. A new choice will be needed before live Analytics starts." : "Accept lets Google Analytics measure visits, gallery opens, photo views and download-button clicks. Reject and withdrawal stop new website analytics events.";
     ui.withdraw.hidden = preference?.analyticsStorage !== "granted";
@@ -347,11 +371,11 @@
   }
   function buildPrivacyUI() {
     const root = element("aside", "", document.body); root.className = "v3-privacy"; root.setAttribute("data-v3-privacy", ""); root.setAttribute("aria-label", "Analytics choices");
-    const revise = button("Analytics choices", root, "revise", () => preferences(true)); revise.setAttribute("aria-controls", "v3-privacy-preferences");
     const prompt = element("section", "", root); element("h2", "Analytics choices", prompt);
     const status = element("p", "", prompt, "status");
     const actions = element("div", "", prompt); actions.className = "v3-privacy__actions";
     button("Accept", actions, "accept", () => saveChoice("granted")); button("Reject", actions, "reject", () => saveChoice("denied")); const open = button("Preferences", actions, "preferences", () => preferences(true));
+    open.setAttribute("aria-controls", "v3-privacy-preferences"); open.setAttribute("aria-expanded", "false");
     const prefs = element("section", "", root); prefs.id = "v3-privacy-preferences"; prefs.hidden = true; element("h2", "Analytics preference", prefs);
     const notice = element("p", "", prefs, "notice");
     const policy = element("a", "Read our privacy policy", prefs, "policy"); policy.href = "/privacy";
@@ -363,7 +387,8 @@
     const withdraw = button("Withdraw consent", prefActions, "withdraw", () => { saveChoice("denied"); closePreferences(); });
     button("Close", prefActions, "close", closePreferences);
     root.addEventListener("keydown", event => { if (event.key === "Escape" && !prefs.hidden) { event.preventDefault(); closePreferences(); } });
-    ui = { root, prompt, status, notice, preferences: prefs, checkbox, saved, revise, open, withdraw }; uiReady = true; renderChoice(); if (wantPreferences) preferences(); sendCurrent();
+    ui = { root, prompt, status, notice, preferences: prefs, checkbox, saved, open, withdraw,
+      menuChoice: document.querySelector("[data-shell-menu-analytics]"), pageChoice: document.querySelector("[data-privacy-open-preferences]") }; uiReady = true; renderChoice(); if (wantPreferences) preferences(); sendCurrent();
   }
   function loadPrivacyStyles() {
     const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "/css/analytics.css";

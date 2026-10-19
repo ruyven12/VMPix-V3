@@ -796,11 +796,20 @@ function handleShellMenuAdmin(event) {
   navigateToRoute(routePaths.admin);
 }
 
+function handleShellMenuAnalytics(event) {
+  if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.hidden || shellMenuPanel.inert || event.defaultPrevented) return;
+  setShellMenuOpen(false);
+  // The menu row becomes inert on close; preferences return to the available Emitter.
+  portfolioRightEmitter.focus({ preventScroll: true });
+  try { window.V3Analytics?.preferences(); } catch { /* Consent remains available through the Privacy page. */ }
+}
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
   shellMenuPanel.querySelector("[data-shell-menu-admin]")?.addEventListener("click", handleShellMenuAdmin);
+  shellMenuPanel.querySelector("[data-shell-menu-analytics]")?.addEventListener("click", handleShellMenuAnalytics);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
   window.addEventListener("keydown", handleShellMenuEscape);
