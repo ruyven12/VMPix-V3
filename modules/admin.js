@@ -2365,12 +2365,16 @@
   const integrityWarningTemplates = Object.freeze({"venuesMissingGps":"{count} venues missing GPS.","venuesMissingLogo":"{count} venues missing logo.","showsMissingPoster":"{count} shows missing poster.","peopleMissingBands":"{count} people missing bands.","bandsMissingStatus":"{count} bands missing status."});
   const integrityPanel = databasePanel?.querySelector("[data-admin-integrity]");
   const integrityButton = integrityPanel?.querySelector("[data-integrity-run]");
+  const integrityPossibleButton = integrityPanel?.querySelector("[data-integrity-possible-run]");
   const integrityProgress = integrityPanel?.querySelector("[data-integrity-progress]");
   const integrityChecked = integrityPanel?.querySelector("[data-integrity-checked]");
   const integrityArchives = new Map(["music", "wrestling"].map(section => [section, integrityPanel?.querySelector(`[data-integrity-archive="${section}"]`)]));
   let integrityGeneration = 0, integrityRun = null, integrityResult = emptyIntegrityResult(), wrestlingIntegrityResult = emptyIntegrityResult(), integrityLastChecked = null;
   const integrityDuplicateResults = new Map(["music", "wrestling"].map(archive => [archive, emptyIntegrityResult()]));
   const integrityDuplicateRendered = new Map();
+  const integrityPossibleResults = new Map(["music", "wrestling"].map(archive => [archive, { ...emptyIntegrityResult(), attempted: false }]));
+  const integrityPossibleRendered = new Map();
+  let integrityLastOperation = null;
   function emptyIntegrityResult() { return { state: "Unavailable", reason: "No integrity report has loaded.", report: null, stale: false, http: null }; }
   function integrityAllowed() {
     return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
@@ -2380,6 +2384,7 @@
     if (!integrityButton) return;
     integrityButton.disabled = !integrityAllowed() || integrityRun !== null;
     integrityButton.setAttribute("aria-busy", String(integrityRun !== null));
+    if (integrityPossibleButton) { integrityPossibleButton.disabled = !integrityAllowed() || integrityRun !== null; integrityPossibleButton.setAttribute("aria-busy", String(integrityRun?.kind === "possible")); }
   }
   function safeIntegrityValue(value) {
     const scrub = scrubQueryResponse(value), safe = sanitizeDiagnosticResponse(scrub.data, bearer);
@@ -2600,9 +2605,9 @@
       state: error ? "Error" : positive || data.state === "Warning" ? "Warning" : unknown || data.state === "Unavailable" ? "Unavailable" : data.warnings.length ? "Warning" : "Healthy",
       reason: positive ? "Exact raw identifier matches require review; no records were changed." : error ? "Some identifier checks could not be completed." : unknown || data.state === "Unavailable" ? "Some identifier checks are unavailable; unknown counts are not zero." : data.warnings.length || data.state === "Warning" ? "Source warnings require review." : "The supported complete identifier checks returned zero duplicate groups." };
   }
-  function integrityArchivePresentation(missing, exact) {
-    const states = [missing.state, exact.state], state = ["Checking", "Error", "Warning", "Unavailable"].find(value => states.includes(value)) || (states.every(value => value === "Healthy") ? "Healthy" : "Unavailable");
-    return { state, text: `Missing Data — ${integrityHistoricalLabel(missing.state, missing.stale)}: ${missing.reason} Exact identifiers — ${integrityHistoricalLabel(exact.state, exact.stale)}.` };
+  function integrityArchivePresentation(missing, exact, possible) {
+    const states = [missing.state, exact.state, ...(possible ? [possible.state] : [])], state = ["Checking", "Error", "Warning", "Unavailable"].find(value => states.includes(value)) || (states.every(value => value === "Healthy") ? "Healthy" : "Unavailable");
+    return { state, text: `Missing Data — ${integrityHistoricalLabel(missing.state, missing.stale)}: ${missing.reason} Exact identifiers — ${integrityHistoricalLabel(exact.state, exact.stale)}.${possible ? ` Possible matches — ${possible.attempted || possible.report || possible.state === "Checking" ?  integrityHistoricalLabel(possible.state, possible.stale) : "Not checked (separate manual action)"}.` : ""}` };
   }
   function duplicateDisplayValue(value, field, truncated) {
     const text = value === null ? "NULL" : value === "" ? "Empty string" : typeof value === "string" && !value.trim() ? "Whitespace only" : field === "date" && parseAdminTimestamp(value) ? formatAdminDateTime(value) : String(value);
@@ -2657,8 +2662,7 @@
     if (report?.checkedAt) checked.dateTime = report.checkedAt; else checked.removeAttribute("datetime");
     exact.querySelector("[data-integrity-total]").textContent = summary;
     exact.querySelector("[data-integrity-empty]").textContent = report ? `${result.reason} At most 10 groups per archive and two records per group are available. Comparisons are not full-record or full-group audits.` : "Run Check All Integrity to request the supported exact identifier checks. No checks run when this section opens.";
-    possible.querySelector("[data-integrity-total]").textContent = "Unavailable";
-    possible.querySelector("[data-integrity-empty]").textContent = "Possible or name-only matching is not implemented. No fuzzy matching request is made.";
+    renderIntegrityPossible(archive, section);
     if (integrityDuplicateRendered.get(section) !== report) { renderIntegrityDuplicateReport(exact.querySelector("[data-integrity-findings]"), report); integrityDuplicateRendered.set(section, report); }
     for (const check of report?.checks || []) {
       const entry = exact.querySelector(`[data-integrity-exact-check="${check.collection}"]`); if (!entry) continue;
@@ -2691,6 +2695,211 @@
       else if (!controller.signal.aborted && http !== null) { next.state = "Error"; next.reason = "The exact identifier response could not be read."; }
     } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
     return { ...next, http, checkedAt: new Date().toISOString() };
+  }
+  const integrityPossibleSpecs = Object.freeze({
+    music: Object.freeze([
+      { collection: "bands", label: "Bands", rule: "bands_name_location", criterion: "band_id", name: "band", fields: ["id", "band_id", "band", "location", "state", "country", "region", "status"] },
+      { collection: "shows", label: "Shows", rule: "shows_name_date_venue", criterion: "show_id", name: "name", fields: ["id", "show_id", "name", "show_date", "venue_id", "venue", "city", "state"] },
+      { collection: "people", label: "People", rule: "people_name_category_context", criterion: "person_id", name: "name", fields: ["id", "person_id", "name", "category", "aliases", "bands"] },
+      { collection: "venues", label: "Venues", rule: "venues_name_location", criterion: "venue_key", name: "venue", fields: ["id", "venue_key", "venue", "city", "state", "country", "latitude", "longitude"] }
+    ]),
+    wrestling: Object.freeze([
+      { collection: "shows", label: "Shows", rule: "shows_name_date_venue", criterion: "show_key", name: "show_name", fields: ["id", "show_key", "show_name", "show_date", "promotion", "venue_id", "venue", "city"] },
+      { collection: "people", label: "People", rule: "people_name_category_context", criterion: "slug", name: "name", fields: ["id", "slug", "name", "category", "aliases", "teams"] },
+      { collection: "venues", label: "Venues", rule: "venues_name_location", criterion: "venue_id", name: "venue_name", fields: ["id", "venue_id", "venue_name", "city", "state", "country", "latitude", "longitude"] }
+    ])
+  });
+  const possibleProofKeys = Object.freeze(["canonicalId", "name", "aliases", "contexts", "category", "location", "city", "state", "country", "showDate", "venueId", "promotion"]);
+  function integrityPossiblePath(archive) { return `/api/admin/diagnostics/${archive}/possible-duplicates`; }
+  function normalizePossibleText(value) { return typeof value === "string" ? value.trim().replace(/\s+/gu, " ").toLowerCase() : ""; }
+  function possiblePublicProjection(value) {
+    if (value === null) return { value: null, truncated: false };
+    let text = "", bytes = 2;
+    for (const character of value) {
+      const code = character.codePointAt(0), extra = code === 34 || code === 92 || [8, 9, 10, 12, 13].includes(code) ? 2 : code < 32 || code >= 0xd800 && code <= 0xdfff ? 6 : code < 128 ? 1 : code < 2048 ? 2 : code < 65536 ? 3 : 4;
+      if (text.length + character.length > 160 || bytes + extra > 160) break;
+      text += character; bytes += extra;
+    }
+    return { value: text, truncated: text !== value };
+  }
+  function possibleEvidence(records, spec, archive) {
+    const [a, b] = records.map(record => record.matchingData), nameA = normalizePossibleText(a.name), nameB = normalizePossibleText(b.name);
+    const shared = (left, right) => [...new Set(left.map(normalizePossibleText).filter(Boolean))].filter(value => right.map(normalizePossibleText).includes(value)).sort()[0];
+    const primary = nameA && nameA === nameB, name = primary ? nameA : spec.rule === "people_name_category_context" ? shared([a.name, ...a.aliases], [b.name, ...b.aliases]) : null;
+    if (!name) return null;
+    const evidence = [{ field: "name", kind: primary ? "Normalized name" : "Alias overlap", value: name }];
+    const normalized = field => { const value = normalizePossibleText(a[field]); if (!value || value !== normalizePossibleText(b[field])) return false; evidence.push({ field, kind: "Normalized equality", value }); return true; };
+    if (spec.rule === "bands_name_location") { if (!["location", "state", "country"].every(normalized)) return null; }
+    else if (spec.rule === "venues_name_location") { if (!["city", "state", "country"].every(normalized)) return null; }
+    else if (spec.rule === "shows_name_date_venue") {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(a.showDate || "") || Number(a.showDate.slice(0, 4)) < 1 || !parseAdminTimestamp(`${a.showDate}T00:00:00Z`) || a.showDate !== b.showDate || !a.venueId?.trim() || a.venueId !== b.venueId) return null;
+      evidence.push({ field: "showDate", kind: "Exact equality", value: a.showDate }, { field: "venueId", kind: "Exact equality", value: a.venueId });
+      if (archive === "wrestling" && !normalized("promotion")) return null;
+    } else if (spec.rule === "people_name_category_context") {
+      const context = shared(a.contexts, b.contexts); if (!normalized("category") || !context) return null;
+      evidence.push({ field: "context", kind: "Normalized equality", value: context });
+    } else return null;
+    return evidence;
+  }
+  function validatePossibleRecord(record, spec, archive) {
+    const text = value => typeof value === "string" && value.length <= 160;
+    const proofText = value => text(value) && normalizePossibleText(value) !== "" && new TextEncoder().encode(JSON.stringify(value)).byteLength <= 160 && normalizePossibleText(value).length <= 160 && new TextEncoder().encode(JSON.stringify(normalizePossibleText(value))).byteLength <= 160;
+    if (!diagnosticObject(record) || Object.keys(record).some(key => !["id", "name", "fields", "truncatedFields", "matchingData"].includes(key)) || !text(record.id) ||
+      !(record.name === null || text(record.name)) || !diagnosticObject(record.fields) || Object.keys(record.fields).length !== spec.fields.length || !spec.fields.every(field => record.fields[field] === null || text(record.fields[field])) ||
+      record.id !== record.fields.id || !proofText(record.id) || record.name !== record.fields[spec.name] || !Array.isArray(record.truncatedFields) || new Set(record.truncatedFields).size !== record.truncatedFields.length || !record.truncatedFields.every(field => spec.fields.includes(field))) return false;
+    const proof = record.matchingData;
+    if (!diagnosticObject(proof) || Object.keys(proof).length !== possibleProofKeys.length || !possibleProofKeys.every(key => Object.prototype.hasOwnProperty.call(proof, key)) ||
+      !["aliases", "contexts"].every(key => Array.isArray(proof[key]) && proof[key].length <= 5 && proof[key].every(proofText)) ||
+      !possibleProofKeys.filter(key => !["aliases", "contexts"].includes(key)).every(key => proof[key] === null || proofText(proof[key])) || !proofText(proof.canonicalId) || !proofText(proof.name)) return false;
+    const used = ["canonicalId", "name"], mapped = [["canonicalId", spec.criterion], ["name", spec.name]];
+    if (spec.rule === "bands_name_location") { used.push("location", "state", "country"); mapped.push(...["location", "state", "country"].map(key => [key, key])); }
+    if (spec.rule === "venues_name_location") { used.push("city", "state", "country"); mapped.push(...["city", "state", "country"].map(key => [key, key])); }
+    if (spec.rule === "shows_name_date_venue") { used.push("showDate", "venueId"); mapped.push(["showDate", "show_date"], ["venueId", "venue_id"]); if (archive === "wrestling") { used.push("promotion"); mapped.push(["promotion", "promotion"]); } }
+    if (spec.rule === "people_name_category_context") { used.push("category", "aliases", "contexts"); mapped.push(["category", "category"]); }
+    if (possibleProofKeys.some(key => !used.includes(key) && (["aliases", "contexts"].includes(key) ? proof[key].length : proof[key] !== null))) return false;
+    const agrees = (value, field) => { const projected = possiblePublicProjection(value); return record.fields[field] === projected.value && record.truncatedFields.includes(field) === projected.truncated; };
+    if (spec.rule === "people_name_category_context") {
+      for (const [key, field] of [["aliases", "aliases"], ["contexts", archive === "music" ? "bands" : "teams"]]) {
+        if (record.fields[field] === null ? proof[key].length !== 0 || record.truncatedFields.includes(field) : !agrees(JSON.stringify(proof[key]), field)) return false;
+      }
+      if (new Set([proof.name, ...proof.aliases].map(normalizePossibleText)).size * new Set(proof.contexts.map(normalizePossibleText)).size > 16) return false;
+    }
+    return mapped.every(([key, field]) => agrees(proof[key], field));
+  }
+  function validateIntegrityPossibleEnvelope(data, archive) {
+    const specs = integrityPossibleSpecs[archive]; if (!specs) return false;
+    const nullableCount = value => value === null || diagnosticCount(value), text = value => typeof value === "string" && value.length <= 1024;
+    const time = value => value === null || typeof value === "number" && Number.isFinite(value) && value >= 0;
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== integrityPossiblePath(archive) || data.archive !== archive || data.source !== "postgres" || data.mode !== "manual" || !parseAdminTimestamp(data.generatedAt) ||
+      !diagnosticObject(data.database) || typeof data.database.connected !== "boolean" || !["Healthy", "Warning", "Error", "Unavailable"].includes(data.state) || !Array.isArray(data.checks) || data.checks.length !== specs.length ||
+      !Array.isArray(data.warnings) || data.warnings.length > 20 || !data.warnings.every(text) || !diagnosticObject(data.timings) || !time(data.timings.schemaMs) || !time(data.timings.totalMs) || !diagnosticObject(data.timings.collections) || !specs.every(spec => time(data.timings.collections[spec.collection]))) return false;
+    let remaining = 10;
+    for (let index = 0; index < specs.length; index++) {
+      const spec = specs[index], check = data.checks[index];
+      if (!diagnosticObject(check) || check.collection !== spec.collection || check.rule !== spec.rule || !text(check.meaning) || !["Healthy", "Warning", "Error", "Unavailable"].includes(check.state) ||
+        !nullableCount(check.count) || !diagnosticCount(check.sampleCount) || check.sampleCount > 5000 || !["scannedRows", "eligibleRows", "unassessedRows"].every(key => nullableCount(check[key]) && (check[key] === null || check[key] <= 2001)) ||
+        !diagnosticObject(check.coverage) || typeof check.coverage.complete !== "boolean" || check.coverage.limit !== 2000 || !text(check.coverage.reason) || !Array.isArray(check.groups) || check.groups.length !== Math.min(remaining, check.sampleCount)) return false;
+      if (check.scannedRows === null) { if (check.eligibleRows !== null || check.unassessedRows !== null || check.sampleCount || check.coverage.complete) return false; }
+      else if (check.eligibleRows === null || check.unassessedRows === null || check.eligibleRows + check.unassessedRows !== check.scannedRows || check.sampleCount > check.eligibleRows * (check.eligibleRows - 1) / 2) return false;
+      if (check.coverage.complete) {
+        if (!data.database.connected || check.scannedRows === null || check.scannedRows > 2000 || check.unassessedRows !== 0 || check.count !== check.sampleCount || check.state !== (check.sampleCount ? "Warning" : "Healthy")) return false;
+      } else if (check.count !== null || check.state === "Healthy" || check.sampleCount && check.state !== "Warning" || !check.sampleCount && !["Error", "Unavailable"].includes(check.state)) return false;
+      const pairs = new Set();
+      for (const group of check.groups) {
+        if (!diagnosticObject(group) || Object.keys(group).some(key => !["classification", "evidence", "records", "comparison"].includes(key)) || group.classification !== "Possible Match" || !Array.isArray(group.records) || group.records.length !== 2 || !group.records.every(record => validatePossibleRecord(record, spec, archive)) ||
+          group.records[0].id === group.records[1].id || group.records[0].matchingData.canonicalId === group.records[1].matchingData.canonicalId || !Array.isArray(group.evidence) || !Array.isArray(group.comparison) || group.comparison.length !== spec.fields.length) return false;
+        const pair = JSON.stringify(group.records.map(record => record.id).sort()); if (pairs.has(pair)) return false; pairs.add(pair);
+        const evidence = possibleEvidence(group.records, spec, archive);
+        if (!evidence || group.evidence.length !== evidence.length || !group.evidence.every((item, i) => diagnosticObject(item) && Object.keys(item).length === 3 && item.field === evidence[i].field && item.kind === evidence[i].kind && item.value === evidence[i].value)) return false;
+        const compared = new Set();
+        for (const comparison of group.comparison) {
+          if (!diagnosticObject(comparison) || !spec.fields.includes(comparison.field) || compared.has(comparison.field) || comparison.status !== duplicateComparisonStatus(group.records, comparison.field)) return false;
+          compared.add(comparison.field);
+        }
+      }
+      remaining -= check.groups.length;
+    }
+    if (archive === "wrestling" && (!diagnosticObject(data.coverage?.embeddedMatches) || data.coverage.embeddedMatches.state !== "Unavailable" || !text(data.coverage.embeddedMatches.reason))) return false;
+    return data.state !== "Healthy" || data.database.connected && data.checks.every(check => check.coverage.complete && check.state === "Healthy");
+  }
+  function projectIntegrityPossibleReport(data, archive) {
+    const technical = safeIntegrityValue(data);
+    const checks = integrityPossibleSpecs[archive].map(spec => {
+      const source = data.checks.find(check => check.collection === spec.collection), reason = safeIntegrityValue(source.coverage.reason);
+      let limited = reason.limited; const groups = [];
+      source.groups.forEach(group => {
+        // Display only the validated bounded projection; proof arrays stay in the separately bounded technical response.
+        const safe = safeIntegrityValue({ records: group.records.map(record => ({ id: record.id, name: record.name, fields: Object.fromEntries(spec.fields.map(field => [field, record.fields[field]])), truncatedFields: record.truncatedFields })), evidence: group.evidence });
+        const display = safe.data;
+        if (!diagnosticObject(display) || !Array.isArray(display.records) || display.records.length !== 2 || display.records.some(record => !diagnosticObject(record) || !diagnosticObject(record.fields)) || !Array.isArray(display.evidence)) { limited = true; return; }
+        const records = display.records.map(record => ({ id: typeof record.id === "string" ? record.id : null, name: typeof record.name === "string" ? record.name : null,
+          fields: Object.fromEntries(spec.fields.map(field => [field, typeof record.fields[field] === "string" || record.fields[field] === null ? record.fields[field] : "[Omitted by safety limits]"])), truncatedFields: Array.isArray(record.truncatedFields) ? record.truncatedFields.filter(field => spec.fields.includes(field)) : [] }));
+        const evidence = display.evidence.filter(item => diagnosticObject(item) && typeof item.field === "string" && typeof item.kind === "string" && typeof item.value === "string").map(item => ({ field: item.field, kind: item.kind, value: item.value }));
+        if (evidence.length !== group.evidence.length) { limited = true; return; }
+        const evidenceLimited = evidence.some((item, i) => item.value !== group.evidence[i].value || item.kind !== group.evidence[i].kind || item.field !== group.evidence[i].field);
+        limited ||= safe.limited || evidenceLimited;
+        groups.push({ classification: "Possible Match", records, evidence, evidenceLimited, comparison: group.comparison.map(item => ({ field: item.field, status: safe.limited || group.records.some((record, i) => records[i].fields[item.field] !== record.fields[item.field]) ? "Unknown" : item.status })) });
+      });
+      return { ...spec, count: source.count, sampleCount: source.sampleCount, scannedRows: source.scannedRows, eligibleRows: source.eligibleRows, unassessedRows: source.unassessedRows,
+        verified: source.coverage.complete && !limited, state: limited ? source.sampleCount ? "Warning" : source.state === "Error" ? "Error" : "Unavailable" : source.state,
+        reason: limited ? "Some displayed evidence is unavailable or redacted; candidate counts are reported source evidence." : typeof reason.data === "string" ? reason.data : "Coverage is unavailable or limited.", groups, limited };
+    });
+    const limited = checks.some(check => check.limited), positive = checks.some(check => check.sampleCount > 0), unknown = checks.some(check => !check.verified), error = data.state === "Error" || checks.some(check => check.state === "Error");
+    const embedded = archive === "wrestling" ? safeIntegrityValue(data.coverage.embeddedMatches.reason).data : null;
+    return { checks, limited, technicalLimited: technical.limited, technical: technical.text, generatedAt: data.generatedAt, checkedAt: null,
+      warnings: data.warnings.map(value => safeIntegrityValue(value).data).filter(value => typeof value === "string").slice(0, 20), embeddedReason: typeof embedded === "string" ? embedded : null,
+      state: error ? "Error" : positive || data.state === "Warning" ? "Warning" : unknown || data.state === "Unavailable" ? "Unavailable" : data.warnings.length ? "Warning" : "Healthy",
+      reason: positive ? "Possible match candidates require review; shared evidence does not confirm duplicate identities." : error ? "Some possible-match checks could not be completed." : unknown || data.state === "Unavailable" ? "Coverage is incomplete or unavailable; unassessed records are not a healthy zero." : data.warnings.length || data.state === "Warning" ? "Source warnings require review." : "No candidates were found within the complete supported matching rules." };
+  }
+  function renderIntegrityPossibleReport(list, report) {
+    const open = new Set([...list.querySelectorAll("details[open][data-integrity-possible-check]")].map(node => node.dataset.integrityPossibleCheck));
+    const openPairs = new Set([...list.querySelectorAll("details[open][data-integrity-possible-group]")].map(node => node.dataset.integrityPossibleGroup));
+    list.replaceChildren(); if (!report) return;
+    report.checks.forEach(check => {
+      const category = document.createElement("details"); category.className = "admin-integrity__technical"; category.dataset.integrityPossibleCheck = check.collection; category.open = open.has(check.collection);
+      integrityText(category, "summary", `${check.label} · ${check.count === null ? `${check.sampleCount} known candidate pairs · Incomplete coverage` : `${check.count} candidate pairs`}`);
+      integrityText(category, "p", `${check.state}: ${check.reason}`).setAttribute("data-integrity-possible-state", "");
+      integrityText(category, "p", check.verified ? "Verified bounded matching coverage." : "Coverage is unavailable or limited.").setAttribute("data-integrity-possible-verification", "");
+      integrityText(category, "p", `Eligible source rows: ${check.eligibleRows === null ? "Not available" : check.eligibleRows}; unassessed rows: ${check.unassessedRows === null ? "Not available" : check.unassessedRows}; rows checked: ${check.scannedRows === null ? "Not available" : check.scannedRows}.`);
+      integrityText(category, "p", `Showing ${check.groups.length} of ${check.sampleCount} known candidate pairs. At most 10 pairs per archive are previewed; additional previews and pagination are unavailable.`);
+      check.groups.forEach(group => {
+        const key = JSON.stringify([check.collection, ...group.records.map(record => record.id).sort()]), entry = document.createElement("details"); entry.className = "admin-integrity__technical admin-integrity__finding"; entry.dataset.integrityPossibleGroup = key; entry.open = openPairs.has(key);
+        integrityText(entry, "summary", `Possible Match · ${group.records.map(record => record.name ?? "Name not available").join(" / ")}`);
+        integrityText(entry, "p", "Review candidate only. Different stable identifiers share the following supported evidence; this is not a confirmed duplicate.");
+        const evidence = document.createElement("dl"); group.evidence.forEach(item => { integrityText(evidence, "dt", `${item.field} · ${item.kind}`); integrityText(evidence, "dd", item.value); }); entry.append(evidence);
+        if (group.evidenceLimited) integrityText(entry, "p", "Some matching evidence is redacted or unavailable; review of this candidate is limited.");
+        if (check.rule === "people_name_category_context") integrityText(entry, "p", "Shared reported band or team text is corroboration only; it is not a verified affiliation ID or proof that two people are one identity.");
+        const comparison = document.createElement("div"); comparison.className = "admin-integrity__comparison"; comparison.setAttribute("data-integrity-possible-comparison", "");
+        group.records.forEach((record, i) => {
+          const card = document.createElement("article"); card.className = "admin-integrity__comparison-record"; card.setAttribute("data-integrity-possible-record", ""); integrityText(card, "h4", `Record ${i + 1}${record.name === null ? "" : ` · ${record.name}`}`);
+          const facts = document.createElement("dl"); check.fields.forEach(field => { const status = group.comparison.find(item => item.field === field)?.status || "Unknown"; integrityText(facts, "dt", `${field} · ${status}`); const value = integrityText(facts, "dd", field === "show_date" ? record.fields[field] === null ? "NULL" : record.fields[field] : duplicateDisplayValue(record.fields[field], field, record.truncatedFields.includes(field))); value.dataset.integrityComparisonState = status; }); card.append(facts); comparison.append(card);
+        }); entry.append(comparison); integrityText(entry, "p", "Comparisons describe stored preview values. Normalized evidence can match despite different stored text. Missing, truncated and redacted values are Unknown."); category.append(entry);
+      }); list.append(category);
+    });
+    if (report.embeddedReason) integrityText(list, "p", `Embedded matches: Unavailable. ${report.embeddedReason}`);
+    if (report.warnings.length) { const warnings = document.createElement("ul"); report.warnings.forEach(warning => integrityText(warnings, "li", warning)); list.append(warnings); }
+    if (report.limited) integrityText(list, "p", "Some displayed evidence is omitted or redacted. Omitted evidence is not verified.");
+    if (report.technicalLimited) integrityText(list, "p", "The Technical Response is abbreviated; available record comparisons are displayed separately.");
+    const technical = document.createElement("details"); technical.className = "admin-integrity__technical"; integrityText(technical, "summary", "Technical Response"); integrityText(technical, "p", "Bounded and redacted response. No confidence percentage, edit or merge action is supplied."); integrityText(technical, "pre", report.technical); list.append(technical);
+  }
+  function renderIntegrityPossible(archive, section) {
+    const result = integrityPossibleResults.get(section), report = result.report, exactResult = integrityDuplicateResults.get(section);
+    const category = archive.querySelector('[data-integrity-category="duplicates"]'), possible = category.querySelector('[data-integrity-duplicate-kind="possible"]');
+    const known = report?.checks.reduce((sum, check) => sum + check.sampleCount, 0) || 0, complete = report && report.checks.every(check => check.verified);
+    const summary = report ? `${integrityHistoricalLabel(result.state, result.stale)} · ${known} ${complete ? "candidate pairs" : "known candidate pairs · Incomplete or limited coverage"}` : result.state === "Checking" ? "Checking" : result.attempted ? `${result.state}: ${result.reason}` : "Not checked · Separate manual action";
+    possible.querySelector("[data-integrity-total]").textContent = summary;
+    possible.querySelector("[data-integrity-empty]").textContent = `${report || result.attempted ? result.reason : "Use Check Possible Matches to run these bounded review checks manually."} Last report: ${formatAdminDateTime(report?.checkedAt, "Not available")}. Last attempt: ${formatAdminDateTime(result.checkedAt, "Not available")}. No match is confirmed automatically.`;
+    if (integrityPossibleRendered.get(section) !== report) { renderIntegrityPossibleReport(possible.querySelector("[data-integrity-findings]"), report); integrityPossibleRendered.set(section, report); }
+    for (const check of report?.checks || []) {
+      const entry = possible.querySelector(`[data-integrity-possible-check="${check.collection}"]`); if (!entry) continue;
+      entry.dataset.integrityState = result.stale ? "Stale" : check.state; entry.querySelector("[data-integrity-possible-state]").textContent = `${integrityHistoricalLabel(check.state, result.stale)}: ${check.reason}`;
+      entry.querySelector("[data-integrity-possible-verification]").textContent = integrityHistoricalLabel(check.verified ? "Verified bounded matching coverage" : "Coverage unavailable or limited", result.stale);
+    }
+    const state = ["Checking", "Error", "Warning", "Unavailable"].find(value => [exactResult.state, result.state].includes(value)) || "Healthy";
+    category.dataset.integrityState = exactResult.stale || result.stale ? "Stale" : state;
+    category.querySelector("[data-integrity-total]").textContent = `Exact identifiers — ${integrityHistoricalLabel(exactResult.state, exactResult.stale)}. Possible matches — ${summary}.`;
+    const dates = [exactResult.report?.checkedAt, report?.checkedAt].filter(value => parseAdminTimestamp(value)).sort(), checked = category.querySelector("[data-integrity-category-checked]"), latest = dates.at(-1);
+    checked.textContent = formatAdminDateTime(latest, "Not available"); if (latest) checked.dateTime = latest; else checked.removeAttribute("datetime");
+  }
+  async function checkIntegrityPossibleSource(archive, run) {
+    const controller = new AbortController(); run.controllers.add(controller); const privateToken = bearer;
+    let http = null, timedOut = false, next = { state: "Unavailable", reason: "Possible-match request could not be verified.", report: null };
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${integrityPossiblePath(archive)}`, { method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${privateToken}` }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal }); http = response.status;
+      if (http === 401 || http === 403) { if (integrityCurrent(run)) { cancelIntegrity(); clearSession(); clearPassword(); present("idle", http === 401 ? "Your session has expired or ended. Connect again." : "Access denied. Connect again to continue."); } try { await response.body?.cancel(); } catch { /* Authorization errors cannot become report content. */ } }
+      else if (!response.ok) { next = { ...next, state: "Error", reason: `HTTP ${http}: possible-match source unavailable.` }; try { await response.body?.cancel(); } catch { /* Preserve the known error outcome. */ } }
+      else { const parsed = await boundedEndpointJson(response, run, controller); if (parsed.unavailable) next.reason = "Response exceeds the 128 KiB safety limit."; else if (parsed.unsupported) { next.reason = "Bounded reading is unavailable."; controller.abort(); } else if (parsed.invalid || !validateIntegrityPossibleEnvelope(parsed.data, archive)) { next.state = "Error"; next.reason = "The possible-match response contract is unverified."; controller.abort(); } else { const report = projectIntegrityPossibleReport(parsed.data, archive); next = { state: report.state, reason: report.reason, report }; } }
+    } catch { if (timedOut) next.reason = "Request exceeded 15 seconds."; else if (!controller.signal.aborted && http !== null) { next.state = "Error"; next.reason = "The possible-match response could not be read."; } }
+    finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    return { ...next, http, checkedAt: new Date().toISOString() };
+  }
+  async function checkPossibleIntegrity() {
+    if (integrityRun || !integrityPanel?.open || !integrityPossibleButton || !prepareStationEntry() || !integrityAllowed()) return;
+    const run = { generation: ++integrityGeneration, kind: "possible", total: 2, pending: new Set(["music-possible", "wrestling-possible"]), controllers: new Set(), readers: new Set(), timers: new Set() }; integrityRun = run;
+    for (const archive of ["music", "wrestling"]) integrityPossibleResults.set(archive, { ...integrityPossibleResults.get(archive), state: "Checking", attempted: true, reason: "Checking bounded possible-match evidence…" }); renderIntegrity();
+    await Promise.all(["music", "wrestling"].map(async archive => { if (!integrityCurrent(run)) return; const next = await checkIntegrityPossibleSource(archive, run); if (!integrityCurrent(run)) return; const previous = integrityPossibleResults.get(archive); if (next.report) next.report.checkedAt = next.checkedAt; integrityPossibleResults.set(archive, { ...next, attempted: true, report: next.report || previous.report, stale: !next.report && Boolean(previous.report) }); run.pending.delete(`${archive}-possible`); renderIntegrity(); }));
+    if (!integrityCurrent(run)) return; integrityRun = null; integrityLastChecked = new Date().toISOString(); integrityLastOperation = { kind: "possible", total: 2 }; renderIntegrity();
   }
   function integrityHistoricalLabel(label, stale) { return stale ? `${label} · Stale (previous result)` : label; }
   function integrityText(parent, tag, text, className) {
@@ -2729,19 +2938,19 @@
   }
   function renderIntegrity(renderReport = false, progress, changedSource = null) {
     if (!integrityPanel || !integrityProgress || !integrityChecked) return;
-    const sources = { music: integrityResult, wrestling: wrestlingIntegrityResult }, completed = integrityRun ? 4 - integrityRun.pending.size : 4;
-    const states = [...Object.values(sources), ...integrityDuplicateResults.values()].map(result => result.state);
+    const sources = { music: integrityResult, wrestling: wrestlingIntegrityResult }, total = integrityRun?.total || integrityLastOperation?.total || 4, completed = integrityRun ? total - integrityRun.pending.size : total;
+    const states = [...Object.values(sources), ...integrityDuplicateResults.values(), ...integrityPossibleResults.values()].map(result => result.state);
     integrityPanel.dataset.integrityState = integrityRun ? "Checking" : states.includes("Error") ? "Error" : states.includes("Warning") ? "Warning" : states.every(state => state === "Healthy") ? "Healthy" : "Unavailable";
-    integrityProgress.textContent = progress || (integrityRun ? `Checking ${completed} / 4 sources.` : integrityLastChecked ? "Complete: 4 / 4 sources checked." : "No integrity checks have run.");
+    integrityProgress.textContent = progress || (integrityRun ? integrityRun.kind === "possible" ? `Possible matches: ${completed} / 2 checked.` : `Checking ${completed} / ${total} sources.` : integrityLastChecked ? integrityLastOperation?.kind === "possible" ? `Possible matches: ${total} / 2 checked.` : `Complete: ${total} / ${total} sources checked.` : "No integrity checks have run.");
     integrityChecked.textContent = formatAdminDateTime(integrityLastChecked, "Not available");
     if (integrityLastChecked) integrityChecked.dateTime = integrityLastChecked; else integrityChecked.removeAttribute("datetime");
     for (const section of ["music", "wrestling"]) {
       const archive = integrityArchives.get(section); if (!archive) continue;
       const result = sources[section], report = result.report;
-      const archivePresentation = integrityArchivePresentation(result, integrityDuplicateResults.get(section));
+      const archivePresentation = integrityArchivePresentation(result, integrityDuplicateResults.get(section), integrityPossibleResults.get(section));
       archive.dataset.integrityState = archivePresentation.state;
       archive.querySelector("[data-integrity-status]").textContent = archivePresentation.text;
-      archive.querySelector("[data-integrity-scope]").textContent = section === "music" ? "Four blank-field aggregates and the separately reported exact identifier checks. Missing-data counts may overlap; they are not unique affected-record totals." : "Seven required-source-field checks and the separately reported exact identifier checks. Optional fields are not errors. Embedded participant validation, possible matching and consistency audits remain unavailable.";
+      archive.querySelector("[data-integrity-scope]").textContent = section === "music" ? "Four blank-field aggregates and the separately reported exact identifier checks. Possible matching uses its separate manual control; incomplete coverage remains unassessed. Missing-data counts may overlap." : "Seven required-source-field checks and the separately reported exact identifier checks. Optional fields are not errors. Embedded participant validation and consistency audits remain unavailable; possible matching uses its separate manual control, with incomplete coverage marked unassessed.";
       archive.querySelectorAll("[data-integrity-entity]").forEach(node => {
         const entity = node.dataset.integrityEntity, checks = report?.checks.filter(check => check.entity === entity) || [];
         if (section === "wrestling" && entity === "matches") node.textContent = !report ? "Not available · Participant validation unavailable" : report.counts.embeddedEntries !== null ? `${report.counts.embeddedEntries} embedded entries · Participant validation unavailable` : report.coverage?.count !== null && report.coverage?.count !== undefined ? `${report.coverage.count} known-array entries (partial count) · Participant validation unavailable` : "Not available · Participant validation unavailable";
@@ -2770,12 +2979,13 @@
       if (run.pending.has("music")) integrityResult = { ...integrityResult, state: "Unavailable", stale: Boolean(integrityResult.report), reason: "Request canceled; previous data may be stale." };
       if (run.pending.has("wrestling")) wrestlingIntegrityResult = { ...wrestlingIntegrityResult, state: "Unavailable", stale: Boolean(wrestlingIntegrityResult.report), reason: "Request canceled; previous data may be stale." };
       for (const archive of ["music", "wrestling"]) if (run.pending.has(`${archive}-duplicates`)) { const previous = integrityDuplicateResults.get(archive); integrityDuplicateResults.set(archive, { ...previous, state: "Unavailable", stale: Boolean(previous.report), reason: "Request canceled; previous identifier data may be stale." }); }
+      for (const archive of ["music", "wrestling"]) if (run.pending.has(`${archive}-possible`)) { const previous = integrityPossibleResults.get(archive); integrityPossibleResults.set(archive, { ...previous, state: "Unavailable", stale: Boolean(previous.report), reason: "Request canceled; previous possible-match data may be stale." }); }
     }
-    renderIntegrity(false, run ? `Canceled: ${4 - run.pending.size} / 4 sources checked.` : undefined);
+    renderIntegrity(false, run ? `Canceled${run.kind === "possible" ? " possible matches" : ""}: ${(run.total || 4) - run.pending.size} / ${run.total || 4} sources checked.` : undefined);
   }
   function resetIntegrity() {
     cancelIntegrity(); integrityResult = emptyIntegrityResult(); wrestlingIntegrityResult = emptyIntegrityResult(); integrityLastChecked = null;
-    for (const archive of ["music", "wrestling"]) integrityDuplicateResults.set(archive, emptyIntegrityResult()); integrityDuplicateRendered.clear();
+    for (const archive of ["music", "wrestling"]) { integrityDuplicateResults.set(archive, emptyIntegrityResult()); integrityPossibleResults.set(archive, { ...emptyIntegrityResult(), attempted: false }); } integrityDuplicateRendered.clear(); integrityPossibleRendered.clear(); integrityLastOperation = null;
     if (integrityPanel) { integrityPanel.open = false; integrityPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
     renderIntegrity(true);
   }
@@ -2819,7 +3029,7 @@
     if (integrityRun || !integrityPanel?.open) return;
     if (!prepareStationEntry() || !integrityAllowed()) return;
     const sources = ["music", "wrestling", "music-duplicates", "wrestling-duplicates"], queue = [...sources];
-    const run = { generation: ++integrityGeneration, pending: new Set(sources), controllers: new Set(), readers: new Set(), timers: new Set() };
+    const run = { generation: ++integrityGeneration, kind: "integrity", total: 4, pending: new Set(sources), controllers: new Set(), readers: new Set(), timers: new Set() };
     integrityRun = run;
     integrityResult = { ...integrityResult, state: "Checking", reason: "Checking selected Music aggregates…" };
     wrestlingIntegrityResult = { ...wrestlingIntegrityResult, state: "Checking", reason: "Checking selected Wrestling source fields…" };
@@ -2838,9 +3048,10 @@
     };
     await Promise.all([worker(), worker()]);
     if (!integrityCurrent(run)) return;
-    integrityRun = null; integrityLastChecked = new Date().toISOString(); renderIntegrity();
+    integrityRun = null; integrityLastChecked = new Date().toISOString(); integrityLastOperation = { kind: "integrity", total: 4 }; renderIntegrity();
   }
   integrityButton?.addEventListener("click", checkAllIntegrity);
+  integrityPossibleButton?.addEventListener("click", checkPossibleIntegrity);
   integrityPanel?.addEventListener("toggle", () => { if (integrityPanel.open && available() && stage.dataset.adminView === "database") { prepareStationEntry(); updateIntegrityControl(); } });
   renderIntegrity(true);
 
