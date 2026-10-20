@@ -32835,3 +32835,14 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-integrity__checked { min-block-size: 1.45em; }
   .admin-shell .admin-integrity__checked time { display: inline; }
 }
+
+/* Admin 4F: bounded exact-identifier comparisons within the existing integrity scrollport. */
+.admin-shell .admin-integrity__comparison { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-block: 8px; }
+.admin-shell .admin-integrity__comparison-record { min-inline-size: 0; padding: 10px; border: 1px solid #473340; background: rgb(18 12 20 / .35); overflow-wrap: anywhere; }
+.admin-shell .admin-integrity__comparison-record h4 { margin: 0 0 8px; font: 400 14px/1.45 var(--font-display); }
+.admin-shell .admin-integrity__comparison-record dl { margin: 0; }
+.admin-shell .admin-integrity__comparison-record [data-integrity-comparison-state="Different"] { padding-inline-start: 6px; border-inline-start: 2px solid #b28a4e; color: #dfbd84; }
+.admin-shell .admin-integrity__comparison-record [data-integrity-comparison-state="Unknown"] { color: #b9aab9; }
+@media (min-width: 840px) {
+  .admin-shell .admin-integrity__comparison { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

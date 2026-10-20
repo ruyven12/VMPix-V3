@@ -2369,6 +2369,8 @@
   const integrityChecked = integrityPanel?.querySelector("[data-integrity-checked]");
   const integrityArchives = new Map(["music", "wrestling"].map(section => [section, integrityPanel?.querySelector(`[data-integrity-archive="${section}"]`)]));
   let integrityGeneration = 0, integrityRun = null, integrityResult = emptyIntegrityResult(), wrestlingIntegrityResult = emptyIntegrityResult(), integrityLastChecked = null;
+  const integrityDuplicateResults = new Map(["music", "wrestling"].map(archive => [archive, emptyIntegrityResult()]));
+  const integrityDuplicateRendered = new Map();
   function emptyIntegrityResult() { return { state: "Unavailable", reason: "No integrity report has loaded.", report: null, stale: false, http: null }; }
   function integrityAllowed() {
     return canEnterStation() && stage.dataset.adminView === "database" && databasePanel && !databasePanel.hidden && !databasePanel.hasAttribute("inert") &&
@@ -2507,6 +2509,189 @@
     }
     archive.querySelector("[data-integrity-json]").textContent = report?.technical || "No report loaded.";
   }
+  const integrityDuplicateSpecs = Object.freeze({
+    music: Object.freeze([
+      { collection: "bands", label: "Bands", criterion: "band_id", name: "band", fields: ["id", "band_id", "band", "region", "location", "status"] },
+      { collection: "shows", label: "Shows", criterion: "show_id", name: "name", fields: ["id", "show_id", "name", "date", "venue_id", "venue", "city", "state"] },
+      { collection: "people", label: "People", criterion: "person_id", name: "name", fields: ["id", "person_id", "name", "category"] },
+      { collection: "venues", label: "Venues", criterion: "venue_key", name: "venue", fields: ["id", "venue_key", "venue", "city", "state", "country", "latitude", "longitude"] }
+    ]),
+    wrestling: Object.freeze([
+      { collection: "shows", label: "Shows", criterion: "show_key", name: "show_name", fields: ["id", "show_key", "show_name", "date", "promotion", "venue_id", "venue"] },
+      { collection: "people", label: "People", criterion: "slug", name: "name", fields: ["id", "slug", "name", "category"] },
+      { collection: "venues", label: "Venues", criterion: "venue_id", name: "venue_name", fields: ["id", "venue_id", "venue_name", "city", "state", "country", "latitude", "longitude"] }
+    ])
+  });
+  function integrityDuplicatePath(archive) { return `/api/admin/diagnostics/${archive}/exact-duplicates`; }
+  function duplicateComparisonStatus(records, field) {
+    if (records.some(record => record.fields[field] === null || !Object.prototype.hasOwnProperty.call(record.fields, field) || record.truncatedFields.includes(field))) return "Unknown";
+    return records[0].fields[field] === records[1].fields[field] ? "Matching" : "Different";
+  }
+  function validateIntegrityDuplicateEnvelope(data, archive) {
+    const specs = integrityDuplicateSpecs[archive]; if (!specs) return false;
+    const state = value => ["Healthy", "Warning", "Error", "Unavailable"].includes(value);
+    const text = (value, limit = 1024) => typeof value === "string" && value.length <= limit;
+    const time = value => value === null || typeof value === "number" && Number.isFinite(value) && value >= 0;
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== integrityDuplicatePath(archive) || data.archive !== archive || data.source !== "postgres" || !parseAdminTimestamp(data.generatedAt) ||
+      !diagnosticObject(data.database) || typeof data.database.connected !== "boolean" || !state(data.state) || !Array.isArray(data.checks) || data.checks.length !== specs.length ||
+      !Array.isArray(data.warnings) || data.warnings.length > 20 || !data.warnings.every(value => text(value)) || !diagnosticObject(data.timings) ||
+      !time(data.timings.schemaMs) || !time(data.timings.totalMs) || !diagnosticObject(data.timings.collections) || !specs.every(spec => time(data.timings.collections[spec.collection]))) return false;
+    if (!data.checks.every((check, index) => diagnosticObject(check) && check.collection === specs[index].collection)) return false;
+    let groups = 0; const seen = new Set();
+    for (const check of data.checks) {
+      if (!diagnosticObject(check) || seen.has(check.collection)) return false;
+      const spec = specs.find(spec => spec.collection === check.collection); if (!spec) return false; seen.add(check.collection);
+      if (check.criterion !== spec.criterion || !Array.isArray(check.matchingFields) || check.matchingFields.length !== 1 || check.matchingFields[0] !== spec.criterion || !text(check.meaning) || !state(check.state) ||
+        !diagnosticObject(check.coverage) || typeof check.coverage.complete !== "boolean" || check.coverage.limit !== 10000 || !text(check.coverage.reason) ||
+        !(check.scannedRows === null || diagnosticCount(check.scannedRows) && check.scannedRows <= 10001) || !Array.isArray(check.groups)) return false;
+      if (check.coverage.complete) {
+        if (!data.database.connected || !diagnosticCount(check.count) || !diagnosticCount(check.affectedRows) || !diagnosticCount(check.scannedRows) || check.scannedRows > 10000 ||
+          check.affectedRows < check.count * 2 || check.affectedRows > check.scannedRows || (check.count === 0) !== (check.affectedRows === 0) || check.state !== (check.count > 0 ? "Warning" : "Healthy") || check.groups.length > check.count) return false;
+      } else if (check.count !== null || check.affectedRows !== null || check.groups.length || !["Error", "Unavailable"].includes(check.state)) return false;
+      if (check.coverage.complete && check.groups.length !== Math.min(10 - groups, check.count)) return false;
+      groups += check.groups.length; if (groups > 10) return false;
+      const recordIds = new Set(); let previewRecords = 0;
+      for (const group of check.groups) {
+        if (!diagnosticObject(group) || !text(group.identifier, 160) || (!group.identifier.trim().length && !group.identifierTruncated) || typeof group.identifierTruncated !== "boolean" || !diagnosticCount(group.recordCount) || group.recordCount < 2 || group.recordCount > check.affectedRows ||
+          !Array.isArray(group.records) || group.records.length !== 2 || group.previewComplete !== (group.recordCount === 2) || !Array.isArray(group.comparison) || group.comparison.length !== spec.fields.length) return false;
+        for (const record of group.records) {
+          if (!diagnosticObject(record) || !text(record.id, 160) || !(record.name === null || text(record.name, 160)) || !diagnosticObject(record.fields) ||
+            Object.keys(record.fields).length !== spec.fields.length || !spec.fields.every(field => record.fields[field] === null || text(record.fields[field], 160)) ||
+            !Array.isArray(record.truncatedFields) || new Set(record.truncatedFields).size !== record.truncatedFields.length || !record.truncatedFields.every(field => spec.fields.includes(field))) return false;
+        }
+        previewRecords += group.recordCount; if (previewRecords > check.affectedRows) return false;
+        for (const record of group.records) {
+          if (record.id !== record.fields.id || record.name !== record.fields[spec.name] || recordIds.has(record.id) || record.fields[spec.criterion] !== group.identifier || record.truncatedFields.includes(spec.criterion) !== group.identifierTruncated) return false;
+          recordIds.add(record.id);
+        }
+        const compared = new Set();
+        for (const comparison of group.comparison) {
+          if (!diagnosticObject(comparison) || !spec.fields.includes(comparison.field) || compared.has(comparison.field) || comparison.status !== duplicateComparisonStatus(group.records, comparison.field)) return false;
+          compared.add(comparison.field);
+        }
+      }
+    }
+    if (archive === "wrestling" && (!diagnosticObject(data.coverage?.embeddedMatches) || data.coverage.embeddedMatches.state !== "Unavailable" || !text(data.coverage.embeddedMatches.reason))) return false;
+    return data.state !== "Healthy" || data.database.connected && data.checks.every(check => check.coverage.complete && check.state === "Healthy");
+  }
+  function projectIntegrityDuplicateReport(data, archive) {
+    const safe = safeIntegrityValue(data), projected = diagnosticObject(safe.data) ? safe.data : {};
+    let limited = safe.limited;
+    const checks = integrityDuplicateSpecs[archive].map(spec => {
+      const source = data.checks.find(check => check.collection === spec.collection), readable = Array.isArray(projected.checks) ? projected.checks.find(check => diagnosticObject(check) && check.collection === spec.collection) : null;
+      const groups = [];
+      source.groups.forEach((group, index) => {
+        const display = Array.isArray(readable?.groups) ? readable.groups[index] : null;
+        if (!diagnosticObject(display) || typeof display.identifier !== "string" || !Array.isArray(display.records) || display.records.length !== 2 || display.records.some(record => !diagnosticObject(record) || !diagnosticObject(record.fields))) { limited = true; return; }
+        const records = display.records.map(record => ({ id: typeof record.id === "string" ? record.id : null, name: typeof record.name === "string" ? record.name : null,
+          fields: Object.fromEntries(spec.fields.map(field => [field, typeof record.fields[field] === "string" || record.fields[field] === null ? record.fields[field] : "[Omitted by safety limits]"])),
+          truncatedFields: Array.isArray(record.truncatedFields) ? record.truncatedFields.filter(field => spec.fields.includes(field)) : [] }));
+        const comparison = group.comparison.map(item => ({ field: item.field, status: safe.limited || group.records.some((record, i) => records[i].fields[item.field] !== record.fields[item.field]) ? "Unknown" : item.status }));
+        groups.push({ identifier: display.identifier, identifierTruncated: group.identifierTruncated, recordCount: group.recordCount, previewComplete: group.previewComplete, records, comparison });
+      });
+      return { ...spec, count: source.count, affectedRows: source.affectedRows, scannedRows: source.scannedRows, complete: source.coverage.complete, verified: source.coverage.complete && !safe.limited,
+        state: source.state, reason: typeof readable?.coverage?.reason === "string" ? readable.coverage.reason : "Source coverage is unavailable or limited.", groups };
+    });
+    if (limited) checks.forEach(check => { check.verified = false; check.state = check.count > 0 ? "Warning" : check.state === "Error" ? "Error" : "Unavailable"; check.reason = "Source counts are retained, but safety limits prevent complete comparison verification."; });
+    const positive = checks.some(check => check.count > 0), unknown = checks.some(check => !check.verified), error = data.state === "Error" || checks.some(check => check.state === "Error");
+    const warnings = Array.isArray(projected.warnings) ? projected.warnings.filter(value => typeof value === "string").slice(0, 20) : [];
+    return { checks, limited, technical: safe.text, generatedAt: data.generatedAt, checkedAt: null, warnings,
+      embeddedReason: archive === "wrestling" && typeof projected.coverage?.embeddedMatches?.reason === "string" ? projected.coverage.embeddedMatches.reason : null,
+      state: error ? "Error" : positive || data.state === "Warning" ? "Warning" : unknown || data.state === "Unavailable" ? "Unavailable" : data.warnings.length ? "Warning" : "Healthy",
+      reason: positive ? "Exact raw identifier matches require review; no records were changed." : error ? "Some identifier checks could not be completed." : unknown || data.state === "Unavailable" ? "Some identifier checks are unavailable; unknown counts are not zero." : data.warnings.length || data.state === "Warning" ? "Source warnings require review." : "The supported complete identifier checks returned zero duplicate groups." };
+  }
+  function integrityArchivePresentation(missing, exact) {
+    const states = [missing.state, exact.state], state = ["Checking", "Error", "Warning", "Unavailable"].find(value => states.includes(value)) || (states.every(value => value === "Healthy") ? "Healthy" : "Unavailable");
+    return { state, text: `Missing Data — ${integrityHistoricalLabel(missing.state, missing.stale)}: ${missing.reason} Exact identifiers — ${integrityHistoricalLabel(exact.state, exact.stale)}.` };
+  }
+  function duplicateDisplayValue(value, field, truncated) {
+    const text = value === null ? "NULL" : value === "" ? "Empty string" : typeof value === "string" && !value.trim() ? "Whitespace only" : field === "date" && parseAdminTimestamp(value) ? formatAdminDateTime(value) : String(value);
+    return truncated ? `${text} · Truncated preview` : text;
+  }
+  function renderIntegrityDuplicateReport(list, report) {
+    const open = new Set([...list.querySelectorAll("details[open][data-integrity-exact-check]")].map(node => node.dataset.integrityExactCheck));
+    const openGroups = new Set([...list.querySelectorAll("details[open][data-integrity-duplicate-group]")].map(node => node.dataset.integrityDuplicateGroup));
+    list.replaceChildren(); if (!report) return;
+    report.checks.forEach(check => {
+      const category = document.createElement("details"); category.className = "admin-integrity__technical"; category.dataset.integrityExactCheck = check.collection; category.open = open.has(check.collection);
+      integrityText(category, "summary", `${check.label} · ${check.count === null ? "Unavailable" : `${check.count} identifier groups`}`);
+      integrityText(category, "p", `Criterion: exact raw ${check.criterion}. Names alone and records with different identifiers do not qualify.`);
+      integrityText(category, "p", `${check.state}: ${check.reason}`).setAttribute("data-integrity-exact-state", "");
+      integrityText(category, "p", check.verified ? "Verified bounded source count." : "Source evidence is unavailable or limited; no healthy zero is assumed.").setAttribute("data-integrity-exact-verification", "");
+      integrityText(category, "p", `Affected source records: ${check.affectedRows === null ? "Not available" : check.affectedRows}. Source rows checked: ${check.scannedRows === null ? "Not available" : check.scannedRows}${check.complete ? " (complete bounded check)" : " (incomplete)"}.`);
+      integrityText(category, "p", `Showing ${check.groups.length} of ${check.count === null ? "an unknown number of" : check.count} identifier groups. Additional groups are unavailable through this bounded preview; no pagination is supported.`);
+      check.groups.forEach((group, index) => {
+        const entry = document.createElement("details"), key = `${check.collection}:${index}:${group.identifier}`; entry.className = "admin-integrity__technical admin-integrity__finding"; entry.dataset.integrityDuplicateGroup = key; entry.open = openGroups.has(key);
+        integrityText(entry, "summary", `Exact identifier match · ${group.identifier.trim() ? group.identifier : "Truncated identifier preview"}${group.identifierTruncated ? " · Truncated identifier" : ""}`);
+        integrityText(entry, "p", `${group.recordCount} source records share this identifier. Showing 2${group.previewComplete ? " of 2 records" : ` of ${group.recordCount} records; additional records are unavailable`}. This is a review candidate, not an automatic merge decision.`);
+        const comparison = document.createElement("div"); comparison.className = "admin-integrity__comparison"; comparison.setAttribute("data-integrity-comparison", "");
+        group.records.forEach((record, recordIndex) => {
+          const card = document.createElement("article"); card.className = "admin-integrity__comparison-record"; card.setAttribute("data-integrity-record", "");
+          integrityText(card, "h4", `Record ${recordIndex + 1}${record.name === null ? "" : ` · ${record.name}`}`);
+          const facts = document.createElement("dl");
+          check.fields.forEach(field => {
+            const status = group.comparison.find(item => item.field === field)?.status || "Unknown";
+            integrityText(facts, "dt", `${field} · ${status}`); const value = integrityText(facts, "dd", duplicateDisplayValue(record.fields[field], field, record.truncatedFields.includes(field)));
+            value.dataset.integrityComparisonState = status;
+          });
+          card.append(facts); comparison.append(card);
+        });
+        entry.append(comparison); integrityText(entry, "p", "Matching and differing labels compare only the two displayed records. NULL, truncated or redacted fields are Unknown."); category.append(entry);
+      });
+      list.append(category);
+    });
+    if (report.embeddedReason) integrityText(list, "p", `Embedded matches: Unavailable. ${report.embeddedReason}`);
+    if (report.warnings.length) { const warnings = document.createElement("ul"); report.warnings.forEach(warning => integrityText(warnings, "li", warning)); list.append(warnings); }
+    if (report.limited) integrityText(list, "p", "Some response content was omitted or redacted by safety limits. Omitted content is not a verified comparison.");
+    const technical = document.createElement("details"); technical.className = "admin-integrity__technical"; integrityText(technical, "summary", "Technical Response");
+    integrityText(technical, "p", "Bounded and redacted backend response. This preview does not provide pagination or repair operations."); integrityText(technical, "pre", report.technical); list.append(technical);
+  }
+  function renderIntegrityDuplicates(archive, section) {
+    const result = integrityDuplicateResults.get(section), report = result.report;
+    const category = archive.querySelector('[data-integrity-category="duplicates"]'), exact = category.querySelector('[data-integrity-duplicate-kind="exact"]'), possible = category.querySelector('[data-integrity-duplicate-kind="possible"]');
+    const known = report?.checks.filter(check => check.count !== null) || [], count = known.reduce((sum, check) => sum + check.count, 0);
+    const countLabel = !report || !known.length ? "Group count not available" : known.length === report.checks.length && !report.limited ? `${count} candidate groups` : `${count} known groups · Partial or limited coverage`;
+    const summary = report ? `${integrityHistoricalLabel(result.state, result.stale)} · ${countLabel} · ${known.length} / ${report.checks.length} collections with source counts` : `${result.state}: ${result.reason}`;
+    category.dataset.integrityState = result.stale ? "Stale" : result.state; category.querySelector("[data-integrity-total]").textContent = summary;
+    const checked = category.querySelector("[data-integrity-category-checked]"); checked.textContent = formatAdminDateTime(report?.checkedAt, "Not available");
+    if (report?.checkedAt) checked.dateTime = report.checkedAt; else checked.removeAttribute("datetime");
+    exact.querySelector("[data-integrity-total]").textContent = summary;
+    exact.querySelector("[data-integrity-empty]").textContent = report ? `${result.reason} At most 10 groups per archive and two records per group are available. Comparisons are not full-record or full-group audits.` : "Run Check All Integrity to request the supported exact identifier checks. No checks run when this section opens.";
+    possible.querySelector("[data-integrity-total]").textContent = "Unavailable";
+    possible.querySelector("[data-integrity-empty]").textContent = "Possible or name-only matching is not implemented. No fuzzy matching request is made.";
+    if (integrityDuplicateRendered.get(section) !== report) { renderIntegrityDuplicateReport(exact.querySelector("[data-integrity-findings]"), report); integrityDuplicateRendered.set(section, report); }
+    for (const check of report?.checks || []) {
+      const entry = exact.querySelector(`[data-integrity-exact-check="${check.collection}"]`); if (!entry) continue;
+      entry.dataset.integrityState = result.stale ? "Stale" : check.state;
+      entry.querySelector("[data-integrity-exact-state]").textContent = `${integrityHistoricalLabel(check.state, result.stale)}: ${check.reason}`;
+      entry.querySelector("[data-integrity-exact-verification]").textContent = integrityHistoricalLabel(check.verified ? "Verified bounded source count" : "Source evidence unavailable or limited", result.stale);
+    }
+  }
+  async function checkIntegrityDuplicateSource(archive, run) {
+    const controller = new AbortController(); run.controllers.add(controller); const privateToken = bearer;
+    let http = null, timedOut = false, next = { state: "Unavailable", reason: "Exact identifier request could not be verified.", report: null };
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${integrityDuplicatePath(archive)}`, { method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${privateToken}` }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal });
+      http = response.status;
+      if (http === 401 || http === 403) {
+        if (integrityCurrent(run)) { cancelIntegrity(); clearSession(); clearPassword(); present("idle", http === 401 ? "Your session has expired or ended. Connect again." : "Access denied. Connect again to continue."); }
+        try { await response.body?.cancel(); } catch { /* Authorization errors cannot become report content. */ }
+      } else if (!response.ok) {
+        next = { ...next, state: "Error", reason: `HTTP ${http}: exact identifier source unavailable.` }; try { await response.body?.cancel(); } catch { /* Preserve the known error outcome. */ }
+      } else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) next.reason = "Response exceeds the 128 KiB safety limit.";
+        else if (parsed.unsupported) { next.reason = "Bounded reading is unavailable."; controller.abort(); }
+        else if (parsed.invalid || !validateIntegrityDuplicateEnvelope(parsed.data, archive)) { next.state = "Error"; next.reason = "The exact identifier response contract is unverified."; controller.abort(); }
+        else { const report = projectIntegrityDuplicateReport(parsed.data, archive); next = { state: report.state, reason: report.reason, report }; }
+      }
+    } catch {
+      if (timedOut) next.reason = "Request exceeded 15 seconds.";
+      else if (!controller.signal.aborted && http !== null) { next.state = "Error"; next.reason = "The exact identifier response could not be read."; }
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    return { ...next, http, checkedAt: new Date().toISOString() };
+  }
   function integrityHistoricalLabel(label, stale) { return stale ? `${label} · Stale (previous result)` : label; }
   function integrityText(parent, tag, text, className) {
     const node = document.createElement(tag); if (className) node.className = className; node.textContent = text; parent.append(node); return node;
@@ -2542,26 +2727,28 @@
       article.querySelector("[data-integrity-check-verification]").textContent = integrityHistoricalLabel(check.verified ? "Verified source count" : "Unavailable or limited", stale);
     });
   }
-  function renderIntegrity(renderReport = false, progress) {
+  function renderIntegrity(renderReport = false, progress, changedSource = null) {
     if (!integrityPanel || !integrityProgress || !integrityChecked) return;
-    const sources = { music: integrityResult, wrestling: wrestlingIntegrityResult }, completed = integrityRun ? 2 - integrityRun.pending.size : 2;
-    const states = Object.values(sources).map(result => result.state);
+    const sources = { music: integrityResult, wrestling: wrestlingIntegrityResult }, completed = integrityRun ? 4 - integrityRun.pending.size : 4;
+    const states = [...Object.values(sources), ...integrityDuplicateResults.values()].map(result => result.state);
     integrityPanel.dataset.integrityState = integrityRun ? "Checking" : states.includes("Error") ? "Error" : states.includes("Warning") ? "Warning" : states.every(state => state === "Healthy") ? "Healthy" : "Unavailable";
-    integrityProgress.textContent = progress || (integrityRun ? `Checking ${completed} / 2 sources.` : integrityLastChecked ? "Complete: 2 / 2 sources checked." : "No integrity checks have run.");
+    integrityProgress.textContent = progress || (integrityRun ? `Checking ${completed} / 4 sources.` : integrityLastChecked ? "Complete: 4 / 4 sources checked." : "No integrity checks have run.");
     integrityChecked.textContent = formatAdminDateTime(integrityLastChecked, "Not available");
     if (integrityLastChecked) integrityChecked.dateTime = integrityLastChecked; else integrityChecked.removeAttribute("datetime");
     for (const section of ["music", "wrestling"]) {
       const archive = integrityArchives.get(section); if (!archive) continue;
       const result = sources[section], report = result.report;
-      archive.dataset.integrityState = result.state;
-      archive.querySelector("[data-integrity-status]").textContent = `${result.state}${result.stale ? " · Stale" : ""}: ${result.reason}`;
-      archive.querySelector("[data-integrity-scope]").textContent = section === "music" ? "Only four blank-field aggregates are available. Counts can overlap; they are not unique affected-record totals." : "Seven required-source-field checks only. Optional fields are not errors. Counts can overlap; embedded participant validation, duplicates and consistency audits are unavailable.";
+      const archivePresentation = integrityArchivePresentation(result, integrityDuplicateResults.get(section));
+      archive.dataset.integrityState = archivePresentation.state;
+      archive.querySelector("[data-integrity-status]").textContent = archivePresentation.text;
+      archive.querySelector("[data-integrity-scope]").textContent = section === "music" ? "Four blank-field aggregates and the separately reported exact identifier checks. Missing-data counts may overlap; they are not unique affected-record totals." : "Seven required-source-field checks and the separately reported exact identifier checks. Optional fields are not errors. Embedded participant validation, possible matching and consistency audits remain unavailable.";
       archive.querySelectorAll("[data-integrity-entity]").forEach(node => {
         const entity = node.dataset.integrityEntity, checks = report?.checks.filter(check => check.entity === entity) || [];
         if (section === "wrestling" && entity === "matches") node.textContent = !report ? "Not available · Participant validation unavailable" : report.counts.embeddedEntries !== null ? `${report.counts.embeddedEntries} embedded entries · Participant validation unavailable` : report.coverage?.count !== null && report.coverage?.count !== undefined ? `${report.coverage.count} known-array entries (partial count) · Participant validation unavailable` : "Not available · Participant validation unavailable";
         else node.textContent = checks.length ? `${checks.filter(check => check.count !== null).length} / ${checks.length} source counts available` : "Not available";
       });
       archive.querySelectorAll("[data-integrity-category]").forEach(category => {
+        if (category.dataset.integrityCategory === "duplicates") return;
         const missing = category.dataset.integrityCategory === "missing", checks = missing ? report?.checks || [] : [];
         category.dataset.integrityState = checks.length ? result.stale ? "Stale" : report.state : "Unavailable";
         category.querySelector("[data-integrity-total]").textContent = checks.length ? `${integrityHistoricalLabel(report.state, result.stale)} · ${checks.filter(check => check.count > 0).length} checks with findings · ${checks.filter(check => !check.verified).length} unverified` : "Unavailable";
@@ -2570,12 +2757,9 @@
         const empty = category.querySelector("[data-integrity-empty]");
         if (category.dataset.integrityCategory !== "duplicates") empty.textContent = missing ? report ? section === "music" ? "Each count describes its own source predicate; no record samples are returned." : "Each count describes its own source predicate; up to 10 affected-record examples per check are shown when available." : `Run Check All Integrity to request the supported ${section === "music" ? "Music aggregates" : "Wrestling missing-data checks"}.` : "No approved lightweight source provides these checks.";
       });
-      archive.querySelectorAll("[data-integrity-duplicate-kind]").forEach(category => {
-        category.querySelector("[data-integrity-total]").textContent = "Not available";
-        category.querySelector("[data-integrity-empty]").textContent = "This endpoint supplies no duplicate groups, comparison records or matching evidence.";
-      });
-      if (renderReport) { if (section === "music") renderIntegrityChecks(archive, report, result.stale); else renderWrestlingIntegrityChecks(archive, report, result.stale); }
+      if (renderReport && (!changedSource || changedSource === section)) { if (section === "music") renderIntegrityChecks(archive, report, result.stale); else renderWrestlingIntegrityChecks(archive, report, result.stale); }
       updateIntegrityCheckLabels(archive, report, result.stale);
+      renderIntegrityDuplicates(archive, section);
     }
     updateIntegrityControl();
   }
@@ -2585,11 +2769,13 @@
       run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
       if (run.pending.has("music")) integrityResult = { ...integrityResult, state: "Unavailable", stale: Boolean(integrityResult.report), reason: "Request canceled; previous data may be stale." };
       if (run.pending.has("wrestling")) wrestlingIntegrityResult = { ...wrestlingIntegrityResult, state: "Unavailable", stale: Boolean(wrestlingIntegrityResult.report), reason: "Request canceled; previous data may be stale." };
+      for (const archive of ["music", "wrestling"]) if (run.pending.has(`${archive}-duplicates`)) { const previous = integrityDuplicateResults.get(archive); integrityDuplicateResults.set(archive, { ...previous, state: "Unavailable", stale: Boolean(previous.report), reason: "Request canceled; previous identifier data may be stale." }); }
     }
-    renderIntegrity(false, run ? `Canceled: ${2 - run.pending.size} / 2 sources checked.` : undefined);
+    renderIntegrity(false, run ? `Canceled: ${4 - run.pending.size} / 4 sources checked.` : undefined);
   }
   function resetIntegrity() {
     cancelIntegrity(); integrityResult = emptyIntegrityResult(); wrestlingIntegrityResult = emptyIntegrityResult(); integrityLastChecked = null;
+    for (const archive of ["music", "wrestling"]) integrityDuplicateResults.set(archive, emptyIntegrityResult()); integrityDuplicateRendered.clear();
     if (integrityPanel) { integrityPanel.open = false; integrityPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
     renderIntegrity(true);
   }
@@ -2632,18 +2818,25 @@
   async function checkAllIntegrity() {
     if (integrityRun || !integrityPanel?.open) return;
     if (!prepareStationEntry() || !integrityAllowed()) return;
-    const run = { generation: ++integrityGeneration, pending: new Set(["music", "wrestling"]), controllers: new Set(), readers: new Set(), timers: new Set() };
+    const sources = ["music", "wrestling", "music-duplicates", "wrestling-duplicates"], queue = [...sources];
+    const run = { generation: ++integrityGeneration, pending: new Set(sources), controllers: new Set(), readers: new Set(), timers: new Set() };
     integrityRun = run;
     integrityResult = { ...integrityResult, state: "Checking", reason: "Checking selected Music aggregates…" };
-    wrestlingIntegrityResult = { ...wrestlingIntegrityResult, state: "Checking", reason: "Checking selected Wrestling source fields…" }; renderIntegrity();
-    await Promise.all(["music", "wrestling"].map(async section => {
-      const next = await checkIntegritySource(section, run); if (!integrityCurrent(run)) return;
-      const previous = section === "music" ? integrityResult : wrestlingIntegrityResult;
-      if (next.report) next.report.checkedAt = next.checkedAt;
-      const result = { ...next, report: next.report || previous.report, stale: !next.report && Boolean(previous.report) };
-      if (section === "music") integrityResult = result; else wrestlingIntegrityResult = result;
-      run.pending.delete(section); renderIntegrity(true);
-    }));
+    wrestlingIntegrityResult = { ...wrestlingIntegrityResult, state: "Checking", reason: "Checking selected Wrestling source fields…" };
+    for (const archive of ["music", "wrestling"]) integrityDuplicateResults.set(archive, { ...integrityDuplicateResults.get(archive), state: "Checking", reason: "Checking exact raw identifiers…" }); renderIntegrity();
+    const worker = async () => {
+      while (queue.length) {
+        if (!integrityCurrent(run)) return;
+        const source = queue.shift(), duplicate = source.endsWith("-duplicates"), archive = duplicate ? source.slice(0, -11) : source;
+        const next = await (duplicate ? checkIntegrityDuplicateSource(archive, run) : checkIntegritySource(archive, run)); if (!integrityCurrent(run)) return;
+        const previous = duplicate ? integrityDuplicateResults.get(archive) : archive === "music" ? integrityResult : wrestlingIntegrityResult;
+        if (next.report) next.report.checkedAt = next.checkedAt;
+        const result = { ...next, report: next.report || previous.report, stale: !next.report && Boolean(previous.report) };
+        if (duplicate) integrityDuplicateResults.set(archive, result); else if (archive === "music") integrityResult = result; else wrestlingIntegrityResult = result;
+        run.pending.delete(source); renderIntegrity(true, undefined, source);
+      }
+    };
+    await Promise.all([worker(), worker()]);
     if (!integrityCurrent(run)) return;
     integrityRun = null; integrityLastChecked = new Date().toISOString(); renderIntegrity();
   }
