@@ -56,6 +56,11 @@
   const databaseTitle = host?.querySelector("#admin-database-title");
   const databaseLogout = host?.querySelector("[data-admin-database-logout]");
   const databaseFeedback = host?.querySelector("[data-admin-database-feedback]");
+  const importsOpen = host?.querySelector("[data-admin-open-imports]");
+  const importsPanel = host?.querySelector("[data-admin-imports-station]");
+  const importsTitle = host?.querySelector("#admin-imports-title");
+  const importsLogout = host?.querySelector("[data-admin-imports-logout]");
+  const importsFeedback = host?.querySelector("[data-admin-imports-feedback]");
   if (!host || !password || !toggle || !connect || !feedback || !stage || !loginPanel ||
       !loginTitle || !deck || !deckTitle || !deckFeedback || !deckLogout || !deckReturn || !returnLink ||
       !apiOpen || !apiPanel || !apiTitle || !apiLogout || !apiFeedback || !apiCheck ||
@@ -95,6 +100,7 @@
     resetSignal();
     surface(apiPanel, false);
     if (databasePanel) surface(databasePanel, false);
+    if (importsPanel) surface(importsPanel, false);
     stage.dataset.adminView = "deck";
     cancelVisuals();
     surface(deck, false);
@@ -135,7 +141,7 @@
     deckReturn.appendChild(returnLink);
     surface(deck, true);
     host.setAttribute("aria-labelledby", "admin-console-title");
-    if (shouldFocus && !(["api", "database"].includes(requestedStation) && visualPhase === "ready")) focusTitle(deckTitle);
+    if (shouldFocus && !(["api", "database", "imports"].includes(requestedStation) && visualPhase === "ready")) focusTitle(deckTitle);
   }
   function showDeck(shouldFocus = true) {
     cancelVisuals();
@@ -214,10 +220,12 @@
     apiFeedback.textContent = message;
     if (databaseLogout) { databaseLogout.disabled = busy(); databaseLogout.textContent = deckLogout.textContent; }
     if (databaseFeedback) databaseFeedback.textContent = message;
+    if (importsLogout) { importsLogout.disabled = busy(); importsLogout.setAttribute("aria-busy", String(busy())); importsLogout.textContent = deckLogout.textContent; }
+    if (importsFeedback) importsFeedback.textContent = message;
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -335,6 +343,8 @@
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
+    if (importsOpen) { importsOpen.disabled = !canEnterStation(); importsOpen.setAttribute("aria-disabled", String(importsOpen.disabled)); }
+    updateImportOverviewControl();
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
@@ -348,6 +358,19 @@
     }
     const wasApi = stage.dataset.adminView === "api";
     const wasDatabase = stage.dataset.adminView === "database";
+    const wasImports = stage.dataset.adminView === "imports";
+    const importsSelected = requestedStation === "imports" && importsPanel && importsTitle && visualPhase === "ready" && bearer &&
+      (state === "authenticated" && expiresAt > Date.now() || wasImports && ["logging-out", "logout-uncertain"].includes(state));
+    if (importsSelected) {
+      if (wasApi) resetSignal();
+      if (wasDatabase) { cancelDatabaseOverview(); cancelRecordsExplorer(); cancelRelationships(); cancelIntegrity(); }
+      surface(loginPanel, false); surface(deck, false); surface(apiPanel, false); if (databasePanel) surface(databasePanel, false); surface(importsPanel, true);
+      stage.dataset.adminView = "imports"; host.setAttribute("aria-labelledby", "admin-imports-title");
+      if (!wasImports && shouldFocus) focusTitle(importsTitle);
+      updateStationControl(); return;
+    }
+    if (wasImports) cancelImportOverview();
+    if (importsPanel) surface(importsPanel, false);
     const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
     if (databaseSelected) {
@@ -374,7 +397,7 @@
       if (visualPhase === "ready") {
         surface(deck, true);
         host.setAttribute("aria-labelledby", "admin-console-title");
-        if ((wasApi || wasDatabase) && shouldFocus) focusTitle(deckTitle);
+        if ((wasApi || wasDatabase || wasImports) && shouldFocus) focusTitle(deckTitle);
       }
     }
     updateStationControl();
@@ -399,6 +422,7 @@
     cancelRecordsExplorer();
     cancelRelationships();
     cancelIntegrity();
+    cancelImportOverview();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -3056,6 +3080,42 @@
   renderIntegrity(true);
 
 
+  // Import status/history routes currently perform schema maintenance; no request is permitted here.
+  const importsOverview = importsPanel?.querySelector("[data-admin-import-overview]");
+  const importsRefresh = importsPanel?.querySelector("[data-imports-refresh]");
+  const importsMessage = importsPanel?.querySelector("[data-imports-message]");
+  let importsAvailabilityChecked = false;
+  function importsOverviewAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && importsOverview && importsRefresh && importsMessage;
+  }
+  function updateImportOverviewControl() {
+    if (!importsRefresh) return;
+    // Required existing endpoints are not read-only. A disabled control cannot imply that a safe refresh is available.
+    importsRefresh.disabled = true; importsRefresh.setAttribute("aria-disabled", "true"); importsRefresh.setAttribute("aria-busy", "false");
+  }
+  function renderImportOverview() {
+    if (!importsOverview || !importsMessage) return;
+    importsOverview.dataset.importsAvailability = importsAvailabilityChecked ? "checked" : "not-checked";
+    importsOverview.dataset.importsState = "Unavailable";
+    importsMessage.textContent = importsAvailabilityChecked ? "Import overview unavailable: no verified read-only import status source is connected. No request was sent." : "Expand Import Overview to check read-only source availability. No import operation will run.";
+    importsPanel.querySelectorAll("[data-imports-value]").forEach(node => { node.textContent = "Not available"; if (node.tagName === "TIME") node.removeAttribute("datetime"); });
+    updateImportOverviewControl();
+  }
+  function checkImportAvailability() {
+    if (!importsOverview?.open || !prepareStationEntry() || !importsOverviewAllowed()) return;
+    importsAvailabilityChecked = true; renderImportOverview();
+  }
+  function cancelImportOverview() { updateImportOverviewControl(); }
+  function resetImportOverview() {
+    importsAvailabilityChecked = false;
+    if (importsOverview) { importsOverview.open = false; importsOverview.querySelectorAll("details").forEach(node => { node.open = false; }); }
+    renderImportOverview();
+  }
+  importsOverview?.addEventListener("toggle", () => { if (importsOverview.open && !importsAvailabilityChecked) checkImportAvailability(); });
+  importsRefresh?.addEventListener("click", checkImportAvailability);
+  renderImportOverview();
+
+
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();
@@ -3080,6 +3140,9 @@
   databaseLogout?.addEventListener("click", () => {
     if (!databasePanel.hidden && !databasePanel.hasAttribute("inert")) logout();
   });
+  importsLogout?.addEventListener("click", () => {
+    if (!importsPanel.hidden && !importsPanel.hasAttribute("inert")) logout();
+  });
   password.addEventListener("keydown", (event) => {
     if (!available() || event.key !== "Enter" || event.isComposing || password.disabled) return;
     event.preventDefault(); connectAction();
@@ -3095,11 +3158,11 @@
     canEnterStation,
     prepareStationEntry,
     setStation(station) {
-      requestedStation = ["api", "database"].includes(station) ? station : "deck";
+      requestedStation = ["api", "database", "imports"].includes(station) ? station : "deck";
       updateStationPresentation();
     },
     activate({ station = "deck" } = {}) {
-      requestedStation = ["api", "database"].includes(station) ? station : "deck";
+      requestedStation = ["api", "database", "imports"].includes(station) ? station : "deck";
       cancelRequest(); active = true; clearPassword();
       present(bearer ? "unverified" : "idle", bearer ? "Checking your session…" : "Enter your password to connect securely.");
       if (bearer) checkSession();

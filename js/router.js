@@ -185,7 +185,7 @@ function getRouteFromUrl(url = window.location.href) {
   }
   if (routePath === routePaths.admin) {
     const station = routeUrl.searchParams.get("station");
-    const adminStation = ["api", "database"].includes(station) ? station : "deck";
+    const adminStation = ["api", "database", "imports"].includes(station) ? station : "deck";
     return { name: "admin", adminStation, canonicalUrl: adminStation === "deck" ? routePaths.admin : `${routePaths.admin}?station=${adminStation}` };
   }
   if (routePath === routePaths.connect) {
