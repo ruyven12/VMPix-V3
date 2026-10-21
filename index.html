@@ -2983,7 +2983,7 @@
       </ul>
     </aside>
 
-    <dialog class="trajectory-overlay" data-trajectory-overlay role="dialog" aria-modal="true" aria-labelledby="trajectory-title" aria-describedby="trajectory-status" aria-hidden="true" tabindex="-1" inert hidden>
+    <dialog class="trajectory-overlay" data-trajectory-overlay role="dialog" aria-modal="true" aria-labelledby="trajectory-title" aria-hidden="true" tabindex="-1" inert hidden>
       <div class="trajectory-overlay__frame" data-trajectory-frame>
         <svg class="trajectory-overlay__rails" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <path class="trajectory-overlay__edge" d="M24 1 H114 L140 19 H860 L886 1 H976 L999 24 V101 L992 113 V487 L999 499 V576 L976 599 H886 L860 581 H140 L114 599 H24 L1 576 V499 L8 487 V113 L1 101 V24 Z" />
@@ -2995,7 +2995,44 @@
         <div class="trajectory-overlay__content" data-trajectory-content>
           <h2 class="trajectory-overlay__title" id="trajectory-title">The Trajectory</h2>
           <span class="trajectory-overlay__divider" aria-hidden="true"></span>
-          <p class="trajectory-overlay__status" id="trajectory-status">Coming Soon</p>
+          <div class="trajectory-overlay__reading" data-trajectory-scroll tabindex="0" role="region" aria-labelledby="trajectory-title">
+            <p>Launching V3 doesn't mean the archive is finished. There's still quite a bit I want to do with it, both with my own photography and eventually with contributions from others.</p>
+            <p>Some of these ideas I've had in mind for a while, and others are things I'd like to explore as the archive continues to grow. Here's a look at what I'm planning beyond the initial launch.</p>
+            <section class="trajectory-overlay__archive" aria-labelledby="trajectory-music-title">
+              <h3 id="trajectory-music-title">The Music Archive</h3>
+              <div class="trajectory-overlay__feature">
+                <h4>Community Contributions</h4>
+                <p>One thing I'd really like to introduce is a way for people to share their own stories, comments, and memories from the places and events documented here.</p>
+                <p>I'd like to start with venues first, then eventually branch out into shows and bands. There's a lot of history behind these places, and sometimes the people who were there have stories that photographs alone can't tell.</p>
+              </div>
+              <div class="trajectory-overlay__feature">
+                <h4>Community Photo Preservation</h4>
+                <p>I'd also like to give people the opportunity to contribute older photographs they may have from shows, venues, or bands.</p>
+                <p>Part of this would involve restoring and remastering those photographs where possible, with the hope of preserving them as part of the archive.</p>
+                <p>Anyone contributing photos would have the option to receive credit for their work or remain anonymous if they prefer. The goal is to preserve these memories and give them a place where others can experience them as well.</p>
+              </div>
+              <div class="trajectory-overlay__feature">
+                <h4>Archive Expansion</h4>
+                <p>On my own end, I still have quite a bit of photography and information to work through.</p>
+                <p>I'll continue adding to the existing collections, filling in missing pieces, and expanding the archive as I go. There's plenty more history I'd like to document.</p>
+              </div>
+            </section>
+            <section class="trajectory-overlay__archive" aria-labelledby="trajectory-wrestling-title">
+              <h3 id="trajectory-wrestling-title">The Wrestling Archive</h3>
+              <div class="trajectory-overlay__feature">
+                <h4>Win-Loss Records</h4>
+                <p>One feature I'd like to bring into the Wrestling Archive is individual win-loss records.</p>
+                <p>These would be based on the matches documented within the archive, allowing visitors to explore wrestlers' wins, losses, draws, and match histories from the events I've covered.</p>
+                <p>It's not necessarily going to represent someone's entire career, but rather the history we've documented here.</p>
+              </div>
+              <div class="trajectory-overlay__feature">
+                <h4>Community Contributions</h4>
+                <p>Much like the Music Archive, I'd eventually like to give people the opportunity to share their own memories, stories, and experiences from wrestling events, venues, and the wrestlers themselves.</p>
+                <p>I'm also hoping to bring community photo submissions and restoration into this side of the archive down the road, using a similar approach to Music.</p>
+              </div>
+            </section>
+            <p class="trajectory-overlay__conclusion">None of these features have a set release date just yet. This is something I'm continuing to build and expand over time, and I'll share more as things start coming together.</p>
+          </div>
         </div>
       </div>
     </dialog>

@@ -1027,7 +1027,6 @@ trajectoryOverlay?.addEventListener("cancel", event => { event.preventDefault();
 document.addEventListener("keydown", event => {
   if (!trajectorySession) return;
   if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); closeTrajectoryOverlay(); }
-  else if (event.key === "Tab") { event.preventDefault(); trajectoryClose?.focus({ preventScroll: true }); }
 }, true);
 document.addEventListener("focusin", event => {
   if (trajectorySession && !trajectoryOverlay.contains(event.target)) trajectoryClose?.focus({ preventScroll: true });
