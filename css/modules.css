@@ -32888,3 +32888,17 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .admin-shell .admin-imports :is(.admin-api__back, .admin-console__logout) { font-size: 12px; }
+
+/* Admin 5A-1: bounded import reports retain the established station layout. */
+.admin-shell .admin-imports .admin-imports__checked { margin-block-start: 8px; color: #b9aab9; }
+.admin-shell .admin-imports [data-imports-issues] { overflow-wrap: anywhere; }
+.admin-shell .admin-imports [data-imports-issues] ul { margin: 6px 0; padding-inline-start: 18px; }
+.admin-shell .admin-imports [data-imports-issues] li { margin-block: 5px; font: 12px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-imports [data-imports-details] { margin-block-end: 8px; }
+.admin-shell .admin-imports__response { margin: 0 10px 10px; }
+.admin-shell .admin-imports__response pre { max-inline-size: 100%; margin: 0; padding: 8px; color: #c9bac8; background: #0c0a0e; font: 12px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+
+/* Reserve the observed two-line mobile status/date capacity without limiting content growth. */
+@media (max-width: 839px) {
+  .admin-shell .admin-imports :is(.admin-imports__message, .admin-imports__checked) { min-block-size: 2.9em; }
+}

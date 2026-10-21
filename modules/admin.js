@@ -3080,39 +3080,225 @@
   renderIntegrity(true);
 
 
-  // Import status/history routes currently perform schema maintenance; no request is permitted here.
+  // Imports reads only the versioned, read-only reporting contract after a safe deployment-capability check.
   const importsOverview = importsPanel?.querySelector("[data-admin-import-overview]");
   const importsRefresh = importsPanel?.querySelector("[data-imports-refresh]");
   const importsMessage = importsPanel?.querySelector("[data-imports-message]");
-  let importsAvailabilityChecked = false;
+  const importsChecked = importsPanel?.querySelector("[data-imports-checked]");
+  const importsArchives = Object.freeze({ music: Object.freeze(["bands", "shows", "people", "venues"]), wrestling: Object.freeze(["shows", "people", "venues"]) });
+  const IMPORT_AUTOMATIC_LOAD_COST_VERIFIED = false; // Owner requires measured PostgreSQL query cost before automatic loading.
+  const importsResults = new Map(Object.keys(importsArchives).map(archive => [archive, emptyImportReport()]));
+  let importsGeneration = 0, importsRun = null, importsAutoAttempted = false, importsLastChecked = null, importsCapabilityBlocked = false;
+  function emptyImportReport(reason = "No report has been checked.") { return { state: "Not Checked", reason, report: null, stale: false, checkedAt: null, http: null }; }
   function importsOverviewAllowed() {
-    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && importsOverview && importsRefresh && importsMessage;
+    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && importsOverview && importsRefresh && importsMessage && importsChecked;
   }
   function updateImportOverviewControl() {
     if (!importsRefresh) return;
-    // Required existing endpoints are not read-only. A disabled control cannot imply that a safe refresh is available.
-    importsRefresh.disabled = true; importsRefresh.setAttribute("aria-disabled", "true"); importsRefresh.setAttribute("aria-busy", "false");
+    importsRefresh.disabled = !importsOverviewAllowed() || importsRun !== null;
+    importsRefresh.setAttribute("aria-disabled", String(importsRefresh.disabled)); importsRefresh.setAttribute("aria-busy", String(importsRun !== null));
+  }
+  function importReportTime(node, value) {
+    if (!node) return;
+    const valid = parseAdminTimestamp(value);
+    node.textContent = valid ? formatAdminDateTime(value, "Not available") : "Not available";
+    if (valid) { node.dateTime = value; node.title = formatAdminDateTime(value); }
+    else { node.removeAttribute("datetime"); node.removeAttribute("title"); }
+  }
+  function importScalar(value, length = 1024) { return value === null || typeof value === "string" && value.length <= length; }
+  function importCount(value) { return value === null || diagnosticCount(value); }
+  function validateImportReport(data, archive) {
+    if (!Object.prototype.hasOwnProperty.call(importsArchives, archive)) return false;
+    if (!diagnosticObject(data) || typeof data.ok !== "boolean" || data.ok === false && data.availability !== "Unavailable" || data.route !== "/api/admin/import-history/latest" || data.source !== "postgres" || data.section !== archive || !parseAdminTimestamp(data.generatedAt) ||
+        !diagnosticObject(data.database) || typeof data.database.connected !== "boolean" || !["Available", "Partial", "Unavailable"].includes(data.availability) ||
+        !Array.isArray(data.items) || data.items.length > importsArchives[archive].length || !Array.isArray(data.warnings) || data.warnings.length > 10 || !data.warnings.every(value => typeof value === "string" && value.length <= 2048) ||
+        !diagnosticObject(data.coverage) || typeof data.coverage.schemaAvailable !== "boolean" || !Array.isArray(data.coverage.datasets) || data.coverage.datasets.length !== importsArchives[archive].length ||
+        !diagnosticObject(data.limits) || data.limits.maxItems !== importsArchives[archive].length || data.limits.maxMessages !== 10 || data.limits.queryTimeoutMs !== 2000) return false;
+    const seen = new Set(), coverage = new Map();
+    for (const item of data.coverage.datasets) {
+      if (!diagnosticObject(item) || item.section !== archive || !importsArchives[archive].includes(item.category) || coverage.has(item.category) || !["Available", "Unavailable"].includes(item.state) || !importScalar(item.reason, 2048)) return false;
+      coverage.set(item.category, item);
+    }
+    for (const item of data.items) {
+      if (!diagnosticObject(item) || item.section !== archive || item.dataset !== `${archive}.${item.category}` || !importsArchives[archive].includes(item.category) || seen.has(item.category) || coverage.get(item.category)?.state !== "Available" ||
+          !(item.id === null || Number.isSafeInteger(item.id) && item.id > 0) || !importScalar(item.status, 320) || !importScalar(item.error_message, 2048) ||
+          !["rows_fetched", "rows_imported", "rows_inserted", "rows_updated", "rows_skipped", "total_rows_after_import", "warnings_count", "errors_count"].every(key => importCount(item[key])) || item.rows_failed !== null || !diagnosticObject(item.metric_provenance) || typeof item.details_limited !== "boolean" ||
+          !["started_at", "finished_at", "created_at"].every(key => item[key] === null || item[key] === "" || typeof item[key] === "string" && parseAdminTimestamp(item[key])) ||
+          !["warnings", "errors"].every(key => item[key] === null || Array.isArray(item[key]) && item[key].length <= 10 && item[key].every(value => typeof value === "string" && value.length <= 2048))) return false;
+      if (item.startedAt !== undefined && item.startedAt !== item.started_at || item.finishedAt !== undefined && item.finishedAt !== item.finished_at ||
+          item.warnings_count !== null && (item.warnings === null || item.warnings_count < item.warnings.length) || item.errors_count !== null && (item.errors === null || item.errors_count < item.errors.length) ||
+          item.warnings_count === null && item.warnings?.length > 0 || item.errors_count === null && item.errors?.length > 0) return false;
+      for (const key of ["rows_fetched", "rows_imported", "rows_inserted", "rows_updated", "rows_skipped", "total_rows_after_import"]) {
+        const provenance = item.metric_provenance[key], value = item[key];
+        if (!["stored_positive", "explicit_zero", "stored_explicit", "unavailable", "conflict"].includes(provenance) ||
+            value === null && !["unavailable", "conflict"].includes(provenance) ||
+            value === 0 && !["explicit_zero", "stored_explicit"].includes(provenance) ||
+            value > 0 && !["stored_positive", "stored_explicit"].includes(provenance) || item.status === "running" && value !== null) return false;
+      }
+      if ((item.warnings_count > 10 || item.errors_count > 10) && !item.details_limited) return false;
+      seen.add(item.category);
+    }
+    if ([...coverage].some(([category, value]) => value.state === "Available" && !seen.has(category))) return false;
+    if ((!data.database.connected || !data.coverage.schemaAvailable) && data.items.length) return false;
+    if (data.availability === "Available" && (!data.database.connected || !data.coverage.schemaAvailable || seen.size !== importsArchives[archive].length)) return false;
+    if (data.availability === "Partial" && data.items.length === 0 || data.availability === "Unavailable" && data.items.length !== 0) return false;
+    return true;
+  }
+  function projectImportReport(data, archive) {
+    const technical = safeIntegrityValue(data), warnings = safeIntegrityValue(data.warnings).data;
+    const items = new Map();
+    for (const item of data.items) {
+      const safe = safeIntegrityValue(item), value = diagnosticObject(safe.data) ? safe.data : Object.create(null);
+      const status = typeof value.status === "string" ? value.status.trim().toLowerCase() : "";
+      const statusLabel = ({ success: "Success", running: "Running", warning: "Warning", failed: "Failed", error: "Error" })[status] || "Not available";
+      const problems = status === "failed" || status === "error" || item.errors_count > 0 || Boolean(item.error_message);
+      const inconsistentTime = item.started_at && item.finished_at && Date.parse(item.finished_at) < Date.parse(item.started_at);
+      const caution = status === "warning" || item.warnings_count > 0 || item.details_limited || inconsistentTime || !["success", "running", "warning", "failed", "error"].includes(status) || safe.limited;
+      items.set(item.category, { ...value, statusLabel, state: problems ? "Error" : caution ? "Warning" : status === "running" ? "Running" : "Available", lastImport: item.started_at || null, inconsistentTime });
+    }
+    const coverage = new Map(data.coverage.datasets.map(item => [item.category, safeIntegrityValue(item).data]));
+    const state = [...items.values()].some(item => item.state === "Error") ? "Error" : data.availability === "Unavailable" ? "Unavailable" :
+      data.availability === "Partial" ? "Partial" : data.warnings.length || [...items.values()].some(item => ["Warning", "Running"].includes(item.state)) ? "Warning" : "Available";
+    return { state, items, coverage, warnings: Array.isArray(warnings) ? warnings : [], technical: technical.text, technicalLimited: technical.limited };
+  }
+  function importText(parent, tag, value) { const node = document.createElement(tag); node.textContent = String(value); parent.appendChild(node); return node; }
+  function renderImportArchive(archive) {
+    const group = importsPanel?.querySelector(`[data-imports-archive="${archive}"]`), result = importsResults.get(archive); if (!group || !result) return;
+    group.dataset.importsState = result.stale ? "Stale" : result.state;
+    const label = result.stale ? `Stale ${result.state}` : result.state;
+    const note = group.querySelector("[data-imports-archive-note]");
+    note.textContent = `${label}. ${result.reason}${result.checkedAt ? ` Last checked: ${formatAdminDateTime(result.checkedAt)}.` : ""}`;
+    const archiveIssues = group.querySelector("[data-imports-archive-issues]");
+    if (archiveIssues && archiveIssues._importReport !== result.report) { archiveIssues._importReport = result.report; archiveIssues.replaceChildren(); (result.report?.warnings || []).forEach(value => importText(archiveIssues, "p", value)); }
+    for (const category of importsArchives[archive]) {
+      const card = group.querySelector(`[data-imports-collection="${archive}-${category}"]`), item = result.report?.items.get(category), coverage = result.report?.coverage.get(category); if (!card) continue;
+      const field = key => card.querySelector(`[data-imports-field="${key}"]`);
+      card.dataset.importsState = result.stale ? "Stale" : item?.state || result.state;
+      field("status").textContent = item ? `${result.stale ? "Stale — " : ""}${item.statusLabel}` : "Not available";
+      importReportTime(field("lastImport"), item?.lastImport || null);
+      for (const [key, source] of [["imported", "rows_imported"], ["updated", "rows_updated"], ["skipped", "rows_skipped"], ["failed", "rows_failed"]]) field(key).textContent = item && diagnosticCount(item[source]) ? String(item[source]) : "Not available";
+      // Stable nodes and native disclosure state survive refresh failures, cancellation and unrelated source completion.
+      if (card._importItem === item && card._importCoverage === coverage && card._importHasReport === Boolean(result.report)) continue;
+      card._importItem = item; card._importCoverage = coverage; card._importHasReport = Boolean(result.report);
+      const issues = card.querySelector("[data-imports-issues]"), details = card.querySelector("[data-imports-details]"); issues.replaceChildren(); details.replaceChildren();
+      const addDetail = (key, value) => { const wrap = document.createElement("div"); importText(wrap, "dt", key); importText(wrap, "dd", value); details.appendChild(wrap); };
+      if (!item) { importText(issues, "p", coverage?.reason || "No verified import history is available for this collection. Unknown counts are not zero."); continue; }
+      if (item.error_message) importText(issues, "p", item.error_message);
+      for (const [key, title] of [["warnings", "Warnings"], ["errors", "Errors"]]) {
+        const count = item[key + "_count"];
+        importText(issues, "p", count === null ? `${title}: Not available.` : `${title}: ${count} reported message${count === 1 ? "" : "s"}${count > item[key].length ? `; showing the first ${item[key].length}` : ""}.`);
+        if (Array.isArray(item[key]) && item[key].length) { const list = document.createElement("ul"); item[key].forEach(value => importText(list, "li", value)); issues.appendChild(list); }
+      }
+      addDetail("Stored status", item.status === null ? "Not available" : item.status);
+      addDetail("Started", formatAdminDateTime(item.started_at, "Not available")); addDetail("Completed", formatAdminDateTime(item.finished_at, "Not available"));
+      if (item.inconsistentTime) importText(issues, "p", "The stored completion precedes the start. Import timing is unverified.");
+      if (item.details_limited) importText(issues, "p", "The supplied message preview is limited or redacted. Unknown affected-record counts are not zero.");
+      for (const [key, title] of [["rows_fetched", "Source rows fetched"], ["rows_inserted", "Inserted records"], ["total_rows_after_import", "Stored total after import"]]) addDetail(title, diagnosticCount(item[key]) ? item[key] : "Not available");
+      addDetail("Processed / failed records", "Not available: these record counts are not stored. Message totals are not failed-record counts.");
+      addDetail("Zero counts", "Zero is shown only with explicit source provenance; default or conflicting stored zeros remain unavailable.");
+      addDetail("Import record ID", item.id === null ? "Not available" : item.id);
+    }
+    group.querySelector("[data-imports-json]").textContent = result.failureTechnical || result.report?.technical || "No report available.";
   }
   function renderImportOverview() {
     if (!importsOverview || !importsMessage) return;
-    importsOverview.dataset.importsAvailability = importsAvailabilityChecked ? "checked" : "not-checked";
-    importsOverview.dataset.importsState = "Unavailable";
-    importsMessage.textContent = importsAvailabilityChecked ? "Import overview unavailable: no verified read-only import status source is connected. No request was sent." : "Expand Import Overview to check read-only source availability. No import operation will run.";
-    importsPanel.querySelectorAll("[data-imports-value]").forEach(node => { node.textContent = "Not available"; if (node.tagName === "TIME") node.removeAttribute("datetime"); });
+    const results = [...importsResults.values()];
+    const state = importsRun ? "Checking" : results.some(value => value.stale) ? "Stale" : ["Error", "Warning", "Partial", "Unavailable"].find(value => results.some(item => item.state === value)) || (results.every(value => value.state === "Available") ? "Available" : "Not Checked");
+    importsOverview.dataset.importsState = state;
+    importsMessage.textContent = importsRun ? `Import reports: ${importsRun.completed} / 2 checked.` : importsCapabilityBlocked ? "Reporting unavailable; history not requested." : importsLastChecked ? `Import reports: 2 / 2 checked. ${state}.` : "Use Refresh Overview to check stored import reports. Automatic loading awaits verified query cost.";
+    importReportTime(importsChecked, importsLastChecked);
+    Object.keys(importsArchives).forEach(renderImportArchive);
+    const candidates = results.flatMap(value => value.report ? [...value.report.items.values()].map(item => ({ item, stale: value.stale })) : []);
+    const dated = candidates.filter(value => parseAdminTimestamp(value.item.lastImport)).sort((a, b) => Date.parse(b.item.lastImport) - Date.parse(a.item.lastImport) || (b.item.id || 0) - (a.item.id || 0));
+    const latest = dated[0], summary = key => importsPanel.querySelector(`[data-imports-summary="${key}"]`);
+    importReportTime(summary("latestTime"), latest?.item.lastImport || null);
+    if (summary("latestStatus")) summary("latestStatus").textContent = latest ? `${latest.stale ? "Stale — " : ""}${latest.item.statusLabel}` : "Not available";
+    // The latest-started attempt owns the summary; message counts never become failed-record counts.
+    if (summary("processed")) summary("processed").textContent = "Not available";
+    if (summary("issueCount")) summary("issueCount").textContent = latest ? `Warnings: ${diagnosticCount(latest.item.warnings_count) ? latest.item.warnings_count : "Not available"} · Errors: ${diagnosticCount(latest.item.errors_count) ? latest.item.errors_count : "Not available"}` : "Not available";
+    const qualifier = importsPanel.querySelector("[data-imports-summary-note]");
+    if (qualifier) qualifier.textContent = "Summary describes the latest-started reported attempt, including an import still running. Coverage may be partial or stale; unknown histories cannot establish an archive-wide latest import.";
     updateImportOverviewControl();
   }
-  function checkImportAvailability() {
-    if (!importsOverview?.open || !prepareStationEntry() || !importsOverviewAllowed()) return;
-    importsAvailabilityChecked = true; renderImportOverview();
+  function cancelImportOverview() {
+    importsGeneration += 1; const run = importsRun; importsRun = null;
+    if (run) {
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      for (const archive of run.pending) { const previous = importsResults.get(archive); importsResults.set(archive, { ...previous, state: "Unavailable", stale: Boolean(previous.report), reason: previous.report ? "Previous report retained; refresh canceled." : "Reporting request canceled before verification." }); }
+      renderImportOverview();
+    }
+    updateImportOverviewControl();
   }
-  function cancelImportOverview() { updateImportOverviewControl(); }
   function resetImportOverview() {
-    importsAvailabilityChecked = false;
+    cancelImportOverview(); importsAutoAttempted = false; importsLastChecked = null; importsCapabilityBlocked = false;
+    for (const archive of Object.keys(importsArchives)) importsResults.set(archive, emptyImportReport());
     if (importsOverview) { importsOverview.open = false; importsOverview.querySelectorAll("details").forEach(node => { node.open = false; }); }
     renderImportOverview();
   }
-  importsOverview?.addEventListener("toggle", () => { if (importsOverview.open && !importsAvailabilityChecked) checkImportAvailability(); });
-  importsRefresh?.addEventListener("click", checkImportAvailability);
+  function importsCurrent(run) {
+    if (importsRun !== run || run.generation !== importsGeneration) return false;
+    if (!importsOverviewAllowed()) { cancelImportOverview(); prepareStationEntry(); return false; }
+    return true;
+  }
+  function importReportingCapability(data) { return diagnosticObject(data) && data.ok === true && data.service === "vmpix-v3-data" && data.importReportingReadOnly === 1; }
+  function applyImportOutcome(previous, next) {
+    const retain = Boolean(previous.report?.items.size) && (!next.report || !next.report.items.size && ["Unavailable", "Error"].includes(next.state));
+    return { ...next, report: retain ? previous.report : next.report, stale: retain,
+      failureTechnical: retain ? next.report?.technical || null : null,
+      reason: retain ? `${next.reason} Previous report retained as stale.${next.report?.warnings.length ? " " + next.report.warnings.join(" ") : ""}` : next.reason };
+  }
+  async function fetchImportSource(archive, run) {
+    const controller = new AbortController(); run.controllers.add(controller); let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    let next = emptyImportReport(archive ? "The stored import report is unavailable." : "Read-only reporting capability was not verified."); next.state = "Unavailable";
+    try {
+      const response = await fetch(archive ? `https://vmpix-data.onrender.com/api/admin/import-history/latest?section=${archive}` : "https://vmpix-data.onrender.com/health", {
+        method: "GET", headers: archive ? { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` } : { Accept: "application/json" },
+        credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal
+      }); http = response.status;
+      if (archive && (http === 401 || http === 403)) {
+        if (importsCurrent(run)) { cancelImportOverview(); clearSession(); clearPassword(); present("idle", http === 401 ? "Your session has expired or ended. Connect again." : "Access denied. Connect again to continue."); }
+        try { await response.body?.cancel(); } catch {}
+      } else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) next.reason = "Reporting response exceeds the 128 KiB limit.";
+        else if (parsed.unsupported) { next.reason = "Bounded response reading is unavailable."; controller.abort(); }
+        else if (parsed.invalid) { next.state = "Error"; next.reason = "Reporting response is not valid JSON."; controller.abort(); }
+        else if (!response.ok) { next.state = http >= 500 ? "Unavailable" : "Error"; next.reason = `HTTP ${http}: reporting source unavailable.`; if (archive && parsed.data?.availability === "Unavailable" && validateImportReport(parsed.data, archive)) next.report = projectImportReport(parsed.data, archive); }
+        else if (!archive) { if (importReportingCapability(parsed.data)) next = { ...next, capable: true, reason: "Read-only reporting deployment verified." }; else next.reason = "This backend has not advertised the required read-only reporting contract. No import history request was sent."; }
+        else if (!validateImportReport(parsed.data, archive)) { next.state = "Error"; next.reason = "The import reporting contract was not verified."; }
+        else { const report = projectImportReport(parsed.data, archive); next = { ...next, state: report.state, report, reason: report.state === "Available" ? "Stored import history received. Missing metrics remain unavailable." : "Stored import history is partial or reports issues. Review collection details." }; }
+      }
+    } catch { if (timedOut) next.reason = "Reporting request exceeded 15 seconds."; else if (!controller.signal.aborted && http !== null) { next.state = "Error"; next.reason = "The reporting response could not be read."; } }
+    finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    return { ...next, http, checkedAt: new Date().toISOString() };
+  }
+  async function refreshImportOverview() {
+    if (importsRun || !importsOverview?.open || !prepareStationEntry() || !importsOverviewAllowed()) return;
+    importsAutoAttempted = true; importsCapabilityBlocked = false;
+    const run = { generation: ++importsGeneration, completed: 0, pending: new Set(Object.keys(importsArchives)), controllers: new Set(), readers: new Set(), timers: new Set() }; importsRun = run;
+    for (const archive of Object.keys(importsArchives)) { const previous = importsResults.get(archive); importsResults.set(archive, { ...previous, state: "Checking", stale: Boolean(previous.report), reason: previous.report ? "Previous report; checking read-only reporting capability…" : "Checking read-only reporting capability…" }); }
+    renderImportOverview();
+    const capability = await fetchImportSource(null, run); if (!importsCurrent(run)) return;
+    if (!capability.capable) {
+      importsCapabilityBlocked = true;
+      for (const archive of Object.keys(importsArchives)) { const previous = importsResults.get(archive); importsResults.set(archive, { ...capability, report: previous.report, stale: Boolean(previous.report) }); }
+      run.completed = 2; run.pending.clear();
+    } else await Promise.all(Object.keys(importsArchives).map(async archive => {
+      if (!importsCurrent(run)) return;
+      const next = await fetchImportSource(archive, run); if (!importsCurrent(run)) return;
+      const previous = importsResults.get(archive); importsResults.set(archive, applyImportOutcome(previous, next));
+      run.pending.delete(archive); run.completed += 1; renderImportOverview();
+    }));
+    if (!importsCurrent(run)) return;
+    importsRun = null; importsLastChecked = new Date().toISOString(); renderImportOverview();
+  }
+  importsOverview?.addEventListener("toggle", () => {
+    if (!importsOverview.open) return;
+    if (IMPORT_AUTOMATIC_LOAD_COST_VERIFIED && !importsAutoAttempted) refreshImportOverview();
+    else { prepareStationEntry(); updateImportOverviewControl(); }
+  });
+  importsRefresh?.addEventListener("click", refreshImportOverview);
   renderImportOverview();
 
 
