@@ -177,6 +177,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.about) {
     return { name: "about", canonicalUrl: routePaths.about };
   }
+  if (routePath === routePaths.upcoming) {
+    return { name: "upcoming", canonicalUrl: routePaths.upcoming };
+  }
   if (routePath === routePaths.privacy) {
     return { name: "privacy", canonicalUrl: routePaths.privacy };
   }
@@ -418,6 +421,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof syncTrajectoryRoute === "function" && syncTrajectoryRoute(route)) return;
   try { window.__v3AnalyticsBoot?.protectAdmin(route); } catch { /* Optional analytics never changes mounting. */ }
   if (route.name !== "privacy" && typeof hidePrivacyShell === "function") hidePrivacyShell();
   if (typeof cancelAdminStationTravel === "function") cancelAdminStationTravel();
@@ -780,13 +784,14 @@ function syncRoute(route, options = {}) {
 function syncRouteFromLocation(options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence();
   syncRoute(route, options);
-  if (typeof stabilizeShellViewport === "function") {
+  if (route.name !== "upcoming" && !trajectorySession && typeof stabilizeShellViewport === "function") {
     stabilizeShellViewport(route, options);
   }
   notifyV3AnalyticsView(route);
 }
 
 function navigateToRoute(url, options = {}) {
+  if (typeof navigateTrajectoryRoute === "function" && navigateTrajectoryRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   try {
     const target = new URL(url, window.location.href);
     if (/^\/admin(?:\/|$)/i.test(target.pathname)) window.__v3AnalyticsBoot?.protectAdmin({ name: "admin" });

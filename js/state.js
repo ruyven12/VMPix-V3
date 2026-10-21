@@ -1990,6 +1990,7 @@ const routePaths = {
   calendar: "/calendar",
   about: "/about",
   privacy: "/privacy",
+  upcoming: "/upcoming",
   contact: "/contact",
   connect: "/connect",
   admin: "/admin",

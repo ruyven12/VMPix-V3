@@ -2976,12 +2976,29 @@
       <div class="shell-menu-preview__surface" aria-hidden="true"></div>
       <ul class="shell-menu-preview__rows">
         <li class="shell-menu-preview__row">The Story (About)</li>
-        <li class="shell-menu-preview__row">The Trajectory (Upcoming)</li>
+        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/upcoming" data-shell-menu-trajectory>The Trajectory (Upcoming)</a></li>
         <li class="shell-menu-preview__row">Contact</li>
         <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" data-shell-menu-analytics aria-controls="v3-privacy-preferences" aria-expanded="false">Analytics Choices</button></li>
         <li class="shell-menu-preview__row shell-menu-preview__row--admin"><a class="shell-menu-preview__admin-link" href="/admin" data-shell-menu-admin>Admin Menu</a></li>
       </ul>
     </aside>
+
+    <dialog class="trajectory-overlay" data-trajectory-overlay role="dialog" aria-modal="true" aria-labelledby="trajectory-title" aria-describedby="trajectory-status" aria-hidden="true" tabindex="-1" inert hidden>
+      <div class="trajectory-overlay__frame" data-trajectory-frame>
+        <svg class="trajectory-overlay__rails" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="trajectory-overlay__edge" d="M24 1 H114 L140 19 H860 L886 1 H976 L999 24 V101 L992 113 V487 L999 499 V576 L976 599 H886 L860 581 H140 L114 599 H24 L1 576 V499 L8 487 V113 L1 101 V24 Z" />
+          <path class="trajectory-overlay__inset" d="M25 37 H115 L155 73 H845 L885 37 H975 M25 563 H115 L155 527 H845 L885 563 H975 M52 80 V195 L67 214 V386 L52 405 V520 M948 80 V195 L933 214 V386 L948 405 V520" />
+          <path class="trajectory-overlay__detail" d="M300 19 L320 32 H680 L700 19 M300 581 L320 568 H680 L700 581 M155 73 V527 M845 73 V527 M500 34 V125 M500 475 V566" />
+          <path class="trajectory-overlay__accent" d="M468 32 H532 M468 568 H532 M8 134 V204 M992 134 V204 M8 396 V466 M992 396 V466" />
+        </svg>
+        <button class="trajectory-overlay__close" type="button" aria-label="Close The Trajectory" data-trajectory-close><span aria-hidden="true"></span></button>
+        <div class="trajectory-overlay__content" data-trajectory-content>
+          <h2 class="trajectory-overlay__title" id="trajectory-title">The Trajectory</h2>
+          <span class="trajectory-overlay__divider" aria-hidden="true"></span>
+          <p class="trajectory-overlay__status" id="trajectory-status">Coming Soon</p>
+        </div>
+      </div>
+    </dialog>
 
     <template id="shell-rail-template">
     <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal shell rail">

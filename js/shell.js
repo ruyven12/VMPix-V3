@@ -804,11 +804,251 @@ function handleShellMenuAnalytics(event) {
   try { window.V3Analytics?.preferences(); } catch { /* Consent remains available through the Privacy page. */ }
 }
 
+// Trajectory is a Shell overlay route: the mounted page remains its owner until a real departure.
+const trajectoryOverlay = document.querySelector("[data-trajectory-overlay]");
+const trajectoryFrame = trajectoryOverlay?.querySelector("[data-trajectory-frame]");
+const trajectoryClose = trajectoryOverlay?.querySelector("[data-trajectory-close]");
+let trajectorySession = null;
+let trajectoryAnimation = null;
+let trajectoryViewportFrame = 0;
+let trajectoryEngineObserver = null;
+
+function canOpenTrajectory() {
+  return Boolean(trajectoryOverlay && trajectoryFrame && shell && !shell.inert && !shellBackSweep &&
+    !bandRecordOpening && !zhentoRhythmEntry && !adminStationTravel && !activeWorldLanding &&
+    !daiionGatewayTransition && !isDaiionDestinationDepartureActive() &&
+    !shell.classList.contains("is-home-transitioning") && !shell.classList.contains("is-global-menu-open"));
+}
+
+function measureTrajectoryViewport() {
+  if (!trajectorySession || !trajectoryOverlay) return;
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || window.innerHeight);
+  const bounds = portfolioEngine?.getBoundingClientRect();
+  const engineStyle = portfolioEngine && getComputedStyle(portfolioEngine);
+  const settledTop = engineStyle ? window.innerHeight - (parseFloat(engineStyle.bottom) || 0) - portfolioEngine.offsetHeight : bottom;
+  const engineTop = bounds?.height ? Math.min(bounds.top, settledTop) : bottom;
+  trajectoryOverlay.style.setProperty("--trajectory-top", top + "px");
+  trajectoryOverlay.style.setProperty("--trajectory-height", Math.max(0, Math.min(bottom, engineTop) - top) + "px");
+}
+
+function scheduleTrajectoryViewport() {
+  if (!trajectorySession || trajectoryViewportFrame) return;
+  trajectoryViewportFrame = requestAnimationFrame(() => { trajectoryViewportFrame = 0; measureTrajectoryViewport(); });
+}
+
+function finishTrajectoryClose(restoreFocus = true) {
+  const session = trajectorySession;
+  if (!session) return;
+  trajectorySession = null;
+  trajectoryAnimation?.cancel();
+  trajectoryAnimation = null;
+  trajectoryEngineObserver?.disconnect();
+  trajectoryEngineObserver = null;
+  for (const type of ["wheel", "touchmove"]) document.removeEventListener(type, blockTrajectoryBackgroundScroll, true);
+  shell.removeEventListener("portfolio:engine-ready", scheduleTrajectoryViewport);
+  cancelAnimationFrame(trajectoryViewportFrame);
+  trajectoryViewportFrame = 0;
+  if (trajectoryOverlay.open && typeof trajectoryOverlay.close === "function") trajectoryOverlay.close();
+  trajectoryOverlay.hidden = true;
+  trajectoryOverlay.inert = true;
+  trajectoryOverlay.setAttribute("aria-hidden", "true");
+  delete trajectoryOverlay.dataset.state;
+  shell.removeAttribute("data-trajectory-open");
+  session.surfaces.forEach(({ node, inert, ariaHidden }) => {
+    if (inert === null) node.removeAttribute("inert"); else node.setAttribute("inert", inert);
+    if (ariaHidden === null) node.removeAttribute("aria-hidden"); else node.setAttribute("aria-hidden", ariaHidden);
+  });
+  document.title = session.title;
+  if (restoreFocus) {
+    session.scroll.forEach(({ node, top, left }) => { if (node.isConnected) node.scrollTo({ top, left, behavior: "instant" }); });
+    syncShellMenuAvailability();
+    const focus = session.focus?.isConnected && !session.focus.closest("[inert]") && !session.focus.disabled
+      ? session.focus : (!portfolioRightEmitter?.disabled ? portfolioRightEmitter : null);
+    focus?.focus({ preventScroll: true });
+    // A cold overlay deliberately skips Portfolio's entry story; show its settled identity when revealed.
+    if (session.fallback) showPortfolioBranding();
+  }
+}
+
+function animateTrajectory(opening) {
+  const previous = trajectoryAnimation;
+  const style = previous ? getComputedStyle(trajectoryFrame) : null;
+  const from = style ? { opacity: style.opacity, transform: style.transform }
+    : { opacity: opening ? 0 : 1, transform: opening ? "scale(.88)" : "scale(1)" };
+  previous?.cancel();
+  trajectoryAnimation = null;
+  trajectoryOverlay.dataset.state = opening ? "opening" : "closing";
+  if (reducedMotion.matches || typeof trajectoryFrame.animate !== "function") {
+    if (opening) trajectoryOverlay.dataset.state = "open"; else finishTrajectoryClose();
+    return;
+  }
+  const animation = trajectoryFrame.animate([from, { opacity: opening ? 1 : 0, transform: opening ? "scale(1)" : "scale(.88)" }], {
+    duration: opening ? 420 : 280, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both",
+  });
+  trajectoryAnimation = animation;
+  animation.finished.then(() => {
+    if (trajectoryAnimation !== animation || !trajectorySession) return;
+    if (opening) { trajectoryAnimation = null; trajectoryOverlay.dataset.state = "open"; animation.cancel(); }
+    else finishTrajectoryClose();
+  }).catch(() => {});
+}
+
+function getTrajectoryHistorySource() {
+  const state = history.state;
+  if (typeof state?.__v3TrajectorySourceEntry !== "string" || !/^[a-zA-Z0-9-]{8,80}$/.test(state.__v3TrajectorySourceEntry) ||
+    typeof state.__v3ShellPreviousRoute !== "string" || state.__v3ShellPreviousRoute.length > 2048) return null;
+  try {
+    const url = new URL(state.__v3ShellPreviousRoute, location.origin);
+    const route = getRouteFromUrl(url.href);
+    if (url.origin === location.origin && !url.username && !url.password && !route.isUnknown && !["home", "upcoming"].includes(route.name)) {
+      return { route, entry: state.__v3TrajectorySourceEntry };
+    }
+  } catch { /* Invalid or stale metadata uses the safe Portfolio fallback. */ }
+  return null;
+}
+
+function showTrajectoryOverlay({ fromHistory = false, forceFallback = false } = {}) {
+  if (!trajectoryOverlay || !trajectoryFrame) return false;
+  if (trajectorySession) { trajectorySession.closeRequested = false; animateTrajectory(true); return true; }
+  const historySource = getTrajectoryHistorySource();
+  const sourceStillMounted = historySource && historySource.entry === v3RouteContext.entry && historySource.route.canonicalUrl === shellRenderedRoute?.canonicalUrl;
+  const canReturnWithHistory = Boolean(historySource && (sourceStillMounted || fromHistory));
+  const fallback = forceFallback || !shellRenderedRoute || shellRenderedRoute.name === "home" || shellRenderedRoute.isUnknown ||
+    (fromHistory && !sourceStillMounted);
+  if (fallback) {
+    syncRoute(getRouteFromUrl(routePaths.portfolio), { shouldCanonicalize: false });
+    applyPortfolioShellRouteContext();
+    schedulePortfolioEngineReadyGate();
+  }
+  const source = shellRenderedRoute;
+  const focus = shellMenuPanel?.contains(document.activeElement) ? portfolioRightEmitter : document.activeElement;
+  resetShellMenu();
+  trajectorySession = {
+    source, title: document.title, focus, fallback,
+    sourceEntry: v3RouteContext.entry, canReturnWithHistory,
+    scroll: [...getV3ResumeScrollers(source).values()].filter(Boolean).map(node => ({ node, top: node.scrollTop, left: node.scrollLeft })),
+    surfaces: [...shell.children].filter(node => node !== trajectoryOverlay).map(node => ({ node, inert: node.getAttribute("inert"), ariaHidden: node.getAttribute("aria-hidden") })),
+  };
+  trajectorySession.surfaces.forEach(({ node }) => { node.inert = true; node.setAttribute("aria-hidden", "true"); });
+  for (const type of ["wheel", "touchmove"]) document.addEventListener(type, blockTrajectoryBackgroundScroll, { capture: true, passive: false });
+  shell.addEventListener("portfolio:engine-ready", scheduleTrajectoryViewport);
+  measureTrajectoryViewport();
+  trajectoryOverlay.hidden = false;
+  trajectoryOverlay.inert = false;
+  trajectoryOverlay.setAttribute("aria-hidden", "false");
+  if (typeof trajectoryOverlay.showModal === "function" && !trajectoryOverlay.open) trajectoryOverlay.showModal();
+  shell.setAttribute("data-trajectory-open", "");
+  document.title = "The Trajectory - Voodoo Media V3.0.01";
+  if (typeof ResizeObserver === "function" && portfolioEngine) {
+    trajectoryEngineObserver = new ResizeObserver(scheduleTrajectoryViewport);
+    trajectoryEngineObserver.observe(portfolioEngine);
+  }
+  animateTrajectory(true);
+  trajectoryClose?.focus({ preventScroll: true });
+  return true;
+}
+
+function syncTrajectoryRoute(route) {
+  if (route.name === "upcoming") return showTrajectoryOverlay();
+  if (!trajectorySession) return false;
+  if (route.canonicalUrl === trajectorySession.source.canonicalUrl) {
+    if (trajectorySession.sourceEntry !== history.state?.v3EntryId && route.name === "portfolio") {
+      beginV3RouteContext(trajectorySession.source, { navigationCause: "back-forward" });
+    }
+    animateTrajectory(false);
+    return true;
+  }
+  finishTrajectoryClose(false);
+  return false;
+}
+
+function navigateTrajectoryRoute(route, options) {
+  if (route.name === "upcoming") {
+    if (trajectorySession && getRouteFromUrl().name === "upcoming") return true;
+    if (!canOpenTrajectory()) return true;
+    pushRouteUrl(route.canonicalUrl, { __v3TrajectorySourceEntry: v3RouteContext.entry });
+    syncTrajectoryRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (trajectorySession && route.canonicalUrl === trajectorySession.source.canonicalUrl) {
+    pushRouteUrl(route.canonicalUrl, options.historyState || {});
+    syncTrajectoryRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (trajectorySession) finishTrajectoryClose(false);
+  return false;
+}
+
+function handleTrajectoryHistory(event) {
+  const route = getRouteFromUrlWithPrototypePrecedence();
+  if (route.name !== "upcoming" && !trajectorySession) return false;
+  if (route.name !== "upcoming" && route.canonicalUrl !== trajectorySession.source.canonicalUrl) {
+    finishTrajectoryClose(false);
+    return false;
+  }
+  shellHistoryIndex = getShellHistoryIndex(event.state);
+  if (route.name === "upcoming") {
+    // Match the existing history cancellation boundary; a stale sweep must never commit behind the HUD.
+    cancelShellBackSweep();
+    cancelBandRecordOpening();
+    cancelZhentoRhythmEntry();
+    cancelAdminStationTravel();
+    showTrajectoryOverlay({ fromHistory: true, forceFallback: !trajectorySession && !canOpenTrajectory() });
+  } else syncTrajectoryRoute(route);
+  notifyV3AnalyticsView(route);
+  return true;
+}
+
+function closeTrajectoryOverlay() {
+  const session = trajectorySession;
+  if (!session || session.closeRequested || trajectoryOverlay.dataset.state === "closing" || getRouteFromUrl().name !== "upcoming") return;
+  session.closeRequested = true;
+  if (session.canReturnWithHistory) history.back();
+  else {
+    replaceRouteUrl(session.source.canonicalUrl);
+    syncTrajectoryRoute(session.source);
+    notifyV3AnalyticsView(session.source);
+  }
+}
+
+function handleShellMenuTrajectory(event) {
+  if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.inert || event.defaultPrevented) { event.preventDefault(); return; }
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  navigateToRoute(routePaths.upcoming);
+}
+
+trajectoryClose?.addEventListener("click", closeTrajectoryOverlay);
+trajectoryOverlay?.addEventListener("cancel", event => { event.preventDefault(); closeTrajectoryOverlay(); });
+document.addEventListener("keydown", event => {
+  if (!trajectorySession) return;
+  if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); closeTrajectoryOverlay(); }
+  else if (event.key === "Tab") { event.preventDefault(); trajectoryClose?.focus({ preventScroll: true }); }
+}, true);
+document.addEventListener("focusin", event => {
+  if (trajectorySession && !trajectoryOverlay.contains(event.target)) trajectoryClose?.focus({ preventScroll: true });
+});
+function blockTrajectoryBackgroundScroll(event) {
+  if (trajectorySession && !trajectoryOverlay.contains(event.target)) event.preventDefault();
+}
+window.addEventListener("resize", scheduleTrajectoryViewport, { passive: true });
+window.visualViewport?.addEventListener("resize", scheduleTrajectoryViewport, { passive: true });
+window.visualViewport?.addEventListener("scroll", scheduleTrajectoryViewport, { passive: true });
+const settleTrajectoryMotion = () => { if (reducedMotion.matches) trajectoryAnimation?.finish(); };
+if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEventListener("change", settleTrajectoryMotion);
+else reducedMotion.addListener(settleTrajectoryMotion);
+
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
   shellMenuPanel.querySelector("[data-shell-menu-admin]")?.addEventListener("click", handleShellMenuAdmin);
+  shellMenuPanel.querySelector("[data-shell-menu-trajectory]")?.addEventListener("click", handleShellMenuTrajectory);
   shellMenuPanel.querySelector("[data-shell-menu-analytics]")?.addEventListener("click", handleShellMenuAnalytics);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
@@ -7967,6 +8207,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) syncHomeEngageReadiness();
   });
   window.addEventListener("popstate", (event) => {
+    if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
     cancelBandRecordOpening();
