@@ -31667,13 +31667,15 @@ button.hall-crusades-archive-crystal:focus-visible {
   background: inherit;
   filter: brightness(1.45) saturate(1.1);
 }
+.rhythm-viewport[data-rhythm-heartbeat="prepared"]::before,
+.rhythm-viewport[data-rhythm-heartbeat="prepared"]::after { will-change: opacity; }
 .rhythm-viewport[data-rhythm-heartbeat="running"]::before { animation: rhythmHeartbeatWave 2400ms cubic-bezier(.16, .55, .3, 1) both; }
 .rhythm-viewport[data-rhythm-heartbeat="running"]::after { animation: rhythmHeartbeatResponse 2400ms ease-in-out both; }
 @keyframes rhythmHeartbeatWave {
   0% { transform: scale(.16); opacity: 0; }
-  14% { opacity: .95; }
-  40% { opacity: .88; }
-  68% { opacity: .58; }
+  14% { opacity: .475; }
+  40% { opacity: .44; }
+  68% { opacity: .29; }
   100% { transform: scale(2.05); opacity: 0; }
 }
 @keyframes rhythmHeartbeatResponse {
@@ -31682,10 +31684,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   44% { opacity: .65; }
   70% { opacity: .18; }
 }
-.rhythm-viewport[data-rhythm-heartbeat="still"]::before { transform: scale(1.05); opacity: .2; }
+.rhythm-viewport[data-rhythm-heartbeat="still"]::before { transform: scale(1.05); opacity: .1; }
 .rhythm-viewport[data-rhythm-heartbeat="still"]::after { opacity: .25; }
 @media (prefers-reduced-motion: reduce) {
-  .rhythm-viewport[data-rhythm-heartbeat]::before { animation: none; transform: scale(1.05); opacity: .2; }
+  .rhythm-viewport[data-rhythm-heartbeat]::before { animation: none; transform: scale(1.05); opacity: .1; }
   .rhythm-viewport[data-rhythm-heartbeat]::after { animation: none; opacity: .25; }
 }
 

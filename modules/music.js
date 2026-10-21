@@ -8870,6 +8870,8 @@ function prepareRhythmArrival(restore = false) {
   finishRhythmArrival();
   if (reducedMotion.matches) { rhythmViewport.dataset.rhythmHeartbeat = 'still'; return; }
   if (v3RouteContext.skipEntryAnimation || (restore && rhythmArrivalPresented)) return;
+  // Prepare transparent heartbeat layers during arrival, before their first visible frame.
+  rhythmViewport.dataset.rhythmHeartbeat = 'prepared';
   rhythmArrival = { animations: [], started: false };
   rhythmViewport.dataset.rhythmArrival = 'waiting';
   syncRhythmArrivalInput();
