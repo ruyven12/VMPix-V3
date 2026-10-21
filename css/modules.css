@@ -31697,6 +31697,22 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-rolodex .rhythm-source-row.is-active.has-long-source-name .rhythm-source-telemetry { grid-area: 2 / 2; }
 }
 
+/* R3: readable neighboring Sources; selected dossier and scanner geometry stay intact. */
+.rhythm-viewport .rhythm-rolodex .rhythm-source-row:not(.is-active) {
+  opacity: .84;
+  border-color: #69789a99;
+  background: linear-gradient(115deg, #3a47693d, transparent 55%), #0b1020ed;
+  box-shadow: inset 0 1px 0 #a8bce712, inset 0 -1px 0 #00000080;
+}
+.rhythm-viewport .rhythm-rolodex .rhythm-source-row:not(.is-active)[data-band-status="inactive"] {
+  border-color: #74798a99;
+  background: linear-gradient(115deg, #2a2d3833, transparent 55%), #10131bee;
+}
+.rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-name { color: #dce3f1; }
+@media (max-width: 899px) {
+  .rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-name { font-size: .875rem; }
+}
+
 /* Source retrieval shares the current Pillar viewport and existing Band state. */
 .rhythm-pillar [data-bands-view][hidden] { display:none; }
 .rhythm-search-panel { display:flex;flex-direction:column;flex:1;min-height:0;min-width:0; }
