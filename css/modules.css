@@ -32945,3 +32945,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-history__heading time { grid-column: 1 / -1; }
   .admin-shell .admin-history__record > .admin-imports__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
 }
+
+/* Admin 5D: read-only failure reporting; unavailable capabilities stay explicit. */
+.admin-shell .admin-conflicts { margin-block-start: 14px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-conflicts .admin-conflicts__message { min-block-size: 4.35em; margin-block: 10px; color: #dfcbd8; }
+.admin-shell .admin-conflicts__category-body { min-inline-size: 0; padding: 0 10px 10px; }
+.admin-shell .admin-conflicts__category-body > p + p { margin-block-start: 8px; }
+.admin-shell .admin-conflicts .admin-conflicts__unavailable { color: #c5b9c5; font-size: 14px; }
+.admin-shell .admin-conflicts .admin-conflicts__checked, .admin-shell .admin-conflicts .admin-conflicts__note { margin-block: 8px; color: #b9aab9; }
+.admin-shell .admin-conflicts__list { margin-block: 12px; }
+.admin-shell .admin-conflicts .admin-conflicts__explanation { margin-block: 8px; color: #e6c4ce; }

@@ -225,7 +225,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); resetConflicts(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -348,6 +348,7 @@
     updateImportOverviewControl();
     updateManualImportControls();
     updateHistoryControls();
+    updateConflictsControls();
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
@@ -372,7 +373,7 @@
       if (!wasImports && shouldFocus) focusTitle(importsTitle);
       updateStationControl(); return;
     }
-    if (wasImports) { cancelImportOverview(); cancelHistory(); }
+    if (wasImports) { cancelImportOverview(); cancelHistory(); cancelConflicts(); }
     if (importsPanel) surface(importsPanel, false);
     const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
@@ -427,6 +428,7 @@
     cancelIntegrity();
     cancelImportOverview();
     cancelHistory();
+    cancelConflicts();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -3665,6 +3667,150 @@
   historyMore?.addEventListener("click", () => loadHistory("more"));
   historyFilter?.addEventListener("change", () => { const selected = historyFilter.value; if (!["all", "music", "wrestling"].includes(selected) || selected === historyState.filter || !historyAllowed()) return; cancelHistory(); historyState = emptyHistory(selected); renderHistory(); loadHistory(); });
   renderHistory();
+
+
+  // Conflict reporting never executes imports. Only recorded failed/error operations have a complete supported feed.
+  const conflictsPanel = importsPanel?.querySelector("[data-admin-conflicts]");
+  const conflictsRefresh = conflictsPanel?.querySelector("[data-conflicts-refresh]");
+  const conflictsMore = conflictsPanel?.querySelector("[data-conflicts-more]");
+  const conflictsMessage = conflictsPanel?.querySelector("[data-conflicts-message]");
+  const conflictsChecked = conflictsPanel?.querySelector("[data-conflicts-checked]");
+  const conflictsList = conflictsPanel?.querySelector("[data-conflicts-list]");
+  const CONFLICTS_AUTOMATIC_LOAD_COST_VERIFIED = false; // Live PostgreSQL query cost remains unverified.
+  const conflictSources = Object.freeze(["music", "wrestling"].flatMap(archive => ["failed", "error"].map(status => Object.freeze({ id: `${archive}-${status}`, archive, status }))));
+  let conflictsGeneration = 0, conflictsRun = null, conflictsState = emptyConflicts();
+  function emptyConflicts() {
+    return { records: [], streams: null, loaded: false, stale: false, hasMore: false, moreBlocked: false, checkedAt: null,
+      reason: "Use Refresh Conflicts to retrieve recorded failed imports. Automatic loading awaits query-cost verification." };
+  }
+  function conflictsAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && conflictsPanel && conflictsRefresh && conflictsMore && conflictsMessage && conflictsList;
+  }
+  function updateConflictsControls() {
+    if (!conflictsRefresh) return;
+    const disabled = !conflictsAllowed();
+    conflictsRefresh.disabled = disabled || conflictsRun !== null;
+    conflictsMore.disabled = disabled || conflictsRun !== null || !conflictsState.hasMore || conflictsState.moreBlocked;
+    conflictsRefresh.setAttribute("aria-busy", String(conflictsRun?.kind === "refresh"));
+    conflictsMore.setAttribute("aria-busy", String(conflictsRun?.kind === "more"));
+  }
+  function validateConflictPage(data, spec, page) {
+    return validateHistoryPage(data, spec.archive, page) && diagnosticObject(data.filters) && data.filters.section === spec.archive && data.filters.status === spec.status &&
+      data.items.every(item => item.status.trim().toLowerCase() === spec.status);
+  }
+  function conflictRecord(item) {
+    const node = historyRecord(item), safe = safeManualImportValue(item), value = safe.data;
+    delete node.dataset.historyRecord; delete node.dataset.historyId;
+    node.dataset.conflictRecord = ""; node.dataset.conflictId = String(item.id); node.classList.add("admin-conflicts__record");
+    const heading = node.querySelector(".admin-history__heading"), started = heading.querySelector("time");
+    started.textContent = `Started: ${formatAdminDateTime(item.started_at, "Not available")}`;
+    const finished = importText(heading, "time", `Completed: ${formatAdminDateTime(item.finished_at, "Not available")}`); if (item.finished_at) finished.dateTime = item.finished_at;
+    const explanation = document.createElement("p"); explanation.className = "admin-conflicts__explanation";
+    explanation.textContent = value.error_message || value.errors?.[0] || "The backend recorded this import as failed. No error description was supplied.";
+    heading.after(explanation); node._conflictItem = item; return node;
+  }
+  function renderConflicts() {
+    if (!conflictsList) return;
+    conflictsMessage.textContent = `${conflictsState.stale ? "Stale results. " : ""}${conflictsState.reason}`;
+    conflictsChecked.textContent = `Last checked: ${formatAdminDateTime(conflictsState.checkedAt, "Not available")}. Displaying ${conflictsState.records.length} failed import${conflictsState.records.length === 1 ? "" : "s"}.`;
+    const existing = new Map([...conflictsList.children].map(node => [Number(node.dataset.conflictId), node])), ids = new Set(conflictsState.records.map(item => item.id));
+    existing.forEach((node, id) => { if (!ids.has(id)) node.remove(); });
+    conflictsState.records.forEach((item, index) => { const old = existing.get(item.id), node = old?._conflictItem === item ? old : conflictRecord(item); if (old && old !== node) old.replaceWith(node); if (conflictsList.children[index] !== node) conflictsList.insertBefore(node, conflictsList.children[index] || null); });
+    conflictsList.setAttribute("aria-busy", String(conflictsRun !== null)); updateConflictsControls();
+  }
+  function cancelConflicts() {
+    const run = conflictsRun; if (!run) return;
+    conflictsGeneration += 1; conflictsRun = null;
+    run.timers.forEach(clearTimeout); run.controllers.forEach(controller => controller.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+    conflictsState.stale = conflictsState.records.length > 0; conflictsState.reason = "Conflict reporting canceled. Use Refresh Conflicts or Show More to retry."; renderConflicts();
+  }
+  function resetConflicts() {
+    cancelConflicts(); conflictsState = emptyConflicts();
+    if (conflictsPanel) { conflictsPanel.open = false; conflictsPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
+    renderConflicts();
+  }
+  function conflictsCurrent(run) {
+    if (conflictsRun !== run || run.generation !== conflictsGeneration) return false;
+    if (!conflictsAllowed()) { cancelConflicts(); prepareStationEntry(); return false; } return true;
+  }
+  async function fetchConflictPage(spec, page, run) {
+    const controller = new AbortController(); run.controllers.add(controller); let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    const path = spec ? `/api/admin/import-history/${spec.archive}?limit=5&page=${page}&status=${spec.status}` : "/health";
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${path}`, { method: "GET", headers: spec ? { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` } : { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal });
+      if (spec && [401, 403].includes(response.status)) {
+        try { await response.body?.cancel(); } catch {}
+        if (conflictsCurrent(run)) { cancelConflicts(); clearSession(); clearPassword(); present("idle", "Your session has expired or access was denied. Connect again."); }
+        throw new Error("Authorization unavailable.");
+      }
+      const parsed = await boundedEndpointJson(response, run, controller);
+      if (parsed.unavailable) throw new Error("Conflict reporting exceeds the 128 KiB limit.");
+      if (parsed.unsupported || parsed.invalid) { controller.abort(); throw new Error("Conflict reporting could not be read safely."); }
+      if (!response.ok) throw new Error(`HTTP ${response.status}: conflict reporting is unavailable.`);
+      if (!spec) { if (!importReportingCapability(parsed.data)) throw new Error("Read-only reporting is not verified on this backend. No history request was sent."); return parsed.data; }
+      if (parsed.data?.availability === "Unavailable" && parsed.data?.route === `/api/admin/import-history/${spec.archive}`) throw new Error(`${spec.archive === "music" ? "Music" : "Wrestling"} failure history is unavailable.`);
+      if (!validateConflictPage(parsed.data, spec, page)) throw new Error("The failed-import response contract, filter or ordering could not be verified.");
+      return parsed.data;
+    } catch (error) {
+      if (timedOut) throw new Error("Conflict reporting exceeded 15 seconds.");
+      if (error instanceof SyntaxError) throw new Error("Conflict reporting is not valid JSON.");
+      if (error instanceof TypeError) throw new Error("Conflict reporting connection is unavailable.");
+      throw error;
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+  }
+  async function loadConflicts(kind = "refresh") {
+    if (conflictsRun || !conflictsPanel?.open || !prepareStationEntry() || !conflictsAllowed() || kind === "more" && (!conflictsState.hasMore || conflictsState.moreBlocked)) return;
+    const focused = [conflictsRefresh, conflictsMore].includes(document.activeElement) ? document.activeElement : null;
+    const run = { generation: ++conflictsGeneration, kind, controllers: new Set(), readers: new Set(), timers: new Set(), focused };
+    conflictsRun = run; conflictsState.stale = conflictsState.records.length > 0; conflictsState.reason = kind === "more" ? "Loading the next five older failed imports…" : "Retrieving the latest five failed imports…"; renderConflicts();
+    const streams = Object.fromEntries(conflictSources.map(spec => { const old = kind === "more" ? conflictsState.streams?.[spec.id] : null; return [spec.id, old ? { ...old, buffer: old.buffer.slice() } : { nextPage: 1, buffer: [], ended: false }]; }));
+    const prior = kind === "more" ? conflictsState.records : [], seen = new Set(prior.map(item => item.id));
+    let overlaps = false;
+    try {
+      await fetchConflictPage(null, 1, run); if (!conflictsCurrent(run)) return;
+      const warnings = [], jobs = conflictSources.filter(spec => streams[spec.id].buffer.length < 5 && !streams[spec.id].ended);
+      let jobIndex = 0, failure = null;
+      const worker = async () => {
+        while (!failure && jobIndex < jobs.length && conflictsCurrent(run)) {
+          const spec = jobs[jobIndex++], stream = streams[spec.id];
+          try {
+            if (stream.nextPage > 2001) { conflictsState.moreBlocked = true; throw new Error("The backend history-page limit was reached. Refresh to return to the latest entries."); }
+            const data = await fetchConflictPage(spec, stream.nextPage, run); if (!conflictsCurrent(run)) return;
+            const known = new Set([...seen, ...stream.buffer.map(item => item.id)]);
+            for (const item of data.items) { if (known.has(item.id)) { overlaps = true; continue; } known.add(item.id); stream.buffer.push(item); }
+            stream.buffer.sort(historyOrder); stream.nextPage += 1; stream.ended = !data.hasNextPage;
+            warnings.push(...data.warnings.map(value => safeManualImportValue(value).data));
+            if (stream.buffer.length < 5 && !stream.ended) { conflictsState.moreBlocked = true; throw new Error("Failure history changed while paging. Refresh Conflicts to obtain a new ordered view."); }
+          } catch (error) { failure ||= error; }
+        }
+      };
+      await Promise.all([worker(), worker()]); if (!conflictsCurrent(run)) return; if (failure) throw failure;
+      const candidates = conflictSources.flatMap(spec => streams[spec.id].buffer).sort(historyOrder), unique = new Map();
+      for (const item of candidates) { if (seen.has(item.id) || unique.has(item.id)) { overlaps = true; continue; } unique.set(item.id, item); }
+      const next = [...unique.values()].slice(0, 5);
+      if (prior.length && next.some(item => historyOrder(prior[prior.length - 1], item) > 0)) { conflictsState.moreBlocked = true; throw new Error("Newer failure history appeared while paging. Refresh Conflicts to restore chronological order."); }
+      const consumed = new Set(next.map(item => item.id));
+      for (const stream of Object.values(streams)) stream.buffer = stream.buffer.filter(item => !consumed.has(item.id));
+      conflictsState.records = prior.concat(next); conflictsState.streams = streams; conflictsState.loaded = true; conflictsState.stale = false; conflictsState.moreBlocked = false;
+      conflictsState.hasMore = Object.values(streams).some(stream => stream.buffer.length || !stream.ended); conflictsState.checkedAt = new Date().toISOString();
+      conflictsState.reason = !conflictsState.records.length ? "No recorded failed/error import operations were returned." : `${next.length} ${kind === "more" ? "older" : "latest"} failed import${next.length === 1 ? "" : "s"} received.${!conflictsState.hasMore ? " No older entries remain in this response." : ""}${overlaps ? " Overlapping page entries were omitted; refresh for the latest view." : ""}${warnings.length ? " Reporting warnings: " + [...new Set(warnings)].join(" ") : ""}`;
+    } catch (error) {
+      if (!conflictsCurrent(run)) return;
+      conflictsState.stale = conflictsState.records.length > 0;
+      conflictsState.reason = `${safeManualImportValue(error?.message || "Conflict reporting is unavailable.").data}${conflictsState.records.length ? " Previous results retained." : " No verified failed imports were loaded."}`;
+    } finally {
+      run.timers.forEach(clearTimeout);
+      if (conflictsRun === run) {
+        conflictsRun = null; renderConflicts();
+        if (run.focused && document.activeElement === document.body && conflictsPanel.open && conflictsAllowed()) (run.focused.disabled ? conflictsRefresh : run.focused).focus({ preventScroll: true });
+      }
+    }
+  }
+  conflictsPanel?.addEventListener("toggle", () => { if (!conflictsPanel.open) return; if (CONFLICTS_AUTOMATIC_LOAD_COST_VERIFIED && !conflictsState.loaded) loadConflicts(); else { prepareStationEntry(); updateConflictsControls(); } });
+  conflictsRefresh?.addEventListener("click", () => loadConflicts());
+  conflictsMore?.addEventListener("click", () => loadConflicts("more"));
+  renderConflicts();
 
 
   function connectAction() {

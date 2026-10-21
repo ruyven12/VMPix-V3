@@ -2866,6 +2866,16 @@
                   <button class="admin-imports__refresh" type="button" data-history-more disabled>Show More</button>
                 </div>
               </details>
+              <details class="admin-conflicts admin-api-section" data-admin-conflicts aria-labelledby="admin-conflicts-title">
+                <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-conflicts-title">Conflict Management</h2></summary>
+                <div class="admin-api-section__body">
+                  <button class="admin-imports__refresh" type="button" data-conflicts-refresh disabled>Refresh Conflicts</button>
+                  <p class="admin-conflicts__message" role="status" aria-live="polite" data-conflicts-message>Use Refresh Conflicts to retrieve recorded failed imports. Automatic loading awaits query-cost verification.</p>
+                  <details class="admin-imports__group" data-conflict-category="conflicts"><summary>Import Conflicts</summary><div class="admin-conflicts__category-body"><p class="admin-conflicts__unavailable">Not available</p><p>Protected-field conflict tracking is not implemented. Ordinary import warnings are not field-level conflicts.</p></div></details>
+                  <details class="admin-imports__group" data-conflict-category="warnings"><summary>Import Warnings</summary><div class="admin-conflicts__category-body"><p class="admin-conflicts__unavailable">Not available</p><p>The backend cannot retrieve a complete paginated warning feed. Filtering only warning-status imports would miss warnings recorded on other import statuses. Use Import History to inspect the warnings supplied for an individual operation.</p><p>Warning-message identifiers and individual warning timestamps are not supplied. No complete latest-five warning list can be verified.</p></div></details>
+                  <details class="admin-imports__group" data-conflict-category="failed"><summary>Failed Imports</summary><div class="admin-conflicts__category-body"><p class="admin-conflicts__checked" data-conflicts-checked>Last checked: Not available. Displaying 0 failed imports.</p><p class="admin-conflicts__note">Recorded failed/error operations, newest import start first. Completed shows the stored finish time when available. Imported records may include updates; unknown counts remain Not available.</p><div class="admin-conflicts__list" data-conflicts-list></div><button class="admin-imports__refresh" type="button" data-conflicts-more disabled>Show More</button></div></details>
+                </div>
+              </details>
               <footer class="admin-api__footer"><p role="status" aria-live="polite" aria-atomic="true" data-admin-imports-feedback></p><button class="admin-console__logout" type="button" data-admin-imports-logout>LOGOUT</button></footer>
             </div>
           </article>
