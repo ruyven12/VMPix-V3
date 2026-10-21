@@ -8829,7 +8829,34 @@ function syncRhythmArrivalInput() {
   const scanner = musicBandsIndex.querySelector('[data-rhythm-rolodex]');
   if (scanner) scanner.tabIndex = complete ? 0 : -1;
 }
+// The one-shot heartbeat is presentation only: it never owns browse readiness.
+let rhythmHeartbeatCleanup = null;
+function stopRhythmHeartbeat() {
+  rhythmHeartbeatCleanup?.();
+  rhythmHeartbeatCleanup = null;
+  rhythmViewport.removeAttribute('data-rhythm-heartbeat');
+}
+function startRhythmHeartbeat() {
+  stopRhythmHeartbeat();
+  if (rhythmViewport.hidden) return;
+  if (reducedMotion.matches) {
+    rhythmViewport.dataset.rhythmHeartbeat = 'still';
+    return;
+  }
+  const settled = event => {
+    if (event.target === rhythmViewport && event.animationName === 'rhythmHeartbeatWave') stopRhythmHeartbeat();
+  };
+  rhythmViewport.addEventListener('animationend', settled);
+  rhythmViewport.addEventListener('animationcancel', settled);
+  rhythmHeartbeatCleanup = () => {
+    rhythmViewport.removeEventListener('animationend', settled);
+    rhythmViewport.removeEventListener('animationcancel', settled);
+  };
+  rhythmViewport.dataset.rhythmHeartbeat = 'running';
+}
+window.addEventListener('pagehide', stopRhythmHeartbeat);
 function finishRhythmArrival() {
+  stopRhythmHeartbeat();
   const arrival = rhythmArrival;
   rhythmArrival = null;
   arrival?.animations.forEach(animation => animation.cancel());
@@ -8841,7 +8868,8 @@ function finishRhythmArrival() {
 }
 function prepareRhythmArrival(restore = false) {
   finishRhythmArrival();
-  if (reducedMotion.matches || v3RouteContext.skipEntryAnimation || (restore && rhythmArrivalPresented)) return;
+  if (reducedMotion.matches) { rhythmViewport.dataset.rhythmHeartbeat = 'still'; return; }
+  if (v3RouteContext.skipEntryAnimation || (restore && rhythmArrivalPresented)) return;
   rhythmArrival = { animations: [], started: false };
   rhythmViewport.dataset.rhythmArrival = 'waiting';
   syncRhythmArrivalInput();
@@ -8878,9 +8906,16 @@ async function startRhythmArrival() {
     if (tier === 'dossier') rhythmViewport.setAttribute('data-rhythm-dossier-ready','');
     syncRhythmArrivalInput();
   }
-  if (rhythmArrival === arrival) finishRhythmArrival();
+  if (rhythmArrival === arrival) {
+    finishRhythmArrival();
+    startRhythmHeartbeat();
+  }
 }
-reducedMotion.addEventListener('change', () => { if (reducedMotion.matches && rhythmArrival) finishRhythmArrival(); });
+reducedMotion.addEventListener('change', () => {
+  if (!reducedMotion.matches) return;
+  if (rhythmArrival) finishRhythmArrival();
+  startRhythmHeartbeat();
+});
 
 let rhythmSourceSession = null;
 function getRhythmSourceStatus(band) {

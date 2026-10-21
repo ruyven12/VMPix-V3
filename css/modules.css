@@ -31647,6 +31647,48 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-viewport:not([hidden]) :is(.rhythm-heading,.zhento-top-hud-rail,.zhento-side-hud-rail,.rhythm-modes,.rhythm-source-filters,[data-rhythm-source-status],.rhythm-search-control,.rhythm-source-list > li,.rhythm-rolodex-controls,[data-bands-search-summary],.rhythm-search-results,.rhythm-source-more) { visibility:visible; }
 }
 
+/* R1: one sonic heartbeat after arrival; temporary paint behind the browse UI. */
+.rhythm-viewport .rhythm-pillar { z-index: 2; }
+.rhythm-viewport[data-rhythm-heartbeat]::before,
+.rhythm-viewport[data-rhythm-heartbeat]::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+}
+.rhythm-viewport[data-rhythm-heartbeat]::before {
+  z-index: 1;
+  background: radial-gradient(ellipse 80% 18% at 50% 63%, transparent 56%, rgba(104, 113, 255, .12) 61%, rgba(111, 155, 255, .72) 66%, rgba(192, 171, 255, .9) 70%, rgba(112, 103, 245, .3) 76%, transparent 84%);
+  transform-origin: 50% 63%;
+}
+.rhythm-viewport[data-rhythm-heartbeat]::after {
+  z-index: 0;
+  background: inherit;
+  filter: brightness(1.45) saturate(1.1);
+}
+.rhythm-viewport[data-rhythm-heartbeat="running"]::before { animation: rhythmHeartbeatWave 2400ms cubic-bezier(.16, .55, .3, 1) both; }
+.rhythm-viewport[data-rhythm-heartbeat="running"]::after { animation: rhythmHeartbeatResponse 2400ms ease-in-out both; }
+@keyframes rhythmHeartbeatWave {
+  0% { transform: scale(.16); opacity: 0; }
+  14% { opacity: .95; }
+  40% { opacity: .88; }
+  68% { opacity: .58; }
+  100% { transform: scale(2.05); opacity: 0; }
+}
+@keyframes rhythmHeartbeatResponse {
+  0%, 100% { opacity: 0; }
+  20% { opacity: .22; }
+  44% { opacity: .65; }
+  70% { opacity: .18; }
+}
+.rhythm-viewport[data-rhythm-heartbeat="still"]::before { transform: scale(1.05); opacity: .2; }
+.rhythm-viewport[data-rhythm-heartbeat="still"]::after { opacity: .25; }
+@media (prefers-reduced-motion: reduce) {
+  .rhythm-viewport[data-rhythm-heartbeat]::before { animation: none; transform: scale(1.05); opacity: .2; }
+  .rhythm-viewport[data-rhythm-heartbeat]::after { animation: none; opacity: .25; }
+}
+
 /* Current Band Detail foundation: retained dossier data inside the Shell's safe content area. */
 .band-detail-content { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);box-sizing:border-box;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:max(3.6rem,env(safe-area-inset-top)) max(2rem,env(safe-area-inset-right)) 1rem max(2rem,env(safe-area-inset-left));color:#e4eaff; }
 .band-detail-content .band-detail-screen { box-sizing:border-box;width:min(100%,62rem);min-width:0;margin-inline:auto; }
