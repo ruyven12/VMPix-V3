@@ -32902,3 +32902,19 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (max-width: 839px) {
   .admin-shell .admin-imports :is(.admin-imports__message, .admin-imports__checked) { min-block-size: 2.9em; }
 }
+
+/* Admin 5B-R: direct manual controls reuse the existing Imports viewport and accordion style. */
+.admin-shell .admin-manual-imports { margin-block-start: 14px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-manual-imports .admin-manual-imports__progress { margin-block: 10px; min-block-size: 2.9em; color: #dfcbd8; }
+.admin-shell .admin-manual-imports .admin-manual-imports__note { margin-block: 8px; color: #b9aab9; }
+.admin-shell .admin-manual-import__rows { padding: 0 10px 10px; }
+.admin-shell .admin-manual-import { padding-block: 12px; border-block-start: 1px solid #473340; min-inline-size: 0; }
+.admin-shell .admin-manual-import__heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.admin-shell .admin-manual-import__heading h4 { margin: 0; color: #e0d1dd; font: 400 14px/1.45 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-manual-import__heading button { appearance: none; flex-shrink: 0; min-block-size: 44px; padding: 8px 10px; border: 1px solid #934057; border-radius: 0; background: #28101d; color: #e5d9e3; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-manual-import__heading button:disabled { color: #ab99a8; cursor: default; }
+.admin-shell .admin-manual-import .admin-manual-import__state { margin-block: 8px 4px; color: #e1c3cf; font-size: 14px; }
+.admin-shell .admin-manual-import [data-manual-import-reason] { min-block-size: 2.9em; }
+.admin-shell .admin-manual-import [data-manual-import-messages] p + p { margin-block-start: 8px; }
+.admin-shell .admin-manual-import__response pre { max-inline-size: 100%; margin: 0; padding: 8px; font: 12px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+.admin-shell .admin-console__station-body .admin-manual-import-indicator { position: absolute; inset-block-end: 2px; inset-inline: 8px; margin: 0; max-inline-size: 100%; color: #d9bdca; font: 10px/1.4 var(--font-display); text-align: center; overflow-wrap: anywhere; }

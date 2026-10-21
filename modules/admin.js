@@ -225,7 +225,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -317,6 +317,7 @@
   }
   async function logout() {
     if (!available() || busy() || !bearer) return;
+    cancelManualImports("Logout interrupted the request.");
     resetSignal();
     const at = ++generation;
     present("logging-out", "Ending your session…");
@@ -345,6 +346,7 @@
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
     if (importsOpen) { importsOpen.disabled = !canEnterStation(); importsOpen.setAttribute("aria-disabled", String(importsOpen.disabled)); }
     updateImportOverviewControl();
+    updateManualImportControls();
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
@@ -3302,6 +3304,175 @@
   renderImportOverview();
 
 
+  // Direct imports are an explicit user action. This controller is local to this Admin document, not a durable job service.
+  const manualImportsPanel = importsPanel?.querySelector("[data-admin-manual-imports]");
+  const manualImportsAll = manualImportsPanel?.querySelector("[data-manual-import-all]");
+  const manualImportsProgress = manualImportsPanel?.querySelector("[data-manual-import-progress]");
+  const manualImportsIndicator = deck?.querySelector("[data-manual-import-indicator]");
+  const MANUAL_IMPORT_TIMEOUT_MS = 180000;
+  const manualImportCatalog = Object.freeze([
+    ["music-bands", "music", "bands", "Music Bands", "Music-Bands", "music_bands"],
+    ["music-shows", "music", "shows", "Music Shows", "Music-Shows", "music_shows"],
+    ["music-people", "music", "people", "Music People", "Music-People", "music_people"],
+    ["music-venues", "music", "venues", "Music Venues", "Music-Venue", "music_venues"],
+    ["wrestling-shows", "wrestling", "shows", "Wrestling Shows", "Wrestling-Matches", "wrestling_shows"],
+    ["wrestling-people", "wrestling", "people", "Wrestling People", "Wrestling-People", "wrestling_people"],
+    ["wrestling-venues", "wrestling", "venues", "Wrestling Venues", "Wrestling-Venue", "wrestling_venues"]
+  ].map(([id, archive, category, label, source, table]) => Object.freeze({ id, archive, category, label, source, table, path: `/admin/import/${archive}/${category}?refresh=1`, route: `/admin/import/${archive}/${category}` })));
+  const manualImportRows = new Map(manualImportCatalog.map(spec => [spec.id, manualImportsPanel?.querySelector(`[data-manual-import="${spec.id}"]`)]));
+  const manualImportResults = new Map(manualImportCatalog.map(spec => [spec.id, emptyManualImport()]));
+  let manualImportGeneration = 0, manualImportRun = null, manualImportLastState = "Idle";
+  function emptyManualImport(state = "Not Started", reason = "No import has been requested.") { return { state, reason, metrics: null, technical: null, messages: [], completedAt: null, receivedAt: null, duration: null }; }
+  function manualImportSessionReady() { return active && state === "authenticated" && bearer !== null && expiresAt > Date.now() && visualPhase === "ready"; }
+  function manualImportCanStart() {
+    return manualImportSessionReady() && available() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && manualImportsPanel?.open && manualImportsAll && manualImportsProgress && [...manualImportRows.values()].every(Boolean);
+  }
+  function updateManualImportControls() {
+    const disabled = !manualImportCanStart() || manualImportRun !== null;
+    if (manualImportsAll) { manualImportsAll.disabled = disabled; manualImportsAll.setAttribute("aria-busy", String(manualImportRun !== null)); }
+    manualImportRows.forEach((row, id) => { const button = row?.querySelector("[data-manual-import-run]"); if (!button) return; button.disabled = disabled; button.setAttribute("aria-busy", String(manualImportRun?.active === id)); button.textContent = manualImportRun?.active === id ? "Importing…" : "Run Import"; });
+    if (manualImportsIndicator) {
+      manualImportsIndicator.hidden = manualImportLastState === "Idle";
+      manualImportsIndicator.textContent = manualImportRun?.active ? `Importing · ${manualImportCatalog.find(spec => spec.id === manualImportRun.active)?.label || "Archive"}` :
+        manualImportLastState === "Success" ? "Import Complete" : manualImportLastState === "Warning" ? "Import Complete · Warning" : manualImportLastState === "Failed" ? "Import Failed" : manualImportLastState === "Busy" ? "Import not started" : manualImportLastState === "Unknown" ? "Import status unknown" : "";
+    }
+  }
+  function renderManualImport(id) {
+    const row = manualImportRows.get(id), result = manualImportResults.get(id); if (!row || !result) return;
+    row.dataset.manualImportState = result.state;
+    row.querySelector("[data-manual-import-state]").textContent = result.state;
+    row.querySelector("[data-manual-import-reason]").textContent = result.reason;
+    const metrics = row.querySelector("[data-manual-import-metrics]"); metrics.replaceChildren();
+    const metric = (label, value) => { const wrap = document.createElement("div"); importText(wrap, "dt", label); importText(wrap, "dd", value); metrics.appendChild(wrap); };
+    for (const [key, label] of [["written", "Records written (upserts)"], ["updated", "Updated records"], ["skipped", "Skipped records"], ["failed", "Failed records"]]) metric(label, diagnosticCount(result.metrics?.[key]) ? String(result.metrics[key]) : "Not available");
+    metric("Execution time", diagnosticCount(result.duration) ? `${result.duration} ms` : "Not available");
+    metric("Completed", formatAdminDateTime(result.completedAt, "Not available"));
+    metric("Response received", formatAdminDateTime(result.receivedAt, "Not available"));
+    const messages = row.querySelector("[data-manual-import-messages]"); messages.replaceChildren(); result.messages.forEach(value => importText(messages, "p", value));
+    if (!result.messages.length) importText(messages, "p", result.technical ? "No additional readable warnings or errors were supplied." : "No response available.");
+    row.querySelector("[data-manual-import-json]").textContent = result.technical || "No response available.";
+    updateManualImportControls();
+  }
+  function manualImportKnownRoute(spec, value) { return value === spec.route || spec.id === "wrestling-people" && value === "/api/wrestling/people/import"; }
+  function safeManualImportValue(input) {
+    let nodes = 0;
+    const credential = /admin[\s_-]*token|token|secret|password|passwd|hash|cookie|authorization|credential|api[\s_-]*key|bearer|private[\s_-]*key|database[\s_-]*url|postgres(?:ql)?:\/\//i;
+    const visit = (value, depth) => {
+      if (++nodes > 2500 || depth > 8) return "[Detail omitted: safety limit]";
+      if (typeof value === "string") {
+        if (credential.test(value)) return "[Sensitive detail redacted]";
+        if (value.length > 2048) return "[Long detail omitted]";
+        return value.replace(/https?:\/\/[^\s<>"']+/gi, "[URL omitted]");
+      }
+      if (Array.isArray(value)) return value.slice(0, 100).map(item => visit(item, depth + 1));
+      if (diagnosticObject(value)) { const out = Object.create(null); for (const key of Object.keys(value).slice(0, 100)) { if (["__proto__", "prototype", "constructor"].includes(key)) continue; out[key] = credential.test(key) ? "[Sensitive detail redacted]" : visit(value[key], depth + 1); } return out; }
+      return value;
+    };
+    return safeIntegrityValue(visit(input, 0));
+  }
+  function interpretManualImport(spec, data, http) {
+    const unknown = emptyManualImport("Unknown", "Import completion could not be verified. It may still finish on the server. Verify in Import Overview before requesting another import.");
+    if (!diagnosticObject(data)) return { ...unknown, stop: true };
+    const safe = safeManualImportValue(data); unknown.technical = safe.text;
+    if (http === 409 && data.locked === true) return { ...unknown, state: "Not Started", reason: "The backend reported an existing import lock. This request was not started; Run All stops here.", stop: true, busy: true };
+    if (!manualImportKnownRoute(spec, data.route) || data.source !== spec.source || typeof data.ok !== "boolean") return { ...unknown, stop: true };
+    const historyState = typeof data.importHistory?.status === "string" ? data.importHistory.status.trim().toLowerCase() : "";
+    if (data.importHistory !== undefined && (!diagnosticObject(data.importHistory) || !["success", "warning", "failed", "error"].includes(historyState)) || data.ok === false && ["success", "warning"].includes(historyState)) return { ...unknown, stop: true };
+    const completedAt = parseAdminTimestamp(data.importLock?.meta?.completedAt) ? data.importLock.meta.completedAt : null;
+    const duration = diagnosticCount(data.importHistory?.duration_ms) ? data.importHistory.duration_ms : null;
+    if (http >= 500 && data.ok === false && typeof data.error === "string" && data.error.trim()) return { ...emptyManualImport("Failed", "The backend reported failure. This does not establish that no data changed."), completedAt, duration, technical: safe.text, messages: [safeManualImportValue(data.error).data], stop: false };
+    if (http !== 200 || data.ok !== true || data.table !== spec.table) return { ...unknown, stop: true };
+    const value = diagnosticObject(safe.data) ? safe.data : Object.create(null);
+    const messages = [];
+    for (const key of ["warnings", "errors"]) if (Array.isArray(value[key])) for (const item of value[key].slice(0, 10)) {
+      if (typeof item === "string") messages.push(`${key === "warnings" ? "Warning" : "Error"}: ${item}`);
+      else if (diagnosticObject(item)) messages.push(`${key === "warnings" ? "Warning" : "Error"}: ${JSON.stringify(item)}`);
+    }
+    if (typeof value.error === "string" && value.error) messages.push(value.error);
+    const failed = ["failed", "error"].includes(historyState) || Array.isArray(data.errors) && data.errors.length > 0 || Boolean(data.error);
+    const warning = historyState === "warning" || Array.isArray(data.warnings) && data.warnings.length > 0 || safe.limited;
+    const state = failed ? "Failed" : warning ? "Warning" : "Success";
+    const count = key => diagnosticCount(data[key]) ? data[key] : null;
+    return { state, reason: failed ? "The backend response reported import errors. Review the result; data may have changed." : warning ? "Import response received with warnings. Review the details." : "The backend confirmed this import response.",
+      metrics: { written: count("upserted"), updated: count("rowsUpdated"), skipped: count("skipped"), failed: count("rowsFailed") },
+      completedAt, receivedAt: null, duration,
+      technical: safe.text, messages, stop: false };
+  }
+  function cancelManualImports(reason = "The request was interrupted.") {
+    const run = manualImportRun; if (!run) return;
+    manualImportGeneration += 1; manualImportRun = null;
+    run.timers.forEach(clearTimeout); run.controllers.forEach(controller => controller.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+    if (run.active) { manualImportResults.set(run.active, emptyManualImport("Unknown", `${reason} The import may still finish on the server. Verify in Import Overview; no automatic retry will occur.`)); renderManualImport(run.active); }
+    for (const id of run.pending) { if (id === run.active) continue; manualImportResults.set(id, emptyManualImport("Skipped", "Not started because this browser-controlled run stopped.")); renderManualImport(id); }
+    manualImportLastState = "Unknown";
+    if (manualImportsProgress) manualImportsProgress.textContent = "Run stopped. Verify in Import Overview.";
+    updateManualImportControls();
+  }
+  function resetManualImports() {
+    cancelManualImports("Your Admin session ended."); manualImportLastState = "Idle";
+    for (const spec of manualImportCatalog) { manualImportResults.set(spec.id, emptyManualImport()); renderManualImport(spec.id); }
+    if (manualImportsPanel) { manualImportsPanel.open = false; manualImportsPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
+    if (manualImportsProgress) manualImportsProgress.textContent = "No import has been requested."; updateManualImportControls();
+  }
+  function manualImportCurrent(run) {
+    if (manualImportRun !== run || run.generation !== manualImportGeneration) return false;
+    if (!manualImportSessionReady()) { cancelManualImports("The Admin session is no longer ready."); prepareStationEntry(); return false; }
+    return true;
+  }
+  async function executeManualImport(spec, run) {
+    const controller = new AbortController(); run.controllers.add(controller); let timedOut = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, MANUAL_IMPORT_TIMEOUT_MS); run.timers.add(timer);
+    let result = { ...emptyManualImport("Unknown", "The connection ended without a verified result. The import may still finish on the server. Verify in Import Overview."), stop: true };
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${spec.path}`, { method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal }); http = response.status;
+      if (http === 401 || http === 403) {
+        result.reason = "Authorization was rejected. No further imports will be requested. Completion is not established.";
+        result.authorization = true; try { await response.body?.cancel(); } catch {}
+      } else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) result.reason = "The result exceeded the 128 KiB limit. Completion is unknown; verify in Import Overview.";
+        else if (parsed.unsupported || parsed.invalid) { result.reason = "The response could not be verified. Completion is unknown; verify in Import Overview."; controller.abort(); }
+        else result = interpretManualImport(spec, parsed.data, http);
+      }
+    } catch { if (timedOut) result.reason = "No verified result arrived within 180 seconds. The import may still finish on the server. Verify in Import Overview."; }
+    finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+    return { ...result, http, receivedAt: http === null ? null : new Date().toISOString() };
+  }
+  async function startManualImports(id = null) {
+    if (manualImportRun || !prepareStationEntry() || !manualImportCanStart()) return;
+    const selected = id === null ? manualImportCatalog : manualImportCatalog.filter(spec => spec.id === id); if (!selected.length) return;
+    const run = { generation: ++manualImportGeneration, all: id === null, active: null, pending: new Set(selected.map(spec => spec.id)), controllers: new Set(), readers: new Set(), timers: new Set() };
+    manualImportRun = run; manualImportLastState = "Importing";
+    for (const spec of selected) { manualImportResults.set(spec.id, emptyManualImport("Queued", "Waiting for this browser-controlled run.")); renderManualImport(spec.id); }
+    const expiryTimer = setTimeout(() => { if (manualImportRun === run) { cancelManualImports("Your Admin session expired."); prepareStationEntry(); } }, Math.max(1, expiresAt - Date.now())); run.timers.add(expiryTimer);
+    let stopped = false;
+    for (let i = 0; i < selected.length; i += 1) {
+      if (!manualImportCurrent(run)) return;
+      const spec = selected[i];
+      if (run.all && spec.id === "music-venues" && !["Success", "Warning"].includes(manualImportResults.get("music-shows").state)) { manualImportResults.set(spec.id, emptyManualImport("Skipped", "Music Venues uses Music Shows data. It was skipped because Music Shows did not complete successfully.")); run.pending.delete(spec.id); renderManualImport(spec.id); continue; }
+      run.active = spec.id; manualImportResults.set(spec.id, emptyManualImport("Importing", "Waiting for the existing backend import command. No automatic retry will occur."));
+      manualImportsProgress.textContent = `Import ${i + 1} of ${selected.length} — ${spec.label}`; renderManualImport(spec.id);
+      const result = await executeManualImport(spec, run); if (!manualImportCurrent(run)) return;
+      manualImportResults.set(spec.id, result); run.pending.delete(spec.id); renderManualImport(spec.id);
+      if (result.stop) {
+        stopped = true; manualImportLastState = result.busy ? "Busy" : "Unknown";
+        for (const remaining of run.pending) { manualImportResults.set(remaining, emptyManualImport("Skipped", "Not started because the previous request did not establish a safe continuation result.")); renderManualImport(remaining); }
+        if (result.authorization) { cancelManualImports("Authorization ended."); clearSession(); clearPassword(); present("idle", "Your session has expired or access was denied. Connect again."); return; }
+        break;
+      }
+    }
+    if (!manualImportCurrent(run)) return;
+    run.timers.forEach(clearTimeout); manualImportRun = null;
+    if (!stopped) manualImportLastState = selected.some(spec => manualImportResults.get(spec.id).state === "Failed") ? "Failed" : selected.some(spec => manualImportResults.get(spec.id).state === "Warning") ? "Warning" : "Success";
+    manualImportsProgress.textContent = stopped ? "Run stopped. Verify in Import Overview." : "Import requests finished. Review results below.";
+    updateManualImportControls();
+  }
+  manualImportsAll?.addEventListener("click", () => startManualImports());
+  manualImportRows.forEach((row, id) => row?.querySelector("[data-manual-import-run]")?.addEventListener("click", () => startManualImports(id)));
+  manualImportsPanel?.addEventListener("toggle", updateManualImportControls);
+  for (const spec of manualImportCatalog) renderManualImport(spec.id);
+
+
   function connectAction() {
     if (!available() || busy() || loginPanel.hidden || loginPanel.hasAttribute("inert")) return;
     if (!bearer) return login();
@@ -3354,6 +3525,7 @@
       if (bearer) checkSession();
     },
     deactivate() {
+      cancelManualImports("You left Admin.");
       active = false; cancelRequest();
       if (host.contains(document.activeElement)) document.activeElement.blur();
       clearPassword();
