@@ -31625,6 +31625,78 @@ button.hall-crusades-archive-crystal:focus-visible {
 :is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="inactive"] .rhythm-source-art { filter:saturate(.2);opacity:.82; }
 :is(.rhythm-rolodex,.rhythm-search-results) .rhythm-source-row[data-band-status="unknown"] .rhythm-source-lifecycle { display:none; }
 
+/* R2: selected Source emphasis only; neighboring cards keep their current treatment. */
+.rhythm-source-selection { display: none; }
+.rhythm-viewport .rhythm-rolodex .rhythm-source-row.is-active {
+  position: relative;
+  isolation: isolate;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f1edff;
+}
+.rhythm-rolodex .rhythm-source-row.is-active::before,
+.rhythm-rolodex .rhythm-source-row.is-active::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.rhythm-rolodex .rhythm-source-row.is-active::before {
+  inset: -1px;
+  z-index: -2;
+  background: linear-gradient(115deg, #81b5ff, #bd9aff 35%, #8b74e0 70%, #a4c7ff);
+}
+.rhythm-rolodex .rhythm-source-row.is-active::after {
+  inset: 1px;
+  z-index: -1;
+  background: linear-gradient(115deg, rgba(46, 64, 113, .38), transparent 45%, rgba(68, 40, 111, .28)), #0e1226f5;
+  box-shadow: inset 0 0 14px rgba(132, 115, 241, .16);
+}
+.rhythm-rolodex .rhythm-source-row.is-active:focus-visible { outline: 2px solid #d5e5ff; outline-offset: -5px; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art {
+  align-self: center;
+  box-sizing: border-box;
+  aspect-ratio: 1;
+  height: auto;
+  border-color: #a2b4edb3;
+  background: #090e20;
+  color: #dce7ff;
+  box-shadow: inset 0 0 10px #7c84d724;
+}
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art img { object-fit: contain; box-sizing: border-box; padding: 3px; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-name { display: grid; align-content: center; gap: .4rem; min-width: 0; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-selection {
+  display: block;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid #9d9ae466;
+  color: #bed7ff;
+  font-size: 10px;
+  line-height: 1.3;
+  letter-spacing: .055em;
+}
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-title { color: #f6f2ff; font-size: clamp(1.5rem, 1.4vw, 1.625rem); line-height: 1.18; overflow-wrap: anywhere; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-telemetry { align-self: stretch; justify-content: center; gap: .55rem; border-color: #9eabdf66; padding-block: .3rem; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-telemetry-label { color: #bdc8e3; line-height: 1.25; }
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-telemetry-value { color: #f0eaff; line-height: 1.35; }
+@media (min-width: 900px) {
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-art { height: var(--rhythm-active-art-size); }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-name { grid-template-columns: minmax(0, 1fr) auto; gap: .25rem .5rem; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-selection { grid-area: 1 / 1; align-self: center; padding-bottom: 0; border-bottom: 0; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-title { grid-area: 2 / 1 / auto / -1; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-lifecycle { grid-area: 1 / 2; flex-direction: row; justify-content: center; gap: .4rem; margin-top: 0; font-size: 12px; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-telemetry { justify-content: space-between; gap: .25rem; padding-block: 0; }
+}
+@media (max-width: 899px) {
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-title { font-size: clamp(1.125rem, 4.6vw, 1.375rem); line-height: 1.25; }
+  .rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-telemetry { align-content: center; }
+  .rhythm-rolodex .rhythm-source-row.is-active.has-long-source-name { grid-template-columns: minmax(0, 1fr) minmax(4.25rem, .7fr); }
+  .rhythm-rolodex .rhythm-source-row.is-active.has-long-source-name .rhythm-source-name { grid-area: 1 / 1 / auto / -1; }
+  .rhythm-rolodex .rhythm-source-row.is-active.has-long-source-name .rhythm-source-art { grid-area: 2 / 1; justify-self: center; width: min(100%, 5.5rem); }
+  .rhythm-rolodex .rhythm-source-row.is-active.has-long-source-name .rhythm-source-telemetry { grid-area: 2 / 2; }
+}
+
 /* Source retrieval shares the current Pillar viewport and existing Band state. */
 .rhythm-pillar [data-bands-view][hidden] { display:none; }
 .rhythm-search-panel { display:flex;flex-direction:column;flex:1;min-height:0;min-width:0; }

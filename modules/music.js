@@ -8947,7 +8947,9 @@ function createRhythmSourceRow(band,select,{direct=false}={}) {
   const art=document.createElement('span');art.className='rhythm-source-art';art.setAttribute('aria-hidden','true');art.textContent=getBandInitials(band.name);
   const url=getBandDetailLogoUrl(band);if(url){const image=document.createElement('img');image.alt='';image.loading='lazy';image.decoding='async';image.addEventListener('error',()=>image.remove(),{once:true});image.src=url;art.append(image);}
   const name=document.createElement('span');name.className='rhythm-source-name';
-  const title=document.createElement('span');title.textContent=band.name;
+  const title=document.createElement('span');title.className='rhythm-source-title';title.textContent=band.name;
+  if(band.name.length>48)row.classList.add('has-long-source-name');
+  if(!direct){const selected=document.createElement('span');selected.className='rhythm-source-selection';selected.textContent='ACTIVE SOURCE';selected.setAttribute('aria-hidden','true');name.append(selected);}
   const raw=band.backend_record||band,lifecycle=getBandDetailLifecycleStatus(getBandDetailGeneral(raw),raw).trim().toLowerCase();
   const statusKey=lifecycle==='active'||lifecycle==='inactive'?lifecycle:'unknown';
   row.dataset.bandStatus=statusKey;
