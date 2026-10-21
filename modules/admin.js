@@ -225,7 +225,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -347,6 +347,7 @@
     if (importsOpen) { importsOpen.disabled = !canEnterStation(); importsOpen.setAttribute("aria-disabled", String(importsOpen.disabled)); }
     updateImportOverviewControl();
     updateManualImportControls();
+    updateHistoryControls();
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
@@ -371,7 +372,7 @@
       if (!wasImports && shouldFocus) focusTitle(importsTitle);
       updateStationControl(); return;
     }
-    if (wasImports) cancelImportOverview();
+    if (wasImports) { cancelImportOverview(); cancelHistory(); }
     if (importsPanel) surface(importsPanel, false);
     const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
@@ -425,6 +426,7 @@
     cancelRelationships();
     cancelIntegrity();
     cancelImportOverview();
+    cancelHistory();
     apiStatus.textContent = "Awaiting Signal";
     apiDetail.textContent = "Backend connection not yet checked.";
     apiConnection.textContent = "—";
@@ -3471,6 +3473,198 @@
   manualImportRows.forEach((row, id) => row?.querySelector("[data-manual-import-run]")?.addEventListener("click", () => startManualImports(id)));
   manualImportsPanel?.addEventListener("toggle", updateManualImportControls);
   for (const spec of manualImportCatalog) renderManualImport(spec.id);
+
+
+  // History is reporting only. Each archive supplies bounded, ordered pages; no import command is used here.
+  const historyPanel = importsPanel?.querySelector("[data-admin-import-history]");
+  const historyFilter = historyPanel?.querySelector("[data-history-filter]");
+  const historyRefresh = historyPanel?.querySelector("[data-history-refresh]");
+  const historyMore = historyPanel?.querySelector("[data-history-more]");
+  const historyMessage = historyPanel?.querySelector("[data-history-message]");
+  const historyChecked = historyPanel?.querySelector("[data-history-checked]");
+  const historyList = historyPanel?.querySelector("[data-history-list]");
+  const HISTORY_AUTOMATIC_LOAD_COST_VERIFIED = false; // Measured PostgreSQL query cost is still awaiting verification.
+  const HISTORY_PAGE_SIZE = 5;
+  const historyColumns = Object.freeze(["rows_fetched", "rows_imported", "rows_inserted", "rows_updated", "rows_skipped", "total_rows_after_import"]);
+  let historyGeneration = 0, historyRun = null, historyState = emptyHistory();
+  function emptyHistory(filter = "all") {
+    return { filter, records: [], streams: null, loaded: false, stale: false, moreBlocked: false, hasMore: false, checkedAt: null,
+      reason: "Use Refresh History to retrieve the latest five entries. Automatic loading awaits query-cost verification." };
+  }
+  function historyAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && historyPanel && historyFilter && historyRefresh && historyMore && historyMessage && historyList;
+  }
+  function updateHistoryControls() {
+    if (!historyRefresh) return;
+    const disabled = !historyAllowed();
+    historyRefresh.disabled = disabled || historyRun !== null;
+    historyRefresh.setAttribute("aria-busy", String(historyRun !== null && historyRun.kind === "refresh"));
+    historyMore.disabled = disabled || historyRun !== null || !historyState.hasMore || historyState.moreBlocked;
+    historyMore.setAttribute("aria-busy", String(historyRun?.kind === "more"));
+    historyFilter.disabled = disabled;
+  }
+  function historyOrder(a, b) {
+    const at = a.started_at ? Date.parse(a.started_at) : -Infinity, bt = b.started_at ? Date.parse(b.started_at) : -Infinity;
+    return at === bt ? b.id - a.id : at > bt ? -1 : 1;
+  }
+  function validateHistoryPage(data, archive, page) {
+    if (!diagnosticObject(data) || data.ok !== true || data.route !== `/api/admin/import-history/${archive}` || data.source !== "postgres" || data.section !== archive || data.availability !== "Available" || !parseAdminTimestamp(data.generatedAt) ||
+      !Array.isArray(data.items) || data.items.length > HISTORY_PAGE_SIZE || data.count !== data.items.length || data.page !== page || data.limit !== HISTORY_PAGE_SIZE || !diagnosticCount(data.total) || data.total < data.count ||
+      data.totalPages !== Math.ceil(data.total / HISTORY_PAGE_SIZE) || data.hasNextPage !== (page < data.totalPages) || data.hasPrevPage !== (page > 1 && data.totalPages > 0) ||
+      !Array.isArray(data.warnings) || data.warnings.length > 10 || !data.warnings.every(value => typeof value === "string" && value.length <= 2048)) return false;
+    const ids = new Set();
+    for (const item of data.items) {
+      if (!diagnosticObject(item) || !Number.isSafeInteger(item.id) || item.id <= 0 || ids.has(item.id) || item.section !== archive || typeof item.category !== "string" || item.category.length > 320 || item.dataset !== `${archive}.${item.category}` ||
+        !["status", "source", "source_identifier", "import_type"].every(key => typeof item[key] === "string" && item[key].length <= 320) || !importScalar(item.error_message, 2048) ||
+        !["started_at", "finished_at", "created_at"].every(key => item[key] === "" || typeof item[key] === "string" && parseAdminTimestamp(item[key])) ||
+        !historyColumns.every(key => importCount(item[key])) || item.rows_failed !== null || !importCount(item.duration_ms) || !diagnosticObject(item.metric_provenance) || typeof item.details_limited !== "boolean" ||
+        !["warnings", "errors"].every(key => Array.isArray(item[key]) && item[key].length <= 10 && item[key].every(value => typeof value === "string" && value.length <= 2048) && importCount(item[key + "_count"]) && (item[key + "_count"] !== null || !item[key].length) && (item[key + "_count"] === null || item[key + "_count"] >= item[key].length))) return false;
+      for (const key of historyColumns) {
+        const value = item[key], provenance = item.metric_provenance[key];
+        if (!["stored_positive", "explicit_zero", "stored_explicit", "unavailable", "conflict"].includes(provenance) || value === null && !["unavailable", "conflict"].includes(provenance) ||
+          value === 0 && !["explicit_zero", "stored_explicit"].includes(provenance) || value > 0 && !["stored_positive", "stored_explicit"].includes(provenance) || item.status.trim().toLowerCase() === "running" && value !== null) return false;
+      }
+      if (item.startedAt !== undefined && item.startedAt !== item.started_at || item.finishedAt !== undefined && item.finishedAt !== item.finished_at ||
+        (item.warnings_count > 10 || item.errors_count > 10) && !item.details_limited) return false;
+      ids.add(item.id);
+    }
+    return data.items.every((item, i) => i === 0 || historyOrder(data.items[i - 1], item) <= 0);
+  }
+  function historyRecord(item) {
+    const safe = safeManualImportValue(item), value = safe.data;
+    const article = document.createElement("article"); article.className = "admin-history__record"; article.dataset.historyRecord = ""; article.dataset.historyId = String(item.id);
+    const heading = document.createElement("div"); heading.className = "admin-history__heading"; article.appendChild(heading);
+    const archive = item.section === "music" ? "Music" : "Wrestling", collection = ({ bands: "Bands", shows: "Shows", people: "People", venues: "Venues" })[item.category] || "Collection not available";
+    importText(heading, "h3", `${archive} · ${collection}`);
+    const status = ({ success: "Success", warning: "Warning", failed: "Failed", error: "Error", running: "Running" })[item.status.trim().toLowerCase()] || "Status not available";
+    article.dataset.historyStatus = item.error_message || item.errors_count > 0 || ["Failed", "Error"].includes(status) ? "Error" : item.warnings_count > 0 || status === "Warning" ? "Warning" : status;
+    importText(heading, "span", `${status}${status === "Success" && (item.error_message || item.errors_count > 0) ? " · Errors reported" : status === "Success" && item.warnings_count > 0 ? " · Warnings" : ""}`);
+    const started = importText(heading, "time", formatAdminDateTime(item.started_at, "Import time not available")); if (item.started_at) started.dateTime = item.started_at;
+    const metrics = document.createElement("dl"); metrics.className = "admin-imports__metrics"; metrics.dataset.historyMetrics = ""; article.appendChild(metrics);
+    const add = (list, label, value) => { const pair = document.createElement("div"); importText(pair, "dt", label); importText(pair, "dd", value); list.appendChild(pair); };
+    for (const [key, label] of [["rows_imported", "Imported records"], ["rows_updated", "Updated records"], ["rows_skipped", "Skipped records"], ["rows_failed", "Failed records"]]) add(metrics, label, diagnosticCount(item[key]) ? item[key] : "Not available");
+    const details = document.createElement("details"); details.className = "admin-history__details"; importText(details, "summary", "Import Details"); article.appendChild(details);
+    const body = document.createElement("div"); body.className = "admin-history__body"; details.appendChild(body);
+    const issues = document.createElement("details"); issues.className = "admin-imports__issues"; importText(issues, "summary", "Warnings & Errors"); body.appendChild(issues);
+    if (value.error_message) importText(issues, "p", value.error_message);
+    for (const key of ["warnings", "errors"]) {
+      const count = item[key + "_count"], label = key === "warnings" ? "Warnings" : "Errors";
+      importText(issues, "p", count === null ? `${label}: Not available.` : `${label}: ${count} reported message${count === 1 ? "" : "s"}${count > item[key].length ? `; showing ${item[key].length}` : ""}.`);
+      (Array.isArray(value[key]) ? value[key] : []).forEach(message => importText(issues, "p", message));
+    }
+    if (item.details_limited || safe.limited) importText(issues, "p", "Some supplied details are limited or redacted.");
+    const extra = document.createElement("details"); extra.className = "admin-imports__technical"; extra.dataset.historyDetails = ""; importText(extra, "summary", "Processing Details"); body.appendChild(extra);
+    const facts = document.createElement("dl"); facts.className = "admin-imports__metrics"; extra.appendChild(facts);
+    for (const [label, text] of [["Import ID", item.id], ["Archive", archive], ["Stored collection", value.category], ["Source", value.source || "Not available"], ["Source identifier", value.source_identifier || "Not available"], ["Import type", value.import_type || "Not available"], ["Started", formatAdminDateTime(item.started_at, "Not available")], ["Completed", formatAdminDateTime(item.finished_at, "Not available")], ["Execution time", diagnosticCount(item.duration_ms) ? `${item.duration_ms} ms` : "Not available"]]) add(facts, label, text);
+    for (const [key, label] of [["rows_fetched", "Source rows fetched"], ["rows_inserted", "Inserted records"], ["total_rows_after_import", "Stored total after import"]]) add(facts, label, diagnosticCount(item[key]) ? item[key] : "Not available");
+    importText(extra, "p", "Affected-record details and failed-record counts are not supplied by this history source. Message totals are not record counts.");
+    if (item.finished_at && item.started_at && Date.parse(item.finished_at) < Date.parse(item.started_at)) importText(extra, "p", "Stored completion precedes the start; timing is unverified.");
+    const technical = document.createElement("details"); technical.className = "admin-imports__technical admin-history__response"; importText(technical, "summary", "Technical Response"); const json = importText(technical, "pre", safe.text); json.dataset.historyJson = ""; body.appendChild(technical);
+    article._historyItem = item; return article;
+  }
+  function renderHistory() {
+    if (!historyList) return;
+    historyFilter.value = historyState.filter;
+    historyMessage.textContent = `${historyState.stale ? "Stale results. " : ""}${historyState.reason}`;
+    historyChecked.textContent = `Last checked: ${formatAdminDateTime(historyState.checkedAt, "Not available")}. Displaying ${historyState.records.length} import${historyState.records.length === 1 ? "" : "s"}.`;
+    const existing = new Map([...historyList.children].map(node => [Number(node.dataset.historyId), node]));
+    const ids = new Set(historyState.records.map(item => item.id));
+    existing.forEach((node, id) => { if (!ids.has(id)) node.remove(); });
+    historyState.records.forEach((item, index) => { const old = existing.get(item.id), node = old?._historyItem === item ? old : historyRecord(item); if (old && old !== node) old.replaceWith(node); if (historyList.children[index] !== node) historyList.insertBefore(node, historyList.children[index] || null); });
+    historyList.setAttribute("aria-busy", String(historyRun !== null)); updateHistoryControls();
+  }
+  function cancelHistory() {
+    const run = historyRun; if (!run) return;
+    historyGeneration += 1; historyRun = null;
+    run.timers.forEach(clearTimeout); run.controllers.forEach(controller => controller.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+    historyState.stale = historyState.records.length > 0;
+    historyState.reason = "History request canceled. Use Refresh History or Show More to retry.";
+    renderHistory();
+  }
+  function resetHistory() {
+    cancelHistory(); historyState = emptyHistory(); if (historyPanel) historyPanel.open = false; renderHistory();
+  }
+  function historyCurrent(run) {
+    if (historyRun !== run || run.generation !== historyGeneration || run.filter !== historyState.filter) return false;
+    if (!historyAllowed()) { cancelHistory(); prepareStationEntry(); return false; } return true;
+  }
+  async function fetchHistoryPage(archive, page, run) {
+    const controller = new AbortController(); run.controllers.add(controller); let timedOut = false;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 15000); run.timers.add(timer);
+    const path = archive ? `/api/admin/import-history/${archive}?limit=5&page=${page}` : "/health";
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${path}`, { method: "GET", headers: archive ? { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` } : { Accept: "application/json" }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal });
+      if (archive && [401, 403].includes(response.status)) {
+        try { await response.body?.cancel(); } catch {}
+        if (historyCurrent(run)) { cancelHistory(); clearSession(); clearPassword(); present("idle", "Your session has expired or access was denied. Connect again."); }
+        throw new Error("Authorization unavailable.");
+      }
+      const parsed = await boundedEndpointJson(response, run, controller);
+      if (parsed.unavailable) throw new Error("History response exceeds the 128 KiB limit.");
+      if (parsed.unsupported || parsed.invalid) { controller.abort(); throw new Error("History response could not be read safely."); }
+      if (!response.ok) throw new Error(`HTTP ${response.status}: history reporting is unavailable.`);
+      if (!archive) { if (!importReportingCapability(parsed.data)) throw new Error("Read-only reporting is not verified on this backend. No history request was sent."); return parsed.data; }
+      if (parsed.data?.availability === "Unavailable" && parsed.data?.route === `/api/admin/import-history/${archive}`) throw new Error(`${archive === "music" ? "Music" : "Wrestling"} history is unavailable.`);
+      if (!validateHistoryPage(parsed.data, archive, page)) throw new Error("The history response contract or ordering could not be verified.");
+      return parsed.data;
+    } catch (error) {
+      if (timedOut) throw new Error("History request exceeded 15 seconds.");
+      if (error instanceof SyntaxError) throw new Error("History response is not valid JSON.");
+      if (error instanceof TypeError) throw new Error("History connection is unavailable.");
+      throw error;
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(controller); }
+  }
+  async function loadHistory(kind = "refresh") {
+    if (historyRun || !historyPanel?.open || !prepareStationEntry() || !historyAllowed() || kind === "more" && (!historyState.hasMore || historyState.moreBlocked)) return;
+    const archives = historyState.filter === "all" ? ["music", "wrestling"] : [historyState.filter];
+    const focused = [historyRefresh, historyMore].includes(document.activeElement) ? document.activeElement : null;
+    const run = { generation: ++historyGeneration, filter: historyState.filter, kind, controllers: new Set(), readers: new Set(), timers: new Set(), focused };
+    historyRun = run; historyState.stale = historyState.records.length > 0; historyState.reason = kind === "more" ? "Loading the next five older entries…" : "Retrieving the latest five entries…"; renderHistory();
+    const streams = Object.fromEntries(archives.map(archive => { const old = kind === "more" ? historyState.streams?.[archive] : null; return [archive, old ? { ...old, buffer: old.buffer.slice() } : { nextPage: 1, buffer: [], ended: false }]; }));
+    const prior = kind === "more" ? historyState.records : [], seen = new Set(prior.map(item => item.id));
+    let overlaps = false;
+    try {
+      await fetchHistoryPage(null, 1, run); if (!historyCurrent(run)) return;
+      const warnings = [];
+      for (const archive of archives) {
+        const stream = streams[archive];
+        if (stream.buffer.length < HISTORY_PAGE_SIZE && !stream.ended) {
+          if (stream.nextPage > 2001) { historyState.moreBlocked = true; throw new Error("The backend history-page limit was reached. Refresh to return to the latest entries."); }
+          const data = await fetchHistoryPage(archive, stream.nextPage, run); if (!historyCurrent(run)) return;
+          const known = new Set([...seen, ...stream.buffer.map(item => item.id)]);
+          for (const item of data.items) { if (known.has(item.id)) { overlaps = true; continue; } known.add(item.id); stream.buffer.push(item); }
+          stream.buffer.sort(historyOrder); stream.nextPage += 1; stream.ended = !data.hasNextPage;
+          warnings.push(...data.warnings.map(value => safeManualImportValue(value).data));
+          if (stream.buffer.length < HISTORY_PAGE_SIZE && !stream.ended) { historyState.moreBlocked = true; throw new Error("History changed while paging. Refresh History to obtain a new ordered view."); }
+        }
+      }
+      const candidates = archives.flatMap(archive => streams[archive].buffer).sort(historyOrder), unique = new Map();
+      for (const item of candidates) { if (seen.has(item.id) || unique.has(item.id)) { overlaps = true; continue; } unique.set(item.id, item); }
+      const next = [...unique.values()].slice(0, HISTORY_PAGE_SIZE);
+      if (prior.length && next.some(item => historyOrder(prior[prior.length - 1], item) > 0)) { historyState.moreBlocked = true; throw new Error("Newer history appeared while paging. Refresh History to restore chronological order."); }
+      const consumed = new Set(next.map(item => item.id));
+      for (const stream of Object.values(streams)) stream.buffer = stream.buffer.filter(item => !consumed.has(item.id));
+      historyState.records = prior.concat(next); historyState.streams = streams; historyState.loaded = true; historyState.stale = false; historyState.moreBlocked = false;
+      historyState.hasMore = Object.values(streams).some(stream => stream.buffer.length || !stream.ended);
+      historyState.checkedAt = new Date().toISOString();
+      historyState.reason = !historyState.records.length ? "No import history was reported for this selection." : `${next.length} ${kind === "more" ? "older" : "latest"} entr${next.length === 1 ? "y" : "ies"} received.${!historyState.hasMore ? " No older entries remain in this response." : ""}${overlaps ? " Overlapping page entries were omitted; refresh for the latest view." : ""}${warnings.length ? " Reporting warnings: " + warnings.join(" ") : ""}`;
+    } catch (error) {
+      if (!historyCurrent(run)) return;
+      historyState.stale = historyState.records.length > 0;
+      historyState.reason = `${safeManualImportValue(error?.message || "History is unavailable.").data}${historyState.records.length ? " Previous results retained." : " No verified entries were loaded."}`;
+    } finally {
+      run.timers.forEach(clearTimeout);
+      if (historyRun === run) {
+        historyRun = null; renderHistory();
+        if (run.focused && document.activeElement === document.body && historyPanel.open && historyAllowed()) (run.focused.disabled ? historyRefresh : run.focused).focus({ preventScroll: true });
+      }
+    }
+  }
+  historyPanel?.addEventListener("toggle", () => { if (!historyPanel.open) return; if (HISTORY_AUTOMATIC_LOAD_COST_VERIFIED && !historyState.loaded) loadHistory(); else { prepareStationEntry(); updateHistoryControls(); } });
+  historyRefresh?.addEventListener("click", () => loadHistory());
+  historyMore?.addEventListener("click", () => loadHistory("more"));
+  historyFilter?.addEventListener("change", () => { const selected = historyFilter.value; if (!["all", "music", "wrestling"].includes(selected) || selected === historyState.filter || !historyAllowed()) return; cancelHistory(); historyState = emptyHistory(selected); renderHistory(); loadHistory(); });
+  renderHistory();
 
 
   function connectAction() {

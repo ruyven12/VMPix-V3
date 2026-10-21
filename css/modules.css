@@ -32918,3 +32918,30 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-manual-import [data-manual-import-messages] p + p { margin-block-start: 8px; }
 .admin-shell .admin-manual-import__response pre { max-inline-size: 100%; margin: 0; padding: 8px; font: 12px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
 .admin-shell .admin-console__station-body .admin-manual-import-indicator { position: absolute; inset-block-end: 2px; inset-inline: 8px; margin: 0; max-inline-size: 100%; color: #d9bdca; font: 10px/1.4 var(--font-display); text-align: center; overflow-wrap: anywhere; }
+
+/* Admin 5C: compact stored history within the existing Imports scroll viewport. */
+.admin-shell .admin-history { margin-block-start: 14px; border: 1px solid #703044; background: rgb(9 8 12 / .38); }
+.admin-shell .admin-history__controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.admin-shell .admin-history__controls label { display: grid; flex: 1 1 140px; gap: 5px; min-inline-size: 0; color: #d9cbd7; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-history__controls select { min-inline-size: 0; inline-size: 100%; min-block-size: 44px; padding: 8px; border: 1px solid #934057; border-radius: 0; background: #170d15; color: #e5d9e3; font: 14px/1.45 var(--font-display); }
+.admin-shell .admin-history__controls select:focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+.admin-shell .admin-history .admin-history__message { min-block-size: 4.35em; margin-block: 10px; color: #dfcbd8; }
+.admin-shell .admin-history .admin-history__checked, .admin-shell .admin-history .admin-history__note { margin-block: 8px; color: #b9aab9; }
+.admin-shell .admin-history__list { margin-block: 12px; }
+.admin-shell .admin-history__record { min-inline-size: 0; padding-block: 12px; border-block-start: 1px solid #473340; overflow-wrap: anywhere; }
+.admin-shell .admin-history__heading { display: grid; gap: 4px; margin-block-end: 8px; }
+.admin-shell .admin-history__heading h3 { margin: 0; color: #e0d1dd; font: 400 14px/1.45 var(--font-display); }
+.admin-shell .admin-history__heading span { color: #d9cbd7; font: 14px/1.45 var(--font-display); }
+.admin-shell .admin-history__heading time { color: #b9aab9; font: 12px/1.45 var(--font-display); }
+.admin-shell .admin-history__record[data-history-status="Warning"] .admin-history__heading span { color: #dfbd84; }
+.admin-shell .admin-history__record[data-history-status="Error"] .admin-history__heading span { color: #ef9aab; }
+.admin-shell .admin-history__details > summary { min-block-size: 44px; padding-block: 11px; color: #d9cbd7; font: 12px/1.45 var(--font-display); cursor: pointer; }
+.admin-shell .admin-history__details > summary::marker { color: #bd526d; }
+.admin-shell .admin-history__body p + p { margin-block-start: 8px; }
+.admin-shell .admin-history__response pre { max-inline-size: 100%; margin: 0; padding: 8px; font: 12px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+@media (min-width: 840px) {
+  .admin-shell .admin-history__controls label { flex: 0 1 240px; }
+  .admin-shell .admin-history__heading { grid-template-columns: minmax(0, 1fr) auto; }
+  .admin-shell .admin-history__heading time { grid-column: 1 / -1; }
+  .admin-shell .admin-history__record > .admin-imports__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+}
