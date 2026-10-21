@@ -225,7 +225,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); resetConflicts(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); resetConflicts(); resetProtection(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -349,6 +349,7 @@
     updateManualImportControls();
     updateHistoryControls();
     updateConflictsControls();
+    updateProtectionControls();
     updateDatabaseControl();
     updateRecordsControl();
     updateRelationshipsControl();
@@ -3811,6 +3812,38 @@
   conflictsRefresh?.addEventListener("click", () => loadConflicts());
   conflictsMore?.addEventListener("click", () => loadConflicts("more"));
   renderConflicts();
+
+
+  // No safe read-only lock reporter is available. A local check must never imply a verified lock state.
+  const protectionPanel = importsPanel?.querySelector("[data-admin-protection]");
+  const protectionCheck = protectionPanel?.querySelector("[data-protection-check]");
+  const protectionMessage = protectionPanel?.querySelector("[data-protection-message]");
+  const protectionAttempt = protectionPanel?.querySelector("[data-protection-attempt]");
+  function protectionAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && protectionPanel?.open && protectionCheck && protectionMessage && protectionAttempt;
+  }
+  function updateProtectionControls() {
+    if (!protectionCheck) return;
+    protectionCheck.disabled = !protectionAllowed();
+    protectionCheck.setAttribute("aria-disabled", String(protectionCheck.disabled));
+  }
+  function resetProtection() {
+    if (!protectionPanel) return;
+    protectionPanel.open = false; protectionPanel.querySelectorAll("details").forEach(node => { node.open = false; });
+    protectionMessage.textContent = "Live lock reporting is unavailable. All lock states remain Unknown.";
+    protectionAttempt.textContent = "Not available"; protectionAttempt.removeAttribute("datetime"); protectionAttempt.removeAttribute("title");
+    updateProtectionControls();
+  }
+  function checkProtection() {
+    if (!prepareStationEntry() || !protectionAllowed()) return;
+    const attempt = new Date().toISOString();
+    protectionMessage.textContent = "No safe live reporting source is available. No request was sent; lock states remain Unknown.";
+    protectionAttempt.dateTime = attempt; protectionAttempt.textContent = formatAdminDateTime(attempt, "Not available");
+    protectionAttempt.title = "Local check attempt only; no server lock state was verified.";
+  }
+  protectionPanel?.addEventListener("toggle", updateProtectionControls);
+  protectionCheck?.addEventListener("click", checkProtection);
+  updateProtectionControls();
 
 
   function connectAction() {
