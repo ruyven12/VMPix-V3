@@ -1967,10 +1967,10 @@ function prepareBandDetailPhotograph(band) {
     session.outgoing = null;
   };
   const schedule = () => {
-    if (active() && !reducedMotion.matches && !session.exhausted && !session.timer) {
+    if (active() && !bandDetailViewport.hasAttribute("data-band-identity-arrival") && !reducedMotion.matches && !session.exhausted && !session.timer) {
       session.timer = setTimeout(() => {
         session.timer = 0;
-        if (!active() || reducedMotion.matches) return;
+        if (!active() || bandDetailViewport.hasAttribute("data-band-identity-arrival") || reducedMotion.matches) return;
         if (session.next) present();
         schedule();
         preload();
@@ -1978,7 +1978,7 @@ function prepareBandDetailPhotograph(band) {
     }
   };
   const present = () => {
-    if (!active() || !session.next) return;
+    if (!active() || !session.next || (session.current && bandDetailViewport.hasAttribute("data-band-identity-arrival"))) return;
     finishFade();
     const previous = session.current;
     session.current = session.next;
@@ -2102,7 +2102,7 @@ function prepareBandDetailPhotograph(band) {
         bandDetailPhotograph?.sync();
       }
     });
-    bandDetailPhotographObserver.observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden", "data-band-record-stage"] });
+    bandDetailPhotographObserver.observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden", "data-band-record-stage", "data-band-identity-arrival"] });
   }
   (async () => {
     await requestMusicShowsSetsData();
@@ -6268,19 +6268,29 @@ function renderBandArchiveTelemetry(band) {
   section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden);
 }
 
-// B3 owns only the permanent HUD decoration. The Shell keeps its existing name handoff.
+// One real HUD: B3 assembly, a short hold, then measured travel into its retained grid slot.
 let bandIdentityReveal = null;
-function settleBandIdentityReveal() {
+function settleBandIdentityReveal(revealContent = false) {
   const session = bandIdentityReveal;
   if (!session) return;
   session.settled = true;
   clearTimeout(session.deadline);
+  clearTimeout(session.revealTimer);
   cancelAnimationFrame(session.frame);
   session.observer.disconnect();
+  session.resizeObserver?.disconnect();
   session.hud.removeEventListener("animationend", session.onEnd);
   session.hud.removeEventListener("animationcancel", session.onEnd);
+  bandDetailContent.removeEventListener("scroll", session.onScroll);
+  session.travel?.cancel();
+  session.hud.style.removeProperty("transform");
   session.hud.removeAttribute("data-identity-reveal");
-  session.hud.removeAttribute("data-identity-handoff");
+  bandDetailViewport.removeAttribute("data-band-identity-arrival");
+  bandDetailViewport.removeAttribute("data-band-identity-content");
+  if (revealContent && !reducedMotion.matches && !bandDetailViewport.hidden) {
+    bandDetailViewport.setAttribute("data-band-identity-content", "");
+    session.revealTimer = setTimeout(() => bandDetailViewport.removeAttribute("data-band-identity-content"), 240);
+  }
 }
 function clearBandIdentityReveal() {
   settleBandIdentityReveal();
@@ -6290,38 +6300,77 @@ function prepareBandIdentityReveal(band, options = {}) {
   const hud = bandDetailName?.closest(".band-identity-hud"), id = getBandId(band);
   if (!hud || !id || bandIdentityReveal?.id === id) return;
   clearBandIdentityReveal();
-  // A restored record is already identified; never replay over restored content/scroll.
   const handoff = Boolean(options.prepareRecordOpening);
-  if (reducedMotion.matches || document.hidden || (!handoff &&
+  if (reducedMotion.matches || document.hidden || typeof hud.animate !== "function" || (!handoff &&
       (v3RouteContext.isResume || v3RouteContext.skipEntryAnimation || v3RouteContext.navigationCause === "back-forward"))) return;
-  const session = { id, hud, handoff, started:false, settled:false, frame:0, deadline:0 };
+  const session = { id, hud, started:false, settled:false, frame:0, deadline:0, revealTimer:0, travel:null };
   bandIdentityReveal = session;
+  const current = () => bandIdentityReveal === session && !session.settled;
   session.onEnd = event => {
-    if (event.animationName === "bandIdentityOutline" && bandIdentityReveal === session) settleBandIdentityReveal();
+    if (!current() || event.animationName !== "bandIdentityOutline") return;
+    if (event.type === "animationcancel") { settleBandIdentityReveal(); return; }
+    if (session.travel) return;
+    // Keep the completed B3 appearance; the same HUD holds and moves, without reparenting.
+    hud.removeEventListener("animationend", session.onEnd);
+    hud.removeEventListener("animationcancel", session.onEnd);
+    hud.removeAttribute("data-identity-reveal");
+    bandDetailViewport.dataset.bandIdentityArrival = "travel";
+    session.travel = hud.animate([
+      { transform:session.transform, offset:0 },
+      { transform:session.transform, offset:350 / 1110, easing:"cubic-bezier(.22,.68,.24,1)" },
+      { transform:"none", offset:1 },
+    ], { duration:1110, fill:"both", easing:"linear" });
+    session.travel.finished.then(() => { if (current()) settleBandIdentityReveal(true); })
+      .catch(() => { if (current()) settleBandIdentityReveal(); });
   };
+  session.onScroll = () => { if (current() && session.started && bandDetailContent.scrollTop !== session.scrollTop) settleBandIdentityReveal(); };
   const sync = () => {
-    if (bandIdentityReveal !== session || session.settled) return;
-    const stage = bandDetailViewport.dataset.bandRecordStage;
-    if (session.started && (bandDetailViewport.hidden || document.hidden)) { settleBandIdentityReveal(); return; }
-    if (session.started || bandDetailViewport.hidden || stage === "prepared") return;
-    if (handoff ? stage !== "morph" : getRouteFromUrl().name !== "band-detail" || getRouteFromUrl().bandId !== id) {
+    if (!current()) return;
+    if (session.started) {
+      if (bandDetailViewport.hidden || document.hidden) settleBandIdentityReveal();
+      return;
+    }
+    // Let the protected Shell handoff finish first; its transient copies stay concealed.
+    if (bandDetailViewport.hidden || bandDetailViewport.hasAttribute("data-band-record-stage")) return;
+    if (getRouteFromUrl().name !== "band-detail" || getRouteFromUrl().bandId !== id || bandDetailContent.scrollTop > 1) {
       settleBandIdentityReveal(); return;
     }
+    const rect = hud.getBoundingClientRect(), viewport = bandDetailContent.getBoundingClientRect();
+    const style = getComputedStyle(bandDetailContent), visual = window.visualViewport;
+    const engine = document.querySelector("[data-portfolio-engine]")?.getBoundingClientRect();
+    const top = Math.max(viewport.top + parseFloat(style.paddingTop), visual?.offsetTop || 0);
+    const bottom = Math.min(viewport.bottom - parseFloat(style.paddingBottom), engine?.top ?? innerHeight,
+      visual ? visual.offsetTop + visual.height : innerHeight);
+    const left = viewport.left + parseFloat(style.paddingLeft), right = viewport.right - parseFloat(style.paddingRight);
+    const scale = Math.min(1.18, (right - left) / rect.width, (bottom - top) / rect.height);
+    if (!rect.width || !rect.height || scale < 1 || bottom <= top) { settleBandIdentityReveal(); return; }
+    session.transform = `translate(${(left + right) / 2 - (rect.left + rect.width / 2)}px, ${(top + bottom) / 2 - (rect.top + rect.height / 2)}px) scale(${scale})`;
     session.started = true;
+    session.scrollTop = bandDetailContent.scrollTop;
+    hud.style.transform = session.transform;
+    bandDetailViewport.dataset.bandIdentityArrival = "assembly";
     hud.dataset.identityReveal = "running";
-    // CSS completion is authoritative; this only settles if an animation event is lost.
-    session.deadline = setTimeout(() => { if (bandIdentityReveal === session) settleBandIdentityReveal(); }, 2000);
+    session.resizeObserver = new ResizeObserver(() => {
+      if (current() && (Math.abs(hud.offsetWidth - rect.width) > 1 || Math.abs(hud.offsetHeight - rect.height) > 1)) settleBandIdentityReveal();
+    });
+    session.resizeObserver.observe(hud);
+    // Failure-safe only: CSS/WAAPI completion owns normal timing.
+    clearTimeout(session.deadline);
+    session.deadline = setTimeout(() => { if (current()) settleBandIdentityReveal(); }, 3600);
   };
   session.observer = new MutationObserver(sync);
   session.observer.observe(bandDetailViewport, { attributes:true, attributeFilter:["hidden", "data-band-record-stage"] });
   hud.addEventListener("animationend", session.onEnd);
   hud.addEventListener("animationcancel", session.onEnd);
-  hud.toggleAttribute("data-identity-handoff", handoff);
+  bandDetailContent.addEventListener("scroll", session.onScroll, { passive:true });
+  bandDetailViewport.dataset.bandIdentityArrival = "waiting";
   hud.dataset.identityReveal = "prepared";
+  session.deadline = setTimeout(() => { if (current()) settleBandIdentityReveal(); }, 6000);
   session.frame = requestAnimationFrame(sync);
 }
-window.addEventListener("pagehide", settleBandIdentityReveal);
-window.addEventListener("resize", settleBandIdentityReveal);
+window.addEventListener("pagehide", () => settleBandIdentityReveal());
+window.addEventListener("resize", () => settleBandIdentityReveal());
+window.visualViewport?.addEventListener("resize", () => settleBandIdentityReveal());
 document.addEventListener("visibilitychange", () => { if (document.hidden) settleBandIdentityReveal(); });
 reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) settleBandIdentityReveal(); });
 
