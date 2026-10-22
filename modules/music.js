@@ -1806,20 +1806,13 @@ function createBandPersonnelCard(member, status, session) {
   getBandPersonnelRoleIcons(member.role).forEach(key => icons.append(createBandPersonnelIcon(BAND_PERSONNEL_ROLE_ICONS[key])));
   const roleText = document.createElement('span');
   roleText.textContent = !member.role || member.role === 'Role Pending' ? 'Role not recorded' : member.role;
-  role.append(icons, roleText);
+  role.append(roleText, icons);
   const state = document.createElement('p');
   state.className = 'band-personnel-status';
-  state.append(createBandPersonnelIcon(status === 'current'
-    ? '<circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/>'
-    : '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>'), document.createTextNode(status === 'current' ? 'Current' : 'Past'));
-  copy.append(name, role, state);
-  const destination = document.createElement('span');
-  destination.className = 'band-personnel-destination';
-  if (person) {
-    destination.append(createBandPersonnelIcon('<path d="M4 12h16m-6-6 6 6-6 6"/>'));
-    card.setAttribute('aria-label', `${member.name}, ${roleText.textContent}, ${status} member. Open person archive.`);
-  } else destination.textContent = 'Not linked';
-  card.append(avatar, copy, destination);
+  state.textContent = `${status === 'current' ? 'Current' : 'Past'} member.${person ? '' : ' Person archive not linked.'}`;
+  copy.append(name, state);
+  if (person) card.setAttribute('aria-label', `${member.name}, ${roleText.textContent}, ${status} member. Open person archive.`);
+  card.append(avatar, copy, role);
   item.append(card);
   return item;
 }
