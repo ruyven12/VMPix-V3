@@ -909,7 +909,7 @@
                 <button class="band-content-tab" id="band-logo-tab" data-band-content-tab="logo" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
                 <button class="band-content-tab" id="band-info-tab" data-band-content-tab="info" type="button" role="tab" aria-selected="false" aria-controls="band-info-panel" tabindex="-1">INFO</button>
                 <button class="band-content-tab" id="band-statistics-tab" data-band-content-tab="statistics" type="button" role="tab" aria-selected="false" aria-controls="band-statistics-panel" tabindex="-1">STATISTICS</button>
-                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>PERSONNEL</button>
+                <button class="band-content-tab" id="band-personnel-tab" data-band-content-tab="personnel" type="button" role="tab" aria-selected="false" aria-controls="band-personnel-panel" tabindex="-1">PERSONNEL</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>SETS</button>
               </div>
               <div class="band-content-stage" data-band-content-stage>
@@ -973,64 +973,15 @@
                     </article>
                   </div>
                 </section>
+                <section class="band-content-panel" id="band-personnel-panel" data-band-content-panel="personnel" role="tabpanel" aria-labelledby="band-personnel-tab" aria-hidden="true" tabindex="-1" inert>
+                  <div class="band-personnel-dossier">
+                    <ul class="band-personnel-roster" aria-label="Documented members, current then past" data-band-detail-core-members></ul>
+                    <p class="band-personnel-link-state" data-band-personnel-link-state role="status"></p>
+                  </div>
+                </section>
               </div>
             </section>
 
-            <section class="band-detail-members" aria-label="Band membership panels">
-              <article class="band-detail-panel" aria-labelledby="core-members-title">
-                <h4 class="band-detail-panel-title" id="core-members-title">CORE MEMBERS</h4>
-                <ul class="band-member-list" data-band-detail-core-members>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">JM</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Jordan Mace</p>
-                      <p class="band-member-role">Vocals / Guitar</p>
-                    </div>
-                  </li>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">SR</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Sera Rowe</p>
-                      <p class="band-member-role">Bass / Keys</p>
-                    </div>
-                  </li>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">TK</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Theo Knox</p>
-                      <p class="band-member-role">Drums</p>
-                    </div>
-                  </li>
-                </ul>
-              </article>
-
-              <article class="band-detail-panel" aria-labelledby="past-members-title">
-                <h4 class="band-detail-panel-title" id="past-members-title">PAST MEMBERS</h4>
-                <ul class="band-member-list" data-band-detail-past-members>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">LC</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Lena Cruz</p>
-                      <p class="band-member-role">Guitar</p>
-                    </div>
-                  </li>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">NR</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Nico Reyes</p>
-                      <p class="band-member-role">Drums</p>
-                    </div>
-                  </li>
-                  <li class="band-member">
-                    <span class="band-member-thumb" aria-hidden="true">AP</span>
-                    <div class="band-member-copy">
-                      <p class="band-member-name">Avery Pike</p>
-                      <p class="band-member-role">Keys</p>
-                    </div>
-                  </li>
-                </ul>
-              </article>
-            </section>
           </article>
           </div>
         </section>

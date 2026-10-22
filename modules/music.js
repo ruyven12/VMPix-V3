@@ -877,6 +877,10 @@ function createBandDetailStateListItem(stateName, bandId, options = {}) {
 }
 
 function renderBandDetailState(stateName = "empty", bandId = "") {
+  cancelBandPersonnelLookup();
+  bandPersonnelSession = null;
+  const personnelNotice = bandDetail?.querySelector("[data-band-personnel-link-state]");
+  if (personnelNotice) personnelNotice.textContent = "";
   clearBandIdentityReveal();
   if (!bandDetail) {
     return;
@@ -1745,193 +1749,148 @@ function getBandPersonnelRoleIcons(role) {
   return matches.length ? matches.slice(0, 2).map(match => match.key) : ['neutral'];
 }
 
-function createBandPersonnelCard(member) {
+// Membership stays authoritative in the band record. People supplies destinations only.
+let bandPersonnelSession = null;
+const bandPersonnelPeopleCache = new Map();
+const bandPersonnelKey = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+function cancelBandPersonnelLookup() {
+  bandPersonnelSession?.controller?.abort();
+}
+function getBandPersonnelPerson(member, session) {
+  if (!session.people) return null;
+  const matches = session.people.filter(person =>
+    Number.isSafeInteger(person?.person_id) && person.person_id > 0
+    && bandPersonnelKey(person.name) === bandPersonnelKey(member.name)
+    && Array.isArray(person.bands) && person.bands.some(link => bandPersonnelKey(link?.band) === session.nameKey));
+  // An exact name plus an explicit band relationship must identify one public People record.
+  return matches.length === 1 ? matches[0] : null;
+}
+function createBandPersonnelIcon(markup) {
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox', '0 0 24 24');
+  icon.setAttribute('aria-hidden', 'true');
+  icon.setAttribute('focusable', 'false');
+  icon.innerHTML = markup; // Static, local icon paths only; all record values use textContent.
+  return icon;
+}
+function createBandPersonnelCard(member, status, session) {
+  const person = getBandPersonnelPerson(member, session);
   const item = document.createElement('li');
-  item.className = 'band-member';
-  const icons = document.createElement('span');
-  icons.className = 'band-personnel-icons';
-  icons.setAttribute('aria-hidden', 'true');
-  getBandPersonnelRoleIcons(member.role).forEach(key => {
-    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    icon.setAttribute('viewBox', '0 0 24 24');
-    icon.setAttribute('focusable', 'false');
-    icon.dataset.personnelIcon = key;
-    icon.innerHTML = BAND_PERSONNEL_ROLE_ICONS[key];
-    icons.append(icon);
-  });
+  item.className = 'band-personnel-record';
+  item.dataset.memberStatus = status;
+  const card = document.createElement(person ? 'a' : 'div');
+  card.className = 'band-personnel-card';
+  if (person) {
+    card.href = getMusicPersonRouteUrl(String(person.person_id));
+    card.addEventListener('click', event => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      navigateToRoute(getMusicPersonRouteUrl(String(person.person_id)));
+    });
+  } else card.classList.add('is-unlinked');
+  // Music People exposes tagged archive cover images, not verified solo portraits.
+  // Do not use cover_image_url, band artwork or crops to imply an individual identity.
+  const avatar = document.createElement('span');
+  avatar.className = 'band-personnel-avatar';
+  avatar.setAttribute('aria-hidden', 'true');
+  avatar.textContent = member.thumb;
   const copy = document.createElement('div');
-  copy.className = 'band-member-copy';
+  copy.className = 'band-personnel-copy';
   const name = document.createElement('p');
-  name.className = 'band-member-name';
+  name.className = 'band-personnel-name';
   name.textContent = member.name;
-  copy.append(name);
-  if (member.role && member.role !== 'Role Pending') {
-    const role = document.createElement('p');
-    role.className = 'band-member-role';
-    role.textContent = member.role;
-    copy.append(role);
-  }
-  item.append(icons, copy);
+  const role = document.createElement('p');
+  role.className = 'band-personnel-role';
+  const icons = document.createElement('span');
+  icons.className = 'band-personnel-role-icons';
+  getBandPersonnelRoleIcons(member.role).forEach(key => icons.append(createBandPersonnelIcon(BAND_PERSONNEL_ROLE_ICONS[key])));
+  const roleText = document.createElement('span');
+  roleText.textContent = !member.role || member.role === 'Role Pending' ? 'Role not recorded' : member.role;
+  role.append(icons, roleText);
+  const state = document.createElement('p');
+  state.className = 'band-personnel-status';
+  state.append(createBandPersonnelIcon(status === 'current'
+    ? '<circle cx="12" cy="12" r="9"/><path d="m7 12 3 3 7-7"/>'
+    : '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>'), document.createTextNode(status === 'current' ? 'Current' : 'Past'));
+  copy.append(name, role, state);
+  const destination = document.createElement('span');
+  destination.className = 'band-personnel-destination';
+  if (person) {
+    destination.append(createBandPersonnelIcon('<path d="M4 12h16m-6-6 6 6-6 6"/>'));
+    card.setAttribute('aria-label', `${member.name}, ${roleText.textContent}, ${status} member. Open person archive.`);
+  } else destination.textContent = 'Not linked';
+  card.append(avatar, copy, destination);
+  item.append(card);
   return item;
 }
-
-function createBandPersonnelPages(container, rosters) {
-  const pages = { current: [], past: [] };
+function renderBandPersonnelCards(session) {
+  if (bandPersonnelSession !== session || !bandDetailCoreMembers) return;
   const fragment = document.createDocumentFragment();
-  Object.entries(rosters).forEach(([key, members]) => {
-    const records = normalizeBandDetailMembers(members);
-    for (let index = 0; index < records.length; index += 2) {
-      const page = document.createElement('li');
-      page.className = 'band-personnel-page';
-      page.setAttribute('aria-roledescription', 'slide');
-      page.setAttribute('aria-label', (key === 'past' ? 'Past' : 'Current') + ' members, page ' + (index / 2 + 1) + ' of ' + Math.ceil(records.length / 2));
-      page.setAttribute('aria-hidden', 'true');
-      page.inert = true;
-      const list = document.createElement('ul');
-      list.className = 'band-personnel-page-members';
-      records.slice(index, index + 2).forEach(member => list.append(createBandPersonnelCard(member)));
-      page.append(list);
-      pages[key].push(page);
-      fragment.append(page);
-    }
-  });
-  container.replaceChildren(fragment);
-  return pages;
+  for (const status of ['current', 'past']) {
+    session.rosters[status].forEach(member => fragment.append(createBandPersonnelCard(member, status, session)));
+  }
+  if (!fragment.childNodes.length) {
+    const empty = document.createElement('li');
+    empty.className = 'band-personnel-empty';
+    empty.textContent = session.documented ? 'No documented members.' : 'Membership information is not available.';
+    fragment.append(empty);
+  }
+  bandDetailCoreMembers.replaceChildren(fragment);
 }
-
+async function requestBandPersonnelLinks() {
+  const session = bandPersonnelSession;
+  if (!session || session.people || session.controller || !session.hasMembers) return;
+  const notice = bandDetail.querySelector('[data-band-personnel-link-state]');
+  const controller = new AbortController();
+  session.controller = controller;
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  if (notice) notice.textContent = 'Checking linked person archives...';
+  try {
+    const url = getMusicPeopleIndexApiUrl();
+    url.searchParams.set('band', session.name);
+    // One existing filtered collection request, at most 100 rows; never scan the full People archive.
+    url.searchParams.set('limit', '100');
+    const response = await fetch(url, { signal: controller.signal, credentials: 'omit' });
+    if (!response.ok) throw new Error('People unavailable');
+    const text = await response.text();
+    if (text.length > 512 * 1024) throw new Error('People response too large');
+    const payload = JSON.parse(text);
+    if (payload.ok !== true || !Array.isArray(payload.data) || payload.data.length > 100
+      || !Number.isSafeInteger(payload.total) || payload.total !== payload.data.length) throw new Error('Incomplete People response');
+    if (controller.signal.aborted || bandPersonnelSession !== session) return;
+    session.people = payload.data;
+    bandPersonnelPeopleCache.set(session.id, session.people);
+    if (bandPersonnelPeopleCache.size > 8) bandPersonnelPeopleCache.delete(bandPersonnelPeopleCache.keys().next().value);
+    renderBandPersonnelCards(session);
+    if (notice) notice.textContent = 'Linked members open their existing person archives.';
+  } catch {
+    if (bandPersonnelSession === session && getRouteFromUrl().name === 'band-detail') {
+      if (notice) notice.textContent = 'Person archives unavailable. Reopen Personnel to retry.';
+    }
+  } finally {
+    clearTimeout(timeout);
+    if (session.controller === controller) session.controller = null;
+  }
+}
 function renderBandPersonnel(band) {
-  const section = bandDetailCoreMembers?.closest('.band-detail-members');
-  if (!section) return;
-  if (!section.classList.contains('band-personnel')) {
-    section.classList.add('band-personnel');
-    section.setAttribute('aria-label', 'Personnel');
-    const title = document.createElement('h4');
-    title.className = 'band-detail-panel-title';
-    title.textContent = 'PERSONNEL';
-    const controls = document.createElement('div');
-    controls.className = 'band-personnel-controls';
-    controls.setAttribute('role', 'group');
-    controls.setAttribute('aria-label', 'Personnel roster');
-    ['current', 'past'].forEach(key => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.dataset.personnelRoster = key;
-      button.setAttribute('aria-controls', 'band-personnel-roster');
-      controls.append(button);
-    });
-    bandDetailCoreMembers.id = 'band-personnel-roster';
-    bandDetailCoreMembers.tabIndex = 0;
-    bandDetailCoreMembers.setAttribute('aria-roledescription', 'carousel');
-    const pagination = document.createElement('div');
-    pagination.className = 'band-personnel-pagination';
-    pagination.setAttribute('role', 'group');
-    pagination.setAttribute('aria-label', 'Personnel pages');
-    const previous = document.createElement('button');
-    previous.type = 'button';
-    previous.dataset.personnelPrevious = '';
-    previous.textContent = '‹';
-    previous.setAttribute('aria-label', 'Previous personnel page');
-    previous.setAttribute('aria-controls', 'band-personnel-roster');
-    const indicator = document.createElement('div');
-    indicator.className = 'band-personnel-indicator';
-    const dots = document.createElement('span');
-    dots.className = 'band-personnel-dots';
-    dots.setAttribute('aria-hidden', 'true');
-    const status = document.createElement('span');
-    status.className = 'band-personnel-page-status';
-    status.setAttribute('aria-live', 'polite');
-    status.setAttribute('aria-atomic', 'true');
-    indicator.append(dots, status);
-    const next = document.createElement('button');
-    next.type = 'button';
-    next.dataset.personnelNext = '';
-    next.textContent = '›';
-    next.setAttribute('aria-label', 'Next personnel page');
-    next.setAttribute('aria-controls', 'band-personnel-roster');
-    pagination.append(previous, indicator, next);
-    section.replaceChildren(title, controls, bandDetailCoreMembers, pagination);
-  }
-  const personnel = getBandDetailPersonnel(band.backend_record || band);
-  // Keep authoritative roster membership and the shared resume selection hook.
+  if (!bandDetailCoreMembers) return;
+  cancelBandPersonnelLookup();
+  const raw = band.backend_record || band;
+  const personnel = getBandDetailPersonnel(raw);
+  const id = getBandId(band);
   const rosters = {
-    current: getUniqueBandDetailMembers(personnel.members),
-    past: getUniqueBandDetailMembers(personnel.past_members),
+    current: normalizeBandDetailMembers(getUniqueBandDetailMembers(personnel.members)),
+    past: normalizeBandDetailMembers(getUniqueBandDetailMembers(personnel.past_members)),
   };
-  section.hidden = !rosters.current.length && !rosters.past.length;
-  const controls = section.querySelector('.band-personnel-controls');
-  controls.hidden = !rosters.current.length || !rosters.past.length;
-  const bandId = getBandId(band);
-  const retained = v3ResumeUI().personnel === 'past' ? 'past'
-    : section.dataset.personnelBand === bandId ? section.dataset.personnelSelection : '';
-  section.dataset.personnelBand = bandId;
-  const pages = createBandPersonnelPages(bandDetailCoreMembers, rosters);
-  const pagination = section.querySelector('.band-personnel-pagination');
-  const previous = pagination.querySelector('[data-personnel-previous]');
-  const next = pagination.querySelector('[data-personnel-next]');
-  const dots = pagination.querySelector('.band-personnel-dots');
-  const status = pagination.querySelector('.band-personnel-page-status');
-  pagination.hidden = Math.max(pages.current.length, pages.past.length) <= 1;
-  let selected = retained && rosters[retained].length ? retained : rosters.current.length ? 'current' : 'past';
-  let pageIndex = 0;
-
-  function renderPage(index) {
-    const count = pages[selected].length;
-    pageIndex = Math.max(0, Math.min(index, count - 1));
-    Object.entries(pages).forEach(([key, rosterPages]) => rosterPages.forEach((page, index) => {
-      const active = key === selected && index === pageIndex;
-      page.classList.toggle('is-active', active);
-      page.setAttribute('aria-hidden', String(!active));
-      page.inert = !active;
-    }));
-    previous.disabled = pageIndex === 0;
-    next.disabled = pageIndex >= count - 1;
-    dots.replaceChildren(...pages[selected].map((_, index) => {
-      const dot = document.createElement('span');
-      dot.className = index === pageIndex ? 'is-active' : '';
-      return dot;
-    }));
-    status.textContent = count ? (pageIndex + 1) + ' / ' + count : '';
-    status.setAttribute('aria-label', count ? 'Personnel page ' + (pageIndex + 1) + ' of ' + count : '');
-  }
-
-  function selectRoster(key) {
-    selected = key;
-    section.dataset.personnelSelection = key;
-    controls.querySelectorAll('button').forEach(button => {
-      const target = button.dataset.personnelRoster;
-      button.textContent = target.toUpperCase() + ' (' + rosters[target].length + ')';
-      button.setAttribute('aria-pressed', String(target === key));
-    });
-    bandDetailCoreMembers.setAttribute('aria-label', key === 'past' ? 'Past members' : 'Current members');
-    renderPage(0);
-  }
-
-  controls.querySelectorAll('button').forEach(button => {
-    button.onclick = () => selectRoster(button.dataset.personnelRoster);
-  });
-  previous.onclick = () => renderPage(pageIndex - 1);
-  next.onclick = () => renderPage(pageIndex + 1);
-  bandDetailCoreMembers.onkeydown = event => {
-    const targets = { ArrowLeft: pageIndex - 1, ArrowRight: pageIndex + 1, Home: 0, End: pages[selected].length - 1 };
-    if (!(event.key in targets)) return;
-    event.preventDefault();
-    renderPage(targets[event.key]);
-  };
-  let swipe = null;
-  bandDetailCoreMembers.onpointerdown = event => {
-    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
-    swipe = { id: event.pointerId, x: event.clientX, y: event.clientY };
-    bandDetailCoreMembers.setPointerCapture(event.pointerId);
-  };
-  bandDetailCoreMembers.onpointerup = event => {
-    if (!swipe || swipe.id !== event.pointerId) return;
-    const dx = event.clientX - swipe.x, dy = event.clientY - swipe.y;
-    swipe = null;
-    if (bandDetailCoreMembers.hasPointerCapture(event.pointerId)) bandDetailCoreMembers.releasePointerCapture(event.pointerId);
-    if (Math.abs(dx) >= 36 && Math.abs(dx) > Math.abs(dy) * 1.3) renderPage(pageIndex + (dx < 0 ? 1 : -1));
-  };
-  bandDetailCoreMembers.onpointercancel = () => { swipe = null; };
-  selectRoster(selected);
+  const session = { id, name: getBandDetailName(raw), nameKey: bandPersonnelKey(getBandDetailName(raw)), rosters,
+    documented: Array.isArray(personnel.members) || Array.isArray(personnel.past_members),
+    hasMembers: Boolean(rosters.current.length || rosters.past.length), people: bandPersonnelPeopleCache.get(id) || null, controller: null };
+  bandPersonnelSession = session;
+  renderBandPersonnelCards(session);
+  const notice = bandDetail.querySelector('[data-band-personnel-link-state]');
+  if (notice) notice.textContent = !session.hasMembers ? '' : session.people
+    ? 'Linked members open their existing person archives.' : 'Person archives are checked when Personnel opens.';
+  if (bandContentState.active === 'personnel') requestBandPersonnelLinks();
 }
 
 // Use resolved, band-linked albums only; logos and show posters are not photographs.
@@ -5992,6 +5951,7 @@ function setMusicVenueIndexVisible(isVisible) {
 }
 
 function setBandDetailVisible(isVisible) {
+  if (!isVisible) cancelBandPersonnelLookup();
   if (!isVisible) settleBandContentTransition();
   if (!isVisible) clearBandIdentityReveal();
   if (!isVisible) clearBandDetailPhotograph();
@@ -6188,7 +6148,8 @@ function syncBandContentBand(bandId) {
   renderBandContentSelection();
 }
 async function selectBandContent(next) {
-  if (!["logo", "info", "statistics"].includes(next) || bandContentState.transition?.target === next) return;
+  if (!["logo", "info", "statistics", "personnel"].includes(next) || bandContentState.transition?.target === next) return;
+  if (next === "personnel") requestBandPersonnelLinks();
   settleBandContentTransition();
   if (next === bandContentState.active) return;
   const stage = bandDetail?.querySelector("[data-band-content-stage]");
