@@ -32027,6 +32027,23 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 
+/* B5C: the retained archive metrics share the existing pixel-transition viewport. */
+.band-statistics-dossier { box-sizing:border-box;width:min(100%,40rem);min-width:0;padding:0 clamp(.65rem,2vw,1.25rem); }
+.band-statistics-dossier .band-detail-completion { box-sizing:border-box;width:100%;margin:0 0 .65rem;gap:.4rem;grid-template-columns:minmax(0,1fr);justify-items:stretch;text-align:left; }
+.band-statistics-dossier .band-detail-completion-head { display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.35rem; }
+.band-statistics-dossier .band-detail-completion-label { font-size:.75rem;line-height:1.4;text-transform:none; }
+.band-statistics-dossier .band-detail-completion-value { font-size:.85rem;line-height:1.4;overflow-wrap:anywhere; }
+.band-statistics-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:.5rem;min-width:0; }
+.band-statistics-grid .band-coverage-item { box-sizing:border-box;display:grid;align-content:center;min-width:0;gap:.3rem;padding:.45rem .35rem;margin:0;border:1px solid rgba(145,155,216,.26);border-radius:0;background:rgba(11,14,33,.64);text-align:center; }
+.band-statistics-grid .band-coverage-label { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
+.band-statistics-grid .band-coverage-value { margin:0;color:#e6ecff;font-size:.95rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
+.band-statistics-dossier .band-detail-progress[hidden] { display:block;visibility:hidden; }
+/* Reserve two-line narrow-screen values while coverage fields arrive asynchronously. */
+@media(max-width:399px) {
+  .band-statistics-grid .band-coverage-item { min-height:6.125rem; }
+}
+
+
 /* Permanent band identity: one title, shared with the existing record transition. */
 .band-detail-content .band-identity-hud {
   position:relative;isolation:isolate;box-sizing:border-box;grid-column:1/-1;

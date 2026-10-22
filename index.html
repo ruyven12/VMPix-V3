@@ -908,7 +908,7 @@
               <div class="band-content-tabs" role="tablist" aria-label="Band archive sections">
                 <button class="band-content-tab" id="band-logo-tab" data-band-content-tab="logo" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
                 <button class="band-content-tab" id="band-info-tab" data-band-content-tab="info" type="button" role="tab" aria-selected="false" aria-controls="band-info-panel" tabindex="-1">INFO</button>
-                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>TELEMETRY</button>
+                <button class="band-content-tab" id="band-statistics-tab" data-band-content-tab="statistics" type="button" role="tab" aria-selected="false" aria-controls="band-statistics-panel" tabindex="-1">STATISTICS</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>PERSONNEL</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>SETS</button>
               </div>
@@ -930,41 +930,51 @@
                     <div class="band-info-row" data-band-identity-last-seen><dt>Last Seen/Performed:</dt><dd>Not available</dd></div>
                   </dl>
                 </section>
+                <section class="band-content-panel" id="band-statistics-panel" data-band-content-panel="statistics" role="tabpanel" aria-labelledby="band-statistics-tab" aria-hidden="true" tabindex="-1" inert>
+                  <div class="band-statistics-dossier">
+                    <div class="band-detail-completion" aria-label="Archive completion">
+                      <div class="band-detail-completion-head">
+                        <p class="band-detail-completion-label">Archive Completion</p>
+                        <p class="band-detail-completion-value" data-band-detail-completion-value>Not available</p>
+                      </div>
+                      <div class="band-detail-progress" aria-hidden="true" hidden>
+                        <span class="band-detail-progress-fill" data-band-detail-progress-fill></span>
+                      </div>
+                    </div>
+                    <div class="band-statistics-grid">
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Status</p>
+                        <p class="band-coverage-value" data-band-detail-lifecycle-status>Not available</p>
+                      </article>
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Contributors</p>
+                        <p class="band-coverage-value" data-band-detail-contributors>Not available</p>
+                      </article>
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Years Covered</p>
+                        <p class="band-coverage-value" data-band-detail-years-covered>Not available</p>
+                      </article>
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Most Active Year</p>
+                        <p class="band-coverage-value" data-band-detail-most-active-year>Not available</p>
+                      </article>
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Sets Captured</p>
+                        <p class="band-coverage-value" data-band-detail-sets-captured>Not available</p>
+                      </article>
+                      <article class="band-coverage-item">
+                        <p class="band-coverage-label">Total Photos</p>
+                        <p class="band-coverage-value" data-band-detail-total-photos>Not available</p>
+                      </article>
+                    </div>
+                  </div>
+                </section>
               </div>
             </section>
 
             <section class="band-detail-coverage" aria-labelledby="band-detail-coverage-title">
               <h4 class="band-detail-panel-title" id="band-detail-coverage-title">ARCHIVE COVERAGE</h4>
-                <div class="band-detail-completion" aria-label="Archive completion">
-                  <div class="band-detail-completion-head">
-                    <p class="band-detail-completion-label">Archive Completion</p>
-                    <p class="band-detail-completion-value" data-band-detail-completion-value>72%</p>
-                  </div>
-                  <div class="band-detail-progress" aria-hidden="true">
-                    <span class="band-detail-progress-fill" data-band-detail-progress-fill></span>
-                  </div>
-                </div>
               <div class="band-coverage-grid">
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Years Covered</p>
-                  <p class="band-coverage-value" data-band-detail-years-covered>Pending</p>
-                </article>
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Most Active Year</p>
-                  <p class="band-coverage-value" data-band-detail-most-active-year>Pending</p>
-                </article>
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Total Photos</p>
-                  <p class="band-coverage-value" data-band-detail-total-photos>486</p>
-                </article>
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Contributors</p>
-                  <p class="band-coverage-value" data-band-detail-contributors>6</p>
-                </article>
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Sets Captured</p>
-                  <p class="band-coverage-value" data-band-detail-sets-captured>18/24</p>
-                </article>
                 <article class="band-coverage-item">
                   <p class="band-coverage-label">Data Status</p>
                   <p class="band-coverage-value" data-band-detail-data-status>Partial</p>
@@ -972,10 +982,6 @@
                 <article class="band-coverage-item">
                   <p class="band-coverage-label">Latest Seen</p>
                   <p class="band-coverage-value" data-band-detail-latest-seen>Pending</p>
-                </article>
-                <article class="band-coverage-item">
-                  <p class="band-coverage-label">Status</p>
-                  <p class="band-coverage-value" data-band-detail-lifecycle-status>Active</p>
                 </article>
                 <article class="band-coverage-item">
                   <p class="band-coverage-label">Last Updated</p>

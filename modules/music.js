@@ -6188,7 +6188,7 @@ function syncBandContentBand(bandId) {
   renderBandContentSelection();
 }
 async function selectBandContent(next) {
-  if (!["logo", "info"].includes(next) || bandContentState.transition?.target === next) return;
+  if (!["logo", "info", "statistics"].includes(next) || bandContentState.transition?.target === next) return;
   settleBandContentTransition();
   if (next === bandContentState.active) return;
   const stage = bandDetail?.querySelector("[data-band-content-stage]");
@@ -6249,7 +6249,9 @@ function initBandContentTabs() {
     const index = buttons.indexOf(event.target);
     if (index < 0) return;
     event.preventDefault();
-    const next = event.key === "Home" ? buttons[0] : event.key === "End" ? buttons[1] : buttons[1 - index];
+    const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1
+      : (index + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length;
+    const next = buttons[nextIndex];
     next.focus({ preventScroll: true });
     selectBandContent(next.dataset.bandContentTab);
   });
@@ -6293,39 +6295,25 @@ function renderBandIdentityDossier(band) {
   const lifecycle = getBandDetailLifecycleStatus(general, raw).toLowerCase();
   const key = ["active", "inactive"].includes(lifecycle) ? lifecycle : "unknown";
   hero.dataset.bandStatus = key;
-  const known = value => value != null && String(value).trim() !== "" && getBandIndexNumber(value) !== null;
-  const archived = stats.archived_sets ?? raw.archived_sets;
-  const total = stats.total_sets ?? raw.total_sets;
-  const hasCompletion = known(archived) && known(total);
-  const completion = hasCompletion ? getBandDetailCompletion(Number(archived), Number(total)) : null;
-  bandDetailCompletionValue.textContent = hasCompletion ? `${completion}%` : "—";
-  bandDetailProgressFill.style.width = `${completion ?? 0}%`;
-  const progress = bandDetail.querySelector(".band-detail-progress");
-  progress.hidden = !hasCompletion;
-  progress.removeAttribute("aria-hidden");
-  progress.setAttribute("role", "progressbar");
-  progress.setAttribute("aria-label", "Archive completion");
-  progress.setAttribute("aria-valuemin", "0");
-  progress.setAttribute("aria-valuemax", "100");
-  if (hasCompletion) progress.setAttribute("aria-valuenow", String(completion));
-  else progress.removeAttribute("aria-valuenow");
   renderBandIdentityLastSeen(band);
 }
 
 function renderBandArchiveTelemetry(band) {
-  const section = bandDetailYearsCovered?.closest(".band-detail-coverage");
+  const section = bandDetailLastUpdated?.closest(".band-detail-coverage");
   if (!section) return;
-  const nodes = [bandDetailYearsCovered, bandDetailMostActiveYear, bandDetailTotalPhotos, bandDetailSetsCaptured, bandDetailLastUpdated, bandDetailContributors];
   if (!section.classList.contains("band-archive-telemetry")) {
     section.classList.add("band-archive-telemetry");
     section.querySelector(".band-detail-panel-title").textContent = "ARCHIVE TELEMETRY";
-    section.querySelector(".band-coverage-grid").replaceChildren(...nodes.map(node => node.closest(".band-coverage-item")));
+    // Migrated metrics retain their original bindings; only unrelated update information stays here.
+    section.querySelector(".band-coverage-grid").replaceChildren(bandDetailLastUpdated.closest(".band-coverage-item"));
   }
   const raw = band.backend_record || band;
   const stats = getBandDetailStats(raw);
   const number = (...values) => {
     for (const value of values) {
-      if (value != null && String(value).trim() !== "" && getBandIndexNumber(value) !== null) return getBandIndexNumber(value);
+      if (value == null || String(value).trim() === "") continue;
+      const parsed = getBandIndexNumber(value);
+      if (parsed !== null && parsed >= 0) return parsed;
     }
     return null;
   };
@@ -6336,25 +6324,42 @@ function renderBandArchiveTelemetry(band) {
   const pastKeys = new Set(getUniqueBandDetailMembers(personnel.past_members).map(getBandDetailMemberKey));
   const members = getUniqueBandDetailMembers(personnel.members, pastKeys);
   const contributors = members.length > 0 ? members.length : number(raw.member_count, raw.memberCount, stats.member_count, stats.memberCount);
+  // Preserve the completion meter's original sources; albums remains a sets-only fallback.
+  const completionArchived = number(stats.archived_sets ?? raw.archived_sets);
+  const completionTotal = number(stats.total_sets ?? raw.total_sets);
+  const hasCompletion = completionArchived !== null && completionTotal !== null;
+  const completion = hasCompletion ? getBandDetailCompletion(completionArchived, completionTotal) : null;
+  bandDetailCompletionValue.textContent = hasCompletion ? `${completion}%` : "Not available";
+  bandDetailProgressFill.style.width = `${completion ?? 0}%`;
+  const progress = bandDetail.querySelector(".band-detail-progress");
+  progress.hidden = !hasCompletion;
+  progress.removeAttribute("aria-hidden");
+  progress.setAttribute("role", "progressbar");
+  progress.setAttribute("aria-label", "Archive completion");
+  progress.setAttribute("aria-valuemin", "0");
+  progress.setAttribute("aria-valuemax", "100");
+  if (hasCompletion) progress.setAttribute("aria-valuenow", String(completion));
+  else progress.removeAttribute("aria-valuenow");
+
+  const values = [
+    [bandDetailLifecycleStatus, getBandDetailLifecycleStatus(getBandDetailGeneral(raw), raw)],
+    [bandDetailContributors, contributors === null ? null : formatBandDetailNumber(contributors)],
+    [bandDetailYearsCovered, getBandDetailYearsCovered(stats, raw)],
+    [bandDetailMostActiveYear, getBandDetailMostActiveYear(stats, raw)],
+    [bandDetailSetsCaptured, archived === null || total === null ? null : `${formatBandDetailNumber(archived)}/${formatBandDetailNumber(total)}`],
+    [bandDetailTotalPhotos, photos === null ? null : formatBandDetailNumber(photos)],
+  ];
+  values.forEach(([node, value]) => {
+    node.textContent = value != null && value !== "Pending" && String(value).trim() !== "" ? String(value) : "Not available";
+  });
   const dateFields = ["last_updated", "lastUpdated", "updated_at", "updatedAt"];
   const rawDate = getBandDetailTextCandidate(...[stats, raw].flatMap(source => dateFields.map(field => source[field])));
   const calendarDate = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   const updated = calendarDate ? `${calendarDate[2]}/${calendarDate[3]}/${calendarDate[1]}` : getBandDetailLastUpdated(stats, raw);
-  const values = [
-    getBandDetailYearsCovered(stats, raw),
-    getBandDetailMostActiveYear(stats, raw),
-    photos === null ? null : formatBandDetailNumber(photos),
-    archived === null || total === null ? null : `${formatBandDetailNumber(archived)}/${formatBandDetailNumber(total)}`,
-    updated,
-    contributors === null ? null : formatBandDetailNumber(contributors),
-  ];
-  nodes.forEach((node, index) => {
-    const value = values[index];
-    const present = value != null && value !== "Pending" && String(value).trim() !== "";
-    node.textContent = present ? String(value) : "";
-    node.closest(".band-coverage-item").hidden = !present;
-  });
-  section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden) && bandDetail.querySelector(".band-detail-progress").hidden;
+  const hasUpdated = updated !== "Pending" && String(updated).trim() !== "";
+  bandDetailLastUpdated.textContent = hasUpdated ? updated : "";
+  bandDetailLastUpdated.closest(".band-coverage-item").hidden = !hasUpdated;
+  section.hidden = !hasUpdated;
 }
 
 // One real HUD: B3 assembly, a short hold, then measured travel into its retained grid slot.
