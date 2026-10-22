@@ -31713,6 +31713,44 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-name { font-size: .875rem; }
 }
 
+/* R4: static archive artwork for confirmed missing or failed Rolodex images only. */
+.rhythm-rolodex .rhythm-source-unarchived {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: 2px;
+  box-sizing: border-box;
+  color: #dce5fb;
+  background: linear-gradient(140deg, #243c5b66, transparent 60%, #39275855), #0b1125;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  font-size: 6px;
+  line-height: 1.25;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: pre-line;
+  pointer-events: none;
+}
+.rhythm-rolodex .rhythm-source-unarchived::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 1px solid #7b90c447;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.rhythm-rolodex .rhythm-source-unarchived::after {
+  content: "";
+  position: absolute;
+  inset: auto 12% 8%;
+  height: 10%;
+  background: #a7a4e84d;
+  clip-path: polygon(0 45%, 25% 45%, 33% 0, 43% 80%, 52% 25%, 59% 45%, 100% 45%, 100% 60%, 57% 60%, 52% 45%, 42% 100%, 33% 25%, 28% 60%, 0 60%);
+}
+.rhythm-rolodex .rhythm-source-row.is-active .rhythm-source-unarchived { font-size: clamp(8px, 2.1vw, 11px); }
+@media (min-width: 900px) {
+  .rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-unarchived { font-size: clamp(6px, .625vw, 8px); }
+}
+
 /* Source retrieval shares the current Pillar viewport and existing Band state. */
 .rhythm-pillar [data-bands-view][hidden] { display:none; }
 .rhythm-search-panel { display:flex;flex-direction:column;flex:1;min-height:0;min-width:0; }

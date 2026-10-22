@@ -8945,7 +8945,16 @@ function createRhythmSourceTelemetry(band) {
 function createRhythmSourceRow(band,select,{direct=false}={}) {
   const item=document.createElement('li'),row=document.createElement('button');row.type='button';row.className='rhythm-source-row';row.dataset.bandId=getBandId(band);row.setAttribute('aria-label','Select '+band.name);
   const art=document.createElement('span');art.className='rhythm-source-art';art.setAttribute('aria-hidden','true');art.textContent=getBandInitials(band.name);
-  const url=getBandDetailLogoUrl(band);if(url){const image=document.createElement('img');image.alt='';image.loading='lazy';image.decoding='async';image.addEventListener('error',()=>image.remove(),{once:true});image.src=url;art.append(image);}
+  const showUnarchivedArtwork=()=>{
+    const label=document.createElement('span');label.className='rhythm-source-unarchived';label.textContent='IMAGE\nNOT\nARCHIVED';
+    art.replaceChildren(label);row.setAttribute('aria-description','Image not archived');
+  };
+  const url=getBandDetailLogoUrl(band);
+  if(url){
+    const image=document.createElement('img');image.alt='';image.loading='lazy';image.decoding='async';
+    image.addEventListener('error',()=>{image.remove();if(!direct)showUnarchivedArtwork();},{once:true});
+    image.src=url;art.append(image);
+  }else if(!direct)showUnarchivedArtwork();
   const name=document.createElement('span');name.className='rhythm-source-name';
   const title=document.createElement('span');title.className='rhythm-source-title';title.textContent=band.name;
   if(band.name.length>48)row.classList.add('has-long-source-name');
