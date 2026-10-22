@@ -1927,19 +1927,20 @@ function renderBandPersonnel(band) {
   selectRoster(selected);
 }
 
-// Background photos come only from a resolved album explicitly linked to this Band.
-// Band cover_image_url currently mirrors logo_url; neither logos nor show posters qualify.
+// Use resolved, band-linked albums only; logos and show posters are not photographs.
 let bandDetailPhotograph = null;
 let bandDetailPhotographObserver = null;
 function clearBandDetailPhotograph() {
   const session = bandDetailPhotograph;
   bandDetailPhotograph = null;
   if (!session) return;
-  clearTimeout(session.timeout);
-  if (session.image) {
-    session.image.onload = session.image.onerror = null;
-    session.image.removeAttribute("src");
-  }
+  clearTimeout(session.timer);
+  clearTimeout(session.fadeTimer);
+  session.frames.forEach(cancelAnimationFrame);
+  session.cancelImage?.();
+  document.removeEventListener("visibilitychange", session.sync);
+  reducedMotion.removeEventListener("change", session.sync);
+  [session.current, session.next, session.outgoing].forEach(item => item?.image.removeAttribute("src"));
   session.layer.classList.remove("is-ready");
   session.layer.replaceChildren();
 }
@@ -1949,56 +1950,178 @@ function prepareBandDetailPhotograph(band) {
   const layer = bandDetailViewport?.querySelector("[data-band-detail-atmosphere]");
   if (!layer || !bandId || bandDetailPhotograph?.bandId === bandId) return;
   clearBandDetailPhotograph();
-  const session = { bandId, layer, image: null, timeout: 0 };
+  const session = { bandId, layer, current: null, next: null, outgoing: null, timer: 0, fadeTimer: 0,
+    frames: [], albums: [], cursor: 0, seen: new Set(), usable: new Set(), failed: new Set(), busy: false, exhausted: false };
   bandDetailPhotograph = session;
+  const current = () => bandDetailPhotograph === session && getBandId(activeMusicBand) === bandId &&
+    (!bandDetailViewport.hidden || bandRecordOpening?.bandId === bandId);
+  const active = () => current() && !document.hidden && !bandDetailViewport.hidden && !bandDetailViewport.hasAttribute("data-band-record-stage");
+  const finishFade = () => {
+    clearTimeout(session.fadeTimer);
+    session.frames.forEach(cancelAnimationFrame);
+    session.frames = [];
+    session.current?.image.classList.add("is-current");
+    session.outgoing?.image.remove();
+    session.outgoing?.image.removeAttribute("src");
+    session.outgoing = null;
+  };
+  const schedule = () => {
+    if (active() && !reducedMotion.matches && !session.exhausted && !session.timer) {
+      session.timer = setTimeout(() => {
+        session.timer = 0;
+        if (!active() || reducedMotion.matches) return;
+        if (session.next) present();
+        schedule();
+        preload();
+      }, 5000);
+    }
+  };
+  const present = () => {
+    if (!active() || !session.next) return;
+    finishFade();
+    const previous = session.current;
+    session.current = session.next;
+    session.next = null;
+    if (!previous) {
+      clearTimeout(session.timer); session.timer = 0; // Give the first decoded photograph a full five seconds.
+      session.current.image.classList.add("is-current");
+      layer.replaceChildren(session.current.image);
+      layer.classList.add("is-ready");
+    } else {
+      // Keep the old image opaque beneath the decoded incoming image: no blank midpoint.
+      session.outgoing = previous;
+      layer.append(session.current.image);
+      session.frames.push(requestAnimationFrame(() => {
+        session.frames.push(requestAnimationFrame(() => {
+          if (current()) session.current.image.classList.add("is-current");
+        }));
+      }));
+      session.fadeTimer = setTimeout(() => { finishFade(); if (active()) preload(); }, 650);
+    }
+  };
+  const decode = src => new Promise(resolve => {
+    const image = new Image();
+    image.alt = ""; image.decoding = "async"; image.fetchPriority = "low";
+    let finished = false;
+    const complete = ok => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+      image.onload = image.onerror = null;
+      session.cancelImage = null;
+      if (!ok) image.removeAttribute("src");
+      resolve(ok ? image : null);
+    };
+    const timeout = setTimeout(() => complete(false), 15000);
+    session.cancelImage = () => complete(false);
+    image.onerror = () => complete(false);
+    image.onload = async () => {
+      try { if (typeof image.decode === "function") await image.decode(); }
+      catch { complete(false); return; }
+      complete(current() && image.naturalWidth > 0 && image.naturalHeight > 0);
+    };
+    image.src = src;
+  });
+  const candidate = () => {
+    if (!session.albums.length) return null;
+    if (session.albums.every(album => album.done)) {
+      if (session.usable.size <= 1) { session.exhausted = true; return null; }
+      session.seen.clear();
+      session.albums.forEach(album => { album.visited = 0; album.next = 1; album.done = album.unavailable; });
+    }
+    for (let n = 0; n < session.albums.length; n++) {
+      const album = session.albums[session.cursor++ % session.albums.length];
+      if (!album.done) return album;
+    }
+    session.exhausted = true;
+    return null;
+  };
+  const preload = async () => {
+    if (!active() || session.busy || session.next || session.outgoing || session.exhausted || (session.current && reducedMotion.matches)) return;
+    session.busy = true;
+    try {
+      // Bounded work: one small page at a time, at most four unsuitable candidates per tick.
+      for (let attempt = 0; attempt < 4 && active(); attempt++) {
+        const album = candidate();
+        if (!album) break;
+        let result;
+        try { result = await requestMusicSmugmugAlbumPhotosPage(album.id, 1, album.next); }
+        catch { if (current()) album.done = album.unavailable = true; continue; }
+        if (!current()) return;
+        if (!active()) break; // Keep this index for resume; the shared loader caches the response.
+        if (!album.total && result.total && (!result.hasMore || result.total > 1)) album.total = result.total;
+        album.visited++;
+        if (album.total) {
+          // A coprime stride visits every index once, spreading adjacent captures apart.
+          const gcd = (a, b) => b ? gcd(b, a % b) : a;
+          let stride = Math.max(1, Math.floor(album.total / 3));
+          while (gcd(stride, album.total) !== 1) stride++;
+          album.next = (album.visited * stride) % album.total + 1;
+          album.done = album.visited >= album.total;
+        } else {
+          const next = result.nextStart;
+          album.done = !result.hasMore || !next || next <= album.next;
+          if (!album.done) album.next = next;
+        }
+        const photo = result.photos[0], src = getMusicAlbumPhotoImageSrc(photo);
+        const key = photo?.dedupeKey || src;
+        if (!src || !isMusicShowPosterImageSrc(src) || src === SET_GALLERY_NO_POSTER_IMAGE_SRC || /\/(?:placeholders|Band-Logos)\//i.test(src) ||
+          session.seen.has(key) || session.failed.has(src) || session.current?.key === key || session.current?.src === src) continue;
+        session.seen.add(key);
+        const image = await decode(src);
+        if (!current()) return;
+        if (!image) { session.failed.add(src); continue; }
+        session.usable.add(key);
+        session.next = { image, key, src };
+        break;
+      }
+    } finally {
+      session.busy = false;
+      if (active()) {
+        if (!session.current && session.next) { present(); schedule(); preload(); }
+        else schedule();
+      }
+    }
+  };
+  session.sync = () => {
+    if (!current()) return;
+    clearTimeout(session.timer); session.timer = 0;
+    if (!active() || reducedMotion.matches) finishFade();
+    if (!active()) return;
+    if (!session.current && session.next) present();
+    schedule(); preload();
+  };
+  document.addEventListener("visibilitychange", session.sync);
+  reducedMotion.addEventListener("change", session.sync);
   if (!bandDetailPhotographObserver) {
     bandDetailPhotographObserver = new MutationObserver(() => {
       if (bandDetailViewport.hidden) clearBandDetailPhotograph();
-      else if (getRouteFromUrl().name === "band-detail" && getBandId(activeMusicBand) === getRouteFromUrl().bandId) prepareBandDetailPhotograph(activeMusicBand);
+      else if (getRouteFromUrl().name === "band-detail" && getBandId(activeMusicBand) === getRouteFromUrl().bandId) {
+        prepareBandDetailPhotograph(activeMusicBand);
+        bandDetailPhotograph?.sync();
+      }
     });
-    bandDetailPhotographObserver.observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden"] });
+    bandDetailPhotographObserver.observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden", "data-band-record-stage"] });
   }
-  const current = () => bandDetailPhotograph === session && getBandId(activeMusicBand) === bandId &&
-    (!bandDetailViewport.hidden || bandRecordOpening?.bandId === bandId);
-  const load = async () => {
-    // Share the existing Captured Sets request/cache. No new archive-wide request.
+  (async () => {
     await requestMusicShowsSetsData();
     if (!current() || musicShowsSetsDataState !== "live") return;
     const keys = new Set([bandId, getBandDetailName(band)].map(createBandSlug));
-    const shows = getSortedSetsArchiveRows(getSetsArchiveRowsForBand(band));
-    const albums = shows.flatMap(getMusicShowSmugAlbums);
-    const album = albums.find(item => String(item.status).toLowerCase() === "resolved" &&
-      [getMusicShowAlbumBandId(item), getMusicShowAlbumBandName(item)].some(key => key && keys.has(createBandSlug(key))) &&
-      (item.album_id || item.albumId || item.gallery_id || item.galleryId) && getMusicShowAlbumPhotoCount(item) !== 0);
-    if (!album) return;
-    const albumId = String(album.album_id || album.albumId || album.gallery_id || album.galleryId).trim();
-    // One deterministic first photo, using the existing bounded, deduplicated photo loader.
-    // Shared requests may complete into their cache after departure; they cannot repaint it.
-    const result = await requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1);
-    if (!current()) return;
-    const src = getMusicAlbumPhotoImageSrc(result.photos[0]);
-    if (!src || !isMusicShowPosterImageSrc(src) || src === SET_GALLERY_NO_POSTER_IMAGE_SRC || /\/(?:placeholders|Band-Logos)\//i.test(src)) return;
-    const image = new Image();
-    session.image = image;
-    image.alt = "";
-    image.decoding = "async";
-    image.fetchPriority = "low";
-    const failed = () => { if (bandDetailPhotograph === session) clearBandDetailPhotograph(); };
-    session.timeout = setTimeout(failed, 15000);
-    image.onerror = failed;
-    image.onload = async () => {
-      try { if (typeof image.decode === "function") await image.decode(); }
-      catch { failed(); return; }
-      if (!current() || !image.naturalWidth || !image.naturalHeight) return;
-      clearTimeout(session.timeout);
-      image.onload = image.onerror = null;
-      layer.replaceChildren(image);
-      layer.classList.add("is-ready");
-    };
-    image.src = src;
-  };
-  load().catch(() => { if (bandDetailPhotograph === session) clearBandDetailPhotograph(); });
+    const ids = new Set();
+    // Newest sets first, round-robin across distinct resolved galleries; no inferred subjects.
+    for (const item of getSortedSetsArchiveRows(getSetsArchiveRowsForBand(band)).flatMap(getMusicShowSmugAlbums)) {
+      const id = String(item.album_id || item.albumId || item.gallery_id || item.galleryId || "").trim();
+      const total = getMusicShowAlbumPhotoCount(item);
+      if (!id || ids.has(id) || total === 0 || String(item.status).toLowerCase() !== "resolved" ||
+        ![getMusicShowAlbumBandId(item), getMusicShowAlbumBandName(item)].some(key => key && keys.has(createBandSlug(key)))) continue;
+      ids.add(id);
+      session.albums.push({ id, total, visited: 0, next: 1, done: false, unavailable: false });
+    }
+    session.exhausted = session.albums.length === 0;
+    session.sync();
+  })().catch(() => { if (current() && !session.current) clearBandDetailPhotograph(); });
 }
+
 
 function setBandDetailLogo(logoUrl, name) {
   const logoShell = bandDetailLogoImage?.closest(".band-detail-logo");
