@@ -5968,7 +5968,7 @@ function renderBandIdentityDossier(band) {
   if (!hero.classList.contains("band-identity-dossier")) {
     hero.classList.add("band-identity-dossier");
     // Retain the existing data-bound identity nodes; Sets now lives below Personnel.
-    bandDetailName.after(bandDetailLocation);
+    copy.prepend(bandDetailLocation);
     copy.querySelector(".band-detail-meta")?.remove();
     bandDetailStatus.after(bandDetailTags);
     const seen = document.createElement("p");
