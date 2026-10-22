@@ -1840,6 +1840,8 @@ async function requestBandPersonnelLinks() {
   if (notice) notice.textContent = 'Checking linked person archives...';
   try {
     const url = getMusicPeopleIndexApiUrl();
+    // Personnel needs stored People relationships only, without photographic archive enrichment.
+    url.searchParams.delete('archive');
     url.searchParams.set('band', session.name);
     // One existing filtered collection request, at most 100 rows; never scan the full People archive.
     url.searchParams.set('limit', '100');
