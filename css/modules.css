@@ -31751,6 +31751,60 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-rolodex .rhythm-source-row:not(.is-active) .rhythm-source-unarchived { font-size: clamp(6px, .625vw, 8px); }
 }
 
+/* R5: unified heading and controls within the existing Pillar height budget. */
+.rhythm-pillar > .rhythm-heading { position: relative; margin-block-end: 1rem; }
+.rhythm-heading h1 {
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  line-height: clamp(1.495rem, 3.9vw, 2.34rem);
+  color: #e2e9ff;
+}
+.rhythm-heading p { color: #b8c9e6; }
+.rhythm-heading::after {
+  content: "";
+  position: absolute;
+  inset: auto auto -.5rem 50%;
+  width: min(80%, 16rem);
+  height: 4px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #7d9ed54d, #b1a0e8b3 50%, #7d9ed54d);
+  clip-path: polygon(0 40%, 42% 40%, 46% 0, 54% 0, 58% 40%, 100% 40%, 100% 60%, 58% 60%, 54% 100%, 46% 100%, 42% 60%, 0 60%);
+  pointer-events: none;
+}
+.rhythm-pillar .rhythm-modes { margin-block-end: .8rem; gap: .5rem; }
+.rhythm-pillar .rhythm-mode {
+  font-size: clamp(.75rem, 1.2vw, .82rem);
+  color: #bdcbe5;
+  border-color: #7589b180;
+  background: #0d1429e6;
+}
+.rhythm-pillar .rhythm-mode[aria-selected="true"] {
+  color: #eef1ff;
+  border-color: #a89bdf;
+  background: linear-gradient(110deg, #24354ae8, #302447ed);
+  box-shadow: inset 0 -2px 0 #a69ce766;
+}
+.rhythm-source-filters { border-color: #7b8eb4a3; background: linear-gradient(115deg, #17243aed, #1e1b32ed); }
+.rhythm-source-filters label { font-size: .75rem; line-height: .875rem; color: #cbd8ee; }
+.rhythm-source-filters label+label { border-inline-start-color: #7e91be33; }
+.rhythm-source-filters select {
+  color: #e4ecfb;
+  border-color: #7386aa99;
+  background: #0a1125f2;
+  padding-inline: .3rem;
+}
+.rhythm-source-filters select:has(option:checked:not([value=""])) { border-color: #b2a3ed; background: #24223deb; }
+.rhythm-source-filters button { color: #dbe4f8; border-color: #8293bb99; background: #1d2038ed; }
+.rhythm-source-filters button:disabled { opacity: .6; }
+.rhythm-pillar :is(.rhythm-mode, .rhythm-source-filters select, .rhythm-source-filters button):focus-visible {
+  outline: 2px solid #d4e3ff;
+  outline-offset: -4px;
+}
+.rhythm-source-panel > .rhythm-source-status { padding-inline: .4rem; color: #c3d2eb; }
+@media (max-width: 899px) {
+  .rhythm-source-filters { grid-template-columns: minmax(52px, .6fr) minmax(0, 1fr) minmax(0, 1.4fr) 3.25rem; }
+  .rhythm-source-filters label+label { border-inline-start: 0; padding-inline-start: 0; }
+}
+
 /* Source retrieval shares the current Pillar viewport and existing Band state. */
 .rhythm-pillar [data-bands-view][hidden] { display:none; }
 .rhythm-search-panel { display:flex;flex-direction:column;flex:1;min-height:0;min-width:0; }
