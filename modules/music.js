@@ -877,6 +877,7 @@ function createBandDetailStateListItem(stateName, bandId, options = {}) {
 }
 
 function renderBandDetailState(stateName = "empty", bandId = "") {
+  clearBandIdentityReveal();
   if (!bandDetail) {
     return;
   }
@@ -5985,6 +5986,7 @@ function setMusicVenueIndexVisible(isVisible) {
 }
 
 function setBandDetailVisible(isVisible) {
+  if (!isVisible) clearBandIdentityReveal();
   if (!isVisible) clearBandDetailPhotograph();
   if (!musicNexusShell || !bandDetail) {
     return;
@@ -6266,6 +6268,63 @@ function renderBandArchiveTelemetry(band) {
   section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden);
 }
 
+// B3 owns only the permanent HUD decoration. The Shell keeps its existing name handoff.
+let bandIdentityReveal = null;
+function settleBandIdentityReveal() {
+  const session = bandIdentityReveal;
+  if (!session) return;
+  session.settled = true;
+  clearTimeout(session.deadline);
+  cancelAnimationFrame(session.frame);
+  session.observer.disconnect();
+  session.hud.removeEventListener("animationend", session.onEnd);
+  session.hud.removeEventListener("animationcancel", session.onEnd);
+  session.hud.removeAttribute("data-identity-reveal");
+  session.hud.removeAttribute("data-identity-handoff");
+}
+function clearBandIdentityReveal() {
+  settleBandIdentityReveal();
+  bandIdentityReveal = null;
+}
+function prepareBandIdentityReveal(band, options = {}) {
+  const hud = bandDetailName?.closest(".band-identity-hud"), id = getBandId(band);
+  if (!hud || !id || bandIdentityReveal?.id === id) return;
+  clearBandIdentityReveal();
+  // A restored record is already identified; never replay over restored content/scroll.
+  const handoff = Boolean(options.prepareRecordOpening);
+  if (reducedMotion.matches || document.hidden || (!handoff &&
+      (v3RouteContext.isResume || v3RouteContext.skipEntryAnimation || v3RouteContext.navigationCause === "back-forward"))) return;
+  const session = { id, hud, handoff, started:false, settled:false, frame:0, deadline:0 };
+  bandIdentityReveal = session;
+  session.onEnd = event => {
+    if (event.animationName === "bandIdentityOutline" && bandIdentityReveal === session) settleBandIdentityReveal();
+  };
+  const sync = () => {
+    if (bandIdentityReveal !== session || session.settled) return;
+    const stage = bandDetailViewport.dataset.bandRecordStage;
+    if (session.started && (bandDetailViewport.hidden || document.hidden)) { settleBandIdentityReveal(); return; }
+    if (session.started || bandDetailViewport.hidden || stage === "prepared") return;
+    if (handoff ? stage !== "morph" : getRouteFromUrl().name !== "band-detail" || getRouteFromUrl().bandId !== id) {
+      settleBandIdentityReveal(); return;
+    }
+    session.started = true;
+    hud.dataset.identityReveal = "running";
+    // CSS completion is authoritative; this only settles if an animation event is lost.
+    session.deadline = setTimeout(() => { if (bandIdentityReveal === session) settleBandIdentityReveal(); }, 2000);
+  };
+  session.observer = new MutationObserver(sync);
+  session.observer.observe(bandDetailViewport, { attributes:true, attributeFilter:["hidden", "data-band-record-stage"] });
+  hud.addEventListener("animationend", session.onEnd);
+  hud.addEventListener("animationcancel", session.onEnd);
+  hud.toggleAttribute("data-identity-handoff", handoff);
+  hud.dataset.identityReveal = "prepared";
+  session.frame = requestAnimationFrame(sync);
+}
+window.addEventListener("pagehide", settleBandIdentityReveal);
+window.addEventListener("resize", settleBandIdentityReveal);
+document.addEventListener("visibilitychange", () => { if (document.hidden) settleBandIdentityReveal(); });
+reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) settleBandIdentityReveal(); });
+
 function showBandDetail(band, options = {}) {
   if (!band || !bandDetail) {
     return;
@@ -6325,6 +6384,7 @@ function showBandDetail(band, options = {}) {
   if (bandDetailName) {
     bandDetailName.textContent = name;
   }
+  prepareBandIdentityReveal(band, options);
   if (bandDetailRegion) {
     bandDetailRegion.textContent = region;
   }

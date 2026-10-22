@@ -31966,7 +31966,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .band-identity-dossier .band-detail-completion-value { grid-row:3; }
 }
 
-/* Permanent band identity: one static title, shared with the existing record transition. */
+/* Permanent band identity: one title, shared with the existing record transition. */
 .band-detail-content .band-identity-hud {
   position:relative;isolation:isolate;box-sizing:border-box;grid-column:1/-1;
   display:grid;place-items:center;min-width:0;min-height:clamp(6.25rem,14vw,9rem);
@@ -31991,6 +31991,44 @@ button.hall-crusades-archive-crystal:focus-visible {
   font-size:clamp(1.45rem,5.8vw,2.8rem);line-height:1.3;letter-spacing:.025em;
   color:#edf2ff;text-align:center;text-transform:none;text-wrap:balance;overflow-wrap:anywhere;
   text-shadow:0 0 12px rgba(114,149,255,.2);
+}
+
+/* B3: local assembly in the permanent identity footprint; no layout or travel animation. */
+.band-detail-content .band-identity-hud { background:transparent; }
+.band-identity-frame { position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;fill:none; }
+.band-identity-frame path { vector-effect:non-scaling-stroke; }
+.band-identity-outline { stroke:#8caef0;stroke-width:1.2;opacity:.78; }
+.band-identity-outline:nth-child(2) { stroke:#b49bea; }
+.band-identity-inlay { stroke:#96a9e8;stroke-width:1;opacity:.54; }
+.band-identity-trace { stroke:#d4e8ff;stroke-width:2;stroke-dasharray:.09 .91;opacity:0; }
+.band-identity-trace:nth-child(4) { stroke:#d4bcff; }
+.band-identity-hud[data-identity-reveal] .band-identity-outline { animation:bandIdentityOutline 1800ms linear both; }
+.band-identity-hud[data-identity-reveal] .band-identity-trace { animation:bandIdentityTrace 1800ms ease-in-out both; }
+.band-identity-hud[data-identity-reveal] .band-identity-inlay { animation:bandIdentityInlay 1800ms ease-out both; }
+.band-identity-hud[data-identity-reveal]::before { animation:bandIdentityGlass 1800ms ease-out both; }
+.band-identity-hud[data-identity-reveal]::after { animation:bandIdentityRails 1800ms ease-out both; }
+/* The Shell already reveals the real name during its existing shared-identity handoff. */
+.band-identity-hud[data-identity-reveal]:not([data-identity-handoff]) .band-detail-name { animation:bandIdentityName 1800ms cubic-bezier(.2,.65,.3,1) both; }
+.band-identity-hud[data-identity-reveal="prepared"] :is(.band-identity-frame path,.band-detail-name),
+.band-identity-hud[data-identity-reveal="prepared"]::before,.band-identity-hud[data-identity-reveal="prepared"]::after { animation-play-state:paused; }
+@keyframes bandIdentityOutline {
+  0% { stroke-dasharray:1;stroke-dashoffset:1;opacity:0; }
+  12% { opacity:.9; }
+  54% { stroke-dasharray:1;stroke-dashoffset:0;opacity:.9; }
+  100% { stroke-dasharray:1;stroke-dashoffset:0;opacity:.78; }
+}
+@keyframes bandIdentityTrace {
+  0%,12% { stroke-dashoffset:1;opacity:0; }
+  22%,60% { opacity:.85; }
+  84%,100% { stroke-dashoffset:0;opacity:0; }
+}
+@keyframes bandIdentityInlay { 0%,32% { opacity:0; } 64%,100% { opacity:.54; } }
+@keyframes bandIdentityGlass { 0% { opacity:0; } 38%,100% { opacity:1; } }
+@keyframes bandIdentityRails { 0%,16% { transform:scaleX(0);opacity:0; } 64%,100% { transform:scaleX(1);opacity:1; } }
+@keyframes bandIdentityName { 0%,38% { clip-path:inset(0 50%);opacity:0; } 76%,100% { clip-path:inset(0);opacity:1; } }
+@media(prefers-reduced-motion:reduce) {
+  .band-identity-hud[data-identity-reveal] :is(.band-identity-frame path,.band-detail-name),
+  .band-identity-hud[data-identity-reveal]::before,.band-identity-hud[data-identity-reveal]::after { animation:none; }
 }
 
 /* Supplemental archive facts; identity and personnel retain their own presentation. */
