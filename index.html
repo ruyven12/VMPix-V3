@@ -905,13 +905,22 @@
                   </svg>
                 <h3 class="band-detail-name" id="band-detail-title" data-band-detail-name>Astra Vale</h3>
               </header>
-              <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
-                <div class="band-detail-logo" aria-hidden="true">
-                  <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
-                  <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
-                  <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
-                </div>
+              <div class="band-content-tabs" role="tablist" aria-label="Band archive sections">
+                <button class="band-content-tab" id="band-logo-tab" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
+                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>INFO</button>
+                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>TELEMETRY</button>
+                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>PERSONNEL</button>
+                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>SETS</button>
               </div>
+              <section class="band-logo-panel" id="band-logo-panel" role="tabpanel" aria-labelledby="band-logo-tab" tabindex="0">
+                <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
+                  <div class="band-detail-logo" aria-hidden="true">
+                    <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
+                    <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
+                    <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
+                  </div>
+                </div>
+              </section>
 
               <div class="band-detail-copy">
                 <div class="band-detail-tags" aria-label="Band archive tags">

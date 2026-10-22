@@ -31966,6 +31966,33 @@ button.hall-crusades-archive-crystal:focus-visible {
   .band-identity-dossier .band-detail-completion-value { grid-row:3; }
 }
 
+/* Band content foundation: Logo reuses the original artwork and its reserved grid cell. */
+.band-content-tabs {
+  grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;min-width:0;
+}
+.band-content-tab {
+  position:relative;isolation:isolate;box-sizing:border-box;flex:1 1 0;min-width:0;min-height:44px;
+  padding:.65rem .35rem;border:1px solid rgba(133,151,212,.38);border-radius:0;
+  background:linear-gradient(130deg,rgba(42,55,92,.55),rgba(28,23,53,.72)),rgba(7,11,26,.92);
+  color:#c6cee4;font:inherit;font-size:.72rem;line-height:1.35;letter-spacing:.025em;text-align:center;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+}
+.band-content-tab[aria-selected="true"] {
+  border-color:#8daef2;color:#eef3ff;background:linear-gradient(120deg,rgba(47,81,145,.75),rgba(68,43,114,.72)),#0b1127;
+  box-shadow:inset 0 -2px 0 #a095e5;
+}
+.band-content-tab:disabled { color:#939bb5;border-color:rgba(128,143,185,.27);cursor:not-allowed; }
+.band-content-tab:focus-visible { outline:none;border-color:#e5eeff;box-shadow:inset 0 0 0 2px #c7d8ff; }
+.band-logo-panel { box-sizing:border-box;display:grid;justify-items:center;align-content:start;min-width:0;margin:0; }
+.band-logo-panel:focus-visible { outline:2px solid #b3c9ff;outline-offset:3px; }
+@media(max-width:699px) {
+  .band-content-tab { flex:0 0 calc((100% - 1rem)/3); }
+}
+
+@media(max-width:399px) {
+  .band-content-tab { flex-basis:calc((100% - .5rem)/2); }
+}
+
 /* Permanent band identity: one title, shared with the existing record transition. */
 .band-detail-content .band-identity-hud {
   position:relative;isolation:isolate;box-sizing:border-box;grid-column:1/-1;
