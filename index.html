@@ -910,7 +910,7 @@
                 <button class="band-content-tab" id="band-info-tab" data-band-content-tab="info" type="button" role="tab" aria-selected="false" aria-controls="band-info-panel" tabindex="-1">INFO</button>
                 <button class="band-content-tab" id="band-statistics-tab" data-band-content-tab="statistics" type="button" role="tab" aria-selected="false" aria-controls="band-statistics-panel" tabindex="-1">STATISTICS</button>
                 <button class="band-content-tab" id="band-personnel-tab" data-band-content-tab="personnel" type="button" role="tab" aria-selected="false" aria-controls="band-personnel-panel" tabindex="-1">PERSONNEL</button>
-                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>SETS</button>
+                <button class="band-content-tab" id="band-sets-tab" data-band-content-tab="sets" type="button" role="tab" aria-selected="false" aria-controls="band-sets-panel" tabindex="-1">SETS</button>
               </div>
               <div class="band-content-stage" data-band-content-stage>
                 <svg class="band-content-mask" aria-hidden="true" focusable="false"><defs><clipPath id="band-content-pixels" clipPathUnits="objectBoundingBox"></clipPath></defs></svg>
@@ -977,6 +977,11 @@
                   <div class="band-personnel-dossier">
                     <ul class="band-personnel-roster" aria-label="Documented members, current then past" data-band-detail-core-members></ul>
                     <p class="band-personnel-link-state" data-band-personnel-link-state role="status"></p>
+                  </div>
+                </section>
+                <section class="band-content-panel" id="band-sets-panel" data-band-content-panel="sets" role="tabpanel" aria-labelledby="band-sets-tab" aria-hidden="true" tabindex="-1" inert>
+                  <div class="band-captured-sets" data-band-captured-sets role="group" aria-roledescription="carousel" aria-label="Captured sets">
+                    <p class="band-captured-sets-state" role="status">Loading captured sets...</p>
                   </div>
                 </section>
               </div>
