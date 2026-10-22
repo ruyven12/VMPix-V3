@@ -884,6 +884,7 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
   bandDetailViewSets?.remove();
   bandDetail.querySelector(".band-captured-sets")?.remove();
   bandCapturedSetsSession = null;
+  clearBandDetailPhotograph();
   const normalizedBandId = String(bandId || "").trim();
   const isLoading = stateName === "loading";
   const isError = stateName === "error";
@@ -1924,6 +1925,79 @@ function renderBandPersonnel(band) {
   };
   bandDetailCoreMembers.onpointercancel = () => { swipe = null; };
   selectRoster(selected);
+}
+
+// Background photos come only from a resolved album explicitly linked to this Band.
+// Band cover_image_url currently mirrors logo_url; neither logos nor show posters qualify.
+let bandDetailPhotograph = null;
+let bandDetailPhotographObserver = null;
+function clearBandDetailPhotograph() {
+  const session = bandDetailPhotograph;
+  bandDetailPhotograph = null;
+  if (!session) return;
+  clearTimeout(session.timeout);
+  if (session.image) {
+    session.image.onload = session.image.onerror = null;
+    session.image.removeAttribute("src");
+  }
+  session.layer.classList.remove("is-ready");
+  session.layer.replaceChildren();
+}
+
+function prepareBandDetailPhotograph(band) {
+  const bandId = getBandId(band);
+  const layer = bandDetailViewport?.querySelector("[data-band-detail-atmosphere]");
+  if (!layer || !bandId || bandDetailPhotograph?.bandId === bandId) return;
+  clearBandDetailPhotograph();
+  const session = { bandId, layer, image: null, timeout: 0 };
+  bandDetailPhotograph = session;
+  if (!bandDetailPhotographObserver) {
+    bandDetailPhotographObserver = new MutationObserver(() => {
+      if (bandDetailViewport.hidden) clearBandDetailPhotograph();
+      else if (getRouteFromUrl().name === "band-detail" && getBandId(activeMusicBand) === getRouteFromUrl().bandId) prepareBandDetailPhotograph(activeMusicBand);
+    });
+    bandDetailPhotographObserver.observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden"] });
+  }
+  const current = () => bandDetailPhotograph === session && getBandId(activeMusicBand) === bandId &&
+    (!bandDetailViewport.hidden || bandRecordOpening?.bandId === bandId);
+  const load = async () => {
+    // Share the existing Captured Sets request/cache. No new archive-wide request.
+    await requestMusicShowsSetsData();
+    if (!current() || musicShowsSetsDataState !== "live") return;
+    const keys = new Set([bandId, getBandDetailName(band)].map(createBandSlug));
+    const shows = getSortedSetsArchiveRows(getSetsArchiveRowsForBand(band));
+    const albums = shows.flatMap(getMusicShowSmugAlbums);
+    const album = albums.find(item => String(item.status).toLowerCase() === "resolved" &&
+      [getMusicShowAlbumBandId(item), getMusicShowAlbumBandName(item)].some(key => key && keys.has(createBandSlug(key))) &&
+      (item.album_id || item.albumId || item.gallery_id || item.galleryId) && getMusicShowAlbumPhotoCount(item) !== 0);
+    if (!album) return;
+    const albumId = String(album.album_id || album.albumId || album.gallery_id || album.galleryId).trim();
+    // One deterministic first photo, using the existing bounded, deduplicated photo loader.
+    // Shared requests may complete into their cache after departure; they cannot repaint it.
+    const result = await requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1);
+    if (!current()) return;
+    const src = getMusicAlbumPhotoImageSrc(result.photos[0]);
+    if (!src || !isMusicShowPosterImageSrc(src) || src === SET_GALLERY_NO_POSTER_IMAGE_SRC || /\/(?:placeholders|Band-Logos)\//i.test(src)) return;
+    const image = new Image();
+    session.image = image;
+    image.alt = "";
+    image.decoding = "async";
+    image.fetchPriority = "low";
+    const failed = () => { if (bandDetailPhotograph === session) clearBandDetailPhotograph(); };
+    session.timeout = setTimeout(failed, 15000);
+    image.onerror = failed;
+    image.onload = async () => {
+      try { if (typeof image.decode === "function") await image.decode(); }
+      catch { failed(); return; }
+      if (!current() || !image.naturalWidth || !image.naturalHeight) return;
+      clearTimeout(session.timeout);
+      image.onload = image.onerror = null;
+      layer.replaceChildren(image);
+      layer.classList.add("is-ready");
+    };
+    image.src = src;
+  };
+  load().catch(() => { if (bandDetailPhotograph === session) clearBandDetailPhotograph(); });
 }
 
 function setBandDetailLogo(logoUrl, name) {
@@ -5788,6 +5862,7 @@ function setMusicVenueIndexVisible(isVisible) {
 }
 
 function setBandDetailVisible(isVisible) {
+  if (!isVisible) clearBandDetailPhotograph();
   if (!musicNexusShell || !bandDetail) {
     return;
   }
@@ -6178,6 +6253,7 @@ function showBandDetail(band, options = {}) {
   renderBandArchiveTelemetry(band);
   renderBandPersonnel(band);
   showBandCapturedSets(band);
+  prepareBandDetailPhotograph(band);
   refreshBandDetailArchiveCoverage(activeMusicBand);
   bandDetail.removeAttribute("data-band-detail-placeholder");
   if (options.prepareRecordOpening) return;
