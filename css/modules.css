@@ -31890,9 +31890,9 @@ button.hall-crusades-archive-crystal:focus-visible {
   .rhythm-viewport[data-rhythm-heartbeat]::after { animation: none; opacity: .25; }
 }
 
-/* Band photograph: one noninteractive, static-blur layer; the Pillar remains underneath. */
+/* Band photograph fills the existing viewport behind the Engine; only content stops above it. */
 .band-detail-atmosphere {
-  position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);
+  position:absolute;inset:0;
   overflow:hidden;pointer-events:none;contain:paint;opacity:0;transition:opacity 320ms ease;
 }
 .band-detail-atmosphere img {
@@ -31901,7 +31901,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .band-detail-atmosphere::after {
   content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(5,10,27,.54),rgba(7,9,25,.62) 75%,#070a15),linear-gradient(115deg,rgba(26,47,101,.2),rgba(65,31,104,.24));
+  background:linear-gradient(180deg,rgba(5,10,27,.605),rgba(7,9,25,.694) 75%,rgba(7,10,21,.75)),linear-gradient(115deg,rgba(26,47,101,.2),rgba(65,31,104,.24));
 }
 .band-detail-viewport:not([data-band-record-stage]) .band-detail-atmosphere.is-ready { opacity:1; }
 .band-detail-atmosphere:empty { opacity:0;transition:none; }
