@@ -32034,9 +32034,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-statistics-dossier .band-detail-completion-label { font-size:.75rem;line-height:1.4;text-transform:none; }
 .band-statistics-dossier .band-detail-completion-value { font-size:.85rem;line-height:1.4;overflow-wrap:anywhere; }
 .band-statistics-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:.5rem;min-width:0; }
-.band-statistics-grid .band-coverage-item { box-sizing:border-box;display:grid;align-content:center;min-width:0;gap:.3rem;padding:.45rem .35rem;margin:0;border:1px solid rgba(145,155,216,.26);border-radius:0;background:rgba(11,14,33,.64);text-align:center; }
-.band-statistics-grid .band-coverage-label { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
-.band-statistics-grid .band-coverage-value { margin:0;color:#e6ecff;font-size:.95rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
+.band-statistics-grid .band-coverage-item, .band-statistics-updated { box-sizing:border-box;display:grid;align-content:center;min-width:0;gap:.3rem;padding:.45rem .35rem;margin:0;border:1px solid rgba(145,155,216,.26);border-radius:0;background:rgba(11,14,33,.64);text-align:center; }
+.band-statistics-grid .band-coverage-label, .band-statistics-updated .band-coverage-label { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
+.band-statistics-grid .band-coverage-value, .band-statistics-updated .band-coverage-value { margin:0;color:#e6ecff;font-size:.95rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
+.band-statistics-dossier > .band-statistics-updated { min-height:3.75rem;margin-top:.5rem; }
+/* Keep unavailable dates omitted while reserving space for a later coverage response. */
+.band-statistics-updated[hidden] { display:grid;visibility:hidden; }
 .band-statistics-dossier .band-detail-progress[hidden] { display:block;visibility:hidden; }
 /* Reserve two-line narrow-screen values while coverage fields arrive asynchronously. */
 @media(max-width:399px) {

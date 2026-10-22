@@ -6299,14 +6299,7 @@ function renderBandIdentityDossier(band) {
 }
 
 function renderBandArchiveTelemetry(band) {
-  const section = bandDetailLastUpdated?.closest(".band-detail-coverage");
-  if (!section) return;
-  if (!section.classList.contains("band-archive-telemetry")) {
-    section.classList.add("band-archive-telemetry");
-    section.querySelector(".band-detail-panel-title").textContent = "ARCHIVE TELEMETRY";
-    // Migrated metrics retain their original bindings; only unrelated update information stays here.
-    section.querySelector(".band-coverage-grid").replaceChildren(bandDetailLastUpdated.closest(".band-coverage-item"));
-  }
+  if (!bandDetailLastUpdated) return;
   const raw = band.backend_record || band;
   const stats = getBandDetailStats(raw);
   const number = (...values) => {
@@ -6359,7 +6352,6 @@ function renderBandArchiveTelemetry(band) {
   const hasUpdated = updated !== "Pending" && String(updated).trim() !== "";
   bandDetailLastUpdated.textContent = hasUpdated ? updated : "";
   bandDetailLastUpdated.closest(".band-coverage-item").hidden = !hasUpdated;
-  section.hidden = !hasUpdated;
 }
 
 // One real HUD: B3 assembly, a short hold, then measured travel into its retained grid slot.
