@@ -901,6 +901,9 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
       : "No matching archive record was found.";
 
   activeMusicBand = null;
+  syncBandContentBand(normalizedBandId);
+  const lastSeen = bandDetail.querySelector("[data-band-identity-last-seen] dd");
+  if (lastSeen) lastSeen.textContent = isLoading ? "Loading" : "Not available";
   setBandDetailLogo("", title);
   if (bandDetailLogoName) {
     bandDetailLogoName.textContent = title;
@@ -923,10 +926,13 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
     bandDetailLocation.textContent = text;
   }
   if (bandDetailCompletionValue) {
-    bandDetailCompletionValue.textContent = "0%";
+    bandDetailCompletionValue.textContent = isLoading ? "Loading" : "Not available";
   }
   if (bandDetailProgressFill) {
     bandDetailProgressFill.style.width = "0%";
+    const progress = bandDetailProgressFill.closest(".band-detail-progress");
+    progress.hidden = true;
+    progress.removeAttribute("aria-valuenow");
   }
   [
     bandDetailYearsCovered,
@@ -5986,6 +5992,7 @@ function setMusicVenueIndexVisible(isVisible) {
 }
 
 function setBandDetailVisible(isVisible) {
+  if (!isVisible) settleBandContentTransition();
   if (!isVisible) clearBandIdentityReveal();
   if (!isVisible) clearBandDetailPhotograph();
   if (!musicNexusShell || !bandDetail) {
@@ -6146,6 +6153,116 @@ function showBandsIndexView(options = {}) {
   }
 }
 
+// Local Band Detail tabs. The inactive panel retains its grid space, not its interactivity.
+const bandContentState = { bandId: null, active: "logo", transition: null };
+function renderBandContentSelection() {
+  const active = bandContentState.active;
+  bandDetail?.querySelectorAll("[data-band-content-tab]").forEach(tab => {
+    const selected = tab.dataset.bandContentTab === active;
+    tab.setAttribute("aria-selected", String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+  });
+  bandDetail?.querySelectorAll("[data-band-content-panel]").forEach(panel => {
+    const selected = panel.dataset.bandContentPanel === active;
+    panel.classList.toggle("is-active", selected);
+    panel.setAttribute("aria-hidden", String(!selected));
+    panel.toggleAttribute("inert", !selected);
+    panel.tabIndex = selected ? 0 : -1;
+  });
+}
+function settleBandContentTransition() {
+  const transition = bandContentState.transition;
+  if (!transition) return;
+  bandContentState.transition = null;
+  clearTimeout(transition.deadline);
+  transition.animations.forEach(animation => animation.cancel());
+  transition.stage.removeAttribute("data-band-tab-transition");
+  transition.stage.removeAttribute("aria-busy");
+  renderBandContentSelection();
+}
+function syncBandContentBand(bandId) {
+  if (bandContentState.bandId === bandId) return;
+  settleBandContentTransition();
+  bandContentState.bandId = bandId;
+  bandContentState.active = "logo";
+  renderBandContentSelection();
+}
+async function selectBandContent(next) {
+  if (!["logo", "info"].includes(next) || bandContentState.transition?.target === next) return;
+  settleBandContentTransition();
+  if (next === bandContentState.active) return;
+  const stage = bandDetail?.querySelector("[data-band-content-stage]");
+  const pixels = Array.from(stage?.querySelectorAll("clipPath rect") || []);
+  const commit = () => { bandContentState.active = next; renderBandContentSelection(); };
+  if (!stage || reducedMotion.matches || document.hidden || !pixels.length || !pixels[0].animate) {
+    commit();
+    return;
+  }
+  const transition = { stage, target: next, animations: [], deadline: 0 };
+  bandContentState.transition = transition;
+  stage.setAttribute("aria-busy", "true");
+  // Failure-safe settlement; canceled promises cannot revive an older selection.
+  transition.deadline = setTimeout(() => {
+    if (bandContentState.transition === transition) { commit(); settleBandContentTransition(); }
+  }, 800);
+  const phase = async entering => {
+    stage.dataset.bandTabTransition = entering ? "in" : "out";
+    transition.animations = pixels.map((pixel, index) => pixel.animate([
+      { transform: entering ? "scale(0)" : "scale(1)" },
+      { transform: entering ? "scale(1)" : "scale(0)" }
+    ], { duration: 130, delay: ((index * 17) % 8) * 10, easing: "steps(4, end)", fill: "both" }));
+    await Promise.all(transition.animations.map(animation => animation.finished));
+  };
+  try {
+    await phase(false);
+    if (bandContentState.transition !== transition) return;
+    const outgoing = transition.animations;
+    commit();
+    const incoming = phase(true);
+    outgoing.forEach(animation => animation.cancel());
+    await incoming;
+    if (bandContentState.transition === transition) settleBandContentTransition();
+  } catch {
+    if (bandContentState.transition === transition) { commit(); settleBandContentTransition(); }
+  }
+}
+function initBandContentTabs() {
+  const tabs = bandDetail?.querySelector(".band-content-tabs");
+  const mask = bandDetail?.querySelector("#band-content-pixels");
+  if (!tabs || !mask || mask.childElementCount) return;
+  // Forty-eight independent clipping cells dissolve/rebuild the real content, without copies or canvas.
+  for (let index = 0; index < 48; index += 1) {
+    const pixel = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    pixel.setAttribute("x", String((index % 8) / 8));
+    pixel.setAttribute("y", String(Math.floor(index / 8) / 6));
+    pixel.setAttribute("width", String(1 / 8));
+    pixel.setAttribute("height", String(1 / 6));
+    mask.append(pixel);
+  }
+  tabs.addEventListener("click", event => {
+    const tab = event.target.closest("[data-band-content-tab]");
+    if (tab && !tab.disabled) selectBandContent(tab.dataset.bandContentTab);
+  });
+  tabs.addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const buttons = Array.from(tabs.querySelectorAll("[data-band-content-tab]"));
+    const index = buttons.indexOf(event.target);
+    if (index < 0) return;
+    event.preventDefault();
+    const next = event.key === "Home" ? buttons[0] : event.key === "End" ? buttons[1] : buttons[1 - index];
+    next.focus({ preventScroll: true });
+    selectBandContent(next.dataset.bandContentTab);
+  });
+  const finish = () => {
+    if (bandContentState.transition) bandContentState.active = bandContentState.transition.target;
+    settleBandContentTransition();
+  };
+  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) finish(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) finish(); });
+  window.addEventListener("pagehide", finish);
+}
+
+
 function renderBandIdentityLastSeen(band) {
   const row = bandDetail?.querySelector("[data-band-identity-last-seen]");
   if (!row) return;
@@ -6157,50 +6274,22 @@ function renderBandIdentityLastSeen(band) {
   const value = calendarDate
     ? `${calendarDate[2]}/${calendarDate[3]}/${calendarDate[1]}`
     : getBandDetailLatestSeen(stats, band);
-  row.hidden = value === "Pending";
-  row.lastElementChild.textContent = row.hidden ? "" : value;
+  row.hidden = false;
+  row.lastElementChild.textContent = value === "Pending" ? "Not available" : value;
 }
 
 function renderBandIdentityDossier(band) {
   const hero = bandDetail?.querySelector(".band-detail-hero");
   if (!hero) return;
-  const copy = hero.querySelector(".band-detail-copy");
-  if (!hero.classList.contains("band-identity-dossier")) {
-    hero.classList.add("band-identity-dossier");
-    // Retain the existing data-bound identity nodes; Sets now lives below Personnel.
-    copy.prepend(bandDetailLocation);
-    copy.querySelector(".band-detail-meta")?.remove();
-    bandDetailStatus.after(bandDetailTags);
-    const seen = document.createElement("p");
-    seen.className = "band-identity-last-seen";
-    seen.dataset.bandIdentityLastSeen = "";
-    const label = document.createElement("span");
-    label.textContent = "LAST SEEN";
-    seen.append(label, document.createElement("span"));
-    copy.querySelector(".band-detail-completion").before(seen);
-    bandDetailViewSets?.remove();
-    bandDetailLogoName?.remove();
-  }
+  hero.classList.add("band-identity-dossier");
+  bandDetailLogoName?.remove();
   const raw = band.backend_record || band;
   const stats = getBandDetailStats(raw);
   const general = getBandDetailGeneral(raw);
   const region = getBandDetailTextCandidate(stats.region, raw.region, general.region);
-  bandDetailRegion.textContent = region;
-  bandDetailRegion.hidden = !region;
-  const archiveStatus = getRhythmSourceStatus(band);
-  bandDetailStatus.textContent = archiveStatus.label;
-  bandDetailStatus.hidden = !archiveStatus.label;
-  // Generic tags may repeat region/completeness; only an explicit genre field belongs here.
-  const genreValue = general.genre ?? raw.genre;
-  const genres = (Array.isArray(genreValue) ? genreValue : [genreValue])
-    .filter(value => typeof value === "string")
-    .map(value => getBandDetailTextCandidate(value))
-    .filter(value => value && ![region, archiveStatus.label].some(label => label.toLowerCase() === value.toLowerCase()));
-  bandDetailTags.textContent = [...new Set(genres)].join(" / ");
-  bandDetailTags.hidden = genres.length === 0;
-  const location = [getBandDetailTextCandidate(stats.location, raw.location), getBandDetailTextCandidate(stats.state, raw.state)].filter(Boolean).join(", ");
-  bandDetailLocation.textContent = location;
-  bandDetailLocation.hidden = !location;
+  bandDetailRegion.textContent = region || "Not available";
+  const location = [getBandDetailTextCandidate(stats.location, raw.location), getBandDetailTextCandidate(stats.state, raw.state)].filter(Boolean).join(" / ");
+  bandDetailLocation.textContent = location || "Not available";
   const lifecycle = getBandDetailLifecycleStatus(general, raw).toLowerCase();
   const key = ["active", "inactive"].includes(lifecycle) ? lifecycle : "unknown";
   hero.dataset.bandStatus = key;
@@ -6211,7 +6300,7 @@ function renderBandIdentityDossier(band) {
   const completion = hasCompletion ? getBandDetailCompletion(Number(archived), Number(total)) : null;
   bandDetailCompletionValue.textContent = hasCompletion ? `${completion}%` : "—";
   bandDetailProgressFill.style.width = `${completion ?? 0}%`;
-  const progress = hero.querySelector(".band-detail-progress");
+  const progress = bandDetail.querySelector(".band-detail-progress");
   progress.hidden = !hasCompletion;
   progress.removeAttribute("aria-hidden");
   progress.setAttribute("role", "progressbar");
@@ -6265,7 +6354,7 @@ function renderBandArchiveTelemetry(band) {
     node.textContent = present ? String(value) : "";
     node.closest(".band-coverage-item").hidden = !present;
   });
-  section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden);
+  section.hidden = nodes.every(node => node.closest(".band-coverage-item").hidden) && bandDetail.querySelector(".band-detail-progress").hidden;
 }
 
 // One real HUD: B3 assembly, a short hold, then measured travel into its retained grid slot.
@@ -6433,6 +6522,7 @@ function showBandDetail(band, options = {}) {
   if (bandDetailName) {
     bandDetailName.textContent = name;
   }
+  syncBandContentBand(getBandId(band));
   prepareBandIdentityReveal(band, options);
   if (bandDetailRegion) {
     bandDetailRegion.textContent = region;
@@ -15335,6 +15425,7 @@ function moveMusicNexusSelection(direction) {
   setMusicNexusContext(cards[nextIndex].dataset.musicNexusCard, true);
 }
 function initMusicModule() {
+  initBandContentTabs();
   if (musicNexusBack) {
     musicNexusBack.addEventListener("click", () => {
       navigateToRoute(routePaths.portfolio, { navigationDirection: "back" });

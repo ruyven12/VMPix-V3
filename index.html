@@ -906,36 +906,35 @@
                 <h3 class="band-detail-name" id="band-detail-title" data-band-detail-name>Astra Vale</h3>
               </header>
               <div class="band-content-tabs" role="tablist" aria-label="Band archive sections">
-                <button class="band-content-tab" id="band-logo-tab" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
-                <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>INFO</button>
+                <button class="band-content-tab" id="band-logo-tab" data-band-content-tab="logo" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
+                <button class="band-content-tab" id="band-info-tab" data-band-content-tab="info" type="button" role="tab" aria-selected="false" aria-controls="band-info-panel" tabindex="-1">INFO</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>TELEMETRY</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>PERSONNEL</button>
                 <button class="band-content-tab" type="button" role="tab" aria-selected="false" tabindex="-1" disabled>SETS</button>
               </div>
-              <section class="band-logo-panel" id="band-logo-panel" role="tabpanel" aria-labelledby="band-logo-tab" tabindex="0">
-                <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
-                  <div class="band-detail-logo" aria-hidden="true">
-                    <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
-                    <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
-                    <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
+              <div class="band-content-stage" data-band-content-stage>
+                <svg class="band-content-mask" aria-hidden="true" focusable="false"><defs><clipPath id="band-content-pixels" clipPathUnits="objectBoundingBox"></clipPath></defs></svg>
+                <section class="band-logo-panel band-content-panel is-active" data-band-content-panel="logo" id="band-logo-panel" role="tabpanel" aria-labelledby="band-logo-tab" tabindex="0">
+                  <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
+                    <div class="band-detail-logo" aria-hidden="true">
+                      <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
+                      <span class="band-detail-logo-mark" data-band-detail-thumb>AV</span>
+                      <span class="band-detail-logo-name" data-band-detail-logo-name>Astra Vale</span>
+                    </div>
                   </div>
-                </div>
-              </section>
+                </section>
+                <section class="band-content-panel" id="band-info-panel" data-band-content-panel="info" role="tabpanel" aria-labelledby="band-info-tab" aria-hidden="true" tabindex="-1" inert>
+                  <dl class="band-info-dossier">
+                    <div class="band-info-row"><dt>Home Location:</dt><dd data-band-detail-location>Not available</dd></div>
+                    <div class="band-info-row"><dt>Region:</dt><dd data-band-detail-region>Not available</dd></div>
+                    <div class="band-info-row" data-band-identity-last-seen><dt>Last Seen/Performed:</dt><dd>Not available</dd></div>
+                  </dl>
+                </section>
+              </div>
+            </section>
 
-              <div class="band-detail-copy">
-                <div class="band-detail-tags" aria-label="Band archive tags">
-                  <span class="band-detail-tag" data-band-detail-region>New England</span>
-                  <span class="band-detail-tag" data-band-detail-tags hidden></span>
-                  <span class="band-detail-tag band-detail-tag--active" data-band-detail-status>Active</span>
-                </div>
-
-                <div class="band-detail-meta" aria-label="Band detail metadata">
-                  <div class="band-detail-meta-row">
-                    <p class="band-detail-meta-label">Location</p>
-                    <p class="band-detail-meta-value" data-band-detail-location>Portland, Maine</p>
-                  </div>
-                </div>
-
+            <section class="band-detail-coverage" aria-labelledby="band-detail-coverage-title">
+              <h4 class="band-detail-panel-title" id="band-detail-coverage-title">ARCHIVE COVERAGE</h4>
                 <div class="band-detail-completion" aria-label="Archive completion">
                   <div class="band-detail-completion-head">
                     <p class="band-detail-completion-label">Archive Completion</p>
@@ -944,13 +943,7 @@
                   <div class="band-detail-progress" aria-hidden="true">
                     <span class="band-detail-progress-fill" data-band-detail-progress-fill></span>
                   </div>
-                  <button class="v3-card v3-card--mini v3-card--interactive band-detail-action" type="button" data-band-detail-view-sets>VIEW SETS</button>
                 </div>
-              </div>
-            </section>
-
-            <section class="band-detail-coverage" aria-labelledby="band-detail-coverage-title">
-              <h4 class="band-detail-panel-title" id="band-detail-coverage-title">ARCHIVE COVERAGE</h4>
               <div class="band-coverage-grid">
                 <article class="band-coverage-item">
                   <p class="band-coverage-label">Years Covered</p>

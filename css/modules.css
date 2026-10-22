@@ -31993,6 +31993,40 @@ button.hall-crusades-archive-crystal:focus-visible {
   .band-content-tab { flex-basis:calc((100% - .5rem)/2); }
 }
 
+/* B5B: one stationary presentation area; both panels reserve space to prevent tab reflow. */
+.band-content-stage {
+  position:relative;isolation:isolate;grid-column:1/-1;display:grid;min-width:0;
+  border:1px solid rgba(139,160,226,.35);background:linear-gradient(125deg,rgba(46,66,115,.12),rgba(64,38,103,.12)),rgba(6,10,25,.58);
+}
+.band-content-stage > .band-content-panel {
+  grid-area:1/1;box-sizing:border-box;display:grid;align-content:center;justify-items:center;
+  min-width:0;margin:0;padding:.75rem 0;visibility:hidden;pointer-events:none;
+}
+.band-content-stage > .band-content-panel.is-active { visibility:inherit;pointer-events:auto; }
+.band-content-panel:focus-visible { outline:2px solid #b3c9ff;outline-offset:-3px; }
+.band-content-stage .band-detail-poster { align-self:center; }
+.band-content-stage[data-band-tab-transition] > .band-content-panel { clip-path:url(#band-content-pixels); }
+.band-content-mask { position:absolute;width:0;height:0;pointer-events:none; }
+.band-content-mask rect { transform-box:fill-box;transform-origin:center; }
+.band-content-tab:not(:disabled) { cursor:pointer; }
+.band-info-dossier { box-sizing:border-box;width:min(100%,40rem);min-width:0;margin:0;padding:0 clamp(.8rem,3vw,1.5rem); }
+.band-info-row { display:grid;grid-template-columns:minmax(0,1fr);gap:.3rem;padding:1rem .25rem;text-align:center; }
+.band-info-row + .band-info-row { border-top:1px solid rgba(135,151,213,.25); }
+.band-info-row dt { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.5;text-transform:none; }
+.band-info-row dd { min-width:0;margin:0;color:#e6ecff;font-size:.9rem;line-height:1.6;text-transform:none;overflow-wrap:anywhere; }
+/* Keep the existing completion meter with the existing telemetry, outside INFO. */
+.band-detail-coverage .band-detail-completion { margin:0 0 1rem;gap:.5rem; }
+.band-detail-coverage .band-detail-completion-head { display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.4rem; }
+.band-detail-coverage .band-detail-completion-label { font-size:.69rem;line-height:1.35;color:#b7aecf; }
+.band-detail-coverage .band-detail-completion-value { font-size:.85rem;line-height:1.3;color:#eee8ff; }
+.band-detail-coverage .band-detail-progress { height:7px;border-radius:0;border-color:rgba(176,151,230,.32);background:rgba(8,9,22,.7); }
+.band-detail-coverage .band-detail-progress-fill { border-radius:0;background:linear-gradient(90deg,#8263bf,#a595d4);box-shadow:none; }
+.band-detail-coverage .band-detail-progress[hidden] { display:none; }
+@media(prefers-reduced-motion:reduce) {
+  .band-content-stage[data-band-tab-transition] > .band-content-panel { clip-path:none; }
+}
+
+
 /* Permanent band identity: one title, shared with the existing record transition. */
 .band-detail-content .band-identity-hud {
   position:relative;isolation:isolate;box-sizing:border-box;grid-column:1/-1;
