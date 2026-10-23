@@ -31926,10 +31926,10 @@ button.hall-crusades-archive-crystal:focus-visible {
   position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr);gap:1rem;
   padding:1rem;border:1px solid rgba(184,164,255,.48);border-radius:0;
   clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
-  background:linear-gradient(125deg,rgba(116,89,187,.13),transparent 56%),rgba(9,10,25,.55);overflow:visible;
+  background:linear-gradient(125deg,rgba(116,89,187,.07),transparent 56%),rgba(9,10,25,.16);overflow:visible;
 }
 .band-identity-dossier::before { inset:0;background:linear-gradient(90deg,rgba(211,196,255,.8),transparent) top left/54px 1px no-repeat,linear-gradient(0deg,rgba(156,182,255,.65),transparent) bottom right/1px 54px no-repeat; }
-.band-identity-dossier .band-detail-poster { position:relative;box-sizing:border-box;width:min(100%,16rem);height:auto;min-height:0;aspect-ratio:1;align-self:start;border:1px solid rgba(174,153,247,.48);border-radius:0;background:rgba(5,6,18,.7);box-shadow:inset 0 0 1.3rem rgba(105,81,161,.1); }
+.band-identity-dossier .band-detail-poster { position:relative;box-sizing:border-box;width:min(100%,16rem);height:auto;min-height:0;aspect-ratio:1;align-self:start;border:1px solid transparent;border-radius:0;background:transparent;box-shadow:none; }
 .band-identity-dossier .band-detail-poster::before,.band-identity-dossier .band-detail-poster::after { display:none; }
 .band-identity-dossier .band-detail-logo { width:100%;height:100%;min-width:0;gap:0;place-items:center;align-content:center; }
 .band-identity-dossier .band-detail-logo-image { width:100%;height:100%;max-height:none;object-fit:contain;filter:none; }
@@ -31996,7 +31996,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 /* B5B: one stationary presentation area; both panels reserve space to prevent tab reflow. */
 .band-content-stage {
   position:relative;isolation:isolate;grid-column:1/-1;display:grid;min-width:0;
-  border:1px solid rgba(139,160,226,.35);background:linear-gradient(125deg,rgba(46,66,115,.12),rgba(64,38,103,.12)),rgba(6,10,25,.58);
+  border:1px solid rgba(139,160,226,.18);background:linear-gradient(90deg,transparent,rgba(6,10,25,.22) 25% 75%,transparent);
 }
 .band-content-stage > .band-content-panel {
   grid-area:1/1;box-sizing:border-box;display:grid;align-content:center;justify-items:center;
@@ -32010,7 +32010,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-content-mask rect { transform-box:fill-box;transform-origin:center; }
 .band-content-tab:not(:disabled) { cursor:pointer; }
 .band-info-dossier { box-sizing:border-box;width:min(100%,40rem);min-width:0;margin:0;padding:0 clamp(.8rem,3vw,1.5rem); }
-.band-info-row { display:grid;grid-template-columns:minmax(0,1fr);gap:.3rem;padding:1rem .25rem;text-align:center; }
+.band-info-row { display:grid;grid-template-columns:minmax(0,1fr);gap:.3rem;padding:1rem .25rem;text-align:center;background:linear-gradient(90deg,transparent,rgba(7,11,27,.22) 25% 75%,transparent); }
 .band-info-row + .band-info-row { border-top:1px solid rgba(135,151,213,.25); }
 .band-info-row dt { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.5;text-transform:none; }
 .band-info-row dd { min-width:0;margin:0;color:#e6ecff;font-size:.9rem;line-height:1.6;text-transform:none;overflow-wrap:anywhere; }
@@ -32034,7 +32034,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-statistics-dossier .band-detail-completion-label { font-size:.75rem;line-height:1.4;text-transform:none; }
 .band-statistics-dossier .band-detail-completion-value { font-size:.85rem;line-height:1.4;overflow-wrap:anywhere; }
 .band-statistics-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:.5rem;min-width:0; }
-.band-statistics-grid .band-coverage-item, .band-statistics-updated { box-sizing:border-box;display:grid;align-content:center;min-width:0;gap:.3rem;padding:.45rem .35rem;margin:0;border:1px solid rgba(145,155,216,.26);border-radius:0;background:rgba(11,14,33,.64);text-align:center; }
+.band-statistics-grid .band-coverage-item, .band-statistics-updated { box-sizing:border-box;display:grid;align-content:center;min-width:0;gap:.3rem;padding:.45rem .35rem;margin:0;border:1px solid transparent;border-bottom-color:rgba(145,155,216,.26);border-radius:0;background:linear-gradient(90deg,transparent,rgba(11,14,33,.24) 25% 75%,transparent);text-align:center; }
 .band-statistics-grid .band-coverage-label, .band-statistics-updated .band-coverage-label { margin:0;color:#b2bfe3;font-size:.75rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
 .band-statistics-grid .band-coverage-value, .band-statistics-updated .band-coverage-value { margin:0;color:#e6ecff;font-size:.95rem;line-height:1.4;text-transform:none;overflow-wrap:anywhere; }
 .band-statistics-dossier > .band-statistics-updated { min-height:3.75rem;margin-top:.5rem; }
@@ -32053,15 +32053,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel-record { min-width:0;margin:0;padding:0; }
 .band-personnel-card {
   position:relative;box-sizing:border-box;display:grid;grid-template-columns:clamp(2.5rem,8vw,3.4rem) minmax(0,1fr) fit-content(46%);align-items:center;gap:clamp(.5rem,2vw,.85rem);
-  min-width:0;min-height:5.75rem;padding:.65rem;border:1px solid rgba(137,161,235,.56);border-left:3px solid #8a9de0;
-  background:linear-gradient(115deg,rgba(42,59,105,.45),rgba(43,29,74,.36)),rgba(8,13,30,.86);color:#e7edff;text-decoration:none;
+  min-width:0;min-height:5.75rem;padding:.65rem;border:1px solid rgba(137,161,235,.2);border-left:3px solid #8a9de0;
+  background:linear-gradient(115deg,rgba(21,31,61,.34),rgba(15,16,38,.18));color:#e7edff;text-decoration:none;
 }
-.band-personnel-record[data-member-status="past"] .band-personnel-card { border-color:#555967;border-left-color:#7d808b;background:linear-gradient(115deg,rgba(57,60,70,.5),rgba(31,33,40,.8));color:#d2d4dd; }
+.band-personnel-record[data-member-status="past"] .band-personnel-card { border-color:rgba(85,89,103,.38);border-left-color:#7d808b;background:linear-gradient(115deg,rgba(35,37,44,.34),rgba(31,33,40,.18));color:#d2d4dd; }
 @media(max-width:399px) { .band-personnel-card { padding:.5rem;gap:.4rem; } }
 .band-personnel-card:focus-visible { outline:2px solid #cfddff;outline-offset:2px; }
 .band-personnel-card[href]:hover { border-color:#c5ceee; }
-.band-personnel-avatar { box-sizing:border-box;display:grid;place-items:center;width:100%;aspect-ratio:1;border:1px solid rgba(150,161,213,.42);background:rgba(19,22,45,.85);color:inherit;font-size:1rem;line-height:1;letter-spacing:.04em; }
-.band-personnel-record[data-member-status="past"] .band-personnel-avatar { border-color:#646773;background:rgba(35,37,44,.85); }
+.band-personnel-avatar { box-sizing:border-box;display:grid;place-items:center;width:100%;aspect-ratio:1;border:1px solid rgba(150,161,213,.3);background:rgba(19,22,45,.38);color:inherit;font-size:1rem;line-height:1;letter-spacing:.04em; }
+.band-personnel-record[data-member-status="past"] .band-personnel-avatar { border-color:rgba(100,103,115,.4);background:rgba(35,37,44,.38); }
 .band-personnel-copy { min-width:0; }
 .band-personnel-name,.band-personnel-role,.band-personnel-status { margin:0;text-transform:none;overflow-wrap:anywhere; }
 .band-personnel-name { font-size:clamp(.9rem,2.5vw,1.1rem);line-height:1.4;color:inherit; }
@@ -32302,9 +32302,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-captured-sets-list { display:grid;min-width:0;margin:0;padding:0;list-style:none; }
 .band-captured-sets-list > li { display:grid;grid-area:1/1;min-width:0;visibility:hidden;pointer-events:none; }
 .band-captured-sets-list > li.is-active { visibility:inherit;pointer-events:inherit; }
-.band-captured-set-row { display:grid;grid-template-rows:auto auto auto 1fr;justify-items:center;align-content:start;gap:.65rem;box-sizing:border-box;width:100%;min-width:0;margin:0;padding:.75rem;border:1px solid rgba(142,159,229,.52);border-radius:0;background:linear-gradient(130deg,rgba(40,58,101,.35),rgba(44,28,78,.24)),rgba(6,10,26,.72);color:#e6edff;font:inherit;text-align:center;cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); }
+.band-captured-set-row { display:grid;grid-template-rows:auto auto auto 1fr;justify-items:center;align-content:start;gap:.65rem;box-sizing:border-box;width:100%;min-width:0;margin:0;padding:.75rem;border:1px solid transparent;border-radius:0;background:linear-gradient(180deg,rgba(6,10,26,.16),transparent 18% 62%,rgba(6,10,26,.28));color:#e6edff;font:inherit;text-align:center;cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); }
 .band-captured-set-row:disabled { cursor:default; }
-.band-captured-set-art { display:grid;place-items:center;position:relative;box-sizing:border-box;width:min(100%,22rem);height:clamp(10rem,30svh,20rem);overflow:hidden;border:1px solid rgba(144,165,232,.5);background:linear-gradient(145deg,rgba(34,51,91,.35),rgba(42,26,72,.3)),#080c1c;box-shadow:inset 0 0 0 4px rgba(107,115,191,.07); }
+.band-captured-set-art { display:grid;place-items:center;position:relative;box-sizing:border-box;width:min(100%,22rem);height:clamp(10rem,30svh,20rem);overflow:hidden;border:1px solid rgba(144,165,232,.25);background:rgba(8,12,28,.12);box-shadow:none; }
 .band-captured-set-image { position:absolute;inset:.4rem;display:block;width:calc(100% - .8rem);height:calc(100% - .8rem);object-fit:contain; }
 .band-captured-set-fallback { padding:1rem;font-size:.75rem;line-height:1.5;text-align:center;color:#b9c5e9;overflow-wrap:anywhere; }
 .band-captured-set-date { color:#bbc9ed;font-size:.75rem;line-height:1.5;letter-spacing:.035em;overflow-wrap:anywhere; }
