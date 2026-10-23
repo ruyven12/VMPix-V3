@@ -3656,14 +3656,14 @@ function requestRingArchiveStats() {
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return true;
-  return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+  return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "music-shows" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
-  if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail") return getShellBackTarget(route);
+  if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "music-shows") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
   if (route?.name === "wrestling") return getShellBackTarget(route);
@@ -3738,6 +3738,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   const backLabel = route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation) ? "Back to Core Control Deck" : {
     "music": "Back to Portfolio",
     "music-bands": "Back to Zhento",
+    "music-shows": "Back to Zhento",
     "band-detail": "Back to Bands",
     "wrestling-people-prototype": "Back to Wrestling",
     "wrestling-people": "Back to Wrestling",
@@ -3787,7 +3788,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail" || route.name === "music-shows";
   shell.dataset.shellRoute = shellRouteName;
   syncShellMenuRoute(route);
   shell.dataset.shellActiveTarget = activeTarget;
@@ -3806,6 +3807,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   if (route.name === "music" || route.name === "music-bands" || route.name === "band-detail") {
     setPortfolioEngineHudCurrentView(route.name === "band-detail" ? getBandDetailEngineTitle(route.bandId) : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
+  if (route.name === "music-shows") setPortfolioEngineHudCurrentView("Pillar of Synchronicity");
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (!isHomeRoute) clearHomeEngageReadiness();
@@ -4649,8 +4651,8 @@ function selectZhentoPillar(landing, key) {
   pulse.querySelectorAll("[data-zhento-destination]").forEach((tile) => tile.setAttribute("aria-pressed", String(selected && tile.dataset.zhentoDestination === key)));
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(selected && row.dataset.zhentoStat === key)));
   const enter = pulse.querySelector(".zhento-enter");
-  enter.disabled = !selected || key !== "bands";
-  enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : "Enter the Pillar of Rhythm");
+  enter.disabled = !selected || !["bands", "shows"].includes(key);
+  enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : key === "shows" ? "Enter the Pillar of Synchronicity" : "Enter the Pillar of Rhythm");
   if (selected) {
     pulse.querySelector(".zhento-detail__title").textContent = pulse.querySelector(`[data-zhento-destination="${key}"] .zhento-pillar-tile__title`).textContent;
     pulse.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[key];
@@ -5326,7 +5328,13 @@ function resetZhentoLandingSelection() {
   enter.setAttribute("aria-label", "Enter — not available yet");
   if (!enter.dataset.zhentoEntryBound) {
     enter.dataset.zhentoEntryBound = "true";
-    enter.addEventListener("click", startZhentoRhythmEntry);
+    enter.addEventListener("click", (event) => {
+      if (landing.dataset.selectedDestination === "shows") {
+        if (getRouteFromUrl().name === "music" && !isWorldLandingInteractionBlocked("zhento") && !zhentoRhythmEntry) navigateToRoute(routePaths.musicShows);
+        return;
+      }
+      startZhentoRhythmEntry(event);
+    });
   }
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     if (button.dataset.zhentoBound) return;
@@ -5484,10 +5492,24 @@ window.addEventListener('resize', finishBandRecordOpeningImmediately);
 window.addEventListener('pagehide', cancelBandRecordOpening);
 reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) finishBandRecordOpeningImmediately(); });
 
+// Shows reuses its existing archive node; the Shell owns its mounted location.
+const synchronicityViewport = document.querySelector('[data-synchronicity-viewport]');
+const musicActivityHome = document.createComment('Music activity return position');
+musicActivityPanel.before(musicActivityHome);
+
 function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
   const detail = route.name === 'band-detail';
   const currentFoundation = isCurrentV3Route(route);
+  const shows = route.name === 'music-shows';
+  if (shows) {
+    if (musicActivityPanel.parentElement !== synchronicityViewport) synchronicityViewport.append(musicActivityPanel);
+  } else {
+    clearTimeout(musicShowsSearchRenderTimer);
+    if (musicActivityPanel.parentElement === synchronicityViewport) musicActivityHome.before(musicActivityPanel);
+  }
+  synchronicityViewport.hidden = !shows;
+  synchronicityViewport.inert = !shows;
   const entering = active && (rhythmViewport.hidden || !rhythmViewport.hasAttribute('data-rhythm-arrival'));
   if (!active) finishRhythmArrival();
   else if (entering) prepareRhythmArrival(Boolean(options.historyState || options.navigationDirection === 'back'));
@@ -5521,6 +5543,19 @@ function showRhythmPillar({ detail = false } = {}) {
   syncBandsIndex(); requestMusicBandsIndexData();
   // The warp owns visibility until cleanup. Direct entries begin after this mount resolves.
   requestAnimationFrame(() => startRhythmArrival());
+}
+
+function showMusicShowsViewport() {
+  clearPortfolioArrivalState(); clearPortfolioOrientationState(); clearPortfolioDirectArrivalState();
+  shell.classList.remove('is-placeholder-view','is-music-nexus-view','is-ring-archive-view','is-wrestling-people-view','is-wrestling-person-detail-view','is-wrestling-shows-view','is-wrestling-show-detail-view','is-wrestling-match-gallery-view','is-wrestling-lightbox-view','is-about-view','is-calendar-view','is-contact-view');
+  shell.classList.add('has-entered-hub','is-module-view');
+  homeFrame?.setAttribute('aria-hidden','true');
+  portfolioHub.setAttribute('aria-hidden','false'); portfolioHub.removeAttribute('inert');
+  for (const host of [modulePlaceholder,musicNexusShell,ringArchiveShell,aboutShell,calendarShell,contactShell]) { host?.setAttribute('aria-hidden','true'); host?.setAttribute('inert',''); }
+  setWrestlingShowsHidden(true); setWrestlingPeopleHidden(true); setWrestlingPersonDetailHidden(true); setWrestlingVenuesHidden(true); setWrestlingShowDetailHidden(true); setWrestlingMatchGalleryHidden(true); setWrestlingLightboxHidden(true);
+  setMusicNexusContext('shows', false, false);
+  setHubChromeHidden(true); setActiveGlobalNav('music');
+  setPortfolioEngineHudCurrentView('Pillar of Synchronicity');
 }
 
 function showMusicNexus(options = {}) {
@@ -7082,7 +7117,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "set-detail": musicNexusShell,
     "music-people": musicNexusShell,
     "person-detail": musicNexusShell,
-    "music-shows": musicNexusShell,
+    "music-shows": synchronicityViewport,
     "show-detail": musicNexusShell,
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
@@ -7117,6 +7152,8 @@ function resetShellScroller(scroller) {
 }
 
 function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
+  // Shows restoration owns its saved position, including data-delayed reloads.
+  if (route.name === "music-shows" && v3RouteContext.snapshot) return;
   const entry = daiionGatewayTransition;
   const persistentViewportUnchanged = (route.name === "wrestling" || (route.name === "music" && entry?.worldName === "soundtrack")) && entry?.promoted
     && entry.generation === portfolioGatewayGeneration && entry.viewportUnchanged;

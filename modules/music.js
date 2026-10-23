@@ -13599,7 +13599,7 @@ function renderMusicShowsArchive(options = {}) {
     existingFilters.remove();
   }
   const allRows = getMusicShowsIndexRows();
-  normalizeActiveMusicShowsFilters(allRows);
+  if (musicShowsSetsLoaded) normalizeActiveMusicShowsFilters(allRows);
   musicActivityPanel.insertBefore(createMusicShowsFilters(allRows), musicActivityList);
 
   const existingTemplates = musicActivityPanel.querySelector("[data-music-shows-state-templates]");
@@ -13610,9 +13610,8 @@ function renderMusicShowsArchive(options = {}) {
   const forcedState = getForcedMockState("musicShows");
   const filteredRows = getFilteredMusicShows();
   const shouldShowLoadingState = !forcedState
-    && !options.skipDataRequest
     && !musicShowsSetsLoaded
-    && !musicShowsIndexDataRequested
+    && musicShowsSetsDataState !== "error"
     && typeof fetch === "function";
   const shouldShowErrorState = !forcedState
     && musicShowsSetsDataState === "error"
@@ -13647,6 +13646,7 @@ function renderMusicShowsArchive(options = {}) {
 
   musicActivityList.append(fragment);
   musicActivityPanel.append(createMusicShowsStateTemplates());
+  if (getRouteFromUrl().name === "music-shows") notifyV3ResumeReady();
   restoreMusicShowsFilterFocus(focusMeta);
   if (!options.skipDataRequest) {
     requestMusicShowsIndexData();
@@ -15783,11 +15783,15 @@ function initMusicModule() {
 
 let musicSourceResume=null;
 function captureMusicResumeState(route) {
+  if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter};
   if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
   if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,bandTab:bandContentState.transition?.target || bandContentState.active,capturedIndex:bandCapturedSetsSession?.selected || 0,capturedSetCode:bandCapturedSetsSession?.rows[bandCapturedSetsSession.selected]?.setCode || ''};
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
 }
 function seedMusicResumeState(route,ui) {
+  if(route.name==='music-shows'){
+    activeMusicShowsSearch=v3Text(ui.query);activeMusicShowsYearFilter=v3Text(ui.year);activeMusicShowsStateFilter=v3Text(ui.state);activeMusicShowsVenueFilter=v3Text(ui.venue);return;
+  }
   if(route.name!=='music-bands')return;
   musicSourceResume={entry:v3RouteContext.entry,selected:v3Text(ui.selected),count:v3Number(ui.count,24,10000),sourceScroll:v3Number(ui.sourceScroll)};
   activeBandsFilterLetter=/^(?:[A-Z#]|0-9)$/.test(v3Text(ui.letter))?ui.letter:"";activeBandsRegionFilter=["local","regional","national","international"].includes(ui.region)?ui.region:"";activeBandsStatusFilter=["complete","partial","needs"].includes(ui.status)?ui.status:"";bandsSearchTerm=v3Text(ui.query);
@@ -15797,6 +15801,7 @@ function settleMusicResumeLanding() {
   landing?.getAnimations({subtree:true}).forEach(animation=>{if(animation instanceof CSSAnimation && animation.effect?.getTiming().iterations!==Infinity)try{animation.finish();}catch{}});
 }
 function restoreMusicResumeState(route,ui) {
+  if(route.name==='music-shows')return musicShowsSetsLoaded || musicShowsSetsDataState==='error';
   if(route.name==='music'){
     settleMusicResumeLanding();
     const button=[...document.querySelectorAll('[data-zhento-destination]')].find(node=>node.dataset.zhentoDestination===v3Text(ui.pillar));

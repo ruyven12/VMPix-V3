@@ -13359,7 +13359,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine {
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine {
   --engine-accent: 137 123 235;
   --engine-accent-soft: 173 186 255;
   --engine-accent-glow: 112 184 255;
@@ -13368,12 +13368,12 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   pointer-events: auto;
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine *,
-  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine *::before,
-  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine *::after { animation: none !important; }
+  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine *,
+  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine *::before,
+  .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine *::after { animation: none !important; }
 }
 
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .universal-bottom-rail { display: none; }
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .universal-bottom-rail { display: none; }
 
 /* Portfolio's current-view readout stays neutral while the selected world colors the energy. */
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left {
@@ -13388,7 +13388,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left,
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left {
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
   grid-column: 1 / -1;
@@ -13405,32 +13405,32 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-label,
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-label { display: block; text-transform: none; }
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine-panel--left .portfolio-engine-label { display: block; text-transform: none; }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-value,
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
 /* Band identities retain the existing single-line readout without covering either emitter. */
 .site-shell[data-shell-route="band-detail"] .portfolio-engine-panel--left .portfolio-engine-value { overflow: hidden; text-overflow: ellipsis; }
 
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])):not([data-shell-module]) .portfolio-engine { visibility: hidden; }
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])):not([data-shell-module]) .portfolio-engine { visibility: hidden; }
 
 
-.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine { transform: translate3d(0,0,0) scale3d(1,1,1); }
+.site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"])) .portfolio-engine { transform: translate3d(0,0,0) scale3d(1,1,1); }
 
 /* Bands uses the current shared module viewport, with no Music presentation ancestor. */
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .portfolio-hub { position:fixed;inset:0;inline-size:100%;block-size:100%;min-height:0;max-height:none;padding:0;border:0;border-radius:0;background:none;transform:none;overflow:visible; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .portfolio-hub::before { content:none; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .portfolio-hub { position:fixed;inset:0;inline-size:100%;block-size:100%;min-height:0;max-height:none;padding:0;border:0;border-radius:0;background:none;transform:none;overflow:visible; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .portfolio-hub::before { content:none; }
 
 /* Bands retains the shared Daïion flow, colored for Zhento. */
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .portfolio-engine { --engine-accent:170 108 235;--engine-accent-soft:220 190 255;--engine-accent-glow:179 112 255; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy--left { display:block;opacity:.9;filter:none; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy--left .engine-emitter-energy-ring--outer { --engine-emitter-ring-angle:-14deg;--engine-emitter-ring-offset:0;animation:daiionEmitterChargeClockwise 7.2s linear -1.3s infinite; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy--left .engine-emitter-energy-ring--middle { --engine-emitter-ring-angle:21deg;--engine-emitter-ring-offset:-18; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy--left .engine-emitter-energy-ring--feed { --engine-emitter-ring-angle:4deg;--engine-emitter-ring-offset:-4;animation:daiionEmitterRingClockwise 5.8s linear -2.1s infinite; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy-discharge--left-crown { animation:daiionEmitterDischargeFlash 4.6s steps(1,end) -.8s infinite; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy-discharge--left-feed { animation:daiionEmitterInwardDischargeSnap 4.9s steps(1,end) -1.1s infinite; }
-.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy-discharge--left-lower { opacity:.18; }
-@media(prefers-reduced-motion:reduce) { .site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"]) .engine-emitter-energy * { animation:none !important; } }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .portfolio-engine { --engine-accent:170 108 235;--engine-accent-soft:220 190 255;--engine-accent-glow:179 112 255; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy--left { display:block;opacity:.9;filter:none; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy--left .engine-emitter-energy-ring--outer { --engine-emitter-ring-angle:-14deg;--engine-emitter-ring-offset:0;animation:daiionEmitterChargeClockwise 7.2s linear -1.3s infinite; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy--left .engine-emitter-energy-ring--middle { --engine-emitter-ring-angle:21deg;--engine-emitter-ring-offset:-18; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy--left .engine-emitter-energy-ring--feed { --engine-emitter-ring-angle:4deg;--engine-emitter-ring-offset:-4;animation:daiionEmitterRingClockwise 5.8s linear -2.1s infinite; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy-discharge--left-crown { animation:daiionEmitterDischargeFlash 4.6s steps(1,end) -.8s infinite; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy-discharge--left-feed { animation:daiionEmitterInwardDischargeSnap 4.9s steps(1,end) -1.1s infinite; }
+.site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy-discharge--left-lower { opacity:.18; }
+@media(prefers-reduced-motion:reduce) { .site-shell:is([data-shell-route="music-bands"], [data-shell-route="band-detail"], [data-shell-route="music-shows"]) .engine-emitter-energy * { animation:none !important; } }
 
 /* Rhythm entry: measured persistent emitters, opaque animated coverage, then current viewport. */
 /* Mount and measure the destination under coverage; disclose its complete interface only at cleanup. */

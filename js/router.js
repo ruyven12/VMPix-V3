@@ -262,7 +262,7 @@ let v3RouteStarted = false, v3ResumeWake = null, v3ResumeObserver = null, v3Resu
 const v3Text = (value, fallback = '') => typeof value === 'string' && value.length <= 300 ? value : fallback;
 const v3Number = (value, fallback = 0, max = 1000000) => Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : fallback;
 function isCurrentV3Route(route) {
-  return ['music','music-bands','band-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
+  return ['music','music-shows','music-bands','band-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
 }
 function createV3EntryId() { return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2); }
 function ensureV3EntryId() {
@@ -313,7 +313,7 @@ function beginV3RouteContext(route,options){
   const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
   v3EntriesRenderedInDocument.add(entry);
   let snapshot=null;
-  if((cause==='reload' || reloadGap || (route.name==='band-detail' && cause==='back-forward')) && isCurrentV3Route(route))try{
+  if((cause==='reload' || reloadGap || (['band-detail','music-shows'].includes(route.name) && cause==='back-forward')) && isCurrentV3Route(route))try{
     const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
     const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
     if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
@@ -488,7 +488,7 @@ function syncRoute(route, options = {}) {
   }
 
   if (route.name === "music-shows") {
-    showMusicNexus({ initialSection: "shows", currentView: "Shows" });
+    showMusicShowsViewport();
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }

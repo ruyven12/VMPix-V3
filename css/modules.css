@@ -33443,3 +33443,37 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (min-width: 840px) {
   .admin-shell .admin-protection__collections { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* S2: existing Shows archive in one Shell-owned viewport; no scene or drawer yet. */
+.synchronicity-viewport {
+  position: fixed;
+  z-index: 30;
+  inset: 0 0 auto;
+  box-sizing: border-box;
+  height: max(0px, calc(var(--app-viewport-height, 100svh) - var(--portfolio-engine-height, clamp(3.35rem, 7.8svh, 4.7rem)) - var(--portfolio-engine-bottom-offset, max(.58rem, env(safe-area-inset-bottom))) - 1rem));
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 20px max(12px, env(safe-area-inset-left));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+}
+.synchronicity-viewport[hidden] { display: none; }
+.synchronicity-viewport .music-shows-archive {
+  box-sizing: border-box;
+  width: min(100%, 52rem);
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  margin: 0 auto;
+  grid-template-rows: auto auto;
+  contain: none;
+  overflow: visible;
+}
+.synchronicity-viewport .music-shows-grid {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+.site-shell[data-shell-route="music-shows"] .public-home { overflow: hidden; }
