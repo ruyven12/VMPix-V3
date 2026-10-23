@@ -33531,7 +33531,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .synchronicity-memory:nth-child(5) { --memory-x: 75%; --memory-y: 81%; width: 17%; }
 }
 
-/* S5: bounded independent drift; S4 anchors, dimensions and frames stay intact. */
+/* S5A: visible, bounded drift; S4 anchors, dimensions and frames stay intact. */
 .synchronicity-memory img {
   position: absolute;
   inset: 2px;
@@ -33539,19 +33539,28 @@ button.hall-crusades-archive-crystal:focus-visible {
   height: calc(100% - 4px);
 }
 .synchronicity-memory[data-memory-living="true"] {
-  animation: synchronicity-memory-drift 19s ease-in-out infinite;
+  --memory-drift-x: 8px;
+  --memory-drift-up: 20px;
+  --memory-drift-down: 20px;
+  animation: synchronicity-memory-drift 12s ease-in-out infinite;
   animation-play-state: paused;
 }
 .synchronicity-memories[data-memory-motion="running"] .synchronicity-memory[data-memory-living="true"] { animation-play-state: running; }
-.synchronicity-memory:nth-child(2) { animation-duration: 23s; animation-direction: reverse; }
-.synchronicity-memory:nth-child(3) { animation-duration: 27s; }
-.synchronicity-memory:nth-child(4) { animation-duration: 21s; animation-direction: reverse; }
-.synchronicity-memory:nth-child(5) { animation-duration: 25s; }
+.synchronicity-memory:nth-child(2) { --memory-drift-x: 6px; --memory-drift-up: 6px; animation-duration: 15s; animation-direction: reverse; }
+.synchronicity-memory:nth-child(3) { --memory-drift-x: 6px; --memory-drift-down: 6px; animation-duration: 13s; }
+.synchronicity-memory:nth-child(4) { --memory-drift-x: 6px; --memory-drift-down: 6px; animation-duration: 16s; animation-direction: reverse; }
+.synchronicity-memory:nth-child(5) { --memory-drift-x: 6px; --memory-drift-down: 6px; animation-duration: 14s; }
 @keyframes synchronicity-memory-drift {
   0%, 100% { transform: translate(-50%, -50%); }
-  25% { transform: translate(calc(-50% + 2px), calc(-50% - 3px)); }
+  25% { transform: translate(calc(-50% + var(--memory-drift-x)), calc(-50% - var(--memory-drift-up))); }
   50% { transform: translate(-50%, -50%); }
-  75% { transform: translate(calc(-50% - 2px), calc(-50% + 3px)); }
+  75% { transform: translate(calc(-50% - var(--memory-drift-x)), calc(-50% + var(--memory-drift-down))); }
+}
+@media (max-height: 500px) {
+  .synchronicity-memory[data-memory-living="true"]:first-child {
+    --memory-drift-up: 16px;
+    --memory-drift-down: 16px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .synchronicity-memories[data-memory-motion] .synchronicity-memory[data-memory-living="true"] { animation-play-state: paused; }

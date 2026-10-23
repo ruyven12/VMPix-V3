@@ -1,0 +1,1007 @@
+[
+  {
+    "size": [
+      360,
+      800
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 712.3125,
+        "top": 0,
+        "right": 360,
+        "bottom": 712.3125,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 336,
+        "height": 288,
+        "top": 10,
+        "right": 348,
+        "bottom": 298,
+        "left": 12
+      },
+      "controls": {
+        "x": 12,
+        "y": 310,
+        "width": 336,
+        "height": 916.96875,
+        "top": 310,
+        "right": 348,
+        "bottom": 1226.96875,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 101.4453125,
+          "maxRight": 258.5546875,
+          "minTop": 81.203125,
+          "maxBottom": 215.265625,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "141.11"
+          ],
+          "heights": [
+            "94.06"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 12.7109375,
+          "maxRight": 112.0703125,
+          "minTop": 43.9921875,
+          "maxBottom": 128.2265625,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "87.36"
+          ],
+          "heights": [
+            "58.23"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 247.9140625,
+          "maxRight": 347.2734375,
+          "minTop": 168.2421875,
+          "maxBottom": 252.4765625,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "87.36"
+          ],
+          "heights": [
+            "58.23"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 360,
+      "clientWidth": 360,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      412,
+      915
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 818.34375,
+        "top": 0,
+        "right": 412,
+        "bottom": 818.34375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 388,
+        "height": 329.390625,
+        "top": 10,
+        "right": 400,
+        "bottom": 339.390625,
+        "left": 12
+      },
+      "controls": {
+        "x": 12,
+        "y": 351.390625,
+        "width": 388,
+        "height": 729.71875,
+        "top": 351.390625,
+        "right": 400,
+        "bottom": 1081.109375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 116.5234375,
+          "maxRight": 295.4765625,
+          "minTop": 93.78125,
+          "maxBottom": 242.40625,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "162.95"
+          ],
+          "heights": [
+            "108.63",
+            "108.62"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 13.75,
+          "maxRight": 126.625,
+          "minTop": 49.421875,
+          "maxBottom": 142.671875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "100.88"
+          ],
+          "heights": [
+            "67.25"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 285.359375,
+          "maxRight": 398.234375,
+          "minTop": 193.53125,
+          "maxBottom": 286.78125,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "100.88"
+          ],
+          "heights": [
+            "67.25"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 412,
+      "clientWidth": 412,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      480,
+      1040
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 939.515625,
+        "top": 0,
+        "right": 480,
+        "bottom": 939.515625,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 456,
+        "height": 360,
+        "top": 10,
+        "right": 468,
+        "bottom": 370,
+        "left": 12
+      },
+      "controls": {
+        "x": 12,
+        "y": 382,
+        "width": 456,
+        "height": 823.125,
+        "top": 382,
+        "right": 468,
+        "bottom": 1205.125,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 955.546875,
+        "width": 461.46875,
+        "height": 75.1875,
+        "top": 955.546875,
+        "right": 470.734375,
+        "bottom": 1030.734375,
+        "left": 9.265625
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 136.2421875,
+          "maxRight": 343.7578125,
+          "minTop": 98.9609375,
+          "maxBottom": 266.6328125,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "191.52"
+          ],
+          "heights": [
+            "127.67"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 15.1171875,
+          "maxRight": 145.6640625,
+          "minTop": 50.875,
+          "maxBottom": 155.90625,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "118.55"
+          ],
+          "heights": [
+            "79.03"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 334.3203125,
+          "maxRight": 464.8671875,
+          "minTop": 209.671875,
+          "maxBottom": 314.703125,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "118.55"
+          ],
+          "heights": [
+            "79.03"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 480,
+      "clientWidth": 480,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      1920,
+      1080
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 979.515625,
+        "top": 0,
+        "right": 1920,
+        "bottom": 979.515625,
+        "left": 0
+      },
+      "stage": {
+        "x": 360,
+        "y": 10,
+        "width": 1200,
+        "height": 420,
+        "top": 10,
+        "right": 1560,
+        "bottom": 430,
+        "left": 360
+      },
+      "controls": {
+        "x": 544,
+        "y": 442,
+        "width": 832,
+        "height": 851.6875,
+        "top": 442,
+        "right": 1376,
+        "bottom": 1293.6875,
+        "left": 544
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 807,
+          "maxRight": 1113,
+          "minTop": 94.9296875,
+          "maxBottom": 328.2578125,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "290.00"
+          ],
+          "heights": [
+            "193.33"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 432,
+          "maxRight": 648,
+          "minTop": 49.390625,
+          "maxBottom": 211.390625,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "204.00"
+          ],
+          "heights": [
+            "136.00"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 1272,
+          "maxRight": 1488,
+          "minTop": 77.390625,
+          "maxBottom": 239.390625,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "204.00"
+          ],
+          "heights": [
+            "136.00"
+          ]
+        },
+        {
+          "duration": 16000,
+          "direction": "reverse",
+          "minLeft": 588,
+          "maxRight": 804,
+          "minTop": 253.796875,
+          "maxBottom": 415.796875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "204.00"
+          ],
+          "heights": [
+            "136.00"
+          ]
+        },
+        {
+          "duration": 14000,
+          "direction": "normal",
+          "minLeft": 1152,
+          "maxRight": 1368,
+          "minTop": 262.1875,
+          "maxBottom": 424.1875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "204.00"
+          ],
+          "heights": [
+            "136.00"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 1920,
+      "clientWidth": 1920,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      915,
+      412
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 333.109375,
+        "top": 0,
+        "right": 915,
+        "bottom": 333.109375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 891,
+        "height": 190,
+        "top": 10,
+        "right": 903,
+        "bottom": 200,
+        "left": 12
+      },
+      "controls": {
+        "x": 41.5,
+        "y": 212,
+        "width": 832,
+        "height": 847.53125,
+        "top": 212,
+        "right": 873.5,
+        "bottom": 1059.53125,
+        "left": 41.5
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 349.140625,
+        "width": 896.46875,
+        "height": 53.59375,
+        "top": 349.140625,
+        "right": 905.734375,
+        "bottom": 402.734375,
+        "left": 9.265625
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 339.5,
+          "maxRight": 575.5,
+          "minTop": 11.859375,
+          "maxBottom": 190.515625,
+          "horizontalRange": 16,
+          "verticalRange": 32,
+          "widths": [
+            "220.00"
+          ],
+          "heights": [
+            "146.66"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 90.203125,
+          "maxRight": 201.078125,
+          "minTop": 16.640625,
+          "maxBottom": 108.546875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "98.88",
+            "98.87"
+          ],
+          "heights": [
+            "65.91"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 713.90625,
+          "maxRight": 824.78125,
+          "minTop": 93.84375,
+          "maxBottom": 185.75,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "98.88"
+          ],
+          "heights": [
+            "65.91"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 915,
+      "clientWidth": 915,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      812,
+      375
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 812,
+        "height": 296.109375,
+        "top": 0,
+        "right": 812,
+        "bottom": 296.109375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 788,
+        "height": 190,
+        "top": 10,
+        "right": 800,
+        "bottom": 200,
+        "left": 12
+      },
+      "controls": {
+        "x": 12,
+        "y": 212,
+        "width": 788,
+        "height": 847.53125,
+        "top": 212,
+        "right": 800,
+        "bottom": 1059.53125,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 312.140625,
+        "width": 793.46875,
+        "height": 53.59375,
+        "top": 312.140625,
+        "right": 802.734375,
+        "bottom": 365.734375,
+        "left": 9.265625
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 288,
+          "maxRight": 524,
+          "minTop": 11.859375,
+          "maxBottom": 190.515625,
+          "horizontalRange": 16,
+          "verticalRange": 32,
+          "widths": [
+            "220.00"
+          ],
+          "heights": [
+            "146.66"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 79.1875,
+          "maxRight": 181.1875,
+          "minTop": 19.59375,
+          "maxBottom": 105.59375,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "90.00"
+          ],
+          "heights": [
+            "60.00"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 630.796875,
+          "maxRight": 732.796875,
+          "minTop": 96.796875,
+          "maxBottom": 182.796875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "90.00"
+          ],
+          "heights": [
+            "60.00"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 812,
+      "clientWidth": 812,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      412,
+      915
+    ],
+    "safe": true,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 793.625,
+        "top": 0,
+        "right": 412,
+        "bottom": 793.625,
+        "left": 0
+      },
+      "stage": {
+        "x": 24,
+        "y": 44,
+        "width": 364,
+        "height": 329.390625,
+        "top": 44,
+        "right": 388,
+        "bottom": 373.390625,
+        "left": 24
+      },
+      "controls": {
+        "x": 24,
+        "y": 385.390625,
+        "width": 364,
+        "height": 729.71875,
+        "top": 385.390625,
+        "right": 388,
+        "bottom": 1115.109375,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 809.640625,
+        "width": 364,
+        "height": 71.359375,
+        "top": 809.640625,
+        "right": 388,
+        "bottom": 881,
+        "left": 24
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 121.5625,
+          "maxRight": 290.4375,
+          "minTop": 131.140625,
+          "maxBottom": 273.046875,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "152.88",
+            "152.87"
+          ],
+          "heights": [
+            "101.91"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 25.28125,
+          "maxRight": 131.90625,
+          "minTop": 85.5078125,
+          "maxBottom": 174.5859375,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "94.63",
+            "94.62"
+          ],
+          "heights": [
+            "63.08"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 280.078125,
+          "maxRight": 386.703125,
+          "minTop": 229.6171875,
+          "maxBottom": 318.6953125,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "94.63"
+          ],
+          "heights": [
+            "63.08"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 412,
+      "clientWidth": 412,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      915,
+      412
+    ],
+    "safe": true,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 308.390625,
+        "top": 0,
+        "right": 915,
+        "bottom": 308.390625,
+        "left": 0
+      },
+      "stage": {
+        "x": 24,
+        "y": 44,
+        "width": 867,
+        "height": 190,
+        "top": 44,
+        "right": 891,
+        "bottom": 234,
+        "left": 24
+      },
+      "controls": {
+        "x": 41.5,
+        "y": 246,
+        "width": 832,
+        "height": 847.53125,
+        "top": 246,
+        "right": 873.5,
+        "bottom": 1093.53125,
+        "left": 41.5
+      },
+      "engine": {
+        "x": 24,
+        "y": 324.40625,
+        "width": 867,
+        "height": 53.59375,
+        "top": 324.40625,
+        "right": 891,
+        "bottom": 378,
+        "left": 24
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 339.5,
+          "maxRight": 575.5,
+          "minTop": 45.859375,
+          "maxBottom": 224.515625,
+          "horizontalRange": 16,
+          "verticalRange": 32,
+          "widths": [
+            "220.00"
+          ],
+          "heights": [
+            "146.66"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 98.609375,
+          "maxRight": 209.484375,
+          "minTop": 50.640625,
+          "maxBottom": 142.546875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "98.88",
+            "98.87"
+          ],
+          "heights": [
+            "65.91"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 705.5,
+          "maxRight": 816.375,
+          "minTop": 127.84375,
+          "maxBottom": 219.75,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "98.88"
+          ],
+          "heights": [
+            "65.91"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 915,
+      "clientWidth": 915,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  },
+  {
+    "size": [
+      1920,
+      800
+    ],
+    "safe": false,
+    "passed": true,
+    "metrics": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 712.3125,
+        "top": 0,
+        "right": 1920,
+        "bottom": 712.3125,
+        "left": 0
+      },
+      "stage": {
+        "x": 360,
+        "y": 10,
+        "width": 1200,
+        "height": 312,
+        "top": 10,
+        "right": 1560,
+        "bottom": 322,
+        "left": 360
+      },
+      "controls": {
+        "x": 544,
+        "y": 334,
+        "width": 832,
+        "height": 851.6875,
+        "top": 334,
+        "right": 1376,
+        "bottom": 1185.6875,
+        "left": 544
+      },
+      "engine": {
+        "x": 480,
+        "y": 728.34375,
+        "width": 960,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 1440,
+        "bottom": 790.734375,
+        "left": 480
+      },
+      "frames": [
+        {
+          "duration": 12000,
+          "direction": "normal",
+          "minLeft": 807,
+          "maxRight": 1113,
+          "minTop": 43.0859375,
+          "maxBottom": 276.4140625,
+          "horizontalRange": 16,
+          "verticalRange": 40,
+          "widths": [
+            "290.00"
+          ],
+          "heights": [
+            "193.33"
+          ]
+        },
+        {
+          "duration": 15000,
+          "direction": "reverse",
+          "minLeft": 438,
+          "maxRight": 642,
+          "minTop": 24.234375,
+          "maxBottom": 178.234375,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "192.00"
+          ],
+          "heights": [
+            "128.00"
+          ]
+        },
+        {
+          "duration": 13000,
+          "direction": "normal",
+          "minLeft": 1278,
+          "maxRight": 1482,
+          "minTop": 41.4375,
+          "maxBottom": 195.4375,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "192.00"
+          ],
+          "heights": [
+            "128.00"
+          ]
+        },
+        {
+          "duration": 16000,
+          "direction": "reverse",
+          "minLeft": 594,
+          "maxRight": 798,
+          "minTop": 172.46875,
+          "maxBottom": 326.46875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "192.00"
+          ],
+          "heights": [
+            "128.00"
+          ]
+        },
+        {
+          "duration": 14000,
+          "direction": "normal",
+          "minLeft": 1158,
+          "maxRight": 1362,
+          "minTop": 178.71875,
+          "maxBottom": 332.71875,
+          "horizontalRange": 12,
+          "verticalRange": 26,
+          "widths": [
+            "192.00"
+          ],
+          "heights": [
+            "128.00"
+          ]
+        }
+      ],
+      "overflow": 0,
+      "scrollWidth": 1920,
+      "clientWidth": 1920,
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")"
+    }
+  }
+]
