@@ -13409,6 +13409,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
+/* Band identities retain the existing single-line readout without covering either emitter. */
+.site-shell[data-shell-route="band-detail"] .portfolio-engine-panel--left .portfolio-engine-value { overflow: hidden; text-overflow: ellipsis; }
 
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], [data-shell-route="band-detail"])):not([data-shell-module]) .portfolio-engine { visibility: hidden; }
 

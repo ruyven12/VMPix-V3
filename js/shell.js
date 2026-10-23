@@ -11,6 +11,10 @@ function setCurrentView(viewName) {
   if (typeof setPortfolioEngineHudCurrentViewDetail === "function") {
     setPortfolioEngineHudCurrentViewDetail("");
   }
+  const route = getRouteFromUrl();
+  if (route.name === "band-detail") {
+    setPortfolioEngineHudCurrentView(getBandDetailEngineTitle(route.bandId));
+  }
 }
 
 const ROUTE_TITLE_LABELS = {
@@ -1724,6 +1728,13 @@ function setPortfolioEngineHudCurrentViewDetail(detailText = "") {
   }
   detail.textContent = text;
   panel.dataset.portfolioEngineDetail = "true";
+}
+
+function getBandDetailEngineTitle(bandId) {
+  const band = findBandById(bandId);
+  return band && !band.isUnknownArchiveRecord
+    ? `Band Dossier - ${getBandDetailName(band)}`
+    : "Band Dossier";
 }
 
 function setPortfolioEngineHudCurrentView(viewName, options = {}) {
@@ -3793,7 +3804,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     clearPortfolioGatewayState();
   }
   if (route.name === "music" || route.name === "music-bands" || route.name === "band-detail") {
-    setPortfolioEngineHudCurrentView(route.name === "band-detail" ? "Band Detail" : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
+    setPortfolioEngineHudCurrentView(route.name === "band-detail" ? getBandDetailEngineTitle(route.bandId) : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -5503,7 +5514,7 @@ function showRhythmPillar({ detail = false } = {}) {
   musicBandsIndex.setAttribute('aria-hidden', String(detail)); musicBandsIndex.inert = detail;
   setHubChromeHidden(true); setActiveGlobalNav('music');
   if (detail) {
-    setPortfolioEngineHudCurrentView('Band Detail');
+    setPortfolioEngineHudCurrentView(getBandDetailEngineTitle(getRouteFromUrl().bandId));
     return;
   }
   setPortfolioEngineHudCurrentView('Pillar of Rhythm');
