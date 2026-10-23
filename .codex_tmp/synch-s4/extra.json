@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Malformed photo response uses real poster fallback",
+    "passed": true
+  },
+  {
+    "name": "Shows API failure retains accessible Retry without false memories",
+    "passed": true
+  },
+  {
+    "name": "Native vertical swipe starting over a memory scrolls only Shows",
+    "passed": true
+  }
+]

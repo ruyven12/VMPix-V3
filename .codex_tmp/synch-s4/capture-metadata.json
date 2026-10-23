@@ -1,0 +1,23 @@
+{
+  "pass": "S4",
+  "route": "/music/shows",
+  "capturedAt": "2026-10-23T20:15:28.449Z",
+  "revision": "4d7fa19a560e15d3493c942e30da43830be163f0",
+  "applicationFiles": [
+    "index.html",
+    "css/modules.css",
+    "modules/music.js"
+  ],
+  "data": "Screenshots use previously recorded real Shows and SmugMug photo responses. Current public Shows GET initially succeeded; subsequent requests were challenged/403. Full live delivery was not verified. Synthetic fixtures separately verify counts, same-date distinct IDs, failure and request bounds.",
+  "browser": "Chrome, CSS viewport emulation, DPR 1; no physical S25 or Safari test",
+  "selection": "Newest-first existing archive order: prefer resolved concert albums among first 20 distinct stable show IDs, at most 10 first-photo pages; fill remaining slots with explicit real show posters.",
+  "requests": "limit=1&start=1 only; max two concurrent; recorded preview 1 photo-page request; synthetic five-frame test 5; all-failure bound 10; shared cached requests reused.",
+  "limits": "3 below 1000px; 5 at/above 1000px; fewer when imagery unavailable. No selection, animation or rotation.",
+  "assetHash": "3293a61b75403c1736f96f4fa0ec6e0ff33e18c25a463d4dcd8825af1f0217a8",
+  "limitations": [
+    "Existing compact mobile filters retained",
+    "Existing font-loading reflow remains; settled preview insertion caused no layout shifts",
+    "Four eligible shows in recorded desktop screenshot; five-frame maximum exercised only in synthetic QA"
+  ],
+  "approval": "Candidate screenshots awaiting visual approval"
+}

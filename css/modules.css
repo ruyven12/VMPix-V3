@@ -33483,3 +33483,50 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .site-shell[data-shell-route="music-shows"] .public-home { overflow: hidden; }
+
+/* S4: reserved, noninteractive memory scene; archive and scene share the S2 scroller. */
+.synchronicity-memories {
+  position: relative;
+  width: min(100%, 1200px);
+  height: clamp(190px, 36svh, 360px);
+  margin: 0 auto 12px;
+  pointer-events: none;
+}
+.synchronicity-memory {
+  --memory-x: 50%;
+  --memory-y: 48%;
+  position: absolute;
+  left: var(--memory-x);
+  top: var(--memory-y);
+  transform: translate(-50%, -50%);
+  width: 42%;
+  max-width: 220px;
+  aspect-ratio: 3 / 2;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2px;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  background: linear-gradient(135deg, rgba(174,193,224,.74), rgba(87,104,164,.28) 38%, rgba(142,110,197,.64));
+}
+.synchronicity-memory img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .96;
+  clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);
+  mask-image: linear-gradient(to right, rgba(0,0,0,.72), #000 5%, #000 95%, rgba(0,0,0,.72));
+}
+.synchronicity-memory[data-memory-kind="poster"] img { object-fit: contain; background: rgba(8,11,24,.5); }
+.synchronicity-memory:nth-child(2) { --memory-x: 15%; --memory-y: 24%; width: 26%; max-width: min(160px, 24svh); }
+.synchronicity-memory:nth-child(3) { --memory-x: 85%; --memory-y: 72%; width: 26%; max-width: min(160px, 24svh); }
+.synchronicity-memories[data-memory-count="2"] .synchronicity-memory:first-child { --memory-x: 62%; }
+@media (min-width: 1000px) {
+  .synchronicity-memories { height: clamp(260px, 39svh, 420px); }
+  .synchronicity-memory { width: 26%; max-width: 290px; }
+  .synchronicity-memory:nth-child(n+2) { max-width: min(220px, 24svh); }
+  .synchronicity-memory:nth-child(2) { --memory-x: 15%; --memory-y: 27%; width: 17%; }
+  .synchronicity-memory:nth-child(3) { --memory-x: 85%; --memory-y: 37%; width: 17%; }
+  .synchronicity-memory:nth-child(4) { --memory-x: 28%; --memory-y: 79%; width: 17%; }
+  .synchronicity-memory:nth-child(5) { --memory-x: 75%; --memory-y: 81%; width: 17%; }
+}

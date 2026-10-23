@@ -13573,6 +13573,135 @@ function requestMusicShowsIndexData() {
   });
 }
 
+// S4: static previews only. Stable show IDs, resolved albums, and bounded first-photo pages.
+let synchronicityMemoriesSession = null;
+let synchronicityMemoriesWide = null;
+
+function clearSynchronicityMemories() {
+  const session = synchronicityMemoriesSession;
+  synchronicityMemoriesSession = null;
+  if (!session) return;
+  session.cancelImages.forEach(cancel => cancel());
+  session.stage.replaceChildren();
+  session.stage.removeAttribute("aria-busy");
+  delete session.stage.dataset.memoryCount;
+}
+
+function prepareSynchronicityMemories() {
+  const viewport = document.querySelector("[data-synchronicity-viewport]");
+  const stage = viewport?.querySelector("[data-synchronicity-memories]");
+  if (!stage || viewport.hidden || getRouteFromUrl().name !== "music-shows") return;
+  if (musicShowsSetsDataState !== "live") { clearSynchronicityMemories(); return; }
+  const limit = synchronicityMemoriesWide?.matches ? 5 : 3;
+  const source = musicShowsSetsCollection, entry = v3RouteContext.entry;
+  if (synchronicityMemoriesSession?.source === source && synchronicityMemoriesSession.entry === entry && synchronicityMemoriesSession.limit === limit) return;
+  clearSynchronicityMemories();
+  const session = { source, entry, limit, stage, cancelImages: new Set(), results: [], seenImages: new Set() };
+  synchronicityMemoriesSession = session;
+  stage.setAttribute("aria-busy", "true");
+  const current = () => synchronicityMemoriesSession === session && !viewport.hidden &&
+    getRouteFromUrl().name === "music-shows" && v3RouteContext.entry === entry && musicShowsSetsCollection === source;
+  const usable = src => Boolean(src && isMusicShowPosterImageSrc(src) && src !== SET_GALLERY_NO_POSTER_IMAGE_SRC && !/\/(?:placeholders|Band-Logos)\//i.test(src));
+  const decode = src => new Promise(resolve => {
+    if (!current() || !usable(src) || session.seenImages.has(src)) { resolve(null); return; }
+    const image = new Image();
+    image.decoding = "async";
+    image.referrerPolicy = "strict-origin-when-cross-origin";
+    let done = false;
+    const finish = ok => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      session.cancelImages.delete(cancel);
+      image.onload = image.onerror = null;
+      if (!ok) image.removeAttribute("src");
+      resolve(ok ? image : null);
+    };
+    const cancel = () => finish(false);
+    const timer = setTimeout(cancel, 8000);
+    session.cancelImages.add(cancel);
+    image.onerror = cancel;
+    image.onload = async () => {
+      try { if (typeof image.decode === "function") await image.decode(); } catch { cancel(); return; }
+      finish(current() && image.naturalWidth > 0 && image.naturalHeight > 0);
+    };
+    image.src = src;
+  });
+  const seenShows = new Set();
+  // No fallback/demo records and no date-derived route codes are used as identity.
+  const candidates = getMusicShowsIndexRows().filter(show => {
+    const id = getMusicShowIdValue(show);
+    if (!id || seenShows.has(id)) return false;
+    seenShows.add(id);
+    return true;
+  }).slice(0, 20).map(show => ({ show, id: getMusicShowIdValue(show), album: getMusicShowSmugAlbums(show).find(album =>
+    String(album.status || "").toLowerCase() === "resolved" &&
+    String(album.album_id || album.gallery_id || "").trim() && getMusicShowAlbumPhotoCount(album) !== 0) }));
+  const retain = result => {
+    if (!result || !current() || session.seenImages.has(result.image.src)) return;
+    session.seenImages.add(result.image.src);
+    session.results.push(result);
+  };
+  const render = () => {
+    if (!current()) return;
+    const fragment = document.createDocumentFragment();
+    session.results.forEach(({ show, id, image, kind }) => {
+      const frame = document.createElement("figure");
+      frame.className = "synchronicity-memory";
+      frame.dataset.memoryShowId = id;
+      frame.dataset.memoryKind = kind;
+      image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
+      image.draggable = false;
+      frame.append(image);
+      fragment.append(frame);
+    });
+    stage.dataset.memoryCount = String(session.results.length);
+    stage.replaceChildren(fragment);
+  };
+  (async () => {
+    // Prefer the newest documented concert galleries. At most ten one-photo API pages,
+    // two requests at a time; never follow pagination or fetch an entire gallery.
+    const albums = candidates.filter(candidate => candidate.album).slice(0, 10);
+    for (let start = 0; start < albums.length && current() && session.results.length < limit;) {
+      const batch = albums.slice(start, start + Math.min(2, limit - session.results.length));
+      start += batch.length;
+      const results = await Promise.all(batch.map(async candidate => {
+        try {
+          const albumId = String(candidate.album.album_id || candidate.album.gallery_id).trim();
+          const page = await requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1);
+          if (!current()) return null;
+          const image = await decode(getMusicAlbumPhotoImageSrc(page.photos[0]));
+          return image ? { ...candidate, image, kind: "photo" } : null;
+        } catch { return null; }
+      }));
+      results.forEach(retain);
+    }
+    // Only explicit poster fields from these real Shows records may fill vacancies.
+    for (const candidate of candidates) {
+      if (!current() || session.results.length >= limit) break;
+      if (session.results.some(result => result.id === candidate.id)) continue;
+      const image = await decode(candidate.show.capturedPoster);
+      if (image) retain({ ...candidate, image, kind: "poster" });
+    }
+    render();
+  })().catch(() => { render(); }).finally(() => {
+    if (current()) stage.setAttribute("aria-busy", "false");
+  });
+}
+
+function initSynchronicityMemories() {
+  const viewport = document.querySelector("[data-synchronicity-viewport]");
+  if (!viewport || synchronicityMemoriesWide) return;
+  synchronicityMemoriesWide = window.matchMedia("(min-width: 1000px)");
+  synchronicityMemoriesWide.addEventListener("change", prepareSynchronicityMemories);
+  new MutationObserver(() => {
+    if (viewport.hidden) clearSynchronicityMemories();
+    else prepareSynchronicityMemories();
+  }).observe(viewport, { attributes: true, attributeFilter: ["hidden"] });
+  window.addEventListener("pagehide", clearSynchronicityMemories);
+  window.addEventListener("pageshow", prepareSynchronicityMemories);
+}
+
 function renderMusicShowsArchive(options = {}) {
   if (!musicActivityPanel || !musicActivityList) {
     return;
@@ -13646,6 +13775,7 @@ function renderMusicShowsArchive(options = {}) {
 
   musicActivityList.append(fragment);
   musicActivityPanel.append(createMusicShowsStateTemplates());
+  prepareSynchronicityMemories();
   if (getRouteFromUrl().name === "music-shows") notifyV3ResumeReady();
   restoreMusicShowsFilterFocus(focusMeta);
   if (!options.skipDataRequest) {
@@ -15565,6 +15695,7 @@ function moveMusicNexusSelection(direction) {
   setMusicNexusContext(cards[nextIndex].dataset.musicNexusCard, true);
 }
 function initMusicModule() {
+  initSynchronicityMemories();
   initBandContentTabs();
   if (musicNexusBack) {
     musicNexusBack.addEventListener("click", () => {
