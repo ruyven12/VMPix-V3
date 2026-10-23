@@ -990,6 +990,8 @@ function showBandDetailRoute(bandId, options = {}) {
   if (band) {
     // The Shell has already prepared this exact record for the measured handoff.
     if (bandRecordOpening?.prepared && bandRecordOpening.bandId === normalizedBandId) {
+      // Adopt the destination entry after Shell promotes the already-prepared handoff.
+      if (bandIdentityReveal?.entry === bandRecordOpening) bandIdentityReveal.entry = v3RouteContext.entry;
       setBandsIndexVisible(false);
       setBandDetailVisible(true);
       setCurrentView("Band Detail");
@@ -6363,12 +6365,13 @@ function clearBandIdentityReveal() {
 }
 function prepareBandIdentityReveal(band, options = {}) {
   const hud = bandDetailName?.closest(".band-identity-hud"), id = getBandId(band);
-  if (!hud || !id || bandIdentityReveal?.id === id) return;
+  const handoff = options.prepareRecordOpening ? bandRecordOpening : null;
+  const entry = handoff || v3RouteContext.entry;
+  if (!hud || !id || (bandIdentityReveal?.id === id && bandIdentityReveal.entry === entry)) return;
   clearBandIdentityReveal();
-  const handoff = Boolean(options.prepareRecordOpening);
-  if (reducedMotion.matches || document.hidden || typeof hud.animate !== "function" || (!handoff &&
-      (v3RouteContext.isResume || v3RouteContext.skipEntryAnimation || v3RouteContext.navigationCause === "back-forward"))) return;
-  const session = { id, hud, started:false, settled:false, frame:0, deadline:0, revealTimer:0, travel:null };
+  if (reducedMotion.matches || document.hidden || typeof hud.animate !== "function" ||
+      (!handoff && (!v3RouteContext.bandEntranceEligible || v3RouteContext.navigationCause === "bfcache"))) return;
+  const session = { id, entry, hud, started:false, settled:false, frame:0, deadline:0, revealTimer:0, travel:null };
   bandIdentityReveal = session;
   const current = () => bandIdentityReveal === session && !session.settled;
   session.onEnd = event => {
@@ -6391,14 +6394,20 @@ function prepareBandIdentityReveal(band, options = {}) {
   session.onScroll = () => { if (current() && session.started && bandDetailContent.scrollTop !== session.scrollTop) settleBandIdentityReveal(); };
   const sync = () => {
     if (!current()) return;
+    const preparingHandoff = session.entry === bandRecordOpening;
+    if (document.hidden || (!preparingHandoff && (getRouteFromUrl().name !== "band-detail" ||
+        getRouteFromUrl().bandId !== id || v3RouteContext.entry !== session.entry))) {
+      settleBandIdentityReveal(); return;
+    }
     if (session.started) {
-      if (bandDetailViewport.hidden || document.hidden) settleBandIdentityReveal();
+      if (bandDetailViewport.hidden) settleBandIdentityReveal();
       return;
     }
     // Let the protected Shell handoff finish first; its transient copies stay concealed.
     if (bandDetailViewport.hidden || bandDetailViewport.hasAttribute("data-band-record-stage")) return;
-    if (getRouteFromUrl().name !== "band-detail" || getRouteFromUrl().bandId !== id || bandDetailContent.scrollTop > 1) {
-      settleBandIdentityReveal(); return;
+    // Shell owns the scroll reset. Wait for it and font geometry without a new timed stage.
+    if (bandDetailContent.scrollTop > 1 || document.fonts?.status === "loading") {
+      session.frame = requestAnimationFrame(sync); return;
     }
     const rect = hud.getBoundingClientRect(), viewport = bandDetailContent.getBoundingClientRect();
     const style = getComputedStyle(bandDetailContent), visual = window.visualViewport;
@@ -6408,7 +6417,8 @@ function prepareBandIdentityReveal(band, options = {}) {
       visual ? visual.offsetTop + visual.height : innerHeight);
     const left = viewport.left + parseFloat(style.paddingLeft), right = viewport.right - parseFloat(style.paddingRight);
     const scale = Math.min(1.18, (right - left) / rect.width, (bottom - top) / rect.height);
-    if (!rect.width || !rect.height || scale < 1 || bottom <= top) { settleBandIdentityReveal(); return; }
+    if (!rect.width || !rect.height || bottom <= top) { session.frame = requestAnimationFrame(sync); return; }
+    if (scale < 1) { settleBandIdentityReveal(); return; }
     session.transform = `translate(${(left + right) / 2 - (rect.left + rect.width / 2)}px, ${(top + bottom) / 2 - (rect.top + rect.height / 2)}px) scale(${scale})`;
     session.started = true;
     session.scrollTop = bandDetailContent.scrollTop;
@@ -6434,8 +6444,8 @@ function prepareBandIdentityReveal(band, options = {}) {
   session.frame = requestAnimationFrame(sync);
 }
 window.addEventListener("pagehide", () => settleBandIdentityReveal());
-window.addEventListener("resize", () => settleBandIdentityReveal());
-window.visualViewport?.addEventListener("resize", () => settleBandIdentityReveal());
+window.addEventListener("resize", () => { if (bandIdentityReveal?.started) settleBandIdentityReveal(); });
+window.visualViewport?.addEventListener("resize", () => { if (bandIdentityReveal?.started) settleBandIdentityReveal(); });
 document.addEventListener("visibilitychange", () => { if (document.hidden) settleBandIdentityReveal(); });
 reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) settleBandIdentityReveal(); });
 
@@ -8618,6 +8628,8 @@ function returnToCapturedBandDetail(route, historyState) {
 }
 
 function restoreBandCapturedSetsScroll(session) {
+  // The Shell snapshot is newer than the last captured-set departure position.
+  if (v3RouteContext.snapshot) return;
   const saved = window.history.state?.bandCapturedSets;
   if (!saved || saved.bandId !== session.bandId || !Number.isFinite(saved.scrollTop)) return;
   // Run after the existing route's viewport reset; restore only this retained history entry.

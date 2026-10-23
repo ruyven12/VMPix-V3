@@ -313,12 +313,17 @@ function beginV3RouteContext(route,options){
   const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
   v3EntriesRenderedInDocument.add(entry);
   let snapshot=null;
-  if((cause==='reload' || reloadGap) && isCurrentV3Route(route))try{
+  if((cause==='reload' || reloadGap || (route.name==='band-detail' && cause==='back-forward')) && isCurrentV3Route(route))try{
     const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
     const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
     if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
   }catch{}
-  v3RouteContext={navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
+  // Band identification replays on a fresh visit or a top-of-page reload only.
+  const bandScrolled = Array.isArray(snapshot?.scroll) && snapshot.scroll.some(row =>
+    ['shell','[data-band-detail-content]'].includes(row?.key) && v3Number(row.top) > 1);
+  const bandEntranceEligible = route.name === 'band-detail' && !['back-forward','bfcache'].includes(cause)
+    && (cause !== 'reload' || !bandScrolled);
+  v3RouteContext={bandEntranceEligible,navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
   if(snapshot)try{if(route.name.startsWith('music')||route.name==='band-detail')seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
   queueMicrotask(()=>{
     const context=v3RouteContext;
