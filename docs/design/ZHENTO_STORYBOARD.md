@@ -82,6 +82,8 @@ Shows remain convergence nexuses: branching sonic paths meet and synchronize. Th
 
 **UNRESOLVED — Origin, purpose, current state and Listener experience.** Detailed story work is not completed. Do not infer these elements from the established convergence concept.
 
+**APPROVED EXPERIENCE DESIGN — PASS S0, 2026-10-23.** See the [Pillar of Synchronicity V1 Experience Blueprint](ZHENTO_SYNCHRONICITY_BLUEPRINT.md) for the approved Shows encounter. Its Nexus architecture and visitor sequence are experience design, not a revision of established historical lore; implementation belongs to separately scoped passes.
+
 **PROTECTED — Final names and confirmed relationships.** Preserve Pillar of Rhythm / Bands, Pillar of Melody / People, Pillar of Harmony / Venues and Pillar of Synchronicity / Shows. These are interconnected parts of Zhento's musical mythology, not merely renamed navigation categories. Protection covers explicitly confirmed story material, not unfinished story elements. Visual implementation remains unresolved and is not protected yet. Physical form, dedicated locations and frontend presentation are not determined here.
 
 The ten-beat structure below is retained with scoped consistency changes for the newer direction. Broad beats do not complete Harmony or Synchronicity's unfinished story work.
