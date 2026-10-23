@@ -1,0 +1,65 @@
+[
+  {
+    "before": true,
+    "shifts": []
+  },
+  {
+    "before": false,
+    "shifts": [
+      {
+        "at": 655.8000000044703,
+        "value": 0.0013867119683159722,
+        "recent": false,
+        "sources": [
+          "v3-state-card v3-state-card--loading",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-reset"
+        ]
+      }
+    ]
+  },
+  {
+    "before": true,
+    "shifts": [
+      {
+        "at": 691.5999999940395,
+        "value": 0.0013867119683159722,
+        "recent": false,
+        "sources": [
+          "v3-state-card v3-state-card--loading",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-reset"
+        ]
+      }
+    ]
+  },
+  {
+    "before": false,
+    "shifts": []
+  },
+  {
+    "before": true,
+    "shifts": []
+  },
+  {
+    "before": false,
+    "shifts": [
+      {
+        "at": 697.1000000014901,
+        "value": 0.0013867119683159722,
+        "recent": false,
+        "sources": [
+          "v3-state-card v3-state-card--loading",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-field",
+          "music-shows-filter-reset"
+        ]
+      }
+    ]
+  }
+]

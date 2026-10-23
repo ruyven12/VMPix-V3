@@ -1,0 +1,326 @@
+{
+  "browser": "Chrome",
+  "data": "Recorded public responses; synthetic filter/scroll fixtures; no live API verification",
+  "passed": 11,
+  "results": [
+    {
+      "name": "viewport 360x800",
+      "passed": true,
+      "width": 360,
+      "height": 712.3125,
+      "bottom": 712.3125,
+      "engineTop": 728.34375,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 518,
+        "sourceHeightVisible": 1024,
+        "leftRightCropEach": 509,
+        "topBottomCropEach": 0
+      }
+    },
+    {
+      "name": "viewport 412x915",
+      "passed": true,
+      "width": 412,
+      "height": 818.34375,
+      "bottom": 818.34375,
+      "engineTop": 834.375,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 516,
+        "sourceHeightVisible": 1024,
+        "leftRightCropEach": 510,
+        "topBottomCropEach": 0
+      }
+    },
+    {
+      "name": "viewport 480x1040",
+      "passed": true,
+      "width": 480,
+      "height": 939.515625,
+      "bottom": 939.515625,
+      "engineTop": 955.546875,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 523,
+        "sourceHeightVisible": 1024,
+        "leftRightCropEach": 506,
+        "topBottomCropEach": 0
+      }
+    },
+    {
+      "name": "viewport 1920x1080",
+      "passed": true,
+      "width": 1920,
+      "height": 979.515625,
+      "bottom": 979.515625,
+      "engineTop": 995.546875,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [
+        {
+          "at": 735.1000000014901,
+          "value": 0.0013867119683159722,
+          "recent": false,
+          "sources": [
+            "v3-state-card v3-state-card--loading",
+            "music-shows-filter-field",
+            "music-shows-filter-field",
+            "music-shows-filter-field",
+            "music-shows-filter-reset"
+          ]
+        }
+      ],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 1536,
+        "sourceHeightVisible": 784,
+        "leftRightCropEach": 0,
+        "topBottomCropEach": 120
+      }
+    },
+    {
+      "name": "viewport 412x915 safe",
+      "passed": true,
+      "width": 412,
+      "height": 793.625,
+      "bottom": 793.625,
+      "engineTop": 809.640625,
+      "gap": 16.015625,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [
+        {
+          "at": 707.4000000059605,
+          "value": 0.008088934143568951,
+          "recent": false,
+          "sources": [
+            "music-shows-grid",
+            "music-shows-filter-reset",
+            "music-shows-filter-field",
+            "music-shows-filter-field",
+            "music-shows-filter-field"
+          ]
+        }
+      ],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 532,
+        "sourceHeightVisible": 1024,
+        "leftRightCropEach": 502,
+        "topBottomCropEach": 0
+      }
+    },
+    {
+      "name": "viewport 412x915 reduced",
+      "passed": true,
+      "width": 412,
+      "height": 818.34375,
+      "bottom": 818.34375,
+      "engineTop": 834.375,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [],
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 516,
+        "sourceHeightVisible": 1024,
+        "leftRightCropEach": 510,
+        "topBottomCropEach": 0
+      }
+    },
+    {
+      "name": "search filters keyboard detail Back Forward refresh restoration",
+      "passed": true,
+      "restoredScroll": 766
+    },
+    {
+      "name": "actual Music entry, Engine Back and no leakage to protected routes",
+      "passed": true,
+      "routes": [
+        "/music",
+        "/music/bands",
+        "/music/bands/emery",
+        "/music/people",
+        "/wrestling/shows",
+        "/privacy"
+      ]
+    },
+    {
+      "name": "toolbar-height resize, touch scrolling and geometry unchanged against S2",
+      "passed": true,
+      "resizeHeights": [
+        830,
+        915,
+        1000,
+        915
+      ],
+      "layoutEqual": true
+    },
+    {
+      "name": "slow and unavailable background does not block content or shift layout",
+      "passed": true,
+      "fallback": "existing interface over dark base",
+      "shifts": 0
+    },
+    {
+      "name": "viewport 915x412",
+      "passed": true,
+      "width": 915,
+      "height": 333.109375,
+      "bottom": 333.109375,
+      "engineTop": 349.140625,
+      "gap": 16.03125,
+      "scrollTop": 0,
+      "overflow": 0,
+      "position": "50% 50%",
+      "size": "cover",
+      "attachment": "scroll",
+      "origin": "border-box",
+      "repeat": "no-repeat",
+      "color": "rgb(8, 11, 18)",
+      "image": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "animation": "none",
+      "filter": "none",
+      "scrollers": [
+        "synchronicity-viewport"
+      ],
+      "shifts": [
+        {
+          "at": 828.1000000014901,
+          "value": 0.016033471956593777,
+          "recent": false,
+          "sources": [
+            "v3-state-card v3-state-card--loading",
+            "music-shows-filter-field",
+            "music-shows-filter-field",
+            "music-shows-filter-field",
+            "music-shows-filter-reset"
+          ]
+        }
+      ],
+      "maxLayoutDifference": 0.15161895751953125,
+      "layoutMatchesS2": true,
+      "asset": {
+        "width": 1536,
+        "height": 1024
+      },
+      "crop": {
+        "sourceWidthVisible": 1536,
+        "sourceHeightVisible": 559,
+        "leftRightCropEach": 0,
+        "topBottomCropEach": 232
+      }
+    }
+  ]
+}

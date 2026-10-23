@@ -1,0 +1,38 @@
+[
+  {
+    "before": true,
+    "delayedFonts": true,
+    "shifts": [
+      {
+        "at": 1237.3999999985099,
+        "value": 0.011931689205584675,
+        "recent": false,
+        "sources": [
+          "music-shows-grid",
+          "portfolio-engine-value",
+          "music-shows-filter-reset",
+          "music-shows-filter-field",
+          "music-shows-filter-field"
+        ]
+      }
+    ]
+  },
+  {
+    "before": false,
+    "delayedFonts": true,
+    "shifts": [
+      {
+        "at": 1309.3000000044703,
+        "value": 0.011931689205584675,
+        "recent": false,
+        "sources": [
+          "music-shows-grid",
+          "portfolio-engine-value",
+          "music-shows-filter-reset",
+          "music-shows-filter-field",
+          "music-shows-filter-field"
+        ]
+      }
+    ]
+  }
+]

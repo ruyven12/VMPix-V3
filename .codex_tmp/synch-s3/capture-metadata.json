@@ -1,0 +1,19 @@
+{
+  "pass": "S3",
+  "route": "/music/shows",
+  "date": "2026-10-23T19:40:15.699Z",
+  "revision": "0090acb89e6ada85154bfddca888c0bc5af94128",
+  "applicationChanges": [
+    "css/modules.css: six-line static Shows background"
+  ],
+  "data": "Recorded public API responses for screenshots; synthetic data for filters and scroll stress checks; live Analytics blocked in isolated test context",
+  "device": "Desktop Chrome browser with CSS viewport emulation, DPR 1; not physical S25 or Safari",
+  "asset": "assets/media/background/zhento-syncronity.png, unmodified 1536x1024",
+  "position": "center center / cover; scroll attachment anchors background to viewport element, not its content",
+  "limitations": [
+    "Existing font-load reflow reproduces with S2 and S3; delayed image decoding produced no new layout shift",
+    "Existing mobile filters remain compact",
+    "Portrait cover sizing naturally crops outer architecture"
+  ],
+  "approval": "Candidate screenshots awaiting user visual signoff"
+}
