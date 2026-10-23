@@ -13596,7 +13596,7 @@ function initSynchronicityArchiveDrawer(viewport) {
     expand.textContent = expanded ? "Collapse" : "Expand";
     expand.setAttribute("aria-expanded", String(expanded));
   };
-  const change = (open, immediate = false, restoreFocus = true) => {
+  const change = (open, immediate = false, restoreFocus = true, afterClose = null) => {
     if (open && !available()) return;
     if (!immediate && state.open === open) return;
     const from = layer.hidden ? "translateY(105%)" : getComputedStyle(drawer).transform;
@@ -13628,6 +13628,7 @@ function initSynchronicityArchiveDrawer(viewport) {
         if (restoreFocus && available() && (document.activeElement === document.body || layer.contains(document.activeElement))) {
           explore.focus({ preventScroll: true });
         }
+        if (available()) afterClose?.();
         synchronicityMemoriesSession?.sync?.();
       }
     };
@@ -13642,6 +13643,13 @@ function initSynchronicityArchiveDrawer(viewport) {
       animation.cancel();
       finish();
     };
+  };
+  state.selectShow = show => {
+    if (!available() || !state.open) return;
+    const entry = state.entry;
+    change(false, false, false, () => {
+      if (state.entry === entry) synchronicityMemoriesSession?.selectShow?.(show);
+    });
   };
   state.syncRoute = () => {
     if (!available()) {
@@ -13884,18 +13892,21 @@ function prepareSynchronicityMemories() {
     session.selection = null;
     selection.panel.remove();
     delete stage.dataset.memorySelected;
-    for (const memory of session.results) memory.frame.inert = false;
+    for (const memory of session.results) if (memory.frame) memory.frame.inert = false;
     session.setPaused(false);
     viewport.scrollTop = selection.scrollTop;
-    selection.memory.frame.focus({ preventScroll: true });
+    const returnTarget = selection.fromTimeline ? viewport.querySelector("[data-synchronicity-explore]") : selection.memory.frame;
+    returnTarget?.focus({ preventScroll: true });
   };
-  const selectMemory = memory => {
-    if (!current() || viewport.inert || session.selection || !session.results.includes(memory)) return;
-    const selection = { id: memory.id, memory, scrollTop: viewport.scrollTop };
+  const selectMemory = (memory, fromTimeline = false) => {
+    if (!current() || viewport.inert || (!fromTimeline && (session.selection || !session.results.includes(memory)))) return;
+    const previous = session.selection;
+    previous?.panel.remove();
+    const selection = { id: memory.id, memory, fromTimeline, scrollTop: previous?.scrollTop ?? viewport.scrollTop };
     session.selection = selection;
     session.setPaused(true);
     stage.dataset.memorySelected = memory.id;
-    for (const item of session.results) item.frame.inert = true;
+    for (const item of session.results) if (item.frame) item.frame.inert = true;
 
     const panel = document.createElement("article");
     panel.className = "synchronicity-show";
@@ -13903,6 +13914,7 @@ function prepareSynchronicityMemories() {
     selection.panel = panel;
     const artwork = document.createElement("div");
     artwork.className = "synchronicity-show-artwork";
+    artwork.textContent = "Image unavailable";
     const title = document.createElement("h2");
     title.id = "synchronicity-selected-title";
     title.className = "synchronicity-show-title";
@@ -13916,11 +13928,12 @@ function prepareSynchronicityMemories() {
       artwork.replaceChildren(preview);
       artwork.dataset.imageKind = kind;
     };
+    selection.showImage = showImage;
     // Keep a decoded, same-show photograph visible while its explicit poster loads.
     showImage(memory.image, memory.kind);
     const date = document.createElement("p");
     date.className = "synchronicity-show-date";
-    date.textContent = getMusicShowDateLabel(memory.show);
+    date.textContent = getSynchronicityTimelineDate(memory.show) ? getMusicShowDateLabel(memory.show) : "Date unavailable";
     const venue = document.createElement("p");
     venue.className = "synchronicity-show-venue";
     venue.textContent = getMusicShowVenueName(memory.show) || "Venue unavailable";
@@ -13959,14 +13972,23 @@ function prepareSynchronicityMemories() {
     actions.append(enter, leave);
     panel.append(artwork, title, date, venue, location, bands, actions);
     stage.append(panel);
+    if (fromTimeline) viewport.scrollTop = 0;
     title.focus({ preventScroll: true });
 
     const poster = memory.show.capturedPoster;
-    if (memory.kind !== "poster" && usable(poster) && poster !== memory.image.src) {
+    if ((!memory.image || memory.kind !== "poster") && usable(poster) && poster !== memory.image?.src) {
       // At most one poster lookup per memory, shared across repeated selections.
       memory.posterPreview ||= decode(poster);
       memory.posterPreview.then(image => showImage(image, "poster"));
     }
+  };
+
+  // Timeline selections share the existing display and source records, without album requests.
+  session.selectShow = show => {
+    const id = getMusicShowIdValue(show);
+    if (!current() || !id || !source.some(record => getMusicShowIdValue(record) === id)) return;
+    const memory = session.results.find(item => item.id === id) || { id, show, image: null, kind: "poster" };
+    selectMemory(memory, true);
   };
 
   document.addEventListener("visibilitychange", session.sync);
@@ -13996,6 +14018,7 @@ function prepareSynchronicityMemories() {
       frame.className = "synchronicity-memory";
       frame.setAttribute("aria-label", show.capturedName ? "Show details for " + show.capturedName : "Show details for this performance");
       frame.addEventListener("click", () => selectMemory(memory));
+      frame.inert = Boolean(session.selection);
       frame.dataset.memoryShowId = id;
       frame.dataset.memoryKind = kind;
       image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
@@ -14010,7 +14033,15 @@ function prepareSynchronicityMemories() {
       fragment.append(frame);
     });
     stage.dataset.memoryCount = String(session.results.length);
-    stage.replaceChildren(fragment);
+    if (session.selection) {
+      // Late memory loading must not detach the focused reconstructed display.
+      stage.querySelectorAll(".synchronicity-memory").forEach(frame => frame.remove());
+      stage.prepend(fragment);
+      const selected = session.results.find(memory => memory.id === session.selection.id);
+      if (selected && !session.selection.panel.querySelector(".synchronicity-show-artwork img")) {
+        session.selection.showImage(selected.image, selected.kind);
+      }
+    } else stage.replaceChildren(fragment);
     session.sync();
   };
   (async () => {
@@ -14064,6 +14095,141 @@ function initSynchronicityMemories() {
   window.addEventListener("pageshow", prepareSynchronicityMemories);
 }
 
+// S8: local accordion state survives drawer toggles; filtering reveals all matching years.
+const synchronicityTimeline = { expanded: null, filterKey: "", filterSource: null, filteredExpanded: new Set() };
+
+function getSynchronicityTimelineDate(show) {
+  const raw = String(show.rawDate || show.date || "").trim();
+  if (!raw || /^\d{4}(?:-\d{1,2})?$/.test(raw)) return null;
+  const date = parseMusicShowDate(raw);
+  if (!date) return null;
+  // Do not assign a fabricated day when the shared parser accepts JS date rollover.
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|[T\s])/);
+  const short = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
+  const parts = iso ? [+iso[1], +iso[2], +iso[3]] : short
+    ? [+short[3] + (short[3].length === 2 ? 2000 : 0), +short[1], +short[2]] : null;
+  if (parts && (date.getFullYear() !== parts[0] || date.getMonth() + 1 !== parts[1] || date.getDate() !== parts[2])) return null;
+  return date;
+}
+
+function createSynchronicityTimeline(rows, allRows) {
+  const fragment = document.createDocumentFragment();
+  const ordered = rows.map(show => ({ show, date: getSynchronicityTimelineDate(show) }))
+    .sort((a, b) => (b.date?.getTime() ?? -Infinity) - (a.date?.getTime() ?? -Infinity) ||
+      getMusicShowTitle(a.show).localeCompare(getMusicShowTitle(b.show)));
+  const years = new Map();
+  for (const item of ordered) {
+    const year = item.date ? String(item.date.getFullYear()) : "unknown";
+    const month = item.date ? item.date.toLocaleString("en-US", { month: "long" }) : "Date unavailable";
+    if (!years.has(year)) years.set(year, new Map());
+    if (!years.get(year).has(month)) years.get(year).set(month, []);
+    years.get(year).get(month).push(item);
+  }
+  if (!synchronicityTimeline.expanded && allRows.length && musicShowsSetsDataState === "live") {
+    const latest = allRows.map(getSynchronicityTimelineDate).filter(Boolean).sort((a, b) => b - a)[0];
+    synchronicityTimeline.expanded = new Set([latest ? String(latest.getFullYear()) : "unknown"]);
+  }
+  const filtered = Boolean(activeMusicShowsSearch.trim() || activeMusicShowsYearFilter || activeMusicShowsStateFilter || activeMusicShowsVenueFilter);
+  const filterKey = JSON.stringify([activeMusicShowsSearch, activeMusicShowsYearFilter, activeMusicShowsStateFilter, activeMusicShowsVenueFilter]);
+  if (synchronicityTimeline.filterKey !== filterKey || synchronicityTimeline.filterSource !== musicShowsSetsCollection) {
+    synchronicityTimeline.filterKey = filterKey;
+    synchronicityTimeline.filterSource = musicShowsSetsCollection;
+    synchronicityTimeline.filteredExpanded = new Set(years.keys());
+  }
+  const expanded = filtered ? synchronicityTimeline.filteredExpanded : (synchronicityTimeline.expanded || new Set());
+  for (const [year, months] of years) {
+    const group = document.createElement("li");
+    group.className = "synchronicity-timeline-year";
+    group.dataset.timelineYear = year;
+    const heading = document.createElement("h3");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "synchronicity-timeline-toggle";
+    const label = document.createElement("span");
+    label.textContent = year === "unknown" ? "Undated shows" : year;
+    const count = [...months.values()].reduce((sum, items) => sum + items.length, 0);
+    const total = document.createElement("span");
+    total.className = "synchronicity-timeline-count";
+    total.textContent = count + (count === 1 ? " show" : " shows");
+    const chevron = document.createElement("span");
+    chevron.className = "synchronicity-timeline-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    toggle.append(label, total, chevron);
+    heading.append(toggle);
+    const body = document.createElement("div");
+    body.id = "synchronicity-year-" + year;
+    body.className = "synchronicity-timeline-months";
+    toggle.setAttribute("aria-controls", body.id);
+    const update = () => {
+      const open = expanded.has(year);
+      toggle.setAttribute("aria-expanded", String(open));
+      body.hidden = !open;
+    };
+    update();
+    toggle.addEventListener("click", () => {
+      expanded.has(year) ? expanded.delete(year) : expanded.add(year);
+      update(); // Toggle existing nodes only; retain images, focus, and scroll ownership.
+    });
+    for (const [month, items] of months) {
+      const monthHeading = document.createElement("h4");
+      monthHeading.textContent = month;
+      const list = document.createElement("ul");
+      list.className = "synchronicity-timeline-entries";
+      for (const { show, date } of items) {
+        const row = document.createElement("li");
+        const entry = document.createElement("button");
+        entry.type = "button";
+        entry.className = "synchronicity-timeline-entry";
+        const id = getMusicShowIdValue(show);
+        entry.dataset.timelineShowId = id;
+        entry.disabled = !id || musicShowsSetsDataState !== "live";
+        const thumb = document.createElement("span");
+        thumb.className = "synchronicity-timeline-thumb";
+        thumb.setAttribute("aria-hidden", "true");
+        const fallback = document.createElement("span");
+        fallback.textContent = "Image unavailable";
+        thumb.append(fallback);
+        // Explicit posters only; no per-entry gallery lookups or generic photographic aliases.
+        const poster = show.capturedPoster;
+        if (poster && isMusicShowPosterImageSrc(poster) && poster !== SET_GALLERY_NO_POSTER_IMAGE_SRC) {
+          const image = document.createElement("img");
+          image.alt = "";
+          image.loading = "lazy";
+          image.decoding = "async";
+          image.width = 56;
+          image.height = 72;
+          image.addEventListener("load", () => { fallback.hidden = true; image.dataset.loaded = ""; }, { once: true });
+          image.addEventListener("error", () => image.remove(), { once: true });
+          image.src = poster;
+          thumb.append(image);
+        }
+        const detail = document.createElement("span");
+        detail.className = "synchronicity-timeline-detail";
+        const name = document.createElement("strong");
+        name.textContent = show.capturedName || "Show name unavailable";
+        const when = document.createElement("span");
+        when.textContent = date ? getMusicShowDateLabel(show) : "Date unavailable";
+        const venue = document.createElement("span");
+        venue.textContent = getMusicShowVenueName(show) || "Venue unavailable";
+        detail.append(name, when, venue);
+        if (!id) {
+          const unavailable = document.createElement("span");
+          unavailable.textContent = "Show identity unavailable";
+          detail.append(unavailable);
+        }
+        entry.append(thumb, detail);
+        entry.addEventListener("click", () => synchronicityArchiveDrawer?.selectShow(show));
+        row.append(entry);
+        list.append(row);
+      }
+      body.append(monthHeading, list);
+    }
+    group.append(heading, body);
+    fragment.append(group);
+  }
+  return fragment;
+}
+
 function renderMusicShowsArchive(options = {}) {
   if (!musicActivityPanel || !musicActivityList) {
     return;
@@ -14077,8 +14243,8 @@ function renderMusicShowsArchive(options = {}) {
   }
 
   musicActivityPanel.classList.add("music-shows-archive");
-  musicActivityList.className = "music-shows-grid";
-  musicActivityList.setAttribute("aria-label", "Shows archive rows");
+  musicActivityList.className = "music-shows-grid synchronicity-timeline";
+  musicActivityList.setAttribute("aria-label", "Chronological Shows timeline");
   musicActivityList.replaceChildren();
 
   const existingYearBar = musicActivityPanel.querySelector("[data-music-shows-years]");
@@ -14118,12 +14284,7 @@ function renderMusicShowsArchive(options = {}) {
       retry: true,
     }));
   } else {
-    filteredRows.forEach((show) => {
-      const item = document.createElement("li");
-      item.className = "music-shows-item";
-      item.append(createMusicShowsCard(show));
-      fragment.append(item);
-    });
+    fragment.append(createSynchronicityTimeline(filteredRows, allRows));
     if (forcedState === "partial") {
       renderMockState(fragment, "partial", "musicShows", { itemTag: "li", itemClass: "music-shows-empty" });
     }

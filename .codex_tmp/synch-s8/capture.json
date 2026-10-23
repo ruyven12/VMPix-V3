@@ -1,0 +1,212 @@
+{
+  "seconds": 20.826120138168335,
+  "frames": 603,
+  "timeline": [
+    {
+      "label": "Nexus",
+      "at": 1792795104769,
+      "state": {
+        "open": false,
+        "expanded": false,
+        "scroll": 0,
+        "motion": "running",
+        "years": [
+          {
+            "year": "2026",
+            "open": "true"
+          },
+          {
+            "year": "2025",
+            "open": "false"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Drawer opens; latest year expanded",
+      "at": 1792795108376,
+      "state": {
+        "open": true,
+        "expanded": false,
+        "scroll": 0,
+        "motion": "paused",
+        "years": [
+          {
+            "year": "2026",
+            "open": "true"
+          },
+          {
+            "year": "2025",
+            "open": "false"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Touch browsing",
+      "at": 1792795112320,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 125,
+        "motion": "paused",
+        "years": [
+          {
+            "year": "2026",
+            "open": "true"
+          },
+          {
+            "year": "2025",
+            "open": "false"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Both years collapsed",
+      "at": 1792795114300,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "paused",
+        "years": [
+          {
+            "year": "2026",
+            "open": "false"
+          },
+          {
+            "year": "2025",
+            "open": "false"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Older year independently expanded",
+      "at": 1792795116501,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "paused",
+        "years": [
+          {
+            "year": "2026",
+            "open": "false"
+          },
+          {
+            "year": "2025",
+            "open": "true"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Mosh for Tots selected",
+      "at": 1792795119545,
+      "state": {
+        "open": false,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "paused",
+        "selected": "237",
+        "years": [
+          {
+            "year": "2026",
+            "open": "false"
+          },
+          {
+            "year": "2025",
+            "open": "true"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Return to echoes; rotation resumes",
+      "at": 1792795121926,
+      "state": {
+        "open": false,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "running",
+        "years": [
+          {
+            "year": "2026",
+            "open": "false"
+          },
+          {
+            "year": "2025",
+            "open": "true"
+          }
+        ]
+      }
+    },
+    {
+      "label": "Reopened with years and position retained",
+      "at": 1792795123810,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "paused",
+        "years": [
+          {
+            "year": "2026",
+            "open": "false"
+          },
+          {
+            "year": "2025",
+            "open": "true"
+          }
+        ]
+      }
+    }
+  ],
+  "metrics": {
+    "overflow": 0,
+    "shifts": [],
+    "animation": null,
+    "timers": 3
+  },
+  "requests": [
+    {
+      "id": "zsRbjf",
+      "limit": 1,
+      "start": 1,
+      "at": 1792795104579
+    },
+    {
+      "id": "LztvDF",
+      "limit": 1,
+      "start": 1,
+      "at": 1792795104579
+    },
+    {
+      "id": "MfPF76",
+      "limit": 1,
+      "start": 1,
+      "at": 1792795104694
+    },
+    {
+      "id": "zsRbjf",
+      "limit": 3,
+      "start": 2,
+      "at": 1792795104718
+    },
+    {
+      "id": "LztvDF",
+      "limit": 3,
+      "start": 2,
+      "at": 1792795104719
+    },
+    {
+      "id": "MfPF76",
+      "limit": 3,
+      "start": 2,
+      "at": 1792795104721
+    }
+  ],
+  "evidence": "Local S8 implementation. Captured public API records and real SmugMug imagery. Native touch events in Chrome emulation, not physical S25 evidence. Analytics blocked."
+}
