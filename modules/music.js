@@ -888,6 +888,8 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
 
   bandDetailViewSets?.remove();
   renderBandCapturedSetsState(stateName === "loading" ? "loading" : "unavailable");
+  cancelBandCapturedSetInteraction();
+  bandCapturedSetsSession?.events.abort();
   bandCapturedSetsSession = null;
   clearBandDetailPhotograph();
   const normalizedBandId = String(bandId || "").trim();
@@ -5949,6 +5951,7 @@ function setMusicVenueIndexVisible(isVisible) {
 }
 
 function setBandDetailVisible(isVisible) {
+  if (!isVisible) cancelBandCapturedSetInteraction();
   if (!isVisible) cancelBandPersonnelLookup();
   if (!isVisible) settleBandContentTransition();
   if (!isVisible) clearBandIdentityReveal();
@@ -6112,7 +6115,7 @@ function showBandsIndexView(options = {}) {
 }
 
 // Local Band Detail tabs. The inactive panel retains its grid space, not its interactivity.
-const bandContentState = { bandId: null, active: "logo", transition: null };
+const bandContentState = { bandId: null, entry: null, active: "statistics", transition: null };
 function renderBandContentSelection() {
   const active = bandContentState.active;
   bandDetail?.querySelectorAll("[data-band-content-tab]").forEach(tab => {
@@ -6128,6 +6131,7 @@ function renderBandContentSelection() {
     panel.tabIndex = selected ? 0 : -1;
   });
   if (active === "sets") loadBandCapturedSetPoster(bandCapturedSetsSession);
+  else cancelBandCapturedSetInteraction();
 }
 function settleBandContentTransition() {
   const transition = bandContentState.transition;
@@ -6140,10 +6144,14 @@ function settleBandContentTransition() {
   renderBandContentSelection();
 }
 function syncBandContentBand(bandId) {
-  if (bandContentState.bandId === bandId) return;
+  const entry = v3RouteContext.entry;
+  if (bandContentState.bandId === bandId && bandContentState.entry === entry) return;
   settleBandContentTransition();
   bandContentState.bandId = bandId;
-  bandContentState.active = "logo";
+  bandContentState.entry = entry;
+  const saved = window.history.state?.bandContentSelection;
+  const restored = saved?.bandId === bandId ? saved.tab : v3ResumeUI().bandTab;
+  bandContentState.active = ["logo", "info", "statistics", "personnel", "sets"].includes(restored) ? restored : "statistics";
   renderBandContentSelection();
 }
 async function selectBandContent(next) {
@@ -6151,6 +6159,12 @@ async function selectBandContent(next) {
   if (next === "personnel") requestBandPersonnelLinks();
   settleBandContentTransition();
   if (next === bandContentState.active) return;
+  cancelBandCapturedSetInteraction();
+  const route = getRouteFromUrl();
+  if (route.name === "band-detail" && route.bandId === bandContentState.bandId) {
+    // Local UI state belongs to this existing history entry, not a new navigation.
+    window.history.replaceState({ ...window.history.state, bandContentSelection: { bandId: route.bandId, tab: next } }, "", window.location.href);
+  }
   const stage = bandDetail?.querySelector("[data-band-content-stage]");
   const pixels = Array.from(stage?.querySelectorAll("clipPath rect") || []);
   const commit = () => { bandContentState.active = next; renderBandContentSelection(); };
@@ -6216,12 +6230,17 @@ function initBandContentTabs() {
     selectBandContent(next.dataset.bandContentTab);
   });
   const finish = () => {
+    cancelBandCapturedSetInteraction();
     if (bandContentState.transition) bandContentState.active = bandContentState.transition.target;
     settleBandContentTransition();
   };
   reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) finish(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden) finish(); });
   window.addEventListener("pagehide", finish);
+  // The Shell can hide this retained viewport directly when returning to the Pillar.
+  new MutationObserver(() => {
+    if (bandDetailViewport.hidden || bandDetailViewport.inert) cancelBandCapturedSetInteraction();
+  }).observe(bandDetailViewport, { attributes: true, attributeFilter: ["hidden", "inert"] });
 }
 
 
@@ -8647,8 +8666,81 @@ function loadBandCapturedSetPoster(session) {
   }
 }
 
-function selectBandCapturedSet(session, index) {
+function cancelBandCapturedSetInteraction(session = bandCapturedSetsSession) {
+  if (!session) return;
+  const gesture = session.gesture;
+  session.gesture = null;
+  if (gesture && session.list.hasPointerCapture?.(gesture.id)) session.list.releasePointerCapture(gesture.id);
+  session.animation?.cancel();
+  session.animation = null;
+  session.suppressClickUntil = 0;
+}
+
+function bindBandCapturedSetInteraction(session, panel) {
+  const list = session.list;
+  const available = () => bandCapturedSetsSession === session && bandContentState.active === 'sets'
+    && !bandContentState.transition && !bandDetail.closest('[inert], [aria-hidden="true"]')
+    && getRouteFromUrl().name === 'band-detail' && getRouteFromUrl().bandId === session.bandId;
+  list.addEventListener('pointerdown', event => {
+    if (!available() || event.pointerType === 'mouse' || !event.isPrimary) return;
+    session.suppressClickUntil = 0;
+    session.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, horizontal: false, context: v3RouteContext };
+  });
+  list.addEventListener('pointermove', event => {
+    const gesture = session.gesture;
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const x = Math.abs(event.clientX - gesture.x), y = Math.abs(event.clientY - gesture.y);
+    if (!gesture.horizontal && y > 12 && y >= x) { session.gesture = null; return; }
+    if (x > 12 && x > y) {
+      gesture.horizontal = true;
+      // Capture only a deliberate horizontal drag; normal taps retain their poster target.
+      try { list.setPointerCapture(event.pointerId); } catch { /* Capture is optional. */ }
+      event.preventDefault();
+    }
+  }, { passive: false });
+  list.addEventListener('pointerup', event => {
+    const gesture = session.gesture;
+    if (!gesture || gesture.id !== event.pointerId) return;
+    session.gesture = null;
+    if (list.hasPointerCapture?.(event.pointerId)) list.releasePointerCapture(event.pointerId);
+    const x = event.clientX - gesture.x, y = event.clientY - gesture.y;
+    if (!available() || gesture.context !== v3RouteContext) {
+      session.suppressClickUntil = performance.now() + 500;
+      event.preventDefault();
+      return;
+    }
+    if (!gesture.horizontal && Math.abs(x) <= Math.abs(y)) return;
+    if (Math.abs(x) > 12 || gesture.horizontal) {
+      // Also suppress edge/sub-threshold drags; they must not accidentally open a set.
+      session.suppressClickUntil = performance.now() + 500;
+      event.preventDefault();
+    }
+    // Hall of Crusades uses a 36px, horizontally dominant swipe. No wrapping at either end.
+    if (Math.abs(x) >= 36 && Math.abs(x) > Math.abs(y)) selectBandCapturedSet(session, session.selected + (x < 0 ? 1 : -1), true);
+  });
+  list.addEventListener('pointercancel', () => { session.gesture = null; });
+  list.addEventListener('lostpointercapture', event => { if (event.target === list) session.gesture = null; });
+  list.addEventListener('click', event => {
+    if (event.detail && performance.now() < session.suppressClickUntil) {
+      session.suppressClickUntil = 0;
+      event.preventDefault(); event.stopImmediatePropagation();
+    }
+  }, true);
+  panel.closest('[role=tabpanel]').addEventListener('keydown', event => {
+    if (event.defaultPrevented || !available() || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    selectBandCapturedSet(session, session.selected + (event.key === 'ArrowRight' ? 1 : -1), true);
+  }, { signal: session.events.signal });
+}
+
+function selectBandCapturedSet(session, index, userInitiated = false) {
   if (bandCapturedSetsSession !== session || !Number.isInteger(index) || index < 0 || index >= session.rows.length) return;
+  const changed = session.selected !== index;
+  const direction = Math.sign(index - session.selected);
+  const focusedPoster = session.list.contains(document.activeElement);
+  const focusedControl = [session.previous, session.next].find(button => button === document.activeElement);
+  session.animation?.cancel();
+  session.animation = null;
   session.selected = index;
   Array.from(session.list.children).forEach((item, position) => {
     const selected = position === index;
@@ -8660,6 +8752,28 @@ function selectBandCapturedSet(session, index) {
   session.next.disabled = index === session.rows.length - 1;
   session.counter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(session.rows.length).padStart(2, '0');
   loadBandCapturedSetPoster(session);
+  if (changed && userInitiated) {
+    window.history.replaceState({ ...window.history.state, bandCapturedSets: {
+      bandId: session.bandId, index, setCode: session.rows[index].setCode,
+    } }, '', window.location.href);
+    const current = session.list.children[index];
+    if (focusedPoster) (current.querySelector('button:not(:disabled)') || session.list).focus({ preventScroll: true });
+    else if (focusedControl?.disabled) (index === 0 ? session.next : session.previous).focus({ preventScroll: true });
+    if (!reducedMotion.matches && !document.hidden && current.animate) {
+      session.animation = current.animate([
+        { transform: 'translateX(' + (direction * 12) + 'px)', opacity: .65 },
+        { transform: 'translateX(0)', opacity: 1 },
+      ], { duration: 180, easing: 'ease-out' });
+    }
+  }
+}
+
+function getBandCapturedSetResumeIndex(rows, bandId, existing) {
+  const saved = window.history.state?.bandCapturedSets;
+  const resume = v3ResumeUI();
+  const code = resume.capturedSetCode || (saved?.bandId === bandId ? saved.setCode : '') || (existing?.bandId === bandId && existing.entry === v3RouteContext.entry ? existing.rows[existing.selected]?.setCode : '');
+  const found = rows.findIndex(show => show.setCode === code);
+  return found >= 0 ? found : Math.max(0, Math.min(rows.length - 1, Math.floor(v3Number(resume.capturedIndex ?? (saved?.bandId === bandId ? saved.index : 0)))));
 }
 
 function renderBandCapturedSets(band) {
@@ -8668,9 +8782,15 @@ function renderBandCapturedSets(band) {
   const bandId = getBandId(band);
   const existing = bandCapturedSetsSession;
   if (existing?.bandId === bandId && existing.source === musicShowsSetsCollection && musicShowsSetsDataState === 'live') {
+    if (existing.entry !== v3RouteContext.entry) {
+      selectBandCapturedSet(existing, getBandCapturedSetResumeIndex(existing.rows, bandId, existing));
+      existing.entry = v3RouteContext.entry;
+    }
     restoreBandCapturedSetsScroll(existing);
     return;
   }
+  cancelBandCapturedSetInteraction();
+  existing?.events.abort();
   bandCapturedSetsSession = null;
   // Legacy fallback rows are not evidence of this Band's captured sets.
   if (!['live', 'empty'].includes(musicShowsSetsDataState)) {
@@ -8681,6 +8801,8 @@ function renderBandCapturedSets(band) {
   if (!rows.length) { renderBandCapturedSetsState('empty'); return; }
   const list = document.createElement('ul');
   list.className = 'band-captured-sets-list';
+  list.tabIndex = -1;
+  list.setAttribute('aria-label', 'Captured sets; use Left and Right arrow keys to browse');
   rows.forEach((show, index) => {
     const item = createSetsListRow(show, false, { captured: true });
     item.setAttribute('aria-label', 'Set ' + (index + 1) + ' of ' + rows.length);
@@ -8699,15 +8821,12 @@ function renderBandCapturedSets(band) {
   next.type = 'button'; next.textContent = 'Next'; next.dataset.capturedDirection = 'next';
   next.setAttribute('aria-label', 'Next captured set');
   controls.append(previous, counter, next);
-  const session = { bandId, source: musicShowsSetsCollection, rows, selected: 0, list, previous, next, counter };
+  const session = { bandId, entry: v3RouteContext.entry, source: musicShowsSetsCollection, rows, selected: 0, list, previous, next, counter, events: new AbortController() };
   bandCapturedSetsSession = session;
-  previous.addEventListener('click', () => selectBandCapturedSet(session, session.selected - 1));
-  next.addEventListener('click', () => selectBandCapturedSet(session, session.selected + 1));
-  const saved = window.history.state?.bandCapturedSets;
-  const resume = v3RouteContext.pending ? v3ResumeUI() : null;
-  const code = resume?.capturedSetCode || (saved?.bandId === bandId ? saved.setCode : '') || (existing?.bandId === bandId ? existing.rows[existing.selected]?.setCode : '');
-  const found = rows.findIndex(show => show.setCode === code);
-  const index = found >= 0 ? found : Math.max(0, Math.min(rows.length - 1, Math.floor(v3Number(resume?.capturedIndex ?? (saved?.bandId === bandId ? saved.index : 0)))));
+  previous.addEventListener('click', () => selectBandCapturedSet(session, session.selected - 1, true));
+  next.addEventListener('click', () => selectBandCapturedSet(session, session.selected + 1, true));
+  bindBandCapturedSetInteraction(session, panel);
+  const index = getBandCapturedSetResumeIndex(rows, bandId, existing);
   panel.setAttribute('aria-busy', 'false');
   panel.replaceChildren(list, controls);
   selectBandCapturedSet(session, index);
@@ -15642,7 +15761,7 @@ function initMusicModule() {
 let musicSourceResume=null;
 function captureMusicResumeState(route) {
   if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
-  if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,bandTab:bandContentState.active,capturedIndex:bandCapturedSetsSession?.selected || 0,capturedSetCode:bandCapturedSetsSession?.rows[bandCapturedSetsSession.selected]?.setCode || ''};
+  if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,bandTab:bandContentState.transition?.target || bandContentState.active,capturedIndex:bandCapturedSetsSession?.selected || 0,capturedSetCode:bandCapturedSetsSession?.rows[bandCapturedSetsSession.selected]?.setCode || ''};
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
 }
 function seedMusicResumeState(route,ui) {
@@ -15664,7 +15783,10 @@ function restoreMusicResumeState(route,ui) {
   if(route.name==='band-detail'){
     if(!musicBandsIndexLoaded)return musicBandsIndex.dataset.bandsDataState==='error';
     if(!findBandById(route.bandId))return true;
-    if(ui.bandTab==='sets'){bandContentState.active='sets';renderBandContentSelection();}
+    if(['logo','info','statistics','personnel','sets'].includes(ui.bandTab)){
+      bandContentState.active=ui.bandTab;renderBandContentSelection();
+      if(ui.bandTab==='personnel')requestBandPersonnelLinks();
+    }
     return musicShowsSetsLoaded || musicShowsSetsDataState==='error';
   }
   return true;

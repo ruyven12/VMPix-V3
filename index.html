@@ -906,15 +906,15 @@
                 <h3 class="band-detail-name" id="band-detail-title" data-band-detail-name>Astra Vale</h3>
               </header>
               <div class="band-content-tabs" role="tablist" aria-label="Band archive sections">
-                <button class="band-content-tab" id="band-logo-tab" data-band-content-tab="logo" type="button" role="tab" aria-selected="true" aria-controls="band-logo-panel">LOGO</button>
+                <button class="band-content-tab" id="band-logo-tab" data-band-content-tab="logo" type="button" role="tab" aria-selected="false" aria-controls="band-logo-panel" tabindex="-1">LOGO</button>
                 <button class="band-content-tab" id="band-info-tab" data-band-content-tab="info" type="button" role="tab" aria-selected="false" aria-controls="band-info-panel" tabindex="-1">INFO</button>
-                <button class="band-content-tab" id="band-statistics-tab" data-band-content-tab="statistics" type="button" role="tab" aria-selected="false" aria-controls="band-statistics-panel" tabindex="-1">STATISTICS</button>
+                <button class="band-content-tab" id="band-statistics-tab" data-band-content-tab="statistics" type="button" role="tab" aria-selected="true" aria-controls="band-statistics-panel">STATISTICS</button>
                 <button class="band-content-tab" id="band-personnel-tab" data-band-content-tab="personnel" type="button" role="tab" aria-selected="false" aria-controls="band-personnel-panel" tabindex="-1">PERSONNEL</button>
                 <button class="band-content-tab" id="band-sets-tab" data-band-content-tab="sets" type="button" role="tab" aria-selected="false" aria-controls="band-sets-panel" tabindex="-1">SETS</button>
               </div>
               <div class="band-content-stage" data-band-content-stage>
                 <svg class="band-content-mask" aria-hidden="true" focusable="false"><defs><clipPath id="band-content-pixels" clipPathUnits="objectBoundingBox"></clipPath></defs></svg>
-                <section class="band-logo-panel band-content-panel is-active" data-band-content-panel="logo" id="band-logo-panel" role="tabpanel" aria-labelledby="band-logo-tab" tabindex="0">
+                <section class="band-logo-panel band-content-panel" data-band-content-panel="logo" id="band-logo-panel" role="tabpanel" aria-labelledby="band-logo-tab" aria-hidden="true" tabindex="-1" inert>
                   <div class="band-detail-poster" role="img" aria-label="Astra Vale placeholder band poster">
                     <div class="band-detail-logo" aria-hidden="true">
                       <img class="band-detail-logo-image" alt="" data-band-detail-logo-image hidden>
@@ -930,7 +930,7 @@
                     <div class="band-info-row" data-band-identity-last-seen><dt>Last Seen/Performed:</dt><dd>Not available</dd></div>
                   </dl>
                 </section>
-                <section class="band-content-panel" id="band-statistics-panel" data-band-content-panel="statistics" role="tabpanel" aria-labelledby="band-statistics-tab" aria-hidden="true" tabindex="-1" inert>
+                <section class="band-content-panel is-active" id="band-statistics-panel" data-band-content-panel="statistics" role="tabpanel" aria-labelledby="band-statistics-tab" tabindex="0">
                   <div class="band-statistics-dossier">
                     <div class="band-detail-completion" aria-label="Archive completion">
                       <div class="band-detail-completion-head">
