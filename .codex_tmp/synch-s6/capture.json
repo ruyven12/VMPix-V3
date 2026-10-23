@@ -1,0 +1,105 @@
+{
+  "seconds": 18.920063018798828,
+  "frames": 568,
+  "timeline": [
+    {
+      "label": "Floating echoes",
+      "at": 1792790834081,
+      "state": {
+        "selected": null,
+        "motion": "running",
+        "scroll": 0
+      }
+    },
+    {
+      "label": "Select Anberlin",
+      "at": 1792790836646,
+      "state": {
+        "selected": "239",
+        "motion": "paused",
+        "scroll": 0
+      }
+    },
+    {
+      "label": "Return and resume",
+      "at": 1792790840397,
+      "state": {
+        "selected": null,
+        "motion": "running",
+        "scroll": 0
+      }
+    },
+    {
+      "label": "Select Burning Time",
+      "at": 1792790844952,
+      "state": {
+        "selected": "238",
+        "motion": "paused",
+        "scroll": 0
+      }
+    },
+    {
+      "label": "Return again",
+      "at": 1792790848539,
+      "state": {
+        "selected": null,
+        "motion": "running",
+        "scroll": 0
+      }
+    }
+  ],
+  "metrics": {
+    "overflow": 0,
+    "shifts": [],
+    "timers": 3,
+    "layers": [
+      1,
+      1,
+      1
+    ],
+    "ids": [
+      "239",
+      "238",
+      "237"
+    ]
+  },
+  "requests": [
+    {
+      "id": "zsRbjf",
+      "limit": 1,
+      "start": 1,
+      "at": 1792790833596
+    },
+    {
+      "id": "LztvDF",
+      "limit": 1,
+      "start": 1,
+      "at": 1792790833597
+    },
+    {
+      "id": "MfPF76",
+      "limit": 1,
+      "start": 1,
+      "at": 1792790833829
+    },
+    {
+      "id": "zsRbjf",
+      "limit": 3,
+      "start": 2,
+      "at": 1792790833856
+    },
+    {
+      "id": "LztvDF",
+      "limit": 3,
+      "start": 2,
+      "at": 1792790833856
+    },
+    {
+      "id": "MfPF76",
+      "limit": 3,
+      "start": 2,
+      "at": 1792790833860
+    }
+  ],
+  "evidence": "Local app with captured public Shows records and real SmugMug imagery; Chrome touch emulation, not a physical S25 device. No live Analytics."
+}

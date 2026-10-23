@@ -33565,3 +33565,144 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .synchronicity-memories[data-memory-motion] .synchronicity-memory[data-memory-living="true"] { animation-play-state: paused; }
 }
+
+/* S6: local memory selection; the Shell viewport remains the only page scroller. */
+.synchronicity-memory {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.synchronicity-memory:focus-visible {
+  outline: none;
+  background: linear-gradient(135deg, #dbeaff, #8bbcff 48%, #bb9afa);
+  box-shadow: inset 0 0 0 3px #dbeaff;
+}
+.synchronicity-memory:focus-visible img {
+  outline: 2px solid #dbeaff;
+  outline-offset: -5px;
+}
+.synchronicity-memories[data-memory-selected] {
+  height: auto;
+  min-height: clamp(190px, 36svh, 360px);
+}
+.synchronicity-memories[data-memory-selected] > .synchronicity-memory {
+  visibility: hidden;
+  pointer-events: none;
+}
+.synchronicity-show {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 16px clamp(12px, 3vw, 28px) 20px;
+  text-align: center;
+  pointer-events: auto;
+  overflow-wrap: anywhere;
+  color: #e7ebfa;
+  background: linear-gradient(90deg, transparent, rgba(8, 12, 28, .76) 18%, rgba(8, 12, 28, .76) 82%, transparent);
+}
+.synchronicity-show-artwork {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  height: clamp(210px, 34svh, 390px);
+  margin: 0 auto 18px;
+  padding: 8px;
+  background:
+    linear-gradient(135deg, #94acd4 0 1px, transparent 1px) top left,
+    linear-gradient(225deg, #8274be 0 1px, transparent 1px) top right,
+    linear-gradient(315deg, #94acd4 0 1px, transparent 1px) bottom right,
+    linear-gradient(45deg, #8274be 0 1px, transparent 1px) bottom left;
+  background-size: 14px 14px;
+  background-repeat: no-repeat;
+  border-block: 1px solid rgba(123, 149, 215, .48);
+}
+.synchronicity-show-artwork img {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.synchronicity-show-title {
+  margin: 0 auto 12px;
+  max-width: 30ch;
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 3.6vw, 1.7rem);
+  line-height: 1.35;
+  font-weight: 600;
+  color: #eef1ff;
+  text-shadow: 0 2px 4px #080c1c;
+}
+.synchronicity-show-title:focus { outline: none; }
+.synchronicity-show-date,
+.synchronicity-show-venue,
+.synchronicity-show-location {
+  margin: 5px auto;
+  max-width: 58ch;
+  font-size: clamp(.83rem, 2.7vw, .98rem);
+  line-height: 1.5;
+  text-shadow: 0 1px 3px #080c1c;
+}
+.synchronicity-show-date { color: #c0c4ed; }
+.synchronicity-show-location { color: #c4cbdc; }
+.synchronicity-show-bands {
+  margin: 14px auto 0;
+  padding-top: 12px;
+  max-width: 58ch;
+  border-top: 1px solid rgba(126, 145, 204, .3);
+}
+.synchronicity-show-bands h3 {
+  margin: 0 0 7px;
+  font: inherit;
+  font-size: .76rem;
+  color: #bbc0e7;
+}
+.synchronicity-show-bands ul {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.synchronicity-show-bands li,
+.synchronicity-show-bands p {
+  margin: 0;
+  font-size: .86rem;
+  line-height: 1.5;
+}
+.synchronicity-show-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 430px;
+  margin: 20px auto 0;
+}
+.synchronicity-show-actions button {
+  min-height: 44px;
+  min-width: 0;
+  padding: 10px 8px;
+  font-family: var(--font-display);
+  font-size: clamp(.67rem, 2.2vw, .8rem);
+  line-height: 1.4;
+  color: #e2e9ff;
+  border: 1px solid rgba(132, 150, 220, .68);
+  background: linear-gradient(125deg, rgba(35, 45, 85, .65), rgba(32, 22, 62, .6));
+  cursor: pointer;
+}
+.synchronicity-show-actions button:focus-visible {
+  outline: 2px solid #c2d6ff;
+  outline-offset: 3px;
+}
+.synchronicity-show-actions button:disabled { opacity: .65; cursor: default; }
+@media (min-width: 1000px) {
+  .synchronicity-memories[data-memory-selected] { min-height: clamp(260px, 39svh, 420px); }
+}

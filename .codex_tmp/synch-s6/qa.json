@@ -1,0 +1,2087 @@
+[
+  {
+    "name": "360x800",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 712.3125,
+            "top": 0,
+            "right": 360,
+            "bottom": 712.3125,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24,
+            "y": 26,
+            "width": 312,
+            "height": 272,
+            "top": 26,
+            "right": 336,
+            "bottom": 298,
+            "left": 24
+          },
+          "imageFit": "contain",
+          "scrollWidth": 360,
+          "clientWidth": 360,
+          "buttons": [
+            {
+              "x": 24,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 175,
+              "bottom": 555.59375,
+              "left": 24
+            },
+            {
+              "x": 185,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 336,
+              "bottom": 555.59375,
+              "left": 185
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 712.3125,
+            "top": 0,
+            "right": 360,
+            "bottom": 712.3125,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24,
+            "y": 26,
+            "width": 312,
+            "height": 272,
+            "top": 26,
+            "right": 336,
+            "bottom": 298,
+            "left": 24
+          },
+          "imageFit": "contain",
+          "scrollWidth": 360,
+          "clientWidth": 360,
+          "buttons": [
+            {
+              "x": 24,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 175,
+              "bottom": 555.59375,
+              "left": 24
+            },
+            {
+              "x": 185,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 336,
+              "bottom": 555.59375,
+              "left": 185
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 712.3125,
+            "top": 0,
+            "right": 360,
+            "bottom": 712.3125,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 728.34375,
+            "width": 341.46875,
+            "height": 62.390625,
+            "top": 728.34375,
+            "right": 350.734375,
+            "bottom": 790.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24,
+            "y": 26,
+            "width": 312,
+            "height": 272,
+            "top": 26,
+            "right": 336,
+            "bottom": 298,
+            "left": 24
+          },
+          "imageFit": "contain",
+          "scrollWidth": 360,
+          "clientWidth": 360,
+          "buttons": [
+            {
+              "x": 24,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 175,
+              "bottom": 555.59375,
+              "left": 24
+            },
+            {
+              "x": 185,
+              "y": 511.59375,
+              "width": 151,
+              "height": 44,
+              "top": 511.59375,
+              "right": 336,
+              "bottom": 555.59375,
+              "left": 185
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790777258
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790777258
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790777289
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790777300
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790777301
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790777304
+      }
+    ]
+  },
+  {
+    "name": "412x915",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 818.34375,
+            "top": 0,
+            "right": 412,
+            "bottom": 818.34375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24.359375,
+            "y": 26,
+            "width": 363.28125,
+            "height": 311.09375,
+            "top": 26,
+            "right": 387.640625,
+            "bottom": 337.09375,
+            "left": 24.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 24.359375,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 201,
+              "bottom": 594.6875,
+              "left": 24.359375
+            },
+            {
+              "x": 211,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 387.640625,
+              "bottom": 594.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 818.34375,
+            "top": 0,
+            "right": 412,
+            "bottom": 818.34375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24.359375,
+            "y": 26,
+            "width": 363.28125,
+            "height": 311.09375,
+            "top": 26,
+            "right": 387.640625,
+            "bottom": 337.09375,
+            "left": 24.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 24.359375,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 201,
+              "bottom": 594.6875,
+              "left": 24.359375
+            },
+            {
+              "x": 211,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 387.640625,
+              "bottom": 594.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 818.34375,
+            "top": 0,
+            "right": 412,
+            "bottom": 818.34375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 834.375,
+            "width": 393.46875,
+            "height": 71.359375,
+            "top": 834.375,
+            "right": 402.734375,
+            "bottom": 905.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 24.359375,
+            "y": 26,
+            "width": 363.28125,
+            "height": 311.09375,
+            "top": 26,
+            "right": 387.640625,
+            "bottom": 337.09375,
+            "left": 24.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 24.359375,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 201,
+              "bottom": 594.6875,
+              "left": 24.359375
+            },
+            {
+              "x": 211,
+              "y": 550.6875,
+              "width": 176.640625,
+              "height": 44,
+              "top": 550.6875,
+              "right": 387.640625,
+              "bottom": 594.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790779466
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790779466
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790779527
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790779540
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790779541
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790779555
+      }
+    ]
+  },
+  {
+    "name": "480x1040",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 480,
+            "height": 939.515625,
+            "top": 0,
+            "right": 480,
+            "bottom": 939.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 955.546875,
+            "width": 461.46875,
+            "height": 75.1875,
+            "top": 955.546875,
+            "right": 470.734375,
+            "bottom": 1030.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 30,
+            "y": 26,
+            "width": 420,
+            "height": 353.59375,
+            "top": 26,
+            "right": 450,
+            "bottom": 379.59375,
+            "left": 30
+          },
+          "imageFit": "contain",
+          "scrollWidth": 480,
+          "clientWidth": 480,
+          "buttons": [
+            {
+              "x": 26.390625,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 235,
+              "bottom": 637.1875,
+              "left": 26.390625
+            },
+            {
+              "x": 245,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 453.609375,
+              "bottom": 637.1875,
+              "left": 245
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 480,
+            "height": 939.515625,
+            "top": 0,
+            "right": 480,
+            "bottom": 939.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 955.546875,
+            "width": 461.46875,
+            "height": 75.1875,
+            "top": 955.546875,
+            "right": 470.734375,
+            "bottom": 1030.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 30,
+            "y": 26,
+            "width": 420,
+            "height": 353.59375,
+            "top": 26,
+            "right": 450,
+            "bottom": 379.59375,
+            "left": 30
+          },
+          "imageFit": "contain",
+          "scrollWidth": 480,
+          "clientWidth": 480,
+          "buttons": [
+            {
+              "x": 26.390625,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 235,
+              "bottom": 637.1875,
+              "left": 26.390625
+            },
+            {
+              "x": 245,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 453.609375,
+              "bottom": 637.1875,
+              "left": 245
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 480,
+            "height": 939.515625,
+            "top": 0,
+            "right": 480,
+            "bottom": 939.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 955.546875,
+            "width": 461.46875,
+            "height": 75.1875,
+            "top": 955.546875,
+            "right": 470.734375,
+            "bottom": 1030.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 30,
+            "y": 26,
+            "width": 420,
+            "height": 353.59375,
+            "top": 26,
+            "right": 450,
+            "bottom": 379.59375,
+            "left": 30
+          },
+          "imageFit": "contain",
+          "scrollWidth": 480,
+          "clientWidth": 480,
+          "buttons": [
+            {
+              "x": 26.390625,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 235,
+              "bottom": 637.1875,
+              "left": 26.390625
+            },
+            {
+              "x": 245,
+              "y": 593.1875,
+              "width": 208.609375,
+              "height": 44,
+              "top": 593.1875,
+              "right": 453.609375,
+              "bottom": 637.1875,
+              "left": 245
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790781554
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790781554
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790781621
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790781630
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790781630
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790781634
+      }
+    ]
+  },
+  {
+    "name": "1920x1080",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 979.515625,
+            "top": 0,
+            "right": 1920,
+            "bottom": 979.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "artwork": {
+            "x": 750,
+            "y": 26,
+            "width": 420,
+            "height": 367.1875,
+            "top": 26,
+            "right": 1170,
+            "bottom": 393.1875,
+            "left": 750
+          },
+          "imageFit": "contain",
+          "scrollWidth": 1920,
+          "clientWidth": 1920,
+          "buttons": [
+            {
+              "x": 745,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 955,
+              "bottom": 674.140625,
+              "left": 745
+            },
+            {
+              "x": 965,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 1175,
+              "bottom": 674.140625,
+              "left": 965
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 979.515625,
+            "top": 0,
+            "right": 1920,
+            "bottom": 979.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "artwork": {
+            "x": 750,
+            "y": 26,
+            "width": 420,
+            "height": 367.1875,
+            "top": 26,
+            "right": 1170,
+            "bottom": 393.1875,
+            "left": 750
+          },
+          "imageFit": "contain",
+          "scrollWidth": 1920,
+          "clientWidth": 1920,
+          "buttons": [
+            {
+              "x": 745,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 955,
+              "bottom": 674.140625,
+              "left": 745
+            },
+            {
+              "x": 965,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 1175,
+              "bottom": 674.140625,
+              "left": 965
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 979.515625,
+            "top": 0,
+            "right": 1920,
+            "bottom": 979.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "artwork": {
+            "x": 750,
+            "y": 26,
+            "width": 420,
+            "height": 367.1875,
+            "top": 26,
+            "right": 1170,
+            "bottom": 393.1875,
+            "left": 750
+          },
+          "imageFit": "contain",
+          "scrollWidth": 1920,
+          "clientWidth": 1920,
+          "buttons": [
+            {
+              "x": 745,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 955,
+              "bottom": 674.140625,
+              "left": 745
+            },
+            {
+              "x": 965,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 1175,
+              "bottom": 674.140625,
+              "left": 965
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9503",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 979.515625,
+            "top": 0,
+            "right": 1920,
+            "bottom": 979.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "artwork": {
+            "x": 750,
+            "y": 26,
+            "width": 420,
+            "height": 367.1875,
+            "top": 26,
+            "right": 1170,
+            "bottom": 393.1875,
+            "left": 750
+          },
+          "imageFit": "contain",
+          "scrollWidth": 1920,
+          "clientWidth": 1920,
+          "buttons": [
+            {
+              "x": 745,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 955,
+              "bottom": 674.140625,
+              "left": 745
+            },
+            {
+              "x": 965,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 1175,
+              "bottom": 674.140625,
+              "left": 965
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9504",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 1920,
+            "height": 979.515625,
+            "top": 0,
+            "right": 1920,
+            "bottom": 979.515625,
+            "left": 0
+          },
+          "engine": {
+            "x": 480,
+            "y": 995.546875,
+            "width": 960,
+            "height": 75.1875,
+            "top": 995.546875,
+            "right": 1440,
+            "bottom": 1070.734375,
+            "left": 480
+          },
+          "artwork": {
+            "x": 750,
+            "y": 26,
+            "width": 420,
+            "height": 367.1875,
+            "top": 26,
+            "right": 1170,
+            "bottom": 393.1875,
+            "left": 750
+          },
+          "imageFit": "contain",
+          "scrollWidth": 1920,
+          "clientWidth": 1920,
+          "buttons": [
+            {
+              "x": 745,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 955,
+              "bottom": 674.140625,
+              "left": 745
+            },
+            {
+              "x": 965,
+              "y": 630.140625,
+              "width": 210,
+              "height": 44,
+              "top": 630.140625,
+              "right": 1175,
+              "bottom": 674.140625,
+              "left": 965
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790783802
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790783802
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790783824
+      },
+      {
+        "id": "S5QA3",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790783826
+      },
+      {
+        "id": "S5QA4",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790783840
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790783850
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790783851
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790783853
+      },
+      {
+        "id": "S5QA3",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790783854
+      },
+      {
+        "id": "S5QA4",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790783857
+      }
+    ]
+  },
+  {
+    "name": "915x412",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 333.109375,
+            "top": 0,
+            "right": 915,
+            "bottom": 333.109375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 349.140625,
+            "width": 896.46875,
+            "height": 53.59375,
+            "top": 349.140625,
+            "right": 905.734375,
+            "bottom": 402.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 26,
+            "width": 420,
+            "height": 210,
+            "top": 26,
+            "right": 667.5,
+            "bottom": 236,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 452.5,
+              "bottom": 516.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 672.5,
+              "bottom": 516.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 333.109375,
+            "top": 0,
+            "right": 915,
+            "bottom": 333.109375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 349.140625,
+            "width": 896.46875,
+            "height": 53.59375,
+            "top": 349.140625,
+            "right": 905.734375,
+            "bottom": 402.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 26,
+            "width": 420,
+            "height": 210,
+            "top": 26,
+            "right": 667.5,
+            "bottom": 236,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 452.5,
+              "bottom": 516.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 672.5,
+              "bottom": 516.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 333.109375,
+            "top": 0,
+            "right": 915,
+            "bottom": 333.109375,
+            "left": 0
+          },
+          "engine": {
+            "x": 9.265625,
+            "y": 349.140625,
+            "width": 896.46875,
+            "height": 53.59375,
+            "top": 349.140625,
+            "right": 905.734375,
+            "bottom": 402.734375,
+            "left": 9.265625
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 26,
+            "width": 420,
+            "height": 210,
+            "top": 26,
+            "right": 667.5,
+            "bottom": 236,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 452.5,
+              "bottom": 516.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 472.953125,
+              "width": 210,
+              "height": 44,
+              "top": 472.953125,
+              "right": 672.5,
+              "bottom": 516.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790786022
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790786022
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790786095
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790786108
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790786108
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790786110
+      }
+    ]
+  },
+  {
+    "name": "412x915 safe",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 793.625,
+            "top": 0,
+            "right": 412,
+            "bottom": 793.625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 809.640625,
+            "width": 364,
+            "height": 71.359375,
+            "top": 809.640625,
+            "right": 388,
+            "bottom": 881,
+            "left": 24
+          },
+          "artwork": {
+            "x": 36.359375,
+            "y": 60,
+            "width": 339.28125,
+            "height": 311.09375,
+            "top": 60,
+            "right": 375.640625,
+            "bottom": 371.09375,
+            "left": 36.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 36.359375,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 201,
+              "bottom": 628.6875,
+              "left": 36.359375
+            },
+            {
+              "x": 211,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 375.640625,
+              "bottom": 628.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 793.625,
+            "top": 0,
+            "right": 412,
+            "bottom": 793.625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 809.640625,
+            "width": 364,
+            "height": 71.359375,
+            "top": 809.640625,
+            "right": 388,
+            "bottom": 881,
+            "left": 24
+          },
+          "artwork": {
+            "x": 36.359375,
+            "y": 60,
+            "width": 339.28125,
+            "height": 311.09375,
+            "top": 60,
+            "right": 375.640625,
+            "bottom": 371.09375,
+            "left": 36.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 36.359375,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 201,
+              "bottom": 628.6875,
+              "left": 36.359375
+            },
+            {
+              "x": 211,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 375.640625,
+              "bottom": 628.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 412,
+            "height": 793.625,
+            "top": 0,
+            "right": 412,
+            "bottom": 793.625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 809.640625,
+            "width": 364,
+            "height": 71.359375,
+            "top": 809.640625,
+            "right": 388,
+            "bottom": 881,
+            "left": 24
+          },
+          "artwork": {
+            "x": 36.359375,
+            "y": 60,
+            "width": 339.28125,
+            "height": 311.09375,
+            "top": 60,
+            "right": 375.640625,
+            "bottom": 371.09375,
+            "left": 36.359375
+          },
+          "imageFit": "contain",
+          "scrollWidth": 412,
+          "clientWidth": 412,
+          "buttons": [
+            {
+              "x": 36.359375,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 201,
+              "bottom": 628.6875,
+              "left": 36.359375
+            },
+            {
+              "x": 211,
+              "y": 584.6875,
+              "width": 164.640625,
+              "height": 44,
+              "top": 584.6875,
+              "right": 375.640625,
+              "bottom": 628.6875,
+              "left": 211
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790788118
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790788119
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790788143
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790788154
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790788155
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790788157
+      }
+    ]
+  },
+  {
+    "name": "915x412 safe",
+    "passed": true,
+    "entries": [
+      {
+        "id": "9500",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 308.390625,
+            "top": 0,
+            "right": 915,
+            "bottom": 308.390625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 324.40625,
+            "width": 867,
+            "height": 53.59375,
+            "top": 324.40625,
+            "right": 891,
+            "bottom": 378,
+            "left": 24
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 60,
+            "width": 420,
+            "height": 210,
+            "top": 60,
+            "right": 667.5,
+            "bottom": 270,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 452.5,
+              "bottom": 550.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 672.5,
+              "bottom": 550.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9501",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 308.390625,
+            "top": 0,
+            "right": 915,
+            "bottom": 308.390625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 324.40625,
+            "width": 867,
+            "height": 53.59375,
+            "top": 324.40625,
+            "right": 891,
+            "bottom": 378,
+            "left": 24
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 60,
+            "width": 420,
+            "height": 210,
+            "top": 60,
+            "right": 667.5,
+            "bottom": 270,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 452.5,
+              "bottom": 550.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 672.5,
+              "bottom": 550.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      },
+      {
+        "id": "9502",
+        "metrics": {
+          "view": {
+            "x": 0,
+            "y": 0,
+            "width": 915,
+            "height": 308.390625,
+            "top": 0,
+            "right": 915,
+            "bottom": 308.390625,
+            "left": 0
+          },
+          "engine": {
+            "x": 24,
+            "y": 324.40625,
+            "width": 867,
+            "height": 53.59375,
+            "top": 324.40625,
+            "right": 891,
+            "bottom": 378,
+            "left": 24
+          },
+          "artwork": {
+            "x": 247.5,
+            "y": 60,
+            "width": 420,
+            "height": 210,
+            "top": 60,
+            "right": 667.5,
+            "bottom": 270,
+            "left": 247.5
+          },
+          "imageFit": "contain",
+          "scrollWidth": 915,
+          "clientWidth": 915,
+          "buttons": [
+            {
+              "x": 242.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 452.5,
+              "bottom": 550.953125,
+              "left": 242.5
+            },
+            {
+              "x": 462.5,
+              "y": 506.953125,
+              "width": 210,
+              "height": 44,
+              "top": 506.953125,
+              "right": 672.5,
+              "bottom": 550.953125,
+              "left": 462.5
+            }
+          ],
+          "nested": 0
+        }
+      }
+    ],
+    "focus": {
+      "visible": true,
+      "shadow": "rgb(219, 234, 255) 0px 0px 0px 3px inset"
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790790127
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790790127
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790790192
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790790204
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790790204
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790790206
+      }
+    ]
+  },
+  {
+    "name": "Actual records: poster, all memory identities, Enter Archive and Back",
+    "passed": true,
+    "observed": [
+      {
+        "id": "239",
+        "title": "Anberlin w/ Emery and Watashi Wa",
+        "bands": [
+          "Watashi Wa",
+          "Emery",
+          "Anberlin"
+        ],
+        "route": "/music/shows/060426",
+        "poster": "https://photos.smugmug.com/photos/i-X9vrrdq/0/MhJr7SV3FV8VJHks7j96CVMFkDX8cK8FTJjkr24dm/X2/i-X9vrrdq-X2.jpg"
+      },
+      {
+        "id": "238",
+        "title": "Burning Time w/ Loki",
+        "bands": [
+          "Loki",
+          "Burning Time"
+        ],
+        "route": "/music/shows/031426",
+        "poster": "https://photos.smugmug.com/photos/i-5xzJcpx/0/MDp38HvzhNdQ7ZmtgzVzjQMmKCsgVLrf4zSrZ5rh7/X2/i-5xzJcpx-X2.jpg"
+      },
+      {
+        "id": "237",
+        "title": "5th Annual Justin Smith Mosh For Tots",
+        "bands": [
+          "Echo Ritual",
+          "Dawn of End",
+          "Dead In Your Eyes",
+          "In The Kingdom of Nightmares",
+          "Thy Enemy",
+          "Kryptosporidium",
+          "I, The Conqueror",
+          "Viqueen"
+        ],
+        "route": "/music/shows/120625",
+        "poster": "https://photos.smugmug.com/photos/i-C2VHT5m/0/NMPrV8HJnkNkScVBxrCvx2MgwRcpkds2tX6nJw6qf/XL/i-C2VHT5m-XL.jpg"
+      }
+    ],
+    "requests": [
+      {
+        "id": "zsRbjf",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790792066
+      },
+      {
+        "id": "LztvDF",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790792067
+      },
+      {
+        "id": "MfPF76",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790792190
+      },
+      {
+        "id": "zsRbjf",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790792397
+      },
+      {
+        "id": "LztvDF",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790792398
+      },
+      {
+        "id": "MfPF76",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790792400
+      },
+      {
+        "id": "zsRbjf",
+        "limit": 12,
+        "start": 1,
+        "at": 1792790792774
+      }
+    ]
+  },
+  {
+    "name": "Pause, resume, rapid selection and bounded timers",
+    "passed": true,
+    "timers": [
+      {
+        "timer": false,
+        "fade": false,
+        "layers": 1,
+        "photos": 4
+      },
+      {
+        "timer": true,
+        "fade": false,
+        "layers": 1,
+        "photos": 4
+      },
+      {
+        "timer": true,
+        "fade": false,
+        "layers": 1,
+        "photos": 4
+      }
+    ],
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790794456
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790794457
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790794484
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790794494
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790794495
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790794500
+      }
+    ]
+  },
+  {
+    "name": "Fallback missing",
+    "passed": true,
+    "text": "Show name unavailable\n\nDate Pending\n\nVenue Pending\n\nLocation Pending\n\nPerforming bands\n\nBand information unavailable\n\nENTER ARCHIVE\nRETURN TO ECHOES"
+  },
+  {
+    "name": "Fallback failed",
+    "passed": true,
+    "state": {
+      "id": "9500",
+      "title": "S5 test performance 0",
+      "motion": "paused",
+      "timers": 0,
+      "inert": true,
+      "hidden": true,
+      "panels": 1,
+      "overflow": 0
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790819150
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790819151
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790819214
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790819224
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790819224
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790819227
+      }
+    ]
+  },
+  {
+    "name": "Fallback slow",
+    "passed": true,
+    "state": {
+      "id": "9500",
+      "title": "S5 test performance 0",
+      "motion": "paused",
+      "timers": 0,
+      "inert": true,
+      "hidden": true,
+      "panels": 1,
+      "overflow": 0
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790820454
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790820455
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790820507
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790820518
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790820518
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792790820523
+      }
+    ]
+  },
+  {
+    "name": "Fallback empty",
+    "passed": true,
+    "state": "No memories or empty frames"
+  },
+  {
+    "name": "Fallback outage",
+    "passed": true,
+    "state": "No memories; existing archive error/retry retained"
+  },
+  {
+    "name": "Fallback single",
+    "passed": true,
+    "state": {
+      "id": "9500",
+      "title": "S5 test performance 0",
+      "motion": "paused",
+      "timers": 0,
+      "inert": true,
+      "hidden": true,
+      "panels": 1,
+      "overflow": 0
+    },
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790826416
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790826417
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792790826449
+      }
+    ]
+  },
+  {
+    "name": "Fallback poster-only",
+    "passed": true,
+    "state": {
+      "id": "9500",
+      "title": "S5 test performance 0",
+      "motion": "paused",
+      "timers": 0,
+      "inert": true,
+      "hidden": true,
+      "panels": 1,
+      "overflow": 0
+    },
+    "requests": []
+  },
+  {
+    "name": "Long values wrap without overflow",
+    "passed": true,
+    "wrapped": true
+  }
+]

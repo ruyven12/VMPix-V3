@@ -13587,6 +13587,7 @@ function clearSynchronicityMemories() {
   session.stage.removeAttribute("aria-busy");
   delete session.stage.dataset.memoryCount;
   delete session.stage.dataset.memoryMotion;
+  delete session.stage.dataset.memorySelected;
 }
 
 function prepareSynchronicityMemories() {
@@ -13733,7 +13734,7 @@ function prepareSynchronicityMemories() {
       schedule(memory);
     }
   };
-  // Reusable local pause/resume, without adding future selection/drawer interactions.
+  // Local pause/resume is shared by visibility, reduced motion, and memory selection.
   // Hidden tabs freeze fades; reduced motion keeps the current valid photograph.
   session.sync = () => {
     if (!document.hidden) { visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear(); }
@@ -13758,12 +13759,106 @@ function prepareSynchronicityMemories() {
   };
   session.setPaused = paused => { session.paused = Boolean(paused); session.sync(); };
   session.dispose = () => {
+    session.selection = null;
     document.removeEventListener("visibilitychange", session.sync);
     reducedMotion.removeEventListener("change", session.sync);
     visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear();
     queue.splice(0).forEach(job => job.resolve(null));
     for (const memory of session.results) { clearTimeout(memory.timer); stopFade(memory); }
   };
+
+  // Selection is local to this Shows scene; route restoration remains Shell-owned.
+  const returnToEchoes = () => {
+    const selection = session.selection;
+    if (!current() || !selection) return;
+    session.selection = null;
+    selection.panel.remove();
+    delete stage.dataset.memorySelected;
+    for (const memory of session.results) memory.frame.inert = false;
+    session.setPaused(false);
+    viewport.scrollTop = selection.scrollTop;
+    selection.memory.frame.focus({ preventScroll: true });
+  };
+  const selectMemory = memory => {
+    if (!current() || viewport.inert || session.selection || !session.results.includes(memory)) return;
+    const selection = { id: memory.id, memory, scrollTop: viewport.scrollTop };
+    session.selection = selection;
+    session.setPaused(true);
+    stage.dataset.memorySelected = memory.id;
+    for (const item of session.results) item.frame.inert = true;
+
+    const panel = document.createElement("article");
+    panel.className = "synchronicity-show";
+    panel.setAttribute("aria-labelledby", "synchronicity-selected-title");
+    selection.panel = panel;
+    const artwork = document.createElement("div");
+    artwork.className = "synchronicity-show-artwork";
+    const title = document.createElement("h2");
+    title.id = "synchronicity-selected-title";
+    title.className = "synchronicity-show-title";
+    title.tabIndex = -1;
+    title.textContent = memory.show.capturedName || "Show name unavailable";
+    const showImage = (image, kind) => {
+      if (!current() || session.selection !== selection || !image) return;
+      const preview = image.cloneNode();
+      preview.alt = (kind === "poster" ? "Show poster for " : "Concert photograph from ") + title.textContent;
+      preview.draggable = false;
+      artwork.replaceChildren(preview);
+      artwork.dataset.imageKind = kind;
+    };
+    // Keep a decoded, same-show photograph visible while its explicit poster loads.
+    showImage(memory.image, memory.kind);
+    const date = document.createElement("p");
+    date.className = "synchronicity-show-date";
+    date.textContent = getMusicShowDateLabel(memory.show);
+    const venue = document.createElement("p");
+    venue.className = "synchronicity-show-venue";
+    venue.textContent = getMusicShowVenueName(memory.show) || "Venue unavailable";
+    const location = document.createElement("p");
+    location.className = "synchronicity-show-location";
+    location.textContent = getMusicShowDetailLocation(memory.show);
+    const bands = document.createElement("div");
+    bands.className = "synchronicity-show-bands";
+    const bandsLabel = document.createElement("h3");
+    bandsLabel.textContent = "Performing bands";
+    const bandNames = getMusicShowBillBands(memory.show);
+    const bandList = document.createElement(bandNames.length ? "ul" : "p");
+    if (bandNames.length) {
+      for (const band of bandNames) {
+        const item = document.createElement("li");
+        item.textContent = band.name;
+        bandList.append(item);
+      }
+    } else bandList.textContent = "Band information unavailable";
+    bands.append(bandsLabel, bandList);
+    const actions = document.createElement("div");
+    actions.className = "synchronicity-show-actions";
+    const enter = document.createElement("button");
+    enter.type = "button";
+    enter.textContent = "ENTER ARCHIVE";
+    enter.addEventListener("click", () => {
+      if (!current() || session.selection !== selection || selection.entering) return;
+      selection.entering = true;
+      enter.disabled = true;
+      selectMusicShowDetailHook(memory.show);
+    });
+    const leave = document.createElement("button");
+    leave.type = "button";
+    leave.textContent = "RETURN TO ECHOES";
+    leave.addEventListener("click", returnToEchoes);
+    actions.append(enter, leave);
+    panel.append(artwork, title, date, venue, location, bands, actions);
+    stage.append(panel);
+    title.focus({ preventScroll: true });
+
+    const poster = memory.show.capturedPoster;
+    if (memory.kind !== "poster" && usable(poster) && poster !== memory.image.src) {
+      // At most one poster lookup per memory, shared across repeated selections.
+      memory.posterPreview ||= decode(poster);
+      memory.posterPreview.then(image => showImage(image, "poster"));
+    }
+  };
+
   document.addEventListener("visibilitychange", session.sync);
   reducedMotion.addEventListener("change", session.sync);
   const seenShows = new Set();
@@ -13786,8 +13881,11 @@ function prepareSynchronicityMemories() {
     const fragment = document.createDocumentFragment();
     session.results.forEach((memory, index) => {
       const { show, id, image, kind } = memory;
-      const frame = document.createElement("figure");
+      const frame = document.createElement("button");
+      frame.type = "button";
       frame.className = "synchronicity-memory";
+      frame.setAttribute("aria-label", show.capturedName ? "Show details for " + show.capturedName : "Show details for this performance");
+      frame.addEventListener("click", () => selectMemory(memory));
       frame.dataset.memoryShowId = id;
       frame.dataset.memoryKind = kind;
       image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
