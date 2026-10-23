@@ -1,0 +1,6 @@
+const fs=require('fs'),base=require('../synch-s5/fixture.cjs');const rows=require('./shows-live.json').data;
+async function setup(browser,o={}){const f=await base.setup(browser,{...o,rows}),calls=[],requests=[];let active=0,peak=0;
+await f.context.route('**/api/music/smugmug/albums/*/photos*',async r=>{const u=new URL(r.request().url()),id=u.pathname.split('/').at(-2),limit=+u.searchParams.get('limit'),start=+u.searchParams.get('start'),file=__dirname+'/album-'+id+'.json';let saved=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,'utf8')):null;const photos=saved?.photos?.slice(start-1,start-1+limit)||[];calls.push({id,limit,start,at:Date.now()});await r.fulfill({contentType:'application/json',body:JSON.stringify({ok:true,album_id:id,photos,total:saved?.total||0,count:photos.length,has_more:!!saved&&start-1+photos.length<saved.total,next_start:start+photos.length})});});
+const inflight=new Set();f.page.on('request',r=>{if(/photos\.smugmug\.com|\/api\/music\/smugmug\/albums\/.+\/photos/.test(r.url())){inflight.add(r);active=inflight.size;peak=Math.max(peak,active);requests.push({url:r.url(),at:Date.now()})}});const end=r=>inflight.delete(r);f.page.on('requestfinished',end);f.page.on('requestfailed',end);
+return{...f,liveCalls:calls,mediaRequests:requests,get mediaPeak(){return peak}}}
+module.exports={...base,setup,rows};

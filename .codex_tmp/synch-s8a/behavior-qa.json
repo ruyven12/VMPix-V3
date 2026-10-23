@@ -1,0 +1,64 @@
+[
+  {
+    "name": "Every memory selectable 412",
+    "passed": true,
+    "count": 15,
+    "apiPeak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "Every memory selectable 1920",
+    "passed": true,
+    "count": 30,
+    "apiPeak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "Progressive reveal; drawer suspends loading; frames do not reposition",
+    "passed": true,
+    "staticRequests": 15,
+    "animatedRequests": 30,
+    "apiPeak": 2,
+    "imagePeak": 2
+  },
+  {
+    "name": "Paused field remains still and resumes; hidden page stops work",
+    "passed": true,
+    "requests": 30
+  },
+  {
+    "name": "duplicates",
+    "passed": true,
+    "count": 6,
+    "requests": 12
+  },
+  {
+    "name": "single",
+    "passed": true,
+    "count": 6,
+    "requests": 6
+  },
+  {
+    "name": "poster",
+    "passed": true,
+    "count": 6,
+    "requests": 0
+  },
+  {
+    "name": "missing",
+    "passed": true,
+    "count": 0,
+    "requests": 0
+  },
+  {
+    "name": "failure",
+    "passed": true,
+    "count": 6,
+    "requests": 12
+  },
+  {
+    "name": "Departure disposes timers, decoded work and observer; same-route reentry safe",
+    "passed": true,
+    "requests": 4
+  }
+]

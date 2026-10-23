@@ -33942,3 +33942,15 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (hover: hover) {
   .synchronicity-timeline-entry:not(:disabled):hover { background: rgba(101, 96, 164, .1); }
 }
+
+/* S8A: scatter spans the existing content bounds, with room reserved for Explore Echoes. */
+.synchronicity-memories { width: min(100%, 1600px); }
+.synchronicity-memories:not([data-memory-selected]) { height: 100%; margin-bottom: 0; }
+.synchronicity-memories .synchronicity-memory:nth-child(n) {
+  width: var(--memory-width, 66px);
+  height: var(--memory-height, 44px);
+  max-width: none;
+  min-width: 44px;
+  min-height: 44px;
+  aspect-ratio: auto;
+}

@@ -1,0 +1,110 @@
+{
+  "seconds": 30.322794914245605,
+  "frames": 892,
+  "dropped": 4,
+  "timeline": [
+    {
+      "label": "Full 15-show Echo Field",
+      "at": 1792797099987,
+      "state": {
+        "count": 15,
+        "motion": "running",
+        "ids": [
+          "239",
+          "238",
+          "237",
+          "236",
+          "235",
+          "234",
+          "233",
+          "232",
+          "231",
+          "230",
+          "229",
+          "228",
+          "227",
+          "226",
+          "225"
+        ]
+      }
+    },
+    {
+      "label": "Independent rotation and floating",
+      "at": 1792797125999,
+      "state": {
+        "count": 15,
+        "motion": "running",
+        "ids": [
+          "239",
+          "238",
+          "237",
+          "236",
+          "235",
+          "234",
+          "233",
+          "232",
+          "231",
+          "230",
+          "229",
+          "228",
+          "227",
+          "226",
+          "225"
+        ]
+      }
+    },
+    {
+      "label": "Drawer pauses memories",
+      "at": 1792797126382,
+      "state": {
+        "count": 15,
+        "motion": "paused",
+        "ids": [
+          "239",
+          "238",
+          "237",
+          "236",
+          "235",
+          "234",
+          "233",
+          "232",
+          "231",
+          "230",
+          "229",
+          "228",
+          "227",
+          "226",
+          "225"
+        ]
+      }
+    },
+    {
+      "label": "Field resumes",
+      "at": 1792797130373,
+      "state": {
+        "count": 15,
+        "motion": "running",
+        "ids": [
+          "239",
+          "238",
+          "237",
+          "236",
+          "235",
+          "234",
+          "233",
+          "232",
+          "231",
+          "230",
+          "229",
+          "228",
+          "227",
+          "226",
+          "225"
+        ]
+      }
+    }
+  ],
+  "metadataRequests": 30,
+  "mediaPeak": 2,
+  "evidence": "Normal-speed Chrome S25-sized emulation of local S8A. Current public Shows records and bounded saved SmugMug metadata; genuine SmugMug photography. Not a physical S25 test."
+}

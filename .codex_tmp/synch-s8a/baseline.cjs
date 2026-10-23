@@ -1,0 +1,4 @@
+const fs=require('fs'),{setup,chromium,synthetic}=require('../synch-s5/fixture.cjs');
+(async()=>{const data=JSON.parse(fs.readFileSync(__dirname+'/shows-live.json','utf8').replace(/^\uFEFF/,''));fs.writeFileSync(__dirname+'/shows-live.json',JSON.stringify(data,null,2));console.log({rows:data.data?.length,meta:data.meta});const b=await chromium.launch({channel:'chrome',headless:true});try{for(const [width,height]of[[412,915],[1920,1080]]){const f=await setup(b,{viewport:{width,height},rows:data.data});await f.go();await f.page.waitForFunction(()=>synchronicityMemoriesSession?.stage.getAttribute('aria-busy')==='false');await f.page.screenshot({path:__dirname+'/before-real-'+width+'x'+height+'.png'});await f.close()}}finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});
+
+

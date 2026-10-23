@@ -13713,7 +13713,7 @@ function prepareSynchronicityMemories() {
   const stage = viewport?.querySelector("[data-synchronicity-memories]");
   if (!stage || viewport.hidden || getRouteFromUrl().name !== "music-shows") return;
   if (musicShowsSetsDataState !== "live") { clearSynchronicityMemories(); return; }
-  const limit = synchronicityMemoriesWide?.matches ? 5 : 3;
+  const limit = synchronicityMemoriesWide?.matches ? 30 : 15;
   const source = musicShowsSetsCollection, entry = v3RouteContext.entry;
   if (synchronicityMemoriesSession?.source === source && synchronicityMemoriesSession.entry === entry && synchronicityMemoriesSession.limit === limit) return;
   clearSynchronicityMemories();
@@ -13722,9 +13722,7 @@ function prepareSynchronicityMemories() {
   stage.setAttribute("aria-busy", "true");
   const current = () => synchronicityMemoriesSession === session && !viewport.hidden &&
     getRouteFromUrl().name === "music-shows" && v3RouteContext.entry === entry && musicShowsSetsCollection === source;
-  const visibleWaiters = new Set();
-  const waitForVisible = () => current() && document.hidden
-    ? new Promise(resolve => visibleWaiters.add(resolve)) : Promise.resolve();
+  const photoSrc = photo => String(photo?.small_url || photo?.smallUrl || getMusicAlbumPhotoImageSrc(photo)).trim();
   const usable = src => Boolean(src && isMusicShowPosterImageSrc(src) && src !== SET_GALLERY_NO_POSTER_IMAGE_SRC && !/\/(?:placeholders|Band-Logos)\//i.test(src));
   const decode = src => new Promise(resolve => {
     if (!current() || !usable(src)) { resolve(null); return; }
@@ -13754,18 +13752,78 @@ function prepareSynchronicityMemories() {
 
   // Shared archive requests keep their cache/in-flight ownership. Late responses
   // may warm that cache, but cannot update a departed scene.
-  const active = () => current() && !session.paused && !synchronicityArchiveDrawer?.blocking && !document.hidden && !viewport.inert && !reducedMotion.matches;
+  const canPrepare = () => current() && !session.paused && !synchronicityArchiveDrawer?.blocking && !document.hidden && !viewport.inert;
+  const active = () => canPrepare() && !reducedMotion.matches;
+  // Fixed scatter anchors sized from Shell content bounds. Each complete drift
+  // envelope stays inside its allocation; the lower center remains open.
+  const mobileSlots = [[1,1],[0,0],[2,2],[0,4],[2,5],[1,0],[2,0],[0,2],[2,3],[0,5],[1,2],[0,1],[2,1],[0,3],[2,4]];
+  const desktopSlots = [[2,1],[4,0],[0,2],[5,3],[1,4],[4,5],[3,0],[0,0],[5,1],[1,2],[4,3],[0,5],[3,2],[1,0],[5,5],[0,3],[4,1],[1,5],[2,0],[5,0],[0,1],[3,1],[4,2],[5,2],[1,1],[0,4],[1,3],[4,4],[5,4],[2,2]];
+  const layoutField = () => {
+    if (!current()) return;
+    const style = getComputedStyle(viewport);
+    const height = viewport.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    const width = stage.clientWidth;
+    if (height <= 0 || width <= 0) return;
+    const short = height < 380, columns = short ? (limit === 30 ? 10 : 5) : (limit === 30 ? 6 : 3);
+    const rows = short ? 3 : 6, cellW = width / columns, cellH = height / rows;
+    const slots = short ? Array.from({ length: limit }, (_, i) => [(i * 7) % columns, Math.floor(i / columns)]) : limit === 30 ? desktopSlots : mobileSlots;
+    const positions = [];
+    slots.forEach(([column, row], index) => {
+      const memory = session.results[index];
+      const driftY = Math.min(16, Math.max(3, (cellH - 56) / 2));
+      const driftX = Math.min(8, Math.max(3, (cellW - 78) / 2));
+      const maxH = Math.min(limit === 30 ? 94 : 62, (cellW - 2 * driftX - 12) / 1.5, cellH - 2 * driftY - 10);
+      const h = Math.max(44, maxH * [1,.86,.94,.8,.9][index % 5]), w = h * 1.5;
+      const slackX = Math.max(0, cellW - w - 2 * driftX - 10);
+      const slackY = Math.max(0, cellH - h - 2 * driftY - 10);
+      const x = (column + .5) * cellW + (((index * 37) % 11) / 10 - .5) * slackX;
+      const stagger = short ? 0 : [0,-.4,.37,-.22,.32,-.35][column] * cellH * Math.sin(Math.PI * (row + .5) / rows);
+      const y = Math.max(h / 2 + driftY + 5, Math.min(height - h / 2 - driftY - 5,
+        (row + .5) * cellH + stagger + (((index * 19) % 9) / 8 - .5) * slackY * .5));
+      positions.push({ memory, column, x, y, w, h, driftX, driftY });
+    });
+    // Keep asymmetrical anchors, resolving only vertical drift-envelope collisions.
+    for (let column = 0; column < columns; column++) {
+      const lane = positions.filter(p => p.column === column).sort((a, b) => a.y - b.y);
+      let edge = 5;
+      for (const p of lane) {
+        const radius = p.h / 2 + p.driftY;
+        p.y = Math.max(p.y, edge + radius);
+        edge = p.y + radius + 5;
+      }
+      edge = height - 5;
+      for (const p of lane.reverse()) {
+        const radius = p.h / 2 + p.driftY;
+        p.y = Math.min(p.y, edge - radius);
+        edge = p.y - radius - 5;
+      }
+    }
+    for (const p of positions) {
+      if (!p.memory?.frame) continue;
+      for (const [key, value] of Object.entries({x:p.x, y:p.y, width:p.w, height:p.h, "drift-x":p.driftX, "drift-up":p.driftY, "drift-down":p.driftY})) {
+        p.memory.frame.style.setProperty("--memory-" + key, value.toFixed(2) + "px");
+      }
+    }
+  };
+  const fieldResize = new ResizeObserver(layoutField);
+  fieldResize.observe(viewport);
+
   const queue = [];
   let workers = 0;
   const pump = () => {
-    while (active() && workers < 2 && queue.length) {
-      const job = queue.shift();
+    while (canPrepare() && workers < 2 && queue.length) {
+      // Initial photographs take priority; reduced motion still prepares static memories.
+      let index = queue.findIndex(job => !job.motion);
+      if (index < 0) index = active() ? 0 : -1;
+      if (index < 0) break;
+      const [job] = queue.splice(index, 1);
       workers++;
       Promise.resolve().then(() => current() ? job.run() : null).catch(() => null)
         .then(job.resolve).finally(() => { workers--; pump(); });
     }
   };
-  const enqueue = run => new Promise(resolve => { queue.push({ run, resolve }); pump(); });
+  const enqueue = (run, motion = true) => !current() ? Promise.resolve(null)
+    : new Promise(resolve => { queue.push({ run, resolve, motion }); pump(); });
   const imageFor = (memory, src) => {
     if (!usable(src) || memory.failed.has(src)) return Promise.resolve(null);
     if (memory.images.has(src)) return Promise.resolve(memory.images.get(src));
@@ -13794,8 +13852,9 @@ function prepareSynchronicityMemories() {
     memory.timer = setTimeout(() => {
       memory.timer = 0;
       if (!active()) return;
-      // Independent clocks can eventually coincide; keep fades at least 900ms apart.
-      const separation = 900 - (performance.now() - (session.lastSwap ?? -Infinity));
+      // Keep the 700ms treatment: at most two mobile / three desktop fades overlap.
+      const spacing = Math.max(limit === 30 ? 250 : 400, 4500 / Math.max(5, session.results.length));
+      const separation = spacing - (performance.now() - (session.lastSwap ?? -Infinity));
       if (separation > 0) { memory.remaining = separation; schedule(memory); return; }
       const next = memory.next;
       memory.next = null;
@@ -13830,7 +13889,7 @@ function prepareSynchronicityMemories() {
           const page = await enqueue(() => requestMusicSmugmugAlbumPhotosPage(memory.albumId, 3, memory.page.nextStart));
           if (!current()) return;
           for (const photo of page?.photos || []) {
-            const src = getMusicAlbumPhotoImageSrc(photo), key = photo.dedupeKey || src;
+            const src = photoSrc(photo), key = photo.dedupeKey || src;
             if (usable(src) && !memory.keys.has(key) && !memory.sources.includes(src)) {
               memory.keys.add(key); memory.sources.push(src);
             }
@@ -13855,7 +13914,6 @@ function prepareSynchronicityMemories() {
   // Local pause/resume is shared by visibility, reduced motion, and memory selection.
   // Hidden tabs freeze fades; reduced motion keeps the current valid photograph.
   session.sync = () => {
-    if (!document.hidden) { visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear(); }
     const playing = active();
     stage.dataset.memoryMotion = playing ? "running" : "paused";
     for (const memory of session.results) {
@@ -13880,7 +13938,7 @@ function prepareSynchronicityMemories() {
     session.selection = null;
     document.removeEventListener("visibilitychange", session.sync);
     reducedMotion.removeEventListener("change", session.sync);
-    visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear();
+    fieldResize.disconnect();
     queue.splice(0).forEach(job => job.resolve(null));
     for (const memory of session.results) { clearTimeout(memory.timer); stopFade(memory); }
   };
@@ -14000,83 +14058,77 @@ function prepareSynchronicityMemories() {
     if (!id || seenShows.has(id)) return false;
     seenShows.add(id);
     return true;
-  }).slice(0, 20).map(show => ({ show, id: getMusicShowIdValue(show), album: getMusicShowSmugAlbums(show).find(album =>
+  }).slice(0, limit * 2).map(show => ({ show, id: getMusicShowIdValue(show), album: getMusicShowSmugAlbums(show).find(album =>
     String(album.status || "").toLowerCase() === "resolved" &&
     String(album.album_id || album.gallery_id || "").trim() && getMusicShowAlbumPhotoCount(album) !== 0) }));
-  const retain = result => {
-    if (!result || !current() || session.seenImages.has(result.image.src)) return;
-    session.seenImages.add(result.image.src);
-    session.results.push(result);
-  };
-  const render = () => {
+  const renderMemory = memory => {
     if (!current()) return;
-    const fragment = document.createDocumentFragment();
-    session.results.forEach((memory, index) => {
-      const { show, id, image, kind } = memory;
-      const frame = document.createElement("button");
-      frame.type = "button";
-      frame.className = "synchronicity-memory";
-      frame.setAttribute("aria-label", show.capturedName ? "Show details for " + show.capturedName : "Show details for this performance");
-      frame.addEventListener("click", () => selectMemory(memory));
-      frame.inert = Boolean(session.selection);
-      frame.dataset.memoryShowId = id;
-      frame.dataset.memoryKind = kind;
-      image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
-      image.draggable = false;
-      Object.assign(memory, {
-        frame, interval: [8400, 9700, 11100, 9000, 11800][index],
-        remaining: [8200, 9200, 10200, 11200, 12000][index], index: 0,
-        sources: [image.src], keys: new Set([memory.photoKey || image.src]),
-        images: new Map([[image.src, image]]), failed: new Set()
-      });
-      frame.append(image);
-      fragment.append(frame);
+    const index = session.results.indexOf(memory);
+    const { show, id, image, kind } = memory;
+    const frame = document.createElement("button");
+    frame.type = "button";
+    frame.className = "synchronicity-memory";
+    frame.setAttribute("aria-label", show.capturedName ? "Show details for " + show.capturedName : "Show details for this performance");
+    frame.addEventListener("click", () => selectMemory(memory));
+    frame.inert = Boolean(session.selection);
+    frame.dataset.memoryShowId = id;
+    frame.dataset.memoryKind = kind;
+    frame.style.animationDuration = (12 + (index * 3 % 5)) + "s";
+    frame.style.animationDelay = (index % 7 * .23) + "s";
+    frame.style.animationDirection = index % 2 ? "reverse" : "normal";
+    image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
+    image.draggable = false;
+    Object.assign(memory, {
+      frame, interval: 8200 + (index * 977 % 3800),
+      remaining: 8200 + index * 263, index: 0,
+      sources: [image.src], keys: new Set([memory.photoKey || image.src]),
+      images: new Map([[image.src, image]]), failed: new Set()
     });
+    frame.append(image);
+    stage.insertBefore(frame, session.selection?.panel || null);
     stage.dataset.memoryCount = String(session.results.length);
-    if (session.selection) {
-      // Late memory loading must not detach the focused reconstructed display.
-      stage.querySelectorAll(".synchronicity-memory").forEach(frame => frame.remove());
-      stage.prepend(fragment);
-      const selected = session.results.find(memory => memory.id === session.selection.id);
-      if (selected && !session.selection.panel.querySelector(".synchronicity-show-artwork img")) {
-        session.selection.showImage(selected.image, selected.kind);
-      }
-    } else stage.replaceChildren(fragment);
+    layoutField();
+    if (session.selection?.id === id && !session.selection.panel.querySelector(".synchronicity-show-artwork img")) {
+      session.selection.showImage(image, kind);
+    }
     session.sync();
   };
+  const retain = result => {
+    if (!result || !current() || session.results.length >= limit || session.seenImages.has(result.image.src)) return;
+    session.seenImages.add(result.image.src);
+    session.results.push(result);
+    renderMemory(result);
+  };
   (async () => {
-    // Prefer the newest documented concert galleries. At most ten one-photo API pages,
-    // two requests at a time; never follow pagination or fetch an entire gallery.
-    const albums = candidates.filter(candidate => candidate.album).slice(0, 10);
+    // Bounded one-photo previews with a small failed-gallery allowance. Initial
+    // previews and rotation share the same two-worker queue.
+    const albums = candidates.filter(candidate => candidate.album).slice(0, limit + 6);
     for (let start = 0; start < albums.length && current() && session.results.length < limit;) {
-      await waitForVisible();
-      if (!current()) break;
       const batch = albums.slice(start, start + Math.min(2, limit - session.results.length));
       start += batch.length;
       const results = await Promise.all(batch.map(async candidate => {
         try {
           const albumId = String(candidate.album.album_id || candidate.album.gallery_id).trim();
-          const page = await requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1);
-          await waitForVisible();
-          if (!current()) return null;
-          const image = await decode(getMusicAlbumPhotoImageSrc(page.photos[0]));
+          const page = await enqueue(() => requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1), false);
+          if (!current() || !page) return null;
+          const image = await enqueue(() => decode(photoSrc(page.photos[0])), false);
           return image ? { ...candidate, albumId, page, photoKey: page.photos[0]?.dedupeKey, image, kind: "photo" } : null;
         } catch { return null; }
       }));
       results.forEach(retain);
     }
-    // Only explicit poster fields from these real Shows records may fill vacancies.
+    // Only real, explicit show posters fill vacancies; never repeat a show.
     for (const candidate of candidates) {
       if (!current() || session.results.length >= limit) break;
       if (session.results.some(result => result.id === candidate.id)) continue;
-      await waitForVisible();
-      if (!current()) break;
-      const image = await decode(candidate.show.capturedPoster);
+      const image = await enqueue(() => decode(candidate.show.capturedPoster), false);
       if (image) retain({ ...candidate, image, kind: "poster" });
     }
-    render();
-  })().catch(() => { render(); }).finally(() => {
-    if (current()) stage.setAttribute("aria-busy", "false");
+  })().catch(() => {}).finally(() => {
+    if (current()) {
+      stage.dataset.memoryCount = String(session.results.length);
+      stage.setAttribute("aria-busy", "false");
+    }
   });
 }
 
