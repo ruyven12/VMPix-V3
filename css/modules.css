@@ -31986,14 +31986,19 @@ button.hall-crusades-archive-crystal:focus-visible {
   .band-content-tab { flex-basis:calc((100% - .5rem)/2); }
 }
 
-/* B5B: one stationary presentation area; both panels reserve space to prevent tab reflow. */
+/* One stationary footprint; content overflow never resizes neighboring tabs. */
 .band-content-stage {
-  position:relative;isolation:isolate;grid-column:1/-1;display:grid;min-width:0;
+  position:relative;isolation:isolate;grid-column:1/-1;display:grid;min-width:0;min-height:0;
+  height:calc(clamp(10rem,30svh,20rem) + 14.5rem + 2px);
+  /* Whole-pixel scrollports let native touch gestures chain cleanly at the inner boundary. */
+  height:round(up,calc(clamp(10rem,30svh,20rem) + 14.5rem + 2px),1px);
+  grid-template: minmax(0,1fr) / minmax(0,1fr);
   border:1px solid rgba(139,160,226,.18);background:linear-gradient(90deg,transparent,rgba(6,10,25,.22) 25% 75%,transparent);
 }
 .band-content-stage > .band-content-panel {
-  grid-area:1/1;box-sizing:border-box;display:grid;align-content:center;justify-items:center;
-  min-width:0;margin:0;padding:.75rem 0;visibility:hidden;pointer-events:none;
+  grid-area:1/1;box-sizing:border-box;display:grid;align-content:start;align-content:safe center;justify-items:center;
+  min-width:0;min-height:0;height:100%;margin:0;padding:.75rem 0;visibility:hidden;pointer-events:none;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:auto;scrollbar-width:thin;scrollbar-color:#7884bd transparent;
 }
 .band-content-stage > .band-content-panel.is-active { visibility:inherit;pointer-events:auto; }
 .band-content-panel:focus-visible { outline:2px solid #b3c9ff;outline-offset:-3px; }
@@ -32040,7 +32045,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 
-/* B5D: one roster, inside the existing shared content area. No inner scrolling. */
+/* B5D: one roster, inside the existing shared content area. Overflow stays inside the shared panel. */
 .band-personnel-dossier { box-sizing:border-box;width:min(100%,42rem);min-width:0;padding:0 clamp(.5rem,2vw,1rem); }
 .band-personnel-roster { display:grid;gap:.55rem;min-width:0;margin:0;padding:0;list-style:none; }
 .band-personnel-record { min-width:0;margin:0;padding:0; }
@@ -32066,11 +32071,11 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel-card svg { display:block;flex:none;width:1rem;height:1rem;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; }
 .band-personnel-empty { margin:0;padding:1rem .25rem;color:#c8cee0;font-size:.85rem;line-height:1.6;text-align:center; }
 .band-personnel-link-state { min-height:3em;margin:.6rem 0 0;color:#b7bfd5;font-size:.75rem;line-height:1.5;text-align:center; }
-/* Keep one 20px inset artwork area without contributing intrinsic size to the shared grid. */
-.band-content-stage > .band-logo-panel { position:relative;padding:20px; }
-.band-logo-panel .band-detail-poster { position:absolute;inset:20px;width:calc(100% - 40px);max-width:none;height:calc(100% - 40px);max-height:none;aspect-ratio:auto;border:0; }
+/* Contained artwork can fill the panel, with 10px horizontal and 20px vertical insets. */
+.band-content-stage > .band-logo-panel { position:relative;padding:20px 10px;overflow:hidden; }
+.band-logo-panel .band-detail-poster { position:absolute;inset:20px 10px;width:calc(100% - 20px);max-width:none;height:calc(100% - 40px);max-height:none;aspect-ratio:auto;border:0; }
 .band-logo-panel .band-detail-logo { position:absolute;inset:0;min-height:0; }
-.band-logo-panel .band-detail-logo-image { position:absolute;inset:0;min-width:0;min-height:0;max-width:100%;max-height:100%;object-fit:scale-down;object-position:center; }
+.band-logo-panel .band-detail-logo-image { position:absolute;inset:0;min-width:0;min-height:0;max-width:100%;max-height:100%;object-fit:contain;object-position:center; }
 
 
 /* Permanent band identity: one title, shared with the existing record transition. */
@@ -32148,8 +32153,13 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .band-detail-viewport[data-band-identity-arrival] .band-identity-hud { z-index:2;transform-origin:center;will-change:transform; }
 .band-detail-viewport[data-band-identity-arrival="waiting"] .band-identity-hud { visibility:hidden; }
-/* The old handoff copies include the selection label/art, not this continuous HUD. */
-.site-shell:has(.band-detail-viewport[data-band-identity-arrival]) > .shell-band-record-shared { visibility:hidden!important; }
+/* Shell hands the actual title into the permanent HUD; source ink retires in the same frame. */
+.band-detail-content .band-identity-hud[data-band-identity-transfer] { visibility:visible; }
+.band-detail-content .band-identity-hud[data-band-identity-transfer="moving"] { clip-path:none; }
+.band-identity-hud[data-band-identity-transfer] .band-detail-name { visibility:visible;opacity:1!important;clip-path:none!important; }
+.site-shell[data-band-record-opening="morph"] [data-record-anchor] .rhythm-source-title { visibility:hidden; }
+.shell-band-record-sonic { position:fixed;z-index:40;height:2px;pointer-events:none;background:linear-gradient(90deg,transparent,#82b7f2 30%,#bca0ed 70%,transparent); }
+.shell-band-record-sonic::after { content:"";position:absolute;left:calc(50% - 3px);top:-3px;width:6px;height:6px;border:1px solid #bca0ed;transform:rotate(45deg); }
 .band-detail-viewport[data-band-identity-content] .band-identity-dossier > :not(.band-identity-hud),
 .band-detail-viewport[data-band-identity-content] .band-detail-screen > :not(.band-identity-dossier) {
   animation:bandIdentityContent 220ms ease-out both;
@@ -32282,11 +32292,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity:0;transition:opacity 240ms ease-out;pointer-events:none;
 }
 .rhythm-source-row[data-record-anchor] { outline:1px solid rgba(190,150,255,.25);outline-offset:1px;border-color:#d8b9ff!important; }
-.site-shell[data-band-record-opening="morph"] .rhythm-pillar { visibility:hidden; }
+
 .band-detail-viewport[data-band-record-stage="prepared"] { visibility:hidden; }
 .band-detail-viewport[data-band-record-stage="prepared"],.site-shell[data-shell-route="music-bands"] .band-detail-viewport[data-band-record-stage="morph"] { background:none; }
 .band-detail-viewport[data-band-record-stage] .band-identity-dossier { transform-origin:0 0; }
-.band-detail-viewport[data-band-record-shared] :is(.band-detail-poster,.band-detail-name) { opacity:0; }
+
 .band-detail-viewport[data-band-record-stage]:is([data-band-record-stage="prepared"],[data-band-record-stage="morph"]) :is(.band-archive-telemetry,.band-personnel),
 .band-detail-viewport[data-band-record-stage="telemetry"] .band-personnel { visibility:hidden; }
 .band-detail-viewport[data-band-record-stage] .band-detail-content { overflow-y:hidden;touch-action:none; }

@@ -6337,6 +6337,19 @@ function renderBandArchiveTelemetry(band) {
 
 // One real HUD: B3 assembly, a short hold, then measured travel into its retained grid slot.
 let bandIdentityReveal = null;
+// Shell transfer and local arrival share the same measured destination, without moving layout.
+function measureBandIdentityPlacement(hud) {
+  const rect = hud.getBoundingClientRect(), viewport = bandDetailContent.getBoundingClientRect();
+  const style = getComputedStyle(bandDetailContent), visual = window.visualViewport;
+  const engine = document.querySelector("[data-portfolio-engine]")?.getBoundingClientRect();
+  const top = Math.max(viewport.top + parseFloat(style.paddingTop), visual?.offsetTop || 0);
+  const bottom = Math.min(viewport.bottom - parseFloat(style.paddingBottom), engine?.top ?? innerHeight,
+    visual ? visual.offsetTop + visual.height : innerHeight);
+  const left = viewport.left + parseFloat(style.paddingLeft), right = viewport.right - parseFloat(style.paddingRight);
+  if (!rect.width || !rect.height || bottom <= top) return null;
+  const scale = Math.min(1.18, (right - left) / rect.width, (bottom - top) / rect.height);
+  return { rect, scale, transform: `translate(${(left + right) / 2 - (rect.left + rect.width / 2)}px, ${(top + bottom) / 2 - (rect.top + rect.height / 2)}px) scale(${scale})` };
+}
 function settleBandIdentityReveal(revealContent = false) {
   const session = bandIdentityReveal;
   if (!session) return;
@@ -6352,6 +6365,7 @@ function settleBandIdentityReveal(revealContent = false) {
   session.travel?.cancel();
   session.hud.style.removeProperty("transform");
   session.hud.removeAttribute("data-identity-reveal");
+  session.hud.removeAttribute("data-band-identity-transfer");
   bandDetailViewport.removeAttribute("data-band-identity-arrival");
   bandDetailViewport.removeAttribute("data-band-identity-content");
   if (revealContent && !reducedMotion.matches && !bandDetailViewport.hidden) {
@@ -6382,6 +6396,7 @@ function prepareBandIdentityReveal(band, options = {}) {
     hud.removeEventListener("animationend", session.onEnd);
     hud.removeEventListener("animationcancel", session.onEnd);
     hud.removeAttribute("data-identity-reveal");
+    hud.removeAttribute("data-band-identity-transfer");
     bandDetailViewport.dataset.bandIdentityArrival = "travel";
     session.travel = hud.animate([
       { transform:session.transform, offset:0 },
@@ -6403,23 +6418,19 @@ function prepareBandIdentityReveal(band, options = {}) {
       if (bandDetailViewport.hidden) settleBandIdentityReveal();
       return;
     }
-    // Let the protected Shell handoff finish first; its transient copies stay concealed.
+    // Let the Shell finish handing the actual title into this single HUD.
     if (bandDetailViewport.hidden || bandDetailViewport.hasAttribute("data-band-record-stage")) return;
     // Shell owns the scroll reset. Wait for it and font geometry without a new timed stage.
     if (bandDetailContent.scrollTop > 1 || document.fonts?.status === "loading") {
       session.frame = requestAnimationFrame(sync); return;
     }
-    const rect = hud.getBoundingClientRect(), viewport = bandDetailContent.getBoundingClientRect();
-    const style = getComputedStyle(bandDetailContent), visual = window.visualViewport;
-    const engine = document.querySelector("[data-portfolio-engine]")?.getBoundingClientRect();
-    const top = Math.max(viewport.top + parseFloat(style.paddingTop), visual?.offsetTop || 0);
-    const bottom = Math.min(viewport.bottom - parseFloat(style.paddingBottom), engine?.top ?? innerHeight,
-      visual ? visual.offsetTop + visual.height : innerHeight);
-    const left = viewport.left + parseFloat(style.paddingLeft), right = viewport.right - parseFloat(style.paddingRight);
-    const scale = Math.min(1.18, (right - left) / rect.width, (bottom - top) / rect.height);
-    if (!rect.width || !rect.height || bottom <= top) { session.frame = requestAnimationFrame(sync); return; }
+    // Clear only the Shell's temporary placement before measuring the retained heading slot.
+    hud.style.removeProperty("transform");
+    const placement = measureBandIdentityPlacement(hud);
+    if (!placement) { session.frame = requestAnimationFrame(sync); return; }
+    const { rect, scale } = placement;
     if (scale < 1) { settleBandIdentityReveal(); return; }
-    session.transform = `translate(${(left + right) / 2 - (rect.left + rect.width / 2)}px, ${(top + bottom) / 2 - (rect.top + rect.height / 2)}px) scale(${scale})`;
+    session.transform = placement.transform;
     session.started = true;
     session.scrollTop = bandDetailContent.scrollTop;
     hud.style.transform = session.transform;
