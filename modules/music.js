@@ -13573,7 +13573,7 @@ function requestMusicShowsIndexData() {
   });
 }
 
-// S4: static previews only. Stable show IDs, resolved albums, and bounded first-photo pages.
+// Synchronicity memories: stable show identities, bounded previews, and local motion lifecycle.
 let synchronicityMemoriesSession = null;
 let synchronicityMemoriesWide = null;
 
@@ -13581,10 +13581,12 @@ function clearSynchronicityMemories() {
   const session = synchronicityMemoriesSession;
   synchronicityMemoriesSession = null;
   if (!session) return;
+  session.dispose?.();
   session.cancelImages.forEach(cancel => cancel());
   session.stage.replaceChildren();
   session.stage.removeAttribute("aria-busy");
   delete session.stage.dataset.memoryCount;
+  delete session.stage.dataset.memoryMotion;
 }
 
 function prepareSynchronicityMemories() {
@@ -13601,9 +13603,12 @@ function prepareSynchronicityMemories() {
   stage.setAttribute("aria-busy", "true");
   const current = () => synchronicityMemoriesSession === session && !viewport.hidden &&
     getRouteFromUrl().name === "music-shows" && v3RouteContext.entry === entry && musicShowsSetsCollection === source;
+  const visibleWaiters = new Set();
+  const waitForVisible = () => current() && document.hidden
+    ? new Promise(resolve => visibleWaiters.add(resolve)) : Promise.resolve();
   const usable = src => Boolean(src && isMusicShowPosterImageSrc(src) && src !== SET_GALLERY_NO_POSTER_IMAGE_SRC && !/\/(?:placeholders|Band-Logos)\//i.test(src));
   const decode = src => new Promise(resolve => {
-    if (!current() || !usable(src) || session.seenImages.has(src)) { resolve(null); return; }
+    if (!current() || !usable(src)) { resolve(null); return; }
     const image = new Image();
     image.decoding = "async";
     image.referrerPolicy = "strict-origin-when-cross-origin";
@@ -13627,6 +13632,140 @@ function prepareSynchronicityMemories() {
     };
     image.src = src;
   });
+
+  // Shared archive requests keep their cache/in-flight ownership. Late responses
+  // may warm that cache, but cannot update a departed scene.
+  const active = () => current() && !session.paused && !document.hidden && !viewport.inert && !reducedMotion.matches;
+  const queue = [];
+  let workers = 0;
+  const pump = () => {
+    while (active() && workers < 2 && queue.length) {
+      const job = queue.shift();
+      workers++;
+      Promise.resolve().then(() => current() ? job.run() : null).catch(() => null)
+        .then(job.resolve).finally(() => { workers--; pump(); });
+    }
+  };
+  const enqueue = run => new Promise(resolve => { queue.push({ run, resolve }); pump(); });
+  const imageFor = (memory, src) => {
+    if (!usable(src) || memory.failed.has(src)) return Promise.resolve(null);
+    if (memory.images.has(src)) return Promise.resolve(memory.images.get(src));
+    return enqueue(async () => {
+      const image = await decode(src);
+      if (image) {
+        image.alt = memory.image.alt;
+        image.draggable = false;
+        memory.images.set(src, image);
+      } else if (current()) memory.failed.add(src);
+      return image;
+    });
+  };
+  const stopFade = memory => {
+    if (!memory.fade) return;
+    memory.fade.onfinish = null;
+    memory.fade.cancel();
+    memory.incoming?.remove();
+    memory.fade = null;
+    memory.incoming = null;
+  };
+  const schedule = memory => {
+    if (!active() || memory.timer || memory.busy || !memory.next) return;
+    const wait = Math.max(memory.remaining ?? memory.interval, 0);
+    memory.due = performance.now() + wait;
+    memory.timer = setTimeout(() => {
+      memory.timer = 0;
+      if (!active()) return;
+      // Independent clocks can eventually coincide; keep fades at least 900ms apart.
+      const separation = 900 - (performance.now() - (session.lastSwap ?? -Infinity));
+      if (separation > 0) { memory.remaining = separation; schedule(memory); return; }
+      const next = memory.next;
+      memory.next = null;
+      session.lastSwap = performance.now();
+      memory.remaining = memory.interval - 700;
+      memory.incoming = next.image;
+      memory.frame.append(next.image);
+      memory.fade = next.image.animate([{ opacity: 0 }, { opacity: .96 }], {
+        duration: 700, easing: "ease-in-out", fill: "forwards"
+      });
+      memory.fade.onfinish = () => {
+        if (!current() || !memory.fade) return;
+        memory.image.remove();
+        memory.image = next.image;
+        memory.index = next.index;
+        const fade = memory.fade;
+        memory.fade = null;
+        memory.incoming = null;
+        fade.cancel();
+        prepareNext(memory);
+      };
+    }, wait);
+  };
+  const prepareNext = async memory => {
+    if (!active() || memory.busy || memory.next || memory.fade || memory.kind !== "photo") return;
+    memory.busy = true;
+    try {
+      if (!memory.expanded) {
+        // One extra page of at most three photos per selected show. No gallery traversal.
+        memory.expanded = true;
+        if (memory.page.hasMore && memory.page.nextStart > 1) {
+          const page = await enqueue(() => requestMusicSmugmugAlbumPhotosPage(memory.albumId, 3, memory.page.nextStart));
+          if (!current()) return;
+          for (const photo of page?.photos || []) {
+            const src = getMusicAlbumPhotoImageSrc(photo), key = photo.dedupeKey || src;
+            if (usable(src) && !memory.keys.has(key) && !memory.sources.includes(src)) {
+              memory.keys.add(key); memory.sources.push(src);
+            }
+          }
+        }
+      }
+      for (let step = 1; step < memory.sources.length && current(); step++) {
+        const index = (memory.index + step) % memory.sources.length;
+        const image = await imageFor(memory, memory.sources[index]);
+        if (!current()) return;
+        if (image && image !== memory.image) {
+          memory.next = { image, index };
+          memory.frame.dataset.memoryLiving = "true";
+          break;
+        }
+      }
+    } finally {
+      memory.busy = false;
+      schedule(memory);
+    }
+  };
+  // Reusable local pause/resume, without adding future selection/drawer interactions.
+  // Hidden tabs freeze fades; reduced motion keeps the current valid photograph.
+  session.sync = () => {
+    if (!document.hidden) { visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear(); }
+    const playing = active();
+    stage.dataset.memoryMotion = playing ? "running" : "paused";
+    for (const memory of session.results) {
+      if (!memory.frame) continue;
+      if (!playing) {
+        if (memory.timer) {
+          memory.remaining = Math.max(0, memory.due - performance.now());
+          clearTimeout(memory.timer); memory.timer = 0;
+        }
+        if (reducedMotion.matches) stopFade(memory);
+        else memory.fade?.pause();
+      } else {
+        memory.fade?.play();
+        prepareNext(memory);
+        schedule(memory);
+      }
+    }
+    pump();
+  };
+  session.setPaused = paused => { session.paused = Boolean(paused); session.sync(); };
+  session.dispose = () => {
+    document.removeEventListener("visibilitychange", session.sync);
+    reducedMotion.removeEventListener("change", session.sync);
+    visibleWaiters.forEach(resolve => resolve()); visibleWaiters.clear();
+    queue.splice(0).forEach(job => job.resolve(null));
+    for (const memory of session.results) { clearTimeout(memory.timer); stopFade(memory); }
+  };
+  document.addEventListener("visibilitychange", session.sync);
+  reducedMotion.addEventListener("change", session.sync);
   const seenShows = new Set();
   // No fallback/demo records and no date-derived route codes are used as identity.
   const candidates = getMusicShowsIndexRows().filter(show => {
@@ -13645,33 +13784,44 @@ function prepareSynchronicityMemories() {
   const render = () => {
     if (!current()) return;
     const fragment = document.createDocumentFragment();
-    session.results.forEach(({ show, id, image, kind }) => {
+    session.results.forEach((memory, index) => {
+      const { show, id, image, kind } = memory;
       const frame = document.createElement("figure");
       frame.className = "synchronicity-memory";
       frame.dataset.memoryShowId = id;
       frame.dataset.memoryKind = kind;
       image.alt = (kind === "photo" ? "Concert photograph from " : "Show poster for ") + getMusicShowTitle(show);
       image.draggable = false;
+      Object.assign(memory, {
+        frame, interval: [8400, 9700, 11100, 9000, 11800][index],
+        remaining: [8200, 9200, 10200, 11200, 12000][index], index: 0,
+        sources: [image.src], keys: new Set([memory.photoKey || image.src]),
+        images: new Map([[image.src, image]]), failed: new Set()
+      });
       frame.append(image);
       fragment.append(frame);
     });
     stage.dataset.memoryCount = String(session.results.length);
     stage.replaceChildren(fragment);
+    session.sync();
   };
   (async () => {
     // Prefer the newest documented concert galleries. At most ten one-photo API pages,
     // two requests at a time; never follow pagination or fetch an entire gallery.
     const albums = candidates.filter(candidate => candidate.album).slice(0, 10);
     for (let start = 0; start < albums.length && current() && session.results.length < limit;) {
+      await waitForVisible();
+      if (!current()) break;
       const batch = albums.slice(start, start + Math.min(2, limit - session.results.length));
       start += batch.length;
       const results = await Promise.all(batch.map(async candidate => {
         try {
           const albumId = String(candidate.album.album_id || candidate.album.gallery_id).trim();
           const page = await requestMusicSmugmugAlbumPhotosPage(albumId, 1, 1);
+          await waitForVisible();
           if (!current()) return null;
           const image = await decode(getMusicAlbumPhotoImageSrc(page.photos[0]));
-          return image ? { ...candidate, image, kind: "photo" } : null;
+          return image ? { ...candidate, albumId, page, photoKey: page.photos[0]?.dedupeKey, image, kind: "photo" } : null;
         } catch { return null; }
       }));
       results.forEach(retain);
@@ -13680,6 +13830,8 @@ function prepareSynchronicityMemories() {
     for (const candidate of candidates) {
       if (!current() || session.results.length >= limit) break;
       if (session.results.some(result => result.id === candidate.id)) continue;
+      await waitForVisible();
+      if (!current()) break;
       const image = await decode(candidate.show.capturedPoster);
       if (image) retain({ ...candidate, image, kind: "poster" });
     }
@@ -13696,8 +13848,8 @@ function initSynchronicityMemories() {
   synchronicityMemoriesWide.addEventListener("change", prepareSynchronicityMemories);
   new MutationObserver(() => {
     if (viewport.hidden) clearSynchronicityMemories();
-    else prepareSynchronicityMemories();
-  }).observe(viewport, { attributes: true, attributeFilter: ["hidden"] });
+    else { prepareSynchronicityMemories(); synchronicityMemoriesSession?.sync?.(); }
+  }).observe(viewport, { attributes: true, attributeFilter: ["hidden", "inert"] });
   window.addEventListener("pagehide", clearSynchronicityMemories);
   window.addEventListener("pageshow", prepareSynchronicityMemories);
 }

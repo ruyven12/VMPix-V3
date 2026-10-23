@@ -1,0 +1,825 @@
+[
+  {
+    "name": "layout 360x800",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 712.3125,
+        "top": 0,
+        "right": 360,
+        "bottom": 712.3125,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 336,
+        "height": 288,
+        "top": 10,
+        "right": 348,
+        "bottom": 298,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "archive": {
+        "x": 12,
+        "y": 310,
+        "width": 336,
+        "height": 916.96875,
+        "top": 310,
+        "right": 348,
+        "bottom": 1226.96875,
+        "left": 12
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 109.4453125,
+            "y": 101.203125,
+            "width": 141.109375,
+            "height": 94.0625,
+            "top": 101.203125,
+            "right": 250.5546875,
+            "bottom": 195.265625,
+            "left": 109.4453125
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 18.7109375,
+            "y": 49.9921875,
+            "width": 87.359375,
+            "height": 58.234375,
+            "top": 49.9921875,
+            "right": 106.0703125,
+            "bottom": 108.2265625,
+            "left": 18.7109375
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 253.9140625,
+            "y": 188.2421875,
+            "width": 87.359375,
+            "height": 58.234375,
+            "top": 188.2421875,
+            "right": 341.2734375,
+            "bottom": 246.4765625,
+            "left": 253.9140625
+          },
+          "drift": "27s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 6,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 412x915",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 818.34375,
+        "top": 0,
+        "right": 412,
+        "bottom": 818.34375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 388,
+        "height": 329.390625,
+        "top": 10,
+        "right": 400,
+        "bottom": 339.390625,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "archive": {
+        "x": 12,
+        "y": 351.390625,
+        "width": 388,
+        "height": 729.71875,
+        "top": 351.390625,
+        "right": 400,
+        "bottom": 1081.109375,
+        "left": 12
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 124.52362060546875,
+            "y": 113.78097534179688,
+            "width": 162.953125,
+            "height": 108.625,
+            "top": 113.78097534179688,
+            "right": 287.47674560546875,
+            "bottom": 222.40597534179688,
+            "left": 124.52362060546875
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 19.75,
+            "y": 55.421875,
+            "width": 100.875,
+            "height": 67.25,
+            "top": 55.421875,
+            "right": 120.625,
+            "bottom": 122.671875,
+            "left": 19.75
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 291.359375,
+            "y": 213.53125,
+            "width": 100.875,
+            "height": 67.25,
+            "top": 213.53125,
+            "right": 392.234375,
+            "bottom": 280.78125,
+            "left": 291.359375
+          },
+          "drift": "27s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 6,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 480x1040",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 939.515625,
+        "top": 0,
+        "right": 480,
+        "bottom": 939.515625,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 456,
+        "height": 360,
+        "top": 10,
+        "right": 468,
+        "bottom": 370,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 955.546875,
+        "width": 461.46875,
+        "height": 75.1875,
+        "top": 955.546875,
+        "right": 470.734375,
+        "bottom": 1030.734375,
+        "left": 9.265625
+      },
+      "archive": {
+        "x": 12,
+        "y": 382,
+        "width": 456,
+        "height": 823.125,
+        "top": 382,
+        "right": 468,
+        "bottom": 1205.125,
+        "left": 12
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 144.2421875,
+            "y": 118.9609375,
+            "width": 191.515625,
+            "height": 127.671875,
+            "top": 118.9609375,
+            "right": 335.7578125,
+            "bottom": 246.6328125,
+            "left": 144.2421875
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 21.1171875,
+            "y": 56.875,
+            "width": 118.546875,
+            "height": 79.03125,
+            "top": 56.875,
+            "right": 139.6640625,
+            "bottom": 135.90625,
+            "left": 21.1171875
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 340.3203125,
+            "y": 229.671875,
+            "width": 118.546875,
+            "height": 79.03125,
+            "top": 229.671875,
+            "right": 458.8671875,
+            "bottom": 308.703125,
+            "left": 340.3203125
+          },
+          "drift": "27s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 6,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 1920x1080",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 979.515625,
+        "top": 0,
+        "right": 1920,
+        "bottom": 979.515625,
+        "left": 0
+      },
+      "stage": {
+        "x": 360,
+        "y": 10,
+        "width": 1200,
+        "height": 420,
+        "top": 10,
+        "right": 1560,
+        "bottom": 430,
+        "left": 360
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "archive": {
+        "x": 544,
+        "y": 442,
+        "width": 832,
+        "height": 851.6875,
+        "top": 442,
+        "right": 1376,
+        "bottom": 1293.6875,
+        "left": 544
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 815.0004272460938,
+            "y": 114.9290542602539,
+            "width": 290.00006103515625,
+            "height": 193.328125,
+            "top": 114.9290542602539,
+            "right": 1105.00048828125,
+            "bottom": 308.2571792602539,
+            "left": 815.0004272460938
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 437.9998779296875,
+            "y": 55.39081573486328,
+            "width": 204,
+            "height": 136,
+            "top": 55.39081573486328,
+            "right": 641.9998779296875,
+            "bottom": 191.39081573486328,
+            "left": 437.9998779296875
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 1278.0001220703125,
+            "y": 97.39048767089844,
+            "width": 204,
+            "height": 136,
+            "top": 97.39048767089844,
+            "right": 1482.0001220703125,
+            "bottom": 233.39048767089844,
+            "left": 1278.0001220703125
+          },
+          "drift": "27s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 594,
+            "y": 273.79693603515625,
+            "width": 204,
+            "height": 136,
+            "top": 273.79693603515625,
+            "right": 798,
+            "bottom": 409.79693603515625,
+            "left": 594
+          },
+          "drift": "21s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 1158,
+            "y": 282.1874694824219,
+            "width": 204,
+            "height": 136,
+            "top": 282.1874694824219,
+            "right": 1362,
+            "bottom": 418.1874694824219,
+            "left": 1158
+          },
+          "drift": "25s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 10,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 915x412",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 333.109375,
+        "top": 0,
+        "right": 915,
+        "bottom": 333.109375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 891,
+        "height": 190,
+        "top": 10,
+        "right": 903,
+        "bottom": 200,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 349.140625,
+        "width": 896.46875,
+        "height": 53.59375,
+        "top": 349.140625,
+        "right": 905.734375,
+        "bottom": 402.734375,
+        "left": 9.265625
+      },
+      "archive": {
+        "x": 41.5,
+        "y": 212,
+        "width": 832,
+        "height": 847.53125,
+        "top": 212,
+        "right": 873.5,
+        "bottom": 1059.53125,
+        "left": 41.5
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 347.5,
+            "y": 27.859375,
+            "width": 220,
+            "height": 146.65625,
+            "top": 27.859375,
+            "right": 567.5,
+            "bottom": 174.515625,
+            "left": 347.5
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 96.203125,
+            "y": 22.640625,
+            "width": 98.875,
+            "height": 65.90625,
+            "top": 22.640625,
+            "right": 195.078125,
+            "bottom": 88.546875,
+            "left": 96.203125
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 719.90625,
+            "y": 113.84375,
+            "width": 98.875,
+            "height": 65.90625,
+            "top": 113.84375,
+            "right": 818.78125,
+            "bottom": 179.75,
+            "left": 719.90625
+          },
+          "drift": "27s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 6,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 412x915 safe",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 793.625,
+        "top": 0,
+        "right": 412,
+        "bottom": 793.625,
+        "left": 0
+      },
+      "stage": {
+        "x": 24,
+        "y": 44,
+        "width": 364,
+        "height": 329.390625,
+        "top": 44,
+        "right": 388,
+        "bottom": 373.390625,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 809.640625,
+        "width": 364,
+        "height": 71.359375,
+        "top": 809.640625,
+        "right": 388,
+        "bottom": 881,
+        "left": 24
+      },
+      "archive": {
+        "x": 24,
+        "y": 385.390625,
+        "width": 364,
+        "height": 729.71875,
+        "top": 385.390625,
+        "right": 388,
+        "bottom": 1115.109375,
+        "left": 24
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 129.5625,
+            "y": 151.140625,
+            "width": 152.875,
+            "height": 101.90625,
+            "top": 151.140625,
+            "right": 282.4375,
+            "bottom": 253.046875,
+            "left": 129.5625
+          },
+          "drift": "19s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 31.28125,
+            "y": 91.5078125,
+            "width": 94.625,
+            "height": 63.078125,
+            "top": 91.5078125,
+            "right": 125.90625,
+            "bottom": 154.5859375,
+            "left": 31.28125
+          },
+          "drift": "23s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 286.078125,
+            "y": 249.6171875,
+            "width": 94.625,
+            "height": 63.078125,
+            "top": 249.6171875,
+            "right": 380.703125,
+            "bottom": 312.6953125,
+            "left": 286.078125
+          },
+          "drift": "27s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 6,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "layout 412x915 reduced",
+    "passed": true,
+    "geometry": {
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 818.34375,
+        "top": 0,
+        "right": 412,
+        "bottom": 818.34375,
+        "left": 0
+      },
+      "stage": {
+        "x": 12,
+        "y": 10,
+        "width": 388,
+        "height": 329.390625,
+        "top": 10,
+        "right": 400,
+        "bottom": 339.390625,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "archive": {
+        "x": 12,
+        "y": 351.390625,
+        "width": 388,
+        "height": 729.71875,
+        "top": 351.390625,
+        "right": 400,
+        "bottom": 1081.109375,
+        "left": 12
+      },
+      "overflow": 0,
+      "memories": [
+        {
+          "box": {
+            "x": 124.5234375,
+            "y": 113.78125,
+            "width": 162.953125,
+            "height": 108.625,
+            "top": 113.78125,
+            "right": 287.4765625,
+            "bottom": 222.40625,
+            "left": 124.5234375
+          },
+          "drift": "1e-06s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 19.75,
+            "y": 55.421875,
+            "width": 100.875,
+            "height": 67.25,
+            "top": 55.421875,
+            "right": 120.625,
+            "bottom": 122.671875,
+            "left": 19.75
+          },
+          "drift": "1e-06s",
+          "photo": true
+        },
+        {
+          "box": {
+            "x": 291.359375,
+            "y": 213.53125,
+            "width": 100.875,
+            "height": 67.25,
+            "top": 213.53125,
+            "right": 392.234375,
+            "bottom": 280.78125,
+            "left": 291.359375
+          },
+          "drift": "1e-06s",
+          "photo": true
+        }
+      ],
+      "scrollOwners": [
+        "synchronicity-viewport"
+      ],
+      "background": "url(\"https://vmpix-v3.onrender.com/assets/media/background/zhento-syncronity.png\")",
+      "position": "50% 50%",
+      "interactive": 0
+    },
+    "requests": 3,
+    "peak": 1,
+    "imagePeak": 1
+  },
+  {
+    "name": "rotation, same-show identity, bounded loading and 30 minute session",
+    "passed": true,
+    "simulatedMinutes": 30,
+    "method": "100x test-only interval and fade acceleration; real timing verified separately in recordings",
+    "swaps": 638,
+    "requests": 10,
+    "images": 20,
+    "peak": 2,
+    "imagePeak": 2,
+    "maxLayers": 2,
+    "blankFrames": 0,
+    "firstSwaps": [
+      {
+        "id": "9501",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA1/1.jpg",
+        "at": 1524.2000000029802
+      },
+      {
+        "id": "9502",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA2/1.jpg",
+        "at": 1538.3000000044703
+      },
+      {
+        "id": "9503",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA3/1.jpg",
+        "at": 1569.3000000044703
+      },
+      {
+        "id": "9504",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA4/1.jpg",
+        "at": 1578.4000000059605
+      },
+      {
+        "id": "9500",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA0/2.jpg",
+        "at": 1640.6000000014901
+      },
+      {
+        "id": "9501",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA1/2.jpg",
+        "at": 1706.8000000044703
+      },
+      {
+        "id": "9502",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA2/2.jpg",
+        "at": 1723.6000000014901
+      },
+      {
+        "id": "9503",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA3/2.jpg",
+        "at": 1737.2000000029802
+      },
+      {
+        "id": "9504",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA4/2.jpg",
+        "at": 1772.1000000014901
+      },
+      {
+        "id": "9500",
+        "src": "https://vmpix-v3.onrender.com/s5-test/S5QA0/3.jpg",
+        "at": 1807.5
+      }
+    ]
+  },
+  {
+    "name": "visibility pause, fade pause, live reduced motion and resume",
+    "passed": true,
+    "visibility": "Simulated document.hidden through actual lifecycle listener",
+    "reducedMotion": "Browser media emulation",
+    "preferenceChanges": true
+  },
+  {
+    "name": "single photo, poster, failed additional images and duplicate photos stay safe",
+    "passed": true,
+    "cases": 5
+  },
+  {
+    "name": "delayed API cancellation, hidden initial loading, retry entry",
+    "passed": true,
+    "hiddenNewLoads": 0,
+    "staleDOM": 0
+  },
+  {
+    "name": "existing archive filters, details, keyboard, Back restoration and repeat cleanup",
+    "passed": true,
+    "scroll": 902,
+    "filterRequests": 0,
+    "reentryCycles": 8,
+    "ids": [
+      "239",
+      "238",
+      "237"
+    ]
+  }
+]

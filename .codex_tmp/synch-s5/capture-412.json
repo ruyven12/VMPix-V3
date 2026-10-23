@@ -1,0 +1,136 @@
+{
+  "viewport": {
+    "width": 412,
+    "height": 915
+  },
+  "video": {
+    "width": 412,
+    "height": 915
+  },
+  "seconds": 34.9295699596405,
+  "frames": 695,
+  "browser": "155.0.8059.85",
+  "data": "Current public API responses captured 2026-10-23, real SmugMug images; local implementation, Analytics blocked; not physical-device evidence.",
+  "requests": [
+    {
+      "id": "zsRbjf",
+      "limit": 1,
+      "start": 1,
+      "at": 1792787719343
+    },
+    {
+      "id": "LztvDF",
+      "limit": 1,
+      "start": 1,
+      "at": 1792787719343
+    },
+    {
+      "id": "MfPF76",
+      "limit": 1,
+      "start": 1,
+      "at": 1792787719631
+    },
+    {
+      "id": "zsRbjf",
+      "limit": 3,
+      "start": 2,
+      "at": 1792787719671
+    },
+    {
+      "id": "LztvDF",
+      "limit": 3,
+      "start": 2,
+      "at": 1792787719671
+    },
+    {
+      "id": "MfPF76",
+      "limit": 3,
+      "start": 2,
+      "at": 1792787719675
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "swaps": [
+      {
+        "id": "239",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/National/Watashi-Wa/060426/i-TpfSRZZ/0/MWQ6V7rKhpwSXbTCmBK2vq6tRg4LjF8wGp6HVT4kz/M/2026-06-04%20-%20Watashi%20Wa-2-M.jpg",
+        "at": 9712.79999999702
+      },
+      {
+        "id": "238",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Loki/031426/i-Hmst8qQ/0/LRN33Dphz2pDWhv7C39Zg3wSdWb4QpTM56wgDDM2q/M/2026-03-14%20-%20Loki-2-M.jpg",
+        "at": 10680.59999999404
+      },
+      {
+        "id": "237",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Echo-Ritual/120625/i-j86kdWt/0/KkQZwWPwmRNwj47mHxhF56sLZzSRXS4bhWtsWSzRG/M/2025-12-06%20-%20Echo%20Ritual-2-M.jpg",
+        "at": 11842.89999999851
+      },
+      {
+        "id": "239",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/National/Watashi-Wa/060426/i-b9fkcKT/0/MXNBvnVVM2WK7WvBStFXvDZBcKXpmwFXFRcK4vQc3/M/2026-06-04%20-%20Watashi%20Wa-3-M.jpg",
+        "at": 18371.19999999553
+      },
+      {
+        "id": "238",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Loki/031426/i-BNfQBRW/0/LzfFvC3W3fz2dgpmS98b5ddStg54pCf4xwM2PrgXB/M/2026-03-14%20-%20Loki-3-M.jpg",
+        "at": 20629.59999999404
+      },
+      {
+        "id": "237",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Echo-Ritual/120625/i-KDNDWZk/0/NGJwFnmZwDfkPcSQhGcftLVMPvL6c5FnXFbdxswGJ/M/2025-12-06%20-%20Echo%20Ritual-3-M.jpg",
+        "at": 23159.19999999553
+      },
+      {
+        "id": "239",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/National/Watashi-Wa/060426/i-pFhV3Mw/0/KDXjBF6jBgr9rFnf75TXRqjHdLsh2nKBb2HmNMt7r/M/2026-06-04%20-%20Watashi%20Wa-4-M.jpg",
+        "at": 27063.19999999553
+      },
+      {
+        "id": "238",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Loki/031426/i-tnMCBKX/0/L9SXDFd5rCsPhxVdrPL4Z4PgJwHpqkWMb3XDVPFqp/M/2026-03-14%20-%20Loki-4-M.jpg",
+        "at": 30566.59999999404
+      },
+      {
+        "id": "237",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Echo-Ritual/120625/i-TGh9hjf/0/LL6GqMFfzZZScTPJzZVL3SL4vCvZk76LGjZHX8zMk/M/2025-12-06%20-%20Echo%20Ritual-4-M.jpg",
+        "at": 34617.09999999404
+      },
+      {
+        "id": "239",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/National/Watashi-Wa/060426/i-xWgtDq9/0/NGDpPwNqFBQSf87nKLvqLFctnLWkD8GrDR6PJLNzW/M/2026-06-04%20-%20Watashi%20Wa-1-M.jpg",
+        "at": 35517.5
+      }
+    ],
+    "frameP50": 16.699999999999818,
+    "frameP95": 16.799999999999272,
+    "gapsOver50": 0,
+    "longTasks": [],
+    "shifts": [],
+    "overflow": 0,
+    "images": [
+      {
+        "id": "239",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/National/Watashi-Wa/060426/i-xWgtDq9/0/NGDpPwNqFBQSf87nKLvqLFctnLWkD8GrDR6PJLNzW/M/2026-06-04%20-%20Watashi%20Wa-1-M.jpg",
+        "kind": "photo",
+        "cached": 4,
+        "layers": 1
+      },
+      {
+        "id": "238",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Loki/031426/i-tnMCBKX/0/L9SXDFd5rCsPhxVdrPL4Z4PgJwHpqkWMb3XDVPFqp/M/2026-03-14%20-%20Loki-4-M.jpg",
+        "kind": "photo",
+        "cached": 4,
+        "layers": 1
+      },
+      {
+        "id": "237",
+        "src": "https://photos.smugmug.com/Music/Archives/Bands/Local/Echo-Ritual/120625/i-TGh9hjf/0/LL6GqMFfzZZScTPJzZVL3SL4vCvZk76LGjZHX8zMk/M/2025-12-06%20-%20Echo%20Ritual-4-M.jpg",
+        "kind": "photo",
+        "cached": 4,
+        "layers": 1
+      }
+    ]
+  }
+}
