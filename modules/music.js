@@ -13574,6 +13574,116 @@ function requestMusicShowsIndexData() {
 }
 
 // Synchronicity memories: stable show identities, bounded previews, and local motion lifecycle.
+
+let synchronicityArchiveDrawer = null;
+
+function initSynchronicityArchiveDrawer(viewport) {
+  if (synchronicityArchiveDrawer) return;
+  const layer = viewport.querySelector("[data-synchronicity-drawer-layer]");
+  const drawer = layer?.querySelector(".synchronicity-drawer");
+  const content = layer?.querySelector("[data-synchronicity-archive-content]");
+  const explore = viewport.querySelector("[data-synchronicity-explore]");
+  const close = layer?.querySelector("[data-synchronicity-drawer-close]");
+  const expand = layer?.querySelector("[data-synchronicity-drawer-expand]");
+  const memories = viewport.querySelector("[data-synchronicity-memories]");
+  if (!layer || !drawer || !content || !explore || !close || !expand || !memories) return;
+  const state = { open: false, blocking: false, expanded: false, scrollTop: 0, animation: null, entry: null, visit: null };
+  synchronicityArchiveDrawer = state;
+  const available = () => !viewport.hidden && !viewport.inert && getRouteFromUrl().name === "music-shows";
+  const setExpanded = expanded => {
+    state.expanded = expanded;
+    drawer.dataset.expanded = String(expanded);
+    expand.textContent = expanded ? "Collapse" : "Expand";
+    expand.setAttribute("aria-expanded", String(expanded));
+  };
+  const change = (open, immediate = false, restoreFocus = true) => {
+    if (open && !available()) return;
+    if (!immediate && state.open === open) return;
+    const from = layer.hidden ? "translateY(105%)" : getComputedStyle(drawer).transform;
+    if (state.animation) { state.animation.onfinish = null; state.animation.cancel(); state.animation = null; }
+    if (!open && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
+    state.open = open;
+    state.blocking = true;
+    layer.hidden = false;
+    layer.inert = !open;
+    viewport.dataset.archiveDrawerOpen = "";
+    memories.inert = true;
+    explore.inert = true;
+    explore.setAttribute("aria-expanded", String(open));
+    const to = open ? "translateY(0)" : "translateY(105%)";
+    drawer.style.transform = to;
+    if (open) {
+      content.scrollTop = state.scrollTop;
+      if (restoreFocus) close.focus({ preventScroll: true });
+    }
+    synchronicityMemoriesSession?.sync?.();
+    const finish = () => {
+      if (!state.open) {
+        layer.hidden = true;
+        layer.inert = true;
+        state.blocking = false;
+        delete viewport.dataset.archiveDrawerOpen;
+        memories.inert = false;
+        explore.inert = false;
+        if (restoreFocus && available() && (document.activeElement === document.body || layer.contains(document.activeElement))) {
+          explore.focus({ preventScroll: true });
+        }
+        synchronicityMemoriesSession?.sync?.();
+      }
+    };
+    if (immediate || reducedMotion.matches || typeof drawer.animate !== "function") { finish(); return; }
+    const animation = drawer.animate([{ transform: from }, { transform: to }], {
+      duration: 300, easing: "cubic-bezier(.22,.61,.36,1)"
+    });
+    state.animation = animation;
+    animation.onfinish = () => {
+      if (state.animation !== animation) return;
+      state.animation = null;
+      animation.cancel();
+      finish();
+    };
+  };
+  state.syncRoute = () => {
+    if (!available()) {
+      if (state.entry) {
+        state.visit = { entry: state.entry, open: state.open, expanded: state.expanded, scrollTop: !layer.hidden && content.contains(musicActivityPanel) ? content.scrollTop : state.scrollTop };
+        state.entry = null;
+      }
+      change(false, true, false);
+      return;
+    }
+    if (state.entry === v3RouteContext.entry) return;
+    state.entry = v3RouteContext.entry;
+    // Keep only the last Shows visit in memory; full refresh/reconstruction restoration is S12.
+    const saved = state.visit?.entry === state.entry ? state.visit : null;
+    state.scrollTop = saved?.scrollTop || 0;
+    setExpanded(Boolean(saved?.expanded));
+    change(Boolean(saved?.open), true, false);
+  };
+  content.addEventListener("scroll", () => {
+    if (state.entry && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
+  }, { passive: true });
+  explore.addEventListener("click", () => change(true));
+  close.addEventListener("click", () => change(false));
+  layer.querySelector("[data-synchronicity-drawer-backdrop]").addEventListener("click", () => change(false));
+  expand.addEventListener("click", () => {
+    const top = content.scrollTop;
+    setExpanded(!state.expanded);
+    content.scrollTop = top;
+  });
+  drawer.addEventListener("keydown", event => {
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); change(false); }
+  });
+  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) state.animation?.finish(); });
+  window.addEventListener("pagehide", () => {
+    if (state.entry) state.visit = { entry: state.entry, open: state.open, expanded: state.expanded, scrollTop: !layer.hidden && content.contains(musicActivityPanel) ? content.scrollTop : state.scrollTop };
+    state.entry = null;
+    change(false, true, false);
+  });
+  window.addEventListener("pageshow", state.syncRoute);
+  state.syncRoute();
+}
+
 let synchronicityMemoriesSession = null;
 let synchronicityMemoriesWide = null;
 
@@ -13636,7 +13746,7 @@ function prepareSynchronicityMemories() {
 
   // Shared archive requests keep their cache/in-flight ownership. Late responses
   // may warm that cache, but cannot update a departed scene.
-  const active = () => current() && !session.paused && !document.hidden && !viewport.inert && !reducedMotion.matches;
+  const active = () => current() && !session.paused && !synchronicityArchiveDrawer?.blocking && !document.hidden && !viewport.inert && !reducedMotion.matches;
   const queue = [];
   let workers = 0;
   const pump = () => {
@@ -13942,9 +14052,11 @@ function prepareSynchronicityMemories() {
 function initSynchronicityMemories() {
   const viewport = document.querySelector("[data-synchronicity-viewport]");
   if (!viewport || synchronicityMemoriesWide) return;
+  initSynchronicityArchiveDrawer(viewport);
   synchronicityMemoriesWide = window.matchMedia("(min-width: 1000px)");
   synchronicityMemoriesWide.addEventListener("change", prepareSynchronicityMemories);
   new MutationObserver(() => {
+    synchronicityArchiveDrawer?.syncRoute();
     if (viewport.hidden) clearSynchronicityMemories();
     else { prepareSynchronicityMemories(); synchronicityMemoriesSession?.sync?.(); }
   }).observe(viewport, { attributes: true, attributeFilter: ["hidden", "inert"] });

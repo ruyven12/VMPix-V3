@@ -5494,6 +5494,7 @@ reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) fini
 
 // Shows reuses its existing archive node; the Shell owns its mounted location.
 const synchronicityViewport = document.querySelector('[data-synchronicity-viewport]');
+const synchronicityArchiveContent = synchronicityViewport.querySelector('[data-synchronicity-archive-content]');
 const musicActivityHome = document.createComment('Music activity return position');
 musicActivityPanel.before(musicActivityHome);
 
@@ -5503,10 +5504,10 @@ function syncRhythmPresentationOwnership(route, options = {}) {
   const currentFoundation = isCurrentV3Route(route);
   const shows = route.name === 'music-shows';
   if (shows) {
-    if (musicActivityPanel.parentElement !== synchronicityViewport) synchronicityViewport.append(musicActivityPanel);
+    if (musicActivityPanel.parentElement !== synchronicityArchiveContent) synchronicityArchiveContent.append(musicActivityPanel);
   } else {
     clearTimeout(musicShowsSearchRenderTimer);
-    if (musicActivityPanel.parentElement === synchronicityViewport) musicActivityHome.before(musicActivityPanel);
+    if (synchronicityViewport.contains(musicActivityPanel)) musicActivityHome.before(musicActivityPanel);
   }
   synchronicityViewport.hidden = !shows;
   synchronicityViewport.inert = !shows;

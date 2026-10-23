@@ -33706,3 +33706,128 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (min-width: 1000px) {
   .synchronicity-memories[data-memory-selected] { min-height: clamp(260px, 39svh, 420px); }
 }
+
+/* S7: one local archive drawer, bounded by the existing Shell Shows viewport. */
+.synchronicity-viewport { padding-bottom: 84px; }
+.synchronicity-viewport[data-archive-drawer-open] { overflow-y: hidden; }
+.synchronicity-drawer-dock,
+.synchronicity-drawer-layer {
+  position: fixed;
+  inset: 0 0 auto;
+  height: inherit;
+  pointer-events: none;
+}
+.synchronicity-drawer-dock { z-index: 2; }
+.synchronicity-explore {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  width: min(280px, calc(100% - 48px));
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 1px solid rgba(158, 175, 246, .8);
+  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  background: linear-gradient(125deg, rgba(24, 39, 78, .94), rgba(34, 21, 65, .92));
+  color: #e5eaff;
+  font: 500 .85rem/1.4 var(--font-display);
+  box-shadow: inset 0 -2px rgba(137, 130, 230, .4);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.synchronicity-drawer-layer {
+  z-index: 3;
+  overflow: hidden;
+}
+.synchronicity-drawer-layer[hidden] { display: none; }
+.synchronicity-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  touch-action: none;
+}
+.synchronicity-drawer {
+  position: absolute;
+  bottom: 0;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(960px, calc(100% - max(12px, env(safe-area-inset-left)) - max(12px, env(safe-area-inset-right))));
+  height: 65%;
+  max-height: calc(100% - max(10px, env(safe-area-inset-top)));
+  margin: 0 auto;
+  padding: 2px;
+  border: 1px solid rgba(131, 150, 211, .7);
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%, 0 14px);
+  background: linear-gradient(125deg, rgba(15, 24, 48, .94), rgba(19, 15, 37, .89));
+  box-shadow: inset 0 1px rgba(176, 185, 228, .3);
+  color: #e2e8fa;
+  pointer-events: auto;
+  transform: translateY(105%);
+}
+.synchronicity-drawer[data-expanded="true"] {
+  height: calc(100% - max(10px, env(safe-area-inset-top)));
+}
+.synchronicity-drawer-header {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 6px;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(133, 147, 210, .4);
+}
+.synchronicity-drawer-header h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-left: 4px;
+  font: 500 clamp(.76rem, 2.6vw, 1rem)/1.5 var(--font-display);
+  overflow-wrap: anywhere;
+}
+.synchronicity-drawer-header button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px;
+  color: #d9e1ff;
+  border: 1px solid rgba(129, 144, 206, .55);
+  background: rgba(36, 37, 72, .5);
+  font: 500 .7rem/1.4 var(--font-display);
+  cursor: pointer;
+}
+.synchronicity-drawer-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  padding: 12px 8px max(12px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: #7776a8 transparent;
+}
+.synchronicity-drawer-content:focus-visible,
+.synchronicity-drawer-header button:focus-visible {
+  outline: 2px solid #c6d7ff;
+  outline-offset: -3px;
+}
+.synchronicity-explore:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px #c6d7ff;
+}
+@media (min-width: 1000px) {
+  .synchronicity-drawer-header { padding: 12px 16px; gap: 10px; }
+  .synchronicity-drawer-content { padding-inline: 20px; }
+}
+
+/* Fit the unchanged archive controls to the narrower drawer browsing surface. */
+.synchronicity-drawer-content .music-shows-filters { position: static; }
+.synchronicity-drawer-content :is(.music-shows-search-input, .music-shows-filter-select, .music-shows-filter-reset) { min-height: 44px; }
+@media (max-width: 600px) {
+  .synchronicity-drawer-content .music-shows-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .synchronicity-drawer-content .music-shows-filter-field--search { grid-column: 1 / -1; }
+}
+.synchronicity-viewport[data-archive-drawer-open] .synchronicity-drawer-dock { visibility: hidden; }

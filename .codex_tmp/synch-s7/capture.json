@@ -1,0 +1,121 @@
+{
+  "seconds": 19.955562114715576,
+  "frames": 594,
+  "timeline": [
+    {
+      "label": "Closed Nexus",
+      "at": 1792793535742,
+      "state": {
+        "open": false,
+        "expanded": false,
+        "scroll": 0,
+        "motion": "running"
+      }
+    },
+    {
+      "label": "Drawer open",
+      "at": 1792793538139,
+      "state": {
+        "open": true,
+        "expanded": false,
+        "scroll": 0,
+        "motion": "paused"
+      }
+    },
+    {
+      "label": "Expanded",
+      "at": 1792793540846,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 0,
+        "motion": "paused"
+      }
+    },
+    {
+      "label": "Touch-scrolled archive",
+      "at": 1792793546329,
+      "state": {
+        "open": true,
+        "expanded": true,
+        "scroll": 297,
+        "motion": "paused"
+      }
+    },
+    {
+      "label": "Collapsed with browsing position",
+      "at": 1792793548379,
+      "state": {
+        "open": true,
+        "expanded": false,
+        "scroll": 297,
+        "motion": "paused"
+      }
+    },
+    {
+      "label": "Closed, memories resume",
+      "at": 1792793551427,
+      "state": {
+        "open": false,
+        "expanded": false,
+        "scroll": 0,
+        "motion": "running"
+      }
+    },
+    {
+      "label": "Reopened at saved position",
+      "at": 1792793553678,
+      "state": {
+        "open": true,
+        "expanded": false,
+        "scroll": 297,
+        "motion": "paused"
+      }
+    }
+  ],
+  "metrics": {
+    "overflow": 0,
+    "shifts": [],
+    "animation": null,
+    "timers": 3
+  },
+  "requests": [
+    {
+      "id": "zsRbjf",
+      "limit": 1,
+      "start": 1,
+      "at": 1792793535236
+    },
+    {
+      "id": "LztvDF",
+      "limit": 1,
+      "start": 1,
+      "at": 1792793535237
+    },
+    {
+      "id": "MfPF76",
+      "limit": 1,
+      "start": 1,
+      "at": 1792793535510
+    },
+    {
+      "id": "zsRbjf",
+      "limit": 3,
+      "start": 2,
+      "at": 1792793535535
+    },
+    {
+      "id": "LztvDF",
+      "limit": 3,
+      "start": 2,
+      "at": 1792793535537
+    },
+    {
+      "id": "MfPF76",
+      "limit": 3,
+      "start": 2,
+      "at": 1792793535541
+    }
+  ],
+  "evidence": "Local S7 implementation, captured public API records and real SmugMug imagery; native touch events in Chrome emulation, not physical S25 evidence. Analytics blocked."
+}

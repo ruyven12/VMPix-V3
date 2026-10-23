@@ -1,0 +1,1985 @@
+[
+  {
+    "name": "360x800",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 712.3125,
+        "top": 0,
+        "right": 360,
+        "bottom": 712.3125,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 249.3125,
+        "width": 336,
+        "height": 463,
+        "top": 249.3125,
+        "right": 348,
+        "bottom": 712.3125,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 252.3125,
+        "width": 330,
+        "height": 65,
+        "top": 252.3125,
+        "right": 345,
+        "bottom": 317.3125,
+        "left": 15
+      },
+      "scrollTop": 0,
+      "scrollWidth": 330,
+      "clientWidth": 330,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 214.5,
+          "y": 262.3125,
+          "width": 64.953125,
+          "height": 44,
+          "top": 262.3125,
+          "right": 279.453125,
+          "bottom": 306.3125,
+          "left": 214.5
+        },
+        {
+          "x": 285.453125,
+          "y": 262.3125,
+          "width": 51.546875,
+          "height": 44,
+          "top": 262.3125,
+          "right": 337,
+          "bottom": 306.3125,
+          "left": 285.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 41,
+          "y": 360.421875,
+          "width": 278,
+          "height": 44,
+          "top": 360.421875,
+          "right": 319,
+          "bottom": 404.421875,
+          "left": 41
+        },
+        {
+          "x": 41,
+          "y": 424.25,
+          "width": 135.640625,
+          "height": 44,
+          "top": 424.25,
+          "right": 176.640625,
+          "bottom": 468.25,
+          "left": 41
+        },
+        {
+          "x": 183.359375,
+          "y": 424.25,
+          "width": 135.640625,
+          "height": 44,
+          "top": 424.25,
+          "right": 319,
+          "bottom": 468.25,
+          "left": 183.359375
+        },
+        {
+          "x": 41,
+          "y": 488.078125,
+          "width": 135.640625,
+          "height": 44,
+          "top": 488.078125,
+          "right": 176.640625,
+          "bottom": 532.078125,
+          "left": 41
+        },
+        {
+          "x": 183.359375,
+          "y": 488.078125,
+          "width": 135.640625,
+          "height": 44,
+          "top": 488.078125,
+          "right": 319,
+          "bottom": 532.078125,
+          "left": 183.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 712.3125,
+        "top": 0,
+        "right": 360,
+        "bottom": 712.3125,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 10,
+        "width": 336,
+        "height": 702.3125,
+        "top": 10,
+        "right": 348,
+        "bottom": 712.3125,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 728.34375,
+        "width": 341.46875,
+        "height": 62.390625,
+        "top": 728.34375,
+        "right": 350.734375,
+        "bottom": 790.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 13,
+        "width": 330,
+        "height": 65,
+        "top": 13,
+        "right": 345,
+        "bottom": 78,
+        "left": 15
+      },
+      "scrollTop": 280,
+      "scrollWidth": 330,
+      "clientWidth": 330,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 209.40625,
+          "y": 23,
+          "width": 70.046875,
+          "height": 44,
+          "top": 23,
+          "right": 279.453125,
+          "bottom": 67,
+          "left": 209.40625
+        },
+        {
+          "x": 285.453125,
+          "y": 23,
+          "width": 51.546875,
+          "height": 44,
+          "top": 23,
+          "right": 337,
+          "bottom": 67,
+          "left": 285.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 41,
+          "y": -158.890625,
+          "width": 278,
+          "height": 44,
+          "top": -158.890625,
+          "right": 319,
+          "bottom": -114.890625,
+          "left": 41
+        },
+        {
+          "x": 41,
+          "y": -95.0625,
+          "width": 135.640625,
+          "height": 44,
+          "top": -95.0625,
+          "right": 176.640625,
+          "bottom": -51.0625,
+          "left": 41
+        },
+        {
+          "x": 183.359375,
+          "y": -95.0625,
+          "width": 135.640625,
+          "height": 44,
+          "top": -95.0625,
+          "right": 319,
+          "bottom": -51.0625,
+          "left": 183.359375
+        },
+        {
+          "x": 41,
+          "y": -31.234375,
+          "width": 135.640625,
+          "height": 44,
+          "top": -31.234375,
+          "right": 176.640625,
+          "bottom": 12.765625,
+          "left": 41
+        },
+        {
+          "x": 183.359375,
+          "y": -31.234375,
+          "width": 135.640625,
+          "height": 44,
+          "top": -31.234375,
+          "right": 319,
+          "bottom": 12.765625,
+          "left": 183.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "412x915",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 818.34375,
+        "top": 0,
+        "right": 412,
+        "bottom": 818.34375,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 286.421875,
+        "width": 388,
+        "height": 531.921875,
+        "top": 286.421875,
+        "right": 400,
+        "bottom": 818.34375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 289.421875,
+        "width": 382,
+        "height": 65,
+        "top": 289.421875,
+        "right": 397,
+        "bottom": 354.421875,
+        "left": 15
+      },
+      "scrollTop": 0,
+      "scrollWidth": 382,
+      "clientWidth": 382,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 266.5,
+          "y": 299.421875,
+          "width": 64.953125,
+          "height": 44,
+          "top": 299.421875,
+          "right": 331.453125,
+          "bottom": 343.421875,
+          "left": 266.5
+        },
+        {
+          "x": 337.453125,
+          "y": 299.421875,
+          "width": 51.546875,
+          "height": 44,
+          "top": 299.421875,
+          "right": 389,
+          "bottom": 343.421875,
+          "left": 337.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 43.21875,
+          "y": 399.75,
+          "width": 325.5625,
+          "height": 44,
+          "top": 399.75,
+          "right": 368.78125,
+          "bottom": 443.75,
+          "left": 43.21875
+        },
+        {
+          "x": 43.21875,
+          "y": 463.578125,
+          "width": 159.421875,
+          "height": 44,
+          "top": 463.578125,
+          "right": 202.640625,
+          "bottom": 507.578125,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 463.578125,
+          "width": 159.421875,
+          "height": 44,
+          "top": 463.578125,
+          "right": 368.78125,
+          "bottom": 507.578125,
+          "left": 209.359375
+        },
+        {
+          "x": 43.21875,
+          "y": 527.40625,
+          "width": 159.421875,
+          "height": 44,
+          "top": 527.40625,
+          "right": 202.640625,
+          "bottom": 571.40625,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 527.40625,
+          "width": 159.421875,
+          "height": 44,
+          "top": 527.40625,
+          "right": 368.78125,
+          "bottom": 571.40625,
+          "left": 209.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 818.34375,
+        "top": 0,
+        "right": 412,
+        "bottom": 818.34375,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 10,
+        "width": 388,
+        "height": 808.34375,
+        "top": 10,
+        "right": 400,
+        "bottom": 818.34375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 834.375,
+        "width": 393.46875,
+        "height": 71.359375,
+        "top": 834.375,
+        "right": 402.734375,
+        "bottom": 905.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 13,
+        "width": 382,
+        "height": 65,
+        "top": 13,
+        "right": 397,
+        "bottom": 78,
+        "left": 15
+      },
+      "scrollTop": 280,
+      "scrollWidth": 382,
+      "clientWidth": 382,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 261.40625,
+          "y": 23,
+          "width": 70.046875,
+          "height": 44,
+          "top": 23,
+          "right": 331.453125,
+          "bottom": 67,
+          "left": 261.40625
+        },
+        {
+          "x": 337.453125,
+          "y": 23,
+          "width": 51.546875,
+          "height": 44,
+          "top": 23,
+          "right": 389,
+          "bottom": 67,
+          "left": 337.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 43.21875,
+          "y": -156.671875,
+          "width": 325.5625,
+          "height": 44,
+          "top": -156.671875,
+          "right": 368.78125,
+          "bottom": -112.671875,
+          "left": 43.21875
+        },
+        {
+          "x": 43.21875,
+          "y": -92.84375,
+          "width": 159.421875,
+          "height": 44,
+          "top": -92.84375,
+          "right": 202.640625,
+          "bottom": -48.84375,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": -92.84375,
+          "width": 159.421875,
+          "height": 44,
+          "top": -92.84375,
+          "right": 368.78125,
+          "bottom": -48.84375,
+          "left": 209.359375
+        },
+        {
+          "x": 43.21875,
+          "y": -29.015625,
+          "width": 159.421875,
+          "height": 44,
+          "top": -29.015625,
+          "right": 202.640625,
+          "bottom": 14.984375,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": -29.015625,
+          "width": 159.421875,
+          "height": 44,
+          "top": -29.015625,
+          "right": 368.78125,
+          "bottom": 14.984375,
+          "left": 209.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "480x1040",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 939.515625,
+        "top": 0,
+        "right": 480,
+        "bottom": 939.515625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 328.84375,
+        "width": 456,
+        "height": 610.671875,
+        "top": 328.84375,
+        "right": 468,
+        "bottom": 939.515625,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 955.546875,
+        "width": 461.46875,
+        "height": 75.1875,
+        "top": 955.546875,
+        "right": 470.734375,
+        "bottom": 1030.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 331.84375,
+        "width": 450,
+        "height": 65,
+        "top": 331.84375,
+        "right": 465,
+        "bottom": 396.84375,
+        "left": 15
+      },
+      "scrollTop": 0,
+      "scrollWidth": 450,
+      "clientWidth": 450,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 334.5,
+          "y": 341.84375,
+          "width": 64.953125,
+          "height": 44,
+          "top": 341.84375,
+          "right": 399.453125,
+          "bottom": 385.84375,
+          "left": 334.5
+        },
+        {
+          "x": 405.453125,
+          "y": 341.84375,
+          "width": 51.546875,
+          "height": 44,
+          "top": 341.84375,
+          "right": 457,
+          "bottom": 385.84375,
+          "left": 405.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 44.65625,
+          "y": 444.734375,
+          "width": 390.6875,
+          "height": 44,
+          "top": 444.734375,
+          "right": 435.34375,
+          "bottom": 488.734375,
+          "left": 44.65625
+        },
+        {
+          "x": 44.65625,
+          "y": 509.921875,
+          "width": 191.859375,
+          "height": 44,
+          "top": 509.921875,
+          "right": 236.515625,
+          "bottom": 553.921875,
+          "left": 44.65625
+        },
+        {
+          "x": 243.46875,
+          "y": 509.921875,
+          "width": 191.875,
+          "height": 44,
+          "top": 509.921875,
+          "right": 435.34375,
+          "bottom": 553.921875,
+          "left": 243.46875
+        },
+        {
+          "x": 44.65625,
+          "y": 575.109375,
+          "width": 191.859375,
+          "height": 44,
+          "top": 575.109375,
+          "right": 236.515625,
+          "bottom": 619.109375,
+          "left": 44.65625
+        },
+        {
+          "x": 243.46875,
+          "y": 575.109375,
+          "width": 191.875,
+          "height": 44,
+          "top": 575.109375,
+          "right": 435.34375,
+          "bottom": 619.109375,
+          "left": 243.46875
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 939.515625,
+        "top": 0,
+        "right": 480,
+        "bottom": 939.515625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 10,
+        "width": 456,
+        "height": 929.515625,
+        "top": 10,
+        "right": 468,
+        "bottom": 939.515625,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 955.546875,
+        "width": 461.46875,
+        "height": 75.1875,
+        "top": 955.546875,
+        "right": 470.734375,
+        "bottom": 1030.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 13,
+        "width": 450,
+        "height": 65,
+        "top": 13,
+        "right": 465,
+        "bottom": 78,
+        "left": 15
+      },
+      "scrollTop": 280,
+      "scrollWidth": 450,
+      "clientWidth": 450,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 329.40625,
+          "y": 23,
+          "width": 70.046875,
+          "height": 44,
+          "top": 23,
+          "right": 399.453125,
+          "bottom": 67,
+          "left": 329.40625
+        },
+        {
+          "x": 405.453125,
+          "y": 23,
+          "width": 51.546875,
+          "height": 44,
+          "top": 23,
+          "right": 457,
+          "bottom": 67,
+          "left": 405.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 44.65625,
+          "y": -154.109375,
+          "width": 390.6875,
+          "height": 44,
+          "top": -154.109375,
+          "right": 435.34375,
+          "bottom": -110.109375,
+          "left": 44.65625
+        },
+        {
+          "x": 44.65625,
+          "y": -88.921875,
+          "width": 191.859375,
+          "height": 44,
+          "top": -88.921875,
+          "right": 236.515625,
+          "bottom": -44.921875,
+          "left": 44.65625
+        },
+        {
+          "x": 243.46875,
+          "y": -88.921875,
+          "width": 191.875,
+          "height": 44,
+          "top": -88.921875,
+          "right": 435.34375,
+          "bottom": -44.921875,
+          "left": 243.46875
+        },
+        {
+          "x": 44.65625,
+          "y": -23.734375,
+          "width": 191.859375,
+          "height": 44,
+          "top": -23.734375,
+          "right": 236.515625,
+          "bottom": 20.265625,
+          "left": 44.65625
+        },
+        {
+          "x": 243.46875,
+          "y": -23.734375,
+          "width": 191.875,
+          "height": 44,
+          "top": -23.734375,
+          "right": 435.34375,
+          "bottom": 20.265625,
+          "left": 243.46875
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "1920x1080",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 979.515625,
+        "top": 0,
+        "right": 1920,
+        "bottom": 979.515625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 480,
+        "y": 342.84375,
+        "width": 960,
+        "height": 636.671875,
+        "top": 342.84375,
+        "right": 1440,
+        "bottom": 979.515625,
+        "left": 480
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "header": {
+        "x": 483,
+        "y": 345.84375,
+        "width": 954,
+        "height": 69,
+        "top": 345.84375,
+        "right": 1437,
+        "bottom": 414.84375,
+        "left": 483
+      },
+      "scrollTop": 0,
+      "scrollWidth": 954,
+      "clientWidth": 954,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 1294.5,
+          "y": 357.84375,
+          "width": 64.953125,
+          "height": 44,
+          "top": 357.84375,
+          "right": 1359.453125,
+          "bottom": 401.84375,
+          "left": 1294.5
+        },
+        {
+          "x": 1369.453125,
+          "y": 357.84375,
+          "width": 51.546875,
+          "height": 44,
+          "top": 357.84375,
+          "right": 1421,
+          "bottom": 401.84375,
+          "left": 1369.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 588.828125,
+          "y": 468.828125,
+          "width": 169.203125,
+          "height": 44,
+          "top": 468.828125,
+          "right": 758.03125,
+          "bottom": 512.828125,
+          "left": 588.828125
+        },
+        {
+          "x": 767.9375,
+          "y": 468.828125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 468.828125,
+          "right": 908.953125,
+          "bottom": 512.828125,
+          "left": 767.9375
+        },
+        {
+          "x": 918.859375,
+          "y": 468.828125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 468.828125,
+          "right": 1059.875,
+          "bottom": 512.828125,
+          "left": 918.859375
+        },
+        {
+          "x": 1069.78125,
+          "y": 468.828125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 468.828125,
+          "right": 1210.796875,
+          "bottom": 512.828125,
+          "left": 1069.78125
+        },
+        {
+          "x": 1220.703125,
+          "y": 468.828125,
+          "width": 110.46875,
+          "height": 44,
+          "top": 468.828125,
+          "right": 1331.171875,
+          "bottom": 512.828125,
+          "left": 1220.703125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 979.515625,
+        "top": 0,
+        "right": 1920,
+        "bottom": 979.515625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 480,
+        "y": 10,
+        "width": 960,
+        "height": 969.515625,
+        "top": 10,
+        "right": 1440,
+        "bottom": 979.515625,
+        "left": 480
+      },
+      "engine": {
+        "x": 480,
+        "y": 995.546875,
+        "width": 960,
+        "height": 75.1875,
+        "top": 995.546875,
+        "right": 1440,
+        "bottom": 1070.734375,
+        "left": 480
+      },
+      "header": {
+        "x": 483,
+        "y": 13,
+        "width": 954,
+        "height": 69,
+        "top": 13,
+        "right": 1437,
+        "bottom": 82,
+        "left": 483
+      },
+      "scrollTop": 280,
+      "scrollWidth": 954,
+      "clientWidth": 954,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 1289.40625,
+          "y": 25,
+          "width": 70.046875,
+          "height": 44,
+          "top": 25,
+          "right": 1359.453125,
+          "bottom": 69,
+          "left": 1289.40625
+        },
+        {
+          "x": 1369.453125,
+          "y": 25,
+          "width": 51.546875,
+          "height": 44,
+          "top": 25,
+          "right": 1421,
+          "bottom": 69,
+          "left": 1369.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 588.828125,
+          "y": -144.015625,
+          "width": 169.203125,
+          "height": 44,
+          "top": -144.015625,
+          "right": 758.03125,
+          "bottom": -100.015625,
+          "left": 588.828125
+        },
+        {
+          "x": 767.9375,
+          "y": -144.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -144.015625,
+          "right": 908.953125,
+          "bottom": -100.015625,
+          "left": 767.9375
+        },
+        {
+          "x": 918.859375,
+          "y": -144.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -144.015625,
+          "right": 1059.875,
+          "bottom": -100.015625,
+          "left": 918.859375
+        },
+        {
+          "x": 1069.78125,
+          "y": -144.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -144.015625,
+          "right": 1210.796875,
+          "bottom": -100.015625,
+          "left": 1069.78125
+        },
+        {
+          "x": 1220.703125,
+          "y": -144.015625,
+          "width": 110.46875,
+          "height": 44,
+          "top": -144.015625,
+          "right": 1331.171875,
+          "bottom": -100.015625,
+          "left": 1220.703125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "915x412",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 333.109375,
+        "top": 0,
+        "right": 915,
+        "bottom": 333.109375,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 116.59375,
+        "width": 891,
+        "height": 216.515625,
+        "top": 116.59375,
+        "right": 903,
+        "bottom": 333.109375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 349.140625,
+        "width": 896.46875,
+        "height": 53.59375,
+        "top": 349.140625,
+        "right": 905.734375,
+        "bottom": 402.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 119.59375,
+        "width": 885,
+        "height": 65,
+        "top": 119.59375,
+        "right": 900,
+        "bottom": 184.59375,
+        "left": 15
+      },
+      "scrollTop": 0,
+      "scrollWidth": 885,
+      "clientWidth": 885,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 769.5,
+          "y": 129.59375,
+          "width": 64.953125,
+          "height": 44,
+          "top": 129.59375,
+          "right": 834.453125,
+          "bottom": 173.59375,
+          "left": 769.5
+        },
+        {
+          "x": 840.453125,
+          "y": 129.59375,
+          "width": 51.546875,
+          "height": 44,
+          "top": 129.59375,
+          "right": 892,
+          "bottom": 173.59375,
+          "left": 840.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 86.328125,
+          "y": 238.578125,
+          "width": 169.203125,
+          "height": 44,
+          "top": 238.578125,
+          "right": 255.53125,
+          "bottom": 282.578125,
+          "left": 86.328125
+        },
+        {
+          "x": 265.4375,
+          "y": 238.578125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 238.578125,
+          "right": 406.453125,
+          "bottom": 282.578125,
+          "left": 265.4375
+        },
+        {
+          "x": 416.359375,
+          "y": 238.578125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 238.578125,
+          "right": 557.375,
+          "bottom": 282.578125,
+          "left": 416.359375
+        },
+        {
+          "x": 567.28125,
+          "y": 238.578125,
+          "width": 141.015625,
+          "height": 44,
+          "top": 238.578125,
+          "right": 708.296875,
+          "bottom": 282.578125,
+          "left": 567.28125
+        },
+        {
+          "x": 718.203125,
+          "y": 238.578125,
+          "width": 110.46875,
+          "height": 44,
+          "top": 238.578125,
+          "right": 828.671875,
+          "bottom": 282.578125,
+          "left": 718.203125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 333.109375,
+        "top": 0,
+        "right": 915,
+        "bottom": 333.109375,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 10,
+        "width": 891,
+        "height": 323.109375,
+        "top": 10,
+        "right": 903,
+        "bottom": 333.109375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 349.140625,
+        "width": 896.46875,
+        "height": 53.59375,
+        "top": 349.140625,
+        "right": 905.734375,
+        "bottom": 402.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 13,
+        "width": 885,
+        "height": 65,
+        "top": 13,
+        "right": 900,
+        "bottom": 78,
+        "left": 15
+      },
+      "scrollTop": 280,
+      "scrollWidth": 885,
+      "clientWidth": 885,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 764.40625,
+          "y": 23,
+          "width": 70.046875,
+          "height": 44,
+          "top": 23,
+          "right": 834.453125,
+          "bottom": 67,
+          "left": 764.40625
+        },
+        {
+          "x": 840.453125,
+          "y": 23,
+          "width": 51.546875,
+          "height": 44,
+          "top": 23,
+          "right": 892,
+          "bottom": 67,
+          "left": 840.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 86.328125,
+          "y": -148.015625,
+          "width": 169.203125,
+          "height": 44,
+          "top": -148.015625,
+          "right": 255.53125,
+          "bottom": -104.015625,
+          "left": 86.328125
+        },
+        {
+          "x": 265.4375,
+          "y": -148.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -148.015625,
+          "right": 406.453125,
+          "bottom": -104.015625,
+          "left": 265.4375
+        },
+        {
+          "x": 416.359375,
+          "y": -148.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -148.015625,
+          "right": 557.375,
+          "bottom": -104.015625,
+          "left": 416.359375
+        },
+        {
+          "x": 567.28125,
+          "y": -148.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -148.015625,
+          "right": 708.296875,
+          "bottom": -104.015625,
+          "left": 567.28125
+        },
+        {
+          "x": 718.203125,
+          "y": -148.015625,
+          "width": 110.46875,
+          "height": 44,
+          "top": -148.015625,
+          "right": 828.671875,
+          "bottom": -104.015625,
+          "left": 718.203125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "412x915 safe",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 793.625,
+        "top": 0,
+        "right": 412,
+        "bottom": 793.625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 24,
+        "y": 277.78125,
+        "width": 364,
+        "height": 515.84375,
+        "top": 277.78125,
+        "right": 388,
+        "bottom": 793.625,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 809.640625,
+        "width": 364,
+        "height": 71.359375,
+        "top": 809.640625,
+        "right": 388,
+        "bottom": 881,
+        "left": 24
+      },
+      "header": {
+        "x": 27,
+        "y": 280.78125,
+        "width": 358,
+        "height": 65,
+        "top": 280.78125,
+        "right": 385,
+        "bottom": 345.78125,
+        "left": 27
+      },
+      "scrollTop": 0,
+      "scrollWidth": 358,
+      "clientWidth": 358,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 254.5,
+          "y": 290.78125,
+          "width": 64.953125,
+          "height": 44,
+          "top": 290.78125,
+          "right": 319.453125,
+          "bottom": 334.78125,
+          "left": 254.5
+        },
+        {
+          "x": 325.453125,
+          "y": 290.78125,
+          "width": 51.546875,
+          "height": 44,
+          "top": 290.78125,
+          "right": 377,
+          "bottom": 334.78125,
+          "left": 325.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 55.21875,
+          "y": 391.109375,
+          "width": 301.5625,
+          "height": 44,
+          "top": 391.109375,
+          "right": 356.78125,
+          "bottom": 435.109375,
+          "left": 55.21875
+        },
+        {
+          "x": 55.21875,
+          "y": 454.9375,
+          "width": 147.421875,
+          "height": 44,
+          "top": 454.9375,
+          "right": 202.640625,
+          "bottom": 498.9375,
+          "left": 55.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 454.9375,
+          "width": 147.421875,
+          "height": 44,
+          "top": 454.9375,
+          "right": 356.78125,
+          "bottom": 498.9375,
+          "left": 209.359375
+        },
+        {
+          "x": 55.21875,
+          "y": 518.765625,
+          "width": 147.421875,
+          "height": 44,
+          "top": 518.765625,
+          "right": 202.640625,
+          "bottom": 562.765625,
+          "left": 55.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 518.765625,
+          "width": 147.421875,
+          "height": 44,
+          "top": 518.765625,
+          "right": 356.78125,
+          "bottom": 562.765625,
+          "left": 209.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 793.625,
+        "top": 0,
+        "right": 412,
+        "bottom": 793.625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 24,
+        "y": 44,
+        "width": 364,
+        "height": 749.625,
+        "top": 44,
+        "right": 388,
+        "bottom": 793.625,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 809.640625,
+        "width": 364,
+        "height": 71.359375,
+        "top": 809.640625,
+        "right": 388,
+        "bottom": 881,
+        "left": 24
+      },
+      "header": {
+        "x": 27,
+        "y": 47,
+        "width": 358,
+        "height": 65,
+        "top": 47,
+        "right": 385,
+        "bottom": 112,
+        "left": 27
+      },
+      "scrollTop": 280,
+      "scrollWidth": 358,
+      "clientWidth": 358,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 249.40625,
+          "y": 57,
+          "width": 70.046875,
+          "height": 44,
+          "top": 57,
+          "right": 319.453125,
+          "bottom": 101,
+          "left": 249.40625
+        },
+        {
+          "x": 325.453125,
+          "y": 57,
+          "width": 51.546875,
+          "height": 44,
+          "top": 57,
+          "right": 377,
+          "bottom": 101,
+          "left": 325.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 55.21875,
+          "y": -122.671875,
+          "width": 301.5625,
+          "height": 44,
+          "top": -122.671875,
+          "right": 356.78125,
+          "bottom": -78.671875,
+          "left": 55.21875
+        },
+        {
+          "x": 55.21875,
+          "y": -58.84375,
+          "width": 147.421875,
+          "height": 44,
+          "top": -58.84375,
+          "right": 202.640625,
+          "bottom": -14.84375,
+          "left": 55.21875
+        },
+        {
+          "x": 209.359375,
+          "y": -58.84375,
+          "width": 147.421875,
+          "height": 44,
+          "top": -58.84375,
+          "right": 356.78125,
+          "bottom": -14.84375,
+          "left": 209.359375
+        },
+        {
+          "x": 55.21875,
+          "y": 4.984375,
+          "width": 147.421875,
+          "height": 44,
+          "top": 4.984375,
+          "right": 202.640625,
+          "bottom": 48.984375,
+          "left": 55.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 4.984375,
+          "width": 147.421875,
+          "height": 44,
+          "top": 4.984375,
+          "right": 356.78125,
+          "bottom": 48.984375,
+          "left": 209.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "915x412 safe",
+    "passed": true,
+    "initial": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 308.390625,
+        "top": 0,
+        "right": 915,
+        "bottom": 308.390625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 24,
+        "y": 107.9375,
+        "width": 867,
+        "height": 200.453125,
+        "top": 107.9375,
+        "right": 891,
+        "bottom": 308.390625,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 324.40625,
+        "width": 867,
+        "height": 53.59375,
+        "top": 324.40625,
+        "right": 891,
+        "bottom": 378,
+        "left": 24
+      },
+      "header": {
+        "x": 27,
+        "y": 110.9375,
+        "width": 861,
+        "height": 65,
+        "top": 110.9375,
+        "right": 888,
+        "bottom": 175.9375,
+        "left": 27
+      },
+      "scrollTop": 0,
+      "scrollWidth": 861,
+      "clientWidth": 861,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 757.5,
+          "y": 120.9375,
+          "width": 64.953125,
+          "height": 44,
+          "top": 120.9375,
+          "right": 822.453125,
+          "bottom": 164.9375,
+          "left": 757.5
+        },
+        {
+          "x": 828.453125,
+          "y": 120.9375,
+          "width": 51.546875,
+          "height": 44,
+          "top": 120.9375,
+          "right": 880,
+          "bottom": 164.9375,
+          "left": 828.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 86.328125,
+          "y": 229.921875,
+          "width": 169.203125,
+          "height": 44,
+          "top": 229.921875,
+          "right": 255.53125,
+          "bottom": 273.921875,
+          "left": 86.328125
+        },
+        {
+          "x": 265.4375,
+          "y": 229.921875,
+          "width": 141.015625,
+          "height": 44,
+          "top": 229.921875,
+          "right": 406.453125,
+          "bottom": 273.921875,
+          "left": 265.4375
+        },
+        {
+          "x": 416.359375,
+          "y": 229.921875,
+          "width": 141.015625,
+          "height": 44,
+          "top": 229.921875,
+          "right": 557.375,
+          "bottom": 273.921875,
+          "left": 416.359375
+        },
+        {
+          "x": 567.28125,
+          "y": 229.921875,
+          "width": 141.015625,
+          "height": 44,
+          "top": 229.921875,
+          "right": 708.296875,
+          "bottom": 273.921875,
+          "left": 567.28125
+        },
+        {
+          "x": 718.203125,
+          "y": 229.921875,
+          "width": 110.46875,
+          "height": 44,
+          "top": 229.921875,
+          "right": 828.671875,
+          "bottom": 273.921875,
+          "left": 718.203125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "expanded": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 915,
+        "height": 308.390625,
+        "top": 0,
+        "right": 915,
+        "bottom": 308.390625,
+        "left": 0
+      },
+      "drawer": {
+        "x": 24,
+        "y": 44,
+        "width": 867,
+        "height": 264.390625,
+        "top": 44,
+        "right": 891,
+        "bottom": 308.390625,
+        "left": 24
+      },
+      "engine": {
+        "x": 24,
+        "y": 324.40625,
+        "width": 867,
+        "height": 53.59375,
+        "top": 324.40625,
+        "right": 891,
+        "bottom": 378,
+        "left": 24
+      },
+      "header": {
+        "x": 27,
+        "y": 47,
+        "width": 861,
+        "height": 65,
+        "top": 47,
+        "right": 888,
+        "bottom": 112,
+        "left": 27
+      },
+      "scrollTop": 280,
+      "scrollWidth": 861,
+      "clientWidth": 861,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 752.40625,
+          "y": 57,
+          "width": 70.046875,
+          "height": 44,
+          "top": 57,
+          "right": 822.453125,
+          "bottom": 101,
+          "left": 752.40625
+        },
+        {
+          "x": 828.453125,
+          "y": 57,
+          "width": 51.546875,
+          "height": 44,
+          "top": 57,
+          "right": 880,
+          "bottom": 101,
+          "left": 828.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 86.328125,
+          "y": -114.015625,
+          "width": 169.203125,
+          "height": 44,
+          "top": -114.015625,
+          "right": 255.53125,
+          "bottom": -70.015625,
+          "left": 86.328125
+        },
+        {
+          "x": 265.4375,
+          "y": -114.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -114.015625,
+          "right": 406.453125,
+          "bottom": -70.015625,
+          "left": 265.4375
+        },
+        {
+          "x": 416.359375,
+          "y": -114.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -114.015625,
+          "right": 557.375,
+          "bottom": -70.015625,
+          "left": 416.359375
+        },
+        {
+          "x": 567.28125,
+          "y": -114.015625,
+          "width": 141.015625,
+          "height": 44,
+          "top": -114.015625,
+          "right": 708.296875,
+          "bottom": -70.015625,
+          "left": 567.28125
+        },
+        {
+          "x": 718.203125,
+          "y": -114.015625,
+          "width": 110.46875,
+          "height": 44,
+          "top": -114.015625,
+          "right": 828.671875,
+          "bottom": -70.015625,
+          "left": 718.203125
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    },
+    "scrollPreserved": 980
+  },
+  {
+    "name": "Selected S6 show preserved; pause and resume without extra API requests",
+    "passed": true,
+    "requests": [
+      {
+        "id": "S5QA0",
+        "limit": 1,
+        "start": 1,
+        "at": 1792793281783
+      },
+      {
+        "id": "S5QA1",
+        "limit": 1,
+        "start": 1,
+        "at": 1792793281784
+      },
+      {
+        "id": "S5QA2",
+        "limit": 1,
+        "start": 1,
+        "at": 1792793281806
+      },
+      {
+        "id": "S5QA0",
+        "limit": 3,
+        "start": 2,
+        "at": 1792793281815
+      },
+      {
+        "id": "S5QA1",
+        "limit": 3,
+        "start": 2,
+        "at": 1792793281816
+      },
+      {
+        "id": "S5QA2",
+        "limit": 3,
+        "start": 2,
+        "at": 1792793281818
+      }
+    ]
+  },
+  {
+    "name": "Actual Show Detail and Back restore drawer, filters and position",
+    "passed": true,
+    "route": "/music/shows/080626",
+    "before": 0,
+    "after": 0
+  },
+  {
+    "name": "Archive availability: empty",
+    "passed": true,
+    "text": "Search Shows\nYear\nAll Years\nState\nAll States\nVenue\nAll Venues\nReset Filters\nNO SHOWS FOUND.\nTRY CLEARING FILTERS."
+  },
+  {
+    "name": "Archive availability: outage",
+    "passed": true,
+    "text": "Search Shows\nYear\nAll Years\n2026\n2025\n2024\n2023\nState\nAll States\nMD\nPA\nVA\nVenue\nAll Venues\nBlack Box Room\nNorth Street Stage\nThe Electric Hall\nThe Lantern\nThe Mill\nWarehouse 44\nReset Filters\nSHOW ARCHIVE OFFLINE\nRETURN TO MUSIC NEXUS OR TRY ANOTHER SHOW LANE.\nRETRY SHOWS"
+  },
+  {
+    "name": "Archive availability: no-images",
+    "passed": true,
+    "text": "Search Shows\nYear\nAll Years\n2026\nState\nAll States\nMaine\nVenue\nAll Venues\nAura\nReset Filters\nS5 test performance 0\n\nAura\n\nPortland, Maine\n\nJune 4th, 2026\nShow #9500\nView Details\nS5 test performance 1\n\nAura\n\nPortland, Maine\n\nJune 4th, 2026\nShow #9501\nView Details\nS5 test performance 2\n\nAura\n\nPortland, Maine\n\nJune 4th, 2026\nShow #9502\nView Details"
+  },
+  {
+    "name": "Archive availability: loading",
+    "passed": true,
+    "text": "Search Shows\nYear\nAll Years\n2026\n2025\n2024\n2023\nState\nAll States\nMD\nPA\nVA\nVenue\nAll Venues\nBlack Box Room\nNorth Street Stage\nThe Electric Hall\nThe Lantern\nThe Mill\nWarehouse 44\nReset Filters\nLOADING SHOW DOSSIERS\nPREPARING EVENT CARDS AND VENUE RELATIONSHIPS."
+  },
+  {
+    "name": "Rapid reversals, interruption, viewport resize and route isolation",
+    "passed": true,
+    "resized": {
+      "view": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 591.109375,
+        "top": 0,
+        "right": 412,
+        "bottom": 591.109375,
+        "left": 0
+      },
+      "drawer": {
+        "x": 12,
+        "y": 206.890625,
+        "width": 388,
+        "height": 384.21875,
+        "top": 206.890625,
+        "right": 400,
+        "bottom": 591.109375,
+        "left": 12
+      },
+      "engine": {
+        "x": 9.265625,
+        "y": 607.140625,
+        "width": 393.46875,
+        "height": 53.59375,
+        "top": 607.140625,
+        "right": 402.734375,
+        "bottom": 660.734375,
+        "left": 9.265625
+      },
+      "header": {
+        "x": 15,
+        "y": 209.890625,
+        "width": 382,
+        "height": 65,
+        "top": 209.890625,
+        "right": 397,
+        "bottom": 274.890625,
+        "left": 15
+      },
+      "scrollTop": 0,
+      "scrollWidth": 382,
+      "clientWidth": 382,
+      "overflow": 0,
+      "parents": 1,
+      "otherArchives": 0,
+      "buttons": [
+        {
+          "x": 266.5,
+          "y": 219.890625,
+          "width": 64.953125,
+          "height": 44,
+          "top": 219.890625,
+          "right": 331.453125,
+          "bottom": 263.890625,
+          "left": 266.5
+        },
+        {
+          "x": 337.453125,
+          "y": 219.890625,
+          "width": 51.546875,
+          "height": 44,
+          "top": 219.890625,
+          "right": 389,
+          "bottom": 263.890625,
+          "left": 337.453125
+        }
+      ],
+      "filters": [
+        {
+          "x": 43.21875,
+          "y": 320.21875,
+          "width": 325.5625,
+          "height": 44,
+          "top": 320.21875,
+          "right": 368.78125,
+          "bottom": 364.21875,
+          "left": 43.21875
+        },
+        {
+          "x": 43.21875,
+          "y": 384.046875,
+          "width": 159.421875,
+          "height": 44,
+          "top": 384.046875,
+          "right": 202.640625,
+          "bottom": 428.046875,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 384.046875,
+          "width": 159.421875,
+          "height": 44,
+          "top": 384.046875,
+          "right": 368.78125,
+          "bottom": 428.046875,
+          "left": 209.359375
+        },
+        {
+          "x": 43.21875,
+          "y": 447.875,
+          "width": 159.421875,
+          "height": 44,
+          "top": 447.875,
+          "right": 202.640625,
+          "bottom": 491.875,
+          "left": 43.21875
+        },
+        {
+          "x": 209.359375,
+          "y": 447.875,
+          "width": 159.421875,
+          "height": 44,
+          "top": 447.875,
+          "right": 368.78125,
+          "bottom": 491.875,
+          "left": 209.359375
+        }
+      ],
+      "motion": "paused",
+      "backgroundInert": true,
+      "outerOverflow": "hidden"
+    }
+  }
+]

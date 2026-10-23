@@ -1009,6 +1009,21 @@
         </script>
         <section class="synchronicity-viewport" data-synchronicity-viewport hidden inert aria-label="Pillar of Synchronicity Shows archive">
           <div class="synchronicity-memories" data-synchronicity-memories role="group" aria-label="Preserved performance memories"></div>
+          <div class="synchronicity-drawer-dock">
+            <button class="synchronicity-explore" type="button" data-synchronicity-explore aria-controls="synchronicity-archive-drawer" aria-expanded="false">EXPLORE ECHOES</button>
+          </div>
+          <div class="synchronicity-drawer-layer" data-synchronicity-drawer-layer hidden inert>
+            <div class="synchronicity-drawer-backdrop" data-synchronicity-drawer-backdrop aria-hidden="true"></div>
+            <section class="synchronicity-drawer" id="synchronicity-archive-drawer" role="dialog" aria-labelledby="synchronicity-archive-title">
+              <header class="synchronicity-drawer-header">
+                <h2 id="synchronicity-archive-title">CHRONOLOGICAL ARCHIVE</h2>
+                <button type="button" data-synchronicity-drawer-expand aria-expanded="false" aria-controls="synchronicity-archive-content">Expand</button>
+                <button type="button" data-synchronicity-drawer-close aria-label="Close chronological archive">Close</button>
+              </header>
+              <div class="synchronicity-drawer-content" id="synchronicity-archive-content" data-synchronicity-archive-content role="region" aria-label="Shows archive" tabindex="0"></div>
+            </section>
+          </div>
+
         </section>
         <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
