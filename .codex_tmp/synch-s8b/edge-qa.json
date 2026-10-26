@@ -1,0 +1,9 @@
+{
+  "missingFields": true,
+  "longText": true,
+  "missingIdNoninteractive": true,
+  "failedPoster": true,
+  "sameShowPhotoFallback": true,
+  "memoryKeyboardSelection": true,
+  "overflow": 0
+}

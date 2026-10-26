@@ -1,0 +1,188 @@
+[
+  {
+    "size": "360x800",
+    "safe": false,
+    "reducedMotion": false,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 520,
+    "viewportHeight": 712,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  },
+  {
+    "size": "412x915",
+    "safe": false,
+    "reducedMotion": false,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 535,
+    "viewportHeight": 818,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  },
+  {
+    "size": "480x1040",
+    "safe": false,
+    "reducedMotion": false,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 578,
+    "viewportHeight": 940,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  },
+  {
+    "size": "1920x1080",
+    "safe": false,
+    "reducedMotion": false,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 615,
+    "viewportHeight": 980,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  },
+  {
+    "size": "915x412",
+    "safe": false,
+    "reducedMotion": false,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 457,
+    "viewportHeight": 333,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  },
+  {
+    "size": "412x915",
+    "safe": true,
+    "reducedMotion": true,
+    "passed": true,
+    "children": [
+      "synchronicity-show-artwork",
+      "synchronicity-show-title",
+      "synchronicity-show-date",
+      "synchronicity-show-venue",
+      "synchronicity-show-number",
+      "synchronicity-show-actions"
+    ],
+    "name": "Soul of a New War Machine Tour",
+    "date": "October 14th, 2026",
+    "venue": "Aura * Portland, Maine",
+    "number": "Show #245",
+    "fit": "contain",
+    "poster": "poster",
+    "visibleMemories": 0,
+    "overflow": 0,
+    "documentOverflow": 0,
+    "height": 535,
+    "viewportHeight": 794,
+    "buttons": [
+      44,
+      44
+    ],
+    "align": "center",
+    "actionsAccessible": true
+  }
+]

@@ -33643,7 +33643,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .synchronicity-show-title:focus { outline: none; }
 .synchronicity-show-date,
 .synchronicity-show-venue,
-.synchronicity-show-location {
+.synchronicity-show-number {
   margin: 5px auto;
   max-width: 58ch;
   font-size: clamp(.83rem, 2.7vw, .98rem);
@@ -33651,34 +33651,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   text-shadow: 0 1px 3px #080c1c;
 }
 .synchronicity-show-date { color: #c0c4ed; }
-.synchronicity-show-location { color: #c4cbdc; }
-.synchronicity-show-bands {
-  margin: 14px auto 0;
-  padding-top: 12px;
-  max-width: 58ch;
-  border-top: 1px solid rgba(126, 145, 204, .3);
-}
-.synchronicity-show-bands h3 {
-  margin: 0 0 7px;
-  font: inherit;
-  font-size: .76rem;
-  color: #bbc0e7;
-}
-.synchronicity-show-bands ul {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.synchronicity-show-bands li,
-.synchronicity-show-bands p {
-  margin: 0;
-  font-size: .86rem;
-  line-height: 1.5;
-}
+.synchronicity-show-number { color: #c4cbdc; }
 .synchronicity-show-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -33954,3 +33927,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   min-height: 44px;
   aspect-ratio: auto;
 }
+
+/* S8B: discovery access returns with the photographic memories. */
+.synchronicity-memories[data-memory-selected] ~ .synchronicity-drawer-dock { display: none; }

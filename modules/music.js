@@ -13994,24 +13994,13 @@ function prepareSynchronicityMemories() {
     date.textContent = getSynchronicityTimelineDate(memory.show) ? getMusicShowDateLabel(memory.show) : "Date unavailable";
     const venue = document.createElement("p");
     venue.className = "synchronicity-show-venue";
-    venue.textContent = getMusicShowVenueName(memory.show) || "Venue unavailable";
-    const location = document.createElement("p");
-    location.className = "synchronicity-show-location";
-    location.textContent = getMusicShowDetailLocation(memory.show);
-    const bands = document.createElement("div");
-    bands.className = "synchronicity-show-bands";
-    const bandsLabel = document.createElement("h3");
-    bandsLabel.textContent = "Performing bands";
-    const bandNames = getMusicShowBillBands(memory.show);
-    const bandList = document.createElement(bandNames.length ? "ul" : "p");
-    if (bandNames.length) {
-      for (const band of bandNames) {
-        const item = document.createElement("li");
-        item.textContent = band.name;
-        bandList.append(item);
-      }
-    } else bandList.textContent = "Band information unavailable";
-    bands.append(bandsLabel, bandList);
+    const venueName = getMusicShowVenueName(memory.show) || "Venue unavailable";
+    const location = getMusicShowDetailLocation(memory.show);
+    venue.textContent = venueName + (location && location !== "Location Pending" ? " * " + location : "");
+    const number = document.createElement("p");
+    number.className = "synchronicity-show-number";
+    const showId = getMusicShowIdValue(memory.show);
+    number.textContent = showId ? "Show #" + showId : "Show number unavailable";
     const actions = document.createElement("div");
     actions.className = "synchronicity-show-actions";
     const enter = document.createElement("button");
@@ -14028,7 +14017,7 @@ function prepareSynchronicityMemories() {
     leave.textContent = "RETURN TO ECHOES";
     leave.addEventListener("click", returnToEchoes);
     actions.append(enter, leave);
-    panel.append(artwork, title, date, venue, location, bands, actions);
+    panel.append(artwork, title, date, venue, number, actions);
     stage.append(panel);
     if (fromTimeline) viewport.scrollTop = 0;
     title.focus({ preventScroll: true });
