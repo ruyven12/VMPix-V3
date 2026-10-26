@@ -33648,9 +33648,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .synchronicity-show-number { color: #c4cbdc; }
 .synchronicity-show-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
-  max-width: 430px;
+  max-width: 230px;
   margin: 20px auto 0;
 }
 .synchronicity-show-actions button {
@@ -34065,8 +34065,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
-  color: #ccd6f2;
-  font: 400 10px/1.3 var(--font-display);
+  color: #e2e9ff;
+  font: 400 11px/1.3 var(--font-display);
   white-space: nowrap;
   text-align: center;
   text-shadow: 0 1px 2px #080b19;
@@ -34078,8 +34078,8 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .synchronicity-memories[data-memory-motion="running"] .synchronicity-memory-date { animation-play-state: running; }
 @keyframes synchronicity-memory-date {
-  0%, 14.82%, 100% { opacity: 0; }
-  3.7%, 11.12% { opacity: .9; }
+  0%, 22.23%, 100% { opacity: 0; }
+  3.7%, 18.52% { opacity: .96; }
 }
 /* Show moving-memory dates during the upper half of their existing drift,
    keeping the label clear of the next photograph without moving either frame. */
@@ -34090,15 +34090,15 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation-direction: inherit;
 }
 @keyframes synchronicity-memory-date-drift {
-  0%, 45%, 100% { opacity: 0; }
-  10%, 32% { opacity: .9; }
+  0%, 50%, 100% { opacity: 0; }
+  7%, 43% { opacity: .96; }
 }
 @media (min-width: 1000px) {
-  .synchronicity-memory-date { font-size: 11px; }
+  .synchronicity-memory-date { font-size: 12px; }
 }
 @media (max-height: 500px) {
-  .synchronicity-memory-date { top: calc(100% + 2px); font-size: 9px; line-height: 1; }
+  .synchronicity-memory-date { top: calc(100% + 1px); font-size: 10px; line-height: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .synchronicity-memories .synchronicity-memory-date { animation-play-state: paused !important; opacity: .9 !important; }
+  .synchronicity-memories .synchronicity-memory-date { animation-play-state: paused !important; opacity: .96 !important; }
 }

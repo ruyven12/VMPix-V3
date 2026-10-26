@@ -14006,20 +14006,11 @@ function prepareSynchronicityMemories() {
     number.textContent = showId ? "Show #" + showId : "Show number unavailable";
     const actions = document.createElement("div");
     actions.className = "synchronicity-show-actions";
-    const enter = document.createElement("button");
-    enter.type = "button";
-    enter.textContent = "ENTER ARCHIVE";
-    enter.addEventListener("click", () => {
-      if (!current() || session.selection !== selection || selection.entering) return;
-      selection.entering = true;
-      enter.disabled = true;
-      selectMusicShowDetailHook(memory.show);
-    });
     const leave = document.createElement("button");
     leave.type = "button";
     leave.textContent = "RETURN TO ECHOES";
     leave.addEventListener("click", returnToEchoes);
-    actions.append(enter, leave);
+    actions.append(leave);
     selection.bill = createSynchronicityBill(memory.show, () => current() && session.selection === selection);
     panel.append(artwork, title, date, venue, number, actions, selection.bill.element);
     stage.append(panel);
