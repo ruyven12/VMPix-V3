@@ -6019,6 +6019,7 @@ function setSetGalleryVisible(isVisible) {
     setGalleryModeVisible(false);
   }
   setGallery.setAttribute("aria-hidden", String(!isVisible));
+  setSetEventInformationVisible(isVisible);
   if (isVisible) syncSetFeaturedPhoto(activeGalleryPhoto);
   else if (getRouteFromUrl().name !== "set-detail") resetSetFeaturedPhoto();
   if (isVisible) {
@@ -6825,7 +6826,9 @@ function updateSetGalleryFromRow(row) {
     return;
   }
 
+  closeSetEventInformation(false);
   resetSetFeaturedPhoto();
+  if (setEventScroll) setEventScroll.scrollTop = 0;
   const setData = row.dataset;
   const imageAccent = getSetImageAccent(row);
   if (setGalleryBand) {
@@ -7560,6 +7563,59 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   });
   return tile;
 }
+
+// S13E: local information disclosure inside the existing Shell-owned Set viewport.
+const setEventUi = document.querySelector("[data-set-event-ui]");
+const setEventDrawer = setEventUi?.querySelector("[data-set-event-drawer]");
+const setEventToggle = setEventUi?.querySelector("[data-set-event-toggle]");
+const setEventScroll = setEventUi?.querySelector("[data-set-event-scroll]");
+let setEventSession = null;
+
+function closeSetEventInformation(restoreFocus = true) {
+  const s = setEventSession;
+  if (!s) return;
+  setEventSession = null;
+  s.events.abort();
+  setEventDrawer.hidden = true;
+  setEventToggle.setAttribute("aria-expanded", "false");
+  setEventUi.querySelector("[data-set-event-chevron]").textContent = "\u2303";
+  setDossierViewport.classList.remove("is-set-event-open");
+  s.content.inert = s.wasInert;
+  if (restoreFocus && getRouteFromUrl().name === "set-detail" && !setEventUi.hidden) {
+    s.content.scrollTo({ top: s.scrollTop, left: s.scrollLeft, behavior: "instant" });
+    setEventToggle.focus({ preventScroll: true });
+  }
+}
+
+function setSetEventInformationVisible(visible) {
+  if (!setEventUi) return;
+  const show = visible && getRouteFromUrl().name === "set-detail";
+  if (!show) closeSetEventInformation(false);
+  setEventUi.hidden = !show;
+}
+
+function openSetEventInformation() {
+  if (setEventSession || !setEventUi || setEventUi.hidden || getRouteFromUrl().name !== "set-detail" ||
+    setGallery?.getAttribute("aria-hidden") !== "false" || musicNexusShell?.parentElement !== setDossierViewport) return;
+  const s = { content: musicNexusShell, wasInert: musicNexusShell.inert,
+    scrollTop: musicNexusShell.scrollTop, scrollLeft: musicNexusShell.scrollLeft, events: new AbortController() };
+  setEventSession = s;
+  s.content.inert = true;
+  setDossierViewport.classList.add("is-set-event-open");
+  setEventDrawer.hidden = false;
+  setEventToggle.setAttribute("aria-expanded", "true");
+  setEventUi.querySelector("[data-set-event-chevron]").textContent = "\u2304";
+  setEventUi.querySelector("[data-set-event-close]").focus({ preventScroll: true });
+  window.addEventListener("pagehide", () => closeSetEventInformation(false), { signal: s.events.signal });
+}
+
+setEventToggle?.addEventListener("click", () => setEventSession ? closeSetEventInformation() : openSetEventInformation());
+setEventUi?.querySelector("[data-set-event-close]")?.addEventListener("click", () => closeSetEventInformation());
+setEventUi?.addEventListener("keydown", event => {
+  if (event.key === "Escape" && setEventSession && !event.defaultPrevented) {
+    event.preventDefault(); event.stopPropagation(); closeSetEventInformation();
+  }
+});
 
 // S13D: an Individual Set content mode. The shared lightbox and its consumers stay separate.
 let setFocusSession = null;
