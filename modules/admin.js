@@ -374,7 +374,7 @@
       if (!wasImports && shouldFocus) focusTitle(importsTitle);
       updateStationControl(); return;
     }
-    if (wasImports) { cancelImportOverview(); cancelHistory(); cancelConflicts(); }
+    if (wasImports) { cancelImportOverview(); cancelHistory(); cancelConflicts(); cancelShowResolver("You left Imports."); }
     if (importsPanel) surface(importsPanel, false);
     const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
@@ -3314,6 +3314,16 @@
   const manualImportsAll = manualImportsPanel?.querySelector("[data-manual-import-all]");
   const manualImportsProgress = manualImportsPanel?.querySelector("[data-manual-import-progress]");
   const manualImportsIndicator = deck?.querySelector("[data-manual-import-indicator]");
+  const SHOW_RESOLVER_ROUTE = "/admin/smug/music/shows/resolve";
+  const showResolverPanel = manualImportsPanel?.querySelector("[data-show-resolver]");
+  const showResolverRequest = showResolverPanel?.querySelector("[data-show-resolver-request]");
+  const showResolverLimit = showResolverPanel?.querySelector("[data-show-resolver-limit]");
+  const showResolverConfirm = showResolverPanel?.querySelector("[data-show-resolver-confirm]");
+  const showResolverExecute = showResolverPanel?.querySelector("[data-show-resolver-execute]");
+  const showResolverMetrics = [["showsScanned", "Shows scanned"], ["showsResolved", "Shows resolved"], ["showsUnresolved", "Shows unresolved"], ["resolvedBandAlbums", "Album mappings resolved"], ["unresolvedBandAlbums", "Album mappings unresolved"], ["recordsUpdated", "Database records updated"], ["failures", "Failures"]];
+  let showResolverRun = null, showResolverConfirmation = null;
+  function emptyShowResolver(state = "Not Started", reason = "No resolution has been requested.") { return { state, reason, report: null, technical: null, messages: [], receivedAt: null }; }
+  let showResolverResult = emptyShowResolver();
   const MANUAL_IMPORT_TIMEOUT_MS = 180000;
   const manualImportCatalog = Object.freeze([
     ["music-bands", "music", "bands", "Music Bands", "Music-Bands", "music_bands"],
@@ -3333,7 +3343,8 @@
     return manualImportSessionReady() && available() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && manualImportsPanel?.open && manualImportsAll && manualImportsProgress && [...manualImportRows.values()].every(Boolean);
   }
   function updateManualImportControls() {
-    const disabled = !manualImportCanStart() || manualImportRun !== null;
+    updateShowResolverControls();
+    const disabled = !manualImportCanStart() || manualImportRun !== null || showResolverRun !== null || showResolverConfirmation !== null;
     if (manualImportsAll) { manualImportsAll.disabled = disabled; manualImportsAll.setAttribute("aria-busy", String(manualImportRun !== null)); }
     manualImportRows.forEach((row, id) => { const button = row?.querySelector("[data-manual-import-run]"); if (!button) return; button.disabled = disabled; button.setAttribute("aria-busy", String(manualImportRun?.active === id)); button.textContent = manualImportRun?.active === id ? "Importing…" : "Run Import"; });
     if (manualImportsIndicator) {
@@ -3404,6 +3415,7 @@
       technical: safe.text, messages, stop: false };
   }
   function cancelManualImports(reason = "The request was interrupted.") {
+    cancelShowResolver(reason);
     const run = manualImportRun; if (!run) return;
     manualImportGeneration += 1; manualImportRun = null;
     run.timers.forEach(clearTimeout); run.controllers.forEach(controller => controller.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
@@ -3415,6 +3427,7 @@
   }
   function resetManualImports() {
     cancelManualImports("Your Admin session ended."); manualImportLastState = "Idle";
+    showResolverResult = emptyShowResolver(); renderShowResolver();
     for (const spec of manualImportCatalog) { manualImportResults.set(spec.id, emptyManualImport()); renderManualImport(spec.id); }
     if (manualImportsPanel) { manualImportsPanel.open = false; manualImportsPanel.querySelectorAll("details").forEach(node => { node.open = false; }); }
     if (manualImportsProgress) manualImportsProgress.textContent = "No import has been requested."; updateManualImportControls();
@@ -3444,7 +3457,7 @@
     return { ...result, http, receivedAt: http === null ? null : new Date().toISOString() };
   }
   async function startManualImports(id = null) {
-    if (manualImportRun || !prepareStationEntry() || !manualImportCanStart()) return;
+    if (manualImportRun || showResolverRun || showResolverConfirmation !== null || !prepareStationEntry() || !manualImportCanStart()) return;
     const selected = id === null ? manualImportCatalog : manualImportCatalog.filter(spec => spec.id === id); if (!selected.length) return;
     const run = { generation: ++manualImportGeneration, all: id === null, active: null, pending: new Set(selected.map(spec => spec.id)), controllers: new Set(), readers: new Set(), timers: new Set() };
     manualImportRun = run; manualImportLastState = "Importing";
@@ -3474,8 +3487,163 @@
   }
   manualImportsAll?.addEventListener("click", () => startManualImports());
   manualImportRows.forEach((row, id) => row?.querySelector("[data-manual-import-run]")?.addEventListener("click", () => startManualImports(id)));
-  manualImportsPanel?.addEventListener("toggle", updateManualImportControls);
+  manualImportsPanel?.addEventListener("toggle", () => { if (!manualImportsPanel.open) showResolverConfirmation = null; updateManualImportControls(); });
   for (const spec of manualImportCatalog) renderManualImport(spec.id);
+
+
+  // Resolver execution is separate from the seven-import catalog and never retries.
+  function showResolverAllowed() { return manualImportCanStart() && showResolverPanel?.open && !manualImportRun && !showResolverRun; }
+  function updateShowResolverControls() {
+    if (!showResolverPanel) return;
+    const ready = showResolverAllowed();
+    showResolverRequest.disabled = !ready || showResolverConfirmation !== null;
+    showResolverLimit.disabled = !ready || showResolverConfirmation !== null;
+    showResolverExecute.disabled = !ready || showResolverConfirmation === null;
+    showResolverRequest.setAttribute("aria-busy", String(showResolverRun !== null));
+    showResolverConfirm.hidden = showResolverConfirmation === null;
+    showResolverPanel.dataset.resolverState = showResolverResult.state;
+  }
+  function renderShowResolver() {
+    if (!showResolverPanel) return;
+    const result = showResolverResult, report = result.report;
+    showResolverPanel.querySelector("[data-show-resolver-state]").textContent = result.state;
+    showResolverPanel.querySelector("[data-show-resolver-reason]").textContent = result.reason;
+    const metrics = showResolverPanel.querySelector("[data-show-resolver-metrics]"); metrics.replaceChildren();
+    const metric = (label, value) => { const wrap = document.createElement("div"); importText(wrap, "dt", label); importText(wrap, "dd", value); metrics.appendChild(wrap); };
+    for (const [key, label] of showResolverMetrics) metric(label, diagnosticCount(report?.summary?.[key]) ? String(report.summary[key]) : "Not available");
+    metric("Response received", formatAdminDateTime(result.receivedAt, "Not available"));
+    const shows = showResolverPanel.querySelector("[data-show-resolver-shows]"); shows.replaceChildren();
+    if (!report?.shows.length) importText(shows, "p", report?.summary?.showsScanned === 0 ? "No eligible shows were reported in this batch." : "No processed-show details were supplied.");
+    for (const show of report?.shows || []) {
+      const card = document.createElement("article"); card.className = "admin-show-resolver__show";
+      importText(card, "h4", `${diagnosticCount(show.show_id) ? "Show #" + show.show_id : "Show number unavailable"}${show.name ? " - " + show.name : ""}`);
+      importText(card, "p", `Status: ${show.smug_sync_status || show.status || "Not available"}. Photos: ${diagnosticCount(show.photo_count) ? show.photo_count : "Not available"}.`);
+      importText(card, "p", `Last synced: ${formatAdminDateTime(show.smug_last_synced_at, "Not available")}`);
+      if (show.message || show.smug_sync_error) importText(card, "p", show.message || show.smug_sync_error);
+      for (const album of show.smug_albums || []) {
+        importText(card, "p", `${album.band || "Band name unavailable"} - ${album.status || "Status unavailable"}. Album: ${album.album_id || "Not available"}. Photos: ${diagnosticCount(album.photo_count) ? album.photo_count : "Not available"}.${album.error ? " " + album.error : ""}`);
+      }
+      if (!show.smug_albums?.length) importText(card, "p", "Band-level album details were not supplied.");
+      shows.appendChild(card);
+    }
+    const messages = showResolverPanel.querySelector("[data-show-resolver-messages]"); messages.replaceChildren();
+    for (const message of result.messages) importText(messages, "p", message);
+    if (!result.messages.length) importText(messages, "p", report ? "No additional failure or warning messages were supplied." : "No verified response available.");
+    showResolverPanel.querySelector("[data-show-resolver-json]").textContent = result.technical || "No response available.";
+    updateManualImportControls();
+  }
+  function projectShowResolver(data) {
+    // Allowlisted projection BEFORE the existing redactor: omit provider URLs, config, locks and arbitrary objects.
+    let limited = false, albumBudget = 150;
+    const fields = (input, strings, counts = []) => {
+      const output = {}; if (!diagnosticObject(input)) return output;
+      strings.forEach(key => { if (typeof input[key] === "string") output[key] = input[key]; });
+      counts.forEach(key => { if (diagnosticCount(input[key])) output[key] = input[key]; });
+      return output;
+    };
+    const slice = (input, limit) => { if (!Array.isArray(input)) return []; if (input.length > limit) limited = true; return input.slice(0, limit); };
+    const show = input => {
+      const output = fields(input, ["name", "status", "smug_sync_status", "smug_last_synced_at", "smug_sync_error", "message"], ["show_id", "photo_count"]);
+      const albums = slice(input?.smug_albums, Math.min(50, albumBudget)); albumBudget -= albums.length;
+      output.smug_albums = albums.map(album => fields(album, ["band", "band_id", "album_id", "status", "error"], ["photo_count"])); return output;
+    };
+    const shows = slice(data.updatedItems, 25).map(show);
+    for (const key of ["failures", "unresolvedShows"]) for (const item of slice(data.diagnostics?.[key], 25)) {
+      if (!diagnosticObject(item)) continue;
+      if (diagnosticCount(item.show_id) && shows.some(existing => existing.show_id === item.show_id)) continue;
+      if (shows.length >= 25) { limited = true; break; } shows.push(show(item));
+    }
+    const warnings = slice(data.warnings, 20).filter(item => typeof item === "string");
+    const failures = slice(data.diagnostics?.failures, 25).map(item => fields(item, ["name", "status", "message"], ["show_id"]));
+    const projection = { projection: "Limited resolver report; URLs, credentials and private configuration omitted.", ...fields(data, ["route", "source", "type", "section", "generatedAt", "error", "message"]), ok: data.ok, summary: fields(data.summary, [], showResolverMetrics.map(([key]) => key)), shows, warnings, failures };
+    const safe = safeManualImportValue(projection);
+    if (diagnosticObject(safe.data)) {
+      for (const key of ["shows", "warnings", "failures"]) {
+        if (!Array.isArray(safe.data[key])) { safe.data[key] = []; limited = true; }
+        safe.data[key] = safe.data[key].filter(item => key === "warnings" ? typeof item === "string" : diagnosticObject(item));
+      }
+      safe.data.shows.forEach(show => { if (!Array.isArray(show.smug_albums)) { show.smug_albums = []; limited = true; } else show.smug_albums = show.smug_albums.filter(diagnosticObject); });
+    }
+    return { data: safe.data, technical: safe.text, limited: limited || safe.limited };
+  }
+  function interpretShowResolver(data, http, limit) {
+    const unknown = emptyShowResolver("Unknown", "The result could not be verified. Processing may have continued server-side. Review the stored show data before requesting another batch; no automatic retry will occur.");
+    if (!diagnosticObject(data)) return unknown;
+    const safe = projectShowResolver(data); unknown.technical = safe.technical;
+    if (!diagnosticObject(safe.data)) return unknown;
+    if (http === 409) return { ...unknown, state: "Busy", reason: "The backend reported an active lock. This request was not started. No automatic retry will occur." };
+    if (data.route !== SHOW_RESOLVER_ROUTE || data.source !== "smugmug" || typeof data.ok !== "boolean") return unknown;
+    if (data.ok === false && http >= 400) return { ...unknown, state: "Failed", reason: "The backend reported a resolver failure. This does not establish that no records changed.", messages: [safe.data.error, safe.data.message].filter(Boolean) };
+    if (http !== 200 || data.ok !== true || data.type !== "smug_show_album_resolution" || data.section !== "music" || !diagnosticObject(data.summary) || data.refresh !== false || data.limit !== limit) return unknown;
+    if (!Array.isArray(data.updatedItems) || data.updatedItems.length > limit || data.updatedItems.some(item => !diagnosticObject(item)) || !Array.isArray(data.warnings) || data.warnings.some(item => typeof item !== "string")) return unknown;
+    const summary = data.summary;
+    if (diagnosticCount(summary.showsScanned) && ["showsResolved", "showsUnresolved", "failures"].some(key => diagnosticCount(summary[key]) && summary[key] > summary.showsScanned)) return unknown;
+    if (["showsScanned", "showsResolved", "showsUnresolved", "failures"].every(key => diagnosticCount(summary[key])) && summary.showsResolved + summary.showsUnresolved + summary.failures > summary.showsScanned) return unknown;
+    if (showResolverMetrics.some(([key]) => summary[key] !== undefined && !diagnosticCount(summary[key])) || diagnosticCount(summary.showsScanned) && summary.showsScanned > limit || diagnosticCount(summary.recordsUpdated) && diagnosticCount(summary.showsScanned) && summary.recordsUpdated > summary.showsScanned) return unknown;
+    const report = safe.data, missing = showResolverMetrics.some(([key]) => !diagnosticCount(summary[key]));
+    const failure = summary.failures > 0;
+    const warning = failure || summary.showsUnresolved > 0 || summary.unresolvedBandAlbums > 0 || summary.skippedLogoSource > 0 || summary.skippedVenueLogoSource > 0 || report.warnings.length > 0 || safe.limited || missing;
+    const messages = report.warnings.map(text => `Warning: ${text}`);
+    report.failures.forEach(item => messages.push(`Failure${diagnosticCount(item.show_id) ? " - Show #" + item.show_id : ""}${item.name ? " " + item.name : ""}: ${item.message || item.status || "No additional explanation supplied."}`));
+    if (missing) messages.push("Some metrics were not supplied and remain Not available.");
+    if (safe.limited) messages.push("Some supplied details were limited or redacted. Counts are backend totals; the displayed details may be incomplete.");
+    messages.push("Resolved shows can still contain unresolved band mappings. Album mapping counts are not unique-band counts.");
+    return { ...unknown, state: failure && summary.showsResolved === 0 ? "Failed" : warning ? "Warning" : "Success", reason: summary.showsScanned === 0 ? "The backend reported no eligible shows in this batch." : warning ? "Resolution finished with issues or incomplete information. Review the supplied results." : "The backend confirmed this resolution response.", report, messages, technical: safe.technical };
+  }
+  function cancelShowResolver(reason) {
+    showResolverConfirmation = null;
+    const run = showResolverRun; if (!run) { updateShowResolverControls(); return; }
+    showResolverRun = null;
+    run.timers.forEach(clearTimeout); run.controllers.forEach(controller => controller.abort()); run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+    showResolverResult = emptyShowResolver("Unknown", `${reason} Processing may have continued server-side. Verify the stored show data before requesting another batch. No automatic retry will occur.`);
+    renderShowResolver();
+  }
+  async function executeShowResolver() {
+    const limit = showResolverConfirmation;
+    if (![1, 5, 25].includes(limit) || !prepareStationEntry() || !showResolverAllowed()) return;
+    showResolverConfirmation = null;
+    const run = { controllers: new Set(), readers: new Set(), timers: new Set() }, controller = new AbortController();
+    showResolverRun = run; run.controllers.add(controller);
+    showResolverResult = emptyShowResolver("Running", `Resolving up to ${limit} eligible show${limit === 1 ? "" : "s"}. Keep Admin open; no automatic retry will occur.`); renderShowResolver();
+    let timedOut = false, authorization = false, http = null;
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, MANUAL_IMPORT_TIMEOUT_MS); run.timers.add(timer);
+    const expiryTimer = setTimeout(() => {
+      if (showResolverRun !== run) return;
+      cancelShowResolver("Your Admin session expired."); prepareStationEntry();
+      present("idle", "Your session expired. Resolver completion is Unknown; processing may have continued server-side. Connect again to verify before retrying.");
+    }, Math.max(1, expiresAt - Date.now())); run.timers.add(expiryTimer);
+    let result = emptyShowResolver("Unknown", "The connection ended without a verified result. Processing may have continued server-side. Verify stored show data before requesting another batch; no automatic retry will occur.");
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com${SHOW_RESOLVER_ROUTE}?limit=${limit}`, { method: "GET", headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` }, credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal }); http = response.status;
+      if (http === 401 || http === 403) { authorization = true; try { await response.body?.cancel(); } catch {} }
+      else if (http === 409) { result = emptyShowResolver("Busy", "The backend reported an active lock. This request was not started. No automatic retry will occur."); try { await response.body?.cancel(); } catch {} }
+      else {
+        const parsed = await boundedEndpointJson(response, run, controller);
+        if (parsed.unavailable) result.reason = "The response exceeded the 128 KiB safety limit. Completion is Unknown; processing may have continued server-side. Verify before retrying.";
+        else if (parsed.unsupported || parsed.invalid) { controller.abort(); }
+        else result = interpretShowResolver(parsed.data, http, limit);
+      }
+    } catch { if (timedOut) result.reason = "No verified result arrived within 180 seconds. Completion is Unknown; processing may have continued server-side. Verify stored show data before requesting another batch. No automatic retry will occur."; }
+    finally { run.timers.forEach(clearTimeout); run.controllers.clear(); }
+    if (showResolverRun !== run) return;
+    showResolverRun = null;
+    if (authorization) { clearSession(); clearPassword(); present("idle", "Resolver authorization was rejected. Your session expired or access was denied. No further requests will be sent; connect again."); return; }
+    if (!manualImportSessionReady()) { showResolverResult = emptyShowResolver("Unknown", "The session ended before the result was verified. Processing may have continued server-side."); renderShowResolver(); prepareStationEntry(); return; }
+    showResolverResult = { ...result, receivedAt: http === null ? null : new Date().toISOString() }; renderShowResolver();
+  }
+  showResolverRequest?.addEventListener("click", () => {
+    if (!prepareStationEntry() || !showResolverAllowed() || showResolverConfirmation !== null) return;
+    const limit = Number(showResolverLimit.value); if (![1, 5, 25].includes(limit)) return;
+    showResolverConfirmation = limit;
+    showResolverPanel.querySelector("[data-show-resolver-confirm-text]").textContent = `Resolve up to ${limit} eligible show${limit === 1 ? "" : "s"}, newest first? This writes SmugMug resolution results to PostgreSQL. It does not select a specific show and does not force-refresh resolved records.`;
+    updateManualImportControls(); showResolverExecute.focus({ preventScroll: true });
+  });
+  showResolverExecute?.addEventListener("click", executeShowResolver);
+  const dismissShowResolverConfirmation = () => { showResolverConfirmation = null; updateManualImportControls(); showResolverRequest?.focus({ preventScroll: true }); };
+  showResolverPanel?.querySelector("[data-show-resolver-cancel]").addEventListener("click", dismissShowResolverConfirmation);
+  showResolverConfirm?.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); dismissShowResolverConfirmation(); } });
+  showResolverPanel?.addEventListener("toggle", () => { if (!showResolverPanel.open) showResolverConfirmation = null; updateManualImportControls(); });
+  renderShowResolver();
 
 
   // History is reporting only. Each archive supplies bounded, ordered pages; no import command is used here.

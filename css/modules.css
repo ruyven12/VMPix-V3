@@ -34033,3 +34033,16 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 /* S8B: discovery access returns with the photographic memories. */
 .synchronicity-memories[data-memory-selected] ~ .synchronicity-drawer-dock { display: none; }
+
+/* SR3: separate, explicitly confirmed Show resolver inside Manual Imports. */
+.admin-shell .admin-show-resolver__body { padding: 0 10px 12px; min-inline-size: 0; overflow-wrap: anywhere; }
+.admin-shell .admin-show-resolver__controls { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; margin-block: 10px; }
+.admin-shell .admin-show-resolver__controls label { display: grid; gap: 5px; color: #dfcbd8; font-size: 13px; }
+.admin-shell .admin-show-resolver__controls select { min-block-size: 44px; min-inline-size: 88px; padding: 8px 12px; border: 1px solid #934057; background: #170e17; color: #e5d9e3; font: inherit; }
+.admin-shell .admin-show-resolver__controls button { min-block-size: 44px; max-inline-size: 100%; white-space: normal; }
+.admin-shell .admin-show-resolver__controls :is(button, select):focus-visible { outline: 2px solid #e6a9c3; outline-offset: 3px; }
+.admin-shell .admin-show-resolver__confirm { padding: 10px; border: 1px solid #934057; background: rgb(40 16 29 / .5); }
+.admin-shell .admin-show-resolver__body [data-show-resolver-state] { font-weight: 600; color: #e1c3cf; }
+.admin-shell .admin-show-resolver__show { padding-block: 10px; border-block-end: 1px solid #473340; }
+.admin-shell .admin-show-resolver__show h4 { margin-block: 0 6px; font: 400 14px/1.5 var(--font-display); }
+.admin-shell .admin-show-resolver__show p { margin-block: 6px; }
