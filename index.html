@@ -1487,7 +1487,7 @@
                 </button>
               </div>
               <figure class="set-featured-photo" aria-label="Featured set photograph" data-set-featured-photo hidden>
-                <button class="set-featured-photo-open" type="button" aria-label="Open featured photograph in lightbox" aria-describedby="set-featured-counter set-featured-status" data-set-featured-open></button>
+                <button class="set-featured-photo-open" type="button" aria-label="Open featured photograph in Focus Mode" aria-describedby="set-featured-counter set-featured-status" data-set-featured-open></button>
                 <button class="set-featured-nav set-featured-prev" type="button" aria-label="Previous featured photograph" data-set-featured-prev disabled>&#8249;</button>
                 <button class="set-featured-nav set-featured-next" type="button" aria-label="Next featured photograph" data-set-featured-next disabled>&#8250;</button>
                 <span class="set-featured-counter" id="set-featured-counter" data-set-featured-counter>00 / 00</span>
@@ -1592,6 +1592,23 @@
             </section>
 
 
+            <section class="set-focus" aria-label="Photograph focus mode" tabindex="-1" data-set-focus hidden>
+              <div class="set-focus-toolbar">
+                <button type="button" data-set-focus-close>Return to Hero</button>
+              </div>
+              <div class="set-focus-stage" role="group" aria-label="Selected photograph" aria-describedby="set-focus-range" tabindex="0" data-set-focus-stage>
+                <div class="set-focus-image" data-set-focus-image></div>
+                <p class="set-focus-status" role="status" data-set-focus-status></p>
+              </div>
+              <div class="set-focus-controls">
+                <button type="button" aria-label="Previous photograph" data-set-focus-prev>&#8249;</button>
+                <div class="set-focus-counts">
+                  <span aria-live="polite" data-set-focus-counter></span>
+                  <span id="set-focus-range" data-set-focus-range></span>
+                </div>
+                <button type="button" aria-label="Next photograph" data-set-focus-next>&#8250;</button>
+              </div>
+            </section>
           </article>
 
           <article class="v3-lightbox-shell lightbox-screen" id="lightbox-screen" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" aria-hidden="true" tabindex="-1" inert data-lightbox-shell data-lightbox-screen>

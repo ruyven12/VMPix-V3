@@ -6015,6 +6015,7 @@ function setSetGalleryVisible(isVisible) {
     setsFeaturedOpen.setAttribute("aria-expanded", String(isVisible));
   }
   if (!isVisible) {
+    closeSetFocus(false);
     setGalleryModeVisible(false);
   }
   setGallery.setAttribute("aria-hidden", String(!isVisible));
@@ -7551,6 +7552,8 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   tile.addEventListener("click", (event) => {
     if (isSetFeaturedPhotoActive() && galleryGrid.contains(tile)) {
       selectSetFeaturedTile(tile, event, "thumbnail");
+    } else if (getRouteFromUrl().name === "set-detail") {
+      openSetFocus(tile, event);
     } else {
       showLightbox(tile, { analytics: beginArchiveAnalytics(event) });
     }
@@ -7558,12 +7561,175 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   return tile;
 }
 
+// S13D: an Individual Set content mode. The shared lightbox and its consumers stay separate.
+let setFocusSession = null;
+
+function isSetFocusCurrent(session = setFocusSession) {
+  return Boolean(session && session === setFocusSession && session.context === v3RouteContext &&
+    getRouteFromUrl().name === "set-detail" && setGallery?.dataset.albumId === session.albumId &&
+    activeSetGalleryPhotoMode === session.origin && session.root.isConnected);
+}
+
+function closeSetFocus(restore = true) {
+  const s = setFocusSession;
+  if (!s) return;
+  const canRestore = restore && isSetFocusCurrent(s);
+  setFocusSession = null;
+  s.events.abort();
+  if (s.pending) { s.pending.onload = s.pending.onerror = null; s.pending.removeAttribute("src"); }
+  s.root.hidden = true;
+  s.root.removeAttribute("aria-busy");
+  s.image.replaceChildren();
+  s.status.textContent = "";
+  setGallery.classList.remove("is-set-focus");
+  s.siblings.forEach(([node, inert]) => { node.inert = inert; });
+  if (canRestore) {
+    // Hero adopts the viewed preview photo; All retains its DOM, loaded range and scroll position.
+    if (s.origin === "preview") syncSetFeaturedPhoto(activeGalleryPhoto);
+    s.scroller.scrollTo({ top: s.scrollTop, left: s.scrollLeft, behavior: "instant" });
+    const target = s.origin === "preview" ? setGallery.querySelector("[data-set-featured-open]") : s.trigger;
+    if (target?.isConnected) target.focus({ preventScroll: true });
+  }
+}
+
+function selectSetFocusPhoto(index, intent = null) {
+  const s = setFocusSession;
+  if (!isSetFocusCurrent(s) || !s.tiles.length) return;
+  // Match the existing viewer's wraparound, confined to this opening's loaded range.
+  const position = ((index % s.tiles.length) + s.tiles.length) % s.tiles.length;
+  const tile = s.tiles[position], photo = setFeaturedPhotoRecords.get(tile);
+  if (!photo || !galleryGrid.contains(tile)) { closeSetFocus(false); return; }
+  const key = getSetGalleryAllModePhotoKey(photo);
+  selectGalleryPhoto(tile);
+  s.counter.textContent = `${String(position + 1).padStart(2, "0")} / ${String(s.tiles.length).padStart(2, "0")}`;
+  s.stage.setAttribute("aria-label", `Photograph ${position + 1} of ${s.tiles.length} loaded photographs`);
+  if (s.key === key && (s.pending || s.displayedKey === key)) return;
+  s.key = key;
+  const request = ++s.request;
+  if (s.pending) { s.pending.onload = s.pending.onerror = null; s.pending.removeAttribute("src"); }
+  s.pending = null;
+  s.root.setAttribute("aria-busy", "true");
+  s.status.textContent = `Loading photograph ${position + 1}...`;
+  const current = () => isSetFocusCurrent(s) && s.request === request &&
+    getSetGalleryAllModePhotoKey(setFeaturedPhotoRecords.get(activeGalleryPhoto)) === key;
+  const commit = (image, failed = false) => {
+    if (!current()) return;
+    s.pending = null;
+    s.image.replaceChildren(image);
+    s.displayedKey = key;
+    s.root.setAttribute("aria-busy", "false");
+    s.status.textContent = failed ? "Photograph unavailable." : "";
+    s.images.delete(key); s.images.set(key, { image, failed });
+    while (s.images.size > 3) s.images.delete(s.images.keys().next().value);
+    if (!failed && intent && currentArchiveAnalyticsIntent(intent) && document.visibilityState === "visible") {
+      dispatchArchiveAnalytics("photo_view", { archive: "music", content_type: "photo",
+        photo_position: position + 1, navigation_method: intent.method }, intent.ticket, tile);
+    }
+  };
+  const cached = s.images.get(key);
+  if (cached) { commit(cached.image, cached.failed); return; }
+  // Keep the prior decoded photograph visible until its replacement is ready.
+  // On initial entry, reuse the already visible hero/thumbnail as an immediate preview.
+  if (!s.image.firstChild) {
+    const hero = setFeaturedPhotoLoad?.displayedKey === key
+      ? setGallery.querySelector("[data-set-featured-open] img") : null;
+    const preview = hero || tile.querySelector("img");
+    if (preview?.complete && preview.naturalWidth) {
+      const copy = preview.cloneNode(); copy.className = ""; copy.removeAttribute("loading");
+      copy.alt = photo.caption || `Concert photograph of ${setGalleryBand?.textContent || "this band"}`;
+      protectArchiveImage(copy); s.image.replaceChildren(copy);
+    }
+  }
+  const sources = [...new Set([getGalleryPhotoLightboxSrc(tile), photo.imageSrc, galleryImageFallbackSrc].filter(Boolean))];
+  let sourceIndex = 0;
+  function load() {
+    if (!current()) return;
+    if (sourceIndex >= sources.length) {
+      s.pending = null; s.image.replaceChildren(); s.root.setAttribute("aria-busy", "false");
+      s.status.textContent = "Photograph unavailable."; return;
+    }
+    const src = sources[sourceIndex++], image = new Image();
+    const failed = src === galleryImageFallbackSrc;
+    s.pending = image;
+    image.alt = failed ? "Photograph unavailable" : photo.caption || `Concert photograph of ${setGalleryBand?.textContent || "this band"}`;
+    applyMusicGalleryImageLoading(image, 0, { firstVisible: true });
+    protectArchiveImage(image);
+    image.onload = async () => {
+      if (!current()) return;
+      if (!image.naturalWidth || !image.naturalHeight) { image.onerror(); return; }
+      if (image.decode) { try { await image.decode(); } catch { /* A loaded image remains usable. */ } }
+      image.onload = image.onerror = null;
+      commit(image, failed);
+    };
+    image.onerror = () => { image.onload = image.onerror = null; load(); };
+    image.src = src;
+  }
+  load();
+}
+
+function openSetFocus(tile, event) {
+  if (getRouteFromUrl().name !== "set-detail" || !setGallery?.closest(".set-dossier-viewport") ||
+    setGallery.getAttribute("aria-hidden") !== "false" || galleryGrid.classList.contains("is-gallery-hidden") ||
+    isLightboxOpen() || setFocusSession) return;
+  const tiles = Array.from(galleryGrid.querySelectorAll("[data-gallery-photo]")).filter(node => setFeaturedPhotoRecords.has(node));
+  const index = tiles.indexOf(tile), root = setGallery.querySelector("[data-set-focus]"), scroller = getActiveShellScroller();
+  if (!root || !scroller || index < 0) return;
+  const s = { root, scroller, context: v3RouteContext, albumId: setGallery.dataset.albumId,
+    origin: activeSetGalleryPhotoMode, tiles, trigger: event?.currentTarget || tile,
+    scrollTop: scroller.scrollTop, scrollLeft: scroller.scrollLeft,
+    events: new AbortController(), pending: null, request: 0, key: "", displayedKey: "", images: new Map(), gesture: null,
+    image: root.querySelector("[data-set-focus-image]"), stage: root.querySelector("[data-set-focus-stage]"),
+    close: root.querySelector("[data-set-focus-close]"), previous: root.querySelector("[data-set-focus-prev]"),
+    next: root.querySelector("[data-set-focus-next]"), counter: root.querySelector("[data-set-focus-counter]"),
+    status: root.querySelector("[data-set-focus-status]"),
+    siblings: Array.from(setGallery.children).filter(node => node !== root).map(node => [node, node.inert]) };
+  setFocusSession = s;
+  s.siblings.forEach(([node]) => { node.inert = true; });
+  setGallery.classList.add("is-set-focus");
+  root.hidden = false;
+  s.close.textContent = s.origin === "preview" ? "Return to Hero" : "Return to Gallery";
+  root.querySelector("[data-set-focus-range]").textContent = `${tiles.length} loaded${activeSetGalleryPhotoTotal > 0 ? ` / ${activeSetGalleryPhotoTotal} in album` : ""}`;
+  s.previous.disabled = s.next.disabled = tiles.length < 2;
+  const listen = (node, name, handler) => node.addEventListener(name, handler, { signal: s.events.signal });
+  const move = (direction, event, method) => {
+    if (!isSetFocusCurrent(s)) { closeSetFocus(false); return; }
+    if (s.tiles.length > 1) selectSetFocusPhoto(s.tiles.indexOf(activeGalleryPhoto) + direction, beginArchiveAnalytics(event, method));
+  };
+  listen(s.close, "click", () => closeSetFocus());
+  listen(s.previous, "click", event => move(-1, event, "previous"));
+  listen(s.next, "click", event => move(1, event, "next"));
+  listen(root, "keydown", event => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.target.closest("input,textarea,select,[contenteditable=true]")) return;
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); closeSetFocus(); }
+    else if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
+      event.preventDefault(); event.stopPropagation(); move(event.key === "ArrowLeft" ? -1 : 1, event, "keyboard");
+    }
+  });
+  listen(s.stage, "pointerdown", event => {
+    if (!event.isPrimary || !["touch", "pen"].includes(event.pointerType)) return;
+    s.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    try { s.stage.setPointerCapture(event.pointerId); } catch { /* Older webviews may omit capture. */ }
+  });
+  listen(s.stage, "pointerup", event => {
+    const g = s.gesture; s.gesture = null;
+    if (!g || g.id !== event.pointerId) return;
+    const dx = event.clientX - g.x, dy = event.clientY - g.y;
+    if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.4) move(dx < 0 ? 1 : -1, event, "swipe");
+  });
+  listen(s.stage, "pointercancel", () => { s.gesture = null; });
+  listen(window, "pagehide", () => closeSetFocus(false));
+  selectSetFocusPhoto(index, beginArchiveAnalytics(event));
+  s.close.focus({ preventScroll: true });
+}
+
+
 // S13B: activeGalleryPhoto remains the sole selection shared with the existing viewer.
 // These references belong to the existing normalized records, not another album cache.
 const setFeaturedPhotoRecords = new WeakMap();
 let setFeaturedPhotoLoad = null;
 
 function resetSetFeaturedPhoto() {
+  closeSetFocus(false);
   const session = setFeaturedPhotoLoad;
   setFeaturedPhotoLoad = null;
   session?.controller.abort();
@@ -7614,7 +7780,7 @@ function moveSetFeaturedPhoto(direction, event, method) {
 }
 
 function syncSetFeaturedPhoto(tile, intent = null) {
-  if (!isSetFeaturedPhotoActive()) return;
+  if (!isSetFeaturedPhotoActive() || setFocusSession) return;
   const s = setFeaturedPhotoLoad, tiles = getSetFeaturedTiles(), index = tiles.indexOf(tile);
   const photo = setFeaturedPhotoRecords.get(tile);
   if (index < 0 || !photo) return;
@@ -7622,7 +7788,7 @@ function syncSetFeaturedPhoto(tile, intent = null) {
   s.prev.disabled = index === 0;
   s.next.disabled = index === tiles.length - 1;
   s.counter.textContent = `${String(index + 1).padStart(2, "0")} / ${String(tiles.length).padStart(2, "0")}`;
-  s.open.setAttribute("aria-label", `Open photograph ${index + 1} of ${tiles.length} in lightbox`);
+  s.open.setAttribute("aria-label", `Open photograph ${index + 1} of ${tiles.length} in Focus Mode`);
   revealSetFeaturedThumbnail(tile);
   const key = getSetGalleryAllModePhotoKey(photo);
   if (s.requestedKey === key && (s.displayedKey === key || s.pending)) return;
@@ -7724,7 +7890,7 @@ function renderSetFeaturedPhoto(photos) {
   listen(s.open, "click", event => {
     if (Date.now() < s.suppressClickUntil || !isSetFeaturedPhotoActive() || isLightboxOpen() ||
       s.figure.getAttribute("aria-busy") === "true" || s.open.getAttribute("aria-disabled") === "true") return;
-    showLightbox(activeGalleryPhoto, { analytics: beginArchiveAnalytics(event) });
+    openSetFocus(activeGalleryPhoto, event);
   });
   listen(figure, "keydown", event => {
     if (!isSetFeaturedPhotoActive() || isLightboxOpen() || event.altKey || event.ctrlKey || event.metaKey ||
@@ -7760,6 +7926,8 @@ function renderSetGalleryPhotoHighlights(photos, options = {}) {
 
   const fragment = document.createDocumentFragment();
   const appendMode = options.append === true;
+  if (!appendMode) closeSetFocus(false);
+  const heroKey = activeSetGalleryPhotoMode === "preview" ? setFeaturedPhotoLoad?.displayedKey : "";
   const startIndex = appendMode ? getCurrentGalleryPhotoTiles().length : 0;
   photos.forEach((photo, index) => {
     fragment.append(createSetGalleryPhotoTile(photo, startIndex + index));
@@ -7772,7 +7940,8 @@ function renderSetGalleryPhotoHighlights(photos, options = {}) {
   galleryGrid.replaceChildren(fragment);
   renderSetFeaturedPhoto(photos);
   activeGalleryPhoto = null;
-  const firstTile = getCurrentGalleryPhotoTiles()[0] || null;
+  const tiles = getCurrentGalleryPhotoTiles();
+  const firstTile = (heroKey && tiles.find(tile => getSetGalleryAllModePhotoKey(setFeaturedPhotoRecords.get(tile)) === heroKey)) || tiles[0] || null;
   if (firstTile) {
     selectGalleryPhoto(firstTile);
   }
