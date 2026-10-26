@@ -34179,3 +34179,35 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile::before { background:rgba(157,175,255,.7); }
 .set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile:focus-visible { outline:2px solid #c2baff;outline-offset:2px; }
+
+/* S13B: preview-only controls; the shared full-gallery viewer is unchanged. */
+.set-dossier-viewport [data-album-photo-mode="all"] .set-featured-photo { display:none; }
+.set-dossier-viewport .set-featured-photo { position:relative; }
+.set-dossier-viewport .set-featured-photo-open {
+  position:relative;display:block;width:100%;min-width:0;padding:0;border:0;border-radius:0;
+  aspect-ratio:var(--set-hero-ratio,1);max-height:min(64svh,46rem);
+  color:inherit;background:none;cursor:pointer;touch-action:pan-y pinch-zoom;
+}
+.set-dossier-viewport .set-featured-photo-open .set-featured-photo-image {
+  position:absolute;inset:0;width:100%;height:100%;max-height:100%;object-fit:contain;
+}
+.set-dossier-viewport .set-featured-nav {
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;
+  padding:0;border:1px solid rgba(176,163,255,.55);border-radius:3px;
+  background:rgba(7,10,28,.72);color:#e4eaff;font-size:1.8rem;line-height:1;cursor:pointer;
+}
+.set-dossier-viewport .set-featured-prev { left:.45rem; }
+.set-dossier-viewport .set-featured-next { right:.45rem; }
+.set-dossier-viewport .set-featured-nav:disabled { opacity:.35;cursor:default; }
+.set-dossier-viewport :is(.set-featured-photo-open,.set-featured-nav):focus-visible { outline:2px solid #c2baff;outline-offset:-3px; }
+.set-dossier-viewport .set-featured-counter {
+  position:absolute;bottom:.5rem;left:50%;transform:translateX(-50%);pointer-events:none;
+  padding:.3rem .6rem;border:1px solid rgba(176,163,255,.3);border-radius:3px;
+  color:#e4eaff;background:rgba(7,10,28,.8);font-size:.7rem;line-height:1.2;white-space:nowrap;
+}
+.set-dossier-viewport .set-featured-photo-status {
+  position:absolute;bottom:2.7rem;left:10%;right:10%;min-height:0;padding:.3rem;
+  pointer-events:none;background:rgba(7,10,28,.8);font-size:.7rem;
+}
+.set-dossier-viewport .set-featured-photo-status:empty { display:none; }

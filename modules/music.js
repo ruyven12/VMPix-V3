@@ -6018,6 +6018,8 @@ function setSetGalleryVisible(isVisible) {
     setGalleryModeVisible(false);
   }
   setGallery.setAttribute("aria-hidden", String(!isVisible));
+  if (isVisible) syncSetFeaturedPhoto(activeGalleryPhoto);
+  else if (getRouteFromUrl().name !== "set-detail") resetSetFeaturedPhoto();
   if (isVisible) {
     setGallery.removeAttribute("inert");
   } else {
@@ -7053,7 +7055,10 @@ function setGalleryState(stateName = "ready") {
   syncSetGalleryPhotoToggleButton(activeState);
   syncSetGalleryLoadMoreButton(activeState);
   flushArchiveGalleryRangeAnalytics(activeState);
-  if (activeState === "ready") flushArchiveAnalytics();
+  if (activeState === "ready") {
+    syncSetFeaturedPhoto(activeGalleryPhoto);
+    flushArchiveAnalytics();
+  }
 }
 
 function getGalleryPhotoLabel(photoTile) {
@@ -7068,7 +7073,7 @@ function syncLightboxPrepTitle() {
   galleryLightboxTitle.textContent = `${getGalleryPhotoLabel(activeGalleryPhoto)} selected`;
 }
 
-function selectGalleryPhoto(photoTile) {
+function selectGalleryPhoto(photoTile, options = {}) {
   if (!photoTile) {
     return;
   }
@@ -7080,6 +7085,7 @@ function selectGalleryPhoto(photoTile) {
     tile.setAttribute("aria-pressed", String(isActive));
   });
   syncLightboxPrepTitle();
+  syncSetFeaturedPhoto(photoTile, options.heroIntent);
 }
 
 function setGalleryViewMode(viewMode = "grid") {
@@ -7512,6 +7518,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   tile.className = `archive-gallery-tile set-gallery-photo-tile${index === 0 ? " is-active" : ""}`;
   tile.type = "button";
   archiveAnalyticsTileIds.set(tile, { archive: "music", photo_id: photo.analyticsImageKey || photo.image_key || "", gallery_id: photo.analyticsAlbumId || photo.album_id });
+  setFeaturedPhotoRecords.set(tile, photo);
   tile.dataset.galleryPhoto = "";
   tile.dataset.galleryPhotoLabel = photo.label;
   tile.dataset.galleryKind = "image";
@@ -7533,75 +7540,208 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   protectArchiveImage(image);
   tile.append(image);
   tile.addEventListener("click", (event) => {
-    showLightbox(tile, { analytics: beginArchiveAnalytics(event) });
+    if (isSetFeaturedPhotoActive() && galleryGrid.contains(tile)) {
+      selectSetFeaturedTile(tile, event, "thumbnail");
+    } else {
+      showLightbox(tile, { analytics: beginArchiveAnalytics(event) });
+    }
   });
   return tile;
 }
 
-// S13A: first usable preview photograph only; no hero navigation or selection state.
+// S13B: activeGalleryPhoto remains the sole selection shared with the existing viewer.
+// These references belong to the existing normalized records, not another album cache.
+const setFeaturedPhotoRecords = new WeakMap();
 let setFeaturedPhotoLoad = null;
 
 function resetSetFeaturedPhoto() {
-  const pendingImage = setFeaturedPhotoLoad?.image;
+  const session = setFeaturedPhotoLoad;
   setFeaturedPhotoLoad = null;
-  if (pendingImage) {
-    pendingImage.onload = pendingImage.onerror = null;
-    pendingImage.removeAttribute("src");
+  session?.controller.abort();
+  if (session?.pending) {
+    session.pending.onload = session.pending.onerror = null;
+    session.pending.removeAttribute("src");
   }
   const figure = setGallery?.querySelector("[data-set-featured-photo]");
   if (figure) {
     figure.hidden = true;
     figure.removeAttribute("aria-busy");
-    figure.replaceChildren();
+    figure.style.removeProperty("--set-hero-ratio");
+    figure.querySelector("[data-set-featured-open]").replaceChildren();
+    figure.querySelector("[data-set-featured-status]").textContent = "";
   }
+}
+
+function isSetFeaturedPhotoActive() {
+  const s = setFeaturedPhotoLoad;
+  return Boolean(s && s.context === v3RouteContext && getRouteFromUrl().name === "set-detail" &&
+    setGallery.dataset.albumId === s.albumId && activeSetGalleryPhotoMode === "preview");
+}
+
+function getSetFeaturedTiles() {
+  return Array.from(galleryGrid?.querySelectorAll("[data-gallery-photo]") || [])
+    .slice(0, MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT);
+}
+
+function revealSetFeaturedThumbnail(tile) {
+  if (!galleryGrid?.clientWidth || setGallery.getAttribute("aria-hidden") !== "false") return;
+  const strip = galleryGrid.getBoundingClientRect(), thumb = tile.getBoundingClientRect();
+  const delta = thumb.left < strip.left + 5 ? thumb.left - strip.left - 5
+    : thumb.right > strip.right - 5 ? thumb.right - strip.right + 5 : 0;
+  if (delta) galleryGrid.scrollTo({ left: galleryGrid.scrollLeft + delta, behavior: "instant" });
+}
+
+function selectSetFeaturedTile(tile, event, method) {
+  if (!isSetFeaturedPhotoActive() || isLightboxOpen() || !getSetFeaturedTiles().includes(tile)) return;
+  setFeaturedPhotoLoad.initial = false;
+  selectGalleryPhoto(tile, { heroIntent: beginArchiveAnalytics(event, method) });
+}
+
+function moveSetFeaturedPhoto(direction, event, method) {
+  if (!isSetFeaturedPhotoActive()) return;
+  const tiles = getSetFeaturedTiles(), index = tiles.indexOf(activeGalleryPhoto);
+  const next = index + direction;
+  if (index >= 0 && next >= 0 && next < tiles.length) selectSetFeaturedTile(tiles[next], event, method);
+}
+
+function syncSetFeaturedPhoto(tile, intent = null) {
+  if (!isSetFeaturedPhotoActive()) return;
+  const s = setFeaturedPhotoLoad, tiles = getSetFeaturedTiles(), index = tiles.indexOf(tile);
+  const photo = setFeaturedPhotoRecords.get(tile);
+  if (index < 0 || !photo) return;
+  s.figure.hidden = false;
+  s.prev.disabled = index === 0;
+  s.next.disabled = index === tiles.length - 1;
+  s.counter.textContent = `${String(index + 1).padStart(2, "0")} / ${String(tiles.length).padStart(2, "0")}`;
+  s.open.setAttribute("aria-label", `Open photograph ${index + 1} of ${tiles.length} in lightbox`);
+  revealSetFeaturedThumbnail(tile);
+  const key = getSetGalleryAllModePhotoKey(photo);
+  if (s.requestedKey === key && (s.displayedKey === key || s.pending)) return;
+  const request = ++s.request;
+  s.requestedKey = key;
+  if (s.pending) { s.pending.onload = s.pending.onerror = null; s.pending.removeAttribute("src"); }
+  s.pending = null;
+  s.figure.setAttribute("aria-busy", "true");
+  s.open.setAttribute("aria-disabled", "true");
+  s.status.textContent = `Loading photograph ${String(index + 1).padStart(2, "0")}...`;
+  const current = () => isSetFeaturedPhotoActive() && setFeaturedPhotoLoad === s &&
+    s.request === request && getSetGalleryAllModePhotoKey(setFeaturedPhotoRecords.get(activeGalleryPhoto)) === key;
+  const commit = (image, failed = false) => {
+    if (!current()) return;
+    s.pending = null;
+    s.initial = false;
+    if (!s.figure.style.getPropertyValue("--set-hero-ratio")) {
+      s.figure.style.setProperty("--set-hero-ratio", `${image.naturalWidth} / ${image.naturalHeight}`);
+    }
+    // Fix the initial presentation ratio for this visit so later selections never move the filmstrip.
+    s.open.replaceChildren(image);
+    s.displayedKey = key;
+    s.figure.setAttribute("aria-busy", "false");
+    s.open.setAttribute("aria-disabled", "false");
+    s.status.textContent = failed ? "Photograph unavailable." : "";
+    s.images.delete(key); s.images.set(key, { image, failed });
+    // Only three decoded display images are retained; the existing browser/API caches do the rest.
+    while (s.images.size > 3) s.images.delete(s.images.keys().next().value);
+    if (!failed && intent && currentArchiveAnalyticsIntent(intent) && !isLightboxOpen() &&
+      setGallery.getAttribute("aria-hidden") === "false" && document.visibilityState === "visible") {
+      dispatchArchiveAnalytics("photo_view", { archive: "music", content_type: "photo",
+        photo_position: getSetFeaturedTiles().indexOf(activeGalleryPhoto) + 1,
+        navigation_method: intent.method }, intent.ticket, activeGalleryPhoto);
+    }
+  };
+  const cached = s.images.get(key);
+  if (cached) { commit(cached.image, cached.failed); return; }
+  const sources = [...new Set([photo.lightboxSrc, photo.imageSrc].filter(Boolean))];
+  let nextSource = 0;
+  function loadSource(fallback = false) {
+    if (!current()) return;
+    if (!fallback && nextSource >= sources.length) {
+      const currentTiles = getSetFeaturedTiles(), currentIndex = currentTiles.indexOf(activeGalleryPhoto);
+      if (s.initial && currentIndex + 1 < currentTiles.length) { selectGalleryPhoto(currentTiles[currentIndex + 1]); return; }
+      loadSource(true); return;
+    }
+    const image = new Image();
+    s.pending = image;
+    image.className = "set-featured-photo-image";
+    image.alt = fallback ? "Photograph unavailable" : photo.caption || `Concert photograph of ${setGalleryBand?.textContent || "this band"}`;
+    applyMusicGalleryImageLoading(image, 0, { firstVisible: true });
+    protectArchiveImage(image);
+    image.onload = async () => {
+      if (!current()) { if (s.pending === image) s.pending = null; return; }
+      if (!image.naturalWidth || !image.naturalHeight) { image.onerror(); return; }
+      if (image.decode) { try { await image.decode(); } catch { /* Loaded fallback remains usable. */ } }
+      if (!current()) { if (s.pending === image) s.pending = null; return; }
+      image.onload = image.onerror = null;
+      commit(image, fallback);
+    };
+    image.onerror = () => {
+      if (!current()) { if (s.pending === image) s.pending = null; return; }
+      image.onload = image.onerror = null;
+      if (!fallback) { loadSource(); return; }
+      s.pending = null; s.initial = false;
+      s.open.replaceChildren(); s.displayedKey = "";
+      s.figure.setAttribute("aria-busy", "false");
+      s.status.textContent = "Photograph unavailable.";
+    };
+    image.src = fallback ? galleryImageFallbackSrc : sources[nextSource++];
+  }
+  loadSource();
 }
 
 function renderSetFeaturedPhoto(photos) {
   const figure = setGallery?.querySelector("[data-set-featured-photo]");
   const albumId = setGallery?.dataset.albumId || "";
-  if (!figure || !albumId || !photos.length || setFeaturedPhotoLoad?.albumId === albumId) return;
-  resetSetFeaturedPhoto();
-  const load = { albumId, image: null };
-  setFeaturedPhotoLoad = load;
-  figure.hidden = false;
-  figure.setAttribute("aria-busy", "true");
-  const status = document.createElement("figcaption");
-  status.className = "set-featured-photo-status";
-  status.setAttribute("role", "status");
-  status.textContent = "Loading featured photograph...";
-  figure.append(status);
-  // Stay bounded to the existing preview. Try its large/preview URLs in order;
-  // missing photography never triggers another album or a bulk gallery fetch.
-  const candidates = photos.slice(0, MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT).flatMap((photo) =>
-    [...new Set([photo.lightboxSrc, photo.imageSrc].filter(Boolean))].map(src => ({ photo, src })));
-  let next = 0;
-  const isCurrent = () => setFeaturedPhotoLoad === load &&
-    setGallery.dataset.albumId === albumId && getRouteFromUrl().name === "set-detail";
-  function tryNext() {
-    if (!isCurrent()) return;
-    if (next >= candidates.length) {
-      figure.setAttribute("aria-busy", "false");
-      status.textContent = "Featured photograph unavailable.";
-      return;
+  if (!figure || !albumId || !photos.length) return;
+  if (activeSetGalleryPhotoMode !== "preview") {
+    // The established full-grid viewer owns selection in All mode; never grow the preview strip.
+    if (setFeaturedPhotoLoad) {
+      setFeaturedPhotoLoad.request++;
+      setFeaturedPhotoLoad.requestedKey = "";
     }
-    const { photo, src } = candidates[next++];
-    const image = new Image();
-    load.image = image;
-    image.className = "set-featured-photo-image";
-    image.alt = photo.caption || `Concert photograph of ${setGalleryBand?.textContent || "this band"}`;
-    applyMusicGalleryImageLoading(image, 0, { firstVisible: true });
-    protectArchiveImage(image);
-    image.onload = () => {
-      if (!isCurrent()) return;
-      if (!image.naturalWidth) { tryNext(); return; }
-      image.onload = image.onerror = null;
-      figure.setAttribute("aria-busy", "false");
-      figure.replaceChildren(image);
-    };
-    image.onerror = tryNext;
-    image.src = src;
+    figure.hidden = true; return;
   }
-  tryNext();
+  if (setFeaturedPhotoLoad?.albumId === albumId && setFeaturedPhotoLoad.context === v3RouteContext) return;
+  resetSetFeaturedPhoto();
+  const s = { albumId, context: v3RouteContext, figure, request: 0, requestedKey: "", displayedKey: "",
+    pending: null, initial: true, images: new Map(), controller: new AbortController(), gesture: null, suppressClickUntil: 0,
+    open: figure.querySelector("[data-set-featured-open]"), prev: figure.querySelector("[data-set-featured-prev]"),
+    next: figure.querySelector("[data-set-featured-next]"), counter: figure.querySelector("[data-set-featured-counter]"),
+    status: figure.querySelector("[data-set-featured-status]") };
+  setFeaturedPhotoLoad = s;
+  figure.hidden = false;
+  const listen = (element, name, handler) => element.addEventListener(name, handler, { signal: s.controller.signal });
+  listen(s.prev, "click", event => moveSetFeaturedPhoto(-1, event, "previous"));
+  listen(s.next, "click", event => moveSetFeaturedPhoto(1, event, "next"));
+  listen(s.open, "click", event => {
+    if (Date.now() < s.suppressClickUntil || !isSetFeaturedPhotoActive() || isLightboxOpen() ||
+      s.figure.getAttribute("aria-busy") === "true" || s.open.getAttribute("aria-disabled") === "true") return;
+    showLightbox(activeGalleryPhoto, { analytics: beginArchiveAnalytics(event) });
+  });
+  listen(figure, "keydown", event => {
+    if (!isSetFeaturedPhotoActive() || isLightboxOpen() || event.altKey || event.ctrlKey || event.metaKey ||
+      ![s.open, s.prev, s.next].includes(event.target) || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault(); event.stopPropagation();
+    moveSetFeaturedPhoto(event.key === "ArrowLeft" ? -1 : 1, event, "keyboard");
+  });
+  listen(s.open, "pointerdown", event => {
+    if (!event.isPrimary || !["touch", "pen"].includes(event.pointerType) || !isSetFeaturedPhotoActive()) return;
+    s.gesture = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    s.open.setPointerCapture(event.pointerId);
+  });
+  listen(s.open, "pointermove", event => {
+    const g = s.gesture;
+    if (g?.id === event.pointerId && Math.hypot(event.clientX - g.x, event.clientY - g.y) > 12) s.suppressClickUntil = Date.now() + 500;
+  });
+  listen(s.open, "pointerup", event => {
+    const g = s.gesture; s.gesture = null;
+    if (!g || g.id !== event.pointerId) return;
+    const dx = event.clientX - g.x, dy = event.clientY - g.y;
+    if (Math.abs(dx) >= 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      s.suppressClickUntil = Date.now() + 500;
+      moveSetFeaturedPhoto(dx < 0 ? 1 : -1, event, "swipe");
+    }
+  });
+  listen(s.open, "pointercancel", () => { s.gesture = null; s.suppressClickUntil = Date.now() + 500; });
 }
 
 function renderSetGalleryPhotoHighlights(photos, options = {}) {
@@ -7611,7 +7751,6 @@ function renderSetGalleryPhotoHighlights(photos, options = {}) {
 
   const fragment = document.createDocumentFragment();
   const appendMode = options.append === true;
-  if (!appendMode) renderSetFeaturedPhoto(photos);
   const startIndex = appendMode ? getCurrentGalleryPhotoTiles().length : 0;
   photos.forEach((photo, index) => {
     fragment.append(createSetGalleryPhotoTile(photo, startIndex + index));
@@ -7622,6 +7761,7 @@ function renderSetGalleryPhotoHighlights(photos, options = {}) {
   }
 
   galleryGrid.replaceChildren(fragment);
+  renderSetFeaturedPhoto(photos);
   activeGalleryPhoto = null;
   const firstTile = getCurrentGalleryPhotoTiles()[0] || null;
   if (firstTile) {
