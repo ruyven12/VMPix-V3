@@ -6986,7 +6986,7 @@ function getSetGalleryLoadMoreButton() {
   setGalleryLoadMoreButton.setAttribute("aria-disabled", "true");
   setGalleryLoadMoreButton.textContent = "Load More Photos";
   setGalleryLoadMoreButton.addEventListener("click", loadMoreSetGalleryAllPhotos);
-  galleryViewAll.insertAdjacentElement("afterend", setGalleryLoadMoreButton);
+  galleryStatesShell.insertAdjacentElement("afterend", setGalleryLoadMoreButton);
   return setGalleryLoadMoreButton;
 }
 
@@ -7012,13 +7012,22 @@ function syncSetGalleryPhotoToggleButton(stateName = "ready") {
     return;
   }
 
-  const canTogglePhotos = stateName === "ready" &&
-    (activeSetGalleryPhotoMode === "all" || activeSetGalleryPhotoTotal > MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT);
+  const isAll = activeSetGalleryPhotoMode === "all";
+  const canTogglePhotos = isAll || (stateName === "ready" && getCurrentGalleryPhotoTiles().length > 0);
   galleryViewAll.disabled = !canTogglePhotos;
-  galleryViewAll.hidden = stateName !== "ready" && activeSetGalleryPhotoTotal <= MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
+  galleryViewAll.hidden = !isAll && stateName !== "ready" && activeSetGalleryPhotoTotal <= MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT;
   galleryViewAll.setAttribute("aria-disabled", String(!canTogglePhotos));
-  galleryViewAll.setAttribute("aria-expanded", String(activeSetGalleryPhotoMode === "all"));
-  galleryViewAll.textContent = activeSetGalleryPhotoMode === "all" ? "Show Less" : "Show All Photos";
+  galleryViewAll.setAttribute("aria-expanded", String(isAll));
+  galleryViewAll.textContent = isAll ? "Return to Hero" : "View All";
+  const title = setGallery?.querySelector(".set-gallery-highlights-title");
+  if (title) title.textContent = isAll ? "All Photographs" : "Photo Highlights";
+  galleryGrid?.setAttribute("aria-label", isAll ? "Album photographs" : "Photo highlight previews");
+  const emptyState = setGallery?.querySelector('[data-gallery-state="empty"]');
+  if (emptyState) {
+    emptyState.querySelector(".archive-gallery-state-title").textContent = isAll ? "No photographs available." : "No preview photos available.";
+    emptyState.querySelector(".archive-gallery-state-text").textContent = isAll ? "No photographs were returned for this album." : "This album has no preview frames yet.";
+  }
+  if (isAll && stateName === "empty" && galleryPhotoCount) galleryPhotoCount.textContent = "0 photographs loaded";
 }
 
 function setGalleryState(stateName = "ready") {
@@ -8045,11 +8054,13 @@ function toggleSetGalleryPhotoRange(event = null) {
   const intent = nextMode === "all" ? beginArchiveAnalytics(event) : null;
   archiveGalleryRangePending = intent ? {intent, context: v3RouteContext, album: getSetAlbumId(row)} : null;
   loadSetGalleryPhotoHighlights(row, { mode: nextMode });
-  if (galleryGrid && nextMode === "preview") {
-    galleryGrid.scrollIntoView({
-      block: "nearest",
-      behavior: reducedMotion.matches ? "auto" : "smooth",
-    });
+  // A mode change starts at the photography area; only the existing Dossier scrollport moves.
+  const scroller = getActiveShellScroller();
+  const photography = setGallery;
+  if (scroller && photography && scroller.contains(photography)) {
+    const inset = Number.parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+    const top = scroller.scrollTop + photography.getBoundingClientRect().top - scroller.getBoundingClientRect().top - inset;
+    scroller.scrollTo({ top: Math.max(0, top), behavior: "instant" });
   }
 }
 

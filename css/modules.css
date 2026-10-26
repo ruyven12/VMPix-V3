@@ -34211,3 +34211,49 @@ button.hall-crusades-archive-crystal:focus-visible {
   pointer-events:none;background:rgba(7,10,28,.8);font-size:.7rem;
 }
 .set-dossier-viewport .set-featured-photo-status:empty { display:none; }
+
+/* S13C: the same album grid replaces the preview; Shell retains page scrolling. */
+.set-dossier-viewport .set-gallery-highlights-head { order:2;gap:clamp(.72rem,2.35vw,.96rem); }
+.set-dossier-viewport .set-gallery-grid { order:1; }
+.set-dossier-viewport .archive-gallery-states { order:3; }
+.set-dossier-viewport .set-gallery-load-more { order:4; }
+.set-dossier-viewport .set-gallery-view-all {
+  min-height:44px;border-color:rgba(176,163,255,.5);
+  background:linear-gradient(135deg,rgba(105,130,222,.12),rgba(126,88,185,.12)),rgba(7,10,28,.6);
+  color:#e4eaff;
+}
+.set-dossier-viewport .set-gallery-view-all:focus-visible { outline:2px solid #c2baff;outline-offset:2px; }
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-head {
+  order:-1;padding-bottom:.85rem;border-bottom:1px solid rgba(157,175,255,.28);
+}
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-title { color:#e4eaff;line-height:1.3; }
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-count { color:#bfcbea;line-height:1.4; }
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-grid:not(.is-gallery-hidden) {
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(.5rem,1.4vw,.8rem);overflow:visible;
+}
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile {
+  min-width:0;min-height:44px;aspect-ratio:4 / 3;
+  border:1px solid rgba(132,154,232,.35);border-radius:2px;
+  background:rgba(7,10,28,.5);box-shadow:none;transform:none;
+}
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile .archive-gallery-image {
+  object-fit:contain;background:none;filter:none;transform:none;
+}
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile::after { content:none; }
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile::before { background:rgba(157,175,255,.7); }
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile:is(:hover,.is-active,:focus-visible) {
+  border-color:rgba(176,163,255,.85);box-shadow:inset 0 0 0 1px rgba(139,166,255,.22);
+}
+.set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-photo-tile:focus-visible { outline:2px solid #c2baff;outline-offset:2px; }
+@media(min-width:700px) {
+  .set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-head {
+    grid-template-columns:minmax(0,1fr) auto;justify-items:start;text-align:left;
+  }
+  .set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-copy { justify-items:start; }
+  .set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-highlights-head .set-gallery-view-all { width:auto;padding-inline:1rem; }
+  .set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-grid:not(.is-gallery-hidden) { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media(min-width:1100px) {
+  .set-dossier-viewport [data-album-photo-mode="all"] .set-gallery-grid:not(.is-gallery-hidden) { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
