@@ -34144,3 +34144,38 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 .set-dossier-viewport:has(.music-nexus-shell.is-lightbox) > :is(.zhento-top-hud-rail,.zhento-side-hud-rail) { visibility:hidden; }
+
+/* S13A: photography first; the existing full-gallery grid and viewer stay intact. */
+.set-dossier-viewport .set-gallery-highlights {
+  min-width:0;padding:0;border:0;border-radius:0;background:none;
+}
+.set-dossier-viewport .set-featured-photo {
+  display:grid;place-items:center;min-width:0;margin:0;
+  border:1px solid rgba(157,175,255,.32);
+  background:rgba(5,8,22,.24);
+}
+.set-dossier-viewport .set-featured-photo[hidden] { display:none; }
+.set-dossier-viewport .set-featured-photo-image {
+  display:block;width:auto;height:auto;max-width:100%;
+  max-height:min(64svh,46rem);object-fit:contain;
+}
+.set-dossier-viewport .set-featured-photo-status {
+  display:grid;place-items:center;min-height:min(52svh,32rem);
+  padding:1rem;color:#d4dcf6;text-align:center;font-size:.8rem;
+}
+.set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-grid:not(.is-gallery-hidden) {
+  display:flex;flex-wrap:nowrap;gap:.6rem;max-width:100%;
+  overflow-x:auto;overflow-y:hidden;padding:.3rem .2rem .55rem;
+  overscroll-behavior-x:contain;scrollbar-width:thin;
+  scrollbar-color:rgba(169,153,224,.6) rgba(10,13,30,.4);
+}
+.set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile {
+  flex:0 0 clamp(4.5rem,18vw,6rem);height:clamp(4.5rem,18vw,6rem);
+  min-height:44px;aspect-ratio:1;border-radius:2px;
+  border-color:rgba(132,154,232,.35);background:rgba(7,10,28,.5);
+}
+.set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile:is(:hover,.is-active,:focus-visible) {
+  border-color:rgba(176,163,255,.85);box-shadow:inset 0 0 0 1px rgba(139,166,255,.22);
+}
+.set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile::before { background:rgba(157,175,255,.7); }
+.set-dossier-viewport [data-album-photo-mode="preview"] .set-gallery-photo-tile:focus-visible { outline:2px solid #c2baff;outline-offset:2px; }

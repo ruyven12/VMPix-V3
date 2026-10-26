@@ -6822,6 +6822,7 @@ function updateSetGalleryFromRow(row) {
     return;
   }
 
+  resetSetFeaturedPhoto();
   const setData = row.dataset;
   const imageAccent = getSetImageAccent(row);
   if (setGalleryBand) {
@@ -7021,6 +7022,7 @@ function syncSetGalleryPhotoToggleButton(stateName = "ready") {
 function setGalleryState(stateName = "ready") {
   const activeState = ["loading", "empty", "error"].includes(stateName) ? stateName : "ready";
   const shouldShowGrid = activeState === "ready";
+  if (activeState === "empty" || activeState === "error") resetSetFeaturedPhoto();
 
   if (!shouldShowGrid) {
     setGalleryModeVisible(false);
@@ -7536,6 +7538,72 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   return tile;
 }
 
+// S13A: first usable preview photograph only; no hero navigation or selection state.
+let setFeaturedPhotoLoad = null;
+
+function resetSetFeaturedPhoto() {
+  const pendingImage = setFeaturedPhotoLoad?.image;
+  setFeaturedPhotoLoad = null;
+  if (pendingImage) {
+    pendingImage.onload = pendingImage.onerror = null;
+    pendingImage.removeAttribute("src");
+  }
+  const figure = setGallery?.querySelector("[data-set-featured-photo]");
+  if (figure) {
+    figure.hidden = true;
+    figure.removeAttribute("aria-busy");
+    figure.replaceChildren();
+  }
+}
+
+function renderSetFeaturedPhoto(photos) {
+  const figure = setGallery?.querySelector("[data-set-featured-photo]");
+  const albumId = setGallery?.dataset.albumId || "";
+  if (!figure || !albumId || !photos.length || setFeaturedPhotoLoad?.albumId === albumId) return;
+  resetSetFeaturedPhoto();
+  const load = { albumId, image: null };
+  setFeaturedPhotoLoad = load;
+  figure.hidden = false;
+  figure.setAttribute("aria-busy", "true");
+  const status = document.createElement("figcaption");
+  status.className = "set-featured-photo-status";
+  status.setAttribute("role", "status");
+  status.textContent = "Loading featured photograph...";
+  figure.append(status);
+  // Stay bounded to the existing preview. Try its large/preview URLs in order;
+  // missing photography never triggers another album or a bulk gallery fetch.
+  const candidates = photos.slice(0, MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT).flatMap((photo) =>
+    [...new Set([photo.lightboxSrc, photo.imageSrc].filter(Boolean))].map(src => ({ photo, src })));
+  let next = 0;
+  const isCurrent = () => setFeaturedPhotoLoad === load &&
+    setGallery.dataset.albumId === albumId && getRouteFromUrl().name === "set-detail";
+  function tryNext() {
+    if (!isCurrent()) return;
+    if (next >= candidates.length) {
+      figure.setAttribute("aria-busy", "false");
+      status.textContent = "Featured photograph unavailable.";
+      return;
+    }
+    const { photo, src } = candidates[next++];
+    const image = new Image();
+    load.image = image;
+    image.className = "set-featured-photo-image";
+    image.alt = photo.caption || `Concert photograph of ${setGalleryBand?.textContent || "this band"}`;
+    applyMusicGalleryImageLoading(image, 0, { firstVisible: true });
+    protectArchiveImage(image);
+    image.onload = () => {
+      if (!isCurrent()) return;
+      if (!image.naturalWidth) { tryNext(); return; }
+      image.onload = image.onerror = null;
+      figure.setAttribute("aria-busy", "false");
+      figure.replaceChildren(image);
+    };
+    image.onerror = tryNext;
+    image.src = src;
+  }
+  tryNext();
+}
+
 function renderSetGalleryPhotoHighlights(photos, options = {}) {
   if (!galleryGrid) {
     return;
@@ -7543,6 +7611,7 @@ function renderSetGalleryPhotoHighlights(photos, options = {}) {
 
   const fragment = document.createDocumentFragment();
   const appendMode = options.append === true;
+  if (!appendMode) renderSetFeaturedPhoto(photos);
   const startIndex = appendMode ? getCurrentGalleryPhotoTiles().length : 0;
   photos.forEach((photo, index) => {
     fragment.append(createSetGalleryPhotoTile(photo, startIndex + index));
