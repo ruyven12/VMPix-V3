@@ -33674,6 +33674,100 @@ button.hall-crusades-archive-crystal:focus-visible {
   .synchronicity-memories[data-memory-selected] { min-height: clamp(260px, 39svh, 420px); }
 }
 
+/* S8E: the shared Bands on the Bill carousel, owned by the selected Nexus show. */
+.synchronicity-bill {
+  margin: 30px auto 0;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.synchronicity-bill-heading {
+  margin: 0;
+  color: #d8e2ff;
+  font: 500 clamp(.88rem, 2.8vw, 1.16rem)/1.4 var(--font-display);
+  letter-spacing: .07em;
+}
+.synchronicity-bill-heading::after {
+  content: "";
+  display: block;
+  width: min(76%, 340px);
+  height: 7px;
+  margin: 13px auto 0;
+  background: linear-gradient(90deg, transparent, #709ad5 30%, #9b88d8 70%, transparent);
+  clip-path: polygon(0 0, 36% 0, 39% 70%, 61% 70%, 64% 0, 100% 0, 100% 18%, 65% 18%, 62% 100%, 38% 100%, 35% 18%, 0 18%);
+}
+.synchronicity-bill .show-detail-viewing-header { justify-content: center; }
+.synchronicity-bill .show-detail-bill-title {
+  color: #becaeb;
+  font: 400 clamp(.72rem, 2.4vw, .88rem)/1.4 var(--font-display);
+  letter-spacing: .08em;
+}
+.synchronicity-bill .show-set-carousel-viewport {
+  height: clamp(210px, 34svh, 350px);
+  border: 1px solid rgba(132, 157, 219, .6);
+  border-radius: 0;
+  background: rgba(9, 14, 33, .3);
+  box-shadow: none;
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+}
+.synchronicity-bill .show-set-card,
+.synchronicity-bill .show-set-card:hover {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #eef2ff;
+}
+.synchronicity-bill .show-set-card-media { background: linear-gradient(135deg, rgba(32, 49, 84, .25), rgba(39, 27, 65, .22)); }
+.synchronicity-bill .show-set-card-overlay {
+  background: linear-gradient(180deg, rgba(4, 8, 20, .18), rgba(4, 8, 20, .68) 36%, rgba(4, 8, 20, .68) 66%, rgba(4, 8, 20, .2));
+}
+.synchronicity-bill .show-set-card-body {
+  align-self: center;
+  justify-items: center;
+  min-width: 0;
+  padding: 18px 52px;
+  gap: 9px;
+  text-align: center;
+}
+.synchronicity-bill .show-set-card-title {
+  font-size: clamp(1.05rem, 4.8vw, 1.8rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.synchronicity-bill .show-set-card-meta { justify-content: center; }
+.synchronicity-bill .show-set-card-meta > span { padding: 0; border: 0; background: transparent; color: #dde3f7; line-height: 1.4; }
+.synchronicity-bill .show-set-card-action { justify-self: center; color: #c9c7f4; line-height: 1.4; letter-spacing: .05em; }
+.synchronicity-bill-placeholder { position: absolute; top: 12px; left: 12px; right: 12px; color: #bdc6dc; font-size: .7rem; }
+.synchronicity-bill .show-detail-carousel-arrow {
+  width: 44px;
+  min-height: 44px;
+  border: 1px solid rgba(139, 156, 220, .6);
+  border-radius: 2px;
+  background: rgba(11, 16, 38, .75);
+  color: #dde8ff;
+}
+.synchronicity-bill .show-detail-carousel-arrow:hover { border-color: #b3caff; background: rgba(40, 43, 85, .8); }
+.synchronicity-bill .show-detail-dots { gap: 0; flex-wrap: wrap; }
+.synchronicity-bill .show-detail-dot {
+  width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  transform: none;
+  transition: none;
+}
+.synchronicity-bill .show-detail-dot::after { content: ""; display: block; width: 7px; height: 7px; margin: auto; border: 1px solid #7887b8; transform: rotate(45deg); }
+.synchronicity-bill .show-detail-dot.is-active::after { background: #a99adf; border-color: #b4c9f6; }
+.synchronicity-bill :is(button, .show-set-carousel-viewport):focus-visible { outline: 2px solid #c2d6ff; outline-offset: -3px; }
+.synchronicity-bill .show-detail-bill-empty { color: #bdc6dc; line-height: 1.5; padding: 16px 0; }
+@media (prefers-reduced-motion: reduce) {
+  .synchronicity-bill .show-detail-carousel-track { transition: none; }
+}
+
 /* S7: one local archive drawer, bounded by the existing Shell Shows viewport. */
 .synchronicity-viewport { padding-bottom: 84px; }
 .synchronicity-viewport[data-archive-drawer-open] { overflow-y: hidden; }

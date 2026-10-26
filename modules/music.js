@@ -13935,6 +13935,7 @@ function prepareSynchronicityMemories() {
   };
   session.setPaused = paused => { session.paused = Boolean(paused); session.sync(); };
   session.dispose = () => {
+    session.selection?.bill?.dispose();
     session.selection = null;
     document.removeEventListener("visibilitychange", session.sync);
     reducedMotion.removeEventListener("change", session.sync);
@@ -13948,6 +13949,7 @@ function prepareSynchronicityMemories() {
     const selection = session.selection;
     if (!current() || !selection) return;
     session.selection = null;
+    selection.bill?.dispose();
     selection.panel.remove();
     delete stage.dataset.memorySelected;
     for (const memory of session.results) if (memory.frame) memory.frame.inert = false;
@@ -13959,6 +13961,7 @@ function prepareSynchronicityMemories() {
   const selectMemory = (memory, fromTimeline = false) => {
     if (!current() || viewport.inert || (!fromTimeline && (session.selection || !session.results.includes(memory)))) return;
     const previous = session.selection;
+    previous?.bill?.dispose();
     previous?.panel.remove();
     const selection = { id: memory.id, memory, fromTimeline, scrollTop: previous?.scrollTop ?? viewport.scrollTop };
     session.selection = selection;
@@ -14017,8 +14020,10 @@ function prepareSynchronicityMemories() {
     leave.textContent = "RETURN TO ECHOES";
     leave.addEventListener("click", returnToEchoes);
     actions.append(enter, leave);
-    panel.append(artwork, title, date, venue, number, actions);
+    selection.bill = createSynchronicityBill(memory.show, () => current() && session.selection === selection);
+    panel.append(artwork, title, date, venue, number, actions, selection.bill.element);
     stage.append(panel);
+    selection.bill.sync();
     if (fromTimeline) viewport.scrollTop = 0;
     title.focus({ preventScroll: true });
 
@@ -14962,6 +14967,7 @@ function isShowSetCardPreviewCurrent(card) {
   if (!preview || !card?.isConnected) {
     return false;
   }
+  if (preview.isCurrent) return preview.isCurrent();
   const route = typeof getRouteFromUrl === "function" ? getRouteFromUrl() : null;
   return route?.name === "show-detail" &&
     getMusicShowRouteCode(preview.show) === String(route.showId || "").trim();
@@ -14989,8 +14995,9 @@ function getMusicShowAlbumPreviewCacheKey(albumId) {
 }
 
 function requestMusicShowAlbumPreviewUrls(preview) {
-  const cacheKey = getMusicShowAlbumPreviewCacheKey(preview?.albumId);
-  if (!cacheKey) {
+  const albumId = getMusicShowAlbumPreviewCacheKey(preview?.albumId);
+  const cacheKey = preview?.isCurrent ? albumId + ":nexus" : albumId;
+  if (!albumId) {
     return Promise.resolve([]);
   }
   if (musicShowAlbumPreviewUrlsCache.has(cacheKey)) {
@@ -15000,14 +15007,17 @@ function requestMusicShowAlbumPreviewUrls(preview) {
     return musicShowAlbumPreviewRequests.get(cacheKey);
   }
 
-  const request = requestMusicSmugmugAlbumPhotos(cacheKey, { mode: "preview" })
+  const request = requestMusicSmugmugAlbumPhotos(albumId, { mode: "preview" })
     .then((result) => {
       const photos = Array.isArray(result?.photos) ? result.photos : [];
       if (photos.length === 0) {
         musicShowAlbumPreviewUrlsCache.set(cacheKey, []);
         return [];
       }
-      const urls = selectMusicShowAlbumPreviewImages(preview.show, preview.album, photos);
+      // The Nexus uses the existing medium-image helper for its larger photographic surface.
+      // Keep the legacy thumbnail selection and its cache untouched.
+      const sources = preview.isCurrent ? photos.map(photo => ({ ...photo, thumbnail_url: getMusicAlbumPhotoImageSrc(photo) })) : photos;
+      const urls = selectMusicShowAlbumPreviewImages(preview.show, preview.album, sources);
       const uniqueUrls = getUniqueShowSetPreviewUrls(urls);
       musicShowAlbumPreviewUrlsCache.set(cacheKey, uniqueUrls);
       return uniqueUrls;
@@ -15027,7 +15037,7 @@ function ensureShowSetCardPreviewAlbumPhotos(card) {
     preview.albumPhotosLoaded ||
     preview.albumPhotosLoading ||
     !preview.albumId ||
-    isShowSetPreviewReducedMotion()
+    (isShowSetPreviewReducedMotion() && !preview.isCurrent)
   ) {
     return;
   }
@@ -15076,7 +15086,17 @@ function advanceShowSetCardPreview(card) {
   const nextImage = preview.images[nextSlot];
   const activeImage = preview.images[preview.activeSlot];
   preview.isAdvancing = true;
-  loadShowSetCardPreviewImage(nextImage, preview.urls[nextIndex]).then(() => {
+  const nextUrl = preview.urls[nextIndex];
+  loadShowSetCardPreviewImage(nextImage, nextUrl).then((loaded) => {
+    if (preview.isCurrent && !loaded) {
+      const currentUrl = preview.urls[preview.currentIndex];
+      preview.urls = preview.urls.filter(url => url !== nextUrl);
+      preview.currentIndex = Math.max(0, preview.urls.indexOf(currentUrl));
+      card.dataset.previewImageCount = String(preview.urls.length);
+      if (preview.urls.length <= 1) stopShowSetCardPreview(card);
+      return;
+    }
+    if (preview.isCurrent && (!isShowSetCardPreviewCurrent(card) || !preview.isCarouselActive)) return;
     if (!preview || !card.isConnected || document.hidden || isShowSetPreviewReducedMotion()) {
       return;
     }
@@ -15105,6 +15125,10 @@ function shouldPlayShowSetCardPreview(card) {
 
 function updateShowSetCardPreviewPlayback(card) {
   const preview = card?.__showSetPreview;
+  if (preview?.isCurrent && !isShowSetCardPreviewCurrent(card)) {
+    stopShowSetCardPreview(card);
+    return;
+  }
   if (!preview) {
     return;
   }
@@ -15199,15 +15223,87 @@ function primeActiveShowSetCardPreview(root = document) {
   updateShowSetCardPreviewPlayback(activeCard);
 }
 
-function createShowDetailAlbumCard(show, album, index) {
+// Reuse the Show Detail carousel; this owner supplies scene lifetime and Nexus presentation.
+function createSynchronicityBill(show, isCurrent) {
+  let disposed = false;
+  const section = createShowDetailBandsOnBill(show, {
+    isCurrent: () => !disposed && isCurrent(),
+    albumOnly: true,
+    albums: getMusicShowResolvedAlbums(show).filter(album =>
+      String(album.status || "").toLowerCase() === "resolved" && getMusicShowAlbumPreviewAlbumId(album)),
+    historyState: { fromSetsArchive: true, setsArchiveUrl: "/music/shows" },
+  });
+  section.classList.add("synchronicity-bill");
+  section.setAttribute("aria-labelledby", "synchronicity-bill-title");
+  const title = section.querySelector(".show-detail-bill-title");
+  title.id = "synchronicity-bill-title";
+  title.textContent = "BANDS ON THE BILL";
+  section.querySelector(".show-detail-bill-active-name").remove();
+  const heading = document.createElement("h3");
+  heading.className = "synchronicity-bill-heading";
+  heading.textContent = "RECONSTRUCTED MEMORY";
+  section.prepend(heading);
+
+  const cards = Array.from(section.querySelectorAll(".show-set-card"));
+  for (const card of cards) {
+    const preview = card.__showSetPreview;
+    card.querySelectorAll(".show-set-card-meta > :not(.show-detail-bill-count)").forEach(item => item.remove());
+    const count = getMusicShowDetailCountCandidate(preview.album.photo_count, preview.album.photoCount,
+      preview.album.photos, preview.album.image_count, preview.album.imageCount);
+    card.querySelector(".show-detail-bill-count").textContent = count === null ? "Photo count unavailable" : count.toLocaleString() + " Photos";
+    card.querySelector(".show-set-card-action").textContent = "CLICK TO VIEW";
+    if (!card.dataset.showAlbumRoute) {
+      card.disabled = true;
+      card.querySelector(".show-set-card-action").textContent = "Archive unavailable";
+    }
+    const placeholder = document.createElement("span");
+    placeholder.className = "synchronicity-bill-placeholder";
+    placeholder.textContent = "Photography unavailable";
+    card.querySelector(".show-set-card-media").append(placeholder);
+    for (const image of preview.images) {
+      image.addEventListener("load", () => {
+        if (disposed || !isCurrent()) return;
+        const valid = image.naturalWidth > 0 && image.src !== new URL(SET_GALLERY_NO_POSTER_IMAGE_SRC, document.baseURI).href;
+        image.hidden = !valid;
+        if (valid) placeholder.hidden = true;
+      });
+    }
+  }
+  const sync = () => {
+    if (disposed || !isCurrent()) return;
+    // The shared factory is built while detached. Register after mounting, then prime only its active slide.
+    for (const card of cards) {
+      if (!showSetPreviewCards.has(card)) registerShowSetCardPreview(card);
+      updateShowSetCardPreviewPlayback(card);
+    }
+  };
+  reducedMotion.addEventListener("change", sync);
+  return {
+    element: section,
+    sync,
+    dispose() {
+      disposed = true;
+      reducedMotion.removeEventListener("change", sync);
+      for (const card of cards) {
+        stopShowSetCardPreview(card);
+        card.__showSetPreview.isCarouselActive = false;
+        card.__showSetPreview.visibilityObserver?.disconnect();
+        showSetPreviewCards.delete(card);
+      }
+    },
+  };
+}
+
+function createShowDetailAlbumCard(show, album, index, options = {}) {
   const bandName = getMusicShowAlbumBandName(album) || `Band ${index + 1}`;
   const bandId = getMusicShowAlbumBandId(album);
   const dateFolder = getMusicShowAlbumDateFolder(show, album);
   const targetUrl = getMusicShowAlbumSetRoute(show, album);
   const albumId = getMusicShowAlbumPreviewAlbumId(album);
+  const previewSource = options.albumOnly ? {} : show;
   const previewImages = (isShowSetPreviewReducedMotion()
-    ? getRandomizedMusicShowAlbumPreviewImages(show, album).slice(0, 1)
-    : getRandomizedMusicShowAlbumPreviewImages(show, album));
+    ? getRandomizedMusicShowAlbumPreviewImages(previewSource, album).slice(0, 1)
+    : getRandomizedMusicShowAlbumPreviewImages(previewSource, album));
 
   const card = document.createElement("button");
   card.type = "button";
@@ -15277,6 +15373,7 @@ function createShowDetailAlbumCard(show, album, index) {
     albumPhotosLoaded: false,
     albumPhotosLoading: false,
     visibilityObserver: null,
+    isCurrent: options.isCurrent,
   };
   registerShowSetCardPreview(card);
   card.addEventListener("click", (event) => {
@@ -15290,7 +15387,7 @@ function createShowDetailAlbumCard(show, album, index) {
     stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
-      historyState: {
+      historyState: options.historyState || {
         fromShowDetail: true,
         showDetailUrl: getMusicShowRouteUrl(show),
       },
@@ -15300,12 +15397,12 @@ function createShowDetailAlbumCard(show, album, index) {
   return card;
 }
 
-function createShowDetailBandsOnBill(show) {
+function createShowDetailBandsOnBill(show, options = {}) {
   const section = document.createElement("section");
   section.className = "show-detail-bill show-detail-viewing";
   section.setAttribute("aria-labelledby", "show-detail-bill-title");
 
-  const albums = getMusicShowResolvedAlbums(show);
+  const albums = options.albums || getMusicShowResolvedAlbums(show);
   let activeIndex = 0;
 
   const header = document.createElement("div");
@@ -15375,7 +15472,7 @@ function createShowDetailBandsOnBill(show) {
     const slide = document.createElement("article");
     slide.className = "show-detail-carousel-slide show-set-carousel-slide";
     slide.setAttribute("aria-label", `${index + 1} of ${albums.length}`);
-    slide.append(createShowDetailAlbumCard(show, album, index));
+    slide.append(createShowDetailAlbumCard(show, album, index, options));
     track.append(slide);
     return slide;
   });
@@ -15414,6 +15511,7 @@ function createShowDetailBandsOnBill(show) {
       const isActive = index === activeIndex;
       slide.classList.toggle("is-active", isActive);
       slide.setAttribute("aria-hidden", String(!isActive));
+      if (options.isCurrent) slide.inert = !isActive;
       setShowSetCardPreviewActive(slide.querySelector(".show-set-card"), isActive);
     });
     dotButtons.forEach((dot, index) => {
@@ -15445,6 +15543,10 @@ function createShowDetailBandsOnBill(show) {
     }
   });
 
+  let suppressClickUntil = 0;
+  if (options.isCurrent) viewport.addEventListener("click", event => {
+    if (performance.now() < suppressClickUntil) { event.preventDefault(); event.stopPropagation(); }
+  }, true);
   let pointerStartX = 0;
   let pointerStartY = 0;
   let pointerId = null;
@@ -15468,6 +15570,7 @@ function createShowDetailBandsOnBill(show) {
     const deltaX = event.clientX - pointerStartX;
     const deltaY = event.clientY - pointerStartY;
     if (Math.abs(deltaX) > 42 && Math.abs(deltaX) > Math.abs(deltaY) * 1.35) {
+      if (options.isCurrent) suppressClickUntil = performance.now() + 500;
       activeIndex += deltaX < 0 ? 1 : -1;
       updateCarousel();
     }
