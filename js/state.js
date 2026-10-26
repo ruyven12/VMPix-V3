@@ -15,6 +15,7 @@ function queryRetainedMusicElements(selector) {
 const rhythmViewport = document.querySelector('[data-rhythm-viewport]');
 const bandDetailViewport = document.querySelector('[data-band-detail-viewport]');
 const bandDetailContent = document.querySelector('[data-band-detail-content]');
+const setDossierViewport = document.querySelector('[data-set-dossier-viewport]');
 
 const shell = document.querySelector(".site-shell");
 const startButton = document.querySelector(".start-button") || document.getElementById("home-presentation-template").content.querySelector(".start-button");

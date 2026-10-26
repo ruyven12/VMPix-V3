@@ -14,6 +14,8 @@ function setCurrentView(viewName) {
   const route = getRouteFromUrl();
   if (route.name === "band-detail") {
     setPortfolioEngineHudCurrentView(getBandDetailEngineTitle(route.bandId));
+  } else if (route.name === "set-detail") {
+    setPortfolioEngineHudCurrentView(viewName);
   }
 }
 
@@ -3656,14 +3658,14 @@ function requestRingArchiveStats() {
 
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return true;
-  return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "music-shows" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
+  return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "set-detail" || route?.name === "music-shows" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
     route?.name === "wrestling-match-detail" || route?.name === "wrestling-match-detail-photo";
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
-  if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "music-shows") return getShellBackTarget(route);
+  if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "set-detail" || route?.name === "music-shows") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
   if (route?.name === "wrestling-person-detail") return routePaths.wrestlingPeople;
   if (route?.name === "wrestling") return getShellBackTarget(route);
@@ -3740,6 +3742,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
     "music-bands": "Back to Zhento",
     "music-shows": "Back to Zhento",
     "band-detail": "Back to Bands",
+    "set-detail": "Back to Archive",
     "wrestling-people-prototype": "Back to Wrestling",
     "wrestling-people": "Back to Wrestling",
     "wrestling-person-detail": "Back to Hall of Champions",
@@ -3788,7 +3791,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail" || route.name === "music-shows";
+  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail" || route.name === "set-detail" || route.name === "music-shows";
   shell.dataset.shellRoute = shellRouteName;
   syncShellMenuRoute(route);
   shell.dataset.shellActiveTarget = activeTarget;
@@ -5499,7 +5502,12 @@ musicActivityPanel.before(musicActivityHome);
 function syncRhythmPresentationOwnership(route, options = {}) {
   const active = route.name === 'music-bands';
   const detail = route.name === 'band-detail';
-  const currentFoundation = isCurrentV3Route(route);
+  const setDossier = route.name === 'set-detail';
+  // Presentation ownership only: Individual Sets retain their existing route/restoration policy.
+  const currentFoundation = isCurrentV3Route(route) || setDossier;
+  if (!setDossier && musicNexusShell.parentElement === setDossierViewport) {
+    document.getElementById('music-presentation-template').content.append(musicNexusShell);
+  }
   const shows = route.name === 'music-shows';
   if (shows) {
     if (musicActivityPanel.parentElement !== synchronicityArchiveContent) synchronicityArchiveContent.append(musicActivityPanel);
@@ -5514,10 +5522,14 @@ function syncRhythmPresentationOwnership(route, options = {}) {
   else if (entering) prepareRhythmArrival(Boolean(options.historyState || options.navigationDirection === 'back'));
   for (const [id, node] of [['home-presentation-template', homeFrame], ['music-presentation-template', musicNexusShell], ['shell-rail-template', bottomRail]]) {
     const template = document.getElementById(id);
-    const parked = currentFoundation && !(id === 'music-presentation-template' && ['music','wrestling-match-detail-photo'].includes(route.name));
+    const parked = currentFoundation && !(id === 'music-presentation-template' && ['music','set-detail','wrestling-match-detail-photo'].includes(route.name));
     if (parked && node?.isConnected) template.content.append(node);
     else if (!parked && template.content.childElementCount) template.before(template.content);
   }
+  // Retain the existing content, state panels and shared lightbox with their bound handlers.
+  if (setDossier && musicNexusShell.parentElement !== setDossierViewport) setDossierViewport.append(musicNexusShell);
+  setDossierViewport.hidden = !setDossier;
+  setDossierViewport.inert = !setDossier;
   rhythmViewport.hidden = !active;
   rhythmViewport.inert = !active;
   bandDetailViewport.hidden = !detail;

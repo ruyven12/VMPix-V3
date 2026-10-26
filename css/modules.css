@@ -31480,12 +31480,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 /* Pillar of Rhythm occupies the current shared viewport beside other V3 modules. */
-:is(.rhythm-viewport, .band-detail-viewport) { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
-:is(.rhythm-viewport, .band-detail-viewport)[hidden] { display:none; }
+:is(.rhythm-viewport, .band-detail-viewport, .set-dossier-viewport) { position:fixed;inset:0;z-index:30;box-sizing:border-box;width:100%;height:100svh;overflow:hidden;background:linear-gradient(rgba(0,0,0,.3),rgba(0,0,0,.3)),radial-gradient(ellipse at 50% 42%,rgba(15,18,55,.48),rgba(19,23,60,.24) 43%,transparent 76%),#070a15 url('/assets/media/background/zhento_pillar_blue.png') center/cover no-repeat; }
+:is(.rhythm-viewport, .band-detail-viewport, .set-dossier-viewport)[hidden] { display:none; }
 /* The existing 835x470 backdrop has a pale three-pixel bottom border.
    Crop only that source border when mobile cover sizing is height-limited. */
 @media (max-width: 899px) and (max-aspect-ratio: 835/470) {
-  :is(.rhythm-viewport, .band-detail-viewport) { background-size:auto,auto,auto calc(100% * 470 / 467);background-position:0 0,0 0,center top; }
+  :is(.rhythm-viewport, .band-detail-viewport, .set-dossier-viewport) { background-size:auto,auto,auto calc(100% * 470 / 467);background-position:0 0,0 0,center top; }
 }
 .rhythm-viewport .rhythm-pillar { position:absolute;inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,.58rem) + 1rem);display:block;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) 1rem max(1rem,env(safe-area-inset-left));overflow-y:auto;overflow-x:hidden;color:#e4eaff; }
 .rhythm-pillar > * { box-sizing:border-box;max-width:62rem;margin-inline:auto; }
@@ -34113,3 +34113,34 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .synchronicity-memories .synchronicity-memory-date { animation-play-state: paused !important; opacity: .96 !important; }
 }
+
+/* S12: the existing set content becomes the single Shell-owned Dossier scrollport.
+   Gallery, metadata and shared lightbox bindings/styles stay intact. */
+.set-dossier-viewport { height:var(--app-viewport-height,100svh); }
+.set-dossier-viewport > .music-nexus-shell {
+  position:absolute;
+  inset:0 0 calc(var(--portfolio-engine-height,4.7rem) + var(--portfolio-engine-bottom-offset,max(.58rem,env(safe-area-inset-bottom))) + 1rem);
+  width:auto;height:auto;max-height:none;
+  padding:max(3.6rem,env(safe-area-inset-top)) max(2rem,env(safe-area-inset-right)) 1rem max(2rem,env(safe-area-inset-left));
+  border:0;border-radius:0;background:none;box-shadow:none;
+  opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:none;
+  color:#e4eaff;scrollbar-color:rgba(169,153,224,.46) rgba(247,247,242,.07);
+}
+.set-dossier-viewport > .music-nexus-shell::before { content:none; }
+.set-dossier-viewport > .music-nexus-shell::-webkit-scrollbar-thumb { background:rgba(169,153,224,.46); }
+.set-dossier-viewport :is(.set-gallery-screen,.sets-archive-screen) {
+  box-sizing:border-box;width:min(100%,62rem);min-width:0;margin-inline:auto;
+  padding:1rem;border:1px solid rgba(184,164,255,.48);border-radius:0;
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  background:linear-gradient(125deg,rgba(116,89,187,.07),transparent 56%),rgba(9,10,25,.16);
+}
+/* Keep the existing viewer inside the same content boundary, above the Engine. */
+.set-dossier-viewport > .music-nexus-shell.is-lightbox { overflow:hidden; }
+.set-dossier-viewport .music-nexus-shell.is-lightbox .lightbox-screen {
+  position:absolute;inset:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);width:auto;min-height:0;height:auto;max-height:100%;overflow-y:auto;
+}
+@media(min-width:700px) {
+  .set-dossier-viewport :is(.set-gallery-screen,.sets-archive-screen) { padding:1.5rem; }
+}
+
+.set-dossier-viewport:has(.music-nexus-shell.is-lightbox) > :is(.zhento-top-hud-rail,.zhento-side-hud-rail) { visibility:hidden; }

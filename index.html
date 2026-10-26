@@ -245,6 +245,12 @@
           root.classList.add("has-entered-hub", "is-module-view");
           root.setAttribute("data-shell-route", routePath === "/music/bands" ? "music-bands" : "band-detail");
         }
+        if (/^\/music\/bands\/[^/]+\/(?:sets\/)?(?!sets$)[^/]+$/.test(routePath)) {
+          const root = document.currentScript.parentElement;
+          root.classList.remove("is-home-route");
+          root.classList.add("has-entered-hub", "is-module-view");
+          root.dataset.shellRoute = "set-detail";
+        }
         if (routePath === "/music/shows") {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
@@ -1024,6 +1030,11 @@
             </section>
           </div>
 
+        </section>
+        <section class="set-dossier-viewport" data-set-dossier-viewport hidden inert aria-label="Individual Set Dossier viewport">
+          <span class="zhento-top-hud-rail" aria-hidden="true"></span>
+          <span class="zhento-side-hud-rail zhento-side-hud-rail--left" aria-hidden="true"></span>
+          <span class="zhento-side-hud-rail zhento-side-hud-rail--right" aria-hidden="true"></span>
         </section>
         <template id="music-presentation-template">
         <section class="music-nexus-shell" aria-labelledby="music-nexus-title" aria-hidden="true" inert data-music-nexus-shell>
