@@ -33828,7 +33828,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   box-shadow: inset 0 1px rgba(176, 185, 228, .3);
   color: #e2e8fa;
   pointer-events: auto;
-  transform: translateY(105%);
+  transform: none;
 }
 .synchronicity-drawer[data-expanded="true"] {
   height: calc(100% - max(10px, env(safe-area-inset-top)));
@@ -33893,7 +33893,14 @@ button.hall-crusades-archive-crystal:focus-visible {
   .synchronicity-drawer-content .music-shows-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .synchronicity-drawer-content .music-shows-filter-field--search { grid-column: 1 / -1; }
 }
-.synchronicity-viewport[data-archive-drawer-open] .synchronicity-drawer-dock { visibility: hidden; }
+/* S10: visibility changes only at the shared motion clock endpoints. */
+.synchronicity-viewport[data-archive-drawer-open]:not([data-archive-drawer-motion]) .synchronicity-drawer-dock { visibility: hidden; }
+.synchronicity-viewport[data-archive-drawer-open] .synchronicity-memory { visibility: hidden; }
+.synchronicity-viewport[data-archive-drawer-motion] .synchronicity-memory[data-memory-converging] {
+  visibility: visible;
+  will-change: transform, opacity;
+}
+.synchronicity-viewport[data-archive-drawer-motion] .synchronicity-drawer { will-change: transform, opacity; }
 
 /* S8: the chronological archive shares the existing drawer's single scroller. */
 .synchronicity-drawer-content .synchronicity-timeline {

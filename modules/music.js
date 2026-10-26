@@ -13587,7 +13587,7 @@ function initSynchronicityArchiveDrawer(viewport) {
   const expand = layer?.querySelector("[data-synchronicity-drawer-expand]");
   const memories = viewport.querySelector("[data-synchronicity-memories]");
   if (!layer || !drawer || !content || !explore || !close || !expand || !memories) return;
-  const state = { open: false, blocking: false, expanded: false, scrollTop: 0, animation: null, entry: null, visit: null };
+  const state = { open: false, blocking: false, expanded: false, scrollTop: 0, animation: null, motion: null, entry: null, visit: null };
   synchronicityArchiveDrawer = state;
   const available = () => !viewport.hidden && !viewport.inert && getRouteFromUrl().name === "music-shows";
   const setExpanded = expanded => {
@@ -13596,53 +13596,136 @@ function initSynchronicityArchiveDrawer(viewport) {
     expand.textContent = expanded ? "Collapse" : "Expand";
     expand.setAttribute("aria-expanded", String(expanded));
   };
+  const clearMotion = () => {
+    const motion = state.motion;
+    state.motion = null;
+    state.animation = null;
+    motion?.animations.forEach(animation => { animation.onfinish = null; animation.cancel(); });
+    motion?.frames.forEach(frame => { delete frame.dataset.memoryConverging; });
+    delete viewport.dataset.archiveDrawerMotion;
+    drawer.style.removeProperty("transform-origin");
+  };
+  const finish = () => {
+    // Establish the endpoint before removing animation overrides. The paused CSS
+    // transforms are the same ones measured at departure, including the date phase.
+    layer.hidden = !state.open;
+    layer.inert = !state.open;
+    state.blocking = state.open;
+    if (state.open) viewport.dataset.archiveDrawerOpen = "";
+    else delete viewport.dataset.archiveDrawerOpen;
+    clearMotion();
+    memories.inert = state.open;
+    explore.inert = state.open;
+    explore.setAttribute("aria-expanded", String(state.open));
+    if (state.restoreFocus && available()) {
+      if (state.open) close.focus({ preventScroll: true });
+      else if (document.activeElement === document.body || layer.contains(document.activeElement)) explore.focus({ preventScroll: true });
+    }
+    const afterClose = state.afterClose;
+    state.afterClose = null;
+    if (!state.open && available()) afterClose?.();
+    synchronicityMemoriesSession?.sync?.();
+  };
+  const playMotion = () => {
+    const motion = state.motion;
+    if (!motion) return;
+    const position = Math.max(0, Math.min(motion.duration, Number(state.animation.currentTime) || 0));
+    const direction = state.open ? 1 : -1;
+    const now = document.timeline.currentTime;
+    motion.animations.forEach(animation => {
+      animation.pause();
+      animation.currentTime = position;
+      animation.playbackRate = direction;
+      if (!document.hidden) {
+        animation.play();
+        animation.startTime = now - position / direction;
+      }
+    });
+  };
   const change = (open, immediate = false, restoreFocus = true, afterClose = null) => {
     if (open && !available()) return;
     if (!immediate && state.open === open) return;
-    const from = layer.hidden ? "translateY(105%)" : getComputedStyle(drawer).transform;
-    if (state.animation) { state.animation.onfinish = null; state.animation.cancel(); state.animation = null; }
     if (!open && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
     state.open = open;
+    state.restoreFocus = restoreFocus;
+    state.afterClose = afterClose;
     state.blocking = true;
-    layer.hidden = false;
-    layer.inert = !open;
-    viewport.dataset.archiveDrawerOpen = "";
     memories.inert = true;
     explore.inert = true;
     explore.setAttribute("aria-expanded", String(open));
-    const to = open ? "translateY(0)" : "translateY(105%)";
-    drawer.style.transform = to;
-    if (open) {
-      content.scrollTop = state.scrollTop;
-      if (restoreFocus) close.focus({ preventScroll: true });
-    }
+    // Freeze existing drift, dates, image crossfades and remaining rotation delays.
+    // They keep their animation objects and clocks; no memory is remounted.
     synchronicityMemoriesSession?.sync?.();
-    const finish = () => {
-      if (!state.open) {
-        layer.hidden = true;
-        layer.inert = true;
-        state.blocking = false;
-        delete viewport.dataset.archiveDrawerOpen;
-        memories.inert = false;
-        explore.inert = false;
-        if (restoreFocus && available() && (document.activeElement === document.body || layer.contains(document.activeElement))) {
-          explore.focus({ preventScroll: true });
-        }
-        if (available()) afterClose?.();
-        synchronicityMemoriesSession?.sync?.();
-      }
-    };
     if (immediate || reducedMotion.matches || typeof drawer.animate !== "function") { finish(); return; }
-    const animation = drawer.animate([{ transform: from }, { transform: to }], {
-      duration: 300, easing: "cubic-bezier(.22,.61,.36,1)"
+    if (state.motion) { playMotion(); return; }
+    // Commit pending pauses at the sampled phase, avoiding the browser's next-frame pause lag.
+    memories.getAnimations({ subtree: true }).forEach(animation => {
+      if (animation.playState === "paused" && animation.currentTime !== null) animation.currentTime = animation.currentTime;
     });
-    state.animation = animation;
-    animation.onfinish = () => {
-      if (state.animation !== animation) return;
-      state.animation = null;
-      animation.cancel();
-      finish();
+
+    layer.hidden = false;
+    layer.inert = true;
+    if (open) content.scrollTop = state.scrollTop;
+    const buttonBounds = explore.getBoundingClientRect();
+    const target = { x: buttonBounds.left + buttonBounds.width / 2, y: buttonBounds.top + buttonBounds.height / 2 };
+    const bounds = drawer.getBoundingClientRect();
+    const snapshots = Array.from(memories.querySelectorAll(".synchronicity-memory")).flatMap(frame => {
+      const rect = frame.getBoundingClientRect();
+      if (!rect.width || !rect.height) return [];
+      const style = getComputedStyle(frame);
+      const matrix = new DOMMatrix(style.transform === "none" ? undefined : style.transform);
+      return [{ frame, from: matrix.toString(), opacity: style.opacity,
+        to: matrix.translate(target.x - rect.left - rect.width / 2, target.y - rect.top - rect.height / 2).scale(.03).toString() }];
+    });
+    const lead = snapshots.length ? 600 : 0;
+    const duration = lead + 960;
+    const motion = { duration, animations: [], frames: snapshots.map(snapshot => snapshot.frame) };
+    state.motion = motion;
+    drawer.style.transformOrigin = `${target.x - bounds.left}px ${target.y - bounds.top}px`;
+    viewport.dataset.archiveDrawerMotion = "";
+    snapshots.forEach(({ frame }) => { frame.dataset.memoryConverging = ""; });
+    viewport.dataset.archiveDrawerOpen = "";
+    const animate = (node, keyframes) => {
+      const animation = node.animate(keyframes, { duration, easing: "linear", fill: "both" });
+      animation.pause();
+      animation.currentTime = open ? 0 : duration;
+      motion.animations.push(animation);
+      return animation;
     };
+    const ease = "cubic-bezier(.22,.61,.36,1)";
+    state.animation = animate(drawer, [
+      { transform: "scale(.001,.003)", offset: 0 },
+      { transform: "scale(.001,.003)", offset: lead / duration, easing: ease },
+      { transform: "scale(1,.003)", offset: (lead + 330) / duration, easing: ease },
+      { transform: "scale(1,1)", offset: (lead + 790) / duration },
+      { transform: "scale(1,1)", offset: 1 }
+    ]);
+    animate(drawer, [
+      { opacity: 0, offset: 0 },
+      { opacity: 0, offset: Math.max(0, lead - 40) / duration },
+      { opacity: 1, offset: (lead + 60) / duration },
+      { opacity: 1, offset: 1 }
+    ]);
+    for (const node of [drawer.querySelector(".synchronicity-drawer-header"), content]) {
+      animate(node, [{ opacity: 0, offset: 0 }, { opacity: 0, offset: (duration - 220) / duration }, { opacity: 1, offset: 1 }]);
+    }
+    animate(explore, [
+      { opacity: 1, offset: 0 },
+      { opacity: 1, offset: Math.max(0, lead - 120) / duration },
+      { opacity: 0, offset: (lead + 60) / duration },
+      { opacity: 0, offset: 1 }
+    ]);
+    snapshots.forEach(({ frame, from, to, opacity }, index) => {
+      const delay = snapshots.length > 1 ? index * 100 / (snapshots.length - 1) : 0;
+      animate(frame, [
+        { transform: from, opacity, offset: 0 },
+        { transform: from, opacity, offset: delay / duration, easing: "cubic-bezier(.55,.02,.8,.45)" },
+        { transform: to, opacity: 0, offset: (delay + 500) / duration },
+        { transform: to, opacity: 0, offset: 1 }
+      ]);
+    });
+    state.animation.onfinish = () => { if (state.motion === motion && state.animation.playState === "finished") finish(); };
+    playMotion();
   };
   state.selectShow = show => {
     if (!available() || !state.open) return;
@@ -13667,14 +13750,16 @@ function initSynchronicityArchiveDrawer(viewport) {
     state.scrollTop = saved?.scrollTop || 0;
     setExpanded(Boolean(saved?.expanded));
     change(Boolean(saved?.open), true, false);
+    content.scrollTop = state.scrollTop;
   };
   content.addEventListener("scroll", () => {
     if (state.entry && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
   }, { passive: true });
-  explore.addEventListener("click", () => { if (!available()) return; setExpanded(true); change(true); });
+  explore.addEventListener("click", () => { if (!available()) return; if (!state.motion) setExpanded(true); change(true); });
   close.addEventListener("click", () => change(false));
   layer.querySelector("[data-synchronicity-drawer-backdrop]").addEventListener("click", () => change(false));
   expand.addEventListener("click", () => {
+    if (state.motion) return;
     const top = content.scrollTop;
     setExpanded(!state.expanded);
     content.scrollTop = top;
@@ -13682,7 +13767,19 @@ function initSynchronicityArchiveDrawer(viewport) {
   drawer.addEventListener("keydown", event => {
     if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); change(false); }
   });
-  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches) state.animation?.finish(); });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && state.motion && available()) { event.preventDefault(); change(false); }
+  });
+  document.addEventListener("visibilitychange", () => { if (state.motion) playMotion(); });
+  reducedMotion.addEventListener("change", () => { if (reducedMotion.matches && state.motion) finish(); });
+  // Geometry is sampled once per sequence. A viewport change settles the requested
+  // endpoint instead of chasing moving coordinates or leaving stale transforms.
+  let width = viewport.clientWidth, height = viewport.clientHeight;
+  new ResizeObserver(() => {
+    const nextWidth = viewport.clientWidth, nextHeight = viewport.clientHeight;
+    if (state.motion && (nextWidth !== width || nextHeight !== height)) finish();
+    width = nextWidth; height = nextHeight;
+  }).observe(viewport);
   window.addEventListener("pagehide", () => {
     if (state.entry) state.visit = { entry: state.entry, open: state.open, expanded: state.expanded, scrollTop: !layer.hidden && content.contains(musicActivityPanel) ? content.scrollTop : state.scrollTop };
     state.entry = null;
