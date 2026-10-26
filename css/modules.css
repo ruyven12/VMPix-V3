@@ -33904,6 +33904,19 @@ button.hall-crusades-archive-crystal:focus-visible {
 .synchronicity-timeline-thumb img[data-loaded] { opacity: 1; }
 .synchronicity-timeline-detail { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; font: 400 .8rem/1.5 var(--font-display); }
 .synchronicity-timeline-detail strong { color: #e4e9fb; font: 500 .88rem/1.5 var(--font-display); }
+.synchronicity-timeline-detail--numbered { grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; }
+.synchronicity-timeline-detail--numbered > span:not(.synchronicity-timeline-number) { grid-column: 1 / -1; }
+.synchronicity-timeline-number {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  justify-self: end;
+  max-width: 7.5rem;
+  color: #bcb7e9;
+  font: 500 .65rem/1.5 var(--font-display);
+  letter-spacing: .04em;
+  text-align: right;
+}
 .synchronicity-timeline-toggle:focus-visible,
 .synchronicity-timeline-entry:focus-visible { outline: 2px solid #c6d7ff; outline-offset: -2px; }
 @media (hover: hover) {

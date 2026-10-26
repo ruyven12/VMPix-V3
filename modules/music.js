@@ -14254,7 +14254,15 @@ function createSynchronicityTimeline(rows, allRows) {
         const venueName = getMusicShowVenueName(show) || "Venue unavailable";
         const location = getMusicShowDetailLocation(show);
         venue.textContent = venueName + (location && location !== "Location Pending" ? " * " + location : "");
-        detail.append(name, when, venue);
+        detail.append(name);
+        if (id) {
+          const number = document.createElement("span");
+          number.className = "synchronicity-timeline-number";
+          number.textContent = "SHOW #" + id;
+          detail.classList.add("synchronicity-timeline-detail--numbered");
+          detail.append(number);
+        }
+        detail.append(when, venue);
         if (!id) {
           const unavailable = document.createElement("span");
           unavailable.textContent = "Show identity unavailable";
