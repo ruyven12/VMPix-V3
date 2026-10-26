@@ -33902,6 +33902,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 .synchronicity-viewport[data-archive-drawer-motion] .synchronicity-drawer { will-change: transform, opacity; }
 
+/* S10A: timeline/show exchanges retain the drawer and keep the Echo Field paused. */
+.synchronicity-viewport[data-archive-selected-show]:not([data-archive-selection-fading]) { overflow-y: auto; }
+.synchronicity-viewport[data-archive-selection-fading] :is(.synchronicity-drawer-layer, .synchronicity-show) { will-change: opacity; }
+
 /* S8: the chronological archive shares the existing drawer's single scroller. */
 .synchronicity-drawer-content .synchronicity-timeline {
   display: block;

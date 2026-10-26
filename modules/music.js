@@ -13727,15 +13727,115 @@ function initSynchronicityArchiveDrawer(viewport) {
     state.animation.onfinish = () => { if (state.motion === motion && state.animation.playState === "finished") finish(); };
     playMotion();
   };
-  state.selectShow = show => {
-    if (!available() || !state.open) return;
-    const entry = state.entry;
-    change(false, false, false, () => {
-      if (state.entry === entry) synchronicityMemoriesSession?.selectShow?.(show);
+  // Timeline browsing is a view exchange, not an S10 archive close/release.
+  const clearSelectionFade = view => {
+    layer.style.removeProperty("opacity");
+    view.selection.panel.style.removeProperty("opacity");
+    view.animations?.forEach(animation => { animation.onfinish = null; animation.cancel(); });
+    view.animations = null;
+    view.fade = null;
+    delete viewport.dataset.archiveSelectionFading;
+  };
+  const finishSelection = (view, focus = true) => {
+    if (state.selectionView !== view) return;
+    layer.hidden = view.show;
+    layer.inert = view.show;
+    clearSelectionFade(view);
+    if (view.show) {
+      memories.inert = false;
+      view.selection.panel.inert = false;
+      if (focus && available()) view.selection.panel.querySelector(".synchronicity-show-title")?.focus({ preventScroll: true });
+    } else {
+      view.session.clearSelection();
+      state.selectionView = null;
+      delete viewport.dataset.archiveSelectedShow;
+      memories.inert = true;
+      content.scrollTop = state.scrollTop;
+      if (focus && available()) {
+        const target = view.origin?.isConnected ? view.origin : close;
+        target.focus({ preventScroll: true });
+      }
+    }
+    synchronicityMemoriesSession?.sync?.();
+  };
+  const playSelection = view => {
+    const position = Math.max(0, Math.min(320, Number(view.fade.currentTime) || 0));
+    const direction = view.show === view.forwardToShow ? 1 : -1;
+    const now = document.timeline.currentTime;
+    view.animations.forEach(animation => {
+      animation.pause();
+      animation.currentTime = position;
+      animation.playbackRate = direction;
+      if (!document.hidden) {
+        animation.play();
+        animation.startTime = now - position / direction;
+      }
     });
   };
+  const exchangeSelection = view => {
+    if (!view.fade) {
+      // Seed the incoming hidden layer before exposing it; a new reverse-playing
+      // animation can otherwise briefly paint its forward initial frame.
+      layer.style.opacity = view.show ? "1" : "0";
+      view.selection.panel.style.opacity = view.show ? "0" : "1";
+    }
+    layer.hidden = false;
+    layer.inert = true;
+    memories.inert = true;
+    view.selection.panel.inert = true;
+    if (!view.show) { setExpanded(true); content.scrollTop = state.scrollTop; }
+    if (reducedMotion.matches || typeof layer.animate !== "function") { finishSelection(view); return; }
+    viewport.dataset.archiveSelectionFading = "";
+    if (!view.fade) {
+      view.forwardToShow = view.show;
+      view.animations = [
+        layer.animate([{ opacity: view.show ? 1 : 0 }, { opacity: view.show ? 0 : 1 }], { duration: 320, easing: "ease-in-out", fill: "both" }),
+        view.selection.panel.animate([{ opacity: view.show ? 0 : 1 }, { opacity: view.show ? 1 : 0 }], { duration: 320, easing: "ease-in-out", fill: "both" })
+      ];
+      view.fade = view.animations[0];
+      view.animations.forEach(animation => { animation.pause(); animation.currentTime = 0; });
+      view.fade.onfinish = () => {
+        if (state.selectionView === view && view.fade?.playState === "finished") finishSelection(view);
+      };
+    }
+    playSelection(view);
+  };
+  state.selectShow = show => {
+    if (!available() || !state.open || state.motion || state.selectionView) return;
+    const session = synchronicityMemoriesSession;
+    const origin = document.activeElement;
+    state.scrollTop = content.scrollTop;
+    const selection = session?.selectShow?.(show);
+    if (!selection) return;
+    const view = { session, selection, origin, show: true, fade: null, animations: null };
+    state.selectionView = view;
+    viewport.dataset.archiveSelectedShow = "";
+    exchangeSelection(view);
+  };
+  state.returnToArchive = selection => {
+    const view = state.selectionView;
+    if (!available() || !view || view.selection !== selection) return false;
+    if (!view.show) return true;
+    view.show = false;
+    exchangeSelection(view);
+    return true;
+  };
+  state.releaseSelection = session => {
+    const view = state.selectionView;
+    if (!view || (session && view.session !== session)) return;
+    view.show = false;
+    setExpanded(true);
+    finishSelection(view, false);
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (state.selectionView?.fade) playSelection(state.selectionView);
+  });
+  reducedMotion.addEventListener("change", () => {
+    if (reducedMotion.matches && state.selectionView?.fade) finishSelection(state.selectionView);
+  });
   state.syncRoute = () => {
     if (!available()) {
+      state.releaseSelection();
       if (state.entry) {
         state.visit = { entry: state.entry, open: state.open, expanded: state.expanded, scrollTop: !layer.hidden && content.contains(musicActivityPanel) ? content.scrollTop : state.scrollTop };
         state.entry = null;
@@ -13781,6 +13881,7 @@ function initSynchronicityArchiveDrawer(viewport) {
     width = nextWidth; height = nextHeight;
   }).observe(viewport);
   window.addEventListener("pagehide", () => {
+    state.releaseSelection();
     if (state.entry) state.visit = { entry: state.entry, open: state.open, expanded: state.expanded, scrollTop: !layer.hidden && content.contains(musicActivityPanel) ? content.scrollTop : state.scrollTop };
     state.entry = null;
     change(false, true, false);
@@ -14032,6 +14133,7 @@ function prepareSynchronicityMemories() {
   };
   session.setPaused = paused => { session.paused = Boolean(paused); session.sync(); };
   session.dispose = () => {
+    synchronicityArchiveDrawer?.releaseSelection?.(session);
     session.selection?.bill?.dispose();
     session.selection = null;
     document.removeEventListener("visibilitychange", session.sync);
@@ -14042,9 +14144,9 @@ function prepareSynchronicityMemories() {
   };
 
   // Selection is local to this Shows scene; route restoration remains Shell-owned.
-  const returnToEchoes = () => {
+  session.clearSelection = () => {
     const selection = session.selection;
-    if (!current() || !selection) return;
+    if (!selection) return;
     session.selection = null;
     selection.bill?.dispose();
     selection.panel.remove();
@@ -14052,6 +14154,12 @@ function prepareSynchronicityMemories() {
     for (const memory of session.results) if (memory.frame) memory.frame.inert = false;
     session.setPaused(false);
     viewport.scrollTop = selection.scrollTop;
+  };
+  const returnToEchoes = () => {
+    const selection = session.selection;
+    if (!current() || !selection) return;
+    if (selection.fromTimeline && synchronicityArchiveDrawer?.returnToArchive?.(selection)) return;
+    session.clearSelection();
     const returnTarget = selection.fromTimeline ? viewport.querySelector("[data-synchronicity-explore]") : selection.memory.frame;
     returnTarget?.focus({ preventScroll: true });
   };
@@ -14113,7 +14221,7 @@ function prepareSynchronicityMemories() {
     stage.append(panel);
     selection.bill.sync();
     if (fromTimeline) viewport.scrollTop = 0;
-    title.focus({ preventScroll: true });
+    else title.focus({ preventScroll: true });
 
     const poster = memory.show.capturedPoster;
     if ((!memory.image || memory.kind !== "poster") && usable(poster) && poster !== memory.image?.src) {
@@ -14121,6 +14229,7 @@ function prepareSynchronicityMemories() {
       memory.posterPreview ||= decode(poster);
       memory.posterPreview.then(image => showImage(image, "poster"));
     }
+    return selection;
   };
 
   // Timeline selections share the existing display and source records, without album requests.
@@ -14128,7 +14237,7 @@ function prepareSynchronicityMemories() {
     const id = getMusicShowIdValue(show);
     if (!current() || !id || !source.some(record => getMusicShowIdValue(record) === id)) return;
     const memory = session.results.find(item => item.id === id) || { id, show, image: null, kind: "poster" };
-    selectMemory(memory, true);
+    return selectMemory(memory, true);
   };
 
   document.addEventListener("visibilitychange", session.sync);
