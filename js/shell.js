@@ -4483,7 +4483,7 @@ function syncZhentoPillarStat() {
   if (stat.textContent !== text) stat.textContent = text;
 }
 
-// Rhythm owns one scoped entry transaction; the route still owns the destination DOM.
+// Both Music pillars share the approved Rhythm entry; the route owns the destination DOM.
 let zhentoRhythmEntry = null;
 function cancelZhentoRhythmEntry() {
   const entry = zhentoRhythmEntry;
@@ -4502,12 +4502,15 @@ function cancelZhentoRhythmEntry() {
 }
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
-  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || landing?.dataset.selectedDestination !== "bands") return;
+  const destination = landing?.dataset.selectedDestination;
+  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows"].includes(destination)) return;
   const engine = document.querySelector("[data-portfolio-engine]");
   const left = engine?.querySelector(".portfolio-engine-left-core");
   const right = engine?.querySelector(".portfolio-engine-reactor");
   if (!left || !right) return;
-  const entry = { timers: [], retirements: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false };
+  const entry = { timers: [], retirements: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false,
+    url: destination === "shows" ? routePaths.musicShows : routePaths.musicBands,
+    routeName: destination === "shows" ? "music-shows" : "music-bands" };
   zhentoRhythmEntry = entry;
   shell.dataset.zhentoRhythmEntry = "accepted";
   shell.inert = true;
@@ -4525,14 +4528,15 @@ function startZhentoRhythmEntry() {
     if (zhentoRhythmEntry !== entry) return;
     entry.promoting = true;
     try {
-      navigateToRoute(routePaths.musicBands);
+      navigateToRoute(entry.url);
       entry.promoted = true;
     } finally {
       entry.promoting = false;
     }
   };
-  // Use the existing single request/cache. Hidden index rendering is intentionally skipped.
-  requestMusicBandsIndexData();
+  // Reuse each destination's existing request/cache without waiting on its response.
+  if (destination === "shows") requestMusicShowsIndexData();
+  else requestMusicBandsIndexData();
   if (reducedMotion.matches) {
     try { promote(); } finally { cancelZhentoRhythmEntry(); }
     return;
@@ -4563,7 +4567,7 @@ function startZhentoRhythmEntry() {
   shell.append(layer);
   const later = (ms, action) => entry.timers.push(window.setTimeout(() => {
     if (zhentoRhythmEntry !== entry) return;
-    const expected = entry.promoted ? "music-bands" : "music";
+    const expected = entry.promoted ? entry.routeName : "music";
     if (getRouteFromUrl().name !== expected) { cancelZhentoRhythmEntry(); return; }
     action();
   }, ms));
@@ -4576,7 +4580,7 @@ function startZhentoRhythmEntry() {
     try {
       promote();
       shell.dataset.zhentoRhythmEntry = "covered";
-      // Actual Bands viewport is active now. Two rendering frames resolve its measured layout.
+      // The destination viewport is active now. Two rendering frames resolve its measured layout.
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (zhentoRhythmEntry !== entry) return;
         later(360, () => { shell.dataset.zhentoRhythmEntry = "reveal"; });
@@ -5328,13 +5332,7 @@ function resetZhentoLandingSelection() {
   enter.setAttribute("aria-label", "Enter — not available yet");
   if (!enter.dataset.zhentoEntryBound) {
     enter.dataset.zhentoEntryBound = "true";
-    enter.addEventListener("click", (event) => {
-      if (landing.dataset.selectedDestination === "shows") {
-        if (getRouteFromUrl().name === "music" && !isWorldLandingInteractionBlocked("zhento") && !zhentoRhythmEntry) navigateToRoute(routePaths.musicShows);
-        return;
-      }
-      startZhentoRhythmEntry(event);
-    });
+    enter.addEventListener("click", startZhentoRhythmEntry);
   }
   landing.querySelectorAll("[data-zhento-destination]").forEach((button) => {
     if (button.dataset.zhentoBound) return;
@@ -8273,8 +8271,9 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   reducedMotion.addEventListener("change", () => {
     if (!zhentoRhythmEntry || !reducedMotion.matches) return;
     const shouldEnter = !zhentoRhythmEntry.promoted && getRouteFromUrl().name === "music";
+    const targetUrl = zhentoRhythmEntry.url;
     cancelZhentoRhythmEntry();
-    if (shouldEnter) navigateToRoute(routePaths.musicBands);
+    if (shouldEnter) navigateToRoute(targetUrl);
   });
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", () => { updateViewportMetrics(); fitZhentoLowerThirdBody(); });

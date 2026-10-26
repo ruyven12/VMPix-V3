@@ -13444,7 +13444,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 
 /* Rhythm entry: measured persistent emitters, opaque animated coverage, then current viewport. */
 /* Mount and measure the destination under coverage; disclose its complete interface only at cleanup. */
-.site-shell[data-zhento-rhythm-entry] .rhythm-viewport > :is(.rhythm-pillar, .zhento-top-hud-rail, .zhento-side-hud-rail) {
+.site-shell[data-zhento-rhythm-entry] .rhythm-viewport > :is(.rhythm-pillar, .zhento-top-hud-rail, .zhento-side-hud-rail),
+.site-shell[data-zhento-rhythm-entry] .synchronicity-viewport > :is(.synchronicity-memories, .synchronicity-drawer-dock) {
   opacity: 0 !important;
   pointer-events: none;
 }
