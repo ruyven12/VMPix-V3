@@ -13671,7 +13671,7 @@ function initSynchronicityArchiveDrawer(viewport) {
   content.addEventListener("scroll", () => {
     if (state.entry && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
   }, { passive: true });
-  explore.addEventListener("click", () => change(true));
+  explore.addEventListener("click", () => { if (!available()) return; setExpanded(true); change(true); });
   close.addEventListener("click", () => change(false));
   layer.querySelector("[data-synchronicity-drawer-backdrop]").addEventListener("click", () => change(false));
   expand.addEventListener("click", () => {
@@ -14079,6 +14079,18 @@ function prepareSynchronicityMemories() {
       images: new Map([[image.src, image]]), failed: new Set()
     });
     frame.append(image);
+    const memoryDate = getSynchronicityTimelineDate(show);
+    if (memoryDate) {
+      const label = document.createElement("time");
+      label.className = "synchronicity-memory-date";
+      label.dateTime = [memoryDate.getFullYear(), String(memoryDate.getMonth() + 1).padStart(2, "0"), String(memoryDate.getDate()).padStart(2, "0")].join("-");
+      label.textContent = memoryDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      label.setAttribute("aria-hidden", "true");
+      frame.setAttribute("aria-label", frame.getAttribute("aria-label") + ", " + getMusicShowDateLabel(show));
+      frame.classList.add("synchronicity-memory--dated");
+      frame.style.setProperty("--memory-date-delay", (.6 + index * 27 / limit).toFixed(2) + "s");
+      frame.append(label);
+    }
     stage.insertBefore(frame, session.selection?.panel || null);
     stage.dataset.memoryCount = String(session.results.length);
     layoutField();

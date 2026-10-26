@@ -34046,3 +34046,59 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-show-resolver__show { padding-block: 10px; border-block-end: 1px solid #473340; }
 .admin-shell .admin-show-resolver__show h4 { margin-block: 0 6px; font: 400 14px/1.5 var(--font-display); }
 .admin-shell .admin-show-resolver__show p { margin-block: 6px; }
+
+/* S8G: the same angular frame paint, with room for a date below the photograph. */
+.synchronicity-memory--dated { clip-path: none; background: none; }
+.synchronicity-memory--dated::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+  background: linear-gradient(135deg, rgba(174,193,224,.74), rgba(87,104,164,.28) 38%, rgba(142,110,197,.64));
+}
+.synchronicity-memory--dated:focus-visible { background: none; box-shadow: none; }
+.synchronicity-memory--dated:focus-visible::before { background: linear-gradient(135deg, #dbeaff, #8bbcff 48%, #bb9afa); box-shadow: inset 0 0 0 3px #dbeaff; }
+.synchronicity-memory-date {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  color: #ccd6f2;
+  font: 400 10px/1.3 var(--font-display);
+  white-space: nowrap;
+  text-align: center;
+  text-shadow: 0 1px 2px #080b19;
+  pointer-events: none;
+  opacity: 0;
+  animation: synchronicity-memory-date 27s ease-in-out infinite;
+  animation-delay: var(--memory-date-delay, .6s);
+  animation-play-state: paused;
+}
+.synchronicity-memories[data-memory-motion="running"] .synchronicity-memory-date { animation-play-state: running; }
+@keyframes synchronicity-memory-date {
+  0%, 14.82%, 100% { opacity: 0; }
+  3.7%, 11.12% { opacity: .9; }
+}
+/* Show moving-memory dates during the upper half of their existing drift,
+   keeping the label clear of the next photograph without moving either frame. */
+.synchronicity-memory[data-memory-living="true"] .synchronicity-memory-date {
+  animation-name: synchronicity-memory-date-drift;
+  animation-duration: inherit;
+  animation-delay: inherit;
+  animation-direction: inherit;
+}
+@keyframes synchronicity-memory-date-drift {
+  0%, 45%, 100% { opacity: 0; }
+  10%, 32% { opacity: .9; }
+}
+@media (min-width: 1000px) {
+  .synchronicity-memory-date { font-size: 11px; }
+}
+@media (max-height: 500px) {
+  .synchronicity-memory-date { top: calc(100% + 2px); font-size: 9px; line-height: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .synchronicity-memories .synchronicity-memory-date { animation-play-state: paused !important; opacity: .9 !important; }
+}
