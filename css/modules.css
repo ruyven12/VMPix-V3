@@ -33720,6 +33720,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   box-shadow: none;
   color: #eef2ff;
 }
+.synchronicity-bill .show-set-card[aria-disabled="true"] { cursor: default; }
+.synchronicity-bill .show-set-card[data-preview-kind="poster"] .show-set-card-image { inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .synchronicity-bill .show-set-card-media { background: linear-gradient(135deg, rgba(32, 49, 84, .25), rgba(39, 27, 65, .22)); }
 .synchronicity-bill .show-set-card-overlay {
   background: linear-gradient(180deg, rgba(4, 8, 20, .18), rgba(4, 8, 20, .68) 36%, rgba(4, 8, 20, .68) 66%, rgba(4, 8, 20, .2));

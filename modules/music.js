@@ -14987,7 +14987,11 @@ function primeShowSetCardPreviewImage(card) {
     activeImage?.dataset?.previewSrc ||
     preview.urls[0] ||
     SET_GALLERY_NO_POSTER_IMAGE_SRC;
-  return loadShowSetCardPreviewImage(activeImage, activeUrl);
+  const loading = loadShowSetCardPreviewImage(activeImage, activeUrl);
+  if (preview.onImageFailure) loading.then(loaded => {
+    if (!loaded && isShowSetCardPreviewCurrent(card)) preview.onImageFailure(activeUrl);
+  });
+  return loading;
 }
 
 function getMusicShowAlbumPreviewCacheKey(albumId) {
@@ -15051,10 +15055,13 @@ function ensureShowSetCardPreviewAlbumPhotos(card) {
       }
       if (Array.isArray(urls) && urls.length > 0) {
         setShowSetCardPreviewUrls(card, urls);
+      } else {
+        preview.onPhotosUnavailable?.();
       }
     })
     .catch(() => {
       preview.albumPhotosLoaded = true;
+      if (isShowSetCardPreviewCurrent(card)) preview.onPhotosUnavailable?.();
     })
     .finally(() => {
       preview.albumPhotosLoading = false;
@@ -15089,6 +15096,7 @@ function advanceShowSetCardPreview(card) {
   const nextUrl = preview.urls[nextIndex];
   loadShowSetCardPreviewImage(nextImage, nextUrl).then((loaded) => {
     if (preview.isCurrent && !loaded) {
+      if (preview.onImageFailure) { preview.onImageFailure(nextUrl); return; }
       const currentUrl = preview.urls[preview.currentIndex];
       preview.urls = preview.urls.filter(url => url !== nextUrl);
       preview.currentIndex = Math.max(0, preview.urls.indexOf(currentUrl));
@@ -15223,14 +15231,42 @@ function primeActiveShowSetCardPreview(root = document) {
   updateShowSetCardPreviewPlayback(activeCard);
 }
 
+// The documented lineup owns order and identity. Albums only enrich a verified member.
+function getSynchronicityBillEntries(show) {
+  const lineup = Array.isArray(show?.bands) ? show.bands : [];
+  const albums = getMusicShowResolvedAlbums(show).filter(album =>
+    String(album.status || "").trim().toLowerCase() === "resolved" && getMusicShowAlbumPreviewAlbumId(album));
+  const entries = [];
+  for (const band of lineup) {
+    const name = typeof band === "string" ? band.trim() : getMusicShowAlbumBandName(band);
+    const id = String(band?.band_id || band?.bandId || "").trim();
+    if (!name || entries.some(entry => id && entry.id ? id === entry.id : name === entry.name)) continue;
+    const matches = albums.filter(album => {
+      const albumBandId = String(album.band_id || album.bandId || "").trim();
+      if (id && albumBandId) return id === albumBandId;
+      // Exact same-show ingestion label only: no slug generation, aliases, or fuzzy name matching.
+      return String(album.lineupBand || getMusicShowAlbumBandName(album)).trim() === name;
+    });
+    const unique = new Map(matches.map(album => [getMusicShowAlbumPreviewAlbumId(album), album]));
+    const album = unique.size === 1 ? unique.values().next().value : null;
+    const route = album && String(album.band_id || album.bandId || "").trim()
+      ? getMusicShowAlbumSetRoute(show, album) : "";
+    entries.push({ name, id, album, route });
+  }
+  return entries;
+}
+
 // Reuse the Show Detail carousel; this owner supplies scene lifetime and Nexus presentation.
 function createSynchronicityBill(show, isCurrent) {
   let disposed = false;
+  const entries = getSynchronicityBillEntries(show);
+  const candidatePoster = String(show.capturedPoster || show.poster || "").trim();
+  const poster = isMusicShowPosterImageSrc(candidatePoster) && candidatePoster !== SET_GALLERY_NO_POSTER_IMAGE_SRC ? candidatePoster : "";
   const section = createShowDetailBandsOnBill(show, {
     isCurrent: () => !disposed && isCurrent(),
     albumOnly: true,
-    albums: getMusicShowResolvedAlbums(show).filter(album =>
-      String(album.status || "").toLowerCase() === "resolved" && getMusicShowAlbumPreviewAlbumId(album)),
+    albums: entries.map(entry => ({ ...entry.album, band: entry.name })),
+    getGalleryRoute: (_album, index) => entries[index].route,
     historyState: { fromSetsArchive: true, setsArchiveUrl: "/music/shows" },
   });
   section.classList.add("synchronicity-bill");
@@ -15243,30 +15279,72 @@ function createSynchronicityBill(show, isCurrent) {
   heading.className = "synchronicity-bill-heading";
   heading.textContent = "RECONSTRUCTED MEMORY";
   section.prepend(heading);
+  const empty = section.querySelector(".show-detail-bill-empty");
+  if (empty) empty.textContent = "No documented band lineup available.";
 
   const cards = Array.from(section.querySelectorAll(".show-set-card"));
-  for (const card of cards) {
+  for (const [index, card] of cards.entries()) {
     const preview = card.__showSetPreview;
+    const entry = entries[index];
     card.querySelectorAll(".show-set-card-meta > :not(.show-detail-bill-count)").forEach(item => item.remove());
     const count = getMusicShowDetailCountCandidate(preview.album.photo_count, preview.album.photoCount,
       preview.album.photos, preview.album.image_count, preview.album.imageCount);
-    card.querySelector(".show-detail-bill-count").textContent = count === null ? "Photo count unavailable" : count.toLocaleString() + " Photos";
-    card.querySelector(".show-set-card-action").textContent = "CLICK TO VIEW";
-    if (!card.dataset.showAlbumRoute) {
-      card.disabled = true;
-      card.querySelector(".show-set-card-action").textContent = "Archive unavailable";
+    const countLabel = card.querySelector(".show-detail-bill-count");
+    const photoLabel = count === null ? "Photo count unavailable" : count.toLocaleString() + " Photos";
+    countLabel.textContent = entry.album ? photoLabel : "Captured photography unavailable";
+    const action = card.querySelector(".show-set-card-action");
+    action.textContent = "CLICK TO VIEW";
+    action.hidden = !entry.route;
+    if (!entry.route) {
+      // Keep pointer events available to the swipe viewport without advertising a gallery link.
+      card.setAttribute("aria-disabled", "true");
+      card.tabIndex = -1;
+      card.setAttribute("aria-label", entry.name + ": captured gallery unavailable");
     }
     const placeholder = document.createElement("span");
     placeholder.className = "synchronicity-bill-placeholder";
-    placeholder.textContent = "Photography unavailable";
+    placeholder.textContent = entry.album ? "Loading photography" : "";
     card.querySelector(".show-set-card-media").append(placeholder);
+    const failed = new Set();
+    const fallback = () => {
+      if (disposed || !isCurrent()) return;
+      countLabel.textContent = entry.album ? photoLabel + " / Preview unavailable" : "Captured photography unavailable";
+      placeholder.textContent = "";
+      card.dataset.previewKind = "poster";
+      setShowSetCardPreviewUrls(card, [poster && !failed.has(poster) ? poster : SET_GALLERY_NO_POSTER_IMAGE_SRC]);
+    };
+    preview.onPhotosUnavailable = fallback;
+    preview.onImageFailure = src => {
+      if (disposed || !isCurrent() || src === SET_GALLERY_NO_POSTER_IMAGE_SRC || failed.has(src)) return;
+      failed.add(src);
+      const currentImage = preview.images[preview.activeSlot];
+      const currentUrl = preview.urls[preview.currentIndex];
+      const remaining = preview.urls.filter(url => !failed.has(url));
+      if (remaining.length === 0) { fallback(); return; }
+      if (currentImage.complete && currentImage.naturalWidth > 0 && !currentImage.hidden && currentUrl !== src) {
+        preview.urls = remaining;
+        preview.currentIndex = Math.max(0, remaining.indexOf(currentUrl));
+        card.dataset.previewImageCount = String(remaining.length);
+        if (remaining.length <= 1) stopShowSetCardPreview(card);
+      } else {
+        setShowSetCardPreviewUrls(card, remaining);
+      }
+    };
     for (const image of preview.images) {
+      // Sources are assigned only to the active slide / its next frame. Eager loading lets
+      // a successfully decoded photograph replace a hidden placeholder, including reduced motion.
+      image.loading = "eager";
       image.addEventListener("load", () => {
         if (disposed || !isCurrent()) return;
         const valid = image.naturalWidth > 0 && image.src !== new URL(SET_GALLERY_NO_POSTER_IMAGE_SRC, document.baseURI).href;
         image.hidden = !valid;
         if (valid) placeholder.hidden = true;
       });
+    }
+    if (!entry.album) {
+      card.dataset.previewKind = "poster";
+      preview.urls = [poster || SET_GALLERY_NO_POSTER_IMAGE_SRC];
+      preview.images.forEach(image => { image.dataset.previewSrc = preview.urls[0]; });
     }
   }
   const sync = () => {
@@ -15298,7 +15376,7 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
   const bandName = getMusicShowAlbumBandName(album) || `Band ${index + 1}`;
   const bandId = getMusicShowAlbumBandId(album);
   const dateFolder = getMusicShowAlbumDateFolder(show, album);
-  const targetUrl = getMusicShowAlbumSetRoute(show, album);
+  const targetUrl = options.getGalleryRoute ? options.getGalleryRoute(album, index) : getMusicShowAlbumSetRoute(show, album);
   const albumId = getMusicShowAlbumPreviewAlbumId(album);
   const previewSource = options.albumOnly ? {} : show;
   const previewImages = (isShowSetPreviewReducedMotion()
