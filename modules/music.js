@@ -14262,7 +14262,9 @@ function createSynchronicityTimeline(rows, allRows) {
         const when = document.createElement("span");
         when.textContent = date ? getMusicShowDateLabel(show) : "Date unavailable";
         const venue = document.createElement("span");
-        venue.textContent = getMusicShowVenueName(show) || "Venue unavailable";
+        const venueName = getMusicShowVenueName(show) || "Venue unavailable";
+        const location = getMusicShowDetailLocation(show);
+        venue.textContent = venueName + (location && location !== "Location Pending" ? " * " + location : "");
         detail.append(name, when, venue);
         if (!id) {
           const unavailable = document.createElement("span");
