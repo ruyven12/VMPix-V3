@@ -6853,7 +6853,13 @@ function updateSetGalleryFromRow(row) {
     setGalleryDate.textContent = setData.setDate || "";
   }
   if (setGalleryTitle) {
-    setGalleryTitle.textContent = setData.setTitle || "";
+    setGalleryTitle.textContent = setData.setTitle || "Untitled Show";
+  }
+  if (setEventTitle) {
+    const title = setGalleryTitle?.textContent || "Untitled Show";
+    setEventTitle.textContent = title;
+    setEventToggle.setAttribute("aria-label", `Event information: ${title}`);
+    setEventToggle.title = title;
   }
   if (setGalleryShowId) {
     setGalleryShowId.textContent = getSetShowId(row);
@@ -7568,6 +7574,7 @@ function createSetGalleryPhotoTile(photo, index = 0) {
 const setEventUi = document.querySelector("[data-set-event-ui]");
 const setEventDrawer = setEventUi?.querySelector("[data-set-event-drawer]");
 const setEventToggle = setEventUi?.querySelector("[data-set-event-toggle]");
+const setEventTitle = setEventToggle?.querySelector("[data-set-event-title]");
 const setEventScroll = setEventUi?.querySelector("[data-set-event-scroll]");
 let setEventSession = null;
 
