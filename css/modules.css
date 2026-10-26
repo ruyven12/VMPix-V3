@@ -33458,12 +33458,6 @@ button.hall-crusades-archive-crystal:focus-visible {
   touch-action: pan-y;
   scrollbar-width: thin;
 }
-/* S3: centered Nexus image stays attached to the Shows viewport as its archive scrolls. */
-.synchronicity-viewport {
-  background: #080b12 url("../assets/media/background/zhento-syncronity.png") center center / cover no-repeat;
-  background-origin: border-box;
-  background-attachment: scroll;
-}
 .synchronicity-viewport[hidden] { display: none; }
 .synchronicity-viewport .music-shows-archive {
   box-sizing: border-box;
