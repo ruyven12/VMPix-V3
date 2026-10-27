@@ -262,7 +262,7 @@ let v3RouteStarted = false, v3ResumeWake = null, v3ResumeObserver = null, v3Resu
 const v3Text = (value, fallback = '') => typeof value === 'string' && value.length <= 300 ? value : fallback;
 const v3Number = (value, fallback = 0, max = 1000000) => Number.isFinite(value) ? Math.max(0, Math.min(max, value)) : fallback;
 function isCurrentV3Route(route) {
-  return ['music','music-shows','music-bands','band-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
+  return ['music','music-shows','music-bands','band-detail','set-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
 }
 function createV3EntryId() { return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2); }
 function ensureV3EntryId() {
@@ -293,8 +293,11 @@ function checkpointV3Resume(allowDeparted = false) {
   const context=v3RouteContext;
   if(!context.entry || context.pending || !isCurrentV3Route(context.route) || (allowDeparted !== true && context.url!==(getRouteFromUrl().canonicalUrl || getPathWithSearch())))return;
   try {
-    const ui=context.route.name.startsWith('music')||context.route.name==='band-detail' ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
+    const ui=context.route.name.startsWith('music')||['band-detail','set-detail'].includes(context.route.name) ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
     const snapshot={version:V3_RESUME_VERSION,entry:context.entry,url:context.url,ui,scroll:captureV3Scroll()};
+    if (context.route.name === "set-detail" && history.state?.v3EntryId === context.entry) {
+      history.replaceState({ ...history.state, setDossier: { ...history.state.setDossier, ui } }, "", location.href);
+    }
     const value=JSON.stringify(snapshot);
     if(value.length<=16000)sessionStorage.setItem(v3ResumeKey(context.entry,context.url),value);
   } catch { /* Storage is optional; navigation and real data rendering must continue. */ }
@@ -313,18 +316,21 @@ function beginV3RouteContext(route,options){
   const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
   v3EntriesRenderedInDocument.add(entry);
   let snapshot=null;
-  if((cause==='reload' || reloadGap || (['band-detail','music-shows'].includes(route.name) && cause==='back-forward')) && isCurrentV3Route(route))try{
+  if((cause==='reload' || reloadGap || (['band-detail','music-shows','set-detail'].includes(route.name) && cause==='back-forward')) && isCurrentV3Route(route))try{
     const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
     const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
     if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
   }catch{}
+  if (!snapshot && route.name === "set-detail" && ['reload','back-forward'].includes(cause) && history.state?.setDossier?.ui) {
+    snapshot = { version: V3_RESUME_VERSION, entry, url, ui: history.state.setDossier.ui, scroll: [] };
+  }
   // Band identification replays on a fresh visit or a top-of-page reload only.
   const bandScrolled = Array.isArray(snapshot?.scroll) && snapshot.scroll.some(row =>
     ['shell','[data-band-detail-content]'].includes(row?.key) && v3Number(row.top) > 1);
   const bandEntranceEligible = route.name === 'band-detail' && !['back-forward','bfcache'].includes(cause)
     && (cause !== 'reload' || !bandScrolled);
   v3RouteContext={bandEntranceEligible,navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
-  if(snapshot)try{if(route.name.startsWith('music')||route.name==='band-detail')seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
+  if(snapshot)try{if(route.name.startsWith('music')||['band-detail','set-detail'].includes(route.name))seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
   queueMicrotask(()=>{
     const context=v3RouteContext;
     if(context.route!==route)return;
@@ -332,10 +338,10 @@ function beginV3RouteContext(route,options){
       if(v3RouteContext!==context)return;
       v3ResumeObserver?.disconnect();
       let ready=true;
-      try{if(context.pending && !context.uiReady)ready=route.name.startsWith('music')||route.name==='band-detail' ? restoreMusicResumeState(route,context.snapshot.ui) : restoreWrestlingResumeState(route,context.snapshot.ui);}catch{ready=true;}
+      try{if(context.pending && !context.uiReady)ready=route.name.startsWith('music')||['band-detail','set-detail'].includes(route.name) ? restoreMusicResumeState(route,context.snapshot.ui) : restoreWrestlingResumeState(route,context.snapshot.ui);}catch{ready=true;}
       if(ready)context.uiReady=true;
       if(context.pending && document.fonts?.status==='loading'){ready=false;if(!context.fontWait){context.fontWait=true;document.fonts.ready.then(()=>{context.fontWait=false;if(v3RouteContext===context && context.pending)restore();});}}
-      if(ready){if(context.pending)restoreV3Scroll(context.snapshot.scroll);context.pending=false;cancelV3ResumeRestore();}
+      if(ready){if(context.pending)restoreV3Scroll(context.snapshot.scroll);context.pending=false;cancelV3ResumeRestore();if(route.name==="set-detail")queueMicrotask(scheduleSetReadoutCycle);}
       else v3ResumeObserver?.observe(document.querySelector('.site-shell'),{childList:true,subtree:true,attributes:true,attributeFilter:['data-record-info-state','data-wrestling-person-dossier-prototype-event-archive-photo-state','data-bands-data-state']});
     };
     if(context.pending){v3ResumeWake=restore;v3ResumeObserver=new MutationObserver(restore);v3ResumeDeadline=setTimeout(()=>{context.pending=false;cancelV3ResumeRestore();},20000);}
@@ -400,6 +406,74 @@ function replaceRouteUrl(url, state = {}) {
     window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
   }
   if (v3RouteContext.entry === window.history.state?.v3EntryId) v3RouteContext.url = getRouteFromUrl().canonicalUrl || getPathWithSearch();
+}
+
+// Same-URL Set modes use Shell entry IDs/indices and the existing resume snapshots.
+function ensureSetDossierHistory() {
+  if (getRouteFromUrl().name !== "set-detail") return;
+  if (history.state?.setDossier) { v3RouteContext.setFamily = history.state.setDossier.family; return; }
+  history.replaceState({ ...history.state, setDossier: { family: ensureV3EntryId(), mode: "preview", origin: "preview" } }, "", location.href);
+  v3RouteContext.setFamily = history.state.setDossier.family;
+}
+function pushSetDossierMode(mode, origin = activeSetGalleryPhotoMode) {
+  if (getRouteFromUrl().name !== "set-detail") return;
+  ensureSetDossierHistory();
+  checkpointV3Resume();
+  const previous = history.state, index = (getShellHistoryIndex(previous) ?? 0) + 1;
+  const entry = createV3EntryId();
+  history.pushState({ ...previous, v3EntryId: entry, [SHELL_HISTORY_INDEX_KEY]: index,
+    setDossier: { family: previous.setDossier.family, mode, origin, previousEntry: previous.v3EntryId } }, "", location.href);
+  shellHistoryIndex = index;
+  v3RouteContext.entry = entry;
+  setReadoutState.entry = entry;
+  v3EntriesRenderedInDocument.add(entry);
+}
+function backSetDossierMode() {
+  if (getRouteFromUrl().name !== "set-detail" || (!setFocusSession && activeSetGalleryPhotoMode !== "all")) return false;
+  if (history.state?.setDossier?.previousEntry) {
+    if (!v3RouteContext.setBackPending) {
+      checkpointV3Resume(); v3RouteContext.setBackPending = true; history.back();
+    }
+  } else {
+    // A restored/copy-pasted entry may have no local predecessor; stay in the Dossier.
+    const ui = captureSetDossierState();
+    ui.mode = setFocusSession ? ui.origin : "preview";
+    history.replaceState({ ...history.state, setDossier: { ...history.state?.setDossier, mode: ui.mode } }, "", location.href);
+    beginSetDossierLocalRestore(ui);
+  }
+  return true;
+}
+function beginSetDossierLocalRestore(ui) {
+  v3RouteContext.setBackPending = false;
+  cancelV3ResumeRestore();
+  const context = v3RouteContext;
+  context.pending = true;
+  context.snapshot = { ui, scroll: [] };
+  const restore = () => {
+    if (v3RouteContext !== context) return;
+    if (restoreSetDossierState(ui)) { context.pending = false; cancelV3ResumeRestore(); scheduleSetReadoutCycle(); }
+  };
+  v3ResumeWake = restore;
+  v3ResumeDeadline = setTimeout(() => { context.pending = false; cancelV3ResumeRestore(); }, 20000);
+  restore();
+}
+function handleSetDossierHistory(event) {
+  const route = getRouteFromUrl(), context = v3RouteContext;
+  if (route.name !== "set-detail" || context.route?.name !== "set-detail" || route.canonicalUrl !== context.url ||
+      !setDossierVisit || setDossierVisit.context !== context || setGallery.getAttribute("aria-hidden") !== "false") return false;
+  const state = event.state;
+  if (!state?.setDossier || state.setDossier.family !== context.setFamily) return false;
+  let ui = state.setDossier.ui || { mode: state.setDossier.mode, origin: state.setDossier.origin };
+  try { const saved = JSON.parse(sessionStorage.getItem(v3ResumeKey(state.v3EntryId, context.url))); if (saved?.entry === state.v3EntryId && saved.url === context.url && saved.version === V3_RESUME_VERSION) ui = saved.ui; } catch {}
+  // Going back from preview Focus adopts the currently viewed preview photograph.
+  if (setFocusSession?.origin === "preview" && ui.mode === "preview" && getShellHistoryIndex(state) < shellHistoryIndex) {
+    ui = { ...ui, heroKey: setDossierPhotoKey(), stripLeft: galleryGrid.scrollLeft, revealHero: true };
+  }
+  const readout = { readout: setReadoutState.index, paused: setReadoutState.paused, manualUntil: setReadoutState.manualUntil };
+  context.entry = state.v3EntryId;
+  shellHistoryIndex = getShellHistoryIndex(state);
+  beginSetDossierLocalRestore({ ...ui, ...readout });
+  return true;
 }
 
 function notifyV3AnalyticsView(route) {

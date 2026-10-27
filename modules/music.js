@@ -1224,6 +1224,9 @@ function showSetGalleryRoute(row, options = {}) {
     return;
   }
 
+  if (setDossierVisit?.context === v3RouteContext && setDossierVisit.album === getSetAlbumId(row)) {
+    updateSetGalleryFromRow(row); return;
+  }
   setGalleryBack?.setAttribute('aria-label', window.history.state?.fromBandCapturedSets ? 'Back to Band Detail' : 'Back to Sets Archive');
   updateSetsFeaturedFromRow(row);
   updateSetGalleryFromRow(row);
@@ -1236,9 +1239,7 @@ function showSetGalleryRoute(row, options = {}) {
   flushArchiveAnalytics();
   setGalleryModeVisible(false);
   const tiles = getCurrentGalleryPhotoTiles();
-  if (tiles[0]) {
-    selectGalleryPhoto(tiles[0]);
-  }
+  if (!activeGalleryPhoto && tiles[0]) selectGalleryPhoto(tiles[0]);
   setCurrentView(row.dataset.setTitle || "Set Detail");
   if (options.shouldScroll !== false && musicNexusShell) {
     musicNexusShell.scrollTo({
@@ -6826,7 +6827,8 @@ function updateSetGalleryFromRow(row) {
     return;
   }
 
-  resetSetFeaturedPhoto();
+  const freshVisit = beginSetDossierVisit(row);
+  if (freshVisit) resetSetFeaturedPhoto();
   const setData = row.dataset;
   const imageAccent = getSetImageAccent(row);
   if (setGalleryBand) {
@@ -6878,11 +6880,14 @@ function updateSetGalleryFromRow(row) {
     setGalleryNotes.textContent = getSetNotes(row);
   }
   syncSetReadout();
+  if (!freshVisit) return;
   activeSetGalleryPhotoMode = "preview";
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
   setSetGalleryPhotoWarning("");
   updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
-  loadSetGalleryPhotoHighlights(row);
+  const resume = v3ResumeUI();
+  const mode = resume.mode === "all" || (resume.mode === "focus" && resume.origin === "all") ? "all" : "preview";
+  loadSetGalleryPhotoHighlights(row, { mode });
 }
 
 function getPhotoCountLabel(count) {
@@ -7071,6 +7076,7 @@ function setGalleryState(stateName = "ready") {
     syncSetFeaturedPhoto(activeGalleryPhoto);
     flushArchiveAnalytics();
   }
+  if (getRouteFromUrl().name === "set-detail") queueMicrotask(() => { notifyV3ResumeReady(); if (!v3RouteContext.pending) checkpointV3Resume(); });
 }
 
 function getGalleryPhotoLabel(photoTile) {
@@ -7563,6 +7569,90 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   return tile;
 }
 
+// S13F: Set-local state participates in the Shell's existing entry snapshots.
+let setDossierVisit = null;
+let setDossierRestore = null;
+function setDossierPhotoKey(tile = activeGalleryPhoto) {
+  return getSetGalleryAllModePhotoKey(setFeaturedPhotoRecords.get(tile));
+}
+function captureSetDossierState() {
+  const visit = setDossierVisit;
+  if (!visit || visit.context !== v3RouteContext) return {};
+  const focus = setFocusSession, origin = focus?.origin || activeSetGalleryPhotoMode;
+  if (origin === "preview") {
+    visit.heroKey = setDossierPhotoKey() || visit.heroKey;
+    visit.stripLeft = galleryGrid.scrollLeft;
+    visit.heroScroll = focus?.scrollTop ?? getActiveShellScroller().scrollTop;
+  } else {
+    visit.gridKey = setDossierPhotoKey() || visit.gridKey;
+    visit.gridScroll = focus?.scrollTop ?? getActiveShellScroller().scrollTop;
+  }
+  return { album: visit.album, mode: focus ? "focus" : origin, origin,
+    heroKey: visit.heroKey, stripLeft: visit.stripLeft, heroScroll: visit.heroScroll,
+    gridKey: visit.gridKey, gridScroll: visit.gridScroll,
+    allCount: getSetGalleryAllModeCache(visit.album)?.photos.length || 0,
+    focusKey: focus ? setDossierPhotoKey() : "", readout: setReadoutState.index,
+    paused: setReadoutState.paused, manualUntil: setReadoutState.manualUntil };
+}
+function beginSetDossierVisit(row) {
+  if (setDossierVisit?.context === v3RouteContext && setDossierVisit.album === getSetAlbumId(row)) return false;
+  setDossierRestore = null;
+  setDossierVisit = { context: v3RouteContext, album: getSetAlbumId(row), heroKey: "", stripLeft: 0,
+    heroScroll: 0, gridKey: "", gridScroll: 0 };
+  ensureSetDossierHistory();
+  return true;
+}
+function restoreSetDossierState(ui = {}) {
+  if (!setDossierVisit || setDossierVisit.context !== v3RouteContext || setGallery.getAttribute("aria-hidden") !== "false") {
+    return musicBandsIndex?.dataset.bandsDataState === "error" || musicShowsSetsDataState === "error";
+  }
+  const visit = setDossierVisit;
+  if (ui.album && ui.album !== visit.album) return true;
+  if (!setDossierRestore || setDossierRestore.ui !== ui) {
+    setDossierRestore = { ui };
+    visit.heroKey = v3Text(ui.heroKey); visit.stripLeft = v3Number(ui.stripLeft);
+    visit.heroScroll = v3Number(ui.heroScroll); visit.gridKey = v3Text(ui.gridKey);
+    visit.gridScroll = v3Number(ui.gridScroll);
+    closeSetFocus(false);
+    settleSetReadout();
+    setReadoutState.entry = v3RouteContext.entry;
+    setReadoutState.index = Math.floor(v3Number(ui.readout, 0, 10));
+    setReadoutState.paused = reducedMotion.matches || ui.paused === true;
+    setReadoutState.manualUntil = Math.min(Date.now() + 5000, v3Number(ui.manualUntil, 0, Number.MAX_SAFE_INTEGER));
+    renderSetReadout();
+  }
+  let origin = ui.mode === "all" || (ui.mode === "focus" && ui.origin === "all") ? "all" : "preview";
+  const failedAll = origin === "all" && getSetGalleryAllModeCache(visit.album)?.partialError && !getSetGalleryAllModeCache(visit.album)?.photos.length;
+  if (failedAll) {
+    origin = "preview";
+    if (!setDossierRestore.previewRecovery) {
+      setDossierRestore.previewRecovery = true;
+      loadSetGalleryPhotoHighlights(activeSetRow);
+    }
+  }
+  if (activeSetGalleryPhotoMode !== origin) loadSetGalleryPhotoHighlights(activeSetRow, { mode: origin });
+  if (galleryGrid.classList.contains("is-gallery-hidden")) {
+    return Boolean(galleryStatesShell?.querySelector('[data-gallery-state="error"].is-active,[data-gallery-state="empty"].is-active'));
+  }
+  const cache = getSetGalleryAllModeCache(visit.album);
+  if (origin === "all" && cache?.hasMore && cache.photos.length < v3Number(ui.allCount, 0, 10000)) {
+    if (!activeSetGalleryAllModeLoading) loadNextSetGalleryAllModePage(activeSetRow);
+    return false;
+  }
+  const tiles = getCurrentGalleryPhotoTiles();
+  if (!tiles.length) return true;
+  const key = ui.mode === "focus" ? v3Text(ui.focusKey) : origin === "preview" ? visit.heroKey : visit.gridKey;
+  const tile = tiles.find(item => setDossierPhotoKey(item) === key) || tiles[0];
+  selectGalleryPhoto(tile);
+  const scroller = getActiveShellScroller();
+  scroller.scrollTo({ top: origin === "preview" ? visit.heroScroll : visit.gridScroll, behavior: "instant" });
+  if (origin === "preview") { galleryGrid.scrollLeft = visit.stripLeft; if (ui.revealHero) revealSetFeaturedThumbnail(tile); }
+  if (ui.mode === "focus" && !failedAll) openSetFocus(tile, null, { history: false });
+  setDossierRestore = null;
+  queueMicrotask(scheduleSetReadoutCycle);
+  return true;
+}
+
 // S13E.2: a local readout of the existing normalized Set metadata bindings.
 const setReadout = document.querySelector("[data-set-readout]");
 const setReadoutText = setReadout?.querySelector("[data-set-readout-text]");
@@ -7570,6 +7660,7 @@ const setReadoutLabel = setReadout?.querySelector("[data-set-readout-label]");
 const setReadoutValue = setReadout?.querySelector("[data-set-readout-value]");
 const setReadoutPrevious = setReadout?.querySelector("[data-set-readout-previous]");
 const setReadoutNext = setReadout?.querySelector("[data-set-readout-next]");
+const setReadoutPlay = setReadout?.querySelector("[data-set-readout-play]");
 const setReadoutFields = [
   ["Event Title", setGalleryTitle], ["Show ID", setGalleryShowId],
   ["City / State", setGalleryCity], ["Venue", setGalleryVenue],
@@ -7577,20 +7668,21 @@ const setReadoutFields = [
   ["Photograph Count", setGalleryPhotos], ["Album Status", setGalleryContributors],
   ["Camera", setGalleryCamera], ["Notes", setGalleryNotes], ["Band Name", setGalleryBand]
 ];
-const setReadoutState = { entry: null, index: 0, shown: -1, transition: null, events: null, pixels: [] };
+const setReadoutState = { entry: null, index: 0, shown: -1, transition: null, events: null, pixels: [], timer: 0, paused: false, manualUntil: 0, interacting: false };
 
 function renderSetReadout() {
   if (!setReadout) return;
   const state = setReadoutState, [label, source] = setReadoutFields[state.index];
   const value = source?.textContent.trim() || "N/A";
   setReadoutLabel.textContent = label;
-  setReadoutValue.textContent = value;
+  if (setReadoutValue.textContent !== value) setReadoutValue.textContent = value;
   setReadoutValue.title = value;
   setReadoutValue.setAttribute("aria-label", `${label}: ${value}`);
   setReadout.dataset.field = String(state.index);
   setReadoutValue.classList.toggle("is-notes", label === "Notes");
   if (state.shown !== state.index) setReadoutValue.scrollTop = setReadoutValue.scrollLeft = 0;
   state.shown = state.index;
+  if (state.index === 9 && !state.paused && setReadoutValue.scrollHeight > setReadoutValue.clientHeight + 1) scheduleSetReadoutCycle();
   setReadoutPrevious.setAttribute("aria-label", `Previous archive field; current field: ${label}`);
   setReadoutNext.setAttribute("aria-label", `Next archive field; current field: ${label}`);
 }
@@ -7607,20 +7699,53 @@ function settleSetReadout() {
   renderSetReadout();
 }
 
+function clearSetReadoutCycle() {
+  clearTimeout(setReadoutState.timer);
+  setReadoutState.timer = 0;
+}
+function scheduleSetReadoutCycle() {
+  const state = setReadoutState;
+  clearSetReadoutCycle();
+  const paused = state.paused;
+  setReadoutPlay.textContent = paused ? "\u25b6" : "\u2161";
+  setReadoutPlay.setAttribute("aria-label", paused ? "Resume automatic archive readout" : "Pause automatic archive readout");
+  setReadoutPlay.setAttribute("aria-pressed", String(paused));
+  if (paused || !state.events || setReadout.hidden || document.hidden || !document.hasFocus() ||
+      getRouteFromUrl().name !== "set-detail" || v3RouteContext.pending || state.interacting ||
+      (state.index === 9 && setReadoutValue === document.activeElement)) return;
+  const longNotes = state.index === 9 && setReadoutValue.scrollHeight > setReadoutValue.clientHeight + 1;
+  const interval = longNotes ? Math.min(15000, Math.max(5000, setReadoutValue.textContent.length * 35)) : 1500;
+  const delay = Math.max(interval, state.manualUntil - Date.now());
+  state.timer = setTimeout(() => {
+    state.timer = 0;
+    if (!state.events || setReadout.hidden || document.hidden || !document.hasFocus() || v3RouteContext.pending) return;
+    moveSetReadout(1, true);
+    scheduleSetReadoutCycle();
+  }, delay);
+}
+function pauseSetReadoutForInteraction() {
+  setReadoutState.manualUntil = Date.now() + 5000;
+  scheduleSetReadoutCycle();
+}
+
 function syncSetReadout() {
   const entry = v3RouteContext.entry;
   if (setReadoutState.entry !== entry) {
     settleSetReadout();
     setReadoutState.entry = entry;
     setReadoutState.index = 0;
+    setReadoutState.paused = reducedMotion.matches;
+    setReadoutState.manualUntil = 0;
   }
   if (!setReadoutState.transition || setReadoutState.transition.phase === "in") renderSetReadout();
 }
 
-async function moveSetReadout(direction) {
+async function moveSetReadout(direction, automatic = false) {
   if (!setReadout || setReadout.hidden || getRouteFromUrl().name !== "set-detail") return;
   const state = setReadoutState;
   state.index = (state.index + direction + setReadoutFields.length) % setReadoutFields.length;
+  setReadoutText.setAttribute("aria-live", automatic ? "off" : "polite");
+  if (!automatic) pauseSetReadoutForInteraction();
   // Rapid presses update the target without restarting the current pixel sequence.
   if (state.transition) {
     if (state.transition.phase === "in") renderSetReadout();
@@ -7661,6 +7786,8 @@ function setSetArchiveReadoutVisible(visible) {
   const show = visible && getRouteFromUrl().name === "set-detail";
   setReadout.hidden = !show;
   if (!show) {
+    clearSetReadoutCycle();
+    setReadoutState.interacting = false;
     settleSetReadout();
     setReadoutState.events?.abort();
     setReadoutState.events = null;
@@ -7692,9 +7819,26 @@ function setSetArchiveReadoutVisible(visible) {
     event.preventDefault(); event.stopPropagation();
     moveSetReadout(event.key === "ArrowLeft" ? -1 : 1);
   });
-  listen(reducedMotion, "change", () => { if (reducedMotion.matches) settleSetReadout(); });
-  listen(document, "visibilitychange", () => { if (document.hidden) settleSetReadout(); });
+  listen(setReadoutPlay, "click", () => {
+    setReadoutState.paused = !setReadoutState.paused;
+    setReadoutState.manualUntil = 0;
+    scheduleSetReadoutCycle();
+  });
+  for (const type of ["wheel", "scroll", "keydown", "focusin"]) listen(setReadoutValue, type, pauseSetReadoutForInteraction);
+  listen(setReadoutValue, "focusout", pauseSetReadoutForInteraction);
+  listen(setReadoutValue, "pointerdown", () => { setReadoutState.interacting = true; pauseSetReadoutForInteraction(); });
+  for (const type of ["pointerup", "pointercancel"]) listen(window, type, () => {
+    if (setReadoutState.interacting) { setReadoutState.interacting = false; pauseSetReadoutForInteraction(); }
+  });
+  listen(reducedMotion, "change", () => {
+    if (reducedMotion.matches) { setReadoutState.paused = true; settleSetReadout(); }
+    scheduleSetReadoutCycle();
+  });
+  listen(document, "visibilitychange", () => { if (document.hidden) settleSetReadout(); scheduleSetReadoutCycle(); });
+  listen(window, "blur", clearSetReadoutCycle);
+  listen(window, "focus", scheduleSetReadoutCycle);
   listen(window, "pagehide", () => setSetArchiveReadoutVisible(false));
+  scheduleSetReadoutCycle();
 }
 
 // S13D: an Individual Set content mode. The shared lightbox and its consumers stay separate.
@@ -7707,6 +7851,7 @@ function isSetFocusCurrent(session = setFocusSession) {
 }
 
 function closeSetFocus(restore = true) {
+  if (restore && backSetDossierMode()) return;
   const s = setFocusSession;
   if (!s) return;
   const canRestore = restore && isSetFocusCurrent(s);
@@ -7741,6 +7886,7 @@ function selectSetFocusPhoto(index, intent = null) {
   s.stage.setAttribute("aria-label", `Photograph ${position + 1} of ${s.tiles.length} loaded photographs`);
   if (s.key === key && (s.pending || s.displayedKey === key)) return;
   s.key = key;
+  queueMicrotask(() => { if (isSetFocusCurrent(s)) checkpointV3Resume(); });
   const request = ++s.request;
   if (s.pending) { s.pending.onload = s.pending.onerror = null; s.pending.removeAttribute("src"); }
   s.pending = null;
@@ -7803,13 +7949,15 @@ function selectSetFocusPhoto(index, intent = null) {
   load();
 }
 
-function openSetFocus(tile, event) {
+function openSetFocus(tile, event, options = {}) {
+  if (v3RouteContext.pending && options.history !== false) return;
   if (getRouteFromUrl().name !== "set-detail" || !setGallery?.closest(".set-dossier-viewport") ||
     setGallery.getAttribute("aria-hidden") !== "false" || galleryGrid.classList.contains("is-gallery-hidden") ||
     isLightboxOpen() || setFocusSession) return;
   const tiles = Array.from(galleryGrid.querySelectorAll("[data-gallery-photo]")).filter(node => setFeaturedPhotoRecords.has(node));
   const index = tiles.indexOf(tile), root = setGallery.querySelector("[data-set-focus]"), scroller = getActiveShellScroller();
   if (!root || !scroller || index < 0) return;
+  if (options.history !== false) pushSetDossierMode("focus", activeSetGalleryPhotoMode);
   const s = { root, scroller, context: v3RouteContext, albumId: setGallery.dataset.albumId,
     origin: activeSetGalleryPhotoMode, tiles, trigger: event?.currentTarget || tile,
     scrollTop: scroller.scrollTop, scrollLeft: scroller.scrollLeft,
@@ -7856,6 +8004,7 @@ function openSetFocus(tile, event) {
   listen(window, "pagehide", () => closeSetFocus(false));
   selectSetFocusPhoto(index, beginArchiveAnalytics(event));
   s.close.focus({ preventScroll: true });
+  if (options.history !== false) checkpointV3Resume();
 }
 
 
@@ -7906,6 +8055,7 @@ function selectSetFeaturedTile(tile, event, method) {
   if (!isSetFeaturedPhotoActive() || isLightboxOpen() || !getSetFeaturedTiles().includes(tile)) return;
   setFeaturedPhotoLoad.initial = false;
   selectGalleryPhoto(tile, { heroIntent: beginArchiveAnalytics(event, method) });
+  queueMicrotask(checkpointV3Resume);
 }
 
 function moveSetFeaturedPhoto(direction, event, method) {
@@ -8136,6 +8286,7 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
     return Promise.resolve(cache);
   }
 
+  const context = v3RouteContext;
   const requestKey = `${albumId}:all`;
   const start = normalizeMusicSmugmugAlbumPhotoStart(cache.nextStart || 1);
   if (cache.loadingStarts.has(start)) {
@@ -8153,7 +8304,7 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
 
   return requestSetGalleryAllModePage(albumId, start)
     .then((page) => {
-      if (!isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
+      if (v3RouteContext !== context || !isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
         return cache;
       }
 
@@ -8199,7 +8350,7 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
       return cache;
     })
     .catch(() => {
-      if (!isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
+      if (v3RouteContext !== context || !isSetGalleryAllModeActive(albumId) || activeSetGalleryAlbumRequestKey !== requestKey) {
         return cache;
       }
       cache.partialError = true;
@@ -8222,7 +8373,7 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
     })
     .finally(() => {
       cache.loadingStarts.delete(start);
-      if (activeSetGalleryAlbumRequestKey === requestKey) {
+      if (v3RouteContext === context && activeSetGalleryAlbumRequestKey === requestKey) {
         activeSetGalleryAllModeLoading = false;
         syncSetGalleryLoadMoreButton(activeSetGalleryPhotoMode === "all" ? "ready" : "loading");
       }
@@ -8270,6 +8421,7 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
     return;
   }
 
+  const context = v3RouteContext;
   const requestKey = `${albumId}:${requestedMode}`;
   activeSetGalleryPhotoMode = requestedMode;
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
@@ -8297,7 +8449,7 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
   setGalleryState("loading");
   requestMusicSmugmugAlbumPhotos(albumId, { mode: requestedMode })
     .then((result) => {
-      if (activeSetGalleryAlbumRequestKey !== requestKey) {
+      if (v3RouteContext !== context || activeSetGalleryAlbumRequestKey !== requestKey) {
         return;
       }
       const photos = result?.photos || [];
@@ -8320,7 +8472,7 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
       setGalleryState("ready");
     })
     .catch(() => {
-      if (activeSetGalleryAlbumRequestKey !== requestKey) {
+      if (v3RouteContext !== context || activeSetGalleryAlbumRequestKey !== requestKey) {
         return;
       }
       if (requestedMode === "all") {
@@ -8350,12 +8502,15 @@ function loadMoreSetGalleryAllPhotos() {
 }
 
 function toggleSetGalleryPhotoRange(event = null) {
+  if (v3RouteContext.pending) return;
   const row = activeSetRow || getFirstVisibleSetRow() || getSetsRows()[0] || null;
   if (!row || !galleryViewAll || galleryViewAll.disabled || galleryViewAll.getAttribute("aria-disabled") === "true") {
     return;
   }
 
-  const nextMode = activeSetGalleryPhotoMode === "all" ? "preview" : "all";
+  if (activeSetGalleryPhotoMode === "all" && backSetDossierMode()) return;
+  pushSetDossierMode("all", "preview");
+  const nextMode = "all";
   const intent = nextMode === "all" ? beginArchiveAnalytics(event) : null;
   archiveGalleryRangePending = intent ? {intent, context: v3RouteContext, album: getSetAlbumId(row)} : null;
   loadSetGalleryPhotoHighlights(row, { mode: nextMode });
@@ -14337,6 +14492,30 @@ function initSynchronicityArchiveDrawer(viewport) {
     viewport.dataset.archiveSelectedShow = "";
     exchangeSelection(view);
   };
+  // Reuse the same selected-show presentation when returning from a Set, without replaying S10.
+  state.restoreSetReturn = ui => {
+    if (!available()) return false;
+    const session = synchronicityMemoriesSession;
+    const show = musicShowsSetsCollection.find(record => String(getMusicShowIdValue(record)) === ui.selectedShow);
+    if (!session || session.entry !== v3RouteContext.entry) return false;
+    state.scrollTop = v3Number(ui.drawerScroll);
+    setExpanded(ui.drawerExpanded === true);
+    change(ui.drawerOpen === true, true, false);
+    content.scrollTop = state.scrollTop;
+    if (show) {
+      const selection = session.selectShow(show);
+      if (!selection) return false;
+      selection.fromTimeline = ui.fromTimeline === true;
+      if (selection.fromTimeline) {
+        state.open = true; state.blocking = true;
+        const view = { session, selection, origin: null, show: true, fade: null, animations: null };
+        state.selectionView = view;
+        viewport.dataset.archiveSelectedShow = "";
+        finishSelection(view, false);
+      }
+    }
+    return true;
+  };
   state.returnToArchive = selection => {
     const view = state.selectionView;
     if (!available() || !view || view.selection !== selection) return false;
@@ -17403,14 +17582,19 @@ function initMusicModule() {
 
 let musicSourceResume=null;
 function captureMusicResumeState(route) {
-  if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter};
+  if(route.name==='set-detail')return captureSetDossierState();
+  if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter,
+    selectedShow:synchronicityMemoriesSession?.selection?.id || '',fromTimeline:synchronicityMemoriesSession?.selection?.fromTimeline === true,
+    drawerOpen:synchronicityArchiveDrawer?.open === true,drawerExpanded:synchronicityArchiveDrawer?.expanded === true,
+    drawerScroll:synchronicityArchiveDrawer?.scrollTop || 0,years:[...(synchronicityTimeline.expanded || [])]};
   if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
   if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,bandTab:bandContentState.transition?.target || bandContentState.active,capturedIndex:bandCapturedSetsSession?.selected || 0,capturedSetCode:bandCapturedSetsSession?.rows[bandCapturedSetsSession.selected]?.setCode || ''};
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
 }
 function seedMusicResumeState(route,ui) {
   if(route.name==='music-shows'){
-    activeMusicShowsSearch=v3Text(ui.query);activeMusicShowsYearFilter=v3Text(ui.year);activeMusicShowsStateFilter=v3Text(ui.state);activeMusicShowsVenueFilter=v3Text(ui.venue);return;
+    activeMusicShowsSearch=v3Text(ui.query);activeMusicShowsYearFilter=v3Text(ui.year);activeMusicShowsStateFilter=v3Text(ui.state);activeMusicShowsVenueFilter=v3Text(ui.venue);
+    if(Array.isArray(ui.years))synchronicityTimeline.expanded=new Set(ui.years.filter(year=>/^(?:[0-9]{4}|unknown)$/.test(year)).slice(0,150));return;
   }
   if(route.name!=='music-bands')return;
   musicSourceResume={entry:v3RouteContext.entry,selected:v3Text(ui.selected),count:v3Number(ui.count,24,10000),sourceScroll:v3Number(ui.sourceScroll)};
@@ -17421,7 +17605,12 @@ function settleMusicResumeLanding() {
   landing?.getAnimations({subtree:true}).forEach(animation=>{if(animation instanceof CSSAnimation && animation.effect?.getTiming().iterations!==Infinity)try{animation.finish();}catch{}});
 }
 function restoreMusicResumeState(route,ui) {
-  if(route.name==='music-shows')return musicShowsSetsLoaded || musicShowsSetsDataState==='error';
+  if(route.name==='set-detail')return restoreSetDossierState(ui);
+  if(route.name==='music-shows'){
+    if(!musicShowsSetsLoaded)return musicShowsSetsDataState==='error';
+    if(!ui.selectedShow && !ui.drawerOpen)return true;
+    return synchronicityArchiveDrawer?.restoreSetReturn?.(ui) === true;
+  }
   if(route.name==='music'){
     settleMusicResumeLanding();
     const button=[...document.querySelectorAll('[data-zhento-destination]')].find(node=>node.dataset.zhentoDestination===v3Text(ui.pillar));

@@ -34326,3 +34326,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .set-readout-text[data-pixel-transition] { clip-path:url(#set-readout-pixels); }
 .set-readout-mask { position:absolute;width:0;height:0;pointer-events:none; }
 .set-readout-mask rect { transform-box:fill-box;transform-origin:center; }
+
+/* S13F: discreet manual pause, isolated from the text's pixel mask. */
+.set-archive-readout .set-readout-play { position:absolute;right:60px;top:7px;width:24px;min-width:24px;height:24px;min-height:24px;font-size:.65rem;border:0;background:none; }
+.set-readout-label { padding-inline:26px; }

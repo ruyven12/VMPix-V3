@@ -3697,6 +3697,7 @@ function handlePrototypeEngineReturnEmitter(event) {
 
   event.preventDefault();
   event.stopPropagation();
+  if (route.name === "set-detail" && backSetDossierMode()) return;
   if (shouldShellBackUseHistory(route)) {
     window.history.back();
     return;
@@ -3920,8 +3921,13 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
     return historyState.bandUrl || getBandRouteUrl(route.bandId);
   }
   if (route.name === "set-detail") {
+    // Explicit known parent context wins; same-URL local entries retain this route.
+    const previous = historyState.__v3ShellPreviousRoute;
+    const parent = previous ? getRouteFromUrl(previous) : null;
+    if (parent && ["band-detail", "sets-archive", "show-detail", "music-shows"].includes(parent.name)) return parent.canonicalUrl;
+    if (historyState.fromShowDetail && getRouteFromUrl(historyState.showDetailUrl || "").name === "show-detail") return historyState.showDetailUrl;
     if (historyState.fromBandCapturedSets) return historyState.bandUrl || getBandRouteUrl(route.bandId);
-    return historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId);
+    return historyState.fromSetsArchive ? historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId) : getBandRouteUrl(route.bandId);
   }
   if (route.name === "wrestling-match-gallery") {
     if (typeof getWrestlingShowRouteUrl === "function") {
@@ -4077,6 +4083,7 @@ function performShellBack() {
 
   const route = getRouteFromUrl();
   const historyState = window.history.state || {};
+  if (route.name === "set-detail" && backSetDossierMode()) return;
   if (shouldShellBackUseHistory(route, historyState)) {
     window.history.back();
     return;
@@ -8229,6 +8236,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
+    if (handleSetDossierHistory(event)) return;
     cancelBandRecordOpening();
     cancelZhentoRhythmEntry();
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();
@@ -8300,6 +8308,12 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) {
       cancelV3ResumeRestore();
       v3RouteContext = { ...v3RouteContext, navigationCause: 'bfcache', skipEntryAnimation: true, isResume: true, pending: false };
+      if (getRouteFromUrl().name === "set-detail" && setDossierVisit) {
+        setDossierVisit.context = v3RouteContext;
+        if (setFeaturedPhotoLoad) setFeaturedPhotoLoad.context = v3RouteContext;
+        setSetArchiveReadoutVisible(true);
+        beginSetDossierLocalRestore(history.state?.setDossier?.ui || {});
+      }
       updateViewportMetrics(); updateShellBackState(getRouteFromUrl()); syncAmbientMotion(); syncPortfolioEngineLightningMotion();
     }
   });
