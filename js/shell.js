@@ -12,7 +12,9 @@ function setCurrentView(viewName) {
     setPortfolioEngineHudCurrentViewDetail("");
   }
   const route = getRouteFromUrl();
-  if (route.name === "band-detail") {
+  if (usesLegacyEngineCoverage(route)) {
+    setPortfolioEngineHudCurrentView(viewName);
+  } else if (route.name === "band-detail") {
     setPortfolioEngineHudCurrentView(getBandDetailEngineTitle(route.bandId));
   } else if (route.name === "set-detail") {
     setPortfolioEngineHudCurrentView(viewName);
@@ -3656,7 +3658,14 @@ function requestRingArchiveStats() {
   return ringArchiveStatsRequest;
 }
 
+// Engine coverage is independent of presentation mounting and route restoration.
+function usesLegacyEngineCoverage(route = getRouteFromUrl()) {
+  return ['music-people','person-detail','music-venues','music-venue-detail','show-detail','sets-archive',
+    'about','contact','calendar','connect'].includes(route?.name);
+}
+
 function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  if (usesLegacyEngineCoverage(route) || ['portfolio','wrestling-venues','wrestling-venue-detail','privacy','admin'].includes(route?.name)) return true;
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return true;
   return route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "set-detail" || route?.name === "music-shows" || route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people" ||
     route?.name === "wrestling-person-detail" || route?.name === "wrestling" || route?.name === "wrestling-shows" || route?.name === "wrestling-show-detail" ||
@@ -3666,6 +3675,7 @@ function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
   const origin = getShellHistoryOrigin(route);
   if (origin) return origin;
+  if (usesLegacyEngineCoverage(route) || ['portfolio','wrestling-venues','wrestling-venue-detail','privacy','admin'].includes(route?.name)) return getShellBackTarget(route);
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
   if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "set-detail" || route?.name === "music-shows") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
@@ -3735,6 +3745,8 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
   initPrototypeEngineReturnEmitter();
 
   const isActive = isPrototypeEngineReturnRoute(route);
+  const coveredBackLabel = usesLegacyEngineCoverage(route) || ['portfolio','wrestling-venues','wrestling-venue-detail','privacy','admin'].includes(route?.name)
+    ? 'Back to ' + getShellBackLabel(getShellBackTarget(route)) : '';
   const backLabel = route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation) ? "Back to Core Control Deck" : {
     "music": "Back to Portfolio",
     "music-bands": "Back to Zhento",
@@ -3748,7 +3760,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
     "wrestling-match-detail": "Back to Campaign Record",
     "wrestling-show-detail": "Back to Shows",
     "wrestling-shows": "Back to Wrestling",
-  }[route?.name];
+  }[route?.name] || coveredBackLabel;
   const isArchiveBack = Boolean(backLabel);
   // Photo routes retain their existing control, without the new BACK treatment.
   shell?.toggleAttribute("data-match-dossier-back", isArchiveBack);
@@ -3789,7 +3801,9 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
   const shellRouteName = route.name === "wrestling-match-detail-photo"
     ? "wrestling-match-detail"
     : route.name;
-  const shouldHideBottomRail = isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail" || route.name === "set-detail" || route.name === "music-shows";
+  const legacyEngine = usesLegacyEngineCoverage(route);
+  shell.toggleAttribute("data-shell-engine-legacy", legacyEngine);
+  const shouldHideBottomRail = legacyEngine || route.name === "privacy" || isHomeRoute || shellRouteName === "admin" || shellRouteName === "portfolio" || route.name === "music" || route.name === "music-bands" || route.name === "band-detail" || route.name === "set-detail" || route.name === "music-shows";
   shell.dataset.shellRoute = shellRouteName;
   syncShellMenuRoute(route);
   shell.dataset.shellActiveTarget = activeTarget;
@@ -3809,6 +3823,7 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     setPortfolioEngineHudCurrentView(route.name === "band-detail" ? getBandDetailEngineTitle(route.bandId) : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   if (route.name === "music-shows") setPortfolioEngineHudCurrentView("Pillar of Synchronicity");
+  if (legacyEngine) setPortfolioEngineHudCurrentView(currentView?.textContent || getShellBackLabel(route.canonicalUrl));
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (!isHomeRoute) clearHomeEngageReadiness();
@@ -7150,6 +7165,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     about: aboutShell,
     privacy: privacyShell,
     contact: contactShell,
+    connect: connectShell,
     admin: adminShell,
   };
 

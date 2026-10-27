@@ -129,6 +129,7 @@ button {
 .site-shell.is-home-route .universal-bottom-rail {
   display: none;
 }
+.site-shell[data-shell-engine-legacy],
 .site-shell[data-shell-route="portfolio"],
 .site-shell:is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back])) {
   --portfolio-engine-height: clamp(3.35rem, 7.8svh, 4.7rem);
@@ -13369,6 +13370,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 /* Zhento landing colors the persistent Shell Engine without changing its ownership. */
+.site-shell[data-shell-engine-legacy][data-shell-module="music"] .portfolio-engine,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]), [data-shell-route="music-shows"])) .portfolio-engine {
   --engine-accent: 137 123 235;
   --engine-accent-soft: 173 186 255;
@@ -13398,6 +13400,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left,
+.site-shell[data-shell-engine-legacy] .portfolio-engine-panel--left,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]), [data-shell-route="music-shows"])) .portfolio-engine-panel--left {
   position: absolute;
   z-index: 3;
@@ -13415,9 +13418,11 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-label,
+.site-shell[data-shell-engine-legacy] .portfolio-engine-panel--left .portfolio-engine-label,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]), [data-shell-route="music-shows"])) .portfolio-engine-panel--left .portfolio-engine-label { display: block; text-transform: none; }
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell[data-world-landing-world="zhento"]:is([data-world-landing-phase="departure"], [data-world-landing-phase="preparing"], [data-world-landing-phase="transport"], [data-world-landing-phase="landing"]) .portfolio-engine-panel--left .portfolio-engine-value,
+.site-shell[data-shell-engine-legacy] .portfolio-engine-panel--left .portfolio-engine-value,
 .site-shell:is([data-shell-route="music"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]), [data-shell-route="music-shows"])) .portfolio-engine-panel--left .portfolio-engine-value { white-space: nowrap; text-transform: none; }
 /* Band identities retain the existing single-line readout without covering either emitter. */
 .site-shell:is([data-shell-route="band-detail"], [data-shell-route="set-detail"]) .portfolio-engine-panel--left .portfolio-engine-value { overflow: hidden; text-overflow: ellipsis; }
@@ -15040,4 +15045,29 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 @media (max-height: 480px) and (min-width: 600px) {
   .trajectory-overlay__content { padding-top: 24px; }
+}
+
+/* BACK-02D: keep legacy content mounted; reserve its existing Shell viewport above Engine. */
+.site-shell:is([data-shell-engine-legacy], [data-shell-route="privacy"]) .universal-bottom-rail { display: none; }
+.site-shell[data-shell-engine-legacy] .portfolio-engine {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+}
+.site-shell[data-shell-engine-legacy] .public-home {
+  padding-block-end: calc(var(--portfolio-engine-height) + var(--portfolio-engine-bottom-offset) + 1rem);
+  overflow-y: hidden;
+}
+.site-shell[data-shell-engine-legacy] .portfolio-engine-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 43.999rem) {
+  .site-shell[data-shell-engine-legacy][data-shell-route="connect"] .connect-shell {
+    height: calc(100% - var(--portfolio-engine-height) - var(--portfolio-engine-bottom-offset) - 1rem);
+    min-height: 0;
+    max-height: calc(100% - var(--portfolio-engine-height) - var(--portfolio-engine-bottom-offset) - 1rem);
+  }
 }
