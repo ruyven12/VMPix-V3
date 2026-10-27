@@ -32062,6 +32062,9 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel-copy { min-width:0; }
 .band-personnel-name,.band-personnel-role,.band-personnel-status { margin:0;text-transform:none;overflow-wrap:anywhere; }
 .band-personnel-name { font-size:clamp(.9rem,2.5vw,1.1rem);line-height:1.4;color:inherit; }
+/* BM-01: band-specific membership, alongside the existing name without changing the roster. */
+.band-personnel-membership { display:inline-block;vertical-align:middle;padding:.12em .35em;border:1px solid rgba(141,204,239,.3);border-radius:2px;color:#a5d5ee;font-size:.625rem;line-height:1.4;letter-spacing:.025em;white-space:nowrap; }
+.band-personnel-record[data-member-status="past"] .band-personnel-membership { border-color:rgba(163,168,182,.28);color:#b8bdc9; }
 .band-personnel-role { display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;text-align:right;color:#bfc9e5;font-size:.8rem;line-height:1.4; }
 .band-personnel-role > :first-child { min-width:0; }
 .band-personnel-role-icons { display:flex;flex-direction:column;align-items:center;gap:.2rem;flex:none; }

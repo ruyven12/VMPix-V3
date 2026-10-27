@@ -1804,6 +1804,13 @@ function createBandPersonnelCard(member, status, session) {
   const name = document.createElement('p');
   name.className = 'band-personnel-name';
   name.textContent = member.name;
+  if (status === 'current' || status === 'past') {
+    const badge = document.createElement('span');
+    badge.className = 'band-personnel-membership';
+    badge.textContent = status.toUpperCase();
+    badge.setAttribute('aria-hidden', 'true'); // The existing accessible membership text already supplies this status.
+    name.append(document.createTextNode(' '), badge);
+  }
   const role = document.createElement('p');
   role.className = 'band-personnel-role';
   const icons = document.createElement('span');
