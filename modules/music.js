@@ -6019,7 +6019,7 @@ function setSetGalleryVisible(isVisible) {
     setGalleryModeVisible(false);
   }
   setGallery.setAttribute("aria-hidden", String(!isVisible));
-  setSetEventInformationVisible(isVisible);
+  setSetArchiveReadoutVisible(isVisible);
   if (isVisible) syncSetFeaturedPhoto(activeGalleryPhoto);
   else if (getRouteFromUrl().name !== "set-detail") resetSetFeaturedPhoto();
   if (isVisible) {
@@ -6826,9 +6826,7 @@ function updateSetGalleryFromRow(row) {
     return;
   }
 
-  closeSetEventInformation(false);
   resetSetFeaturedPhoto();
-  if (setEventScroll) setEventScroll.scrollTop = 0;
   const setData = row.dataset;
   const imageAccent = getSetImageAccent(row);
   if (setGalleryBand) {
@@ -6855,12 +6853,6 @@ function updateSetGalleryFromRow(row) {
   if (setGalleryTitle) {
     setGalleryTitle.textContent = setData.setTitle || "Untitled Show";
   }
-  if (setEventTitle) {
-    const title = setGalleryTitle?.textContent || "Untitled Show";
-    setEventTitle.textContent = title;
-    setEventToggle.setAttribute("aria-label", `Event information: ${title}`);
-    setEventToggle.title = title;
-  }
   if (setGalleryShowId) {
     setGalleryShowId.textContent = getSetShowId(row);
   }
@@ -6885,6 +6877,7 @@ function updateSetGalleryFromRow(row) {
   if (setGalleryNotes) {
     setGalleryNotes.textContent = getSetNotes(row);
   }
+  syncSetReadout();
   activeSetGalleryPhotoMode = "preview";
   activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
   setSetGalleryPhotoWarning("");
@@ -7570,59 +7563,139 @@ function createSetGalleryPhotoTile(photo, index = 0) {
   return tile;
 }
 
-// S13E: local information disclosure inside the existing Shell-owned Set viewport.
-const setEventUi = document.querySelector("[data-set-event-ui]");
-const setEventDrawer = setEventUi?.querySelector("[data-set-event-drawer]");
-const setEventToggle = setEventUi?.querySelector("[data-set-event-toggle]");
-const setEventTitle = setEventToggle?.querySelector("[data-set-event-title]");
-const setEventScroll = setEventUi?.querySelector("[data-set-event-scroll]");
-let setEventSession = null;
+// S13E.2: a local readout of the existing normalized Set metadata bindings.
+const setReadout = document.querySelector("[data-set-readout]");
+const setReadoutText = setReadout?.querySelector("[data-set-readout-text]");
+const setReadoutLabel = setReadout?.querySelector("[data-set-readout-label]");
+const setReadoutValue = setReadout?.querySelector("[data-set-readout-value]");
+const setReadoutPrevious = setReadout?.querySelector("[data-set-readout-previous]");
+const setReadoutNext = setReadout?.querySelector("[data-set-readout-next]");
+const setReadoutFields = [
+  ["Event Title", setGalleryTitle], ["Show ID", setGalleryShowId],
+  ["City / State", setGalleryCity], ["Venue", setGalleryVenue],
+  ["Event Date", setGalleryDate], ["Performance Number", setGalleryPerformance],
+  ["Photograph Count", setGalleryPhotos], ["Album Status", setGalleryContributors],
+  ["Camera", setGalleryCamera], ["Notes", setGalleryNotes], ["Band Name", setGalleryBand]
+];
+const setReadoutState = { entry: null, index: 0, shown: -1, transition: null, events: null, pixels: [] };
 
-function closeSetEventInformation(restoreFocus = true) {
-  const s = setEventSession;
-  if (!s) return;
-  setEventSession = null;
-  s.events.abort();
-  setEventDrawer.hidden = true;
-  setEventToggle.setAttribute("aria-expanded", "false");
-  setEventUi.querySelector("[data-set-event-chevron]").textContent = "\u2303";
-  setDossierViewport.classList.remove("is-set-event-open");
-  s.content.inert = s.wasInert;
-  if (restoreFocus && getRouteFromUrl().name === "set-detail" && !setEventUi.hidden) {
-    s.content.scrollTo({ top: s.scrollTop, left: s.scrollLeft, behavior: "instant" });
-    setEventToggle.focus({ preventScroll: true });
+function renderSetReadout() {
+  if (!setReadout) return;
+  const state = setReadoutState, [label, source] = setReadoutFields[state.index];
+  const value = source?.textContent.trim() || "N/A";
+  setReadoutLabel.textContent = label;
+  setReadoutValue.textContent = value;
+  setReadoutValue.title = value;
+  setReadoutValue.setAttribute("aria-label", `${label}: ${value}`);
+  setReadout.dataset.field = String(state.index);
+  setReadoutValue.classList.toggle("is-notes", label === "Notes");
+  if (state.shown !== state.index) setReadoutValue.scrollTop = setReadoutValue.scrollLeft = 0;
+  state.shown = state.index;
+  setReadoutPrevious.setAttribute("aria-label", `Previous archive field; current field: ${label}`);
+  setReadoutNext.setAttribute("aria-label", `Next archive field; current field: ${label}`);
+}
+
+function settleSetReadout() {
+  const transition = setReadoutState.transition;
+  setReadoutState.transition = null;
+  if (transition) {
+    clearTimeout(transition.deadline);
+    transition.animations.forEach(animation => animation.cancel());
+  }
+  setReadoutText?.removeAttribute("data-pixel-transition");
+  setReadoutText?.removeAttribute("aria-busy");
+  renderSetReadout();
+}
+
+function syncSetReadout() {
+  const entry = v3RouteContext.entry;
+  if (setReadoutState.entry !== entry) {
+    settleSetReadout();
+    setReadoutState.entry = entry;
+    setReadoutState.index = 0;
+  }
+  if (!setReadoutState.transition || setReadoutState.transition.phase === "in") renderSetReadout();
+}
+
+async function moveSetReadout(direction) {
+  if (!setReadout || setReadout.hidden || getRouteFromUrl().name !== "set-detail") return;
+  const state = setReadoutState;
+  state.index = (state.index + direction + setReadoutFields.length) % setReadoutFields.length;
+  // Rapid presses update the target without restarting the current pixel sequence.
+  if (state.transition) {
+    if (state.transition.phase === "in") renderSetReadout();
+    return;
+  }
+  if (reducedMotion.matches || document.hidden || !state.pixels[0]?.animate) {
+    renderSetReadout(); return;
+  }
+  const transition = { animations: [], deadline: 0, phase: "out" };
+  state.transition = transition;
+  setReadoutText.setAttribute("aria-busy", "true");
+  transition.deadline = setTimeout(() => { if (state.transition === transition) settleSetReadout(); }, 400);
+  const phase = async entering => {
+    transition.phase = entering ? "in" : "out";
+    setReadoutText.dataset.pixelTransition = transition.phase;
+    transition.animations = state.pixels.map((pixel, index) => pixel.animate([
+      { transform: entering ? "scale(0)" : "scale(1)" },
+      { transform: entering ? "scale(1)" : "scale(0)" }
+    ], { duration: 70, delay: ((index * 17) % 6) * 5, easing: "steps(4, end)", fill: "both" }));
+    await Promise.all(transition.animations.map(animation => animation.finished));
+  };
+  try {
+    await phase(false);
+    if (state.transition !== transition) return;
+    const outgoing = transition.animations;
+    renderSetReadout();
+    const incoming = phase(true);
+    outgoing.forEach(animation => animation.cancel());
+    await incoming;
+    if (state.transition === transition) settleSetReadout();
+  } catch {
+    if (state.transition === transition) settleSetReadout();
   }
 }
 
-function setSetEventInformationVisible(visible) {
-  if (!setEventUi) return;
+function setSetArchiveReadoutVisible(visible) {
+  if (!setReadout) return;
   const show = visible && getRouteFromUrl().name === "set-detail";
-  if (!show) closeSetEventInformation(false);
-  setEventUi.hidden = !show;
-}
-
-function openSetEventInformation() {
-  if (setEventSession || !setEventUi || setEventUi.hidden || getRouteFromUrl().name !== "set-detail" ||
-    setGallery?.getAttribute("aria-hidden") !== "false" || musicNexusShell?.parentElement !== setDossierViewport) return;
-  const s = { content: musicNexusShell, wasInert: musicNexusShell.inert,
-    scrollTop: musicNexusShell.scrollTop, scrollLeft: musicNexusShell.scrollLeft, events: new AbortController() };
-  setEventSession = s;
-  s.content.inert = true;
-  setDossierViewport.classList.add("is-set-event-open");
-  setEventDrawer.hidden = false;
-  setEventToggle.setAttribute("aria-expanded", "true");
-  setEventUi.querySelector("[data-set-event-chevron]").textContent = "\u2304";
-  setEventUi.querySelector("[data-set-event-close]").focus({ preventScroll: true });
-  window.addEventListener("pagehide", () => closeSetEventInformation(false), { signal: s.events.signal });
-}
-
-setEventToggle?.addEventListener("click", () => setEventSession ? closeSetEventInformation() : openSetEventInformation());
-setEventUi?.querySelector("[data-set-event-close]")?.addEventListener("click", () => closeSetEventInformation());
-setEventUi?.addEventListener("keydown", event => {
-  if (event.key === "Escape" && setEventSession && !event.defaultPrevented) {
-    event.preventDefault(); event.stopPropagation(); closeSetEventInformation();
+  setReadout.hidden = !show;
+  if (!show) {
+    settleSetReadout();
+    setReadoutState.events?.abort();
+    setReadoutState.events = null;
+    return;
   }
-});
+  syncSetReadout();
+  if (setReadoutState.events) return;
+  const events = new AbortController();
+  setReadoutState.events = events;
+  const listen = (node, type, handler) => node.addEventListener(type, handler, { signal: events.signal });
+  if (!setReadoutState.pixels.length) {
+    const mask = setReadout.querySelector("clipPath");
+    // Same clipping-cell technique as Band tabs, confined to the small text display.
+    for (let index = 0; index < 48; index += 1) {
+      const pixel = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      pixel.setAttribute("x", String((index % 12) / 12));
+      pixel.setAttribute("y", String(Math.floor(index / 12) / 4));
+      pixel.setAttribute("width", String(1 / 12));
+      pixel.setAttribute("height", String(1 / 4));
+      mask.append(pixel); setReadoutState.pixels.push(pixel);
+    }
+  }
+  listen(setReadoutPrevious, "click", () => moveSetReadout(-1));
+  listen(setReadoutNext, "click", () => moveSetReadout(1));
+  listen(setReadout, "keydown", event => {
+    // The value region keeps native keyboard scrolling, particularly for Notes.
+    if (!event.target.closest("button") || event.altKey || event.ctrlKey || event.metaKey ||
+      !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault(); event.stopPropagation();
+    moveSetReadout(event.key === "ArrowLeft" ? -1 : 1);
+  });
+  listen(reducedMotion, "change", () => { if (reducedMotion.matches) settleSetReadout(); });
+  listen(document, "visibilitychange", () => { if (document.hidden) settleSetReadout(); });
+  listen(window, "pagehide", () => setSetArchiveReadoutVisible(false));
+}
 
 // S13D: an Individual Set content mode. The shared lightbox and its consumers stay separate.
 let setFocusSession = null;
