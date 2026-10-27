@@ -14516,6 +14516,21 @@ function initSynchronicityArchiveDrawer(viewport) {
     }
     return true;
   };
+  state.restoreLocalHistory = (open, ui, immediate = false) => {
+    if (!available()) return false;
+    if (!open) {
+      state.releaseSelection();
+      change(false);
+      return true;
+    }
+    if (ui.selectedShow) return state.restoreSetReturn(ui);
+    state.scrollTop = v3Number(ui.drawerScroll);
+    setExpanded(ui.drawerExpanded !== false);
+    change(true, immediate);
+    content.scrollTop = state.scrollTop;
+    return true;
+  };
+  const requestClose = () => { if (!backShellLocalDrilldown("synchronicity-drawer")) change(false); };
   state.returnToArchive = selection => {
     const view = state.selectionView;
     if (!available() || !view || view.selection !== selection) return false;
@@ -14559,9 +14574,14 @@ function initSynchronicityArchiveDrawer(viewport) {
   content.addEventListener("scroll", () => {
     if (state.entry && !layer.hidden && content.contains(musicActivityPanel)) state.scrollTop = content.scrollTop;
   }, { passive: true });
-  explore.addEventListener("click", () => { if (!available()) return; if (!state.motion) setExpanded(true); change(true); });
-  close.addEventListener("click", () => change(false));
-  layer.querySelector("[data-synchronicity-drawer-backdrop]").addEventListener("click", () => change(false));
+  explore.addEventListener("click", () => {
+    if (!available() || state.open || !pushShellLocalDrilldown("synchronicity-drawer")) return;
+    if (!state.motion) setExpanded(true);
+    change(true);
+    checkpointV3Resume();
+  });
+  close.addEventListener("click", requestClose);
+  layer.querySelector("[data-synchronicity-drawer-backdrop]").addEventListener("click", requestClose);
   expand.addEventListener("click", () => {
     if (state.motion) return;
     const top = content.scrollTop;
@@ -14569,10 +14589,10 @@ function initSynchronicityArchiveDrawer(viewport) {
     content.scrollTop = top;
   });
   drawer.addEventListener("keydown", event => {
-    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); change(false); }
+    if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); requestClose(); }
   });
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && state.motion && available()) { event.preventDefault(); change(false); }
+    if (event.key === "Escape" && state.motion && available()) { event.preventDefault(); requestClose(); }
   });
   document.addEventListener("visibilitychange", () => { if (state.motion) playMotion(); });
   reducedMotion.addEventListener("change", () => { if (reducedMotion.matches && state.motion) finish(); });
@@ -14623,7 +14643,7 @@ function prepareSynchronicityMemories() {
   synchronicityMemoriesSession = session;
   stage.setAttribute("aria-busy", "true");
   const current = () => synchronicityMemoriesSession === session && !viewport.hidden &&
-    getRouteFromUrl().name === "music-shows" && v3RouteContext.entry === entry && musicShowsSetsCollection === source;
+    getRouteFromUrl().name === "music-shows" && v3RouteContext.entry === session.entry && musicShowsSetsCollection === source;
   const photoSrc = photo => String(photo?.small_url || photo?.smallUrl || getMusicAlbumPhotoImageSrc(photo)).trim();
   const usable = src => Boolean(src && isMusicShowPosterImageSrc(src) && src !== SET_GALLERY_NO_POSTER_IMAGE_SRC && !/\/(?:placeholders|Band-Logos)\//i.test(src));
   const decode = src => new Promise(resolve => {
@@ -17581,7 +17601,7 @@ function captureMusicResumeState(route) {
   if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter,
     selectedShow:synchronicityMemoriesSession?.selection?.id || '',fromTimeline:synchronicityMemoriesSession?.selection?.fromTimeline === true,
     drawerOpen:synchronicityArchiveDrawer?.open === true,drawerExpanded:synchronicityArchiveDrawer?.expanded === true,
-    drawerScroll:synchronicityArchiveDrawer?.scrollTop || 0,years:[...(synchronicityTimeline.expanded || [])]};
+    drawerScroll:synchronicityArchiveDrawer?.scrollTop || 0,years:synchronicityTimeline.expanded ? [...synchronicityTimeline.expanded] : null};
   if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
   if(route.name==='band-detail')return {personnel:bandDetail.querySelector('.band-personnel')?.dataset.personnelSelection,bandTab:bandContentState.transition?.target || bandContentState.active,capturedIndex:bandCapturedSetsSession?.selected || 0,capturedSetCode:bandCapturedSetsSession?.rows[bandCapturedSetsSession.selected]?.setCode || ''};
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
@@ -17602,7 +17622,12 @@ function settleMusicResumeLanding() {
 function restoreMusicResumeState(route,ui) {
   if(route.name==='set-detail')return restoreSetDossierState(ui);
   if(route.name==='music-shows'){
-    if(!musicShowsSetsLoaded)return musicShowsSetsDataState==='error';
+    if(!musicShowsSetsLoaded){
+      // A restored local drawer must still expose the existing loading/error UI.
+      if(getShellLocalDrilldown()?.open && (!ui.selectedShow || musicShowsSetsDataState==='error'))
+        return synchronicityArchiveDrawer?.restoreLocalHistory?.(true,{...ui,selectedShow:''},true) === true;
+      return musicShowsSetsDataState==='error';
+    }
     if(!ui.selectedShow && !ui.drawerOpen)return true;
     return synchronicityArchiveDrawer?.restoreSetReturn?.(ui) === true;
   }

@@ -15167,7 +15167,7 @@ function handleWrestlingPersonDossierPrototypeEventArchiveKeydown(event) {
   }
 }
 
-function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPersonDossierPrototypeShell, trigger = null, analytics = null) {
+function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPersonDossierPrototypeShell, trigger = null, analytics = null, options = {}) {
   const archive = getWrestlingPersonDossierPrototypeEventArchive(shell);
   const dialog = getWrestlingPersonDossierPrototypeEventArchiveDialog(shell);
   const framework = shell?.querySelector(".wrestling-person-dossier-prototype-framework");
@@ -15177,6 +15177,8 @@ function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPerson
     return false;
   }
 
+  if (state.isOpen) return true;
+  if (options.history === true && !pushShellLocalDrilldown("person-event-archive")) return false;
   if (state.closeTimer) {
     window.clearTimeout(state.closeTimer);
     state.closeTimer = 0;
@@ -15212,10 +15214,20 @@ function openWrestlingPersonDossierPrototypeEventArchive(shell = wrestlingPerson
     archive.dataset.wrestlingPersonDossierPrototypeEventArchiveState = "open";
     focusTarget.focus({ preventScroll: true });
   });
+  if (options.history === true) checkpointV3Resume();
   return true;
 }
 
+function restoreWrestlingPersonArchiveHistory(open, ui) {
+  if (!open) {
+    closeWrestlingPersonDossierPrototypeEventArchive({ fromHistory: true });
+    return true;
+  }
+  return restoreWrestlingResumeState(getRouteFromUrl(), { ...ui, open: true });
+}
+
 function closeWrestlingPersonDossierPrototypeEventArchive(options = {}) {
+  if (!options.fromHistory && !options.immediate && backShellLocalDrilldown("person-event-archive")) return;
   const archive = getWrestlingPersonDossierPrototypeEventArchive();
   const shell = wrestlingPersonDossierPrototypeShell;
   const framework = shell?.querySelector(".wrestling-person-dossier-prototype-framework");
@@ -15226,6 +15238,7 @@ function closeWrestlingPersonDossierPrototypeEventArchive(options = {}) {
     return;
   }
 
+  if (state.closeTimer) { window.clearTimeout(state.closeTimer); state.closeTimer = 0; }
   state.isOpen = false;
   wrestlingArchiveAnalyticsGalleryIntents.delete(archive);
   clearWrestlingArchiveInlinePhotoAnalytics();
@@ -15280,7 +15293,7 @@ function bindWrestlingPersonDossierPrototypeEventHistoryInteractions(shell = wre
     }
     event.preventDefault();
     const analytics = typeof beginArchiveAnalytics === "function" ? beginArchiveAnalytics(event, "open") : null;
-    openWrestlingPersonDossierPrototypeEventArchive(shell, openEvent, analytics);
+    openWrestlingPersonDossierPrototypeEventArchive(shell, openEvent, analytics, { history: true });
   });
   timeline.addEventListener("keydown", (event) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {

@@ -4076,6 +4076,7 @@ function performShellBack() {
   if (bandRecordOpening || route.name === "home") return;
   // S13F remains the first and unchanged local Back owner.
   if (route.name === "set-detail" && backSetDossierMode()) return;
+  if (backShellLocalDrilldown()) return;
   const entry = window.history.state?.v3EntryId;
   if (entry && shellBackPendingEntry === entry) return;
   if (shouldShellBackUseHistory(route)) {
@@ -8232,6 +8233,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.
     if (handleSetDossierHistory(event)) return;
+    if (handleShellLocalDrilldownHistory(event)) return;
     cancelBandRecordOpening();
     cancelZhentoRhythmEntry();
     const targetRoute = getRouteFromUrlWithPrototypePrecedence();

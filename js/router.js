@@ -294,6 +294,10 @@ function checkpointV3Resume(allowDeparted = false) {
   if(!context.entry || context.pending || !isCurrentV3Route(context.route) || (allowDeparted !== true && context.url!==(getRouteFromUrl().canonicalUrl || getPathWithSearch())))return;
   try {
     const ui=context.route.name.startsWith('music')||['band-detail','set-detail'].includes(context.route.name) ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
+    rememberShellLocalDrilldownUI(context, ui);
+    if (getShellLocalDrilldown(history.state, context.route) && history.state.v3EntryId === context.entry) {
+      history.replaceState({ ...history.state, localDrilldown: { ...history.state.localDrilldown, ui } }, "", location.href);
+    }
     const snapshot={version:V3_RESUME_VERSION,entry:context.entry,url:context.url,ui,scroll:captureV3Scroll()};
     if (context.route.name === "set-detail" && history.state?.v3EntryId === context.entry) {
       history.replaceState({ ...history.state, setDossier: { ...history.state.setDossier, ui } }, "", location.href);
@@ -324,12 +328,18 @@ function beginV3RouteContext(route,options){
   if (!snapshot && route.name === "set-detail" && ['reload','back-forward'].includes(cause) && history.state?.setDossier?.ui) {
     snapshot = { version: V3_RESUME_VERSION, entry, url, ui: history.state.setDossier.ui, scroll: [] };
   }
+  const local = getShellLocalDrilldown(history.state, route);
+  if (local && ['reload','back-forward'].includes(cause)) {
+    const ui = { ...(snapshot?.ui || local.ui || {}), [route.name === "music-shows" ? "drawerOpen" : "open"]: local.open };
+    snapshot = { version: V3_RESUME_VERSION, entry, url, ui, scroll: snapshot?.scroll || [] };
+  }
   // Band identification replays on a fresh visit or a top-of-page reload only.
   const bandScrolled = Array.isArray(snapshot?.scroll) && snapshot.scroll.some(row =>
     ['shell','[data-band-detail-content]'].includes(row?.key) && v3Number(row.top) > 1);
   const bandEntranceEligible = route.name === 'band-detail' && !['back-forward','bfcache'].includes(cause)
     && (cause !== 'reload' || !bandScrolled);
   v3RouteContext={bandEntranceEligible,navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
+  v3RouteContext.localFamily = local?.family;
   if(snapshot)try{if(route.name.startsWith('music')||['band-detail','set-detail'].includes(route.name))seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
   queueMicrotask(()=>{
     const context=v3RouteContext;
@@ -473,6 +483,107 @@ function handleSetDossierHistory(event) {
   context.entry = state.v3EntryId;
   shellHistoryIndex = getShellHistoryIndex(state);
   beginSetDossierLocalRestore({ ...ui, ...readout });
+  return true;
+}
+
+// Two supported local drilldowns share Shell history IDs and resume storage.
+// A base entry is annotated only on an explicit opening; boot never pushes history.
+function getShellLocalDrilldownKind(route = getRouteFromUrl()) {
+  return route.name === "music-shows" ? "synchronicity-drawer"
+    : route.name === "wrestling-person-detail" ? "person-event-archive" : "";
+}
+function getShellLocalDrilldown(state = history.state, route = getRouteFromUrl()) {
+  const local = state?.localDrilldown, kind = getShellLocalDrilldownKind(route);
+  if (!kind || !local || local.kind !== kind || local.url !== route.canonicalUrl ||
+      typeof local.open !== "boolean" || !/^[a-zA-Z0-9-]{8,80}$/.test(local.family || "") ||
+      !/^[a-zA-Z0-9-]{8,80}$/.test(state.v3EntryId || "") || getShellHistoryIndex(state) === null ||
+      (local.open && !/^[a-zA-Z0-9-]{8,80}$/.test(local.previousEntry || ""))) return null;
+  return local;
+}
+function captureShellLocalDrilldownUI(route) {
+  const ui = route.name === "music-shows" ? captureMusicResumeState(route) : captureWrestlingResumeState(route);
+  // A native Back can arrive before the passive scroll checkpoint runs.
+  if (route.name === "music-shows") {
+    const content = document.querySelector('[data-synchronicity-archive-content]');
+    if (content && !content.closest('[data-synchronicity-drawer-layer]')?.hidden) ui.drawerScroll = content.scrollTop;
+  }
+  return ui;
+}
+function rememberShellLocalDrilldownUI(context, ui) {
+  if (!context.localFamily) return;
+  const snapshots = context.localSnapshots || (context.localSnapshots = new Map());
+  snapshots.set(context.entry, ui);
+  // One parent and its current local child; no separate route-history stack.
+  while (snapshots.size > 2) snapshots.delete(snapshots.keys().next().value);
+}
+function adoptShellLocalDrilldownEntry(entry) {
+  v3RouteContext.entry = entry;
+  v3EntriesRenderedInDocument.add(entry);
+  if (v3RouteContext.route.name === "music-shows") {
+    if (synchronicityArchiveDrawer) synchronicityArchiveDrawer.entry = entry;
+    if (synchronicityMemoriesSession) synchronicityMemoriesSession.entry = entry;
+  }
+}
+function pushShellLocalDrilldown(kind) {
+  const route = getRouteFromUrl(), context = v3RouteContext;
+  if (kind !== getShellLocalDrilldownKind(route) || route.canonicalUrl !== context.url ||
+      context.entry !== history.state?.v3EntryId || context.pending || context.localBackPending) return false;
+  let local = getShellLocalDrilldown();
+  if (local?.open) return false;
+  checkpointV3Resume();
+  const ui = captureShellLocalDrilldownUI(route);
+  local = { kind, url: context.url, family: local?.family || context.entry, open: false, ui };
+  history.replaceState({ ...history.state, localDrilldown: local }, "", location.href);
+  context.localFamily = local.family;
+  rememberShellLocalDrilldownUI(context, ui);
+  const previous = history.state, entry = createV3EntryId(), index = (getShellHistoryIndex(previous) ?? 0) + 1;
+  history.pushState({ ...previous, v3EntryId: entry, [SHELL_HISTORY_INDEX_KEY]: index,
+    localDrilldown: { ...local, open: true, previousEntry: previous.v3EntryId } }, "", location.href);
+  shellHistoryIndex = index;
+  adoptShellLocalDrilldownEntry(entry);
+  return true;
+}
+function backShellLocalDrilldown(kind = getShellLocalDrilldownKind()) {
+  const local = getShellLocalDrilldown();
+  if (!local?.open || local.kind !== kind || local.family !== v3RouteContext.localFamily) return false;
+  if (!v3RouteContext.localBackPending) {
+    checkpointV3Resume();
+    v3RouteContext.localBackPending = true;
+    history.back();
+  }
+  return true;
+}
+function handleShellLocalDrilldownHistory(event) {
+  const route = getRouteFromUrl(), context = v3RouteContext, local = getShellLocalDrilldown(event.state, route);
+  if (!local || route.canonicalUrl !== context.url || route.name !== context.route?.name || local.family !== context.localFamily) return false;
+  rememberShellLocalDrilldownUI(context, captureShellLocalDrilldownUI(route));
+  let ui = context.localSnapshots?.get(event.state.v3EntryId);
+  if (!ui) try {
+    const saved = JSON.parse(sessionStorage.getItem(v3ResumeKey(event.state.v3EntryId, context.url)));
+    if (saved?.version === V3_RESUME_VERSION && saved.entry === event.state.v3EntryId && saved.url === context.url) ui = saved.ui;
+  } catch { /* History's compact snapshot also works without storage. */ }
+  ui = { ...(ui || local.ui || {}), [route.name === "music-shows" ? "drawerOpen" : "open"]: local.open };
+  cancelShellBackSweep();
+  cancelV3ResumeRestore();
+  adoptShellLocalDrilldownEntry(event.state.v3EntryId);
+  shellHistoryIndex = getShellHistoryIndex(event.state);
+  context.localBackPending = false;
+  context.pending = true;
+  context.applied = false;
+  context.snapshot = { ui, scroll: [] };
+  const restore = () => {
+    if (v3RouteContext !== context) return;
+    const ready = route.name === "music-shows"
+      ? synchronicityArchiveDrawer?.restoreLocalHistory?.(local.open, ui)
+      : restoreWrestlingPersonArchiveHistory(local.open, ui);
+    if (ready) { context.pending = false; cancelV3ResumeRestore(); checkpointV3Resume(); }
+  };
+  v3ResumeWake = restore;
+  v3ResumeObserver = new MutationObserver(restore);
+  v3ResumeObserver.observe(document.querySelector('.site-shell'), { childList: true, subtree: true,
+    attributes: true, attributeFilter: ['data-wrestling-person-dossier-prototype-event-archive-photo-state'] });
+  v3ResumeDeadline = setTimeout(() => { context.pending = false; cancelV3ResumeRestore(); }, 20000);
+  restore();
   return true;
 }
 
