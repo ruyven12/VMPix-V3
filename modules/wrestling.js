@@ -20181,6 +20181,7 @@ function restoreWrestlingResumeState(route,ui) {
       if(ui.mode==='viewer' && state.photoRenderItems.length)openWrestlingPersonDossierPrototypeEventArchiveViewer(archive,Math.min(Math.floor(v3Number(ui.photo)),state.photoRenderItems.length-1));
     }return true;
   }
+  if(route.name==='wrestling-venue-detail')return !['idle','loading'].includes(wrestlingVenuesDataState);
   if(route.name==='wrestling-show-detail' || route.name.startsWith('wrestling-match-detail')){
     if(['idle','loading'].includes(wrestlingShowsDataState))return false;
     if(route.name.startsWith('wrestling-match-detail'))return Boolean(document.querySelector('[data-record-info-state="visible"]')) || wrestlingShowsDataState==='error';

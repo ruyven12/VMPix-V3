@@ -7165,8 +7165,9 @@ function resetShellScroller(scroller) {
 }
 
 function stabilizeShellViewport(route = getRouteFromUrl(), options = {}) {
-  // Shows restoration owns its saved position, including data-delayed reloads.
-  if (route.name === "music-shows" && v3RouteContext.snapshot) return;
+  // Entry restoration owns saved positions, including data-delayed reloads.
+  if (v3RouteContext.snapshot && (route.name === "music-shows" ||
+      (isScopedRouteResume(route) && v3RouteContext.route === route))) return;
   const entry = daiionGatewayTransition;
   const persistentViewportUnchanged = (route.name === "wrestling" || (route.name === "music" && entry?.worldName === "soundtrack")) && entry?.promoted
     && entry.generation === portfolioGatewayGeneration && entry.viewportUnchanged;

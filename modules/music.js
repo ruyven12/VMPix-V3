@@ -4872,7 +4872,7 @@ function updateVenueRelationshipFocusWithMotion(card, updateFocus) {
   const shouldReduceMotion = typeof window !== "undefined"
     && typeof window.matchMedia === "function"
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!card || shouldReduceMotion) {
+  if (!card || shouldReduceMotion || (getRouteFromUrl().name === "music-venue-detail" && v3RouteContext.pending)) {
     updateFocus();
     return;
   }
@@ -5207,6 +5207,7 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
 }
 
 function showMusicVenueDetail(venueSlug) {
+  const context = v3RouteContext;
   activeMusicVenueDetailSlug = normalizeMusicVenueSlugValue(venueSlug);
   const venue = venueSlugToVenue(activeMusicVenueDetailSlug);
   renderMusicVenueDetail(venue, activeMusicVenueDetailSlug);
@@ -5216,7 +5217,7 @@ function showMusicVenueDetail(venueSlug) {
   setMusicActivityPanelVisible(false);
   setVenueDetailVisible(true);
   setCurrentView("Venue Detail");
-  if (musicNexusShell) {
+  if (musicNexusShell && !v3RouteContext.snapshot) {
     musicNexusShell.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -5228,7 +5229,7 @@ function showMusicVenueDetail(venueSlug) {
     requestMusicShowsSetsData(),
   ]).then(() => {
     const route = getRouteFromUrl();
-    if (route.name !== "music-venue-detail" || normalizeMusicVenueSlugValue(route.venueSlug) !== activeMusicVenueDetailSlug) {
+    if (v3RouteContext !== context || route.name !== "music-venue-detail" || normalizeMusicVenueSlugValue(route.venueSlug) !== activeMusicVenueDetailSlug) {
       return;
     }
     renderMusicVenueDetail(venueSlugToVenue(activeMusicVenueDetailSlug), activeMusicVenueDetailSlug);
@@ -13020,6 +13021,7 @@ function renderMusicPersonDetail(data) {
 }
 
 function showMusicPersonDetail(personId) {
+  const context = v3RouteContext;
   const data = getMusicPersonDetailData(personId);
   activeMusicPersonDetailId = data.personId;
   setActiveMusicPeopleRow(data.personId);
@@ -13030,7 +13032,7 @@ function showMusicPersonDetail(personId) {
   setMusicActivityPanelVisible(false);
   setMusicPersonDetailVisible(true);
   setCurrentView("Person Detail");
-  if (musicNexusShell) {
+  if (musicNexusShell && !v3RouteContext.snapshot) {
     musicNexusShell.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -13041,7 +13043,7 @@ function showMusicPersonDetail(personId) {
       return;
     }
     const route = getRouteFromUrl();
-    if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
+    if (v3RouteContext !== context || route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
       return;
     }
     const archiveData = getMusicPersonDetailData(personId);
@@ -13056,7 +13058,7 @@ function showMusicPersonDetail(personId) {
     requestMusicShowsSetsData(),
   ]).then(() => {
     const route = getRouteFromUrl();
-    if (route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
+    if (v3RouteContext !== context || route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
       return;
     }
     const refreshedData = getMusicPersonDetailData(personId);
@@ -17203,6 +17205,7 @@ function renderUnusedShowDetailLegacyPreview(show, relationships) {
 }
 
 function showMusicShowDetail(showId, options = {}) {
+  const context = v3RouteContext;
   const routeShowCode = normalizeSetCode(showId);
   const show = findMusicShowById(routeShowCode);
   if (show) {
@@ -17224,13 +17227,13 @@ function showMusicShowDetail(showId, options = {}) {
   if (!options.skipDataRequest && (!musicShowsSetsLoaded || musicShowsSetsDataState !== "live")) {
     requestMusicShowsSetsData().then(() => {
       const currentRoute = getRouteFromUrl();
-      if (currentRoute.name !== "show-detail" || normalizeSetCode(currentRoute.showId) !== routeShowCode) {
+      if (v3RouteContext !== context || currentRoute.name !== "show-detail" || normalizeSetCode(currentRoute.showId) !== routeShowCode) {
         return;
       }
       showMusicShowDetail(routeShowCode, { skipDataRequest: true });
     });
   }
-  if (musicNexusShell) {
+  if (musicNexusShell && !v3RouteContext.snapshot) {
     musicNexusShell.scrollTo({
       top: 0,
       behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -17597,6 +17600,14 @@ function initMusicModule() {
 
 let musicSourceResume=null;
 function captureMusicResumeState(route) {
+  if(route.name==='music-venue-detail')return {
+    panel:venueDetail?.querySelector('[data-venue-relationship][aria-expanded="true"]')?.dataset.venueRelationship || '',
+    artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
+  if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
+    .map(card=>card.dataset.personShowId+'|'+card.dataset.personShowAlbumId).slice(0,100)};
+  if(route.name==='show-detail')return {albumRoute:showDetail.querySelector('.show-set-carousel-slide.is-active .show-set-card')?.dataset.showAlbumRoute || ''};
+  if(route.name==='sets-archive')return {selectedSet:activeSetRow?.dataset.setCode || ''};
+
   if(route.name==='set-detail')return captureSetDossierState();
   if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter,
     selectedShow:synchronicityMemoriesSession?.selection?.id || '',fromTimeline:synchronicityMemoriesSession?.selection?.fromTimeline === true,
@@ -17620,6 +17631,38 @@ function settleMusicResumeLanding() {
   landing?.getAnimations({subtree:true}).forEach(animation=>{if(animation instanceof CSSAnimation && animation.effect?.getTiming().iterations!==Infinity)try{animation.finish();}catch{}});
 }
 function restoreMusicResumeState(route,ui) {
+  if(['music-venue-detail','person-detail','show-detail','sets-archive'].includes(route.name)){
+    const pending=state=>['idle','loading'].includes(state);
+    // Legacy Sets can expose fallback rows while the shared Shows request is still pending.
+    if(musicShowsSetsRequest)return false;
+    if(route.name==='music-venue-detail'){
+      if(pending(musicVenuesDataState)||pending(musicShowsSetsDataState))return false;
+      const card=venueDetail.querySelector('[data-venue-relationship="'+(['shows','bands'].includes(ui.panel)?ui.panel:'shows')+'"]');
+      if(card && ['shows','bands'].includes(ui.panel)){
+        if(ui.panel==='bands'){card._venueArtistSearch=v3Text(ui.artistQuery);setVenueArtistsPanelOpen(card,true);}
+        else setVenueShowsPanelOpen(card,true);
+      }
+    }else if(route.name==='person-detail'){
+      if(pending(musicPeopleIndexDataState)||pending(musicBandsIndex.dataset.bandsDataState)||pending(musicShowsSetsDataState)||musicPersonDetailArchiveRequests.has(normalizeMusicPersonId(route.personId)))return false;
+      if(Array.isArray(ui.expanded)){
+        const expanded=new Set(ui.expanded.filter(key=>typeof key==='string'&&key.length<=300).slice(0,100));
+        personDetail.querySelectorAll('.person-show-card').forEach(card=>{
+          if(card.classList.contains('is-expanded')!==expanded.has(card.dataset.personShowId+'|'+card.dataset.personShowAlbumId))toggleMusicPersonShowCard(card);
+        });
+      }
+    }else if(route.name==='show-detail'){
+      if(pending(musicShowsSetsDataState))return false;
+      const cards=[...showDetail.querySelectorAll('.show-set-carousel-slide .show-set-card')];
+      const index=cards.findIndex(card=>card.dataset.showAlbumRoute===v3Text(ui.albumRoute));
+      if(index>=0)showDetail.querySelectorAll('.show-detail-bill-dots button')[index]?.click();
+    }else{
+      if(pending(musicShowsSetsDataState)||pending(musicBandsIndex.dataset.bandsDataState))return false;
+      const row=getSetsRows().find(row=>row.dataset.setCode===normalizeSetCode(v3Text(ui.selectedSet)));
+      if(row)updateSetsFeaturedFromRow(row);
+    }
+    return true;
+  }
+
   if(route.name==='set-detail')return restoreSetDossierState(ui);
   if(route.name==='music-shows'){
     if(!musicShowsSetsLoaded){

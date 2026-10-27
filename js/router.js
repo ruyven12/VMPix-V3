@@ -264,6 +264,18 @@ const v3Number = (value, fallback = 0, max = 1000000) => Number.isFinite(value) 
 function isCurrentV3Route(route) {
   return ['music','music-shows','music-bands','band-detail','set-detail','wrestling','wrestling-shows','wrestling-show-detail','wrestling-match-detail','wrestling-match-detail-photo','wrestling-people-prototype','wrestling-person-detail','wrestling-venues','wrestling-venue-detail'].includes(route?.name);
 }
+// Restoration eligibility is deliberately separate from presentation ownership.
+function isScopedRouteResume(route) {
+  return ['music-venue-detail','person-detail','show-detail','sets-archive',
+    'wrestling-show-detail','wrestling-person-detail','wrestling-venue-detail'].includes(route?.name);
+}
+function isV3ResumeRoute(route) { return isCurrentV3Route(route) || isScopedRouteResume(route); }
+function isMusicResumeRoute(route) {
+  return route.name.startsWith('music') || ['band-detail','set-detail','person-detail','show-detail','sets-archive'].includes(route.name);
+}
+// Bounded cache of the same snapshots, for SPA traversal when storage is unavailable.
+const v3ResumeSnapshots = new Map();
+let v3ResumeFrame = 0;
 function createV3EntryId() { return crypto.randomUUID?.() || Date.now().toString(36) + Math.random().toString(36).slice(2); }
 function ensureV3EntryId() {
   const state = window.history.state || {};
@@ -276,7 +288,8 @@ function getV3ResumeScrollers(route = v3RouteContext.route) {
   const selectors = route.name === 'music-bands' ? ['.rhythm-pillar','[data-rhythm-rolodex]','#rhythm-search-panel','[data-bands-search-results]']
     : route.name === 'band-detail' ? ['[data-band-detail-content]']
     : route.name === 'wrestling-people-prototype' ? ['[data-wrestling-people-prototype-shell]',...['search','az','category','team'].map(mode=>'[data-hall-of-champions-workspace-results="'+mode+'"]')]
-    : route.name === 'wrestling-person-detail' ? ['[data-wrestling-person-dossier-prototype-shell]','.wrestling-person-dossier-prototype-framework','[data-wrestling-person-dossier-prototype-event-archive-photo-grid]']
+    : route.name === 'wrestling-person-detail' ? ['[data-wrestling-person-dossier-prototype-shell]','.wrestling-person-dossier-prototype-framework','[data-wrestling-person-dossier-prototype-event-archive-photo-grid]','.wrestling-person-dossier-prototype-event-history__card']
+    : route.name === 'wrestling-venue-detail' ? ['.fields-of-conflict-dossier']
     : route.name.startsWith('wrestling-') ? ['.wrestling-show-prototype-surface','.wrestling-show-prototype-encounters','.wrestling-show-prototype-encounter-list'] : [];
   return new Map([['shell',getActiveShellScroller(route)],...selectors.map(selector=>[selector,document.querySelector(selector)])]);
 }
@@ -291,9 +304,9 @@ function restoreV3Scroll(rows) {
 function checkpointV3Resume(allowDeparted = false) {
   clearTimeout(v3CheckpointTimer);
   const context=v3RouteContext;
-  if(!context.entry || context.pending || !isCurrentV3Route(context.route) || (allowDeparted !== true && context.url!==(getRouteFromUrl().canonicalUrl || getPathWithSearch())))return;
+  if(!context.entry || context.pending || !isV3ResumeRoute(context.route) || (allowDeparted !== true && context.url!==(getRouteFromUrl().canonicalUrl || getPathWithSearch())))return;
   try {
-    const ui=context.route.name.startsWith('music')||['band-detail','set-detail'].includes(context.route.name) ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
+    const ui=isMusicResumeRoute(context.route) ? captureMusicResumeState(context.route) : captureWrestlingResumeState(context.route);
     rememberShellLocalDrilldownUI(context, ui);
     if (getShellLocalDrilldown(history.state, context.route) && history.state.v3EntryId === context.entry) {
       history.replaceState({ ...history.state, localDrilldown: { ...history.state.localDrilldown, ui } }, "", location.href);
@@ -303,11 +316,19 @@ function checkpointV3Resume(allowDeparted = false) {
       history.replaceState({ ...history.state, setDossier: { ...history.state.setDossier, ui } }, "", location.href);
     }
     const value=JSON.stringify(snapshot);
-    if(value.length<=16000)sessionStorage.setItem(v3ResumeKey(context.entry,context.url),value);
+    if(value.length<=16000){
+      if(isScopedRouteResume(context.route)){
+        const key=v3ResumeKey(context.entry,context.url);
+        v3ResumeSnapshots.delete(key);v3ResumeSnapshots.set(key,snapshot);
+        while(v3ResumeSnapshots.size>24)v3ResumeSnapshots.delete(v3ResumeSnapshots.keys().next().value);
+        if(history.state?.v3EntryId===context.entry)history.replaceState({...history.state,v3Resume:snapshot},'',location.href);
+      }
+      sessionStorage.setItem(v3ResumeKey(context.entry,context.url),value);
+    }
   } catch { /* Storage is optional; navigation and real data rendering must continue. */ }
 }
 function notifyV3ResumeReady(){v3ResumeWake?.();}
-function cancelV3ResumeRestore(){v3ResumeWake=null;v3ResumeObserver?.disconnect();v3ResumeObserver=null;clearTimeout(v3ResumeDeadline);}
+function cancelV3ResumeRestore(){cancelAnimationFrame(v3ResumeFrame);v3ResumeFrame=0;v3ResumeWake=null;v3ResumeObserver?.disconnect();v3ResumeObserver=null;clearTimeout(v3ResumeDeadline);}
 function beginV3RouteContext(route,options){
   if ((route.name === "wrestling" || v3RouteContext.route?.name === "wrestling") && typeof resetDaiionArchivePresentation === "function") resetDaiionArchivePresentation();
   cancelV3ResumeRestore();
@@ -320,11 +341,15 @@ function beginV3RouteContext(route,options){
   const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
   v3EntriesRenderedInDocument.add(entry);
   let snapshot=null;
-  if((cause==='reload' || reloadGap || (['band-detail','music-shows','set-detail'].includes(route.name) && cause==='back-forward')) && isCurrentV3Route(route))try{
+  if((cause==='reload' || reloadGap || ((['band-detail','music-shows','set-detail'].includes(route.name) || isScopedRouteResume(route)) && cause==='back-forward')) && isV3ResumeRoute(route))try{
     const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
     const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
     if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
   }catch{}
+  if(isScopedRouteResume(route) && ['reload','back-forward'].includes(cause)){
+    const cached=v3ResumeSnapshots.get(v3ResumeKey(entry,url)) || snapshot || history.state?.v3Resume;
+    if(cached?.version===V3_RESUME_VERSION && cached.entry===entry && cached.url===url && cached.ui && typeof cached.ui==='object' && !Array.isArray(cached.ui))snapshot=cached;
+  }
   if (!snapshot && route.name === "set-detail" && ['reload','back-forward'].includes(cause) && history.state?.setDossier?.ui) {
     snapshot = { version: V3_RESUME_VERSION, entry, url, ui: history.state.setDossier.ui, scroll: [] };
   }
@@ -340,17 +365,24 @@ function beginV3RouteContext(route,options){
     && (cause !== 'reload' || !bandScrolled);
   v3RouteContext={bandEntranceEligible,navigationCause:cause,skipEntryAnimation:(cause==='reload' || (reloadGap && snapshot)) && isCurrentV3Route(route),isResume:Boolean(snapshot),entry,url,route,snapshot,pending:Boolean(snapshot),applied:false};
   v3RouteContext.localFamily = local?.family;
-  if(snapshot)try{if(route.name.startsWith('music')||['band-detail','set-detail'].includes(route.name))seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
+  if(snapshot)try{if(isMusicResumeRoute(route))seedMusicResumeState(route,snapshot.ui);else seedWrestlingResumeState(route,snapshot.ui);}catch{v3RouteContext.snapshot=null;v3RouteContext.pending=false;v3RouteContext.isResume=false;}
   queueMicrotask(()=>{
     const context=v3RouteContext;
     if(context.route!==route)return;
     const restore=()=>{
       if(v3RouteContext!==context)return;
+      // Run scoped restoration after synchronous mounts and resolved data callbacks.
+      if(isScopedRouteResume(route) && !context.inResumeFrame){
+        if(!context.pending)return;
+        if(!v3ResumeFrame)v3ResumeFrame=requestAnimationFrame(()=>{v3ResumeFrame=0;context.inResumeFrame=true;restore();context.inResumeFrame=false;});
+        return;
+      }
       v3ResumeObserver?.disconnect();
       let ready=true;
-      try{if(context.pending && !context.uiReady)ready=route.name.startsWith('music')||['band-detail','set-detail'].includes(route.name) ? restoreMusicResumeState(route,context.snapshot.ui) : restoreWrestlingResumeState(route,context.snapshot.ui);}catch{ready=true;}
+      try{if(context.pending && !context.uiReady)ready=isMusicResumeRoute(route) ? restoreMusicResumeState(route,context.snapshot.ui) : restoreWrestlingResumeState(route,context.snapshot.ui);}catch{ready=true;}
       if(ready)context.uiReady=true;
       if(context.pending && document.fonts?.status==='loading'){ready=false;if(!context.fontWait){context.fontWait=true;document.fonts.ready.then(()=>{context.fontWait=false;if(v3RouteContext===context && context.pending)restore();});}}
+      if(ready && context.pending && isScopedRouteResume(route))ready=[...getV3ResumeScrollers(route).values()].some(node=>node?.isConnected && node.clientHeight>0);
       if(ready){if(context.pending)restoreV3Scroll(context.snapshot.scroll);context.pending=false;cancelV3ResumeRestore();if(route.name==="set-detail")queueMicrotask(scheduleSetReadoutCycle);}
       else v3ResumeObserver?.observe(document.querySelector('.site-shell'),{childList:true,subtree:true,attributes:true,attributeFilter:['data-record-info-state','data-wrestling-person-dossier-prototype-event-archive-photo-state','data-bands-data-state']});
     };
@@ -361,6 +393,12 @@ function beginV3RouteContext(route,options){
 }
 for(const type of ['click','input','change','scroll'])document.addEventListener(type,()=>{clearTimeout(v3CheckpointTimer);v3CheckpointTimer=setTimeout(checkpointV3Resume,180);},{capture:true,passive:true});
 window.addEventListener('pagehide',checkpointV3Resume,{capture:true});
+// Trusted intent takes precedence over a data-delayed restore; programmatic rendering does not.
+for(const type of ['pointerdown','touchstart','wheel','keydown','input'])document.addEventListener(type,event=>{
+  if(!event.isTrusted || !v3RouteContext.pending || !isScopedRouteResume(v3RouteContext.route) ||
+    (event.type==='keydown' && ['Shift','Control','Alt','Meta'].includes(event.key)))return;
+  v3RouteContext.pending=false;v3RouteContext.restoreCancelled=true;cancelV3ResumeRestore();
+},{capture:true,passive:true});
 
 const SHELL_HISTORY_INDEX_KEY = "__v3ShellHistoryIndex";
 let shellHistoryIndex = null;
