@@ -3635,7 +3635,7 @@ function syncMusicVenuesArchive() {
 }
 
 function returnToMusicVenuesRoute() {
-  navigateToRoute(routePaths.musicVenues, { navigationDirection: "back" });
+  performShellBack();
 }
 
 function navigateToMusicVenueDetail(venue) {
@@ -12905,7 +12905,7 @@ function renderMusicPersonDetailState(data) {
   const backButton = document.createElement("button");
   backButton.className = "person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back To People";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToMusicPeopleRoute);
 
   const statePanel = createMusicV3StateCard(data.state === "error" ? "error" : data.state, "musicPeople", {
@@ -12935,7 +12935,7 @@ function renderMusicPersonDetail(data) {
   const backButton = document.createElement("button");
   backButton.className = "person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back To People";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToMusicPeopleRoute);
 
   const hero = document.createElement("section");
@@ -13067,7 +13067,7 @@ function showMusicPersonDetail(personId) {
 }
 
 function returnToMusicPeopleRoute() {
-  navigateToRoute(routePaths.musicPeople, { navigationDirection: "back" });
+  performShellBack();
 }
 
 function createMusicPeopleRow(person) {
@@ -15313,13 +15313,7 @@ function renderMusicActivityRows(sectionName, rows) {
 }
 
 function returnToMusicShowsArchive() {
-  const historyState = window.history.state || {};
-  if (getRouteFromUrl().name === "show-detail" && historyState.fromShowsArchive) {
-    window.history.back();
-    return;
-  }
-
-  navigateToRoute(routePaths.musicShows, { navigationDirection: "back" });
+  performShellBack();
 }
 
 function createShowDetailStat(label, value) {
@@ -16884,7 +16878,7 @@ function renderMusicShowDetailState(stateName = "empty", showId = "") {
   const backButton = document.createElement("button");
   backButton.className = "show-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Shows";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToMusicShowsArchive);
 
   const stateSection = document.createElement("section");
@@ -16928,7 +16922,7 @@ function renderMusicShowDetail(show) {
   const backButton = document.createElement("button");
   backButton.className = "show-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Shows";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToMusicShowsArchive);
 
   const hero = document.createElement("section");
@@ -17367,7 +17361,7 @@ function initMusicModule() {
   initBandContentTabs();
   if (musicNexusBack) {
     musicNexusBack.addEventListener("click", () => {
-      navigateToRoute(routePaths.portfolio, { navigationDirection: "back" });
+      performShellBack();
     });
   }
   if (bandDetailBack) {
@@ -17386,6 +17380,7 @@ function initMusicModule() {
     setGalleryBack.addEventListener("click", returnToSetsArchiveFromGallery);
   }
   if (venueDetailBack) {
+    venueDetailBack.textContent = "Back";
     venueDetailBack.addEventListener("click", returnToMusicVenuesRoute);
   }
   galleryPhotoTiles.forEach((tile) => {

@@ -4719,8 +4719,8 @@ function renderWrestlingShowDetailState(showId, stateName) {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Events";
-  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows, { navigationDirection: "back" }));
+  backButton.textContent = "Back";
+  backButton.addEventListener("click", performShellBack);
 
   const stateSection = document.createElement("section");
   stateSection.className = `wrestling-show-state wrestling-show-state--${stateName}`;
@@ -7100,10 +7100,8 @@ function renderWrestlingMatchDossierState(route, stateName) {
   const backButton = document.createElement("button");
   backButton.type = "button";
   backButton.className = "wrestling-detail-back";
-  backButton.textContent = "Back to Show";
-  backButton.addEventListener("click", () => navigateToRoute(
-    `${routePaths.wrestlingShows}/${encodeURIComponent(getWrestlingShowRouteCode(showId))}`, { navigationDirection: "back" }
-  ));
+  backButton.textContent = "Back";
+  backButton.addEventListener("click", performShellBack);
   section.append(backButton, createWrestlingV3StateCard(stateName, "wrestlingShows", {
     title: stateName === "loading" ? "Loading Encounter Archive" : "Archive Record Unavailable",
     text: stateName === "loading"
@@ -7529,8 +7527,8 @@ function renderWrestlingShowDetailRoute(showId = "warzone-26", options = {}) {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Events";
-  backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingShows, { navigationDirection: "back" }));
+  backButton.textContent = "Back";
+  backButton.addEventListener("click", performShellBack);
 
   const hero = document.createElement("section");
   hero.className = "wrestling-detail-hero";
@@ -10759,8 +10757,8 @@ function renderFieldsOfConflictVenueDossier(venueId = getFieldsOfConflictActiveV
     const backButton = document.createElement("button");
     backButton.type = "button";
     backButton.className = "wrestling-detail-back";
-    backButton.textContent = "Back to Fields of Conflict";
-    backButton.addEventListener("click", () => navigateToRoute(routePaths.wrestlingVenues, { navigationDirection: "back" }));
+    backButton.textContent = "Back";
+    backButton.addEventListener("click", performShellBack);
     const loading = ['idle','loading'].includes(wrestlingVenuesDataState);
     dossier.replaceChildren(backButton, createWrestlingV3StateCard(loading ? 'loading' : wrestlingVenuesDataState === 'error' ? 'error' : 'empty', "wrestlingVenues", {
       title: loading ? 'Retrieving Venue Record' : 'Archive Record Unavailable',
@@ -16395,7 +16393,7 @@ function createWrestlingVenueDetailBackButton() {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-venue-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Wrestling Venues";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToWrestlingVenuesRoute);
   return backButton;
 }
@@ -16525,17 +16523,7 @@ function requestWrestlingVenueRelatedEventPhotoCounts(relatedEvents = [], option
 }
 
 function returnToWrestlingVenuesRoute() {
-  const currentRoute = getRouteFromUrl();
-  if (
-    currentRoute.name === "wrestling-venue-detail" &&
-    window.history?.state?.fromWrestlingVenuesIndex &&
-    window.history.length > 1
-  ) {
-    window.history.back();
-    return;
-  }
-
-  navigateToRoute(routePaths.wrestlingVenues, { navigationDirection: "back" });
+  performShellBack();
 }
 
 function renderWrestlingVenueDetailRoute(venueId, options = {}) {
@@ -18113,24 +18101,14 @@ function createWrestlingPersonEventRow(eventRow, person) {
 }
 
 function returnToWrestlingPeopleRoute() {
-  const currentRoute = getRouteFromUrl();
-  if (
-    currentRoute.name === "wrestling-person-detail" &&
-    window.history?.state?.fromWrestlingPeopleIndex &&
-    window.history.length > 1
-  ) {
-    window.history.back();
-    return;
-  }
-
-  navigateToRoute(routePaths.wrestlingPeople, { navigationDirection: "back" });
+  performShellBack();
 }
 
 function createWrestlingPersonDetailBackButton() {
   const backButton = document.createElement("button");
   backButton.className = "wrestling-person-detail-back";
   backButton.type = "button";
-  backButton.textContent = "Back to Wrestling People";
+  backButton.textContent = "Back";
   backButton.addEventListener("click", returnToWrestlingPeopleRoute);
   return backButton;
 }

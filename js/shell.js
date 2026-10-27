@@ -3664,6 +3664,8 @@ function isPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 }
 
 function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
+  const origin = getShellHistoryOrigin(route);
+  if (origin) return origin;
   if (route?.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
   if (route?.name === "music" || route?.name === "music-bands" || route?.name === "band-detail" || route?.name === "set-detail" || route?.name === "music-shows") return getShellBackTarget(route);
   if (route?.name === "wrestling-people-prototype" || route?.name === "wrestling-people") return routePaths.wrestling;
@@ -3697,12 +3699,7 @@ function handlePrototypeEngineReturnEmitter(event) {
 
   event.preventDefault();
   event.stopPropagation();
-  if (route.name === "set-detail" && backSetDossierMode()) return;
-  if (shouldShellBackUseHistory(route)) {
-    window.history.back();
-    return;
-  }
-  navigateToRoute(getPrototypeEngineReturnRoute(route), { navigationDirection: "back" });
+  performShellBack();
 }
 
 function initPrototypeEngineReturnEmitter() {
@@ -3895,39 +3892,54 @@ function updateShellBreadcrumb(route) {
   shellBreadcrumb.setAttribute("aria-label", `Current location: ${breadcrumbLabels.join(" > ")}`);
 }
 
+// Only the router's current-entry predecessor establishes an in-app journey.
+// Relationship flags/URLs alone do not prove that the browser can traverse back.
+function getShellHistoryOrigin(route = getRouteFromUrl(), historyState = window.history.state || {}) {
+  if (!route || route.name === "home" || window.history.length <= 1 ||
+      getShellHistoryIndex(historyState) <= 0 || getShellHistoryIndex(historyState) === null ||
+      !/^[a-zA-Z0-9-]{8,80}$/.test(historyState.v3EntryId || "") ||
+      historyState.v3EntryId !== window.history.state?.v3EntryId ||
+      typeof historyState.route !== "string") return "";
+  const previous = historyState.__v3ShellPreviousRoute;
+  if (typeof previous !== "string" || previous.length > 2048 || !previous.startsWith("/") || previous.startsWith("//")) return "";
+  try {
+    const current = getRouteFromUrl();
+    const recorded = new URL(historyState.route, location.origin);
+    const origin = new URL(previous, location.origin);
+    const target = getRouteFromUrl(origin.href);
+    if (recorded.origin !== location.origin || recorded.username || recorded.password ||
+        getRouteFromUrl(recorded.href).canonicalUrl !== current.canonicalUrl || route.canonicalUrl !== current.canonicalUrl ||
+        origin.origin !== location.origin || origin.username || origin.password || target.isUnknown ||
+        target.canonicalUrl === current.canonicalUrl) return "";
+    return target.canonicalUrl;
+  } catch { return ""; }
+}
+
 function getShellBackTarget(route = getRouteFromUrl(), historyState = window.history.state || {}) {
   if (!route || route.name === "home") {
     return "";
   }
 
-  if (route.name === "privacy") {
-    try {
-      const previous = historyState.__v3ShellPreviousRoute;
-      if (typeof previous === "string" && previous.length <= 2048) {
-        const url = new URL(previous, window.location.origin);
-        const target = getRouteFromUrl(url.href);
-        if (url.origin === window.location.origin && !url.username && !url.password && !target.isUnknown && !["privacy", "route-not-found", "music-route-not-found", "wrestling-route-not-found"].includes(target.name)) return url.pathname + url.search + url.hash;
-      }
-    } catch { /* A direct Privacy entry returns to Portfolio. */ }
-    return routePaths.portfolio;
-  }
+  const origin = getShellHistoryOrigin(route, historyState);
+  if (origin) return origin;
+  if (route.name === "privacy") return routePaths.portfolio;
   if (route.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
   if (route.name === "wrestling-people-prototype") return routePaths.wrestling;
 
   if (route.name === "band-detail") {
-    return normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl || routeNameToShellBackTarget[route.name]);
+    try { return normalizeBandsReturnUrl(historyState.returnUrl || bandsIndexReturnUrl || routeNameToShellBackTarget[route.name]); }
+    catch { return normalizeBandsReturnUrl(); }
   }
   if (route.name === "sets-archive") {
-    return historyState.bandUrl || getBandRouteUrl(route.bandId);
+    return getBandRouteUrl(route.bandId);
   }
   if (route.name === "set-detail") {
-    // Explicit known parent context wins; same-URL local entries retain this route.
-    const previous = historyState.__v3ShellPreviousRoute;
-    const parent = previous ? getRouteFromUrl(previous) : null;
-    if (parent && ["band-detail", "sets-archive", "show-detail", "music-shows"].includes(parent.name)) return parent.canonicalUrl;
-    if (historyState.fromShowDetail && getRouteFromUrl(historyState.showDetailUrl || "").name === "show-detail") return historyState.showDetailUrl;
-    if (historyState.fromBandCapturedSets) return historyState.bandUrl || getBandRouteUrl(route.bandId);
-    return historyState.fromSetsArchive ? historyState.setsArchiveUrl || getBandSetsRouteUrl(route.bandId) : getBandRouteUrl(route.bandId);
+    // A missing origin falls back only within this band's logical hierarchy.
+    try {
+      const parent = historyState.fromSetsArchive && getRouteFromUrl(historyState.setsArchiveUrl || "");
+      if (parent?.name === "sets-archive" && parent.bandId === route.bandId) return parent.canonicalUrl;
+    } catch { /* Invalid legacy context cannot redirect Back. */ }
+    return getBandRouteUrl(route.bandId);
   }
   if (route.name === "wrestling-match-gallery") {
     if (typeof getWrestlingShowRouteUrl === "function") {
@@ -3948,25 +3960,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
 }
 
 function shouldShellBackUseHistory(route = getRouteFromUrl(), historyState = window.history.state || {}) {
-  if (!window.history || window.history.length <= 1 || !route) {
-    return false;
-  }
-
-  const parentTarget = isPrototypeEngineReturnRoute(route)
-    ? getPrototypeEngineReturnRoute(route)
-    : getShellBackTarget(route, historyState);
-  if (parentTarget && historyState.__v3ShellPreviousRoute === parentTarget) return true;
-
-  return (
-    (route.name === "band-detail" && historyState.returnUrl && historyState.fromBandsIndex) ||
-    (route.name === "sets-archive" && historyState.bandUrl && historyState.fromBandDetail) ||
-    (route.name === "set-detail" && historyState.setsArchiveUrl && historyState.fromSetsArchive) ||
-    (route.name === "person-detail" && historyState.fromPeopleIndex) ||
-    (route.name === "show-detail" && historyState.fromShowsArchive) ||
-    (route.name === "music-venue-detail" && historyState.fromMusicVenuesIndex) ||
-    (route.name === "wrestling-person-detail" && historyState.fromWrestlingPeopleIndex) ||
-    (route.name === "wrestling-venue-detail" && historyState.fromWrestlingVenuesIndex)
-  );
+  return Boolean(getShellHistoryOrigin(route, historyState));
 }
 
 function getShellBackLabel(targetUrl) {
@@ -4076,22 +4070,22 @@ function syncShellBackSweepMotion() {
   if (reducedMotion.matches) cancelShellBackSweep(true);
 }
 
+let shellBackPendingEntry = null;
 function performShellBack() {
-  if (!shellBackButton || shellBackButton.disabled || shellBackButton.getAttribute("aria-disabled") === "true") {
-    return;
-  }
-
   const route = getRouteFromUrl();
-  const historyState = window.history.state || {};
+  if (bandRecordOpening || route.name === "home") return;
+  // S13F remains the first and unchanged local Back owner.
   if (route.name === "set-detail" && backSetDossierMode()) return;
-  if (shouldShellBackUseHistory(route, historyState)) {
+  const entry = window.history.state?.v3EntryId;
+  if (entry && shellBackPendingEntry === entry) return;
+  if (shouldShellBackUseHistory(route)) {
+    shellBackPendingEntry = entry;
     window.history.back();
     return;
   }
-
-  const targetUrl = getShellBackTarget(route, historyState);
+  const targetUrl = isPrototypeEngineReturnRoute(route) ? getPrototypeEngineReturnRoute(route) : getShellBackTarget(route);
   if (targetUrl) {
-    navigateToRoute(targetUrl, { shouldFocusBandsView: route.name === "band-detail", navigationDirection: "back" });
+    navigateToRoute(targetUrl, { replaceHistory: true, shouldFocusBandsView: route.name === "band-detail", navigationDirection: "back" });
   }
 }
 
@@ -8233,6 +8227,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) syncHomeEngageReadiness();
   });
   window.addEventListener("popstate", (event) => {
+    shellBackPendingEntry = null;
     if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.

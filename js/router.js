@@ -391,7 +391,7 @@ function pushRouteUrl(url, state = {}) {
   }
 }
 
-function replaceRouteUrl(url, state = {}) {
+function replaceRouteUrl(url, state = {}, resetEntry = false) {
   checkpointV3Resume();
   if (!window.history || typeof window.history.replaceState !== "function") {
     return;
@@ -399,11 +399,11 @@ function replaceRouteUrl(url, state = {}) {
 
   const targetUrl = new URL(url, window.location.href);
   const targetPath = `${targetUrl.pathname}${targetUrl.search}`;
-  const routeState = { ...(window.history.state || {}), ...state, v3EntryId: ensureV3EntryId(), route: targetPath, [SHELL_HISTORY_INDEX_KEY]: getShellHistoryIndex(window.history.state) ?? shellHistoryIndex ?? 0 };
+  const routeState = { ...(resetEntry ? {} : window.history.state || {}), ...state, v3EntryId: resetEntry ? createV3EntryId() : ensureV3EntryId(), route: targetPath, [SHELL_HISTORY_INDEX_KEY]: getShellHistoryIndex(window.history.state) ?? shellHistoryIndex ?? 0 };
   if (targetPath !== getPathWithSearch()) {
     window.history.replaceState(routeState, "", targetPath);
-  } else if (Object.keys(state).length > 0) {
-    window.history.replaceState({ ...(window.history.state || {}), ...routeState }, "", targetPath);
+  } else if (resetEntry || Object.keys(state).length > 0) {
+    window.history.replaceState(routeState, "", targetPath);
   }
   if (v3RouteContext.entry === window.history.state?.v3EntryId) v3RouteContext.url = getRouteFromUrl().canonicalUrl || getPathWithSearch();
 }
@@ -880,7 +880,8 @@ function navigateToRoute(url, options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence(url);
   const targetUrl = route.isUnknown ? url : route.canonicalUrl;
   const restore = () => {
-    pushRouteUrl(targetUrl, options.historyState || {});
+    if (options.replaceHistory === true) replaceRouteUrl(targetUrl, options.historyState || {}, true);
+    else pushRouteUrl(targetUrl, options.historyState || {});
     syncRoute(route, { ...options, shouldCanonicalize: false });
     if (typeof stabilizeShellViewport === "function") {
       stabilizeShellViewport(route, options);

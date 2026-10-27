@@ -2357,7 +2357,7 @@ const routeNameToDrilldownBreadcrumb = {
 const routeNameToShellBackTarget = {
   portfolio: routePaths.home,
   "route-not-found": routePaths.portfolio,
-  music: routePaths.portfolio,
+  music: routePaths.home,
   "music-route-not-found": routePaths.music,
   "music-bands": routePaths.music,
   "band-detail": routePaths.musicBands,
@@ -2369,7 +2369,7 @@ const routeNameToShellBackTarget = {
   "show-detail": routePaths.musicShows,
   "music-venues": routePaths.music,
   "music-venue-detail": routePaths.musicVenues,
-  wrestling: routePaths.portfolio,
+  wrestling: routePaths.home,
   "wrestling-route-not-found": routePaths.wrestling,
   "wrestling-shows": routePaths.wrestling,
   "wrestling-show-detail": routePaths.wrestlingShows,
