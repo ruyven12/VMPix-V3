@@ -1022,6 +1022,7 @@ function navigateToRoute(url, options = {}) {
   // Passage intent stays in memory and never enters history or resume snapshots.
   const { dataConduitIntent, ...routeOptions } = options;
   options = routeOptions;
+  if (typeof isRepeatedShellDataConduitIntent === "function" && isRepeatedShellDataConduitIntent(dataConduitIntent)) return;
   if (typeof cancelShellDataConduit === "function") cancelShellDataConduit("navigation");
   if (typeof navigateTrajectoryRoute === "function" && navigateTrajectoryRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   try {

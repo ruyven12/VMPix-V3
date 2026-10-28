@@ -4005,7 +4005,7 @@ function updateShellBackState(route = getRouteFromUrl()) {
 // Two native 300 ms phases meet at full coverage; restore synchronously between them.
 let shellBackSweep = null;
 
-// DATA-02 shares the existing Shell passage slot; no visual layer or route delay.
+// DATA-03 decorates DATA-02's one-use passage; other Shell transitions stay independent.
 const SHELL_DATA_CONDUIT_WINDOW_MS = 650;
 const shellDataConduitIntents = new WeakSet();
 let shellPassageGeneration = 0;
@@ -4019,7 +4019,7 @@ function createShellDataConduitIntent(event, source, destination, albumId = "") 
   const bounds = source.getBoundingClientRect();
   if (!bounds.width || !bounds.height) return null;
   const intent = Object.freeze({
-    sourceContext: v3RouteContext, sourceEntry: history.state.v3EntryId, sourceUrl: route.canonicalUrl,
+    sourceElement: source, sourceContext: v3RouteContext, sourceEntry: history.state.v3EntryId, sourceUrl: route.canonicalUrl,
     destination: target.canonicalUrl, albumId: String(albumId || "").trim(),
     sourceBounds: Object.freeze({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }),
     generation: shellPassageGeneration, createdAt: performance.now(),
@@ -4041,15 +4041,31 @@ function consumeShellDataConduitIntent(intent, target, isBack) {
 function finishShellDataConduit(passage, status, reason, photoKey = "", albumId = "") {
   if (shellBackSweep !== passage || passage.kind !== "data-conduit") return;
   clearTimeout(passage.timer);
+  clearTimeout(passage.commitTimer);
+  cancelAnimationFrame(passage.frame);
   passage.controller.abort();
+  passage.animations?.forEach(animation => animation.cancel());
+  passage.element?.remove();
+  shell?.removeAttribute("data-data-conduit");
   passage.result = { status, reason, photoKey, albumId, elapsedMs: performance.now() - passage.started };
   passage.phase = status === "cancelled" ? "cancelled" : "complete";
   shellBackSweep = null;
 }
 
+function isRepeatedShellDataConduitIntent(intent) {
+  const passage = shellBackSweep;
+  if (passage?.kind !== "data-conduit" || !shellDataConduitIntents.has(intent) ||
+      intent.sourceContext !== passage.intent.sourceContext || intent.destination !== passage.intent.destination) return false;
+  shellDataConduitIntents.delete(intent);
+  return true;
+}
+
 function cancelShellDataConduit(reason = "navigation") {
   if (shellBackSweep?.kind === "data-conduit" && !shellBackSweep.committing) {
-    finishShellDataConduit(shellBackSweep, "cancelled", reason);
+    const passage = shellBackSweep;
+    // Geometry/motion interruptions still honor an accepted navigation; newer navigation owns its own commit.
+    if (!passage.restored && ["resize", "scroll", "reduced-motion-change"].includes(reason)) passage.commit();
+    finishShellDataConduit(passage, "cancelled", reason);
   }
 }
 
@@ -4067,36 +4083,159 @@ function reportShellDataConduitReadiness(context, albumId, status, photoKey = ""
   }
   if (status === "ready" && (!albumId || !photoKey)) return;
   const mismatch = passage.intent.albumId && albumId && passage.intent.albumId !== albumId;
-  finishShellDataConduit(passage, status === "ready" && !mismatch ? "ready" : "fallback",
-    mismatch ? "album-mismatch" : status, photoKey, albumId);
+  if (passage.readiness) return;
+  passage.readiness = { status: status === "ready" && !mismatch ? "ready" : "fallback",
+    reason: mismatch ? "album-mismatch" : status, photoKey, albumId };
+  if (passage.readiness.status === "ready") reconstructShellDataConduit(passage);
+}
+
+// A fixed twelve-fragment field; geometry is sampled only at extraction and destination mount.
+function animateShellDataConduit(passage, element, frames, start, duration, easing = "linear") {
+  const animation = element.animate(frames, { duration, easing, fill: "forwards" });
+  animation.startTime = passage.timeline + start;
+  passage.animations.push(animation);
+  return animation;
+}
+
+function extractShellDataConduit(passage) {
+  const viewport = window.visualViewport, top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || innerHeight), engine = portfolioEngine?.getBoundingClientRect();
+  passage.top = top;
+  passage.bottom = engine?.height && engine.top > top ? Math.min(bottom, engine.top) : bottom;
+  const layer = document.createElement("div");
+  layer.className = "shell-data-conduit";
+  layer.setAttribute("aria-hidden", "true");
+  layer.style.top = top + "px";
+  layer.style.height = passage.bottom - top + "px";
+  passage.element = layer;
+  passage.fragments = [];
+  const bounds = passage.intent.sourceBounds;
+  for (let i = 0; i < 12; i++) {
+    const fragment = document.createElement("span");
+    fragment.className = "shell-data-conduit__fragment";
+    fragment.textContent = ["01", "◇", "10", ":"][i % 4];
+    const x = bounds.x + bounds.width * (.14 + (i % 4) * .24);
+    const y = Math.max(top + 8, Math.min(passage.bottom - 14, bounds.y + bounds.height * (.2 + Math.floor(i / 4) * .3)));
+    const dx = (i % 4 - 1.5) * 5, dy = (Math.floor(i / 4) - 1) * 6;
+    const from = "translate3d(" + x + "px," + (y - top) + "px,0)";
+    const lifted = "translate3d(" + (x + dx) + "px," + (y + dy - top) + "px,0)";
+    layer.append(fragment);
+    const mx = (x + dx) * .65 + innerWidth / 2 * .35;
+    const my = (y + dy) * .65 + (top + (passage.bottom - top) * .37) * .35;
+    const angle = Math.atan2(my - y - dy, mx - x - dx) * 180 / Math.PI;
+    const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(2.8,.55)";
+    passage.fragments.push({ element: fragment, x: mx, y: my, middle });
+    animateShellDataConduit(passage, fragment, [
+      { transform: from + " scale(.3)", opacity: 0 },
+      { transform: from + " scale(.75)", opacity: .45, offset: .16 },
+      { transform: lifted + " scale(1)", opacity: .85, offset: 120 / 260, easing: "cubic-bezier(.55,.05,.85,.45)" },
+      { transform: middle, opacity: .8 },
+    ], 0, 260);
+  }
+  shell.append(layer);
+  shell.setAttribute("data-data-conduit", "");
+  animateShellDataConduit(passage, passage.intent.sourceElement, [
+    { opacity: 1 }, { opacity: .72, offset: .45 }, { opacity: 0 },
+  ], 0, 120, "ease-in");
+}
+
+function clipShellDataConduit(passage) {
+  const engine = portfolioEngine?.getBoundingClientRect();
+  if (engine?.height && engine.top > passage.top) passage.bottom = Math.min(passage.bottom, engine.top);
+  const readout = document.querySelector(".set-archive-readout:not([hidden])")?.getBoundingClientRect();
+  if (readout?.height && readout.top > passage.top) {
+    passage.bottom = Math.min(passage.bottom, readout.top);
+  }
+  passage.element.style.height = passage.bottom - passage.top + "px";
+}
+
+function transmitShellDataConduit(passage) {
+  const hero = document.querySelector("[data-set-featured-open]"), bounds = hero?.getBoundingClientRect();
+  const x = bounds?.width ? bounds.x + bounds.width / 2 : innerWidth / 2;
+  const y = bounds?.height ? bounds.y + bounds.height / 2 : (passage.top + passage.bottom) / 2;
+  passage.fragments.forEach((fragment, i) => {
+    const tx = x + ((i % 4) - 1.5) * Math.min(28, (bounds?.width || 240) / 10);
+    const ty = Math.max(passage.top + 12, Math.min(passage.bottom - 12, y + (Math.floor(i / 4) - 1) * 24));
+    const angle = Math.atan2(ty - fragment.y, tx - fragment.x) * 180 / Math.PI;
+    const end = "translate3d(" + tx + "px," + (ty - passage.top) + "px,0)";
+    animateShellDataConduit(passage, fragment.element, [
+      { transform: fragment.middle, opacity: .8 },
+      { transform: end + " rotate(" + angle + "deg) scale(.7,.45)", opacity: .5, offset: .9 },
+      { transform: end + " rotate(" + angle + "deg) scale(.15)", opacity: 0 },
+    ], 260, 160 + i * 3, "cubic-bezier(.3,.1,.7,1)");
+  });
+}
+
+function reconstructShellDataConduit(passage) {
+  const image = document.querySelector("[data-set-featured-open] .set-featured-photo-image");
+  if (!passage.element || !image || !image.complete || !image.naturalWidth) return;
+  // Irregular horizontal scan fragments resolve on the actual image; no clone or pixel buffer.
+  const edge = widths => {
+    const points = [];
+    widths.forEach((w, i) => points.push((50 - w / 2) + "% " + i * 12.5 + "%", (50 - w / 2) + "% " + (i + 1) * 12.5 + "%"));
+    widths.slice().reverse().forEach((w, j) => { const i = 7 - j; points.push((50 + w / 2) + "% " + (i + 1) * 12.5 + "%", (50 + w / 2) + "% " + i * 12.5 + "%"); });
+    return "polygon(" + points.join(",") + ")";
+  };
+  const start = Math.max(400, performance.now() - passage.started);
+  animateShellDataConduit(passage, image, [
+    { opacity: 0, clipPath: edge([2,2,2,2,2,2,2,2]) },
+    { opacity: .55, clipPath: edge([28,62,40,86,56,34,72,46]), offset: .25 },
+    { opacity: .85, clipPath: edge([82,100,88,100,94,86,100,92]), offset: .65 },
+    { opacity: 1, clipPath: edge([100,100,100,100,100,100,100,100]) },
+  ], start, Math.max(1, 650 - start), "cubic-bezier(.2,.6,.25,1)");
 }
 
 function commitShellDataConduit(intent, restore, generation) {
   const started = performance.now();
   const passage = { kind: "data-conduit", intent, generation, started,
-    deadline: started + SHELL_DATA_CONDUIT_WINDOW_MS, phase: "routing", context: null,
-    restored: false, committing: true, timer: 0, controller: new AbortController() };
+    deadline: started + SHELL_DATA_CONDUIT_WINDOW_MS, phase: "extraction", context: null,
+    restored: false, committing: false, timer: 0, commitTimer: 0, frame: 0,
+    animations: [], controller: new AbortController(), timeline: started };
   shellBackSweep = passage;
+  passage.commit = () => {
+    if (shellBackSweep !== passage || passage.restored) return;
+    passage.committing = true;
+    passage.restored = true;
+    try {
+      restore(); // The ordinary router commit, once, at the transmission boundary.
+      passage.context = v3RouteContext;
+      if (passage.element) clipShellDataConduit(passage);
+      passage.phase = "transmission";
+      passage.frame = requestAnimationFrame(() => {
+        if (shellBackSweep === passage && passage.element) transmitShellDataConduit(passage);
+      });
+    } catch (error) {
+      finishShellDataConduit(passage, "cancelled", "route-error");
+      throw error;
+    } finally { passage.committing = false; }
+  };
   const signal = passage.controller.signal;
   const cancel = event => cancelShellDataConduit(event.type);
   window.addEventListener("resize", cancel, { signal });
   window.visualViewport?.addEventListener("resize", cancel, { signal });
   window.visualViewport?.addEventListener("scroll", cancel, { signal });
   window.addEventListener("pagehide", cancel, { signal });
-  passage.timer = setTimeout(() => finishShellDataConduit(passage, "fallback", "deadline"), SHELL_DATA_CONDUIT_WINDOW_MS);
+  const interact = event => {
+    if (passage.restored && event.target.closest?.("[data-set-gallery]")) cancelShellDataConduit("interaction");
+  };
+  shell?.addEventListener("pointerdown", interact, { capture: true, signal });
+  shell?.addEventListener("keydown", interact, { capture: true, signal });
+  passage.timer = setTimeout(() => {
+    passage.commit();
+    const result = passage.readiness || { status: "fallback", reason: "deadline" };
+    finishShellDataConduit(passage, result.status, result.reason, result.photoKey, result.albumId);
+  }, SHELL_DATA_CONDUIT_WINDOW_MS);
+  if (reducedMotion.matches || !shell || typeof Element.prototype.animate !== "function") {
+    passage.commit();
+    finishShellDataConduit(passage, "fallback", "reduced-motion");
+    return;
+  }
   try {
-    passage.restored = true;
-    restore(); // Exactly the ordinary router commit; never wait for photography.
-    if (shellBackSweep === passage) {
-      passage.context = v3RouteContext;
-      passage.phase = "waiting";
-      if (reducedMotion.matches) finishShellDataConduit(passage, "fallback", "reduced-motion");
-    }
-  } catch (error) {
-    finishShellDataConduit(passage, "cancelled", "route-error");
-    throw error;
-  } finally {
-    passage.committing = false;
+    extractShellDataConduit(passage);
+    passage.commitTimer = setTimeout(passage.commit, 120);
+  } catch {
+    passage.commit();
+    finishShellDataConduit(passage, "fallback", "visual-unavailable");
   }
 }
 

@@ -12854,6 +12854,24 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 
 
 
+/* DATA-03: temporary Shell-owned fragments; never cover Engine or capture input. */
+.shell-data-conduit {
+  position:fixed;left:0;width:100%;z-index:2147483646;
+  overflow:hidden;contain:paint;pointer-events:none;
+}
+.shell-data-conduit__fragment {
+  position:absolute;left:0;top:0;width:19px;height:10px;
+  border-top:1px solid rgba(137,188,255,.9);border-left:1px solid rgba(166,137,255,.6);
+  color:#b8b4fa;background:linear-gradient(90deg,rgba(78,115,209,.22),transparent);
+  font:8px/10px monospace;letter-spacing:1px;text-align:center;
+  opacity:0;transform-origin:center;will-change:transform,opacity;
+}
+.site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:0; }
+@media (prefers-reduced-motion:reduce) {
+  .shell-data-conduit { display:none; }
+  .site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:1; }
+}
+
 /* Shell Back passage uses the persistent Shell; its measured clip ends above Engine. */
 .shell-back-sweep {
   position: fixed;
