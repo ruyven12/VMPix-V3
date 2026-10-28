@@ -4005,17 +4005,116 @@ function updateShellBackState(route = getRouteFromUrl()) {
 // Two native 300 ms phases meet at full coverage; restore synchronously between them.
 let shellBackSweep = null;
 
+// DATA-02 shares the existing Shell passage slot; no visual layer or route delay.
+const SHELL_DATA_CONDUIT_WINDOW_MS = 650;
+const shellDataConduitIntents = new WeakSet();
+let shellPassageGeneration = 0;
+
+function createShellDataConduitIntent(event, source, destination, albumId = "") {
+  const route = getRouteFromUrl(), target = getRouteFromUrl(destination);
+  if (!event?.isTrusted || event.type !== "click" || event.currentTarget !== source ||
+      route.name !== "show-detail" || shellRenderedRoute?.canonicalUrl !== route.canonicalUrl ||
+      !source?.isConnected || !showDetail?.contains(source) || showDetail.getAttribute("aria-hidden") !== "false" ||
+      target.name !== "set-detail" || !history.state?.v3EntryId) return null;
+  const bounds = source.getBoundingClientRect();
+  if (!bounds.width || !bounds.height) return null;
+  const intent = Object.freeze({
+    sourceContext: v3RouteContext, sourceEntry: history.state.v3EntryId, sourceUrl: route.canonicalUrl,
+    destination: target.canonicalUrl, albumId: String(albumId || "").trim(),
+    sourceBounds: Object.freeze({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height }),
+    generation: shellPassageGeneration, createdAt: performance.now(),
+  });
+  shellDataConduitIntents.add(intent);
+  return intent;
+}
+
+function consumeShellDataConduitIntent(intent, target, isBack) {
+  if (!intent || !shellDataConduitIntents.delete(intent)) return null;
+  const source = getRouteFromUrl();
+  if (isBack || source.name !== "show-detail" || target.name !== "set-detail" ||
+      intent.sourceContext !== v3RouteContext || intent.sourceEntry !== history.state?.v3EntryId ||
+      intent.sourceUrl !== source.canonicalUrl || intent.destination !== target.canonicalUrl ||
+      intent.generation !== shellPassageGeneration || performance.now() - intent.createdAt > SHELL_DATA_CONDUIT_WINDOW_MS) return null;
+  return intent;
+}
+
+function finishShellDataConduit(passage, status, reason, photoKey = "", albumId = "") {
+  if (shellBackSweep !== passage || passage.kind !== "data-conduit") return;
+  clearTimeout(passage.timer);
+  passage.controller.abort();
+  passage.result = { status, reason, photoKey, albumId, elapsedMs: performance.now() - passage.started };
+  passage.phase = status === "cancelled" ? "cancelled" : "complete";
+  shellBackSweep = null;
+}
+
+function cancelShellDataConduit(reason = "navigation") {
+  if (shellBackSweep?.kind === "data-conduit" && !shellBackSweep.committing) {
+    finishShellDataConduit(shellBackSweep, "cancelled", reason);
+  }
+}
+
+// Only the existing Music hero commit and terminal gallery states report here.
+function reportShellDataConduitReadiness(context, albumId, status, photoKey = "") {
+  const passage = shellBackSweep;
+  if (passage?.kind !== "data-conduit" || !passage.restored ||
+      passage.generation !== shellPassageGeneration || context !== v3RouteContext ||
+      context === passage.intent.sourceContext || context.url !== passage.intent.destination ||
+      getRouteFromUrl().canonicalUrl !== passage.intent.destination || context.entry !== history.state?.v3EntryId ||
+      (passage.context && passage.context !== context) || !["ready", "empty", "error", "unavailable"].includes(status)) return;
+  passage.context = context;
+  if (performance.now() >= passage.deadline) {
+    finishShellDataConduit(passage, "fallback", "deadline"); return;
+  }
+  if (status === "ready" && (!albumId || !photoKey)) return;
+  const mismatch = passage.intent.albumId && albumId && passage.intent.albumId !== albumId;
+  finishShellDataConduit(passage, status === "ready" && !mismatch ? "ready" : "fallback",
+    mismatch ? "album-mismatch" : status, photoKey, albumId);
+}
+
+function commitShellDataConduit(intent, restore, generation) {
+  const started = performance.now();
+  const passage = { kind: "data-conduit", intent, generation, started,
+    deadline: started + SHELL_DATA_CONDUIT_WINDOW_MS, phase: "routing", context: null,
+    restored: false, committing: true, timer: 0, controller: new AbortController() };
+  shellBackSweep = passage;
+  const signal = passage.controller.signal;
+  const cancel = event => cancelShellDataConduit(event.type);
+  window.addEventListener("resize", cancel, { signal });
+  window.visualViewport?.addEventListener("resize", cancel, { signal });
+  window.visualViewport?.addEventListener("scroll", cancel, { signal });
+  window.addEventListener("pagehide", cancel, { signal });
+  passage.timer = setTimeout(() => finishShellDataConduit(passage, "fallback", "deadline"), SHELL_DATA_CONDUIT_WINDOW_MS);
+  try {
+    passage.restored = true;
+    restore(); // Exactly the ordinary router commit; never wait for photography.
+    if (shellBackSweep === passage) {
+      passage.context = v3RouteContext;
+      passage.phase = "waiting";
+      if (reducedMotion.matches) finishShellDataConduit(passage, "fallback", "reduced-motion");
+    }
+  } catch (error) {
+    finishShellDataConduit(passage, "cancelled", "route-error");
+    throw error;
+  } finally {
+    passage.committing = false;
+  }
+}
+
 function cancelShellBackSweep(restorePending = false) {
   const sweep = shellBackSweep;
   if (!sweep || sweep.committing) return;
+  if (sweep.kind === "data-conduit") { finishShellDataConduit(sweep, "cancelled", "navigation"); return; }
   shellBackSweep = null;
   sweep.animation?.cancel();
   sweep.element.remove();
   if (restorePending && !sweep.restored) sweep.restore();
 }
 
-function runShellBackSweep(targetRoute, restore, isBack) {
+function runShellBackSweep(targetRoute, restore, isBack, conduitIntent = null) {
+  const intent = consumeShellDataConduitIntent(conduitIntent, targetRoute, isBack);
   cancelShellBackSweep();
+  const generation = ++shellPassageGeneration;
+  if (intent) { commitShellDataConduit(intent, restore, generation); return; }
   const sourceRoute = shellRenderedRoute;
   const host = shell;
   if (sourceRoute?.name === "admin" && targetRoute?.name === "admin") { restore(); return; }
@@ -4082,11 +4181,13 @@ function runShellBackSweep(targetRoute, restore, isBack) {
 }
 
 function syncShellBackSweepMotion() {
+  cancelShellDataConduit("reduced-motion-change");
   if (reducedMotion.matches) cancelShellBackSweep(true);
 }
 
 let shellBackPendingEntry = null;
 function performShellBack() {
+  cancelShellDataConduit("engine-back");
   const route = getRouteFromUrl();
   if (bandRecordOpening || route.name === "home") return;
   // S13F remains the first and unchanged local Back owner.
@@ -8245,6 +8346,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) syncHomeEngageReadiness();
   });
   window.addEventListener("popstate", (event) => {
+    cancelShellDataConduit("history");
     shellBackPendingEntry = null;
     if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }

@@ -7049,7 +7049,12 @@ function syncSetGalleryPhotoToggleButton(stateName = "ready") {
 function setGalleryState(stateName = "ready") {
   const activeState = ["loading", "empty", "error"].includes(stateName) ? stateName : "ready";
   const shouldShowGrid = activeState === "ready";
-  if (activeState === "empty" || activeState === "error") resetSetFeaturedPhoto();
+  if (activeState === "empty" || activeState === "error") {
+    resetSetFeaturedPhoto();
+    if (typeof reportShellDataConduitReadiness === "function") {
+      reportShellDataConduitReadiness(v3RouteContext, setGallery?.dataset.albumId || "", activeState);
+    }
+  }
 
   if (!shouldShowGrid) {
     setGalleryModeVisible(false);
@@ -8111,6 +8116,9 @@ function syncSetFeaturedPhoto(tile, intent = null) {
     s.images.delete(key); s.images.set(key, { image, failed });
     // Only three decoded display images are retained; the existing browser/API caches do the rest.
     while (s.images.size > 3) s.images.delete(s.images.keys().next().value);
+    if (typeof reportShellDataConduitReadiness === "function") {
+      reportShellDataConduitReadiness(s.context, s.albumId, failed ? "unavailable" : "ready", failed ? "" : key);
+    }
     if (!failed && intent && currentArchiveAnalyticsIntent(intent) && !isLightboxOpen() &&
       setGallery.getAttribute("aria-hidden") === "false" && document.visibilityState === "visible") {
       dispatchArchiveAnalytics("photo_view", { archive: "music", content_type: "photo",
@@ -8151,6 +8159,7 @@ function syncSetFeaturedPhoto(tile, intent = null) {
       s.open.replaceChildren(); s.displayedKey = "";
       s.figure.setAttribute("aria-busy", "false");
       s.status.textContent = "Photograph unavailable.";
+      if (typeof reportShellDataConduitReadiness === "function") reportShellDataConduitReadiness(s.context, s.albumId, "unavailable");
     };
     image.src = fallback ? galleryImageFallbackSrc : sources[nextSource++];
   }
@@ -16391,7 +16400,7 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
   };
   registerShowSetCardPreview(card);
   card.addEventListener("click", (event) => {
-    if (!targetUrl) {
+    if (!targetUrl || (options.showDetailSource && getRouteFromUrl().name !== "show-detail")) {
       return;
     }
 
@@ -16401,6 +16410,7 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
     stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
+      dataConduitIntent: options.showDetailSource ? createShellDataConduitIntent(event, card, targetUrl, albumId) : null,
       historyState: options.historyState || {
         fromShowDetail: true,
         showDetailUrl: getMusicShowRouteUrl(show),
@@ -16437,7 +16447,7 @@ function createShowDetailBandsOnBill(show, options = {}) {
   activeBandName.className = "show-detail-bill-active-name";
   activeBandName.addEventListener("click", (event) => {
     const targetUrl = getMusicShowAlbumSetRoute(show, albums[activeIndex]);
-    if (!targetUrl) {
+    if (!targetUrl || (options.showDetailSource && getRouteFromUrl().name !== "show-detail")) {
       return;
     }
 
@@ -16447,6 +16457,7 @@ function createShowDetailBandsOnBill(show, options = {}) {
     stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
+      dataConduitIntent: options.showDetailSource ? createShellDataConduitIntent(event, activeBandName, targetUrl, getMusicShowAlbumPreviewAlbumId(albums[activeIndex])) : null,
       historyState: {
         fromShowDetail: true,
         showDetailUrl: getMusicShowRouteUrl(show),
@@ -17009,7 +17020,7 @@ function renderMusicShowDetail(show) {
   copy.append(eyebrow, title, details, stats);
   hero.append(poster, copy);
 
-  const bill = createShowDetailBandsOnBill(show);
+  const bill = createShowDetailBandsOnBill(show, { showDetailSource: true });
 
   showDetail.replaceChildren(backButton, hero, bill);
   window.requestAnimationFrame(() => {
