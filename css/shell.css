@@ -12859,6 +12859,12 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   position:fixed;left:0;width:100%;z-index:2147483646;
   overflow:hidden;contain:paint;pointer-events:none;
 }
+.shell-data-conduit__content { position:absolute;inset:0;pointer-events:none; }
+.shell-data-conduit__slice {
+  position:absolute;overflow:hidden;contain:paint;pointer-events:none;
+  transform-origin:center;will-change:transform,opacity;
+}
+.shell-data-conduit__slice > * { max-width:none;max-height:none;min-width:0;min-height:0; }
 .shell-data-conduit__fragment {
   position:absolute;left:0;top:0;width:19px;height:10px;
   border-top:1px solid rgba(137,188,255,.9);border-left:1px solid rgba(166,137,255,.6);

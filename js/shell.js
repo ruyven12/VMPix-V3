@@ -4099,6 +4099,88 @@ function animateShellDataConduit(passage, element, frames, start, duration, easi
   return animation;
 }
 
+// DATA-03.3: bounded, inert paint copies of on-screen information, never the Nexus artwork.
+// All geometry/style reads precede writes. No source DOM, image cache or restoration state is changed.
+function captureShellDataConduitContent(passage) {
+  const viewport = passage.intent.sourceElement.closest("[data-synchronicity-viewport]");
+  const bounds = viewport.getBoundingClientRect();
+  const clip = { left: Math.max(0, bounds.left), right: Math.min(innerWidth, bounds.right),
+    top: Math.max(passage.top, bounds.top), bottom: Math.min(passage.bottom, bounds.bottom) };
+  const paints = [], roots = [], properties = ["background", "border", "borderRadius", "padding",
+    "color", "font", "letterSpacing", "textAlign", "textTransform", "textShadow", "whiteSpace",
+    "overflowWrap", "wordBreak", "objectFit", "objectPosition", "clipPath"];
+  let visited = 0;
+  const intersect = (a, b) => ({ left: Math.max(a.left, b.left), right: Math.min(a.right, b.right),
+    top: Math.max(a.top, b.top), bottom: Math.min(a.bottom, b.bottom) });
+  const visit = (element, clipping, opacity) => {
+    if (++visited > 192) throw new Error("Conduit visible-content budget");
+    const style = getComputedStyle(element);
+    if (style.display === "none" || style.visibility !== "visible" || Number(style.opacity) === 0) return;
+    const rect = element.getBoundingClientRect(), visible = intersect(rect, clipping);
+    if (visible.right <= visible.left || visible.bottom <= visible.top) return;
+    opacity *= Number(style.opacity);
+    const text = [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join("");
+    const image = element instanceof HTMLImageElement && element.complete && element.naturalWidth ? element.currentSrc : "";
+    if (text.trim() || image || style.backgroundImage !== "none" || style.backgroundColor !== "rgba(0, 0, 0, 0)" ||
+        [style.borderTopWidth, style.borderRightWidth, style.borderBottomWidth, style.borderLeftWidth].some(width => parseFloat(width) > 0)) {
+      const paint = { rect, visible, text, image, opacity, style: {} };
+      properties.forEach(property => { paint.style[property] = style[property]; });
+      paints.push(paint);
+    }
+    const childClip = { ...clipping };
+    if (style.overflowX !== "visible") { childClip.left = visible.left; childClip.right = visible.right; }
+    if (style.overflowY !== "visible") { childClip.top = visible.top; childClip.bottom = visible.bottom; }
+    for (const child of element.children) visit(child, childClip, opacity);
+  };
+  for (const root of viewport.children) { visit(root, clip, 1); roots.push(root); }
+  if (!paints.length) return;
+  const area = { left: Math.min(...paints.map(p => p.visible.left)), right: Math.max(...paints.map(p => p.visible.right)),
+    top: Math.min(...paints.map(p => p.visible.top)), bottom: Math.max(...paints.map(p => p.visible.bottom)) };
+  const width = (area.right - area.left) / 4, height = (area.bottom - area.top) / 3;
+  const holder = document.createElement("div");
+  holder.className = "shell-data-conduit__content";
+  holder.inert = true;
+  passage.element.prepend(holder);
+  passage.fragments.forEach((fragment, i) => {
+    const x = area.left + i % 4 * width, y = area.top + Math.floor(i / 4) * height;
+    const cell = { left: x, right: x + width, top: y, bottom: y + height };
+    const tile = document.createElement("div");
+    tile.className = "shell-data-conduit__slice";
+    Object.assign(tile.style, { left: x + "px", top: y - passage.top + "px", width: width + "px", height: height + "px" });
+    for (const paint of paints) {
+      const visible = intersect(cell, paint.visible);
+      if (visible.right <= visible.left || visible.bottom <= visible.top) continue;
+      const copy = document.createElement(paint.image ? "img" : "div"), rect = paint.rect;
+      if (paint.image) { copy.src = paint.image; copy.alt = ""; copy.draggable = false; }
+      else copy.textContent = paint.text;
+      Object.assign(copy.style, paint.style, { position: "absolute", boxSizing: "border-box", margin: "0",
+        left: rect.left - x + "px", top: rect.top - y + "px", width: rect.width + "px", height: rect.height + "px",
+        opacity: paint.opacity, pointerEvents: "none", overflow: "hidden" });
+      // Preserve clipping by carousel/viewport ancestors without copying off-screen siblings.
+      copy.style.clip = "rect(" + (paint.visible.top - rect.top) + "px," + (paint.visible.right - rect.left) +
+        "px," + (paint.visible.bottom - rect.top) + "px," + (paint.visible.left - rect.left) + "px)";
+      tile.append(copy);
+    }
+    holder.append(tile);
+    const source = passage.intent.sourceBounds;
+    const selected = cell.bottom > source.y && cell.top < source.y + source.height;
+    const delay = selected ? 0 : 12 + (i % 3) * 4;
+    const dx = fragment.originX + 9.5 - x - width / 2, dy = fragment.originY + 5 - y - height / 2;
+    const end = "translate3d(" + dx + "px," + dy + "px,0) scale(" + 19 / width + "," + 10 / height + ")";
+    const full = "polygon(0 0,100% 0,100% 22%,100% 22%,100% 38%,100% 38%,100% 58%,100% 58%,100% 76%,100% 76%,100% 100%,0 100%,0 76%,0 76%,0 58%,0 58%,0 38%,0 38%,0 22%,0 22%)";
+    const broken = "polygon(8% 0,92% 0,92% 22%,70% 22%,70% 38%,100% 38%,100% 58%,76% 58%,76% 76%,88% 76%,88% 100%,12% 100%,12% 76%,30% 76%,30% 58%,0 58%,0 38%,24% 38%,24% 22%,8% 22%)";
+    animateShellDataConduit(passage, tile, [
+      { transform: "translate3d(0,0,0) scale(1)", opacity: 1, clipPath: full },
+      { transform: "translate3d(0,0,0) scale(1)", opacity: 1, clipPath: full, offset: delay / 140 },
+      { transform: "translate3d(" + dx * .12 + "px," + Math.max(4, dy * .12) + "px,0) scale(.86,.82)", opacity: 1, clipPath: broken, offset: .42 },
+      { transform: end, opacity: .85, clipPath: broken, offset: .86 },
+      { transform: end, opacity: 0, clipPath: broken },
+    ], 0, 140, "cubic-bezier(.35,0,.65,1)");
+  });
+  // Copies replace their originals in the same paint; cancelling restores the untouched source.
+  roots.forEach(root => animateShellDataConduit(passage, root, [{ opacity: 0 }, { opacity: 0 }], 0, 650));
+}
+
 function extractShellDataConduit(passage) {
   const viewport = window.visualViewport, top = viewport?.offsetTop || 0;
   const bottom = top + (viewport?.height || innerHeight), engine = portfolioEngine?.getBoundingClientRect();
@@ -4126,7 +4208,7 @@ function extractShellDataConduit(passage) {
     const my = (y + dy) * .65 + (top + (passage.bottom - top) * .37) * .35;
     const angle = Math.atan2(my - y - dy, mx - x - dx) * 180 / Math.PI;
     const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(4.2,1.1)";
-    passage.fragments.push({ element: fragment, x: mx, y: my, middle });
+    passage.fragments.push({ element: fragment, x: mx, y: my, middle, originX: x, originY: y });
     animateShellDataConduit(passage, fragment, [
       { transform: from + " scale(.3)", opacity: 0 },
       { transform: from + " scale(.75)", opacity: .45, offset: .16 },
@@ -4136,9 +4218,7 @@ function extractShellDataConduit(passage) {
   }
   shell.append(layer);
   shell.setAttribute("data-data-conduit", "");
-  animateShellDataConduit(passage, passage.intent.sourceElement, [
-    { opacity: 1 }, { opacity: .72, offset: .45 }, { opacity: 0 },
-  ], 0, 120, "ease-in");
+  captureShellDataConduitContent(passage);
 }
 
 function clipShellDataConduit(passage) {
