@@ -4125,13 +4125,13 @@ function extractShellDataConduit(passage) {
     const mx = (x + dx) * .65 + innerWidth / 2 * .35;
     const my = (y + dy) * .65 + (top + (passage.bottom - top) * .37) * .35;
     const angle = Math.atan2(my - y - dy, mx - x - dx) * 180 / Math.PI;
-    const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(2.8,.55)";
+    const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(4.2,1.1)";
     passage.fragments.push({ element: fragment, x: mx, y: my, middle });
     animateShellDataConduit(passage, fragment, [
       { transform: from + " scale(.3)", opacity: 0 },
       { transform: from + " scale(.75)", opacity: .45, offset: .16 },
-      { transform: lifted + " scale(1)", opacity: .85, offset: 120 / 260, easing: "cubic-bezier(.55,.05,.85,.45)" },
-      { transform: middle, opacity: .8 },
+      { transform: lifted + " scale(1)", opacity: .85, offset: 120 / 260, easing: "cubic-bezier(.2,.6,.4,.7)" },
+      { transform: middle, opacity: .94 },
     ], 0, 260);
   }
   shell.append(layer);
@@ -4161,8 +4161,8 @@ function transmitShellDataConduit(passage) {
     const angle = Math.atan2(ty - fragment.y, tx - fragment.x) * 180 / Math.PI;
     const end = "translate3d(" + tx + "px," + (ty - passage.top) + "px,0)";
     animateShellDataConduit(passage, fragment.element, [
-      { transform: fragment.middle, opacity: .8 },
-      { transform: end + " rotate(" + angle + "deg) scale(.7,.45)", opacity: .5, offset: .9 },
+      { transform: fragment.middle, opacity: .94 },
+      { transform: end + " rotate(" + angle + "deg) scale(2.4,1)", opacity: .94, offset: .9 },
       { transform: end + " rotate(" + angle + "deg) scale(.15)", opacity: 0 },
     ], 260, 160 + i * 3, "cubic-bezier(.3,.1,.7,1)");
   });
