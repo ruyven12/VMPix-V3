@@ -4012,9 +4012,11 @@ let shellPassageGeneration = 0;
 
 function createShellDataConduitIntent(event, source, destination, albumId = "") {
   const route = getRouteFromUrl(), target = getRouteFromUrl(destination);
+  const viewport = source?.closest("[data-synchronicity-viewport]");
   if (!event?.isTrusted || event.type !== "click" || event.currentTarget !== source ||
-      route.name !== "show-detail" || shellRenderedRoute?.canonicalUrl !== route.canonicalUrl ||
-      !source?.isConnected || !showDetail?.contains(source) || showDetail.getAttribute("aria-hidden") !== "false" ||
+      route.name !== "music-shows" || shellRenderedRoute?.canonicalUrl !== route.canonicalUrl ||
+      !source?.isConnected || !viewport || viewport.hidden || viewport.inert ||
+      !source.matches(".synchronicity-bill .show-set-card") ||
       target.name !== "set-detail" || !history.state?.v3EntryId) return null;
   const bounds = source.getBoundingClientRect();
   if (!bounds.width || !bounds.height) return null;
@@ -4031,7 +4033,7 @@ function createShellDataConduitIntent(event, source, destination, albumId = "") 
 function consumeShellDataConduitIntent(intent, target, isBack) {
   if (!intent || !shellDataConduitIntents.delete(intent)) return null;
   const source = getRouteFromUrl();
-  if (isBack || source.name !== "show-detail" || target.name !== "set-detail" ||
+  if (isBack || source.name !== "music-shows" || target.name !== "set-detail" ||
       intent.sourceContext !== v3RouteContext || intent.sourceEntry !== history.state?.v3EntryId ||
       intent.sourceUrl !== source.canonicalUrl || intent.destination !== target.canonicalUrl ||
       intent.generation !== shellPassageGeneration || performance.now() - intent.createdAt > SHELL_DATA_CONDUIT_WINDOW_MS) return null;

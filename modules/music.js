@@ -16212,6 +16212,9 @@ function createSynchronicityBill(show, isCurrent) {
     albumOnly: true,
     albums: entries.map(entry => ({ ...entry.album, band: entry.name })),
     getGalleryRoute: (_album, index) => entries[index].route,
+    // Only the live Synchronicity selection opts into the Shell-owned transfer.
+    getDataConduitIntent: (event, card, destination, albumId) =>
+      !disposed && isCurrent() ? createShellDataConduitIntent(event, card, destination, albumId) : null,
     historyState: { fromSetsArchive: true, setsArchiveUrl: "/music/shows" },
   });
   section.classList.add("synchronicity-bill");
@@ -16410,7 +16413,7 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
     stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
-      dataConduitIntent: options.showDetailSource ? createShellDataConduitIntent(event, card, targetUrl, albumId) : null,
+      dataConduitIntent: options.getDataConduitIntent?.(event, card, targetUrl, albumId) || null,
       historyState: options.historyState || {
         fromShowDetail: true,
         showDetailUrl: getMusicShowRouteUrl(show),
@@ -16457,7 +16460,6 @@ function createShowDetailBandsOnBill(show, options = {}) {
     stageArchiveRelationshipAnalytics(relationship, targetUrl);
     stageArchiveGalleryAnalytics(event, "music", targetUrl);
     navigateToRoute(targetUrl, {
-      dataConduitIntent: options.showDetailSource ? createShellDataConduitIntent(event, activeBandName, targetUrl, getMusicShowAlbumPreviewAlbumId(albums[activeIndex])) : null,
       historyState: {
         fromShowDetail: true,
         showDetailUrl: getMusicShowRouteUrl(show),
