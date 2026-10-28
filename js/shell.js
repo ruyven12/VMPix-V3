@@ -4006,7 +4006,14 @@ function updateShellBackState(route = getRouteFromUrl()) {
 let shellBackSweep = null;
 
 // DATA-03 decorates DATA-02's one-use passage; other Shell transitions stay independent.
+// Intent freshness stays independent of the cinematic passage duration.
 const SHELL_DATA_CONDUIT_WINDOW_MS = 650;
+const SHELL_DATA_CONDUIT_TIMING = Object.freeze({
+  duration: 1240, extraction: 280, commit: 210,
+  transmissionStart: 140, transmissionLift: 280, transmissionTurn: 520, transmissionEnd: 820,
+  environmentStart: 300, environmentPeak: 610, environmentEnd: 950,
+  reconstructionStart: 780, reconstructionEnd: 1120, controlsStart: 1040,
+});
 const shellDataConduitIntents = new WeakSet();
 let shellPassageGeneration = 0;
 
@@ -4172,14 +4179,14 @@ function captureShellDataConduitContent(passage) {
     const broken = "polygon(8% 0,92% 0,92% 22%,70% 22%,70% 38%,100% 38%,100% 58%,76% 58%,76% 76%,88% 76%,88% 100%,12% 100%,12% 76%,30% 76%,30% 58%,0 58%,0 38%,24% 38%,24% 22%,8% 22%)";
     animateShellDataConduit(passage, tile, [
       { transform: "translate3d(0,0,0) scale(1)", opacity: 1, clipPath: full },
-      { transform: "translate3d(0,0,0) scale(1)", opacity: 1, clipPath: full, offset: delay / 140 },
+      { transform: "translate3d(0,0,0) scale(1)", opacity: 1, clipPath: full, offset: delay * 2 / SHELL_DATA_CONDUIT_TIMING.extraction },
       { transform: "translate3d(" + dx * .12 + "px," + Math.max(4, dy * .12) + "px,0) scale(.86,.82)", opacity: 1, clipPath: broken, offset: .42 },
       { transform: end, opacity: .85, clipPath: broken, offset: .86 },
       { transform: end, opacity: 0, clipPath: broken },
-    ], 0, 140, "cubic-bezier(.35,0,.65,1)");
+    ], 0, SHELL_DATA_CONDUIT_TIMING.extraction, "cubic-bezier(.35,0,.65,1)");
   });
   // Copies replace their originals in the same paint; cancelling restores the untouched source.
-  roots.forEach(root => animateShellDataConduit(passage, root, [{ opacity: 0 }, { opacity: 0 }], 0, 650));
+  roots.forEach(root => animateShellDataConduit(passage, root, [{ opacity: 0 }, { opacity: 0 }], 0, SHELL_DATA_CONDUIT_TIMING.duration));
 }
 
 function extractShellDataConduit(passage) {
@@ -4213,9 +4220,9 @@ function extractShellDataConduit(passage) {
     animateShellDataConduit(passage, fragment, [
       { transform: from + " scale(.3)", opacity: 0 },
       { transform: from + " scale(.75)", opacity: .45, offset: .16 },
-      { transform: lifted + " scale(1)", opacity: .85, offset: 120 / 260, easing: "cubic-bezier(.2,.6,.4,.7)" },
+      { transform: lifted + " scale(1)", opacity: .85, offset: (SHELL_DATA_CONDUIT_TIMING.transmissionLift - SHELL_DATA_CONDUIT_TIMING.transmissionStart) / (SHELL_DATA_CONDUIT_TIMING.transmissionTurn - SHELL_DATA_CONDUIT_TIMING.transmissionStart), easing: "cubic-bezier(.2,.6,.4,.7)" },
       { transform: middle, opacity: .94 },
-    ], 0, 260);
+    ], SHELL_DATA_CONDUIT_TIMING.transmissionStart, SHELL_DATA_CONDUIT_TIMING.transmissionTurn - SHELL_DATA_CONDUIT_TIMING.transmissionStart);
   }
   shell.append(layer);
   shell.setAttribute("data-data-conduit", "");
@@ -4236,6 +4243,7 @@ function transmitShellDataConduit(passage) {
   const hero = document.querySelector("[data-set-featured-open]"), bounds = hero?.getBoundingClientRect();
   const x = bounds?.width ? bounds.x + bounds.width / 2 : innerWidth / 2;
   const y = bounds?.height ? bounds.y + bounds.height / 2 : (passage.top + passage.bottom) / 2;
+  passage.arrival = { x, y };
   passage.fragments.forEach((fragment, i) => {
     const tx = x + ((i % 4) - 1.5) * Math.min(28, (bounds?.width || 240) / 10);
     const ty = Math.max(passage.top + 12, Math.min(passage.bottom - 12, y + (Math.floor(i / 4) - 1) * 24));
@@ -4245,27 +4253,52 @@ function transmitShellDataConduit(passage) {
       { transform: fragment.middle, opacity: .94 },
       { transform: end + " rotate(" + angle + "deg) scale(2.4,1)", opacity: .94, offset: .9 },
       { transform: end + " rotate(" + angle + "deg) scale(.15)", opacity: 0 },
-    ], 260, 160 + i * 3, "cubic-bezier(.3,.1,.7,1)");
+    ], SHELL_DATA_CONDUIT_TIMING.transmissionTurn, SHELL_DATA_CONDUIT_TIMING.transmissionEnd - SHELL_DATA_CONDUIT_TIMING.transmissionTurn + i * 3, "cubic-bezier(.3,.1,.7,1)");
   });
 }
 
 function reconstructShellDataConduit(passage) {
   const image = document.querySelector("[data-set-featured-open] .set-featured-photo-image");
-  if (!passage.element || !image || !image.complete || !image.naturalWidth) return;
-  // Irregular horizontal scan fragments resolve on the actual image; no clone or pixel buffer.
-  const edge = widths => {
-    const points = [];
-    widths.forEach((w, i) => points.push((50 - w / 2) + "% " + i * 12.5 + "%", (50 - w / 2) + "% " + (i + 1) * 12.5 + "%"));
-    widths.slice().reverse().forEach((w, j) => { const i = 7 - j; points.push((50 + w / 2) + "% " + (i + 1) * 12.5 + "%", (50 + w / 2) + "% " + i * 12.5 + "%"); });
-    return "polygon(" + points.join(",") + ")";
+  if (!passage.element || !image || !image.complete || !image.naturalWidth || passage.reconstruction) return;
+  const start = Math.max(SHELL_DATA_CONDUIT_TIMING.reconstructionStart, performance.now() - passage.started);
+  // After data arrival, late photography uses normal rendering, never a compressed last-frame reveal.
+  if (start > SHELL_DATA_CONDUIT_TIMING.transmissionEnd) return;
+  passage.reconstruction = true;
+  const bounds = image.getBoundingClientRect();
+  // The existing streaks' measured landing point seeds one mask on the real photograph.
+  const cx = Math.max(0, Math.min(100, ((passage.arrival?.x ?? bounds.x + bounds.width / 2) - bounds.x) / bounds.width * 100));
+  const cy = Math.max(0, Math.min(100, ((passage.arrival?.y ?? bounds.y + bounds.height / 2) - bounds.y) / bounds.height * 100));
+  const edge = (rx, ry) => {
+    const left = [], right = [];
+    for (let i = 0; i <= 24; i++) {
+      const y = Math.max(0, Math.min(100, Math.max(cy - ry, Math.min(cy + ry, i * 100 / 24))));
+      const distance = Math.min(1, Math.abs(y - cy) / ry);
+      // Fine angled scan edges advance together from the arriving data, without block cuts.
+      const reach = rx * Math.sqrt(1 - distance * distance) * (i % 3 === 0 ? .94 : 1);
+      left.push(Math.max(0, cx - reach) + "% " + y + "%");
+      right.push(Math.min(100, cx + reach) + "% " + y + "%");
+    }
+    return "polygon(" + left.concat(right.reverse()).join(",") + ")";
   };
-  const start = Math.max(400, performance.now() - passage.started);
   animateShellDataConduit(passage, image, [
-    { opacity: 0, clipPath: edge([2,2,2,2,2,2,2,2]) },
-    { opacity: .55, clipPath: edge([28,62,40,86,56,34,72,46]), offset: .25 },
-    { opacity: .85, clipPath: edge([82,100,88,100,94,86,100,92]), offset: .65 },
-    { opacity: 1, clipPath: edge([100,100,100,100,100,100,100,100]) },
-  ], start, Math.max(1, 650 - start), "cubic-bezier(.2,.6,.25,1)");
+    { opacity: 0, clipPath: edge(3, 2) },
+    { opacity: .88, clipPath: edge(24, 34), offset: .30 },
+    { opacity: 1, clipPath: edge(58, 68), offset: .70 },
+    { opacity: 1, clipPath: edge(150, 150), offset: .96 },
+    { opacity: 1, clipPath: edge(150, 150) },
+  ], start, SHELL_DATA_CONDUIT_TIMING.reconstructionEnd - SHELL_DATA_CONDUIT_TIMING.reconstructionStart);
+}
+
+// Visibility only: preserve layout, disabled opacity, bindings and the Readout's local animation.
+function prepareShellDataConduitControls(passage) {
+  const controls = setDossierViewport.querySelectorAll(
+    ".set-gallery-highlights > :not(.set-featured-photo), .set-featured-photo > :not([data-set-featured-open]), .set-gallery-screen > :not(.set-gallery-highlights), .set-archive-readout");
+  for (const control of controls) {
+    animateShellDataConduit(passage, control, [
+      { opacity: 0, visibility: "visible" },
+      { opacity: getComputedStyle(control).opacity, visibility: "visible" },
+    ], SHELL_DATA_CONDUIT_TIMING.controlsStart, SHELL_DATA_CONDUIT_TIMING.duration - SHELL_DATA_CONDUIT_TIMING.controlsStart, "ease-out");
+  }
 }
 
 // DATA-03.4: retain the actual Shell source surface behind the real destination content.
@@ -4289,18 +4322,18 @@ function bridgeShellDataConduitEnvironment(passage) {
   // This owner is hidden until normal route mounting. Its own blue background is never replaced.
   setDossierViewport.prepend(environment);
   animateShellDataConduit(passage, source, [
-    { opacity: 1 }, { opacity: 1, offset: 160 / 500, easing: "cubic-bezier(.4,0,.2,1)" }, { opacity: 0 },
-  ], 0, 500);
+    { opacity: 1 }, { opacity: 1, offset: SHELL_DATA_CONDUIT_TIMING.environmentStart / SHELL_DATA_CONDUIT_TIMING.environmentEnd, easing: "cubic-bezier(.4,0,.2,1)" }, { opacity: 0 },
+  ], 0, SHELL_DATA_CONDUIT_TIMING.environmentEnd);
   animateShellDataConduit(passage, violet, [
-    { opacity: 0 }, { opacity: 0, offset: 160 / 500 },
-    { opacity: 1, offset: 310 / 500 }, { opacity: 0 },
-  ], 0, 500, "ease-in-out");
+    { opacity: 0 }, { opacity: 0, offset: SHELL_DATA_CONDUIT_TIMING.environmentStart / SHELL_DATA_CONDUIT_TIMING.environmentEnd },
+    { opacity: 1, offset: SHELL_DATA_CONDUIT_TIMING.environmentPeak / SHELL_DATA_CONDUIT_TIMING.environmentEnd }, { opacity: 0 },
+  ], 0, SHELL_DATA_CONDUIT_TIMING.environmentEnd, "ease-in-out");
 }
 
 function commitShellDataConduit(intent, restore, generation) {
   const started = performance.now();
   const passage = { kind: "data-conduit", intent, generation, started,
-    deadline: started + SHELL_DATA_CONDUIT_WINDOW_MS, phase: "extraction", context: null,
+    deadline: started + SHELL_DATA_CONDUIT_TIMING.duration, phase: "extraction", context: null,
     restored: false, committing: false, timer: 0, commitTimer: 0, frame: 0,
     animations: [], controller: new AbortController(), timeline: started };
   shellBackSweep = passage;
@@ -4311,7 +4344,10 @@ function commitShellDataConduit(intent, restore, generation) {
     try {
       restore(); // The ordinary router commit, once, at the transmission boundary.
       passage.context = v3RouteContext;
-      if (passage.element) clipShellDataConduit(passage);
+      if (passage.element) {
+        clipShellDataConduit(passage);
+        prepareShellDataConduitControls(passage);
+      }
       passage.phase = "transmission";
       passage.frame = requestAnimationFrame(() => {
         if (shellBackSweep === passage && passage.element) transmitShellDataConduit(passage);
@@ -4336,7 +4372,7 @@ function commitShellDataConduit(intent, restore, generation) {
     passage.commit();
     const result = passage.readiness || { status: "fallback", reason: "deadline" };
     finishShellDataConduit(passage, result.status, result.reason, result.photoKey, result.albumId);
-  }, SHELL_DATA_CONDUIT_WINDOW_MS);
+  }, SHELL_DATA_CONDUIT_TIMING.duration);
   if (reducedMotion.matches || !shell || typeof Element.prototype.animate !== "function") {
     passage.commit();
     finishShellDataConduit(passage, "fallback", "reduced-motion");
@@ -4345,7 +4381,7 @@ function commitShellDataConduit(intent, restore, generation) {
   try {
     extractShellDataConduit(passage);
     bridgeShellDataConduitEnvironment(passage);
-    passage.commitTimer = setTimeout(passage.commit, 120);
+    passage.commitTimer = setTimeout(passage.commit, SHELL_DATA_CONDUIT_TIMING.commit);
   } catch {
     passage.commit();
     finishShellDataConduit(passage, "fallback", "visual-unavailable");

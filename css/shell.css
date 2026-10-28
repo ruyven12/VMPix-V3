@@ -12880,9 +12880,17 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   opacity:0;transform-origin:center;will-change:transform,opacity;
 }
 .site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:0; }
+/* DATA-03.5: a passage-only visibility gate; existing layout and control states are retained. */
+.site-shell[data-data-conduit] [data-set-dossier-viewport] :is(
+  .set-gallery-highlights > :not(.set-featured-photo),
+  .set-featured-photo > :not([data-set-featured-open]),
+  .set-gallery-screen > :not(.set-gallery-highlights),
+  .set-archive-readout
+) { visibility:hidden; }
 @media (prefers-reduced-motion:reduce) {
   .shell-data-conduit, .shell-data-conduit__environment { display:none; }
   .site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:1; }
+  .site-shell[data-data-conduit] [data-set-dossier-viewport] :is(.set-gallery-highlights > *, .set-featured-photo > *, .set-gallery-screen > *, .set-archive-readout) { visibility:visible; }
 }
 
 /* Shell Back passage uses the persistent Shell; its measured clip ends above Engine. */
