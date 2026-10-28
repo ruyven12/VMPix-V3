@@ -12859,6 +12859,13 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   position:fixed;left:0;width:100%;z-index:2147483646;
   overflow:hidden;contain:paint;pointer-events:none;
 }
+/* Environmental bridge is below Dossier content, never above Engine or the conduit. */
+.shell-data-conduit__environment { position:fixed;z-index:0;pointer-events:none;contain:paint; }
+.shell-data-conduit__atmosphere,
+.shell-data-conduit__violet { position:absolute;inset:0;pointer-events:none;will-change:opacity; }
+.shell-data-conduit__violet {
+  opacity:0;background:linear-gradient(125deg,rgba(94,46,147,.24),rgba(64,48,124,.12));
+}
 .shell-data-conduit__content { position:absolute;inset:0;pointer-events:none; }
 .shell-data-conduit__slice {
   position:absolute;overflow:hidden;contain:paint;pointer-events:none;
@@ -12874,7 +12881,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 .site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:0; }
 @media (prefers-reduced-motion:reduce) {
-  .shell-data-conduit { display:none; }
+  .shell-data-conduit, .shell-data-conduit__environment { display:none; }
   .site-shell[data-data-conduit] [data-set-featured-open] .set-featured-photo-image { opacity:1; }
 }
 

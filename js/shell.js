@@ -4048,6 +4048,7 @@ function finishShellDataConduit(passage, status, reason, photoKey = "", albumId 
   passage.controller.abort();
   passage.animations?.forEach(animation => animation.cancel());
   passage.element?.remove();
+  passage.environment?.remove();
   shell?.removeAttribute("data-data-conduit");
   passage.result = { status, reason, photoKey, albumId, elapsedMs: performance.now() - passage.started };
   passage.phase = status === "cancelled" ? "cancelled" : "complete";
@@ -4267,6 +4268,35 @@ function reconstructShellDataConduit(passage) {
   ], start, Math.max(1, 650 - start), "cubic-bezier(.2,.6,.25,1)");
 }
 
+// DATA-03.4: retain the actual Shell source surface behind the real destination content.
+// Full Shell dimensions preserve its cover crop; only the content area above Engine is painted.
+function bridgeShellDataConduitEnvironment(passage) {
+  const bounds = shell.getBoundingClientRect();
+  const background = getComputedStyle(shell, "::before").background;
+  const environment = document.createElement("div");
+  environment.className = "shell-data-conduit__environment";
+  environment.setAttribute("aria-hidden", "true");
+  environment.inert = true;
+  Object.assign(environment.style, { left: bounds.left + "px", top: bounds.top + "px",
+    width: bounds.width + "px", height: bounds.height + "px",
+    clipPath: "inset(" + Math.max(0, passage.top - bounds.top) + "px 0 " + Math.max(0, bounds.bottom - passage.bottom) + "px 0)" });
+  const source = document.createElement("div"), violet = document.createElement("div");
+  source.className = "shell-data-conduit__atmosphere";
+  source.style.background = background;
+  violet.className = "shell-data-conduit__violet";
+  environment.append(source, violet);
+  passage.environment = environment;
+  // This owner is hidden until normal route mounting. Its own blue background is never replaced.
+  setDossierViewport.prepend(environment);
+  animateShellDataConduit(passage, source, [
+    { opacity: 1 }, { opacity: 1, offset: 160 / 500, easing: "cubic-bezier(.4,0,.2,1)" }, { opacity: 0 },
+  ], 0, 500);
+  animateShellDataConduit(passage, violet, [
+    { opacity: 0 }, { opacity: 0, offset: 160 / 500 },
+    { opacity: 1, offset: 310 / 500 }, { opacity: 0 },
+  ], 0, 500, "ease-in-out");
+}
+
 function commitShellDataConduit(intent, restore, generation) {
   const started = performance.now();
   const passage = { kind: "data-conduit", intent, generation, started,
@@ -4314,6 +4344,7 @@ function commitShellDataConduit(intent, restore, generation) {
   }
   try {
     extractShellDataConduit(passage);
+    bridgeShellDataConduitEnvironment(passage);
     passage.commitTimer = setTimeout(passage.commit, 120);
   } catch {
     passage.commit();
