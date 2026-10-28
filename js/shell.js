@@ -4208,14 +4208,14 @@ function extractShellDataConduit(passage) {
     fragment.textContent = ["01", "◇", "10", ":"][i % 4];
     const x = bounds.x + bounds.width * (.14 + (i % 4) * .24);
     const y = Math.max(top + 8, Math.min(passage.bottom - 14, bounds.y + bounds.height * (.2 + Math.floor(i / 4) * .3)));
-    const dx = (i % 4 - 1.5) * 5, dy = (Math.floor(i / 4) - 1) * 6;
     const from = "translate3d(" + x + "px," + (y - top) + "px,0)";
-    const lifted = "translate3d(" + (x + dx) + "px," + (y + dy - top) + "px,0)";
+    // Hold the exact 19x10 slice endpoint until its collapse hands over to this streak.
+    const lifted = from;
     layer.append(fragment);
-    const mx = (x + dx) * .65 + innerWidth / 2 * .35;
-    const my = (y + dy) * .65 + (top + (passage.bottom - top) * .37) * .35;
-    const angle = Math.atan2(my - y - dy, mx - x - dx) * 180 / Math.PI;
-    const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(4.2,1.1)";
+    const mx = x * .65 + innerWidth / 2 * .35;
+    const my = y * .65 + (top + (passage.bottom - top) * .37) * .35;
+    const angle = Math.atan2(my - y, mx - x) * 180 / Math.PI;
+    const middle = "translate3d(" + mx + "px," + (my - top) + "px,0) rotate(" + angle + "deg) scale(4.2,1.65)";
     passage.fragments.push({ element: fragment, x: mx, y: my, middle, originX: x, originY: y });
     animateShellDataConduit(passage, fragment, [
       { transform: from + " scale(.3)", opacity: 0 },
@@ -4245,15 +4245,26 @@ function transmitShellDataConduit(passage) {
   const y = bounds?.height ? bounds.y + bounds.height / 2 : (passage.top + passage.bottom) / 2;
   passage.arrival = { x, y };
   passage.fragments.forEach((fragment, i) => {
-    const tx = x + ((i % 4) - 1.5) * Math.min(28, (bounds?.width || 240) / 10);
-    const ty = Math.max(passage.top + 12, Math.min(passage.bottom - 12, y + (Math.floor(i / 4) - 1) * 24));
-    const angle = Math.atan2(ty - fragment.y, tx - fragment.x) * 180 / Math.PI;
+    // Transforms position the top-left; center the existing 19x10 element on the mask seed.
+    const tx = x - 9.5, ty = y - 5;
+    const angle = Math.atan2(y - fragment.y - 5, x - fragment.x - 9.5) * 180 / Math.PI;
+    // Ordered approach lanes open a small gap, then meet the unchanged Hero seed.
+    const dx = tx - fragment.x, dy = ty - fragment.y;
+    const distance = Math.hypot(dx, dy) || 1;
+    const lane = ((i % 4) - 1.5) * Math.min(8, (bounds?.width || 240) * .018);
+    const progress = .62 - (Math.floor(i / 4) - 1) * .065;
+    const ax = fragment.x + dx * progress - dy / distance * lane;
+    const ay = fragment.y + dy * progress + dx / distance * lane;
+    const approach = "translate3d(" + ax + "px," + (ay - passage.top) + "px,0) rotate(" + angle + "deg) scale(2.6,1.35)";
     const end = "translate3d(" + tx + "px," + (ty - passage.top) + "px,0)";
+    const duration = SHELL_DATA_CONDUIT_TIMING.transmissionEnd - SHELL_DATA_CONDUIT_TIMING.transmissionTurn + i * 3;
+    const arrival = (SHELL_DATA_CONDUIT_TIMING.reconstructionStart - SHELL_DATA_CONDUIT_TIMING.transmissionTurn) / duration;
     animateShellDataConduit(passage, fragment.element, [
-      { transform: fragment.middle, opacity: .94 },
-      { transform: end + " rotate(" + angle + "deg) scale(2.4,1)", opacity: .94, offset: .9 },
+      { transform: fragment.middle, opacity: .94, easing: "cubic-bezier(.3,.1,.7,.7)" },
+      { transform: approach, opacity: .94, offset: arrival * .65, easing: "cubic-bezier(.3,.3,.7,1)" },
+      { transform: end + " rotate(" + angle + "deg) scale(.9,.9)", opacity: .94, offset: arrival, easing: "ease-out" },
       { transform: end + " rotate(" + angle + "deg) scale(.15)", opacity: 0 },
-    ], SHELL_DATA_CONDUIT_TIMING.transmissionTurn, SHELL_DATA_CONDUIT_TIMING.transmissionEnd - SHELL_DATA_CONDUIT_TIMING.transmissionTurn + i * 3, "cubic-bezier(.3,.1,.7,1)");
+    ], SHELL_DATA_CONDUIT_TIMING.transmissionTurn, duration);
   });
 }
 
@@ -4272,20 +4283,22 @@ function reconstructShellDataConduit(passage) {
     const left = [], right = [];
     for (let i = 0; i <= 24; i++) {
       const y = Math.max(0, Math.min(100, Math.max(cy - ry, Math.min(cy + ry, i * 100 / 24))));
-      const distance = Math.min(1, Math.abs(y - cy) / ry);
-      // Fine angled scan edges advance together from the arriving data, without block cuts.
-      const reach = rx * Math.sqrt(1 - distance * distance) * (i % 3 === 0 ? .94 : 1);
-      left.push(Math.max(0, cx - reach) + "% " + y + "%");
-      right.push(Math.min(100, cx + reach) + "% " + y + "%");
+      // One slanted scan front grows from the seed; alternating fine edges resolve continuously.
+      const axis = cx + (cy - y) * .55 * Math.max(0, 1 - rx / 110);
+      const step = Math.min(2, rx * .08);
+      const leftReach = rx - step * (i % 4) / 3;
+      const rightReach = rx - step * ((i + 2) % 4) / 3;
+      left.push(Math.max(0, axis - leftReach) + "% " + y + "%");
+      right.push(Math.min(100, axis + rightReach) + "% " + y + "%");
     }
     return "polygon(" + left.concat(right.reverse()).join(",") + ")";
   };
   animateShellDataConduit(passage, image, [
-    { opacity: 0, clipPath: edge(3, 2) },
-    { opacity: .88, clipPath: edge(24, 34), offset: .30 },
-    { opacity: 1, clipPath: edge(58, 68), offset: .70 },
-    { opacity: 1, clipPath: edge(150, 150), offset: .96 },
-    { opacity: 1, clipPath: edge(150, 150) },
+    { opacity: 0, clipPath: edge(2, 3) },
+    { opacity: .88, clipPath: edge(13, 70), offset: .30 },
+    { opacity: 1, clipPath: edge(60, 120), offset: .70 },
+    { opacity: 1, clipPath: edge(160, 160), offset: .96 },
+    { opacity: 1, clipPath: edge(160, 160) },
   ], start, SHELL_DATA_CONDUIT_TIMING.reconstructionEnd - SHELL_DATA_CONDUIT_TIMING.reconstructionStart);
 }
 
