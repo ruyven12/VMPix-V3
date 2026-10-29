@@ -655,12 +655,21 @@ function syncPortfolioGatewayTriggerState() {
   syncShellMenuAvailability();
 }
 
-// Shell menu uses the existing Engine lifecycle; rows remain informational.
+// NAV-02A: canonical route eligibility, independent of the world's presentation alias.
 function isShellMenuAvailable() {
-  return Boolean(shell && portfolioRightEmitter && shellMenuPanel &&
-    window.location.pathname === routePaths.portfolio && shell.dataset.shellRoute === "portfolio" &&
-    shell.dataset.portfolioEngineReady === "true" && !isPortfolioGatewayActive() &&
-    !shell.classList.contains("is-portfolio-world-arrived"));
+  if (!shell || !portfolioRightEmitter || !shellMenuPanel || !portfolioEngine ||
+      shell.inert || portfolioEngine.closest('[inert]') || !canOpenTrajectory() || trajectorySession) return false;
+  const route = getRouteFromUrl();
+  if (route.isUnknown || !isPrototypeEngineReturnRoute(route) || route.name === 'wrestling-match-detail-photo') return false;
+  if (route.name === 'portfolio' && (shell.dataset.portfolioEngineReady !== 'true' ||
+      isPortfolioGatewayActive() || shell.classList.contains('is-portfolio-world-arrived'))) return false;
+  // Protected viewers/preferences retain ownership until NAV-02B. Never override their inertness.
+  if (document.querySelector('dialog[open]') || [...document.querySelectorAll(
+      '[aria-modal="true"], [data-set-focus], #v3-privacy-preferences')].some(element =>
+      !element.hidden && element.getAttribute('aria-hidden') !== 'true' && element.getClientRects().length)) return false;
+  const style = getComputedStyle(portfolioEngine);
+  return style.display !== 'none' && style.visibility === 'visible' && Number(style.opacity) > 0 &&
+    portfolioEngine.getBoundingClientRect().height > 0;
 }
 
 function stopShellMenuPositioning() {
@@ -721,6 +730,7 @@ function setShellMenuOpen(isOpen) {
 function syncShellMenuAvailability() {
   if (!portfolioRightEmitter || !shellMenuPanel) return;
   const available = isShellMenuAvailable();
+  shell.toggleAttribute("data-shell-menu-available", available);
   if (!available) {
     if (document.activeElement === portfolioRightEmitter) portfolioRightEmitter.blur();
     portfolioRightEmitter.disabled = true;
@@ -758,7 +768,7 @@ function syncShellMenuAvailability() {
 }
 
 function syncShellMenuRoute(route) {
-  const key = route.name === "portfolio" ? window.location.pathname + window.location.search : "";
+  const key = getRouteFromUrl().canonicalUrl || window.location.pathname + window.location.search;
   if (key !== shellMenuRouteKey) {
     resetShellMenu();
     shellMenuRouteKey = key;
@@ -776,8 +786,21 @@ function handleShellMenuToggle() {
 function handleShellMenuEscape(event) {
   if (event.key !== "Escape" || !shellMenuOpen) return;
   event.preventDefault();
+  event.stopImmediatePropagation();
+  dismissShellMenu();
+}
+
+function dismissShellMenu() {
   setShellMenuOpen(false);
   if (isShellMenuAvailable() && !portfolioRightEmitter.disabled) portfolioRightEmitter.focus({ preventScroll: true });
+}
+
+function handleShellMenuOutside(event) {
+  if (!shellMenuOpen || shellMenuPanel.contains(event.target) || portfolioRightEmitter.contains(event.target) ||
+      prototypeEngineReturnEmitter?.contains(event.target)) return;
+  // Let the original pointer event reach the underlying control; never consume its action.
+  setShellMenuOpen(false);
+  if (shellMenuPanel.contains(document.activeElement)) portfolioRightEmitter.focus({ preventScroll: true });
 }
 
 function settleShellMenuRetraction(event) {
@@ -794,14 +817,17 @@ function syncShellMenuMotion() {
   scheduleShellMenuPosition();
 }
 
-function handleShellMenuAdmin(event) {
+function handleShellMenuDestination(event) {
   if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.hidden || shellMenuPanel.inert) {
     event.preventDefault();
     return;
   }
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const destination = routePaths[event.currentTarget.dataset.shellMenuRoute];
+  if (!destination) return;
   event.preventDefault();
-  navigateToRoute(routePaths.admin);
+  dismissShellMenu();
+  if (getRouteFromUrl().canonicalUrl !== destination) navigateToRoute(destination);
 }
 
 function handleShellMenuAnalytics(event) {
@@ -1027,6 +1053,7 @@ function handleShellMenuTrajectory(event) {
   if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.inert || event.defaultPrevented) { event.preventDefault(); return; }
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
+  dismissShellMenu();
   navigateToRoute(routePaths.upcoming);
 }
 
@@ -1054,12 +1081,39 @@ function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
-  shellMenuPanel.querySelector("[data-shell-menu-admin]")?.addEventListener("click", handleShellMenuAdmin);
+  shellMenuPanel.querySelectorAll("[data-shell-menu-route]").forEach(link => link.addEventListener("click", handleShellMenuDestination));
   shellMenuPanel.querySelector("[data-shell-menu-trajectory]")?.addEventListener("click", handleShellMenuTrajectory);
   shellMenuPanel.querySelector("[data-shell-menu-analytics]")?.addEventListener("click", handleShellMenuAnalytics);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
-  window.addEventListener("keydown", handleShellMenuEscape);
+  // Cold-entry CSS can settle without another route/ownership mutation.
+  const settleEngineMenu = event => { if (event.target === portfolioEngine) syncShellMenuAvailability(); };
+  portfolioEngine.addEventListener("transitionend", settleEngineMenu);
+  portfolioEngine.addEventListener("transitioncancel", settleEngineMenu);
+  portfolioEngine.addEventListener("animationend", settleEngineMenu);
+  window.addEventListener("keydown", handleShellMenuEscape, true);
+  document.addEventListener("pointerdown", handleShellMenuOutside, true);
+  // Observe only ownership roots, not photo tiles or per-frame animation styles.
+  const ownershipObserver = new MutationObserver(records => {
+    if (records.some(record => record.type === 'childList' || record.oldValue !== record.target.getAttribute(record.attributeName))) {
+      syncShellMenuAvailability();
+    }
+  });
+  const observeOwner = element => {
+    if (element) ownershipObserver.observe(element, { attributes: true, attributeOldValue: true,
+      attributeFilter: ['class', 'hidden', 'inert', 'open', 'aria-hidden', 'data-portfolio-engine-ready',
+        'data-world-landing-phase', 'data-portfolio-gateway-state'], childList: element === shell });
+  };
+  [shell, portfolioEngine, musicNexusShell, globalMenuDrawer, trajectoryOverlay,
+    ...document.querySelectorAll('[aria-modal="true"], [data-set-focus]')].forEach(observeOwner);
+  // Preferences are inserted lazily outside the Shell; observe their ownership only.
+  const observePreferences = () => {
+    const preferences = document.querySelector('#v3-privacy-preferences');
+    if (preferences) { observeOwner(preferences); observeOwner(preferences.parentElement); }
+  };
+  observePreferences();
+  new MutationObserver(() => { observePreferences(); syncShellMenuAvailability(); })
+    .observe(document.body, { childList: true });
   window.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
   window.addEventListener("orientationchange", scheduleShellMenuPosition, { passive: true });
   window.visualViewport?.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
@@ -4488,6 +4542,7 @@ function syncShellBackSweepMotion() {
 
 let shellBackPendingEntry = null;
 function performShellBack() {
+  if (shellMenuOpen) { dismissShellMenu(); return; }
   cancelShellDataConduit("engine-back");
   const route = getRouteFromUrl();
   if (bandRecordOpening || route.name === "home") return;
@@ -8760,6 +8815,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     if (event.persisted) syncHomeEngageReadiness();
   });
   window.addEventListener("popstate", (event) => {
+    resetShellMenu(); // Also clear before same-route local-history handlers return.
     cancelShellDataConduit("history");
     shellBackPendingEntry = null;
     if (handleTrajectoryHistory(event)) return;
