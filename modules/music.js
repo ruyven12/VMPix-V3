@@ -1550,11 +1550,32 @@ function getBandDetailYearCandidate(...values) {
   return "";
 }
 
+// SmugMug timestamps are instants; archive readouts use Eastern time, including DST.
+// Date-only and unzoned camera values retain their supplied calendar day.
+const musicArchiveTimestampDateFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
+});
+function getMusicArchiveTimestampDateParts(value) {
+  const text = String(value || '').trim();
+  if (!/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})$/i.test(text)) return null;
+  const time = Date.parse(text);
+  if (!Number.isFinite(time)) return null;
+  const parts = Object.fromEntries(musicArchiveTimestampDateFormatter.formatToParts(new Date(time))
+    .filter(part => ['year', 'month', 'day'].includes(part.type))
+    .map(part => [part.type, Number(part.value)]));
+  return { ...parts, time };
+}
+
 function formatBandDetailCompactDate(value, fallback = "Pending") {
   const text = getBandDetailTextCandidate(value);
   if (!text) {
     return fallback;
   }
+
+  const timestampDate = getMusicArchiveTimestampDateParts(text);
+  const calendarDate = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (timestampDate) return formatMusicPersonArchiveDateParts(timestampDate) || fallback;
+  if (calendarDate) return formatMusicPersonArchiveDateParts({ year: Number(calendarDate[1]), month: Number(calendarDate[2]), day: Number(calendarDate[3]) }) || fallback;
 
   const numericMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/);
   if (numericMatch) {
@@ -11279,6 +11300,8 @@ function getMusicPersonOriginalDateTime(source, type) {
 }
 
 function getMusicPersonArchiveDateParts(value) {
+  const timestampDate = getMusicArchiveTimestampDateParts(value);
+  if (timestampDate) return timestampDate;
   if (value instanceof Date && Number.isFinite(value.getTime())) {
     return {
       year: value.getUTCFullYear(),
@@ -11346,6 +11369,8 @@ function formatMusicPersonArchiveDateParts(parts) {
 }
 
 function parseMusicPersonOriginalDateTime(value) {
+  const timestampDate = getMusicArchiveTimestampDateParts(value);
+  if (timestampDate) return timestampDate.time;
   const text = getMusicPeopleText(value);
   if (!text) {
     return null;
@@ -11376,8 +11401,8 @@ function parseMusicPersonOriginalDateTime(value) {
   return Number.isFinite(parsedTime) ? parsedTime : null;
 }
 
-function formatMusicPersonSeenDateTime(time) {
-  return formatMusicPersonArchiveDateParts(getMusicPersonArchiveDateParts(new Date(time)));
+function formatMusicPersonSeenDateTime(time, sourceValue) {
+  return formatMusicPersonArchiveDateParts(getMusicPersonArchiveDateParts(sourceValue ?? new Date(time)));
 }
 
 function getMusicPersonOriginalDateTimeCandidates(source, type) {
@@ -11391,11 +11416,12 @@ function getMusicPersonOriginalDateTimeCandidates(source, type) {
 
 function getMusicPersonSeenValue(source, type) {
   const originalTimes = getMusicPersonOriginalDateTimeCandidates(source, type)
-    .map(parseMusicPersonOriginalDateTime)
-    .filter((time) => Number.isFinite(time));
+    .map(value => ({ value, time: parseMusicPersonOriginalDateTime(value) }))
+    .filter(candidate => Number.isFinite(candidate.time));
   if (originalTimes.length > 0) {
-    const targetTime = type === "first" ? Math.min(...originalTimes) : Math.max(...originalTimes);
-    return formatMusicPersonSeenDateTime(targetTime);
+    const target = originalTimes.reduce((current, candidate) =>
+      (type === "first" ? candidate.time < current.time : candidate.time > current.time) ? candidate : current);
+    return formatMusicPersonSeenDateTime(target.time, target.value);
   }
 
   const sourceKeys = type === "first"
@@ -11406,7 +11432,7 @@ function getMusicPersonSeenValue(source, type) {
     .find(Boolean);
   if (directValue) {
     const parsedTime = parseMusicPersonOriginalDateTime(directValue);
-    return Number.isFinite(parsedTime) ? formatMusicPersonSeenDateTime(parsedTime) : directValue;
+    return Number.isFinite(parsedTime) ? formatMusicPersonSeenDateTime(parsedTime, directValue) : directValue;
   }
 
   const label = type === "first" ? "First Seen" : "Latest Seen";
