@@ -4894,6 +4894,115 @@ const ZHENTO_PILLAR_STAT_LABELS = {
   shows: "Recorded Convergences",
 };
 
+// One local identity cycle; the Individual Set Archive Readout remains independent.
+const ZHENTO_PILLAR_IDENTITIES = {
+  bands: ["Pillar of Rhythm", "The Bands Archive"],
+  people: ["Pillar of Melody", "The People Archive"],
+  venues: ["Pillar of Harmony", "The Venues Archive"],
+  shows: ["Pillar of Synchronicity", "The Shows Archive"],
+};
+let zhentoPillarIdentity = null;
+
+function settleZhentoPillarIdentity(session, commit = false) {
+  const transition = session.transition;
+  session.transition = null;
+  clearTimeout(transition?.deadline);
+  if (commit && transition) session.index = transition.nextIndex;
+  transition?.animations.forEach(animation => animation.cancel());
+  session.text.removeAttribute("data-pixel-transition");
+  session.text.textContent = session.labels[session.index];
+}
+
+function cancelZhentoPillarIdentity() {
+  const session = zhentoPillarIdentity;
+  if (!session) return;
+  zhentoPillarIdentity = null;
+  clearTimeout(session.timer);
+  settleZhentoPillarIdentity(session);
+  session.events.abort();
+}
+
+async function advanceZhentoPillarIdentity(session) {
+  if (!session.active()) return;
+  const transition = { animations: [], deadline: 0, nextIndex: 1 - session.index };
+  session.transition = transition;
+  const finish = () => {
+    if (session.transition !== transition) return;
+    settleZhentoPillarIdentity(session, true);
+    session.schedule();
+  };
+  if (!session.pixels[0]?.animate) { finish(); return; }
+  transition.deadline = setTimeout(finish, 400);
+  // The approved readout's 12x4 clipping cells, scoped to this title alone.
+  const phase = async entering => {
+    session.text.dataset.pixelTransition = entering ? "in" : "out";
+    transition.animations = session.pixels.map((pixel, index) => pixel.animate([
+      { transform: entering ? "scale(0)" : "scale(1)" },
+      { transform: entering ? "scale(1)" : "scale(0)" }
+    ], { duration: 70, delay: ((index * 17) % 6) * 5, easing: "steps(4, end)", fill: "both" }));
+    await Promise.all(transition.animations.map(animation => animation.finished));
+  };
+  try {
+    await phase(false);
+    if (session.transition !== transition) return;
+    const outgoing = transition.animations;
+    session.index = transition.nextIndex;
+    session.text.textContent = session.labels[session.index];
+    const incoming = phase(true);
+    outgoing.forEach(animation => animation.cancel());
+    await incoming;
+    finish();
+  } catch {
+    if (session.transition === transition) finish();
+  }
+}
+
+function startZhentoPillarIdentity(landing, key) {
+  cancelZhentoPillarIdentity();
+  const labels = ZHENTO_PILLAR_IDENTITIES[key];
+  if (!labels) return;
+  const heading = landing.querySelector("#zhento-pillar-title");
+  const text = heading.querySelector(".zhento-pillar-identity");
+  const mask = landing.querySelector("#zhento-pillar-title-pixels");
+  heading.setAttribute("aria-label", labels.join(" / "));
+  text.textContent = labels[0];
+  if (!mask.childElementCount) {
+    for (let index = 0; index < 48; index += 1) {
+      const pixel = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      pixel.setAttribute("x", String((index % 12) / 12));
+      pixel.setAttribute("y", String(Math.floor(index / 12) / 4));
+      pixel.setAttribute("width", String(1 / 12));
+      pixel.setAttribute("height", String(1 / 4));
+      mask.append(pixel);
+    }
+  }
+  const session = { labels, text, index: 0, timer: 0, transition: null,
+    pixels: [...mask.children], events: new AbortController() };
+  zhentoPillarIdentity = session;
+  session.active = () => zhentoPillarIdentity === session && getRouteFromUrl().name === "music"
+    && zhentoInformationContext?.key === "pulse" && landing.dataset.selectedDestination === key
+    && !document.hidden && !reducedMotion.matches && !isWorldLandingInteractionBlocked("zhento");
+  session.schedule = () => {
+    clearTimeout(session.timer); session.timer = 0;
+    if (session.active()) session.timer = setTimeout(() => {
+      session.timer = 0;
+      void advanceZhentoPillarIdentity(session);
+    }, 3000);
+  };
+  session.pause = () => {
+    clearTimeout(session.timer); session.timer = 0;
+    if (reducedMotion.matches) session.index = 0;
+    settleZhentoPillarIdentity(session);
+  };
+  const sync = () => { session.pause(); session.schedule(); };
+  const listen = (node, type, handler) => node.addEventListener(type, handler, { signal: session.events.signal });
+  listen(document, "visibilitychange", sync);
+  listen(reducedMotion, "change", sync);
+  listen(window, "pagehide", session.pause);
+  listen(window, "pageshow", sync);
+  session.schedule();
+}
+
 function syncZhentoPillarStat() {
   const landing = document.querySelector("[data-zhento-landing]");
   const key = landing?.dataset.selectedDestination;
@@ -5078,14 +5187,15 @@ function selectZhentoPillar(landing, key) {
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(selected && row.dataset.zhentoStat === key)));
   const enter = pulse.querySelector(".zhento-enter");
   enter.disabled = !selected || !["bands", "shows"].includes(key);
-  enter.setAttribute("aria-label", enter.disabled ? "Enter — not available yet" : key === "shows" ? "Enter the Pillar of Synchronicity" : "Enter the Pillar of Rhythm");
+  enter.setAttribute("aria-label", enter.disabled ? "Enter the Archive - not available yet" : "Enter the Archive");
   if (selected) {
-    pulse.querySelector(".zhento-detail__title").textContent = pulse.querySelector(`[data-zhento-destination="${key}"] .zhento-pillar-tile__title`).textContent;
+    startZhentoPillarIdentity(landing, key);
     pulse.querySelector(".zhento-detail__copy").textContent = ZHENTO_PILLAR_DESCRIPTIONS[key];
     syncZhentoPillarStat();
   }
   pulse.querySelector(".zhento-detail__copy").scrollTop = 0;
   setZhentoPulseView(landing, selected);
+  if (!selected) cancelZhentoPillarIdentity();
 }
 
 function clearZhentoPillarSelection(landing) {
@@ -5137,6 +5247,8 @@ function setZhentoLowerThirdContent(surface, key) {
 let zhentoInformationContext = null;
 
 function cancelZhentoInformationContext(hide = true) {
+  if (hide) cancelZhentoPillarIdentity();
+  else zhentoPillarIdentity?.pause();
   const context = zhentoInformationContext;
   zhentoInformationContext = null;
   context?.animations.forEach((animation) => animation.cancel());
@@ -5183,6 +5295,7 @@ function showZhentoInformationContext(landing, key) {
   surface.inert = false;
   if (key === "pulse") {
     setZhentoPulseView(landing, Boolean(landing.dataset.selectedDestination));
+    startZhentoPillarIdentity(landing, landing.dataset.selectedDestination);
     syncZhentoPillarStat();
   }
   if (key === "planet-stats") {
@@ -5751,7 +5864,7 @@ function resetZhentoLandingSelection() {
   clearZhentoPillarSelection(landing);
   const enter = landing.querySelector(".zhento-pulse .zhento-enter");
   enter.disabled = true;
-  enter.setAttribute("aria-label", "Enter — not available yet");
+  enter.setAttribute("aria-label", "Enter the Archive - not available yet");
   if (!enter.dataset.zhentoEntryBound) {
     enter.dataset.zhentoEntryBound = "true";
     enter.addEventListener("click", startZhentoRhythmEntry);

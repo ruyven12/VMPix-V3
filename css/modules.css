@@ -31276,6 +31276,37 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-pulse__detail .zhento-detail__copy { margin: .3rem 0; padding: 0; border: 0; font-family: inherit; font-size: calc(.76rem + 2px); line-height: 1.4; letter-spacing: 0; }
 .zhento-pulse .zhento-enter { position: static; transform: none; display: block; inline-size: 100%; min-block-size: 44px; margin: 0; padding: .45rem; border: 0; background: transparent; color: #dce6ff; font: inherit; font-size: .72rem; cursor: pointer; }
 .zhento-pulse .zhento-enter:disabled { opacity: .5; cursor: default; }
+/* Selected-pillar HUD only: keep the existing header, frame and card geometry. */
+.zhento-pulse__detail {
+  --pillar-info-accent:137,167,255;
+  position:relative;isolation:isolate;text-align:center;
+  background:linear-gradient(110deg,rgba(var(--pillar-info-accent),.09),transparent 48%),linear-gradient(180deg,rgba(6,10,22,.5),rgba(6,10,22,.22));
+}
+[data-selected-destination="people"] .zhento-pulse__detail { --pillar-info-accent:145,112,235; }
+[data-selected-destination="venues"] .zhento-pulse__detail { --pillar-info-accent:91,216,204; }
+[data-selected-destination="shows"] .zhento-pulse__detail { --pillar-info-accent:241,184,100; }
+.zhento-pulse__detail::before {
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border:1px solid rgba(var(--pillar-info-accent),.23);
+  clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px),0 8px);
+}
+.zhento-pulse__detail > .zhento-lower-third__header { border-block-end-color:rgba(var(--pillar-info-accent),.3); }
+.zhento-pulse__detail .zhento-detail__title { block-size:1.3em;white-space:nowrap;letter-spacing:.04em;color:rgb(var(--pillar-info-accent)); }
+.zhento-pillar-identity { display:block;block-size:100%; }
+.zhento-pillar-identity[data-pixel-transition] { clip-path:url(#zhento-pillar-title-pixels); }
+.zhento-pillar-title-mask { position:absolute;inline-size:0;block-size:0;pointer-events:none; }
+.zhento-pillar-title-mask rect { transform-box:fill-box;transform-origin:center; }
+.zhento-pulse__detail .zhento-detail__stat { font-size:.72rem;line-height:calc(.65rem * 1.35);color:#dce6f5; }
+.zhento-pulse__detail .zhento-detail__copy { color:#d5deec; }
+.zhento-pulse__detail .zhento-enter {
+  align-self:center;inline-size:min(100%,18rem);color:#edf2ff;
+  border:1px solid rgba(var(--pillar-info-accent),.58);
+  background:linear-gradient(110deg,rgba(var(--pillar-info-accent),.16),rgba(8,12,25,.5));
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+  letter-spacing:.045em;
+}
+.zhento-pulse__detail .zhento-enter:disabled { opacity:.6; }
+.zhento-pulse__detail .zhento-enter:focus-visible { outline:2px solid rgb(var(--pillar-info-accent));outline-offset:-3px; }
 @media (min-width: 541px) {
   .zhento-pulse__selector-box { padding-inline-start: max(2.25rem, 6%); }
 }
