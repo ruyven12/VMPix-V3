@@ -32077,6 +32077,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel-dossier { box-sizing:border-box;width:min(100%,42rem);min-width:0;padding:0 clamp(.5rem,2vw,1rem); }
 .band-personnel-roster { display:grid;gap:.55rem;min-width:0;margin:0;padding:0;list-style:none; }
 .band-personnel-record { min-width:0;margin:0;padding:0; }
+/* BM-02: one ordered roster, with a divider only when former members are documented. */
+.band-personnel-divider { min-width:0;margin:.45rem 0 0;padding:.8rem .65rem .15rem;border-top:1px solid rgba(163,168,182,.3); }
+.band-personnel-divider > h3 { margin:0;color:#b8bdc9;font-size:.8rem;font-weight:normal;line-height:1.4;letter-spacing:.025em;text-transform:none;text-align:center; }
+.band-personnel-record[data-member-status="current"] .band-personnel-name { color:#d4c6fa; }
 .band-personnel-card {
   position:relative;box-sizing:border-box;display:grid;grid-template-columns:clamp(2.5rem,8vw,3.4rem) minmax(0,1fr) fit-content(46%);align-items:center;gap:clamp(.5rem,2vw,.85rem);
   min-width:0;min-height:5.75rem;padding:.65rem;border:1px solid transparent;border-left-width:3px;border-bottom-color:rgba(137,161,235,.3);
@@ -32091,7 +32095,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .band-personnel-name,.band-personnel-role,.band-personnel-status { margin:0;text-transform:none;overflow-wrap:anywhere; }
 .band-personnel-name { font-size:clamp(.9rem,2.5vw,1.1rem);line-height:1.4;color:inherit; }
 /* BM-01: band-specific membership, alongside the existing name without changing the roster. */
-.band-personnel-membership { display:inline-block;vertical-align:middle;padding:.12em .35em;border:1px solid rgba(141,204,239,.3);border-radius:2px;color:#a5d5ee;font-size:.625rem;line-height:1.4;letter-spacing:.025em;white-space:nowrap; }
+.band-personnel-membership { display:inline-block;vertical-align:middle;padding:.12em .35em;border:1px solid rgba(172,149,235,.4);border-radius:2px;color:#d4c6fa;font-size:.625rem;line-height:1.4;letter-spacing:.025em;white-space:nowrap; }
 .band-personnel-record[data-member-status="past"] .band-personnel-membership { border-color:rgba(163,168,182,.28);color:#b8bdc9; }
 .band-personnel-role { display:flex;align-items:center;justify-content:flex-end;gap:5px;min-width:0;text-align:right;color:#bfc9e5;font-size:.8rem;line-height:1.4; }
 .band-personnel-role > :first-child { min-width:0; }

@@ -1860,6 +1860,14 @@ function renderBandPersonnelCards(session) {
   if (bandPersonnelSession !== session || !bandDetailCoreMembers) return;
   const fragment = document.createDocumentFragment();
   for (const status of ['current', 'past']) {
+    if (status === 'past' && session.rosters.past.length) {
+      const divider = document.createElement('li');
+      divider.className = 'band-personnel-divider';
+      const heading = document.createElement('h3');
+      heading.textContent = 'Past Members';
+      divider.append(heading);
+      fragment.append(divider);
+    }
     session.rosters[status].forEach(member => fragment.append(createBandPersonnelCard(member, status, session)));
   }
   if (!fragment.childNodes.length) {
@@ -1913,9 +1921,10 @@ function renderBandPersonnel(band) {
   const raw = band.backend_record || band;
   const personnel = getBandDetailPersonnel(raw);
   const id = getBandId(band);
+  // Preserve each recorded entry and its source order, including repeated names or roles.
   const rosters = {
-    current: normalizeBandDetailMembers(getUniqueBandDetailMembers(personnel.members)),
-    past: normalizeBandDetailMembers(getUniqueBandDetailMembers(personnel.past_members)),
+    current: normalizeBandDetailMembers(personnel.members),
+    past: normalizeBandDetailMembers(personnel.past_members),
   };
   const session = { id, name: getBandDetailName(raw), nameKey: bandPersonnelKey(getBandDetailName(raw)), rosters,
     documented: Array.isArray(personnel.members) || Array.isArray(personnel.past_members),
