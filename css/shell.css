@@ -14641,6 +14641,11 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   font-family: var(--font-display);
   text-transform: none;
 }
+/* NAV-02B: these nonmodal Wrestling dossier surfaces sit at 34 above the ordinary content layer.
+   Keep their Shell disclosure reachable; declared modals still disable it in JS. */
+.site-shell[data-shell-menu-available]:is([data-wrestling-people-prototype="hall-of-champions"], [data-wrestling-person-dossier-prototype="blank"], [data-shell-route="wrestling-match-detail"]) .shell-menu-preview:not([hidden]) {
+  z-index: 35;
+}
 .site-shell[data-shell-menu-available].is-shell-menu-open .shell-menu-preview:not([hidden]) {
   transform: translate(calc(-100% + var(--shell-menu-point)), -100%) scaleY(1);
   opacity: 1;

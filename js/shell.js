@@ -146,6 +146,7 @@ let prototypeEngineReturnControl = null;
 const portfolioRightEmitter = document.querySelector(".portfolio-engine-reactor");
 const shellMenuPanel = document.querySelector("[data-shell-menu-panel]");
 let shellMenuOpen = false;
+let shellMenuReturnFocus = null;
 let shellMenuPositionActive = false;
 let shellMenuPositionFrame = 0;
 let shellMenuEngineWait = null;
@@ -662,9 +663,9 @@ function isShellMenuAvailable() {
   if (route.isUnknown || !isPrototypeEngineReturnRoute(route) || route.name === 'wrestling-match-detail-photo') return false;
   if (route.name === 'portfolio' && (shell.dataset.portfolioEngineReady !== 'true' ||
       isPortfolioGatewayActive() || shell.classList.contains('is-portfolio-world-arrived'))) return false;
-  // Protected viewers/preferences retain ownership until NAV-02B. Never override their inertness.
+  // NAV-02B: integrated Focus is nonmodal; declared modals/preferences keep exclusive ownership.
   if (document.querySelector('dialog[open]') || [...document.querySelectorAll(
-      '[aria-modal="true"], [data-set-focus], #v3-privacy-preferences')].some(element =>
+      '[aria-modal="true"], #v3-privacy-preferences')].some(element =>
       !element.hidden && element.getAttribute('aria-hidden') !== 'true' && element.getClientRects().length)) return false;
   const style = getComputedStyle(portfolioEngine);
   return style.display !== 'none' && style.visibility === 'visible' && Number(style.opacity) > 0 &&
@@ -679,6 +680,7 @@ function stopShellMenuPositioning() {
 
 function resetShellMenu() {
   shellMenuOpen = false;
+  shellMenuReturnFocus = null;
   shellMenuEngineWait = null;
   stopShellMenuPositioning();
   shell?.classList.remove("is-shell-menu-open");
@@ -740,6 +742,9 @@ function scheduleShellMenuPosition() {
 function setShellMenuOpen(isOpen) {
   if (!shellMenuPanel || !portfolioRightEmitter) return false;
   if (isOpen && (!isShellMenuAvailable() || portfolioRightEmitter.disabled || !positionShellMenu())) return false;
+  if (isOpen && !shellMenuOpen) shellMenuReturnFocus ||= document.activeElement;
+  if (!isOpen) shellMenuReturnFocus = null;
+  const opening = isOpen && !shellMenuOpen;
   shellMenuOpen = isOpen;
   if (isOpen) shellMenuPositionActive = true;
   shell.classList.toggle("is-shell-menu-open", isOpen);
@@ -747,6 +752,8 @@ function setShellMenuOpen(isOpen) {
   portfolioRightEmitter.setAttribute("aria-label", isOpen ? "Close Shell menu" : "Open Shell menu");
   shellMenuPanel.setAttribute("aria-hidden", String(!isOpen));
   shellMenuPanel.inert = !isOpen;
+  if (opening) [...shellMenuPanel.querySelectorAll('a[href], button:not(:disabled)')]
+    .find(element => !element.closest('[hidden]'))?.focus({ preventScroll: true });
   if (!isOpen && reducedMotion.matches) stopShellMenuPositioning();
   return true;
 }
@@ -807,22 +814,52 @@ function handleShellMenuToggle() {
   // Same-route history can reset the transient panel without changing its owner.
   syncShellMenuAvailability();
   if (!isShellMenuAvailable() || portfolioRightEmitter.disabled) return;
-  setShellMenuOpen(!shellMenuOpen);
+  if (shellMenuOpen) dismissShellMenu();
+  else if (!setShellMenuOpen(true)) shellMenuReturnFocus = null;
 }
 
 function handleShellMenuEscape(event) {
   if (event.key !== "Escape" || !shellMenuOpen) return;
+  // A newly opened modal owns this key even before the ownership observer runs.
+  if (!isShellMenuAvailable()) { resetShellMenu(); return; }
   event.preventDefault();
   event.stopImmediatePropagation();
   dismissShellMenu();
 }
 
 function dismissShellMenu() {
+  const returnFocus = shellMenuReturnFocus;
   setShellMenuOpen(false);
-  if (isShellMenuAvailable() && !portfolioRightEmitter.disabled) portfolioRightEmitter.focus({ preventScroll: true });
+  if (!isShellMenuAvailable()) return;
+  if (returnFocus?.isConnected && returnFocus !== document.body && returnFocus !== document.documentElement &&
+      !returnFocus.closest('[inert], [hidden], [aria-hidden="true"]') &&
+      !returnFocus.disabled && returnFocus.getClientRects().length) returnFocus.focus({ preventScroll: true });
+  else if (!portfolioRightEmitter.disabled) portfolioRightEmitter.focus({ preventScroll: true });
+}
+
+function handleShellMenuFocus(event) {
+  // A nonmodal disclosure never traps Tab or leaves hidden menu links focused.
+  if (shellMenuOpen && !shellMenuPanel.contains(event.target) && !portfolioRightEmitter.contains(event.target) &&
+      !prototypeEngineReturnEmitter?.contains(event.target)) {
+    setShellMenuOpen(false);
+  }
+}
+
+function isolateShellMenuKeys(event) {
+  // Preserve native link/Tab activation without forwarding photo-navigation keys.
+  if (!shellMenuOpen) return;
+  event.stopPropagation();
+  if (event.key === "Tab") window.requestAnimationFrame(() => {
+    // Tab may leave the document for browser chrome (no subsequent focusin).
+    if (shellMenuOpen && document.activeElement === document.body) setShellMenuOpen(false);
+  });
 }
 
 function handleShellMenuOutside(event) {
+  if (!shellMenuOpen) {
+    // Capture the viewer/drawer control before pointer focus moves to the emitter.
+    shellMenuReturnFocus = portfolioRightEmitter.contains(event.target) ? document.activeElement : null;
+  }
   if (!shellMenuOpen || shellMenuPanel.contains(event.target) || portfolioRightEmitter.contains(event.target) ||
       prototypeEngineReturnEmitter?.contains(event.target)) return;
   // Let the original pointer event reach the underlying control; never consume its action.
@@ -1102,6 +1139,7 @@ function initShellMenu() {
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
   shellMenuPanel.querySelectorAll("[data-shell-menu-route]").forEach(link => link.addEventListener("click", handleShellMenuDestination));
   shellMenuPanel.querySelector("[data-shell-menu-trajectory]")?.addEventListener("click", handleShellMenuTrajectory);
+  shellMenuPanel.addEventListener("keydown", isolateShellMenuKeys);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
   // Cold-entry CSS can settle without another route/ownership mutation.
@@ -1111,8 +1149,10 @@ function initShellMenu() {
   portfolioEngine.addEventListener("animationend", settleEngineMenu);
   window.addEventListener("keydown", handleShellMenuEscape, true);
   document.addEventListener("pointerdown", handleShellMenuOutside, true);
+  document.addEventListener("focusin", handleShellMenuFocus);
   // Observe only ownership roots, not photo tiles or per-frame animation styles.
   const ownershipObserver = new MutationObserver(records => {
+    if (records.some(record => record.type === 'childList')) observeOwnership();
     if (records.some(record => record.type === 'childList' || record.oldValue !== record.target.getAttribute(record.attributeName))) {
       syncShellMenuAvailability();
     }
@@ -1122,16 +1162,18 @@ function initShellMenu() {
       attributeFilter: ['class', 'hidden', 'inert', 'open', 'aria-hidden', 'data-portfolio-engine-ready',
         'data-world-landing-phase', 'data-portfolio-gateway-state'], childList: element === shell });
   };
-  [shell, portfolioEngine, musicNexusShell, globalMenuDrawer, trajectoryOverlay,
-    ...document.querySelectorAll('[aria-modal="true"], [data-set-focus]')].forEach(observeOwner);
-  // Preferences are inserted lazily outside the Shell; observe their ownership only.
-  const observePreferences = () => {
-    const preferences = document.querySelector('#v3-privacy-preferences');
-    if (preferences) { observeOwner(preferences); observeOwner(preferences.parentElement); }
+  const observeOwnership = () => {
+    // Person Event Archive and preferences mount lazily. Track their visibility
+    // wrappers as well, releasing detached owners when the Shell mounts change.
+    ownershipObserver.disconnect();
+    const owners = new Set([shell, portfolioEngine, musicNexusShell, globalMenuDrawer, trajectoryOverlay]);
+    document.querySelectorAll('dialog, [aria-modal="true"], #v3-privacy-preferences').forEach(modal => {
+      for (let owner = modal; owner && owner !== shell && owner !== document.body; owner = owner.parentElement) owners.add(owner);
+    });
+    owners.forEach(observeOwner);
+    ownershipObserver.observe(document.body, { childList: true });
   };
-  observePreferences();
-  new MutationObserver(() => { observePreferences(); syncShellMenuAvailability(); })
-    .observe(document.body, { childList: true });
+  observeOwnership();
   window.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
   window.addEventListener("orientationchange", scheduleShellMenuPosition, { passive: true });
   window.visualViewport?.addEventListener("resize", scheduleShellMenuPosition, { passive: true });
