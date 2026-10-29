@@ -145,7 +145,6 @@ const prototypeEngineReturnEmitter = portfolioEngineScanAnchor;
 let prototypeEngineReturnControl = null;
 const portfolioRightEmitter = document.querySelector(".portfolio-engine-reactor");
 const shellMenuPanel = document.querySelector("[data-shell-menu-panel]");
-const shellMenuUsesAnchor = typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("position-anchor", "--shell-menu-emitter") && CSS.supports("top", "anchor(center)");
 let shellMenuOpen = false;
 let shellMenuPositionActive = false;
 let shellMenuPositionFrame = 0;
@@ -694,18 +693,43 @@ function resetShellMenu() {
   }
 }
 
+function syncShellMenuContext() {
+  const path = (getRouteFromUrl().canonicalUrl || window.location.pathname).split('?')[0];
+  const world = path === routePaths.portfolio ? 'portfolio' :
+    path === routePaths.music || path.startsWith(routePaths.music + '/') ? 'music' :
+    path === routePaths.wrestling || path.startsWith(routePaths.wrestling + '/') ? 'wrestling' : '';
+  shellMenuPanel?.querySelectorAll('[data-shell-menu-world]').forEach(row => {
+    row.hidden = row.dataset.shellMenuWorld === world;
+  });
+}
+
 function positionShellMenu() {
   if (!isShellMenuAvailable()) return false;
-  if (shellMenuUsesAnchor) return true;
+  syncShellMenuContext();
   const rect = portfolioRightEmitter.getBoundingClientRect();
   if (!rect.width || !rect.height) return false;
+  const viewport = window.visualViewport;
+  // Native anchors still position the panel; these measurements also bound its layout.
   shellMenuPanel.style.setProperty("--shell-menu-emitter-x", (rect.left + rect.width / 2) + "px");
   shellMenuPanel.style.setProperty("--shell-menu-emitter-y", (rect.top + rect.height / 2) + "px");
-  return true;
+  shellMenuPanel.style.setProperty("--shell-menu-viewport-top", (viewport?.offsetTop || 0) + "px");
+  shellMenuPanel.style.setProperty("--shell-menu-viewport-left", (viewport?.offsetLeft || 0) + "px");
+  shellMenuPanel.style.setProperty("--shell-menu-viewport-width", (viewport?.width || window.innerWidth) + "px");
+  shellMenuPanel.removeAttribute('data-shell-menu-compact');
+  const rows = shellMenuPanel.querySelector('.shell-menu-preview__rows');
+  const availableHeight = parseFloat(getComputedStyle(shellMenuPanel).maxHeight);
+  if (rows.offsetHeight > availableHeight) shellMenuPanel.setAttribute('data-shell-menu-compact', '');
+  // Below the physical minimum, do not silently clip or introduce a scroll container.
+  const fits = rows.offsetHeight <= availableHeight && rows.scrollWidth <= rows.clientWidth;
+  if (!fits) {
+    setShellMenuOpen(false);
+    portfolioRightEmitter.setAttribute('aria-label', 'Shell menu needs more screen space; enlarge the viewport');
+  }
+  return fits;
 }
 
 function scheduleShellMenuPosition() {
-  if (shellMenuUsesAnchor || !shellMenuPositionActive || shellMenuPositionFrame) return;
+  if (!shellMenuPositionActive || shellMenuPositionFrame) return;
   // One coalesced measurement after viewport handlers, never a positioning loop.
   shellMenuPositionFrame = window.requestAnimationFrame(() => {
     shellMenuPositionFrame = 0;
@@ -768,6 +792,7 @@ function syncShellMenuAvailability() {
 }
 
 function syncShellMenuRoute(route) {
+  syncShellMenuContext();
   const key = getRouteFromUrl().canonicalUrl || window.location.pathname + window.location.search;
   if (key !== shellMenuRouteKey) {
     resetShellMenu();
@@ -779,6 +804,8 @@ function syncShellMenuRoute(route) {
 }
 
 function handleShellMenuToggle() {
+  // Same-route history can reset the transient panel without changing its owner.
+  syncShellMenuAvailability();
   if (!isShellMenuAvailable() || portfolioRightEmitter.disabled) return;
   setShellMenuOpen(!shellMenuOpen);
 }
@@ -828,14 +855,6 @@ function handleShellMenuDestination(event) {
   event.preventDefault();
   dismissShellMenu();
   if (getRouteFromUrl().canonicalUrl !== destination) navigateToRoute(destination);
-}
-
-function handleShellMenuAnalytics(event) {
-  if (!isShellMenuAvailable() || !shellMenuOpen || shellMenuPanel.hidden || shellMenuPanel.inert || event.defaultPrevented) return;
-  setShellMenuOpen(false);
-  // The menu row becomes inert on close; preferences return to the available Emitter.
-  portfolioRightEmitter.focus({ preventScroll: true });
-  try { window.V3Analytics?.preferences(); } catch { /* Consent remains available through the Privacy page. */ }
 }
 
 // Trajectory is a Shell overlay route: the mounted page remains its owner until a real departure.
@@ -1083,7 +1102,6 @@ function initShellMenu() {
   portfolioRightEmitter.addEventListener("click", handleShellMenuToggle);
   shellMenuPanel.querySelectorAll("[data-shell-menu-route]").forEach(link => link.addEventListener("click", handleShellMenuDestination));
   shellMenuPanel.querySelector("[data-shell-menu-trajectory]")?.addEventListener("click", handleShellMenuTrajectory);
-  shellMenuPanel.querySelector("[data-shell-menu-analytics]")?.addEventListener("click", handleShellMenuAnalytics);
   shellMenuPanel.addEventListener("transitionend", settleShellMenuRetraction);
   shellMenuPanel.addEventListener("transitioncancel", settleShellMenuRetraction);
   // Cold-entry CSS can settle without another route/ownership mutation.

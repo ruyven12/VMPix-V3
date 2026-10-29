@@ -2981,17 +2981,26 @@
     </aside>
     <aside class="shell-menu-preview" id="shell-menu-panel" aria-label="Shell menu" aria-hidden="true" data-shell-menu-panel inert hidden>
       <div class="shell-menu-preview__surface" aria-hidden="true"></div>
-      <ul class="shell-menu-preview__rows">
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/portfolio" data-shell-menu-route="portfolio">Portfolio</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/music" data-shell-menu-route="music">Music</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/wrestling" data-shell-menu-route="wrestling">Wrestling</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/calendar" data-shell-menu-route="calendar">Calendar</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/about" data-shell-menu-route="about">The Story (About)</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/upcoming" data-shell-menu-trajectory>The Trajectory (Upcoming)</a></li>
-        <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/contact" data-shell-menu-route="contact">Contact</a></li>
-        <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" data-shell-menu-analytics aria-controls="v3-privacy-preferences" aria-expanded="false">Analytics Choices</button></li>
-        <li class="shell-menu-preview__row shell-menu-preview__row--admin"><a class="shell-menu-preview__admin-link" href="/admin" data-shell-menu-admin data-shell-menu-route="admin">Admin Menu</a></li>
-      </ul>
+      <div class="shell-menu-preview__rows">
+        <div class="shell-menu-preview__group shell-menu-preview__warp">
+          <p class="shell-menu-preview__heading" id="shell-menu-warp-heading">Warp To:</p>
+          <ul class="shell-menu-preview__list" aria-labelledby="shell-menu-warp-heading">
+            <li class="shell-menu-preview__row" data-shell-menu-world="music"><a class="shell-menu-preview__action" href="/music" data-shell-menu-route="music">Music</a></li>
+            <li class="shell-menu-preview__row" data-shell-menu-world="wrestling"><a class="shell-menu-preview__action" href="/wrestling" data-shell-menu-route="wrestling">Wrestling</a></li>
+            <li class="shell-menu-preview__row" data-shell-menu-world="portfolio"><a class="shell-menu-preview__action" href="/portfolio" data-shell-menu-route="portfolio">Portfolio</a></li>
+          </ul>
+        </div>
+        <ul class="shell-menu-preview__group shell-menu-preview__list shell-menu-preview__links">
+          <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/about" data-shell-menu-route="about">The Story</a></li>
+          <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/upcoming" data-shell-menu-trajectory>The Trajectory</a></li>
+          <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/contact" data-shell-menu-route="contact">Contact</a></li>
+          <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" disabled>Report A Bug</button></li>
+          <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" disabled>Analytics</button></li>
+        </ul>
+        <ul class="shell-menu-preview__group shell-menu-preview__list shell-menu-preview__admin">
+          <li class="shell-menu-preview__row"><a class="shell-menu-preview__admin-link" href="/admin" data-shell-menu-admin data-shell-menu-route="admin">Admin Menu</a></li>
+        </ul>
+      </div>
     </aside>
 
     <dialog class="trajectory-overlay" data-trajectory-overlay role="dialog" aria-modal="true" aria-labelledby="trajectory-title" aria-hidden="true" tabindex="-1" inert hidden>
