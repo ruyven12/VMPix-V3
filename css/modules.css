@@ -31249,6 +31249,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 .zhento-pillar-tile[data-zhento-destination="venues"] { --pillar-edge: 91, 216, 204; --pillar-focus: 50% 42%; }
 .zhento-pillar-tile[data-zhento-destination="shows"] { --pillar-edge: 241, 184, 100; --pillar-focus: 51% 42%; }
 .zhento-pillar-tile__art { position: absolute; inset: 0; inline-size: 100%; block-size: var(--pillar-art-share, 100%); object-fit: cover; object-position: var(--pillar-focus); z-index: -1; opacity: 0; }
+.zhento-pillar-tile[data-zhento-destination="shows"] .zhento-pillar-tile__art { object-fit: contain; object-position: center; }
 .zhento-pillar-tile[data-artwork-state="ready"] .zhento-pillar-tile__art { opacity: 1; }
 .zhento-pillar-tile:not([data-artwork-state="ready"])::before {
   position: absolute; inset: 0 0 auto; block-size: var(--pillar-art-share, 60%); display: grid; place-items: center;
