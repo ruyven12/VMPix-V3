@@ -4896,10 +4896,10 @@ const ZHENTO_PILLAR_STAT_LABELS = {
 
 // One local identity cycle; the Individual Set Archive Readout remains independent.
 const ZHENTO_PILLAR_IDENTITIES = {
-  bands: ["Pillar of Rhythm", "The Bands Archive"],
-  people: ["Pillar of Melody", "The People Archive"],
-  venues: ["Pillar of Harmony", "The Venues Archive"],
-  shows: ["Pillar of Synchronicity", "The Shows Archive"],
+  bands: ["The Bands Archive", "Pillar of Rhythm"],
+  people: ["The People Archive", "Pillar of Melody"],
+  venues: ["The Venues Archive", "Pillar of Harmony"],
+  shows: ["The Shows Archive", "Pillar of Synchronicity"],
 };
 let zhentoPillarIdentity = null;
 
