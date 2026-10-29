@@ -4,6 +4,13 @@
    Extracted mechanically from router.js and shell.js; shell/router still own layout and route mounting.
    ========================================================= */
 
+// Temporary visitor-facing placeholder until the Contributor system is implemented.
+// Display only: never use this value to normalize records, relationships or statistics.
+const MUSIC_CONTRIBUTOR_DISPLAY_COUNT = 1;
+queryRetainedMusicElements('[data-music-contributor-display-count]').forEach(node => {
+  node.textContent = String(MUSIC_CONTRIBUTOR_DISPLAY_COUNT);
+});
+
 // Search text and selections stay inside the module; only category/count summaries leave it.
 const musicArchiveComposing = new Set();
 let musicArchiveCompositionContext;
@@ -952,7 +959,7 @@ function renderBandDetailState(stateName = "empty", bandId = "") {
     bandDetailLastUpdated,
   ].forEach((element) => {
     if (element) {
-      element.textContent = isLoading ? "Loading" : "Unavailable";
+      element.textContent = element === bandDetailContributors ? String(MUSIC_CONTRIBUTOR_DISPLAY_COUNT) : isLoading ? "Loading" : "Unavailable";
     }
   });
   if (bandDetailViewSets) {
@@ -6330,7 +6337,7 @@ function renderBandArchiveTelemetry(band) {
 
   const values = [
     [bandDetailLifecycleStatus, getBandDetailLifecycleStatus(getBandDetailGeneral(raw), raw)],
-    [bandDetailContributors, contributors === null ? null : formatBandDetailNumber(contributors)],
+    [bandDetailContributors, formatBandDetailNumber(MUSIC_CONTRIBUTOR_DISPLAY_COUNT)],
     [bandDetailYearsCovered, getBandDetailYearsCovered(stats, raw)],
     [bandDetailMostActiveYear, getBandDetailMostActiveYear(stats, raw)],
     [bandDetailSetsCaptured, archived === null || total === null ? null : `${formatBandDetailNumber(archived)}/${formatBandDetailNumber(total)}`],
@@ -6564,7 +6571,7 @@ function showBandDetail(band, options = {}) {
     bandDetailTotalPhotos.textContent = formatBandDetailNumber(photoCount);
   }
   if (bandDetailContributors) {
-    bandDetailContributors.textContent = formatBandDetailNumber(contributorCount);
+    bandDetailContributors.textContent = formatBandDetailNumber(MUSIC_CONTRIBUTOR_DISPLAY_COUNT);
   }
   if (bandDetailSetsCaptured) {
     bandDetailSetsCaptured.textContent = `${formatBandDetailNumber(archivedSets)}/${formatBandDetailNumber(totalSets)}`;
@@ -6641,7 +6648,7 @@ function updateSetDetailFromRow(row) {
     setDetailPhotos.textContent = setData.setPhotos || "";
   }
   if (setDetailContributors) {
-    setDetailContributors.textContent = setData.setContributors || "";
+    setDetailContributors.textContent = String(MUSIC_CONTRIBUTOR_DISPLAY_COUNT);
   }
   if (setDetailComplete) {
     setDetailComplete.textContent = setData.setComplete || "";
@@ -12897,7 +12904,7 @@ function createMusicPersonShowCard(show, personName) {
 
   const meta = document.createElement("p");
   meta.className = "person-show-expanded-meta";
-  meta.textContent = show.contributors;
+  meta.textContent = `Contributor: ${MUSIC_CONTRIBUTOR_DISPLAY_COUNT}`;
 
   const noteText = getMusicPeopleText(show.notes);
   const notes = noteText ? document.createElement("p") : null;
