@@ -31304,6 +31304,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   .zhento-pulse__info-box .zhento-lower-third__header { padding-block-end: .25rem; }
   .zhento-pulse__grid { flex: 1; min-block-size: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(.15rem, .5svh, .3rem); margin-block-start: 0; }
   .zhento-pillar-tile { --pillar-art-share: 68%; block-size: 100%; }
+  .zhento-pillar-tile[data-zhento-destination="shows"] .zhento-pillar-tile__art { object-fit: cover; }
   .zhento-pillar-tile__arrow { inset-block-start: .3rem; inset-block-end: auto; }
   .zhento-pillar-tile__title { font-size: .65rem; line-height: 1.1; }
   .zhento-pillar-tile__category { font-size: .58rem; line-height: 1.1; }
