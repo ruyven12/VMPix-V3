@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const { endpoint, fulfillCalendar } = require("./fixtures/calendar.cjs");
 
 const viewports = [
   { name: "mobile-samsung", size: { width: 360, height: 800 } },
@@ -30,7 +31,7 @@ const routes = [
   { path: "/wrestling/people/ace-romero", rail: /Champion Dossier/, visibleShell: ".wrestling-person-dossier-prototype-shell", text: /TIMELINE \/ EVENT HISTORY/ },
   { path: "/wrestling/venues", rail: /Fields of Conflict/, visibleShell: ".wrestling-venues-prototype-shell" },
   { path: "/wrestling/venues/portland_expo", rail: /Fields of Conflict/, visibleShell: ".fields-of-conflict-dossier", text: "Portland Expo" },
-  { path: "/calendar", rail: "Upcoming Gigs", context: "#calendar-modal-title", visibleShell: "[data-calendar-overlay]", text: "PREVIEW SCHEDULE" },
+  { path: "/calendar", rail: "Upcoming Gigs", context: "#calendar-modal-title", visibleShell: "[data-calendar-overlay]", text: "CONFIRMED" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },
 ];
@@ -97,8 +98,9 @@ for (const viewport of viewports) {
         page.on("pageerror", (error) => pageErrors.push(error.message));
 
         if (route.path === "/calendar") {
-          // Calendar is a local preview; never reach backend or OAuth services.
+          // Mock the Calendar publication; never reach backend or OAuth services.
           await page.route("**/*", requestRoute => {
+            if (requestRoute.request().url() === endpoint) return fulfillCalendar(requestRoute);
             const url = new URL(requestRoute.request().url());
             if (!url.pathname.startsWith("/api/") && (url.origin === "http://127.0.0.1:4173" || (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname) || url.hostname === "unpkg.com" && url.pathname.startsWith("/leaflet@1.9.4/dist/")))) return requestRoute.continue();
             return requestRoute.fulfill({ status: 200, contentType: "application/javascript", body: "" });

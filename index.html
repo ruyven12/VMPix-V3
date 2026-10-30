@@ -2137,36 +2137,7 @@
 
         <section class="v3-card v3-card--spotlight calendar-events-panel" aria-labelledby="calendar-events-title" data-calendar-events-surface>
           <h3 class="calendar-section-title" id="calendar-events-title">Upcoming Events</h3>
-          <ul class="calendar-event-list" aria-label="Upcoming Events placeholder cards" data-calendar-event-list>
-            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="confirmed">
-              <div class="calendar-event-copy">
-                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
-                <h4 class="calendar-event-title" data-calendar-event-title>MGPS Open House</h4>
-              </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed" data-calendar-event-badge>CONFIRMED</span>
-            </li>
-            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="busy">
-              <div class="calendar-event-copy">
-                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
-                <h4 class="calendar-event-title" data-calendar-event-title>Limitless Wrestling LIVE at Madrid's!</h4>
-              </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--busy" data-calendar-event-badge>BUSY</span>
-            </li>
-            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="tentative">
-              <div class="calendar-event-copy">
-                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
-                <h4 class="calendar-event-title" data-calendar-event-title>25th Annual Appreciation Festival/BBQ/Pool Party</h4>
-              </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--tentative" data-calendar-event-badge>TENTATIVE</span>
-            </li>
-            <li class="v3-card v3-card--event calendar-event-card" data-calendar-placeholder-event data-calendar-event-status="confirmed">
-              <div class="calendar-event-copy">
-                <p class="calendar-event-state" data-calendar-event-state>Busy</p>
-                <h4 class="calendar-event-title" data-calendar-event-title>Herd Flock 8</h4>
-              </div>
-              <span class="v3-card v3-card--state calendar-event-badge calendar-event-badge--confirmed" data-calendar-event-badge>CONFIRMED</span>
-            </li>
-          </ul>
+          <ul class="calendar-event-list" aria-label="Upcoming gigs" data-calendar-event-list></ul>
         </section>
       </section>
       <section class="contact-shell" aria-labelledby="contact-title" aria-hidden="true" inert data-contact-shell data-site-module-scope="contact">
@@ -3083,34 +3054,10 @@
           <h2 class="trajectory-overlay__title" id="calendar-modal-title">Upcoming Gigs</h2>
           <span class="trajectory-overlay__divider" aria-hidden="true"></span>
           <div class="trajectory-overlay__reading calendar-reading" data-calendar-scroll tabindex="0" role="region" aria-labelledby="calendar-modal-title">
-            <p class="calendar-preview"><strong>PREVIEW SCHEDULE</strong>Sample listings for this visual preview.</p>
-            <ol class="calendar-gigs" aria-label="Sample upcoming gigs">
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-11-07"><span>NOV</span><strong>07</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">LIVE MUSIC</p><h3>Live Music Session</h3><p class="calendar-gig__place">Portland, Maine<br>Evening coverage</p></div>
-              </li>
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-11-14"><span>NOV</span><strong>14</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">WRESTLING</p><h3>Ringside Weekend</h3><p class="calendar-gig__place">Southern Maine<br>Event photography</p></div>
-              </li>
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-11-21"><span>NOV</span><strong>21</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">LIVE MUSIC</p><h3>Late Night Sessions</h3><p class="calendar-gig__place">New England<br>On location</p></div>
-              </li>
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-12-05"><span>DEC</span><strong>05</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">WRESTLING</p><h3>Main Event Weekend</h3><p class="calendar-gig__place">New England<br>Ringside coverage</p></div>
-              </li>
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-12-12"><span>DEC</span><strong>12</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">COMMUNITY</p><h3>Community Showcase</h3><p class="calendar-gig__place">Maine<br>On location</p></div>
-              </li>
-              <li class="calendar-gig">
-                <time class="calendar-gig__date" datetime="2026-12-19"><span>DEC</span><strong>19</strong><span>2026</span></time>
-                <div class="calendar-gig__copy"><p class="calendar-gig__kind">LIVE MUSIC</p><h3>Year-End Live Sessions</h3><p class="calendar-gig__place">New England<br>Evening coverage</p></div>
-              </li>
-            </ol>
-            <p class="calendar-preview-end">More stops. More stories. More to come.</p>
+            <p class="calendar-status" data-calendar-status role="status" aria-live="polite" aria-atomic="true">Retrieving upcoming gigs.</p>
+            <button class="calendar-retry" type="button" data-calendar-retry hidden disabled>Retry</button>
+            <p class="calendar-timezone" data-calendar-timezone hidden>Times shown in Eastern Time (America/New_York).</p>
+            <ol class="calendar-gigs" aria-label="Upcoming gigs" data-calendar-gigs hidden></ol>
           </div>
         </div>
       </div>
@@ -3190,6 +3137,7 @@
   <script src="/modules/wrestling.js"></script>
   <script src="/modules/connect.js"></script>
   <script src="/modules/admin.js"></script>
+  <script src="/modules/calendar.js"></script>
   <script src="/js/router.js"></script>
   <script>
     (() => {

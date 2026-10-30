@@ -15127,13 +15127,17 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   .trajectory-overlay__content { padding-top: 24px; }
 }
 
-/* CAL-14: presentation-only Calendar content within the approved modal frame. */
+/* Calendar content within the approved CAL-14A modal frame. */
 .calendar-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); background: rgba(2, 3, 6, .62); }
 /* Back the inherited frame texture so world labels cannot compete with the schedule. */
 .calendar-overlay .trajectory-overlay__frame { background-color: rgba(5, 8, 13, .96); }
 .calendar-overlay .calendar-reading { width: min(100%, 56rem); text-align: start; }
-.calendar-overlay .calendar-preview { margin: 0 0 1.25rem; color: #c1c6d0; font-size: .8rem; line-height: 1.65; text-align: center; }
-.calendar-preview strong { display: block; color: #e3a4b4; font-size: .65rem; letter-spacing: .15em; margin-bottom: .5rem; }
+.calendar-overlay .calendar-status { margin: 0 0 1rem; color: #c1c6d0; font-size: .85rem; line-height: 1.65; text-align: center; }
+.calendar-status:empty { display: none; }
+.calendar-overlay .calendar-timezone { margin: 0 0 1.25rem; color: #c1c6d0; font-size: .75rem; line-height: 1.65; text-align: center; }
+.calendar-retry { min-width: 88px; min-height: 48px; padding: 10px 18px; border: 1px solid rgba(212, 129, 149, .65); background: rgba(10, 10, 16, .68); color: #f4e5e8; font: inherit; font-size: .85rem; cursor: pointer; touch-action: manipulation; }
+.calendar-retry:focus-visible { outline: 2px solid #f1d9e1; outline-offset: 3px; }
+.calendar-gigs[hidden], .calendar-retry[hidden] { display: none; }
 .calendar-gigs { display: grid; gap: 14px; list-style: none; padding: 0; margin: 0; }
 .calendar-gig { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); gap: 12px; padding: 18px 10px; border: 1px solid rgba(186, 193, 204, .23); border-inline-start: 2px solid rgba(231, 79, 111, .65); background: linear-gradient(110deg, rgba(153, 164, 179, .09), rgba(5, 8, 13, .38)); }
 .calendar-gig__date { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; padding-top: 4px; color: #f1d9e1; line-height: 1.2; }
@@ -15144,7 +15148,8 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 .calendar-overlay .calendar-gig h3 { margin: 0 0 8px; font-size: clamp(.94rem, 3.5vw, 1.2rem); line-height: 1.5; text-align: start; text-wrap: wrap; }
 .calendar-overlay .calendar-gig h3::after { display: none; }
 .calendar-overlay .calendar-gig__place { margin: 0; color: #c1c6d0; font-size: .75rem; line-height: 1.65; }
-.calendar-overlay .calendar-preview-end { margin: 1.5rem 0 0; color: #c1c6d0; font-size: .75rem; text-align: center; }
+.calendar-overlay .calendar-gig__time { margin: 0 0 6px; color: #f1d9e1; font-size: .8rem; line-height: 1.65; }
+.calendar-overlay .calendar-gig__description { margin: .75rem 0 0; color: #c1c6d0; font-size: .75rem; line-height: 1.65; white-space: pre-wrap; }
 @media (min-width: 600px) {
   .calendar-gig { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 22px; padding: 22px 24px; }
   .calendar-gig__date strong { font-size: 2rem; }

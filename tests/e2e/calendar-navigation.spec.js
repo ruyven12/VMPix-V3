@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const { endpoint, fulfillCalendar } = require("./fixtures/calendar.cjs");
 
 const viewports = [
   { name: "360x800", size: { width: 360, height: 800 } },
@@ -18,6 +19,7 @@ test.beforeEach(async ({ page, context, baseURL }) => {
     const request = route.request(), url = new URL(request.url());
     const api = url.pathname.startsWith("/api/");
     if (api && /calendar|todoist/i.test(url.pathname)) calendarRequests.get(page).push(url.pathname);
+    if (request.url() === endpoint) return fulfillCalendar(route);
     if (!api && (url.origin === new URL(baseURL).origin || (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname) || url.hostname === "unpkg.com" && url.pathname.startsWith("/leaflet@1.9.4/dist/")))) return route.continue();
     if (request.resourceType() === "script") return route.fulfill({ contentType: "application/javascript", body: "" });
     if (request.resourceType() === "stylesheet") return route.fulfill({ contentType: "text/css", body: "" });
@@ -40,7 +42,8 @@ test.beforeEach(async ({ page, context, baseURL }) => {
 });
 test.afterEach(async ({ page }) => {
   expect(errors.get(page)).toEqual([]);
-  expect(calendarRequests.get(page)).toEqual([]);
+  expect(calendarRequests.get(page).length).toBeGreaterThan(0);
+  expect(calendarRequests.get(page).every(path => path === "/api/calendar")).toBe(true);
   expect(await page.evaluate(() => window.__calendarLegacyExposed)).toBe(false);
 });
 
@@ -51,6 +54,7 @@ async function opened(page) {
   await expect(page.locator("[data-calendar-shell]")).toBeHidden();
   await expect(page.locator("[data-calendar-shell]")).toHaveAttribute("aria-hidden", "true");
   await expect(page.locator("[data-calendar-close]")).toBeFocused();
+  await expect(page.locator("[data-calendar-scroll]")).toHaveAttribute("data-calendar-state", "ready");
 }
 async function closed(page, route = "/portfolio") {
   await expect(page).toHaveURL(new RegExp(`${route}$`));
@@ -92,7 +96,7 @@ for (const viewport of viewports) {
         const response = await page.goto("/calendar", { waitUntil: "domcontentloaded" });
         expect(response.ok()).toBe(true);
         await opened(page);
-        await expect(page.locator(".calendar-preview")).toContainText("Sample listings for this visual preview.");
+        await expect(page.locator(".calendar-preview")).toHaveCount(0);
         await expect(page.locator(".calendar-gig")).toHaveCount(6);
         await page.reload({ waitUntil: "domcontentloaded" });
         await opened(page);
