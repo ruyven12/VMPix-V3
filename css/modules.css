@@ -32865,6 +32865,29 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 
+/* CAL-12: Calendar connection controls stay inside the authenticated System area. */
+.admin-shell .admin-calendar-station { flex-direction: column; align-items: stretch; justify-content: center; gap: 10px; }
+.admin-shell .admin-calendar-station > h2 { text-align: center; }
+.admin-shell .admin-calendar { min-inline-size: 0; background: #141016; border: 1px solid #54434f; }
+.admin-shell .admin-calendar > summary { min-block-size: 44px; padding: 12px; color: #e4d8e0; font-size: 12px; cursor: pointer; }
+.admin-shell .admin-calendar__body { padding: 0 12px 12px; overflow-wrap: anywhere; }
+.admin-shell .admin-calendar p { margin: 0 0 12px; color: #e4d8e0; font: 13px/1.5 var(--font-display), sans-serif; }
+.admin-shell .admin-calendar .admin-calendar__note { color: #bcaab7; font-size: 11px; }
+.admin-shell .admin-calendar__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-shell .admin-calendar button,
+.admin-shell .admin-calendar a { display: inline-block; min-block-size: 44px; max-inline-size: 100%; padding: 12px; border: 1px solid #8b354b; background: #270e18; color: #e4d8e0; font: 12px/1.4 var(--font-display), sans-serif; cursor: pointer; touch-action: manipulation; }
+.admin-shell .admin-calendar button { flex: 1 1 120px; }
+.admin-shell .admin-calendar button:disabled { cursor: not-allowed; color: #ab98a4; border-color: #54434f; background: #141016; }
+.admin-shell .admin-calendar a { margin-block-start: 12px; }
+.admin-shell .admin-calendar a[hidden] { display: none; }
+.admin-shell .admin-calendar a span { font-size: 10px; }
+.admin-shell .admin-calendar .admin-calendar__feedback { margin: 12px 0 0; }
+.admin-shell .admin-calendar :is(summary, button, a):focus-visible { outline: 2px solid #ecd7e2; outline-offset: 3px; }
+@media (max-width: 839px) {
+  .admin-shell .admin-access__stage:is([data-admin-phase="assembling"], [data-admin-phase="ready"]) .admin-console__stations:has(.admin-calendar[open]) { grid-template-rows: repeat(3, minmax(104px, auto)) auto; }
+}
+
+
 /* Admin 3A: API station content stays inside the existing Shell scroll owner. */
 .admin-shell .admin-console__standby[data-admin-open-api] { display: inline-grid; place-items: center; cursor: pointer; }
 .admin-shell .admin-console__standby[data-admin-open-api] > span, .admin-shell .admin-console__standby[data-admin-open-api]::after { grid-area: 1 / 1; }

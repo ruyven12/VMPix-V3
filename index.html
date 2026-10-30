@@ -2422,9 +2422,21 @@
                       <span class="admin-console__pixel" style="--pixel-order: 10"></span>
                       <span class="admin-console__pixel" style="--pixel-order: 11"></span>
                     </span>
-                    <div class="admin-console__station-body">
+                    <div class="admin-console__station-body admin-calendar-station">
                       <h2 id="admin-station-system">SYSTEM</h2>
-                      <button class="admin-console__standby" type="button" disabled aria-disabled="true" tabindex="-1">STANDBY</button>
+                      <details class="admin-calendar" data-admin-calendar>
+                        <summary>Calendar · Todoist</summary>
+                        <div class="admin-calendar__body">
+                          <p role="status" aria-live="polite" aria-atomic="true" data-admin-calendar-status>Connection not checked.</p>
+                          <p class="admin-calendar__note">Connect your account, then return here to check its status. This action does not enable public Calendar visibility.</p>
+                          <div class="admin-calendar__actions">
+                            <button type="button" data-admin-calendar-check disabled>Check status</button>
+                            <button type="button" data-admin-calendar-connect disabled>Connect Todoist</button>
+                          </div>
+                          <a data-admin-calendar-authorize target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" hidden>Continue to Todoist <span>(opens a new tab)</span></a>
+                          <p class="admin-calendar__feedback" role="status" aria-live="polite" aria-atomic="true" data-admin-calendar-feedback></p>
+                        </div>
+                      </details>
                     </div>
                   </section>
                 <span class="admin-console__junction" aria-hidden="true"></span>

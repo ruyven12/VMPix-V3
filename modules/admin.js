@@ -341,6 +341,7 @@
     return available() && state === "authenticated" && bearer !== null && expiresAt > Date.now() && visualPhase === "ready";
   }
   function updateStationControl() {
+    updateCalendarControl();
     apiOpen.disabled = !canEnterStation();
     apiOpen.setAttribute("aria-disabled", String(apiOpen.disabled));
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
@@ -407,6 +408,152 @@
     }
     updateStationControl();
   }
+  // Calendar uses the existing in-memory Admin session. OAuth state stays in the link only.
+  const calendarPanel = host.querySelector("[data-admin-calendar]");
+  const calendarStatus = host.querySelector("[data-admin-calendar-status]");
+  const calendarFeedback = host.querySelector("[data-admin-calendar-feedback]");
+  const calendarCheck = host.querySelector("[data-admin-calendar-check]");
+  const calendarConnect = host.querySelector("[data-admin-calendar-connect]");
+  const calendarLink = host.querySelector("[data-admin-calendar-authorize]");
+  let calendarRun = null;
+  let calendarConfiguration = null;
+  let calendarLinkDeadline = 0;
+  let calendarExpiryTimer = null;
+  function calendarAllowed() {
+    return canEnterStation() && stage.dataset.adminView === "deck" && !deck.hidden && !deck.hasAttribute("inert");
+  }
+  function clearCalendarLink() {
+    clearTimeout(calendarExpiryTimer);
+    calendarExpiryTimer = null;
+    calendarLinkDeadline = 0;
+    if (calendarLink) { calendarLink.hidden = true; calendarLink.removeAttribute("href"); }
+  }
+  function resetCalendar() {
+    calendarRun?.abort(); calendarRun = null;
+    calendarConfiguration = null;
+    clearCalendarLink();
+    if (calendarStatus) calendarStatus.textContent = "Connection not checked.";
+    if (calendarFeedback) calendarFeedback.textContent = "";
+  }
+  function updateCalendarControl() {
+    if (!calendarPanel) return;
+    const allowed = calendarAllowed() && calendarPanel.open;
+    if (!allowed) resetCalendar();
+    calendarCheck.disabled = !allowed || !!calendarRun;
+    calendarConnect.disabled = !allowed || !!calendarRun || !calendarConfiguration;
+    calendarCheck.textContent = calendarRun ? "Please wait…" : "Check status";
+    calendarPanel.setAttribute("aria-busy", String(!!calendarRun));
+  }
+  function validCalendarAuthorization(data) {
+    if (!data || typeof data.authorization_url !== "string" || data.authorization_url.length > 4096) return null;
+    const deadline = expiry(data.expires_at);
+    if (deadline <= Date.now() || deadline > Date.now() + 600000) return null;
+    try {
+      const url = new URL(data.authorization_url);
+      if (url.origin !== "https://app.todoist.com" || url.pathname !== "/oauth/authorize" ||
+          url.username || url.password || url.hash || url.href !== data.authorization_url) return null;
+      const expected = ["client_id", "scope", "state", "response_type", "redirect_uri", "code_challenge_method", "code_challenge"];
+      if ([...url.searchParams.keys()].length !== expected.length || expected.some(key => url.searchParams.getAll(key).length !== 1)) return null;
+      if (!url.searchParams.get("client_id") || url.searchParams.get("scope") !== "data:read" ||
+          url.searchParams.get("response_type") !== "code" || url.searchParams.get("code_challenge_method") !== "S256" ||
+          !/^[A-Za-z0-9_-]{43}$/.test(url.searchParams.get("state")) ||
+          !/^[A-Za-z0-9_-]{43}$/.test(url.searchParams.get("code_challenge"))) return null;
+      const callback = new URL(url.searchParams.get("redirect_uri"));
+      if (callback.origin !== new URL(API).origin || callback.pathname !== "/api/calendar/oauth/callback" ||
+          callback.username || callback.password || callback.search || callback.hash) return null;
+      return { href: url.href, deadline };
+    } catch { return null; }
+  }
+  function displayCalendarStatus(data) {
+    if (!data || ["integration_enabled", "public_enabled", "configured", "authorized"].some(key => typeof data[key] !== "boolean")) return false;
+    calendarConfiguration = data.integration_enabled && data.configured && !data.public_enabled;
+    calendarStatus.textContent = !data.integration_enabled ? "Calendar integration is disabled." :
+      !data.configured ? "Calendar setup is incomplete. Connection is unavailable." :
+      data.authorized ? "Todoist connected." : "Todoist is not connected. Authorization is required.";
+    if (data.public_enabled) {
+      calendarStatus.textContent += " Public visibility is enabled. Review configuration before connecting.";
+    } else calendarStatus.textContent += " Public visibility is disabled.";
+    return true;
+  }
+  async function calendarRequest(startAuthorization = false) {
+    if (!prepareStationEntry() || !calendarAllowed() || !calendarPanel.open || calendarRun ||
+        startAuthorization && !calendarConfiguration) return;
+    clearCalendarLink();
+    const ownController = new AbortController();
+    const at = generation;
+    calendarRun = ownController;
+    calendarFeedback.textContent = startAuthorization ? "Preparing your authorization link…" : "Checking connection…";
+    if (!startAuthorization) { calendarConfiguration = null; calendarStatus.textContent = "Checking connection…"; }
+    updateCalendarControl();
+    const timer = setTimeout(() => ownController.abort(), 15000);
+    const isCurrent = () => calendarRun === ownController && at === generation && calendarAllowed() && calendarPanel.open;
+    try {
+      const response = await fetch(`https://vmpix-data.onrender.com/api/admin/calendar/${startAuthorization ? "oauth/start" : "status"}`, {
+        method: startAuthorization ? "POST" : "GET",
+        headers: { Accept: "application/json", "X-V3-Admin-Request": "1", Authorization: `Bearer ${bearer}` },
+        credentials: "omit", mode: "cors", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal
+      });
+      if (calendarRun === ownController && at === generation && bearer && expiresAt <= Date.now()) {
+        clearSession(); present("idle", "Your session has expired. Connect again."); return;
+      }
+      if (!isCurrent()) return;
+      if (response.status === 401) {
+        clearSession(); present("idle", "Your session has expired or ended. Connect again."); return;
+      }
+      if (!response.ok) {
+        calendarFeedback.textContent = response.status === 403 ? "Access denied. Calendar requires an authorized Admin session." :
+          response.status === 409 ? "Another authorization is in progress. Wait, then try again." :
+          response.status === 429 ? "Too many requests. Wait before trying again." :
+          "Calendar is unavailable. Check status and try again. If this continues, review the backend setup.";
+        if (!startAuthorization) calendarStatus.textContent = "Connection status unavailable.";
+        return;
+      }
+      const data = await response.json();
+      if (!isCurrent()) return;
+      if (startAuthorization) {
+        const authorization = validCalendarAuthorization(data);
+        if (!authorization) throw new Error("Invalid authorization response");
+        calendarLink.href = authorization.href;
+        calendarLinkDeadline = Math.min(authorization.deadline, expiresAt);
+        calendarLink.hidden = false;
+        calendarFeedback.textContent = "Authorization link ready. Continue to Todoist, then return and select Check status to confirm the connection.";
+        calendarExpiryTimer = setTimeout(() => {
+          clearCalendarLink();
+          calendarFeedback.textContent = "The authorization link expired. Select Connect Todoist to request a new link.";
+        }, Math.max(0, calendarLinkDeadline - Date.now()));
+        calendarLink.focus({ preventScroll: true });
+      } else {
+        if (!displayCalendarStatus(data)) throw new Error("Invalid status response");
+        calendarFeedback.textContent = data.authorized && data.configured ? "Connection confirmed by the backend." : "Status checked.";
+      }
+    } catch {
+      if (isCurrent()) {
+        clearCalendarLink();
+        calendarFeedback.textContent = startAuthorization ? "Could not prepare a safe authorization link. Check status, then try again." : "Could not check Calendar. Please try again.";
+        if (!startAuthorization) calendarStatus.textContent = "Connection status unavailable.";
+      }
+    } finally {
+      clearTimeout(timer);
+      if (calendarRun === ownController) { calendarRun = null; updateCalendarControl(); }
+    }
+  }
+  calendarPanel?.addEventListener("toggle", () => {
+    updateCalendarControl();
+    if (calendarPanel.open && calendarAllowed()) calendarRequest();
+  });
+  calendarCheck?.addEventListener("click", () => calendarRequest());
+  calendarConnect?.addEventListener("click", () => calendarRequest(true));
+  calendarLink?.addEventListener("click", event => {
+    if (!prepareStationEntry() || !calendarAllowed() || calendarLinkDeadline <= Date.now()) {
+      event.preventDefault(); clearCalendarLink();
+      calendarFeedback.textContent = "The authorization link is no longer available. Check status, then connect again.";
+      return;
+    }
+    // Leave navigation user-activated; never open a window from the asynchronous POST.
+    calendarFeedback.textContent = "After finishing in Todoist, return and select Check status.";
+  });
+
+
   // Public liveness only: this controller never receives the private Admin bearer.
   let signalGeneration = 0;
   let signalController = null;
