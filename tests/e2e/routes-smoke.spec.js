@@ -30,7 +30,7 @@ const routes = [
   { path: "/wrestling/people/ace-romero", rail: /Champion Dossier/, visibleShell: ".wrestling-person-dossier-prototype-shell", text: /TIMELINE \/ EVENT HISTORY/ },
   { path: "/wrestling/venues", rail: /Fields of Conflict/, visibleShell: ".wrestling-venues-prototype-shell" },
   { path: "/wrestling/venues/portland_expo", rail: /Fields of Conflict/, visibleShell: ".fields-of-conflict-dossier", text: "Portland Expo" },
-  { path: "/calendar", rail: "Calendar", visibleShell: "[data-calendar-shell]" },
+  { path: "/calendar", rail: "Upcoming Gigs", context: "#calendar-modal-title", visibleShell: "[data-calendar-overlay]", text: "PREVIEW SCHEDULE" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
   { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },
 ];
@@ -96,6 +96,14 @@ for (const viewport of viewports) {
         });
         page.on("pageerror", (error) => pageErrors.push(error.message));
 
+        if (route.path === "/calendar") {
+          // Calendar is a local preview; never reach backend or OAuth services.
+          await page.route("**/*", requestRoute => {
+            const url = new URL(requestRoute.request().url());
+            if (!url.pathname.startsWith("/api/") && (url.origin === "http://127.0.0.1:4173" || (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname) || url.hostname === "unpkg.com" && url.pathname.startsWith("/leaflet@1.9.4/dist/")))) return requestRoute.continue();
+            return requestRoute.fulfill({ status: 200, contentType: "application/javascript", body: "" });
+          });
+        }
         const response = await page.goto(route.path, { waitUntil: "domcontentloaded" });
 
         expect(response && response.ok()).toBe(true);
@@ -103,6 +111,7 @@ for (const viewport of viewports) {
         const visibleShell = page.locator(route.visibleShell);
 
         await expect(visibleShell).toBeVisible();
+        if (route.path === "/calendar") await expect(page.locator("[data-calendar-shell]")).toBeHidden();
         await expect(page.locator(route.context || "[data-current-view]")).toHaveText(route.rail);
         if (route.path !== "/") {
           await expect(page.locator("[data-portfolio-engine]:visible, [data-shell-bottom-rail]:visible").first()).toBeVisible();

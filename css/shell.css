@@ -15128,7 +15128,9 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 /* CAL-14: presentation-only Calendar content within the approved modal frame. */
-.calendar-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+.calendar-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); background: rgba(2, 3, 6, .62); }
+/* Back the inherited frame texture so world labels cannot compete with the schedule. */
+.calendar-overlay .trajectory-overlay__frame { background-color: rgba(5, 8, 13, .96); }
 .calendar-overlay .calendar-reading { width: min(100%, 56rem); text-align: start; }
 .calendar-overlay .calendar-preview { margin: 0 0 1.25rem; color: #c1c6d0; font-size: .8rem; line-height: 1.65; text-align: center; }
 .calendar-preview strong { display: block; color: #e3a4b4; font-size: .65rem; letter-spacing: .15em; margin-bottom: .5rem; }
