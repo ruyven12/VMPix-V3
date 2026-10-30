@@ -34423,3 +34423,42 @@ button.hall-crusades-archive-crystal:focus-visible {
   .set-dossier-viewport .set-focus-stage { grid-area:1 / 1 / 2 / 3; }
   .set-dossier-viewport .set-focus-toolbar { grid-area:2 / 2; }
 }
+
+
+/* CON-03: local form and direct channels inside the approved Contact viewport. */
+.contact-relay-layout { display: grid; gap: 28px; padding-block: 26px 30px; min-width: 0; }
+.contact-relay-layout :is(.contact-compose, .contact-channels) { min-width: 0; margin: 0; }
+.contact-relay-layout :is(h3, p, label, input, textarea, a) { text-transform: none; letter-spacing: normal; }
+.contact-terminal .contact-relay-layout h3 { margin: 0 0 14px; font-size: 1.05rem; line-height: 1.5; font-weight: 400; text-align: start; }
+.contact-terminal .contact-relay-layout h3::after { display: none; }
+.contact-terminal .contact-relay-layout :where(p) { margin: 0; max-width: none; font: .9rem/1.55 "Segoe UI", Arial, sans-serif; color: #bac0ca; }
+.contact-terminal .contact-compose__notice { padding: 12px 14px; border-inline-start: 2px solid #b76879; background: rgba(176, 89, 109, .08); }
+.contact-compose__notice strong { color: #e3c3ca; font-weight: 600; }
+.contact-terminal .contact-compose__required { margin-block: 12px; font-size: .8rem; }
+.contact-compose__fields, .contact-compose__identity { display: grid; gap: 16px; min-width: 0; padding: 0; margin: 0; border: 0; }
+.contact-compose__legend { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.contact-compose__field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; min-width: 0; }
+.contact-compose__field label { color: #e4e1e5; font: 600 .95rem/1.5 "Segoe UI", Arial, sans-serif; }
+.contact-compose__hint { margin-bottom: 4px; color: #aeb5c0; font: .75rem/1.5 "Segoe UI", Arial, sans-serif; }
+.contact-compose__field :is(input, textarea) { box-sizing: border-box; display: block; width: 100%; min-width: 0; min-height: 48px; margin: 0; padding: 10px 12px; border: 1px solid #62616a; border-radius: 3px; background: #080a0e; color: #f0edf0; font: 1rem/1.5 "Segoe UI", Arial, sans-serif; }
+.contact-compose__field textarea { min-height: 120px; resize: none; overflow: hidden; overflow-wrap: anywhere; }
+.contact-compose__field :is(input, textarea)[aria-invalid="true"] { border-color: #e39ba9; }
+.contact-relay-layout :is(input, textarea, button, a):focus-visible { outline: 2px solid #f1d9e1; outline-offset: 3px; }
+.contact-terminal .contact-compose__error { color: #f2b8c4; font-size: .85rem; }
+.contact-compose__error[hidden] { display: none; }
+.contact-compose__submit { width: 100%; min-height: 48px; margin-top: 20px; padding: 12px; border: 1px solid #ba7887; border-radius: 3px; background: #301a23; color: #f4e7ec; font: .78rem/1.6 var(--font-display); text-transform: none; cursor: pointer; touch-action: manipulation; }
+.contact-compose__submit:hover { background: #432330; }
+.contact-compose__submit:disabled { opacity: .55; cursor: default; }
+.contact-terminal .contact-compose__feedback:not(:empty) { margin-top: 14px; padding: 12px; border: 1px solid #9a6270; color: #edced6; }
+.contact-channels { padding-top: 24px; border-top: 1px solid rgba(197, 182, 185, .23); }
+.contact-channels ul { display: grid; gap: 10px; margin: 18px 0; padding: 0; list-style: none; }
+.contact-channels a { display: grid; gap: 4px; min-width: 0; min-height: 60px; padding: 12px 14px; border: 1px solid #46464f; border-inline-start: 2px solid #a06978; border-radius: 3px; background: rgba(180, 176, 190, .035); color: #ece4e9; text-decoration: none; overflow-wrap: anywhere; touch-action: manipulation; }
+.contact-channels a:hover { border-color: #c08a97; background: rgba(180, 176, 190, .08); }
+.contact-channels__name { display: flex; justify-content: space-between; gap: 10px; font: 600 .95rem/1.5 "Segoe UI", Arial, sans-serif; }
+.contact-channels__destination { color: #b7bac4; font: .8rem/1.5 "Segoe UI", Arial, sans-serif; }
+.contact-terminal .contact-channels__note { font-size: .8rem; }
+@media (min-width: 900px) {
+  .contact-relay-layout { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 28px; }
+  .contact-compose__identity { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact-channels { align-self: start; padding: 0 0 0 24px; border-top: 0; border-inline-start: 1px solid rgba(197, 182, 185, .23); }
+}

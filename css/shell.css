@@ -15183,8 +15183,24 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 
 
 /* CON-02: Contact alone uses a controlled overlay; shared frames remain unchanged. */
-.contact-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); background: rgba(2, 3, 6, .62); }
-.contact-overlay .trajectory-overlay__frame { background-color: rgba(7, 8, 11, .97); }
+/* The Shell measures the visual viewport up to the Engine; keep its width and motion. */
+.contact-overlay {
+  padding-block: max(20px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-bottom, 0px));
+  background: rgba(2, 3, 6, .62);
+  container: contact-viewport / size;
+}
+.contact-overlay .trajectory-overlay__frame {
+  height: 100%;
+  background:
+    linear-gradient(90deg, rgba(189, 202, 215, .027) 1px, transparent 1px) center / 44px 44px,
+    linear-gradient(rgba(189, 202, 215, .027) 1px, transparent 1px) center / 44px 44px,
+    linear-gradient(110deg, rgba(153, 164, 179, .06), transparent 17%, transparent 83%, rgba(153, 164, 179, .06)),
+    linear-gradient(180deg, #080a0e, #030407 48%, #080a0e);
+}
+/* Respond to the measured space, including keyboards that leave layout height unchanged. */
+@container contact-viewport (max-height: 400px) {
+  .contact-terminal { padding-block: 68px 16px; gap: 12px; }
+}
 .contact-terminal__header { min-width: 0; }
 .contact-terminal__eyebrow { margin: 0 0 12px; color: #c5b6b9; font-size: .65rem; line-height: 1.6; letter-spacing: .16em; }
 .contact-terminal .trajectory-overlay__title { font-size: clamp(1.35rem, 5.7vw, 2.3rem); letter-spacing: .025em; }

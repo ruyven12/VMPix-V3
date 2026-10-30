@@ -3022,11 +3022,54 @@
               <span class="contact-terminal__signal" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
               <p class="contact-terminal__status" data-contact-status role="status" aria-live="polite" aria-atomic="true">Opening terminal…</p>
             </div>
-            <div class="contact-terminal__message">
-              <span class="contact-terminal__index" aria-hidden="true">01 / ESTABLISH CONNECTION</span>
-              <h3>A point of contact.</h3>
-              <p id="contact-relay-description">A space for the next conversation. Your place in the archive is waiting behind this terminal.</p>
-              <p class="contact-terminal__availability">Message transmission is not available yet.</p>
+            <div class="contact-relay-layout">
+              <form class="contact-compose" method="dialog" aria-labelledby="contact-form-title" aria-describedby="contact-relay-description" data-contact-form>
+                <h3 id="contact-form-title">Transmit a message</h3>
+                <p class="contact-compose__notice" id="contact-relay-description"><strong>Delivery unavailable.</strong> Nothing will be sent.</p>
+                <p class="contact-compose__required">All fields are required.</p>
+                <fieldset class="contact-compose__fields" disabled>
+                  <legend class="contact-compose__legend">Your message</legend>
+                  <div class="contact-compose__identity">
+                    <div class="contact-compose__field">
+                      <label for="contact-name">Name</label>
+                      <span class="contact-compose__hint" id="contact-name-hint">100 characters max</span>
+                      <input id="contact-name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="contact-name-hint contact-name-error" data-contact-input>
+                      <p class="contact-compose__error" id="contact-name-error" hidden></p>
+                    </div>
+                    <div class="contact-compose__field">
+                      <label for="contact-email">Email</label>
+                      <span class="contact-compose__hint" id="contact-email-hint">254 characters max</span>
+                      <input id="contact-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" required maxlength="254" aria-describedby="contact-email-hint contact-email-error" data-contact-input>
+                      <p class="contact-compose__error" id="contact-email-error" hidden></p>
+                    </div>
+                  </div>
+                  <div class="contact-compose__field">
+                    <label for="contact-subject">Subject</label>
+                    <span class="contact-compose__hint" id="contact-subject-hint">150 characters max</span>
+                    <input id="contact-subject" name="subject" type="text" required maxlength="150" aria-describedby="contact-subject-hint contact-subject-error" data-contact-input>
+                    <p class="contact-compose__error" id="contact-subject-error" hidden></p>
+                  </div>
+                  <div class="contact-compose__field">
+                    <label for="contact-message">Message</label>
+                    <span class="contact-compose__hint" id="contact-message-hint">5,000 characters max</span>
+                    <textarea id="contact-message" name="message" rows="4" required maxlength="5000" aria-describedby="contact-message-hint contact-message-error" data-contact-input></textarea>
+                    <p class="contact-compose__error" id="contact-message-error" hidden></p>
+                  </div>
+                </fieldset>
+                <button class="contact-compose__submit" type="submit" aria-describedby="contact-relay-description" data-contact-submit disabled>Transmit Message</button>
+                <p class="contact-compose__feedback" data-contact-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+              </form>
+              <aside class="contact-channels" aria-labelledby="contact-channels-title">
+                <h3 id="contact-channels-title">Direct channels</h3>
+                <p>Choose where to start the conversation.</p>
+                <ul>
+                  <li><a href="mailto:ruyven12@gmail.com" data-contact-channel="email"><span class="contact-channels__name">Email</span><span class="contact-channels__destination">ruyven12@gmail.com</span></a></li>
+                  <li><a href="https://www.instagram.com/vmpix1" target="_blank" rel="noopener noreferrer" aria-label="Instagram @vmpix1 (opens in a new tab)" data-contact-channel="instagram"><span class="contact-channels__name">Instagram <span aria-hidden="true">↗</span></span><span class="contact-channels__destination">@vmpix1</span></a></li>
+                  <li><a href="https://www.facebook.com/VMPix" target="_blank" rel="noopener noreferrer" aria-label="Facebook VMPix (opens in a new tab)" data-contact-channel="facebook"><span class="contact-channels__name">Facebook <span aria-hidden="true">↗</span></span><span class="contact-channels__destination">VMPix</span></a></li>
+                  <li><a href="https://x.com/vmpix1" target="_blank" rel="noopener noreferrer" aria-label="X @vmpix1 (opens in a new tab)" data-contact-channel="x"><span class="contact-channels__name">X <span aria-hidden="true">↗</span></span><span class="contact-channels__destination">@vmpix1</span></a></li>
+                </ul>
+                <p class="contact-channels__note">Email opens your mail app. Social channels open in a new tab.</p>
+              </aside>
             </div>
             <p class="contact-terminal__return">Close the terminal or use Engine Back to return.</p>
           </div>
@@ -3109,6 +3152,7 @@
   <script src="/modules/connect.js"></script>
   <script src="/modules/admin.js"></script>
   <script src="/modules/calendar.js"></script>
+  <script src="/modules/contact.js"></script>
   <script src="/js/router.js"></script>
   <script>
     (() => {

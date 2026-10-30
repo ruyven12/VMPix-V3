@@ -90,6 +90,11 @@ for(const viewport of sizes) for(const reducedMotion of ['reduce','no-preference
       await page.evaluate(()=>document.fonts.ready);
       const close=page.locator('[data-contact-close]'), scroll=page.locator('[data-contact-scroll]'), back=page.locator('[data-prototype-engine-return]');
       await page.keyboard.press('Tab'); await expect(scroll).toBeFocused();
+      for (const selector of ['#contact-name','#contact-email','#contact-subject','#contact-message','[data-contact-submit]',
+        '[data-contact-channel="email"]','[data-contact-channel="instagram"]','[data-contact-channel="facebook"]','[data-contact-channel="x"]']) {
+        await page.keyboard.press('Tab'); await expect(page.locator(selector)).toBeFocused();
+        expect(await page.locator(selector).evaluate(el=>{const a=el.getBoundingClientRect(),b=document.querySelector('[data-contact-scroll]').getBoundingClientRect();return a.bottom>b.top && a.top<b.bottom;})).toBe(true);
+      }
       await page.keyboard.press('Tab'); await expect(back).toBeFocused();
       await page.keyboard.press('Tab'); await expect(close).toBeFocused();
       await page.keyboard.press('Shift+Tab'); await expect(back).toBeFocused();
@@ -103,10 +108,14 @@ for(const viewport of sizes) for(const reducedMotion of ['reduce','no-preference
       });
       expect(layout.inert).toBe(true); expect(layout.backInert).toBe(false); expect(layout.nativeModal).toBe(false); expect(layout.overflow).toBe(false);
       expect(layout.frame.x).toBeGreaterThanOrEqual(12); expect(layout.frame.right).toBeLessThanOrEqual(viewport.width-12);
-      expect(layout.frame.bottom).toBeLessThan(layout.engine.top); expect(layout.close.width).toBeGreaterThanOrEqual(44); expect(layout.close.height).toBeGreaterThanOrEqual(44);
+      expect(layout.frame.y).toBeCloseTo(20, 0);
+      expect(layout.engine.top-layout.frame.bottom).toBeCloseTo(20, 0);
+      expect(layout.frame.height).toBeCloseTo(layout.engine.top-40, 0);
+      expect(layout.close.width).toBeGreaterThanOrEqual(44); expect(layout.close.height).toBeGreaterThanOrEqual(44);
       if(process.env.CONTACT_EVIDENCE_DIR && reducedMotion==='no-preference'){
         fs.mkdirSync(process.env.CONTACT_EVIDENCE_DIR,{recursive:true});
         await close.focus();
+        await scroll.evaluate(el=>el.scrollTop=0);
         await page.screenshot({path:path.join(process.env.CONTACT_EVIDENCE_DIR,`contact--${viewport.width}x${viewport.height}.png`)});
       }
       // Exercise overflow even on desktop without adding fixture content to the application.
@@ -123,9 +132,28 @@ for(const viewport of sizes) for(const reducedMotion of ['reduce','no-preference
       }));
       const bounds=await scroll.boundingBox();await page.mouse.move(bounds.x+bounds.width/2,bounds.y+bounds.height/2);await page.mouse.wheel(0,await scroll.evaluate(el=>el.scrollHeight*2));
       await expect.poll(()=>scroll.evaluate(el=>Math.abs(el.scrollHeight-el.clientHeight-el.scrollTop))).toBeLessThan(2);
+      // Only content moves: the full-height frame stays anchored above the Engine.
+      const afterScroll=await page.locator('[data-contact-frame]').boundingBox();
+      expect(afterScroll.y).toBeCloseTo(layout.frame.y, 0);
+      expect(afterScroll.height).toBeCloseTo(layout.frame.height, 0);
       await scroll.locator('[data-qa-overflow]').evaluate(el=>el.remove());
       await page.setViewportSize({width:viewport.width,height:480});
-      await expect.poll(()=>page.evaluate(()=>contactFrame.getBoundingClientRect().bottom<=portfolioEngine.getBoundingClientRect().top)).toBe(true);
+      await expect.poll(()=>page.evaluate(()=>Math.abs(portfolioEngine.getBoundingClientRect().top-contactFrame.getBoundingClientRect().bottom-20))).toBeLessThan(1);
+      await expect.poll(()=>scroll.evaluate(el=>el.clientHeight)).toBeGreaterThan(44);
+      await page.setViewportSize(viewport);
+      // Simulate an offset/shrunken visual viewport independently of layout height.
+      // This covers the measurement contract; it is not physical keyboard/device QA.
+      await page.evaluate(()=>{
+        Object.defineProperties(visualViewport,{offsetTop:{configurable:true,value:48},height:{configurable:true,value:280}});
+        visualViewport.dispatchEvent(new Event('resize'));
+      });
+      await expect.poll(()=>page.locator('[data-contact-frame]').evaluate(el=>el.getBoundingClientRect().top)).toBeCloseTo(68, 0);
+      await expect.poll(()=>page.locator('[data-contact-frame]').evaluate(el=>el.getBoundingClientRect().bottom)).toBeCloseTo(308, 0);
+      await expect.poll(()=>scroll.evaluate(el=>el.clientHeight)).toBeGreaterThan(44);
+      expect(await close.evaluate(el=>{const r=el.getBoundingClientRect();return r.top>=48 && r.bottom<=328;})).toBe(true);
+      expect(await scroll.evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+      await page.evaluate(()=>{delete visualViewport.offsetTop;delete visualViewport.height;visualViewport.dispatchEvent(new Event('resize'));});
+      await expect.poll(()=>page.locator('[data-contact-frame]').evaluate(el=>el.getBoundingClientRect().top)).toBeCloseTo(20, 0);
       await back.focus();await page.keyboard.press('Enter');await closed(page);
     });
     test('source scroll, route state and focus survive opening and history interruption',async({page})=>{
