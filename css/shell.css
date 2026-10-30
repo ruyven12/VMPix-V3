@@ -15127,6 +15127,28 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   .trajectory-overlay__content { padding-top: 24px; }
 }
 
+/* CAL-14: presentation-only Calendar content within the approved modal frame. */
+.calendar-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
+.calendar-overlay .calendar-reading { width: min(100%, 56rem); text-align: start; }
+.calendar-overlay .calendar-preview { margin: 0 0 1.25rem; color: #c1c6d0; font-size: .8rem; line-height: 1.65; text-align: center; }
+.calendar-preview strong { display: block; color: #e3a4b4; font-size: .65rem; letter-spacing: .15em; margin-bottom: .5rem; }
+.calendar-gigs { display: grid; gap: 14px; list-style: none; padding: 0; margin: 0; }
+.calendar-gig { display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); gap: 12px; padding: 18px 10px; border: 1px solid rgba(186, 193, 204, .23); border-inline-start: 2px solid rgba(231, 79, 111, .65); background: linear-gradient(110deg, rgba(153, 164, 179, .09), rgba(5, 8, 13, .38)); }
+.calendar-gig__date { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; padding-top: 4px; color: #f1d9e1; line-height: 1.2; }
+.calendar-gig__date span { font-size: .65rem; letter-spacing: .08em; }
+.calendar-gig__date strong { font-size: 1.65rem; font-weight: 400; }
+.calendar-gig__copy { min-width: 0; }
+.calendar-overlay .calendar-gig__kind { margin: 0 0 6px; color: #e3a4b4; font-size: .65rem; letter-spacing: .08em; line-height: 1.4; }
+.calendar-overlay .calendar-gig h3 { margin: 0 0 8px; font-size: clamp(.94rem, 3.5vw, 1.2rem); line-height: 1.5; text-align: start; text-wrap: wrap; }
+.calendar-overlay .calendar-gig h3::after { display: none; }
+.calendar-overlay .calendar-gig__place { margin: 0; color: #c1c6d0; font-size: .75rem; line-height: 1.65; }
+.calendar-overlay .calendar-preview-end { margin: 1.5rem 0 0; color: #c1c6d0; font-size: .75rem; text-align: center; }
+@media (min-width: 600px) {
+  .calendar-gig { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 22px; padding: 22px 24px; }
+  .calendar-gig__date strong { font-size: 2rem; }
+}
+
+
 /* BACK-02D: keep legacy content mounted; reserve its existing Shell viewport above Engine. */
 .site-shell:is([data-shell-engine-legacy], [data-shell-route="privacy"]) .universal-bottom-rail { display: none; }
 .site-shell[data-shell-engine-legacy] .portfolio-engine {

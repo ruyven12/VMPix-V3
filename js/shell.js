@@ -1133,6 +1133,248 @@ if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEvent
 else reducedMotion.addListener(settleTrajectoryMotion);
 
 
+// CAL-14: independent Calendar overlay, reusing the approved Trajectory presentation and motion.
+const calendarOverlay = document.querySelector("[data-calendar-overlay]");
+const calendarFrame = calendarOverlay?.querySelector("[data-calendar-frame]");
+const calendarClose = calendarOverlay?.querySelector("[data-calendar-close]");
+let calendarSession = null;
+let calendarAnimation = null;
+let calendarViewportFrame = 0;
+let calendarEngineObserver = null;
+
+function canOpenCalendar() {
+  return Boolean(calendarOverlay && calendarFrame && canOpenTrajectory() && !trajectorySession &&
+    !document.querySelector("dialog[open]"));
+}
+
+function measureCalendarViewport() {
+  if (!calendarSession || !calendarOverlay) return;
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || window.innerHeight);
+  const bounds = portfolioEngine?.getBoundingClientRect();
+  const engineStyle = portfolioEngine && getComputedStyle(portfolioEngine);
+  const settledTop = engineStyle ? window.innerHeight - (parseFloat(engineStyle.bottom) || 0) - portfolioEngine.offsetHeight : bottom;
+  const engineTop = bounds?.height ? Math.min(bounds.top, settledTop) : bottom;
+  calendarOverlay.style.setProperty("--trajectory-top", top + "px");
+  calendarOverlay.style.setProperty("--trajectory-height", Math.max(0, Math.min(bottom, engineTop) - top) + "px");
+}
+
+function scheduleCalendarViewport() {
+  if (!calendarSession || calendarViewportFrame) return;
+  calendarViewportFrame = requestAnimationFrame(() => { calendarViewportFrame = 0; measureCalendarViewport(); });
+}
+
+function finishCalendarClose(restoreFocus = true) {
+  const session = calendarSession;
+  if (!session) return;
+  calendarSession = null;
+  calendarAnimation?.cancel();
+  calendarAnimation = null;
+  calendarEngineObserver?.disconnect();
+  calendarEngineObserver = null;
+  for (const type of ["wheel", "touchmove"]) document.removeEventListener(type, blockCalendarBackgroundScroll, true);
+  shell.removeEventListener("portfolio:engine-ready", scheduleCalendarViewport);
+  cancelAnimationFrame(calendarViewportFrame);
+  calendarViewportFrame = 0;
+  if (calendarOverlay.open && typeof calendarOverlay.close === "function") calendarOverlay.close();
+  calendarOverlay.hidden = true;
+  calendarOverlay.inert = true;
+  calendarOverlay.setAttribute("aria-hidden", "true");
+  delete calendarOverlay.dataset.state;
+  shell.removeAttribute("data-calendar-open");
+  session.surfaces.forEach(({ node, inert, ariaHidden }) => {
+    if (inert === null) node.removeAttribute("inert"); else node.setAttribute("inert", inert);
+    if (ariaHidden === null) node.removeAttribute("aria-hidden"); else node.setAttribute("aria-hidden", ariaHidden);
+  });
+  document.title = session.title;
+  if (restoreFocus) {
+    session.scroll.forEach(({ node, top, left }) => { if (node.isConnected) node.scrollTo({ top, left, behavior: "instant" }); });
+    syncShellMenuAvailability();
+    const focus = session.focus?.isConnected && session.focus !== document.body &&
+      !session.focus.closest('[inert], [hidden], [aria-hidden="true"]') && !session.focus.disabled && session.focus.getClientRects().length
+      ? session.focus : (!portfolioRightEmitter?.disabled ? portfolioRightEmitter : null);
+    focus?.focus({ preventScroll: true });
+    // A cold overlay deliberately skips Portfolio's entry story; show its settled identity when revealed.
+    if (session.fallback) showPortfolioBranding();
+  }
+}
+
+function animateCalendar(opening) {
+  const previous = calendarAnimation;
+  const style = previous ? getComputedStyle(calendarFrame) : null;
+  const from = style ? { opacity: style.opacity, transform: style.transform }
+    : { opacity: opening ? 0 : 1, transform: opening ? "scale(.88)" : "scale(1)" };
+  previous?.cancel();
+  calendarAnimation = null;
+  calendarOverlay.dataset.state = opening ? "opening" : "closing";
+  if (reducedMotion.matches || typeof calendarFrame.animate !== "function") {
+    if (opening) calendarOverlay.dataset.state = "open"; else finishCalendarClose();
+    return;
+  }
+  const animation = calendarFrame.animate([from, { opacity: opening ? 1 : 0, transform: opening ? "scale(1)" : "scale(.88)" }], {
+    duration: opening ? 420 : 280, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both",
+  });
+  calendarAnimation = animation;
+  animation.finished.then(() => {
+    if (calendarAnimation !== animation || !calendarSession) return;
+    if (opening) { calendarAnimation = null; calendarOverlay.dataset.state = "open"; animation.cancel(); }
+    else finishCalendarClose();
+  }).catch(() => {});
+}
+
+function getCalendarHistorySource() {
+  const state = history.state;
+  if (typeof state?.__v3CalendarSourceEntry !== "string" || !/^[a-zA-Z0-9-]{8,80}$/.test(state.__v3CalendarSourceEntry) ||
+    typeof state.__v3ShellPreviousRoute !== "string" || state.__v3ShellPreviousRoute.length > 2048) return null;
+  try {
+    const url = new URL(state.__v3ShellPreviousRoute, location.origin);
+    const route = getRouteFromUrl(url.href);
+    if (url.origin === location.origin && !url.username && !url.password && !route.isUnknown && !["home", "upcoming", "calendar"].includes(route.name)) {
+      return { route, entry: state.__v3CalendarSourceEntry };
+    }
+  } catch { /* Invalid or stale metadata uses the safe Portfolio fallback. */ }
+  return null;
+}
+
+function showCalendarOverlay({ fromHistory = false, forceFallback = false } = {}) {
+  if (!calendarOverlay || !calendarFrame) return false;
+  if (trajectorySession) finishTrajectoryClose(false);
+  if (calendarSession) { calendarSession.closeRequested = false; animateCalendar(true); return true; }
+  const historySource = getCalendarHistorySource();
+  const sourceStillMounted = historySource && historySource.entry === v3RouteContext.entry && historySource.route.canonicalUrl === shellRenderedRoute?.canonicalUrl;
+  const canReturnWithHistory = Boolean(historySource && (sourceStillMounted || fromHistory));
+  const fallback = forceFallback || !shellRenderedRoute || shellRenderedRoute.name === "home" || shellRenderedRoute.isUnknown ||
+    (fromHistory && !sourceStillMounted);
+  if (fallback) {
+    syncRoute(getRouteFromUrl(routePaths.portfolio), { shouldCanonicalize: false });
+    applyPortfolioShellRouteContext();
+    schedulePortfolioEngineReadyGate();
+  }
+  const source = shellRenderedRoute;
+  const focus = shellMenuPanel?.contains(document.activeElement) ? portfolioRightEmitter : document.activeElement;
+  resetShellMenu();
+  calendarSession = {
+    source, title: document.title, focus, fallback,
+    sourceEntry: v3RouteContext.entry, canReturnWithHistory,
+    scroll: [...getV3ResumeScrollers(source).values()].filter(Boolean).map(node => ({ node, top: node.scrollTop, left: node.scrollLeft })),
+    surfaces: [...shell.children].filter(node => node !== calendarOverlay).map(node => ({ node, inert: node.getAttribute("inert"), ariaHidden: node.getAttribute("aria-hidden") })),
+  };
+  calendarSession.surfaces.forEach(({ node }) => { node.inert = true; node.setAttribute("aria-hidden", "true"); });
+  for (const type of ["wheel", "touchmove"]) document.addEventListener(type, blockCalendarBackgroundScroll, { capture: true, passive: false });
+  shell.addEventListener("portfolio:engine-ready", scheduleCalendarViewport);
+  measureCalendarViewport();
+  calendarOverlay.hidden = false;
+  calendarOverlay.inert = false;
+  calendarOverlay.setAttribute("aria-hidden", "false");
+  if (typeof calendarOverlay.showModal === "function" && !calendarOverlay.open) calendarOverlay.showModal();
+  shell.setAttribute("data-calendar-open", "");
+  document.title = "Upcoming Gigs - Voodoo Media V3.0.01";
+  if (typeof ResizeObserver === "function" && portfolioEngine) {
+    calendarEngineObserver = new ResizeObserver(scheduleCalendarViewport);
+    calendarEngineObserver.observe(portfolioEngine);
+  }
+  calendarOverlay.querySelector("[data-calendar-scroll]")?.scrollTo(0, 0);
+  animateCalendar(true);
+  calendarClose?.focus({ preventScroll: true });
+  return true;
+}
+
+function syncCalendarRoute(route) {
+  if (route.name === "calendar") return showCalendarOverlay();
+  if (!calendarSession) return false;
+  if (route.canonicalUrl === calendarSession.source.canonicalUrl) {
+    if (calendarSession.sourceEntry !== history.state?.v3EntryId && route.name === "portfolio") {
+      beginV3RouteContext(calendarSession.source, { navigationCause: "back-forward" });
+    }
+    animateCalendar(false);
+    return true;
+  }
+  finishCalendarClose(false);
+  return false;
+}
+
+function navigateCalendarRoute(route, options) {
+  if (route.name === "calendar") {
+    if (calendarSession && getRouteFromUrl().name === "calendar") return true;
+    if (!canOpenCalendar()) return true;
+    pushRouteUrl(route.canonicalUrl, { __v3CalendarSourceEntry: v3RouteContext.entry });
+    syncCalendarRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (calendarSession && route.canonicalUrl === calendarSession.source.canonicalUrl) {
+    pushRouteUrl(route.canonicalUrl, options.historyState || {});
+    syncCalendarRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (calendarSession) finishCalendarClose(false);
+  return false;
+}
+
+function handleCalendarHistory(event) {
+  const route = getRouteFromUrlWithPrototypePrecedence();
+  if (route.name !== "calendar" && !calendarSession) return false;
+  if (route.name !== "calendar" && route.canonicalUrl !== calendarSession.source.canonicalUrl) {
+    finishCalendarClose(false);
+    return false;
+  }
+  shellHistoryIndex = getShellHistoryIndex(event.state);
+  if (route.name === "calendar") {
+    // Match the existing history cancellation boundary; a stale sweep must never commit behind the HUD.
+    cancelShellBackSweep();
+    cancelBandRecordOpening();
+    cancelZhentoRhythmEntry();
+    cancelAdminStationTravel();
+    showCalendarOverlay({ fromHistory: true, forceFallback: !calendarSession && !canOpenCalendar() });
+  } else syncCalendarRoute(route);
+  notifyV3AnalyticsView(route);
+  return true;
+}
+
+function closeCalendarOverlay() {
+  const session = calendarSession;
+  if (!session || session.closeRequested || calendarOverlay.dataset.state === "closing" || getRouteFromUrl().name !== "calendar") return;
+  session.closeRequested = true;
+  if (session.canReturnWithHistory) history.back();
+  else {
+    replaceRouteUrl(session.source.canonicalUrl);
+    syncCalendarRoute(session.source);
+    notifyV3AnalyticsView(session.source);
+  }
+}
+
+calendarClose?.addEventListener("click", closeCalendarOverlay);
+calendarOverlay?.addEventListener("cancel", event => { event.preventDefault(); closeCalendarOverlay(); });
+document.addEventListener("keydown", event => {
+  if (!calendarSession) return;
+  if (event.key === "Tab") {
+    const controls = [...calendarOverlay.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter(node => !node.disabled && !node.closest('[inert], [hidden]') && node.getClientRects().length);
+    const first = controls[0] || calendarClose, last = controls.at(-1) || first;
+    if (!calendarOverlay.contains(document.activeElement) ||
+        event.shiftKey && document.activeElement === first || !event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      (event.shiftKey ? last : first)?.focus({ preventScroll: true });
+    }
+  }
+  if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); closeCalendarOverlay(); }
+}, true);
+document.addEventListener("focusin", event => {
+  if (calendarSession && !calendarOverlay.contains(event.target)) calendarClose?.focus({ preventScroll: true });
+});
+function blockCalendarBackgroundScroll(event) {
+  if (calendarSession && !calendarOverlay.contains(event.target)) event.preventDefault();
+}
+window.addEventListener("resize", scheduleCalendarViewport, { passive: true });
+window.visualViewport?.addEventListener("resize", scheduleCalendarViewport, { passive: true });
+window.visualViewport?.addEventListener("scroll", scheduleCalendarViewport, { passive: true });
+const settleCalendarMotion = () => { if (reducedMotion.matches) calendarAnimation?.finish(); };
+if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEventListener("change", settleCalendarMotion);
+else reducedMotion.addListener(settleCalendarMotion);
+
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
@@ -8878,6 +9120,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     resetShellMenu(); // Also clear before same-route local-history handlers return.
     cancelShellDataConduit("history");
     shellBackPendingEntry = null;
+    if (handleCalendarHistory(event)) return;
     if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }
     checkpointV3Resume(true); // DOM still belongs to the departing context, although the URL has changed.

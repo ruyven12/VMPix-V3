@@ -649,6 +649,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof syncCalendarRoute === "function" && syncCalendarRoute(route)) return;
   if (typeof syncTrajectoryRoute === "function" && syncTrajectoryRoute(route)) return;
   try { window.__v3AnalyticsBoot?.protectAdmin(route); } catch { /* Optional analytics never changes mounting. */ }
   if (route.name !== "privacy" && typeof hidePrivacyShell === "function") hidePrivacyShell();
@@ -1012,7 +1013,7 @@ function syncRoute(route, options = {}) {
 function syncRouteFromLocation(options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence();
   syncRoute(route, options);
-  if (route.name !== "upcoming" && !trajectorySession && typeof stabilizeShellViewport === "function") {
+  if (route.name !== "upcoming" && !trajectorySession && !calendarSession && typeof stabilizeShellViewport === "function") {
     stabilizeShellViewport(route, options);
   }
   notifyV3AnalyticsView(route);
@@ -1024,6 +1025,7 @@ function navigateToRoute(url, options = {}) {
   options = routeOptions;
   if (typeof isRepeatedShellDataConduitIntent === "function" && isRepeatedShellDataConduitIntent(dataConduitIntent)) return;
   if (typeof cancelShellDataConduit === "function") cancelShellDataConduit("navigation");
+  if (typeof navigateCalendarRoute === "function" && navigateCalendarRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateTrajectoryRoute === "function" && navigateTrajectoryRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   try {
     const target = new URL(url, window.location.href);
