@@ -447,7 +447,9 @@
   function validCalendarAuthorization(data) {
     if (!data || typeof data.authorization_url !== "string" || data.authorization_url.length > 4096) return null;
     const deadline = expiry(data.expires_at);
-    if (deadline <= Date.now() || deadline > Date.now() + 600000) return null;
+    const now = Date.now();
+    // Server time can put a valid expiry more than ten minutes ahead of a slow browser.
+    if (deadline <= now) return null;
     try {
       const url = new URL(data.authorization_url);
       if (url.origin !== "https://app.todoist.com" || url.pathname !== "/oauth/authorize" ||
@@ -461,7 +463,8 @@
       const callback = new URL(url.searchParams.get("redirect_uri"));
       if (callback.origin !== new URL(API).origin || callback.pathname !== "/api/calendar/oauth/callback" ||
           callback.username || callback.password || callback.search || callback.hash) return null;
-      return { href: url.href, deadline };
+      // Cap local display; the backend still enforces the one-use state expiry.
+      return { href: url.href, deadline: Math.min(deadline, now + 600000) };
     } catch { return null; }
   }
   function displayCalendarStatus(data) {
