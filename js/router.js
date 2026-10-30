@@ -649,6 +649,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof syncContactRoute === "function" && syncContactRoute(route)) return;
   if (typeof syncCalendarRoute === "function" && syncCalendarRoute(route)) return;
   if (typeof syncTrajectoryRoute === "function" && syncTrajectoryRoute(route)) return;
   try { window.__v3AnalyticsBoot?.protectAdmin(route); } catch { /* Optional analytics never changes mounting. */ }
@@ -883,10 +884,6 @@ function syncRoute(route, options = {}) {
     return;
   }
 
-  if (route.name === "contact") {
-    showContactShell();
-    return;
-  }
 
   if (route.name === "admin") {
     showAdminShell(route);
@@ -1013,7 +1010,7 @@ function syncRoute(route, options = {}) {
 function syncRouteFromLocation(options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence();
   syncRoute(route, options);
-  if (route.name !== "upcoming" && !trajectorySession && !calendarSession && typeof stabilizeShellViewport === "function") {
+  if (route.name !== "upcoming" && !trajectorySession && !calendarSession && !contactSession && typeof stabilizeShellViewport === "function") {
     stabilizeShellViewport(route, options);
   }
   notifyV3AnalyticsView(route);
@@ -1025,6 +1022,7 @@ function navigateToRoute(url, options = {}) {
   options = routeOptions;
   if (typeof isRepeatedShellDataConduitIntent === "function" && isRepeatedShellDataConduitIntent(dataConduitIntent)) return;
   if (typeof cancelShellDataConduit === "function") cancelShellDataConduit("navigation");
+  if (typeof navigateContactRoute === "function" && navigateContactRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateCalendarRoute === "function" && navigateCalendarRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateTrajectoryRoute === "function" && navigateTrajectoryRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   try {

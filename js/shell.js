@@ -1375,6 +1375,298 @@ if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEvent
 else reducedMotion.addListener(settleCalendarMotion);
 
 
+// CON-02: Shell-owned Contact overlay. Only the terminal and the existing Engine Back remain interactive.
+const contactOverlay = document.querySelector("[data-contact-overlay]");
+const contactFrame = contactOverlay?.querySelector("[data-contact-frame]");
+const contactClose = contactOverlay?.querySelector("[data-contact-close]");
+let contactSession = null;
+let contactAnimation = null;
+let contactViewportFrame = 0;
+let contactEngineObserver = null;
+let contactIsolationObserver = null;
+
+function settleContactConnection() {
+  contactOverlay.dataset.state = "open";
+  contactOverlay.querySelector("[data-contact-status]").textContent = "Terminal open";
+}
+
+function syncContactBackControl() {
+  if (!contactSession || !prototypeEngineReturnControl) return;
+  prototypeEngineReturnControl.hidden = false;
+  prototypeEngineReturnControl.disabled = false;
+  prototypeEngineReturnControl.tabIndex = 0;
+  prototypeEngineReturnControl.setAttribute("aria-label", "Close Communications Relay and return");
+}
+
+function isolateContactWorld() {
+  // Preserve every background branch, including UI mounted outside the Shell.
+  // Inert removes controls from the accessibility tree without changing the
+  // world's aria-hidden-driven visual presentation. Engine Back stays in place.
+  const isolated = new Set(), ancestors = new Set();
+  const walk = parent => {
+    for (const node of parent.children) {
+      if (node === contactOverlay || node === prototypeEngineReturnControl) continue;
+      if (node.contains(prototypeEngineReturnControl) || node.contains(contactOverlay)) {
+        if (!ancestors.has(node)) {
+          ancestors.add(node);
+          contactSession.backAncestors.push({ node, ariaHidden: node.getAttribute("aria-hidden") });
+          node.removeAttribute("aria-hidden");
+          contactIsolationObserver?.observe(node, { childList: true });
+        }
+        walk(node);
+      } else {
+        if (!isolated.has(node)) {
+          isolated.add(node);
+          contactSession.surfaces.push({ node, inert: node.getAttribute("inert") });
+          contactIsolationObserver?.observe(node, { attributes: true, attributeFilter: ["inert"] });
+        }
+        if (!node.inert) node.inert = true;
+      }
+    }
+  };
+  // Late UI and delayed world renders cannot reactivate the background.
+  contactIsolationObserver = new MutationObserver(() => { if (contactSession) walk(document.body); });
+  contactIsolationObserver.observe(document.body, { childList: true });
+  walk(document.body);
+  syncContactBackControl();
+}
+
+function canOpenContact() {
+  return Boolean(contactOverlay && contactFrame && canOpenTrajectory() && !trajectorySession && !calendarSession &&
+    !document.querySelector("dialog[open]"));
+}
+
+function measureContactViewport() {
+  if (!contactSession || !contactOverlay) return;
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || window.innerHeight);
+  const bounds = portfolioEngine?.getBoundingClientRect();
+  const engineStyle = portfolioEngine && getComputedStyle(portfolioEngine);
+  const settledTop = engineStyle ? window.innerHeight - (parseFloat(engineStyle.bottom) || 0) - portfolioEngine.offsetHeight : bottom;
+  const engineTop = bounds?.height ? Math.min(bounds.top, settledTop) : bottom;
+  contactOverlay.style.setProperty("--trajectory-top", top + "px");
+  contactOverlay.style.setProperty("--trajectory-height", Math.max(0, Math.min(bottom, engineTop) - top) + "px");
+}
+
+function scheduleContactViewport() {
+  if (!contactSession || contactViewportFrame) return;
+  contactViewportFrame = requestAnimationFrame(() => { contactViewportFrame = 0; measureContactViewport(); });
+}
+
+function finishContactClose(restoreFocus = true) {
+  const session = contactSession;
+  if (!session) return;
+  contactSession = null;
+  contactAnimation?.cancel();
+  contactAnimation = null;
+  contactEngineObserver?.disconnect();
+  contactEngineObserver = null;
+  for (const type of ["wheel", "touchmove"]) document.removeEventListener(type, blockContactBackgroundScroll, true);
+  shell.removeEventListener("portfolio:engine-ready", scheduleContactViewport);
+  cancelAnimationFrame(contactViewportFrame);
+  contactViewportFrame = 0;
+  contactOverlay.hidden = true;
+  contactOverlay.inert = true;
+  contactOverlay.setAttribute("aria-hidden", "true");
+  delete contactOverlay.dataset.state;
+  shell.removeAttribute("data-contact-open");
+  contactIsolationObserver?.disconnect();
+  contactIsolationObserver = null;
+  session.surfaces.forEach(({ node, inert }) => {
+    if (inert === null) node.removeAttribute("inert"); else node.setAttribute("inert", inert);
+  });
+  session.backAncestors.forEach(({ node, ariaHidden }) => {
+    if (ariaHidden === null) node.removeAttribute("aria-hidden"); else node.setAttribute("aria-hidden", ariaHidden);
+  });
+  updatePrototypeEngineReturnEmitter(session.source);
+  document.title = session.title;
+  if (restoreFocus) {
+    session.scroll.forEach(({ node, top, left }) => { if (node.isConnected) node.scrollTo({ top, left, behavior: "instant" }); });
+    syncShellMenuAvailability();
+    const focus = session.focus?.isConnected && session.focus !== document.body &&
+      !session.focus.closest('[inert], [hidden], [aria-hidden="true"]') && !session.focus.disabled && session.focus.getClientRects().length
+      ? session.focus : (!portfolioRightEmitter?.disabled ? portfolioRightEmitter : null);
+    focus?.focus({ preventScroll: true });
+    // A cold overlay deliberately skips Portfolio's entry story; show its settled identity when revealed.
+    if (session.fallback) showPortfolioBranding();
+  }
+}
+
+function animateContact(opening) {
+  const previous = contactAnimation;
+  const style = previous ? getComputedStyle(contactFrame) : null;
+  const from = style ? { opacity: style.opacity, transform: style.transform }
+    : { opacity: opening ? 0 : 1, transform: opening ? "scale(.88)" : "scale(1)" };
+  previous?.cancel();
+  contactAnimation = null;
+  contactOverlay.dataset.state = opening ? "opening" : "closing";
+  if (opening) contactOverlay.querySelector("[data-contact-status]").textContent = "Opening terminal…";
+  if (reducedMotion.matches || typeof contactFrame.animate !== "function") {
+    if (opening) settleContactConnection(); else finishContactClose();
+    return;
+  }
+  const animation = contactFrame.animate([from, { opacity: opening ? 1 : 0, transform: opening ? "scale(1)" : "scale(.88)" }], {
+    duration: opening ? 420 : 280, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both",
+  });
+  contactAnimation = animation;
+  animation.finished.then(() => {
+    if (contactAnimation !== animation || !contactSession) return;
+    if (opening) { contactAnimation = null; settleContactConnection(); animation.cancel(); }
+    else finishContactClose();
+  }).catch(() => {});
+}
+
+function getContactHistorySource() {
+  const state = history.state;
+  if (typeof state?.__v3ContactSourceEntry !== "string" || !/^[a-zA-Z0-9-]{8,80}$/.test(state.__v3ContactSourceEntry) ||
+    typeof state.__v3ShellPreviousRoute !== "string" || state.__v3ShellPreviousRoute.length > 2048) return null;
+  try {
+    const url = new URL(state.__v3ShellPreviousRoute, location.origin);
+    const route = getRouteFromUrl(url.href);
+    if (url.origin === location.origin && !url.username && !url.password && !route.isUnknown && !["home", "upcoming", "calendar", "contact"].includes(route.name)) {
+      return { route, entry: state.__v3ContactSourceEntry };
+    }
+  } catch { /* Invalid or stale metadata uses the safe Portfolio fallback. */ }
+  return null;
+}
+
+function showContactOverlay({ fromHistory = false, forceFallback = false } = {}) {
+  if (!contactOverlay || !contactFrame) return false;
+  if (trajectorySession) finishTrajectoryClose(false);
+  if (calendarSession) finishCalendarClose(false);
+  if (contactSession) { contactSession.closeRequested = false; animateContact(true); return true; }
+  const historySource = getContactHistorySource();
+  const sourceStillMounted = historySource && historySource.entry === v3RouteContext.entry && historySource.route.canonicalUrl === shellRenderedRoute?.canonicalUrl;
+  const canReturnWithHistory = Boolean(historySource && (sourceStillMounted || fromHistory));
+  const fallback = forceFallback || !shellRenderedRoute || shellRenderedRoute.name === "home" || shellRenderedRoute.isUnknown ||
+    (fromHistory && !sourceStillMounted);
+  if (fallback) {
+    syncRoute(getRouteFromUrl(routePaths.portfolio), { shouldCanonicalize: false });
+    applyPortfolioShellRouteContext();
+    schedulePortfolioEngineReadyGate();
+  }
+  const source = shellRenderedRoute;
+  const focus = shellMenuPanel?.contains(document.activeElement) ? portfolioRightEmitter : document.activeElement;
+  resetShellMenu();
+  contactSession = {
+    source, title: document.title, focus, fallback,
+    sourceEntry: v3RouteContext.entry, canReturnWithHistory,
+    scroll: [...getV3ResumeScrollers(source).values()].filter(Boolean).map(node => ({ node, top: node.scrollTop, left: node.scrollLeft })),
+    surfaces: [], backAncestors: [],
+  };
+  isolateContactWorld();
+  for (const type of ["wheel", "touchmove"]) document.addEventListener(type, blockContactBackgroundScroll, { capture: true, passive: false });
+  shell.addEventListener("portfolio:engine-ready", scheduleContactViewport);
+  measureContactViewport();
+  contactOverlay.hidden = false;
+  contactOverlay.inert = false;
+  contactOverlay.setAttribute("aria-hidden", "false");
+  shell.setAttribute("data-contact-open", "");
+  document.title = "Communications Relay - Voodoo Media V3.0.01";
+  if (typeof ResizeObserver === "function" && portfolioEngine) {
+    contactEngineObserver = new ResizeObserver(scheduleContactViewport);
+    contactEngineObserver.observe(portfolioEngine);
+  }
+  contactOverlay.querySelector("[data-contact-scroll]")?.scrollTo(0, 0);
+  animateContact(true);
+  contactClose?.focus({ preventScroll: true });
+  return true;
+}
+
+function syncContactRoute(route) {
+  if (route.name === "contact") return showContactOverlay();
+  if (!contactSession) return false;
+  if (route.canonicalUrl === contactSession.source.canonicalUrl) {
+    if (contactSession.sourceEntry !== history.state?.v3EntryId && route.name === "portfolio") {
+      beginV3RouteContext(contactSession.source, { navigationCause: "back-forward" });
+    }
+    animateContact(false);
+    return true;
+  }
+  finishContactClose(false);
+  return false;
+}
+
+function navigateContactRoute(route, options) {
+  if (route.name === "contact") {
+    if (contactSession && getRouteFromUrl().name === "contact") return true;
+    if (!canOpenContact()) return true;
+    pushRouteUrl(route.canonicalUrl, { __v3ContactSourceEntry: v3RouteContext.entry });
+    syncContactRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (contactSession && route.canonicalUrl === contactSession.source.canonicalUrl) {
+    pushRouteUrl(route.canonicalUrl, options.historyState || {});
+    syncContactRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (contactSession) finishContactClose(false);
+  return false;
+}
+
+function handleContactHistory(event) {
+  const route = getRouteFromUrlWithPrototypePrecedence();
+  if (route.name !== "contact" && !contactSession) return false;
+  if (route.name !== "contact" && route.canonicalUrl !== contactSession.source.canonicalUrl) {
+    finishContactClose(false);
+    return false;
+  }
+  shellHistoryIndex = getShellHistoryIndex(event.state);
+  if (route.name === "contact") {
+    // Match the existing history cancellation boundary; a stale sweep must never commit behind the HUD.
+    cancelShellBackSweep();
+    cancelBandRecordOpening();
+    cancelZhentoRhythmEntry();
+    cancelAdminStationTravel();
+    showContactOverlay({ fromHistory: true, forceFallback: !contactSession && !canOpenContact() });
+  } else syncContactRoute(route);
+  notifyV3AnalyticsView(route);
+  return true;
+}
+
+function closeContactOverlay() {
+  const session = contactSession;
+  if (!session || session.closeRequested || contactOverlay.dataset.state === "closing" || getRouteFromUrl().name !== "contact") return;
+  session.closeRequested = true;
+  if (session.canReturnWithHistory) history.back();
+  else {
+    replaceRouteUrl(session.source.canonicalUrl);
+    syncContactRoute(session.source);
+    notifyV3AnalyticsView(session.source);
+  }
+}
+
+contactClose?.addEventListener("click", closeContactOverlay);
+document.addEventListener("keydown", event => {
+  if (!contactSession) return;
+  if (event.key === "Tab") {
+    const controls = [...contactOverlay.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'), prototypeEngineReturnControl]
+      .filter(node => node && !node.disabled && !node.closest('[inert], [hidden]') && node.getClientRects().length);
+    const index = controls.indexOf(document.activeElement);
+    event.preventDefault();
+    controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length]?.focus({ preventScroll: true });
+  }
+  // Engine Back stays actionable, but must not scroll the preserved world.
+  if (!contactOverlay.contains(event.target) && ["PageDown", "PageUp", "Home", "End", "ArrowDown", "ArrowUp"].includes(event.key)) event.preventDefault();
+  if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); closeContactOverlay(); }
+}, true);
+document.addEventListener("focusin", event => {
+  if (contactSession && !contactOverlay.contains(event.target) && !prototypeEngineReturnControl?.contains(event.target)) contactClose?.focus({ preventScroll: true });
+});
+function blockContactBackgroundScroll(event) {
+  if (contactSession && !contactOverlay.contains(event.target)) event.preventDefault();
+}
+window.addEventListener("resize", scheduleContactViewport, { passive: true });
+window.visualViewport?.addEventListener("resize", scheduleContactViewport, { passive: true });
+window.visualViewport?.addEventListener("scroll", scheduleContactViewport, { passive: true });
+const settleContactMotion = () => { if (reducedMotion.matches) contactAnimation?.finish(); };
+if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEventListener("change", settleContactMotion);
+else reducedMotion.addListener(settleContactMotion);
+
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
@@ -4057,6 +4349,7 @@ function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 }
 
 function handlePrototypeEngineReturnEmitter(event) {
+  if (contactSession) { event.preventDefault(); event.stopPropagation(); closeContactOverlay(); return; }
   const route = getRouteFromUrl();
   if (bandRecordOpening) { event.preventDefault(); return; }
   if (!isPrototypeEngineReturnRoute(route)) {
@@ -4094,6 +4387,7 @@ function initPrototypeEngineReturnEmitter() {
 }
 
 function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
+  if (contactSession) { syncContactBackControl(); return; }
   if (!prototypeEngineReturnEmitter) {
     return;
   }
@@ -4844,6 +5138,7 @@ function syncShellBackSweepMotion() {
 
 let shellBackPendingEntry = null;
 function performShellBack() {
+  if (contactSession) { closeContactOverlay(); return; }
   if (shellMenuOpen) { dismissShellMenu(); return; }
   cancelShellDataConduit("engine-back");
   const route = getRouteFromUrl();
@@ -7701,70 +7996,6 @@ function applyCalendarMockState() {
   });
 }
 
-function showContactShell() {
-  if (!shell || !contactShell) {
-    return;
-  }
-  shell.classList.remove("is-module-view", "is-placeholder-view", "is-music-nexus-view", "is-ring-archive-view", "is-wrestling-people-view", "is-wrestling-person-detail-view", "is-wrestling-shows-view", "is-wrestling-show-detail-view", "is-wrestling-match-gallery-view", "is-wrestling-lightbox-view", "is-about-view", "is-calendar-view");
-  shell.classList.add("has-entered-hub", "is-contact-view");
-  if (homeFrame) {
-    homeFrame.setAttribute("aria-hidden", "true");
-  }
-  if (portfolioHub) {
-    portfolioHub.setAttribute("aria-hidden", "true");
-    portfolioHub.setAttribute("inert", "");
-  }
-  if (modulePlaceholder) {
-    modulePlaceholder.setAttribute("aria-hidden", "true");
-    modulePlaceholder.setAttribute("inert", "");
-  }
-  if (musicNexusShell) {
-    musicNexusShell.setAttribute("aria-hidden", "true");
-    musicNexusShell.setAttribute("inert", "");
-  }
-  if (ringArchiveShell) {
-    ringArchiveShell.setAttribute("aria-hidden", "true");
-    ringArchiveShell.setAttribute("inert", "");
-  }
-  setWrestlingShowsHidden(true);
-  setWrestlingPeopleHidden(true);
-  setWrestlingPersonDetailHidden(true);
-  setWrestlingVenuesHidden(true);
-  setWrestlingShowDetailHidden(true);
-  setWrestlingMatchGalleryHidden(true);
-  setWrestlingLightboxHidden(true);
-  if (aboutShell) {
-    aboutShell.setAttribute("aria-hidden", "true");
-    aboutShell.setAttribute("inert", "");
-  }
-  if (calendarShell) {
-    calendarShell.setAttribute("aria-hidden", "true");
-    calendarShell.setAttribute("inert", "");
-  }
-  contactShell.setAttribute("aria-hidden", "false");
-  contactShell.removeAttribute("inert");
-  setHubChromeHidden(true);
-  applyContactMockState();
-  setCurrentView("Contact");
-  setActiveGlobalNav("contact");
-  if (startButton) {
-    startButton.disabled = true;
-    startButton.setAttribute("aria-busy", "false");
-  }
-}
-
-function applyContactMockState() {
-  const forcedState = getForcedMockState("contact");
-  const formShell = contactShell?.querySelector("[data-contact-form-shell]") || contactShell?.querySelector(".contact-form-shell");
-  if (!formShell) {
-    return;
-  }
-
-  renderSiteModuleMockState(formShell, "contact", forcedState, {
-    partialMode: "append",
-  });
-}
-
 function showModulePlaceholder(moduleName) {
   const content = modulePlaceholderContent[moduleName];
   if (!content || !shell || !portfolioHub || !modulePlaceholder) {
@@ -9120,6 +9351,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     resetShellMenu(); // Also clear before same-route local-history handlers return.
     cancelShellDataConduit("history");
     shellBackPendingEntry = null;
+    if (handleContactHistory(event)) return;
     if (handleCalendarHistory(event)) return;
     if (handleTrajectoryHistory(event)) return;
     try { window.__v3AnalyticsBoot?.protectAdmin(); } catch { /* Exclude arriving Admin before any mount or sweep. */ }

@@ -15180,3 +15180,30 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
     max-height: calc(100% - var(--portfolio-engine-height) - var(--portfolio-engine-bottom-offset) - 1rem);
   }
 }
+
+
+/* CON-02: Contact alone uses a controlled overlay; shared frames remain unchanged. */
+.contact-overlay { padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); background: rgba(2, 3, 6, .62); }
+.contact-overlay .trajectory-overlay__frame { background-color: rgba(7, 8, 11, .97); }
+.contact-terminal__header { min-width: 0; }
+.contact-terminal__eyebrow { margin: 0 0 12px; color: #c5b6b9; font-size: .65rem; line-height: 1.6; letter-spacing: .16em; }
+.contact-terminal .trajectory-overlay__title { font-size: clamp(1.35rem, 5.7vw, 2.3rem); letter-spacing: .025em; }
+.contact-terminal .contact-terminal__viewport { width: min(100%, 50rem); text-align: start; }
+.contact-terminal__connection { display: flex; align-items: center; gap: 14px; padding: 0 0 22px; border-bottom: 1px solid rgba(197, 182, 185, .18); }
+.contact-terminal__signal { display: flex; align-items: center; justify-content: center; gap: 4px; width: 44px; height: 36px; flex: none; }
+.contact-terminal__signal span { width: 3px; height: 9px; background: #d18894; opacity: .8; }
+.contact-terminal__signal span:nth-child(2), .contact-terminal__signal span:nth-child(4) { height: 18px; }
+.contact-terminal__signal span:nth-child(3) { height: 28px; }
+.contact-overlay[data-state="opening"] .contact-terminal__signal { animation: contact-channel-establish 420ms cubic-bezier(.2,.7,.2,1) both; }
+.contact-terminal .contact-terminal__status { margin: 0; color: #e4d8da; font-size: .8rem; line-height: 1.5; }
+.contact-terminal__message { padding: clamp(24px, 4vw, 38px) 0; }
+.contact-terminal__index { color: #c68e98; font-size: .58rem; line-height: 1.8; letter-spacing: .07em; }
+.contact-terminal .contact-terminal__message h3 { margin: 14px 0 18px; color: #f0e9eb; font-size: clamp(1.35rem, 4.5vw, 1.85rem); font-weight: 400; line-height: 1.35; }
+.contact-terminal .contact-terminal__message p { margin: 0; max-width: 39rem; color: #c5c7cd; font-family: "Segoe UI", Arial, sans-serif; font-size: 1rem; line-height: 1.7; }
+.contact-terminal .contact-terminal__message .contact-terminal__availability { margin-top: 24px; padding-inline-start: 12px; border-inline-start: 2px solid #b76879; color: #b8aeb3; font-size: .9rem; }
+.contact-terminal .contact-terminal__return { max-width: none; margin: 0; padding-top: 18px; border-top: 1px solid rgba(197, 182, 185, .18); color: #aaaeb8; font-family: "Segoe UI", Arial, sans-serif; font-size: .85rem; line-height: 1.6; }
+@keyframes contact-channel-establish { from { opacity: .25; transform: scaleY(.4); } to { opacity: 1; transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .contact-overlay[data-state="opening"] .contact-terminal__signal { animation: none; } }
+
+/* Defer the outside-Shell consent prompt until return; its saved choice is untouched. */
+body:has(.contact-overlay:not([hidden])) > [data-v3-privacy] { visibility: hidden; }

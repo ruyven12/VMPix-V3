@@ -2140,68 +2140,6 @@
           <ul class="calendar-event-list" aria-label="Upcoming gigs" data-calendar-event-list></ul>
         </section>
       </section>
-      <section class="contact-shell" aria-labelledby="contact-title" aria-hidden="true" inert data-contact-shell data-site-module-scope="contact">
-        <header class="contact-header">
-          <h2 class="contact-title" id="contact-title">CONTACT</h2>
-          <p class="contact-subtitle">LET'S CONNECT</p>
-        </header>
-
-        <div class="contact-layout">
-          <div class="v3-card v3-card--spotlight contact-form-shell" role="form" aria-label="Contact form shell" data-contact-form-shell>
-            <label class="contact-field" data-contact-field="name">
-              <span class="contact-label">Name</span>
-              <input class="contact-input" type="text" name="name" autocomplete="name">
-            </label>
-
-            <label class="contact-field" data-contact-field="email">
-              <span class="contact-label">Email</span>
-              <input class="contact-input" type="email" name="email" autocomplete="email">
-            </label>
-
-            <label class="contact-field" data-contact-field="subject">
-              <span class="contact-label">Subject</span>
-              <input class="contact-input" type="text" name="subject">
-            </label>
-
-            <label class="contact-field" data-contact-field="message">
-              <span class="contact-label">Message</span>
-              <textarea class="contact-textarea" name="message"></textarea>
-            </label>
-
-            <p class="contact-form-note" id="contact-form-note">
-              Static contact shell. Use the listed channels until messaging is connected.
-            </p>
-            <button class="contact-send" type="button" aria-label="Send message placeholder action" aria-describedby="contact-form-note" data-contact-static-action>SEND MESSAGE</button>
-          </div>
-
-          <div class="contact-methods" aria-label="Contact methods" data-contact-methods>
-            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="email">
-              <h3 class="contact-method-title">Email</h3>
-              <p class="contact-method-meta">Primary channel</p>
-            </article>
-
-            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="instagram">
-              <h3 class="contact-method-title">Instagram</h3>
-              <p class="contact-method-meta">Social channel</p>
-            </article>
-
-            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="facebook">
-              <h3 class="contact-method-title">Facebook</h3>
-              <p class="contact-method-meta">Social channel</p>
-            </article>
-
-            <article class="v3-card v3-card--mini contact-method-card" data-contact-method="x">
-              <h3 class="contact-method-title">X (Twitter)</h3>
-              <p class="contact-method-meta">Social channel</p>
-            </article>
-
-            <article class="v3-card v3-card--state contact-method-card contact-method-card--response" data-contact-static-response>
-              <h3 class="contact-method-title">Response Time</h3>
-              <p class="contact-method-meta">I typically respond within 24&ndash;48 hours.</p>
-            </article>
-          </div>
-        </div>
-      </section>
       <section class="connect-shell" aria-labelledby="connect-title" aria-hidden="true" inert data-connect-shell>
         <div class="connect-stage" data-connect-stage>
           <canvas class="connect-embers" data-connect-embers aria-hidden="true"></canvas>
@@ -3062,6 +3000,39 @@
         </div>
       </div>
     </dialog>
+
+    <!-- Contact is intentionally non-modal: the persistent Engine Back remains in its focus boundary. -->
+    <section class="trajectory-overlay contact-overlay" data-contact-overlay role="dialog" aria-modal="false" aria-labelledby="contact-relay-title" aria-describedby="contact-relay-description" aria-hidden="true" tabindex="-1" inert hidden>
+      <div class="trajectory-overlay__frame" data-contact-frame>
+        <svg class="trajectory-overlay__rails" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="trajectory-overlay__edge" d="M24 1 H114 L140 19 H860 L886 1 H976 L999 24 V101 L992 113 V487 L999 499 V576 L976 599 H886 L860 581 H140 L114 599 H24 L1 576 V499 L8 487 V113 L1 101 V24 Z" />
+          <path class="trajectory-overlay__inset" d="M25 37 H115 L155 73 H845 L885 37 H975 M25 563 H115 L155 527 H845 L885 563 H975 M52 80 V195 L67 214 V386 L52 405 V520 M948 80 V195 L933 214 V386 L948 405 V520" />
+          <path class="trajectory-overlay__detail" d="M300 19 L320 32 H680 L700 19 M300 581 L320 568 H680 L700 581 M155 73 V527 M845 73 V527 M500 34 V125 M500 475 V566" />
+          <path class="trajectory-overlay__accent" d="M468 32 H532 M468 568 H532 M8 134 V204 M992 134 V204 M8 396 V466 M992 396 V466" />
+        </svg>
+        <button class="trajectory-overlay__close" type="button" aria-label="Close Communications Relay" data-contact-close><span aria-hidden="true"></span></button>
+        <div class="trajectory-overlay__content contact-terminal">
+          <header class="contact-terminal__header">
+            <p class="contact-terminal__eyebrow">COMMUNICATIONS RELAY</p>
+            <h2 class="trajectory-overlay__title" id="contact-relay-title">OPEN A CHANNEL</h2>
+          </header>
+          <span class="trajectory-overlay__divider" aria-hidden="true"></span>
+          <div class="trajectory-overlay__reading contact-terminal__viewport" data-contact-scroll tabindex="0" role="region" aria-label="Communications terminal">
+            <div class="contact-terminal__connection">
+              <span class="contact-terminal__signal" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+              <p class="contact-terminal__status" data-contact-status role="status" aria-live="polite" aria-atomic="true">Opening terminal…</p>
+            </div>
+            <div class="contact-terminal__message">
+              <span class="contact-terminal__index" aria-hidden="true">01 / ESTABLISH CONNECTION</span>
+              <h3>A point of contact.</h3>
+              <p id="contact-relay-description">A space for the next conversation. Your place in the archive is waiting behind this terminal.</p>
+              <p class="contact-terminal__availability">Message transmission is not available yet.</p>
+            </div>
+            <p class="contact-terminal__return">Close the terminal or use Engine Back to return.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <template id="shell-rail-template">
     <footer class="universal-bottom-rail status-row" data-shell-bottom-rail aria-label="Universal shell rail">

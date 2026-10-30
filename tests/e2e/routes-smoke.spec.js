@@ -33,7 +33,7 @@ const routes = [
   { path: "/wrestling/venues/portland_expo", rail: /Fields of Conflict/, visibleShell: ".fields-of-conflict-dossier", text: "Portland Expo" },
   { path: "/calendar", rail: "Upcoming Gigs", context: "#calendar-modal-title", visibleShell: "[data-calendar-overlay]", text: "CONFIRMED" },
   { path: "/about", rail: "About", visibleShell: "[data-about-shell]" },
-  { path: "/contact", rail: "Contact", visibleShell: "[data-contact-shell]" },
+  { path: "/contact", rail: "OPEN A CHANNEL", context: "#contact-relay-title", visibleShell: "[data-contact-overlay]" },
 ];
 
 const ignoredConsoleErrors = [
@@ -97,8 +97,8 @@ for (const viewport of viewports) {
         });
         page.on("pageerror", (error) => pageErrors.push(error.message));
 
-        if (route.path === "/calendar") {
-          // Mock the Calendar publication; never reach backend or OAuth services.
+        if (["/calendar", "/contact"].includes(route.path)) {
+          // Isolate Calendar/Contact presentation; never reach backend or OAuth services.
           await page.route("**/*", requestRoute => {
             if (requestRoute.request().url() === endpoint) return fulfillCalendar(requestRoute);
             const url = new URL(requestRoute.request().url());

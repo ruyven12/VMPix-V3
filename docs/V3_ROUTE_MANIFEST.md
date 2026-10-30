@@ -47,7 +47,7 @@ Current `render.yaml` already declares this rewrite behavior.
 | `/wrestling` | Daïion | active | Shared Shell route, source-verified in PASS 6. | See the canonical Wrestling map below; runtime acceptance pending. |
 | `/calendar` | Calendar | active | History API route handled by the shell router. | Opens the current Calendar shell view. |
 | `/about` | About | active | History API route handled by the shell router. | Opens the current About shell view. |
-| `/contact` | Contact | active | History API route handled by the shell router. | Opens the current Contact shell view. |
+| `/contact` | Communications Relay | active | Shell-owned controlled overlay; preserves the mounted source world and history entry. | Close, Escape, browser Back and Engine Back dismiss; Forward reopens. Direct visits/refresh use Portfolio fallback. Terminal foundation only; no message submission. |
 | `/admin` | Admin Shell | future | Main shell navigation currently sends admin traffic to `./admin/index.html`; `/admin` is not currently an SPA route. | Future protected admin route should live inside the V3 route contract. |
 
 ## Portfolio Destination Mapping
