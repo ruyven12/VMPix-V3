@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const API = 'https://vmpix-data.onrender.com/api/contact';
 const SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+const APPROVED_SITE_KEY = '0x4AAAAAAFwodzyao1rfi5mE';
 const ACCEPTED = { ok: true, code: 'provider_accepted', delivery: 'accepted', retryable: false };
 const DRAFT = { name: 'Synthetic Visitor', email: 'visitor@example.com', subject: 'CON05 PRIVATE DRAFT', message: 'Private synthetic message. <b>Plain text only.</b>' };
 const TOKEN = 'synthetic-unverified-token';
@@ -62,7 +63,11 @@ async function setup(page, context, baseURL, options = {}) {
     if (url.origin === new URL(baseURL).origin && request.resourceType() === 'document') {
       const response = await route.fetch();
       let html = await response.text();
-      if (options.enabled !== false) html = html.replace('data-contact-enabled="0" data-contact-sitekey=""', `data-contact-enabled="1" data-contact-sitekey="${options.sitekey ?? 'synthetic-public-key'}"`);
+      // Enable only the intercepted test document; preserve the actual configured public key.
+      if (options.enabled !== false) {
+        html = html.replace('data-contact-enabled="0"', 'data-contact-enabled="1"');
+        if (Object.hasOwn(options, 'sitekey')) html = html.replace(/data-contact-sitekey="[^"]*"/, `data-contact-sitekey="${options.sitekey}"`);
+      }
       return route.fulfill({ response, body: html });
     }
     if (url.origin === new URL(baseURL).origin && !url.pathname.startsWith('/api/') || ['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname) || url.hostname === 'unpkg.com' && url.pathname.startsWith('/leaflet@1.9.4/dist/')) return route.continue();
@@ -91,7 +96,7 @@ for (const viewport of [{width:360,height:800},{width:412,height:915},{width:192
       await page.locator('#contact-email').fill(DRAFT.email);
       await submit(page).click(); await expect(status(page)).toContainText('Security check required'); expect(qa.requests).toHaveLength(0);
       await page.locator('[data-contact-challenge-retry]').click(); await solve(page);
-      expect(await page.evaluate(()=>window.__turnstileTest.renders.at(-1))).toMatchObject({sitekey:'synthetic-public-key',size:'compact',tabindex:0,responseField:false,retry:'never',refresh:'never'});
+      expect(await page.evaluate(()=>window.__turnstileTest.renders.at(-1))).toMatchObject({sitekey:APPROVED_SITE_KEY,size:'compact',tabindex:0,responseField:false,retry:'never',refresh:'never'});
       await page.locator('#contact-message').focus(); await page.keyboard.press('Tab');
       expect(await page.evaluate(()=>document.activeElement.tagName)).toBe('IFRAME');
       // A cross-origin frame retains native keyboard traversal back to Contact.
@@ -143,6 +148,10 @@ test.describe('Contact failure safety',()=>{
   for (const [label, options] of Object.entries({disabled:{enabled:false},missingSiteKey:{sitekey:''}})) test(`${label}: no Turnstile or Contact request`,async({page,context,baseURL})=>{
     const qa=await setup(page,context,baseURL,options);await open(page);await draft(page);await submit(page).click();
     await expect(status(page)).toContainText('Delivery is unavailable');expect(qa.requests).toHaveLength(0);
+    if (label === 'disabled') {
+      await expect(form(page)).toHaveAttribute('data-contact-enabled','0');
+      await expect(form(page)).toHaveAttribute('data-contact-sitekey',APPROVED_SITE_KEY);
+    }
     expect(await page.evaluate(()=>window.__turnstileTest)).toBeUndefined();await assertDraft(page);await assertSafe(qa);
   });
   for (const callback of ['expired-callback','error-callback','timeout-callback','unsupported-callback']) test(`${callback}: no transmission until a fresh explicit check`,async({page,context,baseURL})=>{
