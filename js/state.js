@@ -1993,6 +1993,7 @@ const routePaths = {
   privacy: "/privacy",
   upcoming: "/upcoming",
   contact: "/contact",
+  reportIssue: "/report-issue",
   connect: "/connect",
   admin: "/admin",
 };

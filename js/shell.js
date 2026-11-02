@@ -1667,6 +1667,307 @@ if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEvent
 else reducedMotion.addListener(settleContactMotion);
 
 
+// BUG-03: Shell-owned incident terminal; follows the approved controlled-overlay lifecycle. Only the terminal and the existing Engine Back remain interactive.
+const incidentOverlay = document.querySelector("[data-incident-overlay]");
+const incidentFrame = incidentOverlay?.querySelector("[data-incident-frame]");
+const incidentClose = incidentOverlay?.querySelector("[data-incident-close]");
+let incidentSession = null;
+let incidentAnimation = null;
+let incidentViewportFrame = 0;
+let incidentEngineObserver = null;
+let incidentIsolationObserver = null;
+
+function settleIncidentConnection() {
+  incidentOverlay.dataset.state = "open";
+  incidentOverlay.querySelector("[data-incident-status]").textContent = "Terminal open";
+}
+
+function syncIncidentBackControl() {
+  if (!incidentSession || !prototypeEngineReturnControl) return;
+  prototypeEngineReturnControl.hidden = false;
+  prototypeEngineReturnControl.disabled = false;
+  prototypeEngineReturnControl.tabIndex = 0;
+  prototypeEngineReturnControl.setAttribute("aria-label", "Close Report an Issue and return");
+}
+
+function isolateIncidentWorld() {
+  // Preserve every background branch, including UI mounted outside the Shell.
+  // Inert removes controls from the accessibility tree without changing the
+  // world's aria-hidden-driven visual presentation. Engine Back stays in place.
+  const isolated = new Set(), ancestors = new Set();
+  const walk = parent => {
+    for (const node of parent.children) {
+      if (node === incidentOverlay || node === prototypeEngineReturnControl) continue;
+      if (node.contains(prototypeEngineReturnControl) || node.contains(incidentOverlay)) {
+        if (!ancestors.has(node)) {
+          ancestors.add(node);
+          incidentSession.backAncestors.push({ node, ariaHidden: node.getAttribute("aria-hidden") });
+          node.removeAttribute("aria-hidden");
+          incidentIsolationObserver?.observe(node, { childList: true });
+        }
+        walk(node);
+      } else {
+        if (!isolated.has(node)) {
+          isolated.add(node);
+          incidentSession.surfaces.push({ node, inert: node.getAttribute("inert") });
+          incidentIsolationObserver?.observe(node, { attributes: true, attributeFilter: ["inert"] });
+        }
+        if (!node.inert) node.inert = true;
+      }
+    }
+  };
+  // Late UI and delayed world renders cannot reactivate the background.
+  incidentIsolationObserver = new MutationObserver(() => { if (incidentSession) walk(document.body); });
+  incidentIsolationObserver.observe(document.body, { childList: true });
+  walk(document.body);
+  syncIncidentBackControl();
+}
+
+function canOpenIncident() {
+  return Boolean(incidentOverlay && incidentFrame && canOpenTrajectory() && !trajectorySession && !calendarSession && !contactSession &&
+    !document.querySelector("dialog[open]"));
+}
+
+function measureIncidentViewport() {
+  if (!incidentSession || !incidentOverlay) return;
+  const viewport = window.visualViewport;
+  const top = viewport?.offsetTop || 0;
+  const bottom = top + (viewport?.height || window.innerHeight);
+  const bounds = portfolioEngine?.getBoundingClientRect();
+  const engineStyle = portfolioEngine && getComputedStyle(portfolioEngine);
+  const settledTop = engineStyle ? window.innerHeight - (parseFloat(engineStyle.bottom) || 0) - portfolioEngine.offsetHeight : bottom;
+  const engineTop = bounds?.height ? Math.min(bounds.top, settledTop) : bottom;
+  incidentOverlay.style.setProperty("--trajectory-top", top + "px");
+  incidentOverlay.style.setProperty("--trajectory-height", Math.max(0, Math.min(bottom, engineTop) - top) + "px");
+}
+
+function scheduleIncidentViewport() {
+  if (!incidentSession || incidentViewportFrame) return;
+  incidentViewportFrame = requestAnimationFrame(() => { incidentViewportFrame = 0; measureIncidentViewport(); });
+}
+
+function finishIncidentClose(restoreFocus = true) {
+  const session = incidentSession;
+  if (!session) return;
+  incidentSession = null;
+  incidentAnimation?.cancel();
+  incidentAnimation = null;
+  incidentEngineObserver?.disconnect();
+  incidentEngineObserver = null;
+  for (const type of ["wheel", "touchmove"]) document.removeEventListener(type, blockIncidentBackgroundScroll, true);
+  shell.removeEventListener("portfolio:engine-ready", scheduleIncidentViewport);
+  cancelAnimationFrame(incidentViewportFrame);
+  incidentViewportFrame = 0;
+  incidentOverlay.hidden = true;
+  incidentOverlay.inert = true;
+  incidentOverlay.setAttribute("aria-hidden", "true");
+  delete incidentOverlay.dataset.state;
+  shell.removeAttribute("data-incident-open");
+  incidentIsolationObserver?.disconnect();
+  incidentIsolationObserver = null;
+  session.surfaces.forEach(({ node, inert }) => {
+    if (inert === null) node.removeAttribute("inert"); else node.setAttribute("inert", inert);
+  });
+  session.backAncestors.forEach(({ node, ariaHidden }) => {
+    if (ariaHidden === null) node.removeAttribute("aria-hidden"); else node.setAttribute("aria-hidden", ariaHidden);
+  });
+  updatePrototypeEngineReturnEmitter(session.source);
+  document.title = session.title;
+  if (restoreFocus) {
+    session.scroll.forEach(({ node, top, left }) => { if (node.isConnected) node.scrollTo({ top, left, behavior: "instant" }); });
+    syncShellMenuAvailability();
+    const focus = session.focus?.isConnected && session.focus !== document.body &&
+      !session.focus.closest('[inert], [hidden], [aria-hidden="true"]') && !session.focus.disabled && session.focus.getClientRects().length
+      ? session.focus : (!portfolioRightEmitter?.disabled ? portfolioRightEmitter : null);
+    focus?.focus({ preventScroll: true });
+    // A cold overlay deliberately skips Portfolio's entry story; show its settled identity when revealed.
+    if (session.fallback) showPortfolioBranding();
+  }
+}
+
+function animateIncident(opening) {
+  const previous = incidentAnimation;
+  const style = previous ? getComputedStyle(incidentFrame) : null;
+  const from = style ? { opacity: style.opacity, transform: style.transform }
+    : { opacity: opening ? 0 : 1, transform: opening ? "scale(.88)" : "scale(1)" };
+  previous?.cancel();
+  incidentAnimation = null;
+  incidentOverlay.dataset.state = opening ? "opening" : "closing";
+  if (opening) incidentOverlay.querySelector("[data-incident-status]").textContent = "Opening terminal…";
+  if (reducedMotion.matches || typeof incidentFrame.animate !== "function") {
+    if (opening) settleIncidentConnection(); else finishIncidentClose();
+    return;
+  }
+  const animation = incidentFrame.animate([from, { opacity: opening ? 1 : 0, transform: opening ? "scale(1)" : "scale(.88)" }], {
+    duration: opening ? 420 : 280, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both",
+  });
+  incidentAnimation = animation;
+  animation.finished.then(() => {
+    if (incidentAnimation !== animation || !incidentSession) return;
+    if (opening) { incidentAnimation = null; settleIncidentConnection(); animation.cancel(); }
+    else finishIncidentClose();
+  }).catch(() => {});
+}
+
+function getIncidentHistorySource() {
+  const state = history.state;
+  if (typeof state?.__v3IncidentSourceEntry !== "string" || !/^[a-zA-Z0-9-]{8,80}$/.test(state.__v3IncidentSourceEntry) ||
+    typeof state.__v3ShellPreviousRoute !== "string" || state.__v3ShellPreviousRoute.length > 2048) return null;
+  try {
+    const url = new URL(state.__v3ShellPreviousRoute, location.origin);
+    const route = getRouteFromUrl(url.href);
+    if (url.origin === location.origin && !url.username && !url.password && !route.isUnknown && !["home", "upcoming", "calendar", "contact", "report-issue"].includes(route.name)) {
+      return { route, entry: state.__v3IncidentSourceEntry };
+    }
+  } catch { /* Invalid or stale metadata uses the safe Portfolio fallback. */ }
+  return null;
+}
+
+function showIncidentOverlay({ fromHistory = false, forceFallback = false } = {}) {
+  if (!incidentOverlay || !incidentFrame) return false;
+  if (trajectorySession) finishTrajectoryClose(false);
+  if (calendarSession) finishCalendarClose(false);
+  if (contactSession) finishContactClose(false);
+  if (incidentSession) { incidentSession.closeRequested = false; animateIncident(true); return true; }
+  const historySource = getIncidentHistorySource();
+  const sourceStillMounted = historySource && historySource.entry === v3RouteContext.entry && historySource.route.canonicalUrl === shellRenderedRoute?.canonicalUrl;
+  const canReturnWithHistory = Boolean(historySource && (sourceStillMounted || fromHistory));
+  const fallback = forceFallback || !shellRenderedRoute || shellRenderedRoute.name === "home" || shellRenderedRoute.isUnknown ||
+    (fromHistory && !sourceStillMounted);
+  if (fallback) {
+    syncRoute(getRouteFromUrl(routePaths.portfolio), { shouldCanonicalize: false });
+    applyPortfolioShellRouteContext();
+    schedulePortfolioEngineReadyGate();
+  }
+  const source = shellRenderedRoute;
+  const focus = shellMenuPanel?.contains(document.activeElement) ? portfolioRightEmitter : document.activeElement;
+  resetShellMenu();
+  incidentSession = {
+    source, title: document.title, focus, fallback,
+    sourceEntry: v3RouteContext.entry, canReturnWithHistory,
+    scroll: [...getV3ResumeScrollers(source).values()].filter(Boolean).map(node => ({ node, top: node.scrollTop, left: node.scrollLeft })),
+    surfaces: [], backAncestors: [],
+  };
+  isolateIncidentWorld();
+  for (const type of ["wheel", "touchmove"]) document.addEventListener(type, blockIncidentBackgroundScroll, { capture: true, passive: false });
+  shell.addEventListener("portfolio:engine-ready", scheduleIncidentViewport);
+  measureIncidentViewport();
+  incidentOverlay.hidden = false;
+  incidentOverlay.inert = false;
+  incidentOverlay.setAttribute("aria-hidden", "false");
+  shell.setAttribute("data-incident-open", "");
+  document.title = "Report an Issue - Voodoo Media V3.0.01";
+  if (typeof ResizeObserver === "function" && portfolioEngine) {
+    incidentEngineObserver = new ResizeObserver(scheduleIncidentViewport);
+    incidentEngineObserver.observe(portfolioEngine);
+  }
+  incidentOverlay.querySelector("[data-incident-scroll]")?.scrollTo(0, 0);
+  animateIncident(true);
+  incidentClose?.focus({ preventScroll: true });
+  return true;
+}
+
+function syncIncidentRoute(route) {
+  if (route.name === "report-issue") return showIncidentOverlay();
+  if (!incidentSession) return false;
+  if (route.canonicalUrl === incidentSession.source.canonicalUrl) {
+    if (incidentSession.sourceEntry !== history.state?.v3EntryId && route.name === "portfolio") {
+      beginV3RouteContext(incidentSession.source, { navigationCause: "back-forward" });
+    }
+    animateIncident(false);
+    return true;
+  }
+  finishIncidentClose(false);
+  return false;
+}
+
+function navigateIncidentRoute(route, options) {
+  if (route.name === "report-issue") {
+    if (incidentSession && getRouteFromUrl().name === "report-issue") return true;
+    if (!canOpenIncident()) return true;
+    pushRouteUrl(route.canonicalUrl, { __v3IncidentSourceEntry: v3RouteContext.entry });
+    syncIncidentRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (incidentSession && route.canonicalUrl === incidentSession.source.canonicalUrl) {
+    pushRouteUrl(route.canonicalUrl, options.historyState || {});
+    syncIncidentRoute(route);
+    notifyV3AnalyticsView(route);
+    return true;
+  }
+  if (incidentSession) finishIncidentClose(false);
+  return false;
+}
+
+function handleIncidentHistory(event) {
+  const route = getRouteFromUrlWithPrototypePrecedence();
+  if (route.name !== "report-issue" && !incidentSession) return false;
+  if (route.name !== "report-issue" && route.canonicalUrl !== incidentSession.source.canonicalUrl) {
+    finishIncidentClose(false);
+    return false;
+  }
+  shellHistoryIndex = getShellHistoryIndex(event.state);
+  if (route.name === "report-issue") {
+    // Match the existing history cancellation boundary; a stale sweep must never commit behind the HUD.
+    cancelShellBackSweep();
+    cancelBandRecordOpening();
+    cancelZhentoRhythmEntry();
+    cancelAdminStationTravel();
+    showIncidentOverlay({ fromHistory: true, forceFallback: !incidentSession && !canOpenIncident() });
+  } else syncIncidentRoute(route);
+  notifyV3AnalyticsView(route);
+  return true;
+}
+
+function closeIncidentOverlay() {
+  const session = incidentSession;
+  if (!session || session.closeRequested || incidentOverlay.dataset.state === "closing" || getRouteFromUrl().name !== "report-issue") return;
+  session.closeRequested = true;
+  if (session.canReturnWithHistory) history.back();
+  else {
+    replaceRouteUrl(session.source.canonicalUrl);
+    syncIncidentRoute(session.source);
+    notifyV3AnalyticsView(session.source);
+  }
+}
+
+incidentClose?.addEventListener("click", closeIncidentOverlay);
+document.addEventListener("keydown", event => {
+  if (!incidentSession) return;
+  if (event.key === "Tab") {
+    const controls = [...incidentOverlay.querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'), prototypeEngineReturnControl]
+      .filter(node => node && !node.disabled && !node.closest('[inert], [hidden]') && node.getClientRects().length);
+    const index = controls.indexOf(document.activeElement);
+    event.preventDefault();
+    controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length]?.focus({ preventScroll: true });
+  }
+  // Engine Back stays actionable, but must not scroll the preserved world.
+  if (!incidentOverlay.contains(event.target) && ["PageDown", "PageUp", "Home", "End", "ArrowDown", "ArrowUp"].includes(event.key)) event.preventDefault();
+  if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); closeIncidentOverlay(); }
+}, true);
+document.addEventListener("focusin", event => {
+  if (incidentSession && !incidentOverlay.contains(event.target) && !prototypeEngineReturnControl?.contains(event.target)) incidentClose?.focus({ preventScroll: true });
+});
+function blockIncidentBackgroundScroll(event) {
+  if (incidentSession && !incidentOverlay.contains(event.target)) event.preventDefault();
+}
+window.addEventListener("resize", scheduleIncidentViewport, { passive: true });
+window.visualViewport?.addEventListener("resize", scheduleIncidentViewport, { passive: true });
+window.visualViewport?.addEventListener("scroll", scheduleIncidentViewport, { passive: true });
+const settleIncidentMotion = () => { if (reducedMotion.matches) incidentAnimation?.finish(); };
+if (typeof reducedMotion.addEventListener === "function") reducedMotion.addEventListener("change", settleIncidentMotion);
+else reducedMotion.addListener(settleIncidentMotion);
+
+
+incidentOverlay?.addEventListener("focusin", event => {
+  const viewport = incidentOverlay.querySelector("[data-incident-scroll]");
+  if (!viewport?.contains(event.target) || event.target === viewport) return;
+  const bounds = viewport.getBoundingClientRect(), target = event.target.getBoundingClientRect();
+  if (target.top < bounds.top + 8) viewport.scrollTop += target.top - bounds.top - 8;
+  else if (target.bottom > bounds.bottom - 8) viewport.scrollTop += target.bottom - bounds.bottom + 8;
+});
+
 function initShellMenu() {
   if (!portfolioRightEmitter || !shellMenuPanel || portfolioRightEmitter.dataset.shellMenuBound === "true") return;
   portfolioRightEmitter.dataset.shellMenuBound = "true";
@@ -4349,6 +4650,7 @@ function getPrototypeEngineReturnRoute(route = getRouteFromUrl()) {
 }
 
 function handlePrototypeEngineReturnEmitter(event) {
+  if (incidentSession) { event.preventDefault(); event.stopPropagation(); closeIncidentOverlay(); return; }
   if (contactSession) { event.preventDefault(); event.stopPropagation(); closeContactOverlay(); return; }
   const route = getRouteFromUrl();
   if (bandRecordOpening) { event.preventDefault(); return; }
@@ -4387,6 +4689,7 @@ function initPrototypeEngineReturnEmitter() {
 }
 
 function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
+  if (incidentSession) { syncIncidentBackControl(); return; }
   if (contactSession) { syncContactBackControl(); return; }
   if (!prototypeEngineReturnEmitter) {
     return;
@@ -5138,6 +5441,7 @@ function syncShellBackSweepMotion() {
 
 let shellBackPendingEntry = null;
 function performShellBack() {
+  if (incidentSession) { closeIncidentOverlay(); return; }
   if (contactSession) { closeContactOverlay(); return; }
   if (shellMenuOpen) { dismissShellMenu(); return; }
   cancelShellDataConduit("engine-back");
@@ -9351,6 +9655,7 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     resetShellMenu(); // Also clear before same-route local-history handlers return.
     cancelShellDataConduit("history");
     shellBackPendingEntry = null;
+    if (handleIncidentHistory(event)) return;
     if (handleContactHistory(event)) return;
     if (handleCalendarHistory(event)) return;
     if (handleTrajectoryHistory(event)) return;

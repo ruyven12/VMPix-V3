@@ -48,6 +48,7 @@ Current `render.yaml` already declares this rewrite behavior.
 | `/calendar` | Calendar | active | History API route handled by the shell router. | Opens the current Calendar shell view. |
 | `/about` | About | active | History API route handled by the shell router. | Opens the current About shell view. |
 | `/contact` | Communications Relay | active | Shell-owned controlled overlay; preserves the mounted source world and history entry. | Close, Escape, browser Back and Engine Back dismiss; Forward reopens. Direct visits/refresh use Portfolio fallback. Terminal foundation only; no message submission. |
+| `/report-issue` | Archive Incident Terminal | active | Shell-owned controlled overlay; preserves the mounted source world and history entry. | Close, Escape, Back and Engine Back dismiss; Forward reopens. Direct entry/refresh use Portfolio. A user-activated link opens Google Forms in a separate tab. |
 | `/admin` | Admin Shell | future | Main shell navigation currently sends admin traffic to `./admin/index.html`; `/admin` is not currently an SPA route. | Future protected admin route should live inside the V3 route contract. |
 
 ## Portfolio Destination Mapping

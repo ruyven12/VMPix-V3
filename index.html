@@ -2916,7 +2916,7 @@
           <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/upcoming" data-shell-menu-trajectory>The Trajectory</a></li>
           <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/calendar" data-shell-menu-route="calendar">Calendar</a></li>
           <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/contact" data-shell-menu-route="contact">Contact</a></li>
-          <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" disabled>Report A Bug</button></li>
+          <li class="shell-menu-preview__row"><a class="shell-menu-preview__action" href="/report-issue" data-shell-menu-route="reportIssue">Report an Issue</a></li>
           <li class="shell-menu-preview__row"><button class="shell-menu-preview__action" type="button" disabled>Analytics</button></li>
         </ul>
         <ul class="shell-menu-preview__group shell-menu-preview__list shell-menu-preview__admin">
@@ -3000,6 +3000,36 @@
         </div>
       </div>
     </dialog>
+
+    <!-- Controlled overlay: Engine Back remains outside the dialog and inside its focus boundary. -->
+    <section class="trajectory-overlay incident-overlay" data-incident-overlay role="dialog" aria-modal="false" aria-labelledby="incident-title" aria-describedby="incident-description" aria-hidden="true" tabindex="-1" inert hidden>
+      <div class="trajectory-overlay__frame" data-incident-frame>
+        <svg class="trajectory-overlay__rails" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path class="trajectory-overlay__edge" d="M24 1 H114 L140 19 H860 L886 1 H976 L999 24 V101 L992 113 V487 L999 499 V576 L976 599 H886 L860 581 H140 L114 599 H24 L1 576 V499 L8 487 V113 L1 101 V24 Z" />
+          <path class="trajectory-overlay__inset" d="M25 37 H115 L155 73 H845 L885 37 H975 M25 563 H115 L155 527 H845 L885 563 H975 M52 80 V195 L67 214 V386 L52 405 V520 M948 80 V195 L933 214 V386 L948 405 V520" />
+          <path class="trajectory-overlay__detail" d="M300 19 L320 32 H680 L700 19 M300 581 L320 568 H680 L700 581 M155 73 V527 M845 73 V527 M500 34 V125 M500 475 V566" />
+          <path class="trajectory-overlay__accent" d="M468 32 H532 M468 568 H532 M8 134 V204 M992 134 V204 M8 396 V466 M992 396 V466" />
+        </svg>
+        <button class="trajectory-overlay__close" type="button" aria-label="Close Report an Issue" data-incident-close><span aria-hidden="true"></span></button>
+        <div class="trajectory-overlay__content incident-terminal">
+          <header class="incident-terminal__header">
+            <h2 class="trajectory-overlay__title" id="incident-title">REPORT AN ISSUE</h2>
+            <p class="incident-terminal__subtitle">Archive Incident Terminal</p>
+          </header>
+          <span class="trajectory-overlay__divider" aria-hidden="true"></span>
+          <div class="trajectory-overlay__reading incident-terminal__viewport" data-incident-scroll tabindex="0" role="region" aria-label="Incident reporting terminal">
+            <div class="incident-terminal__channel"><span aria-hidden="true"></span><p data-incident-status role="status" aria-live="polite" aria-atomic="true">Opening terminal…</p></div>
+            <div class="incident-terminal__message">
+              <svg class="incident-terminal__mark" viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false"><path d="M22 6h20l16 16v20L42 58H22L6 42V22z"/><path d="M32 18v18m0 7v3"/></svg>
+              <p id="incident-description">Encountered a problem in the archive? Submit a report to help us investigate and improve the experience.</p>
+              <a class="incident-terminal__launch" href="https://docs.google.com/forms/d/e/1FAIpQLSe2QtiV3sQyXsBSQIFmmuP0P3TlLIpBYOcMRMuP9iFJSC8O_A/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" aria-describedby="incident-launch-note" data-incident-launch>Open Bug Report <span aria-hidden="true">↗</span></a>
+              <p class="incident-terminal__note" id="incident-launch-note">Opens Google Forms in a new tab. Your report is sent only when you submit the Google Form.</p>
+            </div>
+            <p class="incident-terminal__return">Close the terminal or use Engine Back to return.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Contact is intentionally non-modal: the persistent Engine Back remains in its focus boundary. -->
     <section class="trajectory-overlay contact-overlay" data-contact-overlay role="dialog" aria-modal="false" aria-labelledby="contact-relay-title" aria-describedby="contact-relay-description" aria-hidden="true" tabindex="-1" inert hidden>

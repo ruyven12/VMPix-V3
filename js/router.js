@@ -183,6 +183,9 @@ function getRouteFromUrl(url = window.location.href) {
   if (routePath === routePaths.privacy) {
     return { name: "privacy", canonicalUrl: routePaths.privacy };
   }
+  if (routePath === routePaths.reportIssue) {
+    return { name: "report-issue", canonicalUrl: routePaths.reportIssue };
+  }
   if (routePath === routePaths.contact) {
     return { name: "contact", canonicalUrl: routePaths.contact };
   }
@@ -649,6 +652,7 @@ function adoptPersistentWrestlingRoute(route, { worldName = "battleground" } = {
 }
 
 function syncRoute(route, options = {}) {
+  if (typeof syncIncidentRoute === "function" && syncIncidentRoute(route)) return;
   if (typeof syncContactRoute === "function" && syncContactRoute(route)) return;
   if (typeof syncCalendarRoute === "function" && syncCalendarRoute(route)) return;
   if (typeof syncTrajectoryRoute === "function" && syncTrajectoryRoute(route)) return;
@@ -1010,7 +1014,7 @@ function syncRoute(route, options = {}) {
 function syncRouteFromLocation(options = {}) {
   const route = getRouteFromUrlWithPrototypePrecedence();
   syncRoute(route, options);
-  if (route.name !== "upcoming" && !trajectorySession && !calendarSession && !contactSession && typeof stabilizeShellViewport === "function") {
+  if (route.name !== "upcoming" && !trajectorySession && !calendarSession && !contactSession && !incidentSession && typeof stabilizeShellViewport === "function") {
     stabilizeShellViewport(route, options);
   }
   notifyV3AnalyticsView(route);
@@ -1022,6 +1026,7 @@ function navigateToRoute(url, options = {}) {
   options = routeOptions;
   if (typeof isRepeatedShellDataConduitIntent === "function" && isRepeatedShellDataConduitIntent(dataConduitIntent)) return;
   if (typeof cancelShellDataConduit === "function") cancelShellDataConduit("navigation");
+  if (typeof navigateIncidentRoute === "function" && navigateIncidentRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateContactRoute === "function" && navigateContactRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateCalendarRoute === "function" && navigateCalendarRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
   if (typeof navigateTrajectoryRoute === "function" && navigateTrajectoryRoute(getRouteFromUrlWithPrototypePrecedence(url), options)) return;
