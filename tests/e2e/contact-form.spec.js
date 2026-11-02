@@ -1,7 +1,7 @@
 const {test,expect}=require('@playwright/test');
 const fs=require('node:fs');
 const path=require('node:path');
-const sizes=[{width:360,height:800},{width:412,height:915},{width:1920,height:1080}];
+const sizes=[{width:360,height:800},{width:412,height:915},{width:915,height:412},{width:1920,height:1080}];
 const destinations={email:'mailto:ruyven12@gmail.com',instagram:'https://www.instagram.com/vmpix1',facebook:'https://www.facebook.com/VMPix',x:'https://x.com/vmpix1'};
 const errors=new WeakMap();
 test.beforeEach(async({page,context,baseURL})=>{
@@ -75,15 +75,37 @@ for(const viewport of sizes)for(const reducedMotion of ['reduce','no-preference'
     await noNavigationTick(page);await expect(page).toHaveURL(/\/contact$/);expect(outbound).toEqual([]);
     const storage=await page.evaluate(()=>JSON.stringify([localStorage,sessionStorage]));expect(storage).not.toContain('CON03-DRAFT');
   });
-  test('form-first layout, growing message, keyboard viewport and in-memory return',async({page})=>{
-    await open(page);await valid(page);
+  test('social-first hierarchy, growing message, keyboard viewport and in-memory return',async({page})=>{
+    await open(page);
+    await page.locator('[data-contact-scroll]').evaluate(el=>el.scrollTop=0);
+    expect(await page.locator('.contact-channels').evaluate(el=>{
+      const viewport=document.querySelector('[data-contact-scroll]').getBoundingClientRect();
+      return [...el.querySelectorAll('a')].every(link=>{const r=link.getBoundingClientRect();return r.top>=viewport.top&&r.bottom<=viewport.bottom+1;});
+    })).toBe(true);
+    await valid(page);
     const form=await page.locator('[data-contact-form]').boundingBox(),channels=await page.locator('.contact-channels').boundingBox();
-    if(viewport.width<900)expect(channels.y).toBeGreaterThanOrEqual(form.y+form.height);
-    else {
-      expect(channels.x).toBeGreaterThan(form.x+form.width);expect(Math.abs(channels.y-form.y)).toBeLessThan(2);
-      await page.locator('[data-contact-scroll]').evaluate(el=>el.scrollTop=0);
-      expect(await page.locator('[data-contact-submit]').evaluate(el=>el.getBoundingClientRect().bottom<=document.querySelector('[data-contact-scroll]').getBoundingClientRect().bottom)).toBe(true);
+    const divider=page.locator('.contact-relay-divider'),separator=await divider.boundingBox();
+    const indicator=await page.locator('.contact-terminal__connection').boundingBox();
+    expect(separator.y).toBeGreaterThan(channels.y+channels.height);
+    expect(indicator.y).toBeGreaterThan(separator.y+separator.height);
+    expect(form.y).toBeGreaterThanOrEqual(indicator.y+indicator.height);
+    expect(form.x).toBeCloseTo(channels.x,0);expect(form.width).toBeCloseTo(channels.width,0);
+    expect(form.width).toBeLessThanOrEqual(680);
+    await expect(divider).toHaveAttribute('aria-hidden','true');
+    await expect(page.locator('#contact-form-title')).toHaveText('Message to Email');
+    const social=page.locator('.contact-channels a');await expect(social).toHaveCount(3);
+    expect(await social.evaluateAll(links=>links.map(a=>a.dataset.contactChannel))).toEqual(['facebook','instagram','x']);
+    const boxes=await social.evaluateAll(links=>links.map(a=>a.getBoundingClientRect().toJSON()));
+    for(const box of boxes){expect(box.y).toBeCloseTo(boxes[0].y,0);expect(box.width).toBeGreaterThanOrEqual(48);expect(box.height).toBeGreaterThanOrEqual(48);}
+    for(let i=0;i<boxes.length-1;i++)expect(boxes[i+1].x-boxes[i].right).toBeGreaterThanOrEqual(10);
+    for(const link of await social.all()){
+      await expect(link).toHaveAccessibleName(/(Facebook|Instagram|X \/ Twitter).+opens in a new tab/);
+      await expect(link.locator('svg')).toHaveAttribute('aria-hidden','true');
+      await expect(link.locator('svg')).toHaveAttribute('focusable','false');
     }
+    const nested=await page.locator('[data-contact-scroll]').evaluate(el=>[...el.querySelectorAll('*')].filter(node=>{
+      const css=getComputedStyle(node);return /(auto|scroll)/.test(css.overflowY)&&node.scrollHeight>node.clientHeight+1;
+    }).length);expect(nested).toBe(0);
     const frame=await page.locator('[data-contact-frame]').boundingBox();
     const message=page.getByLabel('Message',{exact:true});
     await message.fill('A longer message line for the terminal.\n'.repeat(90));

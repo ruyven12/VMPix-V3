@@ -92,7 +92,7 @@ async function setup(page, context, baseURL, options = {}) {
 async function assertDraft(page) { for (const [name,value] of Object.entries(DRAFT)) await expect(page.locator('#contact-'+name)).toHaveValue(value); }
 async function assertSafe(qa) { expect(qa.forbidden).toEqual([]); expect(qa.errors).toEqual([]); }
 
-for (const viewport of [{width:360,height:800},{width:412,height:915},{width:1920,height:1080}]) for (const reducedMotion of ['reduce','no-preference']) {
+for (const viewport of [{width:360,height:800},{width:412,height:915},{width:915,height:412},{width:1920,height:1080}]) for (const reducedMotion of ['reduce','no-preference']) {
   test.describe(`Contact transmission ${viewport.width}x${viewport.height} ${reducedMotion}`, () => {
     test.use({ viewport, contextOptions:{reducedMotion}, serviceWorkers:'block' });
     test('validates, forwards once, accepts only confirmation, and preserves layout/navigation', async ({page,context,baseURL}) => {
@@ -101,6 +101,14 @@ for (const viewport of [{width:360,height:800},{width:412,height:915},{width:192
       await open(page);
       await expect(form(page)).toHaveAttribute('data-contact-enabled','1');
       await expect(form(page)).toHaveAttribute('data-contact-sitekey',APPROVED_SITE_KEY);
+      await expect(page.locator('#contact-form-title')).toHaveText('Message to Email');
+      if (process.env.CONTACT_EVIDENCE_DIR && reducedMotion==='no-preference') {
+        fs.mkdirSync(process.env.CONTACT_EVIDENCE_DIR,{recursive:true});
+        await page.evaluate(()=>document.fonts.ready);
+        await page.locator('[data-contact-close]').focus();
+        await page.locator('[data-contact-scroll]').evaluate(el=>el.scrollTop=0);
+        await page.screenshot({path:path.join(process.env.CONTACT_EVIDENCE_DIR,`contact-overview--${viewport.width}x${viewport.height}.png`)});
+      }
       await submit(page).click(); await expect(page.locator('#contact-name')).toBeFocused();
       await expect(page.locator('[data-contact-input][aria-invalid="true"]')).toHaveCount(4); expect(qa.requests).toHaveLength(0);
       await draft(page); await page.locator('#contact-email').fill('not-an-email'); await submit(page).click();

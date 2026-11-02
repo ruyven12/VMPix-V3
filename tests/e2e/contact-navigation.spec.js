@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const sizes = [{width:360,height:800},{width:412,height:915},{width:1920,height:1080}];
+const sizes = [{width:360,height:800},{width:412,height:915},{width:915,height:412},{width:1920,height:1080}];
 const errors = new WeakMap();
 test.beforeEach(async ({page,context,baseURL}) => {
   errors.set(page, []);
@@ -109,8 +109,8 @@ for(const viewport of sizes) for(const reducedMotion of ['reduce','no-preference
       await page.evaluate(()=>document.fonts.ready);
       const close=page.locator('[data-contact-close]'), scroll=page.locator('[data-contact-scroll]'), back=page.locator('[data-prototype-engine-return]');
       await page.keyboard.press('Tab'); await expect(scroll).toBeFocused();
-      for (const selector of ['#contact-name','#contact-email','#contact-subject','#contact-message','[data-contact-submit]',
-        '[data-contact-channel="email"]','[data-contact-channel="instagram"]','[data-contact-channel="facebook"]','[data-contact-channel="x"]']) {
+      for (const selector of ['[data-contact-channel="facebook"]','[data-contact-channel="instagram"]','[data-contact-channel="x"]',
+        '#contact-name','#contact-email','#contact-subject','#contact-message','[data-contact-submit]','[data-contact-channel="email"]']) {
         await page.keyboard.press('Tab'); await expect(page.locator(selector)).toBeFocused();
         expect(await page.locator(selector).evaluate(el=>{const a=el.getBoundingClientRect(),b=document.querySelector('[data-contact-scroll]').getBoundingClientRect();return a.bottom>b.top && a.top<b.bottom;})).toBe(true);
       }
