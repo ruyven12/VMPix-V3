@@ -10,6 +10,20 @@ test.beforeEach(async ({page,context,baseURL}) => {
   // No production API, analytics or mail request leaves the browser.
   await context.route('**/*', route => {
     const request=route.request(), url=new URL(request.url());
+    if(request.url()==='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'){
+      return route.fulfill({contentType:'application/javascript',body:`
+        window.turnstile={
+          ready(callback){queueMicrotask(callback);},
+          render(host,options){
+            const widget=document.createElement('div');widget.id='contact-navigation-challenge';
+            widget.style.cssText='width:150px;height:140px';widget.textContent='Mock security check';host.append(widget);
+            queueMicrotask(()=>options.callback('synthetic-navigation-token'));
+            return widget.id;
+          },
+          remove(id){document.getElementById(id)?.remove();}
+        };
+      `});
+    }
     if (!url.pathname.startsWith('/api/') && (url.origin===new URL(baseURL).origin ||
         ['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname) ||
         url.hostname==='unpkg.com' && url.pathname.startsWith('/leaflet@1.9.4/dist/'))) return route.continue();
@@ -29,6 +43,8 @@ async function opened(page) {
   await expect(page.locator('[data-contact-overlay]')).toHaveAttribute('data-state','open');
   await expect(page.locator('[data-contact-overlay]')).toHaveAttribute('aria-modal','false');
   await expect(page.locator('[data-contact-status]')).toHaveText('Terminal open');
+  await expect(page.locator('[data-contact-form]')).toHaveAttribute('data-contact-enabled','1');
+  await expect(page.locator('[data-contact-widget]')).toHaveText('Mock security check');
   await expect(page.locator('[data-contact-shell], [data-contact-static-action]')).toHaveCount(0);
 }
 async function closed(page, route='/portfolio') {

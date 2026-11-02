@@ -63,11 +63,10 @@ async function setup(page, context, baseURL, options = {}) {
     if (url.origin === new URL(baseURL).origin && request.resourceType() === 'document') {
       const response = await route.fetch();
       let html = await response.text();
-      // Enable only the intercepted test document; preserve the actual configured public key.
-      if (options.enabled !== false) {
-        html = html.replace('data-contact-enabled="0"', 'data-contact-enabled="1"');
-        if (Object.hasOwn(options, 'sitekey')) html = html.replace(/data-contact-sitekey="[^"]*"/, `data-contact-sitekey="${options.sitekey}"`);
-      }
+      // Exercise the checked-in enabled configuration by default. Only negative
+      // fixtures override it; all challenge and transmission traffic stays mocked.
+      if (options.enabled === false) html = html.replace('data-contact-enabled="1"', 'data-contact-enabled="0"');
+      if (Object.hasOwn(options, 'sitekey')) html = html.replace(/data-contact-sitekey="[^"]*"/, `data-contact-sitekey="${options.sitekey}"`);
       return route.fulfill({ response, body: html });
     }
     if (url.origin === new URL(baseURL).origin && !url.pathname.startsWith('/api/') || ['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname) || url.hostname === 'unpkg.com' && url.pathname.startsWith('/leaflet@1.9.4/dist/')) return route.continue();
@@ -89,6 +88,8 @@ for (const viewport of [{width:360,height:800},{width:412,height:915},{width:192
       let release; const waiting = new Promise(resolve => { release = resolve; });
       const qa = await setup(page,context,baseURL,{respond:async(route,reply)=>{await waiting;return reply(route);}});
       await open(page);
+      await expect(form(page)).toHaveAttribute('data-contact-enabled','1');
+      await expect(form(page)).toHaveAttribute('data-contact-sitekey',APPROVED_SITE_KEY);
       await submit(page).click(); await expect(page.locator('#contact-name')).toBeFocused();
       await expect(page.locator('[data-contact-input][aria-invalid="true"]')).toHaveCount(4); expect(qa.requests).toHaveLength(0);
       await draft(page); await page.locator('#contact-email').fill('not-an-email'); await submit(page).click();
@@ -104,6 +105,12 @@ for (const viewport of [{width:360,height:800},{width:412,height:915},{width:192
       await page.keyboard.press('Tab'); await expect(submit(page)).toBeFocused();
       const layout = await page.evaluate(()=>({ frame:contactFrame.getBoundingClientRect().toJSON(),engine:portfolioEngine.getBoundingClientRect().toJSON(),overflow:[document.documentElement,contactFrame,document.querySelector('[data-contact-scroll]')].some(el=>el.scrollWidth>el.clientWidth+1) }));
       expect(layout.overflow).toBe(false); expect(layout.engine.top-layout.frame.bottom).toBeCloseTo(20,0); expect(layout.frame.top).toBeCloseTo(20,0);
+      const scroller = page.locator('[data-contact-scroll]');
+      await scroller.evaluate(el=>el.scrollTop=el.scrollHeight);
+      expect(await scroller.evaluate(el=>Math.abs(el.scrollHeight-el.clientHeight-el.scrollTop))).toBeLessThan(2);
+      const afterScroll = await page.locator('[data-contact-frame]').boundingBox();
+      expect(afterScroll.y).toBeCloseTo(layout.frame.top,0); expect(afterScroll.height).toBeCloseTo(layout.frame.height,0);
+      await submit(page).focus();
       if (process.env.CONTACT_EVIDENCE_DIR && reducedMotion==='no-preference') {
         fs.mkdirSync(process.env.CONTACT_EVIDENCE_DIR,{recursive:true});
         await page.evaluate(()=>document.fonts.ready);

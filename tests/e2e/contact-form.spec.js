@@ -6,8 +6,14 @@ const destinations={email:'mailto:ruyven12@gmail.com',instagram:'https://www.ins
 const errors=new WeakMap();
 test.beforeEach(async({page,context,baseURL})=>{
   errors.set(page,[]);page.on('pageerror',e=>errors.get(page).push(e.message));
-  await context.route('**/*',route=>{
+  await context.route('**/*',async route=>{
     const req=route.request(),url=new URL(req.url());
+    // Explicit disabled fallback fixture; active transmission is tested separately.
+    if(url.origin===new URL(baseURL).origin&&req.resourceType()==='document'){
+      const response=await route.fetch();
+      const html=(await response.text()).replace('data-contact-enabled="1"','data-contact-enabled="0"');
+      return route.fulfill({response,body:html});
+    }
     if(!url.pathname.startsWith('/api/')&&(url.origin===new URL(baseURL).origin||['fonts.googleapis.com','fonts.gstatic.com'].includes(url.hostname)||url.hostname==='unpkg.com'&&url.pathname.startsWith('/leaflet@1.9.4/dist/')))return route.continue();
     if(Object.values(destinations).includes(req.url()))return route.fulfill({contentType:'text/html',body:'<!doctype html><title>Isolated channel check</title><p>Mock destination</p>'});
     if(req.resourceType()==='script')return route.fulfill({contentType:'application/javascript',body:''});
