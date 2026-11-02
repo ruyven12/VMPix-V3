@@ -3023,7 +3023,7 @@
               <p class="contact-terminal__status" data-contact-status role="status" aria-live="polite" aria-atomic="true">Opening terminal…</p>
             </div>
             <div class="contact-relay-layout">
-              <form class="contact-compose" method="dialog" aria-labelledby="contact-form-title" aria-describedby="contact-relay-description" data-contact-form>
+              <form class="contact-compose" method="dialog" aria-labelledby="contact-form-title" aria-describedby="contact-relay-description" data-contact-form data-contact-enabled="0" data-contact-sitekey="">
                 <h3 id="contact-form-title">Transmit a message</h3>
                 <p class="contact-compose__notice" id="contact-relay-description"><strong>Delivery unavailable.</strong> Nothing will be sent.</p>
                 <p class="contact-compose__required">All fields are required.</p>
@@ -3056,8 +3056,15 @@
                     <p class="contact-compose__error" id="contact-message-error" hidden></p>
                   </div>
                 </fieldset>
+                <!-- CON-05: public site key above; enabled stays 0 until separately approved. -->
+                <div class="contact-compose__challenge" data-contact-challenge hidden>
+                  <div class="contact-compose__widget" data-contact-widget></div>
+                  <p class="contact-compose__hint" data-contact-challenge-status role="status" aria-live="polite"></p>
+                  <button class="contact-compose__submit" type="button" data-contact-challenge-retry hidden>Retry security check</button>
+                </div>
                 <button class="contact-compose__submit" type="submit" aria-describedby="contact-relay-description" data-contact-submit disabled>Transmit Message</button>
                 <p class="contact-compose__feedback" data-contact-feedback role="status" aria-live="polite" aria-atomic="true"></p>
+                <button class="contact-compose__submit" type="button" data-contact-new-message hidden>Write another message</button>
               </form>
               <aside class="contact-channels" aria-labelledby="contact-channels-title">
                 <h3 id="contact-channels-title">Direct channels</h3>

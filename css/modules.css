@@ -34462,3 +34462,9 @@ button.hall-crusades-archive-crystal:focus-visible {
   .contact-compose__identity { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .contact-channels { align-self: start; padding: 0 0 0 24px; border-top: 0; border-inline-start: 1px solid rgba(197, 182, 185, .23); }
 }
+
+/* CON-05: security controls stay inside the existing single content viewport. */
+.contact-compose__challenge:not([hidden]) { display: grid; gap: 8px; min-width: 0; margin-top: 20px; }
+.contact-compose__widget { min-height: 140px; min-width: 0; }
+.contact-compose__challenge .contact-compose__submit { margin-top: 0; }
+.contact-compose [hidden] { display: none; }
