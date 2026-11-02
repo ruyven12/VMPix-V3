@@ -2,15 +2,20 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
 const API = 'https://vmpix-data.onrender.com/api/contact';
-const SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const APPROVED_SITE_KEY = '0x4AAAAAAFwodzyao1rfi5mE';
 const ACCEPTED = { ok: true, code: 'provider_accepted', delivery: 'accepted', retryable: false };
 const DRAFT = { name: 'Synthetic Visitor', email: 'visitor@example.com', subject: 'CON05 PRIVATE DRAFT', message: 'Private synthetic message. <b>Plain text only.</b>' };
 const TOKEN = 'synthetic-unverified-token';
 const mockScript = `(() => {
-  const qa = window.__turnstileTest = { renders: [], removals: [], callbacks: [], sequence: 0 };
+  const script = document.currentScript;
+  const qa = window.__turnstileTest = { renders: [], removals: [], callbacks: [], sequence: 0, readyCalls: 0, onloadCalls: 0 };
   window.turnstile = {
-    ready(fn) { queueMicrotask(fn); },
+    // Mirror the real SDK: ready() is unsupported for async/defer scripts.
+    ready(fn) {
+      qa.readyCalls++;
+      if (script.async || script.defer) throw new Error('[Cloudflare Turnstile] Remove async/defer before using ready(). [3857]');
+      queueMicrotask(fn);
+    },
     render(host, options) {
       const id = 'mock-' + ++qa.sequence;
       qa.renders.push({ id, sitekey: options.sitekey, size: options.size, tabindex: options.tabindex,
@@ -27,6 +32,9 @@ const mockScript = `(() => {
     },
     remove(id) { qa.removals.push(id); document.getElementById(id)?.remove(); }
   };
+  const loaded = new URL(script.src).searchParams.get('onload');
+  qa.onloadName = loaded; qa.notifyLoaded = () => { qa.onloadCalls++; window[loaded]?.(); };
+  if (loaded) queueMicrotask(qa.notifyLoaded);
 })();`;
 const mockFrame = '<!doctype html><html><body style="margin:0;background:#111;color:white;font:14px Arial"><button style="margin:12px;max-width:126px" type="button">Mock security control</button></body></html>';
 const status = page => page.locator('[data-contact-feedback]');
@@ -54,9 +62,12 @@ async function setup(page, context, baseURL, options = {}) {
       requests.push({ method: request.method(), headers: request.headers(), body: request.postDataJSON() });
       return options.respond ? options.respond(route, reply) : reply(route);
     }
-    if (request.url() === SCRIPT) {
+    if (url.origin === 'https://challenges.cloudflare.com' && url.pathname === '/turnstile/v0/api.js') {
       if (options.scriptFailure) return route.abort();
-      return route.fulfill({ contentType: 'application/javascript', body: mockScript });
+      let body = mockScript;
+      if (options.scriptMode === 'no-callback') body = body.replace('if (loaded) queueMicrotask(qa.notifyLoaded);', '');
+      if (options.scriptMode === 'no-api') body = body.replace('if (loaded) queueMicrotask(qa.notifyLoaded);', 'delete window.turnstile.render; if (loaded) queueMicrotask(qa.notifyLoaded);');
+      return route.fulfill({ contentType: 'application/javascript', body });
     }
     if (url.hostname === 'challenges.cloudflare.com' && url.pathname === '/con05-mock-frame') return route.fulfill({ contentType:'text/html',body:mockFrame });
     if (url.hostname === 'formspree.io' || url.hostname === 'challenges.cloudflare.com') forbidden.push(request.url());
@@ -173,6 +184,47 @@ test.describe('Contact failure safety',()=>{
   for (const value of ['',null,{},'has space','bad\ntoken','x'.repeat(2049)]) test(`malformed token ${typeof value}:${String(value).slice(0,12)}`,async({page,context,baseURL})=>{
     const qa=await setup(page,context,baseURL);await open(page);await draft(page);await solve(page,value);await submit(page).click();
     await expect(form(page)).toHaveAttribute('data-contact-state','failed');expect(qa.requests).toHaveLength(0);await assertDraft(page);await assertSafe(qa);
+  });
+  test('async explicit SDK initialization renders without unsupported ready() and accepts its token callback',async({page,context,baseURL})=>{
+    const qa=await setup(page,context,baseURL);await open(page);await draft(page);
+    await expect(page.locator('[data-contact-widget] iframe')).toBeAttached();
+    const lifecycle=await page.evaluate(()=>({ready:window.__turnstileTest.readyCalls,onload:window.__turnstileTest.onloadCalls}));
+    expect(lifecycle).toEqual({ready:0,onload:1});
+    await solve(page);await expect(page.locator('[data-contact-challenge-status]')).toHaveText('Security check complete.');
+    await expect(form(page)).toHaveAttribute('data-contact-state','ready');await assertDraft(page);
+    expect(qa.requests).toHaveLength(0);await assertSafe(qa);
+  });
+  test('SDK callback deadline cleans up and a stale callback cannot resolve a retry',async({page,context,baseURL})=>{
+    const options={scriptMode:'no-callback'};
+    const qa=await setup(page,context,baseURL,options);await page.clock.install();await open(page);await draft(page);
+    await page.waitForFunction(()=>window.__turnstileTest?.onloadName);
+    const firstName=await page.evaluate(()=>{const name=window.__turnstileTest.onloadName;window.__oldSdkLoaded=window[name];return name;});
+    await page.clock.runFor(10001);await expect(page.locator('[data-contact-challenge-status]')).toContainText('could not load');
+    expect(await page.evaluate(name=>typeof window[name],firstName)).toBe('undefined');await assertDraft(page);
+    await page.locator('[data-contact-challenge-retry]').click();
+    await page.waitForFunction(old=>window.__turnstileTest?.onloadName!==old,firstName);
+    await page.evaluate(()=>window.__oldSdkLoaded());await expect(page.locator('[data-contact-widget] iframe')).toHaveCount(0);
+    await page.evaluate(()=>window.__turnstileTest.notifyLoaded());await solve(page);
+    expect(await page.evaluate(()=>Object.keys(window).filter(key=>key.startsWith('__v3ContactTurnstileLoaded')).length)).toBe(0);
+    await expect(page.locator('[data-contact-challenge-status]')).toHaveText('Security check complete.');
+    expect(qa.requests).toHaveLength(0);await assertDraft(page);await assertSafe(qa);
+  });
+  test('SDK callback without usable API fails closed and supports an explicit retry',async({page,context,baseURL})=>{
+    const options={scriptMode:'no-api'};const qa=await setup(page,context,baseURL,options);await open(page);await draft(page);
+    await expect(page.locator('[data-contact-challenge-status]')).toContainText('could not load');
+    expect(await page.evaluate(()=>Object.keys(window).filter(key=>key.startsWith('__v3ContactTurnstileLoaded')).length)).toBe(0);
+    options.scriptMode='normal';await page.locator('[data-contact-challenge-retry]').click();await solve(page);
+    await expect(form(page)).toHaveAttribute('data-contact-state','ready');expect(qa.requests).toHaveLength(0);await assertDraft(page);await assertSafe(qa);
+  });
+  test('closing during SDK load suppresses hidden rendering and reuses the loaded API on return',async({page,context,baseURL})=>{
+    const qa=await setup(page,context,baseURL,{scriptMode:'no-callback'});await open(page);await draft(page);
+    await page.waitForFunction(()=>window.__turnstileTest?.onloadName);
+    await page.locator('[data-contact-close]').click();await expect(page).toHaveURL(/\/portfolio$/);
+    await page.evaluate(()=>window.__turnstileTest.notifyLoaded());
+    expect(await page.evaluate(()=>window.__turnstileTest.renders.length)).toBe(0);
+    await page.goForward();await solve(page);
+    expect(await page.evaluate(()=>({renders:window.__turnstileTest.renders.length,ready:window.__turnstileTest.readyCalls}))).toEqual({renders:1,ready:0});
+    expect(qa.requests).toHaveLength(0);await assertDraft(page);await assertSafe(qa);
   });
   test('script failure is recoverable without sending or clearing draft',async({page,context,baseURL})=>{
     const options={scriptFailure:true};const qa=await setup(page,context,baseURL,options);await open(page);await draft(page);

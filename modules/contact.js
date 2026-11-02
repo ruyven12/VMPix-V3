@@ -40,6 +40,7 @@
   let widgetGeneration = 0;
   let widgetLoading = false;
   let scriptPromise = null;
+  let scriptLoadSequence = 0;
 
   const visible = () => !overlay.hidden && overlay.dataset.state === "open";
   const blocked = () => phase === "transmitting" || Boolean(attempt);
@@ -103,16 +104,25 @@
   function loadTurnstile() {
     if (scriptPromise) return scriptPromise;
     const script = document.createElement("script");
-    script.src = SCRIPT; script.async = true; script.referrerPolicy = "no-referrer";
+    const callbackName = `__v3ContactTurnstileLoaded${++scriptLoadSequence}`;
+    script.src = `${SCRIPT}&onload=${callbackName}`; script.async = true; script.referrerPolicy = "no-referrer";
     scriptPromise = new Promise((resolve, reject) => {
+      let settled = false;
       const timer = setTimeout(fail, 10000);
-      function fail() { clearTimeout(timer); script.remove(); reject(new Error("challenge_unavailable")); }
-      script.onerror = fail;
-      script.onload = () => {
-        try {
-          window.turnstile.ready(() => { clearTimeout(timer); resolve(window.turnstile); });
-        } catch { fail(); }
+      function cleanup() { clearTimeout(timer); script.onerror = null; delete window[callbackName]; }
+      function fail() {
+        if (settled) return;
+        settled = true; cleanup(); script.remove(); reject(new Error("challenge_unavailable"));
+      }
+      // The async SDK forbids ready(). Register its supported onload callback
+      // before inserting the script; each retry owns a distinct, one-use callback.
+      window[callbackName] = () => {
+        if (settled) return;
+        const api = window.turnstile;
+        if (typeof api?.render !== "function" || typeof api?.remove !== "function") { fail(); return; }
+        settled = true; cleanup(); resolve(api);
       };
+      script.onerror = fail;
       document.head.append(script);
     }).catch(error => { scriptPromise = null; throw error; });
     return scriptPromise;

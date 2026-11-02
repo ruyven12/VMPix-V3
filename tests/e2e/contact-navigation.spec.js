@@ -10,10 +10,11 @@ test.beforeEach(async ({page,context,baseURL}) => {
   // No production API, analytics or mail request leaves the browser.
   await context.route('**/*', route => {
     const request=route.request(), url=new URL(request.url());
-    if(request.url()==='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'){
+    if(url.origin==='https://challenges.cloudflare.com'&&url.pathname==='/turnstile/v0/api.js'){
       return route.fulfill({contentType:'application/javascript',body:`
+        const source=document.currentScript;
         window.turnstile={
-          ready(callback){queueMicrotask(callback);},
+          ready(callback){if(source.async||source.defer)throw new Error("Unsupported ready() for async SDK");queueMicrotask(callback);},
           render(host,options){
             const widget=document.createElement('div');widget.id='contact-navigation-challenge';
             widget.style.cssText='width:150px;height:140px';widget.textContent='Mock security check';host.append(widget);
@@ -22,6 +23,8 @@ test.beforeEach(async ({page,context,baseURL}) => {
           },
           remove(id){document.getElementById(id)?.remove();}
         };
+        const loaded=new URL(source.src).searchParams.get('onload');
+        if(loaded)queueMicrotask(()=>window[loaded]?.());
       `});
     }
     if (!url.pathname.startsWith('/api/') && (url.origin===new URL(baseURL).origin ||
