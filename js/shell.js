@@ -690,19 +690,15 @@ function resetShellMenu() {
     shellMenuPanel.hidden = true;
     shellMenuPanel.inert = true;
     shellMenuPanel.setAttribute("aria-hidden", "true");
+    syncShellMenuContext();
     shellMenuPanel.style.removeProperty("--shell-menu-emitter-x");
     shellMenuPanel.style.removeProperty("--shell-menu-emitter-y");
   }
 }
 
 function syncShellMenuContext() {
-  const path = (getRouteFromUrl().canonicalUrl || window.location.pathname).split('?')[0];
-  const world = path === routePaths.portfolio ? 'portfolio' :
-    path === routePaths.music || path.startsWith(routePaths.music + '/') ? 'music' :
-    path === routePaths.wrestling || path.startsWith(routePaths.wrestling + '/') ? 'wrestling' : '';
-  shellMenuPanel?.querySelectorAll('[data-shell-menu-world]').forEach(row => {
-    row.hidden = row.dataset.shellMenuWorld === world;
-  });
+  const warpGroup = shellMenuPanel?.querySelector('.shell-menu-preview__warp');
+  if (warpGroup) warpGroup.hidden = getRouteFromUrl().name === 'portfolio';
 }
 
 function positionShellMenu() {
@@ -761,6 +757,7 @@ function setShellMenuOpen(isOpen) {
 function syncShellMenuAvailability() {
   if (!portfolioRightEmitter || !shellMenuPanel) return;
   const available = isShellMenuAvailable();
+  if (available) syncShellMenuContext();
   shell.toggleAttribute("data-shell-menu-available", available);
   if (!available) {
     if (document.activeElement === portfolioRightEmitter) portfolioRightEmitter.blur();
@@ -799,7 +796,6 @@ function syncShellMenuAvailability() {
 }
 
 function syncShellMenuRoute(route) {
-  syncShellMenuContext();
   const key = getRouteFromUrl().canonicalUrl || window.location.pathname + window.location.search;
   if (key !== shellMenuRouteKey) {
     resetShellMenu();

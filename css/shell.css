@@ -14716,6 +14716,11 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
   border-top: 0;
   border-left: 1px solid rgba(194, 206, 221, 0.2);
 }
+.shell-menu-preview[data-shell-menu-compact] .shell-menu-preview__warp[hidden] + .shell-menu-preview__links {
+  grid-column: 1 / -1;
+  padding-left: 0;
+  border-left: 0;
+}
 .shell-menu-preview[data-shell-menu-compact] .shell-menu-preview__admin { grid-column: 1 / -1; }
 .shell-menu-preview[data-shell-menu-compact] .shell-menu-preview__action:disabled { min-height: 28px; }
 @supports ((position-anchor: --shell-menu-emitter) and (top: anchor(center))) {
