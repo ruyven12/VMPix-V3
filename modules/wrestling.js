@@ -20112,20 +20112,6 @@ function prepareDaiionCrusadesInterfacePreview() {
   syncHallCrusadesSearchControls();
 }
 
-function syncDaiionRestingIdentityBlock() {
-  const identity = document.querySelector(".daiion-title-reveal");
-  if (!identity || identity.dataset.daiionRestingIdentitySynced === "true") return;
-  const setText = (selector, text) => { const element = identity.querySelector(selector); if (element) element.textContent = text; };
-  const makeLine = (className, text) => Object.assign(document.createElement("span"), { className, textContent: text });
-  setText(".daiion-title-reveal__planet", "PLANET");
-  setText(".daiion-title-reveal__name", "DAÏION");
-  identity.querySelector(".daiion-title-reveal__subtitle")?.replaceChildren(
-    makeLine("daiion-title-reveal__secondary", "THE BATTLEGROUND"),
-    makeLine("daiion-title-reveal__lore", "A world forged by generations of conflict over Draegin.")
-  );
-  identity.dataset.daiionRestingIdentitySynced = "true";
-}
-
 function initWrestlingPeopleModule() {
   initWrestlingPeopleFilters();
   renderWrestlingPeopleIndex({ skipDataRequest: true });
@@ -20133,7 +20119,6 @@ function initWrestlingPeopleModule() {
   initWrestlingShowsArchive();
   applyStaticWrestlingRelationshipHooks();
   syncDaiionEnvironmentalCoverage();
-  syncDaiionRestingIdentityBlock();
   bindWrestlingLandingHallOfChampionsCta();
   bindDaiionLoreFocusPanelContent();
 }
