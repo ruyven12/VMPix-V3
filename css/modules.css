@@ -24179,7 +24179,7 @@ button.hall-crusades-archive-crystal:focus-visible {
     0 0 0.46rem rgba(214, 30, 34, 0.22),
     0 0 1.1rem rgba(135, 11, 16, 0.16);
   opacity: 0;
-  transform: translate3d(-50%, 0.58rem, 0);
+  transform: translate3d(-50%, 22px, 0);
   will-change: opacity, transform;
 }
 .daiion-title-reveal::before {
@@ -24277,14 +24277,14 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__planet {
-  animation: daiionTitleReveal 700ms ease-out both;
+  animation: daiionTitleReveal 950ms ease-out both;
 }
 
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__name {
-  animation: daiionTitleReveal 950ms ease-out 180ms both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
+  animation: daiionTitleReveal 950ms ease-out both, daiionTitleMetalGlint 760ms ease-out 1220ms both;
 }
   .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal__subtitle {
-  animation: daiionTitleSubtitleReveal 520ms ease-out 3500ms both;
+  animation: daiionTitleSubtitleReveal 950ms ease-out both;
 }
 .site-shell[data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived .daiion-title-reveal::before {
   visibility: visible;
@@ -24384,7 +24384,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 @keyframes daiionTitleSubtitleReveal {
   0% {
     opacity: 0;
-    transform: translate3d(-50%, 0.58rem, 0);
+    transform: translate3d(-50%, 22px, 0);
   }
 
   100% {
@@ -30319,11 +30319,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation: zhentoIdentityHold 3200ms ease-out both, zhentoIdentityProject 720ms cubic-bezier(.2,.74,.24,1) 3200ms forwards;
 }
 .zhento-identity__heading { display: grid; gap: .4rem; margin: 0; font-weight: 800; }
+:is(.zhento-identity__planet, .zhento-identity__name, .zhento-identity__subtitle) {
+  animation: zhentoIdentityResolve 950ms ease-out both;
+}
 .zhento-identity__planet {
   font-size: clamp(.75rem, 1.8vw, .95rem);
   letter-spacing: .16em;
   color: #bbd6ff;
-  animation: zhentoIdentityResolve 700ms ease-out both;
 }
 .zhento-identity__name {
   font-size: clamp(2.5rem, 13vw, 6.6rem);
@@ -30331,13 +30333,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   letter-spacing: .025em;
   color: #f1f2ff;
   text-shadow: 0 0 .8rem rgba(130,155,255,.22);
-  animation: zhentoIdentityResolve 950ms ease-out 180ms both;
 }
 .zhento-identity__subtitle {
   margin: .7rem 0 0;
   color: #c9c7ed;
   font-size: clamp(1rem, 2vw, 1.5rem);
-  animation: zhentoIdentityResolve 520ms ease-out 3500ms both;
 }
 .zhento-panel {
   position: absolute;
@@ -32448,14 +32448,8 @@ button.hall-crusades-archive-crystal:focus-visible {
   opacity: 1;
   animation: zhentoTransportIdentityProject 720ms cubic-bezier(.2,.74,.24,1) 3200ms both !important;
 }
-.site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) .zhento-identity__planet {
-  animation: zhentoIdentityResolve 700ms ease-out both !important;
-}
-.site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) .zhento-identity__name {
-  animation: zhentoIdentityResolve 950ms ease-out 180ms both !important;
-}
-.site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) .zhento-identity__subtitle {
-  animation: zhentoIdentityResolve 520ms ease-out 3500ms both !important;
+.site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) :is(.zhento-identity__planet, .zhento-identity__name, .zhento-identity__subtitle) {
+  animation: zhentoIdentityResolve 950ms ease-out both !important;
 }
 .site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) :is(.zhento-top-hud-rail,.zhento-side-hud-rail) {
   animation: zhentoHudReveal 500ms ease-out 2800ms both !important;

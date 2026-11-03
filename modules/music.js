@@ -17690,7 +17690,12 @@ function seedMusicResumeState(route,ui) {
 }
 function settleMusicResumeLanding() {
   const landing=document.querySelector('[data-zhento-landing]') || musicNexusShell;
-  landing?.getAnimations({subtree:true}).forEach(animation=>{if(animation instanceof CSSAnimation && animation.effect?.getTiming().iterations!==Infinity)try{animation.finish();}catch{}});
+  landing?.getAnimations({ subtree: true }).forEach(animation => {
+    if (!(animation instanceof CSSAnimation) || animation.effect?.getTiming().iterations === Infinity) return;
+    // Replay the planet identity while the rest of the landing restores in place.
+    if (animation.effect?.target?.closest(".zhento-identity")) return;
+    try { animation.finish(); } catch {}
+  });
 }
 function restoreMusicResumeState(route,ui) {
   if(['music-venue-detail','person-detail','show-detail','sets-archive'].includes(route.name)){
