@@ -400,6 +400,7 @@ const MUSIC_VENUE_SECTOR_SIZE = 6;
 const musicVenueBeaconPoints = [[844, 485], [866, 515], [824, 548], [874, 583], [794, 618], [878, 650]];
 let activeMusicVenueSector = 0;
 let musicVenueConnectorFrame = 0;
+let harmonyRegistryActivation = null;
 let activeMusicVenueSearch = "";
 let activeMusicVenueStateFilter = "";
 let activeMusicVenueSlugFilter = "";
@@ -3425,6 +3426,7 @@ function sortMusicVenueRows(rows) {
 }
 
 function updateMusicVenuesFilter(filterName, value, event = null) {
+  settleHarmonyRegistryActivation();
   const analyticsBefore = beginMusicArchiveControl(event, "venues");
   activeMusicVenueSector = 0;
   if (filterName === "search") {
@@ -3447,6 +3449,7 @@ function updateMusicVenuesFilter(filterName, value, event = null) {
 }
 
 function resetMusicVenuesFilters(event = null) {
+  settleHarmonyRegistryActivation();
   const analyticsBefore = beginMusicArchiveControl(event, "venues");
   activeMusicVenueSearch = "";
   activeMusicVenueStateFilter = "";
@@ -3587,6 +3590,112 @@ function createMusicVenueBeacon(venue) {
   return beacon;
 }
 
+function settleHarmonyRegistryActivation() {
+  const activation = harmonyRegistryActivation;
+  if (!activation) return;
+
+  harmonyRegistryActivation = null;
+  cancelAnimationFrame(activation.frame);
+  activation.sigil.cancel();
+  activation.pulse.remove();
+  activation.inlays.forEach((inlay) => inlay.style.removeProperty("opacity"));
+  for (const plate of [...musicVenueBeacons.children, ...musicVenueConnections.querySelectorAll("line")]) {
+    plate.style.removeProperty("--harmony-nameplate-lag");
+  }
+  delete musicVenuesIndex.dataset.harmonyActivation;
+  musicVenuesIndex.style.removeProperty("--harmony-nameplate-progress");
+  musicVenuesIndex.style.removeProperty("--harmony-nameplate-shift");
+  musicVenueBeacons.inert = false;
+  musicVenuesTools.inert = false;
+  musicVenuesSectors.inert = false;
+}
+
+function paintHarmonyRegistryPulse(activation, elapsed) {
+  const { artLeft, artTop, scale, sigilY } = activation.projection;
+  const travel = elapsed / 350;
+  const nearY = 666;
+  const farY = 477;
+  const sourceY = sigilY + (farY - sigilY) * travel;
+  const halfWidth = sourceY > nearY
+    ? 2 + 126 * (sigilY - sourceY) / (sigilY - nearY)
+    : 18 + 110 * (sourceY - farY) / (nearY - farY);
+  const x = artLeft + (836 + 18 * travel) * scale;
+  const y = artTop + sourceY * scale;
+  activation.pulse.setAttribute("d", "M" + (x - halfWidth * scale) + " " + y + " H" + (x + halfWidth * scale));
+  activation.pulse.style.opacity = String(0.72 * Math.min(1, travel * 9, (1 - travel) * 12));
+
+  activation.inlays.forEach((inlay, index) => {
+    const arrival = 350 * (sigilY - musicVenueBeaconPoints[index][1]) / (sigilY - farY);
+    const light = Math.max(0, Math.min(1, (elapsed - arrival) / 38));
+    inlay.style.opacity = String(0.14 + 0.86 * light);
+  });
+}
+
+function paintHarmonyRegistryActivation(activation, elapsed) {
+  if (elapsed < 350) {
+    if (musicVenuesIndex.dataset.harmonyActivation !== "pulse") musicVenuesIndex.dataset.harmonyActivation = "pulse";
+    paintHarmonyRegistryPulse(activation, elapsed);
+    return;
+  }
+
+  if (musicVenuesIndex.dataset.harmonyActivation !== "nameplates") {
+    musicVenuesIndex.dataset.harmonyActivation = "nameplates";
+    activation.pulse.remove();
+    activation.inlays.forEach((inlay) => inlay.style.removeProperty("opacity"));
+  }
+  const reveal = (elapsed - 350) / 350;
+  activation.shift = 5 * (1 - reveal) ** 3;
+  musicVenuesIndex.style.setProperty("--harmony-nameplate-progress", String(reveal));
+  musicVenuesIndex.style.setProperty("--harmony-nameplate-shift", activation.shift + "px");
+}
+
+function startHarmonyRegistryActivation() {
+  if (reducedMotion.matches || typeof harmonySigil?.animate !== "function") return;
+
+  const started = performance.now();
+  const context = v3RouteContext;
+  const pathname = location.pathname;
+  const pulse = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  pulse.classList.add("harmony-registry-pulse");
+  const activation = {
+    sigil: harmonySigil.animate([{ opacity: 0.82 }, { opacity: 1 }], { duration: 160, easing: "ease-out" }),
+    pulse,
+    inlays: [],
+    projection: null,
+    revealStart: null,
+    shift: 5,
+    frame: 0,
+  };
+  harmonyRegistryActivation = activation;
+  musicVenuesIndex.dataset.harmonyActivation = "sigil";
+  musicVenueBeacons.inert = true;
+  musicVenuesTools.inert = true;
+  musicVenuesSectors.inert = true;
+
+  const tick = (now) => {
+    if (harmonyRegistryActivation !== activation) return;
+    if (v3RouteContext !== context || location.pathname !== pathname || reducedMotion.matches) {
+      settleHarmonyRegistryActivation();
+      return;
+    }
+    if (activation.projection && activation.revealStart === null) {
+      activation.revealStart = Math.max(started + 200, now);
+    }
+    const elapsed = now - (activation.revealStart ?? Infinity);
+    if (elapsed >= 700) {
+      settleHarmonyRegistryActivation();
+      return;
+    }
+    if (elapsed >= 0 && activation.projection) {
+      paintHarmonyRegistryActivation(activation, elapsed);
+    } else if (now >= started + 200 && musicVenuesIndex.dataset.harmonyActivation === "sigil") {
+      musicVenuesIndex.dataset.harmonyActivation = "waiting";
+    }
+    activation.frame = requestAnimationFrame(tick);
+  };
+  activation.frame = requestAnimationFrame(tick);
+}
+
 function scheduleMusicVenueConnectors() {
   if (!harmonyEnvironment || musicVenueConnectorFrame) return;
   musicVenueConnectorFrame = requestAnimationFrame(() => {
@@ -3604,27 +3713,36 @@ function scheduleMusicVenueConnectors() {
 
     const stage = musicVenueConnections.getBoundingClientRect();
     if (!stage.width || !stage.height || musicVenueBeacons.hidden) {
+      if (!musicVenueBeacons.hidden) settleHarmonyRegistryActivation();
       musicVenueConnections.replaceChildren();
       return;
     }
 
     musicVenueConnections.setAttribute("viewBox", "0 0 " + stage.width + " " + stage.height);
     const connectors = [];
-    Array.from(musicVenueBeacons.children).forEach((beacon, index) => {
+    const activation = harmonyRegistryActivation;
+    const inlays = [];
+    Array.from(musicVenueBeacons.children).forEach((beacon, index, beacons) => {
       const label = beacon.getBoundingClientRect();
+      // The plates follow the pulse from the closest stone outward, 19 ms apart.
+      const lag = String((beacons.length - 1 - index) * 0.055);
+      if (activation) beacon.style.setProperty("--harmony-nameplate-lag", lag);
       const [artX, artY] = musicVenueBeaconPoints[index];
       const x = artLeft + artX * scale - stage.left;
       const y = artTop + artY * scale - stage.top;
       if (x < 0 || x > stage.width || y < 0 || y > stage.height) return;
 
       if (label.top >= stage.top && label.bottom <= stage.bottom) {
-        const labelX = (index % 2 ? label.left : label.right) - stage.left;
+        // The line still points to the settled plate as it slides out over the endpoint.
+        const shift = (activation?.shift ?? 0) * (index % 2 ? -1 : 1);
+        const labelX = (index % 2 ? label.left : label.right) - stage.left - shift;
         const labelY = (label.top + label.bottom) / 2 - stage.top;
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", labelX);
         line.setAttribute("y1", labelY);
         line.setAttribute("x2", x);
         line.setAttribute("y2", y);
+        if (activation) line.style.setProperty("--harmony-nameplate-lag", lag);
         connectors.push(line);
       }
       const marker = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -3636,12 +3754,27 @@ function scheduleMusicVenueConnectors() {
         <path class="music-venue-beacon-stud__inlay" d="M-3.2.6-2-.7h4l1.2 1.3Z"/>
       `;
       connectors.push(marker);
+      if (activation) inlays[index] = marker.lastElementChild;
     });
+    if (activation && !inlays.length) settleHarmonyRegistryActivation();
+    if (activation && inlays.length) {
+      activation.inlays = inlays;
+      activation.projection = {
+        artLeft: artLeft - stage.left,
+        artTop: artTop - stage.top,
+        scale,
+        sigilY: Number(artStyle.getPropertyValue("--harmony-sigil-art-y")),
+      };
+      const elapsed = performance.now() - (activation.revealStart ?? Infinity);
+      if (elapsed >= 0 && elapsed < 700) paintHarmonyRegistryActivation(activation, elapsed);
+      if (elapsed < 350) connectors.push(activation.pulse);
+    }
     musicVenueConnections.replaceChildren(...connectors);
   });
 }
 
 function moveMusicVenueSector(direction) {
+  settleHarmonyRegistryActivation();
   const rows = getFilteredMusicVenues();
   const count = Math.ceil(rows.length / MUSIC_VENUE_SECTOR_SIZE);
   if (count < 2) return;
@@ -3668,6 +3801,7 @@ function renderMusicVenuesResults(rows = musicVenuesLoaded ? getFilteredMusicVen
     return;
   }
   const state = musicVenuesLoaded ? "empty" : musicVenuesDataState === "loading" ? "loading" : "error";
+  if (state !== "loading") settleHarmonyRegistryActivation();
   if (musicVenuesStatus.firstElementChild?.dataset.v3State === state) return;
 
   const copy = {
@@ -6039,6 +6173,7 @@ function setHarmonyArrivalVisible(isVisible) {
 }
 
 function setMusicVenueIndexVisible(isVisible) {
+  if (!isVisible) settleHarmonyRegistryActivation();
   setHarmonyArrivalVisible(false);
   if (!musicVenuesIndex) {
     return;
@@ -17520,10 +17655,8 @@ function initMusicModule() {
     if (harmonyArrival.hidden || getRouteFromUrl().name !== "music-venues") return;
     activeMusicVenueSector = 0;
     musicVenuesTools.open = false;
+    startHarmonyRegistryActivation();
     showMusicVenuesBrowser();
-    if (!reducedMotion.matches && typeof harmonySigil?.animate === "function") {
-      harmonySigil.animate([{ opacity: 0.82 }, { opacity: 1 }], { duration: 160, easing: "ease-out" });
-    }
     musicVenuesList.scrollTop = 0;
     musicVenuesIndex.querySelector("#music-venues-archive-title")?.focus({ preventScroll: true });
   });

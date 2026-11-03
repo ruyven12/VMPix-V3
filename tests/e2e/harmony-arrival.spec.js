@@ -233,6 +233,8 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expect(harbor).toBeHidden();
         expect(await ignitions.jsonValue()).toEqual(expectedIgnitions);
         const archive = page.locator("[data-music-venues-index]");
+        await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+        await expect(archive.locator(".harmony-registry-pulse")).toHaveCount(0);
         const list = page.locator("[data-music-venues-list]");
         const beacons = list.getByRole("list", { name: "Venue beacons" });
         const search = page.getByRole("searchbox", { name: "Search Venue" });
@@ -322,6 +324,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
           await expect(inspect("72")).toBeVisible();
           await expect.poll(() => list.evaluate((node, saved) => Math.abs(node.scrollTop - saved), scroll)).toBeLessThan(2);
           await expect(harbor).toBeHidden();
+          await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
         }
         await page.locator("[data-prototype-engine-return]").press("Enter");
         await expectRestoredArchive();
@@ -391,6 +394,8 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         releaseRetry({ data: [] });
         await expect(signal).toContainText("No venue records are available in the archive.");
         await expect(signal.getByRole("button")).toHaveCount(0);
+        await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+        await expect(archive.locator(".harmony-registry-pulse")).toHaveCount(0);
         await expect(archive.locator("[data-music-venues-count]")).toHaveText("Showing 0 Venues");
         expect(venueRequests).toBe(2);
         expect(showsRequests).toBe(0);
@@ -399,6 +404,112 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
     });
   }
 }
+
+test("holds a single Browse activation for verified data and continues it through rotation", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let releaseVenues;
+  const pendingVenues = new Promise(resolve => { releaseVenues = resolve; });
+  await mockArchive(page, baseURL, () => pendingVenues);
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  const archive = page.locator("[data-music-venues-index]");
+  const trace = await archive.evaluateHandle(node => {
+    const phases = [];
+    const pulseY = [];
+    const lit = [];
+    const shifts = [];
+    const stagger = [];
+    let active = false;
+    const sample = () => {
+      const phase = node.dataset.harmonyActivation;
+      if (phase && phases.at(-1) !== phase) phases.push(phase);
+      if (active && !phase) return;
+      active ||= Boolean(phase);
+      if (phase === "pulse") {
+        const pulse = node.querySelector(".harmony-registry-pulse");
+        const art = document.querySelector("[data-harmony-art]");
+        const paint = art.getBoundingClientRect();
+        const scale = Math.max(paint.width / 1672, paint.height / 941);
+        const crop = Number(getComputedStyle(art).getPropertyValue("--harmony-art-crop-y"));
+        if (pulse?.hasAttribute("d")) {
+          pulseY.push((pulse.getBoundingClientRect().top - paint.top - (paint.height - 941 * scale) * crop) / scale);
+        }
+      } else if (phase === "nameplates") {
+        shifts.push(parseFloat(node.style.getPropertyValue("--harmony-nameplate-shift")));
+        const plates = [...node.querySelectorAll(".music-venue-beacon")];
+        const lines = [...node.querySelectorAll("[data-music-venues-connections] line")];
+        const near = Number(getComputedStyle(plates.at(-1)).opacity);
+        const far = Number(getComputedStyle(plates[0]).opacity);
+        if (lines.length === plates.length) {
+          stagger.push({ near, far, nearLine: Number(getComputedStyle(lines.at(-1)).opacity) });
+        }
+      }
+      if (phase === "pulse" || phase === "nameplates") {
+        [...node.querySelectorAll(".music-venue-beacon-stud__inlay")].forEach((inlay, index) => {
+          if (Number(getComputedStyle(inlay).opacity) > 0.2 && !lit.includes(index)) lit.push(index);
+        });
+      }
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+    return { phases, pulseY, lit, shifts, stagger };
+  });
+
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  await expect(archive).toHaveAttribute("data-harmony-activation", "waiting");
+  await expect(archive.getByText("Establishing Beacon Signals")).toBeVisible();
+  await expect(archive.getByRole("link", { name: /^Inspect / })).toHaveCount(0);
+  await expect(archive.locator(".harmony-registry-pulse")).toHaveCount(0);
+  await expect(archive.locator("summary")).toBeHidden();
+  await expect(page.locator("[data-prototype-engine-return]")).toBeInViewport();
+  releaseVenues({ data: venues });
+
+  await expect(archive).toHaveAttribute("data-harmony-activation", "pulse");
+  expect(await archive.locator("[data-music-venues-beacons]").evaluate(node => node.inert)).toBe(true);
+  await page.setViewportSize({ width: 915, height: 412 });
+  await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+  await expect(archive.locator("summary")).toBeVisible();
+  await expect(archive.getByRole("button", { name: "Next Sector" })).toBeEnabled();
+  await expect(archive.locator(".harmony-registry-pulse")).toHaveCount(0);
+  await expectSectorGeometry(archive);
+
+  const { phases, pulseY, lit, shifts, stagger } = await trace.jsonValue();
+  expect(phases).toEqual(["sigil", "waiting", "pulse", "nameplates"]);
+  expect(pulseY[0]).toBeGreaterThan(650);
+  expect(pulseY.at(-1)).toBeLessThan(510);
+  expect(lit[0]).toBe(5);
+  expect(lit).toContain(0);
+  expect(shifts[0]).toBeGreaterThan(3);
+  expect(shifts.at(-1)).toBeLessThan(shifts[0]);
+  await expect(archive.locator(".music-venue-beacon").first()).toHaveCSS("translate", "none");
+  expect(stagger.some(({ near, far, nearLine }) => near > far && near === nearLine)).toBe(true);
+  await archive.getByRole("button", { name: "Next Sector" }).press("Enter");
+  await expect(archive.getByRole("link", { name: "Inspect Signal Hall 06" })).toBeVisible();
+  await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+});
+
+test("clears pending activation when Engine Back leaves Harbor", async ({ page, baseURL }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let releaseVenues;
+  const pendingVenues = new Promise(resolve => { releaseVenues = resolve; });
+  await mockArchive(page, baseURL, () => pendingVenues);
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  const archive = page.locator("[data-music-venues-index]");
+  try {
+    await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+    await expect(archive).toHaveAttribute("data-harmony-activation", "waiting");
+    await page.locator("[data-prototype-engine-return]").press("Enter");
+    await expect(page).toHaveURL(baseURL + "/music");
+    await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+    expect(await archive.locator("[data-music-venues-beacons]").evaluate(node => node.inert)).toBe(false);
+  } finally {
+    releaseVenues({ data: venues });
+  }
+});
 
 test("paints the Harbor environment before delayed Shell startup and enters it from Zhento", async ({ page, baseURL }) => {
   test.setTimeout(45000);
@@ -637,7 +748,9 @@ test("Harbor sector caption reports actual mixed-state bounds in newest order", 
   const names = page.getByRole("list", { name: "Venue beacons" }).locator("strong");
   await expect(names).toHaveText(["Atlas", "Cedar", "Foundry"]);
   await expect(range).toHaveText("ME / NH Venues (state pending) — A–F");
-  await page.locator("[data-music-venues-tools] summary").press("Enter");
+  const filters = page.locator("[data-music-venues-tools] summary");
+  await expect(filters).toBeVisible();
+  await filters.press("Enter");
   await page.getByRole("combobox", { name: "Filter venues by sort" }).selectOption("newest");
   await expect(names).toHaveText(["Foundry", "Atlas", "Cedar"]);
   await expect(range).toHaveText("ME / NH Venues (state pending) — A–F");

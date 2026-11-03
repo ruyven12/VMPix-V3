@@ -4532,6 +4532,36 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   stroke: none;
 }
 
+.harmony-registry-pulse {
+  fill: none;
+  opacity: 0;
+  stroke: #c1f4ff;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
+
+.music-venues-archive[data-harmony-activation] :is(.music-venues-tools, .music-venues-sectors),
+.music-venues-archive[data-harmony-activation="sigil"] .harmony-registry-signal[data-v3-state="loading"] {
+  visibility: hidden;
+}
+
+.music-venues-archive[data-harmony-activation] :is(.music-venue-beacon, .music-venues-connections line) {
+  opacity: clamp(0, (var(--harmony-nameplate-progress, 0) - var(--harmony-nameplate-lag, 0))
+    / (1 - var(--harmony-nameplate-lag, 0)), 1);
+}
+
+.music-venues-archive[data-harmony-activation] .music-venue-beacon {
+  translate: var(--harmony-nameplate-shift, 5px) 0;
+}
+
+.music-venues-archive[data-harmony-activation] .music-venue-beacon:nth-child(even) {
+  translate: calc(-1 * var(--harmony-nameplate-shift, 5px)) 0;
+}
+
+.music-venues-archive[data-harmony-activation]:not([data-harmony-activation="nameplates"]) .music-venue-beacon-stud__inlay {
+  opacity: 0.14;
+}
+
 .music-venues-list {
   position: relative;
   display: grid;
