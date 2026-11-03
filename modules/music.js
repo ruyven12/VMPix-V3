@@ -9816,6 +9816,10 @@ function updateSetsArchiveSummary(rows = []) {
   }
 
   const setCount = rows.length;
+  if (setCount === 0) {
+    setsArchiveSummary.textContent = "0 SETS";
+    return;
+  }
   const years = rows
     .map(getSetsArchiveYearValue)
     .filter((year) => Number.isFinite(year));
@@ -9895,6 +9899,42 @@ function updateSetsFeaturedFromRow(row) {
   }
 }
 
+function loadBandSetsArchive(band, selectedSetCode) {
+  const context = v3RouteContext;
+  const request = musicShowsSetsLoaded ? null : requestMusicShowsSetsData();
+  const render = () => {
+    if (musicShowsSetsLoaded) {
+      const rows = musicShowsSetsDataState === "live" ? getSetsArchiveRowsForBand(band) : [];
+      renderSetsArchiveRows(rows, { selectedSetCode });
+      return;
+    }
+
+    const loading = musicShowsSetsDataState === "loading";
+    if (setsArchiveSummary) {
+      setsArchiveSummary.textContent = loading ? "LOADING" : "SET TOTAL UNAVAILABLE";
+    }
+    if (setsList) {
+      renderMusicV3State(setsList, loading ? "loading" : "error", "musicShows", {
+        itemTag: "li",
+        itemClass: "sets-list-empty",
+        small: true,
+        text: loading ? "Loading sets for this band." : "Sets for this band could not load from the archive source.",
+        onRetry: !loading && typeof fetch === "function" ? () => loadBandSetsArchive(band, selectedSetCode) : undefined,
+        retryLabel: "Retry Shows",
+      });
+    }
+    updateSetsFeaturedFromRow(null);
+  };
+
+  render();
+  request?.then(() => {
+    if (v3RouteContext === context && setsArchive.getAttribute("aria-hidden") === "false" &&
+        getBandId(activeMusicBand) === getBandId(band)) {
+      render();
+    }
+  });
+}
+
 function showSetsArchive(options = {}) {
   const band = activeMusicBand || musicBandIndexRows[0];
   if (!band || !setsArchive) {
@@ -9912,20 +9952,8 @@ function showSetsArchive(options = {}) {
   setBandDetailVisible(false);
   setSetsArchiveVisible(true);
   setSetDetailVisible(false);
-  if (!musicShowsSetsLoaded && musicShowsSetsCollection.length === 0) {
-    restoreMusicShowsSetsFallback();
-  }
-  renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
+  loadBandSetsArchive(band, selectedSetCode);
   setCurrentView(`Sets ${band.name}`);
-  requestMusicShowsSetsData().then(() => {
-    const route = getRouteFromUrl();
-    const isStillSetsContext = setsArchive.getAttribute("aria-hidden") === "false" || route.name === "set-detail";
-    if (!isStillSetsContext || getBandId(activeMusicBand) !== getBandId(band)) {
-      return;
-    }
-
-    renderSetsArchiveRows(getSetsArchiveRowsForBand(band), { selectedSetCode });
-  });
   if (options.shouldScroll !== false && musicNexusShell) {
     musicNexusShell.scrollTo({
       top: 0,
