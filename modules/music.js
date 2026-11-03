@@ -6813,14 +6813,23 @@ function formatSetPhotoCount(row) {
     : "Pending";
 }
 
-function getSetAlbumPhotoTotal(row) {
-  const albumPhotoCount = getMusicShowAlbumPhotoCount(getSetSmugAlbum(row));
-  if (albumPhotoCount !== null && albumPhotoCount > 0) {
-    return albumPhotoCount;
+function readSetAlbumPhotoTotal(...values) {
+  for (const value of values) {
+    const count = typeof value === "string" && /^\d+$/.test(value.trim()) ? Number(value) : value;
+    if (Number.isSafeInteger(count) && count >= 0) return count;
   }
+  return null;
+}
 
-  const rowPhotoCount = getMusicShowDetailCountCandidate(row?.dataset?.setPhotos);
-  return rowPhotoCount !== null && rowPhotoCount > 0 ? rowPhotoCount : 0;
+function getSetAlbumPhotoTotal(row) {
+  const album = getSetSmugAlbum(row);
+  const albumId = getSetAlbumId(row);
+  if (!albumId) return null;
+
+  const previewKey = getMusicSmugmugAlbumPhotoCacheKey(albumId, "page");
+  return getSetGalleryAllModeCache(albumId)?.total ??
+    musicSmugmugAlbumPhotosCache.get(previewKey)?.albumTotal ??
+    readSetAlbumPhotoTotal(album.photo_count, album.photoCount, album.photos, album.image_count, album.imageCount);
 }
 
 function getAlbumStatusLabelFromValue(value) {
@@ -6927,9 +6936,6 @@ function updateSetGalleryFromRow(row) {
   syncSetReadout();
   if (!freshVisit) return;
   activeSetGalleryPhotoMode = "preview";
-  activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
-  setSetGalleryPhotoWarning("");
-  updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
   const resume = v3ResumeUI();
   const mode = resume.mode === "all" || (resume.mode === "focus" && resume.origin === "all") ? "all" : "preview";
   loadSetGalleryPhotoHighlights(row, { mode });
@@ -6939,35 +6945,23 @@ function getPhotoCountLabel(count) {
   return Number(count) === 1 ? "Photo" : "Photos";
 }
 
-function updateSetGalleryPhotoSummary(visibleCount = 0, totalCount = activeSetGalleryPhotoTotal, mode = activeSetGalleryPhotoMode) {
-  if (!galleryPhotoCount) {
-    return;
-  }
+function updateSetGalleryPhotoSummary(state) {
+  if (!galleryPhotoCount) return;
 
-  const safeVisibleCount = Math.max(0, Number(visibleCount) || 0);
-  const safeTotalCount = Math.max(0, Number(totalCount) || 0);
-  if (mode === "all") {
-    if (safeTotalCount > 0 && safeVisibleCount === 0) {
-      galleryPhotoCount.textContent = `Loading ${safeTotalCount.toLocaleString()} ${getPhotoCountLabel(safeTotalCount)}`;
-      return;
-    }
-    if (safeTotalCount > 0 && safeVisibleCount > 0 && safeVisibleCount < safeTotalCount) {
-      galleryPhotoCount.textContent = `Showing ${safeVisibleCount.toLocaleString()} of ${safeTotalCount.toLocaleString()} ${getPhotoCountLabel(safeTotalCount)}`;
-      return;
-    }
-    const allCount = safeTotalCount || safeVisibleCount;
-    galleryPhotoCount.textContent = allCount > 0
-      ? `Showing All ${allCount.toLocaleString()} ${getPhotoCountLabel(allCount)}`
-      : "Showing All Photos";
-    return;
+  const shown = state === "ready" ? getCurrentGalleryPhotoTiles().length : 0;
+  const total = activeSetGalleryPhotoTotal;
+  const shownText = `${shown.toLocaleString()} ${getPhotoCountLabel(shown)}`;
+  if (state === "loading") {
+    galleryPhotoCount.textContent = "Loading photos...";
+  } else if (state === "error" || total === null || total < shown) {
+    galleryPhotoCount.textContent = shown > 0 ? `Showing ${shownText} \u2022 Total unavailable` : "Photo total unavailable";
+  } else if (total === 0) {
+    galleryPhotoCount.textContent = "0 Photos";
+  } else if (activeSetGalleryPhotoMode === "all" && shown === total) {
+    galleryPhotoCount.textContent = `Showing All ${shownText}`;
+  } else {
+    galleryPhotoCount.textContent = `Showing ${shown.toLocaleString()} of ${total.toLocaleString()} ${getPhotoCountLabel(total)}`;
   }
-
-  const previewCount = Math.min(
-    safeVisibleCount || MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT,
-    safeTotalCount || MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT
-  );
-  const totalText = safeTotalCount > 0 ? safeTotalCount.toLocaleString() : previewCount.toLocaleString();
-  galleryPhotoCount.textContent = `Showing ${previewCount.toLocaleString()} of ${totalText} ${getPhotoCountLabel(safeTotalCount || previewCount)}`;
 }
 
 function setSetGalleryPhotoWarning(message = "") {
@@ -7010,7 +7004,7 @@ function getSetGalleryAllModeCache(albumId, options = {}) {
       nextStart: 1,
       hasMore: true,
       partialError: false,
-      total: 0,
+      total: null,
     });
   }
   return musicSetGalleryAllModeCache.get(safeAlbumId) || null;
@@ -7080,7 +7074,6 @@ function syncSetGalleryPhotoToggleButton(stateName = "ready") {
     emptyState.querySelector(".archive-gallery-state-title").textContent = isAll ? "No photographs available." : "No preview photos available.";
     emptyState.querySelector(".archive-gallery-state-text").textContent = isAll ? "No photographs were returned for this album." : "This album has no preview frames yet.";
   }
-  if (isAll && stateName === "empty" && galleryPhotoCount) galleryPhotoCount.textContent = "0 photographs loaded";
 }
 
 function setGalleryState(stateName = "ready") {
@@ -7119,6 +7112,7 @@ function setGalleryState(stateName = "ready") {
       statePanel.setAttribute("inert", "");
     }
   });
+  updateSetGalleryPhotoSummary(activeState);
   syncSetGalleryPhotoToggleButton(activeState);
   syncSetGalleryLoadMoreButton(activeState);
   flushArchiveGalleryRangeAnalytics(activeState);
@@ -7421,7 +7415,7 @@ function normalizeMusicAlbumPhoto(photo, index = 0) {
   };
 }
 
-function normalizeMusicAlbumPhotosPayload(payload, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT) {
+function normalizeMusicAlbumPhotosPayload(payload, limit = MUSIC_SMUGMUG_ALBUM_PHOTOS_PREVIEW_LIMIT, start = 1) {
   const safeLimit = normalizeMusicSmugmugAlbumPhotoLimit(limit);
   const photos = Array.isArray(payload?.photos) ? payload.photos : [];
   const normalizedPhotos = photos
@@ -7429,10 +7423,13 @@ function normalizeMusicAlbumPhotosPayload(payload, limit = MUSIC_SMUGMUG_ALBUM_P
     .map(normalizeMusicAlbumPhoto)
     .filter(Boolean);
   const nextStart = Number.parseInt(payload?.next_start ?? payload?.nextStart, 10);
+  const hasMore = normalizeMusicSmugmugHasMore(payload?.has_more ?? payload?.hasMore);
+  const emptyAlbum = start === 1 && Array.isArray(payload?.photos) && photos.length === 0 && !hasMore && !(nextStart > start);
 
   return {
+    albumTotal: readSetAlbumPhotoTotal(payload?.total, payload?.total_count, payload?.totalCount) ?? (emptyAlbum ? 0 : null),
     count: getMusicShowDetailCountCandidate(payload?.count, photos.length, normalizedPhotos.length) || normalizedPhotos.length,
-    hasMore: normalizeMusicSmugmugHasMore(payload?.has_more ?? payload?.hasMore),
+    hasMore,
     nextStart: Number.isFinite(nextStart) && nextStart > 0 ? nextStart : null,
     photos: normalizedPhotos,
     total: getMusicShowDetailCountCandidate(payload?.total, payload?.total_count, payload?.totalCount, payload?.count),
@@ -7471,7 +7468,7 @@ function requestMusicSmugmugAlbumPhotosPage(albumId, limit = MUSIC_SMUGMUG_ALBUM
       return response.json();
     })
     .then((payload) => {
-      const result = normalizeMusicAlbumPhotosPayload(payload, safeLimit);
+      const result = normalizeMusicAlbumPhotosPayload(payload, safeLimit, safeStart);
       musicSmugmugAlbumPhotosCache.set(cacheKey, result);
       return result;
     })
@@ -8310,7 +8307,6 @@ function updateSetGalleryAllModeControls(albumId, stateName = "ready") {
   if (cache?.partialError) {
     setSetGalleryPhotoWarning("Full archive could not fully load.");
   }
-  updateSetGalleryPhotoSummary(cache?.photos.length || 0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
   syncSetGalleryPhotoToggleButton(stateName);
   syncSetGalleryLoadMoreButton(stateName);
 }
@@ -8365,12 +8361,9 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
       cache.loadedStarts.add(start);
       const pagePhotos = Array.isArray(page?.photos) ? page.photos : [];
       const appendedPhotos = appendSetGalleryAllModePhotos(cache, pagePhotos);
-      const pageTotal = Number(page?.total) || 0;
-      if (pageTotal > 0) {
-        cache.total = pageTotal;
-        activeSetGalleryPhotoTotal = pageTotal;
-      } else if (cache.photos.length > activeSetGalleryPhotoTotal) {
-        activeSetGalleryPhotoTotal = cache.photos.length;
+      if (page.albumTotal != null) {
+        cache.total = page.albumTotal;
+        activeSetGalleryPhotoTotal = page.albumTotal;
       }
 
       const nextStart = Number.parseInt(page?.nextStart, 10);
@@ -8389,7 +8382,6 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
         if (galleryGrid) {
           galleryGrid.replaceChildren();
         }
-        updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
         setGalleryState("empty");
         return cache;
       }
@@ -8421,7 +8413,6 @@ function loadNextSetGalleryAllModePage(row, options = {}) {
         setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
       }
       setSetGalleryPhotoWarning("Full archive could not load.");
-      updateSetGalleryPhotoSummary(getCurrentGalleryPhotoTiles().length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
       setGalleryState("ready");
       return cache;
     })
@@ -8438,7 +8429,7 @@ function loadSetGalleryAllMode(row) {
   const albumId = getSetAlbumId(row);
   const cache = getSetGalleryAllModeCache(albumId, { create: true });
   activeSetGalleryPhotoMode = "all";
-  activeSetGalleryPhotoTotal = Math.max(getSetAlbumPhotoTotal(row), cache?.total || 0);
+  activeSetGalleryPhotoTotal = getSetAlbumPhotoTotal(row);
   activeSetGalleryAlbumRequestKey = `${albumId}:all`;
   activeSetGalleryAllModeLoading = false;
   if (setGallery) {
@@ -8451,7 +8442,6 @@ function loadSetGalleryAllMode(row) {
     if (galleryGrid) {
       galleryGrid.replaceChildren();
     }
-    updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
     setGalleryState("empty");
     return;
   }
@@ -8463,7 +8453,6 @@ function loadSetGalleryAllMode(row) {
     return;
   }
 
-  updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
   loadNextSetGalleryAllModePage(row, { replace: true });
 }
 
@@ -8490,12 +8479,10 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
     if (galleryGrid) {
       galleryGrid.replaceChildren();
     }
-    updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
     setGalleryState("empty");
     return;
   }
 
-  updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
   setSetGalleryLoadingCopy(
     requestedMode === "all" ? "Loading full archive..." : "Loading archive photos...",
     requestedMode === "all" ? "Fetching album pages." : "Preparing preview frames."
@@ -8507,14 +8494,11 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
         return;
       }
       const photos = result?.photos || [];
-      if (result?.total) {
-        activeSetGalleryPhotoTotal = result.total;
-      }
+      activeSetGalleryPhotoTotal = result.albumTotal ?? activeSetGalleryPhotoTotal;
       if (photos.length === 0) {
         if (galleryGrid) {
           galleryGrid.replaceChildren();
         }
-        updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
         setGalleryState("empty");
         return;
       }
@@ -8522,7 +8506,6 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
       if (requestedMode === "all" && result?.partialError) {
         setSetGalleryPhotoWarning("Full archive could not fully load.");
       }
-      updateSetGalleryPhotoSummary(photos.length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
       setGalleryState("ready");
     })
     .catch(() => {
@@ -8535,14 +8518,12 @@ function loadSetGalleryPhotoHighlights(row, options = {}) {
           setGallery.dataset.albumPhotoMode = activeSetGalleryPhotoMode;
         }
         setSetGalleryPhotoWarning("Full archive could not fully load.");
-        updateSetGalleryPhotoSummary(getCurrentGalleryPhotoTiles().length, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
         setGalleryState("ready");
         return;
       }
       if (galleryGrid) {
         galleryGrid.replaceChildren();
       }
-      updateSetGalleryPhotoSummary(0, activeSetGalleryPhotoTotal, activeSetGalleryPhotoMode);
       setGalleryState("error");
     });
 }
