@@ -215,6 +215,17 @@ for(const viewport of sizes) for(const reducedMotion of ['reduce','no-preference
       await page.goBack();await page.goForward();await opened(page);
       await page.keyboard.press('Escape');await closed(page);
     });
+    test('Report an Issue stays available when a Wrestling photo cannot open',async({page})=>{
+      const route='/wrestling/shows/050826/match-1/photo/001';
+      await page.goto(route,{waitUntil:'domcontentloaded'});
+      await expect(page.locator('[data-lightbox-screen][aria-hidden="false"]')).toHaveCount(0);
+      await remember(page); await menuOpen(page); await preserved(page);
+      await page.goBack(); await closed(page,route); await preserved(page);
+      await expect(page.locator('[data-shell-menu-toggle]')).toBeFocused();
+      await page.goForward(); await opened(page); await preserved(page);
+      await page.getByRole('button',{name:'Close Report an Issue',exact:true}).click();
+      await closed(page,route); await preserved(page);
+    });
     test('approved timing and interruption settle cleanly',async({page})=>{
       expect(await page.evaluate(()=>matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(reducedMotion==='reduce');
       await page.waitForFunction(()=>canOpenIncident());

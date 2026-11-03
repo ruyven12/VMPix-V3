@@ -660,7 +660,7 @@ function isShellMenuAvailable() {
   if (!shell || !portfolioRightEmitter || !shellMenuPanel || !portfolioEngine ||
       shell.inert || portfolioEngine.closest('[inert]') || !canOpenTrajectory() || trajectorySession) return false;
   const route = getRouteFromUrl();
-  if (route.isUnknown || !isPrototypeEngineReturnRoute(route) || route.name === 'wrestling-match-detail-photo') return false;
+  if (route.isUnknown || !isPrototypeEngineReturnRoute(route)) return false;
   if (route.name === 'portfolio' && (shell.dataset.portfolioEngineReady !== 'true' ||
       isPortfolioGatewayActive() || shell.classList.contains('is-portfolio-world-arrived'))) return false;
   // NAV-02B: integrated Focus is nonmodal; declared modals/preferences keep exclusive ownership.
