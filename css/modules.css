@@ -4266,6 +4266,154 @@ html.is-lightbox-scroll-locked body {
   line-height: 0.96;
 }
 
+.music-nexus-shell.is-harmony-arrival {
+  grid-auto-rows: minmax(0, 1fr);
+  align-content: stretch;
+  padding: 0;
+  border-color: rgba(154, 181, 242, 0.28);
+  background: #080e20;
+  scrollbar-gutter: auto;
+}
+
+.music-nexus-shell.is-harmony-arrival::before {
+  content: none;
+}
+
+.harmony-arrival:not([hidden]) {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto minmax(7rem, 1fr) auto;
+  justify-items: center;
+  gap: clamp(0.55rem, 2.4vh, 1.4rem);
+  min-width: 0;
+  padding:
+    max(clamp(0.85rem, 6vh, 3.8rem), env(safe-area-inset-top))
+    max(0.85rem, env(safe-area-inset-right))
+    max(clamp(0.85rem, 6vh, 3.8rem), env(safe-area-inset-bottom))
+    max(0.85rem, env(safe-area-inset-left));
+  overflow: auto;
+  background: radial-gradient(ellipse at center, #182747, #080e20 76%);
+  color: #f3f3ff;
+  text-align: center;
+}
+
+.harmony-arrival__identity h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, min(6.9vw, 8vh), 4.4rem);
+  font-weight: 400;
+  line-height: 1.09;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 16px #080e20;
+  text-wrap: balance;
+}
+
+.harmony-arrival__identity p {
+  margin: 0.5rem 0 0;
+  color: #d9d9f3;
+  font-size: clamp(0.85rem, 2.2vw, 1.1rem);
+  letter-spacing: 0.08em;
+}
+
+.harmony-arrival__scene {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.harmony-arrival__scene::before,
+.harmony-arrival__sigil {
+  grid-area: 1 / 1;
+}
+
+.harmony-arrival__scene::before {
+  width: 100%;
+  height: 100%;
+  content: "";
+  background:
+    linear-gradient(180deg, rgba(8, 14, 32, 0.91), transparent 40%, transparent 68%, rgba(8, 14, 32, 0.86)),
+    url("/assets/media/background/zhento-harmony.png") center 57% / cover no-repeat;
+}
+
+.harmony-arrival__sigil {
+  width: clamp(6rem, min(26vw, 27vh), 12rem);
+  transform: translateY(22%);
+  stroke: #c4d8ff;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  background: radial-gradient(circle, rgba(26, 42, 93, 0.84), rgba(44, 65, 143, 0.28) 48%, transparent 71%);
+  filter: drop-shadow(0 0 8px #8999ff);
+}
+
+.harmony-arrival__browse {
+  grid-row: 3;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0.65rem 1.4rem;
+  border: 1px solid #91a7e7;
+  border-radius: var(--radius-sm);
+  background: #142040;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 16px rgba(136, 155, 236, 0.16);
+  cursor: pointer;
+}
+
+.harmony-arrival__browse:hover,
+.harmony-arrival__browse:focus-visible {
+  background: #243459;
+}
+
+.harmony-arrival__browse:focus-visible {
+  outline: 2px solid #e0e8ff;
+  outline-offset: 4px;
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .harmony-arrival:not([hidden]) {
+    grid-template-rows: auto minmax(5.5rem, 1fr) auto;
+    padding-block: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .harmony-arrival:not([hidden]) {
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    gap: clamp(1rem, 3.5vh, 2rem);
+    background:
+      radial-gradient(ellipse at center, rgba(8, 14, 32, 0.84), #080e20 76%),
+      url("/assets/media/background/zhento-harmony.png") center / cover no-repeat;
+  }
+
+  .harmony-arrival__scene {
+    position: relative;
+    z-index: 0;
+    grid-row: 2;
+    align-self: stretch;
+    justify-self: stretch;
+    margin-inline:
+      calc(-1 * max(0.85rem, env(safe-area-inset-left)))
+      calc(-1 * max(0.85rem, env(safe-area-inset-right)));
+  }
+
+  .harmony-arrival__scene::before {
+    height: auto;
+    aspect-ratio: 1.4;
+    background: url("/assets/media/background/zhento-harmony.png") center / cover no-repeat;
+    mask-image: linear-gradient(180deg, transparent, #000 13% 87%, transparent);
+  }
+}
+
 .music-venues-archive {
   display: none;
   min-height: min(100%, calc(100svh - 12rem));

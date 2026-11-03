@@ -269,7 +269,7 @@ function isCurrentV3Route(route) {
 }
 // Restoration eligibility is deliberately separate from presentation ownership.
 function isScopedRouteResume(route) {
-  return ['music-venue-detail','person-detail','show-detail','sets-archive',
+  return ['music-venues','music-venue-detail','person-detail','show-detail','sets-archive',
     'wrestling-show-detail','wrestling-person-detail','wrestling-venue-detail'].includes(route?.name);
 }
 function isV3ResumeRoute(route) { return isCurrentV3Route(route) || isScopedRouteResume(route); }
@@ -290,6 +290,7 @@ function v3ResumeUI() { return v3RouteContext.pending ? v3RouteContext.snapshot?
 function getV3ResumeScrollers(route = v3RouteContext.route) {
   const selectors = route.name === 'music-bands' ? ['.rhythm-pillar','[data-rhythm-rolodex]','#rhythm-search-panel','[data-bands-search-results]']
     : route.name === 'band-detail' ? ['[data-band-detail-content]']
+    : route.name === 'music-venues' ? ['[data-music-venues-list]']
     : route.name === 'wrestling-people-prototype' ? ['[data-wrestling-people-prototype-shell]',...['search','az','category','team'].map(mode=>'[data-hall-of-champions-workspace-results="'+mode+'"]')]
     : route.name === 'wrestling-person-detail' ? ['[data-wrestling-person-dossier-prototype-shell]','.wrestling-person-dossier-prototype-framework','[data-wrestling-person-dossier-prototype-event-archive-photo-grid]','.wrestling-person-dossier-prototype-event-history__card']
     : route.name === 'wrestling-venue-detail' ? ['.fields-of-conflict-dossier']
@@ -344,12 +345,14 @@ function beginV3RouteContext(route,options){
   const reloadGap = ['reload','back-forward'].includes(v3InitialNavigationCause) && cause==='back-forward' && !v3EntriesRenderedInDocument.has(entry);
   v3EntriesRenderedInDocument.add(entry);
   let snapshot=null;
-  if((cause==='reload' || reloadGap || ((['band-detail','music-shows','set-detail'].includes(route.name) || isScopedRouteResume(route)) && cause==='back-forward')) && isV3ResumeRoute(route))try{
+  // Refresh starts a new Harbor arrival even if this entry previously opened the directory.
+  const canResume = route.name !== 'music-venues' || cause !== 'reload';
+  if(canResume && (cause==='reload' || reloadGap || ((['band-detail','music-shows','set-detail'].includes(route.name) || isScopedRouteResume(route)) && cause==='back-forward')) && isV3ResumeRoute(route))try{
     const raw=sessionStorage.getItem(v3ResumeKey(entry,url));
     const value=raw && raw.length<=16000 ? JSON.parse(raw) : null;
     if(value?.version===V3_RESUME_VERSION && value.entry===entry && value.url===url && value.ui && typeof value.ui==='object' && !Array.isArray(value.ui))snapshot=value;
   }catch{}
-  if(isScopedRouteResume(route) && ['reload','back-forward'].includes(cause)){
+  if(canResume && isScopedRouteResume(route) && ['reload','back-forward'].includes(cause)){
     const cached=v3ResumeSnapshots.get(v3ResumeKey(entry,url)) || snapshot || history.state?.v3Resume;
     if(cached?.version===V3_RESUME_VERSION && cached.entry===entry && cached.url===url && cached.ui && typeof cached.ui==='object' && !Array.isArray(cached.ui))snapshot=cached;
   }

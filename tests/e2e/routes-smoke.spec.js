@@ -24,7 +24,7 @@ const routes = [
   { path: "/music/shows", rail: "Shows", visibleShell: "[data-music-nexus-shell]", text: "Search Shows" },
   { path: "/music/people", rail: "People", visibleShell: "[data-music-nexus-shell]" },
   { path: "/music/people/adam-begin", rail: "Person Detail", visibleShell: ".person-detail-screen", text: "Adam Begin" },
-  { path: "/music/venues", rail: "Venues", visibleShell: "[data-music-venues-index]", text: "Venue Archive" },
+  { path: "/music/venues", rail: "Venues", visibleShell: "[data-harmony-arrival]", text: "Harbor of Harmony" },
   { path: "/music/venues/asylum", rail: "Venue Detail", visibleShell: "[data-venue-detail]", text: "Asylum" },
   { path: "/wrestling", rail: /Outskirts of Daiion|Daiion/, visibleShell: ".portfolio-hub" },
   { path: "/wrestling/people", rail: /Hall of Champions/, visibleShell: ".wrestling-people-prototype-shell" },

@@ -1192,10 +1192,27 @@
           <article class="person-detail-screen" aria-labelledby="person-detail-title" aria-hidden="true" inert data-person-detail></article>
           <article class="show-detail-screen" aria-labelledby="show-detail-title" aria-hidden="true" inert data-show-detail></article>
 
+          <section class="harmony-arrival" aria-labelledby="harmony-arrival-title" data-harmony-arrival hidden>
+            <header class="harmony-arrival__identity">
+              <h2 id="harmony-arrival-title">Harbor of Harmony</h2>
+              <p>The Music Venue Archive</p>
+            </header>
+            <div class="harmony-arrival__scene" aria-hidden="true">
+              <svg class="harmony-arrival__sigil" viewBox="0 0 160 160" fill="none" focusable="false">
+                <circle cx="80" cy="80" r="66" opacity=".35" />
+                <circle cx="80" cy="80" r="55" opacity=".55" stroke-dasharray="1 5" />
+                <path d="M80 24 128 52v56l-48 28-48-28V52Z" opacity=".7" />
+                <path d="M80 40 111 80 80 120 49 80Z" />
+                <path d="M39 80h23l9-15 9 30 9-30 9 15h23M80 9v10m0 122v10M9 80h10m122 0h10" stroke-width="1.5" />
+              </svg>
+            </div>
+            <button class="harmony-arrival__browse" type="button" data-harmony-browse>Browse Venues</button>
+          </section>
+
           <section class="music-venues-archive" aria-labelledby="music-venues-archive-title" aria-hidden="true" inert data-music-venues-index>
             <header class="music-venues-archive-header">
               <p class="venue-detail-panel-kicker">Venue Archive</p>
-              <h4 class="venue-detail-panel-title" id="music-venues-archive-title">Venues</h4>
+              <h4 class="venue-detail-panel-title" id="music-venues-archive-title" tabindex="-1">Venues</h4>
               <p class="music-venues-count" data-music-venues-count>0 venues</p>
             </header>
             <div class="music-venues-filters" aria-label="Venues archive filters" data-music-venues-filters></div>

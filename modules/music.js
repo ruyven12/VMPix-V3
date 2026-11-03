@@ -384,6 +384,7 @@ let musicVenuesCollection = getMockCollection("musicVenues", { clone: false });
 let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
 let musicVenuesDataState = "fallback";
+const harmonyArrival = queryRetainedMusicElement("[data-harmony-arrival]");
 let activeMusicVenueSearch = "";
 let activeMusicVenueStateFilter = "";
 let activeMusicVenueSlugFilter = "";
@@ -3618,7 +3619,7 @@ function createMusicVenueCard(venue) {
 }
 
 function renderMusicVenuesResults() {
-  if (!musicVenuesList) {
+  if (!musicVenuesList || !musicVenuesIndex?.classList.contains("is-active")) {
     return;
   }
 
@@ -3660,20 +3661,22 @@ function renderMusicVenuesResults() {
 }
 
 function renderMusicVenuesArchive() {
+  if (!musicVenuesIndex?.classList.contains("is-active")) return;
   const rows = getMusicVenuesArchiveRows();
-  normalizeActiveMusicVenueFilters(rows);
+  if (musicVenuesLoaded) normalizeActiveMusicVenueFilters(rows);
   renderMusicVenuesFilters(rows);
   renderMusicVenuesResults();
 }
 
-function syncMusicVenuesArchive() {
+function showMusicVenuesBrowser() {
+  setMusicVenueIndexVisible(true);
+  const context = v3RouteContext;
+  const requests = [requestMusicVenuesData(), requestMusicShowsSetsData()];
   renderMusicVenuesArchive();
-  Promise.allSettled([
-    requestMusicVenuesData(),
-    requestMusicShowsSetsData(),
-  ]).then(() => {
-    if (getRouteFromUrl().name === "music-venues") {
+  Promise.allSettled(requests).then(() => {
+    if (v3RouteContext === context && getRouteFromUrl().name === "music-venues") {
       renderMusicVenuesArchive();
+      notifyV3ResumeReady();
     }
   });
 }
@@ -5974,7 +5977,14 @@ function setVenueDetailVisible(isVisible) {
   }
 }
 
+function setHarmonyArrivalVisible(isVisible) {
+  if (!harmonyArrival) return;
+  harmonyArrival.hidden = !isVisible;
+  musicNexusShell?.classList.toggle("is-harmony-arrival", isVisible);
+}
+
 function setMusicVenueIndexVisible(isVisible) {
+  setHarmonyArrivalVisible(false);
   if (!musicVenuesIndex) {
     return;
   }
@@ -5986,12 +5996,6 @@ function setMusicVenueIndexVisible(isVisible) {
   musicVenuesIndex.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
     setVenueDetailVisible(false);
-    renderMusicVenuesArchive();
-    requestMusicVenuesData().then(() => {
-      if (getRouteFromUrl().name === "music-venues") {
-        renderMusicVenuesArchive();
-      }
-    });
     musicVenuesIndex.removeAttribute("inert");
   } else {
     musicVenuesIndex.setAttribute("inert", "");
@@ -17420,12 +17424,12 @@ function setMusicNexusContext(sectionName, shouldFocusCard = false, shouldUpdate
 
   setBandsIndexVisible(sectionName === "bands");
   setPeopleIndexVisible(sectionName === "people");
-  setMusicVenueIndexVisible(sectionName === "venues");
   if (sectionName === "bands") {
     syncBandsIndex();
   }
-  if (sectionName === "venues") {
-    syncMusicVenuesArchive();
+  if (sectionName === "venues" && getRouteFromUrl().name === "music-venues") {
+    if (v3ResumeUI().browsing === true) showMusicVenuesBrowser();
+    else setHarmonyArrivalVisible(true);
   }
 
   const shouldShowActivityPanel = sectionName !== "bands" && sectionName !== "people" && sectionName !== "venues";
@@ -17457,6 +17461,12 @@ function moveMusicNexusSelection(direction) {
   setMusicNexusContext(cards[nextIndex].dataset.musicNexusCard, true);
 }
 function initMusicModule() {
+  harmonyArrival?.querySelector("[data-harmony-browse]")?.addEventListener("click", () => {
+    if (harmonyArrival.hidden || getRouteFromUrl().name !== "music-venues") return;
+    showMusicVenuesBrowser();
+    musicVenuesList.scrollTop = 0;
+    musicVenuesIndex.querySelector("#music-venues-archive-title")?.focus({ preventScroll: true });
+  });
   initSynchronicityMemories();
   initBandContentTabs();
   if (musicNexusBack) {
@@ -17677,6 +17687,13 @@ function initMusicModule() {
 
 let musicSourceResume=null;
 function captureMusicResumeState(route) {
+  if (route.name === "music-venues") return {
+    browsing: musicVenuesIndex.classList.contains("is-active"),
+    search: activeMusicVenueSearch,
+    state: activeMusicVenueStateFilter,
+    venue: activeMusicVenueSlugFilter,
+    sort: activeMusicVenueSort,
+  };
   if(route.name==='music-venue-detail')return {
     panel:venueDetail?.querySelector('[data-venue-relationship][aria-expanded="true"]')?.dataset.venueRelationship || '',
     artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
@@ -17699,6 +17716,13 @@ function captureMusicResumeState(route) {
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
 }
 function seedMusicResumeState(route,ui) {
+  if (route.name === "music-venues") {
+    activeMusicVenueSearch = v3Text(ui.search);
+    activeMusicVenueStateFilter = normalizeMusicVenueState(ui.state);
+    activeMusicVenueSlugFilter = normalizeMusicVenueSlugValue(ui.venue);
+    activeMusicVenueSort = musicVenueSortOptions.some(option => option.value === ui.sort) ? ui.sort : "az";
+    return;
+  }
   if(route.name==='music-shows'){
     activeMusicShowsSearch=v3Text(ui.query);activeMusicShowsYearFilter=v3Text(ui.year);activeMusicShowsStateFilter=v3Text(ui.state);activeMusicShowsVenueFilter=v3Text(ui.venue);
     if(Array.isArray(ui.years))synchronicityTimeline.expanded=new Set(ui.years.filter(year=>/^(?:[0-9]{4}|unknown)$/.test(year)).slice(0,150));return;
@@ -17717,6 +17741,7 @@ function settleMusicResumeLanding() {
   });
 }
 function restoreMusicResumeState(route,ui) {
+  if (route.name === "music-venues") return !ui.browsing || (!musicVenuesRequest && !musicShowsSetsRequest);
   if(['music-venue-detail','person-detail','show-detail','sets-archive'].includes(route.name)){
     const pending=state=>['idle','loading'].includes(state);
     // Legacy Sets can expose fallback rows while the shared Shows request is still pending.
