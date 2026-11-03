@@ -12,7 +12,7 @@ function setCurrentView(viewName) {
     setPortfolioEngineHudCurrentViewDetail("");
   }
   const route = getRouteFromUrl();
-  if (usesLegacyEngineCoverage(route)) {
+  if (usesLegacyEngineCoverage(route) && route.name !== "music-venues") {
     setPortfolioEngineHudCurrentView(viewName);
   } else if (route.name === "band-detail") {
     setPortfolioEngineHudCurrentView(getBandDetailEngineTitle(route.bandId));
@@ -2695,6 +2695,59 @@ function setPortfolioEngineHudCurrentView(viewName, options = {}) {
   }
 }
 
+const HARMONY_ENGINE_TITLES = ["Harbor of Harmony", "Music Venues"];
+const HARMONY_ENGINE_HOLD_MS = 1500;
+const HARMONY_ENGINE_FADE_MS = 110;
+let harmonyEngineTitle = null;
+
+function syncHarmonyEngineTitle(isActive) {
+  if (!isActive) {
+    if (!harmonyEngineTitle) return;
+    clearTimeout(harmonyEngineTitle.timer);
+    harmonyEngineTitle.fade?.cancel();
+    harmonyEngineTitle = null;
+    return;
+  }
+  if (harmonyEngineTitle || !portfolioEngineCurrentView) return;
+
+  const started = performance.now();
+  const cycle = { slot: 0, timer: 0, fade: null };
+  harmonyEngineTitle = cycle;
+  setPortfolioEngineHudCurrentView(HARMONY_ENGINE_TITLES[0]);
+  const tick = () => {
+    if (harmonyEngineTitle !== cycle) return;
+    const elapsed = performance.now() - started;
+    const slot = Math.floor(elapsed / HARMONY_ENGINE_HOLD_MS);
+    const remaining = (slot + 1) * HARMONY_ENGINE_HOLD_MS - elapsed;
+    const canFade = !reducedMotion.matches && typeof portfolioEngineCurrentView.animate === "function";
+    if (slot !== cycle.slot) {
+      cycle.fade?.cancel();
+      setPortfolioEngineHudCurrentView(HARMONY_ENGINE_TITLES[slot % HARMONY_ENGINE_TITLES.length]);
+      cycle.slot = slot;
+      cycle.fade = canFade && remaining > HARMONY_ENGINE_FADE_MS
+        ? portfolioEngineCurrentView.animate([{ opacity: 0 }, { opacity: 1 }], { duration: HARMONY_ENGINE_FADE_MS, easing: "ease-out" })
+        : null;
+    }
+    if (canFade && remaining <= HARMONY_ENGINE_FADE_MS + 1) {
+      cycle.fade?.cancel();
+      cycle.fade = portfolioEngineCurrentView.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: remaining,
+        easing: "ease-in",
+        fill: "forwards",
+      });
+    }
+    const delay = canFade && remaining > HARMONY_ENGINE_FADE_MS + 1
+      ? remaining - HARMONY_ENGINE_FADE_MS
+      : remaining;
+    cycle.timer = window.setTimeout(tick, Math.ceil(delay));
+  };
+  tick();
+}
+
+reducedMotion.addEventListener("change", () => {
+  if (reducedMotion.matches) harmonyEngineTitle?.fade?.cancel();
+});
+
 const HALL_ENGINE_TITLE_PRIMARY = "Daiion - Hall of Crusades";
 const HALL_ENGINE_TITLE_ALTERNATE = "(Wrestling Show Archive)";
 const HALL_ENGINE_SHOW_DETAIL_TITLE_ALTERNATE = "(Campaign Record)";
@@ -3720,9 +3773,11 @@ function setPortfolioActiveWorld(worldName = "portfolio") {
   syncPortfolioBrandingSelection(config.id);
   setPortfolioZhentoIdentification(isPortfolioSelection &&
     (config.id === "soundtrack" || config.id === "battleground"), config.id);
-  setPortfolioEngineHudCurrentView(isPortfolioSelection
-    ? PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio.label
-    : (config.id === "battleground" ? "Outskirts of Daiion" : config.label));
+  if (shell?.dataset.shellRoute !== "music-venues") {
+    setPortfolioEngineHudCurrentView(isPortfolioSelection
+      ? PORTFOLIO_WORLD_SELECTION_CONFIG.portfolio.label
+      : (config.id === "battleground" ? "Outskirts of Daiion" : config.label));
+  }
   portfolioBeaconHotspots.forEach((button) => {
     const isSelected = config.id !== "portfolio" && button.dataset.portfolioStar === config.id;
     button.classList.toggle("is-selected", isSelected);
@@ -4772,7 +4827,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     setPortfolioEngineHudCurrentView(route.name === "band-detail" ? getBandDetailEngineTitle(route.bandId) : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   if (route.name === "music-shows") setPortfolioEngineHudCurrentView("Pillar of Synchronicity");
-  if (legacyEngine) setPortfolioEngineHudCurrentView(currentView?.textContent || getShellBackLabel(route.canonicalUrl));
+  syncHarmonyEngineTitle(route.name === "music-venues");
+  if (legacyEngine && route.name !== "music-venues") setPortfolioEngineHudCurrentView(currentView?.textContent || getShellBackLabel(route.canonicalUrl));
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
   if (!isHomeRoute) clearHomeEngageReadiness();

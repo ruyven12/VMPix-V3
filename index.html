@@ -1222,10 +1222,6 @@
             <svg class="music-venues-connections" data-music-venues-connections aria-hidden="true"></svg>
             <div class="music-venues-list" data-music-venues-list>
               <h2 class="sr-only" id="music-venues-archive-title" tabindex="-1">Beacon Registry</h2>
-              <details class="music-venues-tools" data-music-venues-tools>
-                <summary>Filters</summary>
-                <div data-music-venues-filters></div>
-              </details>
               <div class="music-venues-scene">
                 <div data-music-venues-status></div>
                 <ul class="music-venues-beacons" role="list" aria-label="Venue beacons" data-music-venues-beacons hidden></ul>
@@ -1233,12 +1229,19 @@
               <nav class="music-venues-sectors" aria-label="Venue sectors" data-music-venues-sectors hidden>
                 <button type="button" data-music-venues-sector-step="-1">Previous Sector</button>
                 <div role="status" aria-atomic="true">
-                  <strong data-music-venues-count></strong>
                   <span data-music-venues-range></span>
                 </div>
                 <button type="button" data-music-venues-sector-step="1">Next Sector</button>
               </nav>
             </div>
+            <button class="harmony-filter-sigil" type="button" aria-label="Venue filters" aria-expanded="false" aria-controls="harmony-filter-panel" data-harmony-filter-sigil><span aria-hidden="true" data-harmony-filter-cue>Filters</span></button>
+            <section class="music-venues-tools" id="harmony-filter-panel" aria-labelledby="harmony-filter-title" data-music-venues-tools hidden>
+              <header>
+                <h3 id="harmony-filter-title">Venue Filters</h3>
+                <button type="button" aria-label="Close venue filters" data-harmony-filter-close>×</button>
+              </header>
+              <div data-music-venues-filters></div>
+            </section>
             <section class="harmony-venue-projection" aria-labelledby="harmony-venue-projection-title" data-harmony-venue-projection hidden>
               <header class="harmony-venue-projection__identity">
                 <div class="harmony-venue-projection__mark" data-harmony-venue-logo aria-hidden="true"></div>

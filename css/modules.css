@@ -4652,7 +4652,8 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   stroke-linecap: round;
 }
 
-.music-venues-archive[data-harmony-activation] :is(.music-venues-tools, .music-venues-sectors),
+.music-venues-archive:is([data-harmony-activation], [data-harmony-projection]) :is(.harmony-filter-sigil, .music-venues-tools),
+.music-venues-archive[data-harmony-activation] .music-venues-sectors,
 .music-venues-archive[data-harmony-activation="sigil"] .harmony-registry-signal[data-v3-state="loading"] {
   visibility: hidden;
 }
@@ -4679,7 +4680,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 .music-venues-list {
   position: relative;
   display: grid;
-  grid-template-rows: auto minmax(min-content, 1fr) auto;
+  grid-template-rows: 2.75rem minmax(min-content, 1fr) auto;
   gap: 0.38rem;
   min-width: 0;
   min-height: 0;
@@ -4691,40 +4692,94 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   scrollbar-width: thin;
 }
 
-.music-venues-tools {
-  position: relative;
+.harmony-filter-sigil {
+  position: absolute;
   z-index: 1;
-  justify-self: end;
-  width: min(100%, 26rem);
+  top: var(--harmony-filter-y, -100%);
+  left: var(--harmony-filter-x, 50%);
+  width: max(2.75rem, var(--harmony-filter-target, 0px));
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
 }
 
-@media (max-height: 500px) and (min-width: 42rem) {
-  .music-venues-tools {
-    width: min(43%, 23rem);
-  }
+.harmony-filter-sigil span {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  color: #d6efff;
+  font: 400 0.62rem/1.1 var(--font-display);
+  letter-spacing: 0.055em;
+  text-shadow: 0 1px 4px #081321, 0 0 6px #081321;
+  transform: translateX(-50%);
 }
 
-.music-venues-tools summary {
-  display: list-item;
-  margin-inline-start: auto;
-  width: max-content;
-  max-width: 100%;
-  padding: 0.72rem 0.65rem;
+.harmony-filter-sigil:is(:hover, [aria-expanded="true"]) {
+  box-shadow: inset 0 0 0 1px rgba(180, 240, 255, 0.56);
+}
+
+.music-venues-tools:not([hidden]) {
+  position: absolute;
+  z-index: 2;
+  top: var(--harmony-filter-panel-top);
+  left: var(--harmony-filter-x, 50%);
+  width: var(--harmony-filter-panel-width);
+  max-height: var(--harmony-filter-panel-height);
+  overflow: auto;
+  scroll-padding-block-start: 2.75rem;
+  overscroll-behavior: contain;
+  border: 1px solid rgba(153, 221, 245, 0.48);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 21, 38, 0.97);
+  color: #edf9ff;
+  transform: translateX(-50%);
+  scrollbar-color: #669cae #081526;
+  scrollbar-width: thin;
+}
+
+.music-venues-tools header {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding-inline-start: 0.5rem;
+  background: #10283e;
+}
+
+.music-venues-tools h3 {
+  margin: 0;
+  font: 400 0.72rem var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+.music-venues-tools header button {
+  flex: 0 0 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: #edf9ff;
+  font: inherit;
   cursor: pointer;
 }
 
 .music-venues-filter-bar {
-  margin: 0.35rem 0 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
   gap: 0.42rem;
-  padding: 0.5rem;
-  border: 1px solid rgba(153, 221, 245, 0.32);
-  border-radius: var(--radius-sm);
-  background: rgba(8, 21, 38, 0.94);
-  color: #edf9ff;
+  padding: 0.4rem;
   color-scheme: dark;
+}
+
+.music-venues-tools[data-harmony-filter-layout="aisle"] .music-venues-filter-bar {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .music-venues-filter-field {
@@ -4745,7 +4800,6 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 .music-venues-search-input,
 .music-venues-filter-select,
 .music-venues-filter-reset,
-.music-venues-tools summary,
 .music-venues-sectors button {
   min-width: 0;
   min-height: 2.75rem;
@@ -4781,13 +4835,14 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   justify-self: end;
 }
 
-.music-venues-tools summary:hover,
+.music-venues-tools header button:hover,
 .music-venues-filter-reset:hover,
 .music-venues-sectors button:not(:disabled):hover {
   background: #1b3650;
 }
 
-.music-venues-tools summary:focus-visible,
+.harmony-filter-sigil:focus-visible,
+.music-venues-tools header button:focus-visible,
 .music-venues-filter-bar :is(input, select, button):focus-visible,
 .music-venues-sectors button:focus-visible,
 .music-venue-beacon-link:focus-visible {
@@ -4796,6 +4851,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 }
 
 .music-venues-scene {
+  grid-row: 2;
   display: grid;
   place-items: center;
   min-width: 0;
@@ -4912,6 +4968,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 }
 
 .music-venues-sectors:not([hidden]) {
+  grid-row: 3;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
   align-items: center;
@@ -4929,15 +4986,10 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   opacity: 0.48;
 }
 
-.music-venues-sectors strong,
 .music-venues-sectors span {
   display: block;
   font-size: 0.68rem;
   line-height: 1.24;
-}
-
-.music-venues-sectors strong {
-  color: #edf9ff;
 }
 
 .music-venues-sectors span {
@@ -4988,7 +5040,6 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
     padding: 0.3rem;
   }
 
-  .music-venues-sectors strong,
   .music-venues-sectors span {
     font-size: 0.78rem;
   }

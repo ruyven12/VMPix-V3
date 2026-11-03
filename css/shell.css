@@ -5945,6 +5945,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 /* The persistent rail uses one center cutout on Portfolio and world pages. */
+.site-shell[data-shell-route="music-venues"] .engine-lightning-overlay,
 .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .engine-lightning-overlay,
 .site-shell:is(:is([data-shell-route="music"], [data-shell-route="music-shows"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]))), [data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived, :is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back]))) .engine-lightning-overlay {
   --engine-title-exclusion-start: 24%;
@@ -6775,6 +6776,7 @@ html[data-v3-booting][data-v3-home-boot] .site-shell.is-home-route :is(.home-arc
 }
 
 @media (min-width: 64rem) {
+  .site-shell[data-shell-route="music-venues"] .engine-lightning-overlay,
   .site-shell[data-shell-route="portfolio"]:not(.is-portfolio-world-arrived):not([data-world-landing-world]) .engine-lightning-overlay,
   .site-shell:is(:is([data-shell-route="music"], [data-shell-route="music-shows"], :is([data-shell-route="music-bands"], :is([data-shell-route="band-detail"], [data-shell-route="set-detail"]))), [data-shell-route="portfolio"][data-portfolio-gateway-world="battleground"].is-portfolio-world-arrived, :is([data-shell-route="wrestling-shows"].is-wrestling-shows-view:has(.wrestling-shows-shell[data-wrestling-shows-variant="hall-of-crusades"]), :is([data-shell-route="wrestling-show-detail"].is-wrestling-show-detail-view:has(.wrestling-show-detail-shell[data-wrestling-show-detail-presentation="hall"]), [data-encounter-dossier-adopted][data-match-dossier-back]))) .engine-lightning-overlay {
     --engine-title-exclusion-start: 36%;

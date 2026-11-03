@@ -391,7 +391,8 @@ const harmonySigil = harmonyEnvironment?.querySelector("[data-harmony-sigil]");
 const musicVenueBeacons = musicVenuesList?.querySelector("[data-music-venues-beacons]");
 const musicVenuesStatus = musicVenuesList?.querySelector("[data-music-venues-status]");
 const musicVenueConnections = musicVenuesIndex?.querySelector("[data-music-venues-connections]");
-const musicVenuesTools = musicVenuesList?.querySelector("[data-music-venues-tools]");
+const musicVenuesTools = musicVenuesIndex?.querySelector("[data-music-venues-tools]");
+const harmonyFilterSigil = musicVenuesIndex?.querySelector("[data-harmony-filter-sigil]");
 const musicVenuesSectors = musicVenuesList?.querySelector("[data-music-venues-sectors]");
 const musicVenuesRange = musicVenuesSectors?.querySelector("[data-music-venues-range]");
 const harmonyVenueProjection = musicVenuesIndex?.querySelector("[data-harmony-venue-projection]");
@@ -3320,9 +3321,7 @@ function renderMusicVenueSectorSummary(venues, sectorCount) {
   musicVenuesSectors.hidden = !musicVenuesLoaded;
   musicVenuesSectorSteps.forEach(button => { button.disabled = sectorCount < 2; });
 
-  const count = venues.length;
-  musicVenuesCount.textContent = musicVenuesLoaded ? "Showing " + count + (count === 1 ? " Venue" : " Venues") : "";
-  if (!count) {
+  if (!venues.length) {
     musicVenuesRange.textContent = "";
     return;
   }
@@ -3838,6 +3837,46 @@ function startHarmonyRegistryActivation() {
   activation.frame = requestAnimationFrame(tick);
 }
 
+function setMusicVenuesFiltersOpen(isOpen, moveFocus = false) {
+  musicVenuesTools.hidden = !isOpen;
+  harmonyFilterSigil.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    const stage = musicVenueConnections.getBoundingClientRect();
+    if (stage.width && stage.height) positionHarmonyFilters(stage);
+    else scheduleMusicVenueConnectors();
+    if (moveFocus) musicVenuesTools.scrollTop = 0;
+  }
+  if (!moveFocus) return;
+  const target = isOpen ? musicVenuesFilters.querySelector("[data-music-venues-filter='search']") : harmonyFilterSigil;
+  target?.focus({ preventScroll: true });
+}
+
+function positionHarmonyFilters(stage) {
+  const sigil = harmonySigil.getBoundingClientRect();
+  const x = (sigil.left + sigil.right) / 2 - stage.left;
+  const y = (sigil.top + sigil.bottom) / 2 - stage.top;
+  const style = musicVenuesIndex.style;
+  style.setProperty("--harmony-filter-x", x + "px");
+  style.setProperty("--harmony-filter-y", y + "px");
+  style.setProperty("--harmony-filter-target", sigil.width + "px");
+  if (musicVenuesTools.hidden) return;
+
+  const beacons = [...musicVenueBeacons.children];
+  const gap = musicVenueBeacons.hidden ? 0 : parseFloat(getComputedStyle(musicVenueBeacons).columnGap);
+  const firstPlate = beacons.length ? Math.min(...beacons.map(beacon => beacon.getBoundingClientRect().top)) : Infinity;
+  const status = musicVenuesStatus.firstElementChild?.getBoundingClientRect().top ?? Infinity;
+  const clearTop = Math.min(firstPlate, status, sigil.top) - stage.top;
+  // Narrow scenes use the open sky above the labels. Wider scenes use the central aisle.
+  const useAisle = gap > 140 || (clearTop < 130 && gap >= 64);
+  const panelBottom = (useAisle ? sigil.top - stage.top : clearTop) - 8;
+  const panelTop = Math.max(4, panelBottom - (useAisle ? 320 : 232));
+  const panelWidth = useAisle ? gap - 12 : Math.min(stage.width - 16, 368);
+  musicVenuesTools.dataset.harmonyFilterLayout = useAisle ? "aisle" : "sky";
+  style.setProperty("--harmony-filter-panel-top", panelTop + "px");
+  style.setProperty("--harmony-filter-panel-height", Math.max(0, panelBottom - panelTop) + "px");
+  style.setProperty("--harmony-filter-panel-width", panelWidth + "px");
+}
+
 function scheduleMusicVenueConnectors() {
   if (!harmonyEnvironment || musicVenueConnectorFrame) return;
   musicVenueConnectorFrame = requestAnimationFrame(() => {
@@ -3854,6 +3893,7 @@ function scheduleMusicVenueConnectors() {
     const artTop = paint.top + (paint.height - 941 * scale) * cropY;
 
     const stage = musicVenueConnections.getBoundingClientRect();
+    if (stage.width && stage.height) positionHarmonyFilters(stage);
     if (!stage.width || !stage.height || musicVenueBeacons.hidden) {
       if (!musicVenueBeacons.hidden) settleHarmonyRegistryActivation();
       musicVenueConnections.replaceChildren();
@@ -17879,7 +17919,7 @@ function initMusicModule() {
     if (harmonyArrival.hidden || getRouteFromUrl().name !== "music-venues") return;
     inspectedMusicVenueSlug = "";
     activeMusicVenueSector = 0;
-    musicVenuesTools.open = false;
+    setMusicVenuesFiltersOpen(false);
     startHarmonyRegistryActivation();
     showMusicVenuesBrowser();
     musicVenuesList.scrollTop = 0;
@@ -17901,7 +17941,13 @@ function initMusicModule() {
     musicVenueProjection?.finishImmediately();
   });
   musicVenuesList?.addEventListener("scroll", scheduleMusicVenueConnectors, { passive: true });
-  musicVenuesTools?.addEventListener("toggle", scheduleMusicVenueConnectors);
+  harmonyFilterSigil?.addEventListener("click", () => setMusicVenuesFiltersOpen(musicVenuesTools.hidden, true));
+  musicVenuesTools?.querySelector("[data-harmony-filter-close]")?.addEventListener("click", () => setMusicVenuesFiltersOpen(false, true));
+  musicVenuesIndex?.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || musicVenuesTools.hidden || musicVenueProjection) return;
+    event.stopPropagation();
+    setMusicVenuesFiltersOpen(false, true);
+  });
   if (harmonyEnvironment && musicVenuesIndex && typeof ResizeObserver !== "undefined") {
     const observer = new ResizeObserver(scheduleMusicVenueConnectors);
     observer.observe(harmonyEnvironment);
@@ -18135,7 +18181,7 @@ function captureMusicResumeState(route) {
     venue: activeMusicVenueSlugFilter,
     sort: activeMusicVenueSort,
     sector: activeMusicVenueSector,
-    filtersOpen: musicVenuesTools.open,
+    filtersOpen: !musicVenuesTools.hidden,
     inspectedVenue: inspectedMusicVenueSlug,
   };
   if(route.name==='music-venue-detail')return {
@@ -18167,7 +18213,7 @@ function seedMusicResumeState(route,ui) {
     activeMusicVenueSort = musicVenueSortOptions.some(option => option.value === ui.sort) ? ui.sort : "az";
     activeMusicVenueSector = Math.floor(v3Number(ui.sector));
     inspectedMusicVenueSlug = normalizeMusicVenueSlugValue(ui.inspectedVenue);
-    musicVenuesTools.open = ui.filtersOpen === true;
+    setMusicVenuesFiltersOpen(ui.filtersOpen === true);
     return;
   }
   if(route.name==='music-shows'){
