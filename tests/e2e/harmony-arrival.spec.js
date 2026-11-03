@@ -74,6 +74,53 @@ async function expectHarbor(page) {
   return harbor;
 }
 
+async function expectSectorGeometry(archive, expectedCount = 6) {
+  const markers = archive.locator("[data-music-venues-connections] circle");
+  await expect(markers).toHaveCount(expectedCount);
+  await expect(archive.locator("[data-music-venues-connections] line")).toHaveCount(expectedCount);
+  const geometry = await archive.evaluate(node => {
+    const engineBar = document.querySelector("[data-portfolio-engine]");
+    const rect = node.getBoundingClientRect();
+    const scroll = node.querySelector("[data-music-venues-list]");
+    const footer = node.querySelector("[data-music-venues-sectors]").getBoundingClientRect();
+    const labels = [...node.querySelectorAll(".music-venue-beacon")].map(beacon => beacon.getBoundingClientRect());
+    const artwork = [[844, 485], [866, 515], [824, 548], [874, 583], [794, 618], [878, 650]];
+    const scale = Math.max(rect.width / 1672, rect.height / 941);
+    const left = (rect.width - 1672 * scale) / 2;
+    const top = (rect.height - 941 * scale) * 0.62;
+    const markers = [...node.querySelectorAll("[data-music-venues-connections] circle")];
+    return {
+      clearance: engineBar.getBoundingClientRect().top - rect.bottom,
+      widthRatio: rect.width / innerWidth,
+      width: innerWidth,
+      overflow: scroll.scrollWidth - scroll.clientWidth,
+      footerGap: rect.bottom - footer.bottom,
+      art: getComputedStyle(node).backgroundImage.includes("zhento-harmony.png"),
+      anchors: markers.every((marker, index) => {
+        const [artX, artY] = artwork[index];
+        const x = Number(marker.getAttribute("cx"));
+        const y = Number(marker.getAttribute("cy"));
+        return Math.abs(x - (left + artX * scale)) < 1 && Math.abs(y - (top + artY * scale)) < 1
+          && x > 0 && x < rect.width && y > 0 && y < rect.height
+          && !labels.some(label => rect.left + x > label.left && rect.left + x < label.right
+            && rect.top + y > label.top && rect.top + y < label.bottom);
+      }),
+      labelsFit: labels.every((label, index) =>
+        label.left >= rect.left && label.right <= rect.right && label.top >= rect.top && label.bottom <= footer.top
+        && !labels.slice(index + 1).some(other => label.left < other.right && label.right > other.left
+          && label.top < other.bottom && label.bottom > other.top)),
+    };
+  });
+  expect(Math.abs(geometry.clearance - 20)).toBeLessThanOrEqual(2);
+  expect(geometry.widthRatio).toBeGreaterThan(geometry.width >= 1024 ? 0.99 : 0.8);
+  expect(geometry.overflow).toBeLessThanOrEqual(1);
+  expect(geometry.footerGap).toBeGreaterThanOrEqual(0);
+  expect(geometry.footerGap).toBeLessThan(10);
+  expect(geometry.art).toBe(true);
+  expect(geometry.anchors).toBe(true);
+  expect(geometry.labelsFit).toBe(true);
+}
+
 for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]) {
   for (const reducedMotion of ["no-preference", "reduce"]) {
     test.describe("Harbor " + width + "x" + height + " " + reducedMotion, () => {
@@ -106,91 +153,99 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         const beacons = list.getByRole("list", { name: "Venue beacons" });
         const search = page.getByRole("searchbox", { name: "Search Venue" });
         const state = page.getByRole("combobox", { name: "Filter venues by state" });
-        const more = list.getByRole("button", { name: "Show more venues" });
-        await expect(beacons.getByRole("listitem")).toHaveCount(24);
-        await expect(list.getByRole("status")).toHaveText("24 of 90 venues");
-        await expect(beacons.getByRole("link", { name: "Signal Hall 30 Portland, ME" })).toHaveCount(0);
-        await expect(beacons.getByRole("link").first()).toHaveAttribute("href", harborPath + "/signal-0");
+        const sort = page.getByRole("combobox", { name: "Filter venues by sort" });
+        const venueFilter = page.getByRole("combobox", { name: "Filter venues by venue" });
+        const filters = list.locator("summary");
+        const previous = list.getByRole("button", { name: "Previous Sector" });
+        const next = list.getByRole("button", { name: "Next Sector" });
+        const count = list.locator("[data-music-venues-count]");
+        const range = list.locator("[data-music-venues-range]");
+        const inspect = number => beacons.getByRole("link", { name: "Inspect Signal Hall " + number });
+        await expect(beacons.getByRole("listitem")).toHaveCount(6);
+        await expect(count).toHaveText("Showing 6 Venues");
+        await expect(range).toHaveText("Maine Venues — S");
+        await expect(search).toBeHidden();
+        await expect(inspect("00")).toHaveAttribute("href", harborPath + "/signal-0");
+        expect(await inspect("00").evaluate(node => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
         expect(await page.evaluate(() => history.length)).toBe(beforeBrowse);
         expect(requests).toBe(1);
-        const registryLayout = await archive.evaluate(node => {
-          const engineBar = document.querySelector("[data-portfolio-engine]");
-          const rect = node.getBoundingClientRect();
-          const scroller = node.querySelector("[data-music-venues-list]");
-          return {
-            clearance: engineBar.getBoundingClientRect().top - rect.bottom,
-            widthRatio: rect.width / innerWidth,
-            overflow: scroller.scrollWidth - scroller.clientWidth,
-            scroll: scroller.scrollHeight > scroller.clientHeight,
-            art: getComputedStyle(node).backgroundImage.includes("zhento-harmony.png"),
-          };
-        });
-        expect(Math.abs(registryLayout.clearance - 20)).toBeLessThanOrEqual(2);
-        expect(registryLayout.widthRatio).toBeGreaterThan(width >= 1024 ? 0.99 : 0.8);
-        expect(registryLayout.overflow).toBeLessThanOrEqual(1);
-        expect(registryLayout.scroll).toBe(true);
-        expect(registryLayout.art).toBe(true);
+        await expectSectorGeometry(archive);
 
         if (reducedMotion === "no-preference") {
-          await page.screenshot({ path: testInfo.outputPath("beacon-registry-" + width + "x" + height + ".png") });
+          await page.screenshot({ path: testInfo.outputPath("beacon-sectors-" + width + "x" + height + ".png") });
         }
 
+        await previous.press("Enter");
+        await expect(inspect("84")).toBeVisible();
+        await expect(range).toHaveText("ME / NH Venues — S");
+        await next.press("Enter");
+        await expect(inspect("00")).toBeVisible();
+
+        await filters.press("Enter");
         await search.fill("Concord");
         await expect(beacons.getByRole("listitem")).toHaveCount(5);
-        await expect(beacons.getByRole("link").first()).toContainText("Concord, NH");
-        await expect(more).toBeHidden();
-        await page.getByRole("combobox", { name: "Filter venues by sort" }).selectOption("photos");
+        await expect(beacons.getByRole("listitem").first()).toContainText("Concord, NH");
+        await expect(count).toHaveText("Showing 5 Venues");
+        await expect(range).toHaveText("New Hampshire Venues — S");
+        await expect(next).toBeDisabled();
+        await sort.selectOption("photos");
         await expect(beacons.locator("strong")).toHaveText(["Signal Hall 89", "Signal Hall 86", "Signal Hall 88", "Signal Hall 85", "Signal Hall 87"]);
         await search.fill("Signal Hall");
         await state.focus();
         await state.selectOption("ME");
         await expect(state).toBeFocused();
-        await page.getByRole("combobox", { name: "Filter venues by sort" }).selectOption("newest");
-        await expect(beacons.getByRole("listitem")).toHaveCount(24);
-        await expect(beacons.getByRole("link").first()).toContainText("Signal Hall 84");
-        await page.getByRole("combobox", { name: "Filter venues by venue" }).selectOption("signal-30");
+        await sort.selectOption("newest");
+        await expect(inspect("84")).toBeVisible();
+        await venueFilter.selectOption("signal-30");
         await expect(beacons.getByRole("listitem")).toHaveCount(1);
-        await expect(beacons.getByRole("link").first()).toContainText("Signal Hall 30");
-        await page.getByRole("combobox", { name: "Filter venues by venue" }).selectOption("");
-        await more.press("Enter");
-        await expect(beacons.getByRole("link", { name: "Signal Hall 60 Portland, ME" })).toBeFocused();
-        await expect(beacons.getByRole("listitem")).toHaveCount(48);
-        await more.press("Enter");
-        await expect(beacons.getByRole("listitem")).toHaveCount(72);
-        await expect(list.getByRole("status")).toHaveText("72 of 85 venues");
-        const venue = beacons.getByRole("link", { name: "Signal Hall 30 Portland, ME" });
+        await expect(count).toHaveText("Showing 1 Venue");
+        await expect(inspect("30")).toBeVisible();
+        await venueFilter.selectOption("");
+        await filters.press("Enter");
+        await expect(search).toBeHidden();
+
+        await previous.press("Enter");
+        await expect(beacons.getByRole("listitem")).toHaveCount(1);
+        await expect(count).toHaveText("Showing 1 Venue");
+        await expect(inspect("00")).toBeVisible();
+        await next.press("Enter");
+        await expect(inspect("84")).toBeVisible();
+        await next.press("Enter");
+        await expect(inspect("78")).toBeVisible();
+        await next.press("Enter");
+        await expect(inspect("72")).toBeVisible();
+        await expect(inspect("84")).toHaveCount(0);
+        const venue = inspect("72");
         await venue.scrollIntoViewIfNeeded();
         const scroll = await list.evaluate(node => node.scrollTop);
-        expect(scroll).toBeGreaterThan(0);
         await venue.press("Enter");
-        await expect(page).toHaveURL(baseURL + harborPath + "/signal-30");
-        await expect(page.getByRole("heading", { name: "Signal Hall 30" })).toBeVisible();
+        await expect(page).toHaveURL(baseURL + harborPath + "/signal-72");
+        await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
         await expect(harbor).toBeHidden();
 
         async function expectRestoredArchive() {
           await expect(page).toHaveURL(baseURL + harborPath);
-          await expect(search).toHaveValue("Signal Hall");
-          await expect(page.getByRole("combobox", { name: "Filter venues by state" })).toHaveValue("ME");
-          await expect(page.getByRole("combobox", { name: "Filter venues by sort" })).toHaveValue("newest");
-          await expect(beacons.getByRole("listitem")).toHaveCount(72);
+          await expect(list.locator('[data-music-venues-filter="search"]')).toHaveValue("Signal Hall");
+          await expect(list.locator('[data-music-venues-filter="state"]')).toHaveValue("ME");
+          await expect(list.locator('[data-music-venues-filter="sort"]')).toHaveValue("newest");
+          await expect(search).toBeHidden();
+          await expect(beacons.getByRole("listitem")).toHaveCount(6);
+          await expect(inspect("72")).toBeVisible();
           await expect.poll(() => list.evaluate((node, saved) => Math.abs(node.scrollTop - saved), scroll)).toBeLessThan(2);
           await expect(harbor).toBeHidden();
         }
         await page.locator("[data-prototype-engine-return]").press("Enter");
         await expectRestoredArchive();
         await page.goForward();
-        await expect(page.getByRole("heading", { name: "Signal Hall 30" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
         if (width === 412 && reducedMotion === "reduce") {
           await page.reload({ waitUntil: "domcontentloaded" });
-          await expect(page.getByRole("heading", { name: "Signal Hall 30" })).toBeVisible();
+          await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
         }
         await page.goBack();
         await expectRestoredArchive();
-        await more.press("Enter");
-        await expect(beacons.getByRole("link", { name: "Signal Hall 12 Portland, ME" })).toBeFocused();
-        await expect(beacons.getByRole("listitem")).toHaveCount(85);
-        await expect(list.getByRole("status")).toHaveText("85 venues");
-        await expect(more).toBeHidden();
+        await next.press("Enter");
+        await expect(inspect("66")).toBeVisible();
         const beforeRefresh = requests;
         await page.reload({ waitUntil: "domcontentloaded" });
         await expectHarbor(page);
@@ -220,7 +275,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expect(archive.getByRole("listitem")).toHaveCount(0);
         await archive.getByRole("button", { name: "Retry Venues" }).click();
         await expect(archive.getByText("No venues match the current filters.")).toBeVisible();
-        await expect(archive.locator("[data-music-venues-count]")).toHaveText("0 venues");
+        await expect(archive.locator("[data-music-venues-count]")).toHaveText("Showing 0 Venues");
         expect(requests).toBe(2);
         await expect(harbor).toBeHidden();
       });
@@ -247,18 +302,44 @@ test("keeps the Harbor clear of simulated landscape safe areas", async ({ page, 
   await harbor.getByRole("button", { name: "Browse Venues" }).click();
   const scroller = page.locator("[data-music-venues-list]");
   const search = page.getByRole("searchbox", { name: "Search Venue" });
-  await expect(scroller.getByRole("listitem")).toHaveCount(24);
+  await expect(scroller.getByRole("listitem")).toHaveCount(6);
   const inlinePadding = await scroller.evaluate(node => {
     const style = getComputedStyle(node);
     return [parseFloat(style.paddingRight), parseFloat(style.paddingLeft)];
   });
   expect(inlinePadding).toEqual([insets.right, insets.left]);
   await page.setViewportSize({ width: 412, height: 330 });
+  await scroller.locator("summary").press("Enter");
   await search.fill("Concord");
   await expect(search).toBeFocused();
   await expect(search).toBeInViewport({ ratio: 1 });
-  const lastResult = scroller.getByRole("link", { name: "Signal Hall 89 Concord, NH" });
+  const lastResult = scroller.getByRole("link", { name: "Inspect Signal Hall 89" });
   await lastResult.scrollIntoViewIfNeeded();
   await expect(lastResult).toBeInViewport({ ratio: 1 });
   await expect(scroller.getByRole("listitem")).toHaveCount(5);
+  await scroller.locator("summary").press("Enter");
+  await page.setViewportSize({ width: 915, height: 412 });
+  await expectSectorGeometry(page.locator("[data-music-venues-index]"), 5);
+});
+
+test("Harbor sector caption reports actual mixed-state bounds in newest order", async ({ page, baseURL }) => {
+  const venues = [
+    { venue_id: "foundry", name: "Foundry", state: "NH", created_at: "2024-03-01" },
+    { venue_id: "atlas", name: "Atlas", state: "ME", created_at: "2024-02-01" },
+    { venue_id: "cedar", name: "Cedar", city: "Portland", created_at: "2024-01-01" },
+  ];
+  await mockArchive(page, baseURL, () => ({ data: venues }));
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  await page.getByRole("button", { name: "Browse Venues" }).click();
+
+  const range = page.locator("[data-music-venues-range]");
+  const names = page.getByRole("list", { name: "Venue beacons" }).locator("strong");
+  await expect(names).toHaveText(["Atlas", "Cedar", "Foundry"]);
+  await expect(range).toHaveText("ME / NH Venues (state pending) — A–F");
+  await page.locator("[data-music-venues-tools] summary").press("Enter");
+  await page.getByRole("combobox", { name: "Filter venues by sort" }).selectOption("newest");
+  await expect(names).toHaveText(["Foundry", "Atlas", "Cedar"]);
+  await expect(range).toHaveText("ME / NH Venues (state pending) — A–F");
 });

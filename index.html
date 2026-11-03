@@ -1210,16 +1210,25 @@
           </section>
 
           <section class="music-venues-archive" aria-labelledby="music-venues-archive-title" aria-hidden="true" inert data-music-venues-index>
+            <svg class="music-venues-connections" data-music-venues-connections aria-hidden="true"></svg>
             <div class="music-venues-list" data-music-venues-list>
-              <header class="music-venues-archive-header">
-                <p class="music-venues-kicker">Harbor of Harmony</p>
-                <h2 id="music-venues-archive-title" tabindex="-1">Beacon Registry</h2>
-                <p class="music-venues-count" role="status" data-music-venues-count></p>
-              </header>
-              <div class="music-venues-filters" data-music-venues-filters></div>
-              <div data-music-venues-status></div>
-              <ul class="music-venues-beacons" role="list" aria-label="Venue beacons" data-music-venues-beacons hidden></ul>
-              <button class="music-venues-more" type="button" data-music-venues-more hidden>Show more venues</button>
+              <h2 class="sr-only" id="music-venues-archive-title" tabindex="-1">Beacon Registry</h2>
+              <details class="music-venues-tools" data-music-venues-tools>
+                <summary>Filters</summary>
+                <div data-music-venues-filters></div>
+              </details>
+              <div class="music-venues-scene">
+                <div data-music-venues-status></div>
+                <ul class="music-venues-beacons" role="list" aria-label="Venue beacons" data-music-venues-beacons hidden></ul>
+              </div>
+              <nav class="music-venues-sectors" aria-label="Venue sectors" data-music-venues-sectors hidden>
+                <button type="button" data-music-venues-sector-step="-1">Previous Sector</button>
+                <div role="status" aria-atomic="true">
+                  <strong data-music-venues-count></strong>
+                  <span data-music-venues-range></span>
+                </div>
+                <button type="button" data-music-venues-sector-step="1">Next Sector</button>
+              </nav>
             </div>
           </section>
 
