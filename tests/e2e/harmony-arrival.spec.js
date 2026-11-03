@@ -26,15 +26,16 @@ async function mockArchive(page, baseURL, venueResponse) {
 
 async function expectHarbor(page) {
   const harbor = page.locator("[data-harmony-arrival]");
-  await expect(harbor.getByRole("heading", { name: "Harbor of Harmony" })).toBeVisible();
-  await expect(harbor.getByText("The Music Venue Archive")).toBeVisible();
-  await expect(harbor.locator(".harmony-arrival__sigil")).toBeVisible();
+  await expect(harbor.getByRole("heading", { name: "Harbor of Harmony" })).toBeInViewport({ ratio: 1 });
+  await expect(harbor.getByText("The Music Venue Archive")).toBeInViewport({ ratio: 1 });
+  await expect(harbor.locator(".harmony-arrival__sigil")).toBeInViewport({ ratio: 1 });
   await expect(page.locator("[data-music-venues-index]")).toBeHidden();
   await expect(page.getByRole("searchbox", { name: "Search Venue" })).toHaveCount(0);
-  const art = await harbor.locator(".harmony-arrival__scene").evaluate(async scene => {
-    const background = getComputedStyle(scene, "::before").backgroundImage;
+  const art = await harbor.evaluate(async node => {
+    const style = getComputedStyle(node);
+    const background = style.backgroundImage;
     const url = background.match(/url\("([^"]+zhento-harmony\.png)"\)/)?.[1];
-    if (!url) return false;
+    if (!url || !style.backgroundSize.endsWith("cover")) return false;
     const image = new Image();
     image.src = url;
     await image.decode();
@@ -42,23 +43,25 @@ async function expectHarbor(page) {
   });
   expect(art).toBe(true);
   await page.evaluate(() => document.fonts.ready.then(() => true));
-  await expect(harbor.getByRole("button", { name: "Browse Venues" })).toBeInViewport();
+  await expect(harbor.getByRole("button", { name: "Browse Venues" })).toBeInViewport({ ratio: 1 });
   const engine = page.locator("[data-prototype-engine-return]");
   await expect(engine).toBeInViewport();
   const metrics = await harbor.evaluate(node => {
-    const engineBack = document.querySelector("[data-prototype-engine-return]");
+    const engineBar = document.querySelector("[data-portfolio-engine]");
     const harborRect = node.getBoundingClientRect();
     return {
       viewportOverflow: document.documentElement.scrollWidth - innerWidth,
       chamberOverflow: node.scrollWidth - node.clientWidth,
       chamberScroll: node.scrollHeight - node.clientHeight,
-      clearance: engineBack.getBoundingClientRect().top - harborRect.bottom,
+      clearance: engineBar.getBoundingClientRect().top - harborRect.bottom,
+      widthRatio: harborRect.width / innerWidth,
     };
   });
   expect(metrics.viewportOverflow).toBeLessThanOrEqual(1);
   expect(metrics.chamberOverflow).toBeLessThanOrEqual(1);
   expect(metrics.chamberScroll).toBeLessThanOrEqual(1);
-  expect(metrics.clearance).toBeGreaterThanOrEqual(-1);
+  expect(metrics.widthRatio).toBeGreaterThan(0.8);
+  expect(Math.abs(metrics.clearance - 20)).toBeLessThanOrEqual(2);
   return harbor;
 }
 

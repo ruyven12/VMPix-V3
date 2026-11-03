@@ -4266,6 +4266,17 @@ html.is-lightbox-scroll-locked body {
   line-height: 0.96;
 }
 
+/* The arrival uses the Shell's available stage above its existing Engine reserve. */
+.site-shell[data-shell-route="music-venues"] .portfolio-hub:has(> .is-harmony-arrival) {
+  align-self: start;
+  width: min(100%, 112rem);
+  height: calc(100% - max(0px, 20px - 1rem));
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
 .music-nexus-shell.is-harmony-arrival {
   grid-auto-rows: minmax(0, 1fr);
   align-content: stretch;
@@ -4280,10 +4291,8 @@ html.is-lightbox-scroll-locked body {
 }
 
 .harmony-arrival:not([hidden]) {
-  position: relative;
-  isolation: isolate;
   display: grid;
-  grid-template-rows: auto minmax(7rem, 1fr) auto;
+  grid-template-rows: auto minmax(min-content, 1fr) auto;
   justify-items: center;
   gap: clamp(0.55rem, 2.4vh, 1.4rem);
   min-width: 0;
@@ -4293,7 +4302,9 @@ html.is-lightbox-scroll-locked body {
     max(clamp(0.85rem, 6vh, 3.8rem), env(safe-area-inset-bottom))
     max(0.85rem, env(safe-area-inset-left));
   overflow: auto;
-  background: radial-gradient(ellipse at center, #182747, #080e20 76%);
+  background:
+    linear-gradient(180deg, rgba(6, 12, 25, 0.7), rgba(6, 12, 25, 0.28) 24%, transparent 43% 78%, rgba(6, 12, 25, 0.52)),
+    #080e20 url("/assets/media/background/zhento-harmony.png") center 62% / cover no-repeat;
   color: #f3f3ff;
   text-align: center;
 }
@@ -4312,37 +4323,21 @@ html.is-lightbox-scroll-locked body {
 
 .harmony-arrival__identity p {
   margin: 0.5rem 0 0;
-  color: #d9d9f3;
+  color: #e3e6fb;
   font-size: clamp(0.85rem, 2.2vw, 1.1rem);
   letter-spacing: 0.08em;
+  text-shadow: 0 1px 8px #080e20;
 }
 
 .harmony-arrival__scene {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  align-self: end;
+  padding-block-end: clamp(0.5rem, 10vh, 7rem);
   pointer-events: none;
 }
 
-.harmony-arrival__scene::before,
 .harmony-arrival__sigil {
-  grid-area: 1 / 1;
-}
-
-.harmony-arrival__scene::before {
-  width: 100%;
-  height: 100%;
-  content: "";
-  background:
-    linear-gradient(180deg, rgba(8, 14, 32, 0.91), transparent 40%, transparent 68%, rgba(8, 14, 32, 0.86)),
-    url("/assets/media/background/zhento-harmony.png") center 57% / cover no-repeat;
-}
-
-.harmony-arrival__sigil {
-  width: clamp(6rem, min(26vw, 27vh), 12rem);
-  transform: translateY(22%);
+  display: block;
+  width: clamp(5rem, min(26vw, 23vh), 11rem);
   stroke: #c4d8ff;
   stroke-width: 1;
   stroke-linecap: round;
@@ -4380,37 +4375,11 @@ html.is-lightbox-scroll-locked body {
 
 @media (max-height: 500px) and (orientation: landscape) {
   .harmony-arrival:not([hidden]) {
-    grid-template-rows: auto minmax(5.5rem, 1fr) auto;
     padding-block: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-bottom));
-  }
-}
-
-@media (max-aspect-ratio: 1/1) {
-  .harmony-arrival:not([hidden]) {
-    grid-template-rows: auto auto auto;
-    align-content: center;
-    gap: clamp(1rem, 3.5vh, 2rem);
-    background:
-      radial-gradient(ellipse at center, rgba(8, 14, 32, 0.84), #080e20 76%),
-      url("/assets/media/background/zhento-harmony.png") center / cover no-repeat;
   }
 
   .harmony-arrival__scene {
-    position: relative;
-    z-index: 0;
-    grid-row: 2;
-    align-self: stretch;
-    justify-self: stretch;
-    margin-inline:
-      calc(-1 * max(0.85rem, env(safe-area-inset-left)))
-      calc(-1 * max(0.85rem, env(safe-area-inset-right)));
-  }
-
-  .harmony-arrival__scene::before {
-    height: auto;
-    aspect-ratio: 1.4;
-    background: url("/assets/media/background/zhento-harmony.png") center / cover no-repeat;
-    mask-image: linear-gradient(180deg, transparent, #000 13% 87%, transparent);
+    padding-block-end: 0;
   }
 }
 
