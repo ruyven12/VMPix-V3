@@ -4535,8 +4535,8 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 .harmony-registry-pulse {
   fill: none;
   opacity: 0;
-  stroke: #c1f4ff;
-  stroke-width: 1.25;
+  stroke: #83edff;
+  stroke-width: 2.25;
   stroke-linecap: round;
 }
 
@@ -4546,16 +4546,18 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 }
 
 .music-venues-archive[data-harmony-activation] :is(.music-venue-beacon, .music-venues-connections line) {
-  opacity: clamp(0, (var(--harmony-nameplate-progress, 0) - var(--harmony-nameplate-lag, 0))
-    / (1 - var(--harmony-nameplate-lag, 0)), 1);
+  --harmony-plate-reveal: clamp(0, (var(--harmony-registry-time, 0) - var(--harmony-nameplate-start, 900)) / 300, 1);
+  opacity: var(--harmony-plate-reveal);
 }
 
 .music-venues-archive[data-harmony-activation] .music-venue-beacon {
-  translate: var(--harmony-nameplate-shift, 5px) 0;
+  --harmony-plate-remaining: calc(1 - var(--harmony-plate-reveal));
+  --harmony-plate-shift: calc(5px * var(--harmony-plate-remaining) * var(--harmony-plate-remaining) * var(--harmony-plate-remaining));
+  translate: var(--harmony-plate-shift) 0;
 }
 
 .music-venues-archive[data-harmony-activation] .music-venue-beacon:nth-child(even) {
-  translate: calc(-1 * var(--harmony-nameplate-shift, 5px)) 0;
+  translate: calc(-1 * var(--harmony-plate-shift)) 0;
 }
 
 .music-venues-archive[data-harmony-activation]:not([data-harmony-activation="nameplates"]) .music-venue-beacon-stud__inlay {
@@ -4702,7 +4704,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   margin: 0;
   padding: 0.18rem 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(min-content, 1fr));
+  grid-template-rows: repeat(4, minmax(min-content, 1fr));
   align-items: center;
   gap: 0.24rem clamp(4rem, 18vw, 12rem);
   list-style: none;
@@ -4877,6 +4879,22 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   .music-venues-sectors strong,
   .music-venues-sectors span {
     font-size: 0.78rem;
+  }
+}
+
+@media (max-height: 500px) {
+  .music-venues-list {
+    gap: 0.24rem;
+    padding-block: 0.25rem 0.18rem;
+  }
+
+  .music-venues-beacons:not([hidden]) {
+    padding-block: 0;
+    row-gap: 0.16rem;
+  }
+
+  .music-venue-beacon-label {
+    padding-block: 0.15rem;
   }
 }
 
