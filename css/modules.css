@@ -4508,6 +4508,118 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   grid-template-rows: minmax(0, 1fr);
 }
 
+.music-venues-archive[data-harmony-projection="visible"] > :is(.music-venues-list, .music-venues-connections) {
+  visibility: hidden;
+}
+
+.harmony-venue-projection:not([hidden]) {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(min-content, 1fr) auto;
+  justify-items: center;
+  gap: 0.5rem;
+  overflow: auto;
+  padding: max(0.55rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
+    0.45rem max(0.5rem, env(safe-area-inset-left));
+  text-align: center;
+}
+
+.harmony-venue-projection__identity {
+  display: grid;
+  justify-items: center;
+  align-self: center;
+  gap: 0.28rem;
+  width: min(100%, 45rem);
+  color: #edf9ff;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 9px #081321, 0 1px 18px #081321;
+}
+
+.harmony-venue-projection__mark {
+  display: grid;
+  place-items: center;
+  width: min(100%, 10rem);
+  height: clamp(2.7rem, 12vh, 7.5rem);
+  margin-block-end: 0.3rem;
+}
+
+.harmony-venue-projection__mark img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px #081321);
+}
+
+.harmony-venue-projection__identity h2,
+.harmony-venue-projection__identity p {
+  margin: 0;
+}
+
+.harmony-venue-projection__identity h2 {
+  font: 400 clamp(1.25rem, min(5.8vw, 7vh), 2.5rem)/1.12 var(--font-display);
+  text-wrap: balance;
+}
+
+.harmony-venue-projection__kicker {
+  color: #aeeeff;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.harmony-venue-projection__location {
+  color: #d3e8f2;
+  font-size: clamp(0.76rem, 2.5vw, 0.9rem);
+}
+
+.harmony-venue-projection__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  width: min(100%, 34rem);
+}
+
+.harmony-venue-projection__actions :is(button, a) {
+  display: grid;
+  place-items: center;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(153, 221, 245, 0.48);
+  border-radius: var(--radius-sm);
+  background: #10283e;
+  color: #e9f8ff;
+  font: inherit;
+  font-size: clamp(0.7rem, 2.4vw, 0.84rem);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.harmony-venue-projection__actions a {
+  border-color: #92d7ee;
+  background: #173a53;
+}
+
+.harmony-venue-projection__actions :is(button, a):hover {
+  background: #214863;
+}
+
+.harmony-venue-projection__actions :is(button, a):focus-visible {
+  outline: 2px solid #b4f0ff;
+  outline-offset: -2px;
+}
+
+@media (max-height: 500px) {
+  .harmony-venue-projection__identity {
+    align-self: start;
+  }
+
+  .harmony-venue-projection__mark {
+    height: clamp(2rem, 10vh, 3.25rem);
+  }
+}
+
 .music-venues-connections {
   position: absolute;
   inset: 0;

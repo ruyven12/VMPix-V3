@@ -116,6 +116,32 @@ async function expectHarbor(page) {
   return harbor;
 }
 
+async function expectVenueProjection(page, name, location) {
+  const projection = page.locator("[data-harmony-venue-projection]");
+  await expect(projection).toBeVisible();
+  await expect(projection.getByRole("heading", { name, exact: true })).toBeFocused();
+  await expect(projection.getByText("Beacon Locked", { exact: true })).toBeVisible();
+  await expect(projection.locator("[data-harmony-venue-location]")).toHaveText(location);
+  await expect(page.locator("[data-music-venues-list]")).toBeHidden();
+  await expect(page.locator("[data-music-venues-list]")).toHaveAttribute("inert", "");
+  await expect(page.locator("[data-music-venues-connections]")).toBeHidden();
+  const fits = await projection.evaluate(node => {
+    const identity = node.querySelector(".harmony-venue-projection__identity").getBoundingClientRect();
+    const actions = node.querySelector(".harmony-venue-projection__actions").getBoundingClientRect();
+    const sigil = document.querySelector("[data-harmony-sigil]").getBoundingClientRect();
+    const engine = document.querySelector("[data-portfolio-engine]").getBoundingClientRect();
+    return identity.bottom <= sigil.top && sigil.bottom <= actions.top
+      && engine.top - actions.bottom >= 20
+      && node.scrollWidth - node.clientWidth <= 1
+      && [...node.querySelectorAll("button, a")].every(control => {
+        const box = control.getBoundingClientRect();
+        return box.width >= 44 && box.height >= 44;
+      });
+  });
+  expect(fits).toBe(true);
+  return projection;
+}
+
 async function expectSectorGeometry(archive, expectedCount = 8) {
   const markers = archive.locator("[data-music-venues-connections] .music-venue-beacon-stud");
   await expect(markers).toHaveCount(expectedCount);
@@ -331,6 +357,10 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await venue.scrollIntoViewIfNeeded();
         const scroll = await list.evaluate(node => node.scrollTop);
         await venue.press("Enter");
+        await expect(page).toHaveURL(baseURL + harborPath);
+        const projection = await expectVenueProjection(page, "Signal Hall 68", "Portland, ME");
+        expect(await page.evaluate(() => history.length)).toBe(beforeBrowse);
+        await projection.getByRole("link", { name: "Enter Venue" }).press("Enter");
         await expect(page).toHaveURL(baseURL + harborPath + "/signal-68");
         await expect(page.getByRole("heading", { name: "Signal Hall 68" })).toBeVisible();
         await expect(harbor).toBeHidden();
@@ -343,7 +373,8 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
           await expect(list.locator('[data-music-venues-filter="sort"]')).toHaveValue("newest");
           await expect(search).toBeHidden();
           await expect(beacons.getByRole("listitem")).toHaveCount(8);
-          await expect(inspect("68")).toBeVisible();
+          await expect(inspect("68")).toBeFocused();
+          await expect(projection).toBeHidden();
           await expect.poll(() => list.evaluate((node, saved) => Math.abs(node.scrollTop - saved), scroll)).toBeLessThan(2);
           await expect(harbor).toBeHidden();
           await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
@@ -426,6 +457,77 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
     });
   }
 }
+
+test("Harbor projects recorded venue identity with safe logo fallbacks and restores the same local Registry", async ({ page, baseURL }) => {
+  test.setTimeout(45000);
+  await page.setViewportSize({ width: 915, height: 412 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const logoPath = "/assets/branding/voodoo-media-logo-transparent.png";
+  const brokenPath = "/missing-venue-mark.png";
+  const forbiddenHost = "invalid-logo.example";
+  const projectionVenues = venues.map((venue, index) => {
+    if (index === 6) return { ...venue, logo: "../assets/branding/voodoo-media-logo-transparent.png" };
+    if (index === 1) return { ...venue, logo: "java%73cript%3Aalert(1)", logo_url: "//" + forbiddenHost + "/logo.png" };
+    if (index === 2) return { ...venue, logo_url: brokenPath };
+    if (index === 3) return { ...venue, city: "", state: "" };
+    if (index === 4) return { ...venue, logo: "https://owner:password@" + forbiddenHost + "/logo.png" };
+    return venue;
+  });
+  const disallowed = [];
+  page.on("request", request => {
+    if (request.url().includes(forbiddenHost) || request.url().includes("java%73cript")) disallowed.push(request.url());
+  });
+  await mockArchive(page, baseURL, () => ({ data: projectionVenues }));
+  await page.route("**" + brokenPath, route => route.fulfill({ status: 404, body: "" }));
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+
+  const registry = page.locator("[data-music-venues-list]");
+  const search = registry.getByRole("searchbox", { name: "Search Venue" });
+  const inspect = (number) => registry.getByRole("link", { name: "Inspect Signal Hall " + number });
+  const originalLength = await page.evaluate(() => history.length);
+  const sigil = page.locator("[data-harmony-sigil]");
+  const sigilBox = await sigil.boundingBox();
+  await registry.locator("summary").press("Enter");
+  await search.fill("Signal Hall");
+  await inspect("06").scrollIntoViewIfNeeded();
+  const scroll = await registry.evaluate(node => node.scrollTop);
+  expect(scroll).toBeGreaterThan(0);
+  await inspect("06").press("Enter");
+  const projection = await expectVenueProjection(page, "Signal Hall 06", "Portland, ME");
+  const image = projection.locator("[data-harmony-venue-logo] img");
+  await expect(image).toHaveAttribute("src", baseURL + logoPath);
+  await expect.poll(() => image.evaluate(node => node.naturalWidth)).toBeGreaterThan(0);
+  await expectVenueProjection(page, "Signal Hall 06", "Portland, ME");
+  await expect(projection.getByRole("link", { name: "Enter Venue" })).toHaveAttribute("href", harborPath + "/signal-6");
+  await expect(page).toHaveURL(baseURL + harborPath);
+  expect(await page.evaluate(() => history.length)).toBe(originalLength);
+  expect(await sigil.boundingBox()).toEqual(sigilBox);
+
+  const back = projection.getByRole("button", { name: "Back to Beacons" });
+  await back.press("Enter");
+  await expect(projection).toBeHidden();
+  await expect(inspect("06")).toBeFocused();
+  await expect(search).toHaveValue("Signal Hall");
+  expect(await registry.evaluate(node => node.scrollTop)).toBe(scroll);
+
+  for (const [number, location] of [["01", "Portland, ME"], ["02", "Portland, ME"],
+    ["03", "Location Pending"], ["04", "Portland, ME"]]) {
+    const broken = number === "02" ? page.waitForResponse(response => new URL(response.url()).pathname === brokenPath) : null;
+    await inspect(number).press("Enter");
+    await expectVenueProjection(page, "Signal Hall " + number, location);
+    if (broken) expect((await broken).status()).toBe(404);
+    await expect(image).toHaveCount(0);
+    await expect(sigil).toBeVisible();
+    await back.press("Enter");
+    await expect(inspect(number)).toBeFocused();
+  }
+  expect(disallowed).toEqual([]);
+  await expect(page).toHaveURL(baseURL + harborPath);
+  expect(await page.evaluate(() => history.length)).toBe(originalLength);
+});
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {
   test.setTimeout(45000);
@@ -779,6 +881,7 @@ test("shows and restores verified venue beacons while linked Shows are still loa
     await expect(inspect).toBeVisible();
     await expect(page.locator(".harmony-registry-signal")).toHaveCount(0);
     await inspect.press("Enter");
+    await page.getByRole("link", { name: "Enter Venue" }).press("Enter");
     await expect(page).toHaveURL(baseURL + harborPath + "/signal-0");
     await page.locator("[data-prototype-engine-return]").press("Enter");
     await expect(page).toHaveURL(baseURL + harborPath);
