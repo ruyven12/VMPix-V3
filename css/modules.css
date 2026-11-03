@@ -4266,6 +4266,39 @@ html.is-lightbox-scroll-locked body {
   line-height: 0.96;
 }
 
+.harmony-environment {
+  container: harmony-environment / size;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  background: #081321;
+  pointer-events: none;
+}
+
+.site-shell[data-shell-route="music-venues"]:has(.music-nexus-shell:is(.is-harmony-arrival, .is-venues-index)) > .harmony-environment {
+  display: block;
+}
+
+.harmony-environment__art,
+.harmony-environment::after {
+  position: absolute;
+  inset: 0;
+}
+
+.harmony-environment__art {
+  --harmony-art-crop-y: 0.62;
+  --harmony-sigil-art-y: 704;
+  transform-origin: center bottom;
+  background: url("/assets/media/background/zhento-harmony.png") center calc(var(--harmony-art-crop-y) * 100%) / cover no-repeat;
+}
+
+.harmony-environment::after {
+  background: linear-gradient(180deg, rgba(6, 12, 25, 0.68), rgba(6, 12, 25, 0.25) 24%, transparent 43% 75%, rgba(6, 12, 25, 0.64));
+  content: "";
+}
+
 /* Harmony fills the available stage above the Shell's Engine reserve. */
 .site-shell[data-shell-route="music-venues"] .portfolio-hub:has(> .music-nexus-shell:is(.is-harmony-arrival, .is-venues-index)) {
   align-self: start;
@@ -4277,12 +4310,16 @@ html.is-lightbox-scroll-locked body {
   background: none;
 }
 
+.site-shell[data-shell-route="music-venues"] .portfolio-hub:has(> .music-nexus-shell:is(.is-harmony-arrival, .is-venues-index))::before {
+  content: none;
+}
+
 .music-nexus-shell:is(.is-harmony-arrival, .is-venues-index) {
   grid-auto-rows: minmax(0, 1fr);
   align-content: stretch;
   padding: 0;
-  border-color: rgba(154, 181, 242, 0.28);
-  background: #080e20;
+  border-color: transparent;
+  background: none;
   scrollbar-gutter: auto;
 }
 
@@ -4313,9 +4350,6 @@ html.is-lightbox-scroll-locked body {
     max(clamp(0.85rem, 6vh, 3.8rem), env(safe-area-inset-bottom))
     max(0.85rem, env(safe-area-inset-left));
   overflow: auto;
-  background:
-    linear-gradient(180deg, rgba(6, 12, 25, 0.7), rgba(6, 12, 25, 0.28) 24%, transparent 43% 78%, rgba(6, 12, 25, 0.52)),
-    #080e20 url("/assets/media/background/zhento-harmony.png") center 62% / cover no-repeat;
   color: #f3f3ff;
   text-align: center;
 }
@@ -4340,15 +4374,13 @@ html.is-lightbox-scroll-locked body {
   text-shadow: 0 1px 8px #080e20;
 }
 
-.harmony-arrival__scene {
-  align-self: end;
-  padding-block-end: clamp(0.5rem, 10vh, 7rem);
-  pointer-events: none;
-}
-
 .harmony-arrival__sigil {
+  position: absolute;
+  z-index: 1;
   display: block;
-  width: clamp(5rem, min(26vw, 23vh), 11rem);
+  width: clamp(3rem, min(16vw, 12vh), 7.5rem);
+  visibility: hidden;
+  transform: translate(-50%, -50%);
   stroke: #c4d8ff;
   stroke-width: 1;
   stroke-linecap: round;
@@ -4384,24 +4416,73 @@ html.is-lightbox-scroll-locked body {
   outline-offset: 4px;
 }
 
+@media (orientation: portrait) {
+  .harmony-environment__art {
+    --harmony-sigil-art-y: 690;
+  }
+}
+
 @media (max-height: 500px) and (orientation: landscape) {
   .harmony-arrival:not([hidden]) {
     padding-block: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-bottom));
   }
 
-  .harmony-arrival__scene {
-    padding-block-end: 0;
+}
+
+/* Use the measured Harbor box so mobile visual-viewport changes get the same crop. */
+@container harmony-environment (max-height: 56rem) and (min-aspect-ratio: 1/1) {
+  .harmony-environment__art {
+    --harmony-art-crop-y: 1;
+    transform: scale(1.2);
+  }
+
+  .harmony-arrival__sigil {
+    width: clamp(2rem, 8cqh, 6rem);
+  }
+}
+
+@container harmony-environment (max-height: 49rem) and (max-aspect-ratio: 1/1) {
+  .harmony-environment__art {
+    --harmony-art-crop-y: 1;
+    transform: scale(1.14);
+  }
+
+  .harmony-arrival__sigil {
+    width: clamp(2rem, min(16cqw, 8cqh), 5rem);
+  }
+}
+
+@container harmony-environment (max-height: 40rem) {
+  .harmony-environment__art {
+    --harmony-art-crop-y: 1;
+    transform: scale(1.5);
+  }
+
+  .harmony-arrival__sigil {
+    width: clamp(1.75rem, 10cqh, 2.75rem);
+  }
+}
+
+@container harmony-environment (max-height: 40rem) and (max-aspect-ratio: 1/1) {
+  .harmony-environment__art {
+    --harmony-sigil-art-y: 684;
+  }
+
+  .harmony-arrival__sigil {
+    width: clamp(1.75rem, 7cqh, 2.75rem);
+  }
+}
+
+@container harmony-environment (max-height: 40rem) and (min-aspect-ratio: 23/10) {
+  .harmony-environment__art {
+    transform: scale(1.1);
   }
 }
 
 .music-venues-archive {
-  --harmony-registry-crop-y: 0.62;
   display: none;
   min-height: 0;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(5, 14, 28, 0.54), rgba(5, 14, 28, 0.12) 38%, rgba(5, 14, 28, 0.48)),
-    #081321 url("/assets/media/background/zhento-harmony.png") center calc(var(--harmony-registry-crop-y) * 100%) / cover no-repeat;
 }
 
 .music-venues-archive.is-active {
@@ -4449,6 +4530,12 @@ html.is-lightbox-scroll-locked body {
   z-index: 1;
   justify-self: end;
   width: min(100%, 26rem);
+}
+
+@media (max-height: 500px) and (min-width: 42rem) {
+  .music-venues-tools {
+    width: min(43%, 23rem);
+  }
 }
 
 .music-venues-tools summary {
@@ -4567,6 +4654,12 @@ html.is-lightbox-scroll-locked body {
   align-items: center;
   gap: 0.24rem clamp(4rem, 18vw, 12rem);
   list-style: none;
+}
+
+@media (orientation: portrait) {
+  .music-venues-beacons:not([hidden]) {
+    column-gap: max(4rem, 23vw);
+  }
 }
 
 .music-venue-beacon {

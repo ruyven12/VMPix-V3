@@ -385,6 +385,9 @@ let musicVenuesRequest = null;
 let musicVenuesLoaded = false;
 let musicVenuesDataState = "fallback";
 const harmonyArrival = queryRetainedMusicElement("[data-harmony-arrival]");
+const harmonyEnvironment = document.querySelector("[data-harmony-environment]");
+const harmonyArt = harmonyEnvironment?.querySelector("[data-harmony-art]");
+const harmonySigil = harmonyEnvironment?.querySelector("[data-harmony-sigil]");
 const musicVenueBeacons = musicVenuesList?.querySelector("[data-music-venues-beacons]");
 const musicVenuesStatus = musicVenuesList?.querySelector("[data-music-venues-status]");
 const musicVenueConnections = musicVenuesIndex?.querySelector("[data-music-venues-connections]");
@@ -3585,29 +3588,39 @@ function createMusicVenueBeacon(venue) {
 }
 
 function scheduleMusicVenueConnectors() {
-  if (musicVenueConnectorFrame) return;
+  if (!harmonyEnvironment || musicVenueConnectorFrame) return;
   musicVenueConnectorFrame = requestAnimationFrame(() => {
     musicVenueConnectorFrame = 0;
-    const stage = musicVenuesIndex.getBoundingClientRect();
+    const environment = harmonyEnvironment.getBoundingClientRect();
+    if (!environment.width || !environment.height) return;
+
+    // The transformed art box is the exact positioning area for background-size: cover.
+    const paint = harmonyArt.getBoundingClientRect();
+    const scale = Math.max(paint.width / 1672, paint.height / 941);
+    const artStyle = getComputedStyle(harmonyArt);
+    const cropY = Number(artStyle.getPropertyValue("--harmony-art-crop-y"));
+    const artLeft = paint.left + (paint.width - 1672 * scale) / 2;
+    const artTop = paint.top + (paint.height - 941 * scale) * cropY;
+
+    // Hover above the centerline of the circular platform, using the same crop as the beacons.
+    harmonySigil.style.left = (artLeft + 836 * scale - environment.left) + "px";
+    const sigilArtY = Number(artStyle.getPropertyValue("--harmony-sigil-art-y"));
+    harmonySigil.style.top = (artTop + sigilArtY * scale - environment.top) + "px";
+    harmonySigil.style.visibility = "visible";
+
+    const stage = musicVenueConnections.getBoundingClientRect();
     if (!stage.width || !stage.height || musicVenueBeacons.hidden) {
       musicVenueConnections.replaceChildren();
       return;
     }
 
-    const artWidth = 1672;
-    const artHeight = 941;
-    const scale = Math.max(stage.width / artWidth, stage.height / artHeight);
-    const cropY = Number(getComputedStyle(musicVenuesIndex).getPropertyValue("--harmony-registry-crop-y"));
-    const left = (stage.width - artWidth * scale) * 0.5;
-    const top = (stage.height - artHeight * scale) * cropY;
     musicVenueConnections.setAttribute("viewBox", "0 0 " + stage.width + " " + stage.height);
-
     const connectors = [];
     Array.from(musicVenueBeacons.children).forEach((beacon, index) => {
       const label = beacon.getBoundingClientRect();
       const [artX, artY] = musicVenueBeaconPoints[index];
-      const x = left + artX * scale;
-      const y = top + artY * scale;
+      const x = artLeft + artX * scale - stage.left;
+      const y = artTop + artY * scale - stage.top;
       if (x < 0 || x > stage.width || y < 0 || y > stage.height) return;
 
       if (label.top >= stage.top && label.bottom <= stage.bottom) {
@@ -5989,6 +6002,7 @@ function setHarmonyArrivalVisible(isVisible) {
   if (!harmonyArrival) return;
   harmonyArrival.hidden = !isVisible;
   musicNexusShell?.classList.toggle("is-harmony-arrival", isVisible);
+  if (isVisible) scheduleMusicVenueConnectors();
 }
 
 function setMusicVenueIndexVisible(isVisible) {
@@ -17482,8 +17496,9 @@ function initMusicModule() {
   });
   musicVenuesList?.addEventListener("scroll", scheduleMusicVenueConnectors, { passive: true });
   musicVenuesTools?.addEventListener("toggle", scheduleMusicVenueConnectors);
-  if (musicVenuesIndex && typeof ResizeObserver !== "undefined") {
+  if (harmonyEnvironment && musicVenuesIndex && typeof ResizeObserver !== "undefined") {
     const observer = new ResizeObserver(scheduleMusicVenueConnectors);
+    observer.observe(harmonyEnvironment);
     observer.observe(musicVenuesIndex);
     observer.observe(musicVenueBeacons);
   }

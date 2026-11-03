@@ -32,26 +32,68 @@ async function mockArchive(page, baseURL, venueResponse) {
   });
 }
 
+async function expectHarmonyEnvironment(page) {
+  const environment = page.locator("[data-harmony-environment]");
+  const sigil = environment.locator("[data-harmony-sigil]");
+  await expect(environment).toBeInViewport({ ratio: 1 });
+  await expect(environment).toHaveAttribute("aria-hidden", "true");
+  await expect(sigil).toHaveCount(1);
+  await expect(sigil).toBeInViewport({ ratio: 1 });
+  const geometry = await environment.evaluate(async node => {
+    const style = getComputedStyle(node);
+    const art = node.querySelector("[data-harmony-art]");
+    const artStyle = getComputedStyle(art);
+    const url = artStyle.backgroundImage.match(/url\("([^"]+zhento-harmony\.png)"\)/)?.[1];
+    if (!url || artStyle.backgroundSize !== "cover") return null;
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    const outer = node.getBoundingClientRect();
+    const paint = art.getBoundingClientRect();
+    const shell = node.closest(".site-shell").getBoundingClientRect();
+    const engine = document.querySelector("[data-portfolio-engine]").getBoundingClientRect();
+    const sigil = node.querySelector("[data-harmony-sigil]").getBoundingClientRect();
+    const scale = Math.max(paint.width / 1672, paint.height / 941);
+    const crop = Number(artStyle.getPropertyValue("--harmony-art-crop-y"));
+    const sigilArtY = Number(artStyle.getPropertyValue("--harmony-sigil-art-y"));
+    const expectedX = paint.left + (paint.width - 1672 * scale) / 2 + 836 * scale;
+    const expectedY = paint.top + (paint.height - 941 * scale) * crop + sigilArtY * scale;
+    const hit = document.elementFromPoint(engine.left + engine.width / 2, engine.top + engine.height / 2);
+    return {
+      fullBleed: [outer.left - shell.left, outer.top - shell.top, outer.right - shell.right, outer.bottom - shell.bottom,
+        outer.left, outer.top, outer.right - innerWidth, outer.bottom - innerHeight].every(offset => Math.abs(offset) < 1),
+      paintCoversShell: paint.left <= outer.left && paint.top <= outer.top && paint.right >= outer.right && paint.bottom >= outer.bottom,
+      behindEngine: engine.top < outer.bottom && engine.bottom <= outer.bottom + 1 && !node.contains(hit),
+      pointerTransparent: style.pointerEvents === "none",
+      source: [image.naturalWidth, image.naturalHeight],
+      sigilAnchored: Math.abs((sigil.left + sigil.right) / 2 - expectedX) < 1
+        && Math.abs((sigil.top + sigil.bottom) / 2 - expectedY) < 1,
+    };
+  });
+  expect(geometry).toEqual({
+    fullBleed: true,
+    paintCoversShell: true,
+    behindEngine: true,
+    pointerTransparent: true,
+    source: [1672, 941],
+    sigilAnchored: true,
+  });
+  return sigil;
+}
+
 async function expectHarbor(page) {
   const harbor = page.locator("[data-harmony-arrival]");
   await expect(harbor.getByRole("heading", { name: "Harbor of Harmony" })).toBeInViewport({ ratio: 1 });
   await expect(harbor.getByText("The Music Venue Archive")).toBeInViewport({ ratio: 1 });
-  await expect(harbor.locator(".harmony-arrival__sigil")).toBeInViewport({ ratio: 1 });
+  const sigil = await expectHarmonyEnvironment(page);
   await expect(page.locator("[data-music-venues-index]")).toBeHidden();
   await expect(page.getByRole("searchbox", { name: "Search Venue" })).toHaveCount(0);
-  const art = await harbor.evaluate(async node => {
-    const style = getComputedStyle(node);
-    const background = style.backgroundImage;
-    const url = background.match(/url\("([^"]+zhento-harmony\.png)"\)/)?.[1];
-    if (!url || !style.backgroundSize.endsWith("cover")) return false;
-    const image = new Image();
-    image.src = url;
-    await image.decode();
-    return image.naturalWidth > 0;
-  });
-  expect(art).toBe(true);
   await page.evaluate(() => document.fonts.ready.then(() => true));
-  await expect(harbor.getByRole("button", { name: "Browse Venues" })).toBeInViewport({ ratio: 1 });
+  const browse = harbor.getByRole("button", { name: "Browse Venues" });
+  await expect(browse).toBeInViewport({ ratio: 1 });
+  const sigilBox = await sigil.boundingBox();
+  const buttonBox = await browse.boundingBox();
+  expect(sigilBox.y + sigilBox.height).toBeLessThanOrEqual(buttonBox.y + 1);
   const engine = page.locator("[data-prototype-engine-return]");
   await expect(engine).toBeInViewport();
   const metrics = await harbor.evaluate(node => {
@@ -85,25 +127,38 @@ async function expectSectorGeometry(archive, expectedCount = 6) {
     const footer = node.querySelector("[data-music-venues-sectors]").getBoundingClientRect();
     const labels = [...node.querySelectorAll(".music-venue-beacon")].map(beacon => beacon.getBoundingClientRect());
     const artwork = [[844, 485], [866, 515], [824, 548], [874, 583], [794, 618], [878, 650]];
-    const scale = Math.max(rect.width / 1672, rect.height / 941);
-    const left = (rect.width - 1672 * scale) / 2;
-    const top = (rect.height - 941 * scale) * 0.62;
-    const markers = [...node.querySelectorAll("[data-music-venues-connections] circle")];
+    const svg = node.querySelector("[data-music-venues-connections]");
+    const stage = svg.getBoundingClientRect();
+    const art = document.querySelector("[data-harmony-art]");
+    const paint = art.getBoundingClientRect();
+    const sigil = document.querySelector("[data-harmony-sigil]").getBoundingClientRect();
+    const scale = Math.max(paint.width / 1672, paint.height / 941);
+    const left = paint.left + (paint.width - 1672 * scale) / 2 - stage.left;
+    const top = paint.top + (paint.height - 941 * scale) * Number(getComputedStyle(art).getPropertyValue("--harmony-art-crop-y")) - stage.top;
+    const markers = [...svg.querySelectorAll("circle")];
+    const overlapsSigil = box => box.left < sigil.right && box.right > sigil.left && box.top < sigil.bottom && box.bottom > sigil.top;
+    const insideSigil = (x, y) => x > sigil.left && x < sigil.right && y > sigil.top && y < sigil.bottom;
     return {
       clearance: engineBar.getBoundingClientRect().top - rect.bottom,
       widthRatio: rect.width / innerWidth,
       width: innerWidth,
       overflow: scroll.scrollWidth - scroll.clientWidth,
       footerGap: rect.bottom - footer.bottom,
-      art: getComputedStyle(node).backgroundImage.includes("zhento-harmony.png"),
+      sigilClear: !labels.some(overlapsSigil) && !overlapsSigil(footer)
+        && [...svg.querySelectorAll("line")].every(line => {
+          const [x1, y1, x2, y2] = ["x1", "y1", "x2", "y2"].map(attr => Number(line.getAttribute(attr)));
+          return Array.from({ length: 101 }, (_, step) => step / 100).every(fraction =>
+            !insideSigil(stage.left + x1 + (x2 - x1) * fraction, stage.top + y1 + (y2 - y1) * fraction));
+        }),
       anchors: markers.every((marker, index) => {
         const [artX, artY] = artwork[index];
         const x = Number(marker.getAttribute("cx"));
         const y = Number(marker.getAttribute("cy"));
         return Math.abs(x - (left + artX * scale)) < 1 && Math.abs(y - (top + artY * scale)) < 1
-          && x > 0 && x < rect.width && y > 0 && y < rect.height
-          && !labels.some(label => rect.left + x > label.left && rect.left + x < label.right
-            && rect.top + y > label.top && rect.top + y < label.bottom);
+          && x > 0 && x < stage.width && y > 0 && y < stage.height
+          && !insideSigil(stage.left + x, stage.top + y)
+          && !labels.some(label => stage.left + x > label.left && stage.left + x < label.right
+            && stage.top + y > label.top && stage.top + y < label.bottom);
       }),
       labelsFit: labels.every((label, index) =>
         label.left >= rect.left && label.right <= rect.right && label.top >= rect.top && label.bottom <= footer.top
@@ -116,7 +171,7 @@ async function expectSectorGeometry(archive, expectedCount = 6) {
   expect(geometry.overflow).toBeLessThanOrEqual(1);
   expect(geometry.footerGap).toBeGreaterThanOrEqual(0);
   expect(geometry.footerGap).toBeLessThan(10);
-  expect(geometry.art).toBe(true);
+  expect(geometry.sigilClear).toBe(true);
   expect(geometry.anchors).toBe(true);
   expect(geometry.labelsFit).toBe(true);
 }
@@ -144,6 +199,9 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         if (reducedMotion === "no-preference") {
           await page.screenshot({ path: testInfo.outputPath("harbor-" + width + "x" + height + ".png") });
         }
+        const sigil = page.locator("[data-harmony-sigil]");
+        const sigilNode = await sigil.elementHandle();
+        const arrivalSigilBox = await sigil.boundingBox();
         const beforeBrowse = await page.evaluate(() => history.length);
         await harbor.getByRole("button", { name: "Browse Venues" }).press("Enter");
         await expect(page.getByRole("heading", { name: "Beacon Registry", exact: true })).toBeFocused();
@@ -169,6 +227,9 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         expect(await inspect("00").evaluate(node => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(44);
         expect(await page.evaluate(() => history.length)).toBe(beforeBrowse);
         expect(requests).toBe(1);
+        await expectHarmonyEnvironment(page);
+        expect(await sigil.evaluate((node, original) => node === original, sigilNode)).toBe(true);
+        expect(await sigil.boundingBox()).toEqual(arrivalSigilBox);
         await expectSectorGeometry(archive);
 
         if (reducedMotion === "no-preference") {
@@ -222,6 +283,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expect(page).toHaveURL(baseURL + harborPath + "/signal-72");
         await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
         await expect(harbor).toBeHidden();
+        await expect(page.locator("[data-harmony-environment]")).toBeHidden();
 
         async function expectRestoredArchive() {
           await expect(page).toHaveURL(baseURL + harborPath);
@@ -319,7 +381,30 @@ test("keeps the Harbor clear of simulated landscape safe areas", async ({ page, 
   await expect(scroller.getByRole("listitem")).toHaveCount(5);
   await scroller.locator("summary").press("Enter");
   await page.setViewportSize({ width: 915, height: 412 });
+  await expectHarmonyEnvironment(page);
   await expectSectorGeometry(page.locator("[data-music-venues-index]"), 5);
+  await scroller.locator("summary").press("Enter");
+  const filterLeft = await scroller.locator(".music-venues-filter-bar").evaluate(node => node.getBoundingClientRect().left);
+  const sigilBox = await page.locator("[data-harmony-sigil]").boundingBox();
+  expect(filterLeft).toBeGreaterThanOrEqual(sigilBox.x + sigilBox.width);
+});
+
+test("Harbor keeps the Sigil clear in intermediate desktop and short portrait viewports", async ({ page, baseURL }) => {
+  test.setTimeout(75000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockArchive(page, baseURL, () => ({ data: venues }));
+
+  for (const [width, height] of [[1280, 720], [1366, 768], [1280, 600], [412, 420], [412, 500]]) {
+    await test.step(width + "×" + height, async () => {
+      await page.setViewportSize({ width, height });
+      await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+      const reject = page.getByRole("button", { name: "Reject", exact: true });
+      if (await reject.isVisible()) await reject.click();
+      const harbor = await expectHarbor(page);
+      await harbor.getByRole("button", { name: "Browse Venues" }).press("Enter");
+      await expectSectorGeometry(page.locator("[data-music-venues-index]"));
+    });
+  }
 });
 
 test("Harbor sector caption reports actual mixed-state bounds in newest order", async ({ page, baseURL }) => {
