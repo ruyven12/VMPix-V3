@@ -117,8 +117,10 @@ async function expectHarbor(page) {
 }
 
 async function expectSectorGeometry(archive, expectedCount = 6) {
-  const markers = archive.locator("[data-music-venues-connections] circle");
+  const markers = archive.locator("[data-music-venues-connections] .music-venue-beacon-stud");
   await expect(markers).toHaveCount(expectedCount);
+  await expect(markers.locator("path")).toHaveCount(expectedCount * 2);
+  await expect(archive.locator("[data-music-venues-connections] circle")).toHaveCount(0);
   await expect(archive.locator("[data-music-venues-connections] line")).toHaveCount(expectedCount);
   const geometry = await archive.evaluate(node => {
     const engineBar = document.querySelector("[data-portfolio-engine]");
@@ -135,7 +137,8 @@ async function expectSectorGeometry(archive, expectedCount = 6) {
     const scale = Math.max(paint.width / 1672, paint.height / 941);
     const left = paint.left + (paint.width - 1672 * scale) / 2 - stage.left;
     const top = paint.top + (paint.height - 941 * scale) * Number(getComputedStyle(art).getPropertyValue("--harmony-art-crop-y")) - stage.top;
-    const markers = [...svg.querySelectorAll("circle")];
+    const markers = [...svg.querySelectorAll(".music-venue-beacon-stud")];
+    const lines = [...svg.querySelectorAll("line")];
     const overlapsSigil = box => box.left < sigil.right && box.right > sigil.left && box.top < sigil.bottom && box.bottom > sigil.top;
     const insideSigil = (x, y) => x > sigil.left && x < sigil.right && y > sigil.top && y < sigil.bottom;
     return {
@@ -145,20 +148,25 @@ async function expectSectorGeometry(archive, expectedCount = 6) {
       overflow: scroll.scrollWidth - scroll.clientWidth,
       footerGap: rect.bottom - footer.bottom,
       sigilClear: !labels.some(overlapsSigil) && !overlapsSigil(footer)
-        && [...svg.querySelectorAll("line")].every(line => {
+        && lines.every(line => {
           const [x1, y1, x2, y2] = ["x1", "y1", "x2", "y2"].map(attr => Number(line.getAttribute(attr)));
           return Array.from({ length: 101 }, (_, step) => step / 100).every(fraction =>
             !insideSigil(stage.left + x1 + (x2 - x1) * fraction, stage.top + y1 + (y2 - y1) * fraction));
         }),
       anchors: markers.every((marker, index) => {
         const [artX, artY] = artwork[index];
-        const x = Number(marker.getAttribute("cx"));
-        const y = Number(marker.getAttribute("cy"));
+        const center = new DOMPoint().matrixTransform(marker.getScreenCTM());
+        const x = center.x - stage.left;
+        const y = center.y - stage.top;
+        const box = marker.getBoundingClientRect();
+        const line = lines[index];
         return Math.abs(x - (left + artX * scale)) < 1 && Math.abs(y - (top + artY * scale)) < 1
-          && x > 0 && x < stage.width && y > 0 && y < stage.height
-          && !insideSigil(stage.left + x, stage.top + y)
-          && !labels.some(label => stage.left + x > label.left && stage.left + x < label.right
-            && stage.top + y > label.top && stage.top + y < label.bottom);
+          && Math.abs(x - Number(line.getAttribute("x2"))) < 1 && Math.abs(y - Number(line.getAttribute("y2"))) < 1
+          && box.width >= 7.5 && box.width <= 11 && box.height < box.width / 2
+          && box.left >= stage.left && box.right <= stage.right && box.top >= stage.top && box.bottom <= stage.bottom
+          && !overlapsSigil(box)
+          && !labels.some(label => box.left < label.right && box.right > label.left
+            && box.top < label.bottom && box.bottom > label.top);
       }),
       labelsFit: labels.every((label, index) =>
         label.left >= rect.left && label.right <= rect.right && label.top >= rect.top && label.bottom <= footer.top
@@ -179,7 +187,12 @@ async function expectSectorGeometry(archive, expectedCount = 6) {
 for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]) {
   for (const reducedMotion of ["no-preference", "reduce"]) {
     test.describe("Harbor " + width + "x" + height + " " + reducedMotion, () => {
-      test.use({ viewport: { width, height }, reducedMotion, serviceWorkers: "block" });
+      test.use({ viewport: { width, height }, serviceWorkers: "block" });
+      test.beforeEach(async ({ page }) => {
+        await page.emulateMedia({ reducedMotion });
+        expect(await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches))
+          .toBe(reducedMotion === "reduce");
+      });
 
       test("opens on entry and refresh and restores the browsed archive through history", async ({ page, baseURL }, testInfo) => {
         test.setTimeout(75000);
@@ -201,11 +214,24 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         }
         const sigil = page.locator("[data-harmony-sigil]");
         const sigilNode = await sigil.elementHandle();
+        const ignitions = await sigil.evaluateHandle(node => {
+          const calls = [];
+          const animate = node.animate.bind(node);
+          node.animate = (frames, options) => {
+            calls.push({ frames, duration: options.duration });
+            return animate(frames, options);
+          };
+          return calls;
+        });
+        const expectedIgnitions = reducedMotion === "reduce" ? [] : [
+          { frames: [{ opacity: 0.82 }, { opacity: 1 }], duration: 160 },
+        ];
         const arrivalSigilBox = await sigil.boundingBox();
         const beforeBrowse = await page.evaluate(() => history.length);
         await harbor.getByRole("button", { name: "Browse Venues" }).press("Enter");
         await expect(page.getByRole("heading", { name: "Beacon Registry", exact: true })).toBeFocused();
         await expect(harbor).toBeHidden();
+        expect(await ignitions.jsonValue()).toEqual(expectedIgnitions);
         const archive = page.locator("[data-music-venues-index]");
         const list = page.locator("[data-music-venues-list]");
         const beacons = list.getByRole("list", { name: "Venue beacons" });
@@ -233,6 +259,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expectSectorGeometry(archive);
 
         if (reducedMotion === "no-preference") {
+          await expect(sigil).toHaveCSS("opacity", "1");
           await page.screenshot({ path: testInfo.outputPath("beacon-sectors-" + width + "x" + height + ".png") });
         }
 
@@ -300,6 +327,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expectRestoredArchive();
         await page.goForward();
         await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
+        expect(await ignitions.jsonValue()).toEqual(expectedIgnitions);
         if (width === 412 && reducedMotion === "reduce") {
           await page.reload({ waitUntil: "domcontentloaded" });
           await expect(page.getByRole("heading", { name: "Signal Hall 72" })).toBeVisible();
@@ -308,6 +336,9 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expectRestoredArchive();
         await next.press("Enter");
         await expect(inspect("66")).toBeVisible();
+        if (!(width === 412 && reducedMotion === "reduce")) {
+          expect(await ignitions.jsonValue()).toEqual(expectedIgnitions);
+        }
         const beforeRefresh = requests;
         await page.reload({ waitUntil: "domcontentloaded" });
         await expectHarbor(page);

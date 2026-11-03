@@ -3633,10 +3633,14 @@ function scheduleMusicVenueConnectors() {
         line.setAttribute("y2", y);
         connectors.push(line);
       }
-      const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      marker.setAttribute("cx", x);
-      marker.setAttribute("cy", y);
-      marker.setAttribute("r", "2.5");
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      marker.classList.add("music-venue-beacon-stud");
+      const depthScale = 0.8 + index * 0.04;
+      marker.setAttribute("transform", "translate(" + x + " " + y + ") scale(" + depthScale + ")");
+      marker.innerHTML = `
+        <path class="music-venue-beacon-stud__rim" d="M-5-.4-3.1-1.55h6.2L5-.4V.55L2.9 1.55h-5.8L-5 .55Z"/>
+        <path class="music-venue-beacon-stud__inlay" d="M-3.2.6-2-.7h4l1.2 1.3Z"/>
+      `;
       connectors.push(marker);
     });
     musicVenueConnections.replaceChildren(...connectors);
@@ -17488,6 +17492,9 @@ function initMusicModule() {
     activeMusicVenueSector = 0;
     musicVenuesTools.open = false;
     showMusicVenuesBrowser();
+    if (!reducedMotion.matches && typeof harmonySigil?.animate === "function") {
+      harmonySigil.animate([{ opacity: 0.82 }, { opacity: 1 }], { duration: 160, easing: "ease-out" });
+    }
     musicVenuesList.scrollTop = 0;
     musicVenuesIndex.querySelector("#music-venues-archive-title")?.focus({ preventScroll: true });
   });

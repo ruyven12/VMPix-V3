@@ -4504,10 +4504,15 @@ html.is-lightbox-scroll-locked body {
   stroke-width: 1;
 }
 
-.music-venues-connections circle {
-  fill: #a3eaff;
-  stroke: #1b4f67;
-  stroke-width: 1;
+.music-venue-beacon-stud__rim {
+  fill: #101d29;
+  stroke: #6997aa;
+  stroke-width: 0.65;
+}
+
+.music-venue-beacon-stud__inlay {
+  fill: #b9efff;
+  stroke: none;
 }
 
 .music-venues-list {
