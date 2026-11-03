@@ -13632,30 +13632,11 @@ function getMusicShowDetailBandCount(show) {
     return show.bands.length;
   }
 
-  return getMusicShowDetailCountCandidate(show?.bandCount, show?.band_count) ?? 0;
+  return getMusicShowDetailCountCandidate(show?.bandCount, show?.band_count);
 }
 
 function getMusicShowDetailPhotoCount(show) {
-  const statsCount = getMusicShowDetailCountCandidate(show?.stats?.photoCount, show?.stats?.photo_count);
-  if (statsCount !== null && statsCount > 0) {
-    return statsCount;
-  }
-
-  const directCount = getMusicShowDetailCountCandidate(show?.photoCount, show?.photo_count);
-  if (directCount !== null && directCount > 0) {
-    return directCount;
-  }
-
-  return getMusicShowSmugAlbums(show).reduce((total, album) => {
-    const albumPhotoCount = getMusicShowDetailCountCandidate(
-      album?.photo_count,
-      album?.photoCount,
-      album?.photos,
-      album?.image_count,
-      album?.imageCount
-    );
-    return total + (albumPhotoCount || 0);
-  }, 0);
+  return readSetAlbumPhotoTotal(show?.stats?.photoCount, show?.stats?.photo_count, show?.photoCount, show?.photo_count);
 }
 
 function getMusicShowDetailAlbumCount(show) {
@@ -13678,13 +13659,8 @@ function getMusicShowDetailAlbumCount(show) {
   return albumsWithStatus.length === 0 ? albums.length : 0;
 }
 
-function formatMusicShowDetailStatValue(value, options = {}) {
-  const count = getMusicShowDetailCountCandidate(value);
-  if (count !== null && count > 0) {
-    return count.toLocaleString();
-  }
-
-  return options.pendingWhenEmpty ? "Pending" : "0";
+function formatMusicShowDetailStatValue(value) {
+  return value === null ? "Pending" : value.toLocaleString();
 }
 
 function formatMusicShowArchiveStatusValue(value) {
@@ -14113,7 +14089,8 @@ function selectMusicShowDetailHook(show) {
     return;
   }
 
-  const showRoute = getMusicShowRouteUrl(show);
+  const showId = getMusicShowIdValue(show);
+  const showRoute = getMusicShowRouteUrl(showId ? { showId } : show);
   musicActivityPanel.dataset.selectedShowRoute = showRoute;
   navigateToRoute(showRoute, {
     historyState: {
@@ -14575,6 +14552,10 @@ function initSynchronicityArchiveDrawer(viewport) {
       const selection = session.selectShow(show);
       if (!selection) return false;
       selection.fromTimeline = ui.fromTimeline === true;
+      const bill = selection.bill?.element;
+      const billBand = v3Text(ui.billBand);
+      const index = [...(bill?.querySelectorAll(".show-set-card") || [])].findIndex(card => billBand && card.dataset.bandId === billBand);
+      if (index >= 0) bill.querySelectorAll(".show-detail-bill-dots button")[index]?.click();
       if (selection.fromTimeline) {
         state.open = true; state.blocking = true;
         const view = { session, selection, origin: null, show: true, fade: null, animations: null };
@@ -15009,6 +14990,13 @@ function prepareSynchronicityMemories() {
     leave.textContent = "RETURN TO ECHOES";
     leave.addEventListener("click", returnToEchoes);
     actions.append(leave);
+    if (showId) {
+      const details = document.createElement("button");
+      details.type = "button";
+      details.textContent = "VIEW SHOW DETAILS";
+      details.addEventListener("click", () => selectMusicShowDetailHook(memory.show));
+      actions.append(details);
+    }
     selection.bill = createSynchronicityBill(memory.show, () => current() && session.selection === selection);
     panel.append(artwork, title, date, venue, number, actions, selection.bill.element);
     stage.append(panel);
@@ -15517,7 +15505,8 @@ function getMusicShowResolvedAlbums(show) {
 }
 
 function getMusicShowAlbumSlotLabel(album, index) {
-  const slot = String(album?.slot || album?.lineupSlot || album?.lineup_slot || album?.position || index + 1).trim();
+  const slot = String(album?.slot || album?.lineupSlot || album?.lineup_slot || album?.position ||
+    (index === undefined ? "" : index + 1)).trim();
   if (!slot) {
     return "";
   }
@@ -16411,9 +16400,16 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
   const meta = document.createElement("div");
   meta.className = "show-set-card-meta";
 
-  const metaValues = [
+  const unavailable = options.showDetailSource && !targetUrl;
+  if (unavailable) {
+    card.disabled = true;
+    card.setAttribute("aria-label", `${bandName}: captured gallery unavailable`);
+  }
+  const metaValues = unavailable ? [
+    { className: "show-detail-bill-count", text: "Captured photography unavailable" },
+  ] : [
     { className: "show-detail-bill-count", text: getMusicShowAlbumPhotoLabel(album) },
-    { className: "show-detail-bill-slot", text: getMusicShowAlbumSlotLabel(album, index) },
+    { className: "show-detail-bill-slot", text: getMusicShowAlbumSlotLabel(album, options.showDetailSource ? undefined : index) },
     { className: "show-detail-bill-status", text: getMusicShowAlbumStatusLabel(album) },
     { className: "show-detail-bill-view-count", text: getMusicShowAlbumViewCountLabel(album) },
   ];
@@ -16433,7 +16429,7 @@ function createShowDetailAlbumCard(show, album, index, options = {}) {
   const action = document.createElement("span");
   action.className = "show-set-card-action";
   action.textContent = "View Set";
-  body.append(action);
+  if (!unavailable) body.append(action);
   card.append(media, body);
   card.__showSetPreview = {
     urls: previewImages,
@@ -16496,26 +16492,13 @@ function createShowDetailBandsOnBill(show, options = {}) {
 
   heading.append(title);
 
-  const activeBandName = document.createElement("button");
-  activeBandName.type = "button";
+  const activeBandName = document.createElement("a");
   activeBandName.className = "show-detail-bill-active-name";
-  activeBandName.addEventListener("click", (event) => {
-    const targetUrl = getMusicShowAlbumSetRoute(show, albums[activeIndex]);
-    if (!targetUrl || (options.showDetailSource && getRouteFromUrl().name !== "show-detail")) {
-      return;
-    }
-
-    const relationship = beginArchiveRelationshipAnalytics(event, "music", "show", "set", () => ({
-      source_content_id: musicShowsSetsDataState === "live" ? show.show_id : undefined,
-    }));
-    stageArchiveRelationshipAnalytics(relationship, targetUrl);
-    stageArchiveGalleryAnalytics(event, "music", targetUrl);
-    navigateToRoute(targetUrl, {
-      historyState: {
-        fromShowDetail: true,
-        showDetailUrl: getMusicShowRouteUrl(show),
-      },
-    });
+  activeBandName.addEventListener("click", event => {
+    if (!activeBandName.hasAttribute("href") || event.button !== 0 ||
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigateToRoute(activeBandName.getAttribute("href"));
   });
 
   header.append(heading, activeBandName);
@@ -16523,7 +16506,7 @@ function createShowDetailBandsOnBill(show, options = {}) {
   if (albums.length === 0) {
     const empty = document.createElement("p");
     empty.className = "show-detail-bill-empty";
-    empty.textContent = "No resolved archive albums available.";
+    empty.textContent = "No documented band lineup available.";
     section.append(header, empty);
     return section;
   }
@@ -16585,6 +16568,9 @@ function createShowDetailBandsOnBill(show, options = {}) {
     activeIndex = normalizeShowDetailSlideIndex(activeIndex, albums.length);
     track.style.transform = `translate3d(-${activeIndex * 100}%, 0, 0)`;
     activeBandName.textContent = getMusicShowAlbumBandName(albums[activeIndex]) || "";
+    const bandRoute = options.getBandRoute?.(activeIndex);
+    if (bandRoute) activeBandName.setAttribute("href", bandRoute);
+    else activeBandName.removeAttribute("href");
     slideElements.forEach((slide, index) => {
       const isActive = index === activeIndex;
       slide.classList.toggle("is-active", isActive);
@@ -16989,7 +16975,11 @@ function renderMusicShowDetailState(stateName = "empty", showId = "") {
         ? "Unable to load archive data."
         : "No matching archive record was found.",
     detail: showId ? `Show: ${showId}` : "",
-    retry: isError,
+    onRetry: isError ? () => {
+      requestMusicShowsSetsData();
+      showMusicShowDetail(showId);
+    } : undefined,
+    retryLabel: "Retry Shows",
   }));
   showDetail.replaceChildren(backButton, stateSection);
 }
@@ -17001,9 +16991,12 @@ function renderMusicShowDetail(show) {
 
   cleanupShowSetCardPreviews();
   const relationships = getMusicShowRelationshipSnapshot(show);
-  const showTitle = getMusicShowTitle(show);
+  const showTitle = show.capturedName || "Show name unavailable";
   const showVenue = getMusicShowDetailVenue(show);
-  const showLocation = getMusicShowDetailLocation(show);
+  const recordedLocation = getMusicShowDetailLocation(show);
+  const venueRecord = findMusicVenueById(show.venue_id || show.venueId);
+  const showLocation = recordedLocation === "Location Pending" && venueRecord
+    ? getMusicVenueLocationText(venueRecord) : recordedLocation;
   const showIdValue = getMusicShowIdValue(show) || "Show Pending";
   const bandCount = getMusicShowDetailBandCount(show);
   const photoCount = getMusicShowDetailPhotoCount(show);
@@ -17067,13 +17060,23 @@ function renderMusicShowDetail(show) {
   stats.append(
     createShowDetailStat("Show ID", showIdValue),
     createShowDetailStat("Bands", formatMusicShowDetailStatValue(bandCount)),
-    createShowDetailStat("Photos", formatMusicShowDetailStatValue(photoCount, { pendingWhenEmpty: true }))
+    createShowDetailStat("Photos", formatMusicShowDetailStatValue(photoCount))
   );
 
   copy.append(eyebrow, title, details, stats);
   hero.append(poster, copy);
 
-  const bill = createShowDetailBandsOnBill(show, { showDetailSource: true });
+  const entries = getSynchronicityBillEntries(show);
+  const bill = createShowDetailBandsOnBill(show, {
+    showDetailSource: true,
+    albums: entries.map(entry => ({ ...entry.album, band: entry.name, band_id: entry.id || entry.album?.band_id || entry.album?.bandId })),
+    getGalleryRoute: (_album, index) => entries[index].route,
+    getBandRoute: index => {
+      const { id, album } = entries[index];
+      const bandId = id || String(album?.band_id || album?.bandId || "").trim();
+      return bandId ? getBandRouteUrl(bandId) : "";
+    },
+  });
 
   showDetail.replaceChildren(backButton, hero, bill);
   window.requestAnimationFrame(() => {
@@ -17278,7 +17281,10 @@ function renderUnusedShowDetailLegacyPreview(show, relationships) {
 function showMusicShowDetail(showId, options = {}) {
   const context = v3RouteContext;
   const routeShowCode = normalizeSetCode(showId);
-  const show = findMusicShowById(routeShowCode);
+  const show = musicShowsSetsDataState === "live"
+    ? getMusicShowsIndexRows().find(record => normalizeSetCode(getMusicShowIdValue(record)) === routeShowCode)
+      || findMusicShowById(routeShowCode)
+    : null;
   if (show) {
     renderMusicShowDetail(show);
   } else {
@@ -17676,12 +17682,16 @@ function captureMusicResumeState(route) {
     artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
   if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
     .map(card=>card.dataset.personShowId+'|'+card.dataset.personShowAlbumId).slice(0,100)};
-  if(route.name==='show-detail')return {albumRoute:showDetail.querySelector('.show-set-carousel-slide.is-active .show-set-card')?.dataset.showAlbumRoute || ''};
+  if(route.name==='show-detail'){
+    const card=showDetail.querySelector('.show-set-carousel-slide.is-active .show-set-card');
+    return {albumRoute:card?.dataset.showAlbumRoute || '',billBand:card?.dataset.bandId || ''};
+  }
   if(route.name==='sets-archive')return {selectedSet:activeSetRow?.dataset.setCode || ''};
 
   if(route.name==='set-detail')return captureSetDossierState();
   if(route.name==='music-shows')return {query:activeMusicShowsSearch,year:activeMusicShowsYearFilter,state:activeMusicShowsStateFilter,venue:activeMusicShowsVenueFilter,
     selectedShow:synchronicityMemoriesSession?.selection?.id || '',fromTimeline:synchronicityMemoriesSession?.selection?.fromTimeline === true,
+    billBand:synchronicityMemoriesSession?.selection?.bill?.element.querySelector('.show-set-carousel-slide.is-active .show-set-card')?.dataset.bandId || '',
     drawerOpen:synchronicityArchiveDrawer?.open === true,drawerExpanded:synchronicityArchiveDrawer?.expanded === true,
     drawerScroll:synchronicityArchiveDrawer?.scrollTop || 0,years:synchronicityTimeline.expanded ? [...synchronicityTimeline.expanded] : null};
   if(route.name==='music')return {pillar:document.querySelector('[data-selected-destination]')?.dataset.selectedDestination || ''};
@@ -17729,7 +17739,9 @@ function restoreMusicResumeState(route,ui) {
     }else if(route.name==='show-detail'){
       if(pending(musicShowsSetsDataState))return false;
       const cards=[...showDetail.querySelectorAll('.show-set-carousel-slide .show-set-card')];
-      const index=cards.findIndex(card=>card.dataset.showAlbumRoute===v3Text(ui.albumRoute));
+      const band=v3Text(ui.billBand);
+      const album=v3Text(ui.albumRoute);
+      const index=cards.findIndex(card=>band ? card.dataset.bandId===band : album && card.dataset.showAlbumRoute===album);
       if(index>=0)showDetail.querySelectorAll('.show-detail-bill-dots button')[index]?.click();
     }else{
       if(pending(musicShowsSetsDataState)||pending(musicBandsIndex.dataset.bandsDataState))return false;

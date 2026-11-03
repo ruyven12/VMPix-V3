@@ -8798,6 +8798,7 @@ button.person-show-tagged-thumb:focus-visible {
   line-height: 1.08;
   overflow-wrap: anywhere;
   text-align: right;
+  text-decoration: none;
   text-wrap: balance;
 }
 
