@@ -16,7 +16,7 @@ const shows = [
   { show_id: "unknown", venue_id: "signal-87", name: "No photo count", bands: ["One", "Two"] },
 ];
 
-async function mockArchive(page, baseURL, venueResponse) {
+async function mockArchive(page, baseURL, venueResponse, showsResponse = () => ({ data: shows })) {
   const origin = new URL(baseURL).origin;
   await page.route("**/*", async route => {
     const request = route.request();
@@ -27,7 +27,7 @@ async function mockArchive(page, baseURL, venueResponse) {
     if (request.resourceType() === "script") return route.fulfill({ contentType: "application/javascript", body: "" });
     if (request.resourceType() === "stylesheet") return route.fulfill({ contentType: "text/css", body: "" });
     const { status = 200, data = [] } = url.pathname === "/api/music/venues" ? await venueResponse()
-      : url.pathname === "/api/music/shows/db" ? { data: shows } : {};
+      : url.pathname === "/api/music/shows/db" ? await showsResponse() : {};
     return route.fulfill({ status, headers: { "access-control-allow-origin": "*" }, json: { data, total: data.length, totalPages: 1 } });
   });
 }
@@ -349,32 +349,215 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         expect(errors).toEqual([]);
       });
 
-      test("keeps directory loading, Retry, and empty states behind Browse Venues", async ({ page, baseURL }) => {
-        let release;
-        let requests = 0;
-        const pending = new Promise(resolve => { release = resolve; });
-        await mockArchive(page, baseURL, () => ++requests === 1 ? pending : { data: [] });
+      test("keeps one Harbor loading, Retry, and empty state behind Browse Venues", async ({ page, baseURL }) => {
+        let releaseFailure;
+        let releaseRetry;
+        let venueRequests = 0;
+        let showsRequests = 0;
+        const failure = new Promise(resolve => { releaseFailure = resolve; });
+        const retry = new Promise(resolve => { releaseRetry = resolve; });
+        await mockArchive(page, baseURL, () => ++venueRequests === 1 ? failure : retry, () => {
+          showsRequests++;
+          return { data: shows };
+        });
         await page.goto(harborPath, { waitUntil: "domcontentloaded" });
         const reject = page.getByRole("button", { name: "Reject", exact: true });
         if (await reject.isVisible()) await reject.click();
         const harbor = await expectHarbor(page);
-        expect(requests).toBe(0);
+        expect(venueRequests).toBe(0);
+        expect(showsRequests).toBe(0);
+
         await harbor.getByRole("button", { name: "Browse Venues" }).click();
         const archive = page.locator("[data-music-venues-index]");
-        await expect(archive.getByText("Establishing venue beacon signals.")).toBeVisible();
-        release({ status: 503 });
-        await expect(archive.getByText("Venue records could not load from the archive source.")).toBeVisible();
-        await expect(archive.locator("[data-music-venues-count]")).toHaveText("");
+        const signal = archive.locator(".harmony-registry-signal");
+        await expect(signal).toHaveCount(1);
+        await expect(signal).toBeVisible();
+        await expect(signal).toHaveAttribute("role", "status");
+        await expect(signal).toContainText("Establishing Beacon Signals");
+        await expect(archive.getByText("Loading Venue Grid", { exact: true })).toHaveCount(0);
         await expect(archive.getByRole("listitem")).toHaveCount(0);
-        await archive.getByRole("button", { name: "Retry Venues" }).click();
-        await expect(archive.getByText("No venues match the current filters.")).toBeVisible();
+        await expectHarmonyEnvironment(page);
+        await expect(page.locator("[data-prototype-engine-return]")).toBeVisible();
+
+        releaseFailure({ status: 503 });
+        await expect(signal).toHaveAttribute("role", "alert");
+        await expect(signal).toContainText("Beacon Signals Unavailable");
+        await expect(archive.locator("[data-music-venues-count]")).toHaveText("");
+        expect(venueRequests).toBe(1);
+        expect(showsRequests).toBe(0);
+
+        await signal.getByRole("button", { name: "Retry Venues" }).press("Enter");
+        await expect(signal).toContainText("Establishing Beacon Signals");
+        releaseRetry({ data: [] });
+        await expect(signal).toContainText("No venue records are available in the archive.");
+        await expect(signal.getByRole("button")).toHaveCount(0);
         await expect(archive.locator("[data-music-venues-count]")).toHaveText("Showing 0 Venues");
-        expect(requests).toBe(2);
+        expect(venueRequests).toBe(2);
+        expect(showsRequests).toBe(0);
         await expect(harbor).toBeHidden();
       });
     });
   }
 }
+
+test("paints the Harbor environment before delayed Shell startup and enters it from Zhento", async ({ page, baseURL }) => {
+  test.setTimeout(45000);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() => {
+    const frames = { harbor: 0, homeVisible: 0 };
+    window.harmonyArrivalFrames = frames;
+    const sample = () => {
+      const home = document.querySelector('.site-shell[data-shell-route="music-venues"] .home-frame');
+      if (home && !document.documentElement.hasAttribute("data-v3-booting")) {
+        frames.harbor++;
+        const style = getComputedStyle(home);
+        if (style.display !== "none" && style.visibility === "visible" && Number(style.opacity) > 0) {
+          frames.homeVisible++;
+        }
+      }
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  });
+  let requests = 0;
+  await mockArchive(page, baseURL, () => {
+    requests++;
+    return { data: venues };
+  });
+  let releaseShell;
+  const pendingShell = new Promise(resolve => { releaseShell = resolve; });
+  await page.route("**/js/shell.js", async route => {
+    await pendingShell;
+    await route.continue();
+  });
+
+  await page.goto(harborPath, { waitUntil: "commit" });
+  const environment = page.locator("[data-harmony-environment]");
+  const sigil = environment.locator("[data-harmony-sigil]");
+  let bootSigil;
+  try {
+    await expect(page.locator("html")).toHaveAttribute("data-v3-booting", "");
+    await expect(environment).toBeInViewport({ ratio: 1 });
+    await expect(sigil).toBeInViewport({ ratio: 1 });
+    await expect(sigil).toBeVisible();
+    const art = environment.locator("[data-harmony-art]");
+    await expect(art).toHaveCSS("background-size", "cover");
+    expect(await art.evaluate(async node => {
+      const source = getComputedStyle(node).backgroundImage.match(/url\("([^"]+)"\)/)?.[1];
+      const image = new Image();
+      image.src = source;
+      await image.decode();
+      return [image.naturalWidth, image.naturalHeight];
+    })).toEqual([1672, 941]);
+    await expect(page.locator(".public-home")).toBeHidden();
+    await expect(page.locator("[data-portfolio-engine]")).toBeHidden();
+    await expect(page.getByText("Loading Venue Grid", { exact: true })).toHaveCount(0);
+    bootSigil = await sigil.boundingBox();
+    expect(requests).toBe(0);
+  } finally {
+    releaseShell();
+  }
+  await expect(page.locator("html")).not.toHaveAttribute("data-v3-booting", "");
+  await expect(page.locator(".home-frame")).toHaveCSS("display", "none");
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  await expectHarbor(page);
+  const mountedSigil = await sigil.boundingBox();
+  expect(Math.abs(bootSigil.x - mountedSigil.x)).toBeLessThan(1);
+  expect(Math.abs(bootSigil.y - mountedSigil.y)).toBeLessThan(1);
+  const coldFrames = await page.evaluate(() => window.harmonyArrivalFrames);
+  expect(coldFrames.harbor).toBeGreaterThan(0);
+  expect(coldFrames.homeVisible).toBe(0);
+
+  await page.locator("[data-prototype-engine-return]").press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music");
+  await expect(environment).toBeHidden();
+  await page.locator('[data-zhento-information="pulse"]').press("Enter");
+  await page.getByRole("button", { name: /Pillar of Harmony/ }).press("Enter");
+  const enter = page.getByRole("button", { name: "Enter the Archive", exact: true });
+  await expect(enter).toBeEnabled();
+  await enter.press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath);
+  await expectHarbor(page);
+  await expect(page.locator(".home-frame")).toHaveCSS("display", "none");
+  await expect.poll(() => page.evaluate(() => window.harmonyArrivalFrames.harbor)).toBeGreaterThan(coldFrames.harbor);
+  expect(await page.evaluate(() => window.harmonyArrivalFrames.homeVisible)).toBe(0);
+  expect(requests).toBe(0);
+});
+
+test("shows and restores verified venue beacons while linked Shows are still loading", async ({ page, baseURL }) => {
+  test.setTimeout(45000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let venueRequests = 0;
+  let releaseShows;
+  const pendingShows = new Promise(resolve => { releaseShows = resolve; });
+  await mockArchive(page, baseURL, () => {
+    venueRequests++;
+    return { data: venues };
+  }, () => pendingShows);
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+
+  const showsRequested = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/shows/db");
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  try {
+    await showsRequested;
+    const inspect = page.getByRole("link", { name: "Inspect Signal Hall 00" });
+    await expect(inspect).toBeVisible();
+    await expect(page.locator(".harmony-registry-signal")).toHaveCount(0);
+    await inspect.press("Enter");
+    await expect(page).toHaveURL(baseURL + harborPath + "/signal-0");
+    await page.locator("[data-prototype-engine-return]").press("Enter");
+    await expect(page).toHaveURL(baseURL + harborPath);
+    await expect(inspect).toBeVisible();
+    await expect.poll(() => page.evaluate(() => v3RouteContext.pending)).toBe(false);
+    expect(venueRequests).toBe(1);
+  } finally {
+    releaseShows({ data: shows });
+  }
+  await expect(page.getByRole("link", { name: "Inspect Signal Hall 00" })).toBeVisible();
+});
+
+test("an earlier Shows request does not retry Harbor Venues", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let venueRequests = 0;
+  let releaseShows;
+  const pendingShows = new Promise(resolve => { releaseShows = resolve; });
+  await mockArchive(page, baseURL, () => ++venueRequests === 1 ? { status: 503 } : { data: venues }, () => pendingShows);
+  const showsRequested = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/shows/db");
+  try {
+    await page.goto("/music/shows", { waitUntil: "domcontentloaded" });
+    await showsRequested;
+    const reject = page.getByRole("button", { name: "Reject", exact: true });
+    if (await reject.isVisible()) await reject.click();
+    await page.locator("[data-prototype-engine-return]").press("Enter");
+    await expect(page).toHaveURL(baseURL + "/music");
+    await page.locator('[data-zhento-information="pulse"]').press("Enter");
+    await page.getByRole("button", { name: /Pillar of Harmony/ }).press("Enter");
+    await page.getByRole("button", { name: "Enter the Archive", exact: true }).press("Enter");
+    await expect(page).toHaveURL(baseURL + harborPath);
+    expect(venueRequests).toBe(0);
+
+    await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+    const signal = page.locator(".harmony-registry-signal");
+    await expect(signal).toHaveAttribute("data-v3-state", "error");
+    expect(venueRequests).toBe(1);
+    expect(await page.evaluate(() => Boolean(musicShowsSetsRequest))).toBe(true);
+
+    releaseShows({ data: shows });
+    await expect.poll(() => page.evaluate(() => musicShowsSetsDataState)).toBe("live");
+    await expect(signal).toHaveAttribute("data-v3-state", "error");
+    expect(venueRequests).toBe(1);
+    await signal.getByRole("button", { name: "Retry Venues" }).press("Enter");
+    await expect(page.getByRole("link", { name: "Inspect Signal Hall 00" })).toBeVisible();
+    expect(venueRequests).toBe(2);
+  } finally {
+    releaseShows({ data: shows });
+  }
+});
 
 test("keeps the Harbor clear of simulated landscape safe areas", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 915, height: 412 });

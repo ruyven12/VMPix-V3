@@ -60,7 +60,13 @@
        Opacity preserves the geometry used by synchronous startup measurements. -->
   <style>
     html { background-color: #050507; }
-    html[data-v3-booting] body { opacity: 0 !important; pointer-events: none !important; }
+    html[data-v3-booting] body { pointer-events: none !important; }
+    html[data-v3-booting]:not([data-v3-harmony-boot]) body { opacity: 0 !important; }
+    html[data-v3-booting][data-v3-harmony-boot] body > :not(.site-shell),
+    html[data-v3-booting][data-v3-harmony-boot] .site-shell > :not(.harmony-environment),
+    html[data-v3-booting][data-v3-harmony-boot] .site-shell > :not(.harmony-environment) * {
+      visibility: hidden !important;
+    }
     [data-band-detail-placeholder] { visibility: hidden !important; pointer-events: none !important; }
     [data-home-boot-recovery] { display: none; }
     html[data-v3-home-boot-failed] body { opacity: 1 !important; pointer-events: auto !important; margin: 0; background: #050507; color: #f7f7f2; }
@@ -78,6 +84,7 @@
   <script>
     (() => {
       const root = document.documentElement;
+      if (/^\/music\/venues\/*$/.test(location.pathname)) root.setAttribute("data-v3-harmony-boot", "");
       if (!/^\/music\/bands(?:\/[^/]+)?\/*$/.test(location.pathname)) root.setAttribute("data-v3-booting", "");
       let appliedShellSheet;
       const isStylesheetReady = () => {

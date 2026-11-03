@@ -5986,7 +5986,11 @@ function cancelZhentoRhythmEntry() {
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
   const destination = landing?.dataset.selectedDestination;
-  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows"].includes(destination)) return;
+  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows", "venues"].includes(destination)) return;
+  if (destination === "venues") {
+    navigateToRoute(routePaths.musicVenues);
+    return;
+  }
   const engine = document.querySelector("[data-portfolio-engine]");
   const left = engine?.querySelector(".portfolio-engine-left-core");
   const right = engine?.querySelector(".portfolio-engine-reactor");
@@ -6138,7 +6142,7 @@ function selectZhentoPillar(landing, key) {
   pulse.querySelectorAll("[data-zhento-destination]").forEach((tile) => tile.setAttribute("aria-pressed", String(selected && tile.dataset.zhentoDestination === key)));
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(selected && row.dataset.zhentoStat === key)));
   const enter = pulse.querySelector(".zhento-enter");
-  enter.disabled = !selected || !["bands", "shows"].includes(key);
+  enter.disabled = !selected || !["bands", "shows", "venues"].includes(key);
   enter.setAttribute("aria-label", enter.disabled ? "Enter the Archive - not available yet" : "Enter the Archive");
   if (selected) {
     startZhentoPillarIdentity(landing, key);

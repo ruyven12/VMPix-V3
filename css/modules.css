@@ -4277,8 +4277,14 @@ html.is-lightbox-scroll-locked body {
   pointer-events: none;
 }
 
+html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 .site-shell[data-shell-route="music-venues"]:has(.music-nexus-shell:is(.is-harmony-arrival, .is-venues-index)) > .harmony-environment {
   display: block;
+}
+
+/* Harbor owns the first visible frame after the boot mask is lifted. */
+.site-shell[data-shell-route="music-venues"] .home-frame {
+  display: none;
 }
 
 .harmony-environment__art,
@@ -4287,9 +4293,14 @@ html.is-lightbox-scroll-locked body {
   inset: 0;
 }
 
-.harmony-environment__art {
+:is(.harmony-environment__art, .harmony-arrival__sigil) {
   --harmony-art-crop-y: 0.62;
+  --harmony-art-zoom: 1;
   --harmony-sigil-art-y: 704;
+}
+
+.harmony-environment__art {
+  transform: scale(var(--harmony-art-zoom));
   transform-origin: center bottom;
   background: url("/assets/media/background/zhento-harmony.png") center calc(var(--harmony-art-crop-y) * 100%) / cover no-repeat;
 }
@@ -4375,11 +4386,17 @@ html.is-lightbox-scroll-locked body {
 }
 
 .harmony-arrival__sigil {
+  /* Project the Sigil from the same cover crop and bottom-origin zoom as the art. */
+  --harmony-cover-height: calc(max(100cqh, 100cqw * 941 / 1672) * var(--harmony-art-zoom));
+  --harmony-zoomed-height: calc(100cqh * var(--harmony-art-zoom));
   position: absolute;
   z-index: 1;
+  top: calc(100cqh - var(--harmony-zoomed-height)
+    + (var(--harmony-zoomed-height) - var(--harmony-cover-height)) * var(--harmony-art-crop-y)
+    + var(--harmony-cover-height) * var(--harmony-sigil-art-y) / 941);
+  left: 50%;
   display: block;
   width: clamp(3rem, min(16vw, 12vh), 7.5rem);
-  visibility: hidden;
   transform: translate(-50%, -50%);
   stroke: #c4d8ff;
   stroke-width: 1;
@@ -4417,7 +4434,7 @@ html.is-lightbox-scroll-locked body {
 }
 
 @media (orientation: portrait) {
-  .harmony-environment__art {
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
     --harmony-sigil-art-y: 690;
   }
 }
@@ -4431,9 +4448,9 @@ html.is-lightbox-scroll-locked body {
 
 /* Use the measured Harbor box so mobile visual-viewport changes get the same crop. */
 @container harmony-environment (max-height: 56rem) and (min-aspect-ratio: 1/1) {
-  .harmony-environment__art {
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
     --harmony-art-crop-y: 1;
-    transform: scale(1.2);
+    --harmony-art-zoom: 1.2;
   }
 
   .harmony-arrival__sigil {
@@ -4442,9 +4459,9 @@ html.is-lightbox-scroll-locked body {
 }
 
 @container harmony-environment (max-height: 49rem) and (max-aspect-ratio: 1/1) {
-  .harmony-environment__art {
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
     --harmony-art-crop-y: 1;
-    transform: scale(1.14);
+    --harmony-art-zoom: 1.14;
   }
 
   .harmony-arrival__sigil {
@@ -4453,9 +4470,9 @@ html.is-lightbox-scroll-locked body {
 }
 
 @container harmony-environment (max-height: 40rem) {
-  .harmony-environment__art {
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
     --harmony-art-crop-y: 1;
-    transform: scale(1.5);
+    --harmony-art-zoom: 1.5;
   }
 
   .harmony-arrival__sigil {
@@ -4464,7 +4481,7 @@ html.is-lightbox-scroll-locked body {
 }
 
 @container harmony-environment (max-height: 40rem) and (max-aspect-ratio: 1/1) {
-  .harmony-environment__art {
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
     --harmony-sigil-art-y: 684;
   }
 
@@ -4474,8 +4491,8 @@ html.is-lightbox-scroll-locked body {
 }
 
 @container harmony-environment (max-height: 40rem) and (min-aspect-ratio: 23/10) {
-  .harmony-environment__art {
-    transform: scale(1.1);
+  :is(.harmony-environment__art, .harmony-arrival__sigil) {
+    --harmony-art-zoom: 1.1;
   }
 }
 
@@ -4784,9 +4801,33 @@ html.is-lightbox-scroll-locked body {
   overflow-wrap: anywhere;
 }
 
-.music-venues-empty {
+.harmony-registry-signal.v3-state-card {
+  --v3-state-accent: #a3d7eb;
+  grid-template-columns: minmax(0, 1fr);
   background: rgba(8, 21, 38, 0.94);
+  box-shadow: none;
   text-align: center;
+}
+
+.harmony-registry-signal .v3-state-mark {
+  display: none;
+}
+
+.harmony-registry-signal .v3-state-title {
+  color: #edf9ff;
+}
+
+.harmony-registry-signal .v3-state-text {
+  color: #bddbea;
+  text-transform: none;
+}
+
+.harmony-registry-signal .v3-state-actions {
+  justify-content: center;
+}
+
+.harmony-registry-signal .v3-state-action {
+  min-height: 2.75rem;
 }
 
 @media (min-width: 42rem) {

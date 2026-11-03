@@ -3602,12 +3602,6 @@ function scheduleMusicVenueConnectors() {
     const artLeft = paint.left + (paint.width - 1672 * scale) / 2;
     const artTop = paint.top + (paint.height - 941 * scale) * cropY;
 
-    // Hover above the centerline of the circular platform, using the same crop as the beacons.
-    harmonySigil.style.left = (artLeft + 836 * scale - environment.left) + "px";
-    const sigilArtY = Number(artStyle.getPropertyValue("--harmony-sigil-art-y"));
-    harmonySigil.style.top = (artTop + sigilArtY * scale - environment.top) + "px";
-    harmonySigil.style.visibility = "visible";
-
     const stage = musicVenueConnections.getBoundingClientRect();
     if (!stage.width || !stage.height || musicVenueBeacons.hidden) {
       musicVenueConnections.replaceChildren();
@@ -3666,23 +3660,33 @@ function renderMusicVenuesResults(rows = musicVenuesLoaded ? getFilteredMusicVen
   const venues = rows.slice(start, start + MUSIC_VENUE_SECTOR_SIZE);
   musicVenueBeacons.replaceChildren(...venues.map(createMusicVenueBeacon));
   musicVenueBeacons.hidden = !venues.length;
-  musicVenuesStatus.replaceChildren();
   renderMusicVenueSectorSummary(venues, sectorCount);
   scheduleMusicVenueConnectors();
 
-  if (rows.length) return;
+  if (rows.length) {
+    musicVenuesStatus.replaceChildren();
+    return;
+  }
   const state = musicVenuesLoaded ? "empty" : musicVenuesDataState === "loading" ? "loading" : "error";
-  const messages = {
-    loading: "Establishing venue beacon signals.",
-    empty: "No venues match the current filters.",
-    error: "Venue records could not load from the archive source.",
+  if (musicVenuesStatus.firstElementChild?.dataset.v3State === state) return;
+
+  const copy = {
+    loading: { title: "Establishing Beacon Signals", text: "Receiving venue records from the archive." },
+    empty: {
+      title: "No Venue Beacons Found",
+      text: musicVenuesCollection.length
+        ? "No venues match the current filters."
+        : "No venue records are available in the archive.",
+    },
+    error: { title: "Beacon Signals Unavailable", text: "Venue records could not load from the archive source." },
   };
   const status = createMusicV3StateCard(state, "musicVenues", {
-    retry: state === "error",
-    text: messages[state],
+    ...copy[state],
+    small: true,
+    retry: state === "error" ? { label: "Retry Venues", onClick: loadMusicVenuesBrowser } : false,
   });
-  status.classList.add("music-venues-empty");
-  musicVenuesStatus.append(status);
+  status.classList.add("harmony-registry-signal");
+  musicVenuesStatus.replaceChildren(status);
 }
 
 function renderMusicVenuesArchive() {
@@ -3695,15 +3699,33 @@ function renderMusicVenuesArchive() {
 
 function showMusicVenuesBrowser() {
   setMusicVenueIndexVisible(true);
+  void loadMusicVenuesBrowser();
+}
+
+function musicVenueSortUsesShows() {
+  return activeMusicVenueSort === "events" || activeMusicVenueSort === "photos";
+}
+
+async function loadMusicVenuesBrowser() {
   const context = v3RouteContext;
-  const requests = [requestMusicVenuesData(), requestMusicShowsSetsData()];
+  const isCurrent = () => v3RouteContext === context && getRouteFromUrl().name === "music-venues";
+  const request = requestMusicVenuesData();
   renderMusicVenuesArchive();
-  Promise.allSettled(requests).then(() => {
-    if (v3RouteContext === context && getRouteFromUrl().name === "music-venues") {
-      renderMusicVenuesArchive();
-      notifyV3ResumeReady();
-    }
-  });
+  const loaded = await request;
+  if (!isCurrent()) return;
+
+  renderMusicVenuesArchive();
+  // Show relationships refine the derived sorts after Venue records are already visible.
+  const showsRequest = loaded && musicVenuesCollection.length && !musicShowsSetsLoaded
+    ? requestMusicShowsSetsData()
+    : null;
+  notifyV3ResumeReady();
+
+  if (!showsRequest) return;
+  await showsRequest;
+  if (!isCurrent()) return;
+  if (musicVenueSortUsesShows()) renderMusicVenuesResults();
+  notifyV3ResumeReady();
 }
 
 function returnToMusicVenuesRoute() {
@@ -5752,7 +5774,14 @@ function requestMusicShowsSetsData() {
       return Promise.all(pageRequests)
         .then((remainingPayloads) => mergeMusicShowsPayloadPages([firstPayload, ...remainingPayloads]));
     })
-    .then((payload) => requestMusicVenuesData().then(() => payload))
+    .then(async (payload) => {
+      // A Shows request from an earlier route must not activate or retry Harbor's Venue request.
+      const venueRequest = getRouteFromUrl().name === "music-venues"
+        ? musicVenuesRequest
+        : requestMusicVenuesData();
+      if (venueRequest) await venueRequest;
+      return payload;
+    })
     .then((payload) => {
       const liveRows = normalizeMusicShowSetRows(payload);
       if (liveRows.length === 0) {
@@ -17787,7 +17816,9 @@ function settleMusicResumeLanding() {
   });
 }
 function restoreMusicResumeState(route,ui) {
-  if (route.name === "music-venues") return !ui.browsing || (!musicVenuesRequest && !musicShowsSetsRequest);
+  if (route.name === "music-venues") {
+    return !ui.browsing || (!musicVenuesRequest && (!musicVenueSortUsesShows() || !musicShowsSetsRequest));
+  }
   if(['music-venue-detail','person-detail','show-detail','sets-archive'].includes(route.name)){
     const pending=state=>['idle','loading'].includes(state);
     // Legacy Sets can expose fallback rows while the shared Shows request is still pending.
