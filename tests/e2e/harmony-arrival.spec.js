@@ -877,6 +877,158 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
   });
 }
 
+test("Harbor Solo Arrival reveals only verified identity before the real Dossier sections", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let releaseVenue;
+  const venue = new Promise(resolve => { releaseVenue = resolve; });
+  let releaseShows;
+  const shows = new Promise(resolve => { releaseShows = resolve; });
+  let showsRequests = 0;
+  let photoRequests = 0;
+  await mockArchive(page, baseURL, () => venue, () => { showsRequests++; return shows; });
+  await page.route("**/api/music/venues/aura/photos?*", route => {
+    photoRequests++;
+    return route.fulfill({ json: { photos: [] }, headers: { "access-control-allow-origin": "*" } });
+  });
+  await page.addInitScript(() => {
+    const animate = Element.prototype.animate;
+    window.soloAnimations = [];
+    Element.prototype.animate = function (frames, options) {
+      const animation = animate.call(this, frames, options);
+      if (this.closest("[data-harmony-solo-arrival] .venue-detail-screen")) {
+        animation.pause();
+        window.soloAnimations.push(animation);
+      }
+      return animation;
+    };
+  });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const shell = page.locator(".site-shell");
+  const dossier = page.locator("[data-venue-detail]");
+  const title = dossier.locator("[data-venue-detail-title]");
+  const metadata = dossier.locator("[data-venue-detail-metadata]");
+  const archive = dossier.locator("[data-venue-relationships]");
+  const highlights = dossier.locator("[data-venue-photo-highlights]");
+  const lowerContent = dossier.locator(".venue-detail-content-grid");
+  const engine = page.locator("[data-portfolio-engine]");
+  await expect(dossier.getByText("Loading Venue Archive", { exact: true })).toBeVisible();
+  await expect(archive).toBeHidden();
+  await expect(lowerContent).toBeHidden();
+  await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
+  expect(showsRequests).toBe(0);
+  expect(photoRequests).toBe(0);
+  const engineBefore = await engine.boundingBox();
+  const historyBefore = await page.evaluate(() => history.length);
+  const finish = duration => page.evaluate(value => {
+    window.soloAnimations.filter(animation => animation.playState === "paused" && animation.effect.getTiming().duration === value)
+      .forEach(animation => animation.finish());
+  }, duration);
+  releaseVenue({ data: [{ venue_id: "aura", name: "Aura", city: "Portland", state: "ME" }] });
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "materializing");
+  await expect(title).toHaveText("Aura");
+  await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toHaveCount(1);
+  await expect(shell.locator(".harmony-venue-passage")).toHaveCount(0);
+  await expect(metadata).toBeHidden();
+  await expect(archive).toBeHidden();
+  await expect(highlights).toBeHidden();
+  await expect.poll(() => showsRequests).toBe(1);
+  await expect.poll(() => photoRequests).toBe(1);
+  await finish(150);
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "hold");
+  const position = await title.evaluate(node => {
+    const scroller = node.closest("[data-music-nexus-shell]");
+    const top = scroller.getBoundingClientRect().top + scroller.clientTop;
+    const bottom = Math.min(top + scroller.clientHeight, document.querySelector("[data-portfolio-engine]").getBoundingClientRect().top);
+    const title = node.getBoundingClientRect();
+    return Math.abs((top + bottom - title.top - title.bottom) / 2);
+  });
+  expect(position).toBeLessThan(1);
+  await finish(125);
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "rising");
+  const endBox = await title.evaluate(node => {
+    const rise = node.getAnimations().find(animation => animation.effect.getTiming().duration === 360);
+    const start = node.getBoundingClientRect();
+    rise.currentTime = 360;
+    const end = node.getBoundingClientRect();
+    return { top: end.top, rises: start.top - end.top > 60 };
+  });
+  expect(endBox.rises).toBe(true);
+  await finish(360);
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "revealing");
+  await expect(metadata).toBeVisible();
+  await expect(archive).toBeHidden();
+  await expect(highlights).toBeHidden();
+  await finish(110);
+  await expect(archive).toBeVisible();
+  await expect(highlights).toBeHidden();
+  await finish(110);
+  await expect(highlights).toBeVisible();
+  await expect(lowerContent).toBeVisible();
+  await finish(110);
+  await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
+  expect((await title.boundingBox()).y).toBeCloseTo(endBox.top, 0);
+  expect(await engine.boundingBox()).toEqual(engineBefore);
+  expect(await page.evaluate(() => history.length)).toBe(historyBefore);
+  await expect(archive.getByText("Event Index Loading")).toBeVisible();
+  releaseShows({ data: [] });
+  await expect(archive.getByText("Event Index Loading")).toHaveCount(0);
+  await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
+});
+
+test("Harbor Solo Arrival replaces an interrupted dossier and stays off for an Inspect fallback", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await mockArchive(page, baseURL, () => ({ data: venues }));
+  await page.addInitScript(() => {
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function (frames, options) {
+      const animation = animate.call(this, frames, options);
+      if (this.matches("[data-venue-detail-title]") && this.closest("[data-harmony-solo-arrival]")) animation.pause();
+      return animation;
+    };
+  });
+  await page.goto(harborPath + "/signal-0", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const shell = page.locator(".site-shell");
+  const title = page.locator("[data-venue-detail-title]");
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "materializing");
+  await title.evaluate(node => { window.interruptedSoloEffects = node.getAnimations(); });
+  await page.addStyleTag({ content: ".music-nexus-shell.is-venue-detail { max-height: 28rem; }" });
+  const scroll = await page.evaluate(url => {
+    const scroller = document.querySelector("[data-music-nexus-shell]");
+    scroller.scrollTo({ top: 100, behavior: "instant" });
+    const oldTop = scroller.scrollTop;
+    navigateToRoute(url);
+    return { oldTop, newTop: scroller.scrollTop };
+  }, harborPath + "/signal-1");
+  expect(scroll.oldTop).toBeGreaterThan(0);
+  expect(scroll.newTop).toBe(0);
+  await expect(title).toHaveText("Signal Hall 01");
+  await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "materializing");
+  expect(await page.evaluate(() => window.interruptedSoloEffects.length > 0
+    && window.interruptedSoloEffects.every(animation => animation.playState === "idle"))).toBe(true);
+  await page.evaluate(url => navigateToRoute(url), harborPath);
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  const registry = page.locator("[data-music-venues-index]");
+  await expect(registry).not.toHaveAttribute("data-harmony-activation", /.+/);
+  await page.locator("[data-music-venues-connections]").evaluate(node => {
+    // Force the approved direct-navigation fallback without changing route or data.
+    node.getBoundingClientRect = () => new DOMRect();
+    const shell = document.querySelector(".site-shell");
+    window.fallbackSoloChanges = [];
+    new MutationObserver(records => window.fallbackSoloChanges.push(...records)).observe(shell, {
+      attributes: true, attributeFilter: ["data-harmony-solo-arrival"],
+    });
+  });
+  await registry.getByRole("link", { name: "Inspect Signal Hall 02" }).press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/signal-2");
+  await expect(title).toBeFocused();
+  await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
+  expect(await page.evaluate(() => window.fallbackSoloChanges.length)).toBe(0);
+});
+
 test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "reduce" });

@@ -415,6 +415,8 @@ let harmonyRegistryActivation = null;
 let musicVenueSectorTransition = null;
 let harmonyVenuePassage = null;
 let harmonyVenueReturn = null;
+let harmonyVenueSoloArrival = null;
+const harmonyVenueSoloContexts = new WeakSet();
 let musicVenueProjection = null;
 let inspectedMusicVenueSlug = "";
 let activeMusicVenueSearch = "";
@@ -5899,7 +5901,122 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   syncMusicVenuePhotoHighlights(venue, slug);
 }
 
-function hydrateMusicVenueDossier(context, venueSlug) {
+function prepareHarmonyVenueSoloArrival(context, slug) {
+  const cause = context.navigationCause;
+  if (!["deep-link", "spa", "reload"].includes(cause) || (context.snapshot && cause !== "reload")
+      || (cause === "spa" && history.state?.fromMusicVenuesIndex === true)
+      || context.snapshot?.ui?.panel || harmonyVenueSoloContexts.has(context) || harmonyVenuePassage || harmonyVenueReturn
+      || reducedMotion.matches || typeof venueDetailTitle?.animate !== "function" || typeof AbortController !== "function") return null;
+
+  harmonyVenueSoloContexts.add(context);
+  const controller = new AbortController();
+  const engine = shell.querySelector("[data-portfolio-engine]");
+  const arrival = { animations: [], revealed: [], frame: 0, timer: 0, scrollTop: null, engine };
+  arrival.ownsView = () => {
+    const route = getRouteFromUrl();
+    return harmonyVenueSoloArrival === arrival && v3RouteContext === context && activeMusicVenueDetailSlug === slug
+      && route.name === "music-venue-detail" && normalizeMusicVenueSlugValue(route.venueSlug) === slug
+      && venueDetail.getAttribute("aria-hidden") === "false" && !shell.classList.contains("is-lightbox-view");
+  };
+  arrival.finish = () => {
+    if (harmonyVenueSoloArrival !== arrival) return;
+    harmonyVenueSoloArrival = null;
+    controller.abort();
+    clearTimeout(arrival.timer);
+    cancelAnimationFrame(arrival.frame);
+    arrival.animations.forEach(animation => animation.cancel());
+    arrival.revealed.forEach(section => section.removeAttribute("data-harmony-solo-revealed"));
+    delete shell.dataset.harmonySoloArrival;
+  };
+  harmonyVenueSoloArrival = arrival;
+  // Keep the real loading state available. A late record renders normally without a delayed entrance.
+  arrival.timer = setTimeout(arrival.finish, 1200);
+  const signal = controller.signal;
+  const onInteraction = event => {
+    const target = event.target;
+    if (target instanceof Node && (musicNexusShell.contains(target) || engine?.contains(target)
+        || (event.type === "keydown" && target === document.body))) arrival.finish();
+  };
+  for (const type of ["pointerdown", "wheel", "keydown", "focusin"]) {
+    document.addEventListener(type, onInteraction, { capture: true, passive: true, signal });
+  }
+  musicNexusShell.addEventListener("scroll", () => {
+    if (arrival.scrollTop !== null && Math.abs(musicNexusShell.scrollTop - arrival.scrollTop) > 1) arrival.finish();
+  }, { passive: true, signal });
+  window.addEventListener("popstate", arrival.finish, { capture: true, signal });
+  window.addEventListener("resize", arrival.finish, { signal });
+  window.visualViewport?.addEventListener("resize", arrival.finish, { signal });
+  window.addEventListener("pagehide", arrival.finish, { signal });
+  reducedMotion.addEventListener?.("change", () => { if (reducedMotion.matches) arrival.finish(); }, { signal });
+  return arrival;
+}
+
+function playHarmonyVenueSoloArrival(arrival, context, venue) {
+  if (!arrival?.ownsView()) return;
+  const recordedName = venue && readMusicVenueMetadataText(venue.venueName || venue.venue_name || venue.venue || venue.name || venue.title);
+  if (!recordedName || recordedName !== venueDetailTitle.textContent) { arrival.finish(); return; }
+  clearTimeout(arrival.timer);
+  shell.dataset.harmonySoloArrival = "preparing";
+  const title = venueDetailTitle;
+  const nextFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+  const watchOwner = () => {
+    if (!arrival.ownsView()) { arrival.finish(); return; }
+    arrival.frame = requestAnimationFrame(watchOwner);
+  };
+  arrival.frame = requestAnimationFrame(watchOwner);
+  const play = (node, frames, duration, easing) => {
+    const animation = node.animate(frames, { duration, easing, fill: "both" });
+    arrival.animations.push(animation);
+    const finished = animation.finished;
+    finished.catch(() => {});
+    return finished;
+  };
+  async function run() {
+    // The existing router owns the initial viewport reset and any saved scroll.
+    const deadline = performance.now() + 180;
+    await nextFrame();
+    do { await nextFrame(); } while (arrival.ownsView() && context.pending && performance.now() < deadline);
+    if (!arrival.ownsView() || context.pending) return arrival.finish();
+
+    const titleBox = title.getBoundingClientRect();
+    const scrollerBox = musicNexusShell.getBoundingClientRect();
+    const top = scrollerBox.top + musicNexusShell.clientTop;
+    const bottom = Math.min(top + musicNexusShell.clientHeight, arrival.engine?.getBoundingClientRect().top ?? scrollerBox.bottom);
+    if (!titleBox.width || !titleBox.height || titleBox.height + 20 > bottom - top || titleBox.top >= bottom) {
+      return arrival.finish();
+    }
+    arrival.scrollTop = musicNexusShell.scrollTop;
+    const centerY = (top + bottom - titleBox.top - titleBox.bottom) / 2;
+    const centered = "translate3d(0, " + centerY + "px, 0)";
+    // If a refresh restored the heading above the clip, end visible motion at that edge.
+    const resting = titleBox.bottom < top
+      ? "translate3d(0, " + Math.max(0, top - titleBox.bottom - 4) + "px, 0)" : "none";
+    shell.dataset.harmonySoloArrival = "materializing";
+    await play(title, [{ opacity: 0, transform: centered }, { opacity: 1, transform: centered }], 150, "ease-out");
+    if (!arrival.ownsView()) return arrival.finish();
+    shell.dataset.harmonySoloArrival = "hold";
+    await play(title, [{ transform: centered }, { transform: centered }], 125, "linear");
+    if (!arrival.ownsView()) return arrival.finish();
+    shell.dataset.harmonySoloArrival = "rising";
+    await play(title, [{ transform: centered }, { transform: resting }], 360, "cubic-bezier(.25,.68,.25,1)");
+    if (!arrival.ownsView()) return arrival.finish();
+    shell.dataset.harmonySoloArrival = "revealing";
+    for (const selector of ["[data-venue-detail-metadata]", "[data-venue-relationships]",
+      "[data-venue-photo-highlights], .venue-detail-content-grid"]) {
+      const sections = [...venueDetail.querySelectorAll(selector)].filter(section => !section.hidden);
+      await Promise.all(sections.map(section => {
+        section.dataset.harmonySoloRevealed = "";
+        arrival.revealed.push(section);
+        return play(section, [{ opacity: 0 }, { opacity: 1 }], 110, "ease-out");
+      }));
+      if (!arrival.ownsView()) return arrival.finish();
+    }
+    arrival.finish();
+  }
+  run().catch(arrival.finish);
+}
+
+function hydrateMusicVenueDossier(context, venueSlug, soloArrival = null) {
   const ownsDossier = () => v3RouteContext === context && activeMusicVenueDetailSlug === venueSlug
     && venueDetail?.getAttribute("aria-hidden") === "false";
   if (!ownsDossier()) return;
@@ -5908,6 +6025,7 @@ function hydrateMusicVenueDossier(context, venueSlug) {
   const venue = venueSlugToVenue(venueSlug);
   const showsRequest = venue && !hasVerifiedMusicVenueShows() ? requestMusicShowsSetsData() : null;
   renderMusicVenueDetail(venue, venueSlug);
+  playHarmonyVenueSoloArrival(soloArrival, context, venue);
   if (venue && typeof updateShellBreadcrumb === "function") updateShellBreadcrumb(context.route);
   notifyV3ResumeReady();
   if (!showsRequest) return;
@@ -5919,6 +6037,7 @@ function hydrateMusicVenueDossier(context, venueSlug) {
 }
 
 function showMusicVenueDetail(venueSlug) {
+  harmonyVenueSoloArrival?.finish();
   const context = v3RouteContext;
   const slug = normalizeMusicVenueSlugValue(venueSlug);
   activeMusicVenueDetailSlug = slug;
@@ -5928,20 +6047,21 @@ function showMusicVenueDetail(venueSlug) {
   setMusicActivityPanelVisible(false);
   setVenueDetailVisible(true);
   setCurrentView("Venue Detail");
+  const soloArrival = prepareHarmonyVenueSoloArrival(context, slug);
   if (musicNexusShell && !v3RouteContext.snapshot) {
     musicNexusShell.scrollTo({
       top: 0,
-      behavior: harmonyVenuePassage?.committing ? "instant" : reducedMotion.matches ? "auto" : "smooth",
+      behavior: harmonyVenuePassage?.committing || soloArrival ? "instant" : reducedMotion.matches ? "auto" : "smooth",
     });
   }
 
   if (musicVenuesLoaded) {
-    hydrateMusicVenueDossier(context, slug);
+    hydrateMusicVenueDossier(context, slug, soloArrival);
     return;
   }
   const request = requestMusicVenuesData();
   renderMusicVenueDetail(null, slug);
-  request.then(() => hydrateMusicVenueDossier(context, slug));
+  request.then(() => hydrateMusicVenueDossier(context, slug, soloArrival));
 }
 
 function parseMusicShowDate(dateValue) {
@@ -6627,6 +6747,7 @@ function setVenueDetailVisible(isVisible) {
     return;
   }
 
+  if (!isVisible) harmonyVenueSoloArrival?.finish();
   musicNexusShell.classList.toggle("is-venue-detail", isVisible);
   if (isVisible) {
     setMusicVenueIndexVisible(false);

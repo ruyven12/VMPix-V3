@@ -4899,6 +4899,13 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   grid-row: 1;
 }
 
+.venue-detail-screen:has(> [data-music-venue-detail-state="loading"]) > :is([data-venue-relationships], .venue-detail-content-grid),
+.site-shell[data-harmony-solo-arrival="preparing"] .venue-detail-screen [data-venue-detail-title],
+.site-shell[data-harmony-solo-arrival] .venue-detail-screen > :is([data-venue-detail-metadata],
+    [data-venue-relationships], [data-venue-photo-highlights], .venue-detail-content-grid):not([data-harmony-solo-revealed]) {
+  visibility: hidden;
+}
+
 .harmony-venue-passage {
   position: absolute;
   z-index: 6;
