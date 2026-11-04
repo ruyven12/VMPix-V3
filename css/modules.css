@@ -4927,6 +4927,19 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   transition-property: opacity, transform;
 }
 
+.site-shell[data-harmony-venue-return] .portfolio-hub:has(> .music-nexus-shell.is-venues-index) {
+  transition-property: opacity, transform;
+}
+
+.site-shell[data-harmony-venue-return] .venue-detail-screen[data-harmony-return-title-carried] .venue-detail-title {
+  visibility: hidden;
+}
+
+.site-shell[data-harmony-venue-return] :is(.music-venues-archive, .music-venues-beacons, .harmony-arrival__sigil) {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .site-shell[data-harmony-venue-passage] .music-venues-beacons,
 .site-shell[data-harmony-venue-passage="handoff"] .venue-detail-screen {
   visibility: hidden;

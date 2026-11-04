@@ -272,8 +272,8 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
           const calls = [];
           const animate = node.animate.bind(node);
           node.animate = (frames, options) => {
-            // The forward Inspect departure is separate from the Browse ignition.
-            if (!node.closest('[data-harmony-venue-passage="converging"]')) {
+            // Inspect and its matching return are separate from the Browse ignition.
+            if (!node.closest('[data-harmony-venue-passage="converging"], [data-harmony-venue-return]')) {
               calls.push({ frames, duration: options.duration });
             }
             return animate(frames, options);
@@ -593,7 +593,7 @@ for (const [width, height, clipped] of [[412, 915], [915, 412], [915, 412, true]
       window.harmonyPassageAnimations = [];
       Element.prototype.animate = function (frames, options) {
         const animation = animate.call(this, frames, options);
-        if (this.closest(".harmony-venue-passage")) {
+        if (this.closest("[data-harmony-venue-passage] .harmony-venue-passage")) {
           animation.pause();
           window.harmonyPassageAnimations.push(animation);
         }
@@ -700,6 +700,182 @@ test("Harbor venue passage yields to Engine Back at the handoff boundary", async
   await expect(page).toHaveURL(baseURL + "/music");
   expect(await page.evaluate(() => history.length)).toBe(originalLength);
 });
+
+test("Harbor Engine Back keeps the unfinished forward title covered until native history returns", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await mockArchive(page, baseURL, () => ({ data: venues }));
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  const archive = page.locator("[data-music-venues-index]");
+  const shell = page.locator(".site-shell");
+  const detail = page.locator("[data-venue-detail]");
+  const title = detail.locator("[data-venue-detail-title]");
+  const ghost = shell.locator(".harmony-venue-passage__title");
+  const inspect = archive.getByRole("link", { name: "Inspect Signal Hall 03" });
+  await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+  await page.evaluate(() => {
+    const animate = Element.prototype.animate;
+    const nativeBack = history.back.bind(history);
+    history.back = () => { window.releaseHeldHarborBack = nativeBack; };
+    Element.prototype.animate = function (frames, options) {
+      const animation = animate.call(this, frames, options);
+      if (this.matches(".harmony-venue-passage__title") && options.duration === 360) {
+        animation.pause();
+        animation.currentTime = 350;
+      }
+      return animation;
+    };
+  });
+  await inspect.press("Enter");
+  await expect(ghost).toBeVisible();
+  await expect(title).toBeHidden();
+  const heldFrames = await page.evaluate(async () => {
+    const ghost = document.querySelector(".harmony-venue-passage__title");
+    const title = document.querySelector("[data-venue-detail-title]");
+    const animation = ghost.getAnimations()[0];
+    animation.play();
+    document.querySelector("[data-prototype-engine-return]").click();
+    const frames = [];
+    for (let index = 0; index < 3; index++) {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      frames.push({ carried: ghost.isConnected, hidden: getComputedStyle(title).visibility === "hidden", time: animation.currentTime });
+    }
+    return frames;
+  });
+  expect(heldFrames).toEqual(Array(3).fill({ carried: true, hidden: true, time: 350 }));
+  await expect(page).toHaveURL(baseURL + harborPath + "/signal-3");
+  const restored = await page.evaluate(() => new Promise(resolve => {
+    window.addEventListener("popstate", () => requestAnimationFrame(() => {
+      const shell = document.querySelector(".site-shell");
+      resolve({ route: shell.dataset.shellRoute, passage: Boolean(document.querySelector(".harmony-venue-passage, .shell-back-sweep")),
+        dossierHidden: document.querySelector("[data-venue-detail]").getAttribute("aria-hidden") === "true" });
+    }), { once: true });
+    window.releaseHeldHarborBack();
+  }));
+  expect(restored).toEqual({ route: "music-venues", passage: false, dossierHidden: true });
+  await expect(page).toHaveURL(baseURL + harborPath);
+  await expect(shell).not.toHaveAttribute("data-harmony-venue-return", /.+/);
+  await expect(inspect).toBeFocused();
+});
+
+for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
+  test("Harbor venue return restores the real Registry with " + (partial ? "a partially clipped title" : "an offscreen title") + " and keeps Engine Back single", async ({ page, baseURL }) => {
+    await page.setViewportSize({ width, height });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    let venueRequests = 0;
+    await mockArchive(page, baseURL, () => { venueRequests++; return { data: venues }; });
+    await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Reject", exact: true }).click();
+    await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+    const shell = page.locator(".site-shell");
+    const archive = page.locator("[data-music-venues-index]");
+    const list = archive.locator("[data-music-venues-list]");
+    const inspect = archive.getByRole("link", { name: "Inspect Signal Hall 03" });
+    const detail = page.locator("[data-venue-detail]");
+    const title = detail.locator("[data-venue-detail-title]");
+    const engine = page.locator("[data-portfolio-engine]");
+    const layer = shell.locator(".harmony-venue-passage");
+    const ghost = layer.locator(".harmony-venue-passage__title");
+    const selected = layer.locator("[data-harmony-passage-selected]");
+    await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+    const scroll = await list.evaluate((node, hasClippedHeading) => {
+      if (hasClippedHeading) return node.scrollTop;
+      node.style.maxHeight = "14rem";
+      node.scrollTop = 9;
+      return node.scrollTop;
+    }, partial);
+    if (!partial) expect(scroll).toBeGreaterThan(0);
+    const originalBox = await inspect.locator("..").boundingBox();
+    const engineBox = await engine.boundingBox();
+    await inspect.press("Enter");
+    await expect(title).toBeFocused();
+    if (partial) await page.addStyleTag({ content: ".music-nexus-shell.is-venue-detail { max-height: 28rem; }" });
+    const source = await title.evaluate((node, hasClippedHeading) => {
+      const scroller = node.closest("[data-music-nexus-shell]");
+      const top = scroller.getBoundingClientRect().top + scroller.clientTop;
+      const before = node.getBoundingClientRect();
+      const target = hasClippedHeading ? before.top - top + before.height / 2 : scroller.scrollHeight;
+      scroller.scrollTo({ top: target, behavior: "instant" });
+      const box = node.getBoundingClientRect();
+      return { top, bottom: box.bottom, titleTop: box.top };
+    }, partial);
+    expect(source.titleTop).toBeLessThan(source.top);
+    if (partial) expect(source.bottom).toBeGreaterThan(source.top);
+    else expect(source.bottom).toBeLessThan(source.top);
+    const originalHistory = await page.evaluate(() => {
+      const animate = Element.prototype.animate;
+      window.harmonyReturnArt = document.querySelector("[data-harmony-art]");
+      window.harmonyReturnAnimations = [];
+      Element.prototype.animate = function (frames, options) {
+        const animation = animate.call(this, frames, options);
+        if (this.closest(".site-shell[data-harmony-venue-return]")
+            && (this.matches("[data-venue-detail]") || this.closest(".harmony-venue-passage"))) {
+          animation.pause();
+          window.harmonyReturnAnimations.push(animation);
+        }
+        return animation;
+      };
+      return history.length;
+    });
+    const finish = durations => page.evaluate(values => {
+      window.harmonyReturnAnimations.filter(animation => values.includes(animation.effect.getTiming().duration))
+        .forEach(animation => animation.finish());
+    }, durations);
+    // Activate the existing local Back control without its offscreen focus changing the deliberate scroll fixture.
+    await detail.locator("[data-venue-detail-back]").evaluate(button => button.click());
+    await expect(page).toHaveURL(baseURL + harborPath);
+    await expect(shell).toHaveAttribute("data-harmony-venue-return", "departing");
+    await expect(ghost).toHaveText("Signal Hall 03");
+    await expect(ghost).toHaveCSS("opacity", partial ? "1" : "0");
+    if (partial) {
+      expect((await ghost.boundingBox()).y).toBeCloseTo(source.titleTop, 0);
+      expect(await layer.evaluate(node => getComputedStyle(node).clipPath)).toMatch(/^inset\(/);
+    } else {
+      expect((await ghost.boundingBox()).y).toBeGreaterThanOrEqual(source.top);
+    }
+    await finish([130]);
+    await expect(shell).toHaveAttribute("data-harmony-venue-return", "descending");
+    await expect(archive).toHaveCSS("opacity", "0");
+    const travel = await ghost.evaluate(node => {
+      const animation = node.getAnimations().find(item => item.effect.getTiming().duration === 360);
+      animation.currentTime = 0;
+      const textBox = element => {
+        const range = document.createRange();
+        range.selectNodeContents(element);
+        return range.getBoundingClientRect();
+      };
+      const start = textBox(node);
+      animation.currentTime = 360;
+      const end = textBox(node);
+      const name = textBox(node.parentElement.querySelector("[data-harmony-passage-selected] strong"));
+      return { descends: end.y - start.y > 30,
+        centered: Math.abs((end.left + end.right - name.left - name.right) / 2) < 1
+          && Math.abs((end.top + end.bottom - name.top - name.bottom) / 2) < 1 };
+    });
+    expect(travel).toEqual({ descends: true, centered: true });
+    await page.locator("[data-prototype-engine-return]").press("Enter");
+    await expect(page).toHaveURL(baseURL + harborPath);
+    await expect(shell).toHaveAttribute("data-harmony-venue-return", "descending");
+    await finish([220, 360]);
+    await expect(shell).toHaveAttribute("data-harmony-venue-return", "hold");
+    expect(await layer.evaluate(node => getComputedStyle(node).clipPath)).toBe("none");
+    await expect(ghost).toHaveCount(0);
+    await expect(selected).toContainText("Signal Hall 03");
+    await finish([125]);
+    await expect(shell).toHaveAttribute("data-harmony-venue-return", "spreading");
+    await finish([340]);
+    await expect(layer).toHaveCount(0);
+    await expect(inspect).toBeFocused();
+    expect(await list.evaluate(node => node.scrollTop)).toBe(scroll);
+    expect(await inspect.locator("..").boundingBox()).toEqual(originalBox);
+    expect(await engine.boundingBox()).toEqual(engineBox);
+    expect(await page.evaluate(() => window.harmonyReturnArt === document.querySelector("[data-harmony-art]"))).toBe(true);
+    expect(await page.evaluate(() => history.length)).toBe(originalHistory);
+    expect(venueRequests).toBe(1);
+  });
+}
 
 test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });

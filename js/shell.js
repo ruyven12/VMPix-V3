@@ -5502,6 +5502,7 @@ function performShellBack() {
   // S13F remains the first and unchanged local Back owner.
   if (route.name === "set-detail" && backSetDossierMode()) return;
   if (backShellLocalDrilldown()) return;
+  if (harmonyVenueReturn) return;
   const entry = window.history.state?.v3EntryId;
   if (entry && shellBackPendingEntry === entry) return;
   if (shouldShellBackUseHistory(route)) {
@@ -9707,7 +9708,18 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
   window.addEventListener("pageshow", (event) => {
     if (event.persisted) syncHomeEngageReadiness();
   });
+  let interruptedHarmonyEntry = null;
+  const rememberUnfinishedHarmony = () => {
+    if (shell.dataset.harmonyVenuePassage === "handoff") interruptedHarmonyEntry = v3RouteContext.entry;
+  };
+  // Capture the forward ownership before its local listeners clean up the temporary title.
+  window.addEventListener("popstate", rememberUnfinishedHarmony, { capture: true });
+  window.addEventListener("click", event => {
+    if (event.target?.closest?.("[data-prototype-engine-return], [data-shell-back], [data-venue-detail-back]")) rememberUnfinishedHarmony();
+  }, { capture: true });
   window.addEventListener("popstate", (event) => {
+    const interruptedHarmony = interruptedHarmonyEntry === v3RouteContext.entry;
+    interruptedHarmonyEntry = null;
     resetShellMenu(); // Also clear before same-route local-history handlers return.
     cancelShellDataConduit("history");
     shellBackPendingEntry = null;
@@ -9725,12 +9737,23 @@ if (shell && startButton && (window.v3HomeBoot?.beginInitialization() ?? true)) 
     const historyState = event.state;
     const targetIndex = getShellHistoryIndex(historyState);
     const isBack = targetIndex !== null && shellHistoryIndex !== null && targetIndex < shellHistoryIndex;
+    const isAdjacentBack = isBack && targetIndex === shellHistoryIndex - 1;
     shellHistoryIndex = targetIndex;
-    runShellBackSweep(targetRoute, () => {
+    const restore = () => {
       syncRoute(targetRoute, { historyState, navigationCause: 'back-forward' });
       if (typeof stabilizeShellViewport === "function") stabilizeShellViewport(targetRoute, { historyState });
       try { window.__v3AnalyticsBoot?.commit(targetRoute); } catch { /* Analytics is optional. */ }
-    }, isBack);
+    };
+    if (isAdjacentBack && interruptedHarmony && shellRenderedRoute?.name === "music-venue-detail" && targetRoute.name === "music-venues") {
+      cancelShellBackSweep();
+      restore();
+      return;
+    }
+    if (isAdjacentBack && startHarmonyVenueReturn(shellRenderedRoute, targetRoute, historyState, restore)) {
+      cancelShellBackSweep();
+      return;
+    }
+    runShellBackSweep(targetRoute, restore, isBack);
   });
   if (hubCarousel) {
     hubCarousel.addEventListener("scroll", scheduleSpotlightSync, { passive: true });
