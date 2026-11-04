@@ -413,6 +413,7 @@ let activeMusicVenueSector = 0;
 let musicVenueConnectorFrame = 0;
 let harmonyRegistryActivation = null;
 let musicVenueSectorTransition = null;
+let harmonyVenuePassage = null;
 let musicVenueProjection = null;
 let inspectedMusicVenueSlug = "";
 let activeMusicVenueSearch = "";
@@ -3548,19 +3549,222 @@ function createMusicVenueBeacon(venue) {
   link.addEventListener("click", (event) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    if (musicVenueProjection || harmonyRegistryActivation || musicVenueSectorTransition
+    if (harmonyVenuePassage || musicVenueProjection || harmonyRegistryActivation || musicVenueSectorTransition
         || getRouteFromUrl().name !== "music-venues" || !musicVenuesIndex.classList.contains("is-active")) return;
 
-    inspectedMusicVenueSlug = beacon.dataset.venueSlug;
-    navigateToMusicVenueDetail(venue);
-    if (venueDetailTitle && venueDetail?.getAttribute("aria-hidden") === "false") {
-      venueDetailTitle.tabIndex = -1;
-      venueDetailTitle.focus({ preventScroll: true });
-    }
+    startHarmonyVenuePassage(venue, beacon);
   });
 
   beacon.append(label, link);
   return beacon;
+}
+
+function focusMusicVenueDossierTitle() {
+  if (venueDetailTitle && venueDetail?.getAttribute("aria-hidden") === "false") {
+    venueDetailTitle.tabIndex = -1;
+    venueDetailTitle.focus({ preventScroll: true });
+  }
+}
+
+function startHarmonyVenuePassage(venue, selectedBeacon) {
+  const slug = selectedBeacon.dataset.venueSlug;
+  const navigate = () => {
+    inspectedMusicVenueSlug = slug;
+    navigateToMusicVenueDetail(venue);
+  };
+  const navigateImmediately = () => {
+    navigate();
+    focusMusicVenueDossierTitle();
+  };
+  if (reducedMotion.matches || typeof shell?.animate !== "function" || typeof AbortController !== "function") {
+    navigateImmediately();
+    return;
+  }
+
+  const shellBox = shell.getBoundingClientRect();
+  const stage = musicVenueConnections.getBoundingClientRect();
+  const listBox = musicVenuesList.getBoundingClientRect();
+  const listTop = listBox.top + musicVenuesList.clientTop;
+  const viewport = { top: listTop, bottom: listTop + musicVenuesList.clientHeight };
+  const visible = [...musicVenueBeacons.children].map((beacon, index) => ({ beacon, index, box: beacon.getBoundingClientRect() }))
+    .filter(({ box }) => box.width && box.height && box.bottom > viewport.top && box.top < viewport.bottom);
+  if (!stage.width || !stage.height || !visible.some(({ beacon }) => beacon === selectedBeacon)) {
+    navigateImmediately();
+    return;
+  }
+
+  const sourceContext = v3RouteContext;
+  const sourceUrl = location.href;
+  const destinationUrl = new URL(getMusicVenueRouteUrl(venue), location.href).href;
+  const layer = document.createElement("div");
+  layer.className = "harmony-venue-passage";
+  layer.setAttribute("aria-hidden", "true");
+  layer.inert = true;
+  const centerX = stage.left + stage.width / 2;
+  const shortLandscape = window.matchMedia("(orientation: landscape) and (max-height: 540px)").matches;
+  let centerY = stage.top + stage.height * (shortLandscape ? 0.64 : 0.45);
+  const stackOffset = (beacon, order) => beacon === selectedBeacon ? -19 : (order - (visible.length - 1) / 2) * 5;
+  const stackScale = beacon => beacon === selectedBeacon ? 1.04 : 0.95;
+  if (visible.some(({ box }) => box.top < viewport.top || box.bottom > viewport.bottom)) {
+    // Keep partially visible source cards clipped until the centered stack fits inside the old scrollport.
+    const minY = Math.max(...visible.map(({ beacon, box }, order) =>
+      viewport.top + box.height * stackScale(beacon) / 2 - stackOffset(beacon, order)));
+    const maxY = Math.min(...visible.map(({ beacon, box }, order) =>
+      viewport.bottom - box.height * stackScale(beacon) / 2 - stackOffset(beacon, order)));
+    if (minY > maxY) {
+      navigateImmediately();
+      return;
+    }
+    centerY = Math.max(minY, Math.min(maxY, centerY));
+    layer.style.clipPath = "inset(" + (viewport.top - shellBox.top) + "px 0 "
+      + (shellBox.bottom - viewport.bottom) + "px)";
+  }
+  const plates = visible.map(({ beacon, index, box }, order) => {
+    const plate = beacon.cloneNode(true);
+    const selected = beacon === selectedBeacon;
+    const depth = order - (visible.length - 1) / 2;
+    const originalStyle = getComputedStyle(beacon);
+    plate.classList.add("harmony-venue-passage__plate");
+    plate.toggleAttribute("data-harmony-passage-selected", selected);
+    const link = plate.querySelector("a");
+    link.removeAttribute("href");
+    link.style.gridColumn = index % 2 ? "1" : "2";
+    link.style.gridRow = "1";
+    const label = plate.querySelector(".music-venue-beacon-label");
+    label.style.gridColumn = index % 2 ? "2" : "1";
+    label.style.gridRow = "1";
+    Object.assign(plate.style, {
+      left: (box.left - shellBox.left) + "px",
+      top: (box.top - shellBox.top) + "px",
+      width: box.width + "px",
+      height: box.height + "px",
+      gridTemplateColumns: originalStyle.gridTemplateColumns,
+      paddingInline: originalStyle.paddingInline,
+      transform: "none",
+    });
+    layer.append(plate);
+    return {
+      plate, selected, scale: stackScale(beacon),
+      x: centerX - (box.left + box.width / 2) + (selected ? 0 : depth * 2),
+      y: centerY - (box.top + box.height / 2) + stackOffset(beacon, order),
+    };
+  });
+
+  const abort = new AbortController();
+  const passage = { animations: [], frame: 0, destinationContext: null, committing: false };
+  const ownsSource = () => v3RouteContext === sourceContext && location.href === sourceUrl;
+  const ownsDestination = () => passage.destinationContext && v3RouteContext === passage.destinationContext
+    && location.href === destinationUrl;
+  const cancel = (restoreFocus = false) => {
+    if (harmonyVenuePassage !== passage) return;
+    harmonyVenuePassage = null;
+    abort.abort();
+    cancelAnimationFrame(passage.frame);
+    passage.animations.forEach(animation => animation.cancel());
+    layer.remove();
+    delete shell.dataset.harmonyVenuePassage;
+    if (musicVenuesIndex.classList.contains("is-active")) musicVenuesIndex.inert = false;
+    if (ownsSource()) {
+      if (passage.refreshAfterCancel) renderMusicVenuesResults();
+      if (restoreFocus) focusMusicVenueBeacon(slug);
+    }
+  };
+  const finishImmediately = () => {
+    if (harmonyVenuePassage !== passage) return;
+    const canNavigate = ownsSource();
+    const canFocus = ownsDestination();
+    cancel();
+    if (canNavigate) navigateImmediately();
+    else if (canFocus) focusMusicVenueDossierTitle();
+  };
+  passage.cancel = cancel;
+  passage.finishImmediately = finishImmediately;
+  harmonyVenuePassage = passage;
+
+  const watchOwner = () => {
+    if (!ownsSource() && !ownsDestination()) {
+      cancel();
+      return;
+    }
+    passage.frame = requestAnimationFrame(watchOwner);
+  };
+  passage.frame = requestAnimationFrame(watchOwner);
+  window.addEventListener("popstate", () => cancel(), { capture: true, signal: abort.signal });
+  window.addEventListener("resize", finishImmediately, { signal: abort.signal });
+  shell.addEventListener("click", event => {
+    if (event.target?.closest?.("[data-portfolio-engine]")) cancel();
+  }, { capture: true, signal: abort.signal });
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape" && ownsSource()) cancel(true);
+  }, { capture: true, signal: abort.signal });
+
+  shell.append(layer);
+  shell.dataset.harmonyVenuePassage = "converging";
+  musicVenuesIndex.inert = true;
+
+  const play = (node, frames, duration, easing) => {
+    const animation = node.animate(frames, { duration, easing, fill: "both" });
+    passage.animations.push(animation);
+    return animation.finished;
+  };
+  const transform = (x, y, scale) => `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  const selected = plates.find(entry => entry.selected);
+  const settleSource = () => harmonyVenuePassage === passage && ownsSource();
+  async function run() {
+    await Promise.all([
+      ...plates.map(entry => {
+        entry.stack = transform(entry.x, entry.y, entry.scale);
+        return play(entry.plate, [{ transform: "none" }, { transform: entry.stack }], 340, "cubic-bezier(.25,.7,.25,1)");
+      }),
+      play(musicVenueConnections, [{ opacity: 1 }, { opacity: 0 }], 180, "ease-out"),
+      play(harmonySigil, [{ opacity: 1 }, { opacity: 0 }], 280, "ease-out"),
+    ]);
+    if (!settleSource()) return cancel();
+    shell.dataset.harmonyVenuePassage = "hold";
+    await play(selected.plate, [{ opacity: 1 }, { opacity: 1 }], 125, "linear");
+    if (!settleSource()) return cancel();
+
+    const name = selected.plate.querySelector("strong");
+    const nameBox = name.getBoundingClientRect();
+    shell.dataset.harmonyVenuePassage = "handoff";
+    passage.committing = true;
+    try {
+      navigate();
+      passage.destinationContext = v3RouteContext;
+    } finally {
+      passage.committing = false;
+    }
+
+    // The existing forward scroller reset runs before this frame.
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    if (harmonyVenuePassage !== passage || !ownsDestination()) return cancel();
+    const titleBox = venueDetailTitle?.getBoundingClientRect();
+    if (!titleBox?.width || !titleBox.height || !nameBox.width || !nameBox.height) return finishImmediately();
+
+    const ghost = document.createElement("div");
+    ghost.className = "venue-detail-title harmony-venue-passage__title";
+    ghost.textContent = venueDetailTitle.textContent;
+    Object.assign(ghost.style, {
+      left: (titleBox.left - shellBox.left) + "px",
+      top: (titleBox.top - shellBox.top) + "px",
+      width: titleBox.width + "px",
+    });
+    layer.append(ghost);
+    layer.style.removeProperty("clip-path");
+    name.style.visibility = "hidden";
+    const fromX = nameBox.left + nameBox.width / 2 - titleBox.left - titleBox.width / 2;
+    const fromY = nameBox.top + nameBox.height / 2 - titleBox.top - titleBox.height / 2;
+    const fromScale = Math.min(1, nameBox.width / titleBox.width, nameBox.height / titleBox.height);
+    await Promise.all([
+      play(ghost, [{ transform: transform(fromX, fromY, fromScale) }, { transform: "none" }], 360, "cubic-bezier(.25,.68,.25,1)"),
+      ...plates.map(entry => play(entry.plate, [
+        { transform: entry.stack, opacity: 1 },
+        { transform: transform(entry.x, entry.y + 10, 0.78), opacity: 0 },
+      ], 260, "ease-out")),
+    ]);
+    finishImmediately();
+  }
+  run().catch(finishImmediately);
 }
 
 function focusMusicVenueBeacon(slug) {
@@ -4126,7 +4330,8 @@ async function loadMusicVenuesBrowser() {
   if (!isCurrent()) return;
   // The invisible midpoint reads the latest order. If it already passed, finish the fade before resorting.
   if (musicVenueSortUsesShows()) {
-    if (musicVenueProjection) musicVenueProjection.refreshAfterClose = true;
+    if (harmonyVenuePassage) harmonyVenuePassage.refreshAfterCancel = true;
+    else if (musicVenueProjection) musicVenueProjection.refreshAfterClose = true;
     else if (!musicVenueSectorTransition) renderMusicVenuesResults();
     else if (musicVenueSectorTransition.swapped) musicVenueSectorTransition.refreshAfterFade = true;
   }
@@ -5508,7 +5713,7 @@ function showMusicVenueDetail(venueSlug) {
   if (musicNexusShell && !v3RouteContext.snapshot) {
     musicNexusShell.scrollTo({
       top: 0,
-      behavior: reducedMotion.matches ? "auto" : "smooth",
+      behavior: harmonyVenuePassage?.committing ? "instant" : reducedMotion.matches ? "auto" : "smooth",
     });
   }
 
@@ -6231,6 +6436,7 @@ function setHarmonyArrivalVisible(isVisible) {
 
 function setMusicVenueIndexVisible(isVisible) {
   if (!isVisible) {
+    if (!harmonyVenuePassage?.committing) harmonyVenuePassage?.cancel();
     closeMusicVenueProjection();
     settleHarmonyRegistryActivation();
     settleMusicVenueSectorTransition();
@@ -17746,6 +17952,7 @@ function initMusicModule() {
   });
   reducedMotion.addEventListener("change", () => {
     if (!reducedMotion.matches) return;
+    harmonyVenuePassage?.finishImmediately();
     musicVenueSectorTransition?.finishImmediately();
     musicVenueProjection?.finishImmediately();
     settleHarmonyFilterMotion();
@@ -17760,7 +17967,7 @@ function initMusicModule() {
     setMusicVenuesFiltersOpen(false, true);
   });
   document.addEventListener("click", (event) => {
-    if (!event.detail || !areMusicVenuesFiltersOpen() || musicVenueProjection || harmonyRegistryActivation
+    if (!event.detail || !areMusicVenuesFiltersOpen() || harmonyVenuePassage || musicVenueProjection || harmonyRegistryActivation
         || shell?.dataset.shellRoute !== "music-venues" || getRouteFromUrl().name !== "music-venues"
         || !musicVenuesIndex?.classList.contains("is-active")) return;
     const target = event.target;

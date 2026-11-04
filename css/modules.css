@@ -4899,6 +4899,39 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   grid-row: 1;
 }
 
+.harmony-venue-passage {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.harmony-venue-passage__plate,
+.harmony-venue-passage__title {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.harmony-venue-passage__plate[data-harmony-passage-selected] {
+  z-index: 1;
+  border-color: rgba(155, 226, 246, 0.78);
+}
+
+.harmony-venue-passage__title {
+  z-index: 2;
+  text-align: center;
+}
+
+.site-shell[data-harmony-venue-passage="handoff"] .portfolio-hub:has(> .music-nexus-shell.is-venue-detail) {
+  transition-property: opacity, transform;
+}
+
+.site-shell[data-harmony-venue-passage] .music-venues-beacons,
+.site-shell[data-harmony-venue-passage="handoff"] .venue-detail-screen {
+  visibility: hidden;
+}
+
 .music-venue-beacon-label {
   display: grid;
   gap: 0.18rem;
