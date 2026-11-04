@@ -1258,41 +1258,29 @@
 
           <article class="venue-detail-screen" aria-labelledby="venue-detail-title" aria-hidden="true" inert data-venue-detail>
             <button class="venue-detail-back" type="button" data-venue-detail-back>Back To Venues</button>
-            <section class="venue-detail-hero" aria-labelledby="venue-detail-title">
-              <div class="venue-detail-logo-card" aria-label="Asylum venue mark" data-venue-detail-logo-card>
-                <span class="venue-detail-logo-mark" aria-hidden="true" data-venue-detail-logo-mark>AS</span>
-                <span class="venue-detail-logo-label" data-venue-detail-logo-label>Asylum</span>
-              </div>
-
-              <div class="venue-detail-title-block">
-                <p class="venue-detail-kicker">Venue Dossier</p>
-                <h3 class="venue-detail-title" id="venue-detail-title" data-venue-detail-title>Asylum</h3>
-                <p class="venue-detail-location" data-venue-detail-location>Portland, Maine</p>
-                <dl class="venue-detail-meta-row" aria-label="Venue metadata">
-                  <div class="venue-detail-meta-item">
-                    <dt>Established</dt>
-                    <dd>Pending</dd>
-                  </div>
-                  <div class="venue-detail-meta-item">
-                    <dt>GPS</dt>
-                    <dd>Pending</dd>
-                  </div>
-                  <div class="venue-detail-meta-item">
-                    <dt>Region</dt>
-                    <dd data-venue-detail-region>New England</dd>
-                  </div>
-                </dl>
-                <div class="venue-detail-visual" role="img" aria-label="Compact location visualization for Asylum in Portland, Maine" data-venue-detail-visual>
-                  <span class="venue-detail-visual-line venue-detail-visual-line--one" aria-hidden="true"></span>
-                  <span class="venue-detail-visual-line venue-detail-visual-line--two" aria-hidden="true"></span>
-                  <span class="venue-detail-visual-pin venue-detail-visual-pin--primary" aria-hidden="true"></span>
-                  <span class="venue-detail-visual-pin venue-detail-visual-pin--secondary" aria-hidden="true"></span>
-                  <div class="venue-detail-visual-label">
-                    <span data-venue-detail-visual-primary>Portland Core</span>
-                    <span data-venue-detail-visual-secondary>Archive Signal 01</span>
-                  </div>
+            <header class="venue-detail-identity" data-venue-detail-identity hidden>
+              <h3 class="venue-detail-title" id="venue-detail-title" data-venue-detail-title>Venue Dossier</h3>
+            </header>
+            <section class="venue-detail-metadata" aria-label="Venue metadata" data-venue-detail-metadata hidden>
+              <dl class="venue-detail-meta-row" data-venue-detail-fields>
+                <div class="venue-detail-meta-item" data-venue-detail-field="location" hidden>
+                  <dt>Location</dt>
+                  <dd data-venue-detail-location></dd>
                 </div>
-              </div>
+                <div class="venue-detail-meta-item" data-venue-detail-field="established" hidden>
+                  <dt>Established</dt>
+                  <dd></dd>
+                </div>
+                <div class="venue-detail-meta-item" data-venue-detail-field="gps" hidden>
+                  <dt>GPS</dt>
+                  <dd></dd>
+                </div>
+                <div class="venue-detail-meta-item" data-venue-detail-field="region" hidden>
+                  <dt>Region</dt>
+                  <dd></dd>
+                </div>
+              </dl>
+              <p class="venue-detail-metadata-notice" data-venue-detail-missing hidden></p>
             </section>
 
             <section class="venue-relationships" aria-label="Venue Statistics" data-venue-relationships>

@@ -97,10 +97,8 @@
 .show-detail-relationship-row,
 .show-detail-relationship-chips,
 .venue-detail-screen,
-.venue-detail-hero,
-.venue-detail-logo-card,
-.venue-detail-visual,
-.venue-detail-title-block,
+.venue-detail-identity,
+.venue-detail-metadata,
 .venue-detail-stats-strip,
 .venue-relationships,
 .venue-relationships-header,
@@ -3968,23 +3966,6 @@ html.is-lightbox-scroll-locked body {
   outline-offset: 0.16rem;
 }
 
-.venue-detail-hero {
-  display: grid;
-  grid-template-areas:
-    "logo"
-    "copy";
-  gap: clamp(0.66rem, 0.9rem, 1rem);
-  padding: clamp(0.72rem, 0.92rem, 1.04rem);
-  border: 1px solid rgba(247, 247, 242, 0.1);
-  border-radius: var(--v3-card-radius-feature);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.04), transparent 62%),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.085), transparent 72%),
-    rgba(3, 3, 6, 0.52);
-  overflow: hidden;
-}
-
-.venue-detail-hero::before,
 .venue-detail-panel::before {
   position: absolute;
   inset: 0;
@@ -3995,88 +3976,6 @@ html.is-lightbox-scroll-locked body {
   pointer-events: none;
 }
 
-.venue-detail-logo-card {
-  grid-area: logo;
-  min-height: 9.25rem;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 0.38rem;
-  padding: 0.8rem;
-  border: 1px solid rgba(247, 247, 242, 0.11);
-  border-radius: var(--radius-sm);
-  background:
-    radial-gradient(circle at 50% 38%, rgba(247, 247, 242, 0.12), transparent 0.18rem),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.18), transparent 68%),
-    rgba(1, 1, 3, 0.55);
-  box-shadow: inset 0 0 1.3rem rgba(0, 0, 0, 0.48);
-  overflow: hidden;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.venue-detail-logo-card::after {
-  position: absolute;
-  inset: 12%;
-  content: "";
-  border: 1px solid rgba(247, 247, 242, 0.1);
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.venue-detail-logo-mark {
-  position: relative;
-  z-index: 1;
-  color: rgba(247, 247, 242, 0.9);
-  font-size: 3.2rem;
-  line-height: 0.9;
-}
-
-.venue-detail-logo-label {
-  position: relative;
-  z-index: 1;
-  color: rgba(255, 118, 102, 0.76);
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.venue-detail-visual {
-  grid-area: auto;
-  min-height: clamp(5.7rem, 17vw, 7.6rem);
-  border: 1px solid rgba(247, 247, 242, 0.1);
-  border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.055), transparent 44%),
-    radial-gradient(circle at 62% 42%, rgba(213, 22, 34, 0.22), transparent 0.3rem),
-    radial-gradient(circle at 38% 58%, rgba(247, 247, 242, 0.11), transparent 0.22rem),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.08), transparent 58%),
-    rgba(1, 1, 3, 0.58);
-  box-shadow: inset 0 0 1.55rem rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-.venue-detail-visual::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(rgba(247, 247, 242, 0.035) 1px, transparent 1px) 0 0 / 2.25rem 2.25rem,
-    linear-gradient(90deg, rgba(247, 247, 242, 0.03) 1px, transparent 1px) 0 0 / 2.25rem 2.25rem;
-  mask-image: linear-gradient(180deg, transparent, #000 16%, #000 82%, transparent);
-  pointer-events: none;
-}
-
-.venue-detail-visual::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(180deg, transparent 0 58%, rgba(1, 1, 3, 0.74)),
-    linear-gradient(90deg, rgba(1, 1, 3, 0.45), transparent 24% 76%, rgba(1, 1, 3, 0.42));
-  pointer-events: none;
-}
-
-.venue-detail-visual-line,
 .venue-map-route {
   position: absolute;
   height: 1px;
@@ -4086,22 +3985,6 @@ html.is-lightbox-scroll-locked body {
   pointer-events: none;
 }
 
-.venue-detail-visual-line--one {
-  top: 38%;
-  left: 18%;
-  width: 68%;
-  transform: rotate(-12deg);
-}
-
-.venue-detail-visual-line--two {
-  top: 62%;
-  left: 12%;
-  width: 76%;
-  background: rgba(247, 247, 242, 0.16);
-  transform: rotate(9deg);
-}
-
-.venue-detail-visual-pin,
 .venue-map-node {
   position: absolute;
   z-index: 1;
@@ -4114,47 +3997,8 @@ html.is-lightbox-scroll-locked body {
   pointer-events: none;
 }
 
-.venue-detail-visual-pin--primary {
-  top: 41%;
-  left: 57%;
-}
-
-.venue-detail-visual-pin--secondary {
-  top: 58%;
-  left: 36%;
-  width: 0.52rem;
-  background: rgba(247, 247, 242, 0.52);
-  box-shadow: none;
-}
-
-.venue-detail-visual-label {
-  position: absolute;
-  right: 0.54rem;
-  bottom: 0.5rem;
-  left: 0.54rem;
-  z-index: 1;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.24rem;
-  color: rgba(247, 247, 242, 0.68);
-  font-size: 0.58rem;
-  line-height: 1;
-  text-transform: none;
-}
-
-.venue-detail-title-block {
-  grid-area: copy;
-  min-width: 0;
-  display: grid;
-  align-content: start;
-  gap: 0.54rem;
-}
-
-.venue-detail-kicker,
 .venue-detail-title,
-.venue-detail-location,
+.venue-detail-metadata-notice,
 .venue-detail-meta-row,
 .venue-detail-meta-item,
 .venue-detail-meta-item dt,
@@ -4181,7 +4025,6 @@ html.is-lightbox-scroll-locked body {
   margin: 0;
 }
 
-.venue-detail-kicker,
 .venue-detail-panel-kicker {
   color: rgba(255, 118, 102, 0.78);
   font-size: 0.72rem;
@@ -4189,51 +4032,78 @@ html.is-lightbox-scroll-locked body {
   text-transform: uppercase;
 }
 
+.venue-detail-identity:not([hidden]) {
+  display: grid;
+  justify-items: center;
+  padding-block-start: clamp(0.3rem, 1.5svh, 0.85rem);
+  padding-block-end: clamp(4rem, calc((var(--app-viewport-height, 100svh)
+    - var(--portfolio-engine-height, 4rem) - var(--portfolio-engine-bottom-offset, 0.6rem) - 2rem) / 3), 19rem);
+  text-align: center;
+}
+
 .venue-detail-title {
-  color: rgba(247, 247, 242, 0.95);
-  font-size: 2.2rem;
+  color: #f0f5ff;
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, min(7.2vw, 8svh), 4.3rem);
   font-weight: 400;
-  line-height: 0.96;
+  line-height: 1.1;
   overflow-wrap: anywhere;
-  text-transform: none;
+  text-shadow: 0 2px 14px #081321, 0 1px 5px #081321;
+  text-wrap: balance;
 }
 
-.venue-detail-location {
-  color: rgba(247, 247, 242, 0.66);
-  font-size: 0.88rem;
-  line-height: 1.2;
-  text-transform: none;
-}
-
-.venue-detail-meta-row {
+.venue-detail-metadata:not([hidden]) {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.42rem;
+  gap: 0.45rem;
+  width: min(100%, 32rem);
+  justify-self: center;
 }
 
-.venue-detail-meta-item {
+.venue-detail-meta-row:not([hidden]) {
   display: grid;
-  gap: 0.18rem;
-  padding: 0.46rem 0.52rem;
-  border: 1px solid rgba(247, 247, 242, 0.075);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.venue-detail-meta-item:not([hidden]) {
+  display: grid;
+  align-content: start;
+  gap: 0.24rem;
+  padding: 0.52rem 0.35rem;
+  border-block-start: 1px solid rgba(147, 207, 230, 0.44);
+  text-shadow: 0 1px 3px #081321, 0 1px 8px #081321;
+}
+
+.venue-detail-meta-item dt {
+  color: #afd6e8;
+  font-size: 0.65rem;
+  line-height: 1.18;
+  text-transform: uppercase;
+}
+
+.venue-detail-meta-item dd {
+  color: #ebf6ff;
+  font-size: 0.77rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.venue-detail-metadata-notice {
+  padding: 0.46rem 0.6rem;
+  border: 1px solid rgba(147, 207, 230, 0.29);
   border-radius: var(--radius-sm);
-  background: rgba(1, 1, 3, 0.26);
+  background: rgba(8, 20, 36, 0.86);
+  color: #bdd5e4;
+  font-size: 0.69rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
-.venue-detail-meta-item dt,
 .venue-detail-stat-label {
   color: rgba(247, 247, 242, 0.46);
   font-size: 0.58rem;
   line-height: 1;
   text-transform: uppercase;
-}
-
-.venue-detail-meta-item dd {
-  color: rgba(247, 247, 242, 0.8);
-  font-size: 0.72rem;
-  line-height: 1.12;
-  overflow-wrap: anywhere;
-  text-transform: none;
 }
 
 .venue-detail-stats-strip {
@@ -4278,12 +4148,28 @@ html.is-lightbox-scroll-locked body {
 }
 
 html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
-.site-shell[data-shell-route="music-venues"]:has(.music-nexus-shell:is(.is-harmony-arrival, .is-venues-index)) > .harmony-environment {
+.site-shell[data-shell-route="music-venues"]:has(.music-nexus-shell:is(.is-harmony-arrival, .is-venues-index)) > .harmony-environment,
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view):has(.music-nexus-shell.is-venue-detail) > .harmony-environment {
   display: block;
 }
 
+.site-shell[data-shell-route="music-venue-detail"] > .harmony-environment .harmony-arrival__sigil {
+  display: none;
+}
+
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .portfolio-hub:has(> .music-nexus-shell.is-venue-detail),
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .music-nexus-shell.is-venue-detail {
+  border-color: transparent;
+  background: none;
+}
+
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .portfolio-hub:has(> .music-nexus-shell.is-venue-detail)::before,
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .music-nexus-shell.is-venue-detail::before {
+  content: none;
+}
+
 /* Harbor owns the first visible frame after the boot mask is lifted. */
-.site-shell[data-shell-route="music-venues"] .home-frame {
+.site-shell:is([data-shell-route="music-venues"], [data-shell-route="music-venue-detail"]) .home-frame {
   display: none;
 }
 
@@ -27289,36 +27175,6 @@ button.hall-crusades-archive-crystal:focus-visible {
 }
 
 @media (min-width: 760px) {
-  .venue-detail-hero {
-    grid-template-columns: minmax(11rem, 0.3fr) minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-template-areas:
-      "logo copy";
-    align-items: stretch;
-    gap: 0.86rem;
-    padding: 1rem;
-  }
-
-  .venue-detail-logo-card {
-    min-height: 12rem;
-  }
-
-  .venue-detail-logo-mark {
-    font-size: 4.2rem;
-  }
-
-  .venue-detail-visual {
-    min-height: clamp(6.25rem, 9vw, 8.2rem);
-  }
-
-  .venue-detail-title {
-    font-size: 2.9rem;
-  }
-
-  .venue-detail-meta-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .venue-detail-stats-strip {
     gap: 0.58rem;
   }
@@ -27421,30 +27277,8 @@ button.hall-crusades-archive-crystal:focus-visible {
     gap: 0.58rem;
   }
 
-  .venue-detail-hero,
   .venue-detail-panel {
     padding: 0.62rem;
-  }
-
-  .venue-detail-logo-card {
-    min-height: 7.8rem;
-  }
-
-  .venue-detail-logo-mark {
-    font-size: 2.72rem;
-  }
-
-  .venue-detail-visual {
-    min-height: clamp(5.3rem, 28vw, 7.1rem);
-  }
-
-  .venue-detail-title {
-    font-size: 1.88rem;
-  }
-
-  .venue-detail-visual-label {
-    display: grid;
-    justify-content: start;
   }
 
   .venue-detail-stats-strip {

@@ -396,7 +396,8 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expect(projection).toBeHidden();
         await expect(archive).not.toHaveAttribute("data-harmony-projection", /.+/);
         await expect(harbor).toBeHidden();
-        await expect(page.locator("[data-harmony-environment]")).toBeHidden();
+        await expect(page.locator("[data-harmony-environment]")).toBeVisible();
+        await expect(sigil).toBeHidden();
 
         async function expectRestoredArchive() {
           await expect(page).toHaveURL(baseURL + harborPath);
@@ -556,6 +557,73 @@ test("Harbor Inspect preserves native link intent and restores open filters, foc
   await expectRestoredRegistry();
 });
 
+test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockArchive(page, baseURL, () => ({ payload: { rows: [
+    { venue_id: "aura", venue: "Aura", city: "Portland", state: "Maine", established_year: "1996", latitude: "0", gps_lng: 0, region: "New England" },
+    { venue_id: "partial", venue: "Partial Venue", city: "Portland", state: "unknown", establishedyear: 1997, gpslat: "44.03", gpslon: "181", region: "N/A" },
+    { venue_id: "recorded-location", venue: "Recorded Location", location_label: "Riverfront District" },
+    { venue_id: "unrecorded", venue: "Unrecorded Details", city: "—", state: "Pending", created_at: "2001-01-01", latitude: "", longitude: 0, region: { name: "New England" } },
+  ] } }), () => ({ data: [] }));
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+
+  const dossier = page.locator("[data-venue-detail]");
+  const identity = dossier.locator("[data-venue-detail-identity]");
+  const title = identity.getByRole("heading", { name: "Aura", exact: true });
+  const metadata = dossier.getByRole("region", { name: "Venue metadata" });
+  const field = name => metadata.locator('[data-venue-detail-field="' + name + '"]');
+  const missing = metadata.locator("[data-venue-detail-missing]");
+  const environment = page.locator("[data-harmony-environment]");
+  const art = environment.locator("[data-harmony-art]");
+  const engine = page.locator("[data-portfolio-engine]");
+  const shell = page.locator(".site-shell");
+  await expect(title).toBeVisible();
+  await expect(field("location").locator("dd")).toHaveText("Portland, ME");
+  await expect(field("established").locator("dd")).toHaveText("1996");
+  await expect(field("gps").locator("dd")).toHaveText("0, 0");
+  await expect(field("region").locator("dd")).toHaveText("New England");
+  await expect(missing).toBeHidden();
+  await expect(dossier.locator(".venue-detail-logo-card, .venue-detail-kicker, .venue-detail-visual")).toHaveCount(0);
+  await expect(environment).toBeVisible();
+  await expect(art).toHaveCSS("background-image", /zhento-harmony\.png/);
+  await expect(environment.locator("[data-harmony-sigil]")).toBeHidden();
+  const background = await environment.boundingBox();
+  const shellBox = await shell.boundingBox();
+  const headingBox = await title.boundingBox();
+  const metadataBox = await metadata.boundingBox();
+  const engineBox = await engine.boundingBox();
+  expect(background).toEqual(shellBox);
+  expect(Math.abs((headingBox.x + headingBox.width / 2) - (shellBox.x + shellBox.width / 2))).toBeLessThanOrEqual(8);
+  const gap = metadataBox.y - headingBox.y - headingBox.height;
+  expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.26);
+  expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.4);
+  const scrollHost = page.locator(".music-nexus-shell");
+  await scrollHost.evaluate(node => node.scrollTo({ top: node.scrollHeight, behavior: "instant" }));
+  expect(await scrollHost.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  expect(await environment.boundingBox()).toEqual(background);
+  expect(await engine.boundingBox()).toEqual(engineBox);
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/partial");
+  await expect(identity.getByRole("heading", { name: "Partial Venue", exact: true })).toBeVisible();
+  await expect(field("location").locator("dd")).toHaveText("Portland");
+  await expect(field("established").locator("dd")).toHaveText("1997");
+  await expect(field("gps")).toBeHidden();
+  await expect(field("region")).toBeHidden();
+  await expect(missing).toHaveText("Unavailable Data: State, GPS, Region");
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/recorded-location");
+  await expect(identity.getByRole("heading", { name: "Recorded Location", exact: true })).toBeVisible();
+  await expect(field("location").locator("dd")).toHaveText("Riverfront District");
+  await expect(missing).toHaveText("Unavailable Data: Established, GPS, Region");
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/unrecorded");
+  await expect(identity.getByRole("heading", { name: "Unrecorded Details", exact: true })).toBeVisible();
+  await expect(metadata.locator("[data-venue-detail-fields]")).toBeHidden();
+  await expect(missing).toHaveText("Unavailable Data: City, State, Established, GPS, Region");
+});
+
 test("Venue Dossier shows verified Sheet totals without deriving counts from linked or sampled photos", async ({ page, baseURL }) => {
   test.setTimeout(75000);
   await page.setViewportSize({ width: 412, height: 915 });
@@ -651,8 +719,9 @@ test("Venue Dossier keeps identity and totals unknown while verified Venue data 
   const count = page.locator('[data-venue-detail] [data-venue-relationship="photos"] .venue-relationship-media span');
   try {
     await venueRequest;
-    await expect(page.getByRole("heading", { name: "Venue Dossier", exact: true })).toBeVisible();
-    await expect(page.locator('[data-music-venue-detail-state="loading"]')).toBeVisible();
+    await expect(page.locator("[data-venue-detail-identity]")).toBeHidden();
+    await expect(page.locator("[data-venue-detail-metadata]")).toBeHidden();
+    await expect(page.locator('[data-music-venue-detail-state="loading"]')).toContainText("Loading Venue Archive");
     await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toHaveCount(0);
     await expect(breadcrumb).toBeAttached();
     await expect(breadcrumb).not.toContainText("The Electric Hall");
@@ -661,7 +730,8 @@ test("Venue Dossier keeps identity and totals unknown while verified Venue data 
     releaseVenues({ status: 503 });
   }
   await expect(page.locator('[data-music-venue-detail-state="error"]')).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Venue Archive Unavailable", exact: true })).toBeVisible();
+  await expect(page.locator("[data-venue-detail-identity]")).toBeHidden();
+  await expect(page.locator("[data-venue-detail-metadata]")).toBeHidden();
   await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toHaveCount(0);
   await expect(breadcrumb).toBeAttached();
   await expect(breadcrumb).not.toContainText("The Electric Hall");

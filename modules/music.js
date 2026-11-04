@@ -5665,6 +5665,67 @@ function renderMusicVenueDossierRelationships(venue) {
   }
 }
 
+function readMusicVenueMetadataText(...values) {
+  for (const value of values) {
+    const text = typeof value === "string" ? value.trim() : "";
+    if (text && !/^(?:[-–—?]+|0|n[./]?\s*a\.?|not (?:available|provided|recorded|known)|unknown|pending|none|null|undefined|unavailable|tbd)$/i.test(text)) {
+      return text;
+    }
+  }
+  return "";
+}
+
+function readMusicVenueCoordinate(limit, ...values) {
+  for (const value of values) {
+    const coordinate = typeof value === "string" && /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(value.trim())
+      ? Number(value)
+      : value;
+    if (Number.isFinite(coordinate) && Math.abs(coordinate) <= limit) return coordinate;
+  }
+  return null;
+}
+
+function renderMusicVenueDossierMetadata(venue) {
+  const identity = venueDetail.querySelector("[data-venue-detail-identity]");
+  const metadata = venueDetail.querySelector("[data-venue-detail-metadata]");
+  identity.hidden = !venue;
+  metadata.hidden = !venue;
+  if (!venue) return;
+
+  const city = readMusicVenueMetadataText(venue.city, venue.location_city, venue.locationCity, venue.venue_details?.city, venue.venueDetails?.city);
+  const recordedState = readMusicVenueMetadataText(venue.state, venue.state_abbr, venue.stateAbbr, venue.location_state,
+    venue.locationState, venue.venue_details?.state, venue.venueDetails?.state);
+  const state = normalizeMusicVenueState(recordedState) || recordedState;
+  const established = readMusicVenueMetadataText(
+    ...[venue.established, venue.established_year, venue.establishedyear, venue.establishedYear]
+      .map(value => Number.isSafeInteger(value) && value > 0 ? String(value) : value)
+  );
+  const latitude = readMusicVenueCoordinate(90, venue.latitude, venue.lat, venue.gps_lat, venue.gpslat);
+  const longitude = readMusicVenueCoordinate(180, venue.longitude, venue.lng, venue.lon,
+    venue.gps_lng, venue.gpslng, venue.gps_lon, venue.gpslon);
+  const gps = latitude !== null && longitude !== null ? `${latitude}, ${longitude}` : "";
+  const region = readMusicVenueMetadataText(venue.region, venue.venue_details?.region, venue.venueDetails?.region);
+  const compositeLocation = !city && !state
+    ? readMusicVenueMetadataText(venue.location, venue.location_label, venue.locationLabel)
+    : "";
+  const fields = { location: compositeLocation || [city, state].filter(Boolean).join(", "), established, gps, region };
+
+  metadata.querySelector("[data-venue-detail-fields]").hidden = !Object.values(fields).some(Boolean);
+  for (const field of metadata.querySelectorAll("[data-venue-detail-field]")) {
+    const value = fields[field.dataset.venueDetailField];
+    field.hidden = !value;
+    field.querySelector("dd").textContent = value;
+  }
+  const missing = Object.entries({
+    City: city || compositeLocation, State: state || compositeLocation, Established: established, GPS: gps, Region: region,
+  })
+    .filter(([, value]) => !value)
+    .map(([label]) => label);
+  const notice = metadata.querySelector("[data-venue-detail-missing]");
+  notice.hidden = !missing.length;
+  notice.textContent = missing.length ? "Unavailable Data: " + missing.join(", ") : "";
+}
+
 function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (!venueDetail) {
     return;
@@ -5676,48 +5737,15 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     : unavailableState === "empty" ? "Venue Not Found"
     : unavailableState === "error" ? "Venue Archive Unavailable"
     : "Venue Dossier";
-  const city = String(venue?.city || venue?.venue_details?.city || venue?.venueDetails?.city || "").trim();
-  const state = getMusicVenueState(venue) || String(venue?.state || venue?.venue_details?.state || venue?.venueDetails?.state || "").trim();
-  const location = hasVenue
-    ? ([city, state].filter(Boolean).join(", ") || getMusicVenueLocationText(venue))
-    : "Return to Venue Archive";
-  const region = hasVenue
-    ? String(venue?.region || venue?.venue_details?.region || venue?.venueDetails?.region || state || "Pending").trim()
-    : "Pending";
   const slug = hasVenue ? getMusicVenueSlug(venue) : normalizeMusicVenueSlugValue(requestedSlug);
-  const initials = getBandInitials(name) || "VN";
-
   venueDetail.classList.toggle("is-missing", !hasVenue);
   venueDetail.dataset.venueSlug = slug;
   venueDetail.dataset.venueId = hasVenue ? getMusicVenueId(venue) : "";
 
-  if (venueDetailLogoCard) {
-    venueDetailLogoCard.setAttribute("aria-label", `${name} venue mark`);
-  }
-  if (venueDetailLogoMark) {
-    venueDetailLogoMark.textContent = initials;
-  }
-  if (venueDetailLogoLabel) {
-    venueDetailLogoLabel.textContent = name;
-  }
   if (venueDetailTitle) {
     venueDetailTitle.textContent = name;
   }
-  if (venueDetailLocation) {
-    venueDetailLocation.textContent = location;
-  }
-  if (venueDetailRegion) {
-    venueDetailRegion.textContent = region || "Pending";
-  }
-  if (venueDetailVisual) {
-    venueDetailVisual.setAttribute("aria-label", `Compact location visualization for ${name}${location ? ` in ${location}` : ""}`);
-  }
-  if (venueDetailVisualPrimary) {
-    venueDetailVisualPrimary.textContent = city ? `${city} Core` : "Location Pending";
-  }
-  if (venueDetailVisualSecondary) {
-    venueDetailVisualSecondary.textContent = region && region !== "Pending" ? `${region} Signal` : "Archive Signal";
-  }
+  renderMusicVenueDossierMetadata(venue);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   if (!hasVenue) {
     setMusicVenueDetailRelationshipCount("shows", null);
