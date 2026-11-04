@@ -487,16 +487,24 @@ function retryMusicShowsArchiveState() {
 }
 
 function retryMusicVenuesState() {
-  musicVenuesLoaded = false;
   if (musicVenuesRequest) {
     return;
   }
 
+  const context = v3RouteContext;
+  const source = getRouteFromUrl();
+  const venueSlug = source.name === "music-venue-detail" ? normalizeMusicVenueSlugValue(source.venueSlug) : "";
+  musicVenuesLoaded = false;
   musicVenuesDataState = "loading";
   renderMusicVenuesResults();
-  requestMusicVenuesData().then(() => {
-    if (getRouteFromUrl().name === "music-venues") {
+  requestMusicVenuesData().then((loaded) => {
+    if (v3RouteContext !== context) return;
+    const route = getRouteFromUrl();
+    if (route.name === "music-venues") {
       renderMusicVenuesArchive();
+    } else if (loaded && venueSlug && activeMusicVenueDetailSlug === venueSlug
+      && venueDetail?.getAttribute("aria-hidden") === "false") {
+      renderMusicVenueDetail(venueSlugToVenue(venueSlug), venueSlug);
     }
   });
 }

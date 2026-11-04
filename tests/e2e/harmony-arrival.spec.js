@@ -653,6 +653,129 @@ test("Venue Dossier keeps totals unknown during live loading and when only fallb
   await expect(count).toHaveText("—");
 });
 
+test("Venue Dossier Retry keeps the current error on failure and recovers Aura in place", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  let venueRequests = 0;
+  let showsRequests = 0;
+  let nextVenueResponse = { status: 503 };
+  await mockArchive(page, baseURL, () => {
+    venueRequests++;
+    return nextVenueResponse;
+  }, () => {
+    showsRequests++;
+    return { data: shows };
+  });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const error = dossier.locator('[data-music-venue-detail-state="error"]');
+  const retry = error.getByRole("button", { name: "Retry Venues" });
+  await expect(error).toContainText("Unable To Load Archive Data");
+  const originalButton = await retry.elementHandle();
+  const originalDossier = await dossier.elementHandle();
+  const historyLength = await page.evaluate(() => history.length);
+  const showsAtRetry = showsRequests;
+
+  const startRetry = async () => {
+    let release;
+    nextVenueResponse = new Promise(resolve => { release = resolve; });
+    const expectedRequests = venueRequests + 1;
+    await retry.press("Enter");
+    await retry.press("Enter");
+    await expect.poll(() => venueRequests).toBe(expectedRequests);
+    await expect(error).toBeVisible();
+    await expect(retry).toBeFocused();
+    expect(await retry.evaluate((node, original) => node === original, originalButton)).toBe(true);
+    return async (payload) => {
+      release(payload);
+      await expect.poll(() => page.evaluate(() => musicVenuesRequest === null)).toBe(true);
+      expect(venueRequests).toBe(expectedRequests);
+    };
+  };
+  await (await startRetry())({ status: 503 });
+  await expect(retry).toBeFocused();
+  expect(await retry.evaluate((node, original) => node === original, originalButton)).toBe(true);
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+
+  await (await startRetry())({
+    payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123 }] },
+  });
+  await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
+  await expect(dossier.locator("[data-venue-detail-location]")).toHaveText("Portland, ME");
+  await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("123");
+  await expect(dossier.locator("[data-venue-relationships]")).toBeVisible();
+  await expect(error).toHaveCount(0);
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  expect(await dossier.evaluate((node, original) => node === original, originalDossier)).toBe(true);
+  expect(await page.evaluate(() => history.length)).toBe(historyLength);
+  expect(showsRequests).toBe(showsAtRetry);
+});
+
+test("Venue Dossier Retry cannot repaint a different dossier after navigation", async ({ page, baseURL }) => {
+  let release;
+  const pendingRetry = new Promise(resolve => { release = resolve; });
+  let shouldHold = false;
+  await mockArchive(page, baseURL, () => shouldHold ? pendingRetry : { status: 503 });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  const retry = page.getByRole("button", { name: "Retry Venues" });
+  await expect(retry).toBeVisible();
+  shouldHold = true;
+  const retryRequested = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
+  try {
+    await retry.press("Enter");
+    await retryRequested;
+    await page.evaluate(path => navigateToRoute(path), harborPath + "/other-room");
+    await expect(page).toHaveURL(baseURL + harborPath + "/other-room");
+    await expect(page.locator('[data-music-venue-detail-state="loading"]')).toBeVisible();
+    await page.locator("[data-venue-detail-title]").evaluate(node => {
+      window.dossierRetryTitleChanges = [];
+      new MutationObserver(records => {
+        for (const record of records) {
+          for (const added of record.addedNodes) window.dossierRetryTitleChanges.push(added.textContent);
+        }
+      }).observe(node, { childList: true });
+    });
+  } finally {
+    release({ data: [
+      { venue_id: "aura", venue: "Aura" },
+      { venue_id: "other-room", venue: "Other Room" },
+    ] });
+  }
+  await expect(page.getByRole("heading", { name: "Other Room", exact: true })).toBeVisible();
+  const titleChanges = await page.evaluate(() => window.dossierRetryTitleChanges);
+  expect(titleChanges).toContain("Other Room");
+  expect(titleChanges).not.toContain("Aura");
+  await expect(page).toHaveURL(baseURL + harborPath + "/other-room");
+});
+
+test("Venue Dossier Retry recovers the same dossier beneath a retained Shell overlay", async ({ page, baseURL }) => {
+  let release;
+  const pendingRetry = new Promise(resolve => { release = resolve; });
+  let shouldHold = false;
+  await mockArchive(page, baseURL, () => shouldHold ? pendingRetry : { status: 503 });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const retry = page.getByRole("button", { name: "Retry Venues" });
+  await expect(retry).toBeVisible();
+  shouldHold = true;
+  const retryRequested = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
+  try {
+    await retry.press("Enter");
+    await retryRequested;
+    await page.evaluate(() => navigateToRoute("/calendar"));
+    await expect(page).toHaveURL(baseURL + "/calendar");
+    await expect(page.locator("[data-calendar-overlay]")).toBeVisible();
+  } finally {
+    release({ data: [{ venue_id: "aura", venue: "Aura" }] });
+  }
+  await expect(page.locator("[data-venue-detail-title]")).toHaveText("Aura");
+  await expect(page.locator("[data-calendar-overlay]")).toBeVisible();
+  await page.locator("[data-calendar-close]").press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(page.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
+  await expect(page.locator("[data-music-venue-detail-state]")).toHaveCount(0);
+});
+
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {
   test.setTimeout(45000);
   await page.setViewportSize({ width: 412, height: 915 });
