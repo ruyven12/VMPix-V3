@@ -1088,3 +1088,87 @@ test("Harbor Engine shares the Music cutout and alternates Current View in reduc
   expect((await changes()).filter(({ value }) => /^(Harbor of Harmony|Music Venues)$/.test(value))).toEqual(changesAtExit);
   await expect(readout).toHaveText("Outskirts of Zhento");
 });
+
+
+test("Harbor Sigil filters dissolve, reverse cleanly, and respect reduced motion", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await mockArchive(page, baseURL, () => ({ data: venues }));
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  const reject = page.getByRole("button", { name: "Reject", exact: true });
+  if (await reject.isVisible()) await reject.click();
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  const archive = page.locator("[data-music-venues-index]");
+  await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
+  const sigil = archive.getByRole("button", { name: "Venue filters", exact: true });
+  const panel = archive.locator("[data-music-venues-tools]");
+  const search = panel.getByRole("searchbox", { name: "Search Venue" });
+  const motions = await panel.evaluateHandle(node => {
+    const calls = [];
+    const animate = node.animate.bind(node);
+    node.animate = (frames, options) => {
+      const animation = animate(frames, options);
+      animation.pause();
+      calls.push(animation);
+      return animation;
+    };
+    return calls;
+  });
+  const sample = (time) => motions.evaluate((calls, currentTime) => {
+    const animation = calls.at(-1);
+    animation.currentTime = currentTime;
+    const style = getComputedStyle(animation.effect.target);
+    return { opacity: Number(style.opacity), core: parseFloat(style.getPropertyValue("--harmony-filter-core")) };
+  }, time);
+  const finish = () => motions.evaluate(calls => calls.at(-1).finish());
+  const durations = () => motions.evaluate(calls => calls.map(animation => animation.effect.getTiming().duration));
+
+  await sigil.press("Enter");
+  await expect(sigil).toHaveAttribute("aria-expanded", "true");
+  await expect(search).toBeFocused();
+  await expect(archive).toHaveAttribute("data-harmony-filter-motion", "opening");
+  expect(await sigil.evaluate(node => getComputedStyle(node, "::before").animationName)).toBe("harmonyFilterSigilResponse");
+  expect(await panel.evaluate(node => getComputedStyle(node, "::after").animationIterationCount)).toBe("1");
+  const opening = await sample(180);
+  expect(opening.opacity).toBeGreaterThan(0);
+  expect(opening.opacity).toBeLessThan(1);
+  expect(opening.core).toBeGreaterThan(0);
+  expect(opening.core).toBeLessThan(115);
+  await search.fill("Signal Hall");
+  await search.press("Escape");
+  await expect(sigil).toBeFocused();
+  await expect(sigil).toHaveAttribute("aria-expanded", "false");
+  await expect(panel).toHaveAttribute("inert", "");
+  await expect(archive).toHaveAttribute("data-harmony-filter-motion", "closing");
+  expect(await sample(0)).toEqual(opening);
+  const closing = await sample(150);
+  expect(closing.opacity).toBeLessThan(opening.opacity);
+  expect(closing.core).toBeGreaterThan(opening.core);
+  await sigil.press("Enter");
+  await expect(search).toHaveValue("Signal Hall");
+  expect(await sample(0)).toEqual(closing);
+  expect(await durations()).toEqual([410, 300, 410]);
+  await finish();
+  await expect(archive).not.toHaveAttribute("data-harmony-filter-motion", /.+/);
+  await expect(panel).toBeVisible();
+  await expectHarmonyFilterGeometry(page);
+
+  const next = archive.getByRole("button", { name: "Next Sector" });
+  await next.click();
+  await expect(next).toBeFocused();
+  await expect(sigil).toHaveAttribute("aria-expanded", "false");
+  await expect(panel).toHaveAttribute("inert", "");
+  await expect(archive).toHaveAttribute("data-harmony-filter-motion", "closing");
+  await finish();
+  await expect(panel).toBeHidden();
+  await expect(archive.getByRole("link", { name: "Inspect Signal Hall 08" })).toBeVisible();
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await sigil.press("Enter");
+  await expect(search).toBeFocused();
+  await expect(archive).not.toHaveAttribute("data-harmony-filter-motion", /.+/);
+  await panel.getByRole("button", { name: "Close venue filters" }).press("Enter");
+  await expect(panel).toBeHidden();
+  await expect(sigil).toBeFocused();
+  expect(await durations()).toEqual([410, 300, 410, 300]);
+});

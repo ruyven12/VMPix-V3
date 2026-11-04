@@ -393,6 +393,7 @@ const musicVenuesStatus = musicVenuesList?.querySelector("[data-music-venues-sta
 const musicVenueConnections = musicVenuesIndex?.querySelector("[data-music-venues-connections]");
 const musicVenuesTools = musicVenuesIndex?.querySelector("[data-music-venues-tools]");
 const harmonyFilterSigil = musicVenuesIndex?.querySelector("[data-harmony-filter-sigil]");
+let harmonyFilterMotion = null;
 const musicVenuesSectors = musicVenuesList?.querySelector("[data-music-venues-sectors]");
 const musicVenuesRange = musicVenuesSectors?.querySelector("[data-music-venues-range]");
 const harmonyVenueProjection = musicVenuesIndex?.querySelector("[data-harmony-venue-projection]");
@@ -3659,6 +3660,7 @@ async function openMusicVenueProjection(venue) {
   const context = v3RouteContext;
   const pathname = location.pathname;
   const projection = { venue, slug: getMusicVenueSlug(venue), animations: [], observer: null, ownerFrame: 0 };
+  settleHarmonyFilterMotion();
   musicVenueProjection = projection;
   inspectedMusicVenueSlug = projection.slug;
   const ownsProjection = () => musicVenueProjection === projection && v3RouteContext === context
@@ -3749,7 +3751,7 @@ function settleHarmonyRegistryActivation() {
   delete musicVenuesIndex.dataset.harmonyActivation;
   musicVenuesIndex.style.removeProperty("--harmony-registry-time");
   musicVenueBeacons.inert = false;
-  musicVenuesTools.inert = false;
+  musicVenuesTools.inert = !areMusicVenuesFiltersOpen();
   musicVenuesSectors.inert = false;
 }
 
@@ -3837,9 +3839,63 @@ function startHarmonyRegistryActivation() {
   activation.frame = requestAnimationFrame(tick);
 }
 
-function setMusicVenuesFiltersOpen(isOpen, moveFocus = false) {
+function areMusicVenuesFiltersOpen() {
+  return harmonyFilterSigil?.getAttribute("aria-expanded") === "true";
+}
+
+function settleHarmonyFilterMotion() {
+  const motion = harmonyFilterMotion;
+  harmonyFilterMotion = null;
+  motion?.observer.disconnect();
+  motion?.animation.cancel();
+  if (!musicVenuesTools) return;
+  const isOpen = areMusicVenuesFiltersOpen();
+  delete musicVenuesIndex.dataset.harmonyFilterMotion;
   musicVenuesTools.hidden = !isOpen;
+  musicVenuesTools.inert = !isOpen || Boolean(harmonyRegistryActivation);
+}
+
+function setMusicVenuesFiltersOpen(isOpen, moveFocus = false, shouldAnimate = moveFocus) {
+  const wasOpen = areMusicVenuesFiltersOpen();
+  const animate = shouldAnimate && isOpen !== wasOpen && !reducedMotion.matches
+    && typeof musicVenuesTools.animate === "function";
+  const previous = animate && harmonyFilterMotion ? getComputedStyle(musicVenuesTools) : null;
+  const start = previous ? {
+    opacity: previous.opacity,
+    "--harmony-filter-core": previous.getPropertyValue("--harmony-filter-core").trim(),
+    translate: previous.translate,
+  } : null;
   harmonyFilterSigil.setAttribute("aria-expanded", String(isOpen));
+  settleHarmonyFilterMotion();
+  if (animate) {
+    musicVenuesTools.hidden = false;
+    const clear = { opacity: 1, "--harmony-filter-core": "0%", translate: "0 0" };
+    const dissolved = { opacity: 0, "--harmony-filter-core": "115%", translate: "0 4px" };
+    const frames = isOpen
+      ? start ? [start, clear] : [
+        { ...dissolved, offset: 0 },
+        { ...dissolved, offset: 0.16 },
+        { opacity: 0.82, "--harmony-filter-core": "58%", translate: "0 2px", offset: 0.58 },
+        { ...clear, offset: 1 },
+      ]
+      : [start || clear, dissolved];
+    musicVenuesIndex.dataset.harmonyFilterMotion = isOpen ? "opening" : "closing";
+    const animation = musicVenuesTools.animate(frames, {
+      duration: isOpen ? 410 : 300,
+      easing: isOpen ? "cubic-bezier(0.32, 0.05, 0.23, 1)" : "ease-in-out",
+      fill: "both",
+    });
+    const observer = new MutationObserver(() => {
+      if (shell.dataset.shellRoute !== "music-venues") settleHarmonyFilterMotion();
+    });
+    const motion = { animation, observer };
+    harmonyFilterMotion = motion;
+    observer.observe(shell, { attributes: true, attributeFilter: ["data-shell-route"] });
+    const finish = () => {
+      if (harmonyFilterMotion === motion) settleHarmonyFilterMotion();
+    };
+    animation.finished.then(finish, finish);
+  }
   if (isOpen) {
     const stage = musicVenueConnections.getBoundingClientRect();
     if (stage.width && stage.height) positionHarmonyFilters(stage);
@@ -6437,6 +6493,7 @@ function setMusicVenueIndexVisible(isVisible) {
     closeMusicVenueProjection();
     settleHarmonyRegistryActivation();
     settleMusicVenueSectorTransition();
+    settleHarmonyFilterMotion();
   }
   setHarmonyArrivalVisible(false);
   if (!musicVenuesIndex) {
@@ -17939,14 +17996,27 @@ function initMusicModule() {
     if (!reducedMotion.matches) return;
     musicVenueSectorTransition?.finishImmediately();
     musicVenueProjection?.finishImmediately();
+    settleHarmonyFilterMotion();
   });
   musicVenuesList?.addEventListener("scroll", scheduleMusicVenueConnectors, { passive: true });
-  harmonyFilterSigil?.addEventListener("click", () => setMusicVenuesFiltersOpen(musicVenuesTools.hidden, true));
+  harmonyFilterSigil?.addEventListener("click", () => setMusicVenuesFiltersOpen(!areMusicVenuesFiltersOpen(), true));
   musicVenuesTools?.querySelector("[data-harmony-filter-close]")?.addEventListener("click", () => setMusicVenuesFiltersOpen(false, true));
   musicVenuesIndex?.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || musicVenuesTools.hidden || musicVenueProjection) return;
+    if (event.key !== "Escape" || !areMusicVenuesFiltersOpen() || musicVenueProjection) return;
+    event.preventDefault();
     event.stopPropagation();
     setMusicVenuesFiltersOpen(false, true);
+  });
+  document.addEventListener("click", (event) => {
+    if (!event.detail || !areMusicVenuesFiltersOpen() || musicVenueProjection || harmonyRegistryActivation
+        || shell?.dataset.shellRoute !== "music-venues" || getRouteFromUrl().name !== "music-venues"
+        || !musicVenuesIndex?.classList.contains("is-active")) return;
+    const target = event.target;
+    if (!(target instanceof Element)
+        || target.closest("[data-music-venues-tools], [data-harmony-filter-sigil], .music-venue-beacon-link")) return;
+    const clickedControl = target.closest("a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]");
+    const restoreFocus = !clickedControl && (document.activeElement === document.body || musicVenuesTools.contains(document.activeElement));
+    setMusicVenuesFiltersOpen(false, restoreFocus, true);
   });
   if (harmonyEnvironment && musicVenuesIndex && typeof ResizeObserver !== "undefined") {
     const observer = new ResizeObserver(scheduleMusicVenueConnectors);
@@ -18181,7 +18251,7 @@ function captureMusicResumeState(route) {
     venue: activeMusicVenueSlugFilter,
     sort: activeMusicVenueSort,
     sector: activeMusicVenueSector,
-    filtersOpen: !musicVenuesTools.hidden,
+    filtersOpen: areMusicVenuesFiltersOpen(),
     inspectedVenue: inspectedMusicVenueSlug,
   };
   if(route.name==='music-venue-detail')return {
