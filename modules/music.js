@@ -3236,29 +3236,22 @@ function getMusicVenueShowCount(venue) {
   return Number.isFinite(count) && count >= 0 ? count : null;
 }
 
-function getMusicVenuePhotoCount(venue) {
-  const count = Number.parseInt(
-    venue?.photoCount
-    || venue?.photo_count
-    || venue?.photos
-    || venue?.stats?.photoCount
-    || venue?.stats?.photos
-    || venue?.stats?.totalPhotos,
-    10
-  );
-  return Number.isFinite(count) && count >= 0 ? count : null;
-}
+function getMusicVenueDossierPhotoTotal(venue) {
+  if (!venue || musicVenuesDataState !== "live") return null;
 
-function getMusicVenueBandCount(venue) {
-  const count = Number.parseInt(
-    venue?.bandCount
-    || venue?.band_count
-    || venue?.bandsCount
-    || venue?.stats?.bandCount
-    || venue?.stats?.bands,
-    10
+  // The Sheet API overwrites photo_count, including a default zero for missing cells.
+  // A surviving authored field can confirm zero or expose a coerced canonical value.
+  const authoredValues = [
+    venue.totalPhotos, venue.totalphotos, venue.total_photos,
+    venue.photoCount, venue.photocount, venue.photosTotal, venue.photostotal,
+  ].filter(value => value != null && (typeof value !== "string" || value.trim() !== ""));
+  const authoredTotals = new Set(
+    authoredValues.map(value => readSetAlbumPhotoTotal(value)).filter(value => value !== null)
   );
-  return Number.isFinite(count) && count >= 0 ? count : null;
+  const canonical = readSetAlbumPhotoTotal(venue.photo_count);
+  if (!authoredTotals.size) return !authoredValues.length && canonical > 0 ? canonical : null;
+  if (authoredTotals.size > 1 || (canonical > 0 && !authoredTotals.has(canonical))) return null;
+  return authoredTotals.values().next().value;
 }
 
 function getMusicVenueArchiveMetrics(venue) {
@@ -4183,31 +4176,6 @@ function getMusicVenueShows(venue) {
   return getMusicShowsIndexRows()
     .filter((show) => getMusicShowVenueId(show).toLowerCase() === venueId)
     .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)));
-}
-
-function getMusicVenueDetailStats(venue, linkedShows = null) {
-  const shows = Array.isArray(linkedShows) ? linkedShows : getMusicVenueShows(venue);
-  const uniqueBands = new Set();
-  let photoTotal = 0;
-
-  shows.forEach((show) => {
-    getMusicShowBandNames(show).forEach((bandName) => {
-      const normalizedName = String(bandName || "").trim().toLowerCase();
-      if (normalizedName) {
-        uniqueBands.add(normalizedName);
-      }
-    });
-    const photoCount = Number.parseInt(getMusicShowPhotoCount(show), 10);
-    if (Number.isFinite(photoCount) && photoCount > 0) {
-      photoTotal += photoCount;
-    }
-  });
-
-  return {
-    shows: shows.length,
-    bands: uniqueBands.size || getMusicVenueBandCount(venue),
-    photos: photoTotal || getMusicVenuePhotoCount(venue),
-  };
 }
 
 function collectMusicVenueArtistNames(value, target = []) {
@@ -5674,7 +5642,6 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     : "Pending";
   const slug = hasVenue ? getMusicVenueSlug(venue) : normalizeMusicVenueSlugValue(requestedSlug);
   const linkedShows = hasVenue ? getMusicVenueShows(venue) : [];
-  const stats = hasVenue ? getMusicVenueDetailStats(venue, linkedShows) : { shows: null, bands: null, photos: null };
   const linkedArtists = hasVenue ? getMusicVenueArtists(venue, linkedShows) : [];
   const initials = getBandInitials(name) || "VN";
 
@@ -5710,8 +5677,8 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     venueDetailVisualSecondary.textContent = region && region !== "Pending" ? `${region} Signal` : "Archive Signal";
   }
   setMusicVenueDetailRelationshipCount("shows", linkedShows.length);
-  setMusicVenueDetailRelationshipCount("bands", hasVenue ? linkedArtists.length : stats.bands);
-  setMusicVenueDetailRelationshipCount("photos", stats.photos);
+  setMusicVenueDetailRelationshipCount("bands", hasVenue ? linkedArtists.length : null);
+  setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   if (!hasVenue) {
     hideMusicVenuePhotoHighlightsSection();
     renderMusicVenueDetailState(slug, getMusicVenueDetailUnavailableStateName());

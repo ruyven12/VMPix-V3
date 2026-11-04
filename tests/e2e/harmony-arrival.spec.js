@@ -26,9 +26,9 @@ async function mockArchive(page, baseURL, venueResponse, showsResponse = () => (
     if (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname)) return route.continue();
     if (request.resourceType() === "script") return route.fulfill({ contentType: "application/javascript", body: "" });
     if (request.resourceType() === "stylesheet") return route.fulfill({ contentType: "text/css", body: "" });
-    const { status = 200, data = [] } = url.pathname === "/api/music/venues" ? await venueResponse()
+    const { status = 200, data = [], payload } = url.pathname === "/api/music/venues" ? await venueResponse()
       : url.pathname === "/api/music/shows/db" ? await showsResponse() : {};
-    return route.fulfill({ status, headers: { "access-control-allow-origin": "*" }, json: { data, total: data.length, totalPages: 1 } });
+    return route.fulfill({ status, headers: { "access-control-allow-origin": "*" }, json: payload ?? { data, total: data.length, totalPages: 1 } });
   });
 }
 
@@ -554,6 +554,103 @@ test("Harbor Inspect preserves native link intent and restores open filters, foc
   await expect(dossier.getByRole("heading", { name: "Signal Hall 06", exact: true })).toBeVisible();
   await page.locator("[data-prototype-engine-return]").press("Enter");
   await expectRestoredRegistry();
+});
+
+test("Venue Dossier shows verified Sheet totals without deriving counts from linked or sampled photos", async ({ page, baseURL }) => {
+  test.setTimeout(75000);
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const cases = [
+    [{ photo_count: 96 }, "96"],
+    [{ photo_count: 0, total_photos: "0" }, "0"],
+    [{ photo_count: 0 }, "—"],
+    [{ photo_count: 0, totalphotos: "147" }, "147"],
+    [{ photo_count: 9, totalPhotos: "10" }, "—"],
+    [{ photo_count: 3, photoCount: "3.5", photosTotal: { toString: "invalid" } }, "—"],
+    [{ stats: { photos: 999 } }, "—"],
+    [{ photo_count: 0, total_photos: "9007199254740992" }, "—"],
+  ];
+  const sourceRows = cases.map(([fields], index) => ({ ...venues[index], ...fields }));
+  const duplicateShows = [
+    { show_id: "count-a", name: "Count A", venue_id: "signal-2", album_id: "shared", photo_count: 48 },
+    { show_id: "count-b", name: "Count B", venue_id: "signal-2", album_id: "shared", photo_count: 48 },
+    { show_id: "count-c", name: "Count C", venue_id: "signal-2", photo_count: 0, bands: ["One", "Two"] },
+  ];
+  await mockArchive(page, baseURL, () => ({
+    payload: { source: "Music-Venue", rows: sourceRows, stats: { photo_count: 0 } },
+  }), () => ({ data: duplicateShows }));
+
+  const sample = { image_key: "same-photo", thumbnail_url: "/assets/branding/voodoo-media-logo-transparent.png" };
+  await page.route(/\/api\/music\/venues\/[^/]+\/photos\?/, route => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/signal-0/photos")) {
+      return route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, json: {} });
+    }
+    if (pathname.endsWith("/signal-1/photos")) {
+      return route.fulfill({
+        headers: { "access-control-allow-origin": "*" },
+        json: {
+          photos: [],
+          summary: { venue_total_photos: 0, aggregated_photo_count: 0, returned_count: 0 },
+          pagination: { total: 0, limit: 20, page: 1 },
+        },
+      });
+    }
+    return route.fulfill({
+      headers: { "access-control-allow-origin": "*" },
+      json: {
+        photos: [sample, sample],
+        summary: { venue_total_photos: 999, aggregated_photo_count: 11, scanned_photo_count: 11 },
+        pagination: { total: 11, limit: 20, page: 1 },
+        warnings: ["Album scan limited to 12 of 15 linked albums.", "One linked album fetch failed."],
+      },
+    });
+  });
+  await page.goto(harborPath, { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
+  const dossier = page.locator("[data-venue-detail]");
+  const count = dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span');
+  for (const [index, [, expected]] of cases.entries()) {
+    const inspect = page.getByRole("link", { name: "Inspect " + venues[index].name });
+    await inspect.press("Enter");
+    await expect(page).toHaveURL(baseURL + harborPath + "/signal-" + index);
+    await expect(dossier.getByRole("heading", { name: venues[index].name, exact: true })).toBeVisible();
+    const highlights = dossier.locator("[data-venue-photo-highlights]");
+    if (index === 0) {
+      await expect(highlights).toContainText("Venue photo highlights could not be loaded.");
+    } else if (index === 1) {
+      await expect(highlights).toContainText("No venue photo highlights are available yet.");
+    } else {
+      await expect(highlights).toContainText("Cycling 1 linked-show highlight from 11 scanned photos.");
+    }
+    if (index === 2) {
+      await expect(dossier.locator('[data-venue-relationship="shows"] .venue-relationship-media span')).toHaveText("3");
+    }
+    await expect(count).toHaveText(expected);
+    await page.locator("[data-prototype-engine-return]").press("Enter");
+    await expect(inspect).toBeFocused();
+  }
+});
+
+test("Venue Dossier keeps totals unknown during live loading and when only fallback or unavailable data exists", async ({ page, baseURL }) => {
+  let releaseVenues;
+  const pending = new Promise(resolve => { releaseVenues = resolve; });
+  await mockArchive(page, baseURL, () => pending);
+  const venueRequest = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
+  await page.goto(harborPath + "/the-electric-hall", { waitUntil: "domcontentloaded" });
+  const count = page.locator('[data-venue-detail] [data-venue-relationship="photos"] .venue-relationship-media span');
+  try {
+    await venueRequest;
+    await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toBeVisible();
+    await expect(count).toHaveText("—");
+  } finally {
+    releaseVenues({ status: 503 });
+  }
+  await expect(count).toHaveText("—");
+  await page.goto(harborPath + "/missing-venue-total", { waitUntil: "domcontentloaded" });
+  await expect(page.locator('[data-music-venue-detail-state="error"]')).toBeVisible();
+  await expect(count).toHaveText("—");
 });
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {
