@@ -1283,64 +1283,37 @@
               <p class="venue-detail-metadata-notice" data-venue-detail-missing hidden></p>
             </section>
 
-            <section class="venue-relationships" aria-label="Venue Statistics" data-venue-relationships>
+            <section class="venue-relationships" aria-labelledby="venue-archive-title" data-venue-relationships>
               <header class="venue-relationships-header">
-                <p class="venue-detail-panel-kicker">Venue Statistics</p>
+                <h4 id="venue-archive-title">Venue Archive</h4>
               </header>
 
-              <div class="venue-relationship-grid" aria-label="Venue relationship archive cards">
+              <div class="venue-relationship-grid">
                 <article class="venue-relationship-card" data-venue-relationship="shows" aria-labelledby="venue-relationship-shows-title">
-                  <div class="venue-relationship-media venue-relationship-media--shows" aria-hidden="true">
-                    <span>13</span>
-                  </div>
-                  <div class="venue-relationship-copy">
-                    <h5 class="venue-relationship-title" id="venue-relationship-shows-title">Archive Events</h5>
-                    <p class="venue-relationship-note">Show records connected to this venue archive.</p>
-                    <span class="venue-relationship-status">Open Event Index</span>
-                  </div>
+                  <h5 class="venue-relationship-title" id="venue-relationship-shows-title">Archive Events</h5>
+                  <div class="venue-relationship-media" id="venue-relationship-shows-value"><span>—</span></div>
+                  <span class="venue-relationship-status"></span>
                 </article>
 
                 <article class="venue-relationship-card" data-venue-relationship="bands" aria-labelledby="venue-relationship-bands-title">
-                  <div class="venue-relationship-media venue-relationship-media--bands" aria-hidden="true">
-                    <span>28</span>
-                  </div>
-                  <div class="venue-relationship-copy">
-                    <h5 class="venue-relationship-title" id="venue-relationship-bands-title">Featured Artists</h5>
-                    <p class="venue-relationship-note">Artists documented at this venue.</p>
-                    <span class="venue-relationship-status">Band Relationships</span>
-                  </div>
+                  <h5 class="venue-relationship-title" id="venue-relationship-bands-title">Featured Artists</h5>
+                  <div class="venue-relationship-media" id="venue-relationship-bands-value"><span>—</span></div>
+                  <span class="venue-relationship-status"></span>
                 </article>
 
                 <article class="venue-relationship-card" data-venue-relationship="photos" aria-labelledby="venue-relationship-photos-title">
-                  <div class="venue-relationship-media venue-relationship-media--photos" aria-hidden="true">
-                    <span>—</span>
-                  </div>
-                  <div class="venue-relationship-copy">
-                    <h5 class="venue-relationship-title" id="venue-relationship-photos-title">Total Photos</h5>
-                    <p class="venue-relationship-note">Images connected to this venue archive.</p>
-                  </div>
+                  <h5 class="venue-relationship-title" id="venue-relationship-photos-title">Total Photos</h5>
+                  <div class="venue-relationship-media"><span>—</span></div>
                 </article>
 
                 <article class="venue-relationship-card" data-venue-relationship="region" aria-labelledby="venue-relationship-region-title">
-                  <div class="venue-relationship-media venue-relationship-media--region" aria-hidden="true">
-                    <span>NE</span>
-                  </div>
-                  <div class="venue-relationship-copy">
-                    <h5 class="venue-relationship-title" id="venue-relationship-region-title">Regional Context</h5>
-                    <p class="venue-relationship-note">Nearby archive locations and venue relationships.</p>
-                    <span class="venue-relationship-status">Regional Network</span>
-                  </div>
+                  <h5 class="venue-relationship-title" id="venue-relationship-region-title">Regional Context</h5>
+                  <div class="venue-relationship-media"><span>—</span></div>
                 </article>
 
                 <article class="venue-relationship-card" data-venue-relationship="history" aria-labelledby="venue-relationship-history-title">
-                  <div class="venue-relationship-media venue-relationship-media--history" aria-hidden="true">
-                    <span>V3</span>
-                  </div>
-                  <div class="venue-relationship-copy">
-                    <h5 class="venue-relationship-title" id="venue-relationship-history-title">Archive History</h5>
-                    <p class="venue-relationship-note">Timeline of activity documented at this venue.</p>
-                    <span class="venue-relationship-status">View Timeline</span>
-                  </div>
+                  <h5 class="venue-relationship-title" id="venue-relationship-history-title">Archive History</h5>
+                  <div class="venue-relationship-media"><span>—</span></div>
                 </article>
               </div>
             </section>
@@ -1628,6 +1601,7 @@
               </div>
               <h4 class="sr-only" id="lightbox-title" data-lightbox-photo-title>Photo 01</h4>
               <p class="lightbox-counter" aria-live="polite" data-lightbox-counter>1 / 1</p>
+              <button class="lightbox-info-toggle venue-lightbox-info-toggle" type="button" aria-controls="lightbox-info-panel" aria-expanded="false" data-lightbox-info-toggle hidden>Photo Info</button>
             </header>
 
             <div class="v3-lightbox-layout lightbox-layout">
@@ -1653,7 +1627,11 @@
                     X
                   </button>
                 </header>
-                <div class="v3-lightbox-drawer-grid lightbox-info-grid" aria-label="Lightbox photo info placeholder">
+                <div class="v3-lightbox-drawer-grid lightbox-info-grid" aria-label="Photo information">
+                  <div class="lightbox-info-item venue-lightbox-caption" hidden>
+                    <p class="lightbox-info-label">Caption</p>
+                    <p class="lightbox-info-value" data-venue-lightbox-caption></p>
+                  </div>
                   <div class="lightbox-info-item">
                     <p class="lightbox-info-label">Band</p>
                     <p class="lightbox-info-value" data-lightbox-meta-band-tags>13 High</p>

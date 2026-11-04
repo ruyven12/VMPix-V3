@@ -105,7 +105,6 @@
 .venue-relationship-grid,
 .venue-relationship-card,
 .venue-relationship-media,
-.venue-relationship-copy,
 .venue-detail-content-grid,
 .venue-detail-panel,
 .venue-map-frame,
@@ -4008,9 +4007,7 @@ html.is-lightbox-scroll-locked body {
 .venue-detail-panel-kicker,
 .venue-detail-panel-title,
 .venue-detail-body-copy,
-.venue-relationship-label,
 .venue-relationship-title,
-.venue-relationship-note,
 .venue-relationship-status,
 .venue-timeline-era-kicker,
 .venue-timeline-era-title,
@@ -5058,45 +5055,29 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 
 .venue-relationships {
   display: grid;
-  gap: 0.66rem;
-  padding: 0.78rem;
-  border: 1px solid rgba(247, 247, 242, 0.085);
-  border-radius: var(--v3-card-radius-feature);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.06), transparent 72%),
-    rgba(3, 3, 6, 0.44);
-  overflow: hidden;
+  gap: 0.45rem;
 }
 
-.venue-relationships::before,
-.venue-relationship-card::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(90deg, rgba(213, 22, 34, 0.2), transparent 42% 100%) top / 100% 1px no-repeat,
-    linear-gradient(180deg, rgba(247, 247, 242, 0.036), transparent 66%) left / 1px 100% no-repeat;
-  pointer-events: none;
+.venue-relationships-header,
+.venue-photo-highlights-header {
+  padding-block-end: 0.42rem;
+  border-block-end: 1px solid rgba(153, 217, 238, 0.42);
 }
 
-.venue-relationships-header {
-  display: grid;
-  gap: 0.28rem;
-  justify-items: center;
-  text-align: center;
-}
-
-.venue-relationships-header .venue-detail-panel-kicker {
-  font-size: calc(0.72rem + 3px);
+.venue-relationships-header h4,
+.venue-photo-highlights-title {
+  margin: 0;
+  color: #e7f6ff;
+  font-size: clamp(0.78rem, 2.7vw, 1rem);
+  font-weight: 400;
+  line-height: 1.2;
+  text-shadow: 0 1px 5px #081321;
 }
 
 .venue-relationship-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
-  gap: 0.58rem;
-  justify-content: start;
-  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
 }
 
 .venue-relationships.is-focused .venue-relationship-grid {
@@ -5116,163 +5097,88 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 
 .venue-relationship-card {
   display: grid;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto minmax(1.25em, auto);
+  align-content: start;
+  gap: 0.2rem;
   min-width: 0;
-  min-height: 5.8rem;
-  border: 1px solid rgba(247, 247, 242, 0.075);
+  padding: 0.44rem 0.54rem;
+  border: 1px solid rgba(151, 222, 245, 0.28);
   border-radius: var(--radius-sm);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.028), transparent 62%),
-    rgba(1, 1, 3, 0.34);
-  overflow: hidden;
+  background: linear-gradient(150deg, rgba(12, 31, 48, 0.84), rgba(8, 18, 31, 0.82));
 }
 
-.venue-relationships.is-focused .venue-relationship-card.is-inactive {
-  display: none;
+.venue-relationship-card[data-venue-relationship="history"] {
+  grid-column: 1 / -1;
+  grid-template-rows: auto minmax(2.5em, auto);
 }
 
-.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-card:not(.is-expanded) {
-  display: none;
-}
-
+.venue-relationships.is-focused .venue-relationship-card.is-inactive,
+.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-card:not(.is-expanded),
 .venue-relationships:has(.venue-relationship-card[aria-expanded="true"]) .venue-relationship-card:not([aria-expanded="true"]) {
   display: none;
 }
 
-.venue-relationship-media {
-  position: relative;
-  min-height: 3.1rem;
-  display: grid;
-  place-items: center;
-  padding: 0.46rem;
-  border-bottom: 1px solid rgba(247, 247, 242, 0.065);
-  background:
-    radial-gradient(circle at 62% 34%, rgba(247, 247, 242, 0.11), transparent 0.18rem),
-    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.15), transparent 66%),
-    rgba(247, 247, 242, 0.03);
-  overflow: hidden;
-}
-
-.venue-relationship-media::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(90deg, transparent 0 48%, rgba(247, 247, 242, 0.08) 50%, transparent 52%),
-    linear-gradient(0deg, transparent 0 48%, rgba(247, 247, 242, 0.055) 50%, transparent 52%);
-  opacity: 0.42;
-  pointer-events: none;
-}
-
-.venue-relationship-media span {
-  position: relative;
-  z-index: 1;
-  color: rgba(247, 247, 242, 0.88);
-  font-size: 1.88rem;
-  line-height: 0.9;
-  text-transform: uppercase;
-}
-
-.venue-relationship-media--shows,
-.venue-relationship-media--history {
-  background:
-    radial-gradient(circle at 62% 34%, rgba(213, 22, 34, 0.22), transparent 0.24rem),
-    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.17), transparent 66%),
-    rgba(247, 247, 242, 0.03);
-}
-
-.venue-relationship-media--bands,
-.venue-relationship-media--photos,
-.venue-relationship-media--region {
-  background:
-    radial-gradient(circle at 44% 36%, rgba(247, 247, 242, 0.11), transparent 0.18rem),
-    linear-gradient(180deg, transparent 0 52%, rgba(1, 1, 3, 0.72)),
-    linear-gradient(135deg, rgba(255, 118, 102, 0.12), transparent 68%),
-    rgba(247, 247, 242, 0.028);
-}
-
-.venue-relationship-copy {
-  display: grid;
-  align-content: start;
-  justify-items: center;
-  gap: 0.24rem;
-  padding: 0.42rem 0.52rem 0.5rem;
-  text-align: center;
-}
-
-.venue-relationship-copy > * {
-  justify-self: center;
-  width: 100%;
-  text-align: center;
-}
-
-.venue-relationship-label {
-  color: rgba(255, 118, 102, 0.76);
-  font-size: 0.58rem;
-  line-height: 1;
-  text-transform: none;
-}
-
 .venue-relationship-title {
-  color: rgba(247, 247, 242, 0.86);
-  font-size: 0.86rem;
+  color: #a9cbdd;
+  font-size: 0.67rem;
   font-weight: 400;
-  line-height: 1.12;
-  text-align: center;
+  line-height: 1.18;
   overflow-wrap: anywhere;
-  text-transform: none;
 }
 
-.venue-relationship-note {
-  color: rgba(247, 247, 242, 0.58);
-  font-size: 0.68rem;
-  line-height: 1.34;
-  text-align: center;
+.venue-relationship-card:is([data-venue-relationship="shows"], [data-venue-relationship="bands"]) .venue-relationship-title {
+  padding-inline-end: 0.82rem;
+}
+
+.venue-relationship-media {
+  align-self: start;
+  min-width: 0;
+  color: #edf7ff;
+  font-size: clamp(0.86rem, 3vw, 1.24rem);
+  line-height: 1.2;
   overflow-wrap: anywhere;
-  text-transform: none;
+}
+
+.venue-relationship-card:is([data-venue-relationship="history"], [data-venue-relationship="region"]) .venue-relationship-media {
+  font-size: clamp(0.72rem, 2.15vw, 0.92rem);
 }
 
 .venue-relationship-status {
-  justify-self: center;
-  justify-content: center;
-  width: max-content;
-  max-width: 100%;
-  min-height: 1.3rem;
-  display: inline-flex;
-  align-items: center;
-  margin-top: 0.06rem;
-  padding: 0.24rem 0.42rem;
-  border: 1px solid rgba(213, 22, 34, 0.18);
-  border-radius: 999px;
-  background: rgba(213, 22, 34, 0.055);
-  color: rgba(247, 247, 242, 0.62);
-  font-size: 0.54rem;
-  line-height: 1;
-  text-transform: none;
+  min-block-size: 2.4em;
+  color: #b3cfde;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .venue-relationship-card--expandable {
   cursor: pointer;
   touch-action: manipulation;
-  transition:
-    border-color var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard),
-    transform var(--motion-fast) var(--ease-standard);
+  transition: border-color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
 }
 
-.venue-relationship-card--expandable:hover,
-.venue-relationship-card--expandable:focus-visible,
-.venue-relationship-card--expandable.is-expanded {
-  border-color: rgba(255, 118, 102, 0.24);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 62%),
-    rgba(11, 3, 5, 0.38);
+.venue-relationship-card--expandable::after {
+  position: absolute;
+  inset-block-start: 0.62rem;
+  inset-inline-end: 0.7rem;
+  width: 0.38rem;
+  height: 0.38rem;
+  border: solid #a3deef;
+  border-width: 0 1px 1px 0;
+  transform: rotate(45deg);
+  content: "";
+}
+
+.venue-relationship-card--expandable[aria-expanded="true"]::after {
+  transform: rotate(225deg);
+}
+
+.venue-relationship-card--expandable:is(:hover, :focus-visible, .is-expanded) {
+  border-color: rgba(155, 225, 248, 0.72);
 }
 
 .venue-relationship-card--expandable:focus-visible {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
+  outline: 2px solid #c8effc;
   outline-offset: 0.16rem;
 }
 
@@ -5671,131 +5577,59 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   background: rgba(1, 1, 3, 0.28);
 }
 
-.venue-photo-highlights {
-  position: relative;
+.venue-photo-highlights:not([hidden]) {
   min-width: 0;
   display: grid;
-  gap: 0.66rem;
-  padding: 0.78rem;
-  border: 1px solid rgba(247, 247, 242, 0.085);
-  border-radius: var(--v3-card-radius-feature);
-  background:
-    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 64%),
-    linear-gradient(135deg, rgba(213, 22, 34, 0.052), transparent 72%),
-    rgba(3, 3, 6, 0.42);
-  overflow: hidden;
-}
-
-.venue-photo-highlights::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(90deg, rgba(213, 22, 34, 0.18), transparent 42% 100%) top / 100% 1px no-repeat,
-    linear-gradient(180deg, rgba(247, 247, 242, 0.034), transparent 66%) left / 1px 100% no-repeat;
-  pointer-events: none;
-}
-
-.venue-photo-highlights[hidden] {
-  display: none;
-}
-
-.venue-photo-highlights-header,
-.venue-photo-highlights-body,
-.venue-photo-highlights-footer {
-  position: relative;
-  z-index: 1;
-  min-width: 0;
-}
-
-.venue-photo-highlights-header {
-  display: grid;
-  justify-items: center;
-  gap: 0.28rem;
-  text-align: center;
-}
-
-.venue-photo-highlights-title,
-.venue-photo-highlights-summary {
-  min-width: 0;
-  margin: 0;
-}
-
-.venue-photo-highlights-title {
-  color: rgba(247, 247, 242, 0.86);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.08;
-  text-transform: none;
-}
-
-.venue-photo-highlights-summary {
-  max-width: 34rem;
-  color: rgba(247, 247, 242, 0.56);
-  font-size: 0.68rem;
-  line-height: 1.35;
-  text-transform: none;
+  gap: 0.5rem;
 }
 
 .venue-photo-highlights-body {
-  display: grid;
-  gap: 0.58rem;
+  min-width: 0;
 }
 
-.venue-photo-highlights-carousel {
-  min-width: 0;
+.venue-photo-filmstrip {
   display: grid;
-  gap: 0.58rem;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(5.25rem, 40%, 10rem);
+  gap: 0.45rem;
+  min-width: 0;
+  padding-block: 0.18rem 0.4rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-color: #5e8596 #091724;
+  scrollbar-width: thin;
+  touch-action: pan-x pan-y;
 }
 
-.venue-photo-highlight-stage {
-  appearance: none;
-  position: relative;
-  width: 100%;
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .music-nexus-shell.is-venue-detail {
+  touch-action: pan-x pan-y;
+}
+
+.venue-photo-highlight-thumbnail {
+  display: grid;
+  aspect-ratio: 1;
   min-width: 0;
-  height: auto;
-  aspect-ratio: var(--venue-photo-highlight-ratio, 15 / 8);
-  display: block;
   padding: 0;
-  border: 1px solid rgba(247, 247, 242, 0.09);
+  border: 1px solid rgba(151, 222, 245, 0.36);
   border-radius: var(--radius-sm);
-  background:
-    radial-gradient(circle at 50% 18%, rgba(247, 247, 242, 0.08), transparent 32%),
-    rgba(1, 1, 3, 0.44);
-  color: inherit;
+  background: #091724;
   cursor: pointer;
-  font: inherit;
   overflow: hidden;
-  touch-action: manipulation;
-  transition:
-    border-color var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard);
 }
 
-.venue-photo-highlight-stage:hover,
-.venue-photo-highlight-stage:focus-visible {
-  border-color: rgba(255, 118, 102, 0.26);
-  background:
-    radial-gradient(circle at 50% 18%, rgba(247, 247, 242, 0.105), transparent 34%),
-    rgba(11, 3, 5, 0.42);
-}
-
-.venue-photo-highlight-stage:focus-visible {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
-  outline-offset: 0.14rem;
-}
-
-.venue-photo-highlight-image {
+.venue-photo-highlight-thumbnail img {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
-  object-fit: contain;
-  background: rgba(1, 1, 3, 0.5);
+  object-fit: cover;
   pointer-events: none;
 }
 
-.venue-photo-highlight-image.archive-gallery-image {
-  object-fit: contain;
+.venue-photo-filmstrip:focus-visible,
+.venue-photo-highlight-thumbnail:focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: -2px;
 }
 
 .venue-photo-highlights-state {
@@ -5803,57 +5637,19 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   padding: 0.7rem;
 }
 
-.venue-photo-highlights-controls {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, max-content)) minmax(0, 1fr);
-  align-items: center;
-  justify-content: center;
-  gap: 0.42rem;
+.venue-lightbox-info-toggle[hidden],
+.venue-lightbox-caption[hidden],
+.lightbox-info-panel[data-venue-photo-info] .lightbox-info-title {
+  display: none;
 }
 
-.venue-photo-highlights-control {
-  appearance: none;
-  min-width: 0;
-  min-height: 2.55rem;
-  padding: 0.58rem 0.72rem;
-  border: 1px solid rgba(247, 247, 242, 0.095);
-  border-radius: var(--radius-sm);
-  background: rgba(247, 247, 242, 0.034);
-  color: rgba(247, 247, 242, 0.72);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.64rem;
-  line-height: 1;
-  text-align: center;
-  text-transform: none;
-  touch-action: manipulation;
+.venue-lightbox-caption {
+  grid-column: 1 / -1;
 }
 
-.venue-photo-highlights-control--primary {
-  border-color: rgba(213, 22, 34, 0.24);
-  background: rgba(213, 22, 34, 0.075);
-  color: rgba(247, 247, 242, 0.84);
-}
-
-.venue-photo-highlights-control:hover,
-.venue-photo-highlights-control:focus-visible {
-  border-color: rgba(255, 118, 102, 0.3);
-  background: rgba(213, 22, 34, 0.095);
-  color: rgba(247, 247, 242, 0.9);
-}
-
-.venue-photo-highlights-control:focus-visible {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
-  outline-offset: 0.14rem;
-}
-
-.venue-photo-highlights-counter {
-  min-width: 0;
-  color: rgba(247, 247, 242, 0.54);
-  font-size: 0.62rem;
-  line-height: 1;
-  text-align: right;
+.venue-lightbox-caption .lightbox-info-value {
+  white-space: pre-wrap;
+  line-height: 1.4;
 }
 
 .venue-detail-content-grid {
@@ -27183,22 +26979,6 @@ button.hall-crusades-archive-crystal:focus-visible {
     font-size: 1.7rem;
   }
 
-  .venue-relationships {
-    padding: 0.92rem;
-  }
-
-  .venue-photo-highlights {
-    padding: 0.92rem;
-  }
-
-  .venue-relationship-grid {
-    gap: 0.62rem;
-  }
-
-  .venue-relationship-card {
-    min-height: 6.1rem;
-  }
-
   .venue-detail-content-grid {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 0.78rem;
@@ -27296,52 +27076,6 @@ button.hall-crusades-archive-crystal:focus-visible {
 
   .venue-detail-stat-label {
     font-size: 0.52rem;
-  }
-
-  .venue-relationships {
-    gap: 0.54rem;
-    padding: 0.54rem;
-  }
-
-  .venue-photo-highlights {
-    gap: 0.54rem;
-    padding: 0.54rem;
-  }
-
-  .venue-photo-highlights-controls {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.36rem;
-  }
-
-  .venue-photo-highlights-control {
-    min-height: 2.5rem;
-    padding: 0.54rem 0.36rem;
-    font-size: 0.58rem;
-  }
-
-  .venue-photo-highlights-counter {
-    grid-column: 1 / -1;
-    text-align: center;
-  }
-
-  .venue-relationship-grid {
-    gap: 0.48rem;
-  }
-
-  .venue-relationship-card {
-    min-height: 0;
-  }
-
-  .venue-relationship-media {
-    min-height: 3.1rem;
-  }
-
-  .venue-relationship-copy {
-    padding: 0.42rem 0.5rem 0.5rem;
-  }
-
-  .venue-relationship-status {
-    min-height: 1.3rem;
   }
 
   .venue-map-frame {

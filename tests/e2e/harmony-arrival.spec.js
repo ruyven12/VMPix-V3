@@ -624,6 +624,126 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   await expect(missing).toHaveText("Unavailable Data: City, State, Established, GPS, Region");
 });
 
+test("Venue Dossier keeps the compact archive truthful and opens stable filmstrip photos in the shared lightbox", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const caption = "A recorded caption with enough detail to continue across multiple lines in the shared photo info drawer without truncation.";
+  const photos = Array.from({ length: 22 }, (_, index) => ({
+    image_key: "venue-photo-" + index,
+    thumbnail_url: "/assets/branding/voodoo-media-logo-transparent.png?venue-thumb=" + index,
+    large_url: "/assets/branding/voodoo-media-logo-transparent.png?venue-original=" + index,
+    caption: index === 5 ? caption : index === 7 ? "" : "Recorded frame " + index,
+  }));
+  const shows = [
+    { show_id: "first", venue_id: "aura", name: "First Event", date: "2024-08-01",
+      bands: [{ band: "Signal Artist" }, { name: "signal artist" }, { name: { invalid: "record" } }, "TBA"] },
+    { show_id: "last", venue_id: "aura", name: "Last Event", date: "February 2, 2025", performers: [{ artist: "Second Artist" }] },
+    { show_id: "partial", venue_id: "aura", name: "Title Guess with Imaginary Artist", date: "2010" },
+    { show_id: "invalid", venue_id: "aura", name: "Invalid Date", date: "February 31, 2000" },
+    { show_id: "no-lineup", venue_id: "no-lineup", name: "Unverified Title with Guess", date: "2019" },
+  ];
+  await mockArchive(page, baseURL, () => ({ data: [
+    { venue_id: "aura", venue: "Aura", region: "New England", photo_count: 12 },
+    { venue_id: "no-lineup", venue: "No Lineup" },
+  ] }), () => ({ data: shows }));
+  const galleryRequests = [];
+  await page.route(/\?venue-thumb=0$/, route => route.fulfill({ status: 404, body: "" }));
+  await page.route(/\/api\/music\/venues\/[^/]+\/photos\?/, route => {
+    const url = new URL(route.request().url());
+    galleryRequests.push([url.pathname, url.searchParams.get("page"), url.searchParams.get("limit")]);
+    return route.fulfill({
+      headers: { "access-control-allow-origin": "*" },
+      json: { photos: url.pathname.endsWith("/aura/photos") ? [photos[0], ...photos] : [] },
+    });
+  });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+
+  const dossier = page.locator("[data-venue-detail]");
+  const archive = dossier.getByRole("region", { name: "Venue Archive" });
+  const card = name => archive.locator('[data-venue-relationship="' + name + '"]');
+  const value = name => card(name).locator(".venue-relationship-media span");
+  await expect(archive.getByRole("heading", { name: "Venue Archive" })).toBeVisible();
+  await expect(archive.locator(".venue-relationship-title")).toHaveText([
+    "Archive Events", "Featured Artists", "Total Photos", "Regional Context", "Archive History",
+  ]);
+  await expect(value("shows")).toHaveText("4");
+  await expect(value("bands")).toHaveText("2");
+  await expect(value("photos")).toHaveText("12");
+  await expect(value("region")).toHaveText("New England");
+  await expect(value("history")).toHaveText("Aug 1, 2024 → Feb 2, 2025");
+  await expect(card("shows")).toHaveAccessibleDescription("4");
+  await expect(card("bands")).toHaveAccessibleDescription("2");
+  expect(await archive.evaluate(node => {
+    const [events, artists, photos, region, history] = [...node.querySelectorAll("[data-venue-relationship]")];
+    const box = element => element.getBoundingClientRect();
+    return box(events).top === box(artists).top && box(photos).top === box(region).top
+      && box(history).left === box(events).left && box(history).right === box(artists).right
+      && [photos, region, history].every(tile => getComputedStyle(tile, "::after").content === "none");
+  })).toBe(true);
+  await card("bands").press("Enter");
+  const artistPanel = dossier.locator("[data-venue-artists-panel]");
+  await expect(artistPanel).toContainText("Signal Artist");
+  await expect(artistPanel).not.toContainText("Imaginary Artist");
+  await artistPanel.getByRole("searchbox", { name: "Search Artists" }).fill("Second");
+  await expect(artistPanel.locator(".venue-artists-grid")).toContainText("Second Artist");
+  await expect(artistPanel.locator(".venue-artists-grid")).not.toContainText("Signal Artist");
+  await card("bands").press("Enter");
+
+  const strip = dossier.locator("[data-venue-photo-filmstrip]");
+  const tiles = strip.locator("[data-venue-photo-highlight]");
+  await expect(tiles).toHaveCount(19);
+  const firstImage = tiles.first().locator("img");
+  await expect(firstImage).toHaveCSS("object-fit", "cover");
+  await expect(firstImage).toHaveAttribute("draggable", "false");
+  await firstImage.scrollIntoViewIfNeeded();
+  await expect(firstImage).toHaveAttribute("src", /archive-gallery-placeholder\.svg$/);
+  await expect(tiles.first()).toHaveText("");
+  const tile = tiles.nth(5);
+  await tile.scrollIntoViewIfNeeded();
+  const bounds = await tile.boundingBox();
+  expect(Math.abs(bounds.width - bounds.height)).toBeLessThanOrEqual(1);
+  const stripScroll = await strip.evaluate(node => node.scrollLeft);
+  const scroller = page.locator(".music-nexus-shell");
+  const dossierScroll = await scroller.evaluate(node => node.scrollTop);
+  expect(stripScroll).toBeGreaterThan(0);
+  await tile.click();
+
+  const lightbox = page.getByRole("dialog");
+  const info = lightbox.getByRole("button", { name: "Photo Info" });
+  await expect(lightbox).toBeVisible();
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(lightbox.locator("[data-lightbox-image]")).toHaveAttribute("src", /venue-original=5$/);
+  await expect(lightbox.locator("[data-lightbox-image]")).toHaveCSS("object-fit", "contain");
+  await info.press("Enter");
+  await expect(lightbox.locator("[data-venue-lightbox-caption]")).toBeVisible();
+  await expect(lightbox.locator("[data-venue-lightbox-caption]")).toHaveText(caption);
+  await lightbox.getByRole("button", { name: "Close photo info" }).press("Enter");
+  await lightbox.getByRole("button", { name: "Next photo" }).press("Enter");
+  await expect(lightbox.locator("[data-lightbox-image]")).toHaveAttribute("src", /venue-original=6$/);
+  await info.press("Enter");
+  await lightbox.getByRole("button", { name: "Close photo info" }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(lightbox.locator("[data-lightbox-image]")).toHaveAttribute("src", /venue-original=7$/);
+  await expect(info).toBeHidden();
+  await expect(lightbox.locator("[data-lightbox-info-panel]")).toHaveAttribute("aria-hidden", "true");
+  const closeLightbox = lightbox.getByRole("button", { name: "Close lightbox" });
+  await expect(closeLightbox).toBeFocused();
+  await closeLightbox.press("Enter");
+  await expect(lightbox).toBeHidden();
+  await expect(tile).toBeFocused();
+  expect(await strip.evaluate(node => node.scrollLeft)).toBe(stripScroll);
+  expect(await scroller.evaluate(node => node.scrollTop)).toBe(dossierScroll);
+  expect(galleryRequests).toEqual([["/api/music/venues/aura/photos", "1", "20"]]);
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/no-lineup");
+  await expect(value("shows")).toHaveText("1");
+  await expect(value("bands")).toHaveText("—");
+  await expect(value("history")).toHaveText("—");
+  await card("bands").press("Enter");
+  await expect(artistPanel).toContainText("No verified artist records for these linked shows.");
+});
+
 test("Venue Dossier shows verified Sheet totals without deriving counts from linked or sampled photos", async ({ page, baseURL }) => {
   test.setTimeout(75000);
   await page.setViewportSize({ width: 412, height: 915 });
@@ -653,6 +773,12 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
     const pathname = new URL(route.request().url()).pathname;
     if (pathname.endsWith("/signal-0/photos")) {
       return route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, json: {} });
+    }
+    if (pathname.endsWith("/signal-7/photos")) {
+      return route.fulfill({
+        headers: { "access-control-allow-origin": "*" },
+        json: { photos: [{ thumbnail_url: "invalid" }] },
+      });
     }
     if (pathname.endsWith("/signal-1/photos")) {
       return route.fulfill({
@@ -685,12 +811,12 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
     await expect(page).toHaveURL(baseURL + harborPath + "/signal-" + index);
     await expect(dossier.getByRole("heading", { name: venues[index].name, exact: true })).toBeVisible();
     const highlights = dossier.locator("[data-venue-photo-highlights]");
-    if (index === 0) {
-      await expect(highlights).toContainText("Venue photo highlights could not be loaded.");
+    if (index === 0 || index === 7) {
+      await expect(highlights).toContainText("Photo highlights unavailable.");
     } else if (index === 1) {
-      await expect(highlights).toContainText("No venue photo highlights are available yet.");
+      await expect(highlights).toContainText("No photo highlights available.");
     } else {
-      await expect(highlights).toContainText("Cycling 1 linked-show highlight from 11 scanned photos.");
+      await expect(highlights.locator("[data-venue-photo-highlight]")).toHaveCount(1);
     }
     if (index === 2) {
       await expect(dossier.locator('[data-venue-relationship="shows"] .venue-relationship-media span')).toHaveText("3");
@@ -915,7 +1041,7 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
     await expect(events).not.toHaveAttribute("role", "button");
     await expect(artists).not.toHaveAttribute("role", "button");
-    await expect(highlights).toContainText("No venue photo highlights are available yet.");
+    await expect(highlights).toContainText("No photo highlights available.");
     expect(showsRequests).toBe(1);
     expect(highlightsRequests).toBe(1);
     originalTitle = await title.evaluateHandle(node => node.firstChild);
