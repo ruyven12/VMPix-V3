@@ -3566,7 +3566,15 @@ function createMusicVenueBeacon(venue) {
   link.addEventListener("click", (event) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    void openMusicVenueProjection(venue);
+    if (musicVenueProjection || harmonyRegistryActivation || musicVenueSectorTransition
+        || getRouteFromUrl().name !== "music-venues" || !musicVenuesIndex.classList.contains("is-active")) return;
+
+    inspectedMusicVenueSlug = beacon.dataset.venueSlug;
+    navigateToMusicVenueDetail(venue);
+    if (venueDetailTitle && venueDetail?.getAttribute("aria-hidden") === "false") {
+      venueDetailTitle.tabIndex = -1;
+      venueDetailTitle.focus({ preventScroll: true });
+    }
   });
 
   beacon.append(label, link);
