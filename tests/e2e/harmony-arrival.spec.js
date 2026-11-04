@@ -56,6 +56,20 @@ async function expectHarmonyFilterGeometry(page) {
   })).toBe(true);
 }
 
+async function expectReachableHarmonyFilter(control) {
+  await expect.poll(() => control.evaluate(node => {
+    const body = node.closest("[data-music-venues-filters]");
+    const bodyBox = body.getBoundingClientRect();
+    const controlBox = node.getBoundingClientRect();
+    const target = document.elementFromPoint(
+      (controlBox.left + controlBox.right) / 2,
+      (controlBox.top + controlBox.bottom) / 2
+    );
+    return body.scrollWidth <= body.clientWidth + 1 && controlBox.width >= 44 && controlBox.height >= 44
+      && controlBox.top >= bodyBox.top - 1 && controlBox.bottom <= bodyBox.bottom + 1 && node.contains(target);
+  })).toBe(true);
+}
+
 async function expectHarmonyEnvironment(page) {
   const environment = page.locator("[data-harmony-environment]");
   const sigil = environment.locator("[data-harmony-sigil]");
@@ -272,8 +286,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         const errors = [];
         page.on("pageerror", error => errors.push(error.message));
         await page.goto(harborPath, { waitUntil: "domcontentloaded" });
-        const reject = page.getByRole("button", { name: "Reject", exact: true });
-        if (await reject.isVisible()) await reject.click();
+        await page.getByRole("button", { name: "Reject", exact: true }).click();
         const harbor = await expectHarbor(page);
         expect(requests).toBe(0);
 
@@ -308,7 +321,7 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         const search = page.getByRole("searchbox", { name: "Search Venue" });
         const state = page.getByRole("combobox", { name: "Filter venues by state" });
         const sort = page.getByRole("combobox", { name: "Filter venues by sort" });
-        const venueFilter = page.getByRole("combobox", { name: "Filter venues by venue" });
+        const reset = page.getByRole("button", { name: "Reset Filters" });
         const filters = archive.getByRole("button", { name: "Venue filters", exact: true });
         const previous = list.getByRole("button", { name: "Previous Sector" });
         const next = list.getByRole("button", { name: "Next Sector" });
@@ -346,7 +359,18 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await filters.locator("[data-harmony-filter-cue]").click();
         await expect(filters).toHaveAttribute("aria-expanded", "true");
         await expect(search).toBeFocused();
+        await expect(archive).not.toHaveAttribute("data-harmony-filter-motion", /.+/);
         await expectHarmonyFilterGeometry(page);
+        await expect(page.getByRole("combobox", { name: "Filter venues by venue" })).toHaveCount(0);
+        const filterBody = archive.locator("[data-music-venues-filters]");
+        if (height > width) {
+          expect(await filterBody.evaluate(node => node.scrollHeight - node.clientHeight)).toBeLessThanOrEqual(1);
+        }
+        for (const control of [search, state, sort, reset]) {
+          await expect(control).toBeFocused();
+          await expectReachableHarmonyFilter(control);
+          if (control !== reset) await page.keyboard.press("Tab");
+        }
         await search.fill("Concord");
         await expect(beacons.getByRole("listitem")).toHaveCount(5);
         await expect(beacons.getByRole("listitem").first()).toContainText("Concord, NH");
@@ -360,10 +384,19 @@ for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]
         await expect(state).toBeFocused();
         await sort.selectOption("newest");
         await expect(inspect("84")).toBeVisible();
-        await venueFilter.selectOption("signal-30");
+        await search.fill("Signal Hall 30");
         await expect(beacons.getByRole("listitem")).toHaveCount(1);
         await expect(inspect("30")).toBeVisible();
-        await venueFilter.selectOption("");
+        await reset.click();
+        await expect(search).toBeFocused();
+        await expect(search).toHaveValue("");
+        await expect(state).toHaveValue("");
+        await expect(sort).toHaveValue("az");
+        expect(await filterBody.evaluate(node => node.scrollTop)).toBe(0);
+        await expect(inspect("00")).toBeVisible();
+        await search.fill("Signal Hall");
+        await state.selectOption("ME");
+        await sort.selectOption("newest");
         await search.press("Escape");
         await expect(filters).toBeFocused();
         await expect(filters).toHaveAttribute("aria-expanded", "false");
@@ -992,6 +1025,17 @@ test("keeps the Harbor clear of simulated landscape safe areas", async ({ page, 
   await search.fill("Concord");
   await expect(search).toBeFocused();
   await expect(search).toBeInViewport({ ratio: 1 });
+  const controls = [
+    search,
+    page.getByRole("combobox", { name: "Filter venues by state" }),
+    page.getByRole("combobox", { name: "Filter venues by sort" }),
+    page.getByRole("button", { name: "Reset Filters" }),
+  ];
+  for (const [index, control] of controls.entries()) {
+    await expect(control).toBeFocused();
+    await expectReachableHarmonyFilter(control);
+    if (index < controls.length - 1) await page.keyboard.press("Tab");
+  }
   const lastResult = scroller.getByRole("link", { name: "Inspect Signal Hall 89" });
   await lastResult.scrollIntoViewIfNeeded();
   await expect(lastResult).toBeInViewport({ ratio: 1 });

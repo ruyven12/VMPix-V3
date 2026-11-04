@@ -19,7 +19,7 @@ function musicArchiveControlSnapshot(dataset) {
   if (dataset === "bands") return { query: normalize(bandsSearchTerm), source: musicBandsIndexCollection, filters: {letter: activeBandsFilterLetter, region: activeBandsRegionFilter, status: activeBandsStatusFilter}, view: activeBandsView };
   if (dataset === "shows") return { query: getMusicShowsSearchNeedle(activeMusicShowsSearch)?.phrase || "", source: musicShowsSetsCollection, filters: {year: activeMusicShowsYearFilter, state: activeMusicShowsStateFilter, venue: activeMusicShowsVenueFilter} };
   if (dataset === "people") return { query: normalize(activeMusicPeopleSearch), source: musicPeopleIndexCollection, filters: {letter: activeMusicPeopleLetterFilter, category: activeMusicPeopleCategoryFilter, instrument: activeMusicPeopleInstrumentFilter} };
-  if (dataset === "venues") return { query: normalize(activeMusicVenueSearch), source: musicVenuesCollection, filters: {state: activeMusicVenueStateFilter, venue: activeMusicVenueSlugFilter, sort: activeMusicVenueSort} };
+  if (dataset === "venues") return { query: normalize(activeMusicVenueSearch), source: musicVenuesCollection, filters: {state: activeMusicVenueStateFilter, sort: activeMusicVenueSort} };
   return null;
 }
 function beginMusicArchiveControl(event, dataset) {
@@ -419,7 +419,6 @@ let musicVenueProjection = null;
 let inspectedMusicVenueSlug = "";
 let activeMusicVenueSearch = "";
 let activeMusicVenueStateFilter = "";
-let activeMusicVenueSlugFilter = "";
 let activeMusicVenueSort = "az";
 let activeMusicVenueDetailSlug = "";
 let activeMusicVenuePhotoHighlightsKey = "";
@@ -3350,34 +3349,10 @@ function getMusicVenuesArchiveRows() {
     .sort((left, right) => getMusicVenueName(left).localeCompare(getMusicVenueName(right)));
 }
 
-function getMusicVenueRowsForState(rows, stateFilter = activeMusicVenueStateFilter) {
-  return stateFilter
-    ? rows.filter((venue) => getMusicVenueState(venue) === stateFilter)
-    : rows;
-}
-
-function getMusicVenueSelectOptions(rows, stateFilter = activeMusicVenueStateFilter) {
-  const options = new Map();
-  getMusicVenueRowsForState(rows, stateFilter).forEach((venue) => {
-    const slug = getMusicVenueSlug(venue);
-    const label = getMusicVenueName(venue);
-    if (slug && label && !options.has(slug)) {
-      options.set(slug, { value: slug, label });
-    }
-  });
-  return Array.from(options.values()).sort((left, right) => left.label.localeCompare(right.label));
-}
-
 function normalizeActiveMusicVenueFilters(rows) {
   const stateOptions = new Set(rows.map(getMusicVenueState).filter(Boolean));
   if (activeMusicVenueStateFilter && !stateOptions.has(activeMusicVenueStateFilter)) {
     activeMusicVenueStateFilter = "";
-  }
-  const venueOptions = new Set(
-    getMusicVenueSelectOptions(rows, activeMusicVenueStateFilter).map((venue) => venue.value)
-  );
-  if (activeMusicVenueSlugFilter && !venueOptions.has(activeMusicVenueSlugFilter)) {
-    activeMusicVenueSlugFilter = "";
   }
 }
 
@@ -3388,9 +3363,6 @@ function getFilteredMusicVenues() {
 
   const filteredRows = rows.filter((venue) => {
     if (activeMusicVenueStateFilter && getMusicVenueState(venue) !== activeMusicVenueStateFilter) {
-      return false;
-    }
-    if (activeMusicVenueSlugFilter && getMusicVenueSlug(venue) !== activeMusicVenueSlugFilter) {
       return false;
     }
     if (!searchTerm) {
@@ -3452,11 +3424,6 @@ function updateMusicVenuesFilter(filterName, value, event = null) {
     return;
   } else if (filterName === "state") {
     activeMusicVenueStateFilter = normalizeMusicVenueState(value);
-    normalizeActiveMusicVenueFilters(getMusicVenuesArchiveRows());
-    renderMusicVenuesFilters();
-  } else if (filterName === "venue") {
-    activeMusicVenueSlugFilter = normalizeMusicVenueSlugValue(value);
-    normalizeActiveMusicVenueFilters(getMusicVenuesArchiveRows());
   } else if (filterName === "sort") {
     activeMusicVenueSort = musicVenueSortOptions.some((option) => option.value === value) ? value : "az";
   }
@@ -3471,10 +3438,10 @@ function resetMusicVenuesFilters(event = null) {
   const analyticsBefore = beginMusicArchiveControl(event, "venues");
   activeMusicVenueSearch = "";
   activeMusicVenueStateFilter = "";
-  activeMusicVenueSlugFilter = "";
   activeMusicVenueSort = "az";
   activeMusicVenueSector = 0;
   renderMusicVenuesArchive();
+  musicVenuesFilters.scrollTop = 0;
   musicVenuesFilters.querySelector("[data-music-venues-filter='search']")?.focus({ preventScroll: true });
   reportMusicArchiveControl(event, "venues", analyticsBefore, "filter");
 }
@@ -3519,7 +3486,7 @@ function createMusicVenuesFilters(rows) {
   filters.setAttribute("aria-label", "Venue archive filters");
 
   const searchLabel = document.createElement("label");
-  searchLabel.className = "music-venues-filter-field music-venues-filter-field--search";
+  searchLabel.className = "music-venues-filter-field";
   const searchText = document.createElement("span");
   searchText.className = "music-venues-filter-label";
   searchText.textContent = "Search Venue";
@@ -3527,7 +3494,7 @@ function createMusicVenuesFilters(rows) {
   searchInput.className = "music-venues-search-input";
   searchInput.type = "search";
   searchInput.autocomplete = "off";
-  searchInput.placeholder = "Name or location";
+  searchInput.placeholder = "Name / city";
   searchInput.value = activeMusicVenueSearch;
   searchInput.dataset.musicVenuesFilter = "search";
   searchInput.addEventListener("input", (event) => {
@@ -3537,7 +3504,6 @@ function createMusicVenuesFilters(rows) {
 
   const states = getMusicShowsUniqueOptions(rows, getMusicVenueState)
     .map((state) => ({ value: state, label: state }));
-  const venues = getMusicVenueSelectOptions(rows, activeMusicVenueStateFilter);
 
   const resetButton = document.createElement("button");
   resetButton.className = "music-venues-filter-reset";
@@ -3548,7 +3514,6 @@ function createMusicVenuesFilters(rows) {
   filters.append(
     searchLabel,
     createMusicVenuesFilterField("State", "state", states, activeMusicVenueStateFilter, "All States"),
-    createMusicVenuesFilterField("Venue", "venue", venues, activeMusicVenueSlugFilter, "All Venues"),
     createMusicVenuesFilterField("Sort", "sort", musicVenueSortOptions, activeMusicVenueSort),
     resetButton
   );
@@ -3900,7 +3865,7 @@ function setMusicVenuesFiltersOpen(isOpen, moveFocus = false, shouldAnimate = mo
     const stage = musicVenueConnections.getBoundingClientRect();
     if (stage.width && stage.height) positionHarmonyFilters(stage);
     else scheduleMusicVenueConnectors();
-    if (moveFocus) musicVenuesTools.scrollTop = 0;
+    if (moveFocus) musicVenuesFilters.scrollTop = 0;
   }
   if (!moveFocus) return;
   const target = isOpen ? musicVenuesFilters.querySelector("[data-music-venues-filter='search']") : harmonyFilterSigil;
@@ -18012,8 +17977,10 @@ function initMusicModule() {
         || shell?.dataset.shellRoute !== "music-venues" || getRouteFromUrl().name !== "music-venues"
         || !musicVenuesIndex?.classList.contains("is-active")) return;
     const target = event.target;
-    if (!(target instanceof Element)
-        || target.closest("[data-music-venues-tools], [data-harmony-filter-sigil], .music-venue-beacon-link")) return;
+    // Reset may rebuild the controls before this click reaches the document.
+    const path = event.composedPath();
+    if (!(target instanceof Element) || path.includes(musicVenuesTools) || path.includes(harmonyFilterSigil)
+        || target.closest(".music-venue-beacon-link")) return;
     const clickedControl = target.closest("a[href], button, input, select, textarea, summary, [tabindex], [contenteditable]");
     const restoreFocus = !clickedControl && (document.activeElement === document.body || musicVenuesTools.contains(document.activeElement));
     setMusicVenuesFiltersOpen(false, restoreFocus, true);
@@ -18248,7 +18215,6 @@ function captureMusicResumeState(route) {
     browsing: musicVenuesIndex.classList.contains("is-active"),
     search: activeMusicVenueSearch,
     state: activeMusicVenueStateFilter,
-    venue: activeMusicVenueSlugFilter,
     sort: activeMusicVenueSort,
     sector: activeMusicVenueSector,
     filtersOpen: areMusicVenuesFiltersOpen(),
@@ -18279,7 +18245,6 @@ function seedMusicResumeState(route,ui) {
   if (route.name === "music-venues") {
     activeMusicVenueSearch = v3Text(ui.search);
     activeMusicVenueStateFilter = normalizeMusicVenueState(ui.state);
-    activeMusicVenueSlugFilter = normalizeMusicVenueSlugValue(ui.venue);
     activeMusicVenueSort = musicVenueSortOptions.some(option => option.value === ui.sort) ? ui.sort : "az";
     activeMusicVenueSector = Math.floor(v3Number(ui.sector));
     inspectedMusicVenueSlug = normalizeMusicVenueSlugValue(ui.inspectedVenue);
