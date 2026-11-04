@@ -633,24 +633,44 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
   }
 });
 
-test("Venue Dossier keeps totals unknown during live loading and when only fallback or unavailable data exists", async ({ page, baseURL }) => {
+test("Venue Dossier keeps identity and totals unknown while verified Venue data is unavailable", async ({ page, baseURL }) => {
   let releaseVenues;
+  let showsRequests = 0;
+  let highlightsRequests = 0;
   const pending = new Promise(resolve => { releaseVenues = resolve; });
-  await mockArchive(page, baseURL, () => pending);
+  await mockArchive(page, baseURL, () => pending, () => {
+    showsRequests++;
+    return { data: shows };
+  });
+  page.on("request", request => {
+    if (/\/api\/music\/venues\/[^/]+\/photos$/.test(new URL(request.url()).pathname)) highlightsRequests++;
+  });
   const venueRequest = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
   await page.goto(harborPath + "/the-electric-hall", { waitUntil: "domcontentloaded" });
+  const breadcrumb = page.getByRole("navigation", { name: /Current location.*Venue Detail/ });
   const count = page.locator('[data-venue-detail] [data-venue-relationship="photos"] .venue-relationship-media span');
   try {
     await venueRequest;
-    await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Venue Dossier", exact: true })).toBeVisible();
+    await expect(page.locator('[data-music-venue-detail-state="loading"]')).toBeVisible();
+    await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toHaveCount(0);
+    await expect(breadcrumb).toBeAttached();
+    await expect(breadcrumb).not.toContainText("The Electric Hall");
     await expect(count).toHaveText("—");
   } finally {
     releaseVenues({ status: 503 });
   }
+  await expect(page.locator('[data-music-venue-detail-state="error"]')).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Venue Archive Unavailable", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "The Electric Hall", exact: true })).toHaveCount(0);
+  await expect(breadcrumb).toBeAttached();
+  await expect(breadcrumb).not.toContainText("The Electric Hall");
   await expect(count).toHaveText("—");
   await page.goto(harborPath + "/missing-venue-total", { waitUntil: "domcontentloaded" });
   await expect(page.locator('[data-music-venue-detail-state="error"]')).toBeVisible();
   await expect(count).toHaveText("—");
+  expect(showsRequests).toBe(0);
+  expect(highlightsRequests).toBe(0);
 });
 
 test("Venue Dossier Retry keeps the current error on failure and recovers Aura in place", async ({ page, baseURL }) => {
@@ -674,7 +694,7 @@ test("Venue Dossier Retry keeps the current error on failure and recovers Aura i
   const originalButton = await retry.elementHandle();
   const originalDossier = await dossier.elementHandle();
   const historyLength = await page.evaluate(() => history.length);
-  const showsAtRetry = showsRequests;
+  expect(showsRequests).toBe(0);
 
   const startRetry = async () => {
     let release;
@@ -696,6 +716,7 @@ test("Venue Dossier Retry keeps the current error on failure and recovers Aura i
   await expect(retry).toBeFocused();
   expect(await retry.evaluate((node, original) => node === original, originalButton)).toBe(true);
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  expect(showsRequests).toBe(0);
 
   await (await startRetry())({
     payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123 }] },
@@ -708,7 +729,7 @@ test("Venue Dossier Retry keeps the current error on failure and recovers Aura i
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   expect(await dossier.evaluate((node, original) => node === original, originalDossier)).toBe(true);
   expect(await page.evaluate(() => history.length)).toBe(historyLength);
-  expect(showsRequests).toBe(showsAtRetry);
+  await expect.poll(() => showsRequests).toBe(1);
 });
 
 test("Venue Dossier Retry cannot repaint a different dossier after navigation", async ({ page, baseURL }) => {
@@ -774,6 +795,111 @@ test("Venue Dossier Retry recovers the same dossier beneath a retained Shell ove
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   await expect(page.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
   await expect(page.locator("[data-music-venue-detail-state]")).toHaveCount(0);
+});
+
+test("Venue Dossier paints verified identity and Highlights while linked Shows are pending", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let releaseVenues;
+  let releaseShows;
+  const pendingVenues = new Promise(resolve => { releaseVenues = resolve; });
+  const pendingShows = new Promise(resolve => { releaseShows = resolve; });
+  let showsRequests = 0;
+  let highlightsRequests = 0;
+  await mockArchive(page, baseURL, () => pendingVenues, () => {
+    showsRequests++;
+    return pendingShows;
+  });
+  page.on("request", request => {
+    if (/\/api\/music\/venues\/aura\/photos$/.test(new URL(request.url()).pathname)) highlightsRequests++;
+  });
+  const requested = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const title = dossier.locator("[data-venue-detail-title]");
+  const events = dossier.locator('[data-venue-relationship="shows"]');
+  const artists = dossier.locator('[data-venue-relationship="bands"]');
+  const highlights = dossier.locator("[data-venue-photo-highlights]");
+  try {
+    await requested;
+    await expect(title).toHaveText("Venue Dossier");
+    await expect(dossier.locator('[data-music-venue-detail-state="loading"]')).toBeVisible();
+    expect(showsRequests).toBe(0);
+    expect(highlightsRequests).toBe(0);
+  } finally {
+    releaseVenues({ payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123 }] } });
+  }
+
+  let originalTitle;
+  let originalHighlights;
+  let highlightsTop;
+  try {
+    await expect(title).toHaveText("Aura");
+    await expect(page.getByRole("navigation", { name: /Current location.*Aura/ })).toBeAttached();
+    await expect(dossier.locator("[data-venue-detail-location]")).toHaveText("Portland, ME");
+    await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("123");
+    await expect(events.getByRole("status")).toHaveText("Event Index Loading");
+    await expect(artists.getByRole("status")).toHaveText("Artist Index Loading");
+    await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
+    await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
+    await expect(events).not.toHaveAttribute("role", "button");
+    await expect(artists).not.toHaveAttribute("role", "button");
+    await expect(highlights).toContainText("No venue photo highlights are available yet.");
+    expect(showsRequests).toBe(1);
+    expect(highlightsRequests).toBe(1);
+    originalTitle = await title.evaluateHandle(node => node.firstChild);
+    originalHighlights = await highlights.locator("[data-venue-photo-highlights-body] > *").elementHandle();
+    await page.evaluate(() => document.fonts.ready);
+    highlightsTop = (await highlights.boundingBox()).y;
+  } finally {
+    releaseShows({ data: [
+      { show_id: "aura-august", venue_id: "aura", name: "August at Aura", date: "2024-08-01", bands: ["Arrival Band"] },
+    ] });
+  }
+
+  await expect(events.locator(".venue-relationship-media span")).toHaveText("1");
+  await expect(artists.locator(".venue-relationship-media span")).toHaveText("1");
+  expect(Math.abs((await highlights.boundingBox()).y - highlightsTop)).toBeLessThanOrEqual(1);
+  await events.press("Enter");
+  await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("August at Aura");
+  await events.press("Enter");
+  await artists.press("Enter");
+  await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("Arrival Band");
+  expect(await title.evaluate((node, original) => node.firstChild === original, originalTitle)).toBe(true);
+  expect(await highlights.locator("[data-venue-photo-highlights-body] > *").evaluate((node, original) => node === original, originalHighlights)).toBe(true);
+  expect(highlightsRequests).toBe(1);
+});
+
+test("Venue Dossier preserves verified identity on Shows failure and exposes confirmed empty relationships", async ({ page, baseURL }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let showsRequests = 0;
+  await mockArchive(page, baseURL, () => ({ data: [
+    { venue_id: "aura", venue: "Aura", photo_count: 12 },
+    { venue_id: "other-room", venue: "Other Room", photo_count: 2 },
+  ] }), () => ++showsRequests === 1 ? { status: 503 } : { data: [] });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const events = dossier.locator('[data-venue-relationship="shows"]');
+  const artists = dossier.locator('[data-venue-relationship="bands"]');
+  const highlights = dossier.locator("[data-venue-photo-highlights]");
+  await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
+  await expect(events.getByRole("status")).toHaveText("Event Index Unavailable");
+  await expect(artists.getByRole("status")).toHaveText("Artist Index Unavailable");
+  await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
+  await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
+  await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("12");
+  await expect(highlights).toBeVisible();
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/other-room");
+  await expect(dossier.getByRole("heading", { name: "Other Room", exact: true })).toBeVisible();
+  await expect(events.locator(".venue-relationship-media span")).toHaveText("0");
+  await expect(artists.locator(".venue-relationship-media span")).toHaveText("0");
+  await expect(events).toHaveAttribute("role", "button");
+  await expect(artists).toHaveAttribute("role", "button");
+  await artists.press("Enter");
+  await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("No artists linked to this venue.");
 });
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {

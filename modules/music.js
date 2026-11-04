@@ -502,9 +502,8 @@ function retryMusicVenuesState() {
     const route = getRouteFromUrl();
     if (route.name === "music-venues") {
       renderMusicVenuesArchive();
-    } else if (loaded && venueSlug && activeMusicVenueDetailSlug === venueSlug
-      && venueDetail?.getAttribute("aria-hidden") === "false") {
-      renderMusicVenueDetail(venueSlugToVenue(venueSlug), venueSlug);
+    } else if (loaded && venueSlug) {
+      hydrateMusicVenueDossier(context, venueSlug);
     }
   });
 }
@@ -3037,21 +3036,13 @@ function getMusicVenueSlug(venue) {
   return venueIdToSlug(getMusicVenueId(venue), venue);
 }
 
-function venueSlugToVenue(slug, venues = getMusicVenuesRows()) {
+function venueSlugToVenue(slug) {
   const normalizedSlug = normalizeMusicVenueSlugValue(slug);
-  if (!normalizedSlug) {
+  if (!normalizedSlug || musicVenuesDataState !== "live") {
     return null;
   }
 
-  const fallbackVenues = ["live", "empty"].includes(musicVenuesDataState)
-    ? []
-    : getMockCollection("musicVenues", { clone: false });
-  const searchRows = [
-    ...(Array.isArray(venues) ? venues : []),
-    ...(Array.isArray(fallbackVenues) ? fallbackVenues : []),
-  ];
-
-  return searchRows.find((venue) => {
+  return musicVenuesCollection.find((venue) => {
     const slugCandidates = [
       getMusicVenueSlug(venue),
       venue?.slug,
@@ -3186,14 +3177,6 @@ function requestMusicVenuesData() {
     });
 
   return musicVenuesRequest;
-}
-
-function getMusicVenuesRows() {
-  return ["live", "empty"].includes(musicVenuesDataState)
-    ? musicVenuesCollection
-    : musicVenuesCollection.length > 0
-    ? musicVenuesCollection
-    : getMockCollection("musicVenues", { clone: false });
 }
 
 function normalizeMusicVenueState(value) {
@@ -5494,6 +5477,7 @@ function setupVenueArtistsRelationshipCard(venue, artists) {
 
   const status = card.querySelector(".venue-relationship-status");
   if (status) {
+    status.removeAttribute("role");
     status.textContent = "Band Relationships";
   }
 
@@ -5549,6 +5533,7 @@ function setupVenueShowsRelationshipCard(venue, shows) {
 
   const status = card.querySelector(".venue-relationship-status");
   if (status) {
+    status.removeAttribute("role");
     status.textContent = "Open Event Index";
   }
 
@@ -5633,13 +5618,64 @@ function renderMusicVenueDetailState(venueSlug, stateName = "empty") {
   setMusicVenueRelationshipsHidden(true);
 }
 
+function hasVerifiedMusicVenueShows() {
+  return musicShowsSetsDataState === "live" || musicShowsSetsDataState === "empty";
+}
+
+function renderMusicVenueDossierRelationships(venue) {
+  if (hasVerifiedMusicVenueShows()) {
+    const shows = getMusicVenueShows(venue);
+    const artists = getMusicVenueArtists(venue, shows);
+    setMusicVenueDetailRelationshipCount("shows", shows.length);
+    setMusicVenueDetailRelationshipCount("bands", artists.length);
+    setupVenueShowsRelationshipCard(venue, shows);
+    setupVenueArtistsRelationshipCard(venue, artists);
+    return;
+  }
+
+  const statusLabel = musicShowsSetsDataState === "loading" ? "Loading" : "Unavailable";
+  setVenueRelationshipFocus("");
+  for (const [type, label, getPanel] of [
+    ["shows", "Event Index", getVenueShowsRelationshipPanel],
+    ["bands", "Artist Index", getVenueArtistsRelationshipPanel],
+  ]) {
+    setMusicVenueDetailRelationshipCount(type, null);
+    const card = venueDetail.querySelector('[data-venue-relationship="' + type + '"]');
+    if (!card) continue;
+    card.classList.remove("venue-relationship-card--expandable", "is-expanded");
+    for (const attribute of ["tabindex", "role", "aria-controls", "aria-expanded", "aria-label"]) {
+      card.removeAttribute(attribute);
+    }
+    card.onclick = null;
+    card.onkeydown = null;
+
+    const panel = getPanel();
+    if (panel) {
+      panel.classList.remove("is-expanded");
+      panel.setAttribute("aria-hidden", "true");
+      panel.inert = true;
+      panel.replaceChildren();
+    }
+
+    const status = card.querySelector(".venue-relationship-status");
+    if (status) {
+      status.setAttribute("role", "status");
+      status.textContent = label + " " + statusLabel;
+    }
+  }
+}
+
 function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (!venueDetail) {
     return;
   }
 
   const hasVenue = Boolean(venue);
-  const name = hasVenue ? getMusicVenueName(venue) : "Venue Not Found";
+  const unavailableState = hasVenue ? "" : getMusicVenueDetailUnavailableStateName();
+  const name = hasVenue ? getMusicVenueName(venue)
+    : unavailableState === "empty" ? "Venue Not Found"
+    : unavailableState === "error" ? "Venue Archive Unavailable"
+    : "Venue Dossier";
   const city = String(venue?.city || venue?.venue_details?.city || venue?.venueDetails?.city || "").trim();
   const state = getMusicVenueState(venue) || String(venue?.state || venue?.venue_details?.state || venue?.venueDetails?.state || "").trim();
   const location = hasVenue
@@ -5649,8 +5685,6 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     ? String(venue?.region || venue?.venue_details?.region || venue?.venueDetails?.region || state || "Pending").trim()
     : "Pending";
   const slug = hasVenue ? getMusicVenueSlug(venue) : normalizeMusicVenueSlugValue(requestedSlug);
-  const linkedShows = hasVenue ? getMusicVenueShows(venue) : [];
-  const linkedArtists = hasVenue ? getMusicVenueArtists(venue, linkedShows) : [];
   const initials = getBandInitials(name) || "VN";
 
   venueDetail.classList.toggle("is-missing", !hasVenue);
@@ -5684,25 +5718,42 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (venueDetailVisualSecondary) {
     venueDetailVisualSecondary.textContent = region && region !== "Pending" ? `${region} Signal` : "Archive Signal";
   }
-  setMusicVenueDetailRelationshipCount("shows", linkedShows.length);
-  setMusicVenueDetailRelationshipCount("bands", hasVenue ? linkedArtists.length : null);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   if (!hasVenue) {
+    setMusicVenueDetailRelationshipCount("shows", null);
+    setMusicVenueDetailRelationshipCount("bands", null);
     hideMusicVenuePhotoHighlightsSection();
-    renderMusicVenueDetailState(slug, getMusicVenueDetailUnavailableStateName());
+    renderMusicVenueDetailState(slug, unavailableState);
     return;
   }
   clearMusicVenueDetailState();
-  setupVenueShowsRelationshipCard(venue, linkedShows);
-  setupVenueArtistsRelationshipCard(venue, linkedArtists);
+  renderMusicVenueDossierRelationships(venue);
   syncMusicVenuePhotoHighlights(venue, slug);
+}
+
+function hydrateMusicVenueDossier(context, venueSlug) {
+  const ownsDossier = () => v3RouteContext === context && activeMusicVenueDetailSlug === venueSlug
+    && venueDetail?.getAttribute("aria-hidden") === "false";
+  if (!ownsDossier()) return;
+
+  // The Dossier never substitutes fixture identity or starts optional work without a verified venue.
+  const venue = venueSlugToVenue(venueSlug);
+  const showsRequest = venue && !hasVerifiedMusicVenueShows() ? requestMusicShowsSetsData() : null;
+  renderMusicVenueDetail(venue, venueSlug);
+  if (venue && typeof updateShellBreadcrumb === "function") updateShellBreadcrumb(context.route);
+  notifyV3ResumeReady();
+  if (!showsRequest) return;
+  showsRequest.then(() => {
+    if (!ownsDossier()) return;
+    renderMusicVenueDossierRelationships(venue);
+    notifyV3ResumeReady();
+  });
 }
 
 function showMusicVenueDetail(venueSlug) {
   const context = v3RouteContext;
-  activeMusicVenueDetailSlug = normalizeMusicVenueSlugValue(venueSlug);
-  const venue = venueSlugToVenue(activeMusicVenueDetailSlug);
-  renderMusicVenueDetail(venue, activeMusicVenueDetailSlug);
+  const slug = normalizeMusicVenueSlugValue(venueSlug);
+  activeMusicVenueDetailSlug = slug;
   setBandsIndexVisible(false);
   setPeopleIndexVisible(false);
   setMusicVenueIndexVisible(false);
@@ -5716,16 +5767,13 @@ function showMusicVenueDetail(venueSlug) {
     });
   }
 
-  Promise.allSettled([
-    requestMusicVenuesData(),
-    requestMusicShowsSetsData(),
-  ]).then(() => {
-    const route = getRouteFromUrl();
-    if (v3RouteContext !== context || route.name !== "music-venue-detail" || normalizeMusicVenueSlugValue(route.venueSlug) !== activeMusicVenueDetailSlug) {
-      return;
-    }
-    renderMusicVenueDetail(venueSlugToVenue(activeMusicVenueDetailSlug), activeMusicVenueDetailSlug);
-  });
+  if (musicVenuesLoaded) {
+    hydrateMusicVenueDossier(context, slug);
+    return;
+  }
+  const request = requestMusicVenuesData();
+  renderMusicVenueDetail(null, slug);
+  request.then(() => hydrateMusicVenueDossier(context, slug));
 }
 
 function parseMusicShowDate(dateValue) {
@@ -6173,10 +6221,10 @@ function requestMusicShowsSetsData() {
         .then((remainingPayloads) => mergeMusicShowsPayloadPages([firstPayload, ...remainingPayloads]));
     })
     .then(async (payload) => {
-      // A Shows request from an earlier route must not activate or retry Harbor's Venue request.
-      const venueRequest = getRouteFromUrl().name === "music-venues"
-        ? musicVenuesRequest
-        : requestMusicVenuesData();
+      // Harbor and its Dossier own essential Venue requests, including beneath a Shell overlay.
+      const venueRoutes = ["music-venues", "music-venue-detail"];
+      const ownsVenues = venueRoutes.includes(v3RouteContext.route?.name) || venueRoutes.includes(getRouteFromUrl().name);
+      const venueRequest = ownsVenues ? musicVenuesRequest : requestMusicVenuesData();
       if (venueRequest) await venueRequest;
       return payload;
     })
@@ -18259,18 +18307,25 @@ function restoreMusicResumeState(route,ui) {
     if (slug) focusMusicVenueBeacon(slug);
     return true;
   }
-  if(['music-venue-detail','person-detail','show-detail','sets-archive'].includes(route.name)){
+  if (route.name === "music-venue-detail") {
+    if (musicVenuesRequest || musicVenuesDataState === "loading") return false;
+    if (venueDetail.classList.contains("is-missing") || !["shows", "bands"].includes(ui.panel)) return true;
+    if (musicShowsSetsRequest || musicShowsSetsDataState === "loading") return false;
+    const card = venueDetail.querySelector('[data-venue-relationship="' + ui.panel + '"].venue-relationship-card--expandable');
+    if (!card) return true;
+    if (ui.panel === "bands") {
+      card._venueArtistSearch = v3Text(ui.artistQuery);
+      setVenueArtistsPanelOpen(card, true);
+    } else {
+      setVenueShowsPanelOpen(card, true);
+    }
+    return true;
+  }
+  if(['person-detail','show-detail','sets-archive'].includes(route.name)){
     const pending=state=>['idle','loading'].includes(state);
     // Legacy Sets can expose fallback rows while the shared Shows request is still pending.
     if(musicShowsSetsRequest)return false;
-    if(route.name==='music-venue-detail'){
-      if(pending(musicVenuesDataState)||pending(musicShowsSetsDataState))return false;
-      const card=venueDetail.querySelector('[data-venue-relationship="'+(['shows','bands'].includes(ui.panel)?ui.panel:'shows')+'"]');
-      if(card && ['shows','bands'].includes(ui.panel)){
-        if(ui.panel==='bands'){card._venueArtistSearch=v3Text(ui.artistQuery);setVenueArtistsPanelOpen(card,true);}
-        else setVenueShowsPanelOpen(card,true);
-      }
-    }else if(route.name==='person-detail'){
+    if(route.name==='person-detail'){
       if(pending(musicPeopleIndexDataState)||pending(musicBandsIndex.dataset.bandsDataState)||pending(musicShowsSetsDataState)||musicPersonDetailArchiveRequests.has(normalizeMusicPersonId(route.personId)))return false;
       if(Array.isArray(ui.expanded)){
         const expanded=new Set(ui.expanded.filter(key=>typeof key==='string'&&key.length<=300).slice(0,100));
