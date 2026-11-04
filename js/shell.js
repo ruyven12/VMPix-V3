@@ -4660,7 +4660,7 @@ function requestRingArchiveStats() {
 
 // Engine coverage is independent of presentation mounting and route restoration.
 function usesLegacyEngineCoverage(route = getRouteFromUrl()) {
-  return ['music-people','person-detail','music-venues','music-venue-detail','show-detail','sets-archive',
+  return ['music-people','person-detail','music-venues','music-venue-detail','music-venue-events','show-detail','sets-archive',
     'about','contact','calendar','connect'].includes(route?.name);
 }
 
@@ -4755,6 +4755,7 @@ function updatePrototypeEngineReturnEmitter(route = getRouteFromUrl()) {
     "music": "Back to Portfolio",
     "music-bands": "Back to Zhento",
     "music-shows": "Back to Zhento",
+    "music-venue-events": "Back to Venue Dossier",
     "band-detail": "Back to Bands",
     "set-detail": "Back to Archive",
     "wrestling-people-prototype": "Back to Wrestling",
@@ -4931,6 +4932,7 @@ function getShellHistoryOrigin(route = getRouteFromUrl(), historyState = window.
         getRouteFromUrl(recorded.href).canonicalUrl !== current.canonicalUrl || route.canonicalUrl !== current.canonicalUrl ||
         origin.origin !== location.origin || origin.username || origin.password || target.isUnknown ||
         target.canonicalUrl === current.canonicalUrl) return "";
+    if (route.name === "music-venue-events" && target.canonicalUrl !== getMusicVenueRouteUrl(route.venueSlug)) return "";
     return target.canonicalUrl;
   } catch { return ""; }
 }
@@ -4943,6 +4945,7 @@ function getShellBackTarget(route = getRouteFromUrl(), historyState = window.his
   const origin = getShellHistoryOrigin(route, historyState);
   if (origin) return origin;
   if (route.name === "privacy") return routePaths.portfolio;
+  if (route.name === "music-venue-events") return getMusicVenueRouteUrl(route.venueSlug);
   if (route.name === "admin" && ["api", "database", "imports"].includes(route.adminStation)) return routePaths.admin;
   if (route.name === "wrestling-people-prototype") return routePaths.wrestling;
 
@@ -5512,7 +5515,8 @@ function performShellBack() {
   }
   const targetUrl = isPrototypeEngineReturnRoute(route) ? getPrototypeEngineReturnRoute(route) : getShellBackTarget(route);
   if (targetUrl) {
-    navigateToRoute(targetUrl, { replaceHistory: true, shouldFocusBandsView: route.name === "band-detail", navigationDirection: "back" });
+    navigateToRoute(targetUrl, { replaceHistory: true, shouldFocusBandsView: route.name === "band-detail", navigationDirection: "back",
+      navigationCause: route.name === "music-venue-events" ? "back-forward" : undefined });
   }
 }
 
@@ -8613,6 +8617,7 @@ function getActiveShellScroller(route = getRouteFromUrl()) {
     "show-detail": musicNexusShell,
     "music-venues": musicNexusShell,
     "music-venue-detail": musicNexusShell,
+    "music-venue-events": musicNexusShell,
     wrestling: document.querySelector(".public-home"),
     "wrestling-route-not-found": modulePlaceholder,
     "wrestling-people": wrestlingPeopleShell,

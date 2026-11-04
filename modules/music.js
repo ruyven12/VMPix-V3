@@ -76,7 +76,7 @@ const archiveRelationshipIntents = new WeakMap();
 let archiveRelationshipPending = null, archiveRelationshipDispatch = null;
 let archiveGalleryRangePending = null;
 function archiveRelationshipType(route) {
-  return ({"band-detail":"band", "show-detail":"show", "person-detail":"person", "music-venue-detail":"venue", "set-detail":"set",
+  return ({"band-detail":"band", "show-detail":"show", "person-detail":"person", "music-venue-detail":"venue", "music-venue-events":"venue", "set-detail":"set",
     "wrestling-show-detail":"show", "wrestling-match-detail":"match", "wrestling-person-detail":"person", "wrestling-venue-detail":"venue", "wrestling-venue-detail-prototype":"venue"})[route?.name] || "";
 }
 function beginArchiveRelationshipAnalytics(event, archive, sourceType, targetType, readIdentity = null) {
@@ -387,6 +387,7 @@ const harmonyEnvironment = document.querySelector("[data-harmony-environment]");
 const harmonyArt = harmonyEnvironment?.querySelector("[data-harmony-art]");
 const harmonySigil = harmonyEnvironment?.querySelector("[data-harmony-sigil]");
 const musicVenueBeacons = musicVenuesList?.querySelector("[data-music-venues-beacons]");
+let musicVenueEventsView = null;
 const musicVenuesStatus = musicVenuesList?.querySelector("[data-music-venues-status]");
 const musicVenueConnections = musicVenuesIndex?.querySelector("[data-music-venues-connections]");
 const musicVenuesTools = musicVenuesIndex?.querySelector("[data-music-venues-tools]");
@@ -3067,6 +3068,10 @@ function getMusicVenueRouteUrl(venue) {
   return `${routePaths.musicVenues}/${encodeURIComponent(slug || "venue-pending")}`;
 }
 
+function getMusicVenueEventsRouteUrl(venue) {
+  return getMusicVenueRouteUrl(venue) + "/events";
+}
+
 function normalizeMusicVenueRow(record) {
   const source = record && typeof record === "object" ? record : {};
   const venueId = String(source.venue_id || source.venueId || source.id || source.slug || "").trim();
@@ -5084,161 +5089,6 @@ function getMusicVenueArchiveHistory(shows) {
   return first.getTime() === last.getTime() ? format.format(first) : format.format(first) + " → " + format.format(last);
 }
 
-function getMusicVenueShowYear(show) {
-  const parsedDate = parseMusicShowDate(show?.rawDate || show?.date || show?.show_date || show?.eventDate || show?.formattedDate);
-  if (parsedDate) {
-    return String(parsedDate.getFullYear());
-  }
-
-  const year = String(show?.year || "").trim();
-  return /^\d{4}$/.test(year) ? year : "Pending";
-}
-
-function getMusicVenueShowSafeCountMeta(show) {
-  const photoCount = Number.parseInt(
-    show?.photo_count
-    || show?.photoCount
-    || show?.tagged_photo_count
-    || show?.stats?.photoCount
-    || show?.stats?.photos,
-    10
-  );
-  if (Number.isFinite(photoCount) && photoCount > 0) {
-    return `${photoCount.toLocaleString()} photo${photoCount === 1 ? "" : "s"}`;
-  }
-
-  const setCount = Number.parseInt(
-    show?.set_count
-    || show?.setCount
-    || show?.stats?.setCount
-    || show?.stats?.sets,
-    10
-  );
-  return Number.isFinite(setCount) && setCount > 0
-    ? `${setCount.toLocaleString()} set${setCount === 1 ? "" : "s"}`
-    : "";
-}
-
-function createVenueShowsEmptyState() {
-  const empty = createMusicV3StateCard("empty", "musicShows", {
-    small: true,
-    text: "No shows linked to this venue.",
-  });
-  empty.classList.add("venue-shows-empty");
-  return empty;
-}
-
-function createVenueShowRow(show) {
-  const row = document.createElement("button");
-  row.className = "venue-show-row";
-  row.type = "button";
-  row.dataset.venueShowRow = "";
-  row.dataset.showDetailRoute = getMusicShowRouteUrl(show);
-  row.setAttribute("aria-label", `Open ${getMusicShowTitle(show)} show detail`);
-
-  const copy = document.createElement("span");
-  copy.className = "venue-show-row-copy";
-
-  const title = document.createElement("span");
-  title.className = "venue-show-title";
-  title.textContent = getMusicShowTitle(show);
-
-  const date = document.createElement("span");
-  date.className = "venue-show-date";
-  date.textContent = getMusicShowDateLabel(show);
-
-  copy.append(title, date);
-  row.append(copy);
-
-  const countMeta = getMusicVenueShowSafeCountMeta(show);
-  if (countMeta) {
-    const meta = document.createElement("span");
-    meta.className = "venue-show-meta";
-    meta.textContent = countMeta;
-    row.append(meta);
-  }
-
-  row.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const relationship = beginArchiveRelationshipAnalytics(event, "music", "venue", "show", () => ({
-      source_content_id: musicVenuesDataState === "live" ? venueSlugToVenue(activeMusicVenueDetailSlug)?.venue_id : undefined,
-      target_content_id: musicShowsSetsDataState === "live" ? show.show_id : undefined,
-    }));
-    stageArchiveRelationshipAnalytics(relationship, getMusicShowRouteUrl(show));
-    navigateToRoute(getMusicShowRouteUrl(show), {
-      historyState: {
-        fromVenueDetail: true,
-        venueUrl: getMusicVenueRouteUrl(activeMusicVenueDetailSlug),
-      },
-    });
-  });
-
-  return row;
-}
-
-function renderVenueShowsPanel(panel, shows) {
-  panel.replaceChildren();
-  const inner = document.createElement("div");
-  inner.className = "venue-shows-panel-inner";
-  panel.append(inner);
-
-  if (!Array.isArray(shows) || shows.length === 0) {
-    inner.append(createVenueShowsEmptyState());
-    return;
-  }
-
-  const groupedShows = shows.reduce((groups, show) => {
-    const year = getMusicVenueShowYear(show);
-    if (!groups.has(year)) {
-      groups.set(year, []);
-    }
-    groups.get(year).push(show);
-    return groups;
-  }, new Map());
-
-  const years = Array.from(groupedShows.keys()).sort((left, right) => {
-    const leftYear = Number.parseInt(left, 10);
-    const rightYear = Number.parseInt(right, 10);
-    if (Number.isFinite(leftYear) && Number.isFinite(rightYear)) {
-      return rightYear - leftYear;
-    }
-    if (Number.isFinite(leftYear)) {
-      return -1;
-    }
-    if (Number.isFinite(rightYear)) {
-      return 1;
-    }
-    return left.localeCompare(right);
-  });
-
-  years.forEach((year) => {
-    const group = document.createElement("section");
-    group.className = "venue-shows-year-group";
-    group.setAttribute("aria-label", `${year} linked shows`);
-
-    const heading = document.createElement("h6");
-    heading.className = "venue-shows-year";
-    heading.textContent = year;
-
-    const list = document.createElement("div");
-    list.className = "venue-shows-list";
-    list.setAttribute("role", "list");
-    const yearShows = groupedShows.get(year)
-      .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)));
-    list.classList.toggle("venue-shows-list--split", yearShows.length > 1);
-    yearShows.forEach((show) => {
-      const item = document.createElement("div");
-      item.className = "venue-show-item";
-      item.setAttribute("role", "listitem");
-      item.append(createVenueShowRow(show));
-      list.append(item);
-    });
-
-    group.append(heading, list);
-    inner.append(group);
-  });
-}
-
 function createVenueArtistsEmptyState(text = "No artists linked to this venue.") {
   const empty = createMusicV3StateCard("empty", "musicPeople", {
     small: true,
@@ -5381,34 +5231,6 @@ function renderVenueArtistsPanel(panel, artists, card) {
   updateVenueArtistsGrid(grid, venueArtists, searchInput.value);
 }
 
-function getVenueShowsRelationshipPanel() {
-  if (!venueDetail) {
-    return null;
-  }
-
-  const relationships = venueDetail.querySelector("[data-venue-relationships]");
-  const grid = relationships?.querySelector(".venue-relationship-grid");
-  if (!relationships || !grid) {
-    return null;
-  }
-
-  let panel = Array.from(relationships.children).find((child) => child.hasAttribute("data-venue-shows-panel"));
-  if (!panel) {
-    panel = document.createElement("div");
-    panel.className = "venue-shows-panel";
-    panel.dataset.venueShowsPanel = "";
-    panel.id = "venue-relationship-shows-panel";
-    panel.setAttribute("aria-hidden", "true");
-    panel.setAttribute("inert", "");
-  }
-
-  if (panel.previousElementSibling !== grid) {
-    grid.insertAdjacentElement("afterend", panel);
-  }
-
-  return panel;
-}
-
 function getVenueArtistsRelationshipPanel() {
   if (!venueDetail) {
     return null;
@@ -5521,33 +5343,6 @@ function updateVenueRelationshipFocusWithMotion(card, updateFocus) {
   window.setTimeout(cleanup, 420);
 }
 
-function setVenueShowsPanelOpen(card, isOpen, event = null) {
-  const wasOpen = card.getAttribute("aria-expanded") === "true";
-  const panel = getVenueShowsRelationshipPanel();
-  if (!panel) {
-    return;
-  }
-
-  if (isOpen && panel.dataset.lazyRendered !== "true") {
-    renderVenueShowsPanel(panel, card._linkedVenueShows || []);
-    panel.dataset.lazyRendered = "true";
-  }
-
-  updateVenueRelationshipFocusWithMotion(card, () => {
-    card.classList.toggle("is-expanded", isOpen);
-    card.setAttribute("aria-expanded", String(isOpen));
-    setVenueRelationshipFocus(isOpen ? "shows" : "");
-    panel.classList.toggle("is-expanded", isOpen);
-    panel.setAttribute("aria-hidden", String(!isOpen));
-    if (isOpen) {
-      panel.removeAttribute("inert");
-    } else {
-      panel.setAttribute("inert", "");
-    }
-    reportArchiveContentExpansion(event, card, "music", "venue", "show_history", wasOpen, isOpen);
-  });
-}
-
 function setVenueArtistsPanelOpen(card, isOpen, event = null) {
   const wasOpen = card.getAttribute("aria-expanded") === "true";
   const panel = getVenueArtistsRelationshipPanel();
@@ -5634,61 +5429,199 @@ function setupVenueArtistsRelationshipCard(venue, artists, hasLinkedShows) {
   };
 }
 
-function setupVenueShowsRelationshipCard(venue, shows) {
-  if (!venueDetail) {
+function setupVenueEventsRelationshipLink(venue) {
+  const link = venueDetail.querySelector('[data-venue-relationship="shows"]');
+  link.classList.toggle("venue-relationship-card--expandable", Boolean(venue));
+  if (!venue) {
+    link.removeAttribute("href");
+    link.onclick = null;
     return;
   }
-
-  const card = venueDetail.querySelector('[data-venue-relationship="shows"]');
-  if (!card) {
-    return;
-  }
-
-  const panelId = "venue-relationship-shows-panel";
-  const staleCardPanel = card.querySelector("[data-venue-shows-panel]");
-  if (staleCardPanel) {
-    staleCardPanel.remove();
-  }
-
-  const panel = getVenueShowsRelationshipPanel();
-  if (!panel) {
-    return;
-  }
-
-  panel.id = panelId;
-  card.classList.add("venue-relationship-card--expandable");
-  card.tabIndex = 0;
-  card.setAttribute("role", "button");
-  card.setAttribute("aria-controls", panelId);
-  card.setAttribute("aria-expanded", "false");
-  card.setAttribute("aria-label", `Toggle linked shows for ${venue ? getMusicVenueName(venue) : "this venue"}`);
-  card.setAttribute("aria-describedby", "venue-relationship-shows-value");
-  card._linkedVenueShows = shows;
-  panel.dataset.lazyRendered = "false";
-  panel.replaceChildren();
-  setVenueShowsPanelOpen(card, false);
-
-  const status = card.querySelector(".venue-relationship-status");
-  if (status) {
-    status.removeAttribute("role");
-    status.textContent = "Open Event Index";
-  }
-
-  card.onclick = (event) => {
-    if (event.target.closest("[data-venue-show-row]")) {
-      return;
-    }
-    setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
+  link.href = getMusicVenueEventsRouteUrl(venue);
+  link.onclick = event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    link.focus({ preventScroll: true });
+    navigateToRoute(link.getAttribute("href"));
+    document.getElementById("music-venue-events-title")?.focus({ preventScroll: true });
   };
-  card.onkeydown = (event) => {
-    if (event.target.closest("[data-venue-show-row]")) {
-      return;
-    }
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setVenueShowsPanelOpen(card, card.getAttribute("aria-expanded") !== "true", event);
+}
+
+function setVenueEventsRelationshipStatus(text, isStatus = false) {
+  const status = venueDetail.querySelector('[data-venue-relationship="shows"] .venue-relationship-status');
+  status.textContent = text;
+  if (isStatus) status.setAttribute("role", "status");
+  else status.removeAttribute("role");
+}
+
+const MUSIC_VENUE_EVENTS_BATCH = 10;
+const musicVenueEventsDateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+function getMusicVenueEventGroups(venue) {
+  const groups = new Map();
+  const visited = new Set();
+  for (const show of getMusicVenueShows(venue)) {
+    const showId = getMusicShowIdValue(show);
+    const href = showId ? getMusicShowRouteUrl({ showId }) : "";
+    if (href && visited.has(href)) continue;
+    if (href) visited.add(href);
+    const date = getMusicVenueArchiveDate(show);
+    const rawDate = String(show.rawDate || show.date || "").trim();
+    const recordedYear = rawDate.match(/^(\d{4})(?:-(?:0?[1-9]|1[0-2]))?$/)?.[1]
+      || [show.archive_year, show.show_year, show.event_year, show.backend_record?.year]
+        .map(value => String(value ?? "").trim()).find(value => /^\d{4}$/.test(value));
+    const year = date ? String(date.getFullYear()) : recordedYear || "undated";
+    const title = readMusicVenueMetadataText(show.capturedName ?? show.name) || "Untitled event";
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year).push({ href, date, title });
+  }
+  for (const rows of groups.values()) rows.sort((left, right) => (right.date?.getTime() ?? -Infinity) - (left.date?.getTime() ?? -Infinity)
+    || left.title.localeCompare(right.title));
+  return [...groups].sort(([left], [right]) => (Number(right) || 0) - (Number(left) || 0));
+}
+
+function createMusicVenueEventRow(eventRecord, view) {
+  const item = document.createElement("li");
+  const row = document.createElement(eventRecord.href ? "a" : "div");
+  row.className = "venue-events-row";
+  const date = document.createElement(eventRecord.date ? "time" : "span");
+  if (eventRecord.date) {
+    const value = eventRecord.date;
+    date.dateTime = [value.getFullYear(), value.getMonth() + 1, value.getDate()].map(part => String(part).padStart(2, "0")).join("-");
+    date.textContent = musicVenueEventsDateFormat.format(value);
+  } else date.textContent = "Date unavailable";
+  const title = document.createElement("span");
+  title.textContent = eventRecord.title;
+  row.append(date, title);
+  item.append(row);
+  if (!eventRecord.href) return item;
+
+  row.href = eventRecord.href;
+  row.addEventListener("click", event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    view.selected = eventRecord.href;
+    const relationship = beginArchiveRelationshipAnalytics(event, "music", "venue", "show", () => ({
+      source_content_id: view.venueId, target_content_id: getRouteFromUrl(eventRecord.href).showId,
+    }));
+    stageArchiveRelationshipAnalytics(relationship, eventRecord.href);
+    navigateToRoute(eventRecord.href);
+  });
+  return item;
+}
+
+function renderMusicVenueEventsYear(view, year, rows, defaultOpen) {
+  const group = document.createElement("details");
+  group.className = "venue-events-year";
+  group.dataset.venueEventsYear = year;
+  const summary = document.createElement("summary");
+  const label = document.createElement("span");
+  label.textContent = year === "undated" ? "Date unavailable" : year;
+  const count = document.createElement("span");
+  count.className = "venue-events-year-count";
+  count.textContent = rows.length.toLocaleString() + (rows.length === 1 ? " event" : " events");
+  summary.append(label, count);
+  const list = document.createElement("ul");
+  list.className = "venue-events-list";
+  list.setAttribute("aria-label", label.textContent + " events");
+  const more = document.createElement("button");
+  more.type = "button";
+  more.className = "venue-events-more";
+  more.dataset.venueEventsMore = year;
+  more.textContent = "Load More";
+  more.setAttribute("aria-label", "Load More " + label.textContent + " events");
+  group.append(summary, list, more);
+
+  const appendRows = (limit, focus = false) => {
+    const items = rows.slice(list.children.length, limit).map(row => createMusicVenueEventRow(row, view));
+    list.append(...items);
+    more.hidden = list.children.length >= rows.length;
+    if (focus && items.length) {
+      const first = items[0].firstElementChild;
+      if (first.tagName !== "A") first.tabIndex = -1;
+      first.focus();
     }
   };
+  const showFirstBatch = () => {
+    if (group.open && !list.children.length) appendRows(view.limits.get(year) || MUSIC_VENUE_EVENTS_BATCH);
+  };
+  group.open = view.expanded ? view.expanded.has(year) : defaultOpen;
+  showFirstBatch();
+  group.addEventListener("toggle", showFirstBatch);
+  more.addEventListener("click", () => {
+    const limit = Math.min(rows.length, list.children.length + MUSIC_VENUE_EVENTS_BATCH);
+    view.limits.set(year, limit);
+    appendRows(limit, true);
+  });
+  return group;
+}
+
+function showMusicVenueEvents(venueSlug) {
+  const screen = musicNexusShell.querySelector("[data-music-venue-events]") || document.createElement("section");
+  if (!screen.isConnected) {
+    screen.className = "venue-events-screen";
+    screen.dataset.musicVenueEvents = "";
+    screen.setAttribute("aria-labelledby", "music-venue-events-title");
+    screen.innerHTML = '<button class="venue-detail-back" type="button">Back</button>' +
+      '<header class="venue-events-heading"><h3 id="music-venue-events-title" tabindex="-1">Archive Events</h3>' +
+      '<p data-venue-events-venue hidden></p></header><div data-venue-events-status></div><div data-venue-events-years></div>';
+    screen.querySelector("button").addEventListener("click", performShellBack);
+    musicNexusShell.append(screen);
+  }
+  const validYear = value => typeof value === "string" && /^(?:\d{4}|undated)$/.test(value);
+  const ui = v3ResumeUI();
+  const view = { screen, context: v3RouteContext, slug: normalizeMusicVenueSlugValue(venueSlug), ready: false, request: null,
+    expanded: Array.isArray(ui.years) ? new Set(ui.years.filter(validYear).slice(0, 150)) : null,
+    limits: new Map(Array.isArray(ui.limits) ? ui.limits.filter(row => Array.isArray(row) && validYear(row[0])
+      && Number.isSafeInteger(row[1]) && row[1] >= MUSIC_VENUE_EVENTS_BATCH).slice(0, 150) : []),
+    selected: v3Text(ui.selected),
+  };
+  musicVenueEventsView = view;
+  if (!view.context.snapshot) musicNexusShell.scrollTo({ top: 0, behavior: "instant" });
+  const venueName = screen.querySelector("[data-venue-events-venue]");
+  const status = screen.querySelector("[data-venue-events-status]");
+  const years = screen.querySelector("[data-venue-events-years]");
+  venueName.hidden = true;
+  venueName.textContent = "";
+  years.replaceChildren();
+  const ownsView = () => musicVenueEventsView === view && v3RouteContext === view.context;
+  const showState = (state, title, text) => {
+    status.replaceChildren(createMusicV3StateCard(state, "musicVenueEvents", {
+      title, text, small: true, retry: state === "error" ? { label: "Retry Archive Events", onClick: load } : false,
+    }));
+    view.ready = state !== "loading";
+    if (view.ready) notifyV3ResumeReady();
+  };
+  const load = () => {
+    if (view.request) return;
+    view.request = loadRecords().finally(() => { view.request = null; });
+  };
+  async function loadRecords() {
+    if (!musicVenuesLoaded) {
+      showState("loading", "Loading Venue Archive", "Finding the verified venue record.");
+      const loaded = await requestMusicVenuesData();
+      if (!ownsView()) return;
+      if (!loaded) return showState("error", "Venue Archive Unavailable", "The venue record could not be loaded.");
+    }
+    const venue = venueSlugToVenue(view.slug);
+    if (!venue) return showState("empty", "Archive Record Unavailable", "No matching venue record was found.");
+    view.venueId = getMusicVenueId(venue);
+    venueName.textContent = getMusicVenueName(venue);
+    venueName.hidden = false;
+    if (!hasVerifiedMusicVenueShows()) {
+      showState("loading", "Loading Archive Events", "Receiving verified event records for this venue.");
+      const loaded = await requestMusicShowsSetsData();
+      if (!ownsView()) return;
+      if (!loaded || !hasVerifiedMusicVenueShows()) return showState("error", "Archive Events Unavailable", "The event records could not be loaded.");
+    }
+    const groups = getMusicVenueEventGroups(venue);
+    if (!groups.length) return showState("empty", "No Archive Events", "No events are linked to this venue in the archive.");
+    status.replaceChildren();
+    years.replaceChildren(...groups.map(([year, rows], index) => renderMusicVenueEventsYear(view, year, rows, index === 0)));
+    view.ready = true;
+    notifyV3ResumeReady();
+  }
+  load();
 }
 
 function getMusicVenueDetailUnavailableStateName() {
@@ -5766,7 +5699,7 @@ function renderMusicVenueDossierRelationships(venue) {
     setMusicVenueDetailRelationshipCount("shows", shows.length);
     setMusicVenueDetailRelationshipCount("bands", artists.length || (shows.length ? null : 0));
     setMusicVenueDetailRelationshipValue("history", getMusicVenueArchiveHistory(shows));
-    setupVenueShowsRelationshipCard(venue, shows);
+    setVenueEventsRelationshipStatus("Open Event Index");
     setupVenueArtistsRelationshipCard(venue, artists, shows.length > 0);
     return;
   }
@@ -5774,33 +5707,30 @@ function renderMusicVenueDossierRelationships(venue) {
   const statusLabel = musicShowsSetsDataState === "loading" ? "Loading" : "Unavailable";
   setMusicVenueDetailRelationshipValue("history", "—");
   setVenueRelationshipFocus("");
-  for (const [type, label, getPanel] of [
-    ["shows", "Event Index", getVenueShowsRelationshipPanel],
-    ["bands", "Artist Index", getVenueArtistsRelationshipPanel],
-  ]) {
-    setMusicVenueDetailRelationshipCount(type, null);
-    const card = venueDetail.querySelector('[data-venue-relationship="' + type + '"]');
-    if (!card) continue;
-    card.classList.remove("venue-relationship-card--expandable", "is-expanded");
-    for (const attribute of ["tabindex", "role", "aria-controls", "aria-expanded", "aria-label", "aria-describedby"]) {
-      card.removeAttribute(attribute);
-    }
-    card.onclick = null;
-    card.onkeydown = null;
+  setMusicVenueDetailRelationshipCount("shows", null);
+  setVenueEventsRelationshipStatus("Event Index " + statusLabel, true);
+  setMusicVenueDetailRelationshipCount("bands", null);
+  const card = venueDetail.querySelector('[data-venue-relationship="bands"]');
+  if (!card) return;
+  card.classList.remove("venue-relationship-card--expandable", "is-expanded");
+  for (const attribute of ["tabindex", "role", "aria-controls", "aria-expanded", "aria-label", "aria-describedby"]) {
+    card.removeAttribute(attribute);
+  }
+  card.onclick = null;
+  card.onkeydown = null;
 
-    const panel = getPanel();
-    if (panel) {
-      panel.classList.remove("is-expanded");
-      panel.setAttribute("aria-hidden", "true");
-      panel.inert = true;
-      panel.replaceChildren();
-    }
+  const panel = getVenueArtistsRelationshipPanel();
+  if (panel) {
+    panel.classList.remove("is-expanded");
+    panel.setAttribute("aria-hidden", "true");
+    panel.inert = true;
+    panel.replaceChildren();
+  }
 
-    const status = card.querySelector(".venue-relationship-status");
-    if (status) {
-      status.setAttribute("role", "status");
-      status.textContent = label + " " + statusLabel;
-    }
+  const status = card.querySelector(".venue-relationship-status");
+  if (status) {
+    status.setAttribute("role", "status");
+    status.textContent = "Artist Index " + statusLabel;
   }
 }
 
@@ -5886,6 +5816,7 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     venueDetailTitle.textContent = name;
   }
   renderMusicVenueDossierMetadata(venue);
+  setupVenueEventsRelationshipLink(venue);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   if (!hasVenue) {
     setMusicVenueDetailRelationshipCount("shows", null);
@@ -6510,7 +6441,7 @@ function requestMusicShowsSetsData() {
     })
     .then(async (payload) => {
       // Harbor and its Dossier own essential Venue requests, including beneath a Shell overlay.
-      const venueRoutes = ["music-venues", "music-venue-detail"];
+      const venueRoutes = ["music-venues", "music-venue-detail", "music-venue-events"];
       const ownsVenues = venueRoutes.includes(v3RouteContext.route?.name) || venueRoutes.includes(getRouteFromUrl().name);
       const venueRequest = ownsVenues ? musicVenuesRequest : requestMusicVenuesData();
       if (venueRequest) await venueRequest;
@@ -18552,7 +18483,12 @@ function captureMusicResumeState(route) {
     filtersOpen: areMusicVenuesFiltersOpen(),
     inspectedVenue: inspectedMusicVenueSlug,
   };
+  if (route.name === "music-venue-events" && musicVenueEventsView?.context === v3RouteContext) return {
+    years: [...musicVenueEventsView.screen.querySelectorAll("details[open]")].map(group => group.dataset.venueEventsYear),
+    limits: [...musicVenueEventsView.limits], selected: musicVenueEventsView.selected,
+  };
   if(route.name==='music-venue-detail')return {
+    eventsLink: document.activeElement === venueDetail?.querySelector('[data-venue-relationship="shows"]'),
     panel:venueDetail?.querySelector('[data-venue-relationship][aria-expanded="true"]')?.dataset.venueRelationship || '',
     artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
   if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
@@ -18608,18 +18544,22 @@ function restoreMusicResumeState(route,ui) {
     if (slug) focusMusicVenueBeacon(slug);
     return true;
   }
+  if (route.name === "music-venue-events") {
+    const view = musicVenueEventsView;
+    if (view?.context !== v3RouteContext || !view.ready) return false;
+    if (view.selected) [...view.screen.querySelectorAll("a[href]")]
+      .find(link => link.getAttribute("href") === view.selected)?.focus({ preventScroll: true });
+    return true;
+  }
   if (route.name === "music-venue-detail") {
     if (musicVenuesRequest || musicVenuesDataState === "loading") return false;
-    if (venueDetail.classList.contains("is-missing") || !["shows", "bands"].includes(ui.panel)) return true;
+    if (ui.eventsLink) venueDetail.querySelector('[data-venue-relationship="shows"][href]')?.focus({ preventScroll: true });
+    if (venueDetail.classList.contains("is-missing") || ui.panel !== "bands") return true;
     if (musicShowsSetsRequest || musicShowsSetsDataState === "loading") return false;
     const card = venueDetail.querySelector('[data-venue-relationship="' + ui.panel + '"].venue-relationship-card--expandable');
     if (!card) return true;
-    if (ui.panel === "bands") {
-      card._venueArtistSearch = v3Text(ui.artistQuery);
-      setVenueArtistsPanelOpen(card, true);
-    } else {
-      setVenueShowsPanelOpen(card, true);
-    }
+    card._venueArtistSearch = v3Text(ui.artistQuery);
+    setVenueArtistsPanelOpen(card, true);
     return true;
   }
   if(['person-detail','show-detail','sets-archive'].includes(route.name)){

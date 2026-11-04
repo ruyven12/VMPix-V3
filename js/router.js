@@ -102,6 +102,10 @@ function getRouteFromUrl(url = window.location.href) {
   const musicVenueDetailPrefix = `${routePaths.musicVenues}/`;
   if (routePath.startsWith(musicVenueDetailPrefix)) {
     const routeParts = routePath.slice(musicVenueDetailPrefix.length).split("/");
+    if (routeParts.length === 2 && routeParts[0] && routeParts[1] === "events") {
+      const venueSlug = decodeRoutePart(routeParts[0]);
+      if (venueSlug) return { name: "music-venue-events", venueSlug, canonicalUrl: getMusicVenueEventsRouteUrl(venueSlug) };
+    }
     if (routeParts.length === 1 && routeParts[0]) {
       const venueSlug = decodeRoutePart(routeParts[0]);
       return { name: "music-venue-detail", venueSlug, canonicalUrl: getMusicVenueRouteUrl(venueSlug) };
@@ -269,7 +273,7 @@ function isCurrentV3Route(route) {
 }
 // Restoration eligibility is deliberately separate from presentation ownership.
 function isScopedRouteResume(route) {
-  return ['music-venues','music-venue-detail','person-detail','show-detail','sets-archive',
+  return ['music-venues','music-venue-detail','music-venue-events','person-detail','show-detail','sets-archive',
     'wrestling-show-detail','wrestling-person-detail','wrestling-venue-detail'].includes(route?.name);
 }
 function isV3ResumeRoute(route) { return isCurrentV3Route(route) || isScopedRouteResume(route); }
@@ -740,6 +744,13 @@ function syncRoute(route, options = {}) {
     if (options.shouldCanonicalize !== false) {
       replaceRouteUrl(route.canonicalUrl);
     }
+    return;
+  }
+
+  if (route.name === "music-venue-events") {
+    showMusicNexus({ initialSection: "venues", currentView: "Archive Events" });
+    showMusicVenueEvents(route.venueSlug);
+    if (options.shouldCanonicalize !== false) replaceRouteUrl(route.canonicalUrl);
     return;
   }
 

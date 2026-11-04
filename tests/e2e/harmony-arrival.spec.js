@@ -1529,9 +1529,7 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
   await expect(events.locator(".venue-relationship-media span")).toHaveText("1");
   await expect(artists.locator(".venue-relationship-media span")).toHaveText("1");
   expect(Math.abs((await highlights.boundingBox()).y - highlightsTop)).toBeLessThanOrEqual(1);
-  await events.press("Enter");
-  await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("August at Aura");
-  await events.press("Enter");
+  await expect(events).toHaveAttribute("href", harborPath + "/aura/events");
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("Arrival Band");
   expect(await title.evaluate((node, original) => node.firstChild === original, originalTitle)).toBe(true);
@@ -1564,10 +1562,98 @@ test("Venue Dossier preserves verified identity on Shows failure and exposes con
   await expect(dossier.getByRole("heading", { name: "Other Room", exact: true })).toBeVisible();
   await expect(events.locator(".venue-relationship-media span")).toHaveText("0");
   await expect(artists.locator(".venue-relationship-media span")).toHaveText("0");
-  await expect(events).toHaveAttribute("role", "button");
+  await expect(events).toHaveAttribute("href", harborPath + "/other-room/events");
   await expect(artists).toHaveAttribute("role", "button");
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("No artists linked to this venue.");
+});
+
+test("Harbor Archive Events restores the expanded years, batches, selected event and scroll after Show Back", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const newest = Array.from({ length: 22 }, (_, index) => ({
+    show_id: "summer-" + (index + 1), venue_id: "AURA", name: "Summer Show " + (index + 1),
+    date: "2026-08-" + String(index === 20 ? 22 : index + 1).padStart(2, "0"),
+  }));
+  await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", name: "Aura" }] }), () => ({ data: [
+    ...newest,
+    { show_id: "winter", venue_id: "aura", name: "Winter Night", date: "2025-01-14" },
+    { show_id: "recorded-year", venue_id: "aura", name: "Year Only", date: "2024" },
+    { show_id: "bad-date", venue_id: "aura", name: "Incomplete Date", date: "2026-02-30" },
+    { show_id: "wrong-venue", venue_id: "different", name: "Unrelated Show", date: "2027-02-15" },
+  ] }));
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const entry = dossier.getByRole("link", { name: "Archive Events", exact: true });
+  const timeline = page.locator("[data-music-venue-events]");
+  const scroll = page.locator("[data-music-nexus-shell]");
+  const engine = page.locator("[data-prototype-engine-return]");
+  const year = key => timeline.locator("[data-venue-events-year=\"" + key + "\"]");
+  await expect(entry).toHaveAttribute("href", harborPath + "/aura/events");
+  await entry.press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura/events");
+  await expect(timeline.getByRole("heading", { name: "Archive Events" })).toBeFocused();
+  await expect(timeline.locator("[data-venue-events-venue]")).toHaveText("Aura");
+  await expect(page.locator("[data-harmony-environment]")).toBeVisible();
+  await expect(dossier).toBeHidden();
+  expect(await timeline.locator("details").evaluateAll(groups => groups.map(group => group.dataset.venueEventsYear)))
+    .toEqual(["2026", "2025", "2024", "undated"]);
+  await expect(year("2026")).toHaveAttribute("open", "");
+  await expect(year("2026").locator("summary")).toHaveText("202622 events");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(10);
+  await expect(year("2026").getByRole("link", { name: /Summer Show 21$/ })).toHaveAttribute("href", "/music/shows/summer-21");
+  await expect(year("2026").getByRole("link", { name: /Summer Show 22$/ })).toHaveAttribute("href", "/music/shows/summer-22");
+  await expect(year("2025")).not.toHaveAttribute("open", "");
+  await year("2025").locator("summary").press("Enter");
+  await expect(year("2025").getByRole("link", { name: /Winter Night/ })).toBeVisible();
+  await year("2026").getByRole("button", { name: "Load More 2026 events" }).press("Enter");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(20);
+  await year("2026").getByRole("button", { name: "Load More 2026 events" }).press("Enter");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  const selected = year("2026").getByRole("link", { name: /Summer Show 2$/ });
+  await expect(selected).toBeFocused();
+  await selected.scrollIntoViewIfNeeded();
+  const savedScroll = await scroll.evaluate(node => node.scrollTop);
+  expect(savedScroll).toBeGreaterThan(0);
+  await selected.press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music/shows/summer-2");
+  await expect(page.getByRole("heading", { name: "Summer Show 2", exact: true })).toBeVisible();
+  await engine.press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura/events");
+  await expect(selected).toBeFocused();
+  await expect(year("2025")).toHaveAttribute("open", "");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(savedScroll);
+  await year("undated").locator("summary").press("Enter");
+  await expect(year("undated").getByRole("link", { name: /Date unavailable Incomplete Date/ })).toBeVisible();
+  await engine.press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(entry).toBeFocused();
+  await expect(dossier.locator("[data-venue-shows-panel]")).toHaveCount(0);
+});
+
+test("Harbor Archive Events direct entry keeps verified identity through retry and has a matching Dossier Back", async ({ page, baseURL }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let showsRequests = 0;
+  let photoRequests = 0;
+  await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", name: "Aura" }] }),
+    () => ++showsRequests === 1 ? { status: 503 } : { data: [] });
+  page.on("request", request => { if (/\/api\/music\/venues\/aura\/photos$/.test(new URL(request.url()).pathname)) photoRequests++; });
+  await page.goto(harborPath + "/aura/events", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const timeline = page.locator("[data-music-venue-events]");
+  await expect(timeline.locator("[data-venue-events-venue]")).toHaveText("Aura");
+  await expect(timeline.getByText("Archive Events Unavailable", { exact: true })).toBeVisible();
+  await expect(timeline.locator("details")).toHaveCount(0);
+  await timeline.getByRole("button", { name: "Retry Archive Events" }).click();
+  await expect(timeline.getByText("No Archive Events", { exact: true })).toBeVisible();
+  expect(showsRequests).toBe(2);
+  expect(photoRequests).toBe(0);
+  await page.getByRole("button", { name: "Back to Venue Dossier", exact: true }).press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(page.locator("[data-venue-detail]").getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
+  await expect(timeline).toBeHidden();
 });
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {
