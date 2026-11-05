@@ -1534,8 +1534,11 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     await expect(artists.getByRole("status")).toHaveText("Artist Index Loading");
     await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
     await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
-    await expect(events).not.toHaveAttribute("role", "button");
+    await expect(events).toHaveAttribute("role", "button");
     await expect(artists).not.toHaveAttribute("role", "button");
+    await events.press("Enter");
+    await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("Loading Archive Events");
+    await events.press("Enter");
     await expect(highlights).toContainText("No photo highlights available.");
     expect(showsRequests).toBe(1);
     expect(highlightsRequests).toBe(1);
@@ -1552,7 +1555,7 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
   await expect(events.locator(".venue-relationship-media span")).toHaveText("1");
   await expect(artists.locator(".venue-relationship-media span")).toHaveText("1");
   expect(Math.abs((await highlights.boundingBox()).y - highlightsTop)).toBeLessThanOrEqual(1);
-  await expect(events).toHaveAttribute("href", harborPath + "/aura/events");
+  await expect(events).toHaveAttribute("aria-expanded", "false");
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("Arrival Band");
   expect(await title.evaluate((node, original) => node.firstChild === original, originalTitle)).toBe(true);
@@ -1580,22 +1583,35 @@ test("Venue Dossier preserves verified identity on Shows failure and exposes con
   await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
   await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("12");
   await expect(highlights).toBeVisible();
+  await events.press("Enter");
+  const inline = dossier.locator("[data-venue-shows-panel]");
+  await expect(inline.getByText("Archive Events Unavailable", { exact: true })).toBeVisible();
+  expect(showsRequests).toBe(1);
+  await inline.getByRole("button", { name: "Retry Archive Events" }).click();
+  await expect(inline.getByText("No Archive Events", { exact: true })).toBeVisible();
+  expect(showsRequests).toBe(2);
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
 
   await page.evaluate(path => navigateToRoute(path), harborPath + "/other-room");
   await expect(dossier.getByRole("heading", { name: "Other Room", exact: true })).toBeVisible();
   await expect(events.locator(".venue-relationship-media span")).toHaveText("0");
   await expect(artists.locator(".venue-relationship-media span")).toHaveText("0");
-  await expect(events).toHaveAttribute("href", harborPath + "/other-room/events");
+  await expect(events).toHaveAttribute("aria-expanded", "false");
   await expect(artists).toHaveAttribute("role", "button");
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("No artists linked to this venue.");
 });
 
-test("Harbor Archive Events restores the expanded years, batches, selected event and scroll after Show Back", async ({ page, baseURL }) => {
-  await page.setViewportSize({ width: 412, height: 915 });
-  await page.emulateMedia({ reducedMotion: "reduce" });
+for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]) {
+for (const motion of ["no-preference", "reduce"]) {
+test("Inline Archive Events and Artists restore after Show/Band Back " + width + "x" + height + " " + motion, async ({ page, baseURL }) => {
+  test.setTimeout(60000);
+  await page.setViewportSize({ width, height });
+  await page.emulateMedia({ reducedMotion: motion });
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
   const newest = Array.from({ length: 22 }, (_, index) => ({
-    show_id: "summer-" + (index + 1), venue_id: "AURA", name: "Summer Show " + (index + 1),
+    show_id: "summer-" + (index + 1), venue_id: "AURA", name: "Summer Show " + (index + 1), bands: ["Nine Treasures"],
     date: "2026-08-" + String(index === 20 ? 22 : index + 1).padStart(2, "0"),
   }));
   await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", name: "Aura" }] }), () => ({ data: [
@@ -1608,18 +1624,39 @@ test("Harbor Archive Events restores the expanded years, batches, selected event
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const entry = dossier.getByRole("link", { name: "Archive Events", exact: true });
-  const timeline = page.locator("[data-music-venue-events]");
+  const entry = dossier.getByRole("button", { name: "Archive Events", exact: true });
+  const timeline = dossier.locator("[data-venue-shows-panel]");
   const scroll = page.locator("[data-music-nexus-shell]");
   const engine = page.locator("[data-prototype-engine-return]");
   const year = key => timeline.locator("[data-venue-events-year=\"" + key + "\"]");
-  await expect(entry).toHaveAttribute("href", harborPath + "/aura/events");
+  await expect(entry).toHaveAttribute("aria-expanded", "false");
   await entry.press("Enter");
-  await expect(page).toHaveURL(baseURL + harborPath + "/aura/events");
-  await expect(timeline.getByRole("heading", { name: "Archive Events" })).toBeFocused();
-  await expect(timeline.locator("[data-venue-events-venue]")).toHaveText("Aura");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(entry).toBeFocused();
+  await expect(timeline).toHaveAttribute("aria-hidden", "false");
   await expect(page.locator("[data-harmony-environment]")).toBeVisible();
-  await expect(dossier).toBeHidden();
+  await expect(dossier).toBeVisible();
+  const artists = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  await artists.press("Space");
+  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(dossier.locator(".venue-relationship-grid > :visible")).toHaveCount(5);
+  await artists.press("Enter");
+  await expect(artists).toHaveAttribute("aria-expanded", "false");
+  await expect(entry).toHaveAttribute("aria-expanded", "true");
+  await expect.poll(() => timeline.evaluate(node => {
+    const grid = node.previousElementSibling.getBoundingClientRect();
+    const panel = node.getBoundingClientRect();
+    return panel.top >= grid.bottom && Math.abs(panel.width - grid.width) <= 1;
+  })).toBe(true);
+  if (process.env.HARMONY_EVIDENCE_DIR && motion === "no-preference") {
+    await scroll.evaluate(node => {
+      node.scrollTop += node.querySelector(".venue-relationship-grid").getBoundingClientRect().top - node.getBoundingClientRect().top - 30;
+    });
+    await expect.poll(() => timeline.evaluate(node => node.getAnimations({ subtree: true }).filter(animation =>
+      animation.effect.getTiming().iterations !== Infinity && animation.playState === "running").length)).toBe(0);
+    await page.screenshot({ path: require("node:path").join(process.env.HARMONY_EVIDENCE_DIR, "inline-events-" + width + "x" + height + ".png") });
+  }
   expect(await timeline.locator("details").evaluateAll(groups => groups.map(group => group.dataset.venueEventsYear)))
     .toEqual(["2026", "2025", "2024", "undated"]);
   await expect(year("2026")).toHaveAttribute("open", "");
@@ -1643,18 +1680,48 @@ test("Harbor Archive Events restores the expanded years, batches, selected event
   await expect(page).toHaveURL(baseURL + "/music/shows/summer-2");
   await expect(page.getByRole("heading", { name: "Summer Show 2", exact: true })).toBeVisible();
   await engine.press("Enter");
-  await expect(page).toHaveURL(baseURL + harborPath + "/aura/events");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   await expect(selected).toBeFocused();
   await expect(year("2025")).toHaveAttribute("open", "");
   await expect(year("2026").getByRole("listitem")).toHaveCount(22);
   await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(savedScroll);
   await year("undated").locator("summary").press("Enter");
   await expect(year("undated").getByRole("link", { name: /Date unavailable Incomplete Date/ })).toBeVisible();
+  await entry.press("Enter");
+  await expect(entry).toHaveAttribute("aria-expanded", "false");
+  await expect(timeline).toHaveAttribute("aria-hidden", "true");
+  await entry.press("Space");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await artists.press("Enter");
+  await page.route(/\/api\/music\/bands(?:\?|$)/, route => route.fulfill({ headers: { "access-control-allow-origin": "*" }, json: { data: [{ band_id: "nine-treasures", band: "Nine Treasures", name: "Nine Treasures", region: "International" }], totalPages: 1 } }));
+  const band = dossier.locator(".venue-artists-grid").getByRole("link", { name: "Nine Treasures", exact: true });
+  await expect(band).toHaveAttribute("href", "/music/bands/nine-treasures");
+  await expect(dossier.locator(".venue-artists-top-list .venue-artist-count")).toHaveText("22");
+  await band.scrollIntoViewIfNeeded();
+  const artistScroll = await scroll.evaluate(node => node.scrollTop);
+  await band.press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music/bands/nine-treasures");
+  await expect(page.locator("[data-band-detail-name]")).toHaveText("Nine Treasures");
+  await page.goBack();
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(band).toBeFocused();
+  await expect(entry).toHaveAttribute("aria-expanded", "true");
+  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(artistScroll);
+  await page.goForward();
+  await expect(page).toHaveURL(baseURL + "/music/bands/nine-treasures");
   await engine.press("Enter");
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(entry).toBeFocused();
-  await expect(dossier.locator("[data-venue-shows-panel]")).toHaveCount(0);
+  await expect(entry).toHaveAttribute("aria-expanded", "true");
+  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await timeline.evaluate(node => getComputedStyle(node).overflowY)).not.toMatch(/auto|scroll/);
+  expect(errors).toEqual([]);
 });
+}
+}
 
 test("Harbor Archive Events direct entry keeps verified identity through retry and has a matching Dossier Back", async ({ page, baseURL }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });

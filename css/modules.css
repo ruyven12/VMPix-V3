@@ -5165,12 +5165,12 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   font-size: clamp(0.82rem, 3vw, 1rem);
 }
 
-.venue-events-screen [data-venue-events-years] {
+:is(.venue-events-screen, .venue-events-inline) [data-venue-events-years] {
   display: grid;
   gap: 0.45rem;
 }
 
-.venue-events-screen :is([data-venue-events-status], [data-venue-events-years]):empty {
+:is(.venue-events-screen, .venue-events-inline) :is([data-venue-events-status], [data-venue-events-years]):empty {
   display: none;
 }
 
@@ -5280,21 +5280,6 @@ a.venue-events-row::after {
   gap: 0.45rem;
 }
 
-.venue-relationships.is-focused .venue-relationship-grid {
-  grid-template-columns: minmax(min(100%, 13rem), 18rem);
-  justify-content: center;
-}
-
-.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-grid {
-  grid-template-columns: minmax(min(100%, 13rem), 18rem);
-  justify-content: center;
-}
-
-.venue-relationships:has(.venue-relationship-card[aria-expanded="true"]) .venue-relationship-grid {
-  grid-template-columns: minmax(min(100%, 13rem), 18rem);
-  justify-content: center;
-}
-
 .venue-relationship-card {
   display: grid;
   grid-template-rows: auto minmax(1.25em, auto);
@@ -5310,12 +5295,6 @@ a.venue-events-row::after {
 .venue-relationship-card[data-venue-relationship="history"] {
   grid-column: 1 / -1;
   grid-template-rows: auto minmax(2.5em, auto);
-}
-
-.venue-relationships.is-focused .venue-relationship-card.is-inactive,
-.venue-relationships:has(.venue-shows-panel.is-expanded) .venue-relationship-card:not(.is-expanded),
-.venue-relationships:has(.venue-relationship-card[aria-expanded="true"]) .venue-relationship-card:not([aria-expanded="true"]) {
-  display: none;
 }
 
 .venue-relationship-title {
@@ -5406,7 +5385,8 @@ a.venue-events-row::after {
     opacity var(--motion-fast) var(--ease-standard),
     transform var(--motion-fast) var(--ease-standard),
     border-color var(--motion-fast) var(--ease-standard),
-    background-color var(--motion-fast) var(--ease-standard);
+    background-color var(--motion-fast) var(--ease-standard),
+    margin-block-start var(--motion-standard) var(--ease-standard);
 }
 
 .venue-shows-panel.is-expanded {
@@ -5432,6 +5412,30 @@ a.venue-events-row::after {
 
 .venue-shows-panel.is-expanded .venue-shows-panel-inner {
   padding-block: 0.66rem;
+}
+
+/* Relationship drawers use the full Dossier width; archive tiles stay in place. */
+.venue-events-inline:not(.is-expanded) {
+  margin-block-start: calc(-0.45rem - 2px);
+}
+
+.venue-artists-grid > [role="listitem"] {
+  display: grid;
+  min-width: 0;
+}
+
+.venue-artist-pill[href] {
+  text-decoration: none;
+  min-height: 2.75rem;
+}
+
+.venue-artist-pill[href]:focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .venue-shows-panel { transition: none; }
 }
 
 .venue-artists-panel-inner {
