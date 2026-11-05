@@ -3737,7 +3737,11 @@ function startHarmonyVenuePassage(venue, selectedBeacon) {
     await Promise.all([
       ...plates.map(entry => {
         entry.stack = transform(entry.x, entry.y, entry.scale);
-        return play(entry.plate, [{ transform: "none" }, { transform: entry.stack }], 340, "cubic-bezier(.25,.7,.25,1)");
+        return play(entry.plate, [
+          { transform: "none", opacity: 1 },
+          { opacity: 1, offset: 0.45 },
+          { transform: entry.stack, opacity: entry.selected ? 1 : 0 },
+        ], 340, "cubic-bezier(.25,.7,.25,1)");
       }),
       play(musicVenueConnections, [{ opacity: 1 }, { opacity: 0 }], 180, "ease-out"),
       play(harmonySigil, [{ opacity: 1 }, { opacity: 0 }], 280, "ease-out"),
@@ -3781,7 +3785,7 @@ function startHarmonyVenuePassage(venue, selectedBeacon) {
     await Promise.all([
       play(ghost, [{ transform: transform(fromX, fromY, fromScale) }, { transform: "none" }], 360, "cubic-bezier(.25,.68,.25,1)"),
       ...plates.map(entry => play(entry.plate, [
-        { transform: entry.stack, opacity: 1 },
+        { transform: entry.stack, opacity: entry.selected ? 1 : 0 },
         { transform: transform(entry.x, entry.y + 10, 0.78), opacity: 0 },
       ], 260, "ease-out")),
     ]);
@@ -3942,11 +3946,11 @@ function startHarmonyVenueReturn(sourceRoute, targetRoute, historyState, restore
       const stacked = transform(centerX - (box.left + box.width / 2) + x, centerY - (box.top + box.height / 2) + y, scale);
       Object.assign(plate.style, {
         left: (box.left - shellBox.left) + "px", top: (box.top - shellBox.top) + "px",
-        width: box.width + "px", height: box.height + "px", transform: stacked,
+        width: box.width + "px", height: box.height + "px", transform: stacked, opacity: "0",
         gridTemplateColumns: style.gridTemplateColumns, paddingInline: style.paddingInline,
       });
       layer.append(plate);
-      return { plate, stacked };
+      return { plate, stacked, selected };
     });
     const name = plates[selectedIndex].plate.querySelector("strong");
     const textBox = node => {
@@ -3969,7 +3973,7 @@ function startHarmonyVenueReturn(sourceRoute, targetRoute, historyState, restore
     shell.dataset.harmonyVenueReturn = "descending";
     await Promise.all([
       play(ghost, [{ transform: "none" }, { transform: transform(x, y, scale) }], 360, "cubic-bezier(.25,.68,.25,1)"),
-      ...plates.map(({ plate }) => play(plate, [{ opacity: 0 }, { opacity: 1 }], 220, "ease-out")),
+      ...plates.map(({ plate, selected }) => play(plate, [{ opacity: 0 }, { opacity: selected ? 1 : 0 }], 220, "ease-out")),
     ]);
     if (!ownsView()) return clean();
     ghost.remove();
@@ -3982,7 +3986,9 @@ function startHarmonyVenueReturn(sourceRoute, targetRoute, historyState, restore
     shell.dataset.harmonyVenueReturn = "spreading";
     const reveal = [{ opacity: 0 }, { opacity: 0, offset: 0.45 }, { opacity: 1 }];
     await Promise.all([
-      ...plates.map(({ plate, stacked }) => play(plate, [{ transform: stacked }, { transform: "none" }], 340, "cubic-bezier(.25,.7,.25,1)")),
+      ...plates.map(({ plate, stacked, selected }) => play(plate, [
+        { transform: stacked, opacity: selected ? 1 : 0 }, { transform: "none", opacity: 1 },
+      ], 340, "cubic-bezier(.25,.7,.25,1)")),
       play(musicVenuesIndex, reveal, 340, "ease-out"),
       play(harmonySigil, reveal, 340, "ease-out"),
     ]);

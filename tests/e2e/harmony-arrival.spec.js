@@ -622,8 +622,17 @@ for (const [width, height, clipped] of [[412, 915], [915, 412], [915, 412, true]
     await expect(page).toHaveURL(baseURL + harborPath);
     await page.locator('[data-music-venues-beacons] [data-venue-slug="signal-3"] a').evaluate(link => link.click());
     expect(await page.evaluate(() => history.length)).toBe(originalLength);
+    const convergingOpacity = await plates.evaluateAll(nodes => nodes.map(node => {
+      node.getAnimations().find(animation => animation.effect.getTiming().duration === 340).currentTime = 170;
+      return { selected: node.hasAttribute("data-harmony-passage-selected"), opacity: Number(getComputedStyle(node).opacity) };
+    }));
+    expect(convergingOpacity.filter(node => !node.selected).every(node => node.opacity > 0 && node.opacity < 1)).toBe(true);
+    expect(convergingOpacity.find(node => node.selected).opacity).toBe(1);
     await finish([340]);
     await expect(shell).toHaveAttribute("data-harmony-venue-passage", "hold");
+    await expect(selected).toHaveCSS("opacity", "1");
+    expect(await plates.evaluateAll(nodes => nodes.filter(node => !node.hasAttribute("data-harmony-passage-selected"))
+      .every(node => getComputedStyle(node).opacity === "0"))).toBe(true);
     const aboveStack = await selected.evaluate(node => {
       const centerY = box => (box.top + box.bottom) / 2;
       return [...node.parentElement.children].every(plate => plate === node
@@ -643,6 +652,8 @@ for (const [width, height, clipped] of [[412, 915], [915, 412], [915, 412, true]
     await expect(page).toHaveURL(baseURL + harborPath + "/signal-3");
     await expect(shell).toHaveAttribute("data-harmony-venue-passage", "handoff");
     await expect(ghost).toHaveText("Signal Hall 03");
+    expect(await plates.evaluateAll(nodes => nodes.filter(node => !node.hasAttribute("data-harmony-passage-selected"))
+      .every(node => getComputedStyle(node).opacity === "0"))).toBe(true);
     expect(await layer.evaluate(node => getComputedStyle(node).clipPath)).toBe("none");
     await expect(target).toBeHidden();
     expect(await engine.boundingBox()).toEqual(originalEngine);
@@ -779,6 +790,7 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
     const layer = shell.locator(".harmony-venue-passage");
     const ghost = layer.locator(".harmony-venue-passage__title");
     const selected = layer.locator("[data-harmony-passage-selected]");
+    const plates = layer.locator(".harmony-venue-passage__plate");
     await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
     const scroll = await list.evaluate((node, hasClippedHeading) => {
       if (hasClippedHeading) return node.scrollTop;
@@ -837,6 +849,8 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
     }
     await finish([130]);
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "descending");
+    expect(await plates.evaluateAll(nodes => nodes.filter(node => !node.hasAttribute("data-harmony-passage-selected"))
+      .every(node => getComputedStyle(node).opacity === "0"))).toBe(true);
     await expect(archive).toHaveCSS("opacity", "0");
     const travel = await ghost.evaluate(node => {
       const animation = node.getAnimations().find(item => item.effect.getTiming().duration === 360);
@@ -860,11 +874,20 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "descending");
     await finish([220, 360]);
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "hold");
+    await expect(selected).toHaveCSS("opacity", "1");
+    expect(await plates.evaluateAll(nodes => nodes.filter(node => !node.hasAttribute("data-harmony-passage-selected"))
+      .every(node => getComputedStyle(node).opacity === "0"))).toBe(true);
     expect(await layer.evaluate(node => getComputedStyle(node).clipPath)).toBe("none");
     await expect(ghost).toHaveCount(0);
     await expect(selected).toContainText("Signal Hall 03");
     await finish([125]);
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "spreading");
+    const spreadingOpacity = await plates.evaluateAll(nodes => nodes.map(node => {
+      node.getAnimations().find(animation => animation.effect.getTiming().duration === 340).currentTime = 170;
+      return { selected: node.hasAttribute("data-harmony-passage-selected"), opacity: Number(getComputedStyle(node).opacity) };
+    }));
+    expect(spreadingOpacity.filter(node => !node.selected).every(node => node.opacity > 0 && node.opacity < 1)).toBe(true);
+    expect(spreadingOpacity.find(node => node.selected).opacity).toBe(1);
     await finish([340]);
     await expect(layer).toHaveCount(0);
     await expect(inspect).toBeFocused();
