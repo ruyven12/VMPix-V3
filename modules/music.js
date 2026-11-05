@@ -4604,58 +4604,79 @@ function getMusicVenueShows(venue) {
     .sort((left, right) => getMusicShowTimestamp(right) - getMusicShowTimestamp(left) || getMusicShowTitle(left).localeCompare(getMusicShowTitle(right)));
 }
 
-function collectMusicVenueArtistNames(value, target) {
+function readMusicVenueRelationshipId(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim().toLowerCase();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return "";
+}
+
+function collectMusicVenueArtists(value, target, bandField = false) {
   if (Array.isArray(value)) {
-    value.forEach(item => collectMusicVenueArtistNames(item, target));
+    value.forEach(item => collectMusicVenueArtists(item, target, bandField));
     return;
   }
-  const name = value && typeof value === "object"
+  const structured = value && typeof value === "object";
+  const name = structured
     ? readMusicVenueMetadataText(value.band, value.name, value.band_name, value.bandName,
       value.artist, value.artist_name, value.artistName, value.title)
     : readMusicVenueMetadataText(value);
   if (name && !/^(?:\[object object\]|guests?|tba|to be announced|(?:artist|band) pending|unknown (?:artist|band)|(?:artist|band) unknown)$/i.test(name)) {
-    target.push(name);
+    const typedBand = structured && [value.type, value.entity_type, value.entityType, value.kind]
+      .some(type => typeof type === "string" && type.trim().toLowerCase() === "band");
+    const genericId = structured && (bandField || typedBand) ? readMusicVenueRelationshipId(value.id, value.slug) : "";
+    const bandId = structured ? readMusicVenueRelationshipId(value.band_id, value.bandId, genericId) : "";
+    target.push({ name, bandId });
   }
-}
-
-function getMusicVenueShowArtistNames(show) {
-  const names = [];
-  for (const record of [show, show.backend_record, show.backendRecord]) {
-    if (!record) continue;
-    for (const value of [
-      record.band, record.band_name, record.bandName, record.bands, record.band_names, record.bandNames,
-      record.artists, record.artistNames, record.performers, record.lineup, record.bill,
-    ]) collectMusicVenueArtistNames(value, names);
-  }
-  return names;
 }
 
 function getMusicVenueArtists(venue, linkedShows = null) {
-  const artistsByKey = new Map();
+  const entries = [];
+  const idsByName = new Map();
+  const explicitNamesByShow = new Map();
   const shows = Array.isArray(linkedShows) ? linkedShows : getMusicVenueShows(venue);
-  shows.forEach((show) => {
-    const showArtists = new Map();
-    getMusicVenueShowArtistNames(show).forEach((bandName) => {
-      const name = String(bandName || "").trim();
-      const key = name.toLowerCase();
-      if (name && !showArtists.has(key)) {
-        showArtists.set(key, name);
+  shows.forEach(show => {
+    const artists = [];
+    for (const record of [show, show.backend_record, show.backendRecord]) {
+      if (!record) continue;
+      const fields = ["band", "band_name", "bandName", "bands", "band_names", "artists", "artistNames", "performers", "lineup", "bill"];
+      // The shared Show adapter derives bandNames from band/bands and can stringify malformed scalars.
+      if (!["band", "band_name", "bandName", "bands"].some(key => Object.prototype.hasOwnProperty.call(record, key))) fields.push("bandNames");
+      fields.forEach(key => collectMusicVenueArtists(record[key], artists, key === "band" || key === "bands"));
+    }
+    const showKey = readMusicVenueRelationshipId(show.show_id, show.showId, show.id);
+    const appearance = showKey || show;
+    for (const artist of artists) {
+      const nameKey = artist.name.toLowerCase();
+      if (artist.bandId) {
+        if (!idsByName.has(nameKey)) idsByName.set(nameKey, new Set());
+        idsByName.get(nameKey).add(artist.bandId);
+        if (!explicitNamesByShow.has(appearance)) explicitNamesByShow.set(appearance, new Set());
+        explicitNamesByShow.get(appearance).add(nameKey);
       }
-    });
-
-    showArtists.forEach((name, key) => {
-      const artist = artistsByKey.get(key) || {
-        name,
-        slug: createBandSlug(name),
-        appearances: 0,
-      };
-      artist.appearances += 1;
-      artistsByKey.set(key, artist);
-    });
+      entries.push({ ...artist, nameKey, showKey, appearance });
+    }
   });
 
-  return Array.from(artistsByKey.values())
-    .sort((left, right) => right.appearances - left.appearances || left.name.localeCompare(right.name));
+  const artistsByKey = new Map();
+  const ambiguousIds = new Set();
+  for (const entry of entries) {
+    const ids = idsByName.get(entry.nameKey);
+    if (!entry.bandId && ids?.size > 1) {
+      if (!explicitNamesByShow.get(entry.appearance)?.has(entry.nameKey)) ids.forEach(id => ambiguousIds.add(id));
+      continue;
+    }
+    const bandId = entry.bandId || (ids?.size === 1 ? [...ids][0] : "");
+    const key = bandId ? "id:" + bandId : "name:" + entry.nameKey;
+    const artist = artistsByKey.get(key) || { name: entry.name, bandId, slug: createBandSlug(entry.name), shows: new Set(), unknown: false };
+    if (entry.showKey) artist.shows.add(entry.showKey);
+    else artist.unknown = true;
+    artistsByKey.set(key, artist);
+  }
+  return [...artistsByKey.values()].map(({ shows: appearances, unknown, ...artist }) => ({
+    ...artist, appearances: unknown || ambiguousIds.has(artist.bandId) ? null : appearances.size,
+  })).sort((left, right) => (right.appearances ?? -1) - (left.appearances ?? -1) || left.name.localeCompare(right.name));
 }
 
 function getMusicVenuePhotoHighlightsIdentifier(venue, requestedSlug = "") {
@@ -5105,145 +5126,262 @@ function createVenueArtistsEmptyState(text = "No artists linked to this venue.")
   return empty;
 }
 
-function createVenueArtistPill(artist) {
+function getVenueArtistLetter(name) {
+  const letter = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").charAt(0).toUpperCase();
+  return /^[A-Z]$/.test(letter) ? letter : "#";
+}
+
+function createVenueArtistPill(artist, index) {
   const item = document.createElement("a");
   item.className = "venue-artist-pill";
-  item.href = `/music/bands/${encodeURIComponent(artist.slug || createBandSlug(artist.name))}`;
+  item.href = getBandRouteUrl(artist.bandId || artist.slug || createBandSlug(artist.name));
+  item.dataset.venueArtistName = artist.name;
+  item.dataset.venueArtistAppearances = String(artist.appearances);
+  item.setAttribute("aria-label", artist.name);
+  const name = document.createElement("span");
+  name.textContent = artist.name;
+  const count = document.createElement("span");
+  count.className = "venue-artist-appearances";
+  count.id = "venue-artist-appearances-" + index;
+  count.textContent = artist.appearances === null ? "Appearances unavailable"
+    : artist.appearances.toLocaleString() + (artist.appearances === 1 ? " appearance" : " appearances");
+  item.setAttribute("aria-describedby", count.id);
+  item.append(name, count);
   item.addEventListener("click", event => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     item.focus({ preventScroll: true });
     navigateToRoute(item.getAttribute("href"));
   });
-  item.textContent = artist.name;
-  const entry = document.createElement("div");
-  entry.setAttribute("role", "listitem");
+  const entry = document.createElement("li");
   entry.append(item);
   return entry;
 }
 
-function createVenueArtistLeaderboardCard(artist, index) {
-  const item = document.createElement("li");
-  item.className = "venue-artists-top-card";
-
-  const rank = document.createElement("span");
-  rank.className = "venue-artist-rank";
-  rank.textContent = `#${index + 1}`;
-
-  const count = document.createElement("span");
-  count.className = "venue-artist-count";
-  count.textContent = artist.appearances.toLocaleString();
-
-  const name = document.createElement("span");
-  name.className = "venue-artist-name";
-  name.textContent = artist.name;
-
-  const label = document.createElement("span");
-  label.className = "venue-artist-label";
-  label.textContent = "Documented";
-
-  item.append(rank, count, name, label);
-  return item;
+function updateVenueArtistsGrid(grid, artists, searchTerm, card) {
+  const query = String(searchTerm || "").trim().toLowerCase();
+  const groups = new Map();
+  const ordered = artists.filter(artist => !query || artist.name.toLowerCase().includes(query))
+    .sort((left, right) => left.name.localeCompare(right.name));
+  for (const artist of ordered) {
+    const letter = getVenueArtistLetter(artist.name);
+    if (!groups.has(letter)) groups.set(letter, []);
+    groups.get(letter).push(artist);
+  }
+  grid.replaceChildren();
+  if (!ordered.length) {
+    grid.append(createVenueArtistsEmptyState(query ? "No artists match this search." : "No artists linked to this venue."));
+    return groups;
+  }
+  let rowIndex = 0;
+  const letters = [...groups.keys()].sort((left, right) => left === "#" ? 1 : right === "#" ? -1 : left.localeCompare(right));
+  for (const letter of letters) {
+    const group = document.createElement("section");
+    group.dataset.venueArtistLetter = letter;
+    const heading = document.createElement("h6");
+    heading.className = "venue-artists-letter-heading";
+    heading.textContent = letter;
+    heading.id = "venue-artists-letter-" + (letter === "#" ? "other" : letter);
+    group.setAttribute("aria-labelledby", heading.id);
+    const list = document.createElement("ul");
+    for (const artist of groups.get(letter)) {
+      const row = createVenueArtistPill(artist, rowIndex++);
+      row.firstElementChild.toggleAttribute("data-venue-artist-highlighted", card._venueArtistState.level > 0 && artist.appearances === card._venueArtistState.level);
+      list.append(row);
+    }
+    group.append(heading, list);
+    grid.append(group);
+  }
+  return groups;
 }
 
-function updateVenueArtistsGrid(grid, artists, searchTerm) {
-  if (!grid) {
-    return;
-  }
+function stopVenueArtistScrollTracking(panel) {
+  if (panel?._venueArtistScroll) musicNexusShell.removeEventListener("scroll", panel._venueArtistScroll);
+  cancelAnimationFrame(panel?._venueArtistFrame);
+}
 
-  const normalizedSearch = String(searchTerm || "").trim().toLowerCase();
-  const filteredArtists = (Array.isArray(artists) ? artists : [])
-    .filter((artist) => !normalizedSearch || artist.name.toLowerCase().includes(normalizedSearch))
-    .sort((left, right) => left.name.localeCompare(right.name));
-
-  grid.replaceChildren();
-  if (filteredArtists.length === 0) {
-    grid.append(createVenueArtistsEmptyState(normalizedSearch ? "No artists match this search." : "No artists linked to this venue."));
-    return;
-  }
-
-  filteredArtists.forEach((artist) => {
-    grid.append(createVenueArtistPill(artist));
-  });
+function retryVenueArtists(card) {
+  if (card._venueArtistRequest || card._venueContext !== v3RouteContext) return;
+  const context = v3RouteContext;
+  const request = requestMusicShowsSetsData();
+  const panel = getVenueArtistsRelationshipPanel();
+  renderVenueArtistsPanel(panel, [], card);
+  card._venueArtistRequest = request.then(() => {
+    if (v3RouteContext !== context || card._venueContext !== context) return;
+    renderMusicVenueDossierRelationships(card._venueRecord);
+    const events = musicVenueDossierEventsView;
+    if (events?.context === context && events.screen.getAttribute("aria-hidden") === "false") events.load();
+    notifyV3ResumeReady();
+  }).finally(() => { card._venueArtistRequest = null; });
 }
 
 function renderVenueArtistsPanel(panel, artists, card) {
-  const venueArtists = Array.isArray(artists) ? artists : [];
+  stopVenueArtistScrollTracking(panel);
+  panel._venueArtistScroll = null;
   panel.replaceChildren();
   const inner = document.createElement("div");
   inner.className = "venue-shows-panel-inner venue-artists-panel-inner";
   panel.append(inner);
-
-  if (venueArtists.length === 0) {
-    inner.append(createVenueArtistsEmptyState(card?._hasLinkedVenueShows ? "No verified artist records for these linked shows." : undefined));
+  if (!hasVerifiedMusicVenueShows()) {
+    const loading = musicShowsSetsDataState === "loading";
+    inner.append(createMusicV3StateCard(loading ? "loading" : "error", "musicVenueArtists", {
+      title: loading ? "Loading Featured Artists" : "Featured Artists Unavailable",
+      text: loading ? "Receiving documented artist appearances." : "The artist relationships could not be loaded.",
+      small: true, retry: loading ? false : { label: "Retry Featured Artists", onClick: () => retryVenueArtists(card) },
+    }));
+    return;
+  }
+  const venueArtists = Array.isArray(artists) ? artists : [];
+  if (!venueArtists.length) {
+    inner.append(createVenueArtistsEmptyState(card._hasLinkedVenueShows ? "No verified artist records for these linked shows." : undefined));
     return;
   }
 
+  const state = card._venueArtistState;
   const summary = document.createElement("section");
   summary.className = "venue-artists-summary";
-
   const title = document.createElement("h5");
   title.className = "venue-artists-title";
   title.textContent = "Featured Artists";
-
   const copy = document.createElement("p");
   copy.className = "venue-artists-copy";
-  copy.textContent = `${venueArtists.length.toLocaleString()} artist${venueArtists.length === 1 ? "" : "s"} documented at this venue`;
-
-  const topArtists = document.createElement("div");
-  topArtists.className = "venue-artists-top";
-
+  copy.textContent = venueArtists.length.toLocaleString() + (venueArtists.length === 1 ? " artist" : " artists") + " documented at this venue";
+  const top = document.createElement("div");
+  top.className = "venue-artists-top";
   const topTitle = document.createElement("h6");
   topTitle.className = "venue-artists-top-title";
   topTitle.textContent = "Most Documented Artists";
-
   const topList = document.createElement("ol");
   topList.className = "venue-artists-top-list";
-  venueArtists.slice(0, 3).forEach((artist) => {
-    topList.append(createVenueArtistLeaderboardCard(artist, topList.children.length));
-  });
-  topArtists.append(topTitle, topList);
-  summary.append(title, copy, topArtists);
+  top.append(topTitle, topList);
+  summary.append(title, copy, top);
 
   const searchLabel = document.createElement("label");
   searchLabel.className = "venue-artists-search-field";
   const searchText = document.createElement("span");
   searchText.className = "venue-artists-search-label";
   searchText.textContent = "Search Artists";
-  const searchInput = document.createElement("input");
-  searchInput.className = "venue-artists-search-input";
-  searchInput.type = "search";
-  searchInput.autocomplete = "off";
-  searchInput.placeholder = "Search artist name";
-  searchInput.value = String(card?._venueArtistSearch || "");
-  searchLabel.append(searchText, searchInput);
+  const search = document.createElement("input");
+  search.className = "venue-artists-search-input";
+  search.type = "search";
+  search.autocomplete = "off";
+  search.placeholder = "Search artist name";
+  search.value = card._venueArtistSearch || "";
+  searchLabel.append(searchText, search);
 
+  const alphabet = document.createElement("nav");
+  alphabet.className = "venue-artists-alphabet";
+  alphabet.setAttribute("aria-label", "Artist alphabet");
+  alphabet.dataset.venueArtistAlphabet = "";
+  const rail = document.createElement("div");
+  rail.className = "venue-artists-alphabet-rail";
+  rail.dataset.venueArtistRail = "";
+  alphabet.append(rail);
   const grid = document.createElement("div");
   grid.className = "venue-artists-grid";
-  grid.setAttribute("role", "list");
-
-  let analyticsQuery = searchInput.value.trim().toLowerCase(), analyticsComposing = false;
-  searchInput.addEventListener("input", (event) => {
-    if (card) {
-      card._venueArtistSearch = searchInput.value;
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  if (venueArtists.some(artist => getVenueArtistLetter(artist.name) === "#")) letters.push("#");
+  const setActiveLetter = letter => {
+    state.letter = letter;
+    for (const button of rail.children) button.setAttribute("aria-pressed", String(button.dataset.venueArtistJump === letter));
+  };
+  const refresh = () => {
+    const groups = updateVenueArtistsGrid(grid, venueArtists, search.value, card);
+    for (const button of rail.children) button.disabled = !groups.has(button.dataset.venueArtistJump);
+    setActiveLetter(groups.has(state.letter) ? state.letter : groups.keys().next().value || "");
+    for (const button of topList.querySelectorAll("button")) {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.venueArtistLevel) === state.level));
     }
-    updateVenueArtistsGrid(grid, venueArtists, searchInput.value);
+  };
+  const jump = row => {
+    if (!row) return;
+    setActiveLetter(getVenueArtistLetter(row.dataset.venueArtistName));
+    const top = musicNexusShell.getBoundingClientRect().top + musicNexusShell.clientTop
+      + parseFloat(getComputedStyle(musicNexusShell).paddingTop);
+    const offset = row.getBoundingClientRect().top - top - alphabet.getBoundingClientRect().height - 7;
+    musicNexusShell.scrollTo({ top: Math.max(0, musicNexusShell.scrollTop + offset), behavior: reducedMotion.matches ? "instant" : "smooth" });
+    row.focus({ preventScroll: true });
+  };
+  for (const letter of letters) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.venueArtistJump = letter;
+    button.textContent = letter;
+    button.setAttribute("aria-label", letter === "#" ? "Other artist names" : "Artists beginning with " + letter);
+    button.addEventListener("click", () => {
+      const group = [...grid.children].find(node => node.dataset.venueArtistLetter === letter);
+      jump(group?.querySelector("a"));
+    });
+    rail.append(button);
+  }
+  const levels = [...new Set(venueArtists.map(artist => artist.appearances))].filter(value => value > 0).sort((a, b) => b - a).slice(0, 3);
+  if (!levels.length) {
+    const unavailable = document.createElement("p");
+    unavailable.className = "venue-artists-copy";
+    unavailable.textContent = "Rankings unavailable. Verified appearance totals are not available.";
+    topList.replaceWith(unavailable);
+  }
+  levels.forEach((level, index) => {
+    const members = venueArtists.filter(artist => artist.appearances === level).sort((left, right) => left.name.localeCompare(right.name));
+    const item = document.createElement("li");
+    item.className = "venue-artists-top-card";
+    const rank = document.createElement("span");
+    rank.className = "venue-artist-rank";
+    rank.textContent = "#" + (index + 1);
+    const count = document.createElement("span");
+    count.className = "venue-artist-count";
+    count.textContent = level.toLocaleString();
+    const name = document.createElement("span");
+    name.className = "venue-artist-name";
+    name.textContent = members.length > 1 ? members.length + " bands tied with " + level + " appearances" : members[0].name;
+    const label = document.createElement("span");
+    label.className = "venue-artist-label";
+    label.textContent = level === 1 ? "Documented appearance" : "Documented appearances";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "venue-artists-rank-control";
+    button.dataset.venueArtistLevel = String(level);
+    button.setAttribute("aria-label", members.length > 1 ? name.textContent : members[0].name + ", " + level + " appearances");
+    button.addEventListener("click", () => {
+      if (members.some(artist => !artist.name.toLowerCase().includes(search.value.trim().toLowerCase()))) {
+        search.value = "";
+        card._venueArtistSearch = "";
+      }
+      state.level = level;
+      refresh();
+      jump([...grid.querySelectorAll("a")].find(row => Number(row.dataset.venueArtistAppearances) === level));
+    });
+    item.append(rank, count, name, label, button);
+    topList.append(item);
+  });
+  search.addEventListener("input", event => {
+    card._venueArtistSearch = search.value;
+    refresh();
     try {
-      const query = searchInput.value.trim().toLowerCase();
-      const previous = analyticsQuery, completedComposition = analyticsComposing && !event.isComposing;
-      analyticsQuery = query; analyticsComposing = event.isComposing;
-      if (!event.isTrusted || event.isComposing || !query) { window.V3Analytics?.cancelArchiveSearch?.(); return; }
-      if (query === previous && !completedComposition) return;
-      const context = v3RouteContext, source = musicShowsSetsCollection;
-      window.V3Analytics?.archiveSearch?.(event, {archive: "music", dataset: "bands"}, () => {
-        if (context !== v3RouteContext || source !== musicShowsSetsCollection || !grid.isConnected || grid.closest('[hidden], [inert], [aria-hidden="true"]') || searchInput.value.trim().toLowerCase() !== query || musicShowsSetsDataState !== "live") return null;
+      if (!event.isTrusted || event.isComposing || !search.value.trim()) { window.V3Analytics?.cancelArchiveSearch?.(); return; }
+      const context = v3RouteContext, query = search.value.trim().toLowerCase(), source = musicShowsSetsCollection;
+      window.V3Analytics?.archiveSearch?.(event, { archive: "music", dataset: "bands" }, () => {
+        if (context !== v3RouteContext || source !== musicShowsSetsCollection || panel.getAttribute("aria-hidden") === "true" || search.value.trim().toLowerCase() !== query) return null;
         return venueArtists.filter(artist => artist.name.toLowerCase().includes(query)).length;
       });
-    } catch { /* Optional measurements cannot interrupt search. */ }
+    } catch { /* Optional measurements cannot interrupt artist search. */ }
   });
-
-  inner.append(summary, searchLabel, grid);
-  updateVenueArtistsGrid(grid, venueArtists, searchInput.value);
+  rail.addEventListener("scroll", () => { state.rail = rail.scrollLeft; }, { passive: true });
+  inner.append(summary, searchLabel, alphabet, grid);
+  refresh();
+  rail.scrollLeft = state.rail;
+  panel._venueArtistScroll = () => {
+    cancelAnimationFrame(panel._venueArtistFrame);
+    panel._venueArtistFrame = requestAnimationFrame(() => {
+      if (card._venueContext !== v3RouteContext || panel.getAttribute("aria-hidden") === "true") { stopVenueArtistScrollTracking(panel); return; }
+      const line = musicNexusShell.getBoundingClientRect().top + musicNexusShell.clientTop
+        + parseFloat(getComputedStyle(musicNexusShell).paddingTop) + alphabet.getBoundingClientRect().height + 9;
+      const groups = [...grid.querySelectorAll("[data-venue-artist-letter]")];
+      const active = groups.filter(group => group.getBoundingClientRect().top <= line).at(-1) || groups[0];
+      if (active) setActiveLetter(active.dataset.venueArtistLetter);
+    });
+  };
+  if (panel.getAttribute("aria-hidden") === "false") musicNexusShell.addEventListener("scroll", panel._venueArtistScroll, { passive: true });
 }
 
 function getVenueArtistsRelationshipPanel() {
@@ -5380,8 +5518,10 @@ function setVenueArtistsPanelOpen(card, isOpen, event = null) {
     panel.setAttribute("aria-hidden", String(!isOpen));
     if (isOpen) {
       panel.removeAttribute("inert");
+      if (panel._venueArtistScroll) musicNexusShell.addEventListener("scroll", panel._venueArtistScroll, { passive: true });
     } else {
       panel.setAttribute("inert", "");
+      stopVenueArtistScrollTracking(panel);
     }
     reportArchiveContentExpansion(event, card, "music", "venue", "venue_artists", wasOpen, isOpen);
   });
@@ -5408,6 +5548,7 @@ function setupVenueArtistsRelationshipCard(venue, artists, hasLinkedShows) {
     return;
   }
 
+  stopVenueArtistScrollTracking(panel);
   const sameDossier = card._venueContext === v3RouteContext;
   const wasOpen = sameDossier && card.getAttribute("aria-expanded") === "true";
   card._venueContext = v3RouteContext;
@@ -5422,15 +5563,29 @@ function setupVenueArtistsRelationshipCard(venue, artists, hasLinkedShows) {
   card.setAttribute("aria-describedby", "venue-relationship-bands-value");
   card._linkedVenueArtists = artists;
   card._hasLinkedVenueShows = hasLinkedShows;
-  if (!sameDossier) card._venueArtistSearch = "";
+  card._venueRecord = venue;
+  if (!sameDossier) {
+    const restored = v3ResumeUI();
+    card._venueArtistSearch = v3Text(restored.artistQuery);
+    card._venueArtistState = {
+      letter: /^[A-Z#]$/.test(restored.artists?.letter || "") ? restored.artists.letter : "",
+      level: Number.isSafeInteger(restored.artists?.level) && restored.artists.level > 0 ? restored.artists.level : null,
+      rail: v3Number(restored.artists?.rail),
+    };
+  }
   panel.dataset.lazyRendered = "false";
   panel.replaceChildren();
   setVenueArtistsPanelOpen(card, wasOpen);
 
   const status = card.querySelector(".venue-relationship-status");
   if (status) {
-    status.removeAttribute("role");
-    status.textContent = "Band Relationships";
+    if (hasVerifiedMusicVenueShows()) {
+      status.removeAttribute("role");
+      status.textContent = "Band Relationships";
+    } else {
+      status.setAttribute("role", "status");
+      status.textContent = musicShowsSetsDataState === "loading" ? "Artist Index Loading" : "Artist Index Unavailable";
+    }
   }
 
   card.onclick = (event) => {
@@ -5784,28 +5939,7 @@ function renderMusicVenueDossierRelationships(venue) {
   setMusicVenueDetailRelationshipCount("shows", null);
   setVenueEventsRelationshipStatus("Event Index " + statusLabel, true);
   setMusicVenueDetailRelationshipCount("bands", null);
-  const card = venueDetail.querySelector('[data-venue-relationship="bands"]');
-  if (!card) return;
-  card.classList.remove("venue-relationship-card--expandable", "is-expanded");
-  for (const attribute of ["tabindex", "role", "aria-controls", "aria-expanded", "aria-label", "aria-describedby"]) {
-    card.removeAttribute(attribute);
-  }
-  card.onclick = null;
-  card.onkeydown = null;
-
-  const panel = getVenueArtistsRelationshipPanel();
-  if (panel) {
-    panel.classList.remove("is-expanded");
-    panel.setAttribute("aria-hidden", "true");
-    panel.inert = true;
-    panel.replaceChildren();
-  }
-
-  const status = card.querySelector(".venue-relationship-status");
-  if (status) {
-    status.setAttribute("role", "status");
-    status.textContent = "Artist Index " + statusLabel;
-  }
+  setupVenueArtistsRelationshipCard(venue, [], false);
 }
 
 function readMusicVenueMetadataText(...values) {
@@ -6752,7 +6886,10 @@ function setVenueDetailVisible(isVisible) {
     return;
   }
 
-  if (!isVisible) harmonyVenueSoloArrival?.finish();
+  if (!isVisible) {
+    harmonyVenueSoloArrival?.finish();
+    stopVenueArtistScrollTracking(venueDetail.querySelector("[data-venue-artists-panel]"));
+  }
   musicNexusShell.classList.toggle("is-venue-detail", isVisible);
   if (isVisible) {
     setMusicVenueIndexVisible(false);
@@ -18570,6 +18707,7 @@ function captureMusicResumeState(route) {
     panels: [...venueDetail.querySelectorAll('[data-venue-relationship][aria-expanded="true"]')].map(card => card.dataset.venueRelationship),
     events: captureMusicVenueEventsState(musicVenueDossierEventsView),
     artistLink: document.activeElement?.closest("[data-venue-artists-panel] a")?.getAttribute("href") || '',
+    artists: { ...venueDetail.querySelector('[data-venue-relationship="bands"]')?._venueArtistState },
     artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
   if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
     .map(card=>card.dataset.personShowId+'|'+card.dataset.personShowAlbumId).slice(0,100)};

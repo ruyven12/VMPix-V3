@@ -1535,7 +1535,7 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
     await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
     await expect(events).toHaveAttribute("role", "button");
-    await expect(artists).not.toHaveAttribute("role", "button");
+    await expect(artists).toHaveAttribute("role", "button");
     await events.press("Enter");
     await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("Loading Archive Events");
     await events.press("Enter");
@@ -1744,6 +1744,129 @@ test("Harbor Archive Events direct entry keeps verified identity through retry a
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   await expect(page.locator("[data-venue-detail]").getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
   await expect(timeline).toBeHidden();
+});
+
+test("Harbor inline Artists groups distinct tied levels and restores alphabet, highlights, identity and focus after Band Back", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const shows = Array.from({ length: 7 }, (_, index) => ({
+    show_id: "appearance-" + index, venue_id: "aura", name: "Recorded Event " + index, date: "2025-08-" + String(index + 1).padStart(2, "0"),
+    bands: [
+      { name: "Alpha Ensemble", band_id: index % 2 ? "ALPHA-RECORD-7" : "alpha-record-7" },
+      ...(index < 5 ? ["Beta Band", "Delta Band"] : []),
+      ...(index < 3 ? ["Echo Band", "Zulu Band"] : []),
+      ...(index === 0 ? "CFGHIKLMNOPQRSTVWXY".split("").map(letter => letter + " Archive Band") : []),
+      { name: "N/A" }, { nonsense: "Malformed Artist" },
+      ...(index === 0 ? [42, "64", { name: "Shared Name", band_id: "shared-first" },
+        { name: "Shared Name", band_id: "shared-second" }, "Shared Name"] : []),
+    ],
+  }));
+  shows.push({ show_id: "appearance-0", venue_id: "aura", name: "Duplicate fragment", date: "2025-08-01",
+    bands: [{ name: "ALPHA ENSEMBLE", bandId: "alpha-record-7" }, "Foxtrot Band"] });
+  shows.push({ venue_id: "aura", name: "No stable identity", bands: ["Unknown Total"] });
+  shows.push({ show_id: "ambiguous-name-only", venue_id: "aura", name: "Ambiguous recorded name", bands: ["Shared Name"] });
+  shows.push({ show_id: "performer-types", venue_id: "aura", name: "Recorded performers", performers: [
+    { name: "Person-like Performer", id: "person-7" },
+    { name: "Typed Band", type: "band", id: "typed-band-8" },
+    { name: "Explicit Band", band_id: "explicit-band-9", id: "person-9" },
+  ] });
+  shows.push({ id: 452, venue_id: "aura", name: "Explicit numeric Show", bands: [
+    { name: "Numeric Stage", id: 384 }, { name: "Gamma Record", slug: "gamma-authored-id" },
+  ] });
+  await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", name: "Aura" }] }), () => ({ data: shows }));
+  await page.route(/\/api\/music\/bands(?:\?|$)/, route => route.fulfill({ headers: { "access-control-allow-origin": "*" },
+    json: { data: [{ band_id: "alpha-record-7", band: "Alpha Ensemble", name: "Alpha Ensemble" }], totalPages: 1 } }));
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const toggle = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const panel = dossier.locator("[data-venue-artists-panel]");
+  const scroller = page.locator("[data-music-nexus-shell]");
+  const rail = panel.locator("[data-venue-artist-rail]");
+  const alphabet = panel.getByRole("navigation", { name: "Artist alphabet" });
+  const search = panel.getByRole("searchbox", { name: "Search Artists" });
+  await toggle.press("Enter");
+  await expect(panel.locator(".venue-artists-top-list .venue-artist-count")).toHaveText(["7", "5", "3"]);
+  await expect(panel.getByRole("button", { name: "2 bands tied with 5 appearances", exact: true })).toBeVisible();
+  await expect(panel.getByRole("button", { name: "2 bands tied with 3 appearances", exact: true })).toBeVisible();
+  await expect(panel.locator(".venue-artists-grid").getByRole("link", { name: "Unknown Total", exact: true }))
+    .toHaveAccessibleDescription("Appearances unavailable");
+  await expect(panel.getByText("Malformed Artist", { exact: true })).toHaveCount(0);
+  await expect(panel.getByRole("link", { name: "42", exact: true })).toHaveCount(0);
+  await expect(panel.getByRole("link", { name: "64", exact: true })).toHaveAccessibleDescription("1 appearance");
+  const shared = panel.getByRole("link", { name: "Shared Name", exact: true });
+  await expect(shared).toHaveCount(2);
+  expect(await shared.evaluateAll(rows => rows.map(row => row.getAttribute("href")).sort())).toEqual(["/music/bands/shared-first", "/music/bands/shared-second"]);
+  for (const row of await shared.all()) await expect(row).toHaveAccessibleDescription("Appearances unavailable");
+  await expect(panel.locator('a[href="/music/bands/shared-name"]')).toHaveCount(0);
+  await expect(panel.getByRole("link", { name: "Person-like Performer", exact: true })).toHaveAttribute("href", "/music/bands/person-like-performer");
+  await expect(panel.locator('a[href="/music/bands/person-7"]')).toHaveCount(0);
+  await expect(panel.getByRole("link", { name: "Typed Band", exact: true })).toHaveAttribute("href", "/music/bands/typed-band-8");
+  await expect(panel.getByRole("link", { name: "Explicit Band", exact: true })).toHaveAttribute("href", "/music/bands/explicit-band-9");
+  await expect(panel.getByRole("link", { name: "Numeric Stage", exact: true })).toHaveAttribute("href", "/music/bands/384");
+  await expect(panel.getByRole("link", { name: "Numeric Stage", exact: true })).toHaveAccessibleDescription("1 appearance");
+  await expect(panel.getByRole("link", { name: "Gamma Record", exact: true })).toHaveAttribute("href", "/music/bands/gamma-authored-id");
+  await expect(panel.getByRole("button", { name: "Artists beginning with J" })).toBeDisabled();
+  await search.fill("Beta");
+  await panel.getByRole("button", { name: "2 bands tied with 5 appearances", exact: true }).press("Enter");
+  await expect(search).toHaveValue("");
+  await expect(panel.locator("[data-venue-artist-highlighted]")).toHaveCount(2);
+  await expect(panel.getByRole("link", { name: "Beta Band", exact: true })).toBeFocused();
+  await expect.poll(() => alphabet.evaluate(node => {
+    const box = node.getBoundingClientRect();
+    const scroller = node.closest("[data-music-nexus-shell]").getBoundingClientRect();
+    const inset = parseFloat(getComputedStyle(node.closest("[data-music-nexus-shell]")).paddingTop);
+    return Math.abs(box.top - scroller.top - inset) < 2;
+  })).toBe(true);
+  await panel.getByRole("button", { name: "Artists beginning with A" }).press("Enter");
+  const alpha = panel.locator(".venue-artists-grid").getByRole("link", { name: "Alpha Ensemble", exact: true });
+  await expect(alpha).toBeFocused();
+  await expect(alpha).toHaveAttribute("href", "/music/bands/alpha-record-7");
+  const savedRail = await rail.evaluate(node => { node.scrollLeft = 184; return node.scrollLeft; });
+  expect(savedRail).toBeGreaterThan(0);
+  const savedScroll = await scroller.evaluate(node => node.scrollTop);
+  await alpha.press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music/bands/alpha-record-7");
+  await expect(page.locator("[data-band-detail-name]")).toHaveText("Alpha Ensemble");
+  await page.goBack();
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(alpha).toBeFocused();
+  await expect(panel.locator("[data-venue-artist-highlighted]")).toHaveCount(2);
+  await expect(panel.getByRole("button", { name: "Artists beginning with A" })).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => rail.evaluate(node => node.scrollLeft)).toBe(savedRail);
+  await expect.poll(() => scroller.evaluate(node => node.scrollTop)).toBe(savedScroll);
+  await page.goForward();
+  await expect(page).toHaveURL(baseURL + "/music/bands/alpha-record-7");
+  await page.locator("[data-prototype-engine-return]").press("Enter");
+  await expect(alpha).toBeFocused();
+  await expect(panel.locator("[data-venue-artist-highlighted]")).toHaveCount(2);
+});
+
+test("Harbor inline Artists preserves verified unavailable, loading and empty states through one local retry", async ({ page, baseURL }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let requests = 0;
+  let release;
+  const pending = new Promise(resolve => { release = resolve; });
+  await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", name: "Aura" }] }), () => ++requests === 1 ? { status: 503 } : pending);
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const toggle = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const panel = dossier.locator("[data-venue-artists-panel]");
+  await expect(toggle.getByRole("status")).toHaveText("Artist Index Unavailable");
+  await toggle.press("Enter");
+  await expect(panel.getByText("Featured Artists Unavailable", { exact: true })).toBeVisible();
+  await expect(panel.locator(".venue-artists-top-card")).toHaveCount(0);
+  await panel.getByRole("button", { name: "Retry Featured Artists" }).evaluate(button => { button.click(); button.click(); });
+  await expect(panel.getByText("Loading Featured Artists", { exact: true })).toBeVisible();
+  expect(requests).toBe(2);
+  release({ data: [] });
+  await expect(panel.getByText("No artists linked to this venue.", { exact: true })).toBeVisible();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(toggle.locator(".venue-relationship-media span")).toHaveText("0");
+  await expect(panel.locator("[data-venue-artist-alphabet], .venue-artists-top-card")).toHaveCount(0);
+  expect(requests).toBe(2);
 });
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {

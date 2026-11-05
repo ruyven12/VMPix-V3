@@ -5673,6 +5673,145 @@ a.venue-events-row::after {
   text-transform: none;
 }
 
+/* Clip the existing drawer reveal without creating a second vertical scroll container. */
+.venue-artists-panel,
+.venue-artists-panel .venue-artists-panel-inner {
+  overflow: clip;
+}
+
+.venue-artists-rank-control {
+  position: absolute;
+  inset: 0;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.venue-artists-top-card:has(.venue-artists-rank-control:is(:hover, :focus-visible, [aria-pressed="true"])) {
+  border-color: var(--venue-medal);
+}
+
+.venue-artists-rank-control:focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: 2px;
+}
+
+.venue-artists-alphabet {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  width: min(100%, 40rem);
+  min-width: 0;
+  padding-block: 0.2rem;
+  border-block: 1px solid rgba(153, 217, 238, 0.32);
+  background: rgba(5, 18, 31, 0.98);
+}
+
+.venue-artists-alphabet-rail {
+  display: flex;
+  gap: 0.18rem;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #5e8596 #091724;
+  touch-action: pan-x pan-y;
+}
+
+.venue-artists-alphabet-rail button {
+  flex: 0 0 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.2rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #c9eaf4;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.venue-artists-alphabet-rail button:disabled {
+  color: rgba(185, 215, 233, 0.32);
+  cursor: default;
+}
+
+.venue-artists-alphabet-rail button:is([aria-pressed="true"], :hover:not(:disabled)) {
+  border-color: #8ac8dd;
+  background: #13314a;
+}
+
+.venue-artists-alphabet-rail button:focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: -2px;
+}
+
+.venue-artists-grid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.venue-artists-grid section,
+.venue-artists-grid ul {
+  min-width: 0;
+}
+
+.venue-artists-letter-heading {
+  margin: 0 0 0.22rem;
+  padding-block-end: 0.25rem;
+  border-block-end: 1px solid rgba(153, 217, 238, 0.34);
+  color: #b9d7e9;
+  font-size: 0.87rem;
+  font-weight: 400;
+}
+
+.venue-artists-grid ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.venue-artists-grid .venue-artist-pill {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.46rem 0.55rem;
+  border: 0;
+  border-block-end: 1px solid rgba(153, 217, 238, 0.16);
+  border-radius: 0;
+  background: transparent;
+  color: #e7f6ff;
+  font-size: clamp(0.75rem, 2.65vw, 0.92rem);
+  text-align: start;
+}
+
+.venue-artists-grid .venue-artist-pill::after {
+  width: 0.36rem;
+  height: 0.36rem;
+  border-block-start: 1px solid #9be0f6;
+  border-inline-end: 1px solid #9be0f6;
+  transform: rotate(45deg);
+  content: "";
+}
+
+.venue-artist-appearances {
+  max-width: 7.5rem;
+  color: #aecedf;
+  font-size: 0.68rem;
+  text-align: end;
+}
+
+.venue-artists-grid .venue-artist-pill:is(:hover, :focus-visible, [data-venue-artist-highlighted]) {
+  background: #123047;
+}
+
 .venue-shows-year-group {
   min-width: 0;
   display: grid;
