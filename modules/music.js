@@ -6090,10 +6090,142 @@ function hasVerifiedMusicVenueShows() {
   return musicShowsSetsDataState === "live" || musicShowsSetsDataState === "empty";
 }
 
+function getMusicVenueEditorialText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function getMusicVenueMemoryDate(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith("0000")) return null;
+  const date = new Date(value + "T00:00:00Z");
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? date : null;
+}
+
+function createMusicVenueMemoryDisclosure(title) {
+  const disclosure = document.createElement("details");
+  disclosure.className = "venue-archive-disclosure venue-archive-memory";
+  const summary = document.createElement("summary");
+  const heading = document.createElement("span");
+  heading.className = "venue-archive-disclosure-title";
+  heading.textContent = title;
+  summary.append(heading);
+  const body = document.createElement("div");
+  body.className = "venue-archive-disclosure-body";
+  disclosure.append(summary, body);
+  return { disclosure, summary, body };
+}
+
+function renderMusicVenueEditorialPane(tab, entries, emptyText) {
+  const pane = getMusicVenueArchivePanel(tab);
+  pane.replaceChildren(...entries);
+  if (entries.length || !emptyText) return;
+  const empty = document.createElement("p");
+  empty.className = "venue-detail-body-copy venue-archive-editorial-empty";
+  empty.textContent = emptyText;
+  pane.append(empty);
+}
+
+// Venue rows may carry published about_chapters and explicitly approved community_memories arrays.
+function renderMusicVenueDossierEditorial(venue) {
+  const chapters = [];
+  for (const chapter of Array.isArray(venue?.about_chapters) ? venue.about_chapters : []) {
+    const heading = getMusicVenueEditorialText(chapter?.heading);
+    const paragraphs = Array.isArray(chapter?.paragraphs)
+      ? chapter.paragraphs.map(getMusicVenueEditorialText).filter(Boolean) : [];
+    if (!heading || !paragraphs.length) continue;
+    const section = document.createElement("section");
+    section.className = "venue-archive-chapter";
+    const title = document.createElement("h4");
+    title.className = "venue-archive-disclosure-title";
+    title.textContent = heading;
+    section.append(title);
+    for (const text of paragraphs) {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+      section.append(paragraph);
+    }
+    chapters.push(section);
+  }
+  renderMusicVenueEditorialPane("about", chapters, venue && "Venue history has not been archived yet.");
+
+  const memories = [];
+  const seen = new Set();
+  for (const record of Array.isArray(venue?.community_memories) ? venue.community_memories : []) {
+    if (record?.approved !== true) continue;
+    const id = getMusicVenueEditorialText(record.id);
+    const title = getMusicVenueEditorialText(record.title);
+    const contributor = getMusicVenueEditorialText(record.contributor_name);
+    const preview = getMusicVenueEditorialText(record.preview);
+    const memory = getMusicVenueEditorialText(record.memory);
+    if (!id || !title || !contributor || !preview || !memory || seen.has(id)) continue;
+    seen.add(id);
+    memories.push({
+      title, contributor, preview, memory, date: getMusicVenueMemoryDate(record.publication_date),
+      connection: getMusicVenueEditorialText(record.contributor_connection),
+      showId: readMusicVenueRelationshipId(record.show_id),
+    });
+  }
+  const dateFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
+  memories.sort((left, right) => (right.date?.getTime() ?? -Infinity) - (left.date?.getTime() ?? -Infinity));
+  const memoryNodes = memories.map(({ title, contributor, preview, memory, date, connection, showId }) => {
+    const { disclosure, summary, body } = createMusicVenueMemoryDisclosure(title);
+    const byline = document.createElement("span");
+    byline.className = "venue-archive-memory-meta";
+    const author = document.createElement("span");
+    author.textContent = contributor;
+    byline.append(author);
+    if (date) {
+      const time = document.createElement("time");
+      time.dateTime = date.toISOString().slice(0, 10);
+      time.textContent = dateFormat.format(date);
+      byline.append(time);
+    }
+    const excerpt = document.createElement("span");
+    excerpt.className = "venue-archive-memory-preview";
+    excerpt.textContent = preview;
+    summary.append(byline, excerpt);
+    const text = document.createElement("p");
+    text.textContent = memory;
+    body.append(text);
+    if (connection) {
+      const relationship = document.createElement("p");
+      relationship.className = "venue-archive-memory-meta";
+      relationship.textContent = "Connection: " + connection;
+      body.append(relationship);
+    }
+    if (showId) {
+      const show = document.createElement("p");
+      show.className = "venue-archive-memory-meta";
+      show.dataset.venueMemoryShow = showId;
+      show.hidden = true;
+      body.append(show);
+    }
+    return disclosure;
+  });
+  renderMusicVenueEditorialPane("community", memoryNodes, venue && "No community memories archived yet.");
+}
+
+function updateMusicVenueMemoryShows(shows) {
+  const associations = getMusicVenueArchivePanel("community").querySelectorAll("[data-venue-memory-show]");
+  if (!associations.length) return;
+  const titles = new Map();
+  for (const show of shows) {
+    const id = readMusicVenueRelationshipId(show.show_id, show.showId, show.id);
+    const title = readMusicVenueMetadataText(show.capturedName ?? show.name);
+    if (!id || !title) continue;
+    titles.set(id, titles.has(id) && titles.get(id) !== title ? "" : title);
+  }
+  for (const association of associations) {
+    const title = titles.get(association.dataset.venueMemoryShow);
+    association.hidden = !title;
+    association.textContent = title ? "Associated show: " + title : "";
+  }
+}
+
 function renderMusicVenueDossierRelationships(venue) {
   const shows = hasVerifiedMusicVenueShows() ? getMusicVenueShows(venue) : [];
   setMusicVenueDetailRelationshipValue("history", getMusicVenueArchiveHistory(shows));
   setupVenueArtistsRelationshipCard(venue, getMusicVenueArtists(venue, shows), shows.length > 0);
+  updateMusicVenueMemoryShows(shows);
 }
 
 function readMusicVenueMetadataText(...values) {
@@ -6187,6 +6319,7 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   setupVenueEventsRelationshipCard(venue);
   setupMusicVenueRegionCard(venue, coordinates, metadata);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
+  renderMusicVenueDossierEditorial(venue);
   if (!hasVenue) {
     setMusicVenueDetailRelationshipValue("history", "—");
     hideMusicVenuePhotoHighlightsSection();

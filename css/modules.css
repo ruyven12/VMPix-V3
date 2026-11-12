@@ -5193,24 +5193,36 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   outline-offset: -2px;
 }
 
-.venue-archive-content,
+.venue-detail-screen .venue-archive-content {
+  --venue-archive-ink: #edf7ff;
+  --venue-archive-muted: #b9d7e9;
+  --venue-archive-rule: rgba(153, 217, 238, 0.26);
+  --venue-archive-control: #50728a;
+  --venue-archive-raised: #102638;
+  --venue-archive-active: #17394f;
+  min-width: 0;
+  padding: clamp(0.52rem, 2vw, 0.8rem);
+  border-radius: var(--radius-sm);
+  background: #091624;
+  box-shadow: inset 0 0 0 1px var(--venue-archive-rule);
+  color: var(--venue-archive-ink);
+}
+
 .venue-archive-content [role="tabpanel"] {
   min-width: 0;
 }
 
 .venue-archive-content :is(#venue-pane-photos, #venue-pane-history):not([hidden]) {
   display: grid;
-  gap: 0.54rem;
-  padding: 0.78rem;
-  border: 1px solid rgba(153, 217, 238, 0.25);
-  border-radius: var(--radius-sm);
-  background: rgba(5, 17, 29, 0.84);
+  gap: 0.48rem;
 }
 
 .venue-archive-content [data-venue-archive-value] {
-  font-size: clamp(0.9rem, 3vw, 1.18rem);
-  color: #edf7ff;
+  color: var(--venue-archive-ink);
+  font-size: clamp(1rem, 3.5vw, 1.28rem);
+  line-height: 1.3;
 }
+
 .venue-events-screen {
   display: none;
   width: min(100%, 43rem);
@@ -6096,6 +6108,228 @@ a.venue-events-row::after {
   font-size: 0.8rem;
   line-height: 1.45;
   text-transform: none;
+}
+
+.venue-archive-content :is(.venue-artists-title, .venue-photo-highlights-title, .venue-detail-panel-title) {
+  color: var(--venue-archive-ink);
+  font-size: clamp(0.92rem, 3vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.venue-archive-content :is(.venue-artists-copy, .venue-detail-body-copy, .v3-state-text) {
+  color: var(--venue-archive-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.venue-archive-content :is(.venue-detail-panel, .venue-artists-top) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.venue-archive-content .venue-detail-panel::before { content: none; }
+
+.venue-archive-content :is(.venue-detail-panel-kicker, .venue-artists-top-title, .venue-artists-search-label) {
+  color: var(--venue-archive-muted);
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.venue-archive-content .venue-events-year {
+  border-color: var(--venue-archive-rule);
+  background: transparent;
+}
+
+.venue-archive-content .venue-events-year summary {
+  background: var(--venue-archive-raised);
+}
+
+.venue-archive-content .venue-events-row {
+  border-color: var(--venue-archive-rule);
+  color: var(--venue-archive-ink);
+  font-size: clamp(0.82rem, 2.7vw, 0.94rem);
+  line-height: 1.35;
+}
+
+.venue-archive-content .venue-artists-top-title::before,
+.venue-archive-content .venue-artists-top-title::after {
+  background: var(--venue-archive-rule);
+}
+
+.venue-archive-content .venue-artists-top-list {
+  --venue-archive-rank-gap: 0.54rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--venue-archive-rank-gap);
+}
+
+.venue-archive-content .venue-artists-top-card {
+  flex: 1 1 7.35rem;
+  max-width: min(100%, 10.75rem, max(7.35rem, (100% - var(--venue-archive-rank-gap)) / 2));
+  background: color-mix(in srgb, var(--venue-medal) 8%, var(--venue-archive-raised));
+  box-shadow: none;
+}
+
+.venue-archive-content .venue-artists-top-card::after { box-shadow: none; }
+
+.venue-archive-content :is(.venue-artist-rank, .venue-artist-count, .venue-photo-highlights-title) {
+  text-shadow: none;
+}
+
+.venue-archive-content .venue-artist-name {
+  color: var(--venue-archive-ink);
+  font-size: clamp(0.75rem, 2.4vw, 0.85rem);
+}
+
+.venue-archive-content .venue-artist-label {
+  color: var(--venue-archive-muted);
+  font-size: 0.66rem;
+  line-height: 1.2;
+}
+
+.venue-archive-content :is(.venue-artists-alphabet, .venue-artists-letter-heading, .venue-photo-highlights-header) {
+  border-color: var(--venue-archive-rule);
+}
+
+.venue-archive-content :is(.venue-events-more, .harmony-region-map-toolbar button, .venue-artists-search-input, .v3-state-action) {
+  border-color: var(--venue-archive-control);
+  background: var(--venue-archive-raised);
+  color: var(--venue-archive-ink);
+}
+
+.venue-archive-content :is(.venue-artists-search-input, .v3-state-action) {
+  min-height: 2.75rem;
+  font-size: 0.8rem;
+}
+
+.venue-archive-content .venue-artists-search-input::placeholder {
+  color: var(--venue-archive-muted);
+  opacity: 1;
+}
+
+.venue-archive-content .venue-artists-search-input:focus {
+  outline-color: #c8effc;
+}
+
+.venue-archive-content .v3-state-action:is(:hover, :focus-visible) {
+  background: var(--venue-archive-active);
+}
+
+.venue-archive-content .harmony-region-map-facts {
+  color: var(--venue-archive-ink);
+}
+
+.venue-archive-content :is(.venue-events-year-count, .venue-events-row > :first-child, .harmony-region-map-facts dt) {
+  color: var(--venue-archive-muted);
+  font-size: 0.75rem;
+}
+
+.venue-archive-content .v3-state-card {
+  border-color: var(--venue-archive-rule);
+  background: var(--venue-archive-raised);
+  box-shadow: none;
+}
+
+.venue-archive-content .v3-state-title { color: var(--venue-archive-ink); }
+
+.venue-archive-content :is(#venue-pane-about, #venue-pane-community):not([hidden]) {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.venue-archive-content .venue-archive-editorial-empty {
+  padding: 0.38rem 0.1rem;
+}
+
+.venue-archive-content .venue-archive-disclosure {
+  min-width: 0;
+  border: 1px solid var(--venue-archive-rule);
+  border-radius: var(--radius-sm);
+}
+
+.venue-archive-content .venue-archive-disclosure summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.35rem 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: var(--venue-archive-raised);
+  color: var(--venue-archive-ink);
+  cursor: pointer;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.venue-archive-content .venue-archive-disclosure summary::-webkit-details-marker { display: none; }
+
+.venue-archive-content .venue-archive-disclosure summary::after {
+  grid-area: 1 / 2;
+  width: 0.42rem;
+  height: 0.42rem;
+  border: solid var(--venue-archive-muted);
+  border-width: 1px 1px 0 0;
+  transform: rotate(45deg);
+  content: "";
+}
+
+.venue-archive-content .venue-archive-disclosure[open] summary::after { transform: rotate(135deg); }
+
+.venue-archive-content .venue-archive-disclosure summary:focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: -2px;
+}
+
+.venue-archive-content .venue-archive-disclosure summary:hover { background: var(--venue-archive-active); }
+
+.venue-archive-content .venue-archive-disclosure-title {
+  font-size: clamp(0.88rem, 3.2vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.venue-archive-content .venue-archive-chapter h4 { margin: 0; }
+
+.venue-archive-content .venue-archive-chapter:first-child { border-block-start: 0; }
+
+.venue-archive-content .venue-archive-memory-meta {
+  color: var(--venue-archive-muted);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.venue-archive-content summary .venue-archive-memory-meta {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+}
+
+.venue-archive-content .venue-archive-memory-preview {
+  grid-column: 1 / -1;
+  font-size: 0.82rem;
+  line-height: 1.42;
+}
+
+.venue-archive-content :is(.venue-archive-chapter, .venue-archive-disclosure-body) {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  border-block-start: 1px solid var(--venue-archive-rule);
+  color: var(--venue-archive-ink);
+  font-size: clamp(0.83rem, 2.65vw, 0.95rem);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.venue-archive-content :is(.venue-archive-chapter, .venue-archive-disclosure-body) p {
+  max-width: 70ch;
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 .venue-map-frame {

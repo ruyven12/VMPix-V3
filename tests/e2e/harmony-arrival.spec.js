@@ -1227,9 +1227,9 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   await tab("Archive History").press("Enter");
   await expect(archive.getByRole("tabpanel", { name: "Archive History" })).toContainText("Aug 1, 2024 \u2192 Feb 2, 2025");
   await tab("About").press("Enter");
-  await expect(archive.getByRole("heading", { name: "About The Venue" })).toBeVisible();
+  await expect(archive.getByText("Venue history has not been archived yet.", { exact: true })).toBeVisible();
   await tab("Community").press("Enter");
-  await expect(archive.getByRole("heading", { name: "Testimonials" })).toBeVisible();
+  await expect(archive.getByText("No community memories archived yet.", { exact: true })).toBeVisible();
   await tab("Artists").press("Enter");
   expect(await page.evaluate(() => history.length)).toBe(historyLength);
   const artistPanel = dossier.locator("[data-venue-artists-panel]");
@@ -1291,6 +1291,93 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   await expect(archive.locator('[data-venue-archive-value="history"]')).toHaveText("\u2014");
   await tab("Artists").press("Enter");
   await expect(artistPanel).toContainText("No verified artist records for these linked shows.");
+});
+
+test("Venue Dossier shows published chapters and independently expandable approved memories", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  let releaseShows;
+  const shows = new Promise(resolve => { releaseShows = resolve; });
+  let venueRequests = 0;
+  let showRequests = 0;
+  const memory = (id, title, publication_date, extra = {}) => ({
+    id, title, publication_date, approved: true, contributor_name: "Archive Contributor",
+    preview: "A recorded recollection.", memory: "A full recorded recollection.", ...extra,
+  });
+  const authoredMarkup = "<img src=x onerror=alert(1)>";
+  await mockArchive(page, baseURL, () => {
+    venueRequests++;
+    return { data: [
+      { venue_id: "aura", name: "Aura", about_chapters: [
+        { heading: "Opening Years", paragraphs: ["The archive records the early years.", authoredMarkup, null] },
+        { heading: "Later Years", paragraphs: ["A second chapter."] },
+        { heading: "Empty chapter", paragraphs: [" "] },
+        { heading: "", paragraphs: ["Missing heading text."] },
+      ], community_memories: [
+        memory("no-date", "Undated Record", undefined, { show_id: "other-venue" }),
+        memory("old", "Earlier Record", "1998-04-12", { show_id: "never-recorded" }),
+        memory("latest", "Latest Record", "2024-02-29", { memory: authoredMarkup, contributor_connection: "House photographer", show_id: "linked-show" }),
+        memory("invalid-date", "Invalid Date Record", "2024-02-30"),
+        memory("tie", "Same Day Record", "2024-02-29"),
+        memory("unapproved", "Unapproved Record", "2025-01-01", { approved: false }),
+        memory("truthy", "String Approval Record", "2025-01-02", { approved: "true" }),
+        memory("incomplete", "Incomplete Record", "2025-01-03", { preview: "" }),
+        memory("latest", "Duplicate Record", "2026-01-01"),
+      ] },
+      { venue_id: "plain-venue", name: "Plain Venue" },
+    ] };
+  }, () => { showRequests++; return shows; });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const archive = page.getByRole("region", { name: "Venue Archive" });
+  const aboutTab = archive.getByRole("tab", { name: "About", exact: true });
+  const communityTab = archive.getByRole("tab", { name: "Community", exact: true });
+  const about = archive.getByRole("tabpanel", { name: "About", exact: true });
+  const community = archive.getByRole("tabpanel", { name: "Community", exact: true });
+  const originalHistory = await page.evaluate(() => history.length);
+  await aboutTab.press("Enter");
+  await expect(about.getByRole("heading", { level: 4 })).toHaveText(["Opening Years", "Later Years"]);
+  await expect(about.locator("p")).toHaveText(["The archive records the early years.", authoredMarkup, "A second chapter."]);
+  await expect(about.locator("img, details")).toHaveCount(0);
+  await communityTab.press("Enter");
+  const cards = community.locator("details");
+  await expect(cards.locator(".venue-archive-disclosure-title")).toHaveText([
+    "Latest Record", "Same Day Record", "Earlier Record", "Undated Record", "Invalid Date Record",
+  ]);
+  await expect(community.locator("time")).toHaveText(["Feb 29, 2024", "Feb 29, 2024", "Apr 12, 1998"]);
+  await expect(cards.first().locator("time")).toHaveAttribute("datetime", "2024-02-29");
+  await expect(cards.first().locator("summary")).toContainText("Archive Contributor");
+  await expect(cards.first().locator("summary")).toContainText("A recorded recollection.");
+  await expect(cards.first().locator(".venue-archive-disclosure-body")).toBeHidden();
+  await cards.first().locator("summary").press("Space");
+  await cards.nth(1).locator("summary").press("Enter");
+  await expect(community.locator("details[open]")).toHaveCount(2);
+  await expect(cards.first().getByText(authoredMarkup, { exact: true })).toBeVisible();
+  await expect(cards.first().getByText("Connection: House photographer", { exact: true })).toBeVisible();
+  await expect(cards.first().locator("img")).toHaveCount(0);
+  const linkedShow = cards.first().locator("[data-venue-memory-show]");
+  await expect(linkedShow).toBeHidden();
+  releaseShows({ data: [
+    { show_id: "linked-show", venue_id: "aura", name: "Verified Aura Show" },
+    { show_id: "other-venue", venue_id: "plain-venue", name: "Different Venue Show" },
+  ] });
+  await expect(linkedShow).toHaveText("Associated show: Verified Aura Show");
+  await expect(community.getByText("Associated show: Different Venue Show", { exact: true })).toHaveCount(0);
+  await expect(community.locator("details[open]")).toHaveCount(2);
+  await aboutTab.press("Enter");
+  await communityTab.press("Enter");
+  await expect(community.locator("details[open]")).toHaveCount(2);
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  expect(await page.evaluate(() => history.length)).toBe(originalHistory);
+  expect(venueRequests).toBe(1);
+  expect(showRequests).toBe(1);
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/plain-venue");
+  await aboutTab.press("Enter");
+  await expect(about.getByText("Venue history has not been archived yet.", { exact: true })).toBeVisible();
+  await communityTab.press("Enter");
+  await expect(community.getByText("No community memories archived yet.", { exact: true })).toBeVisible();
+  await expect(community.locator("details")).toHaveCount(0);
 });
 
 test("Venue Dossier shows verified Sheet totals without deriving counts from linked or sampled photos", async ({ page, baseURL }) => {
