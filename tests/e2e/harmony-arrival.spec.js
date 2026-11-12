@@ -1075,6 +1075,7 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
     { venue_id: "aura", venue: "Aura", city: "Portland", state: "Maine", established_year: "1996", latitude: "0", gps_lng: 0, region: "New England" },
     { venue_id: "partial", venue: "Partial Venue", city: "Portland", state: "unknown", establishedyear: 1997, gpslat: "44.03", gpslon: "181", region: "N/A" },
     { venue_id: "recorded-location", venue: "Recorded Location", location_label: "Riverfront District" },
+    { venue_id: "region-only", venue: "Regional Record", region: "New England" },
     { venue_id: "unrecorded", venue: "Unrecorded Details", city: "—", state: "Pending", created_at: "2001-01-01", latitude: "", longitude: 0, region: { name: "New England" } },
   ] } }), () => ({ data: linkedShows }));
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
@@ -1083,7 +1084,9 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   const dossier = page.locator("[data-venue-detail]");
   const identity = dossier.locator("[data-venue-detail-identity]");
   const title = identity.getByRole("heading", { name: "Aura", exact: true });
-  const metadata = dossier.getByRole("region", { name: "Venue metadata" });
+  const metadata = dossier.getByRole("region", { name: "Stats", exact: true });
+  const archiveTabs = dossier.getByRole("tablist", { name: "Venue Archive" });
+  const archiveContent = dossier.locator("[data-venue-archive-content]");
   const field = name => metadata.locator('[data-venue-detail-field="' + name + '"]');
   const missing = metadata.locator("[data-venue-detail-missing]");
   const environment = page.locator("[data-harmony-environment]");
@@ -1091,6 +1094,9 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   const engine = page.locator("[data-portfolio-engine]");
   const shell = page.locator(".site-shell");
   await expect(title).toBeVisible();
+  const statsTitle = metadata.getByRole("heading", { name: "Stats", level: 4, exact: true });
+  await expect(statsTitle).toBeVisible();
+  await expect(statsTitle).toHaveCSS("border-bottom-width", "1px");
   await expect(field("location").locator("dd")).toHaveText("Portland, ME");
   await expect(field("established").locator("dd")).toHaveText("1996");
   await expect(field("gps").locator("dd")).toHaveText("0, 0");
@@ -1105,6 +1111,19 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   const headingBox = await title.boundingBox();
   const metadataBox = await metadata.boundingBox();
   const engineBox = await engine.boundingBox();
+  const tabsBox = await archiveTabs.boundingBox();
+  const contentBox = await archiveContent.boundingBox();
+  const leftFields = await Promise.all(["location", "gps"].map(name => field(name).boundingBox()));
+  const rightFields = await Promise.all(["established", "region"].map(name => field(name).boundingBox()));
+  expect(metadataBox.x).toBeCloseTo(contentBox.x, 0);
+  expect(metadataBox.width).toBeCloseTo(contentBox.width, 0);
+  expect(tabsBox.y).toBeGreaterThanOrEqual(metadataBox.y + metadataBox.height);
+  expect(leftFields[0].x).toBeCloseTo(leftFields[1].x, 0);
+  expect(rightFields[0].x).toBeCloseTo(rightFields[1].x, 0);
+  expect(rightFields[0].x).toBeGreaterThan(leftFields[0].x);
+  expect(rightFields[0].y).toBeCloseTo(leftFields[0].y, 0);
+  expect(rightFields[1].y).toBeCloseTo(leftFields[1].y, 0);
+  expect(leftFields[1].y).toBeGreaterThan(leftFields[0].y);
   expect(background).toEqual(shellBox);
   expect(Math.abs((headingBox.x + headingBox.width / 2) - (shellBox.x + shellBox.width / 2))).toBeLessThanOrEqual(8);
   const gap = metadataBox.y - headingBox.y - headingBox.height;
@@ -1129,6 +1148,17 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   await expect(identity.getByRole("heading", { name: "Recorded Location", exact: true })).toBeVisible();
   await expect(field("location").locator("dd")).toHaveText("Riverfront District");
   await expect(missing).toHaveText("Unavailable Data: Established, GPS, Region");
+
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/region-only");
+  await expect(identity.getByRole("heading", { name: "Regional Record", exact: true })).toBeVisible();
+  await expect(field("region").locator("dd")).toHaveText("New England");
+  await expect(missing).toHaveText("Unavailable Data: City, State, Established, GPS");
+  const regionOnly = await field("region").boundingBox();
+  const fieldsBox = await metadata.locator("[data-venue-detail-fields]").boundingBox();
+  const noticeBox = await missing.boundingBox();
+  expect(regionOnly.x).toBeCloseTo(rightFields[1].x, 0);
+  expect(regionOnly.y).toBeCloseTo(fieldsBox.y, 0);
+  expect(noticeBox.y).toBeGreaterThanOrEqual(regionOnly.y + regionOnly.height);
 
   await page.evaluate(path => navigateToRoute(path), harborPath + "/unrecorded");
   await expect(identity.getByRole("heading", { name: "Unrecorded Details", exact: true })).toBeVisible();

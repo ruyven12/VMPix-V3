@@ -4044,24 +4044,47 @@ html.is-lightbox-scroll-locked body {
 
 .venue-detail-metadata:not([hidden]) {
   display: grid;
-  gap: 0.45rem;
-  width: min(100%, 32rem);
-  justify-self: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, rgba(8, 20, 36, 0.84), rgba(8, 20, 36, 0.62));
+}
+
+.venue-detail-metadata-title {
+  margin: 0;
+  padding-block-end: 0.36rem;
+  border-block-end: 1px solid rgba(147, 207, 230, 0.44);
+  color: #ebf6ff;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
 }
 
 .venue-detail-meta-row:not([hidden]) {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.45rem;
+  grid-template-areas: "location established" "gps region";
+  column-gap: clamp(0.55rem, 2vw, 1rem);
 }
+
+.venue-detail-meta-item[data-venue-detail-field="location"] { grid-area: location; }
+.venue-detail-meta-item[data-venue-detail-field="established"] { grid-area: established; }
+.venue-detail-meta-item[data-venue-detail-field="gps"] { grid-area: gps; }
+.venue-detail-meta-item[data-venue-detail-field="region"] { grid-area: region; }
 
 .venue-detail-meta-item:not([hidden]) {
   display: grid;
   align-content: start;
   gap: 0.24rem;
-  padding: 0.52rem 0.35rem;
-  border-block-start: 1px solid rgba(147, 207, 230, 0.44);
+  padding: 0.36rem 0.25rem;
   text-shadow: 0 1px 3px #081321, 0 1px 8px #081321;
+}
+
+.venue-detail-meta-row:has(> :is([data-venue-detail-field="location"], [data-venue-detail-field="established"]):not([hidden]))
+  > :is([data-venue-detail-field="gps"], [data-venue-detail-field="region"]) {
+  border-block-start: 1px solid rgba(147, 207, 230, 0.3);
 }
 
 .venue-detail-meta-item dt {
