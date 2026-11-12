@@ -5419,6 +5419,141 @@ a.venue-events-row::after {
   margin-block-start: calc(-0.45rem - 2px);
 }
 
+.venue-region-inline:not(.is-expanded) {
+  margin-block-start: calc(-0.45rem - 2px);
+}
+
+.harmony-region-map-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  margin: 0;
+  color: #e7f6ff;
+}
+
+.harmony-region-map-facts div { min-width: 0; }
+
+.harmony-region-map-facts dt {
+  color: #b9d7e9;
+  font-size: 0.68rem;
+}
+
+.harmony-region-map-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.82rem;
+}
+
+.harmony-region-map-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.harmony-region-map-toolbar button:not([hidden]) {
+  min-height: 2.75rem;
+  padding-inline: 0.68rem;
+  border: 1px solid rgba(151, 222, 245, 0.44);
+  border-radius: var(--radius-sm);
+  background: #0c2034;
+  color: #e7f6ff;
+  font: inherit;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.harmony-region-map-toolbar button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.harmony-region-map-toolbar button:is(:hover:not(:disabled), [aria-pressed="true"]) {
+  background: #193c55;
+}
+
+.harmony-region-map-stage {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-width: 0;
+  min-height: clamp(15rem, 43svh, 25rem);
+  overflow: hidden;
+  border: 1px solid rgba(151, 222, 245, 0.35);
+  border-radius: var(--radius-sm);
+  background: #071525;
+}
+
+.venue-region-inline[data-venue-region-state="unavailable"] .harmony-region-map-stage {
+  min-height: 0;
+}
+
+.venue-region-inline[data-venue-region-state="unavailable"] .harmony-region-map-toolbar {
+  display: none;
+}
+
+.harmony-region-map-stage [data-venue-region-map] {
+  position: absolute;
+  inset: 0;
+  min-width: 0;
+  background: #071525;
+  touch-action: pan-y;
+}
+
+.harmony-region-map-stage [data-venue-region-map][aria-hidden="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.harmony-region-map-stage [data-venue-region-map].harmony-region-map--touch-active {
+  touch-action: none;
+}
+
+.harmony-region-map-stage [data-venue-region-status]:not(:empty) {
+  position: relative;
+  display: grid;
+  align-content: center;
+  padding: 0.7rem;
+}
+
+.harmony-region-map-marker {
+  border: 2px solid #b6eefe;
+  border-radius: 50%;
+  background: #123552;
+  box-shadow: 0 0 0 4px rgba(91, 207, 245, 0.28), 0 0 14px rgba(131, 222, 253, 0.74);
+}
+
+.harmony-region-map-marker::after {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: #b6eefe;
+  content: "";
+}
+
+.harmony-region-map-stage .leaflet-control-zoom a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  border-color: #376077;
+  background: #0c2034;
+  color: #e7f6ff;
+}
+
+.harmony-region-map-stage .leaflet-control-attribution {
+  max-width: min(92vw, 35rem);
+  white-space: normal;
+  background: rgba(7, 21, 37, 0.94);
+  color: #d0e5ee;
+}
+
+.harmony-region-map-stage .leaflet-control-attribution a { color: #a9e7fc; }
+
+.harmony-region-map-toolbar button:focus-visible,
+.harmony-region-map-stage :is([data-venue-region-map], .leaflet-control-zoom a):focus-visible {
+  outline: 2px solid #c8effc;
+  outline-offset: -2px;
+}
+
 .venue-artists-grid > [role="listitem"] {
   display: grid;
   min-width: 0;

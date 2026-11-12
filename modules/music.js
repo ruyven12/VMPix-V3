@@ -5853,6 +5853,341 @@ function createMusicVenueEventsView(screen, venueSlug, ui, ownsView, inline = fa
   return view;
 }
 
+const MUSIC_VENUE_MAP_TILE_ROOT = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const MUSIC_VENUE_MAP_ATTRIBUTION = "Powered by Esri &middot; &copy; Esri &middot; Maxar &middot; Earthstar Geographics &middot; HERE &middot; Garmin &middot; OpenStreetMap contributors &middot; GIS User Community";
+const MUSIC_VENUE_MAP_HOME_ZOOM = 15;
+const MUSIC_VENUE_MAP_LATITUDE_LIMIT = 85.05112878;
+let musicVenueRegionView = null;
+let musicVenueMapLibraryRequest = null;
+
+function retryMusicVenueMapLibrary() {
+  if (window.L?.map) return Promise.resolve(true);
+  if (musicVenueMapLibraryRequest) return musicVenueMapLibraryRequest;
+  const existing = document.querySelector('script[src*="/leaflet@"][src$="/leaflet.js"]');
+  if (!existing) return Promise.resolve(false);
+  musicVenueMapLibraryRequest = new Promise(resolve => {
+    const script = document.createElement("script");
+    script.src = existing.src;
+    script.integrity = existing.integrity;
+    script.crossOrigin = existing.crossOrigin;
+    script.async = true;
+    const settle = () => {
+      clearTimeout(timeout);
+      script.remove();
+      resolve(Boolean(window.L?.map));
+    };
+    const timeout = setTimeout(settle, 8000);
+    script.addEventListener("load", settle, { once: true });
+    script.addEventListener("error", settle, { once: true });
+    document.head.append(script);
+  }).finally(() => { musicVenueMapLibraryRequest = null; });
+  return musicVenueMapLibraryRequest;
+}
+
+function ownsMusicVenueRegion(view) {
+  return musicVenueRegionView === view && view.context === v3RouteContext && view.open
+    && venueDetail.getAttribute("aria-hidden") === "false";
+}
+
+function restoreMusicVenueRegionFocus(view) {
+  if (!view || view.focusPending || document.activeElement !== document.body) return;
+  const { card, context } = view;
+  const controller = new AbortController();
+  const deadline = performance.now() + 1000;
+  let frame = 0;
+  const cancel = () => {
+    controller.abort();
+    cancelAnimationFrame(frame);
+    view.focusPending = false;
+  };
+  const focusWhenVisible = () => {
+    if (musicVenueRegionView !== view || v3RouteContext !== context || !card.isConnected
+        || getRouteFromUrl().name !== "music-venue-detail" || document.activeElement !== document.body
+        || performance.now() >= deadline) {
+      cancel();
+      return;
+    }
+    if (!card.closest("[hidden], [inert]") && getComputedStyle(card).visibility === "visible" && card.getClientRects().length) {
+      cancel();
+      card.focus({ preventScroll: true });
+      return;
+    }
+    frame = requestAnimationFrame(focusWhenVisible);
+  };
+  view.focusPending = true;
+  for (const type of ["pointerdown", "touchstart", "wheel", "keydown", "focusin"]) {
+    document.addEventListener(type, event => { if (event.isTrusted) cancel(); },
+      { capture: true, passive: true, signal: controller.signal });
+  }
+  focusWhenVisible();
+}
+
+function getMusicVenueRegionCamera(view) {
+  if (!view.map || !view.mapReady) return view.camera;
+  const center = view.map.wrapLatLng(view.map.getCenter());
+  return { center: [center.lat, center.lng], zoom: view.map.getZoom() };
+}
+
+function releaseMusicVenueRegionMap(view) {
+  cancelAnimationFrame(view.frame);
+  clearTimeout(view.timeout);
+  view.frame = view.timeout = 0;
+  view.resize?.disconnect();
+  view.resize = null;
+  view.camera = getMusicVenueRegionCamera(view);
+  const map = view.map;
+  view.map = null;
+  view.mapReady = false;
+  view.touchActive = false;
+  map?.remove();
+  view.mapHost?.classList.remove("harmony-region-map--touch-active");
+}
+
+function setMusicVenueRegionTouch(view, active) {
+  if (!view.mapReady || !view.touchCapable) return;
+  view.touchActive = active;
+  if (active) {
+    view.map.dragging.enable();
+    view.map.touchZoom.enable();
+    view.map.doubleClickZoom.enable();
+  } else {
+    view.map.dragging.disable();
+    view.map.touchZoom.disable();
+    view.map.doubleClickZoom.disable();
+  }
+  view.mapHost.classList.toggle("harmony-region-map--touch-active", active);
+  view.gestures.setAttribute("aria-pressed", String(active));
+  view.gestures.textContent = active ? "Resume page scrolling" : "Enable map gestures";
+}
+
+function renderMusicVenueRegionState(view, state, title = "", message = "", retry = false) {
+  view.panel.dataset.venueRegionState = state;
+  view.status.replaceChildren();
+  if (state !== "ready") {
+    view.status.append(createMusicV3StateCard(state === "unavailable" ? "empty" : state, "musicVenueRegion", {
+      title, text: message, small: true,
+      retry: retry ? { label: "Retry venue map", onClick: () => {
+        view.card.focus({ preventScroll: true });
+        mountMusicVenueRegionMap(view, true);
+      } } : false,
+    }));
+  }
+  const ready = state === "ready";
+  view.mapHost.inert = !ready;
+  view.mapHost.setAttribute("aria-hidden", String(!ready));
+  view.recenter.disabled = !ready;
+  view.gestures.disabled = !ready;
+  view.gestures.setAttribute("aria-pressed", "false");
+  view.gestures.textContent = "Enable map gestures";
+}
+
+function mountMusicVenueRegionMap(view, retry = false) {
+  if (!ownsMusicVenueRegion(view) || view.map || view.frame || view.libraryPending) return;
+  if (!view.coordinates || Math.abs(view.coordinates[0]) > MUSIC_VENUE_MAP_LATITUDE_LIMIT) {
+    renderMusicVenueRegionState(view, "unavailable", "Venue map unavailable", view.coordinates
+      ? "The recorded GPS coordinates are outside this map’s coverage."
+      : "No verified GPS coordinates are available for this venue.");
+    return;
+  }
+  renderMusicVenueRegionState(view, "loading", "Loading venue map", "Receiving geographic map tiles.");
+  if (retry && !window.L?.map) {
+    view.libraryPending = true;
+    retryMusicVenueMapLibrary().then(loaded => {
+      view.libraryPending = false;
+      if (!ownsMusicVenueRegion(view)) return;
+      if (loaded) mountMusicVenueRegionMap(view);
+      else renderMusicVenueRegionState(view, "error", "Venue map unavailable", "The map library could not load.", true);
+    });
+    return;
+  }
+  view.frame = requestAnimationFrame(() => {
+    view.frame = 0;
+    if (!ownsMusicVenueRegion(view)) return;
+    const leaflet = window.L;
+    if (!leaflet?.map || !view.mapHost.clientWidth || !view.mapHost.clientHeight) {
+      renderMusicVenueRegionState(view, "error", "Venue map unavailable", "The map could not start.", true);
+      return;
+    }
+    let map;
+    const fail = () => {
+      if (!ownsMusicVenueRegion(view) || view.map !== map) return;
+      releaseMusicVenueRegionMap(view);
+      renderMusicVenueRegionState(view, "error", "Venue map unavailable", "Geographic imagery could not load.", true);
+    };
+    try {
+      const camera = view.camera || { center: view.coordinates, zoom: MUSIC_VENUE_MAP_HOME_ZOOM };
+      map = leaflet.map(view.mapHost, {
+        center: camera.center, zoom: camera.zoom, minZoom: 3, maxZoom: 19, scrollWheelZoom: false,
+        dragging: !view.touchCapable, touchZoom: false, doubleClickZoom: !view.touchCapable, tapHold: false, keyboard: true,
+        inertia: !reducedMotion.matches,
+        zoomAnimation: !reducedMotion.matches, fadeAnimation: !reducedMotion.matches, markerZoomAnimation: !reducedMotion.matches,
+      });
+      view.map = map;
+      map.attributionControl?.setPrefix?.(false);
+      const labels = map.createPane("harmony-venue-labels");
+      labels.style.zIndex = "450";
+      labels.style.pointerEvents = "none";
+      const imagery = leaflet.tileLayer(MUSIC_VENUE_MAP_TILE_ROOT + "World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 19, attribution: MUSIC_VENUE_MAP_ATTRIBUTION,
+      });
+      imagery.on("tileload", () => {
+        if (!ownsMusicVenueRegion(view) || view.map !== map || view.mapReady) return;
+        clearTimeout(view.timeout);
+        view.mapReady = true;
+        renderMusicVenueRegionState(view, "ready");
+      });
+      imagery.on("load", () => { if (!view.mapReady) queueMicrotask(fail); });
+      view.timeout = setTimeout(fail, 8000);
+      imagery.addTo(map);
+      for (const layer of ["World_Transportation", "World_Boundaries_and_Places"]) {
+        leaflet.tileLayer(MUSIC_VENUE_MAP_TILE_ROOT + "Reference/" + layer + "/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 19, pane: "harmony-venue-labels",
+        }).addTo(map);
+      }
+      leaflet.marker(view.coordinates, {
+        icon: leaflet.divIcon({ className: "harmony-region-map-marker", iconSize: [24, 24], iconAnchor: [12, 12] }),
+        title: view.name, interactive: false, keyboard: false,
+      }).addTo(map);
+      if (typeof ResizeObserver === "function") {
+        view.resize = new ResizeObserver(() => {
+          if (ownsMusicVenueRegion(view) && view.map === map) map.invalidateSize({ animate: false, pan: false });
+        });
+        view.resize.observe(view.mapHost);
+      }
+    } catch {
+      if (!ownsMusicVenueRegion(view)) return;
+      releaseMusicVenueRegionMap(view);
+      renderMusicVenueRegionState(view, "error", "Venue map unavailable", "The map could not start.", true);
+    }
+  });
+}
+
+function prepareMusicVenueRegionPanel(view) {
+  const panel = document.createElement("div");
+  panel.className = "venue-shows-panel venue-region-inline";
+  panel.id = "venue-relationship-region-panel";
+  panel.setAttribute("aria-hidden", "true");
+  panel.inert = true;
+  panel.dataset.venueRegionPanel = "";
+  panel.innerHTML = '<div class="venue-shows-panel-inner"><div class="harmony-region-map-toolbar">' +
+    '<button type="button" data-venue-map-recenter disabled>Recenter map</button>' +
+    '<button type="button" data-venue-map-gestures aria-pressed="false" disabled>Enable map gestures</button></div>' +
+    '<div class="harmony-region-map-stage"><div data-venue-region-map tabindex="0" role="region" aria-hidden="true" inert></div>' +
+    '<div data-venue-region-status aria-live="polite"></div></div></div>';
+  view.card.closest("[data-venue-relationships]").append(panel);
+  view.panel = panel;
+  const facts = document.createElement("dl");
+  facts.className = "harmony-region-map-facts";
+  facts.dataset.venueRegionFacts = "";
+  for (const [label, value] of [
+    ["Location", view.metadata.location], ["Region", view.metadata.region],
+    ["Latitude", view.coordinates?.[0]], ["Longitude", view.coordinates?.[1]],
+  ]) {
+    if (value === undefined || value === "") continue;
+    const field = document.createElement("div");
+    const term = document.createElement("dt");
+    const detail = document.createElement("dd");
+    term.textContent = label;
+    detail.textContent = String(value);
+    field.append(term, detail);
+    facts.append(field);
+  }
+  if (facts.childElementCount) panel.firstElementChild.prepend(facts);
+  view.mapHost = panel.querySelector("[data-venue-region-map]");
+  view.mapHost.setAttribute("aria-label", "Venue map for " + view.name);
+  view.status = panel.querySelector("[data-venue-region-status]");
+  view.recenter = panel.querySelector("[data-venue-map-recenter]");
+  view.gestures = panel.querySelector("[data-venue-map-gestures]");
+  view.gestures.hidden = !view.touchCapable;
+  view.recenter.addEventListener("click", () => view.map?.setView(view.coordinates, MUSIC_VENUE_MAP_HOME_ZOOM, { animate: false }));
+  view.gestures.addEventListener("click", () => setMusicVenueRegionTouch(view, !view.touchActive));
+  panel.addEventListener("keydown", event => {
+    if (event.key !== "Escape" || !view.touchActive) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setMusicVenueRegionTouch(view, false);
+    view.gestures.focus({ preventScroll: true });
+  });
+}
+
+function setMusicVenueRegionOpen(view, open) {
+  if (!view || view.context !== v3RouteContext || view.open === open) return;
+  view.open = open;
+  view.card.classList.toggle("is-expanded", open);
+  view.card.setAttribute("aria-expanded", String(open));
+  if (!open) {
+    view.owner?.disconnect();
+    view.owner = null;
+    releaseMusicVenueRegionMap(view);
+    view.panel.classList.remove("is-expanded");
+    view.panel.setAttribute("aria-hidden", "true");
+    view.panel.inert = true;
+    return;
+  }
+  view.panel.style.transition = v3RouteContext.pending ? "none" : "";
+  view.panel.classList.add("is-expanded");
+  view.panel.setAttribute("aria-hidden", "false");
+  view.panel.inert = false;
+  view.owner = new MutationObserver(() => {
+    if (view.context !== v3RouteContext) {
+      view.owner?.disconnect();
+      view.owner = null;
+      releaseMusicVenueRegionMap(view);
+    } else if (venueDetail.getAttribute("aria-hidden") === "true" && (view.map || view.frame)) {
+      view.suspended = true;
+      releaseMusicVenueRegionMap(view);
+    } else if (view.suspended && ownsMusicVenueRegion(view)) {
+      view.suspended = false;
+      mountMusicVenueRegionMap(view);
+    }
+  });
+  view.owner.observe(shell, { attributes: true, attributeFilter: ["class", "data-shell-route"] });
+  view.owner.observe(venueDetail, { attributes: true, attributeFilter: ["aria-hidden"] });
+  mountMusicVenueRegionMap(view);
+}
+
+function setupMusicVenueRegionCard(venue, coordinates, metadata) {
+  const card = venueDetail.querySelector('[data-venue-relationship="region"]');
+  const previous = musicVenueRegionView;
+  if (venue && previous?.context === v3RouteContext && String(previous.coordinates) === String(coordinates)) return;
+  if (previous) {
+    previous.owner?.disconnect();
+    releaseMusicVenueRegionMap(previous);
+    previous.panel?.remove();
+    musicVenueRegionView = null;
+  }
+  card.classList.toggle("venue-relationship-card--expandable", Boolean(venue));
+  card.classList.remove("is-expanded");
+  if (!venue) {
+    for (const attribute of ["tabindex", "role", "aria-expanded", "aria-controls"]) card.removeAttribute(attribute);
+    card.onclick = card.onkeydown = null;
+    return;
+  }
+  const saved = v3ResumeUI().regionMap;
+  const center = saved?.center;
+  const camera = coordinates && Array.isArray(saved?.home) && saved.home.length === 2
+    && saved.home.every((value, index) => value === coordinates[index])
+    && Array.isArray(center) && center.length === 2 && center.every(Number.isFinite)
+    && Math.abs(center[0]) <= MUSIC_VENUE_MAP_LATITUDE_LIMIT && Math.abs(center[1]) <= 180
+    && Number.isFinite(saved.zoom) && saved.zoom >= 3 && saved.zoom <= 19 ? { center, zoom: saved.zoom } : null;
+  const view = {
+    context: v3RouteContext, card, coordinates, metadata, camera, name: getMusicVenueName(venue), open: false,
+    touchCapable: navigator.maxTouchPoints > 0 || window.matchMedia("(any-pointer: coarse)").matches,
+  };
+  musicVenueRegionView = view;
+  prepareMusicVenueRegionPanel(view);
+  card.tabIndex = 0;
+  card.setAttribute("role", "button");
+  card.setAttribute("aria-expanded", "false");
+  card.setAttribute("aria-controls", "venue-relationship-region-panel");
+  card.onclick = () => setMusicVenueRegionOpen(view, !view.open);
+  card.onkeydown = event => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    setMusicVenueRegionOpen(view, !view.open);
+  };
+}
+
 function getMusicVenueDetailUnavailableStateName() {
   if (!musicVenuesLoaded && (musicVenuesRequest || (typeof fetch === "function" && musicVenuesDataState !== "error"))) {
     return "loading";
@@ -5962,7 +6297,15 @@ function readMusicVenueCoordinate(limit, ...values) {
   return null;
 }
 
-function renderMusicVenueDossierMetadata(venue) {
+function getMusicVenueDossierCoordinates(venue) {
+  if (!venue) return null;
+  const latitude = readMusicVenueCoordinate(90, venue.latitude, venue.lat, venue.gps_lat, venue.gpslat);
+  const longitude = readMusicVenueCoordinate(180, venue.longitude, venue.lng, venue.lon,
+    venue.gps_lng, venue.gpslng, venue.gps_lon, venue.gpslon);
+  return latitude !== null && longitude !== null ? [latitude, longitude] : null;
+}
+
+function renderMusicVenueDossierMetadata(venue, coordinates) {
   const identity = venueDetail.querySelector("[data-venue-detail-identity]");
   const metadata = venueDetail.querySelector("[data-venue-detail-metadata]");
   identity.hidden = !venue;
@@ -5977,10 +6320,7 @@ function renderMusicVenueDossierMetadata(venue) {
     ...[venue.established, venue.established_year, venue.establishedyear, venue.establishedYear]
       .map(value => Number.isSafeInteger(value) && value > 0 ? String(value) : value)
   );
-  const latitude = readMusicVenueCoordinate(90, venue.latitude, venue.lat, venue.gps_lat, venue.gpslat);
-  const longitude = readMusicVenueCoordinate(180, venue.longitude, venue.lng, venue.lon,
-    venue.gps_lng, venue.gpslng, venue.gps_lon, venue.gpslon);
-  const gps = latitude !== null && longitude !== null ? `${latitude}, ${longitude}` : "";
+  const gps = coordinates ? coordinates.join(", ") : "";
   const region = readMusicVenueMetadataText(venue.region, venue.venue_details?.region, venue.venueDetails?.region);
   setMusicVenueDetailRelationshipValue("region", region || "—");
   const compositeLocation = !city && !state
@@ -6002,6 +6342,7 @@ function renderMusicVenueDossierMetadata(venue) {
   const notice = metadata.querySelector("[data-venue-detail-missing]");
   notice.hidden = !missing.length;
   notice.textContent = missing.length ? "Unavailable Data: " + missing.join(", ") : "";
+  return fields;
 }
 
 function renderMusicVenueDetail(venue, requestedSlug = "") {
@@ -6023,8 +6364,10 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   if (venueDetailTitle) {
     venueDetailTitle.textContent = name;
   }
-  renderMusicVenueDossierMetadata(venue);
+  const coordinates = getMusicVenueDossierCoordinates(venue);
+  const metadata = renderMusicVenueDossierMetadata(venue, coordinates);
   setupVenueEventsRelationshipCard(venue);
+  setupMusicVenueRegionCard(venue, coordinates, metadata);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   if (!hasVenue) {
     setMusicVenueDetailRelationshipCount("shows", null);
@@ -18706,6 +19049,9 @@ function captureMusicResumeState(route) {
     panel: venueDetail.querySelector('[data-venue-relationship][aria-expanded="true"]')?.dataset.venueRelationship || '',
     panels: [...venueDetail.querySelectorAll('[data-venue-relationship][aria-expanded="true"]')].map(card => card.dataset.venueRelationship),
     events: captureMusicVenueEventsState(musicVenueDossierEventsView),
+    regionFocus: document.activeElement === musicVenueRegionView?.card || musicVenueRegionView?.panel?.contains(document.activeElement),
+    regionMap: musicVenueRegionView?.context === v3RouteContext && musicVenueRegionView.coordinates
+      ? { ...getMusicVenueRegionCamera(musicVenueRegionView), home: musicVenueRegionView.coordinates } : null,
     artistLink: document.activeElement?.closest("[data-venue-artists-panel] a")?.getAttribute("href") || '',
     artists: { ...venueDetail.querySelector('[data-venue-relationship="bands"]')?._venueArtistState },
     artistQuery:venueDetail?.querySelector('[data-venue-relationship="bands"]')?._venueArtistSearch || ''};
@@ -18773,6 +19119,7 @@ function restoreMusicResumeState(route,ui) {
     if (musicVenuesRequest || musicVenuesDataState === "loading") return false;
     if (venueDetail.classList.contains("is-missing")) return true;
     const panels = Array.isArray(ui.panels) ? ui.panels : [ui.panel];
+    if (panels.includes("region")) setMusicVenueRegionOpen(musicVenueRegionView, true);
     if (panels.includes("shows")) {
       const view = musicVenueDossierEventsView;
       if (view?.context !== v3RouteContext) return false;
@@ -18792,6 +19139,7 @@ function restoreMusicResumeState(route,ui) {
       }
     }
     if (ui.eventsLink) venueDetail.querySelector('[data-venue-relationship="shows"]')?.focus({ preventScroll: true });
+    if (ui.regionFocus) restoreMusicVenueRegionFocus(musicVenueRegionView);
     return true;
   }
   if(['person-detail','show-detail','sets-archive'].includes(route.name)){

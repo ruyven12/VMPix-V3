@@ -1174,7 +1174,8 @@ test("Venue Dossier keeps the compact archive truthful and opens stable filmstri
     const box = element => element.getBoundingClientRect();
     return box(events).top === box(artists).top && box(photos).top === box(region).top
       && box(history).left === box(events).left && box(history).right === box(artists).right
-      && [photos, region, history].every(tile => getComputedStyle(tile, "::after").content === "none");
+      && [photos, history].every(tile => getComputedStyle(tile, "::after").content === "none")
+      && getComputedStyle(region, "::after").content !== "none";
   })).toBe(true);
   await card("bands").press("Enter");
   const artistPanel = dossier.locator("[data-venue-artists-panel]");
@@ -1867,6 +1868,183 @@ test("Harbor inline Artists preserves verified unavailable, loading and empty st
   await expect(toggle.locator(".venue-relationship-media span")).toHaveText("0");
   await expect(panel.locator("[data-venue-artist-alphabet], .venue-artists-top-card")).toHaveCount(0);
   expect(requests).toBe(2);
+});
+
+async function mockVenueRegionMap(page) {
+  await page.addInitScript(() => {
+    const harness = { maps: [], markers: [], urls: [], tileResult: "ready" };
+    window.venueRegionMapHarness = harness;
+    const toggle = enabled => ({ enabled, enable() { this.enabled = true; }, disable() { this.enabled = false; } });
+    window.L = {
+      map(host, options) {
+        const map = {
+          host, options, camera: { center: options.center, zoom: options.zoom }, removed: false,
+          dragging: toggle(options.dragging), touchZoom: toggle(options.touchZoom), doubleClickZoom: toggle(options.doubleClickZoom),
+          attributionControl: { setPrefix() {} }, createPane: () => document.createElement("div"),
+          getCenter() { return { lat: this.camera.center[0], lng: this.camera.center[1] }; },
+          getZoom() { return this.camera.zoom; }, wrapLatLng: center => center, invalidateSize() {},
+          setView(center, zoom) { this.camera = { center, zoom }; },
+          remove() { this.removed = true; host.replaceChildren(); },
+        };
+        harness.maps.push(map);
+        return map;
+      },
+      tileLayer(url, options) {
+        const callbacks = {};
+        return {
+          on(name, callback) { callbacks[name] = callback; return this; },
+          addTo() {
+            harness.urls.push({ url, options });
+            if (url.includes("World_Imagery")) queueMicrotask(() => {
+              const complete = result => { if (result === "ready") callbacks.tileload?.(); callbacks.load?.(); };
+              if (harness.tileResult === "pending") harness.complete = complete;
+              else complete(harness.tileResult);
+            });
+            return this;
+          },
+        };
+      },
+      divIcon: options => options,
+      marker(coordinates, options) {
+        return { addTo(map) { harness.markers.push({ coordinates, options, map: harness.maps.indexOf(map) }); } };
+      },
+    };
+  });
+}
+
+test("Harbor Regional Context lazily opens one verified venue map and restores its camera after Show Back", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockArchive(page, baseURL, () => ({ data: [{
+    venue_id: "aura", name: "Aura", city: "Portland", state: "ME", region: "New England", latitude: "43.6581", longitude: -70.25,
+  }] }), () => ({ data: [{ show_id: "aura-record", venue_id: "aura", name: "Aura Record", date: "2026-02-14", bands: ["Archive Band"] }] }));
+  await mockVenueRegionMap(page);
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const regional = dossier.getByRole("button", { name: "Regional Context", exact: true });
+  const events = dossier.getByRole("button", { name: "Archive Events", exact: true });
+  const artists = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const panel = dossier.locator("[data-venue-region-panel]");
+  const facts = panel.locator("[data-venue-region-facts]");
+  await expect(regional).toHaveAttribute("aria-expanded", "false");
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps.length)).toBe(0);
+  await events.press("Enter");
+  await artists.press("Enter");
+  await page.evaluate(() => { window.venueRegionMapHarness.tileResult = "pending"; });
+  await regional.press("Enter");
+  await expect(panel).toHaveAttribute("data-venue-region-state", "loading");
+  await expect(facts.locator("dd")).toHaveText(["Portland, ME", "New England", "43.6581", "-70.25"]);
+  await expect(events).toHaveAttribute("aria-expanded", "true");
+  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect.poll(() => page.evaluate(() => Boolean(window.venueRegionMapHarness.complete))).toBe(true);
+  await page.evaluate(() => {
+    const harness = window.venueRegionMapHarness;
+    harness.complete("ready");
+    harness.tileResult = "ready";
+    harness.maps[0].setView([43.66, -70.28], 16);
+  });
+  await expect(panel.getByRole("region", { name: "Venue map for Aura" })).toBeVisible();
+  const first = await page.evaluate(() => {
+    const state = window.venueRegionMapHarness;
+    return { center: state.maps[0].options.center, zoom: state.maps[0].options.zoom, wheel: state.maps[0].options.scrollWheelZoom,
+      markers: state.markers.map(marker => marker.coordinates), urls: state.urls.map(layer => layer.url) };
+  });
+  expect(first).toMatchObject({ center: [43.6581, -70.25], zoom: 15, wheel: false, markers: [[43.6581, -70.25]] });
+  expect(first.urls).toHaveLength(3);
+  expect(first.urls.every(url => url.startsWith("https://server.arcgisonline.com/ArcGIS/rest/services/"))).toBe(true);
+  const event = dossier.locator("[data-venue-shows-panel]").getByRole("link", { name: /Aura Record/ });
+  await event.press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music/shows/aura-record");
+  await expect.poll(() => page.evaluate(() => window.venueRegionMapHarness.maps[0].removed)).toBe(true);
+  await page.goBack();
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(regional).toHaveAttribute("aria-expanded", "true");
+  await expect(panel).toHaveAttribute("data-venue-region-state", "ready");
+  await expect(event).toBeFocused();
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.66, -70.28], zoom: 16 });
+  await panel.getByRole("button", { name: "Recenter map" }).press("Enter");
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.6581, -70.25], zoom: 15 });
+  await regional.press("Enter");
+  await expect(regional).toHaveAttribute("aria-expanded", "false");
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].removed)).toBe(true);
+});
+
+test("Harbor Regional Context restores tile focus after the normal Back presentation becomes visible", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await mockArchive(page, baseURL, () => ({ data: [{
+    venue_id: "aura", name: "Aura", latitude: 43.6581, longitude: -70.25,
+  }] }), () => ({ data: [] }));
+  await mockVenueRegionMap(page);
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const regional = page.getByRole("button", { name: "Regional Context", exact: true });
+  const map = page.getByRole("region", { name: "Venue map for Aura", exact: true });
+  await regional.press("Enter");
+  await expect(map).toBeVisible();
+  await map.focus();
+  await expect(map).toBeFocused();
+  await page.evaluate(() => {
+    window.venueRegionMapHarness.maps[0].setView([43.66, -70.28], 16);
+    navigateToRoute("/about");
+  });
+  await expect(page).toHaveURL(baseURL + "/about");
+  await page.goBack();
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(regional).toBeFocused();
+  await expect(regional).toHaveAttribute("aria-expanded", "true");
+  await expect(map).toBeVisible();
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.66, -70.28], zoom: 16 });
+});
+
+test("Harbor Regional Context skips unavailable GPS and retries geographic tiles without replacing zero coordinates", async ({ page, baseURL }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockVenueRegionMap(page);
+  await page.addInitScript(() => Object.defineProperty(navigator, "maxTouchPoints", { value: 2 }));
+  await mockArchive(page, baseURL, () => ({ data: [
+    { venue_id: "missing", name: "Missing", city: "Portland", region: "New England", latitude: "43.66" },
+    { venue_id: "pole", name: "Pole", latitude: 90, longitude: 0 },
+    { venue_id: "zero", name: "Zero", latitude: "0", longitude: 0 },
+  ] }), () => ({ data: [] }));
+  await page.goto(harborPath + "/missing", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const regional = page.getByRole("button", { name: "Regional Context", exact: true });
+  const panel = page.locator("[data-venue-region-panel]");
+  await regional.press("Enter");
+  await expect(panel).toContainText("No verified GPS coordinates are available");
+  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["Portland", "New England"]);
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/pole");
+  await regional.press("Enter");
+  await expect(panel).toContainText("outside this map’s coverage");
+  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["90", "0"]);
+  expect(await page.evaluate(() => window.venueRegionMapHarness.urls.length)).toBe(0);
+  await page.evaluate(path => { window.venueRegionMapHarness.tileResult = "error"; navigateToRoute(path); }, harborPath + "/zero");
+  await regional.press("Enter");
+  await expect(panel).toHaveAttribute("data-venue-region-state", "error");
+  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["0", "0"]);
+  await expect(panel).toContainText("Geographic imagery could not load.");
+  await page.evaluate(() => { window.venueRegionMapHarness.tileResult = "ready"; });
+  await panel.getByRole("button", { name: "Retry venue map" }).press("Enter");
+  await expect(panel).toHaveAttribute("data-venue-region-state", "ready");
+  const counts = await page.evaluate(() => {
+    const harness = window.venueRegionMapHarness;
+    return { removed: harness.maps.map(map => map.removed), markers: harness.markers.map(marker => marker.coordinates) };
+  });
+  expect(counts).toEqual({ removed: [true, false], markers: [[0, 0], [0, 0]] });
+  const gestures = panel.getByRole("button", { name: "Enable map gestures", exact: true });
+  const flags = () => page.evaluate(() => {
+    const map = window.venueRegionMapHarness.maps[1];
+    return [map.dragging.enabled, map.touchZoom.enabled, map.doubleClickZoom.enabled, map.options.tapHold];
+  });
+  expect(await flags()).toEqual([false, false, false, false]);
+  await gestures.press("Enter");
+  const resume = panel.getByRole("button", { name: "Resume page scrolling", exact: true });
+  await expect(resume).toBeFocused();
+  expect(await flags()).toEqual([true, true, true, false]);
+  await resume.press("Escape");
+  await expect(gestures).toBeFocused();
+  expect(await flags()).toEqual([false, false, false, false]);
 });
 
 test("Harbor fades sector records out before a single verified swap and fades the new sector in", async ({ page, baseURL }) => {
