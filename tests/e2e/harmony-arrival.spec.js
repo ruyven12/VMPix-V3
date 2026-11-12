@@ -932,13 +932,13 @@ test("Harbor Solo Arrival reveals only verified identity before the real Dossier
   const dossier = page.locator("[data-venue-detail]");
   const title = dossier.locator("[data-venue-detail-title]");
   const metadata = dossier.locator("[data-venue-detail-metadata]");
-  const archive = dossier.locator("[data-venue-relationships]");
+  const archive = dossier.getByRole("tablist", { name: "Venue Archive" });
+  const content = dossier.locator("[data-venue-archive-content]");
   const highlights = dossier.locator("[data-venue-photo-highlights]");
-  const lowerContent = dossier.locator(".venue-detail-content-grid");
   const engine = page.locator("[data-portfolio-engine]");
   await expect(dossier.getByText("Loading Venue Archive", { exact: true })).toBeVisible();
   await expect(archive).toBeHidden();
-  await expect(lowerContent).toBeHidden();
+  await expect(content).toBeHidden();
   await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
   expect(showsRequests).toBe(0);
   expect(photoRequests).toBe(0);
@@ -987,24 +987,35 @@ test("Harbor Solo Arrival reveals only verified identity before the real Dossier
   await expect(archive).toBeVisible();
   await expect(highlights).toBeHidden();
   await finish(110);
-  await expect(highlights).toBeVisible();
-  await expect(lowerContent).toBeVisible();
+  await expect(content).toBeVisible();
+  await expect(highlights).toBeHidden();
   await finish(110);
   await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
   expect((await title.boundingBox()).y).toBeCloseTo(endBox.top, 0);
   expect(await engine.boundingBox()).toEqual(engineBefore);
   expect(await page.evaluate(() => history.length)).toBe(historyBefore);
-  await expect(archive.getByText("Event Index Loading")).toBeVisible();
+  await expect(content.getByText("Loading Archive Events")).toBeVisible();
   releaseShows({ data: [] });
-  await expect(archive.getByText("Event Index Loading")).toHaveCount(0);
+  await expect(content.getByText("No Archive Events")).toBeVisible();
   await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
 });
 
 test("Harbor Solo Arrival replaces an interrupted dossier and stays off for an Inspect fallback", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await mockArchive(page, baseURL, () => ({ data: venues }));
+  let releaseVenues;
+  const pendingVenues = new Promise(resolve => { releaseVenues = resolve; });
+  const linkedShows = ["signal-0", "signal-1"].flatMap(venueId =>
+    Array.from({ length: 12 }, (_, index) => ({
+      show_id: venueId + "-opening-" + index, venue_id: venueId, name: "Recorded Opening " + index, date: "2025-07-01",
+    })));
+  await mockArchive(page, baseURL, () => pendingVenues, () => ({ data: linkedShows }));
   await page.addInitScript(() => {
+    const now = Date.now();
+    localStorage.setItem("v3.analytics.preference.v1", JSON.stringify({
+      version: 1, analyticsStorage: "denied", noticeVersion: "reviewed-engagement-1",
+      savedAt: now, expiresAt: now + 180 * 86400000,
+    }));
     const animate = Element.prototype.animate;
     Element.prototype.animate = function (frames, options) {
       const animation = animate.call(this, frames, options);
@@ -1013,11 +1024,13 @@ test("Harbor Solo Arrival replaces an interrupted dossier and stays off for an I
     };
   });
   await page.goto(harborPath + "/signal-0", { waitUntil: "domcontentloaded" });
-  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  await expect(page.getByText("Loading Venue Archive", { exact: true })).toBeVisible();
+  releaseVenues({ data: venues });
   const shell = page.locator(".site-shell");
   const title = page.locator("[data-venue-detail-title]");
   await expect(shell).toHaveAttribute("data-harmony-solo-arrival", "materializing");
   await title.evaluate(node => { window.interruptedSoloEffects = node.getAnimations(); });
+  await expect(page.locator("[data-venue-events-year] li")).toHaveCount(10);
   await page.addStyleTag({ content: ".music-nexus-shell.is-venue-detail { max-height: 28rem; }" });
   const scroll = await page.evaluate(url => {
     const scroller = document.querySelector("[data-music-nexus-shell]");
@@ -1055,12 +1068,15 @@ test("Harbor Solo Arrival replaces an interrupted dossier and stays off for an I
 test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "reduce" });
+  const linkedShows = Array.from({ length: 10 }, (_, index) => ({
+    show_id: "aura-history-" + index, venue_id: "aura", name: "Documented Show " + index, date: "2025-08-03",
+  }));
   await mockArchive(page, baseURL, () => ({ payload: { rows: [
     { venue_id: "aura", venue: "Aura", city: "Portland", state: "Maine", established_year: "1996", latitude: "0", gps_lng: 0, region: "New England" },
     { venue_id: "partial", venue: "Partial Venue", city: "Portland", state: "unknown", establishedyear: 1997, gpslat: "44.03", gpslon: "181", region: "N/A" },
     { venue_id: "recorded-location", venue: "Recorded Location", location_label: "Riverfront District" },
     { venue_id: "unrecorded", venue: "Unrecorded Details", city: "—", state: "Pending", created_at: "2001-01-01", latitude: "", longitude: 0, region: { name: "New England" } },
-  ] } }), () => ({ data: [] }));
+  ] } }), () => ({ data: linkedShows }));
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
 
@@ -1094,6 +1110,7 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   const gap = metadataBox.y - headingBox.y - headingBox.height;
   expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.26);
   expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.4);
+  await expect(dossier.locator("[data-venue-events-year] li")).toHaveCount(10);
   const scrollHost = page.locator(".music-nexus-shell");
   await scrollHost.evaluate(node => node.scrollTo({ top: node.scrollHeight, behavior: "instant" }));
   expect(await scrollHost.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
@@ -1119,7 +1136,7 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   await expect(missing).toHaveText("Unavailable Data: City, State, Established, GPS, Region");
 });
 
-test("Venue Dossier keeps the compact archive truthful and opens stable filmstrip photos in the shared lightbox", async ({ page, baseURL }) => {
+test("Venue Dossier uses accessible archive tabs and opens stable filmstrip photos in the shared lightbox", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   const caption = "A recorded caption with enough detail to continue across multiple lines in the shared photo info drawer without truncation.";
@@ -1156,35 +1173,42 @@ test("Venue Dossier keeps the compact archive truthful and opens stable filmstri
 
   const dossier = page.locator("[data-venue-detail]");
   const archive = dossier.getByRole("region", { name: "Venue Archive" });
-  const card = name => archive.locator('[data-venue-relationship="' + name + '"]');
-  const value = name => card(name).locator(".venue-relationship-media span");
-  await expect(archive.getByRole("heading", { name: "Venue Archive" })).toBeVisible();
-  await expect(archive.locator(".venue-relationship-title")).toHaveText([
-    "Archive Events", "Featured Artists", "Total Photos", "Regional Context", "Archive History",
+  const tabs = archive.getByRole("tablist");
+  const tab = name => tabs.getByRole("tab", { name, exact: true });
+  await expect(tabs.getByRole("tab")).toHaveText([
+    "Events", "Artists", "Total Photos", "Map", "Archive History", "Photo Highlights", "About", "Community",
   ]);
-  await expect(value("shows")).toHaveText("4");
-  await expect(value("bands")).toHaveText("2");
-  await expect(value("photos")).toHaveText("12");
-  await expect(value("region")).toHaveText("New England");
-  await expect(value("history")).toHaveText("Aug 1, 2024 → Feb 2, 2025");
-  await expect(card("shows")).toHaveAccessibleDescription("4");
-  await expect(card("bands")).toHaveAccessibleDescription("2");
-  expect(await archive.evaluate(node => {
-    const [events, artists, photos, region, history] = [...node.querySelectorAll("[data-venue-relationship]")];
-    const box = element => element.getBoundingClientRect();
-    return box(events).top === box(artists).top && box(photos).top === box(region).top
-      && box(history).left === box(events).left && box(history).right === box(artists).right
-      && [photos, history].every(tile => getComputedStyle(tile, "::after").content === "none")
-      && getComputedStyle(region, "::after").content !== "none";
-  })).toBe(true);
-  await card("bands").press("Enter");
+  await expect(tab("Events")).toHaveAttribute("aria-selected", "true");
+  await expect(archive.getByRole("tabpanel")).toHaveCount(1);
+  const historyLength = await page.evaluate(() => history.length);
+  await tab("Events").press("ArrowRight");
+  await expect(tab("Artists")).toBeFocused();
+  await expect(tab("Events")).toHaveAttribute("aria-selected", "true");
+  expect(await tab("Artists").evaluate(button => button.dispatchEvent(new KeyboardEvent("keydown", {
+    key: "ArrowLeft", altKey: true, bubbles: true, cancelable: true,
+  })))).toBe(true);
+  await expect(tab("Artists")).toBeFocused();
+  await tab("Artists").press("End");
+  await expect(tab("Community")).toBeFocused();
+  await tab("Community").press("Home");
+  await expect(tab("Events")).toBeFocused();
+  await tab("Total Photos").press("Enter");
+  await expect(archive.getByRole("tabpanel", { name: "Total Photos" })).toContainText("12");
+  await tab("Archive History").press("Enter");
+  await expect(archive.getByRole("tabpanel", { name: "Archive History" })).toContainText("Aug 1, 2024 \u2192 Feb 2, 2025");
+  await tab("About").press("Enter");
+  await expect(archive.getByRole("heading", { name: "About The Venue" })).toBeVisible();
+  await tab("Community").press("Enter");
+  await expect(archive.getByRole("heading", { name: "Testimonials" })).toBeVisible();
+  await tab("Artists").press("Enter");
+  expect(await page.evaluate(() => history.length)).toBe(historyLength);
   const artistPanel = dossier.locator("[data-venue-artists-panel]");
   await expect(artistPanel).toContainText("Signal Artist");
   await expect(artistPanel).not.toContainText("Imaginary Artist");
   await artistPanel.getByRole("searchbox", { name: "Search Artists" }).fill("Second");
   await expect(artistPanel.locator(".venue-artists-grid")).toContainText("Second Artist");
   await expect(artistPanel.locator(".venue-artists-grid")).not.toContainText("Signal Artist");
-  await card("bands").press("Enter");
+  await tab("Photo Highlights").press("Enter");
 
   const strip = dossier.locator("[data-venue-photo-filmstrip]");
   const tiles = strip.locator("[data-venue-photo-highlight]");
@@ -1233,10 +1257,9 @@ test("Venue Dossier keeps the compact archive truthful and opens stable filmstri
   expect(galleryRequests).toEqual([["/api/music/venues/aura/photos", "1", "20"]]);
 
   await page.evaluate(path => navigateToRoute(path), harborPath + "/no-lineup");
-  await expect(value("shows")).toHaveText("1");
-  await expect(value("bands")).toHaveText("—");
-  await expect(value("history")).toHaveText("—");
-  await card("bands").press("Enter");
+  await tab("Archive History").press("Enter");
+  await expect(archive.locator('[data-venue-archive-value="history"]')).toHaveText("\u2014");
+  await tab("Artists").press("Enter");
   await expect(artistPanel).toContainText("No verified artist records for these linked shows.");
 });
 
@@ -1300,7 +1323,7 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
   const dossier = page.locator("[data-venue-detail]");
-  const count = dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span');
+  const count = dossier.locator('[data-venue-archive-value="photos"]');
   for (const [index, [, expected]] of cases.entries()) {
     const inspect = page.getByRole("link", { name: "Inspect " + venues[index].name });
     await inspect.press("Enter");
@@ -1315,7 +1338,7 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
       await expect(highlights.locator("[data-venue-photo-highlight]")).toHaveCount(1);
     }
     if (index === 2) {
-      await expect(dossier.locator('[data-venue-relationship="shows"] .venue-relationship-media span')).toHaveText("3");
+      await expect(dossier.getByRole("link", { name: /Count [ABC]/ })).toHaveCount(3);
     }
     await expect(count).toHaveText(expected);
     await page.locator("[data-prototype-engine-return]").press("Enter");
@@ -1338,7 +1361,7 @@ test("Venue Dossier keeps identity and totals unknown while verified Venue data 
   const venueRequest = page.waitForRequest(request => new URL(request.url()).pathname === "/api/music/venues");
   await page.goto(harborPath + "/the-electric-hall", { waitUntil: "domcontentloaded" });
   const breadcrumb = page.getByRole("navigation", { name: /Current location.*Venue Detail/ });
-  const count = page.locator('[data-venue-detail] [data-venue-relationship="photos"] .venue-relationship-media span');
+  const count = page.locator('[data-venue-detail] [data-venue-archive-value="photos"]');
   try {
     await venueRequest;
     await expect(page.locator("[data-venue-detail-identity]")).toBeHidden();
@@ -1415,7 +1438,7 @@ test("Venue Dossier Retry keeps the current error on failure and recovers Aura i
   });
   await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
   await expect(dossier.locator("[data-venue-detail-location]")).toHaveText("Portland, ME");
-  await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("123");
+  await expect(dossier.locator('[data-venue-archive-value="photos"]')).toHaveText("123");
   await expect(dossier.locator("[data-venue-relationships]")).toBeVisible();
   await expect(error).toHaveCount(0);
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
@@ -1510,8 +1533,9 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
   const title = dossier.locator("[data-venue-detail-title]");
-  const events = dossier.locator('[data-venue-relationship="shows"]');
-  const artists = dossier.locator('[data-venue-relationship="bands"]');
+  const events = dossier.getByRole("tab", { name: "Events", exact: true });
+  const artists = dossier.getByRole("tab", { name: "Artists", exact: true });
+  const highlightsTab = dossier.getByRole("tab", { name: "Photo Highlights", exact: true });
   const highlights = dossier.locator("[data-venue-photo-highlights]");
   try {
     await requested;
@@ -1530,16 +1554,12 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     await expect(title).toHaveText("Aura");
     await expect(page.getByRole("navigation", { name: /Current location.*Aura/ })).toBeAttached();
     await expect(dossier.locator("[data-venue-detail-location]")).toHaveText("Portland, ME");
-    await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("123");
-    await expect(events.getByRole("status")).toHaveText("Event Index Loading");
-    await expect(artists.getByRole("status")).toHaveText("Artist Index Loading");
-    await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
-    await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
-    await expect(events).toHaveAttribute("role", "button");
-    await expect(artists).toHaveAttribute("role", "button");
-    await events.press("Enter");
-    await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("Loading Archive Events");
-    await events.press("Enter");
+    await expect(dossier.locator('[data-venue-archive-value="photos"]')).toHaveText("123");
+    await expect(events).toHaveAttribute("aria-selected", "true");
+    await expect(dossier.getByText("Loading Archive Events", { exact: true })).toBeVisible();
+    await artists.press("Enter");
+    await expect(dossier.getByText("Loading Featured Artists", { exact: true })).toBeVisible();
+    await highlightsTab.press("Enter");
     await expect(highlights).toContainText("No photo highlights available.");
     expect(showsRequests).toBe(1);
     expect(highlightsRequests).toBe(1);
@@ -1553,10 +1573,9 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     ] });
   }
 
-  await expect(events.locator(".venue-relationship-media span")).toHaveText("1");
-  await expect(artists.locator(".venue-relationship-media span")).toHaveText("1");
+  await expect(dossier.locator("[data-venue-shows-panel]")).toContainText("August at Aura");
   expect(Math.abs((await highlights.boundingBox()).y - highlightsTop)).toBeLessThanOrEqual(1);
-  await expect(events).toHaveAttribute("aria-expanded", "false");
+  await expect(events).toHaveAttribute("aria-selected", "false");
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("Arrival Band");
   expect(await title.evaluate((node, original) => node.firstChild === original, originalTitle)).toBe(true);
@@ -1574,17 +1593,13 @@ test("Venue Dossier preserves verified identity on Shows failure and exposes con
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const events = dossier.locator('[data-venue-relationship="shows"]');
-  const artists = dossier.locator('[data-venue-relationship="bands"]');
+  const events = dossier.getByRole("tab", { name: "Events", exact: true });
+  const artists = dossier.getByRole("tab", { name: "Artists", exact: true });
   const highlights = dossier.locator("[data-venue-photo-highlights]");
   await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
-  await expect(events.getByRole("status")).toHaveText("Event Index Unavailable");
-  await expect(artists.getByRole("status")).toHaveText("Artist Index Unavailable");
-  await expect(events.locator(".venue-relationship-media span")).toHaveText("—");
-  await expect(artists.locator(".venue-relationship-media span")).toHaveText("—");
-  await expect(dossier.locator('[data-venue-relationship="photos"] .venue-relationship-media span')).toHaveText("12");
-  await expect(highlights).toBeVisible();
-  await events.press("Enter");
+  await expect(events).toHaveAttribute("aria-selected", "true");
+  await expect(dossier.locator('[data-venue-archive-value="photos"]')).toHaveText("12");
+  await expect(highlights).toBeHidden();
   const inline = dossier.locator("[data-venue-shows-panel]");
   await expect(inline.getByText("Archive Events Unavailable", { exact: true })).toBeVisible();
   expect(showsRequests).toBe(1);
@@ -1595,17 +1610,15 @@ test("Venue Dossier preserves verified identity on Shows failure and exposes con
 
   await page.evaluate(path => navigateToRoute(path), harborPath + "/other-room");
   await expect(dossier.getByRole("heading", { name: "Other Room", exact: true })).toBeVisible();
-  await expect(events.locator(".venue-relationship-media span")).toHaveText("0");
-  await expect(artists.locator(".venue-relationship-media span")).toHaveText("0");
-  await expect(events).toHaveAttribute("aria-expanded", "false");
-  await expect(artists).toHaveAttribute("role", "button");
+  await expect(events).toHaveAttribute("aria-selected", "true");
+  await expect(inline.getByText("No Archive Events", { exact: true })).toBeVisible();
   await artists.press("Enter");
   await expect(dossier.locator("[data-venue-artists-panel]")).toContainText("No artists linked to this venue.");
 });
 
 for (const [width, height] of [[360, 800], [412, 915], [915, 412], [1920, 1080]]) {
 for (const motion of ["no-preference", "reduce"]) {
-test("Inline Archive Events and Artists restore after Show/Band Back " + width + "x" + height + " " + motion, async ({ page, baseURL }) => {
+test("Dossier Events and Artists tabs restore after Show/Band Back " + width + "x" + height + " " + motion, async ({ page, baseURL }) => {
   test.setTimeout(60000);
   await page.setViewportSize({ width, height });
   await page.emulateMedia({ reducedMotion: motion });
@@ -1625,34 +1638,27 @@ test("Inline Archive Events and Artists restore after Show/Band Back " + width +
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const entry = dossier.getByRole("button", { name: "Archive Events", exact: true });
+  const entry = dossier.getByRole("tab", { name: "Events", exact: true });
   const timeline = dossier.locator("[data-venue-shows-panel]");
   const scroll = page.locator("[data-music-nexus-shell]");
   const engine = page.locator("[data-prototype-engine-return]");
   const year = key => timeline.locator("[data-venue-events-year=\"" + key + "\"]");
-  await expect(entry).toHaveAttribute("aria-expanded", "false");
-  await entry.press("Enter");
-  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(entry).toBeFocused();
-  await expect(timeline).toHaveAttribute("aria-hidden", "false");
+  await expect(entry).toHaveAttribute("aria-selected", "true");
+  await expect(timeline).toBeVisible();
   await expect(page.locator("[data-harmony-environment]")).toBeVisible();
   await expect(dossier).toBeVisible();
-  const artists = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const artists = dossier.getByRole("tab", { name: "Artists", exact: true });
   await artists.press("Space");
-  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(artists).toHaveAttribute("aria-selected", "true");
+  await expect(timeline).toBeHidden();
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(dossier.locator(".venue-relationship-grid > :visible")).toHaveCount(5);
-  await artists.press("Enter");
-  await expect(artists).toHaveAttribute("aria-expanded", "false");
-  await expect(entry).toHaveAttribute("aria-expanded", "true");
-  await expect.poll(() => timeline.evaluate(node => {
-    const grid = node.previousElementSibling.getBoundingClientRect();
-    const panel = node.getBoundingClientRect();
-    return panel.top >= grid.bottom && Math.abs(panel.width - grid.width) <= 1;
-  })).toBe(true);
+  await expect(dossier.getByRole("tabpanel")).toHaveCount(1);
+  await entry.press("Enter");
+  await expect(entry).toHaveAttribute("aria-selected", "true");
+  await expect(timeline).toBeVisible();
   if (process.env.HARMONY_EVIDENCE_DIR && motion === "no-preference") {
     await scroll.evaluate(node => {
-      node.scrollTop += node.querySelector(".venue-relationship-grid").getBoundingClientRect().top - node.getBoundingClientRect().top - 30;
+      node.scrollTop += node.querySelector("[data-venue-archive-tab-bar]").getBoundingClientRect().top - node.getBoundingClientRect().top - 30;
     });
     await expect.poll(() => timeline.evaluate(node => node.getAnimations({ subtree: true }).filter(animation =>
       animation.effect.getTiming().iterations !== Infinity && animation.playState === "running").length)).toBe(0);
@@ -1688,9 +1694,9 @@ test("Inline Archive Events and Artists restore after Show/Band Back " + width +
   await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(savedScroll);
   await year("undated").locator("summary").press("Enter");
   await expect(year("undated").getByRole("link", { name: /Date unavailable Incomplete Date/ })).toBeVisible();
-  await entry.press("Enter");
-  await expect(entry).toHaveAttribute("aria-expanded", "false");
-  await expect(timeline).toHaveAttribute("aria-hidden", "true");
+  await artists.press("Enter");
+  await expect(entry).toHaveAttribute("aria-selected", "false");
+  await expect(timeline).toBeHidden();
   await entry.press("Space");
   await expect(year("2026").getByRole("listitem")).toHaveCount(22);
   await artists.press("Enter");
@@ -1706,16 +1712,24 @@ test("Inline Archive Events and Artists restore after Show/Band Back " + width +
   await page.goBack();
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   await expect(band).toBeFocused();
-  await expect(entry).toHaveAttribute("aria-expanded", "true");
-  await expect(artists).toHaveAttribute("aria-expanded", "true");
-  await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await expect(entry).toHaveAttribute("aria-selected", "false");
+  await expect(artists).toHaveAttribute("aria-selected", "true");
+  await expect(timeline).toBeHidden();
   await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(artistScroll);
   await page.goForward();
   await expect(page).toHaveURL(baseURL + "/music/bands/nine-treasures");
   await engine.press("Enter");
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(entry).toHaveAttribute("aria-expanded", "true");
-  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(entry).toHaveAttribute("aria-selected", "false");
+  await expect(artists).toHaveAttribute("aria-selected", "true");
+  await expect(timeline).toBeHidden();
+  await band.press("Enter");
+  await expect(page).toHaveURL(baseURL + "/music/bands/nine-treasures");
+  await engine.press("Enter");
+  await expect(artists).toHaveAttribute("aria-selected", "true");
+  await entry.press("Enter");
+  await expect(year("2025")).toHaveAttribute("open", "");
+  await expect(year("undated")).toHaveAttribute("open", "");
   await expect(year("2026").getByRole("listitem")).toHaveCount(22);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await timeline.evaluate(node => getComputedStyle(node).overflowY)).not.toMatch(/auto|scroll/);
@@ -1780,7 +1794,7 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const toggle = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const toggle = dossier.getByRole("tab", { name: "Artists", exact: true });
   const panel = dossier.locator("[data-venue-artists-panel]");
   const scroller = page.locator("[data-music-nexus-shell]");
   const rail = panel.locator("[data-venue-artist-rail]");
@@ -1815,9 +1829,13 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   await expect(panel.getByRole("link", { name: "Beta Band", exact: true })).toBeFocused();
   await expect.poll(() => alphabet.evaluate(node => {
     const box = node.getBoundingClientRect();
-    const scroller = node.closest("[data-music-nexus-shell]").getBoundingClientRect();
-    const inset = parseFloat(getComputedStyle(node.closest("[data-music-nexus-shell]")).paddingTop);
-    return Math.abs(box.top - scroller.top - inset) < 2;
+    const scroller = node.closest("[data-music-nexus-shell]");
+    const scrollportTop = scroller.getBoundingClientRect().top + scroller.clientTop
+      + parseFloat(getComputedStyle(scroller).paddingTop);
+    const tabs = node.closest("[data-venue-relationships]").querySelector("[data-venue-archive-tab-bar]").getBoundingClientRect();
+    const focusedRow = document.activeElement.getBoundingClientRect();
+    return Math.abs(tabs.top - scrollportTop) <= 1 && Math.abs(box.top - tabs.bottom) <= 1
+      && focusedRow.top >= box.bottom;
   })).toBe(true);
   await panel.getByRole("button", { name: "Artists beginning with A" }).press("Enter");
   const alpha = panel.locator(".venue-artists-grid").getByRole("link", { name: "Alpha Ensemble", exact: true });
@@ -1831,7 +1849,7 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   await expect(page.locator("[data-band-detail-name]")).toHaveText("Alpha Ensemble");
   await page.goBack();
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(toggle).toHaveAttribute("aria-selected", "true");
   await expect(alpha).toBeFocused();
   await expect(panel.locator("[data-venue-artist-highlighted]")).toHaveCount(2);
   await expect(panel.getByRole("button", { name: "Artists beginning with A" })).toHaveAttribute("aria-pressed", "true");
@@ -1853,9 +1871,8 @@ test("Harbor inline Artists preserves verified unavailable, loading and empty st
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const toggle = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const toggle = dossier.getByRole("tab", { name: "Artists", exact: true });
   const panel = dossier.locator("[data-venue-artists-panel]");
-  await expect(toggle.getByRole("status")).toHaveText("Artist Index Unavailable");
   await toggle.press("Enter");
   await expect(panel.getByText("Featured Artists Unavailable", { exact: true })).toBeVisible();
   await expect(panel.locator(".venue-artists-top-card")).toHaveCount(0);
@@ -1864,8 +1881,7 @@ test("Harbor inline Artists preserves verified unavailable, loading and empty st
   expect(requests).toBe(2);
   release({ data: [] });
   await expect(panel.getByText("No artists linked to this venue.", { exact: true })).toBeVisible();
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(toggle.locator(".venue-relationship-media span")).toHaveText("0");
+  await expect(toggle).toHaveAttribute("aria-selected", "true");
   await expect(panel.locator("[data-venue-artist-alphabet], .venue-artists-top-card")).toHaveCount(0);
   expect(requests).toBe(2);
 });
@@ -1922,12 +1938,12 @@ test("Harbor Regional Context lazily opens one verified venue map and restores i
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const dossier = page.locator("[data-venue-detail]");
-  const regional = dossier.getByRole("button", { name: "Regional Context", exact: true });
-  const events = dossier.getByRole("button", { name: "Archive Events", exact: true });
-  const artists = dossier.getByRole("button", { name: "Featured Artists", exact: true });
+  const regional = dossier.getByRole("tab", { name: "Map", exact: true });
+  const events = dossier.getByRole("tab", { name: "Events", exact: true });
+  const artists = dossier.getByRole("tab", { name: "Artists", exact: true });
   const panel = dossier.locator("[data-venue-region-panel]");
   const facts = panel.locator("[data-venue-region-facts]");
-  await expect(regional).toHaveAttribute("aria-expanded", "false");
+  await expect(regional).toHaveAttribute("aria-selected", "false");
   expect(await page.evaluate(() => window.venueRegionMapHarness.maps.length)).toBe(0);
   await events.press("Enter");
   await artists.press("Enter");
@@ -1935,8 +1951,8 @@ test("Harbor Regional Context lazily opens one verified venue map and restores i
   await regional.press("Enter");
   await expect(panel).toHaveAttribute("data-venue-region-state", "loading");
   await expect(facts.locator("dd")).toHaveText(["Portland, ME", "New England", "43.6581", "-70.25"]);
-  await expect(events).toHaveAttribute("aria-expanded", "true");
-  await expect(artists).toHaveAttribute("aria-expanded", "true");
+  await expect(events).toHaveAttribute("aria-selected", "false");
+  await expect(artists).toHaveAttribute("aria-selected", "false");
   await expect.poll(() => page.evaluate(() => Boolean(window.venueRegionMapHarness.complete))).toBe(true);
   await page.evaluate(() => {
     const harness = window.venueRegionMapHarness;
@@ -1954,20 +1970,30 @@ test("Harbor Regional Context lazily opens one verified venue map and restores i
   expect(first.urls).toHaveLength(3);
   expect(first.urls.every(url => url.startsWith("https://server.arcgisonline.com/ArcGIS/rest/services/"))).toBe(true);
   const event = dossier.locator("[data-venue-shows-panel]").getByRole("link", { name: /Aura Record/ });
+  await events.press("Enter");
+  await expect(panel).toBeHidden();
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[0].removed)).toBe(false);
+  await regional.press("Enter");
+  await expect(panel).toBeVisible();
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps.length)).toBe(1);
+  await events.press("Enter");
   await event.press("Enter");
   await expect(page).toHaveURL(baseURL + "/music/shows/aura-record");
   await expect.poll(() => page.evaluate(() => window.venueRegionMapHarness.maps[0].removed)).toBe(true);
   await page.goBack();
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
-  await expect(regional).toHaveAttribute("aria-expanded", "true");
-  await expect(panel).toHaveAttribute("data-venue-region-state", "ready");
+  await expect(events).toHaveAttribute("aria-selected", "true");
   await expect(event).toBeFocused();
+  await expect(panel).toBeHidden();
+  await regional.press("Enter");
+  await expect(panel).toHaveAttribute("data-venue-region-state", "ready");
   expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.66, -70.28], zoom: 16 });
   await panel.getByRole("button", { name: "Recenter map" }).press("Enter");
   expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.6581, -70.25], zoom: 15 });
-  await regional.press("Enter");
-  await expect(regional).toHaveAttribute("aria-expanded", "false");
-  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].removed)).toBe(true);
+  await artists.press("Enter");
+  await expect(regional).toHaveAttribute("aria-selected", "false");
+  await expect(panel).toBeHidden();
+  expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].removed)).toBe(false);
 });
 
 test("Harbor Regional Context restores tile focus after the normal Back presentation becomes visible", async ({ page, baseURL }) => {
@@ -1979,7 +2005,7 @@ test("Harbor Regional Context restores tile focus after the normal Back presenta
   await mockVenueRegionMap(page);
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
-  const regional = page.getByRole("button", { name: "Regional Context", exact: true });
+  const regional = page.getByRole("tab", { name: "Map", exact: true });
   const map = page.getByRole("region", { name: "Venue map for Aura", exact: true });
   await regional.press("Enter");
   await expect(map).toBeVisible();
@@ -1993,7 +2019,7 @@ test("Harbor Regional Context restores tile focus after the normal Back presenta
   await page.goBack();
   await expect(page).toHaveURL(baseURL + harborPath + "/aura");
   await expect(regional).toBeFocused();
-  await expect(regional).toHaveAttribute("aria-expanded", "true");
+  await expect(regional).toHaveAttribute("aria-selected", "true");
   await expect(map).toBeVisible();
   expect(await page.evaluate(() => window.venueRegionMapHarness.maps[1].camera)).toEqual({ center: [43.66, -70.28], zoom: 16 });
 });
@@ -2009,7 +2035,7 @@ test("Harbor Regional Context skips unavailable GPS and retries geographic tiles
   ] }), () => ({ data: [] }));
   await page.goto(harborPath + "/missing", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
-  const regional = page.getByRole("button", { name: "Regional Context", exact: true });
+  const regional = page.getByRole("tab", { name: "Map", exact: true });
   const panel = page.locator("[data-venue-region-panel]");
   await regional.press("Enter");
   await expect(panel).toContainText("No verified GPS coordinates are available");

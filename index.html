@@ -1283,59 +1283,52 @@
               <p class="venue-detail-metadata-notice" data-venue-detail-missing hidden></p>
             </section>
 
-            <section class="venue-relationships" aria-labelledby="venue-archive-title" data-venue-relationships>
-              <header class="venue-relationships-header">
-                <h4 id="venue-archive-title">Venue Archive</h4>
-              </header>
-
-              <div class="venue-relationship-grid">
-                <article class="venue-relationship-card" data-venue-relationship="shows" aria-labelledby="venue-relationship-shows-title" aria-describedby="venue-relationship-shows-value">
-                  <h5 class="venue-relationship-title" id="venue-relationship-shows-title">Archive Events</h5>
-                  <div class="venue-relationship-media" id="venue-relationship-shows-value"><span>—</span></div>
-                  <span class="venue-relationship-status"></span>
-                </article>
-
-                <article class="venue-relationship-card" data-venue-relationship="bands" aria-labelledby="venue-relationship-bands-title">
-                  <h5 class="venue-relationship-title" id="venue-relationship-bands-title">Featured Artists</h5>
-                  <div class="venue-relationship-media" id="venue-relationship-bands-value"><span>—</span></div>
-                  <span class="venue-relationship-status"></span>
-                </article>
-
-                <article class="venue-relationship-card" data-venue-relationship="photos" aria-labelledby="venue-relationship-photos-title">
-                  <h5 class="venue-relationship-title" id="venue-relationship-photos-title">Total Photos</h5>
-                  <div class="venue-relationship-media"><span>—</span></div>
-                </article>
-
-                <article class="venue-relationship-card" data-venue-relationship="region" aria-labelledby="venue-relationship-region-title">
-                  <h5 class="venue-relationship-title" id="venue-relationship-region-title">Regional Context</h5>
-                  <div class="venue-relationship-media"><span>—</span></div>
-                </article>
-
-                <article class="venue-relationship-card" data-venue-relationship="history" aria-labelledby="venue-relationship-history-title">
-                  <h5 class="venue-relationship-title" id="venue-relationship-history-title">Archive History</h5>
-                  <div class="venue-relationship-media"><span>—</span></div>
-                </article>
+            <section class="venue-relationships" aria-label="Venue Archive" data-venue-relationships>
+              <div class="venue-archive-tab-bar" data-venue-archive-tab-bar>
+                <div class="venue-archive-tabs" role="tablist" aria-label="Venue Archive" data-venue-archive-tabs>
+                  <button type="button" id="venue-tab-events" role="tab" aria-selected="true" aria-controls="venue-pane-events" data-venue-archive-tab="events">Events</button>
+                  <button type="button" id="venue-tab-artists" role="tab" aria-selected="false" aria-controls="venue-pane-artists" data-venue-archive-tab="artists" tabindex="-1">Artists</button>
+                  <button type="button" id="venue-tab-photos" role="tab" aria-selected="false" aria-controls="venue-pane-photos" data-venue-archive-tab="photos" tabindex="-1">Total Photos</button>
+                  <button type="button" id="venue-tab-map" role="tab" aria-selected="false" aria-controls="venue-pane-map" data-venue-archive-tab="map" tabindex="-1">Map</button>
+                  <button type="button" id="venue-tab-history" role="tab" aria-selected="false" aria-controls="venue-pane-history" data-venue-archive-tab="history" tabindex="-1">Archive History</button>
+                  <button type="button" id="venue-tab-highlights" role="tab" aria-selected="false" aria-controls="venue-pane-highlights" data-venue-archive-tab="highlights" tabindex="-1">Photo Highlights</button>
+                  <button type="button" id="venue-tab-about" role="tab" aria-selected="false" aria-controls="venue-pane-about" data-venue-archive-tab="about" tabindex="-1">About</button>
+                  <button type="button" id="venue-tab-community" role="tab" aria-selected="false" aria-controls="venue-pane-community" data-venue-archive-tab="community" tabindex="-1">Community</button>
+                </div>
+              </div>
+              <div class="venue-archive-content" data-venue-archive-content>
+                <div id="venue-pane-events" role="tabpanel" aria-labelledby="venue-tab-events" tabindex="0" data-venue-archive-panel="events"></div>
+                <div id="venue-pane-artists" role="tabpanel" aria-labelledby="venue-tab-artists" tabindex="0" data-venue-archive-panel="artists" hidden inert></div>
+                <div id="venue-pane-photos" role="tabpanel" aria-labelledby="venue-tab-photos" tabindex="0" data-venue-archive-panel="photos" hidden inert>
+                  <h4 class="venue-detail-panel-title">Total Photos</h4>
+                  <p class="venue-detail-body-copy"><strong data-venue-archive-value="photos">—</strong></p>
+                </div>
+                <div id="venue-pane-map" role="tabpanel" aria-labelledby="venue-tab-map" tabindex="0" data-venue-archive-panel="map" hidden inert></div>
+                <div id="venue-pane-history" role="tabpanel" aria-labelledby="venue-tab-history" tabindex="0" data-venue-archive-panel="history" hidden inert>
+                  <h4 class="venue-detail-panel-title">Archive History</h4>
+                  <p class="venue-detail-body-copy" data-venue-archive-value="history">—</p>
+                </div>
+                <div id="venue-pane-highlights" role="tabpanel" aria-labelledby="venue-tab-highlights" tabindex="0" data-venue-archive-panel="highlights" hidden inert></div>
+                <div id="venue-pane-about" role="tabpanel" aria-labelledby="venue-tab-about" tabindex="0" data-venue-archive-panel="about" hidden inert>
+                  <section class="venue-detail-panel venue-detail-panel--about" aria-labelledby="venue-about-title">
+                    <p class="venue-detail-panel-kicker">Venue Content</p>
+                    <h4 class="venue-detail-panel-title" id="venue-about-title">About The Venue</h4>
+                    <p class="venue-detail-body-copy">
+                      This section will contain venue history, significance, archive notes, and long-form venue information.
+                    </p>
+                  </section>
+                </div>
+                <div id="venue-pane-community" role="tabpanel" aria-labelledby="venue-tab-community" tabindex="0" data-venue-archive-panel="community" hidden inert>
+                  <section class="venue-detail-panel venue-detail-panel--testimonials" aria-labelledby="venue-testimonials-title">
+                    <p class="venue-detail-panel-kicker">Community Record</p>
+                    <h4 class="venue-detail-panel-title" id="venue-testimonials-title">Testimonials</h4>
+                    <p class="venue-detail-body-copy">
+                      This section will contain memories, stories, experiences, and first-hand accounts from musicians, fans, promoters, photographers, and venue staff.
+                    </p>
+                  </section>
+                </div>
               </div>
             </section>
-
-            <div class="venue-detail-content-grid">
-              <section class="venue-detail-panel venue-detail-panel--about" aria-labelledby="venue-about-title">
-                <p class="venue-detail-panel-kicker">Venue Content</p>
-                <h4 class="venue-detail-panel-title" id="venue-about-title">About The Venue</h4>
-                <p class="venue-detail-body-copy">
-                  This section will contain venue history, significance, archive notes, and long-form venue information.
-                </p>
-              </section>
-
-              <section class="venue-detail-panel venue-detail-panel--testimonials" aria-labelledby="venue-testimonials-title">
-                <p class="venue-detail-panel-kicker">Community Record</p>
-                <h4 class="venue-detail-panel-title" id="venue-testimonials-title">Testimonials</h4>
-                <p class="venue-detail-body-copy">
-                  This section will contain memories, stories, experiences, and first-hand accounts from musicians, fans, promoters, photographers, and venue staff.
-                </p>
-              </section>
-
-            </div>
           </article>
 
           <section class="v3-card v3-card--spotlight music-nexus-activity" aria-labelledby="music-activity-title" data-music-activity-panel>
