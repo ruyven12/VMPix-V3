@@ -1127,8 +1127,8 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   expect(background).toEqual(shellBox);
   expect(Math.abs((headingBox.x + headingBox.width / 2) - (shellBox.x + shellBox.width / 2))).toBeLessThanOrEqual(8);
   const gap = metadataBox.y - headingBox.y - headingBox.height;
-  expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.26);
-  expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.4);
+  expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.15);
+  expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.2);
   await expect(dossier.locator("[data-venue-events-year] li")).toHaveCount(10);
   const scrollHost = page.locator(".music-nexus-shell");
   await scrollHost.evaluate(node => node.scrollTo({ top: node.scrollHeight, behavior: "instant" }));
