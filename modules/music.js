@@ -426,6 +426,9 @@ let activeMusicVenueStateFilter = "";
 let activeMusicVenueSort = "az";
 let activeMusicVenueDetailSlug = "";
 let activeMusicVenuePhotoHighlightsKey = "";
+let musicVenueTabScrolls = new Map();
+let pendingMusicVenueTabScroll = "";
+let renderedMusicVenueDossierContext = null;
 const musicVenueStateCodes = ["ME", "NH", "MA", "CT", "RI", "VT"];
 const musicVenueStateAliases = {
   MAINE: "ME",
@@ -4569,10 +4572,6 @@ async function loadMusicVenuesBrowser() {
   notifyV3ResumeReady();
 }
 
-function returnToMusicVenuesRoute() {
-  performShellBack();
-}
-
 function navigateToMusicVenueDetail(venue) {
   navigateToRoute(getMusicVenueRouteUrl(venue), {
     historyState: {
@@ -4964,7 +4963,7 @@ function openMusicVenuePhotoHighlightsLightbox(state, index, trigger, analytics)
     source: "music-venue-photo-highlights",
     focusElement: trigger,
     previousActiveGalleryPhoto: activeGalleryPhoto || null,
-    scrollTop: musicNexusShell?.scrollTop ?? 0,
+    scrollTop: getMusicVenueArchiveViewport().scrollTop,
     strip,
     stripScrollLeft: strip.scrollLeft,
   };
@@ -5050,6 +5049,7 @@ function requestMusicVenuePhotoHighlightsPage(state, page = 1) {
       state.request = null;
       if (activeMusicVenuePhotoHighlightsKey === state.key && venueDetail?.getAttribute("aria-hidden") === "false") {
         renderMusicVenuePhotoHighlightsState(state);
+        restoreMusicVenueTabScroll();
         notifyV3ResumeReady();
       }
     });
@@ -5194,7 +5194,7 @@ function updateVenueArtistsGrid(grid, artists, searchTerm, card) {
 }
 
 function stopVenueArtistScrollTracking(panel) {
-  if (panel?._venueArtistScroll) musicNexusShell.removeEventListener("scroll", panel._venueArtistScroll);
+  if (panel?._venueArtistScroll) getMusicVenueArchiveViewport().removeEventListener("scroll", panel._venueArtistScroll);
   cancelAnimationFrame(panel?._venueArtistFrame);
 }
 
@@ -5291,13 +5291,13 @@ function renderVenueArtistsPanel(panel, artists, card) {
       button.setAttribute("aria-pressed", String(Number(button.dataset.venueArtistLevel) === state.level));
     }
   };
+  const viewport = getMusicVenueArchiveViewport();
+  const getAlphabetTop = () => viewport.getBoundingClientRect().top + viewport.clientTop;
   const jump = row => {
     if (!row) return;
     setActiveLetter(getVenueArtistLetter(row.dataset.venueArtistName));
-    const top = musicNexusShell.getBoundingClientRect().top + musicNexusShell.clientTop
-      + parseFloat(getComputedStyle(musicNexusShell).paddingTop);
-    const offset = row.getBoundingClientRect().top - top - alphabet.getBoundingClientRect().height - 7;
-    musicNexusShell.scrollTo({ top: Math.max(0, musicNexusShell.scrollTop + offset - getMusicVenueArchiveStickyHeight()), behavior: reducedMotion.matches ? "instant" : "smooth" });
+    const offset = row.getBoundingClientRect().top - getAlphabetTop() - alphabet.getBoundingClientRect().height - 7;
+    viewport.scrollTo({ top: Math.max(0, viewport.scrollTop + offset), behavior: reducedMotion.matches ? "instant" : "smooth" });
     row.focus({ preventScroll: true });
   };
   for (const letter of letters) {
@@ -5372,14 +5372,13 @@ function renderVenueArtistsPanel(panel, artists, card) {
     cancelAnimationFrame(panel._venueArtistFrame);
     panel._venueArtistFrame = requestAnimationFrame(() => {
       if (card._venueContext !== v3RouteContext || card.hidden) { stopVenueArtistScrollTracking(panel); return; }
-      const line = musicNexusShell.getBoundingClientRect().top + musicNexusShell.clientTop
-        + parseFloat(getComputedStyle(musicNexusShell).paddingTop) + getMusicVenueArchiveStickyHeight() + alphabet.getBoundingClientRect().height + 9;
+      const line = getAlphabetTop() + alphabet.getBoundingClientRect().height + 9;
       const groups = [...grid.querySelectorAll("[data-venue-artist-letter]")];
       const active = groups.filter(group => group.getBoundingClientRect().top <= line).at(-1) || groups[0];
       if (active) setActiveLetter(active.dataset.venueArtistLetter);
     });
   };
-  if (!card.hidden) musicNexusShell.addEventListener("scroll", panel._venueArtistScroll, { passive: true });
+  if (!card.hidden) viewport.addEventListener("scroll", panel._venueArtistScroll, { passive: true });
 }
 
 function getMusicVenueArchivePanel(tab) {
@@ -5409,14 +5408,45 @@ function centerMusicVenueArchiveTab(button) {
   rail.scrollTo({ left: rail.scrollLeft + (tabBox.left + tabBox.right - railBox.left - railBox.right) / 2, behavior: "instant" });
 }
 
-function getMusicVenueArchiveStickyHeight() {
-  return venueDetail.querySelector("[data-venue-archive-tab-bar]").offsetHeight;
+function getMusicVenueArchiveViewport() {
+  return venueDetail.querySelector("[data-venue-archive-content]");
+}
+
+function rememberMusicVenueTabScroll() {
+  const tab = venueDetail.dataset.venueArchiveActive;
+  if (tab && pendingMusicVenueTabScroll !== tab && getMusicVenueArchiveViewport().clientHeight) {
+    musicVenueTabScrolls.set(tab, getMusicVenueArchiveViewport().scrollTop);
+  }
+}
+
+function restoreMusicVenueTabScroll() {
+  const tab = pendingMusicVenueTabScroll;
+  if (!tab || tab !== venueDetail.dataset.venueArchiveActive || renderedMusicVenueDossierContext !== v3RouteContext) return;
+  const viewport = getMusicVenueArchiveViewport();
+  if (!viewport.clientHeight || venueDetail.classList.contains("is-missing")) return;
+  const top = musicVenueTabScrolls.get(tab) || 0;
+  if (top > 0) {
+    if (tab === "events" && (musicVenueDossierEventsView?.context !== v3RouteContext
+        || !musicVenueDossierEventsView.ready)) return;
+    if (tab === "artists" && (!getVenueArtistsRelationshipPanel()?.childElementCount
+        || musicShowsSetsDataState === "loading")) return;
+    if (tab === "highlights" && musicVenuePhotoHighlightsStates.get(activeMusicVenuePhotoHighlightsKey)?.request) return;
+    if (tab === "map" && (musicVenueRegionView?.context !== v3RouteContext
+        || !musicVenueRegionView.panel.dataset.venueRegionState
+        || musicVenueRegionView.panel.dataset.venueRegionState === "loading")) return;
+  }
+  pendingMusicVenueTabScroll = "";
+  viewport.scrollTop = top;
 }
 
 function setMusicVenueArchiveTab(tab, event = null) {
   const button = getMusicVenueArchiveTab(tab);
   if (!button) return;
   const previous = venueDetail.dataset.venueArchiveActive;
+  if (previous !== tab) {
+    rememberMusicVenueTabScroll();
+    pendingMusicVenueTabScroll = tab;
+  }
   venueDetail.dataset.venueArchiveActive = tab;
   for (const item of button.parentElement.children) {
     const active = item === button;
@@ -5429,12 +5459,14 @@ function setMusicVenueArchiveTab(tab, event = null) {
   const artistsPanel = getVenueArtistsRelationshipPanel();
   stopVenueArtistScrollTracking(artistsPanel);
   if (tab === "artists" && artistsPanel?._venueArtistScroll) {
-    musicNexusShell.addEventListener("scroll", artistsPanel._venueArtistScroll, { passive: true });
+    getMusicVenueArchiveViewport().addEventListener("scroll", artistsPanel._venueArtistScroll, { passive: true });
     const rail = artistsPanel.querySelector(".venue-artists-alphabet-rail");
     if (rail) rail.scrollLeft = artistsPanel.parentElement._venueArtistState.rail;
   }
   const events = musicVenueDossierEventsView;
+  if (previous !== tab) getMusicVenueArchiveViewport().scrollTop = 0;
   if (tab === "events" && events?.context === v3RouteContext && !events.ready) events.load();
+  restoreMusicVenueTabScroll();
   centerMusicVenueArchiveTab(button);
   const panelType = { events: "show_history", artists: "venue_artists" }[tab];
   if (event && previous !== tab && panelType) {
@@ -5446,6 +5478,12 @@ function initializeMusicVenueArchiveTabs() {
   const rail = venueDetail.querySelector("[data-venue-archive-tabs]");
   if (rail.dataset.bound) return;
   rail.dataset.bound = "true";
+  const viewport = getMusicVenueArchiveViewport();
+  for (const type of ["pointerdown", "touchstart", "wheel", "keydown"]) {
+    viewport.addEventListener(type, event => {
+      if (event.isTrusted) pendingMusicVenueTabScroll = "";
+    }, { passive: true });
+  }
   rail.addEventListener("click", event => {
     const tab = event.target.closest("[data-venue-archive-tab]");
     if (tab) setMusicVenueArchiveTab(tab.dataset.venueArchiveTab, event);
@@ -5667,7 +5705,10 @@ function createMusicVenueEventsView(screen, venueSlug, ui, ownsView, inline = fa
       title, text, small: true, retry: state === "error" ? { label: "Retry Archive Events", onClick: () => load(true) } : false,
     }));
     view.ready = state !== "loading";
-    if (view.ready) notifyV3ResumeReady();
+    if (view.ready) {
+      if (inline) restoreMusicVenueTabScroll();
+      notifyV3ResumeReady();
+    }
   };
   const load = (retry = false) => {
     if (view.request || !ownsView(view)) return;
@@ -5703,6 +5744,7 @@ function createMusicVenueEventsView(screen, venueSlug, ui, ownsView, inline = fa
     status.replaceChildren();
     years.replaceChildren(...groups.map(([year, rows], index) => renderMusicVenueEventsYear(view, year, rows, index === 0)));
     view.ready = true;
+    if (inline) restoreMusicVenueTabScroll();
     notifyV3ResumeReady();
   }
   view.load = load;
@@ -5835,6 +5877,10 @@ function renderMusicVenueRegionState(view, state, title = "", message = "", retr
   view.gestures.disabled = !ready;
   view.gestures.setAttribute("aria-pressed", "false");
   view.gestures.textContent = "Enable map gestures";
+  if (state !== "loading") {
+    restoreMusicVenueTabScroll();
+    notifyV3ResumeReady();
+  }
 }
 
 function mountMusicVenueRegionMap(view, retry = false) {
@@ -6159,15 +6205,19 @@ function renderMusicVenueDossierEditorial(venue) {
     if (!id || !title || !contributor || !preview || !memory || seen.has(id)) continue;
     seen.add(id);
     memories.push({
-      title, contributor, preview, memory, date: getMusicVenueMemoryDate(record.publication_date),
+      id, title, contributor, preview, memory, date: getMusicVenueMemoryDate(record.publication_date),
       connection: getMusicVenueEditorialText(record.contributor_connection),
       showId: readMusicVenueRelationshipId(record.show_id),
     });
   }
   const dateFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
   memories.sort((left, right) => (right.date?.getTime() ?? -Infinity) - (left.date?.getTime() ?? -Infinity));
-  const memoryNodes = memories.map(({ title, contributor, preview, memory, date, connection, showId }) => {
+  const savedOpen = v3ResumeUI().communityOpen;
+  const open = new Set(Array.isArray(savedOpen) ? savedOpen : []);
+  const memoryNodes = memories.map(({ id, title, contributor, preview, memory, date, connection, showId }) => {
     const { disclosure, summary, body } = createMusicVenueMemoryDisclosure(title);
+    disclosure.dataset.venueMemoryId = id;
+    disclosure.open = open.has(id);
     const byline = document.createElement("span");
     byline.className = "venue-archive-memory-meta";
     const author = document.createElement("span");
@@ -6207,6 +6257,8 @@ function renderMusicVenueDossierEditorial(venue) {
 function updateMusicVenueMemoryShows(shows) {
   const associations = getMusicVenueArchivePanel("community").querySelectorAll("[data-venue-memory-show]");
   if (!associations.length) return;
+  const viewport = venueDetail.dataset.venueArchiveActive === "community" ? getMusicVenueArchiveViewport() : null;
+  const top = viewport?.scrollTop;
   const titles = new Map();
   for (const show of shows) {
     const id = readMusicVenueRelationshipId(show.show_id, show.showId, show.id);
@@ -6216,9 +6268,12 @@ function updateMusicVenueMemoryShows(shows) {
   }
   for (const association of associations) {
     const title = titles.get(association.dataset.venueMemoryShow);
+    const text = title ? "Associated show: " + title : "";
     association.hidden = !title;
-    association.textContent = title ? "Associated show: " + title : "";
+    if (association.textContent !== text) association.textContent = text;
   }
+  // Late Show metadata must not move the active Community pane’s saved position.
+  if (viewport && viewport.scrollTop !== top) viewport.scrollTop = top;
 }
 
 function renderMusicVenueDossierRelationships(venue) {
@@ -6226,6 +6281,7 @@ function renderMusicVenueDossierRelationships(venue) {
   setMusicVenueDetailRelationshipValue("history", getMusicVenueArchiveHistory(shows));
   setupVenueArtistsRelationshipCard(venue, getMusicVenueArtists(venue, shows), shows.length > 0);
   updateMusicVenueMemoryShows(shows);
+  restoreMusicVenueTabScroll();
 }
 
 function readMusicVenueMetadataText(...values) {
@@ -6329,6 +6385,7 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   clearMusicVenueDetailState();
   renderMusicVenueDossierRelationships(venue);
   syncMusicVenuePhotoHighlights(venue, slug);
+  renderedMusicVenueDossierContext = v3RouteContext;
   setMusicVenueArchiveTab(venueDetail.dataset.venueArchiveActive);
 }
 
@@ -6372,8 +6429,9 @@ function prepareHarmonyVenueSoloArrival(context, slug) {
   for (const type of ["pointerdown", "wheel", "keydown", "focusin"]) {
     document.addEventListener(type, onInteraction, { capture: true, passive: true, signal });
   }
-  musicNexusShell.addEventListener("scroll", () => {
-    if (arrival.scrollTop !== null && Math.abs(musicNexusShell.scrollTop - arrival.scrollTop) > 1) arrival.finish();
+  const viewport = getMusicVenueArchiveViewport();
+  viewport.addEventListener("scroll", () => {
+    if (arrival.scrollTop !== null && Math.abs(viewport.scrollTop - arrival.scrollTop) > 1) arrival.finish();
   }, { passive: true, signal });
   window.addEventListener("popstate", arrival.finish, { capture: true, signal });
   window.addEventListener("resize", arrival.finish, { signal });
@@ -6417,7 +6475,7 @@ function playHarmonyVenueSoloArrival(arrival, context, venue) {
     if (!titleBox.width || !titleBox.height || titleBox.height + 20 > bottom - top || titleBox.top >= bottom) {
       return arrival.finish();
     }
-    arrival.scrollTop = musicNexusShell.scrollTop;
+    arrival.scrollTop = getMusicVenueArchiveViewport().scrollTop;
     const centerY = (top + bottom - titleBox.top - titleBox.bottom) / 2;
     const centered = "translate3d(0, " + centerY + "px, 0)";
     // If a refresh restored the heading above the clip, end visible motion at that edge.
@@ -6480,14 +6538,24 @@ function showMusicVenueDetail(venueSlug) {
   setVenueDetailVisible(true);
   setCurrentView("Venue Detail");
   initializeMusicVenueArchiveTabs();
-  setMusicVenueArchiveTab(getMusicVenueSavedTab(v3ResumeUI()));
-  const soloArrival = prepareHarmonyVenueSoloArrival(context, slug);
-  if (musicNexusShell && !v3RouteContext.snapshot) {
-    musicNexusShell.scrollTo({
-      top: 0,
-      behavior: harmonyVenuePassage?.committing || soloArrival ? "instant" : reducedMotion.matches ? "auto" : "smooth",
-    });
+  const saved = v3ResumeUI();
+  const tab = getMusicVenueSavedTab(saved);
+  renderedMusicVenueDossierContext = null;
+  musicVenueTabScrolls = new Map();
+  for (const button of venueDetail.querySelectorAll("[data-venue-archive-tab]")) {
+    const key = button.dataset.venueArchiveTab;
+    const top = saved.tabScrolls?.[key];
+    if (typeof top === "number" && Number.isFinite(top) && top >= 0) musicVenueTabScrolls.set(key, top);
   }
+  if (!musicVenueTabScrolls.has(tab) && Array.isArray(context.snapshot?.scroll)) {
+    const oldTop = context.snapshot.scroll.find(row => row?.key === "shell")?.top;
+    if (typeof oldTop === "number" && Number.isFinite(oldTop) && oldTop > 0) musicVenueTabScrolls.set(tab, oldTop);
+  }
+  getMusicVenueArchiveViewport().scrollTop = 0;
+  delete venueDetail.dataset.venueArchiveActive;
+  pendingMusicVenueTabScroll = tab;
+  setMusicVenueArchiveTab(tab);
+  const soloArrival = prepareHarmonyVenueSoloArrival(context, slug);
 
   if (musicVenuesLoaded) {
     hydrateMusicVenueDossier(context, slug, soloArrival);
@@ -10295,8 +10363,8 @@ function returnToSetGalleryFromLightbox() {
     setVenueDetailVisible(true);
     setCurrentView("Venue Detail");
     window.requestAnimationFrame(() => {
-      if (musicNexusShell && scrollTop !== null) {
-        musicNexusShell.scrollTo({ top: scrollTop, behavior: "auto" });
+      if (scrollTop !== null) {
+        getMusicVenueArchiveViewport().scrollTo({ top: scrollTop, behavior: "instant" });
       }
       if (returnContext.strip?.isConnected) returnContext.strip.scrollLeft = returnContext.stripScrollLeft;
       if (focusTarget) {
@@ -18783,10 +18851,6 @@ function initMusicModule() {
   if (setGalleryBack) {
     setGalleryBack.addEventListener("click", returnToSetsArchiveFromGallery);
   }
-  if (venueDetailBack) {
-    venueDetailBack.textContent = "Back";
-    venueDetailBack.addEventListener("click", returnToMusicVenuesRoute);
-  }
   galleryPhotoTiles.forEach((tile) => {
     protectArchiveImage(tile.querySelector(".archive-gallery-image"));
     tile.addEventListener("click", (event) => {
@@ -18999,16 +19063,23 @@ function captureMusicResumeState(route) {
     inspectedVenue: inspectedMusicVenueSlug,
   };
   if (route.name === "music-venue-events") return captureMusicVenueEventsState(musicVenueEventsView);
-  if(route.name==='music-venue-detail')return {
-    venueTab: venueDetail.dataset.venueArchiveActive,
-    focusedTab: document.activeElement?.dataset.venueArchiveTab,
-    events: captureMusicVenueEventsState(musicVenueDossierEventsView),
-    regionFocus: document.activeElement === musicVenueRegionView?.card || musicVenueRegionView?.panel?.contains(document.activeElement),
-    regionMap: musicVenueRegionView?.context === v3RouteContext && musicVenueRegionView.coordinates
-      ? { ...getMusicVenueRegionCamera(musicVenueRegionView), home: musicVenueRegionView.coordinates } : null,
-    artistLink: document.activeElement?.closest("[data-venue-artists-panel] a")?.getAttribute("href") || '',
-    artists: { ...getMusicVenueArchivePanel("artists")._venueArtistState },
-    artistQuery: getMusicVenueArchivePanel("artists")._venueArtistSearch || ""};
+  if (route.name === "music-venue-detail") {
+    rememberMusicVenueTabScroll();
+    return {
+      venueTab: venueDetail.dataset.venueArchiveActive,
+      tabScrolls: Object.fromEntries(musicVenueTabScrolls),
+      focusedTab: document.activeElement?.dataset.venueArchiveTab,
+      events: captureMusicVenueEventsState(musicVenueDossierEventsView),
+      regionFocus: document.activeElement === musicVenueRegionView?.card || musicVenueRegionView?.panel?.contains(document.activeElement),
+      regionMap: musicVenueRegionView?.context === v3RouteContext && musicVenueRegionView.coordinates
+        ? { ...getMusicVenueRegionCamera(musicVenueRegionView), home: musicVenueRegionView.coordinates } : null,
+      artistLink: document.activeElement?.closest("[data-venue-artists-panel] a")?.getAttribute("href") || "",
+      artists: { ...getMusicVenueArchivePanel("artists")._venueArtistState },
+      artistQuery: getMusicVenueArchivePanel("artists")._venueArtistSearch || "",
+      communityOpen: [...getMusicVenueArchivePanel("community").querySelectorAll("details[open][data-venue-memory-id]")]
+        .map(memory => memory.dataset.venueMemoryId).slice(0, 100),
+    };
+  }
   if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
     .map(card=>card.dataset.personShowId+'|'+card.dataset.personShowAlbumId).slice(0,100)};
   if(route.name==='show-detail'){
@@ -19090,6 +19161,8 @@ function restoreMusicResumeState(route,ui) {
     } else if (tab === "map" && ui.regionFocus) {
       focus = button;
     }
+    restoreMusicVenueTabScroll();
+    if (pendingMusicVenueTabScroll === tab) return false;
     restoreMusicVenueArchiveFocus(focus);
     return true;
   }

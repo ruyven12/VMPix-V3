@@ -771,12 +771,15 @@ test("Harbor Engine Back keeps the unfinished forward title covered until native
   await expect(inspect).toBeFocused();
 });
 
-for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
-  test("Harbor venue return restores the real Registry with " + (partial ? "a partially clipped title" : "an offscreen title") + " and keeps Engine Back single", async ({ page, baseURL }) => {
+for (const [width, height, scrollRegistry] of [[915, 412, true], [412, 915, false]]) {
+  test("Harbor venue return carries the stationary title and restores the real Registry " + width + "x" + height, async ({ page, baseURL }) => {
     await page.setViewportSize({ width, height });
     await page.emulateMedia({ reducedMotion: "no-preference" });
     let venueRequests = 0;
-    await mockArchive(page, baseURL, () => { venueRequests++; return { data: venues }; });
+    const linkedShows = Array.from({ length: 10 }, (_, index) => ({
+      show_id: "return-show-" + index, venue_id: "signal-3", name: "Documented Event " + index, date: "2025-08-03",
+    }));
+    await mockArchive(page, baseURL, () => { venueRequests++; return { data: venues }; }, () => ({ data: linkedShows }));
     await page.goto(harborPath, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Reject", exact: true }).click();
     await page.getByRole("button", { name: "Browse Venues" }).press("Enter");
@@ -792,30 +795,25 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
     const selected = layer.locator("[data-harmony-passage-selected]");
     const plates = layer.locator(".harmony-venue-passage__plate");
     await expect(archive).not.toHaveAttribute("data-harmony-activation", /.+/);
-    const scroll = await list.evaluate((node, hasClippedHeading) => {
-      if (hasClippedHeading) return node.scrollTop;
+    const scroll = await list.evaluate((node, shouldScroll) => {
+      if (!shouldScroll) return node.scrollTop;
       node.style.maxHeight = "14rem";
       node.scrollTop = 9;
       return node.scrollTop;
-    }, partial);
-    if (!partial) expect(scroll).toBeGreaterThan(0);
+    }, scrollRegistry);
+    if (scrollRegistry) expect(scroll).toBeGreaterThan(0);
     const originalBox = await inspect.locator("..").boundingBox();
     const engineBox = await engine.boundingBox();
     await inspect.press("Enter");
     await expect(title).toBeFocused();
-    if (partial) await page.addStyleTag({ content: ".music-nexus-shell.is-venue-detail { max-height: 28rem; }" });
-    const source = await title.evaluate((node, hasClippedHeading) => {
-      const scroller = node.closest("[data-music-nexus-shell]");
-      const top = scroller.getBoundingClientRect().top + scroller.clientTop;
-      const before = node.getBoundingClientRect();
-      const target = hasClippedHeading ? before.top - top + before.height / 2 : scroller.scrollHeight;
-      scroller.scrollTo({ top: target, behavior: "instant" });
-      const box = node.getBoundingClientRect();
-      return { top, bottom: box.bottom, titleTop: box.top };
-    }, partial);
-    expect(source.titleTop).toBeLessThan(source.top);
-    if (partial) expect(source.bottom).toBeGreaterThan(source.top);
-    else expect(source.bottom).toBeLessThan(source.top);
+    await expect(detail.locator("[data-venue-events-year] li")).toHaveCount(10);
+    const source = await title.boundingBox();
+    const paneScroll = await detail.locator("[data-venue-archive-content]").evaluate(node => {
+      node.scrollTo({ top: node.scrollHeight, behavior: "instant" });
+      return node.scrollTop;
+    });
+    expect(paneScroll).toBeGreaterThan(0);
+    expect(await title.boundingBox()).toEqual(source);
     const originalHistory = await page.evaluate(() => {
       const animate = Element.prototype.animate;
       window.harmonyReturnArt = document.querySelector("[data-harmony-art]");
@@ -835,18 +833,12 @@ for (const [width, height, partial] of [[915, 412, false], [412, 915, true]]) {
       window.harmonyReturnAnimations.filter(animation => values.includes(animation.effect.getTiming().duration))
         .forEach(animation => animation.finish());
     }, durations);
-    // Activate the existing local Back control without its offscreen focus changing the deliberate scroll fixture.
-    await detail.locator("[data-venue-detail-back]").evaluate(button => button.click());
+    await page.locator("[data-prototype-engine-return]").press("Enter");
     await expect(page).toHaveURL(baseURL + harborPath);
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "departing");
     await expect(ghost).toHaveText("Signal Hall 03");
-    await expect(ghost).toHaveCSS("opacity", partial ? "1" : "0");
-    if (partial) {
-      expect((await ghost.boundingBox()).y).toBeCloseTo(source.titleTop, 0);
-      expect(await layer.evaluate(node => getComputedStyle(node).clipPath)).toMatch(/^inset\(/);
-    } else {
-      expect((await ghost.boundingBox()).y).toBeGreaterThanOrEqual(source.top);
-    }
+    await expect(ghost).toHaveCSS("opacity", "1");
+    expect((await ghost.boundingBox()).y).toBeCloseTo(source.y, 0);
     await finish([130]);
     await expect(shell).toHaveAttribute("data-harmony-venue-return", "descending");
     expect(await plates.evaluateAll(nodes => nodes.filter(node => !node.hasAttribute("data-harmony-passage-selected"))
@@ -915,6 +907,11 @@ test("Harbor Solo Arrival reveals only verified identity before the real Dossier
     return route.fulfill({ json: { photos: [] }, headers: { "access-control-allow-origin": "*" } });
   });
   await page.addInitScript(() => {
+    const now = Date.now();
+    localStorage.setItem("v3.analytics.preference.v1", JSON.stringify({
+      version: 1, analyticsStorage: "denied", noticeVersion: "reviewed-engagement-1",
+      savedAt: now, expiresAt: now + 180 * 86400000,
+    }));
     const animate = Element.prototype.animate;
     window.soloAnimations = [];
     Element.prototype.animate = function (frames, options) {
@@ -927,7 +924,6 @@ test("Harbor Solo Arrival reveals only verified identity before the real Dossier
     };
   });
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
-  await page.getByRole("button", { name: "Reject", exact: true }).click();
   const shell = page.locator(".site-shell");
   const dossier = page.locator("[data-venue-detail]");
   const title = dossier.locator("[data-venue-detail-title]");
@@ -1033,7 +1029,7 @@ test("Harbor Solo Arrival replaces an interrupted dossier and stays off for an I
   await expect(page.locator("[data-venue-events-year] li")).toHaveCount(10);
   await page.addStyleTag({ content: ".music-nexus-shell.is-venue-detail { max-height: 28rem; }" });
   const scroll = await page.evaluate(url => {
-    const scroller = document.querySelector("[data-music-nexus-shell]");
+    const scroller = document.querySelector("[data-venue-archive-content]");
     scroller.scrollTo({ top: 100, behavior: "instant" });
     const oldTop = scroller.scrollTop;
     navigateToRoute(url);
@@ -1130,9 +1126,14 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.15);
   expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.2);
   await expect(dossier.locator("[data-venue-events-year] li")).toHaveCount(10);
-  const scrollHost = page.locator(".music-nexus-shell");
+  const scrollHost = archiveContent;
+  await expect(dossier.locator("[data-venue-detail-back]")).toHaveCount(0);
   await scrollHost.evaluate(node => node.scrollTo({ top: node.scrollHeight, behavior: "instant" }));
   expect(await scrollHost.evaluate(node => node.scrollTop)).toBeGreaterThan(0);
+  expect(await page.locator("[data-music-nexus-shell]").evaluate(node => node.scrollTop)).toBe(0);
+  expect(await title.boundingBox()).toEqual(headingBox);
+  expect(await metadata.boundingBox()).toEqual(metadataBox);
+  expect(await archiveTabs.boundingBox()).toEqual(tabsBox);
   expect(await environment.boundingBox()).toEqual(background);
   expect(await engine.boundingBox()).toEqual(engineBox);
 
@@ -1254,7 +1255,7 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   const bounds = await tile.boundingBox();
   expect(Math.abs(bounds.width - bounds.height)).toBeLessThanOrEqual(1);
   const stripScroll = await strip.evaluate(node => node.scrollLeft);
-  const scroller = page.locator(".music-nexus-shell");
+  const scroller = dossier.locator("[data-venue-archive-content]");
   const dossierScroll = await scroller.evaluate(node => node.scrollTop);
   expect(stripScroll).toBeGreaterThan(0);
   await tile.click();
@@ -1298,11 +1299,14 @@ test("Venue Dossier shows published chapters and independently expandable approv
   await page.emulateMedia({ reducedMotion: "reduce" });
   let releaseShows;
   const shows = new Promise(resolve => { releaseShows = resolve; });
+  let releaseReloadShows;
+  const reloadShows = new Promise(resolve => { releaseReloadShows = resolve; });
   let venueRequests = 0;
   let showRequests = 0;
   const memory = (id, title, publication_date, extra = {}) => ({
     id, title, publication_date, approved: true, contributor_name: "Archive Contributor",
-    preview: "A recorded recollection.", memory: "A full recorded recollection.", ...extra,
+    preview: "A recorded recollection.",
+    memory: "A full recorded recollection.".repeat(35), ...extra,
   });
   const authoredMarkup = "<img src=x onerror=alert(1)>";
   await mockArchive(page, baseURL, () => {
@@ -1326,7 +1330,7 @@ test("Venue Dossier shows published chapters and independently expandable approv
       ] },
       { venue_id: "plain-venue", name: "Plain Venue" },
     ] };
-  }, () => { showRequests++; return shows; });
+  }, () => ++showRequests === 1 ? shows : reloadShows);
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const archive = page.getByRole("region", { name: "Venue Archive" });
@@ -1357,10 +1361,11 @@ test("Venue Dossier shows published chapters and independently expandable approv
   await expect(cards.first().locator("img")).toHaveCount(0);
   const linkedShow = cards.first().locator("[data-venue-memory-show]");
   await expect(linkedShow).toBeHidden();
-  releaseShows({ data: [
+  const linkedShows = { data: [
     { show_id: "linked-show", venue_id: "aura", name: "Verified Aura Show" },
     { show_id: "other-venue", venue_id: "plain-venue", name: "Different Venue Show" },
-  ] });
+  ] };
+  releaseShows(linkedShows);
   await expect(linkedShow).toHaveText("Associated show: Verified Aura Show");
   await expect(community.getByText("Associated show: Different Venue Show", { exact: true })).toHaveCount(0);
   await expect(community.locator("details[open]")).toHaveCount(2);
@@ -1371,6 +1376,18 @@ test("Venue Dossier shows published chapters and independently expandable approv
   expect(await page.evaluate(() => history.length)).toBe(originalHistory);
   expect(venueRequests).toBe(1);
   expect(showRequests).toBe(1);
+
+  const pane = page.locator("[data-venue-archive-content]");
+  const offset = await pane.evaluate(node => { node.scrollTop = 220; return node.scrollTop; });
+  expect(offset).toBeGreaterThan(0);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect(communityTab).toHaveAttribute("aria-selected", "true");
+  await expect(community.locator("details[open]")).toHaveCount(2);
+  await expect.poll(() => pane.evaluate(node => node.scrollTop)).toBe(offset);
+  await expect(linkedShow).toBeHidden();
+  releaseReloadShows(linkedShows);
+  await expect(linkedShow).toHaveText("Associated show: Verified Aura Show");
+  await expect.poll(() => pane.evaluate(node => node.scrollTop)).toBe(offset);
 
   await page.evaluate(path => navigateToRoute(path), harborPath + "/plain-venue");
   await aboutTab.press("Enter");
@@ -1757,7 +1774,7 @@ test("Dossier Events and Artists tabs restore after Show/Band Back " + width + "
   const dossier = page.locator("[data-venue-detail]");
   const entry = dossier.getByRole("tab", { name: "Events", exact: true });
   const timeline = dossier.locator("[data-venue-shows-panel]");
-  const scroll = page.locator("[data-music-nexus-shell]");
+  const scroll = dossier.locator("[data-venue-archive-content]");
   const engine = page.locator("[data-prototype-engine-return]");
   const year = key => timeline.locator("[data-venue-events-year=\"" + key + "\"]");
   await expect(entry).toHaveAttribute("aria-selected", "true");
@@ -1774,9 +1791,7 @@ test("Dossier Events and Artists tabs restore after Show/Band Back " + width + "
   await expect(entry).toHaveAttribute("aria-selected", "true");
   await expect(timeline).toBeVisible();
   if (process.env.HARMONY_EVIDENCE_DIR && motion === "no-preference") {
-    await scroll.evaluate(node => {
-      node.scrollTop += node.querySelector("[data-venue-archive-tab-bar]").getBoundingClientRect().top - node.getBoundingClientRect().top - 30;
-    });
+    await scroll.evaluate(node => { node.scrollTop = 0; });
     await expect.poll(() => timeline.evaluate(node => node.getAnimations({ subtree: true }).filter(animation =>
       animation.effect.getTiming().iterations !== Infinity && animation.playState === "running").length)).toBe(0);
     await page.screenshot({ path: require("node:path").join(process.env.HARMONY_EVIDENCE_DIR, "inline-events-" + width + "x" + height + ".png") });
@@ -1811,11 +1826,13 @@ test("Dossier Events and Artists tabs restore after Show/Band Back " + width + "
   await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(savedScroll);
   await year("undated").locator("summary").press("Enter");
   await expect(year("undated").getByRole("link", { name: /Date unavailable Incomplete Date/ })).toBeVisible();
+  const eventOffset = await scroll.evaluate(node => node.scrollTop);
   await artists.press("Enter");
   await expect(entry).toHaveAttribute("aria-selected", "false");
   await expect(timeline).toBeHidden();
   await entry.press("Space");
   await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(eventOffset);
   await artists.press("Enter");
   await page.route(/\/api\/music\/bands(?:\?|$)/, route => route.fulfill({ headers: { "access-control-allow-origin": "*" }, json: { data: [{ band_id: "nine-treasures", band: "Nine Treasures", name: "Nine Treasures", region: "International" }], totalPages: 1 } }));
   const band = dossier.locator(".venue-artists-grid").getByRole("link", { name: "Nine Treasures", exact: true });
@@ -1848,6 +1865,13 @@ test("Dossier Events and Artists tabs restore after Show/Band Back " + width + "
   await expect(year("2025")).toHaveAttribute("open", "");
   await expect(year("undated")).toHaveAttribute("open", "");
   await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+  if (width === 412 && motion === "reduce") {
+    await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(eventOffset);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(entry).toHaveAttribute("aria-selected", "true");
+    await expect(year("2026").getByRole("listitem")).toHaveCount(22);
+    await expect.poll(() => scroll.evaluate(node => node.scrollTop)).toBe(eventOffset);
+  }
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await timeline.evaluate(node => getComputedStyle(node).overflowY)).not.toMatch(/auto|scroll/);
   expect(errors).toEqual([]);
@@ -1913,7 +1937,7 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   const dossier = page.locator("[data-venue-detail]");
   const toggle = dossier.getByRole("tab", { name: "Artists", exact: true });
   const panel = dossier.locator("[data-venue-artists-panel]");
-  const scroller = page.locator("[data-music-nexus-shell]");
+  const scroller = dossier.locator("[data-venue-archive-content]");
   const rail = panel.locator("[data-venue-artist-rail]");
   const alphabet = panel.getByRole("navigation", { name: "Artist alphabet" });
   const search = panel.getByRole("searchbox", { name: "Search Artists" });
@@ -1946,12 +1970,11 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   await expect(panel.getByRole("link", { name: "Beta Band", exact: true })).toBeFocused();
   await expect.poll(() => alphabet.evaluate(node => {
     const box = node.getBoundingClientRect();
-    const scroller = node.closest("[data-music-nexus-shell]");
-    const scrollportTop = scroller.getBoundingClientRect().top + scroller.clientTop
-      + parseFloat(getComputedStyle(scroller).paddingTop);
+    const scroller = node.closest("[data-venue-archive-content]");
+    const scrollportTop = scroller.getBoundingClientRect().top + scroller.clientTop;
     const tabs = node.closest("[data-venue-relationships]").querySelector("[data-venue-archive-tab-bar]").getBoundingClientRect();
     const focusedRow = document.activeElement.getBoundingClientRect();
-    return Math.abs(tabs.top - scrollportTop) <= 1 && Math.abs(box.top - tabs.bottom) <= 1
+    return Math.abs(box.top - scrollportTop) <= 1 && tabs.bottom <= scrollportTop
       && focusedRow.top >= box.bottom;
   })).toBe(true);
   await panel.getByRole("button", { name: "Artists beginning with A" }).press("Enter");

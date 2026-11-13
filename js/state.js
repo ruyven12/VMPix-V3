@@ -89,7 +89,6 @@ const venueDetail = queryRetainedMusicElement("[data-venue-detail]");
 const musicVenuesIndex = queryRetainedMusicElement("[data-music-venues-index]");
 const musicVenuesFilters = queryRetainedMusicElement("[data-music-venues-filters]");
 const musicVenuesList = queryRetainedMusicElement("[data-music-venues-list]");
-const venueDetailBack = queryRetainedMusicElement("[data-venue-detail-back]");
 const venueDetailTitle = queryRetainedMusicElement("[data-venue-detail-title]");
 const venueDetailStatValues = Array.from(queryRetainedMusicElements("[data-venue-detail-stat]"));
 const musicNexusBack = queryRetainedMusicElement("[data-music-nexus-back]");
