@@ -4699,7 +4699,6 @@ function createMusicVenuePhotoHighlightsState(identifier) {
     key: getMusicVenuePhotoHighlightsKey(identifier),
     status: "idle",
     isLoading: false,
-    scrollLeft: 0,
     photos: [],
     photoKeys: new Set(),
     venueName: "",
@@ -4891,16 +4890,12 @@ function createMusicVenuePhotoHighlightsStateCard(stateName, text) {
   return stateCard;
 }
 
-function createMusicVenuePhotoHighlightsFilmstrip(state) {
-  const strip = document.createElement("div");
-  strip.className = "venue-photo-filmstrip";
-  strip.dataset.venuePhotoFilmstrip = state.key;
-  strip.setAttribute("role", "group");
-  strip.setAttribute("aria-label", "Venue photo thumbnails");
-  strip.tabIndex = 0;
-  strip.addEventListener("scroll", () => {
-    if (activeMusicVenuePhotoHighlightsKey === state.key && !isLightboxOpen()) state.scrollLeft = strip.scrollLeft;
-  }, { passive: true });
+function createMusicVenuePhotoHighlightsGrid(state) {
+  const grid = document.createElement("div");
+  grid.className = "venue-photo-grid";
+  grid.dataset.venuePhotoGrid = state.key;
+  grid.setAttribute("role", "group");
+  grid.setAttribute("aria-label", "Venue photo thumbnails");
 
   state.photos.forEach((photo, index) => {
     const button = document.createElement("button");
@@ -4919,9 +4914,9 @@ function createMusicVenuePhotoHighlightsFilmstrip(state) {
     button.addEventListener("click", event => {
       openMusicVenuePhotoHighlightsLightbox(state, index, event.currentTarget, beginArchiveAnalytics(event));
     });
-    strip.append(button);
+    grid.append(button);
   });
-  return strip;
+  return grid;
 }
 
 function createMusicVenuePhotoHighlightLightboxTile(photo, index, state) {
@@ -4958,14 +4953,11 @@ function createMusicVenuePhotoHighlightLightboxTile(photo, index, state) {
 function openMusicVenuePhotoHighlightsLightbox(state, index, trigger, analytics) {
   if (activeMusicVenuePhotoHighlightsKey !== state.key || !state.photos[index]) return;
 
-  const strip = trigger.parentElement;
   const returnContext = {
     source: "music-venue-photo-highlights",
     focusElement: trigger,
     previousActiveGalleryPhoto: activeGalleryPhoto || null,
     scrollTop: getMusicVenueArchiveViewport().scrollTop,
-    strip,
-    stripScrollLeft: strip.scrollLeft,
   };
   activeLightboxCustomTiles = state.photos.map((photo, tileIndex) => createMusicVenuePhotoHighlightLightboxTile(photo, tileIndex, state));
   showLightbox(activeLightboxCustomTiles[index], { returnContext, analytics });
@@ -4981,10 +4973,8 @@ function renderMusicVenuePhotoHighlightsState(state) {
   section.setAttribute("aria-busy", String(state.isLoading));
   const body = section.querySelector("[data-venue-photo-highlights-body]");
   if (state.status === "ready") {
-    if (body.firstElementChild?.dataset.venuePhotoFilmstrip !== state.key) {
-      const strip = createMusicVenuePhotoHighlightsFilmstrip(state);
-      body.replaceChildren(strip);
-      strip.scrollLeft = state.scrollLeft;
+    if (body.firstElementChild?.dataset.venuePhotoGrid !== state.key) {
+      body.replaceChildren(createMusicVenuePhotoHighlightsGrid(state));
     }
     return;
   }
@@ -5156,20 +5146,13 @@ function createVenueArtistPill(artist, index) {
   return entry;
 }
 
-function updateVenueArtistsGrid(grid, artists, searchTerm, card) {
-  const query = String(searchTerm || "").trim().toLowerCase();
+function renderVenueArtistsGrid(grid, artists) {
   const groups = new Map();
-  const ordered = artists.filter(artist => !query || artist.name.toLowerCase().includes(query))
-    .sort((left, right) => left.name.localeCompare(right.name));
+  const ordered = [...artists].sort((left, right) => left.name.localeCompare(right.name));
   for (const artist of ordered) {
     const letter = getVenueArtistLetter(artist.name);
     if (!groups.has(letter)) groups.set(letter, []);
     groups.get(letter).push(artist);
-  }
-  grid.replaceChildren();
-  if (!ordered.length) {
-    grid.append(createVenueArtistsEmptyState(query ? "No artists match this search." : "No artists linked to this venue."));
-    return groups;
   }
   let rowIndex = 0;
   const letters = [...groups.keys()].sort((left, right) => left === "#" ? 1 : right === "#" ? -1 : left.localeCompare(right));
@@ -5184,7 +5167,6 @@ function updateVenueArtistsGrid(grid, artists, searchTerm, card) {
     const list = document.createElement("ul");
     for (const artist of groups.get(letter)) {
       const row = createVenueArtistPill(artist, rowIndex++);
-      row.firstElementChild.toggleAttribute("data-venue-artist-highlighted", card._venueArtistState.level > 0 && artist.appearances === card._venueArtistState.level);
       list.append(row);
     }
     group.append(heading, list);
@@ -5254,19 +5236,6 @@ function renderVenueArtistsPanel(panel, artists, card) {
   top.append(topTitle, topList);
   summary.append(title, copy, top);
 
-  const searchLabel = document.createElement("label");
-  searchLabel.className = "venue-artists-search-field";
-  const searchText = document.createElement("span");
-  searchText.className = "venue-artists-search-label";
-  searchText.textContent = "Search Artists";
-  const search = document.createElement("input");
-  search.className = "venue-artists-search-input";
-  search.type = "search";
-  search.autocomplete = "off";
-  search.placeholder = "Search artist name";
-  search.value = card._venueArtistSearch || "";
-  searchLabel.append(searchText, search);
-
   const alphabet = document.createElement("nav");
   alphabet.className = "venue-artists-alphabet";
   alphabet.setAttribute("aria-label", "Artist alphabet");
@@ -5283,10 +5252,11 @@ function renderVenueArtistsPanel(panel, artists, card) {
     state.letter = letter;
     for (const button of rail.children) button.setAttribute("aria-pressed", String(button.dataset.venueArtistJump === letter));
   };
-  const refresh = () => {
-    const groups = updateVenueArtistsGrid(grid, venueArtists, search.value, card);
-    for (const button of rail.children) button.disabled = !groups.has(button.dataset.venueArtistJump);
-    setActiveLetter(groups.has(state.letter) ? state.letter : groups.keys().next().value || "");
+  const groups = renderVenueArtistsGrid(grid, venueArtists);
+  const refreshRanking = () => {
+    for (const row of grid.querySelectorAll("[data-venue-artist-appearances]")) {
+      row.toggleAttribute("data-venue-artist-highlighted", state.level > 0 && Number(row.dataset.venueArtistAppearances) === state.level);
+    }
     for (const button of topList.querySelectorAll("button")) {
       button.setAttribute("aria-pressed", String(Number(button.dataset.venueArtistLevel) === state.level));
     }
@@ -5306,6 +5276,7 @@ function renderVenueArtistsPanel(panel, artists, card) {
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.venueArtistJump = letter;
+    button.disabled = !groups.has(letter);
     button.textContent = letter;
     button.setAttribute("aria-label", letter === "#" ? "Other artist names" : "Artists beginning with " + letter);
     button.addEventListener("click", () => {
@@ -5343,32 +5314,17 @@ function renderVenueArtistsPanel(panel, artists, card) {
     button.dataset.venueArtistLevel = String(level);
     button.setAttribute("aria-label", members.length > 1 ? name.textContent : members[0].name + ", " + level + " appearances");
     button.addEventListener("click", () => {
-      if (members.some(artist => !artist.name.toLowerCase().includes(search.value.trim().toLowerCase()))) {
-        search.value = "";
-        card._venueArtistSearch = "";
-      }
       state.level = level;
-      refresh();
+      refreshRanking();
       jump([...grid.querySelectorAll("a")].find(row => Number(row.dataset.venueArtistAppearances) === level));
     });
     item.append(rank, count, name, label, button);
     topList.append(item);
   });
-  search.addEventListener("input", event => {
-    card._venueArtistSearch = search.value;
-    refresh();
-    try {
-      if (!event.isTrusted || event.isComposing || !search.value.trim()) { window.V3Analytics?.cancelArchiveSearch?.(); return; }
-      const context = v3RouteContext, query = search.value.trim().toLowerCase(), source = musicShowsSetsCollection;
-      window.V3Analytics?.archiveSearch?.(event, { archive: "music", dataset: "bands" }, () => {
-        if (context !== v3RouteContext || source !== musicShowsSetsCollection || card.hidden || search.value.trim().toLowerCase() !== query) return null;
-        return venueArtists.filter(artist => artist.name.toLowerCase().includes(query)).length;
-      });
-    } catch { /* Optional measurements cannot interrupt artist search. */ }
-  });
   rail.addEventListener("scroll", () => { if (!card.hidden) state.rail = rail.scrollLeft; }, { passive: true });
-  inner.append(summary, searchLabel, alphabet, grid);
-  refresh();
+  inner.append(summary, alphabet, grid);
+  refreshRanking();
+  setActiveLetter(groups.has(state.letter) ? state.letter : groups.keys().next().value || "");
   rail.scrollLeft = state.rail;
   panel._venueArtistScroll = () => {
     cancelAnimationFrame(panel._venueArtistFrame);
@@ -5531,7 +5487,6 @@ function setupVenueArtistsRelationshipCard(venue, artists, hasLinkedShows) {
   if (pane._venueContext !== v3RouteContext) {
     const saved = v3ResumeUI();
     pane._venueContext = v3RouteContext;
-    pane._venueArtistSearch = v3Text(saved.artistQuery);
     pane._venueArtistState = {
       letter: /^[A-Z#]$/.test(saved.artists?.letter || "") ? saved.artists.letter : "",
       level: Number.isSafeInteger(saved.artists?.level) && saved.artists.level > 0 ? saved.artists.level : null,
@@ -5977,23 +5932,6 @@ function prepareMusicVenueRegionPanel(view) {
     '<div data-venue-region-status aria-live="polite"></div></div></div>';
   getMusicVenueArchivePanel("map").append(panel);
   view.panel = panel;
-  const facts = document.createElement("dl");
-  facts.className = "harmony-region-map-facts";
-  facts.dataset.venueRegionFacts = "";
-  for (const [label, value] of [
-    ["Location", view.metadata.location], ["Region", view.metadata.region],
-    ["Latitude", view.coordinates?.[0]], ["Longitude", view.coordinates?.[1]],
-  ]) {
-    if (value === undefined || value === "") continue;
-    const field = document.createElement("div");
-    const term = document.createElement("dt");
-    const detail = document.createElement("dd");
-    term.textContent = label;
-    detail.textContent = String(value);
-    field.append(term, detail);
-    facts.append(field);
-  }
-  if (facts.childElementCount) panel.firstElementChild.prepend(facts);
   view.mapHost = panel.querySelector("[data-venue-region-map]");
   view.mapHost.setAttribute("aria-label", "Venue map for " + view.name);
   view.status = panel.querySelector("[data-venue-region-status]");
@@ -6044,7 +5982,7 @@ function setMusicVenueRegionOpen(view, open) {
   mountMusicVenueRegionMap(view);
 }
 
-function setupMusicVenueRegionCard(venue, coordinates, metadata) {
+function setupMusicVenueRegionCard(venue, coordinates) {
   const card = getMusicVenueArchiveTab("map");
   const previous = musicVenueRegionView;
   if (venue && previous?.context === v3RouteContext && String(previous.coordinates) === String(coordinates)) return;
@@ -6063,7 +6001,7 @@ function setupMusicVenueRegionCard(venue, coordinates, metadata) {
     && Math.abs(center[0]) <= MUSIC_VENUE_MAP_LATITUDE_LIMIT && Math.abs(center[1]) <= 180
     && Number.isFinite(saved.zoom) && saved.zoom >= 3 && saved.zoom <= 19 ? { center, zoom: saved.zoom } : null;
   const view = {
-    context: v3RouteContext, card, coordinates, metadata, camera, name: getMusicVenueName(venue), open: false,
+    context: v3RouteContext, card, coordinates, camera, name: getMusicVenueName(venue), open: false,
     touchCapable: navigator.maxTouchPoints > 0 || window.matchMedia("(any-pointer: coarse)").matches,
   };
   musicVenueRegionView = view;
@@ -6350,7 +6288,6 @@ function renderMusicVenueDossierMetadata(venue, coordinates) {
   const notice = metadata.querySelector("[data-venue-detail-missing]");
   notice.hidden = !missing.length;
   notice.textContent = missing.length ? "Unavailable Data: " + missing.join(", ") : "";
-  return fields;
 }
 
 function renderMusicVenueDetail(venue, requestedSlug = "") {
@@ -6373,9 +6310,9 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
     venueDetailTitle.textContent = name;
   }
   const coordinates = getMusicVenueDossierCoordinates(venue);
-  const metadata = renderMusicVenueDossierMetadata(venue, coordinates);
+  renderMusicVenueDossierMetadata(venue, coordinates);
   setupVenueEventsRelationshipCard(venue);
-  setupMusicVenueRegionCard(venue, coordinates, metadata);
+  setupMusicVenueRegionCard(venue, coordinates);
   setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
   renderMusicVenueDossierEditorial(venue);
   if (!hasVenue) {
@@ -10368,7 +10305,6 @@ function returnToSetGalleryFromLightbox() {
       if (scrollTop !== null) {
         getMusicVenueArchiveViewport().scrollTo({ top: scrollTop, behavior: "instant" });
       }
-      if (returnContext.strip?.isConnected) returnContext.strip.scrollLeft = returnContext.stripScrollLeft;
       if (focusTarget) {
         focusTarget.focus({ preventScroll: true });
       }
@@ -19077,7 +19013,6 @@ function captureMusicResumeState(route) {
         ? { ...getMusicVenueRegionCamera(musicVenueRegionView), home: musicVenueRegionView.coordinates } : null,
       artistLink: document.activeElement?.closest("[data-venue-artists-panel] a")?.getAttribute("href") || "",
       artists: { ...getMusicVenueArchivePanel("artists")._venueArtistState },
-      artistQuery: getMusicVenueArchivePanel("artists")._venueArtistSearch || "",
       communityOpen: [...getMusicVenueArchivePanel("community").querySelectorAll("details[open][data-venue-memory-id]")]
         .map(memory => memory.dataset.venueMemoryId).slice(0, 100),
     };

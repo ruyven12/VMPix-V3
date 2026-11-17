@@ -4088,6 +4088,7 @@ html.is-lightbox-scroll-locked body {
   align-content: start;
   gap: 0.24rem;
   padding: 0.36rem 0.25rem;
+  text-align: center;
   text-shadow: 0 1px 3px #081321, 0 1px 8px #081321;
 }
 
@@ -5249,23 +5250,23 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
   margin-inline: auto;
 }
 
-.venue-archive-content :is(.harmony-region-map-facts, .harmony-region-map-toolbar) {
+.venue-archive-content .harmony-region-map-toolbar {
   justify-content: center;
-}
-
-.venue-archive-content .venue-photo-filmstrip {
-  justify-content: safe center;
 }
 
 .venue-archive-content :is(#venue-pane-photos, #venue-pane-history):not([hidden]) {
   display: grid;
+  min-block-size: 100%;
+  place-content: safe center;
+  justify-items: center;
   gap: 0.48rem;
 }
 
-.venue-archive-content [data-venue-archive-value] {
+.venue-archive-content :is(#venue-pane-photos, #venue-pane-history) [data-venue-archive-value] {
   color: var(--venue-archive-ink);
-  font-size: clamp(1rem, 3.5vw, 1.28rem);
-  line-height: 1.3;
+  font-size: clamp(1.3rem, 4.5vw, 1.85rem);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .venue-events-screen {
@@ -5421,27 +5422,6 @@ a.venue-events-row::after {
   display: grid;
   gap: 0.58rem;
 }
-.harmony-region-map-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem 1rem;
-  margin: 0;
-  color: #e7f6ff;
-}
-
-.harmony-region-map-facts div { min-width: 0; }
-
-.harmony-region-map-facts dt {
-  color: #b9d7e9;
-  font-size: 0.68rem;
-}
-
-.harmony-region-map-facts dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-  font-size: 0.82rem;
-}
-
 .harmony-region-map-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -5745,39 +5725,6 @@ a.venue-events-row::after {
   line-height: 1;
 }
 
-.venue-artists-search-field {
-  width: min(100%, 24rem);
-  min-width: 0;
-  display: grid;
-  gap: 0.22rem;
-}
-
-.venue-artists-search-label {
-  color: rgba(247, 247, 242, 0.54);
-  font-size: clamp(0.56rem, 1.95vw, 0.64rem);
-  line-height: 1;
-  text-transform: none;
-}
-
-.venue-artists-search-input {
-  width: 100%;
-  min-width: 0;
-  padding: 0.48rem 0.58rem;
-  border: 1px solid rgba(213, 22, 34, 0.18);
-  border-radius: var(--radius-sm);
-  background: rgba(1, 1, 3, 0.48);
-  color: rgba(247, 247, 242, 0.86);
-  font: inherit;
-  font-size: clamp(0.62rem, 2.08vw, 0.72rem);
-  text-align: center;
-  text-transform: none;
-}
-
-.venue-artists-search-input:focus {
-  outline: 2px solid rgba(247, 247, 242, 0.82);
-  outline-offset: 0.12rem;
-}
-
 .venue-artists-grid {
   width: min(100%, 40rem);
   min-width: 0;
@@ -6066,19 +6013,15 @@ a.venue-events-row::after {
   min-width: 0;
 }
 
-.venue-photo-filmstrip {
+.venue-photo-grid {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: clamp(5.25rem, 40%, 10rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.45rem;
   min-width: 0;
-  padding-block: 0.18rem 0.4rem;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-color: #5e8596 #091724;
-  scrollbar-width: thin;
-  touch-action: pan-x pan-y;
+}
+
+@media (min-width: 64rem) {
+  .venue-photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .public-home {
@@ -6159,7 +6102,6 @@ a.venue-events-row::after {
   pointer-events: none;
 }
 
-.venue-photo-filmstrip:focus-visible,
 .venue-photo-highlight-thumbnail:focus-visible {
   outline: 2px solid #c8effc;
   outline-offset: -2px;
@@ -6234,7 +6176,7 @@ a.venue-events-row::after {
 
 .venue-archive-content .venue-detail-panel::before { content: none; }
 
-.venue-archive-content :is(.venue-detail-panel-kicker, .venue-artists-top-title, .venue-artists-search-label) {
+.venue-archive-content :is(.venue-detail-panel-kicker, .venue-artists-top-title) {
   color: var(--venue-archive-muted);
   font-size: 0.72rem;
   line-height: 1.2;
@@ -6297,35 +6239,22 @@ a.venue-events-row::after {
   border-color: var(--venue-archive-rule);
 }
 
-.venue-archive-content :is(.venue-events-more, .harmony-region-map-toolbar button, .venue-artists-search-input, .v3-state-action) {
+.venue-archive-content :is(.venue-events-more, .harmony-region-map-toolbar button, .v3-state-action) {
   border-color: var(--venue-archive-control);
   background: var(--venue-archive-raised);
   color: var(--venue-archive-ink);
 }
 
-.venue-archive-content :is(.venue-artists-search-input, .v3-state-action) {
+.venue-archive-content .v3-state-action {
   min-height: 2.75rem;
   font-size: 0.8rem;
-}
-
-.venue-archive-content .venue-artists-search-input::placeholder {
-  color: var(--venue-archive-muted);
-  opacity: 1;
-}
-
-.venue-archive-content .venue-artists-search-input:focus {
-  outline-color: #c8effc;
 }
 
 .venue-archive-content .v3-state-action:is(:hover, :focus-visible) {
   background: var(--venue-archive-active);
 }
 
-.venue-archive-content .harmony-region-map-facts {
-  color: var(--venue-archive-ink);
-}
-
-.venue-archive-content :is(.venue-events-year-count, .venue-events-row > :first-child, .harmony-region-map-facts dt) {
+.venue-archive-content :is(.venue-events-year-count, .venue-events-row > :first-child) {
   color: var(--venue-archive-muted);
   font-size: 0.75rem;
 }

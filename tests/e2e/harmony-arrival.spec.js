@@ -1100,6 +1100,10 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   await expect(field("established").locator("dd")).toHaveText("1996");
   await expect(field("gps").locator("dd")).toHaveText("0, 0");
   await expect(field("region").locator("dd")).toHaveText("New England");
+  for (const name of ["location", "established", "gps", "region"]) {
+    await expect(field(name).locator("dt")).toHaveCSS("text-align", "center");
+    await expect(field(name).locator("dd")).toHaveCSS("text-align", "center");
+  }
   await expect(missing).toBeHidden();
   await expect(dossier.locator(".venue-detail-logo-card, .venue-detail-kicker, .venue-detail-visual")).toHaveCount(0);
   await expect(environment).toBeVisible();
@@ -1174,7 +1178,7 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   await expect(missing).toHaveText("Unavailable Data: City, State, Established, GPS, Region");
 });
 
-test("Venue Dossier uses accessible archive tabs and opens stable filmstrip photos in the shared lightbox", async ({ page, baseURL }) => {
+test("Venue Dossier uses accessible archive tabs and opens square grid photos in the shared lightbox", async ({ page, baseURL }) => {
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   const caption = "A recorded caption with enough detail to continue across multiple lines in the shared photo info drawer without truncation.";
@@ -1234,6 +1238,20 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   await expect(archive.getByRole("tabpanel", { name: "Total Photos" })).toContainText("12");
   await tab("Archive History").press("Enter");
   await expect(archive.getByRole("tabpanel", { name: "Archive History" })).toContainText("Aug 1, 2024 \u2192 Feb 2, 2025");
+  for (const name of ["Total Photos", "Archive History"]) {
+    await tab(name).press("Enter");
+    const meter = archive.getByRole("tabpanel", { name, exact: true });
+    expect(await meter.evaluate(node => {
+      const value = node.querySelector("[data-venue-archive-value]");
+      const heading = node.querySelector("h4");
+      const label = heading.getBoundingClientRect();
+      const displayed = value.getBoundingClientRect();
+      const pane = node.parentElement.getBoundingClientRect();
+      return parseFloat(getComputedStyle(value).fontSize) > parseFloat(getComputedStyle(heading).fontSize)
+        && Math.abs((pane.top + pane.bottom - label.top - displayed.bottom) / 2) < 10
+        && Math.abs((pane.left + pane.right - displayed.left - displayed.right) / 2) < 2;
+    })).toBe(true);
+  }
   await tab("About").press("Enter");
   await expect(archive.getByText("Venue history has not been archived yet.", { exact: true })).toBeVisible();
   await tab("Community").press("Enter");
@@ -1243,28 +1261,40 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   const artistPanel = dossier.locator("[data-venue-artists-panel]");
   await expect(artistPanel).toContainText("Signal Artist");
   await expect(artistPanel).not.toContainText("Imaginary Artist");
-  await artistPanel.getByRole("searchbox", { name: "Search Artists" }).fill("Second");
-  await expect(artistPanel.locator(".venue-artists-grid")).toContainText("Second Artist");
-  await expect(artistPanel.locator(".venue-artists-grid")).not.toContainText("Signal Artist");
+  await expect(artistPanel.getByRole("searchbox")).toHaveCount(0);
+  await artistPanel.getByRole("button", { name: "Artists beginning with S", exact: true }).press("Enter");
+  await expect(artistPanel.getByRole("link", { name: "Second Artist", exact: true })).toBeFocused();
+  await expect(artistPanel.locator(".venue-artists-grid")).toContainText("Signal Artist");
   await tab("Photo Highlights").press("Enter");
 
-  const strip = dossier.locator("[data-venue-photo-filmstrip]");
-  const tiles = strip.locator("[data-venue-photo-highlight]");
+  const grid = dossier.locator("[data-venue-photo-grid]");
+  const tiles = grid.locator("[data-venue-photo-highlight]");
   await expect(tiles).toHaveCount(19);
+  const layout = await tiles.evaluateAll(nodes => nodes.slice(0, 4).map(tile => {
+    const { x, y, width, height } = tile.getBoundingClientRect();
+    return { x, y, width, height };
+  }));
+  expect(layout[0].y).toBeCloseTo(layout[1].y, 0);
+  expect(layout[2].y).toBeGreaterThan(layout[0].y);
+  expect(layout[2].x).toBeCloseTo(layout[0].x, 0);
+  expect(layout.every(({ width, height }) => Math.abs(width - height) <= 1)).toBe(true);
+  expect(await grid.evaluate(node => node.scrollWidth === node.clientWidth)).toBe(true);
   const firstImage = tiles.first().locator("img");
   await expect(firstImage).toHaveCSS("object-fit", "cover");
+  await expect(firstImage).toHaveAttribute("loading", "lazy");
+  await expect(firstImage).toHaveAttribute("decoding", "async");
   await expect(firstImage).toHaveAttribute("draggable", "false");
   await firstImage.scrollIntoViewIfNeeded();
   await expect(firstImage).toHaveAttribute("src", /archive-gallery-placeholder\.svg$/);
   await expect(tiles.first()).toHaveText("");
   const tile = tiles.nth(5);
+  const scroller = dossier.locator("[data-venue-archive-content]");
+  await scroller.evaluate(node => { node.scrollTop = 120; });
   await tile.scrollIntoViewIfNeeded();
   const bounds = await tile.boundingBox();
   expect(Math.abs(bounds.width - bounds.height)).toBeLessThanOrEqual(1);
-  const stripScroll = await strip.evaluate(node => node.scrollLeft);
-  const scroller = dossier.locator("[data-venue-archive-content]");
   const dossierScroll = await scroller.evaluate(node => node.scrollTop);
-  expect(stripScroll).toBeGreaterThan(0);
+  expect(dossierScroll).toBeGreaterThan(0);
   await tile.click();
 
   const lightbox = page.getByRole("dialog");
@@ -1290,7 +1320,6 @@ test("Venue Dossier uses accessible archive tabs and opens stable filmstrip phot
   await closeLightbox.press("Enter");
   await expect(lightbox).toBeHidden();
   await expect(tile).toBeFocused();
-  expect(await strip.evaluate(node => node.scrollLeft)).toBe(stripScroll);
   expect(await scroller.evaluate(node => node.scrollTop)).toBe(dossierScroll);
   expect(galleryRequests).toEqual([["/api/music/venues/aura/photos", "1", "20"]]);
 
@@ -1947,7 +1976,7 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   const scroller = dossier.locator("[data-venue-archive-content]");
   const rail = panel.locator("[data-venue-artist-rail]");
   const alphabet = panel.getByRole("navigation", { name: "Artist alphabet" });
-  const search = panel.getByRole("searchbox", { name: "Search Artists" });
+  await expect(panel.getByRole("searchbox")).toHaveCount(0);
   await toggle.press("Enter");
   await expect(panel.locator(".venue-artists-top-list .venue-artist-count")).toHaveText(["7", "5", "3"]);
   await expect(panel.getByRole("button", { name: "2 bands tied with 5 appearances", exact: true })).toBeVisible();
@@ -1970,9 +1999,7 @@ test("Harbor inline Artists groups distinct tied levels and restores alphabet, h
   await expect(panel.getByRole("link", { name: "Numeric Stage", exact: true })).toHaveAccessibleDescription("1 appearance");
   await expect(panel.getByRole("link", { name: "Gamma Record", exact: true })).toHaveAttribute("href", "/music/bands/gamma-authored-id");
   await expect(panel.getByRole("button", { name: "Artists beginning with J" })).toBeDisabled();
-  await search.fill("Beta");
   await panel.getByRole("button", { name: "2 bands tied with 5 appearances", exact: true }).press("Enter");
-  await expect(search).toHaveValue("");
   await expect(panel.locator("[data-venue-artist-highlighted]")).toHaveCount(2);
   await expect(panel.getByRole("link", { name: "Beta Band", exact: true })).toBeFocused();
   await expect.poll(() => alphabet.evaluate(node => {
@@ -2089,7 +2116,7 @@ test("Harbor Regional Context lazily opens one verified venue map and restores i
   const events = dossier.getByRole("tab", { name: "Events", exact: true });
   const artists = dossier.getByRole("tab", { name: "Artists", exact: true });
   const panel = dossier.locator("[data-venue-region-panel]");
-  const facts = panel.locator("[data-venue-region-facts]");
+  const stats = dossier.getByRole("region", { name: "Stats", exact: true });
   await expect(regional).toHaveAttribute("aria-selected", "false");
   expect(await page.evaluate(() => window.venueRegionMapHarness.maps.length)).toBe(0);
   await events.press("Enter");
@@ -2097,7 +2124,8 @@ test("Harbor Regional Context lazily opens one verified venue map and restores i
   await page.evaluate(() => { window.venueRegionMapHarness.tileResult = "pending"; });
   await regional.press("Enter");
   await expect(panel).toHaveAttribute("data-venue-region-state", "loading");
-  await expect(facts.locator("dd")).toHaveText(["Portland, ME", "New England", "43.6581", "-70.25"]);
+  await expect(panel.locator("[data-venue-region-facts]")).toHaveCount(0);
+  await expect(stats.locator("dd:visible")).toHaveText(["Portland, ME", "43.6581, -70.25", "New England"]);
   await expect(events).toHaveAttribute("aria-selected", "false");
   await expect(artists).toHaveAttribute("aria-selected", "false");
   await expect.poll(() => page.evaluate(() => Boolean(window.venueRegionMapHarness.complete))).toBe(true);
@@ -2184,18 +2212,20 @@ test("Harbor Regional Context skips unavailable GPS and retries geographic tiles
   await page.getByRole("button", { name: "Reject", exact: true }).click();
   const regional = page.getByRole("tab", { name: "Map", exact: true });
   const panel = page.locator("[data-venue-region-panel]");
+  const stats = page.getByRole("region", { name: "Stats", exact: true });
   await regional.press("Enter");
   await expect(panel).toContainText("No verified GPS coordinates are available");
-  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["Portland", "New England"]);
+  await expect(panel.locator("dl")).toHaveCount(0);
+  await expect(stats.locator("dd:visible")).toHaveText(["Portland", "New England"]);
   await page.evaluate(path => navigateToRoute(path), harborPath + "/pole");
   await regional.press("Enter");
   await expect(panel).toContainText("outside this map’s coverage");
-  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["90", "0"]);
+  await expect(stats.locator('[data-venue-detail-field="gps"] dd')).toHaveText("90, 0");
   expect(await page.evaluate(() => window.venueRegionMapHarness.urls.length)).toBe(0);
   await page.evaluate(path => { window.venueRegionMapHarness.tileResult = "error"; navigateToRoute(path); }, harborPath + "/zero");
   await regional.press("Enter");
   await expect(panel).toHaveAttribute("data-venue-region-state", "error");
-  await expect(panel.locator("[data-venue-region-facts] dd")).toHaveText(["0", "0"]);
+  await expect(stats.locator('[data-venue-detail-field="gps"] dd')).toHaveText("0, 0");
   await expect(panel).toContainText("Geographic imagery could not load.");
   await page.evaluate(() => { window.venueRegionMapHarness.tileResult = "ready"; });
   await panel.getByRole("button", { name: "Retry venue map" }).press("Enter");
