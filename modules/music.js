@@ -5293,10 +5293,12 @@ function renderVenueArtistsPanel(panel, artists, card) {
   };
   const viewport = getMusicVenueArchiveViewport();
   const getAlphabetTop = () => viewport.getBoundingClientRect().top + viewport.clientTop;
+  const getStickyAlphabetHeight = () => getComputedStyle(alphabet).position === "sticky" ? alphabet.offsetHeight : 0;
   const jump = row => {
     if (!row) return;
     setActiveLetter(getVenueArtistLetter(row.dataset.venueArtistName));
-    const offset = row.getBoundingClientRect().top - getAlphabetTop() - alphabet.getBoundingClientRect().height - 7;
+    const stickyHeight = getStickyAlphabetHeight();
+    const offset = row.getBoundingClientRect().top - getAlphabetTop() - stickyHeight - (stickyHeight ? 7 : 0);
     viewport.scrollTo({ top: Math.max(0, viewport.scrollTop + offset), behavior: reducedMotion.matches ? "instant" : "smooth" });
     row.focus({ preventScroll: true });
   };
@@ -5372,7 +5374,7 @@ function renderVenueArtistsPanel(panel, artists, card) {
     cancelAnimationFrame(panel._venueArtistFrame);
     panel._venueArtistFrame = requestAnimationFrame(() => {
       if (card._venueContext !== v3RouteContext || card.hidden) { stopVenueArtistScrollTracking(panel); return; }
-      const line = getAlphabetTop() + alphabet.getBoundingClientRect().height + 9;
+      const line = getAlphabetTop() + getStickyAlphabetHeight() + 9;
       const groups = [...grid.querySelectorAll("[data-venue-artist-letter]")];
       const active = groups.filter(group => group.getBoundingClientRect().top <= line).at(-1) || groups[0];
       if (active) setActiveLetter(active.dataset.venueArtistLetter);
@@ -6536,7 +6538,7 @@ function showMusicVenueDetail(venueSlug) {
   setMusicVenueIndexVisible(false);
   setMusicActivityPanelVisible(false);
   setVenueDetailVisible(true);
-  setCurrentView("Venue Detail");
+  setCurrentView("Venue Dossier");
   initializeMusicVenueArchiveTabs();
   const saved = v3ResumeUI();
   const tab = getMusicVenueSavedTab(saved);
@@ -10361,7 +10363,7 @@ function returnToSetGalleryFromLightbox() {
     setLightboxVisible(false);
     activeGalleryPhoto = previousActiveGalleryPhoto;
     setVenueDetailVisible(true);
-    setCurrentView("Venue Detail");
+    setCurrentView("Venue Dossier");
     window.requestAnimationFrame(() => {
       if (scrollTop !== null) {
         getMusicVenueArchiveViewport().scrollTo({ top: scrollTop, behavior: "instant" });

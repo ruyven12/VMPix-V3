@@ -168,9 +168,10 @@
 }
 
 .venue-detail-screen {
+  --venue-detail-gap: clamp(0.72rem, 2.1svh, 1rem);
   display: none;
   grid-template-rows: auto auto minmax(0, 1fr);
-  gap: clamp(0.72rem, 2.1svh, 1rem);
+  gap: var(--venue-detail-gap);
   min-height: 0;
   width: min(100%, 61rem);
   justify-self: center;
@@ -4035,9 +4036,7 @@ html.is-lightbox-scroll-locked body {
 .venue-detail-identity:not([hidden]) {
   display: grid;
   justify-items: center;
-  padding-block-start: calc(clamp(0.3rem, 1.5svh, 0.85rem) + 3.05rem);
-  padding-block-end: clamp(2rem, calc((var(--app-viewport-height, 100svh)
-    - var(--portfolio-engine-height, 4rem) - var(--portfolio-engine-bottom-offset, 0.6rem) - 2rem) / 6), 12rem);
+  padding-block-end: calc(25px - var(--venue-detail-gap));
   text-align: center;
 }
 
@@ -5843,6 +5842,10 @@ a.venue-events-row::after {
   background: #05121f;
 }
 
+@container venue-dossier-content (max-height: 6.05rem) {
+  .venue-artists-alphabet { position: static; }
+}
+
 .venue-artists-alphabet-rail {
   display: flex;
   gap: 0.18rem;
@@ -6078,24 +6081,34 @@ a.venue-events-row::after {
   touch-action: pan-x pan-y;
 }
 
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .public-home {
+  padding-block-start: calc(env(safe-area-inset-top, 0px) + 23px);
+}
+
+.site-shell[data-shell-route="music-venue-detail"]:not(.is-lightbox-view) .portfolio-hub:has(> .music-nexus-shell.is-venue-detail) {
+  align-self: start;
+  padding-block-start: 0;
+}
+
 .site-shell:not(.is-lightbox-view) .music-nexus-shell.is-venue-detail {
   grid-template-rows: minmax(0, 1fr);
+  padding-block-start: 0;
   overflow: clip;
   touch-action: pan-x pan-y;
 }
 
 @media (max-height: 540px) {
   .site-shell:not(.is-lightbox-view) .music-nexus-shell.is-venue-detail {
-    padding-block: max(0.35rem, env(safe-area-inset-top)) max(0.35rem, env(safe-area-inset-bottom));
+    padding-block-end: 0.35rem;
+  }
+
+  .venue-detail-screen .venue-archive-content {
+    container: venue-dossier-content / size;
   }
 
   .music-nexus-shell.is-venue-detail .venue-detail-screen {
-    gap: 0.35rem;
+    --venue-detail-gap: 0.35rem;
     padding-bottom: 0;
-  }
-
-  .venue-detail-identity:not([hidden]) {
-    padding-block: 0.18rem 0.3rem;
   }
 
   .venue-detail-title {
@@ -6114,7 +6127,7 @@ a.venue-events-row::after {
 
 @media (min-width: 38rem) and (max-height: 540px) {
   .site-shell:not(.is-lightbox-view) .portfolio-hub:has(> .music-nexus-shell.is-venue-detail) {
-    padding-block: 0.28rem;
+    padding-block-end: 0.28rem;
   }
 
   .venue-detail-meta-row:not([hidden]) {
@@ -27803,11 +27816,11 @@ button.hall-crusades-archive-crystal:focus-visible {
   }
 }
 
-@media (max-width: 479px) {
-  .venue-detail-screen {
-    gap: 0.58rem;
-  }
+@media (max-width: 479px) and (min-height: 541px) {
+  .venue-detail-screen { --venue-detail-gap: 0.58rem; }
+}
 
+@media (max-width: 479px) {
   .venue-detail-panel {
     padding: 0.62rem;
   }

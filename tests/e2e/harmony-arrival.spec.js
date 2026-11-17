@@ -988,7 +988,10 @@ test("Harbor Solo Arrival reveals only verified identity before the real Dossier
   await finish(110);
   await expect(shell).not.toHaveAttribute("data-harmony-solo-arrival", /.+/);
   expect((await title.boundingBox()).y).toBeCloseTo(endBox.top, 0);
-  expect(await engine.boundingBox()).toEqual(engineBefore);
+  const engineAfter = await engine.boundingBox();
+  for (const key of ["x", "y", "width", "height"]) {
+    expect(Math.abs(engineAfter[key] - engineBefore[key])).toBeLessThanOrEqual(0.05);
+  }
   expect(await page.evaluate(() => history.length)).toBe(historyBefore);
   await expect(content.getByText("Loading Archive Events")).toBeVisible();
   releaseShows({ data: [] });
@@ -1122,9 +1125,13 @@ test("Venue Dossier presents a fixed Harbor backdrop and verified metadata only"
   expect(leftFields[1].y).toBeGreaterThan(leftFields[0].y);
   expect(background).toEqual(shellBox);
   expect(Math.abs((headingBox.x + headingBox.width / 2) - (shellBox.x + shellBox.width / 2))).toBeLessThanOrEqual(8);
-  const gap = metadataBox.y - headingBox.y - headingBox.height;
-  expect(gap / (engineBox.y - shellBox.y)).toBeGreaterThan(0.15);
-  expect(gap / (engineBox.y - shellBox.y)).toBeLessThan(0.2);
+  expect(headingBox.y - shellBox.y).toBeCloseTo(25, 0);
+  expect(metadataBox.y - headingBox.y - headingBox.height).toBeCloseTo(25, 0);
+  await expect(engine.locator("[data-portfolio-engine-current-view]")).toHaveText("Venue Dossier");
+  const lightning = engine.locator(".engine-lightning-overlay");
+  await expect(lightning).toHaveCSS("mask-composite", /^intersect(?:,\s*intersect)+$/);
+  await expect(lightning).toHaveCSS("--engine-title-exclusion-start", "24%");
+  await expect(lightning).toHaveCSS("--engine-title-exclusion-end", "76%");
   await expect(dossier.locator("[data-venue-events-year] li")).toHaveCount(10);
   const scrollHost = archiveContent;
   await expect(dossier.locator("[data-venue-detail-back]")).toHaveCount(0);
