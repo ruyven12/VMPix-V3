@@ -18,6 +18,7 @@ const shows = [
 
 async function mockArchive(page, baseURL, venueResponse, showsResponse = () => ({ data: shows })) {
   const origin = new URL(baseURL).origin;
+  let censusVenues = [];
   await page.route("**/*", async route => {
     const request = route.request();
     const url = new URL(request.url());
@@ -26,10 +27,23 @@ async function mockArchive(page, baseURL, venueResponse, showsResponse = () => (
     if (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname)) return route.continue();
     if (request.resourceType() === "script") return route.fulfill({ contentType: "application/javascript", body: "" });
     if (request.resourceType() === "stylesheet") return route.fulfill({ contentType: "text/css", body: "" });
+    const censusId = url.pathname.match(/^\/api\/music\/venues\/([^/]+)\/photo-census$/)?.[1];
+    if (censusId) {
+      const row = censusVenues.find(v => String(v.venue_id) === decodeURIComponent(censusId));
+      return route.fulfill({ json: { ok: true, photo_census: row?.photo_census ?? {
+        total: null, complete: false, status: "unavailable"
+      } } });
+    }
     const { status = 200, data = [], payload } = url.pathname === "/api/music/venues" ? await venueResponse()
       : url.pathname === "/api/music/shows/db" ? await showsResponse() : {};
+    if (url.pathname === "/api/music/venues") censusVenues = payload?.rows || payload?.data || data;
     return route.fulfill({ status, headers: { "access-control-allow-origin": "*" }, json: payload ?? { data, total: data.length, totalPages: 1 } });
   });
+}
+
+function verifiedCensus(venue_id, total, overrides = {}) {
+  return { definition: "music_venue_unique_photographs_v1", venue_id, total,
+    status: "complete", complete: true, verifiedAt: "2026-11-20T12:00:00Z", ...overrides };
 }
 
 async function expectHarmonyFilterGeometry(page) {
@@ -1197,7 +1211,7 @@ test("Venue Dossier uses accessible archive tabs and opens square grid photos in
     { show_id: "no-lineup", venue_id: "no-lineup", name: "Unverified Title with Guess", date: "2019" },
   ];
   await mockArchive(page, baseURL, () => ({ data: [
-    { venue_id: "aura", venue: "Aura", region: "New England", photo_count: 12 },
+    { venue_id: "aura", venue: "Aura", region: "New England", photo_count: 12, photo_census: verifiedCensus("aura", 12) },
     { venue_id: "no-lineup", venue: "No Lineup" },
   ] }), () => ({ data: shows }));
   const galleryRequests = [];
@@ -1433,19 +1447,19 @@ test("Venue Dossier shows published chapters and independently expandable approv
   await expect(community.locator("details")).toHaveCount(0);
 });
 
-test("Venue Dossier shows verified Sheet totals without deriving counts from linked or sampled photos", async ({ page, baseURL }) => {
+test("Venue Dossier shows only verified census totals with HARMONY-03F count validation", async ({ page, baseURL }) => {
   test.setTimeout(75000);
   await page.setViewportSize({ width: 412, height: 915 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   const cases = [
-    [{ photo_count: 96 }, "96"],
-    [{ photo_count: 0, total_photos: "0" }, "0"],
-    [{ photo_count: 0 }, "—"],
-    [{ photo_count: 0, totalphotos: "147" }, "147"],
-    [{ photo_count: 9, totalPhotos: "10" }, "—"],
-    [{ photo_count: 3, photoCount: "3.5", photosTotal: { toString: "invalid" } }, "—"],
-    [{ stats: { photos: 999 } }, "—"],
-    [{ photo_count: 0, total_photos: "9007199254740992" }, "—"],
+    [{ photo_census: verifiedCensus("signal-0", 96) }, "96"],
+    [{ photo_census: verifiedCensus("signal-1", 0) }, "0"],
+    [{ photo_count: 999, total_photos: 999 }, "—"],
+    [{ photo_census: verifiedCensus("signal-3", "147") }, "147"],
+    [{ photo_census: verifiedCensus("signal-4", 10, { complete: false, status: "incomplete" }) }, "—"],
+    [{ photo_census: verifiedCensus("signal-5", "3.5") }, "—"],
+    [{ photo_census: verifiedCensus("wrong-venue", 999) }, "—"],
+    [{ photo_census: verifiedCensus("signal-7", "9007199254740992") }, "—"],
   ];
   const sourceRows = cases.map(([fields], index) => ({ ...venues[index], ...fields }));
   const duplicateShows = [
@@ -1514,6 +1528,42 @@ test("Venue Dossier shows verified Sheet totals without deriving counts from lin
     await page.locator("[data-prototype-engine-return]").press("Enter");
     await expect(inspect).toBeFocused();
   }
+});
+
+test("Venue census refresh, pending, failure and stale response stay isolated from other venues", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockArchive(page, baseURL, () => ({ data: [
+    { venue_id: "first", venue: "First Venue", photo_count: 999 },
+    { venue_id: "second", venue: "Second Venue", photo_count: 999 },
+  ] }));
+  let releaseFirst, firstRequest = new Promise(resolve => { releaseFirst = resolve; });
+  let refreshed = false;
+  let calls = 0;
+  await page.route("**/api/music/venues/*/photo-census", async route => {
+    calls++;
+    const id = new URL(route.request().url()).pathname.split('/')[4];
+    if (id === "first" && !refreshed) await firstRequest;
+    if (id === "first" && refreshed) return route.fulfill({ status: 503, json: { ok: false } });
+    return route.fulfill({ json: { ok: true, photo_census: verifiedCensus(id, id === "second" ? 5 : 99) } });
+  });
+  await page.goto(harborPath + "/first", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const count = page.locator('[data-venue-detail] [data-venue-archive-value="photos"]');
+  await expect(page.locator('[data-venue-detail-title]')).toHaveText("First Venue");
+  await expect(count).toHaveText("—");
+  await expect.poll(() => calls).toBe(1);
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/second");
+  await expect(count).toHaveText("5");
+  releaseFirst();
+  await expect(count).toHaveText("5");
+  refreshed = true;
+  await page.evaluate(path => navigateToRoute(path), harborPath + "/first");
+  await expect.poll(() => calls).toBe(3);
+  await expect(count).toHaveText("—");
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await expect.poll(() => calls).toBe(4);
+  await expect(count).toHaveText("—");
 });
 
 test("Venue Dossier keeps identity and totals unknown while verified Venue data is unavailable", async ({ page, baseURL }) => {
@@ -1604,7 +1654,7 @@ test("Venue Dossier Retry keeps the current error on failure and recovers Aura i
   expect(showsRequests).toBe(0);
 
   await (await startRetry())({
-    payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123 }] },
+    payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123, photo_census: verifiedCensus("aura", 123) }] },
   });
   await expect(dossier.getByRole("heading", { name: "Aura", exact: true })).toBeVisible();
   await expect(dossier.locator("[data-venue-detail-location]")).toHaveText("Portland, ME");
@@ -1714,7 +1764,7 @@ test("Venue Dossier paints verified identity and Highlights while linked Shows a
     expect(showsRequests).toBe(0);
     expect(highlightsRequests).toBe(0);
   } finally {
-    releaseVenues({ payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123 }] } });
+    releaseVenues({ payload: { rows: [{ venue_id: "aura", venue: "Aura", city: "Portland", state: "ME", photo_count: 123, photo_census: verifiedCensus("aura", 123) }] } });
   }
 
   let originalTitle;
@@ -1757,8 +1807,8 @@ test("Venue Dossier preserves verified identity on Shows failure and exposes con
   await page.emulateMedia({ reducedMotion: "reduce" });
   let showsRequests = 0;
   await mockArchive(page, baseURL, () => ({ data: [
-    { venue_id: "aura", venue: "Aura", photo_count: 12 },
-    { venue_id: "other-room", venue: "Other Room", photo_count: 2 },
+    { venue_id: "aura", venue: "Aura", photo_count: 12, photo_census: verifiedCensus("aura", 12) },
+    { venue_id: "other-room", venue: "Other Room", photo_count: 2, photo_census: verifiedCensus("other-room", 2) },
   ] }), () => ++showsRequests === 1 ? { status: 503 } : { data: [] });
   await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Reject", exact: true }).click();

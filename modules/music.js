@@ -3239,20 +3239,43 @@ function getMusicVenueShowCount(venue) {
 
 function getMusicVenueDossierPhotoTotal(venue) {
   if (!venue || musicVenuesDataState !== "live") return null;
+  const census = venue.photo_census;
+  // Keep HARMONY-03F integer validation; Sheet and Highlights totals are not a census.
+  if (census?.definition !== "music_venue_unique_photographs_v1" || census.status !== "complete" ||
+      census.complete !== true || String(census.venue_id) !== String(getMusicVenueId(venue)) ||
+      typeof census.verifiedAt !== "string" || !Number.isFinite(Date.parse(census.verifiedAt))) return null;
+  return readSetAlbumPhotoTotal(census.total);
+}
 
-  // The Sheet API overwrites photo_count, including a default zero for missing cells.
-  // A surviving authored field can confirm zero or expose a coerced canonical value.
-  const authoredValues = [
-    venue.totalPhotos, venue.totalphotos, venue.total_photos,
-    venue.photoCount, venue.photocount, venue.photosTotal, venue.photostotal,
-  ].filter(value => value != null && (typeof value !== "string" || value.trim() !== ""));
-  const authoredTotals = new Set(
-    authoredValues.map(value => readSetAlbumPhotoTotal(value)).filter(value => value !== null)
-  );
-  const canonical = readSetAlbumPhotoTotal(venue.photo_count);
-  if (!authoredTotals.size) return !authoredValues.length && canonical > 0 ? canonical : null;
-  if (authoredTotals.size > 1 || (canonical > 0 && !authoredTotals.has(canonical))) return null;
-  return authoredTotals.values().next().value;
+let musicVenueCensusRequest = null;
+function syncMusicVenuePhotoCensus(venue, slug) {
+  const context = v3RouteContext;
+  const id = venue && getMusicVenueId(venue);
+  if (!id || musicVenuesDataState !== "live") {
+    musicVenueCensusRequest?.controller?.abort();
+    musicVenueCensusRequest = null;
+    setMusicVenueDetailRelationshipCount("photos", null);
+    return;
+  }
+  if (musicVenueCensusRequest?.context === context && musicVenueCensusRequest?.id === id) return;
+  musicVenueCensusRequest?.controller?.abort();
+  const controller = new AbortController();
+  const request = { context, id, controller };
+  musicVenueCensusRequest = request;
+  setMusicVenueDetailRelationshipCount("photos", null);
+  const url = new URL(`/api/music/venues/${encodeURIComponent(id)}/photo-census`, MUSIC_BANDS_INDEX_API_BASE_URL);
+  const ownsView = () => musicVenueCensusRequest === request && v3RouteContext === context &&
+    venueDetail.dataset.venueSlug === slug && venueDetail.dataset.venueId === String(id) &&
+    getRouteFromUrl().name === "music-venue-detail";
+  const timeout = window.setTimeout(() => controller.abort(), MUSIC_VENUES_TIMEOUT_MS);
+  fetch(url, { cache: "no-store", signal: controller.signal })
+    .then(response => response.ok ? response.json() : null)
+    .then(payload => {
+      if (ownsView()) setMusicVenueDetailRelationshipCount("photos", payload?.ok === true
+        ? getMusicVenueDossierPhotoTotal({ ...venue, photo_census: payload.photo_census }) : null);
+    })
+    .catch(() => { if (ownsView()) setMusicVenueDetailRelationshipCount("photos", null); })
+    .finally(() => window.clearTimeout(timeout));
 }
 
 function getMusicVenueArchiveMetrics(venue) {
@@ -6313,7 +6336,7 @@ function renderMusicVenueDetail(venue, requestedSlug = "") {
   renderMusicVenueDossierMetadata(venue, coordinates);
   setupVenueEventsRelationshipCard(venue);
   setupMusicVenueRegionCard(venue, coordinates);
-  setMusicVenueDetailRelationshipCount("photos", getMusicVenueDossierPhotoTotal(venue));
+  syncMusicVenuePhotoCensus(venue, slug);
   renderMusicVenueDossierEditorial(venue);
   if (!hasVenue) {
     setMusicVenueDetailRelationshipValue("history", "—");
