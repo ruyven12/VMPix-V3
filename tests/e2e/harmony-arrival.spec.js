@@ -1566,6 +1566,46 @@ test("Venue census refresh, pending, failure and stale response stay isolated fr
   await expect(count).toHaveText("—");
 });
 
+test("Venue census finishes beneath retained Calendar and remains available after Close", async ({ page, baseURL }) => {
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await mockArchive(page, baseURL, () => ({ data: [{ venue_id: "aura", venue: "Aura", photo_count: 999 }] }));
+  let releaseCensus;
+  const pending = new Promise(resolve => { releaseCensus = resolve; });
+  let requests = 0;
+  await page.route("**/api/music/venues/aura/photo-census", async route => {
+    requests++;
+    await pending;
+    return route.fulfill({ json: { ok: true, photo_census: verifiedCensus("aura", 457) } });
+  });
+  await page.goto(harborPath + "/aura", { waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Reject", exact: true }).click();
+  const dossier = page.locator("[data-venue-detail]");
+  const title = dossier.locator("[data-venue-detail-title]");
+  const count = dossier.locator('[data-venue-archive-value="photos"]');
+  await expect(title).toHaveText("Aura");
+  await expect(count).toHaveText("—");
+  await expect.poll(() => requests).toBe(1);
+  const originalDossier = await dossier.elementHandle();
+  const originalContext = await page.evaluateHandle(() => v3RouteContext);
+  await page.evaluate(() => navigateToRoute("/calendar"));
+  const calendar = page.locator("[data-calendar-overlay]");
+  await expect(page).toHaveURL(baseURL + "/calendar");
+  await expect(calendar).toBeVisible();
+  releaseCensus();
+  await expect(count).toHaveText("457");
+  await expect(calendar).toBeVisible();
+  expect(await page.evaluate(context => v3RouteContext === context, originalContext)).toBe(true);
+  await page.locator("[data-calendar-close]").press("Enter");
+  await expect(page).toHaveURL(baseURL + harborPath + "/aura");
+  await expect(title).toBeVisible();
+  await dossier.getByRole("tab", { name: "Total Photos", exact: true }).press("Enter");
+  await expect(count).toBeVisible();
+  await expect(count).toHaveText("457");
+  expect(await dossier.evaluate((node, original) => node === original, originalDossier)).toBe(true);
+  expect(requests).toBe(1);
+});
+
 test("Venue Dossier keeps identity and totals unknown while verified Venue data is unavailable", async ({ page, baseURL }) => {
   let releaseVenues;
   let showsRequests = 0;

@@ -3266,7 +3266,7 @@ function syncMusicVenuePhotoCensus(venue, slug) {
   const url = new URL(`/api/music/venues/${encodeURIComponent(id)}/photo-census`, MUSIC_BANDS_INDEX_API_BASE_URL);
   const ownsView = () => musicVenueCensusRequest === request && v3RouteContext === context &&
     venueDetail.dataset.venueSlug === slug && venueDetail.dataset.venueId === String(id) &&
-    getRouteFromUrl().name === "music-venue-detail";
+    context.route?.name === "music-venue-detail";
   const timeout = window.setTimeout(() => controller.abort(), MUSIC_VENUES_TIMEOUT_MS);
   fetch(url, { cache: "no-store", signal: controller.signal })
     .then(response => response.ok ? response.json() : null)
