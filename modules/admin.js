@@ -72,6 +72,7 @@
   let generation = 0;
   let controller = null;
   let requestedStation = "deck";
+  let censusRun = null, censusReady = false;
 
   let visualGeneration = 0;
   let visualCleanup = null;
@@ -225,7 +226,7 @@
     renderPresentation(animateArrival);
     updateStationControl();
   }
-  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); resetConflicts(); resetProtection(); }
+  function clearSession() { bearer = null; expiresAt = 0; resetDiagnosticReports(); resetMusicStatus(); resetQueryExplorer(); resetDatabaseOverview(); resetRecordsExplorer(); resetRelationships(); resetIntegrity(); resetImportOverview(); resetManualImports(); resetHistory(); resetConflicts(); resetProtection(); resetCensus(); }
   function cancelRequest() {
     generation += 1;
     controller?.abort();
@@ -318,6 +319,7 @@
   async function logout() {
     if (!available() || busy() || !bearer) return;
     cancelManualImports("Logout interrupted the request.");
+    cancelCensus("Logout interrupted the census request.");
     resetSignal();
     const at = ++generation;
     present("logging-out", "Ending your session…");
@@ -347,6 +349,7 @@
     if (databaseOpen) { databaseOpen.disabled = !canEnterStation(); databaseOpen.setAttribute("aria-disabled", String(databaseOpen.disabled)); }
     if (importsOpen) { importsOpen.disabled = !canEnterStation(); importsOpen.setAttribute("aria-disabled", String(importsOpen.disabled)); }
     updateImportOverviewControl();
+    updateCensusControls();
     updateManualImportControls();
     updateHistoryControls();
     updateConflictsControls();
@@ -375,7 +378,7 @@
       if (!wasImports && shouldFocus) focusTitle(importsTitle);
       updateStationControl(); return;
     }
-    if (wasImports) { cancelImportOverview(); cancelHistory(); cancelConflicts(); cancelShowResolver("You left Imports."); }
+    if (wasImports) { cancelImportOverview(); cancelHistory(); cancelConflicts(); cancelShowResolver("You left Imports."); cancelCensus("You left Imports."); }
     if (importsPanel) surface(importsPanel, false);
     const databaseSelected = requestedStation === "database" && databasePanel && databaseTitle && visualPhase === "ready" && bearer &&
       (state === "authenticated" && expiresAt > Date.now() || wasDatabase && ["logging-out", "logout-uncertain"].includes(state));
@@ -3490,10 +3493,11 @@
   function emptyManualImport(state = "Not Started", reason = "No import has been requested.") { return { state, reason, metrics: null, technical: null, messages: [], completedAt: null, receivedAt: null, duration: null }; }
   function manualImportSessionReady() { return active && state === "authenticated" && bearer !== null && expiresAt > Date.now() && visualPhase === "ready"; }
   function manualImportCanStart() {
-    return manualImportSessionReady() && available() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && manualImportsPanel?.open && manualImportsAll && manualImportsProgress && [...manualImportRows.values()].every(Boolean);
+    return !censusRun && manualImportSessionReady() && available() && stage.dataset.adminView === "imports" && importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && manualImportsPanel?.open && manualImportsAll && manualImportsProgress && [...manualImportRows.values()].every(Boolean);
   }
   function updateManualImportControls() {
     updateShowResolverControls();
+    updateCensusControls();
     const disabled = !manualImportCanStart() || manualImportRun !== null || showResolverRun !== null || showResolverConfirmation !== null;
     if (manualImportsAll) { manualImportsAll.disabled = disabled; manualImportsAll.setAttribute("aria-busy", String(manualImportRun !== null)); }
     manualImportRows.forEach((row, id) => { const button = row?.querySelector("[data-manual-import-run]"); if (!button) return; button.disabled = disabled; button.setAttribute("aria-busy", String(manualImportRun?.active === id)); button.textContent = manualImportRun?.active === id ? "Importing…" : "Run Import"; });
@@ -3794,6 +3798,491 @@
   showResolverConfirm?.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); dismissShowResolverConfirmation(); } });
   showResolverPanel?.addEventListener("toggle", () => { if (!showResolverPanel.open) showResolverConfirmation = null; updateManualImportControls(); });
   renderShowResolver();
+
+
+
+  // Census controls use only the existing in-memory V3 session and existing routes.
+  // Persist only uncertain operation IDs/immutable parameters, never tokens or reports.
+  const censusPanel = importsPanel?.querySelector("[data-admin-venue-census]");
+  const censusNode = key => censusPanel?.querySelector("[data-census-" + key + "]");
+  const CENSUS_ROUTE = "/api/admin/music/venue-photo-census/batches";
+  const CENSUS_PENDING_KEY = "v3.admin.venueCensus.pending.v1";
+  const censusPending = new Map();
+  const censusReasons = new Set(["ambiguous_venue_identity", "invalid_venue_identity", "prior_operation_requires_reconciliation",
+    "verified_within_freshness_window", "not_requested", "venue_not_found", "show_missing_stable_venue_id",
+    "show_missing_verified_set_mappings", "unverified_album_mapping", "album_path_collision", "lineup_album_unresolved",
+    "album_without_verified_mapping", "album_shared_outside_venue", "album_scan_limit_reached", "scan_deadline_reached",
+    "provider_album_attribution_mismatch", "pagination_unverifiable", "album_changed_during_scan", "image_page_missing",
+    "pagination_incomplete", "missing_stable_image_identity", "repeated_image_across_album_pages", "unknown_media_type",
+    "unexpected_next_page", "next_page_missing", "page_scan_limit_reached", "provider_request_failed",
+    "venue_relationships_changed_during_scan", "batch_cancelled", "batch_deadline_reached", "cancelled",
+    "provider_authorization_failed", "provider_limited", "persistence_requires_reconciliation", "operation_interrupted",
+    "batch_stopped", "unavailable_reason"]);
+  const censusStates = ["running", "completed", "stopped", "interrupted", "uncertain", "activity_unverified"];
+  let censusStorageHealthy = true, censusPreview = null, censusDiscovery = null, censusNames = new Map();
+  let censusPlan = null, censusConfirmation = null, censusDetail = null, censusCheckedAt = null;
+  let censusMessage = "Use Check Status to read the current census. Nothing loads or runs automatically.";
+  function censusId(value) { return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value) ? value : null; }
+  function censusOperationId(value) { return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(value) ? value : null; }
+  function censusSame(a, b) { return Array.isArray(a) && a.length === b.length && new Set(a).size === b.length && b.every(id => a.includes(id)); }
+  function censusStamp(value) { return value === null || typeof value === "string" && parseAdminTimestamp(value) ? value : undefined; }
+  function censusParameters(value, pending = false) {
+    if (!diagnosticObject(value) || ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(value.limit) ||
+        !Number.isSafeInteger(value.budgetSeconds) || value.budgetSeconds < 10 || value.budgetSeconds > 300 ||
+        !Number.isSafeInteger(value.maxAgeHours) || value.maxAgeHours < 1 || value.maxAgeHours > 8760 ||
+        typeof value.forceRefresh !== "boolean" || !Array.isArray(value.venueIds) || value.venueIds.length > 100 ||
+        value.venueIds.some(id => !censusId(id)) || new Set(value.venueIds).size !== value.venueIds.length ||
+        pending && (value.maxAgeHours !== 24 || value.venueIds.length < 1 || value.venueIds.length !== value.limit)) return null;
+    return { limit: value.limit, budgetSeconds: value.budgetSeconds, maxAgeHours: value.maxAgeHours,
+      forceRefresh: value.forceRefresh, venueIds: [...value.venueIds] };
+  }
+  function readCensusPending() {
+    try {
+      const raw = sessionStorage.getItem(CENSUS_PENDING_KEY);
+      if (raw === null) return;
+      if (raw.length > 32768) throw Error();
+      const values = JSON.parse(raw);
+      if (!Array.isArray(values) || values.length > 10) throw Error();
+      const restored = new Map();
+      for (const item of values) {
+        const parameters = censusParameters(item?.parameters, true);
+        if (!censusOperationId(item?.operationId) || !parameters || !parseAdminTimestamp(item.attemptedAt) ||
+            restored.has(item.operationId)) throw Error();
+        restored.set(item.operationId, { operationId: item.operationId, parameters, attemptedAt: item.attemptedAt });
+      }
+      restored.forEach((item, id) => censusPending.set(id, item));
+    } catch { censusStorageHealthy = false; }
+  }
+  function saveCensusPending() {
+    try {
+      const values = [...censusPending.values()];
+      if (values.length > 10) throw Error();
+      const raw = JSON.stringify(values);
+      sessionStorage.setItem(CENSUS_PENDING_KEY, raw);
+      if (sessionStorage.getItem(CENSUS_PENDING_KEY) !== raw) throw Error();
+      censusStorageHealthy = true; return true;
+    } catch { censusStorageHealthy = false; return false; }
+  }
+  function censusAllowed() {
+    return censusReady && canEnterStation() && stage.dataset.adminView === "imports" &&
+      importsPanel && !importsPanel.hidden && !importsPanel.hasAttribute("inert") && censusPanel?.open;
+  }
+  function censusWriteBlocked() {
+    return !censusStorageHealthy || censusPending.size > 0 || !censusDiscovery ||
+      censusDiscovery.active.length > 0 || censusDiscovery.hasMore.active;
+  }
+  function updateCensusControls() {
+    if (!censusReady) return;
+    const readDisabled = !censusAllowed() || censusRun !== null || manualImportRun !== null || showResolverRun !== null;
+    const writeDisabled = readDisabled || censusWriteBlocked();
+    ["check", "recent-refresh"].forEach(key => { if (censusNode(key)) censusNode(key).disabled = readDisabled; });
+    ["missing", "all"].forEach(key => { if (censusNode(key)) censusNode(key).disabled = writeDisabled || !!censusConfirmation; });
+    censusNode("limit").disabled = readDisabled || !!censusConfirmation;
+    censusNode("next").disabled = writeDisabled || !censusPlan?.remaining.length || !!censusConfirmation;
+    censusNode("next").hidden = !censusPlan?.remaining.length;
+    censusNode("execute").disabled = writeDisabled || !censusConfirmation;
+    censusNode("cancel").disabled = censusRun !== null;
+    censusNode("confirm").hidden = !censusConfirmation;
+    censusPanel.querySelectorAll("[data-census-operation]").forEach(button => { button.disabled = readDisabled; });
+    censusNode("check").setAttribute("aria-busy", String(censusRun !== null));
+    censusPanel.setAttribute("aria-busy", String(censusRun !== null));
+  }
+  function censusText(parent, tag, value) { return importText(parent, tag, value); }
+  function censusMetric(parent, label, value) {
+    const pair = document.createElement("div"); censusText(pair, "dt", label);
+    censusText(pair, "dd", value === null || value === undefined ? "Not available" : String(value)); parent.appendChild(pair);
+  }
+  function censusKnownName(id) { return censusNames.get(id) || null; }
+  function renderCensusOperation(parent, item, pending = false) {
+    const card = document.createElement("article"); card.className = "admin-census__operation";
+    censusText(card, "h4", item.operationId);
+    censusText(card, "p", pending ? "Outcome unverified. Read this operation before any further census write." :
+      item.status + " · " + formatAdminDateTime(item.finishedAt || item.startedAt, "Time not available"));
+    if (item.summary) censusText(card, "p", "Successful venues: " + (diagnosticCount(item.summary.successes) ? item.summary.successes : "Not available") +
+      " · Incomplete: " + (diagnosticCount(item.summary.incomplete) ? item.summary.incomplete : "Not available"));
+    const inspect = document.createElement("button"); inspect.type = "button"; inspect.className = "admin-imports__refresh";
+    inspect.dataset.censusOperation = item.operationId; inspect.textContent = "Read Operation Status";
+    inspect.addEventListener("click", () => inspectCensusOperation(item.operationId)); card.appendChild(inspect); parent.appendChild(card);
+  }
+  function renderCensus() {
+    if (!censusReady) return;
+    censusNode("state").textContent = censusRun ? censusRun.kind === "execute" ? "Census running" : "Reading census" :
+      censusPending.size ? "Outcome requires verification" : censusConfirmation ? "Awaiting confirmation" : "Ready";
+    censusNode("message").textContent = censusMessage;
+    const metrics = censusNode("metrics"); metrics.replaceChildren();
+    if (censusPreview) {
+      const rows = censusPreview.venues, valid = rows.filter(row => row.venue_id !== null);
+      const current = valid.filter(row => row.verifiedAt !== null && !row.freshnessDue).length;
+      for (const [label, value] of [["Canonical venues", censusPreview.totals.discovered], ["Current verified", current],
+        ["Eligible in this preview", valid.filter(row => row.category === "eligible").length],
+        ["Outdated or requiring recheck", valid.filter(row => row.lastVerifiedAt !== null && (row.freshnessDue || row.verifiedAt === null)).length],
+        ["Canonical unavailable", valid.filter(row => row.category === "unavailable").length],
+        ["Invalid source rows", rows.filter(row => row.venue_id === null).length],
+        ["Source rows", censusPreview.totals.sourceRows],
+        ["Last completed census", formatAdminDateTime(censusPreview.totals.lastCompletedAt, "Not available")]]) censusMetric(metrics, label, value);
+    } else censusMetric(metrics, "Census status", null);
+    censusMetric(metrics, "Active operations at last check", censusDiscovery ? censusDiscovery.active.length + (censusDiscovery.hasMore.active ? "+" : "") : null);
+    censusMetric(metrics, "Last checked", formatAdminDateTime(censusCheckedAt, "Not checked"));
+    const pending = censusNode("pending"); pending.replaceChildren();
+    if (!censusStorageHealthy) censusText(pending, "p", "Operation recovery storage is unavailable. Census writes are blocked; read-only checks remain available.");
+    [...censusPending.values()].forEach(item => renderCensusOperation(pending, item, true));
+    const recent = censusNode("recent"); recent.replaceChildren();
+    if (censusDiscovery) {
+      [...censusDiscovery.active, ...censusDiscovery.recent].forEach(item => renderCensusOperation(recent, item));
+      if (!censusDiscovery.active.length && !censusDiscovery.recent.length) censusText(recent, "p", "No operations were returned in this bounded read.");
+      if (censusDiscovery.hasMore.active || censusDiscovery.hasMore.recent)
+        censusText(recent, "p", "This operation history is limited. Older or additional operations may exist.");
+    } else censusText(recent, "p", "Use Check Status or Refresh Operations to read recorded operations.");
+    const diagnostics = censusNode("diagnostics"); diagnostics.replaceChildren();
+    if (censusPreview) {
+      const reasons = new Map();
+      censusPreview.venues.forEach(row => row.reasons.forEach(reason => reasons.set(reason, (reasons.get(reason) || 0) + 1)));
+      reasons.forEach((amount, reason) => censusText(diagnostics, "p", reason + ": " + amount));
+      const unresolved = censusPreview.venues.filter(row => row.venue_id && (row.category === "unavailable" ||
+        row.lastVerifiedAt !== null && (row.freshnessDue || row.verifiedAt === null)));
+      censusText(diagnostics, "p", "Invalid source rows: " + censusPreview.venues.filter(row => row.venue_id === null).length);
+      unresolved.slice(0, 200).forEach(row => {
+        const item = document.createElement("article"); item.className = "admin-census__operation";
+        censusText(item, "h4", (censusKnownName(row.venue_id) || "Venue name not verified") + " (" + row.venue_id + ")");
+        censusText(item, "p", "Last verified: " + formatAdminDateTime(row.lastVerifiedAt, "Not available"));
+        row.reasons.forEach(reason => censusText(item, "p", reason)); diagnostics.appendChild(item);
+      });
+      if (unresolved.length > 200) censusText(diagnostics, "p", "Showing the first 200 unresolved venue diagnostics.");
+    }
+    if (censusDetail) {
+      censusText(diagnostics, "h4", censusDetail.operationId + " · " + censusDetail.status);
+      censusText(diagnostics, "p", "Provider requests: " + (censusDetail.providerRequests ?? "Not available") +
+        " · Last completed: " + formatAdminDateTime(censusDetail.summary.lastCompletedAt, "Not available"));
+      const selected = new Set([...censusDetail.selectedVenueIds, ...censusDetail.parameters.venueIds]);
+      censusDetail.results.filter(row => selected.has(row.venue_id)).forEach(row => {
+        censusText(diagnostics, "p", (censusKnownName(row.venue_id) || "Venue name not verified") + " (" + row.venue_id + ") · " +
+          row.status + " · Photographs: " + (row.total ?? "Not available"));
+        row.reasons.forEach(reason => censusText(diagnostics, "p", reason));
+      });
+      censusDetail.parameters.venueIds.filter(id => !censusDetail.selectedVenueIds.includes(id)).forEach(id =>
+        censusText(diagnostics, "p", (censusKnownName(id) || "Venue name not verified") + " (" + id + ") · Not selected; no execution reported for this requested venue."));
+    }
+    if (!censusPreview && !censusDetail) censusText(diagnostics, "p", "No verified diagnostic report has been loaded.");
+    censusNode("scope").hidden = !censusPlan;
+    const scopeList = censusNode("scope-list"); scopeList.replaceChildren();
+    if (censusPlan) {
+      censusText(scopeList, "p", censusPlan.remaining.length + " venues remain in this plan. Only the separately confirmed batch will execute.");
+      censusPlan.remaining.forEach(id => censusText(scopeList, "p", (censusKnownName(id) || "Venue name not verified") + " — " + id));
+    }
+    const confirmList = censusNode("confirm-list"); confirmList.replaceChildren();
+    if (censusConfirmation) {
+      censusNode("confirm-title").textContent = (censusConfirmation.parameters.forceRefresh ? "Refresh all qualified venues" : "First census for venues without a verified census") +
+        " · " + censusConfirmation.parameters.venueIds.length + " venues · 120-second budget";
+      censusText(confirmList, "p", "Operation: " + censusConfirmation.operationId);
+      censusConfirmation.parameters.venueIds.forEach(id => censusText(confirmList, "p", censusKnownName(id) + " — " + id));
+    }
+    updateCensusControls();
+  }
+  function projectCensusPreview(data) {
+    if (!diagnosticObject(data) || data.ok !== true || data.mode !== "dry-run" || data.readOnly !== true ||
+        data.databaseMutated !== false || data.maxAgeHours !== 24 || !parseAdminTimestamp(data.asOf) ||
+        !diagnosticObject(data.totals) || !Array.isArray(data.venues) || data.venues.length > 2000 ||
+        !["discovered", "sourceRows", "duplicateVenueRows", "eligible", "skipped", "unavailable", "selected"].every(key => diagnosticCount(data.totals[key])) ||
+        censusStamp(data.totals.lastCompletedAt) === undefined) return null;
+    const ids = new Set(), venues = [];
+    for (const row of data.venues) {
+      if (!diagnosticObject(row) || row.venue_id !== null && (!censusId(row.venue_id) || ids.has(row.venue_id)) ||
+          !["eligible", "skipped", "unavailable"].includes(row.category) || typeof row.selected !== "boolean" ||
+          !Array.isArray(row.reasons) || row.reasons.length > 50 || row.reasons.some(reason => !censusReasons.has(reason))) return null;
+      if (row.venue_id !== null) ids.add(row.venue_id);
+      if (row.venue_id === null) {
+        if (row.category !== "unavailable" || row.selected || !row.reasons.includes("invalid_venue_identity")) return null;
+        venues.push({ venue_id: null, category: "unavailable", selected: false, reasons: [...row.reasons],
+          lastVerifiedAt: null, verifiedAt: null, freshnessDue: true }); continue;
+      }
+      if (!diagnosticCount(row.linkedShows) || !diagnosticCount(row.albums) || typeof row.freshnessDue !== "boolean" ||
+          [row.lastVerifiedAt, row.verifiedAt, row.providerAsOf].some(value => censusStamp(value) === undefined) ||
+          row.selected && row.category !== "eligible") return null;
+      venues.push({ venue_id: row.venue_id, category: row.category, selected: row.selected, reasons: [...row.reasons],
+        linkedShows: row.linkedShows, albums: row.albums, lastVerifiedAt: row.lastVerifiedAt,
+        verifiedAt: row.verifiedAt, providerAsOf: row.providerAsOf, freshnessDue: row.freshnessDue });
+    }
+    if (data.totals.discovered !== ids.size || data.totals.selected !== venues.filter(row => row.selected).length ||
+        ["eligible", "skipped", "unavailable"].some(key => data.totals[key] !== venues.filter(row => row.category === key).length)) return null;
+    return { venues, asOf: data.asOf, totals: Object.fromEntries(["discovered", "sourceRows", "duplicateVenueRows",
+      "eligible", "skipped", "unavailable", "selected", "lastCompletedAt"].map(key => [key, data.totals[key]])) };
+  }
+  function projectCensusOperation(data, summaryOnly = false) {
+    if (!diagnosticObject(data) || !censusOperationId(data.operationId) || !censusStates.includes(data.status) ||
+        ![data.startedAt, data.finishedAt].every(value => censusStamp(value) !== undefined) ||
+        typeof data.requiresReconciliation !== "boolean" || !diagnosticObject(data.summary)) return null;
+    const summary = {};
+    for (const key of ["successes", "incomplete", "failed", "notProcessed"]) {
+      if (data.summary[key] !== null && !diagnosticCount(data.summary[key])) return null;
+      summary[key] = data.summary[key];
+    }
+    if (censusStamp(data.summary.lastCompletedAt) === undefined) return null;
+    summary.lastCompletedAt = data.summary.lastCompletedAt;
+    const result = { operationId: data.operationId, status: data.status, startedAt: data.startedAt,
+      finishedAt: data.finishedAt, requiresReconciliation: data.requiresReconciliation, summary };
+    if (summaryOnly) return result;
+    const parameters = censusParameters(data.parameters);
+    if (data.ok !== true || data.mode !== "execute" || !parameters || !Array.isArray(data.selectedVenueIds) ||
+        data.selectedVenueIds.length > parameters.limit || data.selectedVenueIds.some(id => !censusId(id)) ||
+        new Set(data.selectedVenueIds).size !== data.selectedVenueIds.length ||
+        parameters.venueIds.length > 0 && data.selectedVenueIds.some(id => !parameters.venueIds.includes(id)) ||
+        !Array.isArray(data.results) || data.results.length > 2000 || typeof data.replayed !== "boolean" ||
+        data.providerRequests !== null && !diagnosticCount(data.providerRequests) ||
+        data.inflight !== null && (!diagnosticObject(data.inflight) || !censusId(data.inflight.venue_id))) return null;
+    const results = [];
+    for (const row of data.results) {
+      const verifiedAt = row?.verifiedAt === undefined && row?.status !== "success" ? null : row?.verifiedAt;
+      if (!diagnosticObject(row) || row.venue_id !== null && !censusId(row.venue_id) ||
+          !["success", "incomplete", "failed", "skipped", "unavailable", "not_processed"].includes(row.status) ||
+          row.total !== null && !diagnosticCount(row.total) || censusStamp(verifiedAt) === undefined ||
+          !Array.isArray(row.reasons) || row.reasons.some(reason => !censusReasons.has(reason))) return null;
+      results.push({ venue_id: row.venue_id, status: row.status, total: row.total, verifiedAt, reasons: [...row.reasons] });
+    }
+    return { ...result, parameters, selectedVenueIds: [...data.selectedVenueIds], results,
+      inflight: data.inflight === null ? null : { venue_id: data.inflight.venue_id }, providerRequests: data.providerRequests };
+  }
+  function projectCensusDiscovery(data) {
+    if (!diagnosticObject(data) || data.ok !== true || data.readOnly !== true || data.databaseMutated !== false ||
+        !diagnosticObject(data.hasMore) || typeof data.hasMore.active !== "boolean" || typeof data.hasMore.recent !== "boolean" ||
+        data.limits?.active !== 10 || data.limits?.recent !== 20 || !Array.isArray(data.active) || data.active.length > 10 ||
+        !Array.isArray(data.recent) || data.recent.length > 20) return null;
+    const active = data.active.map(item => projectCensusOperation(item, true)), recent = data.recent.map(item => projectCensusOperation(item, true));
+    if ([...active, ...recent].some(item => !item) || new Set([...active, ...recent].map(item => item.operationId)).size !== active.length + recent.length) return null;
+    return { active, recent, hasMore: { active: data.hasMore.active, recent: data.hasMore.recent } };
+  }
+  function censusCurrent(run) { return censusRun === run && run.generation === generation && censusAllowed() && bearer === run.token; }
+  function cancelCensus(reason = "You left the census controls.") {
+    censusConfirmation = null; censusPlan = null;
+    const run = censusRun;
+    if (run) {
+      censusRun = null; run.cleanupFocus?.();
+      run.timers.forEach(clearTimeout); run.controllers.forEach(item => item.abort());
+      run.readers.forEach(reader => { reader.cancel().catch(() => {}); });
+      censusMessage = run.posted ? reason + " The outcome is unverified. Read the saved operation; never repeat its POST." : reason + " No census write was requested.";
+    }
+    renderCensus();
+  }
+  function resetCensus() {
+    cancelCensus("The Admin session ended.");
+    censusPreview = null; censusDiscovery = null; censusNames.clear(); censusDetail = null; censusCheckedAt = null;
+    censusMessage = censusPending.size ? "A saved operation needs a read-only status check before further writes." :
+      "Use Check Status to read the current census. Nothing loads or runs automatically.";
+    renderCensus();
+  }
+  async function censusRequest(run, path, { body, timeout = 20000, publicRead = false } = {}) {
+    if (!censusCurrent(run)) throw Object.assign(Error(), { kind: "stale" });
+    const ownController = new AbortController(); run.controllers.add(ownController);
+    const timer = setTimeout(() => ownController.abort(), timeout); run.timers.add(timer);
+    try {
+      const headers = { Accept: "application/json" };
+      if (!publicRead) { headers.Authorization = "Bearer " + run.token; headers["X-V3-Admin-Request"] = "1"; }
+      if (body !== undefined) headers["Content-Type"] = "application/json";
+      const response = await fetch("https://vmpix-data.onrender.com" + path, { method: body === undefined ? "GET" : "POST",
+        headers, ...(body === undefined ? {} : { body: JSON.stringify(body) }), credentials: "omit", mode: "cors",
+        cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: ownController.signal });
+      if ([401, 403].includes(response.status) && !publicRead) {
+        await response.body?.cancel(); throw Object.assign(Error(), { kind: "auth" });
+      }
+      const parsed = await boundedEndpointJson(response, run, ownController);
+      if (!censusCurrent(run)) throw Object.assign(Error(), { kind: "stale" });
+      if (parsed.invalid || parsed.unavailable || parsed.unsupported || !diagnosticObject(parsed.data))
+        throw Object.assign(Error(), { kind: "contract" });
+      if (response.status === 404 && parsed.data.error === "batch_not_found") return { missing: true };
+      if (!response.ok) throw Object.assign(Error(), { kind: response.status === 409 ? "busy" : "unavailable" });
+      return parsed.data;
+    } finally { clearTimeout(timer); run.timers.delete(timer); run.controllers.delete(ownController); }
+  }
+  async function censusLoadNames(run) {
+    const names = new Map(), conflicts = new Set(); let total = null, totalPages = null;
+    for (let page = 1; page <= 10; page++) {
+      const data = await censusRequest(run, "/api/music/venues/db?limit=100&page=" + page, { publicRead: true });
+      if (data.ok !== true || data.route !== "/api/music/venues/db" || data.source?.type !== "postgres" ||
+          data.source?.table !== "music_venues" || data.page !== page || data.limit !== 100 ||
+          !diagnosticCount(data.total) || data.total > 1000 || !Array.isArray(data.data) || data.data.length > 100 ||
+          data.count !== data.data.length || data.totalPages !== Math.ceil(data.total / 100) ||
+          data.hasNextPage !== (page < data.totalPages) || data.hasPrevPage !== (page > 1 && data.totalPages > 0) ||
+          total !== null && (data.total !== total || data.totalPages !== totalPages)) throw Object.assign(Error(), { kind: "names" });
+      total = data.total; totalPages = data.totalPages;
+      for (const raw of data.data) {
+        const id = censusId(raw?.venue_id);
+        if (!id || typeof raw.venue !== "string" || !raw.venue.trim() || raw.venue.length > 200 || /[\u0000-\u001f]/.test(raw.venue)) continue;
+        const safe = safeManualImportValue({ name: raw.venue.trim() }).data?.name;
+        if (typeof safe !== "string" || safe !== raw.venue.trim()) continue;
+        if (names.has(id) && names.get(id) !== safe) conflicts.add(id);
+        else names.set(id, safe);
+      }
+      if (!data.hasNextPage) { conflicts.forEach(id => names.delete(id)); return names; }
+    }
+    throw Object.assign(Error(), { kind: "names" });
+  }
+  function censusMatches(detail, pending) {
+    const a = detail.parameters, b = pending.parameters;
+    return detail.operationId === pending.operationId && a.limit === b.limit && a.budgetSeconds === b.budgetSeconds &&
+      a.maxAgeHours === b.maxAgeHours && a.forceRefresh === b.forceRefresh && censusSame(a.venueIds, b.venueIds) &&
+      detail.selectedVenueIds.every(id => b.venueIds.includes(id)) &&
+      !detail.results.some(row => ["success", "incomplete", "failed"].includes(row.status) &&
+        (!b.venueIds.includes(row.venue_id) || !detail.selectedVenueIds.includes(row.venue_id))) &&
+      (detail.inflight === null || detail.selectedVenueIds.includes(detail.inflight.venue_id));
+  }
+  function censusTerminal(detail) {
+    return ["completed", "stopped", "interrupted"].includes(detail.status) && !detail.requiresReconciliation && detail.inflight === null;
+  }
+  function censusClean(detail) {
+    return detail.status === "completed" && censusTerminal(detail) && detail.parameters.venueIds.length > 0 &&
+      censusSame(detail.selectedVenueIds, detail.parameters.venueIds) && detail.selectedVenueIds.every(id => {
+      const rows = detail.results.filter(row => row.venue_id === id);
+      return rows.length === 1 && rows[0].status === "success" && diagnosticCount(rows[0].total) && parseAdminTimestamp(rows[0].verifiedAt);
+    });
+  }
+  async function censusReadOperation(run, id) {
+    const raw = await censusRequest(run, CENSUS_ROUTE + "/" + encodeURIComponent(id));
+    if (raw.missing) return null;
+    const detail = projectCensusOperation(raw);
+    if (!detail || detail.operationId !== id) throw Object.assign(Error(), { kind: "contract" });
+    const saved = censusPending.get(id);
+    if (saved && censusMatches(detail, saved) && censusTerminal(detail)) {
+      censusPending.delete(id); saveCensusPending();
+      if (censusPlan) {
+        if (censusClean(detail)) censusPlan.remaining = censusPlan.remaining.filter(venueId => !saved.parameters.venueIds.includes(venueId));
+        else censusPlan = null;
+      }
+    }
+    censusDetail = detail;
+    return detail;
+  }
+  async function censusReadStatus(run, force = false) {
+    const raw = await censusRequest(run, CENSUS_ROUTE + "?limit=10&maxAgeHours=24&forceRefresh=" + String(force));
+    const preview = projectCensusPreview(raw);
+    if (!preview) throw Object.assign(Error(), { kind: "contract" });
+    const discovery = projectCensusDiscovery(await censusRequest(run, CENSUS_ROUTE + "/operations/recent"));
+    if (!discovery) throw Object.assign(Error(), { kind: "contract" });
+    censusPreview = preview; censusDiscovery = discovery; censusCheckedAt = new Date().toISOString();
+    for (const item of [...censusPending.values()]) await censusReadOperation(run, item.operationId);
+    try { censusNames = await censusLoadNames(run); }
+    catch (error) { if (["auth", "stale"].includes(error.kind)) throw error; censusNames.clear(); }
+    return preview;
+  }
+  async function censusAction(kind, work) {
+    if (!prepareStationEntry() || !censusAllowed() || censusRun || manualImportRun || showResolverRun) return;
+    const run = { kind, generation, token: bearer, controllers: new Set(), readers: new Set(), timers: new Set(), posted: false,
+      focusOperationId: document.activeElement?.getAttribute("data-census-operation"), userMoved: false };
+    const moved = event => { if (event.isTrusted) run.userMoved = true; };
+    document.addEventListener("pointerdown", moved, true); document.addEventListener("keydown", moved, true);
+    run.cleanupFocus = () => { document.removeEventListener("pointerdown", moved, true); document.removeEventListener("keydown", moved, true); };
+    censusRun = run; censusMessage = kind === "execute" ? "Sending this confirmed batch once. Keep Admin open." : "Reading the current census.";
+    const expiryTimer = setTimeout(() => {
+      if (censusRun !== run) return;
+      cancelCensus("Your Admin session expired."); clearSession(); present("idle", "Your session expired. Connect again to read any saved census operation.");
+    }, Math.max(1, expiresAt - Date.now())); run.timers.add(expiryTimer);
+    updateManualImportControls(); renderCensus();
+    try { await work(run); }
+    catch (error) {
+      if (censusRun !== run) return;
+      if (error.kind === "auth") {
+        cancelCensus("Census authorization ended."); clearSession(); clearPassword();
+        present("idle", "Access ended. Connect again to read the saved census operation. No further census requests will be sent."); return;
+      }
+      censusMessage = run.posted ? "Completion is unverified. Use the saved operation's read-only status. Never repeat this POST or replace it with another operation." :
+        error.kind === "busy" ? "Another operation is active. No census write was started here. Check Status before continuing." :
+        error.kind === "names" ? "Venue names could not be verified. Confirmation is blocked; no census write was requested." :
+        "Census controls are unavailable or the expected backend support is not deployed. No authentication fallback or automatic retry will occur.";
+      censusConfirmation = null;
+    } finally {
+      run.timers.forEach(clearTimeout); run.cleanupFocus?.();
+      if (censusRun === run) {
+        censusRun = null; updateManualImportControls(); renderCensus();
+        if (run.focusOperationId && !run.userMoved && censusAllowed() && document.activeElement === document.body) {
+          const equivalent = [...censusPanel.querySelectorAll("[data-census-operation]")].find(button =>
+            button.dataset.censusOperation === run.focusOperationId && !button.disabled && button.getClientRects().length);
+          (equivalent || censusNode("check")).focus({ preventScroll: true });
+        }
+      }
+    }
+  }
+  function censusNewOperation() {
+    if (typeof crypto.randomUUID !== "function") throw Error();
+    return "venue-" + crypto.randomUUID();
+  }
+  async function prepareCensus(mode, next = false) {
+    if (censusWriteBlocked()) return;
+    await censusAction("prepare", async run => {
+      censusConfirmation = null;
+      const force = mode === "all", preview = await censusReadStatus(run, force);
+      if (censusWriteBlocked()) { censusMessage = "An active or unresolved operation blocks census writes. Read its status first."; return; }
+      const qualified = preview.venues.filter(row => row.venue_id && row.category === "eligible" && (force || row.lastVerifiedAt === null)).map(row => row.venue_id);
+      const remaining = next && censusPlan?.mode === mode ? censusPlan.remaining.filter(id => qualified.includes(id)) : qualified;
+      const limit = Number(censusNode("limit").value);
+      if (![5, 10].includes(limit)) throw Error();
+      const ids = remaining.slice(0, limit);
+      censusPlan = { mode, remaining };
+      if (!ids.length) { censusMessage = force ? "No qualified venues are available for refresh." : "No eligible venue needs its first verified census."; return; }
+      if (ids.some(id => !censusKnownName(id))) throw Object.assign(Error(), { kind: "names" });
+      censusConfirmation = { operationId: censusNewOperation(), parameters: {
+        limit: ids.length, budgetSeconds: 120, maxAgeHours: 24, forceRefresh: force, venueIds: ids } };
+      censusMessage = remaining.length + " qualified venues in this plan; this confirmation covers " + ids.length + ". Review the exact names, IDs and operation. Every later batch requires a separate confirmation.";
+    });
+    if (censusConfirmation && censusAllowed()) censusNode("execute").focus({ preventScroll: true });
+  }
+  async function executeCensus() {
+    const pending = censusConfirmation;
+    if (!pending || censusWriteBlocked()) return;
+    await censusAction("execute", async run => {
+      const prior = await censusRequest(run, CENSUS_ROUTE + "/" + pending.operationId);
+      if (!prior.missing) { censusMessage = "This operation already exists. No POST was repeated. Read its status."; censusConfirmation = null; return; }
+      // Durable recovery metadata must be retained before the only execute POST.
+      const saved = { operationId: pending.operationId, parameters: pending.parameters, attemptedAt: new Date().toISOString() };
+      censusPending.set(saved.operationId, saved);
+      if (!saveCensusPending()) { censusPending.delete(saved.operationId); throw Error(); }
+      censusConfirmation = null; run.posted = true;
+      const raw = await censusRequest(run, CENSUS_ROUTE, { body: { mode: "execute", confirm: true,
+        operationId: saved.operationId, ...saved.parameters }, timeout: 180000 });
+      const detail = projectCensusOperation(raw);
+      if (!detail || !censusMatches(detail, saved) || !censusClean(detail)) {
+        if (detail) censusDetail = detail;
+        censusMessage = "The batch needs review. Read its operation status before any further census write."; return;
+      }
+      // A separate GET verifies durable completion. A status GET's replayed flag is expected.
+      const confirmed = await censusReadOperation(run, saved.operationId);
+      if (!confirmed || !censusMatches(confirmed, saved) || !censusClean(confirmed)) {
+        censusMessage = "The execute response was not confirmed by a stored status read. Keep this operation paused."; return;
+      }
+      if (censusPlan) censusPlan.remaining = censusPlan.remaining.filter(id => !saved.parameters.venueIds.includes(id));
+      censusPreview = null;
+      censusMessage = "This batch is complete and verified by a separate read. Check Status or explicitly prepare the next batch; no later batch starts automatically.";
+    });
+  }
+  async function inspectCensusOperation(id) {
+    if (!censusOperationId(id)) return;
+    await censusAction("status", async run => {
+      const detail = await censusReadOperation(run, id);
+      censusMessage = !detail ? "No operation journal was found. That alone does not prove an interrupted POST was never admitted. Keep the saved operation paused." :
+        detail.requiresReconciliation || !censusTerminal(detail) ? "This operation is active or unresolved. No POST will be repeated." :
+        "Stored operation status read. No census was executed by this check.";
+    });
+  }
+  readCensusPending();
+  censusReady = !!censusPanel;
+  censusNode("check")?.addEventListener("click", () => censusAction("check", async run => {
+    censusConfirmation = null; await censusReadStatus(run);
+    censusMessage = censusPending.size ? "Saved operations remain unresolved. Use Read Operation Status; no further census write is permitted." :
+      censusNames.size ? "Current census and bounded operation history read. Nothing was refreshed." :
+        "Census status read; venue names are unavailable. Batch confirmation is blocked.";
+  }));
+  censusNode("recent-refresh")?.addEventListener("click", () => censusAction("operations", async run => {
+    const discovery = projectCensusDiscovery(await censusRequest(run, CENSUS_ROUTE + "/operations/recent"));
+    if (!discovery) throw Error();
+    censusDiscovery = discovery; censusMessage = "Bounded operation history read. Select an operation to read its full status.";
+  }));
+  censusNode("missing")?.addEventListener("click", () => prepareCensus("missing"));
+  censusNode("all")?.addEventListener("click", () => prepareCensus("all"));
+  censusNode("next")?.addEventListener("click", () => prepareCensus(censusPlan?.mode, true));
+  censusNode("execute")?.addEventListener("click", executeCensus);
+  censusNode("cancel")?.addEventListener("click", () => { censusConfirmation = null; censusPlan = null; renderCensus(); censusNode("check").focus({ preventScroll: true }); });
+  censusNode("confirm")?.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !censusRun) { event.preventDefault(); censusConfirmation = null; renderCensus(); censusNode("check").focus({ preventScroll: true }); }
+  });
+  censusPanel?.addEventListener("toggle", () => { if (!censusPanel.open) cancelCensus("You closed the census controls."); updateCensusControls(); });
+  renderCensus();
 
 
   // History is reporting only. Each archive supplies bounded, ordered pages; no import command is used here.
@@ -4217,6 +4706,7 @@
     },
     deactivate() {
       cancelManualImports("You left Admin.");
+      cancelCensus("You left Admin.");
       active = false; cancelRequest();
       if (host.contains(document.activeElement)) document.activeElement.blur();
       clearPassword();

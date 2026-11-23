@@ -35273,3 +35273,23 @@ button.hall-crusades-archive-crystal:focus-visible {
 .contact-compose__widget { min-height: 140px; min-width: 0; }
 .contact-compose__challenge .contact-compose__submit { margin-top: 0; }
 .contact-compose [hidden] { display: none; }
+
+
+/* Music Venue Photo Census stays inside the existing Imports station. */
+.admin-shell .admin-census__body { min-inline-size: 0; overflow-wrap: anywhere; }
+.admin-shell .admin-census__controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-block: 12px; }
+.admin-shell .admin-census__controls label { display: grid; gap: 5px; color: #dfcbd8; font-size: 13px; }
+.admin-shell .admin-census__controls select { min-block-size: 44px; min-inline-size: 80px; padding: 8px 12px; border: 1px solid #934057; background: #170e17; color: #e5d9e3; font: inherit; }
+.admin-shell .admin-census :is(button, select) { min-block-size: 44px; max-inline-size: 100%; white-space: normal; }
+.admin-shell .admin-census :is(button, select):focus-visible { outline: 2px solid #e6a9c3; outline-offset: 3px; }
+.admin-shell .admin-census__confirm { margin-block: 12px; padding: 12px; border: 1px solid #934057; background: #1b0f19; }
+.admin-shell .admin-census__confirm h3 { margin-block: 0 10px; font: 400 15px/1.45 var(--font-display); }
+.admin-shell .admin-census__confirm p, .admin-shell .admin-census__operation p { margin-block: 8px; }
+.admin-shell .admin-census__note { margin-block: 10px; color: #b9aab9; font-size: 12px; line-height: 1.5; }
+.admin-shell .admin-census__operation { min-inline-size: 0; padding-block: 12px; border-block-end: 1px solid #473340; }
+.admin-shell .admin-census__operation h4 { margin: 0; font: 400 13px/1.5 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-census__pending:not(:empty) { margin-block: 12px; padding: 10px; border: 1px solid #934057; }
+.admin-shell .admin-census [data-census-diagnostics] p { margin-block: 8px; }
+.admin-shell .admin-census [data-census-state] { color: #e1c3cf; font-weight: 600; }
+.admin-shell .admin-census__metrics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 18px; }
+@media (min-width: 30rem) { .admin-shell .admin-census__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
