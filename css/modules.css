@@ -35412,3 +35412,29 @@ button.hall-crusades-archive-crystal:focus-visible {
     scrollbar-gutter: auto;
   }
 }
+
+/* M3B: one stationary Melody environment behind the existing content and Engine. */
+.site-shell[data-shell-route="music-people"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 3, 9, .5), rgba(4, 3, 9, .62)),
+    url("/assets/media/background/zhento-melody.png") center / cover no-repeat;
+}
+.site-shell[data-shell-route="music-people"] .music-people-index { background: none; }
+.site-shell[data-shell-route="music-people"] .public-home:has(.music-nexus-shell) {
+  padding-inline: max(clamp(.5rem, 1vw, 1rem), env(safe-area-inset-left))
+    max(clamp(.5rem, 1vw, 1rem), env(safe-area-inset-right));
+  scrollbar-gutter: auto;
+}
+.site-shell[data-shell-route="music-people"] .music-people-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.5rem, 1vw, 1rem);
+  padding-inline: clamp(.5rem, 1vw, 1rem);
+}
+@media (min-width: 64rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 80rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 100rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 120rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
