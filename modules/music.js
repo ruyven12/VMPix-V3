@@ -14873,7 +14873,8 @@ function createMusicPeopleEchoes(rows) {
   title.textContent = "Echoes of Melody";
   const field = document.createElement("div");
   field.className = "music-people-echoes-field";
-  rows.slice(0, 6).forEach((person, index) => {
+  const limit = Math.min(rows.length, 12);
+  rows.slice(0, limit).forEach((person, index) => {
     const descriptor = getMusicPeopleSignatureDescriptor(person);
     const echo = document.createElement("button");
     echo.type = "button";
@@ -14888,6 +14889,10 @@ function createMusicPeopleEchoes(rows) {
     const name = document.createElement("span");
     name.className = "music-people-echo-name";
     name.textContent = person.name;
+    if (descriptor.id && typeof IntersectionObserver === "function") {
+      echo.dataset.echoNameMotion = "caption";
+      name.style.setProperty("--echo-name-index", String(index));
+    }
     echo.append(createMusicPeopleSignature(descriptor), name);
     echo.addEventListener("click", () => {
       setActiveMusicPeopleRow(person.personId);

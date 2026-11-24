@@ -35582,3 +35582,49 @@ button.hall-crusades-archive-crystal:focus-visible {
   .music-people-index .music-people-echo[data-echo-slot="4"] { --echo-x: 74%; --echo-y: 30%; }
   .music-people-index .music-people-echo[data-echo-slot="5"] { --echo-x: 90%; --echo-y: 65%; }
 }
+
+/* M5B: the original sunset covers the legacy ambient plane, as on Shows. */
+.site-shell[data-shell-route="music-people"]::before {
+  z-index: 1;
+  background: #100b17 url("/assets/media/background/zhento-melody.png") center / cover no-repeat;
+}
+.music-people-index .music-people-echoes { block-size: auto; min-block-size: 100cqh; }
+.music-people-index .music-people-echoes-field {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(min-content, 1fr);
+  gap: 1.75rem .75rem; padding: 1rem .5rem; min-block-size: calc(100cqh - 5.5rem);
+}
+.music-people-index .music-people-echo {
+  position: relative; inset: auto; place-self: center; inline-size: min(88%, 10rem); max-inline-size: 100%;
+  transform: translate(calc(var(--echo-shift-x, 0px) + var(--echo-spread-x, 0px)), calc(var(--echo-shift-y, 0px) + var(--echo-spread-y, 0px)));
+}
+.music-people-index .music-people-echo:nth-child(4n + 1) { --echo-spread-x: -.45rem; --echo-spread-y: .25rem; }
+.music-people-index .music-people-echo:nth-child(4n + 2) { --echo-spread-x: .35rem; --echo-spread-y: -.3rem; }
+.music-people-index .music-people-echo:nth-child(4n + 3) { --echo-spread-x: .4rem; --echo-spread-y: .1rem; }
+.music-people-index .music-people-echo:nth-child(4n + 4) { --echo-spread-x: -.35rem; --echo-spread-y: -.25rem; }
+.music-people-index .music-people-echo:nth-child(n + 9) { display: none; }
+.music-people-index .music-people-echo-name { opacity: 1; }
+@media (min-width: 48rem) {
+  .music-people-index .music-people-echoes-field { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 64rem) {
+  .music-people-index .music-people-echo:nth-child(n + 9) { display: flex; }
+}
+
+/* Reuse the existing Shows under-photo caption cycle; notes never drift. */
+.music-people-index .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name {
+  color: #e2e9ff; text-shadow: 0 1px 2px #080b19; opacity: 0;
+  animation: synchronicity-memory-date 27s ease-in-out infinite;
+  animation-delay: calc(.6s + var(--echo-name-index, 0) * 27s / var(--echo-caption-limit, 8)); animation-play-state: paused;
+}
+.site-shell[data-shell-route="music-people"] .music-people-index.is-active[aria-hidden="false"]:not([inert]) .music-people-echo[data-echo-name-motion="caption"] .music-people-note[data-signature-visible] + .music-people-echo-name {
+  animation-play-state: running;
+}
+.music-people-index .music-people-echo:is(:hover, :focus, :active) .music-people-echo-name { opacity: .96 !important; }
+@media (prefers-reduced-motion: reduce) {
+  .music-people-index .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { animation: none; opacity: .96; }
+}
+
+.music-people-index .music-people-echoes { --echo-caption-limit: 8; }
+@media (min-width: 64rem) {
+  .music-people-index .music-people-echoes { --echo-caption-limit: 12; }
+}
