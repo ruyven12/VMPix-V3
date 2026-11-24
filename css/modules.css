@@ -4195,7 +4195,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 }
 
 /* Harbor owns the first visible frame after the boot mask is lifted. */
-.site-shell:is([data-shell-route="music-venues"], [data-shell-route="music-venue-detail"], [data-shell-route="music-venue-events"]) .home-frame {
+.site-shell:is([data-shell-route="music-venues"], [data-shell-route="music-venue-detail"], [data-shell-route="music-venue-events"], [data-shell-route="music-people"]) .home-frame {
   display: none;
 }
 

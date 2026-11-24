@@ -264,6 +264,12 @@
           root.classList.add("has-entered-hub", "is-module-view");
           root.dataset.shellRoute = "music-shows";
         }
+        if (routePath === "/music/people") {
+          const root = document.currentScript.parentElement;
+          root.classList.remove("is-home-route");
+          root.classList.add("has-entered-hub", "is-module-view");
+          root.dataset.shellRoute = "music-people";
+        }
         if (routePath === "/admin") {
           const root = document.currentScript.parentElement;
           root.classList.remove("is-home-route");
