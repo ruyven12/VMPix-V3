@@ -35457,3 +35457,65 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .music-people-index .music-people-note[data-signature-id] { animation: none; opacity: 1; }
 }
+
+/* M5: horizontal tuning in a stationary dock; the People list keeps its geometry. */
+.music-people-index .music-people-filters {
+  position: relative; z-index: 3; display: flex; justify-content: center; align-items: center;
+  inline-size: min(calc(100% - 1rem), 44rem); block-size: 4.5rem; min-inline-size: 0;
+  padding: 0; border: 0; border-radius: 0; background: none;
+}
+.music-people-index .music-people-tuning-sigil {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .05rem;
+  min-inline-size: 10rem; min-block-size: 44px; padding: 0 .6rem; border: 0; border-radius: .35rem;
+  color: #e1c596; background: none; font: inherit; font-size: .82rem; line-height: 1.25; cursor: pointer;
+}
+.music-people-index .music-people-tuning-note { inline-size: 3rem; block-size: 3rem; flex: 0 0 auto; }
+.music-people-index .music-people-filters[data-active-filters] .music-people-tuning-sigil { color: #e8bce2; }
+.music-people-index .music-people-tuning-sigil[aria-expanded="true"] { color: #f1d5f3; }
+.music-people-index .music-people-tuning-panel {
+  position: absolute; inset-block-start: calc(100% + .25rem); inset-inline-start: 0; inline-size: 100%;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: .5rem; min-inline-size: 0;
+  padding: .625rem; border: 1px solid rgba(208, 165, 223, .35); border-radius: .5rem;
+  background: #100b1c; color: #f0e7f3; box-shadow: 0 .4rem 1.1rem rgba(0, 0, 0, .25);
+}
+.music-people-index .music-people-tuning-panel[hidden] { display: none; }
+.music-people-index .music-people-tuning-search { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: end; gap: .375rem; min-inline-size: 0; }
+.music-people-index .music-people-tuning-search-label { display: grid; gap: .25rem; min-inline-size: 0; font-size: .75rem; line-height: 1.2; color: #d8c6e2; }
+.music-people-index .music-people-tuning-search .music-people-search-input {
+  min-inline-size: 0; min-block-size: 44px; block-size: 44px; padding: .5rem; border-color: rgba(208, 165, 223, .35);
+  background: #1a1229; color: #f4edf6; font-size: 1rem;
+}
+.music-people-index .music-people-tuning-search .music-people-search-input::placeholder { color: #bcb0c8; opacity: 1; }
+.music-people-index .music-people-tuning-panel button { min-block-size: 44px; min-inline-size: 44px; padding: .4rem .65rem; border: 1px solid rgba(208, 165, 223, .28); border-radius: .3rem; background: #1a1229; color: #eee4f2; font: inherit; font-size: .875rem; line-height: 1.2; cursor: pointer; }
+.music-people-index .music-people-tuning-group { display: grid; gap: .25rem; min-inline-size: 0; }
+.music-people-index .music-people-tuning-group-title { font-size: .75rem; line-height: 1.2; color: #d8c6e2; white-space: nowrap; }
+.music-people-index .music-people-tuning-rail { display: flex; gap: .375rem; min-inline-size: 0; overflow-x: auto; overflow-y: hidden; overscroll-behavior-inline: contain; touch-action: pan-x; scrollbar-width: thin; scrollbar-color: #8b6f9d #1a1229; }
+.music-people-index .music-people-tuning-option { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: .4rem; white-space: nowrap; }
+.music-people-index .music-people-tuning-symbol { font-size: 1.15rem; line-height: 1; color: #e1c596; }
+.music-people-index .music-people-tuning-panel button[aria-pressed="true"] { border-color: #d0a5df; background: #34203f; color: #fff1fa; }
+.music-people-index .music-people-tuning-panel button:disabled { opacity: .38; cursor: default; }
+.music-people-index .music-people-tuning-panel button:not(:disabled):hover { border-color: #dab4e6; }
+.music-people-index :is(.music-people-tuning-sigil, .music-people-tuning-panel button, .music-people-tuning-panel input):focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
+@media (min-width: 48rem) {
+  .music-people-index .music-people-tuning-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .music-people-index :is(.music-people-tuning-search, [data-music-people-tuning-group="letter"]) { grid-column: 1 / -1; }
+}
+@media (max-height: 540px) {
+  .music-people-index .music-people-filters { block-size: 44px; }
+  .music-people-index .music-people-tuning-sigil { flex-direction: row; gap: .3rem; }
+  .music-people-index .music-people-tuning-note { inline-size: 2rem; block-size: 2rem; }
+  .music-people-index .music-people-tuning-panel { inset-block-start: 0; padding: .5rem; gap: .375rem; }
+  .music-people-index .music-people-tuning-search-label > span { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+  .music-people-index .music-people-tuning-group { grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: .375rem; }
+}
+@media (max-height: 400px) {
+  .music-people-index .music-people-tuning-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .music-people-index :is(.music-people-tuning-search, [data-music-people-tuning-group="letter"]) { grid-column: 1 / -1; }
+}
+@media (max-height: 320px) {
+  .music-people-index .music-people-tuning-panel { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .music-people-index .music-people-tuning-search { grid-column: 1 / -1; }
+  .music-people-index [data-music-people-tuning-group="letter"] { grid-column: auto; }
+  .music-people-index .music-people-tuning-group { display: block; }
+  .music-people-index .music-people-tuning-group-title { position: absolute; inline-size: 1px; block-size: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+}

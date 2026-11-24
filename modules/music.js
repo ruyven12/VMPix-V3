@@ -14587,126 +14587,251 @@ function createMusicPeopleRow(person) {
   return row;
 }
 
-function createMusicPeopleFilterField(labelText, fieldName, options, activeValue, allLabel = "All") {
-  const label = document.createElement("label");
-  label.className = "music-people-filter-field";
+let musicPeopleTuningOpen = false;
+let musicPeopleTuningListenersBound = false;
+let musicPeopleTuningMountObserver = null;
+const musicPeopleTuningRailOffsets = new Map();
 
-  const labelSpan = document.createElement("span");
-  labelSpan.className = "music-people-filter-label";
-  labelSpan.textContent = labelText;
+function rememberMusicPeopleTuningRails() {
+  if (!musicPeopleTuningOpen || !isMusicPeopleTuningVisible()) return;
+  const panel = musicPeopleIndex.querySelector("[data-music-people-tuning-panel]");
+  if (!panel || panel.hidden || !panel.getClientRects().length) return;
+  panel.querySelectorAll("[data-music-people-tuning-rail]").forEach(rail => {
+    if (rail.clientWidth > 0) musicPeopleTuningRailOffsets.set(rail.dataset.musicPeopleTuningRail, rail.scrollLeft);
+  });
+}
 
-  const select = document.createElement("select");
-  select.className = "music-people-filter-select";
-  select.dataset.musicPeopleFilter = fieldName;
-  select.setAttribute("aria-label", `Filter people by ${labelText.toLowerCase()}`);
-
-  const allOption = document.createElement("option");
-  allOption.value = "";
-  allOption.textContent = allLabel;
-  select.append(allOption);
-  options.forEach((optionValue) => {
-    const option = document.createElement("option");
-    if (optionValue && typeof optionValue === "object") {
-      option.value = optionValue.value;
-      option.textContent = optionValue.label;
-    } else {
-      option.value = optionValue;
-      option.textContent = optionValue;
+function restoreMusicPeopleTuningRails() {
+  const panel = musicPeopleIndex?.querySelector("[data-music-people-tuning-panel]");
+  if (!musicPeopleTuningOpen || !panel || panel.hidden) return;
+  panel.querySelectorAll("[data-music-people-tuning-rail]").forEach(rail => {
+    if (rail.clientWidth > 0 && musicPeopleTuningRailOffsets.has(rail.dataset.musicPeopleTuningRail)) {
+      rail.scrollLeft = musicPeopleTuningRailOffsets.get(rail.dataset.musicPeopleTuningRail);
     }
-    select.append(option);
   });
-  select.value = activeValue;
-  select.addEventListener("change", (event) => {
-    updateMusicPeopleFilter(fieldName, select.value, event);
-  });
+}
 
-  label.append(labelSpan, select);
-  return label;
+
+function isMusicPeopleTuningVisible() {
+  return Boolean(musicPeopleIndex?.isConnected && musicPeopleIndex.classList.contains("is-active")
+    && !musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]')
+    && getRouteFromUrl().name === "music-people" && musicPeopleIndex.getClientRects().length);
+}
+
+function setMusicPeopleTuningOpen(isOpen, moveFocus = false) {
+  rememberMusicPeopleTuningRails();
+  musicPeopleTuningOpen = Boolean(isOpen && isMusicPeopleTuningVisible());
+  const filters = musicPeopleIndex?.querySelector("[data-music-people-filters]");
+  const sigil = filters?.querySelector("[data-music-people-tuning-sigil]");
+  const panel = filters?.querySelector("[data-music-people-tuning-panel]");
+  sigil?.setAttribute("aria-expanded", String(musicPeopleTuningOpen));
+  if (panel) {
+    panel.hidden = !musicPeopleTuningOpen;
+    panel.inert = !musicPeopleTuningOpen;
+  }
+  restoreMusicPeopleTuningRails();
+  if (moveFocus && isMusicPeopleTuningVisible()) {
+    const target = musicPeopleTuningOpen ? panel?.querySelector("[data-music-people-filter='search']") : sigil;
+    target?.focus({ preventScroll: true });
+  }
+}
+
+function createMusicPeopleFilterRail(labelText, fieldName, options, activeValue, rows) {
+  const group = document.createElement("div");
+  group.className = "music-people-tuning-group";
+  group.dataset.musicPeopleTuningGroup = fieldName;
+  const label = document.createElement("span");
+  label.className = "music-people-tuning-group-title";
+  label.textContent = labelText;
+  const rail = document.createElement("div");
+  rail.className = "music-people-tuning-rail";
+  rail.dataset.musicPeopleTuningRail = fieldName;
+  rail.setAttribute("role", "group");
+  rail.setAttribute("aria-label", labelText);
+  rail.addEventListener("scroll", () => {
+    if (musicPeopleTuningOpen && isMusicPeopleTuningVisible() && rail.clientWidth > 0) {
+      musicPeopleTuningRailOffsets.set(fieldName, rail.scrollLeft);
+    }
+  }, { passive: true });
+  const choices = [{ value: "", label: "All" }, ...options.map(option => typeof option === "object" ? option : { value: option, label: option })];
+  const letters = new Set(rows.map(person => person.letter));
+  choices.forEach(option => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "music-people-tuning-option";
+    button.dataset.musicPeopleFilter = fieldName;
+    button.dataset.musicPeopleValue = option.value;
+    button.setAttribute("aria-pressed", String(option.value === activeValue));
+    button.setAttribute("aria-label", `${labelText}: ${option.label}`);
+    if (fieldName === "letter" && option.value && !letters.has(option.value)) button.disabled = true;
+    if (fieldName === "instrument") {
+      const symbol = document.createElement("span");
+      symbol.className = "music-people-tuning-symbol";
+      symbol.setAttribute("aria-hidden", "true");
+      const instrument = option.value.toLowerCase();
+      symbol.textContent = /drum|percussion|cymbal/.test(instrument) ? "𝄽"
+        : /guitar|bass|strings|violin|cello/.test(instrument) ? "♫"
+        : /piano|keys|keyboard|organ|synth/.test(instrument) ? "♮"
+        : /vocal|voice|singer/.test(instrument) ? "◉" : "♪";
+      button.appendChild(symbol);
+    }
+    const text = document.createElement("span");
+    text.textContent = option.label;
+    button.appendChild(text);
+    button.addEventListener("click", event => {
+      setMusicPeopleTuningOpen(false);
+      updateMusicPeopleFilter(fieldName, option.value, event);
+      setMusicPeopleTuningOpen(false, true);
+    });
+    rail.appendChild(button);
+  });
+  group.append(label, rail);
+  return group;
 }
 
 function createMusicPeopleFilters(rows) {
+  if (!musicPeopleTuningListenersBound) {
+    document.addEventListener("pointerdown", event => {
+      if (!musicPeopleTuningOpen || event.defaultPrevented) return;
+      if (!isMusicPeopleTuningVisible()) { setMusicPeopleTuningOpen(false); return; }
+      const filters = musicPeopleIndex?.querySelector("[data-music-people-filters]");
+      if (!event.composedPath().includes(filters)) setMusicPeopleTuningOpen(false);
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !event.defaultPrevented && musicPeopleTuningOpen && isMusicPeopleTuningVisible()) {
+        event.preventDefault();
+        setMusicPeopleTuningOpen(false, true);
+      }
+    });
+    if (musicNexusShell && typeof MutationObserver === "function") {
+      musicPeopleTuningMountObserver = new MutationObserver(() => {
+        if (musicPeopleTuningOpen && !isMusicPeopleTuningVisible()) setMusicPeopleTuningOpen(false);
+      });
+      musicPeopleTuningMountObserver.observe(musicNexusShell, { attributes: true, attributeFilter: ["aria-hidden", "inert", "hidden"] });
+    }
+    musicPeopleTuningListenersBound = true;
+  }
   const filters = document.createElement("section");
   filters.className = "music-people-filters";
   filters.dataset.musicPeopleFilters = "";
-  filters.setAttribute("aria-label", "People archive filters");
+  filters.setAttribute("aria-label", "Tune the Chorus");
+  filters.addEventListener("focusout", event => {
+    if (musicPeopleTuningOpen && event.relatedTarget && !filters.contains(event.relatedTarget)) setMusicPeopleTuningOpen(false);
+  });
+  const active = Boolean(activeMusicPeopleSearch || activeMusicPeopleLetterFilter || activeMusicPeopleCategoryFilter || activeMusicPeopleInstrumentFilter);
+  filters.toggleAttribute("data-active-filters", active);
+  const sigil = document.createElement("button");
+  sigil.type = "button";
+  sigil.className = "music-people-tuning-sigil";
+  sigil.dataset.musicPeopleTuningSigil = "";
+  sigil.setAttribute("aria-expanded", String(musicPeopleTuningOpen));
+  sigil.setAttribute("aria-controls", "music-people-tuning-panel");
+  sigil.setAttribute("aria-label", active ? "Tune the Chorus, filters active" : "Tune the Chorus");
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  icon.classList.add("music-people-tuning-note");
+  icon.setAttribute("viewBox", "0 0 64 64");
+  icon.setAttribute("aria-hidden", "true");
+  icon.setAttribute("focusable", "false");
+  const note = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  note.setAttribute("d", "M31 45V12 M31 12C32 21 46 19 44 32C40 26 35 26 31 23 M31 45C31 49 26 53 21 53C16 53 13 50 15 46C17 42 23 40 27 41C30 42 31 43 31 45Z");
+  note.setAttribute("fill", "currentColor");
+  note.setAttribute("stroke", "currentColor");
+  note.setAttribute("stroke-width", "2.5");
+  note.setAttribute("stroke-linecap", "round");
+  note.setAttribute("stroke-linejoin", "round");
+  icon.appendChild(note);
+  const title = document.createElement("span");
+  title.textContent = "Tune the Chorus";
+  sigil.append(icon, title);
+  sigil.addEventListener("click", () => setMusicPeopleTuningOpen(!musicPeopleTuningOpen, true));
 
-  const searchRow = document.createElement("div");
-  searchRow.className = "music-people-filter-row music-people-filter-row--search";
-  const selectRow = document.createElement("div");
-  selectRow.className = "music-people-filter-row music-people-filter-row--selects";
-  const actionRow = document.createElement("div");
-  actionRow.className = "music-people-filter-row music-people-filter-row--actions";
-
+  const panel = document.createElement("div");
+  panel.className = "music-people-tuning-panel";
+  panel.id = "music-people-tuning-panel";
+  panel.dataset.musicPeopleTuningPanel = "";
+  panel.hidden = !musicPeopleTuningOpen;
+  panel.inert = !musicPeopleTuningOpen;
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-label", "Chorus filters");
+  const form = document.createElement("form");
+  form.className = "music-people-tuning-search";
+  form.dataset.musicPeopleTuningSearch = "";
   const searchLabel = document.createElement("label");
-  searchLabel.className = "music-people-filter-field music-people-filter-field--search";
+  searchLabel.className = "music-people-tuning-search-label";
   const searchText = document.createElement("span");
-  searchText.className = "music-people-filter-label";
   searchText.textContent = "Search People";
   const searchInput = document.createElement("input");
   searchInput.className = "music-people-search-input";
   searchInput.type = "search";
   searchInput.autocomplete = "off";
-  searchInput.placeholder = "Search name, category, alias, band, instrument";
+  searchInput.enterKeyHint = "search";
+  searchInput.placeholder = "Name, band or instrument";
   searchInput.value = activeMusicPeopleSearch;
   searchInput.dataset.musicPeopleFilter = "search";
-  searchInput.addEventListener("input", (event) => {
-    updateMusicPeopleFilter("search", searchInput.value, event);
-  });
+  searchInput.addEventListener("input", event => updateMusicPeopleFilter("search", searchInput.value, event));
   searchLabel.append(searchText, searchInput);
-
-  const letterOptions = musicPeopleAlphabet;
-  const categoryOptions = getMusicPeopleCategoryOptions(rows);
-  const instrumentOptions = getMusicPeopleInstrumentOptions(rows);
-
-  const resetButton = document.createElement("button");
-  resetButton.className = "music-people-filter-reset";
-  resetButton.type = "button";
-  resetButton.textContent = "Reset Filters";
-  resetButton.addEventListener("click", resetMusicPeopleFilters);
-
-  searchRow.append(searchLabel);
-  selectRow.append(
-    createMusicPeopleFilterField("Letter", "letter", letterOptions, activeMusicPeopleLetterFilter),
-    createMusicPeopleFilterField("Category", "category", categoryOptions, activeMusicPeopleCategoryFilter),
-    createMusicPeopleFilterField("Instrument", "instrument", instrumentOptions, activeMusicPeopleInstrumentFilter)
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    setMusicPeopleTuningOpen(false, true);
+  });
+  const reset = document.createElement("button");
+  reset.type = "button";
+  reset.textContent = "Reset";
+  reset.dataset.musicPeopleTuningAction = "reset";
+  reset.addEventListener("click", event => {
+    setMusicPeopleTuningOpen(false);
+    resetMusicPeopleFilters(event);
+    setMusicPeopleTuningOpen(false, true);
+  });
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Close";
+  close.dataset.musicPeopleTuningAction = "close";
+  close.addEventListener("click", () => setMusicPeopleTuningOpen(false, true));
+  form.append(searchLabel, reset, close);
+  panel.append(
+    form,
+    createMusicPeopleFilterRail("A–Z", "letter", musicPeopleAlphabet, activeMusicPeopleLetterFilter, rows),
+    createMusicPeopleFilterRail("Category", "category", getMusicPeopleCategoryOptions(rows), activeMusicPeopleCategoryFilter, rows),
+    createMusicPeopleFilterRail("Instrument", "instrument", getMusicPeopleInstrumentOptions(rows), activeMusicPeopleInstrumentFilter, rows)
   );
-  actionRow.append(resetButton);
-  filters.append(searchRow, selectRow, actionRow);
-
+  filters.append(sigil, panel);
   return filters;
 }
 
 function getMusicPeopleFilterFocusMeta() {
-  const activeElement = document.activeElement;
-  if (!musicPeopleIndex) {
-    return null;
-  }
-  if (!activeElement || !musicPeopleIndex.contains(activeElement)) {
-    return null;
-  }
-  const filterName = activeElement.dataset?.musicPeopleFilter;
-  if (!filterName) {
-    return null;
-  }
+  rememberMusicPeopleTuningRails();
+  const active = document.activeElement;
+  const filters = musicPeopleIndex?.querySelector("[data-music-people-filters]");
+  if (!active || !filters?.contains(active)) return null;
   return {
-    filterName,
-    selectionStart: typeof activeElement.selectionStart === "number" ? activeElement.selectionStart : null,
-    selectionEnd: typeof activeElement.selectionEnd === "number" ? activeElement.selectionEnd : null,
+    filterName: active.dataset.musicPeopleFilter || "",
+    optionValue: active.dataset.musicPeopleValue ?? null,
+    action: active.dataset.musicPeopleTuningAction || "",
+    sigil: active.hasAttribute("data-music-people-tuning-sigil"),
+    selectionStart: typeof active.selectionStart === "number" ? active.selectionStart : null,
+    selectionEnd: typeof active.selectionEnd === "number" ? active.selectionEnd : null
   };
 }
 
 function restoreMusicPeopleFilterFocus(focusMeta) {
-  if (!focusMeta || !musicPeopleIndex) {
-    return;
-  }
+  if (!focusMeta || !musicPeopleIndex) return;
   window.requestAnimationFrame(() => {
-    const target = musicPeopleIndex.querySelector(`[data-music-people-filter="${focusMeta.filterName}"]`);
-    if (!target) {
-      return;
+    if (!musicPeopleIndex.isConnected || musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]')) return;
+    const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+    if (!filters) return;
+    restoreMusicPeopleTuningRails();
+    if (document.activeElement !== document.body && document.activeElement !== document.documentElement) return;
+    let target = filters.querySelector("[data-music-people-tuning-sigil]");
+    if (musicPeopleTuningOpen && !focusMeta.sigil) {
+      target = focusMeta.action
+        ? [...filters.querySelectorAll("[data-music-people-tuning-action]")].find(node => node.dataset.musicPeopleTuningAction === focusMeta.action)
+        : [...filters.querySelectorAll("[data-music-people-filter]")].find(node => node.dataset.musicPeopleFilter === focusMeta.filterName
+          && (focusMeta.optionValue === null || node.dataset.musicPeopleValue === focusMeta.optionValue));
     }
-    target.focus({ preventScroll: true });
-    if (focusMeta.filterName === "search" && focusMeta.selectionStart !== null && typeof target.setSelectionRange === "function") {
-      target.setSelectionRange(focusMeta.selectionStart, focusMeta.selectionEnd ?? focusMeta.selectionStart);
+    target?.focus({ preventScroll: true });
+    if (target?.dataset.musicPeopleFilter === "search" && focusMeta.selectionStart !== null) {
+      target.setSelectionRange?.(focusMeta.selectionStart, focusMeta.selectionEnd ?? focusMeta.selectionStart);
     }
   });
 }
@@ -18667,6 +18792,7 @@ function setPeopleIndexVisible(isVisible) {
 
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
+  if (!isVisible) setMusicPeopleTuningOpen(false);
   if (isVisible) {
     const peopleRequest = requestMusicPeopleIndexData();
     renderMusicPeopleIndex({ shouldResetScroll: false });
