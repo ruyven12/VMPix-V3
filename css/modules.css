@@ -35628,3 +35628,30 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (min-width: 64rem) {
   .music-people-index .music-people-echoes { --echo-caption-limit: 12; }
 }
+
+/* M5D: thin staff lanes share the existing scene/list, without moving glyph geometry. */
+.site-shell[data-shell-route="music-people"]::before {
+  background: linear-gradient(rgba(5, 5, 7, .28), rgba(5, 5, 7, .28)), #100b17 url("/assets/media/background/zhento-melody.png") center / cover no-repeat;
+}
+.music-people-index .music-people-staff {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(2, minmax(10rem, 1fr));
+  gap: .75rem; padding: .5rem 0; min-block-size: calc(100cqh - 5.5rem);
+}
+.music-people-index .music-people-staff[data-lane-count="3"] { grid-template-rows: repeat(3, minmax(10rem, 1fr)); }
+.music-people-index .music-people-staff-lane { position: relative; min-inline-size: 0; min-block-size: 10rem; overflow: clip; touch-action: pan-y; }
+.music-people-index .music-people-staff-lane::before {
+  content: ""; position: absolute; inset-inline: 0; inset-block-start: calc(50% - 2rem); block-size: 37px;
+  background: repeating-linear-gradient(to bottom, rgba(225,197,150,.19) 0 1px, transparent 1px 9px); pointer-events: none;
+}
+.music-people-index .music-people-echo-transit { position: absolute; inset-inline-start: 0; inset-block-start: 50%; }
+.music-people-index .music-people-staff .music-people-echo {
+  position: relative; inset: auto; inline-size: 100%; max-inline-size: 100%; transform: none; margin: 0;
+  display: flex; min-block-size: 44px;
+}
+.music-people-index .music-people-echoes-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem 1rem; }
+.music-people-index [data-music-people-echo-controls] { display: flex; gap: .5rem; }
+.music-people-index [data-music-people-echo-controls][hidden] { display: none; }
+.music-people-index [data-music-people-echo-page] { min-block-size: 44px; padding: .45rem .75rem; border: 1px solid rgba(225,197,150,.35); border-radius: .3rem; background: rgba(12,8,19,.65); color: #eee2f1; font: inherit; font-size: .85rem; cursor: pointer; }
+.music-people-index [data-music-people-echo-page]:focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
+.music-people-index [data-echo-mode="static"] .music-people-staff-lane { display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; gap: .75rem; }
+.music-people-index [data-echo-mode="static"] .music-people-echo-transit { position: relative; inset: auto; transform: none; }

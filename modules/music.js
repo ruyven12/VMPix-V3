@@ -14630,6 +14630,7 @@ function setMusicPeopleTuningOpen(isOpen, moveFocus = false) {
     panel.inert = !musicPeopleTuningOpen;
   }
   restoreMusicPeopleTuningRails();
+  syncMusicPeopleEchoes();
   if (moveFocus && isMusicPeopleTuningVisible()) {
     const target = musicPeopleTuningOpen ? panel?.querySelector("[data-music-people-filter='search']") : sigil;
     target?.focus({ preventScroll: true });
@@ -14862,44 +14863,368 @@ function resetMusicPeopleFilters(event = null) {
   reportMusicArchiveControl(event, "people", analyticsBefore, "filter");
 }
 
+let musicPeopleEchoController = null;
+let musicPeopleEchoMemory = null;
+
+// Ordered-population seam: current verified, filtered alphabetical rows only.
+function getMusicPeopleEchoPopulation(rows) {
+  return rows.map((person, index) => {
+    const descriptor = getMusicPeopleSignatureDescriptor(person);
+    return { person, descriptor, key: descriptor.id ? "id:" + descriptor.id : "row:" + index, index };
+  });
+}
+
+function createMusicPeopleEchoToken(record, slotIndex) {
+  const { person, descriptor, index } = record;
+  const echo = document.createElement("button");
+  echo.type = "button";
+  echo.className = "music-people-echo";
+  echo.id = descriptor.id ? `music-people-echo-id-${encodeURIComponent(descriptor.id)}` : `music-people-echo-row-${index}`;
+  echo.dataset.musicPeopleEcho = person.personId;
+  echo.dataset.echoPersonKey = record.key;
+  echo.setAttribute("aria-label", person.name);
+  echo.style.setProperty("--echo-depth", String(descriptor.id ? .9 + ((descriptor.seed >>> 12) % 23) / 100 : 1));
+  const name = document.createElement("span");
+  name.className = "music-people-echo-name";
+  name.textContent = person.name;
+  if (descriptor.id && typeof IntersectionObserver === "function") {
+    echo.dataset.echoNameMotion = "caption";
+    name.style.setProperty("--echo-name-index", "0");
+  }
+  echo.append(createMusicPeopleSignature(descriptor), name);
+  echo.addEventListener("click", () => {
+    setActiveMusicPeopleRow(person.personId);
+    navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
+  });
+  return echo;
+}
+
+function stopMusicPeopleEchoes() {
+  musicPeopleEchoController?.dispose();
+}
+function syncMusicPeopleEchoes() {
+  musicPeopleEchoController?.sync();
+}
+
+function startMusicPeopleEchoes() {
+  const scene = musicPeopleList?.querySelector("[data-music-people-echoes]");
+  if (!scene || musicPeopleEchoController) return;
+  const pool = getMusicPeopleEchoPopulation(scene._echoRows);
+  if (!pool.length) return;
+  const populationKey = JSON.stringify(pool.map(record => record.key));
+  const saved = musicPeopleEchoMemory?.populationKey === populationKey ? musicPeopleEchoMemory : null;
+  const field = scene.querySelector("[data-music-people-staff]");
+  const manual = scene.querySelector("[data-music-people-echo-controls]");
+  const records = new Map(pool.map(record => [record.key, record]));
+  const session = { scene, lanes: [], cursor: saved?.cursor || 0, frame: 0, pendingResize: false,
+    manualStart: saved?.manualStart || 0, width: 0, desktop: null, static: false, disposed: false };
+  const cleanup = [];
+  const active = new Set();
+  const alive = () => musicPeopleEchoController === session && !session.disposed;
+  const ownsView = () => Boolean(musicPeopleIndex?.isConnected && musicPeopleIndex.classList.contains("is-active")
+    && !musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]')
+    && getRouteFromUrl().name === "music-people" && !document.hidden);
+  const interacting = lane => lane.hovered || lane.focused || lane.held;
+  const busy = () => session.lanes.some(interacting);
+  const progress = slot => slot.animation ? Math.min(1, Math.max(0, Number(slot.animation.currentTime || 0) / slot.duration)) : slot.progress || 0;
+  const snapshot = () => ({
+    populationKey, cursor: session.cursor, manualStart: session.manualStart, static: session.static, laneCount: session.lanes.length,
+    pinnedKey: session.lanes.flatMap(lane => lane.slots).find(slot => slot.button === document.activeElement)?.record.key || session.pinnedKey || "",
+    slots: session.lanes.flatMap(lane => lane.slots.map(slot => ({ key: slot.record.key, ordinal: slot.ordinal, progress: progress(slot) })))
+  });
+  const listen = (node, type, handler, options) => {
+    node.addEventListener(type, handler, options);
+    cleanup.push(() => node.removeEventListener(type, handler, options));
+  };
+  const unwatch = slot => {
+    const note = slot.button.querySelector("[data-signature-id]");
+    if (note) musicPeopleSignatureObserver?.unobserve(note);
+  };
+  const nextRecord = () => {
+    for (let tries = 0; tries < pool.length; tries += 1) {
+      const record = pool[session.cursor % pool.length];
+      session.cursor = (session.cursor + 1) % pool.length;
+      if (!active.has(record.key)) return record;
+    }
+    return null;
+  };
+  const position = slot => -slot.width + progress(slot) * (session.width + slot.width);
+  const freeze = slot => {
+    if (!slot.animation) return;
+    slot.wrapper.style.transform = `translate3d(${position(slot)}px, -50%, 0)`;
+    slot.animation.cancel();
+    slot.animation = null;
+  };
+  const setAccessible = (slot, visible) => {
+    if (slot.accessible === visible) return;
+    slot.accessible = visible;
+    slot.button.tabIndex = visible ? 0 : -1;
+    slot.button.inert = !visible;
+    slot.button.setAttribute("aria-hidden", String(!visible));
+  };
+  const ensureTick = () => {
+    if (!session.frame && session.lanes.some(lane => lane.running)) session.frame = requestAnimationFrame(tick);
+  };
+  const recycle = (lane, slot) => {
+    if (!alive() || !session.lanes.includes(lane) || !lane.slots.includes(slot) || !slot.wrapper.isConnected) return;
+    if (interacting(lane) || !ownsView() || musicPeopleTuningOpen || !lane.visible) { slot.waiting = true; return; }
+    unwatch(slot);
+    active.delete(slot.record.key);
+    const record = nextRecord();
+    if (!record) return;
+    slot.record = record;
+    active.add(record.key);
+    slot.animation?.cancel();
+    slot.button = createMusicPeopleEchoToken(record, slot.ordinal);
+    slot.wrapper.replaceChildren(slot.button);
+    slot.wrapper.dataset.echoToken = record.key;
+    slot.accessible = null;
+    slot.waiting = false;
+    animateSlot(lane, slot, 0);
+    const note = slot.button.querySelector("[data-signature-id]");
+    if (note) musicPeopleSignatureObserver?.observe(note);
+    session.sync();
+  };
+  const animateSlot = (lane, slot, phase) => {
+    slot.duration = Math.max(24000, Math.min(70000, (session.width + slot.width) / 28 * 1000));
+    slot.animation = slot.wrapper.animate([
+      { transform: `translate3d(${-slot.width}px, -50%, 0)` },
+      { transform: `translate3d(${session.width}px, -50%, 0)` }
+    ], { duration: slot.duration, easing: "linear", fill: "both" });
+    slot.animation.pause();
+    slot.animation.currentTime = phase * slot.duration;
+    if (lane.running) slot.animation.play();
+    slot.animation.finished.then(() => recycle(lane, slot), () => {});
+    setAccessible(slot, false);
+  };
+  const refreshAccess = () => {
+    if (session.static) return;
+    const viewport = musicPeopleList.getBoundingClientRect();
+    session.lanes.forEach(lane => lane.slots.forEach(slot => {
+      const bounds = slot.button.getBoundingClientRect();
+      const fullyVisible = lane.visible && bounds.left >= viewport.left + musicPeopleList.clientLeft
+        && bounds.right <= viewport.right - musicPeopleList.clientLeft
+        && bounds.top >= viewport.top + musicPeopleList.clientTop && bounds.bottom <= viewport.bottom - musicPeopleList.clientTop;
+      setAccessible(slot, slot.button === document.activeElement || fullyVisible);
+    }));
+  };
+  function tick() {
+    session.frame = 0;
+    if (!alive()) return;
+    session.sync(false);
+    refreshAccess();
+    ensureTick();
+  }
+  session.sync = (schedule = true) => {
+    if (!alive()) return;
+    if (session.pendingResize && !busy()) { layout(); return; }
+    session.lanes.forEach(lane => {
+      const run = !session.static && ownsView() && !musicPeopleTuningOpen && lane.visible && !interacting(lane) && !session.pendingResize;
+      if (run !== lane.running) {
+        lane.running = run;
+        lane.node.dataset.echoState = run ? "running" : "paused";
+        lane.slots.forEach(slot => { if (slot.animation) run ? slot.animation.play() : slot.animation.pause(); });
+      }
+      if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => recycle(lane, slot));
+    });
+    if (schedule) ensureTick();
+  };
+  let laneObserver = null;
+  const laneCleanup = [];
+  const bindLane = (node, type, handler) => {
+    node.addEventListener(type, handler);
+    laneCleanup.push(() => node.removeEventListener(type, handler));
+  };
+  function layout(initial = false, manualPage = false) {
+    if (!alive()) return;
+    if (busy()) {
+      session.pendingResize = true;
+      session.sync(false);
+      const width = Math.round(field.clientWidth);
+      if (!session.static && width > 0) session.lanes.forEach(lane => lane.slots.forEach(slot => {
+        if (slot.button !== document.activeElement) return;
+        session.pinnedKey = slot.record.key;
+        const x = slot.fittedX ?? position(slot);
+        slot.width = Math.min(slot.width, width);
+        slot.wrapper.style.inlineSize = slot.width + "px";
+        slot.fittedX = Math.max(0, Math.min(width - slot.width, x));
+        slot.progress = (slot.fittedX + slot.width) / (width + slot.width);
+        slot.wrapper.style.transform = `translate3d(${slot.fittedX}px, -50%, 0)`;
+        slot.animation?.cancel();
+        slot.animation = null;
+      }));
+      refreshAccess();
+      return;
+    }
+    const memory = initial ? saved : snapshot();
+    session.pendingResize = false;
+    session.desktop = matchMedia("(min-width: 64rem)").matches;
+    session.width = Math.round(field.clientWidth || musicPeopleList.clientWidth || 320);
+    const staticMode = reducedMotion.matches || typeof IntersectionObserver !== "function" || typeof field.animate !== "function";
+    session.static = staticMode;
+    const hidingFocusedManual = !staticMode && manual.contains(document.activeElement);
+    scene.dataset.echoMode = staticMode ? "static" : "moving";
+    manual.hidden = !staticMode;
+    laneObserver?.disconnect();
+    laneCleanup.splice(0).forEach(remove => remove());
+    session.lanes.forEach(lane => lane.slots.forEach(slot => { unwatch(slot); freeze(slot); }));
+    active.clear();
+    field.replaceChildren();
+    const count = session.desktop ? 3 : 2;
+    const perLane = session.desktop ? 4 : staticMode ? 2 : 3;
+    field.dataset.laneCount = String(count);
+    const capacity = Math.min(pool.length, count * perLane);
+    const retained = manualPage || staticMode ? [] : (memory?.slots || []).filter(slot => records.has(slot.key)).map(slot => ({ ...slot }));
+    const pinned = retained.find(slot => slot.key === memory?.pinnedKey);
+    if (pinned && pinned.ordinal >= capacity) {
+      retained.forEach(slot => { if (slot !== pinned && slot.ordinal === capacity - 1) slot.ordinal = -1; });
+      pinned.ordinal = capacity - 1;
+    }
+    if (memory && !manualPage) session.cursor = memory.cursor;
+    if (staticMode) session.cursor = session.manualStart % pool.length;
+    for (let index = 0; index < count; index += 1) {
+      const node = document.createElement("div");
+      node.className = "music-people-staff-lane";
+      node.dataset.echoLane = String(index);
+      node.dataset.echoState = "paused";
+      node.setAttribute("aria-label", `Melody staff ${index + 1}`);
+      const lane = { node, slots: [], visible: false, running: false, hovered: false, focused: false, held: false };
+      session.lanes.push(lane);
+      field.appendChild(node);
+      bindLane(node, "pointerenter", event => { if (event.pointerType === "mouse") { lane.hovered = true; session.sync(); } });
+      bindLane(node, "pointerleave", event => { if (event.pointerType === "mouse") { lane.hovered = false; session.sync(); } });
+      bindLane(node, "pointerdown", event => {
+        lane.held = true;
+        session.pinnedKey = event.target.closest("[data-echo-person-key]")?.dataset.echoPersonKey || session.pinnedKey;
+        session.sync();
+      });
+      bindLane(node, "focusin", event => {
+        lane.focused = true;
+        session.pinnedKey = event.target.closest("[data-echo-person-key]")?.dataset.echoPersonKey || session.pinnedKey;
+        session.sync();
+      });
+      bindLane(node, "focusout", event => {
+        if (!node.contains(event.relatedTarget)) {
+          lane.focused = false;
+          queueMicrotask(() => { if (alive()) session.sync(); });
+        }
+      });
+    }
+    // The old lane array is replaced only after its transforms were retained/cancelled.
+    session.lanes = session.lanes.slice(-count);
+    for (let index = 0; index < capacity; index += 1) {
+      const lane = session.lanes[index % count];
+      const remembered = retained.find(item => item.ordinal === index);
+      let record = remembered && !active.has(remembered.key) ? records.get(remembered.key) : null;
+      if (!record) record = nextRecord();
+      if (!record) continue;
+      active.add(record.key);
+      const wrapper = document.createElement("div");
+      wrapper.className = "music-people-echo-transit";
+      wrapper.dataset.echoToken = record.key;
+      const button = createMusicPeopleEchoToken(record, index);
+      wrapper.appendChild(button);
+      lane.node.appendChild(wrapper);
+      const slot = { record, wrapper, button, ordinal: index, width: Math.min(168, Math.max(112, session.width * .42)), animation: null, progress: 0, accessible: null };
+      wrapper.style.inlineSize = slot.width + "px";
+      lane.slots.push(slot);
+      if (staticMode) setAccessible(slot, true);
+      else {
+        const phase = remembered && !memory?.static && memory?.laneCount === count
+          ? remembered.progress : ((Math.floor(index / count) + .25) / Math.ceil(capacity / count));
+        animateSlot(lane, slot, phase);
+      }
+      const note = button.querySelector("[data-signature-id]");
+      if (note) musicPeopleSignatureObserver?.observe(note);
+    }
+    if (!staticMode) {
+      laneObserver = new IntersectionObserver(entries => {
+        if (!alive()) return;
+        entries.forEach(entry => {
+          const lane = session.lanes.find(item => item.node === entry.target);
+          if (lane) {
+            lane.visible = entry.isIntersecting;
+            if (!lane.visible) lane.slots.forEach(slot => {
+              if (slot.button !== document.activeElement) setAccessible(slot, false);
+            });
+          }
+        });
+        session.sync();
+      }, { root: musicPeopleList, threshold: .01 });
+      session.lanes.forEach(lane => laneObserver.observe(lane.node));
+    }
+    manual.querySelectorAll("button").forEach(button => { button.disabled = pool.length <= capacity; });
+    session.capacity = capacity;
+    session.sync();
+    if (hidingFocusedManual && ownsView() && (document.activeElement === document.body || manual.contains(document.activeElement))) {
+      scene.querySelector("[data-music-people-directory-jump]")?.focus({ preventScroll: true });
+    }
+  }
+  session.dispose = () => {
+    if (!alive()) return;
+    musicPeopleEchoMemory = snapshot();
+    session.disposed = true;
+    cancelAnimationFrame(session.frame);
+    laneObserver?.disconnect();
+    laneCleanup.splice(0).forEach(remove => remove());
+    cleanup.splice(0).forEach(remove => remove());
+    session.lanes.forEach(lane => lane.slots.forEach(slot => { unwatch(slot); freeze(slot); }));
+    musicPeopleEchoController = null;
+  };
+  musicPeopleEchoController = session;
+  listen(document, "visibilitychange", () => session.sync());
+  listen(document, "click", () => session.sync());
+  listen(window, "popstate", () => session.sync());
+  const releasePointer = () => { session.lanes.forEach(lane => { lane.held = false; }); session.sync(); };
+  listen(window, "pointerup", releasePointer);
+  listen(window, "pointercancel", releasePointer);
+  const mediaChange = () => layout();
+  reducedMotion.addEventListener?.("change", mediaChange);
+  cleanup.push(() => reducedMotion.removeEventListener?.("change", mediaChange));
+  const mountObserver = new MutationObserver(() => session.sync());
+  for (let node = musicPeopleIndex; node; node = node.parentElement) {
+    mountObserver.observe(node, { attributes: true, attributeFilter: ["hidden", "inert", "aria-hidden", "class", "data-shell-route"] });
+  }
+  cleanup.push(() => mountObserver.disconnect());
+  if (typeof ResizeObserver === "function") {
+    const observer = new ResizeObserver(() => {
+      if (Math.round(field.clientWidth) !== session.width || matchMedia("(min-width: 64rem)").matches !== session.desktop) layout();
+    });
+    observer.observe(field);
+    cleanup.push(() => observer.disconnect());
+  } else listen(window, "resize", () => layout());
+  manual.querySelectorAll("button").forEach(button => listen(button, "click", () => {
+    session.manualStart = (session.manualStart + (button.dataset.musicPeopleEchoPage === "next" ? session.capacity : -session.capacity) + pool.length) % pool.length;
+    layout(false, true);
+  }));
+  layout(true);
+}
+
 function createMusicPeopleEchoes(rows) {
   const scene = document.createElement("section");
   scene.className = "music-people-echoes";
   scene.dataset.musicPeopleEchoes = "";
+  scene._echoRows = rows;
   scene.setAttribute("aria-labelledby", "music-people-echoes-title");
   const title = document.createElement("h3");
   title.id = "music-people-echoes-title";
   title.className = "music-people-echoes-title";
   title.textContent = "Echoes of Melody";
   const field = document.createElement("div");
-  field.className = "music-people-echoes-field";
-  const limit = Math.min(rows.length, 12);
-  rows.slice(0, limit).forEach((person, index) => {
-    const descriptor = getMusicPeopleSignatureDescriptor(person);
-    const echo = document.createElement("button");
-    echo.type = "button";
-    echo.className = "music-people-echo";
-    echo.id = descriptor.id ? `music-people-echo-id-${encodeURIComponent(descriptor.id)}` : `music-people-echo-row-${index}`;
-    echo.dataset.musicPeopleEcho = person.personId;
-    echo.dataset.echoSlot = String(index);
-    echo.setAttribute("aria-label", person.name);
-    echo.style.setProperty("--echo-shift-x", `${descriptor.id ? (descriptor.seed % 9) - 4 : 0}px`);
-    echo.style.setProperty("--echo-shift-y", `${descriptor.id ? ((descriptor.seed >>> 6) % 13) - 6 : 0}px`);
-    echo.style.setProperty("--echo-depth", String(descriptor.id ? .9 + ((descriptor.seed >>> 12) % 23) / 100 : 1));
-    const name = document.createElement("span");
-    name.className = "music-people-echo-name";
-    name.textContent = person.name;
-    if (descriptor.id && typeof IntersectionObserver === "function") {
-      echo.dataset.echoNameMotion = "caption";
-      name.style.setProperty("--echo-name-index", String(index));
-    }
-    echo.append(createMusicPeopleSignature(descriptor), name);
-    echo.addEventListener("click", () => {
-      setActiveMusicPeopleRow(person.personId);
-      navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
-    });
-    field.appendChild(echo);
-  });
+  field.className = "music-people-echoes-field music-people-staff";
+  field.dataset.musicPeopleStaff = "";
+  const footer = document.createElement("div");
+  footer.className = "music-people-echoes-footer";
+  const controls = document.createElement("div");
+  controls.dataset.musicPeopleEchoControls = "";
+  controls.hidden = true;
+  for (const [value, text] of [["previous", "Previous notes"], ["next", "Next notes"]]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.musicPeopleEchoPage = value;
+    button.textContent = text;
+    controls.appendChild(button);
+  }
   const directory = document.createElement("button");
   directory.type = "button";
   directory.className = "music-people-directory-jump";
@@ -14908,12 +15233,12 @@ function createMusicPeopleEchoes(rows) {
   directory.addEventListener("click", () => {
     const heading = musicPeopleList.querySelector("#music-people-directory-title");
     if (!heading) return;
-    const top = musicPeopleList.scrollTop + heading.getBoundingClientRect().top
-      - musicPeopleList.getBoundingClientRect().top - musicPeopleList.clientTop;
+    const top = musicPeopleList.scrollTop + heading.getBoundingClientRect().top - musicPeopleList.getBoundingClientRect().top - musicPeopleList.clientTop;
     musicPeopleList.scrollTo({ top, behavior: reducedMotion.matches ? "instant" : "smooth" });
     heading.focus({ preventScroll: true });
   });
-  scene.append(title, field, directory);
+  footer.append(controls, directory);
+  scene.append(title, field, footer);
   return scene;
 }
 
@@ -14981,9 +15306,11 @@ function renderMusicPeopleIndex(options = {}) {
   if (!forcedState && !["loading", "error"].includes(dataState) && filteredRows.length === 0) {
     fragment.append(createMusicPeopleEmptyState(allRows.length > 0));
   }
+  stopMusicPeopleEchoes();
   stopMusicPeopleSignatureMotion();
   musicPeopleList.replaceChildren(fragment);
   syncMusicPeopleSignatureMotion();
+  startMusicPeopleEchoes();
   restoreMusicPeopleFilterFocus(focusMeta);
 
   if (options.shouldResetScroll && typeof musicPeopleList.scrollTo === "function") {
@@ -18859,7 +19186,10 @@ function setPeopleIndexVisible(isVisible) {
 
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
-  if (!isVisible) setMusicPeopleTuningOpen(false);
+  if (!isVisible) {
+    setMusicPeopleTuningOpen(false);
+    stopMusicPeopleEchoes();
+  }
   if (isVisible) {
     const peopleRequest = requestMusicPeopleIndexData();
     renderMusicPeopleIndex({ shouldResetScroll: false });
