@@ -14417,6 +14417,135 @@ function returnToMusicPeopleRoute() {
   performShellBack();
 }
 
+// Melody v1: database identity owns variation; documented roles only select notation.
+function getMusicPeopleSignatureDescriptor(person) {
+  const normalizeId = value => {
+    if (typeof value === "number") return Number.isSafeInteger(value) && value > 0 ? String(value) : "";
+    if (typeof value !== "string") return "";
+    const id = value.trim();
+    if (!id || id.length > 128) return "";
+    if (/^\d+$/.test(id)) {
+      const number = Number(id);
+      return Number.isSafeInteger(number) && number > 0 ? String(number) : "";
+    }
+    if (/^[+-]?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|nan|infinity)$/i.test(id)) return "";
+    return /^[a-z0-9][a-z0-9_.:-]{0,127}$/i.test(id) && !/^(unknown|null|undefined|none|n\/?a)$/i.test(id) ? id : "";
+  };
+  const supplied = [person?.person_id, person?.backend_record?.person_id].filter(value => value != null);
+  const ids = supplied.map(normalizeId);
+  const id = ids.length && ids.every(value => value && value === ids[0]) ? ids[0] : "";
+  if (!id) return { version: 1, id: "", role: "universal", families: [], seed: 0, color: "#e1c596", duration: 8, delay: 0 };
+
+  const roles = Array.isArray(person.instrumentNames) ? person.instrumentNames.filter(value => typeof value === "string").join(" ").toLowerCase() : "";
+  const families = new Set();
+  const instruments = new Set();
+  const withoutBassDrum = roles.replace(/\bbass\s+drums?\b/g, "");
+  const strings = [
+    ["guitar", /\bguitar(?:s|ists?)?\b/], ["bass", /\bbass(?:ists?)?\b/], ["violin", /\b(?:violin|fiddle)\b/],
+    ["cello", /\bcello\b/], ["banjo", /\bbanjo\b/], ["mandolin", /\bmandolin\b/], ["ukulele", /\bukulele\b/]
+  ];
+  strings.forEach(([name, pattern]) => { if (pattern.test(withoutBassDrum)) { families.add("strings"); instruments.add(name); } });
+  if (/\bstrings?\b/.test(roles)) families.add("strings");
+  if (/\b(?:drums?|drummer|percussion|percussionist|cajon|timpani|cymbals?)\b/.test(roles)) families.add("percussion");
+  if (/\b(?:keys|keyboard|keyboards|keyboardist|piano|pianist|organ|organist|synth|synthesizer)\b/.test(roles)) families.add("keys");
+  if (/\b(?:vocals?|vocalist|voice|singer|singing)\b/.test(roles)) families.add("vocals");
+  const sorted = [...families].sort();
+  const blended = sorted.length > 1 || instruments.size > 1 || /\bmulti[ -]?instrument(?:alist|alists|al)?\b/.test(roles);
+  let seed = 2166136261;
+  for (const character of `melody:v1:${id}`) seed = Math.imul(seed ^ character.charCodeAt(0), 16777619) >>> 0;
+  const palette = [[275, 62, 76], [307, 57, 75], [18, 46, 72], [37, 73, 73], [47, 73, 75]];
+  const [hue, saturation, lightness] = palette[seed % palette.length];
+  return {
+    version: 1, id, seed, families: sorted, role: blended ? "blended" : sorted[0] || "universal",
+    color: `hsl(${hue + ((seed >>> 5) % 9) - 4} ${saturation}% ${lightness + ((seed >>> 9) % 5) - 2}%)`,
+    duration: 6 + (seed % 4001) / 1000, delay: -((seed >>> 12) % 10000) / 1000
+  };
+}
+
+function createMusicPeopleSignature(descriptor) {
+  const signature = document.createElement("span");
+  signature.className = "music-people-note";
+  signature.setAttribute("aria-hidden", "true");
+  signature.dataset.melodySignature = String(descriptor.version);
+  signature.dataset.signatureRole = descriptor.role;
+  if (descriptor.id) signature.dataset.signatureId = descriptor.id;
+  signature.style.setProperty("--melody-signature-color", descriptor.color);
+  signature.style.setProperty("--melody-signature-duration", `${descriptor.duration}s`);
+  signature.style.setProperty("--melody-signature-delay", `${descriptor.delay}s`);
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 64 64");
+  svg.setAttribute("focusable", "false");
+  const add = (tag, attributes, parent = svg) => {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, String(value)));
+    parent.appendChild(node);
+    return node;
+  };
+  const unit = (descriptor.seed & 65535) / 65535;
+  const headX = descriptor.id ? 21 + unit * 4 : 23;
+  const headY = descriptor.id ? 45 + ((descriptor.seed >>> 16) / 65535) * 4 : 47;
+  const stemX = headX + 8;
+  const top = descriptor.id ? 10 + ((descriptor.seed >>> 7) % 401) / 100 : 12;
+  const accent = add("g", { fill: "none", stroke: "currentColor", "stroke-width": 1.15, "stroke-linecap": "round", opacity: .6 });
+  descriptor.families.forEach(family => {
+    if (family === "strings") add("path", { d: "M5 16H23 M5 21H23 M5 26H23 M11 14V28 M18 19V23" }, accent);
+    if (family === "percussion") add("path", { d: "M43 42L49 48 M49 42L43 48 M51 51L57 57 M57 51L51 57 M38 55H46" }, accent);
+    if (family === "keys") add("path", { d: "M5 27H57 M5 32H57 M5 37H57 M47 29V35 M51 34V40" }, accent);
+    if (family === "vocals") add("path", { d: "M47 30Q55 36 47 42 M51 25Q64 36 51 47" }, accent);
+  });
+  if (descriptor.role === "blended") {
+    add("ellipse", { cx: 49, cy: 50, rx: 3.5, ry: 2.5, fill: "currentColor", stroke: "none", transform: "rotate(-20 49 50)" }, accent);
+    add("path", { d: "M52 49V36 M52 36Q58 39 56 44", "stroke-width": 1.8 }, accent);
+  }
+  if (descriptor.id) {
+    const dotY = 51 + ((descriptor.seed >>> 11) % 501) / 100;
+    add("path", { d: `M7 ${dotY}H12 M9.5 ${dotY - 2}V${dotY + 2}` }, accent);
+  }
+  add("ellipse", { cx: headX, cy: headY, rx: 9, ry: 6, transform: `rotate(-${descriptor.id ? 16 + unit * 10 : 20} ${headX} ${headY})`, fill: "currentColor" });
+  add("path", {
+    d: `M${stemX} ${headY - 2}V${top} M${stemX} ${top}C${stemX + 1} ${top + 9} ${stemX + 15} ${top + 7} ${stemX + 13} ${top + 20}C${stemX + 9} ${top + 14} ${stemX + 4} ${top + 14} ${stemX} ${top + 11}`,
+    fill: "none", stroke: "currentColor", "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round"
+  });
+  signature.appendChild(svg);
+  return signature;
+}
+
+let musicPeopleSignatureObserver = null;
+let musicPeopleSignatureGeneration = 0;
+let musicPeopleSignatureLifecycleBound = false;
+let musicPeopleSignatureMountObserver = null;
+
+function stopMusicPeopleSignatureMotion() {
+  musicPeopleSignatureGeneration += 1;
+  musicPeopleSignatureObserver?.disconnect();
+  musicPeopleSignatureObserver = null;
+  musicPeopleList?.querySelectorAll("[data-signature-visible]").forEach(note => note.removeAttribute("data-signature-visible"));
+}
+
+function syncMusicPeopleSignatureMotion() {
+  stopMusicPeopleSignatureMotion();
+  if (!musicPeopleSignatureLifecycleBound) {
+    document.addEventListener("visibilitychange", syncMusicPeopleSignatureMotion);
+    reducedMotion.addEventListener?.("change", syncMusicPeopleSignatureMotion);
+    if (musicNexusShell && typeof MutationObserver === "function") {
+      musicPeopleSignatureMountObserver = new MutationObserver(syncMusicPeopleSignatureMotion);
+      musicPeopleSignatureMountObserver.observe(musicNexusShell, { attributes: true, attributeFilter: ["aria-hidden", "inert", "hidden"] });
+    }
+    musicPeopleSignatureLifecycleBound = true;
+  }
+  if (!musicPeopleList || !musicPeopleIndex?.isConnected || !musicPeopleIndex.classList.contains("is-active")
+    || musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]') || document.hidden || reducedMotion.matches
+    || typeof IntersectionObserver !== "function") return;
+  const generation = musicPeopleSignatureGeneration;
+  musicPeopleSignatureObserver = new IntersectionObserver(entries => {
+    if (generation !== musicPeopleSignatureGeneration) return;
+    entries.forEach(({ target, isIntersecting }) => {
+      if (target.isConnected) target.toggleAttribute("data-signature-visible", isIntersecting);
+    });
+  }, { root: musicPeopleList, threshold: .01 });
+  musicPeopleList.querySelectorAll("[data-signature-id]").forEach(note => musicPeopleSignatureObserver.observe(note));
+}
+
 function createMusicPeopleRow(person) {
   const row = document.createElement("button");
   row.className = "music-people-row";
@@ -14433,23 +14562,7 @@ function createMusicPeopleRow(person) {
   const bands = documented(person.bandNames);
   row.setAttribute("aria-label", [person.name, instruments.join(", "), bands.join(", ")].filter(Boolean).join(", "));
 
-  // Static universal note for M3. Individual Melody Signatures belong to M4.
-  const signature = document.createElement("span");
-  signature.className = "music-people-note";
-  signature.setAttribute("aria-hidden", "true");
-  const note = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  note.setAttribute("viewBox", "0 0 64 64");
-  note.setAttribute("focusable", "false");
-  const head = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-  head.setAttribute("cx", "23"); head.setAttribute("cy", "47");
-  head.setAttribute("rx", "9"); head.setAttribute("ry", "6");
-  head.setAttribute("transform", "rotate(-20 23 47)"); head.setAttribute("fill", "currentColor");
-  const stem = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  stem.setAttribute("d", "M31 45V12 M31 12C32 21 46 19 44 32C40 26 35 26 31 23");
-  stem.setAttribute("fill", "none"); stem.setAttribute("stroke", "currentColor");
-  stem.setAttribute("stroke-width", "3"); stem.setAttribute("stroke-linecap", "round");
-  stem.setAttribute("stroke-linejoin", "round");
-  note.append(head, stem); signature.appendChild(note);
+  const signature = createMusicPeopleSignature(getMusicPeopleSignatureDescriptor(person));
 
   const name = document.createElement("span");
   name.className = "music-people-name";
@@ -14676,7 +14789,9 @@ function renderMusicPeopleIndex(options = {}) {
   if (!forcedState && !["loading", "error"].includes(dataState) && filteredRows.length === 0) {
     fragment.append(createMusicPeopleEmptyState(allRows.length > 0));
   }
+  stopMusicPeopleSignatureMotion();
   musicPeopleList.replaceChildren(fragment);
+  syncMusicPeopleSignatureMotion();
   restoreMusicPeopleFilterFocus(focusMeta);
 
   if (options.shouldResetScroll && typeof musicPeopleList.scrollTo === "function") {
@@ -18564,6 +18679,7 @@ function setPeopleIndexVisible(isVisible) {
   } else {
     musicPeopleIndex.setAttribute("inert", "");
   }
+  syncMusicPeopleSignatureMotion();
 }
 
 function setMusicActivityPanelVisible(isVisible) {

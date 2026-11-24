@@ -35438,3 +35438,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (min-width: 80rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (min-width: 100rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 @media (min-width: 120rem) { .site-shell[data-shell-route="music-people"] .music-people-list { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+/* M4: static, database-owned notation; only visible signatures breathe. */
+.music-people-index .music-people-note {
+  color: var(--melody-signature-color, #e1c596);
+}
+.music-people-index .music-people-note[data-signature-id] {
+  animation: music-people-signature-breathe var(--melody-signature-duration, 8s) ease-in-out var(--melody-signature-delay, 0s) infinite;
+  animation-play-state: paused;
+}
+.site-shell[data-shell-route="music-people"] .music-people-index.is-active[aria-hidden="false"]:not([inert]) .music-people-note[data-signature-visible] {
+  animation-play-state: running;
+}
+@keyframes music-people-signature-breathe {
+  0%, 100% { opacity: .82; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-people-index .music-people-note[data-signature-id] { animation: none; opacity: 1; }
+}
