@@ -35655,3 +35655,22 @@ button.hall-crusades-archive-crystal:focus-visible {
 .music-people-index [data-music-people-echo-page]:focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
 .music-people-index [data-echo-mode="static"] .music-people-staff-lane { display: flex; flex-wrap: wrap; justify-content: space-around; align-items: center; gap: .75rem; }
 .music-people-index [data-echo-mode="static"] .music-people-echo-transit { position: relative; inset: auto; transform: none; }
+
+/* M5D.1: one content scrollport alternates the Score and full directory. */
+.music-people-index .music-people-tuning-sigil { background: rgba(9, 6, 15, .82); border: 1px solid rgba(225, 197, 150, .24); border-radius: .45rem; }
+.music-people-index .music-people-directory-header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .25rem 1rem; position: sticky; inset-block-start: 0; z-index: 2; background: rgba(12, 8, 19, .94); border-radius: .35rem; }
+.music-people-index .music-people-directory-header .music-people-directory-title { padding: .4rem; }
+.music-people-index .music-people-staff { grid-template-rows: repeat(3, minmax(12rem, 1fr)); }
+.music-people-index .music-people-staff[data-lane-count="4"] { grid-template-rows: repeat(4, minmax(12rem, 1fr)); }
+.music-people-index .music-people-staff-lane { min-block-size: 12rem; }
+.music-people-index [data-echo-mode="static"] .music-people-staff { grid-template-rows: none; grid-auto-rows: minmax(min-content, 1fr); }
+.music-people-index .music-people-echoes[hidden],
+.music-people-index .music-people-directory-header[hidden] { display: none; }
+@media (max-width: 63.999rem) {
+  .music-people-index [data-echo-mode="moving"] .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { animation-play-state: paused !important; }
+  .music-people-index [data-echo-mode="moving"] .music-people-echo[data-echo-name-motion="caption"][data-echo-caption-visible] .music-people-note[data-signature-visible] + .music-people-echo-name { animation-play-state: running !important; }
+}
+
+/* Let the real lane stack size the scene before its footer. */
+.music-people-index .music-people-echoes { grid-template-rows: auto minmax(min-content, 1fr) auto; }
+.music-people-index .music-people-staff[data-lane-count="3"] { grid-template-rows: repeat(3, minmax(12rem, 1fr)); }

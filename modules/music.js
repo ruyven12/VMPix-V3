@@ -14863,6 +14863,43 @@ function resetMusicPeopleFilters(event = null) {
   reportMusicArchiveControl(event, "people", analyticsBefore, "filter");
 }
 
+let musicPeoplePresentationMode = "score";
+const musicPeoplePresentationScroll = { score: 0, directory: 0 };
+
+function rememberMusicPeoplePresentationScroll() {
+  const mode = musicPeopleIndex?.dataset.peoplePresentation;
+  if (["score", "directory"].includes(mode) && musicPeopleList?.clientHeight
+    && !musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]')) {
+    musicPeoplePresentationScroll[mode] = musicPeopleList.scrollTop;
+  }
+}
+function setMusicPeoplePresentation(mode) {
+  if (!["score", "directory"].includes(mode) || mode === musicPeoplePresentationMode) return;
+  rememberMusicPeoplePresentationScroll();
+  musicPeoplePresentationMode = mode;
+  renderMusicPeopleIndex({ restorePresentation: true });
+  const target = mode === "directory"
+    ? musicPeopleList.querySelector("[data-music-people-return-score]")
+    : musicPeopleIndex.querySelector("[data-music-people-tuning-sigil]");
+  target?.focus({ preventScroll: true });
+}
+function createMusicPeopleDirectoryHeader() {
+  const header = document.createElement("div");
+  header.className = "music-people-directory-header";
+  const heading = document.createElement("h3");
+  heading.id = "music-people-directory-title";
+  heading.className = "music-people-directory-title";
+  heading.textContent = "Archive directory";
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "music-people-directory-jump";
+  back.dataset.musicPeopleReturnScore = "";
+  back.textContent = "Living Score";
+  back.addEventListener("click", () => setMusicPeoplePresentation("score"));
+  header.append(heading, back);
+  return header;
+}
+
 let musicPeopleEchoController = null;
 let musicPeopleEchoMemory = null;
 
@@ -14923,12 +14960,12 @@ function startMusicPeopleEchoes() {
   const alive = () => musicPeopleEchoController === session && !session.disposed;
   const ownsView = () => Boolean(musicPeopleIndex?.isConnected && musicPeopleIndex.classList.contains("is-active")
     && !musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]')
-    && getRouteFromUrl().name === "music-people" && !document.hidden);
+    && getRouteFromUrl().name === "music-people" && musicPeoplePresentationMode === "score" && !scene.hidden && !document.hidden);
   const interacting = lane => lane.hovered || lane.focused || lane.held;
   const busy = () => session.lanes.some(interacting);
   const progress = slot => slot.animation ? Math.min(1, Math.max(0, Number(slot.animation.currentTime || 0) / slot.duration)) : slot.progress || 0;
   const snapshot = () => ({
-    populationKey, cursor: session.cursor, manualStart: session.manualStart, static: session.static, laneCount: session.lanes.length,
+    populationKey, cursor: session.cursor, manualStart: session.manualStart, static: session.static, laneCount: session.lanes.length, spacingKey: session.spacingKey,
     pinnedKey: session.lanes.flatMap(lane => lane.slots).find(slot => slot.button === document.activeElement)?.record.key || session.pinnedKey || "",
     slots: session.lanes.flatMap(lane => lane.slots.map(slot => ({ key: slot.record.key, ordinal: slot.ordinal, progress: progress(slot) })))
   });
@@ -14962,6 +14999,15 @@ function startMusicPeopleEchoes() {
     slot.button.inert = !visible;
     slot.button.setAttribute("aria-hidden", String(!visible));
   };
+  const setCaptionVisible = (slot, visible) => {
+    if (session.static || session.desktop || slot.captionVisible === visible) return;
+    slot.captionVisible = visible;
+    const name = slot.button.querySelector(".music-people-echo-name");
+    name?.getAnimations().forEach(animation => {
+      if (animation.animationName === "synchronicity-memory-date") animation.currentTime = 0;
+    });
+    slot.button.toggleAttribute("data-echo-caption-visible", visible);
+  };
   const ensureTick = () => {
     if (!session.frame && session.lanes.some(lane => lane.running)) session.frame = requestAnimationFrame(tick);
   };
@@ -14986,7 +15032,10 @@ function startMusicPeopleEchoes() {
     session.sync();
   };
   const animateSlot = (lane, slot, phase) => {
-    slot.duration = Math.max(24000, Math.min(70000, (session.width + slot.width) / 28 * 1000));
+    const oldWidth = Math.min(168, Math.max(112, session.width * .42));
+    const referenceDuration = Math.max(24000, Math.min(70000, (session.width + oldWidth) / 28 * 1000));
+    const referenceVelocity = (session.width + oldWidth) / referenceDuration;
+    slot.duration = (session.width + slot.width) / (referenceVelocity * 1.25);
     slot.animation = slot.wrapper.animate([
       { transform: `translate3d(${-slot.width}px, -50%, 0)` },
       { transform: `translate3d(${session.width}px, -50%, 0)` }
@@ -15005,6 +15054,7 @@ function startMusicPeopleEchoes() {
       const fullyVisible = lane.visible && bounds.left >= viewport.left + musicPeopleList.clientLeft
         && bounds.right <= viewport.right - musicPeopleList.clientLeft
         && bounds.top >= viewport.top + musicPeopleList.clientTop && bounds.bottom <= viewport.bottom - musicPeopleList.clientTop;
+      setCaptionVisible(slot, fullyVisible && lane.running);
       setAccessible(slot, slot.button === document.activeElement || fullyVisible);
     }));
   };
@@ -15025,6 +15075,7 @@ function startMusicPeopleEchoes() {
         lane.node.dataset.echoState = run ? "running" : "paused";
         lane.slots.forEach(slot => { if (slot.animation) run ? slot.animation.play() : slot.animation.pause(); });
       }
+      if (!run) lane.slots.forEach(slot => setCaptionVisible(slot, false));
       if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => recycle(lane, slot));
     });
     if (schedule) ensureTick();
@@ -15052,6 +15103,14 @@ function startMusicPeopleEchoes() {
         slot.wrapper.style.transform = `translate3d(${slot.fittedX}px, -50%, 0)`;
         slot.animation?.cancel();
         slot.animation = null;
+        if (ownsView()) {
+          const viewport = musicPeopleList.getBoundingClientRect();
+          const bounds = slot.button.getBoundingClientRect();
+          const top = viewport.top + musicPeopleList.clientTop;
+          const bottom = viewport.bottom - musicPeopleList.clientTop;
+          const excess = bounds.top < top ? bounds.top - top : Math.max(0, bounds.bottom - bottom);
+          if (excess) musicPeopleList.scrollTo({ top: musicPeopleList.scrollTop + excess, behavior: "instant" });
+        }
       }));
       refreshAccess();
       return;
@@ -15070,10 +15129,15 @@ function startMusicPeopleEchoes() {
     session.lanes.forEach(lane => lane.slots.forEach(slot => { unwatch(slot); freeze(slot); }));
     active.clear();
     field.replaceChildren();
-    const count = session.desktop ? 3 : 2;
-    const perLane = session.desktop ? 4 : staticMode ? 2 : 3;
+    const count = session.desktop ? 4 : 3;
+    const tokenWidth = session.desktop ? 168 : Math.min(112, Math.max(96, session.width * .28));
+    const target = session.desktop ? 8 : 6;
+    const fit = Math.max(1, Math.floor((session.width + (staticMode ? 12 : tokenWidth)) / (tokenWidth + 12)));
+    const perLane = Math.min(target, fit);
     field.dataset.laneCount = String(count);
+    field.dataset.perLane = String(perLane);
     const capacity = Math.min(pool.length, count * perLane);
+    session.spacingKey = [count, perLane, capacity, tokenWidth.toFixed(2)].join(":");
     const retained = manualPage || staticMode ? [] : (memory?.slots || []).filter(slot => records.has(slot.key)).map(slot => ({ ...slot }));
     const pinned = retained.find(slot => slot.key === memory?.pinnedKey);
     if (pinned && pinned.ordinal >= capacity) {
@@ -15125,12 +15189,12 @@ function startMusicPeopleEchoes() {
       const button = createMusicPeopleEchoToken(record, index);
       wrapper.appendChild(button);
       lane.node.appendChild(wrapper);
-      const slot = { record, wrapper, button, ordinal: index, width: Math.min(168, Math.max(112, session.width * .42)), animation: null, progress: 0, accessible: null };
+      const slot = { record, wrapper, button, ordinal: index, width: tokenWidth, animation: null, progress: 0, accessible: null };
       wrapper.style.inlineSize = slot.width + "px";
       lane.slots.push(slot);
       if (staticMode) setAccessible(slot, true);
       else {
-        const phase = remembered && !memory?.static && memory?.laneCount === count
+        const phase = remembered && !memory?.static && memory?.laneCount === count && memory?.spacingKey === session.spacingKey
           ? remembered.progress : ((Math.floor(index / count) + .25) / Math.ceil(capacity / count));
         animateSlot(lane, slot, phase);
       }
@@ -15230,13 +15294,7 @@ function createMusicPeopleEchoes(rows) {
   directory.className = "music-people-directory-jump";
   directory.dataset.musicPeopleDirectoryJump = "";
   directory.textContent = "Archive directory";
-  directory.addEventListener("click", () => {
-    const heading = musicPeopleList.querySelector("#music-people-directory-title");
-    if (!heading) return;
-    const top = musicPeopleList.scrollTop + heading.getBoundingClientRect().top - musicPeopleList.getBoundingClientRect().top - musicPeopleList.clientTop;
-    musicPeopleList.scrollTo({ top, behavior: reducedMotion.matches ? "instant" : "smooth" });
-    heading.focus({ preventScroll: true });
-  });
+  directory.addEventListener("click", () => setMusicPeoplePresentation("directory"));
   footer.append(controls, directory);
   scene.append(title, field, footer);
   return scene;
@@ -15257,6 +15315,8 @@ function renderMusicPeopleIndex(options = {}) {
     return;
   }
 
+  rememberMusicPeoplePresentationScroll();
+  const restorePresentation = isMusicPeopleTuningVisible() && (options.restorePresentation || !v3RouteContext.pending);
   const focusMeta = getMusicPeopleFilterFocusMeta();
   const allRows = getMusicPeopleIndexRows();
   normalizeActiveMusicPeopleFilters(allRows);
@@ -15277,6 +15337,7 @@ function renderMusicPeopleIndex(options = {}) {
   const filteredRows = getFilteredMusicPeopleRows();
   const numberedRows = getMusicPeopleRowsWithCategoryNumbers(filteredRows);
   const fragment = document.createDocumentFragment();
+  if (musicPeoplePresentationMode === "directory") fragment.append(createMusicPeopleDirectoryHeader());
   if (forcedState && forcedState !== "partial") {
     fragment.append(createMusicV3StateCard(forcedState, "musicPeople"));
   } else if (dataState === "loading" && !musicPeopleIndexLoaded) {
@@ -15284,16 +15345,10 @@ function renderMusicPeopleIndex(options = {}) {
   } else if (dataState === "error" && numberedRows.length === 0) {
     fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
   } else {
-    if (numberedRows.length) {
+    if (musicPeoplePresentationMode === "score" && numberedRows.length) {
       fragment.append(createMusicPeopleEchoes(numberedRows));
-      const heading = document.createElement("h3");
-      heading.id = "music-people-directory-title";
-      heading.className = "music-people-directory-title";
-      heading.tabIndex = -1;
-      heading.textContent = "Archive directory";
-      fragment.appendChild(heading);
     }
-    numberedRows.forEach((person, index) => {
+    if (musicPeoplePresentationMode === "directory") numberedRows.forEach((person, index) => {
       const row = createMusicPeopleRow(person);
       const signatureId = getMusicPeopleSignatureDescriptor(person).id;
       row.id = signatureId ? `music-people-directory-id-${encodeURIComponent(signatureId)}` : `music-people-directory-row-${index}`;
@@ -15309,8 +15364,10 @@ function renderMusicPeopleIndex(options = {}) {
   stopMusicPeopleEchoes();
   stopMusicPeopleSignatureMotion();
   musicPeopleList.replaceChildren(fragment);
+  musicPeopleIndex.dataset.peoplePresentation = musicPeoplePresentationMode;
   syncMusicPeopleSignatureMotion();
   startMusicPeopleEchoes();
+  if (restorePresentation) musicPeopleList.scrollTo({ top: musicPeoplePresentationScroll[musicPeoplePresentationMode], behavior: "instant" });
   restoreMusicPeopleFilterFocus(focusMeta);
 
   if (options.shouldResetScroll && typeof musicPeopleList.scrollTo === "function") {
@@ -19184,6 +19241,7 @@ function setPeopleIndexVisible(isVisible) {
     return;
   }
 
+  if (!isVisible) rememberMusicPeoplePresentationScroll();
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
   if (!isVisible) {
