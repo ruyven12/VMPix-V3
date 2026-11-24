@@ -14911,6 +14911,43 @@ function getMusicPeopleEchoPopulation(rows) {
   });
 }
 
+const musicPeopleEchoVisits = new Map();
+let musicPeopleEchoVisitOwner = null;
+
+function captureMusicPeopleEchoVisitOwner() {
+  if (getRouteFromUrl().name === "music-people" && v3RouteContext.route?.name === "music-people"
+    && typeof v3RouteContext.entry === "string" && v3RouteContext.entry) {
+    musicPeopleEchoVisitOwner = { context: v3RouteContext, entry: v3RouteContext.entry };
+  }
+}
+
+function shuffleMusicPeopleEchoKeys(keys, random = Math.random) {
+  const shuffled = [...keys];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const other = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[other]] = [shuffled[other], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function getMusicPeopleEchoVisit(rows) {
+  captureMusicPeopleEchoVisitOwner();
+  if (musicPeopleEchoVisitOwner?.context !== v3RouteContext || v3RouteContext.route?.name !== "music-people"
+    || musicPeopleEchoVisitOwner.entry !== v3RouteContext.entry) return null;
+  const canonical = getMusicPeopleEchoPopulation(rows);
+  const fingerprint = JSON.stringify(canonical.map(record =>
+    record.descriptor.id ? record.key : record.key + ":" + record.person.personId).sort());
+  const cacheKey = JSON.stringify([v3RouteContext.entry, fingerprint]);
+  let visit = musicPeopleEchoVisits.get(cacheKey);
+  if (!visit) {
+    visit = { entry: v3RouteContext.entry, order: shuffleMusicPeopleEchoKeys(canonical.map(record => record.key)), memory: null };
+    musicPeopleEchoVisits.set(cacheKey, visit);
+    if (musicPeopleEchoVisits.size > 24) musicPeopleEchoVisits.delete(musicPeopleEchoVisits.keys().next().value);
+  }
+  const byKey = new Map(canonical.map(record => [record.key, record]));
+  return { visit, pool: visit.order.map(key => byKey.get(key)).filter(Boolean) };
+}
+
 function createMusicPeopleEchoToken(record, slotIndex) {
   const { person, descriptor, index } = record;
   const echo = document.createElement("button");
@@ -14946,14 +14983,17 @@ function syncMusicPeopleEchoes() {
 function startMusicPeopleEchoes() {
   const scene = musicPeopleList?.querySelector("[data-music-people-echoes]");
   if (!scene || musicPeopleEchoController) return;
-  const pool = getMusicPeopleEchoPopulation(scene._echoRows);
+  const discovery = getMusicPeopleEchoVisit(scene._echoRows);
+  if (!discovery) return;
+  const { visit, pool } = discovery;
   if (!pool.length) return;
   const populationKey = JSON.stringify(pool.map(record => record.key));
-  const saved = musicPeopleEchoMemory?.populationKey === populationKey ? musicPeopleEchoMemory : null;
+  const saved = visit.memory?.entry === visit.entry && visit.memory.populationKey === populationKey ? visit.memory : null;
+  const ledger = { pending: [...(saved?.pending || visit.order)], served: [...(saved?.served || [])], cursor: saved?.cursor || 0, cycle: saved?.cycle || 0 };
   const field = scene.querySelector("[data-music-people-staff]");
   const manual = scene.querySelector("[data-music-people-echo-controls]");
   const records = new Map(pool.map(record => [record.key, record]));
-  const session = { scene, lanes: [], cursor: saved?.cursor || 0, frame: 0, pendingResize: false,
+  const session = { scene, lanes: [], frame: 0, pendingResize: false,
     manualStart: saved?.manualStart || 0, width: 0, desktop: null, static: false, disposed: false };
   const cleanup = [];
   const active = new Set();
@@ -14965,25 +15005,42 @@ function startMusicPeopleEchoes() {
   const busy = () => session.lanes.some(interacting);
   const progress = slot => slot.animation ? Math.min(1, Math.max(0, Number(slot.animation.currentTime || 0) / slot.duration)) : slot.progress || 0;
   const snapshot = () => ({
-    populationKey, cursor: session.cursor, manualStart: session.manualStart, static: session.static, laneCount: session.lanes.length, spacingKey: session.spacingKey,
-    pinnedKey: session.lanes.flatMap(lane => lane.slots).find(slot => slot.button === document.activeElement)?.record.key || session.pinnedKey || "",
-    slots: session.lanes.flatMap(lane => lane.slots.map(slot => ({ key: slot.record.key, ordinal: slot.ordinal, progress: progress(slot) })))
+    entry: visit.entry, populationKey, order: [...visit.order], cursor: ledger.cursor, cycle: ledger.cycle,
+    pending: [...ledger.pending], served: [...ledger.served], manualStart: session.manualStart,
+    static: session.static, laneCount: session.lanes.length, spacingKey: session.spacingKey,
+    pinnedKey: session.lanes.flatMap(lane => lane.slots).find(slot => slot.button === document.activeElement)?.record?.key || session.pinnedKey || "",
+    slots: session.lanes.flatMap(lane => lane.slots.map(slot => {
+      const phase = progress(slot);
+      const released = Boolean(slot.released || slot.waiting || (!session.static && (slot.animation?.playState === "finished" || phase >= 1)));
+      return { key: released ? "" : slot.record?.key || "", ordinal: slot.ordinal, progress: phase, released };
+    }))
   });
   const listen = (node, type, handler, options) => {
     node.addEventListener(type, handler, options);
     cleanup.push(() => node.removeEventListener(type, handler, options));
   };
   const unwatch = slot => {
-    const note = slot.button.querySelector("[data-signature-id]");
+    const note = slot.button?.querySelector("[data-signature-id]");
     if (note) musicPeopleSignatureObserver?.unobserve(note);
   };
+  const markServed = key => {
+    const index = ledger.pending.indexOf(key);
+    if (index < 0) return;
+    ledger.pending.splice(index, 1);
+    ledger.served.push(key);
+    ledger.cursor = ledger.served.length;
+  };
   const nextRecord = () => {
-    for (let tries = 0; tries < pool.length; tries += 1) {
-      const record = pool[session.cursor % pool.length];
-      session.cursor = (session.cursor + 1) % pool.length;
-      if (!active.has(record.key)) return record;
+    if (!ledger.pending.length) {
+      ledger.pending = [...visit.order];
+      ledger.served = [];
+      ledger.cursor = 0;
+      ledger.cycle += 1;
     }
-    return null;
+    const key = ledger.pending.find(candidate => !active.has(candidate));
+    if (!key) return null;
+    markServed(key);
+    return records.get(key);
   };
   const position = slot => -slot.width + progress(slot) * (session.width + slot.width);
   const freeze = slot => {
@@ -14993,14 +15050,14 @@ function startMusicPeopleEchoes() {
     slot.animation = null;
   };
   const setAccessible = (slot, visible) => {
-    if (slot.accessible === visible) return;
+    if (!slot.button || slot.accessible === visible) return;
     slot.accessible = visible;
     slot.button.tabIndex = visible ? 0 : -1;
     slot.button.inert = !visible;
     slot.button.setAttribute("aria-hidden", String(!visible));
   };
   const setCaptionVisible = (slot, visible) => {
-    if (session.static || session.desktop || slot.captionVisible === visible) return;
+    if (!slot.button || session.static || session.desktop || slot.captionVisible === visible) return;
     slot.captionVisible = visible;
     const name = slot.button.querySelector(".music-people-echo-name");
     name?.getAnimations().forEach(animation => {
@@ -15009,15 +15066,28 @@ function startMusicPeopleEchoes() {
     slot.button.toggleAttribute("data-echo-caption-visible", visible);
   };
   const ensureTick = () => {
-    if (!session.frame && session.lanes.some(lane => lane.running)) session.frame = requestAnimationFrame(tick);
+    if (!session.frame && session.lanes.some(lane => lane.running && lane.slots.some(slot => slot.animation?.playState === "running"))) session.frame = requestAnimationFrame(tick);
   };
-  const recycle = (lane, slot) => {
+  const recycle = (lane, slot, completed = null) => {
     if (!alive() || !session.lanes.includes(lane) || !lane.slots.includes(slot) || !slot.wrapper.isConnected) return;
+    if (completed ? slot.animation !== completed : !slot.waiting) return;
     if (interacting(lane) || !ownsView() || musicPeopleTuningOpen || !lane.visible) { slot.waiting = true; return; }
-    unwatch(slot);
-    active.delete(slot.record.key);
+    if (!slot.released) {
+      unwatch(slot);
+      active.delete(slot.record.key);
+      setAccessible(slot, false);
+      setCaptionVisible(slot, false);
+      freeze(slot);
+      slot.progress = 1;
+      slot.released = true;
+      slot.record = null;
+      slot.button = null;
+      slot.wrapper.replaceChildren();
+      slot.wrapper.removeAttribute("data-echo-token");
+      slot.wrapper.dataset.echoWaiting = "";
+    }
     const record = nextRecord();
-    if (!record) return;
+    if (!record) { slot.waiting = true; return; }
     slot.record = record;
     active.add(record.key);
     slot.animation?.cancel();
@@ -15025,7 +15095,10 @@ function startMusicPeopleEchoes() {
     slot.wrapper.replaceChildren(slot.button);
     slot.wrapper.dataset.echoToken = record.key;
     slot.accessible = null;
+    slot.captionVisible = null;
     slot.waiting = false;
+    slot.released = false;
+    slot.wrapper.removeAttribute("data-echo-waiting");
     animateSlot(lane, slot, 0);
     const note = slot.button.querySelector("[data-signature-id]");
     if (note) musicPeopleSignatureObserver?.observe(note);
@@ -15043,13 +15116,17 @@ function startMusicPeopleEchoes() {
     slot.animation.pause();
     slot.animation.currentTime = phase * slot.duration;
     if (lane.running) slot.animation.play();
-    slot.animation.finished.then(() => recycle(lane, slot), () => {});
+    const animation = slot.animation;
+    animation.finished.then(() => {
+      if (slot.animation === animation) recycle(lane, slot, animation);
+    }, () => {});
     setAccessible(slot, false);
   };
   const refreshAccess = () => {
     if (session.static) return;
     const viewport = musicPeopleList.getBoundingClientRect();
     session.lanes.forEach(lane => lane.slots.forEach(slot => {
+      if (!slot.button) return;
       const bounds = slot.button.getBoundingClientRect();
       const fullyVisible = lane.visible && bounds.left >= viewport.left + musicPeopleList.clientLeft
         && bounds.right <= viewport.right - musicPeopleList.clientLeft
@@ -15073,10 +15150,10 @@ function startMusicPeopleEchoes() {
       if (run !== lane.running) {
         lane.running = run;
         lane.node.dataset.echoState = run ? "running" : "paused";
-        lane.slots.forEach(slot => { if (slot.animation) run ? slot.animation.play() : slot.animation.pause(); });
+        lane.slots.forEach(slot => { if (slot.animation) run && !slot.waiting ? slot.animation.play() : slot.animation.pause(); });
       }
       if (!run) lane.slots.forEach(slot => setCaptionVisible(slot, false));
-      if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => recycle(lane, slot));
+      if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => { if (slot.waiting) recycle(lane, slot); });
     });
     if (schedule) ensureTick();
   };
@@ -15136,16 +15213,17 @@ function startMusicPeopleEchoes() {
     const perLane = Math.min(target, fit);
     field.dataset.laneCount = String(count);
     field.dataset.perLane = String(perLane);
-    const capacity = Math.min(pool.length, count * perLane);
+    const pageSize = Math.min(pool.length, count * perLane);
+    if (staticMode) session.manualStart = Math.floor(Math.min(session.manualStart, pool.length - 1) / pageSize) * pageSize;
+    const capacity = staticMode ? Math.min(pageSize, pool.length - session.manualStart) : pageSize;
+    session.pageSize = pageSize;
     session.spacingKey = [count, perLane, capacity, tokenWidth.toFixed(2)].join(":");
-    const retained = manualPage || staticMode ? [] : (memory?.slots || []).filter(slot => records.has(slot.key)).map(slot => ({ ...slot }));
+    const retained = manualPage || staticMode ? [] : (memory?.slots || []).filter(slot => slot.released || records.has(slot.key)).map(slot => ({ ...slot }));
     const pinned = retained.find(slot => slot.key === memory?.pinnedKey);
     if (pinned && pinned.ordinal >= capacity) {
       retained.forEach(slot => { if (slot !== pinned && slot.ordinal === capacity - 1) slot.ordinal = -1; });
       pinned.ordinal = capacity - 1;
     }
-    if (memory && !manualPage) session.cursor = memory.cursor;
-    if (staticMode) session.cursor = session.manualStart % pool.length;
     for (let index = 0; index < count; index += 1) {
       const node = document.createElement("div");
       node.className = "music-people-staff-lane";
@@ -15176,29 +15254,40 @@ function startMusicPeopleEchoes() {
     }
     // The old lane array is replaced only after its transforms were retained/cancelled.
     session.lanes = session.lanes.slice(-count);
+    const retainedByOrdinal = new Map();
+    retained.forEach(slot => {
+      if (slot.ordinal < 0 || slot.ordinal >= capacity || retainedByOrdinal.has(slot.ordinal)) return;
+      if (!slot.released && active.has(slot.key)) return;
+      retainedByOrdinal.set(slot.ordinal, slot);
+      if (!slot.released) {
+        active.add(slot.key);
+        if (memory?.static) markServed(slot.key);
+      }
+    });
     for (let index = 0; index < capacity; index += 1) {
       const lane = session.lanes[index % count];
-      const remembered = retained.find(item => item.ordinal === index);
-      let record = remembered && !active.has(remembered.key) ? records.get(remembered.key) : null;
-      if (!record) record = nextRecord();
-      if (!record) continue;
-      active.add(record.key);
+      const remembered = retainedByOrdinal.get(index);
+      const record = staticMode ? pool[session.manualStart + index]
+        : remembered?.released ? null : remembered ? records.get(remembered.key) : nextRecord();
+      if (record) active.add(record.key);
       const wrapper = document.createElement("div");
       wrapper.className = "music-people-echo-transit";
-      wrapper.dataset.echoToken = record.key;
-      const button = createMusicPeopleEchoToken(record, index);
-      wrapper.appendChild(button);
+      const button = record ? createMusicPeopleEchoToken(record, index) : null;
+      if (record) { wrapper.dataset.echoToken = record.key; wrapper.appendChild(button); }
+      else wrapper.dataset.echoWaiting = "";
       lane.node.appendChild(wrapper);
-      const slot = { record, wrapper, button, ordinal: index, width: tokenWidth, animation: null, progress: 0, accessible: null };
+      const slot = { record, wrapper, button, ordinal: index, width: tokenWidth, animation: null,
+        progress: record ? 0 : 1, accessible: null, released: !record, waiting: !record };
       wrapper.style.inlineSize = slot.width + "px";
       lane.slots.push(slot);
-      if (staticMode) setAccessible(slot, true);
+      if (!record) wrapper.style.transform = `translate3d(${session.width}px, -50%, 0)`;
+      else if (staticMode) setAccessible(slot, true);
       else {
         const phase = remembered && !memory?.static && memory?.laneCount === count && memory?.spacingKey === session.spacingKey
           ? remembered.progress : ((Math.floor(index / count) + .25) / Math.ceil(capacity / count));
         animateSlot(lane, slot, phase);
       }
-      const note = button.querySelector("[data-signature-id]");
+      const note = button?.querySelector("[data-signature-id]");
       if (note) musicPeopleSignatureObserver?.observe(note);
     }
     if (!staticMode) {
@@ -15217,7 +15306,7 @@ function startMusicPeopleEchoes() {
       }, { root: musicPeopleList, threshold: .01 });
       session.lanes.forEach(lane => laneObserver.observe(lane.node));
     }
-    manual.querySelectorAll("button").forEach(button => { button.disabled = pool.length <= capacity; });
+    manual.querySelectorAll("button").forEach(button => { button.disabled = pool.length <= pageSize; });
     session.capacity = capacity;
     session.sync();
     if (hidingFocusedManual && ownsView() && (document.activeElement === document.body || manual.contains(document.activeElement))) {
@@ -15226,7 +15315,7 @@ function startMusicPeopleEchoes() {
   }
   session.dispose = () => {
     if (!alive()) return;
-    musicPeopleEchoMemory = snapshot();
+    visit.memory = musicPeopleEchoMemory = snapshot();
     session.disposed = true;
     cancelAnimationFrame(session.frame);
     laneObserver?.disconnect();
@@ -15258,7 +15347,12 @@ function startMusicPeopleEchoes() {
     cleanup.push(() => observer.disconnect());
   } else listen(window, "resize", () => layout());
   manual.querySelectorAll("button").forEach(button => listen(button, "click", () => {
-    session.manualStart = (session.manualStart + (button.dataset.musicPeopleEchoPage === "next" ? session.capacity : -session.capacity) + pool.length) % pool.length;
+    if (button.dataset.musicPeopleEchoPage === "next") {
+      session.manualStart = session.manualStart + session.pageSize >= pool.length ? 0 : session.manualStart + session.pageSize;
+    } else {
+      session.manualStart = session.manualStart ? Math.max(0, session.manualStart - session.pageSize)
+        : Math.floor((pool.length - 1) / session.pageSize) * session.pageSize;
+    }
     layout(false, true);
   }));
   layout(true);
@@ -19241,6 +19335,7 @@ function setPeopleIndexVisible(isVisible) {
     return;
   }
 
+  if (isVisible) captureMusicPeopleEchoVisitOwner();
   if (!isVisible) rememberMusicPeoplePresentationScroll();
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
