@@ -14862,6 +14862,56 @@ function resetMusicPeopleFilters(event = null) {
   reportMusicArchiveControl(event, "people", analyticsBefore, "filter");
 }
 
+function createMusicPeopleEchoes(rows) {
+  const scene = document.createElement("section");
+  scene.className = "music-people-echoes";
+  scene.dataset.musicPeopleEchoes = "";
+  scene.setAttribute("aria-labelledby", "music-people-echoes-title");
+  const title = document.createElement("h3");
+  title.id = "music-people-echoes-title";
+  title.className = "music-people-echoes-title";
+  title.textContent = "Echoes of Melody";
+  const field = document.createElement("div");
+  field.className = "music-people-echoes-field";
+  rows.slice(0, 6).forEach((person, index) => {
+    const descriptor = getMusicPeopleSignatureDescriptor(person);
+    const echo = document.createElement("button");
+    echo.type = "button";
+    echo.className = "music-people-echo";
+    echo.id = descriptor.id ? `music-people-echo-id-${encodeURIComponent(descriptor.id)}` : `music-people-echo-row-${index}`;
+    echo.dataset.musicPeopleEcho = person.personId;
+    echo.dataset.echoSlot = String(index);
+    echo.setAttribute("aria-label", person.name);
+    echo.style.setProperty("--echo-shift-x", `${descriptor.id ? (descriptor.seed % 9) - 4 : 0}px`);
+    echo.style.setProperty("--echo-shift-y", `${descriptor.id ? ((descriptor.seed >>> 6) % 13) - 6 : 0}px`);
+    echo.style.setProperty("--echo-depth", String(descriptor.id ? .9 + ((descriptor.seed >>> 12) % 23) / 100 : 1));
+    const name = document.createElement("span");
+    name.className = "music-people-echo-name";
+    name.textContent = person.name;
+    echo.append(createMusicPeopleSignature(descriptor), name);
+    echo.addEventListener("click", () => {
+      setActiveMusicPeopleRow(person.personId);
+      navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
+    });
+    field.appendChild(echo);
+  });
+  const directory = document.createElement("button");
+  directory.type = "button";
+  directory.className = "music-people-directory-jump";
+  directory.dataset.musicPeopleDirectoryJump = "";
+  directory.textContent = "Archive directory";
+  directory.addEventListener("click", () => {
+    const heading = musicPeopleList.querySelector("#music-people-directory-title");
+    if (!heading) return;
+    const top = musicPeopleList.scrollTop + heading.getBoundingClientRect().top
+      - musicPeopleList.getBoundingClientRect().top - musicPeopleList.clientTop;
+    musicPeopleList.scrollTo({ top, behavior: reducedMotion.matches ? "instant" : "smooth" });
+    heading.focus({ preventScroll: true });
+  });
+  scene.append(title, field, directory);
+  return scene;
+}
+
 function createMusicPeopleEmptyState(hasPublicRows = true) {
   const empty = createMusicV3StateCard("empty", "musicPeople", {
     text: hasPublicRows
@@ -14904,8 +14954,20 @@ function renderMusicPeopleIndex(options = {}) {
   } else if (dataState === "error" && numberedRows.length === 0) {
     fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
   } else {
-    numberedRows.forEach((person) => {
-      fragment.append(createMusicPeopleRow(person));
+    if (numberedRows.length) {
+      fragment.append(createMusicPeopleEchoes(numberedRows));
+      const heading = document.createElement("h3");
+      heading.id = "music-people-directory-title";
+      heading.className = "music-people-directory-title";
+      heading.tabIndex = -1;
+      heading.textContent = "Archive directory";
+      fragment.appendChild(heading);
+    }
+    numberedRows.forEach((person, index) => {
+      const row = createMusicPeopleRow(person);
+      const signatureId = getMusicPeopleSignatureDescriptor(person).id;
+      row.id = signatureId ? `music-people-directory-id-${encodeURIComponent(signatureId)}` : `music-people-directory-row-${index}`;
+      fragment.appendChild(row);
     });
     if (forcedState === "partial") {
       fragment.append(createMockStateCard("partial", "musicPeople"));

@@ -35519,3 +35519,66 @@ button.hall-crusades-archive-crystal:focus-visible {
   .music-people-index .music-people-tuning-group { display: block; }
   .music-people-index .music-people-tuning-group-title { position: absolute; inline-size: 1px; block-size: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
 }
+
+/* M5A: six quiet Echoes precede the complete directory in the same scrollport. */
+.site-shell[data-shell-route="music-people"] .music-people-list {
+  container-name: music-people-viewport;
+  container-type: size;
+  overflow-anchor: none;
+}
+.music-people-index .music-people-echoes {
+  grid-column: 1 / -1; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: .25rem; min-inline-size: 0; min-block-size: 34rem;
+  block-size: calc(var(--app-viewport-height, 100svh) - var(--prototype-engine-height, 5rem) - var(--prototype-engine-bottom, .5rem) - 8rem);
+  block-size: 100cqh; margin: 0; padding: .25rem 0 .5rem; border: 0; background: none;
+}
+.music-people-index :is(.music-people-echoes-title, .music-people-directory-title) {
+  grid-column: 1 / -1; margin: 0; color: #e4d6e9; text-align: center;
+  font-size: .85rem; font-weight: 500; line-height: 1.35; letter-spacing: .055em;
+}
+.music-people-index .music-people-directory-title { padding-block: .75rem .35rem; }
+.music-people-index .music-people-echoes-field { position: relative; min-inline-size: 0; min-block-size: 0; }
+.music-people-index .music-people-echo {
+  position: absolute; inset-inline-start: calc(var(--echo-x) + var(--echo-shift-x, 0px));
+  inset-block-start: calc(var(--echo-y) + var(--echo-shift-y, 0px)); transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35rem;
+  inline-size: min(44%, 10rem); min-inline-size: 44px; min-block-size: 44px; padding: .3rem;
+  border: 0; border-radius: .35rem; background: none; box-shadow: none; color: inherit;
+  font: inherit; cursor: pointer; touch-action: pan-y;
+}
+.music-people-index .music-people-echo[data-echo-slot="0"] { --echo-x: 25%; --echo-y: 20%; }
+.music-people-index .music-people-echo[data-echo-slot="1"] { --echo-x: 75%; --echo-y: 23%; }
+.music-people-index .music-people-echo[data-echo-slot="2"] { --echo-x: 28%; --echo-y: 50%; }
+.music-people-index .music-people-echo[data-echo-slot="3"] { --echo-x: 74%; --echo-y: 53%; }
+.music-people-index .music-people-echo[data-echo-slot="4"] { --echo-x: 24%; --echo-y: 80%; }
+.music-people-index .music-people-echo[data-echo-slot="5"] { --echo-x: 74%; --echo-y: 81%; }
+.music-people-index .music-people-echo .music-people-note { inline-size: 4rem; block-size: 4rem; }
+.music-people-index .music-people-echo .music-people-note svg { transform: scale(var(--echo-depth, 1)); }
+.music-people-index .music-people-echo-name {
+  display: block; max-inline-size: 100%; color: #f1e7f3; opacity: 0;
+  font-size: .82rem; line-height: 1.3; text-align: center; overflow-wrap: anywhere;
+  text-shadow: 0 1px 3px #08040e; pointer-events: none;
+}
+.music-people-index .music-people-echo:is(:hover, :focus, :active) .music-people-echo-name { opacity: 1; }
+.music-people-index .music-people-echo:is(:hover, :focus, :active) { z-index: 1; }
+.music-people-index .music-people-echo:focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
+.music-people-index .music-people-directory-jump {
+  justify-self: center; min-block-size: 44px; padding: .5rem 1rem; border: 0; border-radius: .3rem;
+  background: none; color: #c7b7d1; font: inherit; font-size: .82rem; line-height: 1.3; cursor: pointer;
+  text-decoration: underline; text-underline-offset: .2rem;
+}
+.music-people-index .music-people-directory-jump:focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
+@media (hover: none), (pointer: coarse) {
+  .music-people-index .music-people-echo-name { opacity: .68; }
+  .music-people-index .music-people-echo:is(:focus, :active) .music-people-echo-name { opacity: 1; }
+}
+@media (min-width: 48rem) {
+  .music-people-index .music-people-echoes { min-block-size: 18rem; }
+  .music-people-index .music-people-echo { inline-size: min(14%, 10rem); }
+  .music-people-index .music-people-echo[data-echo-slot="0"] { --echo-x: 9%; --echo-y: 31%; }
+  .music-people-index .music-people-echo[data-echo-slot="1"] { --echo-x: 25%; --echo-y: 69%; }
+  .music-people-index .music-people-echo[data-echo-slot="2"] { --echo-x: 41%; --echo-y: 36%; }
+  .music-people-index .music-people-echo[data-echo-slot="3"] { --echo-x: 58%; --echo-y: 70%; }
+  .music-people-index .music-people-echo[data-echo-slot="4"] { --echo-x: 74%; --echo-y: 30%; }
+  .music-people-index .music-people-echo[data-echo-slot="5"] { --echo-x: 90%; --echo-y: 65%; }
+}
