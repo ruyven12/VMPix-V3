@@ -35339,3 +35339,23 @@ button.hall-crusades-archive-crystal:focus-visible {
   .admin-shell .admin-census__metrics > div:last-child { grid-column: auto; }
   .admin-shell .admin-census__controls button { flex-grow: 0; }
 }
+
+/* M3 People Index foundation: static notes, documented identity, existing scroll owner. */
+.music-people-index {
+  background: linear-gradient(180deg, rgba(4, 3, 9, .5), rgba(4, 3, 9, .62)),
+    url("/assets/media/background/zhento-melody.png") center / cover no-repeat;
+}
+.music-people-index .music-people-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.6rem, 1.6vw, .95rem); }
+.music-people-index .music-people-list > :not(.music-people-row) { grid-column: 1 / -1; }
+.music-people-index .music-people-row { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-block-size: 11rem; gap: .5rem; padding: clamp(.7rem, 2vw, 1rem); text-align: center; }
+.music-people-index :where(.music-people-row) { background: linear-gradient(180deg, rgba(238, 221, 191, .035), transparent 70%), rgba(7, 4, 12, .65); }
+.music-people-index .music-people-note { display: grid; place-items: center; flex: 0 0 auto; inline-size: 3rem; block-size: 3rem; margin-inline: auto; color: #e1c596; }
+.music-people-index .music-people-note svg { display: block; inline-size: 100%; block-size: 100%; }
+.music-people-index .music-people-row .music-people-name,
+.music-people-index .music-people-row .music-people-instrument,
+.music-people-index .music-people-row .music-people-band { inline-size: 100%; min-inline-size: 0; max-inline-size: 100%; text-align: center; overflow-wrap: anywhere; white-space: normal; line-height: 1.4; }
+.music-people-index .music-people-name { font-size: clamp(.92rem, 2.7vw, 1.08rem); color: rgba(251, 245, 236, .96); }
+.music-people-index .music-people-row .music-people-instrument { font-size: clamp(.76rem, 2.25vw, .9rem); color: rgba(245, 233, 216, .82); }
+.music-people-index .music-people-row .music-people-band { font-size: clamp(.76rem, 2.25vw, .88rem); color: rgba(234, 219, 238, .76); }
+@media (min-width: 64rem) { .music-people-index .music-people-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 90rem) { .music-people-index .music-people-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
