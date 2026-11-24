@@ -985,7 +985,7 @@ The earlier **WELCOME → RESONANCE → ECHO → EMPTINESS** framing is supersed
 | Bands | **Sources of the Pulse.** Without bands there is no music, without music no soundtrack, and without the soundtrack Zhento has no Pulse. Distinct band signals contribute to the larger soundtrack. | Pillar of Rhythm is the final Pillar name; signals are conceptual, not a fuel-production mechanism. |
 | Shows | **Convergence nexuses.** Band signals travel, intersect and synchronize into a shared moment of collective physical experience: branching signals → convergence → nexus. A matrix of sonic pathways meeting at points is possible story/visual language. | Pillar of Synchronicity is the final Pillar name; detailed story elements remain unresolved. Possible visual language does not specify effects or a Listener sequence. |
 | Venues | **Vessels of the Pulse.** Physical performance structures of different sizes and architectural identities housed convergence events. They shape sound as architectural instruments; aged or decayed structures may retain echoes or waveform remnants. This does not establish the current state of the Pillar of Harmony or every venue. | Show = event; venue = physical vessel. A structural parallel to Fields of Conflict does not authorize copying it. Pillar of Harmony is the final Pillar name; purpose, current state and Listener experience remain unresolved. |
-| People | **The Chorus** carries the soundtrack forward: participants, carriers and keepers. | Working canon / provisional name. No Hall of Fame, awards, ranking, fame, elite status or induction implied by inclusion. |
+| People | **The Chorus** carries the soundtrack forward: participants, carriers and keepers. | APPROVED experience name — PASS M2, 2026-11-24. No Hall of Fame, awards, ranking, fame, elite status or induction implied by inclusion. |
 
 ## The Four Pillars of Zhento
 
@@ -1018,6 +1018,20 @@ The earlier **WELCOME → RESONANCE → ECHO → EMPTINESS** framing is supersed
 
 **Listener experience.** The Listener begins recognizing lives within the Pulse and understands that the soundtrack was created by people, memories and individual contributions, rather than sound alone.
 
+### Pillar of Melody — approved experience design, PASS M2
+
+**APPROVED / PROTECTED — 2026-11-24, Chris's “Pillar of Melody Design Documentation” brief.** **Pillar of Melody: The People Archive. The Chorus is the approved experience name**, superseding its earlier provisional-name status.
+
+The core theme is **CONNECTION**: a **Living Archive combined with a Living Network**. Each individual represents a unique note; documented relationships form the melody; together, individuals form The Chorus. Discovery is individual first, without ranking, popularity or implied mortality. This is experience language, not a new literal Pulse mechanism or a claim about the population's fate.
+
+The Listener journey is **The Chorus** (discover individuals) → **The Note** (explore identity) → **The Resonance** (discover documented connections across Zhento) → **Legacy** (documented contributions and photography). These are discovery stages, not new routes or another arrival sequence.
+
+The [Pillar of Melody — The Chorus Experience Blueprint](ZHENTO_MELODY_BLUEPRINT.md) records the approved responsive card grid, persistent musical signatures, Tune the Chorus controls and Identity / Resonance / Legacy detail structure. Use the existing **zhento-melody.png** environment. Signature accents draw from its amber, gold, violet and rose tones without changing the protected purple Shell. **Portraits are deferred.**
+
+Preserve public inclusion rules, canonical routes, universal Pillar arrival / Back transitions, Engine Bar animation and Shell ownership. A selected signature briefly resonates within existing navigation behavior; no additional Shell, arrival screen or replacement transition system is approved.
+
+M2 records design approval only. The M1 accuracy/recovery backlog, implementation, live-data verification and final QA remain separate; the blueprint's proposed M3–M8 roadmap is not permission to implement.
+
 ### Pillar of Harmony — origin confirmed
 
 Venues began as places where the Pulse naturally resonated most clearly. Over time, these spaces became **ARCHITECTURAL INSTRUMENTS** that shaped how music was experienced.
@@ -1036,7 +1050,7 @@ Shows remain convergence nexuses: branching sonic paths meet and synchronize. Th
 
 ### Zhento design protection
 
-**PROTECTED — Final names and confirmed relationships.** Preserve Pillar of Rhythm / Bands, Pillar of Melody / People, Pillar of Harmony / Venues and Pillar of Synchronicity / Shows. These are interconnected parts of Zhento's musical mythology, not merely renamed navigation categories. Protection covers explicitly confirmed story material, not unfinished story elements. Visual implementation remains unresolved and is not protected yet. Physical form, dedicated locations and frontend presentation are not determined here.
+**PROTECTED — Final names and confirmed relationships.** Preserve Pillar of Rhythm / Bands, Pillar of Melody / People, Pillar of Harmony / Venues and Pillar of Synchronicity / Shows. These are interconnected parts of Zhento's musical mythology, not merely renamed navigation categories. Protection covers explicitly confirmed story material and approved experience decisions, not unfinished story elements. Melody's PASS M2 design is protected within its recorded scope; implementation and final QA are not established. Physical form, dedicated locations and frontend details beyond explicitly approved experience design remain unresolved.
 
 ## The Listener and the journey
 
@@ -1080,10 +1094,9 @@ All entries are **UNRESOLVED**; this consolidation answers none of them.
 8. Are sonic waves physically present, Archive visualization or intentionally ambiguous?
 9. How are genres geographically/culturally distributed?
 10. Will any Pillars have dedicated locations or sequences, and what would those locations be called? The four Pillar names are final.
-11. Is “The Chorus” the final People name?
-12. How directly does Zhento connect to Daïion?
-13. Are there additional regions, social structures or cultural groups?
-14. What history led from Zhento at its height to its quieter era? No single historical event is assumed.
+11. How directly does Zhento connect to Daïion?
+12. Are there additional regions, social structures or cultural groups?
+13. What history led from Zhento at its height to its quieter era? No single historical event is assumed.
 
 ### Unresolved Four Pillars and story questions
 
@@ -1095,9 +1108,9 @@ Confirmed names, Rhythm and Melody's narrative foundations, Harmony's origin and
 - What lies at the Heart of the Sound?
 - How literal are the Pillars physically, and how do they appear in-world?
 - Are they literal cultural principles, Archive terminology, or deliberately both?
-- How is the Listener's first encounter staged? Rhythm's felt-before-heard experience and Melody's recognition of lives are confirmed; exact arrival sequences are not.
-- Does each Pillar receive a dedicated world location or sequence?
-- What is their exact frontend presentation?
+- How is the Listener's first encounter staged beyond explicitly approved experience design? Melody's PASS M2 reuses universal arrival transitions; no additional arrival screen is approved.
+- Does each Pillar receive a dedicated world location or sequence? Melody's Living Archive / Living Network does not establish a physical location.
+- What frontend details remain beyond approved experience blueprints? Melody's M2 design is recorded; implementation and final QA remain separate.
 - What is Harmony's purpose?
 - What is Harmony's current state?
 - What is Harmony's Listener experience?
@@ -1106,7 +1119,7 @@ Confirmed names, Rhythm and Melody's narrative foundations, Harmony's origin and
 - What is Synchronicity's current state?
 - What is Synchronicity's Listener experience?
 
-All items above remain **UNRESOLVED**. The Pillars are not established as the journey's final destination. Historical idea-bucket names do not finalize regions or People names.
+All items above remain **UNRESOLVED**. The Pillars are not established as the journey's final destination. Historical idea-bucket names do not finalize regions; The Chorus name is approved by PASS M2.
 
 ## Historical Soundtrack definition — retained source record
 
