@@ -35359,3 +35359,56 @@ button.hall-crusades-archive-crystal:focus-visible {
 .music-people-index .music-people-row .music-people-band { font-size: clamp(.76rem, 2.25vw, .88rem); color: rgba(234, 219, 238, .76); }
 @media (min-width: 64rem) { .music-people-index .music-people-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 90rem) { .music-people-index .music-people-list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* M3A: Melody uses the existing Shell content viewport; only its list scrolls. */
+.site-shell[data-shell-route="music-people"] .portfolio-hub:has(> .music-nexus-shell) {
+  align-self: start;
+  width: 100%;
+  height: calc(100% - max(0px, 20px - 1rem));
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.site-shell[data-shell-route="music-people"] .music-nexus-shell {
+  grid-auto-rows: minmax(0, 1fr);
+  align-content: stretch;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+.site-shell[data-shell-route="music-people"] .portfolio-hub:has(> .music-nexus-shell)::before,
+.site-shell[data-shell-route="music-people"] .music-nexus-shell::before,
+.site-shell[data-shell-route="music-people"] .music-people-index::before {
+  content: none;
+}
+.site-shell[data-shell-route="music-people"] .music-people-index {
+  align-self: stretch;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+.site-shell[data-shell-route="music-people"] .music-people-list {
+  scrollbar-color: rgba(225, 197, 150, .5) rgba(247, 237, 216, .07);
+}
+.site-shell[data-shell-route="music-people"] .music-people-list::-webkit-scrollbar-thumb {
+  background: rgba(225, 197, 150, .5);
+}
+.site-shell[data-shell-route="music-people"] .music-people-list::-webkit-scrollbar-track {
+  background: rgba(247, 237, 216, .07);
+}
+@media (min-width: 64rem) {
+  .site-shell[data-shell-route="music-people"] .public-home:has(.music-nexus-shell) {
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+    scrollbar-gutter: auto;
+  }
+}
