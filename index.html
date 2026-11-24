@@ -2784,17 +2784,28 @@
                 <summary class="admin-api-section__summary"><h2 class="admin-api-section__title" id="admin-venue-census-title">Music Venue Photo Census</h2></summary>
                 <div class="admin-api-section__body admin-census__body">
                   <p>Verified unique photographs from the recorded venue relationships. This is separate from imports and show resolution.</p>
-                  <div class="admin-census__controls">
-                    <button class="admin-imports__refresh" type="button" data-census-check disabled>Check Status</button>
-                    <label for="admin-census-limit">Venues per batch<select id="admin-census-limit" data-census-limit><option value="5">5</option><option value="10">10</option></select></label>
-                    <button class="admin-imports__refresh" type="button" data-census-missing disabled>Refresh Missing</button>
-                    <button class="admin-imports__refresh" type="button" data-census-all disabled>Refresh All</button>
-                    <button class="admin-imports__refresh" type="button" data-census-next hidden disabled>Prepare Next Batch</button>
-                  </div>
-                  <p class="admin-census__note">Refresh Missing selects eligible venues with no previously verified census. Refresh All includes already verified qualified venues. Every batch needs its own confirmation and has a 120-second processing budget. Nothing runs automatically.</p>
+                  <section class="admin-census__overview" aria-labelledby="admin-census-overview-title">
+                    <h3 id="admin-census-overview-title">Status Overview</h3>
+                    <dl class="admin-imports__metrics admin-census__metrics" data-census-metrics></dl>
+                    <dl class="admin-census__metadata" data-census-metadata></dl>
+                  </section>
+                  <section class="admin-census__action-group" aria-labelledby="admin-census-read-title">
+                    <h3 id="admin-census-read-title">Read-only Checks</h3>
+                    <div class="admin-census__controls"><button class="admin-imports__refresh" type="button" data-census-check disabled>Check Status</button><button class="admin-imports__refresh" type="button" data-census-recent-refresh disabled>Refresh Operations</button></div>
+                  </section>
+                  <section class="admin-census__action-group" aria-labelledby="admin-census-prepare-title">
+                    <h3 id="admin-census-prepare-title">Prepare a Census Batch</h3>
+                    <div class="admin-census__controls">
+                      <label for="admin-census-limit">Venues per batch<select id="admin-census-limit" data-census-limit><option value="5">5</option><option value="10">10</option></select></label>
+                      <button class="admin-imports__refresh" type="button" data-census-missing disabled>Refresh Missing</button>
+                      <button class="admin-imports__refresh" type="button" data-census-all disabled>Refresh All</button>
+                      <button class="admin-imports__refresh" type="button" data-census-next hidden disabled>Prepare Next Batch</button>
+                    </div>
+                  </section>
+                  <p class="admin-census__note">Preview the scope before confirming a batch. Refresh Missing selects eligible venues with no previously verified census. Refresh All includes already verified qualified venues. Every batch needs its own confirmation and has a 120-second processing budget. Nothing runs automatically.</p>
                   <p class="admin-manual-import__state" role="status" aria-live="polite" data-census-state>Not checked</p>
                   <p data-census-message>Use Check Status to read the current census. Nothing loads or runs automatically.</p>
-                  <dl class="admin-imports__metrics admin-census__metrics" data-census-metrics></dl>
+
                   <div class="admin-census__confirm" data-census-confirm hidden role="group" aria-labelledby="admin-census-confirm-title">
                     <h3 id="admin-census-confirm-title" data-census-confirm-title>Confirm this batch</h3>
                     <div data-census-confirm-list></div>
@@ -2803,7 +2814,7 @@
                   <details class="admin-imports__issues" data-census-scope hidden><summary>Full Planned Venue Scope</summary><div data-census-scope-list></div></details>
                   <div class="admin-census__pending" data-census-pending></div>
                   <p class="admin-census__note">Timeouts, leaving Admin, or logout can leave an unverified outcome. Read the saved operation before any further write. No POST is automatically retried. Pending operation IDs and batch parameters are retained in this tab; credentials are never stored.</p>
-                  <details class="admin-imports__issues"><summary>Recent Operations</summary><button class="admin-imports__refresh" type="button" data-census-recent-refresh disabled>Refresh Operations</button><div data-census-recent>No operation history loaded.</div></details>
+                  <details class="admin-imports__issues"><summary>Recent Operations</summary><div data-census-recent>No operation history loaded.</div></details>
                   <details class="admin-imports__technical"><summary>Diagnostics</summary><div data-census-diagnostics>No verified diagnostic report loaded.</div></details>
                 </div>
               </details>

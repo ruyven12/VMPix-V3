@@ -35293,3 +35293,49 @@ button.hall-crusades-archive-crystal:focus-visible {
 .admin-shell .admin-census [data-census-state] { color: #e1c3cf; font-weight: 600; }
 .admin-shell .admin-census__metrics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px 18px; }
 @media (min-width: 30rem) { .admin-shell .admin-census__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Census presentation only: overview, controls and grouped source diagnostics. */
+.admin-shell .admin-census__body { font-size: 15px; line-height: 1.55; }
+.admin-shell .admin-census__overview > h3,
+.admin-shell .admin-census__action-group > h3 { margin-block: 0 12px; color: #ead9e4; font: 500 16px/1.4 var(--font-display); }
+.admin-shell .admin-census__overview { margin-block: 18px; }
+.admin-shell .admin-census__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.admin-shell .admin-census__metrics > div { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; min-inline-size: 0; min-block-size: 96px; padding: 12px; border: 1px solid #473340; background: #181019; }
+.admin-shell .admin-census__metrics > div:last-child { grid-column: 1 / -1; }
+.admin-shell .admin-census__metrics dt { color: #cbb9c8; font-size: 13px; line-height: 1.4; }
+.admin-shell .admin-census__metrics dd { margin: 0; color: #f1dfe9; font: 500 clamp(1.5rem, 4vw, 2rem)/1.15 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-census__metadata { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 14px 0 0; color: #b9aab9; font-size: 13px; }
+.admin-shell .admin-census__metadata > div { min-inline-size: 0; max-inline-size: 100%; }
+.admin-shell .admin-census__metadata dt { color: #b9aab9; }
+.admin-shell .admin-census__metadata dd { margin: 3px 0 0; color: #d7c6d2; overflow-wrap: anywhere; }
+.admin-shell .admin-census__action-group { margin-block: 16px; padding-block-start: 14px; border-block-start: 1px solid #473340; }
+.admin-shell .admin-census__controls { gap: 12px; margin-block: 10px 0; }
+.admin-shell .admin-census__controls label,
+.admin-shell .admin-census :is(button, select) { font-size: 15px; line-height: 1.4; }
+.admin-shell .admin-census__controls button { flex: 1 1 148px; padding: 10px 14px; }
+.admin-shell .admin-census__controls label { flex: 0 1 148px; }
+.admin-shell .admin-census__controls select { inline-size: 100%; }
+.admin-shell .admin-census__note { font-size: 13px; line-height: 1.55; }
+.admin-shell .admin-census__confirm { margin-block: 18px; padding: 16px; }
+.admin-shell .admin-census__confirm h3 { font-size: 16px; line-height: 1.5; }
+.admin-shell .admin-census [data-census-state] { margin-block: 16px 8px; font-size: 16px; }
+.admin-shell .admin-census [data-census-message] { margin-block: 8px 16px; }
+.admin-shell .admin-census__diagnostic-group { margin-block: 12px; border: 1px solid #473340; background: #140e16; }
+.admin-shell .admin-census__diagnostic-group > summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; min-block-size: 44px; padding: 12px; cursor: pointer; list-style: none; }
+.admin-shell .admin-census__diagnostic-group > summary::after { content: "+"; margin-inline-start: auto; color: #e6a9c3; }
+.admin-shell .admin-census__diagnostic-group[open] > summary::after { content: "-"; }
+.admin-shell .admin-census__diagnostic-group > summary::-webkit-details-marker { display: none; }
+.admin-shell .admin-census__diagnostic-group > summary:focus-visible { outline: 2px solid #e6a9c3; outline-offset: 2px; }
+.admin-shell .admin-census__diagnostic-group h4 { margin: 0; font: 500 15px/1.4 var(--font-display); color: #ead9e4; }
+.admin-shell .admin-census__group-count { color: #c8b7c5; font-size: 13px; }
+.admin-shell .admin-census__diagnostic-group > p { padding-inline: 12px; }
+.admin-shell .admin-census__diagnostic-record { min-inline-size: 0; margin-inline: 12px; padding-block: 14px; border-block-start: 1px solid #473340; }
+.admin-shell .admin-census__diagnostic-record h5 { margin: 0 0 8px; color: #e6d2df; font: 500 15px/1.5 var(--font-display); overflow-wrap: anywhere; }
+.admin-shell .admin-census__diagnostic-record p { color: #c1afbd; font-size: 13px; }
+.admin-shell .admin-census__diagnostic-record ul { margin-block: 10px 0; padding-inline-start: 20px; }
+.admin-shell .admin-census__diagnostic-record li { margin-block: 6px; color: #dccbd6; }
+@media (min-width: 60rem) {
+  .admin-shell .admin-census__metrics { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .admin-shell .admin-census__metrics > div:last-child { grid-column: auto; }
+  .admin-shell .admin-census__controls button { flex-grow: 0; }
+}

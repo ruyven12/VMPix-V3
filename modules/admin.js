@@ -3888,10 +3888,106 @@
     censusPanel.setAttribute("aria-busy", String(censusRun !== null));
   }
   function censusText(parent, tag, value) { return importText(parent, tag, value); }
-  function censusMetric(parent, label, value) {
-    const pair = document.createElement("div"); censusText(pair, "dt", label);
+  function censusMetric(parent, label, value, key = null) {
+    const pair = document.createElement("div"); if (key) pair.dataset.censusMetric = key; censusText(pair, "dt", label);
     censusText(pair, "dd", value === null || value === undefined ? "Not available" : String(value)); parent.appendChild(pair);
   }
+
+  function censusDiagnosticReason(code) {
+    const reasons = {
+      invalid_venue_identity: ["identity", "This source record has no usable venue identity."],
+      ambiguous_venue_identity: ["identity", "The recorded venue identity is ambiguous."],
+      venue_not_found: ["identity", "The requested venue was not found in the recorded source."],
+      show_missing_stable_venue_id: ["shows", "A linked show is missing its stable venue ID."],
+      show_missing_verified_set_mappings: ["shows", "A linked show has no verified set or album mappings."],
+      venue_relationships_changed_during_scan: ["shows", "Venue relationships changed during the census."],
+      unverified_album_mapping: ["albums", "An album mapping has not been verified."],
+      lineup_album_unresolved: ["albums", "A documented performer has no resolved album mapping."],
+      album_without_verified_mapping: ["albums", "An album has no verified set mapping."],
+      album_path_collision: ["albums", "An album is recorded with conflicting archive paths."],
+      album_shared_outside_venue: ["albums", "An album is also associated with another venue."],
+      provider_album_attribution_mismatch: ["albums", "The album source does not match its recorded venue mapping."],
+      prior_operation_requires_reconciliation: ["other", "A prior operation needs a read-only status check."],
+      album_scan_limit_reached: ["other", "The census reached its album limit before verification finished."],
+      scan_deadline_reached: ["other", "Verification did not finish within the processing budget."],
+      pagination_unverifiable: ["other", "The source did not provide verifiable photo-page information."],
+      album_changed_during_scan: ["other", "An album changed while its photographs were being checked."],
+      image_page_missing: ["other", "A required photo page was unavailable."],
+      pagination_incomplete: ["other", "The returned photo pages were incomplete."],
+      missing_stable_image_identity: ["other", "A photograph is missing its stable source identity."],
+      repeated_image_across_album_pages: ["other", "A source photo page repeated an image identity."],
+      unknown_media_type: ["other", "The source could not confirm whether an item is a photograph."],
+      unexpected_next_page: ["other", "The source reported another page after its stated end."],
+      next_page_missing: ["other", "The source did not supply a required next photo page."],
+      page_scan_limit_reached: ["other", "The census reached its photo-page limit."],
+      provider_request_failed: ["other", "The photograph source could not complete the request."],
+      batch_cancelled: ["other", "This census batch was interrupted."],
+      batch_deadline_reached: ["other", "The batch processing budget ended before verification finished."],
+      cancelled: ["other", "The operation was interrupted."],
+      provider_authorization_failed: ["other", "The photograph source rejected authorization."],
+      provider_limited: ["other", "The photograph source temporarily limited requests."],
+      persistence_requires_reconciliation: ["other", "The stored outcome needs a read-only operation check."],
+      operation_interrupted: ["other", "The operation ended before its remaining work was completed."],
+      batch_stopped: ["other", "The batch stopped before its remaining work was completed."],
+      unavailable_reason: ["other", "Additional census information needs review."]
+    };
+    if (["verified_within_freshness_window", "not_requested"].includes(code)) return null;
+    const value = Object.prototype.hasOwnProperty.call(reasons, code) ? reasons[code] : null;
+    return value ? { group: value[0], text: value[1] } : { group: "other", text: "Additional census information needs review." };
+  }
+  function censusDiagnosticGroups(rows) {
+    const groups = new Map([["identity", "Venue Identity"], ["shows", "Show Relationships"],
+      ["albums", "Album Relationships"], ["other", "Other Census Issues"], ["recheck", "Recheck Required"]]
+      .map(([key, title]) => [key, { key, title, records: new Map() }]));
+    rows.forEach((row, index) => {
+      const identity = row.venue_id === null ? "source:" + index : "venue:" + row.venue_id;
+      const add = (key, code, text) => {
+        const records = groups.get(key).records;
+        if (!records.has(identity)) records.set(identity, { venue_id: row.venue_id, sourcePosition: index + 1,
+          lastVerifiedAt: row.lastVerifiedAt ?? null, reasons: [], codes: [] });
+        const record = records.get(identity);
+        if (!record.reasons.includes(text)) record.reasons.push(text);
+        if (code && !record.codes.includes(code)) record.codes.push(code);
+      };
+      let issue = false;
+      [...new Set(row.reasons)].forEach(code => {
+        const reason = censusDiagnosticReason(code);
+        if (!reason) return;
+        issue = true; add(reason.group, code, reason.text);
+      });
+      if (!issue && row.category === "unavailable")
+        add("other", null, "This census is unavailable; no further reason was recorded.");
+      else if (!issue && row.lastVerifiedAt !== null && row.lastVerifiedAt !== undefined &&
+          (row.freshnessDue || row.verifiedAt === null))
+        add("recheck", null, "A previously verified census needs a fresh check.");
+    });
+    return [...groups.values()].map(group => ({ key: group.key, title: group.title, records: [...group.records.values()] }));
+  }
+  function renderCensusDiagnosticGroups(parent, rows, openGroups) {
+    censusText(parent, "p", "Counts show affected records within each group. A venue can appear in more than one group; do not add these counts together.");
+    censusDiagnosticGroups(rows).forEach(group => {
+      if (["other", "recheck"].includes(group.key) && !group.records.length) return;
+      const details = document.createElement("details"); details.className = "admin-census__diagnostic-group";
+      details.dataset.censusDiagnosticGroup = group.key; details.open = openGroups.has(group.key);
+      const summary = document.createElement("summary");
+      censusText(summary, "h4", group.title);
+      const count = censusText(summary, "span", group.records.length + (group.records.length === 1 ? " affected record" : " affected records"));
+      count.className = "admin-census__group-count"; details.appendChild(summary);
+      if (!group.records.length) censusText(details, "p", "No affected records were reported in this group.");
+      if (group.records.length > 200) censusText(details, "p", "Showing 200 of " + group.records.length + " affected records in this group.");
+      group.records.slice(0, 200).forEach(record => {
+        const item = document.createElement("article"); item.className = "admin-census__diagnostic-record";
+        item.dataset.censusDiagnosticRecord = record.venue_id === null ? "source-" + record.sourcePosition : record.venue_id;
+        censusText(item, "h5", record.venue_id === null ? "Source record " + record.sourcePosition + " — identity unavailable" :
+          (censusKnownName(record.venue_id) || "Venue name not verified") + " (" + record.venue_id + ")");
+        censusText(item, "p", "Last verified: " + formatAdminDateTime(record.lastVerifiedAt, "Not available"));
+        const list = document.createElement("ul");
+        record.reasons.forEach(text => censusText(list, "li", text)); item.appendChild(list); details.appendChild(item);
+      });
+      parent.appendChild(details);
+    });
+  }
+
   function censusKnownName(id) { return censusNames.get(id) || null; }
   function renderCensusOperation(parent, item, pending = false) {
     const card = document.createElement("article"); card.className = "admin-census__operation";
@@ -3906,23 +4002,29 @@
   }
   function renderCensus() {
     if (!censusReady) return;
+    const focusedGroup = document.activeElement?.matches("[data-census-diagnostic-group] > summary") ?
+      document.activeElement.parentElement.dataset.censusDiagnosticGroup : null;
     censusNode("state").textContent = censusRun ? censusRun.kind === "execute" ? "Census running" : "Reading census" :
       censusPending.size ? "Outcome requires verification" : censusConfirmation ? "Awaiting confirmation" : "Ready";
     censusNode("message").textContent = censusMessage;
-    const metrics = censusNode("metrics"); metrics.replaceChildren();
+    const metrics = censusNode("metrics"), metadata = censusNode("metadata");
+    metrics.replaceChildren(); metadata.replaceChildren();
     if (censusPreview) {
       const rows = censusPreview.venues, valid = rows.filter(row => row.venue_id !== null);
       const current = valid.filter(row => row.verifiedAt !== null && !row.freshnessDue).length;
-      for (const [label, value] of [["Canonical venues", censusPreview.totals.discovered], ["Current verified", current],
-        ["Eligible in this preview", valid.filter(row => row.category === "eligible").length],
-        ["Outdated or requiring recheck", valid.filter(row => row.lastVerifiedAt !== null && (row.freshnessDue || row.verifiedAt === null)).length],
-        ["Canonical unavailable", valid.filter(row => row.category === "unavailable").length],
-        ["Invalid source rows", rows.filter(row => row.venue_id === null).length],
+      for (const [key, label, value] of [["canonical", "Canonical Venues", censusPreview.totals.discovered], ["verified", "Verified", current],
+        ["eligible", "Eligible", valid.filter(row => row.category === "eligible").length],
+        ["recheck", "Recheck Required", valid.filter(row => row.lastVerifiedAt !== null && (row.freshnessDue || row.verifiedAt === null)).length],
+        ["unavailable", "Unavailable", valid.filter(row => row.category === "unavailable").length]]) censusMetric(metrics, label, value, key);
+      for (const [label, value] of [["Invalid source rows", rows.filter(row => row.venue_id === null).length],
         ["Source rows", censusPreview.totals.sourceRows],
-        ["Last completed census", formatAdminDateTime(censusPreview.totals.lastCompletedAt, "Not available")]]) censusMetric(metrics, label, value);
-    } else censusMetric(metrics, "Census status", null);
-    censusMetric(metrics, "Active operations at last check", censusDiscovery ? censusDiscovery.active.length + (censusDiscovery.hasMore.active ? "+" : "") : null);
-    censusMetric(metrics, "Last checked", formatAdminDateTime(censusCheckedAt, "Not checked"));
+        ["Latest verification", formatAdminDateTime(censusPreview.totals.lastCompletedAt, "Not available")]]) censusMetric(metadata, label, value);
+    } else {
+      [["canonical", "Canonical Venues"], ["verified", "Verified"], ["eligible", "Eligible"],
+        ["recheck", "Recheck Required"], ["unavailable", "Unavailable"]].forEach(([key, label]) => censusMetric(metrics, label, null, key));
+    }
+    censusMetric(metadata, "Active operations at last check", censusDiscovery ? censusDiscovery.active.length + (censusDiscovery.hasMore.active ? "+" : "") : null);
+    censusMetric(metadata, "Last checked", formatAdminDateTime(censusCheckedAt, "Not checked"));
     const pending = censusNode("pending"); pending.replaceChildren();
     if (!censusStorageHealthy) censusText(pending, "p", "Operation recovery storage is unavailable. Census writes are blocked; read-only checks remain available.");
     [...censusPending.values()].forEach(item => renderCensusOperation(pending, item, true));
@@ -3933,22 +4035,10 @@
       if (censusDiscovery.hasMore.active || censusDiscovery.hasMore.recent)
         censusText(recent, "p", "This operation history is limited. Older or additional operations may exist.");
     } else censusText(recent, "p", "Use Check Status or Refresh Operations to read recorded operations.");
-    const diagnostics = censusNode("diagnostics"); diagnostics.replaceChildren();
-    if (censusPreview) {
-      const reasons = new Map();
-      censusPreview.venues.forEach(row => row.reasons.forEach(reason => reasons.set(reason, (reasons.get(reason) || 0) + 1)));
-      reasons.forEach((amount, reason) => censusText(diagnostics, "p", reason + ": " + amount));
-      const unresolved = censusPreview.venues.filter(row => row.venue_id && (row.category === "unavailable" ||
-        row.lastVerifiedAt !== null && (row.freshnessDue || row.verifiedAt === null)));
-      censusText(diagnostics, "p", "Invalid source rows: " + censusPreview.venues.filter(row => row.venue_id === null).length);
-      unresolved.slice(0, 200).forEach(row => {
-        const item = document.createElement("article"); item.className = "admin-census__operation";
-        censusText(item, "h4", (censusKnownName(row.venue_id) || "Venue name not verified") + " (" + row.venue_id + ")");
-        censusText(item, "p", "Last verified: " + formatAdminDateTime(row.lastVerifiedAt, "Not available"));
-        row.reasons.forEach(reason => censusText(item, "p", reason)); diagnostics.appendChild(item);
-      });
-      if (unresolved.length > 200) censusText(diagnostics, "p", "Showing the first 200 unresolved venue diagnostics.");
-    }
+    const diagnostics = censusNode("diagnostics");
+    const openGroups = new Set([...diagnostics.querySelectorAll("[data-census-diagnostic-group][open]")].map(node => node.dataset.censusDiagnosticGroup));
+    diagnostics.replaceChildren();
+    if (censusPreview) renderCensusDiagnosticGroups(diagnostics, censusPreview.venues, openGroups);
     if (censusDetail) {
       censusText(diagnostics, "h4", censusDetail.operationId + " · " + censusDetail.status);
       censusText(diagnostics, "p", "Provider requests: " + (censusDetail.providerRequests ?? "Not available") +
@@ -3957,7 +4047,7 @@
       censusDetail.results.filter(row => selected.has(row.venue_id)).forEach(row => {
         censusText(diagnostics, "p", (censusKnownName(row.venue_id) || "Venue name not verified") + " (" + row.venue_id + ") · " +
           row.status + " · Photographs: " + (row.total ?? "Not available"));
-        row.reasons.forEach(reason => censusText(diagnostics, "p", reason));
+        row.reasons.forEach(code => { const reason = censusDiagnosticReason(code); if (reason) censusText(diagnostics, "p", reason.text); });
       });
       censusDetail.parameters.venueIds.filter(id => !censusDetail.selectedVenueIds.includes(id)).forEach(id =>
         censusText(diagnostics, "p", (censusKnownName(id) || "Venue name not verified") + " (" + id + ") · Not selected; no execution reported for this requested venue."));
@@ -3977,6 +4067,12 @@
       censusConfirmation.parameters.venueIds.forEach(id => censusText(confirmList, "p", censusKnownName(id) + " — " + id));
     }
     updateCensusControls();
+    if (focusedGroup && censusAllowed() && document.activeElement === document.body) {
+      const equivalent = [...diagnostics.querySelectorAll("[data-census-diagnostic-group]")].find(node =>
+        node.dataset.censusDiagnosticGroup === focusedGroup)?.querySelector("summary");
+      const summary = equivalent || diagnostics.parentElement?.querySelector("summary");
+      if (summary?.getClientRects().length) summary.focus({ preventScroll: true });
+    }
   }
   function projectCensusPreview(data) {
     if (!diagnosticObject(data) || data.ok !== true || data.mode !== "dry-run" || data.readOnly !== true ||

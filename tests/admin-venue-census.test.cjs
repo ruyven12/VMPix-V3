@@ -36,7 +36,7 @@ function operation(selected = ids) {
 }
 const functions = ["parseAdminTimestamp", "censusId", "censusOperationId", "censusSame", "censusStamp", "censusParameters",
   "readCensusPending", "saveCensusPending", "projectCensusPreview", "projectCensusOperation", "projectCensusDiscovery",
-  "censusMatches", "censusTerminal", "censusClean", "censusReadOperation", "censusReadStatus"];
+  "censusMatches", "censusTerminal", "censusClean", "censusReadOperation", "censusReadStatus", "censusDiagnosticReason", "censusDiagnosticGroups", "renderCensusDiagnosticGroups"];
 function harness(raw = null) {
   let stored = raw, writes = 0;
   const context = vm.createContext({
@@ -171,4 +171,103 @@ test("resolved partial or stopped batch cancels its old plan instead of proposin
   h.context.censusRequest = async () => { const raw = operation(ids.slice(0, 2)); raw.status = "stopped"; return raw; };
   await h.api.censusReadOperation({}, "venue-test");
   assert.equal(h.api.censusPending.size, 0); assert.equal(h.api.plan(), null);
+});
+
+test("diagnostic explanations classify identities, shows and albums without exposing raw codes", () => {
+  const { api } = harness();
+  for (const [code, group] of [["invalid_venue_identity", "identity"], ["ambiguous_venue_identity", "identity"],
+    ["show_missing_stable_venue_id", "shows"], ["show_missing_verified_set_mappings", "shows"],
+    ["venue_relationships_changed_during_scan", "shows"], ["unverified_album_mapping", "albums"],
+    ["lineup_album_unresolved", "albums"], ["album_path_collision", "albums"],
+    ["album_shared_outside_venue", "albums"], ["provider_album_attribution_mismatch", "albums"]]) {
+    const result = api.censusDiagnosticReason(code);
+    assert.equal(result.group, group); assert(result.text.length > 10);
+    assert(!result.text.includes(code)); assert(!result.text.includes("_"));
+  }
+  assert.equal(api.censusDiagnosticReason("verified_within_freshness_window"), null);
+  assert.equal(api.censusDiagnosticReason("not_requested"), null);
+  assert.equal(api.censusDiagnosticReason("constructor").group, "other");
+});
+test("diagnostic group counts deduplicate reasons per record and preserve intentional cross-group overlap", () => {
+  const { api } = harness();
+  const row = (venue_id, reasons) => ({ venue_id, reasons, category: "unavailable", lastVerifiedAt: null, verifiedAt: null, freshnessDue: true });
+  const rows = [
+    row("mv_show", ["show_missing_stable_venue_id", "show_missing_verified_set_mappings", "show_missing_stable_venue_id"]),
+    row("mv_album", ["unverified_album_mapping", "lineup_album_unresolved"]),
+    row("mv_both", ["show_missing_stable_venue_id", "album_path_collision"]),
+    row("mv_other", ["prior_operation_requires_reconciliation"]),
+    row(null, ["invalid_venue_identity"]), row(null, ["invalid_venue_identity"])
+  ];
+  const unchanged = JSON.stringify(rows);
+  const groups = api.censusDiagnosticGroups(rows), group = key => groups.find(item => item.key === key);
+  assert.equal(group("identity").records.length, 2);
+  assert.equal(group("shows").records.length, 2);
+  assert.equal(group("albums").records.length, 2);
+  assert.equal(group("other").records.length, 1);
+  assert.equal(group("shows").records.find(item => item.venue_id === "mv_show").reasons.length, 2);
+  assert.equal(group("shows").records.find(item => item.venue_id === "mv_show").codes.length, 2);
+  assert(group("shows").records.some(item => item.venue_id === "mv_both"));
+  assert(group("albums").records.some(item => item.venue_id === "mv_both"));
+  assert.equal(new Set([...group("shows").records, ...group("albums").records].map(item => item.venue_id)).size, 3);
+  assert.equal(JSON.stringify(rows), unchanged);
+});
+test("invalid identities stay distinct source positions without inventing venue names or IDs", () => {
+  const { api } = harness();
+  const rows = [{ venue_id: "mv_valid", category: "eligible", reasons: [], lastVerifiedAt: null },
+    { venue_id: null, category: "unavailable", reasons: ["invalid_venue_identity"] },
+    { venue_id: null, category: "unavailable", reasons: ["invalid_venue_identity"] }];
+  const records = api.censusDiagnosticGroups(rows).find(group => group.key === "identity").records;
+  assert.equal(records.length, 2); assert(records.every(row => row.venue_id === null));
+  assert.equal(JSON.stringify(records.map(row => row.sourcePosition)), JSON.stringify([2, 3]));
+  assert(records.every(row => !Object.hasOwn(row, "venue") && !Object.hasOwn(row, "name")));
+});
+test("current verification and unselected status are not diagnostic issues; stale verification remains visible", () => {
+  const { api } = harness();
+  const groups = api.censusDiagnosticGroups([
+    { venue_id: "mv_current", category: "skipped", reasons: ["verified_within_freshness_window"], lastVerifiedAt: NOW, verifiedAt: NOW, freshnessDue: false },
+    { venue_id: "mv_unselected", category: "skipped", reasons: ["not_requested"], lastVerifiedAt: null, verifiedAt: null, freshnessDue: true },
+    { venue_id: "mv_stale", category: "eligible", reasons: [], lastVerifiedAt: NOW, verifiedAt: null, freshnessDue: true }
+  ]);
+  assert.equal(groups.find(group => group.key === "recheck").records.length, 1);
+  assert.equal(groups.find(group => group.key === "recheck").records[0].venue_id, "mv_stale");
+  assert(groups.filter(group => group.key !== "recheck").every(group => group.records.length === 0));
+});
+test("additional actual issues and unavailable records without supplied reasons remain visible", () => {
+  const { api } = harness();
+  const rows = [
+    { venue_id: "mv_future", category: "unavailable", reasons: ["future_reason"], lastVerifiedAt: null },
+    { venue_id: "mv_unavailable", category: "unavailable", reasons: [], lastVerifiedAt: null }
+  ];
+  const group = api.censusDiagnosticGroups(rows).find(group => group.key === "other");
+  assert.equal(group.records.length, 2);
+  assert.equal(group.records[0].codes[0], "future_reason");
+  assert(group.records.every(row => row.reasons.length > 0 && row.reasons.every(text => !text.includes("_"))));
+});
+test("repeated canonical entries cannot inflate one diagnostic group", () => {
+  const { api } = harness();
+  const group = api.censusDiagnosticGroups([
+    { venue_id: "mv_same", category: "unavailable", reasons: ["unverified_album_mapping"], lastVerifiedAt: null },
+    { venue_id: "mv_same", category: "unavailable", reasons: ["lineup_album_unresolved"], lastVerifiedAt: null }
+  ]).find(group => group.key === "albums");
+  assert.equal(group.records.length, 1); assert.equal(group.records[0].reasons.length, 2);
+});
+
+test("large diagnostic groups keep full counts while rendering a disclosed bounded record list", () => {
+  const h = harness();
+  const node = tag => ({ tag, dataset: {}, children: [], textContent: "", appendChild(child) { this.children.push(child); return child; } });
+  h.context.document = { createElement: node };
+  h.context.censusKnownName = () => "Recorded venue";
+  h.context.formatAdminDateTime = () => "Not available";
+  h.context.censusText = (parent, tag, text) => { const child = node(tag); child.textContent = text; return parent.appendChild(child); };
+  const rows = Array.from({ length: 205 }, (_, i) => ({ venue_id: "mv_large_" + i, category: "unavailable",
+    reasons: ["show_missing_stable_venue_id"], lastVerifiedAt: null }));
+  const groups = h.api.censusDiagnosticGroups(rows);
+  assert.equal(groups.find(group => group.key === "shows").records.length, 205);
+  const parent = node("div");
+  h.api.renderCensusDiagnosticGroups(parent, rows, new Set());
+  const rendered = parent.children.find(child => child.dataset.censusDiagnosticGroup === "shows");
+  assert(rendered);
+  assert.equal(rendered.children.filter(child => child.tag === "article").length, 200);
+  assert(rendered.children.some(child => child.tag === "p" && child.textContent.includes("Showing 200 of 205")));
+  assert(rendered.children[0].children.some(child => child.textContent === "205 affected records"));
 });
