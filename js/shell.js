@@ -6044,11 +6044,12 @@ function cancelZhentoRhythmEntry() {
   }
   updatePrototypeEngineReturnEmitter(getRouteFromUrl());
   if (getRouteFromUrl().name === "music-bands") startRhythmArrival();
+  if (getRouteFromUrl().name === "music-people") syncMusicPeopleSignatureMotion();
 }
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
   const destination = landing?.dataset.selectedDestination;
-  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows", "venues"].includes(destination)) return;
+  if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows", "venues", "people"].includes(destination)) return;
   if (destination === "venues") {
     navigateToRoute(routePaths.musicVenues);
     return;
@@ -6058,8 +6059,8 @@ function startZhentoRhythmEntry() {
   const right = engine?.querySelector(".portfolio-engine-reactor");
   if (!left || !right) return;
   const entry = { timers: [], retirements: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false,
-    url: destination === "shows" ? routePaths.musicShows : routePaths.musicBands,
-    routeName: destination === "shows" ? "music-shows" : "music-bands" };
+    url: destination === "shows" ? routePaths.musicShows : destination === "people" ? routePaths.musicPeople : routePaths.musicBands,
+    routeName: destination === "shows" ? "music-shows" : destination === "people" ? "music-people" : "music-bands" };
   zhentoRhythmEntry = entry;
   shell.dataset.zhentoRhythmEntry = "accepted";
   shell.inert = true;
@@ -6085,6 +6086,7 @@ function startZhentoRhythmEntry() {
   };
   // Reuse each destination's existing request/cache without waiting on its response.
   if (destination === "shows") requestMusicShowsIndexData();
+  else if (destination === "people") requestMusicPeopleIndexData();
   else requestMusicBandsIndexData();
   if (reducedMotion.matches) {
     try { promote(); } finally { cancelZhentoRhythmEntry(); }
@@ -6204,7 +6206,7 @@ function selectZhentoPillar(landing, key) {
   pulse.querySelectorAll("[data-zhento-destination]").forEach((tile) => tile.setAttribute("aria-pressed", String(selected && tile.dataset.zhentoDestination === key)));
   landing.querySelectorAll("[data-zhento-stat]").forEach((row) => row.setAttribute("aria-current", String(selected && row.dataset.zhentoStat === key)));
   const enter = pulse.querySelector(".zhento-enter");
-  enter.disabled = !selected || !["bands", "shows", "venues"].includes(key);
+  enter.disabled = !selected || !["bands", "shows", "venues", "people"].includes(key);
   enter.setAttribute("aria-label", enter.disabled ? "Enter the Archive - not available yet" : "Enter the Archive");
   if (selected) {
     startZhentoPillarIdentity(landing, key);
