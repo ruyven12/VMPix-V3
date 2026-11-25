@@ -15448,6 +15448,8 @@ function clearMusicPeopleLoadingPresentation() {
   if (!current) return;
   musicPeopleLoadingPresentation = null;
   cancelAnimationFrame(current.frame);
+  window.clearTimeout(current.timer);
+  musicPeopleList.inert = current.wasListInert;
   current.resize?.disconnect();
   current.owner?.disconnect();
   current.cleanup.forEach(remove => remove());
@@ -15493,41 +15495,61 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
   if (!isLoading) {
     if (!current) return;
     const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
-    if (filters) filters.inert = false;
-    if (current.phase === "leaving" && sameOwner && hasContent) return;
-    if (!sameOwner || !hasContent || reducedMotion.matches || !current.painted
-      || getRouteFromUrl().name !== "music-people" || !current.layer.isConnected
-      || typeof current.layer.animate !== "function" || typeof musicPeopleList.animate !== "function") {
+    if (!sameOwner || !hasContent || reducedMotion.matches || !current.painted || !current.canPresent()
+      || !current.layer.isConnected || typeof current.layer.animate !== "function" || typeof musicPeopleList.animate !== "function") {
       clearMusicPeopleLoadingPresentation();
       return;
     }
-    current.phase = "leaving";
-    musicPeopleIndex.dataset.peopleLoading = "leaving";
-    current.layer.setAttribute("aria-hidden", "true");
-    current.layer.removeAttribute("role");
-    current.layer.removeAttribute("aria-live");
-    try {
-      current.animations.push(current.layer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "both" }));
-      current.animations.push(musicPeopleList.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out", fill: "both" }));
-      Promise.all(current.animations.map(animation => animation.finished)).then(() => {
-        if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
-      }, () => {
-        if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
-      });
-    } catch { clearMusicPeopleLoadingPresentation(); }
+    musicPeopleList.inert = current.phase === "leaving" ? current.wasListInert : true;
+    if (filters) filters.inert = current.phase !== "leaving";
+    if (current.phase === "holding" || current.phase === "leaving") return;
+    current.phase = "holding";
+    musicPeopleIndex.dataset.peopleLoading = "holding";
+    const begin = () => {
+      current.timer = 0;
+      if (musicPeopleLoadingPresentation !== current) return;
+      if (v3RouteContext !== current.context || reducedMotion.matches || !current.canPresent()) {
+        clearMusicPeopleLoadingPresentation();
+        return;
+      }
+      current.phase = "leaving";
+      musicPeopleIndex.dataset.peopleLoading = "leaving";
+      musicPeopleList.inert = current.wasListInert;
+      const activeFilters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+      if (activeFilters) activeFilters.inert = false;
+      current.layer.setAttribute("aria-hidden", "true");
+      current.layer.removeAttribute("role");
+      current.layer.removeAttribute("aria-live");
+      try {
+        current.animations.push(current.layer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1200, easing: "ease-out", fill: "both" }));
+        current.animations.push(musicPeopleList.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1200, easing: "ease-out", fill: "both" }));
+        Promise.all(current.animations.map(animation => animation.finished)).then(() => {
+          if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
+        }, () => {
+          if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
+        });
+      } catch { clearMusicPeopleLoadingPresentation(); }
+    };
+    const remaining = Math.max(0, 1500 - (performance.now() - current.visibleAt));
+    if (remaining) current.timer = window.setTimeout(begin, remaining);
+    else begin();
     return;
   }
   if (v3RouteContext.route?.name !== "music-people") { clearMusicPeopleLoadingPresentation(); return; }
   if (current && (!sameOwner || current.phase !== "loading")) clearMusicPeopleLoadingPresentation();
   if (!musicPeopleLoadingPresentation) {
     const layer = createMusicPeopleLoadingMotif();
-    const state = { layer, context: v3RouteContext, phase: "loading", painted: false, frame: 0, cleanup: [], animations: [] };
+    const state = { layer, context: v3RouteContext, phase: "loading", painted: false, visibleAt: 0, frame: 0, timer: 0,
+      wasListInert: Boolean(musicPeopleList.inert), cleanup: [], animations: [] };
     musicPeopleLoadingPresentation = state;
     musicPeopleIndex.appendChild(layer);
     const ownsView = () => musicPeopleLoadingPresentation === state && v3RouteContext === state.context
       && v3RouteContext.route?.name === "music-people" && musicPeopleIndex.classList.contains("is-active")
       && musicPeopleIndex.getAttribute("aria-hidden") !== "true"
       && musicNexusShell?.getAttribute("aria-hidden") !== "true" && !musicNexusShell?.hasAttribute("inert");
+    state.canPresent = () => ownsView() && getRouteFromUrl().name === "music-people" && !document.hidden && !shell.inert
+      && !document.documentElement.hasAttribute("data-v3-booting")
+      && !musicPeopleIndex.closest('[hidden], [inert], [aria-hidden="true"]');
     const schedulePaint = () => {
       if (state.painted || state.frame || state.phase !== "loading") return;
       state.frame = requestAnimationFrame(() => {
@@ -15535,8 +15557,10 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
         if (musicPeopleLoadingPresentation !== state || state.phase !== "loading") return;
         state.frame = requestAnimationFrame(() => {
           state.frame = 0;
-          if (ownsView() && getRouteFromUrl().name === "music-people" && !document.hidden && !shell.inert
-            && !document.documentElement.hasAttribute("data-v3-booting")) state.painted = true;
+          if (state.canPresent()) {
+            state.painted = true;
+            state.visibleAt = performance.now();
+          }
         });
       });
     };
@@ -15562,7 +15586,7 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
     if (typeof MutationObserver === "function") {
       state.owner = new MutationObserver(() => {
         if (musicPeopleLoadingPresentation !== state) return;
-        if (!ownsView()) clearMusicPeopleLoadingPresentation();
+        if (!ownsView() || (state.phase !== "loading" && !state.canPresent())) clearMusicPeopleLoadingPresentation();
         else position();
       });
       for (let node = musicPeopleIndex; node; node = node.parentElement) {
@@ -15570,13 +15594,21 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
       }
     }
     const onMotion = () => {
-      if (reducedMotion.matches && state.phase === "leaving" && musicPeopleLoadingPresentation === state) clearMusicPeopleLoadingPresentation();
+      if (reducedMotion.matches && state.phase !== "loading" && musicPeopleLoadingPresentation === state) clearMusicPeopleLoadingPresentation();
     };
     reducedMotion.addEventListener?.("change", onMotion);
     state.cleanup.push(() => reducedMotion.removeEventListener?.("change", onMotion));
+    const onVisibility = () => {
+      if (musicPeopleLoadingPresentation !== state) return;
+      if (document.hidden && state.phase !== "loading") clearMusicPeopleLoadingPresentation();
+      else if (!document.hidden && state.phase === "loading") position();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    state.cleanup.push(() => document.removeEventListener("visibilitychange", onVisibility));
     position();
   }
   musicPeopleIndex.dataset.peopleLoading = "loading";
+  musicPeopleList.inert = true;
   setMusicPeopleTuningOpen(false);
   const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
   if (filters) filters.inert = true;
