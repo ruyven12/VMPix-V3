@@ -4930,7 +4930,42 @@ function createMusicVenuePhotoHighlightsGrid(state) {
     image.alt = "";
     image.loading = "lazy";
     image.decoding = "async";
-    image.addEventListener("error", () => { image.src = galleryImageFallbackSrc; }, { once: true });
+    image.dataset.venueThumbnailState = "loading";
+    let generation = 0, pendingSource = "", revealedSource = "", fade = null;
+    const reveal = async () => {
+      const source = image.currentSrc || image.src;
+      if (!source || pendingSource === source || revealedSource === source) return;
+      const current = ++generation;
+      pendingSource = source;
+      image.dataset.venueThumbnailState = "decoding";
+      try {
+        await Promise.resolve().then(() => typeof image.decode === "function" ? image.decode() : undefined);
+      } catch { /* A loaded, usable image remains displayable after a decode rejection. */ }
+      if (current !== generation) return;
+      pendingSource = "";
+      if (source !== (image.currentSrc || image.src) || !image.complete || image.naturalWidth <= 0) return;
+      revealedSource = source;
+      image.dataset.venueThumbnailState = "ready";
+      image.classList.add("is-venue-photo-ready");
+      if (image.isConnected && !reducedMotion.matches && typeof image.animate === "function") {
+        try {
+          fade = image.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: "ease-out" });
+        } catch { /* The ready image is the static fallback when animation is unavailable. */ }
+      }
+    };
+    image.addEventListener("load", reveal);
+    image.addEventListener("error", () => {
+      generation += 1;
+      pendingSource = "";
+      revealedSource = "";
+      fade?.cancel();
+      image.classList.remove("is-venue-photo-ready");
+      image.dataset.venueThumbnailState = "failed";
+    });
+    image.addEventListener("error", () => {
+      image.dataset.venueThumbnailState = "loading";
+      image.src = galleryImageFallbackSrc;
+    }, { once: true });
     protectArchiveImage(image);
     image.src = photo.imageSrc;
     button.append(image);
@@ -4938,6 +4973,7 @@ function createMusicVenuePhotoHighlightsGrid(state) {
       openMusicVenuePhotoHighlightsLightbox(state, index, event.currentTarget, beginArchiveAnalytics(event));
     });
     grid.append(button);
+    if (image.complete && image.naturalWidth > 0) void reveal();
   });
   return grid;
 }

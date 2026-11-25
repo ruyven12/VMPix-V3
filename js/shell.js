@@ -4829,7 +4829,8 @@ function updateShellRouteContext(route = getRouteFromUrl(), targetName = "") {
     setPortfolioEngineHudCurrentView(route.name === "band-detail" ? getBandDetailEngineTitle(route.bandId) : route.name === "music-bands" ? "Pillar of Rhythm" : "Outskirts of Zhento");
   }
   if (route.name === "music-shows") setPortfolioEngineHudCurrentView("Pillar of Synchronicity");
-  syncHarmonyEngineTitle(route.name === "music-venues");
+  if (route.name === "music-venues" && zhentoRhythmEntry?.routeName === "music-venues") setPortfolioEngineHudCurrentView(HARMONY_ENGINE_TITLES[0]);
+  syncHarmonyEngineTitle(route.name === "music-venues" && zhentoRhythmEntry?.routeName !== "music-venues");
   if (legacyEngine && route.name !== "music-venues") setPortfolioEngineHudCurrentView(currentView?.textContent || getShellBackLabel(route.canonicalUrl));
   shell.dataset.shellModule = moduleContext;
   shell.classList.toggle("is-home-route", isHomeRoute);
@@ -6045,22 +6046,19 @@ function cancelZhentoRhythmEntry() {
   updatePrototypeEngineReturnEmitter(getRouteFromUrl());
   if (getRouteFromUrl().name === "music-bands") startRhythmArrival();
   if (getRouteFromUrl().name === "music-people") syncMusicPeopleSignatureMotion();
+  if (getRouteFromUrl().name === "music-venues") syncHarmonyEngineTitle(true);
 }
 function startZhentoRhythmEntry() {
   const landing = document.querySelector("[data-zhento-landing]");
   const destination = landing?.dataset.selectedDestination;
   if (isWorldLandingInteractionBlocked("zhento") || zhentoRhythmEntry || getRouteFromUrl().name !== "music" || !["bands", "shows", "venues", "people"].includes(destination)) return;
-  if (destination === "venues") {
-    navigateToRoute(routePaths.musicVenues);
-    return;
-  }
   const engine = document.querySelector("[data-portfolio-engine]");
   const left = engine?.querySelector(".portfolio-engine-left-core");
   const right = engine?.querySelector(".portfolio-engine-reactor");
   if (!left || !right) return;
   const entry = { timers: [], retirements: [], layer: null, wasInert: shell.inert, promoting: false, promoted: false,
-    url: destination === "shows" ? routePaths.musicShows : destination === "people" ? routePaths.musicPeople : routePaths.musicBands,
-    routeName: destination === "shows" ? "music-shows" : destination === "people" ? "music-people" : "music-bands" };
+    url: destination === "shows" ? routePaths.musicShows : destination === "people" ? routePaths.musicPeople : destination === "venues" ? routePaths.musicVenues : routePaths.musicBands,
+    routeName: destination === "shows" ? "music-shows" : destination === "people" ? "music-people" : destination === "venues" ? "music-venues" : "music-bands" };
   zhentoRhythmEntry = entry;
   shell.dataset.zhentoRhythmEntry = "accepted";
   shell.inert = true;
@@ -6087,7 +6085,7 @@ function startZhentoRhythmEntry() {
   // Reuse each destination's existing request/cache without waiting on its response.
   if (destination === "shows") requestMusicShowsIndexData();
   else if (destination === "people") requestMusicPeopleIndexData();
-  else requestMusicBandsIndexData();
+  else if (destination === "bands") requestMusicBandsIndexData();
   if (reducedMotion.matches) {
     try { promote(); } finally { cancelZhentoRhythmEntry(); }
     return;

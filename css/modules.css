@@ -35674,3 +35674,10 @@ button.hall-crusades-archive-crystal:focus-visible {
 /* Let the real lane stack size the scene before its footer. */
 .music-people-index .music-people-echoes { grid-template-rows: auto minmax(min-content, 1fr) auto; }
 .music-people-index .music-people-staff[data-lane-count="3"] { grid-template-rows: repeat(3, minmax(12rem, 1fr)); }
+
+/* Dossier thumbnail readiness only; shared lightbox images keep their existing presentation. */
+.venue-photo-highlight-thumbnail img { opacity: 0; }
+.venue-photo-highlight-thumbnail img.is-venue-photo-ready { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .venue-photo-highlight-thumbnail img.is-venue-photo-ready { opacity: 1 !important; }
+}
